@@ -1,0 +1,16 @@
+{
+  "name": "cycley",
+  "version": "1.0.0",
+  "description": "Cycley App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Edward Gonzalez",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^10.12.21",
+    "ajv": "^6.8.1",
+    "colors": "^1.3.3"
+  }
+}

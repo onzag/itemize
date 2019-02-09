@@ -1,0 +1,18 @@
+{
+	"type": "item",
+  "properties": [
+		{
+			"id": "speeds",
+			"type": "number",
+			"default": 10,
+			"min": 1,
+			"max": 14
+		},
+		{
+			"id": "links",
+			"type": "number",
+			"default": 106,
+			"min": 20
+		}
+	]
+}

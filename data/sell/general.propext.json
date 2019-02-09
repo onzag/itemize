@@ -1,0 +1,16 @@
+[
+  {
+    "id": "manufacturer",
+    "type": "string",
+    "autocomplete": "manufacturer",
+    "nullable": true
+  },
+  {
+    "id": "year",
+    "type": "year"
+  },
+  {
+    "id": "condition",
+    "values": ["new", "excellent", "good", "donor", "scrap"]
+  }
+]

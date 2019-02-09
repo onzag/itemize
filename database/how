@@ -1,0 +1,43 @@
+So we have two types of things for tables...
+
+1. items
+2. autocomplete lists
+3. Users
+
+All items come in standard, they have an unique id, a non unique id for referred values
+for the last active item, a deleted date (nullable), a creator id, a date of creation, an edited date (nullable), and edited by,
+remember that the originals get marked as deleted content.
+
+All items have all their information required in their same table, even if they are
+compounded of many other items, this is for simplicity and to avoid table joins, as so,
+information gets reduced and we avoid exceptions.
+
+All items are queryable by any property including the ones that sink deep, all but but active, edited date, and deleted,
+deleted items, only accessible by specifying (specifying the non unique id) by admins, and maybe not by special rules, special rules,
+might be set later.
+
+Special rules can be set by taking and endpoint and setting a custom rule for that one.
+
+In order for the system to know how to use the endpoints for creation and modification of items,
+you need to provide a signed JSON token that must match the given signature in the server,
+this json token should contain
+
+  id: user id
+  permissions:
+    deletedSearch
+    editOnBehalf
+    deleteOnBehalf
+
+All actions have triggers, so say if the creation of an item can warn someone (send them a message),
+you might create a creation trigger, whether conditional or not.
+
+GDPR nuke
+
+Send a signed GDPR nuke token in order to destroy an user.
+
+  id: user id
+  nuke: true
+
+It will delete every item from the user, all text fields will be set to "",
+locations will be set to null, the item will remain not to break other users
+experience.

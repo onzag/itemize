@@ -1,0 +1,38 @@
+{
+  "type": "item",
+  "properties": [
+    {
+			"id": "category",
+			"type": "string",
+			"autocomplete": "category",
+			"autocompleteIsEnforced": true
+		},
+    {
+			"id": "topic",
+			"type": "string",
+			"autocomplete": "topics",
+      "autocompleteSetFromProperty": "category",
+			"autocompleteIsEnforced": true
+		},
+    {
+			"id": "parentItemType",
+			"type": "string",
+			"nullable": true,
+      "hidden": true
+		},
+    {
+			"id": "parentId",
+			"type": "number",
+			"nullable": true,
+      "hidden": true
+		},
+    {
+      "id": "title",
+      "type": "text"
+    },
+    {
+      "id": "content",
+      "type": "text"
+    }
+  ]
+}
