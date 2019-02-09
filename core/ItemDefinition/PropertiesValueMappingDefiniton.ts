@@ -28,9 +28,9 @@ export default class PropertiesValueMappingDefiniton {
     this.parentItemDefinition = parentItemDefinition;
     this.referredItemDefinition = referredItemDefinition;
   }
-  static schema;
-  static schema_validate;
-  static check;
+  static schema:any;
+  static schema_validate:any;
+  static check:any;
 }
 
 if (process.env.NODE_ENV !== "production") {

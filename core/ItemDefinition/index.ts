@@ -5,14 +5,15 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export default class ItemDefinition {
-  constructor(data){
+  constructor(){
 
   }
-  hasItemDefinitionFor(name: string){
-
+  
+  hasItemDefinitionFor(name: string):boolean{
+    return false;
   }
   hasProperty(name: string){
-
+    return false;
   }
   getPropertyValue(name: string):string | boolean | number {
     return null;

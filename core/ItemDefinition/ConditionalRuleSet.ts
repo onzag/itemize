@@ -58,9 +58,9 @@ export default class ConditionalRuleSet {
     this.parent = parent;
     this.parentItemDefinition = parentItemDefinition;
   }
-  static schema;
-  static schema_validate;
-  static check;
+  static schema:any;
+  static schema_validate:any;
+  static check:any;
 
   evaluate(){
     if (this.property){
