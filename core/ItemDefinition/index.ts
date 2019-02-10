@@ -8,17 +8,25 @@ export default class ItemDefinition {
   constructor(){
 
   }
-  
+
+  addOnStateChangeListener(listener: ()=>any):void {
+    
+  }
+
   hasItemDefinitionFor(name: string):boolean{
     return false;
   }
-  hasProperty(name: string){
+  getItemDefinitionFor(name: string):any{
+    return null;
+  }
+  hasPropertyDefinitionFor(name: string){
     return false;
   }
-  getPropertyValue(name: string):string | boolean | number {
+  getPropertyDefinitionFor(name: string):any{
     return null;
   }
   getItemInstances(name: string):Array<any> {
     return [];
   }
+
 }
