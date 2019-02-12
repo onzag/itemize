@@ -10,7 +10,7 @@ export default class ItemDefinition {
   }
 
   addOnStateChangeListener(listener: ()=>any):void {
-    
+
   }
 
   hasItemDefinitionFor(name: string):boolean{
@@ -28,5 +28,7 @@ export default class ItemDefinition {
   getItemInstances(name: string):Array<any> {
     return [];
   }
-
+  getNewInstance(){
+    return this;
+  }
 }

@@ -42,7 +42,7 @@ if (process.env.NODE_ENV !== "production") {
 //Check the schema down to see how this relates
 //at PropertiesValueMappingDefiniton.schema
 export interface PropertiesValueMappingDefinitonType {
-  [propertyName: string]: boolean | string | number
+  [propertyName: string]: boolean | string | number | null
 }
 
 //this represets the raw stored json data, in this case
@@ -87,6 +87,15 @@ export default class PropertiesValueMappingDefiniton {
     this.referredItemDefinition = referredItemDefinition;
   }
 
+  getPropertyMap(): Array<{
+    propertyName: string,
+    value: boolean | string | number | null
+  }>{
+    return Object.keys(this.properties).map(key=>{
+      return {propertyName: key, value: this.properties[key]}
+    });
+  }
+
   //These are here but only truly available in non production
   static schema:any;
   static schema_validate:any;
@@ -108,7 +117,7 @@ if (process.env.NODE_ENV !== "production") {
   PropertiesValueMappingDefiniton.schema = {
     type: "object",
     additionalProperties: {
-      type: ["boolean", "string", "number"]
+      type: ["boolean", "string", "number", "null"]
     },
     minProperties: 1
   };

@@ -71,7 +71,7 @@ interface ConditionalRuleSetRawJSONDataPropertyType
   extends ConditionalRuleSetRawJSONDataBaseType {
   property: string,
   comparator: ConditionalRuleComparatorType,
-  value: boolean | string | number
+  value: boolean | string | number | null
 }
 
 interface ConditionalRuleSetRawJSONDataComponentType
@@ -92,7 +92,7 @@ export default class ConditionalRuleSet {
   //the comparator > < >= <= etc... in string form
   private comparator?: ConditionalRuleComparatorType;
   //the value is compared against
-  private value?: boolean | string | number;
+  private value?: boolean | string | number | null;
 
   //for component based conditionals
   //the component in question
@@ -159,7 +159,8 @@ export default class ConditionalRuleSet {
 
       //lets get the property value as for now
       let actualPropertyValue =
-        this.parentItemDefinition.getPropertyValue(this.property);
+        this.parentItemDefinition.getPropertyDefinitionFor(this.property)
+        .getCurrentValue();
 
       //the result by default is false
       let result = false;
