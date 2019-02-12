@@ -11,6 +11,7 @@
   },
   {
     "id": "condition",
+    "type": "string",
     "values": ["new", "excellent", "good", "donor", "scrap"]
   }
 ]

@@ -30,7 +30,7 @@
 
 //lets do the import, item definition depends on conditional rule set
 //and property value mapping
-import ItemDefinition from '../ItemDefinition';
+import ItemDefinition from '.';
 import PropertiesValueMappingDefiniton,
   { PropertiesValueMappingDefinitonRawJSONDataType } from
   './PropertiesValueMappingDefiniton';
@@ -44,18 +44,29 @@ if (process.env.NODE_ENV !== "production") {
   ajv = new Ajv({schemaId: 'id'});
 }
 
+export type ItemGateType = "or" | "and" | "xor";
+
+export interface ItemGroupHandle {
+  items: Array<Item>,
+  gate: ItemGateType,
+  i18n: string
+};
+
 //this is what our raw json looks like
 export interface ItemRawJSONDataType {
-  name: string,
+  id?: string,
+  name?: string,
+  items?: Array<ItemRawJSONDataType>,
   enforcedProperties?: PropertiesValueMappingDefinitonRawJSONDataType,
   predefinedProperties?: PropertiesValueMappingDefinitonRawJSONDataType,
-  excludedIf: ConditionalRuleSetRawJSONDataType,
+  excludedIf?: ConditionalRuleSetRawJSONDataType,
   mightExclude?: boolean,
   mightExcludeIf?: ConditionalRuleSetRawJSONDataType,
   defaultExcluded?: boolean,
   defaultExcludedIf?: ConditionalRuleSetRawJSONDataType,
   rare?: boolean,
-  sinkIn?: Array<string>
+  sinkIn?: Array<string>,
+  gate?: ItemGateType
 }
 
 //And here we do the class definition
@@ -64,22 +75,27 @@ export default class Item {
   public parentItemDefinition:ItemDefinition;
   public parent:any;
 
+  //attribute to know if this item is actually an item group
+  private isGroup: boolean;
+
   //the data that comes from the raw json is to be processed here
   private itemDefinition: ItemDefinition;
-  private enforcedProperties: PropertiesValueMappingDefiniton;
-  private predefinedProperties: PropertiesValueMappingDefiniton;
   private excludedIf: ConditionalRuleSet;
   private mightExclude: boolean;
   private mightExcludeIf: ConditionalRuleSet;
   private defaultExcluded: boolean;
   private defaultExcludedIf: ConditionalRuleSet;
   private rare: boolean;
+
+  //solo item specific attributes
+  private enforcedProperties: PropertiesValueMappingDefiniton;
+  private predefinedProperties: PropertiesValueMappingDefiniton;
   private sinkIn: Array<string>;
 
-  //This class needs initialization, for efficiency purposes
-  //it makes no sense to initialize the conditions of the class
-  //for its state when not everything is loaded
-  private initialized:boolean;
+  //Group item specific attributes
+  private id: string,
+  private gate:ItemGateType;
+  private items: Array<Item>;
 
   //representing the state of the class
   private onStateChange:()=>any;
@@ -107,10 +123,20 @@ export default class Item {
       Item.check(rawJSON, parent, parentItemDefinition);
     }
 
+    this.id = rawJSON.id;
+
+    //check whether it is a group
+    this.isGroup = !!rawJSON.items;
+
+    //put the items and the gate in place
+    this.gate = rawJSON.gate;
+    this.items = rawJSON.items && rawJSON.items.map(rawJSONItem=>
+      (new Item(rawJSONItem, this, parentItemDefinition, onStateChange)));
+
     //lets get an instance for the item definition for this
     //item, this is because we need to set properties for this specific
     //item and we don't want to be polluting the main item definition
-    this.itemDefinition = parentItemDefinition
+    this.itemDefinition = rawJSON.name && parentItemDefinition
       .getItemDefinitionFor(rawJSON.name).getNewInstance();
 
     //we add an event listener to the parent to recalculate
@@ -155,20 +181,6 @@ export default class Item {
     //state
     this.onStateChange = onStateChange;
     this.state_hasBeenModified = false;
-    this.initialized = false;
-  }
-
-  /**
-   * Initializes an instance, must be run before anything
-   * the reason there is a initialize function is because this class
-   * might be instantiated before all the parent tree is ready, and it
-   * needs for all the properties to be ready in order to be of use
-   */
-  initialize():void {
-    //initialization function
-    if (this.initialized){
-      throw new Error("Item has already been initialized");
-    }
 
     //we need to set the state lets check whether is excluded by force
     //that is if excludedIf returns true
@@ -191,25 +203,21 @@ export default class Item {
 
     //lets setup the enforced and predefined properties in the item
     //definition that we have instantiated before
-    this.enforcedProperties.getPropertyMap()
-      .concat(this.predefinedProperties.getPropertyMap()).forEach(mapSet=>{
-      this.itemDefinition
-        .getPropertyDefinitionFor(mapSet.propertyName)
-        .setCurrentValue(mapSet.value);
-    });
-
-    //set the flag as initialized
-    this.initialized = true;
+    if (!this.isGroup){
+      (this.enforcedProperties ? this.enforcedProperties.getPropertyMap() : [])
+        .concat(this.predefinedProperties ?
+          this.predefinedProperties.getPropertyMap() : []).forEach(mapSet=>{
+        this.itemDefinition
+          .getPropertyDefinitionFor(mapSet.propertyName)
+          .setCurrentValue(mapSet.value);
+      });
+    }
   }
 
   /**
    * Recalcuates whether it's excluded or not
    */
   recalculateExclusionState():void {
-    if (!this.initialized){
-      throw new Error("Item has not been initialized");
-    }
-
     //let's check if it's excluded by force
     let isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
 
@@ -243,15 +251,10 @@ export default class Item {
   }
 
   /**
-   * Tells whether the current item is excluded, must have been
-   * Initialized
+   * Tells whether the current item is excluded
    * @return a boolean whether it's excluded or not
    */
   isCurrentlyExcluded():boolean {
-    if (!this.initialized){
-      throw new Error("Item has not been initialized");
-    }
-
     return this.state_isExcluded;
   }
 
@@ -263,10 +266,6 @@ export default class Item {
    * @return a boolean that tells whether if it can be toggled
    */
   canExclusionBeToggled():boolean {
-    if (!this.initialized){
-      throw new Error("Item has not been initialized");
-    }
-
     //if it's excluded by force the default is false, you cannot toggle
     //anything excluded by force
     let isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
@@ -285,9 +284,7 @@ export default class Item {
    * it'd throw an error
    */
   toggleExclusionState():void {
-    if (!this.initialized){
-      throw new Error("Item has not been initialized");
-    } else if (!this.canExclusionBeToggled()){
+    if (!this.canExclusionBeToggled()){
       throw new Error("Exclusion cannot be toggled");
     }
 
@@ -297,6 +294,21 @@ export default class Item {
     this.state_isExcluded = !this.state_isExcluded;
     //trigger an state change
     this.onStateChange();
+  }
+
+  /**
+   * finds item definition that are not group from an item
+   * instance
+   * @param  name the name of the item
+   * @return      an array of items that are not group
+   */
+  findSingleItemInstancesForName(name: string):Array<Item> {
+    if (!this.isGroup){
+      return this.itemDefinition.getName() === name ? [this] : [];
+    }
+
+    return [].concat.apply(this.items.map(i=>
+      i.findSingleItemInstancesForName(name)));
   }
 
   /**
@@ -311,6 +323,9 @@ export default class Item {
    * Checks whether there are sinking properties
    */
   hasSinkingProperties(){
+    if (this.isGroup){
+      throw new Error("Item is a group hence has no sinking properties");
+    }
     return !!this.sinkIn.length;
   }
 
@@ -320,9 +335,60 @@ export default class Item {
    * @return an array of property definitions you can set up
    */
   getSinkingPropertiesList(){
+    if (this.isGroup){
+      throw new Error("Item is a group hence has no sinking properties");
+    }
     return (this.sinkIn || [])
       .map(propertyName=>this.itemDefinition
         .getPropertyDefinitionFor(propertyName));
+  }
+
+  /**
+   * Tells whether this item is a group of items
+   * @return a boolean
+   */
+  isItemGroup():boolean {
+    return this.isGroup;
+  }
+
+  /**
+   * Provides the current gate
+   * @return the gate, or, and or xor
+   */
+  getGate():ItemGateType {
+    return this.gate;
+  }
+
+  geti18n(){
+    return this.parentItemDefinition.geti18nFor(this.id);
+  }
+
+  /**
+   * Returns a list with the usable items with the respective gate
+   * or otherwise would return a single item, ands are merged, groups
+   * are gone, null is for when no candidate was available
+   * @return the list, single item or null
+   */
+  getCurrentUsableItems(): ItemGroupHandle | Item {
+    if (this.isCurrentlyExcluded() && !this.canExclusionBeToggled()){
+      return null;
+    } else if (!this.isGroup){
+      return this;
+    }
+    let usableItems = this.items
+      .map(i=>i.getCurrentUsableItems())
+      .filter(usableItems=>usableItems);
+
+    if (usableItems.length === 0){
+      return null;
+    } else if (usableItems.length === 1){
+      return usableItems[0]
+    }
+    return <ItemGroupHandle>{
+      items: usableItems,
+      gate: this.getGate(),
+      i18n: this.geti18n()
+    };
   }
 
   //These are here but only truly available in non production
@@ -333,10 +399,14 @@ export default class Item {
 
 if (process.env.NODE_ENV !== "production") {
 
+  let gates = ["and", "or", "xor"];
   //The schema for the item
   Item.schema = {
     type: "object",
     properties: {
+      id: {
+        type: "string"
+      },
       name: {
         type: "string"
       },
@@ -359,9 +429,18 @@ if (process.env.NODE_ENV !== "production") {
         items: {
           type: "string"
         }
-      }
+      },
+      gate: {
+        type: "string",
+        enum: gates
+      },
+      items: {}
     },
-    required: ["name"],
+    dependencies: {
+      items: ["gate"],
+      gate: ["items"],
+      id: ["items"]
+    },
     additionalProperties: false
   };
 
@@ -385,11 +464,31 @@ if (process.env.NODE_ENV !== "production") {
       throw new Error("Check Failed");
     };
 
+    let isGroup = !!rawJSON.items;
+
     //check whether the item definition exists for this item
     //it must exist to be an item
-    if (!parentItemDefinition.hasItemDefinitionFor(rawJSON.name)){
+    if (!isGroup && !parentItemDefinition.hasItemDefinitionFor(rawJSON.name)){
       console.error("Missing item definition for",
         rawJSON, "for", rawJSON.name);
+      throw new Error("Check Failed");
+    }
+
+    if (isGroup && rawJSON.predefinedProperties){
+      console.error("Cannot set predefinedProperties and be a group at",
+        rawJSON);
+      throw new Error("Check Failed");
+    }
+
+    if (isGroup && rawJSON.enforcedProperties){
+      console.error("Cannot set enforcedPropertiesKeys and be a group at",
+        rawJSON);
+      throw new Error("Check Failed");
+    }
+
+    if (isGroup && rawJSON.sinkIn){
+      console.error("Cannot set sinkIn and be a group at",
+        rawJSON);
       throw new Error("Check Failed");
     }
 

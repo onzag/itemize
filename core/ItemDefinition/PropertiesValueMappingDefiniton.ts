@@ -29,7 +29,7 @@
  * wheelset, this is a PropertiesValueMappingDefiniton
  */
 
-import ItemDefinition from '../ItemDefinition';
+import ItemDefinition from '.';
 
 //import ajv checker conditionally
 let ajv;

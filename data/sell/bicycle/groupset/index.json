@@ -9,13 +9,16 @@
 	},
 	"includes": [
 		{
+			"id": "mid-drive-motor-or-hub-drive",
 			"items": [
 				{
 					"name": "mid-drive-motor"
 				},
 				{
+					"id": "hub-drive-specifications",
 					"items": [
 						{
+							"id": "front-hub-or-front-wheel",
 							"items": [
 								{
 									"name": "front-hub",
@@ -33,6 +36,7 @@
 							"gate": "xor"
 						},
 						{
+							"id": "rear-hub-or-rear-wheel",
 							"items": [
 								{
 									"name": "rear-hub",
@@ -69,6 +73,7 @@
 			}
 		},
 		{
+			"id": "front-deraullier-or-chain-guide",
 			"items": [
 				{
 					"name": "front-deraullier",
@@ -137,6 +142,27 @@
 			}
 		},
 		{
+			"id": "chain-or-belt",
+			"items": [
+				{
+					"name": "chain",
+					"enforcedProperties": {
+						"speeds": "speeds"
+					}
+				},
+				{
+					"name": "belt",
+					"excludedIf": {
+						"property": "speeds",
+						"comparator": "not-equals",
+						"value": 1
+					}
+				}
+			],
+			"gate": "xor"
+		},
+		{
+			"id": "wheel-engagement-mechanism",
 			"items": [
 				{
 					"name": "cassette",
@@ -218,6 +244,7 @@
 			}
 		},
 		{
+			"id": "shifting-and-braking",
 			"items": [
 				{
 					"name": "brifters",
@@ -229,6 +256,7 @@
 					}
 				},
 				{
+					"id": "brakes-and-shifters",
 					"items": [
 						{
 							"name": "brakes",
@@ -260,25 +288,6 @@
 			}
 		},
 		{
-			"items": [
-				{
-					"name": "chain",
-					"enforcedProperties": {
-						"speeds": "speeds"
-					}
-				},
-				{
-					"name": "belt",
-					"excludedIf": {
-						"property": "speeds",
-						"comparator": "not-equals",
-						"value": 1
-					}
-				}
-			],
-			"xor": true
-		},
-		{
 			"name": "tensioner",
 			"mightExclude": true,
 			"defaultExcluded" : true
@@ -300,6 +309,7 @@
 	"properties": [
 		{
 			"id": "type",
+			"type": "string",
 			"values": ["standard", "1x", "singlespeed", "hub-gear", "electric"],
 			"default": "standard",
 			"nullable": true,
@@ -330,6 +340,7 @@
 		},
 		{
 			"id": "chainrings",
+			"type": "number",
 			"values": [1, 2, 3],
 			"default": 2,
 			"defaultIf": [
@@ -412,7 +423,6 @@
 			"id": "hydraulic-shifting",
 			"type": "boolean",
 			"rare": true,
-			"searchLevel": "rare",
 			"default": false,
 			"excludedIf": {
 				"property": "electronic",

@@ -46,7 +46,7 @@
  * are very practical, but limited on purpose to avoid excessive complexity
  */
 
-import ItemDefinition from '../ItemDefinition';
+import ItemDefinition from '.';
 
 //import ajv checker conditionally
 let ajv;

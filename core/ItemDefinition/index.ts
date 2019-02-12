@@ -4,6 +4,10 @@ if (process.env.NODE_ENV !== "production") {
   ajv = new Ajv({schemaId: 'id'});
 }
 
+export interface ItemDefinitionPreImportedStructure {
+
+}
+
 export default class ItemDefinition {
   constructor(){
 
@@ -11,6 +15,10 @@ export default class ItemDefinition {
 
   addOnStateChangeListener(listener: ()=>any):void {
 
+  }
+
+  getName():string {
+    return ""
   }
 
   hasItemDefinitionFor(name: string):boolean{
@@ -30,5 +38,14 @@ export default class ItemDefinition {
   }
   getNewInstance(){
     return this;
+  }
+  geti18nFor(id: string):string {
+    return ""
+  }
+
+  static import(
+    location: string | ItemDefinitionPreImportedStructure,
+    language?: string){
+
   }
 }
