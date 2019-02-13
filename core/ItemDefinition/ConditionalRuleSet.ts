@@ -103,6 +103,8 @@ export default class ConditionalRuleSet {
   //the gate, and, or, xor
   private gate?: ConditionalRuleGateType;
   private condition?: ConditionalRuleSet;
+
+  //default values
   public parentItemDefinition:ItemDefinition;
   public parent:any;
 
@@ -211,12 +213,14 @@ export default class ConditionalRuleSet {
 
     //Otherwise in case it's a component based one
     } else {
-      //let's get all the item instances for the specific component
-      let items = this.parentItemDefinition.getItemInstances(this.component);
+      //let's check whether there is an item instance for that
+      //component that are active (aka not excluded)
+      let hasOneOf = this.parentItemDefinition
+        .hasAtLeastOneActiveInstanceOf(this.component);
 
       //And compare the result against the isIncluded boolean
-      return (items.length && this.isIncluded) ||
-        (!items.length && !this.isIncluded);
+      return (hasOneOf && this.isIncluded) ||
+        (!hasOneOf && !this.isIncluded);
     }
   }
 }

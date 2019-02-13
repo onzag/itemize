@@ -47,9 +47,8 @@ if (process.env.NODE_ENV !== "production") {
 export type ItemGateType = "or" | "and" | "xor";
 
 export interface ItemGroupHandle {
-  items: Array<Item>,
-  gate: ItemGateType,
-  i18n: string
+  items: Array<ItemGroupHandle>,
+  gate: ItemGateType
 };
 
 //this is what our raw json looks like
@@ -79,28 +78,28 @@ export default class Item {
   private isGroup: boolean;
 
   //the data that comes from the raw json is to be processed here
-  private itemDefinition: ItemDefinition;
-  private excludedIf: ConditionalRuleSet;
-  private mightExclude: boolean;
-  private mightExcludeIf: ConditionalRuleSet;
-  private defaultExcluded: boolean;
-  private defaultExcludedIf: ConditionalRuleSet;
-  private rare: boolean;
+  private itemDefinition?: ItemDefinition;
+  private excludedIf?: ConditionalRuleSet;
+  private mightExclude?: boolean;
+  private mightExcludeIf?: ConditionalRuleSet;
+  private defaultExcluded?: boolean;
+  private defaultExcludedIf?: ConditionalRuleSet;
+  private rare?: boolean;
 
   //solo item specific attributes
-  private enforcedProperties: PropertiesValueMappingDefiniton;
-  private predefinedProperties: PropertiesValueMappingDefiniton;
-  private sinkIn: Array<string>;
+  private enforcedProperties?: PropertiesValueMappingDefiniton;
+  private predefinedProperties?: PropertiesValueMappingDefiniton;
+  private sinkIn?: Array<string>;
 
   //Group item specific attributes
-  private id: string,
-  private gate:ItemGateType;
-  private items: Array<Item>;
+  private id?: string;
+  private gate?:ItemGateType;
+  private items?: Array<Item>;
 
   //representing the state of the class
   private onStateChange:()=>any;
   private state_isExcluded:boolean;
-  private state_hasBeenModified:boolean;
+  private state_isPhantomExcluded:boolean;
 
   /**
    * The constructor for an Item
@@ -139,11 +138,6 @@ export default class Item {
     this.itemDefinition = rawJSON.name && parentItemDefinition
       .getItemDefinitionFor(rawJSON.name).getNewInstance();
 
-    //we add an event listener to the parent to recalculate
-    //the exclusion state whenever the parent state changes
-    parentItemDefinition
-      .addOnStateChangeListener(this.recalculateExclusionState);
-
     //the enforced properties list
     this.enforcedProperties = rawJSON.enforcedProperties &&
       new PropertiesValueMappingDefiniton(rawJSON.enforcedProperties, this,
@@ -178,9 +172,20 @@ export default class Item {
     this.parent = parent;
     this.parentItemDefinition = parentItemDefinition;
 
-    //state
+    //lets setup the enforced and predefined properties in the item
+    //definition that we have instantiated before
+    if (!this.isGroup){
+      (this.enforcedProperties ? this.enforcedProperties.getPropertyMap() : [])
+        .concat(this.predefinedProperties ?
+          this.predefinedProperties.getPropertyMap() : []).forEach(mapSet=>{
+        this.itemDefinition
+          .getPropertyDefinitionFor(mapSet.propertyName)
+          .setCurrentValue(mapSet.value);
+      });
+    }
+
+    //STATE MANAGEMENT
     this.onStateChange = onStateChange;
-    this.state_hasBeenModified = false;
 
     //we need to set the state lets check whether is excluded by force
     //that is if excludedIf returns true
@@ -201,53 +206,7 @@ export default class Item {
     this.state_isExcluded = isExcludedByForce ||
       (canBeExcluded && isDefaultExcluded) || false;
 
-    //lets setup the enforced and predefined properties in the item
-    //definition that we have instantiated before
-    if (!this.isGroup){
-      (this.enforcedProperties ? this.enforcedProperties.getPropertyMap() : [])
-        .concat(this.predefinedProperties ?
-          this.predefinedProperties.getPropertyMap() : []).forEach(mapSet=>{
-        this.itemDefinition
-          .getPropertyDefinitionFor(mapSet.propertyName)
-          .setCurrentValue(mapSet.value);
-      });
-    }
-  }
-
-  /**
-   * Recalcuates whether it's excluded or not
-   */
-  recalculateExclusionState():void {
-    //let's check if it's excluded by force
-    let isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
-
-    //if it can be excluded
-    let canBeExcluded = this.mightExclude || (this.mightExcludeIf &&
-      this.mightExcludeIf.evaluate());
-
-    //and if by default is excluded
-    let isDefaultExcluded = this.defaultExcluded ||
-      (this.defaultExcludedIf && this.defaultExcludedIf.evaluate());
-
-    //if it's excluded by force and is not excluded
-    if (isExcludedByForce && !this.state_isExcluded){
-      //set it to excluded and trigger a state change
-      this.state_isExcluded = true;
-      this.onStateChange();
-      return;
-    } else if (!canBeExcluded && this.state_isExcluded){
-      //also if it cannot be excluded set it to false
-      this.state_isExcluded = false;
-      this.onStateChange();
-      return;
-    }
-
-    //if it hasn't been modified set it to the default
-    //the reason for this is that state can be recalculated all the time
-    //for every little reason some of which might not be the user
-    if (!this.state_hasBeenModified){
-      this.state_isExcluded = isDefaultExcluded || false;
-    }
+    this.state_isPhantomExcluded = false;
   }
 
   /**
@@ -255,7 +214,40 @@ export default class Item {
    * @return a boolean whether it's excluded or not
    */
   isCurrentlyExcluded():boolean {
-    return this.state_isExcluded;
+    //let's check if it's excluded by force
+    let isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
+
+    if (isExcludedByForce){
+      return true;
+    }
+
+    //if it can be excluded
+    let canBeExcluded = this.mightExclude || (this.mightExcludeIf &&
+      this.mightExcludeIf.evaluate());
+
+    if (canBeExcluded){
+      return this.state_isExcluded;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * The phantom exclusion is an attribute to force an exclude
+   * attribute without having actual logical exclusion, this is
+   * for missing items, let's say you are selling a computer
+   * which for some weird reason has no processor, you'd use
+   * phantom excludes, phantom excludes are for use with
+   * callout excludes, basically meaning your item doesn't quite
+   * meet the criteria but it is close enough
+   *
+   * use these smartly and don't use it if canExclusionBeToggled
+   * is true because it doesn't make sense then
+   *
+   * @return a boolean
+   */
+  isCurrentlyPhantomExcluded():boolean {
+    return this.state_isPhantomExcluded;
   }
 
   /**
@@ -283,15 +275,21 @@ export default class Item {
    * event, note that exclusion must be able to be toggled otherwise
    * it'd throw an error
    */
-  toggleExclusionState():void {
-    if (!this.canExclusionBeToggled()){
+  toggleExclusionState(phantom: boolean):void {
+    if (!phantom && !this.canExclusionBeToggled()){
       throw new Error("Exclusion cannot be toggled");
+    } else if (phantom && this.canExclusionBeToggled()){
+      throw new Error("Using phantom excludes when exclusion can be toggled");
     }
 
-    //basically set it up as it has been externally modified
-    this.state_hasBeenModified = true;
-    //change the exclusion state
-    this.state_isExcluded = !this.state_isExcluded;
+    if (phantom){
+      //change the forced excluded state, this does not
+      //affect the real exclusion state
+      this.state_isPhantomExcluded = !this.state_isPhantomExcluded
+    } else {
+      //change the exclusion state
+      this.state_isExcluded = !this.state_isExcluded;
+    }
     //trigger an state change
     this.onStateChange();
   }
@@ -359,8 +357,31 @@ export default class Item {
     return this.gate;
   }
 
-  geti18n(){
-    return this.parentItemDefinition.geti18nFor(this.id);
+  /**
+   * Tells if an item (whether a group or not)
+   * might currently contain another item, it doesn't
+   * say it for sure because items might be excluded currently
+   * but it allows to narrow a search
+   *
+   * @param  name the name of the item definition
+   * @return      a boolean for whether yes or no
+   */
+  mightCurrentlyContain(name: string):boolean {
+    if (!this.isGroup){
+      return this.itemDefinition.getName() === name;
+    }
+    return this.items.some(i=>i.mightCurrentlyContain(name));
+  }
+
+  /**
+   * Gets the definition name
+   * @return a string with the name
+   */
+  getDefinitionName():string {
+    if (this.isGroup){
+      throw new Error("Groups have no item definitions");
+    }
+    return this.itemDefinition.getName();
   }
 
   /**
@@ -386,8 +407,7 @@ export default class Item {
     }
     return <ItemGroupHandle>{
       items: usableItems,
-      gate: this.getGate(),
-      i18n: this.geti18n()
+      gate: this.getGate()
     };
   }
 
