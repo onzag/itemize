@@ -1,5 +1,5 @@
 {
   "type": "root",
-  "includes": ["post", "sell"],
+  "includes": ["post"],
   "lang": ["EN", "ES"]
 }

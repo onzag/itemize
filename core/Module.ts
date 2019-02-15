@@ -1,14 +1,18 @@
-import ItemDefinition, { ItemDefinitionRawJSONDataType } from "./ItemDefinition";
+import ItemDefinition, { ItemDefinitionRawJSONDataType } from
+  "./ItemDefinition";
+import { PropertyDefinitionRawJSONDataType } from
+  "./ItemDefinition/PropertyDefinition";
 
-interface ModuleRawJSONDataType {
+export interface ModuleRawJSONDataType {
   type: "module",
-  children: Array<ModuleRawJSONDataType | ItemDefinitionRawJSONDataType>
+  children: Array<ModuleRawJSONDataType | ItemDefinitionRawJSONDataType>,
+  propExtensions: Array<PropertyDefinitionRawJSONDataType>
 }
 
 export default class Module {
   private childModules: Array<Module>;
   private childDefinitions: Array<ItemDefinition>;
-  
+
   constructor(rawJSON: ModuleRawJSONDataType, onStateChange: ()=>any){
     this.childModules = [];
     this.childDefinitions = [];
@@ -17,6 +21,10 @@ export default class Module {
       if (c.type === "module"){
         this.childModules.push(new Module(c, onStateChange));
       } else if (c.type === "item"){
+        c.properties = rawJSON.propExtensions
+          .map(e=>
+            (<PropertyDefinitionRawJSONDataType>{...e, isExtension: true}))
+          .concat(c.properties);
         this.childDefinitions.push(new ItemDefinition(c, this,
           null, onStateChange));
       } else {

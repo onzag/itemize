@@ -20,10 +20,8 @@ export interface ItemDefinitionRawJSONDataType {
 
   //property gets added during procesing and merging
   //replacing imports, gotta be there even if empty
-  childDefinitions?: Array<{
-    location?: Array<string>,
-    definition?: ItemDefinitionRawJSONDataType
-  }>,
+  importedChildDefinitions?: Array<Array<string>>,
+  childDefinitions?: Array<ItemDefinitionRawJSONDataType>,
 }
 
 function hasItemOf(name: string, handle: Item | ItemGroupHandle):boolean {
@@ -61,15 +59,15 @@ export default class ItemDefinition {
     this.name = rawJSON.name;
     this.allowCalloutExcludes = rawJSON.allowCalloutExcludes || false;
 
-    this.importedChildDefinitions = [];
+    this.importedChildDefinitions = rawJSON.importedChildDefinitions || [];
     this.childDefinitions = rawJSON.childDefinitions ?
       rawJSON.childDefinitions.map(d=>{
-        if (!d.definition){
-          this.importedChildDefinitions.push(d.location);
-          return null;
+        if ((d as any).type === "module"){
+          throw new Error("module cannot be a child of an item " +
+            rawJSON.name + ">" + d.name);
         }
         return new ItemDefinition(
-          d.definition,
+          d,
           parentModule,
           parentItemDefinition,
           onStateChange

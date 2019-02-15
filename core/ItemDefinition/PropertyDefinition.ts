@@ -184,7 +184,10 @@ export interface PropertyDefinitionRawJSONDataType {
   default?: boolean | string | number,
   defaultIf?: Array<PropertyDefinitionRawJSONRuleDataType>,
   enforcedValues?: Array<PropertyDefinitionRawJSONRuleDataType>,
-  hiddenIf?: ConditionalRuleSetRawJSONDataType
+  hiddenIf?: ConditionalRuleSetRawJSONDataType,
+
+  //This one is added for the sake of data of origin
+  isExtension?: boolean
 }
 
 export interface PropertyDefinitionRuleDataType {
@@ -201,6 +204,7 @@ export default class PropertyDefinition {
   private hidden?: boolean;
   private autocomplete?: string;
   private autocompleteSetFromProperty?: string;
+  private isExtension?: boolean;
   private default?: boolean | string | number;
   private defaultIf?: Array<PropertyDefinitionRuleDataType>;
   private enforcedValues?: Array<PropertyDefinitionRuleDataType>;
@@ -230,6 +234,7 @@ export default class PropertyDefinition {
     this.autocomplete = rawJSON.autocomplete;
     this.autocompleteSetFromProperty = rawJSON.autocompleteSetFromProperty;
     this.default = rawJSON.default;
+    this.isExtension = rawJSON.isExtension;
 
     this.defaultIf = rawJSON.defaultIf && rawJSON.defaultIf.map(dif=>({
       value: dif.value,
@@ -298,6 +303,10 @@ export default class PropertyDefinition {
       return false
     }
     return true;
+  }
+
+  checkIfIsExtension():boolean {
+    return !!this.isExtension;
   }
 
   //These are here but only truly available in non production
