@@ -1,5 +1,6 @@
 import PropertyDefinition, { PropertyDefinitionRawJSONDataType } from "./PropertyDefinition";
 import Item, { ItemRawJSONDataType, ItemGroupHandle } from "./Item";
+import Module from "../Module";
 
 let ajv;
 if (process.env.NODE_ENV !== "production") {
@@ -8,17 +9,21 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export interface ItemDefinitionRawJSONDataType {
+  type: "item",
+
   //property gets added during processing and merging
   //preresents the file name
   name: string,
-  type: string,
   allowCalloutExcludes?: boolean,
-  includes: Array<ItemRawJSONDataType>,
-  properties: Array<PropertyDefinitionRawJSONDataType>,
+  includes?: Array<ItemRawJSONDataType>,
+  properties?: Array<PropertyDefinitionRawJSONDataType>,
 
   //property gets added during procesing and merging
   //replacing imports, gotta be there even if empty
-  childDefinitions: Array<ItemDefinitionRawJSONDataType>
+  childDefinitions?: Array<{
+    location?: Array<string>,
+    definition?: ItemDefinitionRawJSONDataType
+  }>,
 }
 
 function hasItemOf(name: string, handle: Item | ItemGroupHandle):boolean {
@@ -30,37 +35,85 @@ function hasItemOf(name: string, handle: Item | ItemGroupHandle):boolean {
 
 export default class ItemDefinition {
   private rawData: ItemDefinitionRawJSONDataType;
+
   private name: string;
+  private allowCalloutExcludes: boolean;
   private childDefinitions: Array<ItemDefinition>;
+  private importedChildDefinitions: Array<Array<string>>
   private onStateChange: ()=>any;
   private propertyDefinitions: Array<PropertyDefinition>;
   private itemInstances: Array<Item>;
+  private parentModule: Module;
+  private parentItemDefinition: ItemDefinition;
 
   constructor(
-    data: ItemDefinitionRawJSONDataType,
+    rawJSON: ItemDefinitionRawJSONDataType,
+    parentModule: Module,
+    parentItemDefinition: ItemDefinition,
     onStateChange: ()=>any
   ){
-    this.rawData = data;
-    this.name = data.name;
-    this.childDefinitions = data
-      .childDefinitions.map(d=>(new ItemDefinition(d, onStateChange)));
-    this.propertyDefinitions = data.properties
-      .map(p=>(new PropertyDefinition(p, this, this, onStateChange)));
-    this.itemInstances = data.includes
-      .map(i=>(new Item(i, this, this, onStateChange)))
+    if (process.env.NODE_ENV !== "production") {
+      ItemDefinition.check(rawJSON, parentModule,
+        parentItemDefinition, onStateChange);
+    }
+
+    this.rawData = rawJSON;
+    this.name = rawJSON.name;
+    this.allowCalloutExcludes = rawJSON.allowCalloutExcludes || false;
+
+    this.importedChildDefinitions = [];
+    this.childDefinitions = rawJSON.childDefinitions ?
+      rawJSON.childDefinitions.map(d=>{
+        if (!d.definition){
+          this.importedChildDefinitions.push(d.location);
+          return null;
+        }
+        return new ItemDefinition(
+          d.definition,
+          parentModule,
+          parentItemDefinition,
+          onStateChange
+        )
+      }).filter(d=>d) : [];
+    this.propertyDefinitions = rawJSON.properties ? rawJSON.properties
+      .map(p=>(new PropertyDefinition(p, this, this, onStateChange))) : [];
+    this.itemInstances = rawJSON.includes ? rawJSON.includes
+      .map(i=>(new Item(i, this, this, onStateChange))) : [];
     this.onStateChange = onStateChange;
+
+    this.parentModule = parentModule;
+    this.parentItemDefinition = parentItemDefinition;
   }
 
   getName():string {
     return this.name;
   }
 
-  hasItemDefinitionFor(name: string):boolean{
-    return this.childDefinitions.some(d=>d.getName()===name);
+  hasItemDefinitionFor(name: string, avoidImports?: boolean):boolean{
+    let status = this.childDefinitions.some(d=>d.getName()===name);
+    if (!status && !avoidImports){
+      let importedDefinitionLoc = this.importedChildDefinitions
+        .find(d=>d.join("/") === name || d[d.length - 1] === name);
+      if (importedDefinitionLoc){
+        status =
+          this.parentModule.hasItemDefinitionFor(importedDefinitionLoc);
+      }
+    }
+    return status;
   }
 
-  getItemDefinitionFor(name: string):any{
-    let definition = this.childDefinitions.find(d=>d.getName()===name);
+  getItemDefinitionFor(name: string, avoidImports?: boolean):any{
+    let definition = this.childDefinitions
+      .find(d=>d.getName()===name);
+    if (!definition && !avoidImports){
+      let importedDefinitionLoc = this.importedChildDefinitions
+        .find(d=>d.join("/") === name || d[d.length - 1] === name);
+      if (importedDefinitionLoc){
+        definition =
+          this.parentModule.getItemDefinitionFor(importedDefinitionLoc);
+      }
+    }
+
     if (!definition){
       throw new Error("Requested invalid definition " + name);
     }
@@ -102,15 +155,115 @@ export default class ItemDefinition {
     });
   }
 
+  getParentModule(){
+    return this.parentModule;
+  }
+
+  hasParentItemDefinition(){
+    return !!this.parentItemDefinition;
+  }
+
+  getParentItemDefinition(){
+    if (!this.parentItemDefinition){
+      throw new
+        Error("Attempted to get parent definition while missing");
+    }
+    return this.parentItemDefinition;
+  }
+
+  getChildDefinitions():Array<ItemDefinition> {
+    return this.childDefinitions;
+  }
+
+  areCalloutExcludesAllowed():boolean {
+    return this.allowCalloutExcludes;
+  }
+
   getNewInstance(){
-    return new ItemDefinition(this.rawData, this.onStateChange);
+    return new ItemDefinition(this.rawData, this.parentModule,
+      this.parentItemDefinition, this.onStateChange);
   }
 
   getStructure(){
-    
+
   }
 
   getPrettyStructure(){
 
+  }
+
+  //These are here but only truly available in non production
+  static schema:any;
+  static schema_validate:any;
+  static check:any;
+}
+
+if (process.env.NODE_ENV !== "production") {
+  ItemDefinition.schema = {
+    type: "object",
+    properties: {
+      type: {
+        const: "item"
+      },
+      name: {
+        type: "string"
+      },
+      allowCalloutExcludes: {
+        type: "boolean"
+      },
+      includes: {},
+      properties: {},
+      childDefinitions: {
+        type: "array",
+        items: {
+          type: "object",
+          oneOf: [
+            {
+              properties: {
+                location: {
+                  type: "array",
+                  items: {
+                    type: "string"
+                  },
+                  minItems: 1,
+                  additionalItems: false
+                }
+              },
+              required: ["location"]
+            },
+            {
+              properties: {
+                definition: {}
+              },
+              required: ["definition"]
+            }
+          ],
+          additionalProperties: false,
+        },
+        additionalItems: false
+      }
+    },
+    required: ["type", "name"],
+    additionalProperties: false
+  };
+
+  //the validation function created by ajv
+  ItemDefinition.schema_validate =
+    ajv.compile(ItemDefinition.schema);
+
+  ItemDefinition.check = function(
+    rawJSON: ItemDefinitionRawJSONDataType,
+    parentModule: Module,
+    parentItemDefinition: ItemDefinition,
+    onStateChange: ()=>any
+  ){
+    //we check the schema for validity
+    let valid = ItemDefinition.schema_validate(rawJSON);
+
+    //if not valid throw the errors
+    if (!valid) {
+      console.error(ItemDefinition.schema_validate.errors);
+      throw new Error("Check Failed");
+    };
   }
 }
