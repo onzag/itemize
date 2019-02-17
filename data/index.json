@@ -1,5 +1,6 @@
 {
   "type": "root",
-  "includes": ["post"],
-  "lang": ["EN", "ES"]
+  "includes": ["forum"],
+  "lang": ["EN", "ES"],
+  "i18n": "base"
 }

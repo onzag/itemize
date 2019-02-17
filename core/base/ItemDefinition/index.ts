@@ -1,6 +1,7 @@
 import PropertyDefinition, { PropertyDefinitionRawJSONDataType } from "./PropertyDefinition";
 import Item, { ItemRawJSONDataType, ItemGroupHandle } from "./Item";
 import Module from "../Module";
+import { CheckUpError } from "../Error";
 
 let ajv;
 if (process.env.NODE_ENV !== "production") {
@@ -9,7 +10,9 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export interface ItemDefinitionRawJSONDataType {
+  //Builder data
   type: "item",
+  location: string,
 
   //property gets added during processing and merging
   //preresents the file name
@@ -35,6 +38,8 @@ export default class ItemDefinition {
   private rawData: ItemDefinitionRawJSONDataType;
 
   private name: string;
+  public location:string;
+
   private allowCalloutExcludes: boolean;
   private childDefinitions: Array<ItemDefinition>;
   private importedChildDefinitions: Array<Array<string>>
@@ -51,12 +56,13 @@ export default class ItemDefinition {
     onStateChange: ()=>any
   ){
     if (process.env.NODE_ENV !== "production") {
-      ItemDefinition.check(rawJSON, parentModule,
-        parentItemDefinition, onStateChange);
+      ItemDefinition.check(rawJSON);
     }
 
     this.rawData = rawJSON;
     this.name = rawJSON.name;
+    this.location = rawJSON.location;
+
     this.allowCalloutExcludes = rawJSON.allowCalloutExcludes || false;
 
     this.importedChildDefinitions = rawJSON.importedChildDefinitions || [];
@@ -75,9 +81,12 @@ export default class ItemDefinition {
       }).filter(d=>d) : [];
     this.propertyDefinitions = rawJSON.properties ? rawJSON.properties
       .map(p=>(new PropertyDefinition(p, this, this, onStateChange))) : [];
+    this.onStateChange = onStateChange;
+
+    //item instances might request for item definitions during check
+    //so we set them later
     this.itemInstances = rawJSON.includes ? rawJSON.includes
       .map(i=>(new Item(i, this, this, onStateChange))) : [];
-    this.onStateChange = onStateChange;
 
     this.parentModule = parentModule;
     this.parentItemDefinition = parentItemDefinition;
@@ -203,6 +212,9 @@ if (process.env.NODE_ENV !== "production") {
       type: {
         const: "item"
       },
+      location: {
+        type: "string"
+      },
       name: {
         type: "string"
       },
@@ -211,37 +223,23 @@ if (process.env.NODE_ENV !== "production") {
       },
       includes: {},
       properties: {},
-      childDefinitions: {
+      importedChildDefinitions: {
         type: "array",
         items: {
-          type: "object",
-          oneOf: [
-            {
-              properties: {
-                location: {
-                  type: "array",
-                  items: {
-                    type: "string"
-                  },
-                  minItems: 1,
-                  additionalItems: false
-                }
-              },
-              required: ["location"]
-            },
-            {
-              properties: {
-                definition: {}
-              },
-              required: ["definition"]
-            }
-          ],
-          additionalProperties: false,
+          type: "array",
+          items: {
+            type: "string"
+          }
         },
+        minItems: 1,
         additionalItems: false
+      },
+      childDefinitions: {
+        type: "array",
+        items: {}
       }
     },
-    required: ["type", "name"],
+    required: ["type", "name", "location"],
     additionalProperties: false
   };
 
@@ -250,18 +248,19 @@ if (process.env.NODE_ENV !== "production") {
     ajv.compile(ItemDefinition.schema);
 
   ItemDefinition.check = function(
-    rawJSON: ItemDefinitionRawJSONDataType,
-    parentModule: Module,
-    parentItemDefinition: ItemDefinition,
-    onStateChange: ()=>any
+    rawJSON: ItemDefinitionRawJSONDataType
   ){
     //we check the schema for validity
     let valid = ItemDefinition.schema_validate(rawJSON);
 
     //if not valid throw the errors
     if (!valid) {
-      console.error(ItemDefinition.schema_validate.errors);
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "Schema Check Failed",
+        rawJSON.location,
+        ItemDefinition.schema_validate.errors,
+        rawJSON
+      );
     };
   }
 }

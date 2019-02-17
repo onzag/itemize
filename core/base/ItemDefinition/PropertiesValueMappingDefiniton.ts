@@ -78,8 +78,7 @@ export default class PropertiesValueMappingDefiniton {
     //run a check if we are not in production
     //very useful for development
     if (process.env.NODE_ENV !== "production") {
-      PropertiesValueMappingDefiniton.check(rawJSON, parent,
-        parentItemDefinition, referredItemDefinition);
+      PropertiesValueMappingDefiniton.check(rawJSON, referredItemDefinition);
     }
     this.properties = rawJSON;
     this.parent = parent;
@@ -129,9 +128,8 @@ if (process.env.NODE_ENV !== "production") {
   //the checker, takes the same arguments as the constructor
   PropertiesValueMappingDefiniton.check = function(
     rawJSON: PropertiesValueMappingDefinitonRawJSONDataType,
-    parent: any,
-    parentItemDefinition: ItemDefinition,
-    referredItemDefinition: ItemDefinition){
+    referredItemDefinition: ItemDefinition
+  ){
 
     //we check the schema for validity
     let valid = PropertiesValueMappingDefiniton.schema_validate(rawJSON);

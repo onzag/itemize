@@ -1,6 +1,18 @@
 import ItemDefinition from '.';
 import ConditionalRuleSet,
   { ConditionalRuleSetRawJSONDataType } from './ConditionalRuleSet';
+import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
+  MAX_SUPPORTED_REAL, MAX_DECIMAL_COUNT,
+  MAX_STRING_LENGTH,
+  MAX_TEXT_LENGTH,
+  REDUCED_BASE_i18N,
+  CLASSIC_OPTIONAL_i18N,
+  CLASSIC_BASE_i18N,
+  CLASSIC_RANGED_i18N,
+  CLASSIC_RANGED_OPTIONAL_i18N,
+  CLASSIC_SEARCH_BASE_i18N,
+  CLASSIC_SEARCH_OPTIONAL_i18N,
+  CLASSIC_DISTANCE_i18N} from '../../constants';
 
 //import ajv checker conditionally
 let ajv;
@@ -9,6 +21,7 @@ if (process.env.NODE_ENV !== "production") {
   ajv = new Ajv({schemaId: 'id'});
 }
 
+//All the supported property types
 export type PropertyDefinitionSupportedTypes =
   "boolean" |         //A simple boolean, comparable, and stored as a boolean
   "integer" |         //A simple number, comparable, and stored as a number
@@ -29,39 +42,90 @@ export type PropertyDefinitionSupportedTypes =
   "files"             //Represented as a list of local urls, non comparable,
                       //stored as a list of urls
 
+export enum PropertyDefinitionSearchInterfacesType {
+  //uses an instance of the same property type input
+  EXACT,
+  //uses an instance of the same property type input, or two for a range
+  //provides either an exact value or a range
+  EXACT_AND_RANGE,
+  //full text search, uses a simple raw string as search
+  FTS,
+  //uses location and range for searching
+  LOCATION_DISTANCE
+}
+
+//So this is how properties are defined to give an overview on
+//how they are supposed to be managed
 export type PropertyDefinitionSupportedTypesStandardType =
 Record<PropertyDefinitionSupportedTypes, {
+  //json represents how the element is represented in json form
+  //objects are not allowed only boolean numbers and strings are
+  //these are used for types that are allowed to be used by
+  //enforcedProperties and predefinedProperties, it is optional
+  //as types that are not settable do not have a json form
   json?: "boolean" | "number" | "string",
+
+  //this is a validation function that checks whether the value
+  //is valid,
   validate?: (value: PropertyDefinitionSupportedType)=>any,
-  storedAs?: string,
-  indexed?: boolean,
-  indexType?: "classic" | "FTS" | "location",
-  HTMLInjectionCheck?: boolean,
+  //max valid, for numbers
   max?: number,
+  //min valid for numbers
   min?: number,
+  //max length for text and string and whatnot
   maxLenght?: number,
-  whole?: number,
-  decimals?: number
+  //max decimal count
+  maxDecimalCount?: number,
+  //whether it is searchable or not
+  searchable: boolean,
+  //the search interface used
+  searchInterface?: PropertyDefinitionSearchInterfacesType,
+  //i18n supported and expected attributes
+  //they won't be requested at all for hidden and not searchable items
+  //if the item has a range it should be specified too
+  //these will be used for checking more than anything
+  i18n: {
+    base: Array<string>,
+    optional: Array<string>,
+    //range attributes are not requested if disableRangedSearch is true
+    //nor if the searchInterface is not EXACT_AND_RANGE
+    range?: Array<string>,
+    rangeOptional?: Array<string>
+    //location type for search interface specific attributes
+    //not used if the searchInterface is not LOCATION_DISTANCE
+    distance?: Array<string>,
+    //these are only for FTS
+    searchBase?: Array<string>,
+    searchOptional?: Array<string>
+  }
 }>
 
 export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   :PropertyDefinitionSupportedTypesStandardType = {
   boolean: {
     json: "boolean",
-    storedAs: "BOOLEAN",
-    indexed: true,
-    indexType: "classic"
+    searchable: true,
+    searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
+    i18n: {
+      base: REDUCED_BASE_i18N,
+      optional: CLASSIC_OPTIONAL_i18N
+    }
   },
   integer: {
     json: "number",
     validate: (n:PropertyDefinitionSupportedIntegerType)=>
       !isNaN(NaN) && parseInt(<any>n) === n &&
-      n <= 2147483647 && n >= -2147483647,
-    storedAs: "INTEGER",
-    indexed: true,
-    indexType: "classic",
-    max: 2147483647,
-    min: -2147483647
+      n <= MAX_SUPPORTED_INTEGER && n >= -MIN_SUPPORTED_INTEGER,
+    max: MAX_SUPPORTED_INTEGER,
+    min: -MIN_SUPPORTED_INTEGER,
+    searchable: true,
+    searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    i18n: {
+      base: CLASSIC_BASE_i18N,
+      optional: CLASSIC_OPTIONAL_i18N,
+      range: CLASSIC_RANGED_i18N,
+      rangeOptional: CLASSIC_RANGED_OPTIONAL_i18N
+    }
   },
   number: {
     json: "number",
@@ -82,43 +146,77 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
 
       return false;
     },
-    storedAs: "NUMERIC",
-    indexed: true,
-    indexType: "classic",
-    whole: 131072,
-    decimals: 131072,
+    max: MAX_SUPPORTED_REAL,
+    maxDecimalCount: MAX_DECIMAL_COUNT,
+    searchable: true,
+    searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    i18n: {
+      base: CLASSIC_BASE_i18N,
+      optional: CLASSIC_OPTIONAL_i18N,
+      range: CLASSIC_RANGED_i18N,
+      rangeOptional: CLASSIC_RANGED_OPTIONAL_i18N
+    }
   },
   string: {
     json: "string",
     validate: (s:PropertyDefinitionSupportedStringType)=>s.length <= 255,
-    storedAs: "TEXT",
-    indexed: true,
-    indexType: "classic",
-    maxLenght: 255
+    maxLenght: MAX_STRING_LENGTH,
+    searchable: true,
+    searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
+    i18n: {
+      base: CLASSIC_BASE_i18N,
+      optional: CLASSIC_OPTIONAL_i18N
+    }
   },
   text: {
-    storedAs: "TEXT",
     validate: (s:PropertyDefinitionSupportedTextType)=>{
       return typeof s.html === "string" &&
-        typeof s.raw === "string"
+        typeof s.raw === "string" && s.html.length < MAX_TEXT_LENGTH
+        && s.raw.length <= s.html.length;
     },
-    indexed: true,
-    indexType: "FTS",
-    HTMLInjectionCheck: true
+    maxLenght: MAX_TEXT_LENGTH,
+    searchable: true,
+    searchInterface: PropertyDefinitionSearchInterfacesType.FTS,
+    i18n: {
+      base: CLASSIC_BASE_i18N,
+      optional: CLASSIC_OPTIONAL_i18N,
+      range: CLASSIC_RANGED_i18N,
+      rangeOptional: CLASSIC_RANGED_OPTIONAL_i18N
+    }
   },
   year: {
     json: "number",
     validate: (n:number)=>!isNaN(NaN) && parseInt(<any>n) === n &&
       n <= 3000 && n >= 0,
-    storedAs: "SMALLINT",
-    indexed: true,
-    indexType: "classic"
+    searchable: true,
+    searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    i18n: {
+      base: CLASSIC_BASE_i18N,
+      optional: CLASSIC_OPTIONAL_i18N,
+      range: CLASSIC_RANGED_i18N,
+      rangeOptional: CLASSIC_RANGED_OPTIONAL_i18N
+    }
   },
+  //TODO
   date: {
-
+    searchable: true,
+    searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    i18n: {
+      base: CLASSIC_BASE_i18N,
+      optional: CLASSIC_OPTIONAL_i18N,
+      range: CLASSIC_RANGED_i18N,
+      rangeOptional: CLASSIC_RANGED_OPTIONAL_i18N
+    }
   },
   datetime: {
-
+    searchable: true,
+    searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    i18n: {
+      base: CLASSIC_BASE_i18N,
+      optional: CLASSIC_OPTIONAL_i18N,
+      range: CLASSIC_RANGED_i18N,
+      rangeOptional: CLASSIC_RANGED_OPTIONAL_i18N
+    }
   },
   location: {
     validate: (l:PropertyDefinitionSupportedLocationType)=>{
@@ -126,15 +224,28 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
         typeof l.lat === "string" &&
         typeof l.txt === "string"
     },
-    storedAs: "location",
-    indexed: true,
-    indexType: "location"
+    searchable: true,
+    searchInterface: PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE,
+    i18n: {
+      base: REDUCED_BASE_i18N,
+      optional: CLASSIC_OPTIONAL_i18N,
+      distance: CLASSIC_DISTANCE_i18N
+    }
   },
+  //TODO
   images: {
-
+    searchable: false,
+    i18n: {
+      base: REDUCED_BASE_i18N,
+      optional: CLASSIC_OPTIONAL_i18N
+    }
   },
   files: {
-
+    searchable: false,
+    i18n: {
+      base: REDUCED_BASE_i18N,
+      optional: CLASSIC_OPTIONAL_i18N
+    }
   },
 }
 
@@ -146,6 +257,7 @@ export type PropertyDefinitionSupportedTextType = {
   html: string,
   raw: string
 }
+//TODO
 export type PropertyDefinitionSupportedDateType = any;
 export type PropertyDefinitionSupportedDateTimeType = any;
 export type PropertyDefinitionSupportedLocationType = {
@@ -153,6 +265,7 @@ export type PropertyDefinitionSupportedLocationType = {
   lat: string,
   txt: string
 }
+//TODO
 export type PropertyDefinitionSupportedImagesType = any;
 export type PropertyDefinitionSupportedFilesType = any;
 
@@ -173,8 +286,22 @@ export interface PropertyDefinitionRawJSONRuleDataType {
   if: ConditionalRuleSetRawJSONDataType
 }
 
+export type PropertyDefinitionSearchLevelsType =
+  //Will always display a search field, but it might be skipped
+  //this is the default
+  "always" |
+  //Will display a smaller search field and make it clearly optional
+  "moderate" |
+  //Will actually make it so that you need to press a button to see
+  //all search options
+  "rare" |
+  //Does not display any search field at all
+  "disabled"
+
 export interface PropertyDefinitionRawJSONDataType {
+  //the property identifier
   id: string,
+  //the type of the property
   type: PropertyDefinitionSupportedTypes,
   values?: Array<boolean | string | number>,
   nullable?: boolean,
@@ -185,6 +312,8 @@ export interface PropertyDefinitionRawJSONDataType {
   defaultIf?: Array<PropertyDefinitionRawJSONRuleDataType>,
   enforcedValues?: Array<PropertyDefinitionRawJSONRuleDataType>,
   hiddenIf?: ConditionalRuleSetRawJSONDataType,
+  searchLevel?: PropertyDefinitionSearchLevelsType,
+  disableRangedSearch?: boolean,
 
   //This one is added for the sake of data of origin
   isExtension?: boolean
@@ -209,6 +338,8 @@ export default class PropertyDefinition {
   private defaultIf?: Array<PropertyDefinitionRuleDataType>;
   private enforcedValues?: Array<PropertyDefinitionRuleDataType>;
   private hiddenIf?: ConditionalRuleSet;
+  private isRangedSearchDisabled?: boolean;
+  private searchLevel: PropertyDefinitionSearchLevelsType
 
   //representing the state of the class
   private onStateChange:()=>any;
@@ -222,8 +353,7 @@ export default class PropertyDefinition {
   ){
     //If its not production run the checks
     if (process.env.NODE_ENV !== "production") {
-      PropertyDefinition.check(rawJSON, parent,
-        parentItemDefinition, onStateChange);
+      PropertyDefinition.check(rawJSON, parentItemDefinition, onStateChange);
     }
 
     this.id = rawJSON.id;
@@ -235,6 +365,8 @@ export default class PropertyDefinition {
     this.autocompleteSetFromProperty = rawJSON.autocompleteSetFromProperty;
     this.default = rawJSON.default;
     this.isExtension = rawJSON.isExtension;
+    this.isRangedSearchDisabled = rawJSON.disableRangedSearch;
+    this.searchLevel = rawJSON.searchLevel || "always";
 
     this.defaultIf = rawJSON.defaultIf && rawJSON.defaultIf.map(dif=>({
       value: dif.value,
@@ -296,7 +428,7 @@ export default class PropertyDefinition {
 
   isValidValue(newValue: PropertyDefinitionSupportedType):boolean {
     let definition = PropertyDefinition.supportedTypesStandard[this.type];
-    if (definition.json && typeof newValue !== definition){
+    if (definition.json && typeof newValue !== definition.json){
       return false;
     }
     if (definition.validate && !definition.validate(newValue)){
@@ -314,4 +446,72 @@ export default class PropertyDefinition {
   static schema_validate:any;
   static check:any;
   static supportedTypesStandard = PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD;
+}
+
+//We set the value of those if non in production
+//These are very useful debugging utilities
+if (process.env.NODE_ENV !== "production") {
+
+  //The schema for the definition
+  //{
+  //  "amount": 4,
+  //  "type": "car"
+  //},
+  //properties can be any string
+  //the values must be boolean string or number
+  //we should have at least one
+  PropertyDefinition.schema = {
+    type: "object",
+    additionalProperties: {
+      type: ["boolean", "string", "number", "null"]
+    },
+    minProperties: 1
+  };
+
+  //the validation function created by ajv
+  PropertyDefinition.schema_validate =
+    ajv.compile(PropertyDefinition.schema);
+
+  //the checker, takes the same arguments as the constructor
+  PropertyDefinition.check = function(
+    rawJSON: PropertyDefinitionRawJSONDataType,
+    parentItemDefinition: ItemDefinition,
+    onStateChange: ()=>any
+  ){
+
+    //we check the schema for validity
+    let valid = PropertiesValueMappingDefiniton.schema_validate(rawJSON);
+
+    //if not valid throw the errors
+    if (!valid) {
+      console.error(PropertiesValueMappingDefiniton.schema_validate.errors);
+      throw new Error("Check Failed");
+    };
+
+    //We need to loop over the properties that were given
+    let propertyList = Object.keys(rawJSON);
+    let propertyName;
+    for (propertyName of propertyList){
+
+      //get the value for them
+      let propertyValue = rawJSON[propertyName];
+
+      //and lets check that they actually have such properties
+      if (!referredItemDefinition.hasPropertyDefinitionFor(propertyName)){
+        console.error("Property not available in referred itemDefinition",
+          rawJSON, "in property named", propertyName, "valued",
+          propertyValue);
+        throw new Error("Check Failed");
+      };
+
+      //And check whether the value is even valid
+      if (!referredItemDefinition.getPropertyDefinitionFor(propertyName)
+        .isValidValue(propertyValue)){
+        console.error("Property value is invalid in referred itemDefinition",
+          rawJSON, "in property named", propertyName, "valued",
+          propertyValue);
+        throw new Error("Check Failed");
+      };
+    }
+  }
 }

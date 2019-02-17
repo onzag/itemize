@@ -4,24 +4,33 @@ import { PropertyDefinitionRawJSONDataType } from
   "./ItemDefinition/PropertyDefinition";
 
 export interface ModuleRawJSONDataType {
+  //Builder data
   type: "module",
+  location: string,
+  name: string,
+
+  //module data
   children: Array<ModuleRawJSONDataType | ItemDefinitionRawJSONDataType>,
-  propExtensions: Array<PropertyDefinitionRawJSONDataType>
+  propExtensions?: Array<PropertyDefinitionRawJSONDataType>
 }
 
 export default class Module {
   private childModules: Array<Module>;
   private childDefinitions: Array<ItemDefinition>;
+  private name: string;
+  public location:string;
 
   constructor(rawJSON: ModuleRawJSONDataType, onStateChange: ()=>any){
     this.childModules = [];
     this.childDefinitions = [];
+    this.name = rawJSON.name;
+    this.location = rawJSON.location;
 
     rawJSON.children.forEach(c=>{
       if (c.type === "module"){
         this.childModules.push(new Module(c, onStateChange));
       } else if (c.type === "item"){
-        c.properties = rawJSON.propExtensions
+        c.properties = (rawJSON.propExtensions || [])
           .map(e=>
             (<PropertyDefinitionRawJSONDataType>{...e, isExtension: true}))
           .concat(c.properties);
@@ -86,4 +95,12 @@ export default class Module {
   getAllChildModules(){
     return this.childModules;
   }
+
+  getName(){
+    return this.name
+  }
+}
+
+if (process.env.NODE_ENV !== "production") {
+
 }

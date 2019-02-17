@@ -47,6 +47,7 @@
  */
 
 import ItemDefinition from '.';
+import { CheckUpError } from '../Error';
 
 //import ajv checker conditionally
 let ajv;
@@ -122,7 +123,7 @@ export default class ConditionalRuleSet {
     parentItemDefinition: ItemDefinition){
 
     if (process.env.NODE_ENV !== "production") {
-      ConditionalRuleSet.check(rawJSON, parent, parentItemDefinition);
+      ConditionalRuleSet.check(rawJSON, parentItemDefinition);
     }
 
     this.property =
@@ -302,14 +303,17 @@ if (process.env.NODE_ENV !== "production") {
   //And the function that does the actual checking
   ConditionalRuleSet.check = function(
     rawJSON: ConditionalRuleSetRawJSONDataType,
-    parent: any,
     parentItemDefinition: ItemDefinition){
 
     //Let's validate the raw json
     let valid = ConditionalRuleSet.schema_validate(rawJSON);
     if (!valid) {
-      console.error(ConditionalRuleSet.schema_validate.errors);
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "Schema Check Failed",
+        parentItemDefinition.location,
+        ConditionalRuleSet.schema_validate.errors,
+        rawJSON
+      );
     };
 
     //Let's try to search for the item definition for that given component
@@ -319,9 +323,12 @@ if (process.env.NODE_ENV !== "production") {
       (<ConditionalRuleSetRawJSONDataComponentType>rawJSON).component;
     if (component &&
       !parentItemDefinition.hasItemDefinitionFor(component)){
-      console.error("Conditional rule set item definition not avaibale at",
-        rawJSON, "named", component);
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "Conditional rule set item definition not avaibale",
+        parentItemDefinition.location,
+        {component},
+        rawJSON
+      );
     }
 
     //Let's try to find the property that is specified and check
@@ -332,15 +339,25 @@ if (process.env.NODE_ENV !== "production") {
       (<ConditionalRuleSetRawJSONDataPropertyType>rawJSON).value;
     if (property &&
       !parentItemDefinition.hasPropertyDefinitionFor(property)){
-      console.error("Conditional rule set property not avaibale at",
-        rawJSON, "named", property, "valued", value);
-      throw new Error("Check Failed");
+      let obj:any = {};
+      obj[property] = value;
+      throw new CheckUpError(
+        "Conditional rule set property invalid at",
+        parentItemDefinition.location,
+        obj,
+        rawJSON
+      );
     } else if (property &&
       !parentItemDefinition.getPropertyDefinitionFor(property)
       .isValidValue(value)) {
-      console.error("Conditional rule set property invalid at",
-        rawJSON, "named", property, "valued", value);
-      throw new Error("Check Failed");
+      let obj:any = {};
+      obj[property] = value;
+      throw new CheckUpError(
+        "Conditional rule set property invalid at",
+        parentItemDefinition.location,
+        obj,
+        rawJSON
+      );
     }
   }
 }

@@ -119,7 +119,7 @@ export default class Item {
 
     //If its not production run the checks
     if (process.env.NODE_ENV !== "production") {
-      Item.check(rawJSON, parent, parentItemDefinition);
+      Item.check(rawJSON, parentItemDefinition);
     }
 
     this.id = rawJSON.id;
@@ -471,9 +471,8 @@ if (process.env.NODE_ENV !== "production") {
   //the checker, takes the same arguments as the constructor
   Item.check = function(
     rawJSON: ItemRawJSONDataType,
-    parent: any,
     parentItemDefinition: ItemDefinition,
-    onStateChange: ()=>any){
+  ){
 
     //we check the schema for validity
     let valid = Item.schema_validate(rawJSON);
