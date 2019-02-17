@@ -53,7 +53,7 @@ import { CheckUpError } from '../Error';
 let ajv;
 if (process.env.NODE_ENV !== "production") {
   const Ajv = require('ajv');
-  ajv = new Ajv({schemaId: 'id'});
+  ajv = new Ajv();
 }
 
 //Types for the conditions
@@ -107,20 +107,18 @@ export default class ConditionalRuleSet {
 
   //default values
   public parentItemDefinition:ItemDefinition;
-  public parent:any;
 
   /**
    * Constructor
    * @param rawJSON                the raw data as JSON
-   * @param parent                 the parent of this node, usually an Item
    * @param parentItemDefinition   the item definition that this node is
    *                               located, its root; for the example above that
    *                               would be the vehicle item definition
    */
   constructor(
     rawJSON: ConditionalRuleSetRawJSONDataType,
-    parent: any,
-    parentItemDefinition: ItemDefinition){
+    parentItemDefinition: ItemDefinition
+  ){
 
     if (process.env.NODE_ENV !== "production") {
       ConditionalRuleSet.check(rawJSON, parentItemDefinition);
@@ -140,9 +138,8 @@ export default class ConditionalRuleSet {
 
     this.gate = rawJSON.gate;
     this.condition = rawJSON.condition &&
-      new ConditionalRuleSet(rawJSON.condition, this, parentItemDefinition);
+      new ConditionalRuleSet(rawJSON.condition, parentItemDefinition);
 
-    this.parent = parent;
     this.parentItemDefinition = parentItemDefinition;
   }
 
@@ -163,7 +160,7 @@ export default class ConditionalRuleSet {
       //lets get the property value as for now
       let actualPropertyValue =
         this.parentItemDefinition.getPropertyDefinitionFor(this.property)
-        .getCurrentValue();
+        .getCurrentValue().value;
 
       //the result by default is false
       let result = false;

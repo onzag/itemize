@@ -11,20 +11,22 @@
 			"id": "topic",
 			"type": "string",
 			"autocomplete": "topics",
-      "autocompleteSetFromProperty": "category",
+      "autocompleteSetFromProperty": ["category"],
 			"autocompleteIsEnforced": true
 		},
     {
 			"id": "parentItemType",
 			"type": "string",
 			"nullable": true,
-      "hidden": true
+      "hidden": true,
+      "searchLevel": "disabled"
 		},
     {
 			"id": "parentId",
 			"type": "number",
 			"nullable": true,
-      "hidden": true
+      "hidden": true,
+      "searchLevel": "disabled"
 		},
     {
       "id": "title",

@@ -35,7 +35,7 @@ import ItemDefinition from '.';
 let ajv;
 if (process.env.NODE_ENV !== "production") {
   const Ajv = require('ajv');
-  ajv = new Ajv({schemaId: 'id'});
+  ajv = new Ajv();
 }
 
 //Represents the way that properties are stored
@@ -55,12 +55,10 @@ export default class PropertiesValueMappingDefiniton {
   private properties:PropertiesValueMappingDefinitonType;
   public referredItemDefinition:ItemDefinition;
   public parentItemDefinition:ItemDefinition;
-  public parent:any;
 
   /**
    * Contructor for the class
    * @param rawJSON                the raw data as JSON
-   * @param parent                 the parent of this node, usually an Item
    * @param parentItemDefinition   the item definition that this node is
    *                               located, its root; for the example above that
    *                               would be the vehicle item definition
@@ -71,7 +69,6 @@ export default class PropertiesValueMappingDefiniton {
    */
   constructor(
     rawJSON: PropertiesValueMappingDefinitonRawJSONDataType,
-    parent: any,
     parentItemDefinition: ItemDefinition,
     referredItemDefinition: ItemDefinition){
 
@@ -81,7 +78,6 @@ export default class PropertiesValueMappingDefiniton {
       PropertiesValueMappingDefiniton.check(rawJSON, referredItemDefinition);
     }
     this.properties = rawJSON;
-    this.parent = parent;
     this.parentItemDefinition = parentItemDefinition;
     this.referredItemDefinition = referredItemDefinition;
   }

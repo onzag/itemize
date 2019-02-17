@@ -6,7 +6,7 @@ import { CheckUpError } from "../Error";
 let ajv;
 if (process.env.NODE_ENV !== "production") {
   const Ajv = require('ajv');
-  ajv = new Ajv({schemaId: 'id'});
+  ajv = new Ajv();
 }
 
 export interface ItemDefinitionRawJSONDataType {
@@ -80,13 +80,13 @@ export default class ItemDefinition {
         )
       }).filter(d=>d) : [];
     this.propertyDefinitions = rawJSON.properties ? rawJSON.properties
-      .map(p=>(new PropertyDefinition(p, this, this, onStateChange))) : [];
+      .map(p=>(new PropertyDefinition(p, this, onStateChange))) : [];
     this.onStateChange = onStateChange;
 
     //item instances might request for item definitions during check
     //so we set them later
     this.itemInstances = rawJSON.includes ? rawJSON.includes
-      .map(i=>(new Item(i, this, this, onStateChange))) : [];
+      .map(i=>(new Item(i, this, onStateChange))) : [];
 
     this.parentModule = parentModule;
     this.parentItemDefinition = parentItemDefinition;

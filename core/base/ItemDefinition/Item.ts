@@ -41,7 +41,7 @@ import ConditionalRuleSet, { ConditionalRuleSetRawJSONDataType } from
 let ajv;
 if (process.env.NODE_ENV !== "production") {
   const Ajv = require('ajv');
-  ajv = new Ajv({schemaId: 'id'});
+  ajv = new Ajv();
 }
 
 export type ItemGateType = "or" | "and" | "xor";
@@ -72,7 +72,6 @@ export interface ItemRawJSONDataType {
 export default class Item {
   //The basics
   public parentItemDefinition:ItemDefinition;
-  public parent:any;
 
   //attribute to know if this item is actually an item group
   private isGroup: boolean;
@@ -99,12 +98,12 @@ export default class Item {
   //representing the state of the class
   private onStateChange:()=>any;
   private state_isExcluded:boolean;
+  private state_isExcludedModified:boolean;
   private state_isPhantomExcluded:boolean;
 
   /**
    * The constructor for an Item
    * @param rawJSON                the raw data as JSON
-   * @param parent                 the parent of this node, usually an Item
    * @param parentItemDefinition   the item definition that this node is
    *                               located, its root; for the example above that
    *                               would be the vehicle item definition
@@ -113,7 +112,6 @@ export default class Item {
    */
   constructor(
     rawJSON: ItemRawJSONDataType,
-    parent: any,
     parentItemDefinition: ItemDefinition,
     onStateChange: ()=>any){
 
@@ -130,7 +128,7 @@ export default class Item {
     //put the items and the gate in place
     this.gate = rawJSON.gate;
     this.items = rawJSON.items && rawJSON.items.map(rawJSONItem=>
-      (new Item(rawJSONItem, this, parentItemDefinition, onStateChange)));
+      (new Item(rawJSONItem, parentItemDefinition, onStateChange)));
 
     //lets get an instance for the item definition for this
     //item, this is because we need to set properties for this specific
@@ -140,36 +138,37 @@ export default class Item {
 
     //the enforced properties list
     this.enforcedProperties = rawJSON.enforcedProperties &&
-      new PropertiesValueMappingDefiniton(rawJSON.enforcedProperties, this,
+      new PropertiesValueMappingDefiniton(rawJSON.enforcedProperties,
         parentItemDefinition, this.itemDefinition);
 
     //the predefined properties list
     this.predefinedProperties = rawJSON.predefinedProperties &&
-      new PropertiesValueMappingDefiniton(rawJSON.predefinedProperties, this,
+      new PropertiesValueMappingDefiniton(rawJSON.predefinedProperties,
         parentItemDefinition, this.itemDefinition);
 
     //If this is going to be excluded
     this.excludedIf = rawJSON.excludedIf &&
-      new ConditionalRuleSet(rawJSON.excludedIf, this, parentItemDefinition);
+      new ConditionalRuleSet(rawJSON.excludedIf, parentItemDefinition);
 
     //if this might be excluded
     this.mightExclude = rawJSON.mightExclude;
 
     this.mightExcludeIf = rawJSON.mightExcludeIf &&
-      new ConditionalRuleSet(rawJSON.mightExcludeIf, this, parentItemDefinition);
+      new ConditionalRuleSet(rawJSON.mightExcludeIf, parentItemDefinition);
 
     //Default exclusion rules
     this.defaultExcluded = rawJSON.defaultExcluded;
 
     this.defaultExcludedIf = rawJSON.defaultExcludedIf &&
-      new ConditionalRuleSet(rawJSON.defaultExcludedIf, this,
-        parentItemDefinition);
+      new ConditionalRuleSet(
+        rawJSON.defaultExcludedIf,
+        parentItemDefinition
+      );
 
     //whether this is rare
     this.rare = rawJSON.rare;
 
-    //parent node and item definition
-    this.parent = parent;
+    //parent item definition
     this.parentItemDefinition = parentItemDefinition;
 
     //lets setup the enforced and predefined properties in the item
@@ -187,24 +186,14 @@ export default class Item {
     //STATE MANAGEMENT
     this.onStateChange = onStateChange;
 
-    //we need to set the state lets check whether is excluded by force
-    //that is if excludedIf returns true
-    let isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
+    //The initial state is unknown
+    //due to the defaults
+    //this will never be visible as null because only
+    //modified states are the only ones that will show
+    this.state_isExcluded = null;
 
-    //lets check whether it can be excluded (toggled by the user)
-    let canBeExcluded = this.mightExclude || (this.mightExcludeIf &&
-      this.mightExcludeIf.evaluate());
-
-    //and lets check if by default is excluded
-    let isDefaultExcluded = this.defaultExcluded ||
-      (this.defaultExcludedIf && this.defaultExcludedIf.evaluate());
-
-    //so now we check what the initial state is going to be
-    //the primary is if it's excluded by force, if not then it'd
-    //be whether it is default excluded (only if it can be excluded)
-    //otherwise is false
-    this.state_isExcluded = isExcludedByForce ||
-      (canBeExcluded && isDefaultExcluded) || false;
+    //initially the state hasn't been modified
+    this.state_isExcludedModified = false;
 
     this.state_isPhantomExcluded = false;
   }
@@ -224,8 +213,16 @@ export default class Item {
     //if it can be excluded
     let canBeExcluded = this.mightExclude || (this.mightExcludeIf &&
       this.mightExcludeIf.evaluate());
-
     if (canBeExcluded){
+      //if it hasn't been modified we return the default state
+      if (!this.state_isExcludedModified){
+        //depending on the condition
+        let isDefaultExcluded = this.defaultExcluded ||
+          (this.defaultExcludedIf && this.defaultExcludedIf.evaluate()) ||
+          false;
+        //by default the excluded would be false
+        return isDefaultExcluded;
+      }
       return this.state_isExcluded;
     } else {
       return false;
@@ -257,7 +254,7 @@ export default class Item {
    * case is true but it might be false as well
    * @return a boolean that tells whether if it can be toggled
    */
-  canExclusionBeToggled():boolean {
+  canExclusionBeSet():boolean {
     //if it's excluded by force the default is false, you cannot toggle
     //anything excluded by force
     let isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
@@ -275,20 +272,21 @@ export default class Item {
    * event, note that exclusion must be able to be toggled otherwise
    * it'd throw an error
    */
-  toggleExclusionState(phantom: boolean):void {
-    if (!phantom && !this.canExclusionBeToggled()){
-      throw new Error("Exclusion cannot be toggled");
-    } else if (phantom && this.canExclusionBeToggled()){
-      throw new Error("Using phantom excludes when exclusion can be toggled");
+  setExclusionState(value:boolean, phantom: boolean):void {
+    if (!phantom && !this.canExclusionBeSet()){
+      throw new Error("Exclusion cannot be set");
+    } else if (phantom && this.canExclusionBeSet()){
+      throw new Error("Using phantom excludes when exclusion can be set");
     }
 
     if (phantom){
       //change the forced excluded state, this does not
       //affect the real exclusion state
-      this.state_isPhantomExcluded = !this.state_isPhantomExcluded
+      this.state_isPhantomExcluded = value
     } else {
       //change the exclusion state
-      this.state_isExcluded = !this.state_isExcluded;
+      this.state_isExcluded = value;
+      this.state_isExcludedModified = true;
     }
     //trigger an state change
     this.onStateChange();
@@ -391,7 +389,7 @@ export default class Item {
    * @return the list, single item or null
    */
   getCurrentUsableItems(): ItemGroupHandle | Item {
-    if (this.isCurrentlyExcluded() && !this.canExclusionBeToggled()){
+    if (this.isCurrentlyExcluded() && !this.canExclusionBeSet()){
       return null;
     } else if (!this.isGroup){
       return this;

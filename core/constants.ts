@@ -9,6 +9,12 @@ export const MIN_SUPPORTED_INTEGER = -MAX_SUPPORTED_INTEGER;
 export const MAX_DECIMAL_COUNT = 6;
 //Defines how big can decimal numbers get
 export const MAX_SUPPORTED_REAL = 999999999;
+//Defines how small can decimal numbers get
+export const MIN_SUPPORTED_REAL = -999999999;
+//Years max
+export const MAX_SUPPORTED_YEAR = 3000;
+//Years min
+export const MIN_SUPPORTED_YEAR = 0;
 //Defines how many characters a string might have
 export const MAX_STRING_LENGTH = 255;
 //How many characters (including HTML special characters) text might have

@@ -12,13 +12,17 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   CLASSIC_RANGED_OPTIONAL_i18N,
   CLASSIC_SEARCH_BASE_i18N,
   CLASSIC_SEARCH_OPTIONAL_i18N,
-  CLASSIC_DISTANCE_i18N} from '../../constants';
+  CLASSIC_DISTANCE_i18N,
+  MIN_SUPPORTED_REAL,
+  MAX_SUPPORTED_YEAR,
+  MIN_SUPPORTED_YEAR} from '../../constants';
+import { CheckUpError } from '../Error';
 
 //import ajv checker conditionally
 let ajv;
 if (process.env.NODE_ENV !== "production") {
   const Ajv = require('ajv');
-  ajv = new Ajv({schemaId: 'id'});
+  ajv = new Ajv();
 }
 
 //All the supported property types
@@ -65,6 +69,10 @@ Record<PropertyDefinitionSupportedTypes, {
   //as types that are not settable do not have a json form
   json?: "boolean" | "number" | "string",
 
+  //represents an item that would mark for null
+  //by default it is null itself
+  nullableDefault?: any,
+
   //this is a validation function that checks whether the value
   //is valid,
   validate?: (value: PropertyDefinitionSupportedType)=>any,
@@ -103,23 +111,31 @@ Record<PropertyDefinitionSupportedTypes, {
 export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   :PropertyDefinitionSupportedTypesStandardType = {
   boolean: {
+    //a boolean type can be written as a boolean
     json: "boolean",
+    //it is searchable by default
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
+    //the i18n attributes
     i18n: {
       base: REDUCED_BASE_i18N,
       optional: CLASSIC_OPTIONAL_i18N
     }
   },
   integer: {
+    //an integer is represented as a number
     json: "number",
+    //it gotta be validated to check it's a number
     validate: (n:PropertyDefinitionSupportedIntegerType)=>
       !isNaN(NaN) && parseInt(<any>n) === n &&
       n <= MAX_SUPPORTED_INTEGER && n >= -MIN_SUPPORTED_INTEGER,
+    //max and min
     max: MAX_SUPPORTED_INTEGER,
     min: -MIN_SUPPORTED_INTEGER,
+    //it is searchable by exact and range value
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    //i18n attributes
     i18n: {
       base: CLASSIC_BASE_i18N,
       optional: CLASSIC_OPTIONAL_i18N,
@@ -128,28 +144,35 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     }
   },
   number: {
+    //a number is just a number can be integer or decimal
     json: "number",
+    //the validator
     validate: (n:PropertyDefinitionSupportedNumberType)=>{
       if (isNaN(n)){
         return false;
       }
 
-      let strValue = n.toString();
-      if (strValue.indexOf('e') !== -1){
+      if (n <= MAX_SUPPORTED_INTEGER && n >= -MIN_SUPPORTED_INTEGER){
         return false;
       }
+
       let splittedDecimals = n.toString().split(".");
       if (splittedDecimals[0].length < 131072 &&
-        (!splittedDecimals[1] || splittedDecimals[1].length < 131072)){
+        (!splittedDecimals[1] ||
+          splittedDecimals[1].length < MAX_DECIMAL_COUNT)){
           return true;
         }
 
       return false;
     },
+    //max and min
     max: MAX_SUPPORTED_REAL,
+    min: MIN_SUPPORTED_REAL,
     maxDecimalCount: MAX_DECIMAL_COUNT,
+    //it is searchable
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    //i18n attributes required
     i18n: {
       base: CLASSIC_BASE_i18N,
       optional: CLASSIC_OPTIONAL_i18N,
@@ -158,38 +181,55 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     }
   },
   string: {
+    //a string is a string
     json: "string",
+    nullableDefault: "",
+    //validates just the length
     validate: (s:PropertyDefinitionSupportedStringType)=>s.length <= 255,
     maxLenght: MAX_STRING_LENGTH,
+    //it is searchable by an exact value, use text for organic things
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
+    //i18n attributes required
     i18n: {
       base: CLASSIC_BASE_i18N,
       optional: CLASSIC_OPTIONAL_i18N
     }
   },
   text: {
+    nullableDefault: "",
+    //validates the text, texts don't support json value
     validate: (s:PropertyDefinitionSupportedTextType)=>{
       return typeof s.html === "string" &&
         typeof s.raw === "string" && s.html.length < MAX_TEXT_LENGTH
         && s.raw.length <= s.html.length;
     },
+    //the max lenght for the html
     maxLenght: MAX_TEXT_LENGTH,
+    //whether it is searchable or not
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.FTS,
+    //i18n attributes
     i18n: {
       base: CLASSIC_BASE_i18N,
       optional: CLASSIC_OPTIONAL_i18N,
-      range: CLASSIC_RANGED_i18N,
-      rangeOptional: CLASSIC_RANGED_OPTIONAL_i18N
+      searchBase: CLASSIC_SEARCH_BASE_i18N,
+      searchOptional: CLASSIC_SEARCH_OPTIONAL_i18N
     }
   },
   year: {
+    //years can be set as a number
     json: "number",
+    //validates
     validate: (n:number)=>!isNaN(NaN) && parseInt(<any>n) === n &&
-      n <= 3000 && n >= 0,
+      n <= MAX_SUPPORTED_YEAR && n >= MIN_SUPPORTED_YEAR,
+    //max and min
+    max: MAX_SUPPORTED_YEAR,
+    min: MIN_SUPPORTED_YEAR,
+    //searchable attributes and supports range
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    //i18n data
     i18n: {
       base: CLASSIC_BASE_i18N,
       optional: CLASSIC_OPTIONAL_i18N,
@@ -219,13 +259,16 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     }
   },
   location: {
+    //locations just contain this basic data
     validate: (l:PropertyDefinitionSupportedLocationType)=>{
       return typeof l.lng === "string" &&
         typeof l.lat === "string" &&
         typeof l.txt === "string"
     },
+    //they are searchable
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE,
+    //i18n with the distance attributes
     i18n: {
       base: REDUCED_BASE_i18N,
       optional: CLASSIC_OPTIONAL_i18N,
@@ -303,16 +346,29 @@ export interface PropertyDefinitionRawJSONDataType {
   id: string,
   //the type of the property
   type: PropertyDefinitionSupportedTypes,
+  //values for the property set
   values?: Array<boolean | string | number>,
+  //whether it can be null or not
   nullable?: boolean,
+  //hidden does not show at all
   hidden?: boolean,
+  //autocomplete is an endpoint of some sort that requests
+  //data for autocomplete
   autocomplete?: string,
-  autocompleteSetFromProperty?: string,
+  //uses a property attribute
+  autocompleteSetFromProperty?: Array<string>,
+  //whether it's enforced or not
+  autocompleteIsEnforced?: boolean,
+  //default value
   default?: boolean | string | number,
   defaultIf?: Array<PropertyDefinitionRawJSONRuleDataType>,
+  //enforced values
   enforcedValues?: Array<PropertyDefinitionRawJSONRuleDataType>,
+  //hidden if conditional
   hiddenIf?: ConditionalRuleSetRawJSONDataType,
+  //search level
   searchLevel?: PropertyDefinitionSearchLevelsType,
+  //disable ranged search
   disableRangedSearch?: boolean,
 
   //This one is added for the sake of data of origin
@@ -324,7 +380,15 @@ export interface PropertyDefinitionRuleDataType {
   if: ConditionalRuleSet
 }
 
+export interface PropertyValueGetterType {
+  userSet: boolean,
+  default: boolean,
+  enforced: boolean,
+  valid: boolean,
+  value: PropertyDefinitionSupportedType
+}
 
+//The class itself
 export default class PropertyDefinition {
   private id: string;
   private type: PropertyDefinitionSupportedTypes;
@@ -332,7 +396,8 @@ export default class PropertyDefinition {
   private nullable?: boolean;
   private hidden?: boolean;
   private autocomplete?: string;
-  private autocompleteSetFromProperty?: string;
+  private autocompleteSetFromProperty?: Array<string>;
+  private autocompleteIsEnforced?: boolean;
   private isExtension?: boolean;
   private default?: boolean | string | number;
   private defaultIf?: Array<PropertyDefinitionRuleDataType>;
@@ -344,18 +409,25 @@ export default class PropertyDefinition {
   //representing the state of the class
   private onStateChange:()=>any;
   private state_value:PropertyDefinitionSupportedType;
+  private state_valueModified:boolean;
 
+  /**
+   * Builds a property definition
+   * @param rawJSON              the raw json structure
+   * @param parentItemDefinition [description]
+   * @param onStateChange        [description]
+   */
   constructor(
     rawJSON: PropertyDefinitionRawJSONDataType,
-    parent: any,
     parentItemDefinition: ItemDefinition,
     onStateChange: ()=>any
   ){
     //If its not production run the checks
     if (process.env.NODE_ENV !== "production") {
-      PropertyDefinition.check(rawJSON, parentItemDefinition, onStateChange);
+      PropertyDefinition.check(rawJSON, parentItemDefinition);
     }
 
+    //setting the private properties
     this.id = rawJSON.id;
     this.type = rawJSON.type;
     this.values = rawJSON.values;
@@ -363,80 +435,187 @@ export default class PropertyDefinition {
     this.hidden = rawJSON.hidden;
     this.autocomplete = rawJSON.autocomplete;
     this.autocompleteSetFromProperty = rawJSON.autocompleteSetFromProperty;
+    this.autocompleteIsEnforced = rawJSON.autocompleteIsEnforced;
     this.default = rawJSON.default;
     this.isExtension = rawJSON.isExtension;
     this.isRangedSearchDisabled = rawJSON.disableRangedSearch;
     this.searchLevel = rawJSON.searchLevel || "always";
 
+    //set the default value
     this.defaultIf = rawJSON.defaultIf && rawJSON.defaultIf.map(dif=>({
       value: dif.value,
-      if: new ConditionalRuleSet(dif.if, this, parentItemDefinition)
+      if: new ConditionalRuleSet(dif.if, parentItemDefinition)
     }));
 
+    //set the enforced values from the conditional rule set
     this.enforcedValues = rawJSON.enforcedValues &&
       rawJSON.enforcedValues.map(ev=>({
         value: ev.value,
-        if: new ConditionalRuleSet(ev.if, this, parentItemDefinition)
+        if: new ConditionalRuleSet(ev.if, parentItemDefinition)
       }));
 
+    //set the hidden if rule
     this.hiddenIf = rawJSON.hiddenIf &&
-      new ConditionalRuleSet(rawJSON.hiddenIf, this, parentItemDefinition);
+      new ConditionalRuleSet(rawJSON.hiddenIf, parentItemDefinition);
 
     //STATE MANAGEMENT
     this.onStateChange = onStateChange;
-    this.state_value = typeof rawJSON.default !== "undefined" ?
-      rawJSON.default : null;
-
-    if (rawJSON.defaultIf){
-      let rulePasses = this.defaultIf.find(difRule=>difRule.if.evaluate());
-      if (rulePasses){
-        this.state_value = rulePasses.value;
-      }
-    }
+    //initial value is null
+    this.state_value = null;
+    this.state_valueModified = false;
   }
 
+  /**
+   * checks if it's currently hidden (not phantom)
+   * @return a boolean
+   */
   isCurrentlyHidden():boolean{
-    return this.hidden || (this.hiddenIf && this.hiddenIf.evaluate()) || false;
+    return this.hidden ||
+      (this.hiddenIf && this.hiddenIf.evaluate()) || false;
   }
 
+  /**
+   * gives the id of this property defintion
+   * @return the id
+   */
   getId(){
     return this.id;
   }
 
-  getCurrentValue():PropertyDefinitionSupportedType {
+  /**
+   * provides the current useful value for the property defintion
+   * @return a bunch of information about the current value
+   */
+  getCurrentValue():PropertyValueGetterType {
+    //if there's an enforced value
     if (this.enforcedValues) {
+      //let's check if one matches the current situation
       let enforcedValue = this.enforcedValues.find(ev=>{
         return ev.if.evaluate();
       });
+      //if we get one
       if (enforcedValue){
-        return enforcedValue.value;
+        //we return the value that was set to be
+        return {
+          userSet: false,
+          enforced: true,
+          default: false,
+          valid: this.isValidValue(enforcedValue.value),
+          value: enforcedValue.value
+        };
       }
     }
 
-    return this.state_value;
+    //if the value hasn't been modified we are to return the defaults
+    if (!this.state_valueModified){
+      //lets find the default value
+      let defaultValue = this.default;
+      //Also by condition
+      if (this.defaultIf){
+        //find a rule that passes
+        let rulePasses = this.defaultIf.find(difRule=>difRule.if.evaluate());
+        if (rulePasses){
+          //and set the default value to such
+          defaultValue = rulePasses.value;
+        }
+      }
+
+      //return the default value or null if nothing found
+      //the maximum default is null, even if the item is not
+      //nullable in which case the item would be considered invalid
+      return {
+        userSet: false,
+        enforced: false,
+        default: true,
+        valid: this.isValidValue(defaultValue || null),
+        value: defaultValue || null
+      };
+    }
+
+    return {
+      userSet: true,
+      enforced: false,
+      default: false,
+      valid: this.isValidValue(this.state_value),
+      value: this.state_value
+    };
   }
 
-  setCurrentValue(newValue: PropertyDefinitionSupportedType){
-    if (!this.isValidValue(newValue)){
-      throw new Error("Invalid value " + JSON.stringify(newValue));
+  /**
+   * Sets the current value for the item, null is a valid value
+   * Specially if the item is nullable
+   *
+   * The resulting value set might not be the same, if the item
+   * has a default null value, that is, if the value is set to that
+   * value it will be converted to null
+   *
+   * @param  newValue the new value
+   */
+  setCurrentValue(newValue: PropertyDefinitionSupportedType):void {
+    //let's get the definition
+    let definition = PropertyDefinition.supportedTypesStandard[this.type];
+    //find whether there is a nullable value and if it matches
+    let newActualValue = definition.nullableDefault === newValue ?
+      null : newValue;
+
+    //we run some very basic validations, if this is a number and you put in
+    //a string then something is clearly wrong
+    //other kinds of invalid values are ok
+    if (definition.json && typeof newActualValue !== definition.json){
+      throw new Error("Invalid value " + JSON.stringify(newActualValue));
     }
-    if (newValue !== this.state_value){
-      this.state_value = newValue;
+    if (definition.validate && !definition.validate(newActualValue)){
+      throw new Error("Invalid value " + JSON.stringify(newActualValue));
+    }
+
+    //if the value differs we set it for the new
+    //note that the value is set and never check
+    if (newActualValue !== this.state_value){
+      this.state_value = newActualValue;
+      this.state_valueModified = true;
       this.onStateChange();
     }
   }
 
-  isValidValue(newValue: PropertyDefinitionSupportedType):boolean {
-    let definition = PropertyDefinition.supportedTypesStandard[this.type];
-    if (definition.json && typeof newValue !== definition.json){
+  /**
+   * Externally checks a valid value for this input using all
+   * its guns
+   * @param  value the new value to set
+   * @return       a boolean
+   */
+  isValidValue(value: PropertyDefinitionSupportedType):boolean {
+    if (this.nullable && value === null){
+      return true;
+    }
+    if (this.values && !this.values.includes(value)){
       return false;
     }
-    if (definition.validate && !definition.validate(newValue)){
+    //we get the definition and run basic checks
+    let definition = PropertyDefinition.supportedTypesStandard[this.type];
+    if (definition.json && typeof value !== definition.json){
+      return false;
+    }
+    if (definition.validate && !definition.validate(value)){
       return false
     }
     return true;
   }
 
+  /**
+   * Return whether the current holds a valid value
+   * This is good for hinting in the fields, if this
+   * returns false you can make it red
+   * @return a boolean
+   */
+  isCurrentValid():boolean {
+    return this.isValidValue(this.getCurrentValue());
+  }
+
+  /**
+   * Tells if the property is an extension
+   * from the propext list, they usually have priority
+   * @return a boolean
+   */
   checkIfIsExtension():boolean {
     return !!this.isExtension;
   }
@@ -452,6 +631,20 @@ export default class PropertyDefinition {
 //These are very useful debugging utilities
 if (process.env.NODE_ENV !== "production") {
 
+  let valueOneOf = [
+    {
+      type: "string"
+    },
+    {
+      type: "boolean"
+    },
+    {
+      type: "number"
+    }
+  ]
+
+  let searchLevels = ["always", "moderate", "rare", "disabled"];
+
   //The schema for the definition
   //{
   //  "amount": 4,
@@ -462,10 +655,65 @@ if (process.env.NODE_ENV !== "production") {
   //we should have at least one
   PropertyDefinition.schema = {
     type: "object",
-    additionalProperties: {
-      type: ["boolean", "string", "number", "null"]
+    properties: {
+      id: {
+        type: "string"
+      },
+      type:  {
+        type: "string"
+      },
+      values: {
+        type: "array",
+        items: {
+          oneOf: valueOneOf
+        }
+      },
+      nullable: {
+        type: "boolean"
+      },
+      autocomplete: {
+        type: "string"
+      },
+      autocompleteSetFromProperty: {
+        type: "array",
+        items: {
+          type: "string"
+        }
+      },
+      autocompleteIsEnforced: {
+        type: "boolean"
+      },
+      default: {
+        oneOf: valueOneOf
+      },
+      defaultIf: {
+        type: "object",
+        properties: {
+          if: {},
+          value: {
+            oneOf: valueOneOf
+          }
+        },
+        additionalProperties: false,
+        required: ["value", "if"]
+      },
+      hidden: {
+        type: "boolean"
+      },
+      hiddenIf: {},
+      searchLevel: {
+        type: "string",
+        enum: searchLevels
+      },
+      disableRangedSearch: {
+        type: "boolean"
+      },
+      isExtension: {
+        type: "boolean"
+      }
     },
-    minProperties: 1
+    additionalProperties: false,
+    required: ["id", "type"]
   };
 
   //the validation function created by ajv
@@ -475,43 +723,20 @@ if (process.env.NODE_ENV !== "production") {
   //the checker, takes the same arguments as the constructor
   PropertyDefinition.check = function(
     rawJSON: PropertyDefinitionRawJSONDataType,
-    parentItemDefinition: ItemDefinition,
-    onStateChange: ()=>any
+    parentItemDefinition: ItemDefinition
   ){
 
     //we check the schema for validity
-    let valid = PropertiesValueMappingDefiniton.schema_validate(rawJSON);
+    let valid = PropertyDefinition.schema_validate(rawJSON);
 
     //if not valid throw the errors
     if (!valid) {
-      console.error(PropertiesValueMappingDefiniton.schema_validate.errors);
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "Schema Check Failed",
+        parentItemDefinition.location,
+        PropertyDefinition.schema_validate.errors,
+        rawJSON
+      );
     };
-
-    //We need to loop over the properties that were given
-    let propertyList = Object.keys(rawJSON);
-    let propertyName;
-    for (propertyName of propertyList){
-
-      //get the value for them
-      let propertyValue = rawJSON[propertyName];
-
-      //and lets check that they actually have such properties
-      if (!referredItemDefinition.hasPropertyDefinitionFor(propertyName)){
-        console.error("Property not available in referred itemDefinition",
-          rawJSON, "in property named", propertyName, "valued",
-          propertyValue);
-        throw new Error("Check Failed");
-      };
-
-      //And check whether the value is even valid
-      if (!referredItemDefinition.getPropertyDefinitionFor(propertyName)
-        .isValidValue(propertyValue)){
-        console.error("Property value is invalid in referred itemDefinition",
-          rawJSON, "in property named", propertyName, "valued",
-          propertyValue);
-        throw new Error("Check Failed");
-      };
-    }
   }
 }
