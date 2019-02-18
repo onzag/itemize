@@ -301,16 +301,16 @@ export type PropertyDefinitionSupportedTextType = {
   raw: string
 }
 //TODO
-export type PropertyDefinitionSupportedDateType = any;
-export type PropertyDefinitionSupportedDateTimeType = any;
+export type PropertyDefinitionSupportedDateType = null;
+export type PropertyDefinitionSupportedDateTimeType = null;
 export type PropertyDefinitionSupportedLocationType = {
   lng: string,
   lat: string,
   txt: string
 }
 //TODO
-export type PropertyDefinitionSupportedImagesType = any;
-export type PropertyDefinitionSupportedFilesType = any;
+export type PropertyDefinitionSupportedImagesType = null;
+export type PropertyDefinitionSupportedFilesType = null;
 
 export type PropertyDefinitionSupportedType =
   PropertyDefinitionSupportedBooleanType |
@@ -325,7 +325,7 @@ export type PropertyDefinitionSupportedType =
   PropertyDefinitionSupportedFilesType
 
 export interface PropertyDefinitionRawJSONRuleDataType {
-  value: boolean | string | number,
+  value: PropertyDefinitionSupportedType,
   if: ConditionalRuleSetRawJSONDataType
 }
 
@@ -344,10 +344,15 @@ export type PropertyDefinitionSearchLevelsType =
 export interface PropertyDefinitionRawJSONDataType {
   //the property identifier
   id: string,
+  //the locale data, we don't know what it is
+  //the structure is defined in the constants
+  i18nData: {
+    [locale: string]: any
+  },
   //the type of the property
   type: PropertyDefinitionSupportedTypes,
   //values for the property set
-  values?: Array<boolean | string | number>,
+  values?: Array<PropertyDefinitionSupportedType>,
   //whether it can be null or not
   nullable?: boolean,
   //hidden does not show at all
@@ -360,7 +365,7 @@ export interface PropertyDefinitionRawJSONDataType {
   //whether it's enforced or not
   autocompleteIsEnforced?: boolean,
   //default value
-  default?: boolean | string | number,
+  default?: PropertyDefinitionSupportedType,
   defaultIf?: Array<PropertyDefinitionRawJSONRuleDataType>,
   //enforced values
   enforcedValues?: Array<PropertyDefinitionRawJSONRuleDataType>,
@@ -376,7 +381,7 @@ export interface PropertyDefinitionRawJSONDataType {
 }
 
 export interface PropertyDefinitionRuleDataType {
-  value: boolean | string | number,
+  value: PropertyDefinitionSupportedType,
   if: ConditionalRuleSet
 }
 
@@ -391,15 +396,18 @@ export interface PropertyValueGetterType {
 //The class itself
 export default class PropertyDefinition {
   private id: string;
+  private i18nData: {
+    [locale: string]: any
+  };
   private type: PropertyDefinitionSupportedTypes;
-  private values?: Array<boolean | string | number>;
+  private values?: Array<PropertyDefinitionSupportedType>;
   private nullable?: boolean;
   private hidden?: boolean;
   private autocomplete?: string;
   private autocompleteSetFromProperty?: Array<string>;
   private autocompleteIsEnforced?: boolean;
   private isExtension?: boolean;
-  private default?: boolean | string | number;
+  private default?: PropertyDefinitionSupportedType;
   private defaultIf?: Array<PropertyDefinitionRuleDataType>;
   private enforcedValues?: Array<PropertyDefinitionRuleDataType>;
   private hiddenIf?: ConditionalRuleSet;
@@ -429,6 +437,7 @@ export default class PropertyDefinition {
 
     //setting the private properties
     this.id = rawJSON.id;
+    this.i18nData = rawJSON.i18nData;
     this.type = rawJSON.type;
     this.values = rawJSON.values;
     this.nullable = rawJSON.nullable;
@@ -602,22 +611,16 @@ export default class PropertyDefinition {
   }
 
   /**
-   * Return whether the current holds a valid value
-   * This is good for hinting in the fields, if this
-   * returns false you can make it red
-   * @return a boolean
-   */
-  isCurrentValid():boolean {
-    return this.isValidValue(this.getCurrentValue());
-  }
-
-  /**
    * Tells if the property is an extension
    * from the propext list, they usually have priority
    * @return a boolean
    */
   checkIfIsExtension():boolean {
     return !!this.isExtension;
+  }
+
+  getI18nDataFor(locale: string):any {
+    return this.i18nData[locale];
   }
 
   //These are here but only truly available in non production
@@ -645,6 +648,29 @@ if (process.env.NODE_ENV !== "production") {
 
   let searchLevels = ["always", "moderate", "rare", "disabled"];
 
+  let staticIsValidValue = function(
+    type: PropertyDefinitionSupportedTypes,
+    nullable: boolean,
+    values: Array<PropertyDefinitionSupportedType>,
+    value: PropertyDefinitionSupportedType
+  ):boolean {
+    if (nullable && value === null){
+      return true;
+    }
+    if (values && !values.includes(value)){
+      return false;
+    }
+    //we get the definition and run basic checks
+    let definition = PropertyDefinition.supportedTypesStandard[type];
+    if (definition.json && typeof value !== definition.json){
+      return false;
+    }
+    if (definition.validate && !definition.validate(value)){
+      return false
+    }
+    return true;
+  }
+
   //The schema for the definition
   //{
   //  "amount": 4,
@@ -658,6 +684,9 @@ if (process.env.NODE_ENV !== "production") {
     properties: {
       id: {
         type: "string"
+      },
+      i18nData: {
+        type: "object"
       },
       type:  {
         type: "string"
@@ -713,7 +742,7 @@ if (process.env.NODE_ENV !== "production") {
       }
     },
     additionalProperties: false,
-    required: ["id", "type"]
+    required: ["id", "type", "i18nData"]
   };
 
   //the validation function created by ajv
@@ -738,5 +767,64 @@ if (process.env.NODE_ENV !== "production") {
         rawJSON
       );
     };
+
+    //lets check that all the ones in values are valid
+    if (rawJSON.values){
+      let value;
+      for (value of rawJSON.values){
+        if (!staticIsValidValue(
+          rawJSON.type,
+          rawJSON.nullable,
+          rawJSON.values,
+          value
+        )){
+          throw new CheckUpError(
+            "Invalid value for item",
+            parentItemDefinition.location,
+            value,
+            {values: rawJSON.values},
+            rawJSON
+          );
+        };
+      }
+    }
+
+    //Let's check whether the default value is valid too
+    if (rawJSON.default){
+      if (!staticIsValidValue(
+        rawJSON.type,
+        rawJSON.nullable,
+        rawJSON.values,
+        rawJSON.default
+      )){
+        throw new CheckUpError(
+          "Invalid type for default",
+          parentItemDefinition.location,
+          {default: rawJSON.default},
+          rawJSON
+        );
+      };
+    }
+
+    //And the default if values are valid
+    if (rawJSON.defaultIf){
+      let rule:PropertyDefinitionRawJSONRuleDataType;
+      for (rule of rawJSON.defaultIf){
+        if (!staticIsValidValue(
+          rawJSON.type,
+          rawJSON.nullable,
+          rawJSON.values,
+          rule.value
+        )){
+          throw new CheckUpError(
+            "Invalid type for default if definition",
+            parentItemDefinition.location,
+            rule,
+            rawJSON.defaultIf,
+            rawJSON
+          );
+        };
+      }
+    }
   }
 }

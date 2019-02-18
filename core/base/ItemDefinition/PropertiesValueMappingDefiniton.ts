@@ -30,6 +30,8 @@
  */
 
 import ItemDefinition from '.';
+import { PropertyDefinitionSupportedType } from './PropertyDefinition';
+import { CheckUpError } from '../Error';
 
 //import ajv checker conditionally
 let ajv;
@@ -42,7 +44,7 @@ if (process.env.NODE_ENV !== "production") {
 //Check the schema down to see how this relates
 //at PropertiesValueMappingDefiniton.schema
 export interface PropertiesValueMappingDefinitonType {
-  [propertyName: string]: boolean | string | number | null
+  [propertyName: string]: PropertyDefinitionSupportedType
 }
 
 //this represets the raw stored json data, in this case
@@ -75,7 +77,8 @@ export default class PropertiesValueMappingDefiniton {
     //run a check if we are not in production
     //very useful for development
     if (process.env.NODE_ENV !== "production") {
-      PropertiesValueMappingDefiniton.check(rawJSON, referredItemDefinition);
+      PropertiesValueMappingDefiniton.check(rawJSON,
+        parentItemDefinition, referredItemDefinition);
     }
     this.properties = rawJSON;
     this.parentItemDefinition = parentItemDefinition;
@@ -84,7 +87,7 @@ export default class PropertiesValueMappingDefiniton {
 
   getPropertyMap(): Array<{
     propertyName: string,
-    value: boolean | string | number | null
+    value: PropertyDefinitionSupportedType
   }>{
     return Object.keys(this.properties).map(key=>{
       return {propertyName: key, value: this.properties[key]}
@@ -112,6 +115,9 @@ if (process.env.NODE_ENV !== "production") {
   PropertiesValueMappingDefiniton.schema = {
     type: "object",
     additionalProperties: {
+      //despite of being able to use any of the property
+      //definition values we only allow for string numbers
+      //and booleans
       type: ["boolean", "string", "number", "null"]
     },
     minProperties: 1
@@ -124,6 +130,7 @@ if (process.env.NODE_ENV !== "production") {
   //the checker, takes the same arguments as the constructor
   PropertiesValueMappingDefiniton.check = function(
     rawJSON: PropertiesValueMappingDefinitonRawJSONDataType,
+    parentItemDefinition: ItemDefinition,
     referredItemDefinition: ItemDefinition
   ){
 
@@ -132,8 +139,12 @@ if (process.env.NODE_ENV !== "production") {
 
     //if not valid throw the errors
     if (!valid) {
-      console.error(PropertiesValueMappingDefiniton.schema_validate.errors);
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "Schema Check Failed",
+        parentItemDefinition.location,
+        PropertiesValueMappingDefiniton.schema_validate.errors,
+        rawJSON
+      );
     };
 
     //We need to loop over the properties that were given
@@ -146,19 +157,29 @@ if (process.env.NODE_ENV !== "production") {
 
       //and lets check that they actually have such properties
       if (!referredItemDefinition.hasPropertyDefinitionFor(propertyName)){
-        console.error("Property not available in referred itemDefinition",
-          rawJSON, "in property named", propertyName, "valued",
-          propertyValue);
-        throw new Error("Check Failed");
+        let obj:any = {};
+        obj[propertyName] = propertyValue;
+        throw new CheckUpError(
+          "Property not available in referred itemDefinition",
+          parentItemDefinition.location,
+          propertyName,
+          obj,
+          rawJSON
+        );
       };
 
       //And check whether the value is even valid
       if (!referredItemDefinition.getPropertyDefinitionFor(propertyName)
         .isValidValue(propertyValue)){
-        console.error("Property value is invalid in referred itemDefinition",
-          rawJSON, "in property named", propertyName, "valued",
-          propertyValue);
-        throw new Error("Check Failed");
+        let obj:any = {};
+        obj[propertyName] = propertyValue;
+        throw new CheckUpError(
+          "Property value is invalid in referred itemDefinition",
+          parentItemDefinition.location,
+          propertyValue,
+          obj,
+          rawJSON
+        );
       };
     }
   }

@@ -36,6 +36,7 @@ import PropertiesValueMappingDefiniton,
   './PropertiesValueMappingDefiniton';
 import ConditionalRuleSet, { ConditionalRuleSetRawJSONDataType } from
   './ConditionalRuleSet';
+import { CheckUpError } from '../Error';
 
 //the ajv compiler, conditionally imported
 let ajv;
@@ -55,6 +56,9 @@ export interface ItemGroupHandle {
 export interface ItemRawJSONDataType {
   id?: string,
   name?: string,
+  i18nName?: {
+    [locale: string]: string
+  },
   items?: Array<ItemRawJSONDataType>,
   enforcedProperties?: PropertiesValueMappingDefinitonRawJSONDataType,
   predefinedProperties?: PropertiesValueMappingDefinitonRawJSONDataType,
@@ -72,6 +76,10 @@ export interface ItemRawJSONDataType {
 export default class Item {
   //The basics
   public parentItemDefinition:ItemDefinition;
+
+  private i18nName?:{
+    [locale: string]: string
+  };
 
   //attribute to know if this item is actually an item group
   private isGroup: boolean;
@@ -124,6 +132,8 @@ export default class Item {
 
     //check whether it is a group
     this.isGroup = !!rawJSON.items;
+
+    this.i18nName = rawJSON.i18nName;
 
     //put the items and the gate in place
     this.gate = rawJSON.gate;
@@ -409,6 +419,20 @@ export default class Item {
     };
   }
 
+  /**
+   * Gives the i18 name that was specified
+   * or otherwise gives the item definition i18 name
+   * @param  locale the locale iso form
+   * @return        a string or null (if locale not valid)
+   */
+  getI18nNameFor(locale: string){
+    if (this.i18nName){
+      return this.i18nName[locale] || null;
+    }
+
+    return this.itemDefinition.getI18nNameFor(locale);
+  }
+
   //These are here but only truly available in non production
   static schema:any;
   static schema_validate:any;
@@ -427,6 +451,12 @@ if (process.env.NODE_ENV !== "production") {
       },
       name: {
         type: "string"
+      },
+      i18nName: {
+        type: "object",
+        additionalProperties: {
+          type: "string"
+        }
       },
       enforcedProperties: {},
       predefinedProperties: {},
@@ -464,7 +494,7 @@ if (process.env.NODE_ENV !== "production") {
 
   //the validation function created by ajv
   Item.schema_validate =
-    ajv.compile(PropertiesValueMappingDefiniton.schema);
+    ajv.compile(Item.schema);
 
   //the checker, takes the same arguments as the constructor
   Item.check = function(
@@ -477,8 +507,12 @@ if (process.env.NODE_ENV !== "production") {
 
     //if not valid throw the errors
     if (!valid) {
-      console.error(Item.schema_validate.errors);
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "Schema Check Failed",
+        parentItemDefinition.location,
+        Item.schema_validate.errors,
+        rawJSON
+      );
     };
 
     let isGroup = !!rawJSON.items;
@@ -486,27 +520,40 @@ if (process.env.NODE_ENV !== "production") {
     //check whether the item definition exists for this item
     //it must exist to be an item
     if (!isGroup && !parentItemDefinition.hasItemDefinitionFor(rawJSON.name)){
-      console.error("Missing item definition for",
-        rawJSON, "for", rawJSON.name);
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "Missing item definition",
+        parentItemDefinition.location,
+        rawJSON.name,
+        {name: rawJSON.name},
+        rawJSON
+      );
     }
 
     if (isGroup && rawJSON.predefinedProperties){
-      console.error("Cannot set predefinedProperties and be a group at",
-        rawJSON);
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "Cannot set predefinedProperties and be a group",
+        parentItemDefinition.location,
+        {predefinedProperties: rawJSON.predefinedProperties},
+        rawJSON
+      );
     }
 
     if (isGroup && rawJSON.enforcedProperties){
-      console.error("Cannot set enforcedPropertiesKeys and be a group at",
-        rawJSON);
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "Cannot set enforcedProperties and be a group",
+        parentItemDefinition.location,
+        {enforcedProperties: rawJSON.enforcedProperties},
+        rawJSON
+      );
     }
 
     if (isGroup && rawJSON.sinkIn){
-      console.error("Cannot set sinkIn and be a group at",
-        rawJSON);
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "Cannot set sinkIn and be a group",
+        parentItemDefinition.location,
+        {sinkIn: rawJSON.sinkIn},
+        rawJSON
+      );
     }
 
     //get all the predefined properties or an empty array
@@ -527,9 +574,12 @@ if (process.env.NODE_ENV !== "production") {
     //predefined properties and enforced properties must not be shared
     //for the simple reason that enforced properties are set in stone
     if (sharedItems.length){
-      console.error("predefined and enforced properties collision at",
-        rawJSON, "for", sharedItems);
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "predefined and enforced properties collision",
+        parentItemDefinition.location,
+        sharedItems,
+        rawJSON
+      );
     }
 
     //Now we check again this time against the sinkIn properties
@@ -539,9 +589,12 @@ if (process.env.NODE_ENV !== "production") {
     //equally there might not be a collision here, enforced properties
     //need not to sink in
     if (sharedItems2.length){
-      console.error("sink in properties and enforced properties collision at",
-        rawJSON, "for", sharedItems2);
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "sink in properties and enforced properties collision",
+        parentItemDefinition.location,
+        sharedItems2,
+        rawJSON
+      );
     }
 
     //Now we check whether this properties exist for sinkin
@@ -554,9 +607,14 @@ if (process.env.NODE_ENV !== "production") {
       let propertyToSinkIn;
       for (propertyToSinkIn of rawJSON.sinkIn){
         if (!itemDefinition.hasPropertyDefinitionFor(propertyToSinkIn)){
-          console.error("Missing property in item definition for",
-            rawJSON, "to sink in", propertyToSinkIn);
-          throw new Error("Check Failed");
+          throw new CheckUpError(
+            "Missing property in item definition",
+            parentItemDefinition.location,
+            propertyToSinkIn,
+            rawJSON.sinkIn,
+            {sinkIn: rawJSON.sinkIn},
+            rawJSON
+          );
         }
       }
     }
@@ -564,17 +622,21 @@ if (process.env.NODE_ENV !== "production") {
     //Check Conflicting defaultExcluded and defaultExcludedIf
     if (typeof rawJSON.defaultExcluded !== "undefined" &&
       typeof rawJSON.defaultExcludedIf !== "undefined"){
-      console.error("Conflicting properties in",
-        rawJSON, "for defaultExcluded and defaultExcludedIf");
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "Conflicting properties defaultExcluded and defaultExcludedIf",
+        parentItemDefinition.location,
+        rawJSON
+      );
     }
 
     //also Conflicting mightExclude and mightExcludeIf
     if (typeof rawJSON.mightExclude !== "undefined" &&
       typeof rawJSON.mightExcludeIf !== "undefined"){
-      console.error("Conflicting properties in",
-        rawJSON, "for mightExclude and mightExcludeIf");
-      throw new Error("Check Failed");
+      throw new CheckUpError(
+        "Conflicting properties mightExclude and mightExcludeIf",
+        parentItemDefinition.location,
+        rawJSON
+      );
     }
   }
 }

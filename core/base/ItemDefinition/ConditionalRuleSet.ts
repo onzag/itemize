@@ -48,6 +48,7 @@
 
 import ItemDefinition from '.';
 import { CheckUpError } from '../Error';
+import { PropertyDefinitionSupportedType } from './PropertyDefinition';
 
 //import ajv checker conditionally
 let ajv;
@@ -72,7 +73,7 @@ interface ConditionalRuleSetRawJSONDataPropertyType
   extends ConditionalRuleSetRawJSONDataBaseType {
   property: string,
   comparator: ConditionalRuleComparatorType,
-  value: boolean | string | number | null
+  value: PropertyDefinitionSupportedType
 }
 
 interface ConditionalRuleSetRawJSONDataComponentType
@@ -93,7 +94,7 @@ export default class ConditionalRuleSet {
   //the comparator > < >= <= etc... in string form
   private comparator?: ConditionalRuleComparatorType;
   //the value is compared against
-  private value?: boolean | string | number | null;
+  private value?: PropertyDefinitionSupportedType;
 
   //for component based conditionals
   //the component in question
@@ -253,7 +254,10 @@ if (process.env.NODE_ENV !== "production") {
           },
           //value
           value: {
-            type: ["string", "number", "boolean"]
+            //despite of being able to use any of the property
+            //definition values we only allow for string numbers
+            //and booleans
+            type: ["string", "number", "boolean", "null"]
           },
           //gate
           gate: {

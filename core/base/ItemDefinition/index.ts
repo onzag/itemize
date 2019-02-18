@@ -17,6 +17,9 @@ export interface ItemDefinitionRawJSONDataType {
   //property gets added during processing and merging
   //preresents the file name
   name: string,
+  i18nName: {
+    [locale: string]: string
+  },
   allowCalloutExcludes?: boolean,
   includes?: Array<ItemRawJSONDataType>,
   properties?: Array<PropertyDefinitionRawJSONDataType>,
@@ -38,6 +41,9 @@ export default class ItemDefinition {
   private rawData: ItemDefinitionRawJSONDataType;
 
   private name: string;
+  private i18nName: {
+    [locale: string]: string
+  };
   public location:string;
 
   private allowCalloutExcludes: boolean;
@@ -61,6 +67,7 @@ export default class ItemDefinition {
 
     this.rawData = rawJSON;
     this.name = rawJSON.name;
+    this.i18nName = rawJSON.i18nName;
     this.location = rawJSON.location;
 
     this.allowCalloutExcludes = rawJSON.allowCalloutExcludes || false;
@@ -191,6 +198,15 @@ export default class ItemDefinition {
       this.parentItemDefinition, this.onStateChange);
   }
 
+  /**
+   * Provides the item definition item name
+   * @param  locale the locale in iso form
+   * @return        a string or null (if locale not valid)
+   */
+  getI18nNameFor(locale: string){
+    return this.i18nName[locale] || null;
+  }
+
   getStructure(){
 
   }
@@ -218,6 +234,12 @@ if (process.env.NODE_ENV !== "production") {
       name: {
         type: "string"
       },
+      i18nName: {
+        type: "object",
+        additionalProperties: {
+          type: "string"
+        }
+      },
       allowCalloutExcludes: {
         type: "boolean"
       },
@@ -239,7 +261,7 @@ if (process.env.NODE_ENV !== "production") {
         items: {}
       }
     },
-    required: ["type", "name", "location"],
+    required: ["type", "name", "location", "i18nName"],
     additionalProperties: false
   };
 

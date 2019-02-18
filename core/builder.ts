@@ -147,9 +147,9 @@ async function getActualFileIdentifier(location:string){
 
   //Because this isn't running in production the tests should be able
   //to run nicely
-  let rootTest = new Root(resultJSON);
   let failed = false;
   try {
+    let rootTest = new Root(resultJSON);
     rootTest.getAllModules(()=>{});
   } catch (err){
     failed = true;
@@ -158,6 +158,12 @@ async function getActualFileIdentifier(location:string){
     } else {
       throw err;
     }
+  }
+
+  if (failed){
+    console.error("FAILED");
+  } else {
+    console.log("SUCCESS");
   }
 })();
 

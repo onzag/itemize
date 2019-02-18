@@ -1,6 +1,12 @@
 import Module, { ModuleRawJSONDataType } from "./Module";
-import ItemDefinition,
-  { ItemDefinitionRawJSONDataType } from "./ItemDefinition";
+import { CheckUpError } from "./Error";
+
+//import ajv checker conditionally
+let ajv;
+if (process.env.NODE_ENV !== "production") {
+  const Ajv = require('ajv');
+  ajv = new Ajv();
+}
 
 export interface RootRawJSONDataType {
   type: "root",
@@ -13,6 +19,11 @@ export default class Root {
   public location: string;
 
   constructor(rawJSON: RootRawJSONDataType){
+    //If its not production run the checks
+    if (process.env.NODE_ENV !== "production") {
+      Root.check(rawJSON);
+    }
+
     this.childModulesRaw = rawJSON.children;
     this.location = rawJSON.location;
   }
@@ -34,5 +45,50 @@ export default class Root {
       rawData,
       onStateChange
     );
+  }
+
+  static schema:any;
+  static schema_validate:any;
+  static check:any;
+}
+
+if (process.env.NODE_ENV !== "production") {
+  Root.schema = {
+    type: "object",
+    properties: {
+      type: {
+        const: "root"
+      },
+      location: {
+        type: "string"
+      },
+      children: {
+        type: "array",
+        items: {},
+        minItems: 1
+      }
+    },
+    required: ["type", "location"]
+  }
+
+  //the validation function created by ajv
+  Root.schema_validate =
+    ajv.compile(Root.schema);
+
+  Root.check = function(
+    rawJSON: RootRawJSONDataType
+  ){
+    //we check the schema for validity
+    let valid = Root.schema_validate(rawJSON);
+
+    //if not valid throw the errors
+    if (!valid) {
+      throw new CheckUpError(
+        "Schema Check Failed",
+        rawJSON.location,
+        Root.schema_validate.errors,
+        rawJSON
+      );
+    };
   }
 }
