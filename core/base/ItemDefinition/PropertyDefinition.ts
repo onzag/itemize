@@ -346,7 +346,7 @@ export interface PropertyDefinitionRawJSONDataType {
   id: string,
   //the locale data, we don't know what it is
   //the structure is defined in the constants
-  i18nData: {
+  i18nData?: {
     [locale: string]: any
   },
   //the type of the property
@@ -396,7 +396,7 @@ export interface PropertyValueGetterType {
 //The class itself
 export default class PropertyDefinition {
   private id: string;
-  private i18nData: {
+  private i18nData?: {
     [locale: string]: any
   };
   private type: PropertyDefinitionSupportedTypes;
@@ -619,8 +619,16 @@ export default class PropertyDefinition {
     return !!this.isExtension;
   }
 
+  /**
+   * Returns the locale data definition, or null
+   * @param  locale the locale
+   * @return
+   */
   getI18nDataFor(locale: string):any {
-    return this.i18nData[locale];
+    if (!this.i18nData){
+      return null;
+    }
+    return this.i18nData[locale] || null;
   }
 
   //These are here but only truly available in non production
@@ -742,7 +750,7 @@ if (process.env.NODE_ENV !== "production") {
       }
     },
     additionalProperties: false,
-    required: ["id", "type", "i18nData"]
+    required: ["id", "type"]
   };
 
   //the validation function created by ajv

@@ -485,9 +485,8 @@ if (process.env.NODE_ENV !== "production") {
       items: {}
     },
     dependencies: {
-      items: ["gate"],
-      gate: ["items"],
-      id: ["items"]
+      items: ["gate", "id"],
+      gate: ["items"]
     },
     additionalProperties: false
   };

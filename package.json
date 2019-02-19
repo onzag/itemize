@@ -8,12 +8,13 @@
   },
   "author": "Edward Gonzalez",
   "license": "ISC",
-  "dependencies": {
-    "@types/node": "^10.12.24",
-    "ajv": "^6.8.1",
-    "colors": "^1.3.3"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@types/colors": "^1.2.1",
+    "@types/node": "^10.12.24",
+    "@types/properties-reader": "0.0.1",
+    "ajv": "^6.8.1",
+    "colors": "^1.3.3",
     "properties-reader": "0.0.16",
     "source-map-support": "^0.5.10"
   }
