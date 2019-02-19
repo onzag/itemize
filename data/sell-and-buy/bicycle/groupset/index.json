@@ -1,0 +1,435 @@
+{
+	"type": "item",
+	"allowCalloutExcludes": true,
+	"imports": [
+		"bicycle/wheelset/rear-wheel",
+		"bicycle/wheelset/front-wheel",
+		"bicycle/wheelset/rear-wheel/rear-hub",
+		"bicycle/wheelset/front-wheel/front-hub"
+	],
+	"includes": [
+		{
+			"id": "mid-drive-motor-or-hub-drive",
+			"items": [
+				{
+					"name": "mid-drive-motor"
+				},
+				{
+					"id": "hub-drive-specifications",
+					"items": [
+						{
+							"id": "front-hub-or-front-wheel",
+							"items": [
+								{
+									"name": "front-hub",
+									"enforcedProperties": {
+										"electric": true
+									}
+								},
+								{
+									"name": "front-wheel",
+									"enforcedProperties": {
+										"electric": true
+									}
+								}
+							],
+							"gate": "xor"
+						},
+						{
+							"id": "rear-hub-or-rear-wheel",
+							"items": [
+								{
+									"name": "rear-hub",
+									"enforcedProperties": {
+										"electric": true
+									}
+								},
+								{
+									"name": "rear-wheel",
+									"enforcedProperties": {
+										"electric": true
+									}
+								}
+							],
+							"gate": "xor"
+						}
+					],
+					"gate": "or"
+				}
+			],
+			"excludedIf": {
+				"property": "type",
+				"comparator": "not-equal",
+				"value": "electric"
+			},
+			"gate": "or"
+		},
+		{
+			"name": "ebike-battery",
+			"excludedIf": {
+				"property": "type",
+				"comparator": "not-equal",
+				"value": "electric"
+			}
+		},
+		{
+			"id": "front-deraullier-or-chain-guide",
+			"items": [
+				{
+					"name": "front-deraullier",
+					"enforcedProperties": {
+						"chainrings": "chainrings",
+						"electronic": "electronic",
+						"hydraulic": "hydraulic"
+					},
+					"excludedIf": {
+						"property": "speeds",
+						"comparator": "less-than",
+						"value": 2
+					},
+					"defaultExcludedIf": {
+						"property": "type",
+						"comparator": "equals",
+						"value": "hub-gear",
+						"gate": "or",
+						"condition": {
+							"property": "type",
+							"comparator": "equals",
+							"value": "electric"
+						}
+					}
+				},
+				{
+					"name": "chain-guide",
+					"mightExclude": true,
+					"defaultExcluded" : true,
+					"excludedIf": {
+						"property": "chainrings",
+						"comparator": "greater-than",
+						"value": 1
+					}
+				}
+			],
+			"xor": true
+		},
+		{
+			"name": "rear-deraullier",
+			"enforcedProperties": {
+				"speeds": "speeds",
+				"electronic": "electronic",
+				"hydraulic": "hydraulic"
+			},
+			"excludedIf": {
+				"property": "type",
+				"comparator": "less-than",
+				"value": 2
+			},
+			"defaultExcludedIf": {
+				"property": "type",
+				"comparator": "equals",
+				"value": "hub-gear"
+			}
+		},
+		{
+			"name": "crankset",
+			"enforcedProperties": {
+				"chainrings": "chainrings"
+			},
+			"excludedIf": {
+				"property": "type",
+				"comparator": "equals",
+				"value": "electric"
+			}
+		},
+		{
+			"id": "chain-or-belt",
+			"items": [
+				{
+					"name": "chain",
+					"enforcedProperties": {
+						"speeds": "speeds"
+					}
+				},
+				{
+					"name": "belt",
+					"excludedIf": {
+						"property": "speeds",
+						"comparator": "not-equals",
+						"value": 1
+					}
+				}
+			],
+			"gate": "xor"
+		},
+		{
+			"id": "wheel-engagement-mechanism",
+			"items": [
+				{
+					"name": "cassette",
+					"enforcedProperties": {
+						"sprockets": "speeds"
+					},
+					"excludedIf": {
+						"property": "speeds",
+						"comparator": "equals",
+						"value": 1,
+						"gate": "or",
+						"condition": {
+							"component": "belt",
+							"isIncluded": true
+						}
+					}
+				},
+				{
+					"name": "freewheel",
+					"enforcedProperties": {
+						"sprockets": "speeds"
+					},
+					"excludedIf": {
+						"component": "belt",
+						"isIncluded": true
+					}
+				},
+				{
+					"name": "singlespeed-conversion-kit",
+					"enforcedProperties": {
+						"sprockets": "speeds"
+					},
+					"excludedIf": {
+						"property": "speeds",
+						"comparator": "equals",
+						"value": 1,
+						"gate": "or",
+						"condition": {
+							"component": "belt",
+							"isIncluded": true
+						}
+					}
+				},
+				{
+					"name": "belt-sprocket",
+					"excludedIf": {
+						"property": "speeds",
+						"comparator": "greater-than",
+						"value": 1,
+						"gate": "or",
+						"condition": {
+							"component": "belt",
+							"isIncluded": false
+						}
+					}
+				}
+			],
+			"gate": "xor"
+		},
+		{
+			"name": "rear-hub",
+			"enforcedProperties": {
+				"internally-geared": true
+			},
+			"mightExcludeIf": {
+				"property": "type",
+				"comparator": "not-equal",
+				"value": "hub-gear"
+			},
+			"defaultExcluded": true,
+			"excludedIf": {
+				"component": "rear-hub",
+				"isIncluded": true,
+				"gate": "or",
+				"condition": {
+					"component": "rear-wheel",
+					"isIncluded": true
+				}
+			}
+		},
+		{
+			"id": "shifting-and-braking",
+			"items": [
+				{
+					"name": "brifters",
+					"enforcedProperties": {
+						"rear-speeds": "speeds",
+						"front-speeds": "chainrings",
+						"electronic": "electronic",
+						"disc-version": "disc-brakes"
+					}
+				},
+				{
+					"id": "brakes-and-shifters",
+					"items": [
+						{
+							"name": "brakes",
+							"enforcedProperties": {
+								"disc-version": "disc-brakes",
+								"hydraulic": "hydraulic-brakes"
+							}
+						},
+						{
+							"name": "shifters",
+							"enforcedProperties": {
+								"rear-speeds": "speeds",
+								"front-speeds": "chainrings",
+								"electronic": "electronic"
+							}
+						}
+					],
+					"gate": "and"
+				}
+			],
+			"gate": "xor"
+		},
+		{
+			"name": "drivetrain-battery",
+			"excludedIf": {
+				"property": "type",
+				"comparator": "not-equals",
+				"value": "electronic"
+			}
+		},
+		{
+			"name": "tensioner",
+			"mightExclude": true,
+			"defaultExcluded" : true
+		},
+		{
+			"name": "disc-rotors",
+			"excludedIf": {
+				"property" : "disc-brakes",
+				"comparator": "equals",
+				"value": false
+			}
+		},
+		{
+			"name": "pedals",
+			"mightExclude": true,
+			"defaultExcluded": true
+		}
+	],
+	"properties": [
+		{
+			"id": "type",
+			"type": "string",
+			"values": ["standard", "1x", "singlespeed", "hub-gear", "electric"],
+			"default": "standard",
+			"nullable": true,
+			"enforcedValues": [
+				{
+					"value": "singlespeed",
+					"if": {
+						"property": "speeds",
+						"comparator": "equals",
+						"value": 1,
+						"gate": "and",
+						"condition": {
+							"property": "chainrings",
+							"comparator": "equals",
+							"value": 1
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "level",
+			"type": "string",
+			"autocomplete": "groupset-levels",
+			"autocompleteSetFromProperty": ["manufacturer"],
+			"autocompleteSupportsPrefills": true,
+			"nullable": true
+		},
+		{
+			"id": "chainrings",
+			"type": "number",
+			"values": [1, 2, 3],
+			"default": 2,
+			"defaultIf": [
+				{
+					"value": 1,
+					"if": {
+						"property": "type",
+						"comparator": "equals",
+						"value": "electric"
+					}
+				}
+			],
+			"enforcedValues": [
+				{
+					"value": 1,
+					"if": {
+						"property": "type",
+						"comparator": "equals",
+						"value": "singlespeed",
+						"gate": "or",
+						"condition": {
+							"property": "type",
+							"comparator": "equals",
+							"value": "1x"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "speeds",
+			"type": "number",
+			"min": 1,
+			"default": 11,
+			"enforcedValues": [
+				{
+					"value": 1,
+					"if": {
+						"property": "type",
+						"comparator": "equals",
+						"value": "singlespeed"
+					}
+				}
+			]
+		},
+		{
+			"id": "electronic",
+			"type": "boolean"
+		},
+		{
+			"id": "hydraulic-brakes",
+			"type": "boolean",
+			"default": false,
+			"defaultIf": [
+				{
+					"value": true,
+					"if": {
+						"property": "type",
+						"comparator": "equals",
+						"value": "1x"
+					}
+				}
+			]
+		},
+		{
+			"id": "disc-brakes",
+			"type": "boolean",
+			"default": false,
+			"defaultIf": [
+				{
+					"value": true,
+					"if": {
+						"property": "hydraulic-brakes",
+						"comparator": "equals",
+						"value": true
+					}
+				}
+			]
+		},
+		{
+			"id": "hydraulic-shifting",
+			"type": "boolean",
+			"rare": true,
+			"default": false,
+			"excludedIf": {
+				"property": "electronic",
+				"comparator": "equals",
+				"value": true
+			}
+		}
+	]
+}

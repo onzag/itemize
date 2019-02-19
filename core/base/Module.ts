@@ -50,11 +50,13 @@ export default class Module {
       if (c.type === "module"){
         this.childModules.push(new Module(c, onStateChange));
       } else if (c.type === "item"){
-        c.properties = (rawJSON.propExtensions || [])
-          .map(e=>
+        let newChildren = {...c, properties: (
+            rawJSON.propExtensions || []
+          ).map(e=>
             (<PropertyDefinitionRawJSONDataType>{...e, isExtension: true}))
-          .concat(c.properties);
-        this.childDefinitions.push(new ItemDefinition(c, this,
+          .concat(c.properties || [])
+        };
+        this.childDefinitions.push(new ItemDefinition(newChildren, this,
           null, onStateChange));
       } else {
         throw new Error("Cannot handle type " + (c as any).type);

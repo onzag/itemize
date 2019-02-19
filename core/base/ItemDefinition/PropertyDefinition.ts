@@ -15,7 +15,8 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   CLASSIC_DISTANCE_i18N,
   MIN_SUPPORTED_REAL,
   MAX_SUPPORTED_YEAR,
-  MIN_SUPPORTED_YEAR} from '../../constants';
+  MIN_SUPPORTED_YEAR,
+  MAX_CURRENCY_DECIMAL_COUNT} from '../../constants';
 import { CheckUpError } from '../Error';
 
 //import ajv checker conditionally
@@ -30,6 +31,7 @@ export type PropertyDefinitionSupportedTypes =
   "boolean" |         //A simple boolean, comparable, and stored as a boolean
   "integer" |         //A simple number, comparable, and stored as a number
   "number" |          //A simple number, comparable, and stored as a number
+  "currency" |        //Currency, comparable and stored as an object
   "string" |          //A simple string, comparable, and stored as a string
   "text" |            //Represented as an object, non comparable,
                       //stored as text and object and it should be able to do
@@ -72,6 +74,7 @@ Record<PropertyDefinitionSupportedTypes, {
   //represents an item that would mark for null
   //by default it is null itself
   nullableDefault?: any,
+  rangeDefaultSearch?: boolean,
 
   //this is a validation function that checks whether the value
   //is valid,
@@ -81,7 +84,7 @@ Record<PropertyDefinitionSupportedTypes, {
   //min valid for numbers
   min?: number,
   //max length for text and string and whatnot
-  maxLenght?: number,
+  maxLength?: number,
   //max decimal count
   maxDecimalCount?: number,
   //whether it is searchable or not
@@ -128,7 +131,7 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     //it gotta be validated to check it's a number
     validate: (n:PropertyDefinitionSupportedIntegerType)=>
       !isNaN(NaN) && parseInt(<any>n) === n &&
-      n <= MAX_SUPPORTED_INTEGER && n >= -MIN_SUPPORTED_INTEGER,
+      n <= MAX_SUPPORTED_INTEGER && n >= MIN_SUPPORTED_INTEGER,
     //max and min
     max: MAX_SUPPORTED_INTEGER,
     min: -MIN_SUPPORTED_INTEGER,
@@ -152,14 +155,13 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
         return false;
       }
 
-      if (n <= MAX_SUPPORTED_INTEGER && n >= -MIN_SUPPORTED_INTEGER){
+      if (n <= MAX_SUPPORTED_REAL && n >= MIN_SUPPORTED_REAL){
         return false;
       }
 
       let splittedDecimals = n.toString().split(".");
-      if (splittedDecimals[0].length < 131072 &&
-        (!splittedDecimals[1] ||
-          splittedDecimals[1].length < MAX_DECIMAL_COUNT)){
+      if (!splittedDecimals[1] ||
+          splittedDecimals[1].length <= MAX_DECIMAL_COUNT){
           return true;
         }
 
@@ -180,13 +182,53 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       rangeOptional: CLASSIC_RANGED_OPTIONAL_i18N
     }
   },
+  currency: {
+    //locations just contain this basic data
+    validate: (l:PropertyDefinitionSupportedCurrencyType)=>{
+      if (typeof l.value !== "number" &&
+        typeof l.currency !== "string") {
+        return false;
+      }
+
+      if (isNaN(l.value)){
+        return false;
+      }
+
+      if (l.value <= MAX_SUPPORTED_REAL && l.value >= MIN_SUPPORTED_REAL){
+        return false;
+      }
+
+      let splittedDecimals = l.value.toString().split(".");
+      if (!splittedDecimals[1] ||
+          splittedDecimals[1].length <= MAX_CURRENCY_DECIMAL_COUNT){
+          return true;
+        }
+
+      return false;
+    },
+    rangeDefaultSearch: true,
+    //Similar to real
+    max: MAX_SUPPORTED_REAL,
+    min: MIN_SUPPORTED_REAL,
+    maxDecimalCount: MAX_CURRENCY_DECIMAL_COUNT,
+    //it is searchable
+    searchable: true,
+    searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    //i18n attributes required
+    i18n: {
+      base: CLASSIC_BASE_i18N,
+      optional: CLASSIC_OPTIONAL_i18N,
+      range: CLASSIC_RANGED_i18N,
+      rangeOptional: CLASSIC_RANGED_OPTIONAL_i18N
+    }
+  },
   string: {
     //a string is a string
     json: "string",
     nullableDefault: "",
     //validates just the length
     validate: (s:PropertyDefinitionSupportedStringType)=>s.length <= 255,
-    maxLenght: MAX_STRING_LENGTH,
+    maxLength: MAX_STRING_LENGTH,
     //it is searchable by an exact value, use text for organic things
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
@@ -204,8 +246,8 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
         typeof s.raw === "string" && s.html.length < MAX_TEXT_LENGTH
         && s.raw.length <= s.html.length;
     },
-    //the max lenght for the html
-    maxLenght: MAX_TEXT_LENGTH,
+    //the max length for the html
+    maxLength: MAX_TEXT_LENGTH,
     //whether it is searchable or not
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.FTS,
@@ -295,6 +337,10 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
 export type PropertyDefinitionSupportedBooleanType = boolean;
 export type PropertyDefinitionSupportedIntegerType = number;
 export type PropertyDefinitionSupportedNumberType = number;
+export type PropertyDefinitionSupportedCurrencyType = {
+  value: number,
+  currency: string
+}
 export type PropertyDefinitionSupportedStringType = string;
 export type PropertyDefinitionSupportedTextType = {
   html: string,
@@ -316,6 +362,7 @@ export type PropertyDefinitionSupportedType =
   PropertyDefinitionSupportedBooleanType |
   PropertyDefinitionSupportedIntegerType |
   PropertyDefinitionSupportedNumberType |
+  PropertyDefinitionSupportedCurrencyType |
   PropertyDefinitionSupportedStringType |
   PropertyDefinitionSupportedTextType |
   PropertyDefinitionSupportedDateType |
@@ -351,6 +398,12 @@ export interface PropertyDefinitionRawJSONDataType {
   },
   //the type of the property
   type: PropertyDefinitionSupportedTypes,
+  min?: number,
+  max?: number,
+  minLength?: number,
+  maxLength?: number,
+  maxDecimalCount?: number,
+
   //values for the property set
   values?: Array<PropertyDefinitionSupportedType>,
   //whether it can be null or not
@@ -364,6 +417,8 @@ export interface PropertyDefinitionRawJSONDataType {
   autocompleteSetFromProperty?: Array<string>,
   //whether it's enforced or not
   autocompleteIsEnforced?: boolean,
+  //whether the autocomplete supports prefills
+  autocompleteSupportsPrefills?: boolean,
   //default value
   default?: PropertyDefinitionSupportedType,
   defaultIf?: Array<PropertyDefinitionRawJSONRuleDataType>,
@@ -400,12 +455,18 @@ export default class PropertyDefinition {
     [locale: string]: any
   };
   private type: PropertyDefinitionSupportedTypes;
+  private min:number;
+  private max:number;
+  private minLength:number;
+  private maxLength:number;
+  private maxDecimalCount:number;
   private values?: Array<PropertyDefinitionSupportedType>;
   private nullable?: boolean;
   private hidden?: boolean;
   private autocomplete?: string;
   private autocompleteSetFromProperty?: Array<string>;
   private autocompleteIsEnforced?: boolean;
+  private autocompleteSupportsPrefills?: boolean;
   private isExtension?: boolean;
   private default?: PropertyDefinitionSupportedType;
   private defaultIf?: Array<PropertyDefinitionRuleDataType>;
@@ -439,12 +500,18 @@ export default class PropertyDefinition {
     this.id = rawJSON.id;
     this.i18nData = rawJSON.i18nData;
     this.type = rawJSON.type;
+    this.min = rawJSON.min;
+    this.max = rawJSON.max;
+    this.minLength = rawJSON.minLength;
+    this.maxLength = rawJSON.maxLength;
+    this.maxDecimalCount = rawJSON.maxDecimalCount;
     this.values = rawJSON.values;
     this.nullable = rawJSON.nullable;
     this.hidden = rawJSON.hidden;
     this.autocomplete = rawJSON.autocomplete;
     this.autocompleteSetFromProperty = rawJSON.autocompleteSetFromProperty;
     this.autocompleteIsEnforced = rawJSON.autocompleteIsEnforced;
+    this.autocompleteSupportsPrefills = rawJSON.autocompleteSupportsPrefills;
     this.default = rawJSON.default;
     this.isExtension = rawJSON.isExtension;
     this.isRangedSearchDisabled = rawJSON.disableRangedSearch;
@@ -607,6 +674,31 @@ export default class PropertyDefinition {
     if (definition.validate && !definition.validate(value)){
       return false
     }
+
+    if (typeof this.min !== "undefined" &&
+      ((<PropertyDefinitionSupportedCurrencyType>value).value ||
+        value) < this.min){
+      return false;
+    } else if (typeof this.max !== "undefined" &&
+      ((<PropertyDefinitionSupportedCurrencyType>value).value ||
+        value) > this.max){
+      return false;
+    } else if (typeof this.maxLength !== "undefined" &&
+      (<string>value).length > this.maxLength){
+      return false;
+    } else if (typeof this.minLength !== "undefined" &&
+      (<string>value).length < this.minLength){
+      return false;
+    } else if (typeof this.maxDecimalCount !== "number"){
+      let splittedDecimals =
+        ((<PropertyDefinitionSupportedCurrencyType>value).value || value)
+        .toString().split(".");
+      if (splittedDecimals[1] &&
+        splittedDecimals[1].length > this.maxDecimalCount){
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -699,6 +791,24 @@ if (process.env.NODE_ENV !== "production") {
       type:  {
         type: "string"
       },
+      min: {
+        type: "number"
+      },
+      max: {
+        type: "number"
+      },
+      maxLength: {
+        type: "number",
+        minimum: 0
+      },
+      minLength: {
+        type: "number",
+        minimum: 0
+      },
+      maxDecimalCount: {
+        type: "number",
+        minimum: 0
+      },
       values: {
         type: "array",
         items: {
@@ -720,19 +830,41 @@ if (process.env.NODE_ENV !== "production") {
       autocompleteIsEnforced: {
         type: "boolean"
       },
+      autocompleteSupportsPrefills: {
+        type: "boolean"
+      },
       default: {
         oneOf: valueOneOf
       },
       defaultIf: {
-        type: "object",
-        properties: {
-          if: {},
-          value: {
-            oneOf: valueOneOf
-          }
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            if: {},
+            value: {
+              oneOf: valueOneOf
+            }
+          },
+          additionalProperties: false,
+          required: ["value", "if"]
         },
-        additionalProperties: false,
-        required: ["value", "if"]
+        minItems: 1
+      },
+      enforcedValues: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            if: {},
+            value: {
+              oneOf: valueOneOf
+            }
+          },
+          additionalProperties: false,
+          required: ["value", "if"]
+        },
+        minItems: 1
       },
       hidden: {
         type: "boolean"
@@ -833,6 +965,48 @@ if (process.env.NODE_ENV !== "production") {
           );
         };
       }
+    }
+
+    if (rawJSON.type !== "integer" && rawJSON.type !== "number" &&
+      rawJSON.type !== "currency" && typeof rawJSON.min !== "undefined"){
+      throw new CheckUpError(
+        "Cannot set a min value if type not integer or number",
+        parentItemDefinition.location,
+        {min: rawJSON.min},
+        rawJSON
+      );
+    } else if (rawJSON.type !== "integer" && rawJSON.type !== "number" &&
+      rawJSON.type !== "currency" && typeof rawJSON.max !== "undefined"){
+      throw new CheckUpError(
+        "Cannot set a max value if type not integer or number",
+        parentItemDefinition.location,
+        {max: rawJSON.max},
+        rawJSON
+      );
+    } else if (rawJSON.type !== "number" && rawJSON.type !== "currency" &&
+      typeof rawJSON.maxDecimalCount !== "undefined"){
+      throw new CheckUpError(
+        "Cannot set a maxDecimalCount value if type not number",
+        parentItemDefinition.location,
+        {maxDecimalCount: rawJSON.maxDecimalCount},
+        rawJSON
+      );
+    } else if (rawJSON.type !== "string" && rawJSON.type !== "text" &&
+      typeof rawJSON.minLength !== "undefined"){
+      throw new CheckUpError(
+        "Cannot set a minLength value if type not text or string",
+        parentItemDefinition.location,
+        {minLength: rawJSON.minLength},
+        rawJSON
+      );
+    } else if (rawJSON.type !== "string" && rawJSON.type !== "text" &&
+      typeof rawJSON.maxLength !== "undefined"){
+      throw new CheckUpError(
+        "Cannot set a maxLength value if type not text or string",
+        parentItemDefinition.location,
+        {maxLength: rawJSON.maxLength},
+        rawJSON
+      );
     }
   }
 }

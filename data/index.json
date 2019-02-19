@@ -1,5 +1,5 @@
 {
   "type": "root",
-  "includes": ["forum"],
-  "lang": ["EN", "ES"]
+  "includes": ["sell-and-buy"],
+  "lang": []
 }

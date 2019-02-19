@@ -76,7 +76,10 @@ async function getActualFileLocation(
   locationOfElementBeingProcessed: string
 ) {
   let actualFileLocation = location;
-  let exists = await checkExists(location, locationOfElementBeingProcessed);
+  let exists = await checkExists(
+    location,
+    locationOfElementBeingProcessed
+  );
   if (exists){
     let isDirectory = await checkIsDirectory(location,
       locationOfElementBeingProcessed);
@@ -89,7 +92,11 @@ async function getActualFileLocation(
     actualFileLocation += ".json";
   }
 
-  await checkExists(actualFileLocation, locationOfElementBeingProcessed, true);
+  await checkExists(
+    actualFileLocation,
+    locationOfElementBeingProcessed,
+    true
+  );
 
   return actualFileLocation;
 }
@@ -123,7 +130,12 @@ async function getActualFileIdentifier(location:string){
   //lets read the file, let it fail if it fails
   let fileContent = await fsAsync.readFile(actualLocation, 'utf8');
   //lets get the file data
-  let fileData:FileRootDataRawUntreatedJSONDataType = JSON.parse(fileContent);
+  let fileData:FileRootDataRawUntreatedJSONDataType;
+  try {
+    fileData = JSON.parse(fileContent);
+  } catch (err){
+    throw new Error("Invalid JSON at " + actualLocation);
+  }
 
   //it all should start in the root element
   if (fileData.type !== "root"){
@@ -154,6 +166,7 @@ async function getActualFileIdentifier(location:string){
   } catch (err){
     failed = true;
     console.log(colors.red(err.message));
+    console.log(err.stack);
   }
 
   if (!failed){
@@ -166,6 +179,7 @@ async function getActualFileIdentifier(location:string){
       failed = true;
       if (err instanceof CheckUpError){
         err.display();
+        console.log(err.stack);
       } else {
         throw err;
       }
@@ -221,7 +235,13 @@ async function processIncludes(
     let fileContent = await fsAsync.readFile(actualLocation, 'utf8');
     //and the data parsed
     let fileData:FileModuleDataRawUntreatedJSONDataType |
-      FileItemDefinitionUntreatedRawJSONDataType = JSON.parse(fileContent);
+      FileItemDefinitionUntreatedRawJSONDataType;
+
+    try {
+      fileData = JSON.parse(fileContent);
+    } catch (err){
+      throw new Error("Invalid JSON at " + actualLocation);
+    }
 
     //now we check the type to see whether we got a module or a item
     if (fileData.type === "module"){
@@ -290,11 +310,16 @@ async function processModule(
   let propExtensions:Array<PropertyDefinitionRawJSONDataType>;
   if (propExtExists){
     //they are set if the file exists
+    let fileData:Array<PropertyDefinitionRawJSONDataType>;
+    try {
+      fileData = JSON.parse(await fsAsync.readFile(propExtLocation, 'utf8'));
+    } catch (err){
+      throw new Error("Invalid json at " + propExtLocation)
+    }
     propExtensions =
-      await Promise.all<PropertyDefinitionRawJSONDataType>
-      (JSON.parse(await fsAsync.readFile(propExtLocation, 'utf8')).map(
+      await Promise.all<PropertyDefinitionRawJSONDataType>(fileData.map(
         getI18nData.bind(null, supportedLanguages, actualLocation)
-      ))
+      ));
   }
 
   //and the final value is created
@@ -346,10 +371,11 @@ async function processItemDefinition(
   for (imp of (<FileItemDefinitionUntreatedRawJSONDataType>
     fileData).imports || []){
       //this throws an error if it fails to get the location
-      await getActualFileLocation(
-        path.join(lastModuleDirectory, imp),
-        actualLocation
-      );
+      // TODO remove this commented out code
+      // await getActualFileLocation(
+      //   path.join(lastModuleDirectory, imp),
+      //   actualLocation
+      // );
   }
 
   //lets get the file definitions that are imported
@@ -360,11 +386,10 @@ async function processItemDefinition(
 
   //and now lets build the child definitions that are included within
   let childDefinitions:Array<ItemDefinitionRawJSONDataType> = [];
-
   //if the name is index there might be child definitions in the same
   //folder, either files or folders themselves, an item might be made of
   //several smaller sub items
-  if (actualName === "index"){
+  if (path.basename(actualLocation) === "index.json"){
     childDefinitions = <Array<ItemDefinitionRawJSONDataType>>
       (await processIncludes(
         supportedLanguages,
@@ -381,11 +406,20 @@ async function processItemDefinition(
   }
 
   let finalValue:ItemDefinitionRawJSONDataType = {
-    ...fileData,
+    type: fileData.type,
     i18nName,
     name: actualName,
     location: actualLocation
   };
+  if (fileData.allowCalloutExcludes){
+    finalValue.allowCalloutExcludes = fileData.allowCalloutExcludes;
+  }
+  if (fileData.includes && fileData.includes.length){
+    finalValue.includes = fileData.includes;
+  }
+  if (fileData.properties && fileData.properties.length){
+    finalValue.properties = fileData.properties;
+  }
 
   if (importedChildDefinitions.length){
     finalValue.importedChildDefinitions = importedChildDefinitions;
@@ -402,10 +436,37 @@ async function processItemDefinition(
   }
 
   if (finalValue.includes){
+    let fnCheckExists = async (item: ItemRawJSONDataType)=>{
+      if (item.name){
+        if (importedChildDefinitions){
+          if (importedChildDefinitions.find(idef=>{
+            let lastName = idef[idef.length - 1];
+            return (lastName === item.name ||
+              idef.join("/") === item.name);
+          })){
+            return;
+          }
+        }
+        if (item.name.indexOf("/") !== -1){
+          throw new Error("Missing imported item definition for " + item +
+            " in " + actualLocation);
+        }
+        await getActualFileLocation(
+          path.join(path.dirname(actualLocation), item.name),
+          actualLocation
+        );
+      }
+      if (item.items){
+        await Promise.all(item.items.map(item=>fnCheckExists(item)))
+      }
+    }
+
     finalValue.includes = await Promise.all<ItemRawJSONDataType>
-      (finalValue.properties.map(
+      (finalValue.includes.map(
         processItemI18nName.bind(null, supportedLanguages, actualLocation)
       ));
+
+    await Promise.all(finalValue.includes.map(item=>fnCheckExists(item)))
   }
 
   return finalValue;
@@ -543,6 +604,10 @@ async function getI18nData(
     true
   );
 
+  let i18nData:{
+    [locale: string]: any
+  } = {};
+
   //get the properties and the definition
   let properties = PropertiesReader(languageFileLocation).path();
   let definition = PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD[property.type];
@@ -579,8 +644,7 @@ async function getI18nData(
         .map(b=>({key: b, required: true})));
 
     //start initializing the data in the property itself
-    property.i18nData = property.i18nData || {};
-    property.i18nData[locale] = {};
+    i18nData[locale] = {};
 
     //run the expected properties and start running them
     expectedProperties.forEach(expectedProperty=>{
@@ -613,7 +677,7 @@ async function getI18nData(
       }
 
       //now we search where the property has to be set
-      let whereToSet = property.i18nData[locale];
+      let whereToSet = i18nData[locale];
       //by looping on the splitted value
       splitted.forEach((keyValue, index)=>{
         //on the last one we set it as the value
@@ -628,6 +692,8 @@ async function getI18nData(
       });
     });
   });
+
+  property.i18nData = i18nData;
 
   //return the property
   return property;

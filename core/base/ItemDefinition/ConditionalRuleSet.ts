@@ -237,7 +237,6 @@ if (process.env.NODE_ENV !== "production") {
   //The schema
   ConditionalRuleSet.schema = {
     type: "object",
-    additionalProperties: false,
     //We have two schemas in reality, one for the
     //property based rule set and another one for the
     //component based one
@@ -277,7 +276,9 @@ if (process.env.NODE_ENV !== "production") {
         dependencies: {
           gate: ["condition"],
           condition: ["gate"]
-        }
+        },
+
+        additionalProperties: false
       },
       {
         properties: {
@@ -293,8 +294,10 @@ if (process.env.NODE_ENV !== "production") {
         dependencies: {
           gate: ["condition"],
           condition: ["gate"]
-        }
-      },
+        },
+
+        additionalProperties: false
+      }
     ]
   };
 
@@ -340,17 +343,6 @@ if (process.env.NODE_ENV !== "production") {
       (<ConditionalRuleSetRawJSONDataPropertyType>rawJSON).value;
     if (property &&
       !parentItemDefinition.hasPropertyDefinitionFor(property)){
-      let obj:any = {};
-      obj[property] = value;
-      throw new CheckUpError(
-        "Conditional rule set property invalid at",
-        parentItemDefinition.location,
-        obj,
-        rawJSON
-      );
-    } else if (property &&
-      !parentItemDefinition.getPropertyDefinitionFor(property)
-      .isValidValue(value)) {
       let obj:any = {};
       obj[property] = value;
       throw new CheckUpError(

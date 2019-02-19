@@ -51,6 +51,7 @@ export default class ItemDefinition {
   private importedChildDefinitions: Array<Array<string>>
   private onStateChange: ()=>any;
   private propertyDefinitions: Array<PropertyDefinition>;
+  private propertyDefinitionsIds: Array<string>;
   private itemInstances: Array<Item>;
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
@@ -86,6 +87,12 @@ export default class ItemDefinition {
           onStateChange
         )
       }).filter(d=>d) : [];
+
+
+    this.propertyDefinitionsIds = rawJSON.properties ? rawJSON.properties
+      .map(p=>p.id) : [];
+    //Since property definitions can have conditional rule sets
+    //this can check hasPropertyDefinitionFor
     this.propertyDefinitions = rawJSON.properties ? rawJSON.properties
       .map(p=>(new PropertyDefinition(p, this, onStateChange))) : [];
     this.onStateChange = onStateChange;
@@ -135,7 +142,7 @@ export default class ItemDefinition {
   }
 
   hasPropertyDefinitionFor(id: string){
-    return this.propertyDefinitions.some(d=>d.getId()===id);
+    return this.propertyDefinitionsIds.some(d=>d===id);
   }
 
   getPropertyDefinitionFor(id: string):PropertyDefinition {
