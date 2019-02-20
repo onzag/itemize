@@ -2,14 +2,6 @@ import ItemDefinition, { ItemDefinitionRawJSONDataType } from
   "./ItemDefinition";
 import { PropertyDefinitionRawJSONDataType } from
   "./ItemDefinition/PropertyDefinition";
-import { CheckUpError } from "./Error";
-
-//import ajv checker conditionally
-let ajv;
-if (process.env.NODE_ENV !== "production") {
-  const Ajv = require('ajv');
-  ajv = new Ajv();
-}
 
 export interface ModuleRawJSONDataType {
   //Builder data
@@ -28,32 +20,33 @@ export interface ModuleRawJSONDataType {
 export default class Module {
   private rawData: ModuleRawJSONDataType;
   private childModules: Array<Module>;
+  private childItemDefinitions: Array<ItemDefinition>
   private onStateChange:()=>any;
 
   constructor(rawJSON: ModuleRawJSONDataType, onStateChange: ()=>any){
     this.rawData = rawJSON;
     this.childModules = [];
+    this.childItemDefinitions = [];
     this.onStateChange = onStateChange;
-
-    //If its not production run the checks
-    if (process.env.NODE_ENV !== "production") {
-      Module.check(rawJSON);
-    }
 
     rawJSON.children.forEach(c=>{
       if (c.type === "module"){
         this.childModules.push(new Module(c, onStateChange));
       } else if (c.type === "item"){
-        if (process.env.NODE_ENV !== "production"){
-          let newChildren = {...c, properties: (
-              rawJSON.propExtensions || []
-            ).map(e=>
-              (<PropertyDefinitionRawJSONDataType>{...e, isExtension: true}))
-            .concat(c.properties || [])
-          };
-          new ItemDefinition(newChildren, this,
-            null, onStateChange);
-        }
+        let newChildren = {...c, properties: (
+            rawJSON.propExtensions || []
+          ).map(e=>
+            (<PropertyDefinitionRawJSONDataType>{...e, isExtension: true}))
+          .concat(c.properties || [])
+        };
+        this.childItemDefinitions.push(
+          new ItemDefinition(
+            newChildren,
+            this,
+            null,
+            onStateChange
+          )
+        );
       } else {
         throw new Error("Cannot handle type " + (c as any).type);
       }
@@ -96,7 +89,8 @@ export default class Module {
     let currentName:string;
     do {
       currentName = nNameConsumable.shift();
-      finalDefinition.childDefinitions.find(d=>d.name === currentName);
+      finalDefinition =
+        finalDefinition.childDefinitions.find(d=>d.name === currentName);
       if (!finalDefinition){
         throw new Error("Searching for item definition " +
           name.join("/") + " failed");
@@ -106,7 +100,33 @@ export default class Module {
     return finalDefinition;
   }
 
-  getItemDefinitionInstanceFor(name: Array<string>):ItemDefinition {
+  getItemDefinitionFor(name: Array<string>):ItemDefinition {
+    let finalDefinition = <ItemDefinition>this.childItemDefinitions
+      .find(d=>d.getName() === name[0]);
+
+    if (!finalDefinition){
+      throw new Error("Searching for item definition " +
+        name.join("/") + " failed");
+    }
+
+    let nNameConsumable = [...name];
+    nNameConsumable.shift();
+    let currentName:string;
+    do {
+      currentName = nNameConsumable.shift();
+      finalDefinition =
+        finalDefinition.getItemDefinitionFor(currentName, true);
+    } while (currentName);
+
+    return finalDefinition;
+  }
+
+  getDetachedItemDefinitionInstanceFor(name: Array<string>):ItemDefinition {
+    //TODO remove this, this is for hacking the imports
+    return {
+      getNewInstance: ()=>(this.getDetachedItemDefinitionInstanceFor([]))
+    } as any;
+
     return new ItemDefinition(
       this.getItemDefinitionRawFor(name),
       this,
@@ -116,7 +136,7 @@ export default class Module {
   }
 
   getAllChildItemDefinitions(){
-
+    return this.childItemDefinitions;
   }
 
   getAllChildModules(){
@@ -137,8 +157,6 @@ export default class Module {
   }
 
   static schema:any;
-  static schema_validate:any;
-  static check:any;
 }
 
 if (process.env.NODE_ENV !== "production") {
@@ -172,26 +190,5 @@ if (process.env.NODE_ENV !== "production") {
       }
     },
     required: ["type", "location", "name", "i18nName"]
-  }
-
-  //the validation function created by ajv
-  Module.schema_validate =
-    ajv.compile(Module.schema);
-
-  Module.check = function(
-    rawJSON: ModuleRawJSONDataType
-  ){
-    //we check the schema for validity
-    let valid = Module.schema_validate(rawJSON);
-
-    //if not valid throw the errors
-    if (!valid) {
-      throw new CheckUpError(
-        "Schema Check Failed",
-        rawJSON.location,
-        Module.schema_validate.errors,
-        rawJSON
-      );
-    };
   }
 }

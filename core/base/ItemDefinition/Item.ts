@@ -36,15 +36,6 @@ import PropertiesValueMappingDefiniton,
   './PropertiesValueMappingDefiniton';
 import ConditionalRuleSet, { ConditionalRuleSetRawJSONDataType } from
   './ConditionalRuleSet';
-import { CheckUpError } from '../Error';
-
-//the ajv compiler, conditionally imported
-let ajv;
-if (process.env.NODE_ENV !== "production") {
-  const Ajv = require('ajv');
-  ajv = new Ajv();
-}
-
 export type ItemGateType = "or" | "and" | "xor";
 
 export interface ItemGroupHandle {
@@ -75,11 +66,8 @@ export interface ItemRawJSONDataType {
 //And here we do the class definition
 export default class Item {
   //The basics
+  private rawData: ItemRawJSONDataType;
   public parentItemDefinition:ItemDefinition;
-
-  private i18nName?:{
-    [locale: string]: string
-  };
 
   //attribute to know if this item is actually an item group
   private isGroup: boolean;
@@ -87,20 +75,14 @@ export default class Item {
   //the data that comes from the raw json is to be processed here
   private itemDefinition?: ItemDefinition;
   private excludedIf?: ConditionalRuleSet;
-  private mightExclude?: boolean;
   private mightExcludeIf?: ConditionalRuleSet;
-  private defaultExcluded?: boolean;
   private defaultExcludedIf?: ConditionalRuleSet;
-  private rare?: boolean;
 
   //solo item specific attributes
   private enforcedProperties?: PropertiesValueMappingDefiniton;
   private predefinedProperties?: PropertiesValueMappingDefiniton;
-  private sinkIn?: Array<string>;
 
   //Group item specific attributes
-  private id?: string;
-  private gate?:ItemGateType;
   private items?: Array<Item>;
 
   //representing the state of the class
@@ -123,28 +105,14 @@ export default class Item {
     parentItemDefinition: ItemDefinition,
     onStateChange: ()=>any){
 
-    //If its not production run the checks
-    if (process.env.NODE_ENV !== "production") {
-      Item.check(rawJSON, parentItemDefinition);
-    }
-
-    this.id = rawJSON.id;
+    this.rawData = rawJSON;
 
     //check whether it is a group
     this.isGroup = !!rawJSON.items;
 
-    this.i18nName = rawJSON.i18nName;
-
     //put the items and the gate in place
-    this.gate = rawJSON.gate;
     this.items = rawJSON.items && rawJSON.items.map(rawJSONItem=>
       (new Item(rawJSONItem, parentItemDefinition, onStateChange)));
-
-    //lets get an instance for the item definition for this
-    //item, this is because we need to set properties for this specific
-    //item and we don't want to be polluting the main item definition
-    this.itemDefinition = rawJSON.name && parentItemDefinition
-      .getItemDefinitionInstanceFor(rawJSON.name);
 
     //the enforced properties list
     this.enforcedProperties = rawJSON.enforcedProperties &&
@@ -156,18 +124,35 @@ export default class Item {
       new PropertiesValueMappingDefiniton(rawJSON.predefinedProperties,
         parentItemDefinition, this.itemDefinition);
 
+    //lets get an instance for the item definition for this
+    //item, this is because we need to set properties for this specific
+    //item and we don't want to be polluting the main item definition
+    //we modify the properties to set predefined and enforced properties
+    this.itemDefinition = rawJSON.name && parentItemDefinition
+      .getItemDefinitionFor(rawJSON.name).getNewInstance((p)=>{
+        if (this.enforcedProperties &&
+          this.enforcedProperties.hasPropertyValue(p.id)){
+          return {
+            ...p,
+            enforcedValue: this.enforcedProperties.getPropertyValue(p.id)
+          }
+        } else if (this.predefinedProperties &&
+          this.predefinedProperties.hasPropertyValue(p.id)){
+          return {
+            ...p,
+            default: this.predefinedProperties.getPropertyValue(p.id)
+          }
+        }
+
+        return p;
+      });
+
     //If this is going to be excluded
     this.excludedIf = rawJSON.excludedIf &&
       new ConditionalRuleSet(rawJSON.excludedIf, parentItemDefinition);
 
-    //if this might be excluded
-    this.mightExclude = rawJSON.mightExclude;
-
     this.mightExcludeIf = rawJSON.mightExcludeIf &&
       new ConditionalRuleSet(rawJSON.mightExcludeIf, parentItemDefinition);
-
-    //Default exclusion rules
-    this.defaultExcluded = rawJSON.defaultExcluded;
 
     this.defaultExcludedIf = rawJSON.defaultExcludedIf &&
       new ConditionalRuleSet(
@@ -175,25 +160,8 @@ export default class Item {
         parentItemDefinition
       );
 
-    //whether this is rare
-    this.rare = rawJSON.rare;
-
     //parent item definition
     this.parentItemDefinition = parentItemDefinition;
-
-    //lets setup the enforced and predefined properties in the item
-    //definition that we have instantiated before
-    //TODO this needs to be fixed the enforced and predefined properties
-    //need to be somehow set and without triggering the state change
-    if (!this.isGroup){
-      (this.enforcedProperties ? this.enforcedProperties.getPropertyMap() : [])
-        .concat(this.predefinedProperties ?
-          this.predefinedProperties.getPropertyMap() : []).forEach(mapSet=>{
-        // this.itemDefinition
-        //   .getPropertyDefinitionInstanceFor(mapSet.propertyName)
-        //   .setCurrentValue(mapSet.value);
-      });
-    }
 
     //STATE MANAGEMENT
     this.onStateChange = onStateChange;
@@ -223,13 +191,13 @@ export default class Item {
     }
 
     //if it can be excluded
-    let canBeExcluded = this.mightExclude || (this.mightExcludeIf &&
+    let canBeExcluded = this.rawData.mightExclude || (this.mightExcludeIf &&
       this.mightExcludeIf.evaluate());
     if (canBeExcluded){
       //if it hasn't been modified we return the default state
       if (!this.state_isExcludedModified){
         //depending on the condition
-        let isDefaultExcluded = this.defaultExcluded ||
+        let isDefaultExcluded = this.rawData.defaultExcluded ||
           (this.defaultExcludedIf && this.defaultExcludedIf.evaluate()) ||
           false;
         //by default the excluded would be false
@@ -275,7 +243,7 @@ export default class Item {
     }
 
     //otherwise it depends to what might exclude provides
-    return this.mightExclude || (this.mightExcludeIf &&
+    return this.rawData.mightExclude || (this.mightExcludeIf &&
       this.mightExcludeIf.evaluate()) || false;
   }
 
@@ -324,7 +292,7 @@ export default class Item {
    * used for ordering
    */
   isRare():boolean {
-    return this.rare;
+    return this.rawData.rare;
   }
 
   /**
@@ -334,7 +302,7 @@ export default class Item {
     if (this.isGroup){
       throw new Error("Item is a group hence has no sinking properties");
     }
-    return !!this.sinkIn.length;
+    return !!(this.rawData.sinkIn && this.rawData.sinkIn.length);
   }
 
   /**
@@ -346,7 +314,7 @@ export default class Item {
     if (this.isGroup){
       throw new Error("Item is a group hence has no sinking properties");
     }
-    return (this.sinkIn || [])
+    return (this.rawData.sinkIn || [])
       .map(propertyName=>this.itemDefinition
         .getPropertyDefinitionFor(propertyName));
   }
@@ -364,7 +332,7 @@ export default class Item {
    * @return the gate, or, and or xor
    */
   getGate():ItemGateType {
-    return this.gate;
+    return this.rawData.gate;
   }
 
   /**
@@ -428,8 +396,8 @@ export default class Item {
    * @return        a string or null (if locale not valid)
    */
   getI18nNameFor(locale: string){
-    if (this.i18nName){
-      return this.i18nName[locale] || null;
+    if (this.rawData.i18nName){
+      return this.rawData.i18nName[locale] || null;
     }
 
     return this.itemDefinition.getI18nNameFor(locale);
@@ -437,8 +405,6 @@ export default class Item {
 
   //These are here but only truly available in non production
   static schema:any;
-  static schema_validate:any;
-  static check:any;
 }
 
 if (process.env.NODE_ENV !== "production") {
@@ -492,153 +458,4 @@ if (process.env.NODE_ENV !== "production") {
     },
     additionalProperties: false
   };
-
-  //the validation function created by ajv
-  Item.schema_validate =
-    ajv.compile(Item.schema);
-
-  //the checker, takes the same arguments as the constructor
-  Item.check = function(
-    rawJSON: ItemRawJSONDataType,
-    parentItemDefinition: ItemDefinition,
-  ){
-
-    //we check the schema for validity
-    let valid = Item.schema_validate(rawJSON);
-
-    //if not valid throw the errors
-    if (!valid) {
-      throw new CheckUpError(
-        "Schema Check Failed",
-        parentItemDefinition.location,
-        Item.schema_validate.errors,
-        rawJSON
-      );
-    };
-
-    let isGroup = !!rawJSON.items;
-
-    //check whether the item definition exists for this item
-    //it must exist to be an item
-    if (!isGroup && !parentItemDefinition.hasItemDefinitionFor(rawJSON.name)){
-      throw new CheckUpError(
-        "Missing item definition",
-        parentItemDefinition.location,
-        rawJSON.name,
-        {name: rawJSON.name},
-        rawJSON
-      );
-    }
-
-    if (isGroup && rawJSON.predefinedProperties){
-      throw new CheckUpError(
-        "Cannot set predefinedProperties and be a group",
-        parentItemDefinition.location,
-        {predefinedProperties: rawJSON.predefinedProperties},
-        rawJSON
-      );
-    }
-
-    if (isGroup && rawJSON.enforcedProperties){
-      throw new CheckUpError(
-        "Cannot set enforcedProperties and be a group",
-        parentItemDefinition.location,
-        {enforcedProperties: rawJSON.enforcedProperties},
-        rawJSON
-      );
-    }
-
-    if (isGroup && rawJSON.sinkIn){
-      throw new CheckUpError(
-        "Cannot set sinkIn and be a group",
-        parentItemDefinition.location,
-        {sinkIn: rawJSON.sinkIn},
-        rawJSON
-      );
-    }
-
-    //get all the predefined properties or an empty array
-    let predefinedPropertiesKeys = rawJSON.predefinedProperties ?
-      Object.keys(rawJSON.predefinedProperties) : [];
-
-    //The same for the enforced
-    let enforcedPropertiesKeys = rawJSON.enforcedProperties ?
-      Object.keys(rawJSON.enforcedProperties) : [];
-
-    //we don't need to check whether this properties exist in
-    //the item definition because PropertiesValueMappingDefiniton does that
-
-    //see if there are shared between both arrays
-    let sharedItems = predefinedPropertiesKeys
-      .filter(value => -1 !== enforcedPropertiesKeys.indexOf(value));
-
-    //predefined properties and enforced properties must not be shared
-    //for the simple reason that enforced properties are set in stone
-    if (sharedItems.length){
-      throw new CheckUpError(
-        "predefined and enforced properties collision",
-        parentItemDefinition.location,
-        sharedItems,
-        rawJSON
-      );
-    }
-
-    //Now we check again this time against the sinkIn properties
-    let sharedItems2 = (rawJSON.sinkIn || [])
-      .filter(value => -1 !== enforcedPropertiesKeys.indexOf(value));
-
-    //equally there might not be a collision here, enforced properties
-    //need not to sink in
-    if (sharedItems2.length){
-      throw new CheckUpError(
-        "sink in properties and enforced properties collision",
-        parentItemDefinition.location,
-        sharedItems2,
-        rawJSON
-      );
-    }
-
-    //Now we check whether this properties exist for sinkin
-    //unlike predefinedProperties and enforcedProperties nothing checks
-    //sinkIn properties
-    if (rawJSON.sinkIn){
-      let itemDefinitionRaw = parentItemDefinition
-        .getItemDefinitionRawFor(rawJSON.name);
-
-      let propertyToSinkIn:string;
-      for (propertyToSinkIn of rawJSON.sinkIn){
-        if (!itemDefinitionRaw.properties ||
-          !itemDefinitionRaw.properties.some(p=>p.id === propertyToSinkIn)){
-          throw new CheckUpError(
-            "Missing property in item definition",
-            parentItemDefinition.location,
-            propertyToSinkIn,
-            rawJSON.sinkIn,
-            {sinkIn: rawJSON.sinkIn},
-            rawJSON
-          );
-        }
-      }
-    }
-
-    //Check Conflicting defaultExcluded and defaultExcludedIf
-    if (typeof rawJSON.defaultExcluded !== "undefined" &&
-      typeof rawJSON.defaultExcludedIf !== "undefined"){
-      throw new CheckUpError(
-        "Conflicting properties defaultExcluded and defaultExcludedIf",
-        parentItemDefinition.location,
-        rawJSON
-      );
-    }
-
-    //also Conflicting mightExclude and mightExcludeIf
-    if (typeof rawJSON.mightExclude !== "undefined" &&
-      typeof rawJSON.mightExcludeIf !== "undefined"){
-      throw new CheckUpError(
-        "Conflicting properties mightExclude and mightExcludeIf",
-        parentItemDefinition.location,
-        rawJSON
-      );
-    }
-  }
 }

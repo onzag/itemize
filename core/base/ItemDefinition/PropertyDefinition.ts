@@ -17,14 +17,6 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   MAX_SUPPORTED_YEAR,
   MIN_SUPPORTED_YEAR,
   MAX_CURRENCY_DECIMAL_COUNT} from '../../constants';
-import { CheckUpError } from '../Error';
-
-//import ajv checker conditionally
-let ajv;
-if (process.env.NODE_ENV !== "production") {
-  const Ajv = require('ajv');
-  ajv = new Ajv();
-}
 
 //All the supported property types
 export type PropertyDefinitionSupportedTypes =
@@ -425,6 +417,7 @@ export interface PropertyDefinitionRawJSONDataType {
   defaultIf?: Array<PropertyDefinitionRawJSONRuleDataType>,
   //enforced values
   enforcedValues?: Array<PropertyDefinitionRawJSONRuleDataType>,
+  enforcedValue?: PropertyDefinitionSupportedType;
   //hidden if conditional
   hiddenIf?: ConditionalRuleSetRawJSONDataType,
   //search level
@@ -451,30 +444,10 @@ export interface PropertyValueGetterType {
 
 //The class itself
 export default class PropertyDefinition {
-  private id: string;
-  private i18nData?: {
-    [locale: string]: any
-  };
-  private type: PropertyDefinitionSupportedTypes;
-  private min:number;
-  private max:number;
-  private minLength:number;
-  private maxLength:number;
-  private maxDecimalCount:number;
-  private values?: Array<PropertyDefinitionSupportedType>;
-  private nullable?: boolean;
-  private hidden?: boolean;
-  private autocomplete?: string;
-  private autocompleteSetFromProperty?: Array<string>;
-  private autocompleteIsEnforced?: boolean;
-  private autocompleteSupportsPrefills?: boolean;
-  private isExtension?: boolean;
-  private default?: PropertyDefinitionSupportedType;
+  private rawData: PropertyDefinitionRawJSONDataType;
   private defaultIf?: Array<PropertyDefinitionRuleDataType>;
   private enforcedValues?: Array<PropertyDefinitionRuleDataType>;
   private hiddenIf?: ConditionalRuleSet;
-  private isRangedSearchDisabled?: boolean;
-  private searchLevel: PropertyDefinitionSearchLevelsType
 
   //representing the state of the class
   private onStateChange:()=>any;
@@ -492,32 +465,6 @@ export default class PropertyDefinition {
     parentItemDefinition: ItemDefinition,
     onStateChange: ()=>any
   ){
-    //If its not production run the checks
-    if (process.env.NODE_ENV !== "production") {
-      PropertyDefinition.check(rawJSON, parentItemDefinition);
-    }
-
-    //setting the private properties
-    this.id = rawJSON.id;
-    this.i18nData = rawJSON.i18nData;
-    this.type = rawJSON.type;
-    this.min = rawJSON.min;
-    this.max = rawJSON.max;
-    this.minLength = rawJSON.minLength;
-    this.maxLength = rawJSON.maxLength;
-    this.maxDecimalCount = rawJSON.maxDecimalCount;
-    this.values = rawJSON.values;
-    this.nullable = rawJSON.nullable;
-    this.hidden = rawJSON.hidden;
-    this.autocomplete = rawJSON.autocomplete;
-    this.autocompleteSetFromProperty = rawJSON.autocompleteSetFromProperty;
-    this.autocompleteIsEnforced = rawJSON.autocompleteIsEnforced;
-    this.autocompleteSupportsPrefills = rawJSON.autocompleteSupportsPrefills;
-    this.default = rawJSON.default;
-    this.isExtension = rawJSON.isExtension;
-    this.isRangedSearchDisabled = rawJSON.disableRangedSearch;
-    this.searchLevel = rawJSON.searchLevel || "always";
-
     //set the default value
     this.defaultIf = rawJSON.defaultIf && rawJSON.defaultIf.map(dif=>({
       value: dif.value,
@@ -537,7 +484,7 @@ export default class PropertyDefinition {
 
     //STATE MANAGEMENT
     this.onStateChange = onStateChange;
-    //initial value is null
+    //initial value for all namespaces is null
     this.state_value = null;
     this.state_valueModified = false;
   }
@@ -547,7 +494,7 @@ export default class PropertyDefinition {
    * @return a boolean
    */
   isCurrentlyHidden():boolean{
-    return this.hidden ||
+    return this.rawData.hidden ||
       (this.hiddenIf && this.hiddenIf.evaluate()) || false;
   }
 
@@ -556,7 +503,7 @@ export default class PropertyDefinition {
    * @return the id
    */
   getId(){
-    return this.id;
+    return this.rawData.id;
   }
 
   /**
@@ -565,13 +512,15 @@ export default class PropertyDefinition {
    */
   getCurrentValue():PropertyValueGetterType {
     //if there's an enforced value
-    if (this.enforcedValues) {
+    if (this.enforcedValues || this.rawData.enforcedValue) {
       //let's check if one matches the current situation
-      let enforcedValue = this.enforcedValues.find(ev=>{
-        return ev.if.evaluate();
-      });
+      let enforcedValue = typeof this.rawData.enforcedValue !== "undefined" ?
+        this.rawData.enforcedValue :
+        (this.enforcedValues.find(ev=>{
+          return ev.if.evaluate();
+        }) || {value: undefined}).value;
       //if we get one
-      if (enforcedValue){
+      if (typeof enforcedValue !== "undefined"){
         //we return the value that was set to be
         return {
           userSet: false,
@@ -586,7 +535,7 @@ export default class PropertyDefinition {
     //if the value hasn't been modified we are to return the defaults
     if (!this.state_valueModified){
       //lets find the default value
-      let defaultValue = this.default;
+      let defaultValue = this.rawData.default;
       //Also by condition
       if (this.defaultIf){
         //find a rule that passes
@@ -630,7 +579,8 @@ export default class PropertyDefinition {
    */
   setCurrentValue(newValue: PropertyDefinitionSupportedType):void {
     //let's get the definition
-    let definition = PropertyDefinition.supportedTypesStandard[this.type];
+    let definition = PropertyDefinition
+      .supportedTypesStandard[this.rawData.type];
     //find whether there is a nullable value and if it matches
     let newActualValue = definition.nullableDefault === newValue ?
       null : newValue;
@@ -661,14 +611,15 @@ export default class PropertyDefinition {
    * @return       a boolean
    */
   isValidValue(value: PropertyDefinitionSupportedType):boolean {
-    if (this.nullable && value === null){
+    if (this.rawData.nullable && value === null){
       return true;
     }
-    if (this.values && !this.values.includes(value)){
+    if (this.rawData.values && !this.rawData.values.includes(value)){
       return false;
     }
     //we get the definition and run basic checks
-    let definition = PropertyDefinition.supportedTypesStandard[this.type];
+    let definition = PropertyDefinition
+      .supportedTypesStandard[this.rawData.type];
     if (definition.json && typeof value !== definition.json){
       return false;
     }
@@ -676,26 +627,26 @@ export default class PropertyDefinition {
       return false
     }
 
-    if (typeof this.min !== "undefined" &&
+    if (typeof this.rawData.min !== "undefined" &&
       ((<PropertyDefinitionSupportedCurrencyType>value).value ||
-        value) < this.min){
+        value) < this.rawData.min){
       return false;
-    } else if (typeof this.max !== "undefined" &&
+    } else if (typeof this.rawData.max !== "undefined" &&
       ((<PropertyDefinitionSupportedCurrencyType>value).value ||
-        value) > this.max){
+        value) > this.rawData.max){
       return false;
-    } else if (typeof this.maxLength !== "undefined" &&
-      (<string>value).length > this.maxLength){
+    } else if (typeof this.rawData.maxLength !== "undefined" &&
+      (<string>value).length > this.rawData.maxLength){
       return false;
-    } else if (typeof this.minLength !== "undefined" &&
-      (<string>value).length < this.minLength){
+    } else if (typeof this.rawData.minLength !== "undefined" &&
+      (<string>value).length < this.rawData.minLength){
       return false;
-    } else if (typeof this.maxDecimalCount !== "number"){
+    } else if (typeof this.rawData.maxDecimalCount !== "number"){
       let splittedDecimals =
         ((<PropertyDefinitionSupportedCurrencyType>value).value || value)
         .toString().split(".");
       if (splittedDecimals[1] &&
-        splittedDecimals[1].length > this.maxDecimalCount){
+        splittedDecimals[1].length > this.rawData.maxDecimalCount){
         return false;
       }
     }
@@ -709,7 +660,7 @@ export default class PropertyDefinition {
    * @return a boolean
    */
   checkIfIsExtension():boolean {
-    return !!this.isExtension;
+    return !!this.rawData.isExtension;
   }
 
   /**
@@ -718,16 +669,14 @@ export default class PropertyDefinition {
    * @return
    */
   getI18nDataFor(locale: string):any {
-    if (!this.i18nData){
+    if (!this.rawData.i18nData){
       return null;
     }
-    return this.i18nData[locale] || null;
+    return this.rawData.i18nData[locale] || null;
   }
 
   //These are here but only truly available in non production
   static schema:any;
-  static schema_validate:any;
-  static check:any;
   static supportedTypesStandard = PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD;
 }
 
@@ -748,29 +697,6 @@ if (process.env.NODE_ENV !== "production") {
   ]
 
   let searchLevels = ["always", "moderate", "rare", "disabled"];
-
-  let staticIsValidValue = function(
-    type: PropertyDefinitionSupportedTypes,
-    nullable: boolean,
-    values: Array<PropertyDefinitionSupportedType>,
-    value: PropertyDefinitionSupportedType
-  ):boolean {
-    if (nullable && value === null){
-      return true;
-    }
-    if (values && !values.includes(value)){
-      return false;
-    }
-    //we get the definition and run basic checks
-    let definition = PropertyDefinition.supportedTypesStandard[type];
-    if (definition.json && typeof value !== definition.json){
-      return false;
-    }
-    if (definition.validate && !definition.validate(value)){
-      return false
-    }
-    return true;
-  }
 
   //The schema for the definition
   //{
@@ -870,6 +796,9 @@ if (process.env.NODE_ENV !== "production") {
         },
         minItems: 1
       },
+      enforcedValue: {
+        oneOf: valueOneOf
+      },
       hidden: {
         type: "boolean"
       },
@@ -888,129 +817,4 @@ if (process.env.NODE_ENV !== "production") {
     additionalProperties: false,
     required: ["id", "type"]
   };
-
-  //the validation function created by ajv
-  PropertyDefinition.schema_validate =
-    ajv.compile(PropertyDefinition.schema);
-
-  //the checker, takes the same arguments as the constructor
-  PropertyDefinition.check = function(
-    rawJSON: PropertyDefinitionRawJSONDataType,
-    parentItemDefinition: ItemDefinition
-  ){
-
-    //we check the schema for validity
-    let valid = PropertyDefinition.schema_validate(rawJSON);
-
-    //if not valid throw the errors
-    if (!valid) {
-      throw new CheckUpError(
-        "Schema Check Failed",
-        parentItemDefinition.location,
-        PropertyDefinition.schema_validate.errors,
-        rawJSON
-      );
-    };
-
-    //lets check that all the ones in values are valid
-    if (rawJSON.values){
-      let value;
-      for (value of rawJSON.values){
-        if (!staticIsValidValue(
-          rawJSON.type,
-          rawJSON.nullable,
-          rawJSON.values,
-          value
-        )){
-          throw new CheckUpError(
-            "Invalid value for item",
-            parentItemDefinition.location,
-            value,
-            {values: rawJSON.values},
-            rawJSON
-          );
-        };
-      }
-    }
-
-    //Let's check whether the default value is valid too
-    if (rawJSON.default){
-      if (!staticIsValidValue(
-        rawJSON.type,
-        rawJSON.nullable,
-        rawJSON.values,
-        rawJSON.default
-      )){
-        throw new CheckUpError(
-          "Invalid type for default",
-          parentItemDefinition.location,
-          {default: rawJSON.default},
-          rawJSON
-        );
-      };
-    }
-
-    //And the default if values are valid
-    if (rawJSON.defaultIf){
-      let rule:PropertyDefinitionRawJSONRuleDataType;
-      for (rule of rawJSON.defaultIf){
-        if (!staticIsValidValue(
-          rawJSON.type,
-          rawJSON.nullable,
-          rawJSON.values,
-          rule.value
-        )){
-          throw new CheckUpError(
-            "Invalid type for default if definition",
-            parentItemDefinition.location,
-            rule,
-            rawJSON.defaultIf,
-            rawJSON
-          );
-        };
-      }
-    }
-
-    if (rawJSON.type !== "integer" && rawJSON.type !== "number" &&
-      rawJSON.type !== "currency" && typeof rawJSON.min !== "undefined"){
-      throw new CheckUpError(
-        "Cannot set a min value if type not integer or number",
-        parentItemDefinition.location,
-        {min: rawJSON.min},
-        rawJSON
-      );
-    } else if (rawJSON.type !== "integer" && rawJSON.type !== "number" &&
-      rawJSON.type !== "currency" && typeof rawJSON.max !== "undefined"){
-      throw new CheckUpError(
-        "Cannot set a max value if type not integer or number",
-        parentItemDefinition.location,
-        {max: rawJSON.max},
-        rawJSON
-      );
-    } else if (rawJSON.type !== "number" && rawJSON.type !== "currency" &&
-      typeof rawJSON.maxDecimalCount !== "undefined"){
-      throw new CheckUpError(
-        "Cannot set a maxDecimalCount value if type not number",
-        parentItemDefinition.location,
-        {maxDecimalCount: rawJSON.maxDecimalCount},
-        rawJSON
-      );
-    } else if (rawJSON.type !== "string" && rawJSON.type !== "text" &&
-      typeof rawJSON.minLength !== "undefined"){
-      throw new CheckUpError(
-        "Cannot set a minLength value if type not text or string",
-        parentItemDefinition.location,
-        {minLength: rawJSON.minLength},
-        rawJSON
-      );
-    } else if (rawJSON.type !== "string" && rawJSON.type !== "text" &&
-      typeof rawJSON.maxLength !== "undefined"){
-      throw new CheckUpError(
-        "Cannot set a maxLength value if type not text or string",
-        parentItemDefinition.location,
-        {maxLength: rawJSON.maxLength},
-        rawJSON
-      );
-    }
-  }
 }

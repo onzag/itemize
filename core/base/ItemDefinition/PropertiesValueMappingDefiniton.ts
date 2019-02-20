@@ -31,30 +31,17 @@
 
 import ItemDefinition from '.';
 import { PropertyDefinitionSupportedType } from './PropertyDefinition';
-import { CheckUpError } from '../Error';
-
-//import ajv checker conditionally
-let ajv;
-if (process.env.NODE_ENV !== "production") {
-  const Ajv = require('ajv');
-  ajv = new Ajv();
-}
 
 //Represents the way that properties are stored
 //Check the schema down to see how this relates
 //at PropertiesValueMappingDefiniton.schema
-export interface PropertiesValueMappingDefinitonType {
+export interface PropertiesValueMappingDefinitonRawJSONDataType {
   [propertyName: string]: PropertyDefinitionSupportedType
 }
 
-//this represets the raw stored json data, in this case
-//it is exactly the same as the PropertiesValueMappingDefinitonType
-export type PropertiesValueMappingDefinitonRawJSONDataType =
-  PropertiesValueMappingDefinitonType;
-
 //Class is defined here
 export default class PropertiesValueMappingDefiniton {
-  private properties:PropertiesValueMappingDefinitonType;
+  private rawData:PropertiesValueMappingDefinitonRawJSONDataType;
   public referredItemDefinition:ItemDefinition;
   public parentItemDefinition:ItemDefinition;
 
@@ -74,13 +61,7 @@ export default class PropertiesValueMappingDefiniton {
     parentItemDefinition: ItemDefinition,
     referredItemDefinition: ItemDefinition){
 
-    //run a check if we are not in production
-    //very useful for development
-    if (process.env.NODE_ENV !== "production") {
-      PropertiesValueMappingDefiniton.check(rawJSON,
-        parentItemDefinition, referredItemDefinition);
-    }
-    this.properties = rawJSON;
+    this.rawData = rawJSON;
     this.parentItemDefinition = parentItemDefinition;
     this.referredItemDefinition = referredItemDefinition;
   }
@@ -89,15 +70,21 @@ export default class PropertiesValueMappingDefiniton {
     propertyName: string,
     value: PropertyDefinitionSupportedType
   }>{
-    return Object.keys(this.properties).map(key=>{
-      return {propertyName: key, value: this.properties[key]}
+    return Object.keys(this.rawData).map(key=>{
+      return {propertyName: key, value: this.rawData[key]}
     });
+  }
+
+  hasPropertyValue(key: string){
+    return typeof this.rawData[key] !== "undefined";
+  }
+
+  getPropertyValue(key: string){
+    return this.rawData[key];
   }
 
   //These are here but only truly available in non production
   static schema:any;
-  static schema_validate:any;
-  static check:any;
 }
 
 //We set the value of those if non in production
@@ -122,65 +109,4 @@ if (process.env.NODE_ENV !== "production") {
     },
     minProperties: 1
   };
-
-  //the validation function created by ajv
-  PropertiesValueMappingDefiniton.schema_validate =
-    ajv.compile(PropertiesValueMappingDefiniton.schema);
-
-  //the checker, takes the same arguments as the constructor
-  PropertiesValueMappingDefiniton.check = function(
-    rawJSON: PropertiesValueMappingDefinitonRawJSONDataType,
-    parentItemDefinition: ItemDefinition,
-    referredItemDefinition: ItemDefinition
-  ){
-
-    //we check the schema for validity
-    let valid = PropertiesValueMappingDefiniton.schema_validate(rawJSON);
-
-    //if not valid throw the errors
-    if (!valid) {
-      throw new CheckUpError(
-        "Schema Check Failed",
-        parentItemDefinition.location,
-        PropertiesValueMappingDefiniton.schema_validate.errors,
-        rawJSON
-      );
-    };
-
-    //We need to loop over the properties that were given
-    let propertyList = Object.keys(rawJSON);
-    let propertyName;
-    for (propertyName of propertyList){
-
-      //get the value for them
-      let propertyValue = rawJSON[propertyName];
-
-      //and lets check that they actually have such properties
-      if (!referredItemDefinition.hasPropertyDefinitionFor(propertyName)){
-        let obj:any = {};
-        obj[propertyName] = propertyValue;
-        throw new CheckUpError(
-          "Property not available in referred itemDefinition",
-          parentItemDefinition.location,
-          propertyName,
-          obj,
-          rawJSON
-        );
-      };
-
-      //And check whether the value is even valid
-      if (!referredItemDefinition.getPropertyDefinitionFor(propertyName)
-        .isValidValue(propertyValue)){
-        let obj:any = {};
-        obj[propertyName] = propertyValue;
-        throw new CheckUpError(
-          "Property value is invalid in referred itemDefinition",
-          parentItemDefinition.location,
-          propertyValue,
-          obj,
-          rawJSON
-        );
-      };
-    }
-  }
 }
