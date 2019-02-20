@@ -26,13 +26,9 @@ export interface ModuleRawJSONDataType {
 }
 
 export default class Module {
+  private rawData: ModuleRawJSONDataType;
   private childModules: Array<Module>;
-  private childDefinitions: Array<ItemDefinition>;
-  private name: string;
-  private i18nName: {
-    [locale: string]: string
-  };
-  public location:string;
+  private onStateChange:()=>any;
 
   constructor(rawJSON: ModuleRawJSONDataType, onStateChange: ()=>any){
     //If its not production run the checks
@@ -40,78 +36,83 @@ export default class Module {
       Module.check(rawJSON);
     }
 
+    this.rawData = rawJSON;
     this.childModules = [];
-    this.childDefinitions = [];
-    this.name = rawJSON.name;
-    this.i18nName = rawJSON.i18nName;
-    this.location = rawJSON.location;
+    this.onStateChange = onStateChange;
 
     rawJSON.children.forEach(c=>{
       if (c.type === "module"){
         this.childModules.push(new Module(c, onStateChange));
       } else if (c.type === "item"){
-        let newChildren = {...c, properties: (
-            rawJSON.propExtensions || []
-          ).map(e=>
-            (<PropertyDefinitionRawJSONDataType>{...e, isExtension: true}))
-          .concat(c.properties || [])
-        };
-        this.childDefinitions.push(new ItemDefinition(newChildren, this,
-          null, onStateChange));
+        if (process.env.NODE_ENV !== "production"){
+          let newChildren = {...c, properties: (
+              rawJSON.propExtensions || []
+            ).map(e=>
+              (<PropertyDefinitionRawJSONDataType>{...e, isExtension: true}))
+            .concat(c.properties || [])
+          };
+          new ItemDefinition(newChildren, this,
+            null, onStateChange);
+        }
       } else {
         throw new Error("Cannot handle type " + (c as any).type);
       }
     });
   }
 
-  hasItemDefinitionFor(name: string | Array<string>):boolean {
-    if (name instanceof Array){
-      let finalDefinition = this.childDefinitions
-        .find(d=>d.getName() === name[0]);
+  hasItemDefinitionFor(name: Array<string>):boolean {
+    let finalDefinition = <ItemDefinitionRawJSONDataType>this.rawData.children
+      .find(d=>d.type === "item" && d.name === name[0]);
 
+    if (!finalDefinition){
+      return false;
+    }
+
+    let nNameConsumable = [...name];
+    nNameConsumable.shift();
+    let currentName:string;
+    do {
+      currentName = nNameConsumable.shift();
+      finalDefinition.childDefinitions.find(d=>d.name === currentName);
       if (!finalDefinition){
         return false;
       }
+    } while (currentName);
 
-      name.forEach((n, index)=>{
-        if (index === 0){
-          return;
-        }
-        try {
-          finalDefinition = finalDefinition.getItemDefinitionFor(n, true);
-        } catch (e){
-          return false;
-        }
-      });
-
-      return !!finalDefinition;
-    }
-    return this.childDefinitions.some(d=>d.getName() === name);
+    return true;
   }
 
-  getItemDefinitionFor(name: string | Array<string>):ItemDefinition {
-    if (name instanceof Array){
-      let finalDefinition = this.childDefinitions
-        .find(d=>d.getName() === name[0]);
-      name.forEach((n, index)=>{
-        if (index === 0){
-          return;
-        }
-        finalDefinition = finalDefinition.getItemDefinitionFor(n, true);
-      });
+  getItemDefinitionInstanceFor(name: Array<string>):ItemDefinition {
+    let finalDefinition = <ItemDefinitionRawJSONDataType>this.rawData.children
+      .find(d=>d.type === "item" && d.name === name[0]);
 
-      return finalDefinition;
+    if (!finalDefinition){
+      throw new Error("Searching for item definition " +
+        name.join("/") + " failed");
     }
 
-    let item = this.childDefinitions.find(d=>d.getName() === name);
-    if (!item){
-      throw new Error("Searching for item definition " + name + " failed");
-    }
-    return item;
+    let nNameConsumable = [...name];
+    nNameConsumable.shift();
+    let currentName:string;
+    do {
+      currentName = nNameConsumable.shift();
+      finalDefinition.childDefinitions.find(d=>d.name === currentName);
+      if (!finalDefinition){
+        throw new Error("Searching for item definition " +
+          name.join("/") + " failed");
+      }
+    } while (currentName);
+
+    return new ItemDefinition(
+      finalDefinition,
+      this,
+      null,
+      this.onStateChange
+    );
   }
 
   getAllChildItemDefinitions(){
-    return this.childDefinitions;
+
   }
 
   getAllChildModules(){
@@ -119,7 +120,7 @@ export default class Module {
   }
 
   getName(){
-    return this.name
+    return this.rawData.name
   }
 
   /**
@@ -128,7 +129,7 @@ export default class Module {
    * @return        a string or null (if locale not valid)
    */
   getI18nNameFor(locale: string){
-    return this.i18nName[locale] || null;
+    return this.rawData.i18nName[locale] || null;
   }
 
   static schema:any;

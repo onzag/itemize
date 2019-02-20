@@ -144,7 +144,7 @@ export default class Item {
     //item, this is because we need to set properties for this specific
     //item and we don't want to be polluting the main item definition
     this.itemDefinition = rawJSON.name && parentItemDefinition
-      .getItemDefinitionFor(rawJSON.name).getNewInstance();
+      .getItemDefinitionInstanceFor(rawJSON.name);
 
     //the enforced properties list
     this.enforcedProperties = rawJSON.enforcedProperties &&
@@ -601,7 +601,7 @@ if (process.env.NODE_ENV !== "production") {
     //sinkIn properties
     if (rawJSON.sinkIn){
       let itemDefinition = parentItemDefinition
-        .getItemDefinitionFor(rawJSON.name);
+        .getItemDefinitionInstanceFor(rawJSON.name);
 
       let propertyToSinkIn;
       for (propertyToSinkIn of rawJSON.sinkIn){

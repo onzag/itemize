@@ -155,7 +155,7 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
         return false;
       }
 
-      if (n <= MAX_SUPPORTED_REAL && n >= MIN_SUPPORTED_REAL){
+      if (n > MAX_SUPPORTED_REAL || n < MIN_SUPPORTED_REAL){
         return false;
       }
 

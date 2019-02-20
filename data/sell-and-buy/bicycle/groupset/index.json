@@ -425,7 +425,17 @@
 			"type": "boolean",
 			"rare": true,
 			"default": false,
-			"excludedIf": {
+			"enforcedValues": [
+				{
+					"value": false,
+					"if": {
+						"property": "electronic",
+						"comparator": "equals",
+						"value": true
+					}
+				}
+			],
+			"hiddenIf": {
 				"property": "electronic",
 				"comparator": "equals",
 				"value": true
