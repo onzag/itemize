@@ -59,13 +59,17 @@ export default class ItemDefinition {
     parentItemDefinition: ItemDefinition,
     onStateChange: ()=>any
   ){
+    this.rawData = rawJSON;
+    this.parentModule = parentModule;
+    this.parentItemDefinition = parentItemDefinition;
+
     if (process.env.NODE_ENV !== "production") {
       ItemDefinition.check(rawJSON);
 
-      rawJSON.properties
+      (rawJSON.properties || [])
         .forEach(p=>(new PropertyDefinition(p, this, onStateChange)));
 
-      rawJSON.childDefinitions.forEach(d=>{
+      (rawJSON.childDefinitions || []).forEach(d=>{
         if ((d as any).type === "module"){
           throw new Error("module cannot be a child of an item " +
             rawJSON.name + ">" + d.name);
@@ -79,7 +83,6 @@ export default class ItemDefinition {
       })
     }
 
-    this.rawData = rawJSON;
     this.name = rawJSON.name;
     this.i18nName = rawJSON.i18nName;
     this.location = rawJSON.location;
@@ -92,9 +95,6 @@ export default class ItemDefinition {
     //so we set them later
     this.itemInstances = rawJSON.includes ? rawJSON.includes
       .map(i=>(new Item(i, this, onStateChange))) : [];
-
-    this.parentModule = parentModule;
-    this.parentItemDefinition = parentItemDefinition;
   }
 
   getName():string {
@@ -114,10 +114,10 @@ export default class ItemDefinition {
     return status;
   }
 
-  getItemDefinitionInstanceFor(
+  getItemDefinitionRawFor(
     name: string,
     avoidImports?: boolean
-  ):ItemDefinition {
+  ):ItemDefinitionRawJSONDataType {
     let definition = this.rawData.childDefinitions
       .find(d=>d.name===name);
     if (!definition && !avoidImports){
@@ -125,15 +125,22 @@ export default class ItemDefinition {
         .find(d=>d.join("/") === name || d[d.length - 1] === name);
       if (importedDefinitionLoc){
         return this.parentModule
-          .getItemDefinitionInstanceFor(importedDefinitionLoc);
+          .getItemDefinitionRawFor(importedDefinitionLoc);
       }
     }
 
     if (!definition){
       throw new Error("Requested invalid definition " + name);
     }
+    return definition;
+  }
+
+  getItemDefinitionInstanceFor(
+    name: string,
+    avoidImports?: boolean
+  ):ItemDefinition {
     return new ItemDefinition(
-      definition,
+      this.getItemDefinitionRawFor(name, avoidImports),
       this.parentModule,
       this,
       this.onStateChange
@@ -141,16 +148,20 @@ export default class ItemDefinition {
   }
 
   hasPropertyDefinitionFor(id: string){
-    return this.rawData.properties.some(p=>p.id === id);
+    return (this.rawData.properties || []).some(p=>p.id === id);
   }
 
-  getPropertyDefinitionInstanceFor(id: string):PropertyDefinition {
-    let definition = this.rawData.properties.find(p=>p.id === id);
+  getPropertyDefinitionRawFor(id: string):PropertyDefinitionRawJSONDataType {
+    let definition = (this.rawData.properties || []).find(p=>p.id === id);
     if (!definition){
       throw new Error("Requested invalid property " + id);
     }
+    return definition;
+  }
+
+  getPropertyDefinitionInstanceFor(id: string):PropertyDefinition {
     return new PropertyDefinition(
-      definition,
+      this.getPropertyDefinitionRawFor(id),
       this,
       this.onStateChange
     );

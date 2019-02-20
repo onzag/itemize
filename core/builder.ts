@@ -372,6 +372,7 @@ async function processItemDefinition(
     fileData).imports || []){
       //this throws an error if it fails to get the location
       // TODO remove this commented out code
+      // this thing checks whether the imported files do exist
       // await getActualFileLocation(
       //   path.join(lastModuleDirectory, imp),
       //   actualLocation

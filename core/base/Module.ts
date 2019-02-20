@@ -31,14 +31,14 @@ export default class Module {
   private onStateChange:()=>any;
 
   constructor(rawJSON: ModuleRawJSONDataType, onStateChange: ()=>any){
+    this.rawData = rawJSON;
+    this.childModules = [];
+    this.onStateChange = onStateChange;
+
     //If its not production run the checks
     if (process.env.NODE_ENV !== "production") {
       Module.check(rawJSON);
     }
-
-    this.rawData = rawJSON;
-    this.childModules = [];
-    this.onStateChange = onStateChange;
 
     rawJSON.children.forEach(c=>{
       if (c.type === "module"){
@@ -82,7 +82,7 @@ export default class Module {
     return true;
   }
 
-  getItemDefinitionInstanceFor(name: Array<string>):ItemDefinition {
+  getItemDefinitionRawFor(name: Array<string>):ItemDefinitionRawJSONDataType {
     let finalDefinition = <ItemDefinitionRawJSONDataType>this.rawData.children
       .find(d=>d.type === "item" && d.name === name[0]);
 
@@ -103,8 +103,12 @@ export default class Module {
       }
     } while (currentName);
 
+    return finalDefinition;
+  }
+
+  getItemDefinitionInstanceFor(name: Array<string>):ItemDefinition {
     return new ItemDefinition(
-      finalDefinition,
+      this.getItemDefinitionRawFor(name),
       this,
       null,
       this.onStateChange

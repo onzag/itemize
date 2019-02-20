@@ -48,7 +48,7 @@
 
 import ItemDefinition from '.';
 import { CheckUpError } from '../Error';
-import { PropertyDefinitionSupportedType } from './PropertyDefinition';
+import PropertyDefinition, { PropertyDefinitionSupportedType } from './PropertyDefinition';
 
 //import ajv checker conditionally
 let ajv;
@@ -341,19 +341,9 @@ if (process.env.NODE_ENV !== "production") {
       (<ConditionalRuleSetRawJSONDataPropertyType>rawJSON).property;
     let value =
       (<ConditionalRuleSetRawJSONDataPropertyType>rawJSON).value;
+
     if (property &&
       !parentItemDefinition.hasPropertyDefinitionFor(property)){
-      let obj:any = {};
-      obj[property] = value;
-      throw new CheckUpError(
-        "Conditional rule set property invalid at",
-        parentItemDefinition.location,
-        obj,
-        rawJSON
-      );
-    } else if (property &&
-      !parentItemDefinition.getPropertyDefinitionInstanceFor(property)
-      .isValidValue(value)) {
       let obj:any = {};
       obj[property] = value;
       throw new CheckUpError(

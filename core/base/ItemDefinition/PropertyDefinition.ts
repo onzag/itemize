@@ -396,6 +396,7 @@ export interface PropertyDefinitionRawJSONDataType {
   i18nData?: {
     [locale: string]: any
   },
+  rare?: boolean,
   //the type of the property
   type: PropertyDefinitionSupportedTypes,
   min?: number,
@@ -790,6 +791,9 @@ if (process.env.NODE_ENV !== "production") {
       },
       type:  {
         type: "string"
+      },
+      rare: {
+        type: "boolean"
       },
       min: {
         type: "number"

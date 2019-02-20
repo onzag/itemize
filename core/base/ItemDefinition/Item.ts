@@ -183,13 +183,15 @@ export default class Item {
 
     //lets setup the enforced and predefined properties in the item
     //definition that we have instantiated before
+    //TODO this needs to be fixed the enforced and predefined properties
+    //need to be somehow set and without triggering the state change
     if (!this.isGroup){
       (this.enforcedProperties ? this.enforcedProperties.getPropertyMap() : [])
         .concat(this.predefinedProperties ?
           this.predefinedProperties.getPropertyMap() : []).forEach(mapSet=>{
-        this.itemDefinition
-          .getPropertyDefinitionFor(mapSet.propertyName)
-          .setCurrentValue(mapSet.value);
+        // this.itemDefinition
+        //   .getPropertyDefinitionInstanceFor(mapSet.propertyName)
+        //   .setCurrentValue(mapSet.value);
       });
     }
 
@@ -600,12 +602,13 @@ if (process.env.NODE_ENV !== "production") {
     //unlike predefinedProperties and enforcedProperties nothing checks
     //sinkIn properties
     if (rawJSON.sinkIn){
-      let itemDefinition = parentItemDefinition
-        .getItemDefinitionInstanceFor(rawJSON.name);
+      let itemDefinitionRaw = parentItemDefinition
+        .getItemDefinitionRawFor(rawJSON.name);
 
-      let propertyToSinkIn;
+      let propertyToSinkIn:string;
       for (propertyToSinkIn of rawJSON.sinkIn){
-        if (!itemDefinition.hasPropertyDefinitionFor(propertyToSinkIn)){
+        if (!itemDefinitionRaw.properties ||
+          !itemDefinitionRaw.properties.some(p=>p.id === propertyToSinkIn)){
           throw new CheckUpError(
             "Missing property in item definition",
             parentItemDefinition.location,
