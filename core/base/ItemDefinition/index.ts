@@ -1,6 +1,6 @@
 import PropertyDefinition, { PropertyDefinitionRawJSONDataType } from "./PropertyDefinition";
 import Item, { ItemRawJSONDataType, ItemGroupHandle } from "./Item";
-import Module from "../Module";
+import Module, { ModuleRawJSONDataType } from "../Module";
 
 export interface ItemDefinitionRawJSONDataType {
   //Builder data
@@ -31,7 +31,7 @@ function hasItemOf(name: string, handle: Item | ItemGroupHandle):boolean {
 }
 
 export default class ItemDefinition {
-  private rawData: ItemDefinitionRawJSONDataType;
+  public rawData: ItemDefinitionRawJSONDataType;
   private onStateChange: ()=>any;
   private itemInstances: Array<Item>;
   private childDefinitions: Array<ItemDefinition>;
@@ -112,6 +112,45 @@ export default class ItemDefinition {
     return definition;
   }
 
+  getItemDefinitionRawFor(name: string){
+    let definition = ItemDefinition.getItemDefinitionRawFor(
+      this.rawData,
+      this.parentModule.rawData,
+      name
+    );
+    if (!definition){
+      throw new Error("Searching for item definition " +
+        name + " failed");
+    }
+    return definition;
+  }
+
+  static getItemDefinitionRawFor(
+    itemDefinitionRaw: ItemDefinitionRawJSONDataType,
+    parentModuleRaw: ModuleRawJSONDataType,
+    name: string
+  ):ItemDefinitionRawJSONDataType {
+    let definition = itemDefinitionRaw.childDefinitions
+      .find(d=>d.name===name);
+    if (!definition){
+      let importedDefinitionLoc = itemDefinitionRaw.importedChildDefinitions
+        .find(d=>d.join("/") === name || d[d.length - 1] === name);
+      if (importedDefinitionLoc){
+        let importedDefinitionName = importedDefinitionLoc.join("/");
+        let importedPath = itemDefinitionRaw.importedChildDefinitions
+          .find(d=>d.join("/") === importedDefinitionName);
+        if (importedPath){
+          definition = Module.getItemDefinitionRawFor(
+            parentModuleRaw,
+            importedPath
+          );
+        }
+      }
+    }
+
+    return definition;
+  }
+
   hasPropertyDefinitionFor(id: string){
     return (this.rawData.properties || []).some(p=>p.id === id);
   }
@@ -122,6 +161,18 @@ export default class ItemDefinition {
       throw new Error("Requested invalid property " + id);
     }
     return definition;
+  }
+
+  static getPropertyDefinitionRawFor(
+    itemDefinitionRaw: ItemDefinitionRawJSONDataType,
+    parentModuleRaw: ModuleRawJSONDataType,
+    id: string
+  ):PropertyDefinitionRawJSONDataType {
+    let definition = itemDefinitionRaw.properties.find(p=>p.id === id);
+    if (!definition && parentModuleRaw.propExtensions){
+      definition = parentModuleRaw.propExtensions.find(p=>p.id === id);
+    }
+    return definition || null;
   }
 
   hasAtLeastOneActiveInstanceOf(name: string):boolean {
@@ -164,14 +215,7 @@ export default class ItemDefinition {
   }
 
   getChildDefinitions():Array<ItemDefinition> {
-    return this.rawData.childDefinitions.map(d=>{
-      return new ItemDefinition(
-        d,
-        this.parentModule,
-        this.parentItemDefinition,
-        this.onStateChange
-      )
-    });
+    return this.childDefinitions;
   }
 
   areCalloutExcludesAllowed():boolean {

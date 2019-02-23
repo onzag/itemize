@@ -66,7 +66,7 @@ export interface ItemRawJSONDataType {
 //And here we do the class definition
 export default class Item {
   //The basics
-  private rawData: ItemRawJSONDataType;
+  public rawData: ItemRawJSONDataType;
   public parentItemDefinition:ItemDefinition;
 
   //attribute to know if this item is actually an item group

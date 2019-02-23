@@ -401,6 +401,8 @@ export interface PropertyDefinitionRawJSONDataType {
   values?: Array<PropertyDefinitionSupportedType>,
   //whether it can be null or not
   nullable?: boolean,
+  //Makes the value be null if hidden
+  nullIfHidden?: boolean,
   //hidden does not show at all
   hidden?: boolean,
   //autocomplete is an endpoint of some sort that requests
@@ -444,7 +446,7 @@ export interface PropertyValueGetterType {
 
 //The class itself
 export default class PropertyDefinition {
-  private rawData: PropertyDefinitionRawJSONDataType;
+  public rawData: PropertyDefinitionRawJSONDataType;
   private defaultIf?: Array<PropertyDefinitionRuleDataType>;
   private enforcedValues?: Array<PropertyDefinitionRuleDataType>;
   private hiddenIf?: ConditionalRuleSet;
@@ -511,6 +513,17 @@ export default class PropertyDefinition {
    * @return a bunch of information about the current value
    */
   getCurrentValue():PropertyValueGetterType {
+    //make if hidden if null if hidden is set to true
+    if (this.rawData.nullIfHidden && this.isCurrentlyHidden()){
+      return {
+        userSet: false,
+        enforced: true,
+        default: false,
+        valid: true,
+        value: null
+      };
+    }
+
     //if there's an enforced value
     if (this.enforcedValues || this.rawData.enforcedValue) {
       //let's check if one matches the current situation
@@ -611,15 +624,29 @@ export default class PropertyDefinition {
    * @return       a boolean
    */
   isValidValue(value: PropertyDefinitionSupportedType):boolean {
-    if (this.rawData.nullable && value === null){
+    return PropertyDefinition.isValidValue(
+      this.rawData,
+      value,
+      true
+    );
+  }
+
+  static isValidValue(
+    propertyDefinitionRaw: PropertyDefinitionRawJSONDataType,
+    value: PropertyDefinitionSupportedType,
+    checkAgainstValues: boolean
+  ):boolean {
+    if (propertyDefinitionRaw.nullable && value === null){
       return true;
     }
-    if (this.rawData.values && !this.rawData.values.includes(value)){
+    if (propertyDefinitionRaw.values &&
+      checkAgainstValues &&
+      !propertyDefinitionRaw.values.includes(value)){
       return false;
     }
     //we get the definition and run basic checks
     let definition = PropertyDefinition
-      .supportedTypesStandard[this.rawData.type];
+      .supportedTypesStandard[propertyDefinitionRaw.type];
     if (definition.json && typeof value !== definition.json){
       return false;
     }
@@ -627,26 +654,26 @@ export default class PropertyDefinition {
       return false
     }
 
-    if (typeof this.rawData.min !== "undefined" &&
+    if (typeof propertyDefinitionRaw.min !== "undefined" &&
       ((<PropertyDefinitionSupportedCurrencyType>value).value ||
-        value) < this.rawData.min){
+        value) < propertyDefinitionRaw.min){
       return false;
-    } else if (typeof this.rawData.max !== "undefined" &&
+    } else if (typeof propertyDefinitionRaw.max !== "undefined" &&
       ((<PropertyDefinitionSupportedCurrencyType>value).value ||
-        value) > this.rawData.max){
+        value) > propertyDefinitionRaw.max){
       return false;
-    } else if (typeof this.rawData.maxLength !== "undefined" &&
-      (<string>value).length > this.rawData.maxLength){
+    } else if (typeof propertyDefinitionRaw.maxLength !== "undefined" &&
+      (<string>value).length > propertyDefinitionRaw.maxLength){
       return false;
-    } else if (typeof this.rawData.minLength !== "undefined" &&
-      (<string>value).length < this.rawData.minLength){
+    } else if (typeof propertyDefinitionRaw.minLength !== "undefined" &&
+      (<string>value).length < propertyDefinitionRaw.minLength){
       return false;
-    } else if (typeof this.rawData.maxDecimalCount !== "number"){
+    } else if (typeof propertyDefinitionRaw.maxDecimalCount !== "number"){
       let splittedDecimals =
         ((<PropertyDefinitionSupportedCurrencyType>value).value || value)
         .toString().split(".");
       if (splittedDecimals[1] &&
-        splittedDecimals[1].length > this.rawData.maxDecimalCount){
+        splittedDecimals[1].length > propertyDefinitionRaw.maxDecimalCount){
         return false;
       }
     }
@@ -795,6 +822,9 @@ if (process.env.NODE_ENV !== "production") {
           required: ["value", "if"]
         },
         minItems: 1
+      },
+      nullIfHidden: {
+        type: "boolean"
       },
       enforcedValue: {
         oneOf: valueOneOf

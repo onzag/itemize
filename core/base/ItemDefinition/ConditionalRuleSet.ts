@@ -61,14 +61,14 @@ interface ConditionalRuleSetRawJSONDataBaseType {
   condition?: ConditionalRuleSetRawJSONDataType
 }
 
-interface ConditionalRuleSetRawJSONDataPropertyType
+export interface ConditionalRuleSetRawJSONDataPropertyType
   extends ConditionalRuleSetRawJSONDataBaseType {
   property: string,
   comparator: ConditionalRuleComparatorType,
   value: PropertyDefinitionSupportedType
 }
 
-interface ConditionalRuleSetRawJSONDataComponentType
+export interface ConditionalRuleSetRawJSONDataComponentType
   extends ConditionalRuleSetRawJSONDataBaseType {
   component: string,
   isIncluded: boolean
@@ -80,7 +80,7 @@ export type ConditionalRuleSetRawJSONDataType =
 
 //Class begins
 export default class ConditionalRuleSet {
-  private rawData: ConditionalRuleSetRawJSONDataType;
+  public rawData: ConditionalRuleSetRawJSONDataType;
   private condition: ConditionalRuleSet;
   //default values
   public parentItemDefinition:ItemDefinition;

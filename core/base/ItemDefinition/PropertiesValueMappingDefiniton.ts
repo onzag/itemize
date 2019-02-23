@@ -41,7 +41,7 @@ export interface PropertiesValueMappingDefinitonRawJSONDataType {
 
 //Class is defined here
 export default class PropertiesValueMappingDefiniton {
-  private rawData:PropertiesValueMappingDefinitonRawJSONDataType;
+  public rawData:PropertiesValueMappingDefinitonRawJSONDataType;
   public referredItemDefinition:ItemDefinition;
   public parentItemDefinition:ItemDefinition;
 

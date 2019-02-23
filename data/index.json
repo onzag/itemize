@@ -1,5 +1,5 @@
 {
   "type": "root",
-  "includes": ["sell-and-buy"],
+  "includes": ["buy-and-sell"],
   "lang": []
 }

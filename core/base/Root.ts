@@ -7,7 +7,7 @@ export interface RootRawJSONDataType {
 }
 
 export default class Root {
-  private rawData: RootRawJSONDataType;
+  public rawData: RootRawJSONDataType;
 
   constructor(rawJSON: RootRawJSONDataType){
     //If its not production run the checks

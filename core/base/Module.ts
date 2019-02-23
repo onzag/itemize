@@ -18,7 +18,7 @@ export interface ModuleRawJSONDataType {
 }
 
 export default class Module {
-  private rawData: ModuleRawJSONDataType;
+  public rawData: ModuleRawJSONDataType;
   private childModules: Array<Module>;
   private childItemDefinitions: Array<ItemDefinition>
   private onStateChange:()=>any;
@@ -76,12 +76,27 @@ export default class Module {
   }
 
   getItemDefinitionRawFor(name: Array<string>):ItemDefinitionRawJSONDataType {
-    let finalDefinition = <ItemDefinitionRawJSONDataType>this.rawData.children
+    let definition = Module.getItemDefinitionRawFor(
+      this.rawData,
+      name
+    );
+    if (!definition){
+      throw new Error("Searching for item definition " +
+        name.join("/") + " failed");
+    }
+    return definition;
+  }
+
+  static getItemDefinitionRawFor(
+    parentModuleRaw: ModuleRawJSONDataType,
+    name: string[]
+  ):ItemDefinitionRawJSONDataType {
+    let finalDefinition = <ItemDefinitionRawJSONDataType>
+      parentModuleRaw.children
       .find(d=>d.type === "item" && d.name === name[0]);
 
     if (!finalDefinition){
-      throw new Error("Searching for item definition " +
-        name.join("/") + " failed");
+      return null;
     }
 
     let nNameConsumable = [...name];
@@ -92,8 +107,7 @@ export default class Module {
       finalDefinition =
         finalDefinition.childDefinitions.find(d=>d.name === currentName);
       if (!finalDefinition){
-        throw new Error("Searching for item definition " +
-          name.join("/") + " failed");
+        return null;
       }
     } while (currentName);
 

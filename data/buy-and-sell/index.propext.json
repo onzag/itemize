@@ -1,0 +1,56 @@
+[
+  {
+    "id": "title",
+    "type": "string",
+    "autocomplete": "manufacturer",
+    "nullable": true
+  },
+  {
+    "id": "manufacturer",
+    "type": "string",
+    "autocomplete": "manufacturer",
+    "nullable": true
+  },
+  {
+    "id": "year",
+    "type": "year"
+  },
+  {
+    "id": "condition",
+    "type": "string",
+    "values": ["new", "excellent", "good", "donor", "scrap"]
+  },
+  {
+    "id": "sellType",
+    "type": "string",
+    "values": ["standard", "auction"]
+  },
+  {
+    "id": "price",
+    "type": "currency",
+    "hiddenIf": {
+      "property": "sellType",
+      "comparator": "not-equals",
+      "value": "standard"
+    },
+    "nullIfHidden": true
+  },
+  {
+    "id": "initialBid",
+    "hiddenIf": {
+      "property": "sellType",
+      "comparator": "not-equals",
+      "value": "auction"
+    },
+    "nullIfHidden": true
+  },
+  {
+    "id": "minBid",
+    "hiddenIf": {
+      "property": "sellType",
+      "comparator": "not-equals",
+      "value": "auction"
+    },
+    "nullIfHidden": true
+  }
+]

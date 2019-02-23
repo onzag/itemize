@@ -17,9 +17,9 @@ export const MAX_SUPPORTED_YEAR = 3000;
 //Years min
 export const MIN_SUPPORTED_YEAR = 0;
 //Defines how many characters a string might have
-export const MAX_STRING_LENGTH = 255;
+export const MAX_STRING_LENGTH = 10000;
 //How many characters (including HTML special characters) text might have
-export const MAX_TEXT_LENGTH = 10000;
+export const MAX_TEXT_LENGTH = MAX_STRING_LENGTH;
 //The max file size (for either images and binary files)
 export const MAX_FILE_SIZE = 5242880; //equivalent to 5MB
 
