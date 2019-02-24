@@ -78,9 +78,15 @@
 				{
 					"name": "front-deraullier",
 					"enforcedProperties": {
-						"chainrings": "chainrings",
-						"electronic": "electronic",
-						"hydraulic": "hydraulic"
+						"chainrings": {
+							"property": "chainrings"
+						},
+						"electronic": {
+							"property": "electronic"
+						},
+						"hydraulic": {
+							"property": "hydraulic-shifting"
+						}
 					},
 					"excludedIf": {
 						"property": "speeds",
@@ -115,9 +121,15 @@
 		{
 			"name": "rear-deraullier",
 			"enforcedProperties": {
-				"speeds": "speeds",
-				"electronic": "electronic",
-				"hydraulic": "hydraulic"
+				"speeds": {
+					"property": "speeds"
+				},
+				"electronic": {
+					"property": "electronic"
+				},
+				"hydraulic": {
+					"property": "hydraulic-shifting"
+				}
 			},
 			"excludedIf": {
 				"property": "type",
@@ -133,7 +145,9 @@
 		{
 			"name": "crankset",
 			"enforcedProperties": {
-				"chainrings": "chainrings"
+				"chainrings": {
+					"property": "chainrings"
+				}
 			},
 			"excludedIf": {
 				"property": "type",
@@ -147,7 +161,9 @@
 				{
 					"name": "chain",
 					"enforcedProperties": {
-						"speeds": "speeds"
+						"speeds": {
+							"property": "speeds"
+						}
 					}
 				},
 				{
@@ -167,7 +183,9 @@
 				{
 					"name": "cassette",
 					"enforcedProperties": {
-						"sprockets": "speeds"
+						"sprockets": {
+							"property": "speeds"
+						}
 					},
 					"excludedIf": {
 						"property": "speeds",
@@ -183,7 +201,9 @@
 				{
 					"name": "freewheel",
 					"enforcedProperties": {
-						"sprockets": "speeds"
+						"sprockets": {
+							"property": "speeds"
+						}
 					},
 					"excludedIf": {
 						"component": "belt",
@@ -193,7 +213,9 @@
 				{
 					"name": "singlespeed-conversion-kit",
 					"enforcedProperties": {
-						"sprockets": "speeds"
+						"sprockets": {
+							"property": "speeds"
+						}
 					},
 					"excludedIf": {
 						"property": "speeds",
@@ -249,10 +271,18 @@
 				{
 					"name": "brifters",
 					"enforcedProperties": {
-						"rear-speeds": "speeds",
-						"front-speeds": "chainrings",
-						"electronic": "electronic",
-						"disc-version": "disc-brakes"
+						"rear-speeds": {
+							"property": "speeds"
+						},
+						"front-speeds": {
+							"property": "chainrings"
+						},
+						"electronic": {
+							"property": "electronic"
+						},
+						"disc-version": {
+							"property": "disc-brakes"
+						}
 					}
 				},
 				{
@@ -261,16 +291,26 @@
 						{
 							"name": "brakes",
 							"enforcedProperties": {
-								"disc-version": "disc-brakes",
-								"hydraulic": "hydraulic-brakes"
+								"disc-version": {
+									"property": "disc-brakes"
+								},
+								"hydraulic": {
+									"property": "hydraulic-brakes"
+								}
 							}
 						},
 						{
 							"name": "shifters",
 							"enforcedProperties": {
-								"rear-speeds": "speeds",
-								"front-speeds": "chainrings",
-								"electronic": "electronic"
+								"rear-speeds": {
+									"property": "speeds"
+								},
+								"front-speeds": {
+									"property": "chainrings"
+								},
+								"electronic": {
+									"property": "electronic"
+								}
 							}
 						}
 					],

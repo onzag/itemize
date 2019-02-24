@@ -420,21 +420,24 @@ async function processItemDefinition(
   }
 
   let finalValue:ItemDefinitionRawJSONDataType = {
-    type: fileData.type,
     i18nName,
     name: actualName,
-    location: actualLocation
+    location: actualLocation,
+    ...fileData
   };
-  if (fileData.allowCalloutExcludes){
-    finalValue.allowCalloutExcludes = fileData.allowCalloutExcludes;
+  if (!finalValue.allowCalloutExcludes){
+    delete finalValue["allowCalloutExcludes"];
   }
-  if (fileData.includes && fileData.includes.length){
-    finalValue.includes = fileData.includes;
+  if (!finalValue.includes ||
+    (finalValue.includes instanceof Array && !finalValue.includes.length)){
+    delete finalValue["includes"];
   }
-  if (fileData.properties && fileData.properties.length){
-    finalValue.properties = fileData.properties;
+  if (!finalValue.properties ||
+    (finalValue.properties instanceof Array && !finalValue.properties.length)){
+    delete finalValue["properties"];
   }
 
+  delete finalValue["imports"];
   if (importedChildDefinitions.length){
     finalValue.importedChildDefinitions = importedChildDefinitions;
   }
@@ -442,11 +445,19 @@ async function processItemDefinition(
     finalValue.childDefinitions = childDefinitions;
   }
 
+  if (finalValue.properties && !(finalValue.properties instanceof Array)){
+    throw new Error("Properties isn't an array for " + actualLocation);
+  }
+
   if (finalValue.properties){
     finalValue.properties = await Promise.all<PropertyDefinitionRawJSONDataType>
       (finalValue.properties.map(
         getI18nData.bind(null, supportedLanguages, actualLocation)
       ));
+  }
+
+  if (finalValue.includes && !(finalValue.includes instanceof Array)){
+    throw new Error("Includes isn't an array for " + actualLocation);
   }
 
   if (finalValue.includes){

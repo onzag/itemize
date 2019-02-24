@@ -247,6 +247,7 @@ export default class ItemDefinition {
 
   //These are here but only truly available in non production
   static schema:any;
+  static fileSchema:any;
 }
 
 if (process.env.NODE_ENV !== "production") {

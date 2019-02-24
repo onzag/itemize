@@ -1,8 +1,17 @@
 {
   "type": "item",
-  "properties": {
-    "chainrings": {
-      "type": "string"
+  "properties": [
+    {
+      "id": "chainrings",
+      "type": "number"
+    },
+    {
+      "id": "electronic",
+      "type": "boolean"
+    },
+    {
+      "id": "hydraulic",
+      "type": "boolean"
     }
-  }
+  ]
 }

@@ -1,3 +1,9 @@
+TODO TECH
+ - Make the checker be about how files are defined and make ajv checks
+based on the file schema
+ - Fix the checkup errors to give a path somehow instead of the mess that it
+ is now
+
 TODO
 
 - Create a standard for compatibility searches for multi component searches
