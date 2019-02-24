@@ -1,29 +1,42 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import PropertyDefinition, { PropertyDefinitionRawJSONDataType, PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD, PropertyDefinitionSupportedType, PropertyDefinitionSupportedCurrencyType, PropertyDefinitionRawJSONRuleDataType } from
+import PropertyDefinition, {
+  PropertyDefinitionRawJSONDataType,
+  PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD,
+  PropertyDefinitionRawJSONRuleDataType,
+  PropertyDefinitionSupportedType
+} from
   './base/ItemDefinition/PropertyDefinition';
 import Item, { ItemRawJSONDataType } from './base/ItemDefinition/Item';
 import Module, { ModuleRawJSONDataType } from './base/Module';
-import ItemDefinition, { ItemDefinitionRawJSONDataType } from './base/ItemDefinition';
+import ItemDefinition, {
+  ItemDefinitionRawJSONDataType
+} from './base/ItemDefinition';
 import * as PropertiesReader from 'properties-reader';
 import * as colors from 'colors/safe';
 import * as Ajv from 'ajv';
+import Root, { RootRawJSONDataType } from './base/Root';
+import { CheckUpError } from './base/Error';
+import ConditionalRuleSet, {
+  ConditionalRuleSetRawJSONDataType,
+  ConditionalRuleSetRawJSONDataComponentType,
+  ConditionalRuleSetRawJSONDataPropertyType
+} from './base/ItemDefinition/ConditionalRuleSet';
+import PropertiesValueMappingDefiniton, {
+  PropertiesValueMappingDefinitonRawJSONDataType, PropertiesValueMappingReferredPropertyValue
+} from './base/ItemDefinition/PropertiesValueMappingDefiniton';
+
 const ajv = new Ajv();
-
 const fsAsync = fs.promises;
-
-if (process.env.NODE_ENV === "production") {
-  throw new Error("This script cannot run in production mode");
-}
 
 //registering source maps, this one is useful for
 //debugging and since the builder is a development file
 //it's ok this is here
 import 'source-map-support/register'
-import Root, { RootRawJSONDataType } from './base/Root';
-import { CheckUpError } from './base/Error';
-import ConditionalRuleSet, { ConditionalRuleSetRawJSONDataType, ConditionalRuleSetRawJSONDataComponentType, ConditionalRuleSetRawJSONDataPropertyType } from './base/ItemDefinition/ConditionalRuleSet';
-import PropertiesValueMappingDefiniton, { PropertiesValueMappingDefinitonRawJSONDataType } from './base/ItemDefinition/PropertiesValueMappingDefiniton';
+
+if (process.env.NODE_ENV === "production") {
+  throw new Error("This script cannot run in production mode");
+}
 
 //This is the raw untreated json for the root
 interface FileRootDataRawUntreatedJSONDataType {
@@ -174,20 +187,19 @@ async function getActualFileIdentifier(location:string){
   }
 
   if (!failed){
-    //Because this isn't running in production the tests should be able
-    //to run nicely
     try {
-      let rootTest = new Root(resultJSON);
-      rootTest.getAllModules(()=>{});
+      checkRoot(resultJSON);
     } catch (err){
       failed = true;
-      if (err instanceof CheckUpError){
-        err.display();
-        console.log(err.stack);
-      } else {
-        throw err;
-      }
+      err.display && err.display();
+      console.log(err.stack);
     }
+  }
+
+  if (!failed){
+    //Do this just in case
+    //let rootTest = new Root(resultJSON);
+    //rootTest.getAllModules(()=>{});
   }
 
   if (failed){
@@ -195,9 +207,8 @@ async function getActualFileIdentifier(location:string){
   } else {
     console.log("SUCCESS");
     console.log(JSON.stringify(resultJSON, null, 2));
+    fsAsync.writeFile("./builds/data.all.json", JSON.stringify(resultJSON));
   }
-
-  fsAsync.writeFile("./builds/data.all.json", JSON.stringify(resultJSON));
 })();
 
 /**
@@ -375,12 +386,10 @@ async function processItemDefinition(
   for (imp of (<FileItemDefinitionUntreatedRawJSONDataType>
     fileData).imports || []){
       //this throws an error if it fails to get the location
-      // TODO remove this commented out code
-      // this thing checks whether the imported files do exist
-      // await getActualFileLocation(
-      //   path.join(lastModuleDirectory, imp),
-      //   actualLocation
-      // );
+      await getActualFileLocation(
+         path.join(lastModuleDirectory, imp),
+         actualLocation
+      );
   }
 
   //lets get the file definitions that are imported
@@ -1040,25 +1049,78 @@ function checkPropertiesValueMappingDefiniton(
       throw new CheckUpError(
         "Property not available in referred itemDefinition",
         parentItemDefinition.location,
+        {
+          referred: referredItemDefinition,
+          message: "Property " + propertyId +
+            " not available in referred itemDefinition"
+        },
         obj,
         rawData,
         item
       );
     };
 
-    //And check whether the value is even valid
-    if (!PropertyDefinition.isValidValue(propDef, propertyValue, true)){
-      let obj:any = {};
-      obj[propertyId] = propertyValue;
-      throw new CheckUpError(
-        "Property value is invalid in referred itemDefinition",
-        parentItemDefinition.location,
-        propertyValue,
-        obj,
-        rawData,
-        item
-      );
-    };
+    let obj:any = {};
+    obj[propertyId] = propertyValue;
+
+    let referredProperty =
+      (<PropertiesValueMappingReferredPropertyValue>propertyValue);
+    //we must ensure it's not a referred property to do the check
+    if (!referredProperty.property){
+      //And check whether the value is even valid
+      if (!PropertyDefinition.isValidValue(propDef,
+        <PropertyDefinitionSupportedType>propertyValue, true)){
+        throw new CheckUpError(
+          "Property value is invalid in referred itemDefinition",
+          parentItemDefinition.location,
+          {
+            referredProperty: propDef,
+            referred: referredItemDefinition,
+            message: "Property value " + propertyValue +
+              " is invalid in referred itemDefinition"
+          },
+          propertyValue,
+          obj,
+          rawData,
+          item
+        );
+      };
+    } else {
+      //let's get the referred definition this property is about
+      let propertyAsValue =
+        ItemDefinition.getPropertyDefinitionRawFor(parentItemDefinition,
+          parentModule, referredProperty.property);
+
+      //if we don't get any throw an error
+      if (!propertyAsValue){
+        throw new CheckUpError(
+          "Unavailable property as value in mapper",
+          parentItemDefinition.location,
+          propertyValue,
+          obj,
+          rawData,
+          item
+        );
+      }
+
+      //If the types don't match throw an error
+      if (propertyAsValue.type !== propDef.type){
+        throw new CheckUpError(
+          "Property definitions in mapper don't match types",
+          parentItemDefinition.location,
+          {
+            referredProperty: propDef,
+            propertyAsValue,
+            message: "type " + propertyAsValue.type +
+              " and " + propDef.type + " don't match"
+          },
+          propertyValue,
+          obj,
+          rawData,
+          item
+        );
+      }
+    }
   }
 }
 
@@ -1159,6 +1221,26 @@ function checkPropertyDefinition(
         rawData
       );
     };
+  }
+
+  //Let's check whether the autocomplete properties are there
+  if (rawData.autocompleteSetFromProperty){
+    let propertyId:string;
+    for (propertyId of rawData.autocompleteSetFromProperty){
+      if (!ItemDefinition.getPropertyDefinitionRawFor(
+        parentItemDefinition,
+        parentModule,
+        propertyId
+      )){
+        throw new CheckUpError(
+          "Invalid autocomplete property to funnel",
+          parentItemDefinition.location,
+          propertyId,
+          {autocompleteSetFromProperty: rawData.autocompleteSetFromProperty},
+          rawData
+        );
+      };
+    }
   }
 
   //And the default if values are valid

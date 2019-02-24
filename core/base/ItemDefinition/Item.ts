@@ -125,26 +125,20 @@ export default class Item {
         parentItemDefinition, this.itemDefinition);
 
     //lets get an instance for the item definition for this
-    //item, this is because we need to set properties for this specific
-    //item and we don't want to be polluting the main item definition
-    //we modify the properties to set predefined and enforced properties
+    //item, if there's one
     this.itemDefinition = rawJSON.name && parentItemDefinition
-      .getItemDefinitionFor(rawJSON.name).getNewInstance((p)=>{
-        if (this.enforcedProperties &&
-          this.enforcedProperties.hasPropertyValue(p.id)){
-          return {
-            ...p,
-            enforcedValue: this.enforcedProperties.getPropertyValue(p.id)
-          }
-        } else if (this.predefinedProperties &&
-          this.predefinedProperties.hasPropertyValue(p.id)){
-          return {
-            ...p,
-            default: this.predefinedProperties.getPropertyValue(p.id)
-          }
-        }
-
-        return p;
+      .getItemDefinitionFor(rawJSON.name).getNewInstance();
+    //set the enforced and predefined properties overwrites
+    //if needed to
+    this.enforcedProperties &&
+      this.enforcedProperties.getPropertyMap().forEach(p=>{
+        this.itemDefinition.getPropertyDefinitionFor(p.id)
+          .setSuperEnforced(p.value);
+      });
+    this.predefinedProperties &&
+      this.predefinedProperties.getPropertyMap().forEach(p=>{
+        this.itemDefinition.getPropertyDefinitionFor(p.id)
+          .setSuperDefault(p.value);
       });
 
     //If this is going to be excluded
@@ -415,10 +409,12 @@ if (process.env.NODE_ENV !== "production") {
     type: "object",
     properties: {
       id: {
-        type: "string"
+        type: "string",
+        pattern: "^[a-zA-Z0-9-]+$"
       },
       name: {
-        type: "string"
+        type: "string",
+        pattern: "^[a-zA-Z0-9-]+$"
       },
       i18nName: {
         type: "object",

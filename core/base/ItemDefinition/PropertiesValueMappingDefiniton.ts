@@ -30,13 +30,18 @@
  */
 
 import ItemDefinition from '.';
-import { PropertyDefinitionSupportedType } from './PropertyDefinition';
+import PropertyDefinition, { PropertyDefinitionSupportedType } from './PropertyDefinition';
+
+export interface PropertiesValueMappingReferredPropertyValue {
+  property: string
+}
 
 //Represents the way that properties are stored
 //Check the schema down to see how this relates
 //at PropertiesValueMappingDefiniton.schema
 export interface PropertiesValueMappingDefinitonRawJSONDataType {
-  [propertyName: string]: PropertyDefinitionSupportedType
+  [propertyName: string]: PropertyDefinitionSupportedType |
+    PropertiesValueMappingReferredPropertyValue
 }
 
 //Class is defined here
@@ -67,11 +72,14 @@ export default class PropertiesValueMappingDefiniton {
   }
 
   getPropertyMap(): Array<{
-    propertyName: string,
-    value: PropertyDefinitionSupportedType
+    id: string,
+    value: PropertyDefinitionSupportedType | PropertyDefinition
   }>{
     return Object.keys(this.rawData).map(key=>{
-      return {propertyName: key, value: this.rawData[key]}
+      return {
+        id: key,
+        value: this.getPropertyValue(key)
+      }
     });
   }
 
@@ -79,8 +87,15 @@ export default class PropertiesValueMappingDefiniton {
     return typeof this.rawData[key] !== "undefined";
   }
 
-  getPropertyValue(key: string){
-    return this.rawData[key];
+  getPropertyValue(key: string):
+    PropertyDefinitionSupportedType | PropertyDefinition {
+    let value = this.rawData[key];
+    let property =
+      (<PropertiesValueMappingReferredPropertyValue>value).property;
+    if (property){
+      return this.parentItemDefinition.getPropertyDefinitionFor(property);
+    }
+    return <PropertyDefinitionSupportedType>value;
   }
 
   //These are here but only truly available in non production
@@ -102,10 +117,25 @@ if (process.env.NODE_ENV !== "production") {
   PropertiesValueMappingDefiniton.schema = {
     type: "object",
     additionalProperties: {
-      //despite of being able to use any of the property
-      //definition values we only allow for string numbers
-      //and booleans
-      type: ["boolean", "string", "number", "null"]
+      oneOf: [
+          {
+            //despite of being able to use any of the property
+            //definition values we basically only allow for string numbers
+            //and booleans
+            type: ["boolean", "string", "number", "null"]
+          },
+          {
+              type: "object",
+              properties: {
+                property: {
+                  type: "string",
+                  pattern: "^[a-zA-Z0-9-]+$"
+                }
+              },
+              required: ["property"]
+          }
+      ]
+
     },
     minProperties: 1
   };

@@ -30,25 +30,27 @@
     "type": "currency",
     "hiddenIf": {
       "property": "sellType",
-      "comparator": "not-equals",
+      "comparator": "not-equal",
       "value": "standard"
     },
     "nullIfHidden": true
   },
   {
     "id": "initialBid",
+    "type": "currency",
     "hiddenIf": {
       "property": "sellType",
-      "comparator": "not-equals",
+      "comparator": "not-equal",
       "value": "auction"
     },
     "nullIfHidden": true
   },
   {
     "id": "minBid",
+    "type": "currency",
     "hiddenIf": {
       "property": "sellType",
-      "comparator": "not-equals",
+      "comparator": "not-equal",
       "value": "auction"
     },
     "nullIfHidden": true

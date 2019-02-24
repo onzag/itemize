@@ -168,7 +168,8 @@ export default class ItemDefinition {
     parentModuleRaw: ModuleRawJSONDataType,
     id: string
   ):PropertyDefinitionRawJSONDataType {
-    let definition = itemDefinitionRaw.properties.find(p=>p.id === id);
+    let definition = itemDefinitionRaw.properties &&
+      itemDefinitionRaw.properties.find(p=>p.id === id);
     if (!definition && parentModuleRaw.propExtensions){
       definition = parentModuleRaw.propExtensions.find(p=>p.id === id);
     }
@@ -222,13 +223,8 @@ export default class ItemDefinition {
     return this.rawData.allowCalloutExcludes;
   }
 
-  getNewInstance(propertiesMapper?:
-    (p:PropertyDefinitionRawJSONDataType)=>PropertyDefinitionRawJSONDataType){
-    let nRawData = {...this.rawData};
-    if (nRawData.properties && propertiesMapper){
-      nRawData.properties = nRawData.properties.map(propertiesMapper);
-    }
-    return new ItemDefinition(nRawData, this.parentModule,
+  getNewInstance(){
+    return new ItemDefinition(this.rawData, this.parentModule,
       this.parentItemDefinition, this.onStateChange);
   }
 
@@ -264,7 +260,8 @@ if (process.env.NODE_ENV !== "production") {
         type: "string"
       },
       name: {
-        type: "string"
+        type: "string",
+        pattern: "^[a-zA-Z0-9-]+$"
       },
       i18nName: {
         type: "object",

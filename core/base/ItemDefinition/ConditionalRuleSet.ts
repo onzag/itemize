@@ -16,12 +16,12 @@
  *  "name": "belt",
  *  "excludedIf": {
  *    "property": "type",
- *    "comparator": "not-equals",
+ *    "comparator": "not-equal",
  *    "value": "motorbike",
  *    "gate": "or",
  *    "condition": {
  *      "property": "drive-type",
- *      "comparator": "not-equals",
+ *      "comparator": "not-equal",
  *      "value": "belt-drive"
  *    }
  *  }
@@ -50,7 +50,7 @@ import ItemDefinition from '.';
 import { PropertyDefinitionSupportedType } from './PropertyDefinition';
 
 //Types for the conditions
-export type ConditionalRuleComparatorType = "equals" | "not-equals" |
+export type ConditionalRuleComparatorType = "equals" | "not-equal" |
   "greater-than" | "less-than" | "greater-or-equal-than" | "less-or-equal-than"
 //Types for the gates that are available
 export type ConditionalRuleGateType = "or" | "and" | "xor";
@@ -126,7 +126,7 @@ export default class ConditionalRuleSet {
         case "equals":
           result = actualPropertyValue === rawDataAsProperty.value;
           break;
-        case "not-equals":
+        case "not-equal":
           result = actualPropertyValue !== rawDataAsProperty.value;
           break;
         case "greater-than":
@@ -182,7 +182,7 @@ export default class ConditionalRuleSet {
 if (process.env.NODE_ENV !== "production") {
 
   //The comparators we support
-  let comparators = ["equals", "not-equals", "greater-than", "less-than",
+  let comparators = ["equals", "not-equal", "greater-than", "less-than",
     "greater-or-equal-than", "less-or-equal-than"];
   //The gates
   let gates = ["and", "or", "xor"];

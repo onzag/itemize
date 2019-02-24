@@ -19,7 +19,7 @@ export class CheckUpError extends Error {
     console.error(this.message);
     this.jsonStackTraces.forEach((trace, index)=>{
       console.log((index + 1) + ".-");
-      console.error(trace);
+      console.error(JSON.stringify(trace, null, 2));
     });
     this.location && console.error("AT " + this.location)
   }

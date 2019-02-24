@@ -451,6 +451,11 @@ export default class PropertyDefinition {
   private enforcedValues?: Array<PropertyDefinitionRuleDataType>;
   private hiddenIf?: ConditionalRuleSet;
 
+  private superEnforcedValue?: PropertyDefinitionSupportedType
+    | PropertyDefinition;
+  private superDefaultedValue?: PropertyDefinitionSupportedType
+    | PropertyDefinition;
+
   //representing the state of the class
   private onStateChange:()=>any;
   private state_value:PropertyDefinitionSupportedType;
@@ -525,13 +530,29 @@ export default class PropertyDefinition {
     }
 
     //if there's an enforced value
-    if (this.enforcedValues || this.rawData.enforcedValue) {
+    if (typeof this.superEnforcedValue !== "undefined" ||
+        this.enforcedValues ||
+        typeof this.rawData.enforcedValue !== "undefined") {
       //let's check if one matches the current situation
-      let enforcedValue = typeof this.rawData.enforcedValue !== "undefined" ?
-        this.rawData.enforcedValue :
-        (this.enforcedValues.find(ev=>{
-          return ev.if.evaluate();
-        }) || {value: undefined}).value;
+      //we first pick the superEnforcedValue or otherwise the enforcedValue
+      //or otherwise the first enforcedValue that evaluates to true
+      let enforcedValue = typeof this.superEnforcedValue !== "undefined" ?
+        //superenforced might be a property definition so we got to
+        //extract the value in such case
+        (this.superEnforcedValue instanceof PropertyDefinition ?
+          this.superEnforcedValue.getCurrentValue().value :
+          this.superEnforcedValue) :
+
+        //otherwise in other cases we check the enforced value
+        //which has priority
+        (typeof this.rawData.enforcedValue !== "undefined" ?
+          this.rawData.enforcedValue :
+          //otherwise we go to for evaluating the enforced values
+          //or give undefined if nothing is found
+          (this.enforcedValues.find(ev=>{
+            return ev.if.evaluate();
+          }) || {value: undefined}).value);
+
       //if we get one
       if (typeof enforcedValue !== "undefined"){
         //we return the value that was set to be
@@ -547,10 +568,16 @@ export default class PropertyDefinition {
 
     //if the value hasn't been modified we are to return the defaults
     if (!this.state_valueModified){
-      //lets find the default value
-      let defaultValue = this.rawData.default;
+      //lets find the default value, first the super default
+      //and we of course extract it in case of property definition
+      //or otherwise use the default, which might be undefined
+      let defaultValue = typeof this.superDefaultedValue !== "undefined" ?
+        (this.superDefaultedValue instanceof PropertyDefinition ?
+          this.superDefaultedValue.getCurrentValue().value :
+          this.superDefaultedValue) : this.rawData.default;
+
       //Also by condition
-      if (this.defaultIf){
+      if (this.defaultIf && typeof defaultValue === "undefined"){
         //find a rule that passes
         let rulePasses = this.defaultIf.find(difRule=>difRule.if.evaluate());
         if (rulePasses){
@@ -578,6 +605,14 @@ export default class PropertyDefinition {
       valid: this.isValidValue(this.state_value),
       value: this.state_value
     };
+  }
+
+  setSuperEnforced(value: PropertyDefinitionSupportedType | PropertyDefinition){
+    this.superEnforcedValue = value;
+  }
+
+  setSuperDefault(value: PropertyDefinitionSupportedType | PropertyDefinition){
+    this.superDefaultedValue = value;
   }
 
   /**
@@ -737,7 +772,8 @@ if (process.env.NODE_ENV !== "production") {
     type: "object",
     properties: {
       id: {
-        type: "string"
+        type: "string",
+        pattern: "^[a-zA-Z0-9-]+$"
       },
       i18nData: {
         type: "object"

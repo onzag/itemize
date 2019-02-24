@@ -63,14 +63,16 @@ export default class Module {
 
     let nNameConsumable = [...name];
     nNameConsumable.shift();
-    let currentName:string;
-    do {
-      currentName = nNameConsumable.shift();
-      finalDefinition.childDefinitions.find(d=>d.name === currentName);
-      if (!finalDefinition){
-        return false;
-      }
-    } while (currentName);
+    let currentName = nNameConsumable.shift();
+    if (currentName){
+      do {
+        finalDefinition.childDefinitions.find(d=>d.name === currentName);
+        if (!finalDefinition){
+          return false;
+        }
+        currentName = nNameConsumable.shift();
+      } while (currentName);
+    }
 
     return true;
   }
@@ -101,15 +103,17 @@ export default class Module {
 
     let nNameConsumable = [...name];
     nNameConsumable.shift();
-    let currentName:string;
-    do {
-      currentName = nNameConsumable.shift();
-      finalDefinition =
-        finalDefinition.childDefinitions.find(d=>d.name === currentName);
-      if (!finalDefinition){
-        return null;
-      }
-    } while (currentName);
+    let currentName = nNameConsumable.shift();
+    if (currentName){
+      do {
+        finalDefinition =
+          finalDefinition.childDefinitions.find(d=>d.name === currentName);
+        if (!finalDefinition){
+          return null;
+        }
+        currentName = nNameConsumable.shift();
+      } while (currentName);
+    }
 
     return finalDefinition;
   }
@@ -136,11 +140,6 @@ export default class Module {
   }
 
   getDetachedItemDefinitionInstanceFor(name: Array<string>):ItemDefinition {
-    //TODO remove this, this is for hacking the imports
-    return {
-      getNewInstance: ()=>(this.getDetachedItemDefinitionInstanceFor([]))
-    } as any;
-
     return new ItemDefinition(
       this.getItemDefinitionRawFor(name),
       this,
@@ -184,7 +183,8 @@ if (process.env.NODE_ENV !== "production") {
         type: "string"
       },
       name: {
-        type: "string"
+        type: "string",
+        pattern: "^[a-zA-Z0-9-]+$"
       },
       i18nName: {
         type: "object",

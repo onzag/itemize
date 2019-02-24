@@ -110,7 +110,7 @@
 					}
 				}
 			],
-			"xor": true
+			"gate": "xor"
 		},
 		{
 			"name": "rear-deraullier",
@@ -154,7 +154,7 @@
 					"name": "belt",
 					"excludedIf": {
 						"property": "speeds",
-						"comparator": "not-equals",
+						"comparator": "not-equal",
 						"value": 1
 					}
 				}
@@ -283,7 +283,7 @@
 			"name": "drivetrain-battery",
 			"excludedIf": {
 				"property": "type",
-				"comparator": "not-equals",
+				"comparator": "not-equal",
 				"value": "electronic"
 			}
 		},
