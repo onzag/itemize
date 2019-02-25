@@ -248,7 +248,7 @@ if (process.env.NODE_ENV !== "production") {
             $ref: "ConditionalRuleSet"
           }
         },
-        required: ["property", "comparator", "value"],
+        required: ["component", "isIncluded"],
         dependencies: {
           gate: ["condition"],
           condition: ["gate"]

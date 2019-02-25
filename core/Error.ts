@@ -112,7 +112,7 @@ export class Traceback {
     this.append(extractPointData('', pointData));
   }
   display(requested?: boolean){
-    if (this.rawContent && this.stack.length){
+    if (!requested && this.rawContent && this.stack.length){
       let lastBit = this.stack[this.stack.length - 1];
       let beforeMatch = this.rawContent.substr(0, lastBit.posStart);
       let matchData = this.rawContent.substr(
@@ -146,7 +146,7 @@ export class Traceback {
       console.log("\tAT line " +
         colors.yellow(bit.lineStart + "") + ":" +
         colors.yellow(bit.columnStart + "") +
-        " ON " + colors.red(bit.path ? bit.path : "ROOT"))
+        " ON " + colors.red(bit.path ? bit.path : "/"))
     });
 
     if (this.parentTraceback){

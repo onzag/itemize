@@ -147,8 +147,13 @@ const checkRootSchemaValidate =
   ajv.compile(Root.schema);
 const checkItemDefinitionSchemaValidate =
   ajv.compile(ItemDefinition.schema);
-const checkPropertyDefinitionSchemaValidate =
-  ajv.getSchema("PropertyDefinition");
+const checkPropertyDefinitionArraySchemaValidate =
+  ajv.compile({
+    type: "array",
+    items: {
+      $ref: 'ItemDefinition#/definitions/PropertyDefinition'
+    }
+  });
 const checkModuleSchemaValidate =
   ajv.compile(Module.schema);
 function ajvCheck(
@@ -165,13 +170,23 @@ function ajvCheck(
     let actualTraceback = traceback;
     if (firstError.dataPath){
       let splittedPath = firstError.dataPath
-        .replace(/(\.|\])/g, '').split('[');
+        .replace(/\]\.|\]\[/g, '.').split(/\[|\./g);
       let pathLocation:string;
       for (pathLocation of splittedPath){
+        if (!pathLocation){
+          continue;
+        }
         if ((/^[a-zA-Z0-9_-]+$/).test(pathLocation)){
           actualTraceback = actualTraceback.newTraceToBit(pathLocation);
+        } else {
+          break;
         }
       }
+    }
+    let additionalProperty = (firstError.params as any).additionalProperty;
+    if (additionalProperty){
+      actualTraceback =
+        actualTraceback.newTraceToBit(additionalProperty);
     }
     throw new CheckUpError(
       "Schema check fail, " + firstError.message,
@@ -234,15 +249,17 @@ function ajvCheck(
       type: "root",
       location: actualLocation,
       pointers: fileData.pointers,
-      children: <Array<ModuleRawJSONDataType>>(await processIncludes(
-        supportedLanguages,
-        path.dirname(actualLocation),
-        path.dirname(actualLocation),
-        fileData.data.includes,
-        false,
-        true,
-        traceback.newTraceToBit("includes")
-      ))
+      children: fileData.data.includes ?
+        <Array<ModuleRawJSONDataType>>(await processIncludes(
+          supportedLanguages,
+          path.dirname(actualLocation),
+          path.dirname(actualLocation),
+          fileData.data.includes,
+          false,
+          true,
+          traceback.newTraceToBit("includes"),
+          false
+        )) : []
     };
 
     //TODO enable this
@@ -280,7 +297,8 @@ async function processIncludes(
   includes: string[],
   childrenMustBeItemDefinition: boolean,
   childrenMustBeModule: boolean,
-  traceback: Traceback
+  traceback: Traceback,
+  avoidTracebackIndex: boolean
 ):Promise<Array<ModuleRawJSONDataType | ItemDefinitionRawJSONDataType>> {
   //this will be the resulting array, either modules or items
   //in the case of items, it can only have items as children
@@ -294,7 +312,10 @@ async function processIncludes(
   for (include of includes){
     includeIndex++;
 
-    let specificIncludeTraceback = traceback.newTraceToBit(includeIndex);
+    let specificIncludeTraceback = traceback;
+    if (!avoidTracebackIndex){
+      specificIncludeTraceback = traceback.newTraceToBit(includeIndex);
+    }
 
     //so the actual location is the parent folder and the include name
     let actualLocation = await getActualFileLocation(
@@ -303,7 +324,7 @@ async function processIncludes(
     );
 
     let externalSpecificIncludeTraceback =
-      traceback.newTraceToLocation(actualLocation);
+      specificIncludeTraceback.newTraceToLocation(actualLocation);
 
     //now the file content is read
     let fileContent = await fsAsync.readFile(actualLocation, 'utf8');
@@ -434,13 +455,14 @@ async function processModule(
 
     propExtPointers = fileData.pointers;
 
+    ajvCheck(checkPropertyDefinitionArraySchemaValidate,
+      fileData.data, propExtTraceback);
+
     propExtensions =
       await Promise.all<PropertyDefinitionRawJSONDataType>(
         fileData.data.map((pd, index)=>{
           let specificPropertyTraceback =
             propExtTraceback.newTraceToBit(index);
-          ajvCheck(checkPropertyDefinitionSchemaValidate,
-            pd, specificPropertyTraceback);
           return getI18nData(
             supportedLanguages,
             actualLocation,
@@ -460,15 +482,16 @@ async function processModule(
     location: actualLocation,
     pointers,
     raw,
-    children: await processIncludes(
+    children: fileData.includes ? await processIncludes(
       supportedLanguages,
       actualLocationDirectory,
       actualLocationDirectory,
       fileData.includes,
       false,
       false,
-      traceback.newTraceToBit("includes")
-    )
+      traceback.newTraceToBit("includes"),
+      false
+    ) : []
   };
 
   //we add the propExtensions if necessary
@@ -542,7 +565,8 @@ async function processItemDefinition(
           }).map((f)=>f.replace(".json","")),
         true,
         false,
-        traceback
+        traceback,
+        true
       ));
   }
 
@@ -647,9 +671,14 @@ async function processItemDefinition(
     )
 
     finalValue.includes = await Promise.all<ItemRawJSONDataType>
-      (finalValue.includes.map(
-        processItemI18nName.bind(null, supportedLanguages, actualLocation)
-      ));
+      (finalValue.includes.map((item, index)=>{
+        return processItemI18nName(
+          supportedLanguages,
+          actualLocation,
+          item,
+          tracebackIncludes.newTraceToBit(index)
+        );
+      }));
   }
 
   return finalValue;
