@@ -406,6 +406,7 @@ if (process.env.NODE_ENV !== "production") {
   let gates = ["and", "or", "xor"];
   //The schema for the item
   Item.schema = {
+    $id: "Item",
     type: "object",
     properties: {
       id: {
@@ -413,26 +414,29 @@ if (process.env.NODE_ENV !== "production") {
         pattern: "^[a-zA-Z0-9-]+$"
       },
       name: {
-        type: "string",
-        pattern: "^[a-zA-Z0-9-]+$"
+        type: "string"
       },
-      i18nName: {
-        type: "object",
-        additionalProperties: {
-          type: "string"
-        }
+      enforcedProperties: {
+        $ref: PropertiesValueMappingDefiniton.schema.$id
       },
-      enforcedProperties: {},
-      predefinedProperties: {},
-      excludedIf: {},
+      predefinedProperties: {
+        $ref: PropertiesValueMappingDefiniton.schema.$id
+      },
+      excludedIf: {
+        $ref: ConditionalRuleSet.schema.$id
+      },
       mightExclude: {
         type: "boolean"
       },
-      mightExcludeIf: {},
+      mightExcludeIf: {
+        $ref: ConditionalRuleSet.schema.$id
+      },
       defaultExcluded: {
         type: "boolean"
       },
-      defaultExcludedIf: {},
+      defaultExcludedIf: {
+        $ref: ConditionalRuleSet.schema.$id
+      },
       rare: {
         type: "boolean"
       },
@@ -446,7 +450,16 @@ if (process.env.NODE_ENV !== "production") {
         type: "string",
         enum: gates
       },
-      items: {}
+      items: {
+        type: "array",
+        items: {
+          $ref: "Item"
+        }
+      }
+    },
+    definitions: {
+      PropertiesValueMappingDefiniton: PropertiesValueMappingDefiniton.schema,
+      ConditionalRuleSet: ConditionalRuleSet.schema
     },
     dependencies: {
       items: ["gate", "id"],

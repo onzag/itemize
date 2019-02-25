@@ -2,7 +2,11 @@ import Module, { ModuleRawJSONDataType } from "./Module";
 
 export interface RootRawJSONDataType {
   type: "root",
-  location: string,
+  //Avaialble for the builder
+  location?: string,
+  pointers?: any,
+  raw?: string,
+
   children: Array<ModuleRawJSONDataType>
 }
 
@@ -43,15 +47,21 @@ if (process.env.NODE_ENV !== "production") {
       type: {
         const: "root"
       },
-      location: {
-        type: "string"
-      },
-      children: {
+      includes: {
         type: "array",
-        items: {},
+        items: {
+          type: "string"
+        },
         minItems: 1
+      },
+      lang: {
+        type: "array",
+        items: {
+          type: "string"
+        }
       }
     },
-    required: ["type", "location"]
+    additionalProperties: false,
+    required: ["type"]
   }
 }

@@ -189,6 +189,7 @@ if (process.env.NODE_ENV !== "production") {
 
   //The schema
   ConditionalRuleSet.schema = {
+    $id: "ConditionalRuleSet",
     type: "object",
     //We have two schemas in reality, one for the
     //property based rule set and another one for the
@@ -221,7 +222,9 @@ if (process.env.NODE_ENV !== "production") {
           //reference with the json schema 7.0 definition for #
           //because we can get more comprehensive errors when
           //the condition is instanciated later
-          condition: {}
+          condition: {
+            $ref: "ConditionalRuleSet"
+          }
         },
         required: ["property", "comparator", "value"],
 
@@ -241,7 +244,9 @@ if (process.env.NODE_ENV !== "production") {
             type: "string",
             enum: gates
           },
-          condition: {}
+          condition: {
+            $ref: "ConditionalRuleSet"
+          }
         },
         required: ["property", "comparator", "value"],
         dependencies: {

@@ -115,6 +115,7 @@ if (process.env.NODE_ENV !== "production") {
   //the values must be boolean string or number
   //we should have at least one
   PropertiesValueMappingDefiniton.schema = {
+    $id: "PropertiesValueMappingDefiniton",
     type: "object",
     additionalProperties: {
       oneOf: [

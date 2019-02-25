@@ -1,18 +1,25 @@
 import PropertyDefinition, { PropertyDefinitionRawJSONDataType } from "./PropertyDefinition";
 import Item, { ItemRawJSONDataType, ItemGroupHandle } from "./Item";
 import Module, { ModuleRawJSONDataType } from "../Module";
+import PropertiesValueMappingDefiniton from "./PropertiesValueMappingDefiniton";
+import ConditionalRuleSet from "./ConditionalRuleSet";
 
 export interface ItemDefinitionRawJSONDataType {
   //Builder data
   type: "item",
-  location: string,
 
-  //property gets added during processing and merging
-  //preresents the file name
+  //Avaialble for the builder
+  location?: string,
+  pointers?: any,
+  raw?: string,
+
+  //Avilable after a build
   name: string,
   i18nName: {
     [locale: string]: string
   },
+
+  //original data
   allowCalloutExcludes?: boolean,
   includes?: Array<ItemRawJSONDataType>,
   properties?: Array<PropertyDefinitionRawJSONDataType>,
@@ -252,46 +259,43 @@ export default class ItemDefinition {
 
 if (process.env.NODE_ENV !== "production") {
   ItemDefinition.schema = {
+    $id: "ItemDefinition",
     type: "object",
     properties: {
       type: {
         const: "item"
       },
-      location: {
-        type: "string"
-      },
-      name: {
-        type: "string",
-        pattern: "^[a-zA-Z0-9-]+$"
-      },
-      i18nName: {
-        type: "object",
-        additionalProperties: {
-          type: "string"
-        }
-      },
       allowCalloutExcludes: {
         type: "boolean"
       },
-      includes: {},
-      properties: {},
-      importedChildDefinitions: {
+      includes: {
         type: "array",
         items: {
-          type: "array",
-          items: {
-            type: "string"
-          }
+          $ref: Item.schema.$id
+        }
+      },
+      properties: {
+        type: "array",
+        items: {
+          $ref: PropertyDefinition.schema.$id
+        }
+      },
+      imports: {
+        type: "array",
+        items: {
+          type: "string"
         },
         minItems: 1,
         additionalItems: false
-      },
-      childDefinitions: {
-        type: "array",
-        items: {}
       }
     },
-    required: ["type", "name", "location", "i18nName"],
+    definitions: {
+      PropertyDefinition: PropertyDefinition.schema,
+      Item: Item.schema,
+      PropertiesValueMappingDefiniton: PropertiesValueMappingDefiniton.schema,
+      ConditionalRuleSet: ConditionalRuleSet.schema
+    },
+    required: ["type"],
     additionalProperties: false
   };
 }

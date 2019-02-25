@@ -769,6 +769,7 @@ if (process.env.NODE_ENV !== "production") {
   //the values must be boolean string or number
   //we should have at least one
   PropertyDefinition.schema = {
+    $id: "PropertyDefinition2",
     type: "object",
     properties: {
       id: {
@@ -834,7 +835,9 @@ if (process.env.NODE_ENV !== "production") {
         items: {
           type: "object",
           properties: {
-            if: {},
+            if: {
+              $ref: ConditionalRuleSet.schema.$id
+            },
             value: {
               oneOf: valueOneOf
             }
@@ -849,7 +852,9 @@ if (process.env.NODE_ENV !== "production") {
         items: {
           type: "object",
           properties: {
-            if: {},
+            if: {
+              $ref: ConditionalRuleSet.schema.$id
+            },
             value: {
               oneOf: valueOneOf
             }
@@ -868,7 +873,9 @@ if (process.env.NODE_ENV !== "production") {
       hidden: {
         type: "boolean"
       },
-      hiddenIf: {},
+      hiddenIf: {
+        $ref: ConditionalRuleSet.schema.$id
+      },
       searchLevel: {
         type: "string",
         enum: searchLevels
@@ -881,6 +888,9 @@ if (process.env.NODE_ENV !== "production") {
       }
     },
     additionalProperties: false,
+    definitions: {
+      ConditionalRuleSet: ConditionalRuleSet.schema
+    },
     required: ["id", "type"]
   };
 }

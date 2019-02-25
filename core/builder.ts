@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import PropertyDefinition, {
   PropertyDefinitionRawJSONDataType,
   PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD,
@@ -7,24 +5,28 @@ import PropertyDefinition, {
   PropertyDefinitionSupportedType
 } from
   './base/ItemDefinition/PropertyDefinition';
-import Item, { ItemRawJSONDataType } from './base/ItemDefinition/Item';
+import { ItemRawJSONDataType } from './base/ItemDefinition/Item';
 import Module, { ModuleRawJSONDataType } from './base/Module';
 import ItemDefinition, {
   ItemDefinitionRawJSONDataType
 } from './base/ItemDefinition';
-import * as PropertiesReader from 'properties-reader';
-import * as colors from 'colors/safe';
-import * as Ajv from 'ajv';
 import Root, { RootRawJSONDataType } from './base/Root';
-import { CheckUpError } from './base/Error';
-import ConditionalRuleSet, {
+import { CheckUpError, Traceback } from './Error';
+import {
   ConditionalRuleSetRawJSONDataType,
   ConditionalRuleSetRawJSONDataComponentType,
   ConditionalRuleSetRawJSONDataPropertyType
 } from './base/ItemDefinition/ConditionalRuleSet';
-import PropertiesValueMappingDefiniton, {
-  PropertiesValueMappingDefinitonRawJSONDataType, PropertiesValueMappingReferredPropertyValue
+import {
+  PropertiesValueMappingDefinitonRawJSONDataType,
+  PropertiesValueMappingReferredPropertyValue
 } from './base/ItemDefinition/PropertiesValueMappingDefiniton';
+
+import * as fs from 'fs';
+import * as path from 'path';
+import * as PropertiesReader from 'properties-reader';
+import * as Ajv from 'ajv';
+const jsonMap = require('json-source-map');
 
 const ajv = new Ajv();
 const fsAsync = fs.promises;
@@ -61,10 +63,17 @@ export interface FileItemDefinitionUntreatedRawJSONDataType {
   properties?: Array<PropertyDefinitionRawJSONDataType>,
 }
 
+/**
+ * Checks whether a file exists and throws an error if it doesn't
+ * and it's specified to throw an error or otherwise returns false
+ * @param  location                        the location
+ * @param  locationOfElementBeingProcessed
+ * @param  throwErr
+ * @return
+ */
 async function checkExists(
   location: string,
-  locationOfElementBeingProcessed: string,
-  throwErr?:boolean
+  traceback?: Traceback
 ) {
   let exists = true;
   try {
@@ -72,34 +81,34 @@ async function checkExists(
   } catch (e){
     exists = false;
   }
-  if (throwErr && !exists){
-    throw new Error("File " + location +
-      " does not exist from " + locationOfElementBeingProcessed);
+  if (traceback && !exists){
+    throw new CheckUpError("Required file " +
+      location + " does not exist", traceback);
   }
   return exists;
 }
 
 async function checkIsDirectory(
   location: string,
-  locationOfElementBeingProcessed: string
+  traceback: Traceback
 ){
-  checkExists(location, locationOfElementBeingProcessed, true);
+  checkExists(location, traceback);
   const stat = await fsAsync.lstat(location);
   return stat.isDirectory();
 }
 
 async function getActualFileLocation(
   location: string,
-  locationOfElementBeingProcessed: string
+  traceback: Traceback
 ) {
   let actualFileLocation = location;
   let exists = await checkExists(
     location,
-    locationOfElementBeingProcessed
+    traceback
   );
   if (exists){
     let isDirectory = await checkIsDirectory(location,
-      locationOfElementBeingProcessed);
+      traceback);
     if (isDirectory){
       actualFileLocation = path.join(location, "index.json");
     } else if (!location.endsWith(".json")){
@@ -111,8 +120,7 @@ async function getActualFileLocation(
 
   await checkExists(
     actualFileLocation,
-    locationOfElementBeingProcessed,
-    true
+    traceback
   );
 
   return actualFileLocation;
@@ -135,79 +143,122 @@ async function getActualFileIdentifier(location:string){
   return name;
 }
 
+const checkRootSchemaValidate =
+  ajv.compile(Root.schema);
+const checkItemDefinitionSchemaValidate =
+  ajv.compile(ItemDefinition.schema);
+const checkPropertyDefinitionSchemaValidate =
+  ajv.getSchema("PropertyDefinition");
+const checkModuleSchemaValidate =
+  ajv.compile(Module.schema);
+function ajvCheck(
+  fn: Ajv.ValidateFunction,
+  rawData: any,
+  traceback: Traceback
+){
+  let valid = fn(rawData);
+
+  //if not valid throw the errors
+  if (!valid) {
+    //TODO add data from the error to the traceback
+    let firstError = fn.errors[0];
+    let actualTraceback = traceback;
+    if (firstError.dataPath){
+      let splittedPath = firstError.dataPath
+        .replace(/(\.|\])/g, '').split('[');
+      let pathLocation:string;
+      for (pathLocation of splittedPath){
+        if ((/^[a-zA-Z0-9_-]+$/).test(pathLocation)){
+          actualTraceback = actualTraceback.newTraceToBit(pathLocation);
+        }
+      }
+    }
+    throw new CheckUpError(
+      "Schema check fail, " + firstError.message,
+      actualTraceback
+    );
+  };
+}
+
 //Now we execute this code asynchronously
 (async() => {
-  //lets get the actual location of the item, lets assume first
-  //it is the given location
-  let actualLocation = await getActualFileLocation(
-    process.argv[2],
-    "BUILDER"
-  );
-
-  //lets read the file, let it fail if it fails
-  let fileContent = await fsAsync.readFile(actualLocation, 'utf8');
-  //lets get the file data
-  let fileData:FileRootDataRawUntreatedJSONDataType;
   try {
-    fileData = JSON.parse(fileContent);
-  } catch (err){
-    throw new Error("Invalid JSON at " + actualLocation);
-  }
+    //lets get the actual location of the item, lets assume first
+    //it is the given location
+    let actualLocation = await getActualFileLocation(
+      process.argv[2],
+      new Traceback("BUILDER")
+    );
 
-  //it all should start in the root element
-  if (fileData.type !== "root"){
-    throw new Error("Must be type root");
-  }
+    //lets create the traceback for this file
+    let traceback = new Traceback(actualLocation);
 
-  //lets get the supported languages
-  let supportedLanguages = fileData.lang;
+    //lets read the file, let it fail if it fails
+    let fileContent = await fsAsync.readFile(actualLocation, 'utf8');
 
-  //and make the result JSON
-  let resultJSON:RootRawJSONDataType;
+    //lets get the file data
+    let fileData:{
+      data: FileRootDataRawUntreatedJSONDataType,
+      pointers: any
+    };
+    try {
+      fileData = jsonMap.parse(fileContent);
+    } catch (err){
+      throw new CheckUpError(
+        err.message,
+        traceback
+      );
+    }
 
-  let failed = false;
-  try {
-    resultJSON = {
+    //Setup the pointers for the pointer data
+    //to be able to trace to bit
+    //ajv checks require pointers for diving in
+    //the invalid properties
+    traceback.setupPointers(
+      fileData.pointers,
+      fileContent
+    );
+
+    //it all should start in the root element
+    ajvCheck(
+      checkRootSchemaValidate,
+      fileData.data,
+      traceback
+    );
+
+    //lets get the supported languages
+    let supportedLanguages = fileData.data.lang;
+
+    //and make the result JSON
+    let resultJSON:RootRawJSONDataType = {
       type: "root",
       location: actualLocation,
+      pointers: fileData.pointers,
       children: <Array<ModuleRawJSONDataType>>(await processIncludes(
         supportedLanguages,
         path.dirname(actualLocation),
         path.dirname(actualLocation),
-        fileData.includes,
+        fileData.data.includes,
         false,
         true,
-        actualLocation
+        traceback.newTraceToBit("includes")
       ))
     };
-  } catch (err){
-    failed = true;
-    console.log(colors.red(err.message));
-    console.log(err.stack);
-  }
 
-  if (!failed){
-    try {
-      checkRoot(resultJSON);
-    } catch (err){
-      failed = true;
-      err.display && err.display();
-      console.log(err.stack);
-    }
-  }
+    //TODO enable this
+    //checkRoot(resultJSON);
 
-  if (!failed){
+    //TODO enable this
     //Do this just in case
     //let rootTest = new Root(resultJSON);
     //rootTest.getAllModules(()=>{});
-  }
 
-  if (failed){
-    console.error("FAILED");
-  } else {
-    console.log("SUCCESS");
     console.log(JSON.stringify(resultJSON, null, 2));
-    fsAsync.writeFile("./builds/data.all.json", JSON.stringify(resultJSON));
+  } catch (err){
+    if (err instanceof CheckUpError){
+      err.display();
+    }
+    console.log(err.stack);
   }
 })();
 
@@ -229,7 +280,7 @@ async function processIncludes(
   includes: string[],
   childrenMustBeItemDefinition: boolean,
   childrenMustBeModule: boolean,
-  locationOfElementBeingProcessed: string
+  traceback: Traceback
 ):Promise<Array<ModuleRawJSONDataType | ItemDefinitionRawJSONDataType>> {
   //this will be the resulting array, either modules or items
   //in the case of items, it can only have items as children
@@ -237,57 +288,86 @@ async function processIncludes(
 
   //to loop
   let include:string;
+  let includeIndex = -1;
 
   //so we loop over the includes
   for (include of includes){
+    includeIndex++;
+
+    let specificIncludeTraceback = traceback.newTraceToBit(includeIndex);
+
     //so the actual location is the parent folder and the include name
     let actualLocation = await getActualFileLocation(
       path.join(parentFolder, include),
-      locationOfElementBeingProcessed
+      specificIncludeTraceback
     );
+
+    let externalSpecificIncludeTraceback =
+      traceback.newTraceToLocation(actualLocation);
 
     //now the file content is read
     let fileContent = await fsAsync.readFile(actualLocation, 'utf8');
     //and the data parsed
-    let fileData:FileModuleDataRawUntreatedJSONDataType |
-      FileItemDefinitionUntreatedRawJSONDataType;
+    let fileData:{
+      data: FileModuleDataRawUntreatedJSONDataType |
+        FileItemDefinitionUntreatedRawJSONDataType,
+      pointers: any
+    };
 
     try {
-      fileData = JSON.parse(fileContent);
+      fileData = jsonMap.parse(fileContent);
     } catch (err){
-      throw new Error("Invalid JSON at " + actualLocation);
+      throw new CheckUpError(
+        err.message,
+        externalSpecificIncludeTraceback
+      );
     }
 
+    externalSpecificIncludeTraceback.setupPointers(
+      fileData.pointers,
+      fileContent
+    );
+
     //now we check the type to see whether we got a module or a item
-    if (fileData.type === "module"){
+    if (fileData.data.type === "module"){
       if (childrenMustBeItemDefinition){
-        throw new Error("Module found as children of item definition at " +
-          actualLocation + " from " + locationOfElementBeingProcessed)
+        throw new CheckUpError(
+          "Module found as children of item definition",
+          externalSpecificIncludeTraceback
+        )
       }
 
       //we would process a module
       result.push(await processModule(
         supportedLanguages,
         actualLocation,
-        fileData
+        fileData.data,
+        fileData.pointers,
+        fileContent,
+        externalSpecificIncludeTraceback
       ));
-    } else if (fileData.type === "item"){
+    } else if (fileData.data.type === "item"){
       if (childrenMustBeModule){
-        throw new Error(
-          "Item definition found as children of root definition at " +
-          actualLocation + " from " + locationOfElementBeingProcessed)
+        throw new CheckUpError(
+          "Item definition as children of root definition",
+          externalSpecificIncludeTraceback
+        )
       }
       //we would process an item
       result.push(await processItemDefinition(
         supportedLanguages,
         actualLocation,
         lastModuleDirectory,
-        fileData
+        fileData.data,
+        fileData.pointers,
+        fileContent,
+        externalSpecificIncludeTraceback
       ));
     } else if ((fileData as any).type === "root"){
-      throw new Error(
-        "Children as root in " +
-        actualLocation + " from " + locationOfElementBeingProcessed)
+      throw new CheckUpError(
+        "Root found as children",
+        externalSpecificIncludeTraceback
+      )
     }
   }
 
@@ -306,10 +386,19 @@ async function processIncludes(
 async function processModule(
   supportedLanguages:string[],
   actualLocation: string,
-  fileData: FileModuleDataRawUntreatedJSONDataType
+  fileData: FileModuleDataRawUntreatedJSONDataType,
+  pointers: any,
+  raw: string,
+  traceback: Traceback
 ){
+  ajvCheck(checkModuleSchemaValidate, fileData, traceback);
+
   let actualName = await getActualFileIdentifier(actualLocation);
-  let i18nName = await getI18nName(supportedLanguages, actualLocation);
+  let i18nName = await getI18nName(
+    supportedLanguages,
+    actualLocation,
+    traceback
+  );
 
   //lets find prop extensions if they are available
   let propExtLocation =
@@ -317,24 +406,49 @@ async function processModule(
 
   //let's check if the file exists
   let propExtExists = await checkExists(
-    propExtLocation,
-    actualLocation
+    propExtLocation
   );
 
   //propextensions is declared
   let propExtensions:Array<PropertyDefinitionRawJSONDataType>;
+  let propExtRaw:string;
+  let propExtPointers:any;
   if (propExtExists){
     //they are set if the file exists
-    let fileData:Array<PropertyDefinitionRawJSONDataType>;
+    let propExtTraceback = traceback.newTraceToLocation(propExtLocation);
+    let fileData:{
+      data: Array<PropertyDefinitionRawJSONDataType>,
+      pointers: any
+    };
+    propExtRaw = await fsAsync.readFile(propExtLocation, 'utf8');
     try {
-      fileData = JSON.parse(await fsAsync.readFile(propExtLocation, 'utf8'));
+      fileData = jsonMap.parse(propExtRaw);
     } catch (err){
-      throw new Error("Invalid json at " + propExtLocation)
+      throw new CheckUpError(err.message, propExtTraceback);
     }
+
+    propExtTraceback.setupPointers(
+      fileData.pointers,
+      propExtRaw
+    );
+
+    propExtPointers = fileData.pointers;
+
     propExtensions =
-      await Promise.all<PropertyDefinitionRawJSONDataType>(fileData.map(
-        getI18nData.bind(null, supportedLanguages, actualLocation)
-      ));
+      await Promise.all<PropertyDefinitionRawJSONDataType>(
+        fileData.data.map((pd, index)=>{
+          let specificPropertyTraceback =
+            propExtTraceback.newTraceToBit(index);
+          ajvCheck(checkPropertyDefinitionSchemaValidate,
+            pd, specificPropertyTraceback);
+          return getI18nData(
+            supportedLanguages,
+            actualLocation,
+            pd,
+            specificPropertyTraceback
+          );
+        })
+      );
   }
 
   //and the final value is created
@@ -344,6 +458,8 @@ async function processModule(
     name: actualName,
     i18nName,
     location: actualLocation,
+    pointers,
+    raw,
     children: await processIncludes(
       supportedLanguages,
       actualLocationDirectory,
@@ -351,13 +467,16 @@ async function processModule(
       fileData.includes,
       false,
       false,
-      actualLocation
+      traceback.newTraceToBit("includes")
     )
   };
 
   //we add the propExtensions if necessary
   if (propExtensions){
     finalValue.propExtensions = propExtensions;
+    finalValue.propExtRaw = propExtRaw;
+    finalValue.propExtPointers = propExtPointers;
+    finalValue.propExtLocation = propExtLocation;
   }
 
   //and return the final value
@@ -376,21 +495,29 @@ async function processItemDefinition(
   supportedLanguages:string[],
   actualLocation: string,
   lastModuleDirectory: string,
-  fileData: FileItemDefinitionUntreatedRawJSONDataType
+  fileData: FileItemDefinitionUntreatedRawJSONDataType,
+  pointers: any,
+  raw: string,
+  traceback: Traceback
 ){
+  ajvCheck(checkItemDefinitionSchemaValidate, fileData, traceback);
+
   let actualName = await getActualFileIdentifier(actualLocation);
-  let i18nName = await getI18nName(supportedLanguages, actualLocation);
+  let i18nName = await getI18nName(
+    supportedLanguages,
+    actualLocation,
+    traceback
+  );
 
   //lets get the file definitions that are imported that exist
-  let imp:string;
-  for (imp of (<FileItemDefinitionUntreatedRawJSONDataType>
-    fileData).imports || []){
-      //this throws an error if it fails to get the location
-      await getActualFileLocation(
+  await Promise.all(
+    (fileData.imports || []).map((imp, index)=>{
+      return getActualFileLocation(
          path.join(lastModuleDirectory, imp),
-         actualLocation
+         traceback.newTraceToBit("imports").newTraceToBit(index)
       );
-  }
+    })
+  );
 
   //lets get the file definitions that are imported
   //as an array for use by the browser
@@ -415,7 +542,7 @@ async function processItemDefinition(
           }).map((f)=>f.replace(".json","")),
         true,
         false,
-        actualLocation
+        traceback
       ));
   }
 
@@ -423,15 +550,20 @@ async function processItemDefinition(
     i18nName,
     name: actualName,
     location: actualLocation,
+    pointers,
+    raw,
     ...fileData
   };
+
   if (!finalValue.allowCalloutExcludes){
     delete finalValue["allowCalloutExcludes"];
   }
+
   if (!finalValue.includes ||
     (finalValue.includes instanceof Array && !finalValue.includes.length)){
     delete finalValue["includes"];
   }
+
   if (!finalValue.properties ||
     (finalValue.properties instanceof Array && !finalValue.properties.length)){
     delete finalValue["properties"];
@@ -441,57 +573,83 @@ async function processItemDefinition(
   if (importedChildDefinitions.length){
     finalValue.importedChildDefinitions = importedChildDefinitions;
   }
+
   if (childDefinitions.length){
     finalValue.childDefinitions = childDefinitions;
   }
 
-  if (finalValue.properties && !(finalValue.properties instanceof Array)){
-    throw new Error("Properties isn't an array for " + actualLocation);
-  }
-
   if (finalValue.properties){
+    let propertiesTraceback = traceback.newTraceToBit("properties");
     finalValue.properties = await Promise.all<PropertyDefinitionRawJSONDataType>
-      (finalValue.properties.map(
-        getI18nData.bind(null, supportedLanguages, actualLocation)
-      ));
-  }
-
-  if (finalValue.includes && !(finalValue.includes instanceof Array)){
-    throw new Error("Includes isn't an array for " + actualLocation);
+      (finalValue.properties.map((pd, index)=>{
+        let specificPropertyTraceback =
+          propertiesTraceback.newTraceToBit(index);
+        return getI18nData(
+          supportedLanguages,
+          actualLocation,
+          pd,
+          specificPropertyTraceback
+        );
+      }));
   }
 
   if (finalValue.includes){
-    let fnCheckExists = async (item: ItemRawJSONDataType)=>{
+    let fnCheckExists = async (
+      item: ItemRawJSONDataType,
+      iTraceback: Traceback
+    )=>{
+      //so we first check whether the item is a non group type
       if (item.name){
+        //let's check in the imported definitions
         if (importedChildDefinitions){
+          //if we find such imported definition
           if (importedChildDefinitions.find(idef=>{
             let lastName = idef[idef.length - 1];
             return (lastName === item.name ||
               idef.join("/") === item.name);
           })){
+            //we return and assume it is valid
             return;
           }
         }
+        //otherwise if we don't find any and we know for sure
+        //it is meant to be an imported definition
         if (item.name.indexOf("/") !== -1){
-          throw new Error("Missing imported item definition for " + item +
-            " in " + actualLocation);
+          throw new CheckUpError(
+            "Missing imported item definition for " + item,
+            iTraceback.newTraceToBit("name")
+          );
         }
+        //Otherwise we try to get the actual location
+        //it will throw an error otherwise
         await getActualFileLocation(
           path.join(path.dirname(actualLocation), item.name),
-          actualLocation
+          iTraceback.newTraceToBit("name")
         );
-      }
-      if (item.items){
-        await Promise.all(item.items.map(item=>fnCheckExists(item)))
+      } else if (item.items){
+        //if it's a group lets create a group traceback for the items
+        //property
+        let itemGroupTraceback = iTraceback.newTraceToBit("items");
+        //and run a promise looping in each item
+        await Promise.all(
+          item.items.map((item, index)=>{
+            return fnCheckExists(item, itemGroupTraceback.newTraceToBit(index));
+          })
+        )
       }
     }
+
+    let tracebackIncludes = traceback.newTraceToBit("includes");
+    await Promise.all(
+      finalValue.includes.map((item, index)=>{
+        return fnCheckExists(item, tracebackIncludes.newTraceToBit(index));
+      })
+    )
 
     finalValue.includes = await Promise.all<ItemRawJSONDataType>
       (finalValue.includes.map(
         processItemI18nName.bind(null, supportedLanguages, actualLocation)
       ));
-
-    await Promise.all(finalValue.includes.map(item=>fnCheckExists(item)))
   }
 
   return finalValue;
@@ -505,15 +663,15 @@ async function processItemDefinition(
  */
 async function getI18nName(
   supportedLanguages:Array<string>,
-  actualLocation: string
+  actualLocation: string,
+  traceback: Traceback
 ){
   let languageFileLocation =
     actualLocation.replace(".json", ".properties");
 
   await checkExists(
     languageFileLocation,
-    actualLocation,
-    true
+    traceback
   );
 
   let properties = PropertiesReader(languageFileLocation).path();
@@ -521,13 +679,20 @@ async function getI18nName(
     [locale: string]: string
   } = {};
 
+  let localeFileTraceback =
+    traceback.newTraceToLocation(languageFileLocation);
+
   supportedLanguages.forEach(locale=>{
     if (!properties[locale]){
-      throw new Error("File " + languageFileLocation +
-        " does not include language data for " + locale);
+      throw new CheckUpError(
+        "File does not include language data for locale " + locale,
+        localeFileTraceback
+      );
     } else if (typeof properties[locale].name !== "string"){
-      throw new Error("File " + languageFileLocation +
-        " does not have a name for " + locale);
+      throw new CheckUpError(
+        "File does not have a name for " + locale,
+        localeFileTraceback
+      );
     }
     i18nName[locale] = properties[locale].name.trim();
   });
@@ -546,15 +711,22 @@ async function getI18nName(
 async function processItemI18nName(
   supportedLanguages:Array<string>,
   actualLocation: string,
-  item: ItemRawJSONDataType
+  item: ItemRawJSONDataType,
+  traceback: Traceback
 ){
   //we try to see if there are child items
   if (item.items){
+    let itemGroupTraceback = traceback.newTraceToBit("items");
     //we process those too, recursively
     item.items = await Promise.all<ItemRawJSONDataType>
-      (item.items.map(
-        processItemI18nName.bind(null, supportedLanguages, actualLocation)
-      ));
+      (item.items.map((item, index)=>{
+        return processItemI18nName(
+          supportedLanguages,
+          actualLocation,
+          item,
+          itemGroupTraceback.newTraceToBit(index)
+        )
+      }));
   }
   //if there's no id this is over
   if (!item.id){
@@ -568,8 +740,7 @@ async function processItemI18nName(
   //check that it exists
   await checkExists(
     languageFileLocation,
-    actualLocation,
-    true
+    traceback
   );
 
   //get the properties
@@ -578,17 +749,26 @@ async function processItemI18nName(
     [locale: string]: string
   } = {};
 
+  let localeFileTraceback =
+    traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
+
   //use the same technique we used before to get the name
   supportedLanguages.forEach(locale=>{
     if (!properties[locale]){
-      throw new Error("File " + languageFileLocation +
-        " does not include language data for " + locale);
+      throw new CheckUpError(
+        "File does not include language data for " + locale,
+        localeFileTraceback
+      );
     } else if (!properties[locale].item){
-      throw new Error("File " + languageFileLocation +
-        " does not have item data for " + locale);
+      throw new CheckUpError(
+        "File does not have item data for " + locale,
+        localeFileTraceback
+      );
     } else if (typeof properties[locale].item[item.id] !== "string"){
-      throw new Error("File " + languageFileLocation +
-        " does not have an item name for " + locale + " in " + item.id);
+      throw new CheckUpError(
+        "File does not have item data for " + locale + " in " + item.id,
+        localeFileTraceback
+      );
     }
     i18nName[locale] = properties[locale].item[item.id].trim();
   });
@@ -610,7 +790,8 @@ async function processItemI18nName(
 async function getI18nData(
   supportedLanguages:Array<string>,
   actualLocation: string,
-  property: PropertyDefinitionRawJSONDataType
+  property: PropertyDefinitionRawJSONDataType,
+  traceback: Traceback
 ){
   //if it's hidden and you don't search for it then
   //it is pointless to request the data
@@ -623,10 +804,10 @@ async function getI18nData(
     actualLocation.replace(".json", ".properties");
 
   //check that the file exists
+  //throws an error if otherwise
   await checkExists(
     languageFileLocation,
-    actualLocation,
-    true
+    traceback
   );
 
   let i18nData:{
@@ -637,19 +818,27 @@ async function getI18nData(
   let properties = PropertiesReader(languageFileLocation).path();
   let definition = PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD[property.type];
 
+  let localeFileTraceback =
+    traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
+
   //and start to loop
   supportedLanguages.forEach(locale=>{
     //do some checks
     if (!properties[locale]){
-      throw new Error("File " + languageFileLocation +
-        " does not include language data for '" + locale + "'");
+      throw new CheckUpError(
+        "File does not include language data for " + locale,
+        localeFileTraceback
+      );
     } else if (!properties[locale].properties){
-      throw new Error("File " + languageFileLocation +
-        " does not include property 'properties' for '" + locale + "'");
+      throw new CheckUpError(
+        "File does not include property data for " + locale,
+        localeFileTraceback
+      );
     } if (!properties[locale].properties[property.id]){
-      throw new Error("File " + languageFileLocation +
-        " does not include property data for 'property' in '" +
-        property.id + "'");
+      throw new CheckUpError(
+        "Does not include property data for " + locale + " in " + property.id,
+        localeFileTraceback
+      );
     }
 
     //We got to create this list for required and non required data
@@ -692,16 +881,16 @@ async function getI18nData(
         return;
       } else if (!result && expectedProperty.required){
         //otherwise we throw an error
-        throw new Error("File " + languageFileLocation +
+        throw new CheckUpError("File " + languageFileLocation +
           " has missing property data for property id '" + property.id +
           "' in '" + expectedProperty.key + "' required by type '" +
-          property.type + "' in locale " + locale);
+          property.type + "' in locale " + locale, localeFileTraceback);
       } else if (typeof result !== "string"){
         //also throw an error if it's invalid
-        throw new Error("File " + languageFileLocation +
+        throw new CheckUpError("File " + languageFileLocation +
           " has invalid property data for property id '" + property.id +
           "' in '" + expectedProperty.key + "' required by type '" +
-          property.type + "' in locale " + locale);
+          property.type + "' in locale " + locale, localeFileTraceback);
       }
 
       //now we search where the property has to be set
@@ -727,25 +916,11 @@ async function getI18nData(
   return property;
 }
 
-const checkConditionalRuleSetSchemaValidate =
-  ajv.compile(ConditionalRuleSet.schema);
 function checkConditionalRuleSet(
   rawData: ConditionalRuleSetRawJSONDataType,
   parentItemDefinition: ItemDefinitionRawJSONDataType,
   parentModule: ModuleRawJSONDataType,
 ){
-
-  //Let's validate the raw json
-  let valid = checkConditionalRuleSetSchemaValidate(rawData);
-  if (!valid) {
-    throw new CheckUpError(
-      "Schema Check Failed",
-      parentItemDefinition.location,
-      checkConditionalRuleSetSchemaValidate.errors,
-      rawData
-    );
-  };
-
   //Let's try to search for the item definition for that given component
   //should be there at least to be valid, even if item instances are never
   //created
@@ -796,25 +971,10 @@ function checkConditionalRuleSet(
   }
 }
 
-const checkItemDefinitionSchemaValidate =
-  ajv.compile(ItemDefinition.schema);
 function checkItemDefinition(
   rawData: ItemDefinitionRawJSONDataType,
   parentModule: ModuleRawJSONDataType
 ){
-  //we check the schema for validity
-  let valid = checkItemDefinitionSchemaValidate(rawData);
-
-  //if not valid throw the errors
-  if (!valid) {
-    throw new CheckUpError(
-      "Schema Check Failed",
-      rawData.location,
-      checkConditionalRuleSetSchemaValidate.errors,
-      rawData
-    );
-  };
-
   rawData.childDefinitions && rawData
     .childDefinitions.forEach(cd=>checkItemDefinition(cd, parentModule));
 
@@ -826,27 +986,11 @@ function checkItemDefinition(
       .forEach(p=>checkPropertyDefinition(p, rawData, parentModule))
 }
 
-const checkItemSchemaValidate =
-  ajv.compile(Item.schema);
 function checkItem(
   rawData: ItemRawJSONDataType,
   parentItemDefinition: ItemDefinitionRawJSONDataType,
   parentModule: ModuleRawJSONDataType
 ){
-
-  //we check the schema for validity
-  let valid = checkItemSchemaValidate(rawData);
-
-  //if not valid throw the errors
-  if (!valid) {
-    throw new CheckUpError(
-      "Schema Check Failed",
-      parentItemDefinition.location,
-      checkItemSchemaValidate.errors,
-      rawData
-    );
-  };
-
   let isGroup = !!rawData.items;
 
   //check whether the item definition exists for this item
@@ -1015,8 +1159,6 @@ function checkItem(
   }
 }
 
-const checkPropertiesValueMappingDefinitonSchemaValidate =
-  ajv.compile(PropertiesValueMappingDefiniton.schema);
 function checkPropertiesValueMappingDefiniton(
   rawData: PropertiesValueMappingDefinitonRawJSONDataType,
   item: ItemRawJSONDataType,
@@ -1024,21 +1166,6 @@ function checkPropertiesValueMappingDefiniton(
   referredItemDefinition: ItemDefinitionRawJSONDataType,
   parentModule: ModuleRawJSONDataType
 ){
-
-  //we check the schema for validity
-  let valid = checkPropertiesValueMappingDefinitonSchemaValidate(rawData);
-
-  //if not valid throw the errors
-  if (!valid) {
-    throw new CheckUpError(
-      "Schema Check Failed",
-      parentItemDefinition.location,
-      checkPropertiesValueMappingDefinitonSchemaValidate.errors,
-      rawData,
-      item
-    );
-  };
-
   //We need to loop over the properties that were given
   let propertyList = Object.keys(rawData);
   let propertyId;
@@ -1135,27 +1262,11 @@ function checkPropertiesValueMappingDefiniton(
   }
 }
 
-const checkPropertyDefinitionSchemaValidate =
-  ajv.compile(PropertyDefinition.schema);
 function checkPropertyDefinition(
   rawData: PropertyDefinitionRawJSONDataType,
   parentItemDefinition: ItemDefinitionRawJSONDataType,
   parentModule: ModuleRawJSONDataType
 ){
-
-  //we check the schema for validity
-  let valid = checkPropertyDefinitionSchemaValidate(rawData);
-
-  //if not valid throw the errors
-  if (!valid) {
-    throw new CheckUpError(
-      "Schema Check Failed",
-      parentItemDefinition.location,
-      checkPropertyDefinitionSchemaValidate.errors,
-      rawData
-    );
-  };
-
   if (rawData.type !== "integer" && rawData.type !== "number" &&
     rawData.type !== "currency" && typeof rawData.min !== "undefined"){
     throw new CheckUpError(
@@ -1326,24 +1437,9 @@ function checkPropertyDefinition(
   }
 }
 
-const checkModuleSchemaValidate =
-  ajv.compile(Module.schema);
 function checkModule(
   rawData: ModuleRawJSONDataType
 ){
-  //we check the schema for validity
-  let valid = checkModuleSchemaValidate(rawData);
-
-  //if not valid throw the errors
-  if (!valid) {
-    throw new CheckUpError(
-      "Schema Check Failed",
-      rawData.location,
-      checkModuleSchemaValidate.errors,
-      rawData
-    );
-  };
-
   rawData.propExtensions && rawData.propExtensions.forEach(propDef=>{
     //let's create a pseudo item that acts as the module holder
     //this will allow for checking that only matches the prop extensions
@@ -1366,23 +1462,8 @@ function checkModule(
   });
 }
 
-const checkRootSchemaValidate =
-  ajv.compile(Root.schema);
 function checkRoot(
   rawData: RootRawJSONDataType
 ){
-  //we check the schema for validity
-  let valid = checkRootSchemaValidate(rawData);
-
-  //if not valid throw the errors
-  if (!valid) {
-    throw new CheckUpError(
-      "Schema Check Failed",
-      rawData.location,
-      checkRootSchemaValidate.errors,
-      rawData
-    );
-  };
-
   rawData.children && rawData.children.forEach(checkModule);
 }

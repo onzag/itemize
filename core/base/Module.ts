@@ -6,7 +6,16 @@ import { PropertyDefinitionRawJSONDataType } from
 export interface ModuleRawJSONDataType {
   //Builder data
   type: "module",
-  location: string,
+
+  //Avaialble for the builder, data gets stripped
+  location?: string,
+  pointers?: any,
+  raw?: string,
+  propExtLocation?: string,
+  propExtRaw?: string,
+  propExtPointers?: any,
+
+  //Available after a build
   name: string,
   i18nName: {
     [locale: string]: string
@@ -179,30 +188,14 @@ if (process.env.NODE_ENV !== "production") {
       type: {
         const: "module"
       },
-      location: {
-        type: "string"
-      },
-      name: {
-        type: "string",
-        pattern: "^[a-zA-Z0-9-]+$"
-      },
-      i18nName: {
-        type: "object",
-        additionalProperties: {
+      includes: {
+        type: "array",
+        items: {
           type: "string"
-        }
-      },
-      children: {
-        type: "array",
-        items: {},
-        minItems: 1
-      },
-      propExtensions: {
-        type: "array",
-        items: {},
+        },
         minItems: 1
       }
     },
-    required: ["type", "location", "name", "i18nName"]
+    required: ["type"]
   }
 }
