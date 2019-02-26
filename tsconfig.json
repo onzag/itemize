@@ -1,49 +1,12 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
+    "paths": {
+      "*": [
+        "types/*",
+        "*"
+      ]
+    },
     "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -52,13 +15,14 @@
     "experimentalDecorators": true,
     "removeComments": false,
     "noImplicitAny": true,
-    "suppressImplicitAnyIndexErrors": true
+    "suppressImplicitAnyIndexErrors": true,
+    "rootDir": "."
   },
   "compileOnSave": true,
   "exclude": [
     "node_modules"
   ],
   "include": [
-    "core/**/*.ts"
+    "**/*.ts"
   ]
 }

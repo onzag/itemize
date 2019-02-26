@@ -1,40 +1,40 @@
-import PropertyDefinition, {
+import {
   PropertyDefinitionRawJSONDataType,
   PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD,
-  PropertyDefinitionRawJSONRuleDataType,
-  PropertyDefinitionSupportedType
-} from
-  './base/ItemDefinition/PropertyDefinition';
-import { ItemRawJSONDataType } from './base/ItemDefinition/Item';
-import Module, { ModuleRawJSONDataType } from './base/Module';
-import ItemDefinition, {
+} from 'core/base/ItemDefinition/PropertyDefinition';
+import { ItemRawJSONDataType } from 'core/base/ItemDefinition/Item';
+import { ModuleRawJSONDataType } from 'core/base/Module';
+import {
   ItemDefinitionRawJSONDataType
-} from './base/ItemDefinition';
-import Root, { RootRawJSONDataType } from './base/Root';
+} from 'core/base/ItemDefinition';
+import { RootRawJSONDataType } from 'core/base/Root';
 import { CheckUpError, Traceback } from './Error';
-import {
-  ConditionalRuleSetRawJSONDataType,
-  ConditionalRuleSetRawJSONDataComponentType,
-  ConditionalRuleSetRawJSONDataPropertyType
-} from './base/ItemDefinition/ConditionalRuleSet';
-import {
-  PropertiesValueMappingDefinitonRawJSONDataType,
-  PropertiesValueMappingReferredPropertyValue
-} from './base/ItemDefinition/PropertiesValueMappingDefiniton';
 
 import * as fs from 'fs';
 import * as path from 'path';
 import * as PropertiesReader from 'properties-reader';
-import * as Ajv from 'ajv';
-const jsonMap = require('json-source-map');
 
-const ajv = new Ajv();
+const jsonMap = require('json-source-map');
 const fsAsync = fs.promises;
 
 //registering source maps, this one is useful for
 //debugging and since the builder is a development file
 //it's ok this is here
 import 'source-map-support/register'
+
+import {
+  getActualFileLocation,
+  getActualFileIdentifier,
+  checkExists
+} from './util';
+import {
+  ajvCheck,
+  checkRootSchemaValidate,
+  checkModuleSchemaValidate,
+  checkPropertyDefinitionArraySchemaValidate,
+  checkItemDefinitionSchemaValidate
+} from './schemaChecks';
+import { checkRoot } from './checkers';
 
 if (process.env.NODE_ENV === "production") {
   throw new Error("This script cannot run in production mode");
@@ -61,138 +61,6 @@ export interface FileItemDefinitionUntreatedRawJSONDataType {
   imports?: Array<string>,
   includes?: Array<ItemRawJSONDataType>,
   properties?: Array<PropertyDefinitionRawJSONDataType>,
-}
-
-/**
- * Checks whether a file exists and throws an error if it doesn't
- * and it's specified to throw an error or otherwise returns false
- * @param  location                        the location
- * @param  locationOfElementBeingProcessed
- * @param  throwErr
- * @return
- */
-async function checkExists(
-  location: string,
-  traceback?: Traceback
-) {
-  let exists = true;
-  try {
-    await fsAsync.access(location, fs.constants.F_OK);
-  } catch (e){
-    exists = false;
-  }
-  if (traceback && !exists){
-    throw new CheckUpError("Required file " +
-      location + " does not exist", traceback);
-  }
-  return exists;
-}
-
-async function checkIsDirectory(
-  location: string,
-  traceback: Traceback
-){
-  checkExists(location, traceback);
-  const stat = await fsAsync.lstat(location);
-  return stat.isDirectory();
-}
-
-async function getActualFileLocation(
-  location: string,
-  traceback: Traceback
-) {
-  let actualFileLocation = location;
-  let exists = await checkExists(
-    location,
-    traceback
-  );
-  if (exists){
-    let isDirectory = await checkIsDirectory(location,
-      traceback);
-    if (isDirectory){
-      actualFileLocation = path.join(location, "index.json");
-    } else if (!location.endsWith(".json")){
-      actualFileLocation += ".json";
-    }
-  } else if (!location.endsWith(".json")){
-    actualFileLocation += ".json";
-  }
-
-  await checkExists(
-    actualFileLocation,
-    traceback
-  );
-
-  return actualFileLocation;
-}
-
-async function getActualFileIdentifier(location:string){
-  //we split the location in its components
-  let locationSplitted = location.replace(".json","").split(path.sep);
-  //let's get the name of the file
-  let name:string = locationSplitted.pop();
-  //and we need the actual real name for the item
-  //by default is the name of the file
-  //however index isn't an acceptable name, because
-  //it means its just a container for the parent folder
-  if (name === "index"){
-    //so we use the name of the parent folder
-    name = locationSplitted.pop();
-  }
-
-  return name;
-}
-
-const checkRootSchemaValidate =
-  ajv.compile(Root.schema);
-const checkItemDefinitionSchemaValidate =
-  ajv.compile(ItemDefinition.schema);
-const checkPropertyDefinitionArraySchemaValidate =
-  ajv.compile({
-    type: "array",
-    items: {
-      $ref: 'ItemDefinition#/definitions/PropertyDefinition'
-    }
-  });
-const checkModuleSchemaValidate =
-  ajv.compile(Module.schema);
-function ajvCheck(
-  fn: Ajv.ValidateFunction,
-  rawData: any,
-  traceback: Traceback
-){
-  let valid = fn(rawData);
-
-  //if not valid throw the errors
-  if (!valid) {
-    //TODO add data from the error to the traceback
-    let firstError = fn.errors[0];
-    let actualTraceback = traceback;
-    if (firstError.dataPath){
-      let splittedPath = firstError.dataPath
-        .replace(/\]\.|\]\[/g, '.').split(/\[|\./g);
-      let pathLocation:string;
-      for (pathLocation of splittedPath){
-        if (!pathLocation){
-          continue;
-        }
-        if ((/^[a-zA-Z0-9_-]+$/).test(pathLocation)){
-          actualTraceback = actualTraceback.newTraceToBit(pathLocation);
-        } else {
-          break;
-        }
-      }
-    }
-    let additionalProperty = (firstError.params as any).additionalProperty;
-    if (additionalProperty){
-      actualTraceback =
-        actualTraceback.newTraceToBit(additionalProperty);
-    }
-    throw new CheckUpError(
-      "Schema check fail, " + firstError.message,
-      actualTraceback
-    );
-  };
 }
 
 //Now we execute this code asynchronously
@@ -262,8 +130,7 @@ function ajvCheck(
         )) : []
     };
 
-    //TODO enable this
-    //checkRoot(resultJSON);
+    checkRoot(resultJSON);
 
     //TODO enable this
     //Do this just in case
@@ -291,10 +158,10 @@ function ajvCheck(
  * @return                              an array with raw modules and items
  */
 async function processIncludes(
-  supportedLanguages:string[],
+  supportedLanguages:Array<string>,
   parentFolder: string,
   lastModuleDirectory: string,
-  includes: string[],
+  includes: Array<string>,
   childrenMustBeItemDefinition: boolean,
   childrenMustBeModule: boolean,
   traceback: Traceback,
@@ -405,7 +272,7 @@ async function processIncludes(
  * @return                    a raw module
  */
 async function processModule(
-  supportedLanguages:string[],
+  supportedLanguages:Array<string>,
   actualLocation: string,
   fileData: FileModuleDataRawUntreatedJSONDataType,
   pointers: any,
@@ -515,7 +382,7 @@ async function processModule(
  * @return                     a raw treated item
  */
 async function processItemDefinition(
-  supportedLanguages:string[],
+  supportedLanguages:Array<string>,
   actualLocation: string,
   lastModuleDirectory: string,
   fileData: FileItemDefinitionUntreatedRawJSONDataType,
@@ -584,12 +451,12 @@ async function processItemDefinition(
   }
 
   if (!finalValue.includes ||
-    (finalValue.includes instanceof Array && !finalValue.includes.length)){
+    (Array.isArray(finalValue.includes) && !finalValue.includes.length)){
     delete finalValue["includes"];
   }
 
   if (!finalValue.properties ||
-    (finalValue.properties instanceof Array && !finalValue.properties.length)){
+    (Array.isArray(finalValue.properties) && !finalValue.properties.length)){
     delete finalValue["properties"];
   }
 
@@ -943,556 +810,4 @@ async function getI18nData(
 
   //return the property
   return property;
-}
-
-function checkConditionalRuleSet(
-  rawData: ConditionalRuleSetRawJSONDataType,
-  parentItemDefinition: ItemDefinitionRawJSONDataType,
-  parentModule: ModuleRawJSONDataType,
-){
-  //Let's try to search for the item definition for that given component
-  //should be there at least to be valid, even if item instances are never
-  //created
-  let component =
-    (<ConditionalRuleSetRawJSONDataComponentType>rawData).component;
-  if (component &&
-    !ItemDefinition.getItemDefinitionRawFor(
-      parentItemDefinition,
-      parentModule,
-      component
-    )){
-    throw new CheckUpError(
-      "Conditional rule set item definition not available",
-      parentItemDefinition.location,
-      {component},
-      rawData
-    );
-  }
-
-  //Let's check the property
-  let rawDataAsProperty =
-    (<ConditionalRuleSetRawJSONDataPropertyType>rawData);
-  if (rawDataAsProperty.property){
-    let propDef = ItemDefinition.getPropertyDefinitionRawFor(
-      parentItemDefinition,
-      parentModule,
-      rawDataAsProperty.property
-    );
-    if (!propDef){
-      throw new CheckUpError(
-        "Conditional rule set property not available",
-        parentItemDefinition.location,
-        {property: rawDataAsProperty.property},
-        rawData
-      );
-    } else if (!PropertyDefinition.isValidValue(
-      propDef,
-      rawDataAsProperty.value,
-      true
-    )) {
-      throw new CheckUpError(
-        "Conditional rule set value invalid",
-        parentItemDefinition.location,
-        {value: rawDataAsProperty.value},
-        rawData
-      );
-    }
-  }
-}
-
-function checkItemDefinition(
-  rawData: ItemDefinitionRawJSONDataType,
-  parentModule: ModuleRawJSONDataType
-){
-  rawData.childDefinitions && rawData
-    .childDefinitions.forEach(cd=>checkItemDefinition(cd, parentModule));
-
-  rawData.includes &&
-    rawData.includes.forEach(itm=>checkItem(itm, rawData, parentModule));
-
-  rawData.properties &&
-    rawData.properties
-      .forEach(p=>checkPropertyDefinition(p, rawData, parentModule))
-}
-
-function checkItem(
-  rawData: ItemRawJSONDataType,
-  parentItemDefinition: ItemDefinitionRawJSONDataType,
-  parentModule: ModuleRawJSONDataType
-){
-  let isGroup = !!rawData.items;
-
-  //check whether the item definition exists for this item
-  //it must exist to be an item
-  if (!isGroup && !ItemDefinition.getItemDefinitionRawFor(
-    parentItemDefinition, parentModule, rawData.name)){
-    throw new CheckUpError(
-      "Missing item definition",
-      parentItemDefinition.location,
-      {name: rawData.name},
-      rawData
-    );
-  }
-
-  if (isGroup){
-    rawData.items.forEach(itm=>
-      checkItem(itm, parentItemDefinition, parentModule))
-  }
-
-  if (isGroup && rawData.predefinedProperties){
-    throw new CheckUpError(
-      "Cannot set predefinedProperties and be a group",
-      parentItemDefinition.location,
-      {predefinedProperties: rawData.predefinedProperties},
-      rawData
-    );
-  }
-
-  if (isGroup && rawData.enforcedProperties){
-    throw new CheckUpError(
-      "Cannot set enforcedProperties and be a group",
-      parentItemDefinition.location,
-      {enforcedProperties: rawData.enforcedProperties},
-      rawData
-    );
-  }
-
-  if (isGroup && rawData.sinkIn){
-    throw new CheckUpError(
-      "Cannot set sinkIn and be a group",
-      parentItemDefinition.location,
-      {sinkIn: rawData.sinkIn},
-      rawData
-    );
-  }
-
-  //get all the predefined properties or an empty array
-  let predefinedPropertiesKeys = rawData.predefinedProperties ?
-    Object.keys(rawData.predefinedProperties) : [];
-
-  //The same for the enforced
-  let enforcedPropertiesKeys = rawData.enforcedProperties ?
-    Object.keys(rawData.enforcedProperties) : [];
-
-  //we don't need to check whether this properties exist in
-  //the item definition because PropertiesValueMappingDefiniton does that
-
-  //see if there are shared between both arrays
-  let sharedItems = predefinedPropertiesKeys
-    .filter(value => -1 !== enforcedPropertiesKeys.indexOf(value));
-
-  //predefined properties and enforced properties must not be shared
-  //for the simple reason that enforced properties are set in stone
-  if (sharedItems.length){
-    throw new CheckUpError(
-      "predefined and enforced properties collision",
-      parentItemDefinition.location,
-      sharedItems,
-      rawData
-    );
-  }
-
-  //Now we check again this time against the sinkIn properties
-  let sharedItems2 = (rawData.sinkIn || [])
-    .filter(value => -1 !== enforcedPropertiesKeys.indexOf(value));
-
-  //equally there might not be a collision here, enforced properties
-  //need not to sink in
-  if (sharedItems2.length){
-    throw new CheckUpError(
-      "sink in properties and enforced properties collision",
-      parentItemDefinition.location,
-      sharedItems2,
-      rawData
-    );
-  }
-
-  let referredItemDefinitionRaw = ItemDefinition.getItemDefinitionRawFor(
-    parentItemDefinition, parentModule, rawData.name);
-
-  //Now we check whether this properties exist for sinkin
-  if (rawData.sinkIn){
-    let propertyToSinkIn:string;
-    for (propertyToSinkIn of rawData.sinkIn){
-      if (!ItemDefinition
-        .getPropertyDefinitionRawFor(
-          referredItemDefinitionRaw,
-          parentModule,
-          propertyToSinkIn
-        )
-      ){
-        throw new CheckUpError(
-          "Missing property in item definition",
-          parentItemDefinition.location,
-          propertyToSinkIn,
-          rawData.sinkIn,
-          {sinkIn: rawData.sinkIn},
-          rawData
-        );
-      }
-    }
-  }
-
-  //enforced and predefined properties aren't check here they are check
-  //on the value mapper
-  ["enforcedProperties", "predefinedProperties"].forEach(p=>{
-    if (rawData[p]){
-      checkPropertiesValueMappingDefiniton(
-        rawData[p],
-        rawData,
-        parentItemDefinition,
-        referredItemDefinitionRaw,
-        parentModule
-      );
-    }
-  });
-
-  //Check Conflicting defaultExcluded and defaultExcludedIf
-  if (typeof rawData.defaultExcluded !== "undefined" &&
-    typeof rawData.defaultExcludedIf !== "undefined"){
-    throw new CheckUpError(
-      "Conflicting properties defaultExcluded and defaultExcludedIf",
-      parentItemDefinition.location,
-      rawData
-    );
-  } else if (rawData.defaultExcludedIf){
-    checkConditionalRuleSet(
-      rawData.defaultExcludedIf,
-      parentItemDefinition,
-      parentModule
-    );
-  }
-
-  //also Conflicting mightExclude and mightExcludeIf
-  if (typeof rawData.mightExclude !== "undefined" &&
-    typeof rawData.mightExcludeIf !== "undefined"){
-    throw new CheckUpError(
-      "Conflicting properties mightExclude and mightExcludeIf",
-      parentItemDefinition.location,
-      rawData
-    );
-  } else if (rawData.mightExcludeIf){
-    checkConditionalRuleSet(
-      rawData.mightExcludeIf,
-      parentItemDefinition,
-      parentModule
-    );
-  }
-
-  if (rawData.excludedIf){
-    checkConditionalRuleSet(
-      rawData.excludedIf,
-      parentItemDefinition,
-      parentModule
-    );
-  }
-}
-
-function checkPropertiesValueMappingDefiniton(
-  rawData: PropertiesValueMappingDefinitonRawJSONDataType,
-  item: ItemRawJSONDataType,
-  parentItemDefinition: ItemDefinitionRawJSONDataType,
-  referredItemDefinition: ItemDefinitionRawJSONDataType,
-  parentModule: ModuleRawJSONDataType
-){
-  //We need to loop over the properties that were given
-  let propertyList = Object.keys(rawData);
-  let propertyId;
-  for (propertyId of propertyList){
-
-    //get the value for them
-    let propertyValue = rawData[propertyId];
-
-    //and lets check that they actually have such properties
-    let propDef =
-      ItemDefinition.getPropertyDefinitionRawFor(
-        referredItemDefinition,
-        parentModule,
-        propertyId
-      );
-    if (!propDef){
-      let obj:any = {};
-      obj[propertyId] = propertyValue;
-      throw new CheckUpError(
-        "Property not available in referred itemDefinition",
-        parentItemDefinition.location,
-        {
-          referred: referredItemDefinition,
-          message: "Property " + propertyId +
-            " not available in referred itemDefinition"
-        },
-        obj,
-        rawData,
-        item
-      );
-    };
-
-    let obj:any = {};
-    obj[propertyId] = propertyValue;
-
-    let referredProperty =
-      (<PropertiesValueMappingReferredPropertyValue>propertyValue);
-    //we must ensure it's not a referred property to do the check
-    if (!referredProperty.property){
-      //And check whether the value is even valid
-      if (!PropertyDefinition.isValidValue(propDef,
-        <PropertyDefinitionSupportedType>propertyValue, true)){
-        throw new CheckUpError(
-          "Property value is invalid in referred itemDefinition",
-          parentItemDefinition.location,
-          {
-            referredProperty: propDef,
-            referred: referredItemDefinition,
-            message: "Property value " + propertyValue +
-              " is invalid in referred itemDefinition"
-          },
-          propertyValue,
-          obj,
-          rawData,
-          item
-        );
-      };
-    } else {
-      //let's get the referred definition this property is about
-      let propertyAsValue =
-        ItemDefinition.getPropertyDefinitionRawFor(parentItemDefinition,
-          parentModule, referredProperty.property);
-
-      //if we don't get any throw an error
-      if (!propertyAsValue){
-        throw new CheckUpError(
-          "Unavailable property as value in mapper",
-          parentItemDefinition.location,
-          propertyValue,
-          obj,
-          rawData,
-          item
-        );
-      }
-
-      //If the types don't match throw an error
-      if (propertyAsValue.type !== propDef.type){
-        throw new CheckUpError(
-          "Property definitions in mapper don't match types",
-          parentItemDefinition.location,
-          {
-            referredProperty: propDef,
-            propertyAsValue,
-            message: "type " + propertyAsValue.type +
-              " and " + propDef.type + " don't match"
-          },
-          propertyValue,
-          obj,
-          rawData,
-          item
-        );
-      }
-    }
-  }
-}
-
-function checkPropertyDefinition(
-  rawData: PropertyDefinitionRawJSONDataType,
-  parentItemDefinition: ItemDefinitionRawJSONDataType,
-  parentModule: ModuleRawJSONDataType
-){
-  if (rawData.type !== "integer" && rawData.type !== "number" &&
-    rawData.type !== "currency" && typeof rawData.min !== "undefined"){
-    throw new CheckUpError(
-      "Cannot set a min value if type not integer or number",
-      parentItemDefinition.location,
-      {min: rawData.min},
-      rawData
-    );
-  } else if (rawData.type !== "integer" && rawData.type !== "number" &&
-    rawData.type !== "currency" && typeof rawData.max !== "undefined"){
-    throw new CheckUpError(
-      "Cannot set a max value if type not integer or number",
-      parentItemDefinition.location,
-      {max: rawData.max},
-      rawData
-    );
-  } else if (rawData.type !== "number" && rawData.type !== "currency" &&
-    typeof rawData.maxDecimalCount !== "undefined"){
-    throw new CheckUpError(
-      "Cannot set a maxDecimalCount value if type not number",
-      parentItemDefinition.location,
-      {maxDecimalCount: rawData.maxDecimalCount},
-      rawData
-    );
-  } else if (rawData.type !== "string" && rawData.type !== "text" &&
-    typeof rawData.minLength !== "undefined"){
-    throw new CheckUpError(
-      "Cannot set a minLength value if type not text or string",
-      parentItemDefinition.location,
-      {minLength: rawData.minLength},
-      rawData
-    );
-  } else if (rawData.type !== "string" && rawData.type !== "text" &&
-    typeof rawData.maxLength !== "undefined"){
-    throw new CheckUpError(
-      "Cannot set a maxLength value if type not text or string",
-      parentItemDefinition.location,
-      {maxLength: rawData.maxLength},
-      rawData
-    );
-  }
-
-  //lets check that all the ones in values are valid
-  if (rawData.values){
-    let value;
-    for (value of rawData.values){
-      if (!PropertyDefinition.isValidValue(
-        rawData,
-        value,
-        false
-      )){
-        throw new CheckUpError(
-          "Invalid value for item",
-          parentItemDefinition.location,
-          value,
-          {values: rawData.values},
-          rawData
-        );
-      };
-    }
-  }
-
-  //Let's check whether the default value is valid too
-  if (rawData.default){
-    if (!PropertyDefinition.isValidValue(
-      rawData,
-      rawData.default,
-      true
-    )){
-      throw new CheckUpError(
-        "Invalid type for default",
-        parentItemDefinition.location,
-        {default: rawData.default},
-        rawData
-      );
-    };
-  }
-
-  //Let's check whether the autocomplete properties are there
-  if (rawData.autocompleteSetFromProperty){
-    let propertyId:string;
-    for (propertyId of rawData.autocompleteSetFromProperty){
-      if (!ItemDefinition.getPropertyDefinitionRawFor(
-        parentItemDefinition,
-        parentModule,
-        propertyId
-      )){
-        throw new CheckUpError(
-          "Invalid autocomplete property to funnel",
-          parentItemDefinition.location,
-          propertyId,
-          {autocompleteSetFromProperty: rawData.autocompleteSetFromProperty},
-          rawData
-        );
-      };
-    }
-  }
-
-  //And the default if values are valid
-  if (rawData.defaultIf){
-    let rule:PropertyDefinitionRawJSONRuleDataType;
-    for (rule of rawData.defaultIf){
-      checkConditionalRuleSet(
-        rule.if,
-        parentItemDefinition,
-        parentModule
-      );
-
-      if (!PropertyDefinition.isValidValue(
-        rawData,
-        rule.value,
-        true
-      )){
-        throw new CheckUpError(
-          "Invalid type for default if definition",
-          parentItemDefinition.location,
-          rule,
-          rawData.defaultIf,
-          rawData
-        );
-      };
-    }
-  }
-
-  if (rawData.enforcedValue){
-    if (!PropertyDefinition.isValidValue(
-      rawData,
-      rawData.enforcedValue,
-      true
-    )){
-      throw new CheckUpError(
-        "Invalid type for enforcedValue definition",
-        parentItemDefinition.location,
-        {enforcedValue: rawData.enforcedValue},
-        rawData
-      );
-    };
-  }
-
-  if (rawData.enforcedValues){
-    rawData.enforcedValues.forEach(ev=>{
-      checkConditionalRuleSet(ev.if, parentItemDefinition, parentModule);
-
-      if (!PropertyDefinition.isValidValue(
-        rawData,
-        ev.value,
-        true
-      )){
-        throw new CheckUpError(
-          "Invalid type for enforcedValues enforced value",
-          parentItemDefinition.location,
-          {value: ev.value},
-          ev,
-          rawData.enforcedValues,
-          {enforcedValues: rawData.enforcedValues},
-          rawData
-        );
-      };
-    });
-  }
-
-  if (rawData.hiddenIf){
-    checkConditionalRuleSet(
-      rawData.hiddenIf,
-      parentItemDefinition,
-      parentModule
-    );
-  }
-}
-
-function checkModule(
-  rawData: ModuleRawJSONDataType
-){
-  rawData.propExtensions && rawData.propExtensions.forEach(propDef=>{
-    //let's create a pseudo item that acts as the module holder
-    //this will allow for checking that only matches the prop extensions
-    //say if they have conditionals and whatnot
-    checkPropertyDefinition(propDef, {
-      type: "item",
-      name: rawData.name,
-      location: rawData.location.replace(".json", ".propext.json"),
-      i18nName: {},
-      properties: rawData.propExtensions
-    }, rawData);
-  });
-
-  rawData.children && rawData.children.forEach(moduleOrItemDef=>{
-    if (moduleOrItemDef.type === "module"){
-      checkModule(rawData);
-    } else {
-      checkItemDefinition(moduleOrItemDef, rawData);
-    }
-  });
-}
-
-function checkRoot(
-  rawData: RootRawJSONDataType
-){
-  rawData.children && rawData.children.forEach(checkModule);
 }

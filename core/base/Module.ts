@@ -100,7 +100,7 @@ export default class Module {
 
   static getItemDefinitionRawFor(
     parentModuleRaw: ModuleRawJSONDataType,
-    name: string[]
+    name: Array<string>
   ):ItemDefinitionRawJSONDataType {
     let finalDefinition = <ItemDefinitionRawJSONDataType>
       parentModuleRaw.children
