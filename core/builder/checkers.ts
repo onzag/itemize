@@ -1,25 +1,25 @@
-import { RootRawJSONDataType } from "core/base/Root";
+import { RootRawJSONDataType } from "../base/Root";
 import { Traceback, CheckUpError } from "./Error";
-import { ModuleRawJSONDataType } from "core/base/Module";
-import PropertyDefinition from "core/base/ItemDefinition/PropertyDefinition";
-import ItemDefinition from "core/base/ItemDefinition";
+import { ModuleRawJSONDataType } from "../base/Module";
+import PropertyDefinition from "../base/ItemDefinition/PropertyDefinition";
+import ItemDefinition from "../base/ItemDefinition";
 import { PropertyDefinitionRawJSONDataType } from
-  "core/base/ItemDefinition/PropertyDefinition";
+  "../base/ItemDefinition/PropertyDefinition";
 import { ItemDefinitionRawJSONDataType } from
-  "core/base/ItemDefinition";
+  "../base/ItemDefinition";
 import { PropertyDefinitionSupportedType } from
-  "core/base/ItemDefinition/PropertyDefinition";
+  "../base/ItemDefinition/PropertyDefinition";
 import { PropertiesValueMappingReferredPropertyValue } from
-  "core/base/ItemDefinition/PropertiesValueMappingDefiniton";
+  "../base/ItemDefinition/PropertiesValueMappingDefiniton";
 import { PropertiesValueMappingDefinitonRawJSONDataType } from
-  "core/base/ItemDefinition/PropertiesValueMappingDefiniton";
-import { ItemRawJSONDataType } from "core/base/ItemDefinition/Item";
+  "../base/ItemDefinition/PropertiesValueMappingDefiniton";
+import { ItemRawJSONDataType } from "../base/ItemDefinition/Item";
 import { ConditionalRuleSetRawJSONDataPropertyType } from
-  "core/base/ItemDefinition/ConditionalRuleSet";
+  "../base/ItemDefinition/ConditionalRuleSet";
 import { ConditionalRuleSetRawJSONDataComponentType } from
-  "core/base/ItemDefinition/ConditionalRuleSet";
+  "../base/ItemDefinition/ConditionalRuleSet";
 import { ConditionalRuleSetRawJSONDataType } from
-  "core/base/ItemDefinition/ConditionalRuleSet";
+  "../base/ItemDefinition/ConditionalRuleSet";
 
 export function checkConditionalRuleSet(
   rawData: ConditionalRuleSetRawJSONDataType,

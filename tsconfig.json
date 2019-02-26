@@ -3,11 +3,10 @@
     "baseUrl": ".",
     "paths": {
       "*": [
-        "types/*",
-        "*"
+        "types/*"
       ]
     },
-    "target": "es5",
+    "target": "es2016",
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": true,
@@ -16,7 +15,8 @@
     "removeComments": false,
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
-    "rootDir": "."
+    "rootDir": ".",
+    "outDir": "dist"
   },
   "compileOnSave": true,
   "exclude": [

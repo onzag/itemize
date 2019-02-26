@@ -1,13 +1,13 @@
 import {
   PropertyDefinitionRawJSONDataType,
   PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD,
-} from 'core/base/ItemDefinition/PropertyDefinition';
-import { ItemRawJSONDataType } from 'core/base/ItemDefinition/Item';
-import { ModuleRawJSONDataType } from 'core/base/Module';
+} from '../base/ItemDefinition/PropertyDefinition';
+import { ItemRawJSONDataType } from '../base/ItemDefinition/Item';
+import { ModuleRawJSONDataType } from '../base/Module';
 import {
   ItemDefinitionRawJSONDataType
-} from 'core/base/ItemDefinition';
-import { RootRawJSONDataType } from 'core/base/Root';
+} from '../base/ItemDefinition';
+import { RootRawJSONDataType } from '../base/Root';
 import { CheckUpError, Traceback } from './Error';
 
 import * as fs from 'fs';
@@ -443,7 +443,10 @@ async function processItemDefinition(
     location: actualLocation,
     pointers,
     raw,
-    ...fileData
+    includes: fileData.includes,
+    properties: fileData.properties,
+    type: fileData.type,
+    allowCalloutExcludes: fileData.allowCalloutExcludes
   };
 
   if (!finalValue.allowCalloutExcludes){
