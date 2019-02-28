@@ -27,7 +27,6 @@ export function ajvCheck(
 
   //if not valid throw the errors
   if (!valid) {
-    //TODO add data from the error to the traceback
     let firstError = fn.errors[0];
     let actualTraceback = traceback;
     if (firstError.dataPath){

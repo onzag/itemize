@@ -525,7 +525,7 @@ export function checkModule(
 
   rawData.children && rawData.children.forEach(moduleOrItemDef=>{
     if (moduleOrItemDef.type === "module"){
-      checkModule(rawData, actualTraceback);
+      checkModule(moduleOrItemDef, actualTraceback);
     } else {
       checkItemDefinition(moduleOrItemDef, rawData, actualTraceback);
     }

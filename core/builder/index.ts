@@ -13,6 +13,7 @@ import { CheckUpError, Traceback } from './Error';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as PropertiesReader from 'properties-reader';
+import * as colors from 'colors/safe';
 
 const jsonMap = require('json-source-map');
 const fsAsync = fs.promises;
@@ -35,6 +36,7 @@ import {
   checkItemDefinitionSchemaValidate
 } from './schemaChecks';
 import { checkRoot } from './checkers';
+import { processRoot } from './processer';
 
 if (process.env.NODE_ENV === "production") {
   throw new Error("This script cannot run in production mode");
@@ -131,6 +133,33 @@ export interface FileItemDefinitionUntreatedRawJSONDataType {
     };
 
     checkRoot(resultJSON);
+    let resultBuilds = supportedLanguages.map(lang=>{
+      processRoot(resultJSON, lang);
+    });
+
+    if (!await checkExists('./dist')){
+      await fsAsync.mkdir('./dist');
+    }
+
+    if (!await checkExists('./dist/data')){
+      await fsAsync.mkdir('./dist/data');
+    }
+
+    console.log("emiting " + colors.bgGreen('./dist/data/lang.json'));
+    await fsAsync.writeFile(
+      './dist/data/lang.json',
+      JSON.stringify(supportedLanguages)
+    )
+
+    await Promise.all(resultBuilds.map((rb, index)=>{
+      let fileName = `./dist/data/build.${supportedLanguages[index]}.json`;
+      console.log("emiting " + colors.bgGreen(fileName));
+      return fsAsync.writeFile(
+        fileName,
+        JSON.stringify(rb)
+      );
+    }));
+
 
     //TODO enable this
     //Do this just in case
