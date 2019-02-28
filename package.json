@@ -1,7 +1,7 @@
 {
-  "name": "cycley",
+  "name": "itemize",
   "version": "1.0.0",
-  "description": "Cycley App",
+  "description": "Itemize",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

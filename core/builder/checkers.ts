@@ -113,6 +113,13 @@ export function checkItem(
     );
   }
 
+  if (!isGroup && rawData.id){
+    throw new CheckUpError(
+      "Using id in a named non grouped item",
+      traceback.newTraceToBit("id")
+    );
+  }
+
   if (isGroup){
     rawData.items.forEach((itm, index)=>
       checkItem(itm, parentItemDefinition, parentModule,

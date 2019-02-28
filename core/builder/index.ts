@@ -656,10 +656,6 @@ async function processItemI18nName(
         )
       }));
   }
-  //if there's no id this is over
-  if (!item.id){
-    return item;
-  }
 
   //get the language location
   let languageFileLocation =
@@ -680,24 +676,37 @@ async function processItemI18nName(
   let localeFileTraceback =
     traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
 
+  let isGroup = !!item.items;
+
+  let foundLanguageDataInOneFile = false;
   //use the same technique we used before to get the name
   supportedLanguages.forEach(locale=>{
     if (!properties[locale]){
-      throw new CheckUpError(
-        "File does not include language data for " + locale,
-        localeFileTraceback
-      );
+      if (isGroup || foundLanguageDataInOneFile){
+        throw new CheckUpError(
+          "File does not include language data for " + locale,
+          localeFileTraceback
+        );
+      }
+      return;
     } else if (!properties[locale].item){
-      throw new CheckUpError(
-        "File does not have item data for " + locale,
-        localeFileTraceback
-      );
+      if (isGroup || foundLanguageDataInOneFile){
+        throw new CheckUpError(
+          "File does not have item data for " + locale,
+          localeFileTraceback
+        );
+      }
+      return;
     } else if (typeof properties[locale].item[item.id] !== "string"){
-      throw new CheckUpError(
-        "File does not have item data for " + locale + " in " + item.id,
-        localeFileTraceback
-      );
+      if (isGroup || foundLanguageDataInOneFile){
+        throw new CheckUpError(
+          "File does not have item data for " + locale + " in " + item.id,
+          localeFileTraceback
+        );
+      }
+      return;
     }
+    foundLanguageDataInOneFile = true;
     i18nName[locale] = properties[locale].item[item.id].trim();
   });
 

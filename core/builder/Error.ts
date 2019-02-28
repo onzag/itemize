@@ -23,31 +23,25 @@ export class CheckUpError extends Error {
 interface TracebackStackBitType {
   path: string,
   lineStart: number,
-  columnStart: number,
   posStart: number,
   lineEnd: number,
-  columnEnd: number,
   posEnd: number
 }
 
 function extractPointData(path: string, pointData: any):TracebackStackBitType {
   let lineStart =
     pointData.key ? pointData.key.line : pointData.value.line;
-  let columnStart =
     pointData.key ? pointData.key.column : pointData.value.column;
   let posStart =
     pointData.key ? pointData.key.pos : pointData.value.pos;
   let lineEnd = pointData.valueEnd.line;
-  let columnEnd = pointData.valueEnd.column;
   let posEnd = pointData.valueEnd.pos;
 
   return {
     path,
     lineStart,
-    columnStart,
-    posStart,
     lineEnd,
-    columnEnd,
+    posStart,
     posEnd
   }
 }
@@ -138,14 +132,16 @@ export class Traceback {
 
       let resultingLines = processedValueLines.slice(minLine, maxLine + 1)
 
-      console.log(resultingLines.join("\n"));
+      console.log(resultingLines
+        .map((line, index)=>
+          `${colors.yellow(minLine + index + 1 + "")}\t${line}`)
+        .join("\n"));
     }
     console.log((requested ? "REQUESTED BY file " : "AT file ") +
       colors.red(this.location));
     this.stack.reverse().forEach(bit=>{
       console.log("\tAT line " +
-        colors.yellow(bit.lineStart + "") + ":" +
-        colors.yellow(bit.columnStart + "") +
+        colors.yellow(bit.lineStart+1 + "") +
         " ON " + colors.red(bit.path ? bit.path : "/"))
     });
 

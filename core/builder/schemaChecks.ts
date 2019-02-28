@@ -31,7 +31,7 @@ export function ajvCheck(
     let actualTraceback = traceback;
     if (firstError.dataPath){
       let splittedPath = firstError.dataPath
-        .replace(/\]\.|\]\[/g, '.').split(/\[|\./g);
+        .replace(/\]\.|\]\[|\]$/g, '.').split(/\[|\./g);
       let pathLocation:string;
       for (pathLocation of splittedPath){
         if (!pathLocation){

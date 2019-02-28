@@ -462,9 +462,10 @@ if (process.env.NODE_ENV !== "production") {
       ConditionalRuleSet: ConditionalRuleSet.schema
     },
     dependencies: {
-      items: ["gate", "id"],
+      items: ["gate"],
       gate: ["items"]
     },
+    required: ["id"],
     additionalProperties: false
   };
 }
