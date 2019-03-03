@@ -4,7 +4,7 @@
   "description": "Itemize",
   "main": "index.js",
   "scripts": {
-    "install": "tsc",
+    "install": "tsc && webpack",
     "build": "node ./dist/core/builder/index.js",
     "start": "node ./dist/core/server/index.js"
   },
