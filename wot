@@ -1,7 +1,4 @@
 TODO TECH
- - Handle prop extensions better, they should be known whether they are extensions
- or not, and not just hardcore piped from the module
- - Make sure the builder checks for colliding props with prop extensions
 
 TODO
 
