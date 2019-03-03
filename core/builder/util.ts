@@ -1,27 +1,29 @@
-import { Traceback, CheckUpError } from "./Error";
+import * as path from "path";
+import * as fs from "fs";
 
-import * as path from 'path';
-import * as fs from 'fs';
+import CheckUpError from "./Error";
+import Traceback from "./Traceback";
+
 const fsAsync = fs.promises;
 
 /**
  * Checks whether a file exists and throws an error if it doesn't
  * and it's specified to throw an error or otherwise returns false
- * @param  location  the file location
- * @param  traceback an optional traceback to trace
- * @return           a boolean
+ * @param location the file location
+ * @param traceback an optional traceback to trace
+ * @returns a boolean
  */
 export async function checkExists(
   location: string,
-  traceback?: Traceback
+  traceback?: Traceback,
 ) {
   let exists = true;
   try {
     await fsAsync.access(location, fs.constants.F_OK);
-  } catch (e){
+  } catch (e) {
     exists = false;
   }
-  if (traceback && !exists){
+  if (traceback && !exists) {
     throw new CheckUpError("Required file " +
       location + " does not exist", traceback);
   }
@@ -34,12 +36,12 @@ export async function checkExists(
  *
  * @param  location  the location in question
  * @param  traceback a traceback object
- * @return           a boolean
+ * @returns           a boolean
  */
 export async function checkIsDirectory(
   location: string,
-  traceback: Traceback
-){
+  traceback: Traceback,
+) {
   checkExists(location, traceback);
   const stat = await fsAsync.lstat(location);
   return stat.isDirectory();
@@ -54,38 +56,38 @@ export async function checkIsDirectory(
  * @param  partialLocation  the location in question without the ending
  * @param  traceback        a traceback object, this fn throws an error if it
  *                          does not exist
- * @return                  a string with the right location
+ * @returns                  a string with the right location
  */
 export async function getActualFileLocation(
   partialLocation: string,
-  traceback: Traceback
+  traceback: Traceback,
 ) {
   let actualFileLocation = partialLocation;
-  //check if exists without throwing an error
-  let exists = await checkExists(
-    partialLocation
+  // check if exists without throwing an error
+  const exists = await checkExists(
+    partialLocation,
   );
-  //if it exists we must check if it's the right type
-  if (exists){
-    //it must be a directory
-    let isDirectory = await checkIsDirectory(
+  // if it exists we must check if it's the right type
+  if (exists) {
+    // it must be a directory
+    const isDirectory = await checkIsDirectory(
       partialLocation,
-      traceback
+      traceback,
     );
 
-    //if it's a directory as it should add the index.json
-    if (isDirectory){
+    // if it's a directory as it should add the index.json
+    if (isDirectory) {
       actualFileLocation = path.join(partialLocation, "index.json");
     }
-  } else if (!partialLocation.endsWith(".json")){
-    //otherwise add the json ending
+  } else if (!partialLocation.endsWith(".json")) {
+    // otherwise add the json ending
     actualFileLocation += ".json";
   }
 
-  //check that it exists or throw an error
+  // check that it exists or throw an error
   await checkExists(
     actualFileLocation,
-    traceback
+    traceback,
   );
 
   return actualFileLocation;
@@ -97,19 +99,19 @@ export async function getActualFileLocation(
  * module and the same is true for /this/module.json
  *
  * @param  location the file location in question
- * @return          the name
+ * @returns          the name
  */
-export async function getActualFileIdentifier(location:string){
-  //we split the location in its components
-  let locationSplitted = location.replace(".json","").split(path.sep);
-  //let's get the name of the file
-  let name:string = locationSplitted.pop();
-  //and we need the actual real name for the item
-  //by default is the name of the file
-  //however index isn't an acceptable name, because
-  //it means its just a container for the parent folder
-  if (name === "index"){
-    //so we use the name of the parent folder
+export async function getActualFileIdentifier(location: string) {
+  // we split the location in its components
+  const locationSplitted = location.replace(".json", "").split(path.sep);
+  // let's get the name of the file
+  let name: string = locationSplitted.pop();
+  // and we need the actual real name for the item
+  // by default is the name of the file
+  // however index isn't an acceptable name, because
+  // it means its just a container for the parent folder
+  if (name === "index") {
+    // so we use the name of the parent folder
     name = locationSplitted.pop();
   }
 

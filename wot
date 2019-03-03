@@ -1,8 +1,7 @@
 TODO TECH
- - Make the checker be about how files are defined and make ajv checks
-based on the file schema
- - Fix the checkup errors to give a path somehow instead of the mess that it
- is now
+ - Handle prop extensions better, they should be known whether they are extensions
+ or not, and not just hardcore piped from the module
+ - Make sure the builder checks for colliding props with prop extensions
 
 TODO
 

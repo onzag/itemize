@@ -1,43 +1,63 @@
-import Module, { ModuleRawJSONDataType } from "./Module";
+import Module, { IModuleRawJSONDataType } from "./Module";
 
-export interface RootRawJSONDataType {
-  type: "root",
-  //Avaialble for the builder
-  location?: string,
-  pointers?: any,
-  raw?: string,
+export interface IRootRawJSONDataType {
+  type: "root";
+  // Avaialble for the builder
+  location?: string;
+  pointers?: any;
+  raw?: string;
 
-  children: Array<ModuleRawJSONDataType>
+  children: IModuleRawJSONDataType[];
 }
 
 export default class Root {
-  public rawData: RootRawJSONDataType;
+  /**
+   * Schema only available in development
+   */
+  public static schema: any;
 
-  constructor(rawJSON: RootRawJSONDataType){
-    //If its not production run the checks
+  public rawData: IRootRawJSONDataType;
+
+  /**
+   * Builds a root from raw data
+   * @param rawJSON the raw json data
+   */
+  constructor(rawJSON: IRootRawJSONDataType) {
+    // If its not production run the checks
     this.rawData = rawJSON;
   }
 
-  listModuleNames(){
-    return this.rawData.children.map(m=>m.name);
+  /**
+   * list all module names it contains
+   */
+  public listModuleNames() {
+    return this.rawData.children.map((m) => m.name);
   }
 
-  getAllModules(onStateChange: ()=>any){
-    return this.rawData.children.map(m=>(new Module(m, onStateChange)))
+  /**
+   * Provides all the modules it contains
+   * @param onStateChange the state change function that the modules
+   * should follow
+   */
+  public getAllModules(onStateChange: () => any) {
+    return this.rawData.children.map((m) => (new Module(m, onStateChange)));
   }
 
-  getModule(name: string, onStateChange:()=>any){
-    let rawModuleData = this.rawData.children.find(m=>m.name === name);
-    if (!rawModuleData){
+  /**
+   * Gets a specific module given its name
+   * @param name the name of the module
+   * @param onStateChange the on state change function to apply to it
+   */
+  public getModule(name: string, onStateChange: () => any) {
+    const rawModuleData = this.rawData.children.find((m) => m.name === name);
+    if (!rawModuleData) {
       throw new Error("invalid module " + name);
     }
     return new Module(
       rawModuleData,
-      onStateChange
+      onStateChange,
     );
   }
-
-  static schema:any;
 }
 
 if (process.env.NODE_ENV !== "production") {
@@ -45,23 +65,23 @@ if (process.env.NODE_ENV !== "production") {
     type: "object",
     properties: {
       type: {
-        const: "root"
+        const: "root",
       },
       includes: {
         type: "array",
         items: {
-          type: "string"
+          type: "string",
         },
-        minItems: 1
+        minItems: 1,
       },
       lang: {
         type: "array",
         items: {
-          type: "string"
-        }
-      }
+          type: "string",
+        },
+      },
     },
     additionalProperties: false,
-    required: ["type"]
-  }
+    required: ["type"],
+  };
 }

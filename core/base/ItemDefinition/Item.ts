@@ -1,3 +1,41 @@
+// lets do the import, item definition depends on conditional rule set
+// and property value mapping
+import ItemDefinition from ".";
+import PropertiesValueMappingDefiniton,
+  {
+    IPropertiesValueMappingDefinitonRawJSONDataType,
+  } from "./PropertiesValueMappingDefiniton";
+import ConditionalRuleSet, {
+  IConditionalRuleSetRawJSONDataType,
+} from "./ConditionalRuleSet";
+
+export type ItemGateType = "or" | "and" | "xor";
+
+export interface IItemGroupHandle {
+  items: IItemGroupHandle[];
+  gate: ItemGateType;
+}
+
+// this is what our raw json looks like
+export interface IItemRawJSONDataType {
+  id?: string;
+  name?: string;
+  i18nName?: {
+    [locale: string]: string,
+  };
+  items?: IItemRawJSONDataType[];
+  enforcedProperties?: IPropertiesValueMappingDefinitonRawJSONDataType;
+  predefinedProperties?: IPropertiesValueMappingDefinitonRawJSONDataType;
+  excludedIf?: IConditionalRuleSetRawJSONDataType;
+  mightExclude?: boolean;
+  mightExcludeIf?: IConditionalRuleSetRawJSONDataType;
+  defaultExcluded?: boolean;
+  defaultExcludedIf?: IConditionalRuleSetRawJSONDataType;
+  rare?: boolean;
+  sinkIn?: string[];
+  gate?: ItemGateType;
+}
+
 /**
  * This class provides the utilities for the description of an item
  * it's one of the most important classes that defines how an item is added
@@ -25,71 +63,39 @@
  *  ]
  * },
  *
- * This is a simple example where
+ * An item might also be a group of items with a gate
  */
-
-//lets do the import, item definition depends on conditional rule set
-//and property value mapping
-import ItemDefinition from '.';
-import PropertiesValueMappingDefiniton,
-  { PropertiesValueMappingDefinitonRawJSONDataType } from
-  './PropertiesValueMappingDefiniton';
-import ConditionalRuleSet, { ConditionalRuleSetRawJSONDataType } from
-  './ConditionalRuleSet';
-export type ItemGateType = "or" | "and" | "xor";
-
-export interface ItemGroupHandle {
-  items: Array<ItemGroupHandle>,
-  gate: ItemGateType
-};
-
-//this is what our raw json looks like
-export interface ItemRawJSONDataType {
-  id?: string,
-  name?: string,
-  i18nName?: {
-    [locale: string]: string
-  },
-  items?: Array<ItemRawJSONDataType>,
-  enforcedProperties?: PropertiesValueMappingDefinitonRawJSONDataType,
-  predefinedProperties?: PropertiesValueMappingDefinitonRawJSONDataType,
-  excludedIf?: ConditionalRuleSetRawJSONDataType,
-  mightExclude?: boolean,
-  mightExcludeIf?: ConditionalRuleSetRawJSONDataType,
-  defaultExcluded?: boolean,
-  defaultExcludedIf?: ConditionalRuleSetRawJSONDataType,
-  rare?: boolean,
-  sinkIn?: Array<string>,
-  gate?: ItemGateType
-}
-
-//And here we do the class definition
 export default class Item {
-  //The basics
-  public rawData: ItemRawJSONDataType;
-  public parentItemDefinition:ItemDefinition;
+  /**
+   * Schema only available in development
+   */
+  public static schema: any;
 
-  //attribute to know if this item is actually an item group
+  // The basics
+  public rawData: IItemRawJSONDataType;
+  public parentItemDefinition: ItemDefinition;
+
+  // attribute to know if this item is actually an item group
   private isGroup: boolean;
 
-  //the data that comes from the raw json is to be processed here
+  // the data that comes from the raw json is to be processed here
   private itemDefinition?: ItemDefinition;
   private excludedIf?: ConditionalRuleSet;
   private mightExcludeIf?: ConditionalRuleSet;
   private defaultExcludedIf?: ConditionalRuleSet;
 
-  //solo item specific attributes
+  // solo item specific attributes
   private enforcedProperties?: PropertiesValueMappingDefiniton;
   private predefinedProperties?: PropertiesValueMappingDefiniton;
 
-  //Group item specific attributes
-  private items?: Array<Item>;
+  // Group item specific attributes
+  private items?: Item[];
 
-  //representing the state of the class
-  private onStateChange:()=>any;
-  private state_isExcluded:boolean;
-  private state_isExcludedModified:boolean;
-  private state_isPhantomExcluded:boolean;
+  // representing the state of the class
+  private onStateChange: () => any;
+  private stateIsExcluded: boolean;
+  private stateIsExcludedModified: boolean;
+  private stateIsPhantomExcluded: boolean;
 
   /**
    * The constructor for an Item
@@ -101,103 +107,106 @@ export default class Item {
    *                               of the current item changes
    */
   constructor(
-    rawJSON: ItemRawJSONDataType,
+    rawJSON: IItemRawJSONDataType,
     parentItemDefinition: ItemDefinition,
-    onStateChange: ()=>any){
+    onStateChange: () => any,
+  ) {
 
     this.rawData = rawJSON;
 
-    //check whether it is a group
+    // check whether it is a group
     this.isGroup = !!rawJSON.items;
 
-    //put the items and the gate in place
-    this.items = rawJSON.items && rawJSON.items.map(rawJSONItem=>
+    // put the items and the gate in place
+    this.items = rawJSON.items && rawJSON.items.map((rawJSONItem) =>
       (new Item(rawJSONItem, parentItemDefinition, onStateChange)));
 
-    //the enforced properties list
+    // the enforced properties list
     this.enforcedProperties = rawJSON.enforcedProperties &&
       new PropertiesValueMappingDefiniton(rawJSON.enforcedProperties,
         parentItemDefinition, this.itemDefinition);
 
-    //the predefined properties list
+    // the predefined properties list
     this.predefinedProperties = rawJSON.predefinedProperties &&
       new PropertiesValueMappingDefiniton(rawJSON.predefinedProperties,
         parentItemDefinition, this.itemDefinition);
 
-    //lets get an instance for the item definition for this
-    //item, if there's one
+    // lets get an instance for the item definition for this
+    // item, if there's one
     this.itemDefinition = rawJSON.name && parentItemDefinition
       .getItemDefinitionFor(rawJSON.name).getNewInstance();
-    //set the enforced and predefined properties overwrites
-    //if needed to
-    this.enforcedProperties &&
-      this.enforcedProperties.getPropertyMap().forEach(p=>{
+    // set the enforced and predefined properties overwrites
+    // if needed to
+    if (this.enforcedProperties) {
+      this.enforcedProperties.getPropertyMap().forEach((p) => {
         this.itemDefinition.getPropertyDefinitionFor(p.id)
           .setSuperEnforced(p.value);
       });
-    this.predefinedProperties &&
-      this.predefinedProperties.getPropertyMap().forEach(p=>{
+    }
+    if (this.predefinedProperties) {
+      this.predefinedProperties.getPropertyMap().forEach((p) => {
         this.itemDefinition.getPropertyDefinitionFor(p.id)
           .setSuperDefault(p.value);
       });
+    }
 
-    //If this is going to be excluded
+    // If this is going to be excluded
     this.excludedIf = rawJSON.excludedIf &&
       new ConditionalRuleSet(rawJSON.excludedIf, parentItemDefinition);
 
+    // If it might be excluded
     this.mightExcludeIf = rawJSON.mightExcludeIf &&
       new ConditionalRuleSet(rawJSON.mightExcludeIf, parentItemDefinition);
 
+    // if it's default excluded
     this.defaultExcludedIf = rawJSON.defaultExcludedIf &&
       new ConditionalRuleSet(
         rawJSON.defaultExcludedIf,
-        parentItemDefinition
+        parentItemDefinition,
       );
 
-    //parent item definition
+    // parent item definition
     this.parentItemDefinition = parentItemDefinition;
 
-    //STATE MANAGEMENT
+    // State management
     this.onStateChange = onStateChange;
-
-    //The initial state is unknown
-    //due to the defaults
-    //this will never be visible as null because only
-    //modified states are the only ones that will show
-    this.state_isExcluded = null;
-
-    //initially the state hasn't been modified
-    this.state_isExcludedModified = false;
-
-    this.state_isPhantomExcluded = false;
+    // The initial state is unknown
+    // due to the defaults
+    // this will never be visible as null because only
+    // modified states are the only ones that will show
+    this.stateIsExcluded = null;
+    // initially the state hasn't been modified
+    this.stateIsExcludedModified = false;
+    // phanthom excluded are non default
+    this.stateIsPhantomExcluded = false;
   }
 
   /**
    * Tells whether the current item is excluded
    * @return a boolean whether it's excluded or not
    */
-  isCurrentlyExcluded():boolean {
-    //let's check if it's excluded by force
-    let isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
+  public isCurrentlyExcluded(): boolean {
+    // let's check if it's excluded by force
+    const isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
 
-    if (isExcludedByForce){
+    if (isExcludedByForce) {
       return true;
     }
 
-    //if it can be excluded
-    let canBeExcluded = this.rawData.mightExclude || (this.mightExcludeIf &&
+    // if it can be excluded
+    const canBeExcluded = this.rawData.mightExclude || (this.mightExcludeIf &&
       this.mightExcludeIf.evaluate());
-    if (canBeExcluded){
-      //if it hasn't been modified we return the default state
-      if (!this.state_isExcludedModified){
-        //depending on the condition
-        let isDefaultExcluded = this.rawData.defaultExcluded ||
+    if (canBeExcluded) {
+      // if it hasn't been modified we return the default state
+      if (!this.stateIsExcludedModified) {
+        // depending on the condition
+        const isDefaultExcluded = this.rawData.defaultExcluded ||
           (this.defaultExcludedIf && this.defaultExcludedIf.evaluate()) ||
           false;
-        //by default the excluded would be false
+        // by default the excluded would be false
         return isDefaultExcluded;
       }
-      return this.state_isExcluded;
+      return this.stateIsExcluded;
     } else {
       return false;
     }
@@ -215,10 +224,10 @@ export default class Item {
    * use these smartly and don't use it if canExclusionBeToggled
    * is true because it doesn't make sense then
    *
-   * @return a boolean
+   * @returns a boolean
    */
-  isCurrentlyPhantomExcluded():boolean {
-    return this.state_isPhantomExcluded;
+  public isCurrentlyPhantomExcluded(): boolean {
+    return this.stateIsPhantomExcluded;
   }
 
   /**
@@ -226,17 +235,17 @@ export default class Item {
    * This is for when an item might be included
    * like how a car might have a spare wheel or not usually the
    * case is true but it might be false as well
-   * @return a boolean that tells whether if it can be toggled
+   * @returns a boolean that tells whether if it can be toggled
    */
-  canExclusionBeSet():boolean {
-    //if it's excluded by force the default is false, you cannot toggle
-    //anything excluded by force
-    let isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
-    if (isExcludedByForce){
+  public canExclusionBeSet(): boolean {
+    // if it's excluded by force the default is false, you cannot toggle
+    // anything excluded by force
+    const isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
+    if (isExcludedByForce) {
       return false;
     }
 
-    //otherwise it depends to what might exclude provides
+    // otherwise it depends to what might exclude provides
     return this.rawData.mightExclude || (this.mightExcludeIf &&
       this.mightExcludeIf.evaluate()) || false;
   }
@@ -245,39 +254,42 @@ export default class Item {
    * Toggles the exclusion state and triggers an on state change
    * event, note that exclusion must be able to be toggled otherwise
    * it'd throw an error
+   * @throws an error if exclusion cannot be set or if you try
+   * phanthom when exclusion can be set
    */
-  setExclusionState(value:boolean, phantom: boolean):void {
-    if (!phantom && !this.canExclusionBeSet()){
+  public setExclusionState(value: boolean, phantom: boolean) {
+    if (!phantom && !this.canExclusionBeSet()) {
       throw new Error("Exclusion cannot be set");
-    } else if (phantom && this.canExclusionBeSet()){
+    } else if (phantom && this.canExclusionBeSet()) {
       throw new Error("Using phantom excludes when exclusion can be set");
     }
 
-    if (phantom){
-      //change the forced excluded state, this does not
-      //affect the real exclusion state
-      this.state_isPhantomExcluded = value
+    if (phantom) {
+      // change the forced excluded state, this does not
+      // affect the real exclusion state
+      this.stateIsPhantomExcluded = value;
     } else {
-      //change the exclusion state
-      this.state_isExcluded = value;
-      this.state_isExcludedModified = true;
+      // change the exclusion state
+      this.stateIsExcluded = value;
+      this.stateIsExcludedModified = true;
     }
-    //trigger an state change
+    // trigger an state change
     this.onStateChange();
   }
 
   /**
-   * finds item definition that are not group from an item
-   * instance
+   * It basically flattens and filters the whole item
+   * for single item definitions (non group)
    * @param  name the name of the item
-   * @return      an array of items that are not group
+   * @returns an array of items that are not group
    */
-  findSingleItemInstancesForName(name: string):Array<Item> {
-    if (!this.isGroup){
+  public findSingleItemInstancesForName(name: string): Item[] {
+    if (!this.isGroup) {
       return this.itemDefinition.getName() === name ? [this] : [];
     }
 
-    return [].concat.apply(this.items.map(i=>
+    // Concats all the results
+    return [].concat.apply(this.items.map((i) =>
       i.findSingleItemInstancesForName(name)));
   }
 
@@ -285,15 +297,16 @@ export default class Item {
    * Just returns whether is a rare element or not
    * used for ordering
    */
-  isRare():boolean {
+  public isRare(): boolean {
     return this.rawData.rare;
   }
 
   /**
    * Checks whether there are sinking properties
+   * @throws an error if it's a group
    */
-  hasSinkingProperties(){
-    if (this.isGroup){
+  public hasSinkingProperties() {
+    if (this.isGroup) {
       throw new Error("Item is a group hence has no sinking properties");
     }
     return !!(this.rawData.sinkIn && this.rawData.sinkIn.length);
@@ -302,30 +315,31 @@ export default class Item {
   /**
    * Gives the list of sinking properties, these are modifiable
    * and come from the instance itself
-   * @return an array of property definitions you can set up
+   * @throws an error if it's a group
+   * @returns an array of property definitions you can set up
    */
-  getSinkingPropertiesList(){
-    if (this.isGroup){
+  public getSinkingPropertiesList() {
+    if (this.isGroup) {
       throw new Error("Item is a group hence has no sinking properties");
     }
     return (this.rawData.sinkIn || [])
-      .map(propertyName=>this.itemDefinition
+      .map((propertyName) => this.itemDefinition
         .getPropertyDefinitionFor(propertyName));
   }
 
   /**
    * Tells whether this item is a group of items
-   * @return a boolean
+   * @returns a boolean
    */
-  isItemGroup():boolean {
+  public isItemGroup(): boolean {
     return this.isGroup;
   }
 
   /**
    * Provides the current gate
-   * @return the gate, or, and or xor
+   * @returns the gate, or, and or xor
    */
-  getGate():ItemGateType {
+  public getGate(): ItemGateType {
     return this.rawData.gate;
   }
 
@@ -336,21 +350,22 @@ export default class Item {
    * but it allows to narrow a search
    *
    * @param  name the name of the item definition
-   * @return      a boolean for whether yes or no
+   * @returns a boolean for whether yes or no
    */
-  mightCurrentlyContain(name: string):boolean {
-    if (!this.isGroup){
+  public containsItem(name: string): boolean {
+    if (!this.isGroup) {
       return this.itemDefinition.getName() === name;
     }
-    return this.items.some(i=>i.mightCurrentlyContain(name));
+    return this.items.some((i) => i.containsItem(name));
   }
 
   /**
    * Gets the definition name
-   * @return a string with the name
+   * @throws an error
+   * @returns a string with the name
    */
-  getDefinitionName():string {
-    if (this.isGroup){
+  public getDefinitionName(): string {
+    if (this.isGroup) {
       throw new Error("Groups have no item definitions");
     }
     return this.itemDefinition.getName();
@@ -360,112 +375,122 @@ export default class Item {
    * Returns a list with the usable items with the respective gate
    * or otherwise would return a single item, ands are merged, groups
    * are gone, null is for when no candidate was available
-   * @return the list, single item or null
+   * @returns the list, single item or null
    */
-  getCurrentUsableItems(): ItemGroupHandle | Item {
-    if (this.isCurrentlyExcluded() && !this.canExclusionBeSet()){
+  public getCurrentUsableItems(): IItemGroupHandle | Item {
+    // if it's currently excluded and exclusion cannot be set
+    if (this.isCurrentlyExcluded() && !this.canExclusionBeSet()) {
+      // return null because it's effectively a void
       return null;
-    } else if (!this.isGroup){
+    } else if (!this.isGroup) {
+      // if it's not group then return itself
       return this;
     }
-    let usableItems = this.items
-      .map(i=>i.getCurrentUsableItems())
-      .filter(usableItems=>usableItems);
 
-    if (usableItems.length === 0){
+    // otherwise lets get the usable items
+    // within this group
+    const usableItems = this.items
+      .map((i) => i.getCurrentUsableItems())
+      // We filter to remove nulls
+      .filter((usableItemsOfChild) => usableItemsOfChild);
+
+    // if we get nothing from this group
+    if (usableItems.length === 0) {
+      // it's again effectively a void
       return null;
-    } else if (usableItems.length === 1){
-      return usableItems[0]
+    // if we get one
+    } else if (usableItems.length === 1) {
+      // Then we return that item as one
+      return usableItems[0];
     }
-    return <ItemGroupHandle>{
+
+    // Otherwise we return the usable items with the gate
+    return {
       items: usableItems,
-      gate: this.getGate()
-    };
+      gate: this.getGate(),
+    } as IItemGroupHandle;
   }
 
   /**
    * Gives the i18 name that was specified
    * or otherwise gives the item definition i18 name
    * @param  locale the locale iso form
-   * @return        a string or null (if locale not valid)
+   * @returns a string or null (if locale not valid)
    */
-  getI18nNameFor(locale: string){
-    if (this.rawData.i18nName){
+  public getI18nNameFor(locale: string) {
+    if (this.rawData.i18nName) {
       return this.rawData.i18nName[locale] || null;
     }
 
     return this.itemDefinition.getI18nNameFor(locale);
   }
-
-  //These are here but only truly available in non production
-  static schema:any;
 }
 
 if (process.env.NODE_ENV !== "production") {
 
-  let gates = ["and", "or", "xor"];
-  //The schema for the item
+  const gates = ["and", "or", "xor"];
+  // The schema for the item
   Item.schema = {
     $id: "Item",
     type: "object",
     properties: {
       id: {
         type: "string",
-        pattern: "^[a-zA-Z0-9-]+$"
+        pattern: "^[a-zA-Z0-9-]+$",
       },
       name: {
-        type: "string"
+        type: "string",
       },
       enforcedProperties: {
-        $ref: PropertiesValueMappingDefiniton.schema.$id
+        $ref: PropertiesValueMappingDefiniton.schema.$id,
       },
       predefinedProperties: {
-        $ref: PropertiesValueMappingDefiniton.schema.$id
+        $ref: PropertiesValueMappingDefiniton.schema.$id,
       },
       excludedIf: {
-        $ref: ConditionalRuleSet.schema.$id
+        $ref: ConditionalRuleSet.schema.$id,
       },
       mightExclude: {
-        type: "boolean"
+        type: "boolean",
       },
       mightExcludeIf: {
-        $ref: ConditionalRuleSet.schema.$id
+        $ref: ConditionalRuleSet.schema.$id,
       },
       defaultExcluded: {
-        type: "boolean"
+        type: "boolean",
       },
       defaultExcludedIf: {
-        $ref: ConditionalRuleSet.schema.$id
+        $ref: ConditionalRuleSet.schema.$id,
       },
       rare: {
-        type: "boolean"
+        type: "boolean",
       },
       sinkIn: {
         type: "array",
         items: {
-          type: "string"
-        }
+          type: "string",
+        },
       },
       gate: {
         type: "string",
-        enum: gates
+        enum: gates,
       },
       items: {
         type: "array",
         items: {
-          $ref: "Item"
-        }
-      }
+          $ref: "Item",
+        },
+      },
     },
     definitions: {
       PropertiesValueMappingDefiniton: PropertiesValueMappingDefiniton.schema,
-      ConditionalRuleSet: ConditionalRuleSet.schema
+      ConditionalRuleSet: ConditionalRuleSet.schema,
     },
     dependencies: {
       items: ["gate"],
-      gate: ["items"]
+      gate: ["items"],
     },
     required: ["id"],
-    additionalProperties: false
+    additionalProperties: false,
   };
 }

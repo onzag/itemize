@@ -1,236 +1,415 @@
-import PropertyDefinition, { PropertyDefinitionRawJSONDataType } from "./PropertyDefinition";
-import Item, { ItemRawJSONDataType, ItemGroupHandle } from "./Item";
-import Module, { ModuleRawJSONDataType } from "../Module";
-import PropertiesValueMappingDefiniton from "./PropertiesValueMappingDefiniton";
 import ConditionalRuleSet from "./ConditionalRuleSet";
+import Item, { IItemRawJSONDataType, IItemGroupHandle } from "./Item";
+import PropertyDefinition,
+  { IPropertyDefinitionRawJSONDataType } from "./PropertyDefinition";
+import Module, { IModuleRawJSONDataType } from "../Module";
+import PropertiesValueMappingDefiniton from "./PropertiesValueMappingDefiniton";
 
-export interface ItemDefinitionRawJSONDataType {
-  //Builder data
-  type: "item",
+export interface IItemDefinitionRawJSONDataType {
+  // Builder data
+  type: "item";
 
-  //Avaialble for the builder
-  location?: string,
-  pointers?: any,
-  raw?: string,
+  // Avaialble for the builder
+  location?: string;
+  pointers?: any;
+  raw?: string;
 
-  //Avilable after a build
-  name: string,
+  // Avilable after a build
+  name: string;
   i18nName: {
-    [locale: string]: string
-  },
+    [locale: string]: string,
+  };
 
-  //original data
-  allowCalloutExcludes?: boolean,
-  includes?: Array<ItemRawJSONDataType>,
-  properties?: Array<PropertyDefinitionRawJSONDataType>,
+  // original data
+  allowCalloutExcludes?: boolean;
+  includes?: IItemRawJSONDataType[];
+  properties?: IPropertyDefinitionRawJSONDataType[];
 
-  //property gets added during procesing and merging
-  //replacing imports, gotta be there even if empty
-  importedChildDefinitions?: Array<Array<string>>,
-  childDefinitions?: Array<ItemDefinitionRawJSONDataType>,
+  // roperty gets added during procesing and merging
+  // replacing imports, gotta be there even if empty
+  importedChildDefinitions?: string[][];
+  childDefinitions?: IItemDefinitionRawJSONDataType[];
 }
 
-function hasItemOf(name: string, handle: Item | ItemGroupHandle):boolean {
-  if (handle instanceof Item){
+/**
+ * This is a external helper function which checks a list of usable
+ * items to try to find whether it has an item
+ * @param name the name of the item
+ * @param handle the handle either an item itself or an item group
+ * @returns a boolean with the answer
+ */
+function hasItemOf(name: string, handle: Item | IItemGroupHandle): boolean {
+  if (handle instanceof Item) {
     return handle.getDefinitionName() === name;
   }
-  return handle.items.some(i=>hasItemOf(name, i));
+  return handle.items.some((i) => hasItemOf(name, i));
 }
 
+/**
+ * This is the max expression, the item definition class
+ * which basically compounds all how this is defined
+ */
 export default class ItemDefinition {
-  public rawData: ItemDefinitionRawJSONDataType;
-  private onStateChange: ()=>any;
-  private itemInstances: Array<Item>;
-  private childDefinitions: Array<ItemDefinition>;
+  /**
+   * Schema only available in development
+   */
+  public static schema: any;
+
+  /**
+   * A raw helper function that gets a child or imported
+   * raw item definition for an item, it's static, so it works
+   * with raw json data, it throws no error
+   * @param itemDefinitionRaw the json for the item definition
+   * @param parentModuleRaw the parent module that contains
+   * this same item definition raw
+   * @param name the name of the expected child item
+   * @param avoidImports whether to avoid imported items from the module
+   */
+  public static getItemDefinitionRawFor(
+    itemDefinitionRaw: IItemDefinitionRawJSONDataType,
+    parentModuleRaw: IModuleRawJSONDataType,
+    name: string,
+    avoidImports?: boolean,
+  ): IItemDefinitionRawJSONDataType {
+    // Find the definition in the raw form
+    let definition = itemDefinitionRaw.childDefinitions
+      .find((d) => d.name === name);
+
+    // if we don't get it let's check the imports if we are allowed
+    if (!definition && !avoidImports) {
+      // we take the location and we match it like this
+      // /path/example/itemDefinition would be considered imported
+      // as well as itemDefinition would be matched to
+      // /path/example/itemDefinition
+      const importedDefinitionLoc = itemDefinitionRaw.importedChildDefinitions
+        .find((d) => d.join("/") === name || d[d.length - 1] === name);
+
+      // if we got it
+      if (importedDefinitionLoc) {
+        // le'ts get the name and the imported path
+        const importedDefinitionName = importedDefinitionLoc.join("/");
+        const importedPath = itemDefinitionRaw.importedChildDefinitions
+          .find((d) => d.join("/") === importedDefinitionName);
+
+        // There is an equal static function in the parent module for
+        // handling this too
+        if (importedPath) {
+          definition = Module.getItemDefinitionRawFor(
+            parentModuleRaw,
+            importedPath,
+          );
+        }
+      }
+    }
+
+    return definition || null;
+  }
+
+  /**
+   * A raw helper function that takes raw json data and returns
+   * a property definition if it finds it based on its id
+   * it also checks prop extensions
+   * @param itemDefinitionRaw the raw item definition to be searched
+   * @param parentModuleRaw the raw module
+   * @param id the id of the property
+   */
+  public static getPropertyDefinitionRawFor(
+    itemDefinitionRaw: IItemDefinitionRawJSONDataType,
+    parentModuleRaw: IModuleRawJSONDataType,
+    id: string,
+  ): IPropertyDefinitionRawJSONDataType {
+    // We try to find the item definition locally
+    let definition = itemDefinitionRaw.properties &&
+      itemDefinitionRaw.properties.find((p) => p.id === id);
+
+    // Otherwise we might check the prop extensions in the parent module
+    // To see if it's there
+    if (!definition && parentModuleRaw.propExtensions) {
+      definition = parentModuleRaw.propExtensions.find((p) => p.id === id);
+    }
+
+    // We return the definition or null on its defect
+    return definition || null;
+  }
+
+  public rawData: IItemDefinitionRawJSONDataType;
+  private onStateChange: () => any;
+  private itemInstances: Item[];
+  private childDefinitions: ItemDefinition[];
   private importedChildDefinitions: Array<{
     fullName: string,
-    definition: ItemDefinition
+    definition: ItemDefinition,
   }>;
-  private propertyDefinitions: Array<PropertyDefinition>;
+  private propertyDefinitions: PropertyDefinition[];
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
 
   constructor(
-    rawJSON: ItemDefinitionRawJSONDataType,
+    rawJSON: IItemDefinitionRawJSONDataType,
     parentModule: Module,
     parentItemDefinition: ItemDefinition,
-    onStateChange: ()=>any
-  ){
+    onStateChange: () => any,
+  ) {
     this.rawData = rawJSON;
     this.parentModule = parentModule;
     this.parentItemDefinition = parentItemDefinition;
     this.onStateChange = onStateChange;
 
+    // assigning the item definitions that are child by
+    // instantiating them
     this.childDefinitions = rawJSON.childDefinitions ? rawJSON.childDefinitions
-      .map(d=>(new ItemDefinition(d, this.parentModule,
+      .map((d) => (new ItemDefinition(d, this.parentModule,
         this, onStateChange))) : [];
-    this.importedChildDefinitions = rawJSON.importedChildDefinitions ?
+
+    // Assigning the imported child definitions by
+    // instantiating a detached child definition from the
+    // parent module
+    this.importedChildDefinitions =
+      rawJSON.importedChildDefinitions ?
       rawJSON.importedChildDefinitions.map(
-        d=>({
+        (d) => ({
           fullName: d.join("/"),
-          definition: this.parentModule.getDetachedItemDefinitionInstanceFor(d)
-        })) : []
+          definition: this.parentModule.getDetachedItemDefinitionInstanceFor(d),
+        })) : [];
+
+    // assigning the item instances by using the includes
+    // and instantiating those
     this.itemInstances = rawJSON.includes ? rawJSON.includes
-      .map(i=>(new Item(i, this, onStateChange))) : [];
+      .map((i) => (new Item(i, this, onStateChange))) : [];
+
+    // assigning the property definition by using the
+    // properties and instantiating those as well
     this.propertyDefinitions = rawJSON.properties ? rawJSON.properties
-      .map(i=>(new PropertyDefinition(i, this, onStateChange))) : [];
+      .map((i) => (new PropertyDefinition(i, this, onStateChange))) : [];
   }
 
-  getName():string {
+  /**
+   * provides the raw name of the item definition
+   */
+  public getName(): string {
     return this.rawData.name;
   }
 
-  hasItemDefinitionFor(name: string, avoidImports?: boolean):boolean{
-    let status = this.rawData.childDefinitions.some(d=>d.name === name);
-    if (!status && !avoidImports){
-      let importedDefinitionLoc = this.rawData.importedChildDefinitions
-        .find(d=>d.join("/") === name || d[d.length - 1] === name);
-      if (importedDefinitionLoc){
+  /**
+   * Tells whether an item definition has a child item definition for it
+   * @param name the name of the item definition
+   * @param avoidImports whether to avoid the imported detached definitions
+   */
+  public hasItemDefinitionFor(
+    name: string,
+    avoidImports?: boolean,
+  ): boolean {
+    // For this we use the raw data, we check if one
+    // matches the name
+    let status = this.rawData.childDefinitions.some((d) => d.name === name);
+
+    // if we don't find it let's try searching in imports
+    if (!status && !avoidImports) {
+      // we take the location and we match it like this
+      // /path/example/itemDefinition would be considered imported
+      // as well as itemDefinition would be matched to
+      // /path/example/itemDefinition
+      const importedDefinitionLoc = this.rawData.importedChildDefinitions
+        .find((d) => d.join("/") === name || d[d.length - 1] === name);
+      // if we find an imported location that matches
+      if (importedDefinitionLoc) {
+        // we ask the module the same thing
         status =
           this.parentModule.hasItemDefinitionFor(importedDefinitionLoc);
       }
     }
+    // return that status
     return status;
   }
 
-  getItemDefinitionFor(
+  /**
+   * Gets a live item definition for the current item definition
+   * either as a children or a detached instance that came from
+   * another item definition as an import
+   * @throws an error if the item definition does not exist
+   * @param name the name of the item definition
+   * @param avoidImports whether to avoid imported items
+   */
+  public getItemDefinitionFor(
     name: string,
-    avoidImports?: boolean
-  ):ItemDefinition {
+    avoidImports?: boolean,
+  ): ItemDefinition {
+    // We basically do the same as hasItemDefinition but we use
+    // the live instances
     let definition = this.childDefinitions
-      .find(d=>d.getName()===name);
-    if (!definition && !avoidImports){
-      let importedDefinitionLoc = this.rawData.importedChildDefinitions
-        .find(d=>d.join("/") === name || d[d.length - 1] === name);
-      if (importedDefinitionLoc){
-        let importedDefinitionName = importedDefinitionLoc.join("/");
-        let found = this.importedChildDefinitions
-          .find(d=>d.fullName === importedDefinitionName);
-        if (found){
+      .find((d) => d.getName() === name);
+
+    // if we don't have that definition
+    if (!definition && !avoidImports) {
+
+      // Do the same as before and do the matching
+      const importedDefinitionLoc = this.rawData.importedChildDefinitions
+        .find((d) => d.join("/") === name || d[d.length - 1] === name);
+
+      // now we check we got something
+      if (importedDefinitionLoc) {
+        // And now let's use the full names for what we had
+        // already requested to the parent
+        const importedDefinitionName = importedDefinitionLoc.join("/");
+        const found = this.importedChildDefinitions
+          .find((d) => d.fullName === importedDefinitionName);
+
+        // if we find it, we assign it
+        if (found) {
           definition = found.definition;
         }
       }
     }
 
-    if (!definition){
+    // We throw an error in requested a non existant definition
+    if (!definition) {
       throw new Error("Requested invalid definition " + name);
     }
 
+    // return it
     return definition;
   }
 
-  getItemDefinitionRawFor(name: string){
-    let definition = ItemDefinition.getItemDefinitionRawFor(
+  /**
+   * Provides a raw json item definition that it has a children
+   * @param name the name of the item definition
+   * @throws an error if the item definition does not exist
+   * @returns a raw item definition
+   */
+  public getItemDefinitionRawFor(
+    name: string,
+    avoidImports?: boolean,
+  ) {
+    // We basically pipe the data to the static
+    const definition = ItemDefinition.getItemDefinitionRawFor(
       this.rawData,
       this.parentModule.rawData,
-      name
+      name,
     );
-    if (!definition){
+    //
+    if (!definition) {
       throw new Error("Searching for item definition " +
         name + " failed");
     }
     return definition;
   }
 
-  static getItemDefinitionRawFor(
-    itemDefinitionRaw: ItemDefinitionRawJSONDataType,
-    parentModuleRaw: ModuleRawJSONDataType,
-    name: string
-  ):ItemDefinitionRawJSONDataType {
-    let definition = itemDefinitionRaw.childDefinitions
-      .find(d=>d.name===name);
-    if (!definition){
-      let importedDefinitionLoc = itemDefinitionRaw.importedChildDefinitions
-        .find(d=>d.join("/") === name || d[d.length - 1] === name);
-      if (importedDefinitionLoc){
-        let importedDefinitionName = importedDefinitionLoc.join("/");
-        let importedPath = itemDefinitionRaw.importedChildDefinitions
-          .find(d=>d.join("/") === importedDefinitionName);
-        if (importedPath){
-          definition = Module.getItemDefinitionRawFor(
-            parentModuleRaw,
-            importedPath
-          );
-        }
-      }
-    }
-
-    return definition;
+  /**
+   * Checks whether an item definition has a property definition
+   * @param id the property definition id
+   */
+  public hasPropertyDefinitionFor(id: string) {
+    // we use the rawdata to quickly check
+    return (this.rawData.properties || []).some((p) => p.id === id);
   }
 
-  hasPropertyDefinitionFor(id: string){
-    return (this.rawData.properties || []).some(p=>p.id === id);
-  }
-
-  getPropertyDefinitionFor(id: string):PropertyDefinition {
-    let definition = this.propertyDefinitions.find(p=>p.getId() === id);
-    if (!definition){
+  /**
+   * Provides a live property definition for an item definition
+   * this property definition can trigger state changes
+   * @throws error if the property does not exist
+   * @param id the property definition id
+   */
+  public getPropertyDefinitionFor(id: string): PropertyDefinition {
+    const definition = this.propertyDefinitions.find((p) => p.getId() === id);
+    if (!definition) {
       throw new Error("Requested invalid property " + id);
     }
     return definition;
   }
 
-  static getPropertyDefinitionRawFor(
-    itemDefinitionRaw: ItemDefinitionRawJSONDataType,
-    parentModuleRaw: ModuleRawJSONDataType,
-    id: string
-  ):PropertyDefinitionRawJSONDataType {
-    let definition = itemDefinitionRaw.properties &&
-      itemDefinitionRaw.properties.find(p=>p.id === id);
-    if (!definition && parentModuleRaw.propExtensions){
-      definition = parentModuleRaw.propExtensions.find(p=>p.id === id);
-    }
-    return definition || null;
-  }
+  /**
+   * Tells whether the current item definition has items itself
+   * which are active and match the specific name
+   * that means the item is not excluded and the item is
+   * matches the name
+   * @param name the name of the item
+   */
+  public hasAtLeastOneActiveInstanceOf(name: string): boolean {
+    // we need a list of possible candidates
+    // the might currently contain checks if an item
+    // contains the item with the given name
+    // otherwise it's not worth to check for activity
+    const possibleCandidates = this.itemInstances
+      .filter((i) => i.containsItem(name));
 
-  hasAtLeastOneActiveInstanceOf(name: string):boolean {
-    let possibleCandidates = this.itemInstances
-      .filter(i=>i.mightCurrentlyContain(name));
-    if (!possibleCandidates.length){
+    // if there are no possible candidates return false
+    if (!possibleCandidates.length) {
       return false;
     }
 
-    possibleCandidates.some(pc=>{
-      let usableItems = pc.getCurrentUsableItems();
-      if (usableItems === null){
-        return false
-      } else if (usableItems instanceof Item){
-        //now this is a single item because usable
-        //items would return a handle or single items
-        if (usableItems.getDefinitionName() === name){
-          return true
+    // othrewise loop through them and try to find
+    // a single match, that's enough
+    possibleCandidates.some((pc) => {
+      // let's get a list of usable items, these are
+      // the active items with conditional rule sets matched
+      const usableItems = pc.getCurrentUsableItems();
+
+      // it might be null when there's nothing like if the
+      // item is not a group and it's excluded
+      if (usableItems === null) {
+        return false;
+      } else if (usableItems instanceof Item) {
+        // now this is a single item because usable
+        // items would return a handle or single items
+        if (usableItems.getDefinitionName() === name) {
+          return true;
         }
+        return false;
       } else {
+        // Otherwise we refer to this external helper function
         return hasItemOf(name, usableItems);
       }
     });
   }
 
-  getParentModule(){
+  /**
+   * Just gives the parent module
+   */
+  public getParentModule() {
     return this.parentModule;
   }
 
-  hasParentItemDefinition(){
+  /**
+   * Tells whether it has a parent item definition
+   */
+  public hasParentItemDefinition() {
     return !!this.parentItemDefinition;
   }
 
-  getParentItemDefinition(){
-    if (!this.parentItemDefinition){
+  /**
+   * Provides the parent item definition
+   * @throws an error if nothing available
+   */
+  public getParentItemDefinition() {
+    if (!this.parentItemDefinition) {
       throw new
         Error("Attempted to get parent definition while missing");
     }
     return this.parentItemDefinition;
   }
 
-  getChildDefinitions():Array<ItemDefinition> {
+  /**
+   * Provides the live child definitions
+   * without imports
+   */
+  public getChildDefinitions() {
     return this.childDefinitions;
   }
 
-  areCalloutExcludesAllowed():boolean {
+  /**
+   * Tells whether the callout excludes are allowed
+   */
+  public areCalloutExcludesAllowed() {
     return this.rawData.allowCalloutExcludes;
   }
 
-  getNewInstance(){
+  /**
+   * Uses the raw data to instantiate a new instance of
+   * the item definition, uses the same on state change
+   * function for state changes so it remains linked to the
+   * module
+   */
+  public getNewInstance() {
     return new ItemDefinition(this.rawData, this.parentModule,
       this.parentItemDefinition, this.onStateChange);
   }
@@ -238,64 +417,61 @@ export default class ItemDefinition {
   /**
    * Provides the item definition item name
    * @param  locale the locale in iso form
-   * @return        a string or null (if locale not valid)
+   * @returns a string or null (if locale not valid)
    */
-  getI18nNameFor(locale: string){
+  public getI18nNameFor(locale: string) {
     return this.rawData.i18nName[locale] || null;
   }
 
-  getStructure(){
-
+  /**
+   * TODO provides the structure of the current item
+   * as it is currently
+   */
+  public getStructure() {
+    return;
   }
-
-  getPrettyStructure(){
-
-  }
-
-  //These are here but only truly available in non production
-  static schema:any;
-  static fileSchema:any;
 }
 
+// Setup the schema for files
 if (process.env.NODE_ENV !== "production") {
   ItemDefinition.schema = {
     $id: "ItemDefinition",
     type: "object",
     properties: {
       type: {
-        const: "item"
+        const: "item",
       },
       allowCalloutExcludes: {
-        type: "boolean"
+        type: "boolean",
       },
       includes: {
         type: "array",
         items: {
-          $ref: Item.schema.$id
-        }
+          $ref: Item.schema.$id,
+        },
       },
       properties: {
         type: "array",
         items: {
-          $ref: PropertyDefinition.schema.$id
-        }
+          $ref: PropertyDefinition.schema.$id,
+        },
       },
       imports: {
         type: "array",
         items: {
-          type: "string"
+          type: "string",
         },
         minItems: 1,
-        additionalItems: false
-      }
+        additionalItems: false,
+      },
     },
     definitions: {
       PropertyDefinition: PropertyDefinition.schema,
       Item: Item.schema,
       PropertiesValueMappingDefiniton: PropertiesValueMappingDefiniton.schema,
-      ConditionalRuleSet: ConditionalRuleSet.schema
+      ConditionalRuleSet: ConditionalRuleSet.schema,
     },
     required: ["type"],
-    additionalProperties: false
+    additionalProperties: false,
   };
 }
