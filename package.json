@@ -4,7 +4,9 @@
   "description": "Itemize",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "install": "tsc",
+    "build": "node ./dist/core/builder/index.js",
+    "start": "node ./dist/core/server/index.js"
   },
   "author": "Edward Gonzalez",
   "license": "ISC",

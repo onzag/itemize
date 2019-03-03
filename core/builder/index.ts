@@ -68,10 +68,18 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
 // Now we execute this code asynchronously
 (async () => {
   try {
+    let entryPoint: string = process.argv[2];
+    if (!entryPoint) {
+      const rawDataConfig = JSON.parse(
+        await fsAsync.readFile("./config.json", "utf8")
+      );
+      entryPoint = "./data/" + rawDataConfig.entry;
+    }
+
     // lets get the actual location of the item, lets assume first
     // it is the given location
     const actualLocation = await getActualFileLocation(
-      process.argv[2],
+      entryPoint,
       new Traceback("BUILDER"),
     );
 

@@ -1,4 +1,8 @@
+const path = require('path');
+
 module.exports = {
+  entry: './core/client/index.ts',
+  devtool: 'inline-source-map',
   module: {
     rules: [
       {
@@ -14,5 +18,9 @@ module.exports = {
         enforce: "pre"
       }
     ]
+  },
+  output: {
+    filename: 'client.build.js',
+    path: path.resolve(__dirname, 'dist')
   }
 };
