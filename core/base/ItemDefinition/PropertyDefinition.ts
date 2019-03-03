@@ -17,6 +17,7 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   MAX_SUPPORTED_YEAR,
   MIN_SUPPORTED_YEAR,
   MAX_CURRENCY_DECIMAL_COUNT} from "../../constants";
+import Module from "../Module";
 
 // All the supported property types
 export type PropertyDefinitionSupportedTypes =
@@ -428,9 +429,6 @@ export interface IPropertyDefinitionRawJSONDataType {
   searchLevel?: PropertyDefinitionSearchLevelsType;
   // disable ranged search
   disableRangedSearch?: boolean;
-
-  // This one is added for the sake of data of origin
-  isExtension?: boolean;
 }
 
 export interface IPropertyDefinitionRuleDataType {
@@ -521,6 +519,7 @@ export default class PropertyDefinition {
   private defaultIf?: IPropertyDefinitionRuleDataType[];
   private enforcedValues?: IPropertyDefinitionRuleDataType[];
   private hiddenIf?: ConditionalRuleSet;
+  private isExtension: boolean;
 
   private superEnforcedValue?: PropertyDefinitionSupportedType
     | PropertyDefinition;
@@ -540,25 +539,29 @@ export default class PropertyDefinition {
    */
   constructor(
     rawJSON: IPropertyDefinitionRawJSONDataType,
+    parentModule: Module,
     parentItemDefinition: ItemDefinition,
+    isExtension: boolean,
     onStateChange: () => any,
   ) {
     // set the default value
     this.defaultIf = rawJSON.defaultIf && rawJSON.defaultIf.map((dif) => ({
       value: dif.value,
-      if: new ConditionalRuleSet(dif.if, parentItemDefinition),
+      if: new ConditionalRuleSet(dif.if, parentModule, parentItemDefinition),
     }));
 
     // set the enforced values from the conditional rule set
     this.enforcedValues = rawJSON.enforcedValues &&
       rawJSON.enforcedValues.map((ev) => ({
         value: ev.value,
-        if: new ConditionalRuleSet(ev.if, parentItemDefinition),
+        if: new ConditionalRuleSet(ev.if, parentModule, parentItemDefinition),
       }));
 
     // set the hidden if rule
     this.hiddenIf = rawJSON.hiddenIf &&
-      new ConditionalRuleSet(rawJSON.hiddenIf, parentItemDefinition);
+      new ConditionalRuleSet(rawJSON.hiddenIf, parentModule, parentItemDefinition);
+
+    this.isExtension = isExtension;
 
     // STATE MANAGEMENT
     this.onStateChange = onStateChange;
@@ -804,7 +807,7 @@ export default class PropertyDefinition {
    * @return a boolean
    */
   public checkIfIsExtension(): boolean {
-    return !!this.rawData.isExtension;
+    return this.isExtension;
   }
 
   /**

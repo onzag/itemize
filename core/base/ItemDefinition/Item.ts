@@ -8,6 +8,7 @@ import PropertiesValueMappingDefiniton,
 import ConditionalRuleSet, {
   IConditionalRuleSetRawJSONDataType,
 } from "./ConditionalRuleSet";
+import Module from "../Module";
 
 export type ItemGateType = "or" | "and" | "xor";
 
@@ -74,6 +75,7 @@ export default class Item {
   // The basics
   public rawData: IItemRawJSONDataType;
   public parentItemDefinition: ItemDefinition;
+  public parentModule: Module;
 
   // attribute to know if this item is actually an item group
   private isGroup: boolean;
@@ -99,15 +101,17 @@ export default class Item {
 
   /**
    * The constructor for an Item
-   * @param rawJSON                the raw data as JSON
+   * @param rawJSON the raw data as JSON
+   * @param parentModule the parent module
    * @param parentItemDefinition   the item definition that this node is
-   *                               located, its root; for the example above that
-   *                               would be the vehicle item definition
-   * @param onStateChange          A function that runs when the state
-   *                               of the current item changes
+   * located, its root; for the example above that
+   * would be the vehicle item definition
+   * @param onStateChange A function that runs when the state
+   * of the current item changes
    */
   constructor(
     rawJSON: IItemRawJSONDataType,
+    parentModule: Module,
     parentItemDefinition: ItemDefinition,
     onStateChange: () => any,
   ) {
@@ -119,7 +123,7 @@ export default class Item {
 
     // put the items and the gate in place
     this.items = rawJSON.items && rawJSON.items.map((rawJSONItem) =>
-      (new Item(rawJSONItem, parentItemDefinition, onStateChange)));
+      (new Item(rawJSONItem, parentModule, parentItemDefinition, onStateChange)));
 
     // the enforced properties list
     this.enforcedProperties = rawJSON.enforcedProperties &&
@@ -139,34 +143,38 @@ export default class Item {
     // if needed to
     if (this.enforcedProperties) {
       this.enforcedProperties.getPropertyMap().forEach((p) => {
-        this.itemDefinition.getPropertyDefinitionFor(p.id)
+        this.itemDefinition.getPropertyDefinitionFor(p.id, true)
           .setSuperEnforced(p.value);
       });
     }
     if (this.predefinedProperties) {
       this.predefinedProperties.getPropertyMap().forEach((p) => {
-        this.itemDefinition.getPropertyDefinitionFor(p.id)
+        this.itemDefinition.getPropertyDefinitionFor(p.id, true)
           .setSuperDefault(p.value);
       });
     }
 
     // If this is going to be excluded
     this.excludedIf = rawJSON.excludedIf &&
-      new ConditionalRuleSet(rawJSON.excludedIf, parentItemDefinition);
+      new ConditionalRuleSet(rawJSON.excludedIf,
+        parentModule, parentItemDefinition);
 
     // If it might be excluded
     this.mightExcludeIf = rawJSON.mightExcludeIf &&
-      new ConditionalRuleSet(rawJSON.mightExcludeIf, parentItemDefinition);
+      new ConditionalRuleSet(rawJSON.mightExcludeIf,
+        parentModule, parentItemDefinition);
 
     // if it's default excluded
     this.defaultExcludedIf = rawJSON.defaultExcludedIf &&
       new ConditionalRuleSet(
         rawJSON.defaultExcludedIf,
+        parentModule,
         parentItemDefinition,
       );
 
     // parent item definition
     this.parentItemDefinition = parentItemDefinition;
+    this.parentModule = parentModule;
 
     // State management
     this.onStateChange = onStateChange;
@@ -324,7 +332,7 @@ export default class Item {
     }
     return (this.rawData.sinkIn || [])
       .map((propertyName) => this.itemDefinition
-        .getPropertyDefinitionFor(propertyName));
+        .getPropertyDefinitionFor(propertyName, false));
   }
 
   /**

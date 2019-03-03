@@ -112,7 +112,7 @@ export default class PropertiesValueMappingDefiniton {
     const property =
       (value as IPropertiesValueMappingReferredPropertyValue).property;
     if (property) {
-      return this.parentItemDefinition.getPropertyDefinitionFor(property);
+      return this.parentItemDefinition.getPropertyDefinitionFor(property, false);
     }
     return value as PropertyDefinitionSupportedType;
   }

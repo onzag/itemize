@@ -61,6 +61,7 @@ export function checkConditionalRuleSet(
       parentItemDefinition,
       parentModule,
       rawDataAsProperty.property,
+      true,
     );
     if (!propDef) {
       throw new CheckUpError(
@@ -205,11 +206,14 @@ export function checkItem(
   // Now we check whether this properties exist for sinkin
   if (rawData.sinkIn) {
     rawData.sinkIn.forEach((propertyToSinkIn, index) => {
+      // when sinking in properties that are not part of the
+      // element itself (extended) are not valid
       if (!ItemDefinition
         .getPropertyDefinitionRawFor(
           referredItemDefinitionRaw,
           parentModule,
           propertyToSinkIn,
+          false,
         )
       ) {
         throw new CheckUpError(
@@ -293,11 +297,16 @@ export function checkPropertiesValueMappingDefiniton(
       rawData[propertyIdOfTheReferredItem];
 
     // and lets check that they actually have such properties
+    // the same way value mapper setters are not allowed
+    // to set the values of the extended properties
+    // they only exist within item definitions
+    // and set item properties
     const propertyDefinitionOfTheReferredItem =
       ItemDefinition.getPropertyDefinitionRawFor(
         referredItemDefinition,
         parentModule,
         propertyIdOfTheReferredItem,
+        false,
       );
     if (!propertyDefinitionOfTheReferredItem) {
       throw new CheckUpError(
@@ -323,9 +332,12 @@ export function checkPropertiesValueMappingDefiniton(
       }
     } else {
       // let's get the referred definition this property is about
+      // this one is allowed to access the prop extensions
+      // as to set a value it is allowed to use the prop extension
+      // as a value
       const propertyAsValueDefinition =
         ItemDefinition.getPropertyDefinitionRawFor(parentItemDefinition,
-          parentModule, referredPropertyAsValueApplied.property);
+          parentModule, referredPropertyAsValueApplied.property, true);
 
       // if we don't get any throw an error
       if (!propertyAsValueDefinition) {
@@ -431,10 +443,13 @@ export function checkPropertyDefinition(
       traceback.newTraceToBit("autocompleteSetFromProperty");
 
     rawData.autocompleteSetFromProperty.forEach((propertyId, index) => {
+      // Also for property definitions prop extensions are valid
+      // to access in this autocomplete sets
       if (!ItemDefinition.getPropertyDefinitionRawFor(
         parentItemDefinition,
         parentModule,
         propertyId,
+        true,
       )) {
         throw new CheckUpError(
           "Invalid autocomplete property to funnel",
@@ -533,7 +548,8 @@ export function checkModule(
 
       // let's create a pseudo item that acts as the module holder
       // this will allow for checking that only matches the prop extensions
-      // say if they have conditionals and whatnot
+      // say if they have conditionals and whatnot, the pseudo location
+      // is good for checking
       checkPropertyDefinition(
         propDef,
         {
@@ -541,7 +557,7 @@ export function checkModule(
          name: rawData.name,
          location: rawData.location.replace(".json", ".propext.json"),
          i18nName: {},
-         properties: rawData.propExtensions,
+         properties: [],
         },
         rawData,
         specificPropExtTraceback,

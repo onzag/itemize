@@ -1,5 +1,6 @@
 import ItemDefinition from ".";
 import { PropertyDefinitionSupportedType } from "./PropertyDefinition";
+import Module from "../Module";
 
 // Types for the conditions
 export type ConditionalRuleComparatorType = "equals" | "not-equal" |
@@ -83,6 +84,7 @@ export default class ConditionalRuleSet {
    */
   public static schema: any;
 
+  public parentModule: Module;
   public parentItemDefinition: ItemDefinition;
   public rawData: IConditionalRuleSetRawJSONDataType;
 
@@ -91,19 +93,22 @@ export default class ConditionalRuleSet {
   /**
    * Constructor
    * @param rawJSON the raw data as JSON
+   * @param parentModule the module where this node is located
    * @param parentItemDefinition the item definition that this node is
-   *                             located, its root; for the example above that
-   *                             would be the vehicle item definition
+   * located, it might not be available for example for condition
+   * in prop extensions
    */
   constructor(
     rawJSON: IConditionalRuleSetRawJSONDataType,
+    parentModule: Module,
     parentItemDefinition: ItemDefinition,
   ) {
     this.rawData = rawJSON;
     this.condition = rawJSON.condition &&
-      new ConditionalRuleSet(rawJSON.condition, parentItemDefinition);
+      new ConditionalRuleSet(rawJSON.condition, parentModule, parentItemDefinition);
 
     this.parentItemDefinition = parentItemDefinition;
+    this.parentModule = parentModule;
   }
 
   /**
@@ -118,9 +123,11 @@ export default class ConditionalRuleSet {
     if (rawDataAsProperty.property) {
 
       // lets get the property value as for now
-      const actualPropertyValue =
+      const actualPropertyValue = this.parentItemDefinition ?
         this.parentItemDefinition
-          .getPropertyDefinitionFor(rawDataAsProperty.property)
+          .getPropertyDefinitionFor(rawDataAsProperty.property, true)
+          .getCurrentValue().value :
+        this.parentModule.getPropExtensionFor(rawDataAsProperty.property)
           .getCurrentValue().value;
 
       // lets fiddle with the comparator

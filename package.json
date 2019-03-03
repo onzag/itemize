@@ -16,6 +16,7 @@
     "webpack-cli": "^3.2.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.3.4",
     "@babel/preset-typescript": "^7.3.3",
     "@types/colors": "^1.2.1",
     "@types/node": "^10.12.24",

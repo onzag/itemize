@@ -112,11 +112,13 @@ export default class ItemDefinition {
    * @param itemDefinitionRaw the raw item definition to be searched
    * @param parentModuleRaw the raw module
    * @param id the id of the property
+   * @param includeExtensions whether to include the extensions
    */
   public static getPropertyDefinitionRawFor(
     itemDefinitionRaw: IItemDefinitionRawJSONDataType,
     parentModuleRaw: IModuleRawJSONDataType,
     id: string,
+    includeExtensions: boolean,
   ): IPropertyDefinitionRawJSONDataType {
     // We try to find the item definition locally
     let definition = itemDefinitionRaw.properties &&
@@ -124,7 +126,7 @@ export default class ItemDefinition {
 
     // Otherwise we might check the prop extensions in the parent module
     // To see if it's there
-    if (!definition && parentModuleRaw.propExtensions) {
+    if (!definition && includeExtensions && parentModuleRaw.propExtensions) {
       definition = parentModuleRaw.propExtensions.find((p) => p.id === id);
     }
 
@@ -175,12 +177,13 @@ export default class ItemDefinition {
     // assigning the item instances by using the includes
     // and instantiating those
     this.itemInstances = rawJSON.includes ? rawJSON.includes
-      .map((i) => (new Item(i, this, onStateChange))) : [];
+      .map((i) => (new Item(i, parentModule, this, onStateChange))) : [];
 
     // assigning the property definition by using the
     // properties and instantiating those as well
     this.propertyDefinitions = rawJSON.properties ? rawJSON.properties
-      .map((i) => (new PropertyDefinition(i, this, onStateChange))) : [];
+      .map((i) => (new PropertyDefinition(i, parentModule,
+        this, false, onStateChange))) : [];
   }
 
   /**
@@ -297,10 +300,16 @@ export default class ItemDefinition {
   /**
    * Checks whether an item definition has a property definition
    * @param id the property definition id
+   * @param includeExtensions whether to include extensions or not
    */
-  public hasPropertyDefinitionFor(id: string) {
+  public hasPropertyDefinitionFor(id: string, includeExtensions: boolean) {
     // we use the rawdata to quickly check
-    return (this.rawData.properties || []).some((p) => p.id === id);
+    let found = (this.rawData.properties || [])
+      .some((p) => p.id === id);
+    if (!found && includeExtensions) {
+      found = this.parentModule.hasPropExtensionFor(id);
+    }
+    return found;
   }
 
   /**
@@ -308,9 +317,16 @@ export default class ItemDefinition {
    * this property definition can trigger state changes
    * @throws error if the property does not exist
    * @param id the property definition id
+   * @param includeExtensions whether to include extensions or not
    */
-  public getPropertyDefinitionFor(id: string): PropertyDefinition {
-    const definition = this.propertyDefinitions.find((p) => p.getId() === id);
+  public getPropertyDefinitionFor(
+    id: string,
+    includeExtensions: boolean,
+  ): PropertyDefinition {
+    let definition = this.propertyDefinitions.find((p) => p.getId() === id);
+    if (!definition && includeExtensions) {
+      definition = this.parentModule.getPropExtensionFor(id);
+    }
     if (!definition) {
       throw new Error("Requested invalid property " + id);
     }

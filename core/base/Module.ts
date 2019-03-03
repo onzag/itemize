@@ -1,7 +1,7 @@
 import ItemDefinition, {
   IItemDefinitionRawJSONDataType,
 } from "./ItemDefinition";
-import {
+import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
 } from "./ItemDefinition/PropertyDefinition";
 
@@ -77,6 +77,7 @@ export default class Module {
   public rawData: IModuleRawJSONDataType;
   private childModules: Module[];
   private childItemDefinitions: ItemDefinition[];
+  private propExtensions: PropertyDefinition[];
   private onStateChange: () => any;
 
   /**
@@ -90,23 +91,33 @@ export default class Module {
     this.childItemDefinitions = [];
     this.onStateChange = onStateChange;
 
+    if (rawJSON.propExtensions) {
+      this.propExtensions = rawJSON.propExtensions.map((pe) => {
+        return new PropertyDefinition(
+          pe,
+          this,
+          null,
+          true,
+          onStateChange,
+        );
+      });
+    } else {
+      this.propExtensions = [];
+    }
+
     rawJSON.children.forEach((c) => {
       if (c.type === "module") {
         this.childModules.push(new Module(c, onStateChange));
       } else if (c.type === "item") {
-        const newChildren = {...c, properties: (
-            rawJSON.propExtensions || []
-          ).map((e) =>
-            ({...e, isExtension: true} as IPropertyDefinitionRawJSONDataType))
-          .concat(c.properties || []),
-        };
+        const newItemDefinition = new ItemDefinition(
+          c,
+          this,
+          null,
+          onStateChange,
+        );
+
         this.childItemDefinitions.push(
-          new ItemDefinition(
-            newChildren,
-            this,
-            null,
-            onStateChange,
-          ),
+          newItemDefinition,
         );
       } else {
         throw new Error("Cannot handle type " + (c as any).type);
@@ -198,6 +209,29 @@ export default class Module {
     } while (currentName);
 
     return finalDefinition;
+  }
+
+  /**
+   * Checks whether a property extension exists in this module
+   * @param id the property definition id
+   */
+  public hasPropExtensionFor(id: string){
+    // we use the rawdata to quickly check
+    return (this.rawData.propExtensions || [])
+      .some((p) => p.id === id);
+  }
+
+  /**
+   * Provides a prop extension from the module
+   * @throws error if the property does not exist
+   * @param id the property definition id
+   */
+  public getPropExtensionFor(id: string) {
+    const definition = this.propExtensions.find((p) => p.getId() === id);
+    if (!definition) {
+      throw new Error("Requested invalid prop extension " + id);
+    }
+    return definition;
   }
 
   /**

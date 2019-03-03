@@ -7,7 +7,7 @@ import { IModuleRawJSONDataType } from "../base/Module";
 import {
   IItemDefinitionRawJSONDataType,
 } from "../base/ItemDefinition";
-import { IRootRawJSONDataType } from "../base/Root";
+import Root, { IRootRawJSONDataType } from "../base/Root";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import {
@@ -143,7 +143,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
 
     checkRoot(resultJSON);
     const resultBuilds = supportedLanguages.map((lang) => {
-      processRoot(resultJSON, lang);
+      return processRoot(resultJSON, lang);
     });
 
     if (!await checkExists("./dist")) {
@@ -154,27 +154,23 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
       await fsAsync.mkdir("./dist/data");
     }
 
-    console.log("emiting " + colors.bgGreen("./dist/data/lang.json"));
+    console.log("emiting " + colors.green("./dist/data/lang.json"));
     await fsAsync.writeFile(
       "./dist/data/lang.json",
       JSON.stringify(supportedLanguages),
     );
 
+    const rootTest = new Root(resultJSON);
+    rootTest.getAllModules(() => {});
+
     await Promise.all(resultBuilds.map((rb, index) => {
       const fileName = `./dist/data/build.${supportedLanguages[index]}.json`;
-      console.log("emiting " + colors.bgGreen(fileName));
+      console.log("emiting " + colors.green(fileName));
       return fsAsync.writeFile(
         fileName,
         JSON.stringify(rb),
       );
     }));
-
-    // TODO enable this
-    // Do this just in case
-    // let rootTest = new Root(resultJSON);
-    // rootTest.getAllModules(()=>{});
-
-    console.log(JSON.stringify(resultJSON, null, 2));
   } catch (err) {
     if (err instanceof CheckUpError) {
       err.display();
