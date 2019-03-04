@@ -1,9 +1,8 @@
 const path = require('path');
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: './core/client/index.ts',
-  devtool: 'inline-source-map',
   module: {
     rules: [
       {
@@ -12,16 +11,11 @@ module.exports = {
         use: {
           loader: "babel-loader"
         },
-      },
-      {
-        test: /\.js$/,
-        use: ["source-map-loader"],
-        enforce: "pre"
       }
     ]
   },
   output: {
-    filename: 'build.development.js',
+    filename: 'build.production.js',
     path: path.resolve(__dirname, 'dist/data')
   }
 };

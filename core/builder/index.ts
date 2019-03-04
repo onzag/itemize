@@ -29,6 +29,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as PropertiesReader from "properties-reader";
 import * as colors from "colors/safe";
+import * as escapeStringRegexp from "escape-string-regexp";
 
 const jsonMap = require("json-source-map");
 const fsAsync = fs.promises;
@@ -68,109 +69,12 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
 // Now we execute this code asynchronously
 (async () => {
   try {
-    let entryPoint: string = process.argv[2];
-    if (!entryPoint) {
-      const rawDataConfig = JSON.parse(
-        await fsAsync.readFile("./config.json", "utf8")
-      );
-      entryPoint = "./data/" + rawDataConfig.entry;
-    }
-
-    // lets get the actual location of the item, lets assume first
-    // it is the given location
-    const actualLocation = await getActualFileLocation(
-      entryPoint,
-      new Traceback("BUILDER"),
+    const rawDataConfig = JSON.parse(
+      await fsAsync.readFile("./config.json", "utf8"),
     );
-
-    // lets create the traceback for this file
-    const traceback = new Traceback(actualLocation);
-
-    // lets read the file, let it fail if it fails
-    const fileContent = await fsAsync.readFile(actualLocation, "utf8");
-
-    // lets get the file data
-    let fileData: {
-      data: IFileRootDataRawUntreatedJSONDataType;
-      pointers: any;
-    };
-
-    try {
-      fileData = jsonMap.parse(fileContent);
-    } catch (err) {
-      throw new CheckUpError(
-        err.message,
-        traceback,
-      );
-    }
-
-    // Setup the pointers for the pointer data
-    // to be able to trace to bit
-    // ajv checks require pointers for diving in
-    // the invalid properties
-    traceback.setupPointers(
-      fileData.pointers,
-      fileContent,
-    );
-
-    // it all should start in the root element
-    ajvCheck(
-      checkRootSchemaValidate,
-      fileData.data,
-      traceback,
-    );
-
-    // lets get the supported languages
-    const supportedLanguages = fileData.data.lang;
-
-    // and make the result JSON
-    const resultJSON: IRootRawJSONDataType = {
-      type: "root",
-      location: actualLocation,
-      pointers: fileData.pointers,
-      children: fileData.data.includes ?
-        (await processIncludes(
-          supportedLanguages,
-          path.dirname(actualLocation),
-          path.dirname(actualLocation),
-          fileData.data.includes,
-          false,
-          true,
-          traceback.newTraceToBit("includes"),
-          false,
-        )) as IModuleRawJSONDataType[] : [],
-    };
-
-    checkRoot(resultJSON);
-    const resultBuilds = supportedLanguages.map((lang) => {
-      return processRoot(resultJSON, lang);
-    });
-
-    if (!await checkExists("./dist")) {
-      await fsAsync.mkdir("./dist");
-    }
-
-    if (!await checkExists("./dist/data")) {
-      await fsAsync.mkdir("./dist/data");
-    }
-
-    console.log("emiting " + colors.green("./dist/data/lang.json"));
-    await fsAsync.writeFile(
-      "./dist/data/lang.json",
-      JSON.stringify(supportedLanguages),
-    );
-
-    const rootTest = new Root(resultJSON);
-    rootTest.getAllModules(() => {});
-
-    await Promise.all(resultBuilds.map((rb, index) => {
-      const fileName = `./dist/data/build.${supportedLanguages[index]}.json`;
-      console.log("emiting " + colors.green(fileName));
-      return fsAsync.writeFile(
-        fileName,
-        JSON.stringify(rb),
-      );
-    }));
+    await buildData(rawDataConfig.entry);
+    await buildConfig(rawDataConfig);
+    await buildHTML(rawDataConfig);
   } catch (err) {
     if (err instanceof CheckUpError) {
       err.display();
@@ -178,6 +82,135 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
     console.log(err.stack);
   }
 })();
+
+async function buildHTML(rawConfig: any) {
+  if (!await checkExists("./dist/data")) {
+    await fsAsync.mkdir("./dist/data");
+  }
+
+  let baseHTML = await fsAsync.readFile("./core/client/index.html", "utf8");
+  Object.keys(rawConfig).forEach((key) => {
+    baseHTML = baseHTML.replace(
+      new RegExp(escapeStringRegexp("%{" + key + "}"), "g"),
+      rawConfig[key],
+    );
+  });
+
+  baseHTML = baseHTML.replace(
+    new RegExp(escapeStringRegexp("%{BUILD_NUMBER}"), "g"),
+    (new Date()).getTime().toString(),
+  );
+
+  const fileName = "./dist/data/index.html";
+  console.log("emiting " + colors.green(fileName));
+  await fsAsync.writeFile(fileName, baseHTML);
+}
+
+async function buildConfig(rawConfig: any) {
+  const fileName = "./dist/config.json";
+  console.log("emiting " + colors.green(fileName));
+  await fsAsync.writeFile(fileName, JSON.stringify(rawConfig));
+}
+
+async function buildData(entry: string) {
+  const entryPoint = "./data/" + entry;
+
+  // lets get the actual location of the item, lets assume first
+  // it is the given location
+  const actualLocation = await getActualFileLocation(
+    entryPoint,
+    new Traceback("BUILDER"),
+  );
+
+  // lets create the traceback for this file
+  const traceback = new Traceback(actualLocation);
+
+  // lets read the file, let it fail if it fails
+  const fileContent = await fsAsync.readFile(actualLocation, "utf8");
+
+  // lets get the file data
+  let fileData: {
+    data: IFileRootDataRawUntreatedJSONDataType;
+    pointers: any;
+  };
+
+  try {
+    fileData = jsonMap.parse(fileContent);
+  } catch (err) {
+    throw new CheckUpError(
+      err.message,
+      traceback,
+    );
+  }
+
+  // Setup the pointers for the pointer data
+  // to be able to trace to bit
+  // ajv checks require pointers for diving in
+  // the invalid properties
+  traceback.setupPointers(
+    fileData.pointers,
+    fileContent,
+  );
+
+  // it all should start in the root element
+  ajvCheck(
+    checkRootSchemaValidate,
+    fileData.data,
+    traceback,
+  );
+
+  // lets get the supported languages
+  const supportedLanguages = fileData.data.lang;
+
+  // and make the result JSON
+  const resultJSON: IRootRawJSONDataType = {
+    type: "root",
+    location: actualLocation,
+    pointers: fileData.pointers,
+    children: fileData.data.includes ?
+      (await processIncludes(
+        supportedLanguages,
+        path.dirname(actualLocation),
+        path.dirname(actualLocation),
+        fileData.data.includes,
+        false,
+        true,
+        traceback.newTraceToBit("includes"),
+        false,
+      )) as IModuleRawJSONDataType[] : [],
+  };
+
+  checkRoot(resultJSON);
+  const resultBuilds = supportedLanguages.map((lang) => {
+    return processRoot(resultJSON, lang);
+  });
+
+  if (!await checkExists("./dist")) {
+    await fsAsync.mkdir("./dist");
+  }
+
+  if (!await checkExists("./dist/data")) {
+    await fsAsync.mkdir("./dist/data");
+  }
+
+  console.log("emiting " + colors.green("./dist/data/lang.json"));
+  await fsAsync.writeFile(
+    "./dist/data/lang.json",
+    JSON.stringify(supportedLanguages),
+  );
+
+  const rootTest = new Root(resultJSON);
+  rootTest.getAllModules(() => {return; });
+
+  await Promise.all(resultBuilds.map((rb, index) => {
+    const fileName = `./dist/data/build.${supportedLanguages[index]}.json`;
+    console.log("emiting " + colors.green(fileName));
+    return fsAsync.writeFile(
+      fileName,
+      JSON.stringify(rb),
+    );
+  }));
+}
 
 /**
  * this processes all the included files
