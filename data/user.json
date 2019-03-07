@@ -1,0 +1,20 @@
+{
+    "type": "item",
+    "properties": [
+        {
+            "id": "username",
+            "type": "string"
+        },
+        {
+            "id": "email",
+            "type": "string",
+            "searchLevel": "disabled",
+            "disableRetrieval": true
+        },
+        {
+            "id": "password",
+            "type": "password",
+            "disableRetrieval": true
+        }
+    ]
+}

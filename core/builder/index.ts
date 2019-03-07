@@ -1,6 +1,5 @@
-import {
+import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
-  PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD,
 } from "../base/ItemDefinition/PropertyDefinition";
 import { IItemRawJSONDataType } from "../base/ItemDefinition/Item";
 import { IModuleRawJSONDataType } from "../base/Module";
@@ -24,6 +23,7 @@ import {
 } from "./schemaChecks";
 import { checkRoot } from "./checkers";
 import { processRoot } from "./processer";
+import { buildGraphQLSchema } from "./graphql";
 
 import * as fs from "fs";
 import * as path from "path";
@@ -202,6 +202,13 @@ async function buildData(entry: string) {
   const rootTest = new Root(resultJSON);
   rootTest.getAllModules(() => {return; });
 
+  const allFileName = "./dist/data/build.all.json";
+  console.log("emiting " + colors.green(allFileName));
+  await fsAsync.writeFile(
+    allFileName,
+    JSON.stringify(processRoot(resultJSON)),
+  );
+
   await Promise.all(resultBuilds.map((rb, index) => {
     const fileName = `./dist/data/build.${supportedLanguages[index]}.json`;
     console.log("emiting " + colors.green(fileName));
@@ -210,6 +217,14 @@ async function buildData(entry: string) {
       JSON.stringify(rb),
     );
   }));
+
+  const graphql: string = buildGraphQLSchema(resultJSON);
+  const gqlFileName = "./dist/data/build.gql";
+  console.log("emiting " + colors.green(gqlFileName));
+  await fsAsync.writeFile(
+    gqlFileName,
+    graphql,
+  );
 }
 
 /**
@@ -773,9 +788,9 @@ async function getI18nData(
   property: IPropertyDefinitionRawJSONDataType,
   traceback: Traceback,
 ) {
-  // if it's hidden and you don't search for it then
+  // if it's always hidden
   // it is pointless to request the data
-  if (property.hidden && property.searchLevel === "disabled") {
+  if (property.hidden) {
     return property;
   }
 
@@ -796,7 +811,7 @@ async function getI18nData(
 
   // get the properties and the definition
   const properties = PropertiesReader(languageFileLocation).path();
-  const definition = PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD[property.type];
+  const definition = PropertyDefinition.supportedTypesStandard[property.type];
 
   const localeFileTraceback =
     traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
@@ -806,17 +821,18 @@ async function getI18nData(
     // do some checks
     if (!properties[locale]) {
       throw new CheckUpError(
-        "File does not include language data for " + locale,
+        "File does not include language data for '" + locale + "'",
         localeFileTraceback,
       );
     } else if (!properties[locale].properties) {
       throw new CheckUpError(
-        "File does not include property data for " + locale,
+        "File does not include 'properties' data for '" + locale + "'",
         localeFileTraceback,
       );
     } else if (!properties[locale].properties[property.id]) {
       throw new CheckUpError(
-        "Does not include property data for " + locale + " in " + property.id,
+        "Does not include 'properties' data for '" + locale + "' in '" + 
+          property.id + "'",
         localeFileTraceback,
       );
     }
@@ -825,18 +841,29 @@ async function getI18nData(
     const propertyData = properties[locale].properties[property.id];
     const expectedProperties = definition.i18n.base
       .map((b) => ({key: b, required: true}))
+      // concat to optional properties
       .concat((definition.i18n.optional || [])
         .map((b) => ({key: b, required: false})))
-      .concat((definition.i18n.range || [])
+      // concat to search range properties only if necessary
+      .concat((property.disableRangedSearch || property.searchLevel === "disabled" ?
+          [] : definition.i18n.searchRange || [])
         .map((b) => ({key: b, required: true})))
-      .concat((definition.i18n.rangeOptional || [])
+      .concat((property.disableRangedSearch || property.searchLevel === "disabled" ?
+          [] : definition.i18n.searchRangeOptional || [])
         .map((b) => ({key: b, required: false})))
-      .concat((definition.i18n.searchBase || [])
+      // concat to search properties only if necessary
+      .concat((property.searchLevel === "disabled" ?
+          [] : definition.i18n.searchBase || [])
         .map((b) => ({key: b, required: true})))
-      .concat((definition.i18n.searchOptional || [])
+      .concat((property.searchLevel === "disabled" ?
+          [] : definition.i18n.searchOptional || [])
         .map((b) => ({key: b, required: false})))
+      // while we could make a rule for LOCATION_DISTANCE here
+      // there's a check at startup that guarantees that distance
+      // is only required if the type supports distance
       .concat((definition.i18n.distance || [])
         .map((b) => ({key: b, required: true})))
+      // request for the values if supported
       .concat((property.values || [])
         .map((b) => ({key: "values." + b, required: true})));
 
@@ -872,6 +899,9 @@ async function getI18nData(
           "' in '" + expectedProperty.key + "' required by type '" +
           property.type + "' in locale " + locale, localeFileTraceback);
       }
+
+      // Trim the result
+      result = result.trim();
 
       // now we search where the property has to be set
       let whereToSet = i18nData[locale];

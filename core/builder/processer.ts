@@ -19,18 +19,21 @@ import {
  */
 export function processItemDefinition(
   rawData: IItemDefinitionRawJSONDataType,
-  locale: string,
+  locale?: string,
 ) {
   const nRawData = {...rawData};
   delete nRawData.location;
   delete nRawData.pointers;
   delete nRawData.raw;
-  nRawData.i18nName = {...nRawData.i18nName};
-  Object.keys(nRawData.i18nName).forEach((key) => {
-    if (key !== locale) {
-      delete nRawData.i18nName[key];
-    }
-  });
+
+  if (locale) {
+    nRawData.i18nName = {...nRawData.i18nName};
+    Object.keys(nRawData.i18nName).forEach((key) => {
+      if (key !== locale) {
+        delete nRawData.i18nName[key];
+      }
+    });
+  }
 
   nRawData.childDefinitions = nRawData.childDefinitions && nRawData
     .childDefinitions.map((cd) =>
@@ -57,8 +60,12 @@ export function processItemDefinition(
  */
 export function processItem(
   rawData: IItemRawJSONDataType,
-  locale: string,
+  locale?: string,
 ) {
+  if (!locale) {
+    return rawData;
+  }
+
   const nRawData = {...rawData};
   nRawData.i18nName = {...nRawData.i18nName};
   Object.keys(nRawData.i18nName).forEach((key) => {
@@ -76,8 +83,11 @@ export function processItem(
 
 export function processPropertyDefinition(
   rawData: IPropertyDefinitionRawJSONDataType,
-  locale: string,
+  locale?: string,
 ) {
+  if (!locale) {
+    return rawData;
+  }
   const nRawData = {...rawData};
   nRawData.i18nData = {...nRawData.i18nData};
   Object.keys(nRawData.i18nData).forEach((key) => {
@@ -98,7 +108,7 @@ export function processPropertyDefinition(
  */
 export function processModule(
   rawData: IModuleRawJSONDataType,
-  locale: string,
+  locale?: string,
 ) {
   const nRawData = {...rawData};
   delete nRawData.location;
@@ -107,12 +117,15 @@ export function processModule(
   delete nRawData.propExtLocation;
   delete nRawData.propExtPointers;
   delete nRawData.propExtRaw;
-  nRawData.i18nName = {...nRawData.i18nName};
-  Object.keys(nRawData.i18nName).forEach((key) => {
-    if (key !== locale) {
-      delete nRawData.i18nName[key];
-    }
-  });
+
+  if (locale) {
+    nRawData.i18nName = {...nRawData.i18nName};
+    Object.keys(nRawData.i18nName).forEach((key) => {
+      if (key !== locale) {
+        delete nRawData.i18nName[key];
+      }
+    });
+  }
 
   nRawData.propExtensions = nRawData.propExtensions &&
     nRawData.propExtensions.map((propDef) => {
@@ -143,7 +156,7 @@ export function processModule(
  */
 export function processRoot(
   rawData: IRootRawJSONDataType,
-  locale: string,
+  locale?: string,
 ) {
   const nRawData = {...rawData};
   delete nRawData.location;

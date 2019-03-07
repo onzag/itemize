@@ -29,6 +29,9 @@ import {
 import {
   IConditionalRuleSetRawJSONDataType,
 } from "../base/ItemDefinition/ConditionalRuleSet";
+import {
+  RESERVED_PROPERTIES,
+} from "../constants";
 
 export function checkConditionalRuleSet(
   rawData: IConditionalRuleSetRawJSONDataType,
@@ -88,6 +91,14 @@ export function checkItemDefinition(
 ) {
   const actualTraceback = traceback.newTraceToLocation(rawData.location);
   actualTraceback.setupPointers(rawData.pointers, rawData.raw);
+
+  if (rawData.name.startsWith("_")) {
+    throw new CheckUpError(
+      "Definition name '" + rawData.name +
+        "' starts with underscore, and that's invalid",
+      actualTraceback.newTraceToBit("name"),
+    );
+  }
 
   if (rawData.childDefinitions) {
     rawData
@@ -374,6 +385,39 @@ export function checkPropertyDefinition(
   parentModule: IModuleRawJSONDataType,
   traceback: Traceback,
 ) {
+  if (Object.keys(RESERVED_PROPERTIES).includes(rawData.id)) {
+    throw new CheckUpError(
+      "Property '" + rawData.id + "' is reserved",
+      traceback.newTraceToBit("id"),
+    );
+  } else if (rawData.id.startsWith("_")) {
+    throw new CheckUpError(
+      "Property '" + rawData.id + "' starts with underscore, and that's invalid",
+      traceback.newTraceToBit("id"),
+    );
+  }
+
+  const canDisableSearch = PropertyDefinition
+    .supportedTypesStandard[rawData.type].searchable;
+  if (rawData.disableRangedSearch && !canDisableSearch) {
+    throw new CheckUpError(
+      "Type '" + rawData.type + "' does not support disableRangedSearch " +
+      "as it cannot be searched",
+      traceback.newTraceToBit("disableRangedSearch"),
+    );
+  } else if (rawData.searchLevel === "disabled" && !canDisableSearch) {
+    throw new CheckUpError(
+      "Type '" + rawData.type + "' does not support searchLevel as disabled " +
+      "as it cannot be searched",
+      traceback.newTraceToBit("searchLevel"),
+    );
+  } else if (rawData.searchLevel === "disabled" && rawData.disableRangedSearch) {
+    throw new CheckUpError(
+      "Type '" + rawData.type + "' cannot disable ranged search if search is disabled",
+      traceback.newTraceToBit("disableRangedSearch"),
+    );
+  }
+
   if (rawData.type !== "integer" && rawData.type !== "number" &&
     rawData.type !== "currency" && typeof rawData.min !== "undefined") {
     throw new CheckUpError(
@@ -536,6 +580,13 @@ export function checkModule(
 ) {
   const actualTraceback = traceback.newTraceToLocation(rawData.location);
   actualTraceback.setupPointers(rawData.pointers, rawData.raw);
+
+  if (rawData.name.startsWith("_")) {
+    throw new CheckUpError(
+      "Module name '" + rawData.name + "' starts with underscore, and that's invalid",
+      actualTraceback.newTraceToBit("name"),
+    );
+  }
 
   if (rawData.propExtensions) {
     const propExtTraceback = actualTraceback

@@ -41,15 +41,25 @@ export const CLASSIC_OPTIONAL_I18N = [
 export const CLASSIC_SEARCH_OPTIONAL_I18N = [
   "search.hint",
 ];
-export const CLASSIC_RANGED_I18N = [
-  "range.label",
-  "range.from.placeholder",
-  "range.to.placeholder",
+export const CLASSIC_SEARCH_RANGED_I18N = [
+  "search.range.label",
+  "search.range.from.placeholder",
+  "search.range.to.placeholder",
 ];
-export const CLASSIC_RANGED_OPTIONAL_I18N = [
-  "range.hint.from",
-  "range.hint.to",
+export const CLASSIC_SEARCH_RANGED_OPTIONAL_I18N = [
+  "search.range.hint.from",
+  "search.range.hint.to",
 ];
 export const CLASSIC_DISTANCE_I18N = [
   "distance.label",
 ];
+
+// INVALID RESERVED PROPERTY NAMES
+export const RESERVED_PROPERTIES = {
+  id: "ID!",
+  createdAt: "String!",
+  editedAt: "String",
+  createdBy: "ID!",
+  reviewedAt: "String",
+  reviewedBy: "ID",
+};

@@ -8,8 +8,8 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   REDUCED_BASE_I18N,
   CLASSIC_OPTIONAL_I18N,
   CLASSIC_BASE_I18N,
-  CLASSIC_RANGED_I18N,
-  CLASSIC_RANGED_OPTIONAL_I18N,
+  CLASSIC_SEARCH_RANGED_I18N,
+  CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
   CLASSIC_SEARCH_BASE_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N,
   CLASSIC_DISTANCE_I18N,
@@ -26,6 +26,7 @@ export type PropertyDefinitionSupportedTypes =
   "number" |          // A simple number, comparable, and stored as a number
   "currency" |        // Currency, comparable and stored as an object
   "string" |          // A simple string, comparable, and stored as a string
+  "password" |        // A password, stored as a hash, ensure to disable retrieval
   "text" |            // Represented as an object, non comparable,
                       // stored as text and object and it should be able to do
                       // full text search, it's an object due to image support
@@ -53,37 +54,38 @@ export enum PropertyDefinitionSearchInterfacesType {
   LOCATION_DISTANCE,
 }
 
-// So this is how properties are defined to give an overview on
-// how they are supposed to be managed
-export type PropertyDefinitionSupportedTypesStandardType =
-Record<PropertyDefinitionSupportedTypes, {
+export interface IPropertyDefinitionSupportedType {
   // json represents how the element is represented in json form
   // objects are not allowed only boolean numbers and strings are
   // these are used for types that are allowed to be used by
   // enforcedProperties and predefinedProperties, it is optional
   // as types that are not settable do not have a json form
-  json?: "boolean" | "number" | "string",
+  json?: "boolean" | "number" | "string";
+
+  // graphql type as a string
+  gql: string;
+  gqlDef?: {[key: string]: string};
 
   // represents an item that would mark for null
   // by default it is null itself
-  nullableDefault?: any,
-  rangeDefaultSearch?: boolean,
+  nullableDefault?: any;
+  rangeDefaultSearch?: boolean;
 
   // this is a validation function that checks whether the value
   // is valid,
-  validate?: (value: PropertyDefinitionSupportedType) => any,
+  validate?: (value: PropertyDefinitionSupportedType) => any;
   // max valid, for numbers
-  max?: number,
+  max?: number;
   // min valid for numbers
-  min?: number,
+  min?: number;
   // max length for text and string and whatnot
-  maxLength?: number,
+  maxLength?: number;
   // max decimal count
-  maxDecimalCount?: number,
+  maxDecimalCount?: number;
   // whether it is searchable or not
-  searchable: boolean,
+  searchable: boolean;
   // the search interface used
-  searchInterface?: PropertyDefinitionSearchInterfacesType,
+  searchInterface?: PropertyDefinitionSearchInterfacesType;
   // i18n supported and expected attributes
   // they won't be requested at all for hidden and not searchable items
   // if the item has a range it should be specified too
@@ -93,22 +95,29 @@ Record<PropertyDefinitionSupportedTypes, {
     optional: string[],
     // range attributes are not requested if disableRangedSearch is true
     // nor if the searchInterface is not EXACT_AND_RANGE
-    range?: string[],
-    rangeOptional?: string[],
+    // nor if the searchLevel is disabled
+    searchRange?: string[],
+    searchRangeOptional?: string[],
     // location type for search interface specific attributes
     // not used if the searchInterface is not LOCATION_DISTANCE
     distance?: string[],
-    // these are only for FTS
+    // not requested if the searchLevel is disabled
     searchBase?: string[],
     searchOptional?: string[],
-  },
-}>;
+  };
+}
 
-export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
+// So this is how properties are defined to give an overview on
+// how they are supposed to be managed
+export type PropertyDefinitionSupportedTypesStandardType =
+Record<PropertyDefinitionSupportedTypes, IPropertyDefinitionSupportedType>;
+
+const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   : PropertyDefinitionSupportedTypesStandardType = {
   boolean: {
     // a boolean type can be written as a boolean
     json: "boolean",
+    gql: "Boolean",
     // it is searchable by default
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
@@ -116,11 +125,14 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     i18n: {
       base: REDUCED_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
+      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
     },
   },
   integer: {
     // an integer is represented as a number
     json: "number",
+    gql: "Float",
     // it gotta be validated to check it's a number
     validate: (n: PropertyDefinitionSupportedIntegerType) =>
       !isNaN(NaN) && parseInt(n as any, 10) === n &&
@@ -135,13 +147,16 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
-      range: CLASSIC_RANGED_I18N,
-      rangeOptional: CLASSIC_RANGED_OPTIONAL_I18N,
+      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
+      searchRange: CLASSIC_SEARCH_RANGED_I18N,
+      searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
     },
   },
   number: {
     // a number is just a number can be integer or decimal
     json: "number",
+    gql: "Float",
     // the validator
     validate: (n: PropertyDefinitionSupportedNumberType) => {
       if (isNaN(n)) {
@@ -171,11 +186,18 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
-      range: CLASSIC_RANGED_I18N,
-      rangeOptional: CLASSIC_RANGED_OPTIONAL_I18N,
+      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
+      searchRange: CLASSIC_SEARCH_RANGED_I18N,
+      searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
     },
   },
   currency: {
+    gql: "__PropertyType__Currency",
+    gqlDef: {
+      value: "Number!",
+      currency: "String!",
+    },
     // locations just contain this basic data
     validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
       if (typeof l.value !== "number" &&
@@ -211,11 +233,14 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
-      range: CLASSIC_RANGED_I18N,
-      rangeOptional: CLASSIC_RANGED_OPTIONAL_I18N,
+      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
+      searchRange: CLASSIC_SEARCH_RANGED_I18N,
+      searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
     },
   },
   string: {
+    gql: "Float",
     // a string is a string
     json: "string",
     nullableDefault: "",
@@ -229,15 +254,29 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
+      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
+    },
+  },
+  password: {
+    gql: "String",
+    nullableDefault: "",
+    // validates just the length
+    validate: (s: PropertyDefinitionSupportedPasswordType) => s.length <= 255,
+    maxLength: MAX_STRING_LENGTH,
+    searchable: false,
+    // i18n attributes required
+    i18n: {
+      base: CLASSIC_BASE_I18N,
+      optional: CLASSIC_OPTIONAL_I18N,
     },
   },
   text: {
+    gql: "String",
     nullableDefault: "",
     // validates the text, texts don't support json value
-    validate: (s: IPropertyDefinitionSupportedTextType) => {
-      return typeof s.html === "string" &&
-        typeof s.raw === "string" && s.html.length < MAX_TEXT_LENGTH
-        && s.raw.length <= s.html.length;
+    validate: (s: PropertyDefinitionSupportedTextType) => {
+      return typeof s === "string" && s.length < MAX_TEXT_LENGTH;
     },
     // the max length for the html
     maxLength: MAX_TEXT_LENGTH,
@@ -253,6 +292,7 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
   year: {
+    gql: "Float",
     // years can be set as a number
     json: "number",
     // validates
@@ -268,33 +308,47 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
-      range: CLASSIC_RANGED_I18N,
-      rangeOptional: CLASSIC_RANGED_OPTIONAL_I18N,
+      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
+      searchRange: CLASSIC_SEARCH_RANGED_I18N,
+      searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
     },
   },
   // TODO
   date: {
+    gql: "String",
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
-      range: CLASSIC_RANGED_I18N,
-      rangeOptional: CLASSIC_RANGED_OPTIONAL_I18N,
+      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
+      searchRange: CLASSIC_SEARCH_RANGED_I18N,
+      searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
     },
   },
   // TODO
   datetime: {
+    gql: "String",
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
-      range: CLASSIC_RANGED_I18N,
-      rangeOptional: CLASSIC_RANGED_OPTIONAL_I18N,
+      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
+      searchRange: CLASSIC_SEARCH_RANGED_I18N,
+      searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
     },
   },
   location: {
+    gql: "__PropertyType__Location",
+    gqlDef: {
+      lng: "Number!",
+      lat: "Number!",
+      txt: "String",
+    },
     // locations just contain this basic data
     validate: (l: IPropertyDefinitionSupportedLocationType) => {
       return typeof l.lng === "string" &&
@@ -308,11 +362,14 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     i18n: {
       base: REDUCED_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
+      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
       distance: CLASSIC_DISTANCE_I18N,
     },
   },
   // TODO
   images: {
+    gql: "__PropertyType__Images",
     searchable: false,
     i18n: {
       base: REDUCED_BASE_I18N,
@@ -321,6 +378,7 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   },
   // TODO
   files: {
+    gql: "__PropertyType__Files",
     searchable: false,
     i18n: {
       base: REDUCED_BASE_I18N,
@@ -328,6 +386,32 @@ export const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
 };
+
+Object.keys(PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD).forEach((propDefKey) => {
+  const propDef: IPropertyDefinitionSupportedType =
+    PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD[propDefKey];
+  if (!propDef.searchable &&
+    (propDef.i18n.searchBase || propDef.i18n.searchOptional ||
+    propDef.i18n.searchRange || propDef.i18n.searchRangeOptional)) {
+      throw new Error("Invalid propdef with search data for non-searchable > " +
+        propDefKey);
+  } else if (propDef.searchable) {
+    if (!propDef.i18n.searchBase || !propDef.i18n.searchOptional) {
+      throw new Error("Invalid propdef lacking search data while searchable > " +
+        propDefKey);
+    } else if (propDef.searchInterface ===
+      PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
+      (!propDef.i18n.searchRange || !propDef.i18n.searchRangeOptional)) {
+      throw new Error("Invalid propdef lacking ranged search " +
+        "data while ranged searchable > " + propDefKey);
+    } else if (propDef.searchInterface ===
+      PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE &&
+      !propDef.i18n.distance) {
+      throw new Error("Invalid propdef lacking distance data while location > " +
+        propDefKey);
+    }
+  }
+});
 
 export type PropertyDefinitionSupportedBooleanType = boolean;
 export type PropertyDefinitionSupportedIntegerType = number;
@@ -337,17 +421,15 @@ export interface IPropertyDefinitionSupportedCurrencyType {
   currency: string;
 }
 export type PropertyDefinitionSupportedStringType = string;
-export interface IPropertyDefinitionSupportedTextType {
-  html: string;
-  raw: string;
-}
+export type PropertyDefinitionSupportedPasswordType = string;
+export type PropertyDefinitionSupportedTextType = string;
 // TODO
 export type PropertyDefinitionSupportedDateType = null;
 export type PropertyDefinitionSupportedDateTimeType = null;
 export interface IPropertyDefinitionSupportedLocationType {
   lng: string;
   lat: string;
-  txt: string;
+  txt?: string;
 }
 // TODO
 export type PropertyDefinitionSupportedImagesType = null;
@@ -359,7 +441,8 @@ export type PropertyDefinitionSupportedType =
   PropertyDefinitionSupportedNumberType |
   IPropertyDefinitionSupportedCurrencyType |
   PropertyDefinitionSupportedStringType |
-  IPropertyDefinitionSupportedTextType |
+  PropertyDefinitionSupportedPasswordType |
+  PropertyDefinitionSupportedTextType |
   PropertyDefinitionSupportedDateType |
   PropertyDefinitionSupportedDateTimeType |
   IPropertyDefinitionSupportedLocationType |
@@ -429,6 +512,9 @@ export interface IPropertyDefinitionRawJSONDataType {
   searchLevel?: PropertyDefinitionSearchLevelsType;
   // disable ranged search
   disableRangedSearch?: boolean;
+  // disable retrieval, property value is never retrieved
+  // it can only be set or updated
+  disableRetrieval?: boolean;
 }
 
 export interface IPropertyDefinitionRuleDataType {
@@ -450,6 +536,8 @@ export default class PropertyDefinition {
    * Schema only available in development
    */
   public static schema: any;
+  public static supportedTypesStandard =
+    PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD;
 
   /**
    * Checks whether a value is valid or not using
@@ -962,6 +1050,9 @@ if (process.env.NODE_ENV !== "production") {
         enum: searchLevels,
       },
       disableRangedSearch: {
+        type: "boolean",
+      },
+      disableRetrieval: {
         type: "boolean",
       },
     },
