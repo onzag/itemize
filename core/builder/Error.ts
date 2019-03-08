@@ -1,5 +1,6 @@
 import * as colors from "colors/safe";
 import Traceback from "./Traceback";
+import "source-map-support/register";
 
 export default class CheckUpError extends Error {
   private traceback: Traceback;

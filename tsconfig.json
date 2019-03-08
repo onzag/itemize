@@ -6,7 +6,7 @@
         "types/*"
       ]
     },
-    "target": "es2016",
+    "target": "esnext",
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": true,

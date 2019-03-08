@@ -9,6 +9,7 @@ import {
 import {
   IItemRawJSONDataType,
 } from "../base/ItemDefinition/Item";
+import "source-map-support/register";
 
 /**
  * Cleans up build data from

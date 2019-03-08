@@ -15,29 +15,31 @@
     "@types/express": "^4.16.1",
     "escape-string-regexp": "^1.0.5",
     "express": "^4.16.4",
-    "react": "^16.8.3",
-    "react-dom": "^16.8.3",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
     "webpack-cli": "^3.2.3"
   },
   "devDependencies": {
     "@babel/core": "^7.3.4",
     "@babel/preset-typescript": "^7.3.3",
     "@types/colors": "^1.2.1",
-    "@types/node": "^10.12.24",
+    "@types/graphql": "^14.0.7",
+    "@types/node": "^10.12.30",
     "@types/properties-reader": "0.0.1",
-    "ajv": "^6.8.1",
+    "ajv": "^6.10.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.0.5",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "colors": "^1.3.3",
+    "graphql": "^14.1.1",
     "json-source-map": "^0.4.0",
     "properties-reader": "0.0.16",
     "source-map-loader": "^0.2.4",
     "source-map-support": "^0.5.10",
-    "tslint": "^5.13.0",
+    "tslint": "^5.13.1",
     "tslint-react": "^3.6.0",
     "typescript": "^3.3.3333",
-    "webpack": "^4.29.5"
+    "webpack": "^4.29.6"
   }
 }

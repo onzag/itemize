@@ -4,6 +4,7 @@ import ItemDefinition from "../base/ItemDefinition";
 import Module from "../base/Module";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
+import "source-map-support/register";
 
 const ajv = new Ajv();
 

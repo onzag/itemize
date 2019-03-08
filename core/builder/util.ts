@@ -3,6 +3,7 @@ import * as fs from "fs";
 
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
+import "source-map-support/register";
 
 const fsAsync = fs.promises;
 

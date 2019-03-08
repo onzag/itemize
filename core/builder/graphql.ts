@@ -4,39 +4,100 @@ import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
   IPropertyDefinitionSupportedType,
 } from "../base/ItemDefinition/PropertyDefinition";
-import { RESERVED_PROPERTIES } from "../constants";
+import {
+  RESERVED_BASE_PROPERTIES,
+  RESERVED_SEARCH_PROPERTIES,
+  RESERVED_GETTER_PROPERTIES
+} from "../constants";
 import { IModuleRawJSONDataType } from "../base/Module";
 import { IItemDefinitionRawJSONDataType } from "../base/ItemDefinition";
+import "source-map-support/register";
 
-const BASE_TEMPLATE = `"""
-The base template that every item inherits
-"""
-interface __Base {
-${Object.keys(RESERVED_PROPERTIES)
-  .map((rpk) => `  ${rpk}: ${RESERVED_PROPERTIES[rpk]}`)
-  .join(",\n")}
+import {
+  GraphQLSchema,
+  GraphQLSchemaConfig,
+  GraphQLObjectType,
+  GraphQLInterfaceType,
+  GraphQLString,
+  GraphQLInt,
+  GraphQLFloat,
+  GraphQLBoolean,
+  GraphQLID,
+  GraphQLNonNull,
+  GraphQLScalarType,
+  GraphQLNullableType,
+  printSchema,
+  GraphQLList,
+  GraphQLInputObjectType,
+} from "graphql";
+
+const translationTypes = {
+  String: GraphQLString,
+  Int: GraphQLInt,
+  Float: GraphQLFloat,
+  Boolean: GraphQLBoolean,
+  ID: GraphQLID,
+};
+const fancyTranslationTypes = {};
+
+function strToGraphQLType(str: string, isRequired?: boolean, isInput?: boolean): {
+  type: GraphQLScalarType | GraphQLNonNull<GraphQLNullableType>,
+} {
+  let actualStr = str;
+  const internalIsRequired = isRequired || str.endsWith("!");
+  if (str.endsWith("!")) {
+    actualStr = str.substr(0, str.length - 1);
+  }
+  let type = translationTypes[actualStr];
+  if (!type) {
+    type = fancyTranslationTypes[actualStr];
+    if (type && isInput) {
+      type = type.input;
+    } else if (!type && !isInput) {
+      type = type.output;
+    }
+  }
+  if (!type) {
+    throw new Error("Invalid graphql type " + actualStr);
+  }
+  if (internalIsRequired) {
+    return {
+      type: new GraphQLNonNull(type),
+    };
+  }
+  return {
+    type,
+  };
 }
 
-${Object.keys(PropertyDefinition.supportedTypesStandard)
-  .map((pdk) => {
-    const pdv: IPropertyDefinitionSupportedType =
-      PropertyDefinition.supportedTypesStandard[pdk];
-    if (pdv.gqlDef) {
-      return `
-"""
-Definition for the property type for ${pdk}
-"""
-type ${pdv.gql} {
-${Object.keys(pdv.gqlDef)
-  .map((gqldefk) => `  ${gqldefk}: ${pdv.gqlDef[gqldefk]}`)
-  .join(",\n")}
-}`;
-    }
-    return null;
-  })
-  .filter((p) => p)
-  .join("\n\n")}
-`;
+function objToGraphQLFields(obj: {[key: string]: string}) {
+  const objCopy = {};
+  Object.keys(obj).forEach((key) => {
+    objCopy[key] = strToGraphQLType(obj[key]);
+  });
+
+  return objCopy;
+}
+
+const GQLBaseFields = objToGraphQLFields(RESERVED_BASE_PROPERTIES);
+const GQLSearchFields = objToGraphQLFields(RESERVED_SEARCH_PROPERTIES);
+const GQLGetterFields = objToGraphQLFields(RESERVED_GETTER_PROPERTIES);
+Object.keys(PropertyDefinition.supportedTypesStandard).forEach((pdk) => {
+  const pdv: IPropertyDefinitionSupportedType =
+    PropertyDefinition.supportedTypesStandard[pdk];
+  if (pdv.gqlDef) {
+    fancyTranslationTypes[pdv.gql] = {
+      output: new GraphQLObjectType({
+        name: pdv.gql + "_Out",
+        fields: objToGraphQLFields(pdv.gqlDef),
+      }),
+      input: new GraphQLInputObjectType({
+        name: pdv.gql + "_In",
+        fields: objToGraphQLFields(pdv.gqlDef),
+      }),
+    };
+  }
+});
 
 function stringToCamelCase(str: string, lowerInstead?: boolean) {
   return (lowerInstead ? str[0].toLowerCase() : str[0].toUpperCase()) +
@@ -45,10 +106,10 @@ function stringToCamelCase(str: string, lowerInstead?: boolean) {
 
 function buildPropertiesToGraphQL(
   properties: IPropertyDefinitionRawJSONDataType[],
-  sep: string,
   searchMode?: boolean,
-) {
-  const result: string[] = [];
+  isInput?: boolean,
+): any {
+  const result = {};
   properties.forEach((property) => {
     const pdv: IPropertyDefinitionSupportedType =
       PropertyDefinition.supportedTypesStandard[property.type];
@@ -60,152 +121,159 @@ function buildPropertiesToGraphQL(
     if (!searchMode) {
       const nullableSymbol = property.nullable ? "" : "!";
       const rawPropertyName = stringToCamelCase(property.id, true);
-      result.push(
-        `${rawPropertyName}: ${pdv.gql}${nullableSymbol}`,
+      result[rawPropertyName] = strToGraphQLType(
+        pdv.gql, !property.nullable, isInput,
       );
       return;
     }
 
     const givenPropertyName = stringToCamelCase(property.id);
+    const valueOverall = strToGraphQLType(
+      pdv.gql, false, isInput,
+    );
     if (pdv.searchInterface ===
       PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE ||
       pdv.searchInterface ===
       PropertyDefinitionSearchInterfacesType.EXACT) {
-      result.push(`exact${givenPropertyName}: ${pdv.gql}`);
+      result[`exact${givenPropertyName}`] = valueOverall;
     }
     if (pdv.searchInterface ===
       PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE) {
-      result.push(`from${givenPropertyName}: ${pdv.gql}`);
-      result.push(`to${givenPropertyName}: ${pdv.gql}`);
+      result[`from${givenPropertyName}`] = valueOverall;
+      result[`to${givenPropertyName}`] = valueOverall;
     }
     if (pdv.searchInterface ===
       PropertyDefinitionSearchInterfacesType.FTS) {
-      result.push(`search${givenPropertyName}: ${pdv.gql}`);
+      result[`search${givenPropertyName}`] = valueOverall;
     }
     if (pdv.searchInterface ===
       PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE) {
-      result.push(`given${givenPropertyName}: ${pdv.gql}`);
-      result.push(`radius${givenPropertyName}: Number`);
+      result[`given${givenPropertyName}`] = valueOverall;
+      result[`radius${givenPropertyName}`] = valueOverall;
     }
   });
 
-  return result.join(sep);
+  return result;
 }
 
 // TODO need to add item data in the item definition
 // both in query and search sink in properties
-
-function buildGraphQLSchemaItemDefinition(
-  parentModule: IModuleRawJSONDataType,
-  prefix: string,
-  itemDef: IItemDefinitionRawJSONDataType,
-): string {
-  const itemDefNameInSchema = stringToCamelCase(itemDef.name);
-  const resultItemDefinition = `"""
-Implementation for the item definition for '${itemDef.name}' in module '${parentModule.name}'
-"""
-type ${prefix}${itemDefNameInSchema} implements ${stringToCamelCase(parentModule.name)}Base {
-  ${buildPropertiesToGraphQL(itemDef.properties || [], ",\n  ")}
-}
-`;
-  return resultItemDefinition + "\n" + (itemDef.childDefinitions || []).map((cd) => {
-    return buildGraphQLSchemaItemDefinition(
-      parentModule,
-      prefix + "_" + itemDefNameInSchema + "_",
-      cd,
-    );
-}).join("\n");
-}
-
-function buildGraphQLSchemaModule(mod: IModuleRawJSONDataType): string {
-  const moduleNameInSchema = stringToCamelCase(mod.name);
-  const resultMod = `"""
-Implementation for module level querying using property extensions for '${mod.name}'
-"""
-interface ${moduleNameInSchema}Base implements __Base {
-  ${buildPropertiesToGraphQL(mod.propExtensions || [], ",\n  ")}
-}
-`;
-  return resultMod + "\n" + (mod.children || []).map((c) => {
-    if (c.type === "module") {
-      return buildGraphQLSchemaModule(c);
-    }
-    return buildGraphQLSchemaItemDefinition(mod, moduleNameInSchema + "_", c);
-  }).join("\n");
-}
-
-function buildGraphQLSchemaRoot(root: IRootRawJSONDataType) {
-  return (root.children || []).map(buildGraphQLSchemaModule).join("\n");
-}
+// TODO mutations
 
 function buildGraphQLSchemaQueriesItemDefinition(
-  parentModule: IModuleRawJSONDataType,
-  prefix: string,
+  moduleInterface: GraphQLInterfaceType,
+  queryPrefix: string,
   schemaPrefix: string,
   itemDef: IItemDefinitionRawJSONDataType,
-): string {
-  const itemDefNameInQuery = stringToCamelCase(itemDef.name, true);
-  const itemDefNameInSchema = stringToCamelCase(itemDef.name);
-  const resultItemDefinitionSingle = `  ${prefix}${itemDefNameInQuery}(
-    token: String,
-    id: ID!
-  ): ${schemaPrefix}${stringToCamelCase(itemDef.name)}!`;
-  const resultItemDefinitionMultiple = `  search_${prefix}${itemDefNameInQuery} (
-    token: String,
-    firstResult: Int!,
-    limit: Int!${
-      itemDef.properties && itemDef.properties.length ?
-      ",\n    " + buildPropertiesToGraphQL(itemDef.properties, ",\n    ", true) :
-      ""
-    }
-  ): [${schemaPrefix}${stringToCamelCase(itemDef.name)}!]!,`;
+): any {
+  const itemDefNameInQuery = queryPrefix + stringToCamelCase(itemDef.name, true);
+  const itemDefNameInSchema = schemaPrefix + stringToCamelCase(itemDef.name);
 
-  return resultItemDefinitionSingle + "\n" +
-    resultItemDefinitionMultiple + "\n" + (itemDef.childDefinitions || []).map((cd) => {
-      return buildGraphQLSchemaQueriesItemDefinition(
-        parentModule,
-        prefix + "_" + itemDefNameInQuery + "_",
-        schemaPrefix + "_" + itemDefNameInSchema + "_",
-        cd,
-      );
-    });
+  const itemDefinitionType = new GraphQLObjectType({
+    name: itemDefNameInSchema,
+    interfaces: [
+      moduleInterface,
+    ],
+    fields: {
+      ...buildPropertiesToGraphQL(itemDef.properties || []),
+    },
+  });
+
+  const singleItemDefQuery = {
+    name: itemDefNameInQuery,
+    type: itemDefinitionType,
+    args: GQLGetterFields,
+  };
+  const multipleItemDefQuery = {
+    name: "search_" + itemDefNameInQuery,
+    type: new GraphQLList(itemDefinitionType),
+    args: {
+      ...GQLSearchFields,
+      ...buildPropertiesToGraphQL(itemDef.properties || [], true, true),
+    },
+  };
+
+  let finalObj = {};
+  finalObj[itemDefNameInQuery] = singleItemDefQuery;
+  finalObj["search_" + itemDefNameInQuery] = multipleItemDefQuery;
+  (itemDef.childDefinitions || []).map((cd) => {
+    finalObj = {...finalObj, ...buildGraphQLSchemaQueriesItemDefinition(
+      moduleInterface,
+      itemDefNameInQuery + "_",
+      itemDefNameInSchema + "_",
+      cd,
+    )};
+  });
+  return finalObj;
 }
 
-function buildGraphQLSchemaQueriesModule(mod: IModuleRawJSONDataType): string {
+/**
+ * Build the queries for the module
+ * @param mod a module from the root or another module
+ */
+function buildGraphQLSchemaQueriesModule(mod: IModuleRawJSONDataType): any {
   const moduleNameInQuery = stringToCamelCase(mod.name, true);
   const moduleNameInSchema = stringToCamelCase(mod.name);
-  const resultMod = `  ${moduleNameInQuery}(
-    token: String,
-    firstResult: Int!,
-    limit: Int!${
-      mod.propExtensions && mod.propExtensions.length ?
-      ",\n    " + buildPropertiesToGraphQL(mod.propExtensions, ",\n    ", true) :
-      ""
-    }
-  ): [${stringToCamelCase(mod.name)}Base!]!,`;
-  return resultMod + "\n" + (mod.children || []).map((c) => {
+
+  const moduleBaseInterface = new GraphQLInterfaceType({
+    name: moduleNameInSchema,
+    fields: {
+      ...GQLBaseFields,
+      ...buildPropertiesToGraphQL(mod.propExtensions || []),
+    },
+  });
+
+  const moduleQuery = {
+    name: moduleNameInQuery,
+    type: new GraphQLList(moduleBaseInterface),
+    args: {
+      ...GQLSearchFields,
+      ...buildPropertiesToGraphQL(mod.propExtensions || [], true, true),
+    },
+  };
+
+  let finalObj = {};
+  finalObj[moduleNameInQuery] = moduleQuery;
+  (mod.children || []).map((c) => {
     if (c.type === "module") {
-      return buildGraphQLSchemaQueriesModule(c);
+      finalObj = {...finalObj, ...buildGraphQLSchemaQueriesModule(c)};
+    } else {
+      finalObj = {...finalObj, ...buildGraphQLSchemaQueriesItemDefinition(
+        moduleBaseInterface,
+        moduleNameInQuery + "_",
+        moduleNameInSchema + "_",
+        c,
+      )};
     }
-    return buildGraphQLSchemaQueriesItemDefinition(
-      mod,
-      moduleNameInQuery + "_",
-      moduleNameInSchema + "_",
-      c,
-    );
-  }).join("\n");
+  });
+  return finalObj;
 }
 
-function buildGraphQLSchemaQueriesRoot(root: IRootRawJSONDataType) {
-  return `"""
-Queries
-"""
-type Query {
-${root.children.map(buildGraphQLSchemaQueriesModule)}
-}
-`;
+/**
+ * Builds the queries from the root
+ * @param root the root of the itemize definition
+ */
+function buildGraphQLSchemaQueriesRoot(root: IRootRawJSONDataType): any {
+  let finalObj = {};
+  root.children.forEach((mod) => {
+    finalObj = {...finalObj, ...buildGraphQLSchemaQueriesModule(mod)};
+  });
+  return finalObj;
 }
 
+/**
+ * Takes an itemize root and generates a graphql definition
+ * from it
+ * @param root The root of the json definition
+ */
 export function buildGraphQLSchema(root: IRootRawJSONDataType) {
-  return `${BASE_TEMPLATE}${buildGraphQLSchemaRoot(root)}${buildGraphQLSchemaQueriesRoot(root)}`;
+  const rootQueries = buildGraphQLSchemaQueriesRoot(root);
+  const config: GraphQLSchemaConfig = {
+    query: new GraphQLObjectType({
+      name: "Query",
+      fields: rootQueries,
+    }),
+  };
+  const result = new GraphQLSchema(config);
+  return printSchema(result);
 }

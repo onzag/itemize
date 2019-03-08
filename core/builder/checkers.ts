@@ -30,8 +30,11 @@ import {
   IConditionalRuleSetRawJSONDataType,
 } from "../base/ItemDefinition/ConditionalRuleSet";
 import {
-  RESERVED_PROPERTIES,
+  RESERVED_BASE_PROPERTIES,
+  RESERVED_SEARCH_PROPERTIES,
+  RESERVED_GETTER_PROPERTIES,
 } from "../constants";
+import "source-map-support/register";
 
 export function checkConditionalRuleSet(
   rawData: IConditionalRuleSetRawJSONDataType,
@@ -385,7 +388,9 @@ export function checkPropertyDefinition(
   parentModule: IModuleRawJSONDataType,
   traceback: Traceback,
 ) {
-  if (Object.keys(RESERVED_PROPERTIES).includes(rawData.id)) {
+  if (Object.keys(RESERVED_BASE_PROPERTIES).includes(rawData.id) ||
+    Object.keys(RESERVED_SEARCH_PROPERTIES).includes(rawData.id) ||
+    Object.keys(RESERVED_GETTER_PROPERTIES).includes(rawData.id)) {
     throw new CheckUpError(
       "Property '" + rawData.id + "' is reserved",
       traceback.newTraceToBit("id"),

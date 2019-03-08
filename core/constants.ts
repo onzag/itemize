@@ -55,11 +55,20 @@ export const CLASSIC_DISTANCE_I18N = [
 ];
 
 // INVALID RESERVED PROPERTY NAMES
-export const RESERVED_PROPERTIES = {
+export const RESERVED_BASE_PROPERTIES = {
   id: "ID!",
   createdAt: "String!",
   editedAt: "String",
   createdBy: "ID!",
   reviewedAt: "String",
   reviewedBy: "ID",
+};
+export const RESERVED_SEARCH_PROPERTIES = {
+  token: "String",
+  firstResult: "Int!",
+  limit: "Int!",
+};
+export const RESERVED_GETTER_PROPERTIES = {
+  token: "String",
+  id: "Int!",
 };

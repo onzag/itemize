@@ -132,7 +132,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   integer: {
     // an integer is represented as a number
     json: "number",
-    gql: "Float",
+    gql: "Int",
     // it gotta be validated to check it's a number
     validate: (n: PropertyDefinitionSupportedIntegerType) =>
       !isNaN(NaN) && parseInt(n as any, 10) === n &&
@@ -195,7 +195,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   currency: {
     gql: "__PropertyType__Currency",
     gqlDef: {
-      value: "Number!",
+      value: "Float!",
       currency: "String!",
     },
     // locations just contain this basic data
@@ -345,8 +345,8 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   location: {
     gql: "__PropertyType__Location",
     gqlDef: {
-      lng: "Number!",
-      lat: "Number!",
+      lng: "Float!",
+      lat: "Float!",
       txt: "String",
     },
     // locations just contain this basic data
