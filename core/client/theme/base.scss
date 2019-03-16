@@ -1,0 +1,37 @@
+@mixin prefix($property, $prefixes, $values...) {
+  @each $prefix in $prefixes {
+    #{"-" + $prefix + "-" + $property}: $values;
+  }
+
+  #{$property}: $values;
+}
+
+*, *::before, *::after {
+  @include prefix(drag, webkit ms o moz, none);
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+  
+html {
+  height: 100%;
+  width: 100%;
+}
+  
+body {
+  overflow-y: auto;
+}
+  
+ul, ol {
+  padding: 0;
+  list-style-type: none;
+}
+  
+li {
+  padding: 0;
+  display: inline-block;
+}
+  
+a {
+  text-decoration: none;
+}
