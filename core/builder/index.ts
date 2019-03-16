@@ -841,7 +841,7 @@ async function getI18nData(
       );
     } else if (!properties[locale].properties[property.id]) {
       throw new CheckUpError(
-        "Does not include 'properties' data for '" + locale + "' in '" + 
+        "Does not include 'properties' data for '" + locale + "' in '" +
           property.id + "'",
         localeFileTraceback,
       );
