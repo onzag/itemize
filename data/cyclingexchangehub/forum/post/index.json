@@ -15,14 +15,14 @@
 			"autocompleteIsEnforced": true
 		},
     {
-			"id": "parentItemType",
+			"id": "parent_item_type",
 			"type": "string",
 			"nullable": true,
       "hidden": true,
       "searchLevel": "disabled"
 		},
     {
-			"id": "parentId",
+			"id": "parent_id",
 			"type": "number",
 			"nullable": true,
       "hidden": true,

@@ -110,8 +110,9 @@ export function checkItemDefinition(
   }
 
   if (rawData.includes) {
+    const idPool: string[] = [];
     rawData.includes.forEach((itm, index) =>
-      checkItem(itm, rawData, parentModule,
+      checkItem(itm, rawData, parentModule, idPool,
         actualTraceback.newTraceToBit("includes").newTraceToBit(index)));
   }
 
@@ -127,8 +128,17 @@ export function checkItem(
   rawData: IItemRawJSONDataType,
   parentItemDefinition: IItemDefinitionRawJSONDataType,
   parentModule: IModuleRawJSONDataType,
+  idPool: string[],
   traceback: Traceback,
 ) {
+  if (idPool.includes(rawData.id)) {
+    throw new CheckUpError(
+      "Duplicate id in the same item definition",
+      traceback.newTraceToBit("id"),
+    );
+  }
+  idPool.push(rawData.id);
+
   const isGroup = !!rawData.items;
 
   // check whether the item definition exists for this item
@@ -141,16 +151,9 @@ export function checkItem(
     );
   }
 
-  if (!isGroup && rawData.id) {
-    throw new CheckUpError(
-      "Using id in a named non grouped item",
-      traceback.newTraceToBit("id"),
-    );
-  }
-
   if (isGroup) {
     rawData.items.forEach((itm, index) =>
-      checkItem(itm, parentItemDefinition, parentModule,
+      checkItem(itm, parentItemDefinition, parentModule, idPool,
         traceback.newTraceToBit("items").newTraceToBit(index)));
   }
 
@@ -393,11 +396,6 @@ export function checkPropertyDefinition(
     Object.keys(RESERVED_GETTER_PROPERTIES).includes(rawData.id)) {
     throw new CheckUpError(
       "Property '" + rawData.id + "' is reserved",
-      traceback.newTraceToBit("id"),
-    );
-  } else if (rawData.id.startsWith("_")) {
-    throw new CheckUpError(
-      "Property '" + rawData.id + "' starts with underscore, and that's invalid",
       traceback.newTraceToBit("id"),
     );
   }

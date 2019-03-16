@@ -1,5 +1,5 @@
 {
-  "entry": "cyclingexchangehq",
-  "appName": "Cycling Exchange Headquarters",
+  "entry": "cyclingexchangehub",
+  "appName": "Cycling Exchange Hub",
   "port": 8080
 }

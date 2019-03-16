@@ -102,7 +102,10 @@ export async function getActualFileLocation(
  * @param  location the file location in question
  * @returns          the name
  */
-export async function getActualFileIdentifier(location: string) {
+export async function getActualFileIdentifier(
+  location: string,
+  traceback: Traceback,
+) {
   // we split the location in its components
   const locationSplitted = location.replace(".json", "").split(path.sep);
   // let's get the name of the file
@@ -114,6 +117,10 @@ export async function getActualFileIdentifier(location: string) {
   if (name === "index") {
     // so we use the name of the parent folder
     name = locationSplitted.pop();
+  }
+
+  if (!(/[a-z_]+/g).test(name)) {
+    throw new CheckUpError(`Invalid resulting file name '${name}'`, traceback);
   }
 
   return name;

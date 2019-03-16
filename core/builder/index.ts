@@ -362,7 +362,10 @@ async function processModule(
 ) {
   ajvCheck(checkModuleSchemaValidate, fileData, traceback);
 
-  const actualName = await getActualFileIdentifier(actualLocation);
+  const actualName = await getActualFileIdentifier(
+    actualLocation,
+    traceback,
+  );
   const i18nName = await getI18nName(
     supportedLanguages,
     actualLocation,
@@ -473,7 +476,11 @@ async function processItemDefinition(
 ) {
   ajvCheck(checkItemDefinitionSchemaValidate, fileData, traceback);
 
-  const actualName = await getActualFileIdentifier(actualLocation);
+  const actualName = await getActualFileIdentifier(
+    actualLocation,
+    traceback,
+  );
+
   const i18nName = await getI18nName(
     supportedLanguages,
     actualLocation,
@@ -735,12 +742,15 @@ async function processItemI18nName(
 
   const isGroup = !!item.items;
 
-  let foundLanguageDataInOneFile = false;
+  // Whether we found the language data for a locale
+  let foundLanguageData = false;
 
   // use the same technique we used before to get the name
   supportedLanguages.forEach((locale) => {
     if (!properties[locale]) {
-      if (isGroup || foundLanguageDataInOneFile) {
+      // Groups are required to have language data
+      // also if we found language data for another locale
+      if (isGroup || foundLanguageData) {
         throw new CheckUpError(
           "File does not include language data for " + locale,
           localeFileTraceback,
@@ -748,7 +758,7 @@ async function processItemI18nName(
       }
       return;
     } else if (!properties[locale].item) {
-      if (isGroup || foundLanguageDataInOneFile) {
+      if (isGroup || foundLanguageData) {
         throw new CheckUpError(
           "File does not have item data for " + locale,
           localeFileTraceback,
@@ -756,7 +766,7 @@ async function processItemI18nName(
       }
       return;
     } else if (typeof properties[locale].item[item.id] !== "string") {
-      if (isGroup || foundLanguageDataInOneFile) {
+      if (isGroup || foundLanguageData) {
         throw new CheckUpError(
           "File does not have item data for " + locale + " in " + item.id,
           localeFileTraceback,
@@ -764,7 +774,7 @@ async function processItemI18nName(
       }
       return;
     }
-    foundLanguageDataInOneFile = true;
+    foundLanguageData = true;
     i18nName[locale] = properties[locale].item[item.id].trim();
   });
 

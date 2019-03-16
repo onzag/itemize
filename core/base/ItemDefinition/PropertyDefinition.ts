@@ -943,7 +943,7 @@ if (process.env.NODE_ENV !== "production") {
     properties: {
       id: {
         type: "string",
-        pattern: "^[a-zA-Z0-9-]+$",
+        pattern: "^[a-z_]+$",
       },
       i18nData: {
         type: "object",

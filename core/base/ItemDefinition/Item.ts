@@ -19,7 +19,7 @@ export interface IItemGroupHandle {
 
 // this is what our raw json looks like
 export interface IItemRawJSONDataType {
-  id?: string;
+  id: string;
   name?: string;
   i18nName?: {
     [locale: string]: string,
@@ -444,10 +444,11 @@ if (process.env.NODE_ENV !== "production") {
     properties: {
       id: {
         type: "string",
-        pattern: "^[a-zA-Z0-9-]+$",
+        pattern: "^[a-z_]+$",
       },
       name: {
         type: "string",
+        pattern: "^[a-z_]+$",
       },
       enforcedProperties: {
         $ref: PropertiesValueMappingDefiniton.schema.$id,
