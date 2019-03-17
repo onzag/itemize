@@ -1,6 +1,6 @@
 import * as React from "react";
-import { LocaleContext } from "../app";
-import { LocaleDataContext } from "../app";
+import { LocaleContext, LocaleDataContext, DataContext, ILocaleType } from "../app";
+import DevToolRoot from "./droot";
 
 const devtoolsStyle: {
   [name: string]: React.CSSProperties,
@@ -32,12 +32,12 @@ const devtoolsStyle: {
     padding: 10,
     fontSize: 10,
     backgroundColor: "#283593",
-    color: "#ffffff"
+    color: "#ffffff",
   },
   singeLocaleChanger: {
     textDecoration: "underline",
-    cursor: "pointer"
-  }
+    cursor: "pointer",
+  },
 };
 
 interface IDevToolsState {
@@ -58,6 +58,9 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
     this.setState({
       opened: !this.state.opened,
     });
+  }
+  public changeLocale(currentLocale: ILocaleType, newLocaleName: string) {
+    currentLocale.changeTo(newLocaleName);
   }
   public render() {
     const baseStyle = {
@@ -81,16 +84,17 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
                     Current Locale
                     <b> {locale.state} - {localeData.locales[locale.state]} </b>
                     {
-                      locale.updating ? 
+                      locale.updating ?
                       "Updating..." :
                       <React.Fragment>
                         Supports:
-                        {Object.keys(localeData.locales).map(localeName =>
+                        {Object.keys(localeData.locales).map((localeName) =>
                           <React.Fragment key={localeName}>
                             &nbsp;
                             <span
                              style={devtoolsStyle.singeLocaleChanger}
-                             onClick={()=>locale.changeTo(localeName)}>
+                             onClick={this.changeLocale.bind(this, locale, localeName)}
+                            >
                              {localeName} - {localeData.locales[localeName]}
                             </span>
                           </React.Fragment>)}
@@ -104,9 +108,30 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
         </div>
       );
 
-      internalContent = <div style={devtoolsStyle.internalContent}>
-        {internalLocaleContent}
-      </div>
+      const moduleExplorer = (
+        <div>
+          <LocaleContext.Consumer>
+            {(locale) =>
+              <DataContext.Consumer>
+                {(data) =>
+                  <DevToolRoot
+                   data={data.value}
+                   locale={locale.state}
+                   raw={data.raw}
+                  />
+                }
+              </DataContext.Consumer>
+            }
+          </LocaleContext.Consumer>
+        </div>
+      );
+
+      internalContent = (
+        <div style={devtoolsStyle.internalContent}>
+          {internalLocaleContent}
+          {moduleExplorer}
+       </div>
+      );
     }
     return (
       <div style={baseStyle}>

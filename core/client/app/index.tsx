@@ -1,22 +1,27 @@
 import * as React from "react";
 import DevTools from "../devtools";
-import { IRootRawJSONDataType } from "../../base/Root";
+import Root, { IRootRawJSONDataType } from "../../base/Root";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 if (isDevelopment) {
   console.info("Starting Development Mode, Have Fun :)");
 }
 
-interface ILocaleDataType {
+export interface ILocaleDataType {
  locales: {
     [locale: string]: string,
   };
 }
 
-interface ILocaleType {
+export interface ILocaleType {
   changeTo: (locale: string) => Promise<void>;
   state: string;
   updating: boolean;
+}
+
+export interface IDataType {
+  raw: IRootRawJSONDataType;
+  value: Root;
 }
 
 interface IAppProps {
@@ -28,12 +33,13 @@ interface IAppProps {
 interface IAppState {
   specifiedLocale: string;
   specifiedData: IRootRawJSONDataType;
+  specifiedProcessedData: Root;
   localeIsUpdating: boolean;
 }
 
 export const LocaleContext = React.createContext<ILocaleType>(null);
 export const LocaleDataContext = React.createContext<ILocaleDataType>(null);
-export const DataContext = React.createContext<IRootRawJSONDataType>(null);
+export const DataContext = React.createContext<IDataType>(null);
 
 export default class App extends React.Component<IAppProps, IAppState> {
   constructor(props: IAppProps) {
@@ -43,12 +49,13 @@ export default class App extends React.Component<IAppProps, IAppState> {
       specifiedLocale: props.initialLocale,
       localeIsUpdating: false,
       specifiedData: props.initialData,
+      specifiedProcessedData: new Root(props.initialData),
     };
 
     this.changeLocale = this.changeLocale.bind(this);
   }
   public async changeLocale(locale: string) {
-    if (this.state.localeIsUpdating){
+    if (this.state.localeIsUpdating) {
       console.warn("Attempted to update locale to " + locale + " while on update");
     }
 
@@ -64,6 +71,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     this.setState({
       specifiedData: newData,
+      specifiedProcessedData: new Root(newData),
       specifiedLocale: locale,
       localeIsUpdating: false,
     });
@@ -74,9 +82,13 @@ export default class App extends React.Component<IAppProps, IAppState> {
       changeTo: this.changeLocale,
       updating: this.state.localeIsUpdating,
     };
+    const dataContextValue: IDataType = {
+      raw: this.state.specifiedData,
+      value: this.state.specifiedProcessedData,
+    };
     return (
       <LocaleContext.Provider value={localeContextValue}>
-        <DataContext.Provider value={this.state.specifiedData}>
+        <DataContext.Provider value={dataContextValue}>
           <LocaleDataContext.Provider value={this.props.localeData}>
             <h1>It works!</h1>
 
