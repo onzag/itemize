@@ -3,11 +3,11 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   mode: 'production',
-  entry: './core/client/index.ts',
+  entry: ["babel-polyfill", './core/client/index.tsx'],
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "build.css",
-      chunkFilename: "build.css"
+      filename: "build.production.css",
+      chunkFilename: "build.production.css"
     })
   ],
   resolve: {

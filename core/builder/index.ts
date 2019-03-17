@@ -168,7 +168,7 @@ async function buildData(entry: string) {
     location: actualLocation,
     pointers: fileData.pointers,
     children: fileData.data.includes ?
-      (await processIncludes(
+      (await buildIncludes(
         supportedLanguages,
         path.dirname(actualLocation),
         path.dirname(actualLocation),
@@ -196,7 +196,11 @@ async function buildData(entry: string) {
   console.log("emiting " + colors.green("./dist/data/lang.json"));
   await fsAsync.writeFile(
     "./dist/data/lang.json",
-    JSON.stringify(supportedLanguages),
+    JSON.stringify(await buildLang(
+      supportedLanguages,
+      actualLocation,
+      traceback.newTraceToBit("lang"),
+    )),
   );
 
   const rootTest = new Root(resultJSON);
@@ -228,6 +232,52 @@ async function buildData(entry: string) {
 }
 
 /**
+ * Build the core language data that holds information
+ * about the language itself and other localizables
+ * @param supportedLanguages the array of supported languages
+ * @param actualRootLocation the root location that sets these languages
+ * @param traceback the traceback in the location
+ */
+async function buildLang(
+  supportedLanguages: string[],
+  actualRootLocation: string,
+  traceback: Traceback,
+) {
+  const languageFileLocation = actualRootLocation
+    .replace(".json", ".properties");
+
+  await checkExists(
+    languageFileLocation,
+    traceback,
+  );
+
+  const properties = PropertiesReader(languageFileLocation).path();
+  const result: {
+    locales: {
+      [key: string]: string,
+    },
+  } = {
+    locales: {},
+  };
+
+  // and start to loop
+  supportedLanguages.forEach((locale, index) => {
+    const internalTraceback = traceback.newTraceToBit(index);
+
+    if (!properties[locale]) {
+      throw new CheckUpError(
+        "File does not include language data for '" + locale + "'",
+        internalTraceback,
+      );
+    }
+
+    result.locales[locale] = properties[locale];
+  });
+
+  return result;
+}
+
+/**
  * this processes all the included files
  * whether modules or items
  * @param  supportedLanguages           an array with things like EN, ES, etc...
@@ -238,7 +288,7 @@ async function buildData(entry: string) {
  * @param  childrenMustBeModule         throws an error if children is item def
  * @returns                              an array with raw modules and items
  */
-async function processIncludes(
+async function buildIncludes(
   supportedLanguages: string[],
   parentFolder: string,
   lastModuleDirectory: string,
@@ -307,7 +357,7 @@ async function processIncludes(
       }
 
       // we would process a module
-      result.push(await processModule(
+      result.push(await buildModule(
         supportedLanguages,
         actualLocation,
         fileData.data,
@@ -323,7 +373,7 @@ async function processIncludes(
         );
       }
       // we would process an item
-      result.push(await processItemDefinition(
+      result.push(await buildItemDefinition(
         supportedLanguages,
         actualLocation,
         lastModuleDirectory,
@@ -352,7 +402,7 @@ async function processIncludes(
  * @param fileData the data that file contains
  * @returns a raw module
  */
-async function processModule(
+async function buildModule(
   supportedLanguages: string[],
   actualLocation: string,
   fileData: IFileModuleDataRawUntreatedJSONDataType,
@@ -433,7 +483,7 @@ async function processModule(
     location: actualLocation,
     pointers,
     raw,
-    children: fileData.includes ? await processIncludes(
+    children: fileData.includes ? await buildIncludes(
       supportedLanguages,
       actualLocationDirectory,
       actualLocationDirectory,
@@ -465,7 +515,7 @@ async function processModule(
  * @param fileData the file data raw and untreated
  * @returns a raw treated item
  */
-async function processItemDefinition(
+async function buildItemDefinition(
   supportedLanguages: string[],
   actualLocation: string,
   lastModuleDirectory: string,
@@ -511,7 +561,7 @@ async function processItemDefinition(
   // several smaller sub items
   if (path.basename(actualLocation) === "index.json") {
     childDefinitions =
-      (await processIncludes(
+      (await buildIncludes(
         supportedLanguages,
         path.dirname(actualLocation),
         lastModuleDirectory,
@@ -635,7 +685,7 @@ async function processItemDefinition(
 
     finalValue.includes = await Promise.all<IItemRawJSONDataType>
       (finalValue.includes.map((item, index) => {
-        return processItemI18nName(
+        return buildItemI18nName(
           supportedLanguages,
           actualLocation,
           item,
@@ -700,7 +750,7 @@ async function getI18nName(
  * @param item the item itself
  * @returns the item modified
  */
-async function processItemI18nName(
+async function buildItemI18nName(
   supportedLanguages: string[],
   actualLocation: string,
   item: IItemRawJSONDataType,
@@ -712,7 +762,7 @@ async function processItemI18nName(
     // we process those too, recursively
     item.items = await Promise.all<IItemRawJSONDataType>
       (item.items.map((internalItem, index) => {
-        return processItemI18nName(
+        return buildItemI18nName(
           supportedLanguages,
           actualLocation,
           internalItem,

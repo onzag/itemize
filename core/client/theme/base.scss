@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese');
+
 @mixin prefix($property, $prefixes, $values...) {
   @each $prefix in $prefixes {
     #{"-" + $prefix + "-" + $property}: $values;
@@ -13,13 +15,10 @@
   padding: 0;
 }
   
-html {
+html, body, #root, #app {
+  font-family: 'Open Sans', sans-serif;
   height: 100%;
   width: 100%;
-}
-  
-body {
-  overflow-y: auto;
 }
   
 ul, ol {

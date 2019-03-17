@@ -3,12 +3,12 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   mode: 'development',
-  entry: './core/client/index.ts',
+  entry: ["babel-polyfill", './core/client/index.tsx'],
   devtool: 'inline-source-map',
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "build.css",
-      chunkFilename: "build.css"
+      filename: "build.development.css",
+      chunkFilename: "build.development.css"
     })
   ],
   resolve: {

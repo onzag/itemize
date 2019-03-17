@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>%{appName}</title>
-        <link rel="stylesheet" href="/build.css"/>
+        <link rel="stylesheet" href="/resource/build.production.css"/>
     </head>
     <body><div id="root"><div id="app"></div></div></body>
     <script>
@@ -11,6 +11,15 @@
         script.type = "text/javascript";
         if (localStorage && localStorage.getItem("__dev")) {
             script.src = "/resource/build.development.js";
+
+            var element = document.getElementsByTagName("link")[0];
+            element.parentNode.removeChild(element);
+
+            var newStylesheet = document.createElement("link");
+            newStylesheet.href = "/resource/build.development.css";
+            newStylesheet.rel = "stylesheet";
+
+            document.head.appendChild(newStylesheet);
         } else {
             script.src = "/resource/build.production.js";
 
@@ -26,5 +35,6 @@
         document.head.appendChild(script);
 
         var BUILD_NUMBER = "%{BUILD_NUMBER}";
+        var APP_NAME = "%{appName}";
     </script>
 </html>
