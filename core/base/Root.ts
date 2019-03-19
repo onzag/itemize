@@ -36,26 +36,38 @@ export default class Root {
 
   /**
    * Provides all the modules it contains
-   * @param onStateChange the state change function that the modules
    * should follow
    */
-  public getAllModules(onStateChange: () => any) {
-    return this.rawData.children.map((m) => (new Module(m, onStateChange)));
+  public getAllModules() {
+    return this.rawData.children.map((m) => (new Module(m)));
   }
 
   /**
    * Gets a specific module given its name
-   * @param name the name of the module
-   * @param onStateChange the on state change function to apply to it
+   * @param name the full path name of the module
    */
-  public getModule(name: string, onStateChange: () => any) {
-    const rawModuleData = this.rawData.children.find((m) => m.name === name);
-    if (!rawModuleData) {
-      throw new Error("invalid module " + name);
+  public getModule(name: string[]) {
+    if (name.length === 0) {
+      throw new Error("invalid module with no path");
     }
+
+    const nameConsumable = [...name];
+    let currentModule: IModuleRawJSONDataType = null;
+    let currentModuleName = nameConsumable.pop();
+    while (currentModuleName) {
+      currentModule = (currentModule || this.rawData).children
+        .filter((c) => c.type === "module")
+        .find((m) => m.name === currentModuleName) as IModuleRawJSONDataType;
+
+      if (!currentModule) {
+        throw new Error("invalid module " + name.join("/"));
+      }
+
+      currentModuleName = nameConsumable.pop();
+    }
+
     return new Module(
-      rawModuleData,
-      onStateChange,
+      currentModule,
     );
   }
 }

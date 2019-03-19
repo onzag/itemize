@@ -17,7 +17,7 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   MAX_SUPPORTED_YEAR,
   MIN_SUPPORTED_YEAR,
   MAX_CURRENCY_DECIMAL_COUNT} from "../../constants";
-import Module from "../Module";
+import Module, { OnStateChangeListenerType } from "../Module";
 
 // All the supported property types
 export type PropertyDefinitionSupportedTypes =
@@ -615,7 +615,7 @@ export default class PropertyDefinition {
     | PropertyDefinition;
 
   // representing the state of the class
-  private onStateChange: () => any;
+  private onStateChangeListeners: OnStateChangeListenerType[];
   private stateValue: PropertyDefinitionSupportedType;
   private stateValueModified: boolean;
 
@@ -623,14 +623,12 @@ export default class PropertyDefinition {
    * Builds a property definition
    * @param rawJSON the raw json structure
    * @param parentItemDefinition the parent item definition
-   * @param onStateChange the on state change function
    */
   constructor(
     rawJSON: IPropertyDefinitionRawJSONDataType,
     parentModule: Module,
     parentItemDefinition: ItemDefinition,
     isExtension: boolean,
-    onStateChange: () => any,
   ) {
     // set the default value
     this.defaultIf = rawJSON.defaultIf && rawJSON.defaultIf.map((dif) => ({
@@ -652,7 +650,7 @@ export default class PropertyDefinition {
     this.isExtension = isExtension;
 
     // STATE MANAGEMENT
-    this.onStateChange = onStateChange;
+    this.onStateChangeListeners = [];
     // initial value for all namespaces is null
     this.stateValue = null;
     this.stateValueModified = false;
@@ -871,7 +869,7 @@ export default class PropertyDefinition {
     if (newActualValue !== this.stateValue) {
       this.stateValue = newActualValue;
       this.stateValueModified = true;
-      this.onStateChange();
+      this.onStateChangeListeners.forEach((l) => l());
     }
   }
 
@@ -908,6 +906,17 @@ export default class PropertyDefinition {
       return null;
     }
     return this.rawData.i18nData[locale] || null;
+  }
+
+  public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {
+    this.onStateChangeListeners.push(listener);
+  }
+
+  public removeOnStateChangeEventListener(listener: OnStateChangeListenerType) {
+    const index = this.onStateChangeListeners.indexOf(listener);
+    if (index !== -1) {
+      this.onStateChangeListeners.splice(index, 1);
+    }
   }
 }
 

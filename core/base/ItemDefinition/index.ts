@@ -2,7 +2,7 @@ import ConditionalRuleSet from "./ConditionalRuleSet";
 import Item, { IItemRawJSONDataType, IItemGroupHandle } from "./Item";
 import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType } from "./PropertyDefinition";
-import Module, { IModuleRawJSONDataType } from "../Module";
+import Module, { IModuleRawJSONDataType, OnStateChangeListenerType } from "../Module";
 import PropertiesValueMappingDefiniton from "./PropertiesValueMappingDefiniton";
 
 export interface IItemDefinitionRawJSONDataType {
@@ -135,7 +135,6 @@ export default class ItemDefinition {
   }
 
   public rawData: IItemDefinitionRawJSONDataType;
-  private onStateChange: () => any;
   private itemInstances: Item[];
   private childDefinitions: ItemDefinition[];
   private importedChildDefinitions: Array<{
@@ -150,18 +149,16 @@ export default class ItemDefinition {
     rawJSON: IItemDefinitionRawJSONDataType,
     parentModule: Module,
     parentItemDefinition: ItemDefinition,
-    onStateChange: () => any,
   ) {
     this.rawData = rawJSON;
     this.parentModule = parentModule;
     this.parentItemDefinition = parentItemDefinition;
-    this.onStateChange = onStateChange;
 
     // assigning the item definitions that are child by
     // instantiating them
     this.childDefinitions = rawJSON.childDefinitions ? rawJSON.childDefinitions
       .map((d) => (new ItemDefinition(d, this.parentModule,
-        this, onStateChange))) : [];
+        this))) : [];
 
     // Assigning the imported child definitions by
     // instantiating a detached child definition from the
@@ -177,13 +174,13 @@ export default class ItemDefinition {
     // assigning the item instances by using the includes
     // and instantiating those
     this.itemInstances = rawJSON.includes ? rawJSON.includes
-      .map((i) => (new Item(i, parentModule, this, onStateChange))) : [];
+      .map((i) => (new Item(i, parentModule, this))) : [];
 
     // assigning the property definition by using the
     // properties and instantiating those as well
     this.propertyDefinitions = rawJSON.properties ? rawJSON.properties
       .map((i) => (new PropertyDefinition(i, parentModule,
-        this, false, onStateChange))) : [];
+        this, false))) : [];
   }
 
   /**
@@ -413,6 +410,14 @@ export default class ItemDefinition {
   }
 
   /**
+   * Provides the live imported child definitions
+   * without imports
+   */
+  public getImportedChildDefinitions() {
+    return this.importedChildDefinitions.map((icd) => icd.definition);
+  }
+
+  /**
    * Tells whether the callout excludes are allowed
    */
   public areCalloutExcludesAllowed() {
@@ -427,7 +432,7 @@ export default class ItemDefinition {
    */
   public getNewInstance() {
     return new ItemDefinition(this.rawData, this.parentModule,
-      this.parentItemDefinition, this.onStateChange);
+      this.parentItemDefinition);
   }
 
   /**
@@ -437,6 +442,42 @@ export default class ItemDefinition {
    */
   public getI18nNameFor(locale: string) {
     return this.rawData.i18nName[locale] || null;
+  }
+
+  public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {
+    this.childDefinitions.forEach((cd) => {
+      cd.addOnStateChangeEventListener(listener);
+    });
+
+    this.importedChildDefinitions.forEach((icd) => {
+      icd.definition.addOnStateChangeEventListener(listener);
+    });
+
+    this.itemInstances.forEach((ii) => {
+      ii.addOnStateChangeEventListener(listener);
+    });
+
+    this.propertyDefinitions.forEach((pd) => {
+      pd.addOnStateChangeEventListener(listener);
+    });
+  }
+
+  public removeOnStateChangeEventListener(listener: OnStateChangeListenerType) {
+    this.childDefinitions.forEach((cd) => {
+      cd.removeOnStateChangeEventListener(listener);
+    });
+
+    this.importedChildDefinitions.forEach((icd) => {
+      icd.definition.removeOnStateChangeEventListener(listener);
+    });
+
+    this.itemInstances.forEach((ii) => {
+      ii.removeOnStateChangeEventListener(listener);
+    });
+
+    this.propertyDefinitions.forEach((pd) => {
+      pd.removeOnStateChangeEventListener(listener);
+    });
   }
 
   /**

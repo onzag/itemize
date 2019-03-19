@@ -8,7 +8,7 @@ import PropertiesValueMappingDefiniton,
 import ConditionalRuleSet, {
   IConditionalRuleSetRawJSONDataType,
 } from "./ConditionalRuleSet";
-import Module from "../Module";
+import Module, { OnStateChangeListenerType } from "../Module";
 
 export type ItemGateType = "or" | "and" | "xor";
 
@@ -94,7 +94,7 @@ export default class Item {
   private items?: Item[];
 
   // representing the state of the class
-  private onStateChange: () => any;
+  private onStateChangeListeners: OnStateChangeListenerType[];
   private stateIsExcluded: boolean;
   private stateIsExcludedModified: boolean;
   private stateIsPhantomExcluded: boolean;
@@ -106,14 +106,11 @@ export default class Item {
    * @param parentItemDefinition   the item definition that this node is
    * located, its root; for the example above that
    * would be the vehicle item definition
-   * @param onStateChange A function that runs when the state
-   * of the current item changes
    */
   constructor(
     rawJSON: IItemRawJSONDataType,
     parentModule: Module,
     parentItemDefinition: ItemDefinition,
-    onStateChange: () => any,
   ) {
 
     this.rawData = rawJSON;
@@ -123,7 +120,7 @@ export default class Item {
 
     // put the items and the gate in place
     this.items = rawJSON.items && rawJSON.items.map((rawJSONItem) =>
-      (new Item(rawJSONItem, parentModule, parentItemDefinition, onStateChange)));
+      (new Item(rawJSONItem, parentModule, parentItemDefinition)));
 
     // the enforced properties list
     this.enforcedProperties = rawJSON.enforcedProperties &&
@@ -177,7 +174,7 @@ export default class Item {
     this.parentModule = parentModule;
 
     // State management
-    this.onStateChange = onStateChange;
+    this.onStateChangeListeners = [];
     // The initial state is unknown
     // due to the defaults
     // this will never be visible as null because only
@@ -282,7 +279,7 @@ export default class Item {
       this.stateIsExcludedModified = true;
     }
     // trigger an state change
-    this.onStateChange();
+    this.onStateChangeListeners.forEach((l) => l());
   }
 
   /**
@@ -431,6 +428,25 @@ export default class Item {
     }
 
     return this.itemDefinition.getI18nNameFor(locale);
+  }
+
+  public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {
+    this.onStateChangeListeners.push(listener);
+
+    if (this.items) {
+      this.items.forEach((i) => i.addOnStateChangeEventListener(listener));
+    }
+  }
+
+  public removeOnStateChangeEventListener(listener: OnStateChangeListenerType) {
+    const index = this.onStateChangeListeners.indexOf(listener);
+    if (index !== -1) {
+      this.onStateChangeListeners.splice(index, 1);
+    }
+
+    if (this.items) {
+      this.items.forEach((i) => i.removeOnStateChangeEventListener(listener));
+    }
   }
 }
 

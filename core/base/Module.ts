@@ -5,6 +5,8 @@ import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
 } from "./ItemDefinition/PropertyDefinition";
 
+export type OnStateChangeListenerType = () => any;
+
 export interface IModuleRawJSONDataType {
   // Builder data
   type: "module";
@@ -75,21 +77,16 @@ export default class Module {
   }
 
   public rawData: IModuleRawJSONDataType;
-  private childModules: Module[];
   private childItemDefinitions: ItemDefinition[];
   private propExtensions: PropertyDefinition[];
-  private onStateChange: () => any;
 
   /**
    * Builds a module from raw json data
    * @param rawJSON the raw json data
-   * @param onStateChange an function for on state change
    */
-  constructor(rawJSON: IModuleRawJSONDataType, onStateChange: () => any) {
+  constructor(rawJSON: IModuleRawJSONDataType) {
     this.rawData = rawJSON;
-    this.childModules = [];
     this.childItemDefinitions = [];
-    this.onStateChange = onStateChange;
 
     if (rawJSON.propExtensions) {
       this.propExtensions = rawJSON.propExtensions.map((pe) => {
@@ -98,7 +95,6 @@ export default class Module {
           this,
           null,
           true,
-          onStateChange,
         );
       });
     } else {
@@ -107,13 +103,12 @@ export default class Module {
 
     rawJSON.children.forEach((c) => {
       if (c.type === "module") {
-        this.childModules.push(new Module(c, onStateChange));
+        return;
       } else if (c.type === "item") {
         const newItemDefinition = new ItemDefinition(
           c,
           this,
           null,
-          onStateChange,
         );
 
         this.childItemDefinitions.push(
@@ -247,7 +242,6 @@ export default class Module {
       this.getItemDefinitionRawFor(name),
       this,
       null,
-      this.onStateChange,
     );
   }
 
@@ -256,13 +250,6 @@ export default class Module {
    */
   public getAllChildItemDefinitions() {
     return this.childItemDefinitions;
-  }
-
-  /**
-   * Provides all live child modules
-   */
-  public getAllChildModules() {
-    return this.childModules;
   }
 
   /**
@@ -279,6 +266,72 @@ export default class Module {
    */
   public getI18nNameFor(locale: string) {
     return this.rawData.i18nName[locale] || null;
+  }
+
+  /**
+   * list all module names it contains
+   */
+  public listModuleNames() {
+    return this.rawData.children.filter((c) => c.type === "module").map((m) => m.name);
+  }
+
+  /**
+   * Provides all the modules it contains
+   * should follow
+   */
+  public getAllModules() {
+    return this.rawData.children
+      .filter((c) => c.type === "module")
+      .map((m: IModuleRawJSONDataType) => (new Module(m)));
+  }
+
+  /**
+   * Gets a specific module given its name
+   * @param name the name of the module as a path array
+   */
+  public getModule(name: string[]) {
+    if (name.length === 0) {
+      throw new Error("invalid module with no path");
+    }
+
+    const nameConsumable = [...name];
+    let currentModule: IModuleRawJSONDataType = this.rawData;
+    let currentModuleName = nameConsumable.pop();
+    while (currentModuleName) {
+      currentModule = currentModule.children
+        .filter((c) => c.type === "module")
+        .find((m) => m.name === currentModuleName) as IModuleRawJSONDataType;
+
+      if (!currentModule) {
+        throw new Error("invalid module " + name.join("/"));
+      }
+
+      currentModuleName = nameConsumable.pop();
+    }
+
+    return new Module(
+      currentModule,
+    );
+  }
+
+  public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {
+    this.propExtensions.forEach((pe) => {
+      pe.addOnStateChangeEventListener(listener);
+    });
+
+    this.childItemDefinitions.forEach((cd) => {
+      cd.addOnStateChangeEventListener(listener);
+    });
+  }
+
+  public removeOnStateChangeEventListener(listener: OnStateChangeListenerType) {
+    this.propExtensions.forEach((pe) => {
+      pe.removeOnStateChangeEventListener(listener);
+    });
+
+    this.childItemDefinitions.forEach((cd) => {
+      cd.removeOnStateChangeEventListener(listener);
+    });
   }
 }
 

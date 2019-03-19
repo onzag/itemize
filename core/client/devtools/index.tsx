@@ -1,6 +1,6 @@
 import * as React from "react";
 import { LocaleContext, LocaleDataContext, DataContext, ILocaleType } from "../app";
-import DevToolRoot from "./droot";
+import DevToolRoot from "./dRoot";
 
 const devtoolsStyle: {
   [name: string]: React.CSSProperties,
@@ -33,6 +33,7 @@ const devtoolsStyle: {
     fontSize: 10,
     backgroundColor: "#283593",
     color: "#ffffff",
+    overflow: "auto",
   },
   singeLocaleChanger: {
     textDecoration: "underline",
@@ -115,9 +116,8 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
               <DataContext.Consumer>
                 {(data) =>
                   <DevToolRoot
-                   data={data.value}
+                   root={data.value}
                    locale={locale.state}
-                   raw={data.raw}
                   />
                 }
               </DataContext.Consumer>
