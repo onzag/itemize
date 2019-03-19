@@ -285,6 +285,7 @@ export default class ItemDefinition {
       this.rawData,
       this.parentModule.rawData,
       name,
+      avoidImports,
     );
     //
     if (!definition) {
@@ -292,6 +293,14 @@ export default class ItemDefinition {
         name + " failed");
     }
     return definition;
+  }
+
+  /**
+   * Provides all the property definitions without
+   * including the extensions
+   */
+  public getAllPropertyDefinitions() {
+    return this.propertyDefinitions;
   }
 
   /**

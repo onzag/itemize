@@ -630,6 +630,8 @@ export default class PropertyDefinition {
     parentItemDefinition: ItemDefinition,
     isExtension: boolean,
   ) {
+    this.rawData = rawJSON;
+
     // set the default value
     this.defaultIf = rawJSON.defaultIf && rawJSON.defaultIf.map((dif) => ({
       value: dif.value,
@@ -671,6 +673,14 @@ export default class PropertyDefinition {
    */
   public getId() {
     return this.rawData.id;
+  }
+
+  /**
+   * gives the type of this property defintion
+   * @returns the type
+   */
+  public getType() {
+    return this.rawData.type;
   }
 
   /**
@@ -885,6 +895,30 @@ export default class PropertyDefinition {
       value,
       true,
     );
+  }
+
+  public isNullable() {
+    return this.rawData.nullable;
+  }
+
+  public isHidden() {
+    return this.rawData.hidden;
+  }
+
+  public isRare() {
+    return this.rawData.rare;
+  }
+
+  public isRetrievalDisabled() {
+    return this.rawData.disableRetrieval;
+  }
+
+  public isRangedSearchDisabled() {
+    return this.rawData.disableRangedSearch;
+  }
+
+  public getSearchLevel(): PropertyDefinitionSearchLevelsType {
+    return this.rawData.searchLevel || "always";
   }
 
   /**

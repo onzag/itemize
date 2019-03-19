@@ -204,7 +204,7 @@ async function buildData(entry: string) {
   );
 
   const rootTest = new Root(resultJSON);
-  rootTest.getAllModules(() => {return; });
+  rootTest.getAllModules();
 
   const allFileName = "./dist/data/build.all.json";
   console.log("emiting " + colors.green(allFileName));

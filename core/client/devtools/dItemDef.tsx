@@ -2,6 +2,7 @@ import Module from "../../base/Module";
 import ItemDefinition from "../../base/ItemDefinition";
 import DevToolRawVisualizer from "./dRawVisualizer";
 import * as React from "react";
+import DevToolPropertyDefinition from "./dPropertyDef";
 
 interface IItemDefProps {
   module: Module;
@@ -38,6 +39,7 @@ const devtoolsStyle: {
     width: "100%",
     paddingLeft: "15px",
     paddingBottom: "2px",
+    color: "#000",
   },
 };
 
@@ -86,6 +88,13 @@ export default class DevToolItemDefinition extends
               key={childDefinition.getName()}
               module={this.props.module}
               itemDef={childDefinition}
+              locale={this.props.locale}
+            />;
+          })}
+          {this.props.itemDef.getAllPropertyDefinitions().map((propExtension) => {
+            return <DevToolPropertyDefinition
+              key={propExtension.getId()}
+              property={propExtension}
               locale={this.props.locale}
             />;
           })}

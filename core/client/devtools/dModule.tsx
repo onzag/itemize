@@ -1,7 +1,9 @@
+import * as React from "react";
+
 import Module from "../../base/Module";
 import DevToolItemDefinition from "./dItemDef";
-import * as React from "react";
 import DevToolRawVisualizer from "./dRawVisualizer";
+import DevToolPropertyDefinition from "./dPropertyDef";
 
 interface IModuleProps {
   module: Module;
@@ -70,6 +72,13 @@ export default class DevToolModule extends React.Component<IModuleProps, IModule
               key={childDefinition.getName()}
               module={this.props.module}
               itemDef={childDefinition}
+              locale={this.props.locale}
+            />;
+          })}
+          {this.props.module.getAllPropExtensions().map((propExtension) => {
+            return <DevToolPropertyDefinition
+              key={propExtension.getId()}
+              property={propExtension}
               locale={this.props.locale}
             />;
           })}

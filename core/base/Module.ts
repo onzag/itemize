@@ -222,11 +222,18 @@ export default class Module {
    * @param id the property definition id
    */
   public getPropExtensionFor(id: string) {
-    const definition = this.propExtensions.find((p) => p.getId() === id);
-    if (!definition) {
+    const propertyDefinition = this.propExtensions.find((p) => p.getId() === id);
+    if (!propertyDefinition) {
       throw new Error("Requested invalid prop extension " + id);
     }
-    return definition;
+    return propertyDefinition;
+  }
+
+  /**
+   * Provides all the prop extensions
+   */
+  public getAllPropExtensions() {
+    return this.propExtensions;
   }
 
   /**

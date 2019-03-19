@@ -1,4 +1,5 @@
 import Module, { IModuleRawJSONDataType } from "./Module";
+import { IItemDefinitionRawJSONDataType } from "./ItemDefinition";
 
 export interface IRootRawJSONDataType {
   type: "root";
@@ -55,9 +56,11 @@ export default class Root {
     let currentModule: IModuleRawJSONDataType = null;
     let currentModuleName = nameConsumable.pop();
     while (currentModuleName) {
-      currentModule = (currentModule || this.rawData).children
-        .filter((c) => c.type === "module")
-        .find((m) => m.name === currentModuleName) as IModuleRawJSONDataType;
+      currentModule = ((currentModule || this.rawData) as any).children
+        .filter((c: IModuleRawJSONDataType | IItemDefinitionRawJSONDataType) =>
+          c.type === "module")
+        .find((m: IModuleRawJSONDataType) => m.name === currentModuleName) as
+        IModuleRawJSONDataType;
 
       if (!currentModule) {
         throw new Error("invalid module " + name.join("/"));
