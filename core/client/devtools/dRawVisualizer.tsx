@@ -22,7 +22,6 @@ const devtoolsStyle: {
     backgroundColor: "#FFF",
     color: "#000051",
     marginTop: "2px",
-    whiteSpace: "pre",
   },
 };
 
@@ -46,9 +45,9 @@ export default class DevToolRawVisualizer extends
     return (
       <div style={devtoolsStyle.rawItem} onClick={this.toggleExpand}>
         <p>view raw content</p>
-        {this.state.expanded ? <div style={devtoolsStyle.rawChildren}>
+        {this.state.expanded ? <code style={devtoolsStyle.rawChildren}>
           {JSON.stringify(this.props.content, null, 2)}
-        </div> : null}
+        </code> : null}
       </div>
     );
   }

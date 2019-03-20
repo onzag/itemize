@@ -1,6 +1,10 @@
 import * as React from "react";
 import DevToolRawVisualizer from "./dRawVisualizer";
-import PropertyDefinition from "../../base/ItemDefinition/PropertyDefinition";
+import PropertyDefinition, {
+  IPropertyValueGetterType,
+  PropertyDefinitionSupportedType,
+} from "../../base/ItemDefinition/PropertyDefinition";
+import PropertyEntry from "../app/components/base/PropertyEntry";
 
 interface IPropertyDefProps {
   property: PropertyDefinition;
@@ -10,6 +14,8 @@ interface IPropertyDefProps {
 interface IPropertyDefState {
   expanded: boolean;
   searchMode: boolean;
+  detachedPropertyInstance: PropertyDefinition;
+  currentValue: IPropertyValueGetterType;
 }
 
 const devtoolsStyle: {
@@ -26,6 +32,7 @@ const devtoolsStyle: {
     padding: "5px",
     color: "#000000",
     cursor: "pointer",
+    userSelect: "none",
   },
   propertyDefChildren: {
     width: "100%",
@@ -36,19 +43,46 @@ const devtoolsStyle: {
 
 export default class DevToolPropertyDefinition extends
   React.Component<IPropertyDefProps, IPropertyDefState> {
+
+  public static getDerivedStateFromProps(
+    props: IPropertyDefProps,
+    state: IPropertyDefState,
+  ): Partial<IPropertyDefState> {
+    if (
+      !state.detachedPropertyInstance ||
+      props.property.getId() !== state.detachedPropertyInstance.getId()
+    ) {
+      const detachedPropertyInstance = props.property.getNewInstance();
+      return {
+        detachedPropertyInstance,
+        currentValue: detachedPropertyInstance.getCurrentValue(),
+      };
+    }
+    return null;
+  }
+
   constructor(props: IPropertyDefProps) {
     super(props);
 
     this.state = {
       expanded: false,
       searchMode: false,
+      currentValue: null,
+      detachedPropertyInstance: null,
     };
 
     this.toggleExpand = this.toggleExpand.bind(this);
+    this.onChange = this.onChange.bind(this);
   }
   public toggleExpand() {
     this.setState({
       expanded: !this.state.expanded,
+    });
+  }
+  public onChange(newValue: PropertyDefinitionSupportedType) {
+    this.state.detachedPropertyInstance.setCurrentValue(newValue);
+    this.setState({
+      currentValue: this.state.detachedPropertyInstance.getCurrentValue(),
     });
   }
   public render() {
@@ -77,6 +111,20 @@ export default class DevToolPropertyDefinition extends
           <span> (property definition)</span>
         </p>
         {this.state.expanded ? <div style={devtoolsStyle.propertyDefChildren}>
+          <p>
+            This is a detached view of the property
+            it acts as if all the other properties are in its default
+            so the property might be dysfunctional (say as a side effect of
+            the default value of another property)
+          </p>
+          <PropertyEntry
+            property={this.props.property}
+            value={this.state.currentValue}
+            onChange={this.onChange}
+          />
+          <code>
+            {JSON.stringify(this.state.currentValue, null, 2)}
+          </code>
           <DevToolRawVisualizer content={this.props.property.rawData} />
         </div> : null}
       </div>

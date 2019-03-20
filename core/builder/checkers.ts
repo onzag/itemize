@@ -400,8 +400,10 @@ export function checkPropertyDefinition(
     );
   }
 
-  const canDisableSearch = PropertyDefinition
-    .supportedTypesStandard[rawData.type].searchable;
+  const propertyDefintionTypeStandard = PropertyDefinition
+    .supportedTypesStandard[rawData.type];
+
+  const canDisableSearch = propertyDefintionTypeStandard.searchable;
   if (rawData.disableRangedSearch && !canDisableSearch) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' does not support disableRangedSearch " +
@@ -482,6 +484,20 @@ export function checkPropertyDefinition(
         traceback.newTraceToBit("default"),
       );
     }
+  }
+
+  if (!propertyDefintionTypeStandard.supportsAutocomplete && rawData.autocomplete) {
+    throw new CheckUpError(
+      "Cannot use autocomplete on property type '" + rawData.type + "'",
+      traceback.newTraceToBit("autocomplete"),
+    );
+  }
+
+  if (rawData.values && rawData.autocomplete) {
+    throw new CheckUpError(
+      "Cannot use autocomplete and values at the same time",
+      traceback.newTraceToBit("autocomplete"),
+    );
   }
 
   // Let's check whether the autocomplete properties are there

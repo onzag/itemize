@@ -20,7 +20,7 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
 import Module, { OnStateChangeListenerType } from "../Module";
 
 // All the supported property types
-export type PropertyDefinitionSupportedTypes =
+export type PropertyDefinitionSupportedTypeName =
   "boolean" |         // A simple boolean, comparable, and stored as a boolean
   "integer" |         // A simple number, comparable, and stored as a number
   "number" |          // A simple number, comparable, and stored as a number
@@ -69,6 +69,15 @@ export interface IPropertyDefinitionSupportedType {
   // represents an item that would mark for null
   // by default it is null itself
   nullableDefault?: any;
+
+  // Items that have this field support fetch for autocomplete
+  // fields using rest endpoints, this includes support for
+  // autocomplete, autocompleteSetFromProperty, autocompleteIsEnforced
+  // and autocompleteSupportsPreffils
+  supportsAutocomplete?: boolean;
+
+  // Will make it so that the default search mode for
+  // exact and range is range
   rangeDefaultSearch?: boolean;
 
   // this is a validation function that checks whether the value
@@ -110,7 +119,7 @@ export interface IPropertyDefinitionSupportedType {
 // So this is how properties are defined to give an overview on
 // how they are supposed to be managed
 export type PropertyDefinitionSupportedTypesStandardType =
-Record<PropertyDefinitionSupportedTypes, IPropertyDefinitionSupportedType>;
+Record<PropertyDefinitionSupportedTypeName, IPropertyDefinitionSupportedType>;
 
 const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   : PropertyDefinitionSupportedTypesStandardType = {
@@ -133,6 +142,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // an integer is represented as a number
     json: "number",
     gql: "Int",
+    supportsAutocomplete: true,
     // it gotta be validated to check it's a number
     validate: (n: PropertyDefinitionSupportedIntegerType) =>
       !isNaN(NaN) && parseInt(n as any, 10) === n &&
@@ -157,6 +167,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // a number is just a number can be integer or decimal
     json: "number",
     gql: "Float",
+    supportsAutocomplete: true,
     // the validator
     validate: (n: PropertyDefinitionSupportedNumberType) => {
       if (isNaN(n)) {
@@ -244,6 +255,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // a string is a string
     json: "string",
     nullableDefault: "",
+    supportsAutocomplete: true,
     // validates just the length
     validate: (s: PropertyDefinitionSupportedStringType) => s.length <= 255,
     maxLength: MAX_STRING_LENGTH,
@@ -476,7 +488,7 @@ export interface IPropertyDefinitionRawJSONDataType {
   };
   rare?: boolean;
   // the type of the property
-  type: PropertyDefinitionSupportedTypes;
+  type: PropertyDefinitionSupportedTypeName;
   min?: number;
   max?: number;
   minLength?: number;
@@ -526,6 +538,7 @@ export interface IPropertyValueGetterType {
   userSet: boolean;
   default: boolean;
   enforced: boolean;
+  hidden: boolean;
   valid: boolean;
   value: PropertyDefinitionSupportedType;
 }
@@ -604,10 +617,13 @@ export default class PropertyDefinition {
   }
 
   public rawData: IPropertyDefinitionRawJSONDataType;
+  private parentModule: Module;
+  private parentItemDefinition: ItemDefinition;
+  private isExtension: boolean;
+
   private defaultIf?: IPropertyDefinitionRuleDataType[];
   private enforcedValues?: IPropertyDefinitionRuleDataType[];
   private hiddenIf?: ConditionalRuleSet;
-  private isExtension: boolean;
 
   private superEnforcedValue?: PropertyDefinitionSupportedType
     | PropertyDefinition;
@@ -631,6 +647,9 @@ export default class PropertyDefinition {
     isExtension: boolean,
   ) {
     this.rawData = rawJSON;
+    this.parentModule = parentModule;
+    this.parentItemDefinition = parentItemDefinition;
+    this.isExtension = isExtension;
 
     // set the default value
     this.defaultIf = rawJSON.defaultIf && rawJSON.defaultIf.map((dif) => ({
@@ -648,8 +667,6 @@ export default class PropertyDefinition {
     // set the hidden if rule
     this.hiddenIf = rawJSON.hiddenIf &&
       new ConditionalRuleSet(rawJSON.hiddenIf, parentModule, parentItemDefinition);
-
-    this.isExtension = isExtension;
 
     // STATE MANAGEMENT
     this.onStateChangeListeners = [];
@@ -696,6 +713,7 @@ export default class PropertyDefinition {
         default: false,
         valid: true,
         value: null,
+        hidden: true,
       };
     }
 
@@ -733,6 +751,7 @@ export default class PropertyDefinition {
           default: false,
           valid: this.isValidValue(enforcedValue.value),
           value: enforcedValue.value,
+          hidden: this.isCurrentlyHidden(),
         };
       }
     }
@@ -766,6 +785,7 @@ export default class PropertyDefinition {
         default: true,
         valid: this.isValidValue(defaultValue || null),
         value: defaultValue || null,
+        hidden: this.isCurrentlyHidden(),
       };
     }
 
@@ -775,6 +795,7 @@ export default class PropertyDefinition {
       default: false,
       valid: this.isValidValue(this.stateValue),
       value: this.stateValue,
+      hidden: this.isCurrentlyHidden(),
     };
   }
 
@@ -895,6 +916,17 @@ export default class PropertyDefinition {
       value,
       true,
     );
+  }
+
+  /**
+   * Uses the raw data to instantiate a new instance of
+   * the item definition, uses the same on state change
+   * function for state changes so it remains linked to the
+   * module
+   */
+  public getNewInstance() {
+    return new PropertyDefinition(this.rawData, this.parentModule,
+      this.parentItemDefinition, this.isExtension);
   }
 
   public isNullable() {
@@ -1102,6 +1134,11 @@ if (process.env.NODE_ENV !== "production") {
     additionalProperties: false,
     definitions: {
       ConditionalRuleSet: ConditionalRuleSet.schema,
+    },
+    dependencies: {
+      autocompleteSetFromProperty: ["autocomplete"],
+      autocompleteIsEnforced: ["autocomplete"],
+      autocompleteSupportsPrefills: ["autocomplete"],
     },
     required: ["id", "type"],
   };
