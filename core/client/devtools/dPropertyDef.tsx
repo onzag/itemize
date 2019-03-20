@@ -5,6 +5,7 @@ import PropertyDefinition, {
   PropertyDefinitionSupportedType,
 } from "../../base/ItemDefinition/PropertyDefinition";
 import PropertyEntry from "../app/components/base/PropertyEntry";
+import { getItemDefPath } from "./dItemDef";
 
 interface IPropertyDefProps {
   property: PropertyDefinition;
@@ -41,6 +42,11 @@ const devtoolsStyle: {
   },
 };
 
+export function getPropertyDefPath(propertyDef: PropertyDefinition): string {
+  return getItemDefPath(propertyDef.getParentItemDefinition()) +
+    "__" + propertyDef.getId();
+}
+
 export default class DevToolPropertyDefinition extends
   React.Component<IPropertyDefProps, IPropertyDefState> {
 
@@ -65,7 +71,10 @@ export default class DevToolPropertyDefinition extends
     super(props);
 
     this.state = {
-      expanded: false,
+      expanded: JSON.parse(localStorage.getItem(
+        "__dev__propdef__expanded" +
+        getPropertyDefPath(props.property),
+      ) || "false"),
       searchMode: false,
       currentValue: null,
       detachedPropertyInstance: null,
@@ -75,6 +84,11 @@ export default class DevToolPropertyDefinition extends
     this.onChange = this.onChange.bind(this);
   }
   public toggleExpand() {
+    localStorage.setItem(
+      "__dev__propdef__expanded" +
+      getPropertyDefPath(this.props.property),
+      JSON.stringify(!this.state.expanded),
+    );
     this.setState({
       expanded: !this.state.expanded,
     });

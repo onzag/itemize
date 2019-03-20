@@ -77,6 +77,8 @@ export default class Module {
   }
 
   public rawData: IModuleRawJSONDataType;
+  private parentModule: Module;
+
   private childItemDefinitions: ItemDefinition[];
   private propExtensions: PropertyDefinition[];
 
@@ -84,8 +86,12 @@ export default class Module {
    * Builds a module from raw json data
    * @param rawJSON the raw json data
    */
-  constructor(rawJSON: IModuleRawJSONDataType) {
+  constructor(
+    rawJSON: IModuleRawJSONDataType,
+    parentModule: Module,
+  ) {
     this.rawData = rawJSON;
+    this.parentModule = parentModule;
     this.childItemDefinitions = [];
 
     if (rawJSON.propExtensions) {
@@ -289,36 +295,39 @@ export default class Module {
   public getAllModules() {
     return this.rawData.children
       .filter((c) => c.type === "module")
-      .map((m: IModuleRawJSONDataType) => (new Module(m)));
+      .map((m: IModuleRawJSONDataType) => (new Module(m, this)));
   }
 
   /**
    * Gets a specific module given its name
-   * @param name the name of the module as a path array
+   * @param name the name of the module
    */
-  public getModule(name: string[]) {
-    if (name.length === 0) {
-      throw new Error("invalid module with no path");
-    }
-
-    const nameConsumable = [...name];
-    let currentModule: IModuleRawJSONDataType = this.rawData;
-    let currentModuleName = nameConsumable.pop();
-    while (currentModuleName) {
-      currentModule = currentModule.children
-        .filter((c) => c.type === "module")
-        .find((m) => m.name === currentModuleName) as IModuleRawJSONDataType;
-
-      if (!currentModule) {
-        throw new Error("invalid module " + name.join("/"));
-      }
-
-      currentModuleName = nameConsumable.pop();
+  public getChildModule(name: string) {
+    const resultRawData: IModuleRawJSONDataType = this.rawData.children
+      .filter((c) => c.type === "module")
+      .find((m) => m.name === name) as IModuleRawJSONDataType;
+    if (!resultRawData) {
+      throw new Error("invalid module " + name);
     }
 
     return new Module(
-      currentModule,
+      resultRawData,
+      this,
     );
+  }
+
+  /**
+   * Just gives the parent module
+   */
+  public getParentModule() {
+    return this.parentModule;
+  }
+
+  /**
+   * Tells whether it has a parent module
+   */
+  public hasParentModule() {
+    return !!this.parentModule;
   }
 
   public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {

@@ -50,12 +50,13 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
     super(props);
 
     this.state = {
-      opened: false,
+      opened: JSON.parse(localStorage.getItem("__dev__open") || "false"),
     };
 
     this.toggleOpened = this.toggleOpened.bind(this);
   }
   public toggleOpened() {
+    localStorage.setItem("__dev__open", JSON.stringify(!this.state.opened));
     this.setState({
       opened: !this.state.opened,
     });

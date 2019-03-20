@@ -35,17 +35,31 @@ const devtoolsStyle: {
   },
 };
 
+export function getModulePath(mod: Module): string {
+  return (mod.hasParentModule() ?
+    getModulePath(mod.getParentModule()) :
+    "") + "__" + mod.getName();
+}
+
 export default class DevToolModule extends React.Component<IModuleProps, IModuleState> {
   constructor(props: IModuleProps) {
     super(props);
 
     this.state = {
-      expanded: false,
+      expanded: JSON.parse(
+        localStorage.getItem("__dev__module__expanded" +
+        getModulePath(props.module),
+      ) || "false"),
     };
 
     this.toggleExpand = this.toggleExpand.bind(this);
   }
   public toggleExpand() {
+    localStorage.setItem(
+      "__dev__module__expanded" +
+      getModulePath(this.props.module),
+      JSON.stringify(!this.state.expanded),
+    );
     this.setState({
       expanded: !this.state.expanded,
     });
@@ -70,7 +84,6 @@ export default class DevToolModule extends React.Component<IModuleProps, IModule
           {this.props.module.getAllChildItemDefinitions().map((childDefinition) => {
             return <DevToolItemDefinition
               key={childDefinition.getName()}
-              module={this.props.module}
               itemDef={childDefinition}
               locale={this.props.locale}
             />;

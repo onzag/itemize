@@ -40,37 +40,23 @@ export default class Root {
    * should follow
    */
   public getAllModules() {
-    return this.rawData.children.map((m) => (new Module(m)));
+    return this.rawData.children.map((m) => (new Module(m, null)));
   }
 
   /**
    * Gets a specific module given its name
-   * @param name the full path name of the module
+   * @param name the name of the module
    */
-  public getModule(name: string[]) {
-    if (name.length === 0) {
-      throw new Error("invalid module with no path");
-    }
-
-    const nameConsumable = [...name];
-    let currentModule: IModuleRawJSONDataType = null;
-    let currentModuleName = nameConsumable.pop();
-    while (currentModuleName) {
-      currentModule = ((currentModule || this.rawData) as any).children
-        .filter((c: IModuleRawJSONDataType | IItemDefinitionRawJSONDataType) =>
-          c.type === "module")
-        .find((m: IModuleRawJSONDataType) => m.name === currentModuleName) as
-        IModuleRawJSONDataType;
-
-      if (!currentModule) {
-        throw new Error("invalid module " + name.join("/"));
-      }
-
-      currentModuleName = nameConsumable.pop();
+  public getModule(name: string) {
+    const resultRawData: IModuleRawJSONDataType = this.rawData.children
+      .find((m) => m.name === name);
+    if (!resultRawData) {
+      throw new Error("invalid module " + name);
     }
 
     return new Module(
-      currentModule,
+      resultRawData,
+      null,
     );
   }
 }

@@ -570,6 +570,8 @@ export default class PropertyDefinition {
     // Check for nulls
     if (propertyDefinitionRaw.nullable && value === null) {
       return true;
+    } else if (!propertyDefinitionRaw.nullable && value === null) {
+      return false;
     }
     // Check against the values if allowed
     if (propertyDefinitionRaw.values &&
@@ -951,6 +953,20 @@ export default class PropertyDefinition {
 
   public getSearchLevel(): PropertyDefinitionSearchLevelsType {
     return this.rawData.searchLevel || "always";
+  }
+
+  /**
+   * Just gives the parent module
+   */
+  public getParentModule() {
+    return this.parentModule;
+  }
+
+  /**
+   * Just gives the parent item definition
+   */
+  public getParentItemDefinition() {
+    return this.parentItemDefinition;
   }
 
   /**
