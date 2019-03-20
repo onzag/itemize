@@ -24,7 +24,7 @@ const devtoolsStyle: {
 } = {
   propertyDefItem: {
     width: "100%",
-    backgroundColor: "#e8f5e9",
+    backgroundColor: "#fff",
     marginTop: "2px",
   },
   propertyDefTitle: {
@@ -136,6 +136,7 @@ export default class DevToolPropertyDefinition extends
             value={this.state.currentValue}
             onChange={this.onChange}
           />
+          <br/>
           <code>
             {JSON.stringify(this.state.currentValue, null, 2)}
           </code>

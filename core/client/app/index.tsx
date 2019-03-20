@@ -1,6 +1,8 @@
 import * as React from "react";
 import DevTools from "../devtools";
 import Root, { IRootRawJSONDataType } from "../../base/Root";
+import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
+import { createMuiTheme } from "@material-ui/core";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 if (isDevelopment) {
@@ -40,6 +42,13 @@ interface IAppState {
 export const LocaleContext = React.createContext<ILocaleType>(null);
 export const LocaleDataContext = React.createContext<ILocaleDataType>(null);
 export const DataContext = React.createContext<IDataType>(null);
+
+const theme = createMuiTheme({
+  typography: {
+    useNextVariants: true,
+    fontFamily: "'Open Sans', sans-serif",
+  },
+});
 
 export default class App extends React.Component<IAppProps, IAppState> {
   constructor(props: IAppProps) {
@@ -87,15 +96,17 @@ export default class App extends React.Component<IAppProps, IAppState> {
       value: this.state.specifiedProcessedData,
     };
     return (
-      <LocaleContext.Provider value={localeContextValue}>
-        <DataContext.Provider value={dataContextValue}>
-          <LocaleDataContext.Provider value={this.props.localeData}>
-            <h1>It works!</h1>
+      <MuiThemeProvider theme={theme}>
+        <LocaleContext.Provider value={localeContextValue}>
+          <DataContext.Provider value={dataContextValue}>
+            <LocaleDataContext.Provider value={this.props.localeData}>
+              <h1>It works!</h1>
 
-            {isDevelopment ? <DevTools/> : null}
-          </LocaleDataContext.Provider>
-        </DataContext.Provider>
-      </LocaleContext.Provider>
+              {isDevelopment ? <DevTools/> : null}
+            </LocaleDataContext.Provider>
+         </DataContext.Provider>
+        </LocaleContext.Provider>
+      </MuiThemeProvider>
     );
   }
 }

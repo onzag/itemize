@@ -3,6 +3,7 @@ import { IPropertyEntryProps } from ".";
 import {
   PropertyDefinitionSupportedStringType,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
+import TextField from '@material-ui/core/TextField';
 
 interface IPropertyEntryStringState {
   internalStateValue: PropertyDefinitionSupportedStringType;
@@ -40,15 +41,18 @@ export default class PropertyEntryString
       nextProps.value.enforced !== this.props.value.enforced ||
       nextProps.value.hidden !== this.props.value.hidden ||
       nextProps.value.userSet !== this.props.value.userSet ||
-      nextProps.value.valid !== this.props.value.valid;
+      nextProps.value.valid !== this.props.value.valid ||
+      nextProps.locale !== this.props.locale;
   }
   public onChange(e: React.ChangeEvent<HTMLInputElement>) {
     // TODO do something about nullable default, either here or
     // in the base
+    // there seems to be a bug there, oh well we fix it when there's numbers
     this.props.onChange(e.target.value);
   }
   public render() {
-    const className = `property-entry-string ${
+    const i18nData = this.props.property.getI18nDataFor(this.props.locale);
+    const className = `property-entry property-entry-string ${
       this.props.value.default ? "property-entry-string--default" : ""
     } ${
       this.props.value.enforced ? "property-entry-string--enforced" : ""
@@ -61,14 +65,20 @@ export default class PropertyEntryString
         "property-entry-string--valid" :
         "property-entry-string--invalid"
     }`;
+
+    const i18nLabel = i18nData && i18nData.label;
+    const i18nPlaceholder = i18nData && i18nData.placeholder;
     return (
       <div
         className={className}
       >
-        <input
+        <TextField
+          label={i18nLabel}
+          placeholder={i18nPlaceholder}
           type="text"
           value={this.state.internalStateValue}
           onChange={this.onChange}
+          className={className}
         />
       </div>
     );

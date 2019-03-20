@@ -17,11 +17,15 @@ import PropertyEntryDate from "./PropertyEntryDate";
 import PropertyEntryLocation from "./PropertyEntryLocation";
 import PropertyEntryImage from "./PropertyEntryImage";
 import PropertyEntryFiles from "./PropertyEntryFiles";
+import { LocaleContext } from "../../..";
+
+import "../../../../theme/property-entries.scss";
 
 export interface IPropertyEntryProps {
   property: PropertyDefinition;
   value: IPropertyValueGetterType;
   onChange: (newValue: PropertyDefinitionSupportedType) => void;
+  locale?: string;
 }
 
 const typeRegistry:
@@ -46,5 +50,9 @@ const typeRegistry:
 
 export default function PropertyEntry(props: IPropertyEntryProps) {
   const Element = typeRegistry[props.property.getType()];
-  return <Element {...props}/>;
+  return (
+    <LocaleContext.Consumer>
+      {(locale) => <Element {...props} locale={props.locale || locale.state}/>}
+    </LocaleContext.Consumer>
+  );
 }
