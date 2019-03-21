@@ -1,7 +1,20 @@
-.property-entry {
-  color: black;
-}
-
-.property-entry-string {
-  
+.property-entry--string {
+  &.property-entry--invalid.property-entry--user-set {
+    .property-field--input::before {
+      border-bottom-color: #e57373;
+    }
+    .property-field--input::after,
+    .property-field--input:hover:not(.disabled)::before {
+      border-bottom-color: #f44336;
+    }
+    .property-field--label {
+      color: #e57373;
+    }
+    .property-field--label.focused {
+      color: #f44336;
+    }
+  }
+  &.property-entry--hidden {
+    opacity: 0.35
+  }
 }

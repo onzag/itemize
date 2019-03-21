@@ -955,6 +955,14 @@ export default class PropertyDefinition {
     return this.rawData.searchLevel || "always";
   }
 
+  public hasSpecificValidValues() {
+    return !!this.rawData.values;
+  }
+
+  public getSpecificValidValues() {
+    return this.rawData.values;
+  }
+
   /**
    * Just gives the parent module
    */

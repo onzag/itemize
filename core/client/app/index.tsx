@@ -3,6 +3,15 @@ import DevTools from "../devtools";
 import Root, { IRootRawJSONDataType } from "../../base/Root";
 import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
 import { createMuiTheme } from "@material-ui/core";
+import JssProvider from "react-jss/lib/JssProvider";
+import { create } from "jss";
+import { createGenerateClassName, jssPreset } from "@material-ui/core/styles";
+
+const generateClassName = createGenerateClassName();
+const jss = create({
+  ...jssPreset(),
+  insertionPoint: "jss",
+});
 
 const isDevelopment = process.env.NODE_ENV === "development";
 if (isDevelopment) {
@@ -96,17 +105,19 @@ export default class App extends React.Component<IAppProps, IAppState> {
       value: this.state.specifiedProcessedData,
     };
     return (
-      <MuiThemeProvider theme={theme}>
-        <LocaleContext.Provider value={localeContextValue}>
-          <DataContext.Provider value={dataContextValue}>
-            <LocaleDataContext.Provider value={this.props.localeData}>
-              <h1>It works!</h1>
+      <JssProvider jss={jss} generateClassName={generateClassName}>
+        <MuiThemeProvider theme={theme}>
+          <LocaleContext.Provider value={localeContextValue}>
+            <DataContext.Provider value={dataContextValue}>
+              <LocaleDataContext.Provider value={this.props.localeData}>
+                <h1>It works!</h1>
 
-              {isDevelopment ? <DevTools/> : null}
-            </LocaleDataContext.Provider>
-         </DataContext.Provider>
-        </LocaleContext.Provider>
-      </MuiThemeProvider>
+                {isDevelopment ? <DevTools/> : null}
+              </LocaleDataContext.Provider>
+            </DataContext.Provider>
+          </LocaleContext.Provider>
+        </MuiThemeProvider>
+      </JssProvider>
     );
   }
 }

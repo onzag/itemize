@@ -925,7 +925,9 @@ async function getI18nData(
         .map((b) => ({key: b, required: true})))
       // request for the values if supported
       .concat((property.values || [])
-        .map((b) => ({key: "values." + b, required: true})));
+        .map((b) => ({key: "values." + b, required: true})))
+      .concat((property.values && property.nullable ? ["nullValue"] : [])
+        .map((b) => ({key: b, required: true})));
 
     // start initializing the data in the property itself
     i18nData[locale] = {};

@@ -1,12 +1,15 @@
 import React from "react";
-import { IPropertyEntryProps } from ".";
+import { IPropertyEntryProps, getClassName } from ".";
 import {
   PropertyDefinitionSupportedStringType,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
-import TextField from '@material-ui/core/TextField';
+import TextField from "@material-ui/core/TextField";
+import { FormControl, InputLabel, Select, MenuItem, FilledInput } from "@material-ui/core";
+import uuid from "uuid";
 
 interface IPropertyEntryStringState {
   internalStateValue: PropertyDefinitionSupportedStringType;
+  uuid: string;
 }
 
 export default class PropertyEntryString
@@ -24,6 +27,7 @@ export default class PropertyEntryString
 
     this.state = {
       internalStateValue: "",
+      uuid: "uuid-" + uuid.v4(),
     };
 
     this.onChange = this.onChange.bind(this);
@@ -44,43 +48,97 @@ export default class PropertyEntryString
       nextProps.value.valid !== this.props.value.valid ||
       nextProps.locale !== this.props.locale;
   }
-  public onChange(e: React.ChangeEvent<HTMLInputElement>) {
+  public onChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     // TODO do something about nullable default, either here or
     // in the base
-    // there seems to be a bug there, oh well we fix it when there's numbers
+    // apparently nullable default is implemented
     this.props.onChange(e.target.value);
   }
   public render() {
     const i18nData = this.props.property.getI18nDataFor(this.props.locale);
-    const className = `property-entry property-entry-string ${
-      this.props.value.default ? "property-entry-string--default" : ""
-    } ${
-      this.props.value.enforced ? "property-entry-string--enforced" : ""
-    } ${
-      this.props.value.userSet ? "property-entry-string--user-set" : ""
-    } ${
-      this.props.value.hidden ? "property-entry-string--hidden" : ""
-    } ${
-      this.props.value.valid ?
-        "property-entry-string--valid" :
-        "property-entry-string--invalid"
-    }`;
+    const className = getClassName(this.props, "string");
 
+    if (this.props.property.hasSpecificValidValues()) {
+      this.renderSelectTextField(className, i18nData);
+    }
+
+    return this.renderBasicTextField(className, i18nData);
+  }
+
+  public renderSelectTextField(className: string, i18nData: any) {
     const i18nLabel = i18nData && i18nData.label;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
+    const nullValueLabel = i18nData && i18nData.nullValue;
+
     return (
-      <div
-        className={className}
-      >
-        <TextField
-          label={i18nLabel}
-          placeholder={i18nPlaceholder}
-          type="text"
+      <FormControl variant="filled" className={className}>
+        <InputLabel
+          htmlFor={this.state.uuid}
+          classes={{
+            root: "property-field--label",
+            focused: "focused",
+          }}
+        >
+          {i18nLabel}
+        </InputLabel>
+        <Select
           value={this.state.internalStateValue}
           onChange={this.onChange}
-          className={className}
-        />
-      </div>
+          input={
+            <FilledInput
+              id={this.state.uuid}
+              placeholder={i18nPlaceholder}
+              classes={{
+                root: "property-field--input",
+                focused: "focused",
+              }}
+            />
+          }
+        >
+          <MenuItem value="">
+            <em>{nullValueLabel}</em>
+          </MenuItem>
+          {
+            this.props.property.getSpecificValidValues().map((vv) => {
+              const valueName = i18nData && i18nData.values[vv.toString()];
+              return <MenuItem key={vv.toString()} value={vv.toString()}>{
+                valueName
+              }</MenuItem>;
+            })
+          }
+        </Select>
+      </FormControl>
+    );
+  }
+
+  public renderBasicTextField(className: string, i18nData: any) {
+    const i18nLabel = i18nData && i18nData.label;
+    const i18nPlaceholder = i18nData && i18nData.placeholder;
+
+    return (
+      <TextField
+        className={className}
+        label={i18nLabel}
+        placeholder={i18nPlaceholder}
+        type="text"
+        value={this.state.internalStateValue}
+        onChange={this.onChange}
+        InputProps={{
+          classes: {
+            root: "property-field--input",
+            focused: "focused",
+          },
+          id: this.state.uuid,
+        }}
+        InputLabelProps={{
+          classes: {
+            root: "property-field--label",
+            focused: "focused",
+          },
+        }}
+        disabled={this.props.value.enforced}
+        variant="filled"
+      />
     );
   }
 }

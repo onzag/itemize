@@ -48,6 +48,22 @@ const typeRegistry:
   files: PropertyEntryFiles,
 };
 
+export function getClassName(props: IPropertyEntryProps, name: string) {
+  return `property-entry property-entry--${name} ${
+    props.value.default ? "property-entry--default" : ""
+  } ${
+    props.value.enforced ? "property-entry--enforced" : ""
+  } ${
+    props.value.userSet ? "property-entry--user-set" : ""
+  } ${
+    props.value.hidden ? "property-entry--hidden" : ""
+  } ${
+    props.value.valid ?
+      "property-entry--valid" :
+      "property-entry--invalid"
+  }`;
+}
+
 export default function PropertyEntry(props: IPropertyEntryProps) {
   const Element = typeRegistry[props.property.getType()];
   return (
