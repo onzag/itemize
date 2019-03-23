@@ -512,6 +512,8 @@ export interface IPropertyDefinitionRawJSONDataType {
   autocompleteIsEnforced?: boolean;
   // whether the autocomplete supports prefills
   autocompleteSupportsPrefills?: boolean;
+  // whether the autocomplete supports locale
+  autocompleteSupportsLocale?: boolean;
   // default value
   default?: PropertyDefinitionSupportedType;
   defaultIf?: IPropertyDefinitionRawJSONRuleDataType[];
@@ -963,6 +965,18 @@ export default class PropertyDefinition {
     return this.rawData.values;
   }
 
+  public hasAutocomplete() {
+    return !!this.rawData.autocomplete;
+  }
+
+  public isAutocompleteEnforced() {
+    return !!this.rawData.autocompleteIsEnforced;
+  }
+
+  public isAutocompleteLocalized() {
+    return !!this.rawData.autocompleteSupportsLocale;
+  }
+
   /**
    * Just gives the parent module
    */
@@ -1095,6 +1109,9 @@ if (process.env.NODE_ENV !== "production") {
       autocompleteSupportsPrefills: {
         type: "boolean",
       },
+      autocompleteSupportsLocale: {
+        type: "boolean",
+      },
       default: {
         oneOf: valueOneOf,
       },
@@ -1163,6 +1180,7 @@ if (process.env.NODE_ENV !== "production") {
       autocompleteSetFromProperty: ["autocomplete"],
       autocompleteIsEnforced: ["autocomplete"],
       autocompleteSupportsPrefills: ["autocomplete"],
+      autocompleteSupportsLocale: ["autocomplete", "autocompleteSupportsPrefills"],
     },
     required: ["id", "type"],
   };

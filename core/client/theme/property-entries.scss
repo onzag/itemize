@@ -1,20 +1,32 @@
-.property-entry--string {
+.property-entry--field {
   &.property-entry--invalid.property-entry--user-set {
-    .property-field--input::before {
+    .property-entry--input::before {
       border-bottom-color: #e57373;
     }
-    .property-field--input::after,
-    .property-field--input:hover:not(.disabled)::before {
+    .property-entry--input::after,
+    .property-entry--input:hover:not(.disabled)::before {
       border-bottom-color: #f44336;
     }
-    .property-field--label {
+    .property-entry--label {
       color: #e57373;
     }
-    .property-field--label.focused {
+    .property-entry--label.focused {
       color: #f44336;
     }
   }
   &.property-entry--hidden {
     opacity: 0.35
+  }
+}
+
+.property-entry--field--autocomplete-container {
+  position: relative;
+  display: block;
+  width: 100%;
+
+  .property-entry--field--autocomplete-suggestions-container {
+    position: absolute;
+    display: block;
+    width: 100%;
   }
 }
