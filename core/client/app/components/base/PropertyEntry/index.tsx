@@ -4,10 +4,8 @@ import PropertyDefinition, {
   PropertyDefinitionSupportedType,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
 import React from "react";
-import PropertyEntryString from "./PropertyEntryString";
-import PropertyEntryNumber from "./PropertyEntryNumber";
+import PropertyEntryField from "./PropertyEntryField";
 import PropertyEntryBoolean from "./PropertyEntryBoolean";
-import PropertyEntryInteger from "./PropertyEntryInteger";
 import PropertyEntryText from "./PropertyEntryText";
 import PropertyEntryCurrency from "./PropertyEntryCurrency";
 import PropertyEntryPassword from "./PropertyEntryPassword";
@@ -33,9 +31,9 @@ const typeRegistry:
     PropertyDefinitionSupportedTypeName,
     any
   > = {
-  string: PropertyEntryString,
-  integer: PropertyEntryInteger,
-  number: PropertyEntryNumber,
+  string: PropertyEntryField,
+  integer: PropertyEntryField,
+  number: PropertyEntryField,
   boolean: PropertyEntryBoolean,
   text: PropertyEntryText,
   currency: PropertyEntryCurrency,

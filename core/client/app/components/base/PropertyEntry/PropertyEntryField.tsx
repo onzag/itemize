@@ -2,6 +2,8 @@ import React from "react";
 import { IPropertyEntryProps, getClassName } from ".";
 import {
   PropertyDefinitionSupportedStringType,
+  PropertyDefinitionSupportedNumberType,
+  PropertyDefinitionSupportedIntegerType,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
 import TextField from "@material-ui/core/TextField";
 import { FormControl, InputLabel, Select, MenuItem, FilledInput, Paper } from "@material-ui/core";
@@ -11,7 +13,7 @@ import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import equals from "deep-equal";
 
-interface IPropertyEntryStringState {
+interface IPropertyEntryFieldState {
   autocompleteInternalUnmanagedValue: PropertyDefinitionSupportedStringType;
   suggestions: IPropertyEntryAutocompleteSuggestion[];
   uuid: string;
@@ -19,11 +21,13 @@ interface IPropertyEntryStringState {
 
 interface IPropertyEntryAutocompleteSuggestion {
   label: string;
-  value: string;
+  value: PropertyDefinitionSupportedStringType |
+    PropertyDefinitionSupportedNumberType |
+    PropertyDefinitionSupportedIntegerType;
 }
 
-export default class PropertyEntryString
-  extends React.Component<IPropertyEntryProps, IPropertyEntryStringState> {
+export default class PropertyEntryField
+  extends React.Component<IPropertyEntryProps, IPropertyEntryFieldState> {
 
   constructor(props: IPropertyEntryProps) {
     super(props);
@@ -45,7 +49,7 @@ export default class PropertyEntryString
   }
   public shouldComponentUpdate(
     nextProps: IPropertyEntryProps,
-    nextState: IPropertyEntryStringState,
+    nextState: IPropertyEntryFieldState,
   ) {
     return nextProps.property !== this.props.property ||
       this.state.autocompleteInternalUnmanagedValue !==
@@ -76,7 +80,16 @@ export default class PropertyEntryString
       }
       return;
     }
-    this.props.onChange(e.target.value);
+
+    if (this.props.property.getType() === "string") {
+      this.props.onChange(e.target.value);
+    } else if (this.props.property.getType() === "number") {
+      const value = parseFloat(e.target.value);
+      this.props.onChange(isNaN(value) ? null : value);
+    } else if (this.props.property.getType() === "integer") {
+      const value = parseInt(e.target.value, 10);
+      this.props.onChange(isNaN(value) ? null : value);
+    }
   }
 
   public render() {
@@ -108,7 +121,8 @@ export default class PropertyEntryString
           {i18nLabel}
         </InputLabel>
         <Select
-          value={this.props.value.value || ""}
+          value={this.props.value.value === null ?
+            "" : this.props.value.value.toString()}
           onChange={this.onChange}
           input={
             <FilledInput
@@ -160,14 +174,21 @@ export default class PropertyEntryString
       }
     }
 
+    const propertyType = this.props.property.getType();
+    const fieldType = propertyType === "string" ?
+      "text" : "number";
+
+    // TODO add the data for the min, max, decimals and whatnot
+
     return (
       <TextField
         fullWidth={true}
+        type={fieldType}
         className={className}
         label={i18nLabel}
         placeholder={i18nPlaceholder}
-        type="text"
-        value={this.props.value.value || ""}
+        value={this.props.value.value === null ?
+          "" : this.props.value.value.toString()}
         onChange={this.onChange}
         InputProps={{
           classes: {
@@ -265,6 +286,9 @@ export default class PropertyEntryString
   }
 
   public renderAutosuggestField() {
+
+    // TODO make it clear the autosuggest enforced thing that is not valid input
+
     return (
       <Autosuggest
         renderInputComponent={this.renderBasicTextField}
@@ -307,7 +331,8 @@ export default class PropertyEntryString
         inputProps={{
           value: this.props.property.isAutocompleteEnforced() ?
             this.state.autocompleteInternalUnmanagedValue :
-            (this.props.value.value as PropertyDefinitionSupportedStringType || ""),
+            (this.props.value.value === null ?
+              "" : this.props.value.value.toString()),
           onChange: this.onChange,
           className: "property-entry--field--autocomplete",
         }}
