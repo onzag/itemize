@@ -1,3 +1,5 @@
+$property-entry-error-height: 1em;
+
 .property-entry--field {
   &.property-entry--invalid.property-entry--user-set {
     .property-entry--input::before {
@@ -19,6 +21,11 @@
   }
 }
 
+.property-entry--error {
+  color: #e57373;
+  height: $property-entry-error-height;
+}
+
 .property-entry--field--autocomplete-container {
   position: relative;
   display: block;
@@ -28,5 +35,6 @@
     position: absolute;
     display: block;
     width: 100%;
+    top: calc(100% - #{$property-entry-error-height})
   }
 }

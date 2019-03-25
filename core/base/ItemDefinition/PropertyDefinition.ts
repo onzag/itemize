@@ -24,8 +24,6 @@ export enum PropertyInvalidReason {
   INVALID_VALUE = "INVALID_VALUE",
   TOO_LARGE = "TOO_LARGE",
   TOO_SMALL = "TOO_SMALL",
-  TOO_LONG = "TOO_LONG",
-  TOO_SHORT = "TOO_SHORT",
   TOO_MANY_DECIMALS = "TOO_MANY_DECIMALS",
   NOT_NULLABLE = "NOT_NULLABLE",
 }
@@ -156,7 +154,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     supportsAutocomplete: true,
     // it gotta be validated to check it's a number
     validate: (n: PropertyDefinitionSupportedIntegerType) => {
-      if (isNaN(n) || parseInt(n as any, 10) === n) {
+      if (isNaN(n) || parseInt(n as any, 10) !== n) {
         return PropertyInvalidReason.UNSPECIFIED;
       } else if (n > MAX_SUPPORTED_INTEGER) {
         return PropertyInvalidReason.TOO_LARGE;
@@ -168,7 +166,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
     // max and min
     max: MAX_SUPPORTED_INTEGER,
-    min: -MIN_SUPPORTED_INTEGER,
+    min: MIN_SUPPORTED_INTEGER,
     // it is searchable by exact and range value
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
@@ -283,7 +281,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       if (typeof s !== "string") {
         return PropertyInvalidReason.UNSPECIFIED;
       } else if (s.length > MAX_STRING_LENGTH) {
-        return PropertyInvalidReason.TOO_LONG;
+        return PropertyInvalidReason.TOO_LARGE;
       }
 
       return null;
@@ -308,7 +306,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       if (typeof s !== "string") {
         return PropertyInvalidReason.UNSPECIFIED;
       } else if (s.length > MAX_STRING_LENGTH) {
-        return PropertyInvalidReason.TOO_LONG;
+        return PropertyInvalidReason.TOO_LARGE;
       }
 
       return null;
@@ -329,7 +327,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       if (typeof s !== "string") {
         return PropertyInvalidReason.UNSPECIFIED;
       } else if (s.length > MAX_STRING_LENGTH) {
-        return PropertyInvalidReason.TOO_LONG;
+        return PropertyInvalidReason.TOO_LARGE;
       }
 
       return null;
@@ -668,10 +666,10 @@ export default class PropertyDefinition {
       return PropertyInvalidReason.TOO_LARGE;
     } else if (typeof propertyDefinitionRaw.maxLength !== "undefined" &&
       (value as string).length > propertyDefinitionRaw.maxLength) {
-      return PropertyInvalidReason.TOO_LONG;
+      return PropertyInvalidReason.TOO_LARGE;
     } else if (typeof propertyDefinitionRaw.minLength !== "undefined" &&
       (value as string).length < propertyDefinitionRaw.minLength) {
-      return PropertyInvalidReason.TOO_SHORT;
+      return PropertyInvalidReason.TOO_SMALL;
     } else if (typeof propertyDefinitionRaw.maxDecimalCount !== "number") {
       const splittedDecimals =
         ((value as IPropertyDefinitionSupportedCurrencyType).value || value)
@@ -899,13 +897,6 @@ export default class PropertyDefinition {
       if (definition.json && typeof actualValue !== definition.json) {
         throw new Error("Invalid super enforced " + JSON.stringify(actualValue));
       }
-      if (definition.validate) {
-        const invalidReason = definition.validate(actualValue);
-        if (invalidReason) {
-          throw new Error("Invalid super enforced " + JSON.stringify(actualValue) +
-            " " + invalidReason);
-        }
-      }
     }
 
     this.superEnforcedValue = actualValue;
@@ -933,13 +924,6 @@ export default class PropertyDefinition {
       // other kinds of invalid values are ok
       if (definition.json && typeof actualValue !== definition.json) {
         throw new Error("Invalid super default " + JSON.stringify(actualValue));
-      }
-      if (definition.validate) {
-        const invalidReason = definition.validate(actualValue);
-        if (invalidReason) {
-          throw new Error("Invalid super default " + JSON.stringify(actualValue) +
-            " " + invalidReason);
-        }
       }
     }
 
@@ -973,13 +957,6 @@ export default class PropertyDefinition {
       // other kinds of invalid values are ok
       if (definition.json && typeof newActualValue !== definition.json) {
         throw new Error("Invalid value " + JSON.stringify(newActualValue));
-      }
-      if (definition.validate) {
-        const invalidReason = definition.validate(newActualValue);
-        if (invalidReason) {
-          throw new Error("Invalid value " + JSON.stringify(newActualValue) +
-            " " + invalidReason);
-        }
       }
     }
 

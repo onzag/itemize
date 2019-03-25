@@ -216,7 +216,7 @@ export default class Module {
    * Checks whether a property extension exists in this module
    * @param id the property definition id
    */
-  public hasPropExtensionFor(id: string){
+  public hasPropExtensionFor(id: string) {
     // we use the rawdata to quickly check
     return (this.rawData.propExtensions || [])
       .some((p) => p.id === id);

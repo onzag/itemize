@@ -899,7 +899,7 @@ async function getI18nData(
 
     // We got to create this list for required and non required data
     const propertyData = properties[locale].properties[property.id];
-    const expectedProperties = definition.i18n.base
+    let expectedProperties = definition.i18n.base
       .map((b) => ({key: b, required: true}))
       // concat to optional properties
       .concat((definition.i18n.optional || [])
@@ -926,8 +926,31 @@ async function getI18nData(
       // request for the values if supported
       .concat((property.values || [])
         .map((b) => ({key: "values." + b, required: true})))
-      .concat((property.values && property.nullable ? ["nullValue"] : [])
+      .concat((property.values && property.nullable ? ["null_value"] : [])
         .map((b) => ({key: b, required: true})));
+
+    const errorRequiredProperties = [];
+    if (!property.nullable) {
+      errorRequiredProperties.push("error.NOT_NULLABLE");
+    }
+
+    if ((definition.max || definition.maxLength) &&
+      !property.values && !property.autocompleteIsEnforced) {
+      errorRequiredProperties.push("error.TOO_LARGE");
+    }
+
+    if (typeof property.minLength !== "undefined" &&
+      !property.values && !property.autocompleteIsEnforced) {
+      errorRequiredProperties.push("error.TOO_SMALL");
+    }
+
+    if (definition.maxDecimalCount &&
+      !property.values && !property.autocompleteIsEnforced) {
+      errorRequiredProperties.push("error.TOO_MANY_DECIMALS");
+    }
+
+    expectedProperties = expectedProperties.concat(errorRequiredProperties
+      .map((b) => ({key: b, required: true})));
 
     // start initializing the data in the property itself
     i18nData[locale] = {};

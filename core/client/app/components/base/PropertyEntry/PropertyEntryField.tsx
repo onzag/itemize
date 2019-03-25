@@ -14,7 +14,7 @@ import parse from "autosuggest-highlight/parse";
 import equals from "deep-equal";
 
 interface IPropertyEntryFieldState {
-  autocompleteInternalUnmanagedValue: PropertyDefinitionSupportedStringType;
+  internalUnmanagedValue: PropertyDefinitionSupportedStringType;
   suggestions: IPropertyEntryAutocompleteSuggestion[];
   uuid: string;
 }
@@ -35,23 +35,18 @@ export default class PropertyEntryField
     super(props);
 
     const state: IPropertyEntryFieldState = {
-      autocompleteInternalUnmanagedValue: "",
+      internalUnmanagedValue: props.value.value !== null ?
+        props.value.value.toString() : "",
       suggestions: [],
       uuid: "uuid-" + uuid.v4(),
     };
-
-    if (props.property.hasAutocomplete() &&
-      props.property.isAutocompleteEnforced() &&
-      !props.property.isAutocompleteLocalized()) {
-      state.autocompleteInternalUnmanagedValue = props.value.value === null ?
-        "" : props.value.value.toString();
-    }
 
     this.state = state;
 
     this.currentSuggestion = null;
 
     this.onChange = this.onChange.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
     this.renderSelectField = this.renderSelectField.bind(this);
     this.renderBasicTextField = this.renderBasicTextField.bind(this);
     this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
@@ -96,8 +91,8 @@ export default class PropertyEntryField
     nextState: IPropertyEntryFieldState,
   ) {
     return nextProps.property !== this.props.property ||
-      this.state.autocompleteInternalUnmanagedValue !==
-        nextState.autocompleteInternalUnmanagedValue ||
+      this.state.internalUnmanagedValue !==
+        nextState.internalUnmanagedValue ||
       !equals(this.state.suggestions, nextState.suggestions) ||
       !equals(this.props.value, nextProps.value) ||
       nextProps.locale !== this.props.locale;
@@ -108,11 +103,10 @@ export default class PropertyEntryField
     autosuggestOverride?: Autosuggest.ChangeEvent,
   ) {
     if (autosuggestOverride) {
-      if (this.props.property.isAutocompleteEnforced()) {
-        this.setState({
-          autocompleteInternalUnmanagedValue: autosuggestOverride.newValue,
-        });
-      }
+      this.setState({
+        internalUnmanagedValue: autosuggestOverride.newValue,
+      });
+
       const suggestionFound = this.state.suggestions
         .find((s) => {
           if (this.props.property.isAutocompleteLocalized()) {
@@ -134,6 +128,10 @@ export default class PropertyEntryField
           return;
         }
       }
+    } else {
+      this.setState({
+        internalUnmanagedValue: e.target.value,
+      });
     }
 
     if (this.props.property.getType() === "string") {
@@ -145,6 +143,22 @@ export default class PropertyEntryField
       const value = parseInt(e.target.value, 10);
       this.props.onChange(isNaN(value) ? null : value);
     }
+  }
+
+  public onKeyDown(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    if (this.props.property.getType() === "number" ||
+      this.props.property.getType() === "integer") {
+      e.preventDefault();
+    }
+    const definition = this.props.property.getPropertyDefinitionDescription();
+    // const totalMax = definition.max;
+    // if (totalMax) {
+    //  const value = parseFloat(e.target.value);
+
+    //  if (value > totalMax) {
+    //    e.preventDefault();
+    //  }
+    // }
   }
 
   public render() {
@@ -176,8 +190,7 @@ export default class PropertyEntryField
           {i18nLabel}
         </InputLabel>
         <Select
-          value={this.props.value.value === null ?
-            "" : this.props.value.value.toString()}
+          value={this.state.internalUnmanagedValue}
           onChange={this.onChange}
           input={
             <FilledInput
@@ -212,6 +225,14 @@ export default class PropertyEntryField
     const i18nLabel = i18nData && i18nData.label;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
 
+    const invalidReason = this.props.value.invalidReason;
+    let i18nInvalidReason = null;
+    if (this.props.value.userSet && invalidReason && i18nData &&
+      i18nData.error && i18nData.error[invalidReason]) {
+        i18nInvalidReason = i18nData.error[invalidReason];
+    }
+
+    // TODO fix this for the type number property, add the arrows
     const propertyDescription = this.props.property
       .getPropertyDefinitionDescription();
     const inputProps = {
@@ -244,39 +265,39 @@ export default class PropertyEntryField
       }
     }
 
-    const propertyType = this.props.property.getType();
-    const fieldType = propertyType === "string" ?
-      "text" : "number";
-
     return (
-      <TextField
-        fullWidth={true}
-        type={fieldType}
-        className={className}
-        label={i18nLabel}
-        placeholder={i18nPlaceholder}
-        value={this.props.value.value === null ?
-          "" : this.props.value.value.toString()}
-        onChange={this.onChange}
-        InputProps={{
-          classes: {
-            root: "property-entry--input",
-            focused: "focused",
-          },
-          id: this.state.uuid,
-          ...appliedInputProps,
-        }}
-        InputLabelProps={{
-          classes: {
-            root: "property-entry--label",
-            focused: "focused",
-          },
-        }}
-        inputProps={inputProps}
-        disabled={this.props.value.enforced}
-        variant="filled"
-        {...appliedTextFieldProps}
-      />
+      <div className="property-entry--container">
+        <TextField
+          fullWidth={true}
+          type="text"
+          className={className}
+          label={i18nLabel}
+          placeholder={i18nPlaceholder}
+          value={this.state.internalUnmanagedValue}
+          onChange={this.onChange}
+          InputProps={{
+            classes: {
+              root: "property-entry--input",
+              focused: "focused",
+            },
+            id: this.state.uuid,
+            ...appliedInputProps,
+          }}
+          InputLabelProps={{
+            classes: {
+              root: "property-entry--label",
+              focused: "focused",
+            },
+          }}
+          inputProps={inputProps}
+          disabled={this.props.value.enforced}
+          variant="filled"
+          {...appliedTextFieldProps}
+        />
+        {<div className="property-entry--error">
+          {i18nInvalidReason}
+        </div>}
+      </div>
     );
   }
 
@@ -373,7 +394,7 @@ export default class PropertyEntryField
     this.currentSuggestion = suggestion;
     if (suggestion) {
       this.setState({
-        autocompleteInternalUnmanagedValue: suggestion.i18nValue,
+        internalUnmanagedValue: suggestion.i18nValue,
       });
     }
   }
@@ -386,7 +407,6 @@ export default class PropertyEntryField
 
   public renderAutosuggestField() {
 
-    // TODO make it clear the autosuggest enforced thing that is not valid input
     // TODO make it so that when the autosuggest property in from property value
     // is update it invalidates the autosuggest
 
@@ -430,15 +450,9 @@ export default class PropertyEntryField
             "property-entry--field--autocomplete-section-title",
         }}
         inputProps={{
-          value: this.props.property.isAutocompleteEnforced() ?
-            this.state.autocompleteInternalUnmanagedValue :
-            (this.props.value.value === null ?
-              "" : this.props.value.value.toString()),
+          value: this.state.internalUnmanagedValue,
           onChange: this.onChange,
-          className: `property-entry--field--autocomplete ${
-            this.props.property.isAutocompleteEnforced() ?
-              "property-entry--field--autocomplete--enforced" : ""
-          }`,
+          className: "property-entry--field--autocomplete",
         }}
       />
     );
