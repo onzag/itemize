@@ -19,6 +19,17 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   MAX_CURRENCY_DECIMAL_COUNT} from "../../constants";
 import Module, { OnStateChangeListenerType } from "../Module";
 
+export enum PropertyInvalidReason {
+  UNSPECIFIED = "UNSPECIFIED",
+  INVALID_VALUE = "INVALID_VALUE",
+  TOO_LARGE = "TOO_LARGE",
+  TOO_SMALL = "TOO_SMALL",
+  TOO_LONG = "TOO_LONG",
+  TOO_SHORT = "TOO_SHORT",
+  TOO_MANY_DECIMALS = "TOO_MANY_DECIMALS",
+  NOT_NULLABLE = "NOT_NULLABLE",
+}
+
 // All the supported property types
 export type PropertyDefinitionSupportedTypeName =
   "boolean" |         // A simple boolean, comparable, and stored as a boolean
@@ -82,7 +93,7 @@ export interface IPropertyDefinitionSupportedType {
 
   // this is a validation function that checks whether the value
   // is valid,
-  validate?: (value: PropertyDefinitionSupportedType) => any;
+  validate?: (value: PropertyDefinitionSupportedType) => PropertyInvalidReason;
   // max valid, for numbers
   max?: number;
   // min valid for numbers
@@ -144,9 +155,17 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     gql: "Int",
     supportsAutocomplete: true,
     // it gotta be validated to check it's a number
-    validate: (n: PropertyDefinitionSupportedIntegerType) =>
-      !isNaN(NaN) && parseInt(n as any, 10) === n &&
-      n <= MAX_SUPPORTED_INTEGER && n >= MIN_SUPPORTED_INTEGER,
+    validate: (n: PropertyDefinitionSupportedIntegerType) => {
+      if (isNaN(n) || parseInt(n as any, 10) === n) {
+        return PropertyInvalidReason.UNSPECIFIED;
+      } else if (n > MAX_SUPPORTED_INTEGER) {
+        return PropertyInvalidReason.TOO_LARGE;
+      } else if (n < MIN_SUPPORTED_INTEGER) {
+        return PropertyInvalidReason.TOO_SMALL;
+      }
+
+      return null;
+    },
     // max and min
     max: MAX_SUPPORTED_INTEGER,
     min: -MIN_SUPPORTED_INTEGER,
@@ -171,20 +190,21 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // the validator
     validate: (n: PropertyDefinitionSupportedNumberType) => {
       if (isNaN(n)) {
-        return false;
+        return PropertyInvalidReason.UNSPECIFIED;
       }
 
-      if (n > MAX_SUPPORTED_REAL || n < MIN_SUPPORTED_REAL) {
-        return false;
+      if (n > MAX_SUPPORTED_REAL) {
+        return PropertyInvalidReason.TOO_LARGE;
+      } else if (n < MIN_SUPPORTED_REAL) {
+        return PropertyInvalidReason.TOO_SMALL;
       }
 
       const splittedDecimals = n.toString().split(".");
-      if (!splittedDecimals[1] ||
-          splittedDecimals[1].length <= MAX_DECIMAL_COUNT) {
-          return true;
-        }
+      if (!splittedDecimals[1] || splittedDecimals[1].length <= MAX_DECIMAL_COUNT) {
+        return null;
+      }
 
-      return false;
+      return PropertyInvalidReason.TOO_MANY_DECIMALS;
     },
     // max and min
     max: MAX_SUPPORTED_REAL,
@@ -213,24 +233,26 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
       if (typeof l.value !== "number" &&
         typeof l.currency !== "string") {
-        return false;
+        return PropertyInvalidReason.UNSPECIFIED;
       }
 
       if (isNaN(l.value)) {
-        return false;
+        return PropertyInvalidReason.UNSPECIFIED;
       }
 
-      if (l.value <= MAX_SUPPORTED_REAL && l.value >= MIN_SUPPORTED_REAL) {
-        return false;
+      if (l.value > MAX_SUPPORTED_REAL) {
+        return PropertyInvalidReason.TOO_LARGE;
+      } else if (l.value < MIN_SUPPORTED_REAL) {
+        return PropertyInvalidReason.TOO_SMALL;
       }
 
       const splittedDecimals = l.value.toString().split(".");
       if (!splittedDecimals[1] ||
-          splittedDecimals[1].length <= MAX_CURRENCY_DECIMAL_COUNT) {
-          return true;
-        }
+        splittedDecimals[1].length <= MAX_CURRENCY_DECIMAL_COUNT) {
+        return null;
+      }
 
-      return false;
+      return PropertyInvalidReason.TOO_MANY_DECIMALS;
     },
     rangeDefaultSearch: true,
     // Similar to real
@@ -257,7 +279,15 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     nullableDefault: "",
     supportsAutocomplete: true,
     // validates just the length
-    validate: (s: PropertyDefinitionSupportedStringType) => s.length <= 255,
+    validate: (s: PropertyDefinitionSupportedStringType) => {
+      if (typeof s !== "string") {
+        return PropertyInvalidReason.UNSPECIFIED;
+      } else if (s.length > MAX_STRING_LENGTH) {
+        return PropertyInvalidReason.TOO_LONG;
+      }
+
+      return null;
+    },
     maxLength: MAX_STRING_LENGTH,
     // it is searchable by an exact value, use text for organic things
     searchable: true,
@@ -274,7 +304,15 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     gql: "String",
     nullableDefault: "",
     // validates just the length
-    validate: (s: PropertyDefinitionSupportedPasswordType) => s.length <= 255,
+    validate: (s: PropertyDefinitionSupportedPasswordType) => {
+      if (typeof s !== "string") {
+        return PropertyInvalidReason.UNSPECIFIED;
+      } else if (s.length > MAX_STRING_LENGTH) {
+        return PropertyInvalidReason.TOO_LONG;
+      }
+
+      return null;
+    },
     maxLength: MAX_STRING_LENGTH,
     searchable: false,
     // i18n attributes required
@@ -288,7 +326,13 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     nullableDefault: "",
     // validates the text, texts don't support json value
     validate: (s: PropertyDefinitionSupportedTextType) => {
-      return typeof s === "string" && s.length < MAX_TEXT_LENGTH;
+      if (typeof s !== "string") {
+        return PropertyInvalidReason.UNSPECIFIED;
+      } else if (s.length > MAX_STRING_LENGTH) {
+        return PropertyInvalidReason.TOO_LONG;
+      }
+
+      return null;
     },
     // the max length for the html
     maxLength: MAX_TEXT_LENGTH,
@@ -308,8 +352,19 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // years can be set as a number
     json: "number",
     // validates
-    validate: (n: number) => !isNaN(NaN) && parseInt(n as any, 10) === n &&
-      n <= MAX_SUPPORTED_YEAR && n >= MIN_SUPPORTED_YEAR,
+    validate: (n: number) => {
+      if (isNaN(n)) {
+        return PropertyInvalidReason.UNSPECIFIED;
+      } else if (parseInt(n.toString(), 10) !== n) {
+        return PropertyInvalidReason.UNSPECIFIED;
+      } else if (n > MAX_SUPPORTED_YEAR) {
+        return PropertyInvalidReason.TOO_LARGE;
+      } else if (n > MIN_SUPPORTED_YEAR) {
+        return PropertyInvalidReason.TOO_SMALL;
+      }
+
+      return null;
+    },
     // max and min
     max: MAX_SUPPORTED_YEAR,
     min: MIN_SUPPORTED_YEAR,
@@ -363,9 +418,15 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
     // locations just contain this basic data
     validate: (l: IPropertyDefinitionSupportedLocationType) => {
-      return typeof l.lng === "string" &&
-        typeof l.lat === "string" &&
-        typeof l.txt === "string";
+      if (
+        typeof l.lat !== "string" ||
+        typeof l.lng !== "string" ||
+        typeof l.txt !== "string"
+      ) {
+        return PropertyInvalidReason.UNSPECIFIED;
+      }
+
+      return null;
     },
     // they are searchable
     searchable: true,
@@ -542,6 +603,7 @@ export interface IPropertyValueGetterType {
   enforced: boolean;
   hidden: boolean;
   valid: boolean;
+  invalidReason: PropertyInvalidReason;
   value: PropertyDefinitionSupportedType;
 }
 
@@ -568,56 +630,59 @@ export default class PropertyDefinition {
     propertyDefinitionRaw: IPropertyDefinitionRawJSONDataType,
     value: PropertyDefinitionSupportedType,
     checkAgainstValues: boolean,
-  ): boolean {
+  ): PropertyInvalidReason {
     // Check for nulls
     if (propertyDefinitionRaw.nullable && value === null) {
-      return true;
+      return null;
     } else if (!propertyDefinitionRaw.nullable && value === null) {
-      return false;
+      return PropertyInvalidReason.NOT_NULLABLE;
     }
     // Check against the values if allowed
     if (propertyDefinitionRaw.values &&
       checkAgainstValues &&
       !propertyDefinitionRaw.values.includes(value)) {
-      return false;
+      return PropertyInvalidReason.INVALID_VALUE;
     }
     // we get the definition and run basic checks
     const definition = PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       [propertyDefinitionRaw.type];
     // These basic checks are the most important
     if (definition.json && typeof value !== definition.json) {
-      return false;
+      return PropertyInvalidReason.UNSPECIFIED;
     }
-    if (definition.validate && !definition.validate(value)) {
-      return false;
+    if (definition.validate) {
+      const invalidReason = definition.validate(value);
+      if (invalidReason) {
+        return invalidReason;
+      }
     }
 
     // Do the fancy checks
     if (typeof propertyDefinitionRaw.min !== "undefined" &&
       ((value as IPropertyDefinitionSupportedCurrencyType).value ||
         value) < propertyDefinitionRaw.min) {
-      return false;
+      return PropertyInvalidReason.TOO_SMALL;
     } else if (typeof propertyDefinitionRaw.max !== "undefined" &&
       ((value as IPropertyDefinitionSupportedCurrencyType).value ||
         value) > propertyDefinitionRaw.max) {
-      return false;
+      return PropertyInvalidReason.TOO_LARGE;
     } else if (typeof propertyDefinitionRaw.maxLength !== "undefined" &&
       (value as string).length > propertyDefinitionRaw.maxLength) {
-      return false;
+      return PropertyInvalidReason.TOO_LONG;
     } else if (typeof propertyDefinitionRaw.minLength !== "undefined" &&
       (value as string).length < propertyDefinitionRaw.minLength) {
-      return false;
+      return PropertyInvalidReason.TOO_SHORT;
     } else if (typeof propertyDefinitionRaw.maxDecimalCount !== "number") {
       const splittedDecimals =
         ((value as IPropertyDefinitionSupportedCurrencyType).value || value)
         .toString().split(".");
       if (splittedDecimals[1] &&
         splittedDecimals[1].length > propertyDefinitionRaw.maxDecimalCount) {
-        return false;
+          return PropertyInvalidReason.TOO_MANY_DECIMALS;
       }
     }
 
-    return true;
+    return null;
   }
 
   public rawData: IPropertyDefinitionRawJSONDataType;
@@ -716,6 +781,7 @@ export default class PropertyDefinition {
         enforced: true,
         default: false,
         valid: true,
+        invalidReason: null,
         value: null,
         hidden: true,
       };
@@ -748,12 +814,14 @@ export default class PropertyDefinition {
 
       // if we get one
       if (typeof enforcedValue !== "undefined") {
+        const invalidEnforcedReason = this.isValidValue(enforcedValue.value);
         // we return the value that was set to be
         return {
           userSet: false,
           enforced: true,
           default: false,
-          valid: this.isValidValue(enforcedValue.value),
+          valid: !invalidEnforcedReason,
+          invalidReason: invalidEnforcedReason,
           value: enforcedValue.value,
           hidden: this.isCurrentlyHidden(),
         };
@@ -783,21 +851,25 @@ export default class PropertyDefinition {
       // return the default value or null if nothing found
       // the maximum default is null, even if the item is not
       // nullable in which case the item would be considered invalid
+      const invalidDefaultReason = this.isValidValue(defaultValue || null);
       return {
         userSet: false,
         enforced: false,
         default: true,
-        valid: this.isValidValue(defaultValue || null),
+        valid: !invalidDefaultReason,
+        invalidReason: invalidDefaultReason,
         value: defaultValue || null,
         hidden: this.isCurrentlyHidden(),
       };
     }
 
+    const invalidReason = this.isValidValue(this.stateValue);
     return {
       userSet: true,
       enforced: false,
       default: false,
-      valid: this.isValidValue(this.stateValue),
+      valid: !invalidReason,
+      invalidReason,
       value: this.stateValue,
       hidden: this.isCurrentlyHidden(),
     };
@@ -827,8 +899,12 @@ export default class PropertyDefinition {
       if (definition.json && typeof actualValue !== definition.json) {
         throw new Error("Invalid super enforced " + JSON.stringify(actualValue));
       }
-      if (definition.validate && !definition.validate(actualValue)) {
-        throw new Error("Invalid super enforced " + JSON.stringify(actualValue));
+      if (definition.validate) {
+        const invalidReason = definition.validate(actualValue);
+        if (invalidReason) {
+          throw new Error("Invalid super enforced " + JSON.stringify(actualValue) +
+            " " + invalidReason);
+        }
       }
     }
 
@@ -856,10 +932,14 @@ export default class PropertyDefinition {
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
       if (definition.json && typeof actualValue !== definition.json) {
-        throw new Error("Invalid super enforced " + JSON.stringify(actualValue));
+        throw new Error("Invalid super default " + JSON.stringify(actualValue));
       }
-      if (definition.validate && !definition.validate(actualValue)) {
-        throw new Error("Invalid super enforced " + JSON.stringify(actualValue));
+      if (definition.validate) {
+        const invalidReason = definition.validate(actualValue);
+        if (invalidReason) {
+          throw new Error("Invalid super default " + JSON.stringify(actualValue) +
+            " " + invalidReason);
+        }
       }
     }
 
@@ -894,18 +974,19 @@ export default class PropertyDefinition {
       if (definition.json && typeof newActualValue !== definition.json) {
         throw new Error("Invalid value " + JSON.stringify(newActualValue));
       }
-      if (definition.validate && !definition.validate(newActualValue)) {
-        throw new Error("Invalid value " + JSON.stringify(newActualValue));
+      if (definition.validate) {
+        const invalidReason = definition.validate(newActualValue);
+        if (invalidReason) {
+          throw new Error("Invalid value " + JSON.stringify(newActualValue) +
+            " " + invalidReason);
+        }
       }
     }
 
-    // if the value differs we set it for the new
     // note that the value is set and never check
-    if (newActualValue !== this.stateValue) {
-      this.stateValue = newActualValue;
-      this.stateValueModified = true;
-      this.onStateChangeListeners.forEach((l) => l());
-    }
+    this.stateValue = newActualValue;
+    this.stateValueModified = true;
+    this.onStateChangeListeners.forEach((l) => l());
   }
 
   /**
@@ -914,7 +995,7 @@ export default class PropertyDefinition {
    * @param value the value to check
    * @return a boolean
    */
-  public isValidValue(value: PropertyDefinitionSupportedType): boolean {
+  public isValidValue(value: PropertyDefinitionSupportedType): PropertyInvalidReason {
     return PropertyDefinition.isValidValue(
       this.rawData,
       value,
@@ -931,6 +1012,14 @@ export default class PropertyDefinition {
   public getNewInstance() {
     return new PropertyDefinition(this.rawData, this.parentModule,
       this.parentItemDefinition, this.isExtension);
+  }
+
+  /**
+   * Provides the property definition description from the
+   * supported standards
+   */
+  public getPropertyDefinitionDescription() {
+    return PropertyDefinition.supportedTypesStandard[this.getType()];
   }
 
   public isNullable() {
@@ -1180,7 +1269,7 @@ if (process.env.NODE_ENV !== "production") {
       autocompleteSetFromProperty: ["autocomplete"],
       autocompleteIsEnforced: ["autocomplete"],
       autocompleteSupportsPrefills: ["autocomplete"],
-      autocompleteSupportsLocale: ["autocomplete", "autocompleteSupportsPrefills"],
+      autocompleteSupportsLocale: ["autocomplete", "autocompleteIsEnforced"],
     },
     required: ["id", "type"],
   };

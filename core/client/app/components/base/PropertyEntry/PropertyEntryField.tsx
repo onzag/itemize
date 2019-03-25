@@ -20,7 +20,7 @@ interface IPropertyEntryFieldState {
 }
 
 interface IPropertyEntryAutocompleteSuggestion {
-  label: string;
+  i18nValue: string;
   value: PropertyDefinitionSupportedStringType |
     PropertyDefinitionSupportedNumberType |
     PropertyDefinitionSupportedIntegerType;
@@ -29,24 +29,68 @@ interface IPropertyEntryAutocompleteSuggestion {
 export default class PropertyEntryField
   extends React.Component<IPropertyEntryProps, IPropertyEntryFieldState> {
 
+  private currentSuggestion: IPropertyEntryAutocompleteSuggestion;
+
   constructor(props: IPropertyEntryProps) {
     super(props);
 
-    this.state = {
+    const state: IPropertyEntryFieldState = {
       autocompleteInternalUnmanagedValue: "",
       suggestions: [],
       uuid: "uuid-" + uuid.v4(),
     };
 
+    if (props.property.hasAutocomplete() &&
+      props.property.isAutocompleteEnforced() &&
+      !props.property.isAutocompleteLocalized()) {
+      state.autocompleteInternalUnmanagedValue = props.value.value === null ?
+        "" : props.value.value.toString();
+    }
+
+    this.state = state;
+
+    this.currentSuggestion = null;
+
     this.onChange = this.onChange.bind(this);
     this.renderSelectField = this.renderSelectField.bind(this);
     this.renderBasicTextField = this.renderBasicTextField.bind(this);
+    this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
     this.renderAutosuggestField = this.renderAutosuggestField.bind(this);
     this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
     this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
+    this.onI18nSuggestionFetchRequested = this.onI18nSuggestionFetchRequested.bind(this);
     this.getSuggestionValue = this.getSuggestionValue.bind(this);
     this.clearSuggestions = this.clearSuggestions.bind(this);
   }
+
+  public componentDidMount() {
+    if (
+      this.props.value.value &&
+      this.props.property.isAutocompleteEnforced() &&
+      this.props.property.isAutocompleteLocalized()
+    ) {
+      this.onI18nSuggestionFetchRequested({
+        value: this.props.value.value,
+      });
+    }
+  }
+
+  public componentDidUpdate(prevProps) {
+    if (
+      this.props.value.value &&
+      prevProps.value.value !== this.props.value.value &&
+      this.props.property.isAutocompleteEnforced() &&
+      this.props.property.isAutocompleteLocalized()
+    ) {
+      if (!this.currentSuggestion ||
+        this.currentSuggestion.value !== this.props.value.value) {
+        this.onI18nSuggestionFetchRequested({
+          value: this.props.value.value,
+        });
+      }
+    }
+  }
+
   public shouldComponentUpdate(
     nextProps: IPropertyEntryProps,
     nextState: IPropertyEntryFieldState,
@@ -64,21 +108,32 @@ export default class PropertyEntryField
     autosuggestOverride?: Autosuggest.ChangeEvent,
   ) {
     if (autosuggestOverride) {
-      if (this.props.property.isAutocompleteEnforced()) {
-        const suggestionFound = this.state.suggestions
-          .find((s) => s.label === autosuggestOverride.newValue);
+      if (this.props.property.isAutocompleteEnforced()) {
         this.setState({
           autocompleteInternalUnmanagedValue: autosuggestOverride.newValue,
         });
-        if (suggestionFound) {
-          this.props.onChange(suggestionFound.value);
-        } else {
-          this.props.onChange(null);
-        }
-      } else {
-        this.props.onChange(autosuggestOverride.newValue);
       }
-      return;
+      const suggestionFound = this.state.suggestions
+        .find((s) => {
+          if (this.props.property.isAutocompleteLocalized()) {
+            return s.i18nValue === autosuggestOverride.newValue;
+          } else {
+            return (s.value === null ? "" : s.value.toString()) ===
+              autosuggestOverride.newValue;
+          }
+        });
+      if (suggestionFound) {
+        this.currentSuggestion = suggestionFound;
+        this.props.onChange(suggestionFound.value);
+        return;
+      } else {
+        this.currentSuggestion = null;
+
+        if (this.props.property.isAutocompleteEnforced()) {
+          this.props.onChange(null);
+          return;
+        }
+      }
     }
 
     if (this.props.property.getType() === "string") {
@@ -151,16 +206,24 @@ export default class PropertyEntryField
     );
   }
 
-  public renderBasicTextField(inputProps?: any) {
+  public renderBasicTextField(textFieldProps?: any) {
     const i18nData = this.props.property.getI18nDataFor(this.props.locale);
     const className = getClassName(this.props, "field");
     const i18nLabel = i18nData && i18nData.label;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
 
+    const propertyDescription = this.props.property
+      .getPropertyDefinitionDescription();
+    const inputProps = {
+      min: propertyDescription.min,
+      max: propertyDescription.max,
+      step: 1 / Math.pow(10, propertyDescription.maxDecimalCount || 0),
+    };
+
     let appliedTextFieldProps: any = {};
     let appliedInputProps: any = {};
-    if (inputProps) {
-      const { inputRef = () => {return; } , ref, ...other } = inputProps;
+    if (textFieldProps) {
+      const { inputRef = () => {return; } , ref, ...other } = textFieldProps;
       appliedTextFieldProps = other;
       appliedInputProps = {
         inputRef: (node: HTMLInputElement) => {
@@ -172,13 +235,18 @@ export default class PropertyEntryField
       if (appliedTextFieldProps.className) {
         appliedTextFieldProps.className += " " + className;
       }
+
+      if (appliedTextFieldProps.inputProps) {
+        appliedTextFieldProps.inputProps = {
+          ...appliedTextFieldProps.inputProps,
+          ...inputProps,
+        };
+      }
     }
 
     const propertyType = this.props.property.getType();
     const fieldType = propertyType === "string" ?
       "text" : "number";
-
-    // TODO add the data for the min, max, decimals and whatnot
 
     return (
       <TextField
@@ -204,6 +272,7 @@ export default class PropertyEntryField
             focused: "focused",
           },
         }}
+        inputProps={inputProps}
         disabled={this.props.value.enforced}
         variant="filled"
         {...appliedTextFieldProps}
@@ -228,9 +297,11 @@ export default class PropertyEntryField
     suggestion: IPropertyEntryAutocompleteSuggestion,
     params: Autosuggest.RenderSuggestionParams,
   ) {
-    const label = suggestion.label;
-    const matches = match(label, params.query);
-    const parts = parse(label, matches);
+    const valueToMatch = this.props.property.isAutocompleteLocalized() ?
+      suggestion.i18nValue :
+        (suggestion.value === null ? "" : suggestion.value.toString());
+    const matches = match(valueToMatch, params.query);
+    const parts = parse(valueToMatch, matches);
 
     return (
       <MenuItem selected={params.isHighlighted} component="div">
@@ -256,7 +327,9 @@ export default class PropertyEntryField
   public getSuggestionValue(
     suggestion: IPropertyEntryAutocompleteSuggestion,
   ) {
-    return suggestion.label;
+    return this.props.property.isAutocompleteLocalized() ?
+      suggestion.i18nValue :
+        (suggestion.value === null ? "" : suggestion.value.toString());
   }
 
   public onSuggestionsFetchRequested({value}) {
@@ -264,19 +337,45 @@ export default class PropertyEntryField
     this.setState({
       suggestions: [
         {
-          label: "one",
+          i18nValue: "one",
           value: "oneValue",
         },
         {
-          label: "two",
+          i18nValue: "two",
           value: "twoValue",
         },
         {
-          label: "three",
+          i18nValue: "three",
           value: "threeValue",
         },
       ],
     });
+  }
+
+  public onI18nSuggestionFetchRequested({value}) {
+    // TODO implement this
+    console.log("i18n requested");
+    const suggestion = ([
+      {
+        i18nValue: "one",
+        value: "oneValue",
+      },
+      {
+        i18nValue: "two",
+        value: "twoValue",
+      },
+      {
+        i18nValue: "three",
+        value: "threeValue",
+      },
+    ]).find((o) => o.value === value);
+
+    this.currentSuggestion = suggestion;
+    if (suggestion) {
+      this.setState({
+        autocompleteInternalUnmanagedValue: suggestion.i18nValue,
+      });
+    }
   }
 
   public clearSuggestions() {
@@ -288,6 +387,8 @@ export default class PropertyEntryField
   public renderAutosuggestField() {
 
     // TODO make it clear the autosuggest enforced thing that is not valid input
+    // TODO make it so that when the autosuggest property in from property value
+    // is update it invalidates the autosuggest
 
     return (
       <Autosuggest
@@ -334,7 +435,10 @@ export default class PropertyEntryField
             (this.props.value.value === null ?
               "" : this.props.value.value.toString()),
           onChange: this.onChange,
-          className: "property-entry--field--autocomplete",
+          className: `property-entry--field--autocomplete ${
+            this.props.property.isAutocompleteEnforced() ?
+              "property-entry--field--autocomplete--enforced" : ""
+          }`,
         }}
       />
     );

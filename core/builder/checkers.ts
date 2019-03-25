@@ -74,13 +74,16 @@ export function checkConditionalRuleSet(
         "Conditional rule set property not available",
         traceback.newTraceToBit("property"),
       );
-    } else if (!PropertyDefinition.isValidValue(
+    }
+
+    const invalidReason = PropertyDefinition.isValidValue(
       propDef,
       rawDataAsProperty.value,
       true,
-    )) {
+    );
+    if (invalidReason) {
       throw new CheckUpError(
-        "Conditional rule set value invalid",
+        "Conditional rule set value invalid: " + invalidReason,
         traceback.newTraceToBit("value"),
       );
     }
@@ -339,11 +342,15 @@ export function checkPropertiesValueMappingDefiniton(
     // we must ensure it's not a referred property to do the check
     if (!referredPropertyAsValueApplied.property) {
       // And check whether the value is even valid
-      if (!PropertyDefinition.isValidValue(propertyDefinitionOfTheReferredItem,
-        propertyValueAppliedToTheReferred as PropertyDefinitionSupportedType, true)) {
+      const invalidReason = PropertyDefinition.isValidValue(
+        propertyDefinitionOfTheReferredItem,
+        propertyValueAppliedToTheReferred as PropertyDefinitionSupportedType,
+        true,
+      );
+      if (invalidReason) {
         throw new CheckUpError(
           `Property value for '${propertyIdOfTheReferredItem}' is invalid` +
-          ` for referred '${referredItemDefinition.name}'`,
+          ` for referred '${referredItemDefinition.name}' : ${invalidReason}`,
           traceback.newTraceToBit(propertyIdOfTheReferredItem),
         );
       }
@@ -459,13 +466,14 @@ export function checkPropertyDefinition(
   if (rawData.values) {
     const valuesTraceback = traceback.newTraceToBit("values");
     rawData.values.forEach((value, index) => {
-      if (!PropertyDefinition.isValidValue(
+      const invalidreason = PropertyDefinition.isValidValue(
         rawData,
         value,
         false,
-      )) {
+      );
+      if (invalidreason) {
         throw new CheckUpError(
-          "Invalid value for item",
+          "Invalid value for item: " + invalidreason,
           valuesTraceback.newTraceToBit(index),
         );
       }
@@ -474,13 +482,14 @@ export function checkPropertyDefinition(
 
   // Let's check whether the default value is valid too
   if (rawData.default) {
-    if (!PropertyDefinition.isValidValue(
+    const invalidReason = PropertyDefinition.isValidValue(
       rawData,
       rawData.default,
       true,
-    )) {
+    );
+    if (invalidReason) {
       throw new CheckUpError(
-        "Invalid type for default",
+        "Invalid type for default: " + invalidReason,
         traceback.newTraceToBit("default"),
       );
     }
@@ -534,13 +543,14 @@ export function checkPropertyDefinition(
         defaultIfTraceback.newTraceToBit(index).newTraceToBit("if"),
       );
 
-      if (!PropertyDefinition.isValidValue(
+      const invalidReason = PropertyDefinition.isValidValue(
         rawData,
         rule.value,
         true,
-      )) {
+      );
+      if (invalidReason) {
         throw new CheckUpError(
-          "Invalid value for default if definition",
+          "Invalid value for default if definition: " + invalidReason,
           defaultIfTraceback.newTraceToBit(index).newTraceToBit("value"),
         );
       }
@@ -548,13 +558,14 @@ export function checkPropertyDefinition(
   }
 
   if (rawData.enforcedValue) {
-    if (!PropertyDefinition.isValidValue(
+    const invalidReason = PropertyDefinition.isValidValue(
       rawData,
       rawData.enforcedValue,
       true,
-    )) {
+    );
+    if (invalidReason) {
       throw new CheckUpError(
-        "Invalid value for enforced value definition",
+        "Invalid value for enforced value definition: " + invalidReason,
         traceback.newTraceToBit("enforcedValue"),
       );
     }
@@ -570,13 +581,14 @@ export function checkPropertyDefinition(
         enforcedValuesTraceback.newTraceToBit(index).newTraceToBit("if"),
       );
 
-      if (!PropertyDefinition.isValidValue(
+      const invalidReason = PropertyDefinition.isValidValue(
         rawData,
         ev.value,
         true,
-      )) {
+      );
+      if (invalidReason) {
         throw new CheckUpError(
-          "Invalid type for enforcedValues enforced value",
+          "Invalid type for enforcedValues enforced value: " + invalidReason,
           enforcedValuesTraceback.newTraceToBit(index).newTraceToBit("value"),
         );
       }

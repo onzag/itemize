@@ -5,14 +5,26 @@
 			"id": "category",
 			"type": "string",
 			"autocomplete": "category",
-			"autocompleteIsEnforced": true
-		},
+      "autocompleteIsEnforced": true
+    },
+    {
+			"id": "category_locale",
+			"type": "string",
+			"autocomplete": "category",
+      "autocompleteIsEnforced": true,
+      "autocompleteSupportsLocale": true
+    },
+    {
+			"id": "category_non_enforced",
+			"type": "string",
+			"autocomplete": "category"
+    },
     {
 			"id": "topic",
 			"type": "string",
 			"autocomplete": "topics",
       "autocompleteSetFromProperty": ["category"],
-			"autocompleteIsEnforced": true
+      "autocompleteIsEnforced": true
 		},
     {
 			"id": "parent_item_type",
