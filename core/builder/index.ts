@@ -24,6 +24,7 @@ import {
 import { checkRoot } from "./checkers";
 import { processRoot } from "./processer";
 import { buildGraphQLSchema } from "./graphql";
+import { LOCALE_I18N } from "../constants";
 
 import * as fs from "fs";
 import * as path from "path";
@@ -254,7 +255,9 @@ async function buildLang(
   const properties = PropertiesReader(languageFileLocation).path();
   const result: {
     locales: {
-      [key: string]: string,
+      [key: string]: {
+        [data: string]: string,
+      },
     },
   } = {
     locales: {},
@@ -271,7 +274,18 @@ async function buildLang(
       );
     }
 
-    result.locales[locale] = properties[locale];
+    result.locales[locale] = {};
+
+    LOCALE_I18N.forEach((property) => {
+      if (!properties[locale][property]) {
+        throw new CheckUpError(
+          "File does not include data for '" + locale + "' in '" + property + "'",
+          internalTraceback,
+        );
+      }
+
+      result.locales[locale][property] = properties[locale][property];
+    });
   });
 
   return result;

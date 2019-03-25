@@ -15,7 +15,7 @@ import PropertyEntryDate from "./PropertyEntryDate";
 import PropertyEntryLocation from "./PropertyEntryLocation";
 import PropertyEntryImage from "./PropertyEntryImage";
 import PropertyEntryFiles from "./PropertyEntryFiles";
-import { LocaleContext } from "../../..";
+import { LocaleContext, LocaleDataContext } from "../../..";
 
 import "../../../../theme/property-entries.scss";
 
@@ -66,7 +66,16 @@ export default function PropertyEntry(props: IPropertyEntryProps) {
   const Element = typeRegistry[props.property.getType()];
   return (
     <LocaleContext.Consumer>
-      {(locale) => <Element {...props} locale={props.locale || locale.state}/>}
+      {(locale) => <LocaleDataContext.Consumer>
+        {(localeData) =>
+          <Element
+            {...props}
+            locale={props.locale || locale.state}
+            numberSeparator={
+              localeData.locales[props.locale || locale.state].number_separator
+            }
+          />}
+      </LocaleDataContext.Consumer>}
     </LocaleContext.Consumer>
   );
 }

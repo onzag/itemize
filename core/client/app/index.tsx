@@ -20,7 +20,9 @@ if (isDevelopment) {
 
 export interface ILocaleDataType {
  locales: {
-    [locale: string]: string,
+    [locale: string]: {
+      [data: string]: string,
+    },
   };
 }
 

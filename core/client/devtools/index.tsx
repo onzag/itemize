@@ -84,7 +84,7 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
                 {(locale) => <div>
                   <p>
                     Current Locale
-                    <b> {locale.state} - {localeData.locales[locale.state]} </b>
+                    <b> {locale.state} - {localeData.locales[locale.state].name} </b>
                     {
                       locale.updating ?
                       "Updating..." :
@@ -97,7 +97,7 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
                              style={devtoolsStyle.singeLocaleChanger}
                              onClick={this.changeLocale.bind(this, locale, localeName)}
                             >
-                             {localeName} - {localeData.locales[localeName]}
+                             {localeName} - {localeData.locales[localeName].name}
                             </span>
                           </React.Fragment>)}
                       </React.Fragment>

@@ -23,6 +23,11 @@ export const MAX_TEXT_LENGTH = MAX_STRING_LENGTH;
 // The max file size (for either images and binary files)
 export const MAX_FILE_SIZE = 5242880; // equivalent to 5MB
 
+export const LOCALE_I18N = [
+  "name",
+  "number_separator",
+];
+
 // ATTRIBUTES FOR i18N
 export const CLASSIC_BASE_I18N = [
   "label",

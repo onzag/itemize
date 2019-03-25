@@ -19,6 +19,10 @@ interface IPropertyEntryFieldState {
   uuid: string;
 }
 
+interface IPropertyEntryFieldProps extends IPropertyEntryProps {
+  numberSeparator: string;
+}
+
 interface IPropertyEntryAutocompleteSuggestion {
   i18nValue: string;
   value: PropertyDefinitionSupportedStringType |
@@ -27,11 +31,11 @@ interface IPropertyEntryAutocompleteSuggestion {
 }
 
 export default class PropertyEntryField
-  extends React.Component<IPropertyEntryProps, IPropertyEntryFieldState> {
+  extends React.Component<IPropertyEntryFieldProps, IPropertyEntryFieldState> {
 
   private currentSuggestion: IPropertyEntryAutocompleteSuggestion;
 
-  constructor(props: IPropertyEntryProps) {
+  constructor(props: IPropertyEntryFieldProps) {
     super(props);
 
     const state: IPropertyEntryFieldState = {
@@ -275,6 +279,7 @@ export default class PropertyEntryField
           placeholder={i18nPlaceholder}
           value={this.state.internalUnmanagedValue}
           onChange={this.onChange}
+          onKeyDown={this.onKeyDown}
           InputProps={{
             classes: {
               root: "property-entry--input",
