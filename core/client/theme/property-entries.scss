@@ -65,6 +65,7 @@ $property-entry-color-error-clear: #e57373;
     position: absolute;
     display: block;
     width: 100%;
-    top: calc(100% - #{$property-entry-error-height})
+    top: calc(100% - #{$property-entry-error-height});
+    z-index: 1000;
   }
 }

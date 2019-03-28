@@ -609,6 +609,7 @@ export interface IPropertyValueGetterType {
   valid: boolean;
   invalidReason: PropertyInvalidReason;
   value: PropertyDefinitionSupportedType;
+  valueId: string;
 }
 
 // The class itself
@@ -707,6 +708,7 @@ export default class PropertyDefinition {
   private onStateChangeListeners: OnStateChangeListenerType[];
   private stateValue: PropertyDefinitionSupportedType;
   private stateValueModified: boolean;
+  private stateValueId: string;
 
   /**
    * Builds a property definition
@@ -746,6 +748,7 @@ export default class PropertyDefinition {
     // initial value for all namespaces is null
     this.stateValue = null;
     this.stateValueModified = false;
+    this.stateValueId = null;
   }
 
   /**
@@ -788,6 +791,7 @@ export default class PropertyDefinition {
         invalidReason: null,
         value: null,
         hidden: true,
+        valueId: null,
       };
     }
 
@@ -828,6 +832,7 @@ export default class PropertyDefinition {
           invalidReason: invalidEnforcedReason,
           value: enforcedValue.value,
           hidden: this.isCurrentlyHidden(),
+          valueId: null,
         };
       }
     }
@@ -864,6 +869,7 @@ export default class PropertyDefinition {
         invalidReason: invalidDefaultReason,
         value: defaultValue || null,
         hidden: this.isCurrentlyHidden(),
+        valueId: null,
       };
     }
 
@@ -876,6 +882,7 @@ export default class PropertyDefinition {
       invalidReason,
       value: this.stateValue,
       hidden: this.isCurrentlyHidden(),
+      valueId: this.stateValueId,
     };
   }
 
@@ -949,6 +956,7 @@ export default class PropertyDefinition {
    */
   public setCurrentValue(
     newValue: PropertyDefinitionSupportedType,
+    valueId: string,
   ) {
     // let's get the definition
     const definition = PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
@@ -969,6 +977,7 @@ export default class PropertyDefinition {
     // note that the value is set and never check
     this.stateValue = newActualValue;
     this.stateValueModified = true;
+    this.stateValueId = valueId;
     this.onStateChangeListeners.forEach((l) => l());
   }
 

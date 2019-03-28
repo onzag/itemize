@@ -21,7 +21,7 @@ import "../../../../theme/property-entries.scss";
 export interface IPropertyEntryProps {
   property: PropertyDefinition;
   value: IPropertyValueGetterType;
-  onChange: (newValue: PropertyDefinitionSupportedType) => void;
+  onChange: (newValue: PropertyDefinitionSupportedType, valueId: string) => void;
   locale?: string;
   poked?: boolean;
 }

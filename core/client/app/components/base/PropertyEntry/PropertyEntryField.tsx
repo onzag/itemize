@@ -19,6 +19,8 @@ interface IPropertyEntryFieldState {
   internalUnmanagedValue: PropertyDefinitionSupportedStringType;
   suggestions: IPropertyEntryAutocompleteSuggestion[];
   uuid: string;
+  valueId: string;
+  preventNextDerivedUpdate: boolean;
 }
 
 interface IPropertyEntryFieldProps extends IPropertyEntryProps {
@@ -33,11 +35,33 @@ interface IPropertyEntryAutocompleteSuggestion {
     PropertyDefinitionSupportedYearType;
 }
 
+function formatValueAsString(type: string, numberSeparator: string, value: any) {
+  if (type === "number") {
+    return value.toString().replace(/\./g, numberSeparator);
+  }
+  return value.toString();
+}
+
 export default class PropertyEntryField
   extends React.Component<IPropertyEntryFieldProps, IPropertyEntryFieldState> {
 
-  private currentSuggestion: IPropertyEntryAutocompleteSuggestion;
+  public static getDerivedStateFromProps(props: IPropertyEntryFieldProps, state: IPropertyEntryFieldState) {
+    if (state.preventNextDerivedUpdate) {
+      return {
+        preventNextDerivedUpdate: false,
+      };
+    }
 
+    if (props.value.valueId !== state.valueId || props.value.valueId === null) {
+      return {
+        internalUnmanagedValue: props.value.value !== null ?
+        formatValueAsString(props.property.getType(), props.numberSeparator, props.value.value) : "",
+      };
+    }
+    return null;
+  }
+
+  private currentSuggestion: IPropertyEntryAutocompleteSuggestion;
   constructor(props: IPropertyEntryFieldProps) {
     super(props);
 
@@ -46,6 +70,8 @@ export default class PropertyEntryField
         props.value.value.toString() : "",
       suggestions: [],
       uuid: "uuid-" + uuid.v4(),
+      valueId: "uuid-" + uuid.v4(),
+      preventNextDerivedUpdate: false,
     };
 
     this.state = state;
@@ -66,6 +92,8 @@ export default class PropertyEntryField
   }
 
   public componentDidMount() {
+    // Let's check if we have a localized autocomplete
+    // situation on startup
     if (
       this.props.value.value &&
       this.props.property.isAutocompleteEnforced() &&
@@ -73,23 +101,26 @@ export default class PropertyEntryField
     ) {
       this.onI18nSuggestionFetchRequested({
         value: this.props.value.value,
+        preventNextDerivedUpdate: true,
       });
     }
   }
 
-  public componentDidUpdate(prevProps) {
+  public componentDidUpdate(prevProps: IPropertyEntryFieldProps) {
+    // let's check if we have a localized autocomplete
+    // situation during our update, also making sure
+    // that the value is not the same
     if (
+      this.props.value.value !== prevProps.value.value &&
+      this.props.value.valueId !== this.state.valueId &&
       this.props.value.value &&
-      prevProps.value.value !== this.props.value.value &&
       this.props.property.isAutocompleteEnforced() &&
       this.props.property.isAutocompleteLocalized()
     ) {
-      if (!this.currentSuggestion ||
-        this.currentSuggestion.value !== this.props.value.value) {
-        this.onI18nSuggestionFetchRequested({
-          value: this.props.value.value,
-        });
-      }
+      this.onI18nSuggestionFetchRequested({
+        value: this.props.value.value,
+        preventNextDerivedUpdate: true,
+      });
     }
   }
 
@@ -130,7 +161,7 @@ export default class PropertyEntryField
       } else if (type === "integer" || type === "year") {
         numericValue = parseInt(normalizedNumericValueAsString, 10);
       }
-      textualValue = textualValue.replace(/\./g, this.props.numberSeparator);
+      textualValue = formatValueAsString(type, this.props.numberSeparator, textualValue);
     }
     this.setState({
       internalUnmanagedValue: textualValue,
@@ -141,19 +172,23 @@ export default class PropertyEntryField
         if (this.props.property.isAutocompleteLocalized()) {
           return s.i18nValue === textualValue;
         } else {
-          return (s.value === null ? "" : s.value.toString()) === textualValue;
+          if (type === "number" || type === "integer" || type === "year") {
+            return numericValue === s.value;
+          }
+          const normalizedValueAsString = (s.value === null ? "" : s.value.toString());
+          return normalizedValueAsString === textualValue;
         }
       });
 
       if (suggestionFound) {
         this.currentSuggestion = suggestionFound;
-        this.props.onChange(suggestionFound.value);
+        this.props.onChange(suggestionFound.value, this.state.valueId);
         return;
       } else {
         this.currentSuggestion = null;
 
         if (this.props.property.isAutocompleteEnforced()) {
-          this.props.onChange(null);
+          this.props.onChange(null, this.state.valueId);
           return;
         }
       }
@@ -161,10 +196,10 @@ export default class PropertyEntryField
 
     if (type === "number" || type === "integer" || type === "year") {
       if (isNaN(numericValue)) {
-        this.props.onChange(null);
+        this.props.onChange(null, this.state.valueId);
         return;
       } else if (type === "integer" || type === "year") {
-        this.props.onChange(numericValue);
+        this.props.onChange(numericValue, this.state.valueId);
         return;
       }
 
@@ -182,9 +217,9 @@ export default class PropertyEntryField
         actualNumericValue = parseFloat(baseValue + "." + decimalValue.substr(0, maxDecimalCount + 1));
       }
 
-      this.props.onChange(actualNumericValue);
+      this.props.onChange(actualNumericValue, this.state.valueId);
     } else {
-      this.props.onChange(textualValue);
+      this.props.onChange(textualValue, this.state.valueId);
     }
   }
 
@@ -281,8 +316,9 @@ export default class PropertyEntryField
             </MenuItem>
             {
               this.props.property.getSpecificValidValues().map((vv) => {
-                const valueName = i18nData && i18nData.values[vv.toString()];
-                return <MenuItem key={vv.toString()} value={vv.toString()}>{
+                const i18nIdentifier = vv.toString();
+                const valueName = i18nData && i18nData.values[i18nIdentifier];
+                return <MenuItem key={vv.toString()} value={vv as any}>{
                   valueName
                 }</MenuItem>;
               })
@@ -412,7 +448,8 @@ export default class PropertyEntryField
   ) {
     const valueToMatch = this.props.property.isAutocompleteLocalized() ?
       suggestion.i18nValue :
-        (suggestion.value === null ? "" : suggestion.value.toString());
+        (suggestion.value === null ? "" :
+        formatValueAsString(this.props.property.getType(), this.props.numberSeparator, suggestion.value));
     const matches = match(valueToMatch, params.query);
     const parts = parse(valueToMatch, matches);
 
@@ -442,7 +479,8 @@ export default class PropertyEntryField
   ) {
     return this.props.property.isAutocompleteLocalized() ?
       suggestion.i18nValue :
-        (suggestion.value === null ? "" : suggestion.value.toString());
+        (suggestion.value === null ? "" :
+        formatValueAsString(this.props.property.getType(), this.props.numberSeparator, suggestion.value));
   }
 
   public onSuggestionsFetchRequested({value}) {
@@ -465,7 +503,7 @@ export default class PropertyEntryField
     });
   }
 
-  public onI18nSuggestionFetchRequested({value}) {
+  public onI18nSuggestionFetchRequested({value, preventNextDerivedUpdate}) {
     // TODO implement this
     console.log("i18n requested");
     const suggestion = ([
@@ -487,6 +525,7 @@ export default class PropertyEntryField
     if (suggestion) {
       this.setState({
         internalUnmanagedValue: suggestion.i18nValue,
+        preventNextDerivedUpdate,
       });
     }
   }
@@ -498,10 +537,6 @@ export default class PropertyEntryField
   }
 
   public renderAutosuggestField() {
-
-    // TODO make it so that when the autosuggest property in from property value
-    // is update it invalidates the autosuggest
-
     return (
       <Autosuggest
         renderInputComponent={this.renderBasicTextField}

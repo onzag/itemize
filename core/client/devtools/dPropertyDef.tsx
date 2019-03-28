@@ -18,6 +18,7 @@ interface IPropertyDefState {
   detachedPropertyInstance: PropertyDefinition;
   currentValue: IPropertyValueGetterType;
   poked: boolean;
+  showReflectiveClone: boolean;
 }
 
 const devtoolsStyle: {
@@ -81,10 +82,12 @@ export default class DevToolPropertyDefinition extends
       currentValue: null,
       detachedPropertyInstance: null,
       poked: false,
+      showReflectiveClone: false,
     };
 
     this.toggleExpand = this.toggleExpand.bind(this);
     this.togglePoked = this.togglePoked.bind(this);
+    this.toggleReflectiveClone = this.toggleReflectiveClone.bind(this);
     this.onChange = this.onChange.bind(this);
   }
   public toggleExpand() {
@@ -102,8 +105,13 @@ export default class DevToolPropertyDefinition extends
       poked: !this.state.poked,
     });
   }
-  public onChange(newValue: PropertyDefinitionSupportedType) {
-    this.state.detachedPropertyInstance.setCurrentValue(newValue);
+  public toggleReflectiveClone() {
+    this.setState({
+      showReflectiveClone: !this.state.showReflectiveClone,
+    });
+  }
+  public onChange(newValue: PropertyDefinitionSupportedType, valueId?: string) {
+    this.state.detachedPropertyInstance.setCurrentValue(newValue, valueId);
     this.setState({
       currentValue: this.state.detachedPropertyInstance.getCurrentValue(),
     });
@@ -146,8 +154,17 @@ export default class DevToolPropertyDefinition extends
             onChange={this.onChange}
             poked={this.state.poked}
           />
+          {this.state.showReflectiveClone ? <PropertyEntry
+            property={this.props.property}
+            value={this.state.currentValue}
+            onChange={this.onChange}
+            poked={this.state.poked}
+          /> : null}
           <br/>
           <button onClick={this.togglePoked}>{this.state.poked ? "UnPoke" : "Poke"}</button>
+          <button onClick={this.toggleReflectiveClone}>
+            {this.state.showReflectiveClone ? "Hide Reflective Clone" : "Show Reflective Clone"}
+          </button>
           <br/>
           <code>
             {JSON.stringify(this.state.currentValue, null, 2)}

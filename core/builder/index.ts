@@ -939,7 +939,7 @@ async function getI18nData(
         .map((b) => ({key: b, required: true})))
       // request for the values if supported
       .concat((property.values || [])
-        .map((b) => ({key: "values." + b, required: true})))
+        .map((b) => ({key: "values." + b.toString().replace(/\./g, "_dot_").replace("/\s/g", "_"), required: true})))
       .concat((property.values && property.nullable ? ["null_value"] : [])
         .map((b) => ({key: b, required: true})));
 
