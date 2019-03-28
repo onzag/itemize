@@ -9,7 +9,6 @@ import PropertyEntryBoolean from "./PropertyEntryBoolean";
 import PropertyEntryText from "./PropertyEntryText";
 import PropertyEntryCurrency from "./PropertyEntryCurrency";
 import PropertyEntryPassword from "./PropertyEntryPassword";
-import PropertyEntryYear from "./PropertyEntryYear";
 import PropertyEntryDateTime from "./PropertyEntryDateTime";
 import PropertyEntryDate from "./PropertyEntryDate";
 import PropertyEntryLocation from "./PropertyEntryLocation";
@@ -38,7 +37,7 @@ const typeRegistry:
   text: PropertyEntryText,
   currency: PropertyEntryCurrency,
   password: PropertyEntryPassword,
-  year: PropertyEntryYear,
+  year: PropertyEntryField,
   datetime: PropertyEntryDateTime,
   date: PropertyEntryDate,
   location: PropertyEntryLocation,
@@ -67,14 +66,14 @@ export default function PropertyEntry(props: IPropertyEntryProps) {
   return (
     <LocaleContext.Consumer>
       {(locale) => <LocaleDataContext.Consumer>
-        {(localeData) =>
-          <Element
-            {...props}
-            locale={props.locale || locale.state}
-            numberSeparator={
-              localeData.locales[props.locale || locale.state].number_separator
-            }
-          />}
+        {
+          (localeData) =>
+            <Element
+              {...props}
+              locale={props.locale || locale.state}
+              numberSeparator={localeData.locales[props.locale || locale.state].number_separator}
+            />
+        }
       </LocaleDataContext.Consumer>}
     </LocaleContext.Consumer>
   );

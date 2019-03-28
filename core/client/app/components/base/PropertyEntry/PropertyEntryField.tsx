@@ -4,6 +4,7 @@ import {
   PropertyDefinitionSupportedStringType,
   PropertyDefinitionSupportedNumberType,
   PropertyDefinitionSupportedIntegerType,
+  PropertyDefinitionSupportedYearType,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
 import TextField from "@material-ui/core/TextField";
 import { FormControl, InputLabel, Select, MenuItem, FilledInput, Paper, InputAdornment, Icon } from "@material-ui/core";
@@ -21,14 +22,15 @@ interface IPropertyEntryFieldState {
 }
 
 interface IPropertyEntryFieldProps extends IPropertyEntryProps {
-  numberSeparator: string;
+  numberSeparator?: string;
 }
 
 interface IPropertyEntryAutocompleteSuggestion {
   i18nValue: string;
   value: PropertyDefinitionSupportedStringType |
     PropertyDefinitionSupportedNumberType |
-    PropertyDefinitionSupportedIntegerType;
+    PropertyDefinitionSupportedIntegerType |
+    PropertyDefinitionSupportedYearType;
 }
 
 export default class PropertyEntryField
@@ -118,12 +120,13 @@ export default class PropertyEntryField
     }
 
     const type = this.props.property.getType();
-    if (type === "number" || type === "integer") {
-      normalizedNumericValueAsString = textualValue.replace(
-        new RegExp(escapeStringRegexp(this.props.numberSeparator), "g"), ".");
+    if (type === "number" || type === "integer" || type === "year") {
+      normalizedNumericValueAsString = textualValue;
       if (type === "number") {
+        normalizedNumericValueAsString = textualValue.replace(
+          new RegExp(escapeStringRegexp(this.props.numberSeparator), "g"), ".");
         numericValue = parseFloat(normalizedNumericValueAsString);
-      } else if (type === "integer") {
+      } else if (type === "integer" || type === "year") {
         numericValue = parseInt(normalizedNumericValueAsString, 10);
       }
       textualValue = textualValue.replace(/\./g, this.props.numberSeparator);
@@ -155,13 +158,11 @@ export default class PropertyEntryField
       }
     }
 
-    if (type === "string") {
-      this.props.onChange(textualValue);
-    } else if (type === "number" || type === "integer") {
+    if (type === "number" || type === "integer" || type === "year") {
       if (isNaN(numericValue)) {
         this.props.onChange(null);
         return;
-      } else if (type === "integer") {
+      } else if (type === "integer" || type === "year") {
         this.props.onChange(numericValue);
         return;
       }
@@ -181,6 +182,8 @@ export default class PropertyEntryField
       }
 
       this.props.onChange(actualNumericValue);
+    } else {
+      this.props.onChange(textualValue);
     }
   }
 
@@ -192,7 +195,7 @@ export default class PropertyEntryField
     }
 
     const type = this.props.property.getType();
-    if (type === "number" || type === "integer") {
+    if (type === "number" || type === "integer" || type === "year") {
       const separators = "." + this.props.numberSeparator;
       const validKeys = "1234567890" + separators;
       const isBasicallyInteger = this.props.property.getMaxDecimalCount() === 0;
@@ -303,9 +306,10 @@ export default class PropertyEntryField
     }
 
     let inputMode = "text";
-    if (this.props.property.getType() === "integer") {
+    const type = this.props.property.getType();
+    if (type === "integer" || type === "year") {
       inputMode = "numeric";
-    } else if (this.props.property.getType() === "number") {
+    } else if (type === "number") {
       inputMode = "decimal";
     }
 

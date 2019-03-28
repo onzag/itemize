@@ -460,6 +460,11 @@ export function checkPropertyDefinition(
       "Cannot set a maxLength value if type not text or string",
       traceback.newTraceToBit("maxLength"),
     );
+  } else if (typeof rawData.richText !== "undefined" && rawData.type !== "text") {
+    throw new CheckUpError(
+      "Cannot set a richText if type not text",
+      traceback.newTraceToBit("richText"),
+    );
   }
 
   // lets check that all the ones in values are valid

@@ -350,7 +350,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // years can be set as a number
     json: "number",
     // validates
-    validate: (n: number) => {
+    validate: (n: PropertyDefinitionSupportedYearType) => {
       if (isNaN(n)) {
         return PropertyInvalidReason.UNSPECIFIED;
       } else if (!Number.isInteger(n)) {
@@ -494,6 +494,7 @@ export interface IPropertyDefinitionSupportedCurrencyType {
 export type PropertyDefinitionSupportedStringType = string;
 export type PropertyDefinitionSupportedPasswordType = string;
 export type PropertyDefinitionSupportedTextType = string;
+export type PropertyDefinitionSupportedYearType = number;
 // TODO
 export type PropertyDefinitionSupportedDateType = null;
 export type PropertyDefinitionSupportedDateTimeType = null;
@@ -588,6 +589,8 @@ export interface IPropertyDefinitionRawJSONDataType {
   // disable retrieval, property value is never retrieved
   // it can only be set or updated
   disableRetrieval?: boolean;
+  // Rich text support
+  richText?: boolean;
 
   // some design elements
   icon?: string;
@@ -1046,6 +1049,10 @@ export default class PropertyDefinition {
     return !!this.rawData.autocompleteSupportsLocale;
   }
 
+  public isRichText() {
+    return this.rawData.richText;
+  }
+
   public getMaxDecimalCount() {
     return this.rawData.maxDecimalCount || this.getPropertyDefinitionDescription().maxDecimalCount || 0;
   }
@@ -1250,6 +1257,9 @@ if (process.env.NODE_ENV !== "production") {
       },
       icon: {
         type: "string",
+      },
+      richText: {
+        type: "boolean",
       },
     },
     additionalProperties: false,
