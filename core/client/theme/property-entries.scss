@@ -2,11 +2,7 @@ $property-entry-error-height: 1em;
 $property-entry-color-error: #f44336;
 $property-entry-color-error-clear: #e57373;
 
-// There might be errors on startup, however showing errors right away
-// would make it very annoying for users who see a form that has already
-// a ton of errors, so we hide all errors by default
 .property-entry--error {
-  visibility: hidden;
   color: $property-entry-color-error-clear;
   height: $property-entry-error-height;
 }
@@ -49,11 +45,6 @@ $property-entry-color-error-clear: #e57373;
   // it being focused or not
   .material-icons {
     color: $property-entry-color-error;
-  }
-
-  // The error is set to be visible
-  .property-entry--error {
-    visibility: visible;
   }
 }
 

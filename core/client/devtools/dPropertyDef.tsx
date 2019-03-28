@@ -17,6 +17,7 @@ interface IPropertyDefState {
   searchMode: boolean;
   detachedPropertyInstance: PropertyDefinition;
   currentValue: IPropertyValueGetterType;
+  poked: boolean;
 }
 
 const devtoolsStyle: {
@@ -79,9 +80,11 @@ export default class DevToolPropertyDefinition extends
       searchMode: false,
       currentValue: null,
       detachedPropertyInstance: null,
+      poked: false,
     };
 
     this.toggleExpand = this.toggleExpand.bind(this);
+    this.togglePoked = this.togglePoked.bind(this);
     this.onChange = this.onChange.bind(this);
   }
   public toggleExpand() {
@@ -92,6 +95,11 @@ export default class DevToolPropertyDefinition extends
     );
     this.setState({
       expanded: !this.state.expanded,
+    });
+  }
+  public togglePoked() {
+    this.setState({
+      poked: !this.state.poked,
     });
   }
   public onChange(newValue: PropertyDefinitionSupportedType) {
@@ -136,7 +144,10 @@ export default class DevToolPropertyDefinition extends
             property={this.props.property}
             value={this.state.currentValue}
             onChange={this.onChange}
+            poked={this.state.poked}
           />
+          <br/>
+          <button onClick={this.togglePoked}>{this.state.poked ? "UnPoke" : "Poke"}</button>
           <br/>
           <code>
             {JSON.stringify(this.state.currentValue, null, 2)}

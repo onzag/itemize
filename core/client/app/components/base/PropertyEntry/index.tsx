@@ -23,6 +23,7 @@ export interface IPropertyEntryProps {
   value: IPropertyValueGetterType;
   onChange: (newValue: PropertyDefinitionSupportedType) => void;
   locale?: string;
+  poked?: boolean;
 }
 
 const typeRegistry:
@@ -45,8 +46,10 @@ const typeRegistry:
   files: PropertyEntryFiles,
 };
 
-export function getClassName(props: IPropertyEntryProps, name: string) {
+export function getClassName(props: IPropertyEntryProps, name: string, poked?: boolean) {
   return `property-entry property-entry--${name} ${
+    poked ? "property-entry--poked" : ""
+  } ${
     props.value.default ? "property-entry--default" : ""
   } ${
     props.value.enforced ? "property-entry--enforced" : ""

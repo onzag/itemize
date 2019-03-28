@@ -102,6 +102,7 @@ export default class PropertyEntryField
         nextState.internalUnmanagedValue ||
       !equals(this.state.suggestions, nextState.suggestions) ||
       !equals(this.props.value, nextProps.value) ||
+      !!this.props.poked !== !!nextProps.poked ||
       nextProps.locale !== this.props.locale;
   }
 
@@ -226,16 +227,19 @@ export default class PropertyEntryField
 
   public renderSelectField() {
     const i18nData = this.props.property.getI18nDataFor(this.props.locale);
-    const className = getClassName(this.props, "field");
+    const className = getClassName(this.props, "field", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
     const nullValueLabel = i18nData && i18nData.nullValue;
 
     const invalidReason = this.props.value.invalidReason;
     let i18nInvalidReason = null;
-    if (invalidReason && i18nData &&
-      i18nData.error && i18nData.error[invalidReason]) {
-        i18nInvalidReason = i18nData.error[invalidReason];
+    if (
+      (this.props.poked || this.props.value.userSet) &&
+      invalidReason && i18nData &&
+      i18nData.error && i18nData.error[invalidReason]
+    ) {
+      i18nInvalidReason = i18nData.error[invalidReason];
     }
 
     const icon = this.props.property.getIcon();
@@ -294,14 +298,17 @@ export default class PropertyEntryField
 
   public renderBasicTextField(textFieldProps?: any) {
     const i18nData = this.props.property.getI18nDataFor(this.props.locale);
-    const className = getClassName(this.props, "field");
+    const className = getClassName(this.props, "field", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
 
     const invalidReason = this.props.value.invalidReason;
     let i18nInvalidReason = null;
-    if (invalidReason && i18nData &&
-      i18nData.error && i18nData.error[invalidReason]) {
+    if (
+      (this.props.poked || this.props.value.userSet) &&
+      invalidReason && i18nData &&
+      i18nData.error && i18nData.error[invalidReason]
+    ) {
         i18nInvalidReason = i18nData.error[invalidReason];
     }
 
