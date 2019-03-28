@@ -1,31 +1,70 @@
 $property-entry-error-height: 1em;
+$property-entry-color-error: #f44336;
+$property-entry-color-error-clear: #e57373;
 
-.property-entry--field {
-  &.property-entry--invalid.property-entry--user-set {
-    .property-entry--input::before {
-      border-bottom-color: #e57373;
-    }
-    .property-entry--input::after,
-    .property-entry--input:hover:not(.disabled)::before {
-      border-bottom-color: #f44336;
-    }
-    .property-entry--label {
-      color: #e57373;
-    }
-    .property-entry--label.focused {
-      color: #f44336;
-    }
-  }
-  &.property-entry--hidden {
-    opacity: 0.35
-  }
-}
-
+// There might be errors on startup, however showing errors right away
+// would make it very annoying for users who see a form that has already
+// a ton of errors, so we hide all errors by default
 .property-entry--error {
-  color: #e57373;
+  visibility: hidden;
+  color: $property-entry-color-error-clear;
   height: $property-entry-error-height;
 }
 
+// This is for entires that are user set or that have been poked
+// a poked field is poked just to display errors, eg. it's basically
+// going to display any errors as if the user had set it
+.property-entry--invalid.property-entry--user-set, .property-entry--invalid.property-entry--poked {
+
+  // We set the colors of errors when we are in this state
+  // this part of the code is specific to fields
+  // note how this is part of the same element, a entry is a field
+  &.property-entry--field {
+    // this basically sets up the border bottom color of the field
+    // when it's in default mode, not focused, we use the clear color, lighter
+    .property-entry--input::before {
+      border-bottom-color: $property-entry-color-error-clear;
+    }
+
+    // this also sets the line of the border bottom color of the field
+    // this is when it is focused, so we use a more punchy color
+    .property-entry--input::after,
+    .property-entry--input:hover:not(.disabled)::before {
+      border-bottom-color: $property-entry-color-error;
+    }
+
+    // this is for the label of the entry field when it's not focused
+    .property-entry--label {
+      color: $property-entry-color-error-clear;
+    }
+
+    // the same but when it's focused
+    .property-entry--label.focused {
+      color:$property-entry-color-error;
+    }
+  }
+
+  // set the color of the icon if there is one
+  // the icon keeps the strong color regardless on
+  // it being focused or not
+  .material-icons {
+    color: $property-entry-color-error;
+  }
+
+  // The error is set to be visible
+  .property-entry--error {
+    visibility: visible;
+  }
+}
+
+// For fields that are hidden, they are supposed not to be shown
+// but they might be displayed for development reasons, something simple
+.property-entry--hidden {
+  opacity: 0.35;
+}
+
+// this is special and it's actually outside of the property-entry itself, it becomes its parent
+// so it has to be outside here, they are containers after all
 .property-entry--field--autocomplete-container {
   position: relative;
   display: block;

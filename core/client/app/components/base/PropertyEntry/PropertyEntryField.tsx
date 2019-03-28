@@ -6,12 +6,13 @@ import {
   PropertyDefinitionSupportedIntegerType,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
 import TextField from "@material-ui/core/TextField";
-import { FormControl, InputLabel, Select, MenuItem, FilledInput, Paper } from "@material-ui/core";
+import { FormControl, InputLabel, Select, MenuItem, FilledInput, Paper, InputAdornment, Icon } from "@material-ui/core";
 import uuid from "uuid";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import equals from "deep-equal";
+import * as escapeStringRegexp from "escape-string-regexp";
 
 interface IPropertyEntryFieldState {
   internalUnmanagedValue: PropertyDefinitionSupportedStringType;
@@ -106,20 +107,40 @@ export default class PropertyEntryField
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     autosuggestOverride?: Autosuggest.ChangeEvent,
   ) {
+    let textualValue: string = null;
+    let normalizedNumericValueAsString: string = null;
+    let numericValue: number = null;
+
     if (autosuggestOverride) {
-      this.setState({
-        internalUnmanagedValue: autosuggestOverride.newValue,
+      textualValue = autosuggestOverride.newValue;
+    } else {
+      textualValue = e.target.value;
+    }
+
+    const type = this.props.property.getType();
+    if (type === "number" || type === "integer") {
+      normalizedNumericValueAsString = textualValue.replace(
+        new RegExp(escapeStringRegexp(this.props.numberSeparator), "g"), ".");
+      if (type === "number") {
+        numericValue = parseFloat(normalizedNumericValueAsString);
+      } else if (type === "integer") {
+        numericValue = parseInt(normalizedNumericValueAsString, 10);
+      }
+      textualValue = textualValue.replace(/\./g, this.props.numberSeparator);
+    }
+    this.setState({
+      internalUnmanagedValue: textualValue,
+    });
+
+    if (autosuggestOverride) {
+      const suggestionFound = this.state.suggestions.find((s) => {
+        if (this.props.property.isAutocompleteLocalized()) {
+          return s.i18nValue === textualValue;
+        } else {
+          return (s.value === null ? "" : s.value.toString()) === textualValue;
+        }
       });
 
-      const suggestionFound = this.state.suggestions
-        .find((s) => {
-          if (this.props.property.isAutocompleteLocalized()) {
-            return s.i18nValue === autosuggestOverride.newValue;
-          } else {
-            return (s.value === null ? "" : s.value.toString()) ===
-              autosuggestOverride.newValue;
-          }
-        });
       if (suggestionFound) {
         this.currentSuggestion = suggestionFound;
         this.props.onChange(suggestionFound.value);
@@ -132,37 +153,62 @@ export default class PropertyEntryField
           return;
         }
       }
-    } else {
-      this.setState({
-        internalUnmanagedValue: e.target.value,
-      });
     }
 
-    if (this.props.property.getType() === "string") {
-      this.props.onChange(e.target.value);
-    } else if (this.props.property.getType() === "number") {
-      const value = parseFloat(e.target.value);
-      this.props.onChange(isNaN(value) ? null : value);
-    } else if (this.props.property.getType() === "integer") {
-      const value = parseInt(e.target.value, 10);
-      this.props.onChange(isNaN(value) ? null : value);
+    if (type === "string") {
+      this.props.onChange(textualValue);
+    } else if (type === "number" || type === "integer") {
+      if (isNaN(numericValue)) {
+        this.props.onChange(null);
+        return;
+      } else if (type === "integer") {
+        this.props.onChange(numericValue);
+        return;
+      }
+
+      // Number line overflow protection
+      // the problem is that too many decimals cause it to round
+      // so let's only send 1 max of the maximum number of decimals
+      // if there are decimals
+      let actualNumericValue = numericValue;
+      const baseValue = normalizedNumericValueAsString.split(".")[0];
+      const decimalValue = normalizedNumericValueAsString.split(".")[1] || "";
+      const decimalCount = decimalValue.length;
+      const maxDecimalCount = this.props.property.getMaxDecimalCount();
+
+      if (maxDecimalCount < decimalCount) {
+        actualNumericValue = parseFloat(baseValue + "." + decimalValue.substr(0, maxDecimalCount + 1));
+      }
+
+      this.props.onChange(actualNumericValue);
     }
   }
 
-  public onKeyDown(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-    if (this.props.property.getType() === "number" ||
-      this.props.property.getType() === "integer") {
-      e.preventDefault();
+  public onKeyDown(e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) {
+    // All fancy keycodes that don't represent a character are longer than 1
+    // with this we allow all of the to pass
+    if (e.key.length !== 1) {
+      return;
     }
-    const definition = this.props.property.getPropertyDefinitionDescription();
-    // const totalMax = definition.max;
-    // if (totalMax) {
-    //  const value = parseFloat(e.target.value);
 
-    //  if (value > totalMax) {
-    //    e.preventDefault();
-    //  }
-    // }
+    const type = this.props.property.getType();
+    if (type === "number" || type === "integer") {
+      const separators = "." + this.props.numberSeparator;
+      const validKeys = "1234567890" + separators;
+      const isBasicallyInteger = this.props.property.getMaxDecimalCount() === 0;
+      if (separators.includes(e.key) && isBasicallyInteger) {
+        e.preventDefault();
+      } else if (!validKeys.includes(e.key)) {
+        e.preventDefault();
+      } else if (
+        separators.includes(e.key) && (
+          this.state.internalUnmanagedValue.includes(".") ||
+          this.state.internalUnmanagedValue.includes(this.props.numberSeparator)
+        )
+      ) {
+        e.preventDefault();
+      }
+    }
   }
 
   public render() {
@@ -182,44 +228,64 @@ export default class PropertyEntryField
     const i18nPlaceholder = i18nData && i18nData.placeholder;
     const nullValueLabel = i18nData && i18nData.nullValue;
 
+    const invalidReason = this.props.value.invalidReason;
+    let i18nInvalidReason = null;
+    if (invalidReason && i18nData &&
+      i18nData.error && i18nData.error[invalidReason]) {
+        i18nInvalidReason = i18nData.error[invalidReason];
+    }
+
+    const icon = this.props.property.getIcon();
+    const addornment = icon ? (
+      <InputAdornment position="end">
+        <Icon>{icon}</Icon>
+      </InputAdornment>
+    ) : null;
+
     return (
-      <FormControl variant="filled" className={className}>
-        <InputLabel
-          htmlFor={this.state.uuid}
-          classes={{
-            root: "property-field--label",
-            focused: "focused",
-          }}
-        >
-          {i18nLabel}
-        </InputLabel>
-        <Select
-          value={this.state.internalUnmanagedValue}
-          onChange={this.onChange}
-          input={
-            <FilledInput
-              id={this.state.uuid}
-              placeholder={i18nPlaceholder}
-              classes={{
-                root: "property-field--input",
-                focused: "focused",
-              }}
-            />
-          }
-        >
-          <MenuItem value="">
-            <em>{nullValueLabel}</em>
-          </MenuItem>
-          {
-            this.props.property.getSpecificValidValues().map((vv) => {
-              const valueName = i18nData && i18nData.values[vv.toString()];
-              return <MenuItem key={vv.toString()} value={vv.toString()}>{
-                valueName
-              }</MenuItem>;
-            })
-          }
-        </Select>
-      </FormControl>
+      <div className="property-entry--container">
+        <FormControl variant="filled" className={className}>
+          <InputLabel
+            htmlFor={this.state.uuid}
+            classes={{
+              root: "property-field--label",
+              focused: "focused",
+            }}
+          >
+            {i18nLabel}
+          </InputLabel>
+          <Select
+            value={this.state.internalUnmanagedValue}
+            onChange={this.onChange}
+            input={
+              <FilledInput
+                id={this.state.uuid}
+                placeholder={i18nPlaceholder}
+                endAdornment={addornment}
+                classes={{
+                  root: "property-field--input",
+                  focused: "focused",
+                }}
+              />
+            }
+          >
+            <MenuItem value="">
+              <em>{nullValueLabel}</em>
+            </MenuItem>
+            {
+              this.props.property.getSpecificValidValues().map((vv) => {
+                const valueName = i18nData && i18nData.values[vv.toString()];
+                return <MenuItem key={vv.toString()} value={vv.toString()}>{
+                  valueName
+                }</MenuItem>;
+              })
+            }
+          </Select>
+        </FormControl>
+        <div className="property-entry--error">
+          {i18nInvalidReason}
+        </div>
+      </div>
     );
   }
 
@@ -231,18 +297,20 @@ export default class PropertyEntryField
 
     const invalidReason = this.props.value.invalidReason;
     let i18nInvalidReason = null;
-    if (this.props.value.userSet && invalidReason && i18nData &&
+    if (invalidReason && i18nData &&
       i18nData.error && i18nData.error[invalidReason]) {
         i18nInvalidReason = i18nData.error[invalidReason];
     }
 
-    // TODO fix this for the type number property, add the arrows
-    const propertyDescription = this.props.property
-      .getPropertyDefinitionDescription();
+    let inputMode = "text";
+    if (this.props.property.getType() === "integer") {
+      inputMode = "numeric";
+    } else if (this.props.property.getType() === "number") {
+      inputMode = "decimal";
+    }
+
     const inputProps = {
-      min: propertyDescription.min,
-      max: propertyDescription.max,
-      step: 1 / Math.pow(10, propertyDescription.maxDecimalCount || 0),
+      inputMode,
     };
 
     let appliedTextFieldProps: any = {};
@@ -269,6 +337,13 @@ export default class PropertyEntryField
       }
     }
 
+    const icon = this.props.property.getIcon();
+    const addornment = icon ? (
+      <InputAdornment position="end">
+        <Icon>{icon}</Icon>
+      </InputAdornment>
+    ) : null;
+
     return (
       <div className="property-entry--container">
         <TextField
@@ -286,6 +361,7 @@ export default class PropertyEntryField
               focused: "focused",
             },
             id: this.state.uuid,
+            endAdornment: addornment,
             ...appliedInputProps,
           }}
           InputLabelProps={{
@@ -299,9 +375,9 @@ export default class PropertyEntryField
           variant="filled"
           {...appliedTextFieldProps}
         />
-        {<div className="property-entry--error">
+        <div className="property-entry--error">
           {i18nInvalidReason}
-        </div>}
+        </div>
       </div>
     );
   }

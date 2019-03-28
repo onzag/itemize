@@ -154,7 +154,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     supportsAutocomplete: true,
     // it gotta be validated to check it's a number
     validate: (n: PropertyDefinitionSupportedIntegerType) => {
-      if (isNaN(n) || parseInt(n as any, 10) !== n) {
+      if (isNaN(n) || !Number.isInteger(n)) {
         return PropertyInvalidReason.UNSPECIFIED;
       } else if (n > MAX_SUPPORTED_INTEGER) {
         return PropertyInvalidReason.TOO_LARGE;
@@ -353,7 +353,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     validate: (n: number) => {
       if (isNaN(n)) {
         return PropertyInvalidReason.UNSPECIFIED;
-      } else if (parseInt(n.toString(), 10) !== n) {
+      } else if (!Number.isInteger(n)) {
         return PropertyInvalidReason.UNSPECIFIED;
       } else if (n > MAX_SUPPORTED_YEAR) {
         return PropertyInvalidReason.TOO_LARGE;
@@ -588,6 +588,9 @@ export interface IPropertyDefinitionRawJSONDataType {
   // disable retrieval, property value is never retrieved
   // it can only be set or updated
   disableRetrieval?: boolean;
+
+  // some design elements
+  icon?: string;
 }
 
 export interface IPropertyDefinitionRuleDataType {
@@ -1043,6 +1046,14 @@ export default class PropertyDefinition {
     return !!this.rawData.autocompleteSupportsLocale;
   }
 
+  public getMaxDecimalCount() {
+    return this.rawData.maxDecimalCount || this.getPropertyDefinitionDescription().maxDecimalCount || 0;
+  }
+
+  public getIcon() {
+    return this.rawData.icon || null;
+  }
+
   /**
    * Just gives the parent module
    */
@@ -1236,6 +1247,9 @@ if (process.env.NODE_ENV !== "production") {
       },
       disableRetrieval: {
         type: "boolean",
+      },
+      icon: {
+        type: "string",
       },
     },
     additionalProperties: false,
