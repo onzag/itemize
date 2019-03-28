@@ -16,11 +16,7 @@ import equals from "deep-equal";
 import * as escapeStringRegexp from "escape-string-regexp";
 
 interface IPropertyEntryFieldState {
-  internalUnmanagedValue: PropertyDefinitionSupportedStringType;
   suggestions: IPropertyEntryAutocompleteSuggestion[];
-  uuid: string;
-  valueId: string;
-  preventNextDerivedUpdate: boolean;
 }
 
 interface IPropertyEntryFieldProps extends IPropertyEntryProps {
@@ -36,6 +32,9 @@ interface IPropertyEntryAutocompleteSuggestion {
 }
 
 function formatValueAsString(type: string, numberSeparator: string, value: any) {
+  if (value === null) {
+    return "";
+  }
   if (type === "number") {
     return value.toString().replace(/\./g, numberSeparator);
   }
@@ -45,38 +44,15 @@ function formatValueAsString(type: string, numberSeparator: string, value: any) 
 export default class PropertyEntryField
   extends React.Component<IPropertyEntryFieldProps, IPropertyEntryFieldState> {
 
-  public static getDerivedStateFromProps(props: IPropertyEntryFieldProps, state: IPropertyEntryFieldState) {
-    if (state.preventNextDerivedUpdate) {
-      return {
-        preventNextDerivedUpdate: false,
-      };
-    }
-
-    if (props.value.valueId !== state.valueId || props.value.valueId === null) {
-      return {
-        internalUnmanagedValue: props.value.value !== null ?
-        formatValueAsString(props.property.getType(), props.numberSeparator, props.value.value) : "",
-      };
-    }
-    return null;
-  }
-
-  private currentSuggestion: IPropertyEntryAutocompleteSuggestion;
+  private uuid: string;
   constructor(props: IPropertyEntryFieldProps) {
     super(props);
 
-    const state: IPropertyEntryFieldState = {
-      internalUnmanagedValue: props.value.value !== null ?
-        props.value.value.toString() : "",
+    this.uuid =  "uuid-" + uuid.v4();
+
+    this.state = {
       suggestions: [],
-      uuid: "uuid-" + uuid.v4(),
-      valueId: "uuid-" + uuid.v4(),
-      preventNextDerivedUpdate: false,
     };
-
-    this.state = state;
-
-    this.currentSuggestion = null;
 
     this.onChange = this.onChange.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
@@ -86,42 +62,8 @@ export default class PropertyEntryField
     this.renderAutosuggestField = this.renderAutosuggestField.bind(this);
     this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
     this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
-    this.onI18nSuggestionFetchRequested = this.onI18nSuggestionFetchRequested.bind(this);
     this.getSuggestionValue = this.getSuggestionValue.bind(this);
     this.clearSuggestions = this.clearSuggestions.bind(this);
-  }
-
-  public componentDidMount() {
-    // Let's check if we have a localized autocomplete
-    // situation on startup
-    if (
-      this.props.value.value &&
-      this.props.property.isAutocompleteEnforced() &&
-      this.props.property.isAutocompleteLocalized()
-    ) {
-      this.onI18nSuggestionFetchRequested({
-        value: this.props.value.value,
-        preventNextDerivedUpdate: true,
-      });
-    }
-  }
-
-  public componentDidUpdate(prevProps: IPropertyEntryFieldProps) {
-    // let's check if we have a localized autocomplete
-    // situation during our update, also making sure
-    // that the value is not the same
-    if (
-      this.props.value.value !== prevProps.value.value &&
-      this.props.value.valueId !== this.state.valueId &&
-      this.props.value.value &&
-      this.props.property.isAutocompleteEnforced() &&
-      this.props.property.isAutocompleteLocalized()
-    ) {
-      this.onI18nSuggestionFetchRequested({
-        value: this.props.value.value,
-        preventNextDerivedUpdate: true,
-      });
-    }
   }
 
   public shouldComponentUpdate(
@@ -129,8 +71,6 @@ export default class PropertyEntryField
     nextState: IPropertyEntryFieldState,
   ) {
     return nextProps.property !== this.props.property ||
-      this.state.internalUnmanagedValue !==
-        nextState.internalUnmanagedValue ||
       !equals(this.state.suggestions, nextState.suggestions) ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
@@ -163,9 +103,6 @@ export default class PropertyEntryField
       }
       textualValue = formatValueAsString(type, this.props.numberSeparator, textualValue);
     }
-    this.setState({
-      internalUnmanagedValue: textualValue,
-    });
 
     if (autosuggestOverride) {
       const suggestionFound = this.state.suggestions.find((s) => {
@@ -181,14 +118,11 @@ export default class PropertyEntryField
       });
 
       if (suggestionFound) {
-        this.currentSuggestion = suggestionFound;
-        this.props.onChange(suggestionFound.value, this.state.valueId);
+        this.props.onChange(suggestionFound.value, textualValue);
         return;
       } else {
-        this.currentSuggestion = null;
-
         if (this.props.property.isAutocompleteEnforced()) {
-          this.props.onChange(null, this.state.valueId);
+          this.props.onChange(null, textualValue);
           return;
         }
       }
@@ -196,10 +130,10 @@ export default class PropertyEntryField
 
     if (type === "number" || type === "integer" || type === "year") {
       if (isNaN(numericValue)) {
-        this.props.onChange(null, this.state.valueId);
+        this.props.onChange(null, textualValue);
         return;
       } else if (type === "integer" || type === "year") {
-        this.props.onChange(numericValue, this.state.valueId);
+        this.props.onChange(numericValue, textualValue);
         return;
       }
 
@@ -217,9 +151,9 @@ export default class PropertyEntryField
         actualNumericValue = parseFloat(baseValue + "." + decimalValue.substr(0, maxDecimalCount + 1));
       }
 
-      this.props.onChange(actualNumericValue, this.state.valueId);
+      this.props.onChange(actualNumericValue, textualValue);
     } else {
-      this.props.onChange(textualValue, this.state.valueId);
+      this.props.onChange(textualValue, textualValue);
     }
   }
 
@@ -229,6 +163,10 @@ export default class PropertyEntryField
     if (e.key.length !== 1) {
       return;
     }
+
+    const currentValue = this.props.value.stringValue !== null ?
+      this.props.value.stringValue :
+      formatValueAsString(this.props.property.getType(), this.props.numberSeparator, this.props.value.value);
 
     const type = this.props.property.getType();
     if (type === "number" || type === "integer" || type === "year") {
@@ -241,8 +179,8 @@ export default class PropertyEntryField
         e.preventDefault();
       } else if (
         separators.includes(e.key) && (
-          this.state.internalUnmanagedValue.includes(".") ||
-          this.state.internalUnmanagedValue.includes(this.props.numberSeparator)
+          currentValue.includes(".") ||
+          currentValue.includes(this.props.numberSeparator)
         )
       ) {
         e.preventDefault();
@@ -284,11 +222,15 @@ export default class PropertyEntryField
       </InputAdornment>
     ) : null;
 
+    const currentValue = this.props.value.internalValue !== null ?
+      this.props.value.internalValue :
+      formatValueAsString(this.props.property.getType(), this.props.numberSeparator, this.props.value.value);
+
     return (
       <div className="property-entry--container">
         <FormControl variant="filled" className={className}>
           <InputLabel
-            htmlFor={this.state.uuid}
+            htmlFor={this.uuid}
             classes={{
               root: "property-field--label",
               focused: "focused",
@@ -297,11 +239,11 @@ export default class PropertyEntryField
             {i18nLabel}
           </InputLabel>
           <Select
-            value={this.state.internalUnmanagedValue}
+            value={currentValue}
             onChange={this.onChange}
             input={
               <FilledInput
-                id={this.state.uuid}
+                id={this.uuid}
                 placeholder={i18nPlaceholder}
                 endAdornment={addornment}
                 classes={{
@@ -391,6 +333,12 @@ export default class PropertyEntryField
       </InputAdornment>
     ) : null;
 
+    const currentValue = textFieldProps &&  textFieldProps.value ? textFieldProps.value : (
+      this.props.value.stringValue !== null ?
+      this.props.value.stringValue :
+      formatValueAsString(this.props.property.getType(), this.props.numberSeparator, this.props.value.value)
+    );
+
     return (
       <div className="property-entry--container">
         <TextField
@@ -399,7 +347,7 @@ export default class PropertyEntryField
           className={className}
           label={i18nLabel}
           placeholder={i18nPlaceholder}
-          value={this.state.internalUnmanagedValue}
+          value={currentValue}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
           InputProps={{
@@ -407,7 +355,7 @@ export default class PropertyEntryField
               root: "property-entry--input",
               focused: "focused",
             },
-            id: this.state.uuid,
+            id: this.uuid,
             endAdornment: addornment,
             ...appliedInputProps,
           }}
@@ -448,8 +396,7 @@ export default class PropertyEntryField
   ) {
     const valueToMatch = this.props.property.isAutocompleteLocalized() ?
       suggestion.i18nValue :
-        (suggestion.value === null ? "" :
-        formatValueAsString(this.props.property.getType(), this.props.numberSeparator, suggestion.value));
+        (formatValueAsString(this.props.property.getType(), this.props.numberSeparator, suggestion.value));
     const matches = match(valueToMatch, params.query);
     const parts = parse(valueToMatch, matches);
 
@@ -479,8 +426,7 @@ export default class PropertyEntryField
   ) {
     return this.props.property.isAutocompleteLocalized() ?
       suggestion.i18nValue :
-        (suggestion.value === null ? "" :
-        formatValueAsString(this.props.property.getType(), this.props.numberSeparator, suggestion.value));
+        (formatValueAsString(this.props.property.getType(), this.props.numberSeparator, suggestion.value));
   }
 
   public onSuggestionsFetchRequested({value}) {
@@ -503,33 +449,6 @@ export default class PropertyEntryField
     });
   }
 
-  public onI18nSuggestionFetchRequested({value, preventNextDerivedUpdate}) {
-    // TODO implement this
-    console.log("i18n requested");
-    const suggestion = ([
-      {
-        i18nValue: "one",
-        value: "oneValue",
-      },
-      {
-        i18nValue: "two",
-        value: "twoValue",
-      },
-      {
-        i18nValue: "three",
-        value: "threeValue",
-      },
-    ]).find((o) => o.value === value);
-
-    this.currentSuggestion = suggestion;
-    if (suggestion) {
-      this.setState({
-        internalUnmanagedValue: suggestion.i18nValue,
-        preventNextDerivedUpdate,
-      });
-    }
-  }
-
   public clearSuggestions() {
     this.setState({
       suggestions: [],
@@ -537,6 +456,10 @@ export default class PropertyEntryField
   }
 
   public renderAutosuggestField() {
+    const currentValue = this.props.value.stringValue !== null ?
+      this.props.value.stringValue :
+      formatValueAsString(this.props.property.getType(), this.props.numberSeparator, this.props.value.value);
+
     return (
       <Autosuggest
         renderInputComponent={this.renderBasicTextField}
@@ -577,7 +500,7 @@ export default class PropertyEntryField
             "property-entry--field--autocomplete-section-title",
         }}
         inputProps={{
-          value: this.state.internalUnmanagedValue,
+          value: currentValue,
           onChange: this.onChange,
           className: "property-entry--field--autocomplete",
         }}

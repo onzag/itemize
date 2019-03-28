@@ -18,6 +18,8 @@ export const MAX_SUPPORTED_YEAR = 3000;
 export const MIN_SUPPORTED_YEAR = 0;
 // Defines how many characters a string might have
 export const MAX_STRING_LENGTH = 10000;
+// Defines how many characters (yes characters) a rich text might have max
+export const MAX_RAW_TEXT_LENGTH = 100000;
 // How many characters (including HTML special characters) text might have
 export const MAX_TEXT_LENGTH = MAX_STRING_LENGTH;
 // The max file size (for either images and binary files)

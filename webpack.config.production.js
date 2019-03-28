@@ -16,6 +16,10 @@ module.exports = {
   module: {
     rules: [
       {
+        test: path.resolve(__dirname, "node_modules/fast-html-parser/index.js"),
+        use: "null-loader"
+      },
+      {
         test: /\.tsx?$/,
         exclude: /node_modules/,
         use: {
@@ -23,7 +27,7 @@ module.exports = {
         },
       },
       {
-        test: /\.scss$/,
+        test: /\.s?css$/,
         use: [
           {
             loader: MiniCssExtractPlugin.loader

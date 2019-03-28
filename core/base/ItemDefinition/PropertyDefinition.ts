@@ -16,8 +16,11 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   MIN_SUPPORTED_REAL,
   MAX_SUPPORTED_YEAR,
   MIN_SUPPORTED_YEAR,
-  MAX_CURRENCY_DECIMAL_COUNT} from "../../constants";
+  MAX_CURRENCY_DECIMAL_COUNT,
+  MAX_RAW_TEXT_LENGTH,
+} from "../../constants";
 import Module, { OnStateChangeListenerType } from "../Module";
+import * as fastHTMLParser from "fast-html-parser";
 
 export enum PropertyInvalidReason {
   UNSPECIFIED = "UNSPECIFIED",
@@ -326,7 +329,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     validate: (s: PropertyDefinitionSupportedTextType) => {
       if (typeof s !== "string") {
         return PropertyInvalidReason.UNSPECIFIED;
-      } else if (s.length > MAX_STRING_LENGTH) {
+      } else if (s.length > MAX_RAW_TEXT_LENGTH) {
         return PropertyInvalidReason.TOO_LARGE;
       }
 
@@ -609,7 +612,7 @@ export interface IPropertyValueGetterType {
   valid: boolean;
   invalidReason: PropertyInvalidReason;
   value: PropertyDefinitionSupportedType;
-  valueId: string;
+  internalValue: any;
 }
 
 // The class itself
@@ -671,9 +674,6 @@ export default class PropertyDefinition {
       ((value as IPropertyDefinitionSupportedCurrencyType).value ||
         value) > propertyDefinitionRaw.max) {
       return PropertyInvalidReason.TOO_LARGE;
-    } else if (typeof propertyDefinitionRaw.maxLength !== "undefined" &&
-      (value as string).length > propertyDefinitionRaw.maxLength) {
-      return PropertyInvalidReason.TOO_LARGE;
     } else if (typeof propertyDefinitionRaw.minLength !== "undefined" &&
       (value as string).length < propertyDefinitionRaw.minLength) {
       return PropertyInvalidReason.TOO_SMALL;
@@ -684,6 +684,24 @@ export default class PropertyDefinition {
       if (splittedDecimals[1] &&
         splittedDecimals[1].length > propertyDefinitionRaw.maxDecimalCount) {
           return PropertyInvalidReason.TOO_MANY_DECIMALS;
+      }
+    }
+
+    // Special length check
+    if (typeof propertyDefinitionRaw.maxLength !== "undefined") {
+      let characterCount: number;
+      if (!propertyDefinitionRaw.richText) {
+        characterCount = (value as string).length;
+      } else if (propertyDefinitionRaw.richText && fastHTMLParser.parse) {
+        characterCount = fastHTMLParser.parse(value as string).text.length;
+      } else {
+        const dummyElement = document.createElement("div");
+        dummyElement.innerHTML = value as string;
+        characterCount = dummyElement.innerText.length;
+      }
+
+      if (characterCount > propertyDefinitionRaw.maxLength) {
+        return PropertyInvalidReason.TOO_LARGE;
       }
     }
 
@@ -708,7 +726,7 @@ export default class PropertyDefinition {
   private onStateChangeListeners: OnStateChangeListenerType[];
   private stateValue: PropertyDefinitionSupportedType;
   private stateValueModified: boolean;
-  private stateValueId: string;
+  private stateinternalValue: any;
 
   /**
    * Builds a property definition
@@ -748,7 +766,7 @@ export default class PropertyDefinition {
     // initial value for all namespaces is null
     this.stateValue = null;
     this.stateValueModified = false;
-    this.stateValueId = null;
+    this.stateinternalValue = null;
   }
 
   /**
@@ -791,7 +809,7 @@ export default class PropertyDefinition {
         invalidReason: null,
         value: null,
         hidden: true,
-        valueId: null,
+        internalValue: null,
       };
     }
 
@@ -822,7 +840,7 @@ export default class PropertyDefinition {
 
       // if we get one
       if (typeof enforcedValue !== "undefined") {
-        const invalidEnforcedReason = this.isValidValue(enforcedValue.value);
+        const invalidEnforcedReason = this.isValidValue(enforcedValue);
         // we return the value that was set to be
         return {
           userSet: false,
@@ -830,9 +848,9 @@ export default class PropertyDefinition {
           default: false,
           valid: !invalidEnforcedReason,
           invalidReason: invalidEnforcedReason,
-          value: enforcedValue.value,
+          value: enforcedValue,
           hidden: this.isCurrentlyHidden(),
-          valueId: null,
+          internalValue: null,
         };
       }
     }
@@ -861,15 +879,16 @@ export default class PropertyDefinition {
       // the maximum default is null, even if the item is not
       // nullable in which case the item would be considered invalid
       const invalidDefaultReason = this.isValidValue(defaultValue || null);
+      const value = defaultValue || null;
       return {
         userSet: false,
         enforced: false,
         default: true,
         valid: !invalidDefaultReason,
         invalidReason: invalidDefaultReason,
-        value: defaultValue || null,
+        value,
         hidden: this.isCurrentlyHidden(),
-        valueId: null,
+        internalValue: null,
       };
     }
 
@@ -882,7 +901,7 @@ export default class PropertyDefinition {
       invalidReason,
       value: this.stateValue,
       hidden: this.isCurrentlyHidden(),
-      valueId: this.stateValueId,
+      internalValue: this.stateinternalValue,
     };
   }
 
@@ -956,7 +975,7 @@ export default class PropertyDefinition {
    */
   public setCurrentValue(
     newValue: PropertyDefinitionSupportedType,
-    valueId: string,
+    internalValue: any,
   ) {
     // let's get the definition
     const definition = PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
@@ -977,7 +996,7 @@ export default class PropertyDefinition {
     // note that the value is set and never check
     this.stateValue = newActualValue;
     this.stateValueModified = true;
-    this.stateValueId = valueId;
+    this.stateinternalValue = internalValue;
     this.onStateChangeListeners.forEach((l) => l());
   }
 

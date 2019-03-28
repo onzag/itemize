@@ -18,7 +18,6 @@ interface IPropertyDefState {
   detachedPropertyInstance: PropertyDefinition;
   currentValue: IPropertyValueGetterType;
   poked: boolean;
-  showReflectiveClone: boolean;
 }
 
 const devtoolsStyle: {
@@ -82,12 +81,10 @@ export default class DevToolPropertyDefinition extends
       currentValue: null,
       detachedPropertyInstance: null,
       poked: false,
-      showReflectiveClone: false,
     };
 
     this.toggleExpand = this.toggleExpand.bind(this);
     this.togglePoked = this.togglePoked.bind(this);
-    this.toggleReflectiveClone = this.toggleReflectiveClone.bind(this);
     this.onChange = this.onChange.bind(this);
   }
   public toggleExpand() {
@@ -105,18 +102,22 @@ export default class DevToolPropertyDefinition extends
       poked: !this.state.poked,
     });
   }
-  public toggleReflectiveClone() {
-    this.setState({
-      showReflectiveClone: !this.state.showReflectiveClone,
-    });
-  }
-  public onChange(newValue: PropertyDefinitionSupportedType, valueId?: string) {
-    this.state.detachedPropertyInstance.setCurrentValue(newValue, valueId);
+  public onChange(newValue: PropertyDefinitionSupportedType, internalValue?: any) {
+    this.state.detachedPropertyInstance.setCurrentValue(newValue, internalValue);
     this.setState({
       currentValue: this.state.detachedPropertyInstance.getCurrentValue(),
     });
   }
   public render() {
+    let valueToStringify = this.state.currentValue;
+    // a small hack due to internal values being too long
+    if (
+      valueToStringify.internalValue !== null &&
+      typeof valueToStringify.internalValue !== "string"
+    ) {
+      valueToStringify = {...this.state.currentValue, internalValue: "[TOO BIG TO DISPLAY]"};
+    }
+
     const i18nData = this.props.property.getI18nDataFor(this.props.locale);
     const label = i18nData ? i18nData.label : null;
     const nullable = this.props.property.isNullable() ? <span> / nullable</span> : null;
@@ -154,20 +155,11 @@ export default class DevToolPropertyDefinition extends
             onChange={this.onChange}
             poked={this.state.poked}
           />
-          {this.state.showReflectiveClone ? <PropertyEntry
-            property={this.props.property}
-            value={this.state.currentValue}
-            onChange={this.onChange}
-            poked={this.state.poked}
-          /> : null}
           <br/>
           <button onClick={this.togglePoked}>{this.state.poked ? "UnPoke" : "Poke"}</button>
-          <button onClick={this.toggleReflectiveClone}>
-            {this.state.showReflectiveClone ? "Hide Reflective Clone" : "Show Reflective Clone"}
-          </button>
           <br/>
           <code>
-            {JSON.stringify(this.state.currentValue, null, 2)}
+            {JSON.stringify(valueToStringify, null, 2)}
           </code>
           <DevToolRawVisualizer content={this.props.property.rawData} />
         </div> : null}

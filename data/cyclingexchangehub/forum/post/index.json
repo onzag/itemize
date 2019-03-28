@@ -55,7 +55,9 @@
     },
     {
       "id": "content",
-      "type": "text"
+      "type": "text",
+      "richText": true,
+      "maxLength": 30
     }
   ]
 }
