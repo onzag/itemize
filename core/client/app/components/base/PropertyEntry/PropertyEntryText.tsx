@@ -1,51 +1,98 @@
 import React from "react";
 import { IPropertyEntryProps, getClassName } from ".";
 import PropertyEntryField from "./PropertyEntryField";
-import { Editor, EditorState } from "draft-js";
-import "draft-js/dist/Draft.css";
-import { stateFromHTML } from "draft-js-import-html";
-import { stateToHTML } from "draft-js-export-html";
-import { IPropertyValueGetterType } from "../../../../../base/ItemDefinition/PropertyDefinition";
+import { InputLabel, Icon, IconButton } from "@material-ui/core";
+import ReactQuill from "react-quill";
+import equals from "deep-equal";
+import Toolbar from "@material-ui/core/Toolbar";
+import uuid from "uuid";
 
-// TODO handle images, files, emojis, and whatnot
-function getStateFromValue(value: IPropertyValueGetterType): EditorState {
-  return value.internalValue ? value.internalValue : (
-    value.value ?
-      EditorState.create(stateFromHTML(value.value as string)) :
-      EditorState.createEmpty());
+import "react-quill/dist/quill.core.css";
+import "../../../../theme/quill.scss";
+
+function RichTextEditorToolbar(props: {id: string}) {
+  return (
+    <Toolbar id={props.id}>
+      <IconButton classes={{root: "ql-bold"}}>
+        <Icon>format_bold</Icon>
+      </IconButton>
+      <IconButton classes={{root: "ql-italic"}}>
+        <Icon>format_italic</Icon>
+      </IconButton>
+      <IconButton classes={{root: "ql-underline"}}>
+        <Icon>format_underline</Icon>
+      </IconButton>
+      <span className="ql-divider"/>
+      <IconButton classes={{root: "ql-blockquote"}}>
+        <Icon>format_quote</Icon>
+      </IconButton>
+      <IconButton classes={{root: "ql-header"}} value="1">
+        <Icon>title</Icon>
+      </IconButton>
+      <span className="ql-divider"/>
+      <IconButton classes={{root: "ql-list"}} value="ordered">
+        <Icon>format_list_numbered</Icon>
+      </IconButton>
+      <IconButton classes={{root: "ql-list"}} value="bullet">
+        <Icon>format_list_bulleted</Icon>
+      </IconButton>
+      <span className="ql-divider"/>
+      <IconButton classes={{root: ""}}>
+        <Icon>insert_photo</Icon>
+      </IconButton>
+      <IconButton classes={{root: ""}}>
+        <Icon>attach_file</Icon>
+      </IconButton>
+    </Toolbar>
+  );
 }
 
 interface IRichTextEditorState {
-  editorState: EditorState;
+  focused: boolean;
 }
 
 class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEditorState> {
+  private uuid: string;
   constructor(props: IPropertyEntryProps) {
     super(props);
 
     this.state = {
-      editorState: null,
+      focused: false,
     };
 
+    this.uuid =  "uuid-" + uuid.v4();
+
     this.onChange = this.onChange.bind(this);
+    this.onFocus = this.onFocus.bind(this);
+    this.onBlur = this.onBlur.bind(this);
   }
-  public onChange(newState: EditorState) {
-    const currentContentState = getStateFromValue(this.props.value).getCurrentContent();
-    const newContentState = newState.getCurrentContent();
-
-    if (currentContentState !== newContentState) {
-      let html = stateToHTML(newContentState);
-      if (html === "<p><br></p>") {
-        html = null;
-      }
-
-      if (html !== this.props.value.value) {
-        this.props.onChange(html, newState);
-      }
+  public shouldComponentUpdate(nextProps: IPropertyEntryProps, nextState: IRichTextEditorState) {
+    return (
+      nextState.focused !== this.state.focused ||
+      !equals(nextProps.value, this.props.value)
+    );
+  }
+  public onChange(value: string) {
+    if (value === "<p><br></p>") {
+      this.props.onChange(null, null);
+      return;
     }
+    this.props.onChange(value, null);
+  }
+  public onFocus() {
+    this.setState({
+      focused: true,
+    });
+  }
+  public onBlur() {
+    this.setState({
+      focused: false,
+    });
   }
   public render() {
-    const editorState = getStateFromValue(this.props.value);
+    const editorValue = this.props.value.value ?
+      this.props.value.value as string :
+      "";
 
     const i18nData = this.props.property.getI18nDataFor(this.props.locale);
     const className = getClassName(this.props, "rich-text", this.props.poked);
@@ -62,9 +109,38 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
+    const icon = this.props.property.getIcon();
+    const iconComponent = icon ? (
+      <Icon>{icon}</Icon>
+    ) : null;
+
     return (
       <div className="property-entry--container">
-        <Editor placeholder={i18nPlaceholder} editorState={editorState} onChange={this.onChange}/>
+        <div className={className + (this.state.focused ? " focused" : "")}>
+          <InputLabel
+            classes={{
+              root: "property-field--label",
+              focused: "focused",
+            }}
+            focused={this.state.focused}
+          >
+            {iconComponent}{i18nLabel}
+          </InputLabel>
+          <RichTextEditorToolbar id={this.uuid}/>
+          <ReactQuill
+            modules={{
+              toolbar: {
+                container: "#" + this.uuid,
+              },
+            }}
+            theme={null}
+            placeholder={i18nPlaceholder}
+            value={editorValue}
+            onChange={this.onChange}
+            onFocus={this.onFocus}
+            onBlur={this.onBlur}
+          />
+        </div>
         <div className="property-entry--error">
           {i18nInvalidReason}
         </div>

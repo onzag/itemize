@@ -1,10 +1,12 @@
-$property-entry-error-height: 1em;
+$property-entry-error-height: 1rem;
+$property-entry-error-font-height: 0.65rem;
 $property-entry-color-error: #f44336;
 $property-entry-color-error-clear: #e57373;
 
 .property-entry--error {
   color: $property-entry-color-error-clear;
   height: $property-entry-error-height;
+  font-size: $property-entry-error-font-height;
 }
 
 // This is for entires that are user set or that have been poked
@@ -29,6 +31,13 @@ $property-entry-color-error-clear: #e57373;
       border-bottom-color: $property-entry-color-error;
     }
 
+    // set the color of the icon if there is one
+    // the icon keeps the strong color regardless on
+    // it being focused or not
+    .material-icons {
+      color: $property-entry-color-error;
+    }
+
     // this is for the label of the entry field when it's not focused
     .property-entry--label {
       color: $property-entry-color-error-clear;
@@ -40,12 +49,11 @@ $property-entry-color-error-clear: #e57373;
     }
   }
 
-  // set the color of the icon if there is one
-  // the icon keeps the strong color regardless on
-  // it being focused or not
-  .material-icons {
-    color: $property-entry-color-error;
-  }
+  &.property-entry--rich-text {
+    .property-field--label {
+      color: $property-entry-color-error;
+    }
+  }  
 }
 
 // For fields that are hidden, they are supposed not to be shown
@@ -67,5 +75,13 @@ $property-entry-color-error-clear: #e57373;
     width: 100%;
     top: calc(100% - #{$property-entry-error-height});
     z-index: 1000;
+  }
+}
+
+.property-entry--rich-text {
+  .property-field--label {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
   }
 }

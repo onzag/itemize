@@ -1,0 +1,147 @@
+$property-entry-color-error: #f44336;
+$property-entry-color-error-clear: #e57373;
+$toolbar-color: rgba(0, 0, 0, 0.09);
+$quote-background-color: rgba(0, 0, 0, 0.09);
+$quote-highlight-color: #26a69a;
+$quote-text-color: #455a64;
+$icons-color: #000;
+$list-item-color: #ef5350;
+
+.ql-toolbar {
+  background-color: $toolbar-color;
+  color: $icons-color;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+
+  .material-icons {
+    color: $icons-color;
+  }
+
+  .ql-divider {
+    width: 1rem;
+    display: inline-block;
+  }
+
+  .ql-active {
+    background-color: rgba(0, 0, 0, 0.54);
+
+    .material-icons {
+      color: #fff;
+    }
+  }
+}
+
+.quill {
+  position: relative;
+}
+
+.ql-container, .rich-text {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1rem;
+
+  p, li, blockquote, strong {
+    text-align: justify;
+  }
+
+  ul {
+    list-style: none;
+
+    li::before {
+      content: "\2022";
+      color: $list-item-color;
+      display: inline-block;
+      width: 1rem;
+      margin-left: -1rem
+    }
+  }
+
+  ol {
+    list-style: none;
+    counter-reset: item-count;
+
+    li {
+      counter-increment: item-count;
+    }
+
+    li::before {
+      content: "." counter(item-count);
+      color: $list-item-color;
+      display: inline-block;
+      width: 1em;
+      margin-left: -1.5rem;
+      margin-right: 0.5rem;
+      text-align: right;
+      direction: rtl;
+    }
+  }
+
+  blockquote {
+    font-size: 1rem;
+    margin: 1rem auto;
+    font-style: italic;
+    color: $quote-text-color;
+    padding: 1.2rem 30px 1.2rem 75px;
+    border-left: 8px solid $quote-highlight-color;
+    line-height: 1.6;
+    position: relative;
+    background: $quote-background-color;
+  }
+  
+  blockquote::before{
+    font-family: Arial;
+    content: "\201C";
+    color: $quote-highlight-color;
+    font-size: 4rem;
+    position: absolute;
+    left: 10px;
+    top: -10px;
+  }
+  
+  blockquote::after{
+    content: '';
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 300;
+    text-align: left;
+  }
+}
+
+.quill::before {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  content: "\00a0";
+  position: absolute;
+  transition: border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.42);
+  pointer-events: none;
+}
+
+.quill::after {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  content: "";
+  position: absolute;
+  transform: scaleX(0);
+  transition: transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
+  border-bottom: 2px solid #303f9f;
+  pointer-events: none;
+}
+
+.focused {
+  .quill::after {
+    transform: none;
+  }
+}
+
+.property-entry--invalid.property-entry--user-set, .property-entry--invalid.property-entry--poked {
+  .quill::before {
+    border-bottom-color: $property-entry-color-error-clear;
+  }
+  .quill::after {
+    border-bottom-color: $property-entry-color-error;
+  }
+}

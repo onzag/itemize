@@ -164,8 +164,8 @@ export default class PropertyEntryField
       return;
     }
 
-    const currentValue = this.props.value.stringValue !== null ?
-      this.props.value.stringValue :
+    const currentValue = this.props.value.internalValue !== null ?
+      this.props.value.internalValue :
       formatValueAsString(this.props.property.getType(), this.props.numberSeparator, this.props.value.value);
 
     const type = this.props.property.getType();
@@ -334,8 +334,8 @@ export default class PropertyEntryField
     ) : null;
 
     const currentValue = textFieldProps &&  textFieldProps.value ? textFieldProps.value : (
-      this.props.value.stringValue !== null ?
-      this.props.value.stringValue :
+      this.props.value.internalValue !== null ?
+      this.props.value.internalValue :
       formatValueAsString(this.props.property.getType(), this.props.numberSeparator, this.props.value.value)
     );
 
@@ -456,8 +456,8 @@ export default class PropertyEntryField
   }
 
   public renderAutosuggestField() {
-    const currentValue = this.props.value.stringValue !== null ?
-      this.props.value.stringValue :
+    const currentValue = this.props.value.internalValue !== null ?
+      this.props.value.internalValue :
       formatValueAsString(this.props.property.getType(), this.props.numberSeparator, this.props.value.value);
 
     return (
