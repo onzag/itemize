@@ -688,20 +688,38 @@ export default class PropertyDefinition {
     }
 
     // Special length check
-    if (typeof propertyDefinitionRaw.maxLength !== "undefined") {
+    if (
+      typeof propertyDefinitionRaw.maxLength !== "undefined" ||
+      typeof propertyDefinitionRaw.minLength !== "undefined"
+    ) {
       let characterCount: number;
       if (!propertyDefinitionRaw.richText) {
         characterCount = (value as string).length;
       } else if (propertyDefinitionRaw.richText && fastHTMLParser.parse) {
-        characterCount = fastHTMLParser.parse(value as string).text.length;
+        const dummyElement = fastHTMLParser.parse(value as string);
+        characterCount = dummyElement.text.length;
+        if (dummyElement.querySelector(".ql-cursor")) {
+          characterCount--;
+        }
       } else {
         const dummyElement = document.createElement("div");
         dummyElement.innerHTML = value as string;
         characterCount = dummyElement.innerText.length;
+        if (dummyElement.querySelector(".ql-cursor")) {
+          characterCount--;
+        }
       }
 
-      if (characterCount > propertyDefinitionRaw.maxLength) {
+      if (
+        typeof propertyDefinitionRaw.maxLength !== "undefined" &&
+        characterCount > propertyDefinitionRaw.maxLength
+      ) {
         return PropertyInvalidReason.TOO_LARGE;
+      } else if (
+        typeof propertyDefinitionRaw.minLength !== "undefined" &&
+        characterCount < propertyDefinitionRaw.minLength
+      ) {
+        return PropertyInvalidReason.TOO_SMALL;
       }
     }
 

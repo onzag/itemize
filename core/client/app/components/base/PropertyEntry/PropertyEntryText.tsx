@@ -6,44 +6,88 @@ import ReactQuill from "react-quill";
 import equals from "deep-equal";
 import Toolbar from "@material-ui/core/Toolbar";
 import uuid from "uuid";
+import { LocaleDataContext, LocaleContext } from "../../..";
 
 import "react-quill/dist/quill.core.css";
 import "../../../../theme/quill.scss";
 
 function RichTextEditorToolbar(props: {id: string}) {
   return (
-    <Toolbar id={props.id}>
-      <IconButton classes={{root: "ql-bold"}}>
-        <Icon>format_bold</Icon>
-      </IconButton>
-      <IconButton classes={{root: "ql-italic"}}>
-        <Icon>format_italic</Icon>
-      </IconButton>
-      <IconButton classes={{root: "ql-underline"}}>
-        <Icon>format_underline</Icon>
-      </IconButton>
-      <span className="ql-divider"/>
-      <IconButton classes={{root: "ql-blockquote"}}>
-        <Icon>format_quote</Icon>
-      </IconButton>
-      <IconButton classes={{root: "ql-header"}} value="1">
-        <Icon>title</Icon>
-      </IconButton>
-      <span className="ql-divider"/>
-      <IconButton classes={{root: "ql-list"}} value="ordered">
-        <Icon>format_list_numbered</Icon>
-      </IconButton>
-      <IconButton classes={{root: "ql-list"}} value="bullet">
-        <Icon>format_list_bulleted</Icon>
-      </IconButton>
-      <span className="ql-divider"/>
-      <IconButton classes={{root: ""}}>
-        <Icon>insert_photo</Icon>
-      </IconButton>
-      <IconButton classes={{root: ""}}>
-        <Icon>attach_file</Icon>
-      </IconButton>
-    </Toolbar>
+    <LocaleContext.Consumer>
+      {(currentLocale) => <LocaleDataContext.Consumer>
+        {(localeData) =>
+          <Toolbar id={props.id}>
+            <IconButton
+              title={localeData.locales[currentLocale.state].format_bold}
+              classes={{root: "ql-bold"}}
+            >
+              <Icon>format_bold</Icon>
+            </IconButton>
+            <IconButton
+              title={localeData.locales[currentLocale.state].format_italic}
+              classes={{root: "ql-italic"}}
+            >
+              <Icon>format_italic</Icon>
+            </IconButton>
+            <IconButton
+              title={localeData.locales[currentLocale.state].format_underline}
+              classes={{root: "ql-underline"}}
+            >
+              <Icon>format_underline</Icon>
+            </IconButton>
+            <IconButton
+              title={localeData.locales[currentLocale.state].format_title}
+              classes={{root: "ql-header"}}
+              value="1"
+            >
+              <Icon>title</Icon>
+            </IconButton>
+            <span className="ql-divider"/>
+            <IconButton
+              title={localeData.locales[currentLocale.state].format_quote}
+              classes={{root: "ql-blockquote"}}
+            >
+              <Icon>format_quote</Icon>
+            </IconButton>
+            <span className="ql-divider"/>
+            <IconButton
+              title={localeData.locales[currentLocale.state].format_list_numbered}
+              classes={{root: "ql-list"}}
+              value="ordered"
+            >
+              <Icon>format_list_numbered</Icon>
+            </IconButton>
+            <IconButton
+              title={localeData.locales[currentLocale.state].format_list_bulleted}
+              classes={{root: "ql-list"}}
+              value="bullet"
+            >
+              <Icon>format_list_bulleted</Icon>
+            </IconButton>
+            <span className="ql-divider"/>
+            <IconButton
+              title={localeData.locales[currentLocale.state].format_add_image}
+              classes={{root: ""}}
+            >
+              <Icon>insert_photo</Icon>
+            </IconButton>
+            <IconButton
+              title={localeData.locales[currentLocale.state].format_add_video}
+              classes={{root: ""}}
+            >
+              <Icon>video_library</Icon>
+            </IconButton>
+            <IconButton
+              title={localeData.locales[currentLocale.state].format_add_file}
+              classes={{root: ""}}
+            >
+              <Icon>attach_file</Icon>
+            </IconButton>
+          </Toolbar>
+        }
+      </LocaleDataContext.Consumer>
+    }
+    </LocaleContext.Consumer>
   );
 }
 
@@ -73,7 +117,10 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
     );
   }
   public onChange(value: string) {
-    if (value === "<p><br></p>") {
+    if (
+      value === "<p><br></p>" ||
+      value === "<p><span class=\"ql-cursor\">\ufeff</span></p>"
+    ) {
       this.props.onChange(null, null);
       return;
     }

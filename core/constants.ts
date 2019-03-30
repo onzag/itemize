@@ -25,9 +25,22 @@ export const MAX_TEXT_LENGTH = MAX_STRING_LENGTH;
 // The max file size (for either images and binary files)
 export const MAX_FILE_SIZE = 5242880; // equivalent to 5MB
 
+// This is for small use anywhere language data
 export const LOCALE_I18N = [
   "name",
   "number_separator",
+
+  // For quilljs editor
+  "format_bold",
+  "format_italic" ,
+  "format_underline",
+  "format_title",
+  "format_quote",
+  "format_list_numbered",
+  "format_list_bulleted",
+  "format_add_image",
+  "format_add_file",
+  "format_add_video",
 ];
 
 // ATTRIBUTES FOR i18N
