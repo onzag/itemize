@@ -55,6 +55,9 @@ export const CLASSIC_SEARCH_BASE_I18N = [
 export const REDUCED_BASE_I18N = [
   "label",
 ];
+export const REDUCED_SEARCH_BASE_I18N = [
+  "search.label",
+];
 export const CLASSIC_OPTIONAL_I18N = [
   "hint",
 ];

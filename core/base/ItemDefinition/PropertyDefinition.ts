@@ -18,6 +18,7 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   MIN_SUPPORTED_YEAR,
   MAX_CURRENCY_DECIMAL_COUNT,
   MAX_RAW_TEXT_LENGTH,
+  REDUCED_SEARCH_BASE_I18N,
 } from "../../constants";
 import Module, { OnStateChangeListenerType } from "../Module";
 import * as fastHTMLParser from "fast-html-parser";
@@ -146,7 +147,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     i18n: {
       base: REDUCED_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
-      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchBase: REDUCED_SEARCH_BASE_I18N,
       searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
     },
   },

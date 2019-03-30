@@ -3,11 +3,13 @@
     "properties": [
         {
             "id": "username",
-            "type": "string"
+            "type": "string",
+            "icon": "account_circle"
         },
         {
             "id": "email",
             "type": "string",
+            "icon": "email",
             "searchLevel": "disabled",
             "disableRetrieval": true
         },

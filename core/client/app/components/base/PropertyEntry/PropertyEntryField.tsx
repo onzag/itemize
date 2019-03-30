@@ -7,7 +7,7 @@ import {
   PropertyDefinitionSupportedYearType,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
 import TextField from "@material-ui/core/TextField";
-import { FormControl, InputLabel, Select, MenuItem, FilledInput, Paper, InputAdornment, Icon } from "@material-ui/core";
+import { FormControl, InputLabel, Select, MenuItem, FilledInput, Paper, InputAdornment, Icon, IconButton } from "@material-ui/core";
 import uuid from "uuid";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
@@ -17,6 +17,7 @@ import * as escapeStringRegexp from "escape-string-regexp";
 
 interface IPropertyEntryFieldState {
   suggestions: IPropertyEntryAutocompleteSuggestion[];
+  visible: boolean;
 }
 
 interface IPropertyEntryFieldProps extends IPropertyEntryProps {
@@ -45,6 +46,8 @@ export default class PropertyEntryField
   extends React.Component<IPropertyEntryFieldProps, IPropertyEntryFieldState> {
 
   private uuid: string;
+  private inputRef: HTMLInputElement;
+
   constructor(props: IPropertyEntryFieldProps) {
     super(props);
 
@@ -52,6 +55,7 @@ export default class PropertyEntryField
 
     this.state = {
       suggestions: [],
+      visible: props.property.getType() !== "password",
     };
 
     this.onChange = this.onChange.bind(this);
@@ -64,6 +68,7 @@ export default class PropertyEntryField
     this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
     this.getSuggestionValue = this.getSuggestionValue.bind(this);
     this.clearSuggestions = this.clearSuggestions.bind(this);
+    this.toggleVisible = this.toggleVisible.bind(this);
   }
 
   public shouldComponentUpdate(
@@ -72,9 +77,17 @@ export default class PropertyEntryField
   ) {
     return nextProps.property !== this.props.property ||
       !equals(this.state.suggestions, nextState.suggestions) ||
+      this.state.visible !== nextState.visible ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
       nextProps.locale !== this.props.locale;
+  }
+
+  public toggleVisible() {
+    this.setState({
+      visible: !this.state.visible,
+    });
+    this.inputRef.focus();
   }
 
   public onChange(
@@ -218,7 +231,7 @@ export default class PropertyEntryField
     const icon = this.props.property.getIcon();
     const addornment = icon ? (
       <InputAdornment position="end">
-        <Icon>{icon}</Icon>
+        <Icon classes={{root: "property-entry--icon"}}>{icon}</Icon>
       </InputAdornment>
     ) : null;
 
@@ -232,7 +245,7 @@ export default class PropertyEntryField
           <InputLabel
             htmlFor={this.uuid}
             classes={{
-              root: "property-field--label",
+              root: "property-entry--label",
               focused: "focused",
             }}
           >
@@ -247,7 +260,7 @@ export default class PropertyEntryField
                 placeholder={i18nPlaceholder}
                 endAdornment={addornment}
                 classes={{
-                  root: "property-field--input",
+                  root: "property-entry--input",
                   focused: "focused",
                 }}
               />
@@ -303,7 +316,11 @@ export default class PropertyEntryField
     };
 
     let appliedTextFieldProps: any = {};
-    let appliedInputProps: any = {};
+    let appliedInputProps: any = {
+      inputRef: (node: HTMLInputElement) => {
+        this.inputRef = node;
+      },
+    };
     if (textFieldProps) {
       const { inputRef = () => {return; } , ref, ...other } = textFieldProps;
       appliedTextFieldProps = other;
@@ -311,6 +328,8 @@ export default class PropertyEntryField
         inputRef: (node: HTMLInputElement) => {
           ref(node);
           inputRef(node);
+
+          this.inputRef = node;
         },
       };
 
@@ -320,16 +339,29 @@ export default class PropertyEntryField
 
       if (appliedTextFieldProps.inputProps) {
         appliedTextFieldProps.inputProps = {
-          ...appliedTextFieldProps.inputProps,
           ...inputProps,
+          ...appliedTextFieldProps.inputProps,
         };
       }
     }
 
-    const icon = this.props.property.getIcon();
+    const icon = type === "password" ?
+      (this.state.visible ? "visibility" : "visibility_off") :
+      this.props.property.getIcon();
+    const iconValue = icon ? (
+      <Icon classes={{root: "property-entry--icon"}}>
+        {icon}
+      </Icon>
+    ) : null;
     const addornment = icon ? (
       <InputAdornment position="end">
-        <Icon>{icon}</Icon>
+        {
+          type === "password" ?
+          (<IconButton onClick={this.toggleVisible}>
+            {iconValue}
+          </IconButton>) :
+          iconValue
+        }
       </InputAdornment>
     ) : null;
 
@@ -343,7 +375,7 @@ export default class PropertyEntryField
       <div className="property-entry--container">
         <TextField
           fullWidth={true}
-          type="text"
+          type={this.state.visible ? "text" : "password"}
           className={className}
           label={i18nLabel}
           placeholder={i18nPlaceholder}

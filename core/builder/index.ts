@@ -944,7 +944,7 @@ async function getI18nData(
         .map((b) => ({key: b, required: true})));
 
     const errorRequiredProperties = [];
-    if (!property.nullable) {
+    if (!property.nullable && property.type !== "boolean") {
       errorRequiredProperties.push("error.NOT_NULLABLE");
     }
 

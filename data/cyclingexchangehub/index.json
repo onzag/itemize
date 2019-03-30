@@ -1,5 +1,9 @@
 {
   "type": "root",
-  "includes": ["../__internal__/users", "forum"],
+  "includes": [
+    "../__internal__/test",
+    "../__internal__/users",
+    "forum"
+  ],
   "lang": ["en", "es"]
 }

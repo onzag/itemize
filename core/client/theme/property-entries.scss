@@ -1,5 +1,6 @@
 $property-entry-error-height: 1rem;
 $property-entry-error-font-height: 0.65rem;
+$property-entry-color-default: #424242;
 $property-entry-color-error: #f44336;
 $property-entry-color-error-clear: #e57373;
 
@@ -7,6 +8,10 @@ $property-entry-color-error-clear: #e57373;
   color: $property-entry-color-error-clear;
   height: $property-entry-error-height;
   font-size: $property-entry-error-font-height;
+}
+
+.property-entry--icon {
+  color: $property-entry-color-default;
 }
 
 // This is for entires that are user set or that have been poked
@@ -31,13 +36,6 @@ $property-entry-color-error-clear: #e57373;
       border-bottom-color: $property-entry-color-error;
     }
 
-    // set the color of the icon if there is one
-    // the icon keeps the strong color regardless on
-    // it being focused or not
-    .material-icons {
-      color: $property-entry-color-error;
-    }
-
     // this is for the label of the entry field when it's not focused
     .property-entry--label {
       color: $property-entry-color-error-clear;
@@ -45,15 +43,22 @@ $property-entry-color-error-clear: #e57373;
 
     // the same but when it's focused
     .property-entry--label.focused {
-      color:$property-entry-color-error;
+      color: $property-entry-color-error;
     }
   }
 
-  &.property-entry--rich-text {
-    .property-field--label {
+  &.property-entry--rich-text, &.property-entry--switch {
+    .property-entry--label {
       color: $property-entry-color-error;
     }
-  }  
+  }
+
+  // set the color of the icon if there is one
+  // the icon keeps the strong color regardless on
+  // it being focused or not
+  .property-entry--icon {
+    color: $property-entry-color-error;
+  }
 }
 
 // For fields that are hidden, they are supposed not to be shown
@@ -79,9 +84,14 @@ $property-entry-color-error-clear: #e57373;
 }
 
 .property-entry--rich-text {
-  .property-field--label {
+  .property-entry--label {
     display: flex;
     align-items: center;
     padding: 10px 0;
   }
+}
+
+.property-entry--switch {
+  display: flex;
+  align-items: center;
 }

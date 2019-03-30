@@ -410,18 +410,18 @@ export function checkPropertyDefinition(
   const propertyDefintionTypeStandard = PropertyDefinition
     .supportedTypesStandard[rawData.type];
 
-  const canDisableSearch = propertyDefintionTypeStandard.searchable;
-  if (rawData.disableRangedSearch && !canDisableSearch) {
+  const itemIsSearchable = propertyDefintionTypeStandard.searchable;
+  if (rawData.searchLevel && !itemIsSearchable) {
+    throw new CheckUpError(
+      "Type '" + rawData.type + "' does not support searchLevel " +
+      "as it cannot be searched",
+      traceback.newTraceToBit("searchLevel"),
+    );
+  } else if (rawData.disableRangedSearch && !itemIsSearchable) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' does not support disableRangedSearch " +
       "as it cannot be searched",
       traceback.newTraceToBit("disableRangedSearch"),
-    );
-  } else if (rawData.searchLevel === "disabled" && !canDisableSearch) {
-    throw new CheckUpError(
-      "Type '" + rawData.type + "' does not support searchLevel as disabled " +
-      "as it cannot be searched",
-      traceback.newTraceToBit("searchLevel"),
     );
   } else if (rawData.searchLevel === "disabled" && rawData.disableRangedSearch) {
     throw new CheckUpError(
@@ -464,6 +464,13 @@ export function checkPropertyDefinition(
     throw new CheckUpError(
       "Cannot set a richText if type not text",
       traceback.newTraceToBit("richText"),
+    );
+  }
+
+  if (rawData.icon && rawData.type === "password") {
+    throw new CheckUpError(
+      "Passwords cannot have icons",
+      traceback.newTraceToBit("icon"),
     );
   }
 

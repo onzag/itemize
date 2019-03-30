@@ -1,0 +1,10 @@
+{
+    "type": "item",
+    "properties": [
+        {
+            "id": "boolean",
+            "type": "boolean",
+            "icon": "star"
+        }
+    ]
+}

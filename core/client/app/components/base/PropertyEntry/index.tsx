@@ -37,7 +37,7 @@ const typeRegistry:
   boolean: PropertyEntryBoolean,
   text: PropertyEntryText,
   currency: PropertyEntryCurrency,
-  password: PropertyEntryPassword,
+  password: PropertyEntryField,
   year: PropertyEntryField,
   datetime: PropertyEntryDateTime,
   date: PropertyEntryDate,

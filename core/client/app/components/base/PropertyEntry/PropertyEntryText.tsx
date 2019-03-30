@@ -158,7 +158,7 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
 
     const icon = this.props.property.getIcon();
     const iconComponent = icon ? (
-      <Icon>{icon}</Icon>
+      <Icon classes={{root: "property-entry--icon"}}>{icon}</Icon>
     ) : null;
 
     return (
@@ -166,7 +166,7 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
         <div className={className + (this.state.focused ? " focused" : "")}>
           <InputLabel
             classes={{
-              root: "property-field--label",
+              root: "property-entry--label",
               focused: "focused",
             }}
             focused={this.state.focused}
