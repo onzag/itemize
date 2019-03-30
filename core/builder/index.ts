@@ -953,6 +953,10 @@ async function getI18nData(
       errorRequiredProperties.push("error.TOO_LARGE");
     }
 
+    if (definition.supportedSubtypes && property.subtype) {
+      errorRequiredProperties.push("error.INVALID_SUBTYPE_VALUE");
+    }
+
     if (typeof property.minLength !== "undefined" &&
       !property.values && !property.autocompleteIsEnforced) {
       errorRequiredProperties.push("error.TOO_SMALL");

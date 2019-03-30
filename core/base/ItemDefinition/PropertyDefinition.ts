@@ -30,6 +30,7 @@ export enum PropertyInvalidReason {
   TOO_SMALL = "TOO_SMALL",
   TOO_MANY_DECIMALS = "TOO_MANY_DECIMALS",
   NOT_NULLABLE = "NOT_NULLABLE",
+  INVALID_SUBTYPE_VALUE = "INVALID_SUBTYPE_VALUE",
 }
 
 // All the supported property types
@@ -75,6 +76,9 @@ export interface IPropertyDefinitionSupportedType {
   // as types that are not settable do not have a json form
   json?: "boolean" | "number" | "string";
 
+  // supported subtypes of the type
+  supportedSubtypes?: string[];
+
   // graphql type as a string
   gql: string;
   gqlDef?: {[key: string]: string};
@@ -95,7 +99,7 @@ export interface IPropertyDefinitionSupportedType {
 
   // this is a validation function that checks whether the value
   // is valid,
-  validate?: (value: PropertyDefinitionSupportedType) => PropertyInvalidReason;
+  validate?: (value: PropertyDefinitionSupportedType, subtype?: string) => PropertyInvalidReason;
   // max valid, for numbers
   max?: number;
   // min valid for numbers
@@ -133,6 +137,13 @@ export interface IPropertyDefinitionSupportedType {
 // how they are supposed to be managed
 export type PropertyDefinitionSupportedTypesStandardType =
 Record<PropertyDefinitionSupportedTypeName, IPropertyDefinitionSupportedType>;
+
+const EMAIL_REGEX = new RegExp("(?:[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+\\/=?^_`{|}~-]" +
+  "+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09" +
+  "\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9" +
+  "-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]" +
+  "|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53" +
+  "-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
 
 const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   : PropertyDefinitionSupportedTypesStandardType = {
@@ -275,17 +286,22 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
   string: {
-    gql: "Float",
+    gql: "String",
     // a string is a string
     json: "string",
     nullableDefault: "",
     supportsAutocomplete: true,
+    supportedSubtypes: ["email"],
     // validates just the length
-    validate: (s: PropertyDefinitionSupportedStringType) => {
+    validate: (s: PropertyDefinitionSupportedStringType, subtype: string) => {
       if (typeof s !== "string") {
         return PropertyInvalidReason.UNSPECIFIED;
       } else if (s.length > MAX_STRING_LENGTH) {
         return PropertyInvalidReason.TOO_LARGE;
+      }
+
+      if (subtype === "email" && !EMAIL_REGEX.test(s)) {
+        return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
       }
 
       return null;
@@ -553,6 +569,7 @@ export interface IPropertyDefinitionRawJSONDataType {
   rare?: boolean;
   // the type of the property
   type: PropertyDefinitionSupportedTypeName;
+  subtype?: string;
   min?: number;
   max?: number;
   minLength?: number;
@@ -578,6 +595,8 @@ export interface IPropertyDefinitionRawJSONDataType {
   autocompleteSupportsPrefills?: boolean;
   // whether the autocomplete supports locale
   autocompleteSupportsLocale?: boolean;
+  // html style autocomplete
+  htmlAutocomplete?: string;
   // default value
   default?: PropertyDefinitionSupportedType;
   defaultIf?: IPropertyDefinitionRawJSONRuleDataType[];
@@ -660,7 +679,10 @@ export default class PropertyDefinition {
       return PropertyInvalidReason.UNSPECIFIED;
     }
     if (definition.validate) {
-      const invalidReason = definition.validate(value);
+      const invalidReason = definition.validate(
+        value,
+        propertyDefinitionRaw.subtype,
+      );
       if (invalidReason) {
         return invalidReason;
       }
@@ -1096,6 +1118,14 @@ export default class PropertyDefinition {
     return !!this.rawData.autocompleteSupportsLocale;
   }
 
+  public getHTMLAutocomplete() {
+    return this.rawData.htmlAutocomplete || null;
+  }
+
+  public getSubtype() {
+    return this.rawData.subtype || null;
+  }
+
   public isRichText() {
     return this.rawData.richText;
   }
@@ -1195,6 +1225,9 @@ if (process.env.NODE_ENV !== "production") {
       type:  {
         type: "string",
       },
+      subtype:  {
+        type: "string",
+      },
       rare: {
         type: "boolean",
       },
@@ -1242,6 +1275,9 @@ if (process.env.NODE_ENV !== "production") {
       },
       autocompleteSupportsLocale: {
         type: "boolean",
+      },
+      htmlAutocomplete: {
+        type: "string",
       },
       default: {
         oneOf: valueOneOf,

@@ -410,6 +410,14 @@ export function checkPropertyDefinition(
   const propertyDefintionTypeStandard = PropertyDefinition
     .supportedTypesStandard[rawData.type];
 
+  if (rawData.subtype &&
+    !(propertyDefintionTypeStandard.supportedSubtypes || []).includes(rawData.subtype)) {
+    throw new CheckUpError(
+      "Type '" + rawData.type + "' does not support this subtype",
+      traceback.newTraceToBit("subtype"),
+    );
+  }
+
   const itemIsSearchable = propertyDefintionTypeStandard.searchable;
   if (rawData.searchLevel && !itemIsSearchable) {
     throw new CheckUpError(

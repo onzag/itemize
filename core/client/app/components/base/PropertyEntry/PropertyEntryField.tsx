@@ -7,7 +7,17 @@ import {
   PropertyDefinitionSupportedYearType,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
 import TextField from "@material-ui/core/TextField";
-import { FormControl, InputLabel, Select, MenuItem, FilledInput, Paper, InputAdornment, Icon, IconButton } from "@material-ui/core";
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FilledInput,
+  Paper,
+  InputAdornment,
+  Icon,
+  IconButton,
+} from "@material-ui/core";
 import uuid from "uuid";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
@@ -313,6 +323,7 @@ export default class PropertyEntryField
 
     const inputProps = {
       inputMode,
+      autoComplete: this.props.property.getHTMLAutocomplete(),
     };
 
     let appliedTextFieldProps: any = {};
@@ -357,9 +368,14 @@ export default class PropertyEntryField
       <InputAdornment position="end">
         {
           type === "password" ?
-          (<IconButton onClick={this.toggleVisible}>
-            {iconValue}
-          </IconButton>) :
+          (
+            <IconButton
+              classes={{root: "property-entry--field--button"}}
+              onClick={this.toggleVisible}
+            >
+              {iconValue}
+            </IconButton>
+          ) :
           iconValue
         }
       </InputAdornment>

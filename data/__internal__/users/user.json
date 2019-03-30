@@ -9,13 +9,16 @@
         {
             "id": "email",
             "type": "string",
+            "subtype": "email",
             "icon": "email",
             "searchLevel": "disabled",
+            "htmlAutocomplete": "username",
             "disableRetrieval": true
         },
         {
             "id": "password",
             "type": "password",
+            "htmlAutocomplete": "current-password",
             "disableRetrieval": true
         }
     ]
