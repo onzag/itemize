@@ -24,7 +24,7 @@ import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import equals from "deep-equal";
-import * as escapeStringRegexp from "escape-string-regexp";
+import { escapeStringRegexp } from "../../../../../util";
 
 interface IPropertyEntryFieldState {
   suggestions: IPropertyEntryAutocompleteSuggestion[];
@@ -109,26 +109,27 @@ export default class PropertyEntryField
     autosuggestOverride?: Autosuggest.ChangeEvent,
   ) {
     let textualValue: string = null;
-    let normalizedNumericValueAsString: string = null;
     let numericValue: number = null;
+    let normalizedNumericValueAsString: string = null;
 
     if (autosuggestOverride) {
       textualValue = autosuggestOverride.newValue;
     } else {
-      textualValue = e.target.value;
+      textualValue = e.target.value.toString();
     }
 
     const type = this.props.property.getType();
-    if (type === "number" || type === "integer" || type === "year") {
+    if (!normalizedNumericValueAsString && type === "number" || type === "integer" || type === "year") {
       normalizedNumericValueAsString = textualValue;
       if (type === "number") {
+        const escapedNumberSeparator = escapeStringRegexp(this.props.i18n.number_separator);
         normalizedNumericValueAsString = textualValue.replace(
-          new RegExp(escapeStringRegexp(this.props.i18n.numberSeparator), "g"), ".");
+          new RegExp(escapedNumberSeparator, "g"), ".");
         numericValue = parseFloat(normalizedNumericValueAsString);
       } else if (type === "integer" || type === "year") {
         numericValue = parseInt(normalizedNumericValueAsString, 10);
       }
-      textualValue = formatValueAsString(type, this.props.i18n.numberSeparator, textualValue);
+      textualValue = formatValueAsString(type, this.props.i18n.number_separator, textualValue);
     }
 
     if (autosuggestOverride) {
@@ -193,11 +194,11 @@ export default class PropertyEntryField
 
     const currentValue = this.props.value.internalValue !== null ?
       this.props.value.internalValue :
-      formatValueAsString(this.props.property.getType(), this.props.i18n.numberSeparator, this.props.value.value);
+      formatValueAsString(this.props.property.getType(), this.props.i18n.number_separator, this.props.value.value);
 
     const type = this.props.property.getType();
     if (type === "number" || type === "integer" || type === "year") {
-      const separators = "." + this.props.i18n.numberSeparator;
+      const separators = "." + this.props.i18n.number_separator;
       const validKeys = "1234567890" + separators;
       const isBasicallyInteger = this.props.property.getMaxDecimalCount() === 0;
       if (separators.includes(e.key) && isBasicallyInteger) {
@@ -207,7 +208,7 @@ export default class PropertyEntryField
       } else if (
         separators.includes(e.key) && (
           currentValue.includes(".") ||
-          currentValue.includes(this.props.i18n.numberSeparator)
+          currentValue.includes(this.props.i18n.number_separator)
         )
       ) {
         e.preventDefault();
@@ -249,9 +250,9 @@ export default class PropertyEntryField
       </InputAdornment>
     ) : null;
 
-    const currentValue = this.props.value.internalValue !== null ?
-      this.props.value.internalValue :
-      formatValueAsString(this.props.property.getType(), this.props.i18n.numberSeparator, this.props.value.value);
+    const currentValue = this.props.value.value !== null ?
+      this.props.value.value :
+      formatValueAsString(this.props.property.getType(), this.props.i18n.number_separator, this.props.value.value);
 
     return (
       <div className="property-entry--container">
@@ -399,7 +400,7 @@ export default class PropertyEntryField
     const currentValue = textFieldProps &&  textFieldProps.value ? textFieldProps.value : (
       this.props.value.internalValue !== null ?
       this.props.value.internalValue :
-      formatValueAsString(this.props.property.getType(), this.props.i18n.numberSeparator, this.props.value.value)
+      formatValueAsString(this.props.property.getType(), this.props.i18n.number_separator, this.props.value.value)
     );
 
     return (
@@ -459,7 +460,7 @@ export default class PropertyEntryField
   ) {
     const valueToMatch = this.props.property.isAutocompleteLocalized() ?
       suggestion.i18nValue :
-        (formatValueAsString(this.props.property.getType(), this.props.i18n.numberSeparator, suggestion.value));
+        (formatValueAsString(this.props.property.getType(), this.props.i18n.number_separator, suggestion.value));
     const matches = match(valueToMatch, params.query);
     const parts = parse(valueToMatch, matches);
 
@@ -489,7 +490,7 @@ export default class PropertyEntryField
   ) {
     return this.props.property.isAutocompleteLocalized() ?
       suggestion.i18nValue :
-        (formatValueAsString(this.props.property.getType(), this.props.i18n.numberSeparator, suggestion.value));
+        (formatValueAsString(this.props.property.getType(), this.props.i18n.number_separator, suggestion.value));
   }
 
   public onSuggestionsFetchRequested({value}) {
@@ -521,7 +522,7 @@ export default class PropertyEntryField
   public renderAutosuggestField() {
     const currentValue = this.props.value.internalValue !== null ?
       this.props.value.internalValue :
-      formatValueAsString(this.props.property.getType(), this.props.i18n.numberSeparator, this.props.value.value);
+      formatValueAsString(this.props.property.getType(), this.props.i18n.number_separator, this.props.value.value);
 
     return (
       <Autosuggest

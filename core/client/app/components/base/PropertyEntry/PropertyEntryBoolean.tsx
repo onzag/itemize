@@ -1,7 +1,7 @@
 import React from "react";
 import { IPropertyEntryProps, getClassName } from ".";
 import { FormControlLabel, Switch, Icon, FormLabel, FormControl, RadioGroup, Radio } from "@material-ui/core";
-import { capitalize } from "../../../util";
+import { capitalize } from "../../../../../util";
 
 function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
   const i18nData = props.property.getI18nDataFor(props.locale);

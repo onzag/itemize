@@ -61,6 +61,31 @@
             "values": [1, 2, 3, 4],
             "nullable": true,
             "icon": "filter_1"
+        },
+
+        {
+            "id": "number",
+            "type": "number",
+            "icon": "looks_one"
+        },
+        {
+            "id": "number_nullable",
+            "type": "number",
+            "nullable": true,
+            "icon": "looks_one"
+        },
+        {
+            "id": "number_values",
+            "type": "number",
+            "values": [1.0, 1.1, 1.2, 2.0],
+            "icon": "looks_one"
+        },
+        {
+            "id": "number_values_nullable",
+            "type": "number",
+            "values": [1.0, 1.1, 1.2, 2.0],
+            "nullable": true,
+            "icon": "looks_one"
         }
     ]
 }

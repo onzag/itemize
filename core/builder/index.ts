@@ -6,7 +6,7 @@ import { IModuleRawJSONDataType } from "../base/Module";
 import {
   IItemDefinitionRawJSONDataType,
 } from "../base/ItemDefinition";
-import Root, { IRootRawJSONDataType } from "../base/Root";
+import { IRootRawJSONDataType } from "../base/Root";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import {
@@ -25,12 +25,12 @@ import { checkRoot } from "./checkers";
 import { processRoot, clearLang } from "./processer";
 import { buildGraphQLSchema } from "./graphql";
 import { LOCALE_I18N } from "../constants";
+import { escapeStringRegexp } from "../util";
 
 import * as fs from "fs";
 import * as path from "path";
 import * as PropertiesReader from "properties-reader";
 import * as colors from "colors/safe";
-import * as escapeStringRegexp from "escape-string-regexp";
 
 const jsonMap = require("json-source-map");
 const fsAsync = fs.promises;
@@ -937,7 +937,11 @@ async function getI18nData(
         .map((b) => ({key: b, required: true})))
       // request for the values if supported
       .concat((property.values || [])
-        .map((b) => ({key: "values." + b.toString().replace(/\./g, "_dot_").replace("/\s/g", "_"), required: true})))
+        .map((b) => ({
+          key: "values." + b.toString().replace(/\./g, "_dot_").replace("/\s/g", "_"),
+          required: true,
+          actualFinalKeyValue: b.toString(),
+        })))
       .concat((property.values && property.nullable ? ["null_value"] : [])
         .map((b) => ({key: b, required: true})));
 
@@ -1010,7 +1014,7 @@ async function getI18nData(
       splitted.forEach((keyValue, index) => {
         // on the last one we set it as the value
         if (index === splitted.length - 1) {
-          whereToSet[keyValue] = result;
+          whereToSet[(expectedProperty as any).actualFinalKeyValue || keyValue] = result;
           return;
         }
 
