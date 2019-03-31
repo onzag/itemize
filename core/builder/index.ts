@@ -924,10 +924,10 @@ async function getI18nData(
           [] : definition.i18n.searchRangeOptional || [])
         .map((b) => ({key: b, required: false})))
       // concat to search properties only if necessary
-      .concat((property.searchLevel === "disabled" ?
+      .concat((property.disableExactSearch || property.searchLevel === "disabled" ?
           [] : definition.i18n.searchBase || [])
         .map((b) => ({key: b, required: true})))
-      .concat((property.searchLevel === "disabled" ?
+      .concat((property.disableExactSearch || property.searchLevel === "disabled" ?
           [] : definition.i18n.searchOptional || [])
         .map((b) => ({key: b, required: false})))
       // while we could make a rule for LOCATION_DISTANCE here

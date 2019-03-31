@@ -2,7 +2,7 @@ import { IRootRawJSONDataType } from "../base/Root";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import { IModuleRawJSONDataType } from "../base/Module";
-import PropertyDefinition from "../base/ItemDefinition/PropertyDefinition";
+import PropertyDefinition, { PropertyDefinitionSearchInterfacesType } from "../base/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/ItemDefinition";
 import {
   IPropertyDefinitionRawJSONDataType,
@@ -419,11 +419,26 @@ export function checkPropertyDefinition(
   }
 
   const itemIsSearchable = propertyDefintionTypeStandard.searchable;
+  const itemSupportsExactAndRange =
+    propertyDefintionTypeStandard.searchInterface ===
+      PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE;
   if (rawData.searchLevel && !itemIsSearchable) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' does not support searchLevel " +
       "as it cannot be searched",
       traceback.newTraceToBit("searchLevel"),
+    );
+  } else if (!itemSupportsExactAndRange && rawData.disableRangedSearch) {
+    throw new CheckUpError(
+      "Type '" + rawData.type + "' does not support disableRangedSearch " +
+      "as it does not support ranged search",
+      traceback.newTraceToBit("disableRangedSearch"),
+    );
+  } else if (!itemSupportsExactAndRange && rawData.disableExactSearch) {
+    throw new CheckUpError(
+      "Type '" + rawData.type + "' does not support disableExactSearch " +
+      "as it does not have the search range and exact interface, use searchLevel=\"disabled\" instead",
+      traceback.newTraceToBit("disableExactSearch"),
     );
   } else if (rawData.disableRangedSearch && !itemIsSearchable) {
     throw new CheckUpError(
@@ -435,6 +450,22 @@ export function checkPropertyDefinition(
     throw new CheckUpError(
       "Type '" + rawData.type + "' cannot disable ranged search if search is disabled",
       traceback.newTraceToBit("disableRangedSearch"),
+    );
+  } else if (rawData.disableExactSearch && !itemIsSearchable) {
+    throw new CheckUpError(
+      "Type '" + rawData.type + "' does not support disableExactSearch " +
+      "as it cannot be searched",
+      traceback.newTraceToBit("disableExactSearch"),
+    );
+  } else if (rawData.searchLevel === "disabled" && rawData.disableExactSearch) {
+    throw new CheckUpError(
+      "Type '" + rawData.type + "' cannot disable exact search if search is disabled",
+      traceback.newTraceToBit("disableExactSearch"),
+    );
+  } else if (rawData.disableExactSearch && rawData.disableRangedSearch) {
+    throw new CheckUpError(
+      "Cannot disable both exact search and ranged search",
+      traceback,
     );
   }
 

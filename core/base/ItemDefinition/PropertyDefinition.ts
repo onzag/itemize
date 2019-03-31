@@ -609,6 +609,8 @@ export interface IPropertyDefinitionRawJSONDataType {
   searchLevel?: PropertyDefinitionSearchLevelsType;
   // disable ranged search
   disableRangedSearch?: boolean;
+  // disable exact search
+  disableExactSearch?: boolean;
   // disable retrieval, property value is never retrieved
   // it can only be set or updated
   disableRetrieval?: boolean;
@@ -1083,15 +1085,19 @@ export default class PropertyDefinition {
   }
 
   public isRare() {
-    return this.rawData.rare;
+    return this.rawData.rare || false;
   }
 
   public isRetrievalDisabled() {
-    return this.rawData.disableRetrieval;
+    return this.rawData.disableRetrieval || false;
   }
 
   public isRangedSearchDisabled() {
-    return this.rawData.disableRangedSearch;
+    return this.rawData.disableRangedSearch || false;
+  }
+
+  public isExactSearchDisabled() {
+    return this.rawData.disableExactSearch || false;
   }
 
   public getSearchLevel(): PropertyDefinitionSearchLevelsType {
@@ -1333,6 +1339,9 @@ if (process.env.NODE_ENV !== "production") {
         enum: searchLevels,
       },
       disableRangedSearch: {
+        type: "boolean",
+      },
+      disableExactSearch: {
         type: "boolean",
       },
       disableRetrieval: {
