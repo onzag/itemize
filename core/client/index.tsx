@@ -16,7 +16,7 @@ import "babel-polyfill";
     <BrowserRouter>
       <App
         initialData={initialData}
-        localeData={localeData}
+        localeData={localeData.locales}
         initialLocale={initialLocale}
       />
     </BrowserRouter>,

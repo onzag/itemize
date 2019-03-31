@@ -1,5 +1,5 @@
 import * as React from "react";
-import { LocaleContext, LocaleDataContext, DataContext, ILocaleType } from "../app";
+import { LocaleContext, DataContext, ILocaleType } from "../app";
 import DevToolRoot from "./dRoot";
 
 const devtoolsStyle: {
@@ -78,35 +78,31 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
     if (this.state.opened) {
       const internalLocaleContent = (
         <div>
-          <LocaleDataContext.Consumer>
-            {(localeData) =>
-              <LocaleContext.Consumer>
-                {(locale) => <div>
-                  <p>
-                    Current Locale
-                    <b> {locale.state} - {localeData.locales[locale.state].name} </b>
-                    {
-                      locale.updating ?
-                      "Updating..." :
-                      <React.Fragment>
-                        Supports:
-                        {Object.keys(localeData.locales).map((localeName) =>
-                          <React.Fragment key={localeName}>
-                            &nbsp;
-                            <span
-                             style={devtoolsStyle.singeLocaleChanger}
-                             onClick={this.changeLocale.bind(this, locale, localeName)}
-                            >
-                             {localeName} - {localeData.locales[localeName].name}
-                            </span>
-                          </React.Fragment>)}
-                      </React.Fragment>
-                    }
-                  </p>
-                </div>}
-              </LocaleContext.Consumer>
-            }
-         </LocaleDataContext.Consumer>
+          <LocaleContext.Consumer>
+            {(locale) => <div>
+              <p>
+                Current Locale
+                <b> {locale.state} - {locale.locales[locale.state].name} </b>
+                {
+                  locale.updating ?
+                  "Updating..." :
+                  <React.Fragment>
+                    Supports:
+                    {Object.keys(locale.locales).map((localeName) =>
+                      <React.Fragment key={localeName}>
+                        &nbsp;
+                        <span
+                          style={devtoolsStyle.singeLocaleChanger}
+                          onClick={this.changeLocale.bind(this, locale, localeName)}
+                        >
+                         {localeName} - {locale.locales[localeName].name}
+                        </span>
+                      </React.Fragment>)}
+                  </React.Fragment>
+                }
+              </p>
+            </div>}
+          </LocaleContext.Consumer>
         </div>
       );
 

@@ -14,16 +14,20 @@ import PropertyEntryDate from "./PropertyEntryDate";
 import PropertyEntryLocation from "./PropertyEntryLocation";
 import PropertyEntryImage from "./PropertyEntryImage";
 import PropertyEntryFiles from "./PropertyEntryFiles";
-import { LocaleContext, LocaleDataContext } from "../../..";
+import { LocaleContext, Ii18NType } from "../../..";
 
 import "../../../../theme/property-entries.scss";
 
-export interface IPropertyEntryProps {
+export interface IPropertyEntryBaseProps {
   property: PropertyDefinition;
   value: IPropertyValueGetterType;
   onChange: (newValue: PropertyDefinitionSupportedType, internalValue: any) => void;
-  locale?: string;
   poked?: boolean;
+}
+
+export interface IPropertyEntryProps extends IPropertyEntryBaseProps {
+  locale: string;
+  i18n: Ii18NType;
 }
 
 const typeRegistry:
@@ -46,7 +50,7 @@ const typeRegistry:
   files: PropertyEntryFiles,
 };
 
-export function getClassName(props: IPropertyEntryProps, name: string, poked?: boolean) {
+export function getClassName(props: IPropertyEntryBaseProps, name: string, poked?: boolean) {
   return `property-entry property-entry--${name} ${
     poked ? "property-entry--poked" : ""
   } ${
@@ -64,20 +68,18 @@ export function getClassName(props: IPropertyEntryProps, name: string, poked?: b
   }`;
 }
 
-export default function PropertyEntry(props: IPropertyEntryProps) {
+export default function PropertyEntry(props: IPropertyEntryBaseProps) {
   const Element = typeRegistry[props.property.getType()];
   return (
     <LocaleContext.Consumer>
-      {(locale) => <LocaleDataContext.Consumer>
-        {
-          (localeData) =>
-            <Element
-              {...props}
-              locale={props.locale || locale.state}
-              numberSeparator={localeData.locales[props.locale || locale.state].number_separator}
-            />
-        }
-      </LocaleDataContext.Consumer>}
+      {
+        (locale) =>
+          <Element
+            {...props}
+            locale={locale.state}
+            i18n={locale.i18n}
+          />
+      }
     </LocaleContext.Consumer>
   );
 }

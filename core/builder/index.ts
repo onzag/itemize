@@ -22,7 +22,7 @@ import {
   checkItemDefinitionSchemaValidate,
 } from "./schemaChecks";
 import { checkRoot } from "./checkers";
-import { processRoot } from "./processer";
+import { processRoot, clearLang } from "./processer";
 import { buildGraphQLSchema } from "./graphql";
 import { LOCALE_I18N } from "../constants";
 
@@ -42,6 +42,14 @@ import "source-map-support/register";
 
 if (process.env.NODE_ENV === "production") {
   throw new Error("This script cannot run in production mode");
+}
+
+export interface ILocaleLangDataType {
+  locales: {
+    [locale: string]: {
+      [key: string]: string;
+    };
+  };
 }
 
 // This is the raw untreated json for the root
@@ -182,9 +190,6 @@ async function buildData(entry: string) {
   };
 
   checkRoot(resultJSON);
-  const resultBuilds = supportedLanguages.map((lang) => {
-    return processRoot(resultJSON, lang);
-  });
 
   if (!await checkExists("./dist")) {
     await fsAsync.mkdir("./dist");
@@ -194,32 +199,31 @@ async function buildData(entry: string) {
     await fsAsync.mkdir("./dist/data");
   }
 
+  const allLangData = await buildLang(
+    supportedLanguages,
+    actualLocation,
+    traceback.newTraceToBit("lang"),
+  );
   console.log("emiting " + colors.green("./dist/data/lang.json"));
   await fsAsync.writeFile(
     "./dist/data/lang.json",
-    JSON.stringify(await buildLang(
-      supportedLanguages,
-      actualLocation,
-      traceback.newTraceToBit("lang"),
-    )),
+    JSON.stringify(clearLang(allLangData)),
   );
 
-  const rootTest = new Root(resultJSON);
-  rootTest.getAllModules();
-
-  const allFileName = "./dist/data/build.all.json";
-  console.log("emiting " + colors.green(allFileName));
-  await fsAsync.writeFile(
-    allFileName,
-    JSON.stringify(processRoot(resultJSON)),
-  );
-
-  await Promise.all(resultBuilds.map((rb, index) => {
-    const fileName = `./dist/data/build.${supportedLanguages[index]}.json`;
+  const resultBuilds = supportedLanguages.map((lang) => {
+    return processRoot(resultJSON, lang);
+  });
+  await Promise.all(supportedLanguages.map(async (sl, index) => {
+    const resultingBuild = resultBuilds[index];
+    const resultData = {
+      root: resultingBuild,
+      i18n: allLangData.locales[sl],
+    };
+    const fileName = `./dist/data/build.${sl}.json`;
     console.log("emiting " + colors.green(fileName));
-    return fsAsync.writeFile(
+    await fsAsync.writeFile(
       fileName,
-      JSON.stringify(rb),
+      JSON.stringify(resultData),
     );
   }));
 
@@ -243,7 +247,7 @@ async function buildLang(
   supportedLanguages: string[],
   actualRootLocation: string,
   traceback: Traceback,
-) {
+): Promise<ILocaleLangDataType> {
   const languageFileLocation = actualRootLocation
     .replace(".json", ".properties");
 
@@ -253,13 +257,7 @@ async function buildLang(
   );
 
   const properties = PropertiesReader(languageFileLocation).path();
-  const result: {
-    locales: {
-      [key: string]: {
-        [data: string]: string,
-      },
-    },
-  } = {
+  const result: ILocaleLangDataType = {
     locales: {},
   };
 

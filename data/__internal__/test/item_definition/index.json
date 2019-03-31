@@ -4,7 +4,63 @@
         {
             "id": "boolean",
             "type": "boolean",
-            "icon": "star"
+            "icon": "check_circle"
+        },
+        {
+            "id": "boolean_nullable",
+            "type": "boolean",
+            "nullable": true,
+            "icon": "check_circle"
+        },
+
+        {
+            "id": "string",
+            "type": "string",
+            "icon": "text_fields"
+        },
+        {
+            "id": "string_nullable",
+            "type": "string",
+            "nullable": true,
+            "icon": "text_fields"
+        },
+        {
+            "id": "string_values",
+            "type": "string",
+            "values": ["one", "two", "three", "four"],
+            "icon": "text_fields"
+        },
+        {
+            "id": "string_values_nullable",
+            "type": "string",
+            "values": ["one", "two", "three", "four"],
+            "nullable": true,
+            "icon": "text_fields"
+        },
+
+        {
+            "id": "integer",
+            "type": "integer",
+            "icon": "filter_1"
+        },
+        {
+            "id": "integer_nullable",
+            "type": "integer",
+            "nullable": true,
+            "icon": "filter_1"
+        },
+        {
+            "id": "integer_values",
+            "type": "integer",
+            "values": [1, 2, 3, 4],
+            "icon": "filter_1"
+        },
+        {
+            "id": "integer_values_nullable",
+            "type": "integer",
+            "values": [1, 2, 3, 4],
+            "nullable": true,
+            "icon": "filter_1"
         }
     ]
 }

@@ -10,6 +10,7 @@ import {
   IItemRawJSONDataType,
 } from "../base/ItemDefinition/Item";
 import "source-map-support/register";
+import { ILocaleLangDataType } from ".";
 
 /**
  * Cleans up build data from
@@ -171,6 +172,17 @@ export function processRoot(
         locale,
       );
     });
+
+  return nRawData;
+}
+
+export function clearLang(
+  rawData: ILocaleLangDataType,
+) {
+  const nRawData: ILocaleLangDataType = {locales: {}};
+  Object.keys(rawData.locales).forEach((locale) => {
+    nRawData.locales[locale] = {name: rawData.locales[locale].name};
+  });
 
   return nRawData;
 }

@@ -18,18 +18,20 @@ if (isDevelopment) {
   console.info("Starting Development Mode, Have Fun :)");
 }
 
+export interface Ii18NType {
+  [key: string]: string;
+}
+
 export interface ILocaleDataType {
- locales: {
-    [locale: string]: {
-      [data: string]: string,
-    },
-  };
+  [locale: string]: Ii18NType;
 }
 
 export interface ILocaleType {
   changeTo: (locale: string) => Promise<void>;
   state: string;
   updating: boolean;
+  locales: ILocaleDataType;
+  i18n: Ii18NType;
 }
 
 export interface IDataType {
@@ -37,21 +39,25 @@ export interface IDataType {
   value: Root;
 }
 
+export interface IBuildData {
+  root: IRootRawJSONDataType;
+  i18n: Ii18NType;
+}
+
 interface IAppProps {
   initialLocale: string;
-  initialData: IRootRawJSONDataType;
+  initialData: IBuildData;
   localeData: ILocaleDataType;
 }
 
 interface IAppState {
   specifiedLocale: string;
-  specifiedData: IRootRawJSONDataType;
-  specifiedProcessedData: Root;
+  specifiedData: IBuildData;
+  specifiedProcessedRoot: Root;
   localeIsUpdating: boolean;
 }
 
 export const LocaleContext = React.createContext<ILocaleType>(null);
-export const LocaleDataContext = React.createContext<ILocaleDataType>(null);
 export const DataContext = React.createContext<IDataType>(null);
 
 const theme = createMuiTheme({
@@ -69,7 +75,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       specifiedLocale: props.initialLocale,
       localeIsUpdating: false,
       specifiedData: props.initialData,
-      specifiedProcessedData: new Root(props.initialData),
+      specifiedProcessedRoot: new Root(props.initialData.root),
     };
 
     this.changeLocale = this.changeLocale.bind(this);
@@ -83,7 +89,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       localeIsUpdating: true,
     });
 
-    const newData: IRootRawJSONDataType =
+    const newData: IBuildData =
       await fetch(`/resource/build.${locale}.json`)
       .then((r) => r.json());
 
@@ -91,7 +97,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     this.setState({
       specifiedData: newData,
-      specifiedProcessedData: new Root(newData),
+      specifiedProcessedRoot: new Root(newData.root),
       specifiedLocale: locale,
       localeIsUpdating: false,
     });
@@ -101,21 +107,21 @@ export default class App extends React.Component<IAppProps, IAppState> {
       state: this.state.specifiedLocale,
       changeTo: this.changeLocale,
       updating: this.state.localeIsUpdating,
+      locales: this.props.localeData,
+      i18n: this.state.specifiedData.i18n,
     };
     const dataContextValue: IDataType = {
-      raw: this.state.specifiedData,
-      value: this.state.specifiedProcessedData,
+      raw: this.state.specifiedData.root,
+      value: this.state.specifiedProcessedRoot,
     };
     return (
       <JssProvider jss={jss} generateClassName={generateClassName}>
         <MuiThemeProvider theme={theme}>
           <LocaleContext.Provider value={localeContextValue}>
             <DataContext.Provider value={dataContextValue}>
-              <LocaleDataContext.Provider value={this.props.localeData}>
-                <h1>It works!</h1>
+              <h1>It works!</h1>
 
-                {isDevelopment ? <DevTools/> : null}
-              </LocaleDataContext.Provider>
+              {isDevelopment ? <DevTools/> : null}
             </DataContext.Provider>
           </LocaleContext.Provider>
         </MuiThemeProvider>

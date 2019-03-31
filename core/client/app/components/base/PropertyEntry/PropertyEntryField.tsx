@@ -17,6 +17,7 @@ import {
   InputAdornment,
   Icon,
   IconButton,
+  Divider,
 } from "@material-ui/core";
 import uuid from "uuid";
 import Autosuggest from "react-autosuggest";
@@ -28,10 +29,6 @@ import * as escapeStringRegexp from "escape-string-regexp";
 interface IPropertyEntryFieldState {
   suggestions: IPropertyEntryAutocompleteSuggestion[];
   visible: boolean;
-}
-
-interface IPropertyEntryFieldProps extends IPropertyEntryProps {
-  numberSeparator?: string;
 }
 
 interface IPropertyEntryAutocompleteSuggestion {
@@ -53,12 +50,12 @@ function formatValueAsString(type: string, numberSeparator: string, value: any) 
 }
 
 export default class PropertyEntryField
-  extends React.Component<IPropertyEntryFieldProps, IPropertyEntryFieldState> {
+  extends React.Component<IPropertyEntryProps, IPropertyEntryFieldState> {
 
   private uuid: string;
   private inputRef: HTMLInputElement;
 
-  constructor(props: IPropertyEntryFieldProps) {
+  constructor(props: IPropertyEntryProps) {
     super(props);
 
     this.uuid =  "uuid-" + uuid.v4();
@@ -69,6 +66,7 @@ export default class PropertyEntryField
     };
 
     this.onChange = this.onChange.bind(this);
+    this.onChangeByHTMLEvent = this.onChangeByHTMLEvent.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.renderSelectField = this.renderSelectField.bind(this);
     this.renderBasicTextField = this.renderBasicTextField.bind(this);
@@ -100,6 +98,12 @@ export default class PropertyEntryField
     this.inputRef.focus();
   }
 
+  public onChangeByHTMLEvent(
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) {
+    return this.onChange(e, null);
+  }
+
   public onChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     autosuggestOverride?: Autosuggest.ChangeEvent,
@@ -119,12 +123,12 @@ export default class PropertyEntryField
       normalizedNumericValueAsString = textualValue;
       if (type === "number") {
         normalizedNumericValueAsString = textualValue.replace(
-          new RegExp(escapeStringRegexp(this.props.numberSeparator), "g"), ".");
+          new RegExp(escapeStringRegexp(this.props.i18n.numberSeparator), "g"), ".");
         numericValue = parseFloat(normalizedNumericValueAsString);
       } else if (type === "integer" || type === "year") {
         numericValue = parseInt(normalizedNumericValueAsString, 10);
       }
-      textualValue = formatValueAsString(type, this.props.numberSeparator, textualValue);
+      textualValue = formatValueAsString(type, this.props.i18n.numberSeparator, textualValue);
     }
 
     if (autosuggestOverride) {
@@ -189,11 +193,11 @@ export default class PropertyEntryField
 
     const currentValue = this.props.value.internalValue !== null ?
       this.props.value.internalValue :
-      formatValueAsString(this.props.property.getType(), this.props.numberSeparator, this.props.value.value);
+      formatValueAsString(this.props.property.getType(), this.props.i18n.numberSeparator, this.props.value.value);
 
     const type = this.props.property.getType();
     if (type === "number" || type === "integer" || type === "year") {
-      const separators = "." + this.props.numberSeparator;
+      const separators = "." + this.props.i18n.numberSeparator;
       const validKeys = "1234567890" + separators;
       const isBasicallyInteger = this.props.property.getMaxDecimalCount() === 0;
       if (separators.includes(e.key) && isBasicallyInteger) {
@@ -203,7 +207,7 @@ export default class PropertyEntryField
       } else if (
         separators.includes(e.key) && (
           currentValue.includes(".") ||
-          currentValue.includes(this.props.numberSeparator)
+          currentValue.includes(this.props.i18n.numberSeparator)
         )
       ) {
         e.preventDefault();
@@ -226,7 +230,7 @@ export default class PropertyEntryField
     const className = getClassName(this.props, "field", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
-    const nullValueLabel = i18nData && i18nData.nullValue;
+    const nullValueLabel = i18nData && i18nData.null_value;
 
     const invalidReason = this.props.value.invalidReason;
     let i18nInvalidReason = null;
@@ -247,7 +251,7 @@ export default class PropertyEntryField
 
     const currentValue = this.props.value.internalValue !== null ?
       this.props.value.internalValue :
-      formatValueAsString(this.props.property.getType(), this.props.numberSeparator, this.props.value.value);
+      formatValueAsString(this.props.property.getType(), this.props.i18n.numberSeparator, this.props.value.value);
 
     return (
       <div className="property-entry--container">
@@ -258,12 +262,14 @@ export default class PropertyEntryField
               root: "property-entry--label",
               focused: "focused",
             }}
+            shrink={nullValueLabel ? true : undefined}
           >
             {i18nLabel}
           </InputLabel>
           <Select
             value={currentValue}
-            onChange={this.onChange}
+            onChange={this.onChangeByHTMLEvent}
+            displayEmpty={true}
             input={
               <FilledInput
                 id={this.uuid}
@@ -276,9 +282,18 @@ export default class PropertyEntryField
               />
             }
           >
-            <MenuItem value="">
-              <em>{nullValueLabel}</em>
+            <MenuItem
+              selected={false}
+              role="none"
+              classes={{root: "property-entry--input--menu-item-placeholder"}}
+              disabled={true}
+            >
+              <em>{i18nPlaceholder}</em>
             </MenuItem>
+            <Divider/>
+            {nullValueLabel ? <MenuItem value="">
+              <em>{nullValueLabel}</em>
+            </MenuItem> : null}
             {
               this.props.property.getSpecificValidValues().map((vv) => {
                 const i18nIdentifier = vv.toString();
@@ -384,7 +399,7 @@ export default class PropertyEntryField
     const currentValue = textFieldProps &&  textFieldProps.value ? textFieldProps.value : (
       this.props.value.internalValue !== null ?
       this.props.value.internalValue :
-      formatValueAsString(this.props.property.getType(), this.props.numberSeparator, this.props.value.value)
+      formatValueAsString(this.props.property.getType(), this.props.i18n.numberSeparator, this.props.value.value)
     );
 
     return (
@@ -396,7 +411,7 @@ export default class PropertyEntryField
           label={i18nLabel}
           placeholder={i18nPlaceholder}
           value={currentValue}
-          onChange={this.onChange}
+          onChange={this.onChangeByHTMLEvent}
           onKeyDown={this.onKeyDown}
           InputProps={{
             classes: {
@@ -444,7 +459,7 @@ export default class PropertyEntryField
   ) {
     const valueToMatch = this.props.property.isAutocompleteLocalized() ?
       suggestion.i18nValue :
-        (formatValueAsString(this.props.property.getType(), this.props.numberSeparator, suggestion.value));
+        (formatValueAsString(this.props.property.getType(), this.props.i18n.numberSeparator, suggestion.value));
     const matches = match(valueToMatch, params.query);
     const parts = parse(valueToMatch, matches);
 
@@ -474,7 +489,7 @@ export default class PropertyEntryField
   ) {
     return this.props.property.isAutocompleteLocalized() ?
       suggestion.i18nValue :
-        (formatValueAsString(this.props.property.getType(), this.props.numberSeparator, suggestion.value));
+        (formatValueAsString(this.props.property.getType(), this.props.i18n.numberSeparator, suggestion.value));
   }
 
   public onSuggestionsFetchRequested({value}) {
@@ -506,7 +521,7 @@ export default class PropertyEntryField
   public renderAutosuggestField() {
     const currentValue = this.props.value.internalValue !== null ?
       this.props.value.internalValue :
-      formatValueAsString(this.props.property.getType(), this.props.numberSeparator, this.props.value.value);
+      formatValueAsString(this.props.property.getType(), this.props.i18n.numberSeparator, this.props.value.value);
 
     return (
       <Autosuggest

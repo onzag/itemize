@@ -41,6 +41,11 @@ export const LOCALE_I18N = [
   "format_add_image",
   "format_add_file",
   "format_add_video",
+
+  "yes",
+  "no",
+  "unspecified",
+  "any",
 ];
 
 // ATTRIBUTES FOR i18N
@@ -65,7 +70,8 @@ export const CLASSIC_SEARCH_OPTIONAL_I18N = [
   "search.hint",
 ];
 export const CLASSIC_SEARCH_RANGED_I18N = [
-  "search.range.label",
+  "search.range.from.label",
+  "search.range.to.label",
   "search.range.from.placeholder",
   "search.range.to.placeholder",
 ];
