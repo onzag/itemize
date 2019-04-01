@@ -1,0 +1,11 @@
+Countries list origin:
+
+https://raw.githubusercontent.com/annexare/Countries/master/dist/countries.emoji.json
+
+Currencies list base
+
+https://gist.github.com/Fluidbyte/2973986
+
+Comprehensive currency list names in many languages, downloaded original csv and converted to json
+
+http://www.mapanet.eu/en/resources/Currencies.asp

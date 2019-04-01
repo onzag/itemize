@@ -1,0 +1,4454 @@
+[
+  {
+    "CurrencyISO": "AFN",
+    "Language": "EN",
+    "CurrencyName": "Afghani",
+    "Money": "افغانۍ",
+    "Symbol": "؋"
+  },
+  {
+    "CurrencyISO": "DZD",
+    "Language": "EN",
+    "CurrencyName": "Algerian Dinar",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "ARS",
+    "Language": "EN",
+    "CurrencyName": "Argentine Peso",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "AMD",
+    "Language": "EN",
+    "CurrencyName": "Armenian Dram",
+    "Money": "Դրամ",
+    "Symbol": "դ"
+  },
+  {
+    "CurrencyISO": "AWG",
+    "Language": "EN",
+    "CurrencyName": "Aruban Guilder",
+    "Money": "Florijn",
+    "Symbol": "A"
+  },
+  {
+    "CurrencyISO": "AUD",
+    "Language": "EN",
+    "CurrencyName": "Australian Dollar",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "AZN",
+    "Language": "EN",
+    "CurrencyName": "Azerbaijanian Manat",
+    "Money": "Manatı",
+    "Symbol": "м"
+  },
+  {
+    "CurrencyISO": "BSD",
+    "Language": "EN",
+    "CurrencyName": "Bahamian Dollar",
+    "Money": "Dollar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BHD",
+    "Language": "EN",
+    "CurrencyName": "Bahraini Dinar",
+    "Money": "دينار",
+    "Symbol": "."
+  },
+  {
+    "CurrencyISO": "THB",
+    "Language": "EN",
+    "CurrencyName": "Baht",
+    "Money": "บาทไทย",
+    "Symbol": "฿"
+  },
+  {
+    "CurrencyISO": "PAB",
+    "Language": "EN",
+    "CurrencyName": "Balboa",
+    "Money": "Balboa",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BBD",
+    "Language": "EN",
+    "CurrencyName": "Barbados Dollar",
+    "Money": "Dollar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BYR",
+    "Language": "EN",
+    "CurrencyName": "Belarussian Ruble",
+    "Money": "Рубель",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BZD",
+    "Language": "EN",
+    "CurrencyName": "Belize Dollar",
+    "Money": "Dollar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BMD",
+    "Language": "EN",
+    "CurrencyName": "Bermudian Dollar",
+    "Money": "Dollar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "VEF",
+    "Language": "EN",
+    "CurrencyName": "Bolivar Fuerte",
+    "Money": "Bolívar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BOB",
+    "Language": "EN",
+    "CurrencyName": "Boliviano",
+    "Money": "Boliviano",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BRL",
+    "Language": "EN",
+    "CurrencyName": "Brazilian Real",
+    "Money": "Real",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "BND",
+    "Language": "EN",
+    "CurrencyName": "Brunei Dollar",
+    "Money": "Ringgit",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BGN",
+    "Language": "EN",
+    "CurrencyName": "Bulgarian Lev",
+    "Money": "лев",
+    "Symbol": "л"
+  },
+  {
+    "CurrencyISO": "BIF",
+    "Language": "EN",
+    "CurrencyName": "Burundi Franc",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "CAD",
+    "Language": "EN",
+    "CurrencyName": "Canadian Dollar",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "CVE",
+    "Language": "EN",
+    "CurrencyName": "Cape Verde Escudo",
+    "Money": "Escudo",
+    "Symbol": "E"
+  },
+  {
+    "CurrencyISO": "KYD",
+    "Language": "EN",
+    "CurrencyName": "Cayman Islands Dollar",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "GHS",
+    "Language": "EN",
+    "CurrencyName": "Cedi",
+    "Money": "Cedi",
+    "Symbol": "G"
+  },
+  {
+    "CurrencyISO": "XAF",
+    "Language": "EN",
+    "CurrencyName": "CFA Franc",
+    "Money": "Franc",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "XOF",
+    "Language": "EN",
+    "CurrencyName": "CFA Franc",
+    "Money": "Franc",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "XPF",
+    "Language": "EN",
+    "CurrencyName": "CFP Franc",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "CLP",
+    "Language": "EN",
+    "CurrencyName": "Chilean Peso",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "CNY",
+    "Language": "EN",
+    "CurrencyName": "Chinese Yuan",
+    "Money": "人民币",
+    "Symbol": "¥"
+  },
+  {
+    "CurrencyISO": "COP",
+    "Language": "EN",
+    "CurrencyName": "Colombian Peso",
+    "Money": "Peso",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "KMF",
+    "Language": "EN",
+    "CurrencyName": "Comoro Franc",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "CDF",
+    "Language": "EN",
+    "CurrencyName": "Congolese Franc",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "BAM",
+    "Language": "EN",
+    "CurrencyName": "Convertible Marks",
+    "Money": "Marka",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "NIO",
+    "Language": "EN",
+    "CurrencyName": "Cordoba Oro",
+    "Money": "Córdoba",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "CRC",
+    "Language": "EN",
+    "CurrencyName": "Costa Rican Colon",
+    "Money": "Colón",
+    "Symbol": "₡"
+  },
+  {
+    "CurrencyISO": "HRK",
+    "Language": "EN",
+    "CurrencyName": "Croatian Kuna",
+    "Money": "Kuna",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "CUP",
+    "Language": "EN",
+    "CurrencyName": "Cuban Peso",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "CZK",
+    "Language": "EN",
+    "CurrencyName": "Czech Koruna",
+    "Money": "Koruna",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "GMD",
+    "Language": "EN",
+    "CurrencyName": "Dalasi",
+    "Money": "Dalasi",
+    "Symbol": "D"
+  },
+  {
+    "CurrencyISO": "DKK",
+    "Language": "EN",
+    "CurrencyName": "Danish Krone",
+    "Money": "Krone",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "MKD",
+    "Language": "EN",
+    "CurrencyName": "Denar",
+    "Money": "Денар",
+    "Symbol": "д"
+  },
+  {
+    "CurrencyISO": "DJF",
+    "Language": "EN",
+    "CurrencyName": "Djibouti Franc",
+    "Money": "الفرنك",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "STD",
+    "Language": "EN",
+    "CurrencyName": "Dobra",
+    "Money": "Dobra",
+    "Symbol": "D"
+  },
+  {
+    "CurrencyISO": "DOP",
+    "Language": "EN",
+    "CurrencyName": "Dominican Peso",
+    "Money": "Peso",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "VND",
+    "Language": "EN",
+    "CurrencyName": "Dong",
+    "Money": "đồng",
+    "Symbol": "₫"
+  },
+  {
+    "CurrencyISO": "XCD",
+    "Language": "EN",
+    "CurrencyName": "East Caribbean Dollar",
+    "Money": "Dollar",
+    "Symbol": "E"
+  },
+  {
+    "CurrencyISO": "EGP",
+    "Language": "EN",
+    "CurrencyName": "Egyptian Pound",
+    "Money": "الجنيه",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "ETB",
+    "Language": "EN",
+    "CurrencyName": "Ethiopian Birr",
+    "Money": "Birr",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "EUR",
+    "Language": "EN",
+    "CurrencyName": "Euro",
+    "Money": "Euro",
+    "Symbol": "€"
+  },
+  {
+    "CurrencyISO": "FKP",
+    "Language": "EN",
+    "CurrencyName": "Falkland Islands Pound",
+    "Money": "Pound",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "FJD",
+    "Language": "EN",
+    "CurrencyName": "Fiji Dollar",
+    "Money": "Dollar",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "GIP",
+    "Language": "EN",
+    "CurrencyName": "Gibraltar Pound",
+    "Money": "Pound",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "HTG",
+    "Language": "EN",
+    "CurrencyName": "Gourde",
+    "Money": "Gourde",
+    "Symbol": "G"
+  },
+  {
+    "CurrencyISO": "PYG",
+    "Language": "EN",
+    "CurrencyName": "Guarani",
+    "Money": "Guaraní",
+    "Symbol": "₲"
+  },
+  {
+    "CurrencyISO": "GNF",
+    "Language": "EN",
+    "CurrencyName": "Guinea Franc",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "GWP",
+    "Language": "EN",
+    "CurrencyName": "Guinea-Bissau Peso",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "GYD",
+    "Language": "EN",
+    "CurrencyName": "Guyana Dollar",
+    "Money": "Dollar",
+    "Symbol": "G"
+  },
+  {
+    "CurrencyISO": "HKD",
+    "Language": "EN",
+    "CurrencyName": "Hong Kong Dollar",
+    "Money": "香港圓",
+    "Symbol": "H"
+  },
+  {
+    "CurrencyISO": "UAH",
+    "Language": "EN",
+    "CurrencyName": "Hryvnia",
+    "Money": "Гривня",
+    "Symbol": "₴"
+  },
+  {
+    "CurrencyISO": "HUF",
+    "Language": "EN",
+    "CurrencyName": "Hungary Forint",
+    "Money": "Forint",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "ISK",
+    "Language": "EN",
+    "CurrencyName": "Iceland Krona",
+    "Money": "Króna",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "INR",
+    "Language": "EN",
+    "CurrencyName": "Indian Rupee",
+    "Money": "Rupee",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "IRR",
+    "Language": "EN",
+    "CurrencyName": "Iranian Rial",
+    "Money": "﷼",
+    "Symbol": "﷼"
+  },
+  {
+    "CurrencyISO": "IQD",
+    "Language": "EN",
+    "CurrencyName": "Iraqi Dinar",
+    "Money": "دينار",
+    "Symbol": "ع"
+  },
+  {
+    "CurrencyISO": "ILS",
+    "Language": "EN",
+    "CurrencyName": "Israeli Sheqel",
+    "Money": "שקל",
+    "Symbol": "₪"
+  },
+  {
+    "CurrencyISO": "JMD",
+    "Language": "EN",
+    "CurrencyName": "Jamaican Dollar",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "JPY",
+    "Language": "EN",
+    "CurrencyName": "Japan Yen",
+    "Money": "日本円",
+    "Symbol": "¥"
+  },
+  {
+    "CurrencyISO": "JOD",
+    "Language": "EN",
+    "CurrencyName": "Jordanian Dinar",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "KES",
+    "Language": "EN",
+    "CurrencyName": "Kenyan Shilling",
+    "Money": "Shilling",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "PGK",
+    "Language": "EN",
+    "CurrencyName": "Kina",
+    "Money": "Kina",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "LAK",
+    "Language": "EN",
+    "CurrencyName": "Kip",
+    "Money": "ກີບ",
+    "Symbol": "₭"
+  },
+  {
+    "CurrencyISO": "EEK",
+    "Language": "EN",
+    "CurrencyName": "Kroon",
+    "Money": "Kroon",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "KWD",
+    "Language": "EN",
+    "CurrencyName": "Kuwaiti Dinar",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "MWK",
+    "Language": "EN",
+    "CurrencyName": "Kwacha",
+    "Money": "Kwacha",
+    "Symbol": "M"
+  },
+  {
+    "CurrencyISO": "AOA",
+    "Language": "EN",
+    "CurrencyName": "Kwanza",
+    "Money": "Kwanza",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "MMK",
+    "Language": "EN",
+    "CurrencyName": "Kyat",
+    "Money": "Kyat",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "GEL",
+    "Language": "EN",
+    "CurrencyName": "Lari",
+    "Money": "ლარი",
+    "Symbol": "l"
+  },
+  {
+    "CurrencyISO": "LVL",
+    "Language": "EN",
+    "CurrencyName": "Latvian Lats",
+    "Money": "Lats",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "LBP",
+    "Language": "EN",
+    "CurrencyName": "Lebanese Pound",
+    "Money": "ليرة,",
+    "Symbol": "ل"
+  },
+  {
+    "CurrencyISO": "ALL",
+    "Language": "EN",
+    "CurrencyName": "Lek",
+    "Money": "Leku",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "HNL",
+    "Language": "EN",
+    "CurrencyName": "Lempira",
+    "Money": "Lempira",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "SLL",
+    "Language": "EN",
+    "CurrencyName": "Leone",
+    "Money": "Leone",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "LRD",
+    "Language": "EN",
+    "CurrencyName": "Liberian Dollar",
+    "Money": "Dollar",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "LYD",
+    "Language": "EN",
+    "CurrencyName": "Libyan Dinar",
+    "Money": "دينار",
+    "Symbol": "ل"
+  },
+  {
+    "CurrencyISO": "SZL",
+    "Language": "EN",
+    "CurrencyName": "Lilangeni",
+    "Money": "Lilangeni",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "LTL",
+    "Language": "EN",
+    "CurrencyName": "Lithuanian Litas",
+    "Money": "Litas",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "LSL",
+    "Language": "EN",
+    "CurrencyName": "Loti",
+    "Money": "Loti",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "MGA",
+    "Language": "EN",
+    "CurrencyName": "Malagasy Ariary",
+    "Money": "Ariary",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "MYR",
+    "Language": "EN",
+    "CurrencyName": "Malaysian Ringgit",
+    "Money": "ريڠڬيت",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "TMT",
+    "Language": "EN",
+    "CurrencyName": "Manat",
+    "Money": "Манат",
+    "Symbol": "m"
+  },
+  {
+    "CurrencyISO": "MUR",
+    "Language": "EN",
+    "CurrencyName": "Mauritius Rupee",
+    "Money": "Roupie",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "MZN",
+    "Language": "EN",
+    "CurrencyName": "Metical",
+    "Money": "Metical",
+    "Symbol": "M"
+  },
+  {
+    "CurrencyISO": "MXN",
+    "Language": "EN",
+    "CurrencyName": "Mexican Peso",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "MDL",
+    "Language": "EN",
+    "CurrencyName": "Moldovan Leu",
+    "Money": "Leu",
+    "Symbol": "l"
+  },
+  {
+    "CurrencyISO": "MAD",
+    "Language": "EN",
+    "CurrencyName": "Moroccan Dirham",
+    "Money": "درهم",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "NGN",
+    "Language": "EN",
+    "CurrencyName": "Naira",
+    "Money": "Naira",
+    "Symbol": "₦"
+  },
+  {
+    "CurrencyISO": "ERN",
+    "Language": "EN",
+    "CurrencyName": "Nakfa",
+    "Money": "Nakfa",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "NAD",
+    "Language": "EN",
+    "CurrencyName": "Namibia Dollar",
+    "Money": "Dollar",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "NPR",
+    "Language": "EN",
+    "CurrencyName": "Nepalese Rupee",
+    "Money": "Rupee",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "ANG",
+    "Language": "EN",
+    "CurrencyName": "Netherlands Antillian Guilder",
+    "Money": "Gulden",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "RON",
+    "Language": "EN",
+    "CurrencyName": "New Leu",
+    "Money": "Leu",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "NZD",
+    "Language": "EN",
+    "CurrencyName": "New Zealand Dollar",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "BTN",
+    "Language": "EN",
+    "CurrencyName": "Ngultrum",
+    "Money": "དངུལ་ཀྲམ",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "KPW",
+    "Language": "EN",
+    "CurrencyName": "North Korean Won",
+    "Money": "원",
+    "Symbol": "₩"
+  },
+  {
+    "CurrencyISO": "NOK",
+    "Language": "EN",
+    "CurrencyName": "Norwegian Krone",
+    "Money": "Krone",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "PEN",
+    "Language": "EN",
+    "CurrencyName": "Nuevo Sol",
+    "Money": "Sol",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "MRO",
+    "Language": "EN",
+    "CurrencyName": "Ouguiya",
+    "Money": "أوقية",
+    "Symbol": "U"
+  },
+  {
+    "CurrencyISO": "TOP",
+    "Language": "EN",
+    "CurrencyName": "Pa'anga",
+    "Money": "Pa'anga",
+    "Symbol": "T"
+  },
+  {
+    "CurrencyISO": "PKR",
+    "Language": "EN",
+    "CurrencyName": "Pakistan Rupee",
+    "Money": "Rupee",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "MOP",
+    "Language": "EN",
+    "CurrencyName": "Pataca",
+    "Money": "澳門圓",
+    "Symbol": "M"
+  },
+  {
+    "CurrencyISO": "UYU",
+    "Language": "EN",
+    "CurrencyName": "Peso Uruguayo",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "PHP",
+    "Language": "EN",
+    "CurrencyName": "Philippine Peso",
+    "Money": "Piso",
+    "Symbol": "₱"
+  },
+  {
+    "CurrencyISO": "PLN",
+    "Language": "EN",
+    "CurrencyName": "Polish Zloty",
+    "Money": "Złoty",
+    "Symbol": "z"
+  },
+  {
+    "CurrencyISO": "GBP",
+    "Language": "EN",
+    "CurrencyName": "Pound Sterling",
+    "Money": "Pound",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "BWP",
+    "Language": "EN",
+    "CurrencyName": "Pula",
+    "Money": "Pula",
+    "Symbol": "P"
+  },
+  {
+    "CurrencyISO": "QAR",
+    "Language": "EN",
+    "CurrencyName": "Qatari Rial",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "GTQ",
+    "Language": "EN",
+    "CurrencyName": "Quetzal",
+    "Money": "Quetzal",
+    "Symbol": "Q"
+  },
+  {
+    "CurrencyISO": "ZAR",
+    "Language": "EN",
+    "CurrencyName": "Rand",
+    "Money": "Rand",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "OMR",
+    "Language": "EN",
+    "CurrencyName": "Rial Omani",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "KHR",
+    "Language": "EN",
+    "CurrencyName": "Riel",
+    "Money": "Riel",
+    "Symbol": "r"
+  },
+  {
+    "CurrencyISO": "MVR",
+    "Language": "EN",
+    "CurrencyName": "Rufiyaa",
+    "Money": "Rufiyaa",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "IDR",
+    "Language": "EN",
+    "CurrencyName": "Rupiah",
+    "Money": "Rupiah",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "RUB",
+    "Language": "EN",
+    "CurrencyName": "Russian Ruble",
+    "Money": "Рубль",
+    "Symbol": "р"
+  },
+  {
+    "CurrencyISO": "RWF",
+    "Language": "EN",
+    "CurrencyName": "Rwanda Franc",
+    "Money": "Franc",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "SHP",
+    "Language": "EN",
+    "CurrencyName": "Saint Helena Pound",
+    "Money": "Pound",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "SVC",
+    "Language": "EN",
+    "CurrencyName": "Salvadoran Colon",
+    "Money": "Colón",
+    "Symbol": "₡"
+  },
+  {
+    "CurrencyISO": "SAR",
+    "Language": "EN",
+    "CurrencyName": "Saudi Riyal",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "RSD",
+    "Language": "EN",
+    "CurrencyName": "Serbian Dinar",
+    "Money": "Динар",
+    "Symbol": "д"
+  },
+  {
+    "CurrencyISO": "SCR",
+    "Language": "EN",
+    "CurrencyName": "Seychelles Rupee",
+    "Money": "Roupie",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "SGD",
+    "Language": "EN",
+    "CurrencyName": "Singapore Dollar",
+    "Money": "新加坡元",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "SBD",
+    "Language": "EN",
+    "CurrencyName": "Solomon Islands Dollar",
+    "Money": "Dollar",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "KGS",
+    "Language": "EN",
+    "CurrencyName": "Som",
+    "Money": "сом",
+    "Symbol": "с"
+  },
+  {
+    "CurrencyISO": "SOS",
+    "Language": "EN",
+    "CurrencyName": "Somali Shilling",
+    "Money": "Shilin",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "TJS",
+    "Language": "EN",
+    "CurrencyName": "Somoni",
+    "Money": "Сомонӣ",
+    "Symbol": "С"
+  },
+  {
+    "CurrencyISO": "LKR",
+    "Language": "EN",
+    "CurrencyName": "Sri Lanka Rupee",
+    "Money": "Rupee",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "SDG",
+    "Language": "EN",
+    "CurrencyName": "Sudanese Pound",
+    "Money": "جنيه",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "SRD",
+    "Language": "EN",
+    "CurrencyName": "Surinam Dollar",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "SEK",
+    "Language": "EN",
+    "CurrencyName": "Swedish Krona",
+    "Money": "Krona",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "CHF",
+    "Language": "EN",
+    "CurrencyName": "Swiss Franc",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "SYP",
+    "Language": "EN",
+    "CurrencyName": "Syrian Pound",
+    "Money": "الليرة",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "TWD",
+    "Language": "EN",
+    "CurrencyName": "Taiwan Dollar",
+    "Money": "新臺幣",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "BDT",
+    "Language": "EN",
+    "CurrencyName": "Taka",
+    "Money": "টাকা",
+    "Symbol": "৳"
+  },
+  {
+    "CurrencyISO": "WST",
+    "Language": "EN",
+    "CurrencyName": "Tala",
+    "Money": "Tālā",
+    "Symbol": "W"
+  },
+  {
+    "CurrencyISO": "TZS",
+    "Language": "EN",
+    "CurrencyName": "Tanzanian Shilling",
+    "Money": "Shilingi",
+    "Symbol": "/"
+  },
+  {
+    "CurrencyISO": "KZT",
+    "Language": "EN",
+    "CurrencyName": "Tenge",
+    "Money": "Теңгесі",
+    "Symbol": "〒"
+  },
+  {
+    "CurrencyISO": "TTD",
+    "Language": "EN",
+    "CurrencyName": "Trinidad and Tobago Dollar",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "MNT",
+    "Language": "EN",
+    "CurrencyName": "Tugrik",
+    "Money": "Төгрөг",
+    "Symbol": "₮"
+  },
+  {
+    "CurrencyISO": "TND",
+    "Language": "EN",
+    "CurrencyName": "Tunisian Dinar",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "TRY",
+    "Language": "EN",
+    "CurrencyName": "Turkish Lira",
+    "Money": "Lirası",
+    "Symbol": "T"
+  },
+  {
+    "CurrencyISO": "AED",
+    "Language": "EN",
+    "CurrencyName": "UAE Dirham",
+    "Money": "درهم",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "UGX",
+    "Language": "EN",
+    "CurrencyName": "Uganda Shilling",
+    "Money": "Shilling",
+    "Symbol": "U"
+  },
+  {
+    "CurrencyISO": "USD",
+    "Language": "EN",
+    "CurrencyName": "US Dollar",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "UZS",
+    "Language": "EN",
+    "CurrencyName": "Uzbekistan Sum",
+    "Money": "Сўм",
+    "Symbol": "с"
+  },
+  {
+    "CurrencyISO": "VUV",
+    "Language": "EN",
+    "CurrencyName": "Vatu",
+    "Money": "Vatu",
+    "Symbol": "V"
+  },
+  {
+    "CurrencyISO": "KRW",
+    "Language": "EN",
+    "CurrencyName": "Won",
+    "Money": "원",
+    "Symbol": "₩"
+  },
+  {
+    "CurrencyISO": "YER",
+    "Language": "EN",
+    "CurrencyName": "Yemeni Rial",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "ZMK",
+    "Language": "EN",
+    "CurrencyName": "Zambian Kwacha",
+    "Money": "Kwacha",
+    "Symbol": "Z"
+  },
+  {
+    "CurrencyISO": "ZWL",
+    "Language": "EN",
+    "CurrencyName": "Zimbabwe Dollar",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "AFN",
+    "Language": "ES",
+    "CurrencyName": "Afghani",
+    "Money": "افغانۍ",
+    "Symbol": "؋"
+  },
+  {
+    "CurrencyISO": "THB",
+    "Language": "ES",
+    "CurrencyName": "Baht",
+    "Money": "บาทไทย",
+    "Symbol": "฿"
+  },
+  {
+    "CurrencyISO": "PAB",
+    "Language": "ES",
+    "CurrencyName": "Balboa",
+    "Money": "Balboa",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "ETB",
+    "Language": "ES",
+    "CurrencyName": "Birr Etiopía",
+    "Money": "Birr",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "VEF",
+    "Language": "ES",
+    "CurrencyName": "Bolivar Fuerte",
+    "Money": "Bolívar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BOB",
+    "Language": "ES",
+    "CurrencyName": "Boliviano",
+    "Money": "Boliviano",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BND",
+    "Language": "ES",
+    "CurrencyName": "Brunei Dólar",
+    "Money": "Ringgit",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "GHS",
+    "Language": "ES",
+    "CurrencyName": "Cedi",
+    "Money": "Cedi",
+    "Symbol": "G"
+  },
+  {
+    "CurrencyISO": "CRC",
+    "Language": "ES",
+    "CurrencyName": "Colón Costa Rican",
+    "Money": "Colón",
+    "Symbol": "₡"
+  },
+  {
+    "CurrencyISO": "SVC",
+    "Language": "ES",
+    "CurrencyName": "Colón Salvadoreño",
+    "Money": "Colón",
+    "Symbol": "₡"
+  },
+  {
+    "CurrencyISO": "NIO",
+    "Language": "ES",
+    "CurrencyName": "Cordoba Oro",
+    "Money": "Córdoba",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "DKK",
+    "Language": "ES",
+    "CurrencyName": "Corona Danesa",
+    "Money": "Corona",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "ISK",
+    "Language": "ES",
+    "CurrencyName": "Corona Islandia",
+    "Money": "Corona",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "NOK",
+    "Language": "ES",
+    "CurrencyName": "Corona Noruega",
+    "Money": "Corona",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "SEK",
+    "Language": "ES",
+    "CurrencyName": "Corona Suiza",
+    "Money": "Corona",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "GMD",
+    "Language": "ES",
+    "CurrencyName": "Dalasi",
+    "Money": "Dalasi",
+    "Symbol": "D"
+  },
+  {
+    "CurrencyISO": "MKD",
+    "Language": "ES",
+    "CurrencyName": "Dinar",
+    "Money": "Денар",
+    "Symbol": "д"
+  },
+  {
+    "CurrencyISO": "DZD",
+    "Language": "ES",
+    "CurrencyName": "Dinar Algeria",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "BHD",
+    "Language": "ES",
+    "CurrencyName": "Dinar Bahrainí",
+    "Money": "دينار",
+    "Symbol": "."
+  },
+  {
+    "CurrencyISO": "LYD",
+    "Language": "ES",
+    "CurrencyName": "Dinar de Libia",
+    "Money": "دينار",
+    "Symbol": "ل"
+  },
+  {
+    "CurrencyISO": "RSD",
+    "Language": "ES",
+    "CurrencyName": "Dinar de Serbian",
+    "Money": "Динар",
+    "Symbol": "д"
+  },
+  {
+    "CurrencyISO": "TND",
+    "Language": "ES",
+    "CurrencyName": "Dinar de Tunisia",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "IQD",
+    "Language": "ES",
+    "CurrencyName": "Dinar Iraqi",
+    "Money": "دينار",
+    "Symbol": "ع"
+  },
+  {
+    "CurrencyISO": "JOD",
+    "Language": "ES",
+    "CurrencyName": "Dinar Jordano",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "KWD",
+    "Language": "ES",
+    "CurrencyName": "Dinar Kuwaití",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "MAD",
+    "Language": "ES",
+    "CurrencyName": "Dirham de Moroco",
+    "Money": "درهم",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "DJF",
+    "Language": "ES",
+    "CurrencyName": "Djibouti Franco",
+    "Money": "الفرنك",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "STD",
+    "Language": "ES",
+    "CurrencyName": "Dobra",
+    "Money": "Dobra",
+    "Symbol": "D"
+  },
+  {
+    "CurrencyISO": "USD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Americano",
+    "Money": "Dólar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "AUD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Australiano",
+    "Money": "Dólar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "BSD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Bahamas",
+    "Money": "Dólar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BBD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Barbados",
+    "Money": "Dólar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BZD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Belize",
+    "Money": "Dólar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BMD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Bremuda",
+    "Money": "Dólar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "CAD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Canadiense",
+    "Money": "Dólar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "GYD",
+    "Language": "ES",
+    "CurrencyName": "Dólar de Guyana",
+    "Money": "Dólar",
+    "Symbol": "G"
+  },
+  {
+    "CurrencyISO": "NAD",
+    "Language": "ES",
+    "CurrencyName": "Dólar de Namibia",
+    "Money": "Dólar",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "ZWL",
+    "Language": "ES",
+    "CurrencyName": "Dólar de Zimbabwe",
+    "Money": "Dólar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "XCD",
+    "Language": "ES",
+    "CurrencyName": "Dólar del Este Caribeño",
+    "Money": "Dólar",
+    "Symbol": "E"
+  },
+  {
+    "CurrencyISO": "FJD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Fiji",
+    "Money": "Dólar",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "HKD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Hong Kong",
+    "Money": "香港圓",
+    "Symbol": "H"
+  },
+  {
+    "CurrencyISO": "KYD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Islas Caimán",
+    "Money": "Dólar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "SBD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Islas Salomón",
+    "Money": "Dólar",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "JMD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Jamaiquino",
+    "Money": "Dólar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "LRD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Liberiano",
+    "Money": "Dólar",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "NZD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Nueva Zelanda",
+    "Money": "Dólar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "SGD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Singapur",
+    "Money": "新加坡元",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "SRD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Surinam",
+    "Money": "Dólar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "TWD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Taiwanés",
+    "Money": "新臺幣",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "TTD",
+    "Language": "ES",
+    "CurrencyName": "Dólar Trinidad y Tobago",
+    "Money": "Dólar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "VND",
+    "Language": "ES",
+    "CurrencyName": "Dong",
+    "Money": "đồng",
+    "Symbol": "₫"
+  },
+  {
+    "CurrencyISO": "AMD",
+    "Language": "ES",
+    "CurrencyName": "Dram Armenio",
+    "Money": "Դրամ",
+    "Symbol": "դ"
+  },
+  {
+    "CurrencyISO": "CVE",
+    "Language": "ES",
+    "CurrencyName": "Escudo Cabo Verde",
+    "Money": "Escudo",
+    "Symbol": "E"
+  },
+  {
+    "CurrencyISO": "EUR",
+    "Language": "ES",
+    "CurrencyName": "Euro",
+    "Money": "Euro",
+    "Symbol": "€"
+  },
+  {
+    "CurrencyISO": "HUF",
+    "Language": "ES",
+    "CurrencyName": "Florín Húgaro",
+    "Money": "Forín",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "XAF",
+    "Language": "ES",
+    "CurrencyName": "Franco CFA",
+    "Money": "Franco",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "XOF",
+    "Language": "ES",
+    "CurrencyName": "Franco CFA",
+    "Money": "Franco",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "XPF",
+    "Language": "ES",
+    "CurrencyName": "Franco CFA",
+    "Money": "Franco",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "CDF",
+    "Language": "ES",
+    "CurrencyName": "Franco Congolés",
+    "Money": "Franco",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "KMF",
+    "Language": "ES",
+    "CurrencyName": "Franco de Comoro",
+    "Money": "Franco",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "GNF",
+    "Language": "ES",
+    "CurrencyName": "Franco de Guinea",
+    "Money": "Franco",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "RWF",
+    "Language": "ES",
+    "CurrencyName": "Franco Ruandés",
+    "Money": "Franco",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "CHF",
+    "Language": "ES",
+    "CurrencyName": "Franco Suizo",
+    "Money": "Franco",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "BIF",
+    "Language": "ES",
+    "CurrencyName": "Francoo de Burundi",
+    "Money": "Franco",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "HTG",
+    "Language": "ES",
+    "CurrencyName": "Gourde",
+    "Money": "Gourde",
+    "Symbol": "G"
+  },
+  {
+    "CurrencyISO": "PYG",
+    "Language": "ES",
+    "CurrencyName": "Guarani",
+    "Money": "Guaraní",
+    "Symbol": "₲"
+  },
+  {
+    "CurrencyISO": "ANG",
+    "Language": "ES",
+    "CurrencyName": "Guilder Antillas Nerlandesas",
+    "Money": "Gulden",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "AWG",
+    "Language": "ES",
+    "CurrencyName": "Guilder de Aruba",
+    "Money": "Florijn",
+    "Symbol": "A"
+  },
+  {
+    "CurrencyISO": "UAH",
+    "Language": "ES",
+    "CurrencyName": "Hryvnia",
+    "Money": "Гривня",
+    "Symbol": "₴"
+  },
+  {
+    "CurrencyISO": "PGK",
+    "Language": "ES",
+    "CurrencyName": "Kina",
+    "Money": "Kina",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "LAK",
+    "Language": "ES",
+    "CurrencyName": "Kip",
+    "Money": "ກີບ",
+    "Symbol": "₭"
+  },
+  {
+    "CurrencyISO": "CZK",
+    "Language": "ES",
+    "CurrencyName": "Koruna Checa",
+    "Money": "Koruna",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "EEK",
+    "Language": "ES",
+    "CurrencyName": "Kroon",
+    "Money": "Kroon",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "HRK",
+    "Language": "ES",
+    "CurrencyName": "Kuna Croatí",
+    "Money": "Kuna",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "MWK",
+    "Language": "ES",
+    "CurrencyName": "Kwacha",
+    "Money": "Kwacha",
+    "Symbol": "M"
+  },
+  {
+    "CurrencyISO": "ZMK",
+    "Language": "ES",
+    "CurrencyName": "Kwacha de Zambia",
+    "Money": "Kwacha",
+    "Symbol": "Z"
+  },
+  {
+    "CurrencyISO": "AOA",
+    "Language": "ES",
+    "CurrencyName": "Kwanza",
+    "Money": "Kwanza",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "MMK",
+    "Language": "ES",
+    "CurrencyName": "Kyat",
+    "Money": "Kyat",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "GEL",
+    "Language": "ES",
+    "CurrencyName": "Lari",
+    "Money": "ლარი",
+    "Symbol": "l"
+  },
+  {
+    "CurrencyISO": "LVL",
+    "Language": "ES",
+    "CurrencyName": "Latvian Lats",
+    "Money": "Lats",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "ALL",
+    "Language": "ES",
+    "CurrencyName": "Lek",
+    "Money": "Leku",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "HNL",
+    "Language": "ES",
+    "CurrencyName": "Lempira",
+    "Money": "Lempira",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "SLL",
+    "Language": "ES",
+    "CurrencyName": "Leone",
+    "Money": "Leone",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "MDL",
+    "Language": "ES",
+    "CurrencyName": "Leu de Moldovia",
+    "Money": "Leu",
+    "Symbol": "l"
+  },
+  {
+    "CurrencyISO": "BGN",
+    "Language": "ES",
+    "CurrencyName": "Lev Búlgaro",
+    "Money": "лев",
+    "Symbol": "л"
+  },
+  {
+    "CurrencyISO": "SHP",
+    "Language": "ES",
+    "CurrencyName": "Libra de Santa Eelena",
+    "Money": "Libra",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "SDG",
+    "Language": "ES",
+    "CurrencyName": "Libra de Sudán",
+    "Money": "جنيه",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "EGP",
+    "Language": "ES",
+    "CurrencyName": "Libra Egipcia",
+    "Money": "الجنيه",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "GIP",
+    "Language": "ES",
+    "CurrencyName": "Libra Gibraltar",
+    "Money": "Libra",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "FKP",
+    "Language": "ES",
+    "CurrencyName": "Libra Islas Falkland",
+    "Money": "Libra",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "LBP",
+    "Language": "ES",
+    "CurrencyName": "Libra Libanesa",
+    "Money": "ليرة,",
+    "Symbol": "ل"
+  },
+  {
+    "CurrencyISO": "SYP",
+    "Language": "ES",
+    "CurrencyName": "Libra Siria",
+    "Money": "الليرة",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "GBP",
+    "Language": "ES",
+    "CurrencyName": "Libra Sterling",
+    "Money": "Libra",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "SZL",
+    "Language": "ES",
+    "CurrencyName": "Lilangeni",
+    "Money": "Lilangeni",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "TRY",
+    "Language": "ES",
+    "CurrencyName": "Lira Turca",
+    "Money": "Lira",
+    "Symbol": "T"
+  },
+  {
+    "CurrencyISO": "LTL",
+    "Language": "ES",
+    "CurrencyName": "Litas Lutianesa",
+    "Money": "Litas",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "LSL",
+    "Language": "ES",
+    "CurrencyName": "Loti",
+    "Money": "Loti",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "MGA",
+    "Language": "ES",
+    "CurrencyName": "Malagasy Ariary",
+    "Money": "Ariary",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "TMT",
+    "Language": "ES",
+    "CurrencyName": "Manat",
+    "Money": "Манат",
+    "Symbol": "m"
+  },
+  {
+    "CurrencyISO": "AZN",
+    "Language": "ES",
+    "CurrencyName": "Manat Azerbaijanian",
+    "Money": "Manatı",
+    "Symbol": "м"
+  },
+  {
+    "CurrencyISO": "BAM",
+    "Language": "ES",
+    "CurrencyName": "Marcos Convertibles",
+    "Money": "Marka",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "MZN",
+    "Language": "ES",
+    "CurrencyName": "Metical",
+    "Money": "Metical",
+    "Symbol": "M"
+  },
+  {
+    "CurrencyISO": "NGN",
+    "Language": "ES",
+    "CurrencyName": "Naira",
+    "Money": "Naira",
+    "Symbol": "₦"
+  },
+  {
+    "CurrencyISO": "ERN",
+    "Language": "ES",
+    "CurrencyName": "Nakfa",
+    "Money": "Nakfa",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "BTN",
+    "Language": "ES",
+    "CurrencyName": "Ngultrum",
+    "Money": "དངུལ་ཀྲམ",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "RON",
+    "Language": "ES",
+    "CurrencyName": "Nuevo Leu",
+    "Money": "Leu",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "PEN",
+    "Language": "ES",
+    "CurrencyName": "Nuevo Sol",
+    "Money": "Sol",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "MRO",
+    "Language": "ES",
+    "CurrencyName": "Ouguiya",
+    "Money": "أوقية",
+    "Symbol": "U"
+  },
+  {
+    "CurrencyISO": "TOP",
+    "Language": "ES",
+    "CurrencyName": "Pa'anga",
+    "Money": "Pa'anga",
+    "Symbol": "T"
+  },
+  {
+    "CurrencyISO": "MOP",
+    "Language": "ES",
+    "CurrencyName": "Pataca",
+    "Money": "澳門圓",
+    "Symbol": "M"
+  },
+  {
+    "CurrencyISO": "ARS",
+    "Language": "ES",
+    "CurrencyName": "Peso Argentino",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "CLP",
+    "Language": "ES",
+    "CurrencyName": "Peso Chileno",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "COP",
+    "Language": "ES",
+    "CurrencyName": "Peso Colombiano",
+    "Money": "Peso",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "CUP",
+    "Language": "ES",
+    "CurrencyName": "Peso Cubano",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "DOP",
+    "Language": "ES",
+    "CurrencyName": "Peso Dominicano",
+    "Money": "Peso",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "PHP",
+    "Language": "ES",
+    "CurrencyName": "Peso Filipino",
+    "Money": "Piso",
+    "Symbol": "₱"
+  },
+  {
+    "CurrencyISO": "GWP",
+    "Language": "ES",
+    "CurrencyName": "Peso Guinea-Bissau",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "MXN",
+    "Language": "ES",
+    "CurrencyName": "Peso Mexicano",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "UYU",
+    "Language": "ES",
+    "CurrencyName": "Peso Uruguayo",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "BWP",
+    "Language": "ES",
+    "CurrencyName": "Pula",
+    "Money": "Pula",
+    "Symbol": "P"
+  },
+  {
+    "CurrencyISO": "QAR",
+    "Language": "ES",
+    "CurrencyName": "Qatari Rial",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "GTQ",
+    "Language": "ES",
+    "CurrencyName": "Quetzal",
+    "Money": "Quetzal",
+    "Symbol": "Q"
+  },
+  {
+    "CurrencyISO": "ZAR",
+    "Language": "ES",
+    "CurrencyName": "Rand",
+    "Money": "Rand",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "BRL",
+    "Language": "ES",
+    "CurrencyName": "Real Brasileño",
+    "Money": "Real",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "IRR",
+    "Language": "ES",
+    "CurrencyName": "Rial Iraní",
+    "Money": "﷼",
+    "Symbol": "﷼"
+  },
+  {
+    "CurrencyISO": "OMR",
+    "Language": "ES",
+    "CurrencyName": "Rial Omani",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "YER",
+    "Language": "ES",
+    "CurrencyName": "Rial Yemení",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "KHR",
+    "Language": "ES",
+    "CurrencyName": "Riel",
+    "Money": "Riel",
+    "Symbol": "r"
+  },
+  {
+    "CurrencyISO": "MYR",
+    "Language": "ES",
+    "CurrencyName": "Ringgit de Malasia",
+    "Money": "ريڠڬيت",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "SAR",
+    "Language": "ES",
+    "CurrencyName": "Riyal Saudí",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "BYR",
+    "Language": "ES",
+    "CurrencyName": "Rublo Bieloruso",
+    "Money": "Рубель",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "RUB",
+    "Language": "ES",
+    "CurrencyName": "Rublo Ruso",
+    "Money": "Рубль",
+    "Symbol": "р"
+  },
+  {
+    "CurrencyISO": "MVR",
+    "Language": "ES",
+    "CurrencyName": "Rufiyaa",
+    "Money": "Rufiyaa",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "IDR",
+    "Language": "ES",
+    "CurrencyName": "Rupia",
+    "Money": "Rupia",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "SCR",
+    "Language": "ES",
+    "CurrencyName": "Rupia de Seychelles",
+    "Money": "Rupia",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "INR",
+    "Language": "ES",
+    "CurrencyName": "Rupia Indú",
+    "Money": "Rupia",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "MUR",
+    "Language": "ES",
+    "CurrencyName": "Rupia Mauritius",
+    "Money": "Rupia",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "NPR",
+    "Language": "ES",
+    "CurrencyName": "Rupia Nepalesa",
+    "Money": "Rupia",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "PKR",
+    "Language": "ES",
+    "CurrencyName": "Rupia Pakistaní",
+    "Money": "Rupia",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "LKR",
+    "Language": "ES",
+    "CurrencyName": "Rupia Sri Lanka",
+    "Money": "Rupia",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "ILS",
+    "Language": "ES",
+    "CurrencyName": "Sheqel Israeli",
+    "Money": "שקל",
+    "Symbol": "₪"
+  },
+  {
+    "CurrencyISO": "TZS",
+    "Language": "ES",
+    "CurrencyName": "Shilling de Tanzania",
+    "Money": "Shilingi",
+    "Symbol": "/"
+  },
+  {
+    "CurrencyISO": "UGX",
+    "Language": "ES",
+    "CurrencyName": "Shilling de Uganda",
+    "Money": "Shilling",
+    "Symbol": "U"
+  },
+  {
+    "CurrencyISO": "KES",
+    "Language": "ES",
+    "CurrencyName": "Shilling Kenya",
+    "Money": "Shilling",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "SOS",
+    "Language": "ES",
+    "CurrencyName": "Shilling Somalí",
+    "Money": "Shilin",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "KGS",
+    "Language": "ES",
+    "CurrencyName": "Som",
+    "Money": "сом",
+    "Symbol": "с"
+  },
+  {
+    "CurrencyISO": "TJS",
+    "Language": "ES",
+    "CurrencyName": "Somoni",
+    "Money": "Сомонӣ",
+    "Symbol": "С"
+  },
+  {
+    "CurrencyISO": "UZS",
+    "Language": "ES",
+    "CurrencyName": "Sum Uzbekistán",
+    "Money": "Сўм",
+    "Symbol": "с"
+  },
+  {
+    "CurrencyISO": "BDT",
+    "Language": "ES",
+    "CurrencyName": "Taka",
+    "Money": "টাকা",
+    "Symbol": "৳"
+  },
+  {
+    "CurrencyISO": "WST",
+    "Language": "ES",
+    "CurrencyName": "Tala",
+    "Money": "Tālā",
+    "Symbol": "W"
+  },
+  {
+    "CurrencyISO": "KZT",
+    "Language": "ES",
+    "CurrencyName": "Tenge",
+    "Money": "Теңгесі",
+    "Symbol": "〒"
+  },
+  {
+    "CurrencyISO": "MNT",
+    "Language": "ES",
+    "CurrencyName": "Tugrik",
+    "Money": "Төгрөг",
+    "Symbol": "₮"
+  },
+  {
+    "CurrencyISO": "AED",
+    "Language": "ES",
+    "CurrencyName": "UAE Dirham",
+    "Money": "درهم",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "VUV",
+    "Language": "ES",
+    "CurrencyName": "Vatu",
+    "Money": "Vatu",
+    "Symbol": "V"
+  },
+  {
+    "CurrencyISO": "KRW",
+    "Language": "ES",
+    "CurrencyName": "Won",
+    "Money": "원",
+    "Symbol": "₩"
+  },
+  {
+    "CurrencyISO": "KPW",
+    "Language": "ES",
+    "CurrencyName": "Won Nor-Coreano",
+    "Money": "원",
+    "Symbol": "₩"
+  },
+  {
+    "CurrencyISO": "JPY",
+    "Language": "ES",
+    "CurrencyName": "Yen Japonés",
+    "Money": "日本円",
+    "Symbol": "¥"
+  },
+  {
+    "CurrencyISO": "CNY",
+    "Language": "ES",
+    "CurrencyName": "Yuan Chino",
+    "Money": "人民币",
+    "Symbol": "¥"
+  },
+  {
+    "CurrencyISO": "PLN",
+    "Language": "ES",
+    "CurrencyName": "Zloty Polaco",
+    "Money": "Złoty",
+    "Symbol": "z"
+  },
+  {
+    "CurrencyISO": "APN",
+    "Language": "FR",
+    "CurrencyName": "Afghani",
+    "Money": "افغانۍ",
+    "Symbol": "؋"
+  },
+  {
+    "CurrencyISO": "AMD",
+    "Language": "FR",
+    "CurrencyName": "arménienne Dram",
+    "Money": "Դրամ",
+    "Symbol": "դ"
+  },
+  {
+    "CurrencyISO": "AWG",
+    "Language": "FR",
+    "CurrencyName": "Aruba Florin",
+    "Money": "Florijn",
+    "Symbol": "A"
+  },
+  {
+    "CurrencyISO": "THB",
+    "Language": "FR",
+    "CurrencyName": "Baht",
+    "Money": "บาท ไทย",
+    "Symbol": "฿"
+  },
+  {
+    "CurrencyISO": "CAP",
+    "Language": "FR",
+    "CurrencyName": "Balboa",
+    "Money": "Balboa",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BBD",
+    "Language": "FR",
+    "CurrencyName": "Barbade Dollar",
+    "Money": "Dollar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BYR",
+    "Language": "FR",
+    "CurrencyName": "biélorusse Rouble",
+    "Money": "Рубель",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "ETB",
+    "Language": "FR",
+    "CurrencyName": "Birr éthiopien",
+    "Money": "Birr",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "VEF",
+    "Language": "FR",
+    "CurrencyName": "Bolivar Fuerte",
+    "Money": "Bolívar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BOB",
+    "Language": "FR",
+    "CurrencyName": "Boliviano",
+    "Money": "Boliviano",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BND",
+    "Language": "FR",
+    "CurrencyName": "Brunei Dollar",
+    "Money": "Ringgit",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "SGH",
+    "Language": "FR",
+    "CurrencyName": "Cedi",
+    "Money": "Cedi",
+    "Symbol": "G"
+  },
+  {
+    "CurrencyISO": "SVC",
+    "Language": "FR",
+    "CurrencyName": "Colon Salvadorien",
+    "Money": "Colón",
+    "Symbol": "₡"
+  },
+  {
+    "CurrencyISO": "NIO",
+    "Language": "FR",
+    "CurrencyName": "Cordoba Oro",
+    "Money": "Córdoba",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "KPW",
+    "Language": "FR",
+    "CurrencyName": "Corée du Nord Won",
+    "Money": "원",
+    "Symbol": "₩"
+  },
+  {
+    "CurrencyISO": "CRC",
+    "Language": "FR",
+    "CurrencyName": "Costa Rica Colon",
+    "Money": "Colon",
+    "Symbol": "₡"
+  },
+  {
+    "CurrencyISO": "EEK",
+    "Language": "FR",
+    "CurrencyName": "Couronne",
+    "Money": "Kroon",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "DKK",
+    "Language": "FR",
+    "CurrencyName": "Couronne danoise",
+    "Money": "Krone",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "ISK",
+    "Language": "FR",
+    "CurrencyName": "Couronne islandaise",
+    "Money": "couronne",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "NOK",
+    "Language": "FR",
+    "CurrencyName": "Couronne Norvégienne",
+    "Money": "Krone",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "SEK",
+    "Language": "FR",
+    "CurrencyName": "couronne suédoise",
+    "Money": "Couronne",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "CZK",
+    "Language": "FR",
+    "CurrencyName": "Couronne tchèque",
+    "Money": "Couronne",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "GMD",
+    "Language": "FR",
+    "CurrencyName": "Dalasi",
+    "Money": "Dalasi",
+    "Symbol": "D"
+  },
+  {
+    "CurrencyISO": "MKD",
+    "Language": "FR",
+    "CurrencyName": "Denar",
+    "Money": "Денар",
+    "Symbol": "д"
+  },
+  {
+    "CurrencyISO": "DZD",
+    "Language": "FR",
+    "CurrencyName": "Dinar Algérien",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "BHD",
+    "Language": "FR",
+    "CurrencyName": "Dinar de Bahreïn",
+    "Money": "دينار",
+    "Symbol": "."
+  },
+  {
+    "CurrencyISO": "JOD",
+    "Language": "FR",
+    "CurrencyName": "Dinar jordanien",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "KWD",
+    "Language": "FR",
+    "CurrencyName": "Dinar koweïtien",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "LYD",
+    "Language": "FR",
+    "CurrencyName": "Dinar libyen",
+    "Money": "دينار",
+    "Symbol": "ل"
+  },
+  {
+    "CurrencyISO": "RSD",
+    "Language": "FR",
+    "CurrencyName": "Dinar serbe",
+    "Money": "Динар",
+    "Symbol": "д"
+  },
+  {
+    "CurrencyISO": "TND",
+    "Language": "FR",
+    "CurrencyName": "Dinar Tunisien",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "MAD",
+    "Language": "FR",
+    "CurrencyName": "Dirham Marocain",
+    "Money": "درهم",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "MST",
+    "Language": "FR",
+    "CurrencyName": "Dobra",
+    "Money": "Dobra",
+    "Symbol": "D"
+  },
+  {
+    "CurrencyISO": "AUD",
+    "Language": "FR",
+    "CurrencyName": "Dollar australien",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "DMO",
+    "Language": "FR",
+    "CurrencyName": "Dollar bermudien",
+    "Money": "Dollar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "CAD",
+    "Language": "FR",
+    "CurrencyName": "Dollar canadien",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "BZD",
+    "Language": "FR",
+    "CurrencyName": "Dollar de Belize",
+    "Money": "Dollar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "FJD",
+    "Language": "FR",
+    "CurrencyName": "Dollar de Fidji",
+    "Money": "Dollar",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "HKD",
+    "Language": "FR",
+    "CurrencyName": "Dollar de Hong Kong",
+    "Money": "香港 圆",
+    "Symbol": "H"
+  },
+  {
+    "CurrencyISO": "SGD",
+    "Language": "FR",
+    "CurrencyName": "Dollar de Singapour",
+    "Money": "新加坡元",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "TWD",
+    "Language": "FR",
+    "CurrencyName": "dollar de Taïwan",
+    "Money": "新台币",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "BSD",
+    "Language": "FR",
+    "CurrencyName": "Dollar des Bahamas",
+    "Money": "Dollar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "XCD",
+    "Language": "FR",
+    "CurrencyName": "Dollar des Caraïbes orientales",
+    "Money": "Dollar",
+    "Symbol": "E"
+  },
+  {
+    "CurrencyISO": "SBD",
+    "Language": "FR",
+    "CurrencyName": "Dollar des Îles Salomon",
+    "Money": "Dollar",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "ZWL",
+    "Language": "FR",
+    "CurrencyName": "Dollar du Zimbabwe",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "GYD",
+    "Language": "FR",
+    "CurrencyName": "Dollar Guyana",
+    "Money": "Dollar",
+    "Symbol": "G"
+  },
+  {
+    "CurrencyISO": "JMD",
+    "Language": "FR",
+    "CurrencyName": "Dollar jamaïcain",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "LRD",
+    "Language": "FR",
+    "CurrencyName": "Dollar libérien",
+    "Money": "Dollar",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "NAD",
+    "Language": "FR",
+    "CurrencyName": "Dollar Namibie",
+    "Money": "Dollar",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "NZD",
+    "Language": "FR",
+    "CurrencyName": "dollar néo-zélandais",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "SRD",
+    "Language": "FR",
+    "CurrencyName": "Dollar Surinam",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "VND",
+    "Language": "FR",
+    "CurrencyName": "Dong",
+    "Money": "Djong",
+    "Symbol": "₫"
+  },
+  {
+    "CurrencyISO": "AED",
+    "Language": "FR",
+    "CurrencyName": "Emirats Arabes Unis Dirham",
+    "Money": "درهم",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "CVE",
+    "Language": "FR",
+    "CurrencyName": "Escudo du Cap Vert",
+    "Money": "Escudo",
+    "Symbol": "E"
+  },
+  {
+    "CurrencyISO": "EUR",
+    "Language": "FR",
+    "CurrencyName": "Euro",
+    "Money": "Euro",
+    "Symbol": "€"
+  },
+  {
+    "CurrencyISO": "FIF",
+    "Language": "FR",
+    "CurrencyName": "Franc Burundi",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "XOF",
+    "Language": "FR",
+    "CurrencyName": "Franc CFA",
+    "Money": "Franc",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "XAF",
+    "Language": "FR",
+    "CurrencyName": "Franc CFA",
+    "Money": "Franc",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "XPF",
+    "Language": "FR",
+    "CurrencyName": "Franc CFP",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "CDF",
+    "Language": "FR",
+    "CurrencyName": "Franc Congolais",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "DJF",
+    "Language": "FR",
+    "CurrencyName": "Franc de Djibouti",
+    "Money": "الفرنك",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "KMF",
+    "Language": "FR",
+    "CurrencyName": "Franc des Comores",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "CHF",
+    "Language": "FR",
+    "CurrencyName": "franc suisse",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "HTG",
+    "Language": "FR",
+    "CurrencyName": "Gourde",
+    "Money": "Gourde",
+    "Symbol": "G"
+  },
+  {
+    "CurrencyISO": "PYG",
+    "Language": "FR",
+    "CurrencyName": "Guarani",
+    "Money": "guarani",
+    "Symbol": "₲"
+  },
+  {
+    "CurrencyISO": "GNF",
+    "Language": "FR",
+    "CurrencyName": "Guinée Franc",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "PRG",
+    "Language": "FR",
+    "CurrencyName": "Guinée-Bissau Peso",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "HUF",
+    "Language": "FR",
+    "CurrencyName": "Hongrie Forint",
+    "Money": "Forint",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "UAH",
+    "Language": "FR",
+    "CurrencyName": "Hryvnia",
+    "Money": "Гривня",
+    "Symbol": "₴"
+  },
+  {
+    "CurrencyISO": "KYD",
+    "Language": "FR",
+    "CurrencyName": "Îles Caïmans Dollar",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "FKP",
+    "Language": "FR",
+    "CurrencyName": "Îles Falkland Pound",
+    "Money": "Livre",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "IQD",
+    "Language": "FR",
+    "CurrencyName": "irakienne Dinar",
+    "Money": "دينار",
+    "Symbol": "ع"
+  },
+  {
+    "CurrencyISO": "ILS",
+    "Language": "FR",
+    "CurrencyName": "israëli sheqel",
+    "Money": "שקל",
+    "Symbol": "₪"
+  },
+  {
+    "CurrencyISO": "JPY",
+    "Language": "FR",
+    "CurrencyName": "Japon Yen",
+    "Money": "日本 円",
+    "Symbol": "¥"
+  },
+  {
+    "CurrencyISO": "PGK",
+    "Language": "FR",
+    "CurrencyName": "Kina",
+    "Money": "Kina",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "LAK",
+    "Language": "FR",
+    "CurrencyName": "Kip",
+    "Money": "ກີບ",
+    "Symbol": "₭"
+  },
+  {
+    "CurrencyISO": "HRK",
+    "Language": "FR",
+    "CurrencyName": "Kuna Croate",
+    "Money": "Kuna",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "MWK",
+    "Language": "FR",
+    "CurrencyName": "Kwacha",
+    "Money": "Kwacha",
+    "Symbol": "M"
+  },
+  {
+    "CurrencyISO": "ZMK",
+    "Language": "FR",
+    "CurrencyName": "Kwacha zambien",
+    "Money": "Kwacha",
+    "Symbol": "Z"
+  },
+  {
+    "CurrencyISO": "AOA",
+    "Language": "FR",
+    "CurrencyName": "Kwanza",
+    "Money": "Kwanza",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "MMK",
+    "Language": "FR",
+    "CurrencyName": "Kyat",
+    "Money": "Kyat",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "GEL",
+    "Language": "FR",
+    "CurrencyName": "Lari",
+    "Money": "ლარი",
+    "Symbol": "l"
+  },
+  {
+    "CurrencyISO": "LVL",
+    "Language": "FR",
+    "CurrencyName": "Lats letton",
+    "Money": "Lats",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "ALL",
+    "Language": "FR",
+    "CurrencyName": "Lek",
+    "Money": "Leku",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "HNL",
+    "Language": "FR",
+    "CurrencyName": "Lempira",
+    "Money": "Lempira",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "SLL",
+    "Language": "FR",
+    "CurrencyName": "Leone",
+    "Money": "Leone",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "MDL",
+    "Language": "FR",
+    "CurrencyName": "Leu moldave",
+    "Money": "Leu",
+    "Symbol": "l"
+  },
+  {
+    "CurrencyISO": "BGN",
+    "Language": "FR",
+    "CurrencyName": "lev bulgare",
+    "Money": "лев",
+    "Symbol": "л"
+  },
+  {
+    "CurrencyISO": "SZL",
+    "Language": "FR",
+    "CurrencyName": "Lilangeni",
+    "Money": "Lilangeni",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "TRY",
+    "Language": "FR",
+    "CurrencyName": "lire turque",
+    "Money": "Lirasi",
+    "Symbol": "T"
+  },
+  {
+    "CurrencyISO": "LTL",
+    "Language": "FR",
+    "CurrencyName": "Litas lituanien",
+    "Money": "litas",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "GIP",
+    "Language": "FR",
+    "CurrencyName": "Livre de Gibraltar",
+    "Money": "Livre",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "EGP",
+    "Language": "FR",
+    "CurrencyName": "Livre égyptienne",
+    "Money": "الجنيه",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "LBP",
+    "Language": "FR",
+    "CurrencyName": "Livre Libanaise",
+    "Money": "ليرة,",
+    "Symbol": "ل"
+  },
+  {
+    "CurrencyISO": "SDG",
+    "Language": "FR",
+    "CurrencyName": "Livre soudanaise",
+    "Money": "جنيه",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "GBP",
+    "Language": "FR",
+    "CurrencyName": "Livre Sterling",
+    "Money": "Livre",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "SYP",
+    "Language": "FR",
+    "CurrencyName": "Livre syrienne",
+    "Money": "الليرة",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "LSL",
+    "Language": "FR",
+    "CurrencyName": "Loti",
+    "Money": "Loti",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "MGA",
+    "Language": "FR",
+    "CurrencyName": "Malagasy Ariary",
+    "Money": "Ariary",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "TMT",
+    "Language": "FR",
+    "CurrencyName": "Manat",
+    "Money": "Манат",
+    "Symbol": "m"
+  },
+  {
+    "CurrencyISO": "AZN",
+    "Language": "FR",
+    "CurrencyName": "manat azerbaïdjanais",
+    "Money": "Manati",
+    "Symbol": "м"
+  },
+  {
+    "CurrencyISO": "BAM",
+    "Language": "FR",
+    "CurrencyName": "Marks convertibles",
+    "Money": "Marka",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "MZN",
+    "Language": "FR",
+    "CurrencyName": "Metical",
+    "Money": "Metical",
+    "Symbol": "M"
+  },
+  {
+    "CurrencyISO": "NGN",
+    "Language": "FR",
+    "CurrencyName": "Naira",
+    "Money": "Naira",
+    "Symbol": "₦"
+  },
+  {
+    "CurrencyISO": "ERN",
+    "Language": "FR",
+    "CurrencyName": "Nakfa",
+    "Money": "Nakfa",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "BTN",
+    "Language": "FR",
+    "CurrencyName": "Ngultrum",
+    "Money": "དངུལ་ཀྲམ",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "RON",
+    "Language": "FR",
+    "CurrencyName": "Nouveau Leu",
+    "Money": "Leu",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "PEN",
+    "Language": "FR",
+    "CurrencyName": "Nuevo Sol",
+    "Money": "Sol",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "MRO",
+    "Language": "FR",
+    "CurrencyName": "Ouguiya",
+    "Money": "أوقية",
+    "Symbol": "U"
+  },
+  {
+    "CurrencyISO": "TOP",
+    "Language": "FR",
+    "CurrencyName": "Pa'anga",
+    "Money": "Pa'anga",
+    "Symbol": "T"
+  },
+  {
+    "CurrencyISO": "MOP",
+    "Language": "FR",
+    "CurrencyName": "Pataca",
+    "Money": "澳门 圆",
+    "Symbol": "M"
+  },
+  {
+    "CurrencyISO": "ANG",
+    "Language": "FR",
+    "CurrencyName": "Pays-Bas Antilles Florin",
+    "Money": "Gulden",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "ARS",
+    "Language": "FR",
+    "CurrencyName": "Peso argentin",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "CLP",
+    "Language": "FR",
+    "CurrencyName": "Peso Chilien",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "COP",
+    "Language": "FR",
+    "CurrencyName": "Peso colombien",
+    "Money": "Peso",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "CUP",
+    "Language": "FR",
+    "CurrencyName": "Peso cubain",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "DOP",
+    "Language": "FR",
+    "CurrencyName": "Peso Dominican",
+    "Money": "Peso",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "MXN",
+    "Language": "FR",
+    "CurrencyName": "Peso mexicain",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "PHP",
+    "Language": "FR",
+    "CurrencyName": "Peso philippin",
+    "Money": "Piso",
+    "Symbol": "₱"
+  },
+  {
+    "CurrencyISO": "UYU",
+    "Language": "FR",
+    "CurrencyName": "Peso uruguayen",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "BWP",
+    "Language": "FR",
+    "CurrencyName": "Pula",
+    "Money": "Pula",
+    "Symbol": "P"
+  },
+  {
+    "CurrencyISO": "GTQ",
+    "Language": "FR",
+    "CurrencyName": "Quetzal",
+    "Money": "Quetzal",
+    "Symbol": "Q"
+  },
+  {
+    "CurrencyISO": "ZAR",
+    "Language": "FR",
+    "CurrencyName": "Rand",
+    "Money": "Rand",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "BRL",
+    "Language": "FR",
+    "CurrencyName": "Real brésilien",
+    "Money": "Immobilier",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "IRR",
+    "Language": "FR",
+    "CurrencyName": "Rial iranien",
+    "Money": "﷼",
+    "Symbol": "﷼"
+  },
+  {
+    "CurrencyISO": "OMR",
+    "Language": "FR",
+    "CurrencyName": "Rial omanais",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "KHR",
+    "Language": "FR",
+    "CurrencyName": "Riel",
+    "Money": "Riel",
+    "Symbol": "r"
+  },
+  {
+    "CurrencyISO": "MYR",
+    "Language": "FR",
+    "CurrencyName": "Ringgit Malaisien",
+    "Money": "ريڠڬيت",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "QAR",
+    "Language": "FR",
+    "CurrencyName": "Riyal du Qatar",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "YER",
+    "Language": "FR",
+    "CurrencyName": "Riyal du Yémen",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "SAR",
+    "Language": "FR",
+    "CurrencyName": "Riyal saoudien",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "RUB",
+    "Language": "FR",
+    "CurrencyName": "rouble russe",
+    "Money": "Рубль",
+    "Symbol": "р"
+  },
+  {
+    "CurrencyISO": "MUR",
+    "Language": "FR",
+    "CurrencyName": "Roupie de Maurice",
+    "Money": "Roupie",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "LKR",
+    "Language": "FR",
+    "CurrencyName": "Roupie de Sri Lanka",
+    "Money": "Roupie",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "INR",
+    "Language": "FR",
+    "CurrencyName": "Roupie indienne",
+    "Money": "Roupie",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "NPR",
+    "Language": "FR",
+    "CurrencyName": "Roupie Népalaise",
+    "Money": "Roupie",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "PKR",
+    "Language": "FR",
+    "CurrencyName": "Roupie pakistanaise",
+    "Money": "Roupie",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "RCS",
+    "Language": "FR",
+    "CurrencyName": "Roupie Seychelloise",
+    "Money": "Roupie",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "MVR",
+    "Language": "FR",
+    "CurrencyName": "Rufiyaa",
+    "Money": "Rufiyaa",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "IDR",
+    "Language": "FR",
+    "CurrencyName": "Rupiah",
+    "Money": "Rupiah",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "RWF",
+    "Language": "FR",
+    "CurrencyName": "Rwanda Franc",
+    "Money": "Franc",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "SHP",
+    "Language": "FR",
+    "CurrencyName": "Saint Helena Pound",
+    "Money": "Livre",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "SOS",
+    "Language": "FR",
+    "CurrencyName": "Shilling de Somalie",
+    "Money": "Shilin",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "KES",
+    "Language": "FR",
+    "CurrencyName": "Shilling kenyan",
+    "Money": "Shilling",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "UGX",
+    "Language": "FR",
+    "CurrencyName": "Shilling ougandais",
+    "Money": "Shilling",
+    "Symbol": "U"
+  },
+  {
+    "CurrencyISO": "TZS",
+    "Language": "FR",
+    "CurrencyName": "Shilling tanzanien",
+    "Money": "Shilingi",
+    "Symbol": "/"
+  },
+  {
+    "CurrencyISO": "KGS",
+    "Language": "FR",
+    "CurrencyName": "Som",
+    "Money": "сом",
+    "Symbol": "с"
+  },
+  {
+    "CurrencyISO": "TJS",
+    "Language": "FR",
+    "CurrencyName": "Somoni",
+    "Money": "Сомонӣ",
+    "Symbol": "С"
+  },
+  {
+    "CurrencyISO": "UZS",
+    "Language": "FR",
+    "CurrencyName": "Sum ouzbek",
+    "Money": "Сўм",
+    "Symbol": "с"
+  },
+  {
+    "CurrencyISO": "BDT",
+    "Language": "FR",
+    "CurrencyName": "Taka",
+    "Money": "টাকা",
+    "Symbol": "৳"
+  },
+  {
+    "CurrencyISO": "WST",
+    "Language": "FR",
+    "CurrencyName": "Tala",
+    "Money": "Tala",
+    "Symbol": "W"
+  },
+  {
+    "CurrencyISO": "KZT",
+    "Language": "FR",
+    "CurrencyName": "Tenge",
+    "Money": "Теңгесі",
+    "Symbol": "〒"
+  },
+  {
+    "CurrencyISO": "TTD",
+    "Language": "FR",
+    "CurrencyName": "Trinité-et-Tobago Dollar",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "MNT",
+    "Language": "FR",
+    "CurrencyName": "Tugrik",
+    "Money": "Төгрөг",
+    "Symbol": "₮"
+  },
+  {
+    "CurrencyISO": "USD",
+    "Language": "FR",
+    "CurrencyName": "US Dollar",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "VUV",
+    "Language": "FR",
+    "CurrencyName": "Vatu",
+    "Money": "Vatu",
+    "Symbol": "V"
+  },
+  {
+    "CurrencyISO": "KRW",
+    "Language": "FR",
+    "CurrencyName": "won",
+    "Money": "원",
+    "Symbol": "₩"
+  },
+  {
+    "CurrencyISO": "CNY",
+    "Language": "FR",
+    "CurrencyName": "yuan chinois",
+    "Money": "人民币",
+    "Symbol": "¥"
+  },
+  {
+    "CurrencyISO": "PLN",
+    "Language": "FR",
+    "CurrencyName": "Zloty polish",
+    "Money": "Złoty",
+    "Symbol": "z"
+  },
+  {
+    "CurrencyISO": "AFN",
+    "Language": "IT",
+    "CurrencyName": "Afghani afgano",
+    "Money": "افغانۍ",
+    "Symbol": "؋"
+  },
+  {
+    "CurrencyISO": "MGA",
+    "Language": "IT",
+    "CurrencyName": "Ariary malgascio",
+    "Money": "Ariary",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "THB",
+    "Language": "IT",
+    "CurrencyName": "Baht thailandese",
+    "Money": "บาทไทย",
+    "Symbol": "฿"
+  },
+  {
+    "CurrencyISO": "PAB",
+    "Language": "IT",
+    "CurrencyName": "Balboa panamense",
+    "Money": "Balboa",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "ETB",
+    "Language": "IT",
+    "CurrencyName": "Birr etiope",
+    "Money": "Birr",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "VEF",
+    "Language": "IT",
+    "CurrencyName": "Bolivar venezuelano",
+    "Money": "Bolívar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BOB",
+    "Language": "IT",
+    "CurrencyName": "Boliviano boliviano",
+    "Money": "Boliviano",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "GHS",
+    "Language": "IT",
+    "CurrencyName": "Cedi ghanese",
+    "Money": "Cedi",
+    "Symbol": "G"
+  },
+  {
+    "CurrencyISO": "CRC",
+    "Language": "IT",
+    "CurrencyName": "Colón costaricano",
+    "Money": "Colón",
+    "Symbol": "₡"
+  },
+  {
+    "CurrencyISO": "NIO",
+    "Language": "IT",
+    "CurrencyName": "Cordoba nicaraguense",
+    "Money": "Córdoba",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "CZK",
+    "Language": "IT",
+    "CurrencyName": "Corona ceca",
+    "Money": "Koruna",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "DKK",
+    "Language": "IT",
+    "CurrencyName": "Corona danese",
+    "Money": "Krone",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "ISK",
+    "Language": "IT",
+    "CurrencyName": "Corona islandese",
+    "Money": "Króna",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "NOK",
+    "Language": "IT",
+    "CurrencyName": "Corona norvegese",
+    "Money": "Krone",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "SEK",
+    "Language": "IT",
+    "CurrencyName": "Corona svedese",
+    "Money": "Krona",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "GMD",
+    "Language": "IT",
+    "CurrencyName": "Dalasi gambese",
+    "Money": "Dalasi",
+    "Symbol": "D"
+  },
+  {
+    "CurrencyISO": "DZD",
+    "Language": "IT",
+    "CurrencyName": "Dinaro algerino",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "BHD",
+    "Language": "IT",
+    "CurrencyName": "Dinaro del Bahrain",
+    "Money": "دينار",
+    "Symbol": "."
+  },
+  {
+    "CurrencyISO": "JOD",
+    "Language": "IT",
+    "CurrencyName": "Dinaro giordano",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "IQD",
+    "Language": "IT",
+    "CurrencyName": "Dinaro iracheno",
+    "Money": "دينار",
+    "Symbol": "ع"
+  },
+  {
+    "CurrencyISO": "KWD",
+    "Language": "IT",
+    "CurrencyName": "Dinaro kuwaitiano",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "LYD",
+    "Language": "IT",
+    "CurrencyName": "Dinaro libico",
+    "Money": "دينار",
+    "Symbol": "ل"
+  },
+  {
+    "CurrencyISO": "MKD",
+    "Language": "IT",
+    "CurrencyName": "Dinaro macedone",
+    "Money": "Денар",
+    "Symbol": "д"
+  },
+  {
+    "CurrencyISO": "RSD",
+    "Language": "IT",
+    "CurrencyName": "Dinaro serbo",
+    "Money": "Динар",
+    "Symbol": "д"
+  },
+  {
+    "CurrencyISO": "TND",
+    "Language": "IT",
+    "CurrencyName": "Dinaro tunisino",
+    "Money": "دينار",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "AED",
+    "Language": "IT",
+    "CurrencyName": "Dirham degli Emirati Arabi Uniti",
+    "Money": "درهم",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "MAD",
+    "Language": "IT",
+    "CurrencyName": "Dirham marocchino",
+    "Money": "درهم",
+    "Symbol": "د"
+  },
+  {
+    "CurrencyISO": "STD",
+    "Language": "IT",
+    "CurrencyName": "Dobra di São Tomé e Príncipe",
+    "Money": "Dobra",
+    "Symbol": "D"
+  },
+  {
+    "CurrencyISO": "AUD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro australiano",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "CAD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro canadese",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "XCD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro dei Caraibi Orientali",
+    "Money": "Dollar",
+    "Symbol": "E"
+  },
+  {
+    "CurrencyISO": "BZD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro del Belize",
+    "Money": "Dollar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BND",
+    "Language": "IT",
+    "CurrencyName": "Dollaro del Brunei",
+    "Money": "Ringgit",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "BMD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro della Bermuda",
+    "Money": "Dollar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "GYD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro della Guyana",
+    "Money": "Dollar",
+    "Symbol": "G"
+  },
+  {
+    "CurrencyISO": "BSD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro delle Bahamas",
+    "Money": "Dollar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "KYD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro delle Cayman",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "FJD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro delle Figi",
+    "Money": "Dollar",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "SBD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro delle Salomone",
+    "Money": "Dollar",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "BBD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro di Barbados",
+    "Money": "Dollar",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "HKD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro di Hong Kong",
+    "Money": "香港圓",
+    "Symbol": "H"
+  },
+  {
+    "CurrencyISO": "SGD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro di Singapore",
+    "Money": "新加坡元",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "TTD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro di Trinidad e Tobago",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "JMD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro giamaicano",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "LRD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro liberiano",
+    "Money": "Dollar",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "NAD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro namibiano",
+    "Money": "Dollar",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "NZD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro neozelandese",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "USD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro statunitense",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "SRD",
+    "Language": "IT",
+    "CurrencyName": "Dollaro surinamese",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "ZWL",
+    "Language": "IT",
+    "CurrencyName": "Dollaro zimbabwiano",
+    "Money": "Dollar",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "VND",
+    "Language": "IT",
+    "CurrencyName": "Đồng vietnamita",
+    "Money": "đồng",
+    "Symbol": "₫"
+  },
+  {
+    "CurrencyISO": "AMD",
+    "Language": "IT",
+    "CurrencyName": "Dram armeno",
+    "Money": "Դրամ",
+    "Symbol": "դ"
+  },
+  {
+    "CurrencyISO": "CVE",
+    "Language": "IT",
+    "CurrencyName": "Escudo di Capo Verde",
+    "Money": "Escudo",
+    "Symbol": "E"
+  },
+  {
+    "CurrencyISO": "EUR",
+    "Language": "IT",
+    "CurrencyName": "Euro",
+    "Money": "Euro",
+    "Symbol": "€"
+  },
+  {
+    "CurrencyISO": "AWG",
+    "Language": "IT",
+    "CurrencyName": "Fiorino arubano",
+    "Money": "Florijn",
+    "Symbol": "A"
+  },
+  {
+    "CurrencyISO": "ANG",
+    "Language": "IT",
+    "CurrencyName": "Fiorino delle Antille olandesi",
+    "Money": "Gulden",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "HUF",
+    "Language": "IT",
+    "CurrencyName": "Fiorino ungherese",
+    "Money": "Forint",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "XOF",
+    "Language": "IT",
+    "CurrencyName": "Franco CFA BCEAO",
+    "Money": "Franc",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "XAF",
+    "Language": "IT",
+    "CurrencyName": "Franco CFA BEAC",
+    "Money": "Franc",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "XPF",
+    "Language": "IT",
+    "CurrencyName": "Franco CFP",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "CDF",
+    "Language": "IT",
+    "CurrencyName": "Franco congolese",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "BIF",
+    "Language": "IT",
+    "CurrencyName": "Franco del Burundi",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "KMF",
+    "Language": "IT",
+    "CurrencyName": "Franco delle Comore",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "DJF",
+    "Language": "IT",
+    "CurrencyName": "Franco gibutiano",
+    "Money": "الفرنك",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "GNF",
+    "Language": "IT",
+    "CurrencyName": "Franco guineano",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "RWF",
+    "Language": "IT",
+    "CurrencyName": "Franco ruandese",
+    "Money": "Franc",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "CHF",
+    "Language": "IT",
+    "CurrencyName": "Franco svizzero",
+    "Money": "Franc",
+    "Symbol": "F"
+  },
+  {
+    "CurrencyISO": "HTG",
+    "Language": "IT",
+    "CurrencyName": "Gourde haitiano",
+    "Money": "Gourde",
+    "Symbol": "G"
+  },
+  {
+    "CurrencyISO": "UAH",
+    "Language": "IT",
+    "CurrencyName": "Grivnia ucraina",
+    "Money": "Гривня",
+    "Symbol": "₴"
+  },
+  {
+    "CurrencyISO": "PYG",
+    "Language": "IT",
+    "CurrencyName": "Guarani paraguaiano",
+    "Money": "Guaraní",
+    "Symbol": "₲"
+  },
+  {
+    "CurrencyISO": "GWP",
+    "Language": "IT",
+    "CurrencyName": "Guinea-Bissau Peso",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "PGK",
+    "Language": "IT",
+    "CurrencyName": "Kina papuana",
+    "Money": "Kina",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "LAK",
+    "Language": "IT",
+    "CurrencyName": "Kip laotiano",
+    "Money": "ກີບ",
+    "Symbol": "₭"
+  },
+  {
+    "CurrencyISO": "EEK",
+    "Language": "IT",
+    "CurrencyName": "Kroon",
+    "Money": "Kroon",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "HRK",
+    "Language": "IT",
+    "CurrencyName": "Kuna croata",
+    "Money": "Kuna",
+    "Symbol": "k"
+  },
+  {
+    "CurrencyISO": "MWK",
+    "Language": "IT",
+    "CurrencyName": "Kwacha malawiano",
+    "Money": "Kwacha",
+    "Symbol": "M"
+  },
+  {
+    "CurrencyISO": "ZMK",
+    "Language": "IT",
+    "CurrencyName": "Kwacha zambiano",
+    "Money": "Kwacha",
+    "Symbol": "Z"
+  },
+  {
+    "CurrencyISO": "AOA",
+    "Language": "IT",
+    "CurrencyName": "Kwanza angolano",
+    "Money": "Kwanza",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "MMK",
+    "Language": "IT",
+    "CurrencyName": "Kyat birmano",
+    "Money": "Kyat",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "GEL",
+    "Language": "IT",
+    "CurrencyName": "Lari georgiano",
+    "Money": "ლარი",
+    "Symbol": "l"
+  },
+  {
+    "CurrencyISO": "LVL",
+    "Language": "IT",
+    "CurrencyName": "Lats lettone",
+    "Money": "Lats",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "ALL",
+    "Language": "IT",
+    "CurrencyName": "Lek albanese",
+    "Money": "Leku",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "HNL",
+    "Language": "IT",
+    "CurrencyName": "Lempira honduregna",
+    "Money": "Lempira",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "SLL",
+    "Language": "IT",
+    "CurrencyName": "Leone sierraleonese",
+    "Money": "Leone",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "MDL",
+    "Language": "IT",
+    "CurrencyName": "Leu moldavo",
+    "Money": "Leu",
+    "Symbol": "l"
+  },
+  {
+    "CurrencyISO": "SZL",
+    "Language": "IT",
+    "CurrencyName": "Lilangeni dello Swaziland",
+    "Money": "Lilangeni",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "EGP",
+    "Language": "IT",
+    "CurrencyName": "Lira egiziana",
+    "Money": "الجنيه",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "LBP",
+    "Language": "IT",
+    "CurrencyName": "Lira libanese (o sterlina)",
+    "Money": "ليرة,",
+    "Symbol": "ل"
+  },
+  {
+    "CurrencyISO": "SYP",
+    "Language": "IT",
+    "CurrencyName": "Lira siriana (o sterlina)",
+    "Money": "الليرة",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "LTL",
+    "Language": "IT",
+    "CurrencyName": "Lita lituano",
+    "Money": "Litas",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "LSL",
+    "Language": "IT",
+    "CurrencyName": "Loti lesothiano",
+    "Money": "Loti",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "AZN",
+    "Language": "IT",
+    "CurrencyName": "Manat azero",
+    "Money": "Manatı",
+    "Symbol": "м"
+  },
+  {
+    "CurrencyISO": "TMT",
+    "Language": "IT",
+    "CurrencyName": "Manat turkmeno",
+    "Money": "Манат",
+    "Symbol": "m"
+  },
+  {
+    "CurrencyISO": "BAM",
+    "Language": "IT",
+    "CurrencyName": "Marco bosniaco",
+    "Money": "Marka",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "MZN",
+    "Language": "IT",
+    "CurrencyName": "Metical mozambicano",
+    "Money": "Metical",
+    "Symbol": "M"
+  },
+  {
+    "CurrencyISO": "NGN",
+    "Language": "IT",
+    "CurrencyName": "Naira nigeriana",
+    "Money": "Naira",
+    "Symbol": "₦"
+  },
+  {
+    "CurrencyISO": "ERN",
+    "Language": "IT",
+    "CurrencyName": "Nakfa eritreo",
+    "Money": "Nakfa",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "BTN",
+    "Language": "IT",
+    "CurrencyName": "Ngultrum del Bhutan",
+    "Money": "དངུལ་ཀྲམ",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "PEN",
+    "Language": "IT",
+    "CurrencyName": "Nuevo sol peruviano",
+    "Money": "Sol",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "TRY",
+    "Language": "IT",
+    "CurrencyName": "Nuova lira turca",
+    "Money": "Lirası",
+    "Symbol": "T"
+  },
+  {
+    "CurrencyISO": "TWD",
+    "Language": "IT",
+    "CurrencyName": "Nuovo dollaro taiwanese",
+    "Money": "新臺幣",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "RON",
+    "Language": "IT",
+    "CurrencyName": "Nuovo leu rumeno",
+    "Money": "Leu",
+    "Symbol": "L"
+  },
+  {
+    "CurrencyISO": "BGN",
+    "Language": "IT",
+    "CurrencyName": "Nuovo lev bulgaro",
+    "Money": "лев",
+    "Symbol": "л"
+  },
+  {
+    "CurrencyISO": "ILS",
+    "Language": "IT",
+    "CurrencyName": "Nuovo siclo israeliano",
+    "Money": "שקל",
+    "Symbol": "₪"
+  },
+  {
+    "CurrencyISO": "MRO",
+    "Language": "IT",
+    "CurrencyName": "Ouguiya mauritana",
+    "Money": "أوقية",
+    "Symbol": "U"
+  },
+  {
+    "CurrencyISO": "TOP",
+    "Language": "IT",
+    "CurrencyName": "Paʻanga tongano",
+    "Money": "Pa'anga",
+    "Symbol": "T"
+  },
+  {
+    "CurrencyISO": "MOP",
+    "Language": "IT",
+    "CurrencyName": "Pataca di Macao",
+    "Money": "澳門圓",
+    "Symbol": "M"
+  },
+  {
+    "CurrencyISO": "ARS",
+    "Language": "IT",
+    "CurrencyName": "Peso argentino",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "CLP",
+    "Language": "IT",
+    "CurrencyName": "Peso cileno",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "COP",
+    "Language": "IT",
+    "CurrencyName": "Peso colombiano",
+    "Money": "Peso",
+    "Symbol": "C"
+  },
+  {
+    "CurrencyISO": "CUP",
+    "Language": "IT",
+    "CurrencyName": "Peso cubano",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "DOP",
+    "Language": "IT",
+    "CurrencyName": "Peso dominicano",
+    "Money": "Peso",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "PHP",
+    "Language": "IT",
+    "CurrencyName": "Peso filippino",
+    "Money": "Piso",
+    "Symbol": "₱"
+  },
+  {
+    "CurrencyISO": "MXN",
+    "Language": "IT",
+    "CurrencyName": "Peso messicano",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "UYU",
+    "Language": "IT",
+    "CurrencyName": "Peso uruguaiano",
+    "Money": "Peso",
+    "Symbol": "$"
+  },
+  {
+    "CurrencyISO": "BWP",
+    "Language": "IT",
+    "CurrencyName": "Pula del Botswana",
+    "Money": "Pula",
+    "Symbol": "P"
+  },
+  {
+    "CurrencyISO": "GTQ",
+    "Language": "IT",
+    "CurrencyName": "Quetzal guatemalteco",
+    "Money": "Quetzal",
+    "Symbol": "Q"
+  },
+  {
+    "CurrencyISO": "ZAR",
+    "Language": "IT",
+    "CurrencyName": "Rand sudafricano",
+    "Money": "Rand",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "BRL",
+    "Language": "IT",
+    "CurrencyName": "Real brasiliano",
+    "Money": "Real",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "CNY",
+    "Language": "IT",
+    "CurrencyName": "Renminbi cinese (Yuan)",
+    "Money": "人民币",
+    "Symbol": "¥"
+  },
+  {
+    "CurrencyISO": "QAR",
+    "Language": "IT",
+    "CurrencyName": "Rial del Qatar",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "OMR",
+    "Language": "IT",
+    "CurrencyName": "Rial dell'Oman",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "IRR",
+    "Language": "IT",
+    "CurrencyName": "Rial iraniano",
+    "Money": "﷼",
+    "Symbol": "﷼"
+  },
+  {
+    "CurrencyISO": "SAR",
+    "Language": "IT",
+    "CurrencyName": "Rial saudita",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "YER",
+    "Language": "IT",
+    "CurrencyName": "Rial yemenita",
+    "Money": "ريال",
+    "Symbol": "ر"
+  },
+  {
+    "CurrencyISO": "KHR",
+    "Language": "IT",
+    "CurrencyName": "Riel cambogiano",
+    "Money": "Riel",
+    "Symbol": "r"
+  },
+  {
+    "CurrencyISO": "MYR",
+    "Language": "IT",
+    "CurrencyName": "Ringgit malese",
+    "Money": "ريڠڬيت",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "BYR",
+    "Language": "IT",
+    "CurrencyName": "Rublo bielorusso",
+    "Money": "Рубель",
+    "Symbol": "B"
+  },
+  {
+    "CurrencyISO": "RUB",
+    "Language": "IT",
+    "CurrencyName": "Rublo russo",
+    "Money": "Рубль",
+    "Symbol": "р"
+  },
+  {
+    "CurrencyISO": "MVR",
+    "Language": "IT",
+    "CurrencyName": "Rufiyaa delle Maldive",
+    "Money": "Rufiyaa",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "SCR",
+    "Language": "IT",
+    "CurrencyName": "Rupia delle Seychelles",
+    "Money": "Roupie",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "INR",
+    "Language": "IT",
+    "CurrencyName": "Rupia indiana",
+    "Money": "Rupee",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "IDR",
+    "Language": "IT",
+    "CurrencyName": "Rupia indonesiana",
+    "Money": "Rupiah",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "MUR",
+    "Language": "IT",
+    "CurrencyName": "Rupia mauriziana",
+    "Money": "Roupie",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "NPR",
+    "Language": "IT",
+    "CurrencyName": "Rupia nepalese",
+    "Money": "Rupee",
+    "Symbol": "N"
+  },
+  {
+    "CurrencyISO": "PKR",
+    "Language": "IT",
+    "CurrencyName": "Rupia pakistana",
+    "Money": "Rupee",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "LKR",
+    "Language": "IT",
+    "CurrencyName": "Rupia singalese",
+    "Money": "Rupee",
+    "Symbol": "R"
+  },
+  {
+    "CurrencyISO": "SVC",
+    "Language": "IT",
+    "CurrencyName": "Salvadoran Colon",
+    "Money": "Colón",
+    "Symbol": "₡"
+  },
+  {
+    "CurrencyISO": "KES",
+    "Language": "IT",
+    "CurrencyName": "Scellino keniota",
+    "Money": "Shilling",
+    "Symbol": "K"
+  },
+  {
+    "CurrencyISO": "SOS",
+    "Language": "IT",
+    "CurrencyName": "Scellino somalo",
+    "Money": "Shilin",
+    "Symbol": "S"
+  },
+  {
+    "CurrencyISO": "TZS",
+    "Language": "IT",
+    "CurrencyName": "Scellino tanzaniano",
+    "Money": "Shilingi",
+    "Symbol": "/"
+  },
+  {
+    "CurrencyISO": "UGX",
+    "Language": "IT",
+    "CurrencyName": "Scellino ugandese",
+    "Money": "Shilling",
+    "Symbol": "U"
+  },
+  {
+    "CurrencyISO": "KGS",
+    "Language": "IT",
+    "CurrencyName": "Som kirghizo",
+    "Money": "сом",
+    "Symbol": "с"
+  },
+  {
+    "CurrencyISO": "UZS",
+    "Language": "IT",
+    "CurrencyName": "Som uzbeco",
+    "Money": "Сўм",
+    "Symbol": "с"
+  },
+  {
+    "CurrencyISO": "TJS",
+    "Language": "IT",
+    "CurrencyName": "Somoni tagico",
+    "Money": "Сомонӣ",
+    "Symbol": "С"
+  },
+  {
+    "CurrencyISO": "GBP",
+    "Language": "IT",
+    "CurrencyName": "Sterlina britannica",
+    "Money": "Pound",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "FKP",
+    "Language": "IT",
+    "CurrencyName": "Sterlina delle Falkland",
+    "Money": "Pound",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "GIP",
+    "Language": "IT",
+    "CurrencyName": "Sterlina di Gibilterra",
+    "Money": "Pound",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "SHP",
+    "Language": "IT",
+    "CurrencyName": "Sterlina di Sant'Elena",
+    "Money": "Pound",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "SDG",
+    "Language": "IT",
+    "CurrencyName": "Sterlina sudanese",
+    "Money": "جنيه",
+    "Symbol": "£"
+  },
+  {
+    "CurrencyISO": "BDT",
+    "Language": "IT",
+    "CurrencyName": "Taka bengalese",
+    "Money": "টাকা",
+    "Symbol": "৳"
+  },
+  {
+    "CurrencyISO": "WST",
+    "Language": "IT",
+    "CurrencyName": "Tala samoano",
+    "Money": "Tālā",
+    "Symbol": "W"
+  },
+  {
+    "CurrencyISO": "KZT",
+    "Language": "IT",
+    "CurrencyName": "Tenge kazako",
+    "Money": "Теңгесі",
+    "Symbol": "〒"
+  },
+  {
+    "CurrencyISO": "MNT",
+    "Language": "IT",
+    "CurrencyName": "Tugrik mongolo",
+    "Money": "Төгрөг",
+    "Symbol": "₮"
+  },
+  {
+    "CurrencyISO": "VUV",
+    "Language": "IT",
+    "CurrencyName": "Vatu di Vanuatu",
+    "Money": "Vatu",
+    "Symbol": "V"
+  },
+  {
+    "CurrencyISO": "KPW",
+    "Language": "IT",
+    "CurrencyName": "Won nordcoreano",
+    "Money": "원",
+    "Symbol": "₩"
+  },
+  {
+    "CurrencyISO": "KRW",
+    "Language": "IT",
+    "CurrencyName": "Won sudcoreano",
+    "Money": "원",
+    "Symbol": "₩"
+  },
+  {
+    "CurrencyISO": "JPY",
+    "Language": "IT",
+    "CurrencyName": "Yen giapponese",
+    "Money": "日本円",
+    "Symbol": "¥"
+  },
+  {
+    "CurrencyISO": "PLN",
+    "Language": "IT",
+    "CurrencyName": "Złoty polacco",
+    "Money": "Złoty",
+    "Symbol": "z"
+  }
+]
