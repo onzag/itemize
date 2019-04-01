@@ -9,7 +9,7 @@ import { getItemDefPath } from "./dItemDef";
 
 interface IPropertyDefProps {
   property: PropertyDefinition;
-  locale: string;
+  language: string;
 }
 
 interface IPropertyDefState {
@@ -118,7 +118,7 @@ export default class DevToolPropertyDefinition extends
       valueToStringify = {...this.state.currentValue, internalValue: "[TOO BIG TO DISPLAY]"};
     }
 
-    const i18nData = this.props.property.getI18nDataFor(this.props.locale);
+    const i18nData = this.props.property.getI18nDataFor(this.props.language);
     const label = i18nData ? i18nData.label : null;
     const nullable = this.props.property.isNullable() ? <span> / nullable</span> : null;
     const hidden = this.props.property.isHidden() ? <span> / hidden</span> : null;

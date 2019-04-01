@@ -4,7 +4,7 @@ import { FormControlLabel, Switch, Icon, FormLabel, FormControl, RadioGroup, Rad
 import { capitalize } from "../../../../../util";
 
 function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
-  const i18nData = props.property.getI18nDataFor(props.locale);
+  const i18nData = props.property.getI18nDataFor(props.language);
   const className = getClassName(props, "switch", props.poked);
   const i18nLabel = i18nData && i18nData.label;
   const icon = props.property.getIcon();
@@ -48,7 +48,7 @@ function handleOnChange(
 }
 
 function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
-  const i18nData = props.property.getI18nDataFor(props.locale);
+  const i18nData = props.property.getI18nDataFor(props.language);
   const className = getClassName(props, "radio", props.poked);
   const i18nLabel = i18nData && i18nData.label;
   const icon = props.property.getIcon();

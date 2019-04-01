@@ -88,7 +88,7 @@ export default class PropertyEntryField
       this.state.visible !== nextState.visible ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
-      nextProps.locale !== this.props.locale;
+      nextProps.language !== this.props.language;
   }
 
   public toggleVisible() {
@@ -227,7 +227,7 @@ export default class PropertyEntryField
   }
 
   public renderSelectField() {
-    const i18nData = this.props.property.getI18nDataFor(this.props.locale);
+    const i18nData = this.props.property.getI18nDataFor(this.props.language);
     const className = getClassName(this.props, "field", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
@@ -314,7 +314,7 @@ export default class PropertyEntryField
   }
 
   public renderBasicTextField(textFieldProps?: any) {
-    const i18nData = this.props.property.getI18nDataFor(this.props.locale);
+    const i18nData = this.props.property.getI18nDataFor(this.props.language);
     const className = getClassName(this.props, "field", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nPlaceholder = i18nData && i18nData.placeholder;

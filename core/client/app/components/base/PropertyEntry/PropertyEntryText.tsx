@@ -134,7 +134,7 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
       this.props.value.value as string :
       "";
 
-    const i18nData = this.props.property.getI18nDataFor(this.props.locale);
+    const i18nData = this.props.property.getI18nDataFor(this.props.language);
     const className = getClassName(this.props, "rich-text", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nPlaceholder = i18nData && i18nData.placeholder;

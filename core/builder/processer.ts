@@ -175,14 +175,3 @@ export function processRoot(
 
   return nRawData;
 }
-
-export function clearLang(
-  rawData: ILocaleLangDataType,
-) {
-  const nRawData: ILocaleLangDataType = {locales: {}};
-  Object.keys(rawData.locales).forEach((locale) => {
-    nRawData.locales[locale] = {name: rawData.locales[locale].name};
-  });
-
-  return nRawData;
-}

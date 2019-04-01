@@ -35,7 +35,7 @@ const devtoolsStyle: {
     color: "#ffffff",
     overflow: "auto",
   },
-  singeLocaleChanger: {
+  singleLocaleChanger: {
     textDecoration: "underline",
     cursor: "pointer",
   },
@@ -54,6 +54,9 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
     };
 
     this.toggleOpened = this.toggleOpened.bind(this);
+    this.changeLanguage = this.changeLanguage.bind(this);
+    this.changeCurrency = this.changeCurrency.bind(this);
+    this.changeCountry = this.changeCountry.bind(this);
   }
   public toggleOpened() {
     localStorage.setItem("__dev__open", JSON.stringify(!this.state.opened));
@@ -61,8 +64,14 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
       opened: !this.state.opened,
     });
   }
-  public changeLocale(currentLocale: ILocaleType, newLocaleName: string) {
-    currentLocale.changeTo(newLocaleName);
+  public changeLanguage(locale: ILocaleType, newLanguageLocale: string) {
+    locale.changeLanguageTo(newLanguageLocale);
+  }
+  public changeCurrency(locale: ILocaleType, e: React.ChangeEvent<HTMLSelectElement>) {
+    locale.changeCurrencyTo(e.target.value);
+  }
+  public changeCountry(locale: ILocaleType, e: React.ChangeEvent<HTMLSelectElement>) {
+    locale.changeCountryTo(e.target.value);
   }
   public render() {
     const baseStyle = {
@@ -81,24 +90,56 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
           <LocaleContext.Consumer>
             {(locale) => <div>
               <p>
-                Current Locale
-                <b> {locale.state} - {locale.locales[locale.state].name} </b>
+                Current Locale Language
+                <b> {locale.language} - {locale.localeData[locale.language].name} </b>
                 {
                   locale.updating ?
                   "Updating..." :
                   <React.Fragment>
                     Supports:
-                    {Object.keys(locale.locales).map((localeName) =>
+                    {Object.keys(locale.localeData).map((localeName) =>
                       <React.Fragment key={localeName}>
                         &nbsp;
                         <span
-                          style={devtoolsStyle.singeLocaleChanger}
-                          onClick={this.changeLocale.bind(this, locale, localeName)}
+                          style={devtoolsStyle.singleLocaleChanger}
+                          onClick={this.changeLanguage.bind(this, locale, localeName)}
                         >
-                         {localeName} - {locale.locales[localeName].name}
+                         {localeName} - {locale.localeData[localeName].name}
                         </span>
                       </React.Fragment>)}
                   </React.Fragment>
+                }
+              </p>
+              <p>
+                Current Locale Currency
+                <b> {locale.currency} - {locale.currencyData[locale.currency].symbol} </b>
+                {
+                  locale.updating ?
+                  "Updating..." :
+                  <select value={locale.currency} onChange={this.changeCurrency.bind(this, locale)}>
+                    Supports:
+                    {Object.keys(locale.currencyData).map((currencyCode) =>
+                      <option key={currencyCode} value={currencyCode}>
+                        {currencyCode + " - "}
+                        {locale.currencyData[currencyCode].name}
+                      </option>)}
+                  </select>
+                }
+              </p>
+              <p>
+                Current Locale Country
+                <b> {locale.country} - {locale.countryData[locale.country].native} </b>
+                {
+                  locale.updating ?
+                  "Updating..." :
+                  <select value={locale.country} onChange={this.changeCountry.bind(this, locale)}>
+                    Supports:
+                    {Object.keys(locale.countryData).map((countryCode) =>
+                      <option key={countryCode} value={countryCode}>
+                        {locale.countryData[countryCode].emoji}
+                        {" " + locale.countryData[countryCode].native}
+                      </option>)}
+                  </select>
                 }
               </p>
             </div>}
@@ -114,7 +155,7 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
                 {(data) =>
                   <DevToolRoot
                    root={data.value}
-                   locale={locale.state}
+                   language={locale.language}
                   />
                 }
               </DataContext.Consumer>

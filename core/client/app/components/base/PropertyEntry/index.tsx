@@ -26,7 +26,7 @@ export interface IPropertyEntryBaseProps {
 }
 
 export interface IPropertyEntryProps extends IPropertyEntryBaseProps {
-  locale: string;
+  language: string;
   i18n: Ii18NType;
 }
 
@@ -76,7 +76,7 @@ export default function PropertyEntry(props: IPropertyEntryBaseProps) {
         (locale) =>
           <Element
             {...props}
-            locale={locale.state}
+            language={locale.language}
             i18n={locale.i18n}
           />
       }

@@ -7,7 +7,7 @@ import DevToolPropertyDefinition from "./dPropertyDef";
 
 interface IModuleProps {
   module: Module;
-  locale: string;
+  language: string;
 }
 
 interface IModuleState {
@@ -70,7 +70,7 @@ export default class DevToolModule extends React.Component<IModuleProps, IModule
         <p onClick={this.toggleExpand} style={devtoolsStyle.moduleItemTitle}>
           <b>{this.state.expanded ? "-" : "+"} </b>
           <b>{this.props.module.getName()}</b>
-          <span> - {this.props.module.getI18nNameFor(this.props.locale)}</span>
+          <span> - {this.props.module.getI18nNameFor(this.props.language)}</span>
           <span> (module)</span>
         </p>
         {this.state.expanded ? <div style={devtoolsStyle.moduleChildren}>
@@ -78,21 +78,21 @@ export default class DevToolModule extends React.Component<IModuleProps, IModule
             return <DevToolModule
               key={childModule.getName()}
               module={childModule}
-              locale={this.props.locale}
+              language={this.props.language}
             />;
           })}
           {this.props.module.getAllChildItemDefinitions().map((childDefinition) => {
             return <DevToolItemDefinition
               key={childDefinition.getName()}
               itemDef={childDefinition}
-              locale={this.props.locale}
+              language={this.props.language}
             />;
           })}
           {this.props.module.getAllPropExtensions().map((propExtension) => {
             return <DevToolPropertyDefinition
               key={propExtension.getId()}
               property={propExtension}
-              locale={this.props.locale}
+              language={this.props.language}
             />;
           })}
           <DevToolRawVisualizer content={this.props.module.rawData}/>

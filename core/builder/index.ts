@@ -22,10 +22,12 @@ import {
   checkItemDefinitionSchemaValidate,
 } from "./schemaChecks";
 import { checkRoot } from "./checkers";
-import { processRoot, clearLang } from "./processer";
+import { processRoot } from "./processer";
 import { buildGraphQLSchema } from "./graphql";
-import { LOCALE_I18N } from "../constants";
-import { escapeStringRegexp } from "../util";
+import { buildLang, clearLang } from "./lang";
+import { buildJSONResources } from "./resources";
+import { buildHTML } from "./html";
+import { buildConfig } from "./config";
 
 import * as fs from "fs";
 import * as path from "path";
@@ -81,9 +83,12 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
     const rawDataConfig = JSON.parse(
       await fsAsync.readFile("./config.json", "utf8"),
     );
-    await buildData(rawDataConfig.entry);
-    await buildConfig(rawDataConfig);
-    await buildHTML(rawDataConfig);
+    await Promise.all([
+      buildData(rawDataConfig.entry),
+      buildConfig(rawDataConfig),
+      buildHTML(rawDataConfig),
+      buildJSONResources(rawDataConfig),
+    ]);
   } catch (err) {
     if (err instanceof CheckUpError) {
       err.display();
@@ -92,37 +97,8 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   }
 })();
 
-async function buildHTML(rawConfig: any) {
-  if (!await checkExists("./dist/data")) {
-    await fsAsync.mkdir("./dist/data");
-  }
-
-  let baseHTML = await fsAsync.readFile("./core/client/index.html", "utf8");
-  Object.keys(rawConfig).forEach((key) => {
-    baseHTML = baseHTML.replace(
-      new RegExp(escapeStringRegexp("%{" + key + "}"), "g"),
-      rawConfig[key],
-    );
-  });
-
-  baseHTML = baseHTML.replace(
-    new RegExp(escapeStringRegexp("%{BUILD_NUMBER}"), "g"),
-    (new Date()).getTime().toString(),
-  );
-
-  const fileName = "./dist/data/index.html";
-  console.log("emiting " + colors.green(fileName));
-  await fsAsync.writeFile(fileName, baseHTML);
-}
-
-async function buildConfig(rawConfig: any) {
-  const fileName = "./dist/config.json";
-  console.log("emiting " + colors.green(fileName));
-  await fsAsync.writeFile(fileName, JSON.stringify(rawConfig));
-}
-
 async function buildData(entry: string) {
-  const entryPoint = "./data/" + entry;
+  const entryPoint = path.join("data", entry);
 
   // lets get the actual location of the item, lets assume first
   // it is the given location
@@ -191,12 +167,12 @@ async function buildData(entry: string) {
 
   checkRoot(resultJSON);
 
-  if (!await checkExists("./dist")) {
-    await fsAsync.mkdir("./dist");
+  if (!await checkExists("dist")) {
+    await fsAsync.mkdir("dist");
   }
 
-  if (!await checkExists("./dist/data")) {
-    await fsAsync.mkdir("./dist/data");
+  if (!await checkExists(path.join("dist", "data"))) {
+    await fsAsync.mkdir(path.join("dist", "data"));
   }
 
   const allLangData = await buildLang(
@@ -204,9 +180,9 @@ async function buildData(entry: string) {
     actualLocation,
     traceback.newTraceToBit("lang"),
   );
-  console.log("emiting " + colors.green("./dist/data/lang.json"));
+  console.log("emiting " + colors.green(path.join("dist", "data", "lang.json")));
   await fsAsync.writeFile(
-    "./dist/data/lang.json",
+    path.join("dist", "data", "lang.json"),
     JSON.stringify(clearLang(allLangData)),
   );
 
@@ -219,7 +195,7 @@ async function buildData(entry: string) {
       root: resultingBuild,
       i18n: allLangData.locales[sl],
     };
-    const fileName = `./dist/data/build.${sl}.json`;
+    const fileName = path.join("dist", "data", `build.${sl}.json`);
     console.log("emiting " + colors.green(fileName));
     await fsAsync.writeFile(
       fileName,
@@ -228,65 +204,12 @@ async function buildData(entry: string) {
   }));
 
   const graphql: string = buildGraphQLSchema(resultJSON);
-  const gqlFileName = "./dist/data/build.gql";
+  const gqlFileName = path.join("dist", "data", "build.gql");
   console.log("emiting " + colors.green(gqlFileName));
   await fsAsync.writeFile(
     gqlFileName,
     graphql,
   );
-}
-
-/**
- * Build the core language data that holds information
- * about the language itself and other localizables
- * @param supportedLanguages the array of supported languages
- * @param actualRootLocation the root location that sets these languages
- * @param traceback the traceback in the location
- */
-async function buildLang(
-  supportedLanguages: string[],
-  actualRootLocation: string,
-  traceback: Traceback,
-): Promise<ILocaleLangDataType> {
-  const languageFileLocation = actualRootLocation
-    .replace(".json", ".properties");
-
-  await checkExists(
-    languageFileLocation,
-    traceback,
-  );
-
-  const properties = PropertiesReader(languageFileLocation).path();
-  const result: ILocaleLangDataType = {
-    locales: {},
-  };
-
-  // and start to loop
-  supportedLanguages.forEach((locale, index) => {
-    const internalTraceback = traceback.newTraceToBit(index);
-
-    if (!properties[locale]) {
-      throw new CheckUpError(
-        "File does not include language data for '" + locale + "'",
-        internalTraceback,
-      );
-    }
-
-    result.locales[locale] = {};
-
-    LOCALE_I18N.forEach((property) => {
-      if (!properties[locale][property]) {
-        throw new CheckUpError(
-          "File does not include data for '" + locale + "' in '" + property + "'",
-          internalTraceback,
-        );
-      }
-
-      result.locales[locale][property] = properties[locale][property];
-    });
-  });
-
-  return result;
 }
 
 /**

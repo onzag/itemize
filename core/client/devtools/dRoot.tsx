@@ -3,10 +3,10 @@ import Root from "../../base/Root";
 import DevToolModule from "./dModule";
 
 export default function DevToolRoot({
-  locale,
+  language,
   root,
 }: {
-  locale: string,
+  language: string,
   root: Root,
 }) {
   return (
@@ -17,7 +17,7 @@ export default function DevToolRoot({
         <DevToolModule
          key={childModule.getName()}
          module={childModule}
-         locale={locale}
+         language={language}
         />,
       )}
    </React.Fragment>

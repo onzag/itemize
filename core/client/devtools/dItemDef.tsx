@@ -7,7 +7,7 @@ import { getModulePath } from "./dModule";
 
 interface IItemDefProps {
   itemDef: ItemDefinition;
-  locale: string;
+  language: string;
   imported?: boolean;
 }
 
@@ -84,7 +84,7 @@ export default class DevToolItemDefinition extends
         >
           <b>{this.state.expanded ? "-" : "+"} </b>
           <b>{this.props.itemDef.getName()}</b>
-          <span> - {this.props.itemDef.getI18nNameFor(this.props.locale)}</span>
+          <span> - {this.props.itemDef.getI18nNameFor(this.props.language)}</span>
           <span> (item definition)</span>
         </p>
         {this.state.expanded ? <div style={devtoolsStyle.itemDefChildren}>
@@ -92,7 +92,7 @@ export default class DevToolItemDefinition extends
             return <DevToolItemDefinition
               key={childDefinition.getName()}
               itemDef={childDefinition}
-              locale={this.props.locale}
+              language={this.props.language}
               imported={true}
             />;
           })}
@@ -100,14 +100,14 @@ export default class DevToolItemDefinition extends
             return <DevToolItemDefinition
               key={childDefinition.getName()}
               itemDef={childDefinition}
-              locale={this.props.locale}
+              language={this.props.language}
             />;
           })}
           {this.props.itemDef.getAllPropertyDefinitions().map((propExtension) => {
             return <DevToolPropertyDefinition
               key={propExtension.getId()}
               property={propExtension}
-              locale={this.props.locale}
+              language={this.props.language}
             />;
           })}
           <DevToolRawVisualizer content={this.props.itemDef.rawData}/>
