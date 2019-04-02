@@ -7,7 +7,6 @@ export const MIN_SUPPORTED_INTEGER = -MAX_SUPPORTED_INTEGER;
 // Defines how many decimal points are supported, for the sake of usability
 // the number is set to a precision of 6
 export const MAX_DECIMAL_COUNT = 6;
-export const MAX_CURRENCY_DECIMAL_COUNT = 2;
 // Defines how big can decimal numbers get
 export const MAX_SUPPORTED_REAL = 999999999;
 // Defines how small can decimal numbers get
@@ -28,7 +27,8 @@ export const MAX_FILE_SIZE = 5242880; // equivalent to 5MB
 // This is for small use anywhere language data
 export const LOCALE_I18N = [
   "name",
-  "number_separator",
+  "number_decimal_separator",
+  "currency_format",
 
   // For quilljs editor
   "format_bold",

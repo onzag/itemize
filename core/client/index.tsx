@@ -4,6 +4,7 @@ import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import App from "./app";
 import "babel-polyfill";
+import PropertyDefinition from "../base/ItemDefinition/PropertyDefinition";
 
 (async () => {
   // TODO we need to fetch these based on location too if local storage cannot find
@@ -22,6 +23,8 @@ import "babel-polyfill";
     fetch(`/resource/countries.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
     fetch(`/resource/currency.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
   ]);
+
+  PropertyDefinition.currencyData = currencyData;
 
   ReactDOM.render(
     <BrowserRouter>

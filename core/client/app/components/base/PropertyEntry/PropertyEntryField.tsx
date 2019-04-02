@@ -5,6 +5,7 @@ import {
   PropertyDefinitionSupportedNumberType,
   PropertyDefinitionSupportedIntegerType,
   PropertyDefinitionSupportedYearType,
+  IPropertyDefinitionSupportedCurrencyType,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
 import TextField from "@material-ui/core/TextField";
 import {
@@ -25,10 +26,12 @@ import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import equals from "deep-equal";
 import { escapeStringRegexp } from "../../../../../util";
+import { MAX_DECIMAL_COUNT } from "../../../../../constants";
 
 interface IPropertyEntryFieldState {
   suggestions: IPropertyEntryAutocompleteSuggestion[];
   visible: boolean;
+  _materialUIBugRefresh: boolean;
 }
 
 interface IPropertyEntryAutocompleteSuggestion {
@@ -39,11 +42,30 @@ interface IPropertyEntryAutocompleteSuggestion {
     PropertyDefinitionSupportedYearType;
 }
 
+enum BaseType {
+  FLOAT,
+  INTEGER,
+  STRING,
+}
+
+function getBaseType(type: string): BaseType {
+  if (type === "number" || type === "currency") {
+    return BaseType.FLOAT;
+  } else if (type === "integer" || type === "year") {
+    return BaseType.INTEGER;
+  }
+  return BaseType.STRING;
+}
+
+function isNumeric(baseType: BaseType): boolean {
+  return baseType === BaseType.FLOAT || baseType === BaseType.INTEGER;
+}
+
 function formatValueAsString(type: string, numberSeparator: string, value: any) {
   if (value === null) {
     return "";
   }
-  if (type === "number") {
+  if (getBaseType(type) === BaseType.FLOAT) {
     return value.toString().replace(/\./g, numberSeparator);
   }
   return value.toString();
@@ -63,6 +85,8 @@ export default class PropertyEntryField
     this.state = {
       suggestions: [],
       visible: props.property.getType() !== "password",
+
+      _materialUIBugRefresh: false,
     };
 
     this.onChange = this.onChange.bind(this);
@@ -79,6 +103,52 @@ export default class PropertyEntryField
     this.toggleVisible = this.toggleVisible.bind(this);
   }
 
+  public componentDidUpdate(prevProps: IPropertyEntryProps) {
+    if (prevProps.currency !== this.props.currency && this.props.property.getType() === "currency") {
+      const value: IPropertyDefinitionSupportedCurrencyType =
+        this.props.value.value as IPropertyDefinitionSupportedCurrencyType;
+      if (value !== null) {
+        this.props.onChange({
+          value: value.value,
+          currency: this.props.currency.code,
+        },
+        // We do this replacement just in case anyway
+        // we know it only makes sense if the locale changed too
+        // from a language that uses different separators
+        // but it doesn't hurt if it's the same
+        this.props.value.internalValue.replace(
+          prevProps.i18n.number_decimal_separator,
+          this.props.i18n.number_decimal_separator,
+        ));
+      }
+    } else if (prevProps.i18n.number_decimal_separator !== this.props.i18n.number_decimal_separator) {
+      if (this.props.value.value !== null) {
+        this.props.onChange(
+          this.props.value.value,
+          this.props.value.internalValue.replace(
+            prevProps.i18n.number_decimal_separator,
+            this.props.i18n.number_decimal_separator,
+          ),
+        );
+      }
+    }
+
+    if (
+      this.props.property.getType() === "currency" &&
+      prevProps.i18n.currency_format !== this.props.i18n.currency_format
+    ) {
+      this.setState({
+        _materialUIBugRefresh: true,
+      });
+
+      setTimeout(() => {
+        this.setState({
+          _materialUIBugRefresh: false,
+        });
+      }, 30);
+    }
+  }
+
   public shouldComponentUpdate(
     nextProps: IPropertyEntryProps,
     nextState: IPropertyEntryFieldState,
@@ -88,7 +158,10 @@ export default class PropertyEntryField
       this.state.visible !== nextState.visible ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
-      nextProps.language !== this.props.language;
+      nextProps.language !== this.props.language ||
+      nextProps.i18n !== this.props.i18n ||
+      nextProps.currency !== this.props.currency ||
+      nextState._materialUIBugRefresh !== this.state._materialUIBugRefresh;
   }
 
   public toggleVisible() {
@@ -119,17 +192,18 @@ export default class PropertyEntryField
     }
 
     const type = this.props.property.getType();
-    if (!normalizedNumericValueAsString && type === "number" || type === "integer" || type === "year") {
+    const baseType = getBaseType(type);
+    if (isNumeric(baseType)) {
       normalizedNumericValueAsString = textualValue;
-      if (type === "number") {
-        const escapedNumberSeparator = escapeStringRegexp(this.props.i18n.number_separator);
+      if (baseType === BaseType.FLOAT) {
+        const escapedNumberSeparator = escapeStringRegexp(this.props.i18n.number_decimal_separator);
         normalizedNumericValueAsString = textualValue.replace(
           new RegExp(escapedNumberSeparator, "g"), ".");
         numericValue = parseFloat(normalizedNumericValueAsString);
-      } else if (type === "integer" || type === "year") {
+      } else if (baseType === BaseType.INTEGER) {
         numericValue = parseInt(normalizedNumericValueAsString, 10);
       }
-      textualValue = formatValueAsString(type, this.props.i18n.number_separator, textualValue);
+      textualValue = formatValueAsString(type, this.props.i18n.number_decimal_separator, textualValue);
     }
 
     if (autosuggestOverride) {
@@ -137,7 +211,7 @@ export default class PropertyEntryField
         if (this.props.property.isAutocompleteLocalized()) {
           return s.i18nValue === textualValue;
         } else {
-          if (type === "number" || type === "integer" || type === "year") {
+          if (isNumeric(baseType)) {
             return numericValue === s.value;
           }
           const normalizedValueAsString = (s.value === null ? "" : s.value.toString());
@@ -156,11 +230,11 @@ export default class PropertyEntryField
       }
     }
 
-    if (type === "number" || type === "integer" || type === "year") {
+    if (isNumeric(baseType)) {
       if (isNaN(numericValue)) {
         this.props.onChange(null, textualValue);
         return;
-      } else if (type === "integer" || type === "year") {
+      } else if (baseType === BaseType.INTEGER) {
         this.props.onChange(numericValue, textualValue);
         return;
       }
@@ -173,13 +247,22 @@ export default class PropertyEntryField
       const baseValue = normalizedNumericValueAsString.split(".")[0];
       const decimalValue = normalizedNumericValueAsString.split(".")[1] || "";
       const decimalCount = decimalValue.length;
-      const maxDecimalCount = this.props.property.getMaxDecimalCount();
+      // For some cases like in currency this value is null so set it up to max decimal count
+      // as a fallback
+      const maxDecimalCount = this.props.property.getMaxDecimalCount() || MAX_DECIMAL_COUNT;
 
       if (maxDecimalCount < decimalCount) {
         actualNumericValue = parseFloat(baseValue + "." + decimalValue.substr(0, maxDecimalCount + 1));
       }
 
-      this.props.onChange(actualNumericValue, textualValue);
+      if (type === "currency") {
+        this.props.onChange({
+          value: actualNumericValue,
+          currency: this.props.currency.code,
+        }, textualValue);
+      } else {
+        this.props.onChange(actualNumericValue, textualValue);
+      }
     } else {
       this.props.onChange(textualValue, textualValue);
     }
@@ -194,11 +277,15 @@ export default class PropertyEntryField
 
     const currentValue = this.props.value.internalValue !== null ?
       this.props.value.internalValue :
-      formatValueAsString(this.props.property.getType(), this.props.i18n.number_separator, this.props.value.value);
+      formatValueAsString(
+        this.props.property.getType(),
+        this.props.i18n.number_decimal_separator,
+        this.props.value.value,
+      );
 
     const type = this.props.property.getType();
-    if (type === "number" || type === "integer" || type === "year") {
-      const separators = "." + this.props.i18n.number_separator;
+    if (isNumeric(getBaseType(type))) {
+      const separators = "." + this.props.i18n.number_decimal_separator;
       const validKeys = "1234567890" + separators;
       const isBasicallyInteger = this.props.property.getMaxDecimalCount() === 0;
       if (separators.includes(e.key) && isBasicallyInteger) {
@@ -208,7 +295,7 @@ export default class PropertyEntryField
       } else if (
         separators.includes(e.key) && (
           currentValue.includes(".") ||
-          currentValue.includes(this.props.i18n.number_separator)
+          currentValue.includes(this.props.i18n.number_decimal_separator)
         )
       ) {
         e.preventDefault();
@@ -217,6 +304,10 @@ export default class PropertyEntryField
   }
 
   public render() {
+    if (this.state._materialUIBugRefresh) {
+      return null;
+    }
+
     if (this.props.property.hasSpecificValidValues()) {
       return this.renderSelectField();
     } else if (this.props.property.hasAutocomplete()) {
@@ -252,7 +343,11 @@ export default class PropertyEntryField
 
     const currentValue = this.props.value.value !== null ?
       this.props.value.value :
-      formatValueAsString(this.props.property.getType(), this.props.i18n.number_separator, this.props.value.value);
+      formatValueAsString(
+        this.props.property.getType(),
+        this.props.i18n.number_decimal_separator,
+        this.props.value.value,
+      );
 
     return (
       <div className="property-entry--container">
@@ -331,9 +426,10 @@ export default class PropertyEntryField
 
     let inputMode = "text";
     const type = this.props.property.getType();
-    if (type === "integer" || type === "year") {
+    const baseType = getBaseType(type);
+    if (baseType === BaseType.INTEGER) {
       inputMode = "numeric";
-    } else if (type === "number") {
+    } else if (baseType === BaseType.FLOAT) {
       inputMode = "decimal";
     }
 
@@ -371,36 +467,53 @@ export default class PropertyEntryField
         };
       }
     }
+    if (type === "password") {
+      appliedInputProps.endAdornment = (
+        <InputAdornment position="end">
+          <IconButton
+            classes={{root: "property-entry--field--button"}}
+            onClick={this.toggleVisible}
+          >
+            <Icon classes={{root: "property-entry--icon"}}>
+              {this.state.visible ? "visibility" : "visibility_off"}
+            </Icon>
+          </IconButton>
+        </InputAdornment>
+      );
 
-    const icon = type === "password" ?
-      (this.state.visible ? "visibility" : "visibility_off") :
-      this.props.property.getIcon();
-    const iconValue = icon ? (
-      <Icon classes={{root: "property-entry--icon"}}>
-        {icon}
-      </Icon>
-    ) : null;
-    const addornment = icon ? (
-      <InputAdornment position="end">
-        {
-          type === "password" ?
-          (
-            <IconButton
-              classes={{root: "property-entry--field--button"}}
-              onClick={this.toggleVisible}
-            >
-              {iconValue}
-            </IconButton>
-          ) :
-          iconValue
-        }
-      </InputAdornment>
-    ) : null;
+    } else if (type === "currency") {
+      const currencyFormat = this.props.i18n.currency_format;
+      if (currencyFormat === "N$") {
+        appliedInputProps.endAdornment = (
+          <InputAdornment position="end">
+            {this.props.currency.symbol}
+          </InputAdornment>
+        );
+      } else {
+        appliedInputProps.startAdornment = (
+          <InputAdornment position="start">
+            {this.props.currency.symbol}
+          </InputAdornment>
+        );
+      }
+    } else if (this.props.property.getIcon()) {
+      appliedInputProps.endAdornment = (
+        <InputAdornment position="end">
+          <Icon classes={{root: "property-entry--icon"}}>
+            {this.props.property.getIcon()}
+          </Icon>
+        </InputAdornment>
+      );
+    }
 
     const currentValue = textFieldProps &&  textFieldProps.value ? textFieldProps.value : (
       this.props.value.internalValue !== null ?
       this.props.value.internalValue :
-      formatValueAsString(this.props.property.getType(), this.props.i18n.number_separator, this.props.value.value)
+      formatValueAsString(
+        this.props.property.getType(),
+        this.props.i18n.number_decimal_separator,
+        this.props.value.value,
+      )
     );
 
     return (
@@ -420,7 +533,6 @@ export default class PropertyEntryField
               focused: "focused",
             },
             id: this.uuid,
-            endAdornment: addornment,
             ...appliedInputProps,
           }}
           InputLabelProps={{
@@ -460,7 +572,11 @@ export default class PropertyEntryField
   ) {
     const valueToMatch = this.props.property.isAutocompleteLocalized() ?
       suggestion.i18nValue :
-        (formatValueAsString(this.props.property.getType(), this.props.i18n.number_separator, suggestion.value));
+        (formatValueAsString(
+          this.props.property.getType(),
+          this.props.i18n.number_decimal_separator,
+          suggestion.value,
+        ));
     const matches = match(valueToMatch, params.query);
     const parts = parse(valueToMatch, matches);
 
@@ -490,7 +606,11 @@ export default class PropertyEntryField
   ) {
     return this.props.property.isAutocompleteLocalized() ?
       suggestion.i18nValue :
-        (formatValueAsString(this.props.property.getType(), this.props.i18n.number_separator, suggestion.value));
+        (formatValueAsString(
+          this.props.property.getType(),
+          this.props.i18n.number_decimal_separator,
+          suggestion.value,
+        ));
   }
 
   public onSuggestionsFetchRequested({value}) {
@@ -522,7 +642,11 @@ export default class PropertyEntryField
   public renderAutosuggestField() {
     const currentValue = this.props.value.internalValue !== null ?
       this.props.value.internalValue :
-      formatValueAsString(this.props.property.getType(), this.props.i18n.number_separator, this.props.value.value);
+      formatValueAsString(
+        this.props.property.getType(),
+        this.props.i18n.number_decimal_separator,
+        this.props.value.value,
+      );
 
     return (
       <Autosuggest

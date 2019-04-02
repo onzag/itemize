@@ -86,6 +86,16 @@
             "values": [1.0, 1.1, 1.2, 2.0],
             "nullable": true,
             "icon": "looks_one"
+        },
+
+        {
+            "id": "currency",
+            "type": "currency"
+        },
+        {
+            "id": "currency_nullable",
+            "type": "currency",
+            "nullable": true
         }
     ]
 }

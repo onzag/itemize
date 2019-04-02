@@ -2,7 +2,8 @@ import ItemDefinition from ".";
 import ConditionalRuleSet,
   { IConditionalRuleSetRawJSONDataType } from "./ConditionalRuleSet";
 import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
-  MAX_SUPPORTED_REAL, MAX_DECIMAL_COUNT,
+  MAX_SUPPORTED_REAL,
+  MAX_DECIMAL_COUNT,
   MAX_STRING_LENGTH,
   MAX_TEXT_LENGTH,
   REDUCED_BASE_I18N,
@@ -16,7 +17,6 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   MIN_SUPPORTED_REAL,
   MAX_SUPPORTED_YEAR,
   MIN_SUPPORTED_YEAR,
-  MAX_CURRENCY_DECIMAL_COUNT,
   MAX_RAW_TEXT_LENGTH,
   REDUCED_SEARCH_BASE_I18N,
 } from "../../constants";
@@ -112,6 +112,8 @@ export interface IPropertyDefinitionSupportedType {
   searchable: boolean;
   // the search interface used
   searchInterface?: PropertyDefinitionSearchInterfacesType;
+  // whether it supports icons or not
+  supportsIcons: boolean;
   // i18n supported and expected attributes
   // they won't be requested at all for hidden and not searchable items
   // if the item has a range it should be specified too
@@ -155,6 +157,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
     // the i18n attributes
+    supportsIcons: true,
     i18n: {
       base: REDUCED_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
@@ -185,6 +188,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // it is searchable by exact and range value
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    supportsIcons: true,
     // i18n attributes
     i18n: {
       base: CLASSIC_BASE_I18N,
@@ -227,6 +231,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     // i18n attributes required
+    supportsIcons: true,
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
@@ -244,6 +249,10 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
     // locations just contain this basic data
     validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
+      if (!PropertyDefinition.currencyData) {
+        throw new Error("Please ensure to set currency data on the class of property definition");
+      }
+
       if (typeof l.value !== "number" &&
         typeof l.currency !== "string") {
         return PropertyInvalidReason.UNSPECIFIED;
@@ -260,8 +269,13 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       }
 
       const splittedDecimals = l.value.toString().split(".");
+      const currencyData = (PropertyDefinition.currencyData as any)[l.currency];
+      const currencyDefinitionDecimals = currencyData.decimals;
       if (!splittedDecimals[1] ||
-        splittedDecimals[1].length <= MAX_CURRENCY_DECIMAL_COUNT) {
+        splittedDecimals[1].length <= currencyDefinitionDecimals) {
+        if (currencyData.rounding && !Number.isInteger((l.value * 10 ** 2) / (currencyData.rounding * 10 ** 2))) {
+          return PropertyInvalidReason.UNSPECIFIED;
+        }
         return null;
       }
 
@@ -271,10 +285,11 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // Similar to real
     max: MAX_SUPPORTED_REAL,
     min: MIN_SUPPORTED_REAL,
-    maxDecimalCount: MAX_CURRENCY_DECIMAL_COUNT,
     // it is searchable
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+
+    supportsIcons: true,
     // i18n attributes required
     i18n: {
       base: CLASSIC_BASE_I18N,
@@ -310,6 +325,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // it is searchable by an exact value, use text for organic things
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
+    supportsIcons: true,
     // i18n attributes required
     i18n: {
       base: CLASSIC_BASE_I18N,
@@ -333,6 +349,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
     maxLength: MAX_STRING_LENGTH,
     searchable: false,
+    supportsIcons: false,
     // i18n attributes required
     i18n: {
       base: CLASSIC_BASE_I18N,
@@ -357,6 +374,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // whether it is searchable or not
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.FTS,
+    supportsIcons: true,
     // i18n attributes
     i18n: {
       base: CLASSIC_BASE_I18N,
@@ -389,6 +407,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // searchable attributes and supports range
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    supportsIcons: true,
     // i18n data
     i18n: {
       base: CLASSIC_BASE_I18N,
@@ -404,6 +423,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     gql: "String",
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    supportsIcons: true,
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
@@ -418,6 +438,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     gql: "String",
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    supportsIcons: true,
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
@@ -449,6 +470,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // they are searchable
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE,
+    supportsIcons: true,
     // i18n with the distance attributes
     i18n: {
       base: REDUCED_BASE_I18N,
@@ -462,6 +484,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   images: {
     gql: "__PropertyType__Images",
     searchable: false,
+    supportsIcons: true,
     i18n: {
       base: REDUCED_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
@@ -471,6 +494,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   files: {
     gql: "__PropertyType__Files",
     searchable: false,
+    supportsIcons: true,
     i18n: {
       base: REDUCED_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
@@ -642,6 +666,7 @@ export default class PropertyDefinition {
   /**
    * Schema only available in development
    */
+  public static currencyData: null;
   public static schema: any;
   public static supportedTypesStandard =
     PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD;
@@ -1137,6 +1162,9 @@ export default class PropertyDefinition {
   }
 
   public getMaxDecimalCount() {
+    if (this.getType() === "currency") {
+      return null;
+    }
     return this.rawData.maxDecimalCount || this.getPropertyDefinitionDescription().maxDecimalCount || 0;
   }
 

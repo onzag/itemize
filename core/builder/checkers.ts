@@ -506,9 +506,9 @@ export function checkPropertyDefinition(
     );
   }
 
-  if (rawData.icon && rawData.type === "password") {
+  if (rawData.icon && !propertyDefintionTypeStandard.supportsIcons) {
     throw new CheckUpError(
-      "Passwords cannot have icons",
+      `type '${rawData.type}' cannot have icons`,
       traceback.newTraceToBit("icon"),
     );
   }

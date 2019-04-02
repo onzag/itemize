@@ -151,7 +151,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       await fetch(`/resource/build.${localeToSet}.json`)
       .then((r) => r.json());
 
-    localStorage.setItem("locale", localeToSet);
+    localStorage.setItem("lang", localeToSet);
 
     this.setState({
       specifiedData: newData,

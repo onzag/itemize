@@ -7,14 +7,12 @@ import React from "react";
 import PropertyEntryField from "./PropertyEntryField";
 import PropertyEntryBoolean from "./PropertyEntryBoolean";
 import PropertyEntryText from "./PropertyEntryText";
-import PropertyEntryCurrency from "./PropertyEntryCurrency";
-import PropertyEntryPassword from "./PropertyEntryPassword";
 import PropertyEntryDateTime from "./PropertyEntryDateTime";
 import PropertyEntryDate from "./PropertyEntryDate";
 import PropertyEntryLocation from "./PropertyEntryLocation";
 import PropertyEntryImage from "./PropertyEntryImage";
 import PropertyEntryFiles from "./PropertyEntryFiles";
-import { LocaleContext, Ii18NType } from "../../..";
+import { LocaleContext, Ii18NType, ICurrencyType } from "../../..";
 
 import "../../../../theme/property-entries.scss";
 
@@ -27,6 +25,7 @@ export interface IPropertyEntryBaseProps {
 
 export interface IPropertyEntryProps extends IPropertyEntryBaseProps {
   language: string;
+  currency: ICurrencyType;
   i18n: Ii18NType;
 }
 
@@ -40,7 +39,7 @@ const typeRegistry:
   number: PropertyEntryField,
   boolean: PropertyEntryBoolean,
   text: PropertyEntryText,
-  currency: PropertyEntryCurrency,
+  currency: PropertyEntryField,
   password: PropertyEntryField,
   year: PropertyEntryField,
   datetime: PropertyEntryDateTime,
@@ -78,6 +77,7 @@ export default function PropertyEntry(props: IPropertyEntryBaseProps) {
             {...props}
             language={locale.language}
             i18n={locale.i18n}
+            currency={locale.currencyData[locale.currency]}
           />
       }
     </LocaleContext.Consumer>

@@ -101,7 +101,7 @@ function strToGraphQLType(str: string, isRequired?: boolean, isInput?: boolean):
     type = fancyTranslationTypes[actualStr];
     if (type && isInput) {
       type = type.input;
-    } else if (!type && !isInput) {
+    } else if (type && !isInput) {
       type = type.output;
     }
   }
