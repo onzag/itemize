@@ -41,6 +41,7 @@ const fsAsync = fs.promises;
 // debugging and since the builder is a development file
 // it's ok this is here
 import "source-map-support/register";
+import { copyMomentFiles } from "./moment";
 
 if (process.env.NODE_ENV === "production") {
   throw new Error("This script cannot run in production mode");
@@ -210,6 +211,8 @@ async function buildData(entry: string) {
     gqlFileName,
     graphql,
   );
+
+  await copyMomentFiles(supportedLanguages);
 }
 
 /**
@@ -880,6 +883,10 @@ async function getI18nData(
 
     if (definition.supportedSubtypes && property.subtype) {
       errorRequiredProperties.push("error.INVALID_SUBTYPE_VALUE");
+    }
+
+    if (property.type === "date" || property.type === "datetime" || property.type === "time") {
+      errorRequiredProperties.push("error.INVALID_DATETIME");
     }
 
     if (typeof property.minLength !== "undefined" &&

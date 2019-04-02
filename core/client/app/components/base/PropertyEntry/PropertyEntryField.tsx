@@ -486,13 +486,13 @@ export default class PropertyEntryField
       if (currencyFormat === "N$") {
         appliedInputProps.endAdornment = (
           <InputAdornment position="end">
-            {this.props.currency.symbol}
+            <strong>{this.props.currency.symbol}</strong>
           </InputAdornment>
         );
       } else {
         appliedInputProps.startAdornment = (
           <InputAdornment position="start">
-            {this.props.currency.symbol}
+            <strong>{this.props.currency.symbol}</strong>
           </InputAdornment>
         );
       }

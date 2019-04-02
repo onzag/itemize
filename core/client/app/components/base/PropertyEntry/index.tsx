@@ -8,7 +8,6 @@ import PropertyEntryField from "./PropertyEntryField";
 import PropertyEntryBoolean from "./PropertyEntryBoolean";
 import PropertyEntryText from "./PropertyEntryText";
 import PropertyEntryDateTime from "./PropertyEntryDateTime";
-import PropertyEntryDate from "./PropertyEntryDate";
 import PropertyEntryLocation from "./PropertyEntryLocation";
 import PropertyEntryImage from "./PropertyEntryImage";
 import PropertyEntryFiles from "./PropertyEntryFiles";
@@ -43,7 +42,8 @@ const typeRegistry:
   password: PropertyEntryField,
   year: PropertyEntryField,
   datetime: PropertyEntryDateTime,
-  date: PropertyEntryDate,
+  date: PropertyEntryDateTime,
+  time: PropertyEntryDateTime,
   location: PropertyEntryLocation,
   images: PropertyEntryImage,
   files: PropertyEntryFiles,

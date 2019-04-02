@@ -96,6 +96,36 @@
             "id": "currency_nullable",
             "type": "currency",
             "nullable": true
+        },
+
+        {
+            "id": "date",
+            "type": "date"
+        },
+        {
+            "id": "date_nullable",
+            "type": "date",
+            "nullable": true
+        },
+
+        {
+            "id": "datetime",
+            "type": "datetime"
+        },
+        {
+            "id": "datetime_nullable",
+            "type": "datetime",
+            "nullable": true
+        },
+
+        {
+            "id": "time",
+            "type": "time"
+        },
+        {
+            "id": "time_nullable",
+            "type": "time",
+            "nullable": true
         }
     ]
 }

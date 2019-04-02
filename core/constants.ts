@@ -46,6 +46,9 @@ export const LOCALE_I18N = [
   "no",
   "unspecified",
   "any",
+
+  "cancel",
+  "ok",
 ];
 
 // ATTRIBUTES FOR i18N

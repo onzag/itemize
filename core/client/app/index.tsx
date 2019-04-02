@@ -6,6 +6,10 @@ import { createMuiTheme } from "@material-ui/core";
 import JssProvider from "react-jss/lib/JssProvider";
 import { create } from "jss";
 import { createGenerateClassName, jssPreset } from "@material-ui/core/styles";
+import { importScript } from "..";
+import Moment from "moment";
+import { MuiPickersUtilsProvider } from "material-ui-pickers";
+import MomentUtils from "@date-io/moment";
 
 const generateClassName = createGenerateClassName();
 const jss = create({
@@ -147,10 +151,15 @@ export default class App extends React.Component<IAppProps, IAppState> {
       localeIsUpdating: true,
     });
 
-    const newData: IBuildData =
-      await fetch(`/resource/build.${localeToSet}.json`)
-      .then((r) => r.json());
+    const [newData] =
+      await Promise.all([
+        fetch(`/resource/build.${localeToSet}.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
 
+        localeToSet !== "en" ?
+          importScript(`/resource/${localeToSet}.moment.js?version=${(window as any).BUILD_NUMBER}`) : null,
+      ]);
+
+    Moment.locale(localeToSet);
     localStorage.setItem("lang", localeToSet);
 
     this.setState({
@@ -226,9 +235,15 @@ export default class App extends React.Component<IAppProps, IAppState> {
         <MuiThemeProvider theme={theme}>
           <LocaleContext.Provider value={localeContextValue}>
             <DataContext.Provider value={dataContextValue}>
-              <h1>It works!</h1>
+              <MuiPickersUtilsProvider
+                utils={MomentUtils}
+                locale={this.state.specifiedLanguage}
+                moment={Moment}
+              >
+                <h1>It works!</h1>
 
-              {isDevelopment ? <DevTools/> : null}
+                {isDevelopment ? <DevTools/> : null}
+              </MuiPickersUtilsProvider>
             </DataContext.Provider>
           </LocaleContext.Provider>
         </MuiThemeProvider>

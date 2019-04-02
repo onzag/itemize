@@ -26,6 +26,7 @@ import * as fastHTMLParser from "fast-html-parser";
 export enum PropertyInvalidReason {
   UNSPECIFIED = "UNSPECIFIED",
   INVALID_VALUE = "INVALID_VALUE",
+  INVALID_DATETIME = "INVALID_DATETIME",
   TOO_LARGE = "TOO_LARGE",
   TOO_SMALL = "TOO_SMALL",
   TOO_MANY_DECIMALS = "TOO_MANY_DECIMALS",
@@ -47,8 +48,9 @@ export type PropertyDefinitionSupportedTypeName =
                       // images are stored separatedly which includes where in
                       // the text location they are.
   "year" |            // Represented as a number, comparable, stored as number
-  "date" |            // Represented as a number, comparable, stored as a date
-  "datetime" |        // Represented as a number, comparable, stored as a date
+  "date" |            // Represented as a date, comparable, stored as a date
+  "datetime" |        // Represented as a date, comparable, stored as a date
+  "time" |            // Represented as a date, comparable, stored as a date
   "location" |        // Represented as an object, non comparable, stored
                       // as two values
   "images" |          // Represented as a list of local urls, non comparable,
@@ -289,7 +291,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
 
-    supportsIcons: true,
+    supportsIcons: false,
     // i18n attributes required
     i18n: {
       base: CLASSIC_BASE_I18N,
@@ -418,12 +420,20 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
     },
   },
-  // TODO
   date: {
     gql: "String",
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
-    supportsIcons: true,
+    supportsIcons: false,
+    validate: (d: PropertyDefinitionSupportedDateType) => {
+      if (
+        d === "Invalid Date" ||
+        (new Date(d)).toJSON() === "Invalid Date"
+      ) {
+        return PropertyInvalidReason.INVALID_DATETIME;
+      }
+      return null;
+    },
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
@@ -433,12 +443,20 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
     },
   },
-  // TODO
   datetime: {
     gql: "String",
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
-    supportsIcons: true,
+    supportsIcons: false,
+    validate: (d: PropertyDefinitionSupportedDateType) => {
+      if (
+        d === "Invalid Date" ||
+        (new Date(d)).toJSON() === "Invalid Date"
+      ) {
+        return PropertyInvalidReason.INVALID_DATETIME;
+      }
+      return null;
+    },
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
@@ -448,6 +466,30 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
     },
   },
+  time: {
+    gql: "String",
+    searchable: true,
+    searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    supportsIcons: false,
+    validate: (d: PropertyDefinitionSupportedDateType) => {
+      if (
+        d === "Invalid Date" ||
+        (new Date(d)).toJSON() === "Invalid Date"
+      ) {
+        return PropertyInvalidReason.INVALID_DATETIME;
+      }
+      return null;
+    },
+    i18n: {
+      base: CLASSIC_BASE_I18N,
+      optional: CLASSIC_OPTIONAL_I18N,
+      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
+      searchRange: CLASSIC_SEARCH_RANGED_I18N,
+      searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
+    },
+  },
+
   location: {
     gql: "__PropertyType__Location",
     gqlDef: {
@@ -540,9 +582,11 @@ export type PropertyDefinitionSupportedPasswordType = string;
 export type PropertyDefinitionSupportedTextType = string;
 export type PropertyDefinitionSupportedYearType = number;
 // TODO
-export type PropertyDefinitionSupportedDateType = null;
-export type PropertyDefinitionSupportedDateTimeType = null;
+export type PropertyDefinitionSupportedDateType = string;
+export type PropertyDefinitionSupportedDateTimeType = string;
+export type PropertyDefinitionSupportedTimeType = string;
 export interface IPropertyDefinitionSupportedLocationType {
+  // Yes they are string to avoid floating point imprecisions
   lng: string;
   lat: string;
   txt?: string;
@@ -561,6 +605,7 @@ export type PropertyDefinitionSupportedType =
   PropertyDefinitionSupportedTextType |
   PropertyDefinitionSupportedDateType |
   PropertyDefinitionSupportedDateTimeType |
+  PropertyDefinitionSupportedTimeType |
   IPropertyDefinitionSupportedLocationType |
   PropertyDefinitionSupportedImagesType |
   PropertyDefinitionSupportedFilesType;

@@ -44,7 +44,7 @@ $property-entry-color-icon-focused: #303f9f;
   // We set the colors of errors when we are in this state
   // this part of the code is specific to fields
   // note how this is part of the same element, a entry is a field
-  &.property-entry--field {
+  &.property-entry--field, &.property-entry--date-time {
     // this basically sets up the border bottom color of the field
     // when it's in default mode, not focused, we use the clear color, lighter
     .property-entry--input::before {
