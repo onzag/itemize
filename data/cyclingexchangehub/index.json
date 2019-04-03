@@ -4,6 +4,5 @@
     "../__internal__/test",
     "../__internal__/users",
     "forum"
-  ],
-  "lang": ["en", "es"]
+  ]
 }

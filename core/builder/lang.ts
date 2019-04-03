@@ -20,6 +20,8 @@ export async function buildLang(
   const languageFileLocation = actualRootLocation
     .replace(".json", ".properties");
 
+  const internalTraceback = traceback.newTraceToLocation(languageFileLocation);
+
   await checkExists(
     languageFileLocation,
     traceback,
@@ -32,7 +34,6 @@ export async function buildLang(
 
   // and start to loop
   supportedLanguages.forEach((locale, index) => {
-    const internalTraceback = traceback.newTraceToBit(index);
 
     if (!properties[locale]) {
       throw new CheckUpError(

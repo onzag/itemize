@@ -1,5 +1,6 @@
 {
   "entry": "cyclingexchangehub",
   "appName": "Cycling Exchange Hub",
-  "port": 8080
+  "port": 8080,
+  "supportedLanguages": ["en", "es"]
 }

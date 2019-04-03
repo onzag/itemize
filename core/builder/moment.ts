@@ -5,9 +5,9 @@ import * as colors from "colors/safe";
 const fsAsync = fs.promises;
 
 export async function copyMomentFiles(
-  supportedLanguages: string[],
+  rawConfig: {supportedLanguages: string[]},
 ) {
-  await Promise.all(supportedLanguages.map((lang) => {
+  await Promise.all(rawConfig.supportedLanguages.map((lang) => {
     if (lang === "en") {
       return;
     }

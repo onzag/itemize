@@ -47,6 +47,7 @@
     "deep-equal": "^1.0.1",
     "fast-html-parser": "^1.0.1",
     "graphql": "^14.1.1",
+    "history": "^4.9.0",
     "install": "^0.12.2",
     "json-source-map": "^0.4.0",
     "material-ui-pickers": "^2.2.4",

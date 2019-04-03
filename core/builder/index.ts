@@ -59,7 +59,6 @@ export interface ILocaleLangDataType {
 interface IFileRootDataRawUntreatedJSONDataType {
   type: "root";
   includes: string[];
-  lang: string[];
   i18n: string;
 }
 
@@ -85,10 +84,11 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
       await fsAsync.readFile("./config.json", "utf8"),
     );
     await Promise.all([
-      buildData(rawDataConfig.entry),
+      buildData(rawDataConfig),
       buildConfig(rawDataConfig),
       buildHTML(rawDataConfig),
       buildJSONResources(rawDataConfig),
+      copyMomentFiles(rawDataConfig),
     ]);
   } catch (err) {
     if (err instanceof CheckUpError) {
@@ -98,7 +98,8 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   }
 })();
 
-async function buildData(entry: string) {
+async function buildData(rawData: any) {
+  const entry = rawData.entry;
   const entryPoint = path.join("data", entry);
 
   // lets get the actual location of the item, lets assume first
@@ -146,7 +147,7 @@ async function buildData(entry: string) {
   );
 
   // lets get the supported languages
-  const supportedLanguages = fileData.data.lang;
+  const supportedLanguages: string[] = rawData.supportedLanguages;
 
   // and make the result JSON
   const resultJSON: IRootRawJSONDataType = {
@@ -179,7 +180,7 @@ async function buildData(entry: string) {
   const allLangData = await buildLang(
     supportedLanguages,
     actualLocation,
-    traceback.newTraceToBit("lang"),
+    traceback,
   );
   console.log("emiting " + colors.green(path.join("dist", "data", "lang.json")));
   await fsAsync.writeFile(
@@ -211,8 +212,6 @@ async function buildData(entry: string) {
     gqlFileName,
     graphql,
   );
-
-  await copyMomentFiles(supportedLanguages);
 }
 
 /**

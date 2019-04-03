@@ -1,11 +1,14 @@
 import "./theme/base.scss";
 import ReactDOM from "react-dom";
 import React from "react";
-import { BrowserRouter } from "react-router-dom";
+import { Router } from "react-router-dom";
 import App from "./app";
 import "babel-polyfill";
 import PropertyDefinition from "../base/ItemDefinition/PropertyDefinition";
 import Moment from "moment";
+import { createBrowserHistory } from "history";
+
+export const history = createBrowserHistory();
 
 const importedSrcPool: string[] = [];
 export function importScript(src: string) {
@@ -26,16 +29,80 @@ export function importScript(src: string) {
 }
 
 (async () => {
-  // TODO we need to fetch these based on location too if local storage cannot find
-  // anything, by default user session token will be stored in local storage so these
-  // should be set, when logging out they are not removed
-  // TODO SEO also requires different urls, we are on local storage now
-  const storedLang = window.location.pathname.split("/")[1] || localStorage.getItem("lang");
+  const pathNameSplitted = window.location.pathname.split("/");
+  let urlLanguage = pathNameSplitted[1];
+
+  // The stored language takes priority over everything, it would in fact
+  // quick users out of urls in language that isn't stored
+  const storedLang = localStorage.getItem("lang");
   const storedCurrency = localStorage.getItem("currency");
   const storedCountry = localStorage.getItem("country");
-  const initialLang = storedLang || "en";
-  const initialCurrency = storedCurrency || "EUR";
-  const initialCountry = storedCountry || "FI";
+
+  if (storedLang && storedLang !== urlLanguage) {
+    console.info(
+      "stored locale and url language differ, setting url language from",
+      urlLanguage,
+      "to",
+      storedLang,
+    );
+
+    pathNameSplitted[1] = storedLang;
+    urlLanguage = storedLang;
+    const newPathName = pathNameSplitted.join("/");
+    history.replace(newPathName);
+  }
+
+  let guessedLang = null;
+  let guessedCountry = null;
+  let guessedCurrency = null;
+
+  // if any of these are missing we need to try to guess them
+  // we are trying to guess the preferred locale of the user
+  // even if it will not be the initial one
+  if (!storedLang || !storedCurrency || !storedCountry) {
+
+    console.info("stored locale is incomplete running a guess", storedLang, storedCountry, storedCurrency);
+    const previouslyGuessedData = localStorage.getItem("guessedData");
+
+    if (previouslyGuessedData) {
+      console.info("found previously guessed locale");
+    }
+
+    // We might have done this before
+    const guessedUserData = JSON.parse(
+      previouslyGuessedData ||
+      await fetch(`/util/country`).then((r) => r.text()),
+    );
+    localStorage.setItem("guessedData", JSON.stringify(guessedUserData));
+
+    console.info("guessed locale is", guessedUserData);
+
+    if (!(window as any).SUPPORTED_LANGUAGES.includes(guessedLang)) {
+      console.warn("guessed locale is not valid defaulting to english");
+      guessedLang = "en";
+    }
+
+    // Let's set the values
+    guessedLang = guessedUserData.language;
+    guessedCountry = guessedUserData.country;
+    guessedCurrency = guessedUserData.currency;
+
+    // if we have no url language we need to set it to the guessed value
+    if (!urlLanguage) {
+      console.info("using guessed value as lang setting");
+
+      urlLanguage = guessedLang;
+      pathNameSplitted[1] = guessedLang;
+      const newPathName = pathNameSplitted.join("/");
+      history.replace(newPathName);
+    }
+  }
+
+  // let's try now to set the initial locale, the initial language
+  // is always the url language
+  const initialLang = urlLanguage;
+  const initialCurrency = storedCurrency || guessedCurrency;
+  const initialCountry = storedCountry || guessedCountry;
 
   (window as any).moment = Moment;
 
@@ -53,7 +120,7 @@ export function importScript(src: string) {
   PropertyDefinition.currencyData = currencyData;
 
   ReactDOM.render(
-    <BrowserRouter>
+    <Router history={history}>
       <App
         initialData={initialData}
         localeData={localeData.locales}
@@ -62,9 +129,8 @@ export function importScript(src: string) {
 
         initialCurrency={initialCurrency}
         initialCountry={initialCountry}
-        initialLanguage={initialLang}
       />
-    </BrowserRouter>,
+    </Router>,
     document.getElementById("app"),
   );
 })();

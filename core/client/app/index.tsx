@@ -10,6 +10,8 @@ import { importScript } from "..";
 import Moment from "moment";
 import { MuiPickersUtilsProvider } from "material-ui-pickers";
 import MomentUtils from "@date-io/moment";
+import { Route } from "react-router";
+import { history } from "..";
 
 const generateClassName = createGenerateClassName();
 const jss = create({
@@ -83,7 +85,6 @@ export interface IBuildData {
 }
 
 interface IAppProps {
-  initialLanguage: string;
   initialData: IBuildData;
   initialCurrency: string;
   initialCountry: string;
@@ -94,7 +95,6 @@ interface IAppProps {
 }
 
 interface IAppState {
-  specifiedLanguage: string;
   specifiedCountry: string;
   specifiedCurrency: string;
   specifiedData: IBuildData;
@@ -117,7 +117,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
     super(props);
 
     this.state = {
-      specifiedLanguage: props.initialLanguage,
       specifiedCountry: props.initialCountry,
       specifiedCurrency: props.initialCurrency,
       localeIsUpdating: false,
@@ -128,6 +127,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     this.changeLanguageTo = this.changeLanguageTo.bind(this);
     this.changeCountryTo = this.changeCountryTo.bind(this);
     this.changeCurrencyTo = this.changeCurrencyTo.bind(this);
+    this.renderAppWithLocaleContext = this.renderAppWithLocaleContext.bind(this);
   }
   public hasLocaleDataFor(locale: string) {
     return !!this.props.localeData[locale];
@@ -143,7 +143,9 @@ export default class App extends React.Component<IAppProps, IAppState> {
       console.warn("Attempted to set to unavailable language locale " + locale + ", defaulted to english");
     }
 
-    if (localeToSet === this.state.specifiedLanguage) {
+    const pathNameSplitted = window.location.pathname.split("/");
+    const urlLanguage = pathNameSplitted[1];
+    if (localeToSet === urlLanguage) {
       return;
     }
 
@@ -162,10 +164,13 @@ export default class App extends React.Component<IAppProps, IAppState> {
     Moment.locale(localeToSet);
     localStorage.setItem("lang", localeToSet);
 
+    pathNameSplitted[1] = localeToSet;
+    const newPathName = pathNameSplitted.join("/");
+    history.push(newPathName);
+
     this.setState({
       specifiedData: newData,
       specifiedProcessedRoot: new Root(newData.root),
-      specifiedLanguage: localeToSet,
       localeIsUpdating: false,
     });
   }
@@ -208,13 +213,13 @@ export default class App extends React.Component<IAppProps, IAppState> {
       specifiedCurrency: codeToSet,
     });
   }
-  public render() {
+  public renderAppWithLocaleContext({ match }) {
     const localeContextValue: ILocaleType = {
       changeLanguageTo: this.changeLanguageTo,
       changeCountryTo: this.changeCountryTo,
       changeCurrencyTo: this.changeCurrencyTo,
 
-      language: this.state.specifiedLanguage,
+      language: match.params.lang,
       country: this.state.specifiedCountry,
       currency: this.state.specifiedCurrency,
 
@@ -226,6 +231,22 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
       i18n: this.state.specifiedData.i18n,
     };
+
+    return (
+      <LocaleContext.Provider value={localeContextValue}>
+        <MuiPickersUtilsProvider
+          utils={MomentUtils}
+          locale={match.lang}
+          moment={Moment}
+        >
+          <h1>It works!</h1>
+
+          {isDevelopment ? <DevTools /> : null}
+        </MuiPickersUtilsProvider>
+      </LocaleContext.Provider>
+    );
+  }
+  public render() {
     const dataContextValue: IDataType = {
       raw: this.state.specifiedData.root,
       value: this.state.specifiedProcessedRoot,
@@ -233,19 +254,12 @@ export default class App extends React.Component<IAppProps, IAppState> {
     return (
       <JssProvider jss={jss} generateClassName={generateClassName}>
         <MuiThemeProvider theme={theme}>
-          <LocaleContext.Provider value={localeContextValue}>
-            <DataContext.Provider value={dataContextValue}>
-              <MuiPickersUtilsProvider
-                utils={MomentUtils}
-                locale={this.state.specifiedLanguage}
-                moment={Moment}
-              >
-                <h1>It works!</h1>
-
-                {isDevelopment ? <DevTools/> : null}
-              </MuiPickersUtilsProvider>
-            </DataContext.Provider>
-          </LocaleContext.Provider>
+          <DataContext.Provider value={dataContextValue}>
+            <Route
+              path="/:lang/"
+              component={this.renderAppWithLocaleContext}
+            />
+          </DataContext.Provider>
         </MuiThemeProvider>
       </JssProvider>
     );

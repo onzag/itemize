@@ -15,7 +15,7 @@ export async function buildHTML(rawConfig: any) {
   Object.keys(rawConfig).forEach((key) => {
     baseHTML = baseHTML.replace(
       new RegExp(escapeStringRegexp("%{" + key + "}"), "g"),
-      rawConfig[key],
+      Array.isArray(rawConfig[key]) ? rawConfig[key].join(",") : rawConfig[key],
     );
   });
 
