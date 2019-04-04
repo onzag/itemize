@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
@@ -9,7 +10,8 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: "build.development.css",
       chunkFilename: "build.development.css"
-    })
+    }),
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js']

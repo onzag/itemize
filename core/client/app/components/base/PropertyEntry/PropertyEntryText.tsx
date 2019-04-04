@@ -2,7 +2,7 @@ import React from "react";
 import { IPropertyEntryProps, getClassName } from ".";
 import PropertyEntryField from "./PropertyEntryField";
 import { InputLabel, Icon, IconButton } from "@material-ui/core";
-import ReactQuill from "react-quill";
+import ReactQuill from "react-quill/dist/react-quill.min.js";
 import equals from "deep-equal";
 import Toolbar from "@material-ui/core/Toolbar";
 import uuid from "uuid";
