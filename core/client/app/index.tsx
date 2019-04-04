@@ -42,6 +42,8 @@ export interface ICountryType {
   languages: string[];
   emoji: string;
   emojiU: string;
+  longitude: number;
+  latitude: number;
 }
 
 export interface ICurrencyType {

@@ -44,7 +44,7 @@ $property-entry-color-icon-focused: #303f9f;
   // We set the colors of errors when we are in this state
   // this part of the code is specific to fields
   // note how this is part of the same element, a entry is a field
-  &.property-entry--field, &.property-entry--date-time {
+  &.property-entry--field, &.property-entry--date-time, &.property-entry--location {
     // this basically sets up the border bottom color of the field
     // when it's in default mode, not focused, we use the clear color, lighter
     .property-entry--input::before {
@@ -91,17 +91,31 @@ $property-entry-color-icon-focused: #303f9f;
 
 // this is special and it's actually outside of the property-entry itself, it becomes its parent
 // so it has to be outside here, they are containers after all
-.property-entry--field--autocomplete-container {
+.property-entry--field--autocomplete-container, .property-entry--location--autocomplete-container {
   position: relative;
   display: block;
   width: 100%;
 
-  .property-entry--field--autocomplete-suggestions-container {
+  .property-entry--field--autocomplete-suggestions-container, .property-entry--location--autocomplete-suggestions-container {
     position: absolute;
     display: block;
     width: 100%;
     top: calc(100% - #{$property-entry-error-height});
     z-index: 1000;
+  }
+}
+
+.property-entry--location--autocomplete-suggestion-menu-item {
+  height: auto;
+  padding-top: 4px;
+  padding-bottom: 8px;
+
+  .property-entry--location--autocomplete-suggestion-data {
+
+    .property-entry--location--autocomplete-suggestion-atxt {
+      font-size: 0.75rem;
+      line-height: 0.75rem;
+    }
   }
 }
 

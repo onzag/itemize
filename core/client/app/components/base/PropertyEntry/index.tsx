@@ -11,7 +11,7 @@ import PropertyEntryDateTime from "./PropertyEntryDateTime";
 import PropertyEntryLocation from "./PropertyEntryLocation";
 import PropertyEntryImage from "./PropertyEntryImage";
 import PropertyEntryFiles from "./PropertyEntryFiles";
-import { LocaleContext, Ii18NType, ICurrencyType } from "../../..";
+import { LocaleContext, Ii18NType, ICurrencyType, ICountryType } from "../../..";
 
 import "../../../../theme/property-entries.scss";
 
@@ -26,6 +26,7 @@ export interface IPropertyEntryProps extends IPropertyEntryBaseProps {
   language: string;
   currency: ICurrencyType;
   i18n: Ii18NType;
+  country: ICountryType;
 }
 
 const typeRegistry:
@@ -78,6 +79,7 @@ export default function PropertyEntry(props: IPropertyEntryBaseProps) {
             language={locale.language}
             i18n={locale.i18n}
             currency={locale.currencyData[locale.currency]}
+            country={locale.countryData[locale.country]}
           />
       }
     </LocaleContext.Consumer>

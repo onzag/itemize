@@ -80,9 +80,17 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
 // Now we execute this code asynchronously
 (async () => {
   try {
-    const rawDataConfig = JSON.parse(
-      await fsAsync.readFile("./config.json", "utf8"),
+    const rawDataConfigBase = JSON.parse(
+      await fsAsync.readFile("config.json", "utf8"),
     );
+    const rawDataConfigExtra = JSON.parse(await fsAsync.readFile(
+      path.join("config", "index.json"),
+      "utf8",
+    ));
+    const rawDataConfig = {
+      ...rawDataConfigBase,
+      ...rawDataConfigExtra,
+    };
     await Promise.all([
       buildData(rawDataConfig),
       buildConfig(rawDataConfig),
@@ -855,11 +863,6 @@ async function getI18nData(
       .concat((property.disableExactSearch || property.searchLevel === "disabled" ?
           [] : definition.i18n.searchOptional || [])
         .map((b) => ({key: b, required: false})))
-      // while we could make a rule for LOCATION_DISTANCE here
-      // there's a check at startup that guarantees that distance
-      // is only required if the type supports distance
-      .concat((definition.i18n.distance || [])
-        .map((b) => ({key: b, required: true})))
       // request for the values if supported
       .concat((property.values || [])
         .map((b) => ({

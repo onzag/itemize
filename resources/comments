@@ -2,6 +2,10 @@ Countries list origin:
 
 https://raw.githubusercontent.com/annexare/Countries/master/dist/countries.emoji.json
 
+Countries long and lat
+
+https://developers.google.com/public-data/docs/canonical/countries_csv
+
 Currencies list base
 
 https://gist.github.com/Fluidbyte/2973986

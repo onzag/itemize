@@ -13,12 +13,12 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
   CLASSIC_SEARCH_BASE_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N,
-  CLASSIC_DISTANCE_I18N,
   MIN_SUPPORTED_REAL,
   MAX_SUPPORTED_YEAR,
   MIN_SUPPORTED_YEAR,
   MAX_RAW_TEXT_LENGTH,
   REDUCED_SEARCH_BASE_I18N,
+  LOCATION_SEARCH_I18N,
 } from "../../constants";
 import Module, { OnStateChangeListenerType } from "../Module";
 import * as fastHTMLParser from "fast-html-parser";
@@ -128,9 +128,6 @@ export interface IPropertyDefinitionSupportedType {
     // nor if the searchLevel is disabled
     searchRange?: string[],
     searchRangeOptional?: string[],
-    // location type for search interface specific attributes
-    // not used if the searchInterface is not LOCATION_DISTANCE
-    distance?: string[],
     // not requested if the searchLevel is disabled
     searchBase?: string[],
     searchOptional?: string[],
@@ -495,14 +492,16 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     gqlDef: {
       lng: "Float!",
       lat: "Float!",
-      txt: "String",
+      txt: "String!",
+      atxt: "String",
     },
     // locations just contain this basic data
     validate: (l: IPropertyDefinitionSupportedLocationType) => {
       if (
-        typeof l.lat !== "string" ||
-        typeof l.lng !== "string" ||
-        typeof l.txt !== "string"
+        typeof l.lat !== "number" ||
+        typeof l.lng !== "number" ||
+        typeof l.txt !== "string" ||
+        (typeof l.atxt !== "string" && l.atxt !== null)
       ) {
         return PropertyInvalidReason.UNSPECIFIED;
       }
@@ -512,14 +511,13 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // they are searchable
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE,
-    supportsIcons: true,
+    supportsIcons: false,
     // i18n with the distance attributes
     i18n: {
-      base: REDUCED_BASE_I18N,
+      base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
-      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchBase: LOCATION_SEARCH_I18N,
       searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
-      distance: CLASSIC_DISTANCE_I18N,
     },
   },
   // TODO
@@ -561,11 +559,6 @@ Object.keys(PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD).forEach((propDefKey) =
       (!propDef.i18n.searchRange || !propDef.i18n.searchRangeOptional)) {
       throw new Error("Invalid propdef lacking ranged search " +
         "data while ranged searchable > " + propDefKey);
-    } else if (propDef.searchInterface ===
-      PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE &&
-      !propDef.i18n.distance) {
-      throw new Error("Invalid propdef lacking distance data while location > " +
-        propDefKey);
     }
   }
 });
@@ -586,10 +579,10 @@ export type PropertyDefinitionSupportedDateType = string;
 export type PropertyDefinitionSupportedDateTimeType = string;
 export type PropertyDefinitionSupportedTimeType = string;
 export interface IPropertyDefinitionSupportedLocationType {
-  // Yes they are string to avoid floating point imprecisions
-  lng: string;
-  lat: string;
-  txt?: string;
+  lng: number;
+  lat: number;
+  txt: string;
+  atxt: string;
 }
 // TODO
 export type PropertyDefinitionSupportedImagesType = null;

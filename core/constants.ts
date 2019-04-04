@@ -28,6 +28,7 @@ export const MAX_FILE_SIZE = 5242880; // equivalent to 5MB
 export const LOCALE_I18N = [
   "name",
   "number_decimal_separator",
+  "word_separator",
   "currency_format",
 
   // For quilljs editor
@@ -82,8 +83,11 @@ export const CLASSIC_SEARCH_RANGED_OPTIONAL_I18N = [
   "search.range.hint.from",
   "search.range.hint.to",
 ];
-export const CLASSIC_DISTANCE_I18N = [
-  "distance.label",
+export const LOCATION_SEARCH_I18N = [
+  "search.label",
+  "search.placeholder",
+  "search.distance.label",
+  "search.distance.placeholder",
 ];
 
 // INVALID RESERVED PROPERTY NAMES

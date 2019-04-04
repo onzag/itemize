@@ -12,6 +12,13 @@ the required data files, paste the content for your data in the `data`
 folder and the content for your config in the `config` folder make sure
 the entry is set in the `config.json` file entry property.
 
+You then need to create (or copy) a file at `/config/index.json` which
+should contain required API keys to make the project function, these are.
+
+ - `ipStackAccessKey` the access key for https://ipstack.com/ service
+ - `hereAppKey` a here maps app key
+ - `hereAppCode` a here maps app code
+
 This project already includes the data information in it, but does not
 include the config, config contains highly sensitive data that should
 not be commited to the server, JWT, user, passwords, certificates, etc.
@@ -38,6 +45,9 @@ When that is done you can serve via
 Now you can access the server via `http://localhost:8080` or whatever you
 are using as port, by default you get the production version, to get the
 development version you need to run in your javascript console
+
+You might need to set your `hosts` file propertly for access
+from the google places API, to use a hostname.
 
 `localStorage.setItem("__dev", true)`
 

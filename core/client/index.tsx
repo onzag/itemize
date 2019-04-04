@@ -77,15 +77,15 @@ export function importScript(src: string) {
 
     console.info("guessed locale is", guessedUserData);
 
-    if (!(window as any).SUPPORTED_LANGUAGES.includes(guessedLang)) {
-      console.warn("guessed locale is not valid defaulting to english");
-      guessedLang = "en";
-    }
-
     // Let's set the values
     guessedLang = guessedUserData.language;
     guessedCountry = guessedUserData.country;
     guessedCurrency = guessedUserData.currency;
+
+    if (!(window as any).SUPPORTED_LANGUAGES.includes(guessedLang)) {
+      console.warn("guessed locale is not valid defaulting to english");
+      guessedLang = "en";
+    }
 
     // if we have no url language we need to set it to the guessed value
     if (!urlLanguage) {

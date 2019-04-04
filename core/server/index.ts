@@ -7,6 +7,7 @@ const fsAsync = fs.promises;
 const app = express();
 let config: any = null;
 let countries: any = null;
+let index: string = null;
 
 app.use((req, res, next) => {
   res.removeHeader("X-Powered-By");
@@ -15,7 +16,7 @@ app.use((req, res, next) => {
 
 app.get("/util/country", (req, res) => {
   // Only occurs during development
-  res.setHeader("contentType", "application/json");
+  res.setHeader("content-type", "application/json; charset=utf-8");
 
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   if (ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1") {
@@ -57,17 +58,18 @@ app.get("/resource/:resource", (req, res) => {
 });
 
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname + "../../../data/index.html"));
+  res.setHeader("content-type", "text/html; charset=utf-8");
+  res.end(index);
 });
 
 (async () => {
-  config = JSON.parse(
-    await fsAsync.readFile("./dist/config.json", "utf8"),
-  );
-
-  countries = JSON.parse(
-    await fsAsync.readFile("./dist/data/countries.json", "utf8"),
-  );
+  [config, countries, index] = await Promise.all([
+    fsAsync.readFile("./dist/config.json", "utf8"),
+    fsAsync.readFile("./dist/data/countries.json", "utf8"),
+    fsAsync.readFile("./dist/data/index.html", "utf8"),
+  ]);
+  config = JSON.parse(config);
+  countries = JSON.parse(countries);
 
   http.createServer(app).listen(config.port, () => {
     console.log("listening at", config.port);

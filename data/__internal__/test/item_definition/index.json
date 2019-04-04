@@ -126,6 +126,16 @@
             "id": "time_nullable",
             "type": "time",
             "nullable": true
+        },
+
+        {
+            "id": "location",
+            "type": "location"
+        },
+        {
+            "id": "location_nullable",
+            "type": "location",
+            "nullable": true
         }
     ]
 }
