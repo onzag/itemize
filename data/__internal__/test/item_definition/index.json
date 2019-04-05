@@ -136,6 +136,18 @@
             "id": "location_nullable",
             "type": "location",
             "nullable": true
+        },
+
+        {
+            "id": "images",
+            "type": "images",
+            "icon": "photo"
+        },
+        {
+            "id": "images_nullable",
+            "type": "images",
+            "nullable": true,
+            "icon": "photo"
         }
     ]
 }

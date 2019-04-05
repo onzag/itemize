@@ -469,34 +469,44 @@ export function checkPropertyDefinition(
     );
   }
 
-  if (rawData.type !== "integer" && rawData.type !== "number" &&
-    rawData.type !== "currency" && typeof rawData.min !== "undefined") {
+  if (
+    typeof propertyDefintionTypeStandard.max === "undefined" &&
+    typeof rawData.min !== "undefined"
+  ) {
     throw new CheckUpError(
-      "Cannot set a min value if type not integer or number",
+      "Cannot set a min value",
       traceback.newTraceToBit("min"),
     );
-  } else if (rawData.type !== "integer" && rawData.type !== "number" &&
-    rawData.type !== "currency" && typeof rawData.max !== "undefined") {
+  } else if (
+    typeof propertyDefintionTypeStandard.max === "undefined" &&
+    typeof rawData.max !== "undefined"
+  ) {
     throw new CheckUpError(
-      "Cannot set a max value if type not integer or number",
+      "Cannot set a max value",
       traceback.newTraceToBit("max"),
     );
-  } else if (rawData.type !== "number" && rawData.type !== "currency" &&
-    typeof rawData.maxDecimalCount !== "undefined") {
+  } else if (
+    typeof propertyDefintionTypeStandard.maxDecimalCount === "undefined" &&
+    typeof rawData.maxDecimalCount !== "undefined"
+  ) {
     throw new CheckUpError(
-      "Cannot set a maxDecimalCount value if type not number",
+      "Cannot set a maxDecimalCount ",
       traceback.newTraceToBit("maxDecimalCount"),
     );
-  } else if (rawData.type !== "string" && rawData.type !== "text" &&
-    typeof rawData.minLength !== "undefined") {
+  } else if (
+    typeof propertyDefintionTypeStandard.maxLength === "undefined" &&
+    typeof rawData.minLength !== "undefined"
+  ) {
     throw new CheckUpError(
-      "Cannot set a minLength value if type not text or string",
+      "Cannot set a minLength value",
       traceback.newTraceToBit("minLength"),
     );
-  } else if (rawData.type !== "string" && rawData.type !== "text" &&
-    typeof rawData.maxLength !== "undefined") {
+  } else if (
+    typeof propertyDefintionTypeStandard.maxLength === "undefined" &&
+    typeof rawData.maxLength !== "undefined"
+  ) {
     throw new CheckUpError(
-      "Cannot set a maxLength value if type not text or string",
+      "Cannot set a maxLength value",
       traceback.newTraceToBit("maxLength"),
     );
   } else if (typeof rawData.richText !== "undefined" && rawData.type !== "text") {

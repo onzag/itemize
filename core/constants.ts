@@ -23,6 +23,8 @@ export const MAX_RAW_TEXT_LENGTH = 100000;
 export const MAX_TEXT_LENGTH = MAX_STRING_LENGTH;
 // The max file size (for either images and binary files)
 export const MAX_FILE_SIZE = 5242880; // equivalent to 5MB
+export const MAX_FILE_BATCH_COUNT = 25; // how many files can be uploaded at once max
+export const MAX_TOTAL_STORED_FILES = MAX_FILE_SIZE * 100; // how many bytes the user can store
 
 // This is for small use anywhere language data
 export const LOCALE_I18N = [

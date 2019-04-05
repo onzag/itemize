@@ -9,7 +9,6 @@ import PropertyEntryBoolean from "./PropertyEntryBoolean";
 import PropertyEntryText from "./PropertyEntryText";
 import PropertyEntryDateTime from "./PropertyEntryDateTime";
 import PropertyEntryLocation from "./PropertyEntryLocation";
-import PropertyEntryImage from "./PropertyEntryImage";
 import PropertyEntryFiles from "./PropertyEntryFiles";
 import { LocaleContext, Ii18NType, ICurrencyType, ICountryType } from "../../..";
 
@@ -46,7 +45,7 @@ const typeRegistry:
   date: PropertyEntryDateTime,
   time: PropertyEntryDateTime,
   location: PropertyEntryLocation,
-  images: PropertyEntryImage,
+  images: PropertyEntryFiles,
   files: PropertyEntryFiles,
 };
 

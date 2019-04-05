@@ -94,15 +94,23 @@ function strToGraphQLType(str: string, isRequired?: boolean, isInput?: boolean):
     // remove the ! if it was in there
     actualStr = str.substr(0, str.length - 1);
   }
-  // let's get the type
-  let type = translationTypes[actualStr];
-  if (!type) {
-    // if we dont find anything it could be because it's a fancy type
-    type = fancyTranslationTypes[actualStr];
-    if (type && isInput) {
-      type = type.input;
-    } else if (type && !isInput) {
-      type = type.output;
+
+  let type;
+  if (actualStr.endsWith("]") && actualStr.startsWith("[")) {
+    type = new GraphQLList(
+      strToGraphQLType(actualStr.substr(1, str.length - 2), false, isInput).type
+    );
+  } else {
+    // let's get the type
+    type = translationTypes[actualStr];
+    if (!type) {
+      // if we dont find anything it could be because it's a fancy type
+      type = fancyTranslationTypes[actualStr];
+      if (type && isInput) {
+        type = type.input;
+      } else if (type && !isInput) {
+        type = type.output;
+      }
     }
   }
   // Otherwise let's throw an error

@@ -19,6 +19,7 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   MAX_RAW_TEXT_LENGTH,
   REDUCED_SEARCH_BASE_I18N,
   LOCATION_SEARCH_I18N,
+  MAX_FILE_BATCH_COUNT,
 } from "../../constants";
 import Module, { OnStateChangeListenerType } from "../Module";
 import * as fastHTMLParser from "fast-html-parser";
@@ -53,9 +54,9 @@ export type PropertyDefinitionSupportedTypeName =
   "time" |            // Represented as a date, comparable, stored as a date
   "location" |        // Represented as an object, non comparable, stored
                       // as two values
-  "images" |          // Represented as a list of local urls, non comparable,
+  "images" |          // Represented as a list of urls, non comparable,
                       // stored as a list of urls, a main image is allowed
-  "files";            // Represented as a list of local urls, non comparable,
+  "files";            // Represented as a list of urls, non comparable,
                       // stored as a list of urls
 
 export enum PropertyDefinitionSearchInterfacesType {
@@ -520,23 +521,61 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
     },
   },
-  // TODO
   images: {
-    gql: "__PropertyType__Images",
+    gql: "[String!]",
     searchable: false,
     supportsIcons: true,
+    maxLength: MAX_FILE_BATCH_COUNT,
+    validate: (l: PropertyDefinitionSupportedImagesType) => {
+      if (!Array.isArray(l) || l.some((v) => typeof v !== "string")) {
+        return PropertyInvalidReason.UNSPECIFIED;
+      }
+
+      if (l.length > MAX_FILE_BATCH_COUNT) {
+        return PropertyInvalidReason.TOO_LARGE;
+      }
+
+      if (l.toString().indexOf("blob:") === 0) {
+        return null;
+      }
+
+      if (l.toString().indexOf("/files/") === 0) {
+        return null;
+      }
+
+      return PropertyInvalidReason.UNSPECIFIED;
+    },
     i18n: {
-      base: REDUCED_BASE_I18N,
+      base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
     },
   },
-  // TODO
   files: {
-    gql: "__PropertyType__Files",
+    gql: "[String!]",
     searchable: false,
     supportsIcons: true,
+    maxLength: MAX_FILE_BATCH_COUNT,
+    validate: (l: PropertyDefinitionSupportedImagesType) => {
+      if (!Array.isArray(l) || l.some((v) => typeof v !== "string")) {
+        return PropertyInvalidReason.UNSPECIFIED;
+      }
+
+      if (l.length > MAX_FILE_BATCH_COUNT) {
+        return PropertyInvalidReason.TOO_LARGE;
+      }
+
+      if (l.toString().indexOf("blob:") === 0) {
+        return null;
+      }
+
+      if (l.toString().indexOf("/files/") === 0) {
+        return null;
+      }
+
+      return PropertyInvalidReason.UNSPECIFIED;
+    },
     i18n: {
-      base: REDUCED_BASE_I18N,
+      base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
     },
   },
@@ -574,7 +613,6 @@ export type PropertyDefinitionSupportedStringType = string;
 export type PropertyDefinitionSupportedPasswordType = string;
 export type PropertyDefinitionSupportedTextType = string;
 export type PropertyDefinitionSupportedYearType = number;
-// TODO
 export type PropertyDefinitionSupportedDateType = string;
 export type PropertyDefinitionSupportedDateTimeType = string;
 export type PropertyDefinitionSupportedTimeType = string;
@@ -584,9 +622,8 @@ export interface IPropertyDefinitionSupportedLocationType {
   txt: string;
   atxt: string;
 }
-// TODO
-export type PropertyDefinitionSupportedImagesType = null;
-export type PropertyDefinitionSupportedFilesType = null;
+export type PropertyDefinitionSupportedImagesType = string[];
+export type PropertyDefinitionSupportedFilesType = string[];
 
 export type PropertyDefinitionSupportedType =
   PropertyDefinitionSupportedBooleanType |
@@ -780,32 +817,34 @@ export default class PropertyDefinition {
       typeof propertyDefinitionRaw.maxLength !== "undefined" ||
       typeof propertyDefinitionRaw.minLength !== "undefined"
     ) {
-      let characterCount: number;
-      if (!propertyDefinitionRaw.richText) {
-        characterCount = (value as string).length;
+      let count: number;
+      if (Array.isArray(value)) {
+        count = value.length;
+      } else if (!propertyDefinitionRaw.richText) {
+        count = value.toString().length;
       } else if (propertyDefinitionRaw.richText && fastHTMLParser.parse) {
-        const dummyElement = fastHTMLParser.parse(value as string);
-        characterCount = dummyElement.text.length;
+        const dummyElement = fastHTMLParser.parse(value.toString());
+        count = dummyElement.text.length;
         if (dummyElement.querySelector(".ql-cursor")) {
-          characterCount--;
+          count--;
         }
       } else {
         const dummyElement = document.createElement("div");
-        dummyElement.innerHTML = value as string;
-        characterCount = dummyElement.innerText.length;
+        dummyElement.innerHTML = value.toString();
+        count = dummyElement.innerText.length;
         if (dummyElement.querySelector(".ql-cursor")) {
-          characterCount--;
+          count--;
         }
       }
 
       if (
         typeof propertyDefinitionRaw.maxLength !== "undefined" &&
-        characterCount > propertyDefinitionRaw.maxLength
+        count > propertyDefinitionRaw.maxLength
       ) {
         return PropertyInvalidReason.TOO_LARGE;
       } else if (
         typeof propertyDefinitionRaw.minLength !== "undefined" &&
-        characterCount < propertyDefinitionRaw.minLength
+        count < propertyDefinitionRaw.minLength
       ) {
         return PropertyInvalidReason.TOO_SMALL;
       }
