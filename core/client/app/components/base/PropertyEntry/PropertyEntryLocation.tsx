@@ -52,8 +52,9 @@ interface IViewport {
 interface IPropertyEntryLocationState {
   suggestions: IHereResult[];
   viewport: IViewport;
-  marked: boolean;
   searchResults: IHereResult[];
+  searchQuery: string;
+  searchCurrentlyMarkedValue: number;
 }
 
 function processSuggestion(wordSeparator: string, suggestion: IHereResult, overwriteTxt?: string) {
@@ -73,6 +74,8 @@ export default class PropertyEntryLocation
   private delaySuggestionFetch: NodeJS.Timeout;
   private lastSuggestionsValue: IHereResult[];
   private lastSuggestionsValueQ: string;
+  private lastSearchValue: IHereResult[];
+  private lastSearchValueQ: string;
 
   constructor(props: IPropertyEntryProps) {
     super(props);
@@ -83,8 +86,9 @@ export default class PropertyEntryLocation
         center: [props.country.latitude, props.country.longitude],
         zoom: 4,
       },
-      marked: false,
       searchResults: [],
+      searchQuery: null,
+      searchCurrentlyMarkedValue: null,
     };
 
     this.onChange = this.onChange.bind(this);
@@ -98,6 +102,8 @@ export default class PropertyEntryLocation
     this.getSuggestionValue = this.getSuggestionValue.bind(this);
     this.clearSuggestions = this.clearSuggestions.bind(this);
     this.search = this.search.bind(this);
+    this.swapLocation = this.swapLocation.bind(this);
+    this.onKeyPress = this.onKeyPress.bind(this);
   }
 
   public onChange(
@@ -120,11 +126,15 @@ export default class PropertyEntryLocation
           center: suggestionFound.position,
           zoom: 16,
         },
-        marked: true,
+        searchResults: [],
+        searchQuery: null,
+        searchCurrentlyMarkedValue: null,
       });
     } else {
       this.setState({
-        marked: false,
+        searchResults: [],
+        searchQuery: null,
+        searchCurrentlyMarkedValue: null,
       });
     }
   }
@@ -162,25 +172,29 @@ export default class PropertyEntryLocation
     const thisUpdateIdentifier = (new Date()).getTime();
     this.searchTakingPlace = thisUpdateIdentifier;
 
-    const data = await fetch(
+    const results: IHereResult[] = this.lastSearchValueQ === value ? this.lastSearchValue : (await fetch(
       `${url}?at=${countryLatitude},${countryLongitude}&q=${value}&app_id=${appId}&app_code=${appCode}`,
       options,
-    ).then((r) => r.json());
+    ).then((r) => r.json())).results.items.filter((r: IHereResult, index: number, arr: IHereResult[]) => {
+      return arr.findIndex((r2: IHereResult) => equals(r2.position, r.position)) === index;
+    });
 
     if (thisUpdateIdentifier === this.searchTakingPlace) {
-      const results: IHereResult[] = data.results.items;
+      this.lastSearchValue = results;
+      this.lastSearchValueQ = value;
+
       const foundSomething = results.length !== 0;
 
       if (!foundSomething) {
-        this.props.onChange(null, this.props.value.internalValue);
+        this.props.onChange(null, value);
       } else {
         this.props.onChange(
           processSuggestion(
             this.props.i18n.word_separator,
             results[0],
-            this.props.value.internalValue,
+            value,
           ),
-          this.props.value.internalValue,
+          value,
         );
       }
 
@@ -190,14 +204,60 @@ export default class PropertyEntryLocation
             center: results[0].position,
             zoom: 16,
           },
-          marked: true,
           searchResults: results,
+          searchQuery: value,
+          searchCurrentlyMarkedValue: 0,
         });
       } else {
         this.setState({
-          marked: false,
           searchResults: results,
+          searchQuery: value,
+          searchCurrentlyMarkedValue: null,
         });
+      }
+    }
+  }
+
+  public swapLocation() {
+    if (!this.state.searchResults.length) {
+      return;
+    }
+
+    let newSearchCurrentlyMarkedValue = this.state.searchCurrentlyMarkedValue + 1;
+    let newEndpointData: IHereResult = this.state.searchResults[newSearchCurrentlyMarkedValue];
+
+    if (!newEndpointData) {
+      newSearchCurrentlyMarkedValue = 0;
+      newEndpointData = this.state.searchResults[0];
+    }
+
+    this.props.onChange(
+      processSuggestion(
+        this.props.i18n.word_separator,
+        newEndpointData,
+        this.props.value.internalValue,
+      ),
+      this.props.value.internalValue,
+    );
+    this.setState({
+      viewport: {
+        center: newEndpointData.position,
+        zoom: 16,
+      },
+      searchCurrentlyMarkedValue: newSearchCurrentlyMarkedValue,
+    });
+  }
+
+  public onKeyPress(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      const swapAroundLocationsEnabled =
+        this.state.searchQuery === this.props.value.internalValue &&
+        this.state.searchResults.length > 1;
+
+      if (swapAroundLocationsEnabled) {
+        this.swapLocation();
+      } else {
+        this.search();
       }
     }
   }
@@ -218,15 +278,21 @@ export default class PropertyEntryLocation
         i18nInvalidReason = i18nData.error[invalidReason];
     }
 
+    const enableSwapAroundLocations =
+      this.state.searchQuery === this.props.value.internalValue &&
+      this.state.searchResults.length > 1;
+
     let appliedTextFieldProps: any = {};
     let appliedInputProps: any = {
       endAdornment: (
         <InputAdornment position="end">
           <IconButton
             classes={{root: "property-entry--location--button"}}
-            onClick={this.search}
+            onClick={enableSwapAroundLocations ? this.swapLocation : this.search}
           >
-            <Icon classes={{root: "property-entry--icon"}}>search</Icon>
+            <Icon classes={{root: "property-entry--icon"}}>
+              {enableSwapAroundLocations ? "swap_horiz" : "search"}
+            </Icon>
           </IconButton>
         </InputAdornment>
       ),
@@ -274,13 +340,14 @@ export default class PropertyEntryLocation
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
             />
-            {this.state.marked && currentLocationToMark ? <Marker position={currentLocationToMark}>
+            {currentLocationToMark ? <Marker position={currentLocationToMark}>
               <Popup>{currentLocationDataTxt}{currentLocationDataATxt ? <br/> : null}{currentLocationDataATxt}</Popup>
             </Marker> : null}
             {this.state.searchResults
               .filter((result) => !equals(currentLocationToMark, result.position))
               .map((result) => (
                 <Marker
+                  opacity={0.5}
                   key={result.id}
                   position={result.position}
                   onClick={this.onSearchMarkerClick.bind(this, result)}
@@ -290,7 +357,8 @@ export default class PropertyEntryLocation
         </div>
         <TextField
           fullWidth={true}
-          type="text"
+          type="search"
+          onKeyPress={this.onKeyPress}
           className={className}
           label={i18nLabel}
           onChange={this.onChange}
@@ -413,8 +481,20 @@ export default class PropertyEntryLocation
     }
   }
 
-  public onSearchMarkerClick(result: IHereResult, event) {
-    console.log(result, event);
+  public onSearchMarkerClick(result: IHereResult) {
+    const resultSearchIndex = this.state.searchResults.findIndex((r) => r.id === result.id);
+
+    this.props.onChange(
+      processSuggestion(this.props.i18n.word_separator, result, this.props.value.internalValue),
+      this.props.value.internalValue,
+    );
+    this.setState({
+      viewport: {
+        center: result.position,
+        zoom: 14,
+      },
+      searchCurrentlyMarkedValue: resultSearchIndex,
+    });
   }
 
   public clearSuggestions() {
