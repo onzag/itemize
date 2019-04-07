@@ -185,16 +185,31 @@ $property-entry-files-rejected-color-hover: #f44336;
   }
 
   .property-entry--files--placeholder {
-    width: 100%;
+    flex-grow: 2;
     display: block;
     text-align: center;
     font-size: 1rem;
     user-select: none;
     color: $property-entry-files-placeholder-color;
+    text-align: center;
+    border-radius: 25px;
+    border: dotted 2px #ccc;
+    padding: 25px 0;
+    margin: 0 25px;
+
+    &.property-entry--files--placeholder--rejecting {
+      border-color: $property-entry-files-rejected-color;
+    }
+
+    &.property-entry--files--placeholder--accepting {
+      border-color: $property-entry-files-image-color-hover;
+    }
   }
 
   .property-entry--files--file {
-    width: 125px;
+    &:not(.property-entry--files--file--is-image) {
+      width: 125px;
+    }
     padding: 25px 0;
     align-self: flex-start;
 
@@ -285,6 +300,34 @@ $property-entry-files-rejected-color-hover: #f44336;
 
     .property-entry--files--file--image img {
       box-shadow: 0 0 5px 2px $property-entry-files-rejected-color-hover;
+    }
+  }
+
+  &.property-entry--files-paper--single-file {
+    justify-content: center;
+
+    .property-entry--files--file {
+      padding-bottom: 55px;
+    }
+
+    .property-entry--files--file--image {
+      height: 200px;
+    }
+  }
+
+  .property-entry--files--button-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+
+    .property-entry--files--button {
+      flex-grow: 1;
+
+      .property-entry--files--button-icon {
+        margin-left: 0.75rem;
+      }
     }
   }
 }

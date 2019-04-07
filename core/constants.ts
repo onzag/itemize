@@ -62,11 +62,17 @@ export const LOCALE_I18N = [
 
   "file_uploader_placeholder_active",
   "image_uploader_placeholder_active",
+  "file_uploader_placeholder_active_single",
+  "image_uploader_placeholder_active_single",
   "file_uploader_invalid_type",
   "image_uploader_invalid_type",
   "file_uploader_file_too_big",
   "image_uploader_file_too_big",
   "file_uploader_byte_limit_exceed",
+  "file_uploader_select_file",
+  "image_uploader_select_file",
+  "file_uploader_delete_file",
+  "image_uploader_delete_file",
 ];
 
 // ATTRIBUTES FOR i18N

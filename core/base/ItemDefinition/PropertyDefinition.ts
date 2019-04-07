@@ -1239,6 +1239,19 @@ export default class PropertyDefinition {
     return this.rawData.type === "text" && this.rawData.subtype === "html";
   }
 
+  public getMaxLength() {
+    const defaultMaxLength = this.getPropertyDefinitionDescription().maxLength;
+    return typeof this.rawData.maxLength !== "undefined" ?
+      this.rawData.maxLength : (
+        typeof defaultMaxLength !== "undefined" ? defaultMaxLength : null
+      );
+  }
+
+  public getMinLength() {
+    return typeof this.rawData.minLength !== "undefined" ?
+      this.rawData.minLength : null;
+  }
+
   public getMaxDecimalCount() {
     // currency max decimal count is variable, we don't know
     if (this.getType() === "currency") {

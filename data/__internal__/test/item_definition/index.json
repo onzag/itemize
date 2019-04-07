@@ -148,6 +148,12 @@
             "type": "files",
             "nullable": true,
             "icon": "insert_drive_file"
+        },
+        {
+            "id": "files_single",
+            "type": "files",
+            "maxLength": 1,
+            "icon": "insert_drive_file"
         }
     ]
 }
