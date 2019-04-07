@@ -98,7 +98,7 @@ function strToGraphQLType(str: string, isRequired?: boolean, isInput?: boolean):
   let type;
   if (actualStr.endsWith("]") && actualStr.startsWith("[")) {
     type = new GraphQLList(
-      strToGraphQLType(actualStr.substr(1, str.length - 2), false, isInput).type
+      strToGraphQLType(actualStr.substr(1, str.length - 2), false, isInput).type,
     );
   } else {
     // let's get the type

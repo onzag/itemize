@@ -52,6 +52,9 @@ export const LOCALE_I18N = [
 
   "cancel",
   "ok",
+
+  "file_drag_and_drop_placeholder_active",
+  "image_drag_and_drop_placeholder_active",
 ];
 
 // ATTRIBUTES FOR i18N

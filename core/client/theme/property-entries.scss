@@ -4,6 +4,13 @@ $property-entry-color-default: #424242;
 $property-entry-color-error: #f44336;
 $property-entry-color-error-clear: #e57373;
 $property-entry-color-icon-focused: #303f9f;
+$property-entry-files-background-color: rgba(0, 0, 0, 0.09);
+$property-entry-files-placeholder-color: rgb(117, 117, 117);
+$property-entry-files-background-color-hover: rgba(0, 0, 0, 0.13);
+$property-entry-files-icon-color: #424242;
+$property-entry-files-icon-color-hover: #1a237e;
+$property-entry-files-image-color-hover: #42a5f5;
+$property-entry-files-delete-color-hover: #f44336;
 
 .property-entry--error {
   color: $property-entry-color-error-clear;
@@ -132,11 +139,113 @@ $property-entry-color-icon-focused: #303f9f;
   display: flex;
 }
 
-.property-entry--switch, .property-entry--radio .property-entry--label, .property-entry--rich-text .property-entry--label {
+.property-entry--switch,
+.property-entry--radio .property-entry--label,
+.property-entry--rich-text .property-entry--label,
+.property-entry--files .property-entry--label {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-direction: row;
   padding-right: 12px;
   width: 100%;
+}
+
+.property-entry--files-paper {
+  margin-top: 5px;
+  background-color: $property-entry-files-background-color;
+  width: 100%;
+  min-height: 200px;
+  height: auto;
+  align-items: center;
+  justify-content: flex-start;
+  display: flex;
+  cursor: pointer;
+  position: relative;
+  padding: 20px;
+  flex-wrap: wrap;
+
+  &:hover {
+    background-color: $property-entry-files-background-color-hover;
+  }
+
+  .property-entry--files--icon-add {
+    opacity: 0.1;
+    font-size: 100px;
+  }
+
+  .property-entry--files--placeholder {
+    width: 100%;
+    display: block;
+    text-align: center;
+    font-size: 1rem;
+    user-select: none;
+    color: $property-entry-files-placeholder-color;
+  }
+
+  .property-entry--files--file {
+    width: 125px;
+    padding: 25px 0;
+
+    .property-entry--files--file--icon, .property-entry--files--file--image {
+      height: 75px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+
+      .property-entry--files--file--icon-background {
+        font-size: 75px;
+        color: $property-entry-files-icon-color;
+      }
+
+      .property-entry--files--file--icon-filetype {
+        position: absolute;
+        color: white;
+        width: 100%;
+        font-size: 16px;
+        text-align: center;
+        padding: 0 40px;
+        bottom: 15px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .property-entry--files--file--delete {
+        top: -25px;
+        right: 0;
+        position: absolute;
+      }
+    }
+
+    .property-entry--files--file--image {
+      padding-top: 10px;
+      padding-bottom: 5px;
+
+      img {
+        height: 100%;
+        border-radius: 3px;
+      }
+    }
+
+    .property-entry--files--file--name {
+      width: 100%;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.75rem;
+    }
+  }
+
+  .property-entry--files--file:hover {
+    .property-entry--files--file--icon-background {
+      color: $property-entry-files-icon-color-hover;
+    }
+    .property-entry--files--file--delete {
+      color: $property-entry-files-delete-color-hover;
+    }
+    img {
+      box-shadow: 0 0 5px 2px $property-entry-files-image-color-hover;
+    }
+  }
 }
