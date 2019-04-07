@@ -139,15 +139,15 @@
         },
 
         {
-            "id": "images",
-            "type": "images",
-            "icon": "photo"
+            "id": "files",
+            "type": "files",
+            "icon": "insert_drive_file"
         },
         {
-            "id": "images_nullable",
-            "type": "images",
+            "id": "files_nullable",
+            "type": "files",
             "nullable": true,
-            "icon": "photo"
+            "icon": "insert_drive_file"
         }
     ]
 }

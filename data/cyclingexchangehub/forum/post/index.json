@@ -44,7 +44,7 @@
     {
       "id": "content",
       "type": "text",
-      "richText": true,
+      "subtype": "html",
       "minLength": 1
     }
   ]

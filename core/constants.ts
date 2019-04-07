@@ -17,14 +17,21 @@ export const MAX_SUPPORTED_YEAR = 3000;
 export const MIN_SUPPORTED_YEAR = 0;
 // Defines how many characters a string might have
 export const MAX_STRING_LENGTH = 10000;
-// Defines how many characters (yes characters) a rich text might have max
+// Defines how many characters (yes characters) a text might have max
+// please define maxLenght in the property itself for specific checking
+// this check is expensive so checking twice is not good
 export const MAX_RAW_TEXT_LENGTH = 100000;
-// How many characters (including HTML special characters) text might have
-export const MAX_TEXT_LENGTH = MAX_STRING_LENGTH;
 // The max file size (for either images and binary files)
-export const MAX_FILE_SIZE = 5242880; // equivalent to 5MB
+export const MAX_FILE_SIZE = 5000000; // equivalent to 5MB
 export const MAX_FILE_BATCH_COUNT = 25; // how many files can be uploaded at once max
 export const MAX_TOTAL_STORED_FILES = MAX_FILE_SIZE * 100; // how many bytes the user can store
+export const FILE_SUPPORTED_IMAGE_TYPES = [
+  "image/png",
+  "image/gif",
+  "image/jpeg",
+  "image/svg+xml",
+  "image/png",
+];
 
 // This is for small use anywhere language data
 export const LOCALE_I18N = [
@@ -53,8 +60,13 @@ export const LOCALE_I18N = [
   "cancel",
   "ok",
 
-  "file_drag_and_drop_placeholder_active",
-  "image_drag_and_drop_placeholder_active",
+  "file_uploader_placeholder_active",
+  "image_uploader_placeholder_active",
+  "file_uploader_invalid_type",
+  "image_uploader_invalid_type",
+  "file_uploader_file_too_big",
+  "image_uploader_file_too_big",
+  "file_uploader_byte_limit_exceed",
 ];
 
 // ATTRIBUTES FOR i18N

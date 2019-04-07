@@ -11,6 +11,8 @@ $property-entry-files-icon-color: #424242;
 $property-entry-files-icon-color-hover: #1a237e;
 $property-entry-files-image-color-hover: #42a5f5;
 $property-entry-files-delete-color-hover: #f44336;
+$property-entry-files-rejected-color: #e57373;
+$property-entry-files-rejected-color-hover: #f44336;
 
 .property-entry--error {
   color: $property-entry-color-error-clear;
@@ -76,10 +78,18 @@ $property-entry-files-delete-color-hover: #f44336;
     }
   }
 
-  &.property-entry--rich-text, &.property-entry--switch, &.property-entry--radio {
+  &.property-entry--rich-text, &.property-entry--switch, &.property-entry--radio, &.property-entry--files {
     .property-entry--label {
       color: $property-entry-color-error;
     }
+  }
+
+  .property-entry--files-paper {
+    border: solid 1px $property-entry-files-rejected-color;
+  }
+
+  .property-entry--files-paper:hover {
+    border: solid 1px $property-entry-files-rejected-color-hover;
   }
 
   // set the color of the icon if there is one
@@ -186,6 +196,7 @@ $property-entry-files-delete-color-hover: #f44336;
   .property-entry--files--file {
     width: 125px;
     padding: 25px 0;
+    align-self: flex-start;
 
     .property-entry--files--file--icon, .property-entry--files--file--image {
       height: 75px;
@@ -228,12 +239,16 @@ $property-entry-files-delete-color-hover: #f44336;
       }
     }
 
-    .property-entry--files--file--name {
+    .property-entry--files--file--name, .property-entry--files--file--size, .property-entry--files--file--rejected-reason {
       width: 100%;
       text-align: center;
       overflow: hidden;
       text-overflow: ellipsis;
       font-size: 0.75rem;
+    }
+
+    .property-entry--files--file--size {
+      opacity: 0.75;
     }
   }
 
@@ -246,6 +261,30 @@ $property-entry-files-delete-color-hover: #f44336;
     }
     img {
       box-shadow: 0 0 5px 2px $property-entry-files-image-color-hover;
+    }
+  }
+
+  .property-entry--files--file--rejected {
+    .property-entry--files--file--icon .property-entry--files--file--icon-background,
+    .property-entry--files--file--name, .property-entry--files--file--size,
+    .property-entry--files--file--rejected-reason {
+      color: $property-entry-files-rejected-color;
+    }
+
+    .property-entry--files--file--image img {
+      box-shadow: 0 0 5px 2px $property-entry-files-rejected-color;
+    }
+  }
+
+  .property-entry--files--file--rejected:hover {
+    .property-entry--files--file--icon .property-entry--files--file--icon-background,
+    .property-entry--files--file--name, .property-entry--files--file--size,
+    .property-entry--files--file--rejected-reason {
+      color: $property-entry-files-rejected-color-hover;
+    }
+
+    .property-entry--files--file--image img {
+      box-shadow: 0 0 5px 2px $property-entry-files-rejected-color-hover;
     }
   }
 }

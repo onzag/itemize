@@ -509,11 +509,6 @@ export function checkPropertyDefinition(
       "Cannot set a maxLength value",
       traceback.newTraceToBit("maxLength"),
     );
-  } else if (typeof rawData.richText !== "undefined" && rawData.type !== "text") {
-    throw new CheckUpError(
-      "Cannot set a richText if type not text",
-      traceback.newTraceToBit("richText"),
-    );
   }
 
   if (rawData.icon && !propertyDefintionTypeStandard.supportsIcons) {
@@ -521,6 +516,28 @@ export function checkPropertyDefinition(
       `type '${rawData.type}' cannot have icons`,
       traceback.newTraceToBit("icon"),
     );
+  }
+
+  if (propertyDefintionTypeStandard.specialProperties) {
+    propertyDefintionTypeStandard.specialProperties.forEach((property) => {
+      if (property.required && !rawData.specialProperties) {
+        throw new CheckUpError(
+          `type '${rawData.type}' requires specialProperties field for '${property.name}'`,
+          traceback,
+        );
+      } else if (property.required && !rawData.specialProperties[property.name]) {
+        throw new CheckUpError(
+          `type '${rawData.type}' requires special property '${property.name}'`,
+          traceback.newTraceToBit("specialProperties"),
+        );
+      } else if (rawData.specialProperties && rawData.specialProperties[property.name] &&
+        typeof rawData.specialProperties[name] !== property.type) {
+        throw new CheckUpError(
+          `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`,
+          traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),
+        );
+      }
+    });
   }
 
   // lets check that all the ones in values are valid

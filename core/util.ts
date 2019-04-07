@@ -79,3 +79,10 @@ export function mimeTypeToExtension(str: string) {
   return mimeExtensions[str] || str.split("/")[1] || "txt";
 }
 
+export function localeReplacer(str: string, ...args: any[]) {
+  let newStr = str;
+  args.forEach((arg, index) => {
+    newStr = newStr.replace(new RegExp(escapeStringRegexp("{" + index + "}"), "g"), arg);
+  });
+  return newStr;
+}

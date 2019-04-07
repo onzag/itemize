@@ -818,6 +818,13 @@ async function getI18nData(
   const properties = PropertiesReader(languageFileLocation).path();
   const definition = PropertyDefinition.supportedTypesStandard[property.type];
 
+  if (!definition) {
+    throw new CheckUpError(
+      `Unknown type '${property.type}'`,
+      traceback.newTraceToBit("type"),
+    );
+  }
+
   const localeFileTraceback =
     traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
 
@@ -896,9 +903,14 @@ async function getI18nData(
       errorRequiredProperties.push("error.TOO_SMALL");
     }
 
-    if (definition.maxDecimalCount &&
+    if (typeof definition.maxDecimalCount !== "undefined" &&
       !property.values && !property.autocompleteIsEnforced) {
       errorRequiredProperties.push("error.TOO_MANY_DECIMALS");
+    }
+
+    if (typeof property.minDecimalCount !== "undefined" &&
+      !property.values && !property.autocompleteIsEnforced) {
+      errorRequiredProperties.push("error.TOO_FEW_DECIMALS");
     }
 
     expectedProperties = expectedProperties.concat(errorRequiredProperties

@@ -45,7 +45,6 @@ const typeRegistry:
   date: PropertyEntryDateTime,
   time: PropertyEntryDateTime,
   location: PropertyEntryLocation,
-  images: PropertyEntryFiles,
   files: PropertyEntryFiles,
 };
 

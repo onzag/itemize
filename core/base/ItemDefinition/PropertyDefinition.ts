@@ -5,7 +5,6 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   MAX_SUPPORTED_REAL,
   MAX_DECIMAL_COUNT,
   MAX_STRING_LENGTH,
-  MAX_TEXT_LENGTH,
   REDUCED_BASE_I18N,
   CLASSIC_OPTIONAL_I18N,
   CLASSIC_BASE_I18N,
@@ -31,6 +30,7 @@ export enum PropertyInvalidReason {
   TOO_LARGE = "TOO_LARGE",
   TOO_SMALL = "TOO_SMALL",
   TOO_MANY_DECIMALS = "TOO_MANY_DECIMALS",
+  TOO_FEW_DECIMALS = "TOO_FEW_DECIMALS",
   NOT_NULLABLE = "NOT_NULLABLE",
   INVALID_SUBTYPE_VALUE = "INVALID_SUBTYPE_VALUE",
 }
@@ -54,8 +54,6 @@ export type PropertyDefinitionSupportedTypeName =
   "time" |            // Represented as a date, comparable, stored as a date
   "location" |        // Represented as an object, non comparable, stored
                       // as two values
-  "images" |          // Represented as a list of urls, non comparable,
-                      // stored as a list of urls, a main image is allowed
   "files";            // Represented as a list of urls, non comparable,
                       // stored as a list of urls
 
@@ -104,12 +102,19 @@ export interface IPropertyDefinitionSupportedType {
   // is valid,
   validate?: (value: PropertyDefinitionSupportedType, subtype?: string) => PropertyInvalidReason;
   // max valid, for numbers
+  // if you set a max the properties max and min will be available
+  // always set a max if your type supports such comparison
   max?: number;
   // min valid for numbers
   min?: number;
-  // max length for text and string and whatnot
+  // max length for text and string and whatnot, eg array types
+  // if you set a maxLenght, maxLenght and minLenght will be available
+  // always set a maxLeght if your type supports it
   maxLength?: number;
   // max decimal count
+  // basically only used for numeric floating point types
+  // if you set a maxDecimalCount, maxDecimalCount and minDecimalCount will
+  // be available
   maxDecimalCount?: number;
   // whether it is searchable or not
   searchable: boolean;
@@ -117,6 +122,12 @@ export interface IPropertyDefinitionSupportedType {
   searchInterface?: PropertyDefinitionSearchInterfacesType;
   // whether it supports icons or not
   supportsIcons: boolean;
+  // special attributes that might be added specific to that type
+  specialProperties?: Array<{
+    name: string;
+    type: "number" | "string" | "boolean",
+    required?: boolean;
+  }>;
   // i18n supported and expected attributes
   // they won't be requested at all for hidden and not searchable items
   // if the item has a range it should be specified too
@@ -359,18 +370,21 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   text: {
     gql: "String",
     nullableDefault: "",
+    supportedSubtypes: ["html"],
     // validates the text, texts don't support json value
-    validate: (s: PropertyDefinitionSupportedTextType) => {
+    validate: (s: PropertyDefinitionSupportedTextType, subtype?: string) => {
       if (typeof s !== "string") {
         return PropertyInvalidReason.UNSPECIFIED;
+
+      // NOTE how the html text lengh is not checked, even when it is possible
       } else if (s.length > MAX_RAW_TEXT_LENGTH) {
         return PropertyInvalidReason.TOO_LARGE;
       }
 
       return null;
     },
-    // the max length for the html
-    maxLength: MAX_TEXT_LENGTH,
+    // the max length for the text
+    maxLength: MAX_RAW_TEXT_LENGTH,
     // whether it is searchable or not
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.FTS,
@@ -521,41 +535,18 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
     },
   },
-  images: {
-    gql: "[String!]",
-    searchable: false,
-    supportsIcons: true,
-    maxLength: MAX_FILE_BATCH_COUNT,
-    validate: (l: PropertyDefinitionSupportedImagesType) => {
-      if (!Array.isArray(l) || l.some((v) => typeof v !== "string")) {
-        return PropertyInvalidReason.UNSPECIFIED;
-      }
-
-      if (l.length > MAX_FILE_BATCH_COUNT) {
-        return PropertyInvalidReason.TOO_LARGE;
-      }
-
-      if (l.toString().indexOf("blob:") === 0) {
-        return null;
-      }
-
-      if (l.toString().indexOf("/files/") === 0) {
-        return null;
-      }
-
-      return PropertyInvalidReason.UNSPECIFIED;
-    },
-    i18n: {
-      base: CLASSIC_BASE_I18N,
-      optional: CLASSIC_OPTIONAL_I18N,
-    },
-  },
   files: {
     gql: "[String!]",
     searchable: false,
     supportsIcons: true,
     maxLength: MAX_FILE_BATCH_COUNT,
-    validate: (l: PropertyDefinitionSupportedImagesType) => {
+    specialProperties: [
+      {
+        name: "accept",
+        type: "string",
+      },
+    ],
+    validate: (l: PropertyDefinitionSupportedFilesType) => {
       if (!Array.isArray(l) || l.some((v) => typeof v !== "string")) {
         return PropertyInvalidReason.UNSPECIFIED;
       }
@@ -622,7 +613,6 @@ export interface IPropertyDefinitionSupportedLocationType {
   txt: string;
   atxt: string;
 }
-export type PropertyDefinitionSupportedImagesType = string[];
 export type PropertyDefinitionSupportedFilesType = string[];
 
 export type PropertyDefinitionSupportedType =
@@ -637,7 +627,6 @@ export type PropertyDefinitionSupportedType =
   PropertyDefinitionSupportedDateTimeType |
   PropertyDefinitionSupportedTimeType |
   IPropertyDefinitionSupportedLocationType |
-  PropertyDefinitionSupportedImagesType |
   PropertyDefinitionSupportedFilesType;
 
 export interface IPropertyDefinitionRawJSONRuleDataType {
@@ -674,6 +663,7 @@ export interface IPropertyDefinitionRawJSONDataType {
   minLength?: number;
   maxLength?: number;
   maxDecimalCount?: number;
+  minDecimalCount?: number;
 
   // values for the property set
   values?: PropertyDefinitionSupportedType[];
@@ -713,8 +703,10 @@ export interface IPropertyDefinitionRawJSONDataType {
   // disable retrieval, property value is never retrieved
   // it can only be set or updated
   disableRetrieval?: boolean;
-  // Rich text support
-  richText?: boolean;
+  // Special properties
+  specialProperties: {
+    [key: string]: string | boolean | number;
+  };
 
   // some design elements
   icon?: string;
@@ -802,13 +794,21 @@ export default class PropertyDefinition {
     } else if (typeof propertyDefinitionRaw.minLength !== "undefined" &&
       (value as string).length < propertyDefinitionRaw.minLength) {
       return PropertyInvalidReason.TOO_SMALL;
-    } else if (typeof propertyDefinitionRaw.maxDecimalCount !== "number") {
+    } else if (typeof propertyDefinitionRaw.maxDecimalCount !== "undefined" ||
+      typeof propertyDefinitionRaw.minDecimalCount !== "undefined") {
       const splittedDecimals =
         ((value as IPropertyDefinitionSupportedCurrencyType).value || value)
         .toString().split(".");
-      if (splittedDecimals[1] &&
-        splittedDecimals[1].length > propertyDefinitionRaw.maxDecimalCount) {
-          return PropertyInvalidReason.TOO_MANY_DECIMALS;
+      if (
+        typeof propertyDefinitionRaw.maxDecimalCount !== "undefined" && splittedDecimals[1] &&
+        splittedDecimals[1].length > propertyDefinitionRaw.maxDecimalCount
+      ) {
+        return PropertyInvalidReason.TOO_MANY_DECIMALS;
+      } else if (
+        typeof propertyDefinitionRaw.minDecimalCount !== "undefined" &&
+        (splittedDecimals[1] || "").length < propertyDefinitionRaw.minDecimalCount
+      ) {
+        return PropertyInvalidReason.TOO_FEW_DECIMALS;
       }
     }
 
@@ -818,17 +818,18 @@ export default class PropertyDefinition {
       typeof propertyDefinitionRaw.minLength !== "undefined"
     ) {
       let count: number;
+      const isRichText = propertyDefinitionRaw.type === "text" && propertyDefinitionRaw.subtype === "html";
       if (Array.isArray(value)) {
         count = value.length;
-      } else if (!propertyDefinitionRaw.richText) {
+      } else if (!isRichText) {
         count = value.toString().length;
-      } else if (propertyDefinitionRaw.richText && fastHTMLParser.parse) {
+      } else if (isRichText && fastHTMLParser.parse) {
         const dummyElement = fastHTMLParser.parse(value.toString());
         count = dummyElement.text.length;
         if (dummyElement.querySelector(".ql-cursor")) {
           count--;
         }
-      } else {
+      } else if (isRichText) {
         const dummyElement = document.createElement("div");
         dummyElement.innerHTML = value.toString();
         count = dummyElement.innerText.length;
@@ -1235,14 +1236,30 @@ export default class PropertyDefinition {
   }
 
   public isRichText() {
-    return this.rawData.richText;
+    return this.rawData.type === "text" && this.rawData.subtype === "html";
   }
 
   public getMaxDecimalCount() {
+    // currency max decimal count is variable, we don't know
     if (this.getType() === "currency") {
       return null;
     }
     return this.rawData.maxDecimalCount || this.getPropertyDefinitionDescription().maxDecimalCount || 0;
+  }
+
+  public getMinDecimalCount() {
+    if (this.getType() === "currency") {
+      return null;
+    }
+    return this.rawData.minDecimalCount || 0;
+  }
+
+  public getSpecialProperty(name: string) {
+    if (!this.rawData.specialProperties) {
+      return null;
+    }
+
+    return typeof this.rawData.specialProperties[name] !== "undefined" ? this.rawData.specialProperties[name] : null;
   }
 
   public getIcon() {
@@ -1457,6 +1474,11 @@ if (process.env.NODE_ENV !== "production") {
       },
       richText: {
         type: "boolean",
+      },
+      specialProperties: {
+        type: "object",
+        properties: {},
+        additionalProperties: true,
       },
     },
     additionalProperties: false,
