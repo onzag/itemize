@@ -296,6 +296,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // Similar to real
     max: MAX_SUPPORTED_REAL,
     min: MIN_SUPPORTED_REAL,
+    maxDecimalCount: 6,
     // it is searchable
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
