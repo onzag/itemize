@@ -14,17 +14,17 @@ $property-entry-files-delete-color-hover: #f44336;
 $property-entry-files-rejected-color: #e57373;
 $property-entry-files-rejected-color-hover: #f44336;
 
-.property-entry--error {
+.property-entry-error {
   color: $property-entry-color-error-clear;
   height: $property-entry-error-height;
   font-size: $property-entry-error-font-height;
 }
 
-.property-entry--icon {
+.property-entry-icon {
   color: $property-entry-color-default;
 }
 
-.property-entry--input--menu-item-placeholder {
+.property-entry-input-menu-item-placeholder {
   // undebuggable style this is the only way to overwrite it
   // it can't be debugged any attempt to debug on why the placeholder is
   // gray will make it become white
@@ -34,13 +34,13 @@ $property-entry-files-rejected-color-hover: #f44336;
 .property-entry--field {
   width: 100%;
 
-  .property-entry--field--button {
+  .property-entry-field-button {
     border: solid 1px rgba(0, 0, 0, 0.1);
   }
 }
 
 .focused {
-  .property-entry--icon {
+  .property-entry-icon {
     color: $property-entry-color-icon-focused;
   }
 }
@@ -56,46 +56,46 @@ $property-entry-files-rejected-color-hover: #f44336;
   &.property-entry--field, &.property-entry--date-time, &.property-entry--location {
     // this basically sets up the border bottom color of the field
     // when it's in default mode, not focused, we use the clear color, lighter
-    .property-entry--input::before {
+    .property-entry-input::before {
       border-bottom-color: $property-entry-color-error-clear;
     }
 
     // this also sets the line of the border bottom color of the field
     // this is when it is focused, so we use a more punchy color
-    .property-entry--input::after,
-    .property-entry--input:hover:not(.disabled)::before {
+    .property-entry-input::after,
+    .property-entry-input:hover:not(.disabled)::before {
       border-bottom-color: $property-entry-color-error;
     }
 
     // this is for the label of the entry field when it's not focused
-    .property-entry--label {
+    .property-entry-label {
       color: $property-entry-color-error-clear;
     }
 
     // the same but when it's focused
-    .property-entry--label.focused {
+    .property-entry-label.focused {
       color: $property-entry-color-error;
     }
   }
 
   &.property-entry--rich-text, &.property-entry--switch, &.property-entry--radio, &.property-entry--files {
-    .property-entry--label {
+    .property-entry-label {
       color: $property-entry-color-error;
     }
   }
 
-  .property-entry--files-paper {
+  .property-entry-files-paper {
     border: solid 1px $property-entry-files-rejected-color;
   }
 
-  .property-entry--files-paper:hover {
+  .property-entry-files-paper:hover {
     border: solid 1px $property-entry-files-rejected-color-hover;
   }
 
   // set the color of the icon if there is one
   // the icon keeps the strong color regardless on
   // it being focused or not
-  .property-entry--icon {
+  .property-entry-icon {
     color: $property-entry-color-error;
   }
 }
@@ -108,12 +108,12 @@ $property-entry-files-rejected-color-hover: #f44336;
 
 // this is special and it's actually outside of the property-entry itself, it becomes its parent
 // so it has to be outside here, they are containers after all
-.property-entry--field--autocomplete-container, .property-entry--location--autocomplete-container {
+.property-entry-field-autocomplete-container, .property-entry-location-autocomplete-container {
   position: relative;
   display: block;
   width: 100%;
 
-  .property-entry--field--autocomplete-suggestions-container, .property-entry--location--autocomplete-suggestions-container {
+  .property-entry-field-autocomplete-suggestions-container, .property-entry-location-autocomplete-suggestions-container {
     position: absolute;
     display: block;
     width: 100%;
@@ -122,22 +122,30 @@ $property-entry-files-rejected-color-hover: #f44336;
   }
 }
 
-.property-entry--location--autocomplete-suggestion-menu-item {
+.property-entry-location-autocomplete-suggestion-menu-item {
   height: auto;
   padding-top: 4px;
   padding-bottom: 8px;
 
-  .property-entry--location--autocomplete-suggestion-data {
+  .property-entry-location-autocomplete-suggestion-data {
 
-    .property-entry--location--autocomplete-suggestion-atxt {
+    .property-entry-location-autocomplete-suggestion-atxt {
       font-size: 0.75rem;
       line-height: 0.75rem;
     }
   }
 }
 
+.property-entry-location-atxt {
+  height: 1.5rem;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .property-entry--rich-text {
-  .property-entry--label {
+  .property-entry-label {
     display: flex;
     align-items: center;
     padding: 10px 0;
@@ -150,9 +158,9 @@ $property-entry-files-rejected-color-hover: #f44336;
 }
 
 .property-entry--switch,
-.property-entry--radio .property-entry--label,
-.property-entry--rich-text .property-entry--label,
-.property-entry--files .property-entry--label {
+.property-entry--radio .property-entry-label,
+.property-entry--rich-text .property-entry-label,
+.property-entry--files .property-entry-label {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -161,7 +169,7 @@ $property-entry-files-rejected-color-hover: #f44336;
   width: 100%;
 }
 
-.property-entry--files-paper {
+.property-entry-files-paper {
   margin-top: 5px;
   background-color: $property-entry-files-background-color;
   width: 100%;
@@ -179,12 +187,12 @@ $property-entry-files-rejected-color-hover: #f44336;
     background-color: $property-entry-files-background-color-hover;
   }
 
-  .property-entry--files--icon-add {
+  .property-entry-files-icon-add {
     opacity: 0.1;
     font-size: 100px;
   }
 
-  .property-entry--files--placeholder {
+  .property-entry-files-placeholder {
     flex-grow: 2;
     display: block;
     text-align: center;
@@ -197,35 +205,35 @@ $property-entry-files-rejected-color-hover: #f44336;
     padding: 25px 0;
     margin: 0 25px;
 
-    &.property-entry--files--placeholder--rejecting {
+    &.property-entry-files-placeholder--rejecting {
       border-color: $property-entry-files-rejected-color;
     }
 
-    &.property-entry--files--placeholder--accepting {
+    &.property-entry-files-placeholder--accepting {
       border-color: $property-entry-files-image-color-hover;
     }
   }
 
-  .property-entry--files--file {
-    &:not(.property-entry--files--file--is-image) {
+  .property-entry-files-file {
+    &:not(.property-entry-files-file--is-image) {
       width: 125px;
     }
     padding: 25px 0;
     align-self: flex-start;
 
-    .property-entry--files--file--icon, .property-entry--files--file--image {
+    .property-entry-files-file-icon, .property-entry-files-file-image {
       height: 75px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
 
-      .property-entry--files--file--icon-background {
+      .property-entry-files-file-icon-background {
         font-size: 75px;
         color: $property-entry-files-icon-color;
       }
 
-      .property-entry--files--file--icon-filetype {
+      .property-entry-files-file-icon-filetype {
         position: absolute;
         color: white;
         width: 100%;
@@ -237,14 +245,14 @@ $property-entry-files-rejected-color-hover: #f44336;
         text-overflow: ellipsis;
       }
 
-      .property-entry--files--file--delete {
+      .property-entry-files-file-delete {
         top: -25px;
         right: 0;
         position: absolute;
       }
     }
 
-    .property-entry--files--file--image {
+    .property-entry-files-file-image {
       padding-top: 10px;
       padding-bottom: 5px;
 
@@ -254,7 +262,7 @@ $property-entry-files-rejected-color-hover: #f44336;
       }
     }
 
-    .property-entry--files--file--name, .property-entry--files--file--size, .property-entry--files--file--rejected-reason {
+    .property-entry-files-file-name, .property-entry-files-file-size, .property-entry-files-file-rejected-reason {
       width: 100%;
       text-align: center;
       overflow: hidden;
@@ -262,16 +270,16 @@ $property-entry-files-rejected-color-hover: #f44336;
       font-size: 0.75rem;
     }
 
-    .property-entry--files--file--size {
+    .property-entry-files-file-size {
       opacity: 0.75;
     }
   }
 
-  .property-entry--files--file:hover {
-    .property-entry--files--file--icon-background {
+  .property-entry-files-file:hover {
+    .property-entry-files-file-icon-background {
       color: $property-entry-files-icon-color-hover;
     }
-    .property-entry--files--file--delete {
+    .property-entry-files-file-delete {
       color: $property-entry-files-delete-color-hover;
     }
     img {
@@ -279,53 +287,53 @@ $property-entry-files-rejected-color-hover: #f44336;
     }
   }
 
-  .property-entry--files--file--rejected {
-    .property-entry--files--file--icon .property-entry--files--file--icon-background,
-    .property-entry--files--file--name, .property-entry--files--file--size,
-    .property-entry--files--file--rejected-reason {
+  .property-entry-files-file--rejected {
+    .property-entry-files-file-icon .property-entry-files-file-icon-background,
+    .property-entry-files-file-name, .property-entry-files-file-size,
+    .property-entry-files-file-rejected-reason {
       color: $property-entry-files-rejected-color;
     }
 
-    .property-entry--files--file--image img {
+    .property-entry-files-file-image img {
       box-shadow: 0 0 5px 2px $property-entry-files-rejected-color;
     }
   }
 
-  .property-entry--files--file--rejected:hover {
-    .property-entry--files--file--icon .property-entry--files--file--icon-background,
-    .property-entry--files--file--name, .property-entry--files--file--size,
-    .property-entry--files--file--rejected-reason {
+  .property-entry-files-file--rejected:hover {
+    .property-entry-files-file-icon .property-entry-files-file-icon-background,
+    .property-entry-files-file-name, .property-entry-files-file-size,
+    .property-entry-files-file-rejected-reason {
       color: $property-entry-files-rejected-color-hover;
     }
 
-    .property-entry--files--file--image img {
+    .property-entry-files-file-image img {
       box-shadow: 0 0 5px 2px $property-entry-files-rejected-color-hover;
     }
   }
 
-  &.property-entry--files-paper--single-file {
+  &.property-entry-files-paper--single-file {
     justify-content: center;
 
-    .property-entry--files--file {
+    .property-entry-files-file {
       padding-bottom: 55px;
     }
 
-    .property-entry--files--file--image {
+    .property-entry-files-file-image {
       height: 200px;
     }
   }
 
-  .property-entry--files--button-container {
+  .property-entry-files-button-container {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     display: flex;
 
-    .property-entry--files--button {
+    .property-entry-files-button {
       flex-grow: 1;
 
-      .property-entry--files--button-icon {
+      .property-entry-files-button-icon {
         margin-left: 0.75rem;
       }
     }

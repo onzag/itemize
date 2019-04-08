@@ -4,28 +4,30 @@ import { FormControlLabel, Switch, Icon, FormLabel, FormControl, RadioGroup, Rad
 import { capitalize } from "../../../../../util";
 
 function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
+  // let's the get basic data for the entry
   const i18nData = props.property.getI18nDataFor(props.language);
   const className = getClassName(props, "switch", props.poked);
   const i18nLabel = i18nData && i18nData.label;
   const icon = props.property.getIcon();
   const iconComponent = icon ? (
-    <Icon classes={{root: "property-entry--icon"}}>{icon}</Icon>
+    <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
   ) : null;
 
+  // This is very basic and understandable
   return (
-    <div className="property-entry--container">
+    <div className="property-entry-container">
       <FormControl className={className}>
         <FormControlLabel
           aria-label={i18nLabel}
           classes={{
-            label: "property-entry--label",
+            label: "property-entry-label",
           }}
           control={
             <Switch
               checked={props.value.value as boolean || false}
               onChange={props.onChange.bind(null, !props.value.value, null)}
               classes={{
-                root: "property-entry--input",
+                root: "property-entry-input",
               }}
             />
           }
@@ -48,25 +50,29 @@ function handleOnChange(
 }
 
 function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
+  // Let's get the basic data
   const i18nData = props.property.getI18nDataFor(props.language);
   const className = getClassName(props, "radio", props.poked);
   const i18nLabel = i18nData && i18nData.label;
   const icon = props.property.getIcon();
   const iconComponent = icon ? (
-    <Icon classes={{root: "property-entry--icon"}}>{icon}</Icon>
+    <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
   ) : null;
+
+  // The class for every label component
   const fclClasses = {
-    label: "property-entry--label",
+    label: "property-entry-label",
   };
 
+  // return the fieldset
   return (
-    <div className="property-entry--container">
+    <div className="property-entry-container">
       <FormControl component={"fieldset" as any} className={className}>
         <FormLabel
           aria-label={i18nLabel}
           component={"legend" as any}
           classes={{
-            root: "property-entry--label",
+            root: "property-entry-label",
             focused: "focused",
           }}
         >
@@ -101,6 +107,9 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
 }
 
 export default function PropertyEntryBoolean(props: IPropertyEntryProps) {
+  // Booleans come in two types, one is the switch and the other
+  // is a radio, the switch works for basic true/false booleans
+  // whereas the radio works for true/false/null booleans
   if (!props.property.isNullable()) {
     return PropertyEntryBooleanAsSwitch(props);
   }

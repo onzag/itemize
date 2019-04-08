@@ -48,6 +48,12 @@ const typeRegistry:
   files: PropertyEntryFiles,
 };
 
+/**
+ * Provides the class name for a property entry
+ * @param props the properties of the property entry
+ * @param name the name that will be given
+ * @param poked whether it is being poked
+ */
 export function getClassName(props: IPropertyEntryBaseProps, name: string, poked?: boolean) {
   return `property-entry property-entry--${name} ${
     poked ? "property-entry--poked" : ""
@@ -67,7 +73,10 @@ export function getClassName(props: IPropertyEntryBaseProps, name: string, poked
 }
 
 export default function PropertyEntry(props: IPropertyEntryBaseProps) {
+  // First get the element by the type
   const Element = typeRegistry[props.property.getType()];
+
+  // Build the context and render sending the right props
   return (
     <LocaleContext.Consumer>
       {

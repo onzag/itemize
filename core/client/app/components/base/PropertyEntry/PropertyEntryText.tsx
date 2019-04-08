@@ -11,6 +11,7 @@ import { Ii18NType } from "../../..";
 import "react-quill/dist/quill.core.css";
 import "../../../../theme/quill.scss";
 
+// TODO implement missing toolbar functionality
 function RichTextEditorToolbar(props: {id: string, i18n: Ii18NType}) {
   return (
     <Toolbar id={props.id}>
@@ -89,27 +90,35 @@ interface IRichTextEditorState {
 }
 
 class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEditorState> {
+  // this one also gets an uuid
   private uuid: string;
   constructor(props: IPropertyEntryProps) {
     super(props);
 
+    // whether it is focused or not
     this.state = {
       focused: false,
     };
 
     this.uuid =  "uuid-" + uuid.v4();
 
+    // basic functions
     this.onChange = this.onChange.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
   }
   public shouldComponentUpdate(nextProps: IPropertyEntryProps, nextState: IRichTextEditorState) {
+    // we use this too
     return (
       nextState.focused !== this.state.focused ||
       !equals(nextProps.value, this.props.value)
     );
   }
   public onChange(value: string) {
+    // on change, these values are basically empty
+    // so we set to null, however in some circumstances
+    // they are unavoidable, use a value larger than 1 for min
+    // if the field is not nullable
     if (
       value === "<p><br></p>" ||
       value === "<p><span class=\"ql-cursor\">\ufeff</span></p>"
@@ -119,6 +128,7 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
     }
     this.props.onChange(value, null);
   }
+  // basically get the state onto its parent of the focus and blur
   public onFocus() {
     this.setState({
       focused: true,
@@ -130,15 +140,18 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
     });
   }
   public render() {
+    // this is the editor value
     const editorValue = this.props.value.value ?
       this.props.value.value as string :
       "";
 
+    // basic data
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
     const className = getClassName(this.props, "rich-text", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
 
+    // invalid reason
     const invalidReason = this.props.value.invalidReason;
     let i18nInvalidReason = null;
     if (
@@ -149,17 +162,19 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
+    // the icon as usual
     const icon = this.props.property.getIcon();
     const iconComponent = icon ? (
-      <Icon classes={{root: "property-entry--icon"}}>{icon}</Icon>
+      <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
     ) : null;
 
+    // we return the component, note how we set the thing to focused
     return (
-      <div className="property-entry--container">
+      <div className="property-entry-container">
         <div className={className + (this.state.focused ? " focused" : "")}>
           <InputLabel
             classes={{
-              root: "property-entry--label",
+              root: "property-entry-label",
               focused: "focused",
             }}
             focused={this.state.focused}
@@ -181,7 +196,7 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
             onBlur={this.onBlur}
           />
         </div>
-        <div className="property-entry--error">
+        <div className="property-entry-error">
           {i18nInvalidReason}
         </div>
       </div>
