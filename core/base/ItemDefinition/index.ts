@@ -1,7 +1,7 @@
 import ConditionalRuleSet from "./ConditionalRuleSet";
 import Item, { IItemRawJSONDataType, IItemGroupHandle } from "./Item";
 import PropertyDefinition,
-  { IPropertyDefinitionRawJSONDataType } from "./PropertyDefinition";
+  { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionValue } from "./PropertyDefinition";
 import Module, { IModuleRawJSONDataType, OnStateChangeListenerType } from "../Module";
 import PropertiesValueMappingDefiniton from "./PropertiesValueMappingDefiniton";
 
@@ -16,8 +16,17 @@ export interface IItemDefinitionRawJSONDataType {
 
   // Avilable after a build
   name: string;
-  i18nName: {
-    [locale: string]: string,
+  i18nData: {
+    [locale: string]: {
+      name: string;
+      createFormTitle: string;
+      searchFormTitle: string;
+      editFormTitle: string;
+      nameAlt?: string;
+      createFormTitleAlt?: string;
+      searchFormTitleAlt?: string;
+      editFormTitleAlt?: string;
+    },
   };
 
   // original data
@@ -29,6 +38,13 @@ export interface IItemDefinitionRawJSONDataType {
   // replacing imports, gotta be there even if empty
   importedChildDefinitions?: string[][];
   childDefinitions?: IItemDefinitionRawJSONDataType[];
+}
+
+export interface IItemDefinitionValue {
+  properties: Array<{
+    definition: PropertyDefinition,
+    value: IPropertyDefinitionValue,
+  }>;
 }
 
 /**
@@ -445,12 +461,12 @@ export default class ItemDefinition {
   }
 
   /**
-   * Provides the item definition item name
+   * Provides the item definition item locale data
    * @param  locale the locale in iso form
-   * @returns a string or null (if locale not valid)
+   * @returns an object or null (if locale not valid)
    */
-  public getI18nNameFor(locale: string) {
-    return this.rawData.i18nName[locale] || null;
+  public getI18nDataFor(locale: string) {
+    return this.rawData.i18nData[locale] || null;
   }
 
   public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {
@@ -493,8 +509,20 @@ export default class ItemDefinition {
    * TODO provides the structure of the current item
    * as it is currently
    */
-  public getStructure() {
-    return;
+  public getCurrentValue(): IItemDefinitionValue {
+    return {
+      properties: this.getAllPropertyDefinitions().sort((pd) => {
+        if (pd.isRare()) {
+          return 1;
+        }
+        return 0;
+      }).map((pd) => {
+        return {
+          definition: pd,
+          value: pd.getCurrentValue(),
+        };
+      }),
+    };
   }
 }
 

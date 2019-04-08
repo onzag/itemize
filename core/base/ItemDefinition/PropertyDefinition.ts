@@ -718,7 +718,7 @@ export interface IPropertyDefinitionRuleDataType {
   if: ConditionalRuleSet;
 }
 
-export interface IPropertyValueGetterType {
+export interface IPropertyDefinitionValue {
   userSet: boolean;
   default: boolean;
   enforced: boolean;
@@ -945,7 +945,7 @@ export default class PropertyDefinition {
    * provides the current useful value for the property defintion
    * @returns a bunch of information about the current value
    */
-  public getCurrentValue(): IPropertyValueGetterType {
+  public getCurrentValue(): IPropertyDefinitionValue {
     // make if hidden if null if hidden is set to true
     if (this.rawData.nullIfHidden && this.isCurrentlyHidden()) {
       return {

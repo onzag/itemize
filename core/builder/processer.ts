@@ -29,10 +29,10 @@ export function processItemDefinition(
   delete nRawData.raw;
 
   if (locale) {
-    nRawData.i18nName = {...nRawData.i18nName};
-    Object.keys(nRawData.i18nName).forEach((key) => {
+    nRawData.i18nData = {...nRawData.i18nData};
+    Object.keys(nRawData.i18nData).forEach((key) => {
       if (key !== locale) {
-        delete nRawData.i18nName[key];
+        delete nRawData.i18nData[key];
       }
     });
   }
@@ -121,10 +121,10 @@ export function processModule(
   delete nRawData.propExtRaw;
 
   if (locale) {
-    nRawData.i18nName = {...nRawData.i18nName};
-    Object.keys(nRawData.i18nName).forEach((key) => {
+    nRawData.i18nData = {...nRawData.i18nData};
+    Object.keys(nRawData.i18nData).forEach((key) => {
       if (key !== locale) {
-        delete nRawData.i18nName[key];
+        delete nRawData.i18nData[key];
       }
     });
   }

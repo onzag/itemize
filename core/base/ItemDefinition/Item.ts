@@ -427,7 +427,8 @@ export default class Item {
       return this.rawData.i18nName[locale] || null;
     }
 
-    return this.itemDefinition.getI18nNameFor(locale);
+    const parentItemDefinitionI18nData = this.itemDefinition.getI18nDataFor(locale);
+    return parentItemDefinitionI18nData && parentItemDefinitionI18nData.name;
   }
 
   public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {

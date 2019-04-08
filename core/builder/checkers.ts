@@ -716,7 +716,7 @@ export function checkModule(
          type: "item",
          name: rawData.name,
          location: rawData.location.replace(".json", ".propext.json"),
-         i18nName: {},
+         i18nData: {},
          properties: [],
         },
         rawData,

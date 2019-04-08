@@ -21,8 +21,13 @@ export interface IModuleRawJSONDataType {
 
   // Available after a build
   name: string;
-  i18nName: {
-    [locale: string]: string;
+  i18nData: {
+    [locale: string]: {
+      name: string;
+      searchFormTitle: string;
+      nameAlt?: string;
+      searchFormTitleAlt?: string;
+    },
   };
 
   // module data
@@ -273,12 +278,12 @@ export default class Module {
   }
 
   /**
-   * Provides the item definition item name
+   * Provides the module locale data
    * @param  locale the locale in iso form
-   * @returns a string or null (if locale not valid)
+   * @returns an object or null (if locale not valid)
    */
-  public getI18nNameFor(locale: string) {
-    return this.rawData.i18nName[locale] || null;
+  public getI18nDataFor(locale: string) {
+    return this.rawData.i18nData[locale] || null;
   }
 
   /**

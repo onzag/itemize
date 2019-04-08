@@ -42,6 +42,8 @@ const fsAsync = fs.promises;
 // it's ok this is here
 import "source-map-support/register";
 import { copyMomentFiles } from "./moment";
+import { ITEM_DEFINITION_I18N } from "../constants";
+import { MODULE_I18N } from "../constants";
 
 if (process.env.NODE_ENV === "production") {
   throw new Error("This script cannot run in production mode");
@@ -361,7 +363,8 @@ async function buildModule(
     actualLocation,
     traceback,
   );
-  const i18nName = await getI18nName(
+  const i18nData = await getI18nData(
+    true,
     supportedLanguages,
     actualLocation,
     traceback,
@@ -409,7 +412,7 @@ async function buildModule(
         internalFileData.data.map((pd, index) => {
           const specificPropertyTraceback =
             propExtTraceback.newTraceToBit(index);
-          return getI18nData(
+          return getI18nPropertyData(
             supportedLanguages,
             actualLocation,
             pd,
@@ -424,7 +427,7 @@ async function buildModule(
   const finalValue: IModuleRawJSONDataType = {
     type: "module",
     name: actualName,
-    i18nName,
+    i18nData: i18nData as any,
     location: actualLocation,
     pointers,
     raw,
@@ -476,7 +479,8 @@ async function buildItemDefinition(
     traceback,
   );
 
-  const i18nName = await getI18nName(
+  const i18nData = await getI18nData(
+    false,
     supportedLanguages,
     actualLocation,
     traceback,
@@ -522,7 +526,7 @@ async function buildItemDefinition(
   }
 
   const finalValue: IItemDefinitionRawJSONDataType = {
-    i18nName,
+    i18nData: i18nData as any,
     name: actualName,
     location: actualLocation,
     pointers,
@@ -561,7 +565,7 @@ async function buildItemDefinition(
       (finalValue.properties.map((pd, index) => {
         const specificPropertyTraceback =
           propertiesTraceback.newTraceToBit(index);
-        return getI18nData(
+        return getI18nPropertyData(
           supportedLanguages,
           actualLocation,
           pd,
@@ -648,7 +652,8 @@ async function buildItemDefinition(
  * @param actualLocation the location of the item we are working on
  * @returns the right structure for a i18nName attribute
  */
-async function getI18nName(
+async function getI18nData(
+  isModule: boolean,
   supportedLanguages: string[],
   actualLocation: string,
   traceback: Traceback,
@@ -662,12 +667,16 @@ async function getI18nName(
   );
 
   const properties = PropertiesReader(languageFileLocation).path();
-  const i18nName: {
-    [locale: string]: string,
+  const i18nData: {
+    [locale: string]: {
+      [key: string]: string,
+    },
   } = {};
 
   const localeFileTraceback =
     traceback.newTraceToLocation(languageFileLocation);
+
+  const requiredLocaleKeys = isModule ? MODULE_I18N : ITEM_DEFINITION_I18N;
 
   supportedLanguages.forEach((locale) => {
     if (!properties[locale]) {
@@ -675,16 +684,24 @@ async function getI18nName(
         "File does not include language data for locale " + locale,
         localeFileTraceback,
       );
-    } else if (typeof properties[locale].name !== "string") {
-      throw new CheckUpError(
-        "File does not have a name for " + locale,
-        localeFileTraceback,
-      );
     }
-    i18nName[locale] = properties[locale].name.trim();
+    i18nData[locale] = {};
+
+    requiredLocaleKeys.forEach((localeKey: string) => {
+      if (!properties[locale][localeKey]) {
+        throw new CheckUpError(
+          "File does not include language data for key '" + localeKey + "' for locale " + locale,
+          localeFileTraceback,
+        );
+      }
+      i18nData[locale][localeKey] = properties[locale][localeKey].trim();
+      if (i18nData[locale][localeKey + "Alt"]) {
+        i18nData[locale][localeKey + "Alt"] = properties[locale][localeKey + "Alt"].trim();
+      }
+    });
   });
 
-  return i18nName;
+  return i18nData;
 }
 
 /**
@@ -787,7 +804,7 @@ async function buildItemI18nName(
  * @param  property           the property itself
  * @returns                    the property itself
  */
-async function getI18nData(
+async function getI18nPropertyData(
   supportedLanguages: string[],
   actualLocation: string,
   property: IPropertyDefinitionRawJSONDataType,

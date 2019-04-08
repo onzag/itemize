@@ -1,6 +1,6 @@
 import PropertyDefinition, {
   PropertyDefinitionSupportedTypeName,
-  IPropertyValueGetterType,
+  IPropertyDefinitionValue,
   PropertyDefinitionSupportedType,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
 import React from "react";
@@ -16,7 +16,7 @@ import "../../../../theme/property-entries.scss";
 
 export interface IPropertyEntryBaseProps {
   property: PropertyDefinition;
-  value: IPropertyValueGetterType;
+  value: IPropertyDefinitionValue;
   onChange: (newValue: PropertyDefinitionSupportedType, internalValue: any) => void;
   poked?: boolean;
 }

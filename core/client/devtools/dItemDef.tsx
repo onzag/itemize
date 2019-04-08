@@ -84,7 +84,7 @@ export default class DevToolItemDefinition extends
         >
           <b>{this.state.expanded ? "-" : "+"} </b>
           <b>{this.props.itemDef.getName()}</b>
-          <span> - {this.props.itemDef.getI18nNameFor(this.props.language)}</span>
+          <span> - {this.props.itemDef.getI18nDataFor(this.props.language).name}</span>
           <span> (item definition)</span>
         </p>
         {this.state.expanded ? <div style={devtoolsStyle.itemDefChildren}>

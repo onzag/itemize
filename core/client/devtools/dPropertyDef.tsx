@@ -1,7 +1,7 @@
 import * as React from "react";
 import DevToolRawVisualizer from "./dRawVisualizer";
 import PropertyDefinition, {
-  IPropertyValueGetterType,
+  IPropertyDefinitionValue,
   PropertyDefinitionSupportedType,
 } from "../../base/ItemDefinition/PropertyDefinition";
 import PropertyEntry from "../app/components/base/PropertyEntry";
@@ -16,7 +16,7 @@ interface IPropertyDefState {
   expanded: boolean;
   searchMode: boolean;
   detachedPropertyInstance: PropertyDefinition;
-  currentValue: IPropertyValueGetterType;
+  currentValue: IPropertyDefinitionValue;
   poked: boolean;
 }
 

@@ -181,6 +181,7 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
     const className = getClassName(this.props, "date-time", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
+    const i18nDescription = i18nData && i18nData.description;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
 
     // invalid reason getting it up
@@ -319,6 +320,7 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
         <div className="property-entry-error">
           {i18nInvalidReason}
         </div>
+        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
       </div>
     );
   }

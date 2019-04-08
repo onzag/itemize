@@ -8,6 +8,7 @@ function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
   const i18nData = props.property.getI18nDataFor(props.language);
   const className = getClassName(props, "switch", props.poked);
   const i18nLabel = i18nData && i18nData.label;
+  const i18nDescription = i18nData && i18nData.description;
   const icon = props.property.getIcon();
   const iconComponent = icon ? (
     <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
@@ -35,6 +36,7 @@ function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
         />
         {iconComponent}
       </FormControl>
+      {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
     </div>
   );
 }
@@ -54,6 +56,7 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
   const i18nData = props.property.getI18nDataFor(props.language);
   const className = getClassName(props, "radio", props.poked);
   const i18nLabel = i18nData && i18nData.label;
+  const i18nDescription = i18nData && i18nData.description;
   const icon = props.property.getIcon();
   const iconComponent = icon ? (
     <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
@@ -102,6 +105,7 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
           />
         </RadioGroup>
       </FormControl>
+      {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
     </div>
   );
 }

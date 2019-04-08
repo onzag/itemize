@@ -70,7 +70,7 @@ export default class DevToolModule extends React.Component<IModuleProps, IModule
         <p onClick={this.toggleExpand} style={devtoolsStyle.moduleItemTitle}>
           <b>{this.state.expanded ? "-" : "+"} </b>
           <b>{this.props.module.getName()}</b>
-          <span> - {this.props.module.getI18nNameFor(this.props.language)}</span>
+          <span> - {this.props.module.getI18nDataFor(this.props.language).name}</span>
           <span> (module)</span>
         </p>
         {this.state.expanded ? <div style={devtoolsStyle.moduleChildren}>

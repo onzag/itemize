@@ -33,6 +33,18 @@ export const FILE_SUPPORTED_IMAGE_TYPES = [
   "image/png",
 ];
 
+export const MODULE_I18N = [
+  "name",
+  "searchFormTitle",
+];
+
+export const ITEM_DEFINITION_I18N = [
+  "name",
+  "searchFormTitle",
+  "createFormTitle",
+  "editFormTitle",
+]
+
 // This is for small use anywhere language data
 export const LOCALE_I18N = [
   "name",
@@ -75,7 +87,7 @@ export const LOCALE_I18N = [
   "image_uploader_delete_file",
 ];
 
-// ATTRIBUTES FOR i18N
+// ATTRIBUTES FOR i18N PROPERTIES
 export const CLASSIC_BASE_I18N = [
   "label",
   "placeholder",
@@ -91,10 +103,10 @@ export const REDUCED_SEARCH_BASE_I18N = [
   "search.label",
 ];
 export const CLASSIC_OPTIONAL_I18N = [
-  "hint",
+  "description",
 ];
 export const CLASSIC_SEARCH_OPTIONAL_I18N = [
-  "search.hint",
+  "search.description",
 ];
 export const CLASSIC_SEARCH_RANGED_I18N = [
   "search.range.from.label",
@@ -103,8 +115,8 @@ export const CLASSIC_SEARCH_RANGED_I18N = [
   "search.range.to.placeholder",
 ];
 export const CLASSIC_SEARCH_RANGED_OPTIONAL_I18N = [
-  "search.range.hint.from",
-  "search.range.hint.to",
+  "search.range.from.description",
+  "search.range.to.description",
 ];
 export const LOCATION_SEARCH_I18N = [
   "search.label",
