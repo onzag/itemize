@@ -5,7 +5,17 @@
             "id": "string_nullable",
             "type": "string",
             "default": "hello",
-            "nullable": true
+            "nullable": true,
+            "enforcedValues": [
+                {
+                    "value": null,
+                    "if": {
+                        "property": "propext_string",
+                        "comparator": "equals",
+                        "value": "hide"
+                    }
+                }
+            ]
         },
         {
             "id": "dependency_string",

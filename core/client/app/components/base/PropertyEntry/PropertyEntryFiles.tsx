@@ -282,6 +282,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
         >
           {i18nLabel}{iconComponent}
         </FormLabel>
+        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
         <Dropzone
           onDropAccepted={this.onDropAccepted}
           onDropRejected={this.onDropRejected}
@@ -437,7 +438,6 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
         <div className="property-entry-error">
           {i18nInvalidReason}
         </div>
-        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
       </div>
     );
   }

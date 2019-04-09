@@ -6,6 +6,7 @@ import PropertyDefinition, {
 } from "../../base/ItemDefinition/PropertyDefinition";
 import PropertyEntry from "../app/components/base/PropertyEntry";
 import { getItemDefPath } from "./dItemDef";
+import { getModulePath } from "./dModule";
 
 interface IPropertyDefProps {
   property: PropertyDefinition;
@@ -27,6 +28,7 @@ const devtoolsStyle: {
     width: "100%",
     backgroundColor: "#fff",
     marginTop: "2px",
+    color: "#000",
   },
   propertyDefTitle: {
     width: "100%",
@@ -45,6 +47,10 @@ const devtoolsStyle: {
 };
 
 export function getPropertyDefPath(propertyDef: PropertyDefinition): string {
+  if (propertyDef.checkIfIsExtension()) {
+    return getModulePath(propertyDef.getParentModule()) +
+      "__" + propertyDef.getId();
+  }
   return getItemDefPath(propertyDef.getParentItemDefinition()) +
     "__" + propertyDef.getId();
 }

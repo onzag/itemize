@@ -83,7 +83,8 @@ export function checkConditionalRuleSet(
     );
     if (invalidReason) {
       throw new CheckUpError(
-        "Conditional rule set value invalid, reason: " + invalidReason,
+        "Conditional rule set value invalid, reason " +
+          rawDataAsProperty.property + ": " + invalidReason,
         traceback.newTraceToBit("value"),
       );
     }

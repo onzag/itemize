@@ -511,12 +511,9 @@ export default class ItemDefinition {
    */
   public getCurrentValue(): IItemDefinitionValue {
     return {
-      properties: this.getAllPropertyDefinitions().sort((pd) => {
-        if (pd.isRare()) {
-          return 1;
-        }
-        return 0;
-      }).map((pd) => {
+      properties: this.getParentModule().getAllPropExtensions().concat(
+        this.getAllPropertyDefinitions(),
+      ).map((pd) => {
         return {
           definition: pd,
           value: pd.getCurrentValue(),

@@ -18,6 +18,7 @@ function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
   // This is very basic and understandable
   return (
     <div className="property-entry-container">
+      {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
       <FormControl className={className}>
         <FormControlLabel
           aria-label={i18nLabel}
@@ -38,7 +39,6 @@ function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
         />
         {iconComponent}
       </FormControl>
-      {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
     </div>
   );
 }
@@ -83,6 +83,7 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
         >
           {i18nLabel}{iconComponent}
         </FormLabel>
+        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
         <RadioGroup
           value={JSON.stringify(props.value.value)}
           onChange={handleOnChange.bind(this, props)}
@@ -110,7 +111,6 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
           />
         </RadioGroup>
       </FormControl>
-      {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
     </div>
   );
 }

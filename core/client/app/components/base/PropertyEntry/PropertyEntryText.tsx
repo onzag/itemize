@@ -184,6 +184,7 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
           >
             {i18nLabel}{iconComponent}
           </InputLabel>
+          {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
           <RichTextEditorToolbar id={this.uuid} i18n={this.props.i18n}/>
           <ReactQuill
             disabled={this.props.value.enforced}
@@ -203,7 +204,6 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
         <div className="property-entry-error">
           {i18nInvalidReason}
         </div>
-        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
       </div>
     );
   }

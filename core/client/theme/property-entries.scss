@@ -32,6 +32,7 @@ $property-entry-error-height: 1.3rem;
   position: relative;
   text-align: justify;
   font-size: 0.85rem;
+  padding-bottom: 10px;
 }
 
 .property-entry-input-menu-item-placeholder {
@@ -179,13 +180,15 @@ $property-entry-error-height: 1.3rem;
   width: 100%;
 }
 
-.property-entry-datetime-button,
-.property-entry-location-button {
-  background-color: $property-entry-icon-button-color;
-  color: $property-entry-icon-button-icon-color;
+:not(.property-entry--enforced) {
+  .property-entry-datetime-button,
+  .property-entry-location-button {
+    background-color: $property-entry-icon-button-color;
+    color: $property-entry-icon-button-icon-color;
 
-  &:hover {
-    background-color: $property-entry-icon-button-color-hover;
+    &:hover {
+      background-color: $property-entry-icon-button-color-hover;
+    }
   }
 }
 

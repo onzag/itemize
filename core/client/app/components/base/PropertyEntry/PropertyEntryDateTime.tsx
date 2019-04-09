@@ -347,11 +347,11 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
     // return it
     return (
       <div className="property-entry-container">
+        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
         {component}
         <div className="property-entry-error">
           {i18nInvalidReason}
         </div>
-        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
       </div>
     );
   }

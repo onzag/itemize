@@ -1,0 +1,7 @@
+[
+    {
+        "id": "propext_string",
+        "type": "string",
+        "default": "I am a prop extension"
+    }
+]

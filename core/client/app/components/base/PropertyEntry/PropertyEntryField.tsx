@@ -673,6 +673,7 @@ export default class PropertyEntryField
     // return the complex overengineered component in all its glory
     return (
       <div className="property-entry-container">
+        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
         <TextField
           fullWidth={true}
           type={this.state.visible ? "text" : "password"}
@@ -705,7 +706,6 @@ export default class PropertyEntryField
         <div className="property-entry-error">
           {i18nInvalidReason}
         </div>
-        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
       </div>
     );
   }

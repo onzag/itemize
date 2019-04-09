@@ -411,6 +411,7 @@ export default class PropertyEntryLocation
 
     return (
       <div className="property-entry-container">
+        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
         <div className="property-entry-location-atxt">
           {currentLocationDataATxt}
         </div>
@@ -467,7 +468,6 @@ export default class PropertyEntryLocation
         <div className="property-entry-error">
           {i18nInvalidReason}
         </div>
-        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
       </div>
     );
   }

@@ -1369,6 +1369,9 @@ if (process.env.NODE_ENV !== "production") {
     {
       type: "number",
     },
+    {
+      type: "null",
+    },
   ];
 
   const searchLevels = ["always", "moderate", "rare", "disabled"];
