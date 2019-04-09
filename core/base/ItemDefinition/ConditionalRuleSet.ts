@@ -180,6 +180,8 @@ export default class ConditionalRuleSet {
         case "xor":
           return result ? !conditionResult : conditionResult;
       }
+    } else {
+      return result;
     }
   }
 }

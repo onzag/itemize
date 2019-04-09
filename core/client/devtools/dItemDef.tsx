@@ -1,9 +1,10 @@
-import Module from "../../base/Module";
-import ItemDefinition from "../../base/ItemDefinition";
+import ItemDefinition, { IItemDefinitionValue } from "../../base/ItemDefinition";
 import DevToolRawVisualizer from "./dRawVisualizer";
 import * as React from "react";
 import DevToolPropertyDefinition from "./dPropertyDef";
 import { getModulePath } from "./dModule";
+import ItemEntry from "../app/components/base/ItemEntry";
+import PropertyDefinition, { PropertyDefinitionSupportedType } from "../../base/ItemDefinition/PropertyDefinition";
 
 interface IItemDefProps {
   itemDef: ItemDefinition;
@@ -13,6 +14,10 @@ interface IItemDefProps {
 
 interface IItemDefState {
   expanded: boolean;
+  displayBasic: boolean;
+  displayHiddenEntries: boolean;
+  pokeEntries: boolean;
+  value: IItemDefinitionValue;
 }
 
 const devtoolsStyle: {
@@ -41,6 +46,9 @@ const devtoolsStyle: {
     paddingBottom: "2px",
     color: "#000",
   },
+  itemDefDisplay: {
+    backgroundColor: "#fff",
+  },
 };
 
 export function getItemDefPath(itemDef: ItemDefinition): string {
@@ -59,9 +67,20 @@ export default class DevToolItemDefinition extends
         localStorage.getItem("__dev__itemdef__expanded" +
         getItemDefPath(props.itemDef),
       ) || "false"),
+      displayBasic: JSON.parse(
+        localStorage.getItem("__dev__itemdef__displayBasic" +
+        getItemDefPath(props.itemDef),
+      ) || "false"),
+      displayHiddenEntries: false,
+      pokeEntries: false,
+      value: props.itemDef.getCurrentValue(),
     };
 
     this.toggleExpand = this.toggleExpand.bind(this);
+    this.toggleDisplayBasic = this.toggleDisplayBasic.bind(this);
+    this.toggleDisplayHiddenEntries = this.toggleDisplayHiddenEntries.bind(this);
+    this.togglePokeEntries = this.togglePokeEntries.bind(this);
+    this.onPropertyChange = this.onPropertyChange.bind(this);
   }
   public toggleExpand() {
     localStorage.setItem(
@@ -73,7 +92,54 @@ export default class DevToolItemDefinition extends
       expanded: !this.state.expanded,
     });
   }
+  public toggleDisplayBasic() {
+    localStorage.setItem(
+      "__dev__itemdef__displayBasic" +
+      getItemDefPath(this.props.itemDef),
+      JSON.stringify(!this.state.displayBasic),
+    );
+    this.setState({
+      displayBasic: !this.state.displayBasic,
+    });
+  }
+  public toggleDisplayHiddenEntries() {
+    this.setState({
+      displayHiddenEntries: !this.state.displayHiddenEntries,
+    });
+  }
+  public togglePokeEntries() {
+    this.setState({
+      pokeEntries: !this.state.pokeEntries,
+    });
+  }
+  public onPropertyChange(property: PropertyDefinition, value: PropertyDefinitionSupportedType, internalValue: any) {
+    property.setCurrentValue(value, internalValue);
+    this.setState({
+      value: this.props.itemDef.getCurrentValue(),
+    });
+  }
   public render() {
+    let valueToStringify: IItemDefinitionValue = null;
+    if (this.state.value) {
+      valueToStringify = {
+        ...this.state.value,
+        properties: this.state.value.properties.map((propertyValue) => {
+          let propertyValueToStringify = propertyValue.value;
+          // a small hack due to internal values being too long
+          if (
+            propertyValueToStringify.internalValue !== null &&
+            typeof propertyValueToStringify.internalValue !== "string"
+          ) {
+            propertyValueToStringify = {...propertyValueToStringify, internalValue: "[TOO BIG TO DISPLAY]"};
+          }
+
+          return {
+            ...propertyValue,
+            value: propertyValueToStringify,
+          };
+        }),
+      };
+    }
     return (
       <div style={devtoolsStyle.itemDefItem}>
         <p
@@ -88,6 +154,27 @@ export default class DevToolItemDefinition extends
           <span> (item definition)</span>
         </p>
         {this.state.expanded ? <div style={devtoolsStyle.itemDefChildren}>
+          <button onClick={this.toggleDisplayBasic}>{
+            this.state.displayBasic ? "Hide Basic Form" : "Display Basic Form"
+          }</button>
+          <button onClick={this.toggleDisplayHiddenEntries}>{
+            this.state.displayHiddenEntries ? "Hide Hidden Entries" : "Display Hidden Entries"
+          }</button>
+          <button onClick={this.togglePokeEntries}>{
+            this.state.pokeEntries ? "Unpoke Entries" : "Poke Entries"
+          }</button>
+          {this.state.displayBasic ? <div style={devtoolsStyle.itemDefDisplay}>
+            <ItemEntry
+              value={this.state.value}
+              onPropertyChange={this.onPropertyChange}
+              itemDefinition={this.props.itemDef}
+              displayHidden={this.state.displayHiddenEntries}
+              poked={this.state.pokeEntries}
+            />
+            <code>
+              {JSON.stringify(valueToStringify, null, 2)}
+            </code>
+          </div> : null}
           {this.props.itemDef.getImportedChildDefinitions().map((childDefinition) => {
             return <DevToolItemDefinition
               key={childDefinition.getName()}

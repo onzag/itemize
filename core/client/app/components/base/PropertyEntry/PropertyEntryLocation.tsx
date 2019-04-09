@@ -121,6 +121,20 @@ export default class PropertyEntryLocation
     this.onKeyPress = this.onKeyPress.bind(this);
   }
 
+  public shouldComponentUpdate(
+    nextProps: IPropertyEntryProps,
+    nextState: IPropertyEntryLocationState,
+  ) {
+    // This is optimized to only update for the thing it uses
+    return nextProps.property !== this.props.property ||
+      !equals(this.state, nextState) ||
+      !equals(this.props.value, nextProps.value) ||
+      !!this.props.poked !== !!nextProps.poked ||
+      nextProps.language !== this.props.language ||
+      nextProps.i18n !== this.props.i18n ||
+      nextProps.country !== this.props.country;
+  }
+
   public onChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     autosuggestOverride: Autosuggest.ChangeEvent,
@@ -180,6 +194,9 @@ export default class PropertyEntryLocation
   }
 
   public async search() {
+    if (!this.props.value.internalValue) {
+      return;
+    }
     // basically making a search request, we use the
     // internal value for this, as well as the country
     // latitude and longitude of the locale data
@@ -344,10 +361,11 @@ export default class PropertyEntryLocation
       endAdornment: (
         <InputAdornment position="end">
           <IconButton
+            disabled={this.props.value.enforced}
             classes={{root: "property-entry-location-button"}}
             onClick={enableSwapAroundLocations ? this.swapLocation : this.search}
           >
-            <Icon classes={{root: "property-entry-icon"}}>
+            <Icon>
               {enableSwapAroundLocations ? "swap_horiz" : "search"}
             </Icon>
           </IconButton>
@@ -407,7 +425,7 @@ export default class PropertyEntryLocation
             {currentLocationToMark ? <Marker position={currentLocationToMark}>
               <Popup>{currentLocationDataTxt}{currentLocationDataATxt ? <br/> : null}{currentLocationDataATxt}</Popup>
             </Marker> : null}
-            {this.state.searchResults
+            {!this.props.value.enforced ? this.state.searchResults
               .filter((result) => !equals(currentLocationToMark, result.position))
               .map((result) => (
                 <Marker
@@ -416,7 +434,7 @@ export default class PropertyEntryLocation
                   position={result.position}
                   onClick={this.onSearchMarkerClick.bind(this, result)}
                 />
-            ))}
+            )) : null}
           </Map>
         </div>
         <TextField
@@ -433,6 +451,7 @@ export default class PropertyEntryLocation
               root: "property-entry-input",
               focused: "focused",
             },
+            disabled: this.props.value.enforced,
             ...appliedInputProps,
           }}
           InputLabelProps={{

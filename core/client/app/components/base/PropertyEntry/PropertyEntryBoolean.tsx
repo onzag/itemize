@@ -2,6 +2,7 @@ import React from "react";
 import { IPropertyEntryProps, getClassName } from ".";
 import { FormControlLabel, Switch, Icon, FormLabel, FormControl, RadioGroup, Radio } from "@material-ui/core";
 import { capitalize } from "../../../../../util";
+import equals from "deep-equal";
 
 function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
   // let's the get basic data for the entry
@@ -27,6 +28,7 @@ function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
             <Switch
               checked={props.value.value as boolean || false}
               onChange={props.onChange.bind(null, !props.value.value, null)}
+              disabled={props.value.enforced}
               classes={{
                 root: "property-entry-input",
               }}
@@ -90,18 +92,21 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
             value="true"
             control={<Radio/>}
             label={capitalize(props.i18n.yes)}
+            disabled={props.value.enforced}
           />
           <FormControlLabel
             classes={fclClasses}
             value="false"
             control={<Radio/>}
             label={capitalize(props.i18n.no)}
+            disabled={props.value.enforced}
           />
           <FormControlLabel
             classes={fclClasses}
             value="null"
             control={<Radio/>}
             label={capitalize(props.i18n.unspecified)}
+            disabled={props.value.enforced}
           />
         </RadioGroup>
       </FormControl>
@@ -110,12 +115,21 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
   );
 }
 
-export default function PropertyEntryBoolean(props: IPropertyEntryProps) {
-  // Booleans come in two types, one is the switch and the other
-  // is a radio, the switch works for basic true/false booleans
-  // whereas the radio works for true/false/null booleans
-  if (!props.property.isNullable()) {
-    return PropertyEntryBooleanAsSwitch(props);
+export default class PropertyEntryBoolean extends React.Component<IPropertyEntryProps, {}> {
+  public shouldComponentUpdate(nextProps: IPropertyEntryProps) {
+    return this.props.property !== nextProps.property ||
+      !equals(this.props.value, nextProps.value) ||
+      !!this.props.poked !== !!nextProps.poked ||
+      nextProps.language !== this.props.language ||
+      nextProps.i18n !== this.props.i18n;
   }
-  return PropertyEntryBooleanAsRadio(props);
+  public render() {
+    // Booleans come in two types, one is the switch and the other
+    // is a radio, the switch works for basic true/false booleans
+    // whereas the radio works for true/false/null booleans
+    if (!this.props.property.isNullable()) {
+      return PropertyEntryBooleanAsSwitch(this.props);
+    }
+    return PropertyEntryBooleanAsRadio(this.props);
+  }
 }

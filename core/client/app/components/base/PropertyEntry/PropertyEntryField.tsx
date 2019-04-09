@@ -480,6 +480,7 @@ export default class PropertyEntryField
             value={currentValue}
             onChange={this.onChangeByHTMLEvent}
             displayEmpty={true}
+            disabled={this.props.value.enforced}
             input={
               <FilledInput
                 id={this.uuid}
@@ -687,6 +688,7 @@ export default class PropertyEntryField
               focused: "focused",
             },
             id: this.uuid,
+            disabled: this.props.value.enforced,
             ...appliedInputProps,
           }}
           InputLabelProps={{
@@ -855,6 +857,7 @@ export default class PropertyEntryField
           value: currentValue,
           onChange: this.onChange,
           className: "property-entry--field--autocomplete",
+          disabled: this.props.value.enforced,
         }}
       />
     );

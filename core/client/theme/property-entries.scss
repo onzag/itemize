@@ -11,6 +11,9 @@ $property-entry-files-image-color-hover: #42a5f5;
 $property-entry-files-delete-color-hover: #f44336;
 $property-entry-files-rejected-color: #e57373;
 $property-entry-files-rejected-color-hover: #f44336;
+$property-entry-icon-button-color: #2196f3;
+$property-entry-icon-button-color-hover: #1976d2;
+$property-entry-icon-button-icon-color: #fff;
 
 $property-entry-error-height: 1.3rem;
 
@@ -174,6 +177,16 @@ $property-entry-error-height: 1.3rem;
   flex-direction: row;
   padding-right: 12px;
   width: 100%;
+}
+
+.property-entry-datetime-button,
+.property-entry-location-button {
+  background-color: $property-entry-icon-button-color;
+  color: $property-entry-icon-button-icon-color;
+
+  &:hover {
+    background-color: $property-entry-icon-button-color-hover;
+  }
 }
 
 .property-entry-files-paper {

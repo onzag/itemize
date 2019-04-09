@@ -31,13 +31,6 @@
       "searchLevel": "disabled"
     },
     {
-			"id": "parent_id_float",
-			"type": "number",
-			"nullable": true,
-      "hidden": true,
-      "searchLevel": "disabled"
-		},
-    {
       "id": "title",
       "type": "text"
     },

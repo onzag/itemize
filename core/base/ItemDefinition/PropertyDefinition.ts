@@ -672,6 +672,8 @@ export interface IPropertyDefinitionRawJSONDataType {
   nullable?: boolean;
   // Makes the value be null if hidden
   nullIfHidden?: boolean;
+  // Makes the field hidden if value is enforced
+  hiddenIfEnforced?: boolean;
   // hidden does not show at all
   hidden?: boolean;
   // autocomplete is an endpoint of some sort that requests
@@ -916,12 +918,58 @@ export default class PropertyDefinition {
     this.stateinternalValue = null;
   }
 
+  public getEnforcedValue(): {
+    enforced: boolean;
+    value?: PropertyDefinitionSupportedType;
+  } {
+    if (
+      typeof this.superEnforcedValue !== "undefined" ||
+      this.enforcedValues ||
+      typeof this.rawData.enforcedValue !== "undefined"
+    ) {
+
+      // let's check if one matches the current situation
+      // we first pick the superEnforcedValue or otherwise the enforcedValue
+      // or otherwise the first enforcedValue that evaluates to true
+      const enforcedValue = typeof this.superEnforcedValue !== "undefined" ?
+        // superenforced might be a property definition so we got to
+        // extract the value in such case
+        (this.superEnforcedValue instanceof PropertyDefinition ?
+          this.superEnforcedValue.getCurrentValue().value :
+          this.superEnforcedValue) :
+
+        // otherwise in other cases we check the enforced value
+        // which has priority
+        (typeof this.rawData.enforcedValue !== "undefined" ?
+          this.rawData.enforcedValue :
+          // otherwise we go to for evaluating the enforced values
+          // or give undefined if nothing is found
+          (this.enforcedValues.find((ev) => {
+            return ev.if.evaluate();
+          }) || {value: undefined}).value);
+
+      // if we get one
+      if (typeof enforcedValue !== "undefined") {
+        // we return the value that was set to be
+        return {
+          enforced: true,
+          value: enforcedValue,
+        };
+      }
+    }
+
+    return {
+      enforced: false,
+    };
+  }
+
   /**
    * checks if it's currently hidden (not phantom)
    * @returns a boolean
    */
   public isCurrentlyHidden() {
     return this.rawData.hidden ||
+      (this.rawData.hiddenIfEnforced ? this.getEnforcedValue().enforced : false) ||
       (this.hiddenIf && this.hiddenIf.evaluate()) || false;
   }
 
@@ -946,6 +994,24 @@ export default class PropertyDefinition {
    * @returns a bunch of information about the current value
    */
   public getCurrentValue(): IPropertyDefinitionValue {
+
+    const possibleEnforcedValue = this.getEnforcedValue();
+
+    if (possibleEnforcedValue.enforced) {
+      const possibleInvalidEnforcedReason = this.isValidValue(possibleEnforcedValue.value);
+      // we return the value that was set to be
+      return {
+        userSet: false,
+        enforced: true,
+        default: false,
+        valid: !possibleInvalidEnforcedReason,
+        invalidReason: possibleInvalidEnforcedReason,
+        value: possibleEnforcedValue.value,
+        hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(),
+        internalValue: null,
+      };
+    }
+
     // make if hidden if null if hidden is set to true
     if (this.rawData.nullIfHidden && this.isCurrentlyHidden()) {
       return {
@@ -958,48 +1024,6 @@ export default class PropertyDefinition {
         hidden: true,
         internalValue: null,
       };
-    }
-
-    // if there's an enforced value
-    if (typeof this.superEnforcedValue !== "undefined" ||
-        this.enforcedValues ||
-        typeof this.rawData.enforcedValue !== "undefined") {
-
-      // let's check if one matches the current situation
-      // we first pick the superEnforcedValue or otherwise the enforcedValue
-      // or otherwise the first enforcedValue that evaluates to true
-      const enforcedValue = typeof this.superEnforcedValue !== "undefined" ?
-        // superenforced might be a property definition so we got to
-        // extract the value in such case
-        (this.superEnforcedValue instanceof PropertyDefinition ?
-          this.superEnforcedValue.getCurrentValue().value :
-          this.superEnforcedValue) :
-
-        // otherwise in other cases we check the enforced value
-        // which has priority
-        (typeof this.rawData.enforcedValue !== "undefined" ?
-          this.rawData.enforcedValue :
-          // otherwise we go to for evaluating the enforced values
-          // or give undefined if nothing is found
-          (this.enforcedValues.find((ev) => {
-            return ev.if.evaluate();
-          }) || {value: undefined}).value);
-
-      // if we get one
-      if (typeof enforcedValue !== "undefined") {
-        const invalidEnforcedReason = this.isValidValue(enforcedValue);
-        // we return the value that was set to be
-        return {
-          userSet: false,
-          enforced: true,
-          default: false,
-          valid: !invalidEnforcedReason,
-          invalidReason: invalidEnforcedReason,
-          value: enforcedValue,
-          hidden: this.isCurrentlyHidden(),
-          internalValue: null,
-        };
-      }
     }
 
     // if the value hasn't been modified we are to return the defaults
@@ -1325,6 +1349,10 @@ export default class PropertyDefinition {
       this.onStateChangeListeners.splice(index, 1);
     }
   }
+
+  public toJSON() {
+    return this.rawData;
+  }
 }
 
 // We set the value of those if non in production
@@ -1459,6 +1487,9 @@ if (process.env.NODE_ENV !== "production") {
         minItems: 1,
       },
       nullIfHidden: {
+        type: "boolean",
+      },
+      hiddenIfEnforced: {
         type: "boolean",
       },
       enforcedValue: {

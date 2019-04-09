@@ -6,6 +6,7 @@ import { PropertyDefinitionSupportedFilesType } from "../../../../../base/ItemDe
 import { MAX_FILE_SIZE, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../../constants";
 import { mimeTypeToExtension, localeReplacer } from "../../../../../util";
 import prettyBytes from "pretty-bytes";
+import equals from "deep-equal";
 
 interface IFileData {
   name: string;
@@ -67,6 +68,16 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     this.onRemoveFile = this.onRemoveFile.bind(this);
     this.openFile = this.openFile.bind(this);
     this.manuallyTriggerUpload = this.manuallyTriggerUpload.bind(this);
+  }
+  public shouldComponentUpdate(
+    nextProps: IPropertyEntryProps,
+  ) {
+    // This is optimized to only update for the thing it uses
+    return nextProps.property !== this.props.property ||
+      !equals(this.props.value, nextProps.value) ||
+      !!this.props.poked !== !!nextProps.poked ||
+      nextProps.language !== this.props.language ||
+      nextProps.i18n !== this.props.i18n;
   }
   public manuallyTriggerUpload() {
     // utility for the button to manually trigger upload
@@ -279,6 +290,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
           multiple={!singleFile}
           noClick={singleFile && valueAsInternal.length === 1}
           ref={this.dropzoneRef}
+          disabled={this.props.value.enforced}
         >
           {({
             getRootProps,

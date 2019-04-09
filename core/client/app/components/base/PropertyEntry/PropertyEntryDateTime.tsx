@@ -4,6 +4,7 @@ import { IPropertyEntryProps, getClassName } from ".";
 import { PropertyDefinitionSupportedDateType } from "../../../../../base/ItemDefinition/PropertyDefinition";
 import Moment from "moment";
 import { Icon } from "@material-ui/core";
+import equals from "deep-equal";
 
 /**
  * Provides the current value of the date given the
@@ -95,6 +96,18 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
     this.handleOnChange = this.handleOnChange.bind(this);
     this.handleOnInput = this.handleOnInput.bind(this);
     this.getMaskFrom = this.getMaskFrom.bind(this);
+  }
+  public shouldComponentUpdate(
+    nextProps: IPropertyEntryProps,
+    nextState: IPropertyEntryDateTimeState,
+  ) {
+    // This is optimized to only update for the thing it uses
+    return nextProps.property !== this.props.property ||
+      !equals(this.state, nextState) ||
+      !equals(this.props.value, nextProps.value) ||
+      !!this.props.poked !== !!nextProps.poked ||
+      nextProps.language !== this.props.language ||
+      nextProps.i18n !== this.props.i18n;
   }
   public componentDidUpdate(prevProps: IPropertyEntryProps) {
     // active the bugfix for the material refresh
@@ -223,6 +236,7 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
           onInputChange={this.handleOnInput.bind(this, L)}
           error={false}
           helperText={null}
+          disabled={this.props.value.enforced}
           InputProps={{
             classes: {
               root: "property-entry-input",
@@ -233,6 +247,11 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
             classes: {
               root: "property-entry-label",
               focused: "focused",
+            },
+          }}
+          KeyboardButtonProps={{
+            classes: {
+              root: "property-entry-datetime-button",
             },
           }}
         />
@@ -260,6 +279,7 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
           onInputChange={this.handleOnInput.bind(this, LLT)}
           error={false}
           helperText={null}
+          disabled={this.props.value.enforced}
           InputProps={{
             classes: {
               root: "property-entry-input",
@@ -270,6 +290,11 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
             classes: {
               root: "property-entry-label",
               focused: "focused",
+            },
+          }}
+          KeyboardButtonProps={{
+            classes: {
+              root: "property-entry-datetime-button",
             },
           }}
         />
@@ -296,6 +321,7 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
           onInputChange={this.handleOnInput.bind(this, LT)}
           error={false}
           helperText={null}
+          disabled={this.props.value.enforced}
           InputProps={{
             classes: {
               root: "property-entry-input",
@@ -306,6 +332,11 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
             classes: {
               root: "property-entry-label",
               focused: "focused",
+            },
+          }}
+          KeyboardButtonProps={{
+            classes: {
+              root: "property-entry-datetime-button",
             },
           }}
           keyboardIcon={<Icon>access_time</Icon>}

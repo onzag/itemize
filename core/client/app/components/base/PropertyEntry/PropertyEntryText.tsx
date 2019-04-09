@@ -109,10 +109,12 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
   }
   public shouldComponentUpdate(nextProps: IPropertyEntryProps, nextState: IRichTextEditorState) {
     // we use this too
-    return (
-      nextState.focused !== this.state.focused ||
-      !equals(nextProps.value, this.props.value)
-    );
+    return nextProps.property !== this.props.property ||
+      !equals(this.state, nextState) ||
+      !equals(this.props.value, nextProps.value) ||
+      !!this.props.poked !== !!nextProps.poked ||
+      nextProps.language !== this.props.language ||
+      nextProps.i18n !== this.props.i18n;
   }
   public onChange(value: string) {
     // on change, these values are basically empty
@@ -184,6 +186,7 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
           </InputLabel>
           <RichTextEditorToolbar id={this.uuid} i18n={this.props.i18n}/>
           <ReactQuill
+            disabled={this.props.value.enforced}
             modules={{
               toolbar: {
                 container: "#" + this.uuid,
