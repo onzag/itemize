@@ -2,6 +2,7 @@ import * as React from "react";
 
 interface IRawVisualizerProps {
   content: any;
+  title?: string;
 }
 
 interface IRawVisualizerState {
@@ -44,7 +45,7 @@ export default class DevToolRawVisualizer extends
   public render() {
     return (
       <div style={devtoolsStyle.rawItem} onClick={this.toggleExpand}>
-        <p>view raw content</p>
+        <p>{this.props.title ? this.props.title : "view raw content"}</p>
         {this.state.expanded ? <code style={devtoolsStyle.rawChildren}>
           {JSON.stringify(this.props.content, null, 2)}
         </code> : null}

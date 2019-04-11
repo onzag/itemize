@@ -42,6 +42,12 @@ export default class Module {
    */
   public static schema: any;
 
+  public static buildSearchMode(
+    rawData: IModuleRawJSONDataType,
+  ): IModuleRawJSONDataType {
+    return buildSearchMode(rawData);
+  }
+
   /**
    * Provides a full item definition in raw form
    * given raw data of a module and a full path for
@@ -84,6 +90,7 @@ export default class Module {
 
   public rawData: IModuleRawJSONDataType;
   private parentModule: Module;
+  private searchModeModule: Module;
 
   private childItemDefinitions: ItemDefinition[];
   private propExtensions: PropertyDefinition[];
@@ -95,10 +102,15 @@ export default class Module {
   constructor(
     rawJSON: IModuleRawJSONDataType,
     parentModule: Module,
+    disableSearchModeRetrieval?: boolean,
   ) {
     this.rawData = rawJSON;
     this.parentModule = parentModule;
     this.childItemDefinitions = [];
+
+    if (!disableSearchModeRetrieval) {
+      this.searchModeModule = new Module(Module.buildSearchMode(this.rawData), null, true);
+    }
 
     if (rawJSON.propExtensions) {
       this.propExtensions = rawJSON.propExtensions.map((pe) => {
@@ -322,15 +334,15 @@ export default class Module {
     );
   }
 
+  public getSearchModule(): Module {
+    return this.searchModeModule;
+  }
+
   /**
    * Just gives the parent module
    */
   public getParentModule() {
     return this.parentModule;
-  }
-
-  public getModuleInstanceInSearchMode() {
-    return buildSearchMode(this.rawData);
   }
 
   /**

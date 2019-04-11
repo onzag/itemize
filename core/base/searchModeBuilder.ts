@@ -3,6 +3,7 @@ import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
   PropertyDefinitionSearchInterfacesType,
   PropertyInvalidReason,
+  IPropertyDefinitionAlternativePropertyType,
 } from "./ItemDefinition/PropertyDefinition";
 import {
   IConditionalRuleSetRawJSONDataType,
@@ -29,11 +30,11 @@ function buildSearchModeModule(rawData: IModuleRawJSONDataType): IModuleRawJSOND
   if (newModule.children) {
     newModule.children = newModule.children.map((m) => {
       if (m.type === "module") {
-        return buildSearchModeModule(m);
+        return null;
       } else {
         return buildSearchModeItemDefinition(m, knownPropExtMap);
       }
-    });
+    }).filter((s) => !!s);
   }
 
   return newModule;
@@ -122,7 +123,7 @@ function buildSearchModePropertyDefinitions(
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE
   ) {
-    if (!rawData.disableRangedSearch) {
+    if (rawData.disableRangedSearch) {
       newPropDef.id = "EXACT__" + newPropDef.id;
       if (newPropDef.i18nData) {
         newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search"]);
@@ -171,7 +172,7 @@ function buildSearchModePropertyDefinitions(
         newPropDef2InvalidIfRule.attribute = attribute;
         newPropDef2InvalidIfRule.valueAttribute = attribute;
       }
-      newPropDef.invalidIf.push({
+      newPropDef2.invalidIf.push({
         error: PropertyInvalidReason.TO_SMALLER_THAN_FROM,
         if: newPropDef2InvalidIfRule,
       });
@@ -214,18 +215,33 @@ function buildSearchModeConditionalRuleSet(
 ): IConditionalRuleSetRawJSONDataType {
   const newRule = {...rawData};
   if ((newRule as IConditionalRuleSetRawJSONDataPropertyType).property) {
-    if ((newRule as IConditionalRuleSetRawJSONDataPropertyType).property !== "&this") {
+    const newRuleAsProperty = (newRule as IConditionalRuleSetRawJSONDataPropertyType); 
+    if (newRuleAsProperty.property !== "&this") {
       const converted = getConversionRulesetId(otherKnownProperties[
-        (newRule as IConditionalRuleSetRawJSONDataPropertyType).property
+        newRuleAsProperty.property
       ]);
       if (converted === null) {
         return null;
       }
-      (newRule as IConditionalRuleSetRawJSONDataPropertyType).property = converted;
+      newRuleAsProperty.property = converted;
+    }
+
+    const valueAsAlternative = (newRuleAsProperty.value as IPropertyDefinitionAlternativePropertyType);
+    if (valueAsAlternative && valueAsAlternative.property) {
+      newRuleAsProperty.value = {
+        property: getConversionRulesetId(otherKnownProperties[
+          valueAsAlternative.property
+        ]),
+      };
+
+      if (newRuleAsProperty.value.property === null) {
+        return null;
+      }
     }
   } else {
     return null;
   }
+
   if (newRule.condition) {
     const newCondition = buildSearchModeConditionalRuleSet(newRule.condition, otherKnownProperties);
     if (newCondition === null) {
@@ -242,6 +258,10 @@ function getConversionRulesetId(
   const propertyDefinitionDescription = PropertyDefinition.supportedTypesStandard[rawData.type];
   if (!propertyDefinitionDescription.searchable || rawData.searchLevel === "disabled") {
     return null;
+  }
+
+  if (rawData.id === "&this") {
+    return "&this";
   }
 
   let id = rawData.id;
@@ -270,7 +290,7 @@ function getConversionRulesetId(
   ) {
     id = "LOCATION__" + id;
   }
-  return name;
+  return id;
 }
 
 function displaceI18NData(i18n: any, path: string[]){

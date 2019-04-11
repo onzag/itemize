@@ -96,7 +96,10 @@ export default class DevToolModule extends React.Component<IModuleProps, IModule
             />;
           })}
           <DevToolRawVisualizer content={this.props.module.rawData}/>
-          <DevToolRawVisualizer content={this.props.module.getModuleInstanceInSearchMode()}/>
+          <DevToolRawVisualizer
+            title="view search module raw content"
+            content={this.props.module.getSearchModule().rawData}
+          />
         </div> : null}
       </div>
     );
