@@ -3,5 +3,27 @@
         "id": "propext_string",
         "type": "string",
         "default": "I am a prop extension"
+    },
+    {
+        "id": "self_destructing_string",
+        "type": "string",
+        "invalidIf": [
+            {
+                "error": "NOT_SAME",
+                "if": {
+                    "property": "self_destructing_string",
+                    "comparator": "equals",
+                    "value": {
+                        "property": "propext_string"
+                    }
+                }
+            }
+        ],
+        "hiddenIf": {
+            "property": "self_destructing_string",
+            "comparator": "equals",
+            "value": "self destruct"
+        },
+        "nullable": true
     }
 ]

@@ -7,6 +7,11 @@ import PropertyDefinition, {
 } from "../../../../base/ItemDefinition/PropertyDefinition";
 import { LocaleContext } from "../..";
 import PropertyEntry from "./PropertyEntry";
+import ExpansionPanel from "@material-ui/core/ExpansionPanel";
+import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
+import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import { Typography } from "@material-ui/core";
 
 interface IItemEntryProps {
   value: IItemDefinitionValue;
@@ -24,6 +29,27 @@ export default class ItemEntry extends React.Component<IItemEntryProps, {}> {
     super(props);
   }
   public render() {
+    const basicPropertyEntries = [];
+    const rarePropertyEntries = [];
+
+    this.props.value.properties.forEach((propertyValue) => {
+      if (propertyValue.value.hidden && !this.props.displayHidden) {
+        return;
+      }
+      let targetArray = basicPropertyEntries;
+      if (propertyValue.definition.isRare()) {
+        targetArray = rarePropertyEntries;
+      }
+      targetArray.push(
+        <PropertyEntry
+          key={propertyValue.definition.getId()}
+          property={propertyValue.definition}
+          value={propertyValue.value}
+          onChange={this.props.onPropertyChange.bind(this, propertyValue.definition)}
+          poked={this.props.poked}
+        />,
+      );
+    });
     return (
       <LocaleContext.Consumer>
       {
@@ -32,20 +58,15 @@ export default class ItemEntry extends React.Component<IItemEntryProps, {}> {
           return (
             <div className="item-entry-container">
               <span>{i18nData.createFormTitle}</span>
-              {this.props.value.properties.map((propertyValue) => {
-                if (propertyValue.value.hidden && !this.props.displayHidden) {
-                  return null;
-                }
-                return (
-                  <PropertyEntry
-                    key={propertyValue.definition.getId()}
-                    property={propertyValue.definition}
-                    value={propertyValue.value}
-                    onChange={this.props.onPropertyChange.bind(this, propertyValue.definition)}
-                    poked={this.props.poked}
-                  />
-                );
-              })}
+              {basicPropertyEntries}
+              {rarePropertyEntries.length ? (
+                <ExpansionPanel>
+                  <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                    <Typography className="item-entry-rare-label">{locale.i18n.rare_properties_label}</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>{rarePropertyEntries}</ExpansionPanelDetails>
+                </ExpansionPanel>
+              ) : null}
             </div>
           );
         }

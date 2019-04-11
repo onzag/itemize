@@ -1,18 +1,14 @@
 import ItemDefinition from ".";
 import PropertyDefinition, {
-  PropertyDefinitionSupportedType,
+  PropertyDefinitionSupportedType, IPropertyDefinitionAlternativePropertyType,
 } from "./PropertyDefinition";
-
-export interface IPropertiesValueMappingReferredPropertyValue {
-  property: string;
-}
 
 // Represents the way that properties are stored
 // Check the schema down to see how this relates
 // at PropertiesValueMappingDefiniton.schema
 export interface IPropertiesValueMappingDefinitonRawJSONDataType {
   [propertyName: string]: PropertyDefinitionSupportedType |
-    IPropertiesValueMappingReferredPropertyValue;
+    IPropertyDefinitionAlternativePropertyType;
 }
 
 /**
@@ -110,7 +106,7 @@ export default class PropertiesValueMappingDefiniton {
     PropertyDefinitionSupportedType | PropertyDefinition {
     const value = this.rawData[key];
     const property =
-      (value as IPropertiesValueMappingReferredPropertyValue).property;
+      (value as IPropertyDefinitionAlternativePropertyType).property;
     if (property) {
       return this.parentItemDefinition.getPropertyDefinitionFor(property, false);
     }
@@ -133,24 +129,26 @@ if (process.env.NODE_ENV !== "production") {
   PropertiesValueMappingDefiniton.schema = {
     $id: "PropertiesValueMappingDefiniton",
     type: "object",
+    // again the import is buggy so I have to paste it here
     additionalProperties: {
       oneOf: [
-          {
-            // despite of being able to use any of the property
-            // definition values we basically only allow for string numbers
-            // and booleans
-            type: ["boolean", "string", "number", "null"],
+        {
+          type: "object",
+          properties: {
+            property: {
+              type: "string",
+              pattern: "^[a-z_]+$",
+            },
           },
-          {
-              type: "object",
-              properties: {
-                property: {
-                  type: "string",
-                  pattern: "^[a-zA-Z0-9-]+$",
-                },
-              },
-              required: ["property"],
-          },
+          required: ["property"],
+          additionalProperties: false,
+        },
+        {
+          // despite of being able to use any of the property
+          // definition values we basically only allow for string numbers
+          // and booleans
+          type: ["boolean", "string", "number", "null"],
+        },
       ],
     },
     minProperties: 1,

@@ -33,6 +33,8 @@ export enum PropertyInvalidReason {
   TOO_FEW_DECIMALS = "TOO_FEW_DECIMALS",
   NOT_NULLABLE = "NOT_NULLABLE",
   INVALID_SUBTYPE_VALUE = "INVALID_SUBTYPE_VALUE",
+  FROM_LARGER_THAN_TO = "FROM_LARGER_THAN_TO",
+  TO_SMALLER_THAN_FROM = "TO_SMALLER_THAN_FROM",
 }
 
 // All the supported property types
@@ -635,6 +637,11 @@ export interface IPropertyDefinitionRawJSONRuleDataType {
   if: IConditionalRuleSetRawJSONDataType;
 }
 
+export interface IPropertyDefinitionRawJSONInvalidRuleDataType {
+  error: string;
+  if: IConditionalRuleSetRawJSONDataType;
+}
+
 export type PropertyDefinitionSearchLevelsType =
   // Will always display a search field, but it might be skipped
   // this is the default
@@ -692,6 +699,8 @@ export interface IPropertyDefinitionRawJSONDataType {
   // default value
   default?: PropertyDefinitionSupportedType;
   defaultIf?: IPropertyDefinitionRawJSONRuleDataType[];
+  // invalid value
+  invalidIf?: IPropertyDefinitionRawJSONInvalidRuleDataType[];
   // enforced values
   enforcedValues?: IPropertyDefinitionRawJSONRuleDataType[];
   enforcedValue?: PropertyDefinitionSupportedType;
@@ -701,8 +710,6 @@ export interface IPropertyDefinitionRawJSONDataType {
   searchLevel?: PropertyDefinitionSearchLevelsType;
   // disable ranged search
   disableRangedSearch?: boolean;
-  // disable exact search
-  disableExactSearch?: boolean;
   // disable retrieval, property value is never retrieved
   // it can only be set or updated
   disableRetrieval?: boolean;
@@ -720,15 +727,26 @@ export interface IPropertyDefinitionRuleDataType {
   if: ConditionalRuleSet;
 }
 
+export interface IPropertyDefinitionInvalidRuleDataType {
+  error: string;
+  if: ConditionalRuleSet;
+}
+
 export interface IPropertyDefinitionValue {
   userSet: boolean;
   default: boolean;
   enforced: boolean;
   hidden: boolean;
   valid: boolean;
-  invalidReason: PropertyInvalidReason;
+  invalidReason: PropertyInvalidReason | string;
   value: PropertyDefinitionSupportedType;
   internalValue: any;
+}
+
+// OTHER EXPORTS
+
+export interface IPropertyDefinitionAlternativePropertyType {
+  property: string;
 }
 
 // The class itself
@@ -743,7 +761,10 @@ export default class PropertyDefinition {
 
   /**
    * Checks whether a value is valid or not using
-   * the raw data
+   * the raw data, NOTE!!!! this function is context unaware
+   * and hence it cannot execute invalidIf conditional rule
+   * set rules
+   *
    * @param propertyDefinitionRaw The raw json property definition data
    * @param value the value to check against
    * @param checkAgainstValues if to check against its own values
@@ -863,6 +884,7 @@ export default class PropertyDefinition {
   private isExtension: boolean;
 
   private defaultIf?: IPropertyDefinitionRuleDataType[];
+  private invalidIf?: IPropertyDefinitionInvalidRuleDataType[];
   private enforcedValues?: IPropertyDefinitionRuleDataType[];
   private hiddenIf?: ConditionalRuleSet;
 
@@ -897,6 +919,12 @@ export default class PropertyDefinition {
     this.defaultIf = rawJSON.defaultIf && rawJSON.defaultIf.map((dif) => ({
       value: dif.value,
       if: new ConditionalRuleSet(dif.if, parentModule, parentItemDefinition),
+    }));
+
+    // create the invalid rules
+    this.invalidIf = rawJSON.invalidIf && rawJSON.invalidIf.map((ii) => ({
+      error: ii.error,
+      if: new ConditionalRuleSet(ii.if, parentModule, parentItemDefinition),
     }));
 
     // set the enforced values from the conditional rule set
@@ -935,7 +963,7 @@ export default class PropertyDefinition {
         // superenforced might be a property definition so we got to
         // extract the value in such case
         (this.superEnforcedValue instanceof PropertyDefinition ?
-          this.superEnforcedValue.getCurrentValue().value :
+          this.superEnforcedValue.getCurrentValueClean() :
           this.superEnforcedValue) :
 
         // otherwise in other cases we check the enforced value
@@ -989,6 +1017,42 @@ export default class PropertyDefinition {
     return this.rawData.type;
   }
 
+  public getCurrentValueClean(): PropertyDefinitionSupportedType {
+    const possibleEnforcedValue = this.getEnforcedValue();
+
+    if (possibleEnforcedValue.enforced) {
+      return possibleEnforcedValue.value;
+    }
+
+    if (this.rawData.nullIfHidden && this.isCurrentlyHidden()) {
+      return null;
+    }
+
+    if (!this.stateValueModified) {
+      // lets find the default value, first the super default
+      // and we of course extract it in case of property definition
+      // or otherwise use the default, which might be undefined
+      let defaultValue = typeof this.superDefaultedValue !== "undefined" ?
+        (this.superDefaultedValue instanceof PropertyDefinition ?
+          this.superDefaultedValue.getCurrentValueClean() :
+          this.superDefaultedValue) : this.rawData.default;
+
+      // Also by condition
+      if (this.defaultIf && typeof defaultValue === "undefined") {
+        // find a rule that passes
+        const rulePasses = this.defaultIf.find((difRule) => difRule.if.evaluate());
+        if (rulePasses) {
+          // and set the default value to such
+          defaultValue = rulePasses.value;
+        }
+      }
+
+      return defaultValue || null;
+    }
+
+    return this.stateValue;
+  }
+
   /**
    * provides the current useful value for the property defintion
    * @returns a bunch of information about the current value
@@ -1033,7 +1097,7 @@ export default class PropertyDefinition {
       // or otherwise use the default, which might be undefined
       let defaultValue = typeof this.superDefaultedValue !== "undefined" ?
         (this.superDefaultedValue instanceof PropertyDefinition ?
-          this.superDefaultedValue.getCurrentValue().value :
+          this.superDefaultedValue.getCurrentValueClean() :
           this.superDefaultedValue) : this.rawData.default;
 
       // Also by condition
@@ -1173,11 +1237,18 @@ export default class PropertyDefinition {
 
   /**
    * Externally checks a valid value for this input using all
-   * its guns
+   * its guns, this function is context aware
+   *
    * @param value the value to check
-   * @return a boolean
+   * @return the invalid reason as a string
    */
-  public isValidValue(value: PropertyDefinitionSupportedType): PropertyInvalidReason {
+  public isValidValue(value: PropertyDefinitionSupportedType): PropertyInvalidReason | string {
+    if (this.invalidIf) {
+      const invalidMatch = this.invalidIf.find((ii) => ii.if.evaluate());
+      if (invalidMatch) {
+        return invalidMatch.error;
+      }
+    }
     return PropertyDefinition.isValidValue(
       this.rawData,
       value,
@@ -1222,10 +1293,6 @@ export default class PropertyDefinition {
 
   public isRangedSearchDisabled() {
     return this.rawData.disableRangedSearch || false;
-  }
-
-  public isExactSearchDisabled() {
-    return this.rawData.disableExactSearch || false;
   }
 
   public getSearchLevel(): PropertyDefinitionSearchLevelsType {
@@ -1472,6 +1539,24 @@ if (process.env.NODE_ENV !== "production") {
         },
         minItems: 1,
       },
+      invalidIf: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            if: {
+              $ref: ConditionalRuleSet.schema.$id,
+            },
+            error: {
+              type: "string",
+              pattern: "^[A-Z_]+$",
+            },
+          },
+          additionalProperties: false,
+          required: ["error", "if"],
+        },
+        minItems: 1,
+      },
       enforcedValues: {
         type: "array",
         items: {
@@ -1509,9 +1594,6 @@ if (process.env.NODE_ENV !== "production") {
         enum: searchLevels,
       },
       disableRangedSearch: {
-        type: "boolean",
-      },
-      disableExactSearch: {
         type: "boolean",
       },
       disableRetrieval: {

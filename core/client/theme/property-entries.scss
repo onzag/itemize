@@ -17,6 +17,10 @@ $property-entry-icon-button-icon-color: #fff;
 
 $property-entry-error-height: 1.3rem;
 
+.property-entry-container {
+  width: 100%;
+}
+
 .property-entry-error {
   color: $property-entry-color-error;
   height: $property-entry-error-height;
@@ -238,9 +242,7 @@ $property-entry-error-height: 1.3rem;
   }
 
   .property-entry-files-file {
-    &:not(.property-entry-files-file--is-image) {
-      width: 125px;
-    }
+    width: 125px;
     padding: 25px 0;
     align-self: flex-start;
 

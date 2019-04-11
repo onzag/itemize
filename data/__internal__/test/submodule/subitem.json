@@ -69,7 +69,9 @@
                         }
                     }
                 }
-            ]
+            ],
+            "rare": true,
+            "disableRangedSearch": true
         }
     ]
 }

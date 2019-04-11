@@ -236,7 +236,7 @@ function buildPropertiesToGraphQL(
     if (pdv.searchInterface ===
       PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE) {
       // add it too
-      result[`given__${property.id}`] = valueOverall;
+      result[`location__${property.id}`] = valueOverall;
       result[`radius__${property.id}`] = strToGraphQLType("Int");
     }
   });

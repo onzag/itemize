@@ -69,7 +69,7 @@ export function getClassName(props: IPropertyEntryBaseProps, name: string, poked
     props.value.valid ?
       "property-entry--valid" :
       "property-entry--invalid"
-  }`;
+  } ${props.property.isRare() ? "property-entry--rare" : ""}`;
 }
 
 export default function PropertyEntry(props: IPropertyEntryBaseProps) {

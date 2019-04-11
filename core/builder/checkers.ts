@@ -2,7 +2,11 @@ import { IRootRawJSONDataType } from "../base/Root";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import { IModuleRawJSONDataType } from "../base/Module";
-import PropertyDefinition, { PropertyDefinitionSearchInterfacesType } from "../base/ItemDefinition/PropertyDefinition";
+import PropertyDefinition, {
+  PropertyDefinitionSearchInterfacesType,
+  IPropertyDefinitionAlternativePropertyType,
+  PropertyInvalidReason,
+} from "../base/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/ItemDefinition";
 import {
   IPropertyDefinitionRawJSONDataType,
@@ -13,9 +17,6 @@ import {
 import {
   PropertyDefinitionSupportedType,
 } from "../base/ItemDefinition/PropertyDefinition";
-import {
-  IPropertiesValueMappingReferredPropertyValue,
-} from "../base/ItemDefinition/PropertiesValueMappingDefiniton";
 import {
   IPropertiesValueMappingDefinitonRawJSONDataType,
 } from "../base/ItemDefinition/PropertiesValueMappingDefiniton";
@@ -76,17 +77,37 @@ export function checkConditionalRuleSet(
       );
     }
 
-    const invalidReason = PropertyDefinition.isValidValue(
-      propDef,
-      rawDataAsProperty.value,
-      true,
-    );
-    if (invalidReason) {
-      throw new CheckUpError(
-        "Conditional rule set value invalid, reason " +
-          rawDataAsProperty.property + ": " + invalidReason,
-        traceback.newTraceToBit("value"),
+    const valueToCheckAgainst = rawDataAsProperty.value;
+    if (
+      valueToCheckAgainst &&
+      (valueToCheckAgainst as IPropertyDefinitionAlternativePropertyType).property
+    ) {
+      const valueToCheckAgainstItemDefinition = ItemDefinition.getItemDefinitionRawFor(
+        parentItemDefinition,
+        parentModule,
+        (valueToCheckAgainst as IPropertyDefinitionAlternativePropertyType).property,
+        true,
       );
+      if (!valueToCheckAgainstItemDefinition) {
+        throw new CheckUpError(
+          "Conditional rule set value invalid, cannot find property, " +
+            (valueToCheckAgainst as IPropertyDefinitionAlternativePropertyType).property,
+          traceback.newTraceToBit("value").newTraceToBit("property"),
+        );
+      }
+    } else {
+      const invalidReason = PropertyDefinition.isValidValue(
+        propDef,
+        valueToCheckAgainst as PropertyDefinitionSupportedType,
+        true,
+      );
+      if (invalidReason) {
+        throw new CheckUpError(
+          "Conditional rule set value invalid, reason " +
+            rawDataAsProperty.property + ": " + invalidReason,
+          traceback.newTraceToBit("value"),
+        );
+      }
     }
   }
 }
@@ -339,7 +360,7 @@ export function checkPropertiesValueMappingDefiniton(
 
     const referredPropertyAsValueApplied =
       (propertyValueAppliedToTheReferred as
-        IPropertiesValueMappingReferredPropertyValue);
+        IPropertyDefinitionAlternativePropertyType);
     // we must ensure it's not a referred property to do the check
     if (!referredPropertyAsValueApplied.property) {
       // And check whether the value is even valid
@@ -435,12 +456,6 @@ export function checkPropertyDefinition(
       "as it does not support ranged search",
       traceback.newTraceToBit("disableRangedSearch"),
     );
-  } else if (!itemSupportsExactAndRange && rawData.disableExactSearch) {
-    throw new CheckUpError(
-      "Type '" + rawData.type + "' does not support disableExactSearch " +
-      "as it does not have the search range and exact interface, use searchLevel=\"disabled\" instead",
-      traceback.newTraceToBit("disableExactSearch"),
-    );
   } else if (rawData.disableRangedSearch && !itemIsSearchable) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' does not support disableRangedSearch " +
@@ -451,22 +466,6 @@ export function checkPropertyDefinition(
     throw new CheckUpError(
       "Type '" + rawData.type + "' cannot disable ranged search if search is disabled",
       traceback.newTraceToBit("disableRangedSearch"),
-    );
-  } else if (rawData.disableExactSearch && !itemIsSearchable) {
-    throw new CheckUpError(
-      "Type '" + rawData.type + "' does not support disableExactSearch " +
-      "as it cannot be searched",
-      traceback.newTraceToBit("disableExactSearch"),
-    );
-  } else if (rawData.searchLevel === "disabled" && rawData.disableExactSearch) {
-    throw new CheckUpError(
-      "Type '" + rawData.type + "' cannot disable exact search if search is disabled",
-      traceback.newTraceToBit("disableExactSearch"),
-    );
-  } else if (rawData.disableExactSearch && rawData.disableRangedSearch) {
-    throw new CheckUpError(
-      "Cannot disable both exact search and ranged search",
-      traceback,
     );
   }
 
@@ -517,6 +516,16 @@ export function checkPropertyDefinition(
       `type '${rawData.type}' cannot have icons`,
       traceback.newTraceToBit("icon"),
     );
+  }
+
+  if (rawData.invalidIf) {
+    const possiblyBrokenErrorIndex = rawData.invalidIf.findIndex((ii) => PropertyInvalidReason[ii.error]);
+    if (possiblyBrokenErrorIndex !== -1) {
+      throw new CheckUpError(
+        `cannot use invalidIf using a builtin error as name '${rawData.invalidIf[possiblyBrokenErrorIndex].error}'`,
+        traceback.newTraceToBit("invalidIf").newTraceToBit(possiblyBrokenErrorIndex).newTraceToBit("error"),
+      );
+    }
   }
 
   if (propertyDefintionTypeStandard.specialProperties) {

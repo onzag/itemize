@@ -1,5 +1,8 @@
 import ItemDefinition from ".";
-import { PropertyDefinitionSupportedType } from "./PropertyDefinition";
+import {
+  PropertyDefinitionSupportedType,
+  IPropertyDefinitionAlternativePropertyType,
+} from "./PropertyDefinition";
 import Module from "../Module";
 
 // Types for the conditions
@@ -17,8 +20,10 @@ interface IConditionalRuleSetRawJSONDataBaseType {
 export interface IConditionalRuleSetRawJSONDataPropertyType
   extends IConditionalRuleSetRawJSONDataBaseType {
   property: string;
+  attribute?: string;
   comparator: ConditionalRuleComparatorType;
-  value: PropertyDefinitionSupportedType;
+  value: PropertyDefinitionSupportedType | IPropertyDefinitionAlternativePropertyType;
+  valueAttribute?: string;
 }
 
 export interface IConditionalRuleSetRawJSONDataComponentType
@@ -123,33 +128,72 @@ export default class ConditionalRuleSet {
     if (rawDataAsProperty.property) {
 
       // lets get the property value as for now
-      const actualPropertyValue = this.parentItemDefinition ?
+      let actualPropertyValue = this.parentItemDefinition ?
         this.parentItemDefinition
           .getPropertyDefinitionFor(rawDataAsProperty.property, true)
-          .getCurrentValue().value :
+          .getCurrentValueClean() :
         this.parentModule.getPropExtensionFor(rawDataAsProperty.property)
-          .getCurrentValue().value;
+          .getCurrentValueClean();
 
-      // lets fiddle with the comparator
-      switch (rawDataAsProperty.comparator) {
-        case "equals":
-          result = actualPropertyValue === rawDataAsProperty.value;
-          break;
-        case "not-equal":
-          result = actualPropertyValue !== rawDataAsProperty.value;
-          break;
-        case "greater-than":
-          result = actualPropertyValue > rawDataAsProperty.value;
-          break;
-        case "less-than":
-          result = actualPropertyValue < rawDataAsProperty.value;
-          break;
-        case "greater-or-equal-than":
-          result = actualPropertyValue >= rawDataAsProperty.value;
-          break;
-        case "less-or-equal-than":
-          result = actualPropertyValue <= rawDataAsProperty.value;
-          break;
+      if (rawDataAsProperty.attribute && actualPropertyValue !== null) {
+        actualPropertyValue = actualPropertyValue[rawDataAsProperty.attribute];
+      }
+
+      let actualComparedValue = rawDataAsProperty.value;
+      if (actualComparedValue && (actualComparedValue as IPropertyDefinitionAlternativePropertyType).property) {
+        const propertyInQuestion = (actualComparedValue as IPropertyDefinitionAlternativePropertyType).property;
+        actualComparedValue = this.parentItemDefinition ?
+          this.parentItemDefinition
+            .getPropertyDefinitionFor(propertyInQuestion, true)
+            .getCurrentValueClean() :
+          this.parentModule.getPropExtensionFor(propertyInQuestion)
+            .getCurrentValueClean();
+      }
+
+      if (rawDataAsProperty.valueAttribute && actualComparedValue !== null) {
+        actualComparedValue = actualComparedValue[rawDataAsProperty.valueAttribute];
+      }
+
+      const invalidNullComparators = [
+        "greater-than",
+        "less-than",
+        "greater-or-equal-than",
+        "less-or-equal-than",
+      ];
+
+      if ((actualPropertyValue === null || actualComparedValue === null) &&
+        invalidNullComparators.includes(rawDataAsProperty.comparator)) {
+        console.warn(
+          "Attempted to compare",
+          actualPropertyValue,
+          rawDataAsProperty.comparator,
+          actualComparedValue,
+          "please set up a null check when checking property",
+          rawDataAsProperty.property,
+        );
+        result = false;
+      } else {
+        // lets fiddle with the comparator
+        switch (rawDataAsProperty.comparator) {
+          case "equals":
+            result = actualPropertyValue === actualComparedValue;
+            break;
+          case "not-equal":
+            result = actualPropertyValue !== actualComparedValue;
+            break;
+          case "greater-than":
+            result = actualPropertyValue > actualComparedValue;
+            break;
+          case "less-than":
+            result = actualPropertyValue < actualComparedValue;
+            break;
+          case "greater-or-equal-than":
+            result = actualPropertyValue >= actualComparedValue;
+            break;
+          case "less-or-equal-than":
+            result = actualPropertyValue <= actualComparedValue;
+            break;
+        }
       }
     // Otherwise in case it's a component based one
     } else {
@@ -209,18 +253,37 @@ if (process.env.NODE_ENV !== "production") {
         properties: {
           // property
           property: {type: "string"},
+          // attribute
+          attribute: {type: "string"},
           // comparator
           comparator: {
             type: "string",
             enum: comparators,
           },
-          // value
+          // value sadly the import is buggy, so I have to paste it here
           value: {
-            // despite of being able to use any of the property
-            // definition values we only allow for string numbers
-            // and booleans
-            type: ["string", "number", "boolean", "null"],
+            oneOf: [
+              {
+                type: "object",
+                properties: {
+                  property: {
+                    type: "string",
+                    pattern: "^[a-z_]+$",
+                  },
+                },
+                required: ["property"],
+                additionalProperties: false,
+              },
+              {
+                // despite of being able to use any of the property
+                // definition values we basically only allow for string numbers
+                // and booleans
+                type: ["boolean", "string", "number", "null"],
+              },
+            ],
           },
+          // value attribute
+          valueAttribute: {type: "string"},
           // gate
           gate: {
             type: "string",

@@ -43,7 +43,7 @@ export const ITEM_DEFINITION_I18N = [
   "searchFormTitle",
   "createFormTitle",
   "editFormTitle",
-]
+];
 
 // This is for small use anywhere language data
 export const LOCALE_I18N = [
@@ -85,6 +85,8 @@ export const LOCALE_I18N = [
   "image_uploader_select_file",
   "file_uploader_delete_file",
   "image_uploader_delete_file",
+
+  "rare_properties_label",
 ];
 
 // ATTRIBUTES FOR i18N PROPERTIES

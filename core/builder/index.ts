@@ -1,5 +1,5 @@
 import PropertyDefinition, {
-  IPropertyDefinitionRawJSONDataType,
+  IPropertyDefinitionRawJSONDataType, PropertyDefinitionSearchInterfacesType,
 } from "../base/ItemDefinition/PropertyDefinition";
 import { IItemRawJSONDataType } from "../base/ItemDefinition/Item";
 import { IModuleRawJSONDataType } from "../base/Module";
@@ -696,7 +696,7 @@ async function getI18nData(
       }
       i18nData[locale][localeKey] = properties[locale][localeKey].trim();
       if (i18nData[locale][localeKey + "Alt"]) {
-        i18nData[locale][localeKey + "Alt"] = properties[locale][localeKey + "Alt"].trim();
+        i18nData[locale][localeKey + "Alt"] = properties[locale][localeKey ].trim();
       }
     });
   });
@@ -881,10 +881,16 @@ async function getI18nPropertyData(
           [] : definition.i18n.searchRangeOptional || [])
         .map((b) => ({key: b, required: false})))
       // concat to search properties only if necessary
-      .concat((property.disableExactSearch || property.searchLevel === "disabled" ?
+      .concat((property.searchLevel === "disabled" || (
+        definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
+        !property.disableRangedSearch
+      ) ?
           [] : definition.i18n.searchBase || [])
         .map((b) => ({key: b, required: true})))
-      .concat((property.disableExactSearch || property.searchLevel === "disabled" ?
+      .concat((property.searchLevel === "disabled" || (
+        definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
+        !property.disableRangedSearch
+      ) ?
           [] : definition.i18n.searchOptional || [])
         .map((b) => ({key: b, required: false})))
       // request for the values if supported
@@ -895,7 +901,9 @@ async function getI18nPropertyData(
           actualFinalKeyValue: b.toString(),
         })))
       .concat((property.values && property.nullable ? ["null_value"] : [])
-        .map((b) => ({key: b, required: true})));
+        .map((b) => ({key: b, required: true})))
+      .concat((property.invalidIf && !property.hidden ? property.invalidIf.map((ii) => ii.error) : [])
+        .map((b) => ({key: "error." + b, required: true})));
 
     const errorRequiredProperties = [];
     if (!property.nullable && property.type !== "boolean") {

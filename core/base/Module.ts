@@ -4,6 +4,7 @@ import ItemDefinition, {
 import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
 } from "./ItemDefinition/PropertyDefinition";
+import { buildSearchMode } from "./searchModeBuilder";
 
 export type OnStateChangeListenerType = () => any;
 
@@ -326,6 +327,10 @@ export default class Module {
    */
   public getParentModule() {
     return this.parentModule;
+  }
+
+  public getModuleInstanceInSearchMode() {
+    return buildSearchMode(this.rawData);
   }
 
   /**
