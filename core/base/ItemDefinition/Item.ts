@@ -154,12 +154,12 @@ export default class Item {
     // If this is going to be excluded
     this.excludedIf = rawJSON.excludedIf &&
       new ConditionalRuleSet(rawJSON.excludedIf,
-        parentModule, parentItemDefinition);
+        parentModule, parentItemDefinition, null, this);
 
     // If it might be excluded
     this.mightExcludeIf = rawJSON.mightExcludeIf &&
       new ConditionalRuleSet(rawJSON.mightExcludeIf,
-        parentModule, parentItemDefinition);
+        parentModule, parentItemDefinition, null, this);
 
     // if it's default excluded
     this.defaultExcludedIf = rawJSON.defaultExcludedIf &&
@@ -167,6 +167,8 @@ export default class Item {
         rawJSON.defaultExcludedIf,
         parentModule,
         parentItemDefinition,
+        null,
+        this,
       );
 
     // parent item definition

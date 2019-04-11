@@ -63,7 +63,7 @@ export function checkConditionalRuleSet(
   // Let's check the property
   const rawDataAsProperty =
     (rawData as IConditionalRuleSetRawJSONDataPropertyType);
-  if (rawDataAsProperty.property) {
+  if (rawDataAsProperty.property && rawDataAsProperty.property !== "&this") {
     const propDef = ItemDefinition.getPropertyDefinitionRawFor(
       parentItemDefinition,
       parentModule,
@@ -376,7 +376,7 @@ export function checkPropertiesValueMappingDefiniton(
           traceback.newTraceToBit(propertyIdOfTheReferredItem),
         );
       }
-    } else {
+    } else if (referredPropertyAsValueApplied.property !== "&this") {
       // let's get the referred definition this property is about
       // this one is allowed to access the prop extensions
       // as to set a value it is allowed to use the prop extension

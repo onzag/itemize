@@ -146,6 +146,8 @@ export interface IPropertyDefinitionSupportedType {
     searchBase?: string[],
     searchOptional?: string[],
   };
+
+  // toSearch: (base: IPropertyDefinitionRawJSONDataType) => IPropertyDefinitionRawJSONDataType[];
 }
 
 // So this is how properties are defined to give an overview on
@@ -918,25 +920,27 @@ export default class PropertyDefinition {
     // set the default value
     this.defaultIf = rawJSON.defaultIf && rawJSON.defaultIf.map((dif) => ({
       value: dif.value,
-      if: new ConditionalRuleSet(dif.if, parentModule, parentItemDefinition),
+      if: new ConditionalRuleSet(dif.if, parentModule, parentItemDefinition, this, null),
     }));
 
     // create the invalid rules
     this.invalidIf = rawJSON.invalidIf && rawJSON.invalidIf.map((ii) => ({
       error: ii.error,
-      if: new ConditionalRuleSet(ii.if, parentModule, parentItemDefinition),
+      if: new ConditionalRuleSet(ii.if, parentModule, parentItemDefinition, this, null),
     }));
 
     // set the enforced values from the conditional rule set
     this.enforcedValues = rawJSON.enforcedValues &&
       rawJSON.enforcedValues.map((ev) => ({
         value: ev.value,
-        if: new ConditionalRuleSet(ev.if, parentModule, parentItemDefinition),
+        if: new ConditionalRuleSet(ev.if, parentModule,
+          parentItemDefinition, this, null),
       }));
 
     // set the hidden if rule
     this.hiddenIf = rawJSON.hiddenIf &&
-      new ConditionalRuleSet(rawJSON.hiddenIf, parentModule, parentItemDefinition);
+      new ConditionalRuleSet(rawJSON.hiddenIf, parentModule,
+        parentItemDefinition, this, null);
 
     // STATE MANAGEMENT
     this.onStateChangeListeners = [];

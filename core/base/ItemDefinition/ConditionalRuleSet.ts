@@ -1,9 +1,10 @@
 import ItemDefinition from ".";
-import {
+import PropertyDefinition, {
   PropertyDefinitionSupportedType,
   IPropertyDefinitionAlternativePropertyType,
 } from "./PropertyDefinition";
 import Module from "../Module";
+import Item from "./Item";
 
 // Types for the conditions
 export type ConditionalRuleComparatorType = "equals" | "not-equal" |
@@ -92,6 +93,8 @@ export default class ConditionalRuleSet {
 
   public parentModule: Module;
   public parentItemDefinition: ItemDefinition;
+  public parentPropertyDefinition: PropertyDefinition;
+  public parentItem: Item;
   public rawData: IConditionalRuleSetRawJSONDataType;
 
   private condition: ConditionalRuleSet;
@@ -101,6 +104,7 @@ export default class ConditionalRuleSet {
    * @param rawJSON the raw data as JSON
    * @param parentModule the module where this node is located
    * @param parentItemDefinition the item definition that this node is
+   * @param parentPropertyDefinition the property definition that contains the rule
    * located, it might not be available for example for condition
    * in prop extensions
    */
@@ -108,13 +112,18 @@ export default class ConditionalRuleSet {
     rawJSON: IConditionalRuleSetRawJSONDataType,
     parentModule: Module,
     parentItemDefinition: ItemDefinition,
+    parentPropertyDefinition: PropertyDefinition,
+    parentItem: Item,
   ) {
     this.rawData = rawJSON;
     this.condition = rawJSON.condition &&
-      new ConditionalRuleSet(rawJSON.condition, parentModule, parentItemDefinition);
+      new ConditionalRuleSet(rawJSON.condition, parentModule,
+        parentItemDefinition, parentPropertyDefinition, parentItem);
 
     this.parentItemDefinition = parentItemDefinition;
     this.parentModule = parentModule;
+    this.parentPropertyDefinition = parentPropertyDefinition;
+    this.parentItem = parentItem;
   }
 
   /**
@@ -129,12 +138,14 @@ export default class ConditionalRuleSet {
     if (rawDataAsProperty.property) {
 
       // lets get the property value as for now
-      let actualPropertyValue = this.parentItemDefinition ?
-        this.parentItemDefinition
-          .getPropertyDefinitionFor(rawDataAsProperty.property, true)
-          .getCurrentValueClean() :
-        this.parentModule.getPropExtensionFor(rawDataAsProperty.property)
-          .getCurrentValueClean();
+      let actualPropertyValue = rawDataAsProperty.property === "&this" ?
+        this.parentPropertyDefinition :
+        (this.parentItemDefinition ?
+          this.parentItemDefinition
+            .getPropertyDefinitionFor(rawDataAsProperty.property, true)
+            .getCurrentValueClean() :
+          this.parentModule.getPropExtensionFor(rawDataAsProperty.property)
+            .getCurrentValueClean());
 
       if (rawDataAsProperty.attribute && actualPropertyValue !== null) {
         actualPropertyValue = actualPropertyValue[rawDataAsProperty.attribute];
