@@ -21,6 +21,7 @@ export interface IConditionalRuleSetRawJSONDataPropertyType
   extends IConditionalRuleSetRawJSONDataBaseType {
   property: string;
   attribute?: string;
+  method?: "default" | "string" | "datetime";
   comparator: ConditionalRuleComparatorType;
   value: PropertyDefinitionSupportedType | IPropertyDefinitionAlternativePropertyType;
   valueAttribute?: string;
@@ -154,6 +155,14 @@ export default class ConditionalRuleSet {
         actualComparedValue = actualComparedValue[rawDataAsProperty.valueAttribute];
       }
 
+      if (rawDataAsProperty.method === "datetime") {
+        actualPropertyValue = (new Date(actualPropertyValue as string)).getTime();
+        actualComparedValue = (new Date(actualComparedValue as string)).getTime();
+      } else if (rawDataAsProperty.method === "string") {
+        actualPropertyValue = ((actualPropertyValue || "").toString()).toLocaleLowerCase();
+        actualComparedValue = ((actualComparedValue || "").toString()).toLocaleLowerCase();
+      }
+
       const invalidNullComparators = [
         "greater-than",
         "less-than",
@@ -239,6 +248,7 @@ if (process.env.NODE_ENV !== "production") {
     "greater-or-equal-than", "less-or-equal-than"];
   // The gates
   const gates = ["and", "or", "xor"];
+  const methods = ["default", "string", "datetime"];
 
   // The schema
   ConditionalRuleSet.schema = {
@@ -259,6 +269,10 @@ if (process.env.NODE_ENV !== "production") {
           comparator: {
             type: "string",
             enum: comparators,
+          },
+          method: {
+            type: "string",
+            enum: methods,
           },
           // value sadly the import is buggy, so I have to paste it here
           value: {
