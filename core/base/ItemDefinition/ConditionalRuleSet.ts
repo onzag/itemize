@@ -139,7 +139,7 @@ export default class ConditionalRuleSet {
 
       // lets get the property value as for now
       let actualPropertyValue = rawDataAsProperty.property === "&this" ?
-        this.parentPropertyDefinition :
+        this.parentPropertyDefinition.getCurrentValueClean() :
         (this.parentItemDefinition ?
           this.parentItemDefinition
             .getPropertyDefinitionFor(rawDataAsProperty.property, true)
@@ -166,10 +166,8 @@ export default class ConditionalRuleSet {
         actualComparedValue = actualComparedValue[rawDataAsProperty.valueAttribute];
       }
 
-      if (rawDataAsProperty.method === "datetime") {
-        actualPropertyValue = (new Date(actualPropertyValue as string)).getTime();
-        actualComparedValue = (new Date(actualComparedValue as string)).getTime();
-      } else if (rawDataAsProperty.method === "string") {
+      // This method swallows the nulls so it's allowed here
+      if (rawDataAsProperty.method === "string") {
         actualPropertyValue = ((actualPropertyValue || "").toString()).toLocaleLowerCase();
         actualComparedValue = ((actualComparedValue || "").toString()).toLocaleLowerCase();
       }
@@ -181,18 +179,26 @@ export default class ConditionalRuleSet {
         "less-or-equal-than",
       ];
 
-      if ((actualPropertyValue === null || actualComparedValue === null) &&
-        invalidNullComparators.includes(rawDataAsProperty.comparator)) {
-        console.warn(
-          "Attempted to compare",
-          actualPropertyValue,
-          rawDataAsProperty.comparator,
-          actualComparedValue,
-          "please set up a null check when checking property",
-          rawDataAsProperty.property,
-        );
+      const isAnInvalidNullComparator = invalidNullComparators.includes(rawDataAsProperty.comparator);
+      if (
+        (actualPropertyValue === null || actualComparedValue === null) &&
+        isAnInvalidNullComparator
+      ) {
+        result = false;
+      } else if (
+        rawDataAsProperty.method === "datetime" &&
+        (actualPropertyValue === "Invalid Date" || actualComparedValue === "Invalid Date") &&
+        isAnInvalidNullComparator
+      ) {
         result = false;
       } else {
+
+        // null datetimes should be considered so the null check has to be in place
+        if (rawDataAsProperty.method === "datetime") {
+          actualPropertyValue = (new Date(actualPropertyValue as string)).getTime();
+          actualComparedValue = (new Date(actualComparedValue as string)).getTime();
+        }
+
         // lets fiddle with the comparator
         switch (rawDataAsProperty.comparator) {
           case "equals":
@@ -232,6 +238,12 @@ export default class ConditionalRuleSet {
 
     // now we have a result, but we might have a chain, a children condition
     if (this.condition) {
+      if (this.rawData.gate === "and" && !result) {
+        return false;
+      } else if (this.rawData.gate === "or" && result) {
+        return true;
+      }
+
       // if we do we have to evaluate it
       const conditionResult = this.condition.evaluate();
 

@@ -8,6 +8,7 @@ import DevToolPropertyDefinition from "./dPropertyDef";
 interface IModuleProps {
   module: Module;
   language: string;
+  isSearch?: boolean;
 }
 
 interface IModuleState {
@@ -70,10 +71,16 @@ export default class DevToolModule extends React.Component<IModuleProps, IModule
         <p onClick={this.toggleExpand} style={devtoolsStyle.moduleItemTitle}>
           <b>{this.state.expanded ? "-" : "+"} </b>
           <b>{this.props.module.getName()}</b>
+          <b>{this.props.isSearch ? " - search" : ""}</b>
           <span> - {this.props.module.getI18nDataFor(this.props.language).name}</span>
           <span> (module)</span>
         </p>
         {this.state.expanded ? <div style={devtoolsStyle.moduleChildren}>
+          {this.props.module.getSearchModule() ? <DevToolModule
+            module={this.props.module.getSearchModule()}
+            language={this.props.language}
+            isSearch={true}
+          /> : null}
           {this.props.module.getAllModules().map((childModule) => {
             return <DevToolModule
               key={childModule.getName()}
@@ -96,10 +103,6 @@ export default class DevToolModule extends React.Component<IModuleProps, IModule
             />;
           })}
           <DevToolRawVisualizer content={this.props.module.rawData}/>
-          <DevToolRawVisualizer
-            title="view search module raw content"
-            content={this.props.module.getSearchModule().rawData}
-          />
         </div> : null}
       </div>
     );

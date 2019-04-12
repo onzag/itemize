@@ -938,6 +938,14 @@ async function getI18nPropertyData(
       errorRequiredProperties.push("error.TOO_FEW_DECIMALS");
     }
 
+    if (
+      definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
+      !property.disableRangedSearch
+    ) {
+      errorRequiredProperties.push("error.FROM_LARGER_THAN_TO");
+      errorRequiredProperties.push("error.TO_SMALLER_THAN_FROM");
+    }
+
     expectedProperties = expectedProperties.concat(errorRequiredProperties
       .map((b) => ({key: b, required: true})));
 

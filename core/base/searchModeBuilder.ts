@@ -17,6 +17,8 @@ export function buildSearchMode(rawData: IModuleRawJSONDataType): IModuleRawJSON
 
 function buildSearchModeModule(rawData: IModuleRawJSONDataType): IModuleRawJSONDataType {
   const newModule = {...rawData};
+  newModule.name = "QUERY_MOD__" + newModule.name;
+
   const knownPropExtMap = {};
   if (newModule.propExtensions) {
     newModule.propExtensions.forEach((pe) => {
@@ -45,8 +47,10 @@ function buildSearchModeItemDefinition(
   modulePropExtensions: {[id: string]: IPropertyDefinitionRawJSONDataType},
 ): IItemDefinitionRawJSONDataType {
   const newItemDef = {...rawData};
+  newItemDef.name = "QUERY_IDEF__" + newItemDef.name;
   const knownPropMap = {...modulePropExtensions};
   delete newItemDef.includes;
+  delete newItemDef.importedChildDefinitions;
   if (newItemDef.properties) {
     newItemDef.properties.forEach((p) => {
       knownPropMap[p.id] = p;
@@ -54,6 +58,11 @@ function buildSearchModeItemDefinition(
     newItemDef.properties = newItemDef.properties
       .map((p) => buildSearchModePropertyDefinitions(p, knownPropMap))
       .reduce((arr, pArr) => [...arr, ...pArr]);
+  }
+  if (newItemDef.childDefinitions) {
+    newItemDef.childDefinitions = newItemDef.childDefinitions.map((cd) => {
+      return buildSearchModeItemDefinition(cd, modulePropExtensions);
+    });
   }
   return newItemDef;
 }
@@ -130,6 +139,9 @@ function buildSearchModePropertyDefinitions(
       }
     } else {
       newPropDef2 = {...newPropDef};
+      delete newPropDef2.default;
+      delete newPropDef2.defaultIf;
+
       newPropDef.id = "FROM__" + newPropDef.id;
       newPropDef2.id = "TO__" + newPropDef2.id;
 
@@ -215,7 +227,7 @@ function buildSearchModeConditionalRuleSet(
 ): IConditionalRuleSetRawJSONDataType {
   const newRule = {...rawData};
   if ((newRule as IConditionalRuleSetRawJSONDataPropertyType).property) {
-    const newRuleAsProperty = (newRule as IConditionalRuleSetRawJSONDataPropertyType); 
+    const newRuleAsProperty = (newRule as IConditionalRuleSetRawJSONDataPropertyType);
     if (newRuleAsProperty.property !== "&this") {
       const converted = getConversionRulesetId(otherKnownProperties[
         newRuleAsProperty.property
@@ -293,7 +305,7 @@ function getConversionRulesetId(
   return id;
 }
 
-function displaceI18NData(i18n: any, path: string[]){
+function displaceI18NData(i18n: any, path: string[]) {
   const newI18n = {...i18n};
   Object.keys(newI18n).forEach((language) => {
     newI18n[language] = {...newI18n[language]};
