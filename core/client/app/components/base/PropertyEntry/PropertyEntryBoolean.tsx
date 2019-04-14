@@ -7,7 +7,7 @@ import equals from "deep-equal";
 function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
   // let's the get basic data for the entry
   const i18nData = props.property.getI18nDataFor(props.language);
-  const className = getClassName(props, "switch", props.poked);
+  const className = getClassName(props, "switch", props.poked, props.uncommon);
   const i18nLabel = i18nData && i18nData.label;
   const i18nDescription = i18nData && i18nData.description;
   const icon = props.property.getIcon();
@@ -56,7 +56,7 @@ function handleOnChange(
 function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
   // Let's get the basic data
   const i18nData = props.property.getI18nDataFor(props.language);
-  const className = getClassName(props, "radio", props.poked);
+  const className = getClassName(props, "radio", props.poked, props.uncommon);
   const i18nLabel = i18nData && i18nData.label;
   const i18nDescription = i18nData && i18nData.description;
   const icon = props.property.getIcon();
@@ -120,6 +120,7 @@ export default class PropertyEntryBoolean extends React.Component<IPropertyEntry
     return this.props.property !== nextProps.property ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
+      !!this.props.uncommon !== !!nextProps.uncommon ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n;
   }

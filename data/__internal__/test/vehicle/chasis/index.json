@@ -1,0 +1,25 @@
+{
+    "type": "item",
+    "properties": [
+        {
+            "id": "chasis_type",
+            "type": "string",
+            "values": ["motorbike", "quadbike", "car"]
+        },
+        {
+            "id": "material_type",
+            "type": "string",
+            "values": ["steel", "aluminium", "carbon"]
+        },
+        {
+            "id": "external_mudguards",
+            "type": "boolean",
+            "nullIfHidden": true,
+            "hiddenIf": {
+                "property": "chasis_type",
+                "comparator": "equals",
+                "value": "car"
+            }
+        }
+    ]
+}

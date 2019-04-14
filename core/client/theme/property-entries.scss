@@ -14,11 +14,14 @@ $property-entry-files-rejected-color-hover: #f44336;
 $property-entry-icon-button-color: #2196f3;
 $property-entry-icon-button-color-hover: #1976d2;
 $property-entry-icon-button-icon-color: #fff;
+$property-entry-container-border-color: #ccc;
 
 $property-entry-error-height: 1.3rem;
 
 .property-entry-container {
   width: 100%;
+  padding-top: 15px;
+  border-top: solid 1px $property-entry-container-border-color;
 }
 
 .property-entry-error {

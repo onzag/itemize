@@ -76,10 +76,6 @@ export function processItem(
     }
   });
 
-  nRawData.items = nRawData.items &&
-    nRawData.items.map((itm) =>
-      processItem(itm, locale));
-
   return nRawData;
 }
 

@@ -164,42 +164,13 @@ export function checkItem(
   }
   idPool.push(rawData.id);
 
-  const isGroup = !!rawData.items;
-
   // check whether the item definition exists for this item
   // it must exist to be an item
-  if (!isGroup && !ItemDefinition.getItemDefinitionRawFor(
+  if (!ItemDefinition.getItemDefinitionRawFor(
     parentItemDefinition, parentModule, rawData.name)) {
     throw new CheckUpError(
       "Missing item definition",
       traceback.newTraceToBit("name"),
-    );
-  }
-
-  if (isGroup) {
-    rawData.items.forEach((itm, index) =>
-      checkItem(itm, parentItemDefinition, parentModule, idPool,
-        traceback.newTraceToBit("items").newTraceToBit(index)));
-  }
-
-  if (isGroup && rawData.predefinedProperties) {
-    throw new CheckUpError(
-      "Cannot set predefinedProperties and be a group",
-      traceback.newTraceToBit("predefinedProperties"),
-    );
-  }
-
-  if (isGroup && rawData.enforcedProperties) {
-    throw new CheckUpError(
-      "Cannot set enforcedProperties and be a group",
-      traceback.newTraceToBit("enforcedProperties"),
-    );
-  }
-
-  if (isGroup && rawData.sinkIn) {
-    throw new CheckUpError(
-      "Cannot set sinkIn and be a group",
-      traceback.newTraceToBit("sinkIn"),
     );
   }
 

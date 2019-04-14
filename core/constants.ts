@@ -87,6 +87,7 @@ export const LOCALE_I18N = [
   "image_uploader_delete_file",
 
   "rare_properties_label",
+  "uncommon_properties_label",
 ];
 
 // ATTRIBUTES FOR i18N PROPERTIES

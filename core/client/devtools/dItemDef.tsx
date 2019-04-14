@@ -124,7 +124,7 @@ export default class DevToolItemDefinition extends
       valueToStringify = {
         ...this.state.value,
         properties: this.state.value.properties.map((propertyValue) => {
-          let propertyValueToStringify = propertyValue.value;
+          let propertyValueToStringify = {...propertyValue};
           // a small hack due to internal values being too long
           if (
             propertyValueToStringify.internalValue !== null &&
@@ -133,10 +133,7 @@ export default class DevToolItemDefinition extends
             propertyValueToStringify = {...propertyValueToStringify, internalValue: "[TOO BIG TO DISPLAY]"};
           }
 
-          return {
-            ...propertyValue,
-            value: propertyValueToStringify,
-          };
+          return propertyValueToStringify;
         }),
       };
     }
@@ -167,7 +164,6 @@ export default class DevToolItemDefinition extends
             <ItemEntry
               value={this.state.value}
               onPropertyChange={this.onPropertyChange}
-              itemDefinition={this.props.itemDef}
               displayHidden={this.state.displayHiddenEntries}
               poked={this.state.pokeEntries}
             />

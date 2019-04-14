@@ -19,6 +19,7 @@ export interface IPropertyEntryBaseProps {
   value: IPropertyDefinitionValue;
   onChange: (newValue: PropertyDefinitionSupportedType, internalValue: any) => void;
   poked?: boolean;
+  uncommon?: boolean;
 }
 
 export interface IPropertyEntryProps extends IPropertyEntryBaseProps {
@@ -54,9 +55,11 @@ const typeRegistry:
  * @param name the name that will be given
  * @param poked whether it is being poked
  */
-export function getClassName(props: IPropertyEntryBaseProps, name: string, poked?: boolean) {
+export function getClassName(props: IPropertyEntryBaseProps, name: string, poked: boolean, uncommon: boolean) {
   return `property-entry property-entry--${name} ${
     poked ? "property-entry--poked" : ""
+  } ${
+    uncommon ? "property-entry--uncommon" : ""
   } ${
     props.value.default ? "property-entry--default" : ""
   } ${

@@ -1,5 +1,5 @@
 import ConditionalRuleSet from "./ConditionalRuleSet";
-import Item, { IItemRawJSONDataType, IItemGroupHandle } from "./Item";
+import Item, { IItemRawJSONDataType, IItemValue } from "./Item";
 import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionValue } from "./PropertyDefinition";
 import Module, { IModuleRawJSONDataType, OnStateChangeListenerType } from "../Module";
@@ -41,24 +41,9 @@ export interface IItemDefinitionRawJSONDataType {
 }
 
 export interface IItemDefinitionValue {
-  properties: Array<{
-    definition: PropertyDefinition,
-    value: IPropertyDefinitionValue,
-  }>;
-}
-
-/**
- * This is a external helper function which checks a list of usable
- * items to try to find whether it has an item
- * @param name the name of the item
- * @param handle the handle either an item itself or an item group
- * @returns a boolean with the answer
- */
-function hasItemOf(name: string, handle: Item | IItemGroupHandle): boolean {
-  if (handle instanceof Item) {
-    return handle.getDefinitionName() === name;
-  }
-  return handle.items.some((i) => hasItemOf(name, i));
+  itemDefinition: ItemDefinition;
+  items: IItemValue[];
+  properties: IPropertyDefinitionValue[];
 }
 
 /**
@@ -187,16 +172,16 @@ export default class ItemDefinition {
           definition: this.parentModule.getDetachedItemDefinitionInstanceFor(d),
         })) : [];
 
-    // assigning the item instances by using the includes
-    // and instantiating those
-    this.itemInstances = rawJSON.includes ? rawJSON.includes
-      .map((i) => (new Item(i, parentModule, this))) : [];
-
     // assigning the property definition by using the
     // properties and instantiating those as well
     this.propertyDefinitions = rawJSON.properties ? rawJSON.properties
       .map((i) => (new PropertyDefinition(i, parentModule,
         this, false))) : [];
+
+    // assigning the item instances by using the includes
+    // and instantiating those
+    this.itemInstances = rawJSON.includes ? rawJSON.includes
+      .map((i) => (new Item(i, parentModule, this))) : [];
   }
 
   /**
@@ -368,36 +353,14 @@ export default class ItemDefinition {
     // contains the item with the given name
     // otherwise it's not worth to check for activity
     const possibleCandidates = this.itemInstances
-      .filter((i) => i.containsItem(name));
+      .filter((i) => i.getName() === name);
 
     // if there are no possible candidates return false
     if (!possibleCandidates.length) {
       return false;
     }
 
-    // othrewise loop through them and try to find
-    // a single match, that's enough
-    possibleCandidates.some((pc) => {
-      // let's get a list of usable items, these are
-      // the active items with conditional rule sets matched
-      const usableItems = pc.getCurrentUsableItems();
-
-      // it might be null when there's nothing like if the
-      // item is not a group and it's excluded
-      if (usableItems === null) {
-        return false;
-      } else if (usableItems instanceof Item) {
-        // now this is a single item because usable
-        // items would return a handle or single items
-        if (usableItems.getDefinitionName() === name) {
-          return true;
-        }
-        return false;
-      } else {
-        // Otherwise we refer to this external helper function
-        return hasItemOf(name, usableItems);
-      }
-    });
+    return possibleCandidates.some((c) => !c.isCurrentlyExcluded());
   }
 
   /**
@@ -507,19 +470,35 @@ export default class ItemDefinition {
 
   /**
    * TODO provides the structure of the current item
-   * as it is currently
+   * as it is currently, the reason this is more efficient
+   * is because getting the value of each item definition
+   * wastes resources, so using this function is more
+   * efficient than calling the functions
+   * @param onlyIncludeProperties only includes these specific
+   * properties, note property definitions are not fetched in
+   * this case
    */
-  public getCurrentValue(): IItemDefinitionValue {
-    return {
-      properties: this.getParentModule().getAllPropExtensions().concat(
+  public getCurrentValue(
+    onlyIncludeProperties?: string[],
+    excludeItems?: boolean,
+  ): IItemDefinitionValue {
+    const properties = onlyIncludeProperties ?
+      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false).getCurrentValue()) :
+      this.getParentModule().getAllPropExtensions().concat(
         this.getAllPropertyDefinitions(),
       ).map((pd) => {
-        return {
-          definition: pd,
-          value: pd.getCurrentValue(),
-        };
-      }),
+        return pd.getCurrentValue();
+      });
+
+    return {
+      itemDefinition: this,
+      items: excludeItems ? [] : this.itemInstances.map((ii) => ii.getCurrentValue()),
+      properties,
     };
+  }
+
+  public toJSON() {
+    return this.rawData;
   }
 }
 

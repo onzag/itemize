@@ -665,6 +665,7 @@ export interface IPropertyDefinitionRawJSONDataType {
     [locale: string]: any,
   };
   rare?: boolean;
+  uncommon?: boolean;
   // the type of the property
   type: PropertyDefinitionSupportedTypeName;
   subtype?: string;
@@ -680,6 +681,7 @@ export interface IPropertyDefinitionRawJSONDataType {
   // whether it can be null or not
   nullable?: boolean;
   // Makes the value be null if hidden
+  // doe not perform checks so it makes it valid
   nullIfHidden?: boolean;
   // Makes the field hidden if value is enforced
   hiddenIfEnforced?: boolean;
@@ -743,6 +745,7 @@ export interface IPropertyDefinitionValue {
   invalidReason: PropertyInvalidReason | string;
   value: PropertyDefinitionSupportedType;
   internalValue: any;
+  propertyDefinition: PropertyDefinition;
 }
 
 // OTHER EXPORTS
@@ -1042,7 +1045,7 @@ export default class PropertyDefinition {
           this.superDefaultedValue) : this.rawData.default;
 
       // Also by condition
-      if (this.defaultIf && typeof defaultValue === "undefined") {
+      if (this.defaultIf && typeof this.superDefaultedValue === "undefined") {
         // find a rule that passes
         const rulePasses = this.defaultIf.find((difRule) => difRule.if.evaluate());
         if (rulePasses) {
@@ -1077,10 +1080,12 @@ export default class PropertyDefinition {
         value: possibleEnforcedValue.value,
         hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(),
         internalValue: null,
+        propertyDefinition: this,
       };
     }
 
     // make if hidden if null if hidden is set to true
+    // note nulls set this way are always valid
     if (this.rawData.nullIfHidden && this.isCurrentlyHidden()) {
       return {
         userSet: false,
@@ -1091,56 +1096,22 @@ export default class PropertyDefinition {
         value: null,
         hidden: true,
         internalValue: null,
+        propertyDefinition: this,
       };
     }
 
-    // if the value hasn't been modified we are to return the defaults
-    if (!this.stateValueModified) {
-      // lets find the default value, first the super default
-      // and we of course extract it in case of property definition
-      // or otherwise use the default, which might be undefined
-      let defaultValue = typeof this.superDefaultedValue !== "undefined" ?
-        (this.superDefaultedValue instanceof PropertyDefinition ?
-          this.superDefaultedValue.getCurrentValueClean() :
-          this.superDefaultedValue) : this.rawData.default;
-
-      // Also by condition
-      if (this.defaultIf && typeof defaultValue === "undefined") {
-        // find a rule that passes
-        const rulePasses = this.defaultIf.find((difRule) => difRule.if.evaluate());
-        if (rulePasses) {
-          // and set the default value to such
-          defaultValue = rulePasses.value;
-        }
-      }
-
-      // return the default value or null if nothing found
-      // the maximum default is null, even if the item is not
-      // nullable in which case the item would be considered invalid
-      const invalidDefaultReason = this.isValidValue(defaultValue || null);
-      const value = defaultValue || null;
-      return {
-        userSet: false,
-        enforced: false,
-        default: true,
-        valid: !invalidDefaultReason,
-        invalidReason: invalidDefaultReason,
-        value,
-        hidden: this.isCurrentlyHidden(),
-        internalValue: null,
-      };
-    }
-
-    const invalidReason = this.isValidValue(this.stateValue);
+    const value = this.getCurrentValueClean();
+    const invalidReason = this.isValidValue(value);
     return {
-      userSet: true,
+      userSet: this.stateValueModified,
       enforced: false,
-      default: false,
+      default: !this.stateValueModified,
       valid: !invalidReason,
       invalidReason,
-      value: this.stateValue,
+      value,
       hidden: this.isCurrentlyHidden(),
-      internalValue: this.stateinternalValue,
+      internalValue: this.stateValueModified ? this.stateinternalValue : null,
+      propertyDefinition: this,
     };
   }
 
@@ -1289,6 +1260,10 @@ export default class PropertyDefinition {
 
   public isRare() {
     return this.rawData.rare || false;
+  }
+
+  public isUncommon() {
+    return this.rawData.uncommon || false;
   }
 
   public isRetrievalDisabled() {
@@ -1473,6 +1448,9 @@ if (process.env.NODE_ENV !== "production") {
         type: "string",
       },
       rare: {
+        type: "boolean",
+      },
+      uncommon: {
         type: "boolean",
       },
       min: {

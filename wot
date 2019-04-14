@@ -1,12 +1,8 @@
 TODO TECH
 
-0. Restructure conditional rule set for getting the value of the property directly without checking for whether is valid or not as
-right now it uses getCurrentValue which does the check, this is pointless
-1. Support properties as value in conditional rule set, so it can use a property value for checking the condition just like
-property maps can do
-2. create an invalidIf condition which does take an object with conditions, just like enforcedValues, and takes an user defined
-error code, FROM_LARGER_THAN_TO and TO_SMALLER_THAN_FROM will be reserved, and added to invalid conditions, which are reserved, we
-will need checkers for that, translation strings will be needed.
+0. We need to get rid of item groups, and rather use property conditionals to exclude/include those items using whatever logic.
+Reestructure everything to disable item groups, and enable only single items.
+1. Make sure the isIncluded rule works with id and name.
 
 - Implement service workers
 

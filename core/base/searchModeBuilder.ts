@@ -9,7 +9,7 @@ import {
   IConditionalRuleSetRawJSONDataType,
   IConditionalRuleSetRawJSONDataPropertyType,
 } from "./ItemDefinition/ConditionalRuleSet";
-import { IItemDefinitionRawJSONDataType } from "./ItemDefinition";
+import ItemDefinition, { IItemDefinitionRawJSONDataType } from "./ItemDefinition";
 
 export function buildSearchMode(rawData: IModuleRawJSONDataType): IModuleRawJSONDataType {
   return buildSearchModeModule(rawData);
@@ -34,7 +34,7 @@ function buildSearchModeModule(rawData: IModuleRawJSONDataType): IModuleRawJSOND
       if (m.type === "module") {
         return null;
       } else {
-        return buildSearchModeItemDefinition(m, knownPropExtMap);
+        return buildSearchModeItemDefinition(m, knownPropExtMap, rawData);
       }
     }).filter((s) => !!s);
   }
@@ -45,12 +45,20 @@ function buildSearchModeModule(rawData: IModuleRawJSONDataType): IModuleRawJSOND
 function buildSearchModeItemDefinition(
   rawData: IItemDefinitionRawJSONDataType,
   modulePropExtensions: {[id: string]: IPropertyDefinitionRawJSONDataType},
+  originalModule: IModuleRawJSONDataType,
 ): IItemDefinitionRawJSONDataType {
   const newItemDef = {...rawData};
   newItemDef.name = "QUERY_IDEF__" + newItemDef.name;
   const knownPropMap = {...modulePropExtensions};
-  delete newItemDef.includes;
   delete newItemDef.importedChildDefinitions;
+
+  newItemDef.i18nData = {...newItemDef.i18nData};
+  Object.keys(newItemDef.i18nData).forEach((lang) => {
+    newItemDef.i18nData[lang] = {...newItemDef.i18nData[lang]};
+    newItemDef.i18nData[lang].createFormTitle = newItemDef.i18nData[lang].searchFormTitle;
+    newItemDef.i18nData[lang].createFormTitleAlt = newItemDef.i18nData[lang].searchFormTitleAlt;
+  });
+
   if (newItemDef.properties) {
     newItemDef.properties.forEach((p) => {
       knownPropMap[p.id] = p;
@@ -59,9 +67,52 @@ function buildSearchModeItemDefinition(
       .map((p) => buildSearchModePropertyDefinitions(p, knownPropMap))
       .reduce((arr, pArr) => [...arr, ...pArr]);
   }
+
+  newItemDef.includes = newItemDef.includes && newItemDef.includes.map((i) => {
+    const idef = ItemDefinition.getItemDefinitionRawFor(rawData, originalModule, i.name, false);
+    const newInclude = {...i};
+    if (newInclude.defaultExcludedIf) {
+      newInclude.defaultExcludedIf = buildSearchModeConditionalRuleSet(i.defaultExcludedIf, knownPropMap);
+    }
+    if (newInclude.mightExcludeIf) {
+      newInclude.mightExcludeIf = buildSearchModeConditionalRuleSet(i.mightExcludeIf, knownPropMap);
+    }
+    if (newInclude.excludedIf) {
+      newInclude.excludedIf = buildSearchModeConditionalRuleSet(i.excludedIf, knownPropMap);
+    }
+    newInclude.name = "QUERY_IDEF__" + newInclude.name;
+    if (newInclude.sinkIn) {
+      newInclude.sinkIn = newInclude.sinkIn.map((sinkInProperty) => {
+        const property = ItemDefinition.getPropertyDefinitionRawFor(idef, originalModule, sinkInProperty, false);
+        return getConversionRulesetId(property);
+      });
+    }
+    ["enforcedProperties", "predefinedProperties"].forEach((objectKey) => {
+      if (newInclude[objectKey]) {
+        const newValueForThat = {};
+        Object.keys(newInclude[objectKey]).forEach((key) => {
+          const propertyInReferred = ItemDefinition.getPropertyDefinitionRawFor(idef, originalModule, key, false);
+          let value = newInclude.enforcedProperties[key];
+          if ((value as IPropertyDefinitionAlternativePropertyType).property) {
+            value = {
+              property: getConversionRulesetId(
+                knownPropMap[(value as IPropertyDefinitionAlternativePropertyType).property]
+              ),
+            };
+          }
+          newValueForThat[getConversionRulesetId(propertyInReferred)] = value;
+        });
+
+        newInclude[objectKey] = newValueForThat;
+      }
+    });
+
+    return newInclude;
+  });
+
   if (newItemDef.childDefinitions) {
     newItemDef.childDefinitions = newItemDef.childDefinitions.map((cd) => {
-      return buildSearchModeItemDefinition(cd, modulePropExtensions);
+      return buildSearchModeItemDefinition(cd, modulePropExtensions, originalModule);
     });
   }
   return newItemDef;
@@ -78,6 +129,15 @@ function buildSearchModePropertyDefinitions(
 
   const newPropDef = {...rawData};
   newPropDef.nullable = true;
+  if (newPropDef.searchLevel === "rare") {
+    newPropDef.rare = true;
+  } else if (newPropDef.searchLevel === "moderate") {
+    newPropDef.uncommon = true;
+  } else {
+    newPropDef.rare = false;
+    newPropDef.uncommon = false;
+  }
+
   delete newPropDef.autocompleteSupportsPrefills;
   if (newPropDef.defaultIf) {
     newPropDef.defaultIf = newPropDef.defaultIf.map((di) => {

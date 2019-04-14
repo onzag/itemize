@@ -579,50 +579,32 @@ async function buildItemDefinition(
       item: IItemRawJSONDataType,
       iTraceback: Traceback,
     ) => {
-      // so we first check whether the item is a non group type
-      if (item.name) {
-        // let's check in the imported definitions
-        if (importedChildDefinitions) {
-          // if we find such imported definition
-          if (importedChildDefinitions.find((idef) => {
-            const lastName = idef[idef.length - 1];
-            return (lastName === item.name ||
-              idef.join("/") === item.name);
-          })) {
-            // we return and assume it is valid
-            return;
-          }
+      if (importedChildDefinitions) {
+        // if we find such imported definition
+        if (importedChildDefinitions.find((idef) => {
+          const lastName = idef[idef.length - 1];
+          return (lastName === item.name ||
+            idef.join("/") === item.name);
+        })) {
+          // we return and assume it is valid
+          return;
         }
+      }
 
-        // otherwise if we don't find any and we know for sure
-        // it is meant to be an imported definition
-        if (item.name.indexOf("/") !== -1) {
-          throw new CheckUpError(
-            "Missing imported item definition for " + item,
-            iTraceback.newTraceToBit("name"),
-          );
-        }
-        // Otherwise we try to get the actual location
-        // it will throw an error otherwise
-        await getActualFileLocation(
-          path.join(path.dirname(actualLocation), item.name),
+      // otherwise if we don't find any and we know for sure
+      // it is meant to be an imported definition
+      if (item.name.indexOf("/") !== -1) {
+        throw new CheckUpError(
+          "Missing imported item definition for " + item,
           iTraceback.newTraceToBit("name"),
         );
-
-      } else if (item.items) {
-        // if it's a group lets create a group traceback for the items
-        // property
-        const itemGroupTraceback = iTraceback.newTraceToBit("items");
-        // and run a promise looping in each item
-        await Promise.all(
-          item.items.map((internalItem, index) => {
-            return fnCheckExists(
-              internalItem,
-              itemGroupTraceback.newTraceToBit(index),
-            );
-          }),
-        );
       }
+      // Otherwise we try to get the actual location
+      // it will throw an error otherwise
+      await getActualFileLocation(
+        path.join(path.dirname(actualLocation), item.name),
+        iTraceback.newTraceToBit("name"),
+      );
     };
 
     const tracebackIncludes = traceback.newTraceToBit("includes");
@@ -718,21 +700,6 @@ async function buildItemI18nName(
   item: IItemRawJSONDataType,
   traceback: Traceback,
 ) {
-  // we try to see if there are child items
-  if (item.items) {
-    const itemGroupTraceback = traceback.newTraceToBit("items");
-    // we process those too, recursively
-    item.items = await Promise.all<IItemRawJSONDataType>
-      (item.items.map((internalItem, index) => {
-        return buildItemI18nName(
-          supportedLanguages,
-          actualLocation,
-          internalItem,
-          itemGroupTraceback.newTraceToBit(index),
-        );
-      }));
-  }
-
   // get the language location
   const languageFileLocation =
     actualLocation.replace(".json", ".properties");
@@ -752,41 +719,15 @@ async function buildItemI18nName(
   const localeFileTraceback =
     traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
 
-  const isGroup = !!item.items;
-
-  // Whether we found the language data for a locale
-  let foundLanguageData = false;
-
   // use the same technique we used before to get the name
   supportedLanguages.forEach((locale) => {
     if (!properties[locale]) {
-      // Groups are required to have language data
-      // also if we found language data for another locale
-      if (isGroup || foundLanguageData) {
-        throw new CheckUpError(
-          "File does not include language data for " + locale,
-          localeFileTraceback,
-        );
-      }
       return;
     } else if (!properties[locale].item) {
-      if (isGroup || foundLanguageData) {
-        throw new CheckUpError(
-          "File does not have item data for " + locale,
-          localeFileTraceback,
-        );
-      }
       return;
     } else if (typeof properties[locale].item[item.id] !== "string") {
-      if (isGroup || foundLanguageData) {
-        throw new CheckUpError(
-          "File does not have item data for " + locale + " in " + item.id,
-          localeFileTraceback,
-        );
-      }
       return;
     }
-    foundLanguageData = true;
     i18nName[locale] = properties[locale].item[item.id].trim();
   });
 
@@ -900,7 +841,7 @@ async function getI18nPropertyData(
           required: true,
           actualFinalKeyValue: b.toString(),
         })))
-      .concat((property.values && property.nullable ? ["null_value"] : [])
+      .concat((property.values ? ["null_value"] : [])
         .map((b) => ({key: b, required: true})))
       .concat((property.invalidIf && !property.hidden ? property.invalidIf.map((ii) => ii.error) : [])
         .map((b) => ({key: "error." + b, required: true})));
