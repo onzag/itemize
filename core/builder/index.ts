@@ -42,7 +42,12 @@ const fsAsync = fs.promises;
 // it's ok this is here
 import "source-map-support/register";
 import { copyMomentFiles } from "./moment";
-import { ITEM_DEFINITION_I18N } from "../constants";
+import {
+  ITEM_DEFINITION_I18N,
+  ITEM_OPTIONAL_I18N,
+  ITEM_CAN_BE_EXCLUDED_I18N,
+  ITEM_CALLOUT_EXCLUDED_I18N,
+} from "../constants";
 import { MODULE_I18N } from "../constants";
 
 if (process.env.NODE_ENV === "production") {
@@ -73,7 +78,6 @@ interface IFileModuleDataRawUntreatedJSONDataType {
 // and this is the raw untreated json for an item
 export interface IFileItemDefinitionUntreatedRawJSONDataType {
   type: "item";
-  allowCalloutExcludes?: boolean;
   imports?: string[];
   includes?: IItemRawJSONDataType[];
   properties?: IPropertyDefinitionRawJSONDataType[];
@@ -534,12 +538,7 @@ async function buildItemDefinition(
     includes: fileData.includes,
     properties: fileData.properties,
     type: fileData.type,
-    allowCalloutExcludes: fileData.allowCalloutExcludes,
   };
-
-  if (!finalValue.allowCalloutExcludes) {
-    delete finalValue.allowCalloutExcludes;
-  }
 
   if (!finalValue.includes ||
     (Array.isArray(finalValue.includes) && !finalValue.includes.length)) {
@@ -616,7 +615,7 @@ async function buildItemDefinition(
 
     finalValue.includes = await Promise.all<IItemRawJSONDataType>
       (finalValue.includes.map((item, index) => {
-        return buildItemI18nName(
+        return getI18nItemData(
           supportedLanguages,
           actualLocation,
           item,
@@ -677,9 +676,6 @@ async function getI18nData(
         );
       }
       i18nData[locale][localeKey] = properties[locale][localeKey].trim();
-      if (i18nData[locale][localeKey + "Alt"]) {
-        i18nData[locale][localeKey + "Alt"] = properties[locale][localeKey ].trim();
-      }
     });
   });
 
@@ -694,7 +690,7 @@ async function getI18nData(
  * @param item the item itself
  * @returns the item modified
  */
-async function buildItemI18nName(
+async function getI18nItemData(
   supportedLanguages: string[],
   actualLocation: string,
   item: IItemRawJSONDataType,
@@ -712,27 +708,78 @@ async function buildItemI18nName(
 
   // get the properties
   const properties = PropertiesReader(languageFileLocation).path();
-  const i18nName: {
-    [locale: string]: string,
+  const i18nData: {
+    [locale: string]: {
+      [key: string]: string,
+    },
   } = {};
 
   const localeFileTraceback =
     traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
 
+  const expectedProperties = ITEM_OPTIONAL_I18N
+    .map((b) => ({key: b, required: false}))
+    .concat((item.canUserExclude || item.canUserExcludeIf ? ITEM_CAN_BE_EXCLUDED_I18N : [])
+      .map((b) => ({key: b, required: true})))
+    .concat((item.exclusionIsCallout ? ITEM_CALLOUT_EXCLUDED_I18N : [])
+      .map((b) => ({key: b, required: true})));
+
+  const localeDataIsRequired = expectedProperties.filter((p) => p.required).length >= 1;
+
   // use the same technique we used before to get the name
   supportedLanguages.forEach((locale) => {
+    i18nData[locale] = {};
+
     if (!properties[locale]) {
+      if (localeDataIsRequired) {
+        throw new CheckUpError(
+          "File does not include language data for '" + locale + "'",
+          localeFileTraceback,
+        );
+      }
       return;
-    } else if (!properties[locale].item) {
+    } else if (!properties[locale].items) {
+      if (localeDataIsRequired) {
+        throw new CheckUpError(
+          "File does not include 'items' data for '" + locale + "'",
+          localeFileTraceback,
+        );
+      }
       return;
-    } else if (typeof properties[locale].item[item.id] !== "string") {
+    } else if (!properties[locale].items[item.id]) {
+      if (localeDataIsRequired) {
+        throw new CheckUpError(
+          "Does not include 'items' data for '" + locale + "' in '" +
+            item.id + "'",
+          localeFileTraceback,
+        );
+      }
       return;
     }
-    i18nName[locale] = properties[locale].item[item.id].trim();
+
+    expectedProperties.forEach((expectedProperty) => {
+      const result = properties[locale].items[item.id][expectedProperty.key];
+
+      // if we don't find it and it's not required not a big deal
+      if (!result && !expectedProperty.required) {
+        return;
+      } else if (!result && expectedProperty.required) {
+        // otherwise we throw an error
+        throw new CheckUpError("File " + languageFileLocation +
+          " has missing items data for item id '" + item.id +
+          "' in '" + expectedProperty.key + "' in locale " + locale, localeFileTraceback);
+      } else if (typeof result !== "string") {
+        // also throw an error if it's invalid
+        throw new CheckUpError("File " + languageFileLocation +
+          " has invalid items data for item id '" + item.id +
+          "' in '" + expectedProperty.key + "' in locale " + locale, localeFileTraceback);
+      }
+      i18nData[locale][expectedProperty.key] = result.trim();
+    });
   });
 
   // set it and return the item itself
-  item.i18nName = i18nName;
+  item.i18nData = i18nData;
   return item;
 }
 
@@ -786,6 +833,90 @@ async function getI18nPropertyData(
   const localeFileTraceback =
     traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
 
+  const searchLevelIsDisabledOrHidden =
+    property.searchLevel === "disabled" || property.searchLevel === "hidden";
+
+  let expectedProperties = definition.i18n.base
+    .map((b) => ({key: b, required: true}))
+    // concat to optional properties
+    .concat((definition.i18n.optional || [])
+      .map((b) => ({key: b, required: false})))
+    // concat to search range properties only if necessary
+    .concat((property.disableRangedSearch || searchLevelIsDisabledOrHidden ?
+        [] : definition.i18n.searchRange || [])
+      .map((b) => ({key: b, required: true})))
+    .concat((property.disableRangedSearch || searchLevelIsDisabledOrHidden ?
+        [] : definition.i18n.searchRangeOptional || [])
+      .map((b) => ({key: b, required: false})))
+    // concat to search properties only if necessary
+    .concat((searchLevelIsDisabledOrHidden || (
+      definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
+      !property.disableRangedSearch
+    ) ?
+        [] : definition.i18n.searchBase || [])
+      .map((b) => ({key: b, required: true})))
+    .concat((searchLevelIsDisabledOrHidden || (
+      definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
+      !property.disableRangedSearch
+    ) ?
+        [] : definition.i18n.searchOptional || [])
+      .map((b) => ({key: b, required: false})))
+    // request for the values if supported
+    .concat((property.values || [])
+      .map((b) => ({
+        key: "values." + b.toString().replace(/\./g, "_dot_").replace("/\s/g", "_"),
+        required: true,
+        actualFinalKeyValue: b.toString(),
+      })))
+    .concat((property.values ? ["null_value"] : [])
+      .map((b) => ({key: b, required: true})))
+    .concat((property.invalidIf && !property.hidden ? property.invalidIf.map((ii) => ii.error) : [])
+      .map((b) => ({key: "error." + b, required: true})));
+
+  const errorRequiredProperties = [];
+  if (!property.nullable && property.type !== "boolean") {
+    errorRequiredProperties.push("error.NOT_NULLABLE");
+  }
+
+  if ((definition.max || definition.maxLength) &&
+    !property.values && !property.autocompleteIsEnforced) {
+    errorRequiredProperties.push("error.TOO_LARGE");
+  }
+
+  if (definition.supportedSubtypes && property.subtype) {
+    errorRequiredProperties.push("error.INVALID_SUBTYPE_VALUE");
+  }
+
+  if (property.type === "date" || property.type === "datetime" || property.type === "time") {
+    errorRequiredProperties.push("error.INVALID_DATETIME");
+  }
+
+  if (typeof property.minLength !== "undefined" &&
+    !property.values && !property.autocompleteIsEnforced) {
+    errorRequiredProperties.push("error.TOO_SMALL");
+  }
+
+  if (typeof definition.maxDecimalCount !== "undefined" &&
+    !property.values && !property.autocompleteIsEnforced) {
+    errorRequiredProperties.push("error.TOO_MANY_DECIMALS");
+  }
+
+  if (typeof property.minDecimalCount !== "undefined" &&
+    !property.values && !property.autocompleteIsEnforced) {
+    errorRequiredProperties.push("error.TOO_FEW_DECIMALS");
+  }
+
+  if (
+    definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
+    !property.disableRangedSearch
+  ) {
+    errorRequiredProperties.push("error.FROM_LARGER_THAN_TO");
+    errorRequiredProperties.push("error.TO_SMALLER_THAN_FROM");
+  }
+
+  expectedProperties = expectedProperties.concat(errorRequiredProperties
+    .map((b) => ({key: b, required: true})));
+
   // and start to loop
   supportedLanguages.forEach((locale) => {
     // do some checks
@@ -807,91 +938,10 @@ async function getI18nPropertyData(
       );
     }
 
-    // We got to create this list for required and non required data
-    const propertyData = properties[locale].properties[property.id];
-    let expectedProperties = definition.i18n.base
-      .map((b) => ({key: b, required: true}))
-      // concat to optional properties
-      .concat((definition.i18n.optional || [])
-        .map((b) => ({key: b, required: false})))
-      // concat to search range properties only if necessary
-      .concat((property.disableRangedSearch || property.searchLevel === "disabled" ?
-          [] : definition.i18n.searchRange || [])
-        .map((b) => ({key: b, required: true})))
-      .concat((property.disableRangedSearch || property.searchLevel === "disabled" ?
-          [] : definition.i18n.searchRangeOptional || [])
-        .map((b) => ({key: b, required: false})))
-      // concat to search properties only if necessary
-      .concat((property.searchLevel === "disabled" || (
-        definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
-        !property.disableRangedSearch
-      ) ?
-          [] : definition.i18n.searchBase || [])
-        .map((b) => ({key: b, required: true})))
-      .concat((property.searchLevel === "disabled" || (
-        definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
-        !property.disableRangedSearch
-      ) ?
-          [] : definition.i18n.searchOptional || [])
-        .map((b) => ({key: b, required: false})))
-      // request for the values if supported
-      .concat((property.values || [])
-        .map((b) => ({
-          key: "values." + b.toString().replace(/\./g, "_dot_").replace("/\s/g", "_"),
-          required: true,
-          actualFinalKeyValue: b.toString(),
-        })))
-      .concat((property.values ? ["null_value"] : [])
-        .map((b) => ({key: b, required: true})))
-      .concat((property.invalidIf && !property.hidden ? property.invalidIf.map((ii) => ii.error) : [])
-        .map((b) => ({key: "error." + b, required: true})));
-
-    const errorRequiredProperties = [];
-    if (!property.nullable && property.type !== "boolean") {
-      errorRequiredProperties.push("error.NOT_NULLABLE");
-    }
-
-    if ((definition.max || definition.maxLength) &&
-      !property.values && !property.autocompleteIsEnforced) {
-      errorRequiredProperties.push("error.TOO_LARGE");
-    }
-
-    if (definition.supportedSubtypes && property.subtype) {
-      errorRequiredProperties.push("error.INVALID_SUBTYPE_VALUE");
-    }
-
-    if (property.type === "date" || property.type === "datetime" || property.type === "time") {
-      errorRequiredProperties.push("error.INVALID_DATETIME");
-    }
-
-    if (typeof property.minLength !== "undefined" &&
-      !property.values && !property.autocompleteIsEnforced) {
-      errorRequiredProperties.push("error.TOO_SMALL");
-    }
-
-    if (typeof definition.maxDecimalCount !== "undefined" &&
-      !property.values && !property.autocompleteIsEnforced) {
-      errorRequiredProperties.push("error.TOO_MANY_DECIMALS");
-    }
-
-    if (typeof property.minDecimalCount !== "undefined" &&
-      !property.values && !property.autocompleteIsEnforced) {
-      errorRequiredProperties.push("error.TOO_FEW_DECIMALS");
-    }
-
-    if (
-      definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
-      !property.disableRangedSearch
-    ) {
-      errorRequiredProperties.push("error.FROM_LARGER_THAN_TO");
-      errorRequiredProperties.push("error.TO_SMALLER_THAN_FROM");
-    }
-
-    expectedProperties = expectedProperties.concat(errorRequiredProperties
-      .map((b) => ({key: b, required: true})));
-
     // start initializing the data in the property itself
     i18nData[locale] = {};
+
+    const propertyData = properties[locale].properties[property.id];
 
     // run the expected properties and start running them
     expectedProperties.forEach((expectedProperty) => {

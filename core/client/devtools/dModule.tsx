@@ -93,6 +93,7 @@ export default class DevToolModule extends React.Component<IModuleProps, IModule
               key={childDefinition.getName()}
               itemDef={childDefinition}
               language={this.props.language}
+              module={this.props.module}
             />;
           })}
           {this.props.module.getAllPropExtensions().map((propExtension) => {

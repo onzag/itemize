@@ -130,7 +130,6 @@ export default class PropertyEntryLocation
       !equals(this.state, nextState) ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
-      !!this.props.uncommon !== !!nextProps.uncommon ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n ||
       nextProps.country !== this.props.country;
@@ -333,7 +332,7 @@ export default class PropertyEntryLocation
   public renderBasicTextField(textFieldProps?: any) {
     // get the basic data
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
-    const className = getClassName(this.props, "location", this.props.poked, this.props.uncommon);
+    const className = getClassName(this.props, "location", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nDescription = i18nData && i18nData.description;
     const i18nPlaceholder = i18nData && i18nData.placeholder;

@@ -221,11 +221,13 @@ export default class Module {
 
     // Get the current name to work on
     let currentName = nNameConsumable.shift();
-    do {
-      finalDefinition =
-        finalDefinition.getItemDefinitionFor(currentName, true);
-      currentName = nNameConsumable.shift();
-    } while (currentName);
+    if (currentName) {
+      do {
+        finalDefinition =
+          finalDefinition.getItemDefinitionFor(currentName, true);
+        currentName = nNameConsumable.shift();
+      } while (currentName);
+    }
 
     return finalDefinition;
   }
@@ -258,22 +260,6 @@ export default class Module {
    */
   public getAllPropExtensions() {
     return this.propExtensions;
-  }
-
-  /**
-   * Provides a detached instance of an item definition
-   * this method is useful since it needs no initialization and
-   * the detached instance shares nothing with the actual instance
-   * so they keep different states
-   * @throws an error if the path leads to a dead end
-   * @param name the full path of the instance
-   */
-  public getDetachedItemDefinitionInstanceFor(name: string[]): ItemDefinition {
-    return new ItemDefinition(
-      this.getItemDefinitionRawFor(name),
-      this,
-      null,
-    );
   }
 
   /**

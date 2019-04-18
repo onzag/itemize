@@ -191,7 +191,6 @@ export default class PropertyEntryField
       this.state.visible !== nextState.visible ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
-      !!this.props.uncommon !== !!nextProps.uncommon ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n ||
       nextProps.currency !== this.props.currency ||
@@ -430,7 +429,7 @@ export default class PropertyEntryField
   public renderSelectField() {
     // get the basic data
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
-    const className = getClassName(this.props, "field", this.props.poked, this.props.uncommon);
+    const className = getClassName(this.props, "field", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
     const nullValueLabel = this.props.property.isNullable() ?
@@ -534,7 +533,7 @@ export default class PropertyEntryField
 
     // get the basic data
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
-    const className = getClassName(this.props, "field", this.props.poked, this.props.uncommon);
+    const className = getClassName(this.props, "field", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nDescription = i18nData && i18nData.description;
     const i18nPlaceholder = i18nData && i18nData.placeholder;

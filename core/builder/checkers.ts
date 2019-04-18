@@ -267,19 +267,19 @@ export function checkItem(
     );
   }
 
-  // also Conflicting mightExclude and mightExcludeIf
-  if (typeof rawData.mightExclude !== "undefined" &&
-    typeof rawData.mightExcludeIf !== "undefined") {
+  // also Conflicting canUserExclude and canUserExcludeIf
+  if (typeof rawData.canUserExclude !== "undefined" &&
+    typeof rawData.canUserExcludeIf !== "undefined") {
     throw new CheckUpError(
-      "Conflicting properties mightExclude and mightExcludeIf",
+      "Conflicting properties canUserExclude and canUserExcludeIf",
       traceback,
     );
-  } else if (rawData.mightExcludeIf) {
+  } else if (rawData.canUserExcludeIf) {
     checkConditionalRuleSet(
-      rawData.mightExcludeIf,
+      rawData.canUserExcludeIf,
       parentItemDefinition,
       parentModule,
-      traceback.newTraceToBit("mightExcludeIf"),
+      traceback.newTraceToBit("canUserExcludeIf"),
     );
   }
 

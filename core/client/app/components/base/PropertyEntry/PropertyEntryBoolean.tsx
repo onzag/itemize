@@ -4,114 +4,164 @@ import { FormControlLabel, Switch, Icon, FormLabel, FormControl, RadioGroup, Rad
 import { capitalize } from "../../../../../util";
 import equals from "deep-equal";
 
-function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
-  // let's the get basic data for the entry
-  const i18nData = props.property.getI18nDataFor(props.language);
-  const className = getClassName(props, "switch", props.poked, props.uncommon);
-  const i18nLabel = i18nData && i18nData.label;
-  const i18nDescription = i18nData && i18nData.description;
-  const icon = props.property.getIcon();
-  const iconComponent = icon ? (
-    <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
-  ) : null;
-
-  // This is very basic and understandable
+export function PropertyEntryBooleanAsSwitchBase(props: {
+  className?: string;
+  onChange: () => void;
+  checked: boolean;
+  disabled?: boolean;
+  label: string;
+  description?: string;
+  iconComponent?: any;
+}) {
   return (
     <div className="property-entry-container">
-      {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
-      <FormControl className={className}>
+      {props.description ? <div className="property-entry-description">{props.description}</div> : null}
+      <FormControl className={props.className ? props.className : "property-entry property-entry--switch"}>
         <FormControlLabel
-          aria-label={i18nLabel}
+          aria-label={props.label}
           classes={{
             label: "property-entry-label",
           }}
           control={
             <Switch
-              checked={props.value.value as boolean || false}
-              onChange={props.onChange.bind(null, !props.value.value, null)}
-              disabled={props.value.enforced}
+              checked={props.checked}
+              onChange={props.onChange}
+              disabled={props.disabled}
               classes={{
                 root: "property-entry-input",
               }}
             />
           }
-          label={i18nLabel}
+          label={props.label}
         />
-        {iconComponent}
+        {props.iconComponent}
       </FormControl>
     </div>
   );
 }
 
-function handleOnChange(
-  props: IPropertyEntryProps,
-  e: React.ChangeEvent<HTMLInputElement>,
-) {
-  if (e.target.value === "null") {
-    return props.onChange(null, null);
-  }
-  return props.onChange(e.target.value === "true", null);
+function sendValueOnly(fn: (value: string) => void, e: React.ChangeEvent<HTMLInputElement>) {
+  fn(e.target.value);
 }
 
-function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
-  // Let's get the basic data
-  const i18nData = props.property.getI18nDataFor(props.language);
-  const className = getClassName(props, "radio", props.poked, props.uncommon);
-  const i18nLabel = i18nData && i18nData.label;
-  const i18nDescription = i18nData && i18nData.description;
-  const icon = props.property.getIcon();
-  const iconComponent = icon ? (
-    <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
-  ) : null;
-
+export function PropertyEntryBooleanAsRadioBase(props: {
+  className?: string;
+  onChange: (newValue: string) => void;
+  value: string;
+  values: Array<{
+    value: string,
+    label: string,
+  }>;
+  disabled?: boolean;
+  label: string;
+  description?: string;
+  iconComponent?: any;
+}) {
   // The class for every label component
   const fclClasses = {
     label: "property-entry-label",
   };
 
-  // return the fieldset
   return (
     <div className="property-entry-container">
-      <FormControl component={"fieldset" as any} className={className}>
+      <FormControl
+        component={"fieldset" as any}
+        className={props.className ? props.className : "property-entry property-entry--radio"}
+      >
         <FormLabel
-          aria-label={i18nLabel}
+          aria-label={props.label}
           component={"legend" as any}
           classes={{
             root: "property-entry-label",
             focused: "focused",
           }}
         >
-          {i18nLabel}{iconComponent}
+          {props.label}{props.iconComponent}
         </FormLabel>
-        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
+        {props.description ? <div className="property-entry-description">{props.description}</div> : null}
         <RadioGroup
-          value={JSON.stringify(props.value.value)}
-          onChange={handleOnChange.bind(this, props)}
+          value={props.value}
+          onChange={sendValueOnly.bind(this, props.onChange)}
         >
-          <FormControlLabel
+          {props.values.map((v) => <FormControlLabel
+            key={v.value}
             classes={fclClasses}
-            value="true"
+            value={v.value}
             control={<Radio/>}
-            label={capitalize(props.i18n.yes)}
-            disabled={props.value.enforced}
-          />
-          <FormControlLabel
-            classes={fclClasses}
-            value="false"
-            control={<Radio/>}
-            label={capitalize(props.i18n.no)}
-            disabled={props.value.enforced}
-          />
-          <FormControlLabel
-            classes={fclClasses}
-            value="null"
-            control={<Radio/>}
-            label={capitalize(props.i18n.unspecified)}
-            disabled={props.value.enforced}
-          />
+            label={v.label}
+            disabled={props.disabled}
+          />)}
         </RadioGroup>
       </FormControl>
     </div>
+  );
+}
+
+function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
+  // let's the get basic data for the entry
+  const i18nData = props.property.getI18nDataFor(props.language);
+  const className = getClassName(props, "switch", props.poked);
+  const i18nLabel = i18nData && i18nData.label;
+  const i18nDescription = i18nData && i18nData.description;
+  const icon = props.property.getIcon();
+  const iconComponent = icon ? (
+    <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
+  ) : null;
+
+  return (
+    <PropertyEntryBooleanAsSwitchBase
+      className={className}
+      checked={props.value.value as boolean || false}
+      onChange={props.onChange.bind(null, !props.value.value, null)}
+      disabled={props.value.enforced}
+      label={i18nLabel}
+      description={i18nDescription}
+      iconComponent={iconComponent}
+    />
+  );
+}
+
+function handleOnChange(
+  props: IPropertyEntryProps,
+  value: string,
+) {
+  if (value === "null") {
+    return props.onChange(null, null);
+  }
+  return props.onChange(value === "true", null);
+}
+
+function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
+  // Let's get the basic data
+  const i18nData = props.property.getI18nDataFor(props.language);
+  const className = getClassName(props, "radio", props.poked);
+  const i18nLabel = i18nData && i18nData.label;
+  const i18nDescription = i18nData && i18nData.description;
+  const icon = props.property.getIcon();
+  const iconComponent = icon ? (
+    <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
+  ) : null;
+
+  return (
+    <PropertyEntryBooleanAsRadioBase
+      className={className}
+      disabled={props.value.enforced}
+      label={i18nLabel}
+      description={i18nDescription}
+      iconComponent={iconComponent}
+      values={[{
+        value: "true",
+        label: capitalize(props.i18n.yes),
+      }, {
+        value: "false",
+        label: capitalize(props.i18n.no),
+      }, {
+        value: "null",
+        label: capitalize(props.i18n.unspecified),
+      }]}
+      onChange={handleOnChange.bind(this, props)}
+      value={JSON.stringify(props.value.value)}
+    />
   );
 }
 
@@ -120,7 +170,6 @@ export default class PropertyEntryBoolean extends React.Component<IPropertyEntry
     return this.props.property !== nextProps.property ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
-      !!this.props.uncommon !== !!nextProps.uncommon ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n;
   }

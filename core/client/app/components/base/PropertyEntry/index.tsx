@@ -19,7 +19,6 @@ export interface IPropertyEntryBaseProps {
   value: IPropertyDefinitionValue;
   onChange: (newValue: PropertyDefinitionSupportedType, internalValue: any) => void;
   poked?: boolean;
-  uncommon?: boolean;
 }
 
 export interface IPropertyEntryProps extends IPropertyEntryBaseProps {
@@ -55,11 +54,9 @@ const typeRegistry:
  * @param name the name that will be given
  * @param poked whether it is being poked
  */
-export function getClassName(props: IPropertyEntryBaseProps, name: string, poked: boolean, uncommon: boolean) {
+export function getClassName(props: IPropertyEntryBaseProps, name: string, poked: boolean) {
   return `property-entry property-entry--${name} ${
     poked ? "property-entry--poked" : ""
-  } ${
-    uncommon ? "property-entry--uncommon" : ""
   } ${
     props.value.default ? "property-entry--default" : ""
   } ${
@@ -72,7 +69,7 @@ export function getClassName(props: IPropertyEntryBaseProps, name: string, poked
     props.value.valid ?
       "property-entry--valid" :
       "property-entry--invalid"
-  } ${props.property.isRare() ? "property-entry--rare" : ""}`;
+  } "property-entry--rarity-${props.property.getRarity()}`;
 }
 
 export default function PropertyEntry(props: IPropertyEntryBaseProps) {

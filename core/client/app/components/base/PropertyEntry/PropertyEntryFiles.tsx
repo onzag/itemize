@@ -76,7 +76,6 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     return nextProps.property !== this.props.property ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
-      !!this.props.uncommon !== !!nextProps.uncommon ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n;
   }
@@ -217,7 +216,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
   public render() {
     // getting the basic data
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
-    const className = getClassName(this.props, "files", this.props.poked, this.props.uncommon);
+    const className = getClassName(this.props, "files", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nDescription = i18nData && i18nData.description;
     const i18nPlaceholder = i18nData && i18nData.placeholder;

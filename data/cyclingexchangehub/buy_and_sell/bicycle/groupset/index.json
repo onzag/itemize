@@ -107,7 +107,7 @@
 				},
 				{
 					"name": "chain-guide",
-					"mightExclude": true,
+					"canUserExclude": true,
 					"defaultExcluded" : true,
 					"excludedIf": {
 						"property": "chainrings",
@@ -249,7 +249,7 @@
 			"enforcedProperties": {
 				"internally-geared": true
 			},
-			"mightExcludeIf": {
+			"canUserExcludeIf": {
 				"property": "type",
 				"comparator": "not-equal",
 				"value": "hub-gear"
@@ -329,7 +329,7 @@
 		},
 		{
 			"name": "tensioner",
-			"mightExclude": true,
+			"canUserExclude": true,
 			"defaultExcluded" : true
 		},
 		{
@@ -342,7 +342,7 @@
 		},
 		{
 			"name": "pedals",
-			"mightExclude": true,
+			"canUserExclude": true,
 			"defaultExcluded": true
 		}
 	],

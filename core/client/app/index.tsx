@@ -102,6 +102,7 @@ interface IAppState {
   specifiedData: IBuildData;
   specifiedProcessedRoot: Root;
   localeIsUpdating: boolean;
+  localeIsUpdatingFrom: string;
 }
 
 export const LocaleContext = React.createContext<ILocaleType>(null);
@@ -122,6 +123,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       specifiedCountry: props.initialCountry,
       specifiedCurrency: props.initialCurrency,
       localeIsUpdating: false,
+      localeIsUpdatingFrom: null,
       specifiedData: props.initialData,
       specifiedProcessedRoot: new Root(props.initialData.root),
     };
@@ -153,6 +155,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     this.setState({
       localeIsUpdating: true,
+      localeIsUpdatingFrom: urlLanguage,
     });
 
     const [newData] =
@@ -174,6 +177,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       specifiedData: newData,
       specifiedProcessedRoot: new Root(newData.root),
       localeIsUpdating: false,
+      localeIsUpdatingFrom: null,
     });
   }
   public changeCountryTo(code: string) {
@@ -221,7 +225,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       changeCountryTo: this.changeCountryTo,
       changeCurrencyTo: this.changeCurrencyTo,
 
-      language: match.params.lang,
+      language: this.state.localeIsUpdating ? this.state.localeIsUpdatingFrom : match.params.lang,
       country: this.state.specifiedCountry,
       currency: this.state.specifiedCurrency,
 

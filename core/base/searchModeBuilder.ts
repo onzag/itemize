@@ -8,6 +8,7 @@ import PropertyDefinition, {
 import {
   IConditionalRuleSetRawJSONDataType,
   IConditionalRuleSetRawJSONDataPropertyType,
+  IConditionalRuleSetRawJSONDataComponentType,
 } from "./ItemDefinition/ConditionalRuleSet";
 import ItemDefinition, { IItemDefinitionRawJSONDataType } from "./ItemDefinition";
 
@@ -48,7 +49,7 @@ function buildSearchModeItemDefinition(
   originalModule: IModuleRawJSONDataType,
 ): IItemDefinitionRawJSONDataType {
   const newItemDef = {...rawData};
-  newItemDef.name = "QUERY_IDEF__" + newItemDef.name;
+  // newItemDef.name = "QUERY_IDEF__" + newItemDef.name;
   const knownPropMap = {...modulePropExtensions};
   delete newItemDef.importedChildDefinitions;
 
@@ -56,7 +57,6 @@ function buildSearchModeItemDefinition(
   Object.keys(newItemDef.i18nData).forEach((lang) => {
     newItemDef.i18nData[lang] = {...newItemDef.i18nData[lang]};
     newItemDef.i18nData[lang].createFormTitle = newItemDef.i18nData[lang].searchFormTitle;
-    newItemDef.i18nData[lang].createFormTitleAlt = newItemDef.i18nData[lang].searchFormTitleAlt;
   });
 
   if (newItemDef.properties) {
@@ -69,23 +69,34 @@ function buildSearchModeItemDefinition(
   }
 
   newItemDef.includes = newItemDef.includes && newItemDef.includes.map((i) => {
+    if (i.disableSearch) {
+      return null;
+    }
+
     const idef = ItemDefinition.getItemDefinitionRawFor(rawData, originalModule, i.name, false);
     const newInclude = {...i};
+
     if (newInclude.defaultExcludedIf) {
       newInclude.defaultExcludedIf = buildSearchModeConditionalRuleSet(i.defaultExcludedIf, knownPropMap);
     }
-    if (newInclude.mightExcludeIf) {
-      newInclude.mightExcludeIf = buildSearchModeConditionalRuleSet(i.mightExcludeIf, knownPropMap);
+    if (newInclude.canUserExcludeIf) {
+      newInclude.canUserExcludeIf = buildSearchModeConditionalRuleSet(i.canUserExcludeIf, knownPropMap);
     }
     if (newInclude.excludedIf) {
       newInclude.excludedIf = buildSearchModeConditionalRuleSet(i.excludedIf, knownPropMap);
     }
-    newInclude.name = "QUERY_IDEF__" + newInclude.name;
+
+    if (newInclude.canUserExclude || newInclude.canUserExcludeIf) {
+      newInclude.exclusionIsCallout = false;
+      newInclude.ternaryExclusionState = true;
+    }
+
+    // newInclude.name = "QUERY_IDEF__" + newInclude.name;
     if (newInclude.sinkIn) {
       newInclude.sinkIn = newInclude.sinkIn.map((sinkInProperty) => {
         const property = ItemDefinition.getPropertyDefinitionRawFor(idef, originalModule, sinkInProperty, false);
-        return getConversionRulesetId(property);
-      });
+        return getConversionIds(property);
+      }).flat();
     }
     ["enforcedProperties", "predefinedProperties"].forEach((objectKey) => {
       if (newInclude[objectKey]) {
@@ -96,7 +107,7 @@ function buildSearchModeItemDefinition(
           if ((value as IPropertyDefinitionAlternativePropertyType).property) {
             value = {
               property: getConversionRulesetId(
-                knownPropMap[(value as IPropertyDefinitionAlternativePropertyType).property]
+                knownPropMap[(value as IPropertyDefinitionAlternativePropertyType).property],
               ),
             };
           }
@@ -108,7 +119,7 @@ function buildSearchModeItemDefinition(
     });
 
     return newInclude;
-  });
+  }).filter((i) => !!i);
 
   if (newItemDef.childDefinitions) {
     newItemDef.childDefinitions = newItemDef.childDefinitions.map((cd) => {
@@ -129,14 +140,20 @@ function buildSearchModePropertyDefinitions(
 
   const newPropDef = {...rawData};
   newPropDef.nullable = true;
-  if (newPropDef.searchLevel === "rare") {
-    newPropDef.rare = true;
+  if (newPropDef.searchLevel === "hidden") {
+    newPropDef.hidden = true;
   } else if (newPropDef.searchLevel === "moderate") {
-    newPropDef.uncommon = true;
+    newPropDef.rarity = "moderate";
+  } else if (newPropDef.searchLevel === "rare") {
+    newPropDef.rarity = "rare";
   } else {
-    newPropDef.rare = false;
-    newPropDef.uncommon = false;
+    newPropDef.rarity = "standard";
   }
+
+  // Disable search level for any of its children
+  // Just because this is the search level it doesn't make
+  // sense to go deeper
+  newPropDef.searchLevel = "disabled";
 
   delete newPropDef.autocompleteSupportsPrefills;
   if (newPropDef.defaultIf) {
@@ -310,8 +327,6 @@ function buildSearchModeConditionalRuleSet(
         return null;
       }
     }
-  } else {
-    return null;
   }
 
   if (newRule.condition) {
@@ -327,42 +342,49 @@ function buildSearchModeConditionalRuleSet(
 function getConversionRulesetId(
   rawData: IPropertyDefinitionRawJSONDataType,
 ): string {
+  const ids = getConversionIds(rawData);
+  return ids.length ? ids[0] : null;
+}
+
+function getConversionIds(
+  rawData: IPropertyDefinitionRawJSONDataType,
+): string[] {
   const propertyDefinitionDescription = PropertyDefinition.supportedTypesStandard[rawData.type];
   if (!propertyDefinitionDescription.searchable || rawData.searchLevel === "disabled") {
-    return null;
+    return [];
   }
 
   if (rawData.id === "&this") {
-    return "&this";
+    return ["&this"];
   }
 
-  let id = rawData.id;
+  let ids = [rawData.id];
   if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.EXACT
   ) {
-    id = "EXACT__" + id;
+    ids = ["EXACT__" + rawData.id];
   } else if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE
   ) {
     if (!rawData.disableRangedSearch) {
-      id = "EXACT__" + id;
+      ids = ["EXACT__" + rawData.id];
     } else {
-      id = "FROM__" + id;
+      ids = ["FROM__" + rawData.id, "TO__" + rawData.id];
     }
   } else if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.FTS
   ) {
-    id = "SEARCH__" + id;
+    ids = ["SEARCH__" + rawData.id];
   } else if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE
   ) {
-    id = "LOCATION__" + id;
+    ids = ["LOCATION__" + rawData.id];
   }
-  return id;
+  return ids;
 }
 
 function displaceI18NData(i18n: any, path: string[]) {

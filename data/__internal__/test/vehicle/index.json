@@ -9,7 +9,9 @@
                 "chasis_type": {
                     "property": "vehicle_type"
                 }
-            }
+            },
+            "canUserExclude": true,
+            "exclusionIsCallout": true
         }
     ],
     "properties": [
@@ -44,12 +46,12 @@
             "type": "string",
             "values": ["disc", "drum"],
             "searchLevel": "moderate",
-            "uncommon": true
+            "rarity": "moderate"
         },
         {
             "id": "has_nitro",
             "type": "boolean",
-            "rare": true,
+            "rarity": "rare",
             "default": false,
             "hiddenIf": {
                 "property": "vehicle_type",

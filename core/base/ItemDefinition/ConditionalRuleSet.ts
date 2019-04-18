@@ -228,8 +228,9 @@ export default class ConditionalRuleSet {
 
       // let's check whether there is an item instance for that
       // component that are active (aka not excluded)
-      const hasOneOf = this.parentItemDefinition
-        .hasAtLeastOneActiveInstanceOf(rawDataAsComponent.component);
+      const hasOneOf = rawDataAsComponent.component[0] === "#" ?
+        this.parentItemDefinition.hasAnActiveInstanceOfId(rawDataAsComponent.component[0].substr(1)) :
+        this.parentItemDefinition.hasAtLeastOneActiveInstanceOf(rawDataAsComponent.component);
 
       // And compare the result against the isIncluded boolean
       result = (hasOneOf && rawDataAsComponent.isIncluded) ||

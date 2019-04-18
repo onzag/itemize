@@ -653,8 +653,14 @@ export type PropertyDefinitionSearchLevelsType =
   // Will actually make it so that you need to press a button to see
   // all search options
   "rare" |
-  // Does not display any search field at all
+  // Makes the field hidden but remains there and is present at value
+  // can be set programatically because is hidden
+  "hidden" |
+  // Does not display any search field at all and doesn't expect it
   "disabled";
+
+export type PropertyDefinitionRarityLevelsType =
+  "standard" | "moderate" | "rare";
 
 export interface IPropertyDefinitionRawJSONDataType {
   // the property identifier
@@ -664,8 +670,7 @@ export interface IPropertyDefinitionRawJSONDataType {
   i18nData?: {
     [locale: string]: any,
   };
-  rare?: boolean;
-  uncommon?: boolean;
+  rarity?: PropertyDefinitionRarityLevelsType;
   // the type of the property
   type: PropertyDefinitionSupportedTypeName;
   subtype?: string;
@@ -745,7 +750,9 @@ export interface IPropertyDefinitionValue {
   invalidReason: PropertyInvalidReason | string;
   value: PropertyDefinitionSupportedType;
   internalValue: any;
-  propertyDefinition: PropertyDefinition;
+  stateValue: any;
+  stateValueModified: boolean;
+  propertyId: string;
 }
 
 // OTHER EXPORTS
@@ -1080,7 +1087,9 @@ export default class PropertyDefinition {
         value: possibleEnforcedValue.value,
         hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(),
         internalValue: null,
-        propertyDefinition: this,
+        stateValue: this.stateValue,
+        stateValueModified: this.stateValueModified,
+        propertyId: this.getId(),
       };
     }
 
@@ -1096,7 +1105,9 @@ export default class PropertyDefinition {
         value: null,
         hidden: true,
         internalValue: null,
-        propertyDefinition: this,
+        stateValue: this.stateValue,
+        stateValueModified: this.stateValueModified,
+        propertyId: this.getId(),
       };
     }
 
@@ -1111,7 +1122,9 @@ export default class PropertyDefinition {
       value,
       hidden: this.isCurrentlyHidden(),
       internalValue: this.stateValueModified ? this.stateinternalValue : null,
-      propertyDefinition: this,
+      stateValue: this.stateValue,
+      stateValueModified: this.stateValueModified,
+      propertyId: this.getId(),
     };
   }
 
@@ -1210,6 +1223,14 @@ export default class PropertyDefinition {
     this.onStateChangeListeners.forEach((l) => l());
   }
 
+  public applyValue(
+    value: IPropertyDefinitionValue,
+  ) {
+    this.stateValue = value.stateValue;
+    this.stateValueModified = value.stateValueModified;
+    this.stateinternalValue = value.internalValue;
+  }
+
   /**
    * Externally checks a valid value for this input using all
    * its guns, this function is context aware
@@ -1258,12 +1279,8 @@ export default class PropertyDefinition {
     return this.rawData.hidden;
   }
 
-  public isRare() {
-    return this.rawData.rare || false;
-  }
-
-  public isUncommon() {
-    return this.rawData.uncommon || false;
+  public getRarity() {
+    return this.rawData.rarity || "standard";
   }
 
   public isRetrievalDisabled() {
@@ -1420,7 +1437,8 @@ if (process.env.NODE_ENV !== "production") {
     },
   ];
 
-  const searchLevels = ["always", "moderate", "rare", "disabled"];
+  const searchLevels = ["always", "moderate", "rare", "hidden", "disabled"];
+  const rarityLevels = ["standard", "moderate", "rare"];
 
   // The schema for the definition
   // {
@@ -1447,11 +1465,9 @@ if (process.env.NODE_ENV !== "production") {
       subtype:  {
         type: "string",
       },
-      rare: {
-        type: "boolean",
-      },
-      uncommon: {
-        type: "boolean",
+      rarity: {
+        type: "string",
+        enum: rarityLevels,
       },
       min: {
         type: "number",

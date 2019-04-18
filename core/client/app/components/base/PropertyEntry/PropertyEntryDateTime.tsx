@@ -106,7 +106,6 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
       !equals(this.state, nextState) ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
-      !!this.props.uncommon !== !!nextProps.uncommon ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n;
   }
@@ -193,7 +192,7 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
   public render() {
     // get the basic data for datetime
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
-    const className = getClassName(this.props, "date-time", this.props.poked, this.props.uncommon);
+    const className = getClassName(this.props, "date-time", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nDescription = i18nData && i18nData.description;
     const i18nPlaceholder = i18nData && i18nData.placeholder;

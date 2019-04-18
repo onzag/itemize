@@ -10,29 +10,47 @@ import ConditionalRuleSet, {
 } from "./ConditionalRuleSet";
 import Module, { OnStateChangeListenerType } from "../Module";
 
+export enum ItemExclusionState {
+  EXCLUDED = "EXCLUDED",
+  INCLUDED = "INCLUDED",
+  ANY = "ANY",
+}
+
 export interface IItemValue {
-  isExcluded: boolean;
-  isMissing: boolean;
+  exclusionState: ItemExclusionState;
   canExclusionBeSet: boolean;
-  item: Item;
-  itemDefinition: ItemDefinition;
+  itemId: string;
+  itemName: string;
   itemDefinitionValue: IItemDefinitionValue;
+  stateExclusion: ItemExclusionState;
+  stateExclusionModified: boolean;
 }
 
 // this is what our raw json looks like
 export interface IItemRawJSONDataType {
   id: string;
   name: string;
-  i18nName?: {
-    [locale: string]: string,
+  i18nData?: {
+    [locale: string]: {
+      name?: string;
+      exclusionSelectorLabel?: string;   // label for the selector to toggle exclusion in normal mode
+      exclusionTernarySelectorLabel?: string;
+      calloutExcludedLabel?: string;     // label in the title for when the item is callout excluded
+      excludedLabel?: string;            // describe when the item is excluded, for descriptions and the ternary mode
+      includedLabel?: string;            // describe when the item is included, used only for ternary mode
+      anyLabel?: string;                 // describe the inbetween, used only for ternary mode
+    },
   };
   enforcedProperties?: IPropertiesValueMappingDefinitonRawJSONDataType;
   predefinedProperties?: IPropertiesValueMappingDefinitonRawJSONDataType;
   excludedIf?: IConditionalRuleSetRawJSONDataType;
-  mightExclude?: boolean;
-  mightExcludeIf?: IConditionalRuleSetRawJSONDataType;
+  canUserExclude?: boolean;
+  canUserExcludeIf?: IConditionalRuleSetRawJSONDataType;
   defaultExcluded?: boolean;
   defaultExcludedIf?: IConditionalRuleSetRawJSONDataType;
+  ternaryExclusionState?: boolean;
+  exclusionIsCallout?: boolean;
+  disableSearch?: boolean;
   sinkIn?: string[];
 }
 
@@ -79,7 +97,7 @@ export default class Item {
   // the data that comes from the raw json is to be processed here
   private itemDefinition?: ItemDefinition;
   private excludedIf?: ConditionalRuleSet;
-  private mightExcludeIf?: ConditionalRuleSet;
+  private canUserExcludeIf?: ConditionalRuleSet;
   private defaultExcludedIf?: ConditionalRuleSet;
 
   // solo item specific attributes
@@ -88,9 +106,8 @@ export default class Item {
 
   // representing the state of the class
   private onStateChangeListeners: OnStateChangeListenerType[];
-  private stateIsExcluded: boolean;
-  private stateIsExcludedModified: boolean;
-  private stateIsMissing: boolean;
+  private stateExclusion: ItemExclusionState;
+  private stateExclusionModified: boolean;
 
   /**
    * The constructor for an Item
@@ -145,8 +162,8 @@ export default class Item {
         parentModule, parentItemDefinition, null, this);
 
     // If it might be excluded
-    this.mightExcludeIf = rawJSON.mightExcludeIf &&
-      new ConditionalRuleSet(rawJSON.mightExcludeIf,
+    this.canUserExcludeIf = rawJSON.canUserExcludeIf &&
+      new ConditionalRuleSet(rawJSON.canUserExcludeIf,
         parentModule, parentItemDefinition, null, this);
 
     // if it's default excluded
@@ -169,49 +186,53 @@ export default class Item {
     // due to the defaults
     // this will never be visible as null because only
     // modified states are the only ones that will show
-    this.stateIsExcluded = null;
+    this.stateExclusion = ItemExclusionState.ANY;
     // initially the state hasn't been modified
-    this.stateIsExcludedModified = false;
-    // missing is non default
-    this.stateIsMissing = false;
+    this.stateExclusionModified = false;
   }
 
   /**
    * Tells whether the current item is excluded
    * @return a boolean whether it's excluded or not
    */
-  public isCurrentlyExcluded(): boolean {
+  public getExclusionState(): ItemExclusionState {
     // let's check if it's excluded by force
     const isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
 
     if (isExcludedByForce) {
-      return true;
+      return ItemExclusionState.EXCLUDED;
     }
 
     // if it can be excluded
-    const canBeExcluded = this.rawData.mightExclude || (this.mightExcludeIf &&
-      this.mightExcludeIf.evaluate());
-    if (canBeExcluded) {
+    const canBeExcludedByUser = this.rawData.canUserExclude || (this.canUserExcludeIf &&
+      this.canUserExcludeIf.evaluate());
+    if (canBeExcludedByUser) {
       // if it hasn't been modified we return the default state
-      if (!this.stateIsExcludedModified) {
+      if (!this.stateExclusionModified) {
         // depending on the condition
         const isDefaultExcluded = this.rawData.defaultExcluded ||
           (this.defaultExcludedIf && this.defaultExcludedIf.evaluate()) ||
           false;
         // by default the excluded would be false
-        return isDefaultExcluded;
+        if (isDefaultExcluded) {
+          return ItemExclusionState.EXCLUDED;
+        } else if (this.rawData.ternaryExclusionState) {
+          return ItemExclusionState.ANY;
+        }
+        return ItemExclusionState.INCLUDED;
       }
-      return this.stateIsExcluded;
-    } else {
-      return false;
-    }
-  }
 
-  /**
-   * @returns a boolean
-   */
-  public isCurrentlyMissing(): boolean {
-    return this.stateIsMissing;
+      if (
+        !this.rawData.ternaryExclusionState &&
+        this.stateExclusion === ItemExclusionState.ANY
+      ) {
+        return ItemExclusionState.INCLUDED;
+      }
+      return this.stateExclusion;
+    } else if (this.rawData.ternaryExclusionState) {
+      return ItemExclusionState.ANY;
+    }
+    return ItemExclusionState.INCLUDED;
   }
 
   /**
@@ -230,20 +251,21 @@ export default class Item {
     }
 
     // otherwise it depends to what might exclude provides
-    return this.rawData.mightExclude || (this.mightExcludeIf &&
-      this.mightExcludeIf.evaluate()) || false;
+    return this.rawData.canUserExclude || (this.canUserExcludeIf &&
+      this.canUserExcludeIf.evaluate()) || false;
   }
 
-  public setExclusionState(value: boolean) {
-    this.stateIsExcluded = value;
-    this.stateIsExcludedModified = true;
-
-    // trigger an state change
-    this.onStateChangeListeners.forEach((l) => l());
+  public isExclusionTernary(): boolean {
+    return this.rawData.ternaryExclusionState || false;
   }
 
-  public setMissingState(value: boolean) {
-    this.stateIsMissing = value;
+  public isExclusionCallout(): boolean {
+    return this.rawData.exclusionIsCallout || false;
+  }
+
+  public setExclusionState(value: ItemExclusionState) {
+    this.stateExclusion = value;
+    this.stateExclusionModified = true;
 
     // trigger an state change
     this.onStateChangeListeners.forEach((l) => l());
@@ -258,14 +280,26 @@ export default class Item {
   }
 
   public getCurrentValue(): IItemValue {
+    const exclusionState = this.getExclusionState();
     return {
-      isExcluded: this.isCurrentlyExcluded(),
-      isMissing: this.isCurrentlyMissing(),
+      exclusionState,
       canExclusionBeSet: this.canExclusionBeSet(),
-      item: this,
-      itemDefinition: this.itemDefinition,
-      itemDefinitionValue: this.itemDefinition.getCurrentValue(this.rawData.sinkIn || [], true),
+      itemId: this.getId(),
+      itemName: this.getName(),
+      itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
+        this.itemDefinition.getCurrentValue(this.rawData.sinkIn || [], true),
+      stateExclusion: this.stateExclusion,
+      stateExclusionModified: this.stateExclusionModified,
     };
+  }
+
+  public applyValue(value: IItemValue) {
+    this.stateExclusion = value.stateExclusion;
+    this.stateExclusionModified = value.stateExclusionModified;
+
+    if (value.itemDefinitionValue) {
+      this.itemDefinition.applyValue(value.itemDefinitionValue);
+    }
   }
 
   /**
@@ -275,12 +309,23 @@ export default class Item {
    * @returns a string or null (if locale not valid)
    */
   public getI18nNameFor(locale: string) {
-    if (this.rawData.i18nName && this.rawData.i18nName[locale]) {
-      return this.rawData.i18nName[locale] || null;
+    if (this.rawData.i18nData &&
+      this.rawData.i18nData[locale] &&
+      this.rawData.i18nData[locale].name) {
+      return this.rawData.i18nData[locale].name;
     }
 
     const parentItemDefinitionI18nData = this.itemDefinition.getI18nDataFor(locale);
-    return parentItemDefinitionI18nData && parentItemDefinitionI18nData.name;
+    return (parentItemDefinitionI18nData && parentItemDefinitionI18nData.name) || null;
+  }
+
+  /**
+   * Provides the item definition item locale data
+   * @param  locale the locale in iso form
+   * @returns an object or null (if locale not valid)
+   */
+  public getI18nDataFor(locale: string) {
+    return this.rawData.i18nData[locale] || null;
   }
 
   public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {
@@ -296,6 +341,10 @@ export default class Item {
 
   public toJSON() {
     return this.rawData;
+  }
+
+  public getItemDefinition() {
+    return this.itemDefinition;
   }
 }
 
@@ -322,10 +371,10 @@ if (process.env.NODE_ENV !== "production") {
       excludedIf: {
         $ref: ConditionalRuleSet.schema.$id,
       },
-      mightExclude: {
+      canUserExclude: {
         type: "boolean",
       },
-      mightExcludeIf: {
+      canUserExcludeIf: {
         $ref: ConditionalRuleSet.schema.$id,
       },
       defaultExcluded: {
@@ -334,11 +383,20 @@ if (process.env.NODE_ENV !== "production") {
       defaultExcludedIf: {
         $ref: ConditionalRuleSet.schema.$id,
       },
+      ternaryExclusionState: {
+        type: "boolean",
+      },
+      exclusionIsCallout: {
+        type: "boolean",
+      },
       sinkIn: {
         type: "array",
         items: {
           type: "string",
         },
+      },
+      disableSearch: {
+        type: "boolean",
       },
     },
     definitions: {

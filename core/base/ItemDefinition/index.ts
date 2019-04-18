@@ -1,5 +1,5 @@
 import ConditionalRuleSet from "./ConditionalRuleSet";
-import Item, { IItemRawJSONDataType, IItemValue } from "./Item";
+import Item, { IItemRawJSONDataType, IItemValue, ItemExclusionState } from "./Item";
 import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionValue } from "./PropertyDefinition";
 import Module, { IModuleRawJSONDataType, OnStateChangeListenerType } from "../Module";
@@ -22,15 +22,10 @@ export interface IItemDefinitionRawJSONDataType {
       createFormTitle: string;
       searchFormTitle: string;
       editFormTitle: string;
-      nameAlt?: string;
-      createFormTitleAlt?: string;
-      searchFormTitleAlt?: string;
-      editFormTitleAlt?: string;
     },
   };
 
   // original data
-  allowCalloutExcludes?: boolean;
   includes?: IItemRawJSONDataType[];
   properties?: IPropertyDefinitionRawJSONDataType[];
 
@@ -41,7 +36,9 @@ export interface IItemDefinitionRawJSONDataType {
 }
 
 export interface IItemDefinitionValue {
-  itemDefinition: ItemDefinition;
+  moduleName: string;
+  itemDefPath: string[];
+  itemDefName: string;
   items: IItemValue[];
   properties: IPropertyDefinitionValue[];
 }
@@ -169,7 +166,7 @@ export default class ItemDefinition {
       rawJSON.importedChildDefinitions.map(
         (d) => ({
           fullName: d.join("/"),
-          definition: this.parentModule.getDetachedItemDefinitionInstanceFor(d),
+          definition: this.parentModule.getItemDefinitionFor(d).getNewInstance(),
         })) : [];
 
     // assigning the property definition by using the
@@ -189,6 +186,15 @@ export default class ItemDefinition {
    */
   public getName(): string {
     return this.rawData.name;
+  }
+
+  public getPath(): string[] {
+    const parentPath = this.parentItemDefinition ? this.parentItemDefinition.getPath() : [];
+    return parentPath.concat(this.getName());
+  }
+
+  public getModuleName(): string {
+    return this.parentModule.getName();
   }
 
   /**
@@ -269,6 +275,10 @@ export default class ItemDefinition {
 
     // return it
     return definition;
+  }
+
+  public getItemFor(id: string) {
+    return this.itemInstances.find((ii) => ii.getId() === id);
   }
 
   /**
@@ -360,7 +370,18 @@ export default class ItemDefinition {
       return false;
     }
 
-    return possibleCandidates.some((c) => !c.isCurrentlyExcluded());
+    return possibleCandidates.some((c) => c.getExclusionState() !== ItemExclusionState.EXCLUDED);
+  }
+
+  public hasAnActiveInstanceOfId(id: string): boolean {
+    const candidate = this.itemInstances
+      .find((i) => i.getId() === id);
+
+    if (!candidate) {
+      return false;
+    }
+
+    return candidate.getExclusionState() !== ItemExclusionState.EXCLUDED;
   }
 
   /**
@@ -403,13 +424,6 @@ export default class ItemDefinition {
    */
   public getImportedChildDefinitions() {
     return this.importedChildDefinitions.map((icd) => icd.definition);
-  }
-
-  /**
-   * Tells whether the callout excludes are allowed
-   */
-  public areCalloutExcludesAllowed() {
-    return this.rawData.allowCalloutExcludes;
   }
 
   /**
@@ -491,10 +505,26 @@ export default class ItemDefinition {
       });
 
     return {
-      itemDefinition: this,
+      moduleName: this.getModuleName(),
+      itemDefPath: this.getPath(),
+      itemDefName: this.getName(),
       items: excludeItems ? [] : this.itemInstances.map((ii) => ii.getCurrentValue()),
       properties,
     };
+  }
+
+  public applyValue(value: IItemDefinitionValue) {
+    if (value.itemDefPath.join("/") !== this.getPath().join("/")) {
+      throw new Error("Attempted to apply unmatching values");
+    }
+
+    value.items.forEach((itemValue) => {
+      this.getItemFor(itemValue.itemId).applyValue(itemValue);
+    });
+
+    value.properties.forEach((propertyValue) => {
+      this.getPropertyDefinitionFor(propertyValue.propertyId, true).applyValue(propertyValue);
+    });
   }
 
   public toJSON() {
@@ -510,9 +540,6 @@ if (process.env.NODE_ENV !== "production") {
     properties: {
       type: {
         const: "item",
-      },
-      allowCalloutExcludes: {
-        type: "boolean",
       },
       includes: {
         type: "array",

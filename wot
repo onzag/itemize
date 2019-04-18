@@ -1,12 +1,18 @@
 TODO TECH
 
-0. We need to get rid of item groups, and rather use property conditionals to exclude/include those items using whatever logic.
-Reestructure everything to disable item groups, and enable only single items.
-1. Make sure the isIncluded rule works with id and name.
+0. Get rid of missing, make the excluded be the only property to refer to exclusion, make canBeExcluded be default true
+1. remove allowCalloutExcludes in favour of an item specific property, calloutIfExcluded
+2. create a new property called ternaryExclusion, which makes it to allow true, false or null as isCurrentlyExcluded value
+3. Remember to handle this new exclusion ways; null would act more like a true, not a false, which means maybe, so conditional
+rule set must be updated to reflect this, and hasActiveItemOfType and other hasActive functions must check for null values now
+4. The default state of a ternaryExcluded field is null unless specified otherwise.
+
+MAYbe change all this stuff for a ternary value, EXCLUDED, INCLUDED and MAYBE_INCLUDED and call it exclusionState instead
+
+we got to remember to do strip item data of excluded items somehow I guess, from the getCurrentValue or something, if the item
+is excluded we don't want to create it in the db later and whatnot, the value should be null then.
+
+
+
 
 - Implement service workers
-
-TODO
-
-- Create a standard for compatibility searches for multi component searches
-- All items must have a location (by country, and postal ID) and description

@@ -5,11 +5,14 @@ import DevToolPropertyDefinition from "./dPropertyDef";
 import { getModulePath } from "./dModule";
 import ItemEntry from "../app/components/base/ItemEntry";
 import PropertyDefinition, { PropertyDefinitionSupportedType } from "../../base/ItemDefinition/PropertyDefinition";
+import Item, { ItemExclusionState } from "../../base/ItemDefinition/Item";
+import Module from "../../base/Module";
 
 interface IItemDefProps {
   itemDef: ItemDefinition;
   language: string;
   imported?: boolean;
+  module: Module;
 }
 
 interface IItemDefState {
@@ -18,6 +21,7 @@ interface IItemDefState {
   displayHiddenEntries: boolean;
   pokeEntries: boolean;
   value: IItemDefinitionValue;
+  valueFor: ItemDefinition;
 }
 
 const devtoolsStyle: {
@@ -59,6 +63,26 @@ export function getItemDefPath(itemDef: ItemDefinition): string {
 
 export default class DevToolItemDefinition extends
   React.Component<IItemDefProps, IItemDefState> {
+
+  public static getDerivedStateFromProps(
+    props: IItemDefProps,
+    state: IItemDefState,
+  ): Partial<IItemDefState> {
+    if (
+      !state.value ||
+      state.valueFor !== props.itemDef
+    ) {
+      if (state.value) {
+        props.itemDef.applyValue(state.value);
+      }
+      return {
+        value: props.itemDef.getCurrentValue(),
+        valueFor: props.itemDef,
+      };
+    }
+    return null;
+  }
+
   constructor(props: IItemDefProps) {
     super(props);
 
@@ -73,7 +97,8 @@ export default class DevToolItemDefinition extends
       ) || "false"),
       displayHiddenEntries: false,
       pokeEntries: false,
-      value: props.itemDef.getCurrentValue(),
+      value: null,
+      valueFor: null,
     };
 
     this.toggleExpand = this.toggleExpand.bind(this);
@@ -81,6 +106,7 @@ export default class DevToolItemDefinition extends
     this.toggleDisplayHiddenEntries = this.toggleDisplayHiddenEntries.bind(this);
     this.togglePokeEntries = this.togglePokeEntries.bind(this);
     this.onPropertyChange = this.onPropertyChange.bind(this);
+    this.onItemSetExclusionState = this.onItemSetExclusionState.bind(this);
   }
   public toggleExpand() {
     localStorage.setItem(
@@ -114,6 +140,12 @@ export default class DevToolItemDefinition extends
   }
   public onPropertyChange(property: PropertyDefinition, value: PropertyDefinitionSupportedType, internalValue: any) {
     property.setCurrentValue(value, internalValue);
+    this.setState({
+      value: this.props.itemDef.getCurrentValue(),
+    });
+  }
+  public onItemSetExclusionState(item: Item, state: ItemExclusionState) {
+    item.setExclusionState(state);
     this.setState({
       value: this.props.itemDef.getCurrentValue(),
     });
@@ -164,8 +196,10 @@ export default class DevToolItemDefinition extends
             <ItemEntry
               value={this.state.value}
               onPropertyChange={this.onPropertyChange}
+              onItemSetExclusionState={this.onItemSetExclusionState}
               displayHidden={this.state.displayHiddenEntries}
               poked={this.state.pokeEntries}
+              itemDefinition={this.props.itemDef}
             />
             <code>
               {JSON.stringify(valueToStringify, null, 2)}
@@ -177,6 +211,7 @@ export default class DevToolItemDefinition extends
               itemDef={childDefinition}
               language={this.props.language}
               imported={true}
+              module={this.props.module}
             />;
           })}
           {this.props.itemDef.getChildDefinitions().map((childDefinition) => {
@@ -184,6 +219,7 @@ export default class DevToolItemDefinition extends
               key={childDefinition.getName()}
               itemDef={childDefinition}
               language={this.props.language}
+              module={this.props.module}
             />;
           })}
           {this.props.itemDef.getAllPropertyDefinitions().map((propExtension) => {

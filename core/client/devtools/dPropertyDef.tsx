@@ -17,6 +17,7 @@ interface IPropertyDefState {
   expanded: boolean;
   searchMode: boolean;
   detachedPropertyInstance: PropertyDefinition;
+  detachedPropertyForMainInstance: PropertyDefinition;
   currentValue: IPropertyDefinitionValue;
   poked: boolean;
 }
@@ -64,12 +65,18 @@ export default class DevToolPropertyDefinition extends
   ): Partial<IPropertyDefState> {
     if (
       !state.detachedPropertyInstance ||
-      props.property.getId() !== state.detachedPropertyInstance.getId()
+      props.property.getId() !== state.detachedPropertyInstance.getId() ||
+      props.property !== state.detachedPropertyForMainInstance
     ) {
       const detachedPropertyInstance = props.property.getNewInstance();
+      // Restoration of value attempt
+      if (state.currentValue) {
+        detachedPropertyInstance.applyValue(state.currentValue);
+      }
       return {
         detachedPropertyInstance,
         currentValue: detachedPropertyInstance.getCurrentValue(),
+        detachedPropertyForMainInstance: props.property,
       };
     }
     return null;
@@ -86,6 +93,7 @@ export default class DevToolPropertyDefinition extends
       searchMode: false,
       currentValue: null,
       detachedPropertyInstance: null,
+      detachedPropertyForMainInstance: null,
       poked: false,
     };
 
@@ -128,7 +136,8 @@ export default class DevToolPropertyDefinition extends
     const label = i18nData ? i18nData.label : null;
     const nullable = this.props.property.isNullable() ? <span> / nullable</span> : null;
     const hidden = this.props.property.isHidden() ? <span> / hidden</span> : null;
-    const rare = this.props.property.isRare() ? <span> / rare</span> : null;
+    const rarity = this.props.property.getRarity() !== "standard" ?
+      <span> / rarity:{this.props.property.getRarity()}</span> : null;
     const retrievalDisabled = this.props.property.isRetrievalDisabled() ?
       <span> / can't retrieve</span> : null;
     const rangedSearchDisabled = this.props.property.isRangedSearchDisabled() ?
@@ -143,7 +152,7 @@ export default class DevToolPropertyDefinition extends
           <b>{this.state.expanded ? "-" : "+"} </b>
           <b>{this.props.property.getId()}</b>
           <span> / type:{this.props.property.getType()}</span>
-          {nullable}{hidden}{rare}{retrievalDisabled}{rangedSearchDisabled}
+          {nullable}{hidden}{rarity}{retrievalDisabled}{rangedSearchDisabled}
           {searchLevel}
           {label ? <span> - {label}</span> : null}
           <span> (property definition)</span>

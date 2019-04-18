@@ -45,6 +45,22 @@ export const ITEM_DEFINITION_I18N = [
   "editFormTitle",
 ];
 
+export const ITEM_CAN_BE_EXCLUDED_I18N = [
+  "exclusionSelectorLabel",
+  "exclusionTernarySelectorLabel",
+  "excludedLabel",
+  "includedLabel",
+  "anyLabel",
+];
+
+export const ITEM_OPTIONAL_I18N = [
+  "name",
+];
+
+export const ITEM_CALLOUT_EXCLUDED_I18N = [
+  "calloutExcludedLabel",
+];
+
 // This is for small use anywhere language data
 export const LOCALE_I18N = [
   "name",
@@ -87,7 +103,9 @@ export const LOCALE_I18N = [
   "image_uploader_delete_file",
 
   "rare_properties_label",
-  "uncommon_properties_label",
+  "moderate_properties_label",
+
+  "callout_exclude_warning",
 ];
 
 // ATTRIBUTES FOR i18N PROPERTIES
