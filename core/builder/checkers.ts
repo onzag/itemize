@@ -391,6 +391,7 @@ export function checkPropertyDefinition(
   parentModule: IModuleRawJSONDataType,
   traceback: Traceback,
 ) {
+  // These properties are not valid, they are reserved
   if (Object.keys(RESERVED_BASE_PROPERTIES).includes(rawData.id) ||
     Object.keys(RESERVED_SEARCH_PROPERTIES).includes(rawData.id) ||
     Object.keys(RESERVED_GETTER_PROPERTIES).includes(rawData.id)) {
@@ -400,9 +401,11 @@ export function checkPropertyDefinition(
     );
   }
 
+  // Let's get the property standard
   const propertyDefintionTypeStandard = PropertyDefinition
     .supportedTypesStandard[rawData.type];
 
+  // if we have subtype let's check the subtype is valid
   if (rawData.subtype &&
     !(propertyDefintionTypeStandard.supportedSubtypes || []).includes(rawData.subtype)) {
     throw new CheckUpError(
@@ -411,28 +414,37 @@ export function checkPropertyDefinition(
     );
   }
 
+  // we set this constant on whether the type itself is searchable
   const itemIsSearchable = propertyDefintionTypeStandard.searchable;
   const itemSupportsExactAndRange =
     propertyDefintionTypeStandard.searchInterface ===
       PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE;
+
+  // if we have a search level but the item is not searchable throw an error
   if (rawData.searchLevel && !itemIsSearchable) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' does not support searchLevel " +
       "as it cannot be searched",
       traceback.newTraceToBit("searchLevel"),
     );
+
+  // if we don't support exact an range but somehow ranged was disabled throw an error
   } else if (!itemSupportsExactAndRange && rawData.disableRangedSearch) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' does not support disableRangedSearch " +
       "as it does not support ranged search",
       traceback.newTraceToBit("disableRangedSearch"),
     );
+
+  // also when it is not searchable
   } else if (rawData.disableRangedSearch && !itemIsSearchable) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' does not support disableRangedSearch " +
       "as it cannot be searched",
       traceback.newTraceToBit("disableRangedSearch"),
     );
+
+  // this is contradictory
   } else if (rawData.searchLevel === "disabled" && rawData.disableRangedSearch) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' cannot disable ranged search if search is disabled",
@@ -440,8 +452,9 @@ export function checkPropertyDefinition(
     );
   }
 
+  // checks min, max, max decimal count, max length and min length
   if (
-    typeof propertyDefintionTypeStandard.max === "undefined" &&
+    !propertyDefintionTypeStandard.allowsMinMaxDefined &&
     typeof rawData.min !== "undefined"
   ) {
     throw new CheckUpError(
@@ -449,7 +462,7 @@ export function checkPropertyDefinition(
       traceback.newTraceToBit("min"),
     );
   } else if (
-    typeof propertyDefintionTypeStandard.max === "undefined" &&
+    !propertyDefintionTypeStandard.allowsMinMaxDefined &&
     typeof rawData.max !== "undefined"
   ) {
     throw new CheckUpError(
@@ -457,7 +470,7 @@ export function checkPropertyDefinition(
       traceback.newTraceToBit("max"),
     );
   } else if (
-    typeof propertyDefintionTypeStandard.maxDecimalCount === "undefined" &&
+    !propertyDefintionTypeStandard.allowsMaxDecimalCountDefined &&
     typeof rawData.maxDecimalCount !== "undefined"
   ) {
     throw new CheckUpError(
@@ -465,7 +478,7 @@ export function checkPropertyDefinition(
       traceback.newTraceToBit("maxDecimalCount"),
     );
   } else if (
-    typeof propertyDefintionTypeStandard.maxLength === "undefined" &&
+    !propertyDefintionTypeStandard.allowsMinMaxLengthDefined &&
     typeof rawData.minLength !== "undefined"
   ) {
     throw new CheckUpError(
@@ -473,7 +486,7 @@ export function checkPropertyDefinition(
       traceback.newTraceToBit("minLength"),
     );
   } else if (
-    typeof propertyDefintionTypeStandard.maxLength === "undefined" &&
+    !propertyDefintionTypeStandard.allowsMinMaxLengthDefined &&
     typeof rawData.maxLength !== "undefined"
   ) {
     throw new CheckUpError(
@@ -482,6 +495,7 @@ export function checkPropertyDefinition(
     );
   }
 
+  // checks icons
   if (rawData.icon && !propertyDefintionTypeStandard.supportsIcons) {
     throw new CheckUpError(
       `type '${rawData.type}' cannot have icons`,
@@ -489,6 +503,7 @@ export function checkPropertyDefinition(
     );
   }
 
+  // check invalid custom errors
   if (rawData.invalidIf) {
     const possiblyBrokenErrorIndex = rawData.invalidIf.findIndex((ii) => PropertyInvalidReason[ii.error]);
     if (possiblyBrokenErrorIndex !== -1) {
@@ -499,6 +514,7 @@ export function checkPropertyDefinition(
     }
   }
 
+  // check special properties are set
   if (propertyDefintionTypeStandard.specialProperties) {
     propertyDefintionTypeStandard.specialProperties.forEach((property) => {
       if (property.required && !rawData.specialProperties) {

@@ -878,7 +878,7 @@ async function getI18nPropertyData(
     errorRequiredProperties.push("error.NOT_NULLABLE");
   }
 
-  if ((definition.max || definition.maxLength) &&
+  if (definition.i18n.tooLargeErrorInclude &&
     !property.values && !property.autocompleteIsEnforced) {
     errorRequiredProperties.push("error.TOO_LARGE");
   }
@@ -891,12 +891,12 @@ async function getI18nPropertyData(
     errorRequiredProperties.push("error.INVALID_DATETIME");
   }
 
-  if (typeof property.minLength !== "undefined" &&
+  if ((typeof property.minLength !== "undefined" || definition.i18n.tooSmallErrorInclude) &&
     !property.values && !property.autocompleteIsEnforced) {
     errorRequiredProperties.push("error.TOO_SMALL");
   }
 
-  if (typeof definition.maxDecimalCount !== "undefined" &&
+  if (definition.i18n.tooManyDecimalsErrorInclude &&
     !property.values && !property.autocompleteIsEnforced) {
     errorRequiredProperties.push("error.TOO_MANY_DECIMALS");
   }

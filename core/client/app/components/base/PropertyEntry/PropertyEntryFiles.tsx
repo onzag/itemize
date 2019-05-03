@@ -383,9 +383,9 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                   {files}
                   {
                     (
-                      this.props.property.getMaxLength() >
-                      valueAsInternal.length
-                    ) ?
+                      this.props.property.getMaxLength() === 1 &&
+                      valueAsInternal.length === 1
+                    ) ? null :
                     <div
                       className={
                         `property-entry-files-placeholder ${isDragAccept ?
@@ -395,8 +395,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                     >
                       {!valueAsInternal.length ? <p>{isDragActive ? placeholderActive : i18nPlaceholder}</p> : null}
                       <Icon className="property-entry-files-icon-add">note_add</Icon>
-                    </div> :
-                    null
+                    </div>
                   }
                   {
                     singleFile && valueAsInternal.length === 1 ? <div

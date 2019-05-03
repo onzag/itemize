@@ -19,6 +19,7 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   REDUCED_SEARCH_BASE_I18N,
   LOCATION_SEARCH_I18N,
   MAX_FILE_BATCH_COUNT,
+  UNIT_SUBTYPES,
 } from "../../constants";
 import Module, { OnStateChangeListenerType } from "../Module";
 import * as fastHTMLParser from "fast-html-parser";
@@ -43,6 +44,7 @@ export type PropertyDefinitionSupportedTypeName =
   "integer" |         // A simple number, comparable, and stored as a number
   "number" |          // A simple number, comparable, and stored as a number
   "currency" |        // Currency, comparable and stored as an object
+  "unit" |            // Unit, comparable and stored as an object
   "string" |          // A simple string, comparable, and stored as a string
   "password" |        // A password, stored as a hash, ensure to disable retrieval
   "text" |            // Represented as an object, non comparable,
@@ -96,28 +98,9 @@ export interface IPropertyDefinitionSupportedType {
   // and autocompleteSupportsPreffils
   supportsAutocomplete?: boolean;
 
-  // Will make it so that the default search mode for
-  // exact and range is range
-  rangeDefaultSearch?: boolean;
-
   // this is a validation function that checks whether the value
   // is valid,
   validate?: (value: PropertyDefinitionSupportedType, subtype?: string) => PropertyInvalidReason;
-  // max valid, for numbers
-  // if you set a max the properties max and min will be available
-  // always set a max if your type supports such comparison
-  max?: number;
-  // min valid for numbers
-  min?: number;
-  // max length for text and string and whatnot, eg array types
-  // if you set a maxLenght, maxLenght and minLenght will be available
-  // always set a maxLeght if your type supports it
-  maxLength?: number;
-  // max decimal count
-  // basically only used for numeric floating point types
-  // if you set a maxDecimalCount, maxDecimalCount and minDecimalCount will
-  // be available
-  maxDecimalCount?: number;
   // whether it is searchable or not
   searchable: boolean;
   // the search interface used
@@ -130,6 +113,9 @@ export interface IPropertyDefinitionSupportedType {
     type: "number" | "string" | "boolean",
     required?: boolean;
   }>;
+  allowsMinMaxDefined?: boolean;
+  allowsMaxDecimalCountDefined?: boolean;
+  allowsMinMaxLengthDefined?: boolean;
   // i18n supported and expected attributes
   // they won't be requested at all for hidden and not searchable items
   // if the item has a range it should be specified too
@@ -145,6 +131,10 @@ export interface IPropertyDefinitionSupportedType {
     // not requested if the searchLevel is disabled
     searchBase?: string[],
     searchOptional?: string[],
+
+    tooLargeErrorInclude?: boolean,
+    tooSmallErrorInclude?: boolean,
+    tooManyDecimalsErrorInclude?: boolean,
   };
 
   // toSearch: (base: IPropertyDefinitionRawJSONDataType) => IPropertyDefinitionRawJSONDataType[];
@@ -197,13 +187,11 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
 
       return null;
     },
-    // max and min
-    max: MAX_SUPPORTED_INTEGER,
-    min: MIN_SUPPORTED_INTEGER,
     // it is searchable by exact and range value
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     supportsIcons: true,
+    allowsMinMaxDefined: true,
     // i18n attributes
     i18n: {
       base: CLASSIC_BASE_I18N,
@@ -212,6 +200,8 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
       searchRange: CLASSIC_SEARCH_RANGED_I18N,
       searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
+      tooSmallErrorInclude: true,
+      tooLargeErrorInclude: true,
     },
   },
   number: {
@@ -238,13 +228,11 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
 
       return PropertyInvalidReason.TOO_MANY_DECIMALS;
     },
-    // max and min
-    max: MAX_SUPPORTED_REAL,
-    min: MIN_SUPPORTED_REAL,
-    maxDecimalCount: MAX_DECIMAL_COUNT,
     // it is searchable
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    allowsMinMaxDefined: true,
+    allowsMaxDecimalCountDefined: true,
     // i18n attributes required
     supportsIcons: true,
     i18n: {
@@ -254,6 +242,9 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
       searchRange: CLASSIC_SEARCH_RANGED_I18N,
       searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
+      tooSmallErrorInclude: true,
+      tooLargeErrorInclude: true,
+      tooManyDecimalsErrorInclude: true,
     },
   },
   currency: {
@@ -268,7 +259,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
         throw new Error("Please ensure to set currency data on the class of property definition");
       }
 
-      if (typeof l.value !== "number" &&
+      if (typeof l.value !== "number" ||
         typeof l.currency !== "string") {
         return PropertyInvalidReason.UNSPECIFIED;
       }
@@ -279,7 +270,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
 
       if (l.value > MAX_SUPPORTED_REAL) {
         return PropertyInvalidReason.TOO_LARGE;
-      } else if (l.value < MIN_SUPPORTED_REAL) {
+      } else if (l.value < 0) {
         return PropertyInvalidReason.TOO_SMALL;
       }
 
@@ -296,11 +287,6 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
 
       return PropertyInvalidReason.TOO_MANY_DECIMALS;
     },
-    rangeDefaultSearch: true,
-    // Similar to real
-    max: MAX_SUPPORTED_REAL,
-    min: MIN_SUPPORTED_REAL,
-    maxDecimalCount: 6,
     // it is searchable
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
@@ -314,7 +300,75 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
       searchRange: CLASSIC_SEARCH_RANGED_I18N,
       searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
+      tooLargeErrorInclude: true,
+      tooManyDecimalsErrorInclude: true,
     },
+  },
+  unit: {
+    gql: "__PropertyType__Unit",
+    gqlDef: {
+      value: "Float!",
+      unit: "String!",
+      normalizedValue: "Float!",
+      normalizedUnit: "String!",
+    },
+    supportedSubtypes: UNIT_SUBTYPES,
+    validate: (l: IPropertyDefinitionSupportedUnitType) => {
+      // TODO check the unit as for being proper unit, eg. kg, degC, etc...
+      if (typeof l.value !== "number" ||
+        typeof l.unit !== "string" ||
+        typeof l.normalizedValue !== "number" ||
+        typeof l.normalizedUnit !== "string") {
+        return PropertyInvalidReason.UNSPECIFIED;
+      }
+
+      if (isNaN(l.value) || isNaN(l.normalizedValue)) {
+        return PropertyInvalidReason.UNSPECIFIED;
+      }
+
+      if (l.value > MAX_SUPPORTED_REAL) {
+        return PropertyInvalidReason.TOO_LARGE;
+      } else if (l.value < MIN_SUPPORTED_REAL) {
+        return PropertyInvalidReason.TOO_SMALL;
+      }
+
+      const splittedDecimals = l.value.toString().split(".");
+      if (!splittedDecimals[1] || splittedDecimals[1].length <= MAX_DECIMAL_COUNT) {
+        return null;
+      }
+
+      return PropertyInvalidReason.TOO_MANY_DECIMALS;
+    },
+    searchable: true,
+    searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
+    supportsIcons: false,
+    allowsMinMaxDefined: true,
+    allowsMaxDecimalCountDefined: true,
+    // i18n attributes required
+    i18n: {
+      base: CLASSIC_BASE_I18N,
+      optional: CLASSIC_OPTIONAL_I18N,
+      searchBase: CLASSIC_SEARCH_BASE_I18N,
+      searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
+      searchRange: CLASSIC_SEARCH_RANGED_I18N,
+      searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
+      tooSmallErrorInclude: true,
+      tooLargeErrorInclude: true,
+      tooManyDecimalsErrorInclude: true,
+    },
+
+    specialProperties: [
+      {
+        name: "unit",
+        type: "string",
+        required: true,
+      },
+      {
+        name: "imperialUnit",
+        type: "string",
+        required: true,
+      },
+    ],
   },
   string: {
     gql: "String",
@@ -337,17 +391,18 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
 
       return null;
     },
-    maxLength: MAX_STRING_LENGTH,
     // it is searchable by an exact value, use text for organic things
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
     supportsIcons: true,
+    allowsMinMaxLengthDefined: true,
     // i18n attributes required
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
       searchBase: CLASSIC_SEARCH_BASE_I18N,
       searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
+      tooLargeErrorInclude: true,
     },
   },
   password: {
@@ -363,13 +418,13 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
 
       return null;
     },
-    maxLength: MAX_STRING_LENGTH,
     searchable: false,
     supportsIcons: false,
     // i18n attributes required
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
+      tooLargeErrorInclude: true,
     },
   },
   text: {
@@ -389,17 +444,18 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       return null;
     },
     // the max length for the text
-    maxLength: MAX_RAW_TEXT_LENGTH,
     // whether it is searchable or not
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.FTS,
     supportsIcons: true,
+    allowsMinMaxLengthDefined: true,
     // i18n attributes
     i18n: {
       base: CLASSIC_BASE_I18N,
       optional: CLASSIC_OPTIONAL_I18N,
       searchBase: CLASSIC_SEARCH_BASE_I18N,
       searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
+      tooLargeErrorInclude: true,
     },
   },
   year: {
@@ -420,13 +476,11 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
 
       return null;
     },
-    // max and min
-    max: MAX_SUPPORTED_YEAR,
-    min: MIN_SUPPORTED_YEAR,
     // searchable attributes and supports range
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     supportsIcons: true,
+    allowsMinMaxDefined: true,
     // i18n data
     i18n: {
       base: CLASSIC_BASE_I18N,
@@ -544,13 +598,13 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     gql: "[String!]",
     searchable: false,
     supportsIcons: true,
-    maxLength: MAX_FILE_BATCH_COUNT,
     specialProperties: [
       {
         name: "accept",
         type: "string",
       },
     ],
+    allowsMinMaxLengthDefined: true,
     validate: (l: PropertyDefinitionSupportedFilesType) => {
       if (!Array.isArray(l) || l.some((v) => typeof v !== "string")) {
         return PropertyInvalidReason.UNSPECIFIED;
@@ -605,6 +659,12 @@ export interface IPropertyDefinitionSupportedCurrencyType {
   value: number;
   currency: string;
 }
+export interface IPropertyDefinitionSupportedUnitType {
+  value: number;
+  unit: string;
+  normalizedValue: number;
+  normalizedUnit: string;
+}
 export type PropertyDefinitionSupportedStringType = string;
 export type PropertyDefinitionSupportedPasswordType = string;
 export type PropertyDefinitionSupportedTextType = string;
@@ -625,6 +685,7 @@ export type PropertyDefinitionSupportedType =
   PropertyDefinitionSupportedIntegerType |
   PropertyDefinitionSupportedNumberType |
   IPropertyDefinitionSupportedCurrencyType |
+  IPropertyDefinitionSupportedUnitType |
   PropertyDefinitionSupportedStringType |
   PropertyDefinitionSupportedPasswordType |
   PropertyDefinitionSupportedTextType |
@@ -1328,11 +1389,8 @@ export default class PropertyDefinition {
   }
 
   public getMaxLength() {
-    const defaultMaxLength = this.getPropertyDefinitionDescription().maxLength;
     return typeof this.rawData.maxLength !== "undefined" ?
-      this.rawData.maxLength : (
-        typeof defaultMaxLength !== "undefined" ? defaultMaxLength : null
-      );
+      this.rawData.maxLength : null;
   }
 
   public getMinLength() {
@@ -1345,7 +1403,7 @@ export default class PropertyDefinition {
     if (this.getType() === "currency") {
       return null;
     }
-    return this.rawData.maxDecimalCount || this.getPropertyDefinitionDescription().maxDecimalCount || 0;
+    return this.rawData.maxDecimalCount || null;
   }
 
   public getMinDecimalCount() {

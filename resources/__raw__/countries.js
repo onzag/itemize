@@ -23,6 +23,7 @@ Object.keys(countriesData).forEach((countryCode) => {
     ...value,
     latitude: csvData.latitude || csvData.CapitalLatitude,
     longitude: csvData.longitude || csvData.CapitalLongitude,
+    code: countryCode,
   }
 });
 

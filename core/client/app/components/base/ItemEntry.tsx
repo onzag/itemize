@@ -19,7 +19,6 @@ import {
   PropertyEntryBooleanAsSwitchBase,
   PropertyEntryBooleanAsRadioBase,
 } from "./PropertyEntry/PropertyEntryBoolean";
-import Module from "../../../../base/Module";
 
 interface IParentedItemEntryProps {
   value: IItemValue;

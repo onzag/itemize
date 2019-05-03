@@ -6,6 +6,7 @@ import {
   PropertyDefinitionSupportedIntegerType,
   PropertyDefinitionSupportedYearType,
   IPropertyDefinitionSupportedCurrencyType,
+  IPropertyDefinitionSupportedUnitType,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
 import TextField from "@material-ui/core/TextField";
 import {
@@ -27,10 +28,14 @@ import parse from "autosuggest-highlight/parse";
 import equals from "deep-equal";
 import { escapeStringRegexp } from "../../../../../util";
 import { MAX_DECIMAL_COUNT } from "../../../../../constants";
+import convert from "convert-units";
 
 interface IPropertyEntryFieldState {
   suggestions: IPropertyEntryAutocompleteSuggestion[];
   visible: boolean;
+  unit: string;
+  unitDialogOpen: boolean;
+
   _materialUIBugRefresh: boolean;
 }
 
@@ -56,7 +61,7 @@ enum BaseType {
  * @param type the type as a string
  */
 function getBaseType(type: string): BaseType {
-  if (type === "number" || type === "currency") {
+  if (type === "number" || type === "currency" || type === "unit") {
     return BaseType.FLOAT;
   } else if (type === "integer" || type === "year") {
     return BaseType.INTEGER;
@@ -80,13 +85,16 @@ function isNumeric(baseType: BaseType): boolean {
  * @param value the value in question
  */
 function formatValueAsString(type: string, numberSeparator: string, value: any) {
-  if (value === null) {
+  const actualValue = value === null || typeof value === "undefined" ? value : (
+    typeof value.value !== "undefined" ? value.value : value
+  );
+  if (actualValue === null) {
     return "";
   }
   if (getBaseType(type) === BaseType.FLOAT) {
-    return value.toString().replace(/\./g, numberSeparator);
+    return actualValue.toString().replace(/\./g, numberSeparator);
   }
-  return value.toString();
+  return actualValue.toString();
 }
 
 export default class PropertyEntryField
@@ -101,11 +109,22 @@ export default class PropertyEntryField
     // we assign an uuid for this
     this.uuid =  "uuid-" + uuid.v4();
 
+    const prefersImperial = props.country.code === "US";
+    const unitValue = (props.value.value as IPropertyDefinitionSupportedUnitType);
+
     // set the state, contains suggestions and whether it is
     // visible or not, mainly for use with type password
     this.state = {
       suggestions: [],
       visible: props.property.getType() !== "password",
+      unit: props.property.getType() === "unit" ? (
+        unitValue !== null ? unitValue.unit : (
+          prefersImperial ?
+          props.property.getSpecialProperty("baseImperialUnit") as string :
+          props.property.getSpecialProperty("baseUnit") as string
+        )
+      ) : null,
+      unitDialogOpen: false,
 
       _materialUIBugRefresh: false,
     };
@@ -123,6 +142,20 @@ export default class PropertyEntryField
     this.getSuggestionValue = this.getSuggestionValue.bind(this);
     this.clearSuggestions = this.clearSuggestions.bind(this);
     this.toggleVisible = this.toggleVisible.bind(this);
+    this.toggleUnitDialog = this.toggleUnitDialog.bind(this);
+    this.changeUnit = this.changeUnit.bind(this);
+  }
+
+  public toggleUnitDialog() {
+    this.setState({
+      unitDialogOpen: !this.state.unitDialogOpen,
+    });
+  }
+
+  public changeUnit(newUnit: string) {
+    this.setState({
+      unit: newUnit,
+    });
   }
 
   public componentDidUpdate(prevProps: IPropertyEntryProps) {
@@ -162,6 +195,17 @@ export default class PropertyEntryField
       }
     }
 
+    const nextValueAsUnit = (this.props.value.value as IPropertyDefinitionSupportedUnitType);
+    if (
+      this.props.property.getType() === "unit" &&
+      nextValueAsUnit !== null &&
+      nextValueAsUnit.unit !== this.state.unit
+    ) {
+      this.setState({
+        unit: nextValueAsUnit.unit,
+      });
+    }
+
     // another buggy refresh required
     // the placeholder acts weird when changing position
     // it needs a hard refresh, from N$ to $N
@@ -194,6 +238,8 @@ export default class PropertyEntryField
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n ||
       nextProps.currency !== this.props.currency ||
+      nextState.unit !== this.state.unit ||
+      nextState.unitDialogOpen !== this.state.unitDialogOpen ||
       nextState._materialUIBugRefresh !== this.state._materialUIBugRefresh;
   }
 
@@ -245,6 +291,12 @@ export default class PropertyEntryField
 
     // if we have a number here
     if (isNumeric(baseType)) {
+
+      // repair extra minus signs or mispositioned values
+      const isNegative = textualValue.includes("-");
+      if (isNegative) {
+        textualValue = "-" + textualValue.replace(/-/g, "");
+      }
 
       // set the normalized numeric value, just starting up, it might change
       normalizedNumericValueAsString = textualValue;
@@ -349,6 +401,14 @@ export default class PropertyEntryField
           value: actualNumericValue,
           currency: this.props.currency.code,
         }, textualValue);
+      } else if (type === "unit") {
+        this.props.onChange({
+          value: actualNumericValue,
+          unit: this.state.unit,
+          normalizedValue: convert(actualNumericValue)
+            .from(this.state.unit).to(this.props.property.getSpecialProperty("baseUnit") as string),
+          normalizedUnit: this.props.property.getSpecialProperty("baseUnit") as string,
+        }, textualValue);
       } else {
         // do the on change
         this.props.onChange(actualNumericValue, textualValue);
@@ -385,15 +445,17 @@ export default class PropertyEntryField
       // We always allow dot, and the localized separator, it's usually another dot or a comma
       const separators = "." + this.props.i18n.number_decimal_separator;
       // this is what is valid key input
-      const validKeys = "1234567890" + separators;
+      const validKeys = "-1234567890" + separators;
       // basically whether it is an integer
-      const isBasicallyInteger = this.props.property.getMaxDecimalCount() === 0;
+      const isBasicallyInteger = type === "integer" || this.props.property.getMaxDecimalCount() === 0;
       // if we have a separator and we are basically inputting an integer
       if (separators.includes(e.key) && isBasicallyInteger) {
         // cancel the key changing the value
         e.preventDefault();
       } else if (!validKeys.includes(e.key)) {
         // also cancel it if it's not one of the valid keys
+        e.preventDefault();
+      } else if (e.key === "-" && (currentValue.includes("-") || type === "currency")) {
         e.preventDefault();
       } else if (
         // cancel a second separator being inserted, like "1.3" having another . inserted
@@ -647,6 +709,14 @@ export default class PropertyEntryField
           </InputAdornment>
         );
       }
+
+    // for units
+    } else if (type === "unit") {
+      appliedInputProps.endAdornment = (
+        <InputAdornment position="end">
+          <strong>{this.state.unit}</strong>
+        </InputAdornment>
+      );
 
     // otherwise we might just have an icon
     } else if (this.props.property.getIcon()) {

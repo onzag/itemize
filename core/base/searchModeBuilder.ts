@@ -382,7 +382,7 @@ function getConversionIds(
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE
   ) {
-    ids = ["LOCATION__" + rawData.id];
+    ids = ["LOCATION__" + rawData.id, "DISTANCE__" + rawData.id];
   }
   return ids;
 }
