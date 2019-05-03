@@ -3,7 +3,7 @@ import DevToolRawVisualizer from "./dRawVisualizer";
 import * as React from "react";
 import DevToolPropertyDefinition from "./dPropertyDef";
 import { getModulePath } from "./dModule";
-import ItemEntry from "../app/components/base/ItemEntry";
+import ItemEntry, { WizardItemEntry } from "../app/components/base/ItemEntry";
 import PropertyDefinition, { PropertyDefinitionSupportedType } from "../../base/ItemDefinition/PropertyDefinition";
 import Item, { ItemExclusionState } from "../../base/ItemDefinition/Item";
 import Module from "../../base/Module";
@@ -18,6 +18,7 @@ interface IItemDefProps {
 interface IItemDefState {
   expanded: boolean;
   displayBasic: boolean;
+  displayWizard: boolean;
   displayHiddenEntries: boolean;
   pokeEntries: boolean;
   value: IItemDefinitionValue;
@@ -95,6 +96,10 @@ export default class DevToolItemDefinition extends
         localStorage.getItem("__dev__itemdef__displayBasic" +
         getItemDefPath(props.itemDef),
       ) || "false"),
+      displayWizard: JSON.parse(
+        localStorage.getItem("__dev__itemdef__displayWizard" +
+        getItemDefPath(props.itemDef),
+      ) || "false"),
       displayHiddenEntries: false,
       pokeEntries: false,
       value: null,
@@ -103,6 +108,7 @@ export default class DevToolItemDefinition extends
 
     this.toggleExpand = this.toggleExpand.bind(this);
     this.toggleDisplayBasic = this.toggleDisplayBasic.bind(this);
+    this.toggleDisplayWizard = this.toggleDisplayWizard.bind(this);
     this.toggleDisplayHiddenEntries = this.toggleDisplayHiddenEntries.bind(this);
     this.togglePokeEntries = this.togglePokeEntries.bind(this);
     this.onPropertyChange = this.onPropertyChange.bind(this);
@@ -126,6 +132,16 @@ export default class DevToolItemDefinition extends
     );
     this.setState({
       displayBasic: !this.state.displayBasic,
+    });
+  }
+  public toggleDisplayWizard() {
+    localStorage.setItem(
+      "__dev__itemdef__displayWizard" +
+      getItemDefPath(this.props.itemDef),
+      JSON.stringify(!this.state.displayWizard),
+    );
+    this.setState({
+      displayWizard: !this.state.displayWizard,
     });
   }
   public toggleDisplayHiddenEntries() {
@@ -186,6 +202,9 @@ export default class DevToolItemDefinition extends
           <button onClick={this.toggleDisplayBasic}>{
             this.state.displayBasic ? "Hide Basic Form" : "Display Basic Form"
           }</button>
+          <button onClick={this.toggleDisplayWizard}>{
+            this.state.displayWizard ? "Hide Wizard Form" : "Display Wizard Form"
+          }</button>
           <button onClick={this.toggleDisplayHiddenEntries}>{
             this.state.displayHiddenEntries ? "Hide Hidden Entries" : "Display Hidden Entries"
           }</button>
@@ -194,6 +213,19 @@ export default class DevToolItemDefinition extends
           }</button>
           {this.state.displayBasic ? <div style={devtoolsStyle.itemDefDisplay}>
             <ItemEntry
+              value={this.state.value}
+              onPropertyChange={this.onPropertyChange}
+              onItemSetExclusionState={this.onItemSetExclusionState}
+              displayHidden={this.state.displayHiddenEntries}
+              poked={this.state.pokeEntries}
+              itemDefinition={this.props.itemDef}
+            />
+            <code>
+              {JSON.stringify(valueToStringify, null, 2)}
+            </code>
+          </div> : null}
+          {this.state.displayWizard ? <div style={devtoolsStyle.itemDefDisplay}>
+            <WizardItemEntry
               value={this.state.value}
               onPropertyChange={this.onPropertyChange}
               onItemSetExclusionState={this.onItemSetExclusionState}

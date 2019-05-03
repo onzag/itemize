@@ -106,6 +106,10 @@ export const LOCALE_I18N = [
   "image_uploader_delete_file",
 
   // for item definition element
+  "extended_properties_wizard_label",
+  "base_properties_wizard_label",
+  "rare_properties_wizard_label",
+  "moderate_properties_wizard_label",
   "rare_properties_label",
   "moderate_properties_label",
 
@@ -199,27 +203,3 @@ export const UNIT_SUBTYPES = [
   "reactiveEnergy",
   "angle",
 ];
-
-export const UNIT_SUBTYPES_DEFAULT = {
-  length: "m",
-  area: "m2",
-  mass: "g",
-  volume: "l",
-  volumeFlowRate: "l/s",
-  temperature: "C",
-  time: "s",
-  frequency: "Hz",
-  speed: "m/s",
-  pace: "s/m",
-  pressure: "bar",
-  digital: "b",
-  illuminance: "lx",
-  partsPer: "ppm",
-  voltage: "V",
-  current: "A",
-  apparentPower: "VA",
-  reactivePower: "VAR",
-  energy: "J",
-  reactiveEnergy: "VARh",
-  angle: "deg",
-};

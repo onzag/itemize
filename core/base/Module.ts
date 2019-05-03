@@ -26,8 +26,6 @@ export interface IModuleRawJSONDataType {
     [locale: string]: {
       name: string;
       searchFormTitle: string;
-      nameAlt?: string;
-      searchFormTitleAlt?: string;
     },
   };
 
