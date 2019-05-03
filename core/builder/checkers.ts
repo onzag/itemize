@@ -528,7 +528,7 @@ export function checkPropertyDefinition(
           traceback.newTraceToBit("specialProperties"),
         );
       } else if (rawData.specialProperties && rawData.specialProperties[property.name] &&
-        typeof rawData.specialProperties[name] !== property.type) {
+        typeof rawData.specialProperties[property.name] !== property.type) {
         throw new CheckUpError(
           `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`,
           traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),

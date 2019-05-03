@@ -138,14 +138,17 @@ export default class ConditionalRuleSet {
     if (rawDataAsProperty.property) {
 
       // lets get the property value as for now
-      let actualPropertyValue = rawDataAsProperty.property === "&this" ?
-        this.parentPropertyDefinition.getCurrentValueClean() :
-        (this.parentItemDefinition ?
+      let actualPropertyValue = null;
+      if (rawDataAsProperty.property === "&this") {
+        actualPropertyValue = this.parentPropertyDefinition.getCurrentValueClean();
+      } else {
+        actualPropertyValue = (this.parentItemDefinition ?
           this.parentItemDefinition
             .getPropertyDefinitionFor(rawDataAsProperty.property, true)
             .getCurrentValueClean() :
           this.parentModule.getPropExtensionFor(rawDataAsProperty.property)
             .getCurrentValueClean());
+      }
 
       if (rawDataAsProperty.attribute && actualPropertyValue !== null) {
         actualPropertyValue = actualPropertyValue[rawDataAsProperty.attribute];

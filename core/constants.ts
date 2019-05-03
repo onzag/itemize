@@ -80,14 +80,17 @@ export const LOCALE_I18N = [
   "format_add_file",
   "format_add_video",
 
+  // for filling the booleans and other things
   "yes",
   "no",
   "unspecified",
   "any",
 
+  // for the datetime and other things
   "cancel",
   "ok",
 
+  // for file uploader
   "file_uploader_placeholder_active",
   "image_uploader_placeholder_active",
   "file_uploader_placeholder_active_single",
@@ -102,10 +105,18 @@ export const LOCALE_I18N = [
   "file_uploader_delete_file",
   "image_uploader_delete_file",
 
+  // for item definition element
   "rare_properties_label",
   "moderate_properties_label",
 
+  // for item definition too
   "callout_exclude_warning",
+
+  // for showing the dialog message when selecting units
+  "unit_dialog_title",
+  "unit_dialog_others",
+  "unit_dialog_metric",
+  "unit_dialog_imperial",
 ];
 
 // ATTRIBUTES FOR i18N PROPERTIES

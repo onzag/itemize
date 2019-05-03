@@ -368,6 +368,14 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
         type: "string",
         required: true,
       },
+      {
+        name: "lockUnitsToPrimaries",
+        type: "boolean",
+      },
+      {
+        name: "initialPrefill",
+        type: "number",
+      },
     ],
   },
   string: {
@@ -569,6 +577,12 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       txt: "String!",
       atxt: "String",
     },
+    specialProperties: [
+      {
+        name: "prefillToUserLocationIfPossible",
+        type: "boolean",
+      },
+    ],
     // locations just contain this basic data
     validate: (l: IPropertyDefinitionSupportedLocationType) => {
       if (
@@ -881,11 +895,11 @@ export default class PropertyDefinition {
 
     // Do the fancy checks
     if (typeof propertyDefinitionRaw.min !== "undefined" &&
-      ((value as IPropertyDefinitionSupportedCurrencyType).value ||
+      ((value as any).value ||
         value) < propertyDefinitionRaw.min) {
       return PropertyInvalidReason.TOO_SMALL;
     } else if (typeof propertyDefinitionRaw.max !== "undefined" &&
-      ((value as IPropertyDefinitionSupportedCurrencyType).value ||
+      ((value as any).value ||
         value) > propertyDefinitionRaw.max) {
       return PropertyInvalidReason.TOO_LARGE;
     } else if (typeof propertyDefinitionRaw.minLength !== "undefined" &&
@@ -894,7 +908,7 @@ export default class PropertyDefinition {
     } else if (typeof propertyDefinitionRaw.maxDecimalCount !== "undefined" ||
       typeof propertyDefinitionRaw.minDecimalCount !== "undefined") {
       const splittedDecimals =
-        ((value as IPropertyDefinitionSupportedCurrencyType).value || value)
+        ((value as any).value || value)
         .toString().split(".");
       if (
         typeof propertyDefinitionRaw.maxDecimalCount !== "undefined" && splittedDecimals[1] &&
@@ -1399,10 +1413,6 @@ export default class PropertyDefinition {
   }
 
   public getMaxDecimalCount() {
-    // currency max decimal count is variable, we don't know
-    if (this.getType() === "currency") {
-      return null;
-    }
     return this.rawData.maxDecimalCount || null;
   }
 

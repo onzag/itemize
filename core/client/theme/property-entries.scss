@@ -52,8 +52,19 @@ $property-entry-error-height: 1.3rem;
 .property-entry--field {
   width: 100%;
 
-  .property-entry-field-button {
+  .property-entry-field-button, .property-entry-field-button-text {
     border: solid 1px rgba(0, 0, 0, 0.1);
+  }
+
+  .property-entry-field-button-text {
+    display: flex;
+    min-width: 50px;
+    height: 50px;
+    padding: 0 10px;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
   }
 }
 
@@ -365,5 +376,14 @@ $property-entry-error-height: 1.3rem;
         margin-left: 0.75rem;
       }
     }
+  }
+}
+
+.select-unit-dialog {
+  min-width: 400px;
+
+  .select-unit-dialog-subheader {
+    background-color: white;
+    border-bottom: solid 1px #eee;
   }
 }

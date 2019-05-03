@@ -20,6 +20,13 @@ import {
   Icon,
   IconButton,
   Divider,
+  Dialog,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemText,
+  withMobileDialog,
+  ListSubheader,
 } from "@material-ui/core";
 import uuid from "uuid";
 import Autosuggest from "react-autosuggest";
@@ -120,8 +127,8 @@ export default class PropertyEntryField
       unit: props.property.getType() === "unit" ? (
         unitValue !== null ? unitValue.unit : (
           prefersImperial ?
-          props.property.getSpecialProperty("baseImperialUnit") as string :
-          props.property.getSpecialProperty("baseUnit") as string
+          props.property.getSpecialProperty("imperialUnit") as string :
+          props.property.getSpecialProperty("unit") as string
         )
       ) : null,
       unitDialogOpen: false,
@@ -146,6 +153,22 @@ export default class PropertyEntryField
     this.changeUnit = this.changeUnit.bind(this);
   }
 
+  public componentDidMount() {
+    const prefill = this.props.property.getSpecialProperty("initialPrefill") as string;
+    if (
+      typeof prefill !== "undefined" &&
+      prefill !== null &&
+      this.props.value.value === null
+    ) {
+      // Fake event
+      this.onChange({
+        target: {
+          value: prefill,
+        },
+      } as any);
+    }
+  }
+
   public toggleUnitDialog() {
     this.setState({
       unitDialogOpen: !this.state.unitDialogOpen,
@@ -155,7 +178,23 @@ export default class PropertyEntryField
   public changeUnit(newUnit: string) {
     this.setState({
       unit: newUnit,
+      unitDialogOpen: false,
     });
+
+    const currentValueAsUnit = (this.props.value.value as IPropertyDefinitionSupportedUnitType);
+    if (
+      this.props.value.value &&
+      currentValueAsUnit !== null &&
+      newUnit !== currentValueAsUnit.unit
+    ) {
+      this.props.onChange({
+        unit: newUnit,
+        value: currentValueAsUnit.value,
+        normalizedValue: convert(currentValueAsUnit.value)
+          .from(newUnit).to(this.props.property.getSpecialProperty("unit") as string),
+        normalizedUnit: this.props.property.getSpecialProperty("unit") as string,
+      }, this.props.value.internalValue);
+    }
   }
 
   public componentDidUpdate(prevProps: IPropertyEntryProps) {
@@ -390,8 +429,8 @@ export default class PropertyEntryField
 
       // if we have too many decimals from the string count
       if (maxDecimalCount < decimalCount) {
-        // cut the line as an overflow protection
-        actualNumericValue = parseFloat(baseValue + "." + decimalValue.substr(0, maxDecimalCount + 1));
+        // cut the line as an overflow protection, we need to set the last as 9
+        actualNumericValue = parseFloat(baseValue + "." + decimalValue.substr(0, maxDecimalCount) + "9");
       }
 
       // if the type is a currency
@@ -406,8 +445,8 @@ export default class PropertyEntryField
           value: actualNumericValue,
           unit: this.state.unit,
           normalizedValue: convert(actualNumericValue)
-            .from(this.state.unit).to(this.props.property.getSpecialProperty("baseUnit") as string),
-          normalizedUnit: this.props.property.getSpecialProperty("baseUnit") as string,
+            .from(this.state.unit).to(this.props.property.getSpecialProperty("unit") as string),
+          normalizedUnit: this.props.property.getSpecialProperty("unit") as string,
         }, textualValue);
       } else {
         // do the on change
@@ -714,7 +753,12 @@ export default class PropertyEntryField
     } else if (type === "unit") {
       appliedInputProps.endAdornment = (
         <InputAdornment position="end">
-          <strong>{this.state.unit}</strong>
+          <IconButton
+            onClick={this.toggleUnitDialog}
+            classes={{root: "property-entry-field-button-text"}}
+          >
+            <strong>{formatUnit(this.state.unit)}</strong>
+          </IconButton>
         </InputAdornment>
       );
 
@@ -777,6 +821,21 @@ export default class PropertyEntryField
         <div className="property-entry-error">
           {i18nInvalidReason}
         </div>
+        {type === "unit" ? <SelectUnitDialogResponsive
+          open={this.state.unitDialogOpen}
+          title={this.props.i18n.unit_dialog_title}
+          others={this.props.i18n.unit_dialog_others}
+          othersMetric={this.props.i18n.unit_dialog_metric}
+          othersImperial={this.props.i18n.unit_dialog_imperial}
+          onClose={this.toggleUnitDialog}
+          onReplaceUnit={this.changeUnit}
+          selectedUnit={this.state.unit}
+          unitType={this.props.property.getSubtype()}
+          preferred={this.props.property.getSpecialProperty("unit") as string}
+          prefersImperial={this.props.country.code === "US"}
+          preferredImperial={this.props.property.getSpecialProperty("imperialUnit") as string}
+          lockUnitsToPrimaries={!!this.props.property.getSpecialProperty("lockUnitsToPrimaries") as boolean}
+        /> : null}
       </div>
     );
   }
@@ -934,3 +993,120 @@ export default class PropertyEntryField
     );
   }
 }
+
+function formatUnit(unit: string) {
+  if (unit === "l") {
+    return <span>L</span>;
+  } else if (unit === "ml" || unit === "cl" || unit === "dl" || unit === "kl") {
+    return <span>{unit[0]}L</span>;
+  } else if (unit === "C" || unit === "K" || unit === "F" || unit === "R") {
+    return <span>&deg;{unit}</span>;
+  }
+  return (
+    <span>
+      {unit.split(/(\d+)/).filter((m) => !!m).map((m, i) => isNaN(m as any) ?
+        <span key={i}>{m}</span> : <sup key={i}>{m}</sup>)}
+    </span>
+  );
+}
+
+interface ISelectUnitDialogProps {
+  open: boolean;
+  title: string;
+  others: string;
+  othersMetric: string;
+  othersImperial: string;
+  onClose: () => void;
+  onReplaceUnit: (newUnit: string) => void;
+  selectedUnit: string;
+  unitType: string;
+  preferred: string;
+  prefersImperial: boolean;
+  preferredImperial: string;
+  lockUnitsToPrimaries: boolean;
+  fullScreen?: boolean;
+}
+
+function SelectUnitDialog(props: ISelectUnitDialogProps) {
+  const primaryUnit = props.prefersImperial ? props.preferredImperial : props.preferred;
+  const secondaryUnit = props.prefersImperial ? props.preferred : props.preferredImperial;
+  return (
+    <Dialog
+      classes={{
+        paper: "select-unit-dialog",
+      }}
+      open={props.open}
+      onClose={props.onClose}
+      aria-labelledby="unit-dialog-title"
+      fullScreen={props.fullScreen}
+    >
+      <DialogTitle id="unit-dialog-title">{props.title}</DialogTitle>
+      <div>
+        <List>
+          <ListItem
+            selected={primaryUnit === props.selectedUnit}
+            button={true}
+            onClick={props.onReplaceUnit.bind(null, primaryUnit)}
+          >
+            <ListItemText primary={formatUnit(primaryUnit)}/>
+          </ListItem>
+          <ListItem
+            selected={secondaryUnit === props.selectedUnit}
+            button={true}
+            onClick={props.onReplaceUnit.bind(null, secondaryUnit)}
+          >
+            <ListItemText primary={formatUnit(secondaryUnit)}/>
+          </ListItem>
+        </List>
+        {!props.lockUnitsToPrimaries ? <React.Fragment>
+          <Divider/>
+          <List
+            subheader={<ListSubheader
+              classes={{root: "select-unit-dialog-subheader"}}
+            >
+              {props.others}
+            </ListSubheader>}
+          >
+            {convert()
+              .list(props.unitType)
+              .filter((unit) => props.prefersImperial ? unit.system === "imperial" : unit.system === "metric")
+              .filter((unit) => unit.abbr !== primaryUnit && unit.abbr !== secondaryUnit)
+              .map((unit) => (
+              <ListItem
+                selected={unit.abbr === props.selectedUnit}
+                button={true}
+                onClick={props.onReplaceUnit.bind(null, unit.abbr)}
+                key={unit.abbr}
+              >
+                <ListItemText primary={formatUnit(unit.abbr)}/>
+              </ListItem>
+            ))}
+          </List>
+          <Divider/>
+          <List
+            subheader={<ListSubheader classes={{root: "select-unit-dialog-subheader"}}>
+              {props.prefersImperial ? props.othersMetric : props.othersImperial}
+            </ListSubheader>}
+          >
+            {convert()
+              .list(props.unitType)
+              .filter((unit) => props.prefersImperial ? unit.system === "metric" : unit.system === "imperial")
+              .filter((unit) => unit.abbr !== primaryUnit && unit.abbr !== secondaryUnit)
+              .map((unit) => (
+              <ListItem
+                selected={unit.abbr === props.selectedUnit}
+                button={true}
+                onClick={props.onReplaceUnit.bind(null, unit.abbr)}
+                key={unit.abbr}
+              >
+                <ListItemText primary={formatUnit(unit.abbr)}/>
+              </ListItem>
+            ))}
+          </List>
+        </React.Fragment> : null}
+      </div>
+    </Dialog>
+  );
+}
+
+const SelectUnitDialogResponsive = withMobileDialog<ISelectUnitDialogProps>()(SelectUnitDialog);

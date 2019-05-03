@@ -89,6 +89,16 @@
         },
 
         {
+            "id": "unit",
+            "type": "unit",
+            "subtype": "volume",
+            "specialProperties": {
+                "unit": "l",
+                "imperialUnit": "gal"
+            }
+        },
+
+        {
             "id": "currency",
             "type": "currency"
         },

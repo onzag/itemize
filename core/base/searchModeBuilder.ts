@@ -286,9 +286,23 @@ function buildSearchModePropertyDefinitions(
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE
   ) {
-    // TODO we need either a subtype for number or something like it
-    // to properly support search with miles, thanks americans... -_-
+    newPropDef2 = {
+      type: "unit",
+      subtype: "length",
+      id: "DISTANCE__" + newPropDef.id,
+      min: 1,
+      maxDecimalCount: 0,
+      specialProperties: {
+        unit: "km",
+        imperialUnit: "mi",
+        lockUnitsToPrimaries: true,
+        initialPrefill: 100,
+      },
+      i18nData: displaceI18NData(newPropDef.i18nData, ["search", "distance"]),
+    };
     newPropDef.id = "LOCATION__" + newPropDef.id;
+    newPropDef.specialProperties = newPropDef.specialProperties || {};
+    newPropDef.specialProperties.prefillToUserLocationIfPossible = true;
   }
 
   if (newPropDef2) {

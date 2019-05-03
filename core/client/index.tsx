@@ -96,6 +96,8 @@ export function importScript(src: string) {
       const newPathName = pathNameSplitted.join("/");
       history.replace(newPathName);
     }
+  } else {
+    console.info("Stored locale is", storedLang, storedCountry, storedCurrency);
   }
 
   // let's try now to set the initial locale, the initial language
