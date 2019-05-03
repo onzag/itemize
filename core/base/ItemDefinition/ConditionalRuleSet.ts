@@ -300,25 +300,20 @@ if (process.env.NODE_ENV !== "production") {
           },
           // value sadly the import is buggy, so I have to paste it here
           value: {
-            oneOf: [
-              {
-                type: "object",
-                properties: {
-                  property: {
-                    type: "string",
-                    pattern: "^[a-z_]+$",
-                  },
-                },
-                required: ["property"],
-                additionalProperties: false,
-              },
-              {
-                // despite of being able to use any of the property
-                // definition values we basically only allow for string numbers
-                // and booleans
-                type: ["boolean", "string", "number", "null"],
-              },
-            ],
+            // oneOf: [
+            //   {
+            //     type: "object",
+            //     properties: {
+            //       property: {
+            //         type: "string",
+            //         pattern: "^[a-z_]+$",
+            //       },
+            //     },
+            //     required: ["property"],
+            //     additionalProperties: false,
+            //   },
+            //   {},
+            // ],
           },
           // value attribute
           valueAttribute: {type: "string"},

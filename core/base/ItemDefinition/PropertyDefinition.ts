@@ -1480,21 +1480,6 @@ export default class PropertyDefinition {
 // These are very useful debugging utilities
 if (process.env.NODE_ENV !== "production") {
 
-  const valueOneOf = [
-    {
-      type: "string",
-    },
-    {
-      type: "boolean",
-    },
-    {
-      type: "number",
-    },
-    {
-      type: "null",
-    },
-  ];
-
   const searchLevels = ["always", "moderate", "rare", "hidden", "disabled"];
   const rarityLevels = ["standard", "moderate", "rare"];
 
@@ -1547,9 +1532,7 @@ if (process.env.NODE_ENV !== "production") {
       },
       values: {
         type: "array",
-        items: {
-          oneOf: valueOneOf,
-        },
+        items: {},
       },
       nullable: {
         type: "boolean",
@@ -1575,9 +1558,7 @@ if (process.env.NODE_ENV !== "production") {
       htmlAutocomplete: {
         type: "string",
       },
-      default: {
-        oneOf: valueOneOf,
-      },
+      default: {},
       defaultIf: {
         type: "array",
         items: {
@@ -1586,9 +1567,7 @@ if (process.env.NODE_ENV !== "production") {
             if: {
               $ref: ConditionalRuleSet.schema.$id,
             },
-            value: {
-              oneOf: valueOneOf,
-            },
+            value: {},
           },
           additionalProperties: false,
           required: ["value", "if"],
@@ -1621,9 +1600,7 @@ if (process.env.NODE_ENV !== "production") {
             if: {
               $ref: ConditionalRuleSet.schema.$id,
             },
-            value: {
-              oneOf: valueOneOf,
-            },
+            value: {},
           },
           additionalProperties: false,
           required: ["value", "if"],
@@ -1636,9 +1613,7 @@ if (process.env.NODE_ENV !== "production") {
       hiddenIfEnforced: {
         type: "boolean",
       },
-      enforcedValue: {
-        oneOf: valueOneOf,
-      },
+      enforcedValue: {},
       hidden: {
         type: "boolean",
       },
