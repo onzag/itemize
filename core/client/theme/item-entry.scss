@@ -1,3 +1,6 @@
+$item-entry-wizard-color-error: #f44336;
+$item-entry-wizard-color-warning: #f9a825;
+
 .item-entry-container {
   padding: 15px;
 }
@@ -14,4 +17,14 @@
 
 .item-entry-expansion-panel-details {
   display: block;
+}
+
+.item-entry-wizard-icon {
+  &.item-entry-wizard-icon--failed {
+    color: $item-entry-wizard-color-error;
+    font-size: 26px;
+  }
+  &.item-entry-wizard-icon--warning {
+    color: $item-entry-wizard-color-warning;
+  }
 }
