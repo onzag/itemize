@@ -14,14 +14,12 @@ $property-entry-files-rejected-color-hover: #f44336;
 $property-entry-icon-button-color: #2196f3;
 $property-entry-icon-button-color-hover: #1976d2;
 $property-entry-icon-button-icon-color: #fff;
-$property-entry-container-border-color: #ccc;
 
 $property-entry-error-height: 1.3rem;
 
 .property-entry-container {
   width: 100%;
   padding-top: 15px;
-  border-top: solid 1px $property-entry-container-border-color;
 }
 
 .property-entry-error {
@@ -40,6 +38,15 @@ $property-entry-error-height: 1.3rem;
   text-align: justify;
   font-size: 0.85rem;
   padding-bottom: 10px;
+  display: flex;
+
+  span {
+    opacity: 0.8;
+  }
+
+  &.property-entry-description--no-padding {
+    padding-bottom: 0;
+  }
 }
 
 .property-entry-input-menu-item-placeholder {

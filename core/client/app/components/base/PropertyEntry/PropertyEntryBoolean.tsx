@@ -15,7 +15,12 @@ export function PropertyEntryBooleanAsSwitchBase(props: {
 }) {
   return (
     <div className="property-entry-container">
-      {props.description ? <div className="property-entry-description">{props.description}</div> : null}
+      {props.description ? <div
+        className="property-entry-description property-entry-description--no-padding"
+      >
+        <Icon>keyboard_arrow_down</Icon>
+        {props.description}
+      </div> : null}
       <FormControl className={props.className ? props.className : "property-entry property-entry--switch"}>
         <FormControlLabel
           aria-label={props.label}
@@ -78,7 +83,12 @@ export function PropertyEntryBooleanAsRadioBase(props: {
         >
           {props.label}{props.iconComponent}
         </FormLabel>
-        {props.description ? <div className="property-entry-description">{props.description}</div> : null}
+        {props.description ? <div
+          className="property-entry-description property-entry-description--no-padding"
+        >
+          <Icon>keyboard_arrow_down</Icon>
+          {props.description}
+        </div> : null}
         <RadioGroup
           value={props.value}
           onChange={sendValueOnly.bind(this, props.onChange)}

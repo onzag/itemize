@@ -1136,7 +1136,7 @@ export default class PropertyDefinition {
         }
       }
 
-      return defaultValue || null;
+      return typeof defaultValue === "undefined" ? null : defaultValue;
     }
 
     return this.stateValue;

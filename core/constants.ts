@@ -110,6 +110,10 @@ export const LOCALE_I18N = [
   "base_properties_wizard_label",
   "rare_properties_wizard_label",
   "moderate_properties_wizard_label",
+  "wizard_next",
+  "wizard_prev",
+  "wizard_submit",
+  "wizard_invalid_message",
   "rare_properties_label",
   "moderate_properties_label",
 

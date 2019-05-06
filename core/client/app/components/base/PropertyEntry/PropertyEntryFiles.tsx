@@ -282,7 +282,8 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
         >
           {i18nLabel}{iconComponent}
         </FormLabel>
-        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
+        {i18nDescription ? <div className="property-entry-description">
+          <Icon>keyboard_arrow_down</Icon>{i18nDescription}</div> : null}
         <Dropzone
           onDropAccepted={this.onDropAccepted}
           onDropRejected={this.onDropRejected}

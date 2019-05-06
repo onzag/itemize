@@ -52,7 +52,6 @@
             "id": "has_nitro",
             "type": "boolean",
             "rarity": "rare",
-            "default": false,
             "hiddenIf": {
                 "property": "vehicle_type",
                 "comparator": "not-equal",

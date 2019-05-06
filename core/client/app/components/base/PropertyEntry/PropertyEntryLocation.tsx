@@ -411,7 +411,8 @@ export default class PropertyEntryLocation
 
     return (
       <div className="property-entry-container">
-        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
+        {i18nDescription ? <div className="property-entry-description">
+          <Icon>keyboard_arrow_down</Icon>{i18nDescription}</div> : null}
         <div className="property-entry-location-atxt">
           {currentLocationDataATxt}
         </div>

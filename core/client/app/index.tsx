@@ -87,6 +87,11 @@ export interface IBuildData {
   i18n: Ii18NType;
 }
 
+export interface IMobileNavigation {
+  node: React.ReactNode;
+  setNodeTo: (node: React.ReactNode) => void;
+}
+
 interface IAppProps {
   initialData: IBuildData;
   initialCurrency: string;
@@ -104,10 +109,12 @@ interface IAppState {
   specifiedProcessedRoot: Root;
   localeIsUpdating: boolean;
   localeIsUpdatingFrom: string;
+  mobileNavigation: IMobileNavigation;
 }
 
 export const LocaleContext = React.createContext<ILocaleType>(null);
 export const DataContext = React.createContext<IDataType>(null);
+export const MobileNavigationContext = React.createContext<IMobileNavigation>(null);
 
 const theme = createMuiTheme({
   typography: {
@@ -127,12 +134,21 @@ export default class App extends React.Component<IAppProps, IAppState> {
       localeIsUpdatingFrom: null,
       specifiedData: props.initialData,
       specifiedProcessedRoot: new Root(props.initialData.root),
+      mobileNavigation: {
+        node: null,
+        setNodeTo: this.setMobileNavigationNodeTo.bind(this),
+      },
     };
 
     this.changeLanguageTo = this.changeLanguageTo.bind(this);
     this.changeCountryTo = this.changeCountryTo.bind(this);
     this.changeCurrencyTo = this.changeCurrencyTo.bind(this);
     this.renderAppWithLocaleContext = this.renderAppWithLocaleContext.bind(this);
+  }
+  public setMobileNavigationNodeTo(node: React.ReactNode) {
+    this.setState({
+      mobileNavigation: {...this.state.mobileNavigation, node},
+    });
   }
   public hasLocaleDataFor(locale: string) {
     return !!this.props.localeData[locale];
@@ -262,10 +278,12 @@ export default class App extends React.Component<IAppProps, IAppState> {
       <JssProvider jss={jss} generateClassName={generateClassName}>
         <MuiThemeProvider theme={theme}>
           <DataContext.Provider value={dataContextValue}>
-            <Route
-              path="/:lang/"
-              component={this.renderAppWithLocaleContext}
-            />
+            <MobileNavigationContext.Provider value={this.state.mobileNavigation}>
+              <Route
+                path="/:lang/"
+                component={this.renderAppWithLocaleContext}
+              />
+            </MobileNavigationContext.Provider>
           </DataContext.Provider>
         </MuiThemeProvider>
       </JssProvider>

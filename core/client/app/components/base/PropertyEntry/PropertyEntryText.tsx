@@ -184,7 +184,8 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
           >
             {i18nLabel}{iconComponent}
           </InputLabel>
-          {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
+          {i18nDescription ? <div className="property-entry-description">
+            <Icon>keyboard_arrow_down</Icon>{i18nDescription}</div> : null}
           <RichTextEditorToolbar id={this.uuid} i18n={this.props.i18n}/>
           <ReactQuill
             disabled={this.props.value.enforced}

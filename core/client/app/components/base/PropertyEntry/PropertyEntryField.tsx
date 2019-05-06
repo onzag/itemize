@@ -788,7 +788,8 @@ export default class PropertyEntryField
     // return the complex overengineered component in all its glory
     return (
       <div className="property-entry-container">
-        {i18nDescription ? <div className="property-entry-description">{i18nDescription}</div> : null}
+        {i18nDescription ? <div className="property-entry-description">
+          <Icon>keyboard_arrow_down</Icon>{i18nDescription}</div> : null}
         <TextField
           fullWidth={true}
           type={this.state.visible ? "text" : "password"}
