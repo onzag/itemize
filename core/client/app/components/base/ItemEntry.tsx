@@ -11,7 +11,25 @@ import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { Typography, Icon, Stepper, StepLabel, Step, StepContent, StepButton, Button, Hidden } from "@material-ui/core";
+import {
+  Typography,
+  Icon,
+  Stepper,
+  StepLabel,
+  Step,
+  StepContent,
+  StepButton,
+  Button,
+  withMobileDialog,
+  Dialog,
+  AppBar,
+  Toolbar,
+  IconButton,
+  DialogContent,
+  DialogActions,
+  Snackbar,
+  SnackbarContent,
+} from "@material-ui/core";
 import Item, { IItemValue, ItemExclusionState } from "../../../../base/ItemDefinition/Item";
 
 import "../../../theme/item-entry.scss";
@@ -152,22 +170,29 @@ interface IWizardItemEntryProps {
   markAsHidden?: string[];
   disableTitle?: boolean;
   itemDefinition: ItemDefinition;
+  asDialog?: boolean;
+  dialogOpen?: boolean;
+  onDialogClose?: () => void;
+  onSubmit: () => void;
 }
 
 enum WizardStepValueStatus {
-  COMPLETED,
-  COMPLETED_FAILED,
-  COMPLETED_WARNING,
+  COMPLETED = "COMPLETED",
+  COMPLETED_FAILED = "COMPLETED_FAILED",
+  COMPLETED_WARNING = "COMPLETED_WARNING",
 }
 
 interface IWizardItemEntryState {
   activeStep: string;
+  activeStepAsNumber: number;
   valuesStatus: {
     [key: string]: WizardStepValueStatus;
   };
   pokeStatus: {
     [key: string]: boolean;
   };
+  steps: IWizardStepDefinitionReferenceType[];
+  showErrorMessage: boolean;
 }
 
 function checkPropertyValueIsValid(value: IPropertyDefinitionValue) {
@@ -217,7 +242,7 @@ interface IWizardStepDataContainerType {
   propertyDefinition?: PropertyDefinition;
   item?: Item;
   value: IPropertyDefinitionValue | IItemValue;
-  nodeFn: (poked: boolean) => React.ReactNode;
+  nodeFn: (poked: boolean, locale: ILocaleType) => React.ReactNode;
 }
 
 interface IWizardStepDefinitionReferenceType {
@@ -226,36 +251,43 @@ interface IWizardStepDefinitionReferenceType {
   fn: (
     index: number,
     allSteps: IWizardStepDefinitionReferenceType[],
-    activeStep: IWizardStepDefinitionReferenceType,
     selfStepKey: string,
     previousStepKey: string,
-    allPreviousStep: IWizardStepDefinitionReferenceType[],
     nextStepKey: string,
-    allPreviousStepAndSelf: IWizardStepDefinitionReferenceType[],
-    allCheckedSteps: IWizardStepDefinitionReferenceType[],
+    locale: ILocaleType,
+    goToStep: any,
   ) => {
     prevButtonFn: any,
     nextButtonFn: any,
     node: React.ReactNode,
+    failed: boolean,
+    missing: boolean,
   };
 }
 
-function renderButtons(prevButtonFn: () => void, nextButtonFn: () => void, locale: ILocaleType, isLast: boolean) {
+function renderButtons(
+  prevButtonFn: () => void,
+  nextButtonFn: () => void,
+  locale: ILocaleType,
+  isLast: boolean,
+) {
   return (
     <React.Fragment>
       {prevButtonFn ? <Button
-        variant="contained"
         color="primary"
         onClick={prevButtonFn}
+        className="item-entry-button-prev"
       >
+        <Icon>keyboard_arrow_left</Icon>
         {locale.i18n.wizard_prev}
       </Button> : null}
       <Button
-        variant="contained"
         color="primary"
         onClick={nextButtonFn}
+        className="item-entry-button-next"
       >
         {isLast ? locale.i18n.wizard_submit : locale.i18n.wizard_next}
+        <Icon>keyboard_arrow_right</Icon>
       </Button>
     </React.Fragment>
   );
@@ -263,80 +295,23 @@ function renderButtons(prevButtonFn: () => void, nextButtonFn: () => void, local
 
 // tslint:disable-next-line: max-classes-per-file
 export class WizardItemEntry extends React.Component<IWizardItemEntryProps, IWizardItemEntryState> {
-  constructor(props: IItemEntryProps) {
-    super(props);
-
-    this.state = {
-      activeStep: "extended-prop-entries",
-      valuesStatus: {},
-      pokeStatus: {},
-    };
-
-    this.goToStep = this.goToStep.bind(this);
-  }
-  public goToStep(
-    n: string,
-    checkedSteps: IWizardStepDefinitionReferenceType[],
-    activeStep: IWizardStepDefinitionReferenceType,
-    stepsToCheck: IWizardStepDefinitionReferenceType[],
-    preventActiveStepChangeIfLastIsFail: boolean,
-    avoidPokingLast: boolean,
+  public static getDerivedStateFromProps(
+    props: IWizardItemEntryProps,
+    state: IWizardItemEntryState,
   ) {
-    if (n === this.state.activeStep) {
-      return;
-    }
-
-    const nValuesStatus = { ...this.state.valuesStatus };
-    const nPokeStatus = { ...this.state.pokeStatus };
-    let lastIsValid = false;
-    checkedSteps.concat([activeStep]).concat(stepsToCheck).forEach((stepToCheck, index, arr) => {
-      let isAllValid: boolean;
-      let isAWarning: boolean;
-      if (Array.isArray(stepToCheck.value)) {
-        isAllValid = checkMultipleWizardStepIsValid(stepToCheck.value);
-        isAWarning = checkMultipleWizardStepForWarning(stepToCheck.value);
-      } else {
-        isAllValid = checkSingleWizardStepIsValid(stepToCheck.value);
-        isAWarning = checkSingleWizardStepForWarning(stepToCheck.value);
-      }
-      if (index === arr.length - 1) {
-        lastIsValid = isAllValid;
-      }
-      nValuesStatus[stepToCheck.key] = isAllValid ?
-        (isAWarning ? WizardStepValueStatus.COMPLETED_WARNING :
-          WizardStepValueStatus.COMPLETED) : WizardStepValueStatus.COMPLETED_FAILED;
-      if (!(avoidPokingLast && (index === arr.length - 1))) {
-        nPokeStatus[stepToCheck.key] = true;
-      }
-    });
-
-    if (preventActiveStepChangeIfLastIsFail && !lastIsValid) {
-      this.setState({
-        valuesStatus: nValuesStatus,
-        pokeStatus: nPokeStatus,
-      });
-    } else {
-      this.setState({
-        activeStep: n,
-        valuesStatus: nValuesStatus,
-        pokeStatus: nPokeStatus,
-      });
-    }
-  }
-  public render() {
     const basicBasePropertyEntries: IWizardStepDataContainerType[] = [];
     const basicExtendedPropertyEntries: IWizardStepDataContainerType[] = [];
     const moderatePropertyEntries: IWizardStepDataContainerType[] = [];
     const rarePropertyEntries: IWizardStepDataContainerType[] = [];
 
-    this.props.value.properties.forEach((propertyValue) => {
-      const propertyDefinition = this.props.itemDefinition.getPropertyDefinitionFor(propertyValue.propertyId, true);
+    props.value.properties.forEach((propertyValue) => {
+      const propertyDefinition = props.itemDefinition.getPropertyDefinitionFor(propertyValue.propertyId, true);
       if (
         (
           propertyValue.hidden ||
-          (this.props.markAsHidden || []).includes(propertyDefinition.getId())
+          (props.markAsHidden || []).includes(propertyDefinition.getId())
         ) &&
-        !this.props.displayHidden
+        !props.displayHidden
       ) {
         return;
       }
@@ -360,7 +335,7 @@ export class WizardItemEntry extends React.Component<IWizardItemEntryProps, IWiz
               key={propertyDefinition.getId()}
               property={propertyDefinition}
               value={propertyValue}
-              onChange={this.props.onPropertyChange.bind(this, propertyDefinition)}
+              onChange={props.onPropertyChange.bind(this, propertyDefinition)}
               poked={poked}
             />
           ),
@@ -368,206 +343,367 @@ export class WizardItemEntry extends React.Component<IWizardItemEntryProps, IWiz
       );
     });
 
+    const itemEntries = props.value.items.map((ie) => {
+      const item = props.itemDefinition.getItemFor(ie.itemId);
+      return {
+        item,
+        value: ie,
+        nodeFn: (poked: boolean, locale: ILocaleType) => (
+          <ParentedItemEntry
+            key={ie.itemId}
+            value={ie}
+            onPropertyChange={props.onPropertyChange}
+            onItemSetExclusionState={props.onItemSetExclusionState}
+            displayHidden={props.displayHidden}
+            poked={poked}
+            language={locale.language}
+            i18n={locale.i18n}
+            parentItemDefinition={props.itemDefinition}
+            disableExpansionPanel={true}
+          />
+        ),
+      };
+    });
+
+    // TODO catch invalid steps that has been skipped or are invalid
+    // do something about them
+    // need to have the following, uncompleted, in progress, completed,
+    // completed_failed, completed_warning
+
+    const properties = [
+      {
+        key: "extended-prop-entries",
+        value: basicExtendedPropertyEntries,
+        i18n: "extended_properties_wizard_label",
+      },
+      {
+        key: "base-prop-entries",
+        value: basicBasePropertyEntries,
+        i18n: "base_properties_wizard_label",
+      },
+      {
+        key: "moderate-prop-entries",
+        value: moderatePropertyEntries,
+        i18n: "moderate_properties_wizard_label",
+      },
+      {
+        key: "rare-prop-entries",
+        value: rarePropertyEntries,
+        i18n: "rare_properties_wizard_label",
+      },
+    ];
+
+    const steps: IWizardStepDefinitionReferenceType[] = [
+      ...properties.map((p) => {
+        if (!p.value.length) {
+          return null;
+        }
+
+        return {
+          key: p.key,
+          value: p.value,
+          fn: (
+            index,
+            allSteps,
+            selfStepKey,
+            previousStepKey,
+            nextStepKey,
+            locale,
+            goToStep,
+          ) => {
+            const stepStatus = state.valuesStatus[selfStepKey];
+            const pokeStatus = state.pokeStatus[selfStepKey];
+            let labelErrored = false;
+            const stepIconProps: any = { classes: { root: "item-entry-wizard-icon" } };
+            if (pokeStatus && stepStatus === WizardStepValueStatus.COMPLETED_FAILED) {
+              stepIconProps.classes.root += " item-entry-wizard-icon--failed";
+              labelErrored = true;
+            } else if (pokeStatus && stepStatus === WizardStepValueStatus.COMPLETED_WARNING) {
+              stepIconProps.classes.root += " item-entry-wizard-icon--warning";
+            }
+            const prevButtonFn = previousStepKey ?
+              goToStep.bind(this, previousStepKey, false) : null;
+            const nextButtonFn = goToStep.bind(this, nextStepKey, true);
+            return {
+              prevButtonFn,
+              nextButtonFn,
+              failed: stepStatus === WizardStepValueStatus.COMPLETED_FAILED,
+              missing: !stepStatus,
+              node: (
+                <Step key={selfStepKey} completed={typeof stepStatus !== "undefined"}>
+                  <StepButton
+                    onClick={goToStep.bind(this, selfStepKey, false)}
+                  >
+                    <StepLabel
+                      error={labelErrored}
+                      StepIconProps={stepIconProps}
+                    >
+                      {locale.i18n[p.i18n]}
+                    </StepLabel>
+                  </StepButton>
+                  <StepContent>
+                    {p.value.map((m) => m.nodeFn(pokeStatus, locale))}
+                    {
+                      props.asDialog ?
+                      null :
+                      renderButtons(prevButtonFn, nextButtonFn, locale, index === allSteps.length - 1)
+                    }
+                  </StepContent>
+                </Step>
+              ),
+            };
+          },
+        };
+      }),
+
+      ...itemEntries.map((ie) => ({
+        key: `item-entry-${ie.item.getId()}`,
+        value: ie,
+        fn: (
+          index,
+          allSteps,
+          selfStepKey,
+          previousStepKey,
+          nextStepKey,
+          locale,
+          goToStep,
+        ) => {
+          const stepStatus = state.valuesStatus[selfStepKey];
+          const pokeStatus = state.pokeStatus[selfStepKey];
+          let labelErrored = false;
+          const stepIconProps: any = { classes: { root: "item-entry-wizard-icon" } };
+          if (pokeStatus && stepStatus === WizardStepValueStatus.COMPLETED_FAILED) {
+            labelErrored = true;
+            stepIconProps.classes.root += " item-entry-wizard-icon--failed";
+          } else if (pokeStatus && stepStatus === WizardStepValueStatus.COMPLETED_WARNING) {
+            stepIconProps.classes.root += " item-entry-wizard-icon--warning";
+          }
+          const prevButtonFn = previousStepKey ?
+            goToStep.bind(this, previousStepKey, false) : null;
+          const nextButtonFn = goToStep.bind(this, nextStepKey, true);
+          return {
+            prevButtonFn,
+            nextButtonFn,
+            failed: stepStatus === WizardStepValueStatus.COMPLETED_FAILED,
+            missing: !stepStatus,
+            node: (
+              <Step key={selfStepKey} completed={typeof stepStatus !== "undefined"}>
+                <StepButton
+                  onClick={goToStep.bind(this, selfStepKey, false)}
+                >
+                  <StepLabel
+                    error={labelErrored}
+                    StepIconProps={stepIconProps}
+                  >
+                    {ie.item.getI18nNameFor(locale.language)}
+                  </StepLabel>
+                </StepButton>
+                <StepContent>
+                  {ie.nodeFn(pokeStatus, locale)}
+                  {
+                    props.asDialog ?
+                    null :
+                    renderButtons(prevButtonFn, nextButtonFn, locale, index === allSteps.length - 1)
+                  }
+                </StepContent>
+              </Step>
+            ),
+          };
+        },
+      }),
+      ),
+    ].filter((m) => !!m);
+
+    let activeStepAsNumber =
+      steps.findIndex((step) => step.key === state.activeStep);
+    if (activeStepAsNumber === -1) {
+      activeStepAsNumber = 0;
+    }
+
+    const actualActiveStep = steps[activeStepAsNumber].key;
+
+    return {
+      steps,
+      activeStep: actualActiveStep,
+      activeStepAsNumber,
+    };
+  }
+
+  constructor(props: IWizardItemEntryProps) {
+    super(props);
+
+    this.state = {
+      activeStep: "extended-prop-entries",
+      activeStepAsNumber: 0,
+      valuesStatus: {},
+      pokeStatus: {},
+      steps: [],
+      showErrorMessage: false,
+    };
+
+    this.goToStep = this.goToStep.bind(this);
+    this.hideErrorMessage = this.hideErrorMessage.bind(this);
+  }
+  public hideErrorMessage() {
+    this.setState({
+      showErrorMessage: false,
+    });
+  }
+  public goToStep(
+    id: string,
+    preventIfActiveIsFail: boolean,
+  ) {
+    if (id === this.state.activeStep) {
+      return;
+    }
+
+    const checkedSteps = this.state.steps.filter((s) => this.state.valuesStatus[s.key]);
+    const activeStep = this.state.steps[this.state.activeStepAsNumber];
+    let nextStepAsNumber = this.state.steps.findIndex((s) => s.key === id);
+    if (nextStepAsNumber === -1) {
+      nextStepAsNumber = 0;
+    }
+    const nextStep = this.state.steps[nextStepAsNumber];
+
+    const stepsBehindThisStep = this.state.steps.slice(0, nextStepAsNumber);
+    const extraStepsToCheck = checkedSteps.concat([activeStep])
+      .filter((p) => !stepsBehindThisStep.find((s) => s.key === p.key));
+
+    const nValuesStatus = { ...this.state.valuesStatus };
+    const nPokeStatus = { ...this.state.pokeStatus };
+    let activeIsValid = true;
+    let firstFailedStateNotSelf: IWizardStepDefinitionReferenceType = null;
+    extraStepsToCheck.concat(stepsBehindThisStep).forEach((stepToCheck) => {
+      let isAllValid: boolean;
+      let isAWarning: boolean;
+      if (Array.isArray(stepToCheck.value)) {
+        isAllValid = checkMultipleWizardStepIsValid(stepToCheck.value);
+        isAWarning = checkMultipleWizardStepForWarning(stepToCheck.value);
+      } else {
+        isAllValid = checkSingleWizardStepIsValid(stepToCheck.value);
+        isAWarning = checkSingleWizardStepForWarning(stepToCheck.value);
+      }
+      if (stepToCheck.key === activeStep.key) {
+        activeIsValid = isAllValid;
+      }
+      nValuesStatus[stepToCheck.key] = isAllValid ?
+        (isAWarning ? WizardStepValueStatus.COMPLETED_WARNING :
+          WizardStepValueStatus.COMPLETED) : WizardStepValueStatus.COMPLETED_FAILED;
+
+      if (stepToCheck.key !== nextStep.key) {
+        nPokeStatus[stepToCheck.key] = true;
+
+        if (!isAllValid && !firstFailedStateNotSelf) {
+          firstFailedStateNotSelf = stepToCheck;
+        }
+      }
+    });
+
+    if (preventIfActiveIsFail && !activeIsValid) {
+      this.setState({
+        valuesStatus: nValuesStatus,
+        pokeStatus: nPokeStatus,
+      });
+    } else if (!id && firstFailedStateNotSelf) {
+      this.setState({
+        showErrorMessage: true,
+        activeStep: firstFailedStateNotSelf.key,
+        valuesStatus: nValuesStatus,
+        pokeStatus: nPokeStatus,
+      });
+    } else if (!id) {
+      this.props.onSubmit();
+    } else {
+      this.setState({
+        activeStep: id,
+        valuesStatus: nValuesStatus,
+        pokeStatus: nPokeStatus,
+      });
+    }
+  }
+  public render() {
     return (
       <LocaleContext.Consumer>
         {
           (locale) => {
             const i18nData = this.props.itemDefinition.getI18nDataFor(locale.language);
-            const itemEntries = this.props.value.items.map((ie) => {
-              const item = this.props.itemDefinition.getItemFor(ie.itemId);
-              return {
-                item,
-                value: ie,
-                nodeFn: (poked: boolean) => (
-                  <ParentedItemEntry
-                    key={ie.itemId}
-                    value={ie}
-                    onPropertyChange={this.props.onPropertyChange}
-                    onItemSetExclusionState={this.props.onItemSetExclusionState}
-                    displayHidden={this.props.displayHidden}
-                    poked={poked}
-                    language={locale.language}
-                    i18n={locale.i18n}
-                    parentItemDefinition={this.props.itemDefinition}
-                    disableExpansionPanel={true}
-                  />
-                ),
-              };
-            });
 
-            // TODO catch invalid steps that has been skipped or are invalid
-            // do something about them
-            // need to have the following, uncompleted, in progress, completed,
-            // completed_failed, completed_warning
-
-            const properties = [
-              {
-                key: "extended-prop-entries",
-                value: basicExtendedPropertyEntries,
-                i18n: "extended_properties_wizard_label",
-              },
-              {
-                key: "base-prop-entries",
-                value: basicBasePropertyEntries,
-                i18n: "base_properties_wizard_label",
-              },
-              {
-                key: "moderate-prop-entries",
-                value: moderatePropertyEntries,
-                i18n: "moderate_properties_wizard_label",
-              },
-              {
-                key: "rare-prop-entries",
-                value: rarePropertyEntries,
-                i18n: "rare_properties_wizard_label",
-              },
-            ];
-
-            const steps: IWizardStepDefinitionReferenceType[] = [
-              ...properties.map((p) => {
-                if (!p.value.length) {
-                  return null;
-                }
-
-                return {
-                  key: p.key,
-                  value: p.value,
-                  fn: (
-                    index,
-                    allSteps,
-                    activeStep,
-                    selfStepKey,
-                    previousStepKey,
-                    allPreviousStep,
-                    nextStepKey,
-                    allPreviousStepAndSelf,
-                    allCheckedSteps,
-                  ) => {
-                    const stepStatus = this.state.valuesStatus[selfStepKey];
-                    const pokeStatus = this.state.pokeStatus[selfStepKey];
-                    const stepIconProps: any = { classes: { root: "item-entry-wizard-icon" } };
-                    if (pokeStatus && stepStatus === WizardStepValueStatus.COMPLETED_FAILED) {
-                      stepIconProps.classes.root += " item-entry-wizard-icon--failed";
-                      stepIconProps.icon = <Icon classes={{ root: stepIconProps.classes.root }}>remove_circle</Icon>;
-                    } else if (pokeStatus && stepStatus === WizardStepValueStatus.COMPLETED_WARNING) {
-                      stepIconProps.classes.root += " item-entry-wizard-icon--warning";
-                    }
-                    const prevButtonFn = previousStepKey ?
-                      this.goToStep.bind(this, previousStepKey, allCheckedSteps, activeStep,
-                        allPreviousStep, false, false) : null;
-                    const nextButtonFn = this.goToStep.bind(this, nextStepKey, allCheckedSteps, activeStep,
-                      allPreviousStepAndSelf, true, false);
-                    return {
-                      prevButtonFn,
-                      nextButtonFn,
-                      node: (
-                        <Step key={selfStepKey} completed={typeof stepStatus !== "undefined"}>
-                          <StepButton
-                            onClick={this.goToStep.bind(this, selfStepKey, allCheckedSteps, activeStep,
-                              allPreviousStepAndSelf, false, true)}
-                          >
-                            <StepLabel StepIconProps={stepIconProps}>{locale.i18n[p.i18n]}</StepLabel>
-                          </StepButton>
-                          <StepContent>
-                            {p.value.map((m) => m.nodeFn(pokeStatus))}
-                            <Hidden smDown={true}>
-                              {renderButtons(prevButtonFn, nextButtonFn, locale, index === allSteps.length - 1)}
-                            </Hidden>
-                          </StepContent>
-                        </Step>
-                      ),
-                    };
-                  },
-                };
-              }),
-
-              ...itemEntries.map((ie) => ({
-                key: `item-entry-${ie.item.getId()}`,
-                value: ie,
-                fn: (
-                  index,
-                  allSteps,
-                  activeStep,
-                  selfStepKey,
-                  previousStepKey,
-                  allPreviousStep,
-                  nextStepKey,
-                  allPreviousStepAndSelf,
-                  allCheckedSteps,
-                ) => {
-                  const stepStatus = this.state.valuesStatus[selfStepKey];
-                  const pokeStatus = this.state.pokeStatus[selfStepKey];
-                  const stepIconProps: any = { classes: { root: "item-entry-wizard-icon" } };
-                  if (pokeStatus && stepStatus === WizardStepValueStatus.COMPLETED_FAILED) {
-                    stepIconProps.classes.root += " item-entry-wizard-icon--failed";
-                    stepIconProps.icon = <Icon classes={{ root: stepIconProps.classes.root }}>remove_circle</Icon>;
-                  } else if (pokeStatus && stepStatus === WizardStepValueStatus.COMPLETED_WARNING) {
-                    stepIconProps.classes.root += " item-entry-wizard-icon--warning";
-                  }
-                  const prevButtonFn = previousStepKey ?
-                    this.goToStep.bind(this, previousStepKey, allCheckedSteps, activeStep,
-                      allPreviousStep, false, false) : null;
-                  const nextButtonFn = this.goToStep.bind(this, nextStepKey, allCheckedSteps, activeStep,
-                    allPreviousStepAndSelf, true, false);
-                  return {
-                    prevButtonFn,
-                    nextButtonFn,
-                    node: (
-                      <Step key={selfStepKey} completed={typeof stepStatus !== "undefined"}>
-                        <StepButton
-                          onClick={this.goToStep.bind(this, selfStepKey, allCheckedSteps, activeStep,
-                            allPreviousStepAndSelf, false, true)}
-                        >
-                          <StepLabel StepIconProps={stepIconProps}>
-                            {ie.item.getI18nNameFor(locale.language)}
-                          </StepLabel>
-                        </StepButton>
-                        <StepContent>
-                          {ie.nodeFn(pokeStatus)}
-                          <Hidden smDown={true}>
-                            {renderButtons(prevButtonFn, nextButtonFn, locale, index === allSteps.length - 1)}
-                          </Hidden>
-                        </StepContent>
-                      </Step>
-                    ),
-                  };
-                },
-              }),
-              ),
-            ].filter((m) => !!m);
-
-            let activeStepAsNumber =
-              steps.findIndex((step) => step.key === this.state.activeStep);
-            if (activeStepAsNumber === -1) {
-              activeStepAsNumber = 0;
-            }
-
-            const stepsNodeDataArray = steps.map((m, i, arr) =>
+            const stepsNodeDataArray = this.state.steps.map((m, i, arr) =>
               m.fn(
                 i,
-                steps,
-                steps[activeStepAsNumber],
+                this.state.steps,
                 m.key,
                 arr[i - 1] ? arr[i - 1].key : null,
-                arr.slice(0, i),
                 arr[i + 1] ? arr[i + 1].key : null,
-                arr.slice(0, i + 1),
-                arr.filter((k) => typeof this.state.valuesStatus[k.key] !== "undefined"),
+                locale,
+                this.goToStep,
               ),
             );
 
-            const currentNodeData = stepsNodeDataArray[activeStepAsNumber];
+            const currentNodeData = stepsNodeDataArray[this.state.activeStepAsNumber];
+            const currentNodeIsLast = stepsNodeDataArray.length - 1 === this.state.activeStepAsNumber;
 
             const data = (
               <React.Fragment>
-                {this.props.disableTitle ?
+                {this.props.disableTitle || this.props.asDialog ?
                   null :
                   <Typography className="item-entry-wizard-title">{i18nData.createFormTitle}</Typography>}
-                <Stepper nonLinear={true} activeStep={activeStepAsNumber} orientation="vertical">
+                <Stepper nonLinear={true} activeStep={this.state.activeStepAsNumber} orientation="vertical">
                   {stepsNodeDataArray.map((nd) => nd.node)}
                 </Stepper>
               </React.Fragment>
             );
+
+            if (this.props.asDialog) {
+              return (
+                <React.Fragment>
+                  <ItemEntryDialog
+                    fullScreen={true}
+                    open={this.props.dialogOpen}
+                    title={i18nData.createFormTitle}
+                    onClose={this.props.onDialogClose}
+                    buttons={
+                      renderButtons(
+                        currentNodeData.prevButtonFn,
+                        currentNodeData.nextButtonFn,
+                        locale,
+                        currentNodeIsLast,
+                      )
+                    }
+                  >
+                    {data}
+                  </ItemEntryDialog>
+                  <Snackbar
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "center",
+                    }}
+                    open={this.state.showErrorMessage}
+                    autoHideDuration={6000}
+                    onClose={this.hideErrorMessage}
+                  >
+                    <SnackbarContent
+                      aria-describedby="client-snackbar"
+                      message={
+                        <span id="client-snackbar">
+                          <Icon>error</Icon>
+                          {locale.i18n.wizard_invalid_message}
+                        </span>
+                      }
+                      action={[
+                        <IconButton
+                          key="close"
+                          color="inherit"
+                          onClick={this.hideErrorMessage}
+                        >
+                          <Icon>close</Icon>
+                        </IconButton>,
+                      ]}
+                    />
+                  </Snackbar>
+                </React.Fragment>
+              );
+            }
 
             return (
               <div className="item-entry-wizard-container">
@@ -591,6 +727,9 @@ interface IItemEntryProps {
   poked?: boolean;
   markAsHidden?: string[];
   itemDefinition: ItemDefinition;
+  asDialog?: boolean;
+  dialogOpen?: boolean;
+  onDialogClose?: () => void;
 }
 
 // tslint:disable-next-line: max-classes-per-file
@@ -658,7 +797,7 @@ export default class ItemEntry extends React.Component<IItemEntryProps, {}> {
 
             const data = (
               <React.Fragment>
-                {this.props.disableTitle ?
+                {this.props.disableTitle || this.props.asDialog ?
                   null :
                   <Typography className="item-entry-title">{i18nData.createFormTitle}</Typography>}
                 {basicPropertyEntries}
@@ -690,6 +829,19 @@ export default class ItemEntry extends React.Component<IItemEntryProps, {}> {
               </React.Fragment>
             );
 
+            if (this.props.asDialog) {
+              return (
+                <ItemEntryDialog
+                  fullScreen={true}
+                  open={this.props.dialogOpen}
+                  title={i18nData.createFormTitle}
+                  onClose={this.props.onDialogClose}
+                >
+                  {data}
+                </ItemEntryDialog>
+              );
+            }
+
             if (this.props.disableContainment) {
               return data;
             }
@@ -704,4 +856,44 @@ export default class ItemEntry extends React.Component<IItemEntryProps, {}> {
       </LocaleContext.Consumer>
     );
   }
+}
+
+interface IItemEntryDialogProps {
+  open: boolean;
+  title: string;
+  onClose: () => void;
+  children: any;
+  fullScreen?: boolean;
+  buttons?: React.ReactNode;
+}
+
+function ItemEntryDialog(props: IItemEntryDialogProps) {
+  return (
+    <Dialog
+      classes={{
+        paper: "item-entry-dialog",
+      }}
+      open={props.open}
+      onClose={props.onClose}
+      fullScreen={props.fullScreen}
+      scroll="paper"
+    >
+      <AppBar className="item-entry-dialog-appbar">
+        <Toolbar>
+          <IconButton color="inherit" onClick={props.onClose} aria-label="Close">
+            <Icon>close</Icon>
+          </IconButton>
+          <Typography variant="h6" color="inherit" className="item-entry-dialog-title">
+            {props.title}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <DialogContent className="item-entry-dialog-content">
+        {props.children}
+      </DialogContent>
+      {props.buttons ? <DialogActions className="item-entry-dialog-actions">
+        {props.buttons}
+      </DialogActions> : null}
+    </Dialog>
+  );
 }

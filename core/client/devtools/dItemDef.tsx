@@ -219,6 +219,9 @@ export default class DevToolItemDefinition extends
               displayHidden={this.state.displayHiddenEntries}
               poked={this.state.pokeEntries}
               itemDefinition={this.props.itemDef}
+              asDialog={true}
+              dialogOpen={true}
+              onDialogClose={this.toggleDisplayBasic}
             />
             <code>
               {JSON.stringify(valueToStringify, null, 2)}
@@ -230,8 +233,11 @@ export default class DevToolItemDefinition extends
               onPropertyChange={this.onPropertyChange}
               onItemSetExclusionState={this.onItemSetExclusionState}
               displayHidden={this.state.displayHiddenEntries}
-              poked={this.state.pokeEntries}
               itemDefinition={this.props.itemDef}
+              asDialog={true}
+              dialogOpen={true}
+              onDialogClose={this.toggleDisplayWizard}
+              onSubmit={this.toggleDisplayWizard}
             />
             <code>
               {JSON.stringify(valueToStringify, null, 2)}
