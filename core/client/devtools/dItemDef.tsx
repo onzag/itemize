@@ -222,6 +222,8 @@ export default class DevToolItemDefinition extends
               asDialog={true}
               dialogOpen={true}
               onDialogClose={this.toggleDisplayBasic}
+              autoFocusFirst={true}
+              onDialogSubmit={this.toggleDisplayBasic}
             />
             <code>
               {JSON.stringify(valueToStringify, null, 2)}

@@ -19,6 +19,7 @@ export interface IPropertyEntryBaseProps {
   value: IPropertyDefinitionValue;
   onChange: (newValue: PropertyDefinitionSupportedType, internalValue: any) => void;
   poked?: boolean;
+  autoFocus?: boolean;
 }
 
 export interface IPropertyEntryProps extends IPropertyEntryBaseProps {

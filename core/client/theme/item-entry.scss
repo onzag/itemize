@@ -29,8 +29,14 @@ $item-entry-wizard-color-warning: #f9a825;
 }
 
 .item-entry-dialog {
-  width: 1000px;
-  max-width: 1000px;
+  &.item-entry-dialog-wizard {
+    width: 1000px;
+    max-width: 1000px;
+
+    .item-entry-dialog-content {
+      padding-bottom: 0;
+    }
+  }
 
   .item-entry-dialog-appbar {
     position: relative;
@@ -38,10 +44,6 @@ $item-entry-wizard-color-warning: #f9a825;
 
   .item-entry-dialog-title {
     flex: 1;
-  }
-
-  .item-entry-dialog-content {
-    padding-bottom: 0;
   }
 
   .item-entry-dialog-actions {

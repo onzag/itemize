@@ -167,6 +167,10 @@ export default class PropertyEntryField
         },
       } as any);
     }
+
+    if (this.props.autoFocus && this.inputRef) {
+      this.inputRef.focus();
+    }
   }
 
   public toggleUnitDialog() {
