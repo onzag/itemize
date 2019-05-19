@@ -15,7 +15,7 @@
             "icon": "email",
             "searchLevel": "disabled",
             "htmlAutocomplete": "username",
-            "readRoleAccess": ["#self", "admin"]
+            "readRoleAccess": ["#self"]
         },
         {
             "id": "password",
@@ -35,6 +35,13 @@
             "type": "date",
             "nullable": true,
             "editRoleAccess": ["moderator", "admin"],
+            "searchLevel": "disabled"
+        },
+        {
+            "id": "address",
+            "type": "location",
+            "nullable": true,
+            "readRoleAccess": ["#self"],
             "searchLevel": "disabled"
         }
     ]
