@@ -28,6 +28,7 @@ data for a postgresql database
  - `port` the port for the database
  - `user` the database user
  - `password` the password for that user
+ - `database` the database name
 
 You might want to add the `db-status.latest.json` inside the config for use
 in case of changes in the database structure, this file is generated
