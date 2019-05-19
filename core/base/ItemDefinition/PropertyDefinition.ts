@@ -1651,6 +1651,19 @@ if (process.env.NODE_ENV !== "production") {
         properties: {},
         additionalProperties: true,
       },
+
+      readRoleAccess: {
+        type: "array",
+        items: {
+          type: "string",
+        },
+      },
+      editRoleAccess: {
+        type: "array",
+        items: {
+          type: "string",
+        },
+      },
     },
     additionalProperties: false,
     definitions: {

@@ -81,8 +81,11 @@ if (process.env.NODE_ENV !== "production") {
           type: "string",
         },
       },
+      i18n: {
+        type: "string",
+      },
     },
     additionalProperties: false,
-    required: ["type"],
+    required: ["type", "i18n"],
   };
 }

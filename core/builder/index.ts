@@ -194,8 +194,10 @@ async function buildData(rawData: any) {
   const allLangData = await buildLang(
     supportedLanguages,
     actualLocation,
+    path.join(path.dirname(actualLocation), fileData.data.i18n),
     traceback,
   );
+
   console.log("emiting " + colors.green(path.join("dist", "data", "lang.json")));
   await fsAsync.writeFile(
     path.join("dist", "data", "lang.json"),
@@ -205,6 +207,7 @@ async function buildData(rawData: any) {
   const resultBuilds = supportedLanguages.map((lang) => {
     return processRoot(resultJSON, lang);
   });
+
   await Promise.all(supportedLanguages.map(async (sl, index) => {
     const resultingBuild = resultBuilds[index];
     const resultData = {
@@ -908,7 +911,7 @@ async function getI18nPropertyData(
 
   if (
     definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
-    !property.disableRangedSearch
+    !property.disableRangedSearch && property.searchLevel !== "disabled"
   ) {
     errorRequiredProperties.push("error.FROM_LARGER_THAN_TO");
     errorRequiredProperties.push("error.TO_SMALLER_THAN_FROM");

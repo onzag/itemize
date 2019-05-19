@@ -561,6 +561,18 @@ if (process.env.NODE_ENV !== "production") {
         minItems: 1,
         additionalItems: false,
       },
+      readRoleAccess: {
+        type: "array",
+        items: {
+          type: "string",
+        },
+      },
+      createRoleAccess: {
+        type: "array",
+        items: {
+          type: "string",
+        },
+      },
     },
     definitions: {
       PropertyDefinition: PropertyDefinition.schema,

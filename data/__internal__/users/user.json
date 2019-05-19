@@ -1,5 +1,7 @@
 {
     "type": "item",
+    "readRoleAccess": ["#logged"],
+    "createRoleAccess": ["#guest"],
     "properties": [
         {
             "id": "username",
@@ -13,13 +15,27 @@
             "icon": "email",
             "searchLevel": "disabled",
             "htmlAutocomplete": "username",
-            "disableRetrieval": true
+            "readRoleAccess": ["#self", "admin"]
         },
         {
             "id": "password",
             "type": "password",
             "htmlAutocomplete": "current-password",
             "disableRetrieval": true
+        },
+        {
+            "id": "role",
+            "type": "string",
+            "values": ["user", "moderator", "admin"],
+            "default": "user",
+            "editRoleAccess": ["admin"]
+        },
+        {
+            "id": "banned_until",
+            "type": "date",
+            "nullable": true,
+            "editRoleAccess": ["moderator", "admin"],
+            "searchLevel": "disabled"
         }
     ]
 }

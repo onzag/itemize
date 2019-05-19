@@ -15,19 +15,27 @@ import CheckUpError from "./Error";
 export async function buildLang(
   supportedLanguages: string[],
   actualRootLocation: string,
+  i18nBaseFileLocation: string,
   traceback: Traceback,
 ): Promise<ILocaleLangDataType> {
   const languageFileLocation = actualRootLocation
     .replace(".json", ".properties");
+  const baseFileLocation = i18nBaseFileLocation;
 
-  const internalTraceback = traceback.newTraceToLocation(languageFileLocation);
+  const internalTracebackBaseFile = traceback.newTraceToLocation(i18nBaseFileLocation);
 
   await checkExists(
     languageFileLocation,
     traceback,
   );
 
-  const properties = PropertiesReader(languageFileLocation).path();
+  await checkExists(
+    i18nBaseFileLocation,
+    traceback,
+  );
+
+  const propertiesBase = PropertiesReader(baseFileLocation).path();
+  const propertiesExtra = PropertiesReader(languageFileLocation).path();
   const result: ILocaleLangDataType = {
     locales: {},
   };
@@ -35,25 +43,29 @@ export async function buildLang(
   // and start to loop
   supportedLanguages.forEach((locale, index) => {
 
-    if (!properties[locale]) {
+    if (!propertiesBase[locale]) {
       throw new CheckUpError(
         "File does not include language data for '" + locale + "'",
-        internalTraceback,
+        internalTracebackBaseFile,
       );
     }
 
     result.locales[locale] = {};
 
     LOCALE_I18N.forEach((property) => {
-      if (!properties[locale][property]) {
+      if (!propertiesBase[locale][property]) {
         throw new CheckUpError(
           "File does not include data for '" + locale + "' in '" + property + "'",
-          internalTraceback,
+          internalTracebackBaseFile,
         );
       }
 
-      result.locales[locale][property] = properties[locale][property];
+      result.locales[locale][property] = propertiesBase[locale][property];
     });
+
+    if (propertiesExtra[locale]) {
+      result.locales[locale] = {...result.locales[locale], ...propertiesExtra[locale]};
+    }
   });
 
   return result;
