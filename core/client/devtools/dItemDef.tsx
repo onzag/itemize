@@ -1,6 +1,6 @@
 import ItemDefinition, { IItemDefinitionValue } from "../../base/ItemDefinition";
 import DevToolRawVisualizer from "./dRawVisualizer";
-import * as React from "react";
+import React from "react";
 import DevToolPropertyDefinition from "./dPropertyDef";
 import { getModulePath } from "./dModule";
 import ItemEntry, { WizardItemEntry } from "../app/components/base/ItemEntry";

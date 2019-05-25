@@ -16,7 +16,8 @@
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "rootDir": ".",
-    "outDir": "dist"
+    "outDir": "dist",
+    "esModuleInterop": true
   },
   "compileOnSave": true,
   "exclude": [

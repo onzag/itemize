@@ -314,6 +314,10 @@ export default class ItemDefinition {
     return this.propertyDefinitions;
   }
 
+  public getAllItems() {
+    return this.itemInstances;
+  }
+
   /**
    * Checks whether an item definition has a property definition
    * @param id the property definition id
@@ -529,6 +533,13 @@ export default class ItemDefinition {
 
   public toJSON() {
     return this.rawData;
+  }
+
+  public getQualifiedPathName(): string {
+    if (this.parentItemDefinition) {
+      return this.parentItemDefinition.getQualifiedPathName() + "__IDEF_" + this.getName();
+    }
+    return this.parentModule.getQualifiedPathName() + "__IDEF_" + this.getName();
   }
 }
 

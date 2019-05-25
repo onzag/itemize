@@ -22,7 +22,7 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   UNIT_SUBTYPES,
 } from "../../constants";
 import Module, { OnStateChangeListenerType } from "../Module";
-import * as fastHTMLParser from "fast-html-parser";
+import fastHTMLParser from "fast-html-parser";
 
 export enum PropertyInvalidReason {
   UNSPECIFIED = "UNSPECIFIED",
@@ -87,6 +87,10 @@ export interface IPropertyDefinitionSupportedType {
   // graphql type as a string
   gql: string;
   gqlDef?: {[key: string]: string};
+  sql: string | ((id: string) => {[key: string]: string});
+  sqlIn?: (value: PropertyDefinitionSupportedType, id: string, raw?: (...args: any[]) => any) => {[key: string]: any};
+  sqlOut?: (data: {[key: string]: any}, id: string) => PropertyDefinitionSupportedType;
+  sqlSearch?: (value: PropertyDefinitionSupportedType, comparator: string, tb: string, id: string) => any[];
 
   // represents an item that would mark for null
   // by default it is null itself
@@ -158,6 +162,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // a boolean type can be written as a boolean
     json: "boolean",
     gql: "Boolean",
+    sql: "boolean",
     // it is searchable by default
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
@@ -174,6 +179,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // an integer is represented as a number
     json: "number",
     gql: "Int",
+    sql: "integer",
     supportsAutocomplete: true,
     // it gotta be validated to check it's a number
     validate: (n: PropertyDefinitionSupportedIntegerType) => {
@@ -208,6 +214,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // a number is just a number can be integer or decimal
     json: "number",
     gql: "Float",
+    sql: "float",
     supportsAutocomplete: true,
     // the validator
     validate: (n: PropertyDefinitionSupportedNumberType) => {
@@ -252,6 +259,41 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     gqlDef: {
       value: "Float!",
       currency: "String!",
+    },
+    sql: (id) => {
+      const obj = {};
+      obj["VALUE_" + id] = "float";
+      obj["CURRENCY_" + id] = "text";
+      return obj;
+    },
+    sqlIn: (value: IPropertyDefinitionSupportedCurrencyType, id: string) => {
+      const obj = {};
+      obj["VALUE_" + id] = value.value;
+      obj["CURRENCY_" + id] = value.currency;
+      return obj;
+    },
+    sqlOut: (data: {[key: string]: any}, id: string) => {
+      const result: IPropertyDefinitionSupportedCurrencyType = {
+        value: data["VALUE_" + id],
+        currency: data["CURRENCY_" + id],
+      };
+      if (result.value === null) {
+        return null;
+      }
+      return result;
+    },
+    sqlSearch: (value: IPropertyDefinitionSupportedCurrencyType, comparator: string, tb: string, id: string) => {
+      let valueToUse = value.value;
+      if (typeof valueToUse !== "number") {
+        valueToUse = 0;
+      }
+      const idToUse = "VALUE_" + id;
+      return [
+        `??.?? ${comparator} ?`,
+        tb,
+        idToUse,
+        valueToUse,
+      ];
     },
     // locations just contain this basic data
     validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
@@ -311,6 +353,51 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       unit: "String!",
       normalizedValue: "Float!",
       normalizedUnit: "String!",
+    },
+    sql: (id: string) => {
+      const obj = {};
+      obj["VALUE_" + id] = "float";
+      obj["UNIT_" + id] = "text";
+      obj["NORMALIZED_VALUE_" + id] = "float";
+      obj["NORMALIZED_UNIT_" + id] = "text";
+      return obj;
+    },
+    sqlIn: (value: IPropertyDefinitionSupportedUnitType, id: string) => {
+      const obj = {};
+      obj["VALUE_" + id] = value.value;
+      obj["UNIT_" + id] = value.unit;
+      obj["NORMALIZED_VALUE_" + id] = value.normalizedValue;
+      obj["NORMALIZED_UNIT_" + id] = value.normalizedUnit;
+      return obj;
+    },
+    sqlOut: (data: {[key: string]: any}, id: string) => {
+      const result: IPropertyDefinitionSupportedUnitType = {
+        value: data["VALUE_" + id],
+        unit: data["UNIT_" + id],
+        normalizedValue: data["NORMALIZED_VALUE_" + id],
+        normalizedUnit: data["NORMALIZED_UNIT_" + id],
+      };
+      if (result.value === null) {
+        return null;
+      }
+      return result;
+    },
+    sqlSearch: (value: IPropertyDefinitionSupportedUnitType, comparator: string, tb: string, id: string) => {
+      let valueToUse = value.normalizedValue;
+      if (typeof valueToUse !== "number") {
+        valueToUse = 0;
+      }
+      const idToUse = "NORMALIZED_VALUE_" + id;
+      const unitIdToUse = "NORMALIZED_UNIT_" + id;
+      return [
+        `??.?? ${comparator} ? AND ??.?? = ?`,
+        tb,
+        idToUse,
+        valueToUse,
+        tb,
+        unitIdToUse,
+        value.normalizedUnit,
+      ];
     },
     supportedSubtypes: UNIT_SUBTYPES,
     validate: (l: IPropertyDefinitionSupportedUnitType) => {
@@ -382,6 +469,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     gql: "String",
     // a string is a string
     json: "string",
+    sql: "text",
     nullableDefault: "",
     supportsAutocomplete: true,
     supportedSubtypes: ["email"],
@@ -416,6 +504,22 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   password: {
     gql: "String",
     nullableDefault: "",
+    sql: "text",
+    sqlIn: (value: PropertyDefinitionSupportedPasswordType, id: string, raw) => {
+      const obj = {};
+      obj[id] = raw("crypt(?, gen_salt('bf',10))", value);
+      return obj;
+    },
+    sqlSearch: (value: PropertyDefinitionSupportedPasswordType, comparator: string, tb: string, id: string) => {
+      return [
+        `??.?? ${comparator} crypt(?, ??.??)`,
+        tb,
+        id,
+        value,
+        tb,
+        id,
+      ];
+    },
     // validates just the length
     validate: (s: PropertyDefinitionSupportedPasswordType) => {
       if (typeof s !== "string") {
@@ -439,6 +543,8 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     gql: "String",
     nullableDefault: "",
     supportedSubtypes: ["html"],
+    // TODO implement full text search
+    sql: "text",
     // validates the text, texts don't support json value
     validate: (s: PropertyDefinitionSupportedTextType, subtype?: string) => {
       if (typeof s !== "string") {
@@ -467,9 +573,10 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
   year: {
-    gql: "Float",
+    gql: "Int",
     // years can be set as a number
     json: "number",
+    sql: "integer",
     // validates
     validate: (n: PropertyDefinitionSupportedYearType) => {
       if (isNaN(n)) {
@@ -504,6 +611,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     supportsIcons: false,
+    sql: "timestamp",
     validate: (d: PropertyDefinitionSupportedDateType) => {
       if (
         d === "Invalid Date" ||
@@ -527,6 +635,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     supportsIcons: false,
+    sql: "timestamp",
     validate: (d: PropertyDefinitionSupportedDateType) => {
       if (
         d === "Invalid Date" ||
@@ -550,6 +659,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     supportsIcons: false,
+    sql: "time",
     validate: (d: PropertyDefinitionSupportedDateType) => {
       if (
         d === "Invalid Date" ||
@@ -583,6 +693,41 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
         type: "boolean",
       },
     ],
+    // TODO this probably needs to be better
+    sql: (id: string) => {
+      const obj = {};
+      obj["GEO_" + id] = "GEOGRAPHY(Point)";
+      obj["TXT_" + id] = "text";
+      obj["ATXT_" + id] = "text";
+      return obj;
+    },
+    sqlIn: (value: IPropertyDefinitionSupportedLocationType, id: string, raw) => {
+      const obj = {};
+      obj["GEO_" + id] = raw("POINT(?, ?)", value.lng, value.lat);
+      obj["LAT_" + id] = value.lat;
+      obj["LNG_" + id] = value.lng;
+      obj["TXT_" + id] = value.txt;
+      obj["ATXT_" + id] = value.atxt;
+      return obj;
+    },
+    sqlOut: (data: {[key: string]: any}, id: string) => {
+      const result: IPropertyDefinitionSupportedLocationType = {
+        lat: data["LAT_" + id],
+        lng: data["LNG_" + id],
+        txt: data["TXT_" + id],
+        atxt: data["ATXT_" + id],
+      };
+      if (result.lat === null || result.lng === null) {
+        return null;
+      }
+      return result;
+    },
+    sqlSearch: (value: IPropertyDefinitionSupportedLocationType, comparator: string, tb: string, id: string) => {
+      // TODO
+      return [
+
+      ];
+    },
     // locations just contain this basic data
     validate: (l: IPropertyDefinitionSupportedLocationType) => {
       if (
@@ -618,6 +763,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
         type: "string",
       },
     ],
+    sql: "text[]",
     allowsMinMaxLengthDefined: true,
     validate: (l: PropertyDefinitionSupportedFilesType) => {
       if (!Array.isArray(l) || l.some((v) => typeof v !== "string")) {

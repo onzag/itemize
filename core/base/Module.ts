@@ -355,6 +355,13 @@ export default class Module {
       cd.removeOnStateChangeEventListener(listener);
     });
   }
+
+  public getQualifiedPathName(): string {
+    if (this.parentModule) {
+      return this.parentModule.getQualifiedPathName() + "__MOD_" + this.getName();
+    }
+    return "MOD_" + this.getName();
+  }
 }
 
 if (process.env.NODE_ENV !== "production") {

@@ -1,4 +1,4 @@
-import * as colors from "colors/safe";
+import colors from "colors/safe";
 import Traceback from "./Traceback";
 import "source-map-support/register";
 

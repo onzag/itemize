@@ -168,15 +168,45 @@ export const LOCATION_SEARCH_I18N = [
 // INVALID RESERVED PROPERTY NAMES
 export const RESERVED_BASE_PROPERTIES = {
   id: "ID!",
-  createdAt: "String!",
-  editedAt: "String",
-  createdBy: "ID!",
-  reviewedAt: "String",
-  reviewedBy: "ID",
+  created_at: "String!",
+  created_by: "ID!",
+  edited_at: "String",
+  reviewed_at: "String",
+  reviewed_by: "ID",
+  parent_id: "ID",
+  item_id: "String",
+};
+export const RESERVED_BASE_PROPERTIES_SQL = {
+  id: {
+    type: "serial",
+  },
+  created_at: {
+    type: "datetime",
+    notNull: true,
+  },
+  created_by: {
+    type: "integer",
+    notNull: true,
+  },
+  edited_at: {
+    type: "datetime",
+  },
+  reviewed_at: {
+    type: "datetime",
+  },
+  reviewed_by: {
+    type: "integer",
+  },
+  parent_id: {
+    type: "integer",
+  },
+  item_id: {
+    type: "text",
+  },
 };
 export const RESERVED_SEARCH_PROPERTIES = {
   token: "String",
-  firstResult: "Int!",
+  first_result: "Int!",
   limit: "Int!",
 };
 export const RESERVED_GETTER_PROPERTIES = {

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import DevTools from "../devtools";
 import Root, { IRootRawJSONDataType } from "../../base/Root";
 import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";

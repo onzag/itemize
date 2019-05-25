@@ -2,7 +2,7 @@ import Traceback from "./Traceback";
 import { ILocaleLangDataType } from ".";
 import { checkExists } from "./util";
 import { LOCALE_I18N } from "../constants";
-import * as PropertiesReader from "properties-reader";
+import PropertiesReader from "properties-reader";
 import CheckUpError from "./Error";
 
 /**

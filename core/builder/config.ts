@@ -1,7 +1,7 @@
-import * as colors from "colors/safe";
+import colors from "colors/safe";
 
-import * as fs from "fs";
-import * as path from "path";
+import fs from "fs";
+import path from "path";
 const fsAsync = fs.promises;
 
 export async function buildConfig(rawConfig: any) {

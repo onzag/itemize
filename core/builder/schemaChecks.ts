@@ -1,4 +1,4 @@
-import * as Ajv from "ajv";
+import Ajv from "ajv";
 import Root from "../base/Root";
 import ItemDefinition from "../base/ItemDefinition";
 import Module from "../base/Module";

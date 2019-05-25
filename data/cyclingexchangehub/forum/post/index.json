@@ -17,14 +17,14 @@
       "autocompleteSupportsLocale": true
 		},
     {
-			"id": "parent_item_type",
+			"id": "post_for_item_path",
 			"type": "string",
 			"nullable": true,
       "hidden": true,
       "searchLevel": "disabled"
 		},
     {
-			"id": "parent_id",
+			"id": "post_for_item_id",
 			"type": "integer",
 			"nullable": true,
       "hidden": true,

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import Module from "../../base/Module";
 import DevToolItemDefinition from "./dItemDef";

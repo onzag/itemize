@@ -67,9 +67,16 @@ You might need to set your `hosts` file properly.
 
 ### Building the database
 
-To build the database you need to run, note that the app must have been
+To build the database, note that the app must have been
 built beforehand, because the database uses the compiled json files
 for the item definitions to describe the database
+
+Note that you need to have created the user and database beforehand
+and feed it to the configuration files, also you need the postgis
+extension to be installed and pgcrypto.
+
+`CREATE EXTENSION pgcrypto;`
+`CREATE EXTENSION postgis;`
 
 `npm run build-database`
 

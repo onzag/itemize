@@ -29,10 +29,10 @@ import { buildJSONResources } from "./resources";
 import { buildHTML } from "./html";
 import { buildConfig } from "./config";
 
-import * as fs from "fs";
-import * as path from "path";
-import * as PropertiesReader from "properties-reader";
-import * as colors from "colors/safe";
+import fs from "fs";
+import path from "path";
+import PropertiesReader from "properties-reader";
+import colors from "colors/safe";
 
 const jsonMap = require("json-source-map");
 const fsAsync = fs.promises;

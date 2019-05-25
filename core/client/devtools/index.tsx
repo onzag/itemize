@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { LocaleContext, DataContext, ILocaleType } from "../app";
 import DevToolRoot from "./dRoot";
 

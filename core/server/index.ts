@@ -1,7 +1,7 @@
-import * as express from "express";
-import * as http from "http";
-import * as path from "path";
-import * as fs from "fs";
+import express from "express";
+import http from "http";
+import path from "path";
+import fs from "fs";
 const fsAsync = fs.promises;
 
 const app = express();

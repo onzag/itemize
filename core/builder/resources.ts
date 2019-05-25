@@ -1,6 +1,6 @@
-import * as fs from "fs";
-import * as path from "path";
-import * as colors from "colors/safe";
+import fs from "fs";
+import path from "path";
+import colors from "colors/safe";
 const fsAsync = fs.promises;
 
 export async function buildJSONResources(rawConfig: any) {
