@@ -1,13 +1,14 @@
 import Module, { IModuleRawJSONDataType } from "./Module";
-import { IItemDefinitionRawJSONDataType } from "./ItemDefinition";
 
 export interface IRootRawJSONDataType {
   type: "root";
+
   // Avaialble for the builder
   location?: string;
   pointers?: any;
   raw?: string;
 
+  // Set after the build
   children: IModuleRawJSONDataType[];
 }
 
@@ -62,6 +63,9 @@ export default class Root {
 }
 
 if (process.env.NODE_ENV !== "production") {
+  // The root schema object when unprocessed contains
+  // the type, includes, with the modules list, language, and the i18n path
+  // for the default i18n data to include, all but the type gets stripped
   Root.schema = {
     type: "object",
     properties: {

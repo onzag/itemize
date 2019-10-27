@@ -26,6 +26,8 @@ export interface IModuleRawJSONDataType {
     [locale: string]: {
       name: string;
       searchFormTitle: string;
+      ftsSearchFieldLabel: string,
+      ftsSearchFieldPlaceholder: string;
     },
   };
 
@@ -40,6 +42,12 @@ export default class Module {
    */
   public static schema: any;
 
+  /**
+   * Builds the search mode of a raw module
+   * this gives a module that is the search module
+   * of the given module
+   * @param rawData the raw data of the module in json
+   */
   public static buildSearchMode(
     rawData: IModuleRawJSONDataType,
   ): IModuleRawJSONDataType {
@@ -58,15 +66,18 @@ export default class Module {
     name: string[],
   ): IItemDefinitionRawJSONDataType {
     // Search for child items
+    // remember children can be of type module or item
+    // so we got to check
     let finalDefinition = parentModuleRaw.children
       .find((d) => d.type === "item" && d.name === name[0]) as
       IItemDefinitionRawJSONDataType;
 
+    // if we don't find such definition, return null
     if (!finalDefinition) {
       return null;
     }
 
-    // Make a copy
+    // Make a copy of the name
     const nNameConsumable = [...name];
     nNameConsumable.shift();
     // Get the current name to work on
@@ -86,58 +97,105 @@ export default class Module {
     return finalDefinition;
   }
 
+  // Standard properties of the class instance, statics aside
+  /**
+   * The raw data of the module
+   */
   public rawData: IModuleRawJSONDataType;
+  /**
+   * The parent module, if any of this module instance
+   * as an instance
+   */
   private parentModule: Module;
+  /**
+   * The search mode of this module, it is generated
+   * automatically based on the data using the build search mode
+   * functionality
+   */
   private searchModeModule: Module;
 
+  /**
+   * The children item definitions, as instances
+   */
   private childItemDefinitions: ItemDefinition[];
+  /**
+   * The property definitions that the module itself
+   * has, and every item defintion in itself hence
+   * inherits
+   */
   private propExtensions: PropertyDefinition[];
 
   /**
    * Builds a module from raw json data
-   * @param rawJSON the raw json data
+   * @param rawJSON the raw json data of the module
+   * @param parentModule the parent module of the module, can be null
+   * @param disableSearchModeRetrieval makes the search module be null and it's not calculated
+   * this is for use because search modules are generated automatically on every instance
+   * this would create an infite loop if this option wasn't available
    */
   constructor(
     rawJSON: IModuleRawJSONDataType,
     parentModule: Module,
     disableSearchModeRetrieval?: boolean,
   ) {
+    // Setting the raw variables
     this.rawData = rawJSON;
+    // the parent module might be null
     this.parentModule = parentModule;
+    // Setting this as empty just starting
     this.childItemDefinitions = [];
 
+    // if we are not denying this
     if (!disableSearchModeRetrieval) {
+      // We build the search module, using the static function
+      // with our current raw data, null as parent module because search
+      // modules are detached from their parents, and we disable
+      // the generation of a search module of this same module
       this.searchModeModule = new Module(Module.buildSearchMode(this.rawData), null, true);
     }
 
-    if (rawJSON.propExtensions) {
-      this.propExtensions = rawJSON.propExtensions.map((pe) => {
+    // if we have prop extensions in the raw data we were provided
+    if (this.rawData.propExtensions) {
+      // we need to populate the prop extensions
+      this.propExtensions = this.rawData.propExtensions.map((propExtensionRawJSONData) => {
+        // the prop extension constructor is fed the raw json data
+        // the current module as the parent module instance
+        // no item definition as parent definition instance
+        // and true as being an extension
         return new PropertyDefinition(
-          pe,
+          propExtensionRawJSONData,
           this,
           null,
           true,
         );
       });
     } else {
+      // Otherwise if we have no prop extensions, we populate it as empty
       this.propExtensions = [];
     }
 
-    rawJSON.children.forEach((c) => {
-      if (c.type === "module") {
+    // now we loop over the children
+    this.rawData.children.forEach((childRawJSONData) => {
+      // modules are not processed
+      if (childRawJSONData.type === "module") {
         return;
-      } else if (c.type === "item") {
+      } else if (childRawJSONData.type === "item") {
+        // The item is fed to the item definition constructor
+        // the parent module is going to be this
+        // and null is the parent item definition of the module itself
         const newItemDefinition = new ItemDefinition(
-          c,
+          childRawJSONData,
           this,
           null,
         );
 
+        // We add this new definition to the list
         this.childItemDefinitions.push(
           newItemDefinition,
         );
       } else {
-        throw new Error("Cannot handle type " + (c as any).type);
+        // Throw an error in case of invalid type
+        throw new Error("Cannot handle type " + (childRawJSONData as any).type);
       }
     });
   }
@@ -148,10 +206,12 @@ export default class Module {
    * @param name the name path of the definition
    */
   public hasItemDefinitionFor(name: string[]): boolean {
+    // Try to find the first path
     const finalDefinition = this.rawData.children
       .find((d) => d.type === "item" && d.name === name[0]) as
         IItemDefinitionRawJSONDataType;
 
+    // if we don't find it, it's not there
     if (!finalDefinition) {
       return false;
     }
@@ -336,16 +396,28 @@ export default class Module {
     return !!this.parentModule;
   }
 
+  /**
+   * Adds a listener to the structure of this module instances
+   * modules instances have states, as they can be modified
+   * its current property values
+   * @param listener the listener that wishes to be added
+   */
   public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {
+    // We get the properties from the prop extensions
     this.propExtensions.forEach((pe) => {
       pe.addOnStateChangeEventListener(listener);
     });
 
+    // also to the item definitions
     this.childItemDefinitions.forEach((cd) => {
       cd.addOnStateChangeEventListener(listener);
     });
   }
 
+  /**
+   * Removes a listener the same way it adds it
+   * @param listener the listener to be removed
+   */
   public removeOnStateChangeEventListener(listener: OnStateChangeListenerType) {
     this.propExtensions.forEach((pe) => {
       pe.removeOnStateChangeEventListener(listener);
@@ -356,6 +428,10 @@ export default class Module {
     });
   }
 
+  /**
+   * Provides the full qualified path name that is used for absolute reference of the whole
+   * module, this is unique
+   */
   public getQualifiedPathName(): string {
     if (this.parentModule) {
       return this.parentModule.getQualifiedPathName() + "__MOD_" + this.getName();
@@ -365,6 +441,8 @@ export default class Module {
 }
 
 if (process.env.NODE_ENV !== "production") {
+  // Unprocessed modules have the properties for type and includes
+  // properties name and i18nData get added later
   Module.schema = {
     type: "object",
     properties: {

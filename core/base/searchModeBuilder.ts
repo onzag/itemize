@@ -29,7 +29,7 @@ function buildSearchModeModule(rawData: IModuleRawJSONDataType): IModuleRawJSOND
   // cloning the module
   const newModule = {...rawData};
   // renaming using our fancy uppercase letters which are not valid
-  // module names
+  // module names to ensure non collision
   newModule.name = "QUERY_MOD__" + newModule.name;
 
   // we fetch all the properties

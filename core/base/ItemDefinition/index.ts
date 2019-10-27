@@ -22,6 +22,8 @@ export interface IItemDefinitionRawJSONDataType {
       createFormTitle: string;
       searchFormTitle: string;
       editFormTitle: string;
+      ftsSearchFieldLabel: string;
+      ftsSearchFieldPlaceholder: string;
     },
   };
 
@@ -579,6 +581,12 @@ if (process.env.NODE_ENV !== "production") {
         },
       },
       createRoleAccess: {
+        type: "array",
+        items: {
+          type: "string",
+        },
+      },
+      deleteRoleAccess: {
         type: "array",
         items: {
           type: "string",

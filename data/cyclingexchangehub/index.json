@@ -2,8 +2,7 @@
   "type": "root",
   "includes": [
     "../__internal__/test",
-    "../__internal__/users",
-    "forum"
+    "../__internal__/users"
   ],
   "i18n": "../__internal__/index.properties"
 }

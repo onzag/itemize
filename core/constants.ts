@@ -36,6 +36,8 @@ export const FILE_SUPPORTED_IMAGE_TYPES = [
 export const MODULE_I18N = [
   "name",
   "searchFormTitle",
+  "ftsSearchFieldLabel",
+  "ftsSearchFieldPlaceholder",
 ];
 
 export const ITEM_DEFINITION_I18N = [
@@ -43,6 +45,8 @@ export const ITEM_DEFINITION_I18N = [
   "searchFormTitle",
   "createFormTitle",
   "editFormTitle",
+  "ftsSearchFieldLabel",
+  "ftsSearchFieldPlaceholder",
 ];
 
 export const ITEM_CAN_BE_EXCLUDED_I18N = [
@@ -202,6 +206,18 @@ export const RESERVED_BASE_PROPERTIES_SQL = {
   },
   item_id: {
     type: "text",
+  },
+  deleted_at: {
+    type: "boolean",
+  },
+  deleted_by: {
+    type: "integer",
+  },
+  locale: {
+    type: "string",
+  },
+  fts_language: {
+    type: "string",
   },
 };
 export const RESERVED_SEARCH_PROPERTIES = {
