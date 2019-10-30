@@ -20,7 +20,7 @@ function yesno(question: string) {
 (async () => {
   // Retrieve the config for the database
   const dbConfig = JSON.parse(await fsAsync.readFile(
-    path.join("config", "db.json"),
+    path.join("config", "dbhistory", "db.json"),
     "utf8",
   ));
 
@@ -29,7 +29,7 @@ function yesno(question: string) {
   let migrationConfig = {};
   try {
     migrationConfig = JSON.parse(await fsAsync.readFile(
-      path.join("config", "db-status.latest.json"),
+      path.join("config", "dbhistory", "db-status.latest.json"),
       "utf8",
     ));
   } catch (e) {
@@ -80,31 +80,31 @@ function yesno(question: string) {
 
   // write the resulting actual
   await fsAsync.writeFile(
-    path.join("config", "db-status.latest.json"),
+    path.join("config", "dbhistory", "db-status.latest.json"),
     JSON.stringify(actual, null, 2),
   );
   await fsAsync.writeFile(
-    path.join("config", `db-status.${(new Date()).toJSON().replace(/:/g, ".")}.json`),
+    path.join("config", "dbhistory", `db-status.${(new Date()).toJSON().replace(/:/g, ".")}.json`),
     JSON.stringify(actual, null, 2),
   );
 
   // write the actual with the errors ignored
   await fsAsync.writeFile(
-    path.join("config", "db-status.ignore-errors.latest.json"),
+    path.join("config", "dbhistory", "db-status.ignore-errors.latest.json"),
     JSON.stringify(actualIgnoreErrors, null, 2),
   );
   await fsAsync.writeFile(
-    path.join("config", `db-status.ignore-errors.${(new Date()).toJSON().replace(/:/g, ".")}.json`),
+    path.join("config", "dbhistory", `db-status.ignore-errors.${(new Date()).toJSON().replace(/:/g, ".")}.json`),
     JSON.stringify(actualIgnoreErrors, null, 2),
   );
 
   // Write the optimal, what should have been
   await fsAsync.writeFile(
-    path.join("config", `db-status.${(new Date()).toJSON().replace(/:/g, ".")}.optimal.json`),
+    path.join("config", "dbhistory", `db-status.${(new Date()).toJSON().replace(/:/g, ".")}.optimal.json`),
     JSON.stringify(optimal, null, 2),
   );
   await fsAsync.writeFile(
-    path.join("config", `db-status.latest.optimal.json`),
+    path.join("config", "dbhistory", `db-status.latest.optimal.json`),
     JSON.stringify(optimal, null, 2),
   );
 

@@ -319,7 +319,7 @@ function buildGraphQLSchemaQueriesModule(
   // a module level search returns a list and only uses the prop
   // extensions for search, we use true, true for search mode and input mode
   const moduleQuery = {
-    name: moduleNamePrefixed,
+    name: "search__" + moduleNamePrefixed,
     type: new GraphQLList(moduleBaseInterface),
     args: {
       ...GQLSearchFields,
@@ -330,7 +330,7 @@ function buildGraphQLSchemaQueriesModule(
   // We build the final object using the queries that
   // are to be used, and looping to every children by addign a prefix
   let finalObj = {};
-  finalObj[moduleNamePrefixed] = moduleQuery;
+  finalObj["search__" + moduleNamePrefixed] = moduleQuery;
 
   // We loop into every children of the module
   (mod.children || []).map((c) => {

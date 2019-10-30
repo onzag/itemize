@@ -1,5 +1,5 @@
 import React from "react";
-import { LocaleContext, DataContext, ILocaleType } from "../app";
+import { LocaleContext, DataContext, ILocaleContextType } from "../app";
 import DevToolRoot from "./dRoot";
 
 const devtoolsStyle: {
@@ -64,13 +64,13 @@ export default class DevTools extends React.Component<{}, IDevToolsState> {
       opened: !this.state.opened,
     });
   }
-  public changeLanguage(locale: ILocaleType, newLanguageLocale: string) {
+  public changeLanguage(locale: ILocaleContextType, newLanguageLocale: string) {
     locale.changeLanguageTo(newLanguageLocale);
   }
-  public changeCurrency(locale: ILocaleType, e: React.ChangeEvent<HTMLSelectElement>) {
+  public changeCurrency(locale: ILocaleContextType, e: React.ChangeEvent<HTMLSelectElement>) {
     locale.changeCurrencyTo(e.target.value);
   }
-  public changeCountry(locale: ILocaleType, e: React.ChangeEvent<HTMLSelectElement>) {
+  public changeCountry(locale: ILocaleContextType, e: React.ChangeEvent<HTMLSelectElement>) {
     locale.changeCountryTo(e.target.value);
   }
   public render() {

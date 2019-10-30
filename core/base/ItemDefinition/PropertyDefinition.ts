@@ -84,12 +84,34 @@ export interface IPropertyDefinitionSupportedType {
   // supported subtypes of the type
   supportedSubtypes?: string[];
 
-  // graphql type as a string
+  // graphql type as a string,
+  // if using a custom more complex type
+  // start it with __PropertyType__(name of the component)
   gql: string;
+  // graphql definition when using a complex custom type
   gqlDef?: {[key: string]: string};
+  // sql definition, either a string for knex supported types
+  // or a function where the id is the id is a property id
+  // this represents how tables are populated and data is stored
+  // a simple type simply saves the id, say it's a number, so
+  // the row name will be property_id and the type will be number
+  // however if it's a complex value you might need to set the row
+  // names and their types by hand
   sql: string | ((id: string) => {[key: string]: string});
+  // specifies how data is stored, by default it just sets the row value
+  // to whatever is given, however if you have a complex value you should
+  // set this, the raw function is the raw knex function, that allows to build raw queries,
+  // by default if not set this function just sets {property_id: value}
   sqlIn?: (value: PropertyDefinitionSupportedType, id: string, raw?: (...args: any[]) => any) => {[key: string]: any};
+  // sqlOut basically gives the entire table as data, and the property id where it expects
+  // retrieval of that data; by default this function takes the table and does
+  // data[property_id]
   sqlOut?: (data: {[key: string]: any}, id: string) => PropertyDefinitionSupportedType;
+  // function where search is implemented, a value is passed of the same type, a comparator
+  // for that value, the table identifier, and the property id, and you must build a
+  // raw knex query, hence you return the array to apply to the knex whereRaw function
+  // by default this does [`??.?? ${comparator} ?`, table_id, property_id, property_value]
+  // this is catastrophic for complex types as it should be an array of number and string
   sqlSearch?: (value: PropertyDefinitionSupportedType, comparator: string, tb: string, id: string) => any[];
 
   // represents an item that would mark for null
@@ -701,7 +723,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       obj["ATXT_" + id] = "text";
       return obj;
     },
-    sqlIn: (value: IPropertyDefinitionSupportedLocationType, id: string, raw) => {
+    sqlIn : (value: IPropertyDefinitionSupportedLocationType, id: string, raw) => {
       const obj = {};
       obj["GEO_" + id] = raw("POINT(?, ?)", value.lng, value.lat);
       obj["LAT_" + id] = value.lat;

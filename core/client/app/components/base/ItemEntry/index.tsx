@@ -5,7 +5,7 @@ import ItemDefinition, {
 import PropertyDefinition, {
   PropertyDefinitionSupportedType, IPropertyDefinitionValue,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
-import { LocaleContext, ILocaleType } from "../../..";
+import { LocaleContext, ILocaleContextType } from "../../..";
 import PropertyEntry from "../PropertyEntry";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
@@ -49,7 +49,7 @@ interface IItemEntryState {
 function renderButtons(
   cancelButtonFn: () => void,
   okButtonFn: () => void,
-  locale: ILocaleType,
+  locale: ILocaleContextType,
 ) {
   return (
     <React.Fragment>
@@ -100,10 +100,10 @@ export default class ItemEntry extends React.Component<IItemEntryProps, IItemEnt
       showErrorMessage: false,
     };
 
-    this.attemptSubmit = this.attemptSubmit.bind(this);
+    this.attemptDialogSubmit = this.attemptDialogSubmit.bind(this);
     this.hideErrorMessage = this.hideErrorMessage.bind(this);
   }
-  public attemptSubmit() {
+  public attemptDialogSubmit() {
     let isValid = checkAllPropertiesAreValid(this.props.value.properties);
     if (isValid) {
       isValid = checkAllItemsAreValid(this.props.value.items);
@@ -219,18 +219,6 @@ export default class ItemEntry extends React.Component<IItemEntryProps, IItemEnt
             if (this.props.asDialog) {
               return (
                 <React.Fragment>
-                  <ItemEntryDialogResponsive
-                    open={this.props.dialogOpen}
-                    title={i18nData.createFormTitle}
-                    onClose={this.props.onDialogClose}
-                    buttons={renderButtons(
-                      this.props.onDialogCancel,
-                      this.attemptSubmit,
-                      locale,
-                    )}
-                  >
-                    {data}
-                  </ItemEntryDialogResponsive>
                   <Snackbar
                     anchorOrigin={{
                       vertical: "top",
@@ -259,6 +247,18 @@ export default class ItemEntry extends React.Component<IItemEntryProps, IItemEnt
                       ]}
                     />
                   </Snackbar>
+                  <ItemEntryDialogResponsive
+                    open={this.props.dialogOpen}
+                    title={i18nData.createFormTitle}
+                    onClose={this.props.onDialogClose}
+                    buttons={renderButtons(
+                      this.props.onDialogCancel,
+                      this.attemptDialogSubmit,
+                      locale,
+                    )}
+                  >
+                    {data}
+                  </ItemEntryDialogResponsive>
                 </React.Fragment>
               );
             }

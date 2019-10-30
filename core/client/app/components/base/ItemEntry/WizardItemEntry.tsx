@@ -5,7 +5,7 @@ import ItemDefinition, {
 import PropertyDefinition, {
   PropertyDefinitionSupportedType, IPropertyDefinitionValue,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
-import { LocaleContext, ILocaleType } from "../../..";
+import { LocaleContext, ILocaleContextType } from "../../..";
 import PropertyEntry from "../PropertyEntry";
 import {
   Typography,
@@ -105,7 +105,7 @@ interface IWizardStepDataContainerType {
   propertyDefinition?: PropertyDefinition;
   item?: Item;
   value: IPropertyDefinitionValue | IItemValue;
-  nodeFn: (poked: boolean, locale: ILocaleType) => React.ReactNode;
+  nodeFn: (poked: boolean, locale: ILocaleContextType) => React.ReactNode;
 }
 
 interface IWizardStepDefinitionReferenceType {
@@ -117,7 +117,7 @@ interface IWizardStepDefinitionReferenceType {
     selfStepKey: string,
     previousStepKey: string,
     nextStepKey: string,
-    locale: ILocaleType,
+    locale: ILocaleContextType,
     goToStep: any,
   ) => {
     prevButtonFn: any,
@@ -131,7 +131,7 @@ interface IWizardStepDefinitionReferenceType {
 function renderButtons(
   prevButtonFn: () => void,
   nextButtonFn: () => void,
-  locale: ILocaleType,
+  locale: ILocaleContextType,
   isLast: boolean,
 ) {
   return (
@@ -212,7 +212,7 @@ export default class WizardItemEntry extends React.Component<IWizardItemEntryPro
       return {
         item,
         value: ie,
-        nodeFn: (poked: boolean, locale: ILocaleType) => (
+        nodeFn: (poked: boolean, locale: ILocaleContextType) => (
           <ParentedItemEntry
             key={ie.itemId}
             value={ie}

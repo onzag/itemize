@@ -49,6 +49,7 @@ export interface IItemRawJSONDataType {
   defaultExcluded?: boolean;
   defaultExcludedIf?: IConditionalRuleSetRawJSONDataType;
   ternaryExclusionState?: boolean;
+  // Exclusions are called out at UI level, basically the item is considered incomplete
   exclusionIsCallout?: boolean;
   disableSearch?: boolean;
   sinkIn?: string[];
