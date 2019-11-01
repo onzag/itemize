@@ -3,14 +3,21 @@ import PropertyDefinition, {
   PropertyDefinitionSearchInterfacesType,
   IPropertyDefinitionRawJSONDataType,
   IPropertyDefinitionSupportedType,
+  PropertyDefinitionSearchInterfacesPrefixes,
 } from "../base/ItemDefinition/PropertyDefinition";
 import {
   RESERVED_BASE_PROPERTIES,
   RESERVED_SEARCH_PROPERTIES,
   RESERVED_GETTER_PROPERTIES,
+  ITEM_PREFIX,
+  PREFIXED_CONCAT,
+  ITEM_DEFINITION_PREFIX,
+  MODULE_PREFIX,
+  PREFIX_BUILD,
+  EXCLUSION_STATE_SUFFIX,
 } from "../constants";
 import { IModuleRawJSONDataType } from "../base/Module";
-import { IItemDefinitionRawJSONDataType } from "../base/ItemDefinition";
+import ItemDefinition, { IItemDefinitionRawJSONDataType } from "../base/ItemDefinition";
 import "source-map-support/register";
 
 import {
@@ -214,30 +221,39 @@ function buildPropertiesToGraphQL(
       pdv.searchInterface ===
       PropertyDefinitionSearchInterfacesType.EXACT) {
       // add the exact
-      result[`exact__${property.id}`] = valueOverall;
+      result[`${PropertyDefinitionSearchInterfacesPrefixes.EXACT}${property.id}`] = valueOverall;
     }
 
     // For the range interface
     if (pdv.searchInterface ===
-      PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE) {
+      PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
+      !property.disableRangedSearch) {
       // add the range
-      result[`from__${property.id}`] = valueOverall;
-      result[`to__${property.id}`] = valueOverall;
+      result[`${PropertyDefinitionSearchInterfacesPrefixes.FROM}${property.id}`] = valueOverall;
+      result[`${PropertyDefinitionSearchInterfacesPrefixes.TO}${property.id}`] = valueOverall;
     }
 
     // For the FTS interface
     if (pdv.searchInterface ===
       PropertyDefinitionSearchInterfacesType.FTS) {
       // add the search
-      result[`search__${property.id}`] = valueOverall;
+      result[`${PropertyDefinitionSearchInterfacesPrefixes.SEARCH}${property.id}`] = valueOverall;
     }
 
     // And for location, which is special
-    if (pdv.searchInterface ===
-      PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE) {
+    if (
+      pdv.searchInterface ===
+      PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS
+    ) {
+      const distancePropertyDefinition = strToGraphQLType(
+        PropertyDefinition.supportedTypesStandard.unit.gql,
+        false,
+        isInput,
+      );
+
       // add it too
-      result[`location__${property.id}`] = valueOverall;
-      result[`radius__${property.id}`] = strToGraphQLType("Int");
+      result[`${PropertyDefinitionSearchInterfacesPrefixes.LOCATION}${property.id}`] = valueOverall;
+      result[`${PropertyDefinitionSearchInterfacesPrefixes.RADIUS}${property.id}`] = distancePropertyDefinition;
     }
   });
 
@@ -251,18 +267,36 @@ function buildPropertiesToGraphQL(
 function buildGraphQLSchemaQueriesItemDefinition(
   moduleInterface: GraphQLInterfaceType,
   prefix: string,
+  mod: IModuleRawJSONDataType,
   itemDef: IItemDefinitionRawJSONDataType,
 ): any {
   const itemDefNamePrefixed = prefix + itemDef.name;
+
+  const fieldsForThisItemDefinition = {
+    ...buildPropertiesToGraphQL(itemDef.properties || []),
+  };
+
+  (itemDef.includes || []).forEach((include) => {
+    const itemDefOfInclude = ItemDefinition.getItemDefinitionRawFor(itemDef, mod, include.name);
+    const itemDefOfIncludeType = new GraphQLObjectType({
+      name: PREFIXED_CONCAT(itemDefNamePrefixed, ITEM_PREFIX + include.id),
+      interfaces: [
+        moduleInterface,
+      ],
+      fields: {
+        [EXCLUSION_STATE_SUFFIX]: strToGraphQLType("String!"),
+        ...buildPropertiesToGraphQL((itemDefOfInclude.properties || []).filter((p) => include.sinkIn.includes(p.id))),
+      },
+    });
+    fieldsForThisItemDefinition[ITEM_PREFIX + include.id] = {type: itemDefOfIncludeType};
+  });
 
   const itemDefinitionType = new GraphQLObjectType({
     name: itemDefNamePrefixed,
     interfaces: [
       moduleInterface,
     ],
-    fields: {
-      ...buildPropertiesToGraphQL(itemDef.properties || []),
-    },
+    fields: fieldsForThisItemDefinition,
   });
 
   const singleItemDefQuery = {
@@ -271,21 +305,23 @@ function buildGraphQLSchemaQueriesItemDefinition(
     args: GQLGetterFields,
   };
   const multipleItemDefQuery = {
-    name: "search__" + itemDefNamePrefixed,
+    name: PREFIX_BUILD("SEARCH") + itemDefNamePrefixed,
     type: new GraphQLList(itemDefinitionType),
     args: {
       ...GQLSearchFields,
+      ...buildPropertiesToGraphQL(mod.propExtensions || [], true, true),
       ...buildPropertiesToGraphQL(itemDef.properties || [], true, true),
     },
   };
 
   let finalObj = {};
   finalObj[itemDefNamePrefixed] = singleItemDefQuery;
-  finalObj["search__" + itemDefNamePrefixed] = multipleItemDefQuery;
+  finalObj[PREFIX_BUILD("SEARCH") + itemDefNamePrefixed] = multipleItemDefQuery;
   (itemDef.childDefinitions || []).map((cd) => {
     finalObj = {...finalObj, ...buildGraphQLSchemaQueriesItemDefinition(
       moduleInterface,
-      itemDefNamePrefixed + "__IDEF_",
+      PREFIXED_CONCAT(itemDefNamePrefixed, ITEM_DEFINITION_PREFIX),
+      mod,
       cd,
     )};
   });
@@ -319,7 +355,7 @@ function buildGraphQLSchemaQueriesModule(
   // a module level search returns a list and only uses the prop
   // extensions for search, we use true, true for search mode and input mode
   const moduleQuery = {
-    name: "search__" + moduleNamePrefixed,
+    name: PREFIX_BUILD("SEARCH") + moduleNamePrefixed,
     type: new GraphQLList(moduleBaseInterface),
     args: {
       ...GQLSearchFields,
@@ -330,7 +366,7 @@ function buildGraphQLSchemaQueriesModule(
   // We build the final object using the queries that
   // are to be used, and looping to every children by addign a prefix
   let finalObj = {};
-  finalObj["search__" + moduleNamePrefixed] = moduleQuery;
+  finalObj[PREFIX_BUILD("SEARCH") + moduleNamePrefixed] = moduleQuery;
 
   // We loop into every children of the module
   (mod.children || []).map((c) => {
@@ -338,14 +374,15 @@ function buildGraphQLSchemaQueriesModule(
     if (c.type === "module") {
       // we build yet another module, and prefix it to this module
       finalObj = {...finalObj, ...buildGraphQLSchemaQueriesModule(
-        moduleNamePrefixed + "__MOD_",
+        PREFIXED_CONCAT(moduleNamePrefixed, MODULE_PREFIX),
         c,
       )};
     } else {
       // we build a item giving it the interface
       finalObj = {...finalObj, ...buildGraphQLSchemaQueriesItemDefinition(
         moduleBaseInterface,
-        moduleNamePrefixed + "__IDEF_",
+        PREFIXED_CONCAT(moduleNamePrefixed, ITEM_DEFINITION_PREFIX),
+        mod,
         c,
       )};
     }
@@ -361,7 +398,7 @@ function buildGraphQLSchemaQueriesModule(
 function buildGraphQLSchemaQueriesRoot(root: IRootRawJSONDataType): any {
   let finalObj = {};
   root.children.forEach((mod) => {
-    finalObj = {...finalObj, ...buildGraphQLSchemaQueriesModule("MOD_", mod)};
+    finalObj = {...finalObj, ...buildGraphQLSchemaQueriesModule(MODULE_PREFIX, mod)};
   });
   return finalObj;
 }

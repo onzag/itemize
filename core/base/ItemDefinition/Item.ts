@@ -9,6 +9,7 @@ import ConditionalRuleSet, {
   IConditionalRuleSetRawJSONDataType,
 } from "./ConditionalRuleSet";
 import Module, { OnStateChangeListenerType } from "../Module";
+import PropertyDefinition from "./PropertyDefinition";
 
 export enum ItemExclusionState {
   EXCLUDED = "EXCLUDED",
@@ -190,6 +191,15 @@ export default class Item {
     this.stateExclusion = ItemExclusionState.ANY;
     // initially the state hasn't been modified
     this.stateExclusionModified = false;
+  }
+
+  public getSinkingPropertiesIds(): string[] {
+    return this.rawData.sinkIn || [];
+  }
+
+  public getSinkingProperties(): PropertyDefinition[] {
+    return this.getSinkingPropertiesIds()
+      .map((propertyId) => this.itemDefinition.getPropertyDefinitionFor(propertyId, false));
   }
 
   /**

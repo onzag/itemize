@@ -4,6 +4,7 @@ import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionValue } from "./PropertyDefinition";
 import Module, { IModuleRawJSONDataType, OnStateChangeListenerType } from "../Module";
 import PropertiesValueMappingDefiniton from "./PropertiesValueMappingDefiniton";
+import { PREFIXED_CONCAT, ITEM_DEFINITION_PREFIX } from "../../constants";
 
 export interface IItemDefinitionRawJSONDataType {
   // Builder data
@@ -539,9 +540,9 @@ export default class ItemDefinition {
 
   public getQualifiedPathName(): string {
     if (this.parentItemDefinition) {
-      return this.parentItemDefinition.getQualifiedPathName() + "__IDEF_" + this.getName();
+      return PREFIXED_CONCAT(this.parentItemDefinition.getQualifiedPathName(), ITEM_DEFINITION_PREFIX + this.getName());
     }
-    return this.parentModule.getQualifiedPathName() + "__IDEF_" + this.getName();
+    return PREFIXED_CONCAT(this.parentModule.getQualifiedPathName(), ITEM_DEFINITION_PREFIX + this.getName());
   }
 }
 

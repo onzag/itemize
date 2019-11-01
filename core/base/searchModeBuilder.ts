@@ -4,6 +4,7 @@ import PropertyDefinition, {
   PropertyDefinitionSearchInterfacesType,
   PropertyInvalidReason,
   IPropertyDefinitionAlternativePropertyType,
+  PropertyDefinitionSearchInterfacesPrefixes,
 } from "./ItemDefinition/PropertyDefinition";
 import {
   IConditionalRuleSetRawJSONDataType,
@@ -302,7 +303,7 @@ function buildSearchModePropertyDefinitions(
     PropertyDefinitionSearchInterfacesType.EXACT
   ) {
     // we set the original id to EXACT
-    newPropDef.id = "EXACT__" + newPropDef.id;
+    newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.EXACT + newPropDef.id;
     // and extract and displace the i18ndata from the search (everything in search becomes main)
     if (newPropDef.i18nData) {
       newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search"]);
@@ -315,7 +316,7 @@ function buildSearchModePropertyDefinitions(
   ) {
     // with disable ranged search we basically do the same as exact on top
     if (rawData.disableRangedSearch) {
-      newPropDef.id = "EXACT__" + newPropDef.id;
+      newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.EXACT + newPropDef.id;
       if (newPropDef.i18nData) {
         newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search"]);
       }
@@ -329,8 +330,8 @@ function buildSearchModePropertyDefinitions(
       delete newPropDef2.defaultIf;
 
       // set the ids, as FROM and TO
-      newPropDef.id = "FROM__" + newPropDef.id;
-      newPropDef2.id = "TO__" + newPropDef2.id;
+      newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.FROM + newPropDef.id;
+      newPropDef2.id = PropertyDefinitionSearchInterfacesPrefixes.TO + newPropDef2.id;
 
       // set the comparison method as datetime if its one of those kinds
       const method = rawData.type === "date" || rawData.type === "datetime" || rawData.type === "time" ?
@@ -401,18 +402,18 @@ function buildSearchModePropertyDefinitions(
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.FTS
   ) {
-    newPropDef.id = "SEARCH__" + newPropDef.id;
+    newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + newPropDef.id;
     if (newPropDef.i18nData) {
       newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search"]);
     }
 
-  // location distance is fancy
+  // location radius is fancy
   } else if (
     propertyDefinitionDescription.searchInterface ===
-    PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE
+    PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS
   ) {
     // our second property definition is totally brand new
-    // and it's an unit, of subtype lenght, id DISTANCE handle,
+    // and it's an unit, of subtype lenght, id RADIUS handle,
     // the minimum is 1, without decimals, and we set the special
     // properties to set how it would behave, notice how it supports
     // imperials, it initially prefills to 100, so 100km or 100mi
@@ -422,7 +423,7 @@ function buildSearchModePropertyDefinitions(
     newPropDef2 = {
       type: "unit",
       subtype: "length",
-      id: "DISTANCE__" + newPropDef.id,
+      id: PropertyDefinitionSearchInterfacesPrefixes.RADIUS + newPropDef.id,
       min: 1,
       maxDecimalCount: 0,
       specialProperties: {
@@ -431,11 +432,12 @@ function buildSearchModePropertyDefinitions(
         lockUnitsToPrimaries: true,
         initialPrefill: 100,
       },
-      i18nData: displaceI18NData(newPropDef.i18nData, ["search", "distance"]),
+      i18nData: displaceI18NData(newPropDef.i18nData, ["search", "radius"]),
     };
 
-    // we set the original id
-    newPropDef.id = "LOCATION__" + newPropDef.id;
+    // decorate the default property
+    newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + newPropDef.id;
+
     // and we try to use the special property to prefill to user location
     // so it originally points to whatever the user location is set to
     newPropDef.specialProperties = newPropDef.specialProperties || {};
@@ -520,7 +522,7 @@ function buildSearchModeConditionalRuleSet(
 /**
  * Gives the id for a property that would be referred to in search mode
  * for a ruleset, just takes the first result, aka FROM and LOCATION, but
- * ignores TO and DISTANCE
+ * ignores TO and RADIUS
  * @param rawData the property raw data
  */
 function getConversionRulesetId(
@@ -554,26 +556,32 @@ function getConversionIds(
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.EXACT
   ) {
-    ids = ["EXACT__" + rawData.id];
+    ids = [PropertyDefinitionSearchInterfacesPrefixes.EXACT + rawData.id];
   } else if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE
   ) {
-    if (!rawData.disableRangedSearch) {
-      ids = ["EXACT__" + rawData.id];
+    if (rawData.disableRangedSearch) {
+      ids = [PropertyDefinitionSearchInterfacesPrefixes.EXACT + rawData.id];
     } else {
-      ids = ["FROM__" + rawData.id, "TO__" + rawData.id];
+      ids = [
+        PropertyDefinitionSearchInterfacesPrefixes.FROM + rawData.id,
+        PropertyDefinitionSearchInterfacesPrefixes.TO + rawData.id,
+      ];
     }
   } else if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.FTS
   ) {
-    ids = ["SEARCH__" + rawData.id];
+    ids = [PropertyDefinitionSearchInterfacesPrefixes.SEARCH + rawData.id];
   } else if (
     propertyDefinitionDescription.searchInterface ===
-    PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE
+    PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS
   ) {
-    ids = ["LOCATION__" + rawData.id, "DISTANCE__" + rawData.id];
+    ids = [
+      PropertyDefinitionSearchInterfacesPrefixes.LOCATION + rawData.id,
+      PropertyDefinitionSearchInterfacesPrefixes.RADIUS + rawData.id,
+    ];
   }
   return ids;
 }

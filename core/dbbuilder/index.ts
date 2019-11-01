@@ -9,7 +9,8 @@ import Confirm from "prompt-confirm";
 import Root from "../base/Root";
 import ItemDefinition from "../base/ItemDefinition";
 import Module from "../base/Module";
-import { RESERVED_BASE_PROPERTIES_SQL } from "../constants";
+import { RESERVED_BASE_PROPERTIES_SQL, ITEM_PREFIX, EXCLUSION_STATE_SUFFIX, PREFIX_BUILD } from "../constants";
+import PropertyDefinition from "../base/ItemDefinition/PropertyDefinition";
 
 const fsAsync = fs.promises;
 
@@ -20,7 +21,7 @@ function yesno(question: string) {
 (async () => {
   // Retrieve the config for the database
   const dbConfig = JSON.parse(await fsAsync.readFile(
-    path.join("config", "dbhistory", "db.json"),
+    path.join("config", "db.json"),
     "utf8",
   ));
 
@@ -131,6 +132,31 @@ function buildModuleTables(rModule: Module) {
   return result;
 }
 
+function buildPropertyDefinitionTableBit(pd: PropertyDefinition, prefix?: string) {
+  const resultTableSchema = {};
+  const actualPrefix = prefix ? prefix : "";
+  // get the sql def based on the property definition
+  const sqlDef = pd.getPropertyDefinitionDescription().sql;
+  // if it's a string, that's the type
+  if (typeof sqlDef === "string") {
+    resultTableSchema[actualPrefix + pd.getId()] = {
+      type: sqlDef,
+    };
+  // otherwise we might have a more complex value
+  } else {
+    // let's get it based on the function it is
+    const complexValue = sqlDef(actualPrefix + pd.getId());
+    // we are going to loop over that object
+    Object.keys(complexValue).forEach((key) => {
+      // so we can add each row that it returns to the table schema
+      resultTableSchema[key] = {
+        type: complexValue[key],
+      };
+    });
+  }
+  return resultTableSchema;
+}
+
 /**
  * Builds the table for an item definition
  * @param itemDefinition the item definition in question
@@ -141,38 +167,22 @@ function buildItemDefinitionTables(itemDefinition: ItemDefinition) {
   const qualifiedPathName = itemDefinition.getQualifiedPathName();
 
   // add all the standard fields
-  const resultTableSchema = {...RESERVED_BASE_PROPERTIES_SQL};
+  let resultTableSchema = {...RESERVED_BASE_PROPERTIES_SQL};
 
   // now we loop thru every property (they will all become columns)
   itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
-    // get the sql def based on the property definition
-    const sqlDef = pd.getPropertyDefinitionDescription().sql;
-    // if it's a string, that's the type
-    if (typeof sqlDef === "string") {
-      resultTableSchema[pd.getId()] = {
-        type: sqlDef,
-      };
-    // otherwise we might have a more complex value
-    } else {
-      // let's get it based on the function it is
-      const complexValue = sqlDef(pd.getId());
-      // we are going to loop over that object
-      Object.keys(complexValue).forEach((key) => {
-        // so we can add each row that it returns to the table schema
-        resultTableSchema[key] = {
-          type: complexValue[key],
-        };
-      });
-    }
+    resultTableSchema = {...resultTableSchema, ...buildPropertyDefinitionTableBit(pd)};
   });
 
   // now we loop over the child items
   itemDefinition.getAllItems().forEach((i) => {
-    // we add each one of them, they are a foreign key
-    // TODO foreign keys somehow
-    resultTableSchema["CHILD_" + i.getId()] = {
-      type: "integer",
+    const prefix = PREFIX_BUILD(ITEM_PREFIX + i.getId());
+    resultTableSchema[prefix + EXCLUSION_STATE_SUFFIX] = {
+      type: "string",
     };
+    i.getSinkingProperties().forEach((pd) => {
+      resultTableSchema = {...resultTableSchema, ...buildPropertyDefinitionTableBit(pd, prefix)};
+    });
   });
 
   // add that to the result

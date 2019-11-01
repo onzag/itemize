@@ -5,6 +5,7 @@ import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
 } from "./ItemDefinition/PropertyDefinition";
 import { buildSearchMode } from "./searchModeBuilder";
+import { MODULE_PREFIX, PREFIXED_CONCAT } from "../constants";
 
 export type OnStateChangeListenerType = () => any;
 
@@ -434,9 +435,9 @@ export default class Module {
    */
   public getQualifiedPathName(): string {
     if (this.parentModule) {
-      return this.parentModule.getQualifiedPathName() + "__MOD_" + this.getName();
+      return PREFIXED_CONCAT(this.parentModule.getQualifiedPathName(), MODULE_PREFIX + this.getName());
     }
-    return "MOD_" + this.getName();
+    return MODULE_PREFIX + this.getName();
   }
 }
 

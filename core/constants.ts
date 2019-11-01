@@ -165,8 +165,8 @@ export const CLASSIC_SEARCH_RANGED_OPTIONAL_I18N = [
 export const LOCATION_SEARCH_I18N = [
   "search.label",
   "search.placeholder",
-  "search.distance.label",
-  "search.distance.placeholder",
+  "search.radius.label",
+  "search.radius.placeholder",
 ];
 
 // INVALID RESERVED PROPERTY NAMES
@@ -177,8 +177,10 @@ export const RESERVED_BASE_PROPERTIES = {
   edited_at: "String",
   reviewed_at: "String",
   reviewed_by: "ID",
-  parent_id: "ID",
-  item_id: "String",
+  deleted_at: "String",
+  deleted_by: "ID",
+  locale: "String",
+  fts_language: "String",
 };
 export const RESERVED_BASE_PROPERTIES_SQL = {
   id: {
@@ -201,14 +203,8 @@ export const RESERVED_BASE_PROPERTIES_SQL = {
   reviewed_by: {
     type: "integer",
   },
-  parent_id: {
-    type: "integer",
-  },
-  item_id: {
-    type: "text",
-  },
   deleted_at: {
-    type: "boolean",
+    type: "datetime",
   },
   deleted_by: {
     type: "integer",
@@ -220,6 +216,13 @@ export const RESERVED_BASE_PROPERTIES_SQL = {
     type: "string",
   },
 };
+export const PREFIX_BUILD = (s: string) => s + "_";
+export const SUFFIX_BUILD = (s: string) => "_" + s;
+export const PREFIXED_CONCAT = (...args: string[]) => args.join("__");
+export const ITEM_PREFIX = PREFIX_BUILD("ITEM");
+export const MODULE_PREFIX = PREFIX_BUILD("MOD");
+export const ITEM_DEFINITION_PREFIX = PREFIX_BUILD("IDEF");
+export const EXCLUSION_STATE_SUFFIX = SUFFIX_BUILD("EXCLUSION_STATE");
 export const RESERVED_SEARCH_PROPERTIES = {
   token: "String",
   first_result: "Int!",

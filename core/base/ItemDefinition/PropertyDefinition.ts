@@ -20,6 +20,7 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
   LOCATION_SEARCH_I18N,
   MAX_FILE_BATCH_COUNT,
   UNIT_SUBTYPES,
+  PREFIX_BUILD,
 } from "../../constants";
 import Module, { OnStateChangeListenerType } from "../Module";
 import fastHTMLParser from "fast-html-parser";
@@ -69,9 +70,36 @@ export enum PropertyDefinitionSearchInterfacesType {
   EXACT_AND_RANGE,
   // full text search, uses a simple raw string as search
   FTS,
-  // uses location and range for searching
-  LOCATION_DISTANCE,
+  // uses location and radius for searching
+  LOCATION_RADIUS,
 }
+
+export const PropertyDefinitionSearchInterfacesPrefixes = {
+  EXACT: PREFIX_BUILD("EXACT"),
+  FROM: PREFIX_BUILD("FROM"),
+  TO: PREFIX_BUILD("TO"),
+  SEARCH: PREFIX_BUILD("SEARCH"),
+  LOCATION: PREFIX_BUILD("LOCATION"),
+  RADIUS: PREFIX_BUILD("RADIUS"),
+};
+
+export const PropertyDefinitionSearchInterfacesPrefixesList = [
+  [
+    PropertyDefinitionSearchInterfacesPrefixes.EXACT,
+  ],
+  [
+    PropertyDefinitionSearchInterfacesPrefixes.EXACT,
+    PropertyDefinitionSearchInterfacesPrefixes.FROM,
+    PropertyDefinitionSearchInterfacesPrefixes.TO,
+  ],
+  [
+    PropertyDefinitionSearchInterfacesPrefixes.SEARCH,
+  ],
+  [
+    PropertyDefinitionSearchInterfacesPrefixes.LOCATION,
+    PropertyDefinitionSearchInterfacesPrefixes.RADIUS,
+  ],
+];
 
 export interface IPropertyDefinitionSupportedType {
   // json represents how the element is represented in json form
@@ -284,20 +312,20 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
     sql: (id) => {
       const obj = {};
-      obj["VALUE_" + id] = "float";
-      obj["CURRENCY_" + id] = "text";
+      obj[id + "_VALUE"] = "float";
+      obj[id + "_CURRENCY"] = "text";
       return obj;
     },
     sqlIn: (value: IPropertyDefinitionSupportedCurrencyType, id: string) => {
       const obj = {};
-      obj["VALUE_" + id] = value.value;
-      obj["CURRENCY_" + id] = value.currency;
+      obj[id + "_VALUE"] = value.value;
+      obj[id + "_CURRENCY"] = value.currency;
       return obj;
     },
     sqlOut: (data: {[key: string]: any}, id: string) => {
       const result: IPropertyDefinitionSupportedCurrencyType = {
-        value: data["VALUE_" + id],
-        currency: data["CURRENCY_" + id],
+        value: data[id + "_VALUE"],
+        currency: data[id + "_CURRENCY"],
       };
       if (result.value === null) {
         return null;
@@ -309,7 +337,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       if (typeof valueToUse !== "number") {
         valueToUse = 0;
       }
-      const idToUse = "VALUE_" + id;
+      const idToUse = id + "_VALUE";
       return [
         `??.?? ${comparator} ?`,
         tb,
@@ -378,26 +406,26 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
     sql: (id: string) => {
       const obj = {};
-      obj["VALUE_" + id] = "float";
-      obj["UNIT_" + id] = "text";
-      obj["NORMALIZED_VALUE_" + id] = "float";
-      obj["NORMALIZED_UNIT_" + id] = "text";
+      obj[id + "_VALUE"] = "float";
+      obj[id + "_UNIT"] = "text";
+      obj[id + "_NORMALIZED_VALUE"] = "float";
+      obj[id + "_NORMALIZED_UNIT"] = "text";
       return obj;
     },
     sqlIn: (value: IPropertyDefinitionSupportedUnitType, id: string) => {
       const obj = {};
-      obj["VALUE_" + id] = value.value;
-      obj["UNIT_" + id] = value.unit;
-      obj["NORMALIZED_VALUE_" + id] = value.normalizedValue;
-      obj["NORMALIZED_UNIT_" + id] = value.normalizedUnit;
+      obj[id + "_VALUE"] = value.value;
+      obj[id + "_UNIT"] = value.unit;
+      obj[id + "_NORMALIZED_VALUE"] = value.normalizedValue;
+      obj[id + "_NORMALIZED_UNIT"] = value.normalizedUnit;
       return obj;
     },
     sqlOut: (data: {[key: string]: any}, id: string) => {
       const result: IPropertyDefinitionSupportedUnitType = {
-        value: data["VALUE_" + id],
-        unit: data["UNIT_" + id],
-        normalizedValue: data["NORMALIZED_VALUE_" + id],
-        normalizedUnit: data["NORMALIZED_UNIT_" + id],
+        value: data[id + "_VALUE"],
+        unit: data[id + "_UNIT"],
+        normalizedValue: data[id + "_NORMALIZED_VALUE"],
+        normalizedUnit: data[id + "_NORMALIZED_UNIT"],
       };
       if (result.value === null) {
         return null;
@@ -409,8 +437,8 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       if (typeof valueToUse !== "number") {
         valueToUse = 0;
       }
-      const idToUse = "NORMALIZED_VALUE_" + id;
-      const unitIdToUse = "NORMALIZED_UNIT_" + id;
+      const idToUse = id + "_NORMALIZED_VALUE";
+      const unitIdToUse = id + "_NORMALIZED_UNIT";
       return [
         `??.?? ${comparator} ? AND ??.?? = ?`,
         tb,
@@ -718,26 +746,28 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // TODO this probably needs to be better
     sql: (id: string) => {
       const obj = {};
-      obj["GEO_" + id] = "GEOGRAPHY(Point)";
-      obj["TXT_" + id] = "text";
-      obj["ATXT_" + id] = "text";
+      obj[id + "_GEO"] = "GEOGRAPHY(Point)";
+      obj[id + "_LAT"] = "float";
+      obj[id + "_LNG"] = "float";
+      obj[id + "_TXT"] = "text";
+      obj[id + "_ATXT"] = "text";
       return obj;
     },
     sqlIn : (value: IPropertyDefinitionSupportedLocationType, id: string, raw) => {
       const obj = {};
-      obj["GEO_" + id] = raw("POINT(?, ?)", value.lng, value.lat);
-      obj["LAT_" + id] = value.lat;
-      obj["LNG_" + id] = value.lng;
-      obj["TXT_" + id] = value.txt;
-      obj["ATXT_" + id] = value.atxt;
+      obj[id + "_GEO"] = raw("POINT(?, ?)", value.lng, value.lat);
+      obj[id + "_LAT"] = value.lat;
+      obj[id + "_LNG"] = value.lng;
+      obj[id + "_TXT"] = value.txt;
+      obj[id + "_ATXT"] = value.atxt;
       return obj;
     },
     sqlOut: (data: {[key: string]: any}, id: string) => {
       const result: IPropertyDefinitionSupportedLocationType = {
-        lat: data["LAT_" + id],
-        lng: data["LNG_" + id],
-        txt: data["TXT_" + id],
-        atxt: data["ATXT_" + id],
+        lat: data[id + "_LAT"],
+        lng: data[id + "_LNG"],
+        txt: data[id + "_TXT"],
+        atxt: data[id + "_ATXT"],
       };
       if (result.lat === null || result.lng === null) {
         return null;
@@ -765,7 +795,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
     // they are searchable
     searchable: true,
-    searchInterface: PropertyDefinitionSearchInterfacesType.LOCATION_DISTANCE,
+    searchInterface: PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS,
     supportsIcons: false,
     // i18n with the distance attributes
     i18n: {
