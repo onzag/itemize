@@ -44,6 +44,15 @@ export default class Root {
     return this.rawData.children.map((m) => (new Module(m, null)));
   }
 
+  public getSQLTableSchemas() {
+    let resultSchema = {};
+    this.getAllModules().forEach((cModule) => {
+      // first with child modules
+      resultSchema = {...resultSchema, ...cModule.getSQLTableSchemas()};
+    });
+    return resultSchema;
+  }
+
   /**
    * Gets a specific module given its name
    * @param name the name of the module

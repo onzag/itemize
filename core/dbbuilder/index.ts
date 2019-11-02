@@ -7,10 +7,6 @@ import Knex from "knex";
 import Confirm from "prompt-confirm";
 
 import Root from "../base/Root";
-import ItemDefinition from "../base/ItemDefinition";
-import Module from "../base/Module";
-import { RESERVED_BASE_PROPERTIES_SQL, ITEM_PREFIX, EXCLUSION_STATE_SUFFIX, PREFIX_BUILD } from "../constants";
-import PropertyDefinition from "../base/ItemDefinition/PropertyDefinition";
 
 const fsAsync = fs.promises;
 
@@ -65,10 +61,7 @@ function yesno(question: string) {
   const root = new Root(data.root);
 
   // let's get the result by progressively building on top of it
-  let result = {};
-  root.getAllModules().forEach((rModule) => {
-    result = {...result, ...buildModuleTables(rModule)};
-  });
+  const result = root.getSQLTableSchemas();
 
   // make some copies of that result
   const optimal = {...result};
@@ -112,84 +105,6 @@ function yesno(question: string) {
   // say it's all done
   console.log(colors.green("All done..."));
 })();
-
-/**
- * Builds a module migration configuration
- * @param rModule the module in question
- * @returns the migration configuration
- */
-function buildModuleTables(rModule: Module) {
-  // we progresively build the result
-  let result = {};
-  rModule.getAllModules().forEach((cModule) => {
-    // first with child modules
-    result = {...result, ...buildModuleTables(cModule)};
-  });
-  // then with child item definitions
-  rModule.getAllChildItemDefinitions().forEach((cIdef) => {
-    result = {...result, ...buildItemDefinitionTables(cIdef)};
-  });
-  return result;
-}
-
-function buildPropertyDefinitionTableBit(pd: PropertyDefinition, prefix?: string) {
-  const resultTableSchema = {};
-  const actualPrefix = prefix ? prefix : "";
-  // get the sql def based on the property definition
-  const sqlDef = pd.getPropertyDefinitionDescription().sql;
-  // if it's a string, that's the type
-  if (typeof sqlDef === "string") {
-    resultTableSchema[actualPrefix + pd.getId()] = {
-      type: sqlDef,
-    };
-  // otherwise we might have a more complex value
-  } else {
-    // let's get it based on the function it is
-    const complexValue = sqlDef(actualPrefix + pd.getId());
-    // we are going to loop over that object
-    Object.keys(complexValue).forEach((key) => {
-      // so we can add each row that it returns to the table schema
-      resultTableSchema[key] = {
-        type: complexValue[key],
-      };
-    });
-  }
-  return resultTableSchema;
-}
-
-/**
- * Builds the table for an item definition
- * @param itemDefinition the item definition in question
- * @retuurns the migration table
- */
-function buildItemDefinitionTables(itemDefinition: ItemDefinition) {
-  // let's get the qualified path name for the item definition
-  const qualifiedPathName = itemDefinition.getQualifiedPathName();
-
-  // add all the standard fields
-  let resultTableSchema = {...RESERVED_BASE_PROPERTIES_SQL};
-
-  // now we loop thru every property (they will all become columns)
-  itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
-    resultTableSchema = {...resultTableSchema, ...buildPropertyDefinitionTableBit(pd)};
-  });
-
-  // now we loop over the child items
-  itemDefinition.getAllItems().forEach((i) => {
-    const prefix = PREFIX_BUILD(ITEM_PREFIX + i.getId());
-    resultTableSchema[prefix + EXCLUSION_STATE_SUFFIX] = {
-      type: "string",
-    };
-    i.getSinkingProperties().forEach((pd) => {
-      resultTableSchema = {...resultTableSchema, ...buildPropertyDefinitionTableBit(pd, prefix)};
-    });
-  });
-
-  // add that to the result
-  const result = {};
-  result[qualifiedPathName] = resultTableSchema;
-  return result;
-}
 
 /**
  * Builds a type from the knex table

@@ -439,6 +439,19 @@ export default class Module {
     }
     return MODULE_PREFIX + this.getName();
   }
+
+  public getSQLTableSchemas() {
+    let resultSchema = {};
+    this.getAllModules().forEach((cModule) => {
+      // first with child modules
+      resultSchema = {...resultSchema, ...cModule.getSQLTableSchemas()};
+    });
+    // then with child item definitions
+    this.getAllChildItemDefinitions().forEach((cIdef) => {
+      resultSchema = {...resultSchema, ...cIdef.getSQLTableSchemas()};
+    });
+    return resultSchema;
+  }
 }
 
 if (process.env.NODE_ENV !== "production") {

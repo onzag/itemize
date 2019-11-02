@@ -4,7 +4,7 @@ import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionValue } from "./PropertyDefinition";
 import Module, { IModuleRawJSONDataType, OnStateChangeListenerType } from "../Module";
 import PropertiesValueMappingDefiniton from "./PropertiesValueMappingDefiniton";
-import { PREFIXED_CONCAT, ITEM_DEFINITION_PREFIX } from "../../constants";
+import { PREFIXED_CONCAT, ITEM_DEFINITION_PREFIX, RESERVED_BASE_PROPERTIES_SQL } from "../../constants";
 
 export interface IItemDefinitionRawJSONDataType {
   // Builder data
@@ -490,7 +490,7 @@ export default class ItemDefinition {
   }
 
   /**
-   * TODO provides the structure of the current item
+   * provides the structure of the current item
    * as it is currently, the reason this is more efficient
    * is because getting the value of each item definition
    * wastes resources, so using this function is more
@@ -532,6 +532,33 @@ export default class ItemDefinition {
     value.properties.forEach((propertyValue) => {
       this.getPropertyDefinitionFor(propertyValue.propertyId, true).applyValue(propertyValue);
     });
+  }
+
+  public getSQLTableDefinition(excludeStandardFields?: boolean) {
+    // add all the standard fields
+    let resultTableSchema = excludeStandardFields ? {} : {...RESERVED_BASE_PROPERTIES_SQL};
+
+    // now we loop thru every property (they will all become columns)
+    this.getAllPropertyDefinitions().forEach((pd) => {
+      resultTableSchema = {...resultTableSchema, ...pd.getSQLTableDefinition()};
+    });
+
+    // now we loop over the child items
+    this.getAllItems().forEach((i) => {
+      resultTableSchema = {...resultTableSchema, ...i.getSQLTableDefinition()};
+    });
+
+    return resultTableSchema;
+  }
+
+  public getSQLTableSchemas() {
+    let result = {
+      [this.getQualifiedPathName()]: this.getSQLTableDefinition(),
+    };
+    this.getChildDefinitions().forEach((cIdef) => {
+      result = {...result, ...cIdef.getSQLTableSchemas()};
+    });
+    return result;
   }
 
   public toJSON() {

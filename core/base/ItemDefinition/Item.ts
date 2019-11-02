@@ -10,6 +10,7 @@ import ConditionalRuleSet, {
 } from "./ConditionalRuleSet";
 import Module, { OnStateChangeListenerType } from "../Module";
 import PropertyDefinition from "./PropertyDefinition";
+import { PREFIX_BUILD, ITEM_PREFIX, EXCLUSION_STATE_SUFFIX } from "../../constants";
 
 export enum ItemExclusionState {
   EXCLUDED = "EXCLUDED",
@@ -200,6 +201,23 @@ export default class Item {
   public getSinkingProperties(): PropertyDefinition[] {
     return this.getSinkingPropertiesIds()
       .map((propertyId) => this.itemDefinition.getPropertyDefinitionFor(propertyId, false));
+  }
+
+  public getSQLTableDefinition() {
+    const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
+    let resultTableSchema = {
+      [prefix + EXCLUSION_STATE_SUFFIX]: {
+        type: "string",
+        notNull: true,
+      },
+    };
+    this.getSinkingProperties().forEach((sinkingProperty) => {
+      resultTableSchema = {
+        ...resultTableSchema,
+        ...sinkingProperty.getSQLTableDefinition(prefix),
+      };
+    });
+    return resultTableSchema;
   }
 
   /**

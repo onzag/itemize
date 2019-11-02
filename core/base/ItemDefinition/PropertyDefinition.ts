@@ -1629,6 +1629,35 @@ export default class PropertyDefinition {
     return typeof this.rawData.specialProperties[name] !== "undefined" ? this.rawData.specialProperties[name] : null;
   }
 
+  public getSQLTableDefinition(prefix?: string) {
+    const resultTableSchema = {};
+    const actualPrefix = prefix ? prefix : "";
+    // get the sql def based on the property definition
+    const sqlDef = this.getPropertyDefinitionDescription().sql;
+    // if it's a string, that's the type
+    if (typeof sqlDef === "string") {
+      resultTableSchema[actualPrefix + this.getId()] = {
+        type: sqlDef,
+      };
+    // otherwise we might have a more complex value
+    } else {
+      // let's get it based on the function it is
+      const complexValue = sqlDef(actualPrefix + this.getId());
+      // we are going to loop over that object
+      Object.keys(complexValue).forEach((key) => {
+        // so we can add each row that it returns to the table schema
+        resultTableSchema[key] = {
+          type: complexValue[key],
+        };
+      });
+    }
+    return resultTableSchema;
+  }
+
+  public getGQLTableDefinition(prefix?: string) {
+    return;
+  }
+
   public getIcon() {
     return this.rawData.icon || null;
   }

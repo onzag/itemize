@@ -23,7 +23,6 @@ import {
 } from "./schemaChecks";
 import { checkRoot } from "./checkers";
 import { processRoot } from "./processer";
-import { buildGraphQLSchema } from "./graphql";
 import { buildLang, clearLang } from "./lang";
 import { buildJSONResources } from "./resources";
 import { buildHTML } from "./html";
@@ -221,14 +220,6 @@ async function buildData(rawData: any) {
       JSON.stringify(resultData),
     );
   }));
-
-  const graphql: string = buildGraphQLSchema(resultJSON);
-  const gqlFileName = path.join("dist", "data", "build.gql");
-  console.log("emiting " + colors.green(gqlFileName));
-  await fsAsync.writeFile(
-    gqlFileName,
-    graphql,
-  );
 }
 
 /**
