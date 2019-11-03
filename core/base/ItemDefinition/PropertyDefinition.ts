@@ -315,7 +315,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
   currency: {
-    gql: "__PropertyType__Currency",
+    gql: "PROPERTY_TYPE__Currency",
     gqlFields: {
       value: {
         type: GraphQLNonNull(GraphQLFloat),
@@ -411,7 +411,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
   unit: {
-    gql: "__PropertyType__Unit",
+    gql: "PROPERTY_TYPE__Unit",
     gqlFields: {
       value: {
         type: GraphQLNonNull(GraphQLFloat),
@@ -752,7 +752,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   },
 
   location: {
-    gql: "__PropertyType__Location",
+    gql: "PROPERTY_TYPE__Location",
     gqlFields: {
       lng: {
         type: GraphQLNonNull(GraphQLFloat),

@@ -1,6 +1,6 @@
 import React from "react";
 import DevTools from "../devtools";
-import Root, { IRootRawJSONDataType } from "../../base/Root";
+import Root, { IRootRawJSONDataType, Ii18NType, IRawJSONBuildDataType } from "../../base/Root";
 import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
 import { createMuiTheme } from "@material-ui/core";
 import JssProvider from "react-jss/lib/JssProvider";
@@ -28,12 +28,6 @@ const jss = create({
 const isDevelopment = process.env.NODE_ENV === "development";
 if (isDevelopment) {
   console.info("Starting Development Mode, Have Fun :)");
-}
-
-// The interface for locale i18n data
-// contains keys and strings that are the values
-export interface Ii18NType {
-  [key: string]: string;
 }
 
 // The interface for locale data for translation contains
@@ -107,13 +101,6 @@ export interface ILocaleContextType {
 export interface IDataContextType {
   raw: IRootRawJSONDataType;
   value: Root;
-}
-
-// This is the build data that comes raw from the
-// server, as it is raw, in the file
-export interface IRawJSONBuildDataType {
-  root: IRootRawJSONDataType;
-  i18n: Ii18NType;
 }
 
 // The props for the application, this initial information

@@ -10,7 +10,8 @@ import PropertyEntryText from "./PropertyEntryText";
 import PropertyEntryDateTime from "./PropertyEntryDateTime";
 import PropertyEntryLocation from "./PropertyEntryLocation";
 import PropertyEntryFiles from "./PropertyEntryFiles";
-import { LocaleContext, Ii18NType, ICurrencyType, ICountryType } from "../../..";
+import { LocaleContext, ICurrencyType, ICountryType } from "../../..";
+import { Ii18NType } from "../../../../../base/Root";
 
 import "../../../../theme/property-entries.scss";
 

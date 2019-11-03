@@ -1,5 +1,6 @@
 import Module, { IModuleRawJSONDataType } from "./Module";
-import { GraphQLSchema, GraphQLObjectType, printSchema } from "graphql";
+import { GraphQLSchema, GraphQLObjectType } from "graphql";
+import ItemDefinition from "./ItemDefinition";
 
 export interface IRootRawJSONDataType {
   type: "root";
@@ -11,6 +12,34 @@ export interface IRootRawJSONDataType {
 
   // Set after the build
   children: IModuleRawJSONDataType[];
+}
+
+// The interface for locale i18n data
+// contains keys and strings that are the values
+// tslint:disable-next-line: interface-name
+export interface Ii18NType {
+  [key: string]: string;
+}
+
+// This is the build data that comes raw from the
+// server, as it is raw, in the file
+export interface IRawJSONBuildDataType {
+  root: IRootRawJSONDataType;
+  i18n: Ii18NType;
+}
+
+export type FGraphQLIdefGetResolverType = (
+  resolverArgs: {
+    source: any,
+    args: any,
+    context: any,
+    info: any,
+  },
+  itemDefinition: ItemDefinition,
+) => any;
+
+export interface IGraphQLResolversType {
+  getItemDefinition: FGraphQLIdefGetResolverType;
 }
 
 export default class Root {
@@ -71,18 +100,19 @@ export default class Root {
     );
   }
 
-  public getGQLSchema() {
+  public getGQLSchema(resolvers?: IGraphQLResolversType, instanceId?: string) {
     let mutationFields = {};
     let queryFields = {};
+    const givenInstanceId = instanceId ? instanceId : (new Date()).getTime().toString();
 
     this.getAllModules().forEach((mod) => {
       queryFields = {
         ...queryFields,
-        ...mod.getGQLQueryFields(),
+        ...mod.getGQLQueryFields(givenInstanceId, resolvers),
       };
       mutationFields = {
         ...mutationFields,
-        ...mod.getGQLMutationFields(),
+        ...mod.getGQLMutationFields(givenInstanceId, resolvers),
       };
     });
 
@@ -100,10 +130,6 @@ export default class Root {
       query,
       mutation,
     });
-  }
-
-  public getGQLPrintedSchema() {
-    return printSchema(this.getGQLSchema());
   }
 }
 

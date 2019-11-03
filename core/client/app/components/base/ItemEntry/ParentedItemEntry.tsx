@@ -3,7 +3,6 @@ import ItemDefinition from "../../../../../base/ItemDefinition";
 import PropertyDefinition, {
   PropertyDefinitionSupportedType,
 } from "../../../../../base/ItemDefinition/PropertyDefinition";
-import { Ii18NType } from "../../..";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
@@ -19,6 +18,7 @@ import {
 } from "../PropertyEntry/PropertyEntryBoolean";
 
 import ItemEntry from ".";
+import { Ii18NType } from "../../../../../base/Root";
 
 interface IParentedItemEntryProps {
   value: IItemValue;

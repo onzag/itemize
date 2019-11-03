@@ -13,7 +13,6 @@ export default function DevToolRoot({
     <React.Fragment>
       <br/>
       <p>Available Items</p>
-      <code>{root.getGQLPrintedSchema()}</code>
       {root.getAllModules().map((childModule) =>
         <DevToolModule
          key={childModule.getName()}

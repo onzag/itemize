@@ -13,8 +13,10 @@ import {
   PREFIX_SEARCH,
   RESERVED_GETTER_PROPERTIES,
   RESERVED_SEARCH_PROPERTIES,
+  SUFFIX_BUILD,
 } from "../constants";
 import { GraphQLInterfaceType, GraphQLList } from "graphql";
+import { IGraphQLResolversType } from "./Root";
 
 export type OnStateChangeListenerType = () => any;
 
@@ -492,8 +494,8 @@ export default class Module {
     return resultFieldsSchema;
   }
 
-  public getGQLType() {
-    const name = this.getQualifiedPathName();
+  public getGQLType(instanceId: string) {
+    const name = this.getQualifiedPathName() + SUFFIX_BUILD(instanceId);
     if (!MODULE_GQL_POOL[name]) {
       MODULE_GQL_POOL[name] = new GraphQLInterfaceType({
         name: this.getQualifiedPathName(),
@@ -503,13 +505,13 @@ export default class Module {
     return MODULE_GQL_POOL[name];
   }
 
-  public getGQLQueryFields() {
+  public getGQLQueryFields(instanceId: string, resolvers?: IGraphQLResolversType) {
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql queries");
     }
     let fields: any = {
       [PREFIX_SEARCH + this.getQualifiedPathName()]: {
-        type: GraphQLList(this.getGQLType()),
+        type: GraphQLList(this.getGQLType(instanceId)),
         args: {
           ...RESERVED_SEARCH_PROPERTIES,
           ...this.getSearchModule().getGQLFieldsDefinition(true, true),
@@ -519,13 +521,13 @@ export default class Module {
     this.getAllChildItemDefinitions().forEach((cIdef) => {
       fields = {
         ...fields,
-        ...cIdef.getGQLQueryFields(),
+        ...cIdef.getGQLQueryFields(instanceId, resolvers),
       };
     });
     return fields;
   }
 
-  public getGQLMutationFields() {
+  public getGQLMutationFields(instanceId: string, resolvers?: IGraphQLResolversType) {
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql mutations");
     }
@@ -533,7 +535,7 @@ export default class Module {
     this.getAllChildItemDefinitions().forEach((cIdef) => {
       fields = {
         ...fields,
-        ...cIdef.getGQLMutationFields(),
+        ...cIdef.getGQLMutationFields(instanceId, resolvers),
       };
     });
     return fields;

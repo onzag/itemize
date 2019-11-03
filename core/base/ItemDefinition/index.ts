@@ -16,8 +16,10 @@ import {
   RESERVED_GETTER_PROPERTIES,
   RESERVED_ADD_PROPERTIES,
   RESERVED_SEARCH_PROPERTIES,
+  SUFFIX_BUILD,
 } from "../../constants";
 import { GraphQLObjectType, GraphQLList } from "graphql";
+import { IGraphQLResolversType } from "../Root";
 
 const IDEF_GQL_POOL = {};
 
@@ -617,32 +619,46 @@ export default class ItemDefinition {
     return fieldsResult;
   }
 
-  public getGQLType() {
-    const name = this.getQualifiedPathName();
+  public getGQLType(instanceId: string) {
+    const name = this.getQualifiedPathName() + SUFFIX_BUILD(instanceId);
     if (!IDEF_GQL_POOL[name]) {
       IDEF_GQL_POOL[name] = new GraphQLObjectType({
         name: this.getQualifiedPathName(),
-        fields: this.getGQLFieldsDefinition(),
-        interfaces: [this.parentModule.getGQLType()],
+        fields: {
+          // Graphql Inheritance has to be explicitly set for some reason
+          ...this.parentModule.getGQLFieldsDefinition(),
+          ...this.getGQLFieldsDefinition(),
+        },
+        interfaces: [this.parentModule.getGQLType(instanceId)],
       });
     }
     return IDEF_GQL_POOL[name];
   }
 
-  public getGQLQueryFields() {
+  public getGQLQueryFields(instanceId: string, resolvers?: IGraphQLResolversType) {
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql queries");
     }
     const searchModeCounterpart = this.getSearchModeCounterpart();
     let fields = {
       [PREFIX_GET + this.getQualifiedPathName()]: {
-        type: this.getGQLType(),
+        type: this.getGQLType(instanceId),
         args: {
           ...RESERVED_GETTER_PROPERTIES,
         },
+        resolve: (source: any, args: any, context: any, info: any) => {
+          if (resolvers) {
+            return resolvers.getItemDefinition({
+              source,
+              args,
+              context,
+              info,
+            }, this);
+          }
+        },
       },
       [PREFIX_SEARCH + this.getQualifiedPathName()]: {
-        type: GraphQLList(this.getGQLType()),
+        type: GraphQLList(this.getGQLType(instanceId)),
         args: {
           ...RESERVED_SEARCH_PROPERTIES,
           ...searchModeCounterpart.getParentModule().getGQLFieldsDefinition(true, true),
@@ -653,19 +669,19 @@ export default class ItemDefinition {
     this.getChildDefinitions().forEach((cIdef) => {
       fields = {
         ...fields,
-        ...cIdef.getGQLQueryFields(),
+        ...cIdef.getGQLQueryFields(instanceId),
       };
     });
     return fields;
   }
 
-  public getGQLMutationFields() {
+  public getGQLMutationFields(instanceId: string, resolvers?: IGraphQLResolversType) {
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql mutations");
     }
     let fields = {
       [PREFIX_ADD + this.getQualifiedPathName()]: {
-        type: this.getGQLType(),
+        type: this.getGQLType(instanceId),
         args: {
           ...RESERVED_ADD_PROPERTIES,
           ...this.parentModule.getGQLFieldsDefinition(true, true),
@@ -673,7 +689,7 @@ export default class ItemDefinition {
         },
       },
       [PREFIX_EDIT + this.getQualifiedPathName()]: {
-        type: this.getGQLType(),
+        type: this.getGQLType(instanceId),
         args: {
           ...RESERVED_GETTER_PROPERTIES,
           ...this.parentModule.getGQLFieldsDefinition(true, true),
@@ -681,14 +697,14 @@ export default class ItemDefinition {
         },
       },
       [PREFIX_DELETE + this.getQualifiedPathName()]: {
-        type: this.getGQLType(),
+        type: this.getGQLType(instanceId),
         args: RESERVED_GETTER_PROPERTIES,
       },
     };
     this.getChildDefinitions().forEach((cIdef) => {
       fields = {
         ...fields,
-        ...cIdef.getGQLMutationFields(),
+        ...cIdef.getGQLMutationFields(instanceId),
       };
     });
     return fields;
