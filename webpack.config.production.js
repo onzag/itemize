@@ -13,7 +13,7 @@ module.exports = {
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
   ],
   resolve: {
-    extensions: ['.ts', '.tsx', '.js']
+    extensions: ['.ts', '.tsx', '.js', '.mjs']
   },
   module: {
     rules: [
@@ -49,6 +49,11 @@ module.exports = {
           limit: 10000,
         },
       },
+      {
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: 'javascript/auto'
+      }
     ]
   },
   output: {

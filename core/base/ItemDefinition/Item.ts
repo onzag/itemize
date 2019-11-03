@@ -11,6 +11,7 @@ import ConditionalRuleSet, {
 import Module, { OnStateChangeListenerType } from "../Module";
 import PropertyDefinition from "./PropertyDefinition";
 import { PREFIX_BUILD, ITEM_PREFIX, EXCLUSION_STATE_SUFFIX } from "../../constants";
+import { GraphQLString, GraphQLNonNull } from "graphql";
 
 export enum ItemExclusionState {
   EXCLUDED = "EXCLUDED",
@@ -203,7 +204,12 @@ export default class Item {
       .map((propertyId) => this.itemDefinition.getPropertyDefinitionFor(propertyId, false));
   }
 
+  /**
+   * Provides the table bit that is necessary to store item data
+   * for this item when included from the parent definition
+   */
   public getSQLTableDefinition() {
+    // the esclusion state needs to be stored in the table bit
     const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
     let resultTableSchema = {
       [prefix + EXCLUSION_STATE_SUFFIX]: {
@@ -211,6 +217,8 @@ export default class Item {
         notNull: true,
       },
     };
+    // we need all the sinking properties and those are the
+    // ones added to the table
     this.getSinkingProperties().forEach((sinkingProperty) => {
       resultTableSchema = {
         ...resultTableSchema,
@@ -218,6 +226,25 @@ export default class Item {
       };
     });
     return resultTableSchema;
+  }
+
+  public getGQLFieldsDefinition(propertiesAsInput?: boolean) {
+    // the esclusion state needs to be stored in the schema bit
+    const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
+    let fieldsResult = {
+      [prefix + EXCLUSION_STATE_SUFFIX]: {
+        type: GraphQLNonNull(GraphQLString),
+      },
+    };
+    // we need all the sinking properties and those are the
+    // ones added to the schema bit
+    this.getSinkingProperties().forEach((sinkingProperty) => {
+      fieldsResult = {
+        ...fieldsResult,
+        ...sinkingProperty.getGQLFieldsDefinition(propertiesAsInput, prefix),
+      };
+    });
+    return fieldsResult;
   }
 
   /**

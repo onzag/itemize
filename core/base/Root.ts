@@ -1,4 +1,5 @@
 import Module, { IModuleRawJSONDataType } from "./Module";
+import { GraphQLSchema, GraphQLObjectType, printSchema } from "graphql";
 
 export interface IRootRawJSONDataType {
   type: "root";
@@ -68,6 +69,41 @@ export default class Root {
       resultRawData,
       null,
     );
+  }
+
+  public getGQLSchema() {
+    let mutationFields = {};
+    let queryFields = {};
+
+    this.getAllModules().forEach((mod) => {
+      queryFields = {
+        ...queryFields,
+        ...mod.getGQLQueryFields(),
+      };
+      mutationFields = {
+        ...mutationFields,
+        ...mod.getGQLMutationFields(),
+      };
+    });
+
+    const query = new GraphQLObjectType({
+      name: "ROOT_QUERY",
+      fields: queryFields,
+    });
+
+    const mutation = new GraphQLObjectType({
+      name: "ROOT_MUTATIONS",
+      fields: mutationFields,
+    });
+
+    return new GraphQLSchema({
+      query,
+      mutation,
+    });
+  }
+
+  public getGQLPrintedSchema() {
+    return printSchema(this.getGQLSchema());
   }
 }
 

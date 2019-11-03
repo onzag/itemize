@@ -24,6 +24,19 @@ import { MIN_SUPPORTED_INTEGER, MAX_SUPPORTED_INTEGER,
 } from "../../constants";
 import Module, { OnStateChangeListenerType } from "../Module";
 import fastHTMLParser from "fast-html-parser";
+import {
+  GraphQLBoolean,
+  GraphQLNullableType,
+  GraphQLInt,
+  GraphQLFloat,
+  GraphQLNonNull,
+  GraphQLString,
+  GraphQLList,
+  GraphQLInputObjectType,
+  GraphQLObjectType,
+} from "graphql";
+
+const PROPERTY_TYPE_GQL_POOL = {};
 
 export enum PropertyInvalidReason {
   UNSPECIFIED = "UNSPECIFIED",
@@ -112,12 +125,9 @@ export interface IPropertyDefinitionSupportedType {
   // supported subtypes of the type
   supportedSubtypes?: string[];
 
-  // graphql type as a string,
-  // if using a custom more complex type
-  // start it with __PropertyType__(name of the component)
-  gql: string;
-  // graphql definition when using a complex custom type
-  gqlDef?: {[key: string]: string};
+  // graphql type
+  gql: GraphQLNullableType | string;
+  gqlFields?: {[key: string]: {type: GraphQLNullableType}};
   // sql definition, either a string for knex supported types
   // or a function where the id is the id is a property id
   // this represents how tables are populated and data is stored
@@ -211,7 +221,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   boolean: {
     // a boolean type can be written as a boolean
     json: "boolean",
-    gql: "Boolean",
+    gql: GraphQLBoolean,
     sql: "boolean",
     // it is searchable by default
     searchable: true,
@@ -228,7 +238,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   integer: {
     // an integer is represented as a number
     json: "number",
-    gql: "Int",
+    gql: GraphQLInt,
     sql: "integer",
     supportsAutocomplete: true,
     // it gotta be validated to check it's a number
@@ -263,7 +273,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   number: {
     // a number is just a number can be integer or decimal
     json: "number",
-    gql: "Float",
+    gql: GraphQLFloat,
     sql: "float",
     supportsAutocomplete: true,
     // the validator
@@ -306,9 +316,13 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   },
   currency: {
     gql: "__PropertyType__Currency",
-    gqlDef: {
-      value: "Float!",
-      currency: "String!",
+    gqlFields: {
+      value: {
+        type: GraphQLNonNull(GraphQLFloat),
+      },
+      currency: {
+        type: GraphQLNonNull(GraphQLString),
+      },
     },
     sql: (id) => {
       const obj = {};
@@ -398,11 +412,19 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
   },
   unit: {
     gql: "__PropertyType__Unit",
-    gqlDef: {
-      value: "Float!",
-      unit: "String!",
-      normalizedValue: "Float!",
-      normalizedUnit: "String!",
+    gqlFields: {
+      value: {
+        type: GraphQLNonNull(GraphQLFloat),
+      },
+      unit: {
+        type: GraphQLNonNull(GraphQLString),
+      },
+      normalizedValue: {
+        type: GraphQLNonNull(GraphQLFloat),
+      },
+      normalizedUnit: {
+        type: GraphQLNonNull(GraphQLString),
+      },
     },
     sql: (id: string) => {
       const obj = {};
@@ -516,7 +538,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     ],
   },
   string: {
-    gql: "String",
+    gql: GraphQLString,
     // a string is a string
     json: "string",
     sql: "text",
@@ -552,7 +574,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
   password: {
-    gql: "String",
+    gql: GraphQLString,
     nullableDefault: "",
     sql: "text",
     sqlIn: (value: PropertyDefinitionSupportedPasswordType, id: string, raw) => {
@@ -590,7 +612,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
   text: {
-    gql: "String",
+    gql: GraphQLString,
     nullableDefault: "",
     supportedSubtypes: ["html"],
     // TODO implement full text search
@@ -623,7 +645,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
   year: {
-    gql: "Int",
+    gql: GraphQLInt,
     // years can be set as a number
     json: "number",
     sql: "integer",
@@ -657,7 +679,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
   date: {
-    gql: "String",
+    gql: GraphQLString,
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     supportsIcons: false,
@@ -681,7 +703,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
   datetime: {
-    gql: "String",
+    gql: GraphQLString,
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     supportsIcons: false,
@@ -705,7 +727,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
   time: {
-    gql: "String",
+    gql: GraphQLString,
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     supportsIcons: false,
@@ -731,11 +753,19 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
 
   location: {
     gql: "__PropertyType__Location",
-    gqlDef: {
-      lng: "Float!",
-      lat: "Float!",
-      txt: "String!",
-      atxt: "String",
+    gqlFields: {
+      lng: {
+        type: GraphQLNonNull(GraphQLFloat),
+      },
+      lat: {
+        type: GraphQLNonNull(GraphQLFloat),
+      },
+      txt: {
+        type: GraphQLNonNull(GraphQLFloat),
+      },
+      atxt: {
+        type: GraphQLNonNull(GraphQLFloat),
+      },
     },
     specialProperties: [
       {
@@ -806,7 +836,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
   },
   files: {
-    gql: "[String!]",
+    gql: GraphQLList(GraphQLNonNull(GraphQLString)),
     searchable: false,
     supportsIcons: true,
     specialProperties: [
@@ -1629,6 +1659,13 @@ export default class PropertyDefinition {
     return typeof this.rawData.specialProperties[name] !== "undefined" ? this.rawData.specialProperties[name] : null;
   }
 
+  /**
+   * Provides the table bit that is necessary to include this property and
+   * this property alone, that is a table bit
+   * @param prefix a prefix to prefix the table row names, this is
+   * used to prefix item specific properties that are sinked in from
+   * the parent in the item
+   */
   public getSQLTableDefinition(prefix?: string) {
     const resultTableSchema = {};
     const actualPrefix = prefix ? prefix : "";
@@ -1654,8 +1691,52 @@ export default class PropertyDefinition {
     return resultTableSchema;
   }
 
-  public getGQLTableDefinition(prefix?: string) {
-    return;
+  /**
+   * Provides all the schema bit that is necessary to include or query
+   * this property alone, that is a schema bit
+   * @param propertiesAsInput if the property should be as an input object, for use within args
+   * @param prefix a prefix to prefix the schema arguments names, this is
+   * used to prefix item specific properties that are sinked in from
+   * the parent in the item
+   */
+  public getGQLFieldsDefinition(propertiesAsInput?: boolean, prefix?: string) {
+    const resultFieldsSchema = {};
+    const actualPrefix = prefix ? prefix : "";
+    const propertyDescription = this.getPropertyDefinitionDescription();
+    const gqlDef = propertyDescription.gql;
+    let gqlResult;
+    if (typeof gqlDef === "string") {
+      let defName = gqlDef;
+      if (propertiesAsInput) {
+        defName += "_In";
+      } else {
+        defName += "_Out";
+      }
+
+      if (!PROPERTY_TYPE_GQL_POOL[defName]) {
+        const payload = {
+          name: defName,
+          fields: propertyDescription.gqlFields as any,
+        };
+        if (propertiesAsInput) {
+          PROPERTY_TYPE_GQL_POOL[defName] = new GraphQLInputObjectType(payload);
+        } else {
+          PROPERTY_TYPE_GQL_POOL[defName] = new GraphQLObjectType(payload);
+        }
+      }
+      gqlResult = PROPERTY_TYPE_GQL_POOL[defName];
+    } else {
+      gqlResult = gqlDef;
+    }
+
+    if (!this.isNullable()) {
+      gqlResult = GraphQLNonNull(gqlResult);
+    }
+
+    resultFieldsSchema[actualPrefix + this.getId()] = {
+      type: gqlResult,
+    };
+    return resultFieldsSchema;
   }
 
   public getIcon() {

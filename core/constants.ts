@@ -1,3 +1,5 @@
+import { GraphQLID, GraphQLNonNull, GraphQLString, GraphQLInt } from "graphql";
+
 // DATA ATTRIBUTES
 
 // Defines the max supported integer, it should match up the database
@@ -171,20 +173,47 @@ export const LOCATION_SEARCH_I18N = [
 
 // INVALID RESERVED PROPERTY NAMES
 export const RESERVED_BASE_PROPERTIES = {
-  id: "ID!",
-  created_at: "String!",
-  created_by: "ID!",
-  edited_at: "String",
-  reviewed_at: "String",
-  reviewed_by: "ID",
-  deleted_at: "String",
-  deleted_by: "ID",
-  locale: "String",
-  fts_language: "String",
+  id: {
+    type: GraphQLNonNull(GraphQLID),
+  },
+  type: {
+    type: GraphQLNonNull(GraphQLString),
+  },
+  created_at: {
+    type: GraphQLNonNull(GraphQLString),
+  },
+  created_by: {
+    type: GraphQLNonNull(GraphQLID),
+  },
+  edited_at: {
+    type: GraphQLString,
+  },
+  reviewed_at: {
+    type: GraphQLString,
+  },
+  reviewed_by: {
+    type: GraphQLID,
+  },
+  deleted_at: {
+    type: GraphQLString,
+  },
+  deleted_by: {
+    type: GraphQLID,
+  },
+  locale: {
+    type: GraphQLString,
+  },
+  fts_language: {
+    type: GraphQLString,
+  },
 };
 export const RESERVED_BASE_PROPERTIES_SQL = {
   id: {
     type: "serial",
+  },
+  type: {
+    type: "string",
+    notNull: true,
   },
   created_at: {
     type: "datetime",
@@ -223,14 +252,34 @@ export const ITEM_PREFIX = PREFIX_BUILD("ITEM");
 export const MODULE_PREFIX = PREFIX_BUILD("MOD");
 export const ITEM_DEFINITION_PREFIX = PREFIX_BUILD("IDEF");
 export const EXCLUSION_STATE_SUFFIX = SUFFIX_BUILD("EXCLUSION_STATE");
+export const PREFIX_SEARCH = PREFIX_BUILD("SEARCH");
+export const PREFIX_GET = PREFIX_BUILD("GET");
+export const PREFIX_ADD = PREFIX_BUILD("ADD");
+export const PREFIX_EDIT = PREFIX_BUILD("EDIT");
+export const PREFIX_DELETE = PREFIX_BUILD("DELETE");
 export const RESERVED_SEARCH_PROPERTIES = {
-  token: "String",
-  first_result: "Int!",
-  limit: "Int!",
+  token: {
+    type: GraphQLNonNull(GraphQLString),
+  },
+  first_result: {
+    type: GraphQLNonNull(GraphQLInt),
+  },
+  limit: {
+    type: GraphQLNonNull(GraphQLInt),
+  },
 };
 export const RESERVED_GETTER_PROPERTIES = {
-  token: "String",
-  id: "Int!",
+  token: {
+    type: GraphQLNonNull(GraphQLString),
+  },
+  id: {
+    type: GraphQLNonNull(GraphQLID),
+  },
+};
+export const RESERVED_ADD_PROPERTIES = {
+  token: {
+    type: GraphQLNonNull(GraphQLString),
+  },
 };
 
 export const UNIT_SUBTYPES = [

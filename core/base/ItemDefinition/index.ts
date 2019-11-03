@@ -4,7 +4,22 @@ import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionValue } from "./PropertyDefinition";
 import Module, { IModuleRawJSONDataType, OnStateChangeListenerType } from "../Module";
 import PropertiesValueMappingDefiniton from "./PropertiesValueMappingDefiniton";
-import { PREFIXED_CONCAT, ITEM_DEFINITION_PREFIX, RESERVED_BASE_PROPERTIES_SQL } from "../../constants";
+import {
+  PREFIXED_CONCAT,
+  ITEM_DEFINITION_PREFIX,
+  RESERVED_BASE_PROPERTIES_SQL,
+  PREFIX_GET,
+  PREFIX_SEARCH,
+  PREFIX_ADD,
+  PREFIX_EDIT,
+  PREFIX_DELETE,
+  RESERVED_GETTER_PROPERTIES,
+  RESERVED_ADD_PROPERTIES,
+  RESERVED_SEARCH_PROPERTIES,
+} from "../../constants";
+import { GraphQLObjectType, GraphQLList } from "graphql";
+
+const IDEF_GQL_POOL = {};
 
 export interface IItemDefinitionRawJSONDataType {
   // Builder data
@@ -534,9 +549,25 @@ export default class ItemDefinition {
     });
   }
 
-  public getSQLTableDefinition(excludeStandardFields?: boolean) {
+  public getSearchModeCounterpart(): ItemDefinition {
+    return this.parentModule.getSearchModule().getItemDefinitionFor(
+      this.getModulePath(),
+    );
+  }
+
+  public isInSearchMode(): boolean {
+    return this.parentModule.isInSearchMode();
+  }
+
+  /**
+   * Provides the table that is necesary to include this item definition as a whole
+   * that is, this represents a whole table, that is necessary for this item to
+   * be saved when populated, it basically adds up all the table bits
+   * from all the properties and all the items
+   */
+  public getSQLTableDefinition() {
     // add all the standard fields
-    let resultTableSchema = excludeStandardFields ? {} : {...RESERVED_BASE_PROPERTIES_SQL};
+    let resultTableSchema = {...RESERVED_BASE_PROPERTIES_SQL};
 
     // now we loop thru every property (they will all become columns)
     this.getAllPropertyDefinitions().forEach((pd) => {
@@ -551,18 +582,146 @@ export default class ItemDefinition {
     return resultTableSchema;
   }
 
+  /**
+   * Provides all the schemas of all the items, self and its children
+   * that are included within this item definition and all the table names
+   * that should be used using the qualified name
+   */
   public getSQLTableSchemas() {
+    // we add self
     let result = {
       [this.getQualifiedPathName()]: this.getSQLTableDefinition(),
     };
+    // loop over the children and add each one of them and whatever they have
     this.getChildDefinitions().forEach((cIdef) => {
       result = {...result, ...cIdef.getSQLTableSchemas()};
     });
+    // return that
     return result;
+  }
+
+  public getGQLFieldsDefinition(propertiesAsInput?: boolean) {
+    let fieldsResult = {};
+    this.getAllPropertyDefinitions().forEach((pd) => {
+      fieldsResult = {
+        ...fieldsResult,
+        ...pd.getGQLFieldsDefinition(propertiesAsInput),
+      };
+    });
+    this.getAllItems().forEach((i) => {
+      fieldsResult = {
+        ...fieldsResult,
+        ...i.getGQLFieldsDefinition(propertiesAsInput),
+      };
+    });
+    return fieldsResult;
+  }
+
+  public getGQLType() {
+    const name = this.getQualifiedPathName();
+    if (!IDEF_GQL_POOL[name]) {
+      IDEF_GQL_POOL[name] = new GraphQLObjectType({
+        name: this.getQualifiedPathName(),
+        fields: this.getGQLFieldsDefinition(),
+        interfaces: [this.parentModule.getGQLType()],
+      });
+    }
+    return IDEF_GQL_POOL[name];
+  }
+
+  public getGQLQueryFields() {
+    if (this.isInSearchMode()) {
+      throw new Error("Modules in search mode has no graphql queries");
+    }
+    const searchModeCounterpart = this.getSearchModeCounterpart();
+    let fields = {
+      [PREFIX_GET + this.getQualifiedPathName()]: {
+        type: this.getGQLType(),
+        args: {
+          ...RESERVED_GETTER_PROPERTIES,
+        },
+      },
+      [PREFIX_SEARCH + this.getQualifiedPathName()]: {
+        type: GraphQLList(this.getGQLType()),
+        args: {
+          ...RESERVED_SEARCH_PROPERTIES,
+          ...searchModeCounterpart.getParentModule().getGQLFieldsDefinition(true, true),
+          ...searchModeCounterpart.getGQLFieldsDefinition(true),
+        },
+      },
+    };
+    this.getChildDefinitions().forEach((cIdef) => {
+      fields = {
+        ...fields,
+        ...cIdef.getGQLQueryFields(),
+      };
+    });
+    return fields;
+  }
+
+  public getGQLMutationFields() {
+    if (this.isInSearchMode()) {
+      throw new Error("Modules in search mode has no graphql mutations");
+    }
+    let fields = {
+      [PREFIX_ADD + this.getQualifiedPathName()]: {
+        type: this.getGQLType(),
+        args: {
+          ...RESERVED_ADD_PROPERTIES,
+          ...this.parentModule.getGQLFieldsDefinition(true, true),
+          ...this.getGQLFieldsDefinition(true),
+        },
+      },
+      [PREFIX_EDIT + this.getQualifiedPathName()]: {
+        type: this.getGQLType(),
+        args: {
+          ...RESERVED_GETTER_PROPERTIES,
+          ...this.parentModule.getGQLFieldsDefinition(true, true),
+          ...this.getGQLFieldsDefinition(true),
+        },
+      },
+      [PREFIX_DELETE + this.getQualifiedPathName()]: {
+        type: this.getGQLType(),
+        args: RESERVED_GETTER_PROPERTIES,
+      },
+    };
+    this.getChildDefinitions().forEach((cIdef) => {
+      fields = {
+        ...fields,
+        ...cIdef.getGQLMutationFields(),
+      };
+    });
+    return fields;
   }
 
   public toJSON() {
     return this.rawData;
+  }
+
+  public getModulePath(): string[] {
+    if (this.parentItemDefinition) {
+      return this.parentItemDefinition
+        .getModulePath()
+        .concat([
+          this.getName(),
+        ]);
+    }
+    return [this.getName()];
+  }
+
+  public getAbsolutePath(): string[] {
+    if (this.parentItemDefinition) {
+      return this.parentItemDefinition
+        .getAbsolutePath()
+        .concat([
+          this.getName(),
+        ]);
+    }
+    return this.parentModule
+      .getAbsolutePath()
+      .concat([
+        this.getName(),
+      ]);
   }
 
   public getQualifiedPathName(): string {

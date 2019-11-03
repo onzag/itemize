@@ -5,7 +5,16 @@ import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
 } from "./ItemDefinition/PropertyDefinition";
 import { buildSearchMode } from "./searchModeBuilder";
-import { MODULE_PREFIX, PREFIXED_CONCAT } from "../constants";
+import {
+  MODULE_PREFIX,
+  PREFIXED_CONCAT,
+  RESERVED_BASE_PROPERTIES,
+  PREFIX_GET,
+  PREFIX_SEARCH,
+  RESERVED_GETTER_PROPERTIES,
+  RESERVED_SEARCH_PROPERTIES,
+} from "../constants";
+import { GraphQLInterfaceType, GraphQLList } from "graphql";
 
 export type OnStateChangeListenerType = () => any;
 
@@ -36,6 +45,8 @@ export interface IModuleRawJSONDataType {
   children: Array<IModuleRawJSONDataType | IItemDefinitionRawJSONDataType>;
   propExtensions?: IPropertyDefinitionRawJSONDataType[];
 }
+
+const MODULE_GQL_POOL = {};
 
 export default class Module {
   /**
@@ -383,6 +394,10 @@ export default class Module {
     return this.searchModeModule;
   }
 
+  public isInSearchMode(): boolean {
+    return !this.searchModeModule;
+  }
+
   /**
    * Just gives the parent module
    */
@@ -440,6 +455,17 @@ export default class Module {
     return MODULE_PREFIX + this.getName();
   }
 
+  public getAbsolutePath(): string[] {
+    if (this.parentModule) {
+      return this.parentModule
+        .getAbsolutePath()
+        .concat([
+          this.getName(),
+        ]);
+    }
+    return [this.getName()];
+  }
+
   public getSQLTableSchemas() {
     let resultSchema = {};
     this.getAllModules().forEach((cModule) => {
@@ -451,6 +477,66 @@ export default class Module {
       resultSchema = {...resultSchema, ...cIdef.getSQLTableSchemas()};
     });
     return resultSchema;
+  }
+
+  public getGQLFieldsDefinition(excludeBase?: boolean, propertiesAsInput?: boolean) {
+    let resultFieldsSchema = excludeBase ? {} : {
+      ...RESERVED_BASE_PROPERTIES,
+    };
+    this.getAllPropExtensions().forEach((propExtension) => {
+      resultFieldsSchema = {
+        ...resultFieldsSchema,
+        ...propExtension.getGQLFieldsDefinition(propertiesAsInput),
+      };
+    });
+    return resultFieldsSchema;
+  }
+
+  public getGQLType() {
+    const name = this.getQualifiedPathName();
+    if (!MODULE_GQL_POOL[name]) {
+      MODULE_GQL_POOL[name] = new GraphQLInterfaceType({
+        name: this.getQualifiedPathName(),
+        fields: this.getGQLFieldsDefinition(),
+      });
+    }
+    return MODULE_GQL_POOL[name];
+  }
+
+  public getGQLQueryFields() {
+    if (this.isInSearchMode()) {
+      throw new Error("Modules in search mode has no graphql queries");
+    }
+    let fields: any = {
+      [PREFIX_SEARCH + this.getQualifiedPathName()]: {
+        type: GraphQLList(this.getGQLType()),
+        args: {
+          ...RESERVED_SEARCH_PROPERTIES,
+          ...this.getSearchModule().getGQLFieldsDefinition(true, true),
+        },
+      },
+    };
+    this.getAllChildItemDefinitions().forEach((cIdef) => {
+      fields = {
+        ...fields,
+        ...cIdef.getGQLQueryFields(),
+      };
+    });
+    return fields;
+  }
+
+  public getGQLMutationFields() {
+    if (this.isInSearchMode()) {
+      throw new Error("Modules in search mode has no graphql mutations");
+    }
+    let fields = {};
+    this.getAllChildItemDefinitions().forEach((cIdef) => {
+      fields = {
+        ...fields,
+        ...cIdef.getGQLMutationFields(),
+      };
+    });
+    return fields;
   }
 }
 
