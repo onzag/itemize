@@ -61,7 +61,7 @@ function yesno(question: string) {
   const root = new Root(data.root);
 
   // let's get the result by progressively building on top of it
-  const result = root.getSQLTableSchemas();
+  const result = root.getSQLTablesSchema();
 
   // make some copies of that result
   const optimal = {...result};

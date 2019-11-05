@@ -9,14 +9,11 @@ import {
   MODULE_PREFIX,
   PREFIXED_CONCAT,
   RESERVED_BASE_PROPERTIES,
-  PREFIX_GET,
   PREFIX_SEARCH,
-  RESERVED_GETTER_PROPERTIES,
   RESERVED_SEARCH_PROPERTIES,
-  SUFFIX_BUILD,
 } from "../constants";
 import { GraphQLInterfaceType, GraphQLList } from "graphql";
-import { IGraphQLResolversType } from "./Root";
+import { IGraphQLResolversType, ISQLSchemaDefinitionType, IGQLFieldsDefinitionType, IGQLQueryFieldsDefinitionType } from "./Root";
 
 export type OnStateChangeListenerType = () => any;
 
@@ -47,8 +44,6 @@ export interface IModuleRawJSONDataType {
   children: Array<IModuleRawJSONDataType | IItemDefinitionRawJSONDataType>;
   propExtensions?: IPropertyDefinitionRawJSONDataType[];
 }
-
-const MODULE_GQL_POOL = {};
 
 export default class Module {
   /**
@@ -138,6 +133,8 @@ export default class Module {
    * inherits
    */
   private propExtensions: PropertyDefinition[];
+
+  private gqlObj: GraphQLInterfaceType;
 
   /**
    * Builds a module from raw json data
@@ -457,6 +454,10 @@ export default class Module {
     return MODULE_PREFIX + this.getName();
   }
 
+  /**
+   * Provides the absolute path of this current module
+   * in its string array of names
+   */
   public getAbsolutePath(): string[] {
     if (this.parentModule) {
       return this.parentModule
@@ -468,21 +469,27 @@ export default class Module {
     return [this.getName()];
   }
 
-  public getSQLTableSchemas() {
+  /**
+   * Provides the SQL table schemas that are contained
+   * within this module, you expect one schema per item definition
+   * it contains
+   */
+  public getSQLTablesSchema(): ISQLSchemaDefinitionType {
+    // this is where it will be contained
     let resultSchema = {};
     this.getAllModules().forEach((cModule) => {
       // first with child modules
-      resultSchema = {...resultSchema, ...cModule.getSQLTableSchemas()};
+      resultSchema = {...resultSchema, ...cModule.getSQLTablesSchema()};
     });
     // then with child item definitions
     this.getAllChildItemDefinitions().forEach((cIdef) => {
-      resultSchema = {...resultSchema, ...cIdef.getSQLTableSchemas()};
+      resultSchema = {...resultSchema, ...cIdef.getSQLTablesSchema()};
     });
     return resultSchema;
   }
 
-  public getGQLFieldsDefinition(excludeBase?: boolean, propertiesAsInput?: boolean) {
-    let resultFieldsSchema = excludeBase ? {} : {
+  public getGQLFieldsDefinition(excludeBase?: boolean, propertiesAsInput?: boolean): IGQLFieldsDefinitionType {
+    let resultFieldsSchema: IGQLFieldsDefinitionType = excludeBase ? {} : {
       ...RESERVED_BASE_PROPERTIES,
     };
     this.getAllPropExtensions().forEach((propExtension) => {
@@ -494,48 +501,51 @@ export default class Module {
     return resultFieldsSchema;
   }
 
-  public getGQLType(instanceId: string) {
-    const name = this.getQualifiedPathName() + SUFFIX_BUILD(instanceId);
-    if (!MODULE_GQL_POOL[name]) {
-      MODULE_GQL_POOL[name] = new GraphQLInterfaceType({
+  public getGQLType(): GraphQLInterfaceType {
+    if (!this.gqlObj) {
+      this.gqlObj = new GraphQLInterfaceType({
         name: this.getQualifiedPathName(),
         fields: this.getGQLFieldsDefinition(),
       });
     }
-    return MODULE_GQL_POOL[name];
+    return this.gqlObj;
   }
 
-  public getGQLQueryFields(instanceId: string, resolvers?: IGraphQLResolversType) {
+  public getGQLQueryFields(resolvers?: IGraphQLResolversType): IGQLQueryFieldsDefinitionType {
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql queries");
     }
-    let fields: any = {
+    let fields: IGQLQueryFieldsDefinitionType = {
       [PREFIX_SEARCH + this.getQualifiedPathName()]: {
-        type: GraphQLList(this.getGQLType(instanceId)),
+        type: GraphQLList(this.getGQLType()),
         args: {
           ...RESERVED_SEARCH_PROPERTIES,
           ...this.getSearchModule().getGQLFieldsDefinition(true, true),
+        },
+        resolve: (source: any, args: any, context: any, info: any) => {
+          // TODO
+          return;
         },
       },
     };
     this.getAllChildItemDefinitions().forEach((cIdef) => {
       fields = {
         ...fields,
-        ...cIdef.getGQLQueryFields(instanceId, resolvers),
+        ...cIdef.getGQLQueryFields(resolvers),
       };
     });
     return fields;
   }
 
-  public getGQLMutationFields(instanceId: string, resolvers?: IGraphQLResolversType) {
+  public getGQLMutationFields(resolvers?: IGraphQLResolversType): IGQLQueryFieldsDefinitionType {
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql mutations");
     }
-    let fields = {};
+    let fields: IGQLQueryFieldsDefinitionType = {};
     this.getAllChildItemDefinitions().forEach((cIdef) => {
       fields = {
         ...fields,
-        ...cIdef.getGQLMutationFields(instanceId, resolvers),
+        ...cIdef.getGQLMutationFields(resolvers),
       };
     });
     return fields;

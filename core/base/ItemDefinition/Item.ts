@@ -12,8 +12,7 @@ import Module, { OnStateChangeListenerType } from "../Module";
 import PropertyDefinition from "./PropertyDefinition";
 import { PREFIX_BUILD, ITEM_PREFIX, EXCLUSION_STATE_SUFFIX, PREFIXED_CONCAT, SUFFIX_BUILD } from "../../constants";
 import { GraphQLString, GraphQLNonNull, GraphQLInputObjectType, GraphQLObjectType } from "graphql";
-
-const ITEM_GQL_POOL = {};
+import { ISQLTableDefinitionType, IGQLFieldsDefinitionType, ISQLTableRowValue, IGQLValue } from "../Root";
 
 export enum ItemExclusionState {
   EXCLUDED = "EXCLUDED",
@@ -115,6 +114,10 @@ export default class Item {
   private stateExclusion: ItemExclusionState;
   private stateExclusionModified: boolean;
 
+  // graphql helper
+  private gqlInObj: any;
+  private gqlOutObj: any;
+
   /**
    * The constructor for an Item
    * @param rawJSON the raw data as JSON
@@ -210,10 +213,10 @@ export default class Item {
    * Provides the table bit that is necessary to store item data
    * for this item when included from the parent definition
    */
-  public getSQLTableDefinition() {
+  public getSQLTableDefinition(): ISQLTableDefinitionType {
     // the esclusion state needs to be stored in the table bit
     const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
-    let resultTableSchema = {
+    let resultTableSchema: ISQLTableDefinitionType = {
       [prefix + EXCLUSION_STATE_SUFFIX]: {
         type: "string",
         notNull: true,
@@ -230,7 +233,7 @@ export default class Item {
     return resultTableSchema;
   }
 
-  public getGQLFieldsDefinition(instanceId: string, propertiesAsInput?: boolean) {
+  public getGQLFieldsDefinition(propertiesAsInput?: boolean): IGQLFieldsDefinitionType {
     // the esclusion state needs to be stored in the schema bit
     let itemFields = {};
     // we need all the sinking properties and those are the
@@ -242,27 +245,23 @@ export default class Item {
       };
     });
 
-    let itemGQLName = PREFIXED_CONCAT(
-      this.itemDefinition.getQualifiedPathName(),
-      ITEM_PREFIX + this.getId(),
-    );
+    if (
+      (propertiesAsInput && !this.gqlInObj) ||
+      (!propertiesAsInput && !this.gqlOutObj)
+    ) {
+      const itemGQLName = PREFIXED_CONCAT(
+        this.itemDefinition.getQualifiedPathName(),
+        ITEM_PREFIX + this.getId(),
+      );
 
-    if (propertiesAsInput) {
-      itemGQLName += "_In";
-    } else {
-      itemGQLName += "_Out";
-    }
-
-    const poolName = itemGQLName + SUFFIX_BUILD(instanceId);
-    if (!ITEM_GQL_POOL[poolName]) {
       if (propertiesAsInput) {
-        ITEM_GQL_POOL[poolName] = new GraphQLInputObjectType({
-          name: itemGQLName,
+        this.gqlInObj = new GraphQLInputObjectType({
+          name: itemGQLName + "_In",
           fields: itemFields,
         });
       } else {
-        ITEM_GQL_POOL[poolName] = new GraphQLObjectType({
-          name: itemGQLName,
+        this.gqlOutObj = new GraphQLObjectType({
+          name: itemGQLName + "_Out",
           fields: itemFields,
         });
       }
@@ -273,12 +272,12 @@ export default class Item {
         type: GraphQLNonNull(GraphQLString),
       },
       [ITEM_PREFIX + this.getId()]: {
-        type: ITEM_GQL_POOL[poolName],
+        type: propertiesAsInput ? this.gqlInObj : this.gqlOutObj,
       },
     };
   }
 
-  public convertSQLValueToGQLValue(row: {[key: string]: any}) {
+  public convertSQLValueToGQLValue(row: ISQLTableRowValue): IGQLValue {
     const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
     let gqlParentResult = {};
     this.getSinkingProperties().forEach((sinkingProperty) => {
@@ -293,10 +292,10 @@ export default class Item {
     };
   }
 
-  public convertGQLValueToSQLValue(data: {[key: string]: any}) {
+  public convertGQLValueToSQLValue(data: IGQLValue): ISQLTableRowValue {
     const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
     const exclusionStateAccordingToGQL = data[prefix + EXCLUSION_STATE_SUFFIX];
-    let sqlResult = {
+    let sqlResult: ISQLTableRowValue = {
       [prefix + EXCLUSION_STATE_SUFFIX]: exclusionStateAccordingToGQL,
     };
 

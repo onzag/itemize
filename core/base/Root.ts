@@ -1,6 +1,7 @@
 import Module, { IModuleRawJSONDataType } from "./Module";
-import { GraphQLSchema, GraphQLObjectType } from "graphql";
+import { GraphQLSchema, GraphQLObjectType, GraphQLOutputType } from "graphql";
 import ItemDefinition from "./ItemDefinition";
+import { any } from "bluebird";
 
 export interface IRootRawJSONDataType {
   type: "root";
@@ -45,6 +46,40 @@ export interface IGraphQLResolversType {
   addItemDefinition: FGraphQLIdefResolverType;
 }
 
+export interface ISQLColumnDefinitionType {
+  type: string;
+  notNull?: boolean;
+}
+
+export interface ISQLTableDefinitionType {
+  [rowName: string]: ISQLColumnDefinitionType;
+}
+
+export interface ISQLSchemaDefinitionType {
+  [tableName: string]: ISQLTableDefinitionType;
+}
+
+export interface IGQLSingleQueryFieldDefinitionType {
+  type: GraphQLOutputType;
+  args: IGQLFieldsDefinitionType;
+  resolve: any;
+}
+export interface IGQLSingleFieldDefinitionType {
+  type: GraphQLOutputType;
+}
+export interface IGQLQueryFieldsDefinitionType {
+  [fieldName: string]: IGQLSingleQueryFieldDefinitionType;
+}
+export interface IGQLFieldsDefinitionType {
+  [fieldName: string]: IGQLSingleFieldDefinitionType;
+}
+export interface ISQLTableRowValue {
+  [columnName: string]: any;
+}
+export interface IGQLValue {
+  [key: string]: any;
+}
+
 export default class Root {
   /**
    * Schema only available in development
@@ -77,12 +112,18 @@ export default class Root {
     return this.rawData.children.map((m) => (new Module(m, null)));
   }
 
-  public getSQLTableSchemas() {
+  /**
+   * Provides the whole schema that is necessary to populate
+   * in order for all the items contained within this root
+   * to function in the database
+   */
+  public getSQLTablesSchema(): ISQLSchemaDefinitionType {
     let resultSchema = {};
     this.getAllModules().forEach((cModule) => {
-      // first with child modules
-      resultSchema = {...resultSchema, ...cModule.getSQLTableSchemas()};
+      // add together the schemas of all the modules
+      resultSchema = {...resultSchema, ...cModule.getSQLTablesSchema()};
     });
+    // return that
     return resultSchema;
   }
 
@@ -107,29 +148,23 @@ export default class Root {
    * Retrieves the whole structure of the current loaded instance
    * of the schema into a valid graphql schema
    * @param resolvers the resolvers that will resolve the GET, SEARCH, ADD, EDIT and REMOVE requests
-   * @param instanceId usually a random unique identifier that will be used to retrieve one specific
-   * graphql instance, while this is a bit annoying the problem is that graphql demands only one
-   * instance per item definition, since we don't want to have a property and we use a pool instead
-   * we then need an instance id to keep track of which instances we use in the schema
    */
-  public getGQLSchema(resolvers?: IGraphQLResolversType, instanceId?: string) {
+  public getGQLSchema(resolvers?: IGraphQLResolversType): GraphQLSchema {
     // the mutation fields for the mutation query
     let mutationFields = {};
     // the query fields for the query
     let queryFields = {};
-    // we get the instance id that we are going to use, if provided, or create one, based on time
-    const givenInstanceId = instanceId ? instanceId : (new Date()).getTime().toString();
 
     // now we get all the modules stored on root
     this.getAllModules().forEach((mod) => {
       // and per module we extend the query and mutation fields
       queryFields = {
         ...queryFields,
-        ...mod.getGQLQueryFields(givenInstanceId, resolvers),
+        ...mod.getGQLQueryFields(resolvers),
       };
       mutationFields = {
         ...mutationFields,
-        ...mod.getGQLMutationFields(givenInstanceId, resolvers),
+        ...mod.getGQLMutationFields(resolvers),
       };
     });
 

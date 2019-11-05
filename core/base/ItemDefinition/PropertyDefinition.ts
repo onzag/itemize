@@ -34,7 +34,9 @@ import {
   GraphQLList,
   GraphQLInputObjectType,
   GraphQLObjectType,
+  GraphQLOutputType,
 } from "graphql";
+import { ISQLTableDefinitionType, IGQLFieldsDefinitionType, ISQLTableRowValue, IGQLValue } from "../Root";
 
 const PROPERTY_TYPE_GQL_POOL = {};
 
@@ -126,8 +128,8 @@ export interface IPropertyDefinitionSupportedType {
   supportedSubtypes?: string[];
 
   // graphql type
-  gql: GraphQLNullableType | string;
-  gqlFields?: {[key: string]: {type: GraphQLNullableType}};
+  gql: GraphQLOutputType | string;
+  gqlFields?: IGQLFieldsDefinitionType;
   // sql definition, either a string for knex supported types
   // or a function where the id is the id is a property id
   // this represents how tables are populated and data is stored
@@ -140,7 +142,7 @@ export interface IPropertyDefinitionSupportedType {
   // to whatever is given, however if you have a complex value you should
   // set this, the raw function is the raw knex function, that allows to build raw queries,
   // by default if not set this function just sets {property_id: value}
-  sqlIn?: (value: PropertyDefinitionSupportedType, id: string, raw: (...args: any[]) => any) => {[key: string]: any};
+  sqlIn?: (value: PropertyDefinitionSupportedType, id: string, raw: (...args: any[]) => any) => ISQLTableRowValue;
   // sqlOut basically gives the entire table as data, and the property id where it expects
   // retrieval of that data; by default this function takes the table and does
   // data[property_id]
@@ -1729,7 +1731,7 @@ export default class PropertyDefinition {
    * used to prefix item specific properties that are sinked in from
    * the parent in the item
    */
-  public getSQLTableDefinition(prefix?: string) {
+  public getSQLTableDefinition(prefix?: string): ISQLTableDefinitionType {
     const resultTableSchema = {};
     const actualPrefix = prefix ? prefix : "";
     // get the sql def based on the property definition
@@ -1759,9 +1761,9 @@ export default class PropertyDefinition {
    * this property alone, that is a schema bit
    * @param propertiesAsInput if the property should be as an input object, for use within args
    */
-  public getGQLFieldsDefinition(propertiesAsInput?: boolean) {
+  public getGQLFieldsDefinition(propertiesAsInput?: boolean): IGQLFieldsDefinitionType {
     // These are the resulting fields as we will store them here
-    const resultFieldsSchema = {};
+    const resultFieldsSchema: IGQLFieldsDefinitionType = {};
     // we need the description of this property type, to get some general info
     const propertyDescription = this.getPropertyDefinitionDescription();
     // now we extract the gql defintiion, this is a graphql type, or a string,
@@ -1810,7 +1812,7 @@ export default class PropertyDefinition {
     return resultFieldsSchema;
   }
 
-  public convertSQLValueToGQLValue(row: {[key: string]: any}, prefix?: string) {
+  public convertSQLValueToGQLValue(row: ISQLTableRowValue, prefix?: string): IGQLValue {
     const actualPrefix = prefix ? prefix : "";
     const rowName = actualPrefix + this.getId();
     const sqlOut = this.getPropertyDefinitionDescription().sqlOut;
@@ -1825,7 +1827,7 @@ export default class PropertyDefinition {
     };
   }
 
-  public convertGQLValueToSQLValue(data: {[key: string]: any}, prefix?: string) {
+  public convertGQLValueToSQLValue(data: IGQLValue, prefix?: string): ISQLTableRowValue {
     // TODO validation of the value, otherwise invalid values can be manually set,
     // there should be also an overall validation by converting the whole value into
     // a standard value and then validating against that

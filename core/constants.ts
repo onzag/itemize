@@ -1,4 +1,5 @@
 import { GraphQLID, GraphQLNonNull, GraphQLString, GraphQLInt } from "graphql";
+import { ISQLTableDefinitionType, IGQLFieldsDefinitionType } from "./base/Root";
 
 // DATA ATTRIBUTES
 
@@ -172,7 +173,7 @@ export const LOCATION_SEARCH_I18N = [
 ];
 
 // INVALID RESERVED PROPERTY NAMES
-export const RESERVED_BASE_PROPERTIES = {
+export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   id: {
     type: GraphQLNonNull(GraphQLID),
   },
@@ -207,7 +208,7 @@ export const RESERVED_BASE_PROPERTIES = {
     type: GraphQLID,
   },
 };
-export const RESERVED_BASE_PROPERTIES_SQL = {
+export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   id: {
     type: "serial",
   },

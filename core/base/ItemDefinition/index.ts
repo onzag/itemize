@@ -19,10 +19,16 @@ import {
   SUFFIX_BUILD,
   RESERVED_BASE_PROPERTIES,
 } from "../../constants";
-import { GraphQLObjectType, GraphQLList } from "graphql";
-import { IGraphQLResolversType } from "../Root";
-
-const IDEF_GQL_POOL = {};
+import { GraphQLObjectType, GraphQLList, GraphQLOutputType } from "graphql";
+import {
+  IGraphQLResolversType,
+  ISQLTableDefinitionType,
+  ISQLSchemaDefinitionType,
+  IGQLFieldsDefinitionType,
+  IGQLQueryFieldsDefinitionType,
+  ISQLTableRowValue,
+  IGQLValue,
+} from "../Root";
 
 export interface IItemDefinitionRawJSONDataType {
   // Builder data
@@ -165,7 +171,7 @@ export default class ItemDefinition {
   private parentItemDefinition: ItemDefinition;
 
   // Functions for graphql
-  private gqlObj: any;
+  private gqlObj: GraphQLOutputType;
 
   constructor(
     rawJSON: IItemDefinitionRawJSONDataType,
@@ -541,6 +547,11 @@ export default class ItemDefinition {
     };
   }
 
+  /**
+   * Applies an item definition value the state of this
+   * instance
+   * @param value the value, be careful, it will choke if invalid
+   */
   public applyValue(value: IItemDefinitionValue) {
     if (value.itemDefPath.join("/") !== this.getPath().join("/")) {
       throw new Error("Attempted to apply unmatching values");
@@ -555,12 +566,20 @@ export default class ItemDefinition {
     });
   }
 
+  /**
+   * Provides the item definition that represent the search mode of this
+   * same item definition
+   */
   public getSearchModeCounterpart(): ItemDefinition {
     return this.parentModule.getSearchModule().getItemDefinitionFor(
       this.getModulePath(),
     );
   }
 
+  /**
+   * Tells whether this item is the search mode item of another
+   * item
+   */
   public isInSearchMode(): boolean {
     return this.parentModule.isInSearchMode();
   }
@@ -571,9 +590,9 @@ export default class ItemDefinition {
    * be saved when populated, it basically adds up all the table bits
    * from all the properties and all the items
    */
-  public getSQLTableDefinition() {
+  public getSQLTableDefinition(): ISQLTableDefinitionType {
     // add all the standard fields
-    let resultTableSchema = {...RESERVED_BASE_PROPERTIES_SQL};
+    let resultTableSchema: ISQLTableDefinitionType = {...RESERVED_BASE_PROPERTIES_SQL};
 
     // now we loop thru every property (they will all become columns)
     this.getAllPropertyDefinitions().forEach((pd) => {
@@ -589,25 +608,25 @@ export default class ItemDefinition {
   }
 
   /**
-   * Provides all the schemas of all the items, self and its children
+   * Provides all the schema of all the items, self and its children
    * that are included within this item definition and all the table names
    * that should be used using the qualified name
    */
-  public getSQLTableSchemas() {
+  public getSQLTablesSchema(): ISQLSchemaDefinitionType {
     // we add self
     let result = {
       [this.getQualifiedPathName()]: this.getSQLTableDefinition(),
     };
     // loop over the children and add each one of them and whatever they have
     this.getChildDefinitions().forEach((cIdef) => {
-      result = {...result, ...cIdef.getSQLTableSchemas()};
+      result = {...result, ...cIdef.getSQLTablesSchema()};
     });
     // return that
     return result;
   }
 
-  public getGQLFieldsDefinition(instanceId: string, propertiesAsInput?: boolean) {
-    let fieldsResult = {};
+  public getGQLFieldsDefinition(propertiesAsInput?: boolean): IGQLFieldsDefinitionType {
+    let fieldsResult: IGQLFieldsDefinitionType = {};
     this.getAllPropertyDefinitions().forEach((pd) => {
       fieldsResult = {
         ...fieldsResult,
@@ -617,38 +636,37 @@ export default class ItemDefinition {
     this.getAllItems().forEach((i) => {
       fieldsResult = {
         ...fieldsResult,
-        ...i.getGQLFieldsDefinition(instanceId, propertiesAsInput),
+        ...i.getGQLFieldsDefinition(propertiesAsInput),
       };
     });
     return fieldsResult;
   }
 
-  public getGQLType(instanceId: string) {
-    const name = this.getQualifiedPathName() + SUFFIX_BUILD(instanceId);
-    if (!IDEF_GQL_POOL[name]) {
-      const itemSelfFields = this.getGQLFieldsDefinition(instanceId);
-      const fields = {
+  public getGQLType(): GraphQLOutputType {
+    if (!this.gqlObj) {
+      const itemSelfFields = this.getGQLFieldsDefinition();
+      const fields: IGQLFieldsDefinitionType = {
         // Graphql Inheritance has to be explicitly set for some reason
         ...this.parentModule.getGQLFieldsDefinition(),
         ...itemSelfFields,
       };
-      IDEF_GQL_POOL[name] = new GraphQLObjectType({
+      this.gqlObj = new GraphQLObjectType({
         name: this.getQualifiedPathName(),
         fields,
-        interfaces: [this.parentModule.getGQLType(instanceId)],
+        interfaces: [this.parentModule.getGQLType()],
       });
     }
-    return IDEF_GQL_POOL[name];
+    return this.gqlObj;
   }
 
-  public getGQLQueryFields(instanceId: string, resolvers?: IGraphQLResolversType) {
+  public getGQLQueryFields(resolvers?: IGraphQLResolversType): IGQLQueryFieldsDefinitionType {
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql queries");
     }
     const searchModeCounterpart = this.getSearchModeCounterpart();
-    let fields = {
+    let fields: IGQLQueryFieldsDefinitionType = {
       [PREFIX_GET + this.getQualifiedPathName()]: {
-        type: this.getGQLType(instanceId),
+        type: this.getGQLType(),
         args: {
           ...RESERVED_GETTER_PROPERTIES,
         },
@@ -664,25 +682,29 @@ export default class ItemDefinition {
         },
       },
       [PREFIX_SEARCH + this.getQualifiedPathName()]: {
-        type: GraphQLList(this.getGQLType(instanceId)),
+        type: GraphQLList(this.getGQLType()),
         args: {
           ...RESERVED_SEARCH_PROPERTIES,
           ...searchModeCounterpart.getParentModule().getGQLFieldsDefinition(true, true),
-          ...searchModeCounterpart.getGQLFieldsDefinition(instanceId, true),
+          ...searchModeCounterpart.getGQLFieldsDefinition(true),
+        },
+        resolve: (source: any, args: any, context: any, info: any) => {
+          // TODO
+          return;
         },
       },
     };
     this.getChildDefinitions().forEach((cIdef) => {
       fields = {
         ...fields,
-        ...cIdef.getGQLQueryFields(instanceId),
+        ...cIdef.getGQLQueryFields(),
       };
     });
     return fields;
   }
 
-  public convertSQLValueToGQLValue(row: {[key: string]: any}) {
-    let result = {};
+  public convertSQLValueToGQLValue(row: ISQLTableRowValue): IGQLValue {
+    let result: IGQLValue = {};
     Object.keys(RESERVED_BASE_PROPERTIES).forEach((basePropertyKey) => {
       result[basePropertyKey] = row[basePropertyKey] || null;
     });
@@ -696,8 +718,8 @@ export default class ItemDefinition {
     return result;
   }
 
-  public convertGQLValueToSQLValue(data: {[key: string]: any}) {
-    let result = {};
+  public convertGQLValueToSQLValue(data: IGQLValue): ISQLTableRowValue {
+    let result: ISQLTableRowValue = {};
     this.getAllPropertyDefinitions().forEach((pd) => {
       result = {...result, ...pd.convertGQLValueToSQLValue(data)};
     });
@@ -707,17 +729,17 @@ export default class ItemDefinition {
     return result;
   }
 
-  public getGQLMutationFields(instanceId: string, resolvers?: IGraphQLResolversType) {
+  public getGQLMutationFields(resolvers?: IGraphQLResolversType): IGQLQueryFieldsDefinitionType {
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql mutations");
     }
-    let fields = {
+    let fields: IGQLQueryFieldsDefinitionType = {
       [PREFIX_ADD + this.getQualifiedPathName()]: {
-        type: this.getGQLType(instanceId),
+        type: this.getGQLType(),
         args: {
           ...RESERVED_ADD_PROPERTIES,
           ...this.parentModule.getGQLFieldsDefinition(true, true),
-          ...this.getGQLFieldsDefinition(instanceId, true),
+          ...this.getGQLFieldsDefinition(true),
         },
         resolve: (source: any, args: any, context: any, info: any) => {
           if (resolvers) {
@@ -731,22 +753,30 @@ export default class ItemDefinition {
         },
       },
       [PREFIX_EDIT + this.getQualifiedPathName()]: {
-        type: this.getGQLType(instanceId),
+        type: this.getGQLType(),
         args: {
           ...RESERVED_GETTER_PROPERTIES,
           ...this.parentModule.getGQLFieldsDefinition(true, true),
-          ...this.getGQLFieldsDefinition(instanceId, true),
+          ...this.getGQLFieldsDefinition(true),
+        },
+        resolve: (source: any, args: any, context: any, info: any) => {
+          // TODO
+          return;
         },
       },
       [PREFIX_DELETE + this.getQualifiedPathName()]: {
-        type: this.getGQLType(instanceId),
+        type: this.getGQLType(),
         args: RESERVED_GETTER_PROPERTIES,
+        resolve: (source: any, args: any, context: any, info: any) => {
+          // TODO
+          return;
+        },
       },
     };
     this.getChildDefinitions().forEach((cIdef) => {
       fields = {
         ...fields,
-        ...cIdef.getGQLMutationFields(instanceId),
+        ...cIdef.getGQLMutationFields(),
       };
     });
     return fields;
