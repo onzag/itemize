@@ -17,6 +17,7 @@ import {
   RESERVED_ADD_PROPERTIES,
   RESERVED_SEARCH_PROPERTIES,
   SUFFIX_BUILD,
+  RESERVED_BASE_PROPERTIES,
 } from "../../constants";
 import { GraphQLObjectType, GraphQLList } from "graphql";
 import { IGraphQLResolversType } from "../Root";
@@ -162,6 +163,9 @@ export default class ItemDefinition {
   private propertyDefinitions: PropertyDefinition[];
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
+
+  // Functions for graphql
+  private gqlObj: any;
 
   constructor(
     rawJSON: IItemDefinitionRawJSONDataType,
@@ -602,7 +606,7 @@ export default class ItemDefinition {
     return result;
   }
 
-  public getGQLFieldsDefinition(propertiesAsInput?: boolean) {
+  public getGQLFieldsDefinition(instanceId: string, propertiesAsInput?: boolean) {
     let fieldsResult = {};
     this.getAllPropertyDefinitions().forEach((pd) => {
       fieldsResult = {
@@ -613,7 +617,7 @@ export default class ItemDefinition {
     this.getAllItems().forEach((i) => {
       fieldsResult = {
         ...fieldsResult,
-        ...i.getGQLFieldsDefinition(propertiesAsInput),
+        ...i.getGQLFieldsDefinition(instanceId, propertiesAsInput),
       };
     });
     return fieldsResult;
@@ -622,13 +626,15 @@ export default class ItemDefinition {
   public getGQLType(instanceId: string) {
     const name = this.getQualifiedPathName() + SUFFIX_BUILD(instanceId);
     if (!IDEF_GQL_POOL[name]) {
+      const itemSelfFields = this.getGQLFieldsDefinition(instanceId);
+      const fields = {
+        // Graphql Inheritance has to be explicitly set for some reason
+        ...this.parentModule.getGQLFieldsDefinition(),
+        ...itemSelfFields,
+      };
       IDEF_GQL_POOL[name] = new GraphQLObjectType({
         name: this.getQualifiedPathName(),
-        fields: {
-          // Graphql Inheritance has to be explicitly set for some reason
-          ...this.parentModule.getGQLFieldsDefinition(),
-          ...this.getGQLFieldsDefinition(),
-        },
+        fields,
         interfaces: [this.parentModule.getGQLType(instanceId)],
       });
     }
@@ -662,7 +668,7 @@ export default class ItemDefinition {
         args: {
           ...RESERVED_SEARCH_PROPERTIES,
           ...searchModeCounterpart.getParentModule().getGQLFieldsDefinition(true, true),
-          ...searchModeCounterpart.getGQLFieldsDefinition(true),
+          ...searchModeCounterpart.getGQLFieldsDefinition(instanceId, true),
         },
       },
     };
@@ -675,6 +681,32 @@ export default class ItemDefinition {
     return fields;
   }
 
+  public convertSQLValueToGQLValue(row: {[key: string]: any}) {
+    let result = {};
+    Object.keys(RESERVED_BASE_PROPERTIES).forEach((basePropertyKey) => {
+      result[basePropertyKey] = row[basePropertyKey] || null;
+    });
+    this.getAllPropertyDefinitions().forEach((pd) => {
+      result = {...result, ...pd.convertSQLValueToGQLValue(row)};
+    });
+    this.getAllItems().forEach((item) => {
+      result = {...result, ...item.convertSQLValueToGQLValue(row)};
+    });
+    console.log(result);
+    return result;
+  }
+
+  public convertGQLValueToSQLValue(data: {[key: string]: any}) {
+    let result = {};
+    this.getAllPropertyDefinitions().forEach((pd) => {
+      result = {...result, ...pd.convertGQLValueToSQLValue(data)};
+    });
+    this.getAllItems().forEach((item) => {
+      result = {...result, ...item.convertGQLValueToSQLValue(data)};
+    });
+    return result;
+  }
+
   public getGQLMutationFields(instanceId: string, resolvers?: IGraphQLResolversType) {
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql mutations");
@@ -685,7 +717,17 @@ export default class ItemDefinition {
         args: {
           ...RESERVED_ADD_PROPERTIES,
           ...this.parentModule.getGQLFieldsDefinition(true, true),
-          ...this.getGQLFieldsDefinition(true),
+          ...this.getGQLFieldsDefinition(instanceId, true),
+        },
+        resolve: (source: any, args: any, context: any, info: any) => {
+          if (resolvers) {
+            return resolvers.addItemDefinition({
+              source,
+              args,
+              context,
+              info,
+            }, this);
+          }
         },
       },
       [PREFIX_EDIT + this.getQualifiedPathName()]: {
@@ -693,7 +735,7 @@ export default class ItemDefinition {
         args: {
           ...RESERVED_GETTER_PROPERTIES,
           ...this.parentModule.getGQLFieldsDefinition(true, true),
-          ...this.getGQLFieldsDefinition(true),
+          ...this.getGQLFieldsDefinition(instanceId, true),
         },
       },
       [PREFIX_DELETE + this.getQualifiedPathName()]: {

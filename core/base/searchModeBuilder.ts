@@ -83,9 +83,6 @@ function buildSearchModeItemDefinition(
   const newItemDef = {...rawData};
   // create a known property map array using the prop extensions as base
   const knownPropMap = {...modulePropExtensions};
-  // delete anything imported
-  // TODO check why we do this, I removed it
-  // delete newItemDef.importedChildDefinitions;
 
   // close the i18nData from the item definition
   newItemDef.i18nData = {...newItemDef.i18nData};

@@ -6,7 +6,7 @@ import ReactQuill from "react-quill/dist/react-quill.min.js";
 import equals from "deep-equal";
 import Toolbar from "@material-ui/core/Toolbar";
 import uuid from "uuid";
-import { Ii18NType } from "../../..";
+import { Ii18NType } from "../../../../../base/Root";
 
 import "react-quill/dist/quill.core.css";
 import "../../../../theme/quill.scss";

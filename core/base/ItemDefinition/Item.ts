@@ -10,8 +10,10 @@ import ConditionalRuleSet, {
 } from "./ConditionalRuleSet";
 import Module, { OnStateChangeListenerType } from "../Module";
 import PropertyDefinition from "./PropertyDefinition";
-import { PREFIX_BUILD, ITEM_PREFIX, EXCLUSION_STATE_SUFFIX } from "../../constants";
-import { GraphQLString, GraphQLNonNull } from "graphql";
+import { PREFIX_BUILD, ITEM_PREFIX, EXCLUSION_STATE_SUFFIX, PREFIXED_CONCAT, SUFFIX_BUILD } from "../../constants";
+import { GraphQLString, GraphQLNonNull, GraphQLInputObjectType, GraphQLObjectType } from "graphql";
+
+const ITEM_GQL_POOL = {};
 
 export enum ItemExclusionState {
   EXCLUDED = "EXCLUDED",
@@ -228,23 +230,85 @@ export default class Item {
     return resultTableSchema;
   }
 
-  public getGQLFieldsDefinition(propertiesAsInput?: boolean) {
+  public getGQLFieldsDefinition(instanceId: string, propertiesAsInput?: boolean) {
     // the esclusion state needs to be stored in the schema bit
-    const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
-    let fieldsResult = {
-      [prefix + EXCLUSION_STATE_SUFFIX]: {
-        type: GraphQLNonNull(GraphQLString),
-      },
-    };
+    let itemFields = {};
     // we need all the sinking properties and those are the
     // ones added to the schema bit
     this.getSinkingProperties().forEach((sinkingProperty) => {
-      fieldsResult = {
-        ...fieldsResult,
-        ...sinkingProperty.getGQLFieldsDefinition(propertiesAsInput, prefix),
+      itemFields = {
+        ...itemFields,
+        ...sinkingProperty.getGQLFieldsDefinition(propertiesAsInput),
       };
     });
-    return fieldsResult;
+
+    let itemGQLName = PREFIXED_CONCAT(
+      this.itemDefinition.getQualifiedPathName(),
+      ITEM_PREFIX + this.getId(),
+    );
+
+    if (propertiesAsInput) {
+      itemGQLName += "_In";
+    } else {
+      itemGQLName += "_Out";
+    }
+
+    const poolName = itemGQLName + SUFFIX_BUILD(instanceId);
+    if (!ITEM_GQL_POOL[poolName]) {
+      if (propertiesAsInput) {
+        ITEM_GQL_POOL[poolName] = new GraphQLInputObjectType({
+          name: itemGQLName,
+          fields: itemFields,
+        });
+      } else {
+        ITEM_GQL_POOL[poolName] = new GraphQLObjectType({
+          name: itemGQLName,
+          fields: itemFields,
+        });
+      }
+    }
+
+    return {
+      [PREFIX_BUILD(ITEM_PREFIX + this.getId()) + EXCLUSION_STATE_SUFFIX]: {
+        type: GraphQLNonNull(GraphQLString),
+      },
+      [ITEM_PREFIX + this.getId()]: {
+        type: ITEM_GQL_POOL[poolName],
+      },
+    };
+  }
+
+  public convertSQLValueToGQLValue(row: {[key: string]: any}) {
+    const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
+    let gqlParentResult = {};
+    this.getSinkingProperties().forEach((sinkingProperty) => {
+      gqlParentResult = {
+        ...gqlParentResult,
+        ...sinkingProperty.convertSQLValueToGQLValue(row, prefix),
+      };
+    });
+    return {
+      [PREFIX_BUILD(ITEM_PREFIX + this.getId()) + EXCLUSION_STATE_SUFFIX]: row[prefix + EXCLUSION_STATE_SUFFIX],
+      [ITEM_PREFIX + this.getId()]: gqlParentResult,
+    };
+  }
+
+  public convertGQLValueToSQLValue(data: {[key: string]: any}) {
+    const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
+    const exclusionStateAccordingToGQL = data[prefix + EXCLUSION_STATE_SUFFIX];
+    let sqlResult = {
+      [prefix + EXCLUSION_STATE_SUFFIX]: exclusionStateAccordingToGQL,
+    };
+
+    if (exclusionStateAccordingToGQL !== ItemExclusionState.EXCLUDED) {
+      this.getSinkingProperties().forEach((sinkingProperty) => {
+        sqlResult = {
+          ...sqlResult,
+          ...sinkingProperty.convertGQLValueToSQLValue(data[ITEM_PREFIX + this.getId()], prefix),
+        };
+      });
+    }
+    return sqlResult;
   }
 
   /**

@@ -140,7 +140,7 @@ export interface IPropertyDefinitionSupportedType {
   // to whatever is given, however if you have a complex value you should
   // set this, the raw function is the raw knex function, that allows to build raw queries,
   // by default if not set this function just sets {property_id: value}
-  sqlIn?: (value: PropertyDefinitionSupportedType, id: string, raw?: (...args: any[]) => any) => {[key: string]: any};
+  sqlIn?: (value: PropertyDefinitionSupportedType, id: string, raw: (...args: any[]) => any) => {[key: string]: any};
   // sqlOut basically gives the entire table as data, and the property id where it expects
   // retrieval of that data; by default this function takes the table and does
   // data[property_id]
@@ -773,7 +773,6 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
         type: "boolean",
       },
     ],
-    // TODO this probably needs to be better
     sql: (id: string) => {
       const obj = {};
       obj[id + "_GEO"] = "GEOGRAPHY(Point)";
@@ -1574,76 +1573,135 @@ export default class PropertyDefinition {
     return PropertyDefinition.supportedTypesStandard[this.getType()];
   }
 
+  /**
+   * Tells whether the current property is nullable
+   */
   public isNullable() {
     return this.rawData.nullable;
   }
 
+  /**
+   * Tells whether the current property is defined as being hidden
+   */
   public isHidden() {
     return this.rawData.hidden;
   }
 
+  /**
+   * provides the current property rarity
+   */
   public getRarity() {
     return this.rawData.rarity || "standard";
   }
 
+  /**
+   * Checks whether the property can be retrieved
+   */
   public isRetrievalDisabled() {
     return this.rawData.disableRetrieval || false;
   }
 
+  /**
+   * Checks whether the property can be range searched
+   */
   public isRangedSearchDisabled() {
     return this.rawData.disableRangedSearch || false;
   }
 
+  /**
+   * Provides the search level of the property as it was defined
+   */
   public getSearchLevel(): PropertyDefinitionSearchLevelsType {
     return this.rawData.searchLevel || "always";
   }
 
+  /**
+   * Checks whether the property has specific defined valid values
+   */
   public hasSpecificValidValues() {
     return !!this.rawData.values;
   }
 
+  /**
+   * Provides the specific valid values of the given property
+   */
   public getSpecificValidValues() {
     return this.rawData.values;
   }
 
+  /**
+   * Checks whether the property is defined as autocomplete
+   */
   public hasAutocomplete() {
     return !!this.rawData.autocomplete;
   }
 
+  /**
+   * Checks whether the property autocomplete is enforced
+   */
   public isAutocompleteEnforced() {
     return !!this.rawData.autocompleteIsEnforced;
   }
 
+  /**
+   * Checks whether the property autocomplete supports locale
+   */
   public isAutocompleteLocalized() {
     return !!this.rawData.autocompleteSupportsLocale;
   }
 
+  /**
+   * Provides the html level as defined as autocomplete="" in the html tag
+   * attribute, this is mainly for usability
+   */
   public getHTMLAutocomplete() {
     return this.rawData.htmlAutocomplete || null;
   }
 
+  /**
+   * Provides the subtype of the property, if available
+   */
   public getSubtype() {
     return this.rawData.subtype || null;
   }
 
+  /**
+   * Check whether the type is text, and if it's a rich text type
+   */
   public isRichText() {
     return this.rawData.type === "text" && this.rawData.subtype === "html";
   }
 
+  /**
+   * Provides the max length as defined, or null if not available
+   */
   public getMaxLength() {
     return typeof this.rawData.maxLength !== "undefined" ?
       this.rawData.maxLength : null;
   }
 
+  /**
+   * Provides the min length as defined or null if not available
+   */
   public getMinLength() {
     return typeof this.rawData.minLength !== "undefined" ?
       this.rawData.minLength : null;
   }
 
+  /**
+   * Provides the max decimal count as defined, does not provide
+   * the limits as they are defined in the constant, returns null
+   * simply if it's not defined
+   */
   public getMaxDecimalCount() {
     return this.rawData.maxDecimalCount || null;
   }
 
+  /**
+   * Provides the min decimal count as defined, does not provide
+   * the limits as they are defined in the constant, returns null
+   * simply if it's not defined
+   */
   public getMinDecimalCount() {
     if (this.getType() === "currency") {
       return null;
@@ -1651,6 +1709,11 @@ export default class PropertyDefinition {
     return this.rawData.minDecimalCount || 0;
   }
 
+  /**
+   * Provides the value of a special property if it's available
+   * they can only be of type, boolean, string, or number
+   * @param name the name of that specifial property
+   */
   public getSpecialProperty(name: string) {
     if (!this.rawData.specialProperties) {
       return null;
@@ -1695,17 +1758,23 @@ export default class PropertyDefinition {
    * Provides all the schema bit that is necessary to include or query
    * this property alone, that is a schema bit
    * @param propertiesAsInput if the property should be as an input object, for use within args
-   * @param prefix a prefix to prefix the schema arguments names, this is
-   * used to prefix item specific properties that are sinked in from
-   * the parent in the item
    */
-  public getGQLFieldsDefinition(propertiesAsInput?: boolean, prefix?: string) {
+  public getGQLFieldsDefinition(propertiesAsInput?: boolean) {
+    // These are the resulting fields as we will store them here
     const resultFieldsSchema = {};
-    const actualPrefix = prefix ? prefix : "";
+    // we need the description of this property type, to get some general info
     const propertyDescription = this.getPropertyDefinitionDescription();
+    // now we extract the gql defintiion, this is a graphql type, or a string,
+    // in case there's no standard graphql type available
     const gqlDef = propertyDescription.gql;
+
+    // now we need to get the resulting definition based on that graphql result
     let gqlResult;
+    // if we get a string, meaning it's a complex type, or a graphql object
+    // we need to extract its fields
     if (typeof gqlDef === "string") {
+      // so the name is going to depend on whether it's going to be
+      // an input or output type, we do this by attaching in or out
       let defName = gqlDef;
       if (propertiesAsInput) {
         defName += "_In";
@@ -1713,6 +1782,8 @@ export default class PropertyDefinition {
         defName += "_Out";
       }
 
+      // now we have to use the pool, since property types are constant
+      // and the graphql schema only allows for a single definition once
       if (!PROPERTY_TYPE_GQL_POOL[defName]) {
         const payload = {
           name: defName,
@@ -1733,10 +1804,41 @@ export default class PropertyDefinition {
       gqlResult = GraphQLNonNull(gqlResult);
     }
 
-    resultFieldsSchema[actualPrefix + this.getId()] = {
+    resultFieldsSchema[this.getId()] = {
       type: gqlResult,
     };
     return resultFieldsSchema;
+  }
+
+  public convertSQLValueToGQLValue(row: {[key: string]: any}, prefix?: string) {
+    const actualPrefix = prefix ? prefix : "";
+    const rowName = actualPrefix + this.getId();
+    const sqlOut = this.getPropertyDefinitionDescription().sqlOut;
+    let rowValue;
+    if (!sqlOut) {
+      rowValue = row[rowName];
+    } else {
+      rowValue = sqlOut(row, rowName);
+    }
+    return {
+      [this.getId()]: rowValue,
+    };
+  }
+
+  public convertGQLValueToSQLValue(data: {[key: string]: any}, prefix?: string) {
+    // TODO validation of the value, otherwise invalid values can be manually set,
+    // there should be also an overall validation by converting the whole value into
+    // a standard value and then validating against that
+    const actualPrefix = prefix ? prefix : "";
+    const dataKey = actualPrefix + this.getId();
+    const sqlIn = this.getPropertyDefinitionDescription().sqlIn;
+    if (!sqlIn) {
+      return {
+        [dataKey]: data[this.getId()],
+      };
+    }
+    // TODO add knex raw
+    return sqlIn(data[dataKey], dataKey, null);
   }
 
   public getIcon() {

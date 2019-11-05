@@ -185,6 +185,12 @@ export const RESERVED_BASE_PROPERTIES = {
   created_by: {
     type: GraphQLNonNull(GraphQLID),
   },
+  locale: {
+    type: GraphQLNonNull(GraphQLString),
+  },
+  fts_language: {
+    type: GraphQLNonNull(GraphQLString),
+  },
   edited_at: {
     type: GraphQLString,
   },
@@ -199,12 +205,6 @@ export const RESERVED_BASE_PROPERTIES = {
   },
   deleted_by: {
     type: GraphQLID,
-  },
-  locale: {
-    type: GraphQLString,
-  },
-  fts_language: {
-    type: GraphQLString,
   },
 };
 export const RESERVED_BASE_PROPERTIES_SQL = {
@@ -223,6 +223,14 @@ export const RESERVED_BASE_PROPERTIES_SQL = {
     type: "integer",
     notNull: true,
   },
+  locale: {
+    type: "string",
+    notNull: true,
+  },
+  fts_language: {
+    type: "string",
+    notNull: true,
+  },
   edited_at: {
     type: "datetime",
   },
@@ -237,12 +245,6 @@ export const RESERVED_BASE_PROPERTIES_SQL = {
   },
   deleted_by: {
     type: "integer",
-  },
-  locale: {
-    type: "string",
-  },
-  fts_language: {
-    type: "string",
   },
 };
 export const PREFIX_BUILD = (s: string) => s + "_";

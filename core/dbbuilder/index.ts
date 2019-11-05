@@ -71,6 +71,7 @@ function yesno(question: string) {
   // this function will modify actual and actualIgnoreErrors
   // for the actual executed functions
   await buildFromData(knex, migrationConfig, actual, actualIgnoreErrors);
+  knex.destroy();
 
   // write the resulting actual
   await fsAsync.writeFile(
@@ -177,6 +178,7 @@ async function buildFromData(
         // we try to execute it
         try {
           console.log(createQuery.toString());
+          await createQuery;
         } catch (err) {
           showErrorStackAndLogMessage(err);
           // we delete from the new one, modify it

@@ -28,18 +28,21 @@ export interface IRawJSONBuildDataType {
   i18n: Ii18NType;
 }
 
-export type FGraphQLIdefGetResolverType = (
-  resolverArgs: {
-    source: any,
-    args: any,
-    context: any,
-    info: any,
-  },
+interface IGraphQLIdefResolverArgs {
+  source: any;
+  args: any;
+  context: any;
+  info: any;
+}
+
+export type FGraphQLIdefResolverType = (
+  resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) => any;
 
 export interface IGraphQLResolversType {
-  getItemDefinition: FGraphQLIdefGetResolverType;
+  getItemDefinition: FGraphQLIdefResolverType;
+  addItemDefinition: FGraphQLIdefResolverType;
 }
 
 export default class Root {
@@ -100,12 +103,26 @@ export default class Root {
     );
   }
 
+  /**
+   * Retrieves the whole structure of the current loaded instance
+   * of the schema into a valid graphql schema
+   * @param resolvers the resolvers that will resolve the GET, SEARCH, ADD, EDIT and REMOVE requests
+   * @param instanceId usually a random unique identifier that will be used to retrieve one specific
+   * graphql instance, while this is a bit annoying the problem is that graphql demands only one
+   * instance per item definition, since we don't want to have a property and we use a pool instead
+   * we then need an instance id to keep track of which instances we use in the schema
+   */
   public getGQLSchema(resolvers?: IGraphQLResolversType, instanceId?: string) {
+    // the mutation fields for the mutation query
     let mutationFields = {};
+    // the query fields for the query
     let queryFields = {};
+    // we get the instance id that we are going to use, if provided, or create one, based on time
     const givenInstanceId = instanceId ? instanceId : (new Date()).getTime().toString();
 
+    // now we get all the modules stored on root
     this.getAllModules().forEach((mod) => {
+      // and per module we extend the query and mutation fields
       queryFields = {
         ...queryFields,
         ...mod.getGQLQueryFields(givenInstanceId, resolvers),
@@ -116,16 +133,19 @@ export default class Root {
       };
     });
 
+    // now we create those queries who happen to be object types
     const query = new GraphQLObjectType({
       name: "ROOT_QUERY",
       fields: queryFields,
     });
 
+    // same for mutation they are object types
     const mutation = new GraphQLObjectType({
       name: "ROOT_MUTATIONS",
       fields: mutationFields,
     });
 
+    // now we return the shchema
     return new GraphQLSchema({
       query,
       mutation,
