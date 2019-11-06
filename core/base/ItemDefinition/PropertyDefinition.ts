@@ -26,7 +26,6 @@ import Module, { OnStateChangeListenerType } from "../Module";
 import fastHTMLParser from "fast-html-parser";
 import {
   GraphQLBoolean,
-  GraphQLNullableType,
   GraphQLInt,
   GraphQLFloat,
   GraphQLNonNull,
@@ -1812,37 +1811,95 @@ export default class PropertyDefinition {
     return resultFieldsSchema;
   }
 
+  /**
+   * Takes row data information that is in the SQL form and converts
+   * it into a graphql form, only for this specific property
+   * @param row the row that we want to extract information from
+   * @param prefix the prefix, if the information happens to be prefixed
+   */
   public convertSQLValueToGQLValue(row: ISQLTableRowValue, prefix?: string): IGQLValue {
+    // we get an actual prefix, because it's an optional attribute
     const actualPrefix = prefix ? prefix : "";
-    const rowName = actualPrefix + this.getId();
+
+    // we get the column name we are supposed to extract the data
+    // from, usually properties in sql are stored as their raw id, eg.
+    // "distance", "size", etc... but they might be prefixed
+    // usually when they happen to be for an item ITEM_wheel_size
+    const colName = actualPrefix + this.getId();
+
+    // now we need to extract the sql data, we try to get a sqlOut
+    // function which extracts data from rows for a given property
     const sqlOut = this.getPropertyDefinitionDescription().sqlOut;
-    let rowValue;
+
+    // now we need to get the value
+    let colValue;
+
+    // if the function to extract the data is not defined, this means the value is
+    // just a plain value, so we just do a 1:1 extraction
     if (!sqlOut) {
-      rowValue = row[rowName];
+      colValue = row[colName];
     } else {
-      rowValue = sqlOut(row, rowName);
+      // otherwise we pass the data for the row, with the column name where the data
+      // SHOULD be, this might do a complex conversion, like in currency types that
+      // need 2 rows to store the field data, the currency, and the value
+      // eg. ITEM_wheel_price might become ITEM_wheel_price_CURRENCY and ITEM_wheel_price_VALUE
+      // which will in turn once extracted with sqlOut become {currency: ..., value: ...}
+      colValue = sqlOut(row, colName);
     }
+
+    // because we are returning from graphql, the information
+    // is not prefixed and is rather returned in plain form
+    // so the id is all what you get for the property, remember
+    // properties are always in its singular name in graphql form
+    // the only prefixed things are ITEM_
+    // and the properties are into its own object if they
+    // happen to be sinking properties
     return {
-      [this.getId()]: rowValue,
+      [this.getId()]: colValue,
     };
   }
 
-  public convertGQLValueToSQLValue(data: IGQLValue, prefix?: string): ISQLTableRowValue {
+  /**
+   * Converts a graphql value into a sql value, that is graphql data into row
+   * data to be immediately added to the database as it is
+   * @param data the graphql data
+   * @param raw a raw function that is used for creating raw sql statments, eg. knex.raw
+   * @param prefix the prefix, if we need the SQL values to be prefixed, usually
+   * used within items, because item properties need to be prefixed
+   */
+  public convertGQLValueToSQLValue(data: IGQLValue, raw: () => any, prefix?: string): ISQLTableRowValue {
     // TODO validation of the value, otherwise invalid values can be manually set,
     // there should be also an overall validation by converting the whole value into
     // a standard value and then validating against that
+
+    // so we calculate the actual prefix
     const actualPrefix = prefix ? prefix : "";
-    const dataKey = actualPrefix + this.getId();
+
+    // this is where the resulting column should be named
+    const resultingColumnName = actualPrefix + this.getId();
+    // and this is the value of the property, again, properties
+    // are not prefixed, they are either in their own object
+    // or in the root
+    const gqlPropertyValue = data[this.getId()];
+
+    // so we need the sql in function, from the property description
     const sqlIn = this.getPropertyDefinitionDescription().sqlIn;
+
+    // if there is none, we do a 1:1 transformation again
     if (!sqlIn) {
       return {
-        [dataKey]: data[this.getId()],
+        [resultingColumnName]: gqlPropertyValue,
       };
     }
-    // TODO add knex raw
-    return sqlIn(data[dataKey], dataKey, null);
+
+    // otherwise we return as it is
+    return sqlIn(gqlPropertyValue, resultingColumnName, raw);
   }
 
+  /**
+   * Provides the icon name as it was defined for this
+   * property
+   */
   public getIcon() {
     return this.rawData.icon || null;
   }

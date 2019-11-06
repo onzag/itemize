@@ -1,4 +1,4 @@
-import { GraphQLID, GraphQLNonNull, GraphQLString, GraphQLInt } from "graphql";
+import { GraphQLID, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLEnumType, GraphQLEnumTypeConfig } from "graphql";
 import { ISQLTableDefinitionType, IGQLFieldsDefinitionType } from "./base/Root";
 
 // DATA ATTRIBUTES
@@ -260,6 +260,18 @@ export const PREFIX_GET = PREFIX_BUILD("GET");
 export const PREFIX_ADD = PREFIX_BUILD("ADD");
 export const PREFIX_EDIT = PREFIX_BUILD("EDIT");
 export const PREFIX_DELETE = PREFIX_BUILD("DELETE");
+export const ORDER_BY_OPTIONS = {
+  DEFAULT: "DEFAULT",
+  RELEVANCY: "RELEVANCY",
+  DATE: "DATE",
+};
+
+const searchOptionsOrderByOptions = {};
+Object.keys(ORDER_BY_OPTIONS).forEach((key) => {
+  searchOptionsOrderByOptions[key] = {
+    value: key,
+  };
+});
 export const RESERVED_SEARCH_PROPERTIES = {
   token: {
     type: GraphQLNonNull(GraphQLString),
@@ -269,6 +281,15 @@ export const RESERVED_SEARCH_PROPERTIES = {
   },
   limit: {
     type: GraphQLNonNull(GraphQLInt),
+  },
+  order_by: {
+    type: GraphQLNonNull(new GraphQLEnumType({
+      name: "RESERVED_SEARCH_PROPERTY_ENUM_ORDER_BY",
+      values: searchOptionsOrderByOptions,
+    })),
+  },
+  search: {
+    type: GraphQLString,
   },
 };
 export const RESERVED_GETTER_PROPERTIES = {

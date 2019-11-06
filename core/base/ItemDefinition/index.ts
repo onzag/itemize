@@ -16,7 +16,6 @@ import {
   RESERVED_GETTER_PROPERTIES,
   RESERVED_ADD_PROPERTIES,
   RESERVED_SEARCH_PROPERTIES,
-  SUFFIX_BUILD,
   RESERVED_BASE_PROPERTIES,
 } from "../../constants";
 import { GraphQLObjectType, GraphQLList, GraphQLOutputType } from "graphql";
@@ -407,6 +406,11 @@ export default class ItemDefinition {
     return possibleCandidates.some((c) => c.getExclusionState() !== ItemExclusionState.EXCLUDED);
   }
 
+  /**
+   * Checks whether it has an active instance of an item
+   * given its item id (not its name)
+   * @param id the id of the item
+   */
   public hasAnActiveInstanceOfId(id: string): boolean {
     const candidate = this.itemInstances
       .find((i) => i.getId() === id);
@@ -480,6 +484,11 @@ export default class ItemDefinition {
     return this.rawData.i18nData[locale] || null;
   }
 
+  /**
+   * Adds a listener to the structure of this item definition, all
+   * its property, item, and imported definitions once they change
+   * @param listener the listener that wishes to be added
+   */
   public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {
     this.childDefinitions.forEach((cd) => {
       cd.addOnStateChangeEventListener(listener);
@@ -498,6 +507,11 @@ export default class ItemDefinition {
     });
   }
 
+  /**
+   * Removes a listener to the structure of this item definition, all
+   * its property, item, and imported definitions once they change
+   * @param listener the listener that wishes to be removed
+   */
   public removeOnStateChangeEventListener(listener: OnStateChangeListenerType) {
     this.childDefinitions.forEach((cd) => {
       cd.removeOnStateChangeEventListener(listener);
@@ -625,51 +639,88 @@ export default class ItemDefinition {
     return result;
   }
 
+  /**
+   * Provides all the graphql fields that this item definition contains as well as its
+   * items, but only of this specific item definition and does not include its children
+   * @param propertiesAsInput if the properties should be in input form
+   */
   public getGQLFieldsDefinition(propertiesAsInput?: boolean): IGQLFieldsDefinitionType {
+    // the fields result in graphql field form
     let fieldsResult: IGQLFieldsDefinitionType = {};
+
+    // We get all the properties that this item definition contains
     this.getAllPropertyDefinitions().forEach((pd) => {
+      // and we add them progressively
       fieldsResult = {
         ...fieldsResult,
         ...pd.getGQLFieldsDefinition(propertiesAsInput),
       };
     });
+
+    // We do the same with the items
     this.getAllItems().forEach((i) => {
       fieldsResult = {
         ...fieldsResult,
         ...i.getGQLFieldsDefinition(propertiesAsInput),
       };
     });
+
+    // return that
     return fieldsResult;
   }
 
+  /**
+   * Provides the graphql type for the given item definition which
+   * extends the interface of its parent module already
+   */
   public getGQLType(): GraphQLOutputType {
+    // we check if we have an object cached already
     if (!this.gqlObj) {
+      // we get the item definition fields, for this element alone
       const itemSelfFields = this.getGQLFieldsDefinition();
       const fields: IGQLFieldsDefinitionType = {
-        // Graphql Inheritance has to be explicitly set for some reason
+        // Graphql Inheritance has to be explicitly set
+        // we include also the base definitions
         ...this.parentModule.getGQLFieldsDefinition(),
         ...itemSelfFields,
       };
+      // we set the object value
       this.gqlObj = new GraphQLObjectType({
         name: this.getQualifiedPathName(),
         fields,
         interfaces: [this.parentModule.getGQLType()],
       });
     }
+
+    // return that
     return this.gqlObj;
   }
 
+  /**
+   * Provides all the query fields for the given item definition, including all
+   * the children item definitions that are included within this item definition
+   * @param resolvers the resolvers object that will be used to populate the resolvers
+   * of the query fields
+   */
   public getGQLQueryFields(resolvers?: IGraphQLResolversType): IGQLQueryFieldsDefinitionType {
+    // of course you don't have a graphql query in search mode
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql queries");
     }
+
+    // but we need that specific search mode counterpart to populate the arguments
+    // for our query
     const searchModeCounterpart = this.getSearchModeCounterpart();
+
+    // now we add the queries
     let fields: IGQLQueryFieldsDefinitionType = {
+      // basic get query to get an item given an id
       [PREFIX_GET + this.getQualifiedPathName()]: {
         type: this.getGQLType(),
         args: {
           ...RESERVED_GETTER_PROPERTIES,
         },
+        // we just pipe the arguments out of the resolver
         resolve: (source: any, args: any, context: any, info: any) => {
           if (resolvers) {
             return resolvers.getItemDefinition({
@@ -681,6 +732,7 @@ export default class ItemDefinition {
           }
         },
       },
+      // now this is the search query
       [PREFIX_SEARCH + this.getQualifiedPathName()]: {
         type: GraphQLList(this.getGQLType()),
         args: {
@@ -694,46 +746,36 @@ export default class ItemDefinition {
         },
       },
     };
+
+    // add the child definitions to the queries by adding theirs
     this.getChildDefinitions().forEach((cIdef) => {
       fields = {
         ...fields,
         ...cIdef.getGQLQueryFields(),
       };
     });
+
     return fields;
   }
 
-  public convertSQLValueToGQLValue(row: ISQLTableRowValue): IGQLValue {
-    let result: IGQLValue = {};
-    Object.keys(RESERVED_BASE_PROPERTIES).forEach((basePropertyKey) => {
-      result[basePropertyKey] = row[basePropertyKey] || null;
-    });
-    this.getAllPropertyDefinitions().forEach((pd) => {
-      result = {...result, ...pd.convertSQLValueToGQLValue(row)};
-    });
-    this.getAllItems().forEach((item) => {
-      result = {...result, ...item.convertSQLValueToGQLValue(row)};
-    });
-    console.log(result);
-    return result;
-  }
-
-  public convertGQLValueToSQLValue(data: IGQLValue): ISQLTableRowValue {
-    let result: ISQLTableRowValue = {};
-    this.getAllPropertyDefinitions().forEach((pd) => {
-      result = {...result, ...pd.convertGQLValueToSQLValue(data)};
-    });
-    this.getAllItems().forEach((item) => {
-      result = {...result, ...item.convertGQLValueToSQLValue(data)};
-    });
-    return result;
-  }
-
+  /**
+   * Provides all the fields for the mutations that are required to take
+   * place in order to ADD, EDIT and DELETE item definition values
+   * @param resolvers the resolvers for the graphql mutations to populate
+   */
   public getGQLMutationFields(resolvers?: IGraphQLResolversType): IGQLQueryFieldsDefinitionType {
+    // same as before not available in search mode
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql mutations");
     }
+
+    // now we populate the fields as we need to
     let fields: IGQLQueryFieldsDefinitionType = {
+      // the add function works to create a new item definition
+      // instance for this specific item definition, so we
+      // mix the add properties fields, the parent module fields,
+      // excluding the base, and as input, because it's args,
+      // and then we get our own fields
       [PREFIX_ADD + this.getQualifiedPathName()]: {
         type: this.getGQLType(),
         args: {
@@ -752,6 +794,10 @@ export default class ItemDefinition {
           }
         },
       },
+      // The edition uses the standard getter properties to fetch
+      // an item definition instance given its id and then
+      // uses the same idea of adding in order to modify the data
+      // that is in there
       [PREFIX_EDIT + this.getQualifiedPathName()]: {
         type: this.getGQLType(),
         args: {
@@ -764,6 +810,10 @@ export default class ItemDefinition {
           return;
         },
       },
+      // The delete uses the standard getter properties to fetch
+      // the item definition instance, and basically deletes it
+      // instead of retrieving anything, well, it retrieves
+      // the deleted element itself
       [PREFIX_DELETE + this.getQualifiedPathName()]: {
         type: this.getGQLType(),
         args: RESERVED_GETTER_PROPERTIES,
@@ -773,19 +823,89 @@ export default class ItemDefinition {
         },
       },
     };
+
+    // we repeat this process for all the item child definitions
+    // that are added in here
     this.getChildDefinitions().forEach((cIdef) => {
       fields = {
         ...fields,
         ...cIdef.getGQLMutationFields(),
       };
     });
+
+    // return that
     return fields;
   }
 
+  /**
+   * Converts a SQL value directly coming from the database as it is
+   * to a graphql value for this specific item definition
+   * @param row the row value, with all the columns it has; the row
+   * can be overblown with other field data, this will extract only the
+   * data required for this item definition
+   */
+  public convertSQLValueToGQLValue(row: ISQLTableRowValue): IGQLValue {
+    // first we create the graphql result
+    let result: IGQLValue = {};
+
+    // now we take all the base properties that we have
+    // in the graphql model
+    Object.keys(RESERVED_BASE_PROPERTIES).forEach((basePropertyKey) => {
+      result[basePropertyKey] = row[basePropertyKey] || null;
+    });
+
+    // we also take all the property definitions we have
+    // in this item definitions, and convert them one by one
+    // with the row data, this basically also gives graphql value
+    // in the key:value format
+    this.getAllPropertyDefinitions().forEach((pd) => {
+      result = {...result, ...pd.convertSQLValueToGQLValue(row)};
+    });
+
+    // now we do the same for the items
+    this.getAllItems().forEach((item) => {
+      result = {...result, ...item.convertSQLValueToGQLValue(row)};
+    });
+
+    return result;
+  }
+
+  /**
+   * Converts a graphql value, with all its items and everything it
+   * has into a SQL row data value for this specific item definition
+   * @param data the graphql data
+   * @param raw a raw function that is used for creating raw sql statments, eg. knex.raw
+   */
+  public convertGQLValueToSQLValue(data: IGQLValue, raw: () => any): ISQLTableRowValue {
+    // first we create the row value
+    let result: ISQLTableRowValue = {};
+
+    // now we get all the property definitions and do the same
+    // that we did in the SQLtoGQL but in reverse
+    this.getAllPropertyDefinitions().forEach((pd) => {
+      result = {...result, ...pd.convertGQLValueToSQLValue(data, raw)};
+    });
+    // also with the items
+    this.getAllItems().forEach((item) => {
+      result = {...result, ...item.convertGQLValueToSQLValue(data, raw)};
+    });
+
+    return result;
+  }
+
+  /**
+   * Basically returns the raw data itself
+   * doesn't do much
+   */
   public toJSON() {
     return this.rawData;
   }
 
+  /**
+   * Provides the path from the module
+   * base, that is not absolute but a relative
+   * path from the parent module
+   */
   public getModulePath(): string[] {
     if (this.parentItemDefinition) {
       return this.parentItemDefinition
@@ -797,6 +917,10 @@ export default class ItemDefinition {
     return [this.getName()];
   }
 
+  /**
+   * Provides the absolute path all the way
+   * from the root
+   */
   public getAbsolutePath(): string[] {
     if (this.parentItemDefinition) {
       return this.parentItemDefinition
@@ -812,6 +936,11 @@ export default class ItemDefinition {
       ]);
   }
 
+  /**
+   * Provides the qualified path name
+   * of this item definition, which is unique for
+   * this root instance
+   */
   public getQualifiedPathName(): string {
     if (this.parentItemDefinition) {
       return PREFIXED_CONCAT(this.parentItemDefinition.getQualifiedPathName(), ITEM_DEFINITION_PREFIX + this.getName());

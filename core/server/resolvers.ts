@@ -46,7 +46,9 @@ const resolvers: IGraphQLResolversType = {
   },
   async addItemDefinition(resolverArgs, itemDefinition) {
     // TODO some of this data needs to be gotten from the token
-    const sqlData: any = itemDefinition.convertGQLValueToSQLValue(resolverArgs.args);
+    // TODO pass the knex.raw function
+    // TODO validation
+    const sqlData: any = itemDefinition.convertGQLValueToSQLValue(resolverArgs.args, null);
     sqlData.type = itemDefinition.getQualifiedPathName();
     sqlData.created_at = knex.fn.now();
     sqlData.created_by = 1;

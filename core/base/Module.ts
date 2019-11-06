@@ -488,38 +488,75 @@ export default class Module {
     return resultSchema;
   }
 
+  /**
+   * Provides the fields definition for the module itself, and for all
+   * items inside the module which extend these fields, modules by default
+   * contain called base properties, which every element has
+   * @param excludeBase exclude the base properties and only include prop extensions
+   * @param propertiesAsInput if the properties must be in input mode
+   */
   public getGQLFieldsDefinition(excludeBase?: boolean, propertiesAsInput?: boolean): IGQLFieldsDefinitionType {
+    // first create the base considering on whether we exclude or include
+    // the base properties
     let resultFieldsSchema: IGQLFieldsDefinitionType = excludeBase ? {} : {
       ...RESERVED_BASE_PROPERTIES,
     };
+    // now we get all prop extensions of this module
     this.getAllPropExtensions().forEach((propExtension) => {
+      // and basically get the fields for that property
       resultFieldsSchema = {
         ...resultFieldsSchema,
         ...propExtension.getGQLFieldsDefinition(propertiesAsInput),
       };
     });
+    // return that
     return resultFieldsSchema;
   }
 
+  /**
+   * Provides the type (for modules an interface)
+   * that represents this module data
+   */
   public getGQLType(): GraphQLInterfaceType {
+    // if we don't have already created the module for this
+    // instance, we actually reuse, and this is important
+    // if we are using this same item in the same schema
+    // when calling via the parent
     if (!this.gqlObj) {
+      // we create that object with the data
       this.gqlObj = new GraphQLInterfaceType({
         name: this.getQualifiedPathName(),
         fields: this.getGQLFieldsDefinition(),
       });
     }
+    // we return it
     return this.gqlObj;
   }
 
+  /**
+   * Provides the query fields in order to create the query
+   * for a given module, the only query fields you have access to
+   * for modules are search, modules do not support id searches
+   * because they only represent items, but would allow you to perform
+   * a whole level search into all the items it contains
+   * @param resolvers the resolvers that will be used to resolve the query,
+   * these are the generic resolvers that are consumed
+   */
   public getGQLQueryFields(resolvers?: IGraphQLResolversType): IGQLQueryFieldsDefinitionType {
+    // This module might be a search module, and search modules are well, not what we use
+    // to retrieve fields, they are to define arguments
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql queries");
     }
+
+    // now we setup the fields for the query
     let fields: IGQLQueryFieldsDefinitionType = {
       [PREFIX_SEARCH + this.getQualifiedPathName()]: {
         type: GraphQLList(this.getGQLType()),
         args: {
           ...RESERVED_SEARCH_PROPERTIES,
+          // as you can realize the arguments exclude the base and make it into input mode
+          // that means no RESERVED_BASE_PROPERTIES
           ...this.getSearchModule().getGQLFieldsDefinition(true, true),
         },
         resolve: (source: any, args: any, context: any, info: any) => {
@@ -528,6 +565,9 @@ export default class Module {
         },
       },
     };
+
+    // now we get all child definitions and add the query
+    // fields for each of them
     this.getAllChildItemDefinitions().forEach((cIdef) => {
       fields = {
         ...fields,
@@ -537,11 +577,21 @@ export default class Module {
     return fields;
   }
 
+  /**
+   * Because modules have no mutations, it provides all the mutation
+   * fields of the item definitions the module contains
+   * @param resolvers the resolvers that will be used to resolve the query,
+   * these are the generic resolvers that are consumed
+   */
   public getGQLMutationFields(resolvers?: IGraphQLResolversType): IGQLQueryFieldsDefinitionType {
     if (this.isInSearchMode()) {
       throw new Error("Modules in search mode has no graphql mutations");
     }
+
+    // we make the fields, it's empty starting with because
+    // the module has no mutations
     let fields: IGQLQueryFieldsDefinitionType = {};
+    // now we add the mutations of each one of the children
     this.getAllChildItemDefinitions().forEach((cIdef) => {
       fields = {
         ...fields,
