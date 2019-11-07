@@ -1,4 +1,4 @@
-import { GraphQLID, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLEnumType, GraphQLEnumTypeConfig } from "graphql";
+import { GraphQLID, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLEnumType, GraphQLList } from "graphql";
 import { ISQLTableDefinitionType, IGQLFieldsDefinitionType } from "./base/Root";
 
 // DATA ATTRIBUTES
@@ -195,19 +195,35 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   edited_at: {
     type: GraphQLString,
   },
+
+  // MODERATION SPECIFIC FIELDS
   reviewed_at: {
     type: GraphQLString,
   },
   reviewed_by: {
     type: GraphQLID,
   },
-  deleted_at: {
+  blocked_at: {
     type: GraphQLString,
   },
-  deleted_by: {
+  blocked_by: {
     type: GraphQLID,
   },
+  flagged_by: {
+    type: GraphQLList(GraphQLID),
+  },
+  flagged_reasons: {
+    type: GraphQLList(GraphQLString),
+  },
 };
+export const MODERATION_FIELDS = [
+  "reviewed_at",
+  "reviewed_by",
+  "blocked_at",
+  "blocked_by",
+  "flagged_by",
+  "flagged_reasons",
+];
 export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   id: {
     type: "serial",
@@ -241,11 +257,17 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   reviewed_by: {
     type: "integer",
   },
-  deleted_at: {
+  blocked_at: {
     type: "datetime",
   },
-  deleted_by: {
+  blocked_by: {
     type: "integer",
+  },
+  flagged_by: {
+    type: "INT[]",
+  },
+  flagged_reasons: {
+    type: "STRING[]",
   },
 };
 export const PREFIX_BUILD = (s: string) => s + "_";

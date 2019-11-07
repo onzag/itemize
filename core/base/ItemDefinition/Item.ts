@@ -357,7 +357,7 @@ export default class Item {
    * @param data the graphql data value
    * @param raw a raw function that is used for creating raw sql statments, eg. knex.raw
    */
-  public convertGQLValueToSQLValue(data: IGQLValue, raw: () => any): ISQLTableRowValue {
+  public convertGQLValueToSQLValue(data: IGQLValue, raw: (value: any) => any): ISQLTableRowValue {
     // so again we get the prefix as in ITEM_wheel_
     const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
     // the exclusion state in the graphql information should be included in

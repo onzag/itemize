@@ -1867,7 +1867,7 @@ export default class PropertyDefinition {
    * @param prefix the prefix, if we need the SQL values to be prefixed, usually
    * used within items, because item properties need to be prefixed
    */
-  public convertGQLValueToSQLValue(data: IGQLValue, raw: () => any, prefix?: string): ISQLTableRowValue {
+  public convertGQLValueToSQLValue(data: IGQLValue, raw: (value: any) => any, prefix?: string): ISQLTableRowValue {
     // TODO validation of the value, otherwise invalid values can be manually set,
     // there should be also an overall validation by converting the whole value into
     // a standard value and then validating against that

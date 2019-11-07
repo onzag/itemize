@@ -43,7 +43,10 @@ export type FGraphQLIdefResolverType = (
 
 export interface IGraphQLResolversType {
   getItemDefinition: FGraphQLIdefResolverType;
+  searchItemDefinition: FGraphQLIdefResolverType;
   addItemDefinition: FGraphQLIdefResolverType;
+  editItemDefinition: FGraphQLIdefResolverType;
+  deleteItemDefinition: FGraphQLIdefResolverType;
 }
 
 export interface ISQLColumnDefinitionType {

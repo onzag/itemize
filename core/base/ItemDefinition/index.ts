@@ -741,8 +741,14 @@ export default class ItemDefinition {
           ...searchModeCounterpart.getGQLFieldsDefinition(true),
         },
         resolve: (source: any, args: any, context: any, info: any) => {
-          // TODO
-          return;
+          if (resolvers) {
+            return resolvers.searchItemDefinition({
+              source,
+              args,
+              context,
+              info,
+            }, this);
+          }
         },
       },
     };
@@ -806,8 +812,14 @@ export default class ItemDefinition {
           ...this.getGQLFieldsDefinition(true),
         },
         resolve: (source: any, args: any, context: any, info: any) => {
-          // TODO
-          return;
+          if (resolvers) {
+            return resolvers.editItemDefinition({
+              source,
+              args,
+              context,
+              info,
+            }, this);
+          }
         },
       },
       // The delete uses the standard getter properties to fetch
@@ -818,8 +830,14 @@ export default class ItemDefinition {
         type: this.getGQLType(),
         args: RESERVED_GETTER_PROPERTIES,
         resolve: (source: any, args: any, context: any, info: any) => {
-          // TODO
-          return;
+          if (resolvers) {
+            return resolvers.deleteItemDefinition({
+              source,
+              args,
+              context,
+              info,
+            }, this);
+          }
         },
       },
     };
@@ -876,7 +894,7 @@ export default class ItemDefinition {
    * @param data the graphql data
    * @param raw a raw function that is used for creating raw sql statments, eg. knex.raw
    */
-  public convertGQLValueToSQLValue(data: IGQLValue, raw: () => any): ISQLTableRowValue {
+  public convertGQLValueToSQLValue(data: IGQLValue, raw: (value: any) => any): ISQLTableRowValue {
     // first we create the row value
     let result: ISQLTableRowValue = {};
 
@@ -891,6 +909,11 @@ export default class ItemDefinition {
     });
 
     return result;
+  }
+
+  public getSQLQueryFor(data: IGQLValue) {
+    console.log(data);
+    // TODO
   }
 
   /**
