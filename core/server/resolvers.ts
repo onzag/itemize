@@ -55,12 +55,27 @@ const resolvers: IGraphQLResolversType = {
     const requestedFields = graphqlFields(resolverArgs.info);
     console.log(requestedFields);
 
-    const itemDefinitionSearchMode = itemDefinition.getSearchModeCounterpart();
-    itemDefinitionSearchMode.getSQLQueryFor(resolverArgs.args);
+    const builderQuery = knex.select().from(itemDefinition.getQualifiedPathName()).where({
+      blocked_at: null,
+    });
+    itemDefinition.buildSQLQueryFrom(resolverArgs.args, builderQuery);
 
-    const baseQuery = knex.select().from(itemDefinition.getQualifiedPathName());
-    const baseResult: ISQLTableRowValue[] = await baseQuery;
+    const baseResult: ISQLTableRowValue[] = await builderQuery;
     return baseResult.map((row) => itemDefinition.convertSQLValueToGQLValue(row));
+  },
+  async searchModule(resolverArgs, mod) {
+    // TODO optimization
+    const requestedFields = graphqlFields(resolverArgs.info);
+    console.log(requestedFields);
+
+    let allItemDefinitionsInvolved = mod.getAllChildItemDefinitionsRecursive();
+    if (resolverArgs.args.types) {
+      allItemDefinitionsInvolved = allItemDefinitionsInvolved.filter((idef) => {
+        return resolverArgs.args.types.includes(idef.getQualifiedPathName);
+      });
+    }
+
+    // TODO
   },
   async addItemDefinition(resolverArgs, itemDefinition) {
     // TODO optimization

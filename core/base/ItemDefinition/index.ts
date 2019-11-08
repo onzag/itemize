@@ -457,6 +457,18 @@ export default class ItemDefinition {
   }
 
   /**
+   * Provides the live child definitions
+   * without imports, recursively
+   */
+  public getChildDefinitionsRecursive() {
+    let childDefinitions = this.getChildDefinitions();
+    childDefinitions.forEach((idef) => {
+      childDefinitions = childDefinitions.concat(idef.getChildDefinitionsRecursive());
+    });
+    return childDefinitions;
+  }
+
+  /**
    * Provides the live imported child definitions
    * without imports
    */
@@ -609,7 +621,7 @@ export default class ItemDefinition {
     let resultTableSchema: ISQLTableDefinitionType = {...RESERVED_BASE_PROPERTIES_SQL};
 
     // now we loop thru every property (they will all become columns)
-    this.getAllPropertyDefinitions().forEach((pd) => {
+    this.parentModule.getAllPropExtensions().concat(this.getAllPropertyDefinitions()).forEach((pd) => {
       resultTableSchema = {...resultTableSchema, ...pd.getSQLTableDefinition()};
     });
 
@@ -644,12 +656,18 @@ export default class ItemDefinition {
    * items, but only of this specific item definition and does not include its children
    * @param propertiesAsInput if the properties should be in input form
    */
-  public getGQLFieldsDefinition(propertiesAsInput?: boolean): IGQLFieldsDefinitionType {
+  public getGQLFieldsDefinition(excludeBase?: boolean, propertiesAsInput?: boolean): IGQLFieldsDefinitionType {
     // the fields result in graphql field form
-    let fieldsResult: IGQLFieldsDefinitionType = {};
+    let fieldsResult: IGQLFieldsDefinitionType =
+      this.parentModule.getGQLFieldsDefinition(excludeBase, propertiesAsInput);
 
     // We get all the properties that this item definition contains
     this.getAllPropertyDefinitions().forEach((pd) => {
+      // we deny adding those whose retrieval is disabled
+      if (pd.isRetrievalDisabled()) {
+        return;
+      }
+
       // and we add them progressively
       fieldsResult = {
         ...fieldsResult,
@@ -676,18 +694,10 @@ export default class ItemDefinition {
   public getGQLType(): GraphQLOutputType {
     // we check if we have an object cached already
     if (!this.gqlObj) {
-      // we get the item definition fields, for this element alone
-      const itemSelfFields = this.getGQLFieldsDefinition();
-      const fields: IGQLFieldsDefinitionType = {
-        // Graphql Inheritance has to be explicitly set
-        // we include also the base definitions
-        ...this.parentModule.getGQLFieldsDefinition(),
-        ...itemSelfFields,
-      };
       // we set the object value
       this.gqlObj = new GraphQLObjectType({
         name: this.getQualifiedPathName(),
-        fields,
+        fields: this.getGQLFieldsDefinition(),
         interfaces: [this.parentModule.getGQLType()],
       });
     }
@@ -737,8 +747,7 @@ export default class ItemDefinition {
         type: GraphQLList(this.getGQLType()),
         args: {
           ...RESERVED_SEARCH_PROPERTIES,
-          ...searchModeCounterpart.getParentModule().getGQLFieldsDefinition(true, true),
-          ...searchModeCounterpart.getGQLFieldsDefinition(true),
+          ...searchModeCounterpart.getGQLFieldsDefinition(true, true),
         },
         resolve: (source: any, args: any, context: any, info: any) => {
           if (resolvers) {
@@ -786,8 +795,7 @@ export default class ItemDefinition {
         type: this.getGQLType(),
         args: {
           ...RESERVED_ADD_PROPERTIES,
-          ...this.parentModule.getGQLFieldsDefinition(true, true),
-          ...this.getGQLFieldsDefinition(true),
+          ...this.getGQLFieldsDefinition(true, true),
         },
         resolve: (source: any, args: any, context: any, info: any) => {
           if (resolvers) {
@@ -808,8 +816,7 @@ export default class ItemDefinition {
         type: this.getGQLType(),
         args: {
           ...RESERVED_GETTER_PROPERTIES,
-          ...this.parentModule.getGQLFieldsDefinition(true, true),
-          ...this.getGQLFieldsDefinition(true),
+          ...this.getGQLFieldsDefinition(true, true),
         },
         resolve: (source: any, args: any, context: any, info: any) => {
           if (resolvers) {
@@ -911,9 +918,18 @@ export default class ItemDefinition {
     return result;
   }
 
-  public getSQLQueryFor(data: IGQLValue) {
-    console.log(data);
-    // TODO
+  public buildSQLQueryFrom(data: IGQLValue, knexBuilder: any) {
+    this.parentModule.getAllPropExtensions().concat(this.getAllPropertyDefinitions()).forEach((pd) => {
+      if (!pd.isSearchable()) {
+        return;
+      }
+
+      pd.buildSQLQueryFrom(data, "", knexBuilder);
+    });
+
+    this.getAllItems().forEach((item) => {
+      item.buildSQLQueryFrom(data, knexBuilder);
+    });
   }
 
   /**

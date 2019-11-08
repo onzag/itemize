@@ -267,7 +267,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
     type: "INT[]",
   },
   flagged_reasons: {
-    type: "STRING[]",
+    type: "TEXT[]",
   },
 };
 export const PREFIX_BUILD = (s: string) => s + "_";
@@ -312,6 +312,12 @@ export const RESERVED_SEARCH_PROPERTIES = {
   },
   search: {
     type: GraphQLString,
+  },
+};
+export const RESERVED_MODULE_SEARCH_PROPERTIES = {
+  ...RESERVED_SEARCH_PROPERTIES,
+  types: {
+    type: GraphQLList(GraphQLNonNull(GraphQLString)),
   },
 };
 export const RESERVED_GETTER_PROPERTIES = {

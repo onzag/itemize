@@ -115,6 +115,34 @@ export const PropertyDefinitionSearchInterfacesPrefixesList = [
   ],
 ];
 
+function stardardSQLInFn(value: PropertyDefinitionSupportedType, id: string): ISQLTableRowValue {
+  return {
+    [id]: value,
+  };
+}
+
+function standardSQLOutFn(row: ISQLTableRowValue, id: string): PropertyDefinitionSupportedType {
+  return row[id];
+}
+
+function standardSQLSearchFnExactAndRange(data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) {
+  const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
+  const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
+  const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+
+  if (typeof data[exactName] !== "undefined" && data[exactName] !== null) {
+    knexBuilder.andWhere(sqlPrefix + id, data[exactName]);
+  }
+
+  if (typeof data[fromName] !== "undefined" && data[fromName] !== null) {
+    knexBuilder.andWhere(sqlPrefix + id, ">=", data[exactName]);
+  }
+
+  if (typeof data[toName] !== "undefined" && data[toName] !== null) {
+    knexBuilder.andWhere(sqlPrefix + id, ">=", data[toName]);
+  }
+}
+
 export interface IPropertyDefinitionSupportedType {
   // json represents how the element is represented in json form
   // objects are not allowed only boolean numbers and strings are
@@ -141,17 +169,13 @@ export interface IPropertyDefinitionSupportedType {
   // to whatever is given, however if you have a complex value you should
   // set this, the raw function is the raw knex function, that allows to build raw queries,
   // by default if not set this function just sets {property_id: value}
-  sqlIn?: (value: PropertyDefinitionSupportedType, id: string, raw: (...args: any[]) => any) => ISQLTableRowValue;
+  sqlIn: (value: PropertyDefinitionSupportedType, id: string, raw: (...args: any[]) => any) => ISQLTableRowValue;
   // sqlOut basically gives the entire table as data, and the property id where it expects
   // retrieval of that data; by default this function takes the table and does
   // data[property_id]
-  sqlOut?: (data: {[key: string]: any}, id: string) => PropertyDefinitionSupportedType;
-  // function where search is implemented, a value is passed of the same type, a comparator
-  // for that value, the table identifier, and the property id, and you must build a
-  // raw knex query, hence you return the array to apply to the knex whereRaw function
-  // by default this does [`??.?? ${comparator} ?`, table_id, property_id, property_value]
-  // this is catastrophic for complex types as it should be an array of number and string
-  sqlSearch?: (value: PropertyDefinitionSupportedType, comparator: string, tb: string, id: string) => any[];
+  sqlOut: (row: ISQLTableRowValue, id: string) => PropertyDefinitionSupportedType;
+  // TODO description
+  sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) => void;
 
   // represents an item that would mark for null
   // by default it is null itself
@@ -224,6 +248,10 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     json: "boolean",
     gql: GraphQLBoolean,
     sql: "boolean",
+    sqlIn: stardardSQLInFn,
+    sqlOut: standardSQLOutFn,
+    sqlSearch: standardSQLSearchFnExactAndRange,
+
     // it is searchable by default
     searchable: true,
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
@@ -241,6 +269,10 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     json: "number",
     gql: GraphQLInt,
     sql: "integer",
+    sqlIn: stardardSQLInFn,
+    sqlOut: standardSQLOutFn,
+    sqlSearch: standardSQLSearchFnExactAndRange,
+
     supportsAutocomplete: true,
     // it gotta be validated to check it's a number
     validate: (n: PropertyDefinitionSupportedIntegerType) => {
@@ -276,6 +308,10 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     json: "number",
     gql: GraphQLFloat,
     sql: "float",
+    sqlIn: stardardSQLInFn,
+    sqlOut: standardSQLOutFn,
+    sqlSearch: standardSQLSearchFnExactAndRange,
+
     supportsAutocomplete: true,
     // the validator
     validate: (n: PropertyDefinitionSupportedNumberType) => {
@@ -347,18 +383,25 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       }
       return result;
     },
-    sqlSearch: (value: IPropertyDefinitionSupportedCurrencyType, comparator: string, tb: string, id: string) => {
-      let valueToUse = value.value;
-      if (typeof valueToUse !== "number") {
-        valueToUse = 0;
+    sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder) => {
+      const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
+      const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
+      const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+
+      if (typeof data[exactName] !== "undefined" && data[exactName] !== null) {
+        knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", data[exactName].currency);
+        knexBuilder.andWhere(sqlPrefix + id + "_VALUE", data[exactName].value);
       }
-      const idToUse = id + "_VALUE";
-      return [
-        `??.?? ${comparator} ?`,
-        tb,
-        idToUse,
-        valueToUse,
-      ];
+
+      if (typeof data[fromName] !== "undefined" && data[fromName] !== null) {
+        knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", data[fromName].currency);
+        knexBuilder.andWhere(sqlPrefix + id + "_VALUE", ">=", data[fromName].value);
+      }
+
+      if (typeof data[toName] !== "undefined" && data[toName] !== null) {
+        knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", data[toName].currency);
+        knexBuilder.andWhere(sqlPrefix + id + "_VALUE", "<=", data[toName].value);
+      }
     },
     // locations just contain this basic data
     validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
@@ -455,22 +498,25 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       }
       return result;
     },
-    sqlSearch: (value: IPropertyDefinitionSupportedUnitType, comparator: string, tb: string, id: string) => {
-      let valueToUse = value.normalizedValue;
-      if (typeof valueToUse !== "number") {
-        valueToUse = 0;
+    sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder) => {
+      const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
+      const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
+      const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+
+      if (typeof data[exactName] !== "undefined" && data[exactName] !== null) {
+        knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", data[exactName].normalizedUnit);
+        knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", data[exactName].normalizedValue);
       }
-      const idToUse = id + "_NORMALIZED_VALUE";
-      const unitIdToUse = id + "_NORMALIZED_UNIT";
-      return [
-        `??.?? ${comparator} ? AND ??.?? = ?`,
-        tb,
-        idToUse,
-        valueToUse,
-        tb,
-        unitIdToUse,
-        value.normalizedUnit,
-      ];
+
+      if (typeof data[fromName] !== "undefined" && data[fromName] !== null) {
+        knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", data[fromName].normalizedUnit);
+        knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", ">=", data[fromName].normalizedValue);
+      }
+
+      if (typeof data[toName] !== "undefined" && data[toName] !== null) {
+        knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", data[toName].normalizedUnit);
+        knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", data[toName].normalizedValue);
+      }
     },
     supportedSubtypes: UNIT_SUBTYPES,
     validate: (l: IPropertyDefinitionSupportedUnitType) => {
@@ -543,6 +589,10 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // a string is a string
     json: "string",
     sql: "text",
+    sqlIn: stardardSQLInFn,
+    sqlOut: standardSQLOutFn,
+    sqlSearch: standardSQLSearchFnExactAndRange,
+
     nullableDefault: "",
     supportsAutocomplete: true,
     supportedSubtypes: ["email"],
@@ -583,15 +633,19 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       obj[id] = raw("crypt(?, gen_salt('bf',10))", value);
       return obj;
     },
-    sqlSearch: (value: PropertyDefinitionSupportedPasswordType, comparator: string, tb: string, id: string) => {
-      return [
-        `??.?? ${comparator} crypt(?, ??.??)`,
-        tb,
-        id,
-        value,
-        tb,
-        id,
-      ];
+    sqlOut: standardSQLOutFn,
+    sqlSearch: () => {
+      // This should never happen,
+      // first off the searchable is false so it should never trigger a sql search
+      // EXACT_password will never exist in the search module
+      // however passwords can be retrieved, its hash, they have to be explicitly set
+      // disable retrieval to true, in the document definition itself, not doing so
+      // is a leak, but should be obvious when checking /graphql
+
+      // we throw an error still
+      throw new Error(
+        "Attempted to search user by password",
+      );
     },
     // validates just the length
     validate: (s: PropertyDefinitionSupportedPasswordType) => {
@@ -618,6 +672,12 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     supportedSubtypes: ["html"],
     // TODO implement full text search
     sql: "text",
+    sqlIn: stardardSQLInFn,
+    sqlOut: standardSQLOutFn,
+    sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) => {
+      // TODO full text search
+    },
+
     // validates the text, texts don't support json value
     validate: (s: PropertyDefinitionSupportedTextType, subtype?: string) => {
       if (typeof s !== "string") {
@@ -650,6 +710,10 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     // years can be set as a number
     json: "number",
     sql: "integer",
+    sqlIn: stardardSQLInFn,
+    sqlOut: standardSQLOutFn,
+    sqlSearch: standardSQLSearchFnExactAndRange,
+
     // validates
     validate: (n: PropertyDefinitionSupportedYearType) => {
       if (isNaN(n)) {
@@ -685,6 +749,13 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     supportsIcons: false,
     sql: "timestamp",
+    sqlIn: stardardSQLInFn,
+    sqlOut: standardSQLOutFn,
+    sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) => {
+      // TODO date matching somehow, we need to check how input and output goes as
+      // well, we need to be able to get date information properly accross
+    },
+
     validate: (d: PropertyDefinitionSupportedDateType) => {
       if (
         d === "Invalid Date" ||
@@ -709,6 +780,13 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     supportsIcons: false,
     sql: "timestamp",
+    sqlIn: stardardSQLInFn,
+    sqlOut: standardSQLOutFn,
+    sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) => {
+      // TODO date matching somehow, we need to check how input and output goes as
+      // well, we need to be able to get date information properly accross
+    },
+
     validate: (d: PropertyDefinitionSupportedDateType) => {
       if (
         d === "Invalid Date" ||
@@ -733,6 +811,13 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
     supportsIcons: false,
     sql: "time",
+    sqlIn: stardardSQLInFn,
+    sqlOut: standardSQLOutFn,
+    sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) => {
+      // TODO date matching somehow, we need to check how input and output goes as
+      // well, we need to be able to get date information properly accross
+    },
+
     validate: (d: PropertyDefinitionSupportedDateType) => {
       if (
         d === "Invalid Date" ||
@@ -804,11 +889,8 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       }
       return result;
     },
-    sqlSearch: (value: IPropertyDefinitionSupportedLocationType, comparator: string, tb: string, id: string) => {
+    sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder) => {
       // TODO
-      return [
-
-      ];
     },
     // locations just contain this basic data
     validate: (l: IPropertyDefinitionSupportedLocationType) => {
@@ -846,6 +928,12 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       },
     ],
     sql: "text[]",
+    sqlIn: stardardSQLInFn,
+    sqlOut: standardSQLOutFn,
+    sqlSearch: () => {
+      throw new Error("Attempted to search within files");
+    },
+
     allowsMinMaxLengthDefined: true,
     validate: (l: PropertyDefinitionSupportedFilesType) => {
       if (!Array.isArray(l) || l.some((v) => typeof v !== "string")) {
@@ -1617,6 +1705,17 @@ export default class PropertyDefinition {
   }
 
   /**
+   * Tells if it's searchable, either by default or because
+   * of a search level
+   */
+  public isSearchable(): boolean {
+    if (this.getPropertyDefinitionDescription().searchable) {
+      return this.getSearchLevel() !== "disabled";
+    }
+    return false;
+  }
+
+  /**
    * Checks whether the property has specific defined valid values
    */
   public hasSpecificValidValues() {
@@ -1836,16 +1935,13 @@ export default class PropertyDefinition {
 
     // if the function to extract the data is not defined, this means the value is
     // just a plain value, so we just do a 1:1 extraction
-    if (!sqlOut) {
-      colValue = row[colName];
-    } else {
-      // otherwise we pass the data for the row, with the column name where the data
-      // SHOULD be, this might do a complex conversion, like in currency types that
-      // need 2 rows to store the field data, the currency, and the value
-      // eg. ITEM_wheel_price might become ITEM_wheel_price_CURRENCY and ITEM_wheel_price_VALUE
-      // which will in turn once extracted with sqlOut become {currency: ..., value: ...}
-      colValue = sqlOut(row, colName);
-    }
+
+    // we pass the data for the row, with the column name where the data
+    // SHOULD be, this might do a complex conversion, like in currency types that
+    // need 2 rows to store the field data, the currency, and the value
+    // eg. ITEM_wheel_price might become ITEM_wheel_price_CURRENCY and ITEM_wheel_price_VALUE
+    // which will in turn once extracted with sqlOut become {currency: ..., value: ...}
+    colValue = sqlOut(row, colName);
 
     // because we are returning from graphql, the information
     // is not prefixed and is rather returned in plain form
@@ -1885,15 +1981,18 @@ export default class PropertyDefinition {
     // so we need the sql in function, from the property description
     const sqlIn = this.getPropertyDefinitionDescription().sqlIn;
 
-    // if there is none, we do a 1:1 transformation again
-    if (!sqlIn) {
-      return {
-        [resultingColumnName]: gqlPropertyValue,
-      };
-    }
-
-    // otherwise we return as it is
+    // we return as it is
     return sqlIn(gqlPropertyValue, resultingColumnName, raw);
+  }
+
+  public buildSQLQueryFrom(data: IGQLValue, sqlPrefix: string, knexBuilder: any) {
+    const sqlSearchFn = this.getPropertyDefinitionDescription().sqlSearch;
+    sqlSearchFn(
+      data,
+      sqlPrefix,
+      this.getId(),
+      knexBuilder,
+    );
   }
 
   /**

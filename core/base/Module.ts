@@ -13,7 +13,13 @@ import {
   RESERVED_SEARCH_PROPERTIES,
 } from "../constants";
 import { GraphQLInterfaceType, GraphQLList } from "graphql";
-import { IGraphQLResolversType, ISQLSchemaDefinitionType, IGQLFieldsDefinitionType, IGQLQueryFieldsDefinitionType } from "./Root";
+import {
+  IGraphQLResolversType,
+  ISQLSchemaDefinitionType,
+  IGQLFieldsDefinitionType,
+  IGQLQueryFieldsDefinitionType,
+  IGQLValue,
+} from "./Root";
 
 export type OnStateChangeListenerType = () => any;
 
@@ -339,6 +345,18 @@ export default class Module {
   }
 
   /**
+   * Provides all live child item definitions,
+   * recursively
+   */
+  public getAllChildItemDefinitionsRecursive() {
+    let itemDefinitions = this.getAllChildItemDefinitions();
+    itemDefinitions.forEach((idef) => {
+      itemDefinitions = itemDefinitions.concat(idef.getChildDefinitionsRecursive());
+    });
+    return itemDefinitions;
+  }
+
+  /**
    * Gives the name of this module
    */
   public getName() {
@@ -560,8 +578,14 @@ export default class Module {
           ...this.getSearchModule().getGQLFieldsDefinition(true, true),
         },
         resolve: (source: any, args: any, context: any, info: any) => {
-          // TODO
-          return;
+          if (resolvers) {
+            return resolvers.searchModule({
+              source,
+              args,
+              context,
+              info,
+            }, this);
+          }
         },
       },
     };
@@ -599,6 +623,16 @@ export default class Module {
       };
     });
     return fields;
+  }
+
+  public buildSQLQueryFrom(data: IGQLValue, knexBuilder: any) {
+    this.getAllPropExtensions().forEach((pd) => {
+      if (!pd.isSearchable()) {
+        return;
+      }
+
+      pd.buildSQLQueryFrom(data, "", knexBuilder);
+    });
   }
 }
 

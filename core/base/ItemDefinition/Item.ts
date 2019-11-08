@@ -392,6 +392,36 @@ export default class Item {
     return sqlResult;
   }
 
+  public buildSQLQueryFrom(data: IGQLValue, knexBuilder: any) {
+    const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
+    const exclusionState = data[prefix + EXCLUSION_STATE_SUFFIX];
+
+    if (exclusionState === ItemExclusionState.EXCLUDED) {
+      knexBuilder.andWhere(prefix + EXCLUSION_STATE_SUFFIX, ItemExclusionState.EXCLUDED);
+    } else {
+      knexBuilder.andWhere((builder: any) => {
+        if (exclusionState !== ItemExclusionState.EXCLUDED) {
+          builder.andWhere((secondBuilder: any) => {
+            secondBuilder.where(prefix + EXCLUSION_STATE_SUFFIX, ItemExclusionState.INCLUDED);
+
+            const itemData = data[ITEM_PREFIX + this.getId()];
+            this.getSinkingProperties().forEach((pd) => {
+              if (!pd.isSearchable()) {
+                return;
+              }
+
+              pd.buildSQLQueryFrom(itemData, prefix, secondBuilder);
+            });
+          });
+        }
+
+        if (exclusionState === ItemExclusionState.ANY) {
+          builder.orWhere(prefix + EXCLUSION_STATE_SUFFIX, ItemExclusionState.EXCLUDED);
+        }
+      });
+    }
+  }
+
   /**
    * Tells whether the current item is excluded
    * @return a boolean whether it's excluded or not
