@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import Knex from "knex";
 import graphqlFields from "graphql-fields";
-import { CONNECTOR_SQL_COLUMN_FK_NAME, RESERVED_BASE_PROPERTIES_SQL, PREFIX_BUILD } from "../constants";
+import { CONNECTOR_SQL_COLUMN_FK_NAME, RESERVED_BASE_PROPERTIES_SQL, PREFIX_BUILD, RESERVED_SEARCH_PROPERTIES } from "../constants";
 
 const fsAsync = fs.promises;
 
@@ -82,8 +82,21 @@ const resolvers: IGraphQLResolversType = {
     const mod = itemDefinition.getParentModule();
     const moduleTable = mod.getQualifiedPathName();
     const selfTable = itemDefinition.getQualifiedPathName();
+    const searchMod = mod.getSearchModule();
+
+    // the way we calculate whether it requires a join goes by checking
+    // the base properties, to see if it represents a base property, like
+    // id, created_at, created_by, locale, etc... if that runs false,
+    // the we also have to check if we had a requeriment in the search
+    // query, we check the arguments, arguments might be token, limit, etc...
+    // ensure those are not, but the rest might be property ids, we check
+    // if they are all property ids and represent extensions, if that's the case
+    // we are basically doing a module level search, despite using this endpoint
+    // so we don't need a join, joining will be a waste of resources
     const requiresJoin = requestedFieldsSQL.some((columnName) =>
-      !RESERVED_BASE_PROPERTIES_SQL[columnName] && !mod.hasPropExtensionFor(columnName));
+      !RESERVED_BASE_PROPERTIES_SQL[columnName] && !mod.hasPropExtensionFor(columnName)) ||
+      Object.keys(resolverArgs.args).some((argName) =>
+      !RESERVED_SEARCH_PROPERTIES[argName] && !searchMod.hasPropExtensionFor(argName));
 
     const searchQuery = knex.select(requestedFieldsSQL).from(moduleTable).where({
       blocked_at: null,
@@ -159,7 +172,7 @@ const resolvers: IGraphQLResolversType = {
     }
 
     const insertQueryValueMod = await knex(moduleTable).insert(sqlModData).returning(requestedModuleColumnsSQL);
-    sqlIdefData.MODULE_ID = insertQueryValueMod[0].id;
+    sqlIdefData[CONNECTOR_SQL_COLUMN_FK_NAME] = insertQueryValueMod[0].id;
     const insertQueryValueIdef = await knex(selfTable).insert(sqlIdefData).returning(requestedIdefColumnsSQL);
     const value = {
       ...insertQueryValueMod[0],

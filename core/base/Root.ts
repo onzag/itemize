@@ -64,7 +64,7 @@ export interface ISQLColumnDefinitionType {
 }
 
 export interface ISQLTableDefinitionType {
-  [rowName: string]: ISQLColumnDefinitionType;
+  [columnName: string]: ISQLColumnDefinitionType;
 }
 
 export interface ISQLSchemaDefinitionType {

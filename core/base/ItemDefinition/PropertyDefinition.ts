@@ -169,11 +169,20 @@ export interface IPropertyDefinitionSupportedType {
   // to whatever is given, however if you have a complex value you should
   // set this, the raw function is the raw knex function, that allows to build raw queries,
   // by default if not set this function just sets {property_id: value}
-  sqlIn: (value: PropertyDefinitionSupportedType, id: string, raw: (...args: any[]) => any) => ISQLTableRowValue;
+  sqlIn: (
+    value: PropertyDefinitionSupportedType,
+    id: string,
+    property: PropertyDefinition,
+    raw: (...args: any[]) => any,
+  ) => ISQLTableRowValue;
   // sqlOut basically gives the entire table as data, and the property id where it expects
   // retrieval of that data; by default this function takes the table and does
   // data[property_id]
-  sqlOut: (row: ISQLTableRowValue, id: string) => PropertyDefinitionSupportedType;
+  sqlOut: (
+    row: ISQLTableRowValue,
+    id: string,
+    property: PropertyDefinition,
+  ) => PropertyDefinitionSupportedType;
   // TODO description
   sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) => void;
 
@@ -634,7 +643,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     gql: GraphQLString,
     nullableDefault: "",
     sql: "text",
-    sqlIn: (value: PropertyDefinitionSupportedPasswordType, id: string, raw) => {
+    sqlIn: (value: PropertyDefinitionSupportedPasswordType, id, property, raw) => {
       const obj = {};
       obj[id] = raw("crypt(?, gen_salt('bf',10))", value);
       return obj;
@@ -874,7 +883,7 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
       obj[id + "_ATXT"] = "text";
       return obj;
     },
-    sqlIn : (value: IPropertyDefinitionSupportedLocationType, id: string, raw) => {
+    sqlIn : (value: IPropertyDefinitionSupportedLocationType, id, property, raw) => {
       const obj = {};
       obj[id + "_GEO"] = raw("POINT(?, ?)", value.lng, value.lat);
       obj[id + "_LAT"] = value.lat;
@@ -1944,7 +1953,7 @@ export default class PropertyDefinition {
     // need 2 rows to store the field data, the currency, and the value
     // eg. ITEM_wheel_price might become ITEM_wheel_price_CURRENCY and ITEM_wheel_price_VALUE
     // which will in turn once extracted with sqlOut become {currency: ..., value: ...}
-    const colValue = sqlOut(row, colName);
+    const colValue = sqlOut(row, colName, this);
 
     // because we are returning from graphql, the information
     // is not prefixed and is rather returned in plain form
@@ -1985,7 +1994,7 @@ export default class PropertyDefinition {
     const sqlIn = this.getPropertyDefinitionDescription().sqlIn;
 
     // we return as it is
-    return sqlIn(gqlPropertyValue, resultingColumnName, raw);
+    return sqlIn(gqlPropertyValue, resultingColumnName, this, raw);
   }
 
   public buildSQLQueryFrom(data: IGQLValue, sqlPrefix: string, knexBuilder: any) {
