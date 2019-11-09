@@ -369,8 +369,14 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     },
     sqlIn: (value: IPropertyDefinitionSupportedCurrencyType, id: string) => {
       const obj = {};
-      obj[id + "_VALUE"] = value.value;
-      obj[id + "_CURRENCY"] = value.currency;
+
+      if (value === null) {
+        obj[id + "_VALUE"] = null;
+        obj[id + "_CURRENCY"] = null;
+      } else {
+        obj[id + "_VALUE"] = value.value;
+        obj[id + "_CURRENCY"] = value.currency;
+      }
       return obj;
     },
     sqlOut: (data: {[key: string]: any}, id: string) => {
@@ -1930,9 +1936,6 @@ export default class PropertyDefinition {
     // function which extracts data from rows for a given property
     const sqlOut = this.getPropertyDefinitionDescription().sqlOut;
 
-    // now we need to get the value
-    let colValue;
-
     // if the function to extract the data is not defined, this means the value is
     // just a plain value, so we just do a 1:1 extraction
 
@@ -1941,7 +1944,7 @@ export default class PropertyDefinition {
     // need 2 rows to store the field data, the currency, and the value
     // eg. ITEM_wheel_price might become ITEM_wheel_price_CURRENCY and ITEM_wheel_price_VALUE
     // which will in turn once extracted with sqlOut become {currency: ..., value: ...}
-    colValue = sqlOut(row, colName);
+    const colValue = sqlOut(row, colName);
 
     // because we are returning from graphql, the information
     // is not prefixed and is rather returned in plain form

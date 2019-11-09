@@ -17,6 +17,8 @@ import {
   RESERVED_ADD_PROPERTIES,
   RESERVED_SEARCH_PROPERTIES,
   RESERVED_BASE_PROPERTIES,
+  CONNECTOR_SQL_COLUMN_FK_NAME,
+  ITEM_PREFIX,
 } from "../../constants";
 import { GraphQLObjectType, GraphQLList, GraphQLOutputType } from "graphql";
 import {
@@ -614,15 +616,27 @@ export default class ItemDefinition {
    * Provides the table that is necesary to include this item definition as a whole
    * that is, this represents a whole table, that is necessary for this item to
    * be saved when populated, it basically adds up all the table bits
-   * from all the properties and all the items
+   * from all the properties and all the items, this does not include
+   * prop extensions nor module level properties, nor base
    */
   public getSQLTableDefinition(): ISQLTableDefinitionType {
     // add all the standard fields
-    let resultTableSchema: ISQLTableDefinitionType = {...RESERVED_BASE_PROPERTIES_SQL};
+    let resultTableSchema: ISQLTableDefinitionType = {
+      [CONNECTOR_SQL_COLUMN_FK_NAME] : {
+        type: "integer",
+        notNull: true,
+        fkTable: this.getParentModule().getQualifiedPathName(),
+        fkCol: "id",
+        fkAction: "cascade",
+      },
+    };
 
     // now we loop thru every property (they will all become columns)
-    this.parentModule.getAllPropExtensions().concat(this.getAllPropertyDefinitions()).forEach((pd) => {
-      resultTableSchema = {...resultTableSchema, ...pd.getSQLTableDefinition()};
+    this.getAllPropertyDefinitions().forEach((pd) => {
+      resultTableSchema = {
+        ...resultTableSchema,
+        ...pd.getSQLTableDefinition(),
+      };
     });
 
     // now we loop over the child items
@@ -864,18 +878,24 @@ export default class ItemDefinition {
 
   /**
    * Converts a SQL value directly coming from the database as it is
-   * to a graphql value for this specific item definition
+   * to a graphql value for this specific item definition,
+   * this includes the prop extensions and the reserved base properties
    * @param row the row value, with all the columns it has; the row
    * can be overblown with other field data, this will extract only the
    * data required for this item definition
+   * @param graphqlFields contains the only properties that are required
+   * in the request provided by grapql fields,
+   * eg {id: {}, name: {}, ITEM_kitten: {purrs: {}}}
    */
-  public convertSQLValueToGQLValue(row: ISQLTableRowValue): IGQLValue {
+  public convertSQLValueToGQLValue(row: ISQLTableRowValue, graphqlFields: any): IGQLValue {
     // first we create the graphql result
     let result: IGQLValue = {};
 
     // now we take all the base properties that we have
     // in the graphql model
-    Object.keys(RESERVED_BASE_PROPERTIES).forEach((basePropertyKey) => {
+    Object.keys(RESERVED_BASE_PROPERTIES).filter(
+      (baseProperty) => graphqlFields[baseProperty],
+    ).forEach((basePropertyKey) => {
       result[basePropertyKey] = row[basePropertyKey] || null;
     });
 
@@ -883,13 +903,23 @@ export default class ItemDefinition {
     // in this item definitions, and convert them one by one
     // with the row data, this basically also gives graphql value
     // in the key:value format
-    this.getAllPropertyDefinitions().forEach((pd) => {
+    this.getParentModule().getAllPropExtensions().filter(
+      (property) => graphqlFields[property.getId()],
+    ).concat(
+      this.getAllPropertyDefinitions().filter(
+        (property) => graphqlFields[property.getId()],
+      ),
+    ).forEach((pd) => {
       result = {...result, ...pd.convertSQLValueToGQLValue(row)};
     });
 
     // now we do the same for the items
-    this.getAllItems().forEach((item) => {
-      result = {...result, ...item.convertSQLValueToGQLValue(row)};
+    this.getAllItems().filter(
+      (item) => graphqlFields[ITEM_PREFIX + item.getId()],
+    ).forEach((item) => {
+      result = {...result, ...item.convertSQLValueToGQLValue(
+        row, graphqlFields[ITEM_PREFIX + item.getId()],
+      )};
     });
 
     return result;
@@ -898,6 +928,7 @@ export default class ItemDefinition {
   /**
    * Converts a graphql value, with all its items and everything it
    * has into a SQL row data value for this specific item definition
+   * it doesn't include its prop extensions
    * @param data the graphql data
    * @param raw a raw function that is used for creating raw sql statments, eg. knex.raw
    */

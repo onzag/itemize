@@ -9,7 +9,7 @@ import Confirm from "prompt-confirm";
 import Root from "../base/Root";
 
 const fsAsync = fs.promises;
-
+// TODO implement foreign keys, fk, fkAction, etc...
 function yesno(question: string) {
   return (new Confirm(question)).run();
 }

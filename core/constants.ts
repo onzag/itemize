@@ -270,6 +270,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
     type: "TEXT[]",
   },
 };
+export const CONNECTOR_SQL_COLUMN_FK_NAME = "MODULE_ID";
 export const PREFIX_BUILD = (s: string) => s + "_";
 export const SUFFIX_BUILD = (s: string) => "_" + s;
 export const PREFIXED_CONCAT = (...args: string[]) => args.join("__");

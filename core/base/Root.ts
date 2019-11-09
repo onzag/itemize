@@ -58,6 +58,9 @@ export interface IGraphQLResolversType {
 export interface ISQLColumnDefinitionType {
   type: string;
   notNull?: boolean;
+  fkTable?: string;
+  fkCol?: string;
+  fkAction?: string;
 }
 
 export interface ISQLTableDefinitionType {

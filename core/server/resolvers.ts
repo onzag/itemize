@@ -3,8 +3,21 @@ import fs from "fs";
 import path from "path";
 import Knex from "knex";
 import graphqlFields from "graphql-fields";
+import { CONNECTOR_SQL_COLUMN_FK_NAME, RESERVED_BASE_PROPERTIES_SQL, PREFIX_BUILD } from "../constants";
 
 const fsAsync = fs.promises;
+
+function buildColumnNames(base: any, prefix: string = ""): string[] {
+  let result: string[] = [];
+  Object.keys(base).forEach((key) => {
+    if (Object.keys(base[key]).length === 0) {
+      result.push(prefix + key);
+    } else {
+      result = result.concat(buildColumnNames(base[key], PREFIX_BUILD(prefix + key)));
+    }
+  });
+  return result;
+}
 
 let knex: Knex;
 (async () => {
@@ -33,40 +46,62 @@ let knex: Knex;
 
 const resolvers: IGraphQLResolversType = {
   async getItemDefinition(resolverArgs, itemDefinition) {
-    // TODO optimization
     const requestedFields = graphqlFields(resolverArgs.info);
-    console.log(requestedFields);
+    const requestedFieldsSQL = buildColumnNames(requestedFields);
 
     // TODO moderation fields blocking of retrieving
     // TODO blocked_at check if allows
 
-    const selectQueryValue: ISQLTableRowValue[] =
-      await knex.select().from(itemDefinition.getQualifiedPathName()).where({
-        id: resolverArgs.args.id,
-        blocked_at: null,
+    const mod = itemDefinition.getParentModule();
+    const moduleTable = mod.getQualifiedPathName();
+    const selfTable = itemDefinition.getQualifiedPathName();
+    const requiresJoin = requestedFieldsSQL.some((columnName) =>
+      !RESERVED_BASE_PROPERTIES_SQL[columnName] && !mod.hasPropExtensionFor(columnName));
+
+    const selectQuery = knex.select(requestedFieldsSQL).from(moduleTable).where({
+      id: resolverArgs.args.id,
+      blocked_at: null,
+      type: selfTable,
+    });
+    if (requiresJoin) {
+      selectQuery.join(selfTable, (clause) => {
+        clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
       });
+    }
+
+    const selectQueryValue: ISQLTableRowValue[] = await selectQuery;
     if (!selectQueryValue.length) {
       return null;
     }
-    return itemDefinition.convertSQLValueToGQLValue(selectQueryValue[0]);
+    return itemDefinition.convertSQLValueToGQLValue(selectQueryValue[0], requestedFields);
   },
   async searchItemDefinition(resolverArgs, itemDefinition) {
-    // TODO optimization
     const requestedFields = graphqlFields(resolverArgs.info);
-    console.log(requestedFields);
+    const requestedFieldsSQL = buildColumnNames(requestedFields);
 
-    const builderQuery = knex.select().from(itemDefinition.getQualifiedPathName()).where({
+    const mod = itemDefinition.getParentModule();
+    const moduleTable = mod.getQualifiedPathName();
+    const selfTable = itemDefinition.getQualifiedPathName();
+    const requiresJoin = requestedFieldsSQL.some((columnName) =>
+      !RESERVED_BASE_PROPERTIES_SQL[columnName] && !mod.hasPropExtensionFor(columnName));
+
+    const searchQuery = knex.select(requestedFieldsSQL).from(moduleTable).where({
       blocked_at: null,
+      type: selfTable,
     });
-    itemDefinition.buildSQLQueryFrom(resolverArgs.args, builderQuery);
+    itemDefinition.buildSQLQueryFrom(resolverArgs.args, searchQuery);
+    if (requiresJoin) {
+      searchQuery.join(selfTable, (clause) => {
+        clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
+      });
+    }
 
-    const baseResult: ISQLTableRowValue[] = await builderQuery;
-    return baseResult.map((row) => itemDefinition.convertSQLValueToGQLValue(row));
+    const baseResult: ISQLTableRowValue[] = await searchQuery;
+    return baseResult.map((row) => itemDefinition.convertSQLValueToGQLValue(row, requestedFields));
   },
   async searchModule(resolverArgs, mod) {
-    // TODO optimization
     const requestedFields = graphqlFields(resolverArgs.info);
-    console.log(requestedFields);
+    const requestedFieldsSQL = buildColumnNames(requestedFields);
 
     let allItemDefinitionsInvolved = mod.getAllChildItemDefinitionsRecursive();
     if (resolverArgs.args.types) {
@@ -75,29 +110,62 @@ const resolvers: IGraphQLResolversType = {
       });
     }
 
-    // TODO
+    const builderQuery = knex.select(requestedFieldsSQL).from(mod.getQualifiedPathName()).where({
+      blocked_at: null,
+    });
+    mod.buildSQLQueryFrom(resolverArgs.args, builderQuery);
+
+    const baseResult: ISQLTableRowValue[] = await builderQuery;
+    return baseResult.map((row) => mod.convertSQLValueToGQLValue(row, requestedFields));
   },
   async addItemDefinition(resolverArgs, itemDefinition) {
-    // TODO optimization
     const requestedFields = graphqlFields(resolverArgs.info);
-    console.log(requestedFields);
+    const requestedFieldsSQL = buildColumnNames(requestedFields);
 
     // TODO moderation fields blocking of setting the fields
 
+    const mod = itemDefinition.getParentModule();
+    const moduleTable = mod.getQualifiedPathName();
+    const selfTable = itemDefinition.getQualifiedPathName();
+
     // TODO some of this data needs to be gotten from the token
     // TODO validation
-    const sqlData: any = itemDefinition.convertGQLValueToSQLValue(resolverArgs.args, knex.raw);
-    sqlData.type = itemDefinition.getQualifiedPathName();
-    sqlData.created_at = knex.fn.now();
+    const sqlIdefData: any = itemDefinition.convertGQLValueToSQLValue(resolverArgs.args, knex.raw);
+    const sqlModData: any = itemDefinition.getParentModule().convertGQLValueToSQLValue(resolverArgs.args, knex.raw);
+    sqlModData.type = selfTable;
+    sqlModData.created_at = knex.fn.now();
     // TODO user super, locale, fts_language
-    sqlData.created_by = 1;
-    sqlData.locale = "en";
-    sqlData.fts_language = "en";
+    sqlModData.created_by = 1;
+    sqlModData.locale = "en";
+    sqlModData.fts_language = "en";
 
     // TODO check permissions for insert
 
-    const insertQueryValue = await knex(itemDefinition.getQualifiedPathName()).insert(sqlData).returning("*");
-    return insertQueryValue[0];
+    const requestedModuleColumnsSQL: string[] = [];
+    const requestedIdefColumnsSQL: string[] = [];
+    requestedFieldsSQL.forEach((columnName) => {
+      if (
+        RESERVED_BASE_PROPERTIES_SQL[columnName] ||
+        mod.hasPropExtensionFor(columnName)
+      ) {
+        requestedModuleColumnsSQL.push(columnName);
+      } else {
+        requestedIdefColumnsSQL.push(columnName);
+      }
+    });
+
+    if (!requestedModuleColumnsSQL.includes("id")) {
+      requestedModuleColumnsSQL.push("id");
+    }
+
+    const insertQueryValueMod = await knex(moduleTable).insert(sqlModData).returning(requestedModuleColumnsSQL);
+    sqlIdefData.MODULE_ID = insertQueryValueMod[0].id;
+    const insertQueryValueIdef = await knex(selfTable).insert(sqlIdefData).returning(requestedIdefColumnsSQL);
+    const value = {
+      ...insertQueryValueMod[0],
+      ...insertQueryValueIdef[0],
+    };
+    return itemDefinition.convertSQLValueToGQLValue(value, requestedFields);
   },
   async editItemDefinition(resolverArgs, itemDefinition) {
     // TODO optimization
@@ -112,6 +180,8 @@ const resolvers: IGraphQLResolversType = {
 
     // TODO check permissions for edit
 
+    // TODO this is messed up
+
     const insertQueryValue = await knex(itemDefinition.getQualifiedPathName()).update(sqlData).where({
       id: resolverArgs.args.id,
       blocked_at: null,
@@ -123,8 +193,9 @@ const resolvers: IGraphQLResolversType = {
     const requestedFields = graphqlFields(resolverArgs.info);
     console.log(requestedFields);
 
+    // TODO fix this query too, we need to join as well, do not rely in cascade
     const deleteQueryValue: ISQLTableRowValue[] =
-      await knex(itemDefinition.getQualifiedPathName()).where({
+      await knex(itemDefinition.getParentModule().getQualifiedPathName()).where({
         id: resolverArgs.args.id,
         blocked_at: null,
       }).delete("*");
@@ -133,7 +204,7 @@ const resolvers: IGraphQLResolversType = {
       return null;
     }
 
-    return itemDefinition.convertSQLValueToGQLValue(deleteQueryValue[0]);
+    return itemDefinition.convertSQLValueToGQLValue(deleteQueryValue[0], null);
   },
 };
 

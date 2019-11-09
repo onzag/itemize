@@ -316,8 +316,11 @@ export default class Item {
    * Given a SQL row it converts the value of the data contained
    * within that row into the valid graphql value for that data
    * @param row the row sql data
+   * @param graphqlFields contains the only properties that are required
+   * in the request provided by grapql fields,
+   * eg {id: {}, name: {}}
    */
-  public convertSQLValueToGQLValue(row: ISQLTableRowValue): IGQLValue {
+  public convertSQLValueToGQLValue(row: ISQLTableRowValue, graphqlFields: any): IGQLValue {
     // first we create a prefix, the prefix is basically ITEM_wheel_
     // this prefix is added as you remember for every item extra property as
     // wheel as the item itself
@@ -333,7 +336,9 @@ export default class Item {
     let gqlParentResult: IGQLValue = {};
 
     // for that we need all the sinking properties
-    this.getSinkingProperties().forEach((sinkingProperty) => {
+    this.getSinkingProperties().filter(
+      (property) => graphqlFields[property.getId()],
+    ).forEach((sinkingProperty) => {
       // and we add them for the row data, notice how we add the prefix
       // telling the property definition that its properties are prefixed in
       // the sql data with ITEM_wheel_
