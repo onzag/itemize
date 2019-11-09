@@ -702,6 +702,12 @@ export default class Module {
     return result;
   }
 
+  /**
+   * Builds a sql query specific for this module to search
+   * within itself in the database
+   * @param data the data for the query from graphql
+   * @param knexBuilder the knex builder
+   */
   public buildSQLQueryFrom(data: IGQLValue, knexBuilder: any) {
     this.getAllPropExtensions().forEach((pd) => {
       if (!pd.isSearchable()) {
@@ -728,6 +734,12 @@ if (process.env.NODE_ENV !== "production") {
           type: "string",
         },
         minItems: 1,
+      },
+      readRoleAccess: {
+        type: "array",
+        items: {
+          type: "string",
+        },
       },
     },
     required: ["type"],

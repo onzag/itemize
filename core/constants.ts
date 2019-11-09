@@ -209,6 +209,9 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   blocked_by: {
     type: GraphQLID,
   },
+  blocked_reason: {
+    type: GraphQLString,
+  },
   flagged_by: {
     type: GraphQLList(GraphQLID),
   },
@@ -216,14 +219,6 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     type: GraphQLList(GraphQLString),
   },
 };
-export const MODERATION_FIELDS = [
-  "reviewed_at",
-  "reviewed_by",
-  "blocked_at",
-  "blocked_by",
-  "flagged_by",
-  "flagged_reasons",
-];
 export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   id: {
     type: "serial",
@@ -263,11 +258,14 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   blocked_by: {
     type: "integer",
   },
+  blocked_reason: {
+    type: "text",
+  },
   flagged_by: {
-    type: "INT[]",
+    type: "int[]",
   },
   flagged_reasons: {
-    type: "TEXT[]",
+    type: "text[]",
   },
 };
 export const CONNECTOR_SQL_COLUMN_FK_NAME = "MODULE_ID";
@@ -299,6 +297,9 @@ export const RESERVED_SEARCH_PROPERTIES = {
   token: {
     type: GraphQLNonNull(GraphQLString),
   },
+  locale: {
+    type: GraphQLNonNull(GraphQLString),
+  },
   first_result: {
     type: GraphQLNonNull(GraphQLInt),
   },
@@ -328,12 +329,37 @@ export const RESERVED_GETTER_PROPERTIES = {
   id: {
     type: GraphQLNonNull(GraphQLID),
   },
+  locale: {
+    type: GraphQLNonNull(GraphQLString),
+  },
 };
 export const RESERVED_ADD_PROPERTIES = {
   token: {
     type: GraphQLNonNull(GraphQLString),
   },
+  locale: {
+    type: GraphQLNonNull(GraphQLString),
+  },
 };
+export const USER_ROLES = {
+  ADMIN: "ADMIN",
+  MODERATOR: "MODERATOR",
+  USER: "USER",
+  GUEST: "GUEST",
+};
+export const MODERATION_FIELDS = [
+  "reviewed_at",
+  "reviewed_by",
+  "blocked_at",
+  "blocked_by",
+  "blocked_reason",
+  "flagged_by",
+  "flagged_reasons",
+];
+export const ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS = [
+  USER_ROLES.ADMIN,
+  USER_ROLES.MODERATOR,
+];
 
 export const UNIT_SUBTYPES = [
   "length",

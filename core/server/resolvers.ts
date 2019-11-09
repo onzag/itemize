@@ -3,7 +3,15 @@ import fs from "fs";
 import path from "path";
 import Knex from "knex";
 import graphqlFields from "graphql-fields";
-import { CONNECTOR_SQL_COLUMN_FK_NAME, RESERVED_BASE_PROPERTIES_SQL, PREFIX_BUILD, RESERVED_SEARCH_PROPERTIES } from "../constants";
+import {
+  CONNECTOR_SQL_COLUMN_FK_NAME,
+  RESERVED_BASE_PROPERTIES_SQL,
+  PREFIX_BUILD,
+  RESERVED_SEARCH_PROPERTIES,
+  USER_ROLES,
+  MODERATION_FIELDS,
+  ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
+} from "../constants";
 
 const fsAsync = fs.promises;
 
@@ -44,13 +52,30 @@ let knex: Knex;
   });
 })();
 
+function validateTokenAndGetData(token: string) {
+  return {
+    role: token,
+  };
+}
+
+function checkFieldsAreAvailableForRole(tokenData: any, fieldData: any) {
+  const moderationFieldsHaveBeenRequested = MODERATION_FIELDS.some((field) => fieldData[field]);
+  if (
+    moderationFieldsHaveBeenRequested &&
+    !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
+  ) {
+    throw new Error("You have requested to add/edit/view moderation fields with role: " + tokenData.role);
+  }
+}
+
 const resolvers: IGraphQLResolversType = {
   async getItemDefinition(resolverArgs, itemDefinition) {
-    const requestedFields = graphqlFields(resolverArgs.info);
-    const requestedFieldsSQL = buildColumnNames(requestedFields);
+    const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
-    // TODO moderation fields blocking of retrieving
-    // TODO blocked_at check if allows
+    const requestedFields = graphqlFields(resolverArgs.info);
+    checkFieldsAreAvailableForRole(tokenData, requestedFields);
+
+    const requestedFieldsSQL = buildColumnNames(requestedFields);
 
     const mod = itemDefinition.getParentModule();
     const moduleTable = mod.getQualifiedPathName();
