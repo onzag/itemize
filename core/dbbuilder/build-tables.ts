@@ -244,7 +244,7 @@ export async function buildTables(
   // so we start by looping, we use an of-loop because we want
   // to keep things sync, despite being an async function
   for (const tableName of Object.keys(newDatabaseSchema)) {
-    const oldTableSchema = newDatabaseSchema[tableName];
+    const oldTableSchema = oldDatabaseSchema[tableName];
     const newTableSchema = newDatabaseSchema[tableName];
 
     // if there is no old schema

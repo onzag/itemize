@@ -686,11 +686,41 @@ const PROPERTY_DEFINITION_SUPPORTED_TYPES_STANDARD
     nullableDefault: "",
     supportedSubtypes: ["html"],
     // TODO implement full text search
-    sql: "text",
-    sqlIn: stardardSQLInFn,
+    sql: (id: string) => {
+      return {
+        [id]: "text",
+        [id + "_VECTOR"]: "tsvector",
+      };
+    },
+    sqlIn: (value: PropertyDefinitionSupportedTextType, id: string) => {
+      if (value === null) {
+        return {
+          [id]: null,
+          [id + "_VECTOR"]: null,
+        };
+      }
+
+      // TODO setup vector with the value
+      // we need to know the subtype for this because html
+      // is handled differently, as we need to extract, we also need to know
+      // fts_language
+      return {
+        [id]: value,
+        [id + "_VECTOR"]: null,
+      };
+    },
     sqlOut: standardSQLOutFn,
     sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) => {
-      // TODO full text search
+      // TODO we need the fts_language here to pass to the ts_vector
+      const ftsLanguage = "english";
+      const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + id;
+
+      if (typeof data[searchName] !== "undefined" && data[searchName] !== null) {
+        knexBuilder.andWhereRaw(
+          sqlPrefix + id + "_VECTOR @@ to_tsvector(?, ?)",
+          [ftsLanguage, data[searchName]],
+        );
+      }
     },
 
     // validates the text, texts don't support json value

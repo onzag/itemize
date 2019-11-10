@@ -1,4 +1,4 @@
-import { GraphQLID, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLEnumType, GraphQLList } from "graphql";
+import { GraphQLID, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLEnumType, GraphQLList, GraphQLBoolean } from "graphql";
 import { ISQLTableDefinitionType, IGQLFieldsDefinitionType } from "./base/Root";
 
 // DATA ATTRIBUTES
@@ -186,10 +186,10 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   created_by: {
     type: GraphQLNonNull(GraphQLID),
   },
-  locale: {
+  language: {
     type: GraphQLNonNull(GraphQLString),
   },
-  fts_language: {
+  country: {
     type: GraphQLNonNull(GraphQLString),
   },
   edited_at: {
@@ -235,11 +235,11 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
     type: "integer",
     notNull: true,
   },
-  locale: {
+  language: {
     type: "string",
     notNull: true,
   },
-  fts_language: {
+  country: {
     type: "string",
     notNull: true,
   },
@@ -268,6 +268,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
     type: "text[]",
   },
 };
+export const MAX_SQL_LIMIT = 25;
 export const CONNECTOR_SQL_COLUMN_FK_NAME = "MODULE_ID";
 export const PREFIX_BUILD = (s: string) => s + "_";
 export const SUFFIX_BUILD = (s: string) => "_" + s;
@@ -297,14 +298,26 @@ export const RESERVED_SEARCH_PROPERTIES = {
   token: {
     type: GraphQLNonNull(GraphQLString),
   },
-  locale: {
+  language: {
     type: GraphQLNonNull(GraphQLString),
   },
-  first_result: {
+  country: {
+    type: GraphQLNonNull(GraphQLString),
+  },
+  filter_by_language: {
+    type: GraphQLNonNull(GraphQLBoolean),
+  },
+  filter_by_country: {
+    type: GraphQLNonNull(GraphQLBoolean),
+  },
+  offset: {
     type: GraphQLNonNull(GraphQLInt),
   },
   limit: {
     type: GraphQLNonNull(GraphQLInt),
+  },
+  search_date_identifier: {
+    type: GraphQLNonNull(GraphQLString),
   },
   order_by: {
     type: GraphQLNonNull(new GraphQLEnumType({
@@ -329,7 +342,10 @@ export const RESERVED_GETTER_PROPERTIES = {
   id: {
     type: GraphQLNonNull(GraphQLID),
   },
-  locale: {
+  language: {
+    type: GraphQLNonNull(GraphQLString),
+  },
+  country: {
     type: GraphQLNonNull(GraphQLString),
   },
 };
@@ -337,7 +353,10 @@ export const RESERVED_ADD_PROPERTIES = {
   token: {
     type: GraphQLNonNull(GraphQLString),
   },
-  locale: {
+  language: {
+    type: GraphQLNonNull(GraphQLString),
+  },
+  country: {
     type: GraphQLNonNull(GraphQLString),
   },
 };

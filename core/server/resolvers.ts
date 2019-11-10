@@ -11,6 +11,7 @@ import {
   USER_ROLES,
   MODERATION_FIELDS,
   ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
+  MAX_SQL_LIMIT,
 } from "../constants";
 
 const fsAsync = fs.promises;
@@ -28,10 +29,15 @@ function buildColumnNames(base: any, prefix: string = ""): string[] {
 }
 
 let knex: Knex;
+let config: any;
 (async () => {
   // Retrieve the config for the database
   const dbConfig = JSON.parse(await fsAsync.readFile(
     path.join("config", "db.json"),
+    "utf8",
+  ));
+  config = JSON.parse(await fsAsync.readFile(
+    "config.json",
     "utf8",
   ));
 
@@ -54,6 +60,7 @@ let knex: Knex;
 
 function validateTokenAndGetData(token: string) {
   return {
+    id: 1,
     role: token,
   };
 }
@@ -68,20 +75,50 @@ function checkFieldsAreAvailableForRole(tokenData: any, fieldData: any) {
   }
 }
 
+function checkLimit(args: any) {
+  if (args.limit > MAX_SQL_LIMIT) {
+    throw new Error("Limit set too high at " + args.limit);
+  }
+}
+
+function checkLanguageAndRegion(args: any) {
+  if (args.language.length !== 2) {
+    throw new Error("Please use valid non-regionalized language values");
+  }
+  if (!config.dictionaries[args.language]) {
+    throw new Error("This language is not supported, as no dictionary has been set");
+  }
+  if (args.country.length !== 2) {
+    throw new Error("Please use valid region 2-digit ISO codes");
+  }
+}
+
+// TODO validation of retrieval (roles)
+// TODO validation of setting (roles)
+// TODO flagging
+// TODO implementation of tokens
+
 const resolvers: IGraphQLResolversType = {
   async getItemDefinition(resolverArgs, itemDefinition) {
+    checkLanguageAndRegion(resolverArgs.args);
     const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
     const requestedFields = graphqlFields(resolverArgs.info);
     checkFieldsAreAvailableForRole(tokenData, requestedFields);
 
     const requestedFieldsSQL = buildColumnNames(requestedFields);
+    if (requestedFieldsSQL.length === 0) {
+      return {};
+    }
 
     const mod = itemDefinition.getParentModule();
     const moduleTable = mod.getQualifiedPathName();
     const selfTable = itemDefinition.getQualifiedPathName();
     const requiresJoin = requestedFieldsSQL.some((columnName) =>
       !RESERVED_BASE_PROPERTIES_SQL[columnName] && !mod.hasPropExtensionFor(columnName));
+
+    // TODO we need to check if the requested fields have the specific property definition rights
+    // before granting anything
 
     const selectQuery = knex.select(requestedFieldsSQL).from(moduleTable).where({
       id: resolverArgs.args.id,
@@ -101,7 +138,13 @@ const resolvers: IGraphQLResolversType = {
     return itemDefinition.convertSQLValueToGQLValue(selectQueryValue[0], requestedFields);
   },
   async searchItemDefinition(resolverArgs, itemDefinition) {
+    checkLanguageAndRegion(resolverArgs.args);
+    checkLimit(resolverArgs.args);
+    const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+
     const requestedFields = graphqlFields(resolverArgs.info);
+    checkFieldsAreAvailableForRole(tokenData, requestedFields);
+
     const requestedFieldsSQL = buildColumnNames(requestedFields);
 
     const mod = itemDefinition.getParentModule();
@@ -133,12 +176,28 @@ const resolvers: IGraphQLResolversType = {
         clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
       });
     }
+    searchQuery.andWhere("created_at", "<=", resolverArgs.args.search_date_identifier);
+    if (resolverArgs.args.filter_by_language) {
+      searchQuery.andWhere("language", resolverArgs.args.language);
+    }
+    if (resolverArgs.args.filter_by_country) {
+      searchQuery.andWhere("country", resolverArgs.args.country);
+    }
+    searchQuery.limit(resolverArgs.args.limit).offset(resolverArgs.args.offset);
+    // TODO we need to add a count query for both searches
+    // we need to validate the dates
 
     const baseResult: ISQLTableRowValue[] = await searchQuery;
     return baseResult.map((row) => itemDefinition.convertSQLValueToGQLValue(row, requestedFields));
   },
   async searchModule(resolverArgs, mod) {
+    checkLanguageAndRegion(resolverArgs.args);
+    checkLimit(resolverArgs.args);
+    const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+
     const requestedFields = graphqlFields(resolverArgs.info);
+    checkFieldsAreAvailableForRole(tokenData, requestedFields);
+
     const requestedFieldsSQL = buildColumnNames(requestedFields);
 
     let allItemDefinitionsInvolved = mod.getAllChildItemDefinitionsRecursive();
@@ -148,16 +207,29 @@ const resolvers: IGraphQLResolversType = {
       });
     }
 
-    const builderQuery = knex.select(requestedFieldsSQL).from(mod.getQualifiedPathName()).where({
+    const searchQuery = knex.select(requestedFieldsSQL).from(mod.getQualifiedPathName()).where({
       blocked_at: null,
     });
-    mod.buildSQLQueryFrom(resolverArgs.args, builderQuery);
+    mod.buildSQLQueryFrom(resolverArgs.args, searchQuery);
+    searchQuery.andWhere("created_at", "<=", resolverArgs.args.search_date_identifier);
+    if (resolverArgs.args.filter_by_language) {
+      searchQuery.andWhere("language", resolverArgs.args.language);
+    }
+    if (resolverArgs.args.filter_by_country) {
+      searchQuery.andWhere("country", resolverArgs.args.country);
+    }
+    searchQuery.limit(resolverArgs.args.limit).offset(resolverArgs.args.offset);
 
-    const baseResult: ISQLTableRowValue[] = await builderQuery;
+    const baseResult: ISQLTableRowValue[] = await searchQuery;
     return baseResult.map((row) => mod.convertSQLValueToGQLValue(row, requestedFields));
   },
   async addItemDefinition(resolverArgs, itemDefinition) {
+    checkLanguageAndRegion(resolverArgs.args);
+    const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+
     const requestedFields = graphqlFields(resolverArgs.info);
+    checkFieldsAreAvailableForRole(tokenData, requestedFields);
+
     const requestedFieldsSQL = buildColumnNames(requestedFields);
 
     // TODO moderation fields blocking of setting the fields
@@ -166,16 +238,14 @@ const resolvers: IGraphQLResolversType = {
     const moduleTable = mod.getQualifiedPathName();
     const selfTable = itemDefinition.getQualifiedPathName();
 
-    // TODO some of this data needs to be gotten from the token
     // TODO validation
     const sqlIdefData: any = itemDefinition.convertGQLValueToSQLValue(resolverArgs.args, knex.raw);
     const sqlModData: any = itemDefinition.getParentModule().convertGQLValueToSQLValue(resolverArgs.args, knex.raw);
     sqlModData.type = selfTable;
     sqlModData.created_at = knex.fn.now();
-    // TODO user super, locale, fts_language
-    sqlModData.created_by = 1;
-    sqlModData.locale = "en";
-    sqlModData.fts_language = "en";
+    sqlModData.created_by = tokenData.id;
+    sqlModData.language = resolverArgs.args.language;
+    sqlModData.country = resolverArgs.args.country;
 
     // TODO check permissions for insert
 
@@ -206,43 +276,65 @@ const resolvers: IGraphQLResolversType = {
     return itemDefinition.convertSQLValueToGQLValue(value, requestedFields);
   },
   async editItemDefinition(resolverArgs, itemDefinition) {
-    // TODO optimization
+    checkLanguageAndRegion(resolverArgs.args);
+    const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+
     const requestedFields = graphqlFields(resolverArgs.info);
-    console.log(requestedFields);
+    checkFieldsAreAvailableForRole(tokenData, requestedFields);
 
-    // TODO moderation reasons blocking of edit and gather of the fields
+    const requestedFieldsSQL = buildColumnNames(requestedFields);
 
-    // TODO some of this data needs to be gotten from the token
+    const mod = itemDefinition.getParentModule();
+    const moduleTable = mod.getQualifiedPathName();
+    const selfTable = itemDefinition.getQualifiedPathName();
+
     // TODO validation
-    const sqlData: any = itemDefinition.convertGQLValueToSQLValue(resolverArgs.args, knex.raw);
+    const sqlIdefData: any = itemDefinition.convertGQLValueToSQLValue(resolverArgs.args, knex.raw);
+    const sqlModData: any = itemDefinition.getParentModule().convertGQLValueToSQLValue(resolverArgs.args, knex.raw);
+    sqlModData.edited_at = knex.fn.now();
 
     // TODO check permissions for edit
-
-    // TODO this is messed up
-
-    const insertQueryValue = await knex(itemDefinition.getQualifiedPathName()).update(sqlData).where({
-      id: resolverArgs.args.id,
-      blocked_at: null,
+    // TODO check permissions for obtaining the values getting
+    const requestedModuleColumnsSQL: string[] = [];
+    const requestedIdefColumnsSQL: string[] = [];
+    requestedFieldsSQL.forEach((columnName) => {
+      if (
+        RESERVED_BASE_PROPERTIES_SQL[columnName] ||
+        mod.hasPropExtensionFor(columnName)
+      ) {
+        requestedModuleColumnsSQL.push(columnName);
+      } else {
+        requestedIdefColumnsSQL.push(columnName);
+      }
     });
-    return insertQueryValue[0];
+
+    const id = resolverArgs.args.id;
+    const [updateQueryValueMod, updateQueryValueIdef] = await Promise.all([
+      knex(moduleTable).update(sqlModData)
+        .where("id", id).returning(requestedModuleColumnsSQL),
+      knex(selfTable).update(sqlIdefData)
+        .where(CONNECTOR_SQL_COLUMN_FK_NAME, id).returning(requestedIdefColumnsSQL),
+    ]);
+    const value = {
+      ...updateQueryValueMod[0],
+      ...updateQueryValueIdef[0],
+    };
+    return itemDefinition.convertSQLValueToGQLValue(value, requestedFields);
   },
   async deleteItemDefinition(resolverArgs, itemDefinition) {
-    // TODO optimization
-    const requestedFields = graphqlFields(resolverArgs.info);
-    console.log(requestedFields);
+    checkLanguageAndRegion(resolverArgs.args);
+    const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
-    // TODO fix this query too, we need to join as well, do not rely in cascade
-    const deleteQueryValue: ISQLTableRowValue[] =
-      await knex(itemDefinition.getParentModule().getQualifiedPathName()).where({
-        id: resolverArgs.args.id,
-        blocked_at: null,
-      }).delete("*");
+    // TODO check permissions for delete
+    const value = resolvers.getItemDefinition(resolverArgs, itemDefinition);
 
-    if (!deleteQueryValue.length) {
-      return null;
-    }
+    // It cascades to the item definition
+    await knex(itemDefinition.getParentModule().getQualifiedPathName()).where({
+      id: resolverArgs.args.id,
+      blocked_at: null,
+    }).delete();
 
-    return itemDefinition.convertSQLValueToGQLValue(deleteQueryValue[0], null);
+    return value;
   },
 };
 

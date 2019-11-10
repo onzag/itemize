@@ -2,5 +2,9 @@
   "entry": "cyclingexchangehub",
   "appName": "Cycling Exchange Hub",
   "port": 8080,
-  "supportedLanguages": ["en", "es"]
+  "supportedLanguages": ["en", "es"],
+  "dictionaries": {
+    "en": "english",
+    "es": "spanish"
+  }
 }
