@@ -37,6 +37,7 @@ export interface IGQLSingleQueryFieldDefinitionType {
 }
 export interface IGQLSingleFieldDefinitionType {
   type: GraphQLOutputType;
+  description?: string;
 }
 export interface IGQLQueryFieldsDefinitionType {
   [fieldName: string]: IGQLSingleQueryFieldDefinitionType;
@@ -78,12 +79,14 @@ export function getGQLSchemaForRoot(root: Root, resolvers?: IGraphQLResolversTyp
   const query = new GraphQLObjectType({
     name: "ROOT_QUERY",
     fields: queryFields,
+    description: "The root query of the application which contains functions for GET and SEARCH",
   });
 
   // same for mutation they are object types
   const mutation = new GraphQLObjectType({
     name: "ROOT_MUTATIONS",
     fields: mutationFields,
+    description: "The root mutation of the application which contains functions for CREATE, EDIT and DELETE",
   });
 
   // now we return the shchema

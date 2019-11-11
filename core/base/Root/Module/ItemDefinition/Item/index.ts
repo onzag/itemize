@@ -83,11 +83,6 @@ export interface IItemRawJSONDataType {
  * An item might also be a group of items with a gate
  */
 export default class Item {
-  /**
-   * Schema only available in development
-   */
-  public static schema: any;
-
   // The basics
   public rawData: IItemRawJSONDataType;
   public parentItemDefinition: ItemDefinition;
@@ -429,64 +424,4 @@ export default class Item {
   public getItemDefinition() {
     return this.itemDefinition;
   }
-}
-
-if (process.env.NODE_ENV !== "production") {
-  // The schema for the item
-  Item.schema = {
-    $id: "Item",
-    type: "object",
-    properties: {
-      id: {
-        type: "string",
-        pattern: "^[a-z_]+$",
-      },
-      name: {
-        type: "string",
-        pattern: "^[a-z_]+$",
-      },
-      enforcedProperties: {
-        $ref: PropertiesValueMappingDefiniton.schema.$id,
-      },
-      predefinedProperties: {
-        $ref: PropertiesValueMappingDefiniton.schema.$id,
-      },
-      excludedIf: {
-        $ref: ConditionalRuleSet.schema.$id,
-      },
-      canUserExclude: {
-        type: "boolean",
-      },
-      canUserExcludeIf: {
-        $ref: ConditionalRuleSet.schema.$id,
-      },
-      defaultExcluded: {
-        type: "boolean",
-      },
-      defaultExcludedIf: {
-        $ref: ConditionalRuleSet.schema.$id,
-      },
-      ternaryExclusionState: {
-        type: "boolean",
-      },
-      exclusionIsCallout: {
-        type: "boolean",
-      },
-      sinkIn: {
-        type: "array",
-        items: {
-          type: "string",
-        },
-      },
-      disableSearch: {
-        type: "boolean",
-      },
-    },
-    definitions: {
-      PropertiesValueMappingDefiniton: PropertiesValueMappingDefiniton.schema,
-      ConditionalRuleSet: ConditionalRuleSet.schema,
-    },
-    required: ["id", "name"],
-    additionalProperties: false,
-  };
 }

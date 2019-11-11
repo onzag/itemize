@@ -47,11 +47,6 @@ export interface IModuleRawJSONDataType {
 
 export default class Module {
   /**
-   * Schema only available in development
-   */
-  public static schema: any;
-
-  /**
    * Builds the search mode of a raw module
    * this gives a module that is the search module
    * of the given module
@@ -517,31 +512,4 @@ export default class Module {
       return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
     });
   }
-}
-
-if (process.env.NODE_ENV !== "production") {
-  // Unprocessed modules have the properties for type and includes
-  // properties name and i18nData get added later
-  Module.schema = {
-    type: "object",
-    properties: {
-      type: {
-        const: "module",
-      },
-      includes: {
-        type: "array",
-        items: {
-          type: "string",
-        },
-        minItems: 1,
-      },
-      readRoleAccess: {
-        type: "array",
-        items: {
-          type: "string",
-        },
-      },
-    },
-    required: ["type"],
-  };
 }

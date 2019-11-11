@@ -1,7 +1,7 @@
 import Ajv from "ajv";
-import Root from "../base/Root";
-import ItemDefinition from "../base/Root/Module/ItemDefinition";
-import Module from "../base/Root/Module";
+import RootSchema from "../base/Root/schema";
+import ItemDefinitionSchema from "../base/Root/Module/ItemDefinition/schema";
+import ModuleSchema from "../base/Root/Module/schema";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import "source-map-support/register";
@@ -9,9 +9,9 @@ import "source-map-support/register";
 const ajv = new Ajv();
 
 export const checkRootSchemaValidate =
-  ajv.compile(Root.schema);
+  ajv.compile(RootSchema);
 export const checkItemDefinitionSchemaValidate =
-  ajv.compile(ItemDefinition.schema);
+  ajv.compile(ItemDefinitionSchema);
 export const checkPropertyDefinitionArraySchemaValidate =
   ajv.compile({
     type: "array",
@@ -20,7 +20,7 @@ export const checkPropertyDefinitionArraySchemaValidate =
     },
   });
 export const checkModuleSchemaValidate =
-  ajv.compile(Module.schema);
+  ajv.compile(ModuleSchema);
 
 export function ajvCheck(
   fn: Ajv.ValidateFunction,

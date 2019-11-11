@@ -56,14 +56,19 @@ export function getGQLFieldsDefinitionForItem(item: Item, propertiesAsInput?: bo
     }
   }
 
+  const description = item.getI18nDataFor("en").name ||
+    item.getItemDefinition().getI18nDataFor("en").name;
+
   // now we add the exclusion state, and the graphql object, depending to
   // what we have
   return {
     [PREFIX_BUILD(ITEM_PREFIX + item.getId()) + EXCLUSION_STATE_SUFFIX]: {
       type: GraphQLNonNull(GraphQLString),
+      description: description + " - exclusion state",
     },
     [ITEM_PREFIX + item.getId()]: {
       type: propertiesAsInput ? item._gqlInObj : item._gqlOutObj,
+      description,
     },
   };
 }

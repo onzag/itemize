@@ -41,10 +41,6 @@ export interface IPropertiesValueMappingDefinitonRawJSONDataType {
  * wheelset, this is a PropertiesValueMappingDefiniton
  */
 export default class PropertiesValueMappingDefiniton {
-  /**
-   * Schema only available in development
-   */
-  public static schema: any;
 
   public rawData: IPropertiesValueMappingDefinitonRawJSONDataType;
   public referredItemDefinition: ItemDefinition;
@@ -111,38 +107,4 @@ export default class PropertiesValueMappingDefiniton {
     }
     return value as PropertyDefinitionSupportedType;
   }
-}
-
-// We set the value of those if non in production
-// These are very useful debugging utilities
-if (process.env.NODE_ENV !== "production") {
-
-  // The schema for the definition
-  // {
-  //   "amount": 4,
-  //   "type": "car"
-  // },
-  // properties can be any string
-  // the values must be boolean string or number
-  // we should have at least one
-  PropertiesValueMappingDefiniton.schema = {
-    $id: "PropertiesValueMappingDefiniton",
-    type: "object",
-    // oneOf: [
-    //   {
-    //     type: "object",
-    //     properties: {
-    //       property: {
-    //         type: "string",
-    //         pattern: "^[a-z_]+$",
-    //       },
-    //     },
-    //     required: ["property"],
-    //     additionalProperties: false,
-    //   },
-    //   {},
-    // ],
-    additionalProperties: {},
-    minProperties: 1,
-  };
 }

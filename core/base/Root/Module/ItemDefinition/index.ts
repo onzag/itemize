@@ -1,9 +1,7 @@
-import ConditionalRuleSet from "./ConditionalRuleSet";
 import Item, { IItemRawJSONDataType, IItemValue, ItemExclusionState } from "./Item";
 import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionValue } from "./PropertyDefinition";
 import Module, { IModuleRawJSONDataType, OnStateChangeListenerType } from "..";
-import PropertiesValueMappingDefiniton from "./PropertiesValueMappingDefiniton";
 import {
   PREFIXED_CONCAT,
   ITEM_DEFINITION_PREFIX,
@@ -70,11 +68,6 @@ export enum ItemDefinitionIOActions {
  * which basically compounds all how this is defined
  */
 export default class ItemDefinition {
-  /**
-   * Schema only available in development
-   */
-  public static schema: any;
-
   /**
    * A raw helper function that gets a child or imported
    * raw item definition for an item, it's static, so it works
@@ -714,69 +707,4 @@ export default class ItemDefinition {
     }
     return PREFIXED_CONCAT(this.parentModule.getQualifiedPathName(), ITEM_DEFINITION_PREFIX + this.getName());
   }
-}
-
-// Setup the schema for files
-if (process.env.NODE_ENV !== "production") {
-  ItemDefinition.schema = {
-    $id: "ItemDefinition",
-    type: "object",
-    properties: {
-      type: {
-        const: "item",
-      },
-      includes: {
-        type: "array",
-        items: {
-          $ref: Item.schema.$id,
-        },
-      },
-      properties: {
-        type: "array",
-        items: {
-          $ref: PropertyDefinition.schema.$id,
-        },
-      },
-      imports: {
-        type: "array",
-        items: {
-          type: "string",
-        },
-        minItems: 1,
-        additionalItems: false,
-      },
-      readRoleAccess: {
-        type: "array",
-        items: {
-          type: "string",
-        },
-      },
-      createRoleAccess: {
-        type: "array",
-        items: {
-          type: "string",
-        },
-      },
-      editRoleAccess: {
-        type: "array",
-        items: {
-          type: "string",
-        },
-      },
-      deleteRoleAccess: {
-        type: "array",
-        items: {
-          type: "string",
-        },
-      },
-    },
-    definitions: {
-      PropertyDefinition: PropertyDefinition.schema,
-      Item: Item.schema,
-      PropertiesValueMappingDefiniton: PropertiesValueMappingDefiniton.schema,
-      ConditionalRuleSet: ConditionalRuleSet.schema,
-    },
-    required: ["type"],
-    additionalProperties: false,
-  };
 }

@@ -9,7 +9,7 @@ import {
   PREFIX_EDIT,
   PREFIX_DELETE,
 } from "../../../../constants";
-import ItemDefinition from ".";
+import ItemDefinition, { ItemDefinitionIOActions } from ".";
 import { getGQLFieldsDefinitionForProperty } from "./PropertyDefinition/gql";
 import { getGQLFieldsDefinitionForItem } from "./Item/gql";
 import { getGQLFieldsDefinitionForModule, getGQLInterfaceForModule } from "../gql";
@@ -71,6 +71,11 @@ export function getGQLTypeForItemDefinition(itemDefinition: ItemDefinition): Gra
       name: itemDefinition.getQualifiedPathName(),
       fields: getGQLFieldsDefinitionForItemDefinition(itemDefinition),
       interfaces: [getGQLInterfaceForModule(itemDefinition.getParentModule())],
+      description:
+        "CREATE ACCESS: " + itemDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.CREATE).join(", ") + " - " +
+        "READ ACCESS: " + itemDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.READ).join(", ") + " - " +
+        "EDIT ACCESS: " + itemDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.EDIT).join(", ") + " - " +
+        "DELETE ACCESS: " + itemDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.DELETE).join(", ") + " - ",
     });
   }
 

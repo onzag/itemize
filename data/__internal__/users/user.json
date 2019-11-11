@@ -1,7 +1,5 @@
 {
     "type": "item",
-    "readRoleAccess": ["#logged"],
-    "createRoleAccess": ["#guest"],
     "properties": [
         {
             "id": "username",
@@ -14,34 +12,38 @@
             "subtype": "email",
             "icon": "email",
             "searchLevel": "disabled",
+            "nullable": true,
             "htmlAutocomplete": "username",
-            "readRoleAccess": ["#self"]
+            "readRoleAccess": ["SELF", "ADMIN"],
+            "editRoleAccess": ["SELF", "ADMIN"]
+        },
+        {
+            "id": "e_validated",
+            "type": "boolean",
+            "nullable": true,
+            "searchLevel": "disabled",
+            "editRoleAccess": ["ADMIN"]
         },
         {
             "id": "password",
             "type": "password",
             "htmlAutocomplete": "current-password",
-            "disableRetrieval": true
+            "disableRetrieval": true,
+            "editRoleAccess": ["ADMIN"]
         },
         {
             "id": "role",
             "type": "string",
-            "values": ["user", "moderator", "admin"],
-            "default": "user",
-            "editRoleAccess": ["admin"]
-        },
-        {
-            "id": "banned_until",
-            "type": "date",
-            "nullable": true,
-            "editRoleAccess": ["moderator", "admin"],
-            "searchLevel": "disabled"
+            "values": ["USER", "MODERATOR", "ADMIN"],
+            "default": "USER",
+            "editRoleAccess": ["ADMIN"],
+            "createRoleAccess": ["ADMIN"]
         },
         {
             "id": "address",
             "type": "location",
             "nullable": true,
-            "readRoleAccess": ["#self"],
+            "readRoleAccess": ["SELF"],
             "searchLevel": "disabled"
         }
     ]

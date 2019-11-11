@@ -1,6 +1,7 @@
 import { GraphQLInputObjectType, GraphQLObjectType, GraphQLNonNull } from "graphql";
 import PropertyDefinition from "../PropertyDefinition";
 import { IGQLFieldsDefinitionType } from "../../../gql";
+import { ItemDefinitionIOActions } from "..";
 
 const PROPERTY_TYPE_GQL_POOL = {};
 
@@ -58,8 +59,18 @@ export function getGQLFieldsDefinitionForProperty(
     gqlResult = GraphQLNonNull(gqlResult);
   }
 
+  const baseDescription = propertyDefinition.getI18nDataFor("en").description ||
+    propertyDefinition.getI18nDataFor("en").label ||
+    "no description supplied";
+
+  const description = baseDescription + " - " +
+    "CREATE ACCESS: " + propertyDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.CREATE).join(", ") + " - " +
+    "READ ACCESS: " + propertyDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.READ).join(", ") + " - " +
+    "EDIT ACCESS: " + propertyDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.EDIT).join(", ") + " - ";
+
   resultFieldsSchema[propertyDefinition.getId()] = {
     type: gqlResult,
+    description,
   };
   return resultFieldsSchema;
 }

@@ -4,6 +4,7 @@ import Module from ".";
 import { getGQLFieldsDefinitionForProperty } from "./ItemDefinition/PropertyDefinition/gql";
 import { getGQLQueryFieldsForItemDefinition, getGQLMutationFieldsForItemDefinition } from "./ItemDefinition/gql";
 import { IGQLFieldsDefinitionType, IGraphQLResolversType, IGQLQueryFieldsDefinitionType } from "../gql";
+import { ItemDefinitionIOActions } from "./ItemDefinition";
 
 /**
  * Provides the fields definition for the module itself, and for all
@@ -50,6 +51,7 @@ export function getGQLInterfaceForModule(mod: Module): GraphQLInterfaceType {
     mod._gqlObj = new GraphQLInterfaceType({
       name: mod.getQualifiedPathName(),
       fields: getGQLFieldsDefinitionForModule(mod),
+      description: "READ ACCESS: " + mod.getRolesWithAccessTo(ItemDefinitionIOActions.READ).join(", "),
     });
   }
   // we return it

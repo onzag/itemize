@@ -177,47 +177,61 @@ export const LOCATION_SEARCH_I18N = [
 export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   id: {
     type: GraphQLNonNull(GraphQLID),
+    description: "The id of the object",
   },
   type: {
     type: GraphQLNonNull(GraphQLString),
+    description: "The type (qualified name) of the object",
   },
   created_at: {
     type: GraphQLNonNull(GraphQLString),
+    description: "When the item was created",
   },
   created_by: {
     type: GraphQLNonNull(GraphQLID),
+    description: "The id of the user who created this item",
   },
   language: {
     type: GraphQLNonNull(GraphQLString),
+    description: "The language that was used when this item was created",
   },
   country: {
     type: GraphQLNonNull(GraphQLString),
+    description: "The country that was used when this item was created",
   },
   edited_at: {
     type: GraphQLString,
+    description: "Whenever the item was modified, otherwise null",
   },
 
   // MODERATION SPECIFIC FIELDS
   reviewed_at: {
     type: GraphQLString,
+    description: "When a moderator or admin reviewed this object",
   },
   reviewed_by: {
     type: GraphQLID,
+    description: "The user id who reviewed it",
   },
   blocked_at: {
     type: GraphQLString,
+    description: "When the item was blocked, blocked items are not searchable or retrievable by normal means",
   },
   blocked_by: {
     type: GraphQLID,
+    description: "By whom it was blocked",
   },
   blocked_reason: {
     type: GraphQLString,
+    description: "A written text of why it was blocked",
   },
   flagged_by: {
     type: GraphQLList(GraphQLID),
+    description: "Users who flagged this item",
   },
   flagged_reasons: {
     type: GraphQLList(GraphQLString),
+    description: "Users who flagged this item, reason",
   },
 };
 export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
@@ -254,6 +268,9 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
     type: "integer",
   },
   blocked_at: {
+    type: "datetime",
+  },
+  blocked_until: {
     type: "datetime",
   },
   blocked_by: {
@@ -298,67 +315,85 @@ Object.keys(ORDER_BY_OPTIONS).forEach((key) => {
 export const RESERVED_SEARCH_PROPERTIES = {
   token: {
     type: GraphQLNonNull(GraphQLString),
+    description: "the access token provided by the app",
   },
   language: {
     type: GraphQLNonNull(GraphQLString),
+    description: "A supported language (dictionary wise) 2 digit code",
   },
   country: {
     type: GraphQLNonNull(GraphQLString),
+    description: "A country 2 digit code",
   },
   filter_by_language: {
     type: GraphQLNonNull(GraphQLBoolean),
+    description: "Whether to filter by language",
   },
   filter_by_country: {
     type: GraphQLNonNull(GraphQLBoolean),
+    description: "Whether to filter by country",
   },
   offset: {
     type: GraphQLNonNull(GraphQLInt),
+    description: "A SQL offset",
   },
   limit: {
     type: GraphQLNonNull(GraphQLInt),
+    description: "A SQL limit",
   },
   search_date_identifier: {
     type: GraphQLNonNull(GraphQLString),
+    description: "A date, this is to avoid items jumping during a search, it will filter out anything newer than this",
   },
   order_by: {
     type: GraphQLNonNull(new GraphQLEnumType({
       name: "RESERVED_SEARCH_PROPERTY_ENUM_ORDER_BY",
       values: searchOptionsOrderByOptions,
     })),
+    description: "An order type",
   },
   search: {
     type: GraphQLString,
+    description: "A search string",
   },
 };
 export const RESERVED_MODULE_SEARCH_PROPERTIES = {
   ...RESERVED_SEARCH_PROPERTIES,
   types: {
     type: GraphQLList(GraphQLNonNull(GraphQLString)),
+    description: "A list of types (qualified names) to filter by",
   },
 };
 export const RESERVED_GETTER_PROPERTIES = {
   token: {
     type: GraphQLNonNull(GraphQLString),
+    description: "the access token provided by the app",
   },
   id: {
     type: GraphQLNonNull(GraphQLID),
+    description: "the id for that item",
   },
   language: {
     type: GraphQLNonNull(GraphQLString),
+    description: "A supported language (dictionary wise) 2 digit code",
   },
   country: {
     type: GraphQLNonNull(GraphQLString),
+    description: "A country 2 digit code",
   },
 };
 export const RESERVED_ADD_PROPERTIES = {
   token: {
     type: GraphQLNonNull(GraphQLString),
+    description: "the access token provided by the app",
   },
   language: {
     type: GraphQLNonNull(GraphQLString),
+    description: "A supported language (dictionary wise) 2 digit code",
   },
   country: {
     type: GraphQLNonNull(GraphQLString),
+    description: "A country 2 digit code",
   },
 };
 export const USER_ROLES = {

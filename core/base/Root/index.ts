@@ -1,6 +1,4 @@
 import Module, { IModuleRawJSONDataType } from "./Module";
-import { GraphQLOutputType } from "graphql";
-import ItemDefinition from "./Module/ItemDefinition";
 
 export interface IRootRawJSONDataType {
   type: "root";
@@ -29,11 +27,6 @@ export interface IRawJSONBuildDataType {
 }
 
 export default class Root {
-  /**
-   * Schema only available in development
-   */
-  public static schema: any;
-
   public rawData: IRootRawJSONDataType;
 
   /**
@@ -76,36 +69,4 @@ export default class Root {
       null,
     );
   }
-}
-
-if (process.env.NODE_ENV !== "production") {
-  // The root schema object when unprocessed contains
-  // the type, includes, with the modules list, language, and the i18n path
-  // for the default i18n data to include, all but the type gets stripped
-  Root.schema = {
-    type: "object",
-    properties: {
-      type: {
-        const: "root",
-      },
-      includes: {
-        type: "array",
-        items: {
-          type: "string",
-        },
-        minItems: 1,
-      },
-      lang: {
-        type: "array",
-        items: {
-          type: "string",
-        },
-      },
-      i18n: {
-        type: "string",
-      },
-    },
-    additionalProperties: false,
-    required: ["type", "i18n"],
-  };
 }
