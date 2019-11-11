@@ -1,10 +1,10 @@
 import React from "react";
 import { DatePicker, DateTimePicker, TimePicker } from "material-ui-pickers";
 import { IPropertyEntryProps, getClassName } from ".";
-import { PropertyDefinitionSupportedDateType } from "../../../../../base/ItemDefinition/PropertyDefinition";
 import Moment from "moment";
 import { Icon } from "@material-ui/core";
 import equals from "deep-equal";
+import { PropertyDefinitionSupportedDateType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/date";
 
 /**
  * Provides the current value of the date given the

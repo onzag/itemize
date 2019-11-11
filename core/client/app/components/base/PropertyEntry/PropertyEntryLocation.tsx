@@ -1,8 +1,5 @@
 import React from "react";
 import { IPropertyEntryProps, getClassName } from ".";
-import {
-  IPropertyDefinitionSupportedLocationType,
-} from "../../../../../base/ItemDefinition/PropertyDefinition";
 import TextField from "@material-ui/core/TextField";
 import {
   MenuItem,
@@ -18,6 +15,7 @@ import L from "leaflet";
 
 import "leaflet/dist/leaflet.css";
 import "../../../../theme/leaflet.scss";
+import { IPropertyDefinitionSupportedLocationType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 
 // https://github.com/PaulLeCam/react-leaflet/issues/453
 // bug in leaflet

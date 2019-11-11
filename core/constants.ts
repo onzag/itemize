@@ -1,5 +1,6 @@
 import { GraphQLID, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLEnumType, GraphQLList, GraphQLBoolean } from "graphql";
-import { ISQLTableDefinitionType, IGQLFieldsDefinitionType } from "./base/Root";
+import { IGQLFieldsDefinitionType } from "./base/Root/gql";
+import { ISQLTableDefinitionType } from "./base/Root/sql";
 
 // DATA ATTRIBUTES
 
@@ -364,8 +365,9 @@ export const USER_ROLES = {
   ADMIN: "ADMIN",
   MODERATOR: "MODERATOR",
   USER: "USER",
-  GUEST: "GUEST",
 };
+export const SELF_METAROLE = "SELF";
+export const ANYONE_METAROLE = "ANYONE";
 export const MODERATION_FIELDS = [
   "reviewed_at",
   "reviewed_by",

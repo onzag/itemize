@@ -1,12 +1,13 @@
-import ItemDefinition, { IItemDefinitionValue } from "../../base/ItemDefinition";
+import ItemDefinition, { IItemDefinitionValue } from "../../base/Root/Module/ItemDefinition";
 import DevToolRawVisualizer from "./dRawVisualizer";
 import React from "react";
 import DevToolPropertyDefinition from "./dPropertyDef";
 import { getModulePath } from "./dModule";
 import ItemEntry, { WizardItemEntry } from "../app/components/base/ItemEntry";
-import PropertyDefinition, { PropertyDefinitionSupportedType } from "../../base/ItemDefinition/PropertyDefinition";
-import Item, { ItemExclusionState } from "../../base/ItemDefinition/Item";
-import Module from "../../base/Module";
+import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
+import Module from "../../base/Root/Module";
+import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 interface IItemDefProps {
   itemDef: ItemDefinition;

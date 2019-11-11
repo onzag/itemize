@@ -1,11 +1,14 @@
 import PropertyDefinition, {
-  IPropertyDefinitionRawJSONDataType, PropertyDefinitionSearchInterfacesType,
-} from "../base/ItemDefinition/PropertyDefinition";
-import { IItemRawJSONDataType } from "../base/ItemDefinition/Item";
-import { IModuleRawJSONDataType } from "../base/Module";
+  IPropertyDefinitionRawJSONDataType,
+} from "../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { IItemRawJSONDataType } from "../base/Root/Module/ItemDefinition/Item";
+import { IModuleRawJSONDataType } from "../base/Root/Module";
 import {
   IItemDefinitionRawJSONDataType,
-} from "../base/ItemDefinition";
+} from "../base/Root/Module/ItemDefinition";
+import {
+  PropertyDefinitionSearchInterfacesType,
+} from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { IRootRawJSONDataType } from "../base/Root";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";

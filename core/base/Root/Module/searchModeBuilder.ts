@@ -1,16 +1,15 @@
-import { IModuleRawJSONDataType } from "./Module";
+import { IModuleRawJSONDataType } from ".";
 import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
-  PropertyDefinitionSearchInterfacesType,
   PropertyInvalidReason,
   IPropertyDefinitionAlternativePropertyType,
-  PropertyDefinitionSearchInterfacesPrefixes,
 } from "./ItemDefinition/PropertyDefinition";
 import {
   IConditionalRuleSetRawJSONDataType,
   IConditionalRuleSetRawJSONDataPropertyType,
 } from "./ItemDefinition/ConditionalRuleSet";
 import ItemDefinition, { IItemDefinitionRawJSONDataType } from "./ItemDefinition";
+import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "./ItemDefinition/PropertyDefinition/search-interfaces";
 
 /**
  * Builds the search mode for a module

@@ -1,14 +1,14 @@
 import { IRootRawJSONDataType } from "../base/Root";
-import { IModuleRawJSONDataType } from "../base/Module";
+import { IModuleRawJSONDataType } from "../base/Root/Module";
 import {
   IPropertyDefinitionRawJSONDataType,
-} from "../base/ItemDefinition/PropertyDefinition";
+} from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import {
   IItemDefinitionRawJSONDataType,
-} from "../base/ItemDefinition";
+} from "../base/Root/Module/ItemDefinition";
 import {
   IItemRawJSONDataType,
-} from "../base/ItemDefinition/Item";
+} from "../base/Root/Module/ItemDefinition/Item";
 import "source-map-support/register";
 import { ILocaleLangDataType } from ".";
 

@@ -1,8 +1,6 @@
 import PropertyDefinition, {
-  PropertyDefinitionSupportedTypeName,
   IPropertyDefinitionValue,
-  PropertyDefinitionSupportedType,
-} from "../../../../../base/ItemDefinition/PropertyDefinition";
+} from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
 import PropertyEntryField from "./PropertyEntryField";
 import PropertyEntryBoolean from "./PropertyEntryBoolean";
@@ -12,6 +10,10 @@ import PropertyEntryLocation from "./PropertyEntryLocation";
 import PropertyEntryFiles from "./PropertyEntryFiles";
 import { LocaleContext, ICurrencyType, ICountryType } from "../../..";
 import { Ii18NType } from "../../../../../base/Root";
+import {
+  PropertyDefinitionSupportedType,
+  PropertyDefinitionSupportedTypeName,
+} from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 import "../../../../theme/property-entries.scss";
 

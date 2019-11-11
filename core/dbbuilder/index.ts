@@ -4,9 +4,10 @@ import colors from "colors/safe";
 import Knex from "knex";
 import Confirm from "prompt-confirm";
 
-import Root, { ISQLSchemaDefinitionType } from "../base/Root";
+import Root from "../base/Root";
 import { buildTables } from "./build-tables";
 import { buildForeignKeys } from "./build-foreign-key";
+import { ISQLSchemaDefinitionType, getSQLTablesSchemaForRoot } from "../base/Root/sql";
 
 const fsAsync = fs.promises;
 
@@ -61,7 +62,7 @@ export function yesno(question: string) {
   const root = new Root(data.root);
 
   // let's get the result by progressively building on top of it
-  const result = root.getSQLTablesSchema();
+  const result = getSQLTablesSchemaForRoot(root);
 
   // make some copies of that result
   const optimal = {...result};

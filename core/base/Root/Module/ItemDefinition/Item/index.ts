@@ -1,18 +1,12 @@
 // lets do the import, item definition depends on conditional rule set
 // and property value mapping
-import ItemDefinition, { IItemDefinitionValue } from ".";
-import PropertiesValueMappingDefiniton,
-  {
-    IPropertiesValueMappingDefinitonRawJSONDataType,
-  } from "./PropertiesValueMappingDefiniton";
+import ItemDefinition, { IItemDefinitionValue, ItemDefinitionIOActions } from "..";
 import ConditionalRuleSet, {
   IConditionalRuleSetRawJSONDataType,
-} from "./ConditionalRuleSet";
-import Module, { OnStateChangeListenerType } from "../Module";
-import PropertyDefinition from "./PropertyDefinition";
-import { PREFIX_BUILD, ITEM_PREFIX, EXCLUSION_STATE_SUFFIX, PREFIXED_CONCAT, SUFFIX_BUILD } from "../../constants";
-import { GraphQLString, GraphQLNonNull, GraphQLInputObjectType, GraphQLObjectType } from "graphql";
-import { ISQLTableDefinitionType, IGQLFieldsDefinitionType, ISQLTableRowValue, IGQLValue } from "../Root";
+} from "../ConditionalRuleSet";
+import Module, { OnStateChangeListenerType } from "../..";
+import PropertyDefinition from "../PropertyDefinition";
+import PropertiesValueMappingDefiniton, { IPropertiesValueMappingDefinitonRawJSONDataType } from "../PropertiesValueMappingDefiniton";
 
 export enum ItemExclusionState {
   EXCLUDED = "EXCLUDED",
@@ -99,6 +93,12 @@ export default class Item {
   public parentItemDefinition: ItemDefinition;
   public parentModule: Module;
 
+  // graphql helper
+  // tslint:disable-next-line: variable-name
+  public _gqlInObj: any;
+  // tslint:disable-next-line: variable-name
+  public _gqlOutObj: any;
+
   // the data that comes from the raw json is to be processed here
   private itemDefinition?: ItemDefinition;
   private excludedIf?: ConditionalRuleSet;
@@ -113,10 +113,6 @@ export default class Item {
   private onStateChangeListeners: OnStateChangeListenerType[];
   private stateExclusion: ItemExclusionState;
   private stateExclusionModified: boolean;
-
-  // graphql helper
-  private gqlInObj: any;
-  private gqlOutObj: any;
 
   /**
    * The constructor for an Item
@@ -216,215 +212,18 @@ export default class Item {
       .map((propertyId) => this.itemDefinition.getPropertyDefinitionFor(propertyId, false));
   }
 
-  /**
-   * Provides the table bit that is necessary to store item data
-   * for this item when included from the parent definition
-   */
-  public getSQLTableDefinition(): ISQLTableDefinitionType {
-    // the exclusion state needs to be stored in the table bit
-    // so we basically need to get a prefix for this item definition
-    // this is usually ITEM_ the item prefix, and the id of the item
-    // eg ITEM_wheel, we build a prefix as ITEM_wheel_
-    const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
-
-    // the result table schema contains the table definition of all
-    // the columns, the first column we add is the exclusion state
-    // because the exclusion state uses a suffix it is defined as
-    // ITEM_wheel_ + _EXCLUSION_STATE
-    let resultTableSchema: ISQLTableDefinitionType = {
-      [prefix + EXCLUSION_STATE_SUFFIX]: {
-        type: "string",
-        notNull: true,
-      },
-    };
-    // we need all the sinking properties and those are the
-    // ones added to the table
-    this.getSinkingProperties().forEach((sinkingProperty) => {
-      resultTableSchema = {
-        ...resultTableSchema,
-        ...sinkingProperty.getSQLTableDefinition(prefix),
-      };
+  public checkRoleAccessFor(
+    action: ItemDefinitionIOActions,
+    role: string,
+    userId: number,
+    ownerUserId: number,
+    requestedFields: any,
+    throwError: boolean,
+  ) {
+    return Object.keys(requestedFields).every((requestedField) => {
+      const propDef = this.itemDefinition.getPropertyDefinitionFor(requestedField, false);
+      return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
     });
-
-    // we return the resulting schema
-    return resultTableSchema;
-  }
-
-  /**
-   * Provides the graphql definition that will be required to store
-   * this item bit
-   * @param propertiesAsInput if it's in input mode to get
-   * graphql input fields instead
-   */
-  public getGQLFieldsDefinition(propertiesAsInput?: boolean): IGQLFieldsDefinitionType {
-    // the exclusion state needs to be stored in the schema bit
-    let itemFields = {};
-    // we need all the sinking properties and those are the
-    // ones added to the schema bit
-    this.getSinkingProperties().forEach((sinkingProperty) => {
-      itemFields = {
-        ...itemFields,
-        ...sinkingProperty.getGQLFieldsDefinition(propertiesAsInput),
-      };
-    });
-
-    // if we are in the input mode
-    // we need to check out the element we have created
-    // for the fields both for input and output, as the object
-    // itself is just an input type because an item can be whole
-    // null
-    if (
-      (propertiesAsInput && !this.gqlInObj) ||
-      (!propertiesAsInput && !this.gqlOutObj)
-    ) {
-      // we need to create it depending on the rule
-      // whether output or input, we create a GQL name
-      // just for this functionality that doesn't collide
-      // and is specific for this item instance
-      const itemGQLName = PREFIXED_CONCAT(
-        this.itemDefinition.getQualifiedPathName(),
-        ITEM_PREFIX + this.getId(),
-      );
-
-      // and depending if it's in or out
-      if (propertiesAsInput) {
-        this.gqlInObj = new GraphQLInputObjectType({
-          name: itemGQLName + "_In",
-          fields: itemFields,
-        });
-      } else {
-        this.gqlOutObj = new GraphQLObjectType({
-          name: itemGQLName + "_Out",
-          fields: itemFields,
-        });
-      }
-    }
-
-    // now we add the exclusion state, and the graphql object, depending to
-    // what we have
-    return {
-      [PREFIX_BUILD(ITEM_PREFIX + this.getId()) + EXCLUSION_STATE_SUFFIX]: {
-        type: GraphQLNonNull(GraphQLString),
-      },
-      [ITEM_PREFIX + this.getId()]: {
-        type: propertiesAsInput ? this.gqlInObj : this.gqlOutObj,
-      },
-    };
-  }
-
-  /**
-   * Given a SQL row it converts the value of the data contained
-   * within that row into the valid graphql value for that data
-   * @param row the row sql data
-   * @param graphqlFields contains the only properties that are required
-   * in the request provided by grapql fields,
-   * eg {id: {}, name: {}}
-   */
-  public convertSQLValueToGQLValue(row: ISQLTableRowValue, graphqlFields: any): IGQLValue {
-    // first we create a prefix, the prefix is basically ITEM_wheel_
-    // this prefix is added as you remember for every item extra property as
-    // wheel as the item itself
-    const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
-
-    // now this is the result, of the graphql parent field because this is
-    // an object that contains an object, the item sinking properties
-    // are contained within that prefix, for example if the sql is
-    // ITEM_wheel__EXCLUSION_STATE, ITEM_wheel_bolt, ITEM_wheel_rubber
-    // the output should be
-    // ITEM_wheel__EXCLUSION_STATE: ..., ITEM_wheel: {bolt: ... rubber: ...}
-    // this gqlParentResult represents what is in ITEM_wheel
-    let gqlParentResult: IGQLValue = {};
-
-    // for that we need all the sinking properties
-    this.getSinkingProperties().filter(
-      (property) => graphqlFields[property.getId()],
-    ).forEach((sinkingProperty) => {
-      // and we add them for the row data, notice how we add the prefix
-      // telling the property definition that its properties are prefixed in
-      // the sql data with ITEM_wheel_
-      gqlParentResult = {
-        ...gqlParentResult,
-        ...sinkingProperty.convertSQLValueToGQLValue(row, prefix),
-      };
-    });
-
-    // now we return both info, the exclusion state, and the item data
-    // prefixed as necessary
-    return {
-      [prefix + EXCLUSION_STATE_SUFFIX]: row[prefix + EXCLUSION_STATE_SUFFIX],
-      [ITEM_PREFIX + this.getId()]: gqlParentResult,
-    };
-  }
-
-  /**
-   * Converts a GraphQL value into a SQL row data, it takes apart a complex
-   * graphql value and converts it into a serializable sql form
-   * @param data the graphql data value
-   * @param raw a raw function that is used for creating raw sql statments, eg. knex.raw
-   */
-  public convertGQLValueToSQLValue(data: IGQLValue, raw: (value: any) => any): ISQLTableRowValue {
-    // so again we get the prefix as in ITEM_wheel_
-    const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
-    // the exclusion state in the graphql information should be included in
-    // the root data as ITEM_wheel__EXCLUSION_STATE so we extract it
-    const exclusionStateAccordingToGQL = data[prefix + EXCLUSION_STATE_SUFFIX];
-
-    // we add that data to the sql result
-    let sqlResult: ISQLTableRowValue = {
-      [prefix + EXCLUSION_STATE_SUFFIX]: exclusionStateAccordingToGQL,
-    };
-
-    // now the information that is specific about the sql value is only
-    // necessary if the state is not excluded, excluded means it should be
-    // null, even if the info is there, it will be ignored
-    if (exclusionStateAccordingToGQL !== ItemExclusionState.EXCLUDED) {
-      // so we get the sinking properties
-      this.getSinkingProperties().forEach((sinkingProperty) => {
-        // and start adding them, in this case, instead of giving
-        // the root data, we are passing the specific item data, remember
-        // it will be stored in a place like ITEM_wheel where all the properties
-        // are an object within there, we pass that, as all the info should be
-        // there, the prefix then represents the fact, we want all the added properties
-        // to be prefixed with what we are giving, in this case ITEM_wheel_
-        sqlResult = {
-          ...sqlResult,
-          ...sinkingProperty.convertGQLValueToSQLValue(data[ITEM_PREFIX + this.getId()], raw, prefix),
-        };
-      });
-    }
-
-    // we return that
-    return sqlResult;
-  }
-
-  public buildSQLQueryFrom(data: IGQLValue, knexBuilder: any) {
-    const prefix = PREFIX_BUILD(ITEM_PREFIX + this.getId());
-    const exclusionState = data[prefix + EXCLUSION_STATE_SUFFIX];
-
-    if (exclusionState === ItemExclusionState.EXCLUDED) {
-      knexBuilder.andWhere(prefix + EXCLUSION_STATE_SUFFIX, ItemExclusionState.EXCLUDED);
-    } else {
-      knexBuilder.andWhere((builder: any) => {
-        if (exclusionState !== ItemExclusionState.EXCLUDED) {
-          builder.andWhere((secondBuilder: any) => {
-            secondBuilder.where(prefix + EXCLUSION_STATE_SUFFIX, ItemExclusionState.INCLUDED);
-
-            const itemData = data[ITEM_PREFIX + this.getId()];
-            this.getSinkingProperties().forEach((pd) => {
-              if (!pd.isSearchable()) {
-                return;
-              }
-
-              pd.buildSQLQueryFrom(itemData, prefix, secondBuilder);
-            });
-          });
-        }
-
-        if (exclusionState === ItemExclusionState.ANY) {
-          builder.orWhere(prefix + EXCLUSION_STATE_SUFFIX, ItemExclusionState.EXCLUDED);
-        }
-      });
-    }
   }
 
   /**

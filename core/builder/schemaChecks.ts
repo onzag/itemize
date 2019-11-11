@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 import Root from "../base/Root";
-import ItemDefinition from "../base/ItemDefinition";
-import Module from "../base/Module";
+import ItemDefinition from "../base/Root/Module/ItemDefinition";
+import Module from "../base/Root/Module";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import "source-map-support/register";

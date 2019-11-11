@@ -1,7 +1,6 @@
-import ItemDefinition from ".";
-import PropertyDefinition, {
-  PropertyDefinitionSupportedType, IPropertyDefinitionAlternativePropertyType,
-} from "./PropertyDefinition";
+import { PropertyDefinitionSupportedType } from "../PropertyDefinition/types";
+import PropertyDefinition, { IPropertyDefinitionAlternativePropertyType } from "../PropertyDefinition";
+import ItemDefinition from "..";
 
 // Represents the way that properties are stored
 // Check the schema down to see how this relates

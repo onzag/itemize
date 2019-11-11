@@ -1,10 +1,10 @@
 import React from "react";
 import ItemDefinition, {
   IItemDefinitionValue,
-} from "../../../../../base/ItemDefinition";
+} from "../../../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition, {
-  PropertyDefinitionSupportedType, IPropertyDefinitionValue,
-} from "../../../../../base/ItemDefinition/PropertyDefinition";
+  IPropertyDefinitionValue,
+} from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { LocaleContext, ILocaleContextType } from "../../..";
 import PropertyEntry from "../PropertyEntry";
 import {
@@ -20,10 +20,11 @@ import {
   Snackbar,
   SnackbarContent,
 } from "@material-ui/core";
-import Item, { IItemValue, ItemExclusionState } from "../../../../../base/ItemDefinition/Item";
+import Item, { IItemValue, ItemExclusionState } from "../../../../../base/Root/Module/ItemDefinition/Item";
 
 import ParentedItemEntry from "./ParentedItemEntry";
 import ItemEntryDialog from "./Dialog";
+import { PropertyDefinitionSupportedType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 interface IWizardItemEntryProps {
   value: IItemDefinitionValue;

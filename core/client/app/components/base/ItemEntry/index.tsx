@@ -1,10 +1,10 @@
 import React from "react";
 import ItemDefinition, {
   IItemDefinitionValue,
-} from "../../../../../base/ItemDefinition";
+} from "../../../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition, {
-  PropertyDefinitionSupportedType, IPropertyDefinitionValue,
-} from "../../../../../base/ItemDefinition/PropertyDefinition";
+  IPropertyDefinitionValue,
+} from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { LocaleContext, ILocaleContextType } from "../../..";
 import PropertyEntry from "../PropertyEntry";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
@@ -14,13 +14,14 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import {
   Typography, Button, Icon, Snackbar, SnackbarContent, IconButton,
 } from "@material-ui/core";
-import Item, { ItemExclusionState, IItemValue } from "../../../../../base/ItemDefinition/Item";
+import Item, { ItemExclusionState, IItemValue } from "../../../../../base/Root/Module/ItemDefinition/Item";
 
 import "../../../../theme/item-entry.scss";
 
 import WizardItemEntry from "./WizardItemEntry";
 import ParentedItemEntry from "./ParentedItemEntry";
 import { ItemEntryDialogResponsive } from "./Dialog";
+import { PropertyDefinitionSupportedType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 interface IItemEntryProps {
   value: IItemDefinitionValue;

@@ -1,5 +1,5 @@
 import ItemDefinition, {
-  IItemDefinitionRawJSONDataType,
+  IItemDefinitionRawJSONDataType, ItemDefinitionIOActions,
 } from "./ItemDefinition";
 import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
@@ -8,21 +8,10 @@ import { buildSearchMode } from "./searchModeBuilder";
 import {
   MODULE_PREFIX,
   PREFIXED_CONCAT,
-  RESERVED_BASE_PROPERTIES,
-  PREFIX_SEARCH,
-  RESERVED_SEARCH_PROPERTIES,
-  RESERVED_BASE_PROPERTIES_SQL,
-} from "../constants";
-import { GraphQLInterfaceType, GraphQLList } from "graphql";
-import {
-  IGraphQLResolversType,
-  ISQLSchemaDefinitionType,
-  IGQLFieldsDefinitionType,
-  IGQLQueryFieldsDefinitionType,
-  IGQLValue,
-  ISQLTableDefinitionType,
-  ISQLTableRowValue,
-} from "./Root";
+  ANYONE_METAROLE,
+  SELF_METAROLE,
+} from "../../../constants";
+import { GraphQLInterfaceType } from "graphql";
 
 export type OnStateChangeListenerType = () => any;
 
@@ -48,6 +37,8 @@ export interface IModuleRawJSONDataType {
       ftsSearchFieldPlaceholder: string;
     },
   };
+
+  readRoleAccess?: string[];
 
   // module data
   children: Array<IModuleRawJSONDataType | IItemDefinitionRawJSONDataType>;
@@ -120,6 +111,11 @@ export default class Module {
    * The raw data of the module
    */
   public rawData: IModuleRawJSONDataType;
+
+  // graphql helper
+  // tslint:disable-next-line: variable-name
+  public _gqlObj: GraphQLInterfaceType;
+
   /**
    * The parent module, if any of this module instance
    * as an instance
@@ -142,8 +138,6 @@ export default class Module {
    * inherits
    */
   private propExtensions: PropertyDefinition[];
-
-  private gqlObj: GraphQLInterfaceType;
 
   /**
    * Builds a module from raw json data
@@ -490,231 +484,37 @@ export default class Module {
     return [this.getName()];
   }
 
-  /**
-   * Provides the table that is necesary to include this module and all
-   * its children child definitions into it
-   */
-  public getSQLTableDefinition(): ISQLTableDefinitionType {
-    // add all the standard fields
-    let resultTableSchema: ISQLTableDefinitionType = {...RESERVED_BASE_PROPERTIES_SQL};
-
-    // now we loop thru every property (they will all become columns)
-    this.getAllPropExtensions().forEach((pd) => {
-      resultTableSchema = {
-        ...resultTableSchema,
-        ...pd.getSQLTableDefinition(),
-      };
-    });
-
-    return resultTableSchema;
-  }
-
-  /**
-   * Provides the SQL table schemas that are contained
-   * within this module, you expect one schema per item definition
-   * it contains
-   */
-  public getSQLTablesSchema(): ISQLSchemaDefinitionType {
-    // this is where it will be contained
-    let resultSchema = {
-      [this.getQualifiedPathName()]: this.getSQLTableDefinition(),
-    };
-    this.getAllModules().forEach((cModule) => {
-      // first with child modules
-      resultSchema = {...resultSchema, ...cModule.getSQLTablesSchema()};
-    });
-    // then with child item definitions
-    this.getAllChildItemDefinitions().forEach((cIdef) => {
-      resultSchema = {...resultSchema, ...cIdef.getSQLTablesSchema()};
-    });
-    return resultSchema;
-  }
-
-  /**
-   * Provides the fields definition for the module itself, and for all
-   * items inside the module which extend these fields, modules by default
-   * contain called base properties, which every element has
-   * @param excludeBase exclude the base properties and only include prop extensions
-   * @param propertiesAsInput if the properties must be in input mode
-   */
-  public getGQLFieldsDefinition(excludeBase?: boolean, propertiesAsInput?: boolean): IGQLFieldsDefinitionType {
-    // first create the base considering on whether we exclude or include
-    // the base properties
-    let resultFieldsSchema: IGQLFieldsDefinitionType = excludeBase ? {} : {
-      ...RESERVED_BASE_PROPERTIES,
-    };
-    // now we get all prop extensions of this module
-    this.getAllPropExtensions().forEach((propExtension) => {
-      // and basically get the fields for that property
-      resultFieldsSchema = {
-        ...resultFieldsSchema,
-        ...propExtension.getGQLFieldsDefinition(propertiesAsInput),
-      };
-    });
-    // return that
-    return resultFieldsSchema;
-  }
-
-  /**
-   * Provides the type (for modules an interface)
-   * that represents this module data
-   */
-  public getGQLType(): GraphQLInterfaceType {
-    // if we don't have already created the module for this
-    // instance, we actually reuse, and this is important
-    // if we are using this same item in the same schema
-    // when calling via the parent
-    if (!this.gqlObj) {
-      // we create that object with the data
-      this.gqlObj = new GraphQLInterfaceType({
-        name: this.getQualifiedPathName(),
-        fields: this.getGQLFieldsDefinition(),
-      });
+  public getRolesWithAccessTo(action: ItemDefinitionIOActions) {
+    if (action === ItemDefinitionIOActions.READ) {
+      return this.rawData.readRoleAccess || [ANYONE_METAROLE];
     }
-    // we return it
-    return this.gqlObj;
+    return [];
   }
 
-  /**
-   * Provides the query fields in order to create the query
-   * for a given module, the only query fields you have access to
-   * for modules are search, modules do not support id searches
-   * because they only represent items, but would allow you to perform
-   * a whole level search into all the items it contains
-   * @param resolvers the resolvers that will be used to resolve the query,
-   * these are the generic resolvers that are consumed
-   */
-  public getGQLQueryFields(resolvers?: IGraphQLResolversType): IGQLQueryFieldsDefinitionType {
-    // This module might be a search module, and search modules are well, not what we use
-    // to retrieve fields, they are to define arguments
-    if (this.isInSearchMode()) {
-      throw new Error("Modules in search mode has no graphql queries");
-    }
+  public checkRoleAccessFor(
+    action: ItemDefinitionIOActions,
+    role: string,
+    userId: number,
+    ownerUserId: number,
+    requestedFields: any,
+    throwError: boolean,
+  ) {
+    const rolesWithAccess = this.getRolesWithAccessTo(action);
+    const modLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
+      rolesWithAccess.includes(SELF_METAROLE) && userId === ownerUserId
+    ) || rolesWithAccess.includes(role);
 
-    // now we setup the fields for the query
-    let fields: IGQLQueryFieldsDefinitionType = {
-      [PREFIX_SEARCH + this.getQualifiedPathName()]: {
-        type: GraphQLList(this.getGQLType()),
-        args: {
-          ...RESERVED_SEARCH_PROPERTIES,
-          // as you can realize the arguments exclude the base and make it into input mode
-          // that means no RESERVED_BASE_PROPERTIES
-          ...this.getSearchModule().getGQLFieldsDefinition(true, true),
-        },
-        resolve: (source: any, args: any, context: any, info: any) => {
-          if (resolvers) {
-            return resolvers.searchModule({
-              source,
-              args,
-              context,
-              info,
-            }, this);
-          }
-        },
-      },
-    };
-
-    // now we get all child definitions and add the query
-    // fields for each of them
-    this.getAllChildItemDefinitions().forEach((cIdef) => {
-      fields = {
-        ...fields,
-        ...cIdef.getGQLQueryFields(resolvers),
-      };
-    });
-    return fields;
-  }
-
-  /**
-   * Because modules have no mutations, it provides all the mutation
-   * fields of the item definitions the module contains
-   * @param resolvers the resolvers that will be used to resolve the query,
-   * these are the generic resolvers that are consumed
-   */
-  public getGQLMutationFields(resolvers?: IGraphQLResolversType): IGQLQueryFieldsDefinitionType {
-    if (this.isInSearchMode()) {
-      throw new Error("Modules in search mode has no graphql mutations");
-    }
-
-    // we make the fields, it's empty starting with because
-    // the module has no mutations
-    let fields: IGQLQueryFieldsDefinitionType = {};
-    // now we add the mutations of each one of the children
-    this.getAllChildItemDefinitions().forEach((cIdef) => {
-      fields = {
-        ...fields,
-        ...cIdef.getGQLMutationFields(resolvers),
-      };
-    });
-    return fields;
-  }
-
-  /**
-   * Converts a graphql value, with all its items and everything it
-   * has into a SQL row data value for this specific module
-   * @param data the graphql data
-   * @param raw a raw function that is used for creating raw sql statments, eg. knex.raw
-   */
-  public convertGQLValueToSQLValue(data: IGQLValue, raw: (value: any) => any): ISQLTableRowValue {
-    // first we create the row value
-    let result: ISQLTableRowValue = {};
-
-    // now we get all the property extensions
-    this.getAllPropExtensions().forEach((pd) => {
-      result = {...result, ...pd.convertGQLValueToSQLValue(data, raw)};
-    });
-
-    return result;
-  }
-
-  /**
-   * Converts a SQL value directly coming from the database as it is
-   * to a graphql value for this specific module, this
-   * only includes prop extensions and standard properties
-   * and excludes everything else
-   * @param row the row value, with all the columns it has; the row
-   * can be overblown with other field data, this will extract only the
-   * data required for this module
-   * @param graphqlFields contains the only properties that are required
-   * in the request provided by grapql fields,
-   * eg {id: {}, name: {}}
-   */
-  public convertSQLValueToGQLValue(row: ISQLTableRowValue, graphqlFields: any): IGQLValue {
-    // first we create the graphql result
-    let result: IGQLValue = {};
-
-    // now we take all the base properties that we have
-    // in the graphql model
-    Object.keys(RESERVED_BASE_PROPERTIES).forEach((basePropertyKey) => {
-      result[basePropertyKey] = row[basePropertyKey] || null;
-    });
-
-    // we also take all the property definitions we have
-    // in this item definitions, and convert them one by one
-    // with the row data, this basically also gives graphql value
-    // in the key:value format
-    this.getParentModule().getAllPropExtensions().filter(
-      (property) => graphqlFields[property.getId()],
-    ).forEach((pd) => {
-      result = {...result, ...pd.convertSQLValueToGQLValue(row)};
-    });
-
-    return result;
-  }
-
-  /**
-   * Builds a sql query specific for this module to search
-   * within itself in the database
-   * @param data the data for the query from graphql
-   * @param knexBuilder the knex builder
-   */
-  public buildSQLQueryFrom(data: IGQLValue, knexBuilder: any) {
-    this.getAllPropExtensions().forEach((pd) => {
-      if (!pd.isSearchable()) {
-        return;
+    if (!modLevelAccess) {
+      if (throwError) {
+        throw new Error(`Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
+        ` with roles ${rolesWithAccess.join(", ")}`);
       }
+      return false;
+    }
 
-      pd.buildSQLQueryFrom(data, "", knexBuilder);
+    return Object.keys(requestedFields).every((requestedField) => {
+      const propDef = this.getPropExtensionFor(requestedField);
+      return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
     });
   }
 }

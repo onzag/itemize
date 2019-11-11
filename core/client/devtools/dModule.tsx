@@ -1,6 +1,6 @@
 import React from "react";
 
-import Module from "../../base/Module";
+import Module from "../../base/Root/Module";
 import DevToolItemDefinition from "./dItemDef";
 import DevToolRawVisualizer from "./dRawVisualizer";
 import DevToolPropertyDefinition from "./dPropertyDef";

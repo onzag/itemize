@@ -2,11 +2,11 @@ import React from "react";
 import DevToolRawVisualizer from "./dRawVisualizer";
 import PropertyDefinition, {
   IPropertyDefinitionValue,
-  PropertyDefinitionSupportedType,
-} from "../../base/ItemDefinition/PropertyDefinition";
+} from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import PropertyEntry from "../app/components/base/PropertyEntry";
 import { getItemDefPath } from "./dItemDef";
 import { getModulePath } from "./dModule";
+import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 interface IPropertyDefProps {
   property: PropertyDefinition;

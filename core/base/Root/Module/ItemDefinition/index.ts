@@ -2,34 +2,16 @@ import ConditionalRuleSet from "./ConditionalRuleSet";
 import Item, { IItemRawJSONDataType, IItemValue, ItemExclusionState } from "./Item";
 import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionValue } from "./PropertyDefinition";
-import Module, { IModuleRawJSONDataType, OnStateChangeListenerType } from "../Module";
+import Module, { IModuleRawJSONDataType, OnStateChangeListenerType } from "..";
 import PropertiesValueMappingDefiniton from "./PropertiesValueMappingDefiniton";
 import {
   PREFIXED_CONCAT,
   ITEM_DEFINITION_PREFIX,
-  RESERVED_BASE_PROPERTIES_SQL,
-  PREFIX_GET,
-  PREFIX_SEARCH,
-  PREFIX_ADD,
-  PREFIX_EDIT,
-  PREFIX_DELETE,
-  RESERVED_GETTER_PROPERTIES,
-  RESERVED_ADD_PROPERTIES,
-  RESERVED_SEARCH_PROPERTIES,
-  RESERVED_BASE_PROPERTIES,
-  CONNECTOR_SQL_COLUMN_FK_NAME,
   ITEM_PREFIX,
-} from "../../constants";
-import { GraphQLObjectType, GraphQLList, GraphQLOutputType } from "graphql";
-import {
-  IGraphQLResolversType,
-  ISQLTableDefinitionType,
-  ISQLSchemaDefinitionType,
-  IGQLFieldsDefinitionType,
-  IGQLQueryFieldsDefinitionType,
-  ISQLTableRowValue,
-  IGQLValue,
-} from "../Root";
+  ANYONE_METAROLE,
+  SELF_METAROLE,
+} from "../../../../constants";
+import { GraphQLOutputType } from "graphql";
 
 export interface IItemDefinitionRawJSONDataType {
   // Builder data
@@ -56,6 +38,11 @@ export interface IItemDefinitionRawJSONDataType {
   // original data
   includes?: IItemRawJSONDataType[];
   properties?: IPropertyDefinitionRawJSONDataType[];
+  // role permissions
+  readRoleAccess?: string[];
+  createRoleAccess?: string[];
+  editRoleAccess?: string[];
+  deleteRoleAccess?: string[];
 
   // roperty gets added during procesing and merging
   // replacing imports, gotta be there even if empty
@@ -69,6 +56,13 @@ export interface IItemDefinitionValue {
   itemDefName: string;
   items: IItemValue[];
   properties: IPropertyDefinitionValue[];
+}
+
+export enum ItemDefinitionIOActions {
+  READ = "READ",
+  CREATE = "CREATE",
+  EDIT = "EDIT",
+  DELETE = "DELETE",
 }
 
 /**
@@ -161,6 +155,10 @@ export default class ItemDefinition {
   }
 
   public rawData: IItemDefinitionRawJSONDataType;
+  // Functions for graphql
+  // tslint:disable-next-line: variable-name
+  public _gqlObj: GraphQLOutputType;
+
   private itemInstances: Item[];
   private childDefinitions: ItemDefinition[];
   private importedChildDefinitions: Array<{
@@ -170,9 +168,6 @@ export default class ItemDefinition {
   private propertyDefinitions: PropertyDefinition[];
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
-
-  // Functions for graphql
-  private gqlObj: GraphQLOutputType;
 
   constructor(
     rawJSON: IItemDefinitionRawJSONDataType,
@@ -306,6 +301,10 @@ export default class ItemDefinition {
 
     // return it
     return definition;
+  }
+
+  public hasItemFor(id: string) {
+    return !!this.getItemFor(id);
   }
 
   public getItemFor(id: string) {
@@ -612,354 +611,52 @@ export default class ItemDefinition {
     return this.parentModule.isInSearchMode();
   }
 
-  /**
-   * Provides the table that is necesary to include this item definition as a whole
-   * that is, this represents a whole table, that is necessary for this item to
-   * be saved when populated, it basically adds up all the table bits
-   * from all the properties and all the items, this does not include
-   * prop extensions nor module level properties, nor base
-   */
-  public getSQLTableDefinition(): ISQLTableDefinitionType {
-    // add all the standard fields
-    let resultTableSchema: ISQLTableDefinitionType = {
-      [CONNECTOR_SQL_COLUMN_FK_NAME] : {
-        type: "integer",
-        notNull: true,
-        fkTable: this.getParentModule().getQualifiedPathName(),
-        fkCol: "id",
-        fkAction: "cascade",
-      },
-    };
-
-    // now we loop thru every property (they will all become columns)
-    this.getAllPropertyDefinitions().forEach((pd) => {
-      resultTableSchema = {
-        ...resultTableSchema,
-        ...pd.getSQLTableDefinition(),
-      };
-    });
-
-    // now we loop over the child items
-    this.getAllItems().forEach((i) => {
-      resultTableSchema = {...resultTableSchema, ...i.getSQLTableDefinition()};
-    });
-
-    return resultTableSchema;
+  public getRolesWithAccessTo(action: ItemDefinitionIOActions) {
+    if (action === ItemDefinitionIOActions.READ) {
+      return this.rawData.readRoleAccess || [ANYONE_METAROLE];
+    } else if (action === ItemDefinitionIOActions.CREATE) {
+      return this.rawData.createRoleAccess || [ANYONE_METAROLE];
+    } else if (action === ItemDefinitionIOActions.EDIT) {
+      return this.rawData.editRoleAccess || [SELF_METAROLE];
+    } else if (action === ItemDefinitionIOActions.DELETE) {
+      return this.rawData.deleteRoleAccess || [SELF_METAROLE];
+    }
+    return [];
   }
 
-  /**
-   * Provides all the schema of all the items, self and its children
-   * that are included within this item definition and all the table names
-   * that should be used using the qualified name
-   */
-  public getSQLTablesSchema(): ISQLSchemaDefinitionType {
-    // we add self
-    let result = {
-      [this.getQualifiedPathName()]: this.getSQLTableDefinition(),
-    };
-    // loop over the children and add each one of them and whatever they have
-    this.getChildDefinitions().forEach((cIdef) => {
-      result = {...result, ...cIdef.getSQLTablesSchema()};
-    });
-    // return that
-    return result;
-  }
+  public checkRoleAccessFor(
+    action: ItemDefinitionIOActions,
+    role: string,
+    userId: number,
+    ownerUserId: number,
+    requestedFields: any,
+    throwError: boolean,
+  ) {
+    const rolesWithAccess = this.getRolesWithAccessTo(action);
+    const idefLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
+      rolesWithAccess.includes(SELF_METAROLE) && userId === ownerUserId
+    ) || rolesWithAccess.includes(role);
 
-  /**
-   * Provides all the graphql fields that this item definition contains as well as its
-   * items, but only of this specific item definition and does not include its children
-   * @param propertiesAsInput if the properties should be in input form
-   */
-  public getGQLFieldsDefinition(excludeBase?: boolean, propertiesAsInput?: boolean): IGQLFieldsDefinitionType {
-    // the fields result in graphql field form
-    let fieldsResult: IGQLFieldsDefinitionType =
-      this.parentModule.getGQLFieldsDefinition(excludeBase, propertiesAsInput);
-
-    // We get all the properties that this item definition contains
-    this.getAllPropertyDefinitions().forEach((pd) => {
-      // we deny adding those whose retrieval is disabled
-      if (pd.isRetrievalDisabled()) {
-        return;
+    if (!idefLevelAccess) {
+      if (throwError) {
+        throw new Error(`Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
+        ` with roles ${rolesWithAccess.join(", ")}`);
       }
-
-      // and we add them progressively
-      fieldsResult = {
-        ...fieldsResult,
-        ...pd.getGQLFieldsDefinition(propertiesAsInput),
-      };
-    });
-
-    // We do the same with the items
-    this.getAllItems().forEach((i) => {
-      fieldsResult = {
-        ...fieldsResult,
-        ...i.getGQLFieldsDefinition(propertiesAsInput),
-      };
-    });
-
-    // return that
-    return fieldsResult;
-  }
-
-  /**
-   * Provides the graphql type for the given item definition which
-   * extends the interface of its parent module already
-   */
-  public getGQLType(): GraphQLOutputType {
-    // we check if we have an object cached already
-    if (!this.gqlObj) {
-      // we set the object value
-      this.gqlObj = new GraphQLObjectType({
-        name: this.getQualifiedPathName(),
-        fields: this.getGQLFieldsDefinition(),
-        interfaces: [this.parentModule.getGQLType()],
-      });
+      return false;
     }
 
-    // return that
-    return this.gqlObj;
-  }
-
-  /**
-   * Provides all the query fields for the given item definition, including all
-   * the children item definitions that are included within this item definition
-   * @param resolvers the resolvers object that will be used to populate the resolvers
-   * of the query fields
-   */
-  public getGQLQueryFields(resolvers?: IGraphQLResolversType): IGQLQueryFieldsDefinitionType {
-    // of course you don't have a graphql query in search mode
-    if (this.isInSearchMode()) {
-      throw new Error("Modules in search mode has no graphql queries");
+    if (action === ItemDefinitionIOActions.DELETE) {
+      return true;
     }
 
-    // but we need that specific search mode counterpart to populate the arguments
-    // for our query
-    const searchModeCounterpart = this.getSearchModeCounterpart();
-
-    // now we add the queries
-    let fields: IGQLQueryFieldsDefinitionType = {
-      // basic get query to get an item given an id
-      [PREFIX_GET + this.getQualifiedPathName()]: {
-        type: this.getGQLType(),
-        args: {
-          ...RESERVED_GETTER_PROPERTIES,
-        },
-        // we just pipe the arguments out of the resolver
-        resolve: (source: any, args: any, context: any, info: any) => {
-          if (resolvers) {
-            return resolvers.getItemDefinition({
-              source,
-              args,
-              context,
-              info,
-            }, this);
-          }
-        },
-      },
-      // now this is the search query
-      [PREFIX_SEARCH + this.getQualifiedPathName()]: {
-        type: GraphQLList(this.getGQLType()),
-        args: {
-          ...RESERVED_SEARCH_PROPERTIES,
-          ...searchModeCounterpart.getGQLFieldsDefinition(true, true),
-        },
-        resolve: (source: any, args: any, context: any, info: any) => {
-          if (resolvers) {
-            return resolvers.searchItemDefinition({
-              source,
-              args,
-              context,
-              info,
-            }, this);
-          }
-        },
-      },
-    };
-
-    // add the child definitions to the queries by adding theirs
-    this.getChildDefinitions().forEach((cIdef) => {
-      fields = {
-        ...fields,
-        ...cIdef.getGQLQueryFields(),
-      };
-    });
-
-    return fields;
-  }
-
-  /**
-   * Provides all the fields for the mutations that are required to take
-   * place in order to ADD, EDIT and DELETE item definition values
-   * @param resolvers the resolvers for the graphql mutations to populate
-   */
-  public getGQLMutationFields(resolvers?: IGraphQLResolversType): IGQLQueryFieldsDefinitionType {
-    // same as before not available in search mode
-    if (this.isInSearchMode()) {
-      throw new Error("Modules in search mode has no graphql mutations");
-    }
-
-    // now we populate the fields as we need to
-    let fields: IGQLQueryFieldsDefinitionType = {
-      // the add function works to create a new item definition
-      // instance for this specific item definition, so we
-      // mix the add properties fields, the parent module fields,
-      // excluding the base, and as input, because it's args,
-      // and then we get our own fields
-      [PREFIX_ADD + this.getQualifiedPathName()]: {
-        type: this.getGQLType(),
-        args: {
-          ...RESERVED_ADD_PROPERTIES,
-          ...this.getGQLFieldsDefinition(true, true),
-        },
-        resolve: (source: any, args: any, context: any, info: any) => {
-          if (resolvers) {
-            return resolvers.addItemDefinition({
-              source,
-              args,
-              context,
-              info,
-            }, this);
-          }
-        },
-      },
-      // The edition uses the standard getter properties to fetch
-      // an item definition instance given its id and then
-      // uses the same idea of adding in order to modify the data
-      // that is in there
-      [PREFIX_EDIT + this.getQualifiedPathName()]: {
-        type: this.getGQLType(),
-        args: {
-          ...RESERVED_GETTER_PROPERTIES,
-          ...this.getGQLFieldsDefinition(true, true),
-        },
-        resolve: (source: any, args: any, context: any, info: any) => {
-          if (resolvers) {
-            return resolvers.editItemDefinition({
-              source,
-              args,
-              context,
-              info,
-            }, this);
-          }
-        },
-      },
-      // The delete uses the standard getter properties to fetch
-      // the item definition instance, and basically deletes it
-      // instead of retrieving anything, well, it retrieves
-      // the deleted element itself
-      [PREFIX_DELETE + this.getQualifiedPathName()]: {
-        type: this.getGQLType(),
-        args: RESERVED_GETTER_PROPERTIES,
-        resolve: (source: any, args: any, context: any, info: any) => {
-          if (resolvers) {
-            return resolvers.deleteItemDefinition({
-              source,
-              args,
-              context,
-              info,
-            }, this);
-          }
-        },
-      },
-    };
-
-    // we repeat this process for all the item child definitions
-    // that are added in here
-    this.getChildDefinitions().forEach((cIdef) => {
-      fields = {
-        ...fields,
-        ...cIdef.getGQLMutationFields(),
-      };
-    });
-
-    // return that
-    return fields;
-  }
-
-  /**
-   * Converts a SQL value directly coming from the database as it is
-   * to a graphql value for this specific item definition,
-   * this includes the prop extensions and the reserved base properties
-   * @param row the row value, with all the columns it has; the row
-   * can be overblown with other field data, this will extract only the
-   * data required for this item definition
-   * @param graphqlFields contains the only properties that are required
-   * in the request provided by grapql fields,
-   * eg {id: {}, name: {}, ITEM_kitten: {purrs: {}}}
-   */
-  public convertSQLValueToGQLValue(row: ISQLTableRowValue, graphqlFields: any): IGQLValue {
-    // first we create the graphql result
-    let result: IGQLValue = {};
-
-    // now we take all the base properties that we have
-    // in the graphql model
-    Object.keys(RESERVED_BASE_PROPERTIES).filter(
-      (baseProperty) => graphqlFields[baseProperty],
-    ).forEach((basePropertyKey) => {
-      result[basePropertyKey] = row[basePropertyKey] || null;
-    });
-
-    // we also take all the property definitions we have
-    // in this item definitions, and convert them one by one
-    // with the row data, this basically also gives graphql value
-    // in the key:value format
-    this.getParentModule().getAllPropExtensions().filter(
-      (property) => graphqlFields[property.getId()],
-    ).concat(
-      this.getAllPropertyDefinitions().filter(
-        (property) => graphqlFields[property.getId()],
-      ),
-    ).forEach((pd) => {
-      result = {...result, ...pd.convertSQLValueToGQLValue(row)};
-    });
-
-    // now we do the same for the items
-    this.getAllItems().filter(
-      (item) => graphqlFields[ITEM_PREFIX + item.getId()],
-    ).forEach((item) => {
-      result = {...result, ...item.convertSQLValueToGQLValue(
-        row, graphqlFields[ITEM_PREFIX + item.getId()],
-      )};
-    });
-
-    return result;
-  }
-
-  /**
-   * Converts a graphql value, with all its items and everything it
-   * has into a SQL row data value for this specific item definition
-   * it doesn't include its prop extensions
-   * @param data the graphql data
-   * @param raw a raw function that is used for creating raw sql statments, eg. knex.raw
-   */
-  public convertGQLValueToSQLValue(data: IGQLValue, raw: (value: any) => any): ISQLTableRowValue {
-    // first we create the row value
-    let result: ISQLTableRowValue = {};
-
-    // now we get all the property definitions and do the same
-    // that we did in the SQLtoGQL but in reverse
-    this.getAllPropertyDefinitions().forEach((pd) => {
-      result = {...result, ...pd.convertGQLValueToSQLValue(data, raw)};
-    });
-    // also with the items
-    this.getAllItems().forEach((item) => {
-      result = {...result, ...item.convertGQLValueToSQLValue(data, raw)};
-    });
-
-    return result;
-  }
-
-  public buildSQLQueryFrom(data: IGQLValue, knexBuilder: any) {
-    this.parentModule.getAllPropExtensions().concat(this.getAllPropertyDefinitions()).forEach((pd) => {
-      if (!pd.isSearchable()) {
-        return;
+    return Object.keys(requestedFields).every((requestedField) => {
+      if (requestedField.startsWith(ITEM_PREFIX)) {
+        const propDef = this.getPropertyDefinitionFor(requestedField, true);
+        return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
+      } else {
+        const item = this.getItemFor(requestedField.replace(ITEM_PREFIX, ""));
+        return item.checkRoleAccessFor(action, role, userId, ownerUserId, requestedFields[requestedField], throwError);
       }
-
-      pd.buildSQLQueryFrom(data, "", knexBuilder);
-    });
-
-    this.getAllItems().forEach((item) => {
-      item.buildSQLQueryFrom(data, knexBuilder);
     });
   }
 
@@ -1055,6 +752,12 @@ if (process.env.NODE_ENV !== "production") {
         },
       },
       createRoleAccess: {
+        type: "array",
+        items: {
+          type: "string",
+        },
+      },
+      editRoleAccess: {
         type: "array",
         items: {
           type: "string",

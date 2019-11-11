@@ -1,5 +1,5 @@
 import Knex from "knex";
-import { ISQLColumnDefinitionType } from "../base/Root";
+import { ISQLColumnDefinitionType } from "../base/Root/sql";
 
 /**
  * Builds a type from the knex table

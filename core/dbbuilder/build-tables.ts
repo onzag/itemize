@@ -1,7 +1,7 @@
 import colors from "colors/safe";
 import Knex from "knex";
 
-import { ISQLSchemaDefinitionType, ISQLTableDefinitionType, ISQLColumnDefinitionType } from "../base/Root";
+import { ISQLSchemaDefinitionType, ISQLTableDefinitionType, ISQLColumnDefinitionType } from "../base/Root/sql";
 import { showErrorStackAndLogMessage, yesno } from ".";
 import { buildColumn } from "./build-column";
 

@@ -1,14 +1,7 @@
 import React from "react";
 import { IPropertyEntryProps, getClassName } from ".";
-import {
-  PropertyDefinitionSupportedStringType,
-  PropertyDefinitionSupportedNumberType,
-  PropertyDefinitionSupportedIntegerType,
-  PropertyDefinitionSupportedYearType,
-  IPropertyDefinitionSupportedCurrencyType,
-  IPropertyDefinitionSupportedUnitType,
-} from "../../../../../base/ItemDefinition/PropertyDefinition";
 import TextField from "@material-ui/core/TextField";
+
 import {
   FormControl,
   InputLabel,
@@ -34,8 +27,14 @@ import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import equals from "deep-equal";
 import { escapeStringRegexp } from "../../../../../util";
-import { MAX_DECIMAL_COUNT } from "../../../../../constants";
 import convert from "convert-units";
+import { PropertyDefinitionSupportedStringType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/string";
+import { PropertyDefinitionSupportedNumberType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/number";
+import { PropertyDefinitionSupportedIntegerType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/integer";
+import { PropertyDefinitionSupportedYearType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/year";
+import { IPropertyDefinitionSupportedUnitType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/unit";
+import { IPropertyDefinitionSupportedCurrencyType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/currency";
+import { MAX_DECIMAL_COUNT } from "../../../../../constants";
 
 interface IPropertyEntryFieldState {
   suggestions: IPropertyEntryAutocompleteSuggestion[];

@@ -1,10 +1,8 @@
-import ItemDefinition from ".";
-import PropertyDefinition, {
-  PropertyDefinitionSupportedType,
-  IPropertyDefinitionAlternativePropertyType,
-} from "./PropertyDefinition";
-import Module from "../Module";
-import Item from "./Item";
+import { PropertyDefinitionSupportedType } from "../PropertyDefinition/types";
+import PropertyDefinition, { IPropertyDefinitionAlternativePropertyType } from "../PropertyDefinition";
+import ItemDefinition from "..";
+import Item from "../Item";
+import Module from "../..";
 
 // Types for the conditions
 export type ConditionalRuleComparatorType = "equals" | "not-equal" |

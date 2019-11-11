@@ -1,41 +1,30 @@
 import { IRootRawJSONDataType } from "../base/Root";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
-import { IModuleRawJSONDataType } from "../base/Module";
-import PropertyDefinition, {
-  PropertyDefinitionSearchInterfacesType,
-  IPropertyDefinitionAlternativePropertyType,
-  PropertyInvalidReason,
-} from "../base/ItemDefinition/PropertyDefinition";
-import ItemDefinition from "../base/ItemDefinition";
-import {
-  IPropertyDefinitionRawJSONDataType,
-} from "../base/ItemDefinition/PropertyDefinition";
-import {
-  IItemDefinitionRawJSONDataType,
-} from "../base/ItemDefinition";
-import {
-  PropertyDefinitionSupportedType,
-} from "../base/ItemDefinition/PropertyDefinition";
-import {
-  IPropertiesValueMappingDefinitonRawJSONDataType,
-} from "../base/ItemDefinition/PropertiesValueMappingDefiniton";
-import { IItemRawJSONDataType } from "../base/ItemDefinition/Item";
-import {
-  IConditionalRuleSetRawJSONDataPropertyType,
-} from "../base/ItemDefinition/ConditionalRuleSet";
-import {
-  IConditionalRuleSetRawJSONDataComponentType,
-} from "../base/ItemDefinition/ConditionalRuleSet";
-import {
-  IConditionalRuleSetRawJSONDataType,
-} from "../base/ItemDefinition/ConditionalRuleSet";
 import {
   RESERVED_BASE_PROPERTIES,
   RESERVED_SEARCH_PROPERTIES,
   RESERVED_GETTER_PROPERTIES,
 } from "../constants";
 import "source-map-support/register";
+import {
+  IConditionalRuleSetRawJSONDataType,
+  IConditionalRuleSetRawJSONDataComponentType,
+  IConditionalRuleSetRawJSONDataPropertyType,
+} from "../base/Root/Module/ItemDefinition/ConditionalRuleSet";
+import ItemDefinition, { IItemDefinitionRawJSONDataType } from "../base/Root/Module/ItemDefinition";
+import { IModuleRawJSONDataType } from "../base/Root/Module";
+import PropertyDefinition, {
+  IPropertyDefinitionAlternativePropertyType,
+  IPropertyDefinitionRawJSONDataType,
+  PropertyInvalidReason,
+} from "../base/Root/Module/ItemDefinition/PropertyDefinition";
+import {
+  PropertyDefinitionSupportedType,
+} from "../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { IItemRawJSONDataType } from "../base/Root/Module/ItemDefinition/Item";
+import { IPropertiesValueMappingDefinitonRawJSONDataType } from "../base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton";
+import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 
 export function checkConditionalRuleSet(
   rawData: IConditionalRuleSetRawJSONDataType,

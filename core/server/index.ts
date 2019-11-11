@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 import Root, { IRawJSONBuildDataType } from "../base/Root";
 import resolvers from "./resolvers";
+import { getGQLSchemaForRoot } from "../base/Root/gql";
 const fsAsync = fs.promises;
 
 const app = express();
@@ -21,7 +22,7 @@ function initializeApp() {
   });
 
   app.use("/graphql", graphqlHTTP({
-    schema: root.getGQLSchema(resolvers),
+    schema: getGQLSchemaForRoot(root, resolvers),
     graphiql: true,
   }));
 

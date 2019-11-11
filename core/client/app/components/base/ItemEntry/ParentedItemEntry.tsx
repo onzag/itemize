@@ -1,8 +1,5 @@
 import React from "react";
-import ItemDefinition from "../../../../../base/ItemDefinition";
-import PropertyDefinition, {
-  PropertyDefinitionSupportedType,
-} from "../../../../../base/ItemDefinition/PropertyDefinition";
+import ItemDefinition from "../../../../../base/Root/Module/ItemDefinition";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
@@ -11,7 +8,7 @@ import {
   Typography,
   Icon,
 } from "@material-ui/core";
-import Item, { IItemValue, ItemExclusionState } from "../../../../../base/ItemDefinition/Item";
+import Item, { IItemValue, ItemExclusionState } from "../../../../../base/Root/Module/ItemDefinition/Item";
 import {
   PropertyEntryBooleanAsSwitchBase,
   PropertyEntryBooleanAsRadioBase,
@@ -19,6 +16,8 @@ import {
 
 import ItemEntry from ".";
 import { Ii18NType } from "../../../../../base/Root";
+import PropertyDefinition from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { PropertyDefinitionSupportedType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 interface IParentedItemEntryProps {
   value: IItemValue;
