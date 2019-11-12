@@ -4,7 +4,7 @@ import Module from ".";
 import { getGQLFieldsDefinitionForProperty } from "./ItemDefinition/PropertyDefinition/gql";
 import { getGQLQueryFieldsForItemDefinition, getGQLMutationFieldsForItemDefinition } from "./ItemDefinition/gql";
 import { IGQLFieldsDefinitionType, IGraphQLResolversType, IGQLQueryFieldsDefinitionType } from "../gql";
-import { ItemDefinitionIOActions } from "./ItemDefinition";
+import ItemDefinition, { ItemDefinitionIOActions } from "./ItemDefinition";
 
 /**
  * Provides the fields definition for the module itself, and for all
@@ -97,7 +97,7 @@ export function getGQLQueryFieldsForModule(
             args,
             context,
             info,
-          }, this);
+          }, mod);
         }
       },
     },

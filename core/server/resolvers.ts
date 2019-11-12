@@ -23,6 +23,8 @@ import {
 import { buildSQLQueryForModule } from "../base/Root/Module/sql";
 import { convertSQLValueToGQLValueForModule } from "../base/Root/Module/sql";
 import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
+import Debug from "./debug";
+const debug = Debug("resolvers");
 
 const fsAsync = fs.promises;
 
@@ -40,6 +42,7 @@ function buildColumnNames(base: any, prefix: string = ""): string[] {
 
 let knex: Knex;
 let config: any;
+let countryList: any;
 (async () => {
   // Retrieve the config for the database
   const dbConfig = JSON.parse(await fsAsync.readFile(
@@ -50,6 +53,12 @@ let config: any;
     "config.json",
     "utf8",
   ));
+  countryList = JSON.parse(
+    await fsAsync.readFile(
+      path.join("resources", "countries.json"),
+      "utf8",
+    ),
+  );
 
   // Create the connection string
   const dbConnectionKnexConfig = {
@@ -63,7 +72,7 @@ let config: any;
   // we only need one client instance
   knex = Knex({
     client: "pg",
-    debug: true,
+    debug: process.env.NODE_ENV !== "production",
     connection: dbConnectionKnexConfig,
   });
 })();
@@ -76,30 +85,71 @@ function validateTokenAndGetData(token: string) {
 }
 
 function checkFieldsAreAvailableForRole(tokenData: any, fieldData: any) {
+  debug("Checking if fields are available for role...");
   const moderationFieldsHaveBeenRequested = MODERATION_FIELDS.some((field) => fieldData[field]);
   if (
     moderationFieldsHaveBeenRequested &&
     !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
   ) {
+    debug(
+      "Attempted to access to moderation fields with role",
+      tokenData.role,
+      "only",
+      ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
+      "allowed",
+    );
     throw new Error("You have requested to add/edit/view moderation fields with role: " + tokenData.role);
   }
 }
 
 function checkLimit(args: any) {
+  debug("Checking the limit...");
   if (args.limit > MAX_SQL_LIMIT) {
+    debug(
+      "Exceeded limit with",
+      args.limit,
+      "the maximum is",
+      MAX_SQL_LIMIT,
+    );
     throw new Error("Limit set too high at " + args.limit);
   }
 }
 
 function checkLanguageAndRegion(args: any) {
-  if (args.language.length !== 2) {
+  debug("Checking language and region...");
+  if (typeof args.language !== "string" || args.language.length !== 2) {
+    debug(
+      "Invalid language code",
+      args.language,
+    );
     throw new Error("Please use valid non-regionalized language values");
   }
   if (!config.dictionaries[args.language]) {
+    debug(
+      "Unavailable/Unsupported language",
+      args.language,
+    );
     throw new Error("This language is not supported, as no dictionary has been set");
   }
-  if (args.country.length !== 2) {
-    throw new Error("Please use valid region 2-digit ISO codes");
+  if (typeof args.country !== "string" || args.country.length !== 2) {
+    debug(
+      "Invalid country code",
+      args.country,
+    );
+    throw new Error("Please use valid region 2-digit ISO codes in uppercase");
+  }
+  if (!countryList[args.country]) {
+    debug(
+      "Unknown country",
+      args.country,
+    );
+    throw new Error("Unknown country " + args.country);
+  }
+}
+
+function mustBeLoggedIn(tokenData: any) {
+  if (!tokenData.userId) {
+    throw new Error("Must be logged in");
   }
 }
 
@@ -127,8 +177,10 @@ const resolvers: IGraphQLResolversType = {
     const requiresJoin = requestedFieldsSQL.some((columnName) =>
       !RESERVED_BASE_PROPERTIES_SQL[columnName] && !mod.hasPropExtensionFor(columnName));
 
-    if (!requestedFieldsSQL.includes("user_id")) {
-      requestedFieldsSQL.push("user_id");
+    debug("queried fields grant a join with idef data?", requiresJoin);
+
+    if (!requestedFieldsSQL.includes("created_by")) {
+      requestedFieldsSQL.push("created_by");
     }
     const selectQuery = knex.select(requestedFieldsSQL).from(moduleTable).where({
       id: resolverArgs.args.id,
@@ -143,18 +195,27 @@ const resolvers: IGraphQLResolversType = {
 
     const selectQueryValue: ISQLTableRowValue[] = await selectQuery;
     if (!selectQueryValue.length) {
+      debug("no result founds, returning null");
       return null;
     }
+    debug("SQL result found as", selectQueryValue[0]);
+
     const valueToProvide =
       convertSQLValueToGQLValueForItemDefinition(itemDefinition, selectQueryValue[0], requestedFields);
+
+    debug("converted to GQL as", valueToProvide);
+
+    debug("Checking role access, will throw an error if false");
     itemDefinition.checkRoleAccessFor(
       ItemDefinitionIOActions.READ,
       tokenData.role,
       tokenData.userId,
-      valueToProvide.user_id,
+      valueToProvide.created_by,
       requestedFields,
       true,
     );
+
+    debug("providing value");
     return valueToProvide;
   },
   async searchItemDefinition(resolverArgs, itemDefinition) {
@@ -169,6 +230,22 @@ const resolvers: IGraphQLResolversType = {
       ItemDefinitionIOActions.READ,
       tokenData.role,
       tokenData.userId,
+      // So why is it -1 here as well, well
+      // when searching, we cannot just check every
+      // component to see if the user has the rights
+      // using SELF for read, either a property or
+      // the whole item definition, cannot be checked
+      // during the search, it would make the query
+      // too complex otherwise, it's unecessary, so what
+      // we do, we assume searches are granted on role bases
+      // and we stop considering SELF, so we can see
+      // if the user can access all the values that
+      // he is querying as his role grants it, without
+      // considering selfs, granted we could use nulls,
+      // but again, null is the user id of the non-logged
+      // user, so if suddenly, a nonlogged user makes a search
+      // request, all the SELF permissions will be granted, and he
+      // might have unauthorized access
       -1,
       requestedFields,
       true,
@@ -183,10 +260,21 @@ const resolvers: IGraphQLResolversType = {
         searchingFields[arg] = resolverArgs.args[arg];
       }
     });
+    // We also check for the role access of the search fields
+    // the reason is simple, if we can use the query to query
+    // the value of something we don't have access to, then, we
+    // can brute force the value; for example, let's say we have
+    // a SELF locked phone_number field, another user might wish
+    // to know that phone number, so he starts a search process
+    // and uses the EXACT_phone_number field, he will get returned null
+    // until he matches the phone number, this is a leak, a weak one
+    // but a leak nevertheless
     searchModeCounterpart.checkRoleAccessFor(
       ItemDefinitionIOActions.READ,
       tokenData.role,
       tokenData.userId,
+      // And we also use -1 for the same reason as before
+      // this is a search, we ignore SELF
       -1,
       searchingFields,
       true,
@@ -249,6 +337,7 @@ const resolvers: IGraphQLResolversType = {
       ItemDefinitionIOActions.READ,
       tokenData.role,
       tokenData.userId,
+      // Same reason as before, with item definitions
       -1,
       requestedFields,
       true,
@@ -264,6 +353,7 @@ const resolvers: IGraphQLResolversType = {
       ItemDefinitionIOActions.READ,
       tokenData.role,
       tokenData.userId,
+      // Same reason as before, with item definitions
       -1,
       searchingFields,
       true,
@@ -298,6 +388,8 @@ const resolvers: IGraphQLResolversType = {
     checkLanguageAndRegion(resolverArgs.args);
     const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
+    mustBeLoggedIn(tokenData);
+
     const requestedFields = graphqlFields(resolverArgs.info);
     checkFieldsAreAvailableForRole(tokenData, requestedFields);
 
@@ -310,10 +402,23 @@ const resolvers: IGraphQLResolversType = {
         addingFields[arg] = resolverArgs.args[arg];
       }
     });
+
+    debug("extracted fields to add as", addingFields);
+
+    debug("checking role access...");
     itemDefinition.checkRoleAccessFor(
       ItemDefinitionIOActions.CREATE,
       tokenData.role,
       tokenData.userId,
+      // You might wonder why we used -1 as an user id, well
+      // -1 works, no valid user id is negative, and unlogged users
+      // have no user id, so imagine passing null, and having SELF as
+      // the role, then this would pass, granted, it's an edge
+      // case that shows the schema was defined weirdly, but none owns
+      // a non existant object; in this case nevertheless, null would work
+      // because SELF would be granted to the future owner of the object
+      // but that would be strange, and even then, we are forcing users
+      // to be logged in, but we still use -1; just to ignore selfs
       -1,
       addingFields,
       true,
@@ -338,6 +443,9 @@ const resolvers: IGraphQLResolversType = {
     sqlModData.language = resolverArgs.args.language;
     sqlModData.country = resolverArgs.args.country;
 
+    debug("SQL Input data for idef", sqlIdefData);
+    debug("SQL Input data for module", sqlModData);
+
     const requestedModuleColumnsSQL: string[] = [];
     const requestedIdefColumnsSQL: string[] = [];
     requestedFieldsSQL.forEach((columnName) => {
@@ -352,22 +460,46 @@ const resolvers: IGraphQLResolversType = {
     });
 
     if (!requestedModuleColumnsSQL.includes("id")) {
+      debug("Adding id to requested sql columns from the module output as it's missing");
       requestedModuleColumnsSQL.push("id");
     }
 
+    debug("Inserting...");
     const insertQueryValueMod = await knex(moduleTable).insert(sqlModData).returning(requestedModuleColumnsSQL);
     sqlIdefData[CONNECTOR_SQL_COLUMN_FK_NAME] = insertQueryValueMod[0].id;
-    const insertQueryValueIdef = await knex(selfTable).insert(sqlIdefData).returning(requestedIdefColumnsSQL);
+
+    const inserQuery = knex(selfTable).insert(sqlIdefData);
+    if (requestedIdefColumnsSQL.length) {
+      inserQuery.returning(requestedIdefColumnsSQL);
+    }
+    const insertQueryValueIdef = await inserQuery;
     const value = {
       ...insertQueryValueMod[0],
       ...insertQueryValueIdef[0],
     };
+
+    debug("SQL Output is", value);
+
+    debug("Checking role access for read...");
+    // The rule for create and read are different
+    // and set appart, one user might have the rule to
+    // create something but not to read it, it's weird,
+    // but a valid option
+    const requestedFieldsInIdef = {};
+    Object.keys(requestedFields).forEach((arg) => {
+      if (
+        itemDefinition.hasPropertyDefinitionFor(arg, true) ||
+        arg.startsWith(ITEM_PREFIX) && itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, ""))
+      ) {
+        requestedFieldsInIdef[arg] = requestedFields[arg];
+      }
+    });
     itemDefinition.checkRoleAccessFor(
       ItemDefinitionIOActions.READ,
       tokenData.role,
       tokenData.userId,
       tokenData.userId,
-      requestedFields,
+      requestedFieldsInIdef,
       true,
     );
     return convertSQLValueToGQLValueForItemDefinition(itemDefinition, value, requestedFields);
@@ -375,6 +507,8 @@ const resolvers: IGraphQLResolversType = {
   async editItemDefinition(resolverArgs, itemDefinition) {
     checkLanguageAndRegion(resolverArgs.args);
     const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+
+    mustBeLoggedIn(tokenData);
 
     const requestedFields = graphqlFields(resolverArgs.info);
     checkFieldsAreAvailableForRole(tokenData, requestedFields);
@@ -393,12 +527,12 @@ const resolvers: IGraphQLResolversType = {
       }
     });
     const id = resolverArgs.args.id;
-    const userIdData = await knex.select("user_id").from(moduleTable).where({
+    const userIdData = await knex.select("created_by").from(moduleTable).where({
       id,
       blocked_at: null,
       type: selfTable,
     });
-    const userId = userIdData[0] && userIdData[0].user_id;
+    const userId = userIdData[0] && userIdData[0].created_by;
     if (!userId) {
       throw new Error(`There's no ${selfTable} with id ${id}`);
     }
@@ -443,11 +577,17 @@ const resolvers: IGraphQLResolversType = {
       }
     });
 
+    const updateQueryMod = knex(moduleTable).update(sqlModData).where("id", id);
+    if (requestedModuleColumnsSQL.length) {
+      updateQueryMod.returning(requestedModuleColumnsSQL);
+    }
+    const updateQueryIdef = knex(selfTable).update(sqlIdefData).where(CONNECTOR_SQL_COLUMN_FK_NAME, id);
+    if (requestedIdefColumnsSQL.length) {
+      updateQueryIdef.returning(requestedIdefColumnsSQL);
+    }
     const [updateQueryValueMod, updateQueryValueIdef] = await Promise.all([
-      knex(moduleTable).update(sqlModData)
-        .where("id", id).returning(requestedModuleColumnsSQL),
-      knex(selfTable).update(sqlIdefData)
-        .where(CONNECTOR_SQL_COLUMN_FK_NAME, id).returning(requestedIdefColumnsSQL),
+      updateQueryMod,
+      updateQueryIdef,
     ]);
     const value = {
       ...updateQueryValueMod[0],
@@ -459,6 +599,8 @@ const resolvers: IGraphQLResolversType = {
     checkLanguageAndRegion(resolverArgs.args);
     const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
+    mustBeLoggedIn(tokenData);
+
     const requestedFields = graphqlFields(resolverArgs.info);
     checkFieldsAreAvailableForRole(tokenData, requestedFields);
 
@@ -467,12 +609,12 @@ const resolvers: IGraphQLResolversType = {
     const selfTable = itemDefinition.getQualifiedPathName();
 
     const id = resolverArgs.args.id;
-    const userIdData = await knex.select("user_id").from(moduleTable).where({
+    const userIdData = await knex.select("created_by").from(moduleTable).where({
       id,
       blocked_at: null,
       type: selfTable,
     });
-    const userId = userIdData[0] && userIdData[0].user_id;
+    const userId = userIdData[0] && userIdData[0].created_by;
     if (!userId) {
       throw new Error(`There's no ${selfTable} with id ${id}`);
     }

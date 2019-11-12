@@ -120,7 +120,7 @@ export function getGQLQueryFieldsForItemDefinition(
             args,
             context,
             info,
-          }, this);
+          }, itemDefinition);
         }
       },
     },
@@ -138,7 +138,7 @@ export function getGQLQueryFieldsForItemDefinition(
             args,
             context,
             info,
-          }, this);
+          }, itemDefinition);
         }
       },
     },
@@ -191,7 +191,7 @@ export function getGQLMutationFieldsForItemDefinition(
             args,
             context,
             info,
-          }, this);
+          }, itemDefinition);
         }
       },
     },
@@ -212,7 +212,7 @@ export function getGQLMutationFieldsForItemDefinition(
             args,
             context,
             info,
-          }, this);
+          }, itemDefinition);
         }
       },
     },
@@ -230,7 +230,7 @@ export function getGQLMutationFieldsForItemDefinition(
             args,
             context,
             info,
-          }, this);
+          }, itemDefinition);
         }
       },
     },

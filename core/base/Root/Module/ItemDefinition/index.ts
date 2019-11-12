@@ -297,11 +297,15 @@ export default class ItemDefinition {
   }
 
   public hasItemFor(id: string) {
-    return !!this.getItemFor(id);
+    return !!this.itemInstances.find((ii) => ii.getId() === id);
   }
 
   public getItemFor(id: string) {
-    return this.itemInstances.find((ii) => ii.getId() === id);
+    const item = this.itemInstances.find((ii) => ii.getId() === id);
+    if (!item) {
+      throw new Error("Requested invalid item " + id);
+    }
+    return item;
   }
 
   /**
@@ -644,11 +648,11 @@ export default class ItemDefinition {
 
     return Object.keys(requestedFields).every((requestedField) => {
       if (requestedField.startsWith(ITEM_PREFIX)) {
-        const propDef = this.getPropertyDefinitionFor(requestedField, true);
-        return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
-      } else {
         const item = this.getItemFor(requestedField.replace(ITEM_PREFIX, ""));
         return item.checkRoleAccessFor(action, role, userId, ownerUserId, requestedFields[requestedField], throwError);
+      } else {
+        const propDef = this.getPropertyDefinitionFor(requestedField, true);
+        return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
       }
     });
   }
