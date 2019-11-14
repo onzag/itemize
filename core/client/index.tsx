@@ -4,7 +4,7 @@ import React from "react";
 import { Router } from "react-router-dom";
 import App from "./app";
 import "babel-polyfill";
-import PropertyDefinition from "../base/ItemDefinition/PropertyDefinition";
+import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import Moment from "moment";
 import { createBrowserHistory } from "history";
 

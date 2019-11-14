@@ -502,7 +502,7 @@ export default class Module {
     if (!modLevelAccess) {
       if (throwError) {
         throw new Error(`Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
-        ` with roles ${rolesWithAccess.join(", ")}`);
+        ` with only roles ${rolesWithAccess.join(", ")} can be granted access`);
       }
       return false;
     }

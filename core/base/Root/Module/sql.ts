@@ -57,19 +57,34 @@ export function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefinitionTy
  * has into a SQL row data value for this specific module
  * @param mod the module in question
  * @param data the graphql data
- * @param raw a raw function that is used for creating raw sql statments, eg. knex.raw
+ * @param knex the knex instance
+ * @param partialFields fields to make a partial value rather than a total
+ * value, note that we don't recommend using partial fields in order to create
+ * because some properties might treat nulls in a fancy way, when creating
+ * all the table rows should be set, only when updating you should use
+ * partial fields; for example, if you have a field that has a property
+ * that is nullable but it's forced into some value it will be ignored
+ * in a partial field value, don't use partial fields to create
  */
 export function convertGQLValueToSQLValueForModule(
   mod: Module,
   data: IGQLValue,
-  raw: (value: any) => any,
+  knex: any,
+  partialFields?: any,
 ): ISQLTableRowValue {
   // first we create the row value
   let result: ISQLTableRowValue = {};
 
   // now we get all the property extensions
   mod.getAllPropExtensions().forEach((pd) => {
-    result = { ...result, ...convertGQLValueToSQLValueForProperty(pd, data, raw) };
+    // we only add if partialFields allows it, or we don't have
+    // partialFields set
+    if (
+      (partialFields && partialFields[pd.getId()]) ||
+      !partialFields
+    ) {
+      result = { ...result, ...convertGQLValueToSQLValueForProperty(pd, data, knex) };
+    }
   });
 
   return result;

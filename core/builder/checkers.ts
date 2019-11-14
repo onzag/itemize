@@ -484,6 +484,32 @@ export function checkPropertyDefinition(
     );
   }
 
+  if (
+    typeof rawData.coerceNullsIntoDefault !== "undefined" &&
+    !rawData.nullable
+  ) {
+    throw new CheckUpError(
+      "Cannot set coerce nulls into default if property is not nullable",
+      traceback.newTraceToBit("coerceNullsIntoDefault"),
+    );
+  } else if (
+    typeof rawData.coerceNullsIntoDefault !== "undefined" &&
+    typeof rawData.default === "undefined"
+  ) {
+    throw new CheckUpError(
+      "Cannot set coerce nulls into default if property has no basic default value",
+      traceback.newTraceToBit("coerceNullsIntoDefault"),
+    );
+  } else if (
+    typeof rawData.coerceNullsIntoDefault !== "undefined" &&
+    rawData.default === null
+  ) {
+    throw new CheckUpError(
+      "Cannot set coerce nulls into default if default value is also null",
+      traceback.newTraceToBit("coerceNullsIntoDefault"),
+    );
+  }
+
   // checks icons
   if (rawData.icon && !propertyDefintionTypeStandard.supportsIcons) {
     throw new CheckUpError(

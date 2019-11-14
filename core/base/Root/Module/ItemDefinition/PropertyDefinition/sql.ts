@@ -101,7 +101,19 @@ export function convertSQLValueToGQLValueForProperty(
   // need 2 rows to store the field data, the currency, and the value
   // eg. ITEM_wheel_price might become ITEM_wheel_price_CURRENCY and ITEM_wheel_price_VALUE
   // which will in turn once extracted with sqlOut become {currency: ..., value: ...}
-  const colValue = sqlOut(row, colName, this);
+  let colValue = sqlOut(row, colName, this);
+
+  // we check for null coersion, while this shouldn't really
+  // happen, because it should have never saved nulls in the
+  // database to begin with, we might have such a case where
+  // the value is null, for example, after an update, this will
+  // ensure coercion keeps on
+  if (
+    propertyDefinition.isCoercedIntoDefaultWhenNull() &&
+    colValue == null
+  ) {
+    colValue = propertyDefinition.getDefaultValue();
+  }
 
   // because we are returning from graphql, the information
   // is not prefixed and is rather returned in plain form
@@ -120,14 +132,14 @@ export function convertSQLValueToGQLValueForProperty(
  * data to be immediately added to the database as it is
  * @param propertyDefinition the property definition in question
  * @param data the graphql data
- * @param raw a raw function that is used for creating raw sql statments, eg. knex.raw
+ * @param knex the knex instance
  * @param prefix the prefix, if we need the SQL values to be prefixed, usually
  * used within items, because item properties need to be prefixed
  */
 export function convertGQLValueToSQLValueForProperty(
   propertyDefinition: PropertyDefinition,
   data: IGQLValue,
-  raw: (value: any) => any,
+  knex: any,
   prefix ?: string,
 ): ISQLTableRowValue {
   // TODO validation of the value, otherwise invalid values can be manually set,
@@ -142,13 +154,29 @@ export function convertGQLValueToSQLValueForProperty(
   // and this is the value of the property, again, properties
   // are not prefixed, they are either in their own object
   // or in the root
-  const gqlPropertyValue = data[propertyDefinition.getId()];
+  let gqlPropertyValue = data[propertyDefinition.getId()];
+
+  // we treat undefined as null, and set it to default
+  // if it is coerced into null
+  if (
+    propertyDefinition.isCoercedIntoDefaultWhenNull() &&
+    (
+      gqlPropertyValue === null ||
+      typeof gqlPropertyValue === "undefined"
+    )
+  ) {
+    gqlPropertyValue = propertyDefinition.getDefaultValue();
+  }
+  // we also got to set to null any undefined value
+  if (typeof gqlPropertyValue === "undefined") {
+    gqlPropertyValue = null;
+  }
 
   // so we need the sql in function, from the property description
   const sqlIn = propertyDefinition.getPropertyDefinitionDescription().sqlIn;
 
   // we return as it is
-  return sqlIn(gqlPropertyValue, resultingColumnName, this, raw);
+  return sqlIn(gqlPropertyValue, resultingColumnName, this, knex);
 }
 
 /**

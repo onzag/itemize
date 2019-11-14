@@ -3,26 +3,31 @@ import graphqlHTTP from "express-graphql";
 import http from "http";
 import path from "path";
 import fs from "fs";
-import Root, { IRawJSONBuildDataType } from "../base/Root";
+import Root from "../base/Root";
 import resolvers from "./resolvers";
 import { getGQLSchemaForRoot } from "../base/Root/gql";
+import Knex from "knex";
 const fsAsync = fs.promises;
 
 const app = express();
-let config: any;
-let countries: any;
-let index: string;
-let build: IRawJSONBuildDataType;
-let root: Root;
 
-function initializeApp() {
+export interface IAppDataType {
+  root: Root;
+  index: string;
+  countries: any;
+  config: any;
+  knex: Knex;
+}
+
+function initializeApp(appData: IAppDataType) {
+
   app.use((req, res, next) => {
     res.removeHeader("X-Powered-By");
     next();
   });
 
   app.use("/graphql", graphqlHTTP({
-    schema: getGQLSchemaForRoot(root, resolvers),
+    schema: getGQLSchemaForRoot(appData.root, resolvers(appData)),
     graphiql: true,
   }));
 
@@ -41,7 +46,7 @@ function initializeApp() {
     }
 
     // Occurs during production
-    http.get(`http://api.ipstack.com/${ip}?access_key=${config.ipStackAccessKey}`, (resp) => {
+    http.get(`http://api.ipstack.com/${ip}?access_key=${appData.config.ipStackAccessKey}`, (resp) => {
       let data = "";
       resp.on("data", (chunk) => {
         data += chunk;
@@ -50,9 +55,9 @@ function initializeApp() {
         const parsedData = JSON.parse(data);
         res.end(JSON.stringify({
           country: parsedData.country_code,
-          currency: countries[parsedData.country_code] ? countries[parsedData.country_code].currency || "EUR" : "EUR",
+          currency: appData.countries[parsedData.country_code] ? appData.countries[parsedData.country_code].currency || "EUR" : "EUR",
           language: parsedData.languages[0] ? parsedData.languages[0].code :
-            (countries[parsedData.country_code] ? countries[parsedData.country_code].languages[0] || "en" : "en"),
+            (appData.countries[parsedData.country_code] ? appData.countries[parsedData.country_code].languages[0] || "en" : "en"),
         }));
       });
     }).on("error", (err) => {
@@ -71,12 +76,17 @@ function initializeApp() {
 
   app.get("*", (req, res) => {
     res.setHeader("content-type", "text/html; charset=utf-8");
-    res.end(index);
+    res.end(appData.index);
   });
 }
 
 (async () => {
   let rawBuild: string;
+  let config: any;
+  let countries: any;
+  let index: any;
+  let build: any;
+  let root: any;
   [config, countries, index, rawBuild] = await Promise.all([
     fsAsync.readFile("./dist/config.json", "utf8"),
     fsAsync.readFile("./dist/data/countries.json", "utf8"),
@@ -88,7 +98,35 @@ function initializeApp() {
   build = JSON.parse(rawBuild);
   root = new Root(build.root);
 
-  initializeApp();
+  // Retrieve the config for the database
+  const dbConfig = JSON.parse(await fsAsync.readFile(
+    path.join("config", "db.json"),
+    "utf8",
+  ));
+
+  // Create the connection string
+  const dbConnectionKnexConfig = {
+    host: dbConfig.host,
+    port: dbConfig.port,
+    user: dbConfig.user,
+    password: dbConfig.password,
+    database: dbConfig.database,
+  };
+
+  // we only need one client instance
+  const knex = Knex({
+    client: "pg",
+    debug: process.env.NODE_ENV !== "production",
+    connection: dbConnectionKnexConfig,
+  });
+
+  initializeApp({
+    root,
+    index,
+    countries,
+    config,
+    knex,
+  });
 
   http.createServer(app).listen(config.port, () => {
     console.log("listening at", config.port);

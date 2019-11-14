@@ -42,20 +42,28 @@ const typeValue: IPropertyDefinitionSupportedType = {
     },
   },
   sql: (id: string) => {
-    const obj = {};
-    obj[id + "_VALUE"] = "float";
-    obj[id + "_UNIT"] = "text";
-    obj[id + "_NORMALIZED_VALUE"] = "float";
-    obj[id + "_NORMALIZED_UNIT"] = "text";
-    return obj;
+    return {
+      [id + "_VALUE"]: "float",
+      [id + "_UNIT"]: "text",
+      [id + "_NORMALIZED_VALUE"]: "float",
+      [id + "_NORMALIZED_UNIT"]: "text",
+    };
   },
   sqlIn: (value: IPropertyDefinitionSupportedUnitType, id: string) => {
-    const obj = {};
-    obj[id + "_VALUE"] = value.value;
-    obj[id + "_UNIT"] = value.unit;
-    obj[id + "_NORMALIZED_VALUE"] = value.normalizedValue;
-    obj[id + "_NORMALIZED_UNIT"] = value.normalizedUnit;
-    return obj;
+    if (value === null) {
+      return {
+        [id + "_VALUE"]: null,
+        [id + "_UNIT"]: null,
+        [id + "_NORMALIZED_VALUE"]: null,
+        [id + "_NORMALIZED_UNIT"]: null,
+      };
+    }
+    return {
+      [id + "_VALUE"]: value.value,
+      [id + "_UNIT"]: value.unit,
+      [id + "_NORMALIZED_VALUE"]: value.normalizedValue,
+      [id + "_NORMALIZED_UNIT"]: value.normalizedUnit,
+    };
   },
   sqlOut: (data: {[key: string]: any}, id: string) => {
     const result: IPropertyDefinitionSupportedUnitType = {

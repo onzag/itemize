@@ -94,12 +94,20 @@ export function convertSQLValueToGQLValueForItem(item: Item, row: ISQLTableRowVa
  * graphql value and converts it into a serializable sql form
  * @param item the item in question
  * @param data the graphql data value
- * @param raw a raw function that is used for creating raw sql statments, eg. knex.raw
+ * @param knex the knex instance
+ * @param partialFields fields to make a partial value rather than a total
+ * value, note that we don't recommend using partial fields in order to create
+ * because some properties might treat nulls in a fancy way, when creating
+ * all the table rows should be set, only when updating you should use
+ * partial fields; for example, if you have a field that has a property
+ * that is nullable but it's forced into some value it will be ignored
+ * in a partial field value, don't use partial fields to create
  */
 export function convertGQLValueToSQLValueForItem(
   item: Item,
   data: IGQLValue,
-  raw: (value: any) => any,
+  knex: any,
+  partialFields?: any,
 ): ISQLTableRowValue {
   // so again we get the prefix as in ITEM_wheel_
   const prefix = PREFIX_BUILD(ITEM_PREFIX + item.getId());
@@ -118,16 +126,22 @@ export function convertGQLValueToSQLValueForItem(
   if (exclusionStateAccordingToGQL !== ItemExclusionState.EXCLUDED) {
     // so we get the sinking properties
     item.getSinkingProperties().forEach((sinkingProperty) => {
-      // and start adding them, in this case, instead of giving
-      // the root data, we are passing the specific item data, remember
-      // it will be stored in a place like ITEM_wheel where all the properties
-      // are an object within there, we pass that, as all the info should be
-      // there, the prefix then represents the fact, we want all the added properties
-      // to be prefixed with what we are giving, in this case ITEM_wheel_
-      sqlResult = {
-        ...sqlResult,
-        ...convertGQLValueToSQLValueForProperty(sinkingProperty, data[ITEM_PREFIX + item.getId()], raw, prefix),
-      };
+      // partial fields checkup
+      if (
+        (partialFields && partialFields[sinkingProperty.getId()]) ||
+        !partialFields
+      ) {
+        // and start adding them, in this case, instead of giving
+        // the root data, we are passing the specific item data, remember
+        // it will be stored in a place like ITEM_wheel where all the properties
+        // are an object within there, we pass that, as all the info should be
+        // there, the prefix then represents the fact, we want all the added properties
+        // to be prefixed with what we are giving, in this case ITEM_wheel_
+        sqlResult = {
+          ...sqlResult,
+          ...convertGQLValueToSQLValueForProperty(sinkingProperty, data[ITEM_PREFIX + item.getId()], knex, prefix),
+        };
+      }
     });
   }
 

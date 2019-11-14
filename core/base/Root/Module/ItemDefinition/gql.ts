@@ -14,35 +14,45 @@ import { getGQLFieldsDefinitionForProperty } from "./PropertyDefinition/gql";
 import { getGQLFieldsDefinitionForItem } from "./Item/gql";
 import { getGQLFieldsDefinitionForModule, getGQLInterfaceForModule } from "../gql";
 import { IGQLFieldsDefinitionType, IGraphQLResolversType, IGQLQueryFieldsDefinitionType } from "../../gql";
+import { GraphQLDataInputError } from "../../../errors";
 
 /**
  * Provides all the graphql fields that this item definition contains as well as its
  * items, but only of this specific item definition and does not include its children item
  * definition, this includes all extended properties
  * @param itemDefinition the item definition in question
- * @param excludeBase whether to exclude the base properties, like created_at, etc..
- * @param propertiesAsInput if the properties should be in input form
+ * @param options.retrievalMode whether it is in retrieval mode
+ * @param options.excludeBase whether to exclude the base properties, like created_at, etc..
+ * @param options.propertiesAsInput if the properties should be in input form
+ * @param options.optionalForm makes all the parameters optional, that is nullable
  */
 export function getGQLFieldsDefinitionForItemDefinition(
   itemDefinition: ItemDefinition,
-  excludeBase?: boolean,
-  propertiesAsInput?: boolean,
+  options: {
+    retrievalMode: boolean,
+    excludeBase: boolean,
+    propertiesAsInput: boolean,
+    optionalForm: boolean,
+  },
 ): IGQLFieldsDefinitionType {
   // the fields result in graphql field form
   let fieldsResult: IGQLFieldsDefinitionType =
-    getGQLFieldsDefinitionForModule(itemDefinition.getParentModule(), excludeBase, propertiesAsInput);
+    getGQLFieldsDefinitionForModule(itemDefinition.getParentModule(), options);
 
   // We get all the properties that this item definition contains
   itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
     // we deny adding those whose retrieval is disabled
-    if (pd.isRetrievalDisabled()) {
+    if (pd.isRetrievalDisabled() && options.retrievalMode) {
       return;
     }
 
     // and we add them progressively
     fieldsResult = {
       ...fieldsResult,
-      ...getGQLFieldsDefinitionForProperty(pd, propertiesAsInput),
+      ...getGQLFieldsDefinitionForProperty(pd, {
+        propertiesAsInput: options.propertiesAsInput,
+        optionalForm: options.optionalForm,
+      }),
     };
   });
 
@@ -50,7 +60,10 @@ export function getGQLFieldsDefinitionForItemDefinition(
   itemDefinition.getAllItems().forEach((i) => {
     fieldsResult = {
       ...fieldsResult,
-      ...getGQLFieldsDefinitionForItem(i, propertiesAsInput),
+      ...getGQLFieldsDefinitionForItem(i, {
+        propertiesAsInput: options.propertiesAsInput,
+        optionalForm: options.optionalForm,
+      }),
     };
   });
 
@@ -69,7 +82,12 @@ export function getGQLTypeForItemDefinition(itemDefinition: ItemDefinition): Gra
     // we set the object value
     itemDefinition._gqlObj = new GraphQLObjectType({
       name: itemDefinition.getQualifiedPathName(),
-      fields: getGQLFieldsDefinitionForItemDefinition(itemDefinition),
+      fields: getGQLFieldsDefinitionForItemDefinition(itemDefinition, {
+        retrievalMode: true,
+        excludeBase: false,
+        propertiesAsInput: false,
+        optionalForm: false,
+      }),
       interfaces: [getGQLInterfaceForModule(itemDefinition.getParentModule())],
       description:
         "CREATE ACCESS: " + itemDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.CREATE).join(", ") + " - " +
@@ -81,6 +99,37 @@ export function getGQLTypeForItemDefinition(itemDefinition: ItemDefinition): Gra
 
   // return that
   return itemDefinition._gqlObj;
+}
+
+async function resolveGenericFunction(
+  resolveToUse: string,
+  itemDefinition: ItemDefinition,
+  resolvers: IGraphQLResolversType,
+  source: any,
+  args: any,
+  context: any,
+  info: any,
+): Promise<any> {
+  let value = null;
+  if (resolvers) {
+    try {
+      value = await resolvers[resolveToUse]({
+        source,
+        args,
+        context,
+        info,
+      }, itemDefinition);
+    } catch (err) {
+      if (err instanceof GraphQLDataInputError) {
+        throw err;
+      }
+      console.error(err.stack);
+      throw new Error(
+        "Internal server error",
+      );
+    }
+  }
+  return value;
 }
 
 /**
@@ -113,34 +162,21 @@ export function getGQLQueryFieldsForItemDefinition(
         ...RESERVED_GETTER_PROPERTIES,
       },
       // we just pipe the arguments out of the resolver
-      resolve: (source: any, args: any, context: any, info: any) => {
-        if (resolvers) {
-          return resolvers.getItemDefinition({
-            source,
-            args,
-            context,
-            info,
-          }, itemDefinition);
-        }
-      },
+      resolve: resolveGenericFunction.bind(null, "getItemDefinition", itemDefinition, resolvers),
     },
     // now this is the search query
     [PREFIX_SEARCH + itemDefinition.getQualifiedPathName()]: {
       type: GraphQLList(type),
       args: {
         ...RESERVED_SEARCH_PROPERTIES,
-        ...getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, true, true),
+        ...getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, {
+          retrievalMode: false,
+          propertiesAsInput: true,
+          excludeBase: true,
+          optionalForm: true,
+        }),
       },
-      resolve: (source: any, args: any, context: any, info: any) => {
-        if (resolvers) {
-          return resolvers.searchItemDefinition({
-            source,
-            args,
-            context,
-            info,
-          }, itemDefinition);
-        }
-      },
+      resolve: resolveGenericFunction.bind(null, "searchItemDefinition", itemDefinition, resolvers),
     },
   };
 
@@ -182,18 +218,14 @@ export function getGQLMutationFieldsForItemDefinition(
       type,
       args: {
         ...RESERVED_ADD_PROPERTIES,
-        ...getGQLFieldsDefinitionForItemDefinition(itemDefinition, true, true),
+        ...getGQLFieldsDefinitionForItemDefinition(itemDefinition, {
+          retrievalMode: false,
+          propertiesAsInput: true,
+          excludeBase: true,
+          optionalForm: false,
+        }),
       },
-      resolve: (source: any, args: any, context: any, info: any) => {
-        if (resolvers) {
-          return resolvers.addItemDefinition({
-            source,
-            args,
-            context,
-            info,
-          }, itemDefinition);
-        }
-      },
+      resolve: resolveGenericFunction.bind(null, "addItemDefinition", itemDefinition, resolvers),
     },
     // The edition uses the standard getter properties to fetch
     // an item definition instance given its id and then
@@ -203,7 +235,12 @@ export function getGQLMutationFieldsForItemDefinition(
       type,
       args: {
         ...RESERVED_GETTER_PROPERTIES,
-        ...getGQLFieldsDefinitionForItemDefinition(itemDefinition, true, true),
+        ...getGQLFieldsDefinitionForItemDefinition(itemDefinition, {
+          retrievalMode: false,
+          propertiesAsInput: true,
+          excludeBase: true,
+          optionalForm: true,
+        }),
       },
       resolve: (source: any, args: any, context: any, info: any) => {
         if (resolvers) {
@@ -223,16 +260,7 @@ export function getGQLMutationFieldsForItemDefinition(
     [PREFIX_DELETE + itemDefinition.getQualifiedPathName()]: {
       type,
       args: RESERVED_GETTER_PROPERTIES,
-      resolve: (source: any, args: any, context: any, info: any) => {
-        if (resolvers) {
-          return resolvers.deleteItemDefinition({
-            source,
-            args,
-            context,
-            info,
-          }, itemDefinition);
-        }
-      },
+      resolve: resolveGenericFunction.bind(null, "deleteItemDefinition", itemDefinition, resolvers),
     },
   };
 

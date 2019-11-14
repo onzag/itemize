@@ -71,7 +71,7 @@ export interface IPropertyDefinitionSupportedType {
     value: PropertyDefinitionSupportedType,
     id: string,
     property: PropertyDefinition,
-    raw: (...args: any[]) => any,
+    knex: any,
   ) => ISQLTableRowValue;
   // sqlOut basically gives the entire table as data, and the property id where it expects
   // retrieval of that data; by default this function takes the table and does

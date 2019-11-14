@@ -8,6 +8,7 @@ import {
 import Module, { OnStateChangeListenerType } from "../..";
 import fastHTMLParser from "fast-html-parser";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
+import { GraphQLDataInputError } from "../../../../errors";
 
 export enum PropertyInvalidReason {
   UNSPECIFIED = "UNSPECIFIED",
@@ -115,6 +116,8 @@ export interface IPropertyDefinitionRawJSONDataType {
   specialProperties: {
     [key: string]: string | boolean | number;
   };
+  // TODO we might want to do something regarding getting the values and coersion
+  coerceNullsIntoDefault?: boolean;
 
   // role permissions
   readRoleAccess?: string[];
@@ -847,6 +850,14 @@ export default class PropertyDefinition {
     return this.isExtension;
   }
 
+  public isCoercedIntoDefaultWhenNull(): boolean {
+    return !!this.rawData.coerceNullsIntoDefault;
+  }
+
+  public getDefaultValue(): PropertyDefinitionSupportedType {
+    return this.rawData.default;
+  }
+
   /**
    * Returns the locale data definition, or null
    * @param  locale the locale
@@ -882,8 +893,8 @@ export default class PropertyDefinition {
       rolesWithAccess.includes(SELF_METAROLE) && userId === ownerUserId
     ) || rolesWithAccess.includes(role);
     if (!hasAccess && throwError) {
-      throw new Error(`Forbidden, user ${userId} with role ${role} has no ${action} access` +
-      ` to property ${this.getId()} with roles ${rolesWithAccess.join(", ")}`);
+      throw new GraphQLDataInputError(`Forbidden, user ${userId} with role ${role} has no ${action} access` +
+      ` to property ${this.getId()} only roles ${rolesWithAccess.join(", ")} can be granted access`);
     }
     return hasAccess;
   }

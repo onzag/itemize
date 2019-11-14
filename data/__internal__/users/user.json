@@ -21,23 +21,29 @@
             "id": "e_validated",
             "type": "boolean",
             "nullable": true,
+            "default": false,
             "searchLevel": "disabled",
-            "editRoleAccess": ["ADMIN"]
+            "createRoleAccess": ["ADMIN"],
+            "editRoleAccess": ["ADMIN"],
+            "coerceNullsIntoDefault": true
         },
         {
             "id": "password",
             "type": "password",
             "htmlAutocomplete": "current-password",
             "disableRetrieval": true,
+            "readRoleAccess": [],
             "editRoleAccess": ["ADMIN"]
         },
         {
             "id": "role",
             "type": "string",
             "values": ["USER", "MODERATOR", "ADMIN"],
+            "nullable": true,
             "default": "USER",
             "editRoleAccess": ["ADMIN"],
-            "createRoleAccess": ["ADMIN"]
+            "createRoleAccess": ["ADMIN"],
+            "coerceNullsIntoDefault": true
         },
         {
             "id": "address",

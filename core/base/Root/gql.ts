@@ -4,7 +4,7 @@ import ItemDefinition from "./Module/ItemDefinition";
 import { GraphQLSchema, GraphQLObjectType, GraphQLOutputType } from "graphql";
 import { getGQLQueryFieldsForModule, getGQLMutationFieldsForModule } from "./Module/gql";
 
-interface IGraphQLIdefResolverArgs {
+export interface IGraphQLIdefResolverArgs {
   source: any;
   args: any;
   context: any;

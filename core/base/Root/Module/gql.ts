@@ -5,31 +5,44 @@ import { getGQLFieldsDefinitionForProperty } from "./ItemDefinition/PropertyDefi
 import { getGQLQueryFieldsForItemDefinition, getGQLMutationFieldsForItemDefinition } from "./ItemDefinition/gql";
 import { IGQLFieldsDefinitionType, IGraphQLResolversType, IGQLQueryFieldsDefinitionType } from "../gql";
 import ItemDefinition, { ItemDefinitionIOActions } from "./ItemDefinition";
+import { GraphQLDataInputError } from "../../errors";
 
 /**
  * Provides the fields definition for the module itself, and for all
  * items inside the module which extend these fields, modules by default
  * contain called base properties, which every element has
  * @param mod the module in question
- * @param excludeBase exclude the base properties and only include prop extensions
- * @param propertiesAsInput if the properties must be in input mode
+ * @param options.retrievalMode whether it is in retrieval mode
+ * @param options.excludeBase whether to exclude the base properties, like created_at, etc..
+ * @param options.propertiesAsInput if the properties should be in input form
+ * @param options.optionalForm makes all the parameters optional, that is nullable
  */
 export function getGQLFieldsDefinitionForModule(
   mod: Module,
-  excludeBase?: boolean,
-  propertiesAsInput?: boolean,
+  options: {
+    retrievalMode: boolean,
+    excludeBase: boolean,
+    propertiesAsInput: boolean,
+    optionalForm: boolean,
+  },
 ): IGQLFieldsDefinitionType {
   // first create the base considering on whether we exclude or include
   // the base properties
-  let resultFieldsSchema: IGQLFieldsDefinitionType = excludeBase ? {} : {
+  let resultFieldsSchema: IGQLFieldsDefinitionType = options.excludeBase ? {} : {
     ...RESERVED_BASE_PROPERTIES,
   };
   // now we get all prop extensions of this module
   mod.getAllPropExtensions().forEach((propExtension) => {
+    if (options.retrievalMode && propExtension.isRetrievalDisabled()) {
+      return;
+    }
     // and basically get the fields for that property
     resultFieldsSchema = {
       ...resultFieldsSchema,
-      ...getGQLFieldsDefinitionForProperty(propExtension, propertiesAsInput),
+      ...getGQLFieldsDefinitionForProperty(propExtension, {
+        propertiesAsInput: options.propertiesAsInput,
+        optionalForm: options.optionalForm,
+      }),
     };
   });
   // return that
@@ -50,7 +63,12 @@ export function getGQLInterfaceForModule(mod: Module): GraphQLInterfaceType {
     // we create that object with the data
     mod._gqlObj = new GraphQLInterfaceType({
       name: mod.getQualifiedPathName(),
-      fields: getGQLFieldsDefinitionForModule(mod),
+      fields: getGQLFieldsDefinitionForModule(mod, {
+        retrievalMode: true,
+        excludeBase: false,
+        propertiesAsInput: false,
+        optionalForm: false,
+      }),
       description: "READ ACCESS: " + mod.getRolesWithAccessTo(ItemDefinitionIOActions.READ).join(", "),
     });
   }
@@ -88,17 +106,34 @@ export function getGQLQueryFieldsForModule(
         ...RESERVED_SEARCH_PROPERTIES,
         // as you can realize the arguments exclude the base and make it into input mode
         // that means no RESERVED_BASE_PROPERTIES
-        ...getGQLFieldsDefinitionForModule(mod.getSearchModule(), true, true),
+        ...getGQLFieldsDefinitionForModule(mod.getSearchModule(), {
+          retrievalMode: false,
+          excludeBase: true,
+          propertiesAsInput: true,
+          optionalForm: true,
+        }),
       },
-      resolve: (source: any, args: any, context: any, info: any) => {
+      resolve: async (source: any, args: any, context: any, info: any) => {
+        let value = null;
         if (resolvers) {
-          return resolvers.searchModule({
-            source,
-            args,
-            context,
-            info,
-          }, mod);
+          try {
+            value = await resolvers.searchModule({
+              source,
+              args,
+              context,
+              info,
+            }, mod);
+          } catch (err) {
+            if (err instanceof GraphQLDataInputError) {
+              throw err;
+            }
+            console.error(err.stack);
+            throw new Error(
+              "Internal server error",
+            );
+          }
         }
+        return value;
       },
     },
   };
@@ -126,7 +161,7 @@ export function getGQLMutationFieldsForModule(
   resolvers?: IGraphQLResolversType,
 ): IGQLQueryFieldsDefinitionType {
   if (mod.isInSearchMode()) {
-    throw new Error("Modules in search mode has no graphql mutations");
+    throw new Error("Modules in search mode don't have graphql mutations");
   }
 
   // we make the fields, it's empty starting with because

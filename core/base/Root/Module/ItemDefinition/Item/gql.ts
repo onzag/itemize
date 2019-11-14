@@ -9,10 +9,16 @@ import { IGQLFieldsDefinitionType } from "../../../gql";
 /**
  * Provides the graphql definition that will be required to store
  * this item bit
- * @param propertiesAsInput if it's in input mode to get
+ * @param options.propertiesAsInput if it's in input mode to get
  * graphql input fields instead
  */
-export function getGQLFieldsDefinitionForItem(item: Item, propertiesAsInput?: boolean): IGQLFieldsDefinitionType {
+export function getGQLFieldsDefinitionForItem(
+  item: Item,
+  options: {
+    propertiesAsInput: boolean,
+    optionalForm: boolean,
+  },
+): IGQLFieldsDefinitionType {
   // the exclusion state needs to be stored in the schema bit
   let itemFields = {};
   // we need all the sinking properties and those are the
@@ -20,7 +26,7 @@ export function getGQLFieldsDefinitionForItem(item: Item, propertiesAsInput?: bo
   item.getSinkingProperties().forEach((sinkingProperty) => {
     itemFields = {
       ...itemFields,
-      ...getGQLFieldsDefinitionForProperty(sinkingProperty, propertiesAsInput),
+      ...getGQLFieldsDefinitionForProperty(sinkingProperty, options),
     };
   });
 
@@ -29,28 +35,32 @@ export function getGQLFieldsDefinitionForItem(item: Item, propertiesAsInput?: bo
   // for the fields both for input and output, as the object
   // itself is just an input type because an item can be whole
   // null
-  if (
-    (propertiesAsInput && !item._gqlInObj) ||
-    (!propertiesAsInput && !item._gqlOutObj)
-  ) {
-    // we need to create it depending on the rule
-    // whether output or input, we create a GQL name
-    // just for this functionality that doesn't collide
-    // and is specific for this item instance
-    const itemGQLName = PREFIXED_CONCAT(
-      item.getItemDefinition().getQualifiedPathName(),
-      ITEM_PREFIX + item.getId(),
-    );
-
+  let storedObjLocation = "_gql";
+  let itemGQLName = PREFIXED_CONCAT(
+    item.getItemDefinition().getQualifiedPathName(),
+    ITEM_PREFIX + item.getId(),
+  );
+  if (options.propertiesAsInput) {
+    storedObjLocation += "InObj";
+    itemGQLName += "_In";
+  } else {
+    itemGQLName += "_Out";
+    storedObjLocation += "OutObj";
+  }
+  if (options.optionalForm) {
+    itemGQLName += "_Opt";
+    storedObjLocation += "Opt";
+  }
+  if (!item[storedObjLocation]) {
     // and depending if it's in or out
-    if (propertiesAsInput) {
-      item._gqlInObj = new GraphQLInputObjectType({
-        name: itemGQLName + "_In",
+    if (options.propertiesAsInput) {
+      item[storedObjLocation] = new GraphQLInputObjectType({
+        name: itemGQLName,
         fields: itemFields,
       });
     } else {
-      item._gqlOutObj = new GraphQLObjectType({
-        name: itemGQLName + "_Out",
+      item[storedObjLocation] = new GraphQLObjectType({
+        name: itemGQLName,
         fields: itemFields,
       });
     }
@@ -67,7 +77,7 @@ export function getGQLFieldsDefinitionForItem(item: Item, propertiesAsInput?: bo
       description: description + " - exclusion state",
     },
     [ITEM_PREFIX + item.getId()]: {
-      type: propertiesAsInput ? item._gqlInObj : item._gqlOutObj,
+      type: item[storedObjLocation],
       description,
     },
   };

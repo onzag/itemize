@@ -10,6 +10,7 @@ import {
   SELF_METAROLE,
 } from "../../../../constants";
 import { GraphQLOutputType } from "graphql";
+import { GraphQLDataInputError } from "../../../errors";
 
 export interface IItemDefinitionRawJSONDataType {
   // Builder data
@@ -636,8 +637,8 @@ export default class ItemDefinition {
 
     if (!idefLevelAccess) {
       if (throwError) {
-        throw new Error(`Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
-        ` with roles ${rolesWithAccess.join(", ")}`);
+        throw new GraphQLDataInputError(`Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
+        ` only roles ${rolesWithAccess.join(", ")} can be granted access`);
       }
       return false;
     }

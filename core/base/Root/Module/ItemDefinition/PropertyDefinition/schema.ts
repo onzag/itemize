@@ -179,6 +179,9 @@ export default {
         type: "string",
       },
     },
+    coerceNullsIntoDefault: {
+      type: "boolean",
+    },
   },
   additionalProperties: false,
   definitions: {

@@ -1,5 +1,5 @@
 import { IPropertyDefinitionSupportedType } from "../types";
-import { GraphQLNonNull, GraphQLFloat } from "graphql";
+import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
 import { IGQLValue } from "../../../../gql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N, CLASSIC_SEARCH_OPTIONAL_I18N } from "../../../../../../constants";
@@ -22,10 +22,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: GraphQLNonNull(GraphQLFloat),
     },
     txt: {
-      type: GraphQLNonNull(GraphQLFloat),
+      type: GraphQLNonNull(GraphQLString),
     },
     atxt: {
-      type: GraphQLNonNull(GraphQLFloat),
+      type: GraphQLNonNull(GraphQLString),
     },
   },
   specialProperties: [
@@ -35,22 +35,32 @@ const typeValue: IPropertyDefinitionSupportedType = {
     },
   ],
   sql: (id: string) => {
-    const obj = {};
-    obj[id + "_GEO"] = "GEOGRAPHY(Point)";
-    obj[id + "_LAT"] = "float";
-    obj[id + "_LNG"] = "float";
-    obj[id + "_TXT"] = "text";
-    obj[id + "_ATXT"] = "text";
-    return obj;
+    return {
+      [id + "_GEO"]: "GEOGRAPHY(Point)",
+      [id + "_LAT"]: "float",
+      [id + "_LNG"]: "float",
+      [id + "_TXT"]: "text",
+      [id + "_ATXT"]: "text",
+    };
   },
-  sqlIn : (value: IPropertyDefinitionSupportedLocationType, id, property, raw) => {
-    const obj = {};
-    obj[id + "_GEO"] = raw("POINT(?, ?)", value.lng, value.lat);
-    obj[id + "_LAT"] = value.lat;
-    obj[id + "_LNG"] = value.lng;
-    obj[id + "_TXT"] = value.txt;
-    obj[id + "_ATXT"] = value.atxt;
-    return obj;
+  sqlIn : (value: IPropertyDefinitionSupportedLocationType, id, property, knex) => {
+    if (value === null) {
+      return {
+        [id + "_GEO"]: null,
+        [id + "_LAT"]: null,
+        [id + "_LNG"]: null,
+        [id + "_TXT"]: null,
+        [id + "_ATXT"]: null,
+      };
+    }
+
+    return {
+      [id + "_GEO"]: knex.raw("POINT(?, ?)", value.lng, value.lat),
+      [id + "_LAT"]: value.lat,
+      [id + "_LNG"]: value.lng,
+      [id + "_TXT"]: value.txt,
+      [id + "_ATXT"]: value.atxt,
+    };
   },
   sqlOut: (data: {[key: string]: any}, id: string) => {
     const result: IPropertyDefinitionSupportedLocationType = {

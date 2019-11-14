@@ -93,6 +93,10 @@ export default class Item {
   public _gqlInObj: any;
   // tslint:disable-next-line: variable-name
   public _gqlOutObj: any;
+  // tslint:disable-next-line: variable-name
+  public _gqlInObjOpt: any;
+  // tslint:disable-next-line: variable-name
+  public _gqlOutObjOpt: any;
 
   // the data that comes from the raw json is to be processed here
   private itemDefinition?: ItemDefinition;

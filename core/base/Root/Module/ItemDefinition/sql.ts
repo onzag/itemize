@@ -132,12 +132,20 @@ export function convertSQLValueToGQLValueForItemDefinition(
  * it doesn't include its prop extensions
  * @param itemDefinition the item definition in question
  * @param data the graphql data
- * @param raw a raw function that is used for creating raw sql statments, eg. knex.raw
+ * @param knex the knex instance
+ * @param partialFields fields to make a partial value rather than a total
+ * value, note that we don't recommend using partial fields in order to create
+ * because some properties might treat nulls in a fancy way, when creating
+ * all the table rows should be set, only when updating you should use
+ * partial fields; for example, if you have a field that has a property
+ * that is nullable but it's forced into some value it will be ignored
+ * in a partial field value, don't use partial fields to create
  */
 export function convertGQLValueToSQLValueForItemDefinition(
   itemDefinition: ItemDefinition,
   data: IGQLValue,
-  raw: (value: any) => any,
+  knex: any,
+  partialFields?: any,
 ): ISQLTableRowValue {
   // first we create the row value
   let result: ISQLTableRowValue = {};
@@ -145,11 +153,27 @@ export function convertGQLValueToSQLValueForItemDefinition(
   // now we get all the property definitions and do the same
   // that we did in the SQLtoGQL but in reverse
   itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
-    result = { ...result, ...convertGQLValueToSQLValueForProperty(pd, data, raw) };
+    // we only add if partialFields allows it, or we don't have
+    // partialFields set
+    if (
+      (partialFields && partialFields[pd.getId()]) ||
+      !partialFields
+    ) {
+      result = { ...result, ...convertGQLValueToSQLValueForProperty(pd, data, knex) };
+    }
   });
   // also with the items
   itemDefinition.getAllItems().forEach((item) => {
-    result = { ...result, ...convertGQLValueToSQLValueForItem(item, data, raw) };
+    // we only add if partialFields allows it, or we don't have
+    // partialFields set
+    const itemNameInPartialFields = ITEM_PREFIX + item.getName();
+    if (
+      (partialFields && partialFields[itemNameInPartialFields]) ||
+      !partialFields
+    ) {
+      const innerPartialFields = !partialFields ? null : partialFields[itemNameInPartialFields];
+      result = { ...result, ...convertGQLValueToSQLValueForItem(item, data, knex, innerPartialFields) };
+    }
   });
 
   return result;
