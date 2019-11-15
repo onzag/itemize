@@ -8,6 +8,7 @@ import {
   checkFieldsAreAvailableForRole,
   buildColumnNames,
   mustBeLoggedIn,
+  flattenFieldsFromRequestedFields,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { RESERVED_BASE_PROPERTIES_SQL, CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
@@ -29,7 +30,7 @@ export async function editItemDefinition(
 
   mustBeLoggedIn(tokenData);
 
-  const requestedFields = graphqlFields(resolverArgs.info);
+  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
   checkFieldsAreAvailableForRole(tokenData, requestedFields);
 
   const mod = itemDefinition.getParentModule();
@@ -42,15 +43,20 @@ export async function editItemDefinition(
   // in the module name for the given id, as we need to know who created
   // the item in order to validate roles
   const id = resolverArgs.args.id;
-  const userIdData = await appData.knex.select("created_by").from(moduleTable).where({
+  const contentData = await appData.knex.select("created_by", "blocked_at", "deleted_at").from(moduleTable).where({
     id,
-    blocked_at: null,
     type: selfTable,
   });
-  const userId = userIdData[0] && userIdData[0].created_by;
+  const userId = contentData[0] && contentData[0].created_by;
   // if we don't get an user id this means that there's no owner, this is bad input
   if (!userId) {
     throw new GraphQLDataInputError(`There's no ${selfTable} with id ${id}`);
+  }
+  if (contentData[0].deleted_at !== null) {
+    throw new GraphQLDataInputError(`The item has been deleted`);
+  }
+  if (contentData[0].blocked_at !== null) {
+    throw new GraphQLDataInputError(`The item is blocked`);
   }
 
   // now we calculate the fields that we are editing, and the fields that we are
@@ -115,9 +121,17 @@ export async function editItemDefinition(
     appData.knex.raw,
     editingFields,
   );
-  // TODO throw an error if no fields are changing at all
+
+  if (
+    Object.keys(sqlIdefData).length === 0 &&
+    Object.keys(sqlModData).length === 0
+  ) {
+    throw new GraphQLDataInputError("You are not updating anything whatsoever");
+  }
+
   // update when it was edited
   sqlModData.edited_at = appData.knex.fn.now();
+  sqlModData.edited_by = tokenData.userId;
 
   // we need to build the "returning" attributes from
   // the updated queries, for that we need to check
@@ -135,47 +149,54 @@ export async function editItemDefinition(
     }
   });
 
-  // and add them if we have them, note that the module will always have
-  // something to update because the edited_at field is always added when
-  // edition is taking place
-  const updateQueryMod = appData.knex(moduleTable).update(sqlModData).where("id", id);
-  if (requestedModuleColumnsSQL.length) {
-    updateQueryMod.returning(requestedModuleColumnsSQL);
-  }
-
-  // for the update query of the item definition we have to take several things
-  // into consideration, first we set it as an empty object
-  let updateOrSelectQueryIdef: any = {};
-  // if we have something to update
-  if (Object.keys(sqlIdefData).length) {
-    // we make the update query
-    updateOrSelectQueryIdef = appData.knex(selfTable).update(sqlIdefData).where(CONNECTOR_SQL_COLUMN_FK_NAME, id);
-    // we only get to return something in the returning statment if we have something to return
-    if (requestedIdefColumnsSQL.length) {
-      updateOrSelectQueryIdef.returning(requestedIdefColumnsSQL);
+  const value = await appData.knex.transaction(async (transactionKnex) => {
+    // and add them if we have them, note that the module will always have
+    // something to update because the edited_at field is always added when
+    // edition is taking place
+    const updateQueryMod = transactionKnex(moduleTable).update(sqlModData).where("id", id);
+    if (requestedModuleColumnsSQL.length) {
+      updateQueryMod.returning(requestedModuleColumnsSQL);
     }
-  // otherwise we check if we are just requesting some fields from the idef
-  } else if (requestedIdefColumnsSQL.length) {
-    // and make a simple select query
-    updateOrSelectQueryIdef = appData.knex(selfTable).select(requestedIdefColumnsSQL)
-      .where(CONNECTOR_SQL_COLUMN_FK_NAME, id);
-  }
-  // if there's nothing to update, or there is nothing to retrieve, it won't touch the idef table
 
-  // now we run both queries at the same time
-  const [updateQueryValueMod, updateQueryValueIdef] = await Promise.all([
-    updateQueryMod,
-    updateOrSelectQueryIdef,
-  ]);
+    // for the update query of the item definition we have to take several things
+    // into consideration, first we set it as an empty object
+    let updateOrSelectQueryIdef: any = {};
+    // if we have something to update
+    if (Object.keys(sqlIdefData).length) {
+      // we make the update query
+      updateOrSelectQueryIdef = transactionKnex(selfTable).update(sqlIdefData).where(CONNECTOR_SQL_COLUMN_FK_NAME, id);
+      // we only get to return something in the returning statment if we have something to return
+      if (requestedIdefColumnsSQL.length) {
+        updateOrSelectQueryIdef.returning(requestedIdefColumnsSQL);
+      }
+    // otherwise we check if we are just requesting some fields from the idef
+    } else if (requestedIdefColumnsSQL.length) {
+      // and make a simple select query
+      updateOrSelectQueryIdef = transactionKnex(selfTable).select(requestedIdefColumnsSQL)
+        .where(CONNECTOR_SQL_COLUMN_FK_NAME, id);
+    }
+    // if there's nothing to update, or there is nothing to retrieve, it won't touch the idef table
 
-  // and return the given value
-  const value = {
-    ...updateQueryValueMod[0],
-    ...updateQueryValueIdef[0],
-  };
+    // now we run both queries at the same time
+    const updateQueryValueMod = await updateQueryMod;
+    const updateQueryValueIdef = await updateOrSelectQueryIdef;
+
+    return {
+      ...updateQueryValueMod[0],
+      ...updateQueryValueIdef[0],
+    };
+  });
 
   // convert it using the requested fields for that, and ignoring everything else
-  return convertSQLValueToGQLValueForItemDefinition(itemDefinition, value, requestedFields);
+  const gqlValue = convertSQLValueToGQLValueForItemDefinition(itemDefinition, value, requestedFields);
+
+  // we don't need to check for blocked or deleted because such items cannot be edited,
+  // see before, so we return immediately, read has been checked already
+  // we use the same strategy, all extra data will be chopped anyway by graphql
+  return {
+    data: gqlValue,
+    ...gqlValue,
+  };
 }
 
 export function editItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {

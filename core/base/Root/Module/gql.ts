@@ -1,10 +1,15 @@
-import { RESERVED_BASE_PROPERTIES, PREFIX_SEARCH, RESERVED_SEARCH_PROPERTIES } from "../../../constants";
-import { GraphQLInterfaceType, GraphQLList } from "graphql";
+import {
+  RESERVED_BASE_PROPERTIES,
+  PREFIX_SEARCH,
+  RESERVED_SEARCH_PROPERTIES,
+  EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
+} from "../../../constants";
+import { GraphQLInterfaceType, GraphQLList, GraphQLObjectType } from "graphql";
 import Module from ".";
 import { getGQLFieldsDefinitionForProperty } from "./ItemDefinition/PropertyDefinition/gql";
 import { getGQLQueryFieldsForItemDefinition, getGQLMutationFieldsForItemDefinition } from "./ItemDefinition/gql";
 import { IGQLFieldsDefinitionType, IGraphQLResolversType, IGQLQueryFieldsDefinitionType } from "../gql";
-import ItemDefinition, { ItemDefinitionIOActions } from "./ItemDefinition";
+import { ItemDefinitionIOActions } from "./ItemDefinition";
 import { GraphQLDataInputError } from "../../errors";
 
 /**
@@ -76,6 +81,30 @@ export function getGQLInterfaceForModule(mod: Module): GraphQLInterfaceType {
   return mod._gqlObj;
 }
 
+export function getGQLQueryOutputForModule(mod: Module): GraphQLObjectType {
+  if (!mod._gqlQueryObj) {
+    const modInterface = getGQLInterfaceForModule(mod);
+
+    const fields = {
+      data: {
+        type: modInterface,
+      },
+    };
+
+    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
+      fields[property] = RESERVED_BASE_PROPERTIES[property];
+    });
+
+    mod._gqlQueryObj = new GraphQLObjectType({
+      name: mod.getQualifiedPathName() + "__QUERY_OBJECT",
+      fields,
+      description: "READ ACCESS: " + mod.getRolesWithAccessTo(ItemDefinitionIOActions.READ).join(", "),
+    });
+  }
+
+  return mod._gqlQueryObj;
+}
+
 /**
  * Provides the query fields in order to create the query
  * for a given module, the only query fields you have access to
@@ -96,12 +125,12 @@ export function getGQLQueryFieldsForModule(
     throw new Error("Modules in search mode has no graphql queries");
   }
 
-  const gInterface = getGQLInterfaceForModule(mod);
+  const gOuput = getGQLQueryOutputForModule(mod);
 
   // now we setup the fields for the query
   let fields: IGQLQueryFieldsDefinitionType = {
     [PREFIX_SEARCH + mod.getQualifiedPathName()]: {
-      type: GraphQLList(gInterface),
+      type: GraphQLList(gOuput),
       args: {
         ...RESERVED_SEARCH_PROPERTIES,
         // as you can realize the arguments exclude the base and make it into input mode

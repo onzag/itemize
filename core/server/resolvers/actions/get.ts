@@ -2,11 +2,21 @@ import { IAppDataType } from "../../";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
 import Debug from "../../debug";
-import { checkLanguageAndRegion, validateTokenAndGetData, checkFieldsAreAvailableForRole, buildColumnNames } from "../basic";
+import {
+  checkLanguageAndRegion,
+  validateTokenAndGetData,
+  checkFieldsAreAvailableForRole,
+  buildColumnNames,
+  flattenFieldsFromRequestedFields,
+  filterAndPrepareGQLValue,
+} from "../basic";
 import graphqlFields = require("graphql-fields");
-import { RESERVED_BASE_PROPERTIES_SQL, CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
+import {
+  RESERVED_BASE_PROPERTIES_SQL,
+  CONNECTOR_SQL_COLUMN_FK_NAME,
+  ITEM_PREFIX,
+} from "../../../constants";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
-import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 const debug = Debug("resolvers/actions/get");
 
 export async function getItemDefinition(
@@ -21,7 +31,7 @@ export async function getItemDefinition(
 
   // now we find the requested fields that are requested
   // in the get request
-  const requestedFields = graphqlFields(resolverArgs.info);
+  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
   checkFieldsAreAvailableForRole(tokenData, requestedFields);
 
   // we build the SQL column names
@@ -44,12 +54,17 @@ export async function getItemDefinition(
   if (!requestedFieldsSQL.includes("created_by")) {
     requestedFieldsSQL.push("created_by");
   }
+  if (!requestedFieldsSQL.includes("blocked_at")) {
+    requestedFieldsSQL.push("blocked_at");
+  }
+  if (!requestedFieldsSQL.includes("deleted_at")) {
+    requestedFieldsSQL.push("deleted_at");
+  }
 
   // create the select query, filter the blockage, and select the right
   // type based on it
   const selectQuery = appData.knex.select(requestedFieldsSQL).from(moduleTable).where({
     id: resolverArgs.args.id,
-    blocked_at: null,
     type: selfTable,
   });
 
@@ -99,16 +114,6 @@ export async function getItemDefinition(
   }
   debug("SQL result found as", selectQueryValue[0]);
 
-  // we convert the value we were provided, of course, we only need
-  // to process what was requested
-  const valueToProvide = convertSQLValueToGQLValueForItemDefinition(
-    itemDefinition,
-    selectQueryValue[0],
-    requestedFields,
-  );
-
-  debug("converted to GQL as", valueToProvide);
-
   debug("Checking role access, will throw an error if false");
 
   // now we check the role access, this function will throw an error
@@ -121,6 +126,15 @@ export async function getItemDefinition(
     requestedFieldsInIdef,
     true,
   );
+
+  const valueToProvide = filterAndPrepareGQLValue(
+    selectQueryValue[0],
+    requestedFields,
+    tokenData.role,
+    itemDefinition,
+  );
+
+  debug("converted to GQL as", valueToProvide);
 
   debug("providing value");
   // return if otherwise succeeds

@@ -79,13 +79,13 @@ export function yesno(question: string) {
     JSON.stringify(actual, null, 2),
   );
   await fsAsync.writeFile(
-    path.join("config", "dbhistory", `db-status.${(new Date()).toJSON().replace(/:/g, ".")}.json`),
+    path.join("config", "dbhistory", `db-status.${(new Date()).toISOString().replace(/:/g, ".")}.json`),
     JSON.stringify(actual, null, 2),
   );
 
   // Write the optimal, what should have been
   await fsAsync.writeFile(
-    path.join("config", "dbhistory", `db-status.${(new Date()).toJSON().replace(/:/g, ".")}.optimal.json`),
+    path.join("config", "dbhistory", `db-status.${(new Date()).toISOString().replace(/:/g, ".")}.optimal.json`),
     JSON.stringify(optimal, null, 2),
   );
   await fsAsync.writeFile(

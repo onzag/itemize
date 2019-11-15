@@ -1,8 +1,18 @@
-import { PREFIX_BUILD, MODERATION_FIELDS, ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS, MAX_SQL_LIMIT } from "../../constants";
+import {
+  PREFIX_BUILD,
+  MODERATION_FIELDS,
+  ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
+  MAX_SQL_LIMIT,
+  EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
+} from "../../constants";
 import { GraphQLDataInputError } from "../../base/errors";
 import Debug from "../debug";
 import fs from "fs";
 import path from "path";
+import ItemDefinition from "../../base/Root/Module/ItemDefinition";
+import Module from "../../base/Root/Module";
+import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
+import { convertSQLValueToGQLValueForModule } from "../../base/Root/Module/sql";
 const debug = Debug("resolvers/basic");
 
 const fsAsync = fs.promises;
@@ -22,6 +32,18 @@ let countryList: any;
     ),
   );
 })();
+
+export function flattenFieldsFromRequestedFields(requestedFields: any) {
+  const output = {
+    ...(requestedFields.data || {}),
+  };
+  Object.keys(requestedFields).forEach((key) => {
+    if (key !== "data") {
+      output[key] = requestedFields[key];
+    }
+  });
+  return output;
+}
 
 export function buildColumnNames(base: any, prefix: string = ""): string[] {
   let result: string[] = [];
@@ -45,6 +67,7 @@ export function validateTokenAndGetData(token: string) {
 export function checkFieldsAreAvailableForRole(tokenData: any, fieldData: any) {
   debug("Checking if fields are available for role...");
   const moderationFieldsHaveBeenRequested = MODERATION_FIELDS.some((field) => fieldData[field]);
+  console.log(MODERATION_FIELDS, moderationFieldsHaveBeenRequested, tokenData, fieldData);
   if (
     moderationFieldsHaveBeenRequested &&
     !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
@@ -111,4 +134,62 @@ export function mustBeLoggedIn(tokenData: any) {
   if (!tokenData.userId) {
     throw new GraphQLDataInputError("Must be logged in");
   }
+}
+
+export function filterAndPrepareGQLValue(
+  value: any,
+  requestedFields: any,
+  role: string,
+  parentModuleOrIdef: ItemDefinition | Module,
+) {
+  let valueToProvide: any;
+  if (
+    (
+      value.blocked_at === null ||
+      (
+        value.blocked_at !== null &&
+        ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(role)
+      )
+    ) &&
+    value.deleted_at === null
+  ) {
+    let valueOfTheItem: any;
+    if (parentModuleOrIdef instanceof ItemDefinition) {
+      // we convert the value we were provided, of course, we only need
+      // to process what was requested
+      valueOfTheItem = convertSQLValueToGQLValueForItemDefinition(
+        parentModuleOrIdef,
+        value,
+        requestedFields,
+      );
+    } else {
+      valueOfTheItem = convertSQLValueToGQLValueForModule(
+        parentModuleOrIdef,
+        value,
+        requestedFields,
+      );
+    }
+    // we add the object like this, all the non requested data, eg.
+    // values inside that should be outside, and outside that will be inside
+    // will be stripped
+    valueToProvide = {
+      data: valueOfTheItem,
+      ...valueOfTheItem,
+    };
+  } else {
+    // we convert the value we were provided, of course, we only need
+    // to process what was requested
+    valueToProvide = {
+      data: null,
+    };
+    // we add every externally accessed field, these fields are not
+    // a security concern and anyway they are checked beforehand
+    // anything non requested will be stripped, or set to null by this same
+    // code
+    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
+      valueToProvide[property] = value[property];
+    });
+  }
+
+  return valueToProvide;
 }

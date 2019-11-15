@@ -8,6 +8,8 @@ import {
   validateTokenAndGetData,
   checkFieldsAreAvailableForRole,
   buildColumnNames,
+  flattenFieldsFromRequestedFields,
+  filterAndPrepareGQLValue,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
@@ -70,11 +72,12 @@ export async function searchModule(
     });
   }
 
-  const searchQuery = appData.knex.select(requestedFieldsSQL).from(mod.getQualifiedPathName()).where({
-    blocked_at: null,
-  });
+  const searchQuery = appData.knex.select(requestedFieldsSQL)
+    .from(mod.getQualifiedPathName())
+    .where("blocked_at", ">=", resolverArgs.args.search_date_identifier)
+    .andWhere("deleted_at", ">=", resolverArgs.args.search_date_identifier)
+    .andWhere("created_at", "<=", resolverArgs.args.search_date_identifier);
   buildSQLQueryForModule(mod, resolverArgs.args, searchQuery);
-  searchQuery.andWhere("created_at", "<=", resolverArgs.args.search_date_identifier);
   if (resolverArgs.args.filter_by_language) {
     searchQuery.andWhere("language", resolverArgs.args.language);
   }
@@ -84,7 +87,9 @@ export async function searchModule(
   searchQuery.limit(resolverArgs.args.limit).offset(resolverArgs.args.offset);
 
   const baseResult: ISQLTableRowValue[] = await searchQuery;
-  return baseResult.map((row) => convertSQLValueToGQLValueForModule(mod, row, requestedFields));
+  return baseResult
+    .map((row) => convertSQLValueToGQLValueForModule(mod, row, requestedFields))
+    .map((value) => filterAndPrepareGQLValue(value, requestedFields, tokenData.role, mod));
 }
 
 export async function searchItemDefinition(
@@ -99,7 +104,7 @@ export async function searchItemDefinition(
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
   // now we get the requested fields
-  const requestedFields = graphqlFields(resolverArgs.info);
+  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
   checkFieldsAreAvailableForRole(tokenData, requestedFields);
 
   debug("Checking role access for read in idef...");
@@ -206,10 +211,10 @@ export async function searchItemDefinition(
   debug("queried fields grant a join with idef data?", requiresJoin);
 
   // now we build the search query
-  const searchQuery = appData.knex.select(requestedFieldsSQL).from(moduleTable).where({
-    blocked_at: null,
-    type: selfTable,
-  });
+  const searchQuery = appData.knex.select(requestedFieldsSQL).from(moduleTable)
+    .where("blocked_at", ">=", resolverArgs.args.search_date_identifier)
+    .andWhere("deleted_at", ">=", resolverArgs.args.search_date_identifier)
+    .andWhere("created_at", "<=", resolverArgs.args.search_date_identifier);
   // and now we call the function that builds the query itself into
   // that parent query, and adds the andWhere as required
   // into such query
@@ -221,10 +226,6 @@ export async function searchItemDefinition(
       clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
     });
   }
-
-  // now we need to use the search date identifier, this identifier is required
-  // and prevents searchs from jumping around as we paginate
-  searchQuery.andWhere("created_at", "<=", resolverArgs.args.search_date_identifier);
 
   // we add filters if they are requested as so
   if (resolverArgs.args.filter_by_language) {
@@ -257,7 +258,9 @@ export async function searchItemDefinition(
 
   // now we get the base result, and convert every row
   const baseResult: ISQLTableRowValue[] = await searchQuery;
-  return baseResult.map((row) => convertSQLValueToGQLValueForItemDefinition(itemDefinition, row, requestedFields));
+  return baseResult
+    .map((row) => convertSQLValueToGQLValueForItemDefinition(itemDefinition, row, requestedFields))
+    .map((value) => filterAndPrepareGQLValue(value, requestedFields, tokenData.role, itemDefinition));
 }
 
 export function searchItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {

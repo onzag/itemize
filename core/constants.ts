@@ -173,6 +173,15 @@ export const LOCATION_SEARCH_I18N = [
   "search.radius.placeholder",
 ];
 
+export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
+  "id",
+  "blocked_at",
+  "blocked_by",
+  "blocked_until",
+  "blocked_reason",
+  "deleted_at",
+  "deleted_by",
+];
 // INVALID RESERVED PROPERTY NAMES
 export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   id: {
@@ -203,8 +212,10 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     type: GraphQLString,
     description: "Whenever the item was modified, otherwise null",
   },
-
-  // MODERATION SPECIFIC FIELDS
+  edited_by: {
+    type: GraphQLString,
+    description: "Whoever modified this item, otherwise null",
+  },
   reviewed_at: {
     type: GraphQLString,
     description: "When a moderator or admin reviewed this object",
@@ -215,7 +226,14 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   },
   blocked_at: {
     type: GraphQLString,
-    description: "When the item was blocked, blocked items are not searchable or retrievable by normal means",
+    description: "When the item was blocked, blocked items are not searchable or retrievable by normal means; " +
+    "if you as an user own this item, you will only see it blocked, unlike deleted items, blocked items remain " +
+    "in the database until they are manually removed by an admin or moderator, none can access the data of this " +
+    "item, the API will null all the fields, with the exception of blocked_at, blocked_by, blocked_until and blocked_reason",
+  },
+  blocked_until: {
+    type: GraphQLString,
+    description: "Basically makes the block be temporary and will be automatically lifted by the database",
   },
   blocked_by: {
     type: GraphQLID,
@@ -224,6 +242,19 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   blocked_reason: {
     type: GraphQLString,
     description: "A written text of why it was blocked",
+  },
+  deleted_at: {
+    type: GraphQLString,
+    description: "When this item was deleted, if an item was deleted, all its data is gone and has been wiped off the database, " +
+    "however the fields deleted_at and deleted_by will remain, the data is however gone, you cannot recover it; you can nuke " +
+    "your data this way, but be sure to delete all your stuff before your user; the reason why the row remains is for database " +
+    "consistency, if someone is searching something you just deleted in that moment, the other user will lose all the references " +
+    "but with a deleted_at field I can tell the user, oops, data was deleted just while you were looking at it, while you still " +
+    "can tell who deleted it, if you delete the user all traces of that user will be nothing but empty rows with null data",
+  },
+  deleted_by: {
+    type: GraphQLString,
+    description: "Whoever deleted this item, otherwise null",
   },
   flagged_by: {
     type: GraphQLList(GraphQLID),
@@ -261,6 +292,9 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   edited_at: {
     type: "datetime",
   },
+  edited_by: {
+    type: "integer",
+  },
   reviewed_at: {
     type: "datetime",
   },
@@ -279,6 +313,12 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   blocked_reason: {
     type: "text",
   },
+  deleted_at: {
+    type: "datetime",
+  },
+  deleted_by: {
+    type: "integer",
+  },
   flagged_by: {
     type: "int[]",
   },
@@ -288,6 +328,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
 };
 export const MAX_SQL_LIMIT = 25;
 export const CONNECTOR_SQL_COLUMN_FK_NAME = "MODULE_ID";
+export const SQL_DELETED_AT_TIMESTAMP_NAME = "DELETED_AT";
 export const PREFIX_BUILD = (s: string) => s + "_";
 export const SUFFIX_BUILD = (s: string) => "_" + s;
 export const PREFIXED_CONCAT = (...args: string[]) => args.join("__");
@@ -404,11 +445,6 @@ export const USER_ROLES = {
 export const SELF_METAROLE = "SELF";
 export const ANYONE_METAROLE = "ANYONE";
 export const MODERATION_FIELDS = [
-  "reviewed_at",
-  "reviewed_by",
-  "blocked_at",
-  "blocked_by",
-  "blocked_reason",
   "flagged_by",
   "flagged_reasons",
 ];

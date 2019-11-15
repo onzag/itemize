@@ -1,6 +1,11 @@
 import Knex from "knex";
 import { ISQLColumnDefinitionType } from "../base/Root/sql";
 
+const typesForceSpecific = [
+  "timestamp",
+  "date",
+];
+
 /**
  * Builds a type from the knex table
  * @param columnName the column name we want to create
@@ -17,7 +22,7 @@ export function buildColumn(
     actualType = "increments";
   }
 
-  const tableColumnExec = !table[actualType] ?
+  const tableColumnExec = !table[actualType] || typesForceSpecific.includes(actualType) ?
     table.specificType(columnName, actualType) :
     table[actualType](columnName);
   if (columnData.notNull) {

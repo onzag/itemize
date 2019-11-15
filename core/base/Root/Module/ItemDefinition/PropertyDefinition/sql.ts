@@ -78,7 +78,7 @@ export function getSQLTableDefinitionForProperty(
 export function convertSQLValueToGQLValueForProperty(
   propertyDefinition: PropertyDefinition,
   row: ISQLTableRowValue,
-  prefix ?: string,
+  prefix?: string,
 ): IGQLValue {
   // we get an actual prefix, because it's an optional attribute
   const actualPrefix = prefix ? prefix : "";

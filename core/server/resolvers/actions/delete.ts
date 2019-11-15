@@ -7,11 +7,12 @@ import {
   validateTokenAndGetData,
   checkFieldsAreAvailableForRole,
   mustBeLoggedIn,
+  flattenFieldsFromRequestedFields,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
-import { ITEM_PREFIX } from "../../../constants";
 import { GraphQLDataInputError } from "../../../base/errors";
 import { getItemDefinition } from "./get";
+import { ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS } from "../../../constants";
 const debug = Debug("resolvers/actions/delete");
 
 export async function deleteItemDefinition(
@@ -24,23 +25,36 @@ export async function deleteItemDefinition(
 
   mustBeLoggedIn(tokenData);
 
-  const requestedFields = graphqlFields(resolverArgs.info);
+  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
   checkFieldsAreAvailableForRole(tokenData, requestedFields);
 
   const mod = itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
+  debug("Checking access to the element to delete");
   const id = resolverArgs.args.id;
-  const userIdData = await appData.knex.select("created_by").from(moduleTable).where({
+  const contentData = await appData.knex.select("created_by", "deleted_at", "blocked_at").from(moduleTable).where({
     id,
-    blocked_at: null,
     type: selfTable,
   });
-  const userId = userIdData[0] && userIdData[0].created_by;
+  const userId = contentData[0] && contentData[0].created_by;
   if (!userId) {
     throw new GraphQLDataInputError(`There's no ${selfTable} with id ${id}`);
   }
+  debug("Retrieved", contentData[0]);
+  if (contentData[0].deleted_at !== null) {
+    throw new GraphQLDataInputError("The item has been deleted already");
+  }
+  if (
+    contentData[0].blocked_at !== null &&
+    !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
+  ) {
+    throw new GraphQLDataInputError("The item is blocked, only users with role " +
+      ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.join(",") + " can wipe this data");
+  }
+
+  debug("Checking role access...");
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.DELETE,
     tokenData.role,
@@ -49,32 +63,20 @@ export async function deleteItemDefinition(
     null,
     true,
   );
-  const requestedFieldsInIdef = {};
-  Object.keys(requestedFields).forEach((arg) => {
-    if (
-      itemDefinition.hasPropertyDefinitionFor(arg, true) ||
-      arg.startsWith(ITEM_PREFIX) && itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, ""))
-    ) {
-      requestedFieldsInIdef[arg] = requestedFields[arg];
-    }
-  });
-  itemDefinition.checkRoleAccessFor(
-    ItemDefinitionIOActions.READ,
-    tokenData.role,
-    tokenData.userId,
-    userId,
-    requestedFields,
-    true,
-  );
 
-  const value = getItemDefinition(appData, resolverArgs, itemDefinition);
-
-  // It cascades to the item definition
-  await appData.knex(itemDefinition.getParentModule().getQualifiedPathName()).where({
+  // TODO build the transaction to wipe off the values, currently it's doing a bad soft delete
+  await appData.knex(itemDefinition.getParentModule().getQualifiedPathName()).update({
+    deleted_at: appData.knex.fn.now(),
+    deleted_by: tokenData.userId,
+  }).where({
     id: resolverArgs.args.id,
-    blocked_at: null,
-  }).delete();
+  });
 
+  // TODO we should use the update query for this, but not yet, because this is a soft delete
+  debug("calling get query from the get...");
+  const value = await getItemDefinition(appData, resolverArgs, itemDefinition);
+
+  debug("returning from the delete");
   return value;
 }
 

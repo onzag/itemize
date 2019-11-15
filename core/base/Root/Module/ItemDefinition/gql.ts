@@ -8,6 +8,8 @@ import {
   RESERVED_ADD_PROPERTIES,
   PREFIX_EDIT,
   PREFIX_DELETE,
+  EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
+  RESERVED_BASE_PROPERTIES,
 } from "../../../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from ".";
 import { getGQLFieldsDefinitionForProperty } from "./PropertyDefinition/gql";
@@ -101,6 +103,34 @@ export function getGQLTypeForItemDefinition(itemDefinition: ItemDefinition): Gra
   return itemDefinition._gqlObj;
 }
 
+export function getGQLQueryOutputForItemDefinition(itemDefinition: ItemDefinition): GraphQLObjectType {
+  if (!itemDefinition._gqlQueryObj) {
+    const itemDefinitionObj = getGQLTypeForItemDefinition(itemDefinition);
+
+    const fields = {
+      data: {
+        type: itemDefinitionObj,
+      },
+    };
+
+    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
+      fields[property] = RESERVED_BASE_PROPERTIES[property];
+    });
+
+    itemDefinition._gqlQueryObj = new GraphQLObjectType({
+      name: itemDefinition.getQualifiedPathName() + "__QUERY_OBJECT",
+      fields,
+      description:
+        "CREATE ACCESS: " + itemDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.CREATE).join(", ") + " - " +
+        "READ ACCESS: " + itemDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.READ).join(", ") + " - " +
+        "EDIT ACCESS: " + itemDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.EDIT).join(", ") + " - " +
+        "DELETE ACCESS: " + itemDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.DELETE).join(", ") + " - ",
+    });
+  }
+
+  return itemDefinition._gqlQueryObj;
+}
+
 async function resolveGenericFunction(
   resolveToUse: string,
   itemDefinition: ItemDefinition,
@@ -151,7 +181,7 @@ export function getGQLQueryFieldsForItemDefinition(
   // for our query
   const searchModeCounterpart = itemDefinition.getSearchModeCounterpart();
 
-  const type = getGQLTypeForItemDefinition(itemDefinition);
+  const type = getGQLQueryOutputForItemDefinition(itemDefinition);
 
   // now we add the queries
   let fields: IGQLQueryFieldsDefinitionType = {
@@ -205,7 +235,7 @@ export function getGQLMutationFieldsForItemDefinition(
     throw new Error("Modules in search mode has no graphql mutations");
   }
 
-  const type = getGQLTypeForItemDefinition(itemDefinition);
+  const type = getGQLQueryOutputForItemDefinition(itemDefinition);
 
   // now we populate the fields as we need to
   let fields: IGQLQueryFieldsDefinitionType = {

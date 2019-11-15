@@ -7,6 +7,12 @@ import Root from "../base/Root";
 import resolvers from "./resolvers";
 import { getGQLSchemaForRoot } from "../base/Root/gql";
 import Knex from "knex";
+import { types } from "pg";
+
+// Setting the parsers to non defined, for timestamp
+types.setTypeParser(1114, (val) => (new Date(val)).toISOString());
+types.setTypeParser(1184, (val) => (new Date(val)).toISOString());
+
 const fsAsync = fs.promises;
 
 const app = express();

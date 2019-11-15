@@ -9,7 +9,7 @@ import {
   ANYONE_METAROLE,
   SELF_METAROLE,
 } from "../../../../constants";
-import { GraphQLOutputType } from "graphql";
+import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { GraphQLDataInputError } from "../../../errors";
 
 export interface IItemDefinitionRawJSONDataType {
@@ -152,6 +152,8 @@ export default class ItemDefinition {
   // Functions for graphql
   // tslint:disable-next-line: variable-name
   public _gqlObj: GraphQLOutputType;
+  // tslint:disable-next-line: variable-name
+  public _gqlQueryObj: GraphQLObjectType;
 
   private itemInstances: Item[];
   private childDefinitions: ItemDefinition[];

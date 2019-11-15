@@ -1,4 +1,4 @@
-import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES } from "../../../constants";
+import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES, SQL_DELETED_AT_TIMESTAMP_NAME } from "../../../constants";
 import Module from ".";
 import {
   getSQLTableDefinitionForProperty,
@@ -17,7 +17,9 @@ import { IGQLValue } from "../gql";
  */
 export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinitionType {
   // add all the standard fields
-  let resultTableSchema: ISQLTableDefinitionType = { ...RESERVED_BASE_PROPERTIES_SQL };
+  let resultTableSchema: ISQLTableDefinitionType = {
+    ...RESERVED_BASE_PROPERTIES_SQL,
+  };
 
   // now we loop thru every property (they will all become columns)
   mod.getAllPropExtensions().forEach((pd) => {

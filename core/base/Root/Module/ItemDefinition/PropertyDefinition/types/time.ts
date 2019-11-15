@@ -29,10 +29,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
 
   validate: (d: PropertyDefinitionSupportedDateType) => {
-    if (
-      d === "Invalid Date" ||
-      (new Date(d)).toJSON() === "Invalid Date"
-    ) {
+    if (d === "Invalid Date") {
+      return PropertyInvalidReason.INVALID_DATETIME;
+    }
+
+    const dateForm = new Date(d);
+    if (isNaN(dateForm.getTime()) || dateForm.toISOString() !== d) {
       return PropertyInvalidReason.INVALID_DATETIME;
     }
     return null;

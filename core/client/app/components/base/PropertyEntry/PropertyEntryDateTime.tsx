@@ -159,7 +159,7 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
     if (date === null) {
       return this.props.onChange(null, null);
     }
-    this.props.onChange(date.toDate().toJSON(), date);
+    this.props.onChange(date.toDate().toISOString(), date);
   }
   public handleOnInput(format: string, e: React.ChangeEvent<HTMLInputElement>) {
     // this is for typing, we get the string value
@@ -183,7 +183,12 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
     }
 
     // we set up the change event
-    this.props.onChange(value.toDate().toJSON(), value);
+    const valueAsDate = value.toDate();
+    if (isNaN(valueAsDate.getTime())) {
+      this.props.onChange("Invalid Date", value);
+    } else {
+      this.props.onChange(valueAsDate.toISOString(), value);
+    }
   }
   public getMaskFrom(format: string, value: any) {
     // basically provides the mask

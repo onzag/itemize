@@ -8,6 +8,7 @@ import {
   checkFieldsAreAvailableForRole,
   buildColumnNames,
   mustBeLoggedIn,
+  flattenFieldsFromRequestedFields,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { RESERVED_BASE_PROPERTIES_SQL, CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
@@ -28,7 +29,7 @@ export async function addItemDefinition(
 
   mustBeLoggedIn(tokenData);
 
-  const requestedFields = graphqlFields(resolverArgs.info);
+  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
   checkFieldsAreAvailableForRole(tokenData, requestedFields);
 
   const addingFields = {};
@@ -144,7 +145,14 @@ export async function addItemDefinition(
     requestedFieldsInIdef,
     true,
   );
-  return convertSQLValueToGQLValueForItemDefinition(itemDefinition, value, requestedFields);
+  const gqlValue = convertSQLValueToGQLValueForItemDefinition(itemDefinition, value, requestedFields);
+
+  // items that have just been added cannot be blocked or deleted, hence we just return
+  // right away without checking
+  return {
+    data: gqlValue,
+    ...gqlValue,
+  };
 }
 
 export function addItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {

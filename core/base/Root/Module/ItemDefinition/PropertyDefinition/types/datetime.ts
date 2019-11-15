@@ -20,7 +20,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
   supportsIcons: false,
-  sql: "timestamp",
+  sql: "datetime",
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) => {
@@ -29,10 +29,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
 
   validate: (d: PropertyDefinitionSupportedDateType) => {
-    if (
-      d === "Invalid Date" ||
-      (new Date(d)).toJSON() === "Invalid Date"
-    ) {
+    if (d === "Invalid Date") {
+      return PropertyInvalidReason.INVALID_DATETIME;
+    }
+
+    const dateForm = new Date(d);
+    if (isNaN(dateForm.getTime()) || dateForm.toISOString() !== d) {
       return PropertyInvalidReason.INVALID_DATETIME;
     }
     return null;

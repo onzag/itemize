@@ -11,7 +11,7 @@ import {
   ANYONE_METAROLE,
   SELF_METAROLE,
 } from "../../../constants";
-import { GraphQLInterfaceType } from "graphql";
+import { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
 
 export type OnStateChangeListenerType = () => any;
 
@@ -110,6 +110,8 @@ export default class Module {
   // graphql helper
   // tslint:disable-next-line: variable-name
   public _gqlObj: GraphQLInterfaceType;
+  // tslint:disable-next-line: variable-name
+  public _gqlQueryObj: GraphQLObjectType;
 
   /**
    * The parent module, if any of this module instance
