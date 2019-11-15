@@ -3,6 +3,7 @@ import {
   PREFIX_SEARCH,
   RESERVED_SEARCH_PROPERTIES,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
+  ID_CONTAINER_GQL,
 } from "../../../constants";
 import { GraphQLInterfaceType, GraphQLList, GraphQLObjectType } from "graphql";
 import Module from ".";
@@ -125,12 +126,12 @@ export function getGQLQueryFieldsForModule(
     throw new Error("Modules in search mode has no graphql queries");
   }
 
-  const gOuput = getGQLQueryOutputForModule(mod);
+  // const gOuput = getGQLQueryOutputForModule(mod);
 
   // now we setup the fields for the query
   let fields: IGQLQueryFieldsDefinitionType = {
     [PREFIX_SEARCH + mod.getQualifiedPathName()]: {
-      type: GraphQLList(gOuput),
+      type: GraphQLList(ID_CONTAINER_GQL),
       args: {
         ...RESERVED_SEARCH_PROPERTIES,
         // as you can realize the arguments exclude the base and make it into input mode

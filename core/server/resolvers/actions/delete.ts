@@ -5,7 +5,7 @@ import Debug from "../../debug";
 import {
   checkLanguageAndRegion,
   validateTokenAndGetData,
-  checkFieldsAreAvailableForRole,
+  checkBasicFieldsAreAvailableForRole,
   mustBeLoggedIn,
   flattenFieldsFromRequestedFields,
 } from "../basic";
@@ -20,13 +20,13 @@ export async function deleteItemDefinition(
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
-  checkLanguageAndRegion(resolverArgs.args);
+  checkLanguageAndRegion(appData, resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
   mustBeLoggedIn(tokenData);
 
   const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
-  checkFieldsAreAvailableForRole(tokenData, requestedFields);
+  checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
   const mod = itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
@@ -64,7 +64,14 @@ export async function deleteItemDefinition(
     true,
   );
 
-  // TODO build the transaction to wipe off the values, currently it's doing a bad soft delete
+  // So we run a soft delete, the reason for this is that searchs might be active
+  // that are going to match this element for paginating users, we have to keep the
+  // consistency for that point in time, the point in time is marked by SEARCH_REQUESTS_LIFE_IN_MS
+  // the item will still match searches done before delete but its data will not
+  // be accessible by anyone, the item will be deleted once the life has ellapsed
+  // when a search is over SEARCH_REQUESTS_LIFE_IN_MS old, it will be invalid, hence
+  // the rows data can be deleted, but do not delete the row itself, only the data
+  // we still have to keep consistency of old rows
   await appData.knex(itemDefinition.getParentModule().getQualifiedPathName()).update({
     deleted_at: appData.knex.fn.now(),
     deleted_by: tokenData.userId,

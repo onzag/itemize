@@ -10,6 +10,7 @@ import {
   PREFIX_DELETE,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   RESERVED_BASE_PROPERTIES,
+  ID_CONTAINER_GQL,
 } from "../../../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from ".";
 import { getGQLFieldsDefinitionForProperty } from "./PropertyDefinition/gql";
@@ -196,7 +197,7 @@ export function getGQLQueryFieldsForItemDefinition(
     },
     // now this is the search query
     [PREFIX_SEARCH + itemDefinition.getQualifiedPathName()]: {
-      type: GraphQLList(type),
+      type: GraphQLList(ID_CONTAINER_GQL),
       args: {
         ...RESERVED_SEARCH_PROPERTIES,
         ...getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, {

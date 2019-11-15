@@ -5,6 +5,7 @@ import Moment from "moment";
 import { Icon } from "@material-ui/core";
 import equals from "deep-equal";
 import { PropertyDefinitionSupportedDateType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/date";
+import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from "../../../../../constants";
 
 /**
  * Provides the current value of the date given the
@@ -12,12 +13,18 @@ import { PropertyDefinitionSupportedDateType } from "../../../../../base/Root/Mo
  * @param internalValue the internal value, a moment object
  * @param actualValue the actual value, a json string
  */
-function getCurrentValue(internalValue: any, actualValue: string) {
+function getCurrentValue(internalValue: any, actualValue: string, type: string) {
   // internal value has priority, that's why it's there
   if (internalValue) {
     return internalValue;
   } else if (actualValue) {
-    return Moment(actualValue);
+    let dbFormat = DATETIME_FORMAT;
+    if (type === "date") {
+      dbFormat = DATE_FORMAT;
+    } else if (type === "time") {
+      dbFormat = TIME_FORMAT;
+    }
+    return Moment(actualValue, dbFormat);
   }
   return null;
 }
@@ -88,6 +95,7 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
       value: getCurrentValue(
         props.value.internalValue,
         props.value.value as PropertyDefinitionSupportedDateType,
+        props.property.getType(),
       ),
 
       _materialUIBugRefresh: false,
@@ -110,6 +118,8 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
       nextProps.i18n !== this.props.i18n;
   }
   public componentDidUpdate(prevProps: IPropertyEntryProps) {
+    // TODO check if this stills happens, I found a locale bug
+    // before
     // active the bugfix for the material refresh
     // locale doesn't update properly unless you unmount
     // and remount the child components
@@ -142,7 +152,14 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
     // imagine recieving an invalid date and setting it as the current value
     // it would override everything, certainly there might be other solutions
     // but this one is the simplest by far
-    const valueParsed = Moment(new Date(this.props.value.value as string));
+    const type = this.props.property.getType();
+    let dbFormat = DATETIME_FORMAT;
+    if (type === "date") {
+      dbFormat = DATE_FORMAT;
+    } else if (type === "time") {
+      dbFormat = TIME_FORMAT;
+    }
+    const valueParsed = Moment(this.props.value.value as string, dbFormat);
     if (valueParsed.isValid() && !valueParsed.isSame(this.state.value)) {
       this.setState({
         value: valueParsed,
@@ -159,7 +176,19 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
     if (date === null) {
       return this.props.onChange(null, null);
     }
-    this.props.onChange(date.toDate().toISOString(), date);
+
+    if (!date.isValid()) {
+      return this.props.onChange("Invalid Date", date);
+    }
+
+    const type = this.props.property.getType();
+    let format = DATETIME_FORMAT;
+    if (type === "date") {
+      format = DATE_FORMAT;
+    } else if (type === "time") {
+      format = TIME_FORMAT;
+    }
+    this.props.onChange(date.format(format), date);
   }
   public handleOnInput(format: string, e: React.ChangeEvent<HTMLInputElement>) {
     // this is for typing, we get the string value
@@ -183,11 +212,17 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
     }
 
     // we set up the change event
-    const valueAsDate = value.toDate();
-    if (isNaN(valueAsDate.getTime())) {
+    if (!value.isValid()) {
       this.props.onChange("Invalid Date", value);
     } else {
-      this.props.onChange(valueAsDate.toISOString(), value);
+      const type = this.props.property.getType();
+      let outputFormat = DATETIME_FORMAT;
+      if (type === "date") {
+        outputFormat = DATE_FORMAT;
+      } else if (type === "time") {
+        outputFormat = TIME_FORMAT;
+      }
+      this.props.onChange(value.format(outputFormat), value);
     }
   }
   public getMaskFrom(format: string, value: any) {

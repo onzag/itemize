@@ -1,7 +1,6 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLString } from "graphql";
-import { stardardSQLInFn, standardSQLOutFn } from "../sql";
-import { IGQLValue } from "../../../../gql";
+import { stardardSQLInFn, standardSQLOutFn, standardSQLSearchFnExactAndRange } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   CLASSIC_BASE_I18N,
@@ -10,7 +9,9 @@ import {
   CLASSIC_SEARCH_OPTIONAL_I18N,
   CLASSIC_SEARCH_RANGED_I18N,
   CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
+  DATE_FORMAT,
 } from "../../../../../../constants";
+import Moment from "moment";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 
 export type PropertyDefinitionSupportedDateType = string;
@@ -22,18 +23,15 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sql: "date",
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
-  sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) => {
-    // TODO date matching somehow, we need to check how input and output goes as
-    // well, we need to be able to get date information properly accross
-  },
+  sqlSearch: standardSQLSearchFnExactAndRange,
 
   validate: (d: PropertyDefinitionSupportedDateType) => {
     if (d === "Invalid Date") {
       return PropertyInvalidReason.INVALID_DATETIME;
     }
 
-    const dateForm = new Date(d);
-    if (isNaN(dateForm.getTime()) || dateForm.toISOString() !== d) {
+    const dateForm = Moment(d, DATE_FORMAT);
+    if (!dateForm.isValid() || dateForm.format(DATE_FORMAT) !== d) {
       return PropertyInvalidReason.INVALID_DATETIME;
     }
     return null;

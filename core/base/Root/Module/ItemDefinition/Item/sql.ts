@@ -95,6 +95,7 @@ export function convertSQLValueToGQLValueForItem(item: Item, row: ISQLTableRowVa
  * @param item the item in question
  * @param data the graphql data value
  * @param knex the knex instance
+ * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
  * because some properties might treat nulls in a fancy way, when creating
@@ -107,6 +108,7 @@ export function convertGQLValueToSQLValueForItem(
   item: Item,
   data: IGQLValue,
   knex: any,
+  dictionary: string,
   partialFields?: any,
 ): ISQLTableRowValue {
   // so again we get the prefix as in ITEM_wheel_
@@ -139,7 +141,13 @@ export function convertGQLValueToSQLValueForItem(
         // to be prefixed with what we are giving, in this case ITEM_wheel_
         sqlResult = {
           ...sqlResult,
-          ...convertGQLValueToSQLValueForProperty(sinkingProperty, data[ITEM_PREFIX + item.getId()], knex, prefix),
+          ...convertGQLValueToSQLValueForProperty(
+            sinkingProperty,
+            data[ITEM_PREFIX + item.getId()],
+            knex,
+            dictionary,
+            prefix,
+          ),
         };
       }
     });
@@ -149,7 +157,7 @@ export function convertGQLValueToSQLValueForItem(
   return sqlResult;
 }
 
-export function buildSQLQueryForItem(item: Item, data: IGQLValue, knexBuilder: any) {
+export function buildSQLQueryForItem(item: Item, data: IGQLValue, knexBuilder: any, dictionary: string) {
   const prefix = PREFIX_BUILD(ITEM_PREFIX + item.getId());
   const exclusionState = data[prefix + EXCLUSION_STATE_SUFFIX];
 
@@ -167,7 +175,7 @@ export function buildSQLQueryForItem(item: Item, data: IGQLValue, knexBuilder: a
               return;
             }
 
-            buildSQLQueryForProperty(pd, itemData, prefix, secondBuilder);
+            buildSQLQueryForProperty(pd, itemData, prefix, secondBuilder, dictionary);
           });
         });
       }

@@ -4,7 +4,7 @@ import {
 import { GraphQLString } from "graphql";
 import { standardSQLOutFn } from "../sql";
 import { IGQLValue } from "../../../../gql";
-import { PropertyInvalidReason } from "../../PropertyDefinition";
+import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_RAW_TEXT_LENGTH,
   CLASSIC_BASE_I18N,
@@ -13,6 +13,7 @@ import {
   CLASSIC_SEARCH_OPTIONAL_I18N,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
+import fastHTMLParser from "fast-html-parser";
 
 export type PropertyDefinitionSupportedTextType = string;
 const typeValue: IPropertyDefinitionSupportedType = {
@@ -26,7 +27,11 @@ const typeValue: IPropertyDefinitionSupportedType = {
       [id + "_VECTOR"]: "tsvector",
     };
   },
-  sqlIn: (value: PropertyDefinitionSupportedTextType, id: string) => {
+  sqlIn: (
+    value: PropertyDefinitionSupportedTextType,
+    id: string, property: PropertyDefinition,
+    knex: any, dictionary: string,
+  ) => {
     if (value === null) {
       return {
         [id]: null,
@@ -34,25 +39,32 @@ const typeValue: IPropertyDefinitionSupportedType = {
       };
     }
 
-    // TODO setup vector with the value
-    // we need to know the subtype for this because html
-    // is handled differently, as we need to extract, we also need to know
-    // fts_language
+    // it's only necessary to do using the fasthtml parser
+    // because this only runs in the server anyway
+    let escapedText = value;
+    if (property.getSubtype() === "html") {
+      const dummyElement = fastHTMLParser.parse(value.toString());
+      escapedText = dummyElement.text;
+    }
+
     return {
       [id]: value,
-      [id + "_VECTOR"]: null,
+      [id + "_VECTOR"]: knex.raw(
+        "to_tsvector(?, ?)",
+        dictionary,
+        escapedText,
+      ),
     };
   },
   sqlOut: standardSQLOutFn,
-  sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) => {
+  sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any, dictionary: string) => {
     // TODO we need the fts_language here to pass to the ts_vector
-    const ftsLanguage = "english";
     const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + id;
 
     if (typeof data[searchName] !== "undefined" && data[searchName] !== null) {
       knexBuilder.andWhereRaw(
-        sqlPrefix + id + "_VECTOR @@ to_tsvector(?, ?)",
-        [ftsLanguage, data[searchName]],
+        sqlPrefix + id + "_VECTOR @@ to_tsquery(?, ?)",
+        [dictionary, data[searchName]],
       );
     }
   },

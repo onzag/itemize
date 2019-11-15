@@ -72,6 +72,7 @@ export function convertGQLValueToSQLValueForModule(
   mod: Module,
   data: IGQLValue,
   knex: any,
+  dictionary: string,
   partialFields?: any,
 ): ISQLTableRowValue {
   // first we create the row value
@@ -85,7 +86,7 @@ export function convertGQLValueToSQLValueForModule(
       (partialFields && partialFields[pd.getId()]) ||
       !partialFields
     ) {
-      result = { ...result, ...convertGQLValueToSQLValueForProperty(pd, data, knex) };
+      result = { ...result, ...convertGQLValueToSQLValueForProperty(pd, data, knex, dictionary, "") };
     }
   });
 
@@ -135,12 +136,12 @@ export function convertSQLValueToGQLValueForModule(mod: Module, row: ISQLTableRo
  * @param data the data for the query from graphql
  * @param knexBuilder the knex builder
  */
-export function buildSQLQueryForModule(mod: Module, data: IGQLValue, knexBuilder: any) {
+export function buildSQLQueryForModule(mod: Module, data: IGQLValue, knexBuilder: any, dictionary: string) {
   mod.getAllPropExtensions().forEach((pd) => {
     if (!pd.isSearchable()) {
       return;
     }
 
-    buildSQLQueryForProperty(pd, data, "", knexBuilder);
+    buildSQLQueryForProperty(pd, data, "", knexBuilder, dictionary);
   });
 }

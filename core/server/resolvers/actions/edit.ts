@@ -5,10 +5,11 @@ import Debug from "../../debug";
 import {
   checkLanguageAndRegion,
   validateTokenAndGetData,
-  checkFieldsAreAvailableForRole,
+  checkBasicFieldsAreAvailableForRole,
   buildColumnNames,
   mustBeLoggedIn,
   flattenFieldsFromRequestedFields,
+  getDictionary,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { RESERVED_BASE_PROPERTIES_SQL, CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
@@ -25,13 +26,13 @@ export async function editItemDefinition(
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
-  checkLanguageAndRegion(resolverArgs.args);
+  checkLanguageAndRegion(appData, resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
   mustBeLoggedIn(tokenData);
 
   const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
-  checkFieldsAreAvailableForRole(tokenData, requestedFields);
+  checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
   const mod = itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
@@ -109,16 +110,19 @@ export async function editItemDefinition(
   // that we only want the editingFields to be returned
   // into the SQL value, this is valid in here because
   // we don't want things to be defaulted in the query
+  const dictionary = getDictionary(appData, resolverArgs.args);
   const sqlIdefData: any = convertGQLValueToSQLValueForItemDefinition(
     itemDefinition,
     resolverArgs.args,
-    appData.knex.raw,
+    appData.knex,
+    dictionary,
     editingFields,
   );
   const sqlModData: any = convertGQLValueToSQLValueForModule(
     itemDefinition.getParentModule(),
     resolverArgs.args,
-    appData.knex.raw,
+    appData.knex,
+    dictionary,
     editingFields,
   );
 

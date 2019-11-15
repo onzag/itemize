@@ -133,6 +133,7 @@ export function convertSQLValueToGQLValueForProperty(
  * @param propertyDefinition the property definition in question
  * @param data the graphql data
  * @param knex the knex instance
+ * @param dictionary the dictionary to use in full text search mode
  * @param prefix the prefix, if we need the SQL values to be prefixed, usually
  * used within items, because item properties need to be prefixed
  */
@@ -140,17 +141,15 @@ export function convertGQLValueToSQLValueForProperty(
   propertyDefinition: PropertyDefinition,
   data: IGQLValue,
   knex: any,
-  prefix ?: string,
+  dictionary: string,
+  prefix: string,
 ): ISQLTableRowValue {
   // TODO validation of the value, otherwise invalid values can be manually set,
   // there should be also an overall validation by converting the whole value into
   // a standard value and then validating against that
 
-  // so we calculate the actual prefix
-  const actualPrefix = prefix ? prefix : "";
-
   // this is where the resulting column should be named
-  const resultingColumnName = actualPrefix + propertyDefinition.getId();
+  const resultingColumnName = prefix + propertyDefinition.getId();
   // and this is the value of the property, again, properties
   // are not prefixed, they are either in their own object
   // or in the root
@@ -176,7 +175,7 @@ export function convertGQLValueToSQLValueForProperty(
   const sqlIn = propertyDefinition.getPropertyDefinitionDescription().sqlIn;
 
   // we return as it is
-  return sqlIn(gqlPropertyValue, resultingColumnName, this, knex);
+  return sqlIn(gqlPropertyValue, resultingColumnName, this, knex, dictionary);
 }
 
 /**
@@ -192,6 +191,7 @@ export function buildSQLQueryForProperty(
   data: IGQLValue,
   sqlPrefix: string,
   knexBuilder: any,
+  dictionary: string,
 ) {
   const sqlSearchFn = propertyDefinition.getPropertyDefinitionDescription().sqlSearch;
   sqlSearchFn(
@@ -199,5 +199,6 @@ export function buildSQLQueryForProperty(
     sqlPrefix,
     propertyDefinition.getId(),
     knexBuilder,
+    dictionary,
   );
 }

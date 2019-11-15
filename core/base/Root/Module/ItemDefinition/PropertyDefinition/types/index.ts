@@ -72,6 +72,7 @@ export interface IPropertyDefinitionSupportedType {
     id: string,
     property: PropertyDefinition,
     knex: any,
+    dictionary: string,
   ) => ISQLTableRowValue;
   // sqlOut basically gives the entire table as data, and the property id where it expects
   // retrieval of that data; by default this function takes the table and does
@@ -82,7 +83,7 @@ export interface IPropertyDefinitionSupportedType {
     property: PropertyDefinition,
   ) => PropertyDefinitionSupportedType;
   // TODO description
-  sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) => void;
+  sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any, dictionary: string) => void;
 
   // represents an item that would mark for null
   // by default it is null itself

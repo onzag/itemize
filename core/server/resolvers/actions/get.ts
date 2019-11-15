@@ -5,7 +5,7 @@ import Debug from "../../debug";
 import {
   checkLanguageAndRegion,
   validateTokenAndGetData,
-  checkFieldsAreAvailableForRole,
+  checkBasicFieldsAreAvailableForRole,
   buildColumnNames,
   flattenFieldsFromRequestedFields,
   filterAndPrepareGQLValue,
@@ -26,13 +26,13 @@ export async function getItemDefinition(
 ) {
   // first we check that the language and region provided are
   // right and available
-  checkLanguageAndRegion(resolverArgs.args);
+  checkLanguageAndRegion(appData, resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
   // now we find the requested fields that are requested
   // in the get request
   const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
-  checkFieldsAreAvailableForRole(tokenData, requestedFields);
+  checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
   // we build the SQL column names
   const requestedFieldsSQL = buildColumnNames(requestedFields);

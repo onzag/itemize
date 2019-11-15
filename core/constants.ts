@@ -1,4 +1,12 @@
-import { GraphQLID, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLEnumType, GraphQLList, GraphQLBoolean } from "graphql";
+import {
+  GraphQLID,
+  GraphQLNonNull,
+  GraphQLString,
+  GraphQLEnumType,
+  GraphQLList,
+  GraphQLBoolean,
+  GraphQLObjectType,
+} from "graphql";
 import { IGQLFieldsDefinitionType } from "./base/Root/gql";
 import { ISQLTableDefinitionType } from "./base/Root/sql";
 
@@ -37,6 +45,7 @@ export const FILE_SUPPORTED_IMAGE_TYPES = [
   "image/png",
 ];
 
+// The properties for i18n a module should have
 export const MODULE_I18N = [
   "name",
   "searchFormTitle",
@@ -44,6 +53,7 @@ export const MODULE_I18N = [
   "ftsSearchFieldPlaceholder",
 ];
 
+// The properties for i18n an item should have
 export const ITEM_DEFINITION_I18N = [
   "name",
   "searchFormTitle",
@@ -53,6 +63,7 @@ export const ITEM_DEFINITION_I18N = [
   "ftsSearchFieldPlaceholder",
 ];
 
+// The properties for i18n an item that can be excluded should have
 export const ITEM_CAN_BE_EXCLUDED_I18N = [
   "exclusionSelectorLabel",
   "exclusionTernarySelectorLabel",
@@ -61,10 +72,12 @@ export const ITEM_CAN_BE_EXCLUDED_I18N = [
   "anyLabel",
 ];
 
+// The item optional data
 export const ITEM_OPTIONAL_I18N = [
   "name",
 ];
 
+// The properties for i18n a callout excluded item should have
 export const ITEM_CALLOUT_EXCLUDED_I18N = [
   "calloutExcludedLabel",
 ];
@@ -173,6 +186,8 @@ export const LOCATION_SEARCH_I18N = [
   "search.radius.placeholder",
 ];
 
+// properties that are externalized from the property reserved list
+// outside of data
 export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "id",
   "blocked_at",
@@ -245,12 +260,22 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   },
   deleted_at: {
     type: GraphQLString,
-    description: "When this item was deleted, if an item was deleted, all its data is gone and has been wiped off the database, " +
-    "however the fields deleted_at and deleted_by will remain, the data is however gone, you cannot recover it; you can nuke " +
-    "your data this way, but be sure to delete all your stuff before your user; the reason why the row remains is for database " +
-    "consistency, if someone is searching something you just deleted in that moment, the other user will lose all the references " +
-    "but with a deleted_at field I can tell the user, oops, data was deleted just while you were looking at it, while you still " +
-    "can tell who deleted it, if you delete the user all traces of that user will be nothing but empty rows with null data",
+    description: "When this item was deleted, if an item was deleted, all its data will be gone given time " +
+    "however the fields deleted_at and deleted_by will remain, the data will be gone in time, the time is dictated by the search " +
+    "life in milliseconds, the data will be immediately non accessible for everyone, you cannot recover it; " +
+    "the reason why data cannot be immediately deleted is because of active searchs that would mess up their counts " +
+    "if some records dissapear during the search, for example an user finds 21 items divided in 5x5 pages, he is on " +
+    "the first when the item 18 gets deleted, when he keeps paginating he works on the assumption there are 21 items " +
+    "but now there are actually 20, one of the pages is empty, with the deleted_at flag, he would receive a null object " +
+    "that is marked as deleted, his search still matched, but the item cannot be retrieved, while the data is " +
+    "still the database in order to match the search, it will be wiped off once there cannot be matching items " +
+    "this is why there are deleted_at flags in the rest endpoints, but the data is truly deleted afterwards, so " +
+    "you can nuke all your data this way, and even your user, which will be available then for someone else after " +
+    "the search time is lapsed, the existance of deleted rows will remain, for database consistency, this means " +
+    "the id item will never be gone, so if you delete your user, for example, posts will redirect to a null data, deleted_at" +
+    "user forever, even after the data is gone, and has been wiped, it keeps consistency, but all there is, an empty" +
+    "row with id, deleted_at and deleted_by, everything else null (even at database level); I hope this makes happy " +
+    "whoever managed to get here :)",
   },
   deleted_by: {
     type: GraphQLString,
@@ -265,6 +290,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "Users who flagged this item, reason",
   },
 };
+// The same but in SQL
 export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   id: {
     type: "serial",
@@ -346,6 +372,18 @@ export const ORDER_BY_OPTIONS = {
   RELEVANCY: "RELEVANCY",
   DATE: "DATE",
 };
+export const DATETIME_FORMAT = "YYYY-MM-DDTHH:mm:ss\\Z";
+export const TIME_FORMAT = "HH:mm:ss";
+export const DATE_FORMAT = "YYYY-MM-DD";
+
+export const ID_CONTAINER_GQL = new GraphQLObjectType({
+  name: "ID_CONTAINER",
+  fields: {
+    id: {
+      type: GraphQLNonNull(GraphQLID),
+    },
+  },
+});
 
 const searchOptionsOrderByOptions = {};
 Object.keys(ORDER_BY_OPTIONS).forEach((key) => {
@@ -373,18 +411,6 @@ export const RESERVED_SEARCH_PROPERTIES = {
   filter_by_country: {
     type: GraphQLNonNull(GraphQLBoolean),
     description: "Whether to filter by country",
-  },
-  offset: {
-    type: GraphQLNonNull(GraphQLInt),
-    description: "A SQL offset",
-  },
-  limit: {
-    type: GraphQLNonNull(GraphQLInt),
-    description: "A SQL limit",
-  },
-  search_date_identifier: {
-    type: GraphQLNonNull(GraphQLString),
-    description: "A date, this is to avoid items jumping during a search, it will filter out anything newer than this",
   },
   order_by: {
     type: GraphQLNonNull(new GraphQLEnumType({

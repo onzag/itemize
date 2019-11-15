@@ -5,10 +5,11 @@ import Debug from "../../debug";
 import {
   checkLanguageAndRegion,
   validateTokenAndGetData,
-  checkFieldsAreAvailableForRole,
+  checkBasicFieldsAreAvailableForRole,
   buildColumnNames,
   mustBeLoggedIn,
   flattenFieldsFromRequestedFields,
+  getDictionary,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { RESERVED_BASE_PROPERTIES_SQL, CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
@@ -24,13 +25,13 @@ export async function addItemDefinition(
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
-  checkLanguageAndRegion(resolverArgs.args);
+  checkLanguageAndRegion(appData, resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
   mustBeLoggedIn(tokenData);
 
   const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
-  checkFieldsAreAvailableForRole(tokenData, requestedFields);
+  checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
   const addingFields = {};
   Object.keys(resolverArgs.args).forEach((arg) => {
@@ -69,16 +70,19 @@ export async function addItemDefinition(
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
+  const dictionary = getDictionary(appData, resolverArgs.args);
   // TODO validation
   const sqlIdefData: any = convertGQLValueToSQLValueForItemDefinition(
     itemDefinition,
     resolverArgs.args,
     appData.knex,
+    dictionary,
   );
   const sqlModData: any = convertGQLValueToSQLValueForModule(
     itemDefinition.getParentModule(),
     resolverArgs.args,
     appData.knex,
+    dictionary,
   );
   sqlModData.type = selfTable;
   sqlModData.created_at = appData.knex.fn.now();

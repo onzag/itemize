@@ -133,6 +133,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
  * @param itemDefinition the item definition in question
  * @param data the graphql data
  * @param knex the knex instance
+ * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
  * because some properties might treat nulls in a fancy way, when creating
@@ -145,6 +146,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
   itemDefinition: ItemDefinition,
   data: IGQLValue,
   knex: any,
+  dictionary: string,
   partialFields?: any,
 ): ISQLTableRowValue {
   // first we create the row value
@@ -159,7 +161,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
       (partialFields && partialFields[pd.getId()]) ||
       !partialFields
     ) {
-      result = { ...result, ...convertGQLValueToSQLValueForProperty(pd, data, knex) };
+      result = { ...result, ...convertGQLValueToSQLValueForProperty(pd, data, knex, dictionary, "") };
     }
   });
   // also with the items
@@ -172,7 +174,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
       !partialFields
     ) {
       const innerPartialFields = !partialFields ? null : partialFields[itemNameInPartialFields];
-      result = { ...result, ...convertGQLValueToSQLValueForItem(item, data, knex, innerPartialFields) };
+      result = { ...result, ...convertGQLValueToSQLValueForItem(item, data, knex, dictionary, innerPartialFields) };
     }
   });
 
@@ -183,6 +185,7 @@ export function buildSQLQueryForItemDefinition(
   itemDefinition: ItemDefinition,
   data: IGQLValue,
   knexBuilder: any,
+  dictionary: string,
 ) {
   itemDefinition
     .getParentModule()
@@ -193,10 +196,10 @@ export function buildSQLQueryForItemDefinition(
           return;
         }
 
-        buildSQLQueryForProperty(pd, data, "", knexBuilder);
+        buildSQLQueryForProperty(pd, data, "", knexBuilder, dictionary);
       });
 
   itemDefinition.getAllItems().forEach((item) => {
-    buildSQLQueryForItem(item, data, knexBuilder);
+    buildSQLQueryForItem(item, data, knexBuilder, dictionary);
   });
 }

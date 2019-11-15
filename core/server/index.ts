@@ -8,10 +8,25 @@ import resolvers from "./resolvers";
 import { getGQLSchemaForRoot } from "../base/Root/gql";
 import Knex from "knex";
 import { types } from "pg";
+import Moment from "moment";
+import { DATETIME_FORMAT, TIME_FORMAT, DATE_FORMAT } from "../constants";
 
-// Setting the parsers to non defined, for timestamp
-types.setTypeParser(1114, (val) => (new Date(val)).toISOString());
-types.setTypeParser(1184, (val) => (new Date(val)).toISOString());
+// Setting the parsers, postgresql comes with
+// its own way to return this data and I want it
+// to keep it in sync with all the data that we are
+// currently using, first we set all the timezones to
+// utc and then format it into what the client expects
+// also do the same with time and date
+const TIMESTAMP_OID = 1114;
+const TIMESTAMPTZ_OID = 1184;
+const TIME_OID = 1083;
+const DB_TIME_FORMAT = "HH:mm:ss";
+const DATE_OID = 1082;
+const DB_DATE_FORMAT = "YYYY-MM-DD";
+types.setTypeParser(TIMESTAMP_OID, (val) => Moment(val).utc().format(DATETIME_FORMAT));
+types.setTypeParser(TIMESTAMPTZ_OID, (val) => Moment(val).utc().format(DATETIME_FORMAT));
+types.setTypeParser(TIME_OID, (val) => Moment(val, DB_TIME_FORMAT).format(TIME_FORMAT));
+types.setTypeParser(DATE_OID, (val) => Moment(val, DB_DATE_FORMAT).format(DATE_FORMAT));
 
 const fsAsync = fs.promises;
 

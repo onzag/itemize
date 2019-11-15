@@ -3,7 +3,7 @@ import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
 import { IGQLValue } from "../../../../gql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N, CLASSIC_SEARCH_OPTIONAL_I18N } from "../../../../../../constants";
-import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
+import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 
 export interface IPropertyDefinitionSupportedLocationType {
   lng: number;
@@ -36,7 +36,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   ],
   sql: (id: string) => {
     return {
-      [id + "_GEO"]: "GEOGRAPHY(Point)",
+      [id + "_GEO"]: "GEOMETRY(POINT,4326)",
       [id + "_LAT"]: "float",
       [id + "_LNG"]: "float",
       [id + "_TXT"]: "text",
@@ -55,7 +55,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
 
     return {
-      [id + "_GEO"]: knex.raw("POINT(?, ?)", value.lng, value.lat),
+      [id + "_GEO"]: knex.raw("ST_SetSRID(ST_MakePoint(?, ?), 4326);", value.lng, value.lat),
       [id + "_LAT"]: value.lat,
       [id + "_LNG"]: value.lng,
       [id + "_TXT"]: value.txt,
@@ -75,7 +75,22 @@ const typeValue: IPropertyDefinitionSupportedType = {
     return result;
   },
   sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder) => {
-    // TODO
+    const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + id;
+    const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + id;
+
+    if (
+      typeof data[locationName] !== "undefined" && data[locationName] !== null &&
+      typeof data[radiusName] !== "undefined" && data[radiusName] !== null
+    ) {
+      const lng = data[locationName].lng || 0;
+      const lat = data[locationName].lat || 0;
+      const distance = (data[radiusName].normalizedValue || 0) * 1000;
+      knexBuilder.andWhereRaw(
+        "ST_DWithin(??, ST_MakePoint(?,?)::geography, ?)",
+        sqlPrefix + id,
+        lng, lat, distance,
+      );
+    }
   },
   // locations just contain this basic data
   validate: (l: IPropertyDefinitionSupportedLocationType) => {
