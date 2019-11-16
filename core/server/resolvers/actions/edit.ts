@@ -10,6 +10,7 @@ import {
   mustBeLoggedIn,
   flattenFieldsFromRequestedFields,
   getDictionary,
+  serverSideCheckItemDefinitionAgainst,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { RESERVED_BASE_PROPERTIES_SQL, CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
@@ -38,13 +39,16 @@ export async function editItemDefinition(
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
+  itemDefinition.applyValueFromGQL(resolverArgs.args);
+  serverSideCheckItemDefinitionAgainst(itemDefinition, resolverArgs.args);
+
   debug("Making query to get the owner of this item");
 
   // first we make the query for the item, which is not blocked
   // in the module name for the given id, as we need to know who created
   // the item in order to validate roles
   const id = resolverArgs.args.id;
-  const contentData = await appData.knex.select("created_by", "blocked_at", "deleted_at").from(moduleTable).where({
+  const contentData = await appData.knex.select("created_by", "blocked_at").from(moduleTable).where({
     id,
     type: selfTable,
   });
@@ -52,9 +56,6 @@ export async function editItemDefinition(
   // if we don't get an user id this means that there's no owner, this is bad input
   if (!userId) {
     throw new GraphQLDataInputError(`There's no ${selfTable} with id ${id}`);
-  }
-  if (contentData[0].deleted_at !== null) {
-    throw new GraphQLDataInputError(`The item has been deleted`);
   }
   if (contentData[0].blocked_at !== null) {
     throw new GraphQLDataInputError(`The item is blocked`);
@@ -198,7 +199,7 @@ export async function editItemDefinition(
   // see before, so we return immediately, read has been checked already
   // we use the same strategy, all extra data will be chopped anyway by graphql
   return {
-    data: gqlValue,
+    DATA: gqlValue,
     ...gqlValue,
   };
 }

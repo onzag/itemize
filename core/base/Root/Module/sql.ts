@@ -1,4 +1,4 @@
-import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES, SQL_DELETED_AT_TIMESTAMP_NAME } from "../../../constants";
+import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES } from "../../../constants";
 import Module from ".";
 import {
   getSQLTableDefinitionForProperty,

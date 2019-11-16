@@ -1,4 +1,4 @@
-import { getItemDefinitionFn } from "./actions/get";
+import { getItemDefinitionFn, getModuleListFn, getItemDefinitionListFn } from "./actions/get";
 import { addItemDefinitionFn } from "./actions/add";
 import { searchItemDefinitionFn, searchModuleFn } from "./actions/search";
 import { editItemDefinitionFn } from "./actions/edit";
@@ -6,8 +6,6 @@ import { IAppDataType } from "..";
 import { IGraphQLResolversType } from "../../base/Root/gql";
 import { deleteItemDefinitionFn } from "./actions/delete";
 
-// TODO check editing, how does it work, can do partial editing?... roles might fuck this
-// up because of enforcing partial editing
 // TODO flagging
 // TODO implementation of tokens
 // TODO implement unique in property definition and a resolver to check for such unique values in
@@ -22,5 +20,14 @@ export default function resolvers(appData: IAppDataType): IGraphQLResolversType 
     addItemDefinition: addItemDefinitionFn(appData),
     editItemDefinition: editItemDefinitionFn(appData),
     deleteItemDefinition: deleteItemDefinitionFn(appData),
+    getItemDefinitionList: getItemDefinitionListFn(appData),
+    getModuleList: getModuleListFn(appData),
+
+    // flagItem
+    // clearFlags
+    // addModerationMessage
+    // blockItem
+    // banItem
+    // autocomplete
   };
 }

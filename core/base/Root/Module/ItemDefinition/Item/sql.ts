@@ -1,4 +1,4 @@
-import { PREFIX_BUILD, ITEM_PREFIX, EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
+import { EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
 import {
   getSQLTableDefinitionForProperty,
   convertSQLValueToGQLValueForProperty,
@@ -19,7 +19,7 @@ export function getSQLTableDefinitionForItem(item: Item): ISQLTableDefinitionTyp
   // so we basically need to get a prefix for this item definition
   // this is usually ITEM_ the item prefix, and the id of the item
   // eg ITEM_wheel, we build a prefix as ITEM_wheel_
-  const prefix = PREFIX_BUILD(ITEM_PREFIX + item.getId());
+  const prefix = item.getPrefixedQualifiedIdentifier();
 
   // the result table schema contains the table definition of all
   // the columns, the first column we add is the exclusion state
@@ -57,7 +57,7 @@ export function convertSQLValueToGQLValueForItem(item: Item, row: ISQLTableRowVa
   // first we create a prefix, the prefix is basically ITEM_wheel_
   // this prefix is added as you remember for every item extra property as
   // wheel as the item itself
-  const prefix = PREFIX_BUILD(ITEM_PREFIX + item.getId());
+  const prefix = item.getPrefixedQualifiedIdentifier();
 
   // now this is the result, of the graphql parent field because this is
   // an object that contains an object, the item sinking properties
@@ -84,8 +84,8 @@ export function convertSQLValueToGQLValueForItem(item: Item, row: ISQLTableRowVa
   // now we return both info, the exclusion state, and the item data
   // prefixed as necessary
   return {
-    [prefix + EXCLUSION_STATE_SUFFIX]: row[prefix + EXCLUSION_STATE_SUFFIX],
-    [ITEM_PREFIX + item.getId()]: gqlParentResult,
+    [item.getQualifiedExclusionStateIdentifier()]: row[item.getQualifiedExclusionStateIdentifier()],
+    [item.getQualifiedIdentifier()]: gqlParentResult,
   };
 }
 
@@ -112,14 +112,14 @@ export function convertGQLValueToSQLValueForItem(
   partialFields?: any,
 ): ISQLTableRowValue {
   // so again we get the prefix as in ITEM_wheel_
-  const prefix = PREFIX_BUILD(ITEM_PREFIX + item.getId());
+  const prefix = item.getPrefixedQualifiedIdentifier();
   // the exclusion state in the graphql information should be included in
   // the root data as ITEM_wheel__EXCLUSION_STATE so we extract it
-  const exclusionStateAccordingToGQL = data[prefix + EXCLUSION_STATE_SUFFIX];
+  const exclusionStateAccordingToGQL = data[item.getQualifiedExclusionStateIdentifier()];
 
   // we add that data to the sql result
   let sqlResult: ISQLTableRowValue = {
-    [prefix + EXCLUSION_STATE_SUFFIX]: exclusionStateAccordingToGQL,
+    [item.getQualifiedExclusionStateIdentifier()]: exclusionStateAccordingToGQL,
   };
 
   // now the information that is specific about the sql value is only
@@ -143,7 +143,7 @@ export function convertGQLValueToSQLValueForItem(
           ...sqlResult,
           ...convertGQLValueToSQLValueForProperty(
             sinkingProperty,
-            data[ITEM_PREFIX + item.getId()],
+            data[item.getQualifiedIdentifier()],
             knex,
             dictionary,
             prefix,
@@ -158,18 +158,19 @@ export function convertGQLValueToSQLValueForItem(
 }
 
 export function buildSQLQueryForItem(item: Item, data: IGQLValue, knexBuilder: any, dictionary: string) {
-  const prefix = PREFIX_BUILD(ITEM_PREFIX + item.getId());
-  const exclusionState = data[prefix + EXCLUSION_STATE_SUFFIX];
+  const prefix = item.getPrefixedQualifiedIdentifier();
+  const exclusionStateQualifiedId = item.getQualifiedExclusionStateIdentifier();
+  const exclusionState = data[exclusionStateQualifiedId];
 
   if (exclusionState === ItemExclusionState.EXCLUDED) {
-    knexBuilder.andWhere(prefix + EXCLUSION_STATE_SUFFIX, ItemExclusionState.EXCLUDED);
+    knexBuilder.andWhere(exclusionStateQualifiedId, ItemExclusionState.EXCLUDED);
   } else {
     knexBuilder.andWhere((builder: any) => {
       if (exclusionState !== ItemExclusionState.EXCLUDED) {
         builder.andWhere((secondBuilder: any) => {
-          secondBuilder.where(prefix + EXCLUSION_STATE_SUFFIX, ItemExclusionState.INCLUDED);
+          secondBuilder.where(exclusionStateQualifiedId, ItemExclusionState.INCLUDED);
 
-          const itemData = data[ITEM_PREFIX + item.getId()];
+          const itemData = data[item.getQualifiedIdentifier()];
           item.getSinkingProperties().forEach((pd) => {
             if (!pd.isSearchable()) {
               return;

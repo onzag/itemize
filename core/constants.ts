@@ -194,8 +194,7 @@ export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "blocked_by",
   "blocked_until",
   "blocked_reason",
-  "deleted_at",
-  "deleted_by",
+  "mod_comments",
 ];
 // INVALID RESERVED PROPERTY NAMES
 export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
@@ -258,28 +257,9 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     type: GraphQLString,
     description: "A written text of why it was blocked",
   },
-  deleted_at: {
-    type: GraphQLString,
-    description: "When this item was deleted, if an item was deleted, all its data will be gone given time " +
-    "however the fields deleted_at and deleted_by will remain, the data will be gone in time, the time is dictated by the search " +
-    "life in milliseconds, the data will be immediately non accessible for everyone, you cannot recover it; " +
-    "the reason why data cannot be immediately deleted is because of active searchs that would mess up their counts " +
-    "if some records dissapear during the search, for example an user finds 21 items divided in 5x5 pages, he is on " +
-    "the first when the item 18 gets deleted, when he keeps paginating he works on the assumption there are 21 items " +
-    "but now there are actually 20, one of the pages is empty, with the deleted_at flag, he would receive a null object " +
-    "that is marked as deleted, his search still matched, but the item cannot be retrieved, while the data is " +
-    "still the database in order to match the search, it will be wiped off once there cannot be matching items " +
-    "this is why there are deleted_at flags in the rest endpoints, but the data is truly deleted afterwards, so " +
-    "you can nuke all your data this way, and even your user, which will be available then for someone else after " +
-    "the search time is lapsed, the existance of deleted rows will remain, for database consistency, this means " +
-    "the id item will never be gone, so if you delete your user, for example, posts will redirect to a null data, deleted_at" +
-    "user forever, even after the data is gone, and has been wiped, it keeps consistency, but all there is, an empty" +
-    "row with id, deleted_at and deleted_by, everything else null (even at database level); I hope this makes happy " +
-    "whoever managed to get here :)",
-  },
-  deleted_by: {
-    type: GraphQLString,
-    description: "Whoever deleted this item, otherwise null",
+  mod_comments: {
+    type: GraphQLList(GraphQLString),
+    description: "Moderation comments",
   },
   flagged_by: {
     type: GraphQLList(GraphQLID),
@@ -339,11 +319,8 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   blocked_reason: {
     type: "text",
   },
-  deleted_at: {
-    type: "datetime",
-  },
-  deleted_by: {
-    type: "integer",
+  mod_comments: {
+    type: "text[]",
   },
   flagged_by: {
     type: "int[]",
@@ -354,7 +331,6 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
 };
 export const MAX_SQL_LIMIT = 25;
 export const CONNECTOR_SQL_COLUMN_FK_NAME = "MODULE_ID";
-export const SQL_DELETED_AT_TIMESTAMP_NAME = "DELETED_AT";
 export const PREFIX_BUILD = (s: string) => s + "_";
 export const SUFFIX_BUILD = (s: string) => "_" + s;
 export const PREFIXED_CONCAT = (...args: string[]) => args.join("__");
@@ -364,6 +340,7 @@ export const ITEM_DEFINITION_PREFIX = PREFIX_BUILD("IDEF");
 export const EXCLUSION_STATE_SUFFIX = SUFFIX_BUILD("EXCLUSION_STATE");
 export const PREFIX_SEARCH = PREFIX_BUILD("SEARCH");
 export const PREFIX_GET = PREFIX_BUILD("GET");
+export const PREFIX_GET_LIST = PREFIX_BUILD("GET_LIST");
 export const PREFIX_ADD = PREFIX_BUILD("ADD");
 export const PREFIX_EDIT = PREFIX_BUILD("EDIT");
 export const PREFIX_DELETE = PREFIX_BUILD("DELETE");
@@ -391,7 +368,7 @@ Object.keys(ORDER_BY_OPTIONS).forEach((key) => {
     value: key,
   };
 });
-export const RESERVED_SEARCH_PROPERTIES = {
+const BASE_QUERY_PROPERTIES = {
   token: {
     type: GraphQLNonNull(GraphQLString),
     description: "the access token provided by the app",
@@ -404,6 +381,9 @@ export const RESERVED_SEARCH_PROPERTIES = {
     type: GraphQLNonNull(GraphQLString),
     description: "A country 2 digit code",
   },
+};
+export const RESERVED_SEARCH_PROPERTIES = {
+  ...BASE_QUERY_PROPERTIES,
   filter_by_language: {
     type: GraphQLNonNull(GraphQLBoolean),
     description: "Whether to filter by language",
@@ -432,36 +412,21 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = {
   },
 };
 export const RESERVED_GETTER_PROPERTIES = {
-  token: {
-    type: GraphQLNonNull(GraphQLString),
-    description: "the access token provided by the app",
-  },
+  ...BASE_QUERY_PROPERTIES,
   id: {
     type: GraphQLNonNull(GraphQLID),
     description: "the id for that item",
   },
-  language: {
-    type: GraphQLNonNull(GraphQLString),
-    description: "A supported language (dictionary wise) 2 digit code",
-  },
-  country: {
-    type: GraphQLNonNull(GraphQLString),
-    description: "A country 2 digit code",
+};
+export const RESERVED_GETTER_LIST_PROPERTIES = {
+  ...BASE_QUERY_PROPERTIES,
+  ids: {
+    type: GraphQLNonNull(GraphQLID),
+    description: "the ids list for that item",
   },
 };
 export const RESERVED_ADD_PROPERTIES = {
-  token: {
-    type: GraphQLNonNull(GraphQLString),
-    description: "the access token provided by the app",
-  },
-  language: {
-    type: GraphQLNonNull(GraphQLString),
-    description: "A supported language (dictionary wise) 2 digit code",
-  },
-  country: {
-    type: GraphQLNonNull(GraphQLString),
-    description: "A country 2 digit code",
-  },
+  ...BASE_QUERY_PROPERTIES,
 };
 export const USER_ROLES = {
   ADMIN: "ADMIN",

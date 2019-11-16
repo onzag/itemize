@@ -1,6 +1,6 @@
 import { IAppDataType } from "../../";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
-import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
+import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType, FGraphQLModResolverType } from "../../../base/Root/gql";
 import Debug from "../../debug";
 import {
   checkLanguageAndRegion,
@@ -9,6 +9,7 @@ import {
   buildColumnNames,
   flattenFieldsFromRequestedFields,
   filterAndPrepareGQLValue,
+  checkListLimit,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import {
@@ -17,6 +18,7 @@ import {
   ITEM_PREFIX,
 } from "../../../constants";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
+import Module from "../../../base/Root/Module";
 const debug = Debug("resolvers/actions/get");
 
 export async function getItemDefinition(
@@ -54,11 +56,10 @@ export async function getItemDefinition(
   if (!requestedFieldsSQL.includes("created_by")) {
     requestedFieldsSQL.push("created_by");
   }
+  // the reason we need blocked_at is because filtering
+  // is done by the filtering function outside
   if (!requestedFieldsSQL.includes("blocked_at")) {
     requestedFieldsSQL.push("blocked_at");
-  }
-  if (!requestedFieldsSQL.includes("deleted_at")) {
-    requestedFieldsSQL.push("deleted_at");
   }
 
   // create the select query, filter the blockage, and select the right
@@ -141,6 +142,168 @@ export async function getItemDefinition(
   return valueToProvide;
 }
 
+export async function getItemDefinitionList(
+  appData: IAppDataType,
+  resolverArgs: IGraphQLIdefResolverArgs,
+  itemDefinition: ItemDefinition,
+) {
+  // first we check that the language and region provided are
+  // right and available
+  checkLanguageAndRegion(appData, resolverArgs.args);
+  checkListLimit(resolverArgs.args);
+  const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+
+  // now we find the requested fields that are requested
+  // in the get request
+  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
+  checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+
+  // we get the requested fields that take part of the item definition
+  // description
+  const requestedFieldsInIdef = {};
+  Object.keys(requestedFields).forEach((arg) => {
+    if (
+      itemDefinition.hasPropertyDefinitionFor(arg, true) ||
+      arg.startsWith(ITEM_PREFIX) && itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, ""))
+    ) {
+      requestedFieldsInIdef[arg] = requestedFields[arg];
+    }
+  });
+  itemDefinition.checkRoleAccessFor(
+    ItemDefinitionIOActions.READ,
+    tokenData.role,
+    tokenData.userId,
+    -1,
+    requestedFieldsInIdef,
+    true,
+  );
+
+  // we build the SQL column names
+  const requestedFieldsSQL = buildColumnNames(requestedFields);
+  // the reason we need blocked_at is because filtering
+  // is done by the filtering function outside
+  if (!requestedFieldsSQL.includes("blocked_at")) {
+    requestedFieldsSQL.push("blocked_at");
+  }
+  if (!requestedFieldsSQL.includes("id")) {
+    requestedFieldsSQL.push("id");
+  }
+
+  // get the module, the module table name, the table for
+  // the item definition
+  const mod = itemDefinition.getParentModule();
+  const moduleTable = mod.getQualifiedPathName();
+  const selfTable = itemDefinition.getQualifiedPathName();
+  // we check if a join is required if one of the columns we are requesting
+  // is not a property or one of the bases from the module, any ITEM_ prefixed
+  // property indicates a join is required, and any missing property also does
+  const requiresJoin = requestedFieldsSQL.some((columnName) =>
+    !RESERVED_BASE_PROPERTIES_SQL[columnName] && !mod.hasPropExtensionFor(columnName));
+
+  debug("queried fields grant a join with idef data?", requiresJoin);
+
+  // create the select query, filter the blockage, and select the right
+  // type based on it
+  const selectQuery = appData.knex.select(requestedFieldsSQL).from(moduleTable).where({
+    id: resolverArgs.args.ids,
+    type: selfTable,
+  });
+
+  // add the join if it's required
+  if (requiresJoin) {
+    selectQuery.join(selfTable, (clause) => {
+      clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
+    });
+  }
+
+  // execute the select query
+  const selectQueryValue: ISQLTableRowValue[] = await selectQuery;
+  const restoredValuesOrder: ISQLTableRowValue[] = resolverArgs.args.ids.map((id: number) => {
+    return selectQueryValue.find((row) => row.id === id);
+  });
+
+  debug("providing value");
+  // return if otherwise succeeds
+  return restoredValuesOrder.map(
+    (value) => filterAndPrepareGQLValue(value, requestedFields, tokenData.role, itemDefinition),
+  );
+}
+
+export async function getModuleList(
+  appData: IAppDataType,
+  resolverArgs: IGraphQLIdefResolverArgs,
+  mod: Module,
+) {
+  // first we check that the language and region provided are
+  // right and available
+  checkLanguageAndRegion(appData, resolverArgs.args);
+  checkListLimit(resolverArgs.args);
+  const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+
+  // now we find the requested fields that are requested
+  // in the get request
+  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
+  checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+
+  // we get the requested fields that take part of the item definition
+  // description
+  const requestedFieldsInMod = {};
+  Object.keys(requestedFields).forEach((arg) => {
+    if (mod.hasPropExtensionFor(arg)) {
+      requestedFieldsInMod[arg] = requestedFields[arg];
+    }
+  });
+  mod.checkRoleAccessFor(
+    ItemDefinitionIOActions.READ,
+    tokenData.role,
+    tokenData.userId,
+    -1,
+    requestedFieldsInMod,
+    true,
+  );
+
+  // we build the SQL column names
+  const requestedFieldsSQL = buildColumnNames(requestedFields);
+  // the reason we need blocked_at is because filtering
+  // is done by the filtering function outside
+  if (!requestedFieldsSQL.includes("blocked_at")) {
+    requestedFieldsSQL.push("blocked_at");
+  }
+  if (!requestedFieldsSQL.includes("id")) {
+    requestedFieldsSQL.push("id");
+  }
+
+  // get the module, the module table name, the table for
+  // the item definition
+  const moduleTable = mod.getQualifiedPathName();
+
+  // create the select query, filter the blockage, and select the right
+  // type based on it
+  const selectQuery = appData.knex.select(requestedFieldsSQL).from(moduleTable).where({
+    id: resolverArgs.args.ids,
+  });
+
+  // execute the select query
+  const selectQueryValue: ISQLTableRowValue[] = await selectQuery;
+  const restoredValuesOrder: ISQLTableRowValue[] = resolverArgs.args.ids.map((id: number) => {
+    return selectQueryValue.find((row) => row.id === id);
+  });
+
+  debug("providing value");
+  // return if otherwise succeeds
+  return restoredValuesOrder.map(
+    (value) => filterAndPrepareGQLValue(value, requestedFields, tokenData.role, mod),
+  );
+}
+
 export function getItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {
   return getItemDefinition.bind(null, appData);
+}
+
+export function getItemDefinitionListFn(appData: IAppDataType): FGraphQLIdefResolverType {
+  return getItemDefinitionList.bind(null, appData);
+}
+
+export function getModuleListFn(appData: IAppDataType): FGraphQLModResolverType {
+  return getItemDefinitionList.bind(null, appData);
 }

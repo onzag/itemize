@@ -619,6 +619,12 @@ export default class PropertyDefinition {
     this.stateinternalValue = value.internalValue;
   }
 
+  public applyValueFromGQL(value: any) {
+    this.stateValue = value;
+    this.stateValueModified = true;
+    this.stateinternalValue = null;
+  }
+
   /**
    * Externally checks a valid value for this input using all
    * its guns, this function is context aware

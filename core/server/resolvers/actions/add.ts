@@ -10,6 +10,7 @@ import {
   mustBeLoggedIn,
   flattenFieldsFromRequestedFields,
   getDictionary,
+  serverSideCheckItemDefinitionAgainst,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { RESERVED_BASE_PROPERTIES_SQL, CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
@@ -64,6 +65,9 @@ export async function addItemDefinition(
     true,
   );
 
+  itemDefinition.applyValueFromGQL(resolverArgs.args);
+  serverSideCheckItemDefinitionAgainst(itemDefinition, resolverArgs.args);
+
   const requestedFieldsSQL = buildColumnNames(requestedFields);
 
   const mod = itemDefinition.getParentModule();
@@ -71,7 +75,7 @@ export async function addItemDefinition(
   const selfTable = itemDefinition.getQualifiedPathName();
 
   const dictionary = getDictionary(appData, resolverArgs.args);
-  // TODO validation
+
   const sqlIdefData: any = convertGQLValueToSQLValueForItemDefinition(
     itemDefinition,
     resolverArgs.args,
@@ -154,7 +158,7 @@ export async function addItemDefinition(
   // items that have just been added cannot be blocked or deleted, hence we just return
   // right away without checking
   return {
-    data: gqlValue,
+    DATA: gqlValue,
     ...gqlValue,
   };
 }

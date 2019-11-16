@@ -1,4 +1,4 @@
-import { PREFIX_BUILD, ITEM_PREFIX, EXCLUSION_STATE_SUFFIX, PREFIXED_CONCAT } from "../../../../../constants";
+import { PREFIXED_CONCAT } from "../../../../../constants";
 import { GraphQLString, GraphQLNonNull, GraphQLInputObjectType, GraphQLObjectType } from "graphql";
 import {
   getGQLFieldsDefinitionForProperty,
@@ -38,7 +38,7 @@ export function getGQLFieldsDefinitionForItem(
   let storedObjLocation = "_gql";
   let itemGQLName = PREFIXED_CONCAT(
     item.getItemDefinition().getQualifiedPathName(),
-    ITEM_PREFIX + item.getId(),
+    item.getQualifiedIdentifier(),
   );
   if (options.propertiesAsInput) {
     storedObjLocation += "InObj";
@@ -72,11 +72,11 @@ export function getGQLFieldsDefinitionForItem(
   // now we add the exclusion state, and the graphql object, depending to
   // what we have
   return {
-    [PREFIX_BUILD(ITEM_PREFIX + item.getId()) + EXCLUSION_STATE_SUFFIX]: {
+    [item.getQualifiedExclusionStateIdentifier()]: {
       type: GraphQLNonNull(GraphQLString),
       description: description + " - exclusion state",
     },
-    [ITEM_PREFIX + item.getId()]: {
+    [item.getQualifiedIdentifier()]: {
       type: item[storedObjLocation],
       description,
     },

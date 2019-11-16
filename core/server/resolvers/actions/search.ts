@@ -4,9 +4,9 @@ import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType, FGraphQLModResolver
 import Module from "../../../base/Root/Module";
 import {
   checkLanguageAndRegion,
-  checkLimit,
   validateTokenAndGetData,
   getDictionary,
+  serverSideCheckItemDefinitionAgainst,
 } from "../basic";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { buildSQLQueryForModule } from "../../../base/Root/Module/sql";
@@ -25,7 +25,6 @@ export async function searchModule(
   mod: Module,
 ) {
   checkLanguageAndRegion(appData, resolverArgs.args);
-  checkLimit(resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
   const searchingFields = {};
@@ -54,8 +53,8 @@ export async function searchModule(
 
   const searchQuery = appData.knex.select(["id"])
     .from(mod.getQualifiedPathName())
-    .where("blocked_at", null)
-    .andWhere("deleted_at", null);
+    .where("blocked_at", null);
+
   buildSQLQueryForModule(
     mod,
     resolverArgs.args,
@@ -81,7 +80,6 @@ export async function searchItemDefinition(
   // check the language and region, as well as the limit
   // defined in the query
   checkLanguageAndRegion(appData, resolverArgs.args);
-  checkLimit(resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
   // now we need to get the fields that we are using to search
@@ -124,6 +122,10 @@ export async function searchItemDefinition(
     true,
   );
 
+  // Checking search mode counterpart to validate
+  searchModeCounterpart.applyValueFromGQL(resolverArgs.args);
+  serverSideCheckItemDefinitionAgainst(searchModeCounterpart, resolverArgs.args);
+
   // retrieve basic information
   const mod = itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
@@ -137,8 +139,7 @@ export async function searchItemDefinition(
 
   // now we build the search query
   const searchQuery = appData.knex.select(["id"]).from(moduleTable)
-    .where("blocked_at", null)
-    .andWhere("deleted_at", null);
+    .where("blocked_at", null);
   // and now we call the function that builds the query itself into
   // that parent query, and adds the andWhere as required
   // into such query
@@ -163,9 +164,6 @@ export async function searchItemDefinition(
   if (resolverArgs.args.filter_by_country) {
     searchQuery.andWhere("country", resolverArgs.args.country);
   }
-
-  // TODO we need to implement full text search, it's not yet implemented
-  // TODO we need to implement location radius search, it's not yet implemented
 
   // now we get the base result, and convert every row
   const baseResult: ISQLTableRowValue[] = await searchQuery;

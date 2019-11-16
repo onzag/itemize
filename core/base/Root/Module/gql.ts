@@ -4,6 +4,8 @@ import {
   RESERVED_SEARCH_PROPERTIES,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   ID_CONTAINER_GQL,
+  PREFIX_GET_LIST,
+  RESERVED_GETTER_LIST_PROPERTIES,
 } from "../../../constants";
 import { GraphQLInterfaceType, GraphQLList, GraphQLObjectType } from "graphql";
 import Module from ".";
@@ -87,7 +89,7 @@ export function getGQLQueryOutputForModule(mod: Module): GraphQLObjectType {
     const modInterface = getGQLInterfaceForModule(mod);
 
     const fields = {
-      data: {
+      DATA: {
         type: modInterface,
       },
     };
@@ -104,6 +106,37 @@ export function getGQLQueryOutputForModule(mod: Module): GraphQLObjectType {
   }
 
   return mod._gqlQueryObj;
+}
+
+async function resolveGenericFunction(
+  resolveToUse: string,
+  mod: Module,
+  resolvers: IGraphQLResolversType,
+  source: any,
+  args: any,
+  context: any,
+  info: any,
+): Promise<any> {
+  let value = null;
+  if (resolvers) {
+    try {
+      value = await resolvers[resolveToUse]({
+        source,
+        args,
+        context,
+        info,
+      }, mod);
+    } catch (err) {
+      if (err instanceof GraphQLDataInputError) {
+        throw err;
+      }
+      console.error(err.stack);
+      throw new Error(
+        "Internal server error",
+      );
+    }
+  }
+  return value;
 }
 
 /**
@@ -126,7 +159,7 @@ export function getGQLQueryFieldsForModule(
     throw new Error("Modules in search mode has no graphql queries");
   }
 
-  // const gOuput = getGQLQueryOutputForModule(mod);
+  const gOuput = getGQLQueryOutputForModule(mod);
 
   // now we setup the fields for the query
   let fields: IGQLQueryFieldsDefinitionType = {
@@ -143,28 +176,12 @@ export function getGQLQueryFieldsForModule(
           optionalForm: true,
         }),
       },
-      resolve: async (source: any, args: any, context: any, info: any) => {
-        let value = null;
-        if (resolvers) {
-          try {
-            value = await resolvers.searchModule({
-              source,
-              args,
-              context,
-              info,
-            }, mod);
-          } catch (err) {
-            if (err instanceof GraphQLDataInputError) {
-              throw err;
-            }
-            console.error(err.stack);
-            throw new Error(
-              "Internal server error",
-            );
-          }
-        }
-        return value;
-      },
+      resolve: resolveGenericFunction.bind(null, "searchModule", mod),
+    },
+    [PREFIX_GET_LIST + mod.getQualifiedPathName()]: {
+      type: GraphQLList(gOuput),
+      args: RESERVED_GETTER_LIST_PROPERTIES,
+      resolve: resolveGenericFunction.bind(null, "getModuleList", mod, resolvers),
     },
   };
 

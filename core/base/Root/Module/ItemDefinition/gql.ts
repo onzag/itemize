@@ -11,6 +11,8 @@ import {
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   RESERVED_BASE_PROPERTIES,
   ID_CONTAINER_GQL,
+  PREFIX_GET_LIST,
+  RESERVED_GETTER_LIST_PROPERTIES,
 } from "../../../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from ".";
 import { getGQLFieldsDefinitionForProperty } from "./PropertyDefinition/gql";
@@ -109,7 +111,7 @@ export function getGQLQueryOutputForItemDefinition(itemDefinition: ItemDefinitio
     const itemDefinitionObj = getGQLTypeForItemDefinition(itemDefinition);
 
     const fields = {
-      data: {
+      DATA: {
         type: itemDefinitionObj,
       },
     };
@@ -194,6 +196,11 @@ export function getGQLQueryFieldsForItemDefinition(
       },
       // we just pipe the arguments out of the resolver
       resolve: resolveGenericFunction.bind(null, "getItemDefinition", itemDefinition, resolvers),
+    },
+    [PREFIX_GET_LIST + itemDefinition.getQualifiedPathName()]: {
+      type: GraphQLList(type),
+      args: RESERVED_GETTER_LIST_PROPERTIES,
+      resolve: resolveGenericFunction.bind(null, "getItemDefinitionList", itemDefinition, resolvers),
     },
     // now this is the search query
     [PREFIX_SEARCH + itemDefinition.getQualifiedPathName()]: {

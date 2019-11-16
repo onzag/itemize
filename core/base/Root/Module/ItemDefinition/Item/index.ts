@@ -7,6 +7,7 @@ import ConditionalRuleSet, {
 import Module, { OnStateChangeListenerType } from "../..";
 import PropertyDefinition from "../PropertyDefinition";
 import PropertiesValueMappingDefiniton, { IPropertiesValueMappingDefinitonRawJSONDataType } from "../PropertiesValueMappingDefiniton";
+import { ITEM_PREFIX, PREFIX_BUILD, EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
 
 export enum ItemExclusionState {
   EXCLUDED = "EXCLUDED",
@@ -335,6 +336,18 @@ export default class Item {
     return this.rawData.id;
   }
 
+  public getQualifiedIdentifier() {
+    return ITEM_PREFIX + this.getId();
+  }
+
+  public getPrefixedQualifiedIdentifier() {
+    return PREFIX_BUILD(this.getQualifiedIdentifier());
+  }
+
+  public getQualifiedExclusionStateIdentifier() {
+    return this.getPrefixedQualifiedIdentifier() + EXCLUSION_STATE_SUFFIX;
+  }
+
   /**
    * Provides the current value of this item
    */
@@ -366,6 +379,15 @@ export default class Item {
 
     if (value.itemDefinitionValue) {
       this.itemDefinition.applyValue(value.itemDefinitionValue);
+    }
+  }
+
+  public applyValueFromGQL(value: {[key: string]: any}, exclusionState: ItemExclusionState) {
+    this.stateExclusion = exclusionState;
+    this.stateExclusionModified = true;
+
+    if (value) {
+      this.itemDefinition.applyValueFromGQL(value);
     }
   }
 

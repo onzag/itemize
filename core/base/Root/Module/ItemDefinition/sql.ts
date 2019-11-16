@@ -1,4 +1,4 @@
-import { CONNECTOR_SQL_COLUMN_FK_NAME, RESERVED_BASE_PROPERTIES, ITEM_PREFIX } from "../../../../constants";
+import { CONNECTOR_SQL_COLUMN_FK_NAME, RESERVED_BASE_PROPERTIES } from "../../../../constants";
 import {
   convertSQLValueToGQLValueForProperty,
   getSQLTableDefinitionForProperty,
@@ -114,11 +114,11 @@ export function convertSQLValueToGQLValueForItemDefinition(
 
   // now we do the same for the items
   itemDefinition.getAllItems().filter(
-    (item) => graphqlFields[ITEM_PREFIX + item.getId()],
+    (item) => graphqlFields[item.getQualifiedIdentifier()],
   ).forEach((item) => {
     result = {
       ...result, ...convertSQLValueToGQLValueForItem(
-        item, row, graphqlFields[ITEM_PREFIX + item.getId()],
+        item, row, graphqlFields[item.getQualifiedIdentifier()],
       ),
     };
   });
@@ -168,7 +168,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
   itemDefinition.getAllItems().forEach((item) => {
     // we only add if partialFields allows it, or we don't have
     // partialFields set
-    const itemNameInPartialFields = ITEM_PREFIX + item.getName();
+    const itemNameInPartialFields = item.getQualifiedIdentifier();
     if (
       (partialFields && partialFields[itemNameInPartialFields]) ||
       !partialFields

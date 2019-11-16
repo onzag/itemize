@@ -8,6 +8,7 @@ import {
   ITEM_PREFIX,
   ANYONE_METAROLE,
   SELF_METAROLE,
+  EXCLUSION_STATE_SUFFIX,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { GraphQLDataInputError } from "../../../errors";
@@ -590,6 +591,29 @@ export default class ItemDefinition {
 
     value.properties.forEach((propertyValue) => {
       this.getPropertyDefinitionFor(propertyValue.propertyId, true).applyValue(propertyValue);
+    });
+  }
+
+  /**
+   * Applies an item definition value from a graphql data
+   */
+  public applyValueFromGQL(value: {
+    [key: string]: any;
+  }) {
+    this.getAllPropertyDefinitions().forEach((property) => {
+      let givenValue = value[property.getId()];
+      if (typeof givenValue === "undefined") {
+        givenValue = null;
+      }
+      property.applyValueFromGQL(givenValue);
+    });
+    this.getAllItems().forEach((item) => {
+      let givenValue = value[item.getQualifiedIdentifier()];
+      if (typeof givenValue === "undefined") {
+        givenValue = null;
+      }
+      const givenExclusionState = value[item.getQualifiedExclusionStateIdentifier()] || ItemExclusionState.EXCLUDED;
+      item.applyValueFromGQL(givenValue, givenExclusionState);
     });
   }
 

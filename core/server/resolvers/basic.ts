@@ -12,15 +12,17 @@ import Module from "../../base/Root/Module";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
 import { convertSQLValueToGQLValueForModule } from "../../base/Root/Module/sql";
 import { IAppDataType } from "..";
-import { config } from "process";
+import equals from "deep-equal";
+import { IGQLValue } from "../../base/Root/gql";
+import { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
 const debug = Debug("resolvers/basic");
 
 export function flattenFieldsFromRequestedFields(requestedFields: any) {
   const output = {
-    ...(requestedFields.data || {}),
+    ...(requestedFields.DATA || {}),
   };
   Object.keys(requestedFields).forEach((key) => {
-    if (key !== "data") {
+    if (key !== "DATA") {
       output[key] = requestedFields[key];
     }
   });
@@ -67,16 +69,16 @@ export function checkBasicFieldsAreAvailableForRole(tokenData: any, fieldData: a
   }
 }
 
-export function checkLimit(args: any) {
+export function checkListLimit(args: any) {
   debug("Checking the limit...");
-  if (args.limit > MAX_SQL_LIMIT) {
+  if (args.ids > MAX_SQL_LIMIT) {
     debug(
       "Exceeded limit with",
-      args.limit,
+      args.ids,
       "the maximum is",
       MAX_SQL_LIMIT,
     );
-    throw new GraphQLDataInputError("Limit set too high at " + args.limit);
+    throw new GraphQLDataInputError("Too many ids at once, max is " + MAX_SQL_LIMIT);
   }
 }
 
@@ -130,14 +132,11 @@ export function filterAndPrepareGQLValue(
 ) {
   let valueToProvide: any;
   if (
+    value.blocked_at === null ||
     (
-      value.blocked_at === null ||
-      (
-        value.blocked_at !== null &&
-        ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(role)
-      )
-    ) &&
-    value.deleted_at === null
+      value.blocked_at !== null &&
+      ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(role)
+    )
   ) {
     let valueOfTheItem: any;
     if (parentModuleOrIdef instanceof ItemDefinition) {
@@ -159,14 +158,14 @@ export function filterAndPrepareGQLValue(
     // values inside that should be outside, and outside that will be inside
     // will be stripped
     valueToProvide = {
-      data: valueOfTheItem,
+      DATA: valueOfTheItem,
       ...valueOfTheItem,
     };
   } else {
     // we convert the value we were provided, of course, we only need
     // to process what was requested
     valueToProvide = {
-      data: null,
+      DATA: null,
     };
     // we add every externally accessed field, these fields are not
     // a security concern and anyway they are checked beforehand
@@ -178,4 +177,57 @@ export function filterAndPrepareGQLValue(
   }
 
   return valueToProvide;
+}
+
+/**
+ * Checks that an item definition current state is
+ * valid and that the gqlArgValue provided is a match
+ * for this item definition current value, remember
+ * that in order to set the state to the gqlArgValue
+ * you should run itemDefinition.applyValueFromGQL(gqlArgValue);
+ * @param itemDefinition the item definition in question
+ * @param gqlArgValue the arg value that was set
+ */
+export function serverSideCheckItemDefinitionAgainst(
+  itemDefinition: ItemDefinition,
+  gqlArgValue: IGQLValue,
+) {
+  const currentValue = itemDefinition.getCurrentValue();
+  currentValue.properties.forEach((propertyValue) => {
+    let gqlPropertyValue = gqlArgValue[propertyValue.propertyId];
+    if (typeof gqlPropertyValue === "undefined") {
+      gqlPropertyValue = null;
+    }
+    if (propertyValue.invalidReason) {
+      throw new GraphQLDataInputError(
+        `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
+      );
+    } else if (!equals(gqlPropertyValue, propertyValue.value)) {
+      throw new GraphQLDataInputError(
+        `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated value`,
+      );
+    }
+  });
+
+  currentValue.items.forEach((itemValue) => {
+    const item = itemDefinition.getItemFor(itemValue.itemId);
+    let gqlItemValue = gqlArgValue[item.getQualifiedIdentifier()];
+    if (typeof gqlItemValue === "undefined") {
+      gqlItemValue = null;
+    }
+    const gqlExclusionState = gqlArgValue[item.getQualifiedExclusionStateIdentifier()] || null;
+    if (itemValue.exclusionState !== gqlExclusionState) {
+      throw new GraphQLDataInputError(
+        `validation failed at item ${itemValue.itemId} with a mismatch of exclusion state`,
+      );
+    } else if (gqlExclusionState === ItemExclusionState.EXCLUDED && gqlItemValue !== null) {
+      throw new GraphQLDataInputError(
+        `validation failed at item ${itemValue.itemId} with an excluded item but data set for it`,
+      );
+    }
+    serverSideCheckItemDefinitionAgainst(
+      item.getItemDefinition(),
+      gqlItemValue,
+    );
+  });
 }
