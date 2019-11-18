@@ -69,7 +69,9 @@ export async function searchModule(
   }
 
   const baseResult: ISQLTableRowValue[] = await searchQuery;
-  return baseResult;
+  return {
+    ids: baseResult.map((row) => row.id),
+  };
 }
 
 export async function searchItemDefinition(
@@ -167,7 +169,9 @@ export async function searchItemDefinition(
 
   // now we get the base result, and convert every row
   const baseResult: ISQLTableRowValue[] = await searchQuery;
-  return baseResult;
+  return {
+    ids: baseResult.map((row) => row.id),
+  };
 }
 
 export function searchItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {

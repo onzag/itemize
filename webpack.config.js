@@ -19,7 +19,11 @@ module.exports = {
   module: {
     rules: [
       {
-        test: path.resolve(__dirname, "node_modules/fast-html-parser/index.js"),
+        test: path.resolve(__dirname, "node_modules/jsdom/index.js"),
+        use: "null-loader"
+      },
+      {
+        test: path.resolve(__dirname, "node_modules/dompurify/index.js"),
         use: "null-loader"
       },
       {

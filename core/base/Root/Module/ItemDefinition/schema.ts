@@ -3,6 +3,33 @@ import ItemSchema from "./Item/schema";
 import PropertiesValueMappingDefinitionSchema from "./PropertiesValueMappingDefiniton/schema";
 import ConditionalRuleSetSchema from "./ConditionalRuleSet/schema";
 
+const policySchema = {
+  type: "object",
+  patternProperties: {
+    "^[A-Z_]+$": {
+      type: "object",
+      properties: {
+        roles: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          minItems: 1,
+        },
+        properties: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          minItems: 1,
+        },
+      },
+      required: ["roles", "properties"],
+    },
+  },
+  additionalProperties: false,
+};
+
 export default {
   $id: "ItemDefinition",
   type: "object",
@@ -52,6 +79,13 @@ export default {
       type: "array",
       items: {
         type: "string",
+      },
+    },
+    policies: {
+      type: "object",
+      properties: {
+        edit: policySchema,
+        delete: policySchema,
       },
     },
   },

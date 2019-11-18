@@ -50,6 +50,7 @@ export function getGQLFieldsDefinitionForModule(
       ...getGQLFieldsDefinitionForProperty(propExtension, {
         propertiesAsInput: options.propertiesAsInput,
         optionalForm: options.optionalForm,
+        prefix: "",
       }),
     };
   });
@@ -164,7 +165,7 @@ export function getGQLQueryFieldsForModule(
   // now we setup the fields for the query
   let fields: IGQLQueryFieldsDefinitionType = {
     [PREFIX_SEARCH + mod.getQualifiedPathName()]: {
-      type: GraphQLList(ID_CONTAINER_GQL),
+      type: ID_CONTAINER_GQL,
       args: {
         ...RESERVED_SEARCH_PROPERTIES,
         // as you can realize the arguments exclude the base and make it into input mode

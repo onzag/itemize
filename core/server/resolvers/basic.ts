@@ -115,10 +115,12 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
 }
 
 export function getDictionary(appData: IAppDataType, args: any) {
+  debug("Providing dictionary from", args.language);
   return appData.config.dictionaries[args.language];
 }
 
 export function mustBeLoggedIn(tokenData: any) {
+  debug("Checking if user is logged in...");
   if (!tokenData.userId) {
     throw new GraphQLDataInputError("Must be logged in");
   }
@@ -192,7 +194,9 @@ export function serverSideCheckItemDefinitionAgainst(
   itemDefinition: ItemDefinition,
   gqlArgValue: IGQLValue,
 ) {
+  debug("Checking value against item definition...");
   const currentValue = itemDefinition.getCurrentValue();
+  debug("Current value is", currentValue);
   currentValue.properties.forEach((propertyValue) => {
     let gqlPropertyValue = gqlArgValue[propertyValue.propertyId];
     if (typeof gqlPropertyValue === "undefined") {

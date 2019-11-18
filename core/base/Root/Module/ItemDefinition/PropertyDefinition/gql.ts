@@ -17,6 +17,7 @@ export function getGQLFieldsDefinitionForProperty(
   options: {
     propertiesAsInput: boolean,
     optionalForm: boolean,
+    prefix: string,
   },
 ): IGQLFieldsDefinitionType {
   // These are the resulting fields as we will store them here
@@ -72,7 +73,7 @@ export function getGQLFieldsDefinitionForProperty(
     "READ ACCESS: " + propertyDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.READ).join(", ") + " - " +
     "EDIT ACCESS: " + propertyDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.EDIT).join(", ") + " - ";
 
-  resultFieldsSchema[propertyDefinition.getId()] = {
+  resultFieldsSchema[options.prefix + propertyDefinition.getId()] = {
     type: gqlResult,
     description,
   };

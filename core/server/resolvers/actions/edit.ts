@@ -39,6 +39,10 @@ export async function editItemDefinition(
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
+  // TODO implement whole value check, for both, add and edit,
+  // it's safer to do so because w eanyway select the content data
+  // here we can manage to request all the fields in a join and then
+  // doing a pseudoupdate and checking if it will produce a valid result
   itemDefinition.applyValueFromGQL(resolverArgs.args);
   serverSideCheckItemDefinitionAgainst(itemDefinition, resolverArgs.args);
 

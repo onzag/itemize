@@ -33,7 +33,7 @@
             "htmlAutocomplete": "current-password",
             "disableRetrieval": true,
             "readRoleAccess": [],
-            "editRoleAccess": ["ADMIN"]
+            "editRoleAccess": ["SELF", "ADMIN"]
         },
         {
             "id": "role",
@@ -52,5 +52,19 @@
             "readRoleAccess": ["SELF"],
             "searchLevel": "disabled"
         }
-    ]
+    ],
+    "policies": {
+        "edit": {
+            "REQUIRES_PASSWORD_CONFIRMATION": {
+                "roles": ["USER", "MODERATOR"],
+                "properties": ["password"]
+            }
+        },
+        "delete": {
+            "REQUIRES_PASSWORD_CONFIRMATION": {
+                "roles": ["USER", "MODERATOR"],
+                "properties": ["password"]
+            }
+        }
+    }
 }

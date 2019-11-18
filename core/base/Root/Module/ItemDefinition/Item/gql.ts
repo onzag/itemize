@@ -26,7 +26,10 @@ export function getGQLFieldsDefinitionForItem(
   item.getSinkingProperties().forEach((sinkingProperty) => {
     itemFields = {
       ...itemFields,
-      ...getGQLFieldsDefinitionForProperty(sinkingProperty, options),
+      ...getGQLFieldsDefinitionForProperty(sinkingProperty, {
+        ...options,
+        prefix: "",
+      }),
     };
   });
 

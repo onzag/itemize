@@ -13,6 +13,8 @@ import {
   ID_CONTAINER_GQL,
   PREFIX_GET_LIST,
   RESERVED_GETTER_LIST_PROPERTIES,
+  POLICY_PREFIXES,
+  PREFIX_BUILD,
 } from "../../../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from ".";
 import { getGQLFieldsDefinitionForProperty } from "./PropertyDefinition/gql";
@@ -38,6 +40,7 @@ export function getGQLFieldsDefinitionForItemDefinition(
     excludeBase: boolean,
     propertiesAsInput: boolean,
     optionalForm: boolean,
+    includePolicy: string;
   },
 ): IGQLFieldsDefinitionType {
   // the fields result in graphql field form
@@ -57,6 +60,7 @@ export function getGQLFieldsDefinitionForItemDefinition(
       ...getGQLFieldsDefinitionForProperty(pd, {
         propertiesAsInput: options.propertiesAsInput,
         optionalForm: options.optionalForm,
+        prefix: "",
       }),
     };
   });
@@ -73,6 +77,45 @@ export function getGQLFieldsDefinitionForItemDefinition(
   });
 
   // return that
+  if (!options.includePolicy) {
+    return fieldsResult;
+  } else {
+    return {
+      ...fieldsResult,
+      ...getGQLFieldsDefinitionForItemDefinitionPolicies(itemDefinition, {
+        propertiesAsInput: options.propertiesAsInput,
+        policy: options.includePolicy,
+      }),
+    };
+  }
+}
+
+/**
+ * Provides the fields that are required to include policy data for property
+ * definitions
+ * @param itemDefinition the item definition in question
+ * @param options.propertiesAsInput if the properties should be in input form
+ * @param options.optionalForm makes all the parameters optional, that is nullable
+ */
+export function getGQLFieldsDefinitionForItemDefinitionPolicies(
+  itemDefinition: ItemDefinition,
+  options: {
+    policy: string,
+    propertiesAsInput: boolean,
+  },
+): IGQLFieldsDefinitionType {
+  let fieldsResult: IGQLFieldsDefinitionType = {};
+  itemDefinition.getPolicyNamesFor(options.policy).forEach((policyName) => {
+    itemDefinition.getPropertiesForPolicy(options.policy, policyName).forEach((pd) => {
+      fieldsResult = {
+        ...getGQLFieldsDefinitionForProperty(pd, {
+          propertiesAsInput: options.propertiesAsInput,
+          optionalForm: true,
+          prefix: PREFIX_BUILD(POLICY_PREFIXES[options.policy] + policyName),
+        }),
+      };
+    });
+  });
   return fieldsResult;
 }
 
@@ -92,6 +135,7 @@ export function getGQLTypeForItemDefinition(itemDefinition: ItemDefinition): Gra
         excludeBase: false,
         propertiesAsInput: false,
         optionalForm: false,
+        includePolicy: null,
       }),
       interfaces: [getGQLInterfaceForModule(itemDefinition.getParentModule())],
       description:
@@ -204,7 +248,7 @@ export function getGQLQueryFieldsForItemDefinition(
     },
     // now this is the search query
     [PREFIX_SEARCH + itemDefinition.getQualifiedPathName()]: {
-      type: GraphQLList(ID_CONTAINER_GQL),
+      type: ID_CONTAINER_GQL,
       args: {
         ...RESERVED_SEARCH_PROPERTIES,
         ...getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, {
@@ -212,6 +256,7 @@ export function getGQLQueryFieldsForItemDefinition(
           propertiesAsInput: true,
           excludeBase: true,
           optionalForm: true,
+          includePolicy: null,
         }),
       },
       resolve: resolveGenericFunction.bind(null, "searchItemDefinition", itemDefinition, resolvers),
@@ -261,6 +306,7 @@ export function getGQLMutationFieldsForItemDefinition(
           propertiesAsInput: true,
           excludeBase: true,
           optionalForm: false,
+          includePolicy: null,
         }),
       },
       resolve: resolveGenericFunction.bind(null, "addItemDefinition", itemDefinition, resolvers),
@@ -278,6 +324,7 @@ export function getGQLMutationFieldsForItemDefinition(
           propertiesAsInput: true,
           excludeBase: true,
           optionalForm: true,
+          includePolicy: "edit",
         }),
       },
       resolve: (source: any, args: any, context: any, info: any) => {
@@ -297,7 +344,13 @@ export function getGQLMutationFieldsForItemDefinition(
     // the deleted element itself
     [PREFIX_DELETE + itemDefinition.getQualifiedPathName()]: {
       type,
-      args: RESERVED_GETTER_PROPERTIES,
+      args: {
+        ...RESERVED_GETTER_PROPERTIES,
+        ...getGQLFieldsDefinitionForItemDefinitionPolicies(itemDefinition, {
+          propertiesAsInput: true,
+          policy: "delete",
+        }),
+      },
       resolve: resolveGenericFunction.bind(null, "deleteItemDefinition", itemDefinition, resolvers),
     },
   };

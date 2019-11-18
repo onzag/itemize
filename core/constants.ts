@@ -344,6 +344,10 @@ export const PREFIX_GET_LIST = PREFIX_BUILD("GET_LIST");
 export const PREFIX_ADD = PREFIX_BUILD("ADD");
 export const PREFIX_EDIT = PREFIX_BUILD("EDIT");
 export const PREFIX_DELETE = PREFIX_BUILD("DELETE");
+export const POLICY_PREFIXES = {
+  edit: PREFIX_BUILD("POLICY_EDIT"),
+  delete: PREFIX_BUILD("POLICY_DELETE"),
+};
 export const ORDER_BY_OPTIONS = {
   DEFAULT: "DEFAULT",
   RELEVANCY: "RELEVANCY",
@@ -356,8 +360,8 @@ export const DATE_FORMAT = "YYYY-MM-DD";
 export const ID_CONTAINER_GQL = new GraphQLObjectType({
   name: "ID_CONTAINER",
   fields: {
-    id: {
-      type: GraphQLNonNull(GraphQLID),
+    ids: {
+      type: GraphQLList(GraphQLNonNull(GraphQLID)),
     },
   },
 });

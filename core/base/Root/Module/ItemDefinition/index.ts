@@ -8,10 +8,23 @@ import {
   ITEM_PREFIX,
   ANYONE_METAROLE,
   SELF_METAROLE,
-  EXCLUSION_STATE_SUFFIX,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { GraphQLDataInputError } from "../../../errors";
+
+export interface IPolicyValueRawJSONDataType {
+  roles: string[];
+  properties: string[];
+}
+
+export interface IPolicyRawJSONDataType {
+  [policyName: string]: IPolicyValueRawJSONDataType;
+}
+
+export interface IPoliciesRawJSONDataType {
+  edit?: IPolicyRawJSONDataType;
+  delete?: IPolicyRawJSONDataType;
+}
 
 export interface IItemDefinitionRawJSONDataType {
   // Builder data
@@ -32,6 +45,14 @@ export interface IItemDefinitionRawJSONDataType {
       editFormTitle: string;
       ftsSearchFieldLabel: string;
       ftsSearchFieldPlaceholder: string;
+      policies?: {
+        delete?: {
+          [policyName: string]: string,
+        },
+        edit?: {
+          [policyName: string]: string,
+        },
+      }
     },
   };
 
@@ -48,6 +69,9 @@ export interface IItemDefinitionRawJSONDataType {
   // replacing imports, gotta be there even if empty
   importedChildDefinitions?: string[][];
   childDefinitions?: IItemDefinitionRawJSONDataType[];
+
+  // policies
+  policies?: IPoliciesRawJSONDataType;
 }
 
 export interface IItemDefinitionValue {
@@ -345,6 +369,10 @@ export default class ItemDefinition {
     return this.propertyDefinitions;
   }
 
+  public getAllPropertyDefinitionsAndExtensions() {
+    return this.parentModule.getAllPropExtensions().concat(this.getAllPropertyDefinitions());
+  }
+
   public getAllItems() {
     return this.itemInstances;
   }
@@ -597,10 +625,17 @@ export default class ItemDefinition {
   /**
    * Applies an item definition value from a graphql data
    */
-  public applyValueFromGQL(value: {
-    [key: string]: any;
-  }) {
-    this.getAllPropertyDefinitions().forEach((property) => {
+  public applyValueFromGQL(
+    value: {
+      [key: string]: any,
+    },
+    excludeExtensions?: boolean,
+  ) {
+    const properties =
+      excludeExtensions ?
+        this.getAllPropertyDefinitions() :
+        this.getAllPropertyDefinitionsAndExtensions();
+    properties.forEach((property) => {
       let givenValue = value[property.getId()];
       if (typeof givenValue === "undefined") {
         givenValue = null;
@@ -737,5 +772,22 @@ export default class ItemDefinition {
       return PREFIXED_CONCAT(this.parentItemDefinition.getQualifiedPathName(), ITEM_DEFINITION_PREFIX + this.getName());
     }
     return PREFIXED_CONCAT(this.parentModule.getQualifiedPathName(), ITEM_DEFINITION_PREFIX + this.getName());
+  }
+
+  public getPolicyNamesFor(policy: string): string[] {
+    if (!this.rawData.policies || !this.rawData.policies[policy]) {
+      return [];
+    }
+    return Object.keys(this.rawData.policies[policy]);
+  }
+
+  public getPropertiesForPolicy(policy: string, name: string): PropertyDefinition[] {
+    return this.rawData.policies[policy][name].properties.map(
+      (propertyId: string) => this.getPropertyDefinitionFor(propertyId, true),
+    );
+  }
+
+  public getRolesForPolicy(policy: string, name: string): string[] {
+    return this.rawData.policies[policy][name].roles;
   }
 }

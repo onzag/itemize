@@ -6,9 +6,10 @@ import {
   SELF_METAROLE,
 } from "../../../../../constants";
 import Module, { OnStateChangeListenerType } from "../..";
-import fastHTMLParser from "fast-html-parser";
+import { JSDOM } from "jsdom";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
 import { GraphQLDataInputError } from "../../../../errors";
+import createDOMPurify from "dompurify";
 
 export enum PropertyInvalidReason {
   UNSPECIFIED = "UNSPECIFIED",
@@ -158,9 +159,14 @@ export interface IPropertyDefinitionAlternativePropertyType {
   property: string;
 }
 
+const DOMWindow = JSDOM ? (new JSDOM("")).window : window;
+const DOMPurify = createDOMPurify ? createDOMPurify(DOMWindow) : null;
+
 // The class itself
 export default class PropertyDefinition {
   public static currencyData: null;
+  public static window: Window = DOMWindow;
+  public static purifier: createDOMPurify.DOMPurifyI = DOMPurify;
   public static supportedTypesStandard = supportedTypesStandard;
 
   /**
@@ -250,14 +256,8 @@ export default class PropertyDefinition {
         count = value.length;
       } else if (!isRichText) {
         count = value.toString().length;
-      } else if (isRichText && fastHTMLParser.parse) {
-        const dummyElement = fastHTMLParser.parse(value.toString());
-        count = dummyElement.text.length;
-        if (dummyElement.querySelector(".ql-cursor")) {
-          count--;
-        }
-      } else if (isRichText) {
-        const dummyElement = document.createElement("div");
+      } else {
+        const dummyElement = PropertyDefinition.window.document.createElement("div");
         dummyElement.innerHTML = value.toString();
         count = dummyElement.innerText.length;
         if (dummyElement.querySelector(".ql-cursor")) {

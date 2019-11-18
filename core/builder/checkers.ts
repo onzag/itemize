@@ -12,7 +12,7 @@ import {
   IConditionalRuleSetRawJSONDataComponentType,
   IConditionalRuleSetRawJSONDataPropertyType,
 } from "../base/Root/Module/ItemDefinition/ConditionalRuleSet";
-import ItemDefinition, { IItemDefinitionRawJSONDataType } from "../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemDefinitionRawJSONDataType, IPolicyValueRawJSONDataType } from "../base/Root/Module/ItemDefinition";
 import { IModuleRawJSONDataType } from "../base/Root/Module";
 import PropertyDefinition, {
   IPropertyDefinitionAlternativePropertyType,
@@ -115,6 +115,50 @@ export function checkItemDefinition(
         "' starts with underscore, and that's invalid",
       actualTraceback.newTraceToBit("name"),
     );
+  }
+
+  if (rawData.policies) {
+    Object.keys(rawData.policies).forEach((policyKey) => {
+      Object.keys(rawData.policies[policyKey]).forEach((policyRuleKey) => {
+        if (policyRuleKey.startsWith("_")) {
+          throw new CheckUpError(
+            "Policy rule '" + policyRuleKey +
+              "' starts with underscore, and that's invalid",
+            actualTraceback.newTraceToBit("policies").newTraceToBit(policyKey).newTraceToBit(policyRuleKey),
+          );
+        }
+
+        const policyValue: IPolicyValueRawJSONDataType = rawData.policies[policyKey][policyRuleKey];
+        if (policyValue.roles.includes("SELF")) {
+          throw new CheckUpError(
+            "Policy rule '" + policyRuleKey +
+              "' includes a SELF role, and this is not allowed",
+            actualTraceback
+              .newTraceToBit("policies")
+              .newTraceToBit(policyKey)
+              .newTraceToBit(policyRuleKey)
+              .newTraceToBit("roles"),
+          );
+        }
+
+        policyValue.properties.forEach((propertyId, index) => {
+          const propertyRaw =
+            ItemDefinition.getPropertyDefinitionRawFor(rawData, parentModule, propertyId, true);
+          if (propertyRaw === null) {
+            throw new CheckUpError(
+              "Policy rule '" + policyRuleKey +
+                "' contains an invalid property that cannot be found '" + propertyId + "'",
+              actualTraceback
+                .newTraceToBit("policies")
+                .newTraceToBit(policyKey)
+                .newTraceToBit(policyRuleKey)
+                .newTraceToBit("properties")
+                .newTraceToBit(index),
+            );
+          }
+        });
+      });
+    });
   }
 
   if (rawData.childDefinitions) {

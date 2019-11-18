@@ -13,7 +13,6 @@ import {
   CLASSIC_SEARCH_OPTIONAL_I18N,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import fastHTMLParser from "fast-html-parser";
 
 export type PropertyDefinitionSupportedTextType = string;
 const typeValue: IPropertyDefinitionSupportedType = {
@@ -39,16 +38,19 @@ const typeValue: IPropertyDefinitionSupportedType = {
       };
     }
 
-    // it's only necessary to do using the fasthtml parser
-    // because this only runs in the server anyway
+    // TODO check if the text content usage actually creates a proper vector
     let escapedText = value;
+    let purifiedText = value;
     if (property.getSubtype() === "html") {
-      const dummyElement = fastHTMLParser.parse(value.toString());
-      escapedText = dummyElement.text;
+      const dummyElement = PropertyDefinition.window.document.createElement("div");
+      dummyElement.innerHTML = value.toString();
+      escapedText = dummyElement.innerText;
+
+      purifiedText = PropertyDefinition.purifier.sanitize(dummyElement);
     }
 
     return {
-      [id]: value,
+      [id]: purifiedText,
       [id + "_VECTOR"]: knex.raw(
         "to_tsvector(?, ?)",
         dictionary,

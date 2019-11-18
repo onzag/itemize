@@ -387,7 +387,7 @@ export default class Item {
     this.stateExclusionModified = true;
 
     if (value) {
-      this.itemDefinition.applyValueFromGQL(value);
+      this.itemDefinition.applyValueFromGQL(value, true);
     }
   }
 

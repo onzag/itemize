@@ -65,6 +65,29 @@ export async function addItemDefinition(
     true,
   );
 
+  debug("Checking role access for read...");
+  // The rule for create and read are different
+  // and set appart, one user might have the rule to
+  // create something but not to read it, it's weird,
+  // but a valid option
+  const requestedFieldsInIdef = {};
+  Object.keys(requestedFields).forEach((arg) => {
+    if (
+      itemDefinition.hasPropertyDefinitionFor(arg, true) ||
+      arg.startsWith(ITEM_PREFIX) && itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, ""))
+    ) {
+      requestedFieldsInIdef[arg] = requestedFields[arg];
+    }
+  });
+  itemDefinition.checkRoleAccessFor(
+    ItemDefinitionIOActions.READ,
+    tokenData.role,
+    tokenData.userId,
+    tokenData.userId,
+    requestedFieldsInIdef,
+    true,
+  );
+
   itemDefinition.applyValueFromGQL(resolverArgs.args);
   serverSideCheckItemDefinitionAgainst(itemDefinition, resolverArgs.args);
 
@@ -130,29 +153,6 @@ export async function addItemDefinition(
   };
 
   debug("SQL Output is", value);
-
-  debug("Checking role access for read...");
-  // The rule for create and read are different
-  // and set appart, one user might have the rule to
-  // create something but not to read it, it's weird,
-  // but a valid option
-  const requestedFieldsInIdef = {};
-  Object.keys(requestedFields).forEach((arg) => {
-    if (
-      itemDefinition.hasPropertyDefinitionFor(arg, true) ||
-      arg.startsWith(ITEM_PREFIX) && itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, ""))
-    ) {
-      requestedFieldsInIdef[arg] = requestedFields[arg];
-    }
-  });
-  itemDefinition.checkRoleAccessFor(
-    ItemDefinitionIOActions.READ,
-    tokenData.role,
-    tokenData.userId,
-    tokenData.userId,
-    requestedFieldsInIdef,
-    true,
-  );
   const gqlValue = convertSQLValueToGQLValueForItemDefinition(itemDefinition, value, requestedFields);
 
   // items that have just been added cannot be blocked or deleted, hence we just return
