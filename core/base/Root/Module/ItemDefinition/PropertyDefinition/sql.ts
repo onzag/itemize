@@ -36,15 +36,17 @@ export function standardSQLEqualFn(
   value: PropertyDefinitionSupportedType,
   sqlPrefix: string,
   id: string,
-  knexBuilder: any,
   columnName: string,
+  knex: any,
 ) {
-  knexBuilder.select(knexBuilder.raw(
+  return knex.raw(
     "?? = ? AS ??",
-    sqlPrefix + id,
-    value,
-    columnName,
-  ));
+    [
+      sqlPrefix + id,
+      value,
+      columnName,
+    ],
+  );
 }
 
 /**

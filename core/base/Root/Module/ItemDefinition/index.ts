@@ -704,8 +704,15 @@ export default class ItemDefinition {
 
     if (!idefLevelAccess) {
       if (throwError) {
-        throw new GraphQLDataInputError(`Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
-        ` only roles ${rolesWithAccess.join(", ")} can be granted access`);
+        throw new GraphQLDataInputError(
+          `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
+          ` only roles ${rolesWithAccess.join(", ")} can be granted access`,
+          "UNSPECIFIED",
+          null,
+          null,
+          null,
+          null,
+        );
       }
       return false;
     }

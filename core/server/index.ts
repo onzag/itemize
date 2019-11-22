@@ -10,6 +10,8 @@ import Knex from "knex";
 import { types } from "pg";
 import Moment from "moment";
 import { DATETIME_FORMAT, TIME_FORMAT, DATE_FORMAT } from "../constants";
+import { GraphQLError } from "graphql";
+import { GraphQLDataInputError } from "../base/errors";
 
 // Setting the parsers, postgresql comes with
 // its own way to return this data and I want it
@@ -40,6 +42,43 @@ export interface IAppDataType {
   knex: Knex;
 }
 
+const formatError = (error: GraphQLError) => {
+  const originalError = error.originalError;
+  let constructor = null;
+  if (originalError) {
+    constructor = originalError.constructor;
+  }
+
+  let code;
+  let propertyId: string;
+  let itemId: string;
+  let policyName: string;
+  let policyType: string;
+  switch (constructor) {
+    case GraphQLDataInputError:
+      const gqlDataInputError = error.originalError as GraphQLDataInputError;
+      propertyId = gqlDataInputError.propertyId;
+      code = gqlDataInputError.code;
+      policyName = gqlDataInputError.policyName;
+      policyType = gqlDataInputError.policyType;
+      itemId = gqlDataInputError.itemId;
+      break;
+    default:
+      code = "UNSPECIFIED";
+  }
+
+  return {
+    extensions: {
+      code,
+      propertyId,
+      itemId,
+      policyName,
+      policyType,
+    },
+    ...error,
+  };
+};
+
 function initializeApp(appData: IAppDataType) {
 
   app.use((req, res, next) => {
@@ -50,6 +89,7 @@ function initializeApp(appData: IAppDataType) {
   app.use("/graphql", graphqlHTTP({
     schema: getGQLSchemaForRoot(appData.root, resolvers(appData)),
     graphiql: true,
+    formatError,
   }));
 
   app.get("/util/country", (req, res) => {

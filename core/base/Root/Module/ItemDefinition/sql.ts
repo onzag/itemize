@@ -85,7 +85,7 @@ export function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefiniti
 export function convertSQLValueToGQLValueForItemDefinition(
   itemDefinition: ItemDefinition,
   row: ISQLTableRowValue,
-  graphqlFields: any,
+  graphqlFields?: any,
 ): IGQLValue {
   // first we create the graphql result
   let result: IGQLValue = {};
@@ -93,7 +93,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
   // now we take all the base properties that we have
   // in the graphql model
   Object.keys(RESERVED_BASE_PROPERTIES).filter(
-    (baseProperty) => graphqlFields[baseProperty],
+    (baseProperty) => !graphqlFields ? true : graphqlFields[baseProperty],
   ).forEach((basePropertyKey) => {
     result[basePropertyKey] = row[basePropertyKey] || null;
   });
@@ -103,10 +103,10 @@ export function convertSQLValueToGQLValueForItemDefinition(
   // with the row data, this basically also gives graphql value
   // in the key:value format
   itemDefinition.getParentModule().getAllPropExtensions().filter(
-    (property) => graphqlFields[property.getId()],
+    (property) =>  !graphqlFields ? true : graphqlFields[property.getId()],
   ).concat(
     itemDefinition.getAllPropertyDefinitions().filter(
-      (property) => graphqlFields[property.getId()],
+      (property) =>  !graphqlFields ? true : graphqlFields[property.getId()],
     ),
   ).forEach((pd) => {
     result = { ...result, ...convertSQLValueToGQLValueForProperty(pd, row) };
@@ -114,11 +114,11 @@ export function convertSQLValueToGQLValueForItemDefinition(
 
   // now we do the same for the items
   itemDefinition.getAllItems().filter(
-    (item) => graphqlFields[item.getQualifiedIdentifier()],
+    (item) =>  !graphqlFields ? true : graphqlFields[item.getQualifiedIdentifier()],
   ).forEach((item) => {
     result = {
       ...result, ...convertSQLValueToGQLValueForItem(
-        item, row, graphqlFields[item.getQualifiedIdentifier()],
+        item, row,  !graphqlFields ? null : graphqlFields[item.getQualifiedIdentifier()],
       ),
     };
   });

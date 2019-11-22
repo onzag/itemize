@@ -907,8 +907,15 @@ export default class PropertyDefinition {
       rolesWithAccess.includes(SELF_METAROLE) && userId === ownerUserId
     ) || rolesWithAccess.includes(role);
     if (!hasAccess && throwError) {
-      throw new GraphQLDataInputError(`Forbidden, user ${userId} with role ${role} has no ${action} access` +
-      ` to property ${this.getId()} only roles ${rolesWithAccess.join(", ")} can be granted access`);
+      throw new GraphQLDataInputError(
+        `Forbidden, user ${userId} with role ${role} has no ${action} access` +
+        ` to property ${this.getId()} only roles ${rolesWithAccess.join(", ")} can be granted access`,
+        "UNSPECIFIED",
+        null,
+        null,
+        null,
+        null,
+      );
     }
     return hasAccess;
   }

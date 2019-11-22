@@ -82,18 +82,19 @@ const typeValue: IPropertyDefinitionSupportedType = {
     value: IPropertyDefinitionSupportedCurrencyType,
     sqlPrefix: string,
     id: string,
-    knexBuilder: any,
     columnName: string,
     knex: any,
   ) => {
-    knexBuilder.select(knex.raw(
+    return knex.raw(
       "?? = ? AND ?? = ? AS ??",
-      sqlPrefix + id + "_CURRENCY",
-      value.currency,
-      sqlPrefix + id + "_VALUE",
-      value.value,
-      columnName,
-    ));
+      [
+        sqlPrefix + id + "_CURRENCY",
+        value.currency,
+        sqlPrefix + id + "_VALUE",
+        value.value,
+        columnName,
+      ],
+    );
   },
   validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
     if (!PropertyDefinition.currencyData) {

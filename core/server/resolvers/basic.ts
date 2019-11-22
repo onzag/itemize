@@ -5,6 +5,7 @@ import {
   MAX_SQL_LIMIT,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   CONNECTOR_SQL_COLUMN_FK_NAME,
+  INVALID_POLICY_ERROR,
 } from "../../constants";
 import { GraphQLDataInputError } from "../../base/errors";
 import Debug from "../debug";
@@ -15,7 +16,7 @@ import { convertSQLValueToGQLValueForModule } from "../../base/Root/Module/sql";
 import { IAppDataType } from "..";
 import equals from "deep-equal";
 import { IGQLValue } from "../../base/Root/gql";
-import { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
+import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
 import Knex from "knex";
 const debug = Debug("resolvers/basic");
 
@@ -67,6 +68,11 @@ export function checkBasicFieldsAreAvailableForRole(tokenData: any, fieldData: a
     );
     throw new GraphQLDataInputError(
       "You have requested to add/edit/view moderation fields with role: " + tokenData.role,
+      "UNSPECIFIED",
+      null,
+      null,
+      null,
+      null,
     );
   }
 }
@@ -80,7 +86,14 @@ export function checkListLimit(args: any) {
       "the maximum is",
       MAX_SQL_LIMIT,
     );
-    throw new GraphQLDataInputError("Too many ids at once, max is " + MAX_SQL_LIMIT);
+    throw new GraphQLDataInputError(
+      "Too many ids at once, max is " + MAX_SQL_LIMIT,
+      "UNSPECIFIED",
+      null,
+      null,
+      null,
+      null,
+    );
   }
 }
 
@@ -91,28 +104,56 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
       "Invalid language code",
       args.language,
     );
-    throw new GraphQLDataInputError("Please use valid non-regionalized language values");
+    throw new GraphQLDataInputError(
+      "Please use valid non-regionalized language values",
+      "UNSPECIFIED",
+      null,
+      null,
+      null,
+      null,
+    );
   }
   if (!appData.config.dictionaries[args.language]) {
     debug(
       "Unavailable/Unsupported language",
       args.language,
     );
-    throw new GraphQLDataInputError("This language is not supported, as no dictionary has been set");
+    throw new GraphQLDataInputError(
+      "This language is not supported, as no dictionary has been set",
+      "UNSPECIFIED",
+      null,
+      null,
+      null,
+      null,
+    );
   }
   if (typeof args.country !== "string" || args.country.length !== 2) {
     debug(
       "Invalid country code",
       args.country,
     );
-    throw new GraphQLDataInputError("Please use valid region 2-digit ISO codes in uppercase");
+    throw new GraphQLDataInputError(
+      "Please use valid region 2-digit ISO codes in uppercase",
+      "UNSPECIFIED",
+      null,
+      null,
+      null,
+      null,
+    );
   }
   if (!appData.countries[args.country]) {
     debug(
       "Unknown country",
       args.country,
     );
-    throw new GraphQLDataInputError("Unknown country " + args.country);
+    throw new GraphQLDataInputError(
+      "Unknown country " + args.country,
+      "UNSPECIFIED",
+      null,
+      null,
+      null,
+      null,
+    );
   }
 }
 
@@ -124,7 +165,14 @@ export function getDictionary(appData: IAppDataType, args: any) {
 export function mustBeLoggedIn(tokenData: any) {
   debug("Checking if user is logged in...");
   if (!tokenData.userId) {
-    throw new GraphQLDataInputError("Must be logged in");
+    throw new GraphQLDataInputError(
+      "Must be logged in",
+      "UNSPECIFIED",
+      null,
+      null,
+      null,
+      null,
+    );
   }
 }
 
@@ -195,22 +243,30 @@ export function filterAndPrepareGQLValue(
 export function serverSideCheckItemDefinitionAgainst(
   itemDefinition: ItemDefinition,
   gqlArgValue: IGQLValue,
+  referredItem?: Item,
 ) {
   debug("Checking value against item definition...");
   const currentValue = itemDefinition.getCurrentValue();
   debug("Current value is", currentValue);
   currentValue.properties.forEach((propertyValue) => {
-    let gqlPropertyValue = gqlArgValue[propertyValue.propertyId];
-    if (typeof gqlPropertyValue === "undefined") {
-      gqlPropertyValue = null;
-    }
+    const gqlPropertyValue = gqlArgValue[propertyValue.propertyId];
     if (propertyValue.invalidReason) {
       throw new GraphQLDataInputError(
         `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
+        propertyValue.invalidReason,
+        referredItem && referredItem.getId(),
+        propertyValue.propertyId,
+        null,
+        null,
       );
-    } else if (!equals(gqlPropertyValue, propertyValue.value)) {
+    } else if (typeof gqlPropertyValue !== "undefined" && !equals(gqlPropertyValue, propertyValue.value)) {
       throw new GraphQLDataInputError(
         `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated value`,
+        "UNSPECIFIED",
+        referredItem && referredItem.getId(),
+        propertyValue.propertyId,
+        null,
+        null,
       );
     }
   });
@@ -225,15 +281,26 @@ export function serverSideCheckItemDefinitionAgainst(
     if (itemValue.exclusionState !== gqlExclusionState) {
       throw new GraphQLDataInputError(
         `validation failed at item ${itemValue.itemId} with a mismatch of exclusion state`,
+        "UNSPECIFIED",
+        item.getId(),
+        null,
+        null,
+        null,
       );
     } else if (gqlExclusionState === ItemExclusionState.EXCLUDED && gqlItemValue !== null) {
       throw new GraphQLDataInputError(
         `validation failed at item ${itemValue.itemId} with an excluded item but data set for it`,
+        "UNSPECIFIED",
+        item.getId(),
+        null,
+        null,
+        null,
       );
     }
     serverSideCheckItemDefinitionAgainst(
       item.getItemDefinition(),
       gqlItemValue,
+      item,
     );
   });
 }
@@ -247,7 +314,7 @@ export function serverSideCheckItemDefinitionAgainst(
  * @param gqlArgValue the arg value given in the arguments from graphql, where the info should be
  * in qualified path names for the policies
  * @param knex the knex instance
- * @param extraRequests extra SQL columns to request, this only exists to avoid needing many SQL calls
+ * @param extraSQLColumns extra SQL columns to request, this only exists to avoid needing many SQL calls
  * @param preValidation a validation to do, validate if the row doesn't exist here, and anything else necessary
  * the function will crash by Internal server error if no validation is done if the row is null
  */
@@ -258,7 +325,7 @@ export async function runPolicyCheck(
   role: string,
   gqlArgValue: IGQLValue,
   knex: Knex,
-  extraRequests: string[],
+  extraSQLColumns: string[],
   preValidation: (content: any) => void,
 ) {
   const mod = itemDefinition.getParentModule();
@@ -266,9 +333,10 @@ export async function runPolicyCheck(
   const selfTable = itemDefinition.getQualifiedPathName();
 
   let policyQueryRequiresJoin = false;
-  const policyQuery = knex.select(extraRequests);
+  const selectionSQLColumns = [...extraSQLColumns];
 
   const policiesForThisType = itemDefinition.getPolicyNamesFor(policyType);
+  const expecedActualPolicies: string[] = [];
   policiesForThisType.forEach((policyName) => {
     const rolesForThisSpecificPolicy = itemDefinition.getRolesForPolicy(policyType, policyName);
     if (!rolesForThisSpecificPolicy.includes(role)) {
@@ -291,22 +359,31 @@ export async function runPolicyCheck(
       if (invalidReason) {
         throw new GraphQLDataInputError(
           `validation failed for ${qualidiedIdentifier} with reason ${invalidReason}`,
+          invalidReason,
+          null,
+          property.getId(),
+          null,
+          null,
         );
       }
 
-      property.getPropertyDefinitionDescription().sqlEqual(
+      const selectionMetaColumn = property.getPropertyDefinitionDescription().sqlEqual(
         valueForTheProperty,
         "",
         property.getId(),
-        policyQuery,
         policyName,
         knex,
       );
+
+      expecedActualPolicies.push(policyName);
+      selectionSQLColumns.push(selectionMetaColumn);
     });
   });
 
+  console.log(selectionSQLColumns);
+  const policyQuery = knex.select(selectionSQLColumns);
   policyQuery.from(moduleTable);
-  if (policyQueryRequiresJoin) {
+  if (policyQueryRequiresJoin || selectionSQLColumns.includes("*")) {
     policyQuery.join(selfTable, (clause) => {
       clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
     });
@@ -319,10 +396,18 @@ export async function runPolicyCheck(
   preValidation(value);
 
   Object.keys(value).forEach((policyName) => {
+    if (!expecedActualPolicies.includes(policyName)) {
+      return;
+    }
     const passedPolicy = value[policyName];
     if (!passedPolicy) {
       throw new GraphQLDataInputError(
         `validation failed for policy ${policyName}`,
+        INVALID_POLICY_ERROR,
+        null,
+        null,
+        policyType,
+        policyName,
       );
     }
   });

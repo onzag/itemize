@@ -40,13 +40,6 @@ export async function editItemDefinition(
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
-  // TODO implement whole value check, for both, add and edit,
-  // it's safer to do so because w eanyway select the content data
-  // here we can manage to request all the fields in a join and then
-  // doing a pseudoupdate and checking if it will produce a valid result
-  itemDefinition.applyValueFromGQL(resolverArgs.args);
-  serverSideCheckItemDefinitionAgainst(itemDefinition, resolverArgs.args);
-
   debug("Making query to get the owner of this item");
 
   // first we make the query for the item, which is not blocked
@@ -54,6 +47,7 @@ export async function editItemDefinition(
   // the item in order to validate roles
 
   let userId: number;
+  let wholeSqlStoredValue: any;
   await runPolicyCheck(
     "edit",
     itemDefinition,
@@ -61,18 +55,41 @@ export async function editItemDefinition(
     tokenData.role,
     resolverArgs.args,
     appData.knex,
-    ["created_by", "blocked_at"],
+    ["*"],
     (contentData: any) => {
+      wholeSqlStoredValue = contentData;
       userId = contentData && contentData.created_by;
       // if we don't get an user id this means that there's no owner, this is bad input
       if (!userId) {
-        throw new GraphQLDataInputError(`There's no ${selfTable} with id ${resolverArgs.args.id}`);
+        throw new GraphQLDataInputError(
+          `There's no ${selfTable} with id ${resolverArgs.args.id}`,
+          "UNSPECIFIED",
+          null,
+          null,
+          null,
+          null,
+        );
       }
       if (contentData.blocked_at !== null) {
-        throw new GraphQLDataInputError(`The item is blocked`);
+        throw new GraphQLDataInputError(
+          "The item is blocked",
+          "UNSPECIFIED",
+          null,
+          null,
+          null,
+          null,
+        );
       }
     },
   );
+
+  const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(itemDefinition, wholeSqlStoredValue);
+  const expectedUpdatedValue = {
+    ...currentWholeValueAsGQL,
+    ...resolverArgs.args,
+  };
+  itemDefinition.applyValueFromGQL(expectedUpdatedValue);
+  serverSideCheckItemDefinitionAgainst(itemDefinition, resolverArgs.args);
 
   // now we calculate the fields that we are editing, and the fields that we are
   // requesting
@@ -117,8 +134,6 @@ export async function editItemDefinition(
   // now we build the sql requested fields
   const requestedFieldsSQL = buildColumnNames(requestedFields);
 
-  // TODO validation
-
   // and we now build both queries for updating
   // we are telling by setting the partialFields variable
   // that we only want the editingFields to be returned
@@ -144,7 +159,14 @@ export async function editItemDefinition(
     Object.keys(sqlIdefData).length === 0 &&
     Object.keys(sqlModData).length === 0
   ) {
-    throw new GraphQLDataInputError("You are not updating anything whatsoever");
+    throw new GraphQLDataInputError(
+      "You are not updating anything whatsoever",
+      "UNSPECIFIED",
+      null,
+      null,
+      null,
+      null,
+    );
   }
 
   // update when it was edited

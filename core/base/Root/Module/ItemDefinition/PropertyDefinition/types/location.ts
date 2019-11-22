@@ -87,8 +87,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
       const distance = (data[radiusName].normalizedValue || 0) * 1000;
       knexBuilder.andWhereRaw(
         "ST_DWithin(??, ST_MakePoint(?,?)::geography, ?)",
-        sqlPrefix + id,
-        lng, lat, distance,
+        [
+          sqlPrefix + id,
+          lng,
+          lat,
+          distance,
+        ],
       );
     }
   },
@@ -96,18 +100,19 @@ const typeValue: IPropertyDefinitionSupportedType = {
     value: IPropertyDefinitionSupportedLocationType,
     sqlPrefix: string,
     id: string,
-    knexBuilder: any,
     columnName: string,
     knex: any,
   ) => {
-    knexBuilder.select(knex.raw(
+    return knex.raw(
       "?? = ? AND ?? = ? AS ??",
-      sqlPrefix + id + "_LAT",
-      value.lat,
-      sqlPrefix + id + "_LNG",
-      value.lng,
-      columnName,
-    ));
+      [
+        sqlPrefix + id + "_LAT",
+        value.lat,
+        sqlPrefix + id + "_LNG",
+        value.lng,
+        columnName,
+      ],
+    );
   },
   // locations just contain this basic data
   validate: (l: IPropertyDefinitionSupportedLocationType) => {

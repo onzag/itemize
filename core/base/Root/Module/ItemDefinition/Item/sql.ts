@@ -53,7 +53,7 @@ export function getSQLTableDefinitionForItem(item: Item): ISQLTableDefinitionTyp
  * in the request provided by grapql fields,
  * eg {id: {}, name: {}}
  */
-export function convertSQLValueToGQLValueForItem(item: Item, row: ISQLTableRowValue, graphqlFields: any): IGQLValue {
+export function convertSQLValueToGQLValueForItem(item: Item, row: ISQLTableRowValue, graphqlFields?: any): IGQLValue {
   // first we create a prefix, the prefix is basically ITEM_wheel_
   // this prefix is added as you remember for every item extra property as
   // wheel as the item itself
@@ -70,7 +70,7 @@ export function convertSQLValueToGQLValueForItem(item: Item, row: ISQLTableRowVa
 
   // for that we need all the sinking properties
   item.getSinkingProperties().filter(
-    (property) => graphqlFields[property.getId()],
+    (property) => !graphqlFields ? true : graphqlFields[property.getId()],
   ).forEach((sinkingProperty) => {
     // and we add them for the row data, notice how we add the prefix
     // telling the property definition that its properties are prefixed in

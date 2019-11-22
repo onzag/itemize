@@ -38,17 +38,18 @@ const typeValue: IPropertyDefinitionSupportedType = {
     value: PropertyDefinitionSupportedPasswordType,
     sqlPrefix: string,
     id: string,
-    knexBuilder: any,
     columnName: string,
     knex: any,
   ) => {
-    knexBuilder.select(knex.raw(
+    return knex.raw(
       "?? = crypt(?, ??) AS ??",
-      sqlPrefix + id,
-      value,
-      sqlPrefix + id,
-      columnName,
-    ));
+      [
+        sqlPrefix + id,
+        value,
+        sqlPrefix + id,
+        columnName,
+      ],
+    );
   },
   // validates just the length
   validate: (s: PropertyDefinitionSupportedPasswordType) => {

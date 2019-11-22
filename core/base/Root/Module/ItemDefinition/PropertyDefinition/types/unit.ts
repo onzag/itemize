@@ -101,18 +101,19 @@ const typeValue: IPropertyDefinitionSupportedType = {
     value: IPropertyDefinitionSupportedUnitType,
     sqlPrefix: string,
     id: string,
-    knexBuilder: any,
     columnName: string,
     knex: any,
   ) => {
-    knexBuilder.select(knex.raw(
+    return knex.raw(
       "?? = ? AND ?? = ? AS ??",
-      sqlPrefix + id + "_NORMALIZED_UNIT",
-      value.normalizedUnit,
-      sqlPrefix + id + "_NORMALIZED_VALUE",
-      value.normalizedValue,
-      columnName,
-    ));
+      [
+        sqlPrefix + id + "_NORMALIZED_UNIT",
+        value.normalizedUnit,
+        sqlPrefix + id + "_NORMALIZED_VALUE",
+        value.normalizedValue,
+        columnName,
+      ],
+    );
   },
   supportedSubtypes: UNIT_SUBTYPES,
   validate: (l: IPropertyDefinitionSupportedUnitType) => {

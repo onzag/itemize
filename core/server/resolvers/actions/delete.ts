@@ -46,15 +46,29 @@ export async function deleteItemDefinition(
     (contentData: any) => {
       userId = contentData && contentData.created_by;
       if (!userId) {
-        throw new GraphQLDataInputError(`There's no ${selfTable} with id ${resolverArgs.args.id}`);
+        throw new GraphQLDataInputError(
+          `There's no ${selfTable} with id ${resolverArgs.args.id}`,
+          "UNSPECIFIED",
+          null,
+          null,
+          null,
+          null,
+        );
       }
       debug("Retrieved", contentData);
       if (
         contentData.blocked_at !== null &&
         !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
       ) {
-        throw new GraphQLDataInputError("The item is blocked, only users with role " +
-          ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.join(",") + " can wipe this data");
+        throw new GraphQLDataInputError(
+          "The item is blocked, only users with role " +
+          ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.join(",") + " can wipe this data",
+          "UNSPECIFIED",
+          null,
+          null,
+          null,
+          null,
+        );
       }
     },
   );

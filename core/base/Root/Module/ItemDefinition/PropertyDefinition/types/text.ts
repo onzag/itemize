@@ -53,8 +53,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
       [id]: purifiedText,
       [id + "_VECTOR"]: knex.raw(
         "to_tsvector(?, ?)",
-        dictionary,
-        escapedText,
+        [
+          dictionary,
+          escapedText,
+        ],
       ),
     };
   },
@@ -65,8 +67,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     if (typeof data[searchName] !== "undefined" && data[searchName] !== null) {
       knexBuilder.andWhereRaw(
-        sqlPrefix + id + "_VECTOR @@ to_tsquery(?, ?)",
-        [dictionary, data[searchName]],
+        "?? @@ to_tsquery(?, ?)",
+        [
+          sqlPrefix + id + "_VECTOR",
+          dictionary,
+          data[searchName],
+        ],
       );
     }
   },
