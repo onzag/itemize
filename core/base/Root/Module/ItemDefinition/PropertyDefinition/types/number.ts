@@ -1,6 +1,6 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLFloat } from "graphql";
-import { stardardSQLInFn, standardSQLOutFn, standardSQLSearchFnExactAndRange } from "../sql";
+import { stardardSQLInFn, standardSQLOutFn, standardSQLSearchFnExactAndRange, standardSQLEqualFn } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_SUPPORTED_REAL,
@@ -24,6 +24,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
+  sqlEqual: standardSQLEqualFn,
 
   supportsAutocomplete: true,
   // the validator

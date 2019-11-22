@@ -327,16 +327,7 @@ export function getGQLMutationFieldsForItemDefinition(
           includePolicy: "edit",
         }),
       },
-      resolve: (source: any, args: any, context: any, info: any) => {
-        if (resolvers) {
-          return resolvers.editItemDefinition({
-            source,
-            args,
-            context,
-            info,
-          }, itemDefinition);
-        }
-      },
+      resolve: resolveGenericFunction.bind(null, "editItemDefinition", itemDefinition, resolvers),
     },
     // The delete uses the standard getter properties to fetch
     // the item definition instance, and basically deletes it

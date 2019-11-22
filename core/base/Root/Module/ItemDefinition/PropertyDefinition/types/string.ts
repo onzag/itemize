@@ -1,6 +1,6 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLString } from "graphql";
-import { stardardSQLInFn, standardSQLOutFn, standardSQLSearchFnExactAndRange } from "../sql";
+import { stardardSQLInFn, standardSQLOutFn, standardSQLSearchFnExactAndRange, standardSQLEqualFn } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_STRING_LENGTH,
@@ -27,6 +27,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
+  sqlEqual: standardSQLEqualFn,
 
   nullableDefault: "",
   supportsAutocomplete: true,

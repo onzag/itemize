@@ -11,6 +11,7 @@ import {
   flattenFieldsFromRequestedFields,
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
+  runPolicyCheck,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { RESERVED_BASE_PROPERTIES_SQL, CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
@@ -51,19 +52,27 @@ export async function editItemDefinition(
   // first we make the query for the item, which is not blocked
   // in the module name for the given id, as we need to know who created
   // the item in order to validate roles
-  const id = resolverArgs.args.id;
-  const contentData = await appData.knex.select("created_by", "blocked_at").from(moduleTable).where({
-    id,
-    type: selfTable,
-  });
-  const userId = contentData[0] && contentData[0].created_by;
-  // if we don't get an user id this means that there's no owner, this is bad input
-  if (!userId) {
-    throw new GraphQLDataInputError(`There's no ${selfTable} with id ${id}`);
-  }
-  if (contentData[0].blocked_at !== null) {
-    throw new GraphQLDataInputError(`The item is blocked`);
-  }
+
+  let userId: number;
+  await runPolicyCheck(
+    "edit",
+    itemDefinition,
+    resolverArgs.args.id,
+    tokenData.role,
+    resolverArgs.args,
+    appData.knex,
+    ["created_by", "blocked_at"],
+    (contentData: any) => {
+      userId = contentData && contentData.created_by;
+      // if we don't get an user id this means that there's no owner, this is bad input
+      if (!userId) {
+        throw new GraphQLDataInputError(`There's no ${selfTable} with id ${resolverArgs.args.id}`);
+      }
+      if (contentData.blocked_at !== null) {
+        throw new GraphQLDataInputError(`The item is blocked`);
+      }
+    },
+  );
 
   // now we calculate the fields that we are editing, and the fields that we are
   // requesting
@@ -162,7 +171,7 @@ export async function editItemDefinition(
     // and add them if we have them, note that the module will always have
     // something to update because the edited_at field is always added when
     // edition is taking place
-    const updateQueryMod = transactionKnex(moduleTable).update(sqlModData).where("id", id);
+    const updateQueryMod = transactionKnex(moduleTable).update(sqlModData).where("id", resolverArgs.args.id);
     if (requestedModuleColumnsSQL.length) {
       updateQueryMod.returning(requestedModuleColumnsSQL);
     }
@@ -173,7 +182,10 @@ export async function editItemDefinition(
     // if we have something to update
     if (Object.keys(sqlIdefData).length) {
       // we make the update query
-      updateOrSelectQueryIdef = transactionKnex(selfTable).update(sqlIdefData).where(CONNECTOR_SQL_COLUMN_FK_NAME, id);
+      updateOrSelectQueryIdef = transactionKnex(selfTable).update(sqlIdefData).where(
+        CONNECTOR_SQL_COLUMN_FK_NAME,
+        resolverArgs.args.id,
+      );
       // we only get to return something in the returning statment if we have something to return
       if (requestedIdefColumnsSQL.length) {
         updateOrSelectQueryIdef.returning(requestedIdefColumnsSQL);
@@ -182,7 +194,7 @@ export async function editItemDefinition(
     } else if (requestedIdefColumnsSQL.length) {
       // and make a simple select query
       updateOrSelectQueryIdef = transactionKnex(selfTable).select(requestedIdefColumnsSQL)
-        .where(CONNECTOR_SQL_COLUMN_FK_NAME, id);
+        .where(CONNECTOR_SQL_COLUMN_FK_NAME, resolverArgs.args.id);
     }
     // if there's nothing to update, or there is nothing to retrieve, it won't touch the idef table
 

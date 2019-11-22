@@ -78,7 +78,23 @@ const typeValue: IPropertyDefinitionSupportedType = {
       knexBuilder.andWhere(sqlPrefix + id + "_VALUE", "<=", data[toName].value);
     }
   },
-  // locations just contain this basic data
+  sqlEqual: (
+    value: IPropertyDefinitionSupportedCurrencyType,
+    sqlPrefix: string,
+    id: string,
+    knexBuilder: any,
+    columnName: string,
+    knex: any,
+  ) => {
+    knexBuilder.select(knex.raw(
+      "?? = ? AND ?? = ? AS ??",
+      sqlPrefix + id + "_CURRENCY",
+      value.currency,
+      sqlPrefix + id + "_VALUE",
+      value.value,
+      columnName,
+    ));
+  },
   validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
     if (!PropertyDefinition.currencyData) {
       throw new Error("Please ensure to set currency data on the class of property definition");

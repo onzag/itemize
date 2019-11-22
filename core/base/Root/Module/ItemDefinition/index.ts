@@ -47,10 +47,16 @@ export interface IItemDefinitionRawJSONDataType {
       ftsSearchFieldPlaceholder: string;
       policies?: {
         delete?: {
-          [policyName: string]: string,
+          [policyName: string]: {
+            label: string,
+            failed: string,
+          },
         },
         edit?: {
-          [policyName: string]: string,
+          [policyName: string]: {
+            label: string,
+            failed: string,
+          },
         },
       }
     },
@@ -774,15 +780,15 @@ export default class ItemDefinition {
     return PREFIXED_CONCAT(this.parentModule.getQualifiedPathName(), ITEM_DEFINITION_PREFIX + this.getName());
   }
 
-  public getPolicyNamesFor(policy: string): string[] {
-    if (!this.rawData.policies || !this.rawData.policies[policy]) {
+  public getPolicyNamesFor(policyType: string): string[] {
+    if (!this.rawData.policies || !this.rawData.policies[policyType]) {
       return [];
     }
-    return Object.keys(this.rawData.policies[policy]);
+    return Object.keys(this.rawData.policies[policyType]);
   }
 
-  public getPropertiesForPolicy(policy: string, name: string): PropertyDefinition[] {
-    return this.rawData.policies[policy][name].properties.map(
+  public getPropertiesForPolicy(type: string, name: string): PropertyDefinition[] {
+    return this.rawData.policies[type][name].properties.map(
       (propertyId: string) => this.getPropertyDefinitionFor(propertyId, true),
     );
   }

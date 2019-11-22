@@ -4,6 +4,8 @@ import ConditionalRuleSet,
 import {
   ANYONE_METAROLE,
   SELF_METAROLE,
+  PREFIX_BUILD,
+  POLICY_PREFIXES,
 } from "../../../../../constants";
 import Module, { OnStateChangeListenerType } from "../..";
 import { JSDOM } from "jsdom";
@@ -168,6 +170,12 @@ export default class PropertyDefinition {
   public static window: Window = DOMWindow;
   public static purifier: createDOMPurify.DOMPurifyI = DOMPurify;
   public static supportedTypesStandard = supportedTypesStandard;
+
+  public static getQualifiedPolicyPrefix(policyType: string, policyName: string) {
+    return PREFIX_BUILD(
+      POLICY_PREFIXES[policyType] + policyName,
+    );
+  }
 
   /**
    * Checks whether a value is valid or not using
@@ -918,5 +926,9 @@ export default class PropertyDefinition {
 
   public toJSON() {
     return this.rawData;
+  }
+
+  public getQualifiedPolicyIdentifier(policyType: string, policyName: string) {
+    return PropertyDefinition.getQualifiedPolicyPrefix(policyType, policyName) + this.getId();
   }
 }

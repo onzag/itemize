@@ -34,6 +34,22 @@ const typeValue: IPropertyDefinitionSupportedType = {
       "Attempted to search user by password",
     );
   },
+  sqlEqual: (
+    value: PropertyDefinitionSupportedPasswordType,
+    sqlPrefix: string,
+    id: string,
+    knexBuilder: any,
+    columnName: string,
+    knex: any,
+  ) => {
+    knexBuilder.select(knex.raw(
+      "?? = crypt(?, ??) AS ??",
+      sqlPrefix + id,
+      value,
+      sqlPrefix + id,
+      columnName,
+    ));
+  },
   // validates just the length
   validate: (s: PropertyDefinitionSupportedPasswordType) => {
     if (typeof s !== "string") {

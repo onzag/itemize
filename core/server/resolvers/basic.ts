@@ -4,6 +4,7 @@ import {
   ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
   MAX_SQL_LIMIT,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
+  CONNECTOR_SQL_COLUMN_FK_NAME,
 } from "../../constants";
 import { GraphQLDataInputError } from "../../base/errors";
 import Debug from "../debug";
@@ -15,6 +16,7 @@ import { IAppDataType } from "..";
 import equals from "deep-equal";
 import { IGQLValue } from "../../base/Root/gql";
 import { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
+import Knex from "knex";
 const debug = Debug("resolvers/basic");
 
 export function flattenFieldsFromRequestedFields(requestedFields: any) {
@@ -233,5 +235,95 @@ export function serverSideCheckItemDefinitionAgainst(
       item.getItemDefinition(),
       gqlItemValue,
     );
+  });
+}
+
+/**
+ * Runs a policy check on the requested information
+ * @param policyType the policy type on which the request is made on, edit, delete
+ * @param itemDefinition the item definition in question
+ * @param id the id of that item definition on the database
+ * @param role the role of the current user
+ * @param gqlArgValue the arg value given in the arguments from graphql, where the info should be
+ * in qualified path names for the policies
+ * @param knex the knex instance
+ * @param extraRequests extra SQL columns to request, this only exists to avoid needing many SQL calls
+ * @param preValidation a validation to do, validate if the row doesn't exist here, and anything else necessary
+ * the function will crash by Internal server error if no validation is done if the row is null
+ */
+export async function runPolicyCheck(
+  policyType: string,
+  itemDefinition: ItemDefinition,
+  id: number,
+  role: string,
+  gqlArgValue: IGQLValue,
+  knex: Knex,
+  extraRequests: string[],
+  preValidation: (content: any) => void,
+) {
+  const mod = itemDefinition.getParentModule();
+  const moduleTable = mod.getQualifiedPathName();
+  const selfTable = itemDefinition.getQualifiedPathName();
+
+  let policyQueryRequiresJoin = false;
+  const policyQuery = knex.select(extraRequests);
+
+  const policiesForThisType = itemDefinition.getPolicyNamesFor(policyType);
+  policiesForThisType.forEach((policyName) => {
+    const rolesForThisSpecificPolicy = itemDefinition.getRolesForPolicy(policyType, policyName);
+    if (!rolesForThisSpecificPolicy.includes(role)) {
+      return;
+    }
+
+    const propertiesInContext = itemDefinition.getPropertiesForPolicy(policyType, policyName);
+    propertiesInContext.forEach((property) => {
+      if (!property.checkIfIsExtension()) {
+        policyQueryRequiresJoin = true;
+      }
+
+      const qualidiedIdentifier = property.getQualifiedPolicyIdentifier(policyType, policyName);
+      let valueForTheProperty = gqlArgValue[qualidiedIdentifier];
+      if (typeof valueForTheProperty === "undefined") {
+        valueForTheProperty = null;
+      }
+
+      const invalidReason = property.isValidValue(valueForTheProperty);
+      if (invalidReason) {
+        throw new GraphQLDataInputError(
+          `validation failed for ${qualidiedIdentifier} with reason ${invalidReason}`,
+        );
+      }
+
+      property.getPropertyDefinitionDescription().sqlEqual(
+        valueForTheProperty,
+        "",
+        property.getId(),
+        policyQuery,
+        policyName,
+        knex,
+      );
+    });
+  });
+
+  policyQuery.from(moduleTable);
+  if (policyQueryRequiresJoin) {
+    policyQuery.join(selfTable, (clause) => {
+      clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
+    });
+  }
+  policyQuery.where({
+    id,
+    type: selfTable,
+  });
+  const value = (await policyQuery)[0] || null;
+  preValidation(value);
+
+  Object.keys(value).forEach((policyName) => {
+    const passedPolicy = value[policyName];
+    if (!passedPolicy) {
+      throw new GraphQLDataInputError(
+        `validation failed for policy ${policyName}`,
+      );
+    }
   });
 }

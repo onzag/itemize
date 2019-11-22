@@ -84,6 +84,14 @@ export interface IPropertyDefinitionSupportedType {
   ) => PropertyDefinitionSupportedType;
   // TODO description
   sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any, dictionary: string) => void;
+  sqlEqual: (
+    value: PropertyDefinitionSupportedType,
+    sqlPrefix: string,
+    id: string,
+    knexBuilder: any,
+    columnName: string,
+    knex: any,
+  ) => void;
 
   // represents an item that would mark for null
   // by default it is null itself

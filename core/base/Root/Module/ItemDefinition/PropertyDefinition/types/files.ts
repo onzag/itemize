@@ -25,6 +25,9 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlSearch: () => {
     throw new Error("Attempted to search within files");
   },
+  sqlEqual: () => {
+    throw new Error("Attempted to equal within files");
+  },
 
   allowsMinMaxLengthDefined: true,
   validate: (l: PropertyDefinitionSupportedFilesType) => {

@@ -92,6 +92,23 @@ const typeValue: IPropertyDefinitionSupportedType = {
       );
     }
   },
+  sqlEqual: (
+    value: IPropertyDefinitionSupportedLocationType,
+    sqlPrefix: string,
+    id: string,
+    knexBuilder: any,
+    columnName: string,
+    knex: any,
+  ) => {
+    knexBuilder.select(knex.raw(
+      "?? = ? AND ?? = ? AS ??",
+      sqlPrefix + id + "_LAT",
+      value.lat,
+      sqlPrefix + id + "_LNG",
+      value.lng,
+      columnName,
+    ));
+  },
   // locations just contain this basic data
   validate: (l: IPropertyDefinitionSupportedLocationType) => {
     if (

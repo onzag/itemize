@@ -32,6 +32,21 @@ export function standardSQLSearchFnExactAndRange(data: IGQLValue, sqlPrefix: str
   }
 }
 
+export function standardSQLEqualFn(
+  value: PropertyDefinitionSupportedType,
+  sqlPrefix: string,
+  id: string,
+  knexBuilder: any,
+  columnName: string,
+) {
+  knexBuilder.select(knexBuilder.raw(
+    "?? = ? AS ??",
+    sqlPrefix + id,
+    value,
+    columnName,
+  ));
+}
+
 /**
  * Provides the table bit that is necessary to include this property and
  * this property alone, that is a table bit

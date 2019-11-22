@@ -8,6 +8,7 @@ import {
   checkBasicFieldsAreAvailableForRole,
   mustBeLoggedIn,
   flattenFieldsFromRequestedFields,
+  runPolicyCheck,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { GraphQLDataInputError } from "../../../base/errors";
@@ -33,23 +34,30 @@ export async function deleteItemDefinition(
   const selfTable = itemDefinition.getQualifiedPathName();
 
   debug("Checking access to the element to delete");
-  const id = resolverArgs.args.id;
-  const contentData = await appData.knex.select("created_by", "blocked_at").from(moduleTable).where({
-    id,
-    type: selfTable,
-  });
-  const userId = contentData[0] && contentData[0].created_by;
-  if (!userId) {
-    throw new GraphQLDataInputError(`There's no ${selfTable} with id ${id}`);
-  }
-  debug("Retrieved", contentData[0]);
-  if (
-    contentData[0].blocked_at !== null &&
-    !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
-  ) {
-    throw new GraphQLDataInputError("The item is blocked, only users with role " +
-      ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.join(",") + " can wipe this data");
-  }
+  let userId: number;
+  await runPolicyCheck(
+    "delete",
+    itemDefinition,
+    resolverArgs.args.id,
+    tokenData.role,
+    resolverArgs.args,
+    appData.knex,
+    ["created_by", "blocked_at"],
+    (contentData: any) => {
+      userId = contentData && contentData.created_by;
+      if (!userId) {
+        throw new GraphQLDataInputError(`There's no ${selfTable} with id ${resolverArgs.args.id}`);
+      }
+      debug("Retrieved", contentData);
+      if (
+        contentData.blocked_at !== null &&
+        !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
+      ) {
+        throw new GraphQLDataInputError("The item is blocked, only users with role " +
+          ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.join(",") + " can wipe this data");
+      }
+    },
+  );
 
   debug("Checking role access...");
   itemDefinition.checkRoleAccessFor(

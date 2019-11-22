@@ -49,6 +49,7 @@ import {
   ITEM_OPTIONAL_I18N,
   ITEM_CAN_BE_EXCLUDED_I18N,
   ITEM_CALLOUT_EXCLUDED_I18N,
+  POLICY_REQUIRED_I18N,
 } from "../constants";
 import { MODULE_I18N } from "../constants";
 
@@ -708,8 +709,25 @@ async function getI18nData(
         i18nData[locale].policies[policyKey] = {};
 
         Object.keys(policies[policyKey]).forEach((policyRuleKey) => {
-          i18nData[locale].policies[policyKey][policyRuleKey] =
-            properties[locale].policies[policyKey][policyRuleKey].trim();
+          if (!properties[locale].policies[policyKey][policyRuleKey]) {
+            throw new CheckUpError(
+              "File does not include language data for policy '" + policyKey + "' in " +
+              locale + " for rule '" + policyRuleKey + "'",
+              localeFileTraceback,
+            );
+          }
+          i18nData[locale].policies[policyKey][policyRuleKey] = {};
+          POLICY_REQUIRED_I18N.forEach((policyReqiredI18nKey) => {
+            if (!properties[locale].policies[policyKey][policyRuleKey][policyReqiredI18nKey]) {
+              throw new CheckUpError(
+                "File does not include language data for policy '" + policyKey + "' in " +
+                locale + " for rule '" + policyRuleKey + "' in '" + policyReqiredI18nKey + "'",
+                localeFileTraceback,
+              );
+            }
+            i18nData[locale].policies[policyKey][policyRuleKey][policyReqiredI18nKey] =
+              properties[locale].policies[policyKey][policyRuleKey][policyReqiredI18nKey].trim();
+          });
         });
       });
     }

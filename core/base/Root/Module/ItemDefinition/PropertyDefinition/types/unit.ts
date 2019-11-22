@@ -97,6 +97,23 @@ const typeValue: IPropertyDefinitionSupportedType = {
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", data[toName].normalizedValue);
     }
   },
+  sqlEqual: (
+    value: IPropertyDefinitionSupportedUnitType,
+    sqlPrefix: string,
+    id: string,
+    knexBuilder: any,
+    columnName: string,
+    knex: any,
+  ) => {
+    knexBuilder.select(knex.raw(
+      "?? = ? AND ?? = ? AS ??",
+      sqlPrefix + id + "_NORMALIZED_UNIT",
+      value.normalizedUnit,
+      sqlPrefix + id + "_NORMALIZED_VALUE",
+      value.normalizedValue,
+      columnName,
+    ));
+  },
   supportedSubtypes: UNIT_SUBTYPES,
   validate: (l: IPropertyDefinitionSupportedUnitType) => {
     // TODO check the unit as for being proper unit, eg. kg, degC, etc...

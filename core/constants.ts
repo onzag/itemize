@@ -348,6 +348,9 @@ export const POLICY_PREFIXES = {
   edit: PREFIX_BUILD("POLICY_EDIT"),
   delete: PREFIX_BUILD("POLICY_DELETE"),
 };
+export const POLICY_REQUIRED_I18N = [
+  "label", "placeholder", "fail",
+];
 export const ORDER_BY_OPTIONS = {
   DEFAULT: "DEFAULT",
   RELEVANCY: "RELEVANCY",
