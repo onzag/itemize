@@ -6,6 +6,9 @@ import {
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   CONNECTOR_SQL_COLUMN_FK_NAME,
   INVALID_POLICY_ERROR,
+  RESERVED_BASE_PROPERTIES,
+  ITEM_PREFIX,
+  EXCLUSION_STATE_SUFFIX,
 } from "../../constants";
 import { GraphQLDataInputError } from "../../base/errors";
 import Debug from "../debug";
@@ -20,30 +23,141 @@ import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/
 import Knex from "knex";
 const debug = Debug("resolvers/basic");
 
+/**
+ * fields get requested with a DATA and some are external, this
+ * function flattens the request and removed the data and the
+ * external fields into a flat form
+ * @param requestedFields the requested fields
+ */
 export function flattenFieldsFromRequestedFields(requestedFields: any) {
+  // so first we extract the data content
   const output = {
     ...(requestedFields.DATA || {}),
   };
+  // and then we loop for everything else, but data
   Object.keys(requestedFields).forEach((key) => {
     if (key !== "DATA") {
       output[key] = requestedFields[key];
     }
   });
+  // return that
   return output;
 }
 
-export function buildColumnNames(base: any, prefix: string = ""): string[] {
+/**
+ * Builds the column names expected for a given module only
+ * @param requestedFields the requested fields given by graphql fields and flattened
+ * @param mod the module in question
+ */
+export function buildColumnNamesForModuleTableOnly(requestedFields: any, mod: Module): string[] {
+  // this will be the ouput
   let result: string[] = [];
-  Object.keys(base).forEach((key) => {
-    if (Object.keys(base[key]).length === 0) {
-      result.push(prefix + key);
-    } else {
-      result = result.concat(buildColumnNames(base[key], PREFIX_BUILD(prefix + key)));
+  // we start by looping into the requested fields
+  Object.keys(requestedFields).forEach((key) => {
+    // if it's one of the reserved properties, then we can be
+    // sure that it's expected in the module table
+    if (
+      RESERVED_BASE_PROPERTIES[key]
+    ) {
+      result.push(key);
+
+    // also if it's a prop extension
+    } else if (mod.hasPropExtensionFor(key)) {
+      // we get the property
+      const property = mod.getPropExtensionFor(key);
+      // just to access the property description
+      const propDescription = property.getPropertyDefinitionDescription();
+      // now we need to see how it is in sql form and get the instructions
+      // of table formation, a string means, use the property name
+      if (typeof propDescription.sql === "string") {
+        // so we just use the property name
+        result.push(key);
+      } else {
+        // otherwise we pass it to the function, to see
+        // what it splits on, the function returns an object
+        // eg. kitten_SIZE: {type: float, ...} kitten_VALUE
+        // so we want only the keys with represent column names
+        result = result.concat(Object.keys(propDescription.sql(key)));
+      }
     }
   });
+
+  // we return all we have gathered
   return result;
 }
 
+/**
+ * Builds the column names expected for a given item definition only
+ * ignoring all the extensions and base fields
+ * @param requestedFields the requested fields given by graphql fields and flattened
+ * @param itemDefinition item definition in question
+ * @param prefix a prefix to append to everything
+ */
+export function buildColumnNamesForItemDefinitionTableOnly(
+  requestedFields: any,
+  itemDefinition: ItemDefinition,
+  prefix: string = "",
+): string[] {
+  // first we build the result
+  let result: string[] = [];
+  // now we loop into the requested field keys
+  Object.keys(requestedFields).forEach((key) => {
+
+    // we want to see which type it is, it might be
+    // of type ITEM_
+    if (key.startsWith(ITEM_PREFIX)) {
+      // now we have to check with a expected clean name
+      // by removing the prefix
+      const expectedCleanName = key.replace(ITEM_PREFIX, "");
+
+      // now we check if it still uses a suffix for exclusion state
+      if (expectedCleanName.endsWith(EXCLUSION_STATE_SUFFIX)) {
+        result.push(prefix + key);
+      // otherwise we check if it's an item itself, it should be
+      } else if (itemDefinition.hasItemFor(expectedCleanName)) {
+        // we get the item in question
+        const item = itemDefinition.getItemFor(expectedCleanName);
+        // and basically call this function recursively and attach
+        // its result, adding the prefix for this item
+        result = result.concat(
+          buildColumnNamesForItemDefinitionTableOnly(
+            // as you can see only the data of the
+            // specific requested fields is passed, it should
+            // be an object after all
+            requestedFields[key],
+            item.getItemDefinition(),
+            prefix + PREFIX_BUILD(key),
+          ),
+        );
+      }
+
+    // now we check for properties, ignoring extensions
+    } else if (itemDefinition.hasPropertyDefinitionFor(key, false)) {
+      // so we get it
+      const property = itemDefinition.getPropertyDefinitionFor(key, false);
+      // and now we check for a description
+      const propDescription = property.getPropertyDefinitionDescription();
+      // if we have a simple string, it means it's just the id, but don't forget
+      // to prefix that thing
+      if (typeof propDescription.sql === "string") {
+        result.push(prefix + key);
+      } else {
+        // basically the same that we did in the module, but also passing
+        // the prefix
+        result = result.concat(Object.keys(propDescription.sql(prefix + key)));
+      }
+    }
+  });
+
+  // return that thing
+  return result;
+}
+
+/**
+ * Given a token, it validates and provides the role information
+ * for use in the system
+ * @param token the token passed via the args
+ */
 export function validateTokenAndGetData(token: string) {
   return {
     userId: 1,
@@ -51,10 +165,20 @@ export function validateTokenAndGetData(token: string) {
   };
 }
 
-export function checkBasicFieldsAreAvailableForRole(tokenData: any, fieldData: any) {
+/**
+ * Checks if the basic fields are available for the given role, basic
+ * fields are of those reserved properties that are in every module
+ * @param tokenData the token data that is obtained via the validateTokenAndGetData
+ * function
+ * @param requestedFields the requested fields
+ */
+export function checkBasicFieldsAreAvailableForRole(tokenData: any, requestedFields: any) {
   debug("Checking if fields are available for role...");
-  const moderationFieldsHaveBeenRequested = MODERATION_FIELDS.some((field) => fieldData[field]);
-  console.log(MODERATION_FIELDS, moderationFieldsHaveBeenRequested, tokenData, fieldData);
+
+  // now we check if moderation fields have been requested
+  const moderationFieldsHaveBeenRequested = MODERATION_FIELDS.some((field) => requestedFields[field]);
+
+  // if they have been requested, and our role has no native access to that
   if (
     moderationFieldsHaveBeenRequested &&
     !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
@@ -66,6 +190,7 @@ export function checkBasicFieldsAreAvailableForRole(tokenData: any, fieldData: a
       ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
       "allowed",
     );
+    // we throw an error
     throw new GraphQLDataInputError(
       "You have requested to add/edit/view moderation fields with role: " + tokenData.role,
       "UNSPECIFIED",
@@ -75,14 +200,21 @@ export function checkBasicFieldsAreAvailableForRole(tokenData: any, fieldData: a
       null,
     );
   }
+
+  // That was basically the only thing that function does by so far
 }
 
-export function checkListLimit(args: any) {
+/**
+ * Checks a list provided by the getter functions that use
+ * lists to ensure the request isn't too large
+ * @param ids the list ids that have been requested
+ */
+export function checkListLimit(ids: string[]) {
   debug("Checking the limit...");
-  if (args.ids > MAX_SQL_LIMIT) {
+  if (ids.length > MAX_SQL_LIMIT) {
     debug(
       "Exceeded limit with",
-      args.ids,
+      ids,
       "the maximum is",
       MAX_SQL_LIMIT,
     );
@@ -97,8 +229,16 @@ export function checkListLimit(args: any) {
   }
 }
 
+/**
+ * Checks the language and region given the arguments passed
+ * by the graphql resolver
+ * @param appData the app data that is currently in context
+ * @param args the args themselves being passed to the resolver
+ */
 export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
   debug("Checking language and region...");
+
+  // basically we check the type and if the lenght is right
   if (typeof args.language !== "string" || args.language.length !== 2) {
     debug(
       "Invalid language code",
@@ -113,6 +253,10 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
       null,
     );
   }
+
+  // now we check if this is one of the languages we have
+  // a dictionary assigned, only languages with a dictionary
+  // assigned can be used by the database
   if (!appData.config.dictionaries[args.language]) {
     debug(
       "Unavailable/Unsupported language",
@@ -127,6 +271,8 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
       null,
     );
   }
+
+  // basically running the same check again but with the country
   if (typeof args.country !== "string" || args.country.length !== 2) {
     debug(
       "Invalid country code",
@@ -141,6 +287,9 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
       null,
     );
   }
+
+  // and we also check in the country list that it is in fact
+  // a valid country
   if (!appData.countries[args.country]) {
     debug(
       "Unknown country",
@@ -157,11 +306,21 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
   }
 }
 
-export function getDictionary(appData: IAppDataType, args: any) {
+/**
+ * This just extracts the dictionary given the app data
+ * and the language of choice
+ * @param appData the app data
+ * @param args the whole args of the graphql request
+ */
+export function getDictionary(appData: IAppDataType, args: any): string {
   debug("Providing dictionary from", args.language);
   return appData.config.dictionaries[args.language];
 }
 
+/**
+ * Simply throws an error if the user is not logged in
+ * @param tokenData the token data that has been extracted with validateTokenAndGetData
+ */
 export function mustBeLoggedIn(tokenData: any) {
   debug("Checking if user is logged in...");
   if (!tokenData.userId) {
@@ -176,13 +335,31 @@ export function mustBeLoggedIn(tokenData: any) {
   }
 }
 
+/**
+ * Filters and prepares a graphql value for output to the rest endpoint
+ * given the value that has given by the server, the requested fields
+ * that are supposed to be outputted, the role of the current user
+ * and the parent module or item definition this value belongs to,
+ * the form comes with the DATA and the externalized fields
+ * @param value the value gotten from the sql database
+ * @param requestedFields the requested fields
+ * @param role the role of the user requesting the data
+ * @param parentModuleOrIdef the parent module or item definition the value belongs to
+ */
 export function filterAndPrepareGQLValue(
   value: any,
   requestedFields: any,
   role: string,
   parentModuleOrIdef: ItemDefinition | Module,
 ) {
+  // now we check what we are actually giving the user
+  // we are not giving them the exact data because they might
+  // not have the entire access
   let valueToProvide: any;
+
+  // so if the value is not blocked, or if the value is blocked
+  // but we have fancy privileges that allow us to read anyway because
+  // we are pros
   if (
     value.blocked_at === null ||
     (
@@ -190,6 +367,7 @@ export function filterAndPrepareGQLValue(
       ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(role)
     )
   ) {
+    // we are going to get the value for the item
     let valueOfTheItem: any;
     if (parentModuleOrIdef instanceof ItemDefinition) {
       // we convert the value we were provided, of course, we only need
@@ -200,6 +378,7 @@ export function filterAndPrepareGQLValue(
         requestedFields,
       );
     } else {
+      // same for modules
       valueOfTheItem = convertSQLValueToGQLValueForModule(
         parentModuleOrIdef,
         value,
@@ -239,6 +418,8 @@ export function filterAndPrepareGQLValue(
  * you should run itemDefinition.applyValueFromGQL(gqlArgValue);
  * @param itemDefinition the item definition in question
  * @param gqlArgValue the arg value that was set
+ * @param referredItem this is an optional item used to basically
+ * provide better error logging
  */
 export function serverSideCheckItemDefinitionAgainst(
   itemDefinition: ItemDefinition,
@@ -246,11 +427,16 @@ export function serverSideCheckItemDefinitionAgainst(
   referredItem?: Item,
 ) {
   debug("Checking value against item definition...");
+  // we get the current value of the item definition instance
   const currentValue = itemDefinition.getCurrentValue();
   debug("Current value is", currentValue);
+  // now we are going to loop over the properties of that value
   currentValue.properties.forEach((propertyValue) => {
+    // and we get what is set in the graphql value
     const gqlPropertyValue = gqlArgValue[propertyValue.propertyId];
+    // now we check if it has an invalid reason
     if (propertyValue.invalidReason) {
+      // throw an error then
       throw new GraphQLDataInputError(
         `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
         propertyValue.invalidReason,
@@ -259,6 +445,9 @@ export function serverSideCheckItemDefinitionAgainst(
         null,
         null,
       );
+
+    // we also check that the values are matching, but only if they have been
+    // defined in the graphql value
     } else if (typeof gqlPropertyValue !== "undefined" && !equals(gqlPropertyValue, propertyValue.value)) {
       throw new GraphQLDataInputError(
         `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated value`,
@@ -271,13 +460,19 @@ export function serverSideCheckItemDefinitionAgainst(
     }
   });
 
+  // we now check the items
   currentValue.items.forEach((itemValue) => {
+    // now we take the item itself
     const item = itemDefinition.getItemFor(itemValue.itemId);
+    // the graphql item value
     let gqlItemValue = gqlArgValue[item.getQualifiedIdentifier()];
+    // if it's undefined we make it null
     if (typeof gqlItemValue === "undefined") {
       gqlItemValue = null;
     }
+    // the graphql exclusion state value
     const gqlExclusionState = gqlArgValue[item.getQualifiedExclusionStateIdentifier()] || null;
+    // now we check if the exclusion states match
     if (itemValue.exclusionState !== gqlExclusionState) {
       throw new GraphQLDataInputError(
         `validation failed at item ${itemValue.itemId} with a mismatch of exclusion state`,
@@ -287,6 +482,7 @@ export function serverSideCheckItemDefinitionAgainst(
         null,
         null,
       );
+    // and we check if the there's a value set despite it being excluded
     } else if (gqlExclusionState === ItemExclusionState.EXCLUDED && gqlItemValue !== null) {
       throw new GraphQLDataInputError(
         `validation failed at item ${itemValue.itemId} with an excluded item but data set for it`,
@@ -297,6 +493,8 @@ export function serverSideCheckItemDefinitionAgainst(
         null,
       );
     }
+    // now we run a server side check of item definition in the
+    // specific item data, that's where we use our referred item
     serverSideCheckItemDefinitionAgainst(
       item.getItemDefinition(),
       gqlItemValue,
@@ -315,6 +513,7 @@ export function serverSideCheckItemDefinitionAgainst(
  * in qualified path names for the policies
  * @param knex the knex instance
  * @param extraSQLColumns extra SQL columns to request, this only exists to avoid needing many SQL calls
+ * an asterisk is valid here
  * @param preValidation a validation to do, validate if the row doesn't exist here, and anything else necessary
  * the function will crash by Internal server error if no validation is done if the row is null
  */
@@ -328,37 +527,60 @@ export async function runPolicyCheck(
   extraSQLColumns: string[],
   preValidation: (content: any) => void,
 ) {
+  // so now we get the information we need first
   const mod = itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
+  // we check if we are going to need a join, by default, no
   let policyQueryRequiresJoin = false;
+  // and what columns will we be using, by default, the extra columns required
   const selectionSQLColumns = [...extraSQLColumns];
 
+  // let's get all the policies that we have for this policy type group
   const policiesForThisType = itemDefinition.getPolicyNamesFor(policyType);
-  const expecedActualPolicies: string[] = [];
+  // now the expected actual policies that we need information about as in
+  // the policies that this role has to validate against
+  const expectedActualPolicies: string[] = [];
+
+  // so we loop in these policies
   policiesForThisType.forEach((policyName) => {
+    // and we get the roles that need to apply to this policy
     const rolesForThisSpecificPolicy = itemDefinition.getRolesForPolicy(policyType, policyName);
+    // if this is not our user, we can just continue with the next
     if (!rolesForThisSpecificPolicy.includes(role)) {
       return;
     }
 
+    // otherwise we need to see which properties are in consideration for this
+    // policy
     const propertiesInContext = itemDefinition.getPropertiesForPolicy(policyType, policyName);
+    // we loop through those properties
     propertiesInContext.forEach((property) => {
+      // if the property is not a extension
       if (!property.checkIfIsExtension()) {
+        // it means that we require a join
         policyQueryRequiresJoin = true;
       }
 
-      const qualidiedIdentifier = property.getQualifiedPolicyIdentifier(policyType, policyName);
-      let valueForTheProperty = gqlArgValue[qualidiedIdentifier];
+      // now we need the qualified policy identifier, that's where in the args
+      // the value for this policy is stored
+      const qualifiedPolicyIdentifier = property.getQualifiedPolicyIdentifier(policyType, policyName);
+      // and like that we get the value that has been set for that policy
+      let valueForTheProperty = gqlArgValue[qualifiedPolicyIdentifier];
+      // if it's undefined, we set it to null
       if (typeof valueForTheProperty === "undefined") {
         valueForTheProperty = null;
       }
 
+      // now we check if it's a valid value, the value we have given, for the given property
+      // this is a shallow check but works
       const invalidReason = property.isValidValue(valueForTheProperty);
+
+      // if we get an invalid reason, the policy cannot even pass there
       if (invalidReason) {
         throw new GraphQLDataInputError(
-          `validation failed for ${qualidiedIdentifier} with reason ${invalidReason}`,
+          `validation failed for ${qualifiedPolicyIdentifier} with reason ${invalidReason}`,
           invalidReason,
           null,
           property.getId(),
@@ -367,6 +589,10 @@ export async function runPolicyCheck(
         );
       }
 
+      // otherwise we create a selection meta column, for our policy using the sql equal
+      // which will create a column field with the policy name that is going to be
+      // equal to that value, eg. "name" = 'policyValueForProperty' AS "MY_POLICY"
+      // because policies are uppercase this avoids collisions with properties
       const selectionMetaColumn = property.getPropertyDefinitionDescription().sqlEqual(
         valueForTheProperty,
         "",
@@ -375,30 +601,38 @@ export async function runPolicyCheck(
         knex,
       );
 
-      expecedActualPolicies.push(policyName);
+      // now we add that into the expected policy list
+      expectedActualPolicies.push(policyName);
+      // and then we add the meta column into our selection columns
       selectionSQLColumns.push(selectionMetaColumn);
     });
   });
 
-  console.log(selectionSQLColumns);
-  const policyQuery = knex.select(selectionSQLColumns);
-  policyQuery.from(moduleTable);
+  // now we can make the policy query
+  const policyQuery = knex.select(selectionSQLColumns).from(moduleTable);
+  // if the policy requires a join, or if the selection includes an asterisk
+  // and they want all
   if (policyQueryRequiresJoin || selectionSQLColumns.includes("*")) {
+    // we join
     policyQuery.join(selfTable, (clause) => {
       clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
     });
   }
+  // we make the query only where the id and type are right
   policyQuery.where({
     id,
     type: selfTable,
   });
+
+  // we get the value, or nothing, if nothing matched
   const value = (await policyQuery)[0] || null;
+  // and call the pre validation function which should
+  // validate if it's null or not
   preValidation(value);
 
-  Object.keys(value).forEach((policyName) => {
-    if (!expecedActualPolicies.includes(policyName)) {
-      return;
-    }
+  // now we start looping in all the policies, because
+  // policies are checking an equal, we check
+  expectedActualPolicies.forEach((policyName) => {
     const passedPolicy = value[policyName];
     if (!passedPolicy) {
       throw new GraphQLDataInputError(

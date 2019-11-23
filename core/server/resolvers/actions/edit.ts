@@ -6,15 +6,16 @@ import {
   checkLanguageAndRegion,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
-  buildColumnNames,
   mustBeLoggedIn,
   flattenFieldsFromRequestedFields,
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
   runPolicyCheck,
+  buildColumnNamesForModuleTableOnly,
+  buildColumnNamesForItemDefinitionTableOnly,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
-import { RESERVED_BASE_PROPERTIES_SQL, CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
+import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
   convertGQLValueToSQLValueForItemDefinition,
@@ -28,26 +29,35 @@ export async function editItemDefinition(
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
+  // First we check the language and region of the item
   checkLanguageAndRegion(appData, resolverArgs.args);
+  // we ge the token data
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
+  // for editing one must be logged in
   mustBeLoggedIn(tokenData);
 
+  // now we get the requested fields, and check they are available for the given role
   const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
   checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
+  // now we get the basic information
   const mod = itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
   debug("Making query to get the owner of this item");
 
-  // first we make the query for the item, which is not blocked
-  // in the module name for the given id, as we need to know who created
-  // the item in order to validate roles
-
+  // now we get these variables ready
+  // we need to get the userId and the current
+  // entire item definition value that is in the database
+  // there's an easy way to request that, and now, we do it
+  // at the same time we run the policy check
   let userId: number;
   let wholeSqlStoredValue: any;
+
+  // so we run the policy check for edit, this item definition,
+  // with the given id
   await runPolicyCheck(
     "edit",
     itemDefinition,
@@ -55,9 +65,16 @@ export async function editItemDefinition(
     tokenData.role,
     resolverArgs.args,
     appData.knex,
+    // and notice how we request every single field, we want
+    // it all, every single bit of information that is stored
+    // in the table, we want it, and we want to reconstruct that
+    // into a value, but we aren't showing that to the user
     ["*"],
     (contentData: any) => {
+      // so now that we have it all, we set the value of the variable
+      // this might be null
       wholeSqlStoredValue = contentData;
+      // and fetch the userId
       userId = contentData && contentData.created_by;
       // if we don't get an user id this means that there's no owner, this is bad input
       if (!userId) {
@@ -70,6 +87,8 @@ export async function editItemDefinition(
           null,
         );
       }
+
+      // also throw an error if it's blocked
       if (contentData.blocked_at !== null) {
         throw new GraphQLDataInputError(
           "The item is blocked",
@@ -83,13 +102,22 @@ export async function editItemDefinition(
     },
   );
 
+  // Now that the policies have been checked, and that we get the value of the entire item
+  // definition, we need to convert that value to GQL value, and for that we use the converter
+  // note how we don't pass the requested fields because we want it all
   const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(itemDefinition, wholeSqlStoredValue);
+  // and now basically we create a new value that is the combination or both, where our new
+  // values take precedence, yes there will be pollution, with token, id, and whatnot, but that
+  // doesn't matter because the apply function ignores those
   const expectedUpdatedValue = {
     ...currentWholeValueAsGQL,
     ...resolverArgs.args,
   };
+  // and as so we apply the value from graphql
   itemDefinition.applyValueFromGQL(expectedUpdatedValue);
-  serverSideCheckItemDefinitionAgainst(itemDefinition, resolverArgs.args);
+  // and then we check with the entire full value, we want to ensure no changes occurred
+  // and that the updated value will be exactly the result and it will be valid
+  serverSideCheckItemDefinitionAgainst(itemDefinition, expectedUpdatedValue);
 
   // now we calculate the fields that we are editing, and the fields that we are
   // requesting
@@ -112,8 +140,8 @@ export async function editItemDefinition(
     }
   });
 
-  // checking the role access for both
   debug("Checking role access for editing fields...", editingFields);
+  // checking the role access for both
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.EDIT,
     tokenData.role,
@@ -130,9 +158,6 @@ export async function editItemDefinition(
     requestedFieldsInIdef,
     true,
   );
-
-  // now we build the sql requested fields
-  const requestedFieldsSQL = buildColumnNames(requestedFields);
 
   // and we now build both queries for updating
   // we are telling by setting the partialFields variable
@@ -155,6 +180,7 @@ export async function editItemDefinition(
     editingFields,
   );
 
+  // now we check if we are updating anything at all
   if (
     Object.keys(sqlIdefData).length === 0 &&
     Object.keys(sqlModData).length === 0
@@ -176,19 +202,16 @@ export async function editItemDefinition(
   // we need to build the "returning" attributes from
   // the updated queries, for that we need to check
   // which ones comes from where
-  const requestedModuleColumnsSQL: string[] = [];
-  const requestedIdefColumnsSQL: string[] = [];
-  requestedFieldsSQL.forEach((columnName) => {
-    if (
-      RESERVED_BASE_PROPERTIES_SQL[columnName] ||
-      mod.hasPropExtensionFor(columnName)
-    ) {
-      requestedModuleColumnsSQL.push(columnName);
-    } else {
-      requestedIdefColumnsSQL.push(columnName);
-    }
-  });
+  const requestedModuleColumnsSQL = buildColumnNamesForModuleTableOnly(
+    requestedFields,
+    mod,
+  );
+  const requestedIdefColumnsSQL = buildColumnNamesForItemDefinitionTableOnly(
+    requestedFields,
+    itemDefinition,
+  );
 
+  // we build the transaction for the action
   const value = await appData.knex.transaction(async (transactionKnex) => {
     // and add them if we have them, note that the module will always have
     // something to update because the edited_at field is always added when
@@ -220,7 +243,7 @@ export async function editItemDefinition(
     }
     // if there's nothing to update, or there is nothing to retrieve, it won't touch the idef table
 
-    // now we run both queries at the same time
+    // now we run both queries
     const updateQueryValueMod = await updateQueryMod;
     const updateQueryValueIdef = await updateOrSelectQueryIdef;
 

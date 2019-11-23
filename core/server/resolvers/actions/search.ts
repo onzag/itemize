@@ -24,16 +24,26 @@ export async function searchModule(
   resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
 ) {
+  // check language and region
   checkLanguageAndRegion(appData, resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
+  // now build the fields we are searching
   const searchingFields = {};
+  // the search mode counterpart module
   const searchModeCounterpart = mod.getSearchModule();
+  // now we loop over the arguments
   Object.keys(resolverArgs.args).forEach((arg) => {
+    // if the search mode module has a propextension for that argument
     if (searchModeCounterpart.hasPropExtensionFor(arg)) {
+      // then it's one of the fields we are searching against
       searchingFields[arg] = resolverArgs.args[arg];
     }
   });
+
+  // check role access for those searching fields
+  // yes they are not being directly read but they can
+  // be brute forced this way, and we are paranoid as hell
   searchModeCounterpart.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
@@ -44,23 +54,30 @@ export async function searchModule(
     true,
   );
 
+  // now we get all item definitions that are involved for this search
   let allItemDefinitionsInvolved = mod.getAllChildItemDefinitionsRecursive();
+  // if we specify types, then we filter by those types
   if (resolverArgs.args.types) {
     allItemDefinitionsInvolved = allItemDefinitionsInvolved.filter((idef) => {
-      return resolverArgs.args.types.includes(idef.getQualifiedPathName);
+      return resolverArgs.args.types.includes(idef.getQualifiedPathName());
     });
   }
 
+  // now we build the search query, the search query only matches an id
+  // note how we remove blocked_at
   const searchQuery = appData.knex.select(["id"])
     .from(mod.getQualifiedPathName())
     .where("blocked_at", null);
 
+  // now we build the sql query for the module
   buildSQLQueryForModule(
     mod,
     resolverArgs.args,
     searchQuery,
     getDictionary(appData, resolverArgs.args),
   );
+
+  // if we filter by language and country we add that
   if (resolverArgs.args.filter_by_language) {
     searchQuery.andWhere("language", resolverArgs.args.language);
   }
@@ -68,6 +85,7 @@ export async function searchModule(
     searchQuery.andWhere("country", resolverArgs.args.country);
   }
 
+  // return using the base result, and only using the id
   const baseResult: ISQLTableRowValue[] = await searchQuery;
   return {
     ids: baseResult.map((row) => row.id),
@@ -79,8 +97,7 @@ export async function searchItemDefinition(
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
-  // check the language and region, as well as the limit
-  // defined in the query
+  // check the language and region
   checkLanguageAndRegion(appData, resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
@@ -134,6 +151,8 @@ export async function searchItemDefinition(
   const selfTable = itemDefinition.getQualifiedPathName();
   const searchMod = mod.getSearchModule();
 
+  // in this case it works because we are checking raw property names
+  // with the search module, it has no items, so it can easily check it up
   const requiresJoin = Object.keys(resolverArgs.args).some((argName) =>
       !RESERVED_SEARCH_PROPERTIES[argName] && !searchMod.hasPropExtensionFor(argName));
 

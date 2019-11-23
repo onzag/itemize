@@ -6,14 +6,14 @@ import {
   checkLanguageAndRegion,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
-  buildColumnNames,
   flattenFieldsFromRequestedFields,
   filterAndPrepareGQLValue,
   checkListLimit,
+  buildColumnNamesForModuleTableOnly,
+  buildColumnNamesForItemDefinitionTableOnly,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import {
-  RESERVED_BASE_PROPERTIES_SQL,
   CONNECTOR_SQL_COLUMN_FK_NAME,
   ITEM_PREFIX,
 } from "../../../constants";
@@ -36,41 +36,43 @@ export async function getItemDefinition(
   const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
   checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
-  // we build the SQL column names
-  const requestedFieldsSQL = buildColumnNames(requestedFields);
-
   // get the module, the module table name, the table for
   // the item definition
   const mod = itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
-  // we check if a join is required if one of the columns we are requesting
-  // is not a property or one of the bases from the module, any ITEM_ prefixed
-  // property indicates a join is required, and any missing property also does
-  const requiresJoin = requestedFieldsSQL.some((columnName) =>
-    !RESERVED_BASE_PROPERTIES_SQL[columnName] && !mod.hasPropExtensionFor(columnName));
 
-  debug("queried fields grant a join with idef data?", requiresJoin);
+  // we build the SQL column names
+  const requestedModuleColumnsSQL = buildColumnNamesForModuleTableOnly(
+    requestedFields,
+    mod,
+  );
+  const requestedIdefColumnsSQL = buildColumnNamesForItemDefinitionTableOnly(
+    requestedFields,
+    itemDefinition,
+  );
 
   // if we don't include by whom it was created we add it
-  if (!requestedFieldsSQL.includes("created_by")) {
-    requestedFieldsSQL.push("created_by");
+  if (!requestedModuleColumnsSQL.includes("created_by")) {
+    requestedModuleColumnsSQL.push("created_by");
   }
   // the reason we need blocked_at is because filtering
   // is done by the filtering function outside
-  if (!requestedFieldsSQL.includes("blocked_at")) {
-    requestedFieldsSQL.push("blocked_at");
+  if (!requestedModuleColumnsSQL.includes("blocked_at")) {
+    requestedModuleColumnsSQL.push("blocked_at");
   }
 
   // create the select query, filter the blockage, and select the right
   // type based on it
-  const selectQuery = appData.knex.select(requestedFieldsSQL).from(moduleTable).where({
+  const selectQuery = appData.knex.select(
+    requestedModuleColumnsSQL.concat(requestedIdefColumnsSQL),
+  ).from(moduleTable).where({
     id: resolverArgs.args.id,
     type: selfTable,
   });
 
   // add the join if it's required
-  if (requiresJoin) {
+  if (requestedIdefColumnsSQL.length) {
     selectQuery.join(selfTable, (clause) => {
       clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
     });
@@ -150,7 +152,7 @@ export async function getItemDefinitionList(
   // first we check that the language and region provided are
   // right and available
   checkLanguageAndRegion(appData, resolverArgs.args);
-  checkListLimit(resolverArgs.args);
+  checkListLimit(resolverArgs.args.ids);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
   // now we find the requested fields that are requested
@@ -178,39 +180,41 @@ export async function getItemDefinitionList(
     true,
   );
 
-  // we build the SQL column names
-  const requestedFieldsSQL = buildColumnNames(requestedFields);
-  // the reason we need blocked_at is because filtering
-  // is done by the filtering function outside
-  if (!requestedFieldsSQL.includes("blocked_at")) {
-    requestedFieldsSQL.push("blocked_at");
-  }
-  if (!requestedFieldsSQL.includes("id")) {
-    requestedFieldsSQL.push("id");
-  }
-
   // get the module, the module table name, the table for
   // the item definition
   const mod = itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
-  // we check if a join is required if one of the columns we are requesting
-  // is not a property or one of the bases from the module, any ITEM_ prefixed
-  // property indicates a join is required, and any missing property also does
-  const requiresJoin = requestedFieldsSQL.some((columnName) =>
-    !RESERVED_BASE_PROPERTIES_SQL[columnName] && !mod.hasPropExtensionFor(columnName));
 
-  debug("queried fields grant a join with idef data?", requiresJoin);
+  // we build the SQL column names
+  const requestedModuleColumnsSQL = buildColumnNamesForModuleTableOnly(
+    requestedFields,
+    mod,
+  );
+  const requestedIdefColumnsSQL = buildColumnNamesForItemDefinitionTableOnly(
+    requestedFields,
+    itemDefinition,
+  );
+  // the reason we need blocked_at is because filtering
+  // is done by the filtering function outside
+  if (!requestedModuleColumnsSQL.includes("blocked_at")) {
+    requestedModuleColumnsSQL.push("blocked_at");
+  }
+  if (!requestedModuleColumnsSQL.includes("id")) {
+    requestedModuleColumnsSQL.push("id");
+  }
 
   // create the select query, filter the blockage, and select the right
   // type based on it
-  const selectQuery = appData.knex.select(requestedFieldsSQL).from(moduleTable).where({
+  const selectQuery = appData.knex.select(
+    requestedModuleColumnsSQL.concat(requestedIdefColumnsSQL),
+  ).from(moduleTable).where({
     id: resolverArgs.args.ids,
     type: selfTable,
   });
 
   // add the join if it's required
-  if (requiresJoin) {
+  if (requestedIdefColumnsSQL.length) {
     selectQuery.join(selfTable, (clause) => {
       clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
     });
@@ -237,7 +241,7 @@ export async function getModuleList(
   // first we check that the language and region provided are
   // right and available
   checkLanguageAndRegion(appData, resolverArgs.args);
-  checkListLimit(resolverArgs.args);
+  checkListLimit(resolverArgs.args.ids);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
 
   // now we find the requested fields that are requested
@@ -263,7 +267,10 @@ export async function getModuleList(
   );
 
   // we build the SQL column names
-  const requestedFieldsSQL = buildColumnNames(requestedFields);
+  const requestedFieldsSQL = buildColumnNamesForModuleTableOnly(
+    requestedFields,
+    mod,
+  );
   // the reason we need blocked_at is because filtering
   // is done by the filtering function outside
   if (!requestedFieldsSQL.includes("blocked_at")) {

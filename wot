@@ -1,16 +1,12 @@
 TODO TECH
 
-0. Get rid of missing, make the excluded be the only property to refer to exclusion, make canBeExcluded be default true
-1. remove allowCalloutExcludes in favour of an item specific property, calloutIfExcluded
-2. create a new property called ternaryExclusion, which makes it to allow true, false or null as isCurrentlyExcluded value
-3. Remember to handle this new exclusion ways; null would act more like a true, not a false, which means maybe, so conditional
-rule set must be updated to reflect this, and hasActiveItemOfType and other hasActive functions must check for null values now
-4. The default state of a ternaryExcluded field is null unless specified otherwise.
-
-MAYbe change all this stuff for a ternary value, EXCLUDED, INCLUDED and MAYBE_INCLUDED and call it exclusionState instead
-
-we got to remember to do strip item data of excluded items somehow I guess, from the getCurrentValue or something, if the item
-is excluded we don't want to create it in the db later and whatnot, the value should be null then.
+- Implement unique index in SQL
+- Implement unique type in property type as a configuration
+- Implement type checks, the invalid will be given depending on whether one is on the server or client side, maybe add a PropertyDefinition.checkUniqueIndex function
+  that would use fetch in the client side and a sql query on the server side and whatnot, or nothing, it will crash the query
+  on create or edit so it is yet safe, just check if fetch is available to do the request for a valid index
+- Implement some form of triggers, maybe callback functions in the resolvers, we should have some form of user trigger to remove e_validated and
+  whatnot
 
 
 
