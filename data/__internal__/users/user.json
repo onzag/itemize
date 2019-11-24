@@ -4,7 +4,8 @@
         {
             "id": "username",
             "type": "string",
-            "icon": "account_circle"
+            "icon": "account_circle",
+            "unique": true
         },
         {
             "id": "email",

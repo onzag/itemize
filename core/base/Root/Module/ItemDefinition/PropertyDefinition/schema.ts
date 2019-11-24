@@ -28,6 +28,9 @@ export default {
     subtype:  {
       type: "string",
     },
+    unique:  {
+      type: "boolean",
+    },
     rarity: {
       type: "string",
       enum: rarityLevels,

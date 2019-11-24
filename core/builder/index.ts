@@ -932,6 +932,10 @@ async function getI18nPropertyData(
     errorRequiredProperties.push("error.NOT_NULLABLE");
   }
 
+  if (property.unique) {
+    errorRequiredProperties.push("error.NOT_UNIQUE");
+  }
+
   if (definition.i18n.tooLargeErrorInclude &&
     !property.values && !property.autocompleteIsEnforced) {
     errorRequiredProperties.push("error.TOO_LARGE");

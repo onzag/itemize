@@ -2,7 +2,7 @@ import { IPropertyDefinitionSupportedType } from "../types";
 
 import { GraphQLList, GraphQLNonNull, GraphQLString } from "graphql";
 
-import { stardardSQLInFn, standardSQLOutFn } from "../sql";
+import { stardardSQLInFn, standardSQLOutFn, getStandardSQLFnFor } from "../sql";
 
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 
@@ -19,7 +19,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: "string",
     },
   ],
-  sql: "text[]",
+  sql: getStandardSQLFnFor("text[]"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: () => {

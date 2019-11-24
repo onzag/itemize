@@ -1,6 +1,6 @@
 import { GraphQLOutputType } from "graphql";
 import { IGQLFieldsDefinitionType, IGQLValue } from "../../../../gql";
-import { ISQLTableRowValue } from "../../../../sql";
+import { ISQLTableRowValue, ISQLTableDefinitionType } from "../../../../sql";
 import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
 import boolean, { PropertyDefinitionSupportedBooleanType } from "./boolean";
 import number, { PropertyDefinitionSupportedNumberType } from "./number";
@@ -62,7 +62,7 @@ export interface IPropertyDefinitionSupportedType {
   // the row name will be property_id and the type will be number
   // however if it's a complex value you might need to set the row
   // names and their types by hand
-  sql: string | ((id: string) => {[key: string]: string});
+  sql: ((id: string, property: PropertyDefinition) => ISQLTableDefinitionType);
   // specifies how data is stored, by default it just sets the row value
   // to whatever is given, however if you have a complex value you should
   // set this, the raw function is the raw knex function, that allows to build raw queries,

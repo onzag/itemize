@@ -1,6 +1,12 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLString } from "graphql";
-import { stardardSQLInFn, standardSQLOutFn, standardSQLSearchFnExactAndRange, standardSQLEqualFn } from "../sql";
+import {
+  stardardSQLInFn,
+  standardSQLOutFn,
+  standardSQLSearchFnExactAndRange,
+  standardSQLEqualFn,
+  getStandardSQLFnFor,
+} from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   CLASSIC_BASE_I18N,
@@ -20,7 +26,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
   supportsIcons: false,
-  sql: "date",
+  sql: getStandardSQLFnFor("date"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,

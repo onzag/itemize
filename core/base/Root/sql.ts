@@ -7,6 +7,7 @@ export interface ISQLColumnDefinitionType {
   fkTable?: string;
   fkCol?: string;
   fkAction?: string;
+  index?: string;
 }
 
 export interface ISQLTableDefinitionType {

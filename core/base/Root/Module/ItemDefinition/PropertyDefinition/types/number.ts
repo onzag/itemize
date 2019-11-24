@@ -1,6 +1,12 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLFloat } from "graphql";
-import { stardardSQLInFn, standardSQLOutFn, standardSQLSearchFnExactAndRange, standardSQLEqualFn } from "../sql";
+import {
+  stardardSQLInFn,
+  standardSQLOutFn,
+  standardSQLSearchFnExactAndRange,
+  standardSQLEqualFn,
+  getStandardSQLFnFor,
+} from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_SUPPORTED_REAL,
@@ -20,7 +26,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // a number is just a number can be integer or decimal
   json: "number",
   gql: GraphQLFloat,
-  sql: "float",
+  sql: getStandardSQLFnFor("float"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,

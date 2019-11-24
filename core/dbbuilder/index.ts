@@ -8,6 +8,7 @@ import Root from "../base/Root";
 import { buildTables } from "./build-tables";
 import { buildForeignKeys } from "./build-foreign-key";
 import { ISQLSchemaDefinitionType, getSQLTablesSchemaForRoot } from "../base/Root/sql";
+import { buildIndexes } from "./build-index";
 
 const fsAsync = fs.promises;
 
@@ -115,4 +116,5 @@ async function buildDatabase(
 ) {
   await buildTables(knex, oldDatabaseSchema, newDatabaseSchema);
   await buildForeignKeys(knex, oldDatabaseSchema, newDatabaseSchema);
+  await buildIndexes(knex, oldDatabaseSchema, newDatabaseSchema);
 }

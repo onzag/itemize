@@ -25,6 +25,7 @@ export enum PropertyInvalidReason {
   INVALID_SUBTYPE_VALUE = "INVALID_SUBTYPE_VALUE",
   FROM_LARGER_THAN_TO = "FROM_LARGER_THAN_TO",
   TO_SMALLER_THAN_FROM = "TO_SMALLER_THAN_FROM",
+  NOT_UNIQUE = "NOT_UNIQUE",
 }
 
 export interface IPropertyDefinitionRawJSONRuleDataType {
@@ -76,6 +77,8 @@ export interface IPropertyDefinitionRawJSONDataType {
 
   // values for the property set
   values?: PropertyDefinitionSupportedType[];
+  // whether it is unique
+  unique?: boolean;
   // whether it can be null or not
   nullable?: boolean;
   // Makes the value be null if hidden
@@ -252,6 +255,8 @@ export default class PropertyDefinition {
         return PropertyInvalidReason.TOO_FEW_DECIMALS;
       }
     }
+
+    // TODO here add the unique check
 
     // Special length check
     if (
@@ -678,6 +683,10 @@ export default class PropertyDefinition {
    */
   public isNullable() {
     return this.rawData.nullable;
+  }
+
+  public isUnique() {
+    return this.rawData.unique;
   }
 
   /**

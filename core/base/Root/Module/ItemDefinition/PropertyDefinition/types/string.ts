@@ -1,6 +1,12 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLString } from "graphql";
-import { stardardSQLInFn, standardSQLOutFn, standardSQLSearchFnExactAndRange, standardSQLEqualFn } from "../sql";
+import {
+  stardardSQLInFn,
+  standardSQLOutFn,
+  standardSQLSearchFnExactAndRange,
+  standardSQLEqualFn,
+  getStandardSQLFnFor,
+} from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_STRING_LENGTH,
@@ -23,7 +29,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   // a string is a string
   json: "string",
-  sql: "text",
+  sql: getStandardSQLFnFor("text"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,

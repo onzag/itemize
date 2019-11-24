@@ -1,6 +1,12 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLBoolean } from "graphql";
-import { stardardSQLInFn, standardSQLOutFn, standardSQLSearchFnExactAndRange, standardSQLEqualFn } from "../sql";
+import {
+  stardardSQLInFn,
+  standardSQLOutFn,
+  standardSQLSearchFnExactAndRange,
+  standardSQLEqualFn,
+  getStandardSQLFnFor,
+} from "../sql";
 import { REDUCED_BASE_I18N, CLASSIC_OPTIONAL_I18N, REDUCED_SEARCH_BASE_I18N, CLASSIC_SEARCH_OPTIONAL_I18N } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 
@@ -9,7 +15,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // a boolean type can be written as a boolean
   json: "boolean",
   gql: GraphQLBoolean,
-  sql: "boolean",
+  sql: getStandardSQLFnFor("boolean"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,

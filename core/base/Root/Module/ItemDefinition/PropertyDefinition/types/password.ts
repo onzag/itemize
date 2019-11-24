@@ -1,6 +1,6 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLString } from "graphql";
-import { standardSQLOutFn } from "../sql";
+import { standardSQLOutFn, getStandardSQLFnFor } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { MAX_STRING_LENGTH, CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
 
@@ -9,7 +9,7 @@ export type PropertyDefinitionSupportedPasswordType = string;
 const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   nullableDefault: "",
-  sql: "text",
+  sql: getStandardSQLFnFor("text"),
   sqlIn: (value: PropertyDefinitionSupportedPasswordType, id, property, knex) => {
     if (value === null) {
       return  {

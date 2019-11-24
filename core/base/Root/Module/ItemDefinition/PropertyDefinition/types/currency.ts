@@ -32,8 +32,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
   sql: (id) => {
     const obj = {};
-    obj[id + "_VALUE"] = "float";
-    obj[id + "_CURRENCY"] = "text";
+    obj[id + "_VALUE"] = {type: "float"};
+    obj[id + "_CURRENCY"] = {type: "text"};
     return obj;
   },
   sqlIn: (value: IPropertyDefinitionSupportedCurrencyType, id: string) => {

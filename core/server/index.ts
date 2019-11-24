@@ -42,7 +42,7 @@ export interface IAppDataType {
   knex: Knex;
 }
 
-const formatError = (error: GraphQLError) => {
+const customFormatErrorFn = (error: GraphQLError) => {
   const originalError = error.originalError;
   let constructor = null;
   if (originalError) {
@@ -89,7 +89,7 @@ function initializeApp(appData: IAppDataType) {
   app.use("/graphql", graphqlHTTP({
     schema: getGQLSchemaForRoot(appData.root, resolvers(appData)),
     graphiql: true,
-    formatError,
+    customFormatErrorFn,
   }));
 
   app.get("/util/country", (req, res) => {

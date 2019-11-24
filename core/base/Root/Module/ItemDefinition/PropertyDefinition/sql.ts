@@ -4,6 +4,16 @@ import { ISQLTableRowValue, ISQLTableDefinitionType } from "../../../sql";
 import { IGQLValue } from "../../../gql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces";
 
+export function getStandardSQLFnFor(type: string):
+  (id: string, property: PropertyDefinition) => ISQLTableDefinitionType {
+  return (id: string, property: PropertyDefinition) => ({
+    [id]: {
+      type,
+      index: property.isUnique() ? "unique" : null,
+    },
+  });
+}
+
 export function stardardSQLInFn(value: PropertyDefinitionSupportedType, id: string): ISQLTableRowValue {
   return {
     [id]: value,
@@ -61,28 +71,11 @@ export function getSQLTableDefinitionForProperty(
   propertyDefinition: PropertyDefinition,
   prefix ?: string,
 ): ISQLTableDefinitionType {
-  const resultTableSchema = {};
   const actualPrefix = prefix ? prefix : "";
   // get the sql def based on the property definition
   const sqlDef = propertyDefinition.getPropertyDefinitionDescription().sql;
-  // if it's a string, that's the type
-  if (typeof sqlDef === "string") {
-    resultTableSchema[actualPrefix + propertyDefinition.getId()] = {
-      type: sqlDef,
-    };
-    // otherwise we might have a more complex value
-  } else {
-    // let's get it based on the function it is
-    const complexValue = sqlDef(actualPrefix + propertyDefinition.getId());
-    // we are going to loop over that object
-    Object.keys(complexValue).forEach((key) => {
-      // so we can add each row that it returns to the table schema
-      resultTableSchema[key] = {
-        type: complexValue[key],
-      };
-    });
-  }
-  return resultTableSchema;
+  // let's get it based on the function it is
+  return sqlDef(actualPrefix + propertyDefinition.getId(), propertyDefinition);
 }
 
 /**

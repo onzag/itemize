@@ -1,6 +1,12 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLInt } from "graphql";
-import { stardardSQLInFn, standardSQLOutFn, standardSQLSearchFnExactAndRange, standardSQLEqualFn } from "../sql";
+import {
+  stardardSQLInFn,
+  standardSQLOutFn,
+  standardSQLSearchFnExactAndRange,
+  standardSQLEqualFn,
+  getStandardSQLFnFor,
+} from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_SUPPORTED_INTEGER,
@@ -18,7 +24,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // an integer is represented as a number
   json: "number",
   gql: GraphQLInt,
-  sql: "integer",
+  sql: getStandardSQLFnFor("integer"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,

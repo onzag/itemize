@@ -19,11 +19,15 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   nullableDefault: "",
   supportedSubtypes: ["html"],
-  // TODO implement full text search
   sql: (id: string) => {
     return {
-      [id]: "text",
-      [id + "_VECTOR"]: "tsvector",
+      [id]: {
+        type: "text",
+      },
+      [id + "_VECTOR"]: {
+        type: "tsvector",
+        index: "gin",
+      },
     };
   },
   sqlIn: (

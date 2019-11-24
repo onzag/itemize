@@ -77,16 +77,11 @@ export function buildColumnNamesForModuleTableOnly(requestedFields: any, mod: Mo
       const propDescription = property.getPropertyDefinitionDescription();
       // now we need to see how it is in sql form and get the instructions
       // of table formation, a string means, use the property name
-      if (typeof propDescription.sql === "string") {
-        // so we just use the property name
-        result.push(key);
-      } else {
-        // otherwise we pass it to the function, to see
-        // what it splits on, the function returns an object
-        // eg. kitten_SIZE: {type: float, ...} kitten_VALUE
-        // so we want only the keys with represent column names
-        result = result.concat(Object.keys(propDescription.sql(key)));
-      }
+      // we pass it to the function, to see
+      // what it splits on, the function returns an object
+      // eg. kitten_SIZE: {type: float, ...} kitten_VALUE
+      // so we want only the keys with represent column names
+      result = result.concat(Object.keys(propDescription.sql(key, property)));
     }
   });
 
@@ -155,13 +150,9 @@ export function buildColumnNamesForItemDefinitionTableOnly(
       const propDescription = property.getPropertyDefinitionDescription();
       // if we have a simple string, it means it's just the id, but don't forget
       // to prefix that thing
-      if (typeof propDescription.sql === "string") {
-        result.push(prefix + key);
-      } else {
-        // basically the same that we did in the module, but also passing
-        // the prefix
-        result = result.concat(Object.keys(propDescription.sql(prefix + key)));
-      }
+      // basically the same that we did in the module, but also passing
+      // the prefix
+      result = result.concat(Object.keys(propDescription.sql(prefix + key, property)));
     }
   });
 

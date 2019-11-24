@@ -36,11 +36,21 @@ const typeValue: IPropertyDefinitionSupportedType = {
   ],
   sql: (id: string) => {
     return {
-      [id + "_GEO"]: "GEOMETRY(POINT,4326)",
-      [id + "_LAT"]: "float",
-      [id + "_LNG"]: "float",
-      [id + "_TXT"]: "text",
-      [id + "_ATXT"]: "text",
+      [id + "_GEO"]: {
+        type: "GEOMETRY(POINT,4326)",
+      },
+      [id + "_LAT"]: {
+        type: "float",
+      },
+      [id + "_LNG"]: {
+        type: "float",
+      },
+      [id + "_TXT"]: {
+        type: "text",
+      },
+      [id + "_ATXT"]: {
+        type: "text",
+      },
     };
   },
   sqlIn : (value: IPropertyDefinitionSupportedLocationType, id, property, knex) => {

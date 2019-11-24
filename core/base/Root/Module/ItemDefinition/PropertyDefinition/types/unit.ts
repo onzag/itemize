@@ -43,10 +43,18 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
   sql: (id: string) => {
     return {
-      [id + "_VALUE"]: "float",
-      [id + "_UNIT"]: "text",
-      [id + "_NORMALIZED_VALUE"]: "float",
-      [id + "_NORMALIZED_UNIT"]: "text",
+      [id + "_VALUE"]: {
+        type: "float",
+      },
+      [id + "_UNIT"]: {
+        type: "text",
+      },
+      [id + "_NORMALIZED_VALUE"]: {
+        type: "float",
+      },
+      [id + "_NORMALIZED_UNIT"]: {
+        type: "text",
+      },
     };
   },
   sqlIn: (value: IPropertyDefinitionSupportedUnitType, id: string) => {
