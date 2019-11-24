@@ -11,7 +11,7 @@ import {
   EXCLUSION_STATE_SUFFIX,
 } from "../../constants";
 import { GraphQLDataInputError } from "../../base/errors";
-import Debug from "../debug";
+import Debug from "debug";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import Module from "../../base/Root/Module";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
@@ -21,8 +21,8 @@ import equals from "deep-equal";
 import { IGQLValue } from "../../base/Root/gql";
 import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
 import Knex from "knex";
-const debug = Debug("resolvers/basic");
 
+const flattenFieldsFromRequestedFieldsDebug = Debug("resolvers:flattenFieldsFromRequestedFields");
 /**
  * fields get requested with a DATA and some are external, this
  * function flattens the request and removed the data and the
@@ -30,6 +30,7 @@ const debug = Debug("resolvers/basic");
  * @param requestedFields the requested fields
  */
 export function flattenFieldsFromRequestedFields(requestedFields: any) {
+  flattenFieldsFromRequestedFieldsDebug("EXECUTED with %j", requestedFields);
   // so first we extract the data content
   const output = {
     ...(requestedFields.DATA || {}),
@@ -40,16 +41,23 @@ export function flattenFieldsFromRequestedFields(requestedFields: any) {
       output[key] = requestedFields[key];
     }
   });
+  flattenFieldsFromRequestedFieldsDebug("SUCCEED with %j", output);
   // return that
   return output;
 }
 
+const buildColumnNamesForModuleTableOnlyDebug = Debug("resolvers:buildColumnNamesForModuleTableOnly");
 /**
  * Builds the column names expected for a given module only
  * @param requestedFields the requested fields given by graphql fields and flattened
  * @param mod the module in question
  */
 export function buildColumnNamesForModuleTableOnly(requestedFields: any, mod: Module): string[] {
+  buildColumnNamesForModuleTableOnlyDebug(
+    "EXECUTED with %j on module qualified as %s",
+    requestedFields,
+    mod.getQualifiedPathName(),
+  );
   // this will be the ouput
   let result: string[] = [];
   // we start by looping into the requested fields
@@ -82,10 +90,12 @@ export function buildColumnNamesForModuleTableOnly(requestedFields: any, mod: Mo
     }
   });
 
+  buildColumnNamesForModuleTableOnlyDebug("SUCCEED with %j", result);
   // we return all we have gathered
   return result;
 }
 
+const buildColumnNamesForItemDefinitionTableOnlyDebug = Debug("resolvers:buildColumnNamesForItemDefinitionTableOnly");
 /**
  * Builds the column names expected for a given item definition only
  * ignoring all the extensions and base fields
@@ -98,6 +108,12 @@ export function buildColumnNamesForItemDefinitionTableOnly(
   itemDefinition: ItemDefinition,
   prefix: string = "",
 ): string[] {
+  buildColumnNamesForItemDefinitionTableOnlyDebug(
+    "EXECUTED with %j and prefixed with %s on item definition qualified as %s",
+    requestedFields,
+    prefix,
+    itemDefinition.getQualifiedPathName(),
+  );
   // first we build the result
   let result: string[] = [];
   // now we loop into the requested field keys
@@ -149,22 +165,28 @@ export function buildColumnNamesForItemDefinitionTableOnly(
     }
   });
 
+  buildColumnNamesForModuleTableOnlyDebug("SUCCEED with %j", result);
   // return that thing
   return result;
 }
 
+const validateTokenAndGetDataDebug = Debug("resolvers:validateTokenAndGetDataDebug");
 /**
  * Given a token, it validates and provides the role information
  * for use in the system
  * @param token the token passed via the args
  */
 export function validateTokenAndGetData(token: string) {
-  return {
+  validateTokenAndGetDataDebug("EXECUTED with %s", token);
+  const result = {
     userId: 1,
     role: token,
   };
+  validateTokenAndGetDataDebug("SUCCEED with %j", result);
+  return result;
 }
 
+const checkBasicFieldsAreAvailableForRoleDebug = Debug("resolvers:checkBasicFieldsAreAvailableForRole");
 /**
  * Checks if the basic fields are available for the given role, basic
  * fields are of those reserved properties that are in every module
@@ -173,7 +195,11 @@ export function validateTokenAndGetData(token: string) {
  * @param requestedFields the requested fields
  */
 export function checkBasicFieldsAreAvailableForRole(tokenData: any, requestedFields: any) {
-  debug("Checking if fields are available for role...");
+  checkBasicFieldsAreAvailableForRoleDebug(
+    "EXECUTED with token info %j and requested fields %j",
+    tokenData,
+    requestedFields,
+  );
 
   // now we check if moderation fields have been requested
   const moderationFieldsHaveBeenRequested = MODERATION_FIELDS.some((field) => requestedFields[field]);
@@ -183,12 +209,10 @@ export function checkBasicFieldsAreAvailableForRole(tokenData: any, requestedFie
     moderationFieldsHaveBeenRequested &&
     !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
   ) {
-    debug(
-      "Attempted to access to moderation fields with role",
+    checkBasicFieldsAreAvailableForRoleDebug(
+      "FAILED Attempted to access to moderation fields with role %j only %j allowed",
       tokenData.role,
-      "only",
       ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
-      "allowed",
     );
     // we throw an error
     throw new GraphQLDataInputError(
@@ -202,20 +226,21 @@ export function checkBasicFieldsAreAvailableForRole(tokenData: any, requestedFie
   }
 
   // That was basically the only thing that function does by so far
+  checkBasicFieldsAreAvailableForRoleDebug("SUCCEED");
 }
 
+const checkListLimitDebug = Debug("resolvers:checkListLimit");
 /**
  * Checks a list provided by the getter functions that use
  * lists to ensure the request isn't too large
  * @param ids the list ids that have been requested
  */
 export function checkListLimit(ids: string[]) {
-  debug("Checking the limit...");
+  checkListLimitDebug("EXECUTED with %j", ids);
   if (ids.length > MAX_SQL_LIMIT) {
-    debug(
-      "Exceeded limit with",
-      ids,
-      "the maximum is",
+    checkListLimitDebug(
+      "FAILED Exceeded limit by requesting %d ids the maximum limit is %d",
+      ids.length,
       MAX_SQL_LIMIT,
     );
     throw new GraphQLDataInputError(
@@ -227,8 +252,10 @@ export function checkListLimit(ids: string[]) {
       null,
     );
   }
+  checkListLimitDebug("SUCCEED");
 }
 
+const checkLanguageAndRegionDebug = Debug("resolvers:checkLanguageAndRegion");
 /**
  * Checks the language and region given the arguments passed
  * by the graphql resolver
@@ -236,12 +263,12 @@ export function checkListLimit(ids: string[]) {
  * @param args the args themselves being passed to the resolver
  */
 export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
-  debug("Checking language and region...");
+  checkLanguageAndRegionDebug("EXECUTED with args %j", args);
 
   // basically we check the type and if the lenght is right
   if (typeof args.language !== "string" || args.language.length !== 2) {
-    debug(
-      "Invalid language code",
+    checkLanguageAndRegionDebug(
+      "FAILED Invalid language code %s",
       args.language,
     );
     throw new GraphQLDataInputError(
@@ -258,8 +285,8 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
   // a dictionary assigned, only languages with a dictionary
   // assigned can be used by the database
   if (!appData.config.dictionaries[args.language]) {
-    debug(
-      "Unavailable/Unsupported language",
+    checkLanguageAndRegionDebug(
+      "FAILED Unavailable/Unsupported language %s",
       args.language,
     );
     throw new GraphQLDataInputError(
@@ -274,8 +301,8 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
 
   // basically running the same check again but with the country
   if (typeof args.country !== "string" || args.country.length !== 2) {
-    debug(
-      "Invalid country code",
+    checkLanguageAndRegionDebug(
+      "FAILED Invalid country code %s",
       args.country,
     );
     throw new GraphQLDataInputError(
@@ -291,8 +318,8 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
   // and we also check in the country list that it is in fact
   // a valid country
   if (!appData.countries[args.country]) {
-    debug(
-      "Unknown country",
+    checkLanguageAndRegionDebug(
+      "FAILED Unknown country %s",
       args.country,
     );
     throw new GraphQLDataInputError(
@@ -304,8 +331,11 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
       null,
     );
   }
+
+  checkLanguageAndRegionDebug("SUCCEED");
 }
 
+const getDictionaryDebug = Debug("resolvers:getDictionary");
 /**
  * This just extracts the dictionary given the app data
  * and the language of choice
@@ -313,17 +343,21 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
  * @param args the whole args of the graphql request
  */
 export function getDictionary(appData: IAppDataType, args: any): string {
-  debug("Providing dictionary from", args.language);
-  return appData.config.dictionaries[args.language];
+  getDictionaryDebug("EXECUTED with %j", args);
+  const dictionary = appData.config.dictionaries[args.language];
+  getDictionaryDebug("SUCCEED with %s", dictionary);
+  return dictionary;
 }
 
+const mustBeLoggedInDebug = Debug("resolvers:mustBeLoggedIn");
 /**
  * Simply throws an error if the user is not logged in
  * @param tokenData the token data that has been extracted with validateTokenAndGetData
  */
 export function mustBeLoggedIn(tokenData: any) {
-  debug("Checking if user is logged in...");
+  mustBeLoggedInDebug("EXECUTED with %j", tokenData);
   if (!tokenData.userId) {
+    mustBeLoggedInDebug("FAILED");
     throw new GraphQLDataInputError(
       "Must be logged in",
       "UNSPECIFIED",
@@ -333,8 +367,10 @@ export function mustBeLoggedIn(tokenData: any) {
       null,
     );
   }
+  mustBeLoggedInDebug("SUCCEED");
 }
 
+const filterAndPrepareGQLValueDebug = Debug("resolvers:filterAndPrepareGQLValue");
 /**
  * Filters and prepares a graphql value for output to the rest endpoint
  * given the value that has given by the server, the requested fields
@@ -352,6 +388,13 @@ export function filterAndPrepareGQLValue(
   role: string,
   parentModuleOrIdef: ItemDefinition | Module,
 ) {
+  filterAndPrepareGQLValueDebug(
+    "EXECUTED with value %j, where requested fields are %j for role %s and qualified module/item definition %s",
+    value,
+    requestedFields,
+    role,
+    parentModuleOrIdef.getQualifiedPathName(),
+  );
   // now we check what we are actually giving the user
   // we are not giving them the exact data because they might
   // not have the entire access
@@ -407,9 +450,14 @@ export function filterAndPrepareGQLValue(
     });
   }
 
+  filterAndPrepareGQLValueDebug(
+    "SUCCEED with %j",
+    valueToProvide,
+  );
   return valueToProvide;
 }
 
+const serverSideCheckItemDefinitionAgainstDebug = Debug("resolvers:serverSideCheckItemDefinitionAgainst");
 /**
  * Checks that an item definition current state is
  * valid and that the gqlArgValue provided is a match
@@ -426,16 +474,27 @@ export function serverSideCheckItemDefinitionAgainst(
   gqlArgValue: IGQLValue,
   referredItem?: Item,
 ) {
-  debug("Checking value against item definition...");
+  serverSideCheckItemDefinitionAgainstDebug(
+    "EXECUTED with value %j for item defintion with qualified name %s",
+    gqlArgValue,
+    itemDefinition.getQualifiedPathName(),
+  );
   // we get the current value of the item definition instance
   const currentValue = itemDefinition.getCurrentValue();
-  debug("Current value is", currentValue);
+  serverSideCheckItemDefinitionAgainstDebug(
+    "Current value is %j",
+    currentValue,
+  );
   // now we are going to loop over the properties of that value
   currentValue.properties.forEach((propertyValue) => {
     // and we get what is set in the graphql value
     const gqlPropertyValue = gqlArgValue[propertyValue.propertyId];
     // now we check if it has an invalid reason
     if (propertyValue.invalidReason) {
+      serverSideCheckItemDefinitionAgainstDebug(
+        "FAILED due to property failing %s",
+        propertyValue.invalidReason,
+      );
       // throw an error then
       throw new GraphQLDataInputError(
         `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
@@ -449,6 +508,12 @@ export function serverSideCheckItemDefinitionAgainst(
     // we also check that the values are matching, but only if they have been
     // defined in the graphql value
     } else if (typeof gqlPropertyValue !== "undefined" && !equals(gqlPropertyValue, propertyValue.value)) {
+      serverSideCheckItemDefinitionAgainstDebug(
+        "FAILED due to property mismatch on %s where provided was %j and expected was %j",
+        propertyValue.propertyId,
+        gqlPropertyValue,
+        propertyValue.value,
+      );
       throw new GraphQLDataInputError(
         `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated value`,
         "UNSPECIFIED",
@@ -474,20 +539,30 @@ export function serverSideCheckItemDefinitionAgainst(
     const gqlExclusionState = gqlArgValue[item.getQualifiedExclusionStateIdentifier()] || null;
     // now we check if the exclusion states match
     if (itemValue.exclusionState !== gqlExclusionState) {
+      serverSideCheckItemDefinitionAgainstDebug(
+        "FAILED due to exclusion state mismatch on item %s where provided was %s and expected %s",
+        itemValue.itemId,
+        gqlExclusionState,
+        itemValue.exclusionState,
+      );
       throw new GraphQLDataInputError(
         `validation failed at item ${itemValue.itemId} with a mismatch of exclusion state`,
         "UNSPECIFIED",
-        item.getId(),
+        itemValue.itemId,
         null,
         null,
         null,
       );
     // and we check if the there's a value set despite it being excluded
     } else if (gqlExclusionState === ItemExclusionState.EXCLUDED && gqlItemValue !== null) {
+      serverSideCheckItemDefinitionAgainstDebug(
+        "FAILED due to value set on item %s where it was excluded",
+        itemValue.itemId,
+      );
       throw new GraphQLDataInputError(
         `validation failed at item ${itemValue.itemId} with an excluded item but data set for it`,
         "UNSPECIFIED",
-        item.getId(),
+        itemValue.itemId,
         null,
         null,
         null,
@@ -501,8 +576,11 @@ export function serverSideCheckItemDefinitionAgainst(
       item,
     );
   });
+
+  serverSideCheckItemDefinitionAgainstDebug("SUCCEED");
 }
 
+const runPolicyCheckDebug = Debug("resolvers:runPolicyCheck");
 /**
  * Runs a policy check on the requested information
  * @param policyType the policy type on which the request is made on, edit, delete
@@ -527,6 +605,14 @@ export async function runPolicyCheck(
   extraSQLColumns: string[],
   preValidation: (content: any) => void,
 ) {
+  runPolicyCheckDebug(
+    "EXECUTED for policy %s on item definition %s for id %d on role %s for value %j with extra columns %j",
+    policyType,
+    itemDefinition.getQualifiedPathName(),
+    role,
+    gqlArgValue,
+    extraSQLColumns,
+  );
   // so now we get the information we need first
   const mod = itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
@@ -545,10 +631,17 @@ export async function runPolicyCheck(
 
   // so we loop in these policies
   policiesForThisType.forEach((policyName) => {
+    runPolicyCheckDebug("found policy %s", policyName);
     // and we get the roles that need to apply to this policy
     const rolesForThisSpecificPolicy = itemDefinition.getRolesForPolicy(policyType, policyName);
     // if this is not our user, we can just continue with the next
     if (!rolesForThisSpecificPolicy.includes(role)) {
+      runPolicyCheckDebug(
+        "ignoring policy %s as role %s does not require it but only %j demand it",
+        policyName,
+        role,
+        rolesForThisSpecificPolicy,
+      );
       return;
     }
 
@@ -557,6 +650,10 @@ export async function runPolicyCheck(
     const propertiesInContext = itemDefinition.getPropertiesForPolicy(policyType, policyName);
     // we loop through those properties
     propertiesInContext.forEach((property) => {
+      runPolicyCheckDebug(
+        "Found property in policy %s",
+        property.getId(),
+      );
       // if the property is not a extension
       if (!property.checkIfIsExtension()) {
         // it means that we require a join
@@ -573,12 +670,22 @@ export async function runPolicyCheck(
         valueForTheProperty = null;
       }
 
+      runPolicyCheckDebug(
+        "Property qualified policy identifier is %s found value set as %j",
+        qualifiedPolicyIdentifier,
+        valueForTheProperty,
+      );
+
       // now we check if it's a valid value, the value we have given, for the given property
       // this is a shallow check but works
       const invalidReason = property.isValidValue(valueForTheProperty);
 
       // if we get an invalid reason, the policy cannot even pass there
       if (invalidReason) {
+        runPolicyCheckDebug(
+          "FAILED due to failing to pass property validation %s",
+          invalidReason,
+        );
         throw new GraphQLDataInputError(
           `validation failed for ${qualifiedPolicyIdentifier} with reason ${invalidReason}`,
           invalidReason,
@@ -626,6 +733,12 @@ export async function runPolicyCheck(
 
   // we get the value, or nothing, if nothing matched
   const value = (await policyQuery)[0] || null;
+
+  runPolicyCheckDebug(
+    "Database provided %j",
+    value,
+  );
+
   // and call the pre validation function which should
   // validate if it's null or not
   preValidation(value);
@@ -635,6 +748,10 @@ export async function runPolicyCheck(
   expectedActualPolicies.forEach((policyName) => {
     const passedPolicy = value[policyName];
     if (!passedPolicy) {
+      runPolicyCheckDebug(
+        "FAILED due to policy %s not passing",
+        policyName,
+      );
       throw new GraphQLDataInputError(
         `validation failed for policy ${policyName}`,
         INVALID_POLICY_ERROR,
@@ -645,4 +762,6 @@ export async function runPolicyCheck(
       );
     }
   });
+
+  runPolicyCheckDebug("SUCCEED");
 }

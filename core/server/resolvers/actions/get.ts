@@ -1,7 +1,7 @@
 import { IAppDataType } from "../../";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType, FGraphQLModResolverType } from "../../../base/Root/gql";
-import Debug from "../../debug";
+import Debug from "debug";
 import {
   checkLanguageAndRegion,
   validateTokenAndGetData,
@@ -19,13 +19,17 @@ import {
 } from "../../../constants";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
-const debug = Debug("resolvers/actions/get");
 
+const getItemDefinitionDebug = Debug("resolvers:getItemDefinition");
 export async function getItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
+  getItemDefinitionDebug(
+    "EXECUTED for %s",
+    itemDefinition.getQualifiedPathName(),
+  );
   // first we check that the language and region provided are
   // right and available
   checkLanguageAndRegion(appData, resolverArgs.args);
@@ -61,6 +65,9 @@ export async function getItemDefinition(
   if (!requestedModuleColumnsSQL.includes("blocked_at")) {
     requestedModuleColumnsSQL.push("blocked_at");
   }
+
+  getItemDefinitionDebug("Requested columns for idef are %j", requestedIdefColumnsSQL);
+  getItemDefinitionDebug("Requested columns for module are %j", requestedModuleColumnsSQL);
 
   // create the select query, filter the blockage, and select the right
   // type based on it
@@ -112,12 +119,12 @@ export async function getItemDefinition(
       requestedFieldsInIdef,
       true,
     );
-    debug("no result founds, returning null");
+    getItemDefinitionDebug("no result founds, returning null");
     return null;
   }
-  debug("SQL result found as", selectQueryValue[0]);
+  getItemDefinitionDebug("SQL result found as %j", selectQueryValue[0]);
 
-  debug("Checking role access, will throw an error if false");
+  getItemDefinitionDebug("Checking role access for read");
 
   // now we check the role access, this function will throw an error
   // if that fails, and we only check for the requested fields
@@ -137,18 +144,22 @@ export async function getItemDefinition(
     itemDefinition,
   );
 
-  debug("converted to GQL as", valueToProvide);
-
-  debug("providing value");
+  getItemDefinitionDebug("SUCCEED with %j", valueToProvide);
   // return if otherwise succeeds
   return valueToProvide;
 }
 
+const getItemDefinitionListDebug = Debug("resolvers:getItemDefinitionList");
 export async function getItemDefinitionList(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
+  getItemDefinitionListDebug(
+    "EXECUTED for %s",
+    itemDefinition.getQualifiedPathName(),
+  );
+
   // first we check that the language and region provided are
   // right and available
   checkLanguageAndRegion(appData, resolverArgs.args);
@@ -171,6 +182,8 @@ export async function getItemDefinitionList(
       requestedFieldsInIdef[arg] = requestedFields[arg];
     }
   });
+  getItemDefinitionListDebug("Extracted requested fields from idef as %j", requestedFieldsInIdef);
+  getItemDefinitionListDebug("Checking global read access");
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
@@ -204,6 +217,9 @@ export async function getItemDefinitionList(
     requestedModuleColumnsSQL.push("id");
   }
 
+  getItemDefinitionListDebug("Requested columns for idef are %j", requestedIdefColumnsSQL);
+  getItemDefinitionListDebug("Requested columns for module are %j", requestedModuleColumnsSQL);
+
   // create the select query, filter the blockage, and select the right
   // type based on it
   const selectQuery = appData.knex.select(
@@ -226,18 +242,26 @@ export async function getItemDefinitionList(
     return selectQueryValue.find((row) => row.id === id);
   });
 
-  debug("providing value");
-  // return if otherwise succeeds
-  return restoredValuesOrder.map(
+  const finalValues = restoredValuesOrder.map(
     (value) => filterAndPrepareGQLValue(value, requestedFields, tokenData.role, itemDefinition),
   );
+
+  getItemDefinitionListDebug("SUCCEED");
+
+  // return if otherwise succeeds
+  return finalValues;
 }
 
+const getModuleListDebug = Debug("resolvers:getModuleList");
 export async function getModuleList(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
 ) {
+  getModuleListDebug(
+    "EXECUTED for %s",
+    mod.getQualifiedPathName(),
+  );
   // first we check that the language and region provided are
   // right and available
   checkLanguageAndRegion(appData, resolverArgs.args);
@@ -257,6 +281,11 @@ export async function getModuleList(
       requestedFieldsInMod[arg] = requestedFields[arg];
     }
   });
+  getModuleListDebug(
+    "Requested fields calculated as %j",
+    requestedFieldsInMod,
+  );
+  getModuleListDebug("Checking global role access for read");
   mod.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
@@ -280,6 +309,8 @@ export async function getModuleList(
     requestedFieldsSQL.push("id");
   }
 
+  getItemDefinitionListDebug("Requested columns are %j", requestedFieldsSQL);
+
   // get the module, the module table name, the table for
   // the item definition
   const moduleTable = mod.getQualifiedPathName();
@@ -296,11 +327,13 @@ export async function getModuleList(
     return selectQueryValue.find((row) => row.id === id);
   });
 
-  debug("providing value");
   // return if otherwise succeeds
-  return restoredValuesOrder.map(
+  const finalValues = restoredValuesOrder.map(
     (value) => filterAndPrepareGQLValue(value, requestedFields, tokenData.role, mod),
   );
+
+  getItemDefinitionListDebug("SUCCEED");
+  return finalValues;
 }
 
 export function getItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {

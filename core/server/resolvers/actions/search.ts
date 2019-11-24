@@ -1,4 +1,4 @@
-import Debug from "../../debug";
+import Debug from "debug";
 import { IAppDataType } from "../../../server";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType, FGraphQLModResolverType } from "../../../base/Root/gql";
 import Module from "../../../base/Root/Module";
@@ -17,13 +17,18 @@ import {
   CONNECTOR_SQL_COLUMN_FK_NAME,
 } from "../../../constants";
 import { buildSQLQueryForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
-const debug = Debug("resolvers/actions/search");
 
+const searchModuleDebug = Debug("resolvers:searchModule");
 export async function searchModule(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
 ) {
+  searchModuleDebug(
+    "EXECUTED for %s",
+    mod.getQualifiedPathName(),
+  );
+
   // check language and region
   checkLanguageAndRegion(appData, resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
@@ -41,6 +46,16 @@ export async function searchModule(
     }
   });
 
+  searchModuleDebug(
+    "Searching fields retrieved as %j",
+    searchingFields,
+  );
+
+  searchModuleDebug(
+    "Checking read role access based on %s",
+    searchModeCounterpart.getQualifiedPathName(),
+  );
+
   // check role access for those searching fields
   // yes they are not being directly read but they can
   // be brute forced this way, and we are paranoid as hell
@@ -53,15 +68,6 @@ export async function searchModule(
     searchingFields,
     true,
   );
-
-  // now we get all item definitions that are involved for this search
-  let allItemDefinitionsInvolved = mod.getAllChildItemDefinitionsRecursive();
-  // if we specify types, then we filter by those types
-  if (resolverArgs.args.types) {
-    allItemDefinitionsInvolved = allItemDefinitionsInvolved.filter((idef) => {
-      return resolverArgs.args.types.includes(idef.getQualifiedPathName());
-    });
-  }
 
   // now we build the search query, the search query only matches an id
   // note how we remove blocked_at
@@ -84,19 +90,32 @@ export async function searchModule(
   if (resolverArgs.args.filter_by_country) {
     searchQuery.andWhere("country", resolverArgs.args.country);
   }
+  if (resolverArgs.args.types) {
+    searchQuery.andWhere("type", resolverArgs.args.types);
+  }
 
   // return using the base result, and only using the id
   const baseResult: ISQLTableRowValue[] = await searchQuery;
-  return {
+  const finalResult = {
     ids: baseResult.map((row) => row.id),
   };
+
+  searchModuleDebug("SUCCEED with %j", finalResult);
+
+  return finalResult;
 }
 
+const searchItemDefinitionDebug = Debug("resolvers:searchItemDefinition");
 export async function searchItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
+  searchItemDefinitionDebug(
+    "EXECUTED for %s",
+    itemDefinition.getQualifiedPathName(),
+  );
+
   // check the language and region
   checkLanguageAndRegion(appData, resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
@@ -119,7 +138,15 @@ export async function searchItemDefinition(
     }
   });
 
-  debug("Checking role access for read in idef search mode...");
+  searchItemDefinitionDebug(
+    "Searching fields retrieved as %j",
+    searchingFields,
+  );
+
+  searchItemDefinitionDebug(
+    "Checking read role access based on %s",
+    searchModeCounterpart.getQualifiedPathName(),
+  );
 
   // We also check for the role access of the search fields
   // the reason is simple, if we can use the query to query
@@ -156,7 +183,10 @@ export async function searchItemDefinition(
   const requiresJoin = Object.keys(resolverArgs.args).some((argName) =>
       !RESERVED_SEARCH_PROPERTIES[argName] && !searchMod.hasPropExtensionFor(argName));
 
-  debug("queried fields grant a join with idef data?", requiresJoin);
+  searchItemDefinitionDebug(
+    "Join considered as %j",
+    requiresJoin,
+  );
 
   // now we build the search query
   const searchQuery = appData.knex.select(["id"]).from(moduleTable)
@@ -188,9 +218,11 @@ export async function searchItemDefinition(
 
   // now we get the base result, and convert every row
   const baseResult: ISQLTableRowValue[] = await searchQuery;
-  return {
+  const finalResult = {
     ids: baseResult.map((row) => row.id),
   };
+  searchItemDefinitionDebug("SUCCEED with %j", finalResult);
+  return finalResult;
 }
 
 export function searchItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {

@@ -1,7 +1,7 @@
 import { IAppDataType } from "../../";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
-import Debug from "../../debug";
+import Debug from "debug";
 import {
   checkLanguageAndRegion,
   validateTokenAndGetData,
@@ -22,13 +22,15 @@ import {
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sql";
 import { GraphQLDataInputError } from "../../../base/errors";
-const debug = Debug("resolvers/actions/edit");
 
+const debug = Debug("resolvers:editItemDefinition");
 export async function editItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
+  debug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
+
   // First we check the language and region of the item
   checkLanguageAndRegion(appData, resolverArgs.args);
   // we ge the token data
@@ -78,6 +80,7 @@ export async function editItemDefinition(
       userId = contentData && contentData.created_by;
       // if we don't get an user id this means that there's no owner, this is bad input
       if (!userId) {
+        debug("FAILED due to lack of content data");
         throw new GraphQLDataInputError(
           `There's no ${selfTable} with id ${resolverArgs.args.id}`,
           "UNSPECIFIED",
@@ -90,6 +93,7 @@ export async function editItemDefinition(
 
       // also throw an error if it's blocked
       if (contentData.blocked_at !== null) {
+        debug("FAILED due to element being blocked");
         throw new GraphQLDataInputError(
           "The item is blocked",
           "UNSPECIFIED",
@@ -106,6 +110,7 @@ export async function editItemDefinition(
   // definition, we need to convert that value to GQL value, and for that we use the converter
   // note how we don't pass the requested fields because we want it all
   const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(itemDefinition, wholeSqlStoredValue);
+  debug("Current GQL value found as %j", currentWholeValueAsGQL);
   // and now basically we create a new value that is the combination or both, where our new
   // values take precedence, yes there will be pollution, with token, id, and whatnot, but that
   // doesn't matter because the apply function ignores those
@@ -113,6 +118,7 @@ export async function editItemDefinition(
     ...currentWholeValueAsGQL,
     ...resolverArgs.args,
   };
+  debug("Expectd GQL value considered as %j, applying such value", expectedUpdatedValue);
   // and as so we apply the value from graphql
   itemDefinition.applyValueFromGQL(expectedUpdatedValue);
   // and then we check with the entire full value, we want to ensure no changes occurred
@@ -130,6 +136,10 @@ export async function editItemDefinition(
       editingFields[arg] = resolverArgs.args[arg];
     }
   });
+  debug(
+    "Fields to be edited from the idef have been extracted as %j",
+    editingFields,
+  );
   const requestedFieldsInIdef = {};
   Object.keys(requestedFields).forEach((arg) => {
     if (
@@ -139,8 +149,12 @@ export async function editItemDefinition(
       requestedFieldsInIdef[arg] = requestedFields[arg];
     }
   });
+  debug(
+    "Fields to be requested from the idef have been extracted as %j",
+    requestedFieldsInIdef,
+  );
 
-  debug("Checking role access for editing fields...", editingFields);
+  debug("Checking role access for editing");
   // checking the role access for both
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.EDIT,
@@ -150,6 +164,7 @@ export async function editItemDefinition(
     editingFields,
     true,
   );
+  debug("Checking role access for read");
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
@@ -185,6 +200,7 @@ export async function editItemDefinition(
     Object.keys(sqlIdefData).length === 0 &&
     Object.keys(sqlModData).length === 0
   ) {
+    debug("FAILED due to input data being none");
     throw new GraphQLDataInputError(
       "You are not updating anything whatsoever",
       "UNSPECIFIED",
@@ -199,6 +215,9 @@ export async function editItemDefinition(
   sqlModData.edited_at = appData.knex.fn.now();
   sqlModData.edited_by = tokenData.userId;
 
+  debug("SQL Input data for idef is %j", sqlIdefData);
+  debug("SQL Input data for module is %j", sqlModData);
+
   // we need to build the "returning" attributes from
   // the updated queries, for that we need to check
   // which ones comes from where
@@ -210,6 +229,9 @@ export async function editItemDefinition(
     requestedFields,
     itemDefinition,
   );
+
+  debug("Requested columns for idef are %j", requestedIdefColumnsSQL);
+  debug("Requested columns for module are %j", requestedModuleColumnsSQL);
 
   // we build the transaction for the action
   const value = await appData.knex.transaction(async (transactionKnex) => {
@@ -253,16 +275,22 @@ export async function editItemDefinition(
     };
   });
 
+  debug("SQL Output is %j", value);
+
   // convert it using the requested fields for that, and ignoring everything else
   const gqlValue = convertSQLValueToGQLValueForItemDefinition(itemDefinition, value, requestedFields);
 
   // we don't need to check for blocked or deleted because such items cannot be edited,
   // see before, so we return immediately, read has been checked already
   // we use the same strategy, all extra data will be chopped anyway by graphql
-  return {
+  const finalOutput = {
     DATA: gqlValue,
     ...gqlValue,
   };
+
+  debug("SUCCEED with GQL output %j", finalOutput);
+
+  return finalOutput;
 }
 
 export function editItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {

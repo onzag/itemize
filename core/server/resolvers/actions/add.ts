@@ -1,7 +1,7 @@
 import { IAppDataType } from "../../";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
-import Debug from "../../debug";
+import Debug from "debug";
 import {
   checkLanguageAndRegion,
   validateTokenAndGetData,
@@ -20,13 +20,14 @@ import {
   convertGQLValueToSQLValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sql";
-const debug = Debug("resolvers/actions/add");
 
+const debug = Debug("resolvers:addItemDefinition");
 export async function addItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
+  debug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
   // First we check the language and the region, based on the args
   // as we expect every request to contain this data and be
   // valid for our app
@@ -61,10 +62,9 @@ export async function addItemDefinition(
     }
   });
 
-  debug("extracted fields to add as", addingFields);
+  debug("Fields to add have been extracted as %j", addingFields);
 
-  debug("checking role access...");
-
+  debug("Checking role access for creation...");
   // now we check the role access for the given
   // create action
   itemDefinition.checkRoleAccessFor(
@@ -85,7 +85,6 @@ export async function addItemDefinition(
     true,
   );
 
-  debug("Checking role access for read...");
   // The rule for create and read are different
   // and set appart, one user might have the rule to
   // create something but not to read it, it's weird,
@@ -99,6 +98,12 @@ export async function addItemDefinition(
       requestedFieldsThatRepresentPropertiesAndItems[arg] = requestedFields[arg];
     }
   });
+
+  debug(
+    "Fields to be requested from the idef have been extracted as %j",
+    requestedFieldsThatRepresentPropertiesAndItems,
+  );
+  debug("Checking role access for read...");
   // so now we check the role access for the reading of
   // those fields, as you can see we use the userId of the user
   // since he will be the owner as well
@@ -158,8 +163,8 @@ export async function addItemDefinition(
   sqlModData.language = resolverArgs.args.language;
   sqlModData.country = resolverArgs.args.country;
 
-  debug("SQL Input data for idef", sqlIdefData);
-  debug("SQL Input data for module", sqlModData);
+  debug("SQL Input data for idef is %j", sqlIdefData);
+  debug("SQL Input data for module is %j", sqlModData);
 
   // now we check what is requested from where, from the module
   // and from the item definition table
@@ -212,7 +217,7 @@ export async function addItemDefinition(
     };
   });
 
-  debug("SQL Output is", value);
+  debug("SQL Output is %j", value);
   // now we convert that SQL value to the respective GQL value
   // the reason we pass the requested fields is to filter by the fields
   // that we actually want, not passing this would make the gql value
@@ -224,12 +229,16 @@ export async function addItemDefinition(
     requestedFields,
   );
 
-  // items that have just been added cannot be blocked or deleted, hence we just return
-  // right away without checking
-  return {
+  const finalOutput = {
     DATA: gqlValue,
     ...gqlValue,
   };
+
+  debug("SUCCEED with GQL output %j", finalOutput);
+
+  // items that have just been added cannot be blocked or deleted, hence we just return
+  // right away without checking
+  return finalOutput;
 }
 
 export function addItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {
