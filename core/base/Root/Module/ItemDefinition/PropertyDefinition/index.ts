@@ -164,15 +164,45 @@ export interface IPropertyDefinitionAlternativePropertyType {
   property: string;
 }
 
+export type PropertyDefinitionIndexCheckerFunctionType =
+  (property: PropertyDefinition, value: PropertyDefinitionSupportedType) => Promise<boolean>;
+
+async function clientSideIndexChecker(property: PropertyDefinition, value: PropertyDefinitionSupportedType) {
+  if (value === null) {
+    return true;
+  }
+
+  const qualifiedParentName = property.checkIfIsExtension() ?
+    property.getParentModule().getQualifiedPathName() :
+    property.getParentItemDefinition().getQualifiedPathName();
+  const result = await fetch("/rest/index-check/" + qualifiedParentName + "/" + property.getId(), {
+    method: "POST",
+    cache: "no-cache",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(value),
+  });
+  try {
+    return !!result.json();
+  } catch (err) {
+    return true;
+  }
+}
+
 const DOMWindow = JSDOM ? (new JSDOM("")).window : window;
 const DOMPurify = createDOMPurify ? createDOMPurify(DOMWindow) : null;
 
 // The class itself
 export default class PropertyDefinition {
-  public static currencyData: null;
   public static window: Window = DOMWindow;
   public static purifier: createDOMPurify.DOMPurifyI = DOMPurify;
   public static supportedTypesStandard = supportedTypesStandard;
+
+  // this static is required to be set in order to check currency types
+  public static currencyData: null;
+  // this static is required to be set in order to check for indexes
+  public static indexChecker: PropertyDefinitionIndexCheckerFunctionType = clientSideIndexChecker;
 
   public static getQualifiedPolicyPrefix(policyType: string, policyName: string) {
     return PREFIX_BUILD(
@@ -740,9 +770,16 @@ export default class PropertyDefinition {
       return standardErrOutput;
     }
 
-    // TODO unique index check
+    const hasIndex = this.isUnique();
+    if (hasIndex) {
+      const isValidIndex = await PropertyDefinition.indexChecker(this, value);
+      if (!isValidIndex) {
+        return PropertyInvalidReason.NOT_UNIQUE;
+      }
+    }
+
     // TODO autocomplete enforced check
-    return standardErrOutput;
+    return null;
   }
 
   /**

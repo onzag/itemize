@@ -9,6 +9,7 @@ import {
 import { getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue } from "../sql";
 import { IGQLValue } from "../gql";
+import Knex from "knex";
 
 /**
  * Provides the table that is necesary to include this module and all
@@ -71,7 +72,7 @@ export function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefinitionTy
 export function convertGQLValueToSQLValueForModule(
   mod: Module,
   data: IGQLValue,
-  knex: any,
+  knex: Knex,
   dictionary: string,
   partialFields?: any,
 ): ISQLTableRowValue {

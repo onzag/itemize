@@ -27,6 +27,10 @@ module.exports = {
         use: "null-loader"
       },
       {
+        test: path.resolve(__dirname, "node_modules/knex/index.js"),
+        use: "null-loader"
+      },
+      {
         test: /\.tsx?$/,
         exclude: /node_modules/,
         use: {

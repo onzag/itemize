@@ -217,10 +217,10 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // and we fetch the new data, as relevant, mostly the build, and the moment to patch
     const [newData] =
       await Promise.all([
-        fetch(`/resource/build.${localeToSet}.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
+        fetch(`/rest/resource/build.${localeToSet}.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
 
         localeToSet !== "en" ?
-          importScript(`/resource/${localeToSet}.moment.js?version=${(window as any).BUILD_NUMBER}`) : null,
+          importScript(`/rest/resource/${localeToSet}.moment.js?version=${(window as any).BUILD_NUMBER}`) : null,
       ]);
 
     // Now we patch moment

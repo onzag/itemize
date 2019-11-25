@@ -109,7 +109,7 @@ export function importScript(src: string) {
     // user data, either from local storage or the server side
     const guessedUserData = JSON.parse(
       previouslyGuessedData ||
-      await fetch(`/util/country`).then((r) => r.text()),
+      await fetch(`/rest/util/country`).then((r) => r.text()),
     );
 
     // and we set it to local storage afterwards, we don't need to waste requests
@@ -170,13 +170,13 @@ export function importScript(src: string) {
   // basically, we are going to keep this simple, only update the worker if it's
   // a new url, simple, even for this script the build number applies
   const [initialData, localeData, countryData, currencyData] = await Promise.all([
-    fetch(`/resource/build.${initialLang}.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
-    fetch(`/resource/lang.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
-    fetch(`/resource/countries.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
-    fetch(`/resource/currency.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
+    fetch(`/rest/resource/build.${initialLang}.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
+    fetch(`/rest/resource/lang.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
+    fetch(`/rest/resource/countries.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
+    fetch(`/rest/resource/currency.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
 
     initialLang !== "en" ?
-      importScript(`/resource/${initialLang}.moment.js?version=${(window as any).BUILD_NUMBER}`) : null,
+      importScript(`/rest/resource/${initialLang}.moment.js?version=${(window as any).BUILD_NUMBER}`) : null,
   ]);
 
   // the locale of moment is set, note how await was used, hence all the previous script

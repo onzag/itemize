@@ -695,8 +695,8 @@ export async function runPolicyCheck(
         valueForTheProperty,
         "",
         property.getId(),
-        policyName,
         knex,
+        policyName,
       );
 
       // now we add that into the expected policy list

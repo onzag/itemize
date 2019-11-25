@@ -4,6 +4,7 @@ import { IGQLValue } from "../../../../gql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N, CLASSIC_SEARCH_OPTIONAL_I18N } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
+import Knex from "knex";
 
 export interface IPropertyDefinitionSupportedLocationType {
   lng: number;
@@ -110,9 +111,15 @@ const typeValue: IPropertyDefinitionSupportedType = {
     value: IPropertyDefinitionSupportedLocationType,
     sqlPrefix: string,
     id: string,
-    columnName: string,
-    knex: any,
+    knex: Knex,
+    columnName?: string,
   ) => {
+    if (!columnName) {
+      return {
+        [sqlPrefix + id + "_LAT"]: value.lat,
+        [sqlPrefix + id + "_LNG"]: value.lng,
+      };
+    }
     return knex.raw(
       "?? = ? AND ?? = ? AS ??",
       [

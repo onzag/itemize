@@ -17,6 +17,7 @@ import {
 } from "../../../../../../constants";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
+import Knex from "knex";
 
 export interface IPropertyDefinitionSupportedUnitType {
   value: number;
@@ -109,9 +110,15 @@ const typeValue: IPropertyDefinitionSupportedType = {
     value: IPropertyDefinitionSupportedUnitType,
     sqlPrefix: string,
     id: string,
-    columnName: string,
-    knex: any,
+    knex: Knex,
+    columnName?: string,
   ) => {
+    if (!columnName) {
+      return {
+        [sqlPrefix + id + "_NORMALIZED_UNIT"]: value.normalizedUnit,
+        [sqlPrefix + id + "_NORMALIZED_VALUE"]: value.normalizedValue,
+      };
+    }
     return knex.raw(
       "?? = ? AND ?? = ? AS ??",
       [

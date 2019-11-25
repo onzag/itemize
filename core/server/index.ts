@@ -12,6 +12,9 @@ import Moment from "moment";
 import { DATETIME_FORMAT, TIME_FORMAT, DATE_FORMAT } from "../constants";
 import { GraphQLError } from "graphql";
 import { GraphQLDataInputError } from "../base/errors";
+import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql";
+import restServices from "./rest";
 
 // Setting the parsers, postgresql comes with
 // its own way to return this data and I want it
@@ -38,6 +41,7 @@ export interface IAppDataType {
   root: Root;
   index: string;
   countries: any;
+  currencies: any;
   config: any;
   knex: Knex;
 }
@@ -86,54 +90,13 @@ function initializeApp(appData: IAppDataType) {
     next();
   });
 
+  app.use("/rest", restServices(appData));
+
   app.use("/graphql", graphqlHTTP({
     schema: getGQLSchemaForRoot(appData.root, resolvers(appData)),
     graphiql: true,
     customFormatErrorFn,
   }));
-
-  app.get("/util/country", (req, res) => {
-    // Only occurs during development
-    res.setHeader("content-type", "application/json; charset=utf-8");
-
-    const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-    if (ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1") {
-      res.end(JSON.stringify({
-        country: "FI",
-        currency: "EUR",
-        language: "fi",
-      }));
-      return;
-    }
-
-    // Occurs during production
-    http.get(`http://api.ipstack.com/${ip}?access_key=${appData.config.ipStackAccessKey}`, (resp) => {
-      let data = "";
-      resp.on("data", (chunk) => {
-        data += chunk;
-      });
-      resp.on("end", () => {
-        const parsedData = JSON.parse(data);
-        res.end(JSON.stringify({
-          country: parsedData.country_code,
-          currency: appData.countries[parsedData.country_code] ? appData.countries[parsedData.country_code].currency || "EUR" : "EUR",
-          language: parsedData.languages[0] ? parsedData.languages[0].code :
-            (appData.countries[parsedData.country_code] ? appData.countries[parsedData.country_code].languages[0] || "en" : "en"),
-        }));
-      });
-    }).on("error", (err) => {
-      res.end("EN");
-    });
-  });
-
-  app.get("/resource/:resource", (req, res) => {
-    const resourceName: string = req.params.resource;
-    if (resourceName.indexOf("..") !== -1) {
-      res.setHeader("Content-Type", "text/plain");
-      res.end("Uh! uh! :) Directory Traversal Attack Denied :D");
-    }
-    res.sendFile(path.resolve(__dirname + `../../../data/${req.params.resource}`));
-  });
 
   app.get("*", (req, res) => {
     res.setHeader("content-type", "text/html; charset=utf-8");
@@ -145,18 +108,23 @@ function initializeApp(appData: IAppDataType) {
   let rawBuild: string;
   let config: any;
   let countries: any;
+  let currencies: any;
   let index: any;
   let build: any;
   let root: any;
-  [config, countries, index, rawBuild] = await Promise.all([
+  [config, countries, currencies, index, rawBuild] = await Promise.all([
     fsAsync.readFile("./dist/config.json", "utf8"),
     fsAsync.readFile("./dist/data/countries.json", "utf8"),
+    fsAsync.readFile("./dist/data/currencies.json", "utf8"),
     fsAsync.readFile("./dist/data/index.html", "utf8"),
     fsAsync.readFile("./dist/data/build.en.json", "utf8"),
   ]);
   config = JSON.parse(config);
   countries = JSON.parse(countries);
+  currencies = JSON.parse(currencies);
   build = JSON.parse(rawBuild);
+
+  PropertyDefinition.currencyData = currencies;
   root = new Root(build.root);
 
   // Retrieve the config for the database
@@ -181,10 +149,13 @@ function initializeApp(appData: IAppDataType) {
     connection: dbConnectionKnexConfig,
   });
 
+  PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
+
   initializeApp({
     root,
     index,
     countries,
+    currencies,
     config,
     knex,
   });

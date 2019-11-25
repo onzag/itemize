@@ -14,6 +14,7 @@ import {
 } from "./Item/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue } from "../../sql";
 import { IGQLValue } from "../../gql";
+import Knex from "knex";
 
 /**
  * Provides the table that is necesary to include this item definition as a whole
@@ -145,7 +146,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
 export function convertGQLValueToSQLValueForItemDefinition(
   itemDefinition: ItemDefinition,
   data: IGQLValue,
-  knex: any,
+  knex: Knex,
   dictionary: string,
   partialFields?: any,
 ): ISQLTableRowValue {

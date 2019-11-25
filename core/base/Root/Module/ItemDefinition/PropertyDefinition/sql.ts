@@ -3,6 +3,8 @@ import PropertyDefinition from "../PropertyDefinition";
 import { ISQLTableRowValue, ISQLTableDefinitionType } from "../../../sql";
 import { IGQLValue } from "../../../gql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces";
+import { CONNECTOR_SQL_COLUMN_FK_NAME } from "../../../../../constants";
+import Knex from "knex";
 
 export function getStandardSQLFnFor(type: string):
   (id: string, property: PropertyDefinition) => ISQLTableDefinitionType {
@@ -46,14 +48,20 @@ export function standardSQLEqualFn(
   value: PropertyDefinitionSupportedType,
   sqlPrefix: string,
   id: string,
-  columnName: string,
-  knex: any,
+  knex: Knex,
+  columnName?: string,
 ) {
+  if (!columnName) {
+    return {
+      [sqlPrefix + id]: value,
+    };
+  }
+
   return knex.raw(
     "?? = ? AS ??",
     [
       sqlPrefix + id,
-      value,
+      value as any,
       columnName,
     ],
   );
@@ -150,7 +158,7 @@ export function convertSQLValueToGQLValueForProperty(
 export function convertGQLValueToSQLValueForProperty(
   propertyDefinition: PropertyDefinition,
   data: IGQLValue,
-  knex: any,
+  knex: Knex,
   dictionary: string,
   prefix: string,
 ): ISQLTableRowValue {
@@ -211,4 +219,24 @@ export function buildSQLQueryForProperty(
     knexBuilder,
     dictionary,
   );
+}
+
+export async function serverSideIndexChecker(
+  knex: Knex,
+  property: PropertyDefinition,
+  value: PropertyDefinitionSupportedType,
+) {
+  if (value === null) {
+    return true;
+  }
+  const qualifiedParentName = property.checkIfIsExtension() ?
+    property.getParentModule().getQualifiedPathName() :
+    property.getParentItemDefinition().getQualifiedPathName();
+  const result = await knex.select(
+    property.checkIfIsExtension() ? "id" : CONNECTOR_SQL_COLUMN_FK_NAME,
+  ).from(qualifiedParentName)
+  .where(
+    property.getPropertyDefinitionDescription().sqlEqual(value, "", property.getId(), knex),
+  );
+  return !result.length;
 }

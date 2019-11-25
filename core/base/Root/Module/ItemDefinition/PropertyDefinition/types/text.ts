@@ -13,6 +13,7 @@ import {
   CLASSIC_SEARCH_OPTIONAL_I18N,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
+import Knex from "knex";
 
 export type PropertyDefinitionSupportedTextType = string;
 const typeValue: IPropertyDefinitionSupportedType = {
@@ -33,7 +34,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlIn: (
     value: PropertyDefinitionSupportedTextType,
     id: string, property: PropertyDefinition,
-    knex: any, dictionary: string,
+    knex: Knex, dictionary: string,
   ) => {
     if (value === null) {
       return {

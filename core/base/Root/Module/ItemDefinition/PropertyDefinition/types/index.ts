@@ -17,6 +17,7 @@ import location, { IPropertyDefinitionSupportedLocationType } from "./location";
 import files, { PropertyDefinitionSupportedFilesType } from "./files";
 import year, { PropertyDefinitionSupportedYearType } from "./year";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
+import Knex from "knex";
 
 // All the supported property types
 export type PropertyDefinitionSupportedTypeName =
@@ -71,7 +72,7 @@ export interface IPropertyDefinitionSupportedType {
     value: PropertyDefinitionSupportedType,
     id: string,
     property: PropertyDefinition,
-    knex: any,
+    knex: Knex,
     dictionary: string,
   ) => ISQLTableRowValue;
   // sqlOut basically gives the entire table as data, and the property id where it expects
@@ -88,8 +89,8 @@ export interface IPropertyDefinitionSupportedType {
     value: PropertyDefinitionSupportedType,
     sqlPrefix: string,
     id: string,
-    columnName: string,
-    knex: any,
+    knex: Knex,
+    columnName?: string,
   ) => any;
 
   // represents an item that would mark for null

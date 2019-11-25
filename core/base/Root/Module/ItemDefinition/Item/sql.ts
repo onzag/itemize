@@ -8,6 +8,7 @@ import {
 import Item, { ItemExclusionState } from "../Item";
 import { ISQLTableDefinitionType, ISQLTableRowValue } from "../../../sql";
 import { IGQLValue } from "../../../gql";
+import Knex from "knex";
 
 /**
  * Provides the table bit that is necessary to store item data
@@ -107,7 +108,7 @@ export function convertSQLValueToGQLValueForItem(item: Item, row: ISQLTableRowVa
 export function convertGQLValueToSQLValueForItem(
   item: Item,
   data: IGQLValue,
-  knex: any,
+  knex: Knex,
   dictionary: string,
   partialFields?: any,
 ): ISQLTableRowValue {

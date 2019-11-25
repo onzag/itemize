@@ -14,6 +14,7 @@ import {
   CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
+import Knex from "knex";
 
 export interface IPropertyDefinitionSupportedCurrencyType {
   value: number;
@@ -82,9 +83,15 @@ const typeValue: IPropertyDefinitionSupportedType = {
     value: IPropertyDefinitionSupportedCurrencyType,
     sqlPrefix: string,
     id: string,
-    columnName: string,
-    knex: any,
+    knex: Knex,
+    columnName?: string,
   ) => {
+    if (!columnName) {
+      return {
+        [sqlPrefix + id + "_CURRENCY"]: value.currency,
+        [sqlPrefix + id + "_VALUE"]: value.value,
+      };
+    }
     return knex.raw(
       "?? = ? AND ?? = ? AS ??",
       [
