@@ -127,7 +127,7 @@ export async function addItemDefinition(
   // are the values that are being set, remember rules in item defintions
   // can change the output, and yet keep things valid, so the arg can be invalid
   // if the output is different from it
-  serverSideCheckItemDefinitionAgainst(itemDefinition, resolverArgs.args);
+  await serverSideCheckItemDefinitionAgainst(itemDefinition, resolverArgs.args);
 
   // extract this information
   const mod = itemDefinition.getParentModule();

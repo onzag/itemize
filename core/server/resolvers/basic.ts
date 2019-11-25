@@ -460,7 +460,7 @@ const serverSideCheckItemDefinitionAgainstDebug = Debug("resolvers:serverSideChe
  * @param referredItem this is an optional item used to basically
  * provide better error logging
  */
-export function serverSideCheckItemDefinitionAgainst(
+export async function serverSideCheckItemDefinitionAgainst(
   itemDefinition: ItemDefinition,
   gqlArgValue: IGQLValue,
   referredItem?: Item,
@@ -471,7 +471,7 @@ export function serverSideCheckItemDefinitionAgainst(
     itemDefinition.getQualifiedPathName(),
   );
   // we get the current value of the item definition instance
-  const currentValue = itemDefinition.getCurrentValue();
+  const currentValue = await itemDefinition.getCurrentValue();
   serverSideCheckItemDefinitionAgainstDebug(
     "Current value is %j",
     currentValue,
@@ -517,7 +517,7 @@ export function serverSideCheckItemDefinitionAgainst(
   });
 
   // we now check the items
-  currentValue.items.forEach((itemValue) => {
+  for (const itemValue of currentValue.items) {
     // now we take the item itself
     const item = itemDefinition.getItemFor(itemValue.itemId);
     // the graphql item value
@@ -561,12 +561,12 @@ export function serverSideCheckItemDefinitionAgainst(
     }
     // now we run a server side check of item definition in the
     // specific item data, that's where we use our referred item
-    serverSideCheckItemDefinitionAgainst(
+    await serverSideCheckItemDefinitionAgainst(
       item.getItemDefinition(),
       gqlItemValue,
       item,
     );
-  });
+  }
 
   serverSideCheckItemDefinitionAgainstDebug("SUCCEED");
 }
@@ -621,7 +621,7 @@ export async function runPolicyCheck(
   const expectedActualPolicies: string[] = [];
 
   // so we loop in these policies
-  policiesForThisType.forEach((policyName) => {
+  for (const policyName of policiesForThisType) {
     runPolicyCheckDebug("found policy %s", policyName);
     // and we get the roles that need to apply to this policy
     const rolesForThisSpecificPolicy = itemDefinition.getRolesForPolicy(policyType, policyName);
@@ -633,14 +633,14 @@ export async function runPolicyCheck(
         role,
         rolesForThisSpecificPolicy,
       );
-      return;
+      continue;
     }
 
     // otherwise we need to see which properties are in consideration for this
     // policy
     const propertiesInContext = itemDefinition.getPropertiesForPolicy(policyType, policyName);
     // we loop through those properties
-    propertiesInContext.forEach((property) => {
+    for (const property of propertiesInContext) {
       runPolicyCheckDebug(
         "Found property in policy %s",
         property.getId(),
@@ -669,7 +669,7 @@ export async function runPolicyCheck(
 
       // now we check if it's a valid value, the value we have given, for the given property
       // this is a shallow check but works
-      const invalidReason = property.isValidValue(valueForTheProperty);
+      const invalidReason = await property.isValidValue(valueForTheProperty);
 
       // if we get an invalid reason, the policy cannot even pass there
       if (invalidReason) {
@@ -703,8 +703,8 @@ export async function runPolicyCheck(
       expectedActualPolicies.push(policyName);
       // and then we add the meta column into our selection columns
       selectionSQLColumns.push(selectionMetaColumn);
-    });
-  });
+    }
+  }
 
   // now we can make the policy query
   const policyQuery = knex.select(selectionSQLColumns).from(moduleTable);

@@ -579,6 +579,33 @@ export default class ItemDefinition {
   }
 
   /**
+   * same as getCurrentValue but ignores external checking
+   * so it doesn't have to be async and no need to spend
+   * network resources, checks most, but ignores unique and
+   * autocomplete checkings
+   */
+  public getCurrentValueNoExternalChecking(
+    onlyIncludeProperties?: string[],
+    excludeItems?: boolean,
+  ): IItemDefinitionValue {
+    const properties = onlyIncludeProperties ?
+      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false).getCurrentValueNoExternalChecking()) :
+      this.getParentModule().getAllPropExtensions().concat(
+        this.getAllPropertyDefinitions(),
+      ).map((pd) => {
+        return pd.getCurrentValueNoExternalChecking();
+      });
+
+    return {
+      moduleName: this.getModuleName(),
+      itemDefPath: this.getPath(),
+      itemDefName: this.getName(),
+      items: excludeItems ? [] : this.itemInstances.map((ii) => ii.getCurrentValueNoExternalChecking()),
+      properties,
+    };
+  }
+
+  /**
    * provides the structure of the current item
    * as it is currently, the reason this is more efficient
    * is because getting the value of each item definition
@@ -587,24 +614,26 @@ export default class ItemDefinition {
    * @param onlyIncludeProperties only includes these specific
    * properties, note property definitions are not fetched in
    * this case
+   * @param excludeItems excludes the items in the list
    */
-  public getCurrentValue(
+  public async getCurrentValue(
     onlyIncludeProperties?: string[],
     excludeItems?: boolean,
-  ): IItemDefinitionValue {
-    const properties = onlyIncludeProperties ?
+  ): Promise<IItemDefinitionValue> {
+    const properties = await Promise.all(onlyIncludeProperties ?
       onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false).getCurrentValue()) :
       this.getParentModule().getAllPropExtensions().concat(
         this.getAllPropertyDefinitions(),
       ).map((pd) => {
         return pd.getCurrentValue();
-      });
+      }),
+    );
 
     return {
       moduleName: this.getModuleName(),
       itemDefPath: this.getPath(),
       itemDefName: this.getName(),
-      items: excludeItems ? [] : this.itemInstances.map((ii) => ii.getCurrentValue()),
+      items: excludeItems ? [] : await Promise.all(this.itemInstances.map((ii: Item) => ii.getCurrentValue())),
       properties,
     };
   }

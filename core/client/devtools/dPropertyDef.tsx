@@ -75,12 +75,16 @@ export default class DevToolPropertyDefinition extends
       }
       return {
         detachedPropertyInstance,
-        currentValue: detachedPropertyInstance.getCurrentValue(),
+        currentValue: state.currentValue ? state.currentValue :
+          detachedPropertyInstance.getCurrentValueNoExternalChecking(),
         detachedPropertyForMainInstance: props.property,
       };
     }
     return null;
   }
+
+  private updateTimeout: NodeJS.Timer;
+  private lastUpdateId: number;
 
   constructor(props: IPropertyDefProps) {
     super(props);
@@ -117,10 +121,23 @@ export default class DevToolPropertyDefinition extends
     });
   }
   public onChange(newValue: PropertyDefinitionSupportedType, internalValue?: any) {
+    const currentUpdateId = (new Date()).getTime();
+    this.lastUpdateId = currentUpdateId;
+
     this.state.detachedPropertyInstance.setCurrentValue(newValue, internalValue);
     this.setState({
-      currentValue: this.state.detachedPropertyInstance.getCurrentValue(),
+      currentValue: this.state.detachedPropertyInstance.getCurrentValueNoExternalChecking(),
     });
+
+    clearTimeout(this.updateTimeout);
+    this.updateTimeout = setTimeout(async () => {
+      const newCurrentValue = await this.state.detachedPropertyInstance.getCurrentValue();
+      if (this.lastUpdateId === currentUpdateId) {
+        this.setState({
+          currentValue: newCurrentValue,
+        });
+      }
+    }, 300);
   }
   public render() {
     let valueToStringify = this.state.currentValue;

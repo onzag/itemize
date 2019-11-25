@@ -123,7 +123,7 @@ export async function editItemDefinition(
   itemDefinition.applyValueFromGQL(expectedUpdatedValue);
   // and then we check with the entire full value, we want to ensure no changes occurred
   // and that the updated value will be exactly the result and it will be valid
-  serverSideCheckItemDefinitionAgainst(itemDefinition, expectedUpdatedValue);
+  await serverSideCheckItemDefinitionAgainst(itemDefinition, expectedUpdatedValue);
 
   // now we calculate the fields that we are editing, and the fields that we are
   // requesting

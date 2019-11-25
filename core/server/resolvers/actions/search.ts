@@ -170,7 +170,7 @@ export async function searchItemDefinition(
 
   // Checking search mode counterpart to validate
   searchModeCounterpart.applyValueFromGQL(resolverArgs.args);
-  serverSideCheckItemDefinitionAgainst(searchModeCounterpart, resolverArgs.args);
+  await serverSideCheckItemDefinitionAgainst(searchModeCounterpart, resolverArgs.args);
 
   // retrieve basic information
   const mod = itemDefinition.getParentModule();

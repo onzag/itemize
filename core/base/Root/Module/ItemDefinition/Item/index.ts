@@ -351,7 +351,7 @@ export default class Item {
   /**
    * Provides the current value of this item
    */
-  public getCurrentValue(): IItemValue {
+  public getCurrentValueNoExternalChecking(): IItemValue {
     const exclusionState = this.getExclusionState();
     return {
       exclusionState,
@@ -359,7 +359,24 @@ export default class Item {
       itemId: this.getId(),
       itemName: this.getName(),
       itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
-        this.itemDefinition.getCurrentValue(this.rawData.sinkIn || [], true),
+        this.itemDefinition.getCurrentValueNoExternalChecking(this.rawData.sinkIn || [], true),
+      stateExclusion: this.stateExclusion,
+      stateExclusionModified: this.stateExclusionModified,
+    };
+  }
+
+  /**
+   * Provides the current value of this item
+   */
+  public async getCurrentValue(): Promise<IItemValue> {
+    const exclusionState = this.getExclusionState();
+    return {
+      exclusionState,
+      canExclusionBeSet: this.canExclusionBeSet(),
+      itemId: this.getId(),
+      itemName: this.getName(),
+      itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
+        (await this.itemDefinition.getCurrentValue(this.rawData.sinkIn || [], true)),
       stateExclusion: this.stateExclusion,
       stateExclusionModified: this.stateExclusionModified,
     };

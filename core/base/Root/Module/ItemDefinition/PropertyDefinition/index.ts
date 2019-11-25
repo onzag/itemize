@@ -122,7 +122,7 @@ export interface IPropertyDefinitionRawJSONDataType {
   specialProperties: {
     [key: string]: string | boolean | number;
   };
-  // TODO we might want to do something regarding getting the values and coersion
+  // whether nulls are coerced into their default value
   coerceNullsIntoDefault?: boolean;
 
   // role permissions
@@ -182,16 +182,23 @@ export default class PropertyDefinition {
 
   /**
    * Checks whether a value is valid or not using
-   * the raw data, NOTE!!!! this function is context unaware
+   * the raw data.
+   *
+   * NOTE!!!! this function is context unaware
    * and hence it cannot execute invalidIf conditional rule
    * set rules
+   *
+   * NOTE!!!!! this function is external events unaware
+   * and hence it cannot check for unique indexes and
+   * autocomplete enforced results
    *
    * @param propertyDefinitionRaw The raw json property definition data
    * @param value the value to check against
    * @param checkAgainstValues if to check against its own values
    * some properties are enums, and this checks whether to check against
-   * these enums, but you mighst not want to do that if checking that the
-   * enums itself are valid
+   * these enums, but for example, when checking the information on the enums
+   * during the checkers.ts process, we don't want to check that because
+   * then it will always be valid
    */
   public static isValidValue(
     propertyDefinitionRaw: IPropertyDefinitionRawJSONDataType,
@@ -205,9 +212,11 @@ export default class PropertyDefinition {
       return PropertyInvalidReason.NOT_NULLABLE;
     }
     // Check against the values if allowed
-    if (propertyDefinitionRaw.values &&
+    if (
+      propertyDefinitionRaw.values &&
       checkAgainstValues &&
-      !propertyDefinitionRaw.values.includes(value)) {
+      !propertyDefinitionRaw.values.includes(value)
+    ) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
     // we get the definition and run basic checks
@@ -255,8 +264,6 @@ export default class PropertyDefinition {
         return PropertyInvalidReason.TOO_FEW_DECIMALS;
       }
     }
-
-    // TODO here add the unique check
 
     // Special length check
     if (
@@ -475,12 +482,12 @@ export default class PropertyDefinition {
    * provides the current useful value for the property defintion
    * @returns a bunch of information about the current value
    */
-  public getCurrentValue(): IPropertyDefinitionValue {
+  public getCurrentValueNoExternalChecking(): IPropertyDefinitionValue {
 
     const possibleEnforcedValue = this.getEnforcedValue();
 
     if (possibleEnforcedValue.enforced) {
-      const possibleInvalidEnforcedReason = this.isValidValue(possibleEnforcedValue.value);
+      const possibleInvalidEnforcedReason = this.isValidValueNoExternalChecking(possibleEnforcedValue.value);
       // we return the value that was set to be
       return {
         userSet: false,
@@ -516,7 +523,68 @@ export default class PropertyDefinition {
     }
 
     const value = this.getCurrentValueClean();
-    const invalidReason = this.isValidValue(value);
+    const invalidReason = this.isValidValueNoExternalChecking(value);
+    return {
+      userSet: this.stateValueModified,
+      enforced: false,
+      default: !this.stateValueModified,
+      valid: !invalidReason,
+      invalidReason,
+      value,
+      hidden: this.isCurrentlyHidden(),
+      internalValue: this.stateValueModified ? this.stateinternalValue : null,
+      stateValue: this.stateValue,
+      stateValueModified: this.stateValueModified,
+      propertyId: this.getId(),
+    };
+  }
+
+  /**
+   * provides the current useful value for the property defintion
+   * @returns a bunch of information about the current value
+   */
+  public async getCurrentValue(): Promise<IPropertyDefinitionValue> {
+
+    const possibleEnforcedValue = this.getEnforcedValue();
+
+    if (possibleEnforcedValue.enforced) {
+      const possibleInvalidEnforcedReason = await this.isValidValue(possibleEnforcedValue.value);
+      // we return the value that was set to be
+      return {
+        userSet: false,
+        enforced: true,
+        default: false,
+        valid: !possibleInvalidEnforcedReason,
+        invalidReason: possibleInvalidEnforcedReason,
+        value: possibleEnforcedValue.value,
+        hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(),
+        internalValue: null,
+        stateValue: this.stateValue,
+        stateValueModified: this.stateValueModified,
+        propertyId: this.getId(),
+      };
+    }
+
+    // make if hidden if null if hidden is set to true
+    // note nulls set this way are always valid
+    if (this.rawData.nullIfHidden && this.isCurrentlyHidden()) {
+      return {
+        userSet: false,
+        enforced: true,
+        default: false,
+        valid: true,
+        invalidReason: null,
+        value: null,
+        hidden: true,
+        internalValue: null,
+        stateValue: this.stateValue,
+        stateValueModified: this.stateValueModified,
+        propertyId: this.getId(),
+      };
+    }
+
+    const value = this.getCurrentValueClean();
+    const invalidReason = await this.isValidValue(value);
     return {
       userSet: this.stateValueModified,
       enforced: false,
@@ -639,13 +707,12 @@ export default class PropertyDefinition {
   }
 
   /**
-   * Externally checks a valid value for this input using all
-   * its guns, this function is context aware
+   * Checks the valid value but ignores external checking
    *
    * @param value the value to check
    * @return the invalid reason as a string
    */
-  public isValidValue(value: PropertyDefinitionSupportedType): PropertyInvalidReason | string {
+  public isValidValueNoExternalChecking(value: PropertyDefinitionSupportedType): PropertyInvalidReason | string {
     if (this.invalidIf) {
       const invalidMatch = this.invalidIf.find((ii) => ii.if.evaluate());
       if (invalidMatch) {
@@ -657,6 +724,25 @@ export default class PropertyDefinition {
       value,
       true,
     );
+  }
+
+  /**
+   * Externally checks a valid value for this input using all
+   * its guns, this function is context aware
+   *
+   * @param value the value to check
+   * @return the invalid reason as a string
+   */
+  public async isValidValue(value: PropertyDefinitionSupportedType): Promise<PropertyInvalidReason | string> {
+    const standardErrOutput = this.isValidValueNoExternalChecking(value);
+
+    if (standardErrOutput) {
+      return standardErrOutput;
+    }
+
+    // TODO unique index check
+    // TODO autocomplete enforced check
+    return standardErrOutput;
   }
 
   /**

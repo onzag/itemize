@@ -78,12 +78,15 @@ export default class DevToolItemDefinition extends
         props.itemDef.applyValue(state.value);
       }
       return {
-        value: props.itemDef.getCurrentValue(),
+        value: state.value ? state.value : props.itemDef.getCurrentValueNoExternalChecking(),
         valueFor: props.itemDef,
       };
     }
     return null;
   }
+
+  private updateTimeout: NodeJS.Timer;
+  private lastUpdateId: number;
 
   constructor(props: IItemDefProps) {
     super(props);
@@ -155,17 +158,51 @@ export default class DevToolItemDefinition extends
       pokeEntries: !this.state.pokeEntries,
     });
   }
-  public onPropertyChange(property: PropertyDefinition, value: PropertyDefinitionSupportedType, internalValue: any) {
+  public onPropertyChange(
+    property: PropertyDefinition,
+    value: PropertyDefinitionSupportedType,
+    internalValue: any,
+  ) {
+    const currentUpdateId = (new Date()).getTime();
+    this.lastUpdateId = currentUpdateId;
+
     property.setCurrentValue(value, internalValue);
     this.setState({
-      value: this.props.itemDef.getCurrentValue(),
+      value: this.props.itemDef.getCurrentValueNoExternalChecking(),
     });
+
+    clearTimeout(this.updateTimeout);
+    this.updateTimeout = setTimeout(async () => {
+      const newValue = await this.props.itemDef.getCurrentValue();
+      if (this.lastUpdateId === currentUpdateId) {
+        this.setState({
+          value: newValue,
+        });
+      }
+    }, 300);
   }
   public onItemSetExclusionState(item: Item, state: ItemExclusionState) {
+    // TODO this functionality should be passed to the item entry object itself
+    // the developer shouldn't have to deal with this, just give them an onchange
+    // event and they are not able to set the value, we will also need a
+    // isExternalCheckingNecessary function for optimization
+    const currentUpdateId = (new Date()).getTime();
+    this.lastUpdateId = currentUpdateId;
+
     item.setExclusionState(state);
     this.setState({
-      value: this.props.itemDef.getCurrentValue(),
+      value: this.props.itemDef.getCurrentValueNoExternalChecking(),
     });
+
+    clearTimeout(this.updateTimeout);
+    this.updateTimeout = setTimeout(async () => {
+      const newValue = await this.props.itemDef.getCurrentValue();
+      if (this.lastUpdateId === currentUpdateId) {
+        this.setState({
+          value: newValue,
+        });
+      }
+    }, 300);
   }
   public render() {
     let valueToStringify: IItemDefinitionValue = null;
