@@ -17,12 +17,13 @@
     "suppressImplicitAnyIndexErrors": true,
     "rootDir": ".",
     "outDir": "dist",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
   },
   "compileOnSave": true,
   "exclude": [
     "node_modules",
-    "core/client"
+    "itemize/client"
   ],
   "include": [
     "**/*.ts"

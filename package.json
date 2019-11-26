@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "install": "tsc",
-    "build": "webpack && webpack --config ./webpack.config.production.js && node ./dist/core/builder/index.js",
+    "build": "webpack && webpack --config ./webpack.config.production.js && node ./dist/itemize/builder/index.js",
     "webpack-dev": "webpack",
     "webpack-prod": "webpack --config ./webpack.config.production.js",
-    "build-data": "node ./dist/core/builder/index.js",
-    "start": "node ./dist/core/server/index.js",
-    "build-database": "node ./dist/core/dbbuilder/index.js"
+    "build-data": "node ./dist/itemize/builder/index.js",
+    "start": "node ./dist/itemize/server/index.js",
+    "build-database": "node ./dist/itemize/dbbuilder/index.js"
   },
   "author": "Edward Gonzalez",
   "license": "ISC",

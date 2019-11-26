@@ -120,7 +120,7 @@ production other than one file is minified and stripped of its developer data
 ## Deployment
 
 Deployment is meant to be simple and only requires the folder `dist` and
-`node_modules` into the server, running `node ./dist/core/server.js` does
+`node_modules` into the server, running `node ./dist/itemize/server.js` does
 the job.
 
 Currently there's no multi threading support but it is meant to be added
