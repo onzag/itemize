@@ -41,7 +41,7 @@ export interface IAppDataType {
   root: Root;
   index: string;
   countries: any;
-  currencies: any;
+  currency: any;
   config: any;
   knex: Knex;
 }
@@ -108,23 +108,23 @@ function initializeApp(appData: IAppDataType) {
   let rawBuild: string;
   let config: any;
   let countries: any;
-  let currencies: any;
+  let currency: any;
   let index: any;
   let build: any;
   let root: any;
-  [config, countries, currencies, index, rawBuild] = await Promise.all([
+  [config, countries, currency, index, rawBuild] = await Promise.all([
     fsAsync.readFile("./dist/config.json", "utf8"),
     fsAsync.readFile("./dist/data/countries.json", "utf8"),
-    fsAsync.readFile("./dist/data/currencies.json", "utf8"),
+    fsAsync.readFile("./dist/data/currency.json", "utf8"),
     fsAsync.readFile("./dist/data/index.html", "utf8"),
     fsAsync.readFile("./dist/data/build.en.json", "utf8"),
   ]);
   config = JSON.parse(config);
   countries = JSON.parse(countries);
-  currencies = JSON.parse(currencies);
+  currency = JSON.parse(currency);
   build = JSON.parse(rawBuild);
 
-  PropertyDefinition.currencyData = currencies;
+  PropertyDefinition.currencyData = currency;
   root = new Root(build.root);
 
   // Retrieve the config for the database
@@ -155,7 +155,7 @@ function initializeApp(appData: IAppDataType) {
     root,
     index,
     countries,
-    currencies,
+    currency,
     config,
     knex,
   });

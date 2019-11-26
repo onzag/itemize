@@ -7,11 +7,24 @@ import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/Prope
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import bodyParser from "body-parser";
+import { strict } from "assert";
 
 export default function restServices(appData: IAppDataType) {
   const router = express.Router();
+  const bodyParserJSON = bodyParser.json({
+    strict: false,
+  });
 
-  router.use(bodyParser.json());
+  router.use((req, res, next) => {
+    bodyParserJSON(req, res, (err) => {
+      if (err) {
+        res.status(400);
+        res.end("Malformed JSON");
+      } else {
+        next();
+      }
+    });
+  });
 
   async function routerIndexChecker(property: PropertyDefinition, req: express.Request, res: express.Response) {
     res.setHeader("content-type", "application/json; charset=utf-8");
@@ -102,7 +115,7 @@ export default function restServices(appData: IAppDataType) {
     });
   });
 
-  router.get("/rest/resource/:resource", (req, res) => {
+  router.get("/resource/:resource", (req, res) => {
     const resourceName: string = req.params.resource;
     if (resourceName.indexOf("..") !== -1) {
       res.setHeader("Content-Type", "text/plain");
@@ -112,6 +125,11 @@ export default function restServices(appData: IAppDataType) {
   });
 
   appData.root.getAllModules().forEach(buildRouteForModule);
+
+  router.use((req, res) => {
+    res.status(404);
+    res.end("Unknown Endpoint");
+  });
 
   return router;
 }
