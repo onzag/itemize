@@ -457,12 +457,14 @@ const serverSideCheckItemDefinitionAgainstDebug = Debug("resolvers:serverSideChe
  * you should run itemDefinition.applyValueFromGQL(gqlArgValue);
  * @param itemDefinition the item definition in question
  * @param gqlArgValue the arg value that was set
+ * @param id the stored item id, if available, or null
  * @param referredItem this is an optional item used to basically
  * provide better error logging
  */
 export async function serverSideCheckItemDefinitionAgainst(
   itemDefinition: ItemDefinition,
   gqlArgValue: IGQLValue,
+  id: number,
   referredItem?: Item,
 ) {
   serverSideCheckItemDefinitionAgainstDebug(
@@ -471,7 +473,7 @@ export async function serverSideCheckItemDefinitionAgainst(
     itemDefinition.getQualifiedPathName(),
   );
   // we get the current value of the item definition instance
-  const currentValue = await itemDefinition.getCurrentValue();
+  const currentValue = await itemDefinition.getCurrentValue(id);
   serverSideCheckItemDefinitionAgainstDebug(
     "Current value is %j",
     currentValue,
@@ -564,6 +566,7 @@ export async function serverSideCheckItemDefinitionAgainst(
     await serverSideCheckItemDefinitionAgainst(
       item.getItemDefinition(),
       gqlItemValue,
+      id,
       item,
     );
   }
@@ -669,7 +672,7 @@ export async function runPolicyCheck(
 
       // now we check if it's a valid value, the value we have given, for the given property
       // this is a shallow check but works
-      const invalidReason = await property.isValidValue(valueForTheProperty);
+      const invalidReason = await property.isValidValue(valueForTheProperty, id);
 
       // if we get an invalid reason, the policy cannot even pass there
       if (invalidReason) {

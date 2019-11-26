@@ -29,11 +29,18 @@ export default function restServices(appData: IAppDataType) {
   async function routerIndexChecker(property: PropertyDefinition, req: express.Request, res: express.Response) {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
-    const value: any = req.body;
+    const value: any = req.body.value;
+    const id: number = req.body.id;
+    if (typeof id !== "number" && id !== null) {
+      res.status(400);
+      res.end("Invalid Input on id");
+      return;
+    }
     const definition = property.getPropertyDefinitionDescription();
+
     if (definition.json && typeof value !== definition.json) {
       res.status(400);
-      res.end("Invalid Input");
+      res.end("Invalid Input on value");
       return;
     }
     if (definition.validate) {
@@ -47,7 +54,7 @@ export default function restServices(appData: IAppDataType) {
         return;
       }
     }
-    const isValid = await serverSideIndexChecker(appData.knex, property, value);
+    const isValid = await serverSideIndexChecker(appData.knex, property, value, id);
     res.end(JSON.stringify(isValid));
   }
 

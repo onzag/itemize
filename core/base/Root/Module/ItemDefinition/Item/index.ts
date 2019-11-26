@@ -367,8 +367,9 @@ export default class Item {
 
   /**
    * Provides the current value of this item
+   * @param id the id of the stored item definition or module
    */
-  public async getCurrentValue(): Promise<IItemValue> {
+  public async getCurrentValue(id: number): Promise<IItemValue> {
     const exclusionState = this.getExclusionState();
     return {
       exclusionState,
@@ -376,7 +377,7 @@ export default class Item {
       itemId: this.getId(),
       itemName: this.getName(),
       itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
-        (await this.itemDefinition.getCurrentValue(this.rawData.sinkIn || [], true)),
+        (await this.itemDefinition.getCurrentValue(id, this.rawData.sinkIn || [], true)),
       stateExclusion: this.stateExclusion,
       stateExclusionModified: this.stateExclusionModified,
     };

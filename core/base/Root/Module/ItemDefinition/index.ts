@@ -611,21 +611,23 @@ export default class ItemDefinition {
    * is because getting the value of each item definition
    * wastes resources, so using this function is more
    * efficient than calling the functions
+   * @param id the stored value of the item definition, pass null if new
    * @param onlyIncludeProperties only includes these specific
    * properties, note property definitions are not fetched in
    * this case
    * @param excludeItems excludes the items in the list
    */
   public async getCurrentValue(
+    id: number,
     onlyIncludeProperties?: string[],
     excludeItems?: boolean,
   ): Promise<IItemDefinitionValue> {
     const properties = await Promise.all(onlyIncludeProperties ?
-      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false).getCurrentValue()) :
+      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false).getCurrentValue(id)) :
       this.getParentModule().getAllPropExtensions().concat(
         this.getAllPropertyDefinitions(),
       ).map((pd) => {
-        return pd.getCurrentValue();
+        return pd.getCurrentValue(id);
       }),
     );
 
@@ -633,7 +635,7 @@ export default class ItemDefinition {
       moduleName: this.getModuleName(),
       itemDefPath: this.getPath(),
       itemDefName: this.getName(),
-      items: excludeItems ? [] : await Promise.all(this.itemInstances.map((ii: Item) => ii.getCurrentValue())),
+      items: excludeItems ? [] : await Promise.all(this.itemInstances.map((ii: Item) => ii.getCurrentValue(id))),
       properties,
     };
   }

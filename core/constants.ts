@@ -1,5 +1,5 @@
 import {
-  GraphQLID,
+  GraphQLInt,
   GraphQLNonNull,
   GraphQLString,
   GraphQLEnumType,
@@ -199,7 +199,7 @@ export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
 // INVALID RESERVED PROPERTY NAMES
 export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   id: {
-    type: GraphQLNonNull(GraphQLID),
+    type: GraphQLNonNull(GraphQLInt),
     description: "The id of the object",
   },
   type: {
@@ -211,7 +211,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "When the item was created",
   },
   created_by: {
-    type: GraphQLNonNull(GraphQLID),
+    type: GraphQLNonNull(GraphQLInt),
     description: "The id of the user who created this item",
   },
   language: {
@@ -235,7 +235,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "When a moderator or admin reviewed this object",
   },
   reviewed_by: {
-    type: GraphQLID,
+    type: GraphQLInt,
     description: "The user id who reviewed it",
   },
   blocked_at: {
@@ -250,7 +250,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "Basically makes the block be temporary and will be automatically lifted by the database",
   },
   blocked_by: {
-    type: GraphQLID,
+    type: GraphQLInt,
     description: "By whom it was blocked",
   },
   blocked_reason: {
@@ -262,7 +262,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "Moderation comments",
   },
   flagged_by: {
-    type: GraphQLList(GraphQLID),
+    type: GraphQLList(GraphQLInt),
     description: "Users who flagged this item",
   },
   flagged_reasons: {
@@ -365,7 +365,7 @@ export const ID_CONTAINER_GQL = new GraphQLObjectType({
   name: "ID_CONTAINER",
   fields: {
     ids: {
-      type: GraphQLList(GraphQLNonNull(GraphQLID)),
+      type: GraphQLList(GraphQLNonNull(GraphQLInt)),
     },
   },
 });
@@ -422,14 +422,14 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = {
 export const RESERVED_GETTER_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   id: {
-    type: GraphQLNonNull(GraphQLID),
+    type: GraphQLNonNull(GraphQLInt),
     description: "the id for that item",
   },
 };
 export const RESERVED_GETTER_LIST_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   ids: {
-    type: GraphQLNonNull(GraphQLID),
+    type: GraphQLNonNull(GraphQLInt),
     description: "the ids list for that item",
   },
 };

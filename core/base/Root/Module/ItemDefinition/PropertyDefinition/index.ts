@@ -165,9 +165,13 @@ export interface IPropertyDefinitionAlternativePropertyType {
 }
 
 export type PropertyDefinitionIndexCheckerFunctionType =
-  (property: PropertyDefinition, value: PropertyDefinitionSupportedType) => Promise<boolean>;
+  (property: PropertyDefinition, value: PropertyDefinitionSupportedType, id: number) => Promise<boolean>;
 
-async function clientSideIndexChecker(property: PropertyDefinition, value: PropertyDefinitionSupportedType) {
+async function clientSideIndexChecker(
+  property: PropertyDefinition,
+  value: PropertyDefinitionSupportedType,
+  id: number,
+) {
   if (value === null) {
     return true;
   }
@@ -181,7 +185,10 @@ async function clientSideIndexChecker(property: PropertyDefinition, value: Prope
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(value),
+    body: JSON.stringify({
+      value,
+      id,
+    }),
   });
   try {
     return !!result.json();
@@ -571,14 +578,15 @@ export default class PropertyDefinition {
 
   /**
    * provides the current useful value for the property defintion
+   * @param id the id of the current item definition as stored, pass null if not stored
    * @returns a bunch of information about the current value
    */
-  public async getCurrentValue(): Promise<IPropertyDefinitionValue> {
+  public async getCurrentValue(id: number): Promise<IPropertyDefinitionValue> {
 
     const possibleEnforcedValue = this.getEnforcedValue();
 
     if (possibleEnforcedValue.enforced) {
-      const possibleInvalidEnforcedReason = await this.isValidValue(possibleEnforcedValue.value);
+      const possibleInvalidEnforcedReason = await this.isValidValue(possibleEnforcedValue.value, id);
       // we return the value that was set to be
       return {
         userSet: false,
@@ -614,7 +622,7 @@ export default class PropertyDefinition {
     }
 
     const value = this.getCurrentValueClean();
-    const invalidReason = await this.isValidValue(value);
+    const invalidReason = await this.isValidValue(value, id);
     return {
       userSet: this.stateValueModified,
       enforced: false,
@@ -761,9 +769,13 @@ export default class PropertyDefinition {
    * its guns, this function is context aware
    *
    * @param value the value to check
+   * @param id the id of the item as stored (pass null if new)
    * @return the invalid reason as a string
    */
-  public async isValidValue(value: PropertyDefinitionSupportedType): Promise<PropertyInvalidReason | string> {
+  public async isValidValue(
+    value: PropertyDefinitionSupportedType,
+    id: number,
+  ): Promise<PropertyInvalidReason | string> {
     const standardErrOutput = this.isValidValueNoExternalChecking(value);
 
     if (standardErrOutput) {
@@ -772,7 +784,7 @@ export default class PropertyDefinition {
 
     const hasIndex = this.isUnique();
     if (hasIndex) {
-      const isValidIndex = await PropertyDefinition.indexChecker(this, value);
+      const isValidIndex = await PropertyDefinition.indexChecker(this, value, id);
       if (!isValidIndex) {
         return PropertyInvalidReason.NOT_UNIQUE;
       }
