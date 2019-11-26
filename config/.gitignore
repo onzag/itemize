@@ -1,3 +1,4 @@
-*
-!dbhistory
-!.gitignore
+/dbhistory
+db.sensitive.json
+index.sensitive.json
+index.json

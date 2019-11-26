@@ -120,7 +120,7 @@ function initializeApp(appData: IAppDataType) {
 
   // Retrieve the config for the database
   const dbConfig = JSON.parse(await fsAsync.readFile(
-    path.join("config", "db.json"),
+    path.join("config", "db.sensitive.json"),
     "utf8",
   ));
 

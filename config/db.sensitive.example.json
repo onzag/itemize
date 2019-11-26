@@ -1,0 +1,7 @@
+{
+    "host": "localhost",
+    "port": 5432,
+    "user": "POSTGRESQL_USER",
+    "password": "PASSWORD",
+    "database": "POSTGRESQL_DB"
+}

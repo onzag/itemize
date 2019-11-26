@@ -95,15 +95,15 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
 (async () => {
   try {
     const rawDataConfigBase = JSON.parse(
-      await fsAsync.readFile("config.json", "utf8"),
+      await fsAsync.readFile(path.join("config", "index.json"), "utf8"),
     );
-    const rawDataConfigExtra = JSON.parse(await fsAsync.readFile(
-      path.join("config", "index.json"),
+    const sensitiveConfigExtra = JSON.parse(await fsAsync.readFile(
+      path.join("config", "index.sensitive.json"),
       "utf8",
     ));
     const rawDataConfig = {
       ...rawDataConfigBase,
-      ...rawDataConfigExtra,
+      ...sensitiveConfigExtra,
     };
     await Promise.all([
       buildData(rawDataConfig),
@@ -121,8 +121,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
 })();
 
 async function buildData(rawData: any) {
-  const entry = rawData.entry;
-  const entryPoint = path.join("data", entry);
+  const entryPoint = "data";
 
   // lets get the actual location of the item, lets assume first
   // it is the given location

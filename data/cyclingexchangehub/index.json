@@ -1,8 +1,0 @@
-{
-  "type": "root",
-  "includes": [
-    "../../itemize/data/test",
-    "../../itemize/data/users"
-  ],
-  "i18n": "../../itemize/data/index.properties"
-}
