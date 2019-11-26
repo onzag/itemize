@@ -191,7 +191,7 @@ async function clientSideIndexChecker(property: PropertyDefinition, value: Prope
 }
 
 const DOMWindow = JSDOM ? (new JSDOM("")).window : window;
-const DOMPurify = createDOMPurify ? createDOMPurify(DOMWindow) : null;
+const DOMPurify = createDOMPurify(DOMWindow);
 
 // The class itself
 export default class PropertyDefinition {

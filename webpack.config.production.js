@@ -18,11 +18,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: path.resolve(__dirname, "node_modules/jsdom/index.js"),
-        use: "null-loader"
-      },
-      {
-        test: path.resolve(__dirname, "node_modules/dompurify/index.js"),
+        test: path.resolve(__dirname, "node_modules/jsdom/lib/api.js"),
         use: "null-loader"
       },
       {
