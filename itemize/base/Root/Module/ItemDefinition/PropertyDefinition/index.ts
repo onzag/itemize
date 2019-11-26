@@ -190,7 +190,7 @@ async function clientSideIndexChecker(
     }),
   });
   try {
-    return !!result.json();
+    return !!(await result.json());
   } catch (err) {
     return true;
   }

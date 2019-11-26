@@ -1,5 +1,4 @@
 import React from "react";
-import DevTools from "../devtools";
 import Root, { IRootRawJSONDataType, Ii18NType, IRawJSONBuildDataType } from "../../base/Root";
 import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
 import { createMuiTheme } from "@material-ui/core";
@@ -72,6 +71,8 @@ interface IAppProps {
   initialCountry: string;
 
   localeData: ILocaleDataType;
+
+  mainComponent: React.ReactElement;
 }
 
 // so you can see here, the specified country and currency
@@ -330,9 +331,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
           locale={currentActualLanguageDeregionalized}
           moment={Moment}
         >
-          <h1>It works!</h1>
-
-          {isDevelopment ? <DevTools /> : null}
+          {this.props.mainComponent}
         </MuiPickersUtilsProvider>
       </LocaleContext.Provider>
     );

@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   mode: 'development',
-  entry: ["babel-polyfill", './itemize/client/index.tsx'],
+  entry: ["babel-polyfill", './src/client/index.tsx'],
   devtool: 'inline-source-map',
   plugins: [
     new MiniCssExtractPlugin({

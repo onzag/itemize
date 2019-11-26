@@ -39,7 +39,7 @@ export function importScript(src: string) {
   });
 }
 
-(async () => {
+export async function initializeItemizeApp(mainComponent: React.ReactElement) {
   // basically the way this website works is that the
   // language is the first argument of the location url
   // so /en/whatever /fi/whatever, determine the language
@@ -189,8 +189,10 @@ export function importScript(src: string) {
 
         initialCurrency={initialCurrency}
         initialCountry={initialCountry}
+
+        mainComponent={mainComponent}
       />
     </Router>,
     document.getElementById("app"),
   );
-})();
+}
