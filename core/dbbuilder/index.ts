@@ -71,7 +71,12 @@ export function yesno(question: string) {
 
   // this function will modify actual
   // for the actual executed functions
-  await buildDatabase(knex, oldDatabaseSchema, actual);
+  try {
+    await buildDatabase(knex, oldDatabaseSchema, actual);
+  } catch (err) {
+    console.error(err.stack);
+    return;
+  }
   knex.destroy();
 
   // write the resulting actual

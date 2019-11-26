@@ -13,11 +13,11 @@ export async function buildIndexes(
   for (const tableName of Object.keys(newDatabaseSchema)) {
     // the result table schema for that specific table
     const newTableSchema = newDatabaseSchema[tableName];
-    const oldTableSchema = oldDatabaseSchema[tableName];
+    const oldTableSchema = oldDatabaseSchema && oldDatabaseSchema[tableName];
 
     for (const columnName of Object.keys(newTableSchema)) {
       const newColumnSchema = newTableSchema[columnName];
-      const oldColumnSchema = oldTableSchema[columnName];
+      const oldColumnSchema = oldTableSchema && oldTableSchema[columnName];
       const newIndexType = newColumnSchema.index;
       let wasSupposedToDropOldIndexButDidnt = false;
 
