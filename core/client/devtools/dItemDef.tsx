@@ -173,7 +173,7 @@ export default class DevToolItemDefinition extends
 
     clearTimeout(this.updateTimeout);
     this.updateTimeout = setTimeout(async () => {
-      const newValue = await this.props.itemDef.getCurrentValue();
+      const newValue = await this.props.itemDef.getCurrentValue(null);
       if (this.lastUpdateId === currentUpdateId) {
         this.setState({
           value: newValue,
@@ -196,7 +196,7 @@ export default class DevToolItemDefinition extends
 
     clearTimeout(this.updateTimeout);
     this.updateTimeout = setTimeout(async () => {
-      const newValue = await this.props.itemDef.getCurrentValue();
+      const newValue = await this.props.itemDef.getCurrentValue(null);
       if (this.lastUpdateId === currentUpdateId) {
         this.setState({
           value: newValue,

@@ -131,7 +131,7 @@ export default class DevToolPropertyDefinition extends
 
     clearTimeout(this.updateTimeout);
     this.updateTimeout = setTimeout(async () => {
-      const newCurrentValue = await this.state.detachedPropertyInstance.getCurrentValue();
+      const newCurrentValue = await this.state.detachedPropertyInstance.getCurrentValue(null);
       if (this.lastUpdateId === currentUpdateId) {
         this.setState({
           currentValue: newCurrentValue,
