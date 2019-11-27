@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 import Root from "../base/Root";
 import resolvers from "./resolvers";
-import { getGQLSchemaForRoot } from "../base/Root/gql";
+import { getGQLSchemaForRoot, IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
 import Knex from "knex";
 import { types } from "pg";
 import Moment from "moment";
@@ -15,6 +15,8 @@ import { GraphQLDataInputError } from "../base/errors";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql";
 import restServices from "./rest";
+import { customUserQueries } from "./user/queries";
+import { customUserMutations } from "./user/mutations";
 
 // Setting the parsers, postgresql comes with
 // its own way to return this data and I want it
@@ -42,6 +44,13 @@ export interface IAppDataType {
   index: string;
   config: any;
   knex: Knex;
+}
+
+export interface IServerCustomizationDataType {
+  customGQLQueries?: IGQLQueryFieldsDefinitionType;
+  customGQLMutations?: IGQLQueryFieldsDefinitionType;
+  customRouterEndpoint?: string;
+  customRouter?: express.Router;
 }
 
 const customFormatErrorFn = (error: GraphQLError) => {
@@ -81,8 +90,7 @@ const customFormatErrorFn = (error: GraphQLError) => {
   };
 };
 
-function initializeApp(appData: IAppDataType) {
-
+function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataType) {
   app.use((req, res, next) => {
     res.removeHeader("X-Powered-By");
     next();
@@ -91,10 +99,27 @@ function initializeApp(appData: IAppDataType) {
   app.use("/rest", restServices(appData));
 
   app.use("/graphql", graphqlHTTP({
-    schema: getGQLSchemaForRoot(appData.root, resolvers(appData)),
+    schema: getGQLSchemaForRoot(
+      appData.root,
+      {
+        ...customUserQueries,
+        ...custom.customGQLQueries,
+      },
+      {
+        ...customUserMutations,
+        ...custom.customGQLMutations,
+      },
+      resolvers(appData),
+    ),
     graphiql: true,
     customFormatErrorFn,
   }));
+
+  if (custom.customRouterEndpoint) {
+    app.use(custom.customRouterEndpoint, custom.customRouter);
+  } else if (custom.customRouter) {
+    app.use(custom.customRouter);
+  }
 
   app.get("*", (req, res) => {
     res.setHeader("content-type", "text/html; charset=utf-8");
@@ -102,7 +127,7 @@ function initializeApp(appData: IAppDataType) {
   });
 }
 
-(async () => {
+export async function initializeServer(custom: IServerCustomizationDataType = {}) {
   let rawBuild: string;
   let config: any;
   let index: any;
@@ -147,9 +172,9 @@ function initializeApp(appData: IAppDataType) {
     index,
     config,
     knex,
-  });
+  }, custom);
 
   http.createServer(app).listen(config.port, () => {
     console.log("listening at", config.port);
   });
-})();
+}

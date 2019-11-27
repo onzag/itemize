@@ -11,6 +11,7 @@ import Module, { OnStateChangeListenerType } from "../..";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
 import { GraphQLDataInputError } from "../../../../errors";
 import { DOMWindow } from "../../../../util";
+import equals from "deep-equal";
 
 export enum PropertyInvalidReason {
   UNSPECIFIED = "UNSPECIFIED",
@@ -175,6 +176,13 @@ async function clientSideIndexChecker(
     return true;
   }
 
+  if (
+    property.lastUniqueCheckId === id &&
+    (property.lastUniqueCheckValue === value || equals(property.lastUniqueCheckValue, value))
+  ) {
+    return property.lastUniqueCheckValid;
+  }
+
   const qualifiedParentName = property.checkIfIsExtension() ?
     property.getParentModule().getQualifiedPathName() :
     property.getParentItemDefinition().getQualifiedPathName();
@@ -190,7 +198,11 @@ async function clientSideIndexChecker(
     }),
   });
   try {
-    return !!(await result.json());
+    const output = await result.json();
+    property.lastUniqueCheckValid = output;
+    property.lastUniqueCheckValue = value;
+    property.lastUniqueCheckId = id;
+    return !!output;
   } catch (err) {
     return true;
   }
@@ -329,6 +341,10 @@ export default class PropertyDefinition {
 
     return null;
   }
+
+  public lastUniqueCheckValid: boolean;
+  public lastUniqueCheckValue: PropertyDefinitionSupportedType;
+  public lastUniqueCheckId: number;
 
   public rawData: IPropertyDefinitionRawJSONDataType;
   private parentModule: Module;
@@ -508,15 +524,20 @@ export default class PropertyDefinition {
   }
 
   /**
-   * provides the current useful value for the property defintion
+   * provides the current useful value for the property defintion without doing
+   * any external checking, pass the id still as a cache of previously external
+   * checked results might apply
+   * @param id the id of the current item definition as stored, pass null if not stored
    * @returns a bunch of information about the current value
    */
-  public getCurrentValueNoExternalChecking(): IPropertyDefinitionValue {
+  public getCurrentValueNoExternalChecking(id: number): IPropertyDefinitionValue {
 
     const possibleEnforcedValue = this.getEnforcedValue();
 
     if (possibleEnforcedValue.enforced) {
-      const possibleInvalidEnforcedReason = this.isValidValueNoExternalChecking(possibleEnforcedValue.value);
+      const possibleInvalidEnforcedReason = this.isValidValueNoExternalChecking(
+        possibleEnforcedValue.value, id,
+      );
       // we return the value that was set to be
       return {
         userSet: false,
@@ -552,7 +573,7 @@ export default class PropertyDefinition {
     }
 
     const value = this.getCurrentValueClean();
-    const invalidReason = this.isValidValueNoExternalChecking(value);
+    const invalidReason = this.isValidValueNoExternalChecking(value, id);
     return {
       userSet: this.stateValueModified,
       enforced: false,
@@ -738,11 +759,30 @@ export default class PropertyDefinition {
 
   /**
    * Checks the valid value but ignores external checking
+   * pass the value still because cache might apply of previous
+   * external checking
    *
    * @param value the value to check
+   * @param id the id of the item as stored (pass null if new)
    * @return the invalid reason as a string
    */
-  public isValidValueNoExternalChecking(value: PropertyDefinitionSupportedType): PropertyInvalidReason | string {
+  public isValidValueNoExternalChecking(
+    value: PropertyDefinitionSupportedType,
+    id: number,
+  ): PropertyInvalidReason | string {
+
+    // Cache check
+    const hasIndex = this.isUnique();
+    if (hasIndex) {
+      if (
+        this.lastUniqueCheckId === id &&
+        (this.lastUniqueCheckValue === value || equals(this.lastUniqueCheckValue, value)) &&
+        !this.lastUniqueCheckValid
+      ) {
+        return PropertyInvalidReason.NOT_UNIQUE;
+      }
+    }
+
     if (this.invalidIf) {
       const invalidMatch = this.invalidIf.find((ii) => ii.if.evaluate());
       if (invalidMatch) {
@@ -768,7 +808,7 @@ export default class PropertyDefinition {
     value: PropertyDefinitionSupportedType,
     id: number,
   ): Promise<PropertyInvalidReason | string> {
-    const standardErrOutput = this.isValidValueNoExternalChecking(value);
+    const standardErrOutput = this.isValidValueNoExternalChecking(value, id);
 
     if (standardErrOutput) {
       return standardErrOutput;

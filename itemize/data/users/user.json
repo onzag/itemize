@@ -8,6 +8,20 @@
             "unique": true
         },
         {
+            "id": "app_lang_locale",
+            "type": "string",
+            "nullable": true,
+            "hidden": true,
+            "searchLevel": "disabled"
+        },
+        {
+            "id": "currency",
+            "type": "string",
+            "nullable": true,
+            "hidden": true,
+            "searchLevel": "disabled"
+        },
+        {
             "id": "email",
             "type": "string",
             "subtype": "email",

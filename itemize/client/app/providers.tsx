@@ -30,7 +30,9 @@ export const ModuleContext = React.createContext<IModuleContextType>(null);
 interface IItemDefinitionProviderProps {
   children: any;
   itemDefinition: string;
+  forId?: number;
   searchCounterpart?: boolean;
+  disableExternalChecks?: boolean;
 }
 
 interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProps {
@@ -41,6 +43,7 @@ interface IActualItemDefinitionProviderState {
   value: IItemDefinitionValue;
   valueFor: ItemDefinition;
   valueForQualifiedName: string;
+  valueForContainsExternallyCheckedProperty: boolean;
 }
 
 class ActualItemDefinitionProvider extends
@@ -63,6 +66,7 @@ class ActualItemDefinitionProvider extends
       newValueFor.applyValue(state.value);
       return {
         valueFor: newValueFor,
+        valueForContainsExternallyCheckedProperty: newValueFor.containsAnExternallyCheckedProperty(),
       };
     }
     return null;
@@ -80,20 +84,22 @@ class ActualItemDefinitionProvider extends
     }
 
     this.state = {
-      value: valueFor.getCurrentValueNoExternalChecking(),
+      value: valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
       valueFor,
       valueForQualifiedName: valueFor.getQualifiedPathName(),
+      valueForContainsExternallyCheckedProperty: valueFor.containsAnExternallyCheckedProperty(),
     };
 
     this.onPropertyChange = this.onPropertyChange.bind(this);
     this.onItemSetExclusionState = this.onItemSetExclusionState.bind(this);
   }
   public componentDidMount() {
-    this.setStateToCurrentValueWithExternalChecking(null);
+    if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+      this.setStateToCurrentValueWithExternalChecking(null);
+    }
   }
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
-    // TODO optimize this, it's not always necessary
-    const newValue = await this.state.valueFor.getCurrentValue(null);
+    const newValue = await this.state.valueFor.getCurrentValue(this.props.forId || null);
     if (currentUpdateId === null || this.lastUpdateId === currentUpdateId) {
       this.setState({
         value: newValue,
@@ -110,14 +116,16 @@ class ActualItemDefinitionProvider extends
 
     property.setCurrentValue(value, internalValue);
     this.setState({
-      value: this.state.valueFor.getCurrentValueNoExternalChecking(),
+      value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
     });
 
-    clearTimeout(this.updateTimeout);
-    this.updateTimeout = setTimeout(
-      this.setStateToCurrentValueWithExternalChecking.bind(this, currentUpdateId),
-      300,
-    );
+    if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+      clearTimeout(this.updateTimeout);
+      this.updateTimeout = setTimeout(
+        this.setStateToCurrentValueWithExternalChecking.bind(this, currentUpdateId),
+        300,
+      );
+    }
   }
   public onItemSetExclusionState(item: Item, state: ItemExclusionState) {
     const currentUpdateId = (new Date()).getTime();
@@ -125,14 +133,16 @@ class ActualItemDefinitionProvider extends
 
     item.setExclusionState(state);
     this.setState({
-      value: this.state.valueFor.getCurrentValueNoExternalChecking(),
+      value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
     });
 
-    clearTimeout(this.updateTimeout);
-    this.updateTimeout = setTimeout(
-      this.setStateToCurrentValueWithExternalChecking.bind(this, currentUpdateId),
-      300,
-    );
+    if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+      clearTimeout(this.updateTimeout);
+      this.updateTimeout = setTimeout(
+        this.setStateToCurrentValueWithExternalChecking.bind(this, currentUpdateId),
+        300,
+      );
+    }
   }
   public render() {
     return (

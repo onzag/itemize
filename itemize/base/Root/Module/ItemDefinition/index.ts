@@ -582,25 +582,32 @@ export default class ItemDefinition {
    * same as getCurrentValue but ignores external checking
    * so it doesn't have to be async and no need to spend
    * network resources, checks most, but ignores unique and
-   * autocomplete checkings
+   * autocomplete checkings; note that you should still pass id
+   * in order to get cached previously checked results
+   * @param id the stored value of the item definition, pass null if new
+   * @param onlyIncludeProperties only includes these specific
+   * properties, note property definitions are not fetched in
+   * this case
+   * @param excludeItems excludes the items in the list
    */
   public getCurrentValueNoExternalChecking(
+    id: number,
     onlyIncludeProperties?: string[],
     excludeItems?: boolean,
   ): IItemDefinitionValue {
     const properties = onlyIncludeProperties ?
-      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false).getCurrentValueNoExternalChecking()) :
+      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false).getCurrentValueNoExternalChecking(id)) :
       this.getParentModule().getAllPropExtensions().concat(
         this.getAllPropertyDefinitions(),
       ).map((pd) => {
-        return pd.getCurrentValueNoExternalChecking();
+        return pd.getCurrentValueNoExternalChecking(id);
       });
 
     return {
       moduleName: this.getModuleName(),
       itemDefPath: this.getPath(),
       itemDefName: this.getName(),
-      items: excludeItems ? [] : this.itemInstances.map((ii) => ii.getCurrentValueNoExternalChecking()),
+      items: excludeItems ? [] : this.itemInstances.map((ii) => ii.getCurrentValueNoExternalChecking(id)),
       properties,
     };
   }
@@ -804,6 +811,22 @@ export default class ItemDefinition {
       .concat([
         this.getName(),
       ]);
+  }
+
+  public containsAnExternallyCheckedProperty(
+    onlyCheckProperties?: string[],
+    ignoreItems?: boolean,
+  ): boolean {
+    const existInFirstLayer: boolean =
+      this.getAllPropertyDefinitionsAndExtensions()
+      .filter((pd) => !onlyCheckProperties ? true : onlyCheckProperties.includes(pd.getId()))
+      .some((pd) => pd.isUnique());
+    if (existInFirstLayer) {
+      return true;
+    } else if (ignoreItems) {
+      return false;
+    }
+    return this.getAllItems().some((i) => i.containsAnExternallyCheckedProperty());
   }
 
   /**

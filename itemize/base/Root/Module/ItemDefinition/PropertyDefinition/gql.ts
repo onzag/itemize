@@ -64,8 +64,9 @@ export function getGQLFieldsDefinitionForProperty(
     gqlResult = GraphQLNonNull(gqlResult);
   }
 
-  const baseDescription = propertyDefinition.getI18nDataFor("en").description ||
-    propertyDefinition.getI18nDataFor("en").label ||
+  const englishData = propertyDefinition.getI18nDataFor("en");
+  const baseDescription = englishData && englishData.description ||
+    englishData && englishData.label ||
     "no description supplied";
 
   const description = baseDescription + " - " +

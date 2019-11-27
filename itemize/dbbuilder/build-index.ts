@@ -52,7 +52,12 @@ export async function buildIndexes(
         }
       }
 
-      if (newIndexType && !wasSupposedToDropOldIndexButDidnt) {
+
+      if (
+        newIndexType &&
+        newIndexType !== (oldColumnSchema && oldColumnSchema.index) &&
+        !wasSupposedToDropOldIndexButDidnt
+      ) {
         console.log(colors.yellow(
           `Index on ${tableName}.${columnName} of type ${newIndexType} has been created`,
         ));

@@ -350,8 +350,9 @@ export default class Item {
 
   /**
    * Provides the current value of this item
+   * @param id the id of the stored item definition or module
    */
-  public getCurrentValueNoExternalChecking(): IItemValue {
+  public getCurrentValueNoExternalChecking(id: number): IItemValue {
     const exclusionState = this.getExclusionState();
     return {
       exclusionState,
@@ -359,7 +360,7 @@ export default class Item {
       itemId: this.getId(),
       itemName: this.getName(),
       itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
-        this.itemDefinition.getCurrentValueNoExternalChecking(this.rawData.sinkIn || [], true),
+        this.itemDefinition.getCurrentValueNoExternalChecking(id, this.rawData.sinkIn || [], true),
       stateExclusion: this.stateExclusion,
       stateExclusionModified: this.stateExclusionModified,
     };
@@ -460,6 +461,10 @@ export default class Item {
    */
   public toJSON() {
     return this.rawData;
+  }
+
+  public containsAnExternallyCheckedProperty(): boolean {
+    return this.itemDefinition.containsAnExternallyCheckedProperty(this.rawData.sinkIn, true);
   }
 
   /**

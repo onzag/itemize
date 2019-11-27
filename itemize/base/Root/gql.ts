@@ -58,7 +58,12 @@ export interface IGQLValue {
  * @param root the Root of he schema
  * @param resolvers the resolvers that will resolve the GET, SEARCH, ADD, EDIT and REMOVE requests
  */
-export function getGQLSchemaForRoot(root: Root, resolvers?: IGraphQLResolversType): GraphQLSchema {
+export function getGQLSchemaForRoot(
+  root: Root,
+  customQueries: IGQLQueryFieldsDefinitionType,
+  customMutations: IGQLQueryFieldsDefinitionType,
+  resolvers?: IGraphQLResolversType,
+): GraphQLSchema {
   // the mutation fields for the mutation query
   let mutationFields = {};
   // the query fields for the query
@@ -76,6 +81,16 @@ export function getGQLSchemaForRoot(root: Root, resolvers?: IGraphQLResolversTyp
       ...getGQLMutationFieldsForModule(mod, resolvers),
     };
   });
+
+  queryFields = {
+    ...customQueries,
+    ...queryFields,
+  };
+
+  mutationFields = {
+    ...customMutations,
+    ...mutationFields,
+  };
 
   // now we create those queries who happen to be object types
   const query = new GraphQLObjectType({

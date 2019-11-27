@@ -218,6 +218,8 @@ export async function editItemDefinition(
   // update when it was edited
   sqlModData.edited_at = appData.knex.fn.now();
   sqlModData.edited_by = tokenData.userId;
+  sqlModData.language = resolverArgs.args.language;
+  sqlModData.country = resolverArgs.args.country;
 
   debug("SQL Input data for idef is %j", sqlIdefData);
   debug("SQL Input data for module is %j", sqlModData);

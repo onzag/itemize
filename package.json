@@ -9,7 +9,7 @@
     "webpack-dev": "webpack",
     "webpack-prod": "webpack --config ./webpack.config.production.js",
     "build-data": "node ./dist/itemize/builder/index.js",
-    "start": "node ./dist/itemize/server/index.js",
+    "start": "node ./dist/src/server/index.js",
     "build-database": "node ./dist/itemize/dbbuilder/index.js"
   },
   "author": "Edward Gonzalez",
