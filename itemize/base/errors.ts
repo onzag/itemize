@@ -4,14 +4,28 @@ export class GraphQLDataInputError extends Error {
   public itemId: string;
   public policyName: string;
   public policyType: string;
-  constructor(m: string, code: string, itemId: string, propertyId: string, policyType: string, policyName: string) {
-    super(m);
+  public modulePath: string[];
+  public itemDefPath: string[];
 
-    this.code = code;
-    this.itemId = itemId;
-    this.propertyId = propertyId;
-    this.policyName = policyName;
-    this.policyType = policyType;
+  constructor(data: {
+    message: string;
+    code: string;
+    modulePath?: string[];
+    itemDefPath?: string[];
+    itemId?: string;
+    propertyId?: string;
+    policyType?: string;
+    policyName?: string;
+  }) {
+    super(data.message);
+
+    this.code = data.code;
+    this.modulePath = data.modulePath || null;
+    this.itemDefPath = data.itemDefPath || null;
+    this.itemId = data.itemId || null;
+    this.propertyId = data.propertyId || null;
+    this.policyName = data.policyName || null;
+    this.policyType = data.policyType || null;
 
     // Set the prototype explicitly.
     Object.setPrototypeOf(this, GraphQLDataInputError.prototype);

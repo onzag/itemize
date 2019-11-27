@@ -81,27 +81,19 @@ export async function editItemDefinition(
       // if we don't get an user id this means that there's no owner, this is bad input
       if (!userId) {
         debug("FAILED due to lack of content data");
-        throw new GraphQLDataInputError(
-          `There's no ${selfTable} with id ${resolverArgs.args.id}`,
-          "UNSPECIFIED",
-          null,
-          null,
-          null,
-          null,
-        );
+        throw new GraphQLDataInputError({
+          message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
+          code: "UNSPECIFIED",
+        });
       }
 
       // also throw an error if it's blocked
       if (contentData.blocked_at !== null) {
         debug("FAILED due to element being blocked");
-        throw new GraphQLDataInputError(
-          "The item is blocked",
-          "UNSPECIFIED",
-          null,
-          null,
-          null,
-          null,
-        );
+        throw new GraphQLDataInputError({
+          message: "The item is blocked",
+          code: "UNSPECIFIED",
+        });
       }
     },
   );
@@ -205,14 +197,10 @@ export async function editItemDefinition(
     Object.keys(sqlModData).length === 0
   ) {
     debug("FAILED due to input data being none");
-    throw new GraphQLDataInputError(
-      "You are not updating anything whatsoever",
-      "UNSPECIFIED",
-      null,
-      null,
-      null,
-      null,
-    );
+    throw new GraphQLDataInputError({
+      message: "You are not updating anything whatsoever",
+      code: "UNSPECIFIED",
+    });
   }
 
   // update when it was edited

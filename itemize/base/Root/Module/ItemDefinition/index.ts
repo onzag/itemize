@@ -742,15 +742,11 @@ export default class ItemDefinition {
 
     if (!idefLevelAccess) {
       if (throwError) {
-        throw new GraphQLDataInputError(
-          `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
+        throw new GraphQLDataInputError({
+          message: `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
           ` only roles ${rolesWithAccess.join(", ")} can be granted access`,
-          "UNSPECIFIED",
-          null,
-          null,
-          null,
-          null,
-        );
+          code: "UNSPECIFIED",
+        });
       }
       return false;
     }

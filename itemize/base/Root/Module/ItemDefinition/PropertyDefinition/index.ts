@@ -26,6 +26,7 @@ export enum PropertyInvalidReason {
   FROM_LARGER_THAN_TO = "FROM_LARGER_THAN_TO",
   TO_SMALLER_THAN_FROM = "TO_SMALLER_THAN_FROM",
   NOT_UNIQUE = "NOT_UNIQUE",
+  INVALID_PASSWORD = "INVALID_PASSWORD",
 }
 
 export interface IPropertyDefinitionRawJSONRuleDataType {
@@ -1083,15 +1084,11 @@ export default class PropertyDefinition {
       rolesWithAccess.includes(SELF_METAROLE) && userId === ownerUserId
     ) || rolesWithAccess.includes(role);
     if (!hasAccess && throwError) {
-      throw new GraphQLDataInputError(
-        `Forbidden, user ${userId} with role ${role} has no ${action} access` +
+      throw new GraphQLDataInputError({
+        message: `Forbidden, user ${userId} with role ${role} has no ${action} access` +
         ` to property ${this.getId()} only roles ${rolesWithAccess.join(", ")} can be granted access`,
-        "UNSPECIFIED",
-        null,
-        null,
-        null,
-        null,
-      );
+        code: "UNSPECIFIED",
+      });
     }
     return hasAccess;
   }

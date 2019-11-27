@@ -49,7 +49,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
           sqlPrefix + id,
           value,
           sqlPrefix + id,
-          columnName,
         ],
       );
     }

@@ -1,1 +1,3 @@
-export const customUserMutations = {};
+import { IAppDataType } from "..";
+
+export const customUserMutations = (appData: IAppDataType) => ({});

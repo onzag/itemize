@@ -47,10 +47,10 @@ export interface IAppDataType {
 }
 
 export interface IServerCustomizationDataType {
-  customGQLQueries?: IGQLQueryFieldsDefinitionType;
-  customGQLMutations?: IGQLQueryFieldsDefinitionType;
+  customGQLQueries?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;
+  customGQLMutations?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;
   customRouterEndpoint?: string;
-  customRouter?: express.Router;
+  customRouter?: (appData: IAppDataType) => express.Router;
 }
 
 const customFormatErrorFn = (error: GraphQLError) => {
@@ -90,6 +90,26 @@ const customFormatErrorFn = (error: GraphQLError) => {
   };
 };
 
+async function customResolveWrapper(
+  fn: any,
+  source: any,
+  args: any,
+  context: any,
+  info: any,
+): Promise<any> {
+  try {
+    return await fn(source, args, context, info);
+  } catch (err) {
+    if (err instanceof GraphQLDataInputError) {
+      throw err;
+    }
+    console.error(err.stack);
+    throw new Error(
+      "Internal server error",
+    );
+  }
+}
+
 function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataType) {
   app.use((req, res, next) => {
     res.removeHeader("X-Powered-By");
@@ -98,17 +118,37 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
 
   app.use("/rest", restServices(appData));
 
+  const allCustomQueries = {
+    ...customUserQueries(appData),
+    ...custom.customGQLQueries && custom.customGQLQueries(appData),
+  };
+
+  const allCustomMutations = {
+    ...customUserMutations(appData),
+    ...custom.customGQLMutations && custom.customGQLMutations(appData),
+  };
+
+  const finalAllCustomQueries = {};
+  Object.keys(allCustomQueries).forEach((customQueryKey) => {
+    finalAllCustomQueries[customQueryKey] = {
+      ...allCustomQueries[customQueryKey],
+      resolve: customResolveWrapper.bind(null, allCustomQueries[customQueryKey].resolve),
+    };
+  });
+
+  const finalAllCustomMutations = {};
+  Object.keys(allCustomMutations).forEach((customMutationKey) => {
+    finalAllCustomMutations[customMutationKey] = {
+      ...allCustomMutations[customMutationKey],
+      resolve: customResolveWrapper.bind(null, allCustomMutations[customMutationKey].resolve),
+    };
+  });
+
   app.use("/graphql", graphqlHTTP({
     schema: getGQLSchemaForRoot(
       appData.root,
-      {
-        ...customUserQueries,
-        ...custom.customGQLQueries,
-      },
-      {
-        ...customUserMutations,
-        ...custom.customGQLMutations,
-      },
+      finalAllCustomQueries,
+      finalAllCustomMutations,
       resolvers(appData),
     ),
     graphiql: true,
@@ -116,9 +156,9 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
   }));
 
   if (custom.customRouterEndpoint) {
-    app.use(custom.customRouterEndpoint, custom.customRouter);
+    app.use(custom.customRouterEndpoint, custom.customRouter(appData));
   } else if (custom.customRouter) {
-    app.use(custom.customRouter);
+    app.use(custom.customRouter(appData));
   }
 
   app.get("*", (req, res) => {

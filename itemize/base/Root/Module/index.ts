@@ -404,6 +404,11 @@ export default class Module {
     return this.parentModule;
   }
 
+  public getPath(): string[] {
+    const parentPath = this.parentModule ? this.parentModule.getPath() : [];
+    return parentPath.concat(this.getName());
+  }
+
   /**
    * Tells whether it has a parent module
    */

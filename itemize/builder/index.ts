@@ -931,6 +931,10 @@ async function getI18nPropertyData(
     errorRequiredProperties.push("error.NOT_NULLABLE");
   }
 
+  if (property.type === "password") {
+    errorRequiredProperties.push("error.INVALID_PASSWORD");
+  }
+
   if (property.unique) {
     errorRequiredProperties.push("error.NOT_UNIQUE");
   }

@@ -69,14 +69,10 @@ export async function deleteItemDefinition(
       // if there is no userId then the row was null, we throw an error
       if (!userId) {
         debug("FAILED due to lack of content data");
-        throw new GraphQLDataInputError(
-          `There's no ${selfTable} with id ${resolverArgs.args.id}`,
-          "UNSPECIFIED",
-          null,
-          null,
-          null,
-          null,
-        );
+        throw new GraphQLDataInputError({
+          message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
+          code: "UNSPECIFIED",
+        });
       }
 
       // if the content is blocked, and our role has no special access
@@ -87,15 +83,11 @@ export async function deleteItemDefinition(
         !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
       ) {
         debug("FAILED due to blocked content and no moderation access for role %s", tokenData.role);
-        throw new GraphQLDataInputError(
-          "The item is blocked, only users with role " +
+        throw new GraphQLDataInputError({
+          message: "The item is blocked, only users with role " +
           ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.join(",") + " can wipe this data",
-          "UNSPECIFIED",
-          null,
-          null,
-          null,
-          null,
-        );
+          code: "UNSPECIFIED",
+        });
       }
     },
   );

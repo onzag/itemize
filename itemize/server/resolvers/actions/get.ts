@@ -71,7 +71,7 @@ export async function getItemDefinition(
 
   // create the select query, filter the blockage, and select the right
   // type based on it
-  const selectQuery = appData.knex.select(
+  const selectQuery = appData.knex.first(
     requestedModuleColumnsSQL.concat(requestedIdefColumnsSQL),
   ).from(moduleTable).where({
     id: resolverArgs.args.id,
@@ -86,7 +86,7 @@ export async function getItemDefinition(
   }
 
   // execute the select query
-  const selectQueryValue: ISQLTableRowValue[] = await selectQuery;
+  const selectQueryValue: ISQLTableRowValue = await selectQuery;
 
   // we get the requested fields that take part of the item definition
   // description
@@ -102,7 +102,7 @@ export async function getItemDefinition(
 
   // if we don't have any result, we cannot even check permissions
   // the thing does not exist, returning null
-  if (!selectQueryValue.length) {
+  if (!selectQueryValue) {
     // now there is not much but to run this function
     // as a gimmick, we use -1 as the user id to make
     // some sort of global user, as SELF rules clearly
@@ -122,7 +122,7 @@ export async function getItemDefinition(
     getItemDefinitionDebug("no result founds, returning null");
     return null;
   }
-  getItemDefinitionDebug("SQL result found as %j", selectQueryValue[0]);
+  getItemDefinitionDebug("SQL result found as %j", selectQueryValue);
 
   getItemDefinitionDebug("Checking role access for read");
 
@@ -132,13 +132,13 @@ export async function getItemDefinition(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.userId,
-    selectQueryValue[0].created_by,
+    selectQueryValue.created_by,
     requestedFieldsInIdef,
     true,
   );
 
   const valueToProvide = filterAndPrepareGQLValue(
-    selectQueryValue[0],
+    selectQueryValue,
     requestedFields,
     tokenData.role,
     itemDefinition,
