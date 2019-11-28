@@ -29,7 +29,7 @@ export const ModuleContext = React.createContext<IModuleContextType>(null);
 
 interface IItemDefinitionProviderProps {
   children: any;
-  itemDefinition: string;
+  itemDefinition?: string;
   forId?: number;
   searchCounterpart?: boolean;
   disableExternalChecks?: boolean;
@@ -63,7 +63,7 @@ class ActualItemDefinitionProvider extends
           "Replacing a context of an item definition for another is not allowed",
         );
       }
-      newValueFor.applyValue(state.value);
+      newValueFor.applyValue(props.forId, state.value);
       return {
         valueFor: newValueFor,
         valueForContainsExternallyCheckedProperty: newValueFor.containsAnExternallyCheckedProperty(),
@@ -93,9 +93,15 @@ class ActualItemDefinitionProvider extends
     this.onPropertyChange = this.onPropertyChange.bind(this);
     this.onItemSetExclusionState = this.onItemSetExclusionState.bind(this);
   }
+  public loadValue() {
+    // TODO
+  }
   public componentDidMount() {
     if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       this.setStateToCurrentValueWithExternalChecking(null);
+    }
+    if (this.props.forId) {
+      this.loadValue();
     }
   }
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
@@ -114,7 +120,7 @@ class ActualItemDefinitionProvider extends
     const currentUpdateId = (new Date()).getTime();
     this.lastUpdateId = currentUpdateId;
 
-    property.setCurrentValue(value, internalValue);
+    property.setCurrentValue(this.props.forId, value, internalValue);
     this.setState({
       value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
     });

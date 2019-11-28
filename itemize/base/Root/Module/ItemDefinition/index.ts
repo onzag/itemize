@@ -426,7 +426,7 @@ export default class ItemDefinition {
    * matches the name
    * @param name the name of the item
    */
-  public hasAtLeastOneActiveInstanceOf(name: string): boolean {
+  public hasAtLeastOneActiveInstanceOf(id: number, name: string): boolean {
     // we need a list of possible candidates
     // the might currently contain checks if an item
     // contains the item with the given name
@@ -439,23 +439,24 @@ export default class ItemDefinition {
       return false;
     }
 
-    return possibleCandidates.some((c) => c.getExclusionState() !== ItemExclusionState.EXCLUDED);
+    return possibleCandidates.some((c) => c.getExclusionState(id) !== ItemExclusionState.EXCLUDED);
   }
 
   /**
    * Checks whether it has an active instance of an item
    * given its item id (not its name)
-   * @param id the id of the item
+   * @param id the slot id
+   * @param itemId the id of the item
    */
-  public hasAnActiveInstanceOfId(id: string): boolean {
+  public hasAnActiveInstanceOfId(id: number, itemId: string): boolean {
     const candidate = this.itemInstances
-      .find((i) => i.getId() === id);
+      .find((i) => i.getId() === itemId);
 
     if (!candidate) {
       return false;
     }
 
-    return candidate.getExclusionState() !== ItemExclusionState.EXCLUDED;
+    return candidate.getExclusionState(id) !== ItemExclusionState.EXCLUDED;
   }
 
   /**
@@ -619,6 +620,7 @@ export default class ItemDefinition {
    * wastes resources, so using this function is more
    * efficient than calling the functions
    * @param id the stored value of the item definition, pass null if new
+   * this also represens the slot
    * @param onlyIncludeProperties only includes these specific
    * properties, note property definitions are not fetched in
    * this case
@@ -652,17 +654,17 @@ export default class ItemDefinition {
    * instance
    * @param value the value, be careful, it will choke if invalid
    */
-  public applyValue(value: IItemDefinitionValue) {
+  public applyValue(id: number, value: IItemDefinitionValue) {
     if (value.itemDefPath.join("/") !== this.getPath().join("/")) {
       throw new Error("Attempted to apply unmatching values");
     }
 
     value.items.forEach((itemValue) => {
-      this.getItemFor(itemValue.itemId).applyValue(itemValue);
+      this.getItemFor(itemValue.itemId).applyValue(id, itemValue);
     });
 
     value.properties.forEach((propertyValue) => {
-      this.getPropertyDefinitionFor(propertyValue.propertyId, true).applyValue(propertyValue);
+      this.getPropertyDefinitionFor(propertyValue.propertyId, true).applyValue(id, propertyValue);
     });
   }
 
@@ -670,6 +672,7 @@ export default class ItemDefinition {
    * Applies an item definition value from a graphql data
    */
   public applyValueFromGQL(
+    id: number,
     value: {
       [key: string]: any,
     },
@@ -684,7 +687,7 @@ export default class ItemDefinition {
       if (typeof givenValue === "undefined") {
         givenValue = null;
       }
-      property.applyValueFromGQL(givenValue);
+      property.applyValueFromGQL(id, givenValue);
     });
     this.getAllItems().forEach((item) => {
       let givenValue = value[item.getQualifiedIdentifier()];
@@ -692,7 +695,7 @@ export default class ItemDefinition {
         givenValue = null;
       }
       const givenExclusionState = value[item.getQualifiedExclusionStateIdentifier()] || ItemExclusionState.EXCLUDED;
-      item.applyValueFromGQL(givenValue, givenExclusionState);
+      item.applyValueFromGQL(id, givenValue, givenExclusionState);
     });
   }
 

@@ -230,9 +230,9 @@ export default class Item {
    * Tells whether the current item is excluded
    * @return a boolean whether it's excluded or not
    */
-  public getExclusionState(): ItemExclusionState {
+  public getExclusionState(id: number): ItemExclusionState {
     // let's check if it's excluded by force
-    const isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
+    const isExcludedByForce = this.excludedIf && this.excludedIf.evaluate(id);
 
     if (isExcludedByForce) {
       return ItemExclusionState.EXCLUDED;
@@ -240,13 +240,13 @@ export default class Item {
 
     // if it can be excluded
     const canBeExcludedByUser = this.rawData.canUserExclude || (this.canUserExcludeIf &&
-      this.canUserExcludeIf.evaluate());
+      this.canUserExcludeIf.evaluate(id));
     if (canBeExcludedByUser) {
       // if it hasn't been modified we return the default state
       if (!this.stateExclusionModified) {
         // depending on the condition
         const isDefaultExcluded = this.rawData.defaultExcluded ||
-          (this.defaultExcludedIf && this.defaultExcludedIf.evaluate()) ||
+          (this.defaultExcludedIf && this.defaultExcludedIf.evaluate(id)) ||
           false;
         // by default the excluded would be false
         if (isDefaultExcluded) {
@@ -277,17 +277,17 @@ export default class Item {
    * case is true but it might be false as well
    * @returns a boolean that tells whether if it can be toggled
    */
-  public canExclusionBeSet(): boolean {
+  public canExclusionBeSet(id: number): boolean {
     // if it's excluded by force the default is false, you cannot toggle
     // anything excluded by force
-    const isExcludedByForce = this.excludedIf && this.excludedIf.evaluate();
+    const isExcludedByForce = this.excludedIf && this.excludedIf.evaluate(id);
     if (isExcludedByForce) {
       return false;
     }
 
     // otherwise it depends to what might exclude provides
     return this.rawData.canUserExclude || (this.canUserExcludeIf &&
-      this.canUserExcludeIf.evaluate()) || false;
+      this.canUserExcludeIf.evaluate(id)) || false;
   }
 
   /**
@@ -353,10 +353,10 @@ export default class Item {
    * @param id the id of the stored item definition or module
    */
   public getCurrentValueNoExternalChecking(id: number): IItemValue {
-    const exclusionState = this.getExclusionState();
+    const exclusionState = this.getExclusionState(id);
     return {
       exclusionState,
-      canExclusionBeSet: this.canExclusionBeSet(),
+      canExclusionBeSet: this.canExclusionBeSet(id),
       itemId: this.getId(),
       itemName: this.getName(),
       itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
@@ -371,10 +371,10 @@ export default class Item {
    * @param id the id of the stored item definition or module
    */
   public async getCurrentValue(id: number): Promise<IItemValue> {
-    const exclusionState = this.getExclusionState();
+    const exclusionState = this.getExclusionState(id);
     return {
       exclusionState,
-      canExclusionBeSet: this.canExclusionBeSet(),
+      canExclusionBeSet: this.canExclusionBeSet(id),
       itemId: this.getId(),
       itemName: this.getName(),
       itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
@@ -390,23 +390,24 @@ export default class Item {
    * and a proper error be returned when you try to retrieve it
    * hopefully this means validation as well as in
    * it cannot be cheated
+   * @param id the id this item is stored
    * @param value the value of the item
    */
-  public applyValue(value: IItemValue) {
+  public applyValue(id: number, value: IItemValue) {
     this.stateExclusion = value.stateExclusion;
     this.stateExclusionModified = value.stateExclusionModified;
 
     if (value.itemDefinitionValue) {
-      this.itemDefinition.applyValue(value.itemDefinitionValue);
+      this.itemDefinition.applyValue(id, value.itemDefinitionValue);
     }
   }
 
-  public applyValueFromGQL(value: {[key: string]: any}, exclusionState: ItemExclusionState) {
+  public applyValueFromGQL(id: number, value: {[key: string]: any}, exclusionState: ItemExclusionState) {
     this.stateExclusion = exclusionState;
     this.stateExclusionModified = true;
 
     if (value) {
-      this.itemDefinition.applyValueFromGQL(value, true);
+      this.itemDefinition.applyValueFromGQL(id, value, true);
     }
   }
 

@@ -124,7 +124,7 @@ export default class ConditionalRuleSet {
    * Evaluates the result of the conditional value as this current point
    * as defined by the item defintion
    */
-  public evaluate(): boolean {
+  public evaluate(id: number): boolean {
     // if this is a property type conditional rule set
     let result: boolean = false;
     const rawDataAsProperty: IConditionalRuleSetRawJSONDataPropertyType =
@@ -134,14 +134,14 @@ export default class ConditionalRuleSet {
       // lets get the property value as for now
       let actualPropertyValue = null;
       if (rawDataAsProperty.property === "&this") {
-        actualPropertyValue = this.parentPropertyDefinition.getCurrentValueClean();
+        actualPropertyValue = this.parentPropertyDefinition.getCurrentValueClean(id);
       } else {
         actualPropertyValue = (this.parentItemDefinition ?
           this.parentItemDefinition
             .getPropertyDefinitionFor(rawDataAsProperty.property, true)
-            .getCurrentValueClean() :
+            .getCurrentValueClean(id) :
           this.parentModule.getPropExtensionFor(rawDataAsProperty.property)
-            .getCurrentValueClean());
+            .getCurrentValueClean(id));
       }
 
       if (rawDataAsProperty.attribute && actualPropertyValue !== null) {
@@ -154,9 +154,9 @@ export default class ConditionalRuleSet {
         actualComparedValue = this.parentItemDefinition ?
           this.parentItemDefinition
             .getPropertyDefinitionFor(propertyInQuestion, true)
-            .getCurrentValueClean() :
+            .getCurrentValueClean(id) :
           this.parentModule.getPropExtensionFor(propertyInQuestion)
-            .getCurrentValueClean();
+            .getCurrentValueClean(id);
       }
 
       if (rawDataAsProperty.valueAttribute && actualComparedValue !== null) {
@@ -226,8 +226,8 @@ export default class ConditionalRuleSet {
       // let's check whether there is an item instance for that
       // component that are active (aka not excluded)
       const hasOneOf = rawDataAsComponent.component[0] === "#" ?
-        this.parentItemDefinition.hasAnActiveInstanceOfId(rawDataAsComponent.component[0].substr(1)) :
-        this.parentItemDefinition.hasAtLeastOneActiveInstanceOf(rawDataAsComponent.component);
+        this.parentItemDefinition.hasAnActiveInstanceOfId(id, rawDataAsComponent.component[0].substr(1)) :
+        this.parentItemDefinition.hasAtLeastOneActiveInstanceOf(id, rawDataAsComponent.component);
 
       // And compare the result against the isIncluded boolean
       result = (hasOneOf && rawDataAsComponent.isIncluded) ||
@@ -243,7 +243,7 @@ export default class ConditionalRuleSet {
       }
 
       // if we do we have to evaluate it
-      const conditionResult = this.condition.evaluate();
+      const conditionResult = this.condition.evaluate(id);
 
       // and use the gate to calculate the proper result
       switch (this.rawData.gate) {

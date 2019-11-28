@@ -158,6 +158,13 @@ export interface IPropertyDefinitionValue {
   propertyId: string;
 }
 
+function nullIfUndefined<T>(value: T): T {
+  if (typeof value === "undefined") {
+    return null;
+  }
+  return value;
+}
+
 // OTHER EXPORTS
 
 export interface IPropertyDefinitionAlternativePropertyType {
@@ -177,10 +184,10 @@ async function clientSideIndexChecker(
   }
 
   if (
-    property.lastUniqueCheckId === id &&
-    (property.lastUniqueCheckValue === value || equals(property.lastUniqueCheckValue, value))
+    property.stateLastUniqueCheck[id] &&
+    (property.stateLastUniqueCheck[id].value === value || equals(property.stateLastUniqueCheck[id].value, value))
   ) {
-    return property.lastUniqueCheckValid;
+    return property.stateLastUniqueCheck[id].valid;
   }
 
   const qualifiedParentName = property.checkIfIsExtension() ?
@@ -199,9 +206,10 @@ async function clientSideIndexChecker(
   });
   try {
     const output = await result.json();
-    property.lastUniqueCheckValid = output;
-    property.lastUniqueCheckValue = value;
-    property.lastUniqueCheckId = id;
+    property.stateLastUniqueCheck[id] = {
+      valid: !!output,
+      value,
+    };
     return !!output;
   } catch (err) {
     return true;
@@ -342,10 +350,6 @@ export default class PropertyDefinition {
     return null;
   }
 
-  public lastUniqueCheckValid: boolean;
-  public lastUniqueCheckValue: PropertyDefinitionSupportedType;
-  public lastUniqueCheckId: number;
-
   public rawData: IPropertyDefinitionRawJSONDataType;
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
@@ -363,9 +367,22 @@ export default class PropertyDefinition {
 
   // representing the state of the class
   private onStateChangeListeners: OnStateChangeListenerType[];
-  private stateValue: PropertyDefinitionSupportedType;
-  private stateValueModified: boolean;
-  private stateinternalValue: any;
+  private stateValue: {
+    [slotId: number]: PropertyDefinitionSupportedType,
+  };
+  private stateValueModified: {
+    [slotId: number]: boolean,
+  };
+  private stateinternalValue: {
+    [slotId: number]: any,
+  };
+  // tslint:disable-next-line: member-ordering
+  public stateLastUniqueCheck: {
+    [slotId: number]: {
+      value: PropertyDefinitionSupportedType,
+      valid: boolean,
+    },
+  };
 
   /**
    * Builds a property definition
@@ -411,12 +428,13 @@ export default class PropertyDefinition {
     // STATE MANAGEMENT
     this.onStateChangeListeners = [];
     // initial value for all namespaces is null
-    this.stateValue = null;
-    this.stateValueModified = false;
-    this.stateinternalValue = null;
+    this.stateValue = {};
+    this.stateValueModified = {};
+    this.stateinternalValue = {};
+    this.stateLastUniqueCheck = {};
   }
 
-  public getEnforcedValue(): {
+  public getEnforcedValue(id: number): {
     enforced: boolean;
     value?: PropertyDefinitionSupportedType;
   } {
@@ -433,7 +451,7 @@ export default class PropertyDefinition {
         // superenforced might be a property definition so we got to
         // extract the value in such case
         (this.superEnforcedValue instanceof PropertyDefinition ?
-          this.superEnforcedValue.getCurrentValueClean() :
+          this.superEnforcedValue.getCurrentValueClean(id) :
           this.superEnforcedValue) :
 
         // otherwise in other cases we check the enforced value
@@ -443,7 +461,7 @@ export default class PropertyDefinition {
           // otherwise we go to for evaluating the enforced values
           // or give undefined if nothing is found
           (this.enforcedValues.find((ev) => {
-            return ev.if.evaluate();
+            return ev.if.evaluate(id);
           }) || {value: undefined}).value);
 
       // if we get one
@@ -465,10 +483,10 @@ export default class PropertyDefinition {
    * checks if it's currently hidden (not phantom)
    * @returns a boolean
    */
-  public isCurrentlyHidden() {
+  public isCurrentlyHidden(id: number) {
     return this.rawData.hidden ||
-      (this.rawData.hiddenIfEnforced ? this.getEnforcedValue().enforced : false) ||
-      (this.hiddenIf && this.hiddenIf.evaluate()) || false;
+      (this.rawData.hiddenIfEnforced ? this.getEnforcedValue(id).enforced : false) ||
+      (this.hiddenIf && this.hiddenIf.evaluate(id)) || false;
   }
 
   /**
@@ -487,30 +505,30 @@ export default class PropertyDefinition {
     return this.rawData.type;
   }
 
-  public getCurrentValueClean(): PropertyDefinitionSupportedType {
-    const possibleEnforcedValue = this.getEnforcedValue();
+  public getCurrentValueClean(id: number): PropertyDefinitionSupportedType {
+    const possibleEnforcedValue = this.getEnforcedValue(id);
 
     if (possibleEnforcedValue.enforced) {
       return possibleEnforcedValue.value;
     }
 
-    if (this.rawData.nullIfHidden && this.isCurrentlyHidden()) {
+    if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id)) {
       return null;
     }
 
-    if (!this.stateValueModified) {
+    if (!this.stateValueModified[id]) {
       // lets find the default value, first the super default
       // and we of course extract it in case of property definition
       // or otherwise use the default, which might be undefined
       let defaultValue = typeof this.superDefaultedValue !== "undefined" ?
         (this.superDefaultedValue instanceof PropertyDefinition ?
-          this.superDefaultedValue.getCurrentValueClean() :
+          this.superDefaultedValue.getCurrentValueClean(id) :
           this.superDefaultedValue) : this.rawData.default;
 
       // Also by condition
       if (this.defaultIf && typeof this.superDefaultedValue === "undefined") {
         // find a rule that passes
-        const rulePasses = this.defaultIf.find((difRule) => difRule.if.evaluate());
+        const rulePasses = this.defaultIf.find((difRule) => difRule.if.evaluate(id));
         if (rulePasses) {
           // and set the default value to such
           defaultValue = rulePasses.value;
@@ -520,7 +538,7 @@ export default class PropertyDefinition {
       return typeof defaultValue === "undefined" ? null : defaultValue;
     }
 
-    return this.stateValue;
+    return nullIfUndefined(this.stateValue[id]);
   }
 
   /**
@@ -532,11 +550,11 @@ export default class PropertyDefinition {
    */
   public getCurrentValueNoExternalChecking(id: number): IPropertyDefinitionValue {
 
-    const possibleEnforcedValue = this.getEnforcedValue();
+    const possibleEnforcedValue = this.getEnforcedValue(id);
 
     if (possibleEnforcedValue.enforced) {
       const possibleInvalidEnforcedReason = this.isValidValueNoExternalChecking(
-        possibleEnforcedValue.value, id,
+        id, possibleEnforcedValue.value,
       );
       // we return the value that was set to be
       return {
@@ -546,17 +564,17 @@ export default class PropertyDefinition {
         valid: !possibleInvalidEnforcedReason,
         invalidReason: possibleInvalidEnforcedReason,
         value: possibleEnforcedValue.value,
-        hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(),
+        hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id),
         internalValue: null,
-        stateValue: this.stateValue,
-        stateValueModified: this.stateValueModified,
+        stateValue: nullIfUndefined(this.stateValue[id]),
+        stateValueModified: this.stateValueModified[id] || false,
         propertyId: this.getId(),
       };
     }
 
     // make if hidden if null if hidden is set to true
     // note nulls set this way are always valid
-    if (this.rawData.nullIfHidden && this.isCurrentlyHidden()) {
+    if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id)) {
       return {
         userSet: false,
         enforced: true,
@@ -566,25 +584,25 @@ export default class PropertyDefinition {
         value: null,
         hidden: true,
         internalValue: null,
-        stateValue: this.stateValue,
-        stateValueModified: this.stateValueModified,
+        stateValue: nullIfUndefined(this.stateValue[id]),
+        stateValueModified: this.stateValueModified[id] || false,
         propertyId: this.getId(),
       };
     }
 
-    const value = this.getCurrentValueClean();
-    const invalidReason = this.isValidValueNoExternalChecking(value, id);
+    const value = this.getCurrentValueClean(id);
+    const invalidReason = this.isValidValueNoExternalChecking(id, value);
     return {
-      userSet: this.stateValueModified,
+      userSet: this.stateValueModified[id] || false,
       enforced: false,
-      default: !this.stateValueModified,
+      default: !this.stateValueModified[id],
       valid: !invalidReason,
       invalidReason,
       value,
-      hidden: this.isCurrentlyHidden(),
-      internalValue: this.stateValueModified ? this.stateinternalValue : null,
-      stateValue: this.stateValue,
-      stateValueModified: this.stateValueModified,
+      hidden: this.isCurrentlyHidden(id),
+      internalValue: this.stateValueModified[id] ? this.stateinternalValue[id] : null,
+      stateValue: nullIfUndefined(this.stateValue[id]),
+      stateValueModified: this.stateValueModified[id],
       propertyId: this.getId(),
     };
   }
@@ -592,14 +610,15 @@ export default class PropertyDefinition {
   /**
    * provides the current useful value for the property defintion
    * @param id the id of the current item definition as stored, pass null if not stored
+   * this also represents the slot
    * @returns a bunch of information about the current value
    */
   public async getCurrentValue(id: number): Promise<IPropertyDefinitionValue> {
 
-    const possibleEnforcedValue = this.getEnforcedValue();
+    const possibleEnforcedValue = this.getEnforcedValue(id);
 
     if (possibleEnforcedValue.enforced) {
-      const possibleInvalidEnforcedReason = await this.isValidValue(possibleEnforcedValue.value, id);
+      const possibleInvalidEnforcedReason = await this.isValidValue(id, possibleEnforcedValue.value);
       // we return the value that was set to be
       return {
         userSet: false,
@@ -608,17 +627,17 @@ export default class PropertyDefinition {
         valid: !possibleInvalidEnforcedReason,
         invalidReason: possibleInvalidEnforcedReason,
         value: possibleEnforcedValue.value,
-        hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(),
+        hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id),
         internalValue: null,
-        stateValue: this.stateValue,
-        stateValueModified: this.stateValueModified,
+        stateValue: nullIfUndefined(this.stateValue[id]),
+        stateValueModified: this.stateValueModified[id],
         propertyId: this.getId(),
       };
     }
 
     // make if hidden if null if hidden is set to true
     // note nulls set this way are always valid
-    if (this.rawData.nullIfHidden && this.isCurrentlyHidden()) {
+    if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id)) {
       return {
         userSet: false,
         enforced: true,
@@ -628,25 +647,25 @@ export default class PropertyDefinition {
         value: null,
         hidden: true,
         internalValue: null,
-        stateValue: this.stateValue,
-        stateValueModified: this.stateValueModified,
+        stateValue: nullIfUndefined(this.stateValue[id]),
+        stateValueModified: this.stateValueModified[id],
         propertyId: this.getId(),
       };
     }
 
-    const value = this.getCurrentValueClean();
-    const invalidReason = await this.isValidValue(value, id);
+    const value = this.getCurrentValueClean(id);
+    const invalidReason = await this.isValidValue(id, value);
     return {
-      userSet: this.stateValueModified,
+      userSet: this.stateValueModified[id] || false,
       enforced: false,
-      default: !this.stateValueModified,
+      default: !this.stateValueModified[id],
       valid: !invalidReason,
       invalidReason,
       value,
-      hidden: this.isCurrentlyHidden(),
-      internalValue: this.stateValueModified ? this.stateinternalValue : null,
-      stateValue: this.stateValue,
-      stateValueModified: this.stateValueModified,
+      hidden: this.isCurrentlyHidden(id),
+      internalValue: this.stateValueModified[id] ? this.stateinternalValue[id] : null,
+      stateValue: nullIfUndefined(this.stateValue[id]),
+      stateValueModified: this.stateValueModified[id] || false,
       propertyId: this.getId(),
     };
   }
@@ -718,6 +737,7 @@ export default class PropertyDefinition {
    * @param  newValue the new value
    */
   public setCurrentValue(
+    id: number,
     newValue: PropertyDefinitionSupportedType,
     internalValue: any,
   ) {
@@ -737,24 +757,28 @@ export default class PropertyDefinition {
     }
 
     // note that the value is set and never check
-    this.stateValue = newActualValue;
-    this.stateValueModified = true;
-    this.stateinternalValue = internalValue;
+    this.stateValue[id] = newActualValue;
+    this.stateValueModified[id] = true;
+    this.stateinternalValue[id] = internalValue;
     this.onStateChangeListeners.forEach((l) => l());
   }
 
   public applyValue(
+    id: number,
     value: IPropertyDefinitionValue,
   ) {
-    this.stateValue = value.stateValue;
-    this.stateValueModified = value.stateValueModified;
-    this.stateinternalValue = value.internalValue;
+    this.stateValue[id] = value.stateValue;
+    this.stateValueModified[id] = value.stateValueModified;
+    this.stateinternalValue[id] = value.internalValue;
   }
 
-  public applyValueFromGQL(value: any) {
-    this.stateValue = value;
-    this.stateValueModified = true;
-    this.stateinternalValue = null;
+  public applyValueFromGQL(
+    id: number,
+    value: any,
+  ) {
+    this.stateValue[id] = value;
+    this.stateValueModified[id] = true;
+    this.stateinternalValue[id] = null;
   }
 
   /**
@@ -767,24 +791,24 @@ export default class PropertyDefinition {
    * @return the invalid reason as a string
    */
   public isValidValueNoExternalChecking(
-    value: PropertyDefinitionSupportedType,
     id: number,
+    value: PropertyDefinitionSupportedType,
   ): PropertyInvalidReason | string {
 
     // Cache check
     const hasIndex = this.isUnique();
     if (hasIndex) {
       if (
-        this.lastUniqueCheckId === id &&
-        (this.lastUniqueCheckValue === value || equals(this.lastUniqueCheckValue, value)) &&
-        !this.lastUniqueCheckValid
+        this.stateLastUniqueCheck[id] &&
+        (this.stateLastUniqueCheck[id].value === value || equals(this.stateLastUniqueCheck[id].value, value)) &&
+        !this.stateLastUniqueCheck[id].valid
       ) {
         return PropertyInvalidReason.NOT_UNIQUE;
       }
     }
 
     if (this.invalidIf) {
-      const invalidMatch = this.invalidIf.find((ii) => ii.if.evaluate());
+      const invalidMatch = this.invalidIf.find((ii) => ii.if.evaluate(id));
       if (invalidMatch) {
         return invalidMatch.error;
       }
@@ -805,10 +829,10 @@ export default class PropertyDefinition {
    * @return the invalid reason as a string
    */
   public async isValidValue(
-    value: PropertyDefinitionSupportedType,
     id: number,
+    value: PropertyDefinitionSupportedType,
   ): Promise<PropertyInvalidReason | string> {
-    const standardErrOutput = this.isValidValueNoExternalChecking(value, id);
+    const standardErrOutput = this.isValidValueNoExternalChecking(id, value);
 
     if (standardErrOutput) {
       return standardErrOutput;

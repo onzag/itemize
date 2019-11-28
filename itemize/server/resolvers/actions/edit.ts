@@ -112,7 +112,7 @@ export async function editItemDefinition(
   };
   debug("Expectd GQL value considered as %j, applying such value", expectedUpdatedValue);
   // and as so we apply the value from graphql
-  itemDefinition.applyValueFromGQL(expectedUpdatedValue);
+  itemDefinition.applyValueFromGQL(resolverArgs.args.id, expectedUpdatedValue);
   // and then we check with the entire full value, we want to ensure no changes occurred
   // and that the updated value will be exactly the result and it will be valid
   await serverSideCheckItemDefinitionAgainst(
@@ -120,6 +120,8 @@ export async function editItemDefinition(
     expectedUpdatedValue,
     resolverArgs.args.id,
   );
+
+  // TODO clean the slot, this is a memory leak situation otherwise
 
   // now we calculate the fields that we are editing, and the fields that we are
   // requesting
