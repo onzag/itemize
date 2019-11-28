@@ -120,8 +120,7 @@ export async function editItemDefinition(
     expectedUpdatedValue,
     resolverArgs.args.id,
   );
-
-  // TODO clean the slot, this is a memory leak situation otherwise
+  itemDefinition.cleanValueFor(resolverArgs.args.id);
 
   // now we calculate the fields that we are editing, and the fields that we are
   // requesting

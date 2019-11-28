@@ -111,8 +111,12 @@ export default class Item {
 
   // representing the state of the class
   private onStateChangeListeners: OnStateChangeListenerType[];
-  private stateExclusion: ItemExclusionState;
-  private stateExclusionModified: boolean;
+  private stateExclusion: {
+    [id: number]: ItemExclusionState,
+  };
+  private stateExclusionModified: {
+    [id: number]: boolean,
+  };
 
   /**
    * The constructor for an Item
@@ -187,13 +191,9 @@ export default class Item {
 
     // State management
     this.onStateChangeListeners = [];
-    // The initial state is unknown
-    // due to the defaults
-    // this will never be visible as null because only
-    // modified states are the only ones that will show
-    this.stateExclusion = ItemExclusionState.ANY;
+    this.stateExclusion = {};
     // initially the state hasn't been modified
-    this.stateExclusionModified = false;
+    this.stateExclusionModified = {};
   }
 
   /**
@@ -243,7 +243,7 @@ export default class Item {
       this.canUserExcludeIf.evaluate(id));
     if (canBeExcludedByUser) {
       // if it hasn't been modified we return the default state
-      if (!this.stateExclusionModified) {
+      if (!this.stateExclusionModified[id]) {
         // depending on the condition
         const isDefaultExcluded = this.rawData.defaultExcluded ||
           (this.defaultExcludedIf && this.defaultExcludedIf.evaluate(id)) ||
@@ -259,11 +259,12 @@ export default class Item {
 
       if (
         !this.rawData.ternaryExclusionState &&
-        this.stateExclusion === ItemExclusionState.ANY
+        this.stateExclusion[id] === ItemExclusionState.ANY ||
+        !this.stateExclusion[id]
       ) {
         return ItemExclusionState.INCLUDED;
       }
-      return this.stateExclusion;
+      return this.stateExclusion[id];
     } else if (this.rawData.ternaryExclusionState) {
       return ItemExclusionState.ANY;
     }
@@ -312,9 +313,9 @@ export default class Item {
    * Sets the exclusion state to a new value
    * @param value the value for the exclusion state
    */
-  public setExclusionState(value: ItemExclusionState) {
-    this.stateExclusion = value;
-    this.stateExclusionModified = true;
+  public setExclusionState(id: number, value: ItemExclusionState) {
+    this.stateExclusion[id] = value;
+    this.stateExclusionModified[id] = true;
 
     // trigger an state change
     this.onStateChangeListeners.forEach((l) => l());
@@ -361,8 +362,8 @@ export default class Item {
       itemName: this.getName(),
       itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
         this.itemDefinition.getCurrentValueNoExternalChecking(id, this.rawData.sinkIn || [], true),
-      stateExclusion: this.stateExclusion,
-      stateExclusionModified: this.stateExclusionModified,
+      stateExclusion: this.stateExclusion[id] || ItemExclusionState.ANY,
+      stateExclusionModified: this.stateExclusionModified[id] || false,
     };
   }
 
@@ -379,8 +380,8 @@ export default class Item {
       itemName: this.getName(),
       itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
         (await this.itemDefinition.getCurrentValue(id, this.rawData.sinkIn || [], true)),
-      stateExclusion: this.stateExclusion,
-      stateExclusionModified: this.stateExclusionModified,
+      stateExclusion: this.stateExclusion[id] || ItemExclusionState.ANY,
+      stateExclusionModified: this.stateExclusionModified[id] || false,
     };
   }
 
@@ -394,8 +395,8 @@ export default class Item {
    * @param value the value of the item
    */
   public applyValue(id: number, value: IItemValue) {
-    this.stateExclusion = value.stateExclusion;
-    this.stateExclusionModified = value.stateExclusionModified;
+    this.stateExclusion[id] = value.stateExclusion;
+    this.stateExclusionModified[id] = value.stateExclusionModified;
 
     if (value.itemDefinitionValue) {
       this.itemDefinition.applyValue(id, value.itemDefinitionValue);
@@ -403,12 +404,21 @@ export default class Item {
   }
 
   public applyValueFromGQL(id: number, value: {[key: string]: any}, exclusionState: ItemExclusionState) {
-    this.stateExclusion = exclusionState;
-    this.stateExclusionModified = true;
+    this.stateExclusion[id] = exclusionState;
+    this.stateExclusionModified[id] = true;
 
     if (value) {
       this.itemDefinition.applyValueFromGQL(id, value, true);
     }
+  }
+
+  public cleanValueFor(
+    id: number,
+  ) {
+    delete this.stateExclusion[id];
+    delete this.stateExclusionModified[id];
+
+    this.itemDefinition.cleanValueFor(id, true);
   }
 
   /**

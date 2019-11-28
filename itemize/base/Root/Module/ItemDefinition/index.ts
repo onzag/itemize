@@ -699,6 +699,19 @@ export default class ItemDefinition {
     });
   }
 
+  public cleanValueFor(id: number, excludeExtensions?: boolean) {
+    const properties =
+      excludeExtensions ?
+        this.getAllPropertyDefinitions() :
+        this.getAllPropertyDefinitionsAndExtensions();
+    properties.forEach((property) => {
+      property.cleanValueFor(id);
+    });
+    this.getAllItems().forEach((item) => {
+      item.cleanValueFor(id);
+    });
+  }
+
   /**
    * Provides the item definition that represent the search mode of this
    * same item definition

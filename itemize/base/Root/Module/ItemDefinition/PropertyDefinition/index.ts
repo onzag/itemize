@@ -781,6 +781,14 @@ export default class PropertyDefinition {
     this.stateinternalValue[id] = null;
   }
 
+  public cleanValueFor(
+    id: number,
+  ) {
+    delete this.stateValue[id];
+    delete this.stateValueModified[id];
+    delete this.stateinternalValue[id];
+  }
+
   /**
    * Checks the valid value but ignores external checking
    * pass the value still because cache might apply of previous

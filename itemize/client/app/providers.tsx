@@ -63,7 +63,7 @@ class ActualItemDefinitionProvider extends
           "Replacing a context of an item definition for another is not allowed",
         );
       }
-      newValueFor.applyValue(props.forId, state.value);
+      newValueFor.applyValue(props.forId || null, state.value);
       return {
         valueFor: newValueFor,
         valueForContainsExternallyCheckedProperty: newValueFor.containsAnExternallyCheckedProperty(),
@@ -120,7 +120,7 @@ class ActualItemDefinitionProvider extends
     const currentUpdateId = (new Date()).getTime();
     this.lastUpdateId = currentUpdateId;
 
-    property.setCurrentValue(this.props.forId, value, internalValue);
+    property.setCurrentValue(this.props.forId || null, value, internalValue);
     this.setState({
       value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
     });
@@ -137,7 +137,7 @@ class ActualItemDefinitionProvider extends
     const currentUpdateId = (new Date()).getTime();
     this.lastUpdateId = currentUpdateId;
 
-    item.setExclusionState(state);
+    item.setExclusionState(this.props.forId || null, state);
     this.setState({
       value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
     });
