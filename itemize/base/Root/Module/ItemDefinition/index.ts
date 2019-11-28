@@ -196,6 +196,11 @@ export default class ItemDefinition {
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
 
+  // state information
+  private stateHasAppliedValueTo: {
+    [id: number]: boolean,
+  };
+
   constructor(
     rawJSON: IItemDefinitionRawJSONDataType,
     parentModule: Module,
@@ -232,6 +237,8 @@ export default class ItemDefinition {
     // and instantiating those
     this.itemInstances = rawJSON.includes ? rawJSON.includes
       .map((i) => (new Item(i, parentModule, this))) : [];
+
+    this.stateHasAppliedValueTo = {};
   }
 
   /**
@@ -655,6 +662,8 @@ export default class ItemDefinition {
    * @param value the value, be careful, it will choke if invalid
    */
   public applyValue(id: number, value: IItemDefinitionValue) {
+    this.stateHasAppliedValueTo[id] = true;
+
     if (value.itemDefPath.join("/") !== this.getPath().join("/")) {
       throw new Error("Attempted to apply unmatching values");
     }
@@ -678,6 +687,8 @@ export default class ItemDefinition {
     },
     excludeExtensions?: boolean,
   ) {
+    this.stateHasAppliedValueTo[id] = true;
+
     const properties =
       excludeExtensions ?
         this.getAllPropertyDefinitions() :
@@ -700,6 +711,8 @@ export default class ItemDefinition {
   }
 
   public cleanValueFor(id: number, excludeExtensions?: boolean) {
+    delete this.stateHasAppliedValueTo[id];
+
     const properties =
       excludeExtensions ?
         this.getAllPropertyDefinitions() :
@@ -710,6 +723,10 @@ export default class ItemDefinition {
     this.getAllItems().forEach((item) => {
       item.cleanValueFor(id);
     });
+  }
+
+  public hasAppliedValueTo(id: number): boolean {
+    return !!this.stateHasAppliedValueTo[id];
   }
 
   /**

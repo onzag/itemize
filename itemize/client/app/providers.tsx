@@ -1,14 +1,24 @@
 import React from "react";
-import { DataContext } from ".";
-import ItemDefinition, { IItemDefinitionValue } from "../../base/Root/Module/ItemDefinition";
+import { DataContext, LocaleContext, ILocaleContextType } from ".";
+import ItemDefinition, { IItemDefinitionValue, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import Module from "../../base/Root/Module";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
+import { TokenContext, ITokenContextType } from "./internal-providers";
+import {
+  ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
+  MODERATION_FIELDS,
+  EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
+  PREFIX_GET,
+} from "../../constants";
+import { buildGqlQuery, gqlQuery } from "./gql-querier";
 
 export interface IItemDefinitionContextType {
   idef: ItemDefinition;
   value: IItemDefinitionValue;
+  deleted: boolean;
+  blocked: boolean;
   onPropertyChange: (
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
@@ -31,12 +41,15 @@ interface IItemDefinitionProviderProps {
   children: any;
   itemDefinition?: string;
   forId?: number;
+  assumeOwnership?: boolean;
   searchCounterpart?: boolean;
   disableExternalChecks?: boolean;
 }
 
 interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProps {
   mod: Module;
+  tokenData: ITokenContextType;
+  localeData: ILocaleContextType;
 }
 
 interface IActualItemDefinitionProviderState {
@@ -44,6 +57,23 @@ interface IActualItemDefinitionProviderState {
   valueFor: ItemDefinition;
   valueForQualifiedName: string;
   valueForContainsExternallyCheckedProperty: boolean;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+
+function flattenRecievedFields(recievedFields: any) {
+  // so first we extract the data content
+  const output = {
+    ...(recievedFields.DATA || {}),
+  };
+  // and then we loop for everything else, but data
+  Object.keys(recievedFields).forEach((key) => {
+    if (key !== "DATA") {
+      output[key] = recievedFields[key];
+    }
+  });
+  // return that
+  return output;
 }
 
 class ActualItemDefinitionProvider extends
@@ -88,21 +118,133 @@ class ActualItemDefinitionProvider extends
       valueFor,
       valueForQualifiedName: valueFor.getQualifiedPathName(),
       valueForContainsExternallyCheckedProperty: valueFor.containsAnExternallyCheckedProperty(),
+      isBlocked: false,
+      isDeleted: false,
     };
 
     this.onPropertyChange = this.onPropertyChange.bind(this);
     this.onItemSetExclusionState = this.onItemSetExclusionState.bind(this);
+    this.loadValue = this.loadValue.bind(this);
   }
-  public loadValue() {
-    // TODO
+  public async loadValue() {
+    if (this.props.forId && !this.state.valueFor.hasAppliedValueTo(this.props.forId)) {
+      const requestFields: any = {
+        DATA: {},
+      };
+      EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
+        requestFields[p] = {};
+      });
+      if (ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(this.props.tokenData.role)) {
+        MODERATION_FIELDS.forEach((mf) => {
+          requestFields.DATA[mf] = {};
+        });
+      }
+      this.state.valueFor.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+        if (pd.isRetrievalDisabled()) {
+          return;
+        }
+        if (
+          pd.checkRoleAccessFor(
+            ItemDefinitionIOActions.READ,
+            this.props.tokenData.role,
+            this.props.tokenData.id,
+            this.props.assumeOwnership ? this.props.tokenData.id : -1,
+            false,
+          )
+        ) {
+          requestFields.DATA[pd.getId()] = {};
+
+          const propertyDescription = pd.getPropertyDefinitionDescription();
+          if (propertyDescription.gqlFields) {
+            Object.keys(propertyDescription.gqlFields).forEach((field) => {
+              requestFields.DATA[pd.getId()][field] = {};
+            });
+          }
+        }
+      });
+      this.state.valueFor.getAllItems().forEach((item) => {
+        requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
+
+        const qualifiedId = item.getQualifiedIdentifier();
+        requestFields.DATA[qualifiedId] = {};
+
+        item.getSinkingProperties().forEach((sp) => {
+          if (sp.isRetrievalDisabled()) {
+            return;
+          }
+          if (
+            sp.checkRoleAccessFor(
+              ItemDefinitionIOActions.READ,
+              this.props.tokenData.role,
+              this.props.tokenData.id,
+              this.props.assumeOwnership ? this.props.tokenData.id : -1,
+              false,
+            )
+          ) {
+            requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = {};
+
+            const propertyDescription = sp.getPropertyDefinitionDescription();
+            if (propertyDescription.gqlFields) {
+              Object.keys(propertyDescription.gqlFields).forEach((field) => {
+                requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()][field] = {};
+              });
+            }
+          }
+        });
+
+        if (Object.keys(requestFields.DATA[qualifiedId]).length === 0) {
+          delete requestFields.DATA[qualifiedId];
+        }
+      });
+
+      if (Object.keys(requestFields.DATA).length === 0) {
+        delete requestFields.DATA;
+      }
+
+      const queryName = PREFIX_GET + this.state.valueFor.getQualifiedPathName();
+      const gqlValue = await gqlQuery(
+        buildGqlQuery({
+          name: queryName,
+          args: {
+            id: this.props.forId,
+            token: this.props.tokenData.token,
+            language: this.props.localeData.language.split("-")[0],
+            country: this.props.localeData.country,
+          },
+          fields: requestFields,
+        }),
+      );
+
+      // TODO check for errors
+      if (!gqlValue) {
+        // TODO connection error
+      } else if (!gqlValue.data) {
+        // TODO strange error but .error fields available
+      } else if (!gqlValue.data[queryName]) {
+        // TODO check for other error still here
+        // TODO deleted functionality
+      } else if (gqlValue.data[queryName].blocked_at) {
+        // TODO blocked
+      } else {
+        const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
+        this.state.valueFor.applyValueFromGQL(this.props.forId, recievedFields);
+        this.setState({
+          value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId),
+        });
+        if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+          this.setStateToCurrentValueWithExternalChecking(null);
+        }
+      }
+    }
+  }
+  public componentDidUpdate() {
+    this.loadValue();
   }
   public componentDidMount() {
     if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       this.setStateToCurrentValueWithExternalChecking(null);
     }
-    if (this.props.forId) {
-      this.loadValue();
-    }
+    this.loadValue();
   }
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
     const newValue = await this.state.valueFor.getCurrentValue(this.props.forId || null);
@@ -158,6 +300,8 @@ class ActualItemDefinitionProvider extends
           value: this.state.value,
           onPropertyChange: this.onPropertyChange,
           onItemSetExclusionState: this.onItemSetExclusionState,
+          deleted: this.state.isDeleted,
+          blocked: this.state.isBlocked,
         }}
       >
         {this.props.children}
@@ -168,16 +312,35 @@ class ActualItemDefinitionProvider extends
 
 export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
   return (
-    <ModuleContext.Consumer>
+    <LocaleContext.Consumer>
       {
-        (data) => {
-          if (!data) {
-            throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
-          }
-          return <ActualItemDefinitionProvider mod={data.mod} {...props}/>;
-        }
+        (localeData) => (
+          <TokenContext.Consumer>
+            {
+              (tokenData) => (
+                <ModuleContext.Consumer>
+                  {
+                    (data) => {
+                      if (!data) {
+                        throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
+                      }
+                      return (
+                        <ActualItemDefinitionProvider
+                          localeData={localeData}
+                          mod={data.mod}
+                          tokenData={tokenData}
+                          {...props}
+                        />
+                      );
+                    }
+                  }
+                </ModuleContext.Consumer>
+              )
+            }
+          </TokenContext.Consumer>
+        )
       }
-    </ModuleContext.Consumer>
+    </LocaleContext.Consumer>
   );
 }
 

@@ -4,7 +4,7 @@ import { GraphQLEndpointErrorType } from "../../base/errors";
 
 export interface ITokenProviderState {
   token: string;
-  id: string;
+  id: number;
   role: string;
   error: GraphQLEndpointErrorType;
   isLoggingIn: boolean;
@@ -24,7 +24,7 @@ export class TokenProvider extends React.Component<{}, ITokenProviderState> {
 
     this.state = {
       token: localStorage.getItem("TOKEN") || null,
-      id: localStorage.getItem("ID") || null,
+      id: parseInt(localStorage.getItem("ID"), 10) || null,
       role: localStorage.getItem("ROLE") || null,
       isLoggingIn: false,
       error: null,

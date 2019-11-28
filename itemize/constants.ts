@@ -203,7 +203,6 @@ export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "blocked_by",
   "blocked_until",
   "blocked_reason",
-  "mod_comments",
 ];
 // INVALID RESERVED PROPERTY NAMES
 export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
@@ -266,10 +265,6 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     type: GraphQLString,
     description: "A written text of why it was blocked",
   },
-  mod_comments: {
-    type: GraphQLList(GraphQLString),
-    description: "Moderation comments",
-  },
   flagged_by: {
     type: GraphQLList(GraphQLInt),
     description: "Users who flagged this item",
@@ -327,9 +322,6 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   },
   blocked_reason: {
     type: "text",
-  },
-  mod_comments: {
-    type: "text[]",
   },
   flagged_by: {
     type: "int[]",
