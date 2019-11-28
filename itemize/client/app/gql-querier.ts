@@ -55,7 +55,7 @@ export async function gqlQuery(query: string) {
   });
 
   try {
-    return value.json();
+    return await value.json();
   } catch (err) {
     return null;
   }

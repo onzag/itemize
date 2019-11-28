@@ -58,6 +58,11 @@ export default class Module {
     return buildSearchMode(rawData);
   }
 
+  public static getPropExtensionRawFor(parentModuleRaw: IModuleRawJSONDataType, id: string) {
+    const propertyDefinition = parentModuleRaw.propExtensions.find((p) => p.id === id);
+    return propertyDefinition;
+  }
+
   /**
    * Provides a full item definition in raw form
    * given raw data of a module and a full path for

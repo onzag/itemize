@@ -1,7 +1,7 @@
 import { initializeItemizeApp } from "../../itemize/client";
 import React from "react";
 import { ModuleProvider, ItemDefinitionProvider } from "../../itemize/client/app/providers";
-import { Entry, IfLogStatus, LogActioner } from "../../itemize/client/app/elements";
+import { Entry, IfLogStatus, LogActioner, ReadableErrorFor } from "../../itemize/client/app/elements";
 
 initializeItemizeApp(
   <ModuleProvider module="users">
@@ -10,8 +10,9 @@ initializeItemizeApp(
       <Entry id="password"/>
 
       <LogActioner>{
-        (login, logout) => (
+        (login, logout, activeError) => (
           <React.Fragment>
+            <ReadableErrorFor error={activeError}/>
             <IfLogStatus status="LOGGED_IN">
               logged in
               <button onClick={logout}>logout</button>

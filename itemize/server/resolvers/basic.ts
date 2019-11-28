@@ -653,8 +653,9 @@ export async function runPolicyCheck(
         );
         throw new GraphQLEndpointError({
           message: `validation failed for ${qualifiedPolicyIdentifier} with reason ${invalidReason}`,
-          code: invalidReason,
-          propertyId: property.getId(),
+          code: INVALID_POLICY_ERROR,
+          modulePath: mod.getPath(),
+          itemDefPath: itemDefinition.getPath(),
           policyType,
           policyName,
         });
@@ -721,7 +722,8 @@ export async function runPolicyCheck(
         throw new GraphQLEndpointError({
           message: `validation failed for policy ${policyName}`,
           code: INVALID_POLICY_ERROR,
-          propertyId: property.getId(),
+          modulePath: mod.getPath(),
+          itemDefPath: itemDefinition.getPath(),
           policyType,
           policyName,
         });

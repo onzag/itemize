@@ -52,7 +52,6 @@ export async function buildIndexes(
         }
       }
 
-
       if (
         newIndexType &&
         newIndexType !== (oldColumnSchema && oldColumnSchema.index) &&

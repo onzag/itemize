@@ -11,7 +11,7 @@ import { types } from "pg";
 import Moment from "moment";
 import { DATETIME_FORMAT, TIME_FORMAT, DATE_FORMAT } from "../constants";
 import { GraphQLError } from "graphql";
-import { GraphQLEndpointError } from "../base/errors";
+import { GraphQLEndpointError, GraphQLEndpointErrorType } from "../base/errors";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql";
 import restServices from "./rest";
@@ -60,32 +60,21 @@ const customFormatErrorFn = (error: GraphQLError) => {
     constructor = originalError.constructor;
   }
 
-  let code;
-  let propertyId: string;
-  let itemId: string;
-  let policyName: string;
-  let policyType: string;
+  let extensions: GraphQLEndpointErrorType;
   switch (constructor) {
     case GraphQLEndpointError:
       const gqlDataInputError = error.originalError as GraphQLEndpointError;
-      propertyId = gqlDataInputError.propertyId;
-      code = gqlDataInputError.code;
-      policyName = gqlDataInputError.policyName;
-      policyType = gqlDataInputError.policyType;
-      itemId = gqlDataInputError.itemId;
+      extensions = gqlDataInputError.data;
       break;
     default:
-      code = "UNSPECIFIED";
+      extensions = {
+        message: "severe uncaught internal error",
+        code: "INTERNAL_SERVER_ERROR",
+      };
   }
 
   return {
-    extensions: {
-      code,
-      propertyId,
-      itemId,
-      policyName,
-      policyType,
-    },
+    extensions,
     ...error,
   };
 };

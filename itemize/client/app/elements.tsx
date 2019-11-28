@@ -1,9 +1,13 @@
 import PropertyEntry from "./components/base/PropertyEntry";
 import { ItemDefinitionContext } from "./providers";
-import { IPropertyDefinitionValue } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import PropertyDefinition, { IPropertyDefinitionValue, IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
-import { IItemDefinitionValue } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemDefinitionValue, IItemDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition";
 import { TokenContext } from "./internal-providers";
+import { GraphQLEndpointErrorType } from "../../base/errors";
+import { DataContext, LocaleContext } from ".";
+import Root from "../../base/Root";
+import Module from "../../base/Root/Module";
 
 interface IPropertyProps {
   id: string;
@@ -43,8 +47,82 @@ export function Entry(props: IPropertyProps) {
   );
 }
 
+interface IReadableErrorForProps {
+  error: GraphQLEndpointErrorType;
+}
+export function ReadableErrorFor(props: IReadableErrorForProps) {
+  if (props.error === null) {
+    return null;
+  }
+  return (
+    <LocaleContext.Consumer>
+      {
+        (localeData) => {
+          const freeError = props.error as any;
+          if (!freeError.modulePath) {
+            const errorMessage: string = localeData.i18n.error[props.error.code];
+            return errorMessage;
+          }
+          return (
+            <DataContext.Consumer>
+              {
+                (data) => {
+                  const mod = Root.getModuleRawFor(data.raw, freeError.modulePath);
+                  if (!mod) {
+                    return null;
+                  }
+
+                  let itemDef: IItemDefinitionRawJSONDataType;
+                  if (freeError.itemDefPath) {
+                    itemDef = Module.getItemDefinitionRawFor(mod, freeError.itemDefPath);
+                    if (!itemDef) {
+                      return null;
+                    }
+                  }
+
+                  if (freeError.propertyId) {
+                    let propertyDef: IPropertyDefinitionRawJSONDataType;
+                    if (itemDef) {
+                      propertyDef = ItemDefinition.getPropertyDefinitionRawFor(
+                        itemDef,
+                        mod,
+                        freeError.propertyId,
+                        true,
+                      );
+                    } else {
+                      propertyDef = Module.getPropExtensionRawFor(
+                        mod,
+                        freeError.propertyId,
+                      );
+                    }
+                    if (!propertyDef) {
+                      return null;
+                    }
+
+                    return propertyDef.i18nData[localeData.language].error[props.error.code];
+                  } else if (freeError.policyType) {
+                    return itemDef
+                      .i18nData[localeData.language]
+                      .policies[freeError.policyType][freeError.policyName]
+                      .fail;
+                  }
+                }
+              }
+            </DataContext.Consumer>
+          );
+        }
+      }
+    </LocaleContext.Consumer>
+  );
+}
+
 interface ILogActionerProps {
-  children: (login: () => any, logout: () => any) => React.ReactNode;
+  children: (
+    login: () => any,
+    logout: () => any,
+    activeError: GraphQLEndpointErrorType,
+    dismissError: () => any,
+  ) => React.ReactNode;
 }
 export function LogActioner(props: ILogActionerProps) {
   return (
@@ -81,15 +159,18 @@ export function LogActioner(props: ILogActionerProps) {
 
                   let login: () => any;
                   let logout: () => any;
+                  let dismissError: () => any;
                   if (!tokenContextValue.isLoggingIn) {
                     login = tokenContextValue.login.bind(null, usernameValue, passwordValue, null);
                     logout = tokenContextValue.logout;
+                    dismissError = tokenContextValue.dismissError;
                   } else {
                     login = () => null;
                     logout = () => null;
+                    dismissError = () => null;
                   }
 
-                  return props.children && props.children(login, logout);
+                  return props.children && props.children(login, logout, tokenContextValue.error, dismissError);
                 }
               }
             </ItemDefinitionContext.Consumer>

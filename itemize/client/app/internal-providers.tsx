@@ -1,16 +1,19 @@
 import React from "react";
 import { gqlQuery, buildGqlQuery } from "./gql-querier";
+import { GraphQLEndpointErrorType } from "../../base/errors";
 
 export interface ITokenProviderState {
   token: string;
   id: string;
   role: string;
+  error: GraphQLEndpointErrorType;
   isLoggingIn: boolean;
 }
 
 export interface ITokenContextType extends ITokenProviderState {
   login: (username: string, password: string, token: string) => void;
   logout: () => void;
+  dismissError: () => void;
 }
 
 export const TokenContext = React.createContext<ITokenContextType>(null);
@@ -24,6 +27,7 @@ export class TokenProvider extends React.Component<{}, ITokenProviderState> {
       id: localStorage.getItem("ID") || null,
       role: localStorage.getItem("ROLE") || null,
       isLoggingIn: false,
+      error: null,
     };
 
     this.login = this.login.bind(this);
@@ -59,12 +63,27 @@ export class TokenProvider extends React.Component<{}, ITokenProviderState> {
         },
       ),
     );
-    // TODO something really bad happened
-    // either no connection or server totally failed
     if (!data) {
-      // TODO
+      this.setState({
+        isLoggingIn: false,
+        id: null,
+        token: null,
+        role: null,
+        error: {
+          message: "Failed to connect",
+          code: "CANT_CONNECT",
+        },
+      });
     } else {
-      // TODO handle invalid password and whatnot
+      if (data.errors) {
+        this.setState({
+          error: data.errors[0].extensions,
+        });
+      } else {
+        this.setState({
+          error: null,
+        });
+      }
       const tokenData = data.data.token;
       const tokenDataId = tokenData ? tokenData.id : null;
       const tokenDataRole = tokenData ? tokenData.role : null;
@@ -106,6 +125,11 @@ export class TokenProvider extends React.Component<{}, ITokenProviderState> {
       role: null,
     });
   }
+  public dismissError() {
+    this.setState({
+      error: null,
+    });
+  }
   public render() {
     return (
       <TokenContext.Provider
@@ -113,6 +137,7 @@ export class TokenProvider extends React.Component<{}, ITokenProviderState> {
           ...this.state,
           login: this.login,
           logout: this.logout,
+          dismissError: this.dismissError,
         }}
       >
         {this.props.children}

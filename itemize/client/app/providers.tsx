@@ -177,22 +177,41 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
 
 interface IModuleProviderProps {
   children: any;
-  module: string;
+  module?: string;
+  submodule?: string;
 }
 
 // TODO module level searches
 export function ModuleProvider(props: IModuleProviderProps) {
-  return (
-    <DataContext.Consumer>
-      {
-        (data) => {
-          return (
-            <ModuleContext.Provider value={{mod: data.value.getModule(props.module)}}>
-              {props.children}
-            </ModuleContext.Provider>
-          );
+  if (props.submodule) {
+    return (
+      <ModuleContext.Consumer>
+        {
+          (data) => {
+            return (
+              <ModuleContext.Provider value={{mod: data.mod.getChildModule(props.module)}}>
+                {props.children}
+              </ModuleContext.Provider>
+            );
+          }
         }
-      }
-    </DataContext.Consumer>
-  );
+      </ModuleContext.Consumer>
+    );
+  } else if (props.module) {
+    return (
+      <DataContext.Consumer>
+        {
+          (data) => {
+            return (
+              <ModuleContext.Provider value={{mod: data.value.getModule(props.module)}}>
+                {props.children}
+              </ModuleContext.Provider>
+            );
+          }
+        }
+      </DataContext.Consumer>
+    );
+  } else {
+    return props.children;
+  }
 }
