@@ -163,7 +163,14 @@ class ActualItemDefinitionProvider extends
 export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
   return (
     <ModuleContext.Consumer>
-      {(data) => <ActualItemDefinitionProvider mod={data.mod} {...props}/>}
+      {
+        (data) => {
+          if (!data) {
+            throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
+          }
+          return <ActualItemDefinitionProvider mod={data.mod} {...props}/>;
+        }
+      }
     </ModuleContext.Consumer>
   );
 }

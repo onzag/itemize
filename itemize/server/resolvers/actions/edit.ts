@@ -21,7 +21,7 @@ import {
   convertGQLValueToSQLValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sql";
-import { GraphQLDataInputError } from "../../../base/errors";
+import { GraphQLEndpointError } from "../../../base/errors";
 
 const debug = Debug("resolvers:editItemDefinition");
 export async function editItemDefinition(
@@ -81,7 +81,7 @@ export async function editItemDefinition(
       // if we don't get an user id this means that there's no owner, this is bad input
       if (!userId) {
         debug("FAILED due to lack of content data");
-        throw new GraphQLDataInputError({
+        throw new GraphQLEndpointError({
           message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
           code: "UNSPECIFIED",
         });
@@ -90,9 +90,9 @@ export async function editItemDefinition(
       // also throw an error if it's blocked
       if (contentData.blocked_at !== null) {
         debug("FAILED due to element being blocked");
-        throw new GraphQLDataInputError({
+        throw new GraphQLEndpointError({
           message: "The item is blocked",
-          code: "UNSPECIFIED",
+          code: "BLOCKED",
         });
       }
     },
@@ -197,7 +197,7 @@ export async function editItemDefinition(
     Object.keys(sqlModData).length === 0
   ) {
     debug("FAILED due to input data being none");
-    throw new GraphQLDataInputError({
+    throw new GraphQLEndpointError({
       message: "You are not updating anything whatsoever",
       code: "UNSPECIFIED",
     });

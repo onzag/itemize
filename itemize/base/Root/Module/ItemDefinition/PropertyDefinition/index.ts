@@ -9,7 +9,7 @@ import {
 } from "../../../../../constants";
 import Module, { OnStateChangeListenerType } from "../..";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
-import { GraphQLDataInputError } from "../../../../errors";
+import { GraphQLEndpointError } from "../../../../errors";
 import { DOMWindow } from "../../../../util";
 import equals from "deep-equal";
 
@@ -26,7 +26,6 @@ export enum PropertyInvalidReason {
   FROM_LARGER_THAN_TO = "FROM_LARGER_THAN_TO",
   TO_SMALLER_THAN_FROM = "TO_SMALLER_THAN_FROM",
   NOT_UNIQUE = "NOT_UNIQUE",
-  INVALID_PASSWORD = "INVALID_PASSWORD",
 }
 
 export interface IPropertyDefinitionRawJSONRuleDataType {
@@ -1084,10 +1083,10 @@ export default class PropertyDefinition {
       rolesWithAccess.includes(SELF_METAROLE) && userId === ownerUserId
     ) || rolesWithAccess.includes(role);
     if (!hasAccess && throwError) {
-      throw new GraphQLDataInputError({
+      throw new GraphQLEndpointError({
         message: `Forbidden, user ${userId} with role ${role} has no ${action} access` +
         ` to property ${this.getId()} only roles ${rolesWithAccess.join(", ")} can be granted access`,
-        code: "UNSPECIFIED",
+        code: "FORBIDDEN",
       });
     }
     return hasAccess;

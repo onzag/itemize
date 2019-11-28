@@ -41,7 +41,7 @@ export async function buildLang(
   };
 
   // and start to loop
-  supportedLanguages.forEach((locale, index) => {
+  supportedLanguages.forEach((locale) => {
 
     if (!propertiesBase[locale]) {
       throw new CheckUpError(
@@ -53,14 +53,43 @@ export async function buildLang(
     result.locales[locale] = {};
 
     LOCALE_I18N.forEach((property) => {
-      if (!propertiesBase[locale][property]) {
+      const propertySplitted = property.split(".");
+      let propertyResult = propertiesBase[locale];
+      let propKey: string;
+      // try to find it
+      for (propKey of propertySplitted) {
+        propertyResult = propertyResult[propKey];
+        if (!propertyResult) {
+          break;
+        }
+      }
+      if (!propertyResult) {
         throw new CheckUpError(
           "File does not include data for '" + locale + "' in '" + property + "'",
           internalTracebackBaseFile,
         );
+      } else if (typeof propertyResult !== "string") {
+        throw new CheckUpError(
+          "File has an invalid type for '" + locale + "' in '" + property + "'",
+          internalTracebackBaseFile,
+        );
       }
 
-      result.locales[locale][property] = propertiesBase[locale][property];
+      propertyResult = propertyResult.trim();
+
+      let whereToSet: any = result.locales[locale];
+      // by looping on the splitted value
+      propertySplitted.forEach((keyValue, index) => {
+        // on the last one we set it as the value
+        if (index === propertySplitted.length - 1) {
+          whereToSet[keyValue] = propertyResult;
+          return;
+        }
+
+        // otherwise we try to get deeper
+        whereToSet[keyValue] = whereToSet[keyValue] || {};
+        whereToSet = whereToSet[keyValue];
+      });
     });
 
     if (propertiesExtra[locale]) {

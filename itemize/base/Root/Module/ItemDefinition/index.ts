@@ -10,7 +10,7 @@ import {
   SELF_METAROLE,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
-import { GraphQLDataInputError } from "../../../errors";
+import { GraphQLEndpointError } from "../../../errors";
 
 export interface IPolicyValueRawJSONDataType {
   roles: string[];
@@ -742,10 +742,10 @@ export default class ItemDefinition {
 
     if (!idefLevelAccess) {
       if (throwError) {
-        throw new GraphQLDataInputError({
+        throw new GraphQLEndpointError({
           message: `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
           ` only roles ${rolesWithAccess.join(", ")} can be granted access`,
-          code: "UNSPECIFIED",
+          code: "FORBIDDEN",
         });
       }
       return false;

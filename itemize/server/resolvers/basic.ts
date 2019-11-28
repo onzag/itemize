@@ -10,7 +10,7 @@ import {
   ITEM_PREFIX,
   EXCLUSION_STATE_SUFFIX,
 } from "../../constants";
-import { GraphQLDataInputError } from "../../base/errors";
+import { GraphQLEndpointError } from "../../base/errors";
 import Debug from "debug";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import Module from "../../base/Root/Module";
@@ -207,9 +207,9 @@ export function checkBasicFieldsAreAvailableForRole(tokenData: any, requestedFie
       ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
     );
     // we throw an error
-    throw new GraphQLDataInputError({
+    throw new GraphQLEndpointError({
       message: "You have requested to add/edit/view moderation fields with role: " + tokenData.role,
-      code: "UNSPECIFIED",
+      code: "FORBIDDEN",
     });
   }
 
@@ -231,7 +231,7 @@ export function checkListLimit(ids: string[]) {
       ids.length,
       MAX_SQL_LIMIT,
     );
-    throw new GraphQLDataInputError({
+    throw new GraphQLEndpointError({
       message: "Too many ids at once, max is " + MAX_SQL_LIMIT,
       code: "UNSPECIFIED",
     });
@@ -255,7 +255,7 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
       "FAILED Invalid language code %s",
       args.language,
     );
-    throw new GraphQLDataInputError({
+    throw new GraphQLEndpointError({
       message: "Please use valid non-regionalized language values",
       code: "UNSPECIFIED",
     });
@@ -269,7 +269,7 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
       "FAILED Unavailable/Unsupported language %s",
       args.language,
     );
-    throw new GraphQLDataInputError({
+    throw new GraphQLEndpointError({
       message: "This language is not supported, as no dictionary has been set",
       code: "UNSPECIFIED",
     });
@@ -281,7 +281,7 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
       "FAILED Invalid country code %s",
       args.country,
     );
-    throw new GraphQLDataInputError({
+    throw new GraphQLEndpointError({
       message: "Please use valid region 2-digit ISO codes in uppercase",
       code: "UNSPECIFIED",
     });
@@ -294,7 +294,7 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
       "FAILED Unknown country %s",
       args.country,
     );
-    throw new GraphQLDataInputError({
+    throw new GraphQLEndpointError({
       message: "Unknown country " + args.country,
       code: "UNSPECIFIED",
     });
@@ -326,9 +326,9 @@ export function mustBeLoggedIn(tokenData: any) {
   mustBeLoggedInDebug("EXECUTED with %j", tokenData);
   if (!tokenData.userId) {
     mustBeLoggedInDebug("FAILED");
-    throw new GraphQLDataInputError({
+    throw new GraphQLEndpointError({
       message: "Must be logged in",
-      code: "UNSPECIFIED",
+      code: "MUST_BE_LOGGED_IN",
     });
   }
   mustBeLoggedInDebug("SUCCEED");
@@ -462,7 +462,7 @@ export async function serverSideCheckItemDefinitionAgainst(
         propertyValue.invalidReason,
       );
       // throw an error then
-      throw new GraphQLDataInputError({
+      throw new GraphQLEndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
         code: propertyValue.invalidReason,
         modulePath: itemDefinition.getParentModule().getPath(),
@@ -480,7 +480,7 @@ export async function serverSideCheckItemDefinitionAgainst(
         gqlPropertyValue,
         propertyValue.value,
       );
-      throw new GraphQLDataInputError({
+      throw new GraphQLEndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated value`,
         code: "UNSPECIFIED",
         modulePath: itemDefinition.getParentModule().getPath(),
@@ -511,7 +511,7 @@ export async function serverSideCheckItemDefinitionAgainst(
         gqlExclusionState,
         itemValue.exclusionState,
       );
-      throw new GraphQLDataInputError({
+      throw new GraphQLEndpointError({
         message: `validation failed at item ${itemValue.itemId} with a mismatch of exclusion state`,
         code: "UNSPECIFIED",
         modulePath: itemDefinition.getParentModule().getPath(),
@@ -524,7 +524,7 @@ export async function serverSideCheckItemDefinitionAgainst(
         "FAILED due to value set on item %s where it was excluded",
         itemValue.itemId,
       );
-      throw new GraphQLDataInputError({
+      throw new GraphQLEndpointError({
         message: `validation failed at item ${itemValue.itemId} with an excluded item but data set for it`,
         code: "UNSPECIFIED",
         modulePath: itemDefinition.getParentModule().getPath(),
@@ -651,7 +651,7 @@ export async function runPolicyCheck(
           "FAILED due to failing to pass property validation %s",
           invalidReason,
         );
-        throw new GraphQLDataInputError({
+        throw new GraphQLEndpointError({
           message: `validation failed for ${qualifiedPolicyIdentifier} with reason ${invalidReason}`,
           code: invalidReason,
           propertyId: property.getId(),
@@ -718,7 +718,7 @@ export async function runPolicyCheck(
           "FAILED due to policy %s not passing",
           policyName,
         );
-        throw new GraphQLDataInputError({
+        throw new GraphQLEndpointError({
           message: `validation failed for policy ${policyName}`,
           code: INVALID_POLICY_ERROR,
           propertyId: property.getId(),

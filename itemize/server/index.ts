@@ -11,7 +11,7 @@ import { types } from "pg";
 import Moment from "moment";
 import { DATETIME_FORMAT, TIME_FORMAT, DATE_FORMAT } from "../constants";
 import { GraphQLError } from "graphql";
-import { GraphQLDataInputError } from "../base/errors";
+import { GraphQLEndpointError } from "../base/errors";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql";
 import restServices from "./rest";
@@ -66,8 +66,8 @@ const customFormatErrorFn = (error: GraphQLError) => {
   let policyName: string;
   let policyType: string;
   switch (constructor) {
-    case GraphQLDataInputError:
-      const gqlDataInputError = error.originalError as GraphQLDataInputError;
+    case GraphQLEndpointError:
+      const gqlDataInputError = error.originalError as GraphQLEndpointError;
       propertyId = gqlDataInputError.propertyId;
       code = gqlDataInputError.code;
       policyName = gqlDataInputError.policyName;
@@ -100,13 +100,14 @@ async function customResolveWrapper(
   try {
     return await fn(source, args, context, info);
   } catch (err) {
-    if (err instanceof GraphQLDataInputError) {
+    if (err instanceof GraphQLEndpointError) {
       throw err;
     }
     console.error(err.stack);
-    throw new Error(
-      "Internal server error",
-    );
+    throw new GraphQLEndpointError({
+      message: "Internal Server Error",
+      code: "INTERNAL_SERVER_ERROR",
+    });
   }
 }
 

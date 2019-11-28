@@ -13,7 +13,7 @@ import { getGQLFieldsDefinitionForProperty } from "./ItemDefinition/PropertyDefi
 import { getGQLQueryFieldsForItemDefinition, getGQLMutationFieldsForItemDefinition } from "./ItemDefinition/gql";
 import { IGQLFieldsDefinitionType, IGraphQLResolversType, IGQLQueryFieldsDefinitionType } from "../gql";
 import { ItemDefinitionIOActions } from "./ItemDefinition";
-import { GraphQLDataInputError } from "../../errors";
+import { GraphQLEndpointError } from "../../errors";
 
 /**
  * Provides the fields definition for the module itself, and for all
@@ -128,13 +128,14 @@ async function resolveGenericFunction(
         info,
       }, mod);
     } catch (err) {
-      if (err instanceof GraphQLDataInputError) {
+      if (err instanceof GraphQLEndpointError) {
         throw err;
       }
       console.error(err.stack);
-      throw new Error(
-        "Internal server error",
-      );
+      throw new GraphQLEndpointError({
+        message: "Internal Server Error",
+        code: "INTERNAL_SERVER_ERROR",
+      });
     }
   }
   return value;

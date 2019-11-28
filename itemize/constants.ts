@@ -146,6 +146,15 @@ export const LOCALE_I18N = [
   "unit_dialog_others",
   "unit_dialog_metric",
   "unit_dialog_imperial",
+
+  "error.INVALID_CREDENTIALS",
+  "error.BLOCKED",
+  "error.DELETED",
+  "error.CANT_CONNECT",
+  "error.INTERNAL_SERVER_ERROR",
+  "error.UNSPECIFIED",
+  "error.MUST_BE_LOGGED_IN",
+  "error.FORBIDDEN",
 ];
 
 // ATTRIBUTES FOR i18N PROPERTIES

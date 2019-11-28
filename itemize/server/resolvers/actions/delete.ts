@@ -11,7 +11,7 @@ import {
   runPolicyCheck,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
-import { GraphQLDataInputError } from "../../../base/errors";
+import { GraphQLEndpointError } from "../../../base/errors";
 import { ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS } from "../../../constants";
 
 const debug = Debug("resolvers:deleteItemDefinition");
@@ -69,7 +69,7 @@ export async function deleteItemDefinition(
       // if there is no userId then the row was null, we throw an error
       if (!userId) {
         debug("FAILED due to lack of content data");
-        throw new GraphQLDataInputError({
+        throw new GraphQLEndpointError({
           message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
           code: "UNSPECIFIED",
         });
@@ -83,10 +83,10 @@ export async function deleteItemDefinition(
         !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
       ) {
         debug("FAILED due to blocked content and no moderation access for role %s", tokenData.role);
-        throw new GraphQLDataInputError({
+        throw new GraphQLEndpointError({
           message: "The item is blocked, only users with role " +
           ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.join(",") + " can wipe this data",
-          code: "UNSPECIFIED",
+          code: "BLOCKED",
         });
       }
     },

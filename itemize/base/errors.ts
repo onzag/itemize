@@ -1,4 +1,4 @@
-export class GraphQLDataInputError extends Error {
+export class GraphQLEndpointError extends Error {
   public code: string;
   public propertyId: string;
   public itemId: string;
@@ -28,6 +28,6 @@ export class GraphQLDataInputError extends Error {
     this.policyType = data.policyType || null;
 
     // Set the prototype explicitly.
-    Object.setPrototypeOf(this, GraphQLDataInputError.prototype);
+    Object.setPrototypeOf(this, GraphQLEndpointError.prototype);
   }
 }

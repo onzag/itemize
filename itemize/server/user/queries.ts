@@ -1,9 +1,9 @@
 import { IAppDataType } from "..";
 import { IGQLQueryFieldsDefinitionType } from "../../../itemize/base/Root/gql";
-import { GraphQLString } from "graphql";
+import { GraphQLString, GraphQLObjectType, GraphQLInt } from "graphql";
 import { CONNECTOR_SQL_COLUMN_FK_NAME } from "../../constants";
 import { jwtVerify, jwtSign } from "../token";
-import { GraphQLDataInputError } from "../../../itemize/base/errors";
+import { GraphQLEndpointError } from "../../../itemize/base/errors";
 import { PropertyInvalidReason } from "../../../itemize/base/Root/Module/ItemDefinition/PropertyDefinition";
 
 export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinitionType => {
@@ -20,7 +20,20 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
   return {
     token: {
-      type: GraphQLString,
+      type: new GraphQLObjectType({
+        name: "TOKEN_OBJECT",
+        fields: {
+          token: {
+            type: GraphQLString,
+          },
+          id: {
+            type: GraphQLInt,
+          },
+          role: {
+            type: GraphQLString,
+          },
+        },
+      }),
       args: {
         username: {
           type: GraphQLString,
@@ -39,8 +52,12 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
         if (args.token) {
           try {
-            await jwtVerify(args.token, appData.config.jwtKey);
-            return args.token;
+            const decoded: any = await jwtVerify(args.token, appData.config.jwtKey) as object;
+            return {
+              token: args.token,
+              id: decoded.id,
+              role: decoded.role,
+            };
           } catch (err) {
             return null;
           }
@@ -56,14 +73,14 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             const token = await jwtSign(resultUser, appData.config.jwtKey, {
               expiresIn: "7d",
             });
-            return token;
+            return {
+              ...resultUser,
+              token,
+            };
           } else {
-            throw new GraphQLDataInputError({
+            throw new GraphQLEndpointError({
               message: "Invalid Credentials",
-              code: PropertyInvalidReason.INVALID_PASSWORD,
-              modulePath: ["users"],
-              itemDefPath: ["user"],
-              propertyId: "password",
+              code: "INVALID_CREDENTIALS",
             });
           }
         }

@@ -57,11 +57,12 @@ if (process.env.NODE_ENV === "production") {
   throw new Error("This script cannot run in production mode");
 }
 
+interface IKeyValuePairNestedType {
+  [key: string]: string | IKeyValuePairNestedType;
+}
 export interface ILocaleLangDataType {
   locales: {
-    [locale: string]: {
-      [key: string]: string;
-    };
+    [locale: string]: IKeyValuePairNestedType;
   };
 }
 
@@ -929,10 +930,6 @@ async function getI18nPropertyData(
   const errorRequiredProperties = [];
   if (!property.nullable && property.type !== "boolean") {
     errorRequiredProperties.push("error.NOT_NULLABLE");
-  }
-
-  if (property.type === "password") {
-    errorRequiredProperties.push("error.INVALID_PASSWORD");
   }
 
   if (property.unique) {

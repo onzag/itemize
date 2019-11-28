@@ -12,6 +12,7 @@ import MomentUtils from "@date-io/moment";
 import { Route } from "react-router";
 import { history } from "..";
 import { countries, currencies } from "../../resources";
+import { TokenProvider } from "./internal-providers";
 
 // We need to extract the jss generation because we want to
 // inject our custom css anyway, as despite having it
@@ -351,12 +352,14 @@ export default class App extends React.Component<IAppProps, IAppState> {
     return (
       <JssProvider jss={jss} generateClassName={generateClassName}>
         <MuiThemeProvider theme={theme}>
-          <DataContext.Provider value={dataContextValue}>
-            <Route
-              path="/:lang/"
-              component={this.renderAppWithLocaleContext}
-            />
-          </DataContext.Provider>
+          <TokenProvider>
+            <DataContext.Provider value={dataContextValue}>
+              <Route
+                path="/:lang/"
+                component={this.renderAppWithLocaleContext}
+              />
+            </DataContext.Provider>
+          </TokenProvider>
         </MuiThemeProvider>
       </JssProvider>
     );
