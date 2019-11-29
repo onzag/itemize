@@ -1,8 +1,8 @@
 import React from "react";
 import Root, { IRootRawJSONDataType, Ii18NType, IRawJSONBuildDataType } from "../../base/Root";
-import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
+import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import { createMuiTheme } from "@material-ui/core";
-import JssProvider from "react-jss/lib/JssProvider";
+import { JssProvider } from "react-jss";
 import { create } from "jss";
 import { createGenerateClassName, jssPreset } from "@material-ui/core/styles";
 import { importScript } from "..";
@@ -14,6 +14,7 @@ import { history } from "..";
 import { countries, currencies } from "../../resources";
 import { TokenProvider } from "./internal-providers";
 
+// TODO rid of scss and use jss
 // We need to extract the jss generation because we want to
 // inject our custom css anyway, as despite having it
 // we are not really using the material ui JSS tools
@@ -99,7 +100,6 @@ export const DataContext = React.createContext<IDataContextType>(null);
 // we create the material ui theme
 const theme = createMuiTheme({
   typography: {
-    useNextVariants: true,
     fontFamily: "'Open Sans', sans-serif",
   },
 });
@@ -136,6 +136,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
   }
 
   /**
+   * TODO update user if logged in
    * Changes the language for the one specified by that locale
    * @param locale the two letter or language-region code for the locale
    */
@@ -327,13 +328,15 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // such a code is stripped if it's production
     return (
       <LocaleContext.Provider value={localeContextValue}>
-        <MuiPickersUtilsProvider
-          utils={MomentUtils}
-          locale={currentActualLanguageDeregionalized}
-          moment={Moment}
-        >
-          {this.props.mainComponent}
-        </MuiPickersUtilsProvider>
+        <TokenProvider localeContext={localeContextValue}>
+          <MuiPickersUtilsProvider
+            utils={MomentUtils}
+            locale={currentActualLanguageDeregionalized}
+            moment={Moment}
+          >
+            {this.props.mainComponent}
+          </MuiPickersUtilsProvider>
+        </TokenProvider>
       </LocaleContext.Provider>
     );
   }
@@ -350,16 +353,14 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // our data context, and then pass the react router route, note that the
     // router itself is the parent
     return (
-      <JssProvider jss={jss} generateClassName={generateClassName}>
+      <JssProvider jss={jss} generateId={generateClassName}>
         <MuiThemeProvider theme={theme}>
-          <TokenProvider>
-            <DataContext.Provider value={dataContextValue}>
-              <Route
-                path="/:lang/"
-                component={this.renderAppWithLocaleContext}
-              />
-            </DataContext.Provider>
-          </TokenProvider>
+          <DataContext.Provider value={dataContextValue}>
+            <Route
+              path="/:lang/"
+              component={this.renderAppWithLocaleContext}
+            />
+          </DataContext.Provider>
         </MuiThemeProvider>
       </JssProvider>
     );

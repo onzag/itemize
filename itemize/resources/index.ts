@@ -30,18 +30,15 @@ export interface ICurrencyType {
   decimals: number;
 }
 
-// This one represents the list of countries as an object,
-// given the country code
 export interface ICountryDataType {
   [countryCode: string]: ICountryType;
 }
 
-// TODO move this logic
-// This one is the list of currencies given the currency
-// code
 export interface ICurrencyDataType {
   [currencyCode: string]: ICurrencyType;
 }
 
 export const countries: ICountryDataType = countriesJSON as any;
 export const currencies: ICurrencyDataType = currenciesJSON as any;
+export const arrCountries: ICountryType[] = Object.keys(countries).map((code) => countries[code]);
+export const arrCurrencies: ICurrencyType[] = Object.keys(currencies).map((code) => currencies[code]);

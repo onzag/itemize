@@ -10,14 +10,18 @@
         {
             "id": "app_lang_locale",
             "type": "string",
-            "nullable": true,
+            "hidden": true,
+            "searchLevel": "disabled"
+        },
+        {
+            "id": "app_country",
+            "type": "string",
             "hidden": true,
             "searchLevel": "disabled"
         },
         {
             "id": "currency",
             "type": "string",
-            "nullable": true,
             "hidden": true,
             "searchLevel": "disabled"
         },

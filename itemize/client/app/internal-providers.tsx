@@ -1,13 +1,19 @@
 import React from "react";
 import { gqlQuery, buildGqlQuery } from "./gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
+import { ILocaleContextType } from ".";
+import { PREFIX_GET } from "../../constants";
 
-export interface ITokenProviderState {
+interface ITokenProviderState {
   token: string;
   id: number;
   role: string;
   error: GraphQLEndpointErrorType;
   isLoggingIn: boolean;
+}
+
+interface ITokenProviderProps {
+  localeContext: ILocaleContextType;
 }
 
 export interface ITokenContextType extends ITokenProviderState {
@@ -18,8 +24,8 @@ export interface ITokenContextType extends ITokenProviderState {
 
 export const TokenContext = React.createContext<ITokenContextType>(null);
 
-export class TokenProvider extends React.Component<{}, ITokenProviderState> {
-  constructor(props: {}) {
+export class TokenProvider extends React.Component<ITokenProviderProps, ITokenProviderState> {
+  constructor(props: ITokenProviderProps) {
     super(props);
 
     this.state = {
@@ -109,6 +115,45 @@ export class TokenProvider extends React.Component<{}, ITokenProviderState> {
         token: tokenDataToken,
         role: tokenDataRole,
       });
+
+      if (tokenDataId) {
+        const userLanguageData = await gqlQuery(
+          buildGqlQuery(
+            {
+              name: "GET_MOD_users__IDEF_user",
+              args: {
+                token: tokenDataToken,
+                language: this.props.localeContext.language.split("-")[0],
+                country: this.props.localeContext.country,
+                id: tokenDataId,
+              },
+              fields: {
+                DATA: {
+                  app_country: {},
+                  app_lang_locale: {},
+                  currency: {},
+                },
+              },
+            },
+          ),
+        );
+
+        if (userLanguageData && userLanguageData.data && userLanguageData.data.GET_MOD_users__IDEF_user) {
+          const localeUserData = userLanguageData.data.GET_MOD_users__IDEF_user.DATA;
+          // we still check everything just in case the user is blocked
+          if (localeUserData) {
+            if (this.props.localeContext.country !== localeUserData.app_country) {
+              this.props.localeContext.changeCountryTo(localeUserData.app_country);
+            }
+            if (this.props.localeContext.language !== localeUserData.app_lang_locale) {
+              this.props.localeContext.changeLanguageTo(localeUserData.app_lang_locale);
+            }
+            if (this.props.localeContext.currency !== localeUserData.currency) {
+              this.props.localeContext.changeCurrencyTo(localeUserData.currency);
+            }
+          }
+        }
+      }
     }
   }
   public logout() {

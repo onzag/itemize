@@ -4,7 +4,7 @@ import {
 } from "../types";
 import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
 import { IGQLValue } from "../../../../gql";
-import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
+import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_SUPPORTED_REAL,
   CLASSIC_BASE_I18N,

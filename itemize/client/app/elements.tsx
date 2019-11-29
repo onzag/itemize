@@ -1,6 +1,6 @@
 import PropertyEntry from "./components/base/PropertyEntry";
 import { ItemDefinitionContext } from "./providers";
-import PropertyDefinition, { IPropertyDefinitionValue, IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { IPropertyDefinitionValue, IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
 import ItemDefinition, { IItemDefinitionValue, IItemDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition";
 import { TokenContext } from "./internal-providers";
@@ -9,13 +9,16 @@ import { DataContext, LocaleContext } from ".";
 import Root from "../../base/Root";
 import Module from "../../base/Root/Module";
 import PropertyView from "./components/base/PropertyView";
+import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../resources";
 
-interface IPropertyEntryViewProps {
+interface IPropertyEntryViewReadProps {
   id: string;
   item?: string;
+  children?: (value: PropertyDefinitionSupportedType) => React.ReactNode;
 }
 
-function EntryView(props: IPropertyEntryViewProps, view: boolean) {
+function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: boolean) {
   return (
     <ItemDefinitionContext.Consumer>
       {
@@ -36,7 +39,9 @@ function EntryView(props: IPropertyEntryViewProps, view: boolean) {
 
           const property = itemDefinitionContextualValue.idef.getPropertyDefinitionFor(props.id, true);
 
-          if (view) {
+          if (read) {
+            return props.children(propertyValue.value);
+          } else if (view) {
             return (
               <PropertyView
                 property={property}
@@ -58,12 +63,16 @@ function EntryView(props: IPropertyEntryViewProps, view: boolean) {
   );
 }
 
-export function Entry(props: IPropertyEntryViewProps) {
-  return EntryView(props, false);
+export function Entry(props: IPropertyEntryViewReadProps) {
+  return EntryViewRead(props, false, false);
 }
 
-export function View(props: IPropertyEntryViewProps) {
-  return EntryView(props, true);
+export function View(props: IPropertyEntryViewReadProps) {
+  return EntryViewRead(props, true, false);
+}
+
+export function Reader(props: IPropertyEntryViewReadProps) {
+  return EntryViewRead(props, false, true);
 }
 
 interface IReadableErrorForProps {
@@ -242,6 +251,90 @@ export function UserIdRetriever(props: IUserIdRetrieverProps) {
         }
       }
     </TokenContext.Consumer>
+  );
+}
+
+interface IFnAppLanguageRetrieverLanguageFormType {
+  code: string;
+  name: string;
+}
+type FnAppLanguageRetrieverType = (arg: {
+  currentLanguage: IFnAppLanguageRetrieverLanguageFormType,
+  availableLanguages: IFnAppLanguageRetrieverLanguageFormType[],
+  changeLanguageTo: (code: string) => void,
+}) => React.ReactNode;
+export function AppLanguageRetriever(props: {
+  children: FnAppLanguageRetrieverType;
+}) {
+  return (
+    <LocaleContext.Consumer>
+      {
+        (localeContext) => {
+          const currentLanguage: IFnAppLanguageRetrieverLanguageFormType = {
+            code: localeContext.language,
+            name: localeContext.localeData[localeContext.language].name,
+          };
+          const availableLanguages: IFnAppLanguageRetrieverLanguageFormType[] = [];
+          Object.keys(localeContext.localeData).forEach((code) => {
+            availableLanguages.push({
+              code,
+              name: localeContext.localeData[code].name,
+            });
+          });
+          return props.children({
+            currentLanguage,
+            availableLanguages,
+            changeLanguageTo: localeContext.updating ? () => null : localeContext.changeLanguageTo,
+          });
+        }
+      }
+    </LocaleContext.Consumer>
+  );
+}
+
+type FnAppCurrencyRetrieverType = (arg: {
+  currentCurrency: ICurrencyType,
+  availableCurrencies: ICurrencyType[],
+  changeCurrencyTo: (code: string) => void,
+}) => React.ReactNode;
+export function AppCurrencyRetriever(props: {
+  children: FnAppCurrencyRetrieverType;
+}) {
+  return (
+    <LocaleContext.Consumer>
+      {
+        (localeContext) => {
+          return props.children({
+            currentCurrency: currencies[localeContext.currency.toUpperCase()],
+            availableCurrencies: arrCurrencies,
+            changeCurrencyTo: localeContext.updating ? () => null : localeContext.changeCurrencyTo,
+          });
+        }
+      }
+    </LocaleContext.Consumer>
+  );
+}
+
+type FnAppCountryRetrieverType = (arg: {
+  currentCountry: ICountryType,
+  availableCountries: ICountryType[],
+  changeCountryTo: (code: string) => void,
+}) => React.ReactNode;
+export function AppCountryRetriever(props: {
+  children: FnAppCountryRetrieverType;
+}) {
+  return (
+    <LocaleContext.Consumer>
+      {
+        (localeContext) => {
+          return props.children({
+            currentCountry: countries[localeContext.country.toUpperCase()],
+            availableCountries: arrCountries,
+            changeCountryTo: localeContext.updating ? () => null : localeContext.changeCountryTo,
+          });
+        }
+      }
+    </LocaleContext.Consumer>
   );
 }
 
