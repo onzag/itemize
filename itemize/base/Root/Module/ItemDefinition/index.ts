@@ -1,7 +1,7 @@
 import Item, { IItemRawJSONDataType, IItemValue, ItemExclusionState } from "./Item";
 import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionValue } from "./PropertyDefinition";
-import Module, { IModuleRawJSONDataType, OnStateChangeListenerType } from "..";
+import Module, { IModuleRawJSONDataType, ListenerType } from "..";
 import {
   PREFIXED_CONCAT,
   ITEM_DEFINITION_PREFIX,
@@ -196,6 +196,10 @@ export default class ItemDefinition {
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
 
+  private listeners: {
+    [id: number]: ListenerType[],
+  };
+
   // state information
   private stateHasAppliedValueTo: {
     [id: number]: boolean,
@@ -239,6 +243,8 @@ export default class ItemDefinition {
       .map((i) => (new Item(i, parentModule, this))) : [];
 
     this.stateHasAppliedValueTo = {};
+
+    this.listeners = [];
   }
 
   /**
@@ -541,52 +547,6 @@ export default class ItemDefinition {
   }
 
   /**
-   * Adds a listener to the structure of this item definition, all
-   * its property, item, and imported definitions once they change
-   * @param listener the listener that wishes to be added
-   */
-  public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {
-    this.childDefinitions.forEach((cd) => {
-      cd.addOnStateChangeEventListener(listener);
-    });
-
-    this.importedChildDefinitions.forEach((icd) => {
-      icd.definition.addOnStateChangeEventListener(listener);
-    });
-
-    this.itemInstances.forEach((ii) => {
-      ii.addOnStateChangeEventListener(listener);
-    });
-
-    this.propertyDefinitions.forEach((pd) => {
-      pd.addOnStateChangeEventListener(listener);
-    });
-  }
-
-  /**
-   * Removes a listener to the structure of this item definition, all
-   * its property, item, and imported definitions once they change
-   * @param listener the listener that wishes to be removed
-   */
-  public removeOnStateChangeEventListener(listener: OnStateChangeListenerType) {
-    this.childDefinitions.forEach((cd) => {
-      cd.removeOnStateChangeEventListener(listener);
-    });
-
-    this.importedChildDefinitions.forEach((icd) => {
-      icd.definition.removeOnStateChangeEventListener(listener);
-    });
-
-    this.itemInstances.forEach((ii) => {
-      ii.removeOnStateChangeEventListener(listener);
-    });
-
-    this.propertyDefinitions.forEach((pd) => {
-      pd.removeOnStateChangeEventListener(listener);
-    });
-  }
-
-  /**
    * same as getCurrentValue but ignores external checking
    * so it doesn't have to be async and no need to spend
    * network resources, checks most, but ignores unique and
@@ -885,5 +845,24 @@ export default class ItemDefinition {
 
   public getRolesForPolicy(policy: string, name: string): string[] {
     return this.rawData.policies[policy][name].roles;
+  }
+
+  public addListener(id: number, listener: ListenerType) {
+    this.listeners[id] = this.listeners[id] || [];
+    this.listeners[id].push(listener);
+  }
+
+  public removeListener(id: number, listener: ListenerType) {
+    if (!this.listeners[id]) {
+      return;
+    }
+    const index = this.listeners[id].indexOf(listener);
+    if (index !== -1) {
+      this.listeners[id].splice(index, 1);
+    }
+  }
+
+  public triggerListeners(id: number, but?: ListenerType) {
+    this.listeners[id].filter((l) => l !== but).forEach((l) => l());
   }
 }

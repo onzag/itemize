@@ -13,7 +13,7 @@ import {
 } from "../../../constants";
 import { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
 
-export type OnStateChangeListenerType = () => any;
+export type ListenerType = () => any;
 
 export interface IModuleRawJSONDataType {
   // Builder data
@@ -141,6 +141,10 @@ export default class Module {
    */
   private propExtensions: PropertyDefinition[];
 
+  private listeners: {
+    [id: number]: ListenerType[],
+  };
+
   /**
    * Builds a module from raw json data
    * @param rawJSON the raw json data of the module
@@ -214,6 +218,8 @@ export default class Module {
         throw new Error("Cannot handle type " + (childRawJSONData as any).type);
       }
     });
+
+    this.listeners = [];
   }
 
   /**
@@ -421,36 +427,23 @@ export default class Module {
     return !!this.parentModule;
   }
 
-  /**
-   * Adds a listener to the structure of this module instances
-   * modules instances have states, as they can be modified
-   * its current property values
-   * @param listener the listener that wishes to be added
-   */
-  public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {
-    // We get the properties from the prop extensions
-    this.propExtensions.forEach((pe) => {
-      pe.addOnStateChangeEventListener(listener);
-    });
-
-    // also to the item definitions
-    this.childItemDefinitions.forEach((cd) => {
-      cd.addOnStateChangeEventListener(listener);
-    });
+  public addListener(id: number, listener: ListenerType) {
+    this.listeners[id] = this.listeners[id] || [];
+    this.listeners[id].push(listener);
   }
 
-  /**
-   * Removes a listener the same way it adds it
-   * @param listener the listener to be removed
-   */
-  public removeOnStateChangeEventListener(listener: OnStateChangeListenerType) {
-    this.propExtensions.forEach((pe) => {
-      pe.removeOnStateChangeEventListener(listener);
-    });
+  public removeListener(id: number, listener: ListenerType) {
+    if (!this.listeners[id]) {
+      return;
+    }
+    const index = this.listeners[id].indexOf(listener);
+    if (index !== -1) {
+      this.listeners[id].splice(index, 1);
+    }
+  }
 
-    this.childItemDefinitions.forEach((cd) => {
-      cd.removeOnStateChangeEventListener(listener);
-    });
+  public triggerListeners(id: number, but?: ListenerType) {
+    this.listeners[id].filter((l) => l !== but).forEach((l) => l());
   }
 
   /**

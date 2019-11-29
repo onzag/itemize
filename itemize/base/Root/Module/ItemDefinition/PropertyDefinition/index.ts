@@ -7,7 +7,7 @@ import {
   PREFIX_BUILD,
   POLICY_PREFIXES,
 } from "../../../../../constants";
-import Module, { OnStateChangeListenerType } from "../..";
+import Module from "../..";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
 import { GraphQLEndpointError } from "../../../../errors";
 import { DOMWindow } from "../../../../util";
@@ -366,7 +366,6 @@ export default class PropertyDefinition {
     | PropertyDefinition;
 
   // representing the state of the class
-  private onStateChangeListeners: OnStateChangeListenerType[];
   private stateValue: {
     [slotId: number]: PropertyDefinitionSupportedType,
   };
@@ -425,8 +424,6 @@ export default class PropertyDefinition {
       new ConditionalRuleSet(rawJSON.hiddenIf, parentModule,
         parentItemDefinition, this, null);
 
-    // STATE MANAGEMENT
-    this.onStateChangeListeners = [];
     // initial value for all namespaces is null
     this.stateValue = {};
     this.stateValueModified = {};
@@ -760,7 +757,6 @@ export default class PropertyDefinition {
     this.stateValue[id] = newActualValue;
     this.stateValueModified[id] = true;
     this.stateinternalValue[id] = internalValue;
-    this.onStateChangeListeners.forEach((l) => l());
   }
 
   public applyValue(
@@ -1122,17 +1118,6 @@ export default class PropertyDefinition {
       });
     }
     return hasAccess;
-  }
-
-  public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {
-    this.onStateChangeListeners.push(listener);
-  }
-
-  public removeOnStateChangeEventListener(listener: OnStateChangeListenerType) {
-    const index = this.onStateChangeListeners.indexOf(listener);
-    if (index !== -1) {
-      this.onStateChangeListeners.splice(index, 1);
-    }
   }
 
   public toJSON() {

@@ -4,7 +4,7 @@ import ItemDefinition, { IItemDefinitionValue, ItemDefinitionIOActions } from ".
 import ConditionalRuleSet, {
   IConditionalRuleSetRawJSONDataType,
 } from "../ConditionalRuleSet";
-import Module, { OnStateChangeListenerType } from "../..";
+import Module from "../..";
 import PropertyDefinition from "../PropertyDefinition";
 import PropertiesValueMappingDefiniton, { IPropertiesValueMappingDefinitonRawJSONDataType } from "../PropertiesValueMappingDefiniton";
 import { ITEM_PREFIX, PREFIX_BUILD, EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
@@ -110,7 +110,6 @@ export default class Item {
   private predefinedProperties?: PropertiesValueMappingDefiniton;
 
   // representing the state of the class
-  private onStateChangeListeners: OnStateChangeListenerType[];
   private stateExclusion: {
     [id: number]: ItemExclusionState,
   };
@@ -190,7 +189,6 @@ export default class Item {
     this.parentModule = parentModule;
 
     // State management
-    this.onStateChangeListeners = [];
     this.stateExclusion = {};
     // initially the state hasn't been modified
     this.stateExclusionModified = {};
@@ -316,9 +314,6 @@ export default class Item {
   public setExclusionState(id: number, value: ItemExclusionState) {
     this.stateExclusion[id] = value;
     this.stateExclusionModified[id] = true;
-
-    // trigger an state change
-    this.onStateChangeListeners.forEach((l) => l());
   }
 
   /**
@@ -445,26 +440,6 @@ export default class Item {
    */
   public getI18nDataFor(locale: string) {
     return this.rawData.i18nData[locale] || null;
-  }
-
-  /**
-   * Adds an on state change listener to this specific item for when its item
-   * data changes, basically only its exclusion state
-   * @param listener the listener to add
-   */
-  public addOnStateChangeEventListener(listener: OnStateChangeListenerType) {
-    this.onStateChangeListeners.push(listener);
-  }
-
-  /**
-   * Removes the state change listener of this item
-   * @param listener the listener to remove
-   */
-  public removeOnStateChangeEventListener(listener: OnStateChangeListenerType) {
-    const index = this.onStateChangeListeners.indexOf(listener);
-    if (index !== -1) {
-      this.onStateChangeListeners.splice(index, 1);
-    }
   }
 
   /**

@@ -1,7 +1,7 @@
 import { initializeItemizeApp } from "../../itemize/client";
 import React from "react";
 import { ModuleProvider, ItemDefinitionProvider } from "../../itemize/client/app/providers";
-import { Entry, IfLogStatus, LogActioner, ReadableErrorFor, UserIdRetriever, StatsForNerds } from "../../itemize/client/app/elements";
+import { Entry, IfLogStatus, LogActioner, ReadableErrorFor, UserIdRetriever, StatsForNerds, View } from "../../itemize/client/app/elements";
 
 initializeItemizeApp(
   <UserIdRetriever>
@@ -36,7 +36,15 @@ initializeItemizeApp(
               )
             }</LogActioner>
 
-            <StatsForNerds/>
+            <View id="username"/>
+          </ItemDefinitionProvider>
+          <ItemDefinitionProvider
+            itemDefinition="user"
+            disableExternalChecks={true}
+            forId={userId}
+            assumeOwnership={true}
+          >
+            <Entry id="username"/>
           </ItemDefinitionProvider>
         </ModuleProvider>;
       }

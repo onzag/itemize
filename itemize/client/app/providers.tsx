@@ -11,6 +11,7 @@ import {
   MODERATION_FIELDS,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   PREFIX_GET,
+  PREFIX_BUILD,
 } from "../../constants";
 import { buildGqlQuery, gqlQuery } from "./gql-querier";
 
@@ -76,6 +77,10 @@ function flattenRecievedFields(recievedFields: any) {
   return output;
 }
 
+const ItemDefinitionProviderRequestsInProgressRegistry: {
+  [qualifiedPathNameWithID: string]: boolean;
+} = {};
+
 class ActualItemDefinitionProvider extends
   React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
 
@@ -125,9 +130,23 @@ class ActualItemDefinitionProvider extends
     this.onPropertyChange = this.onPropertyChange.bind(this);
     this.onItemSetExclusionState = this.onItemSetExclusionState.bind(this);
     this.loadValue = this.loadValue.bind(this);
+    this.listener = this.listener.bind(this);
+
+    valueFor.addListener(this.props.forId || null, this.listener);
+  }
+  public listener() {
+    this.setState({
+      value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
+    });
   }
   public async loadValue() {
     if (this.props.forId && !this.state.valueFor.hasAppliedValueTo(this.props.forId)) {
+      const qualifiedPathNameWithID = PREFIX_BUILD(this.state.valueFor.getQualifiedPathName()) + this.props.forId;
+      if (ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID]) {
+        return;
+      }
+      ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID] = true;
+
       const requestFields: any = {
         DATA: {},
       };
@@ -227,17 +246,24 @@ class ActualItemDefinitionProvider extends
         // TODO blocked
       } else {
         const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
-        this.state.valueFor.applyValueFromGQL(this.props.forId, recievedFields);
-        this.setState({
-          value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId),
-        });
+        this.state.valueFor.applyValueFromGQL(this.props.forId || null, recievedFields);
+        this.state.valueFor.triggerListeners(this.props.forId || null);
         if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
           this.setStateToCurrentValueWithExternalChecking(null);
         }
       }
+
+      delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
     }
   }
-  public componentDidUpdate() {
+  public componentDidUpdate(
+    prevProps: IActualItemDefinitionProviderProps,
+    prevState: IActualItemDefinitionProviderState,
+  ) {
+    if (prevProps.forId !== this.props.forId || prevState.valueFor !== this.state.valueFor) {
+      prevState.valueFor.removeListener(prevProps.forId || null, this.listener);
+      this.state.valueFor.addListener(this.props.forId || null, this.listener);
+    }
     this.loadValue();
   }
   public componentDidMount() {
@@ -252,6 +278,7 @@ class ActualItemDefinitionProvider extends
       this.setState({
         value: newValue,
       });
+      this.state.valueFor.triggerListeners(this.props.forId || null, this.listener);
     }
   }
   public onPropertyChange(
@@ -263,9 +290,7 @@ class ActualItemDefinitionProvider extends
     this.lastUpdateId = currentUpdateId;
 
     property.setCurrentValue(this.props.forId || null, value, internalValue);
-    this.setState({
-      value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
-    });
+    this.state.valueFor.triggerListeners(this.props.forId || null);
 
     if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       clearTimeout(this.updateTimeout);
@@ -280,9 +305,7 @@ class ActualItemDefinitionProvider extends
     this.lastUpdateId = currentUpdateId;
 
     item.setExclusionState(this.props.forId || null, state);
-    this.setState({
-      value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
-    });
+    this.state.valueFor.triggerListeners(this.props.forId || null);
 
     if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       clearTimeout(this.updateTimeout);

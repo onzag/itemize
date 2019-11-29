@@ -8,13 +8,14 @@ import { GraphQLEndpointErrorType } from "../../base/errors";
 import { DataContext, LocaleContext } from ".";
 import Root from "../../base/Root";
 import Module from "../../base/Root/Module";
+import PropertyView from "./components/base/PropertyView";
 
-interface IPropertyProps {
+interface IPropertyEntryViewProps {
   id: string;
   item?: string;
 }
 
-export function Entry(props: IPropertyProps) {
+function EntryView(props: IPropertyEntryViewProps, view: boolean) {
   return (
     <ItemDefinitionContext.Consumer>
       {
@@ -34,17 +35,35 @@ export function Entry(props: IPropertyProps) {
           }
 
           const property = itemDefinitionContextualValue.idef.getPropertyDefinitionFor(props.id, true);
-          return (
-            <PropertyEntry
-              property={property}
-              value={propertyValue}
-              onChange={itemDefinitionContextualValue.onPropertyChange.bind(null, property)}
-            />
-          );
+
+          if (view) {
+            return (
+              <PropertyView
+                property={property}
+                value={propertyValue}
+              />
+            );
+          } else {
+            return (
+              <PropertyEntry
+                property={property}
+                value={propertyValue}
+                onChange={itemDefinitionContextualValue.onPropertyChange.bind(null, property)}
+              />
+            );
+          }
         }
       }
     </ItemDefinitionContext.Consumer>
   );
+}
+
+export function Entry(props: IPropertyEntryViewProps) {
+  return EntryView(props, false);
+}
+
+export function View(props: IPropertyEntryViewProps) {
+  return EntryView(props, true);
 }
 
 interface IReadableErrorForProps {
