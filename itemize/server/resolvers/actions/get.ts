@@ -11,6 +11,7 @@ import {
   checkListLimit,
   buildColumnNamesForModuleTableOnly,
   buildColumnNamesForItemDefinitionTableOnly,
+  validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import {
@@ -34,6 +35,7 @@ export async function getItemDefinition(
   // right and available
   checkLanguageAndRegion(appData, resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+  validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we find the requested fields that are requested
   // in the get request
@@ -114,7 +116,7 @@ export async function getItemDefinition(
     itemDefinition.checkRoleAccessFor(
       ItemDefinitionIOActions.READ,
       tokenData.role,
-      tokenData.userId,
+      tokenData.id,
       -1,
       requestedFieldsInIdef,
       true,
@@ -131,7 +133,7 @@ export async function getItemDefinition(
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
-    tokenData.userId,
+    tokenData.id,
     selectQueryValue.created_by,
     requestedFieldsInIdef,
     true,
@@ -187,7 +189,7 @@ export async function getItemDefinitionList(
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
-    tokenData.userId,
+    tokenData.id,
     -1,
     requestedFieldsInIdef,
     true,
@@ -267,6 +269,7 @@ export async function getModuleList(
   checkLanguageAndRegion(appData, resolverArgs.args);
   checkListLimit(resolverArgs.args.ids);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+  validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we find the requested fields that are requested
   // in the get request
@@ -289,7 +292,7 @@ export async function getModuleList(
   mod.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
-    tokenData.userId,
+    tokenData.id,
     -1,
     requestedFieldsInMod,
     true,

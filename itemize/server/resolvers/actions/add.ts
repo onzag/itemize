@@ -12,6 +12,7 @@ import {
   serverSideCheckItemDefinitionAgainst,
   buildColumnNamesForItemDefinitionTableOnly,
   buildColumnNamesForModuleTableOnly,
+  validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
@@ -39,6 +40,7 @@ export async function addItemDefinition(
   // check that the user is logged in, for adding, only logged users
   // are valid
   mustBeLoggedIn(tokenData);
+  validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we see which fields are being requested for the answer after adding, first
   // we flatten the fields, remember that we have external and internal fields
@@ -70,7 +72,7 @@ export async function addItemDefinition(
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.CREATE,
     tokenData.role,
-    tokenData.userId,
+    tokenData.id,
     // You might wonder why we used -1 as an user id, well
     // -1 works, no valid user id is negative, and unlogged users
     // have no user id, so imagine passing null, and having SELF as
@@ -110,8 +112,8 @@ export async function addItemDefinition(
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
-    tokenData.userId,
-    tokenData.userId,
+    tokenData.id,
+    tokenData.id,
     requestedFieldsThatRepresentPropertiesAndItems,
     true,
   );
@@ -159,7 +161,7 @@ export async function addItemDefinition(
   // this data is added every time when creating
   sqlModData.type = selfTable;
   sqlModData.created_at = appData.knex.fn.now();
-  sqlModData.created_by = tokenData.userId;
+  sqlModData.created_by = tokenData.id;
   sqlModData.language = resolverArgs.args.language;
   sqlModData.country = resolverArgs.args.country;
 

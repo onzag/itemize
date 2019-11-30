@@ -7,6 +7,7 @@ import {
   validateTokenAndGetData,
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
+  validateTokenIsntBlocked,
 } from "../basic";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { buildSQLQueryForModule } from "../../../base/Root/Module/sql";
@@ -32,6 +33,7 @@ export async function searchModule(
   // check language and region
   checkLanguageAndRegion(appData, resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+  validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now build the fields we are searching
   const searchingFields = {};
@@ -62,7 +64,7 @@ export async function searchModule(
   searchModeCounterpart.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
-    tokenData.userId,
+    tokenData.id,
     // Same reason as before, with item definitions
     -1,
     searchingFields,
@@ -119,6 +121,7 @@ export async function searchItemDefinition(
   // check the language and region
   checkLanguageAndRegion(appData, resolverArgs.args);
   const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+  validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we need to get the fields that we are using to search
   const searchingFields = {};
@@ -160,7 +163,7 @@ export async function searchItemDefinition(
   searchModeCounterpart.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
-    tokenData.userId,
+    tokenData.id,
     // And we also use -1 for the same reason as before
     // this is a search, we ignore SELF
     -1,

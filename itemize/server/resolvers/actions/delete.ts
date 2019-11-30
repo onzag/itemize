@@ -9,6 +9,7 @@ import {
   mustBeLoggedIn,
   flattenFieldsFromRequestedFields,
   runPolicyCheck,
+  validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { GraphQLEndpointError } from "../../../base/errors";
@@ -29,6 +30,7 @@ export async function deleteItemDefinition(
 
   // for deleting we must be logged in
   mustBeLoggedIn(tokenData);
+  validateTokenIsntBlocked(appData.knex, tokenData);
 
   // we flatten and get the requested fields
   const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
@@ -99,7 +101,7 @@ export async function deleteItemDefinition(
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.DELETE,
     tokenData.role,
-    tokenData.userId,
+    tokenData.id,
     userId,
     null,
     true,

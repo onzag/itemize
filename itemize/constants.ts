@@ -155,6 +155,7 @@ export const LOCALE_I18N = [
   "error.UNSPECIFIED",
   "error.MUST_BE_LOGGED_IN",
   "error.FORBIDDEN",
+  "error.USER_BLOCKED",
 ];
 
 // ATTRIBUTES FOR i18N PROPERTIES

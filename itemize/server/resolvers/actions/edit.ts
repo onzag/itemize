@@ -13,6 +13,7 @@ import {
   runPolicyCheck,
   buildColumnNamesForModuleTableOnly,
   buildColumnNamesForItemDefinitionTableOnly,
+  validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
@@ -38,6 +39,7 @@ export async function editItemDefinition(
 
   // for editing one must be logged in
   mustBeLoggedIn(tokenData);
+  validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we get the requested fields, and check they are available for the given role
   const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
@@ -156,7 +158,7 @@ export async function editItemDefinition(
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.EDIT,
     tokenData.role,
-    tokenData.userId,
+    tokenData.id,
     userId,
     editingFields,
     true,
@@ -165,7 +167,7 @@ export async function editItemDefinition(
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
-    tokenData.userId,
+    tokenData.id,
     userId,
     requestedFieldsInIdef,
     true,
@@ -206,7 +208,7 @@ export async function editItemDefinition(
 
   // update when it was edited
   sqlModData.edited_at = appData.knex.fn.now();
-  sqlModData.edited_by = tokenData.userId;
+  sqlModData.edited_by = tokenData.id;
   sqlModData.language = resolverArgs.args.language;
   sqlModData.country = resolverArgs.args.country;
 

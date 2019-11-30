@@ -1,47 +1,40 @@
 import React from "react";
-import { AppBar, Toolbar, IconButton, Icon, Button, Avatar } from "@material-ui/core";
-import { IfLogStatus, Reader, AppLanguageRetriever, AppCountryRetriever, AppCurrencyRetriever } from "../../../itemize/client/app/elements";
+import { AppBar, Toolbar, IconButton, Icon, Button, createStyles, WithStyles, withStyles } from "@material-ui/core";
+import { IfLogStatus } from "../../../itemize/client/app/elements";
+import { Avatar } from "../user/avatar";
 
-export default function Navbar() {
+const navbarStyles = createStyles({
+  container: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "100%",
+    display: "flex",
+    flexDirection: "row-reverse",
+  },
+});
+
+interface INavbarProps extends WithStyles<typeof navbarStyles> {
+}
+
+export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
   return (
     <AppBar>
       <Toolbar>
         <IconButton edge="start" color="inherit" aria-label="menu">
           <Icon>menu</Icon>
         </IconButton>
-        <IfLogStatus>
-          {(status) => {
-            if (status === "LOGGED_OUT") {
-              return <Button color="inherit">Login</Button>;
-            } else if (status === "LOGGED_IN") {
-              return (
-                <Reader id="username">
-                  {
-                    (value) => (
-                      <Avatar variant="rounded">{value ? value[0] : ""}</Avatar>
-                    )
-                  }
-                </Reader>
-              );
-            }
-          }}
-        </IfLogStatus>
-        <AppLanguageRetriever>{
-          (lang) => {
-            return <span>{lang.currentLanguage.name}</span>;
-          }
-        }</AppLanguageRetriever>
-        <AppCountryRetriever>{
-          (country) => {
-            return <span>{country.currentCountry.emoji}</span>;
-          }
-        }</AppCountryRetriever>
-        <AppCurrencyRetriever>{
-          (currency) => {
-            return <span>{currency.currentCurrency.name}</span>;
-          }
-        }</AppCurrencyRetriever>
+        <div className={props.classes.container}>
+          <IfLogStatus>
+            {(status) => {
+              if (status === "LOGGED_OUT") {
+                return <Button color="inherit">Login</Button>;
+              } else if (status === "LOGGED_IN") {
+                return <Avatar/>;
+              }
+            }}
+          </IfLogStatus>
+        </div>
       </Toolbar>
     </AppBar>
   );
-}
+});

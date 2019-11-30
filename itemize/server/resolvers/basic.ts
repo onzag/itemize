@@ -162,16 +162,20 @@ export function buildColumnNamesForItemDefinitionTableOnly(
   return result;
 }
 
+export interface IServerSideTokenDataType {
+  id: number;
+  role: string;
+}
 const validateTokenAndGetDataDebug = Debug("resolvers:validateTokenAndGetDataDebug");
 /**
  * Given a token, it validates and provides the role information
  * for use in the system
  * @param token the token passed via the args
  */
-export function validateTokenAndGetData(token: string) {
+export function validateTokenAndGetData(token: string): IServerSideTokenDataType {
   validateTokenAndGetDataDebug("EXECUTED with %s", token);
   const result = {
-    userId: 1,
+    id: 1,
     role: token,
   };
   validateTokenAndGetDataDebug("SUCCEED with %j", result);
@@ -186,7 +190,7 @@ const checkBasicFieldsAreAvailableForRoleDebug = Debug("resolvers:checkBasicFiel
  * function
  * @param requestedFields the requested fields
  */
-export function checkBasicFieldsAreAvailableForRole(tokenData: any, requestedFields: any) {
+export function checkBasicFieldsAreAvailableForRole(tokenData: IServerSideTokenDataType, requestedFields: any) {
   checkBasicFieldsAreAvailableForRoleDebug(
     "EXECUTED with token info %j and requested fields %j",
     tokenData,
@@ -322,9 +326,9 @@ const mustBeLoggedInDebug = Debug("resolvers:mustBeLoggedIn");
  * Simply throws an error if the user is not logged in
  * @param tokenData the token data that has been extracted with validateTokenAndGetData
  */
-export function mustBeLoggedIn(tokenData: any) {
+export function mustBeLoggedIn(tokenData: IServerSideTokenDataType) {
   mustBeLoggedInDebug("EXECUTED with %j", tokenData);
-  if (!tokenData.userId) {
+  if (!tokenData.id) {
     mustBeLoggedInDebug("FAILED");
     throw new GraphQLEndpointError({
       message: "Must be logged in",
@@ -332,6 +336,23 @@ export function mustBeLoggedIn(tokenData: any) {
     });
   }
   mustBeLoggedInDebug("SUCCEED");
+}
+
+const validateTokenIsntBlockedDebug = Debug("resolvers:validateTokenIsntBlocked");
+export async function validateTokenIsntBlocked(knex: Knex, tokenData: IServerSideTokenDataType) {
+  validateTokenIsntBlockedDebug("EXECUTED");
+  if (tokenData.id) {
+    const result = await knex.first("blocked_at").from("MOD_users").where({
+      id: tokenData.id,
+    });
+    if (result.blocked_at !== null) {
+      throw new GraphQLEndpointError({
+        message: "User is Blocked",
+        code: "USER_BLOCKED",
+      });
+    }
+  }
+  validateTokenIsntBlockedDebug("SUCCEED");
 }
 
 const filterAndPrepareGQLValueDebug = Debug("resolvers:filterAndPrepareGQLValue");
