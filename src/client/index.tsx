@@ -1,8 +1,8 @@
 import React from "react";
 import { initializeItemizeApp } from "../../itemize/client";
-import { Navbar } from "./navbar";
 import { ModuleProvider, ItemDefinitionProvider } from "../../itemize/client/app/providers";
 import { UserIdRetriever } from "../../itemize/client/app/elements";
+import App from "./app";
 
 initializeItemizeApp(
   <UserIdRetriever>
@@ -13,7 +13,7 @@ initializeItemizeApp(
           forId={userId}
           disableExternalChecks={true}
         >
-          <Navbar />
+          <App userId={userId}/>
         </ItemDefinitionProvider>
       </ModuleProvider>
     )}

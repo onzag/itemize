@@ -89,6 +89,8 @@ export default class Root {
   }
 
   /**
+   * TODO make the root actually be the main instance and stop returning instances
+   * here, it's inefficient
    * Gets a specific module given its name
    * @param name the name of the module
    */

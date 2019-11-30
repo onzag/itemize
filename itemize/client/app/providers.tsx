@@ -58,6 +58,7 @@ interface IActualItemDefinitionProviderState {
   valueFor: ItemDefinition;
   valueForQualifiedName: string;
   valueForContainsExternallyCheckedProperty: boolean;
+  valueForId: number;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -98,9 +99,12 @@ class ActualItemDefinitionProvider extends
           "Replacing a context of an item definition for another is not allowed",
         );
       }
-      newValueFor.applyValue(props.forId || null, state.value);
+      if (state.valueForId === (props.forId || null)) {
+        newValueFor.applyValue(props.forId || null, state.value);
+      }
       return {
         valueFor: newValueFor,
+        valueForId: props.forId || null,
         valueForContainsExternallyCheckedProperty: newValueFor.containsAnExternallyCheckedProperty(),
       };
     }
@@ -123,6 +127,7 @@ class ActualItemDefinitionProvider extends
       valueFor,
       valueForQualifiedName: valueFor.getQualifiedPathName(),
       valueForContainsExternallyCheckedProperty: valueFor.containsAnExternallyCheckedProperty(),
+      valueForId: props.forId || null,
       isBlocked: false,
       isDeleted: false,
     };
@@ -137,6 +142,7 @@ class ActualItemDefinitionProvider extends
   public listener() {
     this.setState({
       value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
+      valueForId: this.props.forId || null,
     });
   }
   public async loadValue() {
@@ -277,6 +283,7 @@ class ActualItemDefinitionProvider extends
     if (currentUpdateId === null || this.lastUpdateId === currentUpdateId) {
       this.setState({
         value: newValue,
+        valueForId: this.props.forId || null,
       });
       this.state.valueFor.triggerListeners(this.props.forId || null, this.listener);
     }

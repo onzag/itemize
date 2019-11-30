@@ -1,6 +1,6 @@
 import React from "react";
 import { Avatar as MAvatar } from "@material-ui/core";
-import { Reader } from "../../../itemize/client/app/elements";
+import { Reader, Link } from "../../../itemize/client/app/elements";
 import { countries } from "../../../itemize/resources";
 import { withStyles, createStyles } from "@material-ui/styles";
 import { WithStyles } from "react-jss";
@@ -122,10 +122,13 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
                 if (appCountryValue && countries[appCountryValue]) {
                   countryEmoji = countries[appCountryValue].emoji;
                 }
-                return <MAvatar alt={userNameValue} classes={{root: `${props.classes.avatar} ${numberColorClassName}`}}>
-                  {userNameValue ? userNameValue[0] : ""}
-                  <div className={props.classes.flag}>{countryEmoji}</div>
-                </MAvatar>;
+                // TODO get raw properties, such as id, country, etc...
+                return <Link to={`/profile/${1}`}>
+                  <MAvatar alt={userNameValue} classes={{root: `${props.classes.avatar} ${numberColorClassName}`}}>
+                    {userNameValue ? userNameValue[0] : ""}
+                    <div className={props.classes.flag}>{countryEmoji}</div>
+                  </MAvatar>
+                </Link>;
               }
             }
           </Reader>;

@@ -464,6 +464,9 @@ export default class Module {
   }
 
   public triggerListeners(id: number, but?: ListenerType) {
+    if (!this.listeners[id]) {
+      return;
+    }
     this.listeners[id].filter((l) => l !== but).forEach((l) => l());
   }
 

@@ -11,6 +11,27 @@ import Module from "../../base/Root/Module";
 import PropertyView from "./components/base/PropertyView";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../resources";
+import { Link as RouterLink, LinkProps, Route as RouterRoute, RouteProps } from "react-router-dom";
+
+export function Link(props: LinkProps) {
+  const currentLocaleFromURL = location.pathname.split("/")[1] || null;
+  if (!currentLocaleFromURL) {
+    return null;
+  }
+  let urlDefined = props.to;
+  if (urlDefined[0] !== "/") {
+    urlDefined = "/" + urlDefined;
+  }
+  return <RouterLink {...props} to={`/${currentLocaleFromURL}${urlDefined}`}/>;
+}
+
+export function Route(props: RouteProps) {
+  let urlDefined = props.path;
+  if (urlDefined[0] !== "/") {
+    urlDefined = "/" + urlDefined;
+  }
+  return <RouterRoute {...props} path={`/:__lang${urlDefined}`}/>;
+}
 
 interface IPropertyEntryViewReadProps {
   id: string;
@@ -199,12 +220,12 @@ export function ReadableErrorFor(props: IReadableErrorForProps) {
 }
 
 interface ILogActionerProps {
-  children: (
+  children: (actioner: {
     login: () => any,
     logout: () => any,
-    activeError: GraphQLEndpointErrorType,
+    error: GraphQLEndpointErrorType,
     dismissError: () => any,
-  ) => React.ReactNode;
+  }) => React.ReactNode;
 }
 export function LogActioner(props: ILogActionerProps) {
   return (
@@ -252,7 +273,12 @@ export function LogActioner(props: ILogActionerProps) {
                     dismissError = () => null;
                   }
 
-                  return props.children && props.children(login, logout, tokenContextValue.error, dismissError);
+                  return props.children && props.children({
+                    login,
+                    logout,
+                    error: tokenContextValue.error,
+                    dismissError,
+                  });
                 }
               }
             </ItemDefinitionContext.Consumer>
