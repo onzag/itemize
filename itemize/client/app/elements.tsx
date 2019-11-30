@@ -24,7 +24,7 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
       {
         (itemDefinitionContextualValue) => {
           if (!itemDefinitionContextualValue) {
-            throw new Error("The Entry must be in a ItemDefinitionProvider context");
+            throw new Error("The Entry/View/Read must be in a ItemDefinitionProvider context");
           }
 
           let propertyValue: IPropertyDefinitionValue = null;
@@ -73,6 +73,60 @@ export function View(props: IPropertyEntryViewReadProps) {
 
 export function Reader(props: IPropertyEntryViewReadProps) {
   return EntryViewRead(props, false, true);
+}
+
+interface II18nReadProps {
+  id: string;
+  args?: string[];
+  item?: string;
+  children?: (value: string) => React.ReactNode;
+}
+
+export function I18nRead(props: II18nReadProps) {
+  return (
+    <LocaleContext.Consumer>
+      {
+        (localeContext) => (
+          <ItemDefinitionContext.Consumer>
+            {
+              (itemDefinitionContextualValue) => {
+                if (!itemDefinitionContextualValue) {
+                  throw new Error("The i18nRead must be in a ItemDefinitionProvider context");
+                }
+
+                let i18nValue: string = null;
+                if (props.item) {
+                  const item = itemDefinitionContextualValue.idef.getItemFor(props.item);
+                  if (props.id === "name") {
+                    i18nValue = item.getI18nNameFor(localeContext.language) || null;
+                  } else {
+                    const itemI18nData = item.getI18nDataFor(localeContext.language);
+                    i18nValue = itemI18nData ? itemI18nData[props.id] : null;
+                  }
+                } else {
+                  const i18nIdefData = itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
+                  if (i18nIdefData && i18nIdefData.custom && i18nIdefData.custom[props.id]) {
+                    i18nValue = i18nIdefData.custom[props.id];
+                  } else {
+                    i18nValue = i18nIdefData ? i18nIdefData[props.id] : null;
+                  }
+                }
+
+                if (props.args) {
+                  i18nValue = i18nValue.replace(/\{(\d+)\}/g, (match, indexMatch) => (props.args[indexMatch] || "?"));
+                }
+
+                if (!props.children) {
+                  return i18nValue;
+                }
+                return props.children(i18nValue);
+              }
+            }
+          </ItemDefinitionContext.Consumer>
+        )
+      }
+    </LocaleContext.Consumer>
+  );
 }
 
 interface IReadableErrorForProps {

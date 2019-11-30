@@ -508,7 +508,7 @@ export default class WizardItemEntry extends React.Component<IWizardItemEntryPro
               <React.Fragment>
                 {this.props.disableTitle || this.props.asDialog ?
                   null :
-                  <Typography className="item-entry-wizard-title">{i18nData.createFormTitle}</Typography>}
+                  <Typography className="item-entry-wizard-title">{"NULL"}</Typography>}
                 <Stepper nonLinear={true} activeStep={this.state.activeStepAsNumber} orientation="vertical">
                   {stepsNodeDataArray.map((nd) => nd.node)}
                 </Stepper>
@@ -521,7 +521,7 @@ export default class WizardItemEntry extends React.Component<IWizardItemEntryPro
                   <ItemEntryDialog
                     fullScreen={true}
                     open={this.props.dialogOpen}
-                    title={i18nData.createFormTitle}
+                    title={"NULL"}
                     onClose={this.props.onDialogClose}
                     buttons={
                       renderButtons(

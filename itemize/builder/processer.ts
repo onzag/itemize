@@ -25,6 +25,7 @@ export function processItemDefinition(
 ) {
   const nRawData = {...rawData};
   delete nRawData.location;
+  delete nRawData.i18nDataLocation;
   delete nRawData.pointers;
   delete nRawData.raw;
 
@@ -115,6 +116,7 @@ export function processModule(
   delete nRawData.propExtLocation;
   delete nRawData.propExtPointers;
   delete nRawData.propExtRaw;
+  delete nRawData.i18nDataLocation;
 
   if (locale) {
     nRawData.i18nData = {...nRawData.i18nData};

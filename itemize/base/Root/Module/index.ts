@@ -13,6 +13,33 @@ import {
 } from "../../../constants";
 import { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
 
+export interface IRawJSONI18NDataType {
+  [locale: string]: {
+    name: string;
+    fts_search_field_label: string,
+    fts_search_field_placeholder: string;
+    custom?: {
+      [key: string]: string;
+    },
+    // policies is however not used in module
+    // since policies cannot really be added to modules
+    policies?: {
+      delete?: {
+        [policyName: string]: {
+          label: string,
+          failed: string,
+        },
+      },
+      edit?: {
+        [policyName: string]: {
+          label: string,
+          failed: string,
+        },
+      },
+    };
+  };
+}
+
 export type ListenerType = () => any;
 
 export interface IModuleRawJSONDataType {
@@ -21,6 +48,7 @@ export interface IModuleRawJSONDataType {
 
   // Avaialble for the builder, data gets stripped
   location?: string;
+  i18nDataLocation?: string;
   pointers?: any;
   raw?: string;
   propExtLocation?: string;
@@ -29,14 +57,7 @@ export interface IModuleRawJSONDataType {
 
   // Available after a build
   name: string;
-  i18nData: {
-    [locale: string]: {
-      name: string;
-      searchFormTitle: string;
-      ftsSearchFieldLabel: string,
-      ftsSearchFieldPlaceholder: string;
-    },
-  };
+  i18nData: IRawJSONI18NDataType;
 
   readRoleAccess?: string[];
 

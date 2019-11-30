@@ -13,7 +13,7 @@ import {
   IConditionalRuleSetRawJSONDataPropertyType,
 } from "../base/Root/Module/ItemDefinition/ConditionalRuleSet";
 import ItemDefinition, { IItemDefinitionRawJSONDataType, IPolicyValueRawJSONDataType } from "../base/Root/Module/ItemDefinition";
-import { IModuleRawJSONDataType } from "../base/Root/Module";
+import { IModuleRawJSONDataType, IRawJSONI18NDataType } from "../base/Root/Module";
 import PropertyDefinition, {
   IPropertyDefinitionAlternativePropertyType,
   IPropertyDefinitionRawJSONDataType,
@@ -116,6 +116,11 @@ export function checkItemDefinition(
       actualTraceback.newTraceToBit("name"),
     );
   }
+
+  checkI18nCustomConsistency(
+    rawData.i18nData,
+    actualTraceback.newTraceToLocation(rawData.i18nDataLocation),
+  );
 
   if (rawData.policies) {
     Object.keys(rawData.policies).forEach((policyKey) => {
@@ -739,6 +744,41 @@ export function checkPropertyDefinition(
   }
 }
 
+export function checkI18nCustomConsistency(
+  rawData: IRawJSONI18NDataType,
+  traceback: Traceback,
+) {
+  const analysis = Object.keys(rawData).map((localeKey: string) => {
+    const customData = rawData[localeKey].custom;
+    if (!customData) {
+      return {
+        keys: [],
+        localeKey,
+      };
+    }
+    return {
+      keys: Object.keys(customData),
+      localeKey,
+    };
+  });
+
+  analysis.forEach((analysisData) => {
+    analysis.forEach((analysisDataCompared) => {
+      if (analysisData.localeKey !== analysisDataCompared.localeKey) {
+        analysisData.keys.forEach((customKeyInLocale) => {
+          if (!analysisDataCompared.keys.includes(customKeyInLocale)) {
+            throw new CheckUpError(
+              "Custom i18n in locale " + analysisData.localeKey + " includes custom key '" +
+              customKeyInLocale + "' which is not present in locale " + analysisDataCompared.localeKey,
+              traceback,
+            );
+          }
+        });
+      }
+    });
+  });
+}
+
 export function checkModule(
   rawData: IModuleRawJSONDataType,
   traceback: Traceback,
@@ -752,6 +792,11 @@ export function checkModule(
       actualTraceback.newTraceToBit("name"),
     );
   }
+
+  checkI18nCustomConsistency(
+    rawData.i18nData,
+    traceback.newTraceToLocation(rawData.i18nDataLocation),
+  );
 
   if (rawData.propExtensions) {
     const propExtTraceback = actualTraceback
@@ -769,11 +814,11 @@ export function checkModule(
       checkPropertyDefinition(
         propDef,
         {
-         type: "item",
-         name: rawData.name,
-         location: rawData.location.replace(".json", ".propext.json"),
-         i18nData: {},
-         properties: [],
+          type: "item",
+          name: rawData.name,
+          location: rawData.location.replace(".json", ".propext.json"),
+          i18nData: {},
+          properties: [],
         },
         rawData,
         specificPropExtTraceback,

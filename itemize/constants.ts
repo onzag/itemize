@@ -46,30 +46,20 @@ export const FILE_SUPPORTED_IMAGE_TYPES = [
 ];
 
 // The properties for i18n a module should have
-export const MODULE_I18N = [
+export const MODULE_AND_ITEM_DEF_I18N = [
   "name",
-  "searchFormTitle",
-  "ftsSearchFieldLabel",
-  "ftsSearchFieldPlaceholder",
+  "fts_search_field_label",
+  "fts_search_field_placeholder",
 ];
-
-// The properties for i18n an item should have
-export const ITEM_DEFINITION_I18N = [
-  "name",
-  "searchFormTitle",
-  "createFormTitle",
-  "editFormTitle",
-  "ftsSearchFieldLabel",
-  "ftsSearchFieldPlaceholder",
-];
+export const MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY = "custom";
 
 // The properties for i18n an item that can be excluded should have
 export const ITEM_CAN_BE_EXCLUDED_I18N = [
-  "exclusionSelectorLabel",
-  "exclusionTernarySelectorLabel",
-  "excludedLabel",
-  "includedLabel",
-  "anyLabel",
+  "exclusion_selector_label",
+  "exclusion_ternary_selector_label",
+  "excluded_label",
+  "included_label",
+  "any_label",
 ];
 
 // The item optional data
@@ -79,7 +69,7 @@ export const ITEM_OPTIONAL_I18N = [
 
 // The properties for i18n a callout excluded item should have
 export const ITEM_CALLOUT_EXCLUDED_I18N = [
-  "calloutExcludedLabel",
+  "callout_excluded_label",
 ];
 
 // This is for small use anywhere language data

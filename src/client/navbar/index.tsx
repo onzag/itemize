@@ -1,6 +1,6 @@
 import React from "react";
 import { AppBar, Toolbar, IconButton, Icon, Button, createStyles, WithStyles, withStyles } from "@material-ui/core";
-import { IfLogStatus } from "../../../itemize/client/app/elements";
+import { IfLogStatus, I18nRead } from "../../../itemize/client/app/elements";
 import { Avatar } from "../user/avatar";
 
 const navbarStyles = createStyles({
@@ -27,7 +27,9 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
           <IfLogStatus>
             {(status) => {
               if (status === "LOGGED_OUT") {
-                return <Button color="inherit">Login</Button>;
+                return <Button color="inherit">
+                  <I18nRead id="login"/>
+                </Button>;
               } else if (status === "LOGGED_IN") {
                 return <Avatar/>;
               }

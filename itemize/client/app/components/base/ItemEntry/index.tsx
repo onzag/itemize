@@ -187,7 +187,7 @@ export default class ItemEntry extends React.Component<IItemEntryProps, IItemEnt
               <React.Fragment>
                 {this.props.disableTitle || this.props.asDialog ?
                   null :
-                  <Typography className="item-entry-title">{i18nData.createFormTitle}</Typography>}
+                  <Typography className="item-entry-title">{"NULL"}</Typography>}
                 {basicPropertyEntries}
                 {itemEntries}
                 {moderatePropertyEntries.length ? (
@@ -250,7 +250,7 @@ export default class ItemEntry extends React.Component<IItemEntryProps, IItemEnt
                   </Snackbar>
                   <ItemEntryDialogResponsive
                     open={this.props.dialogOpen}
-                    title={i18nData.createFormTitle}
+                    title={"NULL"}
                     onClose={this.props.onDialogClose}
                     buttons={renderButtons(
                       this.props.onDialogCancel,

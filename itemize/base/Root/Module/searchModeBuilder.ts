@@ -83,15 +83,6 @@ function buildSearchModeItemDefinition(
   // create a known property map array using the prop extensions as base
   const knownPropMap = {...modulePropExtensions};
 
-  // close the i18nData from the item definition
-  newItemDef.i18nData = {...newItemDef.i18nData};
-  Object.keys(newItemDef.i18nData).forEach((lang) => {
-    // now the name to create this object (and because this object will be a search)
-    // will be replaced by the search form title
-    newItemDef.i18nData[lang] = {...newItemDef.i18nData[lang]};
-    newItemDef.i18nData[lang].createFormTitle = newItemDef.i18nData[lang].searchFormTitle;
-  });
-
   // if we have properties
   if (newItemDef.properties) {
     // we loop to them and add them to the known list

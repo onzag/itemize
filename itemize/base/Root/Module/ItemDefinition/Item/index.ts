@@ -32,12 +32,12 @@ export interface IItemRawJSONDataType {
   i18nData?: {
     [locale: string]: {
       name?: string;
-      exclusionSelectorLabel?: string;   // label for the selector to toggle exclusion in normal mode
-      exclusionTernarySelectorLabel?: string;
-      calloutExcludedLabel?: string;     // label in the title for when the item is callout excluded
-      excludedLabel?: string;            // describe when the item is excluded, for descriptions and the ternary mode
-      includedLabel?: string;            // describe when the item is included, used only for ternary mode
-      anyLabel?: string;                 // describe the inbetween, used only for ternary mode
+      exclusion_selector_label?: string;   // label for the selector to toggle exclusion in normal mode
+      exclusion_ternary_selector_label?: string;
+      callout_excluded_label?: string;     // label in the title for when the item is callout excluded
+      excluded_label?: string;            // describe when the item is excluded, for descriptions and the ternary mode
+      included_label?: string;            // describe when the item is included, used only for ternary mode
+      any_label?: string;                 // describe the inbetween, used only for ternary mode
     },
   };
   enforcedProperties?: IPropertiesValueMappingDefinitonRawJSONDataType;

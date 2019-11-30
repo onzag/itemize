@@ -62,15 +62,15 @@ export default class ParentedItemEntry extends React.Component<IParentedItemEntr
             value={this.props.value.exclusionState}
             values={[{
               value: ItemExclusionState.ANY,
-              label: i18nData.anyLabel,
+              label: i18nData.any_label,
             }, {
               value: ItemExclusionState.INCLUDED,
-              label: i18nData.includedLabel,
+              label: i18nData.included_label,
             }, {
               value: ItemExclusionState.EXCLUDED,
-              label: i18nData.excludedLabel,
+              label: i18nData.excluded_label,
             }]}
-            label={i18nData.exclusionTernarySelectorLabel}
+            label={i18nData.exclusion_ternary_selector_label}
           />
         );
       } else {
@@ -86,7 +86,7 @@ export default class ParentedItemEntry extends React.Component<IParentedItemEntr
               ),
             )}
             checked={this.props.value.exclusionState === ItemExclusionState.EXCLUDED}
-            label={i18nData.exclusionSelectorLabel}
+            label={i18nData.exclusion_selector_label}
           />
         );
       }

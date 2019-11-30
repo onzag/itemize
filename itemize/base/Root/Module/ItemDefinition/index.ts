@@ -1,7 +1,7 @@
 import Item, { IItemRawJSONDataType, IItemValue, ItemExclusionState } from "./Item";
 import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionValue } from "./PropertyDefinition";
-import Module, { IModuleRawJSONDataType, ListenerType } from "..";
+import Module, { IModuleRawJSONDataType, ListenerType, IRawJSONI18NDataType } from "..";
 import {
   PREFIXED_CONCAT,
   ITEM_DEFINITION_PREFIX,
@@ -32,35 +32,13 @@ export interface IItemDefinitionRawJSONDataType {
 
   // Avaialble for the builder
   location?: string;
+  i18nDataLocation?: string;
   pointers?: any;
   raw?: string;
 
   // Avilable after a build
   name: string;
-  i18nData: {
-    [locale: string]: {
-      name: string;
-      createFormTitle: string;
-      searchFormTitle: string;
-      editFormTitle: string;
-      ftsSearchFieldLabel: string;
-      ftsSearchFieldPlaceholder: string;
-      policies?: {
-        delete?: {
-          [policyName: string]: {
-            label: string,
-            failed: string,
-          },
-        },
-        edit?: {
-          [policyName: string]: {
-            label: string,
-            failed: string,
-          },
-        },
-      }
-    },
-  };
+  i18nData: IRawJSONI18NDataType;
 
   // original data
   includes?: IItemRawJSONDataType[];

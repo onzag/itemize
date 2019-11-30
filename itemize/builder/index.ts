@@ -2,7 +2,7 @@ import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
 } from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { IItemRawJSONDataType } from "../base/Root/Module/ItemDefinition/Item";
-import { IModuleRawJSONDataType } from "../base/Root/Module";
+import { IModuleRawJSONDataType, IRawJSONI18NDataType } from "../base/Root/Module";
 import {
   IItemDefinitionRawJSONDataType, IPoliciesRawJSONDataType,
 } from "../base/Root/Module/ItemDefinition";
@@ -45,13 +45,13 @@ const fsAsync = fs.promises;
 import "source-map-support/register";
 import { copyMomentFiles } from "./moment";
 import {
-  ITEM_DEFINITION_I18N,
   ITEM_OPTIONAL_I18N,
   ITEM_CAN_BE_EXCLUDED_I18N,
   ITEM_CALLOUT_EXCLUDED_I18N,
   POLICY_REQUIRED_I18N,
+  MODULE_AND_ITEM_DEF_I18N,
+  MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY,
 } from "../constants";
-import { MODULE_I18N } from "../constants";
 
 if (process.env.NODE_ENV === "production") {
   throw new Error("This script cannot run in production mode");
@@ -370,11 +370,11 @@ async function buildModule(
     actualLocation,
     traceback,
   );
+  const i18nDataLocation = actualLocation.replace(".json", ".properties");
   const i18nData = await getI18nData(
-    true,
+    i18nDataLocation,
     supportedLanguages,
     null,
-    actualLocation,
     traceback,
   );
 
@@ -437,6 +437,7 @@ async function buildModule(
     name: actualName,
     i18nData: i18nData as any,
     location: actualLocation,
+    i18nDataLocation,
     pointers,
     raw,
     children: fileData.includes ? await buildIncludes(
@@ -487,11 +488,12 @@ async function buildItemDefinition(
     traceback,
   );
 
+  const i18nDataLocation = actualLocation.replace(".json", ".properties");
+
   const i18nData = await getI18nData(
-    false,
+    i18nDataLocation,
     supportedLanguages,
     fileData.policies,
-    actualLocation,
     traceback,
   );
 
@@ -538,6 +540,7 @@ async function buildItemDefinition(
     i18nData: i18nData as any,
     name: actualName,
     location: actualLocation,
+    i18nDataLocation,
     pointers,
     raw,
     includes: fileData.includes,
@@ -636,46 +639,47 @@ async function buildItemDefinition(
 /**
  * Provides the i18name as given by the language file
  * @param supportedLanguages the supported languages we expect
- * @param actualLocation the location of the item we are working on
  * @returns the right structure for a i18nName attribute
  */
 async function getI18nData(
-  isModule: boolean,
+  languageFileLocation: string,
   supportedLanguages: string[],
   policies: IPoliciesRawJSONDataType,
-  actualLocation: string,
   traceback: Traceback,
 ) {
-  const languageFileLocation =
-    actualLocation.replace(".json", ".properties");
-
+  // we check whether it exists
   await checkExists(
     languageFileLocation,
     traceback,
   );
 
+  // and then we use the properties reader on it
   const properties: any = PropertiesReader(languageFileLocation).path();
-  const i18nData: {
-    [locale: string]: {
-      [key: string]: any,
-    },
-  } = {};
+  const i18nData: IRawJSONI18NDataType = {};
 
+  // the traceback for such file
   const localeFileTraceback =
     traceback.newTraceToLocation(languageFileLocation);
 
-  const requiredLocaleKeys = isModule ? MODULE_I18N : ITEM_DEFINITION_I18N;
-
+  // now we loop over each lanaguage we support
   supportedLanguages.forEach((locale) => {
+    // if we find nothing we throw an error
     if (!properties[locale]) {
       throw new CheckUpError(
         "File does not include language data for locale " + locale,
         localeFileTraceback,
       );
     }
-    i18nData[locale] = {};
+    // otherwise set the locale data to empty
+    i18nData[locale] = {
+      name: null,
+      fts_search_field_label: null,
+      fts_search_field_placeholder: null,
+    };
 
-    requiredLocaleKeys.forEach((localeKey: string) => {
+    // for every locale key we have that we need either for item definition
+    // or module as defined by the constants
+    MODULE_AND_ITEM_DEF_I18N.forEach((localeKey: string) => {
       if (!properties[locale][localeKey]) {
         throw new CheckUpError(
           "File does not include language data for key '" + localeKey + "' for locale " + locale,
@@ -698,37 +702,55 @@ async function getI18nData(
       i18nData[locale].policies = {};
 
       // now we check which policies we have available, per key
-      Object.keys(policies).forEach((policyKey) => {
-        if (!properties[locale].policies[policyKey]) {
+      Object.keys(policies).forEach((policyType) => {
+        // and we check that we have language data for such policy type, either read or delete
+        if (!properties[locale].policies[policyType]) {
           throw new CheckUpError(
-            "File does not include language data for policy '" + policyKey + "' in " + locale,
+            "File does not include language data for policy '" + policyType + "' in " + locale,
             localeFileTraceback,
           );
         }
 
-        i18nData[locale].policies[policyKey] = {};
+        // now we add such policy in the policy list as empty
+        i18nData[locale].policies[policyType] = {};
 
-        Object.keys(policies[policyKey]).forEach((policyRuleKey) => {
-          if (!properties[locale].policies[policyKey][policyRuleKey]) {
+        // then we start adding up the policy rules, these are the policy names
+        // eg. REQUIRES_PASSWORD_CONFIRMATION and whatnot
+        Object.keys(policies[policyType]).forEach((policyName) => {
+          if (!properties[locale].policies[policyType][policyName]) {
             throw new CheckUpError(
-              "File does not include language data for policy '" + policyKey + "' in " +
-              locale + " for rule '" + policyRuleKey + "'",
+              "File does not include language data for policy '" + policyType + "' in " +
+              locale + " for rule '" + policyName + "'",
               localeFileTraceback,
             );
           }
-          i18nData[locale].policies[policyKey][policyRuleKey] = {};
+          i18nData[locale].policies[policyType][policyName] = {};
           POLICY_REQUIRED_I18N.forEach((policyReqiredI18nKey) => {
-            if (!properties[locale].policies[policyKey][policyRuleKey][policyReqiredI18nKey]) {
+            if (!properties[locale].policies[policyType][policyName][policyReqiredI18nKey]) {
               throw new CheckUpError(
-                "File does not include language data for policy '" + policyKey + "' in " +
-                locale + " for rule '" + policyRuleKey + "' in '" + policyReqiredI18nKey + "'",
+                "File does not include language data for policy '" + policyType + "' in " +
+                locale + " for rule '" + policyName + "' in '" + policyReqiredI18nKey + "'",
                 localeFileTraceback,
               );
             }
-            i18nData[locale].policies[policyKey][policyRuleKey][policyReqiredI18nKey] =
-              properties[locale].policies[policyKey][policyRuleKey][policyReqiredI18nKey].trim();
+            i18nData[locale].policies[policyType][policyName][policyReqiredI18nKey] =
+              properties[locale].policies[policyType][policyName][policyReqiredI18nKey].trim();
           });
         });
+      });
+    }
+
+    if (properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY]) {
+      i18nData[locale].custom = {};
+      Object.keys(properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY]).forEach((customPropertyInCustomKey) => {
+        if (typeof properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY][customPropertyInCustomKey] !== "string") {
+          throw new CheckUpError(
+            "Custom key '" + customPropertyInCustomKey + "' in locale " + locale + " is not a string",
+            localeFileTraceback,
+          );
+        }
+        i18nData[locale].custom[customPropertyInCustomKey] =
+          properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY][customPropertyInCustomKey];
       });
     }
   });
