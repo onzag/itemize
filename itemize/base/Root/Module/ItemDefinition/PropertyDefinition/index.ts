@@ -1127,4 +1127,13 @@ export default class PropertyDefinition {
   public getQualifiedPolicyIdentifier(policyType: string, policyName: string) {
     return PropertyDefinition.getQualifiedPolicyPrefix(policyType, policyName) + this.getId();
   }
+
+  public mergeWithI18n(
+    pdef: IPropertyDefinitionRawJSONDataType,
+  ) {
+    this.rawData.i18nData = {
+      ...this.rawData.i18nData,
+      ...pdef.i18nData,
+    };
+  }
 }

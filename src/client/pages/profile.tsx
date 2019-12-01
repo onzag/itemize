@@ -1,7 +1,9 @@
 import React from "react";
-import { UserIdRetriever, LogActioner } from "../../../itemize/client/app/elements";
-import { NotFound } from "./not-found";
+import { UserIdRetriever, LogActioner, ItemDefinitionLoader, View, I18nRead, StatsForNerds } from "../../../itemize/client/app/elements";
 import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
+import { BlockedPage } from "./blocked";
+import { ErrorPage } from "./error";
+import { Button } from "@material-ui/core";
 
 interface IProfileProps {
   match: {
@@ -11,34 +13,60 @@ interface IProfileProps {
   };
 }
 
+function SimulatedNotFoundPage() {
+  return (
+    <ErrorPage
+      error={{
+        message: "User not found",
+        code: "NOT_FOUND",
+      }}
+    />
+  );
+}
+
 function ActualProfile(props: {
   isOwner?: boolean,
 }) {
+  let content = null;
   if (props.isOwner) {
-    return (
+    content = (
       <LogActioner>
-        {(logActions) => (
-          <div>
-            <div onClick={logActions.logout}>logout</div>
-            <div onClick={logActions.logout}>logout</div>
-            <div onClick={logActions.logout}>logout</div>
-            <div onClick={logActions.logout}>logout</div>
-            <div onClick={logActions.logout}>logout</div>
-            <div onClick={logActions.logout}>logout</div>
-            <div onClick={logActions.logout}>logout</div>
-            <div onClick={logActions.logout}>logout</div>
-          </div>
-        )}
+        {(actioner) => {
+          return (
+            <React.Fragment>
+              <Button onClick={actioner.logout}>
+                <I18nRead id="logout"/>
+              </Button>
+            </React.Fragment>
+          );
+        }}
       </LogActioner>
     );
+  } else {
+    content = (
+      <React.Fragment>
+        <View id="username"/>
+      </React.Fragment>
+    );
   }
-  return null;
+  return (
+    <ItemDefinitionLoader
+      notFoundComponent={SimulatedNotFoundPage}
+      blockedComponent={BlockedPage}
+      errorComponent={ErrorPage}
+    >
+      {content}
+      <StatsForNerds/>
+    </ItemDefinitionLoader>
+  );
 }
 
 export function Profile(props: IProfileProps) {
   const actualId = parseInt(props.match.params.id, 10);
   if (isNaN(actualId)) {
-    return <NotFound/>;
+    return (
+      <SimulatedNotFoundPage />
+    );
   }
   return (
     <UserIdRetriever>

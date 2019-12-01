@@ -34,7 +34,7 @@ export async function getItemDefinition(
   // first we check that the language and region provided are
   // right and available
   checkLanguageAndRegion(appData, resolverArgs.args);
-  const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+  const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
   validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we find the requested fields that are requested
@@ -122,6 +122,7 @@ export async function getItemDefinition(
       true,
     );
     getItemDefinitionDebug("no result founds, returning null");
+    // We do not return the 404, just return null in this case
     return null;
   }
   getItemDefinitionDebug("SQL result found as %j", selectQueryValue);
@@ -166,7 +167,7 @@ export async function getItemDefinitionList(
   // right and available
   checkLanguageAndRegion(appData, resolverArgs.args);
   checkListLimit(resolverArgs.args.ids);
-  const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+  const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // now we find the requested fields that are requested
   // in the get request
@@ -268,7 +269,7 @@ export async function getModuleList(
   // right and available
   checkLanguageAndRegion(appData, resolverArgs.args);
   checkListLimit(resolverArgs.args.ids);
-  const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+  const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
   validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we find the requested fields that are requested

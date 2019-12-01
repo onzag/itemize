@@ -35,7 +35,7 @@ export async function addItemDefinition(
   checkLanguageAndRegion(appData, resolverArgs.args);
   // now we need to extract the token and get its data, making
   // sure it's a valid token
-  const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+  const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // check that the user is logged in, for adding, only logged users
   // are valid

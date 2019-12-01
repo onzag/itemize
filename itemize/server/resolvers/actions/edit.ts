@@ -35,7 +35,7 @@ export async function editItemDefinition(
   // First we check the language and region of the item
   checkLanguageAndRegion(appData, resolverArgs.args);
   // we ge the token data
-  const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+  const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // for editing one must be logged in
   mustBeLoggedIn(tokenData);
@@ -85,7 +85,7 @@ export async function editItemDefinition(
         debug("FAILED due to lack of content data");
         throw new GraphQLEndpointError({
           message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
-          code: "UNSPECIFIED",
+          code: "NOT_FOUND",
         });
       }
 

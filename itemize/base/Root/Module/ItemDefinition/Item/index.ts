@@ -457,4 +457,13 @@ export default class Item {
   public getItemDefinition() {
     return this.itemDefinition;
   }
+
+  public mergeWithI18n(
+    itemRaw: IItemRawJSONDataType,
+  ) {
+    this.rawData.i18nData = {
+      ...this.rawData.i18nData,
+      ...itemRaw.i18nData,
+    };
+  }
 }

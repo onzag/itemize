@@ -32,7 +32,7 @@ export async function searchModule(
 
   // check language and region
   checkLanguageAndRegion(appData, resolverArgs.args);
-  const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+  const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
   validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now build the fields we are searching
@@ -120,7 +120,7 @@ export async function searchItemDefinition(
 
   // check the language and region
   checkLanguageAndRegion(appData, resolverArgs.args);
-  const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+  const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
   validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we need to get the fields that we are using to search

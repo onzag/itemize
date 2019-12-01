@@ -13,31 +13,33 @@ import {
 } from "../../../constants";
 import { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
 
-export interface IRawJSONI18NDataType {
-  [locale: string]: {
-    name: string;
-    fts_search_field_label: string,
-    fts_search_field_placeholder: string;
-    custom?: {
-      [key: string]: string;
-    },
-    // policies is however not used in module
-    // since policies cannot really be added to modules
-    policies?: {
-      delete?: {
-        [policyName: string]: {
-          label: string,
-          failed: string,
-        },
-      },
-      edit?: {
-        [policyName: string]: {
-          label: string,
-          failed: string,
-        },
-      },
-    };
+export interface IRawJsonI18NSpecificLocaleDataType {
+  name: string;
+  fts_search_field_label: string;
+  fts_search_field_placeholder: string;
+  custom?: {
+    [key: string]: string;
   };
+  // policies is however not used in module
+  // since policies cannot really be added to modules
+  policies?: {
+    delete?: {
+      [policyName: string]: {
+        label: string,
+        failed: string,
+      },
+    },
+    edit?: {
+      [policyName: string]: {
+        label: string,
+        failed: string,
+      },
+    },
+  };
+}
+
+export interface IRawJSONI18NDataType {
+  [locale: string]: IRawJsonI18NSpecificLocaleDataType;
 }
 
 export type ListenerType = () => any;
@@ -528,6 +530,38 @@ export default class Module {
     return Object.keys(requestedFields).every((requestedField) => {
       const propDef = this.getPropExtensionFor(requestedField);
       return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
+    });
+  }
+
+  public mergeWithI18n(
+    mod: IModuleRawJSONDataType,
+  ) {
+    this.rawData.i18nData = {
+      ...this.rawData.i18nData,
+      ...mod.i18nData,
+    };
+
+    this.childModules.forEach((cMod) => {
+      const nameOfMergeModule = cMod.getName();
+      const mergeModuleRaw: IModuleRawJSONDataType = mod.children &&
+        mod.children.find((m) => m.type === "module" && m.name === nameOfMergeModule) as IModuleRawJSONDataType;
+      if (mergeModuleRaw) {
+        cMod.mergeWithI18n(mergeModuleRaw);
+      }
+    });
+
+    this.childItemDefinitions.forEach((cIdef) => {
+      const mergeIdefRaw = Module.getItemDefinitionRawFor(mod, [cIdef.getName()]);
+      if (mergeIdefRaw) {
+        cIdef.mergeWithI18n(mod, mergeIdefRaw);
+      }
+    });
+
+    this.propExtensions.forEach((pExt) => {
+      const mergePropertyRaw = Module.getPropExtensionRawFor(mod, pExt.getId());
+      if (mergePropertyRaw) {
+        pExt.mergeWithI18n(mergePropertyRaw);
+      }
     });
   }
 }

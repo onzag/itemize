@@ -26,7 +26,7 @@ export async function deleteItemDefinition(
   // do the basic things, check the language and region
   // and get the token data
   checkLanguageAndRegion(appData, resolverArgs.args);
-  const tokenData = validateTokenAndGetData(resolverArgs.args.token);
+  const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // for deleting we must be logged in
   mustBeLoggedIn(tokenData);
@@ -73,7 +73,7 @@ export async function deleteItemDefinition(
         debug("FAILED due to lack of content data");
         throw new GraphQLEndpointError({
           message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
-          code: "UNSPECIFIED",
+          code: "NOT_FOUND",
         });
       }
 

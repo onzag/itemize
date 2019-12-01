@@ -110,13 +110,16 @@ export default class App extends React.Component<IAppProps, IAppState> {
     super(props);
 
     // set the values in the state to the initial
+    // we expose the root variable just because it makes
+    // some debugging easier afterwards
+    (window as any).ROOT = new Root(props.initialData.root);
     this.state = {
       specifiedCountry: props.initialCountry,
       specifiedCurrency: props.initialCurrency,
       localeIsUpdating: false,
       localeIsUpdatingFrom: null,
       specifiedData: props.initialData,
-      specifiedProcessedRoot: new Root(props.initialData.root),
+      specifiedProcessedRoot: (window as any).ROOT,
     };
 
     // the helper functions that change the state of the whole app
@@ -193,10 +196,10 @@ export default class App extends React.Component<IAppProps, IAppState> {
     const newPathName = pathNameSplitted.join("/");
     history.push(newPathName);
 
-    // And now we might restore the state, with the new data, new root
+    // And now we might restore the state, with the new data
+    this.state.specifiedProcessedRoot.mergeWithI18n(newData.root);
     this.setState({
       specifiedData: newData,
-      specifiedProcessedRoot: new Root(newData.root),
       localeIsUpdating: false,
       localeIsUpdatingFrom: null,
     });

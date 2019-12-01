@@ -5,7 +5,8 @@
             "id": "username",
             "type": "string",
             "icon": "account_circle",
-            "unique": true
+            "unique": true,
+            "htmlAutocomplete": "username"
         },
         {
             "id": "app_lang_locale",
@@ -32,7 +33,6 @@
             "icon": "email",
             "searchLevel": "disabled",
             "nullable": true,
-            "htmlAutocomplete": "username",
             "readRoleAccess": ["SELF", "ADMIN"],
             "editRoleAccess": ["SELF", "ADMIN"]
         },

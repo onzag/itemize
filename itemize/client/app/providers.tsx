@@ -19,8 +19,9 @@ import { GraphQLEndpointErrorType } from "../../base/errors";
 export interface IItemDefinitionContextType {
   idef: ItemDefinition;
   value: IItemDefinitionValue;
-  deleted: boolean;
+  notFound: boolean;
   blocked: boolean;
+  blockedButDataAccessible: boolean;
   loadError: GraphQLEndpointErrorType;
   onPropertyChange: (
     property: PropertyDefinition,
@@ -62,7 +63,8 @@ interface IActualItemDefinitionProviderState {
   valueForContainsExternallyCheckedProperty: boolean;
   valueForId: number;
   isBlocked: boolean;
-  isDeleted: boolean;
+  isBlockedButDataIsAccessible: boolean;
+  notFound: boolean;
   loadError: GraphQLEndpointErrorType;
 }
 
@@ -132,7 +134,8 @@ class ActualItemDefinitionProvider extends
       valueForContainsExternallyCheckedProperty: valueFor.containsAnExternallyCheckedProperty(),
       valueForId: props.forId || null,
       isBlocked: false,
-      isDeleted: false,
+      isBlockedButDataIsAccessible: false,
+      notFound: false,
       loadError: null,
     };
 
@@ -144,15 +147,19 @@ class ActualItemDefinitionProvider extends
     valueFor.addListener(this.props.forId || null, this.listener);
   }
   public listener() {
+    console.log("WE LISTENED FOR", this.props.forId);
     this.setState({
       value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
       valueForId: this.props.forId || null,
     });
   }
   public async loadValue() {
+    console.log("ASKED TO LOAD VALUE", this.props.forId);
     if (this.props.forId && !this.state.valueFor.hasAppliedValueTo(this.props.forId)) {
+      console.log("YES LOADIN");
       const qualifiedPathNameWithID = PREFIX_BUILD(this.state.valueFor.getQualifiedPathName()) + this.props.forId;
       if (ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID]) {
+        console.log("CANCEL IT BECAUSE WE ALREADY LOADIN");
         return;
       }
       ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID] = true;
@@ -244,7 +251,6 @@ class ActualItemDefinitionProvider extends
         }),
       );
 
-      // TODO maybe clean fields during errors
       if (!gqlValue) {
         this.setState({
           loadError: {
@@ -252,7 +258,8 @@ class ActualItemDefinitionProvider extends
             code: "CANT_CONNECT",
           },
           isBlocked: false,
-          isDeleted: false,
+          isBlockedButDataIsAccessible: false,
+          notFound: false,
         });
       } else {
         if (gqlValue.errors) {
@@ -264,30 +271,42 @@ class ActualItemDefinitionProvider extends
             loadError: null,
           });
         }
-        if (!gqlValue.data[queryName]) {
-          this.setState({
-            isDeleted: true,
-            isBlocked: false,
-          });
-        } else {
-          if (gqlValue.data[queryName].blocked_at) {
+
+        if (gqlValue.data) {
+          if (!gqlValue.data[queryName]) {
             this.setState({
-              isDeleted: false,
-              isBlocked: true,
+              notFound: true,
+              isBlocked: false,
+              isBlockedButDataIsAccessible: false,
             });
           } else {
-            this.setState({
-              isBlocked: false,
-              isDeleted: false,
-            });
-          }
+            if (gqlValue.data[queryName].blocked_at) {
+              this.setState({
+                notFound: false,
+                isBlocked: true,
+                isBlockedButDataIsAccessible: !!gqlValue.data[queryName].DATA,
+              });
+            } else {
+              this.setState({
+                isBlocked: false,
+                notFound: false,
+                isBlockedButDataIsAccessible: false,
+              });
+            }
 
-          const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
-          this.state.valueFor.applyValueFromGQL(this.props.forId || null, recievedFields);
-          this.state.valueFor.triggerListeners(this.props.forId || null);
-          if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
-            this.setStateToCurrentValueWithExternalChecking(null);
+            const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
+            this.state.valueFor.applyValueFromGQL(this.props.forId || null, recievedFields);
+            this.state.valueFor.triggerListeners(this.props.forId || null);
+            if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+              this.setStateToCurrentValueWithExternalChecking(null);
+            }
           }
+        } else {
+          this.setState({
+            isBlocked: false,
+            notFound: false,
+            isBlockedButDataIsAccessible: false,
+          });
         }
       }
 
@@ -339,6 +358,9 @@ class ActualItemDefinitionProvider extends
       );
     }
   }
+  public componentWillUnmount() {
+    this.state.valueFor.removeListener(this.state.valueForId, this.listener);
+  }
   public onItemSetExclusionState(item: Item, state: ItemExclusionState) {
     const currentUpdateId = (new Date()).getTime();
     this.lastUpdateId = currentUpdateId;
@@ -362,8 +384,9 @@ class ActualItemDefinitionProvider extends
           value: this.state.value,
           onPropertyChange: this.onPropertyChange,
           onItemSetExclusionState: this.onItemSetExclusionState,
-          deleted: this.state.isDeleted,
+          notFound: this.state.notFound,
           blocked: this.state.isBlocked,
+          blockedButDataAccessible: this.state.isBlockedButDataIsAccessible,
           loadError: this.state.loadError,
         }}
       >

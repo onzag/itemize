@@ -4,7 +4,7 @@ import { GraphQLString, GraphQLObjectType, GraphQLInt } from "graphql";
 import { CONNECTOR_SQL_COLUMN_FK_NAME } from "../../constants";
 import { jwtVerify, jwtSign } from "../token";
 import { GraphQLEndpointError } from "../../../itemize/base/errors";
-import { PropertyInvalidReason } from "../../../itemize/base/Root/Module/ItemDefinition/PropertyDefinition";
+import { IServerSideTokenDataType } from "../resolvers/basic";
 
 export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinitionType => {
   const userModule = appData.root.getModule("users");
@@ -55,7 +55,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
         if (args.token) {
           try {
-            const decoded: any = await jwtVerify(args.token, appData.config.jwtKey) as object;
+            const decoded = await jwtVerify<IServerSideTokenDataType>(args.token, appData.config.jwtKey);
             return {
               token: args.token,
               id: decoded.id,

@@ -1,7 +1,7 @@
 import Item, { IItemRawJSONDataType, IItemValue, ItemExclusionState } from "./Item";
 import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionValue } from "./PropertyDefinition";
-import Module, { IModuleRawJSONDataType, ListenerType, IRawJSONI18NDataType } from "..";
+import Module, { IModuleRawJSONDataType, ListenerType, IRawJSONI18NDataType, IRawJsonI18NSpecificLocaleDataType } from "..";
 import {
   PREFIXED_CONCAT,
   ITEM_DEFINITION_PREFIX,
@@ -173,6 +173,7 @@ export default class ItemDefinition {
   private propertyDefinitions: PropertyDefinition[];
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
+  private originatingInstance: ItemDefinition;
 
   private listeners: {
     [id: number]: ListenerType[],
@@ -187,10 +188,12 @@ export default class ItemDefinition {
     rawJSON: IItemDefinitionRawJSONDataType,
     parentModule: Module,
     parentItemDefinition: ItemDefinition,
+    originatingInstance?: ItemDefinition,
   ) {
     this.rawData = rawJSON;
     this.parentModule = parentModule;
     this.parentItemDefinition = parentItemDefinition;
+    this.originatingInstance = originatingInstance || null;
 
     // assigning the item definitions that are child by
     // instantiating them
@@ -206,7 +209,7 @@ export default class ItemDefinition {
       rawJSON.importedChildDefinitions.map(
         (d) => ({
           fullName: d.join("/"),
-          definition: this.parentModule.getItemDefinitionFor(d).getNewInstance(),
+          definition: this.parentModule.getItemDefinitionFor(d),
         })) : [];
 
     // assigning the property definition by using the
@@ -511,8 +514,7 @@ export default class ItemDefinition {
    * module
    */
   public getNewInstance() {
-    return new ItemDefinition(this.rawData, this.parentModule,
-      this.parentItemDefinition);
+    return new ItemDefinition(this.rawData, this.parentModule, this.parentItemDefinition, this);
   }
 
   /**
@@ -520,7 +522,10 @@ export default class ItemDefinition {
    * @param  locale the locale in iso form
    * @returns an object or null (if locale not valid)
    */
-  public getI18nDataFor(locale: string) {
+  public getI18nDataFor(locale: string): IRawJsonI18NSpecificLocaleDataType {
+    if (this.originatingInstance) {
+      return this.originatingInstance.getI18nDataFor(locale);
+    }
     return this.rawData.i18nData[locale] || null;
   }
 
@@ -842,5 +847,37 @@ export default class ItemDefinition {
 
   public triggerListeners(id: number, but?: ListenerType) {
     this.listeners[id].filter((l) => l !== but).forEach((l) => l());
+  }
+
+  public mergeWithI18n(
+    mod: IModuleRawJSONDataType,
+    idef: IItemDefinitionRawJSONDataType,
+  ) {
+    this.rawData.i18nData = {
+      ...this.rawData.i18nData,
+      ...idef.i18nData,
+    };
+
+    this.childDefinitions.forEach((cIdef) => {
+      const mergeIdefRaw = ItemDefinition.getItemDefinitionRawFor(idef, mod, cIdef.getName());
+      if (mergeIdefRaw) {
+        cIdef.mergeWithI18n(mod, mergeIdefRaw);
+      }
+    });
+
+    this.propertyDefinitions.forEach((pD) => {
+      const mergePropertyRaw = ItemDefinition.getPropertyDefinitionRawFor(idef, mod, pD.getId(), false);
+      if (mergePropertyRaw) {
+        pD.mergeWithI18n(mergePropertyRaw);
+      }
+    });
+
+    this.itemInstances.forEach((ii) => {
+      const mergeItemRaw = this.rawData.includes &&
+        this.rawData.includes.find((include) => include.id === ii.getId());
+      if (mergeItemRaw) {
+        ii.mergeWithI18n(mergeItemRaw);
+      }
+    });
   }
 }

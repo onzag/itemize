@@ -22,6 +22,7 @@ import { IGQLValue } from "../../base/Root/gql";
 import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
 import Knex from "knex";
 import { countries } from "../../resources";
+import { jwtVerify } from "../token";
 
 const flattenFieldsFromRequestedFieldsDebug = Debug("resolvers:flattenFieldsFromRequestedFields");
 /**
@@ -172,12 +173,24 @@ const validateTokenAndGetDataDebug = Debug("resolvers:validateTokenAndGetDataDeb
  * for use in the system
  * @param token the token passed via the args
  */
-export function validateTokenAndGetData(token: string): IServerSideTokenDataType {
+export async function validateTokenAndGetData(appData: IAppDataType, token: string): Promise<IServerSideTokenDataType> {
   validateTokenAndGetDataDebug("EXECUTED with %s", token);
-  const result = {
-    id: 1,
-    role: token,
-  };
+  let result: IServerSideTokenDataType;
+  if (token === null) {
+    result = {
+      id: null,
+      role: "GUEST",
+    };
+  } else {
+    try {
+      result = await jwtVerify<IServerSideTokenDataType>(token, appData.config.jwtKey);
+    } catch (err) {
+      throw new GraphQLEndpointError({
+        message: "Invalid token that didn't pass verification",
+        code: "UNSPECIFIED",
+      });
+    }
+  }
   validateTokenAndGetDataDebug("SUCCEED with %j", result);
   return result;
 }

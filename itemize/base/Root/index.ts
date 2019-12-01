@@ -104,4 +104,13 @@ export default class Root {
 
     return resultModule;
   }
+
+  public mergeWithI18n(root: IRootRawJSONDataType) {
+    this.childModules.forEach((mod) => {
+      const mergeModuleRaw = Root.getModuleRawFor(root, [mod.getName()]);
+      if (mergeModuleRaw) {
+        mod.mergeWithI18n(mergeModuleRaw);
+      }
+    });
+  }
 }

@@ -139,13 +139,13 @@ export const LOCALE_I18N = [
 
   "error.INVALID_CREDENTIALS",
   "error.BLOCKED",
-  "error.DELETED",
   "error.CANT_CONNECT",
   "error.INTERNAL_SERVER_ERROR",
   "error.UNSPECIFIED",
   "error.MUST_BE_LOGGED_IN",
   "error.FORBIDDEN",
   "error.USER_BLOCKED",
+  "error.NOT_FOUND",
 ];
 
 // ATTRIBUTES FOR i18N PROPERTIES
@@ -370,7 +370,7 @@ Object.keys(ORDER_BY_OPTIONS).forEach((key) => {
 });
 const BASE_QUERY_PROPERTIES = {
   token: {
-    type: GraphQLNonNull(GraphQLString),
+    type: GraphQLString,
     description: "the access token provided by the app",
   },
   language: {

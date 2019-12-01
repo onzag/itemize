@@ -16,13 +16,13 @@ export async function jwtSign(
   });
 }
 
-export async function jwtVerify(
+export async function jwtVerify<T>(
   token: string,
   secretOrPublicKey: jwt.Secret,
   options?: jwt.VerifyOptions,
-): Promise<object | string> {
-  return new Promise<object | string>((resolve, reject) => {
-    jwt.verify(token, secretOrPublicKey, options, (err: Error, decoded: object | string) => {
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    jwt.verify(token, secretOrPublicKey, options, (err: Error, decoded: any) => {
       if (err) {
         reject(err);
       } else {

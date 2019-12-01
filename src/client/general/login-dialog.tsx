@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, createStyles, withStyles, WithStyles, Icon } from "@material-ui/core";
 import { DialogResponsive } from "./dialog";
-import { Entry, I18nRead, LogActioner, ReadableErrorFor } from "../../../itemize/client/app/elements";
+import { Entry, I18nRead, LogActioner, I18nReadError } from "../../../itemize/client/app/elements";
 
 const loginDialogStyles = createStyles({});
 
@@ -35,7 +35,7 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: INavbarProps) =
                 <Entry id="username" onChange={actioner.dismissError} showAsInvalid={!!actioner.error}/>
                 <Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error}/>
 
-                <ReadableErrorFor error={actioner.error}/>
+                <I18nReadError error={actioner.error}/>
               </form>
             </DialogResponsive>
           )}
