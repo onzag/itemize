@@ -77,7 +77,7 @@ export function Profile(props: IProfileProps) {
           }
           return (
             <ModuleProvider module="users">
-              <ItemDefinitionProvider itemDefinition="user" forId={actualId}>
+              <ItemDefinitionProvider itemDefinition="user" forId={actualId} disableExternalChecks={true}>
                 <ActualProfile/>
               </ItemDefinitionProvider>
             </ModuleProvider>

@@ -31,7 +31,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     this.state = {
       token: localStorage.getItem("TOKEN") || null,
       id: parseInt(localStorage.getItem("ID"), 10) || null,
-      role: localStorage.getItem("ROLE") || null,
+      role: localStorage.getItem("ROLE") || "GUEST",
       isLoggingIn: false,
       error: null,
     };
@@ -75,7 +75,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         isLoggingIn: false,
         id: null,
         token: null,
-        role: null,
+        role: "GUEST",
         error: {
           message: "Failed to connect",
           code: "CANT_CONNECT",
@@ -172,7 +172,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     this.setState({
       id: null,
       token: null,
-      role: null,
+      role: "GUEST",
     });
   }
   public dismissError() {

@@ -183,6 +183,14 @@ export default class ItemDefinition {
   private stateHasAppliedValueTo: {
     [id: number]: boolean,
   };
+  private stateGQLAppliedValue: {
+    [id: number]: {
+      userIdRequester: number,
+      roleRequester: string,
+      query: string,
+      value: any,
+    };
+  };
 
   constructor(
     rawJSON: IItemDefinitionRawJSONDataType,
@@ -224,6 +232,7 @@ export default class ItemDefinition {
       .map((i) => (new Item(i, parentModule, this))) : [];
 
     this.stateHasAppliedValueTo = {};
+    this.stateGQLAppliedValue = {};
 
     this.listeners = [];
   }
@@ -629,8 +638,17 @@ export default class ItemDefinition {
       [key: string]: any,
     },
     excludeExtensions?: boolean,
+    graphqlUserIdRequester?: number,
+    graphqlRoleRequester?: string,
+    graphqlQuery?: string,
   ) {
     this.stateHasAppliedValueTo[id] = true;
+    this.stateGQLAppliedValue[id] = {
+      userIdRequester: graphqlUserIdRequester,
+      roleRequester: graphqlRoleRequester,
+      value,
+      query: graphqlQuery,
+    };
 
     const properties =
       excludeExtensions ?
@@ -655,6 +673,7 @@ export default class ItemDefinition {
 
   public cleanValueFor(id: number, excludeExtensions?: boolean) {
     delete this.stateHasAppliedValueTo[id];
+    delete this.stateGQLAppliedValue[id];
 
     const properties =
       excludeExtensions ?
@@ -670,6 +689,10 @@ export default class ItemDefinition {
 
   public hasAppliedValueTo(id: number): boolean {
     return !!this.stateHasAppliedValueTo[id];
+  }
+
+  public getGQLAppliedValue(id: number) {
+    return this.stateGQLAppliedValue[id];
   }
 
   /**
@@ -879,5 +902,7 @@ export default class ItemDefinition {
         ii.mergeWithI18n(mergeItemRaw);
       }
     });
+
+    // TODO search mode merge with 18n
   }
 }

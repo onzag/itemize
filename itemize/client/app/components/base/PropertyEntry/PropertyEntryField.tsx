@@ -201,39 +201,43 @@ export default class PropertyEntryField
   }
 
   public componentDidUpdate(prevProps: IPropertyEntryProps) {
-    // let's update currencies if they change because of a locale change
-    if (prevProps.currency !== this.props.currency && this.props.property.getType() === "currency") {
-      // let's get the value
-      const value: IPropertyDefinitionSupportedCurrencyType =
-        this.props.value.value as IPropertyDefinitionSupportedCurrencyType;
-      // if we have a value
-      if (value !== null) {
-        // update it for the new currency
-        this.props.onChange({
-          value: value.value,
-          currency: this.props.currency.code,
-        },
-        // We do this replacement just in case anyway
-        // we know it only makes sense if the locale changed too
-        // from a language that uses different separators
-        // but it doesn't hurt if it's the same
-        this.props.value.internalValue.replace(
-          prevProps.i18n.number_decimal_separator,
-          this.props.i18n.number_decimal_separator,
-        ));
-      }
+    if (this.props.value.internalValue) {
+      // let's update currencies if they change because of a locale change
+      if (prevProps.currency !== this.props.currency && this.props.property.getType() === "currency") {
+        // let's get the value
+        const value: IPropertyDefinitionSupportedCurrencyType =
+          this.props.value.value as IPropertyDefinitionSupportedCurrencyType;
+        // if we have a value
+        if (value !== null) {
+          // update it for the new currency
+          this.props.onChange(
+            {
+              value: value.value,
+              currency: this.props.currency.code,
+            },
+            // We do this replacement just in case anyway
+            // we know it only makes sense if the locale changed too
+            // from a language that uses different separators
+            // but it doesn't hurt if it's the same
+            this.props.value.internalValue.replace(
+              prevProps.i18n.number_decimal_separator,
+              this.props.i18n.number_decimal_separator,
+            ),
+          );
+        }
 
-    // a decimal separator update in case
-    } else if (prevProps.i18n.number_decimal_separator !== this.props.i18n.number_decimal_separator) {
-      // if the value is not null
-      if (this.props.value.value !== null) {
-        this.props.onChange(
-          this.props.value.value,
-          this.props.value.internalValue.replace(
-            prevProps.i18n.number_decimal_separator,
-            this.props.i18n.number_decimal_separator,
-          ),
-        );
+      // a decimal separator update in case
+      } else if (prevProps.i18n.number_decimal_separator !== this.props.i18n.number_decimal_separator) {
+        // if the value is not null
+        if (this.props.value.value !== null) {
+          this.props.onChange(
+            this.props.value.value,
+            this.props.value.internalValue.replace(
+              prevProps.i18n.number_decimal_separator,
+              this.props.i18n.number_decimal_separator,
+            ),
+          );
+        }
       }
     }
 

@@ -58,10 +58,6 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
 
 interface IActualItemDefinitionProviderState {
   value: IItemDefinitionValue;
-  valueFor: ItemDefinition;
-  valueForQualifiedName: string;
-  valueForContainsExternallyCheckedProperty: boolean;
-  valueForId: number;
   isBlocked: boolean;
   isBlockedButDataIsAccessible: boolean;
   notFound: boolean;
@@ -71,7 +67,7 @@ interface IActualItemDefinitionProviderState {
 function flattenRecievedFields(recievedFields: any) {
   // so first we extract the data content
   const output = {
-    ...(recievedFields.DATA || {}),
+    ...(recievedFields.DATA || {}),
   };
   // and then we loop for everything else, but data
   Object.keys(recievedFields).forEach((key) => {
@@ -90,34 +86,10 @@ const ItemDefinitionProviderRequestsInProgressRegistry: {
 class ActualItemDefinitionProvider extends
   React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
 
-  public static getDerivedStateFromProps(
-    props: IActualItemDefinitionProviderProps,
-    state: IActualItemDefinitionProviderState,
-  ): Partial<IActualItemDefinitionProviderState> {
-    let newValueFor = props.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
-    if (props.searchCounterpart) {
-      newValueFor = newValueFor.getSearchModeCounterpart();
-    }
-    if (state.valueFor !== newValueFor) {
-      if (state.valueForQualifiedName !== newValueFor.getQualifiedPathName()) {
-        throw new Error(
-          "Replacing a context of an item definition for another is not allowed",
-        );
-      }
-      if (state.valueForId === (props.forId || null)) {
-        newValueFor.applyValue(props.forId || null, state.value);
-      }
-      return {
-        valueFor: newValueFor,
-        valueForId: props.forId || null,
-        valueForContainsExternallyCheckedProperty: newValueFor.containsAnExternallyCheckedProperty(),
-      };
-    }
-    return null;
-  }
-
   private updateTimeout: NodeJS.Timer;
   private lastUpdateId: number;
+  private itemDefinition: ItemDefinition;
+  private containsExternallyCheckedProperty: boolean;
 
   constructor(props: IActualItemDefinitionProviderProps) {
     super(props);
@@ -129,10 +101,6 @@ class ActualItemDefinitionProvider extends
 
     this.state = {
       value: valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
-      valueFor,
-      valueForQualifiedName: valueFor.getQualifiedPathName(),
-      valueForContainsExternallyCheckedProperty: valueFor.containsAnExternallyCheckedProperty(),
-      valueForId: props.forId || null,
       isBlocked: false,
       isBlockedButDataIsAccessible: false,
       notFound: false,
@@ -145,42 +113,114 @@ class ActualItemDefinitionProvider extends
     this.listener = this.listener.bind(this);
 
     valueFor.addListener(this.props.forId || null, this.listener);
+    this.itemDefinition = valueFor;
+    this.containsExternallyCheckedProperty = valueFor.containsAnExternallyCheckedProperty();
+  }
+  public componentDidUpdate(
+    prevProps: IActualItemDefinitionProviderProps,
+  ) {
+    if (this.props.itemDefinition !== prevProps.itemDefinition) {
+      throw new Error(
+        "Changing item definitions is not allowed, you went from " +
+        this.props.itemDefinition + " to " +
+        prevProps.itemDefinition,
+      );
+    }
+    if ((prevProps.forId || null) !== (this.props.forId || null)) {
+      this.itemDefinition.removeListener(prevProps.forId || null, this.listener);
+      this.itemDefinition.addListener(this.props.forId || null, this.listener);
+      // we set the value given we have changed the forId
+      this.setState({
+        value: this.itemDefinition.getCurrentValueNoExternalChecking(this.props.forId || null),
+      });
+      if (this.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+        this.setStateToCurrentValueWithExternalChecking(null);
+      }
+    }
+    if (
+      (prevProps.forId || null) !== (this.props.forId || null) ||
+      prevProps.tokenData.id !== this.props.tokenData.id ||
+      prevProps.tokenData.role !== this.props.tokenData.role
+    ) {
+      this.loadValue();
+    }
+  }
+  public componentDidMount() {
+    if (this.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+      this.setStateToCurrentValueWithExternalChecking(null);
+    }
+    this.loadValue();
   }
   public listener() {
     console.log("WE LISTENED FOR", this.props.forId);
+    let valueFor = this.props.mod.getItemDefinitionFor(this.props.itemDefinition.split("/"));
+    if (this.props.searchCounterpart) {
+      valueFor = valueFor.getSearchModeCounterpart();
+    }
     this.setState({
-      value: this.state.valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
-      valueForId: this.props.forId || null,
+      value: valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
     });
   }
   public async loadValue() {
+    if (!this.props.forId) {
+      return;
+    }
+
     console.log("ASKED TO LOAD VALUE", this.props.forId);
-    if (this.props.forId && !this.state.valueFor.hasAppliedValueTo(this.props.forId)) {
-      console.log("YES LOADIN");
-      const qualifiedPathNameWithID = PREFIX_BUILD(this.state.valueFor.getQualifiedPathName()) + this.props.forId;
-      if (ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID]) {
-        console.log("CANCEL IT BECAUSE WE ALREADY LOADIN");
+    const qualifiedPathNameWithID = PREFIX_BUILD(this.itemDefinition.getQualifiedPathName()) + this.props.forId;
+    if (ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID]) {
+      console.log("CANCEL IT BECAUSE WE ALREADY LOADIN");
+      return;
+    }
+    ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID] = true;
+
+    const requestFields: any = {
+      DATA: {},
+    };
+    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
+      requestFields[p] = {};
+    });
+    if (ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(this.props.tokenData.role)) {
+      MODERATION_FIELDS.forEach((mf) => {
+        requestFields.DATA[mf] = {};
+      });
+    }
+    this.itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+      if (pd.isRetrievalDisabled()) {
         return;
       }
-      ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID] = true;
+      if (
+        pd.checkRoleAccessFor(
+          ItemDefinitionIOActions.READ,
+          this.props.tokenData.role,
+          this.props.tokenData.id,
+          this.props.assumeOwnership ? this.props.tokenData.id : -1,
+          false,
+        )
+      ) {
+        console.log("PASSED", pd.getId(), "for", this.props.tokenData.id, this.props.assumeOwnership);
+        requestFields.DATA[pd.getId()] = {};
 
-      const requestFields: any = {
-        DATA: {},
-      };
-      EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
-        requestFields[p] = {};
-      });
-      if (ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(this.props.tokenData.role)) {
-        MODERATION_FIELDS.forEach((mf) => {
-          requestFields.DATA[mf] = {};
-        });
+        const propertyDescription = pd.getPropertyDefinitionDescription();
+        if (propertyDescription.gqlFields) {
+          Object.keys(propertyDescription.gqlFields).forEach((field) => {
+            requestFields.DATA[pd.getId()][field] = {};
+          });
+        }
       }
-      this.state.valueFor.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
-        if (pd.isRetrievalDisabled()) {
+    });
+    this.itemDefinition.getAllItems().forEach((item) => {
+      requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
+
+      const qualifiedId = item.getQualifiedIdentifier();
+      requestFields.DATA[qualifiedId] = {};
+
+      item.getSinkingProperties().forEach((sp) => {
+        if (sp.isRetrievalDisabled()) {
           return;
         }
         if (
-          pd.checkRoleAccessFor(
+          sp.checkRoleAccessFor(
             ItemDefinitionIOActions.READ,
             this.props.tokenData.role,
             this.props.tokenData.id,
@@ -188,155 +228,121 @@ class ActualItemDefinitionProvider extends
             false,
           )
         ) {
-          requestFields.DATA[pd.getId()] = {};
+          requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = {};
 
-          const propertyDescription = pd.getPropertyDefinitionDescription();
+          const propertyDescription = sp.getPropertyDefinitionDescription();
           if (propertyDescription.gqlFields) {
             Object.keys(propertyDescription.gqlFields).forEach((field) => {
-              requestFields.DATA[pd.getId()][field] = {};
+              requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()][field] = {};
             });
           }
         }
       });
-      this.state.valueFor.getAllItems().forEach((item) => {
-        requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
 
-        const qualifiedId = item.getQualifiedIdentifier();
-        requestFields.DATA[qualifiedId] = {};
-
-        item.getSinkingProperties().forEach((sp) => {
-          if (sp.isRetrievalDisabled()) {
-            return;
-          }
-          if (
-            sp.checkRoleAccessFor(
-              ItemDefinitionIOActions.READ,
-              this.props.tokenData.role,
-              this.props.tokenData.id,
-              this.props.assumeOwnership ? this.props.tokenData.id : -1,
-              false,
-            )
-          ) {
-            requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = {};
-
-            const propertyDescription = sp.getPropertyDefinitionDescription();
-            if (propertyDescription.gqlFields) {
-              Object.keys(propertyDescription.gqlFields).forEach((field) => {
-                requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()][field] = {};
-              });
-            }
-          }
-        });
-
-        if (Object.keys(requestFields.DATA[qualifiedId]).length === 0) {
-          delete requestFields.DATA[qualifiedId];
-        }
-      });
-
-      if (Object.keys(requestFields.DATA).length === 0) {
-        delete requestFields.DATA;
+      if (Object.keys(requestFields.DATA[qualifiedId]).length === 0) {
+        delete requestFields.DATA[qualifiedId];
       }
+    });
 
-      const queryName = PREFIX_GET + this.state.valueFor.getQualifiedPathName();
-      const gqlValue = await gqlQuery(
-        buildGqlQuery({
-          name: queryName,
-          args: {
-            id: this.props.forId,
-            token: this.props.tokenData.token,
-            language: this.props.localeData.language.split("-")[0],
-            country: this.props.localeData.country,
-          },
-          fields: requestFields,
-        }),
-      );
+    if (Object.keys(requestFields.DATA).length === 0) {
+      delete requestFields.DATA;
+    }
 
-      if (!gqlValue) {
+    const queryName = PREFIX_GET + this.itemDefinition.getQualifiedPathName();
+    const query = buildGqlQuery({
+      name: queryName,
+      args: {
+        id: this.props.forId,
+        token: this.props.tokenData.token,
+        language: this.props.localeData.language.split("-")[0],
+        country: this.props.localeData.country,
+      },
+      fields: requestFields,
+    });
+    const appliedGQLValue = this.itemDefinition.getGQLAppliedValue(this.props.forId);
+    if (appliedGQLValue && appliedGQLValue.query === query) {
+      delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
+      console.log("CANCEL IT BECAUSE IT MATCHES OUR CACHE");
+      return;
+    }
+    const gqlValue = await gqlQuery(query);
+
+    if (!gqlValue) {
+      this.setState({
+        loadError: {
+          message: "Failed to connect",
+          code: "CANT_CONNECT",
+        },
+        isBlocked: false,
+        isBlockedButDataIsAccessible: false,
+        notFound: false,
+      });
+    } else {
+      if (gqlValue.errors) {
         this.setState({
-          loadError: {
-            message: "Failed to connect",
-            code: "CANT_CONNECT",
-          },
-          isBlocked: false,
-          isBlockedButDataIsAccessible: false,
-          notFound: false,
+          loadError: gqlValue.errors[0].extensions,
         });
       } else {
-        if (gqlValue.errors) {
-          this.setState({
-            loadError: gqlValue.errors[0].extensions,
-          });
-        } else {
-          this.setState({
-            loadError: null,
-          });
-        }
-
-        if (gqlValue.data) {
-          if (!gqlValue.data[queryName]) {
-            this.setState({
-              notFound: true,
-              isBlocked: false,
-              isBlockedButDataIsAccessible: false,
-            });
-          } else {
-            if (gqlValue.data[queryName].blocked_at) {
-              this.setState({
-                notFound: false,
-                isBlocked: true,
-                isBlockedButDataIsAccessible: !!gqlValue.data[queryName].DATA,
-              });
-            } else {
-              this.setState({
-                isBlocked: false,
-                notFound: false,
-                isBlockedButDataIsAccessible: false,
-              });
-            }
-
-            const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
-            this.state.valueFor.applyValueFromGQL(this.props.forId || null, recievedFields);
-            this.state.valueFor.triggerListeners(this.props.forId || null);
-            if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
-              this.setStateToCurrentValueWithExternalChecking(null);
-            }
-          }
-        } else {
-          this.setState({
-            isBlocked: false,
-            notFound: false,
-            isBlockedButDataIsAccessible: false,
-          });
-        }
+        this.setState({
+          loadError: null,
+        });
       }
 
-      delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
+      if (gqlValue.data) {
+        if (!gqlValue.data[queryName]) {
+          this.setState({
+            notFound: true,
+            isBlocked: false,
+            isBlockedButDataIsAccessible: false,
+          });
+        } else {
+          if (gqlValue.data[queryName].blocked_at) {
+            this.setState({
+              notFound: false,
+              isBlocked: true,
+              isBlockedButDataIsAccessible: !!gqlValue.data[queryName].DATA,
+            });
+          } else {
+            this.setState({
+              isBlocked: false,
+              notFound: false,
+              isBlockedButDataIsAccessible: false,
+            });
+          }
+
+          console.log(query);
+          const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
+          this.itemDefinition.applyValueFromGQL(
+            this.props.forId || null,
+            recievedFields,
+            false,
+            this.props.tokenData.id,
+            this.props.tokenData.role,
+            query,
+          );
+          this.itemDefinition.triggerListeners(this.props.forId || null);
+          if (this.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+            this.setStateToCurrentValueWithExternalChecking(null);
+          }
+        }
+      } else {
+        this.setState({
+          isBlocked: false,
+          notFound: false,
+          isBlockedButDataIsAccessible: false,
+        });
+      }
     }
-  }
-  public componentDidUpdate(
-    prevProps: IActualItemDefinitionProviderProps,
-    prevState: IActualItemDefinitionProviderState,
-  ) {
-    if (prevProps.forId !== this.props.forId || prevState.valueFor !== this.state.valueFor) {
-      prevState.valueFor.removeListener(prevProps.forId || null, this.listener);
-      this.state.valueFor.addListener(this.props.forId || null, this.listener);
-    }
-    this.loadValue();
-  }
-  public componentDidMount() {
-    if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
-      this.setStateToCurrentValueWithExternalChecking(null);
-    }
-    this.loadValue();
+
+    delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
   }
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
-    const newValue = await this.state.valueFor.getCurrentValue(this.props.forId || null);
+    const newValue = await this.itemDefinition.getCurrentValue(this.props.forId || null);
     if (currentUpdateId === null || this.lastUpdateId === currentUpdateId) {
       this.setState({
         value: newValue,
-        valueForId: this.props.forId || null,
       });
-      this.state.valueFor.triggerListeners(this.props.forId || null, this.listener);
+      this.itemDefinition.triggerListeners(this.props.forId || null, this.listener);
     }
   }
   public onPropertyChange(
@@ -348,9 +354,9 @@ class ActualItemDefinitionProvider extends
     this.lastUpdateId = currentUpdateId;
 
     property.setCurrentValue(this.props.forId || null, value, internalValue);
-    this.state.valueFor.triggerListeners(this.props.forId || null);
+    this.itemDefinition.triggerListeners(this.props.forId || null);
 
-    if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+    if (this.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       clearTimeout(this.updateTimeout);
       this.updateTimeout = setTimeout(
         this.setStateToCurrentValueWithExternalChecking.bind(this, currentUpdateId),
@@ -359,16 +365,16 @@ class ActualItemDefinitionProvider extends
     }
   }
   public componentWillUnmount() {
-    this.state.valueFor.removeListener(this.state.valueForId, this.listener);
+    this.itemDefinition.removeListener(this.props.forId || null, this.listener);
   }
   public onItemSetExclusionState(item: Item, state: ItemExclusionState) {
     const currentUpdateId = (new Date()).getTime();
     this.lastUpdateId = currentUpdateId;
 
     item.setExclusionState(this.props.forId || null, state);
-    this.state.valueFor.triggerListeners(this.props.forId || null);
+    this.itemDefinition.triggerListeners(this.props.forId || null);
 
-    if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+    if (this.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       clearTimeout(this.updateTimeout);
       this.updateTimeout = setTimeout(
         this.setStateToCurrentValueWithExternalChecking.bind(this, currentUpdateId),
@@ -380,7 +386,7 @@ class ActualItemDefinitionProvider extends
     return (
       <ItemDefinitionContext.Provider
         value={{
-          idef: this.state.valueFor,
+          idef: this.itemDefinition,
           value: this.state.value,
           onPropertyChange: this.onPropertyChange,
           onItemSetExclusionState: this.onItemSetExclusionState,
@@ -444,7 +450,7 @@ export function ModuleProvider(props: IModuleProviderProps) {
         {
           (data) => {
             return (
-              <ModuleContext.Provider value={{mod: data.mod.getChildModule(props.module)}}>
+              <ModuleContext.Provider value={{ mod: data.mod.getChildModule(props.module) }}>
                 {props.children}
               </ModuleContext.Provider>
             );
@@ -458,7 +464,7 @@ export function ModuleProvider(props: IModuleProviderProps) {
         {
           (data) => {
             return (
-              <ModuleContext.Provider value={{mod: data.value.getModule(props.module)}}>
+              <ModuleContext.Provider value={{ mod: data.value.getModule(props.module) }}>
                 {props.children}
               </ModuleContext.Provider>
             );
