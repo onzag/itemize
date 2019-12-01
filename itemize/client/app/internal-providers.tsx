@@ -38,6 +38,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
 
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
+    this.dismissError = this.dismissError.bind(this);
   }
   public componentDidMount() {
     if (this.state.token !== null) {
@@ -115,6 +116,10 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         token: tokenDataToken,
         role: tokenDataRole,
       });
+
+      // TODO clear cache?... all of it?...
+      // thinking how loading changes depending of
+      // on the user role
 
       if (tokenDataId) {
         const userLanguageData = await gqlQuery(

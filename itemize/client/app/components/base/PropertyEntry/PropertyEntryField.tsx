@@ -277,6 +277,7 @@ export default class PropertyEntryField
       this.state.visible !== nextState.visible ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
+      !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n ||
       nextProps.currency !== this.props.currency ||

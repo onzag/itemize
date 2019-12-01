@@ -76,6 +76,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     return nextProps.property !== this.props.property ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
+      !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n;
   }

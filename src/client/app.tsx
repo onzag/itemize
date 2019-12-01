@@ -2,6 +2,8 @@ import React from "react";
 import { LoginDialog } from "./general/login-dialog";
 import { Navbar } from "./navbar";
 import { Route } from "../../itemize/client/app/elements";
+import { Profile } from "./pages/profile";
+import { FrontPage } from "./pages/frontpage";
 
 interface IAppState {
   loginDialogOpen: boolean;
@@ -10,30 +12,6 @@ interface IAppState {
 
 interface IAppProps {
   userId: number;
-}
-
-function testFrontpage() {
-  return (
-    <div>
-      <div>aaaaaaaaa</div>
-      <div>aaaaaaaaaaaa</div>
-      <div>aaaaaaaaaaaaaa</div>
-      <div>aaaaaaaaaaaaa</div>
-      <div>aaaaaaaaaaaa</div>
-    </div>
-  );
-}
-
-function testProfile() {
-  return (
-    <div>
-      <div>bbbbbbbbbbbbbbbb</div>
-      <div>bbbbbbbbbbbbbbbbb</div>
-      <div>bbbbbbbbbbbbbbbbb</div>
-      <div>bbbbbbbbbbbbbbbb</div>
-      <div>bbbbbbbbbbbbbbbb</div>
-    </div>
-  );
 }
 
 export default class App extends React.Component<IAppProps, IAppState> {
@@ -76,8 +54,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
       <React.Fragment>
         <Navbar onLoginClick={this.openLoginDialog}/>
         <LoginDialog open={this.state.loginDialogOpen} onClose={this.closeLoginDialog}/>
-        <Route path="/" exact={true} component={testFrontpage}/>
-        <Route path="/profile/:id" component={testProfile}/>
+        <Route path="/" exact={true} component={FrontPage}/>
+        <Route path="/profile/:id" component={Profile}/>
       </React.Fragment>
     );
   }

@@ -47,7 +47,10 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
       },
       async resolve(source: any, args: any, context: any, info: any) {
         if (!args.username && !args.token) {
-          return null;
+          throw new GraphQLEndpointError({
+            message: "Invalid Credentials",
+            code: "INVALID_CREDENTIALS",
+          });
         }
 
         if (args.token) {

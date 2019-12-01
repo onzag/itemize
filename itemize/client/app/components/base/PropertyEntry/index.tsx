@@ -22,6 +22,7 @@ export interface IPropertyEntryBaseProps {
   property: PropertyDefinition;
   value: IPropertyDefinitionValue;
   onChange: (newValue: PropertyDefinitionSupportedType, internalValue: any) => void;
+  forceInvalid?: boolean;
   poked?: boolean;
   autoFocus?: boolean;
 }
@@ -62,7 +63,7 @@ const typeRegistry:
  */
 export function getClassName(props: IPropertyEntryBaseProps, name: string, poked: boolean) {
   return `property-entry property-entry--${name} ${
-    poked ? "property-entry--poked" : ""
+    poked || props.forceInvalid ? "property-entry--poked" : ""
   } ${
     props.value.default ? "property-entry--default" : ""
   } ${
@@ -72,10 +73,10 @@ export function getClassName(props: IPropertyEntryBaseProps, name: string, poked
   } ${
     props.value.hidden ? "property-entry--hidden" : ""
   } ${
-    props.value.valid ?
-      "property-entry--valid" :
-      "property-entry--invalid"
-  } "property-entry--rarity-${props.property.getRarity()}`;
+    !props.value.valid || props.forceInvalid ?
+      "property-entry--invalid" :
+      "property-entry--valid"
+  } property-entry--rarity-${props.property.getRarity()}`;
 }
 
 export default function PropertyEntry(props: IPropertyEntryBaseProps) {

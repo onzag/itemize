@@ -114,6 +114,7 @@ export default class PropertyEntryDateTime extends React.Component<IPropertyEntr
       !equals(this.state, nextState) ||
       !equals(this.props.value, nextProps.value) ||
       !!this.props.poked !== !!nextProps.poked ||
+      !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n;
   }

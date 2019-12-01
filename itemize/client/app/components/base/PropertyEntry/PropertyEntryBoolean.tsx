@@ -179,6 +179,7 @@ export default class PropertyEntryBoolean extends React.Component<IPropertyEntry
   public shouldComponentUpdate(nextProps: IPropertyEntryProps) {
     return this.props.property !== nextProps.property ||
       !equals(this.props.value, nextProps.value) ||
+      !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       !!this.props.poked !== !!nextProps.poked ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n;

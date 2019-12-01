@@ -402,9 +402,7 @@ export default class Item {
     this.stateExclusion[id] = exclusionState;
     this.stateExclusionModified[id] = true;
 
-    if (value) {
-      this.itemDefinition.applyValueFromGQL(id, value, true);
-    }
+    this.itemDefinition.applyValueFromGQL(id, value || {}, true);
   }
 
   public cleanValueFor(

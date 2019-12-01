@@ -64,6 +64,8 @@ export default class Root {
 
   public rawData: IRootRawJSONDataType;
 
+  private childModules: Module[];
+
   /**
    * Builds a root from raw data
    * @param rawJSON the raw json data
@@ -71,6 +73,8 @@ export default class Root {
   constructor(rawJSON: IRootRawJSONDataType) {
     // If its not production run the checks
     this.rawData = rawJSON;
+
+    this.childModules = rawJSON.children.map((c) => new Module(c, null));
   }
 
   /**
@@ -85,25 +89,19 @@ export default class Root {
    * should follow
    */
   public getAllModules() {
-    return this.rawData.children.map((m) => (new Module(m, null)));
+    return this.childModules;
   }
 
   /**
-   * TODO make the root actually be the main instance and stop returning instances
-   * here, it's inefficient
    * Gets a specific module given its name
    * @param name the name of the module
    */
   public getModule(name: string) {
-    const resultRawData: IModuleRawJSONDataType = this.rawData.children
-      .find((m) => m.name === name);
-    if (!resultRawData) {
+    const resultModule = this.childModules.find((m) => m.getName() === name);
+    if (!resultModule) {
       throw new Error("invalid module " + name);
     }
 
-    return new Module(
-      resultRawData,
-      null,
-    );
+    return resultModule;
   }
 }

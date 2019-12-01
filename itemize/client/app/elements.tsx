@@ -1,6 +1,6 @@
 import PropertyEntry from "./components/base/PropertyEntry";
 import { ItemDefinitionContext } from "./providers";
-import { IPropertyDefinitionValue, IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import PropertyDefinition, { IPropertyDefinitionValue, IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
 import ItemDefinition, { IItemDefinitionValue, IItemDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition";
 import { TokenContext } from "./internal-providers";
@@ -33,10 +33,31 @@ export function Route(props: RouteProps) {
   return <RouterRoute {...props} path={`/:__lang${urlDefined}`}/>;
 }
 
+// TODO add showAsInvalid as an option
+interface IPropertyEntryProps {
+  id: string;
+  item?: string;
+  showAsInvalid?: boolean;
+  onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, inernalValue?: any) => void;
+}
+
+interface IPropertyReadProps {
+  id: string;
+  item?: string;
+  children?: (value: PropertyDefinitionSupportedType) => React.ReactNode;
+}
+
+interface IPropertyViewProps {
+  id: string;
+  item?: string;
+}
+
 interface IPropertyEntryViewReadProps {
   id: string;
   item?: string;
   children?: (value: PropertyDefinitionSupportedType) => React.ReactNode;
+  showAsInvalid?: boolean;
+  onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, internalValue?: any) => void;
 }
 
 function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: boolean) {
@@ -70,11 +91,18 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
               />
             );
           } else {
+            const onChange = (newValue: PropertyDefinitionSupportedType, internalValue?: any) => {
+              if (props.onChange) {
+                props.onChange(property, newValue, internalValue);
+              }
+              itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
+            };
             return (
               <PropertyEntry
                 property={property}
                 value={propertyValue}
-                onChange={itemDefinitionContextualValue.onPropertyChange.bind(null, property)}
+                onChange={onChange}
+                forceInvalid={props.showAsInvalid}
               />
             );
           }
@@ -84,15 +112,15 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
   );
 }
 
-export function Entry(props: IPropertyEntryViewReadProps) {
+export function Entry(props: IPropertyEntryProps) {
   return EntryViewRead(props, false, false);
 }
 
-export function View(props: IPropertyEntryViewReadProps) {
+export function View(props: IPropertyViewProps) {
   return EntryViewRead(props, true, false);
 }
 
-export function Reader(props: IPropertyEntryViewReadProps) {
+export function Reader(props: IPropertyReadProps) {
   return EntryViewRead(props, false, true);
 }
 

@@ -155,6 +155,7 @@ export default class Module {
    * The children item definitions, as instances
    */
   private childItemDefinitions: ItemDefinition[];
+  private childModules: Module[];
   /**
    * The property definitions that the module itself
    * has, and every item defintion in itself hence
@@ -185,6 +186,7 @@ export default class Module {
     this.parentModule = parentModule;
     // Setting this as empty just starting
     this.childItemDefinitions = [];
+    this.childModules = [];
 
     // if we are not denying this
     if (!disableSearchModeRetrieval) {
@@ -219,7 +221,13 @@ export default class Module {
     this.rawData.children.forEach((childRawJSONData) => {
       // modules are not processed
       if (childRawJSONData.type === "module") {
-        return;
+        const newModule = new Module(
+          childRawJSONData,
+          this,
+        );
+        this.childModules.push(
+          newModule,
+        );
       } else if (childRawJSONData.type === "item") {
         // The item is fed to the item definition constructor
         // the parent module is going to be this
@@ -398,9 +406,7 @@ export default class Module {
    * should follow
    */
   public getAllModules() {
-    return this.rawData.children
-      .filter((c) => c.type === "module")
-      .map((m: IModuleRawJSONDataType) => (new Module(m, this)));
+    return this.childModules;
   }
 
   /**
@@ -408,17 +414,12 @@ export default class Module {
    * @param name the name of the module
    */
   public getChildModule(name: string) {
-    const resultRawData: IModuleRawJSONDataType = this.rawData.children
-      .filter((c) => c.type === "module")
-      .find((m) => m.name === name) as IModuleRawJSONDataType;
-    if (!resultRawData) {
+    const resultModule = this.childModules.find((m) => m.getName() === name);
+    if (!resultModule) {
       throw new Error("invalid module " + name);
     }
 
-    return new Module(
-      resultRawData,
-      this,
-    );
+    return resultModule;
   }
 
   public getSearchModule(): Module {

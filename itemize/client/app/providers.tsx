@@ -14,12 +14,14 @@ import {
   PREFIX_BUILD,
 } from "../../constants";
 import { buildGqlQuery, gqlQuery } from "./gql-querier";
+import { GraphQLEndpointErrorType } from "../../base/errors";
 
 export interface IItemDefinitionContextType {
   idef: ItemDefinition;
   value: IItemDefinitionValue;
   deleted: boolean;
   blocked: boolean;
+  loadError: GraphQLEndpointErrorType;
   onPropertyChange: (
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
@@ -61,6 +63,7 @@ interface IActualItemDefinitionProviderState {
   valueForId: number;
   isBlocked: boolean;
   isDeleted: boolean;
+  loadError: GraphQLEndpointErrorType;
 }
 
 function flattenRecievedFields(recievedFields: any) {
@@ -130,6 +133,7 @@ class ActualItemDefinitionProvider extends
       valueForId: props.forId || null,
       isBlocked: false,
       isDeleted: false,
+      loadError: null,
     };
 
     this.onPropertyChange = this.onPropertyChange.bind(this);
@@ -240,22 +244,50 @@ class ActualItemDefinitionProvider extends
         }),
       );
 
-      // TODO check for errors
+      // TODO maybe clean fields during errors
       if (!gqlValue) {
-        // TODO connection error
-      } else if (!gqlValue.data) {
-        // TODO strange error but .error fields available
-      } else if (!gqlValue.data[queryName]) {
-        // TODO check for other error still here
-        // TODO deleted functionality
-      } else if (gqlValue.data[queryName].blocked_at) {
-        // TODO blocked
+        this.setState({
+          loadError: {
+            message: "Failed to connect",
+            code: "CANT_CONNECT",
+          },
+          isBlocked: false,
+          isDeleted: false,
+        });
       } else {
-        const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
-        this.state.valueFor.applyValueFromGQL(this.props.forId || null, recievedFields);
-        this.state.valueFor.triggerListeners(this.props.forId || null);
-        if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
-          this.setStateToCurrentValueWithExternalChecking(null);
+        if (gqlValue.errors) {
+          this.setState({
+            loadError: gqlValue.errors[0].extensions,
+          });
+        } else {
+          this.setState({
+            loadError: null,
+          });
+        }
+        if (!gqlValue.data[queryName]) {
+          this.setState({
+            isDeleted: true,
+            isBlocked: false,
+          });
+        } else {
+          if (gqlValue.data[queryName].blocked_at) {
+            this.setState({
+              isDeleted: false,
+              isBlocked: true,
+            });
+          } else {
+            this.setState({
+              isBlocked: false,
+              isDeleted: false,
+            });
+          }
+
+          const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
+          this.state.valueFor.applyValueFromGQL(this.props.forId || null, recievedFields);
+          this.state.valueFor.triggerListeners(this.props.forId || null);
+          if (this.state.valueForContainsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+            this.setStateToCurrentValueWithExternalChecking(null);
+          }
         }
       }
 
@@ -332,6 +364,7 @@ class ActualItemDefinitionProvider extends
           onItemSetExclusionState: this.onItemSetExclusionState,
           deleted: this.state.isDeleted,
           blocked: this.state.isBlocked,
+          loadError: this.state.loadError,
         }}
       >
         {this.props.children}
