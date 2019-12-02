@@ -23,6 +23,13 @@ const policySchema = {
           },
           minItems: 1,
         },
+        applyingProperties: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          minItems: 1,
+        },
       },
       required: ["roles", "properties"],
     },

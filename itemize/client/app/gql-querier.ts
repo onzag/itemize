@@ -23,8 +23,8 @@ function buildFields(fields: {
   return fieldsStr;
 }
 
-export function buildGqlQuery(...queries: IGQLQueryObj[]) {
-  let queryStr = "query{";
+function buildGqlThing(type: string, ...queries: IGQLQueryObj[]) {
+  let queryStr = type + "{";
   queries.forEach((q) => {
     queryStr += q.name;
     if (q.args && Object.keys(q.args).length) {
@@ -44,7 +44,16 @@ export function buildGqlQuery(...queries: IGQLQueryObj[]) {
   return queryStr;
 }
 
+export function buildGqlQuery(...queries: IGQLQueryObj[]) {
+  return buildGqlThing("query", ...queries);
+}
+
+export function buildGqlMutation(...mutations: IGQLQueryObj[]) {
+  return buildGqlThing("mutation", ...mutations);
+}
+
 export async function gqlQuery(query: string) {
+  console.log(query);
   const value = await fetch("/graphql", {
     method: "POST",
     cache: "no-cache",

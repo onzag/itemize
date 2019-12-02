@@ -12,7 +12,8 @@ import MomentUtils from "@date-io/moment";
 import { Route } from "react-router";
 import { history } from "..";
 import { countries, currencies } from "../../resources";
-import { TokenProvider } from "./internal-providers";
+import { TokenProvider, ITokenProviderState } from "./internal-providers";
+import { buildGqlMutation, gqlQuery } from "./gql-querier";
 
 // TODO rid of scss and use jss
 // We need to extract the jss generation because we want to
@@ -42,9 +43,9 @@ export interface ILocaleDataType {
 // This is the locale type, which contains the locale
 // information for using in the application
 export interface ILocaleContextType {
-  changeLanguageTo: (code: string) => Promise<void>;
-  changeCurrencyTo: (code: string) => void;
-  changeCountryTo: (code: string) => void;
+  changeLanguageTo: (code: string, avoidUpdatingUser?: boolean) => Promise<void>;
+  changeCurrencyTo: (code: string, avoidUpdatingUser?: boolean) => void;
+  changeCountryTo: (code: string, avoidChangingLanguageAndCurrency?: boolean, avoidUpdatingUser?: boolean) => void;
   language: string;
   currency: string;
   country: string;
@@ -106,6 +107,8 @@ const theme = createMuiTheme({
 
 // now we export the App
 export default class App extends React.Component<IAppProps, IAppState> {
+  private tokenState: ITokenProviderState = null;
+
   constructor(props: IAppProps) {
     super(props);
 
@@ -128,6 +131,51 @@ export default class App extends React.Component<IAppProps, IAppState> {
     this.changeCountryTo = this.changeCountryTo.bind(this);
     this.changeCurrencyTo = this.changeCurrencyTo.bind(this);
     this.renderAppWithLocaleContext = this.renderAppWithLocaleContext.bind(this);
+    this.setTokenState = this.setTokenState.bind(this);
+    this.updateUserProperty = this.updateUserProperty.bind(this);
+  }
+
+  public setTokenState(state: ITokenProviderState) {
+    this.tokenState = state;
+  }
+
+  public async updateUserProperty(propertyId: string, value: string) {
+    // we check that there's an user logged in
+    if (this.tokenState && this.tokenState.id) {
+      console.log("updating user property", propertyId, value);
+      const result = await gqlQuery(
+        buildGqlMutation({
+          name: "EDIT_MOD_users__IDEF_user",
+          args: {
+            id: this.tokenState.id,
+            token: this.tokenState.token,
+            // the language is irrelevant since we are not setting
+            // text fields, so en will work just fine, getting
+            // the language will be annoying and this will do the job anyway
+            language: "en",
+            country: this.state.specifiedCountry,
+            [propertyId]: value,
+          },
+          fields: {
+            DATA: {
+              [propertyId]: {},
+            },
+          },
+        }),
+      );
+      // Ignore errors, we just go for success
+      if (result && result.data.DATA && result.data.DATA) {
+        const actualPropertyResult: string = result.data.DATA[propertyId];
+        const userItemDefinition = this.state.specifiedProcessedRoot
+          .getModule("users").getItemDefinitionFor(["user"]);
+        if (userItemDefinition.hasAppliedValueTo(this.tokenState.id)) {
+          console.log("found an instance, triggering update");
+          const property = userItemDefinition.getPropertyDefinitionFor(propertyId, false);
+          property.applyValueFromGQL(this.tokenState.id, actualPropertyResult);
+          userItemDefinition.triggerListeners(this.tokenState.id);
+        }
+      }
+    }
   }
 
   /**
@@ -143,7 +191,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
    * Changes the language for the one specified by that locale
    * @param locale the two letter or language-region code for the locale
    */
-  public async changeLanguageTo(locale: string) {
+  public async changeLanguageTo(locale: string, avoidUpdatingUser?: boolean) {
+    console.log("changing language to", locale);
     // if it's updating, this shouldn't have happened
     if (this.state.localeIsUpdating) {
       console.warn("Attempted to update locale to " + locale + " while on update");
@@ -198,6 +247,9 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     // And now we might restore the state, with the new data
     this.state.specifiedProcessedRoot.mergeWithI18n(newData.root);
+    if (!avoidUpdatingUser) {
+      this.updateUserProperty("app_lang_locale", localeToSet);
+    }
     this.setState({
       specifiedData: newData,
       localeIsUpdating: false,
@@ -211,7 +263,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
    * of currency and language
    * @param code the two letter uppercase code for the country
    */
-  public changeCountryTo(code: string) {
+  public changeCountryTo(code: string, avoidChangingLanguageAndCurrency?: boolean, avoidUpdatingUser?: boolean) {
+    console.log("changing country to", code);
     // Codes should be uppercase, but well, let's get wiggle room for error
     let codeToSet = code.toUpperCase();
 
@@ -225,39 +278,44 @@ export default class App extends React.Component<IAppProps, IAppState> {
       console.warn("Attempted to set country to unavailable " + code + ", defaulted to Finland");
     }
 
-    // So now we need to get what is relevant, the languages, we check
-    // what languages are spokes in the region, now because we have some places
-    // where no official language exist (aka now just Antartica), we check for
-    // that we have some, otherwise default to english; also notice how
-    // there are many official languages, however, we default to the first one
-    // which we assume is the most spoken
-    const languageSpokenThere = countryData.languages.length ?
-      countryData.languages[0].toLowerCase() || "en" : "en";
+    if (!avoidChangingLanguageAndCurrency) {
+      // So now we need to get what is relevant, the languages, we check
+      // what languages are spokes in the region, now because we have some places
+      // where no official language exist (aka now just Antartica), we check for
+      // that we have some, otherwise default to english; also notice how
+      // there are many official languages, however, we default to the first one
+      // which we assume is the most spoken
+      const languageSpokenThere = countryData.languages.length ?
+        countryData.languages[0].toLowerCase() || "en" : "en";
 
-    // now the language might be regionalized, we check it is
-    const isRegionalizedAlready = languageSpokenThere.includes("-");
-    // now we extract the regionalized and non regionalized factors
-    const languageSpokenThereNonRegionalized = isRegionalizedAlready ?
-      languageSpokenThere.split("-")[0] : languageSpokenThere;
-    const languageSpokenThereRegionalized = isRegionalizedAlready ?
-      languageSpokenThere : languageSpokenThere + "-" + codeToSet;
+      // now the language might be regionalized, we check it is
+      const isRegionalizedAlready = languageSpokenThere.includes("-");
+      // now we extract the regionalized and non regionalized factors
+      const languageSpokenThereNonRegionalized = isRegionalizedAlready ?
+        languageSpokenThere.split("-")[0] : languageSpokenThere;
+      const languageSpokenThereRegionalized = isRegionalizedAlready ?
+        languageSpokenThere : languageSpokenThere + "-" + codeToSet;
 
-    // We check for both, giving the regionalized priority
-    // as you can notice, this language might not be available,
-    // in that case the app will default to the default language
-    if (this.hasLocaleDataFor(languageSpokenThereRegionalized)) {
-      this.changeLanguageTo(languageSpokenThereRegionalized);
-    } else {
-      this.changeLanguageTo(languageSpokenThereNonRegionalized);
+      // We check for both, giving the regionalized priority
+      // as you can notice, this language might not be available,
+      // in that case the app will default to the default language
+      if (this.hasLocaleDataFor(languageSpokenThereRegionalized)) {
+        this.changeLanguageTo(languageSpokenThereRegionalized, avoidUpdatingUser);
+      } else {
+        this.changeLanguageTo(languageSpokenThereNonRegionalized, avoidUpdatingUser);
+      }
+
+      // Now we also change the currency, we default to euros in
+      // case there's no currency defined
+      const currencyUsedThere = countryData.currency || "EUR";
+      this.changeCurrencyTo(currencyUsedThere, avoidUpdatingUser);
     }
-
-    // Now we also change the currency, we default to euros in
-    // case there's no currency defined
-    const currencyUsedThere = countryData.currency || "EUR";
-    this.changeCurrencyTo(currencyUsedThere);
 
     // Now we set the country in local storage
     localStorage.setItem("country", codeToSet);
+    if (!avoidUpdatingUser) {
+      this.updateUserProperty("app_country", codeToSet);
+    }
 
     // and update the state
     this.setState({
@@ -270,7 +328,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
    * given its 3 letter uppercase code
    * @param code the three letter uppercase code of the currency
    */
-  public changeCurrencyTo(code: string) {
+  public changeCurrencyTo(code: string, avoidUpdatingUser?: boolean) {
+    console.log("changing currency to", code);
 
     // We still uppercase it anyway
     let codeToSet = code.toUpperCase();
@@ -285,6 +344,9 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     // We set the currency in local storage
     localStorage.setItem("currency", codeToSet);
+    if (!avoidUpdatingUser) {
+      this.updateUserProperty("currency", codeToSet);
+    }
 
     // and set the state
     this.setState({
@@ -331,7 +393,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // such a code is stripped if it's production
     return (
       <LocaleContext.Provider value={localeContextValue}>
-        <TokenProvider localeContext={localeContextValue}>
+        <TokenProvider localeContext={localeContextValue} onProviderStateSet={this.setTokenState}>
           <MuiPickersUtilsProvider
             utils={MomentUtils}
             locale={currentActualLanguageDeregionalized}

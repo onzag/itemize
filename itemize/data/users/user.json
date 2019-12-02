@@ -76,7 +76,8 @@
         "edit": {
             "REQUIRES_PASSWORD_CONFIRMATION": {
                 "roles": ["USER", "MODERATOR"],
-                "properties": ["password"]
+                "properties": ["password"],
+                "applyingProperties": ["username", "password", "role"]
             }
         },
         "delete": {

@@ -2,18 +2,19 @@ import React from "react";
 import { gqlQuery, buildGqlQuery } from "./gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import { ILocaleContextType } from ".";
-import { PREFIX_GET } from "../../constants";
 
-interface ITokenProviderState {
+export interface ITokenProviderState {
   token: string;
   id: number;
   role: string;
   error: GraphQLEndpointErrorType;
   isLoggingIn: boolean;
+  isReady: boolean;
 }
 
 interface ITokenProviderProps {
   localeContext: ILocaleContextType;
+  onProviderStateSet: (state: ITokenProviderState) => void;
 }
 
 export interface ITokenContextType extends ITokenProviderState {
@@ -28,11 +29,13 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
   constructor(props: ITokenProviderProps) {
     super(props);
 
+    const hasStoredToken = !!localStorage.getItem("TOKEN");
     this.state = {
-      token: localStorage.getItem("TOKEN") || null,
-      id: parseInt(localStorage.getItem("ID"), 10) || null,
-      role: localStorage.getItem("ROLE") || "GUEST",
+      token: null,
+      id: null,
+      role: "GUEST",
       isLoggingIn: false,
+      isReady: !hasStoredToken,
       error: null,
     };
 
@@ -41,8 +44,11 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     this.dismissError = this.dismissError.bind(this);
   }
   public componentDidMount() {
-    if (this.state.token !== null) {
-      this.login(null, null, this.state.token);
+    const storedToken = localStorage.getItem("TOKEN");
+    if (storedToken !== null) {
+      this.login(null, null, storedToken);
+    } else {
+      this.props.onProviderStateSet(this.state);
     }
   }
   public async login(username: string, password: string, token: string) {
@@ -70,8 +76,9 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         },
       ),
     );
+
     if (!data) {
-      this.setState({
+      const newState: ITokenProviderState = {
         isLoggingIn: false,
         id: null,
         token: null,
@@ -80,17 +87,11 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
           message: "Failed to connect",
           code: "CANT_CONNECT",
         },
-      });
+        isReady: true,
+      };
+      this.setState(newState);
+      this.props.onProviderStateSet(newState);
     } else {
-      if (data.errors) {
-        this.setState({
-          error: data.errors[0].extensions,
-        });
-      } else {
-        this.setState({
-          error: null,
-        });
-      }
       const tokenData = data.data.token;
       const tokenDataId = tokenData ? tokenData.id : null;
       const tokenDataRole = tokenData ? tokenData.role : null;
@@ -100,22 +101,20 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       } else {
         localStorage.removeItem("TOKEN");
       }
-      if (tokenDataId !== null) {
-        localStorage.setItem("ID", tokenDataId);
-      } else {
-        localStorage.removeItem("ID");
-      }
-      if (tokenDataRole !== null) {
-        localStorage.setItem("ROLE", tokenDataRole);
-      } else {
-        localStorage.removeItem("ROLE");
-      }
-      this.setState({
+
+      const newState: ITokenProviderState = {
         isLoggingIn: false,
         id: tokenDataId,
         token: tokenDataToken,
         role: tokenDataRole,
-      });
+        isReady: true,
+        error: data.errors ? data.errors[0].extensions : null,
+      };
+
+      console.log("user", tokenDataId, tokenDataRole, "logged in");
+
+      this.setState(newState);
+      this.props.onProviderStateSet(newState);
 
       // TODO clear cache?... all of it?...
       // thinking how loading changes depending of
@@ -147,14 +146,15 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
           const localeUserData = userLanguageData.data.GET_MOD_users__IDEF_user.DATA;
           // we still check everything just in case the user is blocked
           if (localeUserData) {
+            console.log("user locale is", localeUserData);
             if (this.props.localeContext.country !== localeUserData.app_country) {
-              this.props.localeContext.changeCountryTo(localeUserData.app_country);
+              this.props.localeContext.changeCountryTo(localeUserData.app_country, true, true);
             }
             if (this.props.localeContext.language !== localeUserData.app_lang_locale) {
-              this.props.localeContext.changeLanguageTo(localeUserData.app_lang_locale);
+              this.props.localeContext.changeLanguageTo(localeUserData.app_lang_locale, true);
             }
             if (this.props.localeContext.currency !== localeUserData.currency) {
-              this.props.localeContext.changeCurrencyTo(localeUserData.currency);
+              this.props.localeContext.changeCurrencyTo(localeUserData.currency, true);
             }
           }
         }
@@ -181,6 +181,9 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     });
   }
   public render() {
+    if (!this.state.isReady) {
+      return null;
+    }
     return (
       <TokenContext.Provider
         value={{

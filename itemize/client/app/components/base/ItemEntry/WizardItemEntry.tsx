@@ -1,6 +1,6 @@
 import React from "react";
 import ItemDefinition, {
-  IItemDefinitionValue,
+  IItemDefinitionValueType,
 } from "../../../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition, {
   IPropertyDefinitionValue,
@@ -27,7 +27,7 @@ import ItemEntryDialog from "./Dialog";
 import { PropertyDefinitionSupportedType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 interface IWizardItemEntryProps {
-  value: IItemDefinitionValue;
+  value: IItemDefinitionValueType;
   onPropertyChange: (property: PropertyDefinition, value: PropertyDefinitionSupportedType, internalValue: any) => void;
   onItemSetExclusionState: (item: Item, state: ItemExclusionState) => void;
   displayHidden?: boolean;

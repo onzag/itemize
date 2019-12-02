@@ -1,17 +1,12 @@
 import React from "react";
-import { UserIdRetriever, LogActioner, ItemDefinitionLoader, View, I18nRead, StatsForNerds } from "../../../itemize/client/app/elements";
+import { UserIdRetriever, LogActioner, ItemDefinitionLoader, View, I18nRead, StatsForNerds, Entry } from "../../../itemize/client/app/elements";
 import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
 import { BlockedPage } from "./blocked";
 import { ErrorPage } from "./error";
-import { Button } from "@material-ui/core";
-
-interface IProfileProps {
-  match: {
-    params: {
-      id: string;
-    };
-  };
-}
+import { Button, createStyles, withStyles } from "@material-ui/core";
+import { Avatar } from "../general/avatar";
+import { WithStyles } from "react-jss";
+import { LanguagePicker } from "../general/language-picker";
 
 function SimulatedNotFoundPage() {
   return (
@@ -24,9 +19,21 @@ function SimulatedNotFoundPage() {
   );
 }
 
-function ActualProfile(props: {
-  isOwner?: boolean,
-}) {
+const profileStyles = createStyles({});
+
+interface IProfileStylesProps extends WithStyles<typeof profileStyles> {}
+interface IProfileProps extends IProfileStylesProps {
+  match: {
+    params: {
+      id: string;
+    };
+  };
+}
+interface IActualProfileProps extends IProfileStylesProps {
+  isOwner?: boolean;
+}
+
+function ActualProfile(props: IActualProfileProps) {
   let content = null;
   if (props.isOwner) {
     content = (
@@ -34,6 +41,12 @@ function ActualProfile(props: {
         {(actioner) => {
           return (
             <React.Fragment>
+              <div>
+                <Avatar large={true} hideFlag={true}/>
+                <LanguagePicker/>
+              </div>
+              <Entry id="username"/>
+              <Entry id="email"/>
               <Button onClick={actioner.logout}>
                 <I18nRead id="logout"/>
               </Button>
@@ -45,6 +58,9 @@ function ActualProfile(props: {
   } else {
     content = (
       <React.Fragment>
+        <div>
+          <Avatar large={true} hideFlag={true}/>
+        </div>
         <View id="username"/>
       </React.Fragment>
     );
@@ -56,12 +72,11 @@ function ActualProfile(props: {
       errorComponent={ErrorPage}
     >
       {content}
-      <StatsForNerds/>
     </ItemDefinitionLoader>
   );
 }
 
-export function Profile(props: IProfileProps) {
+export const Profile = withStyles(profileStyles)((props: IProfileProps) => {
   const actualId = parseInt(props.match.params.id, 10);
   if (isNaN(actualId)) {
     return (
@@ -73,12 +88,12 @@ export function Profile(props: IProfileProps) {
       {
         (userId) => {
           if (userId === actualId) {
-            return <ActualProfile isOwner={true}/>;
+            return <ActualProfile {...props} isOwner={true}/>;
           }
           return (
             <ModuleProvider module="users">
               <ItemDefinitionProvider itemDefinition="user" forId={actualId} disableExternalChecks={true}>
-                <ActualProfile/>
+                <ActualProfile {...props}/>
               </ItemDefinitionProvider>
             </ModuleProvider>
           );
@@ -86,4 +101,4 @@ export function Profile(props: IProfileProps) {
       }
     </UserIdRetriever>
   );
-}
+});

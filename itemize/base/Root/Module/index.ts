@@ -563,5 +563,10 @@ export default class Module {
         pExt.mergeWithI18n(mergePropertyRaw);
       }
     });
+
+    if (this.searchModeModule) {
+      const searchModeRaw = Module.buildSearchMode(mod);
+      this.searchModeModule.mergeWithI18n(searchModeRaw);
+    }
   }
 }

@@ -644,6 +644,25 @@ export async function runPolicyCheck(
       continue;
     }
 
+    if (policyType !== "delete") {
+      const applyingPropertyIds =
+        itemDefinition.getApplyingPropertyIdsForPolicy(policyType, policyName);
+
+      if (applyingPropertyIds) {
+        const somePropertyValueIsApplied =
+        applyingPropertyIds.some((applyingPropertyId) => !!gqlArgValue[applyingPropertyId]);
+
+        if (!somePropertyValueIsApplied) {
+          runPolicyCheckDebug(
+            "ignoring policy %s as there wasno matching applying property for %j",
+            policyName,
+            applyingPropertyIds,
+          );
+          continue;
+        }
+      }
+    }
+
     // otherwise we need to see which properties are in consideration for this
     // policy
     const propertiesInContext = itemDefinition.getPropertiesForPolicy(policyType, policyName);

@@ -2,16 +2,17 @@ import PropertyEntry from "./components/base/PropertyEntry";
 import { ItemDefinitionContext } from "./providers";
 import PropertyDefinition, { IPropertyDefinitionValue, IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
-import ItemDefinition, { IItemDefinitionValue, IItemDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemDefinitionValueType, IItemDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition";
 import { TokenContext } from "./internal-providers";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import { DataContext, LocaleContext } from ".";
 import Root from "../../base/Root";
 import Module from "../../base/Root/Module";
-import PropertyView from "./components/base/PropertyView";
+import PropertyView, { RawBasePropertyView } from "./components/base/PropertyView";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../resources";
 import { Link as RouterLink, LinkProps, Route as RouterRoute, RouteProps } from "react-router-dom";
+import { RESERVED_BASE_PROPERTIES } from "../../constants";
 
 export function Link(props: LinkProps) {
   const currentLocaleFromURL = location.pathname.split("/")[1] || null;
@@ -72,6 +73,9 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
           let propertyValue: IPropertyDefinitionValue = null;
           if (props.item) {
             const itemValue = itemDefinitionContextualValue.value.items.find((i) => i.itemName === props.item);
+            if (!itemValue) {
+              throw new Error("Cannot find the item " + itemValue);
+            }
             if (itemValue.itemDefinitionValue) {
               propertyValue = itemValue.itemDefinitionValue.properties.find((p) => p.propertyId === props.id);
             }
@@ -79,18 +83,51 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
             propertyValue = itemDefinitionContextualValue.value.properties.find((p) => p.propertyId === props.id);
           }
 
-          const property = itemDefinitionContextualValue.idef.getPropertyDefinitionFor(props.id, true);
-
           if (read) {
-            return props.children(propertyValue.value);
+            if (propertyValue) {
+              return props.children(propertyValue.value);
+            }
+            if (!props.item && RESERVED_BASE_PROPERTIES[props.id]) {
+              let gqlValue = itemDefinitionContextualValue.value.gqlOriginalAppliedValue &&
+                itemDefinitionContextualValue.value.gqlOriginalAppliedValue.value[props.id];
+              if (typeof gqlValue === "undefined") {
+                gqlValue = null;
+              }
+              return props.children(gqlValue);
+            }
+            throw new Error("Cannot find property for " + props.id);
           } else if (view) {
-            return (
-              <PropertyView
-                property={property}
-                value={propertyValue}
-              />
-            );
+            if (propertyValue) {
+              const property = itemDefinitionContextualValue.idef.getPropertyDefinitionFor(props.id, true);
+              return (
+                <PropertyView
+                  property={property}
+                  value={propertyValue}
+                />
+              );
+            }
+            if (!props.item && RESERVED_BASE_PROPERTIES[props.id]) {
+              let gqlValue = itemDefinitionContextualValue.value.gqlOriginalAppliedValue &&
+                itemDefinitionContextualValue.value.gqlOriginalAppliedValue[props.id];
+              if (typeof gqlValue === "undefined") {
+                gqlValue = null;
+              }
+              if (typeof gqlValue === "number") {
+                return <RawBasePropertyView
+                  value={gqlValue.toString()}
+                />;
+              } else {
+                return <RawBasePropertyView
+                  value={gqlValue}
+                />;
+              }
+            }
+            throw new Error("Cannot find property for " + props.id);
           } else {
+            if (!propertyValue) {
+              throw new Error("Cannot find property for " + props.id);
+            }
+            const property = itemDefinitionContextualValue.idef.getPropertyDefinitionFor(props.id, true);
             const onChange = (newValue: PropertyDefinitionSupportedType, internalValue?: any) => {
               if (props.onChange) {
                 props.onChange(property, newValue, internalValue);
@@ -346,7 +383,17 @@ export function LogActioner(props: ILogActionerProps) {
                   let logout: () => any;
                   let dismissError: () => any;
                   if (!tokenContextValue.isLoggingIn) {
-                    login = tokenContextValue.login.bind(null, usernameValue, passwordValue, null);
+                    login = () => {
+                      tokenContextValue.login(usernameValue as string, passwordValue as string, null);
+                      // we do it but on a delay in order to avoid flickering for example
+                      // in dialogs that are going to close
+                      setTimeout(() => {
+                        const passwordPdef =
+                        itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
+                        passwordPdef.applyValueFromGQL(null, null);
+                        itemDefinitionContextualValue.idef.triggerListeners(null);
+                      }, 300);
+                    };
                     logout = tokenContextValue.logout;
                     dismissError = tokenContextValue.dismissError;
                   } else {
@@ -416,6 +463,11 @@ export function UserIdRetriever(props: IUserIdRetrieverProps) {
   );
 }
 
+// TODO language switch that is able to update the current user
+// maybe we need to do this whole deep level
+// one procedure might be to take the appData root and
+// somehow pipe the data there if we have an active user
+// and if we do update that and trigger the listeners
 interface IFnAppLanguageRetrieverLanguageFormType {
   code: string;
   name: string;
@@ -505,7 +557,7 @@ export function StatsForNerds() {
     <ItemDefinitionContext.Consumer>
       {
         (itemDefinitionContextualValue) => {
-          const valueToStringify: IItemDefinitionValue = {
+          const valueToStringify: IItemDefinitionValueType = {
             ...itemDefinitionContextualValue.value,
             properties: itemDefinitionContextualValue.value.properties.map((propertyValue) => {
               let propertyValueToStringify = {...propertyValue};

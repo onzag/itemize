@@ -1,6 +1,6 @@
 // lets do the import, item definition depends on conditional rule set
 // and property value mapping
-import ItemDefinition, { IItemDefinitionValue, ItemDefinitionIOActions } from "..";
+import ItemDefinition, { IItemDefinitionValueType, ItemDefinitionIOActions } from "..";
 import ConditionalRuleSet, {
   IConditionalRuleSetRawJSONDataType,
 } from "../ConditionalRuleSet";
@@ -20,7 +20,7 @@ export interface IItemValue {
   canExclusionBeSet: boolean;
   itemId: string;
   itemName: string;
-  itemDefinitionValue: IItemDefinitionValue;
+  itemDefinitionValue: IItemDefinitionValueType;
   stateExclusion: ItemExclusionState;
   stateExclusionModified: boolean;
 }
@@ -348,7 +348,7 @@ export default class Item {
    * Provides the current value of this item
    * @param id the id of the stored item definition or module
    */
-  public getCurrentValueNoExternalChecking(id: number): IItemValue {
+  public getCurrentValueNoExternalChecking(id: number, emulateExternalChecking?: boolean): IItemValue {
     const exclusionState = this.getExclusionState(id);
     return {
       exclusionState,
@@ -356,7 +356,8 @@ export default class Item {
       itemId: this.getId(),
       itemName: this.getName(),
       itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
-        this.itemDefinition.getCurrentValueNoExternalChecking(id, this.rawData.sinkIn || [], true),
+        this.itemDefinition.getCurrentValueNoExternalChecking(id,
+          emulateExternalChecking, this.rawData.sinkIn || [], true),
       stateExclusion: this.stateExclusion[id] || ItemExclusionState.ANY,
       stateExclusionModified: this.stateExclusionModified[id] || false,
     };

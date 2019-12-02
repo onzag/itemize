@@ -45,6 +45,12 @@ const avatarStyles = createStyles({
       opacity: 1,
     },
   },
+  avatarLarge: {
+    width: "200px",
+    height: "200px",
+    color: "rgba(255,255,255,0.7)",
+    fontSize: "120px",
+  },
   randomColor0: {
     backgroundColor: "#f44336",
     border: "solid 2px #b71c1c",
@@ -89,51 +95,51 @@ const avatarStyles = createStyles({
 
 interface IAvatarProps extends WithStyles<typeof avatarStyles> {
   hideFlag?: boolean;
-}
-
-function convertStringToNumber(str: string): number {
-  let total = 0;
-  for (let i = 0; i < str.length; i++) {
-    total += str.charCodeAt(i);
-  }
-  return total % 10;
+  large?: boolean;
 }
 
 // TODO profile picture support
-// TODO onclick go to profile
+// TODO make the color be about the id rather than the string
 export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
   return (
-    <Reader id="username">
-      {
-        (userNameValue: string) => {
-          let numberColorClassName = "";
-          if (userNameValue) {
-            numberColorClassName = props.classes["randomColor" + convertStringToNumber(userNameValue)];
-          }
-          if (props.hideFlag) {
-            return <MAvatar alt={userNameValue} classes={{root: `${props.classes.avatar} ${numberColorClassName}`}}>
-              {userNameValue ? userNameValue[0] : ""}
-            </MAvatar>;
-          }
-          return <Reader id="app_country">
-            {
-              (appCountryValue: string) => {
-                let countryEmoji = null;
-                if (appCountryValue && countries[appCountryValue]) {
-                  countryEmoji = countries[appCountryValue].emoji;
-                }
-                // TODO get raw properties, such as id, country, etc...
-                return <Link to={`/profile/${1}`}>
-                  <MAvatar alt={userNameValue} classes={{root: `${props.classes.avatar} ${numberColorClassName}`}}>
-                    {userNameValue ? userNameValue[0] : ""}
-                    <div className={props.classes.flag}>{countryEmoji}</div>
-                  </MAvatar>
-                </Link>;
+    <Reader id="id">
+      {(id: number) => (
+        <Reader id="username">
+          {
+            (userNameValue: string) => {
+              const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : null;
+              if (props.hideFlag) {
+                return <MAvatar
+                  alt={userNameValue}
+                  classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.large ? props.classes.avatarLarge : ""}` }}
+                >
+                  {userNameValue ? userNameValue[0] : ""}
+                </MAvatar>;
               }
+              return <Reader id="app_country">
+                {
+                  (appCountryValue: string) => {
+                    let countryEmoji = null;
+                    if (appCountryValue && countries[appCountryValue]) {
+                      countryEmoji = countries[appCountryValue].emoji;
+                    }
+                    // TODO get raw properties, such as id, country, etc...
+                    return <Link to={`/profile/${1}`}>
+                      <MAvatar
+                        alt={userNameValue}
+                        classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.large ? props.classes.avatarLarge : ""}` }}
+                      >
+                        {userNameValue ? userNameValue[0] : ""}
+                        <div className={props.classes.flag}>{countryEmoji}</div>
+                      </MAvatar>
+                    </Link>;
+                  }
+                }
+              </Reader>;
             }
-          </Reader>;
-        }
-      }
+          }
+        </Reader>
+      )}
     </Reader>
   );
 });

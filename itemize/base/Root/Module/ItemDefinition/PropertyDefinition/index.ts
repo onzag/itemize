@@ -545,13 +545,13 @@ export default class PropertyDefinition {
    * @param id the id of the current item definition as stored, pass null if not stored
    * @returns a bunch of information about the current value
    */
-  public getCurrentValueNoExternalChecking(id: number): IPropertyDefinitionValue {
+  public getCurrentValueNoExternalChecking(id: number, emulateExternalChecking?: boolean): IPropertyDefinitionValue {
 
     const possibleEnforcedValue = this.getEnforcedValue(id);
 
     if (possibleEnforcedValue.enforced) {
       const possibleInvalidEnforcedReason = this.isValidValueNoExternalChecking(
-        id, possibleEnforcedValue.value,
+        id, possibleEnforcedValue.value, emulateExternalChecking,
       );
       // we return the value that was set to be
       return {
@@ -797,17 +797,20 @@ export default class PropertyDefinition {
   public isValidValueNoExternalChecking(
     id: number,
     value: PropertyDefinitionSupportedType,
+    emulateExternalChecking?: boolean,
   ): PropertyInvalidReason | string {
 
     // Cache check
-    const hasIndex = this.isUnique();
-    if (hasIndex) {
-      if (
-        this.stateLastUniqueCheck[id] &&
-        (this.stateLastUniqueCheck[id].value === value || equals(this.stateLastUniqueCheck[id].value, value)) &&
-        !this.stateLastUniqueCheck[id].valid
-      ) {
-        return PropertyInvalidReason.NOT_UNIQUE;
+    if (emulateExternalChecking) {
+      const hasIndex = this.isUnique();
+      if (hasIndex) {
+        if (
+          this.stateLastUniqueCheck[id] &&
+          (this.stateLastUniqueCheck[id].value === value || equals(this.stateLastUniqueCheck[id].value, value)) &&
+          !this.stateLastUniqueCheck[id].valid
+        ) {
+          return PropertyInvalidReason.NOT_UNIQUE;
+        }
       }
     }
 

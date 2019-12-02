@@ -15,6 +15,7 @@ import { GraphQLEndpointError } from "../../../errors";
 export interface IPolicyValueRawJSONDataType {
   roles: string[];
   properties: string[];
+  applyingProperties: string[];
 }
 
 export interface IPolicyRawJSONDataType {
@@ -58,12 +59,14 @@ export interface IItemDefinitionRawJSONDataType {
   policies?: IPoliciesRawJSONDataType;
 }
 
-export interface IItemDefinitionValue {
+export interface IItemDefinitionValueType {
   moduleName: string;
   itemDefPath: string[];
   itemDefName: string;
   items: IItemValue[];
   properties: IPropertyDefinitionValue[];
+  gqlOriginalAppliedValue: IItemDefinitionGQLValueType;
+  forId: number;
 }
 
 export enum ItemDefinitionIOActions {
@@ -71,6 +74,13 @@ export enum ItemDefinitionIOActions {
   CREATE = "CREATE",
   EDIT = "EDIT",
   DELETE = "DELETE",
+}
+
+export interface IItemDefinitionGQLValueType {
+  userIdRequester: number;
+  roleRequester: string;
+  query: string;
+  value: any;
 }
 
 /**
@@ -184,12 +194,7 @@ export default class ItemDefinition {
     [id: number]: boolean,
   };
   private stateGQLAppliedValue: {
-    [id: number]: {
-      userIdRequester: number,
-      roleRequester: string,
-      query: string,
-      value: any,
-    };
+    [id: number]: IItemDefinitionGQLValueType;
   };
 
   constructor(
@@ -545,6 +550,9 @@ export default class ItemDefinition {
    * autocomplete checkings; note that you should still pass id
    * in order to get cached previously checked results
    * @param id the stored value of the item definition, pass null if new
+   * @param emulateExternalChecking emulates an externally checked
+   * property as the get current value async leaves a cache behind
+   * and this will use the cache rather than re-requesting
    * @param onlyIncludeProperties only includes these specific
    * properties, note property definitions are not fetched in
    * this case
@@ -552,23 +560,28 @@ export default class ItemDefinition {
    */
   public getCurrentValueNoExternalChecking(
     id: number,
+    emulateExternalChecking?: boolean,
     onlyIncludeProperties?: string[],
     excludeItems?: boolean,
-  ): IItemDefinitionValue {
+  ): IItemDefinitionValueType {
     const properties = onlyIncludeProperties ?
-      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false).getCurrentValueNoExternalChecking(id)) :
+      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false)
+        .getCurrentValueNoExternalChecking(id, emulateExternalChecking)) :
       this.getParentModule().getAllPropExtensions().concat(
         this.getAllPropertyDefinitions(),
       ).map((pd) => {
-        return pd.getCurrentValueNoExternalChecking(id);
+        return pd.getCurrentValueNoExternalChecking(id, emulateExternalChecking);
       });
 
     return {
       moduleName: this.getModuleName(),
       itemDefPath: this.getPath(),
       itemDefName: this.getName(),
-      items: excludeItems ? [] : this.itemInstances.map((ii) => ii.getCurrentValueNoExternalChecking(id)),
+      items: excludeItems ? [] : this.itemInstances.map((ii) =>
+        ii.getCurrentValueNoExternalChecking(id, emulateExternalChecking)),
       properties,
+      gqlOriginalAppliedValue: this.getGQLAppliedValue(id),
+      forId: id,
     };
   }
 
@@ -589,7 +602,7 @@ export default class ItemDefinition {
     id: number,
     onlyIncludeProperties?: string[],
     excludeItems?: boolean,
-  ): Promise<IItemDefinitionValue> {
+  ): Promise<IItemDefinitionValueType> {
     const properties = await Promise.all(onlyIncludeProperties ?
       onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false).getCurrentValue(id)) :
       this.getParentModule().getAllPropExtensions().concat(
@@ -605,6 +618,8 @@ export default class ItemDefinition {
       itemDefName: this.getName(),
       items: excludeItems ? [] : await Promise.all(this.itemInstances.map((ii: Item) => ii.getCurrentValue(id))),
       properties,
+      gqlOriginalAppliedValue: this.getGQLAppliedValue(id),
+      forId: id,
     };
   }
 
@@ -613,8 +628,9 @@ export default class ItemDefinition {
    * instance
    * @param value the value, be careful, it will choke if invalid
    */
-  public applyValue(id: number, value: IItemDefinitionValue) {
+  public applyValue(id: number, value: IItemDefinitionValueType) {
     this.stateHasAppliedValueTo[id] = true;
+    this.applyValueFromGQL[id] = value.gqlOriginalAppliedValue;
 
     if (value.itemDefPath.join("/") !== this.getPath().join("/")) {
       throw new Error("Attempted to apply unmatching values");
@@ -691,8 +707,8 @@ export default class ItemDefinition {
     return !!this.stateHasAppliedValueTo[id];
   }
 
-  public getGQLAppliedValue(id: number) {
-    return this.stateGQLAppliedValue[id];
+  public getGQLAppliedValue(id: number): IItemDefinitionGQLValueType {
+    return this.stateGQLAppliedValue[id] || null;
   }
 
   /**
@@ -849,6 +865,11 @@ export default class ItemDefinition {
     );
   }
 
+  public getApplyingPropertyIdsForPolicy(type: string, name: string): string[] {
+    const applyingProperties = this.rawData.policies[type][name].applyingProperties;
+    return applyingProperties || null;
+  }
+
   public getRolesForPolicy(policy: string, name: string): string[] {
     return this.rawData.policies[policy][name].roles;
   }
@@ -902,7 +923,5 @@ export default class ItemDefinition {
         ii.mergeWithI18n(mergeItemRaw);
       }
     });
-
-    // TODO search mode merge with 18n
   }
 }

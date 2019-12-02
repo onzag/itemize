@@ -162,6 +162,25 @@ export function checkItemDefinition(
             );
           }
         });
+
+        if (policyValue.applyingProperties) {
+          policyValue.applyingProperties.forEach((propertyId, index) => {
+            const propertyRaw =
+              ItemDefinition.getPropertyDefinitionRawFor(rawData, parentModule, propertyId, true);
+            if (propertyRaw === null) {
+              throw new CheckUpError(
+                "Policy rule '" + policyRuleKey +
+                  "' contains an invalid property that cannot be found '" + propertyId + "'",
+                actualTraceback
+                  .newTraceToBit("policies")
+                  .newTraceToBit(policyKey)
+                  .newTraceToBit(policyRuleKey)
+                  .newTraceToBit("applyingProperties")
+                  .newTraceToBit(index),
+              );
+            }
+          });
+        }
       });
     });
   }

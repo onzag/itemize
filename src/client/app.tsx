@@ -54,7 +54,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
       <React.Fragment>
         <Navbar onLoginClick={this.openLoginDialog}/>
         <LoginDialog open={this.state.loginDialogOpen} onClose={this.closeLoginDialog}/>
-        USERID = {this.props.userId}
         <Route path="/" exact={true} component={FrontPage}/>
         <Route path="/profile/:id" component={Profile}/>
       </React.Fragment>

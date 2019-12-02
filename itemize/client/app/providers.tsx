@@ -1,6 +1,6 @@
 import React from "react";
 import { DataContext, LocaleContext, ILocaleContextType } from ".";
-import ItemDefinition, { IItemDefinitionValue, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemDefinitionValueType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import Module from "../../base/Root/Module";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
@@ -12,13 +12,14 @@ import {
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   PREFIX_GET,
   PREFIX_BUILD,
+  STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
 } from "../../constants";
 import { buildGqlQuery, gqlQuery } from "./gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 
 export interface IItemDefinitionContextType {
   idef: ItemDefinition;
-  value: IItemDefinitionValue;
+  value: IItemDefinitionValueType;
   notFound: boolean;
   blocked: boolean;
   blockedButDataAccessible: boolean;
@@ -57,7 +58,7 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
 }
 
 interface IActualItemDefinitionProviderState {
-  value: IItemDefinitionValue;
+  value: IItemDefinitionValueType;
   isBlocked: boolean;
   isBlockedButDataIsAccessible: boolean;
   notFound: boolean;
@@ -100,7 +101,10 @@ class ActualItemDefinitionProvider extends
     }
 
     this.state = {
-      value: valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
+      value: valueFor.getCurrentValueNoExternalChecking(
+        this.props.forId || null,
+        !this.props.disableExternalChecks,
+      ),
       isBlocked: false,
       isBlockedButDataIsAccessible: false,
       notFound: false,
@@ -131,7 +135,10 @@ class ActualItemDefinitionProvider extends
       this.itemDefinition.addListener(this.props.forId || null, this.listener);
       // we set the value given we have changed the forId
       this.setState({
-        value: this.itemDefinition.getCurrentValueNoExternalChecking(this.props.forId || null),
+        value: this.itemDefinition.getCurrentValueNoExternalChecking(
+          this.props.forId || null,
+          !this.props.disableExternalChecks,
+        ),
       });
       if (this.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
         this.setStateToCurrentValueWithExternalChecking(null);
@@ -152,13 +159,15 @@ class ActualItemDefinitionProvider extends
     this.loadValue();
   }
   public listener() {
-    console.log("WE LISTENED FOR", this.props.forId);
     let valueFor = this.props.mod.getItemDefinitionFor(this.props.itemDefinition.split("/"));
     if (this.props.searchCounterpart) {
       valueFor = valueFor.getSearchModeCounterpart();
     }
     this.setState({
-      value: valueFor.getCurrentValueNoExternalChecking(this.props.forId || null),
+      value: valueFor.getCurrentValueNoExternalChecking(
+        this.props.forId || null,
+        !this.props.disableExternalChecks,
+      ),
     });
   }
   public async loadValue() {
@@ -166,10 +175,8 @@ class ActualItemDefinitionProvider extends
       return;
     }
 
-    console.log("ASKED TO LOAD VALUE", this.props.forId);
     const qualifiedPathNameWithID = PREFIX_BUILD(this.itemDefinition.getQualifiedPathName()) + this.props.forId;
     if (ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID]) {
-      console.log("CANCEL IT BECAUSE WE ALREADY LOADIN");
       return;
     }
     ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID] = true;
@@ -177,6 +184,9 @@ class ActualItemDefinitionProvider extends
     const requestFields: any = {
       DATA: {},
     };
+    STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
+      requestFields.DATA[p] = {};
+    });
     EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
       requestFields[p] = {};
     });
@@ -198,7 +208,6 @@ class ActualItemDefinitionProvider extends
           false,
         )
       ) {
-        console.log("PASSED", pd.getId(), "for", this.props.tokenData.id, this.props.assumeOwnership);
         requestFields.DATA[pd.getId()] = {};
 
         const propertyDescription = pd.getPropertyDefinitionDescription();
@@ -262,7 +271,6 @@ class ActualItemDefinitionProvider extends
     const appliedGQLValue = this.itemDefinition.getGQLAppliedValue(this.props.forId);
     if (appliedGQLValue && appliedGQLValue.query === query) {
       delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
-      console.log("CANCEL IT BECAUSE IT MATCHES OUR CACHE");
       return;
     }
     const gqlValue = await gqlQuery(query);
@@ -310,7 +318,6 @@ class ActualItemDefinitionProvider extends
             });
           }
 
-          console.log(query);
           const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
           this.itemDefinition.applyValueFromGQL(
             this.props.forId || null,

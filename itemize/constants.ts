@@ -195,6 +195,18 @@ export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "blocked_until",
   "blocked_reason",
 ];
+export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
+  "id",
+  "type",
+  "created_at",
+  "created_by",
+  "language",
+  "country",
+  "edited_at",
+  "edited_by",
+  "reviewed_at",
+  "reviewed_by",
+];
 // INVALID RESERVED PROPERTY NAMES
 export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   id: {

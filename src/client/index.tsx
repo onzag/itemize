@@ -11,7 +11,6 @@ initializeItemizeApp(
         <ItemDefinitionProvider
           itemDefinition="user"
           forId={userId}
-          disableExternalChecks={true}
           assumeOwnership={true}
         >
           <App userId={userId}/>

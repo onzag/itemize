@@ -2,6 +2,7 @@ import React from "react";
 import { Button, createStyles, withStyles, WithStyles, Icon } from "@material-ui/core";
 import { DialogResponsive } from "./dialog";
 import { Entry, I18nRead, LogActioner, I18nReadError } from "../../../itemize/client/app/elements";
+import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
 
 const loginDialogStyles = createStyles({});
 
@@ -12,35 +13,39 @@ interface INavbarProps extends WithStyles<typeof loginDialogStyles> {
 
 export const LoginDialog = withStyles(loginDialogStyles)((props: INavbarProps) => {
   return (
-    <LogActioner>
-      {(actioner) => (
-        <I18nRead id="login">
-          {(i18nLogin: string) => (
-            <DialogResponsive
-              open={props.open}
-              onClose={props.onClose}
-              title={i18nLogin}
-              buttons={
-                <Button
-                  color="primary"
-                  aria-label={i18nLogin}
-                  startIcon={<Icon>done</Icon>}
-                  onClick={actioner.login}
+    <ModuleProvider module="users">
+      <ItemDefinitionProvider itemDefinition="user" disableExternalChecks={true}>
+        <LogActioner>
+          {(actioner) => (
+            <I18nRead id="login">
+              {(i18nLogin: string) => (
+                <DialogResponsive
+                  open={props.open}
+                  onClose={props.onClose}
+                  title={i18nLogin}
+                  buttons={
+                    <Button
+                      color="primary"
+                      aria-label={i18nLogin}
+                      startIcon={<Icon>done</Icon>}
+                      onClick={actioner.login}
+                    >
+                      {i18nLogin}
+                    </Button>
+                  }
                 >
-                  {i18nLogin}
-                </Button>
-              }
-            >
-              <form>
-                <Entry id="username" onChange={actioner.dismissError} showAsInvalid={!!actioner.error}/>
-                <Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error}/>
+                  <form>
+                    <Entry id="username" onChange={actioner.dismissError} showAsInvalid={!!actioner.error}/>
+                    <Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error}/>
 
-                <I18nReadError error={actioner.error}/>
-              </form>
-            </DialogResponsive>
+                    <I18nReadError error={actioner.error}/>
+                  </form>
+                </DialogResponsive>
+              )}
+            </I18nRead>
           )}
-        </I18nRead>
-      )}
-    </LogActioner>
+        </LogActioner>
+      </ItemDefinitionProvider>
+    </ModuleProvider>
   );
 });

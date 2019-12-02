@@ -91,3 +91,13 @@ export default function PropertyView(props: IPropertyViewBaseProps) {
     </LocaleContext.Consumer>
   );
 }
+
+export function RawBasePropertyView(props: {
+  value: string;
+}) {
+  return (
+    <div className="property-view property-view--base-property">
+      {props.value}
+    </div>
+  );
+}

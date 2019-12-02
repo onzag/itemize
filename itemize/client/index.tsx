@@ -89,7 +89,7 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
   if (!storedLang || !storedCurrency || !storedCountry) {
 
     // Log what is going on
-    console.info("stored locale is incomplete running a guess", storedLang, storedCountry, storedCurrency);
+    console.log("stored locale is incomplete running a guess", storedLang, storedCountry, storedCurrency);
 
     // We try to check if we previously tried to guess for this given instance
     // granted, there's no difference from redoing the guess, but, this saves
@@ -98,7 +98,7 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
 
     // if we find it, we log it
     if (previouslyGuessedData) {
-      console.info("found previously guessed locale");
+      console.log("found previously guessed locale");
     }
 
     // So we do a trick here, because previouslyGuessedData
@@ -115,18 +115,20 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
     localStorage.setItem("guessedData", JSON.stringify(guessedUserData));
 
     // We log this
-    console.info("guessed locale is", guessedUserData);
+    console.log("guessed locale is", guessedUserData);
 
     // Let's set the values
-    guessedLang = guessedUserData.language;
-    guessedCountry = guessedUserData.country;
-    guessedCurrency = guessedUserData.currency;
+    guessedLang = storedLang || guessedUserData.language;
+    guessedCountry = storedCurrency || guessedUserData.country;
+    guessedCurrency = storedCountry || guessedUserData.currency;
+
+    console.log("applying from guess", guessedLang, guessedCountry, guessedCurrency);
 
     // So this is a global variable, that must exist, sadly but necessary
     // this is a very simple way to have it available in the client side
     // and it's always necessary, it's hardcoded in the webpage HTML during the build
     if (!(window as any).SUPPORTED_LANGUAGES.includes(guessedLang)) {
-      console.warn("guessed locale is not valid defaulting to english");
+      console.log("guessed locale is not valid defaulting to english");
       guessedLang = "en";
     }
 
@@ -138,7 +140,7 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
     // not only there was no stored language data, but no url data
     if (!urlLanguage) {
       // We log this is happening
-      console.info("using guessed value as lang setting");
+      console.log("using guessed value as lang setting");
 
       // and set the url language to the guessed values
       urlLanguage = guessedLang;
@@ -148,7 +150,7 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
     }
   } else {
     // Otherwise we log what we have gotten stored
-    console.info("Stored locale is", storedLang, storedCountry, storedCurrency);
+    console.log("Stored locale is", storedLang, storedCountry, storedCurrency);
   }
 
   // let's try now to set the initial locale, the initial language
