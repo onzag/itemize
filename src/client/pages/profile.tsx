@@ -87,13 +87,14 @@ export const Profile = withStyles(profileStyles)((props: IProfileProps) => {
     <UserIdRetriever>
       {
         (userId) => {
-          if (userId === actualId) {
-            return <ActualProfile {...props} isOwner={true}/>;
-          }
           return (
             <ModuleProvider module="users">
-              <ItemDefinitionProvider itemDefinition="user" forId={actualId} disableExternalChecks={true}>
-                <ActualProfile {...props}/>
+              <ItemDefinitionProvider
+                itemDefinition="user"
+                forId={actualId}
+                disableExternalChecks={userId !== actualId}
+              >
+                <ActualProfile {...props} isOwner={userId === actualId}/>
               </ItemDefinitionProvider>
             </ModuleProvider>
           );

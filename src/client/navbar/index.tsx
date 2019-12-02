@@ -3,6 +3,7 @@ import { AppBar, Toolbar, IconButton, Icon, Button, createStyles, WithStyles, wi
 import { IfLogStatus, I18nRead } from "../../../itemize/client/app/elements";
 import { Avatar } from "../general/avatar";
 import { LanguagePicker } from "../general/language-picker";
+import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
 
 const navbarStyles = (theme: Theme) => createStyles({
   container: {
@@ -22,6 +23,7 @@ const navbarStyles = (theme: Theme) => createStyles({
 });
 
 interface INavbarProps extends WithStyles<typeof navbarStyles> {
+  loggedUserId: number;
   onLoginClick: () => void;
 }
 
@@ -34,20 +36,24 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
             <Icon>menu</Icon>
           </IconButton>
           <div className={props.classes.container}>
-            <IfLogStatus>
-              {(status) => {
-                if (status === "LOGGED_OUT") {
-                  return <React.Fragment>
-                    <Button color="inherit" variant="outlined" onClick={props.onLoginClick}>
-                      <I18nRead id="login"/>
-                    </Button>
-                    <LanguagePicker className={props.classes.languageButton}/>
-                  </React.Fragment>;
-                } else if (status === "LOGGED_IN") {
-                  return <Avatar/>;
-                }
-              }}
-            </IfLogStatus>
+            <ModuleProvider module="users">
+              <ItemDefinitionProvider itemDefinition="user" forId={props.loggedUserId} disableExternalChecks={true}>
+                <IfLogStatus>
+                  {(status) => {
+                    if (status === "LOGGED_OUT") {
+                      return <React.Fragment>
+                        <Button color="inherit" variant="outlined" onClick={props.onLoginClick}>
+                          <I18nRead id="login"/>
+                        </Button>
+                        <LanguagePicker className={props.classes.languageButton}/>
+                      </React.Fragment>;
+                    } else if (status === "LOGGED_IN") {
+                      return <Avatar/>;
+                    }
+                  }}
+                </IfLogStatus>
+              </ItemDefinitionProvider>
+            </ModuleProvider>
           </div>
         </Toolbar>
       </AppBar>

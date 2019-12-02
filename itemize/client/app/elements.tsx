@@ -389,8 +389,20 @@ export function LogActioner(props: ILogActionerProps) {
                       // in dialogs that are going to close
                       setTimeout(() => {
                         const passwordPdef =
-                        itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
-                        passwordPdef.applyValueFromGQL(null, null);
+                          itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
+                        passwordPdef.applyValue(null, {
+                          userSet: false,
+                          default: false,
+                          enforced: false,
+                          hidden: false,
+                          valid: false,
+                          invalidReason: "NOT_NULLABLE",
+                          value: null,
+                          internalValue: "",
+                          stateValue: null,
+                          stateValueModified: false,
+                          propertyId: "password",
+                        });
                         itemDefinitionContextualValue.idef.triggerListeners(null);
                       }, 300);
                     };

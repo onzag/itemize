@@ -52,7 +52,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
   public render() {
     return (
       <React.Fragment>
-        <Navbar onLoginClick={this.openLoginDialog}/>
+        <Navbar onLoginClick={this.openLoginDialog} loggedUserId={this.props.userId}/>
         <LoginDialog open={this.state.loginDialogOpen} onClose={this.closeLoginDialog}/>
         <Route path="/" exact={true} component={FrontPage}/>
         <Route path="/profile/:id" component={Profile}/>
