@@ -239,6 +239,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     // And we set the language via local storage, so it has priority
     localStorage.setItem("lang", localeToSet);
+    document.body.parentElement.lang = localeToSet;
 
     // We set it to the url
     pathNameSplitted[1] = localeToSet;

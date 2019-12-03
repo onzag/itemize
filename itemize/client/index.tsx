@@ -181,6 +181,7 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
   // the locale of moment is set, note how await was used, hence all the previous script
   // have been imported, and should be available for moment
   Moment.locale(initialLang);
+  document.body.parentElement.lang = initialLang;
 
   // finally we render the react thing
   ReactDOM.render(
