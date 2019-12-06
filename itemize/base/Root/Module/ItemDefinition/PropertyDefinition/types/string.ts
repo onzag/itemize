@@ -41,7 +41,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // validates just the length
   validate: (s: PropertyDefinitionSupportedStringType, subtype: string) => {
     if (typeof s !== "string") {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
     } else if (s.length > MAX_STRING_LENGTH) {
       return PropertyInvalidReason.TOO_LARGE;
     }

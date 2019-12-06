@@ -564,14 +564,18 @@ export function AppCountryRetriever(props: {
   );
 }
 
-export function StatsForNerds() {
+export function StatsForNerds(props: {
+  propertyIds?: string[],
+}) {
   return (
     <ItemDefinitionContext.Consumer>
       {
         (itemDefinitionContextualValue) => {
           const valueToStringify: IItemDefinitionValueType = {
             ...itemDefinitionContextualValue.value,
-            properties: itemDefinitionContextualValue.value.properties.map((propertyValue) => {
+            properties: itemDefinitionContextualValue.value.properties
+              .filter((p) => !props.propertyIds || props.propertyIds.includes(p.propertyId))
+              .map((propertyValue) => {
               let propertyValueToStringify = {...propertyValue};
               // a small hack due to internal values being too long
               if (

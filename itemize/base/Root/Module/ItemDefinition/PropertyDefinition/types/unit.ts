@@ -137,11 +137,11 @@ const typeValue: IPropertyDefinitionSupportedType = {
       typeof l.unit !== "string" ||
       typeof l.normalizedValue !== "number" ||
       typeof l.normalizedUnit !== "string") {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
     }
 
     if (isNaN(l.value) || isNaN(l.normalizedValue)) {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
     }
 
     if (l.value > MAX_SUPPORTED_REAL) {

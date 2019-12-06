@@ -107,11 +107,11 @@ const typeValue: IPropertyDefinitionSupportedType = {
   validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
     if (typeof l.value !== "number" ||
       typeof l.currency !== "string") {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
     }
 
     if (isNaN(l.value)) {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
     }
 
     if (l.value > MAX_SUPPORTED_REAL) {
@@ -126,7 +126,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     if (!splittedDecimals[1] ||
       splittedDecimals[1].length <= currencyDefinitionDecimals) {
       if (currencyData.rounding && !Number.isInteger((l.value * 10 ** 2) / (currencyData.rounding * 10 ** 2))) {
-        return PropertyInvalidReason.UNSPECIFIED;
+        return PropertyInvalidReason.INVALID_VALUE;
       }
       return null;
     }

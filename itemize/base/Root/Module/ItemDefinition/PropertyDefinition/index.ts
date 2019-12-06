@@ -14,9 +14,7 @@ import { DOMWindow } from "../../../../util";
 import equals from "deep-equal";
 
 export enum PropertyInvalidReason {
-  UNSPECIFIED = "UNSPECIFIED",
   INVALID_VALUE = "INVALID_VALUE",
-  INVALID_DATETIME = "INVALID_DATETIME",
   TOO_LARGE = "TOO_LARGE",
   TOO_SMALL = "TOO_SMALL",
   TOO_MANY_DECIMALS = "TOO_MANY_DECIMALS",
@@ -272,7 +270,7 @@ export default class PropertyDefinition {
     const definition = supportedTypesStandard[propertyDefinitionRaw.type];
     // These basic checks are the most important
     if (definition.json && typeof value !== definition.json) {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
     }
     if (definition.validate) {
       const invalidReason = definition.validate(
@@ -546,7 +544,6 @@ export default class PropertyDefinition {
    * @returns a bunch of information about the current value
    */
   public getCurrentValueNoExternalChecking(id: number, emulateExternalChecking?: boolean): IPropertyDefinitionValue {
-
     const possibleEnforcedValue = this.getEnforcedValue(id);
 
     if (possibleEnforcedValue.enforced) {

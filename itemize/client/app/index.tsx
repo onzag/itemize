@@ -7,7 +7,7 @@ import { create } from "jss";
 import { createGenerateClassName, jssPreset } from "@material-ui/core/styles";
 import { importScript } from "..";
 import Moment from "moment";
-import { MuiPickersUtilsProvider } from "material-ui-pickers";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import { Route } from "react-router";
 import { history } from "..";
@@ -398,7 +398,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
           <MuiPickersUtilsProvider
             utils={MomentUtils}
             locale={currentActualLanguageDeregionalized}
-            moment={Moment}
+            libInstance={Moment}
           >
             {this.props.mainComponent}
           </MuiPickersUtilsProvider>

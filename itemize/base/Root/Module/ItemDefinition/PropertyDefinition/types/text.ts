@@ -87,7 +87,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // validates the text, texts don't support json value
   validate: (s: PropertyDefinitionSupportedTextType, subtype?: string) => {
     if (typeof s !== "string") {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
 
     // NOTE how the html text lengh is not checked, even when it is possible
     } else if (s.length > MAX_RAW_TEXT_LENGTH) {

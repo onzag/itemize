@@ -34,9 +34,9 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // validates
   validate: (n: PropertyDefinitionSupportedYearType) => {
     if (isNaN(n)) {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
     } else if (!Number.isInteger(n)) {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
     } else if (n > MAX_SUPPORTED_YEAR) {
       return PropertyInvalidReason.TOO_LARGE;
     } else if (n > MIN_SUPPORTED_YEAR) {

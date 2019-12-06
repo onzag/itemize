@@ -963,12 +963,23 @@ async function getI18nPropertyData(
     errorRequiredProperties.push("error.TOO_LARGE");
   }
 
-  if (definition.supportedSubtypes && property.subtype) {
+  if (definition.supportedSubtypes && property.subtype && property.type === "string") {
     errorRequiredProperties.push("error.INVALID_SUBTYPE_VALUE");
   }
 
-  if (property.type === "date" || property.type === "datetime" || property.type === "time") {
-    errorRequiredProperties.push("error.INVALID_DATETIME");
+  if (
+    (
+      property.type === "date" ||
+      property.type === "datetime" ||
+      property.type === "time" ||
+      property.type === "number" ||
+      property.type === "currency" ||
+      property.type === "integer" ||
+      property.type === "year" ||
+      property.type === "unit"
+    ) && !property.values
+  ) {
+    errorRequiredProperties.push("error.INVALID_VALUE");
   }
 
   if ((typeof property.minLength !== "undefined" || definition.i18n.tooSmallErrorInclude) &&

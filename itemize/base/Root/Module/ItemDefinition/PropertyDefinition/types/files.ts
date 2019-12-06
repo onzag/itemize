@@ -32,7 +32,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   allowsMinMaxLengthDefined: true,
   validate: (l: PropertyDefinitionSupportedFilesType) => {
     if (!Array.isArray(l) || l.some((v) => typeof v !== "string")) {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
     }
 
     if (l.length > MAX_FILE_BATCH_COUNT) {
@@ -47,7 +47,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       return null;
     }
 
-    return PropertyInvalidReason.UNSPECIFIED;
+    return PropertyInvalidReason.INVALID_VALUE;
   },
   i18n: {
     base: CLASSIC_BASE_I18N,

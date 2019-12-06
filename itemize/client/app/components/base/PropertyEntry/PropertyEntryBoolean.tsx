@@ -1,177 +1,146 @@
 import React from "react";
-import { IPropertyEntryProps, getClassName } from ".";
+import { IPropertyEntryProps } from ".";
 import { FormControlLabel, Switch, Icon, FormLabel, FormControl, RadioGroup, Radio } from "@material-ui/core";
 import { capitalize } from "../../../../../util";
 import equals from "deep-equal";
 
-export function PropertyEntryBooleanAsSwitchBase(props: {
-  className?: string;
-  onChange: () => void;
-  checked: boolean;
-  disabled?: boolean;
-  label: string;
-  description?: string;
-  iconComponent?: any;
-}) {
-  return (
-    <div className="property-entry-container">
-      {props.description ? <div
-        className="property-entry-description property-entry-description--no-padding"
-      >
-        <Icon>keyboard_arrow_down</Icon>
-        {props.description}
-      </div> : null}
-      <FormControl className={props.className ? props.className : "property-entry property-entry--switch"}>
-        <FormControlLabel
-          aria-label={props.label}
-          classes={{
-            label: "property-entry-label",
-          }}
-          control={
-            <Switch
-              checked={props.checked}
-              onChange={props.onChange}
-              disabled={props.disabled}
-              classes={{
-                root: "property-entry-input",
-              }}
-            />
-          }
-          label={props.label}
-        />
-        {props.iconComponent}
-      </FormControl>
-    </div>
-  );
-}
-
-function sendValueOnly(fn: (value: string) => void, e: React.ChangeEvent<HTMLInputElement>) {
-  fn(e.target.value);
-}
-
-export function PropertyEntryBooleanAsRadioBase(props: {
-  className?: string;
-  onChange: (newValue: string) => void;
-  value: string;
-  values: Array<{
-    value: string,
-    label: string,
-  }>;
-  disabled?: boolean;
-  label: string;
-  description?: string;
-  iconComponent?: any;
-}) {
-  // The class for every label component
-  const fclClasses = {
-    label: "property-entry-label",
-  };
-
-  return (
-    <div className="property-entry-container">
-      <FormControl
-        component={"fieldset" as any}
-        className={props.className ? props.className : "property-entry property-entry--radio"}
-      >
-        <FormLabel
-          aria-label={props.label}
-          component={"legend" as any}
-          classes={{
-            root: "property-entry-label",
-            focused: "focused",
-          }}
-        >
-          {props.label}{props.iconComponent}
-        </FormLabel>
-        {props.description ? <div
-          className="property-entry-description property-entry-description--no-padding"
-        >
-          <Icon>keyboard_arrow_down</Icon>
-          {props.description}
-        </div> : null}
-        <RadioGroup
-          value={props.value}
-          onChange={sendValueOnly.bind(this, props.onChange)}
-        >
-          {props.values.map((v) => <FormControlLabel
-            key={v.value}
-            classes={fclClasses}
-            value={v.value}
-            control={<Radio/>}
-            label={v.label}
-            disabled={props.disabled}
-          />)}
-        </RadioGroup>
-      </FormControl>
-    </div>
-  );
-}
-
 function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
   // let's the get basic data for the entry
   const i18nData = props.property.getI18nDataFor(props.language);
-  const className = getClassName(props, "switch", props.poked);
   const i18nLabel = i18nData && i18nData.label;
   const i18nDescription = i18nData && i18nData.description;
   const icon = props.property.getIcon();
   const iconComponent = icon ? (
-    <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
+    <Icon classes={{root: props.classes.icon}}>{icon}</Icon>
   ) : null;
 
+  // so now we build the initial container,
+  // add the description accordingly
+  // and build the field using form control
+  // that's basically the only way to do so
+  // because material ui really gets complicated
+  // for no reason at all
   return (
-    <PropertyEntryBooleanAsSwitchBase
-      className={className}
-      checked={props.value.value as boolean || false}
-      onChange={props.onChange.bind(null, !props.value.value, null)}
-      disabled={props.value.enforced}
-      label={i18nLabel}
-      description={i18nDescription}
-      iconComponent={iconComponent}
-    />
+    <div className={props.classes.container}>
+      {i18nDescription ? <div
+        className={props.classes.description}
+      >
+        {i18nDescription}
+      </div> : null}
+      <FormControl className={props.classes.entry}>
+        <FormControlLabel
+          aria-label={i18nLabel}
+          classes={{
+            label: props.classes.label,
+          }}
+          control={
+            <Switch
+              checked={props.value.value as boolean || false}
+              onChange={props.onChange.bind(null, !props.value.value, null)}
+              disabled={props.value.enforced}
+            />
+          }
+          label={i18nLabel}
+        />
+        {iconComponent}
+      </FormControl>
+    </div>
   );
 }
 
+/**
+ * Handles the onchange event of the property entry as radio
+ * as it is required that it passes a boolean or null
+ * @param props the properties of the field
+ * @param e the browser event
+ */
 function handleOnChange(
   props: IPropertyEntryProps,
-  value: string,
+  e: React.ChangeEvent<HTMLInputElement>,
 ) {
+  // we extract the value from the browser event
+  const value = e.target.value;
+  // if the value is null as a string
   if (value === "null") {
+    // we trigger the change to null
     return props.onChange(null, null);
   }
+  // if the value comes as it's true or false, we pass it as so
+  // note how we don't use internal values for booleans
   return props.onChange(value === "true", null);
 }
 
 function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
   // Let's get the basic data
   const i18nData = props.property.getI18nDataFor(props.language);
-  const className = getClassName(props, "radio", props.poked);
   const i18nLabel = i18nData && i18nData.label;
   const i18nDescription = i18nData && i18nData.description;
   const icon = props.property.getIcon();
   const iconComponent = icon ? (
-    <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
+    <Icon classes={{root: props.classes.icon}}>{icon}</Icon>
   ) : null;
 
+  // so the values are composed into, true, false and null
+  // because the value must be a string, we set it as a string
+  // then we use yes, no or unspecified as the definitions
+  const values = [{
+    value: "true",
+    label: capitalize(props.i18n.yes),
+  }, {
+    value: "false",
+    label: capitalize(props.i18n.no),
+  }, {
+    value: "null",
+    label: capitalize(props.i18n.unspecified),
+  }];
+
+  // this is the class that every radio select
+  // contains, because it contains a label we use
+  // a label class
+  const fclClasses = {
+    label: props.classes.label,
+  };
+
+  // now we create the class, just as before
+  // we use a fieldset as the component
+  // and we use the classname of the entry
+  // get the form label and build the radio group
   return (
-    <PropertyEntryBooleanAsRadioBase
-      className={className}
-      disabled={props.value.enforced}
-      label={i18nLabel}
-      description={i18nDescription}
-      iconComponent={iconComponent}
-      values={[{
-        value: "true",
-        label: capitalize(props.i18n.yes),
-      }, {
-        value: "false",
-        label: capitalize(props.i18n.no),
-      }, {
-        value: "null",
-        label: capitalize(props.i18n.unspecified),
-      }]}
-      onChange={handleOnChange.bind(this, props)}
-      value={JSON.stringify(props.value.value)}
-    />
+    <div className={props.classes.container}>
+      <FormControl
+        component={"fieldset" as any}
+        className={props.classes.entry}
+      >
+        <FormLabel
+          aria-label={i18nLabel}
+          component={"legend" as any}
+          classes={{
+            root: props.classes.label,
+            focused: "focused",
+          }}
+        >
+          {i18nLabel}{iconComponent}
+        </FormLabel>
+        {i18nDescription ? <div
+          className={props.classes.description}
+        >
+          {i18nDescription}
+        </div> : null}
+        <RadioGroup
+          value={JSON.stringify(props.value.value)}
+          onChange={handleOnChange.bind(this, props)}
+        >
+          {values.map((v) => <FormControlLabel
+            key={v.value}
+            classes={fclClasses}
+            value={v.value}
+            control={<Radio/>}
+            label={v.label}
+            disabled={props.value.enforced}
+          />)}
+        </RadioGroup>
+      </FormControl>
+    </div>
   );
 }
 

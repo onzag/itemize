@@ -31,12 +31,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   sqlEqual: standardSQLEqualFn,
-
-  supportsAutocomplete: true,
   // the validator
   validate: (n: PropertyDefinitionSupportedNumberType) => {
     if (isNaN(n)) {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
     }
 
     if (n > MAX_SUPPORTED_REAL) {

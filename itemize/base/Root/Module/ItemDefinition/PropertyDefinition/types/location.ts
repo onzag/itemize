@@ -139,7 +139,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       typeof l.txt !== "string" ||
       (typeof l.atxt !== "string" && l.atxt !== null)
     ) {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
     }
 
     return null;

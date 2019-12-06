@@ -35,12 +35,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
   validate: (d: PropertyDefinitionSupportedDateType) => {
     if (d === "Invalid Date") {
-      return PropertyInvalidReason.INVALID_DATETIME;
+      return PropertyInvalidReason.INVALID_VALUE;
     }
 
     const dateForm = Moment(d, DATETIME_FORMAT);
     if (!dateForm.isValid() || dateForm.format(DATETIME_FORMAT) !== d) {
-      return PropertyInvalidReason.INVALID_DATETIME;
+      return PropertyInvalidReason.INVALID_VALUE;
     }
     return null;
   },

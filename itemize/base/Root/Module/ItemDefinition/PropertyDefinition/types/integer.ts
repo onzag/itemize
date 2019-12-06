@@ -29,12 +29,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   sqlEqual: standardSQLEqualFn,
-
-  supportsAutocomplete: true,
   // it gotta be validated to check it's a number
   validate: (n: PropertyDefinitionSupportedIntegerType) => {
     if (isNaN(n) || !Number.isInteger(n)) {
-      return PropertyInvalidReason.UNSPECIFIED;
+      return PropertyInvalidReason.INVALID_VALUE;
     } else if (n > MAX_SUPPORTED_INTEGER) {
       return PropertyInvalidReason.TOO_LARGE;
     } else if (n < MIN_SUPPORTED_INTEGER) {

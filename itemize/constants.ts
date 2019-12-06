@@ -74,9 +74,13 @@ export const ITEM_CALLOUT_EXCLUDED_I18N = [
 
 // This is for small use anywhere language data
 export const LOCALE_I18N = [
+  // language name
   "name",
+  // decimal separator that is used, comma or dot
   "number_decimal_separator",
+  // word separator, comma, usually
   "word_separator",
+  // N$ or $N depending if currency symbol goes before or after
   "currency_format",
 
   // For quilljs editor
@@ -116,18 +120,6 @@ export const LOCALE_I18N = [
   "file_uploader_delete_file",
   "image_uploader_delete_file",
 
-  // for item definition element
-  "extended_properties_wizard_label",
-  "base_properties_wizard_label",
-  "rare_properties_wizard_label",
-  "moderate_properties_wizard_label",
-  "wizard_next",
-  "wizard_prev",
-  "wizard_submit",
-  "wizard_invalid_message",
-  "rare_properties_label",
-  "moderate_properties_label",
-
   // for item definition too
   "callout_exclude_warning",
 
@@ -137,6 +129,7 @@ export const LOCALE_I18N = [
   "unit_dialog_metric",
   "unit_dialog_imperial",
 
+  // basic base errors
   "error.INVALID_CREDENTIALS",
   "error.BLOCKED",
   "error.CANT_CONNECT",
