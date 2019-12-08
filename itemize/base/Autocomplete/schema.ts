@@ -2,7 +2,7 @@ const singleFilterSchema = {
   $id: "SingleFilterSchema",
   type: "object",
   patternProperties: {
-    "^[A-Z_]+$": {},
+    "^[A-Za-z_]+$": {},
   },
   additionalProperties: false,
 };
@@ -26,7 +26,7 @@ const valueSchema = {
       },
     },
     filter: {
-      $ref: "#/definitions/SingleFilterSchema",
+      $ref: "SingleFilterSchema",
     },
   },
   required: ["type", "value"],
@@ -43,19 +43,21 @@ const filterSchema = {
     values: {
       type: "array",
       items: {
-        oneOf: [
-          {
-            $ref: "#/definitions/ValueSchema",
-          },
-          {
-            $ref: "#/definitions/FilterSchema",
-          },
-        ],
+        $ref: "ValueSchema",
       },
+    },
+    filters: {
+      type: "array",
+      items: {
+        $ref: "FilterSchema",
+      },
+    },
+    filter: {
+      $ref: "SingleFilterSchema",
     },
   },
   additionalProperties: false,
-  required: ["type", "values"],
+  required: ["type", "filter"],
 };
 
 export default {
@@ -72,17 +74,16 @@ export default {
     values: {
       type: "array",
       items: {
-        oneOf: [
-          {
-            $ref: "#/definitions/ValueSchema",
-          },
-          {
-            $ref: "#/definitions/FilterSchema",
-          },
-        ],
+        $ref: "ValueSchema",
+      },
+    },
+    filters: {
+      type: "array",
+      items: {
+        $ref: "FilterSchema",
       },
     },
   },
   additionalProperties: false,
-  required: ["type", "values"],
+  required: ["type"],
 };

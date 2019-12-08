@@ -25,6 +25,7 @@ import {
 import { IItemRawJSONDataType } from "../base/Root/Module/ItemDefinition/Item";
 import { IPropertiesValueMappingDefinitonRawJSONDataType } from "../base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton";
 import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
+import { IFilterRawJSONDataType, IAutocompleteValueRawJSONDataType } from "../base/Autocomplete";
 
 export function checkConditionalRuleSet(
   rawData: IConditionalRuleSetRawJSONDataType,
@@ -870,4 +871,41 @@ export function checkRoot(
       );
     });
   }
+}
+
+export function checkAutocompleteFilterAndValues(
+  rawData: Array<IFilterRawJSONDataType | IAutocompleteValueRawJSONDataType>,
+  supportedLanguages: string[],
+  traceback: Traceback,
+) {
+  rawData.forEach((value, index) => {
+    if (value.type === "filter") {
+      if (value.values) {
+        checkAutocompleteFilterAndValues(
+          value.values,
+          supportedLanguages,
+          traceback.newTraceToBit(index).newTraceToBit("values"),
+        );
+      }
+      if (value.filters) {
+        checkAutocompleteFilterAndValues(
+          value.filters,
+          supportedLanguages,
+          traceback.newTraceToBit(index).newTraceToBit("filters"),
+        );
+      }
+    } else {
+      if (value.i18n) {
+        const i18nTraceback = traceback.newTraceToBit(index).newTraceToBit("i18n");
+        supportedLanguages.forEach((language) => {
+          if (!value.i18n[language]) {
+            throw new CheckUpError(
+              "Missing locale value for language " + language,
+              i18nTraceback,
+            );
+          }
+        });
+      }
+    }
+  });
 }

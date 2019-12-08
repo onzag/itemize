@@ -1,9 +1,9 @@
 {
     "type": "autocomplete",
-    "values": [
+    "filters": [
         {
             "type": "filter",
-            "filters": {
+            "filter": {
                 "group_name": "numbers"
             },
             "values": [
@@ -91,7 +91,7 @@
         },
         {
             "type": "filter",
-            "filters": {
+            "filter": {
                 "group_name": "letters"
             },
             "values": [

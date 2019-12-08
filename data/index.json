@@ -4,5 +4,8 @@
     "../itemize/data/test",
     "../itemize/data/users"
   ],
-  "i18n": "../itemize/data/index.properties"
+  "i18n": "../itemize/data/index.properties",
+  "autocomplete": [
+    "../itemize/data/test.autocomplete.json"
+  ]
 }

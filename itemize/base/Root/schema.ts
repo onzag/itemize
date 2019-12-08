@@ -11,7 +11,7 @@ export default {
       },
       minItems: 1,
     },
-    autocompletes: {
+    autocomplete: {
       type: "array",
       items: {
         type: "string",

@@ -10,6 +10,7 @@ import {
   PropertyDefinitionSearchInterfacesType,
 } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { IRootRawJSONDataType } from "../base/Root";
+import { IAutocompleteRawJSONDataType } from "../base/Autocomplete";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import {
@@ -52,6 +53,7 @@ import {
   MODULE_AND_ITEM_DEF_I18N,
   MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY,
 } from "../constants";
+import { buildAutocomplete } from "./autocomplete";
 
 if (process.env.NODE_ENV === "production") {
   throw new Error("This script cannot run in production mode");
@@ -71,6 +73,7 @@ interface IFileRootDataRawUntreatedJSONDataType {
   type: "root";
   includes: string[];
   i18n: string;
+  autocomplete?: string[];
 }
 
 // this is the raw untreated json for the module
@@ -229,6 +232,25 @@ async function buildData(rawData: any) {
       JSON.stringify(resultData),
     );
   }));
+
+  let autocomplete: IAutocompleteRawJSONDataType[] = [];
+  if (fileData.data.autocomplete) {
+    const autocompleteTraceback = traceback.newTraceToBit("autocomplete");
+    autocomplete = await Promise.all(fileData.data.autocomplete.map((autocompleteSource, index) => {
+      return buildAutocomplete(
+        path.join(path.dirname(actualLocation), autocompleteSource),
+        supportedLanguages,
+        autocompleteTraceback.newTraceToBit(index),
+      );
+    }));
+  }
+
+  const autocompleteFileName = path.join("dist", "autocomplete.json");
+  console.log("emiting " + colors.green(autocompleteFileName));
+  await fsAsync.writeFile(
+    autocompleteFileName,
+    JSON.stringify(autocomplete),
+  );
 }
 
 /**
