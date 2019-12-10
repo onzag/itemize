@@ -156,6 +156,7 @@ export interface IPropertyEntryBaseProps {
   forceInvalid?: boolean;
   poked?: boolean;
   autoFocus?: boolean;
+  forId: number;
 }
 
 interface IPropertyEntryStylesApplierProps extends IPropertyEntryBaseProps, WithStyles<typeof generalStyles> {

@@ -13,10 +13,13 @@ import { DATETIME_FORMAT, TIME_FORMAT, DATE_FORMAT } from "../constants";
 import { GraphQLError } from "graphql";
 import { GraphQLEndpointError, GraphQLEndpointErrorType } from "../base/errors";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
-import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql";
+import { serverSideIndexChecker, serverSideAutocompleteChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import restServices from "./rest";
 import { customUserQueries } from "./user/queries";
 import { customUserMutations } from "./user/mutations";
+import Autocomplete, { IAutocompleteRawJSONDataType } from "../base/Autocomplete";
+
+// TODO comment and document
 
 // Setting the parsers, postgresql comes with
 // its own way to return this data and I want it
@@ -41,6 +44,7 @@ const app = express();
 
 export interface IAppDataType {
   root: Root;
+  autocompletes: Autocomplete[];
   index: string;
   config: any;
   knex: Knex;
@@ -163,15 +167,20 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   let index: any;
   let build: any;
   let root: any;
-  [config, index, rawBuild] = await Promise.all([
+  let autocompleteSource: string;
+  [config, index, rawBuild, autocompleteSource] = await Promise.all([
     fsAsync.readFile("./dist/config.json", "utf8"),
     fsAsync.readFile("./dist/data/index.html", "utf8"),
     fsAsync.readFile("./dist/data/build.en.json", "utf8"),
+    fsAsync.readFile("./dist/autocomplete.json", "utf8"),
   ]);
   config = JSON.parse(config);
   build = JSON.parse(rawBuild);
 
   root = new Root(build.root);
+
+  const autocompletes = JSON.parse(autocompleteSource)
+    .map((s: IAutocompleteRawJSONDataType) => (new Autocomplete(s)));
 
   // Retrieve the config for the database
   const dbConfig = JSON.parse(await fsAsync.readFile(
@@ -196,9 +205,11 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   });
 
   PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
+  PropertyDefinition.autocompleteChecker = serverSideAutocompleteChecker.bind(null, autocompletes);
 
   initializeApp({
     root,
+    autocompletes,
     index,
     config,
     knex,

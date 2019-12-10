@@ -40,28 +40,31 @@
         {
             "id": "string_autocomplete",
             "type": "string",
-            "autocomplete": "test_autocomplete"
+            "autocomplete": "test-group"
         },
         {
             "id": "string_autocomplete_nullable",
             "type": "string",
             "nullable": true,
-            "autocomplete": "test_autocomplete"
+            "autocomplete": "test-group"
         },
         {
             "id": "string_autocomplete_nullable_enforced",
             "type": "string",
             "nullable": true,
-            "autocomplete": "test_autocomplete",
+            "autocomplete": "test-group",
             "autocompleteIsEnforced": true
         },
         {
             "id": "string_autocomplete_nullable_locale",
             "type": "string",
             "nullable": true,
-            "autocomplete": "test_autocomplete",
+            "autocomplete": "test",
             "autocompleteIsEnforced": true,
-            "autocompleteSupportsLocale": true
+            "autocompleteSupportsLocale": true,
+            "autocompleteFilterFromProperty": {
+                "group_name": "string_autocomplete_nullable_enforced"
+            }
         },
 
         {

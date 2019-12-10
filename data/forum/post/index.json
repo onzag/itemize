@@ -12,7 +12,9 @@
 			"id": "topic",
 			"type": "string",
 			"autocomplete": "topics",
-      "autocompleteSetFromProperty": ["category"],
+      "autocompleteFilterFromProperty": {
+        "category": "category"
+      },
       "autocompleteIsEnforced": true,
       "autocompleteSupportsLocale": true
 		},

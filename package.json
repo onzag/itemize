@@ -15,11 +15,13 @@
   "author": "Edward Gonzalez",
   "license": "ISC",
   "dependencies": {
+    "@types/diacritics": "^1.3.1",
     "@types/dompurify": "^2.0.0",
     "@types/graphql-fields": "^1.3.2",
     "@types/jsdom": "^12.2.4",
     "@types/jsonwebtoken": "^8.3.5",
     "body-parser": "^1.19.0",
+    "diacritics": "^1.3.0",
     "dompurify": "^2.0.7",
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",

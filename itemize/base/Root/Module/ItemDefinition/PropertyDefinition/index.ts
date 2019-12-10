@@ -12,6 +12,7 @@ import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefini
 import { GraphQLEndpointError } from "../../../../errors";
 import { DOMWindow } from "../../../../util";
 import equals from "deep-equal";
+import { ISingleFilterRawJSONDataType } from "../../../../Autocomplete";
 
 export enum PropertyInvalidReason {
   INVALID_VALUE = "INVALID_VALUE",
@@ -90,7 +91,9 @@ export interface IPropertyDefinitionRawJSONDataType {
   // data for autocomplete
   autocomplete?: string;
   // uses a property attribute
-  autocompleteSetFromProperty?: string[];
+  autocompleteFilterFromProperty?: {
+    [keyName: string]: string,
+  };
   // whether it's enforced or not
   autocompleteIsEnforced?: boolean;
   // whether the autocomplete supports prefills
@@ -169,7 +172,7 @@ export interface IPropertyDefinitionAlternativePropertyType {
   property: string;
 }
 
-export type PropertyDefinitionIndexCheckerFunctionType =
+export type PropertyDefinitionCheckerFunctionType =
   (property: PropertyDefinition, value: PropertyDefinitionSupportedType, id: number) => Promise<boolean>;
 
 async function clientSideIndexChecker(
@@ -214,12 +217,58 @@ async function clientSideIndexChecker(
   }
 }
 
+async function clientSideAutocompleteChecker(
+  property: PropertyDefinition,
+  value: PropertyDefinitionSupportedType,
+  id: number,
+) {
+  if (value === null) {
+    return true;
+  }
+
+  const filters = property.getAutocompletePopulatedFiltersFor(id);
+  const autocompleteId = property.getAutocompleteId();
+
+  if (
+    property.stateLastAutocompleteCheck[id] &&
+    property.stateLastAutocompleteCheck[id].value === value &&
+    equals(property.stateLastAutocompleteCheck[id].filters, filters)
+  ) {
+    return property.stateLastAutocompleteCheck[id].valid;
+  }
+
+  // TODO this can actually be cached with the build identifier again
+  const result = await fetch("/rest/autocomplete-check/" + autocompleteId, {
+    method: "POST",
+    cache: "no-cache",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      value,
+      filters,
+    }),
+  });
+  try {
+    const output = await result.json();
+    property.stateLastAutocompleteCheck[id] = {
+      valid: !!output,
+      value,
+      filters,
+    };
+    return !!output;
+  } catch (err) {
+    return true;
+  }
+}
+
 // The class itself
 export default class PropertyDefinition {
   public static supportedTypesStandard = supportedTypesStandard;
 
   // this static is required to be set in order to check for indexes
-  public static indexChecker: PropertyDefinitionIndexCheckerFunctionType = clientSideIndexChecker;
+  public static indexChecker: PropertyDefinitionCheckerFunctionType = clientSideIndexChecker;
+  public static autocompleteChecker: PropertyDefinitionCheckerFunctionType = clientSideAutocompleteChecker;
 
   public static getQualifiedPolicyPrefix(policyType: string, policyName: string) {
     return PREFIX_BUILD(
@@ -380,6 +429,14 @@ export default class PropertyDefinition {
       valid: boolean,
     },
   };
+  // tslint:disable-next-line: member-ordering
+  public stateLastAutocompleteCheck: {
+    [slotId: number]: {
+      value: PropertyDefinitionSupportedType,
+      valid: boolean,
+      filters: ISingleFilterRawJSONDataType,
+    },
+  };
 
   /**
    * Builds a property definition
@@ -427,6 +484,7 @@ export default class PropertyDefinition {
     this.stateValueModified = {};
     this.stateinternalValue = {};
     this.stateLastUniqueCheck = {};
+    this.stateLastAutocompleteCheck = {};
   }
 
   public getEnforcedValue(id: number): {
@@ -809,6 +867,17 @@ export default class PropertyDefinition {
           return PropertyInvalidReason.NOT_UNIQUE;
         }
       }
+
+      if (this.hasAutocomplete() && this.isAutocompleteEnforced()) {
+        const filters = this.getAutocompletePopulatedFiltersFor(id);
+        if (
+          this.stateLastAutocompleteCheck[id] &&
+          this.stateLastAutocompleteCheck[id].value === value &&
+          equals(this.stateLastAutocompleteCheck[id].filters, filters)
+        ) {
+          return PropertyInvalidReason.INVALID_VALUE;
+        }
+      }
     }
 
     if (this.invalidIf) {
@@ -850,7 +919,12 @@ export default class PropertyDefinition {
       }
     }
 
-    // TODO autocomplete enforced check
+    if (this.hasAutocomplete() && this.isAutocompleteEnforced()) {
+      const isValidAutocomplete = await PropertyDefinition.autocompleteChecker(this, value, id);
+      if (!isValidAutocomplete) {
+        return PropertyInvalidReason.INVALID_VALUE;
+      }
+    }
     return null;
   }
 
@@ -952,6 +1026,13 @@ export default class PropertyDefinition {
   }
 
   /**
+   * Returns the autocomplete id
+   */
+  public getAutocompleteId() {
+    return this.rawData.autocomplete;
+  }
+
+  /**
    * Checks whether the property autocomplete is enforced
    */
   public isAutocompleteEnforced() {
@@ -963,6 +1044,20 @@ export default class PropertyDefinition {
    */
   public isAutocompleteLocalized() {
     return !!this.rawData.autocompleteSupportsLocale;
+  }
+
+  public getAutocompletePopulatedFiltersFor(id: number): ISingleFilterRawJSONDataType {
+    if (!this.rawData.autocompleteFilterFromProperty) {
+      return null;
+    }
+
+    const result: ISingleFilterRawJSONDataType = {};
+    Object.keys(this.rawData.autocompleteFilterFromProperty).forEach((key) => {
+      result[key] = this.parentItemDefinition
+        .getPropertyDefinitionFor(this.rawData.autocompleteFilterFromProperty[key], true).getCurrentValueClean(id);
+    });
+
+    return result;
   }
 
   /**

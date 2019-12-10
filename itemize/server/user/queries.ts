@@ -6,6 +6,8 @@ import { jwtVerify, jwtSign } from "../token";
 import { GraphQLEndpointError } from "../../../itemize/base/errors";
 import { IServerSideTokenDataType } from "../resolvers/basic";
 
+// TODO comment and document
+
 export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinitionType => {
   const userModule = appData.root.getModule("users");
   const userIdef = userModule.getItemDefinitionFor(["user"]);

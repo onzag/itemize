@@ -3,11 +3,14 @@ import express from "express";
 import http from "http";
 import path from "path";
 import Module from "../base/Root/Module";
-import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql";
+import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import bodyParser from "body-parser";
 import { countries } from "../resources";
+import { IAutocompleteOutputType } from "../base/Autocomplete";
+
+// TODO comment and document
 
 export default function restServices(appData: IAppDataType) {
   const router = express.Router();
@@ -27,8 +30,6 @@ export default function restServices(appData: IAppDataType) {
   });
 
   async function routerIndexChecker(property: PropertyDefinition, req: express.Request, res: express.Response) {
-    res.setHeader("content-type", "application/json; charset=utf-8");
-
     const value: any = req.body.value;
     const id: number = req.body.id;
     if (typeof id !== "number" && id !== null) {
@@ -54,6 +55,7 @@ export default function restServices(appData: IAppDataType) {
         return;
       }
     }
+    res.setHeader("content-type", "application/json; charset=utf-8");
     const isValid = await serverSideIndexChecker(appData.knex, property, value, id);
     res.end(JSON.stringify(isValid));
   }
@@ -132,6 +134,51 @@ export default function restServices(appData: IAppDataType) {
   });
 
   appData.root.getAllModules().forEach(buildRouteForModule);
+
+  appData.autocompletes.forEach((autocomplete) => {
+    router.post("/autocomplete/" + autocomplete.getName() + "/", (req, res) => {
+      const languageLocale: string = req.body.lang;
+      const query: string = req.body.query;
+      const filters: any = req.body.filters || {};
+
+      if (typeof languageLocale !== "string" && typeof languageLocale !== "undefined" && languageLocale !== null) {
+        res.status(400);
+        res.end("Invalid Input on lang");
+        return;
+      }
+
+      if (typeof query !== "string") {
+        res.status(400);
+        res.end("Invalid Input on query");
+        return;
+      }
+
+      let results: IAutocompleteOutputType[];
+      if (languageLocale) {
+        results = autocomplete.findI18nRecommendations(query, languageLocale, filters);
+      } else {
+        results = autocomplete.findRecommendations(query, filters);
+      }
+
+      res.setHeader("content-type", "application/json; charset=utf-8");
+      res.end(JSON.stringify(results));
+    });
+
+    router.post("/autocomplete-check/" + autocomplete.getName() + "/", (req, res) => {
+      const value: string = req.body.value;
+      const filters: any = req.body.filters || {};
+
+      if (typeof value !== "string") {
+        res.status(400);
+        res.end("Invalid Input on query");
+        return;
+      }
+
+      res.setHeader("content-type", "application/json; charset=utf-8");
+      const isValid = !!autocomplete.findExactValueFor(value, filters);
+      res.end(JSON.stringify(isValid));
+    });
+  });
 
   router.use((req, res) => {
     res.status(404);

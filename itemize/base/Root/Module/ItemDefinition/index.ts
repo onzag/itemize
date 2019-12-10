@@ -831,7 +831,7 @@ export default class ItemDefinition {
     const existInFirstLayer: boolean =
       this.getAllPropertyDefinitionsAndExtensions()
       .filter((pd) => !onlyCheckProperties ? true : onlyCheckProperties.includes(pd.getId()))
-      .some((pd) => pd.isUnique());
+      .some((pd) => pd.isUnique() || (pd.hasAutocomplete() && pd.isAutocompleteEnforced()));
     if (existInFirstLayer) {
       return true;
     } else if (ignoreItems) {

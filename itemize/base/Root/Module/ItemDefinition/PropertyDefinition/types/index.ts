@@ -99,7 +99,7 @@ export interface IPropertyDefinitionSupportedType {
 
   // Items that have this field support fetch for autocomplete
   // fields using rest endpoints, this includes support for
-  // autocomplete, autocompleteSetFromProperty, autocompleteIsEnforced
+  // autocomplete, autocompleteFilterFromProperty, autocompleteIsEnforced
   // and autocompleteSupportsPreffils
   supportsAutocomplete?: boolean;
 

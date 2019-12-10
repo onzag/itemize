@@ -7,8 +7,8 @@ export function FrontPage() {
     <ModuleProvider module="test">
       <ItemDefinitionProvider itemDefinition="item_definition">
         {/* <Entry id="string_autocomplete"/>
-        <Entry id="string_autocomplete_nullable"/>
-        <Entry id="string_autocomplete_nullable_enforced"/> */}
+        <Entry id="string_autocomplete_nullable"/> */}
+        <Entry id="string_autocomplete_nullable_enforced"/>
         <Entry id="string_autocomplete_nullable_locale"/>
         <StatsForNerds
           propertyIds={

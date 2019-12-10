@@ -19,8 +19,8 @@
                     "type": "value",
                     "value": "twoValue",
                     "i18n": {
-                        "en": "dos",
-                        "es": "two"
+                        "en": "two",
+                        "es": "dos"
                     }
                 },
                 {

@@ -669,11 +669,12 @@ export function checkPropertyDefinition(
   }
 
   // Let's check whether the autocomplete properties are there
-  if (rawData.autocompleteSetFromProperty) {
-    const autocompleteSetFromPropertyTraceback =
-      traceback.newTraceToBit("autocompleteSetFromProperty");
+  if (rawData.autocompleteFilterFromProperty) {
+    const autocompleteFilterFromPropertyTraceback =
+      traceback.newTraceToBit("autocompleteFilterFromProperty");
 
-    rawData.autocompleteSetFromProperty.forEach((propertyId, index) => {
+    Object.keys(rawData.autocompleteFilterFromProperty).forEach((keyId) => {
+      const propertyId = rawData.autocompleteFilterFromProperty[keyId];
       // Also for property definitions prop extensions are valid
       // to access in this autocomplete sets
       if (!ItemDefinition.getPropertyDefinitionRawFor(
@@ -684,7 +685,7 @@ export function checkPropertyDefinition(
       )) {
         throw new CheckUpError(
           "Invalid autocomplete property to funnel",
-          autocompleteSetFromPropertyTraceback.newTraceToBit(index),
+          autocompleteFilterFromPropertyTraceback.newTraceToBit(keyId),
         );
       }
     });

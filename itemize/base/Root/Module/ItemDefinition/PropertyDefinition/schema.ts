@@ -63,11 +63,12 @@ export default {
     autocomplete: {
       type: "string",
     },
-    autocompleteSetFromProperty: {
-      type: "array",
-      items: {
+    autocompleteFilterFromProperty: {
+      type: "object",
+      additionalProperties: {
         type: "string",
       },
+      minItems: 1,
     },
     autocompleteIsEnforced: {
       type: "boolean",
@@ -191,7 +192,7 @@ export default {
     ConditionalRuleSet: ConditionalRuleSetSchema,
   },
   dependencies: {
-    autocompleteSetFromProperty: ["autocomplete"],
+    autocompleteFilterFromProperty: ["autocomplete"],
     autocompleteIsEnforced: ["autocomplete"],
     autocompleteSupportsPrefills: ["autocomplete"],
     autocompleteSupportsLocale: ["autocomplete", "autocompleteIsEnforced"],

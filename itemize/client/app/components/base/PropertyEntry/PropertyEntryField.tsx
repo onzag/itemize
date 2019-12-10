@@ -13,31 +13,11 @@ import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import equals from "deep-equal";
-import { PropertyDefinitionSupportedStringType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/string";
-
-const SUGGESTIONS_ARRAY = [
-  {
-    i18nValue: "one",
-    value: "oneValue",
-  },
-  {
-    i18nValue: "two",
-    value: "twoValue",
-  },
-  {
-    i18nValue: "three",
-    value: "threeValue",
-  },
-];
+import { IAutocompleteOutputType } from "../../../../../base/Autocomplete";
 
 interface IPropertyEntryFieldState {
-  suggestions: IPropertyEntryAutocompleteSuggestion[];
+  suggestions: IAutocompleteOutputType[];
   visible: boolean;
-}
-
-interface IPropertyEntryAutocompleteSuggestion {
-  i18nValue: string;
-  value: PropertyDefinitionSupportedStringType;
 }
 
 export default class PropertyEntryField
@@ -123,7 +103,7 @@ export default class PropertyEntryField
       value = autosuggestOverride.newValue;
       internalValue = value;
       if (this.props.property.isAutocompleteLocalized()) {
-        const suggestionFound = this.state.suggestions.find((s) => s.i18nValue === internalValue);
+        const suggestionFound = this.state.suggestions.find((s) => s.i18n === internalValue);
         value = suggestionFound ? suggestionFound.value : value;
       }
     } else {
@@ -306,7 +286,7 @@ export default class PropertyEntryField
   }
 
   public renderAutosuggestSuggestion(
-    suggestion: IPropertyEntryAutocompleteSuggestion,
+    suggestion: IAutocompleteOutputType,
     params: Autosuggest.RenderSuggestionParams,
   ) {
     // returns a specific suggestion
@@ -315,7 +295,7 @@ export default class PropertyEntryField
     // because we support numbers and stuff we need to know what value
     // we are matching against, a localized or non localized one
     const valueToMatch: string = this.props.property.isAutocompleteLocalized() ?
-      suggestion.i18nValue :
+      suggestion.i18n :
       suggestion.value;
     const matches = match(valueToMatch, params.query);
     const parts = parse(valueToMatch, matches);
@@ -342,32 +322,54 @@ export default class PropertyEntryField
   }
 
   public getSuggestionValue(
-    suggestion: IPropertyEntryAutocompleteSuggestion,
+    suggestion: IAutocompleteOutputType,
   ) {
     // just return the suggestion value as it will want to
     // be set in the input, we localize it if deemed necessary
     return this.props.property.isAutocompleteLocalized() ?
-      suggestion.i18nValue :
+      suggestion.i18n :
       suggestion.value;
   }
 
-  public onSuggestionsFetchRequested({value}) {
+  public async onSuggestionsFetchRequested({value}) {
     const currentFetchRequestTimeId = (new Date()).getTime();
     this.lastAutocompleteFetchRequestTime = currentFetchRequestTimeId;
 
-    setTimeout(() => {
+    // TODO use service workers on this index check given the request is equal, pass the build
+    // number on the fetch request, and if the request is equal this means the output should be the same
+    // because the build number and everything is the same
+    const result =
+      await fetch("/rest/autocomplete/" + this.props.property.getAutocompleteId(), {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          lang: this.props.property.isAutocompleteLocalized() ? this.props.language : null,
+          query: value,
+          filters: this.props.property.getAutocompletePopulatedFiltersFor(this.props.forId),
+        }),
+      });
+
+    try {
+      const output: IAutocompleteOutputType[] = await result.json();
       if (currentFetchRequestTimeId === this.lastAutocompleteFetchRequestTime) {
         this.setState({
-          suggestions: SUGGESTIONS_ARRAY,
+          suggestions: output,
         });
       }
       if (this.props.property.isAutocompleteLocalized()) {
-        const suggestionFound = SUGGESTIONS_ARRAY.find((s) => s.i18nValue === this.props.value.internalValue || "");
+        const suggestionFound = output.find((s) => s.i18n === this.props.value.internalValue || "");
         if (suggestionFound && suggestionFound.value !== this.props.value.value) {
           this.props.onChange(suggestionFound.value, this.props.value.internalValue);
         }
       }
-    }, 5000);
+    } catch (err) {
+      this.setState({
+        suggestions: [],
+      });
+    }
   }
 
   public clearSuggestions() {

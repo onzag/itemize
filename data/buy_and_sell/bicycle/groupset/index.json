@@ -374,7 +374,7 @@
 			"id": "level",
 			"type": "string",
 			"autocomplete": "groupset-levels",
-			"autocompleteSetFromProperty": ["manufacturer"],
+			"autocompleteFilterFromProperty": ["manufacturer"],
 			"autocompleteSupportsPrefills": true,
 			"nullable": true
 		},

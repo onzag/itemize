@@ -998,7 +998,8 @@ async function getI18nPropertyData(
       property.type === "currency" ||
       property.type === "integer" ||
       property.type === "year" ||
-      property.type === "unit"
+      property.type === "unit" ||
+      property.autocompleteIsEnforced
     ) && !property.values
   ) {
     errorRequiredProperties.push("error.INVALID_VALUE");

@@ -140,6 +140,7 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
                 value={propertyValue}
                 onChange={onChange}
                 forceInvalid={props.showAsInvalid}
+                forId={itemDefinitionContextualValue.forId}
               />
             );
           }

@@ -3,7 +3,6 @@ import PropertyDefinition from "../PropertyDefinition";
 import { ISQLTableRowValue, ISQLTableDefinitionType } from "../../../sql";
 import { IGQLValue } from "../../../gql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces";
-import { CONNECTOR_SQL_COLUMN_FK_NAME } from "../../../../../constants";
 import Knex from "knex";
 
 export function getStandardSQLFnFor(type: string):
@@ -219,30 +218,4 @@ export function buildSQLQueryForProperty(
     knexBuilder,
     dictionary,
   );
-}
-
-export async function serverSideIndexChecker(
-  knex: Knex,
-  property: PropertyDefinition,
-  value: PropertyDefinitionSupportedType,
-  id: number,
-) {
-  if (value === null) {
-    return true;
-  }
-  const moduleIDColumn = property.checkIfIsExtension() ? "id" : CONNECTOR_SQL_COLUMN_FK_NAME;
-  const qualifiedParentName = property.checkIfIsExtension() ?
-    property.getParentModule().getQualifiedPathName() :
-    property.getParentItemDefinition().getQualifiedPathName();
-  const query = knex.select(
-    moduleIDColumn,
-  ).from(qualifiedParentName)
-  .where(
-    property.getPropertyDefinitionDescription().sqlEqual(value, "", property.getId(), knex),
-  );
-  if (id !== null) {
-    query.andWhere(moduleIDColumn, "!=", id);
-  }
-  const result = await query;
-  return !result.length;
 }

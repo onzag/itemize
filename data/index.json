@@ -6,6 +6,7 @@
   ],
   "i18n": "../itemize/data/index.properties",
   "autocomplete": [
-    "../itemize/data/test.autocomplete.json"
+    "../itemize/data/test.autocomplete.json",
+    "../itemize/data/test-group.autocomplete.json"
   ]
 }

@@ -1,0 +1,17 @@
+{
+    "type": "autocomplete",
+    "values": [
+        {
+            "type": "value",
+            "value": "letters"
+        },
+        {
+            "type": "value",
+            "value": "numbers"
+        },
+        {
+            "type": "value",
+            "value": "other"
+        }
+    ]
+}

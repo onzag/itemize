@@ -24,6 +24,7 @@ export interface IItemDefinitionContextType {
   blocked: boolean;
   blockedButDataAccessible: boolean;
   loadError: GraphQLEndpointErrorType;
+  forId: number;
   onPropertyChange: (
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
@@ -401,6 +402,7 @@ class ActualItemDefinitionProvider extends
           blocked: this.state.isBlocked,
           blockedButDataAccessible: this.state.isBlockedButDataIsAccessible,
           loadError: this.state.loadError,
+          forId: this.props.forId || null,
         }}
       >
         {this.props.children}
