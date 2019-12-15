@@ -134,14 +134,14 @@ export default class ConditionalRuleSet {
       // lets get the property value as for now
       let actualPropertyValue = null;
       if (rawDataAsProperty.property === "&this") {
-        actualPropertyValue = this.parentPropertyDefinition.getCurrentValueClean(id);
+        actualPropertyValue = this.parentPropertyDefinition.getCurrentValue(id);
       } else {
         actualPropertyValue = (this.parentItemDefinition ?
           this.parentItemDefinition
             .getPropertyDefinitionFor(rawDataAsProperty.property, true)
-            .getCurrentValueClean(id) :
+            .getCurrentValue(id) :
           this.parentModule.getPropExtensionFor(rawDataAsProperty.property)
-            .getCurrentValueClean(id));
+            .getCurrentValue(id));
       }
 
       if (rawDataAsProperty.attribute && actualPropertyValue !== null) {
@@ -154,9 +154,9 @@ export default class ConditionalRuleSet {
         actualComparedValue = this.parentItemDefinition ?
           this.parentItemDefinition
             .getPropertyDefinitionFor(propertyInQuestion, true)
-            .getCurrentValueClean(id) :
+            .getCurrentValue(id) :
           this.parentModule.getPropExtensionFor(propertyInQuestion)
-            .getCurrentValueClean(id);
+            .getCurrentValue(id);
       }
 
       if (rawDataAsProperty.valueAttribute && actualComparedValue !== null) {

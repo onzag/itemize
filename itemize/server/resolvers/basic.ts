@@ -461,7 +461,7 @@ const serverSideCheckItemDefinitionAgainstDebug = Debug("resolvers:serverSideChe
  * valid and that the gqlArgValue provided is a match
  * for this item definition current value, remember
  * that in order to set the state to the gqlArgValue
- * you should run itemDefinition.applyValueFromGQL(gqlArgValue);
+ * you should run itemDefinition.applyValue(gqlArgValue);
  * @param itemDefinition the item definition in question
  * @param gqlArgValue the arg value that was set
  * @param id the stored item id, if available, or null

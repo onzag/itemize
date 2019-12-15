@@ -320,7 +320,7 @@ class ActualItemDefinitionProvider extends
           }
 
           const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
-          this.itemDefinition.applyValueFromGQL(
+          this.itemDefinition.applyValue(
             this.props.forId || null,
             recievedFields,
             false,

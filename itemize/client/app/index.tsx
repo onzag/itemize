@@ -171,7 +171,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
         if (userItemDefinition.hasAppliedValueTo(this.tokenState.id)) {
           console.log("found an instance, triggering update");
           const property = userItemDefinition.getPropertyDefinitionFor(propertyId, false);
-          property.applyValueFromGQL(this.tokenState.id, actualPropertyResult);
+          property.applyValue(this.tokenState.id, actualPropertyResult);
           userItemDefinition.triggerListeners(this.tokenState.id);
         }
       }

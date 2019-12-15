@@ -624,31 +624,9 @@ export default class ItemDefinition {
   }
 
   /**
-   * Applies an item definition value the state of this
-   * instance
-   * @param value the value, be careful, it will choke if invalid
-   */
-  public applyState(id: number, value: IItemDefinitionStateType) {
-    this.stateHasAppliedValueTo[id] = true;
-    this.stateGQLAppliedValue[id] = value.gqlOriginalAppliedValue;
-
-    if (value.itemDefPath.join("/") !== this.getPath().join("/")) {
-      throw new Error("Attempted to apply unmatching values");
-    }
-
-    value.items.forEach((itemValue) => {
-      this.getItemFor(itemValue.itemId).applyState(id, itemValue);
-    });
-
-    value.properties.forEach((propertyValue) => {
-      this.getPropertyDefinitionFor(propertyValue.propertyId, true).applyState(id, propertyValue);
-    });
-  }
-
-  /**
    * Applies an item definition value from a graphql data
    */
-  public applyValueFromGQL(
+  public applyValue(
     id: number,
     value: {
       [key: string]: any,
@@ -675,7 +653,7 @@ export default class ItemDefinition {
       if (typeof givenValue === "undefined") {
         givenValue = null;
       }
-      property.applyValueFromGQL(id, givenValue);
+      property.applyValue(id, givenValue);
     });
     this.getAllItems().forEach((item) => {
       let givenValue = value[item.getQualifiedIdentifier()];
@@ -683,7 +661,7 @@ export default class ItemDefinition {
         givenValue = null;
       }
       const givenExclusionState = value[item.getQualifiedExclusionStateIdentifier()] || ItemExclusionState.EXCLUDED;
-      item.applyValueFromGQL(id, givenValue, givenExclusionState);
+      item.applyValue(id, givenValue, givenExclusionState);
     });
   }
 

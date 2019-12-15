@@ -381,29 +381,11 @@ export default class Item {
     };
   }
 
-  /**
-   * Appliesa value to this item definition
-   * the value can be invalid and it will be checked
-   * and a proper error be returned when you try to retrieve it
-   * hopefully this means validation as well as in
-   * it cannot be cheated
-   * @param id the id this item is stored
-   * @param value the value of the item
-   */
-  public applyState(id: number, value: IItemState) {
-    this.stateExclusion[id] = value.stateExclusion;
-    this.stateExclusionModified[id] = value.stateExclusionModified;
-
-    if (value.itemDefinitionValue) {
-      this.itemDefinition.applyState(id, value.itemDefinitionValue);
-    }
-  }
-
-  public applyValueFromGQL(id: number, value: {[key: string]: any}, exclusionState: ItemExclusionState) {
+  public applyValue(id: number, value: {[key: string]: any}, exclusionState: ItemExclusionState) {
     this.stateExclusion[id] = exclusionState;
     this.stateExclusionModified[id] = true;
 
-    this.itemDefinition.applyValueFromGQL(id, value || {}, true);
+    this.itemDefinition.applyValue(id, value || {}, true);
   }
 
   public cleanValueFor(

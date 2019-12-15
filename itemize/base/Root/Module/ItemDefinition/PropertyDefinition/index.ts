@@ -504,7 +504,7 @@ export default class PropertyDefinition {
         // superenforced might be a property definition so we got to
         // extract the value in such case
         (this.superEnforcedValue instanceof PropertyDefinition ?
-          this.superEnforcedValue.getCurrentValueClean(id) :
+          this.superEnforcedValue.getCurrentValue(id) :
           this.superEnforcedValue) :
 
         // otherwise in other cases we check the enforced value
@@ -558,7 +558,7 @@ export default class PropertyDefinition {
     return this.rawData.type;
   }
 
-  public getCurrentValueClean(id: number): PropertyDefinitionSupportedType {
+  public getCurrentValue(id: number): PropertyDefinitionSupportedType {
     const possibleEnforcedValue = this.getEnforcedValue(id);
 
     if (possibleEnforcedValue.enforced) {
@@ -575,7 +575,7 @@ export default class PropertyDefinition {
       // or otherwise use the default, which might be undefined
       let defaultValue = typeof this.superDefaultedValue !== "undefined" ?
         (this.superDefaultedValue instanceof PropertyDefinition ?
-          this.superDefaultedValue.getCurrentValueClean(id) :
+          this.superDefaultedValue.getCurrentValue(id) :
           this.superDefaultedValue) : this.rawData.default;
 
       // Also by condition
@@ -642,7 +642,7 @@ export default class PropertyDefinition {
       };
     }
 
-    const value = this.getCurrentValueClean(id);
+    const value = this.getCurrentValue(id);
     const invalidReason = this.isValidValueNoExternalChecking(id, value);
     return {
       userSet: this.stateValueModified[id] || false,
@@ -705,7 +705,7 @@ export default class PropertyDefinition {
       };
     }
 
-    const value = this.getCurrentValueClean(id);
+    const value = this.getCurrentValue(id);
     const invalidReason = await this.isValidValue(id, value);
     return {
       userSet: this.stateValueModified[id] || false,
@@ -814,16 +814,7 @@ export default class PropertyDefinition {
     this.stateinternalValue[id] = internalValue;
   }
 
-  public applyState(
-    id: number,
-    value: IPropertyDefinitionState,
-  ) {
-    this.stateValue[id] = value.stateValue;
-    this.stateValueModified[id] = value.stateValueModified;
-    this.stateinternalValue[id] = value.internalValue;
-  }
-
-  public applyValueFromGQL(
+  public applyValue(
     id: number,
     value: any,
   ) {
@@ -1054,7 +1045,7 @@ export default class PropertyDefinition {
     const result: ISingleFilterRawJSONDataType = {};
     Object.keys(this.rawData.autocompleteFilterFromProperty).forEach((key) => {
       result[key] = this.parentItemDefinition
-        .getPropertyDefinitionFor(this.rawData.autocompleteFilterFromProperty[key], true).getCurrentValueClean(id);
+        .getPropertyDefinitionFor(this.rawData.autocompleteFilterFromProperty[key], true).getCurrentValue(id);
     });
 
     return result;

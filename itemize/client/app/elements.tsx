@@ -391,19 +391,7 @@ export function LogActioner(props: ILogActionerProps) {
                       setTimeout(() => {
                         const passwordPdef =
                           itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
-                        passwordPdef.applyState(null, {
-                          userSet: false,
-                          default: false,
-                          enforced: false,
-                          hidden: false,
-                          valid: false,
-                          invalidReason: "NOT_NULLABLE",
-                          value: null,
-                          internalValue: "",
-                          stateValue: null,
-                          stateValueModified: false,
-                          propertyId: "password",
-                        });
+                        passwordPdef.cleanValueFor(null);
                         itemDefinitionContextualValue.idef.triggerListeners(null);
                       }, 300);
                     };

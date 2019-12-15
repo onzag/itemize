@@ -172,7 +172,7 @@ export async function searchItemDefinition(
   );
 
   // Checking search mode counterpart to validate
-  searchModeCounterpart.applyValueFromGQL(null, resolverArgs.args);
+  searchModeCounterpart.applyValue(null, resolverArgs.args);
   await serverSideCheckItemDefinitionAgainst(
     searchModeCounterpart,
     resolverArgs.args,
