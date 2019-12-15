@@ -1,5 +1,5 @@
 import React from "react";
-import { IPropertyEntryProps, getClassName } from ".";
+import { IPropertyEntryProps } from ".";
 import TextField from "@material-ui/core/TextField";
 import {
   MenuItem,
@@ -331,7 +331,6 @@ export default class PropertyEntryLocation
   public renderBasicTextField(textFieldProps?: any) {
     // get the basic data
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
-    const className = getClassName(this.props, "location", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nDescription = i18nData && i18nData.description;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
@@ -355,13 +354,15 @@ export default class PropertyEntryLocation
       this.state.searchResults.length > 1;
 
     // We do something similar to the field
-    let appliedTextFieldProps: any = {};
+    let appliedTextFieldProps: any = {
+      className: this.props.classes.entry,
+    };
     let appliedInputProps: any = {
       endAdornment: (
         <InputAdornment position="end">
           <IconButton
             disabled={this.props.value.enforced}
-            classes={{root: "property-entry-location-button"}}
+            classes={{root: this.props.classes.iconButton}}
             onClick={enableSwapAroundLocations ? this.swapLocation : this.search}
           >
             <Icon>
@@ -381,10 +382,6 @@ export default class PropertyEntryLocation
           inputRef(node);
         },
       };
-
-      if (appliedTextFieldProps.className) {
-        appliedTextFieldProps.className += " " + className;
-      }
     }
 
     // get the current value, the txt is the value as it is input
@@ -409,13 +406,13 @@ export default class PropertyEntryLocation
       (this.props.value.value as IPropertyDefinitionSupportedLocationType).atxt;
 
     return (
-      <div className="property-entry-container">
-        {i18nDescription ? <div className="property-entry-description">
+      <div className={this.props.classes.container}>
+        {i18nDescription ? <div className={this.props.classes.description}>
           <Icon>keyboard_arrow_down</Icon>{i18nDescription}</div> : null}
-        <div className="property-entry-location-atxt">
+        <div className={this.props.classes.locationAlternativeTextHeader}>
           {currentLocationDataATxt}
         </div>
-        <div className="property-entry-location-map-container">
+        <div className={this.props.classes.locationMapContainer}>
           <Map
             viewport={this.state.viewport}
           >
@@ -442,14 +439,14 @@ export default class PropertyEntryLocation
           fullWidth={true}
           type="search"
           onKeyPress={this.onKeyPress}
-          className={className}
+          className={this.props.classes.entry}
           label={i18nLabel}
           onChange={this.onChange}
           placeholder={i18nPlaceholder}
           value={currentValue}
           InputProps={{
             classes: {
-              root: "property-entry-input",
+              root: this.props.classes.fieldInput,
               focused: "focused",
             },
             disabled: this.props.value.enforced,
@@ -457,7 +454,7 @@ export default class PropertyEntryLocation
           }}
           InputLabelProps={{
             classes: {
-              root: "property-entry-label",
+              root: this.props.classes.label,
               focused: "focused",
             },
           }}
@@ -465,7 +462,7 @@ export default class PropertyEntryLocation
           variant="filled"
           {...appliedTextFieldProps}
         />
-        <div className="property-entry-error">
+        <div className={this.props.classes.errorMessage}>
           {i18nInvalidReason}
         </div>
       </div>
@@ -496,17 +493,17 @@ export default class PropertyEntryLocation
     // because we don't want <br>
     return (
       <MenuItem
-        className="property-entry-location-autocomplete-suggestion-menu-item"
+        className={this.props.classes.autocompleteMenuItem}
         selected={params.isHighlighted}
         component="div"
         onClick={this.setPlaceFrom.bind(this, suggestion)}
       >
-        <div className="property-entry-location-autocomplete-suggestion-data">
+        <div>
           <div
-            className="property-entry-location-autocomplete-suggestion-txt"
+            className={this.props.classes.autocompleteMenuItemMainText}
             dangerouslySetInnerHTML={{__html: suggestion.highlightedTitle}}
           />
-          <div className="property-entry-location-autocomplete-suggestion-atxt">
+          <div className={this.props.classes.autocompleteMenuItemSubText}>
             {
               suggestion.vicinity ?
               suggestion.vicinity.replace(/\<br\/\>/g, this.props.i18n.word_separator + " ") :
@@ -618,39 +615,24 @@ export default class PropertyEntryLocation
         onSuggestionsClearRequested={this.clearSuggestions}
         suggestions={this.state.suggestions}
         theme={{
-          container:
-            "property-entry-location-autocomplete-container",
-          containerOpen:
-            "property-entry-location-autocomplete-container--open",
-          input:
-            "property-entry-location-autocomplete-input",
-          inputOpen:
-            "property-entry-location-autocomplete-input--open",
-          inputFocused:
-            "focused",
-          suggestionsContainer:
-            "property-entry-location-autocomplete-suggestions-container",
-          suggestionsContainerOpen:
-            "property-entry-location-autocomplete-suggestions-container--open",
-          suggestionsList:
-            "property-entry-location-autocomplete-suggestions-list",
-          suggestion:
-            "property-entry-location-autocomplete-suggestion",
-          suggestionFirst:
-            "property-entry-location-autocomplete-suggestion--first",
-          suggestionHighlighted:
-            "property-entry-location-autocomplete-suggestion--highlighted",
-          sectionContainer:
-            "property-entry-location-autocomplete-section-container",
-          sectionContainerFirst:
-            "property-entry-location-autocomplete-section-container--first",
-          sectionTitle:
-            "property-entry-location-autocomplete-section-title",
+          container: this.props.classes.autocompleteContainer,
+          containerOpen: this.props.classes.autocompleteContainerOpen,
+          input: this.props.classes.autocompleteInput,
+          inputOpen: this.props.classes.autocompleteInputOpen,
+          inputFocused: "focused",
+          suggestionsContainer: this.props.classes.autocompleteSuggestionsContainer,
+          suggestionsContainerOpen: this.props.classes.autocompleteSuggestionsContainerOpen,
+          suggestionsList: this.props.classes.autocompleteSuggestionsList,
+          suggestion: this.props.classes.autocompleteSuggestion,
+          suggestionFirst: this.props.classes.autocompleteFirstSuggestion,
+          suggestionHighlighted: this.props.classes.autocompleteSuggestionHighlighted,
+          sectionContainer: this.props.classes.autocompleteSectionContainer,
+          sectionContainerFirst: this.props.classes.autocompleteFirstSectionContainer,
+          sectionTitle: this.props.classes.autocompleteSectionTitle,
         }}
         inputProps={{
           value: currentValue,
           onChange: this.onChange,
-          className: "property-entry-location-autocomplete",
         }}
       />
     );

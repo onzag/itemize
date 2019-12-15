@@ -36,6 +36,10 @@ interface IPropertyEntryThemeType {
   labelFocusedColor: string;
   labelInvalidColor: string;
   labelInvalidFocusedColor: string;
+  locationAlternativeTextHeaderHeight: string;
+  locationAlternativeTextHeaderFontSize: string;
+  autocompleteMenuItemFontSize: string;
+  autocompleteMenuItemSubFontSize: string;
 }
 const STANDARD_THEME: IPropertyEntryThemeType = {
   invalidColor: "#f44336",
@@ -51,6 +55,10 @@ const STANDARD_THEME: IPropertyEntryThemeType = {
   labelFocusedColor: "#3f51b5",
   labelInvalidColor: "#f44336",
   labelInvalidFocusedColor: "#f44336",
+  locationAlternativeTextHeaderHeight: "1.5rem",
+  locationAlternativeTextHeaderFontSize: "0.75rem",
+  autocompleteMenuItemFontSize: "1rem",
+  autocompleteMenuItemSubFontSize: "0.75rem",
 };
 
 function shouldShowInvalid(props: IPropertyEntryBaseProps) {
@@ -145,6 +153,74 @@ export const generalStyles = (theme: IPropertyEntryThemeType) => createStyles({
   unitDialogSubheader: {
     backgroundColor: "white",
     borderBottom: "solid 1px #eee",
+  },
+  autocompleteContainer: {
+    position: "relative",
+    display: "block",
+    width: "100%",
+  },
+  autocompleteContainerOpen: {
+
+  },
+  autocompleteInput: {
+
+  },
+  autocompleteInputOpen: {
+
+  },
+  autocompleteSuggestionsContainer: {
+    position: "absolute" as "absolute",
+    display: "block",
+    width: "100%",
+    top: `calc(100% - ${theme.errorMessageContainerSize})`,
+    zIndex: 1000,
+  },
+  autocompleteSuggestionsContainerOpen: {
+
+  },
+  autocompleteSuggestionsList: {
+
+  },
+  autocompleteSuggestion: {
+
+  },
+  autocompleteFirstSuggestion: {
+
+  },
+  autocompleteSuggestionHighlighted: {
+
+  },
+  autocompleteSectionContainer: {
+
+  },
+  autocompleteFirstSectionContainer: {
+
+  },
+  autocompleteSectionTitle: {
+
+  },
+  autocompleteMenuItem: {
+    height: "auto",
+    paddingTop: 4,
+    paddingBottom: 8,
+  },
+  autocompleteMenuItemMainText: {
+    fontSize: theme.autocompleteMenuItemFontSize,
+    lineHeight: theme.autocompleteMenuItemFontSize,
+  },
+  autocompleteMenuItemSubText: {
+    fontSize: theme.autocompleteMenuItemSubFontSize,
+    lineHeight: theme.autocompleteMenuItemSubFontSize,
+  },
+  locationAlternativeTextHeader: {
+    height: theme.locationAlternativeTextHeaderHeight,
+    fontSize: theme.locationAlternativeTextHeaderFontSize,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  locationMapContainer: {
+
   },
 });
 

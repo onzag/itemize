@@ -6,15 +6,11 @@ export function FrontPage() {
   return (
     <ModuleProvider module="test">
       <ItemDefinitionProvider itemDefinition="item_definition">
-        {/* <Entry id="string_autocomplete"/>
-        <Entry id="string_autocomplete_nullable"/> */}
-        <Entry id="string_autocomplete_nullable_enforced"/>
-        <Entry id="string_autocomplete_nullable_locale"/>
+        <Entry id="location"/>
         <StatsForNerds
           propertyIds={
             [
-              "string_autocomplete_nullable_enforced",
-              "string_autocomplete_nullable_locale",
+              "location",
             ]
           }
         />

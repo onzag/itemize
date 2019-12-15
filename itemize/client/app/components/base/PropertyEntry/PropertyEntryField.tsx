@@ -301,8 +301,12 @@ export default class PropertyEntryField
     const parts = parse(valueToMatch, matches);
 
     return (
-      <MenuItem selected={params.isHighlighted} component="div">
-        <div>
+      <MenuItem
+        className={this.props.classes.autocompleteMenuItem}
+        selected={params.isHighlighted}
+        component="div"
+      >
+        <div className={this.props.classes.autocompleteMenuItemMainText}>
           {
             parts.map((part, index) =>
               part.highlight ? (
@@ -391,39 +395,24 @@ export default class PropertyEntryField
         onSuggestionsClearRequested={this.clearSuggestions}
         suggestions={this.state.suggestions}
         theme={{
-          container:
-            "property-entry-field-autocomplete-container",
-          containerOpen:
-            "property-entry-field-autocomplete-container--open",
-          input:
-            "property-entry-field-autocomplete-input",
-          inputOpen:
-            "property-entry-field-autocomplete-input--open",
-          inputFocused:
-            "focused",
-          suggestionsContainer:
-            "property-entry-field-autocomplete-suggestions-container",
-          suggestionsContainerOpen:
-            "property-entry-field-autocomplete-suggestions-container--open",
-          suggestionsList:
-            "property-entry-field-autocomplete-suggestions-list",
-          suggestion:
-            "property-entry-field-autocomplete-suggestion",
-          suggestionFirst:
-            "property-entry-field-autocomplete-suggestion--first",
-          suggestionHighlighted:
-            "property-entry-field-autocomplete-suggestion--highlighted",
-          sectionContainer:
-            "property-entry-field-autocomplete-section-container",
-          sectionContainerFirst:
-            "property-entry-field-autocomplete-section-container--first",
-          sectionTitle:
-            "property-entry-field-autocomplete-section-title",
+          container: this.props.classes.autocompleteContainer,
+          containerOpen: this.props.classes.autocompleteContainerOpen,
+          input: this.props.classes.autocompleteInput,
+          inputOpen: this.props.classes.autocompleteInputOpen,
+          inputFocused: "focused",
+          suggestionsContainer: this.props.classes.autocompleteSuggestionsContainer,
+          suggestionsContainerOpen: this.props.classes.autocompleteSuggestionsContainerOpen,
+          suggestionsList: this.props.classes.autocompleteSuggestionsList,
+          suggestion: this.props.classes.autocompleteSuggestion,
+          suggestionFirst: this.props.classes.autocompleteFirstSuggestion,
+          suggestionHighlighted: this.props.classes.autocompleteSuggestionHighlighted,
+          sectionContainer: this.props.classes.autocompleteSectionContainer,
+          sectionContainerFirst: this.props.classes.autocompleteFirstSectionContainer,
+          sectionTitle: this.props.classes.autocompleteSectionTitle,
         }}
         inputProps={{
           value: this.props.value.internalValue || this.props.value.value || "",
           onChange: this.onChange,
-          className: "property-entry--field--autocomplete",
           disabled: this.props.value.enforced,
         }}
       />
