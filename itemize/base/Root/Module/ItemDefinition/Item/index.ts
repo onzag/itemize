@@ -1,6 +1,6 @@
 // lets do the import, item definition depends on conditional rule set
 // and property value mapping
-import ItemDefinition, { IItemDefinitionValueType, ItemDefinitionIOActions } from "..";
+import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } from "..";
 import ConditionalRuleSet, {
   IConditionalRuleSetRawJSONDataType,
 } from "../ConditionalRuleSet";
@@ -15,12 +15,12 @@ export enum ItemExclusionState {
   ANY = "ANY",
 }
 
-export interface IItemValue {
+export interface IItemState {
   exclusionState: ItemExclusionState;
   canExclusionBeSet: boolean;
   itemId: string;
   itemName: string;
-  itemDefinitionValue: IItemDefinitionValueType;
+  itemDefinitionValue: IItemDefinitionStateType;
   stateExclusion: ItemExclusionState;
   stateExclusionModified: boolean;
 }
@@ -348,7 +348,7 @@ export default class Item {
    * Provides the current value of this item
    * @param id the id of the stored item definition or module
    */
-  public getCurrentValueNoExternalChecking(id: number, emulateExternalChecking?: boolean): IItemValue {
+  public getStateNoExternalChecking(id: number, emulateExternalChecking?: boolean): IItemState {
     const exclusionState = this.getExclusionState(id);
     return {
       exclusionState,
@@ -356,7 +356,7 @@ export default class Item {
       itemId: this.getId(),
       itemName: this.getName(),
       itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
-        this.itemDefinition.getCurrentValueNoExternalChecking(id,
+        this.itemDefinition.getStateNoExternalChecking(id,
           emulateExternalChecking, this.rawData.sinkIn || [], true),
       stateExclusion: this.stateExclusion[id] || ItemExclusionState.ANY,
       stateExclusionModified: this.stateExclusionModified[id] || false,
@@ -367,7 +367,7 @@ export default class Item {
    * Provides the current value of this item
    * @param id the id of the stored item definition or module
    */
-  public async getCurrentValue(id: number): Promise<IItemValue> {
+  public async getState(id: number): Promise<IItemState> {
     const exclusionState = this.getExclusionState(id);
     return {
       exclusionState,
@@ -375,7 +375,7 @@ export default class Item {
       itemId: this.getId(),
       itemName: this.getName(),
       itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
-        (await this.itemDefinition.getCurrentValue(id, this.rawData.sinkIn || [], true)),
+        (await this.itemDefinition.getState(id, this.rawData.sinkIn || [], true)),
       stateExclusion: this.stateExclusion[id] || ItemExclusionState.ANY,
       stateExclusionModified: this.stateExclusionModified[id] || false,
     };
@@ -390,12 +390,12 @@ export default class Item {
    * @param id the id this item is stored
    * @param value the value of the item
    */
-  public applyValue(id: number, value: IItemValue) {
+  public applyState(id: number, value: IItemState) {
     this.stateExclusion[id] = value.stateExclusion;
     this.stateExclusionModified[id] = value.stateExclusionModified;
 
     if (value.itemDefinitionValue) {
-      this.itemDefinition.applyValue(id, value.itemDefinitionValue);
+      this.itemDefinition.applyState(id, value.itemDefinitionValue);
     }
   }
 

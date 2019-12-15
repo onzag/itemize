@@ -480,7 +480,7 @@ export async function serverSideCheckItemDefinitionAgainst(
     itemDefinition.getQualifiedPathName(),
   );
   // we get the current value of the item definition instance
-  const currentValue = await itemDefinition.getCurrentValue(id);
+  const currentValue = await itemDefinition.getState(id);
   serverSideCheckItemDefinitionAgainstDebug(
     "Current value is %j",
     currentValue,

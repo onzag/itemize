@@ -1,6 +1,6 @@
-import Item, { IItemRawJSONDataType, IItemValue, ItemExclusionState } from "./Item";
+import Item, { IItemRawJSONDataType, IItemState, ItemExclusionState } from "./Item";
 import PropertyDefinition,
-  { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionValue } from "./PropertyDefinition";
+  { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionState } from "./PropertyDefinition";
 import Module, { IModuleRawJSONDataType, ListenerType, IRawJSONI18NDataType, IRawJsonI18NSpecificLocaleDataType } from "..";
 import {
   PREFIXED_CONCAT,
@@ -59,12 +59,12 @@ export interface IItemDefinitionRawJSONDataType {
   policies?: IPoliciesRawJSONDataType;
 }
 
-export interface IItemDefinitionValueType {
+export interface IItemDefinitionStateType {
   moduleName: string;
   itemDefPath: string[];
   itemDefName: string;
-  items: IItemValue[];
-  properties: IPropertyDefinitionValue[];
+  items: IItemState[];
+  properties: IPropertyDefinitionState[];
   gqlOriginalAppliedValue: IItemDefinitionGQLValueType;
   forId: number;
 }
@@ -558,19 +558,19 @@ export default class ItemDefinition {
    * this case
    * @param excludeItems excludes the items in the list
    */
-  public getCurrentValueNoExternalChecking(
+  public getStateNoExternalChecking(
     id: number,
     emulateExternalChecking?: boolean,
     onlyIncludeProperties?: string[],
     excludeItems?: boolean,
-  ): IItemDefinitionValueType {
+  ): IItemDefinitionStateType {
     const properties = onlyIncludeProperties ?
       onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false)
-        .getCurrentValueNoExternalChecking(id, emulateExternalChecking)) :
+        .getStateNoExternalChecking(id, emulateExternalChecking)) :
       this.getParentModule().getAllPropExtensions().concat(
         this.getAllPropertyDefinitions(),
       ).map((pd) => {
-        return pd.getCurrentValueNoExternalChecking(id, emulateExternalChecking);
+        return pd.getStateNoExternalChecking(id, emulateExternalChecking);
       });
 
     return {
@@ -578,7 +578,7 @@ export default class ItemDefinition {
       itemDefPath: this.getPath(),
       itemDefName: this.getName(),
       items: excludeItems ? [] : this.itemInstances.map((ii) =>
-        ii.getCurrentValueNoExternalChecking(id, emulateExternalChecking)),
+        ii.getStateNoExternalChecking(id, emulateExternalChecking)),
       properties,
       gqlOriginalAppliedValue: this.getGQLAppliedValue(id),
       forId: id,
@@ -598,17 +598,17 @@ export default class ItemDefinition {
    * this case
    * @param excludeItems excludes the items in the list
    */
-  public async getCurrentValue(
+  public async getState(
     id: number,
     onlyIncludeProperties?: string[],
     excludeItems?: boolean,
-  ): Promise<IItemDefinitionValueType> {
+  ): Promise<IItemDefinitionStateType> {
     const properties = await Promise.all(onlyIncludeProperties ?
-      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false).getCurrentValue(id)) :
+      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false).getState(id)) :
       this.getParentModule().getAllPropExtensions().concat(
         this.getAllPropertyDefinitions(),
       ).map((pd) => {
-        return pd.getCurrentValue(id);
+        return pd.getState(id);
       }),
     );
 
@@ -616,7 +616,7 @@ export default class ItemDefinition {
       moduleName: this.getModuleName(),
       itemDefPath: this.getPath(),
       itemDefName: this.getName(),
-      items: excludeItems ? [] : await Promise.all(this.itemInstances.map((ii: Item) => ii.getCurrentValue(id))),
+      items: excludeItems ? [] : await Promise.all(this.itemInstances.map((ii: Item) => ii.getState(id))),
       properties,
       gqlOriginalAppliedValue: this.getGQLAppliedValue(id),
       forId: id,
@@ -628,20 +628,20 @@ export default class ItemDefinition {
    * instance
    * @param value the value, be careful, it will choke if invalid
    */
-  public applyValue(id: number, value: IItemDefinitionValueType) {
+  public applyState(id: number, value: IItemDefinitionStateType) {
     this.stateHasAppliedValueTo[id] = true;
-    this.applyValueFromGQL[id] = value.gqlOriginalAppliedValue;
+    this.stateGQLAppliedValue[id] = value.gqlOriginalAppliedValue;
 
     if (value.itemDefPath.join("/") !== this.getPath().join("/")) {
       throw new Error("Attempted to apply unmatching values");
     }
 
     value.items.forEach((itemValue) => {
-      this.getItemFor(itemValue.itemId).applyValue(id, itemValue);
+      this.getItemFor(itemValue.itemId).applyState(id, itemValue);
     });
 
     value.properties.forEach((propertyValue) => {
-      this.getPropertyDefinitionFor(propertyValue.propertyId, true).applyValue(id, propertyValue);
+      this.getPropertyDefinitionFor(propertyValue.propertyId, true).applyState(id, propertyValue);
     });
   }
 

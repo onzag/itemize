@@ -1,6 +1,6 @@
 import React from "react";
 import { DataContext, LocaleContext, ILocaleContextType } from ".";
-import ItemDefinition, { IItemDefinitionValueType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import Module from "../../base/Root/Module";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
@@ -19,7 +19,7 @@ import { GraphQLEndpointErrorType } from "../../base/errors";
 
 export interface IItemDefinitionContextType {
   idef: ItemDefinition;
-  value: IItemDefinitionValueType;
+  value: IItemDefinitionStateType;
   notFound: boolean;
   blocked: boolean;
   blockedButDataAccessible: boolean;
@@ -59,7 +59,7 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
 }
 
 interface IActualItemDefinitionProviderState {
-  value: IItemDefinitionValueType;
+  value: IItemDefinitionStateType;
   isBlocked: boolean;
   isBlockedButDataIsAccessible: boolean;
   notFound: boolean;
@@ -102,7 +102,7 @@ class ActualItemDefinitionProvider extends
     }
 
     this.state = {
-      value: valueFor.getCurrentValueNoExternalChecking(
+      value: valueFor.getStateNoExternalChecking(
         this.props.forId || null,
         !this.props.disableExternalChecks,
       ),
@@ -136,7 +136,7 @@ class ActualItemDefinitionProvider extends
       this.itemDefinition.addListener(this.props.forId || null, this.listener);
       // we set the value given we have changed the forId
       this.setState({
-        value: this.itemDefinition.getCurrentValueNoExternalChecking(
+        value: this.itemDefinition.getStateNoExternalChecking(
           this.props.forId || null,
           !this.props.disableExternalChecks,
         ),
@@ -165,7 +165,7 @@ class ActualItemDefinitionProvider extends
       valueFor = valueFor.getSearchModeCounterpart();
     }
     this.setState({
-      value: valueFor.getCurrentValueNoExternalChecking(
+      value: valueFor.getStateNoExternalChecking(
         this.props.forId || null,
         !this.props.disableExternalChecks,
       ),
@@ -345,7 +345,7 @@ class ActualItemDefinitionProvider extends
     delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
   }
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
-    const newValue = await this.itemDefinition.getCurrentValue(this.props.forId || null);
+    const newValue = await this.itemDefinition.getState(this.props.forId || null);
     if (currentUpdateId === null || this.lastUpdateId === currentUpdateId) {
       this.setState({
         value: newValue,

@@ -145,7 +145,7 @@ export interface IPropertyDefinitionInvalidRuleDataType {
   if: ConditionalRuleSet;
 }
 
-export interface IPropertyDefinitionValue {
+export interface IPropertyDefinitionState {
   userSet: boolean;
   default: boolean;
   enforced: boolean;
@@ -601,7 +601,7 @@ export default class PropertyDefinition {
    * @param id the id of the current item definition as stored, pass null if not stored
    * @returns a bunch of information about the current value
    */
-  public getCurrentValueNoExternalChecking(id: number, emulateExternalChecking?: boolean): IPropertyDefinitionValue {
+  public getStateNoExternalChecking(id: number, emulateExternalChecking?: boolean): IPropertyDefinitionState {
     const possibleEnforcedValue = this.getEnforcedValue(id);
 
     if (possibleEnforcedValue.enforced) {
@@ -665,7 +665,7 @@ export default class PropertyDefinition {
    * this also represents the slot
    * @returns a bunch of information about the current value
    */
-  public async getCurrentValue(id: number): Promise<IPropertyDefinitionValue> {
+  public async getState(id: number): Promise<IPropertyDefinitionState> {
 
     const possibleEnforcedValue = this.getEnforcedValue(id);
 
@@ -814,9 +814,9 @@ export default class PropertyDefinition {
     this.stateinternalValue[id] = internalValue;
   }
 
-  public applyValue(
+  public applyState(
     id: number,
-    value: IPropertyDefinitionValue,
+    value: IPropertyDefinitionState,
   ) {
     this.stateValue[id] = value.stateValue;
     this.stateValueModified[id] = value.stateValueModified;

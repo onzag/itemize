@@ -1,5 +1,5 @@
 import PropertyDefinition, {
-  IPropertyDefinitionValue,
+  IPropertyDefinitionState,
 } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
 import PropertyViewField from "./PropertyViewField";
@@ -19,7 +19,7 @@ import { currencies, countries, ICurrencyType, ICountryType } from "../../../../
 
 export interface IPropertyViewBaseProps {
   property: PropertyDefinition;
-  value: IPropertyDefinitionValue;
+  value: IPropertyDefinitionState;
 }
 
 export interface IPropertyViewProps extends IPropertyViewBaseProps {

@@ -1,8 +1,8 @@
 import PropertyEntry from "./components/base/PropertyEntry";
 import { ItemDefinitionContext } from "./providers";
-import PropertyDefinition, { IPropertyDefinitionValue, IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import PropertyDefinition, { IPropertyDefinitionState, IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
-import ItemDefinition, { IItemDefinitionValueType, IItemDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemDefinitionStateType, IItemDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition";
 import { TokenContext } from "./internal-providers";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import { DataContext, LocaleContext } from ".";
@@ -70,7 +70,7 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
             throw new Error("The Entry/View/Read must be in a ItemDefinitionProvider context");
           }
 
-          let propertyValue: IPropertyDefinitionValue = null;
+          let propertyValue: IPropertyDefinitionState = null;
           if (props.item) {
             const itemValue = itemDefinitionContextualValue.value.items.find((i) => i.itemName === props.item);
             if (!itemValue) {
@@ -391,7 +391,7 @@ export function LogActioner(props: ILogActionerProps) {
                       setTimeout(() => {
                         const passwordPdef =
                           itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
-                        passwordPdef.applyValue(null, {
+                        passwordPdef.applyState(null, {
                           userSet: false,
                           default: false,
                           enforced: false,
@@ -572,7 +572,7 @@ export function StatsForNerds(props: {
     <ItemDefinitionContext.Consumer>
       {
         (itemDefinitionContextualValue) => {
-          const valueToStringify: IItemDefinitionValueType = {
+          const valueToStringify: IItemDefinitionStateType = {
             ...itemDefinitionContextualValue.value,
             properties: itemDefinitionContextualValue.value.properties
               .filter((p) => !props.propertyIds || props.propertyIds.includes(p.propertyId))

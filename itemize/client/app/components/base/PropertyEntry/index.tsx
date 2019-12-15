@@ -1,5 +1,5 @@
 import PropertyDefinition, {
-  IPropertyDefinitionValue,
+  IPropertyDefinitionState,
 } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
 import PropertyEntryBoolean from "./PropertyEntryBoolean";
@@ -261,7 +261,7 @@ export const generalStyles = (theme: IPropertyEntryThemeType) => createStyles({
 
 export interface IPropertyEntryBaseProps {
   property: PropertyDefinition;
-  value: IPropertyDefinitionValue;
+  value: IPropertyDefinitionState;
   onChange: (newValue: PropertyDefinitionSupportedType, internalValue: any) => void;
   theme?: Partial<IPropertyEntryThemeType>;
   forceInvalid?: boolean;

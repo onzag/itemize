@@ -22,7 +22,7 @@ import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from "../../../../../consta
  * @param internalValue the internal value, a moment object
  * @param actualValue the actual value, a json string
  */
-function getCurrentValue(internalValue: any, actualValue: string, type: string) {
+function getState(internalValue: any, actualValue: string, type: string) {
   // internal value has priority, that's why it's there
   if (internalValue) {
     return internalValue;
@@ -74,7 +74,7 @@ export default class PropertyEntryDateTime extends
     // a new object is created during a change event, we need to create it
     // this way then
     this.state = {
-      value: getCurrentValue(
+      value: getState(
         props.value.internalValue,
         props.value.value as PropertyDefinitionSupportedDateType,
         props.property.getType(),
