@@ -6,11 +6,11 @@ export function FrontPage() {
   return (
     <ModuleProvider module="test">
       <ItemDefinitionProvider itemDefinition="item_definition">
-        <Entry id="location"/>
+        <Entry id="propext_test"/>
         <StatsForNerds
           propertyIds={
             [
-              "location",
+              "propext_test",
             ]
           }
         />

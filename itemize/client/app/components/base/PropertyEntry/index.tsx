@@ -222,6 +222,41 @@ export const generalStyles = (theme: IPropertyEntryThemeType) => createStyles({
   locationMapContainer: {
 
   },
+  quill: (props: IPropertyEntryBaseProps) => {
+    const shouldShowInvalidQuill = shouldShowInvalid(props);
+    return {
+      "position": "relative",
+      // this is the colur when the field is out of focus
+      "&::before": {
+        left: 0,
+        right: 0,
+        bottom: 0,
+        content: "'\\00a0'",
+        position: "absolute",
+        transition: "border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+        borderBottom: "1px solid " +
+          (shouldShowInvalidQuill ? theme.fieldBorderInvalidColor : theme.fieldBorderColor),
+        pointerEvents: "none",
+      },
+      // the color that pops up when the field is in focus
+      "&::after": {
+        left: 0,
+        bottom: 0,
+        right: 0,
+        content: "''",
+        position: "absolute",
+        transform: "scaleX(0)",
+        transition: "transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
+        borderBottom: "2px solid " +
+          (shouldShowInvalidQuill ? theme.fieldBorderInvalidColorFocused : theme.fieldBorderColorFocused),
+        pointerEvents: "none",
+      },
+      // during the hover event
+      "&.focused::after": {
+        transform: "none",
+      },
+    };
+  },
 });
 
 export interface IPropertyEntryBaseProps {

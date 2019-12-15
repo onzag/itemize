@@ -1,5 +1,5 @@
 import React from "react";
-import { IPropertyEntryProps, getClassName } from ".";
+import { IPropertyEntryProps } from ".";
 import PropertyEntryField from "./PropertyEntryField";
 import { InputLabel, Icon, IconButton } from "@material-ui/core";
 import ReactQuill from "react-quill/dist/react-quill.min.js";
@@ -150,7 +150,6 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
 
     // basic data
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
-    const className = getClassName(this.props, "rich-text", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nDescription = i18nData && i18nData.description;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
@@ -169,26 +168,27 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
     // the icon as usual
     const icon = this.props.property.getIcon();
     const iconComponent = icon ? (
-      <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
+      <Icon classes={{root: this.props.classes.icon}}>{icon}</Icon>
     ) : null;
 
     // we return the component, note how we set the thing to focused
     return (
-      <div className="property-entry-container">
-        <div className={className + (this.state.focused ? " focused" : "")}>
+      <div className={this.props.classes.container}>
+        <div>
           <InputLabel
             classes={{
-              root: "property-entry-label",
+              root: this.props.classes.label,
               focused: "focused",
             }}
             focused={this.state.focused}
           >
             {i18nLabel}{iconComponent}
           </InputLabel>
-          {i18nDescription ? <div className="property-entry-description">
+          {i18nDescription ? <div className={this.props.classes.description}>
             <Icon>keyboard_arrow_down</Icon>{i18nDescription}</div> : null}
           <RichTextEditorToolbar id={this.uuid} i18n={this.props.i18n}/>
           <ReactQuill
+            className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
             disabled={this.props.value.enforced}
             modules={{
               toolbar: {
@@ -203,7 +203,7 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
             onBlur={this.onBlur}
           />
         </div>
-        <div className="property-entry-error">
+        <div className={this.props.classes.errorMessage}>
           {i18nInvalidReason}
         </div>
       </div>
