@@ -55,10 +55,6 @@ export default class PropertyEntryField
     }
   }
 
-  public componentDidUpdate(prevProps: IPropertyEntryProps) {
-    // TODO update displayed value in autocomplete based in language
-  }
-
   public shouldComponentUpdate(
     nextProps: IPropertyEntryProps,
     nextState: IPropertyEntryFieldState,

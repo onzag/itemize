@@ -4,7 +4,7 @@ import PropertyDefinition, {
 import React from "react";
 import PropertyEntryBoolean from "./PropertyEntryBoolean";
 import PropertyEntryText from "./PropertyEntryText";
-// import PropertyEntryDateTime from "./PropertyEntryDateTime";
+import PropertyEntryDateTime from "./PropertyEntryDateTime";
 import PropertyEntryLocation from "./PropertyEntryLocation";
 import PropertyEntryFiles from "./PropertyEntryFiles";
 import PropertyEntryNumeric from "./PropertyEntryNumeric";
@@ -295,9 +295,9 @@ const typeRegistry:
   unit: PropertyEntryNumeric,
   password: PropertyEntryField,
   year: PropertyEntryNumeric,
-  datetime: null,
-  date: null,
-  time: null,
+  datetime: PropertyEntryDateTime,
+  date: PropertyEntryDateTime,
+  time: PropertyEntryDateTime,
   location: PropertyEntryLocation,
   files: PropertyEntryFiles,
 };
