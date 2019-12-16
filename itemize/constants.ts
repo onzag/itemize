@@ -35,7 +35,7 @@ export const MAX_STRING_LENGTH = 10000;
 export const MAX_RAW_TEXT_LENGTH = 100000;
 // The max file size (for either images and binary files)
 export const MAX_FILE_SIZE = 5000000; // equivalent to 5MB
-export const MAX_FILE_BATCH_COUNT = 25; // how many files can be uploaded at once max
+export const MAX_FILE_BATCH_COUNT = 25; // how many files can be used in one item at once
 export const MAX_TOTAL_STORED_FILES = MAX_FILE_SIZE * 100; // how many bytes the user can store
 export const FILE_SUPPORTED_IMAGE_TYPES = [
   "image/png",

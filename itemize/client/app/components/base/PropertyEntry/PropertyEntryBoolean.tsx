@@ -115,7 +115,7 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
           aria-label={i18nLabel}
           component={"legend" as any}
           classes={{
-            root: props.classes.label,
+            root: props.classes.label + " " + props.classes.labelSingleLine,
             focused: "focused",
           }}
         >

@@ -408,7 +408,8 @@ export default class PropertyEntryLocation
     return (
       <div className={this.props.classes.container}>
         {i18nDescription ? <div className={this.props.classes.description}>
-          <Icon>keyboard_arrow_down</Icon>{i18nDescription}</div> : null}
+          {i18nDescription}
+        </div> : null}
         <div className={this.props.classes.locationAlternativeTextHeader}>
           {currentLocationDataATxt}
         </div>

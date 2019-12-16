@@ -43,7 +43,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       return null;
     }
 
-    if (l.toString().indexOf("/files/") === 0) {
+    if (l.toString().indexOf("/rest/files/") === 0) {
       return null;
     }
 
@@ -52,6 +52,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   i18n: {
     base: CLASSIC_BASE_I18N,
     optional: CLASSIC_OPTIONAL_I18N,
+    tooLargeErrorInclude: true,
   },
 };
 export default typeValue;

@@ -224,7 +224,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     // getting the icon
     const icon = this.props.property.getIcon();
     const iconComponent = icon ? (
-      <Icon classes={{root: "property-entry-icon"}}>{icon}</Icon>
+      <Icon classes={{root: this.props.classes.icon}}>{icon}</Icon>
     ) : null;
 
     // whether it is a single file
@@ -276,14 +276,15 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
         <FormLabel
           aria-label={i18nLabel}
           classes={{
-            root: this.props.classes.label,
+            root: this.props.classes.label + " " + this.props.classes.labelSingleLine,
             focused: "focused",
           }}
         >
           {i18nLabel}{iconComponent}
         </FormLabel>
         {i18nDescription ? <div className={this.props.classes.description}>
-          <Icon>keyboard_arrow_down</Icon>{i18nDescription}</div> : null}
+          {i18nDescription}
+        </div> : null}
         <Dropzone
           onDropAccepted={this.onDropAccepted}
           onDropRejected={this.onDropRejected}

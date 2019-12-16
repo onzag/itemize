@@ -8,6 +8,7 @@ export function FrontPage() {
       <ItemDefinitionProvider itemDefinition="item_definition">
         <Entry id="files"/>
         <Entry id="files_single"/>
+        <Entry id="boolean_nullable"/>
         <StatsForNerds
           propertyIds={
             [
