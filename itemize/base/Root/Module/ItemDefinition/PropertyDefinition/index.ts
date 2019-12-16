@@ -10,7 +10,7 @@ import {
 import Module from "../..";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
 import { GraphQLEndpointError } from "../../../../errors";
-import { DOMWindow } from "../../../../util";
+import { DOMWindow } from "../../../../../util";
 import equals from "deep-equal";
 import { ISingleFilterRawJSONDataType } from "../../../../Autocomplete";
 
@@ -373,7 +373,7 @@ export default class PropertyDefinition {
       } else if (!isRichText) {
         count = value.toString().length;
       } else {
-        const dummyElement = DOMWindow.document.createElement("div");
+        const dummyElement = DOMWindow.document.createElement("template");
         dummyElement.innerHTML = value.toString();
         count = dummyElement.innerText.length;
         if (dummyElement.querySelector(".ql-cursor")) {

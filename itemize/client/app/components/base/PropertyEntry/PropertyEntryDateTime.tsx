@@ -15,6 +15,7 @@ import {
   PropertyDefinitionSupportedDateType,
 } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/date";
 import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from "../../../../../constants";
+import { getLocalizedDateFormat, getLocalizedTimeFormat, getLocalizedDateTimeFormat } from "../../../../../util";
 
 /**
  * Provides the current value of the date given the
@@ -22,7 +23,7 @@ import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from "../../../../../consta
  * @param internalValue the internal value, a moment object
  * @param actualValue the actual value, a json string
  */
-function getState(internalValue: any, actualValue: string, type: string) {
+function getValue(internalValue: any, actualValue: string, type: string) {
   // internal value has priority, that's why it's there
   if (internalValue) {
     return internalValue;
@@ -36,28 +37,6 @@ function getState(internalValue: any, actualValue: string, type: string) {
     return Moment(actualValue, dbFormat);
   }
   return null;
-}
-
-/**
- * gets the actual format given a string format
- * this is basically only used to avoid inconsistencies
- * regarding input to create a mask, and it only happens with
- * time basically, but here we can override masks
- * @param value the format string
- */
-function getActualFormat(value: string) {
-  // Since we cannot have a mask that uses only one H
-  // we need to return it with two, same for the second
-  // we canot have a one or two digits situation
-
-  if (value === "H:mm") {
-    return "HH:mm";
-  } else if (value === "h:mm A") {
-    return "hh:mm A";
-  }
-
-  // any other value is tipically allowed
-  return value;
 }
 
 interface IPropertyEntryDateTimeState {
@@ -74,7 +53,7 @@ export default class PropertyEntryDateTime extends
     // a new object is created during a change event, we need to create it
     // this way then
     this.state = {
-      value: getState(
+      value: getValue(
         props.value.internalValue,
         props.value.value as PropertyDefinitionSupportedDateType,
         props.property.getType(),
@@ -173,7 +152,7 @@ export default class PropertyEntryDateTime extends
     const type = this.props.property.getType();
     if (type === "date") {
       // let's extract the locale format from moment for a long date
-      const L = getActualFormat((Moment.localeData() as any)._longDateFormat.L);
+      const L = getLocalizedDateFormat(true);
       const basicProps = {
         autoOk: true,
         cancelLabel: this.props.i18n.cancel,
@@ -221,8 +200,7 @@ export default class PropertyEntryDateTime extends
       }
     } else if (type === "datetime") {
       // let's use the long format with the time format
-      const LLT = getActualFormat((Moment.localeData() as any)._longDateFormat.L) + " " +
-        getActualFormat((Moment.localeData() as any)._longDateFormat.LT);
+      const LLT = getLocalizedDateTimeFormat(true);
       const basicProps = {
         autoOk: true,
         ampm: LLT.includes("A"),
@@ -271,7 +249,7 @@ export default class PropertyEntryDateTime extends
       }
     } else if (type === "time") {
       // and the time only
-      const LT = getActualFormat((Moment.localeData() as any)._longDateFormat.LT);
+      const LT = getLocalizedTimeFormat(true);
       const basicProps = {
         autoOk: true,
         ampm: LT.includes("A"),

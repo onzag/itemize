@@ -16,7 +16,6 @@ import {
   PropertyDefinitionSupportedType,
   PropertyDefinitionSupportedTypeName,
 } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-
 import { currencies, countries, ICurrencyType, ICountryType } from "../../../../../resources";
 import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
 import { IPropertyEntryThemeType, style, STANDARD_THEME } from "./styles";
@@ -64,33 +63,6 @@ const typeRegistry:
   files: PropertyEntryFiles,
 };
 
-/**
- * Provides the class name for a property entry
- * TODO delete this
- * @param props the properties of the property entry
- * @param name the name that will be given
- * @param poked whether it is being poked
- */
-export function getClassName(props: IPropertyEntryBaseProps, name: string, poked: boolean) {
-  return `property-entry property-entry--${name} ${
-    poked || props.forceInvalid ? "property-entry--poked" : ""
-  } ${
-    props.value.default ? "property-entry--default" : ""
-  } ${
-    props.value.enforced ? "property-entry--enforced" : ""
-  } ${
-    props.value.userSet ? "property-entry--user-set" : ""
-  } ${
-    props.value.hidden ? "property-entry--hidden" : ""
-  } ${
-    !props.value.valid || props.forceInvalid ?
-      "property-entry--invalid" :
-      "property-entry--valid"
-  } property-entry--rarity-${props.property.getRarity()}`;
-}
-
-// I had to use any because the typescript debugger shows a non-sensical bug
-// for no reason
 const PropertyEntryStylesApplier = withStyles(style)((props: IPropertyEntryStylesApplierProps) => {
   // First get the element by the type
   const Element = props.property.hasSpecificValidValues() ?

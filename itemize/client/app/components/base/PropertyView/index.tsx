@@ -8,16 +8,27 @@ import PropertyViewField from "./PropertyViewField";
 // import PropertyViewDateTime from "./PropertyViewDateTime";
 // import PropertyViewLocation from "./PropertyViewLocation";
 // import PropertyViewFiles from "./PropertyViewFiles";
-import { LocaleContext } from "../../..";
+import { LocaleContext, ILocaleContextType } from "../../..";
 import { Ii18NType } from "../../../../../base/Root";
 import {
   PropertyDefinitionSupportedTypeName,
 } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { currencies, countries, ICurrencyType, ICountryType } from "../../../../../resources";
+import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
+import { IPropertyViewThemeType, style, STANDARD_THEME } from "./styles";
+import PropertyViewDateTime from "./PropertyViewDateTime";
+import PropertyViewBoolean from "./PropertyViewBoolean";
+import PropertyViewText from "./PropertyViewText";
+import PropertyViewLocation from "./PropertyViewLocation";
 
 export interface IPropertyViewBaseProps {
   property: PropertyDefinition;
   value: IPropertyDefinitionState;
+  theme?: Partial<IPropertyViewThemeType>;
+}
+
+interface IPropertyViewStylesApplierProps extends IPropertyViewBaseProps, WithStyles<typeof style> {
+  locale: ILocaleContextType;
 }
 
 export interface IPropertyViewProps extends IPropertyViewBaseProps {
@@ -35,56 +46,55 @@ const typeRegistry:
   string: PropertyViewField,
   integer: PropertyViewField,
   number: PropertyViewField,
-  boolean: null,
-  text: null,
+  boolean: PropertyViewBoolean,
+  text: PropertyViewText,
   currency: PropertyViewField,
   unit: PropertyViewField,
   password: PropertyViewField,
   year: PropertyViewField,
-  datetime: null,
-  date: null,
-  time: null,
-  location: null,
+  datetime: PropertyViewDateTime,
+  date: PropertyViewDateTime,
+  time: PropertyViewDateTime,
+  location: PropertyViewLocation,
   files: null,
 };
 
-/**
- * Provides the class name for a property entry
- * @param props the properties of the property entry
- * @param name the name that will be given
- */
-export function getClassName(props: IPropertyViewBaseProps, name: string) {
-  return `property-view property-view--${name} ${
-    props.value.default ? "property-view--default" : ""
-  } ${
-    props.value.enforced ? "property-view--enforced" : ""
-  } ${
-    props.value.userSet ? "property-view--user-set" : ""
-  } ${
-    props.value.hidden ? "property-view--hidden" : ""
-  } ${
-    props.value.valid ?
-      "property-view--valid" :
-      "property-view--invalid"
-  } "property-view--rarity-${props.property.getRarity()}`;
-}
-
-export default function PropertyView(props: IPropertyViewBaseProps) {
+const PropertyViewStylesApplier = withStyles(style)((props: IPropertyViewStylesApplierProps) => {
   // First get the element by the type
   const Element = typeRegistry[props.property.getType()];
+
+  return (
+    <Element
+      {...props}
+      language={props.locale.language}
+      i18n={props.locale.i18n}
+      currency={currencies[props.locale.currency]}
+      country={countries[props.locale.country]}
+      classes={props.classes}
+    />
+  );
+});
+
+export default function PropertyView(props: IPropertyViewBaseProps) {
+  let appliedTheme: IPropertyViewThemeType = STANDARD_THEME;
+  if (props.theme) {
+    appliedTheme = {
+      ...STANDARD_THEME,
+      ...props.theme,
+    };
+  }
 
   // Build the context and render sending the right props
   return (
     <LocaleContext.Consumer>
       {
         (locale) =>
-          <Element
-            {...props}
-            language={locale.language}
-            i18n={locale.i18n}
-            currency={currencies[locale.currency]}
-            country={countries[locale.country]}
-          />
+          <ThemeProvider theme={appliedTheme}>
+            <PropertyViewStylesApplier
+              {...props}
+              locale={locale}
+            />
+          </ThemeProvider>
       }
     </LocaleContext.Consumer>
   );
@@ -94,7 +104,7 @@ export function RawBasePropertyView(props: {
   value: string;
 }) {
   return (
-    <div className="property-view property-view--base-property">
+    <div>
       {props.value}
     </div>
   );

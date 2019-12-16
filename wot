@@ -1,10 +1,6 @@
 TODO TECH
 
-- Implement unique index in SQL
-- Implement unique type in property type as a configuration
-- Implement type checks, the invalid will be given depending on whether one is on the server or client side, maybe add a PropertyDefinition.checkUniqueIndex function
-  that would use fetch in the client side and a sql query on the server side and whatnot, or nothing, it will crash the query
-  on create or edit so it is yet safe, just check if fetch is available to do the request for a valid index
+- Remove icons from the structure and add them to the property entry itself
 - Implement some form of triggers, maybe callback functions in the resolvers, we should have some form of user trigger to remove e_validated and
   whatnot
 

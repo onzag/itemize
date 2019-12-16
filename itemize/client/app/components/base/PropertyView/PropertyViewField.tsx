@@ -1,10 +1,15 @@
-import { getClassName, IPropertyViewProps } from "../PropertyView";
+import { IPropertyViewProps } from "../PropertyView";
 import React from "react";
 
-export default function PropertyViewField(props: IPropertyViewProps) {
-  return (
-    <div className={getClassName(props, "field")}>
-      {props.value.value}
-    </div>
-  );
+export default class PropertyViewField extends React.Component<IPropertyViewProps, {}> {
+  public shouldComponentUpdate(nextProps: IPropertyViewProps) {
+    return this.props.value.value !== nextProps.value.value;
+  }
+  public render() {
+    return (
+      <div>
+        {this.props.value.value}
+      </div>
+    );
+  }
 }

@@ -1,3 +1,7 @@
+import Moment from "moment";
+import { JSDOM } from "jsdom";
+import createDOMPurify from "dompurify";
+
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -80,9 +84,50 @@ export function mimeTypeToExtension(str: string) {
 }
 
 export function localeReplacer(str: string, ...args: any[]) {
-  let newStr = str;
-  args.forEach((arg, index) => {
-    newStr = newStr.replace(new RegExp(escapeStringRegexp("{" + index + "}"), "g"), arg);
-  });
-  return newStr;
+  return str.replace(/\{(\d+)\}/g, (match, indexMatch) => (args[indexMatch] || "?"));
 }
+
+/**
+ * gets the actual format given a string format
+ * this is basically only used to avoid inconsistencies
+ * regarding input to create a mask, and it only happens with
+ * time basically, but here we can override masks
+ * @param value the format string
+ */
+export function getNormalizedDateTimeFormat(value: string) {
+  // Since we cannot have a mask that uses only one H
+  // we need to return it with two, same for the second
+  // we canot have a one or two digits situation
+
+  if (value === "H:mm") {
+    return "HH:mm";
+  } else if (value === "h:mm A") {
+    return "hh:mm A";
+  }
+
+  // any other value is tipically allowed
+  return value;
+}
+
+export function getLocalizedTimeFormat(normalize: boolean) {
+  const LT = (Moment.localeData() as any)._longDateFormat.LT;
+  if (!normalize) {
+    return LT;
+  }
+  return LT;
+}
+
+export function getLocalizedDateFormat(normalize: boolean) {
+  const L = (Moment.localeData() as any)._longDateFormat.L;
+  if (!normalize) {
+    return L;
+  }
+  return getNormalizedDateTimeFormat(L);
+}
+
+export function getLocalizedDateTimeFormat(normalize: boolean) {
+  return getLocalizedDateFormat(normalize) + " " + getLocalizedTimeFormat(normalize);
+}
+
+export const DOMWindow = JSDOM ? (new JSDOM("")).window : window;
+export const DOMPurify = createDOMPurify(DOMWindow);

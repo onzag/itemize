@@ -13,6 +13,7 @@ import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefi
 import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../resources";
 import { Link as RouterLink, LinkProps, Route as RouterRoute, RouteProps } from "react-router-dom";
 import { RESERVED_BASE_PROPERTIES } from "../../constants";
+import { localeReplacer } from "../../util";
 
 export function Link(props: LinkProps) {
   const currentLocaleFromURL = location.pathname.split("/")[1] || null;
@@ -254,7 +255,7 @@ export function I18nRead(props: II18nReadProps) {
                 }
 
                 if (props.args) {
-                  i18nValue = i18nValue.replace(/\{(\d+)\}/g, (match, indexMatch) => (props.args[indexMatch] || "?"));
+                  i18nValue = localeReplacer(i18nValue, props.args);
                 }
 
                 if (!props.children) {

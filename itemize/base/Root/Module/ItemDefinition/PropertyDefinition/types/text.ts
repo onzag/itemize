@@ -14,7 +14,7 @@ import {
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
-import { DOMWindow, DOMPurify } from "../../../../../util";
+import { DOMWindow, DOMPurify } from "../../../../../../util";
 
 export type PropertyDefinitionSupportedTextType = string;
 const typeValue: IPropertyDefinitionSupportedType = {
@@ -47,8 +47,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
     // TODO check if the text content usage actually creates a proper vector
     let escapedText = value;
     let purifiedText = value;
-    if (property.getSubtype() === "html") {
-      const dummyElement = DOMWindow.document.createElement("div");
+    if (property.isRichText()) {
+      const dummyElement = DOMWindow.document.createElement("template");
       dummyElement.innerHTML = value.toString();
       escapedText = dummyElement.innerText;
 
