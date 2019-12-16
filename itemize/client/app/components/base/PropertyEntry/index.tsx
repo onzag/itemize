@@ -18,8 +18,7 @@ import {
 } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 import { currencies, countries, ICurrencyType, ICountryType } from "../../../../../resources";
-import { ThemeProvider, withStyles } from "@material-ui/styles";
-import { WithStyles } from "react-jss";
+import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
 import { IPropertyEntryThemeType, style, STANDARD_THEME } from "./styles";
 
 export interface IPropertyEntryBaseProps {

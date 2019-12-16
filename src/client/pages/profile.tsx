@@ -3,9 +3,8 @@ import { UserIdRetriever, LogActioner, ItemDefinitionLoader, View, I18nRead, Sta
 import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
 import { BlockedPage } from "./blocked";
 import { ErrorPage } from "./error";
-import { Button, createStyles, withStyles } from "@material-ui/core";
+import { Button, createStyles, withStyles, WithStyles } from "@material-ui/core";
 import { Avatar } from "../general/avatar";
-import { WithStyles } from "react-jss";
 import { LanguagePicker } from "../general/language-picker";
 
 function SimulatedNotFoundPage() {

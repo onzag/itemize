@@ -13,8 +13,6 @@ import { Ii18NType } from "../../../../../base/Root";
 import {
   PropertyDefinitionSupportedTypeName,
 } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-
-import "../../../../theme/property-entries.scss";
 import { currencies, countries, ICurrencyType, ICountryType } from "../../../../../resources";
 
 export interface IPropertyViewBaseProps {

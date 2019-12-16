@@ -2,9 +2,6 @@ import React from "react";
 import Root, { IRootRawJSONDataType, Ii18NType, IRawJSONBuildDataType } from "../../base/Root";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import { createMuiTheme } from "@material-ui/core";
-import { JssProvider } from "react-jss";
-import { create } from "jss";
-import { createGenerateClassName, jssPreset } from "@material-ui/core/styles";
 import { importScript } from "..";
 import Moment from "moment";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
@@ -14,17 +11,6 @@ import { history } from "..";
 import { countries, currencies } from "../../resources";
 import { TokenProvider, ITokenProviderState } from "./internal-providers";
 import { buildGqlMutation, gqlQuery } from "./gql-querier";
-
-// TODO rid of scss and use jss
-// We need to extract the jss generation because we want to
-// inject our custom css anyway, as despite having it
-// we are not really using the material ui JSS tools
-// we have our own custom SCSS
-const generateClassName = createGenerateClassName();
-const jss = create({
-  ...jssPreset(),
-  insertionPoint: "jss",
-});
 
 // Just a message for whether is development
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -102,6 +88,9 @@ export const DataContext = React.createContext<IDataContextType>(null);
 const theme = createMuiTheme({
   typography: {
     fontFamily: "'Open Sans', sans-serif",
+    fontWeightLight: 300,
+    fontWeightRegular: 400,
+    fontWeightMedium: 500,
   },
 });
 
@@ -419,16 +408,14 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // our data context, and then pass the react router route, note that the
     // router itself is the parent
     return (
-      <JssProvider jss={jss} generateId={generateClassName}>
-        <MuiThemeProvider theme={theme}>
-          <DataContext.Provider value={dataContextValue}>
-            <Route
-              path="/:lang/"
-              component={this.renderAppWithLocaleContext}
-            />
-          </DataContext.Provider>
-        </MuiThemeProvider>
-      </JssProvider>
+      <MuiThemeProvider theme={theme}>
+        <DataContext.Provider value={dataContextValue}>
+          <Route
+            path="/:lang/"
+            component={this.renderAppWithLocaleContext}
+          />
+        </DataContext.Provider>
+      </MuiThemeProvider>
     );
   }
 }

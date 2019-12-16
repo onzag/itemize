@@ -2,8 +2,7 @@ import React from "react";
 import { Avatar as MAvatar } from "@material-ui/core";
 import { Reader, Link } from "../../../itemize/client/app/elements";
 import { countries } from "../../../itemize/resources";
-import { withStyles, createStyles } from "@material-ui/styles";
-import { WithStyles } from "react-jss";
+import { withStyles, WithStyles, createStyles } from "@material-ui/styles";
 
 const avatarStyles = createStyles({
   flag: {
