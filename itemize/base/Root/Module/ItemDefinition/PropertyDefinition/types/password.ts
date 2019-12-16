@@ -73,7 +73,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
     return null;
   },
   searchable: false,
-  supportsIcons: false,
   // i18n attributes required
   i18n: {
     base: CLASSIC_BASE_I18N,

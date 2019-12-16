@@ -147,7 +147,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // they are searchable
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS,
-  supportsIcons: false,
   // i18n with the distance attributes
   i18n: {
     base: CLASSIC_BASE_I18N,

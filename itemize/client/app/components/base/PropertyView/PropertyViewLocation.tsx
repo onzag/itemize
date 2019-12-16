@@ -36,7 +36,7 @@ export default class PropertyViewLocation
     props: IPropertyViewProps,
     state: IPropertyViewLocationState,
   ): Partial<IPropertyViewLocationState> {
-    const valueAsLocation = props.value.value as IPropertyDefinitionSupportedLocationType;
+    const valueAsLocation = props.state.value as IPropertyDefinitionSupportedLocationType;
     const latitude = valueAsLocation ? valueAsLocation.lat : props.country.latitude;
     const longitude = valueAsLocation ? valueAsLocation.lng : props.country.longitude;
     const newViewport: IViewport = {
@@ -55,7 +55,7 @@ export default class PropertyViewLocation
   constructor(props: IPropertyViewProps) {
     super(props);
 
-    const valueAsLocation = props.value.value as IPropertyDefinitionSupportedLocationType;
+    const valueAsLocation = props.state.value as IPropertyDefinitionSupportedLocationType;
     const latitude = valueAsLocation ? valueAsLocation.lat : props.country.latitude;
     const longitude = valueAsLocation ? valueAsLocation.lng : props.country.longitude;
 
@@ -75,27 +75,27 @@ export default class PropertyViewLocation
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
       !equals(this.state, nextState) ||
-      !equals(this.props.value, nextProps.value) ||
+      !equals(this.props.state, nextProps.state) ||
       nextProps.country !== this.props.country;
   }
 
   public render() {
     // the location to mark is the currently set value
-    const currentLocationToMark = this.props.value.value && [
-      (this.props.value.value as IPropertyDefinitionSupportedLocationType).lat,
-      (this.props.value.value as IPropertyDefinitionSupportedLocationType).lng,
+    const currentLocationToMark = this.props.state.value && [
+      (this.props.state.value as IPropertyDefinitionSupportedLocationType).lat,
+      (this.props.state.value as IPropertyDefinitionSupportedLocationType).lng,
     ];
 
     // the txt
-    const currentLocationDataTxt = this.props.value.value &&
-      (this.props.value.value as IPropertyDefinitionSupportedLocationType).txt;
+    const currentLocationDataTxt = this.props.state.value &&
+      (this.props.state.value as IPropertyDefinitionSupportedLocationType).txt;
 
     // and the alternative txt data
-    const currentLocationDataATxt = this.props.value.value &&
-      (this.props.value.value as IPropertyDefinitionSupportedLocationType).atxt;
+    const currentLocationDataATxt = this.props.state.value &&
+      (this.props.state.value as IPropertyDefinitionSupportedLocationType).atxt;
 
     return (
-      <div>
+      <div className={this.props.classes.container}>
         <div>
           {currentLocationDataATxt}
         </div>

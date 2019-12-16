@@ -56,7 +56,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
   allowsMinMaxDefined: true,
   allowsMaxDecimalCountDefined: true,
   // i18n attributes required
-  supportsIcons: true,
   i18n: {
     base: CLASSIC_BASE_I18N,
     optional: CLASSIC_OPTIONAL_I18N,

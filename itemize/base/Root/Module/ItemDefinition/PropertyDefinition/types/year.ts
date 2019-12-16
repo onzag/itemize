@@ -48,7 +48,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // searchable attributes and supports range
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
-  supportsIcons: true,
   allowsMinMaxDefined: true,
   // i18n data
   i18n: {

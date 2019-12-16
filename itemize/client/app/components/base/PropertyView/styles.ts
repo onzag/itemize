@@ -1,11 +1,15 @@
 import { createStyles } from "@material-ui/styles";
 
-// tslint:disable-next-line: no-empty-interface
 export interface IPropertyViewThemeType {
+  containerWidth: string | number;
 }
 
 export const STANDARD_THEME: IPropertyViewThemeType = {
+  containerWidth: "100%",
 };
 
 export const style = (theme: IPropertyViewThemeType) => createStyles({
+  container: {
+    width: theme.containerWidth,
+  },
 });

@@ -2,12 +2,6 @@ import PropertyDefinition, {
   IPropertyDefinitionState,
 } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
-import PropertyViewField from "./PropertyViewField";
-// import PropertyViewBoolean from "./PropertyViewBoolean";
-// import PropertyViewText from "./PropertyViewText";
-// import PropertyViewDateTime from "./PropertyViewDateTime";
-// import PropertyViewLocation from "./PropertyViewLocation";
-// import PropertyViewFiles from "./PropertyViewFiles";
 import { LocaleContext, ILocaleContextType } from "../../..";
 import { Ii18NType } from "../../../../../base/Root";
 import {
@@ -16,6 +10,7 @@ import {
 import { currencies, countries, ICurrencyType, ICountryType } from "../../../../../resources";
 import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
 import { IPropertyViewThemeType, style, STANDARD_THEME } from "./styles";
+import PropertyViewField from "./PropertyViewField";
 import PropertyViewDateTime from "./PropertyViewDateTime";
 import PropertyViewBoolean from "./PropertyViewBoolean";
 import PropertyViewText from "./PropertyViewText";
@@ -23,7 +18,7 @@ import PropertyViewLocation from "./PropertyViewLocation";
 
 export interface IPropertyViewBaseProps {
   property: PropertyDefinition;
-  value: IPropertyDefinitionState;
+  state: IPropertyDefinitionState;
   theme?: Partial<IPropertyViewThemeType>;
 }
 
@@ -31,7 +26,7 @@ interface IPropertyViewStylesApplierProps extends IPropertyViewBaseProps, WithSt
   locale: ILocaleContextType;
 }
 
-export interface IPropertyViewProps extends IPropertyViewBaseProps {
+export interface IPropertyViewProps extends IPropertyViewStylesApplierProps {
   language: string;
   currency: ICurrencyType;
   i18n: Ii18NType;
@@ -56,6 +51,8 @@ const typeRegistry:
   date: PropertyViewDateTime,
   time: PropertyViewDateTime,
   location: PropertyViewLocation,
+
+  // TODO
   files: null,
 };
 
@@ -75,6 +72,7 @@ const PropertyViewStylesApplier = withStyles(style)((props: IPropertyViewStylesA
   );
 });
 
+// TODO title, description to views and flags to hide and show them
 export default function PropertyView(props: IPropertyViewBaseProps) {
   let appliedTheme: IPropertyViewThemeType = STANDARD_THEME;
   if (props.theme) {

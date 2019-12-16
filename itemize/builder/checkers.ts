@@ -579,14 +579,6 @@ export function checkPropertyDefinition(
     );
   }
 
-  // checks icons
-  if (rawData.icon && !propertyDefintionTypeStandard.supportsIcons) {
-    throw new CheckUpError(
-      `type '${rawData.type}' cannot have icons`,
-      traceback.newTraceToBit("icon"),
-    );
-  }
-
   // check invalid custom errors
   if (rawData.invalidIf) {
     const possiblyBrokenErrorIndex = rawData.invalidIf.findIndex((ii) => PropertyInvalidReason[ii.error]);

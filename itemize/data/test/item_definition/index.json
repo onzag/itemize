@@ -3,39 +3,33 @@
     "properties": [
         {
             "id": "boolean",
-            "type": "boolean",
-            "icon": "check_circle"
+            "type": "boolean"
         },
         {
             "id": "boolean_nullable",
             "type": "boolean",
-            "nullable": true,
-            "icon": "check_circle"
+            "nullable": true
         },
 
         {
             "id": "string",
-            "type": "string",
-            "icon": "text_fields"
+            "type": "string"
         },
         {
             "id": "string_nullable",
             "type": "string",
-            "nullable": true,
-            "icon": "text_fields"
+            "nullable": true
         },
         {
             "id": "string_values",
             "type": "string",
-            "values": ["one", "two", "three", "four"],
-            "icon": "text_fields"
+            "values": ["one", "two", "three", "four"]
         },
         {
             "id": "string_values_nullable",
             "type": "string",
             "values": ["one", "two", "three", "four"],
-            "nullable": true,
-            "icon": "text_fields"
+            "nullable": true
         },
         {
             "id": "string_autocomplete",
@@ -69,52 +63,44 @@
 
         {
             "id": "integer",
-            "type": "integer",
-            "icon": "filter_1"
+            "type": "integer"
         },
         {
             "id": "integer_nullable",
             "type": "integer",
-            "nullable": true,
-            "icon": "filter_1"
+            "nullable": true
         },
         {
             "id": "integer_values",
             "type": "integer",
-            "values": [1, 2, 3, 4],
-            "icon": "filter_1"
+            "values": [1, 2, 3, 4]
         },
         {
             "id": "integer_values_nullable",
             "type": "integer",
             "values": [1, 2, 3, 4],
-            "nullable": true,
-            "icon": "filter_1"
+            "nullable": true
         },
 
         {
             "id": "number",
-            "type": "number",
-            "icon": "looks_one"
+            "type": "number"
         },
         {
             "id": "number_nullable",
             "type": "number",
-            "nullable": true,
-            "icon": "looks_one"
+            "nullable": true
         },
         {
             "id": "number_values",
             "type": "number",
-            "values": [1.0, 1.1, 1.2, 2.0],
-            "icon": "looks_one"
+            "values": [1.0, 1.1, 1.2, 2.0]
         },
         {
             "id": "number_values_nullable",
             "type": "number",
             "values": [1.0, 1.1, 1.2, 2.0],
-            "nullable": true,
-            "icon": "looks_one"
+            "nullable": true
         },
 
         {
@@ -179,20 +165,17 @@
 
         {
             "id": "files",
-            "type": "files",
-            "icon": "insert_drive_file"
+            "type": "files"
         },
         {
             "id": "files_nullable",
             "type": "files",
-            "nullable": true,
-            "icon": "insert_drive_file"
+            "nullable": true
         },
         {
             "id": "files_single",
             "type": "files",
-            "maxLength": 1,
-            "icon": "insert_drive_file"
+            "maxLength": 1
         }
     ]
 }

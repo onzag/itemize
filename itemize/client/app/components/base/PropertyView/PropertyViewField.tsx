@@ -3,12 +3,12 @@ import React from "react";
 
 export default class PropertyViewField extends React.Component<IPropertyViewProps, {}> {
   public shouldComponentUpdate(nextProps: IPropertyViewProps) {
-    return this.props.value.value !== nextProps.value.value;
+    return this.props.state.value !== nextProps.state.value;
   }
   public render() {
     return (
-      <div>
-        {this.props.value.value}
+      <div className={this.props.classes.container}>
+        {this.props.state.value}
       </div>
     );
   }

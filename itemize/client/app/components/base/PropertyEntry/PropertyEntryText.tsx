@@ -111,11 +111,12 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
     // we use this too
     return nextProps.property !== this.props.property ||
       !equals(this.state, nextState) ||
-      !equals(this.props.value, nextProps.value) ||
+      !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       nextProps.language !== this.props.language ||
-      nextProps.i18n !== this.props.i18n;
+      nextProps.i18n !== this.props.i18n ||
+      nextProps.icon !== this.props.icon;
   }
   public onChange(value: string) {
     // on change, these values are basically empty
@@ -144,8 +145,8 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
   }
   public render() {
     // this is the editor value
-    const editorValue = this.props.value.value ?
-      this.props.value.value as string :
+    const editorValue = this.props.state.value ?
+      this.props.state.value as string :
       "";
 
     // basic data
@@ -155,10 +156,10 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
     const i18nPlaceholder = i18nData && i18nData.placeholder;
 
     // invalid reason
-    const invalidReason = this.props.value.invalidReason;
+    const invalidReason = this.props.state.invalidReason;
     let i18nInvalidReason = null;
     if (
-      (this.props.poked || this.props.value.userSet) &&
+      (this.props.poked || this.props.state.userSet) &&
       invalidReason && i18nData &&
       i18nData.error && i18nData.error[invalidReason]
     ) {
@@ -166,7 +167,7 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
     }
 
     // the icon as usual
-    const icon = this.props.property.getIcon();
+    const icon = this.props.icon;
     const iconComponent = icon ? (
       <Icon classes={{root: this.props.classes.icon}}>{icon}</Icon>
     ) : null;
@@ -189,7 +190,7 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
           <RichTextEditorToolbar id={this.uuid} i18n={this.props.i18n}/>
           <ReactQuill
             className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
-            disabled={this.props.value.enforced}
+            disabled={this.props.state.enforced}
             modules={{
               toolbar: {
                 container: "#" + this.uuid,

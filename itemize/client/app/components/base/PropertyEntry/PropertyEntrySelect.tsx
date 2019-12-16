@@ -78,11 +78,12 @@ export default class PropertyEntrySelect
   ) {
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
-      !equals(this.props.value, nextProps.value) ||
+      !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       nextProps.language !== this.props.language ||
-      nextProps.i18n !== this.props.i18n;
+      nextProps.i18n !== this.props.i18n ||
+      nextProps.icon !== this.props.icon;
   }
 
   public onChange(
@@ -112,10 +113,10 @@ export default class PropertyEntrySelect
       i18nData && i18nData.null_value : null;
 
     // get the invalid reason
-    const invalidReason = this.props.value.invalidReason;
+    const invalidReason = this.props.state.invalidReason;
     let i18nInvalidReason = null;
     if (
-      (this.props.poked || this.props.value.userSet) &&
+      (this.props.poked || this.props.state.userSet) &&
       invalidReason && i18nData &&
       i18nData.error && i18nData.error[invalidReason]
     ) {
@@ -123,7 +124,7 @@ export default class PropertyEntrySelect
     }
 
     // build the icon
-    const icon = this.props.property.getIcon();
+    const icon = this.props.icon;
     const addornment = icon ? (
       <InputAdornment position="end">
         <Icon classes={{root: this.props.classes.icon}}>{icon}</Icon>
@@ -131,12 +132,12 @@ export default class PropertyEntrySelect
     ) : null;
 
     // get the current value that is on display
-    const currentValue = this.props.value.value !== null ?
-      this.props.value.value :
+    const currentValue = this.props.state.value !== null ?
+      this.props.state.value :
       formatValueAsString(
         this.props.property.getType(),
         this.props.i18n.number_decimal_separator,
-        this.props.value.value,
+        this.props.state.value,
       );
 
     // and just return this
@@ -160,7 +161,7 @@ export default class PropertyEntrySelect
             value={currentValue}
             onChange={this.onChange}
             displayEmpty={true}
-            disabled={this.props.value.enforced}
+            disabled={this.props.state.enforced}
             variant="filled"
             classes={{
               icon: addornment ? this.props.classes.selectFieldIconWhenAddornmentIsActive : null,

@@ -63,11 +63,12 @@ export default class PropertyEntryField
     return nextProps.property !== this.props.property ||
       !equals(this.state.suggestions, nextState.suggestions) ||
       this.state.visible !== nextState.visible ||
-      !equals(this.props.value, nextProps.value) ||
+      !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       nextProps.language !== this.props.language ||
-      nextProps.i18n !== this.props.i18n;
+      nextProps.i18n !== this.props.i18n ||
+      nextProps.icon !== this.props.icon;
   }
 
   public toggleVisible() {
@@ -132,10 +133,10 @@ export default class PropertyEntryField
     const i18nPlaceholder = i18nData && i18nData.placeholder;
 
     // get the invalid reason if any
-    const invalidReason = this.props.value.invalidReason;
+    const invalidReason = this.props.state.invalidReason;
     let i18nInvalidReason = null;
     if (
-      (this.props.poked || this.props.value.userSet) &&
+      (this.props.poked || this.props.state.userSet) &&
       invalidReason && i18nData &&
       i18nData.error && i18nData.error[invalidReason]
     ) {
@@ -216,12 +217,12 @@ export default class PropertyEntryField
           </IconButton>
         </InputAdornment>
       );
-    } else if (this.props.property.getIcon()) {
+    } else if (this.props.icon) {
       // set it at the end
       appliedInputProps.endAdornment = (
         <InputAdornment position="end">
           <Icon classes={{root: this.props.classes.icon}}>
-            {this.props.property.getIcon()}
+            {this.props.icon}
           </Icon>
         </InputAdornment>
       );
@@ -238,14 +239,14 @@ export default class PropertyEntryField
           className={this.props.classes.entry}
           label={i18nLabel}
           placeholder={i18nPlaceholder}
-          value={this.props.value.internalValue || this.props.value.value || ""}
+          value={this.props.state.internalValue || this.props.state.value || ""}
           onChange={this.onChangeByHTMLEvent}
           InputProps={{
             classes: {
               root: this.props.classes.fieldInput,
               focused: "focused",
             },
-            disabled: this.props.value.enforced,
+            disabled: this.props.state.enforced,
             ...appliedInputProps,
           }}
           InputLabelProps={{
@@ -255,7 +256,7 @@ export default class PropertyEntryField
             },
           }}
           inputProps={inputProps}
-          disabled={this.props.value.enforced}
+          disabled={this.props.state.enforced}
           variant="filled"
           {...appliedTextFieldProps}
         />
@@ -360,9 +361,9 @@ export default class PropertyEntryField
         });
       }
       if (this.props.property.isAutocompleteLocalized()) {
-        const suggestionFound = output.find((s) => s.i18n === this.props.value.internalValue || "");
-        if (suggestionFound && suggestionFound.value !== this.props.value.value) {
-          this.props.onChange(suggestionFound.value, this.props.value.internalValue);
+        const suggestionFound = output.find((s) => s.i18n === this.props.state.internalValue || "");
+        if (suggestionFound && suggestionFound.value !== this.props.state.value) {
+          this.props.onChange(suggestionFound.value, this.props.state.internalValue);
         }
       }
     } catch (err) {
@@ -407,9 +408,9 @@ export default class PropertyEntryField
           sectionTitle: this.props.classes.autocompleteSectionTitle,
         }}
         inputProps={{
-          value: this.props.value.internalValue || this.props.value.value || "",
+          value: this.props.state.internalValue || this.props.state.value || "",
           onChange: this.onChange,
-          disabled: this.props.value.enforced,
+          disabled: this.props.state.enforced,
         }}
       />
     );

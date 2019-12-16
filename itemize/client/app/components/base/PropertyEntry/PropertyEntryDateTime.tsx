@@ -54,8 +54,8 @@ export default class PropertyEntryDateTime extends
     // this way then
     this.state = {
       value: getValue(
-        props.value.internalValue,
-        props.value.value as PropertyDefinitionSupportedDateType,
+        props.state.internalValue,
+        props.state.value as PropertyDefinitionSupportedDateType,
         props.property.getType(),
       ),
     };
@@ -69,7 +69,7 @@ export default class PropertyEntryDateTime extends
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
       !equals(this.state, nextState) ||
-      !equals(this.props.value, nextProps.value) ||
+      !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       nextProps.language !== this.props.language ||
@@ -77,7 +77,7 @@ export default class PropertyEntryDateTime extends
   }
   public componentDidUpdate(prevProps: IPropertyEntryProps) {
     // if the value is null we update accordingly
-    if (this.props.value.value === null) {
+    if (this.props.state.value === null) {
       if (this.state.value !== null) {
         this.setState({
           value: null,
@@ -98,7 +98,7 @@ export default class PropertyEntryDateTime extends
     } else if (type === "time") {
       dbFormat = TIME_FORMAT;
     }
-    const valueParsed = Moment(this.props.value.value as string, dbFormat);
+    const valueParsed = Moment(this.props.state.value as string, dbFormat);
     if (valueParsed.isValid() && !valueParsed.isSame(this.state.value)) {
       this.setState({
         value: valueParsed,
@@ -137,10 +137,10 @@ export default class PropertyEntryDateTime extends
     const i18nPlaceholder = i18nData && i18nData.placeholder;
 
     // invalid reason getting it up
-    const invalidReason = this.props.value.invalidReason;
+    const invalidReason = this.props.state.invalidReason;
     let i18nInvalidReason = null;
     if (
-      (this.props.poked || this.props.value.userSet) &&
+      (this.props.poked || this.props.state.userSet) &&
       invalidReason && i18nData &&
       i18nData.error && i18nData.error[invalidReason]
     ) {
@@ -167,7 +167,7 @@ export default class PropertyEntryDateTime extends
         onChange: this.handleOnChange,
         error: false,
         helperText: null,
-        disabled: this.props.value.enforced,
+        disabled: this.props.state.enforced,
         InputProps: {
           classes: {
             root: this.props.classes.fieldInput,
@@ -216,7 +216,7 @@ export default class PropertyEntryDateTime extends
         onChange: this.handleOnChange,
         error: false,
         helperText: null,
-        disabled: this.props.value.enforced,
+        disabled: this.props.state.enforced,
         InputProps: {
           classes: {
             root: this.props.classes.fieldInput,
@@ -265,7 +265,7 @@ export default class PropertyEntryDateTime extends
         onChange: this.handleOnChange,
         error: false,
         helperText: null,
-        disabled: this.props.value.enforced,
+        disabled: this.props.state.enforced,
         InputProps: {
           classes: {
             root: this.props.classes.fieldInput,

@@ -154,9 +154,6 @@ export default {
     disableRetrieval: {
       type: "boolean",
     },
-    icon: {
-      type: "string",
-    },
     richText: {
       type: "boolean",
     },

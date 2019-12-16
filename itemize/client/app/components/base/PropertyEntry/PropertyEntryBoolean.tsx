@@ -9,9 +9,8 @@ function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
   const i18nData = props.property.getI18nDataFor(props.language);
   const i18nLabel = i18nData && i18nData.label;
   const i18nDescription = i18nData && i18nData.description;
-  const icon = props.property.getIcon();
-  const iconComponent = icon ? (
-    <Icon classes={{root: props.classes.icon}}>{icon}</Icon>
+  const iconComponent = props.icon ? (
+    <Icon classes={{root: props.classes.icon}}>{props.icon}</Icon>
   ) : null;
 
   // so now we build the initial container,
@@ -35,9 +34,9 @@ function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
           }}
           control={
             <Switch
-              checked={props.value.value as boolean || false}
-              onChange={props.onChange.bind(null, !props.value.value, null)}
-              disabled={props.value.enforced}
+              checked={props.state.value as boolean || false}
+              onChange={props.onChange.bind(null, !props.state.value, null)}
+              disabled={props.state.enforced}
             />
           }
           label={i18nLabel}
@@ -75,7 +74,7 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
   const i18nData = props.property.getI18nDataFor(props.language);
   const i18nLabel = i18nData && i18nData.label;
   const i18nDescription = i18nData && i18nData.description;
-  const icon = props.property.getIcon();
+  const icon = props.icon;
   const iconComponent = icon ? (
     <Icon classes={{root: props.classes.icon}}>{icon}</Icon>
   ) : null;
@@ -127,7 +126,7 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
           {i18nDescription}
         </div> : null}
         <RadioGroup
-          value={JSON.stringify(props.value.value)}
+          value={JSON.stringify(props.state.value)}
           onChange={handleOnChange.bind(this, props)}
         >
           {values.map((v) => <FormControlLabel
@@ -136,7 +135,7 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
             value={v.value}
             control={<Radio/>}
             label={v.label}
-            disabled={props.value.enforced}
+            disabled={props.state.enforced}
           />)}
         </RadioGroup>
       </FormControl>
@@ -147,7 +146,7 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
 export default class PropertyEntryBoolean extends React.Component<IPropertyEntryProps, {}> {
   public shouldComponentUpdate(nextProps: IPropertyEntryProps) {
     return this.props.property !== nextProps.property ||
-      !equals(this.props.value, nextProps.value) ||
+      !equals(this.props.state, nextProps.state) ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       !!this.props.poked !== !!nextProps.poked ||
       nextProps.language !== this.props.language ||

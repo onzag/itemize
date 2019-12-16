@@ -100,7 +100,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // whether it is searchable or not
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.FTS,
-  supportsIcons: true,
   allowsMinMaxLengthDefined: true,
   // i18n attributes
   i18n: {

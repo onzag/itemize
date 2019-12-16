@@ -425,6 +425,9 @@ export default class Module {
   }
 
   public getSearchModule(): Module {
+    if (!this.searchModeModule) {
+      throw new Error("No search module for " + this.getName());
+    }
     return this.searchModeModule;
   }
 

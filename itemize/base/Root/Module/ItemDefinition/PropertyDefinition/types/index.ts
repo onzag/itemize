@@ -110,8 +110,6 @@ export interface IPropertyDefinitionSupportedType {
   searchable: boolean;
   // the search interface used
   searchInterface?: PropertyDefinitionSearchInterfacesType;
-  // whether it supports icons or not
-  supportsIcons: boolean;
   // special attributes that might be added specific to that type
   specialProperties?: Array<{
     name: string;

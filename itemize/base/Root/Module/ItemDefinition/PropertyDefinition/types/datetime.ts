@@ -26,7 +26,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
-  supportsIcons: false,
   sql: getStandardSQLFnFor("datetime"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,

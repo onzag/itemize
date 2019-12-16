@@ -4,7 +4,6 @@
         {
             "id": "username",
             "type": "string",
-            "icon": "account_circle",
             "unique": true,
             "htmlAutocomplete": "username"
         },
@@ -30,7 +29,6 @@
             "id": "email",
             "type": "string",
             "subtype": "email",
-            "icon": "email",
             "searchLevel": "disabled",
             "nullable": true,
             "readRoleAccess": ["SELF", "ADMIN"],

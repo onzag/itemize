@@ -45,7 +45,7 @@ function shouldShowInvalid(props: IPropertyEntryBaseProps) {
   if (props.forceInvalid) {
     return true;
   }
-  return !props.value.valid && (props.poked || props.value.userSet);
+  return !props.state.valid && (props.poked || props.state.userSet);
 }
 export const style = (theme: IPropertyEntryThemeType) => createStyles({
   entry: {
@@ -113,7 +113,7 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
         },
         // during the hover event
         "&:hover::before": {
-          borderBottomColor: props.value.enforced ? theme.fieldBorderColor : theme.fieldBorderInvalidColorFocused,
+          borderBottomColor: props.state.enforced ? theme.fieldBorderColor : theme.fieldBorderInvalidColorFocused,
         },
       };
     }

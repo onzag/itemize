@@ -25,7 +25,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
   // the i18n attributes
-  supportsIcons: true,
   i18n: {
     base: REDUCED_BASE_I18N,
     optional: CLASSIC_OPTIONAL_I18N,

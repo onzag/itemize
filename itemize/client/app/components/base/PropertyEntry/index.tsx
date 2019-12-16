@@ -22,13 +22,15 @@ import { IPropertyEntryThemeType, style, STANDARD_THEME } from "./styles";
 
 export interface IPropertyEntryBaseProps {
   property: PropertyDefinition;
-  value: IPropertyDefinitionState;
+  state: IPropertyDefinitionState;
   onChange: (newValue: PropertyDefinitionSupportedType, internalValue: any) => void;
+  forId: number;
+
   theme?: Partial<IPropertyEntryThemeType>;
   forceInvalid?: boolean;
   poked?: boolean;
   autoFocus?: boolean;
-  forId: number;
+  icon?: string;
 }
 
 interface IPropertyEntryStylesApplierProps extends IPropertyEntryBaseProps, WithStyles<typeof style> {

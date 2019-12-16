@@ -1,5 +1,5 @@
 import PropertyEntry from "./components/base/PropertyEntry";
-import { ItemDefinitionContext } from "./providers";
+import { ItemDefinitionContext, ItemContext } from "./providers";
 import PropertyDefinition, { IPropertyDefinitionState, IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
 import ItemDefinition, { IItemDefinitionStateType, IItemDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition";
@@ -14,6 +14,10 @@ import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICou
 import { Link as RouterLink, LinkProps, Route as RouterRoute, RouteProps } from "react-router-dom";
 import { RESERVED_BASE_PROPERTIES } from "../../constants";
 import { localeReplacer } from "../../util";
+import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
+import ItemExclusionSwitch from "./components/base/ItemExclusionSwitch";
+import ItemCalloutWarning from "./components/base/ItemCalloutWarning";
+import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 
 export function Link(props: LinkProps) {
   const currentLocaleFromURL = location.pathname.split("/")[1] || null;
@@ -35,117 +39,141 @@ export function Route(props: RouteProps) {
   return <RouterRoute {...props} path={`/:__lang${urlDefined}`}/>;
 }
 
-// TODO add showAsInvalid as an option
+type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search";
+
 interface IPropertyEntryProps {
   id: string;
-  item?: string;
+  searchVariant?: SearchVariants;
   showAsInvalid?: boolean;
+  icon?: string;
   onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, inernalValue?: any) => void;
 }
 
 interface IPropertyReadProps {
   id: string;
-  item?: string;
+  searchVariant?: SearchVariants;
   children?: (value: PropertyDefinitionSupportedType) => React.ReactNode;
 }
 
 interface IPropertyViewProps {
   id: string;
-  item?: string;
+  searchVariant?: SearchVariants;
+}
+
+interface IExclusionSwitchProps {
+  onChange?: (item: Item, newExclusionState: ItemExclusionState) => void;
 }
 
 interface IPropertyEntryViewReadProps {
   id: string;
-  item?: string;
+  searchVariant?: SearchVariants;
   children?: (value: PropertyDefinitionSupportedType) => React.ReactNode;
   showAsInvalid?: boolean;
+  icon?: string;
   onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, internalValue?: any) => void;
 }
 
+// TODO EntryViewRead in module context only for module level searches
 function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: boolean) {
   return (
     <ItemDefinitionContext.Consumer>
       {
-        (itemDefinitionContextualValue) => {
-          if (!itemDefinitionContextualValue) {
-            throw new Error("The Entry/View/Read must be in a ItemDefinitionProvider context");
-          }
+        (itemDefinitionContextualValue) => (
+          <ItemContext.Consumer>
+            {
+              (itemContextualValue) => {
+                if (!itemDefinitionContextualValue) {
+                  throw new Error("The Entry/View/Read must be in a ItemDefinitionProvider context");
+                }
 
-          let propertyValue: IPropertyDefinitionState = null;
-          if (props.item) {
-            const itemValue = itemDefinitionContextualValue.value.items.find((i) => i.itemName === props.item);
-            if (!itemValue) {
-              throw new Error("Cannot find the item " + itemValue);
-            }
-            if (itemValue.itemDefinitionValue) {
-              propertyValue = itemValue.itemDefinitionValue.properties.find((p) => p.propertyId === props.id);
-            }
-          } else {
-            propertyValue = itemDefinitionContextualValue.value.properties.find((p) => p.propertyId === props.id);
-          }
+                let actualId = props.id;
+                if (props.searchVariant) {
+                  actualId =
+                    PropertyDefinitionSearchInterfacesPrefixes[props.searchVariant.toUpperCase()] + props.id;
+                }
 
-          if (read) {
-            if (propertyValue) {
-              return props.children(propertyValue.value);
-            }
-            if (!props.item && RESERVED_BASE_PROPERTIES[props.id]) {
-              let gqlValue = itemDefinitionContextualValue.value.gqlOriginalAppliedValue &&
-                itemDefinitionContextualValue.value.gqlOriginalAppliedValue.value[props.id];
-              if (typeof gqlValue === "undefined") {
-                gqlValue = null;
+                const isMetaProperty = !!RESERVED_BASE_PROPERTIES[actualId];
+                const property = !isMetaProperty ? (
+                    itemContextualValue ?
+                    itemContextualValue.item.getSinkingPropertyFor(actualId) :
+                    itemDefinitionContextualValue.idef.getPropertyDefinitionFor(actualId, true)
+                  ) : null;
+                let propertyState: IPropertyDefinitionState = null;
+                if (!isMetaProperty) {
+                  if (itemContextualValue) {
+                    propertyState = itemContextualValue.state.itemDefinitionState.properties
+                      .find((p) => p.propertyId === actualId);
+                  } else {
+                    propertyState =
+                      itemDefinitionContextualValue.state.properties.find((p) => p.propertyId === actualId);
+                  }
+                }
+
+                if (read) {
+                  if (propertyState) {
+                    return props.children(propertyState.value);
+                  }
+                  if (isMetaProperty) {
+                    let gqlValue = itemDefinitionContextualValue.state.gqlOriginalAppliedValue &&
+                      itemDefinitionContextualValue.state.gqlOriginalAppliedValue.value[actualId];
+                    if (typeof gqlValue === "undefined") {
+                      gqlValue = null;
+                    }
+                    return props.children(gqlValue);
+                  }
+                  // Property has no state, and no internal value, it must be somehow hidden
+                  return null;
+                } else if (view) {
+                  if (propertyState) {
+                    return (
+                      <PropertyView
+                        property={property}
+                        state={propertyState}
+                      />
+                    );
+                  }
+                  if (isMetaProperty) {
+                    let gqlValue = itemDefinitionContextualValue.state.gqlOriginalAppliedValue &&
+                      itemDefinitionContextualValue.state.gqlOriginalAppliedValue[actualId];
+                    if (typeof gqlValue === "undefined") {
+                      gqlValue = null;
+                    }
+                    if (typeof gqlValue === "number") {
+                      return <RawBasePropertyView
+                        value={gqlValue.toString()}
+                      />;
+                    } else {
+                      return <RawBasePropertyView
+                        value={gqlValue}
+                      />;
+                    }
+                  }
+                  return null;
+                } else {
+                  if (!propertyState) {
+                    return null;
+                  }
+                  const onChange = (newValue: PropertyDefinitionSupportedType, internalValue?: any) => {
+                    if (props.onChange) {
+                      props.onChange(property, newValue, internalValue);
+                    }
+                    itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
+                  };
+                  return (
+                    <PropertyEntry
+                      property={property}
+                      state={propertyState}
+                      onChange={onChange}
+                      forceInvalid={props.showAsInvalid}
+                      icon={props.icon}
+                      forId={itemDefinitionContextualValue.forId}
+                    />
+                  );
+                }
               }
-              return props.children(gqlValue);
             }
-            throw new Error("Cannot find property for " + props.id);
-          } else if (view) {
-            if (propertyValue) {
-              const property = itemDefinitionContextualValue.idef.getPropertyDefinitionFor(props.id, true);
-              return (
-                <PropertyView
-                  property={property}
-                  value={propertyValue}
-                />
-              );
-            }
-            if (!props.item && RESERVED_BASE_PROPERTIES[props.id]) {
-              let gqlValue = itemDefinitionContextualValue.value.gqlOriginalAppliedValue &&
-                itemDefinitionContextualValue.value.gqlOriginalAppliedValue[props.id];
-              if (typeof gqlValue === "undefined") {
-                gqlValue = null;
-              }
-              if (typeof gqlValue === "number") {
-                return <RawBasePropertyView
-                  value={gqlValue.toString()}
-                />;
-              } else {
-                return <RawBasePropertyView
-                  value={gqlValue}
-                />;
-              }
-            }
-            throw new Error("Cannot find property for " + props.id);
-          } else {
-            if (!propertyValue) {
-              throw new Error("Cannot find property for " + props.id);
-            }
-            const property = itemDefinitionContextualValue.idef.getPropertyDefinitionFor(props.id, true);
-            const onChange = (newValue: PropertyDefinitionSupportedType, internalValue?: any) => {
-              if (props.onChange) {
-                props.onChange(property, newValue, internalValue);
-              }
-              itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
-            };
-            return (
-              <PropertyEntry
-                property={property}
-                value={propertyValue}
-                onChange={onChange}
-                forceInvalid={props.showAsInvalid}
-                forId={itemDefinitionContextualValue.forId}
-              />
-            );
-          }
-        }
+          </ItemContext.Consumer>
+        )
       }
     </ItemDefinitionContext.Consumer>
   );
@@ -161,6 +189,63 @@ export function View(props: IPropertyViewProps) {
 
 export function Reader(props: IPropertyReadProps) {
   return EntryViewRead(props, false, true);
+}
+
+export function ExclusionSwitch(props: IExclusionSwitchProps) {
+  return (
+    <ItemDefinitionContext.Consumer>
+      {
+        (itemDefinitionContextualValue) => (
+          <ItemContext.Consumer>
+            {
+              (itemContextualValue) => {
+                if (!itemContextualValue) {
+                  throw new Error("The ExclusionSwitch must be in an Item context");
+                }
+
+                const onChange = (newExclusionState: ItemExclusionState) => {
+                  if (props.onChange) {
+                    props.onChange(itemContextualValue.item, newExclusionState);
+                  }
+                  itemDefinitionContextualValue.onItemSetExclusionState(itemContextualValue.item, newExclusionState);
+                };
+
+                return (
+                  <ItemExclusionSwitch
+                    item={itemContextualValue.item}
+                    state={itemContextualValue.state}
+                    onChange={onChange}
+                    forId={itemDefinitionContextualValue.forId}
+                  />
+                );
+              }
+            }
+          </ItemContext.Consumer>
+        )
+      }
+    </ItemDefinitionContext.Consumer>
+  );
+}
+
+export function CalloutWarning() {
+  return (
+    <ItemContext.Consumer>
+      {
+        (itemContextualValue) => {
+          if (!itemContextualValue) {
+            throw new Error("The CalloutWarning must be in an Item context");
+          }
+
+          return (
+            <ItemCalloutWarning
+              item={itemContextualValue.item}
+              state={itemContextualValue.state}
+            />
+          );
+        }
+      }
+    </ItemContext.Consumer>
+  );
 }
 
 interface IItemDefinitionLoader {
@@ -220,7 +305,6 @@ export function ItemDefinitionLoader(props: IItemDefinitionLoader) {
 interface II18nReadProps {
   id: string;
   args?: string[];
-  item?: string;
   children?: (value: string) => React.ReactNode;
 }
 
@@ -231,38 +315,43 @@ export function I18nRead(props: II18nReadProps) {
         (localeContext) => (
           <ItemDefinitionContext.Consumer>
             {
-              (itemDefinitionContextualValue) => {
-                if (!itemDefinitionContextualValue) {
-                  throw new Error("The i18nRead must be in a ItemDefinitionProvider context");
-                }
+              (itemDefinitionContextualValue) => (
+                <ItemContext.Consumer>
+                  {
+                    (itemContext) => {
+                      if (!itemDefinitionContextualValue) {
+                        throw new Error("The i18nRead must be in a ItemDefinitionProvider context");
+                      }
 
-                let i18nValue: string = null;
-                if (props.item) {
-                  const item = itemDefinitionContextualValue.idef.getItemFor(props.item);
-                  if (props.id === "name") {
-                    i18nValue = item.getI18nNameFor(localeContext.language) || null;
-                  } else {
-                    const itemI18nData = item.getI18nDataFor(localeContext.language);
-                    i18nValue = itemI18nData ? itemI18nData[props.id] : null;
+                      let i18nValue: string = null;
+                      if (itemContext) {
+                        if (props.id === "name") {
+                          i18nValue = itemContext.item.getI18nNameFor(localeContext.language) || null;
+                        } else {
+                          const itemI18nData = itemContext.item.getI18nDataFor(localeContext.language);
+                          i18nValue = itemI18nData ? itemI18nData[props.id] : null;
+                        }
+                      } else {
+                        const i18nIdefData = itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
+                        if (i18nIdefData && i18nIdefData.custom && i18nIdefData.custom[props.id]) {
+                          i18nValue = i18nIdefData.custom[props.id];
+                        } else {
+                          i18nValue = i18nIdefData ? i18nIdefData[props.id] : null;
+                        }
+                      }
+
+                      if (props.args) {
+                        i18nValue = localeReplacer(i18nValue, props.args);
+                      }
+
+                      if (!props.children) {
+                        return i18nValue;
+                      }
+                      return props.children(i18nValue);
+                    }
                   }
-                } else {
-                  const i18nIdefData = itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
-                  if (i18nIdefData && i18nIdefData.custom && i18nIdefData.custom[props.id]) {
-                    i18nValue = i18nIdefData.custom[props.id];
-                  } else {
-                    i18nValue = i18nIdefData ? i18nIdefData[props.id] : null;
-                  }
-                }
-
-                if (props.args) {
-                  i18nValue = localeReplacer(i18nValue, props.args);
-                }
-
-                if (!props.children) {
-                  return i18nValue;
-                }
-                return props.children(i18nValue);
-              }
+                </ItemContext.Consumer>
+              )
             }
           </ItemDefinitionContext.Consumer>
         )
@@ -361,9 +450,9 @@ export function LogActioner(props: ILogActionerProps) {
                     throw new Error("The LogActioner must be in a ItemDefinitionProvider context");
                   }
 
-                  const username = itemDefinitionContextualValue.value.properties
+                  const username = itemDefinitionContextualValue.state.properties
                     .find((pv) => pv.propertyId === "username");
-                  const password = itemDefinitionContextualValue.value.properties
+                  const password = itemDefinitionContextualValue.state.properties
                     .find((pv) => pv.propertyId === "password");
 
                   if (!username) {
@@ -554,6 +643,20 @@ export function AppCountryRetriever(props: {
   );
 }
 
+// TODO submit for a country
+// tslint:disable-next-line: no-empty
+export function SubmitButton() {
+}
+
+// TODO search for a country
+// tslint:disable-next-line: no-empty
+export function SearchButton() {
+}
+
+// tslint:disable-next-line: no-empty
+export function SearchResultsRetriever() {
+}
+
 export function StatsForNerds(props: {
   propertyIds?: string[],
 }) {
@@ -562,8 +665,8 @@ export function StatsForNerds(props: {
       {
         (itemDefinitionContextualValue) => {
           const valueToStringify: IItemDefinitionStateType = {
-            ...itemDefinitionContextualValue.value,
-            properties: itemDefinitionContextualValue.value.properties
+            ...itemDefinitionContextualValue.state,
+            properties: itemDefinitionContextualValue.state.properties
               .filter((p) => !props.propertyIds || props.propertyIds.includes(p.propertyId))
               .map((propertyValue) => {
               let propertyValueToStringify = {...propertyValue};

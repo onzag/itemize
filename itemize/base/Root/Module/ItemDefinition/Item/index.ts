@@ -20,7 +20,7 @@ export interface IItemState {
   canExclusionBeSet: boolean;
   itemId: string;
   itemName: string;
-  itemDefinitionValue: IItemDefinitionStateType;
+  itemDefinitionState: IItemDefinitionStateType;
   stateExclusion: ItemExclusionState;
   stateExclusionModified: boolean;
 }
@@ -201,6 +201,14 @@ export default class Item {
     return this.rawData.sinkIn || [];
   }
 
+  public getSinkingPropertyFor(id: string) {
+    if (!this.rawData.sinkIn.includes(id)) {
+      throw new Error("Invalid sinking property: " + id);
+    }
+
+    return this.itemDefinition.getPropertyDefinitionFor(id, false);
+  }
+
   /**
    * Provides all the sinking properties as property definition
    * instances
@@ -355,7 +363,7 @@ export default class Item {
       canExclusionBeSet: this.canExclusionBeSet(id),
       itemId: this.getId(),
       itemName: this.getName(),
-      itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
+      itemDefinitionState: exclusionState === ItemExclusionState.EXCLUDED ? null :
         this.itemDefinition.getStateNoExternalChecking(id,
           emulateExternalChecking, this.rawData.sinkIn || [], true),
       stateExclusion: this.stateExclusion[id] || ItemExclusionState.ANY,
@@ -374,7 +382,7 @@ export default class Item {
       canExclusionBeSet: this.canExclusionBeSet(id),
       itemId: this.getId(),
       itemName: this.getName(),
-      itemDefinitionValue: exclusionState === ItemExclusionState.EXCLUDED ? null :
+      itemDefinitionState: exclusionState === ItemExclusionState.EXCLUDED ? null :
         (await this.itemDefinition.getState(id, this.rawData.sinkIn || [], true)),
       stateExclusion: this.stateExclusion[id] || ItemExclusionState.ANY,
       stateExclusionModified: this.stateExclusionModified[id] || false,

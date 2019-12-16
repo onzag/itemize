@@ -77,7 +77,7 @@ export default class PropertyEntryNumeric
     super(props);
 
     const prefersImperial = props.country.code === "US";
-    const unitValue = (props.value.value as IPropertyDefinitionSupportedUnitType);
+    const unitValue = (props.state.value as IPropertyDefinitionSupportedUnitType);
 
     // we calculate the unit on whether it prefers imperial
     // or not
@@ -104,7 +104,7 @@ export default class PropertyEntryNumeric
     if (
       typeof prefill !== "undefined" &&
       prefill !== null &&
-      this.props.value.value === null
+      this.props.state.value === null
     ) {
       // Fake event
       this.onChange({
@@ -131,9 +131,9 @@ export default class PropertyEntryNumeric
       unitDialogOpen: false,
     });
 
-    const currentValueAsUnit = (this.props.value.value as IPropertyDefinitionSupportedUnitType);
+    const currentValueAsUnit = (this.props.state.value as IPropertyDefinitionSupportedUnitType);
     if (
-      this.props.value.value &&
+      this.props.state.value &&
       currentValueAsUnit !== null &&
       newUnit !== currentValueAsUnit.unit
     ) {
@@ -143,17 +143,17 @@ export default class PropertyEntryNumeric
         normalizedValue: convert(currentValueAsUnit.value)
           .from(newUnit).to(this.props.property.getSpecialProperty("unit") as string),
         normalizedUnit: this.props.property.getSpecialProperty("unit") as string,
-      }, this.props.value.internalValue);
+      }, this.props.state.internalValue);
     }
   }
 
   public componentDidUpdate(prevProps: IPropertyEntryProps) {
-    if (this.props.value.internalValue) {
+    if (this.props.state.internalValue) {
       // let's update currencies if they change because of a locale change
       if (prevProps.currency !== this.props.currency && this.props.property.getType() === "currency") {
         // let's get the value
         const value: IPropertyDefinitionSupportedCurrencyType =
-          this.props.value.value as IPropertyDefinitionSupportedCurrencyType;
+          this.props.state.value as IPropertyDefinitionSupportedCurrencyType;
         // if we have a value
         if (value !== null) {
           // update it for the new currency
@@ -166,7 +166,7 @@ export default class PropertyEntryNumeric
             // we know it only makes sense if the locale changed too
             // from a language that uses different separators
             // but it doesn't hurt if it's the same
-            this.props.value.internalValue.replace(
+            this.props.state.internalValue.replace(
               prevProps.i18n.number_decimal_separator,
               this.props.i18n.number_decimal_separator,
             ),
@@ -176,10 +176,10 @@ export default class PropertyEntryNumeric
       // a decimal separator update in case
       } else if (prevProps.i18n.number_decimal_separator !== this.props.i18n.number_decimal_separator) {
         // if the value is not null
-        if (this.props.value.value !== null) {
+        if (this.props.state.value !== null) {
           this.props.onChange(
-            this.props.value.value,
-            this.props.value.internalValue.replace(
+            this.props.state.value,
+            this.props.state.internalValue.replace(
               prevProps.i18n.number_decimal_separator,
               this.props.i18n.number_decimal_separator,
             ),
@@ -188,7 +188,7 @@ export default class PropertyEntryNumeric
       }
     }
 
-    const nextValueAsUnit = (this.props.value.value as IPropertyDefinitionSupportedUnitType);
+    const nextValueAsUnit = (this.props.state.value as IPropertyDefinitionSupportedUnitType);
     if (
       this.props.property.getType() === "unit" &&
       nextValueAsUnit !== null &&
@@ -206,14 +206,15 @@ export default class PropertyEntryNumeric
   ) {
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
-      !equals(this.props.value, nextProps.value) ||
+      !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n ||
       nextProps.currency !== this.props.currency ||
       nextState.unit !== this.state.unit ||
-      nextState.unitDialogOpen !== this.state.unitDialogOpen;
+      nextState.unitDialogOpen !== this.state.unitDialogOpen ||
+      nextProps.icon !== this.props.icon;
   }
 
   public onKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
@@ -334,10 +335,10 @@ export default class PropertyEntryNumeric
     const i18nPlaceholder = i18nData && i18nData.placeholder;
 
     // get the invalid reason if any
-    const invalidReason = this.props.value.invalidReason;
+    const invalidReason = this.props.state.invalidReason;
     let i18nInvalidReason = null;
     if (
-      (this.props.poked || this.props.value.userSet) &&
+      (this.props.poked || this.props.state.userSet) &&
       invalidReason && i18nData &&
       i18nData.error && i18nData.error[invalidReason]
     ) {
@@ -399,12 +400,12 @@ export default class PropertyEntryNumeric
       );
 
     // otherwise we might just have an icon
-    } else if (this.props.property.getIcon()) {
+    } else if (this.props.icon) {
       // set it at the end
       appliedInputProps.endAdornment = (
         <InputAdornment position="end">
           <Icon classes={{root: this.props.classes.icon}}>
-            {this.props.property.getIcon()}
+            {this.props.icon}
           </Icon>
         </InputAdornment>
       );
@@ -412,12 +413,12 @@ export default class PropertyEntryNumeric
 
     // get the currently being displayed value
     const currentValue =
-      this.props.value.internalValue !== null ?
-      this.props.value.internalValue :
+      this.props.state.internalValue !== null ?
+      this.props.state.internalValue :
       formatValueAsString(
         this.props.property.getType(),
         this.props.i18n.number_decimal_separator,
-        this.props.value.value,
+        this.props.state.value,
       );
 
     // return the complex overengineered component in all its glory
@@ -441,7 +442,7 @@ export default class PropertyEntryNumeric
               root: this.props.classes.fieldInput,
               focused: "focused",
             },
-            disabled: this.props.value.enforced,
+            disabled: this.props.state.enforced,
             ...appliedInputProps,
           }}
           InputLabelProps={{
@@ -451,7 +452,7 @@ export default class PropertyEntryNumeric
             },
           }}
           inputProps={inputProps}
-          disabled={this.props.value.enforced}
+          disabled={this.props.state.enforced}
           variant="filled"
         />
         <div className={this.props.classes.errorMessage}>

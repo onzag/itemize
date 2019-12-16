@@ -159,7 +159,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
-  supportsIcons: false,
   allowsMinMaxDefined: true,
   allowsMaxDecimalCountDefined: true,
   // i18n attributes required

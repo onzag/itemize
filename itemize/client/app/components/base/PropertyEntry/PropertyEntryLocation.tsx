@@ -126,7 +126,7 @@ export default class PropertyEntryLocation
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
       !equals(this.state, nextState) ||
-      !equals(this.props.value, nextProps.value) ||
+      !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       nextProps.language !== this.props.language ||
@@ -193,13 +193,13 @@ export default class PropertyEntryLocation
   }
 
   public async search() {
-    if (!this.props.value.internalValue) {
+    if (!this.props.state.internalValue) {
       return;
     }
     // basically making a search request, we use the
     // internal value for this, as well as the country
     // latitude and longitude of the locale data
-    const value = this.props.value.internalValue;
+    const value = this.props.state.internalValue;
     const countryLatitude = this.props.country.latitude;
     const countryLongitude = this.props.country.longitude;
     const url = "https://places.cit.api.here.com/places/v1/discover/search";
@@ -300,9 +300,9 @@ export default class PropertyEntryLocation
       processSuggestion(
         this.props.i18n.word_separator,
         newEndpointData,
-        this.props.value.internalValue,
+        this.props.state.internalValue,
       ),
-      this.props.value.internalValue,
+      this.props.state.internalValue,
     );
     this.setState({
       viewport: {
@@ -317,7 +317,7 @@ export default class PropertyEntryLocation
     // basically we want to trigger swap or search on enter
     if (e.key === "Enter") {
       const swapAroundLocationsEnabled =
-        this.state.searchQuery === this.props.value.internalValue &&
+        this.state.searchQuery === this.props.state.internalValue &&
         this.state.searchResults.length > 1;
 
       if (swapAroundLocationsEnabled) {
@@ -336,10 +336,10 @@ export default class PropertyEntryLocation
     const i18nPlaceholder = i18nData && i18nData.placeholder;
 
     // the invalid reason
-    const invalidReason = this.props.value.invalidReason;
+    const invalidReason = this.props.state.invalidReason;
     let i18nInvalidReason = null;
     if (
-      (this.props.poked || this.props.value.userSet) &&
+      (this.props.poked || this.props.state.userSet) &&
       invalidReason && i18nData &&
       i18nData.error && i18nData.error[invalidReason]
     ) {
@@ -350,7 +350,7 @@ export default class PropertyEntryLocation
     // and we haven't changed our search query to what we searched
     // then
     const enableSwapAroundLocations =
-      this.state.searchQuery === this.props.value.internalValue &&
+      this.state.searchQuery === this.props.state.internalValue &&
       this.state.searchResults.length > 1;
 
     // We do something similar to the field
@@ -361,7 +361,7 @@ export default class PropertyEntryLocation
       endAdornment: (
         <InputAdornment position="end">
           <IconButton
-            disabled={this.props.value.enforced}
+            disabled={this.props.state.enforced}
             classes={{root: this.props.classes.iconButton}}
             onClick={enableSwapAroundLocations ? this.swapLocation : this.search}
           >
@@ -385,25 +385,25 @@ export default class PropertyEntryLocation
     }
 
     // get the current value, the txt is the value as it is input
-    const currentValue = textFieldProps &&  textFieldProps.value ? textFieldProps.value : (
-      this.props.value.internalValue !== null ?
-      this.props.value.internalValue :
-      (this.props.value.value ? (this.props.value.value as IPropertyDefinitionSupportedLocationType).txt : "")
+    const currentValue = textFieldProps &&  textFieldProps.state ? textFieldProps.state : (
+      this.props.state.internalValue !== null ?
+      this.props.state.internalValue :
+      (this.props.state.value ? (this.props.state.value as IPropertyDefinitionSupportedLocationType).txt : "")
     );
 
     // the location to mark is the currently set value
-    const currentLocationToMark = this.props.value.value && [
-      (this.props.value.value as IPropertyDefinitionSupportedLocationType).lat,
-      (this.props.value.value as IPropertyDefinitionSupportedLocationType).lng,
+    const currentLocationToMark = this.props.state.value && [
+      (this.props.state.value as IPropertyDefinitionSupportedLocationType).lat,
+      (this.props.state.value as IPropertyDefinitionSupportedLocationType).lng,
     ];
 
     // the txt
-    const currentLocationDataTxt = this.props.value.value &&
-      (this.props.value.value as IPropertyDefinitionSupportedLocationType).txt;
+    const currentLocationDataTxt = this.props.state.value &&
+      (this.props.state.value as IPropertyDefinitionSupportedLocationType).txt;
 
     // and the alternative txt data
-    const currentLocationDataATxt = this.props.value.value &&
-      (this.props.value.value as IPropertyDefinitionSupportedLocationType).atxt;
+    const currentLocationDataATxt = this.props.state.value &&
+      (this.props.state.value as IPropertyDefinitionSupportedLocationType).atxt;
 
     return (
       <div className={this.props.classes.container}>
@@ -424,7 +424,7 @@ export default class PropertyEntryLocation
             {currentLocationToMark ? <Marker position={currentLocationToMark}>
               <Popup>{currentLocationDataTxt}{currentLocationDataATxt ? <br/> : null}{currentLocationDataATxt}</Popup>
             </Marker> : null}
-            {!this.props.value.enforced ? this.state.searchResults
+            {!this.props.state.enforced ? this.state.searchResults
               .filter((result) => !equals(currentLocationToMark, result.position))
               .map((result) => (
                 <Marker
@@ -450,7 +450,7 @@ export default class PropertyEntryLocation
               root: this.props.classes.fieldInput,
               focused: "focused",
             },
-            disabled: this.props.value.enforced,
+            disabled: this.props.state.enforced,
             ...appliedInputProps,
           }}
           InputLabelProps={{
@@ -459,7 +459,7 @@ export default class PropertyEntryLocation
               focused: "focused",
             },
           }}
-          disabled={this.props.value.enforced}
+          disabled={this.props.state.enforced}
           variant="filled"
           {...appliedTextFieldProps}
         />
@@ -582,8 +582,8 @@ export default class PropertyEntryLocation
 
     // set the change
     this.props.onChange(
-      processSuggestion(this.props.i18n.word_separator, result, this.props.value.internalValue),
-      this.props.value.internalValue,
+      processSuggestion(this.props.i18n.word_separator, result, this.props.state.internalValue),
+      this.props.state.internalValue,
     );
     // set the viewport, and update the index of the marked value
     this.setState({
@@ -603,9 +603,9 @@ export default class PropertyEntryLocation
 
   public render() {
     // render the thing
-    const currentValue = this.props.value.internalValue !== null ?
-      this.props.value.internalValue :
-      (this.props.value.value ? (this.props.value.value as IPropertyDefinitionSupportedLocationType).txt : "");
+    const currentValue = this.props.state.internalValue !== null ?
+      this.props.state.internalValue :
+      (this.props.state.value ? (this.props.state.value as IPropertyDefinitionSupportedLocationType).txt : "");
     return (
       <Autosuggest
         renderInputComponent={this.renderBasicTextField}

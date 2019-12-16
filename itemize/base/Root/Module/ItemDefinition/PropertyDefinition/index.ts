@@ -130,9 +130,6 @@ export interface IPropertyDefinitionRawJSONDataType {
   readRoleAccess?: string[];
   createRoleAccess?: string[];
   editRoleAccess?: string[];
-
-  // some design elements
-  icon?: string;
 }
 
 export interface IPropertyDefinitionRuleDataType {
@@ -1121,14 +1118,6 @@ export default class PropertyDefinition {
     }
 
     return typeof this.rawData.specialProperties[name] !== "undefined" ? this.rawData.specialProperties[name] : null;
-  }
-
-  /**
-   * Provides the icon name as it was defined for this
-   * property
-   */
-  public getIcon() {
-    return this.rawData.icon || null;
   }
 
   /**

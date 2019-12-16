@@ -4,7 +4,7 @@ import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } fro
 import Module from "../../base/Root/Module";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
+import Item, { ItemExclusionState, IItemState } from "../../base/Root/Module/ItemDefinition/Item";
 import { TokenContext, ITokenContextType } from "./internal-providers";
 import {
   ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
@@ -19,7 +19,7 @@ import { GraphQLEndpointErrorType } from "../../base/errors";
 
 export interface IItemDefinitionContextType {
   idef: ItemDefinition;
-  value: IItemDefinitionStateType;
+  state: IItemDefinitionStateType;
   notFound: boolean;
   blocked: boolean;
   blockedButDataAccessible: boolean;
@@ -40,6 +40,12 @@ export interface IModuleContextType {
   mod: Module;
 }
 
+export interface IItemContext {
+  item: Item;
+  state: IItemState;
+}
+
+export const ItemContext = React.createContext<IItemContext>(null);
 export const ItemDefinitionContext = React.createContext<IItemDefinitionContextType>(null);
 export const ModuleContext = React.createContext<IModuleContextType>(null);
 
@@ -59,7 +65,7 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
 }
 
 interface IActualItemDefinitionProviderState {
-  value: IItemDefinitionStateType;
+  itemDefinitionState: IItemDefinitionStateType;
   isBlocked: boolean;
   isBlockedButDataIsAccessible: boolean;
   notFound: boolean;
@@ -102,7 +108,7 @@ class ActualItemDefinitionProvider extends
     }
 
     this.state = {
-      value: valueFor.getStateNoExternalChecking(
+      itemDefinitionState: valueFor.getStateNoExternalChecking(
         this.props.forId || null,
         !this.props.disableExternalChecks,
       ),
@@ -136,7 +142,7 @@ class ActualItemDefinitionProvider extends
       this.itemDefinition.addListener(this.props.forId || null, this.listener);
       // we set the value given we have changed the forId
       this.setState({
-        value: this.itemDefinition.getStateNoExternalChecking(
+        itemDefinitionState: this.itemDefinition.getStateNoExternalChecking(
           this.props.forId || null,
           !this.props.disableExternalChecks,
         ),
@@ -165,7 +171,7 @@ class ActualItemDefinitionProvider extends
       valueFor = valueFor.getSearchModeCounterpart();
     }
     this.setState({
-      value: valueFor.getStateNoExternalChecking(
+      itemDefinitionState: valueFor.getStateNoExternalChecking(
         this.props.forId || null,
         !this.props.disableExternalChecks,
       ),
@@ -345,10 +351,10 @@ class ActualItemDefinitionProvider extends
     delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
   }
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
-    const newValue = await this.itemDefinition.getState(this.props.forId || null);
+    const newItemDefinitionState = await this.itemDefinition.getState(this.props.forId || null);
     if (currentUpdateId === null || this.lastUpdateId === currentUpdateId) {
       this.setState({
-        value: newValue,
+        itemDefinitionState: newItemDefinitionState,
       });
       this.itemDefinition.triggerListeners(this.props.forId || null, this.listener);
     }
@@ -395,7 +401,7 @@ class ActualItemDefinitionProvider extends
       <ItemDefinitionContext.Provider
         value={{
           idef: this.itemDefinition,
-          value: this.state.value,
+          state: this.state.itemDefinitionState,
           onPropertyChange: this.onPropertyChange,
           onItemSetExclusionState: this.onItemSetExclusionState,
           notFound: this.state.notFound,
@@ -445,6 +451,33 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
   );
 }
 
+interface IItemProviderProps {
+  children: any;
+  item: string;
+}
+
+export function ItemProvider(props: IItemProviderProps) {
+  return (
+    <ItemDefinitionContext.Consumer>
+      {
+        (itemDefinitionContextualValue) => {
+          const itemState = itemDefinitionContextualValue.state.items.find((i) => i.itemId === props.item);
+          return (
+            <ItemContext.Provider
+              value={{
+                item: itemDefinitionContextualValue.idef.getItemFor(props.item),
+                state: itemState,
+              }}
+            >
+              {props.children}
+            </ItemContext.Provider>
+          );
+        }
+      }
+    </ItemDefinitionContext.Consumer>
+  );
+}
+
 interface IModuleProviderProps {
   children: any;
   module?: string;
@@ -484,4 +517,14 @@ export function ModuleProvider(props: IModuleProviderProps) {
   } else {
     return props.children;
   }
+}
+
+// TODO
+// tslint:disable-next-line: no-empty
+export function ModuleLevelSearchProvider() {
+}
+
+// TODO
+// tslint:disable-next-line: no-empty
+export function ItemDefinitionLevelSearchProvider() {
 }

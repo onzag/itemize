@@ -12,7 +12,6 @@ export type PropertyDefinitionSupportedFilesType = string[];
 const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLList(GraphQLNonNull(GraphQLString)),
   searchable: false,
-  supportsIcons: true,
   specialProperties: [
     {
       name: "accept",

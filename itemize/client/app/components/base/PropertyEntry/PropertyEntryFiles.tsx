@@ -74,11 +74,12 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
   ) {
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
-      !equals(this.props.value, nextProps.value) ||
+      !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       nextProps.language !== this.props.language ||
-      nextProps.i18n !== this.props.i18n;
+      nextProps.i18n !== this.props.i18n ||
+      nextProps.icon !== this.props.icon;
   }
   public manuallyTriggerUpload() {
     // utility for the button to manually trigger upload
@@ -222,7 +223,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     const i18nPlaceholder = i18nData && i18nData.placeholder;
 
     // getting the icon
-    const icon = this.props.property.getIcon();
+    const icon = this.props.icon;
     const iconComponent = icon ? (
       <Icon classes={{root: this.props.classes.icon}}>{icon}</Icon>
     ) : null;

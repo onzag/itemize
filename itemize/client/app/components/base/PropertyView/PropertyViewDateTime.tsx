@@ -7,10 +7,10 @@ import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from "../../../../../consta
 export default class PropertyViewDateTime extends React.Component<IPropertyViewProps, {}> {
   public shouldComponentUpdate(nextProps: IPropertyViewProps) {
     return this.props.language !== nextProps.language ||
-      this.props.value.value !== nextProps.value.value;
+      this.props.state.value !== nextProps.state.value;
   }
   public render() {
-    if (this.props.value.value === null) {
+    if (this.props.state.value === null) {
       return <div/>;
     }
 
@@ -28,8 +28,8 @@ export default class PropertyViewDateTime extends React.Component<IPropertyViewP
       dbFormat = TIME_FORMAT;
     }
     return (
-      <div>
-        {Moment(this.props.value.value as string, dbFormat).format(format)}
+      <div className={this.props.classes.container}>
+        {Moment(this.props.state.value as string, dbFormat).format(format)}
       </div>
     );
   }

@@ -55,7 +55,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // it is searchable by an exact value, use text for organic things
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
-  supportsIcons: true,
   allowsMinMaxLengthDefined: true,
   // i18n attributes required
   i18n: {
