@@ -1,5 +1,5 @@
 import React from "react";
-import { IPropertyEntryProps, getClassName } from ".";
+import { IPropertyEntryProps } from ".";
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import { Paper, RootRef, Icon, FormLabel, IconButton, Button } from "@material-ui/core";
 import { mimeTypeToExtension, localeReplacer } from "../../../../../util";
@@ -24,7 +24,7 @@ function simpleQSparse(queryString: string): {[key: string]: string} {
 }
 
 // because we expect to be efficient, we are going to actually store data in the url as
-// query string, expected file location at /files/by-user/:userId/file/:fileId/:fileName?type=:contentType&size=:size
+// query string, expected file location at /rest/files/:userId/:fileId/:fileName?type=:contentType&size=:size
 // a &small attribute should be valid too, for a small version of images
 function extractFileDataFromUrl(url: string): IFileData {
   const [base, queryString] = url.split("?");
@@ -217,7 +217,6 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
   public render() {
     // getting the basic data
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
-    const className = getClassName(this.props, "files", this.props.poked);
     const i18nLabel = i18nData && i18nData.label;
     const i18nDescription = i18nData && i18nData.description;
     const i18nPlaceholder = i18nData && i18nData.placeholder;
@@ -273,17 +272,17 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
 
     // return the component itself
     return (
-      <div className={className}>
+      <div className={this.props.classes.container}>
         <FormLabel
           aria-label={i18nLabel}
           classes={{
-            root: "property-entry-label",
+            root: this.props.classes.label,
             focused: "focused",
           }}
         >
           {i18nLabel}{iconComponent}
         </FormLabel>
-        {i18nDescription ? <div className="property-entry-description">
+        {i18nDescription ? <div className={this.props.classes.description}>
           <Icon>keyboard_arrow_down</Icon>{i18nDescription}</div> : null}
         <Dropzone
           onDropAccepted={this.onDropAccepted}
@@ -308,10 +307,9 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
               const fileData: IFileData = this.ownedObjectURLPool[value.url] || extractFileDataFromUrl(value.url);
               const isSupportedImage = fileData.type.startsWith("image/") &&
                 FILE_SUPPORTED_IMAGE_TYPES.includes(fileData.type);
-              const fileClassName =
-                `property-entry-files-file ${value.rejected ?
-                  "property-entry-files-file--rejected" : ""} ${isSupportedImage ?
-                  "property-entry-files-file--is-image" : ""}`;
+              const mainFileClassName = this.props.classes.file +
+                (value.rejected ? " " + this.props.classes.fileRejected : "");
+
               if (isSupportedImage) {
                 const reduceSizeURL =
                   value.url.indexOf("blob:") !== 0 && !singleFile ?
@@ -319,24 +317,24 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                   value.url;
                 return (
                   <div
-                    className={fileClassName}
+                    className={mainFileClassName}
                     key={index}
                     onClick={this.openFile.bind(this, value.url)}
                   >
-                    <div className="property-entry-files-file-image">
-                      <img src={reduceSizeURL}/>
+                    <div className={this.props.classes.fileDataContainer}>
+                      <img src={reduceSizeURL} className={this.props.classes.imageThumbnail}/>
                       {!singleFile ? <IconButton
-                        className="property-entry-files-file-delete"
+                        className={this.props.classes.fileDeleteButton}
                         onClick={this.onRemoveFile.bind(this, value.url)}
                       >
                         <Icon>remove_circle</Icon>
                       </IconButton> : null}
                     </div>
-                    <p className="property-entry-files-file-name">{fileData.name}</p>
-                    <p className="property-entry-files-file-size">({
+                    <p className={this.props.classes.fileName}>{fileData.name}</p>
+                    <p className={this.props.classes.fileSize}>({
                       prettyBytes(fileData.size)
                     })</p>
-                    {value.rejected ? <p className="property-entry-files-file-rejected-reason">
+                    {value.rejected ? <p className={this.props.classes.fileRejectedDescription}>
                       {localeReplacer(this.props.i18n[value.reason], prettyBytes(MAX_FILE_SIZE))}
                     </p> : null}
                   </div>
@@ -344,27 +342,27 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
               } else {
                 return (
                   <div
-                    className={fileClassName}
+                    className={mainFileClassName}
                     key={index}
                     onClick={this.openFile.bind(this, value.url)}
                   >
-                    <div className="property-entry-files-file-icon">
-                      <Icon className="property-entry-files-file-icon-background">insert_drive_file</Icon>
-                      <span className="property-entry-files-file-icon-filetype">{
+                    <div className={this.props.classes.fileDataContainer}>
+                      <Icon className={this.props.classes.fileIcon}>insert_drive_file</Icon>
+                      <span className={this.props.classes.fileMimeType}>{
                         mimeTypeToExtension(fileData.type)
                       }</span>
                       {!singleFile ? <IconButton
-                        className="property-entry-files-file-delete"
+                        className={this.props.classes.fileDeleteButton}
                         onClick={this.onRemoveFile.bind(this, value.url)}
                       >
                         <Icon>remove_circle</Icon>
                       </IconButton> : null}
                     </div>
-                    <p className="property-entry-files-file-name">{fileData.name}</p>
-                    <p className="property-entry-files-file-size">({
+                    <p className={this.props.classes.fileName}>{fileData.name}</p>
+                    <p className={this.props.classes.fileSize}>({
                       prettyBytes(fileData.size)
                     })</p>
-                    {value.rejected ? <p className="property-entry-files-file-rejected-reason">
+                    {value.rejected ? <p className={this.props.classes.fileRejectedDescription}>
                       {localeReplacer(this.props.i18n[value.reason], prettyBytes(MAX_FILE_SIZE))}
                     </p> : null}
                   </div>
@@ -377,8 +375,8 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                 <Paper
                   {...rootProps}
                   classes={{
-                    root: `property-entry-files-paper ${singleFile ?
-                      "property-entry-files-paper--single-file" : ""}`,
+                    root: `${this.props.classes.filesPaper} ${singleFile ?
+                      this.props.classes.filesPaperSingleFile : ""}`,
                   }}
                 >
                   <input {...getInputProps()} />
@@ -389,22 +387,20 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                       valueAsInternal.length === 1
                     ) ? null :
                     <div
-                      className={
-                        `property-entry-files-placeholder ${isDragAccept ?
-                        "property-entry-files-placeholder--accepting" : ""} ${isDragReject ?
-                        "property-entry-files-placeholder--rejecting" : ""}`
-                      }
+                      className={`${this.props.classes.filesPlaceholder} ${isDragAccept ?
+                          this.props.classes.filesPlaceholderAccepting : ""} ${isDragReject ?
+                          this.props.classes.filesPlaceholderRejecting : ""}`}
                     >
                       {!valueAsInternal.length ? <p>{isDragActive ? placeholderActive : i18nPlaceholder}</p> : null}
-                      <Icon className="property-entry-files-icon-add">note_add</Icon>
+                      <Icon className={this.props.classes.filesIconAdd}>note_add</Icon>
                     </div>
                   }
                   {
                     singleFile && valueAsInternal.length === 1 ? <div
-                      className="property-entry-files-button-container"
+                      className={this.props.classes.filesSingleFileButtonContainer}
                     >
                       <Button
-                        className="property-entry-files-button"
+                        className={this.props.classes.filesSingleFileButton}
                         variant="contained"
                         color="secondary"
                         onClick={this.onRemoveFile.bind(this, valueAsInternal[0].url)}
@@ -414,10 +410,10 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                           this.props.i18n.image_uploader_delete_file :
                           this.props.i18n.file_uploader_delete_file
                         }
-                        <Icon className="property-entry-files-button-icon">remove_circle_outline</Icon>
+                        <Icon className={this.props.classes.filesSingleFileButtonIcon}>remove_circle_outline</Icon>
                       </Button>
                       <Button
-                        className="property-entry-files-button"
+                        className={this.props.classes.filesSingleFileButton}
                         variant="contained"
                         color="primary"
                         onClick={this.manuallyTriggerUpload}
@@ -427,7 +423,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                           this.props.i18n.image_uploader_select_file :
                           this.props.i18n.file_uploader_select_file
                         }
-                        <Icon className="property-entry-files-button-icon">cloud_upload</Icon>
+                        <Icon className={this.props.classes.filesSingleFileButtonIcon}>cloud_upload</Icon>
                       </Button>
                     </div> : null
                   }
@@ -436,7 +432,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
             );
           }}
         </Dropzone>
-        <div className="property-entry-error">
+        <div className={this.props.classes.errorMessage}>
           {i18nInvalidReason}
         </div>
       </div>

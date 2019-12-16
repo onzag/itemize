@@ -17,7 +17,6 @@ import {
   PropertyDefinitionSupportedTypeName,
 } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
-import "../../../../theme/property-entries.scss";
 import { currencies, countries, ICurrencyType, ICountryType } from "../../../../../resources";
 import { createStyles, ThemeProvider, withStyles } from "@material-ui/styles";
 import { WithStyles } from "react-jss";
@@ -76,7 +75,7 @@ export const generalStyles = (theme: IPropertyEntryThemeType) => createStyles({
     justifyContent: "space-between",
   },
   container: {
-    width: "100%",
+    width: theme.containerWidth,
   },
   description: {
     width: "100%",
@@ -256,6 +255,136 @@ export const generalStyles = (theme: IPropertyEntryThemeType) => createStyles({
         transform: "none",
       },
     };
+  },
+  file: {
+    "width": "125px",
+    "padding": "25px 0",
+    "alignSelf": "flex-start",
+    "&:hover $imageThumbnail": {
+      boxShadow: "0 0 5px 2px #42a5f5",
+    },
+    "&:hover $fileDeleteButton": {
+      color: "#f44336",
+    },
+  },
+  fileRejected: {
+    "$imageThumbnail": {
+      boxShadow: "0 0 5px 2px #e57373",
+    },
+    "&:hover $imageThumbnail": {
+      boxShadow: "0 0 5px 2px #f44336",
+    },
+    "$fileName, $fileSize, $fileRejectedDescription": {
+      color: "#e57373",
+    },
+    "&:hover $fileName, &:hover $fileSize, &:hover $fileRejectedDescription": {
+      color: "#f44336",
+    },
+  },
+  fileDataContainer: {
+    height: "75px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  },
+  fileDeleteButton: {
+    top: "-25px",
+    right: 0,
+    position: "absolute",
+  },
+  fileName: {
+    width: "100%",
+    textAlign: "center",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    fontSize: "0.75rem",
+  },
+  fileSize: {
+    width: "100%",
+    textAlign: "center",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    fontSize: "0.75rem",
+    opacity: "0.75",
+  },
+  fileRejectedDescription: {
+    width: "100%",
+    textAlign: "center",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    fontSize: "0.75rem",
+  },
+  fileIcon: {
+    fontSize: "75px",
+    color: "#424242",
+  },
+  fileMimeType: {
+    position: "absolute",
+    color: "white",
+    width: "100%",
+    fontSize: "16px",
+    textAlign: "center",
+    padding: "0 40px",
+    bottom: "15px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+  filesPaper: {
+    marginTop: "5px",
+    backgroundColor: "rgba(0, 0, 0, 0.09)",
+    width: "100%",
+    minHeight: "200px",
+    height: "auto",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    display: "flex",
+    cursor: "pointer",
+    position: "relative",
+    padding: "20px",
+    flexWrap: "wrap",
+  },
+  filesPaperSingleFile: {
+    justifyContent: "center",
+  },
+  filesPlaceholder: {
+    flexGrow: 2,
+    display: "block",
+    textAlign: "center",
+    fontSize: "1rem",
+    userSelect: "none",
+    color: "rgb(117, 117, 117)",
+    borderRadius: "25px",
+    border: "dotted 2px #ccc",
+    padding: "25px 0",
+    margin: "0 25px",
+  },
+  filesPlaceholderAccepting: {
+    borderColor: "#42a5f5",
+  },
+  filesPlaceholderRejecting: {
+    borderColor: "#f44336",
+  },
+  filesIconAdd: {
+    opacity: 0.1,
+    fontSize: "100px",
+  },
+  filesSingleFileButtonContainer: {
+    position: "absolute",
+    bottom: "0",
+    left: "0",
+    right: "0",
+    display: "flex",
+  },
+  filesSingleFileButton: {
+    flexGrow: 1,
+  },
+  filesSingleFileButtonIcon: {
+    marginLeft: "0.75rem",
+  },
+  imageThumbnail: {
+    height: "100%",
+    borderRadius: "3px",
   },
 });
 
