@@ -298,7 +298,7 @@ export default class ItemDefinition {
    * @param name the name of the item definition
    * @param avoidImports whether to avoid imported items
    */
-  public getItemDefinitionFor(
+  public getDirectlyAvailableItemDefinitionInContextFor(
     name: string,
     avoidImports?: boolean,
   ): ItemDefinition {

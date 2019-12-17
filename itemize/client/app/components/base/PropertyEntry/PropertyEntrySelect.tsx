@@ -71,6 +71,8 @@ export default class PropertyEntrySelect
   constructor(props: IPropertyEntryProps) {
     super(props);
     this.uuid =  "uuid-" + uuid.v4();
+
+    this.onChange = this.onChange.bind(this);
   }
 
   public shouldComponentUpdate(

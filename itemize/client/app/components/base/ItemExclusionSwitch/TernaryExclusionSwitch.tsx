@@ -1,3 +1,4 @@
+import React from "react";
 import { IItemExclusionSwitchProps } from ".";
 import { FormControlLabel, FormLabel, FormControl, RadioGroup, Radio } from "@material-ui/core";
 import { capitalize } from "../../../../../util";
@@ -47,7 +48,7 @@ export default function TernaryExclusionSwitch(props: IItemExclusionSwitchProps)
           {i18nLabel}
         </FormLabel>
         <RadioGroup
-          value={props.state.stateExclusion}
+          value={props.state.exclusionState}
           onChange={handleOnChange.bind(this, props)}
         >
           {values.map((v) => <FormControlLabel

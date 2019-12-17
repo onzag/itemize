@@ -335,7 +335,7 @@ export default class Module {
     if (currentName) {
       do {
         finalDefinition =
-          finalDefinition.getItemDefinitionFor(currentName, true);
+          finalDefinition.getDirectlyAvailableItemDefinitionInContextFor(currentName, true);
         currentName = nNameConsumable.shift();
       } while (currentName);
     }

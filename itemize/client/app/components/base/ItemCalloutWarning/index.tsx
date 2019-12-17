@@ -19,7 +19,7 @@ const ItemCalloutWarningWithStyles = withStyles(style)((props: IItemCalloutWarni
   let calloutExcludedWarning: string = null;
   if (
     props.item.isExclusionCallout() &&
-    props.state.stateExclusion === ItemExclusionState.EXCLUDED
+    props.state.exclusionState === ItemExclusionState.EXCLUDED
   ) {
     calloutExcludedWarning = props.item.getI18nDataFor(props.locale.language).callout_excluded_label;
   }

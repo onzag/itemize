@@ -146,7 +146,7 @@ export default class Item {
     // lets get an instance for the item definition for this
     // item, if there's one, and let's detach it
     this.itemDefinition = rawJSON.name && parentItemDefinition
-      .getItemDefinitionFor(rawJSON.name).getNewInstance();
+      .getDirectlyAvailableItemDefinitionInContextFor(rawJSON.name).getNewInstance();
     // set the enforced and predefined properties overwrites
     // if needed to
 

@@ -1,3 +1,4 @@
+import React from "react";
 import { IItemExclusionSwitchProps } from ".";
 import { FormControlLabel, Switch, FormControl } from "@material-ui/core";
 import { ItemExclusionState } from "../../../../../base/Root/Module/ItemDefinition/Item";
@@ -17,11 +18,11 @@ export default function StandardExclusionSwitch(props: IItemExclusionSwitchProps
           }}
           control={
             <Switch
-              checked={props.state.stateExclusion === ItemExclusionState.INCLUDED}
+              checked={props.state.exclusionState === ItemExclusionState.INCLUDED}
               onChange={
                 props.onChange.bind(
                   null,
-                  (props.state.stateExclusion === ItemExclusionState.INCLUDED ?
+                  (props.state.exclusionState === ItemExclusionState.INCLUDED ?
                     ItemExclusionState.EXCLUDED :
                     ItemExclusionState.INCLUDED),
                 )

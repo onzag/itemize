@@ -101,8 +101,12 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
                 let propertyState: IPropertyDefinitionState = null;
                 if (!isMetaProperty) {
                   if (itemContextualValue) {
-                    propertyState = itemContextualValue.state.itemDefinitionState.properties
-                      .find((p) => p.propertyId === actualId);
+                    // this might be null if the state is excluded, which makes the property state
+                    // be null and unknown
+                    if (itemContextualValue.state.itemDefinitionState) {
+                      propertyState = itemContextualValue.state.itemDefinitionState.properties
+                        .find((p) => p.propertyId === actualId);
+                    }
                   } else {
                     propertyState =
                       itemDefinitionContextualValue.state.properties.find((p) => p.propertyId === actualId);
