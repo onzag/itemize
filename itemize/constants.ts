@@ -333,6 +333,7 @@ export const SUFFIX_BUILD = (s: string) => "_" + s;
 export const PREFIXED_CONCAT = (...args: string[]) => args.join("__");
 export const ITEM_PREFIX = PREFIX_BUILD("ITEM");
 export const MODULE_PREFIX = PREFIX_BUILD("MOD");
+export const SEARCH_MODE_MODULE_PREFIX = PREFIX_BUILD("SEARCH_MODE");
 export const ITEM_DEFINITION_PREFIX = PREFIX_BUILD("IDEF");
 export const EXCLUSION_STATE_SUFFIX = SUFFIX_BUILD("EXCLUSION_STATE");
 export const PREFIX_SEARCH = PREFIX_BUILD("SEARCH");

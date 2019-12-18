@@ -4,7 +4,6 @@ import ItemDefinition, {
 import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
 } from "./ItemDefinition/PropertyDefinition";
-import { buildSearchMode } from "./searchModeBuilder";
 import {
   MODULE_PREFIX,
   PREFIXED_CONCAT,
@@ -12,6 +11,7 @@ import {
   SELF_METAROLE,
 } from "../../../constants";
 import { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
+import { buildSearchModeModule } from "./search-mode";
 
 export interface IRawJsonI18NSpecificLocaleDataType {
   name: string;
@@ -78,7 +78,7 @@ export default class Module {
   public static buildSearchMode(
     rawData: IModuleRawJSONDataType,
   ): IModuleRawJSONDataType {
-    return buildSearchMode(rawData);
+    return buildSearchModeModule(rawData);
   }
 
   public static getPropExtensionRawFor(parentModuleRaw: IModuleRawJSONDataType, id: string) {
