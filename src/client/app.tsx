@@ -4,6 +4,7 @@ import { Navbar } from "./navbar";
 import { Route } from "../../itemize/client/app/elements";
 import { Profile } from "./pages/profile";
 import { FrontPage } from "./pages/frontpage";
+import { SignupDialog } from "./general/signup-dialog";
 
 interface IAppState {
   loginDialogOpen: boolean;
@@ -38,9 +39,12 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     this.openLoginDialog = this.openLoginDialog.bind(this);
     this.closeLoginDialog = this.closeLoginDialog.bind(this);
+    this.openSignupDialog = this.openSignupDialog.bind(this);
+    this.closeSignupDialog = this.closeSignupDialog.bind(this);
   }
   public openLoginDialog() {
     this.setState({
+      signupDialogOpen: false,
       loginDialogOpen: true,
     });
   }
@@ -49,11 +53,31 @@ export default class App extends React.Component<IAppProps, IAppState> {
       loginDialogOpen: false,
     });
   }
+  public openSignupDialog() {
+    this.setState({
+      signupDialogOpen: true,
+      loginDialogOpen: false,
+    });
+  }
+  public closeSignupDialog() {
+    this.setState({
+      signupDialogOpen: false,
+    });
+  }
   public render() {
     return (
       <React.Fragment>
         <Navbar onLoginClick={this.openLoginDialog} loggedUserId={this.props.userId}/>
-        <LoginDialog open={this.state.loginDialogOpen} onClose={this.closeLoginDialog}/>
+        <LoginDialog
+          onSignupRequest={this.openSignupDialog}
+          open={this.state.loginDialogOpen}
+          onClose={this.closeLoginDialog}
+        />
+        <SignupDialog
+          onLoginRequest={this.openLoginDialog}
+          open={this.state.signupDialogOpen}
+          onClose={this.closeSignupDialog}
+        />
         <Route path="/" exact={true} component={FrontPage}/>
         <Route path="/profile/:id" component={Profile}/>
       </React.Fragment>

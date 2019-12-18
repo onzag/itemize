@@ -436,6 +436,7 @@ export function I18nReadError(props: II18nReadErrorProps) {
 interface ILogActionerProps {
   children: (actioner: {
     login: () => any,
+    signup: () => any,
     logout: () => any,
     error: GraphQLEndpointErrorType,
     dismissError: () => any,
@@ -477,17 +478,22 @@ export function LogActioner(props: ILogActionerProps) {
                   let login: () => any;
                   let logout: () => any;
                   let dismissError: () => any;
+                  let signup: () => any;
                   if (!tokenContextValue.isLoggingIn) {
+                    const cleanFields = () => {
+                      const passwordPdef =
+                        itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
+                      passwordPdef.cleanValueFor(null);
+                      itemDefinitionContextualValue.idef.triggerListeners(null);
+                    };
                     login = () => {
                       tokenContextValue.login(usernameValue as string, passwordValue as string, null);
                       // we do it but on a delay in order to avoid flickering for example
                       // in dialogs that are going to close
-                      setTimeout(() => {
-                        const passwordPdef =
-                          itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
-                        passwordPdef.cleanValueFor(null);
-                        itemDefinitionContextualValue.idef.triggerListeners(null);
-                      }, 300);
+                      setTimeout(cleanFields, 300);
+                    };
+                    signup = () => {
+                      setTimeout(cleanFields, 300);
                     };
                     logout = tokenContextValue.logout;
                     dismissError = tokenContextValue.dismissError;
@@ -495,10 +501,12 @@ export function LogActioner(props: ILogActionerProps) {
                     login = () => null;
                     logout = () => null;
                     dismissError = () => null;
+                    signup = () => null;
                   }
 
                   return props.children && props.children({
                     login,
+                    signup,
                     logout,
                     error: tokenContextValue.error,
                     dismissError,

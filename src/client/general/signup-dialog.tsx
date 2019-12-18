@@ -4,34 +4,34 @@ import { DialogResponsive } from "./dialog";
 import { Entry, I18nRead, LogActioner, I18nReadError } from "../../../itemize/client/app/elements";
 import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
 
-const loginDialogStyles = createStyles({});
+const signupDialogStyles = createStyles({});
 
-interface ILoginDialogProps extends WithStyles<typeof loginDialogStyles> {
+interface ISignupDialogProps extends WithStyles<typeof signupDialogStyles> {
   open: boolean;
   onClose: () => void;
-  onSignupRequest: () => void;
+  onLoginRequest: () => void;
 }
 
-export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogProps) => {
+export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialogProps) => {
   return (
     <ModuleProvider module="users">
-      <ItemDefinitionProvider itemDefinition="user" disableExternalChecks={true}>
+      <ItemDefinitionProvider itemDefinition="user">
         <LogActioner>
           {(actioner) => (
-            <I18nRead id="login">
-              {(i18nLogin: string) => (
+            <I18nRead id="signup">
+              {(i18nSignup: string) => (
                 <DialogResponsive
                   open={props.open}
                   onClose={props.onClose}
-                  title={i18nLogin}
+                  title={i18nSignup}
                   buttons={
                     <Button
                       color="primary"
-                      aria-label={i18nLogin}
+                      aria-label={i18nSignup}
                       startIcon={<Icon>done</Icon>}
-                      onClick={actioner.login}
+                      onClick={actioner.signup}
                     >
-                      {i18nLogin}
+                      {i18nSignup}
                     </Button>
                   }
                 >
@@ -41,8 +41,8 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
 
                     <I18nReadError error={actioner.error}/>
                   </form>
-                  <Button color="secondary" onClick={props.onSignupRequest}>
-                    <I18nRead id="signupInstead"/>
+                  <Button color="secondary" onClick={props.onLoginRequest}>
+                    <I18nRead id="loginInstead"/>
                   </Button>
                 </DialogResponsive>
               )}
