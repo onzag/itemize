@@ -5,6 +5,8 @@ import { Route } from "../../itemize/client/components/navigaton";
 import { Profile } from "./pages/profile";
 import { FrontPage } from "./pages/frontpage";
 import { SignupDialog } from "./general/signup-dialog";
+import { TermsAndConditions } from "./pages/terms-and-conditions";
+import { PrivacyPolicy } from "./pages/privacy-policy";
 
 interface IAppState {
   loginDialogOpen: boolean;
@@ -79,6 +81,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
           onClose={this.closeSignupDialog}
         />
         <Route path="/" exact={true} component={FrontPage}/>
+        <Route path="/terms-and-conditions" component={TermsAndConditions}/>
+        <Route path="/privacy-policy" component={PrivacyPolicy}/>
         <Route path="/profile/:id" component={Profile}/>
       </React.Fragment>
     );
