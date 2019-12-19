@@ -1,6 +1,6 @@
 import React from "react";
 import { GraphQLEndpointErrorType } from "../../../itemize/base/errors";
-import { I18nReadError } from "../../../itemize/client/app/elements";
+import { I18nReadError } from "../../../itemize/client/components/localization";
 
 export function ErrorPage(props: { error: GraphQLEndpointErrorType }) {
   return (

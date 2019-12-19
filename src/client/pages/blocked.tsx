@@ -1,5 +1,5 @@
 import React from "react";
-import { I18nReadError } from "../../../itemize/client/app/elements";
+import { I18nReadError } from "../../../itemize/client/components/localization";
 
 export function BlockedPage(props: { hasBlockedAccess: boolean, children: any }) {
   return (

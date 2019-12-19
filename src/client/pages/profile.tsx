@@ -1,11 +1,15 @@
 import React from "react";
-import { UserIdRetriever, LogActioner, ItemDefinitionLoader, View, I18nRead, StatsForNerds, Entry } from "../../../itemize/client/app/elements";
 import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
 import { BlockedPage } from "./blocked";
 import { ErrorPage } from "./error";
 import { Button, createStyles, withStyles, WithStyles } from "@material-ui/core";
 import { Avatar } from "../general/avatar";
 import { LanguagePicker } from "../general/language-picker";
+import { LogActioner } from "../../../itemize/client/components/login";
+import { Entry, View } from "../../../itemize/client/components/property";
+import { I18nRead } from "../../../itemize/client/components/localization";
+import { ItemDefinitionLoader } from "../../../itemize/client/components/item-definition";
+import { UserIdRetriever } from "../../../itemize/client/components/user";
 
 function SimulatedNotFoundPage() {
   return (

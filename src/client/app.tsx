@@ -1,7 +1,7 @@
 import React from "react";
 import { LoginDialog } from "./general/login-dialog";
 import { Navbar } from "./navbar";
-import { Route } from "../../itemize/client/app/elements";
+import { Route } from "../../itemize/client/components/navigaton";
 import { Profile } from "./pages/profile";
 import { FrontPage } from "./pages/frontpage";
 import { SignupDialog } from "./general/signup-dialog";

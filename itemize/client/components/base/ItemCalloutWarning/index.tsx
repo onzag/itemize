@@ -1,9 +1,9 @@
 import React from "react";
-import { LocaleContext, ILocaleContextType } from "../../..";
 import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
 import { style, STANDARD_THEME, IItemCalloutWarningThemeType } from "./styles";
-import Item, { IItemState, ItemExclusionState } from "../../../../../base/Root/Module/ItemDefinition/Item";
+import Item, { IItemState, ItemExclusionState } from "../../../../base/Root/Module/ItemDefinition/Item";
 import { Icon } from "@material-ui/core";
+import { ILocaleContextType, LocaleContext } from "../../../app";
 
 export interface IItemCalloutWarningBaseProps {
   item: Item;

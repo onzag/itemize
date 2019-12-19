@@ -1,8 +1,9 @@
 import React from "react";
 import { Avatar as MAvatar } from "@material-ui/core";
-import { Reader, Link } from "../../../itemize/client/app/elements";
 import { countries } from "../../../itemize/imported-resources";
 import { withStyles, WithStyles, createStyles } from "@material-ui/styles";
+import { Reader } from "../../../itemize/client/components/property";
+import { Link } from "../../../itemize/client/components/navigaton";
 
 const avatarStyles = createStyles({
   flag: {

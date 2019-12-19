@@ -1,6 +1,7 @@
 import React from "react";
 import { AppBar, Toolbar, IconButton, Icon, Button, createStyles, WithStyles, withStyles, Theme } from "@material-ui/core";
-import { IfLogStatus, I18nRead } from "../../../itemize/client/app/elements";
+import { IfLogStatus } from "../../../itemize/client/components/login";
+import { I18nRead } from "../../../itemize/client/components/localization";
 import { Avatar } from "../general/avatar";
 import { LanguagePicker } from "../general/language-picker";
 import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";

@@ -1,7 +1,7 @@
 import React from "react";
 import { IItemExclusionSwitchProps } from ".";
 import { FormControlLabel, Switch, FormControl } from "@material-ui/core";
-import { ItemExclusionState } from "../../../../../base/Root/Module/ItemDefinition/Item";
+import { ItemExclusionState } from "../../../../base/Root/Module/ItemDefinition/Item";
 
 export default function StandardExclusionSwitch(props: IItemExclusionSwitchProps) {
   // let's the get basic data for the entry

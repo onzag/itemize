@@ -1,6 +1,6 @@
 import PropertyDefinition, {
   IPropertyDefinitionState,
-} from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+} from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
 import PropertyEntryBoolean from "./PropertyEntryBoolean";
 import PropertyEntryText from "./PropertyEntryText";
@@ -10,13 +10,13 @@ import PropertyEntryFiles from "./PropertyEntryFiles";
 import PropertyEntryNumeric from "./PropertyEntryNumeric";
 import PropertyEntrySelect from "./PropertyEntrySelect";
 import PropertyEntryField from "./PropertyEntryField";
-import { LocaleContext, ILocaleContextType } from "../../..";
-import { Ii18NType } from "../../../../../base/Root";
+import { LocaleContext, ILocaleContextType } from "../../../app";
+import { Ii18NType } from "../../../../base/Root";
 import {
   PropertyDefinitionSupportedType,
   PropertyDefinitionSupportedTypeName,
-} from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import { currencies, countries, ICurrencyType, ICountryType } from "../../../../../imported-resources";
+} from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { currencies, countries, ICurrencyType, ICountryType } from "../../../../imported-resources";
 import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
 import { IPropertyEntryThemeType, style, STANDARD_THEME } from "./styles";
 

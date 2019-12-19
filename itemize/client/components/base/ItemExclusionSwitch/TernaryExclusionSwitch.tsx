@@ -1,8 +1,8 @@
 import React from "react";
 import { IItemExclusionSwitchProps } from ".";
 import { FormControlLabel, FormLabel, FormControl, RadioGroup, Radio } from "@material-ui/core";
-import { capitalize } from "../../../../../util";
-import { ItemExclusionState } from "../../../../../base/Root/Module/ItemDefinition/Item";
+import { capitalize } from "../../../../util";
+import { ItemExclusionState } from "../../../../base/Root/Module/ItemDefinition/Item";
 
 function handleOnChange(
   props: IItemExclusionSwitchProps,

@@ -1,7 +1,9 @@
 import React from "react";
 import { Button, createStyles, withStyles, WithStyles, Icon } from "@material-ui/core";
 import { DialogResponsive } from "./dialog";
-import { Entry, I18nRead, LogActioner, I18nReadError } from "../../../itemize/client/app/elements";
+import { I18nRead, I18nReadError } from "../../../itemize/client/components/localization";
+import { LogActioner } from "../../../itemize/client/components/login";
+import { Entry } from "../../../itemize/client/components/property";
 import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
 
 const loginDialogStyles = createStyles({});

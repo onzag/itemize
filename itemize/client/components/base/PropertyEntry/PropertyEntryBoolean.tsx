@@ -1,7 +1,7 @@
 import React from "react";
-import { IPropertyEntryProps } from ".";
+import { IPropertyEntryProps } from "../PropertyEntry";
 import { FormControlLabel, Switch, Icon, FormLabel, FormControl, RadioGroup, Radio } from "@material-ui/core";
-import { capitalize } from "../../../../../util";
+import { capitalize } from "../../../../util";
 import equals from "deep-equal";
 
 function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {

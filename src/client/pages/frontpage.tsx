@@ -1,6 +1,9 @@
 import React from "react";
 import { ModuleProvider, ItemDefinitionProvider, ItemProvider } from "../../../itemize/client/app/providers";
-import { Entry, StatsForNerds, I18nRead, ExclusionSwitch, CalloutWarning } from "../../../itemize/client/app/elements";
+import { I18nRead } from "../../../itemize/client/components/localization";
+import { CalloutWarning, ExclusionSwitch } from "../../../itemize/client/components/item";
+import { Entry } from "../../../itemize/client/components/property";
+import { StatsForNerds } from "../../../itemize/client/components/dev";
 
 export function FrontPage() {
   return (

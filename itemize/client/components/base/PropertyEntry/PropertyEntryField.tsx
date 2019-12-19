@@ -1,5 +1,5 @@
 import React from "react";
-import { IPropertyEntryProps } from ".";
+import { IPropertyEntryProps } from "../PropertyEntry";
 import TextField from "@material-ui/core/TextField";
 
 import {
@@ -13,7 +13,7 @@ import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import equals from "deep-equal";
-import { IAutocompleteOutputType } from "../../../../../base/Autocomplete";
+import { IAutocompleteOutputType } from "../../../../base/Autocomplete";
 
 interface IPropertyEntryFieldState {
   suggestions: IAutocompleteOutputType[];

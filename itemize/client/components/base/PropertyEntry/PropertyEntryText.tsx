@@ -1,15 +1,15 @@
 import React from "react";
-import { IPropertyEntryProps } from ".";
+import { IPropertyEntryProps } from "../PropertyEntry";
 import PropertyEntryField from "./PropertyEntryField";
 import { InputLabel, Icon, IconButton } from "@material-ui/core";
 import ReactQuill from "react-quill/dist/react-quill.min.js";
 import equals from "deep-equal";
 import Toolbar from "@material-ui/core/Toolbar";
 import uuid from "uuid";
-import { Ii18NType } from "../../../../../base/Root";
+import { Ii18NType } from "../../../../base/Root";
 
 import "react-quill/dist/quill.core.css";
-import "../../../../theme/quill.scss";
+import "../../../theme/quill.scss";
 
 // TODO implement missing toolbar functionality
 function RichTextEditorToolbar(props: {id: string, i18n: Ii18NType}) {

@@ -1,5 +1,5 @@
 import React from "react";
-import { AppLanguageRetriever } from "../../../itemize/client/app/elements";
+import { AppLanguageRetriever } from "../../../itemize/client/components/localization";
 import { Button, Icon, Menu, MenuItem } from "@material-ui/core";
 
 interface ILanguagePickerProps {

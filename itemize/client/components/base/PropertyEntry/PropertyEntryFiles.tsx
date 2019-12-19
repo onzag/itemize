@@ -1,12 +1,12 @@
 import React from "react";
-import { IPropertyEntryProps } from ".";
+import { IPropertyEntryProps } from "../PropertyEntry";
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import { Paper, RootRef, Icon, FormLabel, IconButton, Button } from "@material-ui/core";
-import { mimeTypeToExtension, localeReplacer } from "../../../../../util";
+import { mimeTypeToExtension, localeReplacer } from "../../../../util";
 import prettyBytes from "pretty-bytes";
 import equals from "deep-equal";
-import { PropertyDefinitionSupportedFilesType } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
-import { MAX_FILE_SIZE, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../../constants";
+import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
+import { MAX_FILE_SIZE, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
 
 interface IFileData {
   name: string;
