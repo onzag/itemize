@@ -28,7 +28,7 @@ import {
 import { checkRoot } from "./checkers";
 import { processRoot } from "./processer";
 import { buildLang, clearLang } from "./lang";
-import { buildJSONResources } from "./resources";
+import { buildResources } from "./resources";
 import { buildHTML } from "./html";
 import { buildConfig } from "./config";
 
@@ -37,7 +37,7 @@ import path from "path";
 import PropertiesReader from "properties-reader";
 import colors from "colors/safe";
 
-const jsonMap = require("json-source-map");
+import jsonMap from "json-source-map";
 const fsAsync = fs.promises;
 
 // registering source maps, this one is useful for
@@ -113,7 +113,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
       buildData(rawDataConfig),
       buildConfig(rawDataConfig),
       buildHTML(rawDataConfig),
-      buildJSONResources(rawDataConfig),
+      buildResources(rawDataConfig),
       copyMomentFiles(rawDataConfig),
     ]);
   } catch (err) {

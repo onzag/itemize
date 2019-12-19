@@ -108,8 +108,8 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     // call the onchange, as replacing or as concatenating depending
     // on whether it is a single file or not
     this.props.onChange(
-      (singleFile ? [] : this.props.value.value as PropertyDefinitionSupportedFilesType || []).concat(objectURLS),
-      (singleFile ? [] : this.props.value.internalValue as IInternalURLFileDataWithState[] || []).concat(
+      (singleFile ? [] : this.props.state.value as PropertyDefinitionSupportedFilesType || []).concat(objectURLS),
+      (singleFile ? [] : this.props.state.internalValue as IInternalURLFileDataWithState[] || []).concat(
         objectURLS.map((url: string) => ({url})),
       ),
     );
@@ -148,10 +148,10 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     // note that it is hardset to an empty string if it's a single file
     // so it forces a replacement, none of the conditionals will pass, it will
     // just remain an empty array, making it replace
-    let valueAsInternal: IInternalURLFileDataWithState[] = singleFile ? [] : this.props.value.internalValue;
-    if (!valueAsInternal && this.props.value.value) {
+    let valueAsInternal: IInternalURLFileDataWithState[] = singleFile ? [] : this.props.state.internalValue;
+    if (!valueAsInternal && this.props.state.value) {
       valueAsInternal = (
-        this.props.value.value as PropertyDefinitionSupportedFilesType
+        this.props.state.value as PropertyDefinitionSupportedFilesType
       ).map((url: string) => ({url}));
     } else if (!valueAsInternal) {
       valueAsInternal = [];
@@ -160,7 +160,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     // by the same logic the onchange set it to null
     // replacing an existant file if there was one
     this.props.onChange(
-      singleFile ? null : this.props.value.value,
+      singleFile ? null : this.props.state.value,
       valueAsInternal.concat(newInternalValueData),
     );
   }
@@ -184,11 +184,11 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     }
 
     // let's get the index in the internal value
-    const indexInInternalValue = (this.props.value.internalValue as IInternalURLFileDataWithState[] || []).findIndex(
+    const indexInInternalValue = (this.props.state.internalValue as IInternalURLFileDataWithState[] || []).findIndex(
       (value) => value.url === url,
     );
     // this will be the new value
-    let newInternalValue = this.props.value.internalValue as IInternalURLFileDataWithState[];
+    let newInternalValue = this.props.state.internalValue as IInternalURLFileDataWithState[];
     // if the index in the internal value the url is there
     if (indexInInternalValue !== -1) {
       // we make a copy, and splice it, and set it to null if necessary
@@ -200,10 +200,10 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     }
 
     // let's do the exact same but for the actual value
-    const indexInValue = (this.props.value.value as PropertyDefinitionSupportedFilesType || []).findIndex(
+    const indexInValue = (this.props.state.value as PropertyDefinitionSupportedFilesType || []).findIndex(
       (value) => value === url,
     );
-    let newValue = this.props.value.value as PropertyDefinitionSupportedFilesType;
+    let newValue = this.props.state.value as PropertyDefinitionSupportedFilesType;
     if (indexInValue !== -1) {
       newValue = [...newValue];
       newValue.splice(indexInValue, 1);
@@ -244,10 +244,10 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     }
 
     // the invalid reason
-    const invalidReason = this.props.value.invalidReason;
+    const invalidReason = this.props.state.invalidReason;
     let i18nInvalidReason = null;
     if (
-      (this.props.poked || this.props.value.userSet) &&
+      (this.props.poked || this.props.state.userSet) &&
       invalidReason && i18nData &&
       i18nData.error && i18nData.error[invalidReason]
     ) {
@@ -262,10 +262,10 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     }
 
     // the value from the internal source, either recreated or from the internal value
-    let valueAsInternal: IInternalURLFileDataWithState[] = this.props.value.internalValue;
-    if (!valueAsInternal && this.props.value.value) {
+    let valueAsInternal: IInternalURLFileDataWithState[] = this.props.state.internalValue;
+    if (!valueAsInternal && this.props.state.value) {
       valueAsInternal = (
-        this.props.value.value as PropertyDefinitionSupportedFilesType
+        this.props.state.value as PropertyDefinitionSupportedFilesType
       ).map((url: string) => ({url}));
     } else if (!valueAsInternal) {
       valueAsInternal = [];
@@ -294,7 +294,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
           multiple={!singleFile}
           noClick={singleFile && valueAsInternal.length === 1}
           ref={this.dropzoneRef}
-          disabled={this.props.value.enforced}
+          disabled={this.props.state.enforced}
         >
           {({
             getRootProps,

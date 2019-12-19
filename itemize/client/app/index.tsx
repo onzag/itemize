@@ -8,7 +8,7 @@ import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import { Route } from "react-router";
 import { history } from "..";
-import { countries, currencies } from "../../resources";
+import { countries, currencies } from "../../imported-resources";
 import { TokenProvider, ITokenProviderState } from "./internal-providers";
 import { buildGqlMutation, gqlQuery } from "./gql-querier";
 
@@ -22,7 +22,7 @@ if (isDevelopment) {
 // a locale, for which there is i18n data, eg, en, es, de, etc...
 // this interface just has basic data for all the available locales
 // usually only containing the name
-export interface ILocaleDataType {
+export interface ILangLocalesType {
   [locale: string]: Ii18NType;
 }
 
@@ -36,7 +36,7 @@ export interface ILocaleContextType {
   currency: string;
   country: string;
   updating: boolean;
-  localeData: ILocaleDataType;
+  langLocales: ILangLocalesType;
   i18n: Ii18NType;
 }
 
@@ -59,7 +59,7 @@ interface IAppProps {
   initialCurrency: string;
   initialCountry: string;
 
-  localeData: ILocaleDataType;
+  langLocales: ILangLocalesType;
 
   mainComponent: React.ReactElement;
 }
@@ -172,7 +172,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
    * @param locale the two letter or language-region code for the locale
    */
   public hasLocaleDataFor(locale: string) {
-    return !!this.props.localeData[locale];
+    return !!this.props.langLocales[locale];
   }
 
   /**
@@ -371,7 +371,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
       updating: this.state.localeIsUpdating,
 
-      localeData: this.props.localeData,
+      langLocales: this.props.langLocales,
       i18n: this.state.specifiedData.i18n,
     };
 

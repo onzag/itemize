@@ -170,7 +170,7 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
   // the reason the build number gets used, is because of use of service workers
   // basically, we are going to keep this simple, only update the worker if it's
   // a new url, simple, even for this script the build number applies
-  const [initialData, localeData] = await Promise.all([
+  const [initialData, lang] = await Promise.all([
     fetch(`/rest/resource/build.${initialLang}.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
     fetch(`/rest/resource/lang.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
 
@@ -188,7 +188,7 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
     <Router history={history}>
       <App
         initialData={initialData}
-        localeData={localeData.locales}
+        langLocales={lang.locales}
 
         initialCurrency={initialCurrency}
         initialCountry={initialCountry}

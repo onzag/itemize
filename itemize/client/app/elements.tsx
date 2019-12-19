@@ -10,7 +10,7 @@ import Root from "../../base/Root";
 import Module from "../../base/Root/Module";
 import PropertyView, { RawBasePropertyView } from "./components/base/PropertyView";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../resources";
+import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../imported-resources";
 import { Link as RouterLink, LinkProps, Route as RouterRoute, RouteProps } from "react-router-dom";
 import { RESERVED_BASE_PROPERTIES } from "../../constants";
 import { localeReplacer } from "../../util";
@@ -309,7 +309,9 @@ export function ItemDefinitionLoader(props: IItemDefinitionLoader) {
 interface II18nReadProps {
   id: string;
   args?: string[];
-  children?: (value: string) => React.ReactNode;
+  html?: boolean;
+  htmlWrappingTag?: string;
+  children?: (value: string | React.ReactNode) => React.ReactNode;
 }
 
 export function I18nRead(props: II18nReadProps) {
@@ -323,35 +325,45 @@ export function I18nRead(props: II18nReadProps) {
                 <ItemContext.Consumer>
                   {
                     (itemContext) => {
-                      if (!itemDefinitionContextualValue) {
-                        throw new Error("The i18nRead must be in a ItemDefinitionProvider context");
-                      }
 
                       let i18nValue: string = null;
-                      if (itemContext) {
-                        if (props.id === "name") {
-                          i18nValue = itemContext.item.getI18nNameFor(localeContext.language) || null;
+                      if (itemDefinitionContextualValue) {
+                        if (itemContext) {
+                          if (props.id === "name") {
+                            i18nValue = itemContext.item.getI18nNameFor(localeContext.language) || null;
+                          } else {
+                            const itemI18nData = itemContext.item.getI18nDataFor(localeContext.language);
+                            i18nValue = itemI18nData ? itemI18nData[props.id] : null;
+                          }
                         } else {
-                          const itemI18nData = itemContext.item.getI18nDataFor(localeContext.language);
-                          i18nValue = itemI18nData ? itemI18nData[props.id] : null;
+                          const i18nIdefData =
+                            itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
+                          if (i18nIdefData && i18nIdefData.custom && i18nIdefData.custom[props.id]) {
+                            i18nValue = i18nIdefData.custom[props.id];
+                          } else {
+                            i18nValue = i18nIdefData ? i18nIdefData[props.id] : null;
+                          }
                         }
                       } else {
-                        const i18nIdefData = itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
-                        if (i18nIdefData && i18nIdefData.custom && i18nIdefData.custom[props.id]) {
-                          i18nValue = i18nIdefData.custom[props.id];
-                        } else {
-                          i18nValue = i18nIdefData ? i18nIdefData[props.id] : null;
-                        }
+                        i18nValue = localeContext.i18n[props.id] || null;
                       }
 
                       if (props.args) {
                         i18nValue = localeReplacer(i18nValue, props.args);
                       }
 
-                      if (!props.children) {
-                        return i18nValue;
+                      let finalNode: string | React.ReactNode = i18nValue;
+                      if (props.html && finalNode !== null) {
+                        const Element: any = props.htmlWrappingTag || "div";
+                        finalNode = (
+                          <Element dangerouslySetInnerHTML={{__html: i18nValue}}/>
+                        );
                       }
-                      return props.children(i18nValue);
+
+                      if (!props.children) {
+                        return finalNode;
+                      }
+                      return props.children(finalNode);
                     }
                   }
                 </ItemContext.Consumer>
@@ -589,13 +601,13 @@ export function AppLanguageRetriever(props: {
         (localeContext) => {
           const currentLanguage: IFnAppLanguageRetrieverLanguageFormType = {
             code: localeContext.language,
-            name: localeContext.localeData[localeContext.language].name,
+            name: localeContext.langLocales[localeContext.language].name,
           };
           const availableLanguages: IFnAppLanguageRetrieverLanguageFormType[] = [];
-          Object.keys(localeContext.localeData).forEach((code) => {
+          Object.keys(localeContext.langLocales).forEach((code) => {
             availableLanguages.push({
               code,
-              name: localeContext.localeData[code].name,
+              name: localeContext.langLocales[code].name,
             });
           });
           return props.children({

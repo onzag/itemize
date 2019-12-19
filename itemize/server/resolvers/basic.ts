@@ -21,7 +21,7 @@ import equals from "deep-equal";
 import { IGQLValue } from "../../base/Root/gql";
 import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
 import Knex from "knex";
-import { countries } from "../../resources";
+import { countries } from "../../imported-resources";
 import { jwtVerify } from "../token";
 
 const flattenFieldsFromRequestedFieldsDebug = Debug("resolvers:flattenFieldsFromRequestedFields");

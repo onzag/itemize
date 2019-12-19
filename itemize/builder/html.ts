@@ -1,6 +1,7 @@
 import { escapeStringRegexp } from "../util";
 import { checkExists } from "./util";
 import colors from "colors/safe";
+import htmlMinifier from "html-minifier";
 
 import fs from "fs";
 import path from "path";
@@ -27,6 +28,19 @@ export async function buildHTML(rawConfig: any) {
   baseHTML = baseHTML.replace(
     new RegExp(escapeStringRegexp("%{BUILD_NUMBER}"), "g"),
     (new Date()).getTime().toString(),
+  );
+
+  baseHTML = htmlMinifier.minify(
+    baseHTML,
+    {
+      collapseBooleanAttributes: true,
+      collapseInlineTagWhitespace: true,
+      collapseWhitespace: true,
+      conservativeCollapse: true,
+      removeComments: true,
+      removeEmptyAttributes: true,
+      removeRedundantAttributes: true,
+    },
   );
 
   const fileName = path.join("dist", "data", "index.html");

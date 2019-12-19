@@ -7,7 +7,7 @@ import { Ii18NType } from "../../../../../base/Root";
 import {
   PropertyDefinitionSupportedTypeName,
 } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import { currencies, countries, ICurrencyType, ICountryType } from "../../../../../resources";
+import { currencies, countries, ICurrencyType, ICountryType } from "../../../../../imported-resources";
 import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
 import { IPropertyViewThemeType, style, STANDARD_THEME } from "./styles";
 import PropertyViewField from "./PropertyViewField";

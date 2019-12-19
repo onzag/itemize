@@ -1,4 +1,4 @@
-import { currencies } from "../../../../../../resources";
+import { currencies } from "../../../../../../imported-resources";
 import {
   IPropertyDefinitionSupportedType,
 } from "../types";

@@ -16,7 +16,7 @@ import {
   PropertyDefinitionSupportedType,
   PropertyDefinitionSupportedTypeName,
 } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import { currencies, countries, ICurrencyType, ICountryType } from "../../../../../resources";
+import { currencies, countries, ICurrencyType, ICountryType } from "../../../../../imported-resources";
 import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
 import { IPropertyEntryThemeType, style, STANDARD_THEME } from "./styles";
 

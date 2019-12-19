@@ -7,7 +7,7 @@ import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/Prope
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import bodyParser from "body-parser";
-import { countries } from "../resources";
+import { countries } from "../imported-resources";
 import { IAutocompleteOutputType } from "../base/Autocomplete";
 
 // TODO comment and document
@@ -124,14 +124,7 @@ export default function restServices(appData: IAppDataType) {
     });
   });
 
-  router.get("/resource/:resource", (req, res) => {
-    const resourceName: string = req.params.resource;
-    if (resourceName.indexOf("..") !== -1) {
-      res.setHeader("Content-Type", "text/plain");
-      res.end("Uh! uh! :) Directory Traversal Attack Denied :D");
-    }
-    res.sendFile(path.resolve(__dirname + `../../../data/${req.params.resource}`));
-  });
+  router.use("/resource", express.static(path.resolve(__dirname + "../../../data/")));
 
   appData.root.getAllModules().forEach(buildRouteForModule);
 
