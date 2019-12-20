@@ -5,7 +5,7 @@ import HTMLResourceLoader from "../../../itemize/client/components/resources";
 export function PrivacyPolicy() {
   return (
     <React.Fragment>
-      <I18nRead id="privacy_policy">
+      <I18nRead id="privacy_policy_content">
         {
           (value: string) => {
             return <HTMLResourceLoader location={value}/>;

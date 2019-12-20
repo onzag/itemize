@@ -83,8 +83,31 @@ export function mimeTypeToExtension(str: string) {
   return mimeExtensions[str] || str.split("/")[1] || "txt";
 }
 
-export function localeReplacer(str: string, ...args: any[]) {
+export function localeReplacer(str: string, ...args: any[]): string {
   return str.replace(/\{(\d+)\}/g, (match, indexMatch) => (args[indexMatch] || "?"));
+}
+
+export function localeReplacerToArray(str: string, ...args: any[]): any[] {
+  const splitted: string[] = str.split(/\{(\d+)\}/g);
+  const result: any[] = [];
+
+  splitted.forEach((splitResult, index) => {
+    if (!splitResult) {
+      return;
+    }
+
+    if (index % 2 === 1) {
+      if (typeof args[splitResult] !== "undefined") {
+        result.push(args[splitResult]);
+      } else {
+        result.push("?");
+      }
+    } else {
+      result.push(splitResult);
+    }
+  });
+
+  return result;
 }
 
 /**

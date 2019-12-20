@@ -5,6 +5,7 @@ import { Entry } from "../../../itemize/client/components/property";
 import { I18nRead, I18nReadError } from "../../../itemize/client/components/localization";
 import { LogActioner } from "../../../itemize/client/components/login";
 import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
+import { Link } from "../../../itemize/client/components/navigaton";
 
 const signupDialogStyles = createStyles({});
 
@@ -42,6 +43,24 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
                     <Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error}/>
 
                     <I18nReadError error={actioner.error}/>
+
+                    <I18nRead
+                      id="accept_terms"
+                      args={
+                        [
+                          (
+                            <Link to="/terms-and-conditions">
+                              <I18nRead id="terms_and_conditions"/>
+                            </Link>
+                          ),
+                          (
+                            <Link to="/privacy-policy">
+                              <I18nRead id="privacy_policy"/>
+                            </Link>
+                          ),
+                        ]
+                      }
+                    />
                   </form>
                   <Button color="secondary" onClick={props.onLoginRequest}>
                     <I18nRead id="loginInstead"/>

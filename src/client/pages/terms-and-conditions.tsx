@@ -5,7 +5,7 @@ import HTMLResourceLoader from "../../../itemize/client/components/resources";
 export function TermsAndConditions() {
   return (
     <React.Fragment>
-      <I18nRead id="terms_and_conditions">
+      <I18nRead id="terms_and_conditions_content">
         {
           (value: string) => {
             return <HTMLResourceLoader location={value}/>;

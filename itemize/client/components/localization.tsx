@@ -1,7 +1,7 @@
 import React from "react";
 import { LocaleContext, DataContext } from "../app";
 import { ItemDefinitionContext, ItemContext } from "../app/providers";
-import { localeReplacer } from "../../util";
+import { localeReplacerToArray, localeReplacer } from "../../util";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import Root from "../../base/Root";
 import Module from "../../base/Root/Module";
@@ -11,7 +11,7 @@ import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICou
 
 interface II18nReadProps {
   id: string;
-  args?: string[];
+  args?: any[];
   html?: boolean;
   htmlWrappingTag?: string;
   children?: (value: string | React.ReactNode) => React.ReactNode;
@@ -29,14 +29,14 @@ export function I18nRead(props: II18nReadProps) {
                   {
                     (itemContext) => {
 
-                      let i18nValue: string = null;
+                      let i18nValue: any = null;
                       if (itemDefinitionContextualValue) {
                         if (itemContext) {
                           if (props.id === "name") {
                             i18nValue = itemContext.item.getI18nNameFor(localeContext.language) || null;
                           } else {
                             const itemI18nData = itemContext.item.getI18nDataFor(localeContext.language);
-                            i18nValue = itemI18nData ? itemI18nData[props.id] : null;
+                            i18nValue = itemI18nData ? itemI18nData[props.id] || null : null;
                           }
                         } else {
                           const i18nIdefData =
@@ -44,15 +44,38 @@ export function I18nRead(props: II18nReadProps) {
                           if (i18nIdefData && i18nIdefData.custom && i18nIdefData.custom[props.id]) {
                             i18nValue = i18nIdefData.custom[props.id];
                           } else {
-                            i18nValue = i18nIdefData ? i18nIdefData[props.id] : null;
+                            i18nValue = i18nIdefData ? i18nIdefData[props.id] || null : null;
                           }
                         }
-                      } else {
+                      }
+
+                      if (!itemDefinitionContextualValue || i18nValue === null) {
                         i18nValue = localeContext.i18n[props.id] || null;
                       }
 
+                      if (i18nValue === null) {
+                        let errMessage: string = "Unknown key in context: " + props.id;
+                        if (itemDefinitionContextualValue) {
+                          errMessage += "; in item definition context for " +
+                            itemDefinitionContextualValue.idef.getName();
+                          if (itemContext) {
+                            errMessage += "; in item context for " +
+                              itemContext.item.getName();
+                          }
+                        }
+                        throw new Error(errMessage);
+                      }
+
                       if (props.args) {
-                        i18nValue = localeReplacer(i18nValue, props.args);
+                        if (props.args.every((a) => typeof a === "string")) {
+                          i18nValue = localeReplacer(i18nValue, ...props.args);
+                        } else {
+                          i18nValue = localeReplacerToArray(i18nValue, ...props.args).map((output, index) => (
+                            <React.Fragment key={index}>
+                              {output}
+                            </React.Fragment>
+                          ));
+                        }
                       }
 
                       let finalNode: string | React.ReactNode = i18nValue;
