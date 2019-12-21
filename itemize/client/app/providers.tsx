@@ -16,7 +16,7 @@ import {
   PREFIX_EDIT,
   PREFIX_ADD,
 } from "../../constants";
-import { buildGqlQuery, gqlQuery } from "./gql-querier";
+import { buildGqlQuery, buildGqlMutation, gqlQuery } from "./gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 
 interface IBasicActionResponse {
@@ -430,6 +430,8 @@ class ActualItemDefinitionProvider extends
       );
     }
   }
+  // TODO check that all fields are valid before submit
+  // poke if otherwise
   // TODO policies
   public async submit(): Promise<IActionResponseWithId> {
     if (this.state.submitting) {
@@ -559,7 +561,7 @@ class ActualItemDefinitionProvider extends
     if (this.props.forId) {
       args.id = this.props.forId;
     }
-    const query = buildGqlQuery({
+    const query = buildGqlMutation({
       name: queryName,
       args,
       fields: requestFields,
@@ -574,16 +576,19 @@ class ActualItemDefinitionProvider extends
       };
       this.setState({
         submitError: error,
+        submitting: false,
       });
     } else {
       if (gqlValue.errors) {
         error = gqlValue.errors[0].extensions;
         this.setState({
           submitError: error,
+          submitting: false,
         });
       } else {
         this.setState({
           submitError: null,
+          submitting: false,
         });
       }
 

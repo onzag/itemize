@@ -9,6 +9,7 @@ import {
   RESERVED_BASE_PROPERTIES,
   ITEM_PREFIX,
   EXCLUSION_STATE_SUFFIX,
+  GUEST_METAROLE,
 } from "../../constants";
 import { GraphQLEndpointError } from "../../base/errors";
 import Debug from "debug";
@@ -179,7 +180,7 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
   if (token === null) {
     result = {
       id: null,
-      role: "GUEST",
+      role: GUEST_METAROLE,
     };
   } else {
     try {
@@ -332,23 +333,6 @@ export function getDictionary(appData: IAppDataType, args: any): string {
   const dictionary = appData.config.dictionaries[args.language];
   getDictionaryDebug("SUCCEED with %s", dictionary);
   return dictionary;
-}
-
-const mustBeLoggedInDebug = Debug("resolvers:mustBeLoggedIn");
-/**
- * Simply throws an error if the user is not logged in
- * @param tokenData the token data that has been extracted with validateTokenAndGetData
- */
-export function mustBeLoggedIn(tokenData: IServerSideTokenDataType) {
-  mustBeLoggedInDebug("EXECUTED with %j", tokenData);
-  if (!tokenData.id) {
-    mustBeLoggedInDebug("FAILED");
-    throw new GraphQLEndpointError({
-      message: "Must be logged in",
-      code: "MUST_BE_LOGGED_IN",
-    });
-  }
-  mustBeLoggedInDebug("SUCCEED");
 }
 
 const validateTokenIsntBlockedDebug = Debug("resolvers:validateTokenIsntBlocked");

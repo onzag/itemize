@@ -6,7 +6,6 @@ import {
   checkLanguageAndRegion,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
-  mustBeLoggedIn,
   flattenFieldsFromRequestedFields,
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
@@ -15,7 +14,7 @@ import {
   validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
-import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
+import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX, UNSPECIFIED_OWNER } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
   convertGQLValueToSQLValueForItemDefinition,
@@ -39,7 +38,6 @@ export async function addItemDefinition(
 
   // check that the user is logged in, for adding, only logged users
   // are valid
-  mustBeLoggedIn(tokenData);
   validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we see which fields are being requested for the answer after adding, first
@@ -73,16 +71,7 @@ export async function addItemDefinition(
     ItemDefinitionIOActions.CREATE,
     tokenData.role,
     tokenData.id,
-    // You might wonder why we used -1 as an user id, well
-    // -1 works, no valid user id is negative, and unlogged users
-    // have no user id, so imagine passing null, and having SELF as
-    // the role, then this would pass, granted, it's an edge
-    // case that shows the schema was defined weirdly, but none owns
-    // a non existant object; in this case nevertheless, null would work
-    // because SELF would be granted to the future owner of the object
-    // but that would be strange, and even then, we are forcing users
-    // to be logged in, but we still use -1; just to ignore selfs
-    -1,
+    tokenData.id,
     addingFields,
     true,
   );
@@ -161,7 +150,7 @@ export async function addItemDefinition(
   // this data is added every time when creating
   sqlModData.type = selfTable;
   sqlModData.created_at = appData.knex.fn.now();
-  sqlModData.created_by = tokenData.id;
+  sqlModData.created_by = tokenData.id || UNSPECIFIED_OWNER;
   sqlModData.language = resolverArgs.args.language;
   sqlModData.country = resolverArgs.args.country;
 

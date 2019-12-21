@@ -95,6 +95,9 @@ export default {
         delete: policySchema,
       },
     },
+    ownerIsObjectId: {
+      type: "boolean",
+    },
   },
   definitions: {
     PropertyDefinition: PropertyDefinitionSchema,

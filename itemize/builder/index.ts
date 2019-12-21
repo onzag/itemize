@@ -93,6 +93,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   deleteRoleAccess?: string[];
   readRoleAccess?: string[];
   policies?: IPoliciesRawJSONDataType;
+  ownerIsObjectId?: boolean;
 }
 
 // Now we execute this code asynchronously
@@ -570,6 +571,26 @@ async function buildItemDefinition(
     type: fileData.type,
     policies: fileData.policies,
   };
+
+  if (fileData.readRoleAccess) {
+    finalValue.readRoleAccess = fileData.readRoleAccess;
+  }
+
+  if (fileData.createRoleAccess) {
+    finalValue.createRoleAccess = fileData.createRoleAccess;
+  }
+
+  if (fileData.editRoleAccess) {
+    finalValue.editRoleAccess = fileData.editRoleAccess;
+  }
+
+  if (fileData.deleteRoleAccess) {
+    finalValue.deleteRoleAccess = fileData.deleteRoleAccess;
+  }
+
+  if (fileData.ownerIsObjectId) {
+    finalValue.ownerIsObjectId = fileData.ownerIsObjectId;
+  }
 
   if (!finalValue.includes ||
     (Array.isArray(finalValue.includes) && !finalValue.includes.length)) {

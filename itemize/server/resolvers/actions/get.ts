@@ -17,6 +17,7 @@ import graphqlFields = require("graphql-fields");
 import {
   CONNECTOR_SQL_COLUMN_FK_NAME,
   ITEM_PREFIX,
+  UNSPECIFIED_OWNER,
 } from "../../../constants";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
@@ -59,8 +60,11 @@ export async function getItemDefinition(
   );
 
   // if we don't include by whom it was created we add it
-  if (!requestedModuleColumnsSQL.includes("created_by")) {
+  if (!requestedModuleColumnsSQL.includes("created_by") && !itemDefinition.isOwnerObjectId()) {
     requestedModuleColumnsSQL.push("created_by");
+  }
+  if (!requestedModuleColumnsSQL.includes("id") && itemDefinition.isOwnerObjectId()) {
+    requestedModuleColumnsSQL.push("id");
   }
   // the reason we need blocked_at is because filtering
   // is done by the filtering function outside
@@ -117,7 +121,7 @@ export async function getItemDefinition(
       ItemDefinitionIOActions.READ,
       tokenData.role,
       tokenData.id,
-      -1,
+      UNSPECIFIED_OWNER,
       requestedFieldsInIdef,
       true,
     );
@@ -129,13 +133,18 @@ export async function getItemDefinition(
 
   getItemDefinitionDebug("Checking role access for read");
 
+  let userId = selectQueryValue.created_by;
+  if (itemDefinition.isOwnerObjectId()) {
+    userId = selectQueryValue.id;
+  }
+
   // now we check the role access, this function will throw an error
   // if that fails, and we only check for the requested fields
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
-    selectQueryValue.created_by,
+    userId,
     requestedFieldsInIdef,
     true,
   );
@@ -191,7 +200,7 @@ export async function getItemDefinitionList(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
-    -1,
+    UNSPECIFIED_OWNER,
     requestedFieldsInIdef,
     true,
   );
@@ -294,7 +303,7 @@ export async function getModuleList(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
-    -1,
+    UNSPECIFIED_OWNER,
     requestedFieldsInMod,
     true,
   );

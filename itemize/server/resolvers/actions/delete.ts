@@ -6,7 +6,6 @@ import {
   checkLanguageAndRegion,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
-  mustBeLoggedIn,
   flattenFieldsFromRequestedFields,
   runPolicyCheck,
   validateTokenIsntBlocked,
@@ -29,7 +28,6 @@ export async function deleteItemDefinition(
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // for deleting we must be logged in
-  mustBeLoggedIn(tokenData);
   validateTokenIsntBlocked(appData.knex, tokenData);
 
   // we flatten and get the requested fields
@@ -57,24 +55,27 @@ export async function deleteItemDefinition(
     tokenData.role,
     resolverArgs.args,
     appData.knex,
-    ["created_by", "blocked_at"],
+    ["id", "created_by", "blocked_at"],
 
     // this functions runs before the policy has been checked
     // and we do it for being efficient, because we can run
     // both of these checks with a single SQL query, and the policy
     // checker is built in a way that it demands and expects that
     (contentData: any) => {
-      // so now we get the content information, which might
-      // be null if nothing was found, so we check too
-      userId = contentData && contentData.created_by;
-
       // if there is no userId then the row was null, we throw an error
-      if (!userId) {
+      if (!contentData) {
         debug("FAILED due to lack of content data");
         throw new GraphQLEndpointError({
           message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
           code: "NOT_FOUND",
         });
+      }
+
+      // so now we get the content information, which might
+      // be null if nothing was found, so we check too
+      userId = contentData.created_by;
+      if (itemDefinition.isOwnerObjectId()) {
+        userId = contentData.id;
       }
 
       // if the content is blocked, and our role has no special access

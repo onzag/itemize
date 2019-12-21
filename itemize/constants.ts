@@ -441,6 +441,8 @@ export const USER_ROLES = {
 };
 export const SELF_METAROLE = "SELF";
 export const ANYONE_METAROLE = "ANYONE";
+export const ANYONE_LOGGED_METAROLE = "ANYONE_LOGGED";
+export const GUEST_METAROLE = "GUEST";
 export const MODERATION_FIELDS = [
   "flagged_by",
   "flagged_reasons",
@@ -473,3 +475,6 @@ export const UNIT_SUBTYPES = [
   "reactiveEnergy",
   "angle",
 ];
+
+export const UNSPECIFIED_OWNER = -1;
+export const OWNER_ID_AS_OBJECT_ID = -2;

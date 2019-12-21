@@ -8,6 +8,8 @@ import {
   ITEM_PREFIX,
   ANYONE_METAROLE,
   SELF_METAROLE,
+  ANYONE_LOGGED_METAROLE,
+  GUEST_METAROLE,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { GraphQLEndpointError } from "../../../errors";
@@ -57,6 +59,9 @@ export interface IItemDefinitionRawJSONDataType {
 
   // policies
   policies?: IPoliciesRawJSONDataType;
+
+  // ownership
+  ownerIsObjectId?: boolean;
 }
 
 export interface IItemDefinitionStateType {
@@ -724,7 +729,7 @@ export default class ItemDefinition {
     if (action === ItemDefinitionIOActions.READ) {
       return this.rawData.readRoleAccess || [ANYONE_METAROLE];
     } else if (action === ItemDefinitionIOActions.CREATE) {
-      return this.rawData.createRoleAccess || [ANYONE_METAROLE];
+      return this.rawData.createRoleAccess || [ANYONE_LOGGED_METAROLE];
     } else if (action === ItemDefinitionIOActions.EDIT) {
       return this.rawData.editRoleAccess || [SELF_METAROLE];
     } else if (action === ItemDefinitionIOActions.DELETE) {
@@ -741,8 +746,12 @@ export default class ItemDefinition {
     requestedFields: any,
     throwError: boolean,
   ) {
+    const notLoggedInWhenShould = role === GUEST_METAROLE;
     const rolesWithAccess = this.getRolesWithAccessTo(action);
-    const idefLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
+    const idefLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
+    (
+      rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+    ) || (
       rolesWithAccess.includes(SELF_METAROLE) && userId === ownerUserId
     ) || rolesWithAccess.includes(role);
 
@@ -751,7 +760,7 @@ export default class ItemDefinition {
         throw new GraphQLEndpointError({
           message: `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
           ` only roles ${rolesWithAccess.join(", ")} can be granted access`,
-          code: "FORBIDDEN",
+          code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
         });
       }
       return false;
@@ -914,5 +923,9 @@ export default class ItemDefinition {
         ii.mergeWithI18n(mergeItemRaw);
       }
     });
+  }
+
+  public isOwnerObjectId() {
+    return this.rawData.ownerIsObjectId || false;
   }
 }

@@ -3,6 +3,7 @@ import { gqlQuery, buildGqlQuery } from "./gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import { ILocaleContextType } from ".";
 import { Location } from "history";
+import { GUEST_METAROLE } from "../../constants";
 
 export interface ITokenProviderState {
   token: string;
@@ -34,7 +35,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     this.state = {
       token: null,
       id: null,
-      role: "GUEST",
+      role: GUEST_METAROLE,
       isLoggingIn: false,
       isReady: !hasStoredToken,
       error: null,
@@ -83,7 +84,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         isLoggingIn: false,
         id: null,
         token: null,
-        role: "GUEST",
+        role: GUEST_METAROLE,
         error: {
           message: "Failed to connect",
           code: "CANT_CONNECT",
@@ -173,7 +174,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     this.setState({
       id: null,
       token: null,
-      role: "GUEST",
+      role: GUEST_METAROLE,
     });
   }
   public dismissError() {

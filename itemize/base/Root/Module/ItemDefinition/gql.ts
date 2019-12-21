@@ -306,7 +306,7 @@ export function getGQLMutationFieldsForItemDefinition(
           retrievalMode: false,
           propertiesAsInput: true,
           excludeBase: true,
-          optionalForm: false,
+          optionalForm: true,
           includePolicy: null,
         }),
       },

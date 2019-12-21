@@ -16,6 +16,7 @@ import {
   ITEM_PREFIX,
   RESERVED_SEARCH_PROPERTIES,
   CONNECTOR_SQL_COLUMN_FK_NAME,
+  UNSPECIFIED_OWNER,
 } from "../../../constants";
 import { buildSQLQueryForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 
@@ -66,7 +67,7 @@ export async function searchModule(
     tokenData.role,
     tokenData.id,
     // Same reason as before, with item definitions
-    -1,
+    UNSPECIFIED_OWNER,
     searchingFields,
     true,
   );
@@ -166,7 +167,7 @@ export async function searchItemDefinition(
     tokenData.id,
     // And we also use -1 for the same reason as before
     // this is a search, we ignore SELF
-    -1,
+    UNSPECIFIED_OWNER,
     searchingFields,
     true,
   );

@@ -84,5 +84,7 @@
                 "properties": ["password"]
             }
         }
-    }
+    },
+    "createRoleAccess": ["GUEST", "ADMIN"],
+    "ownerIsObjectId": true
 }

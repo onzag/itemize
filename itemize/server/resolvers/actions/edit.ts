@@ -6,7 +6,6 @@ import {
   checkLanguageAndRegion,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
-  mustBeLoggedIn,
   flattenFieldsFromRequestedFields,
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
@@ -16,7 +15,7 @@ import {
   validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
-import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
+import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX, UNSPECIFIED_OWNER } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
   convertGQLValueToSQLValueForItemDefinition,
@@ -38,7 +37,6 @@ export async function editItemDefinition(
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // for editing one must be logged in
-  mustBeLoggedIn(tokenData);
   validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we get the requested fields, and check they are available for the given role
@@ -78,15 +76,20 @@ export async function editItemDefinition(
       // so now that we have it all, we set the value of the variable
       // this might be null
       wholeSqlStoredValue = contentData;
-      // and fetch the userId
-      userId = contentData && contentData.created_by;
+
       // if we don't get an user id this means that there's no owner, this is bad input
-      if (!userId) {
+      if (!contentData) {
         debug("FAILED due to lack of content data");
         throw new GraphQLEndpointError({
           message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
           code: "NOT_FOUND",
         });
+      }
+
+      // and fetch the userId
+      userId = contentData.created_by;
+      if (itemDefinition.isOwnerObjectId()) {
+        userId = contentData.id;
       }
 
       // also throw an error if it's blocked

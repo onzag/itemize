@@ -72,7 +72,7 @@ const customFormatErrorFn = (error: GraphQLError) => {
       break;
     default:
       extensions = {
-        message: "Internal Error while parsing data",
+        message: "Unspecified Error while parsing data",
         code: "UNSPECIFIED",
       };
   }
