@@ -9,7 +9,7 @@ import MomentUtils from "@date-io/moment";
 import { Route } from "react-router";
 import { history } from "..";
 import { countries, currencies } from "../../imported-resources";
-import { TokenProvider, ITokenProviderState } from "./internal-providers";
+import { TokenProvider, ITokenProviderState, LocationStateContext } from "./internal-providers";
 import { buildGqlMutation, gqlQuery } from "./gql-querier";
 
 // Just a message for whether is development
@@ -216,7 +216,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     // and we fetch the new data, as relevant, mostly the build, and the moment to patch
     const [newData] =
-      await Promise.all([
+      await Promise.all<any>([
         fetch(`/rest/resource/build.${localeToSet}.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
 
         localeToSet !== "en" ?
@@ -348,7 +348,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
    * Renders the application with the locale context data
    * @param param0 the url match from the router, contains the url language
    */
-  public renderAppWithLocaleContext({ match }) {
+  public renderAppWithLocaleContext({ match, location }) {
     // Now the match.params.lang is actually a quite unreliable way to check for the current language
     // in use during updates, there's a reason, the url changes triggering a react update before the
     // language data has been loaded, this makes the app feel quite responsive and it's important, but
@@ -389,7 +389,9 @@ export default class App extends React.Component<IAppProps, IAppState> {
             locale={currentActualLanguageDeregionalized}
             libInstance={Moment}
           >
-            {this.props.mainComponent}
+            <LocationStateContext.Provider value={location}>
+              {this.props.mainComponent}
+            </LocationStateContext.Provider>
           </MuiPickersUtilsProvider>
         </TokenProvider>
       </LocaleContext.Provider>

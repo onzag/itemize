@@ -2,6 +2,7 @@ import React from "react";
 import { gqlQuery, buildGqlQuery } from "./gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import { ILocaleContextType } from ".";
+import { Location } from "history";
 
 export interface ITokenProviderState {
   token: string;
@@ -198,3 +199,5 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     );
   }
 }
+
+export const LocationStateContext = React.createContext<Location>(null);
