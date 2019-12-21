@@ -47,9 +47,12 @@ export function LogActioner(props: ILogActionerProps) {
 
                   let login: () => any;
                   let logout: () => any;
-                  let dismissError: () => any;
                   let signup: () => any;
-                  if (!tokenContextValue.isLoggingIn) {
+                  const dismissError = () => {
+                    tokenContextValue.dismissError();
+                    itemDefinitionContextualValue.dismissSubmitError();
+                  };
+                  if (!tokenContextValue.isLoggingIn && !itemDefinitionContextualValue.submitting) {
                     const cleanFields = () => {
                       const passwordPdef =
                         itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
@@ -62,15 +65,16 @@ export function LogActioner(props: ILogActionerProps) {
                       // in dialogs that are going to close
                       setTimeout(cleanFields, 300);
                     };
-                    signup = () => {
-                      setTimeout(cleanFields, 300);
+                    signup = async () => {
+                      const result = await itemDefinitionContextualValue.submit();
+                      if (!result.error) {
+                        login();
+                      }
                     };
                     logout = tokenContextValue.logout;
-                    dismissError = tokenContextValue.dismissError;
                   } else {
                     login = () => null;
                     logout = () => null;
-                    dismissError = () => null;
                     signup = () => null;
                   }
 
@@ -78,7 +82,7 @@ export function LogActioner(props: ILogActionerProps) {
                     login,
                     signup,
                     logout,
-                    error: tokenContextValue.error,
+                    error: tokenContextValue.error || itemDefinitionContextualValue.submitError,
                     dismissError,
                   });
                 }

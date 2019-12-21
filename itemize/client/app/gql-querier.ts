@@ -52,6 +52,7 @@ export function buildGqlMutation(...mutations: IGQLQueryObj[]) {
   return buildGqlThing("mutation", ...mutations);
 }
 
+// TODO implement timeouts
 export async function gqlQuery(query: string) {
   console.log(query);
   const value = await fetch("/graphql", {

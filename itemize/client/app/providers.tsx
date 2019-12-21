@@ -13,9 +13,19 @@ import {
   PREFIX_GET,
   PREFIX_BUILD,
   STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
+  PREFIX_EDIT,
+  PREFIX_ADD,
 } from "../../constants";
 import { buildGqlQuery, gqlQuery } from "./gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
+
+interface IBasicActionResponse {
+  error: GraphQLEndpointErrorType;
+}
+
+interface IActionResponseWithId extends IBasicActionResponse {
+  id: number;
+}
 
 export interface IItemDefinitionContextType {
   idef: ItemDefinition;
@@ -24,6 +34,10 @@ export interface IItemDefinitionContextType {
   blocked: boolean;
   blockedButDataAccessible: boolean;
   loadError: GraphQLEndpointErrorType;
+  submitError: GraphQLEndpointErrorType;
+  submitting: boolean;
+  reload: () => Promise<IBasicActionResponse>;
+  submit: () => Promise<IActionResponseWithId>;
   forId: number;
   onPropertyChange: (
     property: PropertyDefinition,
@@ -34,6 +48,8 @@ export interface IItemDefinitionContextType {
     item: Item,
     state: ItemExclusionState,
   ) => void;
+  dismissLoadError: () => void;
+  dismissSubmitError: () => void;
 }
 
 export interface IModuleContextType {
@@ -70,6 +86,8 @@ interface IActualItemDefinitionProviderState {
   isBlockedButDataIsAccessible: boolean;
   notFound: boolean;
   loadError: GraphQLEndpointErrorType;
+  submitError: GraphQLEndpointErrorType;
+  submitting: boolean;
 }
 
 function flattenRecievedFields(recievedFields: any) {
@@ -116,12 +134,17 @@ class ActualItemDefinitionProvider extends
       isBlockedButDataIsAccessible: false,
       notFound: false,
       loadError: null,
+      submitError:  null,
+      submitting: false,
     };
 
     this.onPropertyChange = this.onPropertyChange.bind(this);
     this.onItemSetExclusionState = this.onItemSetExclusionState.bind(this);
     this.loadValue = this.loadValue.bind(this);
     this.listener = this.listener.bind(this);
+    this.submit = this.submit.bind(this);
+    this.dismissLoadError = this.dismissLoadError.bind(this);
+    this.dismissSubmitError = this.dismissSubmitError.bind(this);
 
     valueFor.addListener(this.props.forId || null, this.listener);
     this.itemDefinition = valueFor;
@@ -177,7 +200,7 @@ class ActualItemDefinitionProvider extends
       ),
     });
   }
-  public async loadValue() {
+  public async loadValue(): Promise<IBasicActionResponse> {
     if (!this.props.forId) {
       return;
     }
@@ -211,7 +234,9 @@ class ActualItemDefinitionProvider extends
           ItemDefinitionIOActions.READ,
           this.props.tokenData.role,
           this.props.tokenData.id,
-          this.props.assumeOwnership ? this.props.tokenData.id : -1,
+          this.props.assumeOwnership ? this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(
+            this.props.forId || null,
+          ),
           false,
         )
       ) {
@@ -240,7 +265,9 @@ class ActualItemDefinitionProvider extends
             ItemDefinitionIOActions.READ,
             this.props.tokenData.role,
             this.props.tokenData.id,
-            this.props.assumeOwnership ? this.props.tokenData.id : -1,
+            this.props.assumeOwnership ? this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(
+              this.props.forId || null,
+            ),
             false,
           )
         ) {
@@ -275,27 +302,30 @@ class ActualItemDefinitionProvider extends
       },
       fields: requestFields,
     });
-    const appliedGQLValue = this.itemDefinition.getGQLAppliedValue(this.props.forId);
+    const appliedGQLValue = this.itemDefinition.getGQLAppliedValue(this.props.forId || null);
     if (appliedGQLValue && appliedGQLValue.query === query) {
       delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
       return;
     }
     const gqlValue = await gqlQuery(query);
 
+    let error: GraphQLEndpointErrorType = null;
     if (!gqlValue) {
+      error = {
+        message: "Failed to connect",
+        code: "CANT_CONNECT",
+      };
       this.setState({
-        loadError: {
-          message: "Failed to connect",
-          code: "CANT_CONNECT",
-        },
+        loadError: error,
         isBlocked: false,
         isBlockedButDataIsAccessible: false,
         notFound: false,
       });
     } else {
       if (gqlValue.errors) {
+        error = gqlValue.errors[0].extensions;
         this.setState({
-          loadError: gqlValue.errors[0].extensions,
+          loadError: error,
         });
       } else {
         this.setState({
@@ -349,6 +379,10 @@ class ActualItemDefinitionProvider extends
     }
 
     delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
+
+    return {
+      error,
+    };
   }
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
     const newItemDefinitionState = await this.itemDefinition.getState(this.props.forId || null);
@@ -396,6 +430,210 @@ class ActualItemDefinitionProvider extends
       );
     }
   }
+  // TODO policies
+  public async submit(): Promise<IActionResponseWithId> {
+    if (this.state.submitting) {
+      return;
+    }
+
+    this.setState({
+      submitting: true,
+    });
+
+    const requestFields: any = {
+      DATA: {},
+    };
+    const argumentsForQuery: any = {};
+    STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
+      requestFields.DATA[p] = {};
+    });
+    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
+      requestFields[p] = {};
+    });
+    if (ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(this.props.tokenData.role)) {
+      MODERATION_FIELDS.forEach((mf) => {
+        requestFields.DATA[mf] = {};
+      });
+    }
+
+    this.itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+      if (
+        !pd.isRetrievalDisabled() &&
+        pd.checkRoleAccessFor(
+          ItemDefinitionIOActions.READ,
+          this.props.tokenData.role,
+          this.props.tokenData.id,
+          this.props.assumeOwnership ? this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(
+            this.props.forId || null,
+          ),
+          false,
+        )
+      ) {
+        requestFields.DATA[pd.getId()] = {};
+
+        const propertyDescription = pd.getPropertyDefinitionDescription();
+        if (propertyDescription.gqlFields) {
+          Object.keys(propertyDescription.gqlFields).forEach((field) => {
+            requestFields.DATA[pd.getId()][field] = {};
+          });
+        }
+      }
+
+      if (
+        pd.checkRoleAccessFor(
+          !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
+          this.props.tokenData.role,
+          this.props.tokenData.id,
+          this.props.assumeOwnership ? this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(
+            this.props.forId || null,
+          ),
+          false,
+        )
+      ) {
+        argumentsForQuery[pd.getId()] = pd.getCurrentValue(this.props.forId || null);
+      }
+    });
+
+    this.itemDefinition.getAllItems().forEach((item) => {
+      requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
+      argumentsForQuery[item.getQualifiedExclusionStateIdentifier()] = item.getExclusionState(this.props.forId || null);
+
+      const qualifiedId = item.getQualifiedIdentifier();
+      requestFields.DATA[qualifiedId] = {};
+      argumentsForQuery[qualifiedId] = {};
+
+      item.getSinkingProperties().forEach((sp) => {
+        if (
+          !sp.isRetrievalDisabled() &&
+          sp.checkRoleAccessFor(
+            ItemDefinitionIOActions.READ,
+            this.props.tokenData.role,
+            this.props.tokenData.id,
+            this.props.assumeOwnership ? this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(
+              this.props.forId || null,
+            ),
+            false,
+          )
+        ) {
+          requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = {};
+
+          const propertyDescription = sp.getPropertyDefinitionDescription();
+          if (propertyDescription.gqlFields) {
+            Object.keys(propertyDescription.gqlFields).forEach((field) => {
+              requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()][field] = {};
+            });
+          }
+        }
+
+        if (
+          sp.checkRoleAccessFor(
+            !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
+            this.props.tokenData.role,
+            this.props.tokenData.id,
+            this.props.assumeOwnership ? this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(
+              this.props.forId || null,
+            ),
+            false,
+          )
+        ) {
+          argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(this.props.forId || null);
+        }
+      });
+
+      if (Object.keys(requestFields.DATA[qualifiedId]).length === 0) {
+        delete requestFields.DATA[qualifiedId];
+      }
+      if (Object.keys(argumentsForQuery[qualifiedId]).length === 0) {
+        delete argumentsForQuery[qualifiedId];
+      }
+    });
+
+    const queryName = (!this.props.forId ? PREFIX_ADD : PREFIX_EDIT) +
+      this.itemDefinition.getQualifiedPathName();
+    const args = {
+      token: this.props.tokenData.token,
+      language: this.props.localeData.language.split("-")[0],
+      country: this.props.localeData.country,
+      ...argumentsForQuery,
+    };
+    if (this.props.forId) {
+      args.id = this.props.forId;
+    }
+    const query = buildGqlQuery({
+      name: queryName,
+      args,
+      fields: requestFields,
+    });
+    const gqlValue = await gqlQuery(query);
+
+    let error: GraphQLEndpointErrorType = null;
+    if (!gqlValue) {
+      error = {
+        message: "Failed to connect",
+        code: "CANT_CONNECT",
+      };
+      this.setState({
+        submitError: error,
+      });
+    } else {
+      if (gqlValue.errors) {
+        error = gqlValue.errors[0].extensions;
+        this.setState({
+          submitError: error,
+        });
+      } else {
+        this.setState({
+          submitError: null,
+        });
+      }
+
+      if (gqlValue.data && gqlValue.data[queryName] && gqlValue.data[queryName].id) {
+        const recievedId = gqlValue.data[queryName].id;
+        const representativeGetQuery = buildGqlQuery({
+          name: PREFIX_GET + this.itemDefinition.getQualifiedPathName(),
+          args: {
+            id: recievedId,
+            token: this.props.tokenData.token,
+            language: this.props.localeData.language.split("-")[0],
+            country: this.props.localeData.country,
+          },
+          fields: requestFields,
+        });
+
+        const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
+        this.itemDefinition.applyValue(
+          recievedId,
+          recievedFields,
+          false,
+          this.props.tokenData.id,
+          this.props.tokenData.role,
+          representativeGetQuery,
+        );
+        this.itemDefinition.triggerListeners(recievedId);
+
+        return {
+          id: recievedId,
+          error,
+        };
+      }
+    }
+
+    // happens during an error or whatnot
+    return {
+      id: null,
+      error,
+    };
+  }
+  public dismissLoadError() {
+    this.setState({
+      loadError: null,
+    });
+  }
+  public dismissSubmitError() {
+    this.setState({
+      submitError: null,
+    });
+  }
   public render() {
     return (
       <ItemDefinitionContext.Provider
@@ -408,7 +646,13 @@ class ActualItemDefinitionProvider extends
           blocked: this.state.isBlocked,
           blockedButDataAccessible: this.state.isBlockedButDataIsAccessible,
           loadError: this.state.loadError,
+          submitError: this.state.submitError,
+          submitting: this.state.submitting,
+          submit: this.submit,
+          reload: this.loadValue,
           forId: this.props.forId || null,
+          dismissLoadError: this.dismissLoadError,
+          dismissSubmitError: this.dismissSubmitError,
         }}
       >
         {this.props.children}

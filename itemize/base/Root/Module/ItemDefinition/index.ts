@@ -665,6 +665,19 @@ export default class ItemDefinition {
     });
   }
 
+  public getAppliedValueOwnerIfAny(id: number) {
+    if (
+      !this.stateHasAppliedValueTo[id] ||
+      !this.stateGQLAppliedValue[id] ||
+      !this.stateGQLAppliedValue[id].value ||
+      !this.stateGQLAppliedValue[id].value.created_by
+    ) {
+      return -1;
+    }
+
+    return this.stateGQLAppliedValue[id].value.created_by;
+  }
+
   public cleanValueFor(id: number, excludeExtensions?: boolean) {
     delete this.stateHasAppliedValueTo[id];
     delete this.stateGQLAppliedValue[id];
