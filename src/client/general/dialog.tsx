@@ -13,6 +13,7 @@ import {
   WithStyles,
   withStyles,
 } from "@material-ui/core";
+import { I18nRead } from "../../../itemize/client/components/localization";
 
 const dialogStyles = createStyles({
   paper: {},
@@ -55,9 +56,13 @@ export const Dialog = withStyles(dialogStyles)((props: IDialogProps) => {
     >
       <AppBar className={props.classes.appbar}>
         <Toolbar>
-          <IconButton color="inherit" onClick={props.onClose} aria-label="Close">
-            <Icon>close</Icon>
-          </IconButton>
+          <I18nRead id="close">
+            {(i18nClose: string) => (
+              <IconButton color="inherit" onClick={props.onClose} aria-label={i18nClose}>
+                <Icon>close</Icon>
+              </IconButton>
+            )}
+          </I18nRead>
           <Typography variant="h6" color="inherit" className={props.classes.title}>
             {props.title}
           </Typography>

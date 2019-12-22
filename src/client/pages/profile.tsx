@@ -8,8 +8,9 @@ import { LanguagePicker } from "../general/language-picker";
 import { LogActioner } from "../../../itemize/client/components/login";
 import { Entry, View } from "../../../itemize/client/components/property";
 import { I18nRead } from "../../../itemize/client/components/localization";
-import { ItemDefinitionLoader } from "../../../itemize/client/components/item-definition";
+import { ItemDefinitionLoader, SubmitActioner } from "../../../itemize/client/components/item-definition";
 import { UserIdRetriever } from "../../../itemize/client/components/user";
+import Snackbar from "../general/snackbar";
 
 function SimulatedNotFoundPage() {
   return (
@@ -41,21 +42,42 @@ function ActualProfile(props: IActualProfileProps) {
   if (props.isOwner) {
     content = (
       <LogActioner>
-        {(actioner) => {
-          return (
-            <React.Fragment>
-              <div>
-                <Avatar large={true} hideFlag={true}/>
-                <LanguagePicker/>
-              </div>
-              <Entry id="username"/>
-              <Entry id="email"/>
-              <Button onClick={actioner.logout}>
-                <I18nRead id="logout"/>
-              </Button>
-            </React.Fragment>
-          );
-        }}
+        {(logActioner) => (
+          <SubmitActioner>
+            {(submitActioner) => (
+              <React.Fragment>
+                <div>
+                  <Avatar large={true} hideFlag={true}/>
+                  <LanguagePicker/>
+                </div>
+                <Entry id="username"/>
+                <Entry id="email"/>
+                <Button onClick={logActioner.logout}>
+                  <I18nRead id="logout"/>
+                </Button>
+                <Button
+                  onClick={submitActioner.submitError ? null : submitActioner.submit.bind(null, {
+                    onlyIncludeProperties: ["username", "email"],
+                  })}
+                >
+                  <I18nRead id="update_profile"/>
+                </Button>
+                <Snackbar
+                  uniqueId="profile-update-message-error"
+                  open={!!submitActioner.submitError}
+                  i18nDisplay={submitActioner.submitError}
+                  onClose={submitActioner.dismissError}
+                />
+                <Snackbar
+                  uniqueId="profile-update-message-success"
+                  open={!!submitActioner.submitted}
+                  i18nDisplay="profile_updated_succesfully"
+                  onClose={submitActioner.dismissSubmitted}
+                />
+              </React.Fragment>
+            )}
+          </SubmitActioner>
+        )}
       </LogActioner>
     );
   } else {

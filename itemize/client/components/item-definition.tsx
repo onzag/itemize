@@ -1,9 +1,9 @@
 import React from "react";
 import { GraphQLEndpointErrorType } from "../../base/errors";
-import { ItemDefinitionContext } from "../app/providers";
+import { ItemDefinitionContext, IBasicActionResponse, IActionResponseWithId } from "../app/providers";
 
 interface IItemDefinitionLoader {
-  errorComponent?: React.ComponentType<{error: GraphQLEndpointErrorType}>;
+  errorComponent?: React.ComponentType<{error: GraphQLEndpointErrorType, reload: () => Promise<IBasicActionResponse>}>;
   notFoundComponent?: React.ComponentType<any>;
   blockedComponent?: React.ComponentType<{hasBlockedAccess: boolean}>;
   children: any;
@@ -26,6 +26,7 @@ export function ItemDefinitionLoader(props: IItemDefinitionLoader) {
           }
           return <ErrorComponent
             error={itemDefinitionContext.loadError}
+            reload={itemDefinitionContext.reload}
             children={props.children}
           />;
         } else if (
@@ -56,7 +57,30 @@ export function ItemDefinitionLoader(props: IItemDefinitionLoader) {
   );
 }
 
-// TODO submit for a country
-// tslint:disable-next-line: no-empty
-export function SubmitButton() {
+interface ISubmitActionerProps {
+  children: (arg: {
+    submitError: GraphQLEndpointErrorType;
+    dismissError: () => void;
+    dismissSubmitted: () => void;
+    submitting: boolean;
+    submitted: boolean;
+    submit: () => Promise<IActionResponseWithId>;
+  }) => any;
+}
+
+export function SubmitActioner(props: ISubmitActionerProps) {
+  return (
+    <ItemDefinitionContext.Consumer>{
+      (itemDefinitionContext) => (
+        props.children({
+          submitError: itemDefinitionContext.submitError,
+          submitting: itemDefinitionContext.submitting,
+          submitted: itemDefinitionContext.submitted,
+          submit: itemDefinitionContext.submit,
+          dismissError: itemDefinitionContext.dismissSubmitError,
+          dismissSubmitted: itemDefinitionContext.dismissSubmitted,
+        })
+      )
+    }</ItemDefinitionContext.Consumer>
+  );
 }

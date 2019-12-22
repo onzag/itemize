@@ -44,7 +44,7 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
                     <I18nReadError error={actioner.error}/>
                   </form>
                   <Button color="secondary" onClick={props.onSignupRequest}>
-                    <I18nRead id="signupInstead"/>
+                    <I18nRead id="signup_instead"/>
                   </Button>
                 </DialogResponsive>
               )}

@@ -19,12 +19,17 @@ import {
 import { buildGqlQuery, buildGqlMutation, gqlQuery } from "./gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 
-interface IBasicActionResponse {
+export interface IBasicActionResponse {
   error: GraphQLEndpointErrorType;
 }
 
-interface IActionResponseWithId extends IBasicActionResponse {
+export interface IActionResponseWithId extends IBasicActionResponse {
   id: number;
+}
+
+export interface IActionSubmitOptions {
+  onlyIncludeProperties?: string[];
+  onlyIncludeItems?: string[];
 }
 
 export interface IItemDefinitionContextType {
@@ -36,9 +41,10 @@ export interface IItemDefinitionContextType {
   loadError: GraphQLEndpointErrorType;
   submitError: GraphQLEndpointErrorType;
   submitting: boolean;
+  submitted: boolean;
   poked: boolean;
   reload: () => Promise<IBasicActionResponse>;
-  submit: () => Promise<IActionResponseWithId>;
+  submit: (options?: IActionSubmitOptions) => Promise<IActionResponseWithId>;
   forId: number;
   onPropertyChange: (
     property: PropertyDefinition,
@@ -60,6 +66,7 @@ export interface IItemDefinitionContextType {
   ) => void;
   dismissLoadError: () => void;
   dismissSubmitError: () => void;
+  dismissSubmitted: () => void;
 }
 
 export interface IModuleContextType {
@@ -98,6 +105,7 @@ interface IActualItemDefinitionProviderState {
   loadError: GraphQLEndpointErrorType;
   submitError: GraphQLEndpointErrorType;
   submitting: boolean;
+  submitted: boolean;
   poked: boolean;
 }
 
@@ -147,6 +155,7 @@ class ActualItemDefinitionProvider extends
       loadError: null,
       submitError:  null,
       submitting: false,
+      submitted: false,
       poked: false,
     };
 
@@ -159,6 +168,7 @@ class ActualItemDefinitionProvider extends
     this.dismissSubmitError = this.dismissSubmitError.bind(this);
     this.onPropertyEnforce = this.onPropertyEnforce.bind(this);
     this.onPropertyClearEnforce = this.onPropertyClearEnforce.bind(this);
+    this.dismissSubmitted = this.dismissSubmitted.bind(this);
 
     valueFor.addListener(this.props.forId || null, this.listener);
     this.itemDefinition = valueFor;
@@ -460,16 +470,23 @@ class ActualItemDefinitionProvider extends
     }
   }
   // TODO policies
-  public async submit(): Promise<IActionResponseWithId> {
+  public async submit(options: IActionSubmitOptions = {}): Promise<IActionResponseWithId> {
     if (this.state.submitting) {
       return;
     }
 
     let isInvalid = this.state.itemDefinitionState.properties.some((p) => {
+      if (options.onlyIncludeProperties && !options.onlyIncludeProperties.includes(p.propertyId)) {
+        return false;
+      }
       return !p.valid;
     });
     if (!isInvalid) {
       isInvalid = this.state.itemDefinitionState.items.some((i) => {
+        if (options.onlyIncludeItems && !options.onlyIncludeItems.includes(i.itemId)) {
+          return false;
+        }
+
         const item = this.itemDefinition.getItemFor(i.itemId);
         const sinkingPropertyIds = item.getSinkingPropertiesIds();
 
@@ -522,6 +539,10 @@ class ActualItemDefinitionProvider extends
       });
     }
 
+    const appliedOwner = this.itemDefinition.getAppliedValueOwnerIfAny(
+      this.props.forId || null,
+    );
+
     this.itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
       if (
         !pd.isRetrievalDisabled() &&
@@ -546,13 +567,12 @@ class ActualItemDefinitionProvider extends
       }
 
       if (
+        (!options.onlyIncludeProperties || options.onlyIncludeProperties.includes(pd.getId())) ||
         pd.checkRoleAccessFor(
           !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
           this.props.tokenData.role,
           this.props.tokenData.id,
-          this.props.assumeOwnership ? this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(
-            this.props.forId || null,
-          ),
+          this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
           false,
         )
       ) {
@@ -575,9 +595,7 @@ class ActualItemDefinitionProvider extends
             ItemDefinitionIOActions.READ,
             this.props.tokenData.role,
             this.props.tokenData.id,
-            this.props.assumeOwnership ? this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(
-              this.props.forId || null,
-            ),
+            this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
             false,
           )
         ) {
@@ -592,13 +610,12 @@ class ActualItemDefinitionProvider extends
         }
 
         if (
+          (!options.onlyIncludeItems || options.onlyIncludeItems.includes(item.getId())) ||
           sp.checkRoleAccessFor(
             !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
             this.props.tokenData.role,
             this.props.tokenData.id,
-            this.props.assumeOwnership ? this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(
-              this.props.forId || null,
-            ),
+            this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
             false,
           )
         ) {
@@ -703,6 +720,11 @@ class ActualItemDefinitionProvider extends
       submitError: null,
     });
   }
+  public dismissSubmitted() {
+    this.setState({
+      submitted: null,
+    });
+  }
   public render() {
     return (
       <ItemDefinitionContext.Provider
@@ -719,12 +741,14 @@ class ActualItemDefinitionProvider extends
           loadError: this.state.loadError,
           submitError: this.state.submitError,
           submitting: this.state.submitting,
+          submitted: this.state.submitted,
           poked: this.state.poked,
           submit: this.submit,
           reload: this.loadValue,
           forId: this.props.forId || null,
           dismissLoadError: this.dismissLoadError,
           dismissSubmitError: this.dismissSubmitError,
+          dismissSubmitted: this.dismissSubmitted,
         }}
       >
         {this.props.children}

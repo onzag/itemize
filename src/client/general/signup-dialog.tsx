@@ -78,7 +78,7 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
                     />
                   </form>
                   <Button color="secondary" onClick={props.onLoginRequest}>
-                    <I18nRead id="loginInstead"/>
+                    <I18nRead id="login_instead"/>
                   </Button>
                 </DialogResponsive>
               )}

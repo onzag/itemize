@@ -674,13 +674,15 @@ export default class ItemDefinition {
     if (
       !this.stateHasAppliedValueTo[id] ||
       !this.stateGQLAppliedValue[id] ||
-      !this.stateGQLAppliedValue[id].value ||
-      !this.stateGQLAppliedValue[id].value.created_by
+      !this.stateGQLAppliedValue[id].value
     ) {
       return -1;
     }
 
-    return this.stateGQLAppliedValue[id].value.created_by;
+    if (this.isOwnerObjectId()) {
+      return this.stateGQLAppliedValue[id].value.id || -1;
+    }
+    return this.stateGQLAppliedValue[id].value.created_by || -1;
   }
 
   public cleanValueFor(id: number, excludeExtensions?: boolean) {

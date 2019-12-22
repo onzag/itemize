@@ -105,6 +105,9 @@ export const LOCALE_I18N = [
   "cancel",
   "ok",
 
+  // for mostly the aria label of closing dialogs
+  "close",
+
   // for file uploader
   "file_uploader_placeholder_active",
   "image_uploader_placeholder_active",
