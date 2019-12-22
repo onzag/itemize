@@ -128,9 +128,16 @@ export function I18nReadError(props: II18nReadErrorProps) {
                   }
 
                   let itemDef: IItemDefinitionRawJSONDataType;
-                  if (freeError.itemDefPath) {
+                  if (freeError.itemIdItemDefPath) {
+                    itemDef = Module.getItemDefinitionRawFor(mod, freeError.itemIdItemDefPath);
+                    if (!itemDef) {
+                      console.warn("failed to display error due to itemIdItemDefPath", freeError);
+                      return null;
+                    }
+                  } else if (freeError.itemDefPath) {
                     itemDef = Module.getItemDefinitionRawFor(mod, freeError.itemDefPath);
                     if (!itemDef) {
+                      console.warn("failed to display error due to itemDefPath", freeError);
                       return null;
                     }
                   }
@@ -151,10 +158,16 @@ export function I18nReadError(props: II18nReadErrorProps) {
                       );
                     }
                     if (!propertyDef) {
+                      console.warn("failed to display error due to propertyId", freeError);
                       return null;
                     }
 
-                    return propertyDef.i18nData[localeData.language].error[props.error.code];
+                    const i18nErrorValue = propertyDef.i18nData[localeData.language].error[freeError.code];
+                    if (!i18nErrorValue) {
+                      console.warn("failed to display error due to code", freeError);
+                      return null;
+                    }
+                    return i18nErrorValue;
                   } else if (freeError.policyType) {
                     return itemDef
                       .i18nData[localeData.language]

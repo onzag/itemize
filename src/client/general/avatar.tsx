@@ -123,8 +123,7 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
                     if (appCountryValue && countries[appCountryValue]) {
                       countryEmoji = countries[appCountryValue].emoji;
                     }
-                    // TODO get raw properties, such as id, country, etc...
-                    return <Link to={`/profile/${1}`}>
+                    return <Link to={`/profile/${id}`}>
                       <MAvatar
                         alt={userNameValue}
                         classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.large ? props.classes.avatarLarge : ""}` }}

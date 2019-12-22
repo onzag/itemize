@@ -36,6 +36,7 @@ export interface IItemDefinitionContextType {
   loadError: GraphQLEndpointErrorType;
   submitError: GraphQLEndpointErrorType;
   submitting: boolean;
+  poked: boolean;
   reload: () => Promise<IBasicActionResponse>;
   submit: () => Promise<IActionResponseWithId>;
   forId: number;
@@ -47,6 +48,15 @@ export interface IItemDefinitionContextType {
   onItemSetExclusionState: (
     item: Item,
     state: ItemExclusionState,
+  ) => void;
+  onPropertyEnforce: (
+    property: PropertyDefinition,
+    value: PropertyDefinitionSupportedType,
+    givenForId: number,
+  ) => void;
+  onPropertyClearEnforce: (
+    property: PropertyDefinition,
+    givenForId: number,
   ) => void;
   dismissLoadError: () => void;
   dismissSubmitError: () => void;
@@ -88,6 +98,7 @@ interface IActualItemDefinitionProviderState {
   loadError: GraphQLEndpointErrorType;
   submitError: GraphQLEndpointErrorType;
   submitting: boolean;
+  poked: boolean;
 }
 
 function flattenRecievedFields(recievedFields: any) {
@@ -136,6 +147,7 @@ class ActualItemDefinitionProvider extends
       loadError: null,
       submitError:  null,
       submitting: false,
+      poked: false,
     };
 
     this.onPropertyChange = this.onPropertyChange.bind(this);
@@ -145,6 +157,8 @@ class ActualItemDefinitionProvider extends
     this.submit = this.submit.bind(this);
     this.dismissLoadError = this.dismissLoadError.bind(this);
     this.dismissSubmitError = this.dismissSubmitError.bind(this);
+    this.onPropertyEnforce = this.onPropertyEnforce.bind(this);
+    this.onPropertyClearEnforce = this.onPropertyClearEnforce.bind(this);
 
     valueFor.addListener(this.props.forId || null, this.listener);
     this.itemDefinition = valueFor;
@@ -412,6 +426,21 @@ class ActualItemDefinitionProvider extends
       );
     }
   }
+  public onPropertyEnforce(
+    property: PropertyDefinition,
+    value: PropertyDefinitionSupportedType,
+    givenForId: number,
+  ) {
+    property.setSuperEnforced(givenForId || null, value);
+    this.itemDefinition.triggerListeners(givenForId || null);
+  }
+  public onPropertyClearEnforce(
+    property: PropertyDefinition,
+    givenForId: number,
+  ) {
+    property.clearSuperEnforced(givenForId || null);
+    this.itemDefinition.triggerListeners(givenForId || null);
+  }
   public componentWillUnmount() {
     this.itemDefinition.removeListener(this.props.forId || null, this.listener);
   }
@@ -430,12 +459,47 @@ class ActualItemDefinitionProvider extends
       );
     }
   }
-  // TODO check that all fields are valid before submit
-  // poke if otherwise
   // TODO policies
   public async submit(): Promise<IActionResponseWithId> {
     if (this.state.submitting) {
       return;
+    }
+
+    let isInvalid = this.state.itemDefinitionState.properties.some((p) => {
+      return !p.valid;
+    });
+    if (!isInvalid) {
+      isInvalid = this.state.itemDefinitionState.items.some((i) => {
+        const item = this.itemDefinition.getItemFor(i.itemId);
+        const sinkingPropertyIds = item.getSinkingPropertiesIds();
+
+        return i.itemDefinitionState.properties.some((p) => {
+          if (!sinkingPropertyIds.includes(p.propertyId)) {
+            return false;
+          }
+          return !p.valid;
+        });
+      });
+    }
+
+    if (!this.state.poked) {
+      this.setState({
+        poked: true,
+      });
+    }
+
+    if (isInvalid) {
+      const emulatedError: GraphQLEndpointErrorType = {
+        message: "Submit refused due to invalid information in form fields",
+        code: "INVALID_DATA_SUBMIT_REFUSED",
+      };
+      this.setState({
+        submitError: emulatedError,
+      });
+      return {
+        id: null,
+        error: emulatedError,
+      };
     }
 
     this.setState({
@@ -647,12 +711,15 @@ class ActualItemDefinitionProvider extends
           state: this.state.itemDefinitionState,
           onPropertyChange: this.onPropertyChange,
           onItemSetExclusionState: this.onItemSetExclusionState,
+          onPropertyEnforce: this.onPropertyEnforce,
+          onPropertyClearEnforce: this.onPropertyClearEnforce,
           notFound: this.state.notFound,
           blocked: this.state.isBlocked,
           blockedButDataAccessible: this.state.isBlockedButDataIsAccessible,
           loadError: this.state.loadError,
           submitError: this.state.submitError,
           submitting: this.state.submitting,
+          poked: this.state.poked,
           submit: this.submit,
           reload: this.loadValue,
           forId: this.props.forId || null,

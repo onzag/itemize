@@ -29,13 +29,27 @@ export function redirectTo(newLocation: string, state?: any) {
   history.push(newLocation, state);
 }
 
+interface ICustomLinkProps extends LinkProps {
+  to: string;
+}
+
+function linkOnClick(props: ICustomLinkProps, e: React.MouseEvent<HTMLAnchorElement>) {
+  if (props.to === location.pathname + location.search) {
+    e.preventDefault();
+  }
+
+  if (props.onClick) {
+    props.onClick(e);
+  }
+}
+
 /**
  * Same as the router link but actually takes
  * care of the current language set and uses such
  * language if the location is absolute
  * @param props the LinkProps
  */
-export function Link(props: LinkProps) {
+export function Link(props: ICustomLinkProps) {
   const currentLocaleFromURL = location.pathname.split("/")[1] || null;
   if (!currentLocaleFromURL) {
     return null;
@@ -44,7 +58,13 @@ export function Link(props: LinkProps) {
   if (urlDefined[0] !== "/") {
     urlDefined = "/" + urlDefined;
   }
-  return <RouterLink {...props} to={`/${currentLocaleFromURL}${urlDefined}`}/>;
+  const urlTo = `/${currentLocaleFromURL}${urlDefined}`;
+  const newProps: LinkProps = {
+    ...props,
+    to: urlTo,
+  };
+
+  return <RouterLink {...newProps} onClick={linkOnClick.bind(null, newProps)}/>;
 }
 
 /**

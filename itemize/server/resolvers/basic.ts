@@ -457,6 +457,7 @@ export async function serverSideCheckItemDefinitionAgainst(
   gqlArgValue: IGQLValue,
   id: number,
   referredItem?: Item,
+  referredParentOfItem?: ItemDefinition,
 ) {
   serverSideCheckItemDefinitionAgainstDebug(
     "EXECUTED with value %j for item defintion with qualified name %s",
@@ -485,9 +486,10 @@ export async function serverSideCheckItemDefinitionAgainst(
       throw new GraphQLEndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
         code: propertyValue.invalidReason,
-        modulePath: itemDefinition.getParentModule().getPath(),
-        itemDefPath: itemDefinition.getPath(),
+        modulePath: (referredParentOfItem || itemDefinition).getParentModule().getPath(),
+        itemDefPath: (referredParentOfItem || itemDefinition).getPath(),
         itemId: referredItem && referredItem.getId(),
+        itemIdItemDefPath: referredParentOfItem && referredParentOfItem.getPath(),
         propertyId: propertyValue.propertyId,
       });
 
@@ -503,9 +505,10 @@ export async function serverSideCheckItemDefinitionAgainst(
       throw new GraphQLEndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated value`,
         code: "UNSPECIFIED",
-        modulePath: itemDefinition.getParentModule().getPath(),
-        itemDefPath: itemDefinition.getPath(),
+        modulePath: (referredParentOfItem || itemDefinition).getParentModule().getPath(),
+        itemDefPath: (referredParentOfItem || itemDefinition).getPath(),
         itemId: referredItem && referredItem.getId(),
+        itemIdItemDefPath: referredParentOfItem && referredParentOfItem.getPath(),
         propertyId: propertyValue.propertyId,
       });
     }
@@ -534,9 +537,10 @@ export async function serverSideCheckItemDefinitionAgainst(
       throw new GraphQLEndpointError({
         message: `validation failed at item ${itemValue.itemId} with a mismatch of exclusion state`,
         code: "UNSPECIFIED",
-        modulePath: itemDefinition.getParentModule().getPath(),
-        itemDefPath: itemDefinition.getPath(),
+        modulePath: (referredParentOfItem || itemDefinition).getParentModule().getPath(),
+        itemDefPath: (referredParentOfItem || itemDefinition).getPath(),
         itemId: itemValue.itemId,
+        itemIdItemDefPath: referredParentOfItem && referredParentOfItem.getPath(),
       });
     // and we check if the there's a value set despite it being excluded
     } else if (gqlExclusionState === ItemExclusionState.EXCLUDED && gqlItemValue !== null) {
@@ -547,9 +551,10 @@ export async function serverSideCheckItemDefinitionAgainst(
       throw new GraphQLEndpointError({
         message: `validation failed at item ${itemValue.itemId} with an excluded item but data set for it`,
         code: "UNSPECIFIED",
-        modulePath: itemDefinition.getParentModule().getPath(),
-        itemDefPath: itemDefinition.getPath(),
+        modulePath: (referredParentOfItem || itemDefinition).getParentModule().getPath(),
+        itemDefPath: (referredParentOfItem || itemDefinition).getPath(),
         itemId: itemValue.itemId,
+        itemIdItemDefPath: referredParentOfItem && referredParentOfItem.getPath(),
       });
     }
     // now we run a server side check of item definition in the
@@ -559,6 +564,7 @@ export async function serverSideCheckItemDefinitionAgainst(
       gqlItemValue,
       id,
       item,
+      referredParentOfItem || itemDefinition,
     );
   }
 

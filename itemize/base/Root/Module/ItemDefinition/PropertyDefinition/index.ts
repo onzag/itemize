@@ -413,6 +413,12 @@ export default class PropertyDefinition {
   private stateValue: {
     [slotId: number]: PropertyDefinitionSupportedType,
   };
+  private stateSuperEnforcedValue: {
+    [slotId: number]: PropertyDefinitionSupportedType,
+  };
+  private stateSuperDefaultedValue: {
+    [slotId: number]: PropertyDefinitionSupportedType,
+  };
   private stateValueModified: {
     [slotId: number]: boolean,
   };
@@ -482,6 +488,7 @@ export default class PropertyDefinition {
     this.stateinternalValue = {};
     this.stateLastUniqueCheck = {};
     this.stateLastAutocompleteCheck = {};
+    this.stateSuperEnforcedValue = {};
   }
 
   public getEnforcedValue(id: number): {
@@ -490,6 +497,7 @@ export default class PropertyDefinition {
   } {
     if (
       typeof this.superEnforcedValue !== "undefined" ||
+      typeof this.stateSuperEnforcedValue[id] !== "undefined" ||
       this.enforcedValues ||
       typeof this.rawData.enforcedValue !== "undefined"
     ) {
@@ -504,15 +512,22 @@ export default class PropertyDefinition {
           this.superEnforcedValue.getCurrentValue(id) :
           this.superEnforcedValue) :
 
-        // otherwise in other cases we check the enforced value
-        // which has priority
-        (typeof this.rawData.enforcedValue !== "undefined" ?
-          this.rawData.enforcedValue :
-          // otherwise we go to for evaluating the enforced values
-          // or give undefined if nothing is found
-          (this.enforcedValues.find((ev) => {
-            return ev.if.evaluate(id);
-          }) || {value: undefined}).value);
+        (
+          // if the global super enforced value failed, we check for
+          // the slotted value
+          typeof this.stateSuperEnforcedValue[id] !== "undefined" ?
+          this.stateSuperEnforcedValue[id] :
+
+          // otherwise in other cases we check the enforced value
+          // which has priority
+          (typeof this.rawData.enforcedValue !== "undefined" ?
+            this.rawData.enforcedValue :
+            // otherwise we go to for evaluating the enforced values
+            // or give undefined if nothing is found
+            (this.enforcedValues.find((ev) => {
+              return ev.if.evaluate(id);
+            }) || {value: undefined}).value)
+        );
 
       // if we get one
       if (typeof enforcedValue !== "undefined") {
@@ -726,7 +741,7 @@ export default class PropertyDefinition {
    * @throws an error if the value is invalid
    * @param value the value to enforce it can be a property
    */
-  public setSuperEnforced(
+  public setGlobalSuperEnforced(
     value: PropertyDefinitionSupportedType | PropertyDefinition,
   ) {
     // let's get the definition
@@ -747,13 +762,41 @@ export default class PropertyDefinition {
     this.superEnforcedValue = actualValue;
   }
 
+  public setSuperEnforced(
+    id: number,
+    value: PropertyDefinitionSupportedType,
+  ) {
+    // let's get the definition
+    const definition = supportedTypesStandard[this.rawData.type];
+    // find whether there is a nullable value and if it matches
+    const actualValue = definition.nullableDefault === value ?
+      null : value;
+
+    if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
+      // we run some very basic validations, if this is a number and you put in
+      // a string then something is clearly wrong
+      // other kinds of invalid values are ok
+      if (definition.json && typeof actualValue !== definition.json) {
+        throw new Error("Invalid super enforced " + JSON.stringify(actualValue));
+      }
+    }
+
+    this.stateSuperEnforcedValue[id] = actualValue;
+  }
+
+  public clearSuperEnforced(
+    id: number,
+  ) {
+    delete this.stateSuperEnforcedValue[id];
+  }
+
   /**
    * Sets a super default value that superseeds any default value or
    * values, the value might be another property definition to extract
    * the value from
    * @param value the value to default to it can be a property
    */
-  public setSuperDefault(
+  public setGlobalSuperDefault(
     value: PropertyDefinitionSupportedType | PropertyDefinition,
   ) {
     // let's get the definition
@@ -826,6 +869,7 @@ export default class PropertyDefinition {
     delete this.stateValue[id];
     delete this.stateValueModified[id];
     delete this.stateinternalValue[id];
+    delete this.stateSuperEnforcedValue[id];
   }
 
   /**

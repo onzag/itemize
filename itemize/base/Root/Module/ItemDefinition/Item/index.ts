@@ -153,14 +153,14 @@ export default class Item {
     if (this.enforcedProperties) {
       this.enforcedProperties.getPropertyMap().forEach((p) => {
         this.itemDefinition.getPropertyDefinitionFor(p.id, true)
-          .setSuperEnforced(p.value);
+          .setGlobalSuperEnforced(p.value);
       });
     }
 
     if (this.predefinedProperties) {
       this.predefinedProperties.getPropertyMap().forEach((p) => {
         this.itemDefinition.getPropertyDefinitionFor(p.id, true)
-          .setSuperDefault(p.value);
+          .setGlobalSuperDefault(p.value);
       });
     }
 

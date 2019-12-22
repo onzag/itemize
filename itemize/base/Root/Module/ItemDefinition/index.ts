@@ -890,6 +890,9 @@ export default class ItemDefinition {
   }
 
   public triggerListeners(id: number, but?: ListenerType) {
+    if (!this.listeners[id]) {
+      return;
+    }
     this.listeners[id].filter((l) => l !== but).forEach((l) => l());
   }
 

@@ -6,6 +6,7 @@ import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Modu
 import { RESERVED_BASE_PROPERTIES } from "../../constants";
 import PropertyView, { RawBasePropertyView } from "./base/PropertyView";
 import PropertyEntry from "./base/PropertyEntry";
+import PropertySetter from "./base/PropertySetter";
 
 type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search";
 
@@ -15,6 +16,12 @@ interface IPropertyEntryProps {
   showAsInvalid?: boolean;
   icon?: string;
   onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, inernalValue?: any) => void;
+}
+
+interface IPropertySetterProps {
+  id: string;
+  searchVariant?: SearchVariants;
+  value: PropertyDefinitionSupportedType;
 }
 
 interface IPropertyReadProps {
@@ -28,17 +35,18 @@ interface IPropertyViewProps {
   searchVariant?: SearchVariants;
 }
 
-interface IPropertyEntryViewReadProps {
+interface IPropertyEntryViewReadSetProps {
   id: string;
   searchVariant?: SearchVariants;
   children?: (value: PropertyDefinitionSupportedType) => React.ReactNode;
   showAsInvalid?: boolean;
   icon?: string;
   onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, internalValue?: any) => void;
+  value?: PropertyDefinitionSupportedType;
 }
 
-// TODO EntryViewRead in module context only for module level searches
-function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: boolean) {
+// TODO EntryViewReadSet in module context only for module level searches
+function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" | "view" | "read" | "set") {
   return (
     <ItemDefinitionContext.Consumer>
       {
@@ -47,7 +55,7 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
             {
               (itemContextualValue) => {
                 if (!itemDefinitionContextualValue) {
-                  throw new Error("The Entry/View/Read must be in a ItemDefinitionProvider context");
+                  throw new Error("The Entry/View/Read/Set must be in a ItemDefinitionProvider context");
                 }
 
                 let actualId = props.id;
@@ -77,7 +85,7 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
                   }
                 }
 
-                if (read) {
+                if (type === "read") {
                   if (propertyState) {
                     return props.children(propertyState.value);
                   }
@@ -91,7 +99,7 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
                   }
                   // Property has no state, and no internal value, it must be somehow hidden
                   return null;
-                } else if (view) {
+                } else if (type === "view") {
                   if (propertyState) {
                     return (
                       <PropertyView
@@ -117,7 +125,8 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
                     }
                   }
                   return null;
-                } else {
+                } else if (type === "entry") {
+                  // property has no state it must be hidden
                   if (!propertyState) {
                     return null;
                   }
@@ -135,6 +144,22 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
                       forceInvalid={props.showAsInvalid}
                       icon={props.icon}
                       forId={itemDefinitionContextualValue.forId}
+                      poked={itemDefinitionContextualValue.poked}
+                    />
+                  );
+                } else {
+                  // property has no state it must be hidden
+                  if (!propertyState) {
+                    return null;
+                  }
+
+                  return (
+                    <PropertySetter
+                      property={property}
+                      onEnforce={itemDefinitionContextualValue.onPropertyEnforce.bind(null, property)}
+                      onClearEnforcement={itemDefinitionContextualValue.onPropertyClearEnforce.bind(null, property)}
+                      forId={itemDefinitionContextualValue.forId}
+                      value={props.value}
                     />
                   );
                 }
@@ -148,13 +173,17 @@ function EntryViewRead(props: IPropertyEntryViewReadProps, view: boolean, read: 
 }
 
 export function Entry(props: IPropertyEntryProps) {
-  return EntryViewRead(props, false, false);
+  return EntryViewReadSet(props, "entry");
 }
 
 export function View(props: IPropertyViewProps) {
-  return EntryViewRead(props, true, false);
+  return EntryViewReadSet(props, "view");
 }
 
 export function Reader(props: IPropertyReadProps) {
-  return EntryViewRead(props, false, true);
+  return EntryViewReadSet(props, "read");
+}
+
+export function Setter(props: IPropertySetterProps) {
+  return EntryViewReadSet(props, "set");
 }

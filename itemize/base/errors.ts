@@ -24,6 +24,7 @@ interface IGraphQLEndpointErrorOverloadPropertyInItemType {
   modulePath: string[];
   itemDefPath: string[];
   itemId: string;
+  itemIdItemDefPath: string[];
   propertyId: string;
 }
 

@@ -1,8 +1,8 @@
 import React from "react";
 import { Button, createStyles, withStyles, WithStyles, Icon } from "@material-ui/core";
 import { DialogResponsive } from "./dialog";
-import { Entry } from "../../../itemize/client/components/property";
-import { I18nRead, I18nReadError } from "../../../itemize/client/components/localization";
+import { Entry, Setter } from "../../../itemize/client/components/property";
+import { I18nRead, I18nReadError, AppCountryRetriever, AppLanguageRetriever, AppCurrencyRetriever } from "../../../itemize/client/components/localization";
 import { LogActioner } from "../../../itemize/client/components/login";
 import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
 import { Link } from "../../../itemize/client/components/navigaton";
@@ -41,6 +41,21 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
                   <form>
                     <Entry id="username" onChange={actioner.dismissError} showAsInvalid={!!actioner.error}/>
                     <Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error}/>
+                    <AppLanguageRetriever>
+                      {(languageData) => (
+                        <Setter id="app_lang_locale" value={languageData.currentLanguage.code}/>
+                      )}
+                    </AppLanguageRetriever>
+                    <AppCountryRetriever>
+                      {(countryData) => (
+                        <Setter id="app_country" value={countryData.currentCountry.code}/>
+                      )}
+                    </AppCountryRetriever>
+                    <AppCurrencyRetriever>
+                      {(currencyData) => (
+                        <Setter id="currency" value={currencyData.currentCurrency.code}/>
+                      )}
+                    </AppCurrencyRetriever>
 
                     <I18nReadError error={actioner.error}/>
 

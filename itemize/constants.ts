@@ -133,6 +133,7 @@ export const LOCALE_I18N = [
   "error.INVALID_CREDENTIALS",
   "error.BLOCKED",
   "error.CANT_CONNECT",
+  "error.INVALID_DATA_SUBMIT_REFUSED",
   "error.INTERNAL_SERVER_ERROR",
   "error.UNSPECIFIED",
   "error.MUST_BE_LOGGED_IN",

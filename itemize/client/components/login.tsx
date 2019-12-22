@@ -68,8 +68,7 @@ export function LogActioner(props: ILogActionerProps) {
                     signup = async () => {
                       const result = await itemDefinitionContextualValue.submit();
                       if (!result.error) {
-                        console.log("FAKE LOGIN");
-                        // login();
+                        login();
                       }
                     };
                     logout = tokenContextValue.logout;
