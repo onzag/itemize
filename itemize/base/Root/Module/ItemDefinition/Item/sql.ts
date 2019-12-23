@@ -158,7 +158,7 @@ export function convertGQLValueToSQLValueForItem(
   return sqlResult;
 }
 
-export function buildSQLQueryForItem(item: Item, data: IGQLValue, knexBuilder: any, dictionary: string) {
+export function buildSQLQueryForItem(item: Item, data: IGQLValue, knexBuilder: Knex.QueryBuilder, dictionary: string) {
   const prefix = item.getPrefixedQualifiedIdentifier();
   const exclusionStateQualifiedId = item.getQualifiedExclusionStateIdentifier();
   const exclusionState = data[exclusionStateQualifiedId];
@@ -166,9 +166,9 @@ export function buildSQLQueryForItem(item: Item, data: IGQLValue, knexBuilder: a
   if (exclusionState === ItemExclusionState.EXCLUDED) {
     knexBuilder.andWhere(exclusionStateQualifiedId, ItemExclusionState.EXCLUDED);
   } else {
-    knexBuilder.andWhere((builder: any) => {
+    knexBuilder.andWhere((builder) => {
       if (exclusionState !== ItemExclusionState.EXCLUDED) {
-        builder.andWhere((secondBuilder: any) => {
+        builder.andWhere((secondBuilder) => {
           secondBuilder.where(exclusionStateQualifiedId, ItemExclusionState.INCLUDED);
 
           const itemData = data[item.getQualifiedIdentifier()];

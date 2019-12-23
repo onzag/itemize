@@ -137,7 +137,12 @@ export function convertSQLValueToGQLValueForModule(mod: Module, row: ISQLTableRo
  * @param data the data for the query from graphql
  * @param knexBuilder the knex builder
  */
-export function buildSQLQueryForModule(mod: Module, data: IGQLValue, knexBuilder: any, dictionary: string) {
+export function buildSQLQueryForModule(
+  mod: Module,
+  data: IGQLValue,
+  knexBuilder: Knex.QueryBuilder,
+  dictionary: string,
+) {
   mod.getAllPropExtensions().forEach((pd) => {
     if (!pd.isSearchable()) {
       return;

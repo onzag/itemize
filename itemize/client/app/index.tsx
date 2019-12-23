@@ -176,7 +176,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
   }
 
   /**
-   * TODO update user if logged in
    * Changes the language for the one specified by that locale
    * @param locale the two letter or language-region code for the locale
    */

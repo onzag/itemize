@@ -25,7 +25,12 @@ export function standardSQLOutFn(row: ISQLTableRowValue, id: string): PropertyDe
   return row[id];
 }
 
-export function standardSQLSearchFnExactAndRange(data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any) {
+export function standardSQLSearchFnExactAndRange(
+  data: IGQLValue,
+  sqlPrefix: string,
+  id: string,
+  knexBuilder: Knex.QueryBuilder,
+) {
   const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
   const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
   const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
@@ -161,10 +166,6 @@ export function convertGQLValueToSQLValueForProperty(
   dictionary: string,
   prefix: string,
 ): ISQLTableRowValue {
-  // TODO validation of the value, otherwise invalid values can be manually set,
-  // there should be also an overall validation by converting the whole value into
-  // a standard value and then validating against that
-
   // this is where the resulting column should be named
   const resultingColumnName = prefix + propertyDefinition.getId();
   // and this is the value of the property, again, properties

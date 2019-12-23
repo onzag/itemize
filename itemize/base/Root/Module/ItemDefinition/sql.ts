@@ -185,7 +185,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
 export function buildSQLQueryForItemDefinition(
   itemDefinition: ItemDefinition,
   data: IGQLValue,
-  knexBuilder: any,
+  knexBuilder: Knex.QueryBuilder,
   dictionary: string,
 ) {
   itemDefinition

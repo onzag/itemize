@@ -83,8 +83,23 @@ export interface IPropertyDefinitionSupportedType {
     id: string,
     property: PropertyDefinition,
   ) => PropertyDefinitionSupportedType;
-  // TODO description
-  sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any, dictionary: string) => void;
+  // Represents a search for an item
+  // data is the graphql value obtained from the search query mode item definition
+  // sqlPrefix is a prefix that everything is prefixed in sql, usually for the item
+  // id is the id of the property
+  // knexBuilder is the builder that is being used so it can attach the where queries to it
+  // and dictionary is the postgres dictionary that can be used for sql searches
+  sqlSearch: (
+    data: IGQLValue,
+    sqlPrefix: string,
+    id: string,
+    knexBuilder: Knex.QueryBuilder,
+    dictionary: string,
+  ) => void;
+  // Represents a check for equality of a property against another
+  // same with the sql prefix as the search
+  // same for the id, and knex is just the knex instance, not a builder
+  // and an optional column name so that it can be used as select as
   sqlEqual: (
     value: PropertyDefinitionSupportedType,
     sqlPrefix: string,

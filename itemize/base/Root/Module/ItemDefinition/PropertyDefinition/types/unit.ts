@@ -132,7 +132,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
   supportedSubtypes: UNIT_SUBTYPES,
   validate: (l: IPropertyDefinitionSupportedUnitType) => {
-    // TODO check the unit as for being proper unit, eg. kg, degC, etc...
     if (typeof l.value !== "number" ||
       typeof l.unit !== "string" ||
       typeof l.normalizedValue !== "number" ||
