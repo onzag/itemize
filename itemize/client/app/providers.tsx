@@ -322,7 +322,6 @@ class ActualItemDefinitionProvider extends
         id: this.props.forId,
         token: this.props.tokenData.token,
         language: this.props.localeData.language.split("-")[0],
-        country: this.props.localeData.country,
       },
       fields: requestFields,
     });
@@ -566,16 +565,16 @@ class ActualItemDefinitionProvider extends
         }
       }
 
-      if (
-        (!options.onlyIncludeProperties || options.onlyIncludeProperties.includes(pd.getId())) ||
+      const shouldBeIncludedInQuery = options.onlyIncludeProperties ?
+        options.onlyIncludeProperties.includes(pd.getId()) :
         pd.checkRoleAccessFor(
           !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
           this.props.tokenData.role,
           this.props.tokenData.id,
           this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
           false,
-        )
-      ) {
+        );
+      if (shouldBeIncludedInQuery) {
         argumentsForQuery[pd.getId()] = pd.getCurrentValue(this.props.forId || null);
       }
     });
@@ -587,6 +586,10 @@ class ActualItemDefinitionProvider extends
       const qualifiedId = item.getQualifiedIdentifier();
       requestFields.DATA[qualifiedId] = {};
       argumentsForQuery[qualifiedId] = {};
+
+      const itemShouldBeIncludedInQuery = options.onlyIncludeItems ?
+        options.onlyIncludeItems.includes(item.getId()) :
+        true;
 
       item.getSinkingProperties().forEach((sp) => {
         if (
@@ -610,7 +613,7 @@ class ActualItemDefinitionProvider extends
         }
 
         if (
-          (!options.onlyIncludeItems || options.onlyIncludeItems.includes(item.getId())) ||
+          itemShouldBeIncludedInQuery &&
           sp.checkRoleAccessFor(
             !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
             this.props.tokenData.role,
@@ -636,7 +639,6 @@ class ActualItemDefinitionProvider extends
     const args = {
       token: this.props.tokenData.token,
       language: this.props.localeData.language.split("-")[0],
-      country: this.props.localeData.country,
       ...argumentsForQuery,
     };
     if (this.props.forId) {
@@ -681,7 +683,6 @@ class ActualItemDefinitionProvider extends
             id: recievedId,
             token: this.props.tokenData.token,
             language: this.props.localeData.language.split("-")[0],
-            country: this.props.localeData.country,
           },
           fields: requestFields,
         });

@@ -8,7 +8,7 @@
             "htmlAutocomplete": "username"
         },
         {
-            "id": "app_lang_locale",
+            "id": "app_language",
             "type": "string",
             "hidden": true,
             "searchLevel": "disabled"
@@ -20,7 +20,7 @@
             "searchLevel": "disabled"
         },
         {
-            "id": "currency",
+            "id": "app_currency",
             "type": "string",
             "hidden": true,
             "searchLevel": "disabled"

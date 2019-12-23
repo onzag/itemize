@@ -22,7 +22,6 @@ import equals from "deep-equal";
 import { IGQLValue } from "../../base/Root/gql";
 import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
 import Knex from "knex";
-import { countries } from "../../imported-resources";
 import { jwtVerify } from "../token";
 
 const flattenFieldsFromRequestedFieldsDebug = Debug("resolvers:flattenFieldsFromRequestedFields");
@@ -257,19 +256,19 @@ export function checkListLimit(ids: string[]) {
   checkListLimitDebug("SUCCEED");
 }
 
-const checkLanguageAndRegionDebug = Debug("resolvers:checkLanguageAndRegion");
+const checkLanguageDebug = Debug("resolvers:checkLanguage");
 /**
  * Checks the language and region given the arguments passed
  * by the graphql resolver
  * @param appData the app data that is currently in context
  * @param args the args themselves being passed to the resolver
  */
-export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
-  checkLanguageAndRegionDebug("EXECUTED with args %j", args);
+export function checkLanguage(appData: IAppDataType, args: any) {
+  checkLanguageDebug("EXECUTED with args %j", args);
 
   // basically we check the type and if the lenght is right
   if (typeof args.language !== "string" || args.language.length !== 2) {
-    checkLanguageAndRegionDebug(
+    checkLanguageDebug(
       "FAILED Invalid language code %s",
       args.language,
     );
@@ -283,7 +282,7 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
   // a dictionary assigned, only languages with a dictionary
   // assigned can be used by the database
   if (!appData.config.dictionaries[args.language]) {
-    checkLanguageAndRegionDebug(
+    checkLanguageDebug(
       "FAILED Unavailable/Unsupported language %s",
       args.language,
     );
@@ -293,32 +292,7 @@ export function checkLanguageAndRegion(appData: IAppDataType, args: any) {
     });
   }
 
-  // basically running the same check again but with the country
-  if (typeof args.country !== "string" || args.country.length !== 2) {
-    checkLanguageAndRegionDebug(
-      "FAILED Invalid country code %s",
-      args.country,
-    );
-    throw new GraphQLEndpointError({
-      message: "Please use valid region 2-digit ISO codes in uppercase",
-      code: "UNSPECIFIED",
-    });
-  }
-
-  // and we also check in the country list that it is in fact
-  // a valid country
-  if (!countries[args.country]) {
-    checkLanguageAndRegionDebug(
-      "FAILED Unknown country %s",
-      args.country,
-    );
-    throw new GraphQLEndpointError({
-      message: "Unknown country " + args.country,
-      code: "UNSPECIFIED",
-    });
-  }
-
-  checkLanguageAndRegionDebug("SUCCEED");
+  checkLanguageDebug("SUCCEED");
 }
 
 const getDictionaryDebug = Debug("resolvers:getDictionary");
@@ -342,6 +316,12 @@ export async function validateTokenIsntBlocked(knex: Knex, tokenData: IServerSid
     const result = await knex.first("blocked_at").from("MOD_users").where({
       id: tokenData.id,
     });
+    if (!result) {
+      throw new GraphQLEndpointError({
+        message: "User has been removed",
+        code: "USER_REMOVED",
+      });
+    }
     if (result.blocked_at !== null) {
       throw new GraphQLEndpointError({
         message: "User is Blocked",

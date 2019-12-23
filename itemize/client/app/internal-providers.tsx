@@ -104,23 +104,34 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         localStorage.removeItem("TOKEN");
       }
 
+      const error = data.errors ? data.errors[0].extensions : null;
       const newState: ITokenProviderState = {
         isLoggingIn: false,
         id: tokenDataId,
         token: tokenDataToken,
         role: tokenDataRole,
         isReady: true,
-        error: data.errors ? data.errors[0].extensions : null,
+        // when it's not ready and the login is automatic
+        // we might want to ignore errors, user just got
+        // logged off automatically, likely his token expired
+        // otherwise errors might appear in off places
+        error: this.state.isReady ? error : null,
       };
 
-      console.log("user", tokenDataId, tokenDataRole, "logged in");
+      if (tokenDataToken !== null) {
+        console.log("user", tokenDataId, tokenDataRole, "logged in");
+      } else {
+        console.log("credentials deemed invalid", error);
+      }
 
       this.setState(newState);
       this.props.onProviderStateSet(newState);
 
       // TODO clear cache?... all of it?...
       // thinking how loading changes depending of
-      // on the user role
+      // on the user role; I think this is actually done
+      // but I am not sure as the cache is query based and different
+      // roles have different queries
 
       if (tokenDataId) {
         const userLanguageData = await gqlQuery(
@@ -130,14 +141,13 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
               args: {
                 token: tokenDataToken,
                 language: this.props.localeContext.language.split("-")[0],
-                country: this.props.localeContext.country,
                 id: tokenDataId,
               },
               fields: {
                 DATA: {
                   app_country: {},
-                  app_lang_locale: {},
-                  currency: {},
+                  app_language: {},
+                  app_currency: {},
                 },
               },
             },
@@ -152,11 +162,11 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
             if (this.props.localeContext.country !== localeUserData.app_country) {
               this.props.localeContext.changeCountryTo(localeUserData.app_country, true, true);
             }
-            if (this.props.localeContext.language !== localeUserData.app_lang_locale) {
-              this.props.localeContext.changeLanguageTo(localeUserData.app_lang_locale, true);
+            if (this.props.localeContext.language !== localeUserData.app_language) {
+              this.props.localeContext.changeLanguageTo(localeUserData.app_language, true);
             }
-            if (this.props.localeContext.currency !== localeUserData.currency) {
-              this.props.localeContext.changeCurrencyTo(localeUserData.currency, true);
+            if (this.props.localeContext.currency !== localeUserData.app_currency) {
+              this.props.localeContext.changeCurrencyTo(localeUserData.app_currency, true);
             }
           }
         }
@@ -169,8 +179,6 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       return;
     }
     localStorage.removeItem("TOKEN");
-    localStorage.removeItem("ID");
-    localStorage.removeItem("ROLE");
     this.setState({
       id: null,
       token: null,

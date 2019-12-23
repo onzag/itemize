@@ -3,7 +3,7 @@ import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Modu
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType, FGraphQLModResolverType } from "../../../base/Root/gql";
 import Debug from "debug";
 import {
-  checkLanguageAndRegion,
+  checkLanguage,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
   flattenFieldsFromRequestedFields,
@@ -34,9 +34,9 @@ export async function getItemDefinition(
   );
   // first we check that the language and region provided are
   // right and available
-  checkLanguageAndRegion(appData, resolverArgs.args);
+  checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we find the requested fields that are requested
   // in the get request
@@ -174,7 +174,7 @@ export async function getItemDefinitionList(
 
   // first we check that the language and region provided are
   // right and available
-  checkLanguageAndRegion(appData, resolverArgs.args);
+  checkLanguage(appData, resolverArgs.args);
   checkListLimit(resolverArgs.args.ids);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
@@ -276,10 +276,10 @@ export async function getModuleList(
   );
   // first we check that the language and region provided are
   // right and available
-  checkLanguageAndRegion(appData, resolverArgs.args);
+  checkLanguage(appData, resolverArgs.args);
   checkListLimit(resolverArgs.args.ids);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we find the requested fields that are requested
   // in the get request

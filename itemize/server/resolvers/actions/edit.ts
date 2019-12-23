@@ -3,7 +3,7 @@ import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Modu
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
 import Debug from "debug";
 import {
-  checkLanguageAndRegion,
+  checkLanguage,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
   flattenFieldsFromRequestedFields,
@@ -32,12 +32,12 @@ export async function editItemDefinition(
   debug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
 
   // First we check the language and region of the item
-  checkLanguageAndRegion(appData, resolverArgs.args);
+  checkLanguage(appData, resolverArgs.args);
   // we ge the token data
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // for editing one must be logged in
-  validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we get the requested fields, and check they are available for the given role
   const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
@@ -212,8 +212,6 @@ export async function editItemDefinition(
   // update when it was edited
   sqlModData.edited_at = appData.knex.fn.now();
   sqlModData.edited_by = tokenData.id;
-  sqlModData.language = resolverArgs.args.language;
-  sqlModData.country = resolverArgs.args.country;
 
   debug("SQL Input data for idef is %j", sqlIdefData);
   debug("SQL Input data for module is %j", sqlModData);

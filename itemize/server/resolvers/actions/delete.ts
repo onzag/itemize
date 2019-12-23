@@ -3,7 +3,7 @@ import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Modu
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
 import Debug from "debug";
 import {
-  checkLanguageAndRegion,
+  checkLanguage,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
   flattenFieldsFromRequestedFields,
@@ -24,11 +24,11 @@ export async function deleteItemDefinition(
 
   // do the basic things, check the language and region
   // and get the token data
-  checkLanguageAndRegion(appData, resolverArgs.args);
+  checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // for deleting we must be logged in
-  validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, tokenData);
 
   // we flatten and get the requested fields
   const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));

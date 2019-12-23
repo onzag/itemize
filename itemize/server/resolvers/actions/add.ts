@@ -3,7 +3,7 @@ import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Modu
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
 import Debug from "debug";
 import {
-  checkLanguageAndRegion,
+  checkLanguage,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
   flattenFieldsFromRequestedFields,
@@ -31,14 +31,14 @@ export async function addItemDefinition(
   // First we check the language and the region, based on the args
   // as we expect every request to contain this data and be
   // valid for our app
-  checkLanguageAndRegion(appData, resolverArgs.args);
+  checkLanguage(appData, resolverArgs.args);
   // now we need to extract the token and get its data, making
   // sure it's a valid token
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // check that the user is logged in, for adding, only logged users
   // are valid
-  validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we see which fields are being requested for the answer after adding, first
   // we flatten the fields, remember that we have external and internal fields
@@ -151,8 +151,6 @@ export async function addItemDefinition(
   sqlModData.type = selfTable;
   sqlModData.created_at = appData.knex.fn.now();
   sqlModData.created_by = tokenData.id || UNSPECIFIED_OWNER;
-  sqlModData.language = resolverArgs.args.language;
-  sqlModData.country = resolverArgs.args.country;
 
   debug("SQL Input data for idef is %j", sqlIdefData);
   debug("SQL Input data for module is %j", sqlModData);

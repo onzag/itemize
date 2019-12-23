@@ -14,6 +14,11 @@ interface ILoginDialogProps extends WithStyles<typeof loginDialogStyles> {
   onSignupRequest: () => void;
 }
 
+function runTwoFunctions(functionA, functionB) {
+  functionA();
+  functionB();
+}
+
 export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogProps) => {
   return (
     <ModuleProvider module="users">
@@ -43,7 +48,10 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
 
                     <I18nReadError error={actioner.error}/>
                   </form>
-                  <Button color="secondary" onClick={props.onSignupRequest}>
+                  <Button
+                    color="secondary"
+                    onClick={runTwoFunctions.bind(null, actioner.dismissError, props.onSignupRequest)}
+                  >
                     <I18nRead id="signup_instead"/>
                   </Button>
                 </DialogResponsive>

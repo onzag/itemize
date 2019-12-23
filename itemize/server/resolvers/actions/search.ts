@@ -3,7 +3,7 @@ import { IAppDataType } from "../../../server";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType, FGraphQLModResolverType } from "../../../base/Root/gql";
 import Module from "../../../base/Root/Module";
 import {
-  checkLanguageAndRegion,
+  checkLanguage,
   validateTokenAndGetData,
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
@@ -32,9 +32,9 @@ export async function searchModule(
   );
 
   // check language and region
-  checkLanguageAndRegion(appData, resolverArgs.args);
+  checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now build the fields we are searching
   const searchingFields = {};
@@ -86,13 +86,7 @@ export async function searchModule(
     getDictionary(appData, resolverArgs.args),
   );
 
-  // if we filter by language and country we add that
-  if (resolverArgs.args.filter_by_language) {
-    searchQuery.andWhere("language", resolverArgs.args.language);
-  }
-  if (resolverArgs.args.filter_by_country) {
-    searchQuery.andWhere("country", resolverArgs.args.country);
-  }
+  // if we filter by type
   if (resolverArgs.args.types) {
     searchQuery.andWhere("type", resolverArgs.args.types);
   }
@@ -120,9 +114,9 @@ export async function searchItemDefinition(
   );
 
   // check the language and region
-  checkLanguageAndRegion(appData, resolverArgs.args);
+  checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, tokenData);
 
   // now we need to get the fields that we are using to search
   const searchingFields = {};
@@ -214,14 +208,6 @@ export async function searchItemDefinition(
     searchQuery.join(selfTable, (clause) => {
       clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
     });
-  }
-
-  // we add filters if they are requested as so
-  if (resolverArgs.args.filter_by_language) {
-    searchQuery.andWhere("language", resolverArgs.args.language);
-  }
-  if (resolverArgs.args.filter_by_country) {
-    searchQuery.andWhere("country", resolverArgs.args.country);
   }
 
   // now we get the base result, and convert every row

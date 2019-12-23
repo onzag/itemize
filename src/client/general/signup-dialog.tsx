@@ -15,6 +15,11 @@ interface ISignupDialogProps extends WithStyles<typeof signupDialogStyles> {
   onLoginRequest: () => void;
 }
 
+function runTwoFunctions(functionA, functionB) {
+  functionA();
+  functionB();
+}
+
 export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialogProps) => {
   return (
     <ModuleProvider module="users">
@@ -43,7 +48,7 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
                     <Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error}/>
                     <AppLanguageRetriever>
                       {(languageData) => (
-                        <Setter id="app_lang_locale" value={languageData.currentLanguage.code}/>
+                        <Setter id="app_language" value={languageData.currentLanguage.code}/>
                       )}
                     </AppLanguageRetriever>
                     <AppCountryRetriever>
@@ -53,7 +58,7 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
                     </AppCountryRetriever>
                     <AppCurrencyRetriever>
                       {(currencyData) => (
-                        <Setter id="currency" value={currencyData.currentCurrency.code}/>
+                        <Setter id="app_currency" value={currencyData.currentCurrency.code}/>
                       )}
                     </AppCurrencyRetriever>
 
@@ -77,7 +82,10 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
                       }
                     />
                   </form>
-                  <Button color="secondary" onClick={props.onLoginRequest}>
+                  <Button
+                    color="secondary"
+                    onClick={runTwoFunctions.bind(null, actioner.dismissError, props.onLoginRequest)}
+                  >
                     <I18nRead id="login_instead"/>
                   </Button>
                 </DialogResponsive>

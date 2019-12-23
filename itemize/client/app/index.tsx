@@ -142,7 +142,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
             // text fields, so en will work just fine, getting
             // the language will be annoying and this will do the job anyway
             language: "en",
-            country: this.state.specifiedCountry,
             [propertyId]: value,
           },
           fields: {
@@ -237,7 +236,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // And now we might restore the state, with the new data
     this.state.specifiedProcessedRoot.mergeWithI18n(newData.root);
     if (!avoidUpdatingUser) {
-      this.updateUserProperty("app_lang_locale", localeToSet);
+      this.updateUserProperty("app_language", localeToSet);
     }
     this.setState({
       specifiedData: newData,
@@ -334,7 +333,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // We set the currency in local storage
     localStorage.setItem("currency", codeToSet);
     if (!avoidUpdatingUser) {
-      this.updateUserProperty("currency", codeToSet);
+      this.updateUserProperty("app_currency", codeToSet);
     }
 
     // and set the state

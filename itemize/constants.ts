@@ -142,6 +142,7 @@ export const LOCALE_I18N = [
   "error.MUST_BE_LOGGED_IN",
   "error.FORBIDDEN",
   "error.USER_BLOCKED",
+  "error.USER_REMOVED",
   "error.NOT_FOUND",
 ];
 
@@ -197,8 +198,6 @@ export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "type",
   "created_at",
   "created_by",
-  "language",
-  "country",
   "edited_at",
   "edited_by",
   "reviewed_at",
@@ -221,14 +220,6 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   created_by: {
     type: GraphQLNonNull(GraphQLInt),
     description: "The id of the user who created this item",
-  },
-  language: {
-    type: GraphQLNonNull(GraphQLString),
-    description: "The language that was used when this item was created",
-  },
-  country: {
-    type: GraphQLNonNull(GraphQLString),
-    description: "The country that was used when this item was created",
   },
   edited_at: {
     type: GraphQLString,
@@ -289,14 +280,6 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   },
   created_by: {
     type: "integer",
-    notNull: true,
-  },
-  language: {
-    type: "string",
-    notNull: true,
-  },
-  country: {
-    type: "string",
     notNull: true,
   },
   edited_at: {
@@ -385,23 +368,11 @@ const BASE_QUERY_PROPERTIES = {
   },
   language: {
     type: GraphQLNonNull(GraphQLString),
-    description: "A supported language (dictionary wise) 2 digit code",
-  },
-  country: {
-    type: GraphQLNonNull(GraphQLString),
-    description: "A country 2 digit code",
+    description: "A supported language (dictionary wise) 2 digit code, it is used for FTS purposes and text analysis",
   },
 };
 export const RESERVED_SEARCH_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
-  filter_by_language: {
-    type: GraphQLNonNull(GraphQLBoolean),
-    description: "Whether to filter by language",
-  },
-  filter_by_country: {
-    type: GraphQLNonNull(GraphQLBoolean),
-    description: "Whether to filter by country",
-  },
   order_by: {
     type: GraphQLNonNull(new GraphQLEnumType({
       name: "RESERVED_SEARCH_PROPERTY_ENUM_ORDER_BY",
