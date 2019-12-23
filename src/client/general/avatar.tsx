@@ -98,8 +98,8 @@ interface IAvatarProps extends WithStyles<typeof avatarStyles> {
   large?: boolean;
 }
 
+// TODO with styles re-renders despite everything on top being optmized
 // TODO profile picture support
-// TODO make the color be about the id rather than the string
 export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
   return (
     <Reader id="id">

@@ -365,7 +365,7 @@ export default class Item {
       itemName: this.getName(),
       itemDefinitionState: exclusionState === ItemExclusionState.EXCLUDED ? null :
         this.itemDefinition.getStateNoExternalChecking(id,
-          emulateExternalChecking, this.rawData.sinkIn || [], true, true),
+          emulateExternalChecking, this.rawData.sinkIn || [], [], true),
       stateExclusion: this.stateExclusion[id] || ItemExclusionState.ANY,
       stateExclusionModified: this.stateExclusionModified[id] || false,
     };
@@ -383,7 +383,7 @@ export default class Item {
       itemId: this.getId(),
       itemName: this.getName(),
       itemDefinitionState: exclusionState === ItemExclusionState.EXCLUDED ? null :
-        (await this.itemDefinition.getState(id, this.rawData.sinkIn || [], true, true)),
+        (await this.itemDefinition.getState(id, this.rawData.sinkIn || [], [], true)),
       stateExclusion: this.stateExclusion[id] || ItemExclusionState.ANY,
       stateExclusionModified: this.stateExclusionModified[id] || false,
     };

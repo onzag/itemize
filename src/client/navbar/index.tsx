@@ -43,10 +43,15 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                 forId={props.loggedUserId}
                 disableExternalChecks={true}
                 assumeOwnership={true}
+                optimize={{
+                  onlyIncludeItems: [],
+                  onlyIncludeProperties: ["username", "app_country"],
+                  excludePolicies: true,
+                }}
               >
                 <IfLogStatus>
                   {(status) => {
-                    if (status === "LOGGED_OUT") {
+                    if (status === "LOGGED_OUT" || status === "LOGGING_IN") {
                       return <React.Fragment>
                         <Button color="inherit" variant="outlined" onClick={props.onLoginClick}>
                           <I18nRead id="login"/>

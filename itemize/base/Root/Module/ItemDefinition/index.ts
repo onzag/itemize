@@ -619,7 +619,7 @@ export default class ItemDefinition {
     id: number,
     emulateExternalChecking?: boolean,
     onlyIncludeProperties?: string[],
-    excludeItems?: boolean,
+    onlyIncludeItems?: string[],
     excludePolicies?: boolean,
   ): IItemDefinitionStateType {
     const properties = onlyIncludeProperties ?
@@ -646,12 +646,20 @@ export default class ItemDefinition {
       });
     }
 
+    let items: IItemState[];
+    if (onlyIncludeItems) {
+      items = onlyIncludeItems.map((ii) =>
+        this.getItemFor(ii).getStateNoExternalChecking(id, emulateExternalChecking));
+    } else {
+      items = this.itemInstances.map((ii) =>
+        ii.getStateNoExternalChecking(id, emulateExternalChecking));
+    }
+
     return {
       moduleName: this.getModuleName(),
       itemDefPath: this.getPath(),
       itemDefName: this.getName(),
-      items: excludeItems ? [] : this.itemInstances.map((ii) =>
-        ii.getStateNoExternalChecking(id, emulateExternalChecking)),
+      items,
       properties,
       policies,
       gqlOriginalAppliedValue: this.getGQLAppliedValue(id),
@@ -675,7 +683,7 @@ export default class ItemDefinition {
   public async getState(
     id: number,
     onlyIncludeProperties?: string[],
-    excludeItems?: boolean,
+    onlyIncludeItems?: string[],
     excludePolicies?: boolean,
   ): Promise<IItemDefinitionStateType> {
     const properties = await Promise.all(onlyIncludeProperties ?
@@ -701,11 +709,18 @@ export default class ItemDefinition {
       }));
     }
 
+    let items: IItemState[];
+    if (onlyIncludeItems) {
+      items = await Promise.all(onlyIncludeItems.map((ii) => this.getItemFor(ii).getState(id)));
+    } else {
+      items = await Promise.all(this.itemInstances.map((ii: Item) => ii.getState(id)));
+    }
+
     return {
       moduleName: this.getModuleName(),
       itemDefPath: this.getPath(),
       itemDefName: this.getName(),
-      items: excludeItems ? [] : await Promise.all(this.itemInstances.map((ii: Item) => ii.getState(id))),
+      items,
       properties,
       policies,
       gqlOriginalAppliedValue: this.getGQLAppliedValue(id),

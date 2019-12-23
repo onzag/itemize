@@ -52,7 +52,7 @@ interface IPropertyEntryViewReadSetProps {
   onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, internalValue?: any) => void;
   value?: PropertyDefinitionSupportedType;
 }
-
+// TODO optimize
 // TODO EntryViewReadSet in module context only for module level searches
 function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" | "view" | "read" | "set") {
   return (

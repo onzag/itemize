@@ -19,6 +19,8 @@ import {
 } from "../../constants";
 import { buildGqlQuery, buildGqlMutation, gqlQuery } from "./gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
+import uuid from "uuid";
+import equals from "deep-equal";
 
 export interface IBasicActionResponse {
   error: GraphQLEndpointErrorType;
@@ -105,6 +107,11 @@ interface IItemDefinitionProviderProps {
   assumeOwnership?: boolean;
   searchCounterpart?: boolean;
   disableExternalChecks?: boolean;
+  optimize?: {
+    onlyIncludeProperties?: string[],
+    onlyIncludeItems?: string[],
+    excludePolicies?: boolean,
+  };
 }
 
 interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProps {
@@ -159,9 +166,12 @@ class ActualItemDefinitionProvider extends
   private lastUpdateId: number;
   private itemDefinition: ItemDefinition;
   private containsExternallyCheckedProperty: boolean;
+  private id: string;
 
   constructor(props: IActualItemDefinitionProviderProps) {
     super(props);
+
+    this.id = uuid.v4();
 
     let valueFor = props.mod.getItemDefinitionFor(this.props.itemDefinition.split("/"));
     if (props.searchCounterpart) {
@@ -194,6 +204,9 @@ class ActualItemDefinitionProvider extends
       itemDefinitionState: valueFor.getStateNoExternalChecking(
         this.props.forId || null,
         !this.props.disableExternalChecks,
+        this.props.optimize && this.props.optimize.onlyIncludeProperties,
+        this.props.optimize && this.props.optimize.onlyIncludeItems,
+        this.props.optimize && this.props.optimize.excludePolicies,
       ),
       isBlocked: false,
       isBlockedButDataIsAccessible: false,
@@ -212,16 +225,41 @@ class ActualItemDefinitionProvider extends
       canCreate: this.canCreate(),
     };
   }
+  public shouldComponentUpdate(
+    nextProps: IActualItemDefinitionProviderProps,
+    nextState: IActualItemDefinitionProviderState,
+  ) {
+    if (this.props.itemDefinition !== nextProps.itemDefinition) {
+      throw new Error(
+        "Changing item definitions is not allowed, you want to go from " +
+        this.props.itemDefinition + " to " +
+        nextProps.itemDefinition,
+      );
+    }
+    if (!!this.props.searchCounterpart !== !!nextProps.searchCounterpart) {
+      throw new Error(
+        "Changing item definitions counterpart mode is not allowed on " +
+        this.props.itemDefinition,
+      );
+    }
+    if (this.props.mod !== nextProps.mod) {
+      throw new Error(
+        "Changing modules is not allowed, you want to go from " +
+        this.props.mod.getName() + " to " +
+        nextProps.mod.getName() + " in " +
+        this.props.itemDefinition,
+      );
+    }
+    return (nextProps.forId || null) !== (this.props.forId || null) ||
+      !!nextProps.assumeOwnership !== !!this.props.assumeOwnership ||
+      nextProps.children !== this.props.children ||
+      nextProps.localeData !== this.props.localeData ||
+      nextProps.tokenData !== this.props.tokenData ||
+      !equals(this.state, nextState);
+  }
   public async componentDidUpdate(
     prevProps: IActualItemDefinitionProviderProps,
   ) {
-    if (this.props.itemDefinition !== prevProps.itemDefinition) {
-      throw new Error(
-        "Changing item definitions is not allowed, you went from " +
-        this.props.itemDefinition + " to " +
-        prevProps.itemDefinition,
-      );
-    }
     if ((prevProps.forId || null) !== (this.props.forId || null)) {
       this.itemDefinition.removeListener(prevProps.forId || null, this.listener);
       this.itemDefinition.addListener(this.props.forId || null, this.listener);
@@ -230,6 +268,9 @@ class ActualItemDefinitionProvider extends
         itemDefinitionState: this.itemDefinition.getStateNoExternalChecking(
           this.props.forId || null,
           !this.props.disableExternalChecks,
+          this.props.optimize && this.props.optimize.onlyIncludeProperties,
+          this.props.optimize && this.props.optimize.onlyIncludeItems,
+          this.props.optimize && this.props.optimize.excludePolicies,
         ),
       });
       if (this.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
@@ -266,6 +307,9 @@ class ActualItemDefinitionProvider extends
       itemDefinitionState: valueFor.getStateNoExternalChecking(
         this.props.forId || null,
         !this.props.disableExternalChecks,
+        this.props.optimize && this.props.optimize.onlyIncludeProperties,
+        this.props.optimize && this.props.optimize.onlyIncludeItems,
+        this.props.optimize && this.props.optimize.excludePolicies,
       ),
     });
   }
@@ -465,7 +509,12 @@ class ActualItemDefinitionProvider extends
     };
   }
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
-    const newItemDefinitionState = await this.itemDefinition.getState(this.props.forId || null);
+    const newItemDefinitionState = await this.itemDefinition.getState(
+      this.props.forId || null,
+      this.props.optimize && this.props.optimize.onlyIncludeProperties,
+      this.props.optimize && this.props.optimize.onlyIncludeItems,
+      this.props.optimize && this.props.optimize.excludePolicies,
+    );
     if (currentUpdateId === null || this.lastUpdateId === currentUpdateId) {
       this.setState({
         itemDefinitionState: newItemDefinitionState,
@@ -1130,21 +1179,40 @@ interface IItemProviderProps {
   item: string;
 }
 
+interface IActualItemProviderProps {
+  state: IItemState;
+  item: Item;
+}
+
+// tslint:disable-next-line: max-classes-per-file
+class ActualItemProvider extends React.Component<IActualItemProviderProps, {}> {
+  public shouldComponentUpdate(nextProps: IActualItemProviderProps) {
+    return nextProps.item !== this.props.item ||
+      !equals(this.props.state, nextProps.state);
+  }
+  public render() {
+    return (
+      <ItemContext.Provider
+        value={{
+          item: this.props.item,
+          state: this.props.state,
+        }}
+      >
+        {this.props.children}
+      </ItemContext.Provider>
+    );
+  }
+}
+
 export function ItemProvider(props: IItemProviderProps) {
   return (
     <ItemDefinitionContext.Consumer>
       {
         (itemDefinitionContextualValue) => {
           const itemState = itemDefinitionContextualValue.state.items.find((i) => i.itemId === props.item);
+          const itemObject = itemDefinitionContextualValue.idef.getItemFor(props.item);
           return (
-            <ItemContext.Provider
-              value={{
-                item: itemDefinitionContextualValue.idef.getItemFor(props.item),
-                state: itemState,
-              }}
-            >
-              {props.children}
-            </ItemContext.Provider>
+            <ActualItemProvider item={itemObject} state={itemState}/>
           );
         }
       }

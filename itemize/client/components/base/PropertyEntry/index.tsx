@@ -84,7 +84,6 @@ const PropertyEntryStylesApplier = withStyles(style)((props: IPropertyEntryStyle
 });
 
 export default function PropertyEntry(props: IPropertyEntryBaseProps) {
-
   let appliedTheme: IPropertyEntryThemeType = STANDARD_THEME;
   if (props.theme) {
     appliedTheme = {

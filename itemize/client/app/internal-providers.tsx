@@ -20,7 +20,7 @@ interface ITokenProviderProps {
 }
 
 export interface ITokenContextType extends ITokenProviderState {
-  login: (username: string, password: string, token: string) => void;
+  login: (username: string, password: string, token: string) => Promise<void>;
   logout: () => void;
   dismissError: () => void;
 }
