@@ -13,8 +13,8 @@ export async function serverSideIndexChecker(
   if (value === null) {
     return true;
   }
-  const moduleIDColumn = property.checkIfIsExtension() ? "id" : CONNECTOR_SQL_COLUMN_FK_NAME;
-  const qualifiedParentName = property.checkIfIsExtension() ?
+  const moduleIDColumn = property.isExtension() ? "id" : CONNECTOR_SQL_COLUMN_FK_NAME;
+  const qualifiedParentName = property.isExtension() ?
     property.getParentModule().getQualifiedPathName() :
     property.getParentItemDefinition().getQualifiedPathName();
   const query = knex.select(

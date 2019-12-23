@@ -337,6 +337,9 @@ export const POLICY_PREFIXES = {
 export const POLICY_REQUIRED_I18N = [
   "label", "placeholder", "fail",
 ];
+export const POLICY_OPTIONAL_I18N = [
+  "description",
+];
 export const ORDER_BY_OPTIONS = {
   DEFAULT: "DEFAULT",
   RELEVANCY: "RELEVANCY",

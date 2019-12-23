@@ -15,6 +15,7 @@ import {
   STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   PREFIX_EDIT,
   PREFIX_ADD,
+  POLICY_PREFIXES,
 } from "../../constants";
 import { buildGqlQuery, buildGqlMutation, gqlQuery } from "./gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
@@ -468,27 +469,51 @@ class ActualItemDefinitionProvider extends
       );
     }
   }
-  // TODO policies
+  public giveSubmitEmulatedInvalidError(): IActionResponseWithId {
+    const emulatedError: GraphQLEndpointErrorType = {
+      message: "Submit refused due to invalid information in form fields",
+      code: "INVALID_DATA_SUBMIT_REFUSED",
+    };
+    this.setState({
+      submitError: emulatedError,
+    });
+    return {
+      id: null,
+      error: emulatedError,
+    };
+  }
   public async submit(options: IActionSubmitOptions = {}): Promise<IActionResponseWithId> {
+    // if we are already submitting, we reject the action
     if (this.state.submitting) {
       return;
     }
 
+    // let's make this variable to check on whether things are invalid or not
+    // first we check every property, that is included and allowed we use some
+    // and return whether it's invalid
     let isInvalid = this.state.itemDefinitionState.properties.some((p) => {
+      // we return false if we have an only included properties and our property is in there
+      // because that means that whether it is valid or not is irrelevant for our query
       if (options.onlyIncludeProperties && !options.onlyIncludeProperties.includes(p.propertyId)) {
         return false;
       }
       return !p.valid;
     });
+
+    // now we check the next only is it's not already invalid
     if (!isInvalid) {
+      // and we do this time the same but with the items
       isInvalid = this.state.itemDefinitionState.items.some((i) => {
+        // same using the variable for only include items, same check as before
         if (options.onlyIncludeItems && !options.onlyIncludeItems.includes(i.itemId)) {
           return false;
         }
 
+        // and now we get the sinking property ids
         const item = this.itemDefinition.getItemFor(i.itemId);
         const sinkingPropertyIds = item.getSinkingPropertiesIds();
 
+        // and we extract the state only if it's a sinking property
         return i.itemDefinitionState.properties.some((p) => {
           if (!sinkingPropertyIds.includes(p.propertyId)) {
             return false;
@@ -498,50 +523,52 @@ class ActualItemDefinitionProvider extends
       });
     }
 
+    // if it's not poked already, let's poke it
     if (!this.state.poked) {
       this.setState({
         poked: true,
       });
     }
 
+    // if it's invalid let's return the emulated error
     if (isInvalid) {
-      const emulatedError: GraphQLEndpointErrorType = {
-        message: "Submit refused due to invalid information in form fields",
-        code: "INVALID_DATA_SUBMIT_REFUSED",
-      };
-      this.setState({
-        submitError: emulatedError,
-      });
-      return {
-        id: null,
-        error: emulatedError,
-      };
+      return this.giveSubmitEmulatedInvalidError();
     }
 
-    this.setState({
-      submitting: true,
-    });
+    // now we are going to build our query
+    // also we make a check later on for the policies
+    // if necessary
 
+    // so the requested fields, at base, it's just nothing
     const requestFields: any = {
       DATA: {},
     };
+    // and these would be the arguments for the graphql query
     const argumentsForQuery: any = {};
+
+    // now we go for the standard fields, and we add all of them
     STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
       requestFields.DATA[p] = {};
     });
+    // we add the external ones as well
     EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
       requestFields[p] = {};
     });
+    // and if our role allows it, we add the moderation fields
     if (ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(this.props.tokenData.role)) {
       MODERATION_FIELDS.forEach((mf) => {
         requestFields.DATA[mf] = {};
       });
     }
 
+    // we get the applied owner of this item, basically what we have loaded
+    // for this user created_by or id if the item is marked as if its id
+    // is the owner, in the case of null, the applied owner is -1
     const appliedOwner = this.itemDefinition.getAppliedValueOwnerIfAny(
       this.props.forId || null,
     );
 
+    // Now we get all the property definitions and extensions for the item
     this.itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
       if (
         !pd.isRetrievalDisabled() &&
@@ -632,6 +659,66 @@ class ActualItemDefinitionProvider extends
       if (Object.keys(argumentsForQuery[qualifiedId]).length === 0) {
         delete argumentsForQuery[qualifiedId];
       }
+    });
+
+    // super hack in order to get the applying policy args
+    const applyingPolicyArgs: any = {};
+    // first we only need to run this if it's not invalid, otherwise the values
+    // are never really used for the policy state, also this is only useful for
+    // edits
+    if (this.props.forId && this.state.itemDefinitionState.policies.edit) {
+      // now we set the variable by checking all the policies in the state using some
+      // we check every policyName included in edit
+      isInvalid = Object.keys(this.state.itemDefinitionState.policies.edit).some((policyName) => {
+        // and for that we check using some again every property that is applied in the policy
+        return this.state.itemDefinitionState.policies.edit[policyName].some((propertyStateInPolicy) => {
+          // and now we need to check whether the policy is at all necessary, as in, are we modifying
+          // any property that would cause this to be needed, for that we get the applying ids
+          const applyingPropertyIds = this.itemDefinition.getApplyingPropertyIdsForPolicy("edit", policyName);
+          // and using some yet again we check whether using the argumentsForQuery which is a gql object
+          // which funnily will contain the same id in case it is there, it will tell us whether one
+          // of the property actually is going to be modified and so our policy applies
+          const oneOfApplyingPropertiesApplies = applyingPropertyIds.some((pid) => typeof argumentsForQuery[pid] !== "undefined");
+          // if it doesn't match anything, we return false, so technically this policy is valid, regardless on whether
+          // the value itself is valid or not because it will not pass to the graphql query
+          if (!oneOfApplyingPropertiesApplies) {
+            return false;
+          }
+          // Here we are doing exactly the same as we did with applying property ids but this time
+          // now we do it with the roles
+          const applyingRoles = this.itemDefinition.getRolesForPolicy("edit", policyName);
+          const oneOfApplyingRolesApplies = applyingRoles.includes(this.props.tokenData.role);
+          if (!oneOfApplyingRolesApplies) {
+            return false;
+          }
+          // otherwise if we find that it is not valid
+          if (!propertyStateInPolicy.valid) {
+            // then we return true, indicating the algorithm to terminate all its execution in this policy
+            // madness and just make isInvalid true and give the emulated invalid error
+            return true;
+          }
+          // otherwise we are going to set it in the policy arguments that go with the arguments for the
+          // query
+          const policyProperty =
+            this.itemDefinition.getPropertyDefinitionForPolicy("edit", policyName, propertyStateInPolicy.propertyId);
+          // then we are going to set that value using the qualified identifier that is used
+          // in the args
+          applyingPolicyArgs[policyProperty.getQualifiedPolicyIdentifier("edit", policyName)] =
+            propertyStateInPolicy.value;
+          // and we return false to indicate success of a valid property value
+          return false;
+        });
+      });
+    }
+
+    // if it's invalid we give the simulated error yet again
+    if (isInvalid) {
+      return this.giveSubmitEmulatedInvalidError();
+    }
+
+    // now it's when we are actually submitting
+    this.setState({
+      submitting: true,
     });
 
     const queryName = (!this.props.forId ? PREFIX_ADD : PREFIX_EDIT) +

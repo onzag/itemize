@@ -17,6 +17,8 @@ export function buildSearchModeItemDefinition(
 ): IItemDefinitionRawJSONDataType {
   // copy that
   const newItemDef = {...rawData};
+  // remove policies
+  delete newItemDef.policies;
   // create a known property map array using the prop extensions as base
   const knownPropMap = {...modulePropExtensions};
 

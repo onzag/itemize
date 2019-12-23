@@ -64,12 +64,22 @@ export interface IItemDefinitionRawJSONDataType {
   ownerIsObjectId?: boolean;
 }
 
+export interface IPolicyStateType {
+  [policyName: string]: IPropertyDefinitionState[];
+}
+
+export interface IPoliciesStateType {
+  edit?: IPolicyStateType;
+  delete?: IPolicyStateType;
+}
+
 export interface IItemDefinitionStateType {
   moduleName: string;
   itemDefPath: string[];
   itemDefName: string;
   items: IItemState[];
   properties: IPropertyDefinitionState[];
+  policies: IPoliciesStateType;
   gqlOriginalAppliedValue: IItemDefinitionGQLValueType;
   forId: number;
 }
@@ -86,6 +96,15 @@ export interface IItemDefinitionGQLValueType {
   roleRequester: string;
   query: string;
   value: any;
+}
+
+export interface IPolicyType {
+  [policyName: string]: PropertyDefinition[];
+}
+
+export interface IPoliciesType {
+  edit?: IPolicyType;
+  delete?: IPolicyType;
 }
 
 /**
@@ -186,6 +205,7 @@ export default class ItemDefinition {
     definition: ItemDefinition,
   }>;
   private propertyDefinitions: PropertyDefinition[];
+  private policyPropertyDefinitions: IPoliciesType;
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
   private originatingInstance: ItemDefinition;
@@ -235,6 +255,20 @@ export default class ItemDefinition {
     this.propertyDefinitions = rawJSON.properties ? rawJSON.properties
       .map((i) => (new PropertyDefinition(i, parentModule,
         this, false))) : [];
+
+    this.policyPropertyDefinitions = {};
+    if (rawJSON.policies) {
+      Object.keys(rawJSON.policies).forEach((policyType) => {
+        this.policyPropertyDefinitions[policyType] = {};
+        Object.keys(rawJSON.policies[policyType]).forEach((policyName) => {
+          this.policyPropertyDefinitions[policyType][policyName] =
+            rawJSON.policies[policyType][policyName].properties.map(
+              (propertyId: string) =>
+                this.getPropertyDefinitionFor(propertyId, true).getNewInstance(),
+            );
+        });
+      });
+    }
 
     // assigning the item instances by using the includes
     // and instantiating those
@@ -432,6 +466,24 @@ export default class ItemDefinition {
     return definition;
   }
 
+  public getPropertyDefinitionForPolicy(
+    policyType: string,
+    policyName: string,
+    id: string,
+  ): PropertyDefinition {
+    if (!this.policyPropertyDefinitions[policyType]) {
+      throw new Error("There is no data regarding policy type " + policyType);
+    } else if (!this.policyPropertyDefinitions[policyType][policyName]) {
+      throw new Error("There is no data regarding policy type " + policyType + " in name " + policyName);
+    }
+    const definition = this.policyPropertyDefinitions[policyType][policyName]
+      .find((p: PropertyDefinition) => p.getId() === id);
+    if (!definition) {
+      throw new Error("There is no property in policy type " + policyType + " in name " + policyName + " for " + id);
+    }
+    return definition;
+  }
+
   /**
    * Tells whether the current item definition has items itself
    * which are active and match the specific name
@@ -568,6 +620,7 @@ export default class ItemDefinition {
     emulateExternalChecking?: boolean,
     onlyIncludeProperties?: string[],
     excludeItems?: boolean,
+    excludePolicies?: boolean,
   ): IItemDefinitionStateType {
     const properties = onlyIncludeProperties ?
       onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false)
@@ -578,6 +631,21 @@ export default class ItemDefinition {
         return pd.getStateNoExternalChecking(id, emulateExternalChecking);
       });
 
+    let policies: IPoliciesStateType = null;
+    if (!excludePolicies) {
+      policies = {};
+      ["edit", "delete"].map((policyType) => {
+        if (this.policyPropertyDefinitions[policyType]) {
+          policies[policyType] = {};
+          Object.keys(this.policyPropertyDefinitions[policyType]).map((policyName) => {
+            policies[policyType][policyName] =
+              this.getPropertiesForPolicy(policyType, policyName)
+              .map((pd) => pd.getStateNoExternalChecking(id, emulateExternalChecking));
+          });
+        }
+      });
+    }
+
     return {
       moduleName: this.getModuleName(),
       itemDefPath: this.getPath(),
@@ -585,6 +653,7 @@ export default class ItemDefinition {
       items: excludeItems ? [] : this.itemInstances.map((ii) =>
         ii.getStateNoExternalChecking(id, emulateExternalChecking)),
       properties,
+      policies,
       gqlOriginalAppliedValue: this.getGQLAppliedValue(id),
       forId: id,
     };
@@ -607,9 +676,10 @@ export default class ItemDefinition {
     id: number,
     onlyIncludeProperties?: string[],
     excludeItems?: boolean,
+    excludePolicies?: boolean,
   ): Promise<IItemDefinitionStateType> {
     const properties = await Promise.all(onlyIncludeProperties ?
-      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false).getState(id)) :
+      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, true).getState(id)) :
       this.getParentModule().getAllPropExtensions().concat(
         this.getAllPropertyDefinitions(),
       ).map((pd) => {
@@ -617,12 +687,27 @@ export default class ItemDefinition {
       }),
     );
 
+    let policies: IPoliciesStateType = null;
+    if (!excludePolicies) {
+      policies = {};
+      await Promise.all(["edit", "delete"].map(async (policyType) => {
+        if (this.policyPropertyDefinitions[policyType]) {
+          policies[policyType] = {};
+          await Promise.all(Object.keys(this.policyPropertyDefinitions[policyType]).map(async (policyName) => {
+            policies[policyType][policyName] =
+              await Promise.all(this.getPropertiesForPolicy(policyType, policyName).map((pd) => pd.getState(id)));
+          }));
+        }
+      }));
+    }
+
     return {
       moduleName: this.getModuleName(),
       itemDefPath: this.getPath(),
       itemDefName: this.getName(),
       items: excludeItems ? [] : await Promise.all(this.itemInstances.map((ii: Item) => ii.getState(id))),
       properties,
+      policies,
       gqlOriginalAppliedValue: this.getGQLAppliedValue(id),
       forId: id,
     };
@@ -863,7 +948,7 @@ export default class ItemDefinition {
 
   public getPropertiesForPolicy(type: string, name: string): PropertyDefinition[] {
     return this.rawData.policies[type][name].properties.map(
-      (propertyId: string) => this.getPropertyDefinitionFor(propertyId, true),
+      (propertyId: string) => this.getPropertyDefinitionForPolicy(type, name, propertyId),
     );
   }
 

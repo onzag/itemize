@@ -52,6 +52,7 @@ import {
   POLICY_REQUIRED_I18N,
   MODULE_AND_ITEM_DEF_I18N,
   MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY,
+  POLICY_OPTIONAL_I18N,
 } from "../constants";
 import { buildAutocomplete } from "./autocomplete";
 
@@ -778,6 +779,13 @@ async function getI18nData(
             }
             i18nData[locale].policies[policyType][policyName][policyReqiredI18nKey] =
               properties[locale].policies[policyType][policyName][policyReqiredI18nKey].trim();
+          });
+          POLICY_OPTIONAL_I18N.forEach((policyOptionalI18nKey) => {
+            if (!properties[locale].policies[policyType][policyName][policyOptionalI18nKey]) {
+              return;
+            }
+            i18nData[locale].policies[policyType][policyName][policyOptionalI18nKey] =
+              properties[locale].policies[policyType][policyName][policyOptionalI18nKey].trim();
           });
         });
       });

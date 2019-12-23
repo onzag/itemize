@@ -398,6 +398,7 @@ export default class PropertyDefinition {
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
   private propertyIsExtension: boolean;
+  private originatingInstance: PropertyDefinition;
 
   private defaultIf?: IPropertyDefinitionRuleDataType[];
   private invalidIf?: IPropertyDefinitionInvalidRuleDataType[];
@@ -451,11 +452,13 @@ export default class PropertyDefinition {
     parentModule: Module,
     parentItemDefinition: ItemDefinition,
     isExtension: boolean,
+    originatingInstance?: PropertyDefinition,
   ) {
     this.rawData = rawJSON;
     this.parentModule = parentModule;
     this.parentItemDefinition = parentItemDefinition;
     this.propertyIsExtension = isExtension;
+    this.originatingInstance = originatingInstance || null;
 
     // set the default value
     this.defaultIf = rawJSON.defaultIf && rawJSON.defaultIf.map((dif) => ({
@@ -968,7 +971,7 @@ export default class PropertyDefinition {
    */
   public getNewInstance() {
     return new PropertyDefinition(this.rawData, this.parentModule,
-      this.parentItemDefinition, this.propertyIsExtension);
+      this.parentItemDefinition, this.propertyIsExtension, this);
   }
 
   /**
@@ -1201,6 +1204,9 @@ export default class PropertyDefinition {
    * @returns the locale data
    */
   public getI18nDataFor(locale: string): any {
+    if (this.originatingInstance) {
+      return this.originatingInstance.getI18nDataFor(locale);
+    }
     if (!this.rawData.i18nData) {
       return null;
     }

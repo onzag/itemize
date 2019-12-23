@@ -13,6 +13,8 @@ type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search"
 interface IPropertyEntryProps {
   id: string;
   searchVariant?: SearchVariants;
+  policyType?: string;
+  policyName?: string;
   showAsInvalid?: boolean;
   icon?: string;
   onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, inernalValue?: any) => void;
@@ -21,12 +23,16 @@ interface IPropertyEntryProps {
 interface IPropertySetterProps {
   id: string;
   searchVariant?: SearchVariants;
+  policyType?: string;
+  policyName?: string;
   value: PropertyDefinitionSupportedType;
 }
 
 interface IPropertyReadProps {
   id: string;
   searchVariant?: SearchVariants;
+  policyType?: string;
+  policyName?: string;
   children?: (value: PropertyDefinitionSupportedType) => React.ReactNode;
 }
 
@@ -38,6 +44,8 @@ interface IPropertyViewProps {
 interface IPropertyEntryViewReadSetProps {
   id: string;
   searchVariant?: SearchVariants;
+  policyType?: string;
+  policyName?: string;
   children?: (value: PropertyDefinitionSupportedType) => React.ReactNode;
   showAsInvalid?: boolean;
   icon?: string;
@@ -68,7 +76,13 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                 const property = !isMetaProperty ? (
                     itemContextualValue ?
                     itemContextualValue.item.getSinkingPropertyFor(actualId) :
-                    itemDefinitionContextualValue.idef.getPropertyDefinitionFor(actualId, true)
+                    (
+                      (props.policyType && props.policyName) ?
+                        itemDefinitionContextualValue.idef
+                          .getPropertyDefinitionForPolicy(props.policyType, props.policyName, actualId) :
+                        itemDefinitionContextualValue.idef
+                          .getPropertyDefinitionFor(actualId, true)
+                    )
                   ) : null;
                 let propertyState: IPropertyDefinitionState = null;
                 if (!isMetaProperty) {
