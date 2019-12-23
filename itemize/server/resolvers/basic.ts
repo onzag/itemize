@@ -668,7 +668,7 @@ export async function runPolicyCheck(
 
       // now we check if it's a valid value, the value we have given, for the given property
       // this is a shallow check but works
-      const invalidReason = await property.isValidValue(valueForTheProperty, id);
+      const invalidReason = await property.isValidValue(id, valueForTheProperty);
 
       // if we get an invalid reason, the policy cannot even pass there
       if (invalidReason) {

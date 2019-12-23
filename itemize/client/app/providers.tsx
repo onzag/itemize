@@ -28,9 +28,14 @@ export interface IActionResponseWithId extends IBasicActionResponse {
   id: number;
 }
 
+type policyPathType = [string, string, string];
+
 export interface IActionSubmitOptions {
   onlyIncludeProperties?: string[];
   onlyIncludeItems?: string[];
+  unpokeAfterSuccess?: boolean;
+  propertiesToCleanOnSuccess?: string[];
+  policiesToCleanOnSuccess?: policyPathType[];
 }
 
 export interface IItemDefinitionContextType {
@@ -77,6 +82,7 @@ export interface IItemDefinitionContextType {
   dismissSubmitted: () => void;
   dismissDeleteError: () => void;
   dismissDeleted: () => void;
+  unpoke: () => void;
 }
 
 export interface IModuleContextType {
@@ -94,7 +100,7 @@ export const ModuleContext = React.createContext<IModuleContextType>(null);
 
 interface IItemDefinitionProviderProps {
   children: any;
-  itemDefinition?: string;
+  itemDefinition: string;
   forId?: number;
   assumeOwnership?: boolean;
   searchCounterpart?: boolean;
@@ -141,7 +147,9 @@ function flattenRecievedFields(recievedFields: any) {
 }
 
 const ItemDefinitionProviderRequestsInProgressRegistry: {
-  [qualifiedPathNameWithID: string]: boolean;
+  [qualifiedPathNameWithID: string]: {
+    wasOwnershipAssumed: boolean,
+  };
 } = {};
 
 class ActualItemDefinitionProvider extends
@@ -176,6 +184,7 @@ class ActualItemDefinitionProvider extends
     this.canEdit = this.canEdit.bind(this);
     this.canCreate = this.canCreate.bind(this);
     this.canDelete = this.canDelete.bind(this);
+    this.unpoke = this.unpoke.bind(this);
 
     valueFor.addListener(this.props.forId || null, this.listener);
     this.itemDefinition = valueFor;
@@ -230,7 +239,8 @@ class ActualItemDefinitionProvider extends
     if (
       (prevProps.forId || null) !== (this.props.forId || null) ||
       prevProps.tokenData.id !== this.props.tokenData.id ||
-      prevProps.tokenData.role !== this.props.tokenData.role
+      prevProps.tokenData.role !== this.props.tokenData.role ||
+      prevProps.assumeOwnership !== this.props.assumeOwnership
     ) {
       await this.loadValue();
 
@@ -266,9 +276,21 @@ class ActualItemDefinitionProvider extends
 
     const qualifiedPathNameWithID = PREFIX_BUILD(this.itemDefinition.getQualifiedPathName()) + this.props.forId;
     if (ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID]) {
+      if (
+        !!ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].wasOwnershipAssumed !==
+        !!this.props.assumeOwnership
+      ) {
+        console.warn(
+          "Two simultaneous requests in item definition " + this.props.itemDefinition + " for id " + this.props.forId +
+          " have been launched and the ownership assumption does not match, this is a no-op, and would cause a race" +
+          " where only the first request can be fullfilled and cached, fix the issue ASAP",
+        );
+      }
       return;
     }
-    ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID] = true;
+    ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID] = {
+      wasOwnershipAssumed: this.props.assumeOwnership,
+    };
 
     const requestFields: any = {
       DATA: {},
@@ -692,15 +714,14 @@ class ActualItemDefinitionProvider extends
       });
     }
 
-    // if it's not poked already, let's poke it
-    if (!this.state.poked) {
-      this.setState({
-        poked: true,
-      });
-    }
-
     // if it's invalid let's return the emulated error
     if (isInvalid) {
+      // if it's not poked already, let's poke it
+      if (!this.state.poked) {
+        this.setState({
+          poked: true,
+        });
+      }
       return this.giveEmulatedInvalidError("submitError", true) as IActionResponseWithId;
     }
 
@@ -849,6 +870,12 @@ class ActualItemDefinitionProvider extends
 
     // if it's invalid we give the simulated error yet again
     if (isInvalid) {
+      // if it's not poked already, let's poke it
+      if (!this.state.poked) {
+        this.setState({
+          poked: true,
+        });
+      }
       return this.giveEmulatedInvalidError("submitError", true)  as IActionResponseWithId;
     }
 
@@ -885,6 +912,7 @@ class ActualItemDefinitionProvider extends
         submitError: error,
         submitting: false,
         submitted: false,
+        poked: true,
       });
     } else {
       if (gqlValue.errors) {
@@ -893,12 +921,14 @@ class ActualItemDefinitionProvider extends
           submitError: error,
           submitting: false,
           submitted: false,
+          poked: true,
         });
       } else {
         this.setState({
           submitError: null,
           submitting: false,
           submitted: true,
+          poked: options.unpokeAfterSuccess ? false : true,
         });
       }
 
@@ -923,6 +953,16 @@ class ActualItemDefinitionProvider extends
           this.props.tokenData.role,
           representativeGetQuery,
         );
+        if (options.propertiesToCleanOnSuccess) {
+          options.propertiesToCleanOnSuccess.forEach((ptc) => {
+            this.itemDefinition.getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId);
+          });
+        }
+        if (options.policiesToCleanOnSuccess) {
+          options.policiesToCleanOnSuccess.forEach((policyArray) => {
+            this.itemDefinition.getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId);
+          });
+        }
         this.itemDefinition.triggerListeners(recievedId);
 
         return {
@@ -1004,6 +1044,11 @@ class ActualItemDefinitionProvider extends
       false,
     );
   }
+  public unpoke() {
+    this.setState({
+      poked: false,
+    });
+  }
   public render() {
     return (
       <ItemDefinitionContext.Provider
@@ -1034,6 +1079,7 @@ class ActualItemDefinitionProvider extends
           dismissSubmitted: this.dismissSubmitted,
           dismissDeleteError: this.dismissDeleteError,
           dismissDeleted: this.dismissDeleted,
+          unpoke: this.unpoke,
           canCreate: this.state.canCreate,
           canDelete: this.state.canDelete,
           canEdit: this.state.canEdit,

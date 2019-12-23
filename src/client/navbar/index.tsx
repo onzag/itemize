@@ -38,7 +38,12 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
           </IconButton>
           <div className={props.classes.container}>
             <ModuleProvider module="users">
-              <ItemDefinitionProvider itemDefinition="user" forId={props.loggedUserId} disableExternalChecks={true}>
+              <ItemDefinitionProvider
+                itemDefinition="user"
+                forId={props.loggedUserId}
+                disableExternalChecks={true}
+                assumeOwnership={true}
+              >
                 <IfLogStatus>
                   {(status) => {
                     if (status === "LOGGED_OUT") {

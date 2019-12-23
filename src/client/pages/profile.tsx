@@ -59,7 +59,10 @@ function ActualProfile(props: IActualProfileProps) {
                 </Button>
                 <Button
                   onClick={submitActioner.submitError ? null : submitActioner.submit.bind(null, {
-                    onlyIncludeProperties: ["username", "email"],
+                    onlyIncludeProperties: ["username", "email", "password"],
+                    propertiesToCleanOnSuccess: ["password"],
+                    policiesToCleanOnSuccess: [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]],
+                    unpokeAfterSuccess: true,
                   })}
                 >
                   <I18nRead id="update_profile"/>
@@ -120,6 +123,7 @@ export const Profile = withStyles(profileStyles)((props: IProfileProps) => {
                 itemDefinition="user"
                 forId={actualId}
                 disableExternalChecks={userId !== actualId}
+                assumeOwnership={userId === actualId}
               >
                 <ActualProfile {...props} isOwner={userId === actualId}/>
               </ItemDefinitionProvider>
