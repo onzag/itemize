@@ -669,7 +669,7 @@ export default class PropertyDefinition {
       hidden: this.isCurrentlyHidden(id),
       internalValue: this.stateValueModified[id] ? this.stateinternalValue[id] : null,
       stateValue: nullIfUndefined(this.stateValue[id]),
-      stateValueModified: this.stateValueModified[id],
+      stateValueModified: this.stateValueModified[id] || false,
       propertyId: this.getId(),
     };
   }
@@ -697,7 +697,7 @@ export default class PropertyDefinition {
         hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id),
         internalValue: null,
         stateValue: nullIfUndefined(this.stateValue[id]),
-        stateValueModified: this.stateValueModified[id],
+        stateValueModified: this.stateValueModified[id] || false,
         propertyId: this.getId(),
       };
     }
@@ -715,7 +715,7 @@ export default class PropertyDefinition {
         hidden: true,
         internalValue: null,
         stateValue: nullIfUndefined(this.stateValue[id]),
-        stateValueModified: this.stateValueModified[id],
+        stateValueModified: this.stateValueModified[id] || false,
         propertyId: this.getId(),
       };
     }
@@ -860,9 +860,10 @@ export default class PropertyDefinition {
   public applyValue(
     id: number,
     value: any,
+    modifiedState: boolean,
   ) {
     this.stateValue[id] = value;
-    this.stateValueModified[id] = true;
+    this.stateValueModified[id] = modifiedState;
     this.stateinternalValue[id] = null;
   }
 

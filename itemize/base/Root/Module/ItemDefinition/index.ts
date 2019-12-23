@@ -740,10 +740,12 @@ export default class ItemDefinition {
         this.getAllPropertyDefinitionsAndExtensions();
     properties.forEach((property) => {
       let givenValue = value[property.getId()];
+      let setAsModified = true;
       if (typeof givenValue === "undefined") {
+        setAsModified = false;
         givenValue = null;
       }
-      property.applyValue(id, givenValue);
+      property.applyValue(id, givenValue, setAsModified);
     });
     this.getAllItems().forEach((item) => {
       let givenValue = value[item.getQualifiedIdentifier()];

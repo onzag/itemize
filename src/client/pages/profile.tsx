@@ -52,6 +52,8 @@ function ActualProfile(props: IActualProfileProps) {
                 </div>
                 <Entry id="username"/>
                 <Entry id="email"/>
+                <Entry id="password"/>
+                <Entry id="password" policyType="edit" policyName="REQUIRES_PASSWORD_CONFIRMATION"/>
                 <Button onClick={logActioner.logout}>
                   <I18nRead id="logout"/>
                 </Button>

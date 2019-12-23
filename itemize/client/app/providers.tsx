@@ -15,7 +15,6 @@ import {
   STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   PREFIX_EDIT,
   PREFIX_ADD,
-  POLICY_PREFIXES,
   PREFIX_DELETE,
 } from "../../constants";
 import { buildGqlQuery, buildGqlMutation, gqlQuery } from "./gql-querier";
@@ -161,6 +160,27 @@ class ActualItemDefinitionProvider extends
       valueFor = valueFor.getSearchModeCounterpart();
     }
 
+    this.onPropertyChange = this.onPropertyChange.bind(this);
+    this.onItemSetExclusionState = this.onItemSetExclusionState.bind(this);
+    this.loadValue = this.loadValue.bind(this);
+    this.delete = this.delete.bind(this);
+    this.listener = this.listener.bind(this);
+    this.submit = this.submit.bind(this);
+    this.dismissLoadError = this.dismissLoadError.bind(this);
+    this.dismissSubmitError = this.dismissSubmitError.bind(this);
+    this.dismissDeleteError = this.dismissSubmitError.bind(this);
+    this.onPropertyEnforce = this.onPropertyEnforce.bind(this);
+    this.onPropertyClearEnforce = this.onPropertyClearEnforce.bind(this);
+    this.dismissSubmitted = this.dismissSubmitted.bind(this);
+    this.dismissDeleted = this.dismissDeleted.bind(this);
+    this.canEdit = this.canEdit.bind(this);
+    this.canCreate = this.canCreate.bind(this);
+    this.canDelete = this.canDelete.bind(this);
+
+    valueFor.addListener(this.props.forId || null, this.listener);
+    this.itemDefinition = valueFor;
+    this.containsExternallyCheckedProperty = valueFor.containsAnExternallyCheckedProperty();
+
     this.state = {
       itemDefinitionState: valueFor.getStateNoExternalChecking(
         this.props.forId || null,
@@ -182,24 +202,6 @@ class ActualItemDefinitionProvider extends
       canDelete: this.canDelete(),
       canCreate: this.canCreate(),
     };
-
-    this.onPropertyChange = this.onPropertyChange.bind(this);
-    this.onItemSetExclusionState = this.onItemSetExclusionState.bind(this);
-    this.loadValue = this.loadValue.bind(this);
-    this.delete = this.delete.bind(this);
-    this.listener = this.listener.bind(this);
-    this.submit = this.submit.bind(this);
-    this.dismissLoadError = this.dismissLoadError.bind(this);
-    this.dismissSubmitError = this.dismissSubmitError.bind(this);
-    this.dismissDeleteError = this.dismissSubmitError.bind(this);
-    this.onPropertyEnforce = this.onPropertyEnforce.bind(this);
-    this.onPropertyClearEnforce = this.onPropertyClearEnforce.bind(this);
-    this.dismissSubmitted = this.dismissSubmitted.bind(this);
-    this.dismissDeleted = this.dismissDeleted.bind(this);
-
-    valueFor.addListener(this.props.forId || null, this.listener);
-    this.itemDefinition = valueFor;
-    this.containsExternallyCheckedProperty = valueFor.containsAnExternallyCheckedProperty();
   }
   public async componentDidUpdate(
     prevProps: IActualItemDefinitionProviderProps,
@@ -642,6 +644,7 @@ class ActualItemDefinitionProvider extends
         deleted: true,
         notFound: true,
       });
+      this.itemDefinition.triggerListeners(this.props.forId);
     }
 
     return {
