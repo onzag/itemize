@@ -16,6 +16,7 @@ import {
   PREFIX_EDIT,
   PREFIX_ADD,
   POLICY_PREFIXES,
+  PREFIX_DELETE,
 } from "../../constants";
 import { buildGqlQuery, buildGqlMutation, gqlQuery } from "./gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
@@ -36,6 +37,7 @@ export interface IActionSubmitOptions {
 export interface IItemDefinitionContextType {
   idef: ItemDefinition;
   state: IItemDefinitionStateType;
+  forId: number;
   notFound: boolean;
   blocked: boolean;
   blockedButDataAccessible: boolean;
@@ -43,10 +45,16 @@ export interface IItemDefinitionContextType {
   submitError: GraphQLEndpointErrorType;
   submitting: boolean;
   submitted: boolean;
+  deleteError: GraphQLEndpointErrorType;
+  deleting: boolean;
+  deleted: boolean;
   poked: boolean;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
   reload: () => Promise<IBasicActionResponse>;
   submit: (options?: IActionSubmitOptions) => Promise<IActionResponseWithId>;
-  forId: number;
+  delete: () => Promise<IBasicActionResponse>;
   onPropertyChange: (
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
@@ -68,6 +76,8 @@ export interface IItemDefinitionContextType {
   dismissLoadError: () => void;
   dismissSubmitError: () => void;
   dismissSubmitted: () => void;
+  dismissDeleteError: () => void;
+  dismissDeleted: () => void;
 }
 
 export interface IModuleContextType {
@@ -107,7 +117,13 @@ interface IActualItemDefinitionProviderState {
   submitError: GraphQLEndpointErrorType;
   submitting: boolean;
   submitted: boolean;
+  deleteError: GraphQLEndpointErrorType;
+  deleting: boolean;
+  deleted: boolean;
   poked: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  canCreate: boolean;
 }
 
 function flattenRecievedFields(recievedFields: any) {
@@ -157,25 +173,35 @@ class ActualItemDefinitionProvider extends
       submitError:  null,
       submitting: false,
       submitted: false,
+      deleteError:  null,
+      deleting: false,
+      deleted: false,
       poked: false,
+
+      canEdit: this.canEdit(),
+      canDelete: this.canDelete(),
+      canCreate: this.canCreate(),
     };
 
     this.onPropertyChange = this.onPropertyChange.bind(this);
     this.onItemSetExclusionState = this.onItemSetExclusionState.bind(this);
     this.loadValue = this.loadValue.bind(this);
+    this.delete = this.delete.bind(this);
     this.listener = this.listener.bind(this);
     this.submit = this.submit.bind(this);
     this.dismissLoadError = this.dismissLoadError.bind(this);
     this.dismissSubmitError = this.dismissSubmitError.bind(this);
+    this.dismissDeleteError = this.dismissSubmitError.bind(this);
     this.onPropertyEnforce = this.onPropertyEnforce.bind(this);
     this.onPropertyClearEnforce = this.onPropertyClearEnforce.bind(this);
     this.dismissSubmitted = this.dismissSubmitted.bind(this);
+    this.dismissDeleted = this.dismissDeleted.bind(this);
 
     valueFor.addListener(this.props.forId || null, this.listener);
     this.itemDefinition = valueFor;
     this.containsExternallyCheckedProperty = valueFor.containsAnExternallyCheckedProperty();
   }
-  public componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: IActualItemDefinitionProviderProps,
   ) {
     if (this.props.itemDefinition !== prevProps.itemDefinition) {
@@ -204,7 +230,13 @@ class ActualItemDefinitionProvider extends
       prevProps.tokenData.id !== this.props.tokenData.id ||
       prevProps.tokenData.role !== this.props.tokenData.role
     ) {
-      this.loadValue();
+      await this.loadValue();
+
+      this.setState({
+        canEdit: this.canEdit(),
+        canDelete: this.canDelete(),
+        canCreate: this.canCreate(),
+      });
     }
   }
   public componentDidMount() {
@@ -469,17 +501,151 @@ class ActualItemDefinitionProvider extends
       );
     }
   }
-  public giveSubmitEmulatedInvalidError(): IActionResponseWithId {
+  public checkPoliciesAndGetArgs(policyType: string, argumentsToCheckPropertiesAgainst?: any): [boolean, any] {
+    const applyingPolicyArgs: any = {};
+    return [
+      Object.keys(this.state.itemDefinitionState.policies[policyType]).some((policyName) => {
+        // and for that we check using some again every property that is applied in the policy
+        return this.state.itemDefinitionState.policies[policyType][policyName].some((propertyStateInPolicy) => {
+          // we check regarding the property ids only if we are asked to do so by the arguments for query
+          if (argumentsToCheckPropertiesAgainst) {
+            // and now we need to check whether the policy is at all necessary, as in, are we modifying
+            // any property that would cause this to be needed, for that we get the applying ids
+            const applyingPropertyIds = this.itemDefinition.getApplyingPropertyIdsForPolicy(policyType, policyName);
+            // and using some yet again we check whether using the argumentsToCheckPropertiesAgainst
+            // which is a gql object
+            // which funnily will contain the same id in case it is there, it will tell us whether one
+            // of the property actually is going to be modified and so our policy applies
+            const oneOfApplyingPropertiesApplies = applyingPropertyIds
+              .some((pid) => typeof argumentsToCheckPropertiesAgainst[pid] !== "undefined");
+            // if it doesn't match anything, we return false, so technically this policy is valid, regardless on whether
+            // the value itself is valid or not because it will not pass to the graphql query
+            if (!oneOfApplyingPropertiesApplies) {
+              return false;
+            }
+          }
+          // Here we are doing exactly the same as we did with applying property ids but this time
+          // now we do it with the roles
+          const applyingRoles = this.itemDefinition.getRolesForPolicy(policyType, policyName);
+          const oneOfApplyingRolesApplies = applyingRoles.includes(this.props.tokenData.role);
+          if (!oneOfApplyingRolesApplies) {
+            return false;
+          }
+          // otherwise if we find that it is not valid
+          if (!propertyStateInPolicy.valid) {
+            // then we return true, indicating the algorithm to terminate all its execution in this policy
+            // madness and just make isInvalid true and give the emulated invalid error
+            return true;
+          }
+          // otherwise we are going to set it in the policy arguments that go with the arguments for the
+          // query
+          const policyProperty =
+            this.itemDefinition
+            .getPropertyDefinitionForPolicy(policyType, policyName, propertyStateInPolicy.propertyId);
+          // then we are going to set that value using the qualified identifier that is used
+          // in the args
+          applyingPolicyArgs[policyProperty.getQualifiedPolicyIdentifier(policyType, policyName)] =
+            propertyStateInPolicy.value;
+          // and we return false to indicate success of a valid property value
+          return false;
+        });
+      }),
+      applyingPolicyArgs,
+    ];
+  }
+  public giveEmulatedInvalidError(stateApplied: string, withId: boolean): IActionResponseWithId | IBasicActionResponse {
     const emulatedError: GraphQLEndpointErrorType = {
       message: "Submit refused due to invalid information in form fields",
       code: "INVALID_DATA_SUBMIT_REFUSED",
     };
     this.setState({
-      submitError: emulatedError,
+      [stateApplied]: emulatedError,
+    } as any);
+
+    if (withId) {
+      return {
+        id: null,
+        error: emulatedError,
+      };
+    } else {
+      return {
+        error: emulatedError,
+      };
+    }
+  }
+  public async delete(): Promise<IBasicActionResponse> {
+    if (this.state.deleting || this.props.forId === null) {
+      return;
+    }
+
+    // if it's not poked already, let's poke it
+    if (!this.state.poked) {
+      this.setState({
+        poked: true,
+      });
+    }
+
+    const requestFields: any = {
+      id: {},
+    };
+
+    const [isInvalid, applyingPolicyArgs] = this.checkPoliciesAndGetArgs(
+      "delete",
+    );
+
+    if (isInvalid) {
+      return this.giveEmulatedInvalidError("deleteError", false);
+    }
+
+    this.setState({
+      deleting: true,
     });
+
+    const queryName = PREFIX_DELETE +
+      this.itemDefinition.getQualifiedPathName();
+    const args = {
+      id: this.props.forId,
+      token: this.props.tokenData.token,
+      language: this.props.localeData.language.split("-")[0],
+      ...applyingPolicyArgs,
+    };
+    const query = buildGqlMutation({
+      name: queryName,
+      args,
+      fields: requestFields,
+    });
+    const gqlValue = await gqlQuery(query);
+
+    let error: GraphQLEndpointErrorType = null;
+    if (!gqlValue) {
+      error = {
+        message: "Failed to connect",
+        code: "CANT_CONNECT",
+      };
+      this.setState({
+        deleteError: error,
+        deleting: false,
+        deleted: false,
+      });
+    } else if (gqlValue.errors) {
+      error = gqlValue.errors[0].extensions;
+      this.setState({
+        deleteError: error,
+        deleting: false,
+        deleted: false,
+      });
+    } else {
+      this.itemDefinition.cleanValueFor(this.props.forId);
+      this.setState({
+        deleteError: null,
+        deleting: false,
+        deleted: true,
+        notFound: true,
+      });
+    }
+
     return {
-      id: null,
-      error: emulatedError,
+      error,
     };
   }
   public async submit(options: IActionSubmitOptions = {}): Promise<IActionResponseWithId> {
@@ -532,7 +698,7 @@ class ActualItemDefinitionProvider extends
 
     // if it's invalid let's return the emulated error
     if (isInvalid) {
-      return this.giveSubmitEmulatedInvalidError();
+      return this.giveEmulatedInvalidError("submitError", true) as IActionResponseWithId;
     }
 
     // now we are going to build our query
@@ -569,6 +735,9 @@ class ActualItemDefinitionProvider extends
     );
 
     // Now we get all the property definitions and extensions for the item
+    // you might wonder why we check role access one by one and not the total
+    // well, we literally don't care, the developer is reponsible to deny this
+    // to get here, we are just building a query, not preventing a submit
     this.itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
       if (
         !pd.isRetrievalDisabled() &&
@@ -662,58 +831,22 @@ class ActualItemDefinitionProvider extends
     });
 
     // super hack in order to get the applying policy args
-    const applyingPolicyArgs: any = {};
+    let applyingPolicyArgs: any = {};
     // first we only need to run this if it's not invalid, otherwise the values
     // are never really used for the policy state, also this is only useful for
     // edits
     if (this.props.forId && this.state.itemDefinitionState.policies.edit) {
       // now we set the variable by checking all the policies in the state using some
       // we check every policyName included in edit
-      isInvalid = Object.keys(this.state.itemDefinitionState.policies.edit).some((policyName) => {
-        // and for that we check using some again every property that is applied in the policy
-        return this.state.itemDefinitionState.policies.edit[policyName].some((propertyStateInPolicy) => {
-          // and now we need to check whether the policy is at all necessary, as in, are we modifying
-          // any property that would cause this to be needed, for that we get the applying ids
-          const applyingPropertyIds = this.itemDefinition.getApplyingPropertyIdsForPolicy("edit", policyName);
-          // and using some yet again we check whether using the argumentsForQuery which is a gql object
-          // which funnily will contain the same id in case it is there, it will tell us whether one
-          // of the property actually is going to be modified and so our policy applies
-          const oneOfApplyingPropertiesApplies = applyingPropertyIds.some((pid) => typeof argumentsForQuery[pid] !== "undefined");
-          // if it doesn't match anything, we return false, so technically this policy is valid, regardless on whether
-          // the value itself is valid or not because it will not pass to the graphql query
-          if (!oneOfApplyingPropertiesApplies) {
-            return false;
-          }
-          // Here we are doing exactly the same as we did with applying property ids but this time
-          // now we do it with the roles
-          const applyingRoles = this.itemDefinition.getRolesForPolicy("edit", policyName);
-          const oneOfApplyingRolesApplies = applyingRoles.includes(this.props.tokenData.role);
-          if (!oneOfApplyingRolesApplies) {
-            return false;
-          }
-          // otherwise if we find that it is not valid
-          if (!propertyStateInPolicy.valid) {
-            // then we return true, indicating the algorithm to terminate all its execution in this policy
-            // madness and just make isInvalid true and give the emulated invalid error
-            return true;
-          }
-          // otherwise we are going to set it in the policy arguments that go with the arguments for the
-          // query
-          const policyProperty =
-            this.itemDefinition.getPropertyDefinitionForPolicy("edit", policyName, propertyStateInPolicy.propertyId);
-          // then we are going to set that value using the qualified identifier that is used
-          // in the args
-          applyingPolicyArgs[policyProperty.getQualifiedPolicyIdentifier("edit", policyName)] =
-            propertyStateInPolicy.value;
-          // and we return false to indicate success of a valid property value
-          return false;
-        });
-      });
+      [isInvalid, applyingPolicyArgs] = this.checkPoliciesAndGetArgs(
+        "edit",
+        argumentsForQuery,
+      );
     }
 
     // if it's invalid we give the simulated error yet again
     if (isInvalid) {
-      return this.giveSubmitEmulatedInvalidError();
+      return this.giveEmulatedInvalidError("submitError", true)  as IActionResponseWithId;
     }
 
     // now it's when we are actually submitting
@@ -727,6 +860,7 @@ class ActualItemDefinitionProvider extends
       token: this.props.tokenData.token,
       language: this.props.localeData.language.split("-")[0],
       ...argumentsForQuery,
+      ...applyingPolicyArgs,
     };
     if (this.props.forId) {
       args.id = this.props.forId;
@@ -747,6 +881,7 @@ class ActualItemDefinitionProvider extends
       this.setState({
         submitError: error,
         submitting: false,
+        submitted: false,
       });
     } else {
       if (gqlValue.errors) {
@@ -754,11 +889,13 @@ class ActualItemDefinitionProvider extends
         this.setState({
           submitError: error,
           submitting: false,
+          submitted: false,
         });
       } else {
         this.setState({
           submitError: null,
           submitting: false,
+          submitted: true,
         });
       }
 
@@ -803,6 +940,11 @@ class ActualItemDefinitionProvider extends
       loadError: null,
     });
   }
+  public dismissDeleteError() {
+    this.setState({
+      deleteError: null,
+    });
+  }
   public dismissSubmitError() {
     this.setState({
       submitError: null,
@@ -812,6 +954,52 @@ class ActualItemDefinitionProvider extends
     this.setState({
       submitted: null,
     });
+  }
+  public dismissDeleted() {
+    this.setState({
+      deleted: false,
+    });
+  }
+  public canDelete() {
+    if (this.props.forId === null) {
+      return false;
+    }
+    return this.itemDefinition.checkRoleAccessFor(
+      ItemDefinitionIOActions.DELETE,
+      this.props.tokenData.role,
+      this.props.tokenData.id,
+      this.props.assumeOwnership ?
+        this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(this.props.forId),
+      {},
+      false,
+    );
+  }
+  public canCreate() {
+    if (this.props.forId !== null) {
+      return false;
+    }
+    return this.itemDefinition.checkRoleAccessFor(
+      ItemDefinitionIOActions.CREATE,
+      this.props.tokenData.role,
+      this.props.tokenData.id,
+      this.props.tokenData.id,
+      {},
+      false,
+    );
+  }
+  public canEdit() {
+    if (this.props.forId === null) {
+      return false;
+    }
+    return this.itemDefinition.checkRoleAccessFor(
+      ItemDefinitionIOActions.EDIT,
+      this.props.tokenData.role,
+      this.props.tokenData.id,
+      this.props.assumeOwnership ?
+        this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(this.props.forId),
+      {},
+      false,
+    );
   }
   public render() {
     return (
@@ -830,13 +1018,22 @@ class ActualItemDefinitionProvider extends
           submitError: this.state.submitError,
           submitting: this.state.submitting,
           submitted: this.state.submitted,
+          deleteError: this.state.deleteError,
+          deleting: this.state.deleting,
+          deleted: this.state.deleted,
           poked: this.state.poked,
           submit: this.submit,
           reload: this.loadValue,
+          delete: this.delete,
           forId: this.props.forId || null,
           dismissLoadError: this.dismissLoadError,
           dismissSubmitError: this.dismissSubmitError,
           dismissSubmitted: this.dismissSubmitted,
+          dismissDeleteError: this.dismissDeleteError,
+          dismissDeleted: this.dismissDeleted,
+          canCreate: this.state.canCreate,
+          canDelete: this.state.canDelete,
+          canEdit: this.state.canEdit,
         }}
       >
         {this.props.children}
