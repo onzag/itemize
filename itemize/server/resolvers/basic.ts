@@ -645,7 +645,7 @@ export async function runPolicyCheck(
         property.getId(),
       );
       // if the property is not a extension
-      if (!property.checkIfIsExtension()) {
+      if (!property.isExtension()) {
         // it means that we require a join
         policyQueryRequiresJoin = true;
       }

@@ -1,6 +1,6 @@
 TODO TECH
 
-- Remove icons from the structure and add them to the property entry itself
+- Remove rarity, and searchMode replace it with canSearch
 - Implement some form of triggers, maybe callback functions in the resolvers, we should have some form of user trigger to remove e_validated and
   whatnot
 

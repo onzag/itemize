@@ -188,7 +188,7 @@ async function clientSideIndexChecker(
     return property.stateLastUniqueCheck[id].valid;
   }
 
-  const qualifiedParentName = property.checkIfIsExtension() ?
+  const qualifiedParentName = property.isExtension() ?
     property.getParentModule().getQualifiedPathName() :
     property.getParentItemDefinition().getQualifiedPathName();
   const result = await fetch("/rest/index-check/" + qualifiedParentName + "/" + property.getId(), {
@@ -397,7 +397,7 @@ export default class PropertyDefinition {
   public rawData: IPropertyDefinitionRawJSONDataType;
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
-  private isExtension: boolean;
+  private propertyIsExtension: boolean;
 
   private defaultIf?: IPropertyDefinitionRuleDataType[];
   private invalidIf?: IPropertyDefinitionInvalidRuleDataType[];
@@ -455,7 +455,7 @@ export default class PropertyDefinition {
     this.rawData = rawJSON;
     this.parentModule = parentModule;
     this.parentItemDefinition = parentItemDefinition;
-    this.isExtension = isExtension;
+    this.propertyIsExtension = isExtension;
 
     // set the default value
     this.defaultIf = rawJSON.defaultIf && rawJSON.defaultIf.map((dif) => ({
@@ -968,7 +968,7 @@ export default class PropertyDefinition {
    */
   public getNewInstance() {
     return new PropertyDefinition(this.rawData, this.parentModule,
-      this.parentItemDefinition, this.isExtension);
+      this.parentItemDefinition, this.propertyIsExtension);
   }
 
   /**
@@ -1183,8 +1183,8 @@ export default class PropertyDefinition {
    * from the propext list, they usually have priority
    * @return a boolean
    */
-  public checkIfIsExtension(): boolean {
-    return this.isExtension;
+  public isExtension(): boolean {
+    return this.propertyIsExtension;
   }
 
   public isCoercedIntoDefaultWhenNull(): boolean {
