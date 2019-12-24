@@ -1,5 +1,5 @@
 import React from "react";
-import { ItemDefinitionContext } from "../app/providers";
+import { ItemDefinitionContext } from "../providers/item-definition";
 import { IItemDefinitionStateType } from "../../base/Root/Module/ItemDefinition";
 
 export function StatsForNerds(props: {

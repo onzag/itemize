@@ -75,7 +75,7 @@ export interface IPoliciesStateType {
 
 export interface IItemDefinitionStateType {
   moduleName: string;
-  itemDefPath: string[];
+  itemDefQualifiedName: string;
   itemDefName: string;
   items: IItemState[];
   properties: IPropertyDefinitionState[];
@@ -657,7 +657,7 @@ export default class ItemDefinition {
 
     return {
       moduleName: this.getModuleName(),
-      itemDefPath: this.getPath(),
+      itemDefQualifiedName: this.getQualifiedPathName(),
       itemDefName: this.getName(),
       items,
       properties,
@@ -718,7 +718,7 @@ export default class ItemDefinition {
 
     return {
       moduleName: this.getModuleName(),
-      itemDefPath: this.getPath(),
+      itemDefQualifiedName: this.getQualifiedPathName(),
       itemDefName: this.getName(),
       items,
       properties,

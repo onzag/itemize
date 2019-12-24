@@ -1,5 +1,5 @@
 import React from "react";
-import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
+import { ItemDefinitionProvider } from "../../../itemize/client/providers/item-definition";
 import { BlockedPage } from "./blocked";
 import { ErrorPage } from "./error";
 import { Button, createStyles, withStyles, WithStyles } from "@material-ui/core";
@@ -11,6 +11,7 @@ import { I18nRead } from "../../../itemize/client/components/localization";
 import { ItemDefinitionLoader, SubmitActioner } from "../../../itemize/client/components/item-definition";
 import { UserIdRetriever } from "../../../itemize/client/components/user";
 import Snackbar from "../general/snackbar";
+import { ModuleProvider } from "../../../itemize/client/providers/module";
 
 function SimulatedNotFoundPage() {
   return (

@@ -1,12 +1,13 @@
 import React from "react";
 import PropertyDefinition, { IPropertyDefinitionState } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import { ItemDefinitionContext, ItemContext } from "../app/providers";
+import { ItemDefinitionContext } from "../providers/item-definition";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { RESERVED_BASE_PROPERTIES } from "../../constants";
 import PropertyView, { RawBasePropertyView } from "./base/PropertyView";
 import PropertyEntry from "./base/PropertyEntry";
 import PropertySetter from "./base/PropertySetter";
+import { ItemContext } from "../providers/item";
 
 type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search";
 

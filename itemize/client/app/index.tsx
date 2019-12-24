@@ -155,7 +155,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       if (result && result.data.DATA && result.data.DATA) {
         const actualPropertyResult: string = result.data.DATA[propertyId];
         const userItemDefinition = this.state.specifiedProcessedRoot
-          .getModule("users").getItemDefinitionFor(["user"]);
+          .getModuleFor(["users"]).getItemDefinitionFor(["user"]);
         if (userItemDefinition.hasAppliedValueTo(this.tokenState.id)) {
           console.log("found an instance, triggering update");
           const property = userItemDefinition.getPropertyDefinitionFor(propertyId, false);

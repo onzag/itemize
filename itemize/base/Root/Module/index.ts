@@ -158,6 +158,7 @@ export default class Module {
    */
   private childItemDefinitions: ItemDefinition[];
   private childModules: Module[];
+  private childPropExtensionItemDefinition: ItemDefinition;
   /**
    * The property definitions that the module itself
    * has, and every item defintion in itself hence
@@ -250,6 +251,13 @@ export default class Module {
       }
     });
 
+    this.childPropExtensionItemDefinition = new ItemDefinition({
+      type: "item",
+      name: this.rawData.name,
+      i18nData: this.rawData.i18nData,
+      readRoleAccess: this.rawData.readRoleAccess,
+    }, this, null);
+
     this.listeners = [];
   }
 
@@ -341,6 +349,35 @@ export default class Module {
     }
 
     return finalDefinition;
+  }
+
+  public getPropExtensionItemDefinition() {
+    return this.childPropExtensionItemDefinition;
+  }
+
+  /**
+   * Gets a specific module given its name
+   * @param name the name of the module
+   */
+  public getModuleFor(name: string[]): Module {
+    // Search within the child definitions
+    const resultModule = this.childModules
+      .find((m) => m.getName() === name[0]);
+
+    if (!resultModule) {
+      throw new Error("Searching for module " +
+        name.join("/") + " failed");
+    }
+
+    // consume and loop like usual
+    const nNameConsumable = [...name];
+    nNameConsumable.shift();
+
+    if (nNameConsumable.length === 0) {
+      return resultModule;
+    } else {
+      return resultModule.getModuleFor(nNameConsumable);
+    }
   }
 
   /**

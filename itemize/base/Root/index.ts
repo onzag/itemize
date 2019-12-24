@@ -96,13 +96,25 @@ export default class Root {
    * Gets a specific module given its name
    * @param name the name of the module
    */
-  public getModule(name: string) {
-    const resultModule = this.childModules.find((m) => m.getName() === name);
+  public getModuleFor(name: string[]) {
+    // Search within the child definitions
+    const resultModule = this.childModules
+      .find((m) => m.getName() === name[0]);
+
     if (!resultModule) {
-      throw new Error("invalid module " + name);
+      throw new Error("Searching for module " +
+        name.join("/") + " failed");
     }
 
-    return resultModule;
+    // consume and loop like usual
+    const nNameConsumable = [...name];
+    nNameConsumable.shift();
+
+    if (nNameConsumable.length === 0) {
+      return resultModule;
+    } else {
+      return resultModule.getModuleFor(nNameConsumable);
+    }
   }
 
   public mergeWithI18n(root: IRootRawJSONDataType) {

@@ -4,7 +4,8 @@ import { DialogResponsive } from "./dialog";
 import { I18nRead, I18nReadError } from "../../../itemize/client/components/localization";
 import { LogActioner } from "../../../itemize/client/components/login";
 import { Entry } from "../../../itemize/client/components/property";
-import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
+import { ItemDefinitionProvider } from "../../../itemize/client/providers/item-definition";
+import { ModuleProvider } from "../../../itemize/client/providers/module";
 
 const loginDialogStyles = createStyles({});
 
@@ -22,7 +23,11 @@ function runTwoFunctions(functionA, functionB) {
 export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogProps) => {
   return (
     <ModuleProvider module="users">
-      <ItemDefinitionProvider itemDefinition="user" disableExternalChecks={true}>
+      <ItemDefinitionProvider
+        itemDefinition="user"
+        disableExternalChecks={true}
+        optimize={{disableListener: !props.open}}
+      >
         <LogActioner>
           {(actioner) => (
             <I18nRead id="login">

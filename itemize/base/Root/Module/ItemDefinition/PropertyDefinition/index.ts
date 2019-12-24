@@ -658,7 +658,7 @@ export default class PropertyDefinition {
     }
 
     const value = this.getCurrentValue(id);
-    const invalidReason = this.isValidValueNoExternalChecking(id, value);
+    const invalidReason = this.isValidValueNoExternalChecking(id, value, emulateExternalChecking);
     return {
       userSet: this.stateValueModified[id] || false,
       enforced: false,
@@ -890,7 +890,6 @@ export default class PropertyDefinition {
     value: PropertyDefinitionSupportedType,
     emulateExternalChecking?: boolean,
   ): PropertyInvalidReason | string {
-
     // Cache check
     if (emulateExternalChecking) {
       const hasIndex = this.isUnique();

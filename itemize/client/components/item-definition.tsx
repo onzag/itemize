@@ -1,6 +1,6 @@
 import React from "react";
 import { GraphQLEndpointErrorType } from "../../base/errors";
-import { ItemDefinitionContext, IBasicActionResponse, IActionResponseWithId } from "../app/providers";
+import { ItemDefinitionContext, IBasicActionResponse, IActionResponseWithId } from "../providers/item-definition";
 
 interface IItemDefinitionLoader {
   errorComponent?: React.ComponentType<{error: GraphQLEndpointErrorType, reload: () => Promise<IBasicActionResponse>}>;

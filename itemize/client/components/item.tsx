@@ -1,8 +1,9 @@
 import React from "react";
 import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
-import { ItemDefinitionContext, ItemContext } from "../app/providers";
+import { ItemDefinitionContext } from "../providers/item-definition";
 import ItemExclusionSwitch from "./base/ItemExclusionSwitch";
 import ItemCalloutWarning from "./base/ItemCalloutWarning";
+import { ItemContext } from "../providers/item";
 
 interface IExclusionSwitchProps {
   onChange?: (item: Item, newExclusionState: ItemExclusionState) => void;

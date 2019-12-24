@@ -1,11 +1,11 @@
 import React from "react";
-import { DataContext, LocaleContext, ILocaleContextType } from ".";
+import { LocaleContext, ILocaleContextType } from "../app";
 import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import Module from "../../base/Root/Module";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import Item, { ItemExclusionState, IItemState } from "../../base/Root/Module/ItemDefinition/Item";
-import { TokenContext, ITokenContextType } from "./internal-providers";
+import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
+import { TokenContext, ITokenContextType } from "../app/internal-providers";
 import {
   ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
   MODERATION_FIELDS,
@@ -17,10 +17,10 @@ import {
   PREFIX_ADD,
   PREFIX_DELETE,
 } from "../../constants";
-import { buildGqlQuery, buildGqlMutation, gqlQuery } from "./gql-querier";
+import { buildGqlQuery, buildGqlMutation, gqlQuery } from "../app/gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
-import uuid from "uuid";
 import equals from "deep-equal";
+import { ModuleContext } from "./module";
 
 export interface IBasicActionResponse {
   error: GraphQLEndpointErrorType;
@@ -91,18 +91,11 @@ export interface IModuleContextType {
   mod: Module;
 }
 
-export interface IItemContext {
-  item: Item;
-  state: IItemState;
-}
-
-export const ItemContext = React.createContext<IItemContext>(null);
 export const ItemDefinitionContext = React.createContext<IItemDefinitionContextType>(null);
-export const ModuleContext = React.createContext<IModuleContextType>(null);
 
 interface IItemDefinitionProviderProps {
   children: any;
-  itemDefinition: string;
+  itemDefinition?: string;
   forId?: number;
   assumeOwnership?: boolean;
   searchCounterpart?: boolean;
@@ -111,13 +104,16 @@ interface IItemDefinitionProviderProps {
     onlyIncludeProperties?: string[],
     onlyIncludeItems?: string[],
     excludePolicies?: boolean,
+    disableListener?: boolean,
   };
 }
 
 interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProps {
-  mod: Module;
   tokenData: ITokenContextType;
   localeData: ILocaleContextType;
+  itemDefinitionInstance: ItemDefinition;
+  itemDefinitionQualifiedName: string;
+  containsExternallyCheckedProperty: boolean;
 }
 
 interface IActualItemDefinitionProviderState {
@@ -162,21 +158,37 @@ const ItemDefinitionProviderRequestsInProgressRegistry: {
 class ActualItemDefinitionProvider extends
   React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
 
+  // sometimes when doing some updates when you change the item
+  // definition to another item definition (strange but ok)
+  // the state between the item and the expected state will
+  // not match, so we need to make it be the state of the
+  // item definition itself, so we make a check using the qualified name
+  public static getDerivedStateFromProps(
+    props: IActualItemDefinitionProviderProps,
+    state: IActualItemDefinitionProviderState,
+  ) {
+    if (
+      props.itemDefinitionQualifiedName !== state.itemDefinitionState.itemDefQualifiedName ||
+      (props.forId || null) !== (state.itemDefinitionState.forId || null)
+    ) {
+      return {
+        state: props.itemDefinitionInstance.getStateNoExternalChecking(
+          props.forId || null,
+          !props.disableExternalChecks,
+          props.optimize && props.optimize.onlyIncludeProperties,
+          props.optimize && props.optimize.onlyIncludeItems,
+          props.optimize && props.optimize.excludePolicies,
+        ),
+      };
+    }
+    return null;
+  }
+
   private updateTimeout: NodeJS.Timer;
   private lastUpdateId: number;
-  private itemDefinition: ItemDefinition;
-  private containsExternallyCheckedProperty: boolean;
-  private id: string;
 
   constructor(props: IActualItemDefinitionProviderProps) {
     super(props);
-
-    this.id = uuid.v4();
-
-    let valueFor = props.mod.getItemDefinitionFor(this.props.itemDefinition.split("/"));
-    if (props.searchCounterpart) {
-      valueFor = valueFor.getSearchModeCounterpart();
-    }
 
     this.onPropertyChange = this.onPropertyChange.bind(this);
     this.onItemSetExclusionState = this.onItemSetExclusionState.bind(this);
@@ -196,12 +208,11 @@ class ActualItemDefinitionProvider extends
     this.canDelete = this.canDelete.bind(this);
     this.unpoke = this.unpoke.bind(this);
 
-    valueFor.addListener(this.props.forId || null, this.listener);
-    this.itemDefinition = valueFor;
-    this.containsExternallyCheckedProperty = valueFor.containsAnExternallyCheckedProperty();
-
-    this.state = {
-      itemDefinitionState: valueFor.getStateNoExternalChecking(
+    this.state = this.setupInitialState();
+  }
+  public setupInitialState(): IActualItemDefinitionProviderState {
+    return {
+      itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
         this.props.forId || null,
         !this.props.disableExternalChecks,
         this.props.optimize && this.props.optimize.onlyIncludeProperties,
@@ -225,47 +236,45 @@ class ActualItemDefinitionProvider extends
       canCreate: this.canCreate(),
     };
   }
+  public setupListeners() {
+    this.props.itemDefinitionInstance.addListener(this.props.forId || null, this.listener);
+  }
+  public unSetupListeners() {
+    this.props.itemDefinitionInstance.removeListener(this.props.forId || null, this.listener);
+  }
   public shouldComponentUpdate(
     nextProps: IActualItemDefinitionProviderProps,
     nextState: IActualItemDefinitionProviderState,
   ) {
-    if (this.props.itemDefinition !== nextProps.itemDefinition) {
-      throw new Error(
-        "Changing item definitions is not allowed, you want to go from " +
-        this.props.itemDefinition + " to " +
-        nextProps.itemDefinition,
-      );
-    }
-    if (!!this.props.searchCounterpart !== !!nextProps.searchCounterpart) {
-      throw new Error(
-        "Changing item definitions counterpart mode is not allowed on " +
-        this.props.itemDefinition,
-      );
-    }
-    if (this.props.mod !== nextProps.mod) {
-      throw new Error(
-        "Changing modules is not allowed, you want to go from " +
-        this.props.mod.getName() + " to " +
-        nextProps.mod.getName() + " in " +
-        this.props.itemDefinition,
-      );
-    }
-    return (nextProps.forId || null) !== (this.props.forId || null) ||
+    const updatedIntoSomethingThatInvalidatesTheState =
+      this.props.itemDefinitionInstance !== nextProps.itemDefinitionInstance;
+    return updatedIntoSomethingThatInvalidatesTheState ||
+      (nextProps.forId || null) !== (this.props.forId || null) ||
       !!nextProps.assumeOwnership !== !!this.props.assumeOwnership ||
       nextProps.children !== this.props.children ||
       nextProps.localeData !== this.props.localeData ||
       nextProps.tokenData !== this.props.tokenData ||
+      !equals(this.props.optimize, nextProps.optimize) ||
       !equals(this.state, nextState);
   }
   public async componentDidUpdate(
     prevProps: IActualItemDefinitionProviderProps,
   ) {
-    if ((prevProps.forId || null) !== (this.props.forId || null)) {
-      this.itemDefinition.removeListener(prevProps.forId || null, this.listener);
-      this.itemDefinition.addListener(this.props.forId || null, this.listener);
+    const itemDefinitionWasUpdated = this.props.itemDefinitionInstance !== prevProps.itemDefinitionInstance;
+    if (itemDefinitionWasUpdated) {
+      prevProps.itemDefinitionInstance.removeListener(prevProps.forId || null, this.listener);
+    }
+
+    if (
+      (prevProps.forId || null) !== (this.props.forId || null) ||
+      !equals(this.props.optimize, prevProps.optimize) ||
+      itemDefinitionWasUpdated
+    ) {
+      prevProps.itemDefinitionInstance.removeListener(prevProps.forId || null, this.listener);
+      this.props.itemDefinitionInstance.addListener(this.props.forId || null, this.listener);
       // we set the value given we have changed the forId
       this.setState({
-        itemDefinitionState: this.itemDefinition.getStateNoExternalChecking(
+        itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
           this.props.forId || null,
           !this.props.disableExternalChecks,
           this.props.optimize && this.props.optimize.onlyIncludeProperties,
@@ -273,7 +282,7 @@ class ActualItemDefinitionProvider extends
           this.props.optimize && this.props.optimize.excludePolicies,
         ),
       });
-      if (this.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+      if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
         this.setStateToCurrentValueWithExternalChecking(null);
       }
     }
@@ -281,7 +290,8 @@ class ActualItemDefinitionProvider extends
       (prevProps.forId || null) !== (this.props.forId || null) ||
       prevProps.tokenData.id !== this.props.tokenData.id ||
       prevProps.tokenData.role !== this.props.tokenData.role ||
-      prevProps.assumeOwnership !== this.props.assumeOwnership
+      prevProps.assumeOwnership !== this.props.assumeOwnership ||
+      itemDefinitionWasUpdated
     ) {
       await this.loadValue();
 
@@ -293,18 +303,18 @@ class ActualItemDefinitionProvider extends
     }
   }
   public componentDidMount() {
-    if (this.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+    this.setupListeners();
+    if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       this.setStateToCurrentValueWithExternalChecking(null);
     }
     this.loadValue();
   }
   public listener() {
-    let valueFor = this.props.mod.getItemDefinitionFor(this.props.itemDefinition.split("/"));
-    if (this.props.searchCounterpart) {
-      valueFor = valueFor.getSearchModeCounterpart();
+    if (this.props.optimize && this.props.optimize.disableListener) {
+      return;
     }
     this.setState({
-      itemDefinitionState: valueFor.getStateNoExternalChecking(
+      itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
         this.props.forId || null,
         !this.props.disableExternalChecks,
         this.props.optimize && this.props.optimize.onlyIncludeProperties,
@@ -318,12 +328,20 @@ class ActualItemDefinitionProvider extends
       return;
     }
 
-    const qualifiedPathNameWithID = PREFIX_BUILD(this.itemDefinition.getQualifiedPathName()) + this.props.forId;
+    const qualifiedPathNameWithID = PREFIX_BUILD(
+      this.props.itemDefinitionInstance.getQualifiedPathName(),
+    ) + this.props.forId;
     if (ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID]) {
       if (
         !!ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].wasOwnershipAssumed !==
         !!this.props.assumeOwnership
       ) {
+        // TODO maybe do something about this in order to allow this behaviour as it will for istance matter
+        // where a query request is contained in another query request eg kitten {pawNumber, hairCount} and
+        // another query where kitten {pawNumber, hairCount, friends} the first is contained within the second
+        // so we could totally reuse the gqlAppliedValue rather than re-requesting due to differences?... maybe
+        // on the other hand this deletes data that might have been leaked when you log out and things reload
+        // with new credentials, as that old data, remains in the cache
         console.warn(
           "Two simultaneous requests in item definition " + this.props.itemDefinition + " for id " + this.props.forId +
           " have been launched and the ownership assumption does not match, this is a no-op, and would cause a race" +
@@ -350,7 +368,7 @@ class ActualItemDefinitionProvider extends
         requestFields.DATA[mf] = {};
       });
     }
-    this.itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+    this.props.itemDefinitionInstance.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
       if (pd.isRetrievalDisabled()) {
         return;
       }
@@ -359,9 +377,10 @@ class ActualItemDefinitionProvider extends
           ItemDefinitionIOActions.READ,
           this.props.tokenData.role,
           this.props.tokenData.id,
-          this.props.assumeOwnership ? this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(
-            this.props.forId || null,
-          ),
+          this.props.assumeOwnership ? this.props.tokenData.id :
+            this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
+              this.props.forId || null,
+            ),
           false,
         )
       ) {
@@ -375,7 +394,7 @@ class ActualItemDefinitionProvider extends
         }
       }
     });
-    this.itemDefinition.getAllItems().forEach((item) => {
+    this.props.itemDefinitionInstance.getAllItems().forEach((item) => {
       requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
 
       const qualifiedId = item.getQualifiedIdentifier();
@@ -390,9 +409,10 @@ class ActualItemDefinitionProvider extends
             ItemDefinitionIOActions.READ,
             this.props.tokenData.role,
             this.props.tokenData.id,
-            this.props.assumeOwnership ? this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(
-              this.props.forId || null,
-            ),
+            this.props.assumeOwnership ? this.props.tokenData.id :
+              this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
+                this.props.forId || null,
+              ),
             false,
           )
         ) {
@@ -416,7 +436,7 @@ class ActualItemDefinitionProvider extends
       delete requestFields.DATA;
     }
 
-    const queryName = PREFIX_GET + this.itemDefinition.getQualifiedPathName();
+    const queryName = PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName();
     const query = buildGqlQuery({
       name: queryName,
       args: {
@@ -426,7 +446,7 @@ class ActualItemDefinitionProvider extends
       },
       fields: requestFields,
     });
-    const appliedGQLValue = this.itemDefinition.getGQLAppliedValue(this.props.forId || null);
+    const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
     if (appliedGQLValue && appliedGQLValue.query === query) {
       delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
       return;
@@ -480,7 +500,7 @@ class ActualItemDefinitionProvider extends
           }
 
           const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
-          this.itemDefinition.applyValue(
+          this.props.itemDefinitionInstance.applyValue(
             this.props.forId || null,
             recievedFields,
             false,
@@ -488,8 +508,8 @@ class ActualItemDefinitionProvider extends
             this.props.tokenData.role,
             query,
           );
-          this.itemDefinition.triggerListeners(this.props.forId || null);
-          if (this.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+          this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null);
+          if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
             this.setStateToCurrentValueWithExternalChecking(null);
           }
         }
@@ -509,7 +529,7 @@ class ActualItemDefinitionProvider extends
     };
   }
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
-    const newItemDefinitionState = await this.itemDefinition.getState(
+    const newItemDefinitionState = await this.props.itemDefinitionInstance.getState(
       this.props.forId || null,
       this.props.optimize && this.props.optimize.onlyIncludeProperties,
       this.props.optimize && this.props.optimize.onlyIncludeItems,
@@ -519,7 +539,7 @@ class ActualItemDefinitionProvider extends
       this.setState({
         itemDefinitionState: newItemDefinitionState,
       });
-      this.itemDefinition.triggerListeners(this.props.forId || null, this.listener);
+      this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null, this.listener);
     }
   }
   public onPropertyChange(
@@ -531,9 +551,9 @@ class ActualItemDefinitionProvider extends
     this.lastUpdateId = currentUpdateId;
 
     property.setCurrentValue(this.props.forId || null, value, internalValue);
-    this.itemDefinition.triggerListeners(this.props.forId || null);
+    this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null);
 
-    if (this.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+    if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       clearTimeout(this.updateTimeout);
       this.updateTimeout = setTimeout(
         this.setStateToCurrentValueWithExternalChecking.bind(this, currentUpdateId),
@@ -547,26 +567,26 @@ class ActualItemDefinitionProvider extends
     givenForId: number,
   ) {
     property.setSuperEnforced(givenForId || null, value);
-    this.itemDefinition.triggerListeners(givenForId || null);
+    this.props.itemDefinitionInstance.triggerListeners(givenForId || null);
   }
   public onPropertyClearEnforce(
     property: PropertyDefinition,
     givenForId: number,
   ) {
     property.clearSuperEnforced(givenForId || null);
-    this.itemDefinition.triggerListeners(givenForId || null);
+    this.props.itemDefinitionInstance.triggerListeners(givenForId || null);
   }
   public componentWillUnmount() {
-    this.itemDefinition.removeListener(this.props.forId || null, this.listener);
+    this.unSetupListeners();
   }
   public onItemSetExclusionState(item: Item, state: ItemExclusionState) {
     const currentUpdateId = (new Date()).getTime();
     this.lastUpdateId = currentUpdateId;
 
     item.setExclusionState(this.props.forId || null, state);
-    this.itemDefinition.triggerListeners(this.props.forId || null);
+    this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null);
 
-    if (this.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+    if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       clearTimeout(this.updateTimeout);
       this.updateTimeout = setTimeout(
         this.setStateToCurrentValueWithExternalChecking.bind(this, currentUpdateId),
@@ -584,7 +604,8 @@ class ActualItemDefinitionProvider extends
           if (argumentsToCheckPropertiesAgainst) {
             // and now we need to check whether the policy is at all necessary, as in, are we modifying
             // any property that would cause this to be needed, for that we get the applying ids
-            const applyingPropertyIds = this.itemDefinition.getApplyingPropertyIdsForPolicy(policyType, policyName);
+            const applyingPropertyIds = this.props.itemDefinitionInstance
+              .getApplyingPropertyIdsForPolicy(policyType, policyName);
             // and using some yet again we check whether using the argumentsToCheckPropertiesAgainst
             // which is a gql object
             // which funnily will contain the same id in case it is there, it will tell us whether one
@@ -599,7 +620,7 @@ class ActualItemDefinitionProvider extends
           }
           // Here we are doing exactly the same as we did with applying property ids but this time
           // now we do it with the roles
-          const applyingRoles = this.itemDefinition.getRolesForPolicy(policyType, policyName);
+          const applyingRoles = this.props.itemDefinitionInstance.getRolesForPolicy(policyType, policyName);
           const oneOfApplyingRolesApplies = applyingRoles.includes(this.props.tokenData.role);
           if (!oneOfApplyingRolesApplies) {
             return false;
@@ -613,7 +634,7 @@ class ActualItemDefinitionProvider extends
           // otherwise we are going to set it in the policy arguments that go with the arguments for the
           // query
           const policyProperty =
-            this.itemDefinition
+            this.props.itemDefinitionInstance
             .getPropertyDefinitionForPolicy(policyType, policyName, propertyStateInPolicy.propertyId);
           // then we are going to set that value using the qualified identifier that is used
           // in the args
@@ -675,7 +696,7 @@ class ActualItemDefinitionProvider extends
     });
 
     const queryName = PREFIX_DELETE +
-      this.itemDefinition.getQualifiedPathName();
+      this.props.itemDefinitionInstance.getQualifiedPathName();
     const args = {
       id: this.props.forId,
       token: this.props.tokenData.token,
@@ -708,14 +729,14 @@ class ActualItemDefinitionProvider extends
         deleted: false,
       });
     } else {
-      this.itemDefinition.cleanValueFor(this.props.forId);
+      this.props.itemDefinitionInstance.cleanValueFor(this.props.forId);
       this.setState({
         deleteError: null,
         deleting: false,
         deleted: true,
         notFound: true,
       });
-      this.itemDefinition.triggerListeners(this.props.forId);
+      this.props.itemDefinitionInstance.triggerListeners(this.props.forId);
     }
 
     return {
@@ -750,7 +771,7 @@ class ActualItemDefinitionProvider extends
         }
 
         // and now we get the sinking property ids
-        const item = this.itemDefinition.getItemFor(i.itemId);
+        const item = this.props.itemDefinitionInstance.getItemFor(i.itemId);
         const sinkingPropertyIds = item.getSinkingPropertiesIds();
 
         // and we extract the state only if it's a sinking property
@@ -803,7 +824,7 @@ class ActualItemDefinitionProvider extends
     // we get the applied owner of this item, basically what we have loaded
     // for this user created_by or id if the item is marked as if its id
     // is the owner, in the case of null, the applied owner is -1
-    const appliedOwner = this.itemDefinition.getAppliedValueOwnerIfAny(
+    const appliedOwner = this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
       this.props.forId || null,
     );
 
@@ -811,16 +832,17 @@ class ActualItemDefinitionProvider extends
     // you might wonder why we check role access one by one and not the total
     // well, we literally don't care, the developer is reponsible to deny this
     // to get here, we are just building a query, not preventing a submit
-    this.itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+    this.props.itemDefinitionInstance.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
       if (
         !pd.isRetrievalDisabled() &&
         pd.checkRoleAccessFor(
           ItemDefinitionIOActions.READ,
           this.props.tokenData.role,
           this.props.tokenData.id,
-          this.props.assumeOwnership ? this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(
-            this.props.forId || null,
-          ),
+          this.props.assumeOwnership ? this.props.tokenData.id :
+            this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
+              this.props.forId || null,
+            ),
           false,
         )
       ) {
@@ -848,7 +870,7 @@ class ActualItemDefinitionProvider extends
       }
     });
 
-    this.itemDefinition.getAllItems().forEach((item) => {
+    this.props.itemDefinitionInstance.getAllItems().forEach((item) => {
       requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
       argumentsForQuery[item.getQualifiedExclusionStateIdentifier()] = item.getExclusionState(this.props.forId || null);
 
@@ -934,7 +956,7 @@ class ActualItemDefinitionProvider extends
     });
 
     const queryName = (!this.props.forId ? PREFIX_ADD : PREFIX_EDIT) +
-      this.itemDefinition.getQualifiedPathName();
+      this.props.itemDefinitionInstance.getQualifiedPathName();
     const args = {
       token: this.props.tokenData.token,
       language: this.props.localeData.language.split("-")[0],
@@ -984,7 +1006,7 @@ class ActualItemDefinitionProvider extends
       if (gqlValue.data && gqlValue.data[queryName] && gqlValue.data[queryName].id) {
         const recievedId = gqlValue.data[queryName].id;
         const representativeGetQuery = buildGqlQuery({
-          name: PREFIX_GET + this.itemDefinition.getQualifiedPathName(),
+          name: PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(),
           args: {
             id: recievedId,
             token: this.props.tokenData.token,
@@ -994,7 +1016,7 @@ class ActualItemDefinitionProvider extends
         });
 
         const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
-        this.itemDefinition.applyValue(
+        this.props.itemDefinitionInstance.applyValue(
           recievedId,
           recievedFields,
           false,
@@ -1004,15 +1026,17 @@ class ActualItemDefinitionProvider extends
         );
         if (options.propertiesToCleanOnSuccess) {
           options.propertiesToCleanOnSuccess.forEach((ptc) => {
-            this.itemDefinition.getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId);
+            this.props.itemDefinitionInstance
+              .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId);
           });
         }
         if (options.policiesToCleanOnSuccess) {
           options.policiesToCleanOnSuccess.forEach((policyArray) => {
-            this.itemDefinition.getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId);
+            this.props.itemDefinitionInstance
+              .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId);
           });
         }
-        this.itemDefinition.triggerListeners(recievedId);
+        this.props.itemDefinitionInstance.triggerListeners(recievedId);
 
         return {
           id: recievedId,
@@ -1056,12 +1080,12 @@ class ActualItemDefinitionProvider extends
     if (this.props.forId === null) {
       return false;
     }
-    return this.itemDefinition.checkRoleAccessFor(
+    return this.props.itemDefinitionInstance.checkRoleAccessFor(
       ItemDefinitionIOActions.DELETE,
       this.props.tokenData.role,
       this.props.tokenData.id,
       this.props.assumeOwnership ?
-        this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(this.props.forId),
+        this.props.tokenData.id : this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId),
       {},
       false,
     );
@@ -1070,7 +1094,7 @@ class ActualItemDefinitionProvider extends
     if (this.props.forId !== null) {
       return false;
     }
-    return this.itemDefinition.checkRoleAccessFor(
+    return this.props.itemDefinitionInstance.checkRoleAccessFor(
       ItemDefinitionIOActions.CREATE,
       this.props.tokenData.role,
       this.props.tokenData.id,
@@ -1083,12 +1107,12 @@ class ActualItemDefinitionProvider extends
     if (this.props.forId === null) {
       return false;
     }
-    return this.itemDefinition.checkRoleAccessFor(
+    return this.props.itemDefinitionInstance.checkRoleAccessFor(
       ItemDefinitionIOActions.EDIT,
       this.props.tokenData.role,
       this.props.tokenData.id,
       this.props.assumeOwnership ?
-        this.props.tokenData.id : this.itemDefinition.getAppliedValueOwnerIfAny(this.props.forId),
+        this.props.tokenData.id : this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId),
       {},
       false,
     );
@@ -1102,7 +1126,7 @@ class ActualItemDefinitionProvider extends
     return (
       <ItemDefinitionContext.Provider
         value={{
-          idef: this.itemDefinition,
+          idef: this.props.itemDefinitionInstance,
           state: this.state.itemDefinitionState,
           onPropertyChange: this.onPropertyChange,
           onItemSetExclusionState: this.onItemSetExclusionState,
@@ -1154,11 +1178,23 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                       if (!data) {
                         throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
                       }
+                      let valueFor: ItemDefinition;
+                      if (props.itemDefinition) {
+                        valueFor = data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+                        if (props.searchCounterpart) {
+                          valueFor = valueFor.getSearchModeCounterpart();
+                        }
+                      } else {
+                        valueFor = data.mod.getPropExtensionItemDefinition();
+                      }
+
                       return (
                         <ActualItemDefinitionProvider
                           localeData={localeData}
-                          mod={data.mod}
                           tokenData={tokenData}
+                          itemDefinitionInstance={valueFor}
+                          itemDefinitionQualifiedName={valueFor.getQualifiedPathName()}
+                          containsExternallyCheckedProperty={valueFor.containsAnExternallyCheckedProperty()}
                           {...props}
                         />
                       );
@@ -1172,101 +1208,4 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
       }
     </LocaleContext.Consumer>
   );
-}
-
-interface IItemProviderProps {
-  children: any;
-  item: string;
-}
-
-interface IActualItemProviderProps {
-  state: IItemState;
-  item: Item;
-}
-
-// tslint:disable-next-line: max-classes-per-file
-class ActualItemProvider extends React.Component<IActualItemProviderProps, {}> {
-  public shouldComponentUpdate(nextProps: IActualItemProviderProps) {
-    return nextProps.item !== this.props.item ||
-      !equals(this.props.state, nextProps.state);
-  }
-  public render() {
-    return (
-      <ItemContext.Provider
-        value={{
-          item: this.props.item,
-          state: this.props.state,
-        }}
-      >
-        {this.props.children}
-      </ItemContext.Provider>
-    );
-  }
-}
-
-export function ItemProvider(props: IItemProviderProps) {
-  return (
-    <ItemDefinitionContext.Consumer>
-      {
-        (itemDefinitionContextualValue) => {
-          const itemState = itemDefinitionContextualValue.state.items.find((i) => i.itemId === props.item);
-          const itemObject = itemDefinitionContextualValue.idef.getItemFor(props.item);
-          return (
-            <ActualItemProvider item={itemObject} state={itemState}/>
-          );
-        }
-      }
-    </ItemDefinitionContext.Consumer>
-  );
-}
-
-interface IModuleProviderProps {
-  children: any;
-  module?: string;
-  submodule?: string;
-}
-
-// TODO module level searches
-export function ModuleProvider(props: IModuleProviderProps) {
-  if (props.submodule) {
-    return (
-      <ModuleContext.Consumer>
-        {
-          (data) => {
-            return (
-              <ModuleContext.Provider value={{ mod: data.mod.getChildModule(props.module) }}>
-                {props.children}
-              </ModuleContext.Provider>
-            );
-          }
-        }
-      </ModuleContext.Consumer>
-    );
-  } else if (props.module) {
-    return (
-      <DataContext.Consumer>
-        {
-          (data) => {
-            return (
-              <ModuleContext.Provider value={{ mod: data.value.getModule(props.module) }}>
-                {props.children}
-              </ModuleContext.Provider>
-            );
-          }
-        }
-      </DataContext.Consumer>
-    );
-  } else {
-    return props.children;
-  }
-}
-
-// TODO
-// tslint:disable-next-line: no-empty
-export function ModuleLevelSearchProvider() {
-}
-
-// TODO
-// tslint:disable-next-line: no-empty
-export function ItemDefinitionLevelSearchProvider() {
 }

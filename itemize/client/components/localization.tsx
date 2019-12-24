@@ -1,6 +1,6 @@
 import React from "react";
 import { LocaleContext, DataContext } from "../app";
-import { ItemDefinitionContext, ItemContext } from "../app/providers";
+import { ItemDefinitionContext } from "../providers/item-definition";
 import { localeReplacerToArray, localeReplacer } from "../../util";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import Root from "../../base/Root";
@@ -8,6 +8,7 @@ import Module from "../../base/Root/Module";
 import ItemDefinition, { IItemDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition";
 import { IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../imported-resources";
+import { ItemContext } from "../providers/item";
 
 interface II18nReadProps {
   id: string;

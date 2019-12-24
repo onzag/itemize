@@ -7,7 +7,7 @@ import { GraphQLEndpointError } from "../../../itemize/base/errors";
 import { IServerSideTokenDataType } from "../resolvers/basic";
 
 export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinitionType => {
-  const userModule = appData.root.getModule("users");
+  const userModule = appData.root.getModuleFor(["users"]);
   const userIdef = userModule.getItemDefinitionFor(["user"]);
 
   const userTable = userIdef.getQualifiedPathName();

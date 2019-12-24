@@ -4,7 +4,8 @@ import { IfLogStatus } from "../../../itemize/client/components/login";
 import { I18nRead } from "../../../itemize/client/components/localization";
 import { Avatar } from "../general/avatar";
 import { LanguagePicker } from "../general/language-picker";
-import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
+import { ItemDefinitionProvider } from "../../../itemize/client/providers/item-definition";
+import { ModuleProvider } from "../../../itemize/client/providers/module";
 
 const navbarStyles = (theme: Theme) => createStyles({
   container: {
@@ -47,6 +48,7 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                   onlyIncludeItems: [],
                   onlyIncludeProperties: ["username", "app_country"],
                   excludePolicies: true,
+                  disableListener: !props.loggedUserId,
                 }}
               >
                 <IfLogStatus>

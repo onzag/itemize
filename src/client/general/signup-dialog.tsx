@@ -4,8 +4,9 @@ import { DialogResponsive } from "./dialog";
 import { Entry, Setter } from "../../../itemize/client/components/property";
 import { I18nRead, I18nReadError, AppCountryRetriever, AppLanguageRetriever, AppCurrencyRetriever } from "../../../itemize/client/components/localization";
 import { LogActioner } from "../../../itemize/client/components/login";
-import { ModuleProvider, ItemDefinitionProvider } from "../../../itemize/client/app/providers";
+import { ItemDefinitionProvider } from "../../../itemize/client/providers/item-definition";
 import { Link } from "../../../itemize/client/components/navigaton";
+import { ModuleProvider } from "../../../itemize/client/providers/module";
 
 const signupDialogStyles = createStyles({});
 
@@ -23,7 +24,7 @@ function runTwoFunctions(functionA, functionB) {
 export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialogProps) => {
   return (
     <ModuleProvider module="users">
-      <ItemDefinitionProvider itemDefinition="user">
+      <ItemDefinitionProvider itemDefinition="user" optimize={{disableListener: !props.open}}>
         <LogActioner>
           {(actioner) => (
             <I18nRead id="signup">
