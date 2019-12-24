@@ -13,6 +13,7 @@ import {
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { GraphQLEndpointError } from "../../../errors";
+import uuid from "uuid";
 
 export interface IPolicyValueRawJSONDataType {
   roles: string[];
@@ -96,6 +97,7 @@ export interface IItemDefinitionGQLValueType {
   roleRequester: string;
   query: string;
   value: any;
+  requestFields: any;
 }
 
 export interface IPolicyType {
@@ -209,10 +211,12 @@ export default class ItemDefinition {
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
   private originatingInstance: ItemDefinition;
+  private extensionsInstance: boolean = false;
 
   private listeners: {
     [id: number]: ListenerType[],
   };
+  private lastListenerCallId: string = "";
 
   // state information
   private stateHasAppliedValueTo: {
@@ -279,6 +283,14 @@ export default class ItemDefinition {
     this.stateGQLAppliedValue = {};
 
     this.listeners = [];
+  }
+
+  public setAsExtensionsInstance() {
+    this.extensionsInstance = true;
+  }
+
+  public isExtensionsInstance() {
+    return this.extensionsInstance;
   }
 
   /**
@@ -736,10 +748,11 @@ export default class ItemDefinition {
     value: {
       [key: string]: any,
     },
-    excludeExtensions?: boolean,
-    graphqlUserIdRequester?: number,
-    graphqlRoleRequester?: string,
-    graphqlQuery?: string,
+    excludeExtensions: boolean,
+    graphqlUserIdRequester: number,
+    graphqlRoleRequester: string,
+    graphqlQuery: string,
+    requestFields: any,
   ) {
     this.stateHasAppliedValueTo[id] = true;
     this.stateGQLAppliedValue[id] = {
@@ -747,6 +760,7 @@ export default class ItemDefinition {
       roleRequester: graphqlRoleRequester,
       value,
       query: graphqlQuery,
+      requestFields,
     };
 
     const properties =
@@ -993,11 +1007,22 @@ export default class ItemDefinition {
     }
   }
 
-  public triggerListeners(id: number, but?: ListenerType) {
-    if (!this.listeners[id]) {
-      return;
+  public triggerListeners(id: number, but?: ListenerType, callId?: string) {
+    if (this.lastListenerCallId !== callId) {
+      this.lastListenerCallId = callId || uuid.v4();
+      if (this.extensionsInstance) {
+        this.parentModule.getAllChildItemDefinitions().forEach((cd) => {
+          cd.triggerListeners(id, but, this.lastListenerCallId);
+        });
+      } else {
+        this.parentModule.getPropExtensionItemDefinition().triggerListeners(id, but, this.lastListenerCallId);
+      }
+
+      if (!this.listeners[id]) {
+        return;
+      }
+      this.listeners[id].filter((l) => l !== but).forEach((l) => l());
     }
-    this.listeners[id].filter((l) => l !== but).forEach((l) => l());
   }
 
   public mergeWithI18n(

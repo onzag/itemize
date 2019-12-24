@@ -393,7 +393,7 @@ export default class Item {
     this.stateExclusion[id] = exclusionState;
     this.stateExclusionModified[id] = true;
 
-    this.itemDefinition.applyValue(id, value || {}, true);
+    this.itemDefinition.applyValue(id, value || {}, true, null, null, null, null);
   }
 
   public cleanValueFor(

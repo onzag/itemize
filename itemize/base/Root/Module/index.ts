@@ -257,6 +257,7 @@ export default class Module {
       i18nData: this.rawData.i18nData,
       readRoleAccess: this.rawData.readRoleAccess,
     }, this, null);
+    this.childPropExtensionItemDefinition.setAsExtensionsInstance();
 
     this.listeners = [];
   }

@@ -22,7 +22,9 @@ interface IActualModuleProviderProps {
 
 class ActualModuleProvider extends React.Component<IActualModuleProviderProps, {}> {
   public shouldComponentUpdate(nextProps: IActualModuleProviderProps) {
-    return this.props.mod !== nextProps.mod || this.props.children !== nextProps.children;
+    return this.props.mod !== nextProps.mod ||
+      this.props.children !== nextProps.children ||
+      this.props.root !== nextProps.root;
   }
   public render() {
     return (

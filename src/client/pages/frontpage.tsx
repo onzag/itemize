@@ -10,7 +10,7 @@ import { ItemProvider } from "../../../itemize/client/providers/item";
 export function FrontPage() {
   return (
     <ModuleProvider module="test">
-      <ItemDefinitionProvider itemDefinition="vehicle">
+      {/* <ItemDefinitionProvider itemDefinition="vehicle">
         <div>
           <I18nRead id="name"/>
         </div>
@@ -22,15 +22,11 @@ export function FrontPage() {
           <ExclusionSwitch/>
           <Entry id="material_type"/>
         </ItemProvider>
-        <Entry id="vehicle_type"/>
-        <Entry id="four_wheel_drive"/>
-        <StatsForNerds
-          propertyIds={
-            [
-              "vehicle_type",
-            ]
-          }
-        />
+        <Entry id="propext_test"/>
+        <Entry id="propext_test"/>
+      </ItemDefinitionProvider> */}
+      <ItemDefinitionProvider>
+        <Entry id="propext_test"/>
       </ItemDefinitionProvider>
     </ModuleProvider>
   );

@@ -1,4 +1,4 @@
-interface IGQLQueryObj {
+export interface IGQLQueryObj {
   name: string;
   args?: {
     [key: string]: any;

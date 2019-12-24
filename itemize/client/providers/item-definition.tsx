@@ -17,7 +17,7 @@ import {
   PREFIX_ADD,
   PREFIX_DELETE,
 } from "../../constants";
-import { buildGqlQuery, buildGqlMutation, gqlQuery } from "../app/gql-querier";
+import { buildGqlQuery, buildGqlMutation, gqlQuery, IGQLQueryObj } from "../app/gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";
@@ -28,6 +28,10 @@ export interface IBasicActionResponse {
 
 export interface IActionResponseWithId extends IBasicActionResponse {
   id: number;
+}
+
+export interface IActionResponseWithManyIds extends IBasicActionResponse {
+  ids: number[];
 }
 
 type policyPathType = [string, string, string];
@@ -54,6 +58,9 @@ export interface IItemDefinitionContextType {
   deleteError: GraphQLEndpointErrorType;
   deleting: boolean;
   deleted: boolean;
+  searchError: GraphQLEndpointErrorType;
+  searching: boolean;
+  searchResuls: number[];
   poked: boolean;
   canCreate: boolean;
   canEdit: boolean;
@@ -61,6 +68,7 @@ export interface IItemDefinitionContextType {
   reload: () => Promise<IBasicActionResponse>;
   submit: (options?: IActionSubmitOptions) => Promise<IActionResponseWithId>;
   delete: () => Promise<IBasicActionResponse>;
+  search: () => Promise<IActionResponseWithManyIds>;
   onPropertyChange: (
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
@@ -84,6 +92,8 @@ export interface IItemDefinitionContextType {
   dismissSubmitted: () => void;
   dismissDeleteError: () => void;
   dismissDeleted: () => void;
+  dismissSearchError: () => void;
+  dismissSearchResults: () => void;
   unpoke: () => void;
 }
 
@@ -128,6 +138,9 @@ interface IActualItemDefinitionProviderState {
   deleteError: GraphQLEndpointErrorType;
   deleting: boolean;
   deleted: boolean;
+  searchError: GraphQLEndpointErrorType;
+  searching: boolean;
+  searchResults: number[];
   poked: boolean;
   canEdit: boolean;
   canDelete: boolean;
@@ -207,6 +220,9 @@ class ActualItemDefinitionProvider extends
     this.canCreate = this.canCreate.bind(this);
     this.canDelete = this.canDelete.bind(this);
     this.unpoke = this.unpoke.bind(this);
+    this.search = this.search.bind(this);
+    this.dismissSearchError = this.dismissSearchError.bind(this);
+    this.dismissSearchResults = this.dismissSearchResults.bind(this);
 
     this.state = this.setupInitialState();
   }
@@ -223,12 +239,19 @@ class ActualItemDefinitionProvider extends
       isBlockedButDataIsAccessible: false,
       notFound: false,
       loadError: null,
-      submitError:  null,
+
+      submitError: null,
       submitting: false,
       submitted: false,
-      deleteError:  null,
+
+      deleteError: null,
       deleting: false,
       deleted: false,
+
+      searchError: null,
+      searching: false,
+      searchResults: [],
+
       poked: false,
 
       canEdit: this.canEdit(),
@@ -248,7 +271,7 @@ class ActualItemDefinitionProvider extends
   ) {
     const updatedIntoSomethingThatInvalidatesTheState =
       this.props.itemDefinitionInstance !== nextProps.itemDefinitionInstance;
-    return updatedIntoSomethingThatInvalidatesTheState ||
+    return updatedIntoSomethingThatInvalidatesTheState ||
       (nextProps.forId || null) !== (this.props.forId || null) ||
       !!nextProps.assumeOwnership !== !!this.props.assumeOwnership ||
       nextProps.children !== this.props.children ||
@@ -323,6 +346,145 @@ class ActualItemDefinitionProvider extends
       ),
     });
   }
+  public getFieldsAndArgs(
+    options: {
+      includeArgs: boolean,
+      onlyIncludePropertiesForArgs?: string[],
+      onlyIncludeItemsForArgs?: string[],
+    },
+  ): [any, any] {
+    // so the requested fields, at base, it's just nothing
+    const requestFields: any = {
+      DATA: {},
+    };
+    // and these would be the arguments for the graphql query
+    const argumentsForQuery: any = {};
+
+    // now we go for the standard fields, and we add all of them
+    STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
+      requestFields.DATA[p] = {};
+    });
+    // we add the external ones as well
+    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
+      requestFields[p] = {};
+    });
+    // and if our role allows it, we add the moderation fields
+    if (ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(this.props.tokenData.role)) {
+      MODERATION_FIELDS.forEach((mf) => {
+        requestFields.DATA[mf] = {};
+      });
+    }
+
+    // we get the applied owner of this item, basically what we have loaded
+    // for this user created_by or id if the item is marked as if its id
+    // is the owner, in the case of null, the applied owner is -1
+    const appliedOwner = this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
+      this.props.forId || null,
+    );
+
+    // Now we get all the property definitions and extensions for the item
+    // you might wonder why we check role access one by one and not the total
+    // well, we literally don't care, the developer is reponsible to deny this
+    // to get here, we are just building a query, not preventing a submit
+    this.props.itemDefinitionInstance.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+      if (
+        !pd.isRetrievalDisabled() &&
+        pd.checkRoleAccessFor(
+          ItemDefinitionIOActions.READ,
+          this.props.tokenData.role,
+          this.props.tokenData.id,
+          this.props.assumeOwnership ? this.props.tokenData.id :
+            this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
+              this.props.forId || null,
+            ),
+          false,
+        )
+      ) {
+        requestFields.DATA[pd.getId()] = {};
+
+        const propertyDescription = pd.getPropertyDefinitionDescription();
+        if (propertyDescription.gqlFields) {
+          Object.keys(propertyDescription.gqlFields).forEach((field) => {
+            requestFields.DATA[pd.getId()][field] = {};
+          });
+        }
+      }
+
+      const shouldBeIncludedInQuery = options.includeArgs ? (
+        options.onlyIncludePropertiesForArgs ?
+          options.onlyIncludePropertiesForArgs.includes(pd.getId()) :
+          pd.checkRoleAccessFor(
+            !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
+            this.props.tokenData.role,
+            this.props.tokenData.id,
+            this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
+            false,
+          )
+      ) : false;
+      if (shouldBeIncludedInQuery) {
+        argumentsForQuery[pd.getId()] = pd.getCurrentValue(this.props.forId || null);
+      }
+    });
+
+    this.props.itemDefinitionInstance.getAllItems().forEach((item) => {
+      requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
+      argumentsForQuery[item.getQualifiedExclusionStateIdentifier()] = item.getExclusionState(this.props.forId || null);
+
+      const qualifiedId = item.getQualifiedIdentifier();
+      requestFields.DATA[qualifiedId] = {};
+      argumentsForQuery[qualifiedId] = {};
+
+      const itemShouldBeIncludedInQuery = options.includeArgs ? (
+        options.onlyIncludeItemsForArgs ?
+          options.onlyIncludeItemsForArgs.includes(item.getId()) :
+          true
+      ) : false;
+
+      item.getSinkingProperties().forEach((sp) => {
+        if (
+          !sp.isRetrievalDisabled() &&
+          sp.checkRoleAccessFor(
+            ItemDefinitionIOActions.READ,
+            this.props.tokenData.role,
+            this.props.tokenData.id,
+            this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
+            false,
+          )
+        ) {
+          requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = {};
+
+          const propertyDescription = sp.getPropertyDefinitionDescription();
+          if (propertyDescription.gqlFields) {
+            Object.keys(propertyDescription.gqlFields).forEach((field) => {
+              requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()][field] = {};
+            });
+          }
+        }
+
+        if (
+          itemShouldBeIncludedInQuery &&
+          sp.checkRoleAccessFor(
+            !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
+            this.props.tokenData.role,
+            this.props.tokenData.id,
+            this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
+            false,
+          )
+        ) {
+          argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(this.props.forId || null);
+        }
+      });
+
+      if (Object.keys(requestFields.DATA[qualifiedId]).length === 0) {
+        delete requestFields.DATA[qualifiedId];
+      }
+      if (Object.keys(argumentsForQuery[qualifiedId]).length === 0) {
+        delete argumentsForQuery[qualifiedId];
+      }
+    });
+
+    return [requestFields, argumentsForQuery];
+  }
   public async loadValue(): Promise<IBasicActionResponse> {
     if (!this.props.forId) {
       return;
@@ -354,171 +516,63 @@ class ActualItemDefinitionProvider extends
       wasOwnershipAssumed: this.props.assumeOwnership,
     };
 
-    const requestFields: any = {
-      DATA: {},
-    };
-    STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
-      requestFields.DATA[p] = {};
-    });
-    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
-      requestFields[p] = {};
-    });
-    if (ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(this.props.tokenData.role)) {
-      MODERATION_FIELDS.forEach((mf) => {
-        requestFields.DATA[mf] = {};
-      });
-    }
-    this.props.itemDefinitionInstance.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
-      if (pd.isRetrievalDisabled()) {
-        return;
-      }
-      if (
-        pd.checkRoleAccessFor(
-          ItemDefinitionIOActions.READ,
-          this.props.tokenData.role,
-          this.props.tokenData.id,
-          this.props.assumeOwnership ? this.props.tokenData.id :
-            this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
-              this.props.forId || null,
-            ),
-          false,
-        )
-      ) {
-        requestFields.DATA[pd.getId()] = {};
-
-        const propertyDescription = pd.getPropertyDefinitionDescription();
-        if (propertyDescription.gqlFields) {
-          Object.keys(propertyDescription.gqlFields).forEach((field) => {
-            requestFields.DATA[pd.getId()][field] = {};
-          });
-        }
-      }
-    });
-    this.props.itemDefinitionInstance.getAllItems().forEach((item) => {
-      requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
-
-      const qualifiedId = item.getQualifiedIdentifier();
-      requestFields.DATA[qualifiedId] = {};
-
-      item.getSinkingProperties().forEach((sp) => {
-        if (sp.isRetrievalDisabled()) {
-          return;
-        }
-        if (
-          sp.checkRoleAccessFor(
-            ItemDefinitionIOActions.READ,
-            this.props.tokenData.role,
-            this.props.tokenData.id,
-            this.props.assumeOwnership ? this.props.tokenData.id :
-              this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
-                this.props.forId || null,
-              ),
-            false,
-          )
-        ) {
-          requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = {};
-
-          const propertyDescription = sp.getPropertyDefinitionDescription();
-          if (propertyDescription.gqlFields) {
-            Object.keys(propertyDescription.gqlFields).forEach((field) => {
-              requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()][field] = {};
-            });
-          }
-        }
-      });
-
-      if (Object.keys(requestFields.DATA[qualifiedId]).length === 0) {
-        delete requestFields.DATA[qualifiedId];
-      }
+    const [requestFields] = this.getFieldsAndArgs({
+      includeArgs: false,
     });
 
-    if (Object.keys(requestFields.DATA).length === 0) {
-      delete requestFields.DATA;
-    }
+    const {
+      value,
+      error,
+      cached,
+      query,
+    } = await this.runQueryFor(
+      PREFIX_GET,
+      "query",
+      {},
+      requestFields,
+      true,
+    );
 
-    const queryName = PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName();
-    const query = buildGqlQuery({
-      name: queryName,
-      args: {
-        id: this.props.forId,
-        token: this.props.tokenData.token,
-        language: this.props.localeData.language.split("-")[0],
-      },
-      fields: requestFields,
-    });
-    const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
-    if (appliedGQLValue && appliedGQLValue.query === query) {
+    if (cached) {
       delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
       return;
     }
-    const gqlValue = await gqlQuery(query);
 
-    let error: GraphQLEndpointErrorType = null;
-    if (!gqlValue) {
-      error = {
-        message: "Failed to connect",
-        code: "CANT_CONNECT",
-      };
+    if (error) {
       this.setState({
         loadError: error,
         isBlocked: false,
         isBlockedButDataIsAccessible: false,
         notFound: false,
       });
-    } else {
-      if (gqlValue.errors) {
-        error = gqlValue.errors[0].extensions;
-        this.setState({
-          loadError: error,
-        });
-      } else {
-        this.setState({
-          loadError: null,
-        });
-      }
+    } else if (!value) {
+      this.setState({
+        loadError: null,
+        notFound: true,
+        isBlocked: false,
+        isBlockedButDataIsAccessible: false,
+      });
+    } else if (value) {
+      this.setState({
+        loadError: null,
+        notFound: false,
+        isBlocked: !!value.blocked_at,
+        isBlockedButDataIsAccessible: value.blocked_at ? !!value.DATA : false,
+      });
 
-      if (gqlValue.data) {
-        if (!gqlValue.data[queryName]) {
-          this.setState({
-            notFound: true,
-            isBlocked: false,
-            isBlockedButDataIsAccessible: false,
-          });
-        } else {
-          if (gqlValue.data[queryName].blocked_at) {
-            this.setState({
-              notFound: false,
-              isBlocked: true,
-              isBlockedButDataIsAccessible: !!gqlValue.data[queryName].DATA,
-            });
-          } else {
-            this.setState({
-              isBlocked: false,
-              notFound: false,
-              isBlockedButDataIsAccessible: false,
-            });
-          }
-
-          const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
-          this.props.itemDefinitionInstance.applyValue(
-            this.props.forId || null,
-            recievedFields,
-            false,
-            this.props.tokenData.id,
-            this.props.tokenData.role,
-            query,
-          );
-          this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null);
-          if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
-            this.setStateToCurrentValueWithExternalChecking(null);
-          }
-        }
-      } else {
-        this.setState({
-          isBlocked: false,
-          notFound: false,
-          isBlockedButDataIsAccessible: false,
-        });
+      const recievedFields = flattenRecievedFields(value);
+      this.props.itemDefinitionInstance.applyValue(
+        this.props.forId || null,
+        recievedFields,
+        false,
+        this.props.tokenData.id,
+        this.props.tokenData.role,
+        query,
+        requestFields,
+      );
+      this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null);
+      if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+        this.setStateToCurrentValueWithExternalChecking(null);
       }
     }
 
@@ -594,6 +648,115 @@ class ActualItemDefinitionProvider extends
       );
     }
   }
+  public checkItemDefinitionStateValidity(
+    options: {
+      onlyIncludeProperties?: string[],
+      onlyIncludeItems?: string[],
+    },
+  ): boolean {
+    // let's make this variable to check on whether things are invalid or not
+    // first we check every property, that is included and allowed we use some
+    // and return whether it's invalid
+    let isInvalid = this.state.itemDefinitionState.properties.some((p) => {
+      // we return false if we have an only included properties and our property is in there
+      // because that means that whether it is valid or not is irrelevant for our query
+      if (options.onlyIncludeProperties && !options.onlyIncludeProperties.includes(p.propertyId)) {
+        return false;
+      }
+      return !p.valid;
+    });
+
+    // now we check the next only is it's not already invalid
+    if (!isInvalid) {
+      // and we do this time the same but with the items
+      isInvalid = this.state.itemDefinitionState.items.some((i) => {
+        // same using the variable for only include items, same check as before
+        if (options.onlyIncludeItems && !options.onlyIncludeItems.includes(i.itemId)) {
+          return false;
+        }
+
+        // and now we get the sinking property ids
+        const item = this.props.itemDefinitionInstance.getItemFor(i.itemId);
+        const sinkingPropertyIds = item.getSinkingPropertiesIds();
+
+        // and we extract the state only if it's a sinking property
+        return i.itemDefinitionState.properties.some((p) => {
+          if (!sinkingPropertyIds.includes(p.propertyId)) {
+            return false;
+          }
+          return !p.valid;
+        });
+      });
+    }
+
+    return isInvalid;
+  }
+  public async runQueryFor(
+    queryPrefix: string,
+    queryType: "query" | "mutation",
+    baseArgs: any,
+    requestFields: any,
+    ifCachedCancel: boolean,
+  ) {
+    const queryName = queryPrefix +
+      this.props.itemDefinitionInstance.getQualifiedPathName();
+    const args = {
+      token: this.props.tokenData.token,
+      language: this.props.localeData.language.split("-")[0],
+      ...baseArgs,
+    };
+    if (this.props.forId) {
+      args.id = this.props.forId;
+    }
+
+    const objQuery: IGQLQueryObj = {
+      name: queryName,
+      args,
+      fields: requestFields,
+    };
+    let query: string;
+    if (queryType === "query") {
+      query = buildGqlQuery(objQuery);
+    } else {
+      query = buildGqlMutation(objQuery);
+    }
+
+    if (ifCachedCancel) {
+      const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
+      if (appliedGQLValue && appliedGQLValue.query === query) {
+        return {
+          error: null,
+          value: appliedGQLValue.value,
+          cached: true,
+          query,
+        };
+      }
+    }
+
+    const gqlValue = await gqlQuery(query);
+
+    let error: GraphQLEndpointErrorType = null;
+    if (!gqlValue) {
+      error = {
+        message: "Failed to connect",
+        code: "CANT_CONNECT",
+      };
+    } else if (gqlValue.errors) {
+      error = gqlValue.errors[0].extensions;
+    }
+
+    let value: any = null;
+    if (gqlValue && gqlValue.data && gqlValue.data[queryName]) {
+      value = gqlValue.data[queryName];
+    }
+
+    return {
+      error,
+      value,
+      cached: false,
+      query,
+    };
+  }
   public checkPoliciesAndGetArgs(policyType: string, argumentsToCheckPropertiesAgainst?: any): [boolean, any] {
     const applyingPolicyArgs: any = {};
     return [
@@ -635,7 +798,7 @@ class ActualItemDefinitionProvider extends
           // query
           const policyProperty =
             this.props.itemDefinitionInstance
-            .getPropertyDefinitionForPolicy(policyType, policyName, propertyStateInPolicy.propertyId);
+              .getPropertyDefinitionForPolicy(policyType, policyName, propertyStateInPolicy.propertyId);
           // then we are going to set that value using the qualified identifier that is used
           // in the args
           applyingPolicyArgs[policyProperty.getQualifiedPolicyIdentifier(policyType, policyName)] =
@@ -679,10 +842,6 @@ class ActualItemDefinitionProvider extends
       });
     }
 
-    const requestFields: any = {
-      id: {},
-    };
-
     const [isInvalid, applyingPolicyArgs] = this.checkPoliciesAndGetArgs(
       "delete",
     );
@@ -695,34 +854,19 @@ class ActualItemDefinitionProvider extends
       deleting: true,
     });
 
-    const queryName = PREFIX_DELETE +
-      this.props.itemDefinitionInstance.getQualifiedPathName();
-    const args = {
-      id: this.props.forId,
-      token: this.props.tokenData.token,
-      language: this.props.localeData.language.split("-")[0],
-      ...applyingPolicyArgs,
-    };
-    const query = buildGqlMutation({
-      name: queryName,
-      args,
-      fields: requestFields,
-    });
-    const gqlValue = await gqlQuery(query);
+    const {
+      error,
+    } = await this.runQueryFor(
+      PREFIX_DELETE,
+      applyingPolicyArgs,
+      "mutation",
+      {
+        id: {},
+      },
+      false,
+    );
 
-    let error: GraphQLEndpointErrorType = null;
-    if (!gqlValue) {
-      error = {
-        message: "Failed to connect",
-        code: "CANT_CONNECT",
-      };
-      this.setState({
-        deleteError: error,
-        deleting: false,
-        deleted: false,
-      });
-    } else if (gqlValue.errors) {
-      error = gqlValue.errors[0].extensions;
+    if (error) {
       this.setState({
         deleteError: error,
         deleting: false,
@@ -749,40 +893,7 @@ class ActualItemDefinitionProvider extends
       return;
     }
 
-    // let's make this variable to check on whether things are invalid or not
-    // first we check every property, that is included and allowed we use some
-    // and return whether it's invalid
-    let isInvalid = this.state.itemDefinitionState.properties.some((p) => {
-      // we return false if we have an only included properties and our property is in there
-      // because that means that whether it is valid or not is irrelevant for our query
-      if (options.onlyIncludeProperties && !options.onlyIncludeProperties.includes(p.propertyId)) {
-        return false;
-      }
-      return !p.valid;
-    });
-
-    // now we check the next only is it's not already invalid
-    if (!isInvalid) {
-      // and we do this time the same but with the items
-      isInvalid = this.state.itemDefinitionState.items.some((i) => {
-        // same using the variable for only include items, same check as before
-        if (options.onlyIncludeItems && !options.onlyIncludeItems.includes(i.itemId)) {
-          return false;
-        }
-
-        // and now we get the sinking property ids
-        const item = this.props.itemDefinitionInstance.getItemFor(i.itemId);
-        const sinkingPropertyIds = item.getSinkingPropertiesIds();
-
-        // and we extract the state only if it's a sinking property
-        return i.itemDefinitionState.properties.some((p) => {
-          if (!sinkingPropertyIds.includes(p.propertyId)) {
-            return false;
-          }
-          return !p.valid;
-        });
-      });
-    }
+    let isInvalid = this.checkItemDefinitionStateValidity(options);
 
     // if it's invalid let's return the emulated error
     if (isInvalid) {
@@ -799,130 +910,10 @@ class ActualItemDefinitionProvider extends
     // also we make a check later on for the policies
     // if necessary
 
-    // so the requested fields, at base, it's just nothing
-    const requestFields: any = {
-      DATA: {},
-    };
-    // and these would be the arguments for the graphql query
-    const argumentsForQuery: any = {};
-
-    // now we go for the standard fields, and we add all of them
-    STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
-      requestFields.DATA[p] = {};
-    });
-    // we add the external ones as well
-    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
-      requestFields[p] = {};
-    });
-    // and if our role allows it, we add the moderation fields
-    if (ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(this.props.tokenData.role)) {
-      MODERATION_FIELDS.forEach((mf) => {
-        requestFields.DATA[mf] = {};
-      });
-    }
-
-    // we get the applied owner of this item, basically what we have loaded
-    // for this user created_by or id if the item is marked as if its id
-    // is the owner, in the case of null, the applied owner is -1
-    const appliedOwner = this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
-      this.props.forId || null,
-    );
-
-    // Now we get all the property definitions and extensions for the item
-    // you might wonder why we check role access one by one and not the total
-    // well, we literally don't care, the developer is reponsible to deny this
-    // to get here, we are just building a query, not preventing a submit
-    this.props.itemDefinitionInstance.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
-      if (
-        !pd.isRetrievalDisabled() &&
-        pd.checkRoleAccessFor(
-          ItemDefinitionIOActions.READ,
-          this.props.tokenData.role,
-          this.props.tokenData.id,
-          this.props.assumeOwnership ? this.props.tokenData.id :
-            this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
-              this.props.forId || null,
-            ),
-          false,
-        )
-      ) {
-        requestFields.DATA[pd.getId()] = {};
-
-        const propertyDescription = pd.getPropertyDefinitionDescription();
-        if (propertyDescription.gqlFields) {
-          Object.keys(propertyDescription.gqlFields).forEach((field) => {
-            requestFields.DATA[pd.getId()][field] = {};
-          });
-        }
-      }
-
-      const shouldBeIncludedInQuery = options.onlyIncludeProperties ?
-        options.onlyIncludeProperties.includes(pd.getId()) :
-        pd.checkRoleAccessFor(
-          !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
-          this.props.tokenData.role,
-          this.props.tokenData.id,
-          this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
-          false,
-        );
-      if (shouldBeIncludedInQuery) {
-        argumentsForQuery[pd.getId()] = pd.getCurrentValue(this.props.forId || null);
-      }
-    });
-
-    this.props.itemDefinitionInstance.getAllItems().forEach((item) => {
-      requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
-      argumentsForQuery[item.getQualifiedExclusionStateIdentifier()] = item.getExclusionState(this.props.forId || null);
-
-      const qualifiedId = item.getQualifiedIdentifier();
-      requestFields.DATA[qualifiedId] = {};
-      argumentsForQuery[qualifiedId] = {};
-
-      const itemShouldBeIncludedInQuery = options.onlyIncludeItems ?
-        options.onlyIncludeItems.includes(item.getId()) :
-        true;
-
-      item.getSinkingProperties().forEach((sp) => {
-        if (
-          !sp.isRetrievalDisabled() &&
-          sp.checkRoleAccessFor(
-            ItemDefinitionIOActions.READ,
-            this.props.tokenData.role,
-            this.props.tokenData.id,
-            this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
-            false,
-          )
-        ) {
-          requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = {};
-
-          const propertyDescription = sp.getPropertyDefinitionDescription();
-          if (propertyDescription.gqlFields) {
-            Object.keys(propertyDescription.gqlFields).forEach((field) => {
-              requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()][field] = {};
-            });
-          }
-        }
-
-        if (
-          itemShouldBeIncludedInQuery &&
-          sp.checkRoleAccessFor(
-            !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
-            this.props.tokenData.role,
-            this.props.tokenData.id,
-            this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
-            false,
-          )
-        ) {
-          argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(this.props.forId || null);
-        }
-      });
-
-      if (Object.keys(requestFields.DATA[qualifiedId]).length === 0) {
-        delete requestFields.DATA[qualifiedId];
-      }
-      if (Object.keys(argumentsForQuery[qualifiedId]).length === 0) {
-        delete argumentsForQuery[qualifiedId];
-      }
+    const [requestFields, argumentsForQuery] = this.getFieldsAndArgs({
+      includeArgs: true,
+      onlyIncludeItemsForArgs: options.onlyIncludeItems,
+      onlyIncludePropertiesForArgs: options.onlyIncludeProperties,
     });
 
     // super hack in order to get the applying policy args
@@ -947,7 +938,7 @@ class ActualItemDefinitionProvider extends
           poked: true,
         });
       }
-      return this.giveEmulatedInvalidError("submitError", true)  as IActionResponseWithId;
+      return this.giveEmulatedInvalidError("submitError", true) as IActionResponseWithId;
     }
 
     // now it's when we are actually submitting
@@ -955,100 +946,75 @@ class ActualItemDefinitionProvider extends
       submitting: true,
     });
 
-    const queryName = (!this.props.forId ? PREFIX_ADD : PREFIX_EDIT) +
-      this.props.itemDefinitionInstance.getQualifiedPathName();
-    const args = {
-      token: this.props.tokenData.token,
-      language: this.props.localeData.language.split("-")[0],
-      ...argumentsForQuery,
-      ...applyingPolicyArgs,
-    };
-    if (this.props.forId) {
-      args.id = this.props.forId;
-    }
-    const query = buildGqlMutation({
-      name: queryName,
-      args,
-      fields: requestFields,
-    });
-    const gqlValue = await gqlQuery(query);
+    const {
+      value,
+      error,
+    } = await this.runQueryFor(
+      !this.props.forId ? PREFIX_ADD : PREFIX_EDIT,
+      "mutation",
+      {
+        ...argumentsForQuery,
+        ...applyingPolicyArgs,
+      },
+      requestFields,
+      false,
+    );
 
-    let error: GraphQLEndpointErrorType = null;
-    if (!gqlValue) {
-      error = {
-        message: "Failed to connect",
-        code: "CANT_CONNECT",
-      };
+    let recievedId: number = null;
+    if (error) {
       this.setState({
         submitError: error,
         submitting: false,
         submitted: false,
         poked: true,
       });
-    } else {
-      if (gqlValue.errors) {
-        error = gqlValue.errors[0].extensions;
-        this.setState({
-          submitError: error,
-          submitting: false,
-          submitted: false,
-          poked: true,
-        });
-      } else {
-        this.setState({
-          submitError: null,
-          submitting: false,
-          submitted: true,
-          poked: options.unpokeAfterSuccess ? false : true,
-        });
-      }
-
-      if (gqlValue.data && gqlValue.data[queryName] && gqlValue.data[queryName].id) {
-        const recievedId = gqlValue.data[queryName].id;
-        const representativeGetQuery = buildGqlQuery({
-          name: PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(),
-          args: {
-            id: recievedId,
-            token: this.props.tokenData.token,
-            language: this.props.localeData.language.split("-")[0],
-          },
-          fields: requestFields,
-        });
-
-        const recievedFields = flattenRecievedFields(gqlValue.data[queryName]);
-        this.props.itemDefinitionInstance.applyValue(
-          recievedId,
-          recievedFields,
-          false,
-          this.props.tokenData.id,
-          this.props.tokenData.role,
-          representativeGetQuery,
-        );
-        if (options.propertiesToCleanOnSuccess) {
-          options.propertiesToCleanOnSuccess.forEach((ptc) => {
-            this.props.itemDefinitionInstance
-              .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId);
-          });
-        }
-        if (options.policiesToCleanOnSuccess) {
-          options.policiesToCleanOnSuccess.forEach((policyArray) => {
-            this.props.itemDefinitionInstance
-              .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId);
-          });
-        }
-        this.props.itemDefinitionInstance.triggerListeners(recievedId);
-
-        return {
+    } else if (value) {
+      recievedId = value.id;
+      const representativeGetQuery = buildGqlQuery({
+        name: PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(),
+        args: {
           id: recievedId,
-          error,
-        };
+          token: this.props.tokenData.token,
+          language: this.props.localeData.language.split("-")[0],
+        },
+        fields: requestFields,
+      });
+
+      const recievedFields = flattenRecievedFields(value);
+      this.props.itemDefinitionInstance.applyValue(
+        recievedId,
+        recievedFields,
+        false,
+        this.props.tokenData.id,
+        this.props.tokenData.role,
+        representativeGetQuery,
+        requestFields,
+      );
+      if (options.propertiesToCleanOnSuccess) {
+        options.propertiesToCleanOnSuccess.forEach((ptc) => {
+          this.props.itemDefinitionInstance
+            .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId);
+        });
       }
+      if (options.policiesToCleanOnSuccess) {
+        options.policiesToCleanOnSuccess.forEach((policyArray) => {
+          this.props.itemDefinitionInstance
+            .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId);
+        });
+      }
+      this.props.itemDefinitionInstance.triggerListeners(recievedId);
     }
 
     // happens during an error or whatnot
     return {
-      id: null,
+      id: recievedId,
       error,
+    };
+  }
+  public async search() {
+    return {
+      ids: [],
+      error: null,
     };
   }
   public dismissLoadError() {
@@ -1074,6 +1040,16 @@ class ActualItemDefinitionProvider extends
   public dismissDeleted() {
     this.setState({
       deleted: false,
+    });
+  }
+  public dismissSearchError() {
+    this.setState({
+      searchError: null,
+    });
+  }
+  public dismissSearchResults() {
+    this.setState({
+      searchResults: [],
     });
   }
   public canDelete() {
@@ -1142,16 +1118,22 @@ class ActualItemDefinitionProvider extends
           deleteError: this.state.deleteError,
           deleting: this.state.deleting,
           deleted: this.state.deleted,
+          searchError: this.state.searchError,
+          searching: this.state.searching,
+          searchResuls: this.state.searchResults,
           poked: this.state.poked,
           submit: this.submit,
           reload: this.loadValue,
           delete: this.delete,
+          search: this.search,
           forId: this.props.forId || null,
           dismissLoadError: this.dismissLoadError,
           dismissSubmitError: this.dismissSubmitError,
           dismissSubmitted: this.dismissSubmitted,
           dismissDeleteError: this.dismissDeleteError,
           dismissDeleted: this.dismissDeleted,
+          dismissSearchError: this.dismissSearchError,
+          dismissSearchResults: this.dismissSearchResults,
           unpoke: this.unpoke,
           canCreate: this.state.canCreate,
           canDelete: this.state.canDelete,

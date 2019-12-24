@@ -16,6 +16,7 @@ interface IItemProviderProps {
 }
 
 interface IActualItemProviderProps {
+  children: any;
   state: IItemState;
   item: Item;
 }
@@ -24,6 +25,7 @@ interface IActualItemProviderProps {
 class ActualItemProvider extends React.Component<IActualItemProviderProps, {}> {
   public shouldComponentUpdate(nextProps: IActualItemProviderProps) {
     return nextProps.item !== this.props.item ||
+      nextProps.children !== this.props.children ||
       !equals(this.props.state, nextProps.state);
   }
   public render() {
@@ -48,7 +50,9 @@ export function ItemProvider(props: IItemProviderProps) {
           const itemState = itemDefinitionContextualValue.state.items.find((i) => i.itemId === props.item);
           const itemObject = itemDefinitionContextualValue.idef.getItemFor(props.item);
           return (
-            <ActualItemProvider item={itemObject} state={itemState}/>
+            <ActualItemProvider item={itemObject} state={itemState}>
+              {props.children}
+            </ActualItemProvider>
           );
         }
       }
