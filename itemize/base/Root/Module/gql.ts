@@ -165,7 +165,7 @@ export function getGQLQueryFieldsForModule(
 
   // now we setup the fields for the query
   let fields: IGQLQueryFieldsDefinitionType = {
-    [PREFIX_SEARCH + mod.getQualifiedPathName()]: {
+    [PREFIX_SEARCH + mod.getSearchModule().getQualifiedPathName()]: {
       type: ID_CONTAINER_GQL,
       args: {
         ...RESERVED_SEARCH_PROPERTIES,
@@ -178,7 +178,7 @@ export function getGQLQueryFieldsForModule(
           optionalForm: true,
         }),
       },
-      resolve: resolveGenericFunction.bind(null, "searchModule", mod),
+      resolve: resolveGenericFunction.bind(null, "searchModule", mod, resolvers),
     },
     [PREFIX_GET_LIST + mod.getQualifiedPathName()]: {
       type: GraphQLList(gOuput),

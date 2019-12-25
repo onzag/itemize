@@ -8,6 +8,13 @@ export interface IGQLQueryObj {
   };
 }
 
+export class GQLEnum {
+  public value: string;
+  constructor(value: string) {
+    this.value = value;
+  }
+}
+
 function buildFields(fields: {
   [key: string]: any;
 }) {
@@ -23,16 +30,36 @@ function buildFields(fields: {
   return fieldsStr;
 }
 
+function buildArgs(
+  args: {
+    [key: string]: any;
+  },
+  keyType: boolean,
+) {
+  let argsStr = keyType ? "{" : "(";
+  Object.keys(args).forEach((argKey) => {
+    argsStr += argKey + ":";
+    if (typeof (args[argKey]) === "object" && args[argKey] !== null) {
+      if (args[argKey] instanceof GQLEnum) {
+        argsStr += args[argKey].value;
+      } else {
+        argsStr += buildArgs(args[argKey], true);
+      }
+    } else {
+      argsStr += JSON.stringify(args[argKey]);
+    }
+    argsStr += ",";
+  });
+  argsStr += keyType ? "}" : ")";
+  return argsStr;
+}
+
 function buildGqlThing(type: string, ...queries: IGQLQueryObj[]) {
   let queryStr = type + "{";
   queries.forEach((q) => {
     queryStr += q.name;
     if (q.args && Object.keys(q.args).length) {
-      queryStr += "(";
-      Object.keys(q.args).forEach((argKey) => {
-        queryStr += argKey + ":" + JSON.stringify(q.args[argKey]) + ",";
-      });
-      queryStr += ")";
+      queryStr += buildArgs(q.args, false);
     }
     if (q.fields && Object.keys(q.fields).length) {
       queryStr += buildFields(q.fields);
@@ -69,4 +96,44 @@ export async function gqlQuery(query: string) {
   } catch (err) {
     return null;
   }
+}
+
+export function requestFieldsAreContained(requestFieldsSubset: any, requestFieldsMain: any): boolean {
+  const subSetKeys = Object.keys(requestFieldsSubset);
+  const mainKeys = Object.keys(requestFieldsMain);
+  if (subSetKeys.length > mainKeys.length) {
+    return false;
+  } else if (subSetKeys.length === 0 && mainKeys.length === 0) {
+    return true;
+  }
+  return subSetKeys.every((key) => {
+    if (!requestFieldsMain[key]) {
+      return false;
+    }
+
+    requestFieldsAreContained(requestFieldsSubset[key], requestFieldsMain[key]);
+  });
+}
+
+export function deepMerge(gqlValueOrFieldsOverride: any, gqlValueOfFieldsOverriden: any): any {
+  if (typeof gqlValueOrFieldsOverride !== "object" || gqlValueOrFieldsOverride === null) {
+    return gqlValueOrFieldsOverride;
+  }
+
+  const newObjMerge = {
+    ...gqlValueOfFieldsOverriden,
+  };
+
+  Object.keys(gqlValueOrFieldsOverride).forEach((key) => {
+    if (newObjMerge[key]) {
+      newObjMerge[key] = deepMerge(
+        gqlValueOrFieldsOverride[key],
+        newObjMerge[key],
+      );
+    } else {
+      newObjMerge[key] = gqlValueOrFieldsOverride[key];
+    }
+  });
+
+  return newObjMerge;
 }

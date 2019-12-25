@@ -63,13 +63,14 @@ export interface IPropertyDefinitionSupportedType {
   // the row name will be property_id and the type will be number
   // however if it's a complex value you might need to set the row
   // names and their types by hand
-  sql: ((id: string, property: PropertyDefinition) => ISQLTableDefinitionType);
+  sql: ((sqlPrefix: string, id: string, property: PropertyDefinition) => ISQLTableDefinitionType);
   // specifies how data is stored, by default it just sets the row value
   // to whatever is given, however if you have a complex value you should
   // set this, the raw function is the raw knex function, that allows to build raw queries,
   // by default if not set this function just sets {property_id: value}
   sqlIn: (
     value: PropertyDefinitionSupportedType,
+    sqlPrefix: string,
     id: string,
     property: PropertyDefinition,
     knex: Knex,
@@ -80,6 +81,7 @@ export interface IPropertyDefinitionSupportedType {
   // data[property_id]
   sqlOut: (
     row: ISQLTableRowValue,
+    sqlPrefix: string,
     id: string,
     property: PropertyDefinition,
   ) => PropertyDefinitionSupportedType;

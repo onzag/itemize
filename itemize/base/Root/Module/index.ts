@@ -197,7 +197,7 @@ export default class Module {
       // with our current raw data, null as parent module because search
       // modules are detached from their parents, and we disable
       // the generation of a search module of this same module
-      this.searchModeModule = new Module(Module.buildSearchMode(this.rawData), null, true);
+      this.searchModeModule = new Module(Module.buildSearchMode(this.rawData), this, true);
     }
 
     // if we have prop extensions in the raw data we were provided
@@ -460,6 +460,14 @@ export default class Module {
     }
 
     return resultModule;
+  }
+
+  public getStandardModule(): Module {
+    if (this.searchModeModule) {
+      throw new Error("No standard module for " + this.getName());
+    }
+
+    return this.parentModule;
   }
 
   public getSearchModule(): Module {

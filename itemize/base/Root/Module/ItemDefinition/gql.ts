@@ -248,7 +248,7 @@ export function getGQLQueryFieldsForItemDefinition(
       resolve: resolveGenericFunction.bind(null, "getItemDefinitionList", itemDefinition, resolvers),
     },
     // now this is the search query
-    [PREFIX_SEARCH + itemDefinition.getQualifiedPathName()]: {
+    [PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()]: {
       type: ID_CONTAINER_GQL,
       args: {
         ...RESERVED_SEARCH_PROPERTIES,

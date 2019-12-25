@@ -10,6 +10,7 @@ import {
   SELF_METAROLE,
   ANYONE_LOGGED_METAROLE,
   GUEST_METAROLE,
+  UNSPECIFIED_OWNER,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { GraphQLEndpointError } from "../../../errors";
@@ -796,9 +797,9 @@ export default class ItemDefinition {
     }
 
     if (this.isOwnerObjectId()) {
-      return this.stateGQLAppliedValue[id].value.id || -1;
+      return this.stateGQLAppliedValue[id].value.id || UNSPECIFIED_OWNER;
     }
-    return this.stateGQLAppliedValue[id].value.created_by || -1;
+    return this.stateGQLAppliedValue[id].value.created_by || UNSPECIFIED_OWNER;
   }
 
   public cleanValueFor(id: number, excludeExtensions?: boolean) {
@@ -830,7 +831,16 @@ export default class ItemDefinition {
    * same item definition
    */
   public getSearchModeCounterpart(): ItemDefinition {
+    if (this.isExtensionsInstance()) {
+      return this.parentModule.getSearchModule().getPropExtensionItemDefinition();
+    }
     return this.parentModule.getSearchModule().getItemDefinitionFor(
+      this.getModulePath(),
+    );
+  }
+
+  public getStandardCounterpart(): ItemDefinition {
+    return this.parentModule.getStandardModule().getItemDefinitionFor(
       this.getModulePath(),
     );
   }

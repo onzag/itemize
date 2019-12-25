@@ -11,14 +11,14 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   nullableDefault: "",
   sql: getStandardSQLFnFor("text"),
-  sqlIn: (value: PropertyDefinitionSupportedPasswordType, id, property, knex) => {
+  sqlIn: (value: PropertyDefinitionSupportedPasswordType, sqlPrefix, id, property, knex) => {
     if (value === null) {
       return  {
-        [id]: null,
+        [sqlPrefix + id]: null,
       };
     }
     return  {
-      [id]: knex.raw("crypt(?, gen_salt('bf',10))", value),
+      [sqlPrefix + id]: knex.raw("crypt(?, gen_salt('bf',10))", value),
     };
   },
   sqlOut: standardSQLOutFn,

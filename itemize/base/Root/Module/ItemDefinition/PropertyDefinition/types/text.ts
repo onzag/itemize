@@ -21,12 +21,15 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   nullableDefault: "",
   supportedSubtypes: ["html"],
-  sql: (id: string) => {
+  sql: (sqlPrefix: string, id: string) => {
     return {
-      [id]: {
+      [sqlPrefix + id]: {
         type: "text",
       },
-      [id + "_VECTOR"]: {
+      [sqlPrefix + id + "_DICTIONARY"]: {
+        type: "regconfig",
+      },
+      [sqlPrefix + id + "_VECTOR"]: {
         type: "tsvector",
         index: "gin",
       },
@@ -34,13 +37,15 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
   sqlIn: (
     value: PropertyDefinitionSupportedTextType,
+    sqlPrefix: string,
     id: string, property: PropertyDefinition,
     knex: Knex, dictionary: string,
   ) => {
     if (value === null) {
       return {
-        [id]: null,
-        [id + "_VECTOR"]: null,
+        [sqlPrefix + id]: null,
+        [sqlPrefix + id + "_VECTOR"]: null,
+        [sqlPrefix + id + "_DICTIONARY"]: dictionary,
       };
     }
 
@@ -57,6 +62,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     return {
       [id]: purifiedText,
+      [id + "_DICTIONARY"]: dictionary,
       [id + "_VECTOR"]: knex.raw(
         "to_tsvector(?, ?)",
         [
@@ -68,15 +74,14 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
   sqlOut: standardSQLOutFn,
   sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any, dictionary: string) => {
-    // TODO we need the fts_language here to pass to the ts_vector
     const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + id;
 
     if (typeof data[searchName] !== "undefined" && data[searchName] !== null) {
       knexBuilder.andWhereRaw(
-        "?? @@ to_tsquery(?, ?)",
+        "?? @@ to_tsquery(??, ?)",
         [
           sqlPrefix + id + "_VECTOR",
-          dictionary,
+          sqlPrefix + id + "_DICTIONARY",
           data[searchName],
         ],
       );

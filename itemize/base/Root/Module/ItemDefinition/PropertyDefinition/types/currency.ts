@@ -32,28 +32,29 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: GraphQLNonNull(GraphQLString),
     },
   },
-  sql: (id) => {
-    const obj = {};
-    obj[id + "_VALUE"] = {type: "float"};
-    obj[id + "_CURRENCY"] = {type: "text"};
-    return obj;
+  sql: (sqlPrefix, id) => {
+    return {
+      [sqlPrefix + id + "_VALUE"]: {type: "float"},
+      [sqlPrefix + id + "_CURRENCY"]: {type: "text"},
+    };
   },
-  sqlIn: (value: IPropertyDefinitionSupportedCurrencyType, id: string) => {
-    const obj = {};
-
+  sqlIn: (value: IPropertyDefinitionSupportedCurrencyType, sqlPrefix: string, id: string) => {
     if (value === null) {
-      obj[id + "_VALUE"] = null;
-      obj[id + "_CURRENCY"] = null;
-    } else {
-      obj[id + "_VALUE"] = value.value;
-      obj[id + "_CURRENCY"] = value.currency;
+      return {
+        [sqlPrefix + id + "_VALUE"]: null,
+        [sqlPrefix + id + "_CURRENCY"]: null,
+      };
     }
-    return obj;
+
+    return {
+      [sqlPrefix + id + "_VALUE"]: value.value,
+      [sqlPrefix + id + "_CURRENCY"]: value.currency,
+    };
   },
-  sqlOut: (data: {[key: string]: any}, id: string) => {
+  sqlOut: (data: {[key: string]: any}, sqlPrefix: string, id: string) => {
     const result: IPropertyDefinitionSupportedCurrencyType = {
-      value: data[id + "_VALUE"],
-      currency: data[id + "_CURRENCY"],
+      value: data[sqlPrefix + id + "_VALUE"],
+      currency: data[sqlPrefix + id + "_CURRENCY"],
     };
     if (result.value === null) {
       return null;

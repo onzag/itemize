@@ -1,6 +1,6 @@
 import React from "react";
 import { GraphQLEndpointErrorType } from "../../base/errors";
-import { ItemDefinitionContext, IBasicActionResponse, IActionResponseWithId } from "../providers/item-definition";
+import { ItemDefinitionContext, IBasicActionResponse, IActionResponseWithId, IActionResponseWithManyIds } from "../providers/item-definition";
 
 interface IItemDefinitionLoader {
   errorComponent?: React.ComponentType<{error: GraphQLEndpointErrorType, reload: () => Promise<IBasicActionResponse>}>;
@@ -9,6 +9,7 @@ interface IItemDefinitionLoader {
   children: any;
 }
 
+// TODO optimize
 /**
  * This safe element assumes success and will render success unless proven
  * otherwise, there's no loading, it will use whatever it has stored meanwhile
@@ -68,6 +69,7 @@ interface ISubmitActionerProps {
   }) => any;
 }
 
+// TODO optimize
 export function SubmitActioner(props: ISubmitActionerProps) {
   return (
     <ItemDefinitionContext.Consumer>{
@@ -79,6 +81,35 @@ export function SubmitActioner(props: ISubmitActionerProps) {
           submit: itemDefinitionContext.submit,
           dismissError: itemDefinitionContext.dismissSubmitError,
           dismissSubmitted: itemDefinitionContext.dismissSubmitted,
+        })
+      )
+    }</ItemDefinitionContext.Consumer>
+  );
+}
+
+interface ISearchActionerProps {
+  children: (arg: {
+    searchError: GraphQLEndpointErrorType;
+    dismissSearchResults: () => void;
+    dismissSearchError: () => void;
+    searching: boolean;
+    searchResults: number[];
+    search: () => Promise<IActionResponseWithManyIds>;
+  }) => any;
+}
+
+// TODO optimize
+export function SearchActioner(props: ISearchActionerProps) {
+  return (
+    <ItemDefinitionContext.Consumer>{
+      (itemDefinitionContext) => (
+        props.children({
+          searchError: itemDefinitionContext.searchError,
+          searching: itemDefinitionContext.searching,
+          searchResults: itemDefinitionContext.searchResuls,
+          search: itemDefinitionContext.search,
+          dismissSearchResults: itemDefinitionContext.dismissSearchResults,
+          dismissSearchError: itemDefinitionContext.dismissSearchError,
         })
       )
     }</ItemDefinitionContext.Consumer>

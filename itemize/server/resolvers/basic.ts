@@ -83,7 +83,7 @@ export function buildColumnNamesForModuleTableOnly(requestedFields: any, mod: Mo
       // what it splits on, the function returns an object
       // eg. kitten_SIZE: {type: float, ...} kitten_VALUE
       // so we want only the keys with represent column names
-      result = result.concat(Object.keys(propDescription.sql(key, property)));
+      result = result.concat(Object.keys(propDescription.sql("", key, property)));
     }
   });
 
@@ -154,7 +154,7 @@ export function buildColumnNamesForItemDefinitionTableOnly(
       // to prefix that thing
       // basically the same that we did in the module, but also passing
       // the prefix
-      result = result.concat(Object.keys(propDescription.sql(prefix + key, property)));
+      result = result.concat(Object.keys(propDescription.sql(prefix, key, property)));
     }
   });
 

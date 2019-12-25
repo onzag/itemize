@@ -6,27 +6,28 @@ import { Entry } from "../../../itemize/client/components/property";
 import { StatsForNerds } from "../../../itemize/client/components/dev";
 import { ModuleProvider } from "../../../itemize/client/providers/module";
 import { ItemProvider } from "../../../itemize/client/providers/item";
+import { SearchActioner } from "../../../itemize/client/components/item-definition";
 
 export function FrontPage() {
   return (
     <ModuleProvider module="test">
-      {/* <ItemDefinitionProvider itemDefinition="vehicle">
+      <ItemDefinitionProvider searchCounterpart={true}>
         <div>
           <I18nRead id="name"/>
         </div>
-        <ItemProvider item="chasis">
+        {/* <ItemProvider item="chasis">
           <div>
             <I18nRead id="name"/>
           </div>
-          <CalloutWarning/>
-          <ExclusionSwitch/>
-          <Entry id="material_type"/>
-        </ItemProvider>
-        <Entry id="propext_test"/>
-        <Entry id="propext_test"/>
-      </ItemDefinitionProvider> */}
-      <ItemDefinitionProvider>
-        <Entry id="propext_test"/>
+          <Entry id="material_type" searchVariant="exact"/>
+        </ItemProvider> */}
+        <Entry id="propext_test" searchVariant="search"/>
+
+        <SearchActioner>
+          {(actioner) => {
+            return <button onClick={actioner.search}>search</button>;
+          }}
+        </SearchActioner>
       </ItemDefinitionProvider>
     </ModuleProvider>
   );

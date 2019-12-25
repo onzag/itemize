@@ -16,8 +16,10 @@ import {
   PREFIX_EDIT,
   PREFIX_ADD,
   PREFIX_DELETE,
+  UNSPECIFIED_OWNER,
+  PREFIX_SEARCH,
 } from "../../constants";
-import { buildGqlQuery, buildGqlMutation, gqlQuery, IGQLQueryObj } from "../app/gql-querier";
+import { buildGqlQuery, buildGqlMutation, gqlQuery, IGQLQueryObj, requestFieldsAreContained, deepMerge, GQLEnum } from "../app/gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";
@@ -349,10 +351,13 @@ class ActualItemDefinitionProvider extends
   public getFieldsAndArgs(
     options: {
       includeArgs: boolean,
+      includeFields: boolean,
       onlyIncludePropertiesForArgs?: string[],
       onlyIncludeItemsForArgs?: string[],
+      forThisItemDefinitionInstanceInstead?: ItemDefinition,
+      forAnUnspecifiedOwner?: boolean,
     },
-  ): [any, any] {
+  ) {
     // so the requested fields, at base, it's just nothing
     const requestFields: any = {
       DATA: {},
@@ -378,25 +383,30 @@ class ActualItemDefinitionProvider extends
     // we get the applied owner of this item, basically what we have loaded
     // for this user created_by or id if the item is marked as if its id
     // is the owner, in the case of null, the applied owner is -1
-    const appliedOwner = this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
-      this.props.forId || null,
-    );
+    const appliedOwner = options.forAnUnspecifiedOwner ?
+      UNSPECIFIED_OWNER :
+      (this.props.assumeOwnership ?
+        this.props.tokenData.id :
+        (options.forThisItemDefinitionInstanceInstead || this.props.itemDefinitionInstance)
+          .getAppliedValueOwnerIfAny(
+            this.props.forId || null,
+          )
+      );
 
     // Now we get all the property definitions and extensions for the item
     // you might wonder why we check role access one by one and not the total
     // well, we literally don't care, the developer is reponsible to deny this
     // to get here, we are just building a query, not preventing a submit
-    this.props.itemDefinitionInstance.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+    (options.forThisItemDefinitionInstanceInstead || this.props.itemDefinitionInstance)
+    .getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
       if (
+        options.includeFields &&
         !pd.isRetrievalDisabled() &&
         pd.checkRoleAccessFor(
           ItemDefinitionIOActions.READ,
           this.props.tokenData.role,
           this.props.tokenData.id,
-          this.props.assumeOwnership ? this.props.tokenData.id :
-            this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
-              this.props.forId || null,
-            ),
+          appliedOwner,
           false,
         )
       ) {
@@ -417,7 +427,7 @@ class ActualItemDefinitionProvider extends
             !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
             this.props.tokenData.role,
             this.props.tokenData.id,
-            this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
+            appliedOwner,
             false,
           )
       ) : false;
@@ -426,7 +436,8 @@ class ActualItemDefinitionProvider extends
       }
     });
 
-    this.props.itemDefinitionInstance.getAllItems().forEach((item) => {
+    (options.forThisItemDefinitionInstanceInstead || this.props.itemDefinitionInstance)
+    .getAllItems().forEach((item) => {
       requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
       argumentsForQuery[item.getQualifiedExclusionStateIdentifier()] = item.getExclusionState(this.props.forId || null);
 
@@ -442,12 +453,13 @@ class ActualItemDefinitionProvider extends
 
       item.getSinkingProperties().forEach((sp) => {
         if (
+          options.includeFields &&
           !sp.isRetrievalDisabled() &&
           sp.checkRoleAccessFor(
             ItemDefinitionIOActions.READ,
             this.props.tokenData.role,
             this.props.tokenData.id,
-            this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
+            appliedOwner,
             false,
           )
         ) {
@@ -467,7 +479,7 @@ class ActualItemDefinitionProvider extends
             !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
             this.props.tokenData.role,
             this.props.tokenData.id,
-            this.props.assumeOwnership ? this.props.tokenData.id : appliedOwner,
+            appliedOwner,
             false,
           )
         ) {
@@ -483,7 +495,7 @@ class ActualItemDefinitionProvider extends
       }
     });
 
-    return [requestFields, argumentsForQuery];
+    return {requestFields, argumentsForQuery};
   }
   public async loadValue(): Promise<IBasicActionResponse> {
     if (!this.props.forId) {
@@ -516,21 +528,21 @@ class ActualItemDefinitionProvider extends
       wasOwnershipAssumed: this.props.assumeOwnership,
     };
 
-    const [requestFields] = this.getFieldsAndArgs({
+    const { requestFields } = this.getFieldsAndArgs({
       includeArgs: false,
+      includeFields: true,
     });
 
     const {
       value,
       error,
       cached,
-      query,
+      getQuery,
+      getQueryFields,
     } = await this.runQueryFor(
       PREFIX_GET,
-      "query",
       {},
       requestFields,
-      true,
     );
 
     if (cached) {
@@ -567,8 +579,8 @@ class ActualItemDefinitionProvider extends
         false,
         this.props.tokenData.id,
         this.props.tokenData.role,
-        query,
-        requestFields,
+        getQuery,
+        getQueryFields,
       );
       this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null);
       if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
@@ -649,7 +661,7 @@ class ActualItemDefinitionProvider extends
     }
   }
   public checkItemDefinitionStateValidity(
-    options: {
+    options?: {
       onlyIncludeProperties?: string[],
       onlyIncludeItems?: string[],
     },
@@ -660,7 +672,7 @@ class ActualItemDefinitionProvider extends
     let isInvalid = this.state.itemDefinitionState.properties.some((p) => {
       // we return false if we have an only included properties and our property is in there
       // because that means that whether it is valid or not is irrelevant for our query
-      if (options.onlyIncludeProperties && !options.onlyIncludeProperties.includes(p.propertyId)) {
+      if (options && options.onlyIncludeProperties && !options.onlyIncludeProperties.includes(p.propertyId)) {
         return false;
       }
       return !p.valid;
@@ -671,7 +683,7 @@ class ActualItemDefinitionProvider extends
       // and we do this time the same but with the items
       isInvalid = this.state.itemDefinitionState.items.some((i) => {
         // same using the variable for only include items, same check as before
-        if (options.onlyIncludeItems && !options.onlyIncludeItems.includes(i.itemId)) {
+        if (options && options.onlyIncludeItems && !options.onlyIncludeItems.includes(i.itemId)) {
           return false;
         }
 
@@ -693,13 +705,13 @@ class ActualItemDefinitionProvider extends
   }
   public async runQueryFor(
     queryPrefix: string,
-    queryType: "query" | "mutation",
     baseArgs: any,
     requestFields: any,
-    ifCachedCancel: boolean,
   ) {
     const queryName = queryPrefix +
-      this.props.itemDefinitionInstance.getQualifiedPathName();
+      (this.props.itemDefinitionInstance.isExtensionsInstance() ?
+      this.props.itemDefinitionInstance.getParentModule().getQualifiedPathName() :
+      this.props.itemDefinitionInstance.getQualifiedPathName());
     const args = {
       token: this.props.tokenData.token,
       language: this.props.localeData.language.split("-")[0],
@@ -708,27 +720,38 @@ class ActualItemDefinitionProvider extends
     if (this.props.forId) {
       args.id = this.props.forId;
     }
+    if (queryPrefix === PREFIX_SEARCH) {
+      args.order_by = new GQLEnum("DEFAULT");
+    }
 
     const objQuery: IGQLQueryObj = {
       name: queryName,
       args,
       fields: requestFields,
     };
+
     let query: string;
-    if (queryType === "query") {
+    if (queryPrefix === PREFIX_GET || queryPrefix === PREFIX_SEARCH) {
       query = buildGqlQuery(objQuery);
     } else {
       query = buildGqlMutation(objQuery);
     }
 
-    if (ifCachedCancel) {
-      const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
-      if (appliedGQLValue && appliedGQLValue.query === query) {
+    const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
+    if (queryPrefix === PREFIX_GET) {
+      if (
+        appliedGQLValue &&
+        (
+          appliedGQLValue.query === query ||
+          requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
+        )
+      ) {
         return {
           error: null,
           value: appliedGQLValue.value,
           cached: true,
-          query,
+          getQuery: appliedGQLValue.query,
+          getQueryFields: appliedGQLValue.requestFields,
         };
       }
     }
@@ -746,15 +769,49 @@ class ActualItemDefinitionProvider extends
     }
 
     let value: any = null;
+    let mergedQueryFields: any = null;
     if (gqlValue && gqlValue.data && gqlValue.data[queryName]) {
       value = gqlValue.data[queryName];
+      if (
+        queryPrefix === PREFIX_GET ||
+        queryPrefix === PREFIX_EDIT ||
+        queryPrefix === PREFIX_ADD
+      ) {
+        value = flattenRecievedFields(value);
+        if (appliedGQLValue && appliedGQLValue.value) {
+          value = deepMerge(
+            value,
+            appliedGQLValue.value,
+          );
+          mergedQueryFields = deepMerge(
+            requestFields,
+            appliedGQLValue.requestFields,
+          );
+        }
+      }
+    }
+
+    let getQuery: string = null;
+    if (queryPrefix === PREFIX_GET) {
+      getQuery = query;
+    } else if (queryPrefix === PREFIX_EDIT || queryPrefix === PREFIX_ADD) {
+      getQuery = buildGqlQuery({
+        name: PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(),
+        args: {
+          id: value && value.id,
+          token: this.props.tokenData.token,
+          language: this.props.localeData.language.split("-")[0],
+        },
+        fields: mergedQueryFields || requestFields,
+      });
     }
 
     return {
       error,
       value,
       cached: false,
-      query,
+      getQuery,
+      getQueryFields: mergedQueryFields || requestFields,
     };
   }
   public checkPoliciesAndGetArgs(policyType: string, argumentsToCheckPropertiesAgainst?: any): [boolean, any] {
@@ -810,7 +867,11 @@ class ActualItemDefinitionProvider extends
       applyingPolicyArgs,
     ];
   }
-  public giveEmulatedInvalidError(stateApplied: string, withId: boolean): IActionResponseWithId | IBasicActionResponse {
+  public giveEmulatedInvalidError(
+    stateApplied: string,
+    withId: boolean,
+    withIds: boolean,
+  ): IActionResponseWithId | IBasicActionResponse | IActionResponseWithManyIds {
     const emulatedError: GraphQLEndpointErrorType = {
       message: "Submit refused due to invalid information in form fields",
       code: "INVALID_DATA_SUBMIT_REFUSED",
@@ -824,6 +885,11 @@ class ActualItemDefinitionProvider extends
         id: null,
         error: emulatedError,
       };
+    } else if (withIds) {
+      return {
+        ids: [],
+        error: emulatedError,
+      };
     } else {
       return {
         error: emulatedError,
@@ -832,14 +898,7 @@ class ActualItemDefinitionProvider extends
   }
   public async delete(): Promise<IBasicActionResponse> {
     if (this.state.deleting || this.props.forId === null) {
-      return;
-    }
-
-    // if it's not poked already, let's poke it
-    if (!this.state.poked) {
-      this.setState({
-        poked: true,
-      });
+      return null;
     }
 
     const [isInvalid, applyingPolicyArgs] = this.checkPoliciesAndGetArgs(
@@ -847,7 +906,13 @@ class ActualItemDefinitionProvider extends
     );
 
     if (isInvalid) {
-      return this.giveEmulatedInvalidError("deleteError", false);
+      // if it's not poked already, let's poke it
+      if (!this.state.poked) {
+        this.setState({
+          poked: true,
+        });
+      }
+      return this.giveEmulatedInvalidError("deleteError", false, false);
     }
 
     this.setState({
@@ -859,11 +924,9 @@ class ActualItemDefinitionProvider extends
     } = await this.runQueryFor(
       PREFIX_DELETE,
       applyingPolicyArgs,
-      "mutation",
       {
         id: {},
       },
-      false,
     );
 
     if (error) {
@@ -871,6 +934,7 @@ class ActualItemDefinitionProvider extends
         deleteError: error,
         deleting: false,
         deleted: false,
+        poked: true,
       });
     } else {
       this.props.itemDefinitionInstance.cleanValueFor(this.props.forId);
@@ -879,6 +943,7 @@ class ActualItemDefinitionProvider extends
         deleting: false,
         deleted: true,
         notFound: true,
+        poked: true,
       });
       this.props.itemDefinitionInstance.triggerListeners(this.props.forId);
     }
@@ -890,7 +955,7 @@ class ActualItemDefinitionProvider extends
   public async submit(options: IActionSubmitOptions = {}): Promise<IActionResponseWithId> {
     // if we are already submitting, we reject the action
     if (this.state.submitting) {
-      return;
+      return null;
     }
 
     let isInvalid = this.checkItemDefinitionStateValidity(options);
@@ -903,15 +968,19 @@ class ActualItemDefinitionProvider extends
           poked: true,
         });
       }
-      return this.giveEmulatedInvalidError("submitError", true) as IActionResponseWithId;
+      return this.giveEmulatedInvalidError("submitError", true, false) as IActionResponseWithId;
     }
 
     // now we are going to build our query
     // also we make a check later on for the policies
     // if necessary
 
-    const [requestFields, argumentsForQuery] = this.getFieldsAndArgs({
+    const {
+      requestFields,
+      argumentsForQuery,
+    } = this.getFieldsAndArgs({
       includeArgs: true,
+      includeFields: true,
       onlyIncludeItemsForArgs: options.onlyIncludeItems,
       onlyIncludePropertiesForArgs: options.onlyIncludeProperties,
     });
@@ -938,7 +1007,7 @@ class ActualItemDefinitionProvider extends
           poked: true,
         });
       }
-      return this.giveEmulatedInvalidError("submitError", true) as IActionResponseWithId;
+      return this.giveEmulatedInvalidError("submitError", true, false) as IActionResponseWithId;
     }
 
     // now it's when we are actually submitting
@@ -949,15 +1018,15 @@ class ActualItemDefinitionProvider extends
     const {
       value,
       error,
+      getQuery,
+      getQueryFields,
     } = await this.runQueryFor(
       !this.props.forId ? PREFIX_ADD : PREFIX_EDIT,
-      "mutation",
       {
         ...argumentsForQuery,
         ...applyingPolicyArgs,
       },
       requestFields,
-      false,
     );
 
     let recievedId: number = null;
@@ -969,17 +1038,14 @@ class ActualItemDefinitionProvider extends
         poked: true,
       });
     } else if (value) {
-      recievedId = value.id;
-      const representativeGetQuery = buildGqlQuery({
-        name: PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(),
-        args: {
-          id: recievedId,
-          token: this.props.tokenData.token,
-          language: this.props.localeData.language.split("-")[0],
-        },
-        fields: requestFields,
+      this.setState({
+        submitError: null,
+        submitting: false,
+        submitted: true,
+        poked: !options.unpokeAfterSuccess,
       });
 
+      recievedId = value.id;
       const recievedFields = flattenRecievedFields(value);
       this.props.itemDefinitionInstance.applyValue(
         recievedId,
@@ -987,8 +1053,8 @@ class ActualItemDefinitionProvider extends
         false,
         this.props.tokenData.id,
         this.props.tokenData.role,
-        representativeGetQuery,
-        requestFields,
+        getQuery,
+        getQueryFields,
       );
       if (options.propertiesToCleanOnSuccess) {
         options.propertiesToCleanOnSuccess.forEach((ptc) => {
@@ -1011,7 +1077,63 @@ class ActualItemDefinitionProvider extends
       error,
     };
   }
-  public async search() {
+  public async search(): Promise<IActionResponseWithManyIds> {
+    if (this.state.searching) {
+      return null;
+    }
+    const isInvalid = this.checkItemDefinitionStateValidity();
+
+    if (!this.state.poked) {
+      this.setState({
+        poked: true,
+      });
+    }
+
+    // if it's invalid let's return the emulated error
+    if (isInvalid) {
+      return this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithManyIds;
+    }
+
+    this.setState({
+      searching: true,
+    });
+
+    const {
+      argumentsForQuery,
+    } = this.getFieldsAndArgs({
+      includeArgs: true,
+      includeFields: false,
+    });
+
+    const {
+      value,
+      error,
+    } = await this.runQueryFor(
+      PREFIX_SEARCH,
+      argumentsForQuery,
+      {
+        ids: {},
+      },
+    );
+
+    const searchResults: number[] = [];
+    if (error) {
+      this.setState({
+        searchError: error,
+        searching: false,
+        searchResults,
+        poked: true,
+      });
+    } else {
+      // TODO get the search results, can't remember how they come
+      this.setState({
+        searchError: null,
+        searching: false,
+        searchResults: value ? value.ids : [],
+        poked: true,
+      });
+    }
+
     return {
       ids: [],
       error: null,
@@ -1163,11 +1285,11 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                       let valueFor: ItemDefinition;
                       if (props.itemDefinition) {
                         valueFor = data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
-                        if (props.searchCounterpart) {
-                          valueFor = valueFor.getSearchModeCounterpart();
-                        }
                       } else {
                         valueFor = data.mod.getPropExtensionItemDefinition();
+                      }
+                      if (props.searchCounterpart) {
+                        valueFor = valueFor.getSearchModeCounterpart();
                       }
 
                       return (

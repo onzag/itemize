@@ -42,44 +42,44 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: GraphQLNonNull(GraphQLString),
     },
   },
-  sql: (id: string) => {
+  sql: (sqlPrefix: string, id: string) => {
     return {
-      [id + "_VALUE"]: {
+      [sqlPrefix + id + "_VALUE"]: {
         type: "float",
       },
-      [id + "_UNIT"]: {
+      [sqlPrefix + id + "_UNIT"]: {
         type: "text",
       },
-      [id + "_NORMALIZED_VALUE"]: {
+      [sqlPrefix + id + "_NORMALIZED_VALUE"]: {
         type: "float",
       },
-      [id + "_NORMALIZED_UNIT"]: {
+      [sqlPrefix + id + "_NORMALIZED_UNIT"]: {
         type: "text",
       },
     };
   },
-  sqlIn: (value: IPropertyDefinitionSupportedUnitType, id: string) => {
+  sqlIn: (value: IPropertyDefinitionSupportedUnitType, sqlPrefix: string, id: string) => {
     if (value === null) {
       return {
-        [id + "_VALUE"]: null,
-        [id + "_UNIT"]: null,
-        [id + "_NORMALIZED_VALUE"]: null,
-        [id + "_NORMALIZED_UNIT"]: null,
+        [sqlPrefix + id + "_VALUE"]: null,
+        [sqlPrefix + id + "_UNIT"]: null,
+        [sqlPrefix + id + "_NORMALIZED_VALUE"]: null,
+        [sqlPrefix + id + "_NORMALIZED_UNIT"]: null,
       };
     }
     return {
-      [id + "_VALUE"]: value.value,
-      [id + "_UNIT"]: value.unit,
-      [id + "_NORMALIZED_VALUE"]: value.normalizedValue,
-      [id + "_NORMALIZED_UNIT"]: value.normalizedUnit,
+      [sqlPrefix + id + "_VALUE"]: value.value,
+      [sqlPrefix + id + "_UNIT"]: value.unit,
+      [sqlPrefix + id + "_NORMALIZED_VALUE"]: value.normalizedValue,
+      [sqlPrefix + id + "_NORMALIZED_UNIT"]: value.normalizedUnit,
     };
   },
-  sqlOut: (data: {[key: string]: any}, id: string) => {
+  sqlOut: (data: {[key: string]: any}, sqlPrefix: string, id: string) => {
     const result: IPropertyDefinitionSupportedUnitType = {
-      value: data[id + "_VALUE"],
-      unit: data[id + "_UNIT"],
-      normalizedValue: data[id + "_NORMALIZED_VALUE"],
-      normalizedUnit: data[id + "_NORMALIZED_UNIT"],
+      value: data[sqlPrefix + id + "_VALUE"],
+      unit: data[sqlPrefix + id + "_UNIT"],
+      normalizedValue: data[sqlPrefix + id + "_NORMALIZED_VALUE"],
+      normalizedUnit: data[sqlPrefix + id + "_NORMALIZED_UNIT"],
     };
     if (result.value === null) {
       return null;

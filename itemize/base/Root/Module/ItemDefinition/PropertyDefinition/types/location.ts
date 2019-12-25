@@ -35,50 +35,50 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: "boolean",
     },
   ],
-  sql: (id: string) => {
+  sql: (sqlPrefix: string, id: string) => {
     return {
-      [id + "_GEO"]: {
+      [sqlPrefix + id + "_GEO"]: {
         type: "GEOMETRY(POINT,4326)",
       },
-      [id + "_LAT"]: {
+      [sqlPrefix + id + "_LAT"]: {
         type: "float",
       },
-      [id + "_LNG"]: {
+      [sqlPrefix + id + "_LNG"]: {
         type: "float",
       },
-      [id + "_TXT"]: {
+      [sqlPrefix + id + "_TXT"]: {
         type: "text",
       },
-      [id + "_ATXT"]: {
+      [sqlPrefix + id + "_ATXT"]: {
         type: "text",
       },
     };
   },
-  sqlIn : (value: IPropertyDefinitionSupportedLocationType, id, property, knex) => {
+  sqlIn : (value: IPropertyDefinitionSupportedLocationType, sqlPrefix: string, id, property, knex) => {
     if (value === null) {
       return {
-        [id + "_GEO"]: null,
-        [id + "_LAT"]: null,
-        [id + "_LNG"]: null,
-        [id + "_TXT"]: null,
-        [id + "_ATXT"]: null,
+        [sqlPrefix + id + "_GEO"]: null,
+        [sqlPrefix + id + "_LAT"]: null,
+        [sqlPrefix + id + "_LNG"]: null,
+        [sqlPrefix + id + "_TXT"]: null,
+        [sqlPrefix + id + "_ATXT"]: null,
       };
     }
 
     return {
-      [id + "_GEO"]: knex.raw("ST_SetSRID(ST_MakePoint(?, ?), 4326);", value.lng, value.lat),
-      [id + "_LAT"]: value.lat,
-      [id + "_LNG"]: value.lng,
-      [id + "_TXT"]: value.txt,
-      [id + "_ATXT"]: value.atxt,
+      [sqlPrefix + id + "_GEO"]: knex.raw("ST_SetSRID(ST_MakePoint(?, ?), 4326);", value.lng, value.lat),
+      [sqlPrefix + id + "_LAT"]: value.lat,
+      [sqlPrefix + id + "_LNG"]: value.lng,
+      [sqlPrefix + id + "_TXT"]: value.txt,
+      [sqlPrefix + id + "_ATXT"]: value.atxt,
     };
   },
-  sqlOut: (data: {[key: string]: any}, id: string) => {
+  sqlOut: (data: {[key: string]: any}, sqlPrefix: string, id: string) => {
     const result: IPropertyDefinitionSupportedLocationType = {
-      lat: data[id + "_LAT"],
-      lng: data[id + "_LNG"],
-      txt: data[id + "_TXT"],
-      atxt: data[id + "_ATXT"],
+      lat: data[sqlPrefix + id + "_LAT"],
+      lng: data[sqlPrefix + id + "_LNG"],
+      txt: data[sqlPrefix + id + "_TXT"],
+      atxt: data[sqlPrefix + id + "_ATXT"],
     };
     if (result.lat === null || result.lng === null) {
       return null;

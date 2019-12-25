@@ -4,7 +4,27 @@ TODO TECH
 - Implement some form of triggers, maybe callback functions in the resolvers, we should have some form of user trigger to remove e_validated and
   whatnot
 
+- Idea for the special cache, websockets pub sub, websockets would make a connection and pub sub by a string
+{register: [type, id]}
+server will websocket reply with
+{register: [type, id, date]}
+unregister with
+{unregister: [type, id]}
 
+server will send the following message on an event
+{event: [type, id, uuid]}
 
+the uuid now has to be part of the basic mutations and token and everything
+
+polling should be a fallback for the websocket using socket.io should suffice, this will allow the
+cache to be efficient
+
+service worker will also do the caching by checking the request, and checking for a larger payload
+probably a requestFields, queryName, header must be added for the service worker to manage
+service worker returns if it finds a match
+if disableCache header is present, then service worker does not use cache and cache the new result
+the websocket will tell with the date that it returns if the dates match and then the loadValue can run again
+with the new information
+service worker cache must be flushed during logouts
 
 - Implement service workers

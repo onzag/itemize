@@ -6,23 +6,31 @@ import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces"
 import Knex from "knex";
 
 export function getStandardSQLFnFor(type: string):
-  (id: string, property: PropertyDefinition) => ISQLTableDefinitionType {
-  return (id: string, property: PropertyDefinition) => ({
-    [id]: {
+  (sqlPrefix: string, id: string, property: PropertyDefinition) => ISQLTableDefinitionType {
+  return (sqlPrefix: string, id: string, property: PropertyDefinition) => ({
+    [sqlPrefix + id]: {
       type,
       index: property.isUnique() ? "unique" : null,
     },
   });
 }
 
-export function stardardSQLInFn(value: PropertyDefinitionSupportedType, id: string): ISQLTableRowValue {
+export function stardardSQLInFn(
+  value: PropertyDefinitionSupportedType,
+  sqlPrefix: string,
+  id: string,
+): ISQLTableRowValue {
   return {
-    [id]: value,
+    [sqlPrefix + id]: value,
   };
 }
 
-export function standardSQLOutFn(row: ISQLTableRowValue, id: string): PropertyDefinitionSupportedType {
-  return row[id];
+export function standardSQLOutFn(
+  row: ISQLTableRowValue,
+  sqlPrefix: string,
+  id: string,
+): PropertyDefinitionSupportedType {
+  return row[sqlPrefix + id];
 }
 
 export function standardSQLSearchFnExactAndRange(
@@ -81,13 +89,13 @@ export function standardSQLEqualFn(
  */
 export function getSQLTableDefinitionForProperty(
   propertyDefinition: PropertyDefinition,
-  prefix ?: string,
+  prefix?: string,
 ): ISQLTableDefinitionType {
   const actualPrefix = prefix ? prefix : "";
   // get the sql def based on the property definition
   const sqlDef = propertyDefinition.getPropertyDefinitionDescription().sql;
   // let's get it based on the function it is
-  return sqlDef(actualPrefix + propertyDefinition.getId(), propertyDefinition);
+  return sqlDef(actualPrefix, propertyDefinition.getId(), propertyDefinition);
 }
 
 /**
@@ -109,7 +117,7 @@ export function convertSQLValueToGQLValueForProperty(
   // from, usually properties in sql are stored as their raw id, eg.
   // "distance", "size", etc... but they might be prefixed
   // usually when they happen to be for an item ITEM_wheel_size
-  const colName = actualPrefix + propertyDefinition.getId();
+  // the prefix is now passed to the sqlOut function
 
   // now we need to extract the sql data, we try to get a sqlOut
   // function which extracts data from rows for a given property
@@ -123,7 +131,7 @@ export function convertSQLValueToGQLValueForProperty(
   // need 2 rows to store the field data, the currency, and the value
   // eg. ITEM_wheel_price might become ITEM_wheel_price_CURRENCY and ITEM_wheel_price_VALUE
   // which will in turn once extracted with sqlOut become {currency: ..., value: ...}
-  let colValue = sqlOut(row, colName, this);
+  let colValue = sqlOut(row, actualPrefix, propertyDefinition.getId(), this);
 
   // we check for null coersion, while this shouldn't really
   // happen, because it should have never saved nulls in the
@@ -166,8 +174,6 @@ export function convertGQLValueToSQLValueForProperty(
   dictionary: string,
   prefix: string,
 ): ISQLTableRowValue {
-  // this is where the resulting column should be named
-  const resultingColumnName = prefix + propertyDefinition.getId();
   // and this is the value of the property, again, properties
   // are not prefixed, they are either in their own object
   // or in the root
@@ -193,7 +199,7 @@ export function convertGQLValueToSQLValueForProperty(
   const sqlIn = propertyDefinition.getPropertyDefinitionDescription().sqlIn;
 
   // we return as it is
-  return sqlIn(gqlPropertyValue, resultingColumnName, this, knex, dictionary);
+  return sqlIn(gqlPropertyValue, prefix, propertyDefinition.getId(), this, knex, dictionary);
 }
 
 /**

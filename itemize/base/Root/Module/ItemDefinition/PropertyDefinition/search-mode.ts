@@ -94,6 +94,10 @@ export function buildSearchModePropertyDefinitions(
   // sense to go deeper
   newPropDef.searchLevel = "disabled";
 
+  if (newPropDef.type === "text") {
+    newPropDef.type = "string";
+  }
+
   // we delete the prefill functionality, as it doesn't make sense
   // in search mode
   delete newPropDef.autocompleteSupportsPrefills;
