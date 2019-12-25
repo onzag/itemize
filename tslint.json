@@ -5,6 +5,7 @@
     "ordered-imports": false,
     "no-console": false,
     "no-var-requires": false,
-    "jsx-no-multiline-js": false
+    "jsx-no-multiline-js": false,
+    "max-classes-per-file": false
   }
 }

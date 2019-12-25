@@ -23,6 +23,7 @@ import { buildGqlQuery, buildGqlMutation, gqlQuery, IGQLQueryObj, requestFieldsA
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";
+import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 
 export interface IBasicActionResponse {
   error: GraphQLEndpointErrorType;
@@ -46,6 +47,12 @@ export interface IActionSubmitOptions {
   policiesToCleanOnSuccess?: policyPathType[];
 }
 
+export interface IActionSearchOptions {
+  onlyIncludeSearchPropertiesForProperties?: string[];
+  onlyIncludeItems?: string[];
+  unpokeAfterSuccess?: boolean;
+}
+
 export interface IItemDefinitionContextType {
   idef: ItemDefinition;
   state: IItemDefinitionStateType;
@@ -54,6 +61,7 @@ export interface IItemDefinitionContextType {
   blocked: boolean;
   blockedButDataAccessible: boolean;
   loadError: GraphQLEndpointErrorType;
+  loading: boolean;
   submitError: GraphQLEndpointErrorType;
   submitting: boolean;
   submitted: boolean;
@@ -113,10 +121,24 @@ interface IItemDefinitionProviderProps {
   searchCounterpart?: boolean;
   disableExternalChecks?: boolean;
   optimize?: {
+    // only downloads and includes the properties specified in the list
+    // in the state
     onlyIncludeProperties?: string[],
+    // only includes the items specified in the list in the state
     onlyIncludeItems?: string[],
+    // excludes the policies from being part of the state
     excludePolicies?: boolean,
+    // disables the listener that will trigger an update if other
+    // elements that share its same id are triggered, this means that
+    // two item definition providers of the same type and id don't communicate
+    // anymore
     disableListener?: boolean,
+    // prevents waiting for data to be gathered before loading the value
+    // this can be detrimental in some cases, doesn't affect memory cached values
+    dontWaitForLoad?: boolean,
+    // cleans the value from the memory cache once the object dismounts
+    // as the memory cache might only grow and grow
+    cleanOnDismount?: boolean,
   };
 }
 
@@ -134,6 +156,7 @@ interface IActualItemDefinitionProviderState {
   isBlockedButDataIsAccessible: boolean;
   notFound: boolean;
   loadError: GraphQLEndpointErrorType;
+  loading: boolean;
   submitError: GraphQLEndpointErrorType;
   submitting: boolean;
   submitted: boolean;
@@ -166,9 +189,13 @@ function flattenRecievedFields(recievedFields: any) {
 
 const ItemDefinitionProviderRequestsInProgressRegistry: {
   [qualifiedPathNameWithID: string]: {
-    wasOwnershipAssumed: boolean,
+    currentRequestedFields: any,
+    registeredCallbacks: any[],
   };
 } = {};
+function itemDefinitionProviderRequestsInProgressTimeout(time: number) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
 
 class ActualItemDefinitionProvider extends
   React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
@@ -241,6 +268,7 @@ class ActualItemDefinitionProvider extends
       isBlockedButDataIsAccessible: false,
       notFound: false,
       loadError: null,
+      loading: !!this.props.forId,
 
       submitError: null,
       submitting: false,
@@ -346,12 +374,17 @@ class ActualItemDefinitionProvider extends
         this.props.optimize && this.props.optimize.onlyIncludeItems,
         this.props.optimize && this.props.optimize.excludePolicies,
       ),
+      // yes items are clearly not loading if the listener finds itself
+      // here, while yes
+      loading: false,
     });
   }
   public getFieldsAndArgs(
     options: {
       includeArgs: boolean,
       includeFields: boolean,
+      onlyIncludeProperties?: string[],
+      onlyIncludeItems?: string[],
       onlyIncludePropertiesForArgs?: string[],
       onlyIncludeItemsForArgs?: string[],
       forThisItemDefinitionInstanceInstead?: ItemDefinition,
@@ -399,17 +432,20 @@ class ActualItemDefinitionProvider extends
     // to get here, we are just building a query, not preventing a submit
     (options.forThisItemDefinitionInstanceInstead || this.props.itemDefinitionInstance)
     .getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
-      if (
-        options.includeFields &&
-        !pd.isRetrievalDisabled() &&
-        pd.checkRoleAccessFor(
-          ItemDefinitionIOActions.READ,
-          this.props.tokenData.role,
-          this.props.tokenData.id,
-          appliedOwner,
-          false,
-        )
-      ) {
+      const shouldBeIncludedInFields = options.includeFields ? (
+        options.onlyIncludeProperties ?
+          options.onlyIncludeProperties.includes(pd.getId()) :
+          (
+            !pd.isRetrievalDisabled() && pd.checkRoleAccessFor(
+              ItemDefinitionIOActions.READ,
+              this.props.tokenData.role,
+              this.props.tokenData.id,
+              appliedOwner,
+              false,
+            )
+          )
+      ) : false;
+      if (shouldBeIncludedInFields) {
         requestFields.DATA[pd.getId()] = {};
 
         const propertyDescription = pd.getPropertyDefinitionDescription();
@@ -420,7 +456,7 @@ class ActualItemDefinitionProvider extends
         }
       }
 
-      const shouldBeIncludedInQuery = options.includeArgs ? (
+      const shouldBeIncludedInArgs = options.includeArgs ? (
         options.onlyIncludePropertiesForArgs ?
           options.onlyIncludePropertiesForArgs.includes(pd.getId()) :
           pd.checkRoleAccessFor(
@@ -431,7 +467,7 @@ class ActualItemDefinitionProvider extends
             false,
           )
       ) : false;
-      if (shouldBeIncludedInQuery) {
+      if (shouldBeIncludedInArgs) {
         argumentsForQuery[pd.getId()] = pd.getCurrentValue(this.props.forId || null);
       }
     });
@@ -445,15 +481,25 @@ class ActualItemDefinitionProvider extends
       requestFields.DATA[qualifiedId] = {};
       argumentsForQuery[qualifiedId] = {};
 
-      const itemShouldBeIncludedInQuery = options.includeArgs ? (
+      const itemShouldBeIncludedInArgs = options.includeArgs ? (
         options.onlyIncludeItemsForArgs ?
           options.onlyIncludeItemsForArgs.includes(item.getId()) :
           true
       ) : false;
 
+      const itemShouldBeIncludedInFields = options.includeFields ? (
+        options.onlyIncludeItems ?
+          options.onlyIncludeItems.includes(item.getId()) :
+          true
+      ) : false;
+
+      if (!itemShouldBeIncludedInArgs && !itemShouldBeIncludedInFields) {
+        return;
+      }
+
       item.getSinkingProperties().forEach((sp) => {
         if (
-          options.includeFields &&
+          itemShouldBeIncludedInFields &&
           !sp.isRetrievalDisabled() &&
           sp.checkRoleAccessFor(
             ItemDefinitionIOActions.READ,
@@ -474,7 +520,7 @@ class ActualItemDefinitionProvider extends
         }
 
         if (
-          itemShouldBeIncludedInQuery &&
+          itemShouldBeIncludedInArgs &&
           sp.checkRoleAccessFor(
             !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
             this.props.tokenData.role,
@@ -498,41 +544,117 @@ class ActualItemDefinitionProvider extends
     return {requestFields, argumentsForQuery};
   }
   public async loadValue(): Promise<IBasicActionResponse> {
+    // we don't use loading here because there's one big issue
+    // elements are assumed into the loading state by the constructor
+    // if they have an id
     if (!this.props.forId) {
       return;
     }
 
-    const qualifiedPathNameWithID = PREFIX_BUILD(
-      this.props.itemDefinitionInstance.getQualifiedPathName(),
-    ) + this.props.forId;
-    if (ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID]) {
-      if (
-        !!ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].wasOwnershipAssumed !==
-        !!this.props.assumeOwnership
-      ) {
-        // TODO maybe do something about this in order to allow this behaviour as it will for istance matter
-        // where a query request is contained in another query request eg kitten {pawNumber, hairCount} and
-        // another query where kitten {pawNumber, hairCount, friends} the first is contained within the second
-        // so we could totally reuse the gqlAppliedValue rather than re-requesting due to differences?... maybe
-        // on the other hand this deletes data that might have been leaked when you log out and things reload
-        // with new credentials, as that old data, remains in the cache
-        console.warn(
-          "Two simultaneous requests in item definition " + this.props.itemDefinition + " for id " + this.props.forId +
-          " have been launched and the ownership assumption does not match, this is a no-op, and would cause a race" +
-          " where only the first request can be fullfilled and cached, fix the issue ASAP",
-        );
-      }
-      return;
-    }
-    ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID] = {
-      wasOwnershipAssumed: this.props.assumeOwnership,
-    };
-
+    // We get the request fields that we are going to use
+    // in order to load the value, we use the optimizers
+    // so as to request only what is necessary for it to be populated
+    // there is however one thing, different optimizers might have been
+    // used accross the application, and two components with different
+    // optimizations might have been used at the same time for the
+    // same id
     const { requestFields } = this.getFieldsAndArgs({
       includeArgs: false,
       includeFields: true,
+      onlyIncludeItems: this.props.optimize && this.props.optimize.onlyIncludeItems,
+      onlyIncludeProperties: this.props.optimize && this.props.optimize.onlyIncludeProperties,
     });
 
+    // Prevent loading at all if value currently available and cached
+    const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId);
+    if (
+      appliedGQLValue &&
+      requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
+    ) {
+      return {
+        error: null,
+      };
+    }
+
+    // the loading state is launched here, however
+    // the loading is removed by the listener not by
+    // this same function, to be efficient, we could remove
+    // it via this function but doing it in the listener
+    // who listens for change is better, items are clearly
+    // not loading if the listener has detected a change in them
+    // you might wonder why in the loader and not in the waiter
+    // well it's because the waiter might only executes for the active
+    // instance
+    if (!this.state.loading) {
+      this.setState({
+        loading: true,
+      });
+    }
+
+    if (this.props.optimize && this.props.optimize.dontWaitForLoad) {
+      return await this.loadValueWaiter(
+        requestFields,
+      );
+    }
+
+    // this is why we have a registry
+    // we build the qualified path name with the id so as to be
+    // an unique identifier for this id
+    const qualifiedPathNameWithID = PREFIX_BUILD(
+      this.props.itemDefinitionInstance.getQualifiedPathName(),
+    ) + "." + this.props.forId;
+
+    // if we have gotten already it there, it means some other instance is already
+    // executing to load the value for this same object and same id which means
+    // it's waiting and we have a time of grace for this to add what we want to
+    // that request as well
+    if (ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID]) {
+      // we add our fields to what we expect to this waiter
+      ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].currentRequestedFields =
+        deepMerge(
+          ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].currentRequestedFields,
+          requestFields,
+        );
+      // and return this promise that will inform us by adding the resolve to the registry
+      return new Promise((resolve) => {
+        ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].registeredCallbacks.push(resolve);
+      });
+    }
+
+    // if that's not the case, horray, we are the first ones to request this value
+    // we make our object, these are the fields we will be requesting, and these
+    // are the callbacks, empty to start
+    ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID] = {
+      currentRequestedFields: requestFields,
+      registeredCallbacks: [],
+    };
+
+    // now we wait a little bit
+    await itemDefinitionProviderRequestsInProgressTimeout(70);
+
+    // now we get what we are expected to get, some other instances might
+    // have added to this request
+    const requestFieldsToGet =
+      ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].currentRequestedFields;
+    // we extract the resolvers as well
+    const resolversToTrigger =
+      ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].registeredCallbacks;
+    // and now delete it, we aren't waiting anymore, it's time to execute
+    delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
+
+    // so we load the value
+    const value = await this.loadValueWaiter(
+      requestFieldsToGet,
+    );
+
+    // run all the resolvers that were expecting callback with the value
+    resolversToTrigger.forEach((r) => r(value));
+
+    // and return such value ourselves
+    return value;
+  }
+
+  public async loadValueWaiter(requestFields: any): Promise<IBasicActionResponse> {
     const {
       value,
       error,
@@ -543,13 +665,19 @@ class ActualItemDefinitionProvider extends
       PREFIX_GET,
       {},
       requestFields,
+      false,
     );
 
+    // this should never happen honestly as we are giving
+    // a false flag for return cached value for get requests
+    // but we leave it here just in case
     if (cached) {
-      delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
-      return;
+      return {
+        error: null,
+      };
     }
 
+    // so if we get an error we give it
     if (error) {
       this.setState({
         loadError: error,
@@ -588,8 +716,6 @@ class ActualItemDefinitionProvider extends
       }
     }
 
-    delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
-
     return {
       error,
     };
@@ -613,6 +739,13 @@ class ActualItemDefinitionProvider extends
     value: PropertyDefinitionSupportedType,
     internalValue: any,
   ) {
+    if (this.state.loading) {
+      // we will deny any change that happens
+      // if the item is loading, as everything
+      // will be removed anyway
+      return;
+    }
+
     const currentUpdateId = (new Date()).getTime();
     this.lastUpdateId = currentUpdateId;
 
@@ -643,6 +776,10 @@ class ActualItemDefinitionProvider extends
     this.props.itemDefinitionInstance.triggerListeners(givenForId || null);
   }
   public componentWillUnmount() {
+    if (this.props.optimize && this.props.optimize.cleanOnDismount) {
+      this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null);
+      this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null);
+    }
     this.unSetupListeners();
   }
   public onItemSetExclusionState(item: Item, state: ItemExclusionState) {
@@ -707,6 +844,7 @@ class ActualItemDefinitionProvider extends
     queryPrefix: string,
     baseArgs: any,
     requestFields: any,
+    returnCachedValuesForGetRequests: boolean,
   ) {
     const queryName = queryPrefix +
       (this.props.itemDefinitionInstance.isExtensionsInstance() ?
@@ -738,7 +876,7 @@ class ActualItemDefinitionProvider extends
     }
 
     const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
-    if (queryPrefix === PREFIX_GET) {
+    if (queryPrefix === PREFIX_GET && returnCachedValuesForGetRequests) {
       if (
         appliedGQLValue &&
         (
@@ -927,6 +1065,7 @@ class ActualItemDefinitionProvider extends
       {
         id: {},
       },
+      false,
     );
 
     if (error) {
@@ -981,6 +1120,8 @@ class ActualItemDefinitionProvider extends
     } = this.getFieldsAndArgs({
       includeArgs: true,
       includeFields: true,
+      onlyIncludeItems: this.props.optimize && this.props.optimize.onlyIncludeItems,
+      onlyIncludeProperties: this.props.optimize && this.props.optimize.onlyIncludeProperties,
       onlyIncludeItemsForArgs: options.onlyIncludeItems,
       onlyIncludePropertiesForArgs: options.onlyIncludeProperties,
     });
@@ -1027,6 +1168,7 @@ class ActualItemDefinitionProvider extends
         ...applyingPolicyArgs,
       },
       requestFields,
+      false,
     );
 
     let recievedId: number = null;
@@ -1077,7 +1219,7 @@ class ActualItemDefinitionProvider extends
       error,
     };
   }
-  public async search(): Promise<IActionResponseWithManyIds> {
+  public async search(options?: IActionSearchOptions): Promise<IActionResponseWithManyIds> {
     if (this.state.searching) {
       return null;
     }
@@ -1098,11 +1240,23 @@ class ActualItemDefinitionProvider extends
       searching: true,
     });
 
+    let onlyIncludePropertiesForArgs: string[] = null;
+    if (options.onlyIncludeSearchPropertiesForProperties) {
+      onlyIncludePropertiesForArgs = [];
+      const standardIdef = this.props.itemDefinitionInstance.getStandardCounterpart();
+      options.onlyIncludeSearchPropertiesForProperties.forEach((propertyId) => {
+        const standardProperty = standardIdef.getPropertyDefinitionFor(propertyId, true);
+        onlyIncludePropertiesForArgs = onlyIncludePropertiesForArgs.concat(getConversionIds(standardProperty.rawData));
+      });
+    }
+
     const {
       argumentsForQuery,
     } = this.getFieldsAndArgs({
       includeArgs: true,
       includeFields: false,
+      onlyIncludeItemsForArgs: options.onlyIncludeItems,
+      onlyIncludePropertiesForArgs,
     });
 
     const {
@@ -1114,6 +1268,7 @@ class ActualItemDefinitionProvider extends
       {
         ids: {},
       },
+      false,
     );
 
     const searchResults: number[] = [];
@@ -1125,7 +1280,6 @@ class ActualItemDefinitionProvider extends
         poked: true,
       });
     } else {
-      // TODO get the search results, can't remember how they come
       this.setState({
         searchError: null,
         searching: false,
@@ -1234,6 +1388,7 @@ class ActualItemDefinitionProvider extends
           blocked: this.state.isBlocked,
           blockedButDataAccessible: this.state.isBlockedButDataIsAccessible,
           loadError: this.state.loadError,
+          loading: this.state.loading,
           submitError: this.state.submitError,
           submitting: this.state.submitting,
           submitted: this.state.submitted,

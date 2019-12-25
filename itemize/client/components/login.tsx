@@ -19,6 +19,7 @@ interface IActualLogActionerProps extends ILogActionerProps {
   itemDefinitionContextualValue: IItemDefinitionContextType;
 }
 
+// TODO add analytics
 class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
   constructor(props: IActualLogActionerProps) {
     super(props);

@@ -1,15 +1,52 @@
 import React from "react";
 import { GraphQLEndpointErrorType } from "../../base/errors";
-import { ItemDefinitionContext, IBasicActionResponse, IActionResponseWithId, IActionResponseWithManyIds } from "../providers/item-definition";
+import {
+  ItemDefinitionContext,
+  IBasicActionResponse,
+  IActionResponseWithId,
+  IActionResponseWithManyIds,
+  IItemDefinitionContextType,
+} from "../providers/item-definition";
+import equals from "deep-equal";
 
 interface IItemDefinitionLoader {
-  errorComponent?: React.ComponentType<{error: GraphQLEndpointErrorType, reload: () => Promise<IBasicActionResponse>}>;
-  notFoundComponent?: React.ComponentType<any>;
-  blockedComponent?: React.ComponentType<{hasBlockedAccess: boolean}>;
-  children: any;
+  children: (arg: {
+    loading: boolean,
+    notFound: boolean,
+    blocked: boolean,
+    hasBlockedAccess: boolean,
+    error: GraphQLEndpointErrorType,
+    reload: () => Promise<IBasicActionResponse>,
+  }) => any;
 }
 
-// TODO optimize
+interface IActualItemDefinitionLoader extends IItemDefinitionLoader {
+  itemDefinitionContext: IItemDefinitionContextType;
+}
+
+class ActualItemDefinitionLoader extends React.Component<IActualItemDefinitionLoader, {}> {
+  public shouldComponentUpdate(nextProps: IActualItemDefinitionLoader) {
+    return nextProps.itemDefinitionContext.loadError !== this.props.itemDefinitionContext.loadError ||
+      nextProps.children !== this.props.children ||
+      nextProps.itemDefinitionContext.blocked !== this.props.itemDefinitionContext.blocked ||
+      nextProps.itemDefinitionContext.blockedButDataAccessible !==
+        this.props.itemDefinitionContext.blockedButDataAccessible ||
+      nextProps.itemDefinitionContext.notFound !== this.props.itemDefinitionContext.notFound ||
+      nextProps.itemDefinitionContext.loading !== this.props.itemDefinitionContext.loading;
+  }
+  public render() {
+    return this.props.children(
+      {
+        loading: this.props.itemDefinitionContext.loading,
+        notFound: this.props.itemDefinitionContext.notFound,
+        blocked: this.props.itemDefinitionContext.blocked,
+        hasBlockedAccess: this.props.itemDefinitionContext.blockedButDataAccessible,
+        error: this.props.itemDefinitionContext.loadError,
+        reload: this.props.itemDefinitionContext.reload,
+      },
+    );
+  }
+}
 /**
  * This safe element assumes success and will render success unless proven
  * otherwise, there's no loading, it will use whatever it has stored meanwhile
@@ -17,43 +54,9 @@ interface IItemDefinitionLoader {
 export function ItemDefinitionLoader(props: IItemDefinitionLoader) {
   return (
     <ItemDefinitionContext.Consumer>{
-      (itemDefinitionContext) => {
-        if (
-          itemDefinitionContext.loadError
-        ) {
-          const ErrorComponent = props.errorComponent;
-          if (!ErrorComponent) {
-            return null;
-          }
-          return <ErrorComponent
-            error={itemDefinitionContext.loadError}
-            reload={itemDefinitionContext.reload}
-            children={props.children}
-          />;
-        } else if (
-          itemDefinitionContext.blocked
-        ) {
-          const BlockedComponent = props.blockedComponent;
-          if (!BlockedComponent) {
-            return null;
-          }
-          return <BlockedComponent
-            hasBlockedAccess={itemDefinitionContext.blockedButDataAccessible}
-            children={props.children}
-          />;
-        } else if (
-          itemDefinitionContext.notFound
-        ) {
-          const NotFoundComponent = props.notFoundComponent;
-          if (!NotFoundComponent) {
-            return null;
-          }
-          return <NotFoundComponent
-            children={props.children}
-          />;
-        }
-        return props.children;
-      }
+      (itemDefinitionContext) => (
+        <ActualItemDefinitionLoader {...props} itemDefinitionContext={itemDefinitionContext}/>
+      )
     }</ItemDefinitionContext.Consumer>
   );
 }
@@ -69,19 +72,34 @@ interface ISubmitActionerProps {
   }) => any;
 }
 
-// TODO optimize
+interface IActualSubmitActionerProps extends ISubmitActionerProps {
+  itemDefinitionContext: IItemDefinitionContextType;
+}
+
+class ActualSubmitActioner extends React.Component<IActualSubmitActionerProps, {}> {
+  public shouldComponentUpdate(nextProps) {
+    return nextProps.children !== this.props.children ||
+      nextProps.itemDefinitionContext.submitError !== this.props.itemDefinitionContext.submitError ||
+      nextProps.itemDefinitionContext.submitting !== this.props.itemDefinitionContext.submitting ||
+      nextProps.itemDefinitionContext.submitted !== this.props.itemDefinitionContext.submitted;
+  }
+  public render() {
+    return this.props.children({
+      submitError: this.props.itemDefinitionContext.submitError,
+      submitting: this.props.itemDefinitionContext.submitting,
+      submitted: this.props.itemDefinitionContext.submitted,
+      submit: this.props.itemDefinitionContext.submit,
+      dismissError: this.props.itemDefinitionContext.dismissSubmitError,
+      dismissSubmitted: this.props.itemDefinitionContext.dismissSubmitted,
+    });
+  }
+}
+
 export function SubmitActioner(props: ISubmitActionerProps) {
   return (
     <ItemDefinitionContext.Consumer>{
       (itemDefinitionContext) => (
-        props.children({
-          submitError: itemDefinitionContext.submitError,
-          submitting: itemDefinitionContext.submitting,
-          submitted: itemDefinitionContext.submitted,
-          submit: itemDefinitionContext.submit,
-          dismissError: itemDefinitionContext.dismissSubmitError,
-          dismissSubmitted: itemDefinitionContext.dismissSubmitted,
-        })
+        <ActualSubmitActioner {...props} itemDefinitionContext={itemDefinitionContext}/>
       )
     }</ItemDefinitionContext.Consumer>
   );
@@ -98,19 +116,34 @@ interface ISearchActionerProps {
   }) => any;
 }
 
-// TODO optimize
+interface IActualSearchActionerProps extends ISearchActionerProps {
+  itemDefinitionContext: IItemDefinitionContextType;
+}
+
+class ActualSearchActioner extends React.Component<IActualSearchActionerProps, {}> {
+  public shouldComponentUpdate(nextProps) {
+    return nextProps.children !== this.props.children ||
+      nextProps.itemDefinitionContext.searchError !== this.props.itemDefinitionContext.searchError ||
+      nextProps.itemDefinitionContext.searching !== this.props.itemDefinitionContext.searching ||
+      !equals(nextProps.itemDefinitionContext.searchResuls, this.props.itemDefinitionContext.searchResuls);
+  }
+  public render() {
+    return this.props.children({
+      searchError: this.props.itemDefinitionContext.searchError,
+      searching: this.props.itemDefinitionContext.searching,
+      searchResults: this.props.itemDefinitionContext.searchResuls,
+      search: this.props.itemDefinitionContext.search,
+      dismissSearchResults: this.props.itemDefinitionContext.dismissSearchResults,
+      dismissSearchError: this.props.itemDefinitionContext.dismissSearchError,
+    });
+  }
+}
+
 export function SearchActioner(props: ISearchActionerProps) {
   return (
     <ItemDefinitionContext.Consumer>{
       (itemDefinitionContext) => (
-        props.children({
-          searchError: itemDefinitionContext.searchError,
-          searching: itemDefinitionContext.searching,
-          searchResults: itemDefinitionContext.searchResuls,
-          search: itemDefinitionContext.search,
-          dismissSearchResults: itemDefinitionContext.dismissSearchResults,
-          dismissSearchError: itemDefinitionContext.dismissSearchError,
-        })
+        <ActualSearchActioner {...props} itemDefinitionContext={itemDefinitionContext}/>
       )
     }</ItemDefinitionContext.Consumer>
   );

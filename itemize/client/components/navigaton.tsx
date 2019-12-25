@@ -33,6 +33,7 @@ interface ICustomLinkProps extends LinkProps {
   to: string;
 }
 
+// TODO add analytics
 function linkOnClick(props: ICustomLinkProps, e: React.MouseEvent<HTMLAnchorElement>) {
   if (props.to === location.pathname + location.search) {
     e.preventDefault();

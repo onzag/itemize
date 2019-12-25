@@ -97,12 +97,28 @@ function ActualProfile(props: IActualProfileProps) {
     );
   }
   return (
-    <ItemDefinitionLoader
-      notFoundComponent={SimulatedNotFoundPage}
-      blockedComponent={BlockedPage}
-      errorComponent={ErrorPage}
-    >
-      {content}
+    <ItemDefinitionLoader>
+      {
+        (arg) => {
+          if (arg.notFound) {
+            return <SimulatedNotFoundPage/>;
+          } else if (arg.blocked) {
+            return (
+              <BlockedPage hasBlockedAccess={arg.hasBlockedAccess}>
+                {content}
+              </BlockedPage>
+            );
+          }
+
+          return (
+            <React.Fragment>
+              <i>{arg.loading ? "LOADING" : "LOADED"}</i>
+
+              {content}
+            </React.Fragment>
+          );
+        }
+      }
     </ItemDefinitionLoader>
   );
 }

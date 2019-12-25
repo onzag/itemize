@@ -185,11 +185,6 @@ export function I18nReadError(props: II18nReadErrorProps) {
   );
 }
 
-// TODO language switch that is able to update the current user
-// maybe we need to do this whole deep level
-// one procedure might be to take the appData root and
-// somehow pipe the data there if we have an active user
-// and if we do update that and trigger the listeners
 interface IFnAppLanguageRetrieverLanguageFormType {
   code: string;
   name: string;
