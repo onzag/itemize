@@ -26,7 +26,6 @@ import equals from "deep-equal";
 import { ModuleContext } from "./module";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import CacheWorkerInstance from "../workers/cache";
-import uuid from "uuid";
 import { RemoteListener } from "../app/remote-listener";
 
 export interface IBasicActionResponse {
@@ -718,7 +717,6 @@ class ActualItemDefinitionProvider extends
       memoryCached,
       cached,
       getQueryFields,
-      actionUUID,
     } = await this.runQueryFor(
       PREFIX_GET,
       {},
@@ -772,7 +770,6 @@ class ActualItemDefinitionProvider extends
         this.props.tokenData.id,
         this.props.tokenData.role,
         getQueryFields,
-        actionUUID,
       );
       this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null);
       if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
@@ -916,7 +913,6 @@ class ActualItemDefinitionProvider extends
     memoryCached: boolean,
     cached: boolean,
     getQueryFields: any,
-    actionUUID: string,
   }> {
     const queryBase = (this.props.itemDefinitionInstance.isExtensionsInstance() ?
       this.props.itemDefinitionInstance.getParentModule().getQualifiedPathName() :
@@ -946,7 +942,6 @@ class ActualItemDefinitionProvider extends
           memoryCached: true,
           cached: false,
           getQueryFields: appliedGQLValue.requestFields,
-          actionUUID: null,
         };
       }
     }
@@ -961,23 +956,18 @@ class ActualItemDefinitionProvider extends
     ) {
       workerCachedValue =
         await CacheWorkerInstance.instance.getCachedValue(queryName, this.props.forId, requestFields);
-      if (queryPrefix === PREFIX_GET && returnWorkerCachedValuesForGetRequests) {
+      if (queryPrefix === PREFIX_GET && returnWorkerCachedValuesForGetRequests && workerCachedValue) {
         return {
           error: null,
           value: workerCachedValue.value,
           memoryCached: false,
           cached: true,
-          getQueryFields: convertValueToFields(workerCachedValue.value),
-          actionUUID: null,
+          getQueryFields: workerCachedValue.value ? convertValueToFields(workerCachedValue.value) : null,
         };
       }
     }
-
-    let actionUUID: string;
     if (queryPrefix === PREFIX_EDIT || queryPrefix === PREFIX_DELETE) {
-      actionUUID = uuid.v4();
-      args.action_uuid = actionUUID;
-      this.props.remoteListener.addActionInProgress(actionUUID);
+      args.listener_uuid = this.props.remoteListener.getUUID();
     }
 
     const objQuery: IGQLQueryObj = {
@@ -1062,7 +1052,6 @@ class ActualItemDefinitionProvider extends
       memoryCached: false,
       cached: false,
       getQueryFields: mergedQueryFields || requestFields,
-      actionUUID,
     };
   }
   public checkPoliciesAndGetArgs(policyType: string, argumentsToCheckPropertiesAgainst?: any): [boolean, any] {
@@ -1172,7 +1161,6 @@ class ActualItemDefinitionProvider extends
 
     const {
       error,
-      actionUUID,
     } = await this.runQueryFor(
       PREFIX_DELETE,
       applyingPolicyArgs,
@@ -1201,8 +1189,6 @@ class ActualItemDefinitionProvider extends
       });
       this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId);
     }
-
-    this.props.remoteListener.removeActionInProgress(actionUUID);
 
     return {
       error,
@@ -1277,7 +1263,6 @@ class ActualItemDefinitionProvider extends
       value,
       error,
       getQueryFields,
-      actionUUID,
     } = await this.runQueryFor(
       !this.props.forId ? PREFIX_ADD : PREFIX_EDIT,
       {
@@ -1313,7 +1298,6 @@ class ActualItemDefinitionProvider extends
         this.props.tokenData.id,
         this.props.tokenData.role,
         getQueryFields,
-        actionUUID,
       );
       if (options.propertiesToCleanOnSuccess) {
         options.propertiesToCleanOnSuccess.forEach((ptc) => {
@@ -1329,8 +1313,6 @@ class ActualItemDefinitionProvider extends
       }
       this.props.itemDefinitionInstance.triggerListeners("change", recievedId);
     }
-
-    this.props.remoteListener.removeActionInProgress(actionUUID);
 
     // happens during an error or whatnot
     return {

@@ -1,8 +1,8 @@
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import io from "socket.io-client";
 import Root from "../../base/Root";
+import uuid from "uuid";
 
-// TODO automatic reconnect
 export class RemoteListener {
   private socket: SocketIOClient.Socket;
   private root: Root;
@@ -16,8 +16,8 @@ export class RemoteListener {
     itemDefinition: ItemDefinition;
     forId: number;
   }> = [];
+  private uuid: string = uuid.v4();
   private isReconnect: boolean = false;
-  private actionsInProgess: string[] = [];
   constructor(root: Root) {
     this.reattachListeners = this.reattachListeners.bind(this);
     this.onPossibleChangeListened = this.onPossibleChangeListened.bind(this);
@@ -29,17 +29,8 @@ export class RemoteListener {
     this.socket.on("connect", this.reattachListeners);
     this.socket.on("changed", this.onPossibleChangeListened);
   }
-  public addActionInProgress(uuid: string) {
-    this.actionsInProgess.push(uuid);
-  }
-  public removeActionInProgress(uuid: string) {
-    // removals are delayed
-    // simple reason, it simplifies checks and the websocket might take some
-    // time, if the websocket manages to come after 3 seconds, that still
-    // is no issue, but it will be a wasted event on delete
-    setTimeout(() => {
-      this.actionsInProgess = this.actionsInProgess.filter((u) => u !== uuid);
-    }, 3000);
+  public getUUID() {
+    return this.uuid;
   }
   public addListenerFor(itemDefinition: ItemDefinition, forId: number) {
     this.listeners[itemDefinition.getQualifiedPathName() + "." + forId] = {
@@ -90,27 +81,24 @@ export class RemoteListener {
     modulePath: string,
     itemDefinitionPath: string,
     id: number,
-    editedAt: string,
-    uuid: string,
-    deleted: boolean,
+    type: "modified" | "deleted" | "edited_at_feedback",
+    editedAtFeedback: string,
   ) {
-    console.log("feedback recieved with", modulePath, itemDefinitionPath, id, editedAt, uuid, deleted);
-    if (this.actionsInProgess.includes(uuid)) {
-      return;
-    }
+    console.log("feedback recieved with", modulePath, itemDefinitionPath, id, type, editedAtFeedback);
 
     const itemDefinition =
       this.root.getModuleFor(modulePath.split("/")).getItemDefinitionFor(itemDefinitionPath.split("/"));
     const appliedGQLValue = itemDefinition.getGQLAppliedValue(id);
     if (appliedGQLValue) {
-      if (uuid && appliedGQLValue.actionUUID !== uuid) {
-        console.log("triggering due to uuid");
+      if (
+        type === "modified" ||
+        (
+          type === "edited_at_feedback" &&
+          editedAtFeedback !== appliedGQLValue.flattenedValue.edited_at
+        )
+      ) {
         itemDefinition.triggerListeners("reload", id);
-      // TODO check edited_at are same format
-      } else if (editedAt !== appliedGQLValue.flattenedValue.edited_at) {
-        console.log("triggering due to date");
-        itemDefinition.triggerListeners("reload", id);
-      } else if (deleted) {
+      } else if (type === "deleted") {
         itemDefinition.triggerListeners("deleted", id);
       }
     }
@@ -135,6 +123,11 @@ export class RemoteListener {
     });
   }
   private reattachListeners() {
+    this.socket.emit(
+      "identify",
+      this.uuid,
+    );
+
     Object.keys(this.listeners).forEach((listenerKey) => {
       const itemDefinition = this.listeners[listenerKey].itemDefinition;
       const forId = this.listeners[listenerKey].id;

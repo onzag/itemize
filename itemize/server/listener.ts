@@ -8,6 +8,7 @@ interface IListenerList {
       [mergedIndexIdentifier: string]: boolean;
     }
     amount: number;
+    uuid: string;
   };
 }
 
@@ -16,6 +17,21 @@ export class Listener {
   private appData: IAppDataType;
   constructor(appData: IAppDataType) {
     this.appData = appData;
+  }
+  public setUUID(
+    socket: Socket,
+    uuid: string,
+  ) {
+    if (!this.listeners[socket.id]) {
+      this.listeners[socket.id] = {
+        socket,
+        listens: {},
+        uuid,
+        amount: 0,
+      };
+    } else {
+      this.listeners[socket.id].uuid = uuid;
+    }
   }
   public addListener(
     socket: Socket,
@@ -27,6 +43,7 @@ export class Listener {
       this.listeners[socket.id] = {
         socket,
         listens: {},
+        uuid: null,
         amount: 0,
       };
     }
@@ -37,7 +54,6 @@ export class Listener {
     }
 
     const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
-    console.log(mergedIndexIdentifier, socket.id);
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
@@ -55,9 +71,9 @@ export class Listener {
         id,
       });
       if (result) {
-        socket.emit("changed", modulePath, itemDefinitionPath, id, result.edited_at, null, false);
+        socket.emit("changed", modulePath, itemDefinitionPath, id, "edited_at_feedback", result.edited_at);
       } else if (!result) {
-        socket.emit("changed", modulePath, itemDefinitionPath, id, null, null, true);
+        socket.emit("changed", modulePath, itemDefinitionPath, id, "deleted", null);
       }
     } catch (err) {
       console.log(err);
@@ -80,16 +96,23 @@ export class Listener {
     modulePath: string,
     itemDefinitionPath: string,
     id: number,
-    changeUUID: string,
+    listenerUUID: string,
     deleted: boolean,
   ) {
-    console.log("requested trigger on", modulePath, itemDefinitionPath, id, changeUUID, deleted);
+    console.log("requested trigger on", modulePath, itemDefinitionPath, id, listenerUUID, deleted);
     const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
     Object.keys(this.listeners).forEach((socketKey) => {
       const whatListening = this.listeners[socketKey].listens;
-      if (whatListening[mergedIndexIdentifier]) {
+      if (whatListening[mergedIndexIdentifier] && this.listeners[socketKey].uuid !== listenerUUID) {
         console.log("emitting to someone");
-        this.listeners[socketKey].socket.emit("changed", modulePath, itemDefinitionPath, id, null, changeUUID, deleted);
+        this.listeners[socketKey].socket.emit(
+          "changed",
+          modulePath,
+          itemDefinitionPath,
+          id,
+          deleted ? "deleted" : "modified",
+          null,
+        );
       }
     });
   }

@@ -121,7 +121,7 @@ export async function deleteItemDefinition(
     mod.getPath().join("/"),
     itemDefinition.getPath().join("/"),
     resolverArgs.args.id,
-    resolverArgs.args.action_uuid,
+    resolverArgs.args.listener_uuid,
     true,
   );
 

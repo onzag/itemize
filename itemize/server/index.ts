@@ -232,6 +232,9 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     socket.on("register", (modulePath: string, itemDefinitionPath: string, id: number) => {
       appData.listener.addListener(socket, modulePath, itemDefinitionPath, id);
     });
+    socket.on("identify", (uuid: string) => {
+      appData.listener.setUUID(socket, uuid);
+    });
     socket.on("feedback", (modulePath: string, itemDefinitionPath: string, id: number) => {
       appData.listener.requestFeedback(socket, modulePath, itemDefinitionPath, id);
     });

@@ -404,7 +404,7 @@ export const RESERVED_GETTER_PROPERTIES = {
 };
 export const RESERVED_CHANGE_PROPERTIES = {
   ...RESERVED_GETTER_PROPERTIES,
-  action_uuid: {
+  listener_uuid: {
     type: GraphQLNonNull(GraphQLString),
     description: "An uuid to identify this action",
   },

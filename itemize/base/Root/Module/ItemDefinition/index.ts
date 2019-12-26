@@ -99,7 +99,6 @@ export interface IItemDefinitionGQLValueType {
   rawValue: any;
   flattenedValue: any;
   requestFields: any;
-  actionUUID: string;
 }
 
 export interface IPolicyType {
@@ -776,7 +775,6 @@ export default class ItemDefinition {
     graphqlUserIdRequester: number,
     graphqlRoleRequester: string,
     requestFields: any,
-    actionUUID: string,
   ) {
     const flattenedValue = typeof value.DATA !== "undefined" ? flattenRawGQLValue(value) : value;
     this.stateHasAppliedValueTo[id] = true;
@@ -786,7 +784,6 @@ export default class ItemDefinition {
       rawValue: value,
       flattenedValue,
       requestFields,
-      actionUUID,
     };
 
     const properties =
