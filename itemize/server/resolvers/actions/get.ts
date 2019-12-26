@@ -6,7 +6,6 @@ import {
   checkLanguage,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
-  flattenFieldsFromRequestedFields,
   filterAndPrepareGQLValue,
   checkListLimit,
   buildColumnNamesForModuleTableOnly,
@@ -18,9 +17,11 @@ import {
   CONNECTOR_SQL_COLUMN_FK_NAME,
   ITEM_PREFIX,
   UNSPECIFIED_OWNER,
+  ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
 } from "../../../constants";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
+import { flattenRawGQLValueOrFields, requestFieldsAreContained, deepMerge } from "../../../util";
 
 const getItemDefinitionDebug = Debug("resolvers:getItemDefinition");
 export async function getItemDefinition(
@@ -36,11 +37,12 @@ export async function getItemDefinition(
   // right and available
   checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  await validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
 
   // now we find the requested fields that are requested
   // in the get request
-  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
+  const rawFields = graphqlFields(resolverArgs.info);
+  const requestedFields = flattenRawGQLValueOrFields(rawFields);
   checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
   // get the module, the module table name, the table for
@@ -49,50 +51,8 @@ export async function getItemDefinition(
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
-  // we build the SQL column names
-  const requestedModuleColumnsSQL = buildColumnNamesForModuleTableOnly(
-    requestedFields,
-    mod,
-  );
-  const requestedIdefColumnsSQL = buildColumnNamesForItemDefinitionTableOnly(
-    requestedFields,
-    itemDefinition,
-  );
-
-  // if we don't include by whom it was created we add it
-  if (!requestedModuleColumnsSQL.includes("created_by") && !itemDefinition.isOwnerObjectId()) {
-    requestedModuleColumnsSQL.push("created_by");
-  }
-  if (!requestedModuleColumnsSQL.includes("id") && itemDefinition.isOwnerObjectId()) {
-    requestedModuleColumnsSQL.push("id");
-  }
-  // the reason we need blocked_at is because filtering
-  // is done by the filtering function outside
-  if (!requestedModuleColumnsSQL.includes("blocked_at")) {
-    requestedModuleColumnsSQL.push("blocked_at");
-  }
-
-  getItemDefinitionDebug("Requested columns for idef are %j", requestedIdefColumnsSQL);
-  getItemDefinitionDebug("Requested columns for module are %j", requestedModuleColumnsSQL);
-
-  // create the select query, filter the blockage, and select the right
-  // type based on it
-  const selectQuery = appData.knex.first(
-    requestedModuleColumnsSQL.concat(requestedIdefColumnsSQL),
-  ).from(moduleTable).where({
-    id: resolverArgs.args.id,
-    type: selfTable,
-  });
-
-  // add the join if it's required
-  if (requestedIdefColumnsSQL.length) {
-    selectQuery.join(selfTable, (clause) => {
-      clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
-    });
-  }
-
-  // execute the select query
-  const selectQueryValue: ISQLTableRowValue = await selectQuery;
+  const selectQueryValue: ISQLTableRowValue =
+    await appData.cache.requestCache(selfTable, moduleTable, resolverArgs.args.id);
 
   // we get the requested fields that take part of the item definition
   // description
@@ -156,9 +116,9 @@ export async function getItemDefinition(
     itemDefinition,
   );
 
-  getItemDefinitionDebug("SUCCEED with %j", valueToProvide);
+  getItemDefinitionDebug("SUCCEED with %j", valueToProvide.toReturnToUser);
   // return if otherwise succeeds
-  return valueToProvide;
+  return valueToProvide.toReturnToUser;
 }
 
 const getItemDefinitionListDebug = Debug("resolvers:getItemDefinitionList");
@@ -180,7 +140,7 @@ export async function getItemDefinitionList(
 
   // now we find the requested fields that are requested
   // in the get request
-  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
+  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
   checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
   // we get the requested fields that take part of the item definition
@@ -279,11 +239,11 @@ export async function getModuleList(
   checkLanguage(appData, resolverArgs.args);
   checkListLimit(resolverArgs.args.ids);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  await validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
 
   // now we find the requested fields that are requested
   // in the get request
-  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
+  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
   checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
   // we get the requested fields that take part of the item definition

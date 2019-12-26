@@ -6,13 +6,13 @@ import {
   checkLanguage,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
-  flattenFieldsFromRequestedFields,
   runPolicyCheck,
   validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { GraphQLEndpointError } from "../../../base/errors";
 import { ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS } from "../../../constants";
+import { flattenRawGQLValueOrFields } from "../../../util";
 
 const debug = Debug("resolvers:deleteItemDefinition");
 export async function deleteItemDefinition(
@@ -28,10 +28,10 @@ export async function deleteItemDefinition(
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // for deleting we must be logged in
-  await validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
 
   // we flatten and get the requested fields
-  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
+  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
   checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
   // now we get this basic information
@@ -47,6 +47,7 @@ export async function deleteItemDefinition(
   // confirmation for deleting users, we also need to
   // gather the created_by and blocked_at to check the rights
   // of the user
+  // TODO cache
   let userId: number;
   await runPolicyCheck(
     "delete",
@@ -61,6 +62,7 @@ export async function deleteItemDefinition(
     // and we do it for being efficient, because we can run
     // both of these checks with a single SQL query, and the policy
     // checker is built in a way that it demands and expects that
+    // TODO cache
     (contentData: any) => {
       // if there is no userId then the row was null, we throw an error
       if (!contentData) {
@@ -117,13 +119,16 @@ export async function deleteItemDefinition(
 
   debug("SUCCEED");
 
-  appData.listener.triggerListeners(
-    mod.getPath().join("/"),
-    itemDefinition.getPath().join("/"),
-    resolverArgs.args.id,
-    resolverArgs.args.listener_uuid,
-    true,
-  );
+  (async () => {
+    await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, null);
+    appData.listener.triggerListeners(
+      mod.getPath().join("/"),
+      itemDefinition.getPath().join("/"),
+      resolverArgs.args.id,
+      resolverArgs.args.listener_uuid,
+      true,
+    );
+  })();
 
   // return null, yep, the output is always null, because it's gone
   // however we are not running the check on the fields that can be read

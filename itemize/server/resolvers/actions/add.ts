@@ -6,7 +6,6 @@ import {
   checkLanguage,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
-  flattenFieldsFromRequestedFields,
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
   buildColumnNamesForItemDefinitionTableOnly,
@@ -14,12 +13,14 @@ import {
   validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
-import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX, UNSPECIFIED_OWNER } from "../../../constants";
+import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX,
+  UNSPECIFIED_OWNER, EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
   convertGQLValueToSQLValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sql";
+import { flattenRawGQLValueOrFields } from "../../../util";
 
 const debug = Debug("resolvers:addItemDefinition");
 export async function addItemDefinition(
@@ -38,12 +39,12 @@ export async function addItemDefinition(
 
   // check that the user is logged in, for adding, only logged users
   // are valid
-  await validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
 
   // now we see which fields are being requested for the answer after adding, first
   // we flatten the fields, remember that we have external and internal fields
   // contained in the DATA value, we flatten that first
-  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
+  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
   // now we use the basic functions and we check if the basic fields are available,
   // basic fields are module based, like moderation fields
   checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
@@ -222,8 +223,17 @@ export async function addItemDefinition(
 
   const finalOutput = {
     DATA: gqlValue,
-    ...gqlValue,
   };
+
+  EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
+    if (typeof gqlValue[property] !== "undefined") {
+      finalOutput[property] = gqlValue[property];
+    }
+  });
+
+  // we don't know what the cached value is, but we assume there is nothing
+  // as it's a new object
+  appData.cache.requestCache(selfTable, moduleTable, value.id);
 
   debug("SUCCEED with GQL output %j", finalOutput);
 

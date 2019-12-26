@@ -34,7 +34,7 @@ export async function searchModule(
   // check language and region
   checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  await validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
 
   // now build the fields we are searching
   const searchingFields = {};
@@ -116,7 +116,7 @@ export async function searchItemDefinition(
   // check the language and region
   checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  await validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
 
   // now we need to get the fields that we are using to search
   const searchingFields = {};

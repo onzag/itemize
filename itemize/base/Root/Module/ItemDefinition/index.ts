@@ -15,6 +15,7 @@ import {
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { GraphQLEndpointError } from "../../../errors";
 import uuid from "uuid";
+import { flattenRawGQLValueOrFields } from "../../../../util";
 
 export interface IPolicyValueRawJSONDataType {
   roles: string[];
@@ -108,24 +109,6 @@ export interface IPolicyType {
 export interface IPoliciesType {
   edit?: IPolicyType;
   delete?: IPolicyType;
-}
-
-function flattenRawGQLValue(recievedFields: any) {
-  if (!recievedFields) {
-    return recievedFields;
-  }
-  // so first we extract the data content
-  const output = {
-    ...(recievedFields.DATA || {}),
-  };
-  // and then we loop for everything else, but data
-  Object.keys(recievedFields).forEach((key) => {
-    if (key !== "DATA") {
-      output[key] = recievedFields[key];
-    }
-  });
-  // return that
-  return output;
 }
 
 /**
@@ -776,7 +759,7 @@ export default class ItemDefinition {
     graphqlRoleRequester: string,
     requestFields: any,
   ) {
-    const flattenedValue = typeof value.DATA !== "undefined" ? flattenRawGQLValue(value) : value;
+    const flattenedValue = typeof value.DATA !== "undefined" ? flattenRawGQLValueOrFields(value) : value;
     this.stateHasAppliedValueTo[id] = true;
     this.stateGQLAppliedValue[id] = {
       userIdRequester: graphqlUserIdRequester,

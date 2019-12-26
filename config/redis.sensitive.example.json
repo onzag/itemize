@@ -1,0 +1,6 @@
+{
+    "host": "localhost",
+    "port": 8080,
+    "path": "path",
+    "url": "THESE ARGUMENTS ARE USED DIRECTLY TO FEED THE REDIS CONSTRUCTOR, MORE OPTIONS ARE AVAILABLE"
+}

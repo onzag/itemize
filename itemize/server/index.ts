@@ -20,6 +20,8 @@ import { customUserMutations } from "./user/mutations";
 import Autocomplete, { IAutocompleteRawJSONDataType } from "../base/Autocomplete";
 import ioMain from "socket.io";
 import { Listener } from "./listener";
+import redis, { RedisClient } from "redis";
+import { Cache } from "./cache";
 
 // TODO comment and document
 
@@ -51,6 +53,10 @@ export interface IAppDataType {
   config: any;
   knex: Knex;
   listener: Listener;
+  cache: Cache;
+  redis: RedisClient;
+  redisPub: RedisClient;
+  redisSub: RedisClient;
 }
 
 export interface IServerCustomizationDataType {
@@ -191,6 +197,11 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     "utf8",
   ));
 
+  const redisConfig = JSON.parse(await fsAsync.readFile(
+    path.join("config", "redis.sensitive.json"),
+    "utf8",
+  ));
+
   // Create the connection string
   const dbConnectionKnexConfig = {
     host: dbConfig.host,
@@ -207,6 +218,10 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     connection: dbConnectionKnexConfig,
   });
 
+  const redisClient: RedisClient = redis.createClient(redisConfig);
+  const redisPub: RedisClient = redis.createClient(redisConfig);
+  const redisSub: RedisClient = redis.createClient(redisConfig);
+
   PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
   PropertyDefinition.autocompleteChecker = serverSideAutocompleteChecker.bind(null, autocompletes);
 
@@ -217,6 +232,10 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     config,
     knex,
     listener: null,
+    redis: redisClient,
+    redisSub,
+    redisPub,
+    cache: new Cache(redisClient, knex),
   };
 
   appData.listener = new Listener(appData);

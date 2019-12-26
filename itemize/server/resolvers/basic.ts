@@ -23,30 +23,8 @@ import { IGQLValue } from "../../base/Root/gql";
 import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
 import Knex from "knex";
 import { jwtVerify } from "../token";
-
-const flattenFieldsFromRequestedFieldsDebug = Debug("resolvers:flattenFieldsFromRequestedFields");
-/**
- * fields get requested with a DATA and some are external, this
- * function flattens the request and removed the data and the
- * external fields into a flat form
- * @param requestedFields the requested fields
- */
-export function flattenFieldsFromRequestedFields(requestedFields: any) {
-  flattenFieldsFromRequestedFieldsDebug("EXECUTED with %j", requestedFields);
-  // so first we extract the data content
-  const output = {
-    ...(requestedFields.DATA || {}),
-  };
-  // and then we loop for everything else, but data
-  Object.keys(requestedFields).forEach((key) => {
-    if (key !== "DATA") {
-      output[key] = requestedFields[key];
-    }
-  });
-  flattenFieldsFromRequestedFieldsDebug("SUCCEED with %j", output);
-  // return that
-  return output;
-}
+import { Cache } from "../cache";
+import { ISQLTableRowValue } from "../../base/Root/sql";
 
 const buildColumnNamesForModuleTableOnlyDebug = Debug("resolvers:buildColumnNamesForModuleTableOnly");
 /**
@@ -310,19 +288,17 @@ export function getDictionary(appData: IAppDataType, args: any): string {
 }
 
 const validateTokenIsntBlockedDebug = Debug("resolvers:validateTokenIsntBlocked");
-export async function validateTokenIsntBlocked(knex: Knex, tokenData: IServerSideTokenDataType) {
+export async function validateTokenIsntBlocked(knex: Knex, cache: Cache, tokenData: IServerSideTokenDataType) {
   validateTokenIsntBlockedDebug("EXECUTED");
   if (tokenData.id) {
-    const result = await knex.first("blocked_at").from("MOD_users").where({
-      id: tokenData.id,
-    });
-    if (!result) {
+    const sqlResult: ISQLTableRowValue = await cache.requestCache("MOD_users__IDEF_user", "MOD_users", tokenData.id);
+    if (!sqlResult) {
       throw new GraphQLEndpointError({
         message: "User has been removed",
         code: "USER_REMOVED",
       });
     }
-    if (result.blocked_at !== null) {
+    if (sqlResult && sqlResult.blocked_at !== null) {
       throw new GraphQLEndpointError({
         message: "User is Blocked",
         code: "USER_BLOCKED",
@@ -330,6 +306,11 @@ export async function validateTokenIsntBlocked(knex: Knex, tokenData: IServerSid
     }
   }
   validateTokenIsntBlockedDebug("SUCCEED");
+}
+
+export interface IFilteredAndPreparedValueType {
+  toReturnToUser: any;
+  actualValue: any;
 }
 
 const filterAndPrepareGQLValueDebug = Debug("resolvers:filterAndPrepareGQLValue");
@@ -349,7 +330,7 @@ export function filterAndPrepareGQLValue(
   requestedFields: any,
   role: string,
   parentModuleOrIdef: ItemDefinition | Module,
-) {
+): IFilteredAndPreparedValueType {
   filterAndPrepareGQLValueDebug(
     "EXECUTED with value %j, where requested fields are %j for role %s and qualified module/item definition %s",
     value,
@@ -357,59 +338,50 @@ export function filterAndPrepareGQLValue(
     role,
     parentModuleOrIdef.getQualifiedPathName(),
   );
-  // now we check what we are actually giving the user
-  // we are not giving them the exact data because they might
-  // not have the entire access
-  let valueToProvide: any;
-
-  // so if the value is not blocked, or if the value is blocked
-  // but we have fancy privileges that allow us to read anyway because
-  // we are pros
-  if (
-    value.blocked_at === null ||
-    (
-      value.blocked_at !== null &&
-      ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(role)
-    )
-  ) {
-    // we are going to get the value for the item
-    let valueOfTheItem: any;
-    if (parentModuleOrIdef instanceof ItemDefinition) {
-      // we convert the value we were provided, of course, we only need
-      // to process what was requested
-      valueOfTheItem = convertSQLValueToGQLValueForItemDefinition(
-        parentModuleOrIdef,
-        value,
-        requestedFields,
-      );
-    } else {
-      // same for modules
-      valueOfTheItem = convertSQLValueToGQLValueForModule(
-        parentModuleOrIdef,
-        value,
-        requestedFields,
-      );
-    }
-    // we add the object like this, all the non requested data, eg.
-    // values inside that should be outside, and outside that will be inside
-    // will be stripped
-    valueToProvide = {
-      DATA: valueOfTheItem,
-      ...valueOfTheItem,
-    };
-  } else {
+  // we are going to get the value for the item
+  let valueOfTheItem: any;
+  if (parentModuleOrIdef instanceof ItemDefinition) {
     // we convert the value we were provided, of course, we only need
     // to process what was requested
-    valueToProvide = {
+    valueOfTheItem = convertSQLValueToGQLValueForItemDefinition(
+      parentModuleOrIdef,
+      value,
+      requestedFields,
+    );
+  } else {
+    // same for modules
+    valueOfTheItem = convertSQLValueToGQLValueForModule(
+      parentModuleOrIdef,
+      value,
+      requestedFields,
+    );
+  }
+  // we add the object like this, all the non requested data, eg.
+  // values inside that should be outside, and outside that will be inside
+  // will be stripped
+  const actualValue = {
+    DATA: valueOfTheItem,
+  };
+
+  EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
+    if (typeof value[property] !== "undefined") {
+      actualValue[property] = value[property];
+    }
+  });
+
+  const valueToProvide = {
+    toReturnToUser: actualValue,
+    actualValue,
+  };
+
+  if (
+    value.blocked_at !== null &&
+    !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(role)
+  ) {
+    valueToProvide.toReturnToUser = {
+      ...valueToProvide.toReturnToUser,
       DATA: null,
     };
-    // we add every externally accessed field, these fields are not
-    // a security concern and anyway they are checked beforehand
-    // anything non requested will be stripped, or set to null by this same
-    // code
-    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
-      valueToProvide[property] = value[property];
-    });
   }
 
   filterAndPrepareGQLValueDebug(

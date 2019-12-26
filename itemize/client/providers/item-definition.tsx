@@ -19,8 +19,8 @@ import {
   UNSPECIFIED_OWNER,
   PREFIX_SEARCH,
 } from "../../constants";
-import { buildGqlQuery, buildGqlMutation, gqlQuery, IGQLQueryObj,
-  requestFieldsAreContained, deepMerge, GQLEnum, convertValueToFields } from "../app/gql-querier";
+import { buildGqlQuery, buildGqlMutation, gqlQuery, IGQLQueryObj, GQLEnum } from "../app/gql-querier";
+import { requestFieldsAreContained, deepMerge, convertValueToFields } from "../../util";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";

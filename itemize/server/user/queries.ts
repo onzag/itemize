@@ -5,6 +5,8 @@ import { CONNECTOR_SQL_COLUMN_FK_NAME } from "../../constants";
 import { jwtVerify, jwtSign } from "../token";
 import { GraphQLEndpointError } from "../../../itemize/base/errors";
 import { IServerSideTokenDataType } from "../resolvers/basic";
+import { ISQLTableRowValue } from "../../base/Root/sql";
+import { deepMerge } from "../../util";
 
 export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinitionType => {
   const userModule = appData.root.getModuleFor(["users"]);
@@ -67,6 +69,8 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         });
         let failureToGetUserIsCredentials = false;
         let preGeneratedToken: string = null;
+        let queryHasPasswordCheck: boolean = false;
+        let decodedId: number = null;
 
         // if we have a token provided
         if (args.token) {
@@ -79,6 +83,8 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             resultUserQuery
               .where("id", decoded.id)
               .andWhere("role", decoded.role);
+
+            decodedId = decoded.id;
           } catch (err) {
             throw new GraphQLEndpointError({
               message: "Token is invalid",
@@ -88,6 +94,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         } else {
           // otherwise we are using username and password combo
           failureToGetUserIsCredentials = true;
+          queryHasPasswordCheck = true;
           // and we apply as required
           resultUserQuery
             .where(userNamePropertyDescription.sqlEqual(args.username, "", usernameProperty.getId(), appData.knex))
@@ -95,7 +102,25 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         }
 
         // now we get the user whichever was the method
-        const resultUser = await resultUserQuery;
+        let resultUserFromSQLQuery: ISQLTableRowValue = null;
+        if (!queryHasPasswordCheck) {
+          resultUserFromSQLQuery = await appData.cache.requestCache(
+            userTable,
+            moduleTable,
+            decodedId,
+          );
+        } else {
+          resultUserFromSQLQuery = await resultUserQuery;
+        }
+
+        let resultUser = resultUserFromSQLQuery;
+        if (resultUser) {
+          resultUser = {
+            id: resultUser.id,
+            role: resultUser.role,
+            blocked_at: resultUser.blocked_at,
+          };
+        }
         // if we get an user
         if (resultUser) {
           // if the user is blocked

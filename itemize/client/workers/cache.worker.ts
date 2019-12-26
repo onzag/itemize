@@ -1,6 +1,6 @@
 import { expose } from "comlink";
 import { openDB, DBSchema, IDBPDatabase } from "idb";
-import { requestFieldsAreContained, deepMerge } from "../app/gql-querier";
+import { requestFieldsAreContained } from "../../util";
 
 interface ICacheDB extends DBSchema {
   queries: {

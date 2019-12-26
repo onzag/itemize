@@ -1,5 +1,6 @@
 import { Socket } from "socket.io";
 import { IAppDataType } from ".";
+import { ISQLTableRowValue } from "../base/Root/sql";
 
 interface IListenerList {
   [socketId: string]: {
@@ -17,6 +18,9 @@ export class Listener {
   private appData: IAppDataType;
   constructor(appData: IAppDataType) {
     this.appData = appData;
+    this.pubSubTriggerListeners = this.pubSubTriggerListeners.bind(this);
+
+    this.appData.redisSub.on("message", this.pubSubTriggerListeners);
   }
   public setUUID(
     socket: Socket,
@@ -55,6 +59,7 @@ export class Listener {
 
     const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+      this.appData.redisSub.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
     }
@@ -67,12 +72,13 @@ export class Listener {
   ) {
     try {
       const mod = this.appData.root.getModuleFor(modulePath.split("/"));
-      const result = await this.appData.knex.first("edited_at").from(mod.getQualifiedPathName()).where({
-        id,
-      });
-      if (result) {
-        socket.emit("changed", modulePath, itemDefinitionPath, id, "edited_at_feedback", result.edited_at);
-      } else if (!result) {
+      const itemDefinition = mod.getItemDefinitionFor(itemDefinitionPath.split("/"));
+      const queriedResult: ISQLTableRowValue = this.appData.cache.requestCache(
+        itemDefinition.getQualifiedPathName(), mod.getQualifiedPathName(), id,
+      );
+      if (queriedResult) {
+        socket.emit("changed", modulePath, itemDefinitionPath, id, "edited_at_feedback", queriedResult.edited_at);
+      } else {
         socket.emit("changed", modulePath, itemDefinitionPath, id, "deleted", null);
       }
     } catch (err) {
@@ -88,6 +94,7 @@ export class Listener {
   ) {
     const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
     if (this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+      this.appData.redisSub.unsubscribe(mergedIndexIdentifier);
       delete this.listeners[socket.id].listens[mergedIndexIdentifier];
       this.listeners[socket.id].amount--;
     }
@@ -101,16 +108,32 @@ export class Listener {
   ) {
     console.log("requested trigger on", modulePath, itemDefinitionPath, id, listenerUUID, deleted);
     const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
+    this.appData.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
+      modulePath,
+      itemDefinitionPath,
+      id,
+      listenerUUID,
+      deleted,
+      mergedIndexIdentifier,
+    }));
+  }
+  public pubSubTriggerListeners(
+    channel: string,
+    message: string,
+  ) {
+    const parsedContent = JSON.parse(message);
+    console.log(parsedContent);
     Object.keys(this.listeners).forEach((socketKey) => {
       const whatListening = this.listeners[socketKey].listens;
-      if (whatListening[mergedIndexIdentifier] && this.listeners[socketKey].uuid !== listenerUUID) {
+      if (whatListening[parsedContent.mergedIndexIdentifier] &&
+        this.listeners[socketKey].uuid !== parsedContent.listenerUUID) {
         console.log("emitting to someone");
         this.listeners[socketKey].socket.emit(
           "changed",
-          modulePath,
-          itemDefinitionPath,
-          id,
-          deleted ? "deleted" : "modified",
+          parsedContent.modulePath,
+          parsedContent.itemDefinitionPath,
+          parsedContent.id,
+          parsedContent.deleted ? "deleted" : "modified",
           null,
         );
       }

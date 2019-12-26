@@ -6,7 +6,6 @@ import {
   checkLanguage,
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
-  flattenFieldsFromRequestedFields,
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
   runPolicyCheck,
@@ -15,13 +14,14 @@ import {
   validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
-import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX, UNSPECIFIED_OWNER } from "../../../constants";
+import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
   convertGQLValueToSQLValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sql";
 import { GraphQLEndpointError } from "../../../base/errors";
+import { flattenRawGQLValueOrFields } from "../../../util";
 
 const debug = Debug("resolvers:editItemDefinition");
 export async function editItemDefinition(
@@ -37,10 +37,10 @@ export async function editItemDefinition(
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // for editing one must be logged in
-  await validateTokenIsntBlocked(appData.knex, tokenData);
+  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
 
   // now we get the requested fields, and check they are available for the given role
-  const requestedFields = flattenFieldsFromRequestedFields(graphqlFields(resolverArgs.info));
+  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
   checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
   // now we get the basic information
@@ -60,6 +60,7 @@ export async function editItemDefinition(
 
   // so we run the policy check for edit, this item definition,
   // with the given id
+  // TODO cache
   await runPolicyCheck(
     "edit",
     itemDefinition,
@@ -289,13 +290,17 @@ export async function editItemDefinition(
 
   debug("SUCCEED with GQL output %j", finalOutput);
 
-  appData.listener.triggerListeners(
-    mod.getPath().join("/"),
-    itemDefinition.getPath().join("/"),
-    resolverArgs.args.id,
-    resolverArgs.args.listener_uuid,
-    false,
-  );
+  // we return and this executes after it returns
+  (async () => {
+    await appData.cache.requestCache(selfTable, moduleTable, resolverArgs.args.id, true);
+    appData.listener.triggerListeners(
+      mod.getPath().join("/"),
+      itemDefinition.getPath().join("/"),
+      resolverArgs.args.id,
+      resolverArgs.args.listener_uuid,
+      false,
+    );
+  })();
 
   return finalOutput;
 }
