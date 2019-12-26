@@ -37,6 +37,7 @@ export class Listener {
     }
 
     const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
+    console.log(mergedIndexIdentifier, socket.id);
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
@@ -82,10 +83,12 @@ export class Listener {
     changeUUID: string,
     deleted: boolean,
   ) {
+    console.log("requested trigger on", modulePath, itemDefinitionPath, id, changeUUID, deleted);
     const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
     Object.keys(this.listeners).forEach((socketKey) => {
       const whatListening = this.listeners[socketKey].listens;
       if (whatListening[mergedIndexIdentifier]) {
+        console.log("emitting to someone");
         this.listeners[socketKey].socket.emit("changed", modulePath, itemDefinitionPath, id, null, changeUUID, deleted);
       }
     });

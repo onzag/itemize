@@ -79,7 +79,7 @@ export interface IItemDefinitionContextType {
   canCreate: boolean;
   canEdit: boolean;
   canDelete: boolean;
-  reload: () => Promise<IBasicActionResponse>;
+  reload: (denyCache?: boolean) => Promise<IBasicActionResponse>;
   submit: (options?: IActionSubmitOptions) => Promise<IActionResponseWithId>;
   delete: () => Promise<IBasicActionResponse>;
   search: () => Promise<IActionResponseWithManyIds>;
@@ -183,6 +183,9 @@ const ItemDefinitionProviderRequestsInProgressRegistry: {
     registeredCallbacks: any[],
   };
 } = {};
+const ItemDefinitionProviderCleanUpsInProgressRegistry: {
+  [qualifiedPathNameWithID: string]: boolean;
+} = {};
 function itemDefinitionProviderRequestsInProgressTimeout(time: number) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
@@ -226,7 +229,9 @@ class ActualItemDefinitionProvider extends
     this.onItemSetExclusionState = this.onItemSetExclusionState.bind(this);
     this.loadValue = this.loadValue.bind(this);
     this.delete = this.delete.bind(this);
-    this.listener = this.listener.bind(this);
+    this.changeListener = this.changeListener.bind(this);
+    this.deleteListener = this.deleteListener.bind(this);
+    this.reloadListener = this.reloadListener.bind(this);
     this.submit = this.submit.bind(this);
     this.dismissLoadError = this.dismissLoadError.bind(this);
     this.dismissSubmitError = this.dismissSubmitError.bind(this);
@@ -284,14 +289,18 @@ class ActualItemDefinitionProvider extends
     };
   }
   public setupListeners() {
-    this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.listener);
+    this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.changeListener);
     if (this.props.forId) {
+      this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
+      this.props.itemDefinitionInstance.addListener("delete", this.props.forId, this.deleteListener);
       this.props.remoteListener.addListenerFor(this.props.itemDefinitionInstance, this.props.forId);
     }
   }
   public unSetupListeners() {
-    this.props.itemDefinitionInstance.removeListener("change", this.props.forId || null, this.listener);
+    this.props.itemDefinitionInstance.removeListener("change", this.props.forId || null, this.changeListener);
     if (this.props.forId) {
+      this.props.itemDefinitionInstance.removeListener("reload", this.props.forId, this.reloadListener);
+      this.props.itemDefinitionInstance.removeListener("delete", this.props.forId, this.deleteListener);
       this.props.remoteListener.removeListenerFor(this.props.itemDefinitionInstance, this.props.forId);
     }
   }
@@ -316,8 +325,10 @@ class ActualItemDefinitionProvider extends
   ) {
     const itemDefinitionWasUpdated = this.props.itemDefinitionInstance !== prevProps.itemDefinitionInstance;
     if (itemDefinitionWasUpdated) {
-      prevProps.itemDefinitionInstance.removeListener("change", prevProps.forId || null, this.listener);
+      prevProps.itemDefinitionInstance.removeListener("change", prevProps.forId || null, this.changeListener);
       if (prevProps.forId) {
+        prevProps.itemDefinitionInstance.removeListener("reload", prevProps.forId, this.reloadListener);
+        prevProps.itemDefinitionInstance.removeListener("delete", prevProps.forId, this.deleteListener);
         prevProps.remoteListener.removeListenerFor(prevProps.itemDefinitionInstance, prevProps.forId);
       }
     }
@@ -327,12 +338,16 @@ class ActualItemDefinitionProvider extends
       !equals(this.props.optimize, prevProps.optimize) ||
       itemDefinitionWasUpdated
     ) {
-      prevProps.itemDefinitionInstance.removeListener("change", prevProps.forId || null, this.listener);
+      prevProps.itemDefinitionInstance.removeListener("change", prevProps.forId || null, this.changeListener);
       if (prevProps.forId) {
+        prevProps.itemDefinitionInstance.addListener("reload", prevProps.forId, this.reloadListener);
+        prevProps.itemDefinitionInstance.addListener("delete", prevProps.forId, this.deleteListener);
         prevProps.remoteListener.removeListenerFor(prevProps.itemDefinitionInstance, prevProps.forId);
       }
-      this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.listener);
+      this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.changeListener);
       if (this.props.forId) {
+        this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
+        this.props.itemDefinitionInstance.addListener("delete", this.props.forId, this.deleteListener);
         this.props.remoteListener.addListenerFor(this.props.itemDefinitionInstance, this.props.forId);
       }
       // we set the value given we have changed the forId
@@ -372,7 +387,35 @@ class ActualItemDefinitionProvider extends
     }
     this.loadValue();
   }
-  public listener() {
+  public deleteListener() {
+    const qualifiedPathNameWithID = this.props.itemDefinitionInstance.getQualifiedPathName() + "." + this.props.forId;
+    if (!ItemDefinitionProviderCleanUpsInProgressRegistry[qualifiedPathNameWithID]) {
+      ItemDefinitionProviderCleanUpsInProgressRegistry[qualifiedPathNameWithID] = true;
+      if (CacheWorkerInstance.isSupported) {
+        CacheWorkerInstance.instance.setCache(
+          PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId, null);
+      }
+      this.props.itemDefinitionInstance.cleanValueFor(this.props.forId);
+    }
+
+    if (!this.state.notFound) {
+      this.setState({
+        notFound: true,
+        itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
+          this.props.forId || null,
+          !this.props.disableExternalChecks,
+          this.props.optimize && this.props.optimize.onlyIncludeProperties,
+          this.props.optimize && this.props.optimize.onlyIncludeItems,
+          this.props.optimize && this.props.optimize.excludePolicies,
+        ),
+      });
+    }
+  }
+  public reloadListener() {
+    console.log("RELOAD LISTENED");
+    this.loadValue(true);
+  }
+  public changeListener() {
     if (this.props.optimize && this.props.optimize.disableListener) {
       return;
     }
@@ -553,7 +596,7 @@ class ActualItemDefinitionProvider extends
 
     return {requestFields, argumentsForQuery};
   }
-  public async loadValue(): Promise<IBasicActionResponse> {
+  public async loadValue(denyCache?: boolean): Promise<IBasicActionResponse> {
     // we don't use loading here because there's one big issue
     // elements are assumed into the loading state by the constructor
     // if they have an id
@@ -575,15 +618,17 @@ class ActualItemDefinitionProvider extends
       onlyIncludeProperties: this.props.optimize && this.props.optimize.onlyIncludeProperties,
     });
 
-    // Prevent loading at all if value currently available and memoryCached
-    const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId);
-    if (
-      appliedGQLValue &&
-      requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
-    ) {
-      return {
-        error: null,
-      };
+    if (!denyCache) {
+      // Prevent loading at all if value currently available and memoryCached
+      const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId);
+      if (
+        appliedGQLValue &&
+        requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
+      ) {
+        return {
+          error: null,
+        };
+      }
     }
 
     // the loading state is launched here, however
@@ -604,6 +649,7 @@ class ActualItemDefinitionProvider extends
     if (this.props.optimize && this.props.optimize.dontWaitForLoad) {
       return await this.loadValueWaiter(
         requestFields,
+        denyCache,
       );
     }
 
@@ -655,6 +701,7 @@ class ActualItemDefinitionProvider extends
     // so we load the value
     const value = await this.loadValueWaiter(
       requestFieldsToGet,
+      denyCache,
     );
 
     // run all the resolvers that were expecting callback with the value
@@ -664,7 +711,7 @@ class ActualItemDefinitionProvider extends
     return value;
   }
 
-  public async loadValueWaiter(requestFields: any): Promise<IBasicActionResponse> {
+  public async loadValueWaiter(requestFields: any, denyCache?: boolean): Promise<IBasicActionResponse> {
     const {
       value,
       error,
@@ -677,6 +724,7 @@ class ActualItemDefinitionProvider extends
       {},
       requestFields,
       false,
+      !denyCache,
     );
 
     // this should never happen honestly as we are giving
@@ -747,7 +795,7 @@ class ActualItemDefinitionProvider extends
       this.setState({
         itemDefinitionState: newItemDefinitionState,
       });
-      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null, this.listener);
+      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null, this.changeListener);
     }
   }
   public onPropertyChange(
@@ -861,6 +909,7 @@ class ActualItemDefinitionProvider extends
     baseArgs: any,
     requestFields: any,
     returnMemoryCachedValuesForGetRequests: boolean,
+    returnWorkerCachedValuesForGetRequests: boolean,
   ): Promise<{
     error: GraphQLEndpointErrorType,
     value: any,
@@ -885,12 +934,6 @@ class ActualItemDefinitionProvider extends
       args.order_by = new GQLEnum("DEFAULT");
     }
 
-    const objQuery: IGQLQueryObj = {
-      name: queryName,
-      args,
-      fields: requestFields,
-    };
-
     const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
     if (queryPrefix === PREFIX_GET && returnMemoryCachedValuesForGetRequests) {
       if (
@@ -908,20 +951,40 @@ class ActualItemDefinitionProvider extends
       }
     }
 
-    if (queryPrefix === PREFIX_GET && this.props.forId && CacheWorkerInstance.isSupported) {
-      const workerCachedValue =
+    let workerCachedValue: any = null;
+    if (
+      (
+        queryPrefix === PREFIX_GET ||
+        queryPrefix === PREFIX_EDIT
+      ) &&
+      this.props.forId
+    ) {
+      workerCachedValue =
         await CacheWorkerInstance.instance.getCachedValue(queryName, this.props.forId, requestFields);
-      if (workerCachedValue) {
+      if (queryPrefix === PREFIX_GET && returnWorkerCachedValuesForGetRequests) {
         return {
           error: null,
           value: workerCachedValue.value,
           memoryCached: false,
           cached: true,
-          getQueryFields: convertValueToFields(workerCachedValue),
+          getQueryFields: convertValueToFields(workerCachedValue.value),
           actionUUID: null,
         };
       }
     }
+
+    let actionUUID: string;
+    if (queryPrefix === PREFIX_EDIT || queryPrefix === PREFIX_DELETE) {
+      actionUUID = uuid.v4();
+      args.action_uuid = actionUUID;
+      this.props.remoteListener.addActionInProgress(actionUUID);
+    }
+
+    const objQuery: IGQLQueryObj = {
+      name: queryName,
+      args,
+      fields: requestFields,
+    };
 
     let query: string;
     if (queryPrefix === PREFIX_GET || queryPrefix === PREFIX_SEARCH) {
@@ -952,14 +1015,31 @@ class ActualItemDefinitionProvider extends
         queryPrefix === PREFIX_ADD
       ) {
         if (appliedGQLValue && appliedGQLValue.rawValue) {
-          value = deepMerge(
-            value,
-            appliedGQLValue.rawValue,
-          );
-          mergedQueryFields = deepMerge(
-            requestFields,
-            appliedGQLValue.requestFields,
-          );
+          if (workerCachedValue && workerCachedValue.value) {
+            value = deepMerge(
+              value,
+              deepMerge(
+                appliedGQLValue.rawValue,
+                workerCachedValue.value,
+              ),
+            );
+            mergedQueryFields = deepMerge(
+              requestFields,
+              deepMerge(
+                appliedGQLValue.requestFields,
+                convertValueToFields(workerCachedValue.value),
+              ),
+            );
+          } else {
+            value = deepMerge(
+              value,
+              appliedGQLValue.rawValue,
+            );
+            mergedQueryFields = deepMerge(
+              requestFields,
+              appliedGQLValue.requestFields,
+            );
+          }
         }
       }
     }
@@ -974,12 +1054,6 @@ class ActualItemDefinitionProvider extends
       ) {
         CacheWorkerInstance.instance.setCache(PREFIX_GET + queryBase, this.props.forId, value);
       }
-    }
-
-    let actionUUID: string;
-    if (queryPrefix === PREFIX_EDIT || queryPrefix === PREFIX_DELETE) {
-      actionUUID = uuid.v4();
-      args.action_uuid = actionUUID;
     }
 
     return {
@@ -1098,12 +1172,14 @@ class ActualItemDefinitionProvider extends
 
     const {
       error,
+      actionUUID,
     } = await this.runQueryFor(
       PREFIX_DELETE,
       applyingPolicyArgs,
       {
         id: {},
       },
+      false,
       false,
     );
 
@@ -1125,6 +1201,8 @@ class ActualItemDefinitionProvider extends
       });
       this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId);
     }
+
+    this.props.remoteListener.removeActionInProgress(actionUUID);
 
     return {
       error,
@@ -1208,6 +1286,7 @@ class ActualItemDefinitionProvider extends
       },
       requestFields,
       false,
+      false,
     );
 
     let recievedId: number = null;
@@ -1250,6 +1329,8 @@ class ActualItemDefinitionProvider extends
       }
       this.props.itemDefinitionInstance.triggerListeners("change", recievedId);
     }
+
+    this.props.remoteListener.removeActionInProgress(actionUUID);
 
     // happens during an error or whatnot
     return {
@@ -1306,6 +1387,7 @@ class ActualItemDefinitionProvider extends
       {
         ids: {},
       },
+      false,
       false,
     );
 
