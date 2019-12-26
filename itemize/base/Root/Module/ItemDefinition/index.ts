@@ -82,7 +82,7 @@ export interface IItemDefinitionStateType {
   items: IItemState[];
   properties: IPropertyDefinitionState[];
   policies: IPoliciesStateType;
-  gqlOriginalAppliedValue: IItemDefinitionGQLValueType;
+  gqlOriginalFlattenedValue: any;
   forId: number;
 }
 
@@ -96,8 +96,8 @@ export enum ItemDefinitionIOActions {
 export interface IItemDefinitionGQLValueType {
   userIdRequester: number;
   roleRequester: string;
-  query: string;
-  value: any;
+  rawValue: any;
+  flattenedValue: any;
   requestFields: any;
 }
 
@@ -108,6 +108,24 @@ export interface IPolicyType {
 export interface IPoliciesType {
   edit?: IPolicyType;
   delete?: IPolicyType;
+}
+
+function flattenRawGQLValue(recievedFields: any) {
+  if (!recievedFields) {
+    return recievedFields;
+  }
+  // so first we extract the data content
+  const output = {
+    ...(recievedFields.DATA || {}),
+  };
+  // and then we loop for everything else, but data
+  Object.keys(recievedFields).forEach((key) => {
+    if (key !== "DATA") {
+      output[key] = recievedFields[key];
+    }
+  });
+  // return that
+  return output;
 }
 
 /**
@@ -668,6 +686,7 @@ export default class ItemDefinition {
         ii.getStateNoExternalChecking(id, emulateExternalChecking));
     }
 
+    const gqlOriginal = this.getGQLAppliedValue(id);
     return {
       moduleName: this.getModuleName(),
       itemDefQualifiedName: this.getQualifiedPathName(),
@@ -675,7 +694,7 @@ export default class ItemDefinition {
       items,
       properties,
       policies,
-      gqlOriginalAppliedValue: this.getGQLAppliedValue(id),
+      gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
       forId: id,
     };
   }
@@ -729,6 +748,7 @@ export default class ItemDefinition {
       items = await Promise.all(this.itemInstances.map((ii: Item) => ii.getState(id)));
     }
 
+    const gqlOriginal = this.getGQLAppliedValue(id);
     return {
       moduleName: this.getModuleName(),
       itemDefQualifiedName: this.getQualifiedPathName(),
@@ -736,7 +756,7 @@ export default class ItemDefinition {
       items,
       properties,
       policies,
-      gqlOriginalAppliedValue: this.getGQLAppliedValue(id),
+      gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
       forId: id,
     };
   }
@@ -752,15 +772,15 @@ export default class ItemDefinition {
     excludeExtensions: boolean,
     graphqlUserIdRequester: number,
     graphqlRoleRequester: string,
-    graphqlQuery: string,
     requestFields: any,
   ) {
+    const flattenedValue = typeof value.DATA !== "undefined" ? flattenRawGQLValue(value) : value;
     this.stateHasAppliedValueTo[id] = true;
     this.stateGQLAppliedValue[id] = {
       userIdRequester: graphqlUserIdRequester,
       roleRequester: graphqlRoleRequester,
-      value,
-      query: graphqlQuery,
+      rawValue: value,
+      flattenedValue,
       requestFields,
     };
 
@@ -769,7 +789,7 @@ export default class ItemDefinition {
         this.getAllPropertyDefinitions() :
         this.getAllPropertyDefinitionsAndExtensions();
     properties.forEach((property) => {
-      let givenValue = value[property.getId()];
+      let givenValue = flattenedValue[property.getId()];
       let setAsModified = true;
       if (typeof givenValue === "undefined") {
         setAsModified = false;
@@ -778,11 +798,12 @@ export default class ItemDefinition {
       property.applyValue(id, givenValue, setAsModified);
     });
     this.getAllItems().forEach((item) => {
-      let givenValue = value[item.getQualifiedIdentifier()];
+      let givenValue = flattenedValue[item.getQualifiedIdentifier()];
       if (typeof givenValue === "undefined") {
         givenValue = null;
       }
-      const givenExclusionState = value[item.getQualifiedExclusionStateIdentifier()] || ItemExclusionState.EXCLUDED;
+      const givenExclusionState =
+        flattenedValue[item.getQualifiedExclusionStateIdentifier()] || ItemExclusionState.EXCLUDED;
       item.applyValue(id, givenValue, givenExclusionState);
     });
   }
@@ -791,15 +812,15 @@ export default class ItemDefinition {
     if (
       !this.stateHasAppliedValueTo[id] ||
       !this.stateGQLAppliedValue[id] ||
-      !this.stateGQLAppliedValue[id].value
+      !this.stateGQLAppliedValue[id].flattenedValue
     ) {
       return -1;
     }
 
     if (this.isOwnerObjectId()) {
-      return this.stateGQLAppliedValue[id].value.id || UNSPECIFIED_OWNER;
+      return this.stateGQLAppliedValue[id].flattenedValue.id || UNSPECIFIED_OWNER;
     }
-    return this.stateGQLAppliedValue[id].value.created_by || UNSPECIFIED_OWNER;
+    return this.stateGQLAppliedValue[id].flattenedValue.created_by || UNSPECIFIED_OWNER;
   }
 
   public cleanValueFor(id: number, excludeExtensions?: boolean) {

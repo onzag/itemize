@@ -98,20 +98,23 @@ export async function gqlQuery(query: string) {
   }
 }
 
-export function requestFieldsAreContained(requestFieldsSubset: any, requestFieldsMain: any): boolean {
+export function requestFieldsAreContained(requestFieldsSubset: any, requestFieldsOrValueMain: any): boolean {
   const subSetKeys = Object.keys(requestFieldsSubset);
-  const mainKeys = Object.keys(requestFieldsMain);
+  const mainKeys = Object.keys(requestFieldsOrValueMain);
   if (subSetKeys.length > mainKeys.length) {
     return false;
   } else if (subSetKeys.length === 0 && mainKeys.length === 0) {
     return true;
   }
   return subSetKeys.every((key) => {
-    if (!requestFieldsMain[key]) {
+    if (typeof requestFieldsOrValueMain[key] === "undefined") {
       return false;
     }
 
-    requestFieldsAreContained(requestFieldsSubset[key], requestFieldsMain[key]);
+    if (typeof requestFieldsOrValueMain[key] === "object" && requestFieldsOrValueMain[key] !== null) {
+      return requestFieldsAreContained(requestFieldsSubset[key], requestFieldsOrValueMain[key]);
+    }
+    return true;
   });
 }
 
@@ -136,4 +139,20 @@ export function deepMerge(gqlValueOrFieldsOverride: any, gqlValueOfFieldsOverrid
   });
 
   return newObjMerge;
+}
+
+export function convertValueToFields(value: any) {
+  if (typeof value !== "object" || value === null) {
+    return {};
+  }
+
+  const newFields = {
+    ...value,
+  };
+
+  Object.keys(newFields).forEach((key) => {
+    newFields[key] = convertValueToFields(newFields[key]);
+  });
+
+  return newFields;
 }

@@ -19,11 +19,13 @@ import {
   UNSPECIFIED_OWNER,
   PREFIX_SEARCH,
 } from "../../constants";
-import { buildGqlQuery, buildGqlMutation, gqlQuery, IGQLQueryObj, requestFieldsAreContained, deepMerge, GQLEnum } from "../app/gql-querier";
+import { buildGqlQuery, buildGqlMutation, gqlQuery, IGQLQueryObj,
+  requestFieldsAreContained, deepMerge, GQLEnum, convertValueToFields } from "../app/gql-querier";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
+import CacheWorkerInstance from "../workers/cache";
 
 export interface IBasicActionResponse {
   error: GraphQLEndpointErrorType;
@@ -134,7 +136,7 @@ interface IItemDefinitionProviderProps {
     // anymore
     disableListener?: boolean,
     // prevents waiting for data to be gathered before loading the value
-    // this can be detrimental in some cases, doesn't affect memory cached values
+    // this can be detrimental in some cases, doesn't affect memory memoryCached values
     dontWaitForLoad?: boolean,
     // cleans the value from the memory cache once the object dismounts
     // as the memory cache might only grow and grow
@@ -170,21 +172,6 @@ interface IActualItemDefinitionProviderState {
   canEdit: boolean;
   canDelete: boolean;
   canCreate: boolean;
-}
-
-function flattenRecievedFields(recievedFields: any) {
-  // so first we extract the data content
-  const output = {
-    ...(recievedFields.DATA || {}),
-  };
-  // and then we loop for everything else, but data
-  Object.keys(recievedFields).forEach((key) => {
-    if (key !== "DATA") {
-      output[key] = recievedFields[key];
-    }
-  });
-  // return that
-  return output;
 }
 
 const ItemDefinitionProviderRequestsInProgressRegistry: {
@@ -254,6 +241,10 @@ class ActualItemDefinitionProvider extends
     this.dismissSearchResults = this.dismissSearchResults.bind(this);
 
     this.state = this.setupInitialState();
+
+    if (CacheWorkerInstance.isSupported) {
+      CacheWorkerInstance.instance.setupVersion((window as any).BUILD_NUMBER);
+    }
   }
   public setupInitialState(): IActualItemDefinitionProviderState {
     return {
@@ -565,7 +556,7 @@ class ActualItemDefinitionProvider extends
       onlyIncludeProperties: this.props.optimize && this.props.optimize.onlyIncludeProperties,
     });
 
-    // Prevent loading at all if value currently available and cached
+    // Prevent loading at all if value currently available and memoryCached
     const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId);
     if (
       appliedGQLValue &&
@@ -658,8 +649,7 @@ class ActualItemDefinitionProvider extends
     const {
       value,
       error,
-      cached,
-      getQuery,
+      memoryCached,
       getQueryFields,
     } = await this.runQueryFor(
       PREFIX_GET,
@@ -669,9 +659,11 @@ class ActualItemDefinitionProvider extends
     );
 
     // this should never happen honestly as we are giving
-    // a false flag for return cached value for get requests
-    // but we leave it here just in case
-    if (cached) {
+    // a false flag for return memoryCached value for get requests
+    // but we leave it here just in case, memoryCached means the object
+    // is already in memory in the state and already populated because react uses
+    // that state
+    if (memoryCached) {
       return {
         error: null,
       };
@@ -700,14 +692,12 @@ class ActualItemDefinitionProvider extends
         isBlockedButDataIsAccessible: value.blocked_at ? !!value.DATA : false,
       });
 
-      const recievedFields = flattenRecievedFields(value);
       this.props.itemDefinitionInstance.applyValue(
         this.props.forId || null,
-        recievedFields,
+        value,
         false,
         this.props.tokenData.id,
         this.props.tokenData.role,
-        getQuery,
         getQueryFields,
       );
       this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null);
@@ -844,12 +834,18 @@ class ActualItemDefinitionProvider extends
     queryPrefix: string,
     baseArgs: any,
     requestFields: any,
-    returnCachedValuesForGetRequests: boolean,
-  ) {
-    const queryName = queryPrefix +
-      (this.props.itemDefinitionInstance.isExtensionsInstance() ?
+    returnMemoryCachedValuesForGetRequests: boolean,
+  ): Promise<{
+    error: GraphQLEndpointErrorType,
+    value: any,
+    memoryCached: boolean,
+    cached: boolean,
+    getQueryFields: any,
+  }> {
+    const queryBase = (this.props.itemDefinitionInstance.isExtensionsInstance() ?
       this.props.itemDefinitionInstance.getParentModule().getQualifiedPathName() :
       this.props.itemDefinitionInstance.getQualifiedPathName());
+    const queryName = queryPrefix + queryBase;
     const args = {
       token: this.props.tokenData.token,
       language: this.props.localeData.language.split("-")[0],
@@ -868,30 +864,41 @@ class ActualItemDefinitionProvider extends
       fields: requestFields,
     };
 
+    const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
+    if (queryPrefix === PREFIX_GET && returnMemoryCachedValuesForGetRequests) {
+      if (
+        appliedGQLValue &&
+        requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
+      ) {
+        return {
+          error: null,
+          value: appliedGQLValue.rawValue,
+          memoryCached: true,
+          cached: false,
+          getQueryFields: appliedGQLValue.requestFields,
+        };
+      }
+    }
+
+    if (queryPrefix === PREFIX_GET && this.props.forId && CacheWorkerInstance.isSupported) {
+      const workerCachedValue =
+        await CacheWorkerInstance.instance.getCachedValue(queryName, this.props.forId, requestFields);
+      if (workerCachedValue) {
+        return {
+          error: null,
+          value: workerCachedValue.value,
+          memoryCached: false,
+          cached: true,
+          getQueryFields: convertValueToFields(workerCachedValue),
+        };
+      }
+    }
+
     let query: string;
     if (queryPrefix === PREFIX_GET || queryPrefix === PREFIX_SEARCH) {
       query = buildGqlQuery(objQuery);
     } else {
       query = buildGqlMutation(objQuery);
-    }
-
-    const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
-    if (queryPrefix === PREFIX_GET && returnCachedValuesForGetRequests) {
-      if (
-        appliedGQLValue &&
-        (
-          appliedGQLValue.query === query ||
-          requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
-        )
-      ) {
-        return {
-          error: null,
-          value: appliedGQLValue.value,
-          cached: true,
-          getQuery: appliedGQLValue.query,
-          getQueryFields: appliedGQLValue.requestFields,
-        };
-      }
     }
 
     const gqlValue = await gqlQuery(query);
@@ -915,11 +922,10 @@ class ActualItemDefinitionProvider extends
         queryPrefix === PREFIX_EDIT ||
         queryPrefix === PREFIX_ADD
       ) {
-        value = flattenRecievedFields(value);
-        if (appliedGQLValue && appliedGQLValue.value) {
+        if (appliedGQLValue && appliedGQLValue.rawValue) {
           value = deepMerge(
             value,
-            appliedGQLValue.value,
+            appliedGQLValue.rawValue,
           );
           mergedQueryFields = deepMerge(
             requestFields,
@@ -929,26 +935,23 @@ class ActualItemDefinitionProvider extends
       }
     }
 
-    let getQuery: string = null;
-    if (queryPrefix === PREFIX_GET) {
-      getQuery = query;
-    } else if (queryPrefix === PREFIX_EDIT || queryPrefix === PREFIX_ADD) {
-      getQuery = buildGqlQuery({
-        name: PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(),
-        args: {
-          id: value && value.id,
-          token: this.props.tokenData.token,
-          language: this.props.localeData.language.split("-")[0],
-        },
-        fields: mergedQueryFields || requestFields,
-      });
+    if (!error && CacheWorkerInstance.isSupported) {
+      if (queryPrefix === PREFIX_DELETE) {
+        CacheWorkerInstance.instance.setCache(PREFIX_GET + queryBase, this.props.forId, null);
+      } else if (
+        queryPrefix === PREFIX_GET ||
+        queryPrefix === PREFIX_EDIT ||
+        queryPrefix === PREFIX_ADD
+      ) {
+        CacheWorkerInstance.instance.setCache(PREFIX_GET + queryBase, this.props.forId, value);
+      }
     }
 
     return {
       error,
       value,
+      memoryCached: false,
       cached: false,
-      getQuery,
       getQueryFields: mergedQueryFields || requestFields,
     };
   }
@@ -1159,7 +1162,6 @@ class ActualItemDefinitionProvider extends
     const {
       value,
       error,
-      getQuery,
       getQueryFields,
     } = await this.runQueryFor(
       !this.props.forId ? PREFIX_ADD : PREFIX_EDIT,
@@ -1188,14 +1190,12 @@ class ActualItemDefinitionProvider extends
       });
 
       recievedId = value.id;
-      const recievedFields = flattenRecievedFields(value);
       this.props.itemDefinitionInstance.applyValue(
         recievedId,
-        recievedFields,
+        value,
         false,
         this.props.tokenData.id,
         this.props.tokenData.role,
-        getQuery,
         getQueryFields,
       );
       if (options.propertiesToCleanOnSuccess) {

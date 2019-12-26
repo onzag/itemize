@@ -4,6 +4,7 @@ import { GraphQLEndpointErrorType } from "../../base/errors";
 import { ILocaleContextType } from ".";
 import { Location } from "history";
 import { GUEST_METAROLE } from "../../constants";
+import CacheWorkerInstance from "../workers/cache";
 
 export interface ITokenProviderState {
   token: string;
@@ -82,9 +83,9 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     if (!data) {
       const newState: ITokenProviderState = {
         isLoggingIn: false,
-        id: null,
-        token: null,
-        role: GUEST_METAROLE,
+        id: parseInt(localStorage.getItem("ID"), 10),
+        token: localStorage.getItem("TOKEN"),
+        role: localStorage.getItem("ROLE"),
         error: {
           message: "Failed to connect",
           code: "CANT_CONNECT",
@@ -100,8 +101,12 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       const tokenDataToken = tokenData ? tokenData.token : null;
       if (tokenDataToken !== null) {
         localStorage.setItem("TOKEN", tokenDataToken);
+        localStorage.setItem("ROLE", tokenDataRole);
+        localStorage.setItem("ID", tokenDataId);
       } else {
         localStorage.removeItem("TOKEN");
+        localStorage.removeItem("ROLE");
+        localStorage.removeItem("ID");
       }
 
       const error = data.errors ? data.errors[0].extensions : null;
@@ -134,6 +139,39 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       // roles have different queries
 
       if (tokenDataId) {
+
+        const fields = {
+          DATA: {
+            app_country: {},
+            app_language: {},
+            app_currency: {},
+          },
+        };
+        const cachedData = {
+          app_country: null,
+          app_currency: null,
+          app_language: null,
+        };
+        if (CacheWorkerInstance.isSupported) {
+          const cachedValue =
+            await CacheWorkerInstance.instance.getCachedValue("GET_MOD_users__IDEF_user", tokenDataId, fields);
+          if (cachedValue && cachedValue.value && cachedValue.value.DATA) {
+            cachedData.app_country = cachedValue.value.DATA.app_country;
+            cachedData.app_currency = cachedValue.value.DATA.app_currency;
+            cachedData.app_language = cachedValue.value.DATA.app_language;
+            console.log("cached user locale is", cachedData);
+            if (this.props.localeContext.country !== cachedData.app_country) {
+              this.props.localeContext.changeCountryTo(cachedData.app_country, true, true);
+            }
+            if (this.props.localeContext.language !== cachedData.app_language) {
+              this.props.localeContext.changeLanguageTo(cachedData.app_language, true);
+            }
+            if (this.props.localeContext.currency !== cachedData.app_currency) {
+              this.props.localeContext.changeCurrencyTo(cachedData.app_currency, true);
+            }
+          }
+        }
+
         const userLanguageData = await gqlQuery(
           buildGqlQuery(
             {
@@ -143,13 +181,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
                 language: this.props.localeContext.language.split("-")[0],
                 id: tokenDataId,
               },
-              fields: {
-                DATA: {
-                  app_country: {},
-                  app_language: {},
-                  app_currency: {},
-                },
-              },
+              fields,
             },
           ),
         );
@@ -159,13 +191,22 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
           // we still check everything just in case the user is blocked
           if (localeUserData) {
             console.log("user locale is", localeUserData);
-            if (this.props.localeContext.country !== localeUserData.app_country) {
+            if (
+              localeUserData.app_country !== cachedData.app_country &&
+              this.props.localeContext.country !== localeUserData.app_country
+            ) {
               this.props.localeContext.changeCountryTo(localeUserData.app_country, true, true);
             }
-            if (this.props.localeContext.language !== localeUserData.app_language) {
+            if (
+              localeUserData.app_language !== cachedData.app_language &&
+              this.props.localeContext.language !== localeUserData.app_language
+            ) {
               this.props.localeContext.changeLanguageTo(localeUserData.app_language, true);
             }
-            if (this.props.localeContext.currency !== localeUserData.app_currency) {
+            if (
+              localeUserData.app_currency !== cachedData.app_currency &&
+              this.props.localeContext.currency !== localeUserData.app_currency
+            ) {
               this.props.localeContext.changeCurrencyTo(localeUserData.app_currency, true);
             }
           }

@@ -109,8 +109,8 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                     return props.children(propertyState.value);
                   }
                   if (isMetaProperty) {
-                    let gqlValue = itemDefinitionContextualValue.state.gqlOriginalAppliedValue &&
-                      itemDefinitionContextualValue.state.gqlOriginalAppliedValue.value[actualId];
+                    let gqlValue = itemDefinitionContextualValue.state.gqlOriginalFlattenedValue &&
+                      itemDefinitionContextualValue.state.gqlOriginalFlattenedValue[actualId];
                     if (typeof gqlValue === "undefined") {
                       gqlValue = null;
                     }
@@ -128,8 +128,8 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                     );
                   }
                   if (isMetaProperty) {
-                    let gqlValue = itemDefinitionContextualValue.state.gqlOriginalAppliedValue &&
-                      itemDefinitionContextualValue.state.gqlOriginalAppliedValue[actualId];
+                    let gqlValue = itemDefinitionContextualValue.state.gqlOriginalFlattenedValue &&
+                      itemDefinitionContextualValue.state.gqlOriginalFlattenedValue[actualId];
                     if (typeof gqlValue === "undefined") {
                       gqlValue = null;
                     }

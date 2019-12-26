@@ -4,7 +4,11 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   mode: 'development',
-  entry: ["babel-polyfill", './src/client/index.tsx'],
+  entry: {
+    "service-worker": ["babel-polyfill", "./itemize/client/workers/service.worker.ts"],
+    "cache-worker": ["babel-polyfill", "./itemize/client/workers/cache.worker.ts"],
+    "build": ["babel-polyfill", "./src/client/index.tsx"],
+  },
   devtool: 'inline-source-map',
   plugins: [
     new MiniCssExtractPlugin({
@@ -24,6 +28,10 @@ module.exports = {
       },
       {
         test: path.resolve(__dirname, "node_modules/knex/index.js"),
+        use: "null-loader"
+      },
+      {
+        test: /\.worker.\ts$/,
         use: "null-loader"
       },
       {
@@ -67,7 +75,7 @@ module.exports = {
     ]
   },
   output: {
-    filename: 'build.development.js',
+    filename: '[name].development.js',
     path: path.resolve(__dirname, 'dist/data')
   }
 };
