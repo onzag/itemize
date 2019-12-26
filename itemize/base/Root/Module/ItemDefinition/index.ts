@@ -99,6 +99,7 @@ export interface IItemDefinitionGQLValueType {
   rawValue: any;
   flattenedValue: any;
   requestFields: any;
+  actionUUID: string;
 }
 
 export interface IPolicyType {
@@ -233,7 +234,9 @@ export default class ItemDefinition {
   private extensionsInstance: boolean = false;
 
   private listeners: {
-    [id: number]: ListenerType[],
+    [event: string]: {
+      [id: number]: ListenerType[],
+    },
   };
   private lastListenerCallId: string = "";
 
@@ -301,7 +304,7 @@ export default class ItemDefinition {
     this.stateHasAppliedValueTo = {};
     this.stateGQLAppliedValue = {};
 
-    this.listeners = [];
+    this.listeners = {};
   }
 
   public setAsExtensionsInstance() {
@@ -773,6 +776,7 @@ export default class ItemDefinition {
     graphqlUserIdRequester: number,
     graphqlRoleRequester: string,
     requestFields: any,
+    actionUUID: string,
   ) {
     const flattenedValue = typeof value.DATA !== "undefined" ? flattenRawGQLValue(value) : value;
     this.stateHasAppliedValueTo[id] = true;
@@ -782,6 +786,7 @@ export default class ItemDefinition {
       rawValue: value,
       flattenedValue,
       requestFields,
+      actionUUID,
     };
 
     const properties =
@@ -1023,36 +1028,39 @@ export default class ItemDefinition {
     return this.rawData.policies[policy][name].roles;
   }
 
-  public addListener(id: number, listener: ListenerType) {
-    this.listeners[id] = this.listeners[id] || [];
-    this.listeners[id].push(listener);
+  public addListener(event: string, id: number, listener: ListenerType) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = {};
+    }
+    this.listeners[event][id] = this.listeners[event][id] || [];
+    this.listeners[event][id].push(listener);
   }
 
-  public removeListener(id: number, listener: ListenerType) {
-    if (!this.listeners[id]) {
+  public removeListener(event: string, id: number, listener: ListenerType) {
+    if (!this.listeners[event] || !this.listeners[event][id]) {
       return;
     }
-    const index = this.listeners[id].indexOf(listener);
+    const index = this.listeners[event][id].indexOf(listener);
     if (index !== -1) {
-      this.listeners[id].splice(index, 1);
+      this.listeners[event][id].splice(index, 1);
     }
   }
 
-  public triggerListeners(id: number, but?: ListenerType, callId?: string) {
+  public triggerListeners(event: string, id: number, but?: ListenerType, callId?: string) {
     if (this.lastListenerCallId !== callId) {
       this.lastListenerCallId = callId || uuid.v4();
       if (this.extensionsInstance) {
         this.parentModule.getAllChildItemDefinitions().forEach((cd) => {
-          cd.triggerListeners(id, but, this.lastListenerCallId);
+          cd.triggerListeners(event, id, but, this.lastListenerCallId);
         });
       } else {
-        this.parentModule.getPropExtensionItemDefinition().triggerListeners(id, but, this.lastListenerCallId);
+        this.parentModule.getPropExtensionItemDefinition().triggerListeners(event, id, but, this.lastListenerCallId);
       }
 
-      if (!this.listeners[id]) {
+      if (!this.listeners[event] || !this.listeners[event][id]) {
         return;
       }
-      this.listeners[id].filter((l) => l !== but).forEach((l) => l());
+      this.listeners[event][id].filter((l) => l !== but).forEach((l) => l());
     }
   }
 

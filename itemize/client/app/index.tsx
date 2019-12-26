@@ -11,6 +11,7 @@ import { history } from "..";
 import { countries, currencies } from "../../imported-resources";
 import { TokenProvider, ITokenProviderState, LocationStateContext } from "./internal-providers";
 import { buildGqlMutation, gqlQuery } from "./gql-querier";
+import { RemoteListener } from "./remote-listener";
 
 // Just a message for whether is development
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -46,6 +47,7 @@ export interface ILocaleContextType {
 export interface IDataContextType {
   raw: IRootRawJSONDataType;
   value: Root;
+  remoteListener: RemoteListener;
 }
 
 // The props for the application, this initial information
@@ -97,6 +99,7 @@ const theme = createMuiTheme({
 // now we export the App
 export default class App extends React.Component<IAppProps, IAppState> {
   private tokenState: ITokenProviderState = null;
+  private remoteListener: RemoteListener = null;
 
   constructor(props: IAppProps) {
     super(props);
@@ -113,6 +116,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
       specifiedData: props.initialData,
       specifiedProcessedRoot: (window as any).ROOT,
     };
+
+    this.remoteListener = new RemoteListener((window as any).ROOT);
 
     // the helper functions that change the state of the whole app
     // to change language, country and currency
@@ -160,7 +165,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
           console.log("found an instance, triggering update");
           const property = userItemDefinition.getPropertyDefinitionFor(propertyId, false);
           property.applyValue(this.tokenState.id, actualPropertyResult, false);
-          userItemDefinition.triggerListeners(this.tokenState.id);
+          userItemDefinition.triggerListeners("change", this.tokenState.id);
         }
       }
     }
@@ -402,6 +407,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     const dataContextValue: IDataContextType = {
       raw: this.state.specifiedData.root,
       value: this.state.specifiedProcessedRoot,
+      remoteListener: this.remoteListener,
     };
 
     // Now we return that with the JSS provider, material ui theme provider,

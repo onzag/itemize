@@ -15,6 +15,7 @@ import {
   RESERVED_GETTER_LIST_PROPERTIES,
   POLICY_PREFIXES,
   PREFIX_BUILD,
+  RESERVED_CHANGE_PROPERTIES,
 } from "../../../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from ".";
 import { getGQLFieldsDefinitionForProperty } from "./PropertyDefinition/gql";
@@ -236,9 +237,7 @@ export function getGQLQueryFieldsForItemDefinition(
     // basic get query to get an item given an id
     [PREFIX_GET + itemDefinition.getQualifiedPathName()]: {
       type,
-      args: {
-        ...RESERVED_GETTER_PROPERTIES,
-      },
+      args: RESERVED_GETTER_PROPERTIES,
       // we just pipe the arguments out of the resolver
       resolve: resolveGenericFunction.bind(null, "getItemDefinition", itemDefinition, resolvers),
     },
@@ -319,7 +318,7 @@ export function getGQLMutationFieldsForItemDefinition(
     [PREFIX_EDIT + itemDefinition.getQualifiedPathName()]: {
       type,
       args: {
-        ...RESERVED_GETTER_PROPERTIES,
+        ...RESERVED_CHANGE_PROPERTIES,
         ...getGQLFieldsDefinitionForItemDefinition(itemDefinition, {
           retrievalMode: false,
           propertiesAsInput: true,
@@ -337,7 +336,7 @@ export function getGQLMutationFieldsForItemDefinition(
     [PREFIX_DELETE + itemDefinition.getQualifiedPathName()]: {
       type,
       args: {
-        ...RESERVED_GETTER_PROPERTIES,
+        ...RESERVED_CHANGE_PROPERTIES,
         ...getGQLFieldsDefinitionForItemDefinitionPolicies(itemDefinition, {
           propertiesAsInput: true,
           policy: "delete",

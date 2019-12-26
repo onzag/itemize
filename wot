@@ -5,7 +5,7 @@ TODO TECH
   whatnot
 
 - Idea for the special cache, websockets pub sub, websockets would make a connection and pub sub by a string
-{register: [type, id]}
+{register: [type, id, expectFeedback]}
 server will websocket reply with
 {register: [type, id, date]}
 unregister with

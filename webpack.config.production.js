@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 module.exports = {
   mode: 'production',
   entry: {
+    "service-worker": ["babel-polyfill", "./itemize/client/workers/service.worker.ts"],
     "cache-worker": ["babel-polyfill", "./itemize/client/workers/cache.worker.ts"],
     "build": ["babel-polyfill", "./src/client/index.tsx"],
   },

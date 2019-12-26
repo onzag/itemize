@@ -118,7 +118,7 @@ export async function editItemDefinition(
   debug("Expectd GQL value considered as %j, applying such value", expectedUpdatedValue);
   // and as so we apply the value from graphql
   itemDefinition.applyValue(
-    resolverArgs.args.id, expectedUpdatedValue, false, tokenData.id, tokenData.role, null);
+    resolverArgs.args.id, expectedUpdatedValue, false, tokenData.id, tokenData.role, null, null);
   // and then we check with the entire full value, we want to ensure no changes occurred
   // and that the updated value will be exactly the result and it will be valid
   await serverSideCheckItemDefinitionAgainst(
@@ -288,6 +288,14 @@ export async function editItemDefinition(
   };
 
   debug("SUCCEED with GQL output %j", finalOutput);
+
+  appData.listener.triggerListeners(
+    mod.getPath().join("/"),
+    itemDefinition.getPath().join("/"),
+    resolverArgs.args.id,
+    resolverArgs.args.action_uuid,
+    false,
+  );
 
   return finalOutput;
 }

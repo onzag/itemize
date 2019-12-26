@@ -402,6 +402,13 @@ export const RESERVED_GETTER_PROPERTIES = {
     description: "the id for that item",
   },
 };
+export const RESERVED_CHANGE_PROPERTIES = {
+  ...RESERVED_GETTER_PROPERTIES,
+  action_uuid: {
+    type: GraphQLNonNull(GraphQLString),
+    description: "An uuid to identify this action",
+  },
+};
 export const RESERVED_GETTER_LIST_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   ids: {

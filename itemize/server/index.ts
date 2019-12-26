@@ -18,6 +18,8 @@ import restServices from "./rest";
 import { customUserQueries } from "./user/queries";
 import { customUserMutations } from "./user/mutations";
 import Autocomplete, { IAutocompleteRawJSONDataType } from "../base/Autocomplete";
+import ioMain from "socket.io";
+import { Listener } from "./listener";
 
 // TODO comment and document
 
@@ -48,6 +50,7 @@ export interface IAppDataType {
   index: string;
   config: any;
   knex: Knex;
+  listener: Listener;
 }
 
 export interface IServerCustomizationDataType {
@@ -207,15 +210,36 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
   PropertyDefinition.autocompleteChecker = serverSideAutocompleteChecker.bind(null, autocompletes);
 
-  initializeApp({
+  const appData: IAppDataType = {
     root,
     autocompletes,
     index,
     config,
     knex,
-  }, custom);
+    listener: null,
+  };
 
-  http.createServer(app).listen(config.port, () => {
+  appData.listener = new Listener(appData);
+
+  initializeApp(appData, custom);
+
+  const server = http.createServer(app);
+  server.listen(config.port, () => {
     console.log("listening at", config.port);
+  });
+  const io = ioMain(server);
+  io.on("connection", (socket) => {
+    socket.on("register", (modulePath: string, itemDefinitionPath: string, id: number) => {
+      appData.listener.addListener(socket, modulePath, itemDefinitionPath, id);
+    });
+    socket.on("feedback", (modulePath: string, itemDefinitionPath: string, id: number) => {
+      appData.listener.requestFeedback(socket, modulePath, itemDefinitionPath, id);
+    });
+    socket.on("unregister", (modulePath: string, itemDefinitionPath: string, id: number) => {
+      appData.listener.removeListener(socket, modulePath, itemDefinitionPath, id);
+    });
+    socket.on("disconnect", () => {
+      appData.listener.removeSocket(socket);
+    });
   });
 }

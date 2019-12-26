@@ -117,6 +117,14 @@ export async function deleteItemDefinition(
 
   debug("SUCCEED");
 
+  appData.listener.triggerListeners(
+    mod.getPath().join("/"),
+    itemDefinition.getPath().join("/"),
+    resolverArgs.args.id,
+    resolverArgs.args.action_uuid,
+    true,
+  );
+
   // return null, yep, the output is always null, because it's gone
   // however we are not running the check on the fields that can be read
   // but anyway there's no usable data, so why would we need a check

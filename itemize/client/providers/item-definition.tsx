@@ -26,6 +26,8 @@ import equals from "deep-equal";
 import { ModuleContext } from "./module";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import CacheWorkerInstance from "../workers/cache";
+import uuid from "uuid";
+import { RemoteListener } from "../app/remote-listener";
 
 export interface IBasicActionResponse {
   error: GraphQLEndpointErrorType;
@@ -150,6 +152,7 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
   itemDefinitionInstance: ItemDefinition;
   itemDefinitionQualifiedName: string;
   containsExternallyCheckedProperty: boolean;
+  remoteListener: RemoteListener;
 }
 
 interface IActualItemDefinitionProviderState {
@@ -281,10 +284,16 @@ class ActualItemDefinitionProvider extends
     };
   }
   public setupListeners() {
-    this.props.itemDefinitionInstance.addListener(this.props.forId || null, this.listener);
+    this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.listener);
+    if (this.props.forId) {
+      this.props.remoteListener.addListenerFor(this.props.itemDefinitionInstance, this.props.forId);
+    }
   }
   public unSetupListeners() {
-    this.props.itemDefinitionInstance.removeListener(this.props.forId || null, this.listener);
+    this.props.itemDefinitionInstance.removeListener("change", this.props.forId || null, this.listener);
+    if (this.props.forId) {
+      this.props.remoteListener.removeListenerFor(this.props.itemDefinitionInstance, this.props.forId);
+    }
   }
   public shouldComponentUpdate(
     nextProps: IActualItemDefinitionProviderProps,
@@ -298,6 +307,7 @@ class ActualItemDefinitionProvider extends
       nextProps.children !== this.props.children ||
       nextProps.localeData !== this.props.localeData ||
       nextProps.tokenData !== this.props.tokenData ||
+      nextProps.remoteListener !== this.props.remoteListener ||
       !equals(this.props.optimize, nextProps.optimize) ||
       !equals(this.state, nextState);
   }
@@ -306,7 +316,10 @@ class ActualItemDefinitionProvider extends
   ) {
     const itemDefinitionWasUpdated = this.props.itemDefinitionInstance !== prevProps.itemDefinitionInstance;
     if (itemDefinitionWasUpdated) {
-      prevProps.itemDefinitionInstance.removeListener(prevProps.forId || null, this.listener);
+      prevProps.itemDefinitionInstance.removeListener("change", prevProps.forId || null, this.listener);
+      if (prevProps.forId) {
+        prevProps.remoteListener.removeListenerFor(prevProps.itemDefinitionInstance, prevProps.forId);
+      }
     }
 
     if (
@@ -314,8 +327,14 @@ class ActualItemDefinitionProvider extends
       !equals(this.props.optimize, prevProps.optimize) ||
       itemDefinitionWasUpdated
     ) {
-      prevProps.itemDefinitionInstance.removeListener(prevProps.forId || null, this.listener);
-      this.props.itemDefinitionInstance.addListener(this.props.forId || null, this.listener);
+      prevProps.itemDefinitionInstance.removeListener("change", prevProps.forId || null, this.listener);
+      if (prevProps.forId) {
+        prevProps.remoteListener.removeListenerFor(prevProps.itemDefinitionInstance, prevProps.forId);
+      }
+      this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.listener);
+      if (this.props.forId) {
+        this.props.remoteListener.addListenerFor(this.props.itemDefinitionInstance, this.props.forId);
+      }
       // we set the value given we have changed the forId
       this.setState({
         itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
@@ -650,7 +669,9 @@ class ActualItemDefinitionProvider extends
       value,
       error,
       memoryCached,
+      cached,
       getQueryFields,
+      actionUUID,
     } = await this.runQueryFor(
       PREFIX_GET,
       {},
@@ -667,6 +688,10 @@ class ActualItemDefinitionProvider extends
       return {
         error: null,
       };
+    }
+
+    if (cached) {
+      this.props.remoteListener.requestFeedbackFor(this.props.itemDefinitionInstance, this.props.forId);
     }
 
     // so if we get an error we give it
@@ -699,8 +724,9 @@ class ActualItemDefinitionProvider extends
         this.props.tokenData.id,
         this.props.tokenData.role,
         getQueryFields,
+        actionUUID,
       );
-      this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null);
+      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null);
       if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
         this.setStateToCurrentValueWithExternalChecking(null);
       }
@@ -721,7 +747,7 @@ class ActualItemDefinitionProvider extends
       this.setState({
         itemDefinitionState: newItemDefinitionState,
       });
-      this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null, this.listener);
+      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null, this.listener);
     }
   }
   public onPropertyChange(
@@ -740,7 +766,7 @@ class ActualItemDefinitionProvider extends
     this.lastUpdateId = currentUpdateId;
 
     property.setCurrentValue(this.props.forId || null, value, internalValue);
-    this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null);
+    this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null);
 
     if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       clearTimeout(this.updateTimeout);
@@ -756,19 +782,19 @@ class ActualItemDefinitionProvider extends
     givenForId: number,
   ) {
     property.setSuperEnforced(givenForId || null, value);
-    this.props.itemDefinitionInstance.triggerListeners(givenForId || null);
+    this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null);
   }
   public onPropertyClearEnforce(
     property: PropertyDefinition,
     givenForId: number,
   ) {
     property.clearSuperEnforced(givenForId || null);
-    this.props.itemDefinitionInstance.triggerListeners(givenForId || null);
+    this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null);
   }
   public componentWillUnmount() {
     if (this.props.optimize && this.props.optimize.cleanOnDismount) {
       this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null);
-      this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null);
+      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null);
     }
     this.unSetupListeners();
   }
@@ -777,7 +803,7 @@ class ActualItemDefinitionProvider extends
     this.lastUpdateId = currentUpdateId;
 
     item.setExclusionState(this.props.forId || null, state);
-    this.props.itemDefinitionInstance.triggerListeners(this.props.forId || null);
+    this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null);
 
     if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       clearTimeout(this.updateTimeout);
@@ -841,6 +867,7 @@ class ActualItemDefinitionProvider extends
     memoryCached: boolean,
     cached: boolean,
     getQueryFields: any,
+    actionUUID: string,
   }> {
     const queryBase = (this.props.itemDefinitionInstance.isExtensionsInstance() ?
       this.props.itemDefinitionInstance.getParentModule().getQualifiedPathName() :
@@ -876,6 +903,7 @@ class ActualItemDefinitionProvider extends
           memoryCached: true,
           cached: false,
           getQueryFields: appliedGQLValue.requestFields,
+          actionUUID: null,
         };
       }
     }
@@ -890,6 +918,7 @@ class ActualItemDefinitionProvider extends
           memoryCached: false,
           cached: true,
           getQueryFields: convertValueToFields(workerCachedValue),
+          actionUUID: null,
         };
       }
     }
@@ -947,12 +976,19 @@ class ActualItemDefinitionProvider extends
       }
     }
 
+    let actionUUID: string;
+    if (queryPrefix === PREFIX_EDIT || queryPrefix === PREFIX_DELETE) {
+      actionUUID = uuid.v4();
+      args.action_uuid = actionUUID;
+    }
+
     return {
       error,
       value,
       memoryCached: false,
       cached: false,
       getQueryFields: mergedQueryFields || requestFields,
+      actionUUID,
     };
   }
   public checkPoliciesAndGetArgs(policyType: string, argumentsToCheckPropertiesAgainst?: any): [boolean, any] {
@@ -1087,7 +1123,7 @@ class ActualItemDefinitionProvider extends
         notFound: true,
         poked: true,
       });
-      this.props.itemDefinitionInstance.triggerListeners(this.props.forId);
+      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId);
     }
 
     return {
@@ -1163,6 +1199,7 @@ class ActualItemDefinitionProvider extends
       value,
       error,
       getQueryFields,
+      actionUUID,
     } = await this.runQueryFor(
       !this.props.forId ? PREFIX_ADD : PREFIX_EDIT,
       {
@@ -1197,6 +1234,7 @@ class ActualItemDefinitionProvider extends
         this.props.tokenData.id,
         this.props.tokenData.role,
         getQueryFields,
+        actionUUID,
       );
       if (options.propertiesToCleanOnSuccess) {
         options.propertiesToCleanOnSuccess.forEach((ptc) => {
@@ -1210,7 +1248,7 @@ class ActualItemDefinitionProvider extends
             .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId);
         });
       }
-      this.props.itemDefinitionInstance.triggerListeners(recievedId);
+      this.props.itemDefinitionInstance.triggerListeners("change", recievedId);
     }
 
     // happens during an error or whatnot
@@ -1454,6 +1492,7 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                           itemDefinitionInstance={valueFor}
                           itemDefinitionQualifiedName={valueFor.getQualifiedPathName()}
                           containsExternallyCheckedProperty={valueFor.containsAnExternallyCheckedProperty()}
+                          remoteListener={data.remoteListener}
                           {...props}
                         />
                       );

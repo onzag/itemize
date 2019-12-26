@@ -5,6 +5,7 @@ import {
   RESERVED_BASE_PROPERTIES,
   RESERVED_SEARCH_PROPERTIES,
   RESERVED_GETTER_PROPERTIES,
+  RESERVED_CHANGE_PROPERTIES,
 } from "../constants";
 import "source-map-support/register";
 import {
@@ -452,7 +453,8 @@ export function checkPropertyDefinition(
   // These properties are not valid, they are reserved
   if (Object.keys(RESERVED_BASE_PROPERTIES).includes(rawData.id) ||
     Object.keys(RESERVED_SEARCH_PROPERTIES).includes(rawData.id) ||
-    Object.keys(RESERVED_GETTER_PROPERTIES).includes(rawData.id)) {
+    Object.keys(RESERVED_GETTER_PROPERTIES).includes(rawData.id) ||
+    Object.keys(RESERVED_CHANGE_PROPERTIES).includes(rawData.id)) {
     throw new CheckUpError(
       "Property '" + rawData.id + "' is reserved",
       traceback.newTraceToBit("id"),
