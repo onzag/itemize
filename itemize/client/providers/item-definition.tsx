@@ -36,8 +36,8 @@ export interface IActionResponseWithId extends IBasicActionResponse {
   id: number;
 }
 
-export interface IActionResponseWithManyIds extends IBasicActionResponse {
-  ids: number[];
+export interface IActionResponseWithSearchResults extends IBasicActionResponse {
+  results: ISearchResult[];
 }
 
 type policyPathType = [string, string, string];
@@ -54,6 +54,13 @@ export interface IActionSearchOptions {
   onlyIncludeSearchPropertiesForProperties?: string[];
   onlyIncludeItems?: string[];
   unpokeAfterSuccess?: boolean;
+}
+
+export interface ISearchResult {
+  type: string;
+  module_path: string;
+  idef_path: string;
+  id: number;
 }
 
 export interface IItemDefinitionContextType {
@@ -73,7 +80,7 @@ export interface IItemDefinitionContextType {
   deleted: boolean;
   searchError: GraphQLEndpointErrorType;
   searching: boolean;
-  searchResuls: number[];
+  searchResuls: ISearchResult[];
   poked: boolean;
   canCreate: boolean;
   canEdit: boolean;
@@ -81,7 +88,7 @@ export interface IItemDefinitionContextType {
   reload: (denyCache?: boolean) => Promise<IBasicActionResponse>;
   submit: (options?: IActionSubmitOptions) => Promise<IActionResponseWithId>;
   delete: () => Promise<IBasicActionResponse>;
-  search: () => Promise<IActionResponseWithManyIds>;
+  search: () => Promise<IActionResponseWithSearchResults>;
   onPropertyChange: (
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
@@ -169,7 +176,7 @@ interface IActualItemDefinitionProviderState {
   deleted: boolean;
   searchError: GraphQLEndpointErrorType;
   searching: boolean;
-  searchResults: number[];
+  searchResults: ISearchResult[];
   poked: boolean;
   canEdit: boolean;
   canDelete: boolean;
@@ -1111,7 +1118,7 @@ class ActualItemDefinitionProvider extends
     stateApplied: string,
     withId: boolean,
     withIds: boolean,
-  ): IActionResponseWithId | IBasicActionResponse | IActionResponseWithManyIds {
+  ): IActionResponseWithId | IBasicActionResponse | IActionResponseWithSearchResults {
     const emulatedError: GraphQLEndpointErrorType = {
       message: "Submit refused due to invalid information in form fields",
       code: "INVALID_DATA_SUBMIT_REFUSED",
@@ -1127,7 +1134,7 @@ class ActualItemDefinitionProvider extends
       };
     } else if (withIds) {
       return {
-        ids: [],
+        results: [],
         error: emulatedError,
       };
     } else {
@@ -1320,7 +1327,7 @@ class ActualItemDefinitionProvider extends
       error,
     };
   }
-  public async search(options?: IActionSearchOptions): Promise<IActionResponseWithManyIds> {
+  public async search(options?: IActionSearchOptions): Promise<IActionResponseWithSearchResults> {
     if (this.state.searching) {
       return null;
     }
@@ -1334,7 +1341,7 @@ class ActualItemDefinitionProvider extends
 
     // if it's invalid let's return the emulated error
     if (isInvalid) {
-      return this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithManyIds;
+      return this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithSearchResults;
     }
 
     this.setState({
@@ -1367,13 +1374,18 @@ class ActualItemDefinitionProvider extends
       PREFIX_SEARCH,
       argumentsForQuery,
       {
-        ids: {},
+        ids: {
+          id: {},
+          idef_path: {},
+          module_path: {},
+          type: {},
+        },
       },
       false,
       false,
     );
 
-    const searchResults: number[] = [];
+    const searchResults: ISearchResult[] = [];
     if (error) {
       this.setState({
         searchError: error,
@@ -1391,7 +1403,7 @@ class ActualItemDefinitionProvider extends
     }
 
     return {
-      ids: [],
+      results: searchResults,
       error: null,
     };
   }

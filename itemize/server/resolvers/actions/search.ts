@@ -74,7 +74,7 @@ export async function searchModule(
 
   // now we build the search query, the search query only matches an id
   // note how we remove blocked_at
-  const searchQuery = appData.knex.select(["id"])
+  const searchQuery = appData.knex.select(["id", "type", "module_path", "idef_path"])
     .from(mod.getQualifiedPathName())
     .where("blocked_at", null);
 
@@ -94,7 +94,7 @@ export async function searchModule(
   // return using the base result, and only using the id
   const baseResult: ISQLTableRowValue[] = await searchQuery;
   const finalResult = {
-    ids: baseResult.map((row) => row.id),
+    ids: baseResult,
   };
 
   searchModuleDebug("SUCCEED with %j", finalResult);
@@ -212,8 +212,17 @@ export async function searchItemDefinition(
 
   // now we get the base result, and convert every row
   const baseResult: ISQLTableRowValue[] = await searchQuery;
+  const modPath = mod.getPath();
+  const selfPath = itemDefinition.getPath();
   const finalResult = {
-    ids: baseResult.map((row) => row.id),
+    ids: baseResult.map((row) => {
+      return {
+        id: row.id,
+        type: selfTable,
+        module_path: modPath,
+        idef_path: selfPath,
+      };
+    }),
   };
   searchItemDefinitionDebug("SUCCEED with %j", finalResult);
   return finalResult;

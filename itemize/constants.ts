@@ -4,7 +4,6 @@ import {
   GraphQLString,
   GraphQLEnumType,
   GraphQLList,
-  GraphQLBoolean,
   GraphQLObjectType,
 } from "graphql";
 import { IGQLFieldsDefinitionType } from "./base/Root/gql";
@@ -188,6 +187,9 @@ export const LOCATION_SEARCH_I18N = [
 // outside of data
 export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "id",
+  "type",
+  "module_path",
+  "idef_path",
   "blocked_at",
   "blocked_by",
   "blocked_until",
@@ -195,7 +197,6 @@ export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
 ];
 export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "id",
-  "type",
   "created_at",
   "created_by",
   "edited_at",
@@ -212,6 +213,14 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   type: {
     type: GraphQLNonNull(GraphQLString),
     description: "The type (qualified name) of the object",
+  },
+  module_path: {
+    type: GraphQLNonNull(GraphQLString),
+    description: "The path of the module from root",
+  },
+  idef_path: {
+    type: GraphQLNonNull(GraphQLString),
+    description: "The path of the item definition from the module",
   },
   created_at: {
     type: GraphQLNonNull(GraphQLString),
@@ -271,6 +280,14 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
     type: "serial",
   },
   type: {
+    type: "string",
+    notNull: true,
+  },
+  module_path: {
+    type: "string",
+    notNull: true,
+  },
+  idef_path: {
     type: "string",
     notNull: true,
   },
@@ -349,11 +366,29 @@ export const DATETIME_FORMAT = "YYYY-MM-DDTHH:mm:ss\\Z";
 export const TIME_FORMAT = "HH:mm:ss";
 export const DATE_FORMAT = "YYYY-MM-DD";
 
+export const ID_ELEMENT_GQL = new GraphQLObjectType({
+  name: "ID_ELEMENT",
+  fields: {
+    id: {
+      type: GraphQLNonNull(GraphQLInt),
+    },
+    type: {
+      type: GraphQLNonNull(GraphQLString),
+    },
+    module_path: {
+      type: GraphQLNonNull(GraphQLString),
+    },
+    idef_path: {
+      type: GraphQLNonNull(GraphQLString),
+    },
+  },
+});
+
 export const ID_CONTAINER_GQL = new GraphQLObjectType({
   name: "ID_CONTAINER",
   fields: {
     ids: {
-      type: GraphQLList(GraphQLNonNull(GraphQLInt)),
+      type: GraphQLList(GraphQLNonNull(ID_ELEMENT_GQL)),
     },
   },
 });

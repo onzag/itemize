@@ -32,6 +32,8 @@ export default class CacheWorker {
 
     try {
       this.dbPromise = openDB<ICacheDB>(CACHE_NAME, version, {
+        // TODO this function fails sometimes randomly and it's impossible to tell why
+        // it's buggy, figure out why it fails and when
         upgrade(db) {
           const queriesStore = db.createObjectStore(TABLE_NAME);
           queriesStore.createIndex("expires", "timestamp");

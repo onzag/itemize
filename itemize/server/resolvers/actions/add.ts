@@ -149,6 +149,8 @@ export async function addItemDefinition(
 
   // this data is added every time when creating
   sqlModData.type = selfTable;
+  sqlModData.module_path = mod.getPath().join("/");
+  sqlModData.idef_path = itemDefinition.getPath().join("/");
   sqlModData.created_at = appData.knex.fn.now();
   sqlModData.created_by = tokenData.id || UNSPECIFIED_OWNER;
 
