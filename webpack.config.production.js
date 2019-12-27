@@ -30,6 +30,10 @@ module.exports = {
         use: "null-loader"
       },
       {
+        test: path.resolve(__dirname, "node_modules/bcrypt/bcrypt.js"),
+        use: "null-loader"
+      },
+      {
         test: /\.worker.\ts$/,
         use: "null-loader"
       },

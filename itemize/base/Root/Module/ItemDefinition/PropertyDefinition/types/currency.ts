@@ -16,6 +16,7 @@ import {
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
+import { ISQLTableRowValue } from "../../../../../Root/sql";
 
 export interface IPropertyDefinitionSupportedCurrencyType {
   value: number;
@@ -104,6 +105,18 @@ const typeValue: IPropertyDefinitionSupportedType = {
         columnName,
       ],
     );
+  },
+  sqlLocalEqual: (
+    value: IPropertyDefinitionSupportedCurrencyType,
+    sqlPrefix: string,
+    id: string,
+    data: ISQLTableRowValue,
+  ) => {
+    if (value === null) {
+      return data[sqlPrefix + id + "_VALUE"] === value;
+    }
+    return data[sqlPrefix + id + "_VALUE"] === value.value &&
+      data[sqlPrefix + id + "_CURRENCY"] === value.currency;
   },
   validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
     if (typeof l.value !== "number" ||

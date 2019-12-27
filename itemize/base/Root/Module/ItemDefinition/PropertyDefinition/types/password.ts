@@ -4,6 +4,8 @@ import { standardSQLOutFn, getStandardSQLFnFor } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { MAX_STRING_LENGTH, CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
 import Knex from "knex";
+import { ISQLTableRowValue } from "../../../../sql";
+import bcyrpt from "bcrypt";
 
 export type PropertyDefinitionSupportedPasswordType = string;
 
@@ -61,6 +63,17 @@ const typeValue: IPropertyDefinitionSupportedType = {
         columnName,
       ],
     );
+  },
+  sqlLocalEqual: (
+    value: PropertyDefinitionSupportedPasswordType,
+    sqlPrefix: string,
+    id: string,
+    data: ISQLTableRowValue,
+  ) => {
+    if (value === null) {
+      return data[sqlPrefix + id] === value;
+    }
+    return bcyrpt.compareSync(value, data[sqlPrefix + id]);
   },
   // validates just the length
   validate: (s: PropertyDefinitionSupportedPasswordType) => {

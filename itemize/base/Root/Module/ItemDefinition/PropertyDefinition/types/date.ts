@@ -6,6 +6,7 @@ import {
   standardSQLSearchFnExactAndRange,
   standardSQLEqualFn,
   getStandardSQLFnFor,
+  standardSQLLocalEqualFn,
 } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
@@ -30,6 +31,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   sqlEqual: standardSQLEqualFn,
+  sqlLocalEqual: standardSQLLocalEqualFn,
 
   validate: (d: PropertyDefinitionSupportedDateType) => {
     if (d === "Invalid Date") {

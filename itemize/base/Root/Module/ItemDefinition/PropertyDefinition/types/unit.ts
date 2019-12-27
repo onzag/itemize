@@ -18,6 +18,7 @@ import {
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
+import { ISQLTableRowValue } from "../../../../sql";
 
 export interface IPropertyDefinitionSupportedUnitType {
   value: number;
@@ -129,6 +130,18 @@ const typeValue: IPropertyDefinitionSupportedType = {
         columnName,
       ],
     );
+  },
+  sqlLocalEqual: (
+    value: IPropertyDefinitionSupportedUnitType,
+    sqlPrefix: string,
+    id: string,
+    data: ISQLTableRowValue,
+  ) => {
+    if (value === null) {
+      return data[sqlPrefix + id + "_NORMALIZED_VALUE"] === value;
+    }
+    return data[sqlPrefix + id + "_NORMALIZED_VALUE"] === value.normalizedValue &&
+      data[sqlPrefix + id + "_NORMALIZED_UNIT"] === value.normalizedUnit;
   },
   supportedSubtypes: UNIT_SUBTYPES,
   validate: (l: IPropertyDefinitionSupportedUnitType) => {

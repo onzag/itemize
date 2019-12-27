@@ -5,6 +5,7 @@ import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N, CLASSIC_SEARCH_OPTIONAL_I18N } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import Knex from "knex";
+import { ISQLTableRowValue } from "../../../../sql";
 
 export interface IPropertyDefinitionSupportedLocationType {
   lng: number;
@@ -130,6 +131,18 @@ const typeValue: IPropertyDefinitionSupportedType = {
         columnName,
       ],
     );
+  },
+  sqlLocalEqual: (
+    value: IPropertyDefinitionSupportedLocationType,
+    sqlPrefix: string,
+    id: string,
+    data: ISQLTableRowValue,
+  ) => {
+    if (value === null) {
+      return data[sqlPrefix + id + "_LAT"] === value;
+    }
+    return data[sqlPrefix + id + "_LAT"] === value.lat &&
+      data[sqlPrefix + id + "_LNG"] === value.lng;
   },
   // locations just contain this basic data
   validate: (l: IPropertyDefinitionSupportedLocationType) => {

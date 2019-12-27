@@ -27,6 +27,9 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlEqual: () => {
     throw new Error("Attempted to equal within files");
   },
+  sqlLocalEqual: () => {
+    throw new Error("Attempted to local equal within files");
+  },
 
   allowsMinMaxLengthDefined: true,
   validate: (l: PropertyDefinitionSupportedFilesType) => {

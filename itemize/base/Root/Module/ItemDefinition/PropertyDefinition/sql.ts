@@ -79,6 +79,15 @@ export function standardSQLEqualFn(
   );
 }
 
+export function standardSQLLocalEqualFn(
+  value: PropertyDefinitionSupportedType,
+  sqlPrefix: string,
+  id: string,
+  data: ISQLTableRowValue,
+): boolean {
+  return data[sqlPrefix + id] === value;
+}
+
 /**
  * Provides the table bit that is necessary to include this property and
  * this property alone, that is a table bit

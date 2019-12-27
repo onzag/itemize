@@ -109,6 +109,15 @@ export interface IPropertyDefinitionSupportedType {
     knex: Knex,
     columnName?: string,
   ) => any;
+  // A local equal, ran during cache checks very useful for checking
+  // against policies during policy checks and other forms of checks
+  // with raw database data
+  sqlLocalEqual: (
+    value: PropertyDefinitionSupportedType,
+    sqlPrefix: string,
+    id: string,
+    data: ISQLTableRowValue,
+  ) => boolean;
 
   // represents an item that would mark for null
   // by default it is null itself

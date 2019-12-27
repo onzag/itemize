@@ -233,7 +233,7 @@ export async function addItemDefinition(
 
   // we don't know what the cached value is, but we assume there is nothing
   // as it's a new object
-  appData.cache.requestCache(selfTable, moduleTable, value.id);
+  appData.cache.requestCache(selfTable, moduleTable, value.id, true);
 
   debug("SUCCEED with GQL output %j", finalOutput);
 

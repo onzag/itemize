@@ -6,6 +6,7 @@ import {
   standardSQLSearchFnExactAndRange,
   standardSQLEqualFn,
   getStandardSQLFnFor,
+  standardSQLLocalEqualFn,
 } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
@@ -34,6 +35,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   sqlEqual: standardSQLEqualFn,
+  sqlLocalEqual: standardSQLLocalEqualFn,
 
   nullableDefault: "",
   supportsAutocomplete: true,

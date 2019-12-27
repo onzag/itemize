@@ -2,7 +2,7 @@ import {
   IPropertyDefinitionSupportedType,
 } from "../types";
 import { GraphQLString } from "graphql";
-import { standardSQLOutFn, standardSQLEqualFn } from "../sql";
+import { standardSQLOutFn, standardSQLEqualFn, standardSQLLocalEqualFn } from "../sql";
 import { IGQLValue } from "../../../../gql";
 import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
@@ -88,6 +88,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
   },
   sqlEqual: standardSQLEqualFn,
+  sqlLocalEqual: standardSQLLocalEqualFn,
 
   // validates the text, texts don't support json value
   validate: (s: PropertyDefinitionSupportedTextType, subtype?: string) => {

@@ -13,12 +13,30 @@ export class Cache {
     this.redisClient = redisClient;
     this.knex = knex;
   }
-  public getCachedValue(qualifiedPathName: string, id: number): Promise<{value: ISQLTableRowValue}> {
-    console.log("retrieving", qualifiedPathName, id);
-    const qualifiedIdentifier = "QUERY:" + qualifiedPathName + "." + id.toString();
+  public getModuleCachedValue(
+    moduleQueryIdentifier: string,
+  ): Promise<{value: ISQLTableRowValue}> {
     return new Promise((resolve, reject) => {
-      this.redisClient.get(qualifiedIdentifier, (error, value) => {
-        console.log("obtained", value);
+      this.redisClient.get(moduleQueryIdentifier, (error, value) => {
+        if (value === null) {
+          resolve(null);
+        }
+        if (!error && value) {
+          this.getIdefCachedValue(value).then(resolve).catch(() => {
+            resolve(null);
+          });
+          this.pokeCache(moduleQueryIdentifier);
+        } else {
+          resolve(null);
+        }
+      });
+    });
+  }
+  public getIdefCachedValue(
+    idefQueryIdentifier: string,
+  ): Promise<{value: ISQLTableRowValue}> {
+    return new Promise((resolve, reject) => {
+      this.redisClient.get(idefQueryIdentifier, (error, value) => {
         if (value === null) {
           resolve(null);
         }
@@ -27,54 +45,107 @@ export class Cache {
             resolve({
               value: JSON.parse(value),
             });
+            this.pokeCache(idefQueryIdentifier);
           } catch {
             resolve(null);
           }
         } else {
           resolve(null);
         }
-
-        this.pokeCache(qualifiedPathName, id);
       });
     });
   }
-  public pokeCache(qualifiedPathName: string, id: number) {
-    const qualifiedIdentifier = "QUERY:" + qualifiedPathName + "." + id.toString();
-    this.redisClient.expire(qualifiedIdentifier, CACHE_EXPIRES_DAYS * 86400);
+  public pokeCache(keyIdentifier: string) {
+    this.redisClient.expire(keyIdentifier, CACHE_EXPIRES_DAYS * 86400);
   }
-  public forceCacheInto(qualifiedPathName: string, id: number, value: any) {
-    const qualifiedIdentifier = "QUERY:" + qualifiedPathName + "." + id.toString();
+  public forceCacheInto(idefTable: string, id: number, value: any) {
+    const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString();
     return new Promise((resolve) => {
-      this.redisClient.set(qualifiedIdentifier, JSON.stringify(value), (error) => {
+      this.redisClient.set(idefQueryIdentifier, JSON.stringify(value), (error) => {
         resolve(value);
         if (!error) {
-          this.pokeCache(qualifiedPathName, id);
+          this.pokeCache(idefQueryIdentifier);
         }
       });
     });
   }
-  public async requestCache(
-    qualifiedPathName: string,
+  public async requestModuleCache(
     moduleTable: string,
     id: number,
     refresh?: boolean,
   ): Promise<ISQLTableRowValue> {
+    const moduleQueryIdentifier = "MODQUERY:" + moduleTable + "." + id.toString();
     if (!refresh) {
-      const currentValue = await this.getCachedValue(qualifiedPathName, id);
+      const currentValue = await this.getModuleCachedValue(moduleQueryIdentifier);
       if (currentValue) {
         return currentValue.value;
       }
     }
-    const qualifiedIdentifier = "QUERY:" + qualifiedPathName + "." + id.toString();
+    const modQueryValue = await this.knex.first("*").from(moduleTable).where("id", id);
+    let mergedValue: ISQLTableRowValue = null;
+    let idefQueryIdentifier: string;
+    if (modQueryValue) {
+      idefQueryIdentifier = "IDEFQUERY:" + modQueryValue.type + "." + id.toString();
+      const idefQueryValue =
+        await this.knex.first("*").from(modQueryValue.type).where(CONNECTOR_SQL_COLUMN_FK_NAME, id);
+      mergedValue = {
+        ...modQueryValue,
+        ...idefQueryValue,
+      };
+    }
+
+    if (mergedValue) {
+      this.redisClient.set(idefQueryIdentifier, JSON.stringify(mergedValue), (error) => {
+        if (!error) {
+          this.pokeCache(idefQueryIdentifier);
+        }
+      });
+
+      this.redisClient.set(moduleQueryIdentifier, idefQueryIdentifier, (error) => {
+        if (!error) {
+          this.pokeCache(moduleQueryIdentifier);
+        }
+      });
+    }
+
+    return mergedValue;
+  }
+  public async requestCache(
+    idefTable: string,
+    moduleTable: string,
+    id: number,
+    refresh?: boolean,
+  ): Promise<ISQLTableRowValue> {
+    console.log("requested", idefTable, moduleTable, id);
+    const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString();
+    if (!refresh) {
+      const currentValue = await this.getIdefCachedValue(idefQueryIdentifier);
+      if (currentValue) {
+        console.log("providing cached", currentValue.value);
+        return currentValue.value;
+      }
+    }
     const queryValue =
-      await this.knex.first("*").from(moduleTable).where("id", id).join(qualifiedPathName, (clause) => {
+      await this.knex.first("*").from(moduleTable).where("id", id).join(idefTable, (clause) => {
       clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
     });
-    this.redisClient.set(qualifiedIdentifier, JSON.stringify(queryValue), (error) => {
+    this.redisClient.set(idefQueryIdentifier, JSON.stringify(queryValue), (error) => {
       if (!error) {
-        this.pokeCache(qualifiedPathName, id);
+        this.pokeCache(idefQueryIdentifier);
+      }
+    });
+
+    const moduleQueryIdentifier = "MODQUERY:" + moduleTable + "." + id.toString();
+    this.redisClient.set(moduleQueryIdentifier, idefQueryIdentifier, (error) => {
+      if (!error) {
+        this.pokeCache(moduleQueryIdentifier);
       }
     });
     return queryValue;
+  }
+  public async requestListCache(
+
+  ) {
+    // TODO
   }
 }

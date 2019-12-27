@@ -6,6 +6,7 @@ import {
   standardSQLSearchFnExactAndRange,
   standardSQLEqualFn,
   getStandardSQLFnFor,
+  standardSQLLocalEqualFn,
 } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
@@ -29,6 +30,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   sqlEqual: standardSQLEqualFn,
+  sqlLocalEqual: standardSQLLocalEqualFn,
+
   // it gotta be validated to check it's a number
   validate: (n: PropertyDefinitionSupportedIntegerType) => {
     if (isNaN(n) || !Number.isInteger(n)) {
