@@ -447,7 +447,7 @@ export const RESERVED_CHANGE_PROPERTIES = {
 export const RESERVED_GETTER_LIST_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   ids: {
-    type: GraphQLNonNull(GraphQLInt),
+    type: GraphQLNonNull(GraphQLList(ID_ELEMENT_GQL)),
     description: "the ids list for that item",
   },
 };

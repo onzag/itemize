@@ -8,16 +8,13 @@ import {
   checkBasicFieldsAreAvailableForRole,
   filterAndPrepareGQLValue,
   checkListLimit,
-  buildColumnNamesForModuleTableOnly,
-  buildColumnNamesForItemDefinitionTableOnly,
   validateTokenIsntBlocked,
+  checkListTypes,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import {
-  CONNECTOR_SQL_COLUMN_FK_NAME,
   ITEM_PREFIX,
   UNSPECIFIED_OWNER,
-  ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
 } from "../../../constants";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
@@ -136,6 +133,8 @@ export async function getItemDefinitionList(
   // right and available
   checkLanguage(appData, resolverArgs.args);
   checkListLimit(resolverArgs.args.ids);
+  const mod = itemDefinition.getParentModule();
+  checkListTypes(resolverArgs.args.ids, mod);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // now we find the requested fields that are requested
@@ -167,54 +166,13 @@ export async function getItemDefinitionList(
 
   // get the module, the module table name, the table for
   // the item definition
-  const mod = itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
-  const selfTable = itemDefinition.getQualifiedPathName();
-
-  // we build the SQL column names
-  const requestedModuleColumnsSQL = buildColumnNamesForModuleTableOnly(
-    requestedFields,
-    mod,
+  const resultValues: ISQLTableRowValue[] = await this.appData.cache.requestListCache(
+    moduleTable,
+    resolverArgs.args.ids,
   );
-  const requestedIdefColumnsSQL = buildColumnNamesForItemDefinitionTableOnly(
-    requestedFields,
-    itemDefinition,
-  );
-  // the reason we need blocked_at is because filtering
-  // is done by the filtering function outside
-  if (!requestedModuleColumnsSQL.includes("blocked_at")) {
-    requestedModuleColumnsSQL.push("blocked_at");
-  }
-  if (!requestedModuleColumnsSQL.includes("id")) {
-    requestedModuleColumnsSQL.push("id");
-  }
 
-  getItemDefinitionListDebug("Requested columns for idef are %j", requestedIdefColumnsSQL);
-  getItemDefinitionListDebug("Requested columns for module are %j", requestedModuleColumnsSQL);
-
-  // create the select query, filter the blockage, and select the right
-  // type based on it
-  const selectQuery = appData.knex.select(
-    requestedModuleColumnsSQL.concat(requestedIdefColumnsSQL),
-  ).from(moduleTable).where({
-    id: resolverArgs.args.ids,
-    type: selfTable,
-  });
-
-  // add the join if it's required
-  if (requestedIdefColumnsSQL.length) {
-    selectQuery.join(selfTable, (clause) => {
-      clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
-    });
-  }
-
-  // execute the select query
-  const selectQueryValue: ISQLTableRowValue[] = await selectQuery;
-  const restoredValuesOrder: ISQLTableRowValue[] = resolverArgs.args.ids.map((id: number) => {
-    return selectQueryValue.find((row) => row.id === id);
-  });
-
-  const finalValues = restoredValuesOrder.map(
+  const finalValues = resultValues.map(
     (value) => filterAndPrepareGQLValue(value, requestedFields, tokenData.role, itemDefinition),
   );
 
@@ -238,6 +196,7 @@ export async function getModuleList(
   // right and available
   checkLanguage(appData, resolverArgs.args);
   checkListLimit(resolverArgs.args.ids);
+  checkListTypes(resolverArgs.args.ids, mod);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
   await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
 
@@ -268,40 +227,14 @@ export async function getModuleList(
     true,
   );
 
-  // we build the SQL column names
-  const requestedFieldsSQL = buildColumnNamesForModuleTableOnly(
-    requestedFields,
-    mod,
-  );
-  // the reason we need blocked_at is because filtering
-  // is done by the filtering function outside
-  if (!requestedFieldsSQL.includes("blocked_at")) {
-    requestedFieldsSQL.push("blocked_at");
-  }
-  if (!requestedFieldsSQL.includes("id")) {
-    requestedFieldsSQL.push("id");
-  }
-
-  getItemDefinitionListDebug("Requested columns are %j", requestedFieldsSQL);
-
-  // get the module, the module table name, the table for
-  // the item definition
   const moduleTable = mod.getQualifiedPathName();
-
-  // create the select query, filter the blockage, and select the right
-  // type based on it
-  const selectQuery = appData.knex.select(requestedFieldsSQL).from(moduleTable).where({
-    id: resolverArgs.args.ids,
-  });
-
-  // execute the select query
-  const selectQueryValue: ISQLTableRowValue[] = await selectQuery;
-  const restoredValuesOrder: ISQLTableRowValue[] = resolverArgs.args.ids.map((id: number) => {
-    return selectQueryValue.find((row) => row.id === id);
-  });
+  const resultValues: ISQLTableRowValue[] = await this.appData.cache.requestListCache(
+    moduleTable,
+    resolverArgs.args.ids,
+  );
 
   // return if otherwise succeeds
-  const finalValues = restoredValuesOrder.map(
+  const finalValues = resultValues.map(
     (value) => filterAndPrepareGQLValue(value, requestedFields, tokenData.role, mod),
   );
 

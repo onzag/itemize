@@ -3,6 +3,7 @@ import equals from "deep-equal";
 import Knex from "knex";
 import { CONNECTOR_SQL_COLUMN_FK_NAME } from "../constants";
 import { ISQLTableRowValue } from "../base/Root/sql";
+import { ISearchResultIdentifierType } from "./resolvers/actions/search";
 
 const CACHE_EXPIRES_DAYS = 2;
 
@@ -143,9 +144,24 @@ export class Cache {
     });
     return queryValue;
   }
+  public checkCache(keyIdentifier: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      this.redisClient.exists(keyIdentifier, (error, reply: number) => {
+        if (error) {
+          resolve(false);
+        } else {
+          resolve(reply === 1);
+        }
+      });
+    });
+  }
   public async requestListCache(
-
-  ) {
-    // TODO
+    moduleTable: string,
+    ids: ISearchResultIdentifierType[],
+  ): Promise<ISQLTableRowValue> {
+    const resultValues = await Promise.all(ids.map((idContainer) => {
+      return this.requestCache(idContainer.type, moduleTable, idContainer.id);
+    }));
+    return resultValues;
   }
 }

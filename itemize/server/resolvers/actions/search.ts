@@ -20,6 +20,13 @@ import {
 } from "../../../constants";
 import { buildSQLQueryForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 
+export interface ISearchResultIdentifierType {
+  id: number;
+  type: string;
+  module_path: string;
+  idef_path: string;
+}
+
 const searchModuleDebug = Debug("resolvers:searchModule");
 export async function searchModule(
   appData: IAppDataType,
@@ -92,7 +99,7 @@ export async function searchModule(
   }
 
   // return using the base result, and only using the id
-  const baseResult: ISQLTableRowValue[] = await searchQuery;
+  const baseResult: ISearchResultIdentifierType[] = await searchQuery;
   const finalResult = {
     ids: baseResult,
   };
@@ -212,9 +219,11 @@ export async function searchItemDefinition(
 
   // now we get the base result, and convert every row
   const baseResult: ISQLTableRowValue[] = await searchQuery;
-  const modPath = mod.getPath();
-  const selfPath = itemDefinition.getPath();
-  const finalResult = {
+  const modPath = mod.getPath().join("/");
+  const selfPath = itemDefinition.getPath().join("/");
+  const finalResult: {
+    ids: ISearchResultIdentifierType[];
+  } = {
     ids: baseResult.map((row) => {
       return {
         id: row.id,

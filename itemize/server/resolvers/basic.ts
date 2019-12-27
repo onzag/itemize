@@ -25,6 +25,7 @@ import Knex from "knex";
 import { jwtVerify } from "../token";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
+import { ISearchResultIdentifierType } from "./actions/search";
 
 const buildColumnNamesForModuleTableOnlyDebug = Debug("resolvers:buildColumnNamesForModuleTableOnly");
 /**
@@ -218,7 +219,7 @@ const checkListLimitDebug = Debug("resolvers:checkListLimit");
  * lists to ensure the request isn't too large
  * @param ids the list ids that have been requested
  */
-export function checkListLimit(ids: string[]) {
+export function checkListLimit(ids: ISearchResultIdentifierType[]) {
   checkListLimitDebug("EXECUTED with %j", ids);
   if (ids.length > MAX_SQL_LIMIT) {
     checkListLimitDebug(
@@ -232,6 +233,36 @@ export function checkListLimit(ids: string[]) {
     });
   }
   checkListLimitDebug("SUCCEED");
+}
+
+const checkListTypesDebug = Debug("resolvers:checkListTypes");
+export function checkListTypes(ids: ISearchResultIdentifierType[], mod: Module) {
+  checkListTypesDebug("EXECUTED with %j", ids);
+  const moduleQualifiedPathName = mod.getQualifiedPathName();
+  ids.forEach((idContainer) => {
+    if (!idContainer.type.startsWith(moduleQualifiedPathName)) {
+      throw new GraphQLEndpointError({
+        message: "Unknown qualified path name for " + idContainer.type,
+        code: "UNSPECIFIED",
+      });
+    }
+
+    if (!mod.hasItemDefinitionFor(idContainer.idef_path.split("/"))) {
+      throw new GraphQLEndpointError({
+        message: "Unknown idef_path " + idContainer.idef_path,
+        code: "UNSPECIFIED",
+      });
+    }
+
+    const supposedItemDefinition = mod.getItemDefinitionFor(idContainer.idef_path.split("/"));
+    if (supposedItemDefinition.getQualifiedPathName() !== idContainer.type) {
+      throw new GraphQLEndpointError({
+        message: "qualfied path names do not match " + idContainer.type + " " +
+          supposedItemDefinition.getQualifiedPathName(),
+        code: "UNSPECIFIED",
+      });
+    }
+  });
 }
 
 const checkLanguageDebug = Debug("resolvers:checkLanguage");
