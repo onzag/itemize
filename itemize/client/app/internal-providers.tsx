@@ -5,6 +5,9 @@ import { ILocaleContextType } from ".";
 import { Location } from "history";
 import { GUEST_METAROLE } from "../../constants";
 import CacheWorkerInstance from "../workers/cache";
+import { ICacheMatchType } from "../workers/cache.worker";
+import { deepMerge } from "../../gql-util";
+import equals from "deep-equal";
 
 export interface ITokenProviderState {
   token: string;
@@ -146,6 +149,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
             app_language: {},
             app_currency: {},
           },
+          last_modified: {},
         };
         const cachedData = {
           app_country: null,
@@ -209,6 +213,13 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
             ) {
               this.props.localeContext.changeCurrencyTo(localeUserData.app_currency, true);
             }
+          }
+
+          if (CacheWorkerInstance.isSupported) {
+            const newCachedValue = userLanguageData.data.GET_MOD_users__IDEF_user;
+            CacheWorkerInstance.instance.mergeCachedValue(
+              "GET_MOD_users__IDEF_user", tokenDataId, newCachedValue, fields,
+            );
           }
         }
       }

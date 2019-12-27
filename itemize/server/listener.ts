@@ -73,7 +73,7 @@ export class Listener {
     try {
       const mod = this.appData.root.getModuleFor(modulePath.split("/"));
       const itemDefinition = mod.getItemDefinitionFor(itemDefinitionPath.split("/"));
-      const queriedResult: ISQLTableRowValue = this.appData.cache.requestCache(
+      const queriedResult: ISQLTableRowValue = await this.appData.cache.requestCache(
         itemDefinition.getQualifiedPathName(), mod.getQualifiedPathName(), id,
       );
       if (queriedResult) {

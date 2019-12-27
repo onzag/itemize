@@ -48,7 +48,6 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                   onlyIncludeItems: [],
                   onlyIncludeProperties: ["username", "app_country"],
                   excludePolicies: true,
-                  disableListener: !props.loggedUserId,
                 }}
               >
                 <IfLogStatus>

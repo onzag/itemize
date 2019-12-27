@@ -634,7 +634,7 @@ class ActualItemDefinitionProvider extends
       ItemDefinitionProviderCleanUpsInProgressRegistry[qualifiedPathNameWithID] = true;
       // and now we cache the value to null if we can do so, null for removed
       if (CacheWorkerInstance.isSupported) {
-        CacheWorkerInstance.instance.setCache(
+        CacheWorkerInstance.instance.setCachedValue(
           PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId, null, null);
       }
       // and we clean the value from the item definition instance
@@ -1317,7 +1317,6 @@ class ActualItemDefinitionProvider extends
     }
 
     // otherwise now let's check for the worker
-    let workerCachedValue: any = null;
     if (
       // if we have an id and a GET or EDIT request we want
       // to get the cached value, always, for update reasons as well
@@ -1329,11 +1328,15 @@ class ActualItemDefinitionProvider extends
       CacheWorkerInstance.isSupported
     ) {
       // we ask the worker for the value
-      workerCachedValue =
+      const workerCachedValue =
         await CacheWorkerInstance.instance.getCachedValue(queryName, this.props.forId, requestFields);
       // if we have a GET request and we are allowed to return from the wroker cache and we actually
       // found something in our cache, return that
-      if (queryPrefix === PREFIX_GET && returnWorkerCachedValuesForGetRequests && workerCachedValue) {
+      if (
+        queryPrefix === PREFIX_GET &&
+        returnWorkerCachedValuesForGetRequests &&
+        workerCachedValue
+      ) {
         return {
           error: null,
           value: workerCachedValue.value,
@@ -1400,8 +1403,7 @@ class ActualItemDefinitionProvider extends
       // set up the cache
       if (
         queryPrefix === PREFIX_GET ||
-        queryPrefix === PREFIX_EDIT ||
-        queryPrefix === PREFIX_ADD
+        queryPrefix === PREFIX_EDIT
       ) {
         // first we check if we have a value in memory
         // cache and we merge it with what we got
@@ -1425,20 +1427,6 @@ class ActualItemDefinitionProvider extends
             appliedGQLValue.requestFields,
           );
         }
-        if (
-          workerCachedValue &&
-          workerCachedValue.value &&
-          workerCachedValue.value.last_modified === value.last_modified
-        ) {
-          value = deepMerge(
-            value,
-            workerCachedValue.value,
-          );
-          mergedQueryFields = deepMerge(
-            requestFields,
-            workerCachedValue.fields,
-          );
-        }
       }
     }
 
@@ -1452,7 +1440,7 @@ class ActualItemDefinitionProvider extends
         queryPrefix === PREFIX_DELETE ||
         (queryPrefix === PREFIX_GET && !value)
       ) {
-        CacheWorkerInstance.instance.setCache(PREFIX_GET + queryBase, this.props.forId, null, null);
+        CacheWorkerInstance.instance.setCachedValue(PREFIX_GET + queryBase, this.props.forId, null, null);
       } else if (
         (
           queryPrefix === PREFIX_GET ||
@@ -1461,7 +1449,7 @@ class ActualItemDefinitionProvider extends
         ) &&
         value && mergedQueryFields
       ) {
-        CacheWorkerInstance.instance.setCache(PREFIX_GET + queryBase, this.props.forId, value, mergedQueryFields);
+        CacheWorkerInstance.instance.mergeCachedValue(PREFIX_GET + queryBase, value.id, value, mergedQueryFields);
       }
     }
 

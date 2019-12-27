@@ -1,8 +1,8 @@
 import { expose } from "comlink";
 import { openDB, DBSchema, IDBPDatabase } from "idb";
-import { requestFieldsAreContained } from "../../gql-util";
+import { requestFieldsAreContained, deepMerge } from "../../gql-util";
 
-interface ICacheMatchType {
+export interface ICacheMatchType {
   value: any;
   fields: any;
   expires: Date;
@@ -104,8 +104,16 @@ export default class CacheWorker {
    * @param id the id of the item definition instance
    * @param partialValue the partial value
    */
-  public async setCache(queryName: string, id: number, partialValue: any, partialFields: any) {
-    console.log("requested to save", queryName, id, partialValue);
+  public async setCachedValue(
+    queryName: string,
+    id: number,
+    partialValue: any,
+    partialFields: any,
+    touchOrMerge?: boolean,
+  ) {
+    if (!touchOrMerge) {
+      console.log("REQUESTED TO STORE", queryName, id, partialValue);
+    }
 
     // so first we await for our database
     const db = await this.dbPromise;
@@ -132,6 +140,46 @@ export default class CacheWorker {
     }
   }
 
+  public async mergeCachedValue(
+    queryName: string,
+    id: number,
+    partialValue: any,
+    partialFields: any,
+  ) {
+    console.log("REQUESTED TO MERGE", queryName, id, partialValue);
+
+    const currentValue = await this.getCachedValue(queryName, id);
+    if (
+      !currentValue ||
+      !currentValue.value ||
+      partialValue.last_modified !== currentValue.value.last_modified
+    ) {
+      await this.setCachedValue(
+        queryName,
+        id,
+        partialValue,
+        partialFields,
+        true,
+      );
+    } else {
+      const mergedFields = deepMerge(
+        partialFields,
+        currentValue.fields,
+      );
+      const mergedValue = deepMerge(
+        partialValue,
+        currentValue.value,
+      );
+      await this.setCachedValue(
+        queryName,
+        id,
+        mergedValue,
+        mergedFields,
+        true,
+      );
+    }
+  }
+
   /**
    * Provides a cached value (all of it) if and only if this matches
    * the requested fields, it will not return anything (cache miss)
@@ -140,8 +188,10 @@ export default class CacheWorker {
    * @param id the id of the item definition instance
    * @param requestedFields the requested fields from graphql
    */
-  public async getCachedValue(queryName: string, id: number, requestedFields: any): Promise<ICacheMatchType> {
-    console.log("requested", queryName, id, requestedFields);
+  public async getCachedValue(queryName: string, id: number, requestedFields?: any): Promise<ICacheMatchType> {
+    if (requestedFields) {
+      console.log("CACHED QUERY REQUESTED", queryName, id, requestedFields);
+    }
 
     // so we fetch our db like usual
     const db = await this.dbPromise;
@@ -165,12 +215,12 @@ export default class CacheWorker {
         const value = idbValue.value;
         const fields = idbValue.fields;
 
-        // so we check if the value is valid for such
-        if (requestFieldsAreContained(requestedFields, fields)) {
-          // if it is we poke the cache by setting it again
-          this.setCache(queryName, id, value, fields);
-          // provide that value
-          console.log("provided", value);
+        this.setCachedValue(queryName, id, value, fields, true);
+
+        if (!requestedFields || requestFieldsAreContained(requestedFields, fields)) {
+          if (requestedFields) {
+            console.log("RETURNING FROM CACHE", queryName, id, requestedFields, idbValue);
+          }
           return idbValue;
         }
       }
@@ -178,6 +228,9 @@ export default class CacheWorker {
       console.warn(err);
     }
 
+    if (requestedFields) {
+      console.log("NO MATCH", queryName, id, requestedFields);
+    }
     // cache didn't match, returning no match
     // something wrong might have happened as well
     return null;
