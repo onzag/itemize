@@ -72,6 +72,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
   ) => {
     if (value === null) {
       return data[sqlPrefix + id] === value;
+    } else if (!data[sqlPrefix + id]) {
+      return false;
     }
     return bcyrpt.compareSync(value, data[sqlPrefix + id]);
   },

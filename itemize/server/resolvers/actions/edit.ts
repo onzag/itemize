@@ -22,6 +22,7 @@ import {
 import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sql";
 import { GraphQLEndpointError } from "../../../base/errors";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
+import { ISQLTableRowValue } from "../../../base/Root/sql";
 
 const debug = Debug("resolvers:editItemDefinition");
 export async function editItemDefinition(
@@ -56,30 +57,19 @@ export async function editItemDefinition(
   // there's an easy way to request that, and now, we do it
   // at the same time we run the policy check
   let userId: number;
-  let wholeSqlStoredValue: any;
 
   // so we run the policy check for edit, this item definition,
   // with the given id
-  // TODO cache
-  await runPolicyCheck(
+  const wholeSqlStoredValue: ISQLTableRowValue = await runPolicyCheck(
     "edit",
     itemDefinition,
     resolverArgs.args.id,
     tokenData.role,
     resolverArgs.args,
-    appData.knex,
-    // and notice how we request every single field, we want
-    // it all, every single bit of information that is stored
-    // in the table, we want it, and we want to reconstruct that
-    // into a value, but we aren't showing that to the user
-    ["*"],
-    (contentData: any) => {
-      // so now that we have it all, we set the value of the variable
-      // this might be null
-      wholeSqlStoredValue = contentData;
-
+    appData.cache,
+    (content: ISQLTableRowValue) => {
       // if we don't get an user id this means that there's no owner, this is bad input
-      if (!contentData) {
+      if (!content) {
         debug("FAILED due to lack of content data");
         throw new GraphQLEndpointError({
           message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
@@ -88,13 +78,13 @@ export async function editItemDefinition(
       }
 
       // and fetch the userId
-      userId = contentData.created_by;
+      userId = content.created_by;
       if (itemDefinition.isOwnerObjectId()) {
-        userId = contentData.id;
+        userId = content.id;
       }
 
       // also throw an error if it's blocked
-      if (contentData.blocked_at !== null) {
+      if (content.blocked_at !== null) {
         debug("FAILED due to element being blocked");
         throw new GraphQLEndpointError({
           message: "The item is blocked",

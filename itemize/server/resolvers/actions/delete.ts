@@ -55,17 +55,16 @@ export async function deleteItemDefinition(
     resolverArgs.args.id,
     tokenData.role,
     resolverArgs.args,
-    appData.knex,
-    ["id", "created_by", "blocked_at"],
+    appData.cache,
 
     // this functions runs before the policy has been checked
     // and we do it for being efficient, because we can run
     // both of these checks with a single SQL query, and the policy
     // checker is built in a way that it demands and expects that
     // TODO cache
-    (contentData: any) => {
+    (content: any) => {
       // if there is no userId then the row was null, we throw an error
-      if (!contentData) {
+      if (!content) {
         debug("FAILED due to lack of content data");
         throw new GraphQLEndpointError({
           message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
@@ -75,16 +74,16 @@ export async function deleteItemDefinition(
 
       // so now we get the content information, which might
       // be null if nothing was found, so we check too
-      userId = contentData.created_by;
+      userId = content.created_by;
       if (itemDefinition.isOwnerObjectId()) {
-        userId = contentData.id;
+        userId = content.id;
       }
 
       // if the content is blocked, and our role has no special access
       // to moderation fields, then this content cannot be removed
       // from the website, no matter what
       if (
-        contentData.blocked_at !== null &&
+        content.blocked_at !== null &&
         !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
       ) {
         debug("FAILED due to blocked content and no moderation access for role %s", tokenData.role);

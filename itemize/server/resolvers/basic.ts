@@ -575,9 +575,8 @@ export async function runPolicyCheck(
   id: number,
   role: string,
   gqlArgValue: IGQLValue,
-  knex: Knex,
-  extraSQLColumns: string[],
-  preValidation: (content: any) => void,
+  cache: Cache,
+  preValidation: (content: ISQLTableRowValue) => void,
 ) {
   runPolicyCheckDebug(
     "EXECUTED for policy %s on item definition %s for id %d on role %s for value %j with extra columns %j",
@@ -585,23 +584,19 @@ export async function runPolicyCheck(
     itemDefinition.getQualifiedPathName(),
     role,
     gqlArgValue,
-    extraSQLColumns,
   );
   // so now we get the information we need first
   const mod = itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
-  // we check if we are going to need a join, by default, no
-  let policyQueryRequiresJoin = false;
-  // and what columns will we be using, by default, the extra columns required
-  const selectionSQLColumns = [...extraSQLColumns];
+  const selectQueryValue: ISQLTableRowValue =
+    await cache.requestCache(selfTable, moduleTable, id);
+
+  preValidation(selectQueryValue);
 
   // let's get all the policies that we have for this policy type group
   const policiesForThisType = itemDefinition.getPolicyNamesFor(policyType);
-  // now the expected actual policies that we need information about as in
-  // the policies that this role has to validate against
-  const expectedActualPolicies: string[] = [];
 
   // so we loop in these policies
   for (const policyName of policiesForThisType) {
@@ -625,7 +620,9 @@ export async function runPolicyCheck(
 
       if (applyingPropertyIds) {
         const somePropertyValueIsApplied =
-        applyingPropertyIds.some((applyingPropertyId) => !!gqlArgValue[applyingPropertyId]);
+        applyingPropertyIds.some(
+          (applyingPropertyId) => typeof gqlArgValue[applyingPropertyId] !== "undefined",
+        );
 
         if (!somePropertyValueIsApplied) {
           runPolicyCheckDebug(
@@ -647,11 +644,6 @@ export async function runPolicyCheck(
         "Found property in policy %s",
         property.getId(),
       );
-      // if the property is not a extension
-      if (!property.isExtension()) {
-        // it means that we require a join
-        policyQueryRequiresJoin = true;
-      }
 
       // now we need the qualified policy identifier, that's where in the args
       // the value for this policy is stored
@@ -693,56 +685,14 @@ export async function runPolicyCheck(
       // which will create a column field with the policy name that is going to be
       // equal to that value, eg. "name" = 'policyValueForProperty' AS "MY_POLICY"
       // because policies are uppercase this avoids collisions with properties
-      const selectionMetaColumn = property.getPropertyDefinitionDescription().sqlEqual(
+      const policyMatches = property.getPropertyDefinitionDescription().sqlLocalEqual(
         valueForTheProperty,
         "",
         property.getId(),
-        knex,
-        policyName + "__" + property.getId(),
+        selectQueryValue,
       );
 
-      // now we add that into the expected policy list
-      expectedActualPolicies.push(policyName);
-      // and then we add the meta column into our selection columns
-      selectionSQLColumns.push(selectionMetaColumn);
-    }
-  }
-
-  // now we can make the policy query
-  const policyQuery = knex.first(selectionSQLColumns).from(moduleTable);
-  // if the policy requires a join, or if the selection includes an asterisk
-  // and they want all
-  if (policyQueryRequiresJoin || selectionSQLColumns.includes("*")) {
-    // we join
-    policyQuery.join(selfTable, (clause) => {
-      clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
-    });
-  }
-  // we make the query only where the id and type are right
-  policyQuery.where({
-    id,
-    type: selfTable,
-  });
-
-  // we get the value, or nothing, if nothing matched
-  const value = (await policyQuery) || null;
-
-  runPolicyCheckDebug(
-    "Database provided %j",
-    value,
-  );
-
-  // and call the pre validation function which should
-  // validate if it's null or not
-  preValidation(value);
-
-  // now we start looping in all the policies, because
-  // policies are checking an equal, we check
-  expectedActualPolicies.forEach((policyName) => {
-    const propertiesInContext = itemDefinition.getPropertiesForPolicy(policyType, policyName);
-    for (const property of propertiesInContext) {
-      const passedPolicy = value[policyName + "__" + property.getId()];
-      if (!passedPolicy) {
+      if (!policyMatches) {
         runPolicyCheckDebug(
           "FAILED due to policy %s not passing",
           policyName,
@@ -757,7 +707,9 @@ export async function runPolicyCheck(
         });
       }
     }
-  });
+  }
 
   runPolicyCheckDebug("SUCCEED");
+
+  return selectQueryValue;
 }
