@@ -15,7 +15,7 @@ import {
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { GraphQLEndpointError } from "../../../errors";
 import uuid from "uuid";
-import { flattenRawGQLValueOrFields } from "../../../../util";
+import { flattenRawGQLValueOrFields } from "../../../../gql-util";
 
 export interface IPolicyValueRawJSONDataType {
   roles: string[];

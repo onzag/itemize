@@ -77,9 +77,16 @@ export class Listener {
         itemDefinition.getQualifiedPathName(), mod.getQualifiedPathName(), id,
       );
       if (queriedResult) {
-        socket.emit("changed", modulePath, itemDefinitionPath, id, "edited_at_feedback", queriedResult.edited_at);
+        socket.emit(
+          "changed",
+          modulePath,
+          itemDefinitionPath,
+          id,
+          "last_modified",
+          queriedResult.last_modified,
+        );
       } else {
-        socket.emit("changed", modulePath, itemDefinitionPath, id, "deleted", null);
+        socket.emit("changed", modulePath, itemDefinitionPath, id, "not_found", null);
       }
     } catch (err) {
       console.log(err);
@@ -133,7 +140,7 @@ export class Listener {
           parsedContent.modulePath,
           parsedContent.itemDefinitionPath,
           parsedContent.id,
-          parsedContent.deleted ? "deleted" : "modified",
+          parsedContent.deleted ? "not_found" : "modified",
           null,
         );
       }

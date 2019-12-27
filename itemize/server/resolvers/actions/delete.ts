@@ -12,7 +12,7 @@ import {
 import graphqlFields = require("graphql-fields");
 import { GraphQLEndpointError } from "../../../base/errors";
 import { ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS } from "../../../constants";
-import { flattenRawGQLValueOrFields } from "../../../util";
+import { flattenRawGQLValueOrFields } from "../../../gql-util";
 
 const debug = Debug("resolvers:deleteItemDefinition");
 export async function deleteItemDefinition(

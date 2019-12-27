@@ -20,7 +20,7 @@ import {
   convertGQLValueToSQLValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sql";
-import { flattenRawGQLValueOrFields } from "../../../util";
+import { flattenRawGQLValueOrFields } from "../../../gql-util";
 
 const debug = Debug("resolvers:addItemDefinition");
 export async function addItemDefinition(
@@ -153,6 +153,7 @@ export async function addItemDefinition(
   sqlModData.module_path = mod.getPath().join("/");
   sqlModData.idef_path = itemDefinition.getPath().join("/");
   sqlModData.created_at = appData.knex.fn.now();
+  sqlModData.last_modified = appData.knex.fn.now();
   sqlModData.created_by = tokenData.id || UNSPECIFIED_OWNER;
 
   debug("SQL Input data for idef is %j", sqlIdefData);

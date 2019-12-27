@@ -5,6 +5,7 @@ import {
   GraphQLEnumType,
   GraphQLList,
   GraphQLObjectType,
+  GraphQLInputObjectType,
 } from "graphql";
 import { IGQLFieldsDefinitionType } from "./base/Root/gql";
 import { ISQLTableDefinitionType } from "./base/Root/sql";
@@ -194,9 +195,9 @@ export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "blocked_by",
   "blocked_until",
   "blocked_reason",
+  "last_modified",
 ];
 export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
-  "id",
   "created_at",
   "created_by",
   "edited_at",
@@ -245,6 +246,14 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   reviewed_by: {
     type: GraphQLInt,
     description: "The user id who reviewed it",
+  },
+  last_modified: {
+    type: GraphQLNonNull(GraphQLString),
+    description: "An internal variable that represents when the whole object, as a whole " +
+    " was last modified, by any factor, edited_at servers a UI purpose when things were " +
+    " modified by normal means whereas last_modified is a global factor, it could be the " +
+    " server that did the change, or a side effect, edited_at can be used in the UI " +
+    " last modified is for usage which checking if objects updated",
   },
   blocked_at: {
     type: GraphQLString,
@@ -311,6 +320,9 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   reviewed_by: {
     type: "integer",
   },
+  last_modified: {
+    type: "datetime",
+  },
   blocked_at: {
     type: "datetime",
   },
@@ -366,22 +378,28 @@ export const DATETIME_FORMAT = "YYYY-MM-DDTHH:mm:ss\\Z";
 export const TIME_FORMAT = "HH:mm:ss";
 export const DATE_FORMAT = "YYYY-MM-DD";
 
+const ID_ELEMENT_FIELDS = {
+  id: {
+    type: GraphQLNonNull(GraphQLInt),
+  },
+  type: {
+    type: GraphQLNonNull(GraphQLString),
+  },
+  module_path: {
+    type: GraphQLNonNull(GraphQLString),
+  },
+  idef_path: {
+    type: GraphQLNonNull(GraphQLString),
+  },
+};
 export const ID_ELEMENT_GQL = new GraphQLObjectType({
   name: "ID_ELEMENT",
-  fields: {
-    id: {
-      type: GraphQLNonNull(GraphQLInt),
-    },
-    type: {
-      type: GraphQLNonNull(GraphQLString),
-    },
-    module_path: {
-      type: GraphQLNonNull(GraphQLString),
-    },
-    idef_path: {
-      type: GraphQLNonNull(GraphQLString),
-    },
-  },
+  fields: ID_ELEMENT_FIELDS,
+});
+
+export const ID_ELEMENT_INPUT_GQL = new GraphQLInputObjectType({
+  name: "ID_ELEMENT_INPUT",
+  fields: ID_ELEMENT_FIELDS,
 });
 
 export const ID_CONTAINER_GQL = new GraphQLObjectType({
@@ -447,7 +465,7 @@ export const RESERVED_CHANGE_PROPERTIES = {
 export const RESERVED_GETTER_LIST_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   ids: {
-    type: GraphQLNonNull(GraphQLList(ID_ELEMENT_GQL)),
+    type: GraphQLNonNull(GraphQLList(ID_ELEMENT_INPUT_GQL)),
     description: "the ids list for that item",
   },
 };

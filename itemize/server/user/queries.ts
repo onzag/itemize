@@ -6,7 +6,6 @@ import { jwtVerify, jwtSign } from "../token";
 import { GraphQLEndpointError } from "../../../itemize/base/errors";
 import { IServerSideTokenDataType } from "../resolvers/basic";
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { deepMerge } from "../../util";
 
 export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinitionType => {
   const userModule = appData.root.getModuleFor(["users"]);

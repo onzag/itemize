@@ -21,7 +21,7 @@ import {
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sql";
 import { GraphQLEndpointError } from "../../../base/errors";
-import { flattenRawGQLValueOrFields } from "../../../util";
+import { flattenRawGQLValueOrFields } from "../../../gql-util";
 
 const debug = Debug("resolvers:editItemDefinition");
 export async function editItemDefinition(
@@ -213,6 +213,7 @@ export async function editItemDefinition(
 
   // update when it was edited
   sqlModData.edited_at = appData.knex.fn.now();
+  sqlModData.last_modified = appData.knex.fn.now();
   sqlModData.edited_by = tokenData.id;
 
   debug("SQL Input data for idef is %j", sqlIdefData);

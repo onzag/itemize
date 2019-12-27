@@ -33,7 +33,12 @@ export class RemoteListener {
     return this.uuid;
   }
   public addListenerFor(itemDefinition: ItemDefinition, forId: number) {
-    this.listeners[itemDefinition.getQualifiedPathName() + "." + forId] = {
+    const qualifiedIdentifier = itemDefinition.getQualifiedPathName() + "." + forId;
+    if (this.listeners[qualifiedIdentifier]) {
+      return;
+    }
+
+    this.listeners[qualifiedIdentifier] = {
       id: forId,
       itemDefinition,
     };
@@ -81,10 +86,10 @@ export class RemoteListener {
     modulePath: string,
     itemDefinitionPath: string,
     id: number,
-    type: "modified" | "deleted" | "edited_at_feedback",
-    editedAtFeedback: string,
+    type: "modified" | "not_found" | "last_modified",
+    lastModifiedFeedback: string,
   ) {
-    console.log("feedback recieved with", modulePath, itemDefinitionPath, id, type, editedAtFeedback);
+    console.log("feedback recieved with", modulePath, itemDefinitionPath, id, type, lastModifiedFeedback);
 
     const itemDefinition =
       this.root.getModuleFor(modulePath.split("/")).getItemDefinitionFor(itemDefinitionPath.split("/"));
@@ -93,14 +98,18 @@ export class RemoteListener {
       if (
         type === "modified" ||
         (
-          type === "edited_at_feedback" &&
-          editedAtFeedback !== appliedGQLValue.flattenedValue.edited_at
+          type === "last_modified" &&
+          lastModifiedFeedback !== appliedGQLValue.flattenedValue.last_modified
         )
       ) {
         itemDefinition.triggerListeners("reload", id);
-      } else if (type === "deleted") {
-        itemDefinition.triggerListeners("deleted", id);
+      } else if (type === "not_found") {
+        itemDefinition.triggerListeners("not_found", id);
       }
+    } else if (type === "modified" || type === "last_modified") {
+      itemDefinition.triggerListeners("reload", id);
+    } else if (type === "not_found") {
+      itemDefinition.triggerListeners("not_found", id);
     }
   }
   private consumeDelayedFeedbacks(forAnSpecificId?: number) {
@@ -143,7 +152,6 @@ export class RemoteListener {
     this.consumeDelayedFeedbacks();
 
     this.isReconnect = true;
-    // TODO automatic reconnect, ask for feedback when listeners reattached
     console.log("reattach listenrs asked");
   }
 }
