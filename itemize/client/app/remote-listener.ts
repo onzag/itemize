@@ -16,8 +16,10 @@ export class RemoteListener {
     itemDefinition: ItemDefinition;
     forId: number;
   }> = [];
+  private connectionListeners: Array<() => void> = [];
   private uuid: string = uuid.v4();
   private isReconnect: boolean = false;
+  private offline: boolean = false;
   constructor(root: Root) {
     this.reattachListeners = this.reattachListeners.bind(this);
     this.onPossibleChangeListened = this.onPossibleChangeListened.bind(this);
@@ -28,9 +30,22 @@ export class RemoteListener {
     this.socket = io(`${location.protocol}//${location.host}`);
     this.socket.on("connect", this.reattachListeners);
     this.socket.on("changed", this.onPossibleChangeListened);
+    this.socket.on("disconnect", this.onDisconnect);
   }
   public getUUID() {
     return this.uuid;
+  }
+  public isOffline() {
+    return this.offline;
+  }
+  public addConnectStatusListener(listener: () => void) {
+    this.connectionListeners.push(listener);
+  }
+  public removeConnectStatusListener(listener: () => void) {
+    const index = this.connectionListeners.indexOf(listener);
+    if (index !== -1) {
+      this.connectionListeners.splice(index, 1);
+    }
   }
   public addListenerFor(itemDefinition: ItemDefinition, forId: number) {
     const qualifiedIdentifier = itemDefinition.getQualifiedPathName() + "." + forId;
@@ -149,9 +164,18 @@ export class RemoteListener {
       }
     });
 
+    if (this.isReconnect) {
+      this.connectionListeners.forEach((l) => l());
+    }
+
     this.consumeDelayedFeedbacks();
 
     this.isReconnect = true;
+    this.offline = false;
     console.log("reattach listenrs asked");
+  }
+  private onDisconnect() {
+    this.connectionListeners.forEach((l) => l());
+    this.offline = true;
   }
 }

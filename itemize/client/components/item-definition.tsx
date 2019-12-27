@@ -4,8 +4,9 @@ import {
   ItemDefinitionContext,
   IBasicActionResponse,
   IActionResponseWithId,
-  IActionResponseWithManyIds,
+  IActionResponseWithSearchResults,
   IItemDefinitionContextType,
+  ISearchResult,
 } from "../providers/item-definition";
 import equals from "deep-equal";
 
@@ -111,8 +112,8 @@ interface ISearchActionerProps {
     dismissSearchResults: () => void;
     dismissSearchError: () => void;
     searching: boolean;
-    searchResults: number[];
-    search: () => Promise<IActionResponseWithManyIds>;
+    searchResults: ISearchResult[];
+    search: () => Promise<IActionResponseWithSearchResults>;
   }) => any;
 }
 
