@@ -1,6 +1,9 @@
 import Moment from "moment";
 import { JSDOM } from "jsdom";
 import createDOMPurify from "dompurify";
+import { STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES, EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
+  ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS, MODERATION_FIELDS } from "./constants";
+import ItemDefinition, { ItemDefinitionIOActions } from "./base/Root/Module/ItemDefinition";
 
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -150,6 +153,203 @@ export function getLocalizedDateFormat(normalize: boolean) {
 
 export function getLocalizedDateTimeFormat(normalize: boolean) {
   return getLocalizedDateFormat(normalize) + " " + getLocalizedTimeFormat(normalize);
+}
+
+export function getFieldsAndArgs(
+  options: {
+    includeArgs: boolean,
+    includeFields: boolean,
+    onlyIncludeProperties?: string[],
+    onlyIncludeItems?: string[],
+    onlyIncludePropertiesForArgs?: string[],
+    onlyIncludeItemsForArgs?: string[],
+    appliedOwner?: number,
+    userRole: string;
+    userId: number;
+    itemDefinitionInstance: ItemDefinition;
+    forId: number;
+  },
+) {
+  // so the requested fields, at base, it's just nothing
+  const requestFields: any = {
+    DATA: {},
+  };
+  // and these would be the arguments for the graphql query
+  const argumentsForQuery: any = {};
+
+  // now we go for the standard fields, and we add all of them
+  STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
+    requestFields.DATA[p] = {};
+  });
+  // we add the external ones as well
+  EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
+    requestFields[p] = {};
+  });
+  // and if our role allows it, we add the moderation fields
+  if (ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(options.userRole)) {
+    MODERATION_FIELDS.forEach((mf) => {
+      requestFields.DATA[mf] = {};
+    });
+  }
+
+  // we get the applied owner of this item, basically what we have loaded
+  // for this user created_by or id if the item is marked as if its id
+  // is the owner, in the case of null, the applied owner is -1
+  const appliedOwner = options.appliedOwner || options.itemDefinitionInstance.getAppliedValueOwnerIfAny(
+    options.forId || null,
+  );
+
+  // Now we get all the property definitions and extensions for the item
+  // you might wonder why we check role access one by one and not the total
+  // well, we literally don't care, the developer is reponsible to deny this
+  // to get here, we are just building a query, not preventing a submit
+  options.itemDefinitionInstance.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+    // now how we tell if it should be included in fields, well first
+    // are we including fields at all? well if yes, then are we specifying
+    // specific properties that should be included or are we taking all
+    // if taking all it depends on the rules, and the role access
+    const shouldBeIncludedInFields = options.includeFields ? (
+      options.onlyIncludeProperties ?
+        options.onlyIncludeProperties.includes(pd.getId()) :
+        (
+          !pd.isRetrievalDisabled() && pd.checkRoleAccessFor(
+            ItemDefinitionIOActions.READ,
+            options.userRole,
+            options.userId,
+            appliedOwner,
+            false,
+          )
+        )
+    ) : false;
+
+    // so if all that messy conditional passes
+    if (shouldBeIncludedInFields) {
+      // we add it to the fields we want to add
+      // because it's a property it goes in data
+      requestFields.DATA[pd.getId()] = {};
+
+      // now we get the description for this field
+      const propertyDescription = pd.getPropertyDefinitionDescription();
+      // if there are graphql fields defined
+      if (propertyDescription.gqlFields) {
+        // we add each one of them
+        Object.keys(propertyDescription.gqlFields).forEach((field) => {
+          requestFields.DATA[pd.getId()][field] = {};
+        });
+      }
+    }
+
+    // now for the arguments, same rule
+    // are we including arguments at all?
+    // are we specifying which specific arguments?
+    // otherwise use the role access for it
+    const shouldBeIncludedInArgs = options.includeArgs ? (
+      options.onlyIncludePropertiesForArgs ?
+        options.onlyIncludePropertiesForArgs.includes(pd.getId()) :
+        pd.checkRoleAccessFor(
+          !options.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
+          options.userRole,
+          options.userId,
+          appliedOwner,
+          false,
+        )
+    ) : false;
+
+    // the value for an argument is the value of the property
+    // as it is
+    if (shouldBeIncludedInArgs) {
+      argumentsForQuery[pd.getId()] = pd.getCurrentValue(options.forId || null);
+    }
+  });
+
+  // now we go for the items
+  options.itemDefinitionInstance.getAllItems().forEach((item) => {
+    // and now we get the qualified identifier that grapqhl expects
+    const qualifiedId = item.getQualifiedIdentifier();
+
+    if (options.includeFields) {
+      // items are always expected to have a value
+      requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
+      requestFields.DATA[qualifiedId] = {};
+    }
+
+    if (options.includeArgs) {
+      // we set the exclusion state we expect, it might be a ternary as well
+      // like in search mode
+      argumentsForQuery[
+        item.getQualifiedExclusionStateIdentifier()
+      ] = item.getExclusionState(options.forId || null);
+      // we add it to the data, and we add it to the arguments
+      argumentsForQuery[qualifiedId] = {};
+    }
+
+    // now the conditional for whether we need to have that item properties in the arg
+    const itemShouldBeIncludedInArgs = options.includeArgs ? (
+      options.onlyIncludeItemsForArgs ?
+        options.onlyIncludeItemsForArgs.includes(item.getId()) :
+        true
+    ) : false;
+
+    // and for the fields
+    const itemShouldBeIncludedInFields = options.includeFields ? (
+      options.onlyIncludeItems ?
+        options.onlyIncludeItems.includes(item.getId()) :
+        true
+    ) : false;
+
+    if (!itemShouldBeIncludedInArgs && !itemShouldBeIncludedInFields) {
+      // if we don't we can just skip
+      return;
+    }
+
+    // otherwise we need the sinking properties
+    // as only the sinking properties manage
+    item.getSinkingProperties().forEach((sp) => {
+      // we always check for role access and whether we can retrieve it or not
+      if (
+        itemShouldBeIncludedInFields &&
+        !sp.isRetrievalDisabled() &&
+        sp.checkRoleAccessFor(
+          ItemDefinitionIOActions.READ,
+          options.userRole,
+          options.userId,
+          appliedOwner,
+          false,
+        )
+      ) {
+        requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = {};
+
+        const propertyDescription = sp.getPropertyDefinitionDescription();
+        if (propertyDescription.gqlFields) {
+          Object.keys(propertyDescription.gqlFields).forEach((field) => {
+            requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()][field] = {};
+          });
+        }
+      }
+
+      if (
+        itemShouldBeIncludedInArgs &&
+        sp.checkRoleAccessFor(
+          !options.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
+          options.userRole,
+          options.userId,
+          appliedOwner,
+          false,
+        )
+      ) {
+        argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(options.forId || null);
+      }
+    });
+
+    if (Object.keys(requestFields.DATA[qualifiedId]).length === 0) {
+      delete requestFields.DATA[qualifiedId];
+    }
+    if (Object.keys(argumentsForQuery[qualifiedId]).length === 0) {
+      delete argumentsForQuery[qualifiedId];
+    }
+  });
+
+  return {requestFields, argumentsForQuery};
 }
 
 export const DOMWindow = JSDOM ? (new JSDOM("")).window : window;

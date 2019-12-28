@@ -154,10 +154,10 @@ export interface IPropertyDefinitionSupportedType {
     optional: string[],
     // range attributes are not requested if disableRangedSearch is true
     // nor if the searchInterface is not EXACT_AND_RANGE
-    // nor if the searchLevel is disabled
+    // nor if its not searchable
     searchRange?: string[],
     searchRangeOptional?: string[],
-    // not requested if the searchLevel is disabled
+    // not requested if the searchable is disabled
     searchBase?: string[],
     searchOptional?: string[],
 

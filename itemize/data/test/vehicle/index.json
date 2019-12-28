@@ -44,20 +44,16 @@
         {
             "id": "brake_type",
             "type": "string",
-            "values": ["disc", "drum"],
-            "searchLevel": "moderate",
-            "rarity": "moderate"
+            "values": ["disc", "drum"]
         },
         {
             "id": "has_nitro",
             "type": "boolean",
-            "rarity": "rare",
             "hiddenIf": {
                 "property": "vehicle_type",
                 "comparator": "not-equal",
                 "value": "car"
             },
-            "searchLevel": "rare",
             "nullable": true,
             "nullIfHidden": true
         }

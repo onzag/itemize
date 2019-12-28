@@ -37,21 +37,6 @@ export interface IPropertyDefinitionRawJSONInvalidRuleDataType {
   if: IConditionalRuleSetRawJSONDataType;
 }
 
-export type PropertyDefinitionSearchLevelsType =
-  // Will always display a search field, but it might be skipped
-  // this is the default
-  "always" |
-  // Will display a smaller search field and make it clearly optional
-  "moderate" |
-  // Will actually make it so that you need to press a button to see
-  // all search options
-  "rare" |
-  // Makes the field hidden but remains there and is present at value
-  // can be set programatically because is hidden
-  "hidden" |
-  // Does not display any search field at all and doesn't expect it
-  "disabled";
-
 export type PropertyDefinitionRarityLevelsType =
   "standard" | "moderate" | "rare";
 
@@ -63,7 +48,6 @@ export interface IPropertyDefinitionRawJSONDataType {
   i18nData?: {
     [locale: string]: any,
   };
-  rarity?: PropertyDefinitionRarityLevelsType;
   // the type of the property
   type: PropertyDefinitionSupportedTypeName;
   subtype?: string;
@@ -113,7 +97,7 @@ export interface IPropertyDefinitionRawJSONDataType {
   // hidden if conditional
   hiddenIf?: IConditionalRuleSetRawJSONDataType;
   // search level
-  searchLevel?: PropertyDefinitionSearchLevelsType;
+  searchable?: boolean;
   // disable ranged search
   disableRangedSearch?: boolean;
   // disable retrieval, property value is never retrieved
@@ -1001,13 +985,6 @@ export default class PropertyDefinition {
   }
 
   /**
-   * provides the current property rarity
-   */
-  public getRarity() {
-    return this.rawData.rarity || "standard";
-  }
-
-  /**
    * Checks whether the property can be retrieved
    */
   public isRetrievalDisabled() {
@@ -1022,19 +999,15 @@ export default class PropertyDefinition {
   }
 
   /**
-   * Provides the search level of the property as it was defined
-   */
-  public getSearchLevel(): PropertyDefinitionSearchLevelsType {
-    return this.rawData.searchLevel || "always";
-  }
-
-  /**
    * Tells if it's searchable, either by default or because
    * of a search level
    */
   public isSearchable(): boolean {
     if (this.getPropertyDefinitionDescription().searchable) {
-      return this.getSearchLevel() !== "disabled";
+      if (typeof this.rawData.searchable === "undefined") {
+        return true;
+      }
+      return this.rawData.searchable;
     }
     return false;
   }

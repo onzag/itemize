@@ -481,11 +481,11 @@ export function checkPropertyDefinition(
       PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE;
 
   // if we have a search level but the item is not searchable throw an error
-  if (rawData.searchLevel && !itemIsSearchable) {
+  if (typeof rawData.searchable !== "undefined" && !itemIsSearchable) {
     throw new CheckUpError(
-      "Type '" + rawData.type + "' does not support searchLevel " +
+      "Type '" + rawData.type + "' does not support searchable flag " +
       "as it cannot be searched",
-      traceback.newTraceToBit("searchLevel"),
+      traceback.newTraceToBit("searchable"),
     );
 
   // if we don't support exact an range but somehow ranged was disabled throw an error
@@ -505,7 +505,7 @@ export function checkPropertyDefinition(
     );
 
   // this is contradictory
-  } else if (rawData.searchLevel === "disabled" && rawData.disableRangedSearch) {
+  } else if (typeof rawData.searchable !== "undefined" && !rawData.searchable && rawData.disableRangedSearch) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' cannot disable ranged search if search is disabled",
       traceback.newTraceToBit("disableRangedSearch"),

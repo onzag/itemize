@@ -15,7 +15,13 @@ export function getConversionIds(
 ): string[] {
   // we need the description
   const propertyDefinitionDescription = PropertyDefinition.supportedTypesStandard[rawData.type];
-  if (!propertyDefinitionDescription.searchable || rawData.searchLevel === "disabled") {
+  if (
+    !propertyDefinitionDescription.searchable ||
+    (
+      typeof rawData.searchable !== "undefined" &&
+      !rawData.searchable
+    )
+  ) {
     // return empty array if it's not searchable or search level is disabled
     return [];
   }
@@ -70,29 +76,24 @@ export function buildSearchModePropertyDefinitions(
   // so we need the description from the standard
   const propertyDefinitionDescription = PropertyDefinition.supportedTypesStandard[rawData.type];
   // if it's not searchable by definition, or the search level is set to disabled, we return an empty array
-  if (!propertyDefinitionDescription.searchable || rawData.searchLevel === "disabled") {
+  if (
+    !propertyDefinitionDescription.searchable ||
+    (
+      typeof rawData.searchable !== "undefined" &&
+      !rawData.searchable
+    )
+  ) {
     return [];
   }
 
   // we create the new property definition via copy
   const newPropDef = {...rawData};
   newPropDef.nullable = true;
-  // if the search level is set to hidden, we hide
-  if (newPropDef.searchLevel === "hidden") {
-    newPropDef.hidden = true;
-  // if the search level is set to moderate, or rare, we set it as the rarity
-  } else if (newPropDef.searchLevel === "moderate") {
-    newPropDef.rarity = "moderate";
-  } else if (newPropDef.searchLevel === "rare") {
-    newPropDef.rarity = "rare";
-  } else {
-    newPropDef.rarity = "standard";
-  }
 
   // Disable search level for any of its children
   // Just because this is the search level it doesn't make
   // sense to go deeper
-  newPropDef.searchLevel = "disabled";
+  newPropDef.searchable = false;
 
   if (newPropDef.type === "text") {
     newPropDef.type = "string";

@@ -1,18 +1,12 @@
 import React from "react";
 import { LocaleContext, ILocaleContextType } from "../app";
 import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
-import Module from "../../base/Root/Module";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
 import { TokenContext, ITokenContextType } from "../app/internal-providers";
 import {
-  ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
-  MODERATION_FIELDS,
-  EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   PREFIX_GET,
-  PREFIX_BUILD,
-  STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   PREFIX_EDIT,
   PREFIX_ADD,
   PREFIX_DELETE,
@@ -26,6 +20,7 @@ import { ModuleContext } from "./module";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import CacheWorkerInstance from "../workers/cache";
 import { RemoteListener } from "../app/remote-listener";
+import { getFieldsAndArgs } from "../../util";
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
@@ -144,7 +139,7 @@ export interface IItemDefinitionContextType {
   searching: boolean;
   // the obtained search results from the graphql endpoint
   // just as they come
-  searchResuls: ISearchResult[];
+  searchResults: ISearchResult[];
   // poked is a flag that is raised to mean to ignore
   // anything regarding user set statuses and just mark
   // things as they are, for example, by default many fields
@@ -212,10 +207,19 @@ export interface IItemDefinitionContextType {
 
   // to remove the poked status
   unpoke: () => void;
+
+  // the remote listener
+  remoteListener: RemoteListener;
+}
+
+export interface ISearchItemDefinitionValueContextType {
+  currentlySearching: ISearchResult[];
+  searchFields: any;
 }
 
 // This is the context that will serve it
 export const ItemDefinitionContext = React.createContext<IItemDefinitionContextType>(null);
+export const SearchItemDefinitionValueContext = React.createContext<ISearchItemDefinitionValueContextType>(null);
 
 // Now we pass on the provider, this is what the developer
 // is actually expected to fill
@@ -261,9 +265,6 @@ interface IItemDefinitionProviderProps {
     onlyIncludeItems?: string[],
     // excludes the policies from being part of the state
     excludePolicies?: boolean,
-    // prevents waiting for data to be gathered before loading the value
-    // this can be detrimental in some cases, doesn't affect memory memoryCached values
-    dontWaitForLoad?: boolean,
     // cleans the value from the memory cache once the object dismounts
     // as the memory cache might only grow and grow
     cleanOnDismount?: boolean,
@@ -287,6 +288,8 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
   // the remote listener for listening to changes that occur
   // server side
   remoteListener: RemoteListener;
+  // the searching context to pull values from
+  searchContext: ISearchItemDefinitionValueContextType;
 }
 
 // This is the state of such, it's basically a copy of the
@@ -313,48 +316,11 @@ interface IActualItemDefinitionProviderState {
   canCreate: boolean;
 }
 
-// These are some registers they are used for making
-// things more efficient, this one is for when values are
-// loaded, because there are going to be many item definition instances
-// some optimized differently, requesting different things
-// we need to
-// 1. Not launch two server request
-// 2. Make one request so that it fullfills both of their needs
-const ItemDefinitionProviderRequestsInProgressRegistry: {
-  // so requests can be identified with the item definition that
-  // we are trying to load and the id we are trying to load
-  [qualifiedPathNameWithID: string]: {
-    // the requested fields that are expected to be loaded
-    currentRequestedFields: any,
-    // and who is waiting for them
-    registeredCallbacks: any[],
-  };
-} = {};
-// this is how much time it waits for every component instance
-// to gather up in that registry, instances run async, so we need
-// all of them to register themselves up in this train
-// to get their needs satisfied, 70ms can be quite a lot so ensure
-// that if you only have one single instance you use the
-// dontWaitForLoad in the optmize flag which will disable this
-// wait time
-const ITEM_DEFINITION_PROVIDER_REQUEST_TIMEOUT = 70;
-// This is basically sleep, but async
-function itemDefinitionProviderRequestsInProgressTimeout(time: number) {
-  return new Promise((resolve) => setTimeout(resolve, time));
-}
-// since remote listener might trigger that an element is now to be
-// marked not found, we only need to really to update the state once
-// and update the respective cache value
-const ItemDefinitionProviderCleanUpsInProgressRegistry: {
-  [qualifiedPathNameWithID: string]: boolean;
-} = {};
-
 /**
  * Here it is, the mighty
  */
-class ActualItemDefinitionProvider extends
+export class ActualItemDefinitionProvider extends
   React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
-
   // sometimes when doing some updates when you change the item
   // definition to another item definition (strange but ok)
   // the state between the item and the expected state will
@@ -406,7 +372,6 @@ class ActualItemDefinitionProvider extends
     this.loadValue = this.loadValue.bind(this);
     this.delete = this.delete.bind(this);
     this.changeListener = this.changeListener.bind(this);
-    this.notFoundListener = this.notFoundListener.bind(this);
     this.reloadListener = this.reloadListener.bind(this);
     this.submit = this.submit.bind(this);
     this.dismissLoadError = this.dismissLoadError.bind(this);
@@ -502,8 +467,6 @@ class ActualItemDefinitionProvider extends
       // we have gotten (or have cached) this listener is very important for that reason, otherwise our app
       // will get frozen in the past
       this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
-      // the second remote listener is when the server says that an item now should be marked as not found
-      this.props.itemDefinitionInstance.addListener("not_found", this.props.forId, this.notFoundListener);
 
       // note how we used the item definition instance and that's because those events are piped from
       // within this remote listener, the remote listener pipes the events from the websocket
@@ -521,7 +484,6 @@ class ActualItemDefinitionProvider extends
     if (this.props.forId) {
       // remove all the remote listeners
       this.props.itemDefinitionInstance.removeListener("reload", this.props.forId, this.reloadListener);
-      this.props.itemDefinitionInstance.removeListener("not_found", this.props.forId, this.notFoundListener);
       this.props.remoteListener.removeListenerFor(this.props.itemDefinitionInstance, this.props.forId);
     }
   }
@@ -545,7 +507,8 @@ class ActualItemDefinitionProvider extends
       !!nextProps.assumeOwnership !== !!this.props.assumeOwnership ||
       nextProps.children !== this.props.children ||
       nextProps.localeData !== this.props.localeData ||
-      nextProps.tokenData !== this.props.tokenData ||
+      nextProps.tokenData.id !== this.props.tokenData.id ||
+      nextProps.tokenData.role !== this.props.tokenData.role ||
       nextProps.remoteListener !== this.props.remoteListener ||
       !equals(this.props.optimize, nextProps.optimize) ||
       !equals(this.state, nextState);
@@ -571,7 +534,6 @@ class ActualItemDefinitionProvider extends
         prevProps.itemDefinitionInstance.removeListener("change", prevProps.forId || null, this.changeListener);
         if (prevProps.forId) {
           prevProps.itemDefinitionInstance.addListener("reload", prevProps.forId, this.reloadListener);
-          prevProps.itemDefinitionInstance.addListener("not_found", prevProps.forId, this.notFoundListener);
           prevProps.remoteListener.removeListenerFor(prevProps.itemDefinitionInstance, prevProps.forId);
         }
 
@@ -579,7 +541,6 @@ class ActualItemDefinitionProvider extends
         this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.changeListener);
         if (this.props.forId) {
           this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
-          this.props.itemDefinitionInstance.addListener("not_found", this.props.forId, this.notFoundListener);
           this.props.remoteListener.addListenerFor(this.props.itemDefinitionInstance, this.props.forId);
         }
       }
@@ -623,36 +584,6 @@ class ActualItemDefinitionProvider extends
     }
   }
 
-  // This is the remote listener that listens to things being removed and wiped from the database
-  public notFoundListener() {
-    // so we first need to setup the qualified id
-    const qualifiedPathNameWithID = this.props.itemDefinitionInstance.getQualifiedPathName() + "." + this.props.forId;
-    // and only one is allowed at once to clean up the cache and setup the state of the application
-    // every other one will be called but it's pointless if everyone calls this function
-    if (!ItemDefinitionProviderCleanUpsInProgressRegistry[qualifiedPathNameWithID]) {
-      // so we set it to true (note how we never set it to false)
-      ItemDefinitionProviderCleanUpsInProgressRegistry[qualifiedPathNameWithID] = true;
-      // and now we cache the value to null if we can do so, null for removed
-      if (CacheWorkerInstance.isSupported) {
-        CacheWorkerInstance.instance.setCachedValue(
-          PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId, null, null);
-      }
-      // and we clean the value from the item definition instance
-      this.props.itemDefinitionInstance.cleanValueFor(this.props.forId);
-    }
-
-    // we set the state to not found
-    this.setState({
-      notFound: true,
-      itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
-        this.props.forId || null,
-        !this.props.disableExternalChecks,
-        this.props.optimize && this.props.optimize.onlyIncludeProperties,
-        this.props.optimize && this.props.optimize.onlyIncludeItems,
-        this.props.optimize && this.props.optimize.excludePolicies,
-      ),
-    });
-  }
   public reloadListener() {
     console.log("RELOAD LISTENED");
     // well this is very simple the app requested a reload
@@ -671,200 +602,13 @@ class ActualItemDefinitionProvider extends
         this.props.optimize && this.props.optimize.onlyIncludeItems,
         this.props.optimize && this.props.optimize.excludePolicies,
       ),
+      // we do this because eg. the search relies on triggering the change listener
+      // no notify that things aren't loading anymore
+      loading: false,
+      // also search might do this, and it's true anyway
+      notFound:
+        this.props.forId ? this.props.itemDefinitionInstance.hasAppliedValueTo(this.props.forId || null) : false,
     });
-  }
-  public getFieldsAndArgs(
-    options: {
-      includeArgs: boolean,
-      includeFields: boolean,
-      onlyIncludeProperties?: string[],
-      onlyIncludeItems?: string[],
-      onlyIncludePropertiesForArgs?: string[],
-      onlyIncludeItemsForArgs?: string[],
-    },
-  ) {
-    // so the requested fields, at base, it's just nothing
-    const requestFields: any = {
-      DATA: {},
-    };
-    // and these would be the arguments for the graphql query
-    const argumentsForQuery: any = {};
-
-    // now we go for the standard fields, and we add all of them
-    STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
-      requestFields.DATA[p] = {};
-    });
-    // we add the external ones as well
-    EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
-      requestFields[p] = {};
-    });
-    // and if our role allows it, we add the moderation fields
-    if (ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(this.props.tokenData.role)) {
-      MODERATION_FIELDS.forEach((mf) => {
-        requestFields.DATA[mf] = {};
-      });
-    }
-
-    // we get the applied owner of this item, basically what we have loaded
-    // for this user created_by or id if the item is marked as if its id
-    // is the owner, in the case of null, the applied owner is -1
-    const appliedOwner = this.props.assumeOwnership ?
-      this.props.tokenData.id :
-      this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(
-        this.props.forId || null,
-      );
-
-    // Now we get all the property definitions and extensions for the item
-    // you might wonder why we check role access one by one and not the total
-    // well, we literally don't care, the developer is reponsible to deny this
-    // to get here, we are just building a query, not preventing a submit
-    this.props.itemDefinitionInstance.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
-      // now how we tell if it should be included in fields, well first
-      // are we including fields at all? well if yes, then are we specifying
-      // specific properties that should be included or are we taking all
-      // if taking all it depends on the rules, and the role access
-      const shouldBeIncludedInFields = options.includeFields ? (
-        options.onlyIncludeProperties ?
-          options.onlyIncludeProperties.includes(pd.getId()) :
-          (
-            !pd.isRetrievalDisabled() && pd.checkRoleAccessFor(
-              ItemDefinitionIOActions.READ,
-              this.props.tokenData.role,
-              this.props.tokenData.id,
-              appliedOwner,
-              false,
-            )
-          )
-      ) : false;
-
-      // so if all that messy conditional passes
-      if (shouldBeIncludedInFields) {
-        // we add it to the fields we want to add
-        // because it's a property it goes in data
-        requestFields.DATA[pd.getId()] = {};
-
-        // now we get the description for this field
-        const propertyDescription = pd.getPropertyDefinitionDescription();
-        // if there are graphql fields defined
-        if (propertyDescription.gqlFields) {
-          // we add each one of them
-          Object.keys(propertyDescription.gqlFields).forEach((field) => {
-            requestFields.DATA[pd.getId()][field] = {};
-          });
-        }
-      }
-
-      // now for the arguments, same rule
-      // are we including arguments at all?
-      // are we specifying which specific arguments?
-      // otherwise use the role access for it
-      const shouldBeIncludedInArgs = options.includeArgs ? (
-        options.onlyIncludePropertiesForArgs ?
-          options.onlyIncludePropertiesForArgs.includes(pd.getId()) :
-          pd.checkRoleAccessFor(
-            !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
-            this.props.tokenData.role,
-            this.props.tokenData.id,
-            appliedOwner,
-            false,
-          )
-      ) : false;
-
-      // the value for an argument is the value of the property
-      // as it is
-      if (shouldBeIncludedInArgs) {
-        argumentsForQuery[pd.getId()] = pd.getCurrentValue(this.props.forId || null);
-      }
-    });
-
-    // now we go for the items
-    this.props.itemDefinitionInstance.getAllItems().forEach((item) => {
-      // and now we get the qualified identifier that grapqhl expects
-      const qualifiedId = item.getQualifiedIdentifier();
-
-      if (options.includeFields) {
-        // items are always expected to have a value
-        requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
-        requestFields.DATA[qualifiedId] = {};
-      }
-
-      if (options.includeArgs) {
-        // we set the exclusion state we expect, it might be a ternary as well
-        // like in search mode
-        argumentsForQuery[
-          item.getQualifiedExclusionStateIdentifier()
-        ] = item.getExclusionState(this.props.forId || null);
-        // we add it to the data, and we add it to the arguments
-        argumentsForQuery[qualifiedId] = {};
-      }
-
-      // now the conditional for whether we need to have that item properties in the arg
-      const itemShouldBeIncludedInArgs = options.includeArgs ? (
-        options.onlyIncludeItemsForArgs ?
-          options.onlyIncludeItemsForArgs.includes(item.getId()) :
-          true
-      ) : false;
-
-      // and for the fields
-      const itemShouldBeIncludedInFields = options.includeFields ? (
-        options.onlyIncludeItems ?
-          options.onlyIncludeItems.includes(item.getId()) :
-          true
-      ) : false;
-
-      if (!itemShouldBeIncludedInArgs && !itemShouldBeIncludedInFields) {
-        // if we don't we can just skip
-        return;
-      }
-
-      // otherwise we need the sinking properties
-      // as only the sinking properties manage
-      item.getSinkingProperties().forEach((sp) => {
-        // we always check for role access and whether we can retrieve it or not
-        if (
-          itemShouldBeIncludedInFields &&
-          !sp.isRetrievalDisabled() &&
-          sp.checkRoleAccessFor(
-            ItemDefinitionIOActions.READ,
-            this.props.tokenData.role,
-            this.props.tokenData.id,
-            appliedOwner,
-            false,
-          )
-        ) {
-          requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = {};
-
-          const propertyDescription = sp.getPropertyDefinitionDescription();
-          if (propertyDescription.gqlFields) {
-            Object.keys(propertyDescription.gqlFields).forEach((field) => {
-              requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()][field] = {};
-            });
-          }
-        }
-
-        if (
-          itemShouldBeIncludedInArgs &&
-          sp.checkRoleAccessFor(
-            !this.props.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
-            this.props.tokenData.role,
-            this.props.tokenData.id,
-            appliedOwner,
-            false,
-          )
-        ) {
-          argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(this.props.forId || null);
-        }
-      });
-
-      if (Object.keys(requestFields.DATA[qualifiedId]).length === 0) {
-        delete requestFields.DATA[qualifiedId];
-      }
-      if (Object.keys(argumentsForQuery[qualifiedId]).length === 0) {
-        delete argumentsForQuery[qualifiedId];
-      }
-    });
-
-    return {requestFields, argumentsForQuery};
   }
   public async loadValue(denyCache?: boolean): Promise<IActionResponseWithValue> {
     // we don't use loading here because there's one big issue
@@ -881,11 +625,16 @@ class ActualItemDefinitionProvider extends
     // used accross the application, and two components with different
     // optimizations might have been used at the same time for the
     // same id
-    const { requestFields } = this.getFieldsAndArgs({
+    const { requestFields } = getFieldsAndArgs({
       includeArgs: false,
       includeFields: true,
       onlyIncludeItems: this.props.optimize && this.props.optimize.onlyIncludeItems,
       onlyIncludeProperties: this.props.optimize && this.props.optimize.onlyIncludeProperties,
+      appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
+      userId: this.props.tokenData.id,
+      userRole: this.props.tokenData.role,
+      itemDefinitionInstance: this.props.itemDefinitionInstance,
+      forId: this.props.forId,
     });
 
     if (!denyCache) {
@@ -895,10 +644,12 @@ class ActualItemDefinitionProvider extends
         appliedGQLValue &&
         requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
       ) {
-        return {
+        const completedValue = this.loadValueCompleted({
           value: appliedGQLValue.rawValue,
           error: null,
-        };
+        });
+        this.props.remoteListener.requestFeedbackFor(this.props.itemDefinitionInstance, this.props.forId);
+        return completedValue;
       }
     }
 
@@ -917,70 +668,24 @@ class ActualItemDefinitionProvider extends
       });
     }
 
-    if (this.props.optimize && this.props.optimize.dontWaitForLoad) {
-      return await this.loadValueWaiter(
-        requestFields,
-        denyCache,
-      );
+    // the reason why we use deny cache here is simple
+    // the search context is a form of a memory cache, it might be loading
+    // still when for some reason it was asked to reload, I can think of a extreme case
+    // when the client loads from memory, a reload is requested, but the search conxtext hasn't
+    // released yet the value
+    if (
+      !denyCache &&
+      this.props.searchContext &&
+      this.props.searchContext.currentlySearching.find(
+        (s) => s.id === this.props.forId && s.type === this.props.itemDefinitionInstance.getQualifiedPathName(),
+      ) &&
+      requestFieldsAreContained(requestFields, this.props.searchContext.searchFields)
+    ) {
+      return;
     }
 
-    // this is why we have a registry
-    // we build the qualified path name with the id so as to be
-    // an unique identifier for this id
-    const qualifiedPathNameWithID = PREFIX_BUILD(
-      this.props.itemDefinitionInstance.getQualifiedPathName(),
-    ) + "." + this.props.forId;
-
-    // if we have gotten already it there, it means some other instance is already
-    // executing to load the value for this same object and same id which means
-    // it's waiting and we have a time of grace for this to add what we want to
-    // that request as well
-    if (ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID]) {
-      // we add our fields to what we expect to this waiter
-      ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].currentRequestedFields =
-        deepMerge(
-          ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].currentRequestedFields,
-          requestFields,
-        );
-
-      // and return this promise that will inform us by adding the resolve to the registry
-      return new Promise((resolve) => {
-        // this function is called once the waiter has done and has provided a value
-        ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].registeredCallbacks.push(
-          // we just take that value call the completed function and resolve
-          // that way the user that called the loadValue function using the reload
-          // can also get the value from the resolve
-          (resolvedValue: IActionResponseWithValueAndQueryFields) => {
-            resolve(this.loadValueCompleted(resolvedValue));
-          },
-        );
-      });
-    }
-
-    // if that's not the case, horray, we are the first ones to request this value
-    // we make our object, these are the fields we will be requesting, and these
-    // are the callbacks, empty to start
-    ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID] = {
-      currentRequestedFields: requestFields,
-      registeredCallbacks: [],
-    };
-
-    // now we wait a little bit
-    await itemDefinitionProviderRequestsInProgressTimeout(ITEM_DEFINITION_PROVIDER_REQUEST_TIMEOUT);
-
-    // now we get what we are expected to get, some other instances might
-    // have added to this request
-    const requestFieldsToGet =
-      ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].currentRequestedFields;
-    // we extract the resolvers as well
-    const resolversToTrigger =
-      ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID].registeredCallbacks;
-    // and now delete it, we aren't waiting anymore, it's time to execute
-    delete ItemDefinitionProviderRequestsInProgressRegistry[qualifiedPathNameWithID];
-
-    // so we load the value
     const value = await this.loadValueWaiter(
-      requestFieldsToGet,
+      requestFields,
       denyCache,
     );
 
@@ -1004,11 +709,7 @@ class ActualItemDefinitionProvider extends
       }
     }
 
-    // run all the resolvers that were expecting callback with the value
-    resolversToTrigger.forEach((r) => r(value));
-
-    // and return such value ourselves
-    return value;
+    this.loadValueCompleted(value);
   }
 
   public async loadValueWaiter(requestFields: any, denyCache?: boolean):
@@ -1063,7 +764,7 @@ class ActualItemDefinitionProvider extends
       getQueryFields,
     };
   }
-  public loadValueCompleted(value: IActionResponseWithValueAndQueryFields): IActionResponseWithValue {
+  public loadValueCompleted(value: IActionResponseWithValue): IActionResponseWithValue {
     // so once everything has been completed this function actually runs per instance
     if (value.error) {
       // if we got an error we basically have no value
@@ -1629,13 +1330,18 @@ class ActualItemDefinitionProvider extends
     const {
       requestFields,
       argumentsForQuery,
-    } = this.getFieldsAndArgs({
+    } = getFieldsAndArgs({
       includeArgs: true,
       includeFields: true,
       onlyIncludeItems: this.props.optimize && this.props.optimize.onlyIncludeItems,
       onlyIncludeProperties: this.props.optimize && this.props.optimize.onlyIncludeProperties,
       onlyIncludeItemsForArgs: options.onlyIncludeItems,
       onlyIncludePropertiesForArgs: options.onlyIncludeProperties,
+      appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
+      userId: this.props.tokenData.id,
+      userRole: this.props.tokenData.role,
+      itemDefinitionInstance: this.props.itemDefinitionInstance,
+      forId: this.props.forId,
     });
 
     // super hack in order to get the applying policy args
@@ -1763,11 +1469,16 @@ class ActualItemDefinitionProvider extends
 
     const {
       argumentsForQuery,
-    } = this.getFieldsAndArgs({
+    } = getFieldsAndArgs({
       includeArgs: true,
       includeFields: false,
       onlyIncludeItemsForArgs: options.onlyIncludeItems,
       onlyIncludePropertiesForArgs,
+      appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
+      userId: this.props.tokenData.id,
+      userRole: this.props.tokenData.role,
+      itemDefinitionInstance: this.props.itemDefinitionInstance,
+      forId: this.props.forId,
     });
 
     const {
@@ -1915,7 +1626,7 @@ class ActualItemDefinitionProvider extends
           deleted: this.state.deleted,
           searchError: this.state.searchError,
           searching: this.state.searching,
-          searchResuls: this.state.searchResults,
+          searchResults: this.state.searchResults,
           poked: this.state.poked,
           submit: this.submit,
           reload: this.loadValue,
@@ -1933,6 +1644,7 @@ class ActualItemDefinitionProvider extends
           canCreate: this.state.canCreate,
           canDelete: this.state.canDelete,
           canEdit: this.state.canEdit,
+          remoteListener: this.props.remoteListener,
         }}
       >
         {this.props.children}
@@ -1951,32 +1663,37 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
               (tokenData) => (
                 <ModuleContext.Consumer>
                   {
-                    (data) => {
-                      if (!data) {
-                        throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
-                      }
-                      let valueFor: ItemDefinition;
-                      if (props.itemDefinition) {
-                        valueFor = data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
-                      } else {
-                        valueFor = data.mod.getPropExtensionItemDefinition();
-                      }
-                      if (props.searchCounterpart) {
-                        valueFor = valueFor.getSearchModeCounterpart();
-                      }
+                    (data) => (
+                      <SearchItemDefinitionValueContext.Consumer>
+                        {(searchContext) => {
+                          if (!data) {
+                            throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
+                          }
+                          let valueFor: ItemDefinition;
+                          if (props.itemDefinition) {
+                            valueFor = data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+                          } else {
+                            valueFor = data.mod.getPropExtensionItemDefinition();
+                          }
+                          if (props.searchCounterpart) {
+                            valueFor = valueFor.getSearchModeCounterpart();
+                          }
 
-                      return (
-                        <ActualItemDefinitionProvider
-                          localeData={localeData}
-                          tokenData={tokenData}
-                          itemDefinitionInstance={valueFor}
-                          itemDefinitionQualifiedName={valueFor.getQualifiedPathName()}
-                          containsExternallyCheckedProperty={valueFor.containsAnExternallyCheckedProperty()}
-                          remoteListener={data.remoteListener}
-                          {...props}
-                        />
-                      );
-                    }
+                          return (
+                            <ActualItemDefinitionProvider
+                              localeData={localeData}
+                              tokenData={tokenData}
+                              itemDefinitionInstance={valueFor}
+                              itemDefinitionQualifiedName={valueFor.getQualifiedPathName()}
+                              containsExternallyCheckedProperty={valueFor.containsAnExternallyCheckedProperty()}
+                              remoteListener={data.remoteListener}
+                              searchContext={searchContext}
+                              {...props}
+                            />
+                          );
+                        }}
+                      </SearchItemDefinitionValueContext.Consumer>
+                    )
                   }
                 </ModuleContext.Consumer>
               )

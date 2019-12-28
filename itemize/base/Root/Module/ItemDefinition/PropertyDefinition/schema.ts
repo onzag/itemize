@@ -1,8 +1,4 @@
 import ConditionalRuleSetSchema from "../ConditionalRuleSet/schema";
-
-const searchLevels = ["always", "moderate", "rare", "hidden", "disabled"];
-const rarityLevels = ["standard", "moderate", "rare"];
-
 // The schema for the definition
 // {
 //   "amount": 4,
@@ -30,10 +26,6 @@ export default {
     },
     unique:  {
       type: "boolean",
-    },
-    rarity: {
-      type: "string",
-      enum: rarityLevels,
     },
     min: {
       type: "number",
@@ -144,9 +136,8 @@ export default {
     hiddenIf: {
       $ref: "ConditionalRuleSet",
     },
-    searchLevel: {
-      type: "string",
-      enum: searchLevels,
+    searchable: {
+      type: "boolean",
     },
     disableRangedSearch: {
       type: "boolean",

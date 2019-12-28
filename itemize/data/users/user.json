@@ -11,25 +11,25 @@
             "id": "app_language",
             "type": "string",
             "hidden": true,
-            "searchLevel": "disabled"
+            "searchable": false
         },
         {
             "id": "app_country",
             "type": "string",
             "hidden": true,
-            "searchLevel": "disabled"
+            "searchable": false
         },
         {
             "id": "app_currency",
             "type": "string",
             "hidden": true,
-            "searchLevel": "disabled"
+            "searchable": false
         },
         {
             "id": "email",
             "type": "string",
             "subtype": "email",
-            "searchLevel": "disabled",
+            "searchable": false,
             "nullable": true,
             "readRoleAccess": ["SELF", "ADMIN"],
             "editRoleAccess": ["SELF", "ADMIN"]
@@ -39,7 +39,7 @@
             "type": "boolean",
             "nullable": true,
             "default": false,
-            "searchLevel": "disabled",
+            "searchable": false,
             "createRoleAccess": ["ADMIN"],
             "editRoleAccess": ["ADMIN"],
             "coerceNullsIntoDefault": true
@@ -67,7 +67,7 @@
             "type": "location",
             "nullable": true,
             "readRoleAccess": ["SELF"],
-            "searchLevel": "disabled"
+            "searchable": false
         }
     ],
     "policies": {

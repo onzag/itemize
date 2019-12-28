@@ -2,6 +2,8 @@ import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import io from "socket.io-client";
 import Root from "../../base/Root";
 import uuid from "uuid";
+import CacheWorkerInstance from "../workers/cache";
+import { PREFIX_GET } from "../../constants";
 
 export class RemoteListener {
   private socket: SocketIOClient.Socket;
@@ -119,12 +121,24 @@ export class RemoteListener {
       ) {
         itemDefinition.triggerListeners("reload", id);
       } else if (type === "not_found") {
-        itemDefinition.triggerListeners("not_found", id);
+        itemDefinition.cleanValueFor(id);
+        if (CacheWorkerInstance.isSupported) {
+          CacheWorkerInstance.instance.setCachedValue(
+            PREFIX_GET + itemDefinition.getQualifiedPathName(), id, null, null,
+          );
+        }
+        itemDefinition.triggerListeners("change", id);
       }
     } else if (type === "modified" || type === "last_modified") {
       itemDefinition.triggerListeners("reload", id);
     } else if (type === "not_found") {
-      itemDefinition.triggerListeners("not_found", id);
+      itemDefinition.cleanValueFor(id);
+      if (CacheWorkerInstance.isSupported) {
+        CacheWorkerInstance.instance.setCachedValue(
+          PREFIX_GET + itemDefinition.getQualifiedPathName(), id, null, null,
+        );
+      }
+      itemDefinition.triggerListeners("change", id);
     }
   }
   private consumeDelayedFeedbacks(forAnSpecificId?: number) {

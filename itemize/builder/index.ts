@@ -960,8 +960,8 @@ async function getI18nPropertyData(
   const localeFileTraceback =
     traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
 
-  const searchLevelIsDisabledOrHidden =
-    property.searchLevel === "disabled" || property.searchLevel === "hidden";
+  const searchIsDisabled =
+    typeof property.searchable !== "undefined" && !property.searchable;
 
   let expectedProperties = definition.i18n.base
     .map((b) => ({key: b, required: true}))
@@ -969,20 +969,20 @@ async function getI18nPropertyData(
     .concat((definition.i18n.optional || [])
       .map((b) => ({key: b, required: false})))
     // concat to search range properties only if necessary
-    .concat((property.disableRangedSearch || searchLevelIsDisabledOrHidden ?
+    .concat((property.disableRangedSearch || searchIsDisabled ?
         [] : definition.i18n.searchRange || [])
       .map((b) => ({key: b, required: true})))
-    .concat((property.disableRangedSearch || searchLevelIsDisabledOrHidden ?
+    .concat((property.disableRangedSearch || searchIsDisabled ?
         [] : definition.i18n.searchRangeOptional || [])
       .map((b) => ({key: b, required: false})))
     // concat to search properties only if necessary
-    .concat((searchLevelIsDisabledOrHidden || (
+    .concat((searchIsDisabled || (
       definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
       !property.disableRangedSearch
     ) ?
         [] : definition.i18n.searchBase || [])
       .map((b) => ({key: b, required: true})))
-    .concat((searchLevelIsDisabledOrHidden || (
+    .concat((searchIsDisabled || (
       definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
       !property.disableRangedSearch
     ) ?
@@ -1053,7 +1053,11 @@ async function getI18nPropertyData(
 
   if (
     definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
-    !property.disableRangedSearch && property.searchLevel !== "disabled"
+    !property.disableRangedSearch &&
+    (
+      typeof property.searchable === "undefined" ||
+      property.searchable
+    )
   ) {
     errorRequiredProperties.push("error.FROM_LARGER_THAN_TO");
     errorRequiredProperties.push("error.TO_SMALLER_THAN_FROM");

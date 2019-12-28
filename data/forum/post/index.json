@@ -23,14 +23,14 @@
 			"type": "string",
 			"nullable": true,
       "hidden": true,
-      "searchLevel": "disabled"
+      "searchable": false
 		},
     {
 			"id": "post_for_item_id",
 			"type": "integer",
 			"nullable": true,
       "hidden": true,
-      "searchLevel": "disabled"
+      "searchable": false
     },
     {
       "id": "title",

@@ -126,13 +126,13 @@ class ActualSearchActioner extends React.Component<IActualSearchActionerProps, {
     return nextProps.children !== this.props.children ||
       nextProps.itemDefinitionContext.searchError !== this.props.itemDefinitionContext.searchError ||
       nextProps.itemDefinitionContext.searching !== this.props.itemDefinitionContext.searching ||
-      !equals(nextProps.itemDefinitionContext.searchResuls, this.props.itemDefinitionContext.searchResuls);
+      !equals(nextProps.itemDefinitionContext.searchResults, this.props.itemDefinitionContext.searchResults);
   }
   public render() {
     return this.props.children({
       searchError: this.props.itemDefinitionContext.searchError,
       searching: this.props.itemDefinitionContext.searching,
-      searchResults: this.props.itemDefinitionContext.searchResuls,
+      searchResults: this.props.itemDefinitionContext.searchResults,
       search: this.props.itemDefinitionContext.search,
       dismissSearchResults: this.props.itemDefinitionContext.dismissSearchResults,
       dismissSearchError: this.props.itemDefinitionContext.dismissSearchError,
