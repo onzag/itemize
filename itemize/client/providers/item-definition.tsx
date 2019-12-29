@@ -607,7 +607,7 @@ export class ActualItemDefinitionProvider extends
       loading: false,
       // also search might do this, and it's true anyway
       notFound:
-        this.props.forId ? this.props.itemDefinitionInstance.hasAppliedValueTo(this.props.forId || null) : false,
+        this.props.forId ? !this.props.itemDefinitionInstance.hasAppliedValueTo(this.props.forId || null) : false,
     });
   }
   public async loadValue(denyCache?: boolean): Promise<IActionResponseWithValue> {

@@ -147,6 +147,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
             // text fields, so en will work just fine, getting
             // the language will be annoying and this will do the job anyway
             language: "en",
+            listener_uuid: this.remoteListener.getUUID(),
             [propertyId]: value,
           },
           fields: {
@@ -157,7 +158,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
         }),
       );
       // Ignore errors, we just go for success
-      if (result && result.data.DATA && result.data.DATA) {
+      if (result && result.data && result.data.DATA && result.data.DATA) {
         const actualPropertyResult: string = result.data.DATA[propertyId];
         const userItemDefinition = this.state.specifiedProcessedRoot
           .getModuleFor(["users"]).getItemDefinitionFor(["user"]);
