@@ -14,6 +14,15 @@ import { DOMWindow } from "../../../../../util";
 import equals from "deep-equal";
 import { ISingleFilterRawJSONDataType } from "../../../../Autocomplete";
 
+export interface IPropertyDefinitionIncludedFileInfoType {
+  name: string;
+  type: string;
+  id: string;
+  url: string;
+  size: number;
+  src?: File;
+}
+
 export enum PropertyInvalidReason {
   INVALID_VALUE = "INVALID_VALUE",
   TOO_LARGE = "TOO_LARGE",
@@ -302,6 +311,34 @@ export default class PropertyDefinition {
     if (definition.json && typeof value !== definition.json) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
+    if (definition.gqlList) {
+      if (Array.isArray(value)) {
+        return PropertyInvalidReason.INVALID_VALUE;
+      }
+      if (definition.gqlAddFileToFields) {
+        if (!(value as any).every((v: IPropertyDefinitionIncludedFileInfoType) => {
+          return typeof v.id === "string" &&
+            typeof v.name === "string" &&
+            typeof v.type === "string" &&
+            typeof v.url === "string" &&
+            typeof v.size === "number" &&
+            v.src === null || typeof v.src === "undefined" || v.src instanceof File;
+        })) {
+          return PropertyInvalidReason.INVALID_VALUE;
+        }
+      }
+    } else if (definition.gqlAddFileToFields) {
+      if (
+        typeof (value as any).id !== "string" ||
+        typeof (value as any).name !== "string" ||
+        typeof (value as any).type !== "string" ||
+        typeof (value as any).url !== "string" ||
+        typeof (value as any).size !== "number" ||
+        ((value as any).src !== null && typeof value !== "undefined" && !((value as any).src instanceof File))
+      ) {
+        return PropertyInvalidReason.INVALID_VALUE;
+      }
+    }
     if (definition.validate) {
       const invalidReason = definition.validate(
         value,
@@ -555,6 +592,32 @@ export default class PropertyDefinition {
    */
   public getType() {
     return this.rawData.type;
+  }
+
+  public getRequestFields() {
+    let requestFields = {};
+    // now we get the description for this field
+    const propertyDescription = this.getPropertyDefinitionDescription();
+    // if there are graphql fields defined
+    if (propertyDescription.gqlFields) {
+      // we add each one of them
+      Object.keys(propertyDescription.gqlFields).forEach((field) => {
+        requestFields[field] = {};
+      });
+    }
+
+    if (propertyDescription.gqlAddFileToFields) {
+      requestFields = {
+        ...requestFields,
+        name: {},
+        url: {},
+        id: {},
+        size: {},
+        type: {},
+      };
+    }
+
+    return requestFields;
   }
 
   public getCurrentValue(id: number): PropertyDefinitionSupportedType {

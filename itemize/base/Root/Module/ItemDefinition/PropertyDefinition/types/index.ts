@@ -56,6 +56,8 @@ export interface IPropertyDefinitionSupportedType {
   // graphql type
   gql: GraphQLOutputType | string;
   gqlFields?: IGQLFieldsDefinitionType;
+  gqlList?: boolean;
+  gqlAddFileToFields?: boolean;
   // sql definition, either a string for knex supported types
   // or a function where the id is the id is a property id
   // this represents how tables are populated and data is stored

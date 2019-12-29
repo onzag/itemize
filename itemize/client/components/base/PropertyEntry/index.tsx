@@ -6,7 +6,7 @@ import PropertyEntryBoolean from "./PropertyEntryBoolean";
 import PropertyEntryText from "./PropertyEntryText";
 import PropertyEntryDateTime from "./PropertyEntryDateTime";
 import PropertyEntryLocation from "./PropertyEntryLocation";
-import PropertyEntryFiles from "./PropertyEntryFiles";
+// import PropertyEntryFiles from "./PropertyEntryFiles";
 import PropertyEntryNumeric from "./PropertyEntryNumeric";
 import PropertyEntrySelect from "./PropertyEntrySelect";
 import PropertyEntryField from "./PropertyEntryField";
@@ -62,7 +62,8 @@ const typeRegistry:
   date: PropertyEntryDateTime,
   time: PropertyEntryDateTime,
   location: PropertyEntryLocation,
-  files: PropertyEntryFiles,
+  files: null,
+  // files: PropertyEntryFiles,
 };
 
 const PropertyEntryStylesApplier = withStyles(style)((props: IPropertyEntryStylesApplierProps) => {

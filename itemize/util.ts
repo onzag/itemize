@@ -226,17 +226,7 @@ export function getFieldsAndArgs(
     if (shouldBeIncludedInFields) {
       // we add it to the fields we want to add
       // because it's a property it goes in data
-      requestFields.DATA[pd.getId()] = {};
-
-      // now we get the description for this field
-      const propertyDescription = pd.getPropertyDefinitionDescription();
-      // if there are graphql fields defined
-      if (propertyDescription.gqlFields) {
-        // we add each one of them
-        Object.keys(propertyDescription.gqlFields).forEach((field) => {
-          requestFields.DATA[pd.getId()][field] = {};
-        });
-      }
+      requestFields.DATA[pd.getId()] = pd.getRequestFields();
     }
 
     // now for the arguments, same rule
@@ -317,14 +307,7 @@ export function getFieldsAndArgs(
           false,
         )
       ) {
-        requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = {};
-
-        const propertyDescription = sp.getPropertyDefinitionDescription();
-        if (propertyDescription.gqlFields) {
-          Object.keys(propertyDescription.gqlFields).forEach((field) => {
-            requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()][field] = {};
-          });
-        }
+        requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = sp.getRequestFields();
       }
 
       if (

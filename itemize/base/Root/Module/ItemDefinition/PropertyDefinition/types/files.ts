@@ -1,26 +1,33 @@
 import { IPropertyDefinitionSupportedType } from "../types";
-
-import { GraphQLList, GraphQLNonNull, GraphQLString } from "graphql";
-
-import { stardardSQLInFn, standardSQLOutFn, getStandardSQLFnFor } from "../sql";
-
-import { PropertyInvalidReason } from "../../PropertyDefinition";
-
+import { getStandardSQLFnFor, stardardSQLInWithJSONStringifyFn, standardSQLOutWithJSONParseFn } from "../sql";
+import { PropertyInvalidReason, IPropertyDefinitionIncludedFileInfoType } from "../../PropertyDefinition";
 import { MAX_FILE_BATCH_COUNT, CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
 
-export type PropertyDefinitionSupportedFilesType = string[];
+// tslint:disable-next-line: no-empty-interface
+export interface IPropertyDefinitionSupportedSingleFilesType extends IPropertyDefinitionIncludedFileInfoType {
+}
+
+export type PropertyDefinitionSupportedFilesType = IPropertyDefinitionSupportedSingleFilesType[];
 const typeValue: IPropertyDefinitionSupportedType = {
-  gql: GraphQLList(GraphQLNonNull(GraphQLString)),
+  gql: "PROPERTY_TYPE__Files",
+  gqlFields: {},
+  gqlAddFileToFields: true,
+  gqlList: true,
+
   searchable: false,
   specialProperties: [
     {
       name: "accept",
       type: "string",
     },
+    {
+      name: "sizes",
+      type: "string",
+    },
   ],
-  sql: getStandardSQLFnFor("text[]"),
-  sqlIn: stardardSQLInFn,
-  sqlOut: standardSQLOutFn,
+  sql: getStandardSQLFnFor("text"),
+  sqlIn: stardardSQLInWithJSONStringifyFn,
+  sqlOut: standardSQLOutWithJSONParseFn,
   sqlSearch: () => {
     throw new Error("Attempted to search within files");
   },
@@ -33,20 +40,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
   allowsMinMaxLengthDefined: true,
   validate: (l: PropertyDefinitionSupportedFilesType) => {
-    if (!Array.isArray(l) || l.some((v) => typeof v !== "string")) {
+    if (!Array.isArray(l)) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 
     if (l.length > MAX_FILE_BATCH_COUNT) {
       return PropertyInvalidReason.TOO_LARGE;
-    }
-
-    if (l.toString().indexOf("blob:") === 0) {
-      return null;
-    }
-
-    if (l.toString().indexOf("/rest/files/") === 0) {
-      return null;
     }
 
     return PropertyInvalidReason.INVALID_VALUE;

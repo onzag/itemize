@@ -12,7 +12,7 @@ import {
   PREFIX_DELETE,
   PREFIX_SEARCH,
 } from "../../constants";
-import { buildGqlQuery, buildGqlMutation, gqlQuery, IGQLQueryObj, GQLEnum } from "../app/gql-querier";
+import { buildGqlQuery, buildGqlMutation, gqlQuery, IGQLQueryObj, GQLEnum, GQLQuery } from "../app/gql-querier";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
@@ -1063,7 +1063,7 @@ export class ActualItemDefinitionProvider extends
     };
 
     // it's either a query or a mutation, only GET and SEARCH are queries
-    let query: string;
+    let query: GQLQuery;
     if (queryPrefix === PREFIX_GET || queryPrefix === PREFIX_SEARCH) {
       query = buildGqlQuery(objQuery);
     } else {

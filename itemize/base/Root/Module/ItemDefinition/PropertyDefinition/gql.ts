@@ -1,7 +1,8 @@
-import { GraphQLInputObjectType, GraphQLObjectType, GraphQLNonNull } from "graphql";
+import { GraphQLInputObjectType, GraphQLObjectType, GraphQLNonNull, GraphQLList, GraphQLString, GraphQLInt } from "graphql";
 import PropertyDefinition from "../PropertyDefinition";
 import { IGQLFieldsDefinitionType } from "../../../gql";
 import { ItemDefinitionIOActions } from "..";
+import { GraphQLUpload } from "graphql-upload";
 
 const PROPERTY_TYPE_GQL_POOL = {};
 
@@ -45,14 +46,52 @@ export function getGQLFieldsDefinitionForProperty(
     // now we have to use the pool, since property types are constant
     // and the graphql schema only allows for a single definition once
     if (!PROPERTY_TYPE_GQL_POOL[defName]) {
+      const fields: any = {
+        ...propertyDescription.gqlFields,
+      };
+      if (propertyDescription.gqlAddFileToFields) {
+        fields.id = {
+          type: GraphQLNonNull(GraphQLString),
+        };
+        fields.name = {
+          type: GraphQLNonNull(GraphQLString),
+        };
+        fields.type = {
+          type: GraphQLNonNull(GraphQLString),
+        };
+        fields.size = {
+          type: GraphQLNonNull(GraphQLInt),
+        };
+        if (options.propertiesAsInput) {
+          fields.url = {
+            type: GraphQLString,
+          };
+          fields.src = {
+            type: GraphQLUpload,
+          };
+        } else {
+          fields.url = {
+            type: GraphQLNonNull(GraphQLString),
+          };
+        }
+      }
       const payload = {
         name: defName,
-        fields: propertyDescription.gqlFields as any,
+        fields,
       };
+      let result: any;
       if (options.propertiesAsInput) {
-        PROPERTY_TYPE_GQL_POOL[defName] = new GraphQLInputObjectType(payload);
+        result = new GraphQLInputObjectType(payload);
       } else {
-        PROPERTY_TYPE_GQL_POOL[defName] = new GraphQLObjectType(payload);
+        result = new GraphQLObjectType(payload);
+      }
+
+      if (propertyDescription.gqlList) {
+        PROPERTY_TYPE_GQL_POOL[defName] = GraphQLList(
+          GraphQLNonNull(result),
+        );
+      } else {
+        PROPERTY_TYPE_GQL_POOL[defName] = result;
       }
     }
     gqlResult = PROPERTY_TYPE_GQL_POOL[defName];

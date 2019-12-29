@@ -25,12 +25,34 @@ export function stardardSQLInFn(
   };
 }
 
+export function stardardSQLInWithJSONStringifyFn(
+  value: PropertyDefinitionSupportedType,
+  sqlPrefix: string,
+  id: string,
+): ISQLTableRowValue {
+  return {
+    [sqlPrefix + id]: JSON.stringify(value),
+  };
+}
+
 export function standardSQLOutFn(
   row: ISQLTableRowValue,
   sqlPrefix: string,
   id: string,
 ): PropertyDefinitionSupportedType {
   return row[sqlPrefix + id];
+}
+
+export function standardSQLOutWithJSONParseFn(
+  row: ISQLTableRowValue,
+  sqlPrefix: string,
+  id: string,
+): PropertyDefinitionSupportedType {
+  try {
+    return JSON.parse(row[sqlPrefix + id]);
+  } catch {
+    return null;
+  }
 }
 
 export function standardSQLSearchFnExactAndRange(

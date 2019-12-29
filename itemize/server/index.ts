@@ -22,6 +22,7 @@ import ioMain from "socket.io";
 import { Listener } from "./listener";
 import redis, { RedisClient } from "redis";
 import { Cache } from "./cache";
+import { graphqlUploadExpress } from "graphql-upload";
 
 // TODO comment and document
 
@@ -147,16 +148,24 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     };
   });
 
-  app.use("/graphql", graphqlHTTP({
-    schema: getGQLSchemaForRoot(
-      appData.root,
-      finalAllCustomQueries,
-      finalAllCustomMutations,
-      resolvers(appData),
-    ),
-    graphiql: true,
-    customFormatErrorFn,
-  }));
+  app.use(
+    "/graphql",
+    // TODO check these fields
+    graphqlUploadExpress({
+      maxFileSize: 10000000,
+      maxFiles: 2,
+    }),
+    graphqlHTTP({
+      schema: getGQLSchemaForRoot(
+        appData.root,
+        finalAllCustomQueries,
+        finalAllCustomMutations,
+        resolvers(appData),
+      ),
+      graphiql: true,
+      customFormatErrorFn,
+    }),
+  );
 
   if (custom.customRouterEndpoint) {
     app.use(custom.customRouterEndpoint, custom.customRouter(appData));

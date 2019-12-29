@@ -63,6 +63,17 @@
             "coerceNullsIntoDefault": true
         },
         {
+            "id": "profile_picture",
+            "type": "files",
+            "maxLength": 1,
+            "specialProperties": {
+                "accept": "image",
+                "sizes": "24x24 48x48 128x128"
+            },
+            "nullable": true,
+            "editRoleAccess": ["SELF", "ADMIN"]
+        },
+        {
             "id": "address",
             "type": "location",
             "nullable": true,
