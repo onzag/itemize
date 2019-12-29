@@ -5,44 +5,18 @@ import { Paper, RootRef, Icon, FormLabel, IconButton, Button } from "@material-u
 import { mimeTypeToExtension, localeReplacer } from "../../../../util";
 import prettyBytes from "pretty-bytes";
 import equals from "deep-equal";
-import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
+import {
+  PropertyDefinitionSupportedFilesType,
+  IPropertyDefinitionSupportedSingleFilesType,
+} from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { MAX_FILE_SIZE, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
-
-interface IFileData {
-  name: string;
-  type: string;
-  size: number;
-}
-
-function simpleQSparse(queryString: string): {[key: string]: string} {
-  const query = {};
-  queryString.split("&").forEach((pair: string) => {
-    const pairData = pair.split("=");
-    query[decodeURIComponent(pairData[0])] = decodeURIComponent(pairData[1] || "");
-  });
-  return query;
-}
-
-// because we expect to be efficient, we are going to actually store data in the url as
-// query string, expected file location at /rest/files/:userId/:fileId/:fileName?type=:contentType&size=:size
-// a &small attribute should be valid too, for a small version of images
-function extractFileDataFromUrl(url: string): IFileData {
-  const [base, queryString] = url.split("?");
-  const baseSplitted = base.split("/");
-  const name = decodeURIComponent(baseSplitted[baseSplitted.length - 1]);
-  const parsed = simpleQSparse(queryString);
-  return {
-    name,
-    type: parsed.type,
-    size: parseInt(parsed.size, 10),
-  };
-}
+import uuid from "uuid";
 
 // in reality there might be invisible for the property
 // rejected files, so all files will have this state
 // regardless of anything, this is for the internal
 interface IInternalURLFileDataWithState {
-  url: string;
+  value: IPropertyDefinitionSupportedSingleFilesType;
   rejected?: boolean;
   reason?: string;
 }
@@ -99,42 +73,65 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     const singleFile = this.props.property.getMaxLength() === 1;
 
     // let's get the object urls of the files added
-    const objectURLS = files.map((file: File) => {
+    const newFiles: IPropertyDefinitionSupportedSingleFilesType[] = files.map((file: File) => {
       const objectURL = URL.createObjectURL(file);
       this.ownedObjectURLPool[objectURL] = file;
-      return objectURL;
+      return {
+        name: file.name,
+        type: file.type,
+        id: "FILE" + uuid.v4().replace(/-/g, ""),
+        url: objectURL,
+        size: file.size,
+        src: file,
+      };
+    });
+
+    const newInternalFiles: IInternalURLFileDataWithState[] = newFiles.map((value) => {
+      return {
+        value,
+      };
     });
 
     // call the onchange, as replacing or as concatenating depending
     // on whether it is a single file or not
     this.props.onChange(
-      (singleFile ? [] : this.props.state.value as PropertyDefinitionSupportedFilesType || []).concat(objectURLS),
-      (singleFile ? [] : this.props.state.internalValue as IInternalURLFileDataWithState[] || []).concat(
-        objectURLS.map((url: string) => ({url})),
-      ),
+      (singleFile ? [] : this.props.state.value as PropertyDefinitionSupportedFilesType || [])
+        .concat(newFiles),
+      (singleFile ? [] : this.props.state.internalValue as IInternalURLFileDataWithState[] || [])
+        .concat(newInternalFiles),
     );
   }
   public onDropRejected(files: File[]) {
+
+    // let's get the object urls of the files added
+    const newFiles: IPropertyDefinitionSupportedSingleFilesType[] = files.map((file: File) => {
+      const objectURL = URL.createObjectURL(file);
+      this.ownedObjectURLPool[objectURL] = file;
+      return {
+        name: file.name,
+        type: file.type,
+        id: "FILE" + uuid.v4().replace(/-/g, ""),
+        url: objectURL,
+        size: file.size,
+        src: file,
+      };
+    });
+
     // we need to create our internal values with the rejection and the reason of why
     // they were rejected
-    const newInternalValueData: IInternalURLFileDataWithState[] = files.map((file: File) => {
-      // create the object url
-      const objectURL = URL.createObjectURL(file);
-      // add it to the pool
-      this.ownedObjectURLPool[objectURL] = file;
-
+    const newInternalValueData: IInternalURLFileDataWithState[] = newFiles.map((value) => {
       // check if it's images we are accepting
       const isImage = (this.props.property.getSpecialProperty("accept") as string || "").startsWith("image");
       // the reason by default is that is an invalid type
       let reason = isImage ? "image_uploader_invalid_type" : "file_uploader_invalid_type";
       // but if the file is too large
-      if (file.size > MAX_FILE_SIZE) {
+      if (value.src.size > MAX_FILE_SIZE) {
         // change it to that
         reason = isImage ? "image_uploader_file_too_big" : "file_uploader_file_too_big";
       }
 
       return {
-        url: objectURL,
+        value,
         rejected: true,
         reason,
       };
@@ -152,7 +149,9 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     if (!valueAsInternal && this.props.state.value) {
       valueAsInternal = (
         this.props.state.value as PropertyDefinitionSupportedFilesType
-      ).map((url: string) => ({url}));
+      ).map((value) => {
+        return {value};
+      });
     } else if (!valueAsInternal) {
       valueAsInternal = [];
     }
@@ -164,28 +163,31 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
       valueAsInternal.concat(newInternalValueData),
     );
   }
-  public openFile(url: string, e: React.MouseEvent<HTMLButtonElement>) {
+  public openFile(
+    value: IPropertyDefinitionSupportedSingleFilesType,
+    e: React.MouseEvent<HTMLButtonElement>,
+  ) {
     // open a file, let's stop the propagation
     // for some reason it's not possible to set the window title
     e.stopPropagation();
     e.preventDefault();
 
-    const w = window.open(url, "_blank");
+    window.open(value.url, "_blank");
   }
-  public onRemoveFile(url: string, e: React.MouseEvent<HTMLButtonElement>) {
+  public onRemoveFile(value: IPropertyDefinitionSupportedSingleFilesType, e: React.MouseEvent<HTMLButtonElement>) {
     // stop the propagation and stuff
     e.stopPropagation();
     e.preventDefault();
 
     // revoke the url and remove it from the pool
-    if (this.ownedObjectURLPool[url]) {
-      delete this.ownedObjectURLPool[url];
-      URL.revokeObjectURL(url);
+    if (this.ownedObjectURLPool[value.url]) {
+      delete this.ownedObjectURLPool[value.url];
+      URL.revokeObjectURL(value.url);
     }
 
     // let's get the index in the internal value
     const indexInInternalValue = (this.props.state.internalValue as IInternalURLFileDataWithState[] || []).findIndex(
-      (value) => value.url === url,
+      (internalValue) => internalValue.value.id === value.id,
     );
     // this will be the new value
     let newInternalValue = this.props.state.internalValue as IInternalURLFileDataWithState[];
@@ -201,7 +203,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
 
     // let's do the exact same but for the actual value
     const indexInValue = (this.props.state.value as PropertyDefinitionSupportedFilesType || []).findIndex(
-      (value) => value === url,
+      (standardValue) => standardValue.id === value.id,
     );
     let newValue = this.props.state.value as PropertyDefinitionSupportedFilesType;
     if (indexInValue !== -1) {
@@ -266,7 +268,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     if (!valueAsInternal && this.props.state.value) {
       valueAsInternal = (
         this.props.state.value as PropertyDefinitionSupportedFilesType
-      ).map((url: string) => ({url}));
+      ).map((value) => ({value}));
     } else if (!valueAsInternal) {
       valueAsInternal = [];
     }
@@ -306,35 +308,34 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
             const {ref, ...rootProps} = getRootProps();
 
             const files = valueAsInternal.map((value, index) => {
-              const fileData: IFileData = this.ownedObjectURLPool[value.url] || extractFileDataFromUrl(value.url);
-              const isSupportedImage = fileData.type.startsWith("image/") &&
-                FILE_SUPPORTED_IMAGE_TYPES.includes(fileData.type);
+              const isSupportedImage = value.value.type.startsWith("image/") &&
+                FILE_SUPPORTED_IMAGE_TYPES.includes(value.value.type);
               const mainFileClassName = this.props.classes.file +
                 (value.rejected ? " " + this.props.classes.fileRejected : "");
 
               if (isSupportedImage) {
                 const reduceSizeURL =
-                  value.url.indexOf("blob:") !== 0 && !singleFile ?
-                  value.url + "&small" :
-                  value.url;
+                  value.value.url.indexOf("blob:") !== 0 && !singleFile ?
+                  value.value.url + "&small" :
+                  value.value.url;
                 return (
                   <div
                     className={mainFileClassName}
                     key={index}
-                    onClick={this.openFile.bind(this, value.url)}
+                    onClick={this.openFile.bind(this, value.value)}
                   >
                     <div className={this.props.classes.fileDataContainer}>
                       <img src={reduceSizeURL} className={this.props.classes.imageThumbnail}/>
                       {!singleFile ? <IconButton
                         className={this.props.classes.fileDeleteButton}
-                        onClick={this.onRemoveFile.bind(this, value.url)}
+                        onClick={this.onRemoveFile.bind(this, value.value)}
                       >
                         <Icon>remove_circle</Icon>
                       </IconButton> : null}
                     </div>
-                    <p className={this.props.classes.fileName}>{fileData.name}</p>
+                    <p className={this.props.classes.fileName}>{value.value.name}</p>
                     <p className={this.props.classes.fileSize}>({
-                      prettyBytes(fileData.size)
+                      prettyBytes(value.value.size)
                     })</p>
                     {value.rejected ? <p className={this.props.classes.fileRejectedDescription}>
                       {localeReplacer(this.props.i18n[value.reason], prettyBytes(MAX_FILE_SIZE))}
@@ -346,23 +347,23 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                   <div
                     className={mainFileClassName}
                     key={index}
-                    onClick={this.openFile.bind(this, value.url)}
+                    onClick={this.openFile.bind(this, value.value)}
                   >
                     <div className={this.props.classes.fileDataContainer}>
                       <Icon className={this.props.classes.fileIcon}>insert_drive_file</Icon>
                       <span className={this.props.classes.fileMimeType}>{
-                        mimeTypeToExtension(fileData.type)
+                        mimeTypeToExtension(value.value.type)
                       }</span>
                       {!singleFile ? <IconButton
                         className={this.props.classes.fileDeleteButton}
-                        onClick={this.onRemoveFile.bind(this, value.url)}
+                        onClick={this.onRemoveFile.bind(this, value.value)}
                       >
                         <Icon>remove_circle</Icon>
                       </IconButton> : null}
                     </div>
-                    <p className={this.props.classes.fileName}>{fileData.name}</p>
+                    <p className={this.props.classes.fileName}>{value.value.name}</p>
                     <p className={this.props.classes.fileSize}>({
-                      prettyBytes(fileData.size)
+                      prettyBytes(value.value.size)
                     })</p>
                     {value.rejected ? <p className={this.props.classes.fileRejectedDescription}>
                       {localeReplacer(this.props.i18n[value.reason], prettyBytes(MAX_FILE_SIZE))}
@@ -405,7 +406,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                         className={this.props.classes.filesSingleFileButton}
                         variant="contained"
                         color="secondary"
-                        onClick={this.onRemoveFile.bind(this, valueAsInternal[0].url)}
+                        onClick={this.onRemoveFile.bind(this, valueAsInternal[0].value)}
                       >
                         {
                           isExpectingImages ?

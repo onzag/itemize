@@ -226,7 +226,7 @@ export default class Item {
     requestedFields: any,
     throwError: boolean,
   ) {
-    return Object.keys(requestedFields).every((requestedField) => {
+    return Object.keys(requestedFields || {}).every((requestedField) => {
       const propDef = this.itemDefinition.getPropertyDefinitionFor(requestedField, false);
       return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
     });

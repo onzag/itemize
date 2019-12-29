@@ -20,7 +20,7 @@ export interface IPropertyDefinitionIncludedFileInfoType {
   id: string;
   url: string;
   size: number;
-  src?: File;
+  src?: File | Promise<any>;
 }
 
 export enum PropertyInvalidReason {
@@ -312,17 +312,24 @@ export default class PropertyDefinition {
       return PropertyInvalidReason.INVALID_VALUE;
     }
     if (definition.gqlList) {
-      if (Array.isArray(value)) {
+      if (!Array.isArray(value)) {
         return PropertyInvalidReason.INVALID_VALUE;
       }
       if (definition.gqlAddFileToFields) {
         if (!(value as any).every((v: IPropertyDefinitionIncludedFileInfoType) => {
+          console.log(v.src);
           return typeof v.id === "string" &&
             typeof v.name === "string" &&
             typeof v.type === "string" &&
             typeof v.url === "string" &&
             typeof v.size === "number" &&
-            v.src === null || typeof v.src === "undefined" || v.src instanceof File;
+              v.src === null ||
+              typeof v.src === "undefined" ||
+              (v.src as Promise<any>).then ||
+              (
+                typeof File !== "undefined" &&
+                v.src instanceof File
+              );
         })) {
           return PropertyInvalidReason.INVALID_VALUE;
         }
@@ -334,7 +341,14 @@ export default class PropertyDefinition {
         typeof (value as any).type !== "string" ||
         typeof (value as any).url !== "string" ||
         typeof (value as any).size !== "number" ||
-        ((value as any).src !== null && typeof value !== "undefined" && !((value as any).src instanceof File))
+          (
+            (value as any).src !== null &&
+            typeof value !== "undefined" &&
+            !(value as any).src.then && (
+              typeof File === "undefined" ||
+              !((value as any).src instanceof File)
+            )
+          )
       ) {
         return PropertyInvalidReason.INVALID_VALUE;
       }

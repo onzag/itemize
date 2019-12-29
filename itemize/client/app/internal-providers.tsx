@@ -98,7 +98,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       this.setState(newState);
       this.props.onProviderStateSet(newState);
     } else {
-      const tokenData = data.data.token;
+      const tokenData = data.data && data.data.token;
       const tokenDataId = tokenData ? tokenData.id : null;
       const tokenDataRole = tokenData ? tokenData.role : null;
       const tokenDataToken = tokenData ? tokenData.token : null;

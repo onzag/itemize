@@ -25,6 +25,7 @@ export class RemoteListener {
   constructor(root: Root) {
     this.reattachListeners = this.reattachListeners.bind(this);
     this.onPossibleChangeListened = this.onPossibleChangeListened.bind(this);
+    this.onDisconnect = this.onDisconnect.bind(this);
 
     this.root = root;
     this.listeners = {};

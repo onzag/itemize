@@ -12,6 +12,7 @@ import { ItemDefinitionLoader, SubmitActioner } from "../../../itemize/client/co
 import { UserIdRetriever } from "../../../itemize/client/components/user";
 import Snackbar from "../general/snackbar";
 import { ModuleProvider } from "../../../itemize/client/providers/module";
+import { StatsForNerds } from "../../../itemize/client/components/dev";
 
 function SimulatedNotFoundPage() {
   return (
@@ -47,23 +48,31 @@ function ActualProfile(props: IActualProfileProps) {
           <SubmitActioner>
             {(submitActioner) => (
               <React.Fragment>
-                <div>
+                <Entry id="profile_picture"/>
+                {/* <div>
                   <Avatar large={true} hideFlag={true}/>
                   <LanguagePicker/>
                 </div>
                 <Entry id="username"/>
                 <Entry id="email"/>
                 <Entry id="password"/>
-                <Entry id="password" policyType="edit" policyName="REQUIRES_PASSWORD_CONFIRMATION"/>
+                <Entry id="password" policyType="edit" policyName="REQUIRES_PASSWORD_CONFIRMATION"/> */}
                 <Button onClick={logActioner.logout}>
                   <I18nRead id="logout"/>
                 </Button>
-                <Button
+                {/* <Button
                   onClick={submitActioner.submitError ? null : submitActioner.submit.bind(null, {
                     onlyIncludeProperties: ["username", "email", "password"],
                     propertiesToCleanOnSuccess: ["password"],
                     policiesToCleanOnSuccess: [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]],
                     unpokeAfterSuccess: true,
+                  })}
+                >
+                  <I18nRead id="update_profile"/>
+                </Button> */}
+                <Button
+                  onClick={submitActioner.submitError ? null : submitActioner.submit.bind(null, {
+                    onlyIncludeProperties: ["profile_picture"],
                   })}
                 >
                   <I18nRead id="update_profile"/>
@@ -80,6 +89,7 @@ function ActualProfile(props: IActualProfileProps) {
                   i18nDisplay="profile_updated_succesfully"
                   onClose={submitActioner.dismissSubmitted}
                 />
+                <StatsForNerds propertyIds={["profile_picture"]}/>
               </React.Fragment>
             )}
           </SubmitActioner>
@@ -113,6 +123,8 @@ function ActualProfile(props: IActualProfileProps) {
           return (
             <React.Fragment>
               <i>{arg.loading ? "LOADING" : "LOADED"}</i>
+              <i> - </i>
+              <i>{arg.error ? arg.error.code : "ALL WELL"}</i>
 
               {content}
             </React.Fragment>

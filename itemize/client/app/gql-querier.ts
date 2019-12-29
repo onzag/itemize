@@ -14,7 +14,13 @@ export class GQLQuery {
     this.findFilesAndProcessArgs = this.findFilesAndProcessArgs.bind(this);
 
     this.processedQueries = queries.map((query) => {
-      return this.findFilesAndProcessArgs(query.args);
+      if (query.args) {
+        return {
+          ...query,
+          args: this.findFilesAndProcessArgs(query.args),
+        };
+      }
+      return query;
     });
   }
   public getOperations() {
@@ -66,7 +72,7 @@ export class GQLQuery {
 
     const newResult = {};
     Object.keys(arg).forEach((argKey) => {
-      newResult[argKey] = this.findFilesAndProcessArgs(arg);
+      newResult[argKey] = this.findFilesAndProcessArgs(arg[argKey]);
     });
 
     return newResult;
@@ -120,41 +126,37 @@ function buildFields(fields: {
 }
 
 function buildArgs(
-  args: {
-    [key: string]: any;
-  },
-  keyType: boolean,
+  args: any,
+  keyOpenType: string,
+  keyCloseType: string,
 ) {
-  let argsStr = keyType ? "{" : "(";
-  Object.keys(args).forEach((argKey) => {
-    argsStr += argKey + ":";
-    if (typeof (args[argKey]) === "object" && args[argKey] !== null) {
-      if (args[argKey] instanceof GQLEnum || args[argKey] instanceof GQLRaw) {
-        argsStr += args[argKey].value;
-      } else if (args[argKey] instanceof GQLVar) {
-        argsStr += "$" + args[argKey].value;
-      } else {
-        argsStr += buildArgs(args[argKey], true);
-      }
-    } else {
-      argsStr += JSON.stringify(args[argKey]);
-    }
-    argsStr += ",";
-  });
-  argsStr += keyType ? "}" : ")";
-  return argsStr;
+  if (typeof (args) !== "object" || args === null) {
+    return JSON.stringify(args);
+  }
+
+  if (args instanceof GQLEnum || args instanceof GQLRaw) {
+    return args.value;
+  } else if (args instanceof GQLVar) {
+    return "$" + args.value;
+  } else if (Array.isArray(args)) {
+    return "[" + args.map((arg) => buildArgs(arg, "{", "}")).join(",") + "]";
+  }
+
+  return keyOpenType + Object.keys(args).map((argKey) => {
+    return argKey + ":" + buildArgs(args[argKey], "{", "}");
+  }).join(",") + keyCloseType;
 }
 
 function buildGqlThing(type: string, mainArgs: any, ...queries: IGQLQueryObj[]) {
   let queryStr = type;
   if (Object.keys(mainArgs).length) {
-    queryStr += buildArgs(mainArgs, false);
+    queryStr += buildArgs(mainArgs, "(", ")");
   }
   queryStr += "{";
   queries.forEach((q) => {
     queryStr += q.name;
     if (q.args && Object.keys(q.args).length) {
-      queryStr += buildArgs(q.args, false);
+      queryStr += buildArgs(q.args, "(", ")");
     }
     if (q.fields && Object.keys(q.fields).length) {
       queryStr += buildFields(q.fields);

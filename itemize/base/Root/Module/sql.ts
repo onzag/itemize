@@ -84,7 +84,7 @@ export function convertGQLValueToSQLValueForModule(
     // we only add if partialFields allows it, or we don't have
     // partialFields set
     if (
-      (partialFields && partialFields[pd.getId()]) ||
+      (partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
       !partialFields
     ) {
       result = { ...result, ...convertGQLValueToSQLValueForProperty(pd, data, knex, dictionary, "") };
