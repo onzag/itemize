@@ -21,11 +21,23 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: "string",
     },
     {
-      name: "sizes",
+      name: "dimensions",
+      type: "string",
+    },
+    {
+      name: "small_dimension",
+      type: "string",
+    },
+    {
+      name: "medium_dimension",
+      type: "string",
+    },
+    {
+      name: "large_dimension",
       type: "string",
     },
   ],
-  sql: getStandardSQLFnFor("text"),
+  sql: getStandardSQLFnFor && getStandardSQLFnFor("text"),
   sqlIn: stardardSQLInWithJSONStringifyFn,
   sqlOut: standardSQLOutWithJSONParseFn,
   sqlSearch: () => {

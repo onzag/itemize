@@ -65,7 +65,12 @@ export default class CacheWorker {
       upgrade(db) {
         try {
           console.log("CLEARING CACHE DUE TO UPGRADE");
-          db.deleteObjectStore(TABLE_NAME);
+          try {
+            db.deleteObjectStore(TABLE_NAME);
+          } catch (err) {
+            // No way to know if the store is there
+            // so must catch the error
+          }
           const queriesStore = db.createObjectStore(TABLE_NAME);
           queriesStore.createIndex("expires", "timestamp");
         } catch (err) {
@@ -247,7 +252,6 @@ export default class CacheWorker {
     }
     // cache didn't match, returning no match
     // something wrong might have happened as well
-    console.log("WTF");
     return null;
   }
 }

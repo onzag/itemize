@@ -25,7 +25,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
   // we have a pool of owned urls that are alive during the existance
   // of this component, be careful of using those urls elsewhere, they
   // will be revoked when this component unmounts
-  private ownedObjectURLPool: {[key: string]: File};
+  private ownedObjectURLPool: {[key: string]: string};
 
   // the dropzone ref
   private dropzoneRef = React.createRef<DropzoneRef>();
@@ -64,8 +64,8 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
   }
   public componentWillUnmount() {
     // revoke urls on unmount
-    Object.keys(this.ownedObjectURLPool).forEach((ownedURL: string) => {
-      URL.revokeObjectURL(ownedURL);
+    Object.keys(this.ownedObjectURLPool).forEach((id: string) => {
+      URL.revokeObjectURL(this.ownedObjectURLPool[id]);
     });
   }
   public onDropAccepted(files: File[]) {
@@ -75,11 +75,12 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     // let's get the object urls of the files added
     const newFiles: IPropertyDefinitionSupportedSingleFilesType[] = files.map((file: File) => {
       const objectURL = URL.createObjectURL(file);
-      this.ownedObjectURLPool[objectURL] = file;
+      const id = "FILE" + uuid.v4().replace(/-/g, "");
+      this.ownedObjectURLPool[id] = objectURL;
       return {
         name: file.name,
         type: file.type,
-        id: "FILE" + uuid.v4().replace(/-/g, ""),
+        id,
         url: objectURL,
         size: file.size,
         src: file,
@@ -106,11 +107,12 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     // let's get the object urls of the files added
     const newFiles: IPropertyDefinitionSupportedSingleFilesType[] = files.map((file: File) => {
       const objectURL = URL.createObjectURL(file);
-      this.ownedObjectURLPool[objectURL] = file;
+      const id = "FILE" + uuid.v4().replace(/-/g, "");
+      this.ownedObjectURLPool[id] = objectURL;
       return {
         name: file.name,
         type: file.type,
-        id: "FILE" + uuid.v4().replace(/-/g, ""),
+        id,
         url: objectURL,
         size: file.size,
         src: file,
@@ -180,9 +182,9 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     e.preventDefault();
 
     // revoke the url and remove it from the pool
-    if (this.ownedObjectURLPool[value.url]) {
-      delete this.ownedObjectURLPool[value.url];
-      URL.revokeObjectURL(value.url);
+    if (this.ownedObjectURLPool[value.id]) {
+      URL.revokeObjectURL(this.ownedObjectURLPool[value.id]);
+      delete this.ownedObjectURLPool[value.id];
     }
 
     // let's get the index in the internal value
@@ -266,6 +268,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     // the value from the internal source, either recreated or from the internal value
     let valueAsInternal: IInternalURLFileDataWithState[] = this.props.state.internalValue;
     if (!valueAsInternal && this.props.state.value) {
+      console.log(this.props.state.value);
       valueAsInternal = (
         this.props.state.value as PropertyDefinitionSupportedFilesType
       ).map((value) => ({value}));
@@ -314,10 +317,22 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                 (value.rejected ? " " + this.props.classes.fileRejected : "");
 
               if (isSupportedImage) {
+                let toUseURL = value.value.url;
+                if (toUseURL.indexOf("blob:") !== 0) {
+                  const objectURL = this.ownedObjectURLPool[value.value.id];
+                  if (objectURL) {
+                    toUseURL = objectURL;
+                  }
+                }
+
                 const reduceSizeURL =
-                  value.value.url.indexOf("blob:") !== 0 && !singleFile ?
-                  value.value.url + "&small" :
-                  value.value.url;
+                  toUseURL.indexOf("blob:") !== 0 ?
+                    (
+                      !singleFile ?
+                      toUseURL : // + "_SMALL" : TODO activate these
+                      toUseURL// + "_MEDIUM"
+                    ) :
+                    toUseURL;
                 return (
                   <div
                     className={mainFileClassName}

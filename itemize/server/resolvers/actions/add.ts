@@ -21,6 +21,8 @@ import {
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sql";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
+import uuid from "uuid";
+import { updateTransitoryId } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
 
 const debug = Debug("resolvers:addItemDefinition");
 export async function addItemDefinition(
@@ -132,18 +134,25 @@ export async function addItemDefinition(
   // so we check via dictionaries
   const dictionary = getDictionary(appData, resolverArgs.args);
 
+  const transitoryId = "TEMP" + uuid.v4().replace(/-/g, "");
+
   // now we extract the SQL information for both item definition table
   // and the module table, this value is database ready, and hence needs
   // knex and the dictionary to convert fields that need it
-  const sqlIdefData: any = convertGQLValueToSQLValueForItemDefinition(
+  const sqlIdefData: any = await convertGQLValueToSQLValueForItemDefinition(
+    transitoryId,
     itemDefinition,
     resolverArgs.args,
+    null,
     appData.knex,
     dictionary,
   );
   const sqlModData: any = convertGQLValueToSQLValueForModule(
+    transitoryId,
     itemDefinition.getParentModule(),
+    itemDefinition,
     resolverArgs.args,
+    null,
     appData.knex,
     dictionary,
   );
@@ -231,6 +240,12 @@ export async function addItemDefinition(
       finalOutput[property] = gqlValue[property];
     }
   });
+
+  await updateTransitoryId(
+    itemDefinition,
+    transitoryId,
+    value.id.toString(),
+  );
 
   // we don't know what the cached value is, but we assume there is nothing
   // as it's a new object

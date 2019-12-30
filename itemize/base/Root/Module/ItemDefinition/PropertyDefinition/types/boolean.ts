@@ -16,7 +16,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // a boolean type can be written as a boolean
   json: "boolean",
   gql: GraphQLBoolean,
-  sql: getStandardSQLFnFor("boolean"),
+  sql: getStandardSQLFnFor && getStandardSQLFnFor("boolean"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,

@@ -27,7 +27,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // a number is just a number can be integer or decimal
   json: "number",
   gql: GraphQLFloat,
-  sql: getStandardSQLFnFor("float"),
+  sql: getStandardSQLFnFor && getStandardSQLFnFor("float"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,

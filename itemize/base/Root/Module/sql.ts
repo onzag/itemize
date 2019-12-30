@@ -10,6 +10,7 @@ import { getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue } from "../sql";
 import { IGQLValue } from "../gql";
 import Knex from "knex";
+import ItemDefinition from "./ItemDefinition";
 
 /**
  * Provides the table that is necesary to include this module and all
@@ -69,27 +70,37 @@ export function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefinitionTy
  * that is nullable but it's forced into some value it will be ignored
  * in a partial field value, don't use partial fields to create
  */
-export function convertGQLValueToSQLValueForModule(
+export async function convertGQLValueToSQLValueForModule(
+  transitoryId: string,
   mod: Module,
+  itemDefinition: ItemDefinition,
   data: IGQLValue,
+  oldData: IGQLValue,
   knex: Knex,
   dictionary: string,
   partialFields?: any,
-): ISQLTableRowValue {
+): Promise<ISQLTableRowValue> {
   // first we create the row value
   let result: ISQLTableRowValue = {};
 
-  // now we get all the property extensions
-  mod.getAllPropExtensions().forEach((pd) => {
-    // we only add if partialFields allows it, or we don't have
-    // partialFields set
-    if (
-      (partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
-      !partialFields
-    ) {
-      result = { ...result, ...convertGQLValueToSQLValueForProperty(pd, data, knex, dictionary, "") };
-    }
-  });
+  await Promise.all(
+    // now we get all the property extensions
+    mod.getAllPropExtensions().map(async (pd) => {
+      // we only add if partialFields allows it, or we don't have
+      // partialFields set
+      if (
+        (partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
+        !partialFields
+      ) {
+        result = {
+          ...result,
+          ...(await convertGQLValueToSQLValueForProperty(
+            transitoryId, itemDefinition, null, pd, data, oldData, knex, dictionary, "",
+          )),
+        };
+      }
+    }),
+  );
 
   return result;
 }

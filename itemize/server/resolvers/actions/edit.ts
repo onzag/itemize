@@ -14,7 +14,7 @@ import {
   validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
-import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX } from "../../../constants";
+import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX, EXCLUSION_STATE_SUFFIX } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
   convertGQLValueToSQLValueForItemDefinition,
@@ -122,10 +122,13 @@ export async function editItemDefinition(
   // now we calculate the fields that we are editing, and the fields that we are
   // requesting
   const editingFields = {};
-  Object.keys(resolverArgs.args).forEach((arg) => {
+  Object.keys(resolverArgs.args).map(async (arg) => {
     if (
       itemDefinition.hasPropertyDefinitionFor(arg, true) ||
-      arg.startsWith(ITEM_PREFIX) && itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, ""))
+      (
+        arg.startsWith(ITEM_PREFIX) &&
+        itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, "").replace(EXCLUSION_STATE_SUFFIX, ""))
+      )
     ) {
       editingFields[arg] = resolverArgs.args[arg];
     }
@@ -174,16 +177,21 @@ export async function editItemDefinition(
   // into the SQL value, this is valid in here because
   // we don't want things to be defaulted in the query
   const dictionary = getDictionary(appData, resolverArgs.args);
-  const sqlIdefData: any = convertGQLValueToSQLValueForItemDefinition(
+  const sqlIdefData: any = await convertGQLValueToSQLValueForItemDefinition(
+    resolverArgs.args.id.toString(),
     itemDefinition,
     resolverArgs.args,
+    currentWholeValueAsGQL,
     appData.knex,
     dictionary,
     editingFields,
   );
   const sqlModData: any = convertGQLValueToSQLValueForModule(
+    resolverArgs.args.id.toString(),
     itemDefinition.getParentModule(),
+    itemDefinition,
     resolverArgs.args,
+    currentWholeValueAsGQL,
     appData.knex,
     dictionary,
     editingFields,

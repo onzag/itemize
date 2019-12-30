@@ -30,7 +30,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   // a string is a string
   json: "string",
-  sql: getStandardSQLFnFor("text"),
+  sql: getStandardSQLFnFor && getStandardSQLFnFor("text"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,

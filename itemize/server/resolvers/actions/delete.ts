@@ -13,6 +13,7 @@ import graphqlFields = require("graphql-fields");
 import { GraphQLEndpointError } from "../../../base/errors";
 import { ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS } from "../../../constants";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
+import { deleteEverythingInTransitoryId } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
 
 const debug = Debug("resolvers:deleteItemDefinition");
 export async function deleteItemDefinition(
@@ -118,6 +119,11 @@ export async function deleteItemDefinition(
 
   debug("SUCCEED");
 
+  // we don't want to await any of this
+  deleteEverythingInTransitoryId(
+    itemDefinition,
+    resolverArgs.args.id.toString(),
+  );
   (async () => {
     await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, null);
     appData.listener.triggerListeners(

@@ -12,7 +12,7 @@ export type PropertyDefinitionSupportedPasswordType = string;
 const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   nullableDefault: "",
-  sql: getStandardSQLFnFor("text"),
+  sql: getStandardSQLFnFor && getStandardSQLFnFor("text"),
   sqlIn: (value: PropertyDefinitionSupportedPasswordType, sqlPrefix, id, property, knex) => {
     if (value === null) {
       return  {

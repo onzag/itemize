@@ -9,6 +9,7 @@ import Item, { ItemExclusionState } from "../Item";
 import { ISQLTableDefinitionType, ISQLTableRowValue } from "../../../sql";
 import { IGQLValue } from "../../../gql";
 import Knex from "knex";
+import ItemDefinition from "..";
 
 /**
  * Provides the table bit that is necessary to store item data
@@ -105,13 +106,16 @@ export function convertSQLValueToGQLValueForItem(item: Item, row: ISQLTableRowVa
  * that is nullable but it's forced into some value it will be ignored
  * in a partial field value, don't use partial fields to create
  */
-export function convertGQLValueToSQLValueForItem(
+export async function convertGQLValueToSQLValueForItem(
+  transitoryId: string,
+  itemDefinition: ItemDefinition,
   item: Item,
   data: IGQLValue,
+  oldData: IGQLValue,
   knex: Knex,
   dictionary: string,
   partialFields?: any,
-): ISQLTableRowValue {
+): Promise<ISQLTableRowValue> {
   // so again we get the prefix as in ITEM_wheel_
   const prefix = item.getPrefixedQualifiedIdentifier();
   // the exclusion state in the graphql information should be included in
@@ -127,31 +131,37 @@ export function convertGQLValueToSQLValueForItem(
   // necessary if the state is not excluded, excluded means it should be
   // null, even if the info is there, it will be ignored
   if (exclusionStateAccordingToGQL !== ItemExclusionState.EXCLUDED) {
-    // so we get the sinking properties
-    item.getSinkingProperties().forEach((sinkingProperty) => {
-      // partial fields checkup
-      if (
-        (partialFields && partialFields[sinkingProperty.getId()]) ||
-        !partialFields
-      ) {
-        // and start adding them, in this case, instead of giving
-        // the root data, we are passing the specific item data, remember
-        // it will be stored in a place like ITEM_wheel where all the properties
-        // are an object within there, we pass that, as all the info should be
-        // there, the prefix then represents the fact, we want all the added properties
-        // to be prefixed with what we are giving, in this case ITEM_wheel_
-        sqlResult = {
-          ...sqlResult,
-          ...convertGQLValueToSQLValueForProperty(
-            sinkingProperty,
-            data[item.getQualifiedIdentifier()],
-            knex,
-            dictionary,
-            prefix,
-          ),
-        };
-      }
-    });
+    await Promise.all(
+      // so we get the sinking properties
+      item.getSinkingProperties().map(async (sinkingProperty) => {
+        // partial fields checkup
+        if (
+          (partialFields && partialFields[sinkingProperty.getId()]) ||
+          !partialFields
+        ) {
+          // and start adding them, in this case, instead of giving
+          // the root data, we are passing the specific item data, remember
+          // it will be stored in a place like ITEM_wheel where all the properties
+          // are an object within there, we pass that, as all the info should be
+          // there, the prefix then represents the fact, we want all the added properties
+          // to be prefixed with what we are giving, in this case ITEM_wheel_
+          sqlResult = {
+            ...sqlResult,
+            ...(await convertGQLValueToSQLValueForProperty(
+              transitoryId,
+              itemDefinition,
+              item,
+              sinkingProperty,
+              data[item.getQualifiedIdentifier()],
+              (oldData && oldData[item.getQualifiedIdentifier()]) || null,
+              knex,
+              dictionary,
+              prefix,
+            )),
+          };
+        }
+      }),
+    );
   }
 
   // we return that

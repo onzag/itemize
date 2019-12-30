@@ -109,7 +109,7 @@
             "subtype": "volume",
             "specialProperties": {
                 "unit": "l",
-                "imperialUnit": "gal"
+                "imperial_unit": "gal"
             }
         },
 

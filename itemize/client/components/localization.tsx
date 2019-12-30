@@ -51,7 +51,10 @@ export function I18nRead(props: II18nReadProps) {
                       }
 
                       if (!itemDefinitionContextualValue || i18nValue === null) {
-                        i18nValue = localeContext.i18n[props.id] || null;
+                        i18nValue = (
+                          localeContext.i18n[localeContext.language] &&
+                          localeContext.i18n[localeContext.language][props.id]
+                        ) || null;
                       }
 
                       if (i18nValue === null) {
@@ -116,7 +119,7 @@ export function I18nReadError(props: II18nReadErrorProps) {
         (localeData) => {
           const freeError = props.error as any;
           if (!freeError.modulePath) {
-            const errorMessage: string = localeData.i18n.error[props.error.code];
+            const errorMessage: string = localeData.i18n[localeData.language].error[props.error.code];
             return errorMessage;
           }
           return (

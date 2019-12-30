@@ -26,7 +26,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLInt,
   // years can be set as a number
   json: "number",
-  sql: getStandardSQLFnFor("integer"),
+  sql: getStandardSQLFnFor && getStandardSQLFnFor("integer"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,

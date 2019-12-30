@@ -32,7 +32,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
   specialProperties: [
     {
-      name: "prefillToUserLocationIfPossible",
+      // TODO implement
+      name: "prefill_to_user_location_if_possible",
       type: "boolean",
     },
   ],

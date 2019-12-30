@@ -10,6 +10,10 @@ const fsAsync = fs.promises;
 async function copyOneDirectoryLevel(pathname: string, constructedPath: string) {
   const filesInDirectory = await fsAsync.readdir(pathname);
 
+  if (!await checkExists(path.join("dist", "data", "uploads"))) {
+    await fsAsync.mkdir(path.join("dist", "data", "uploads"));
+  }
+
   await Promise.all(filesInDirectory.map(async (fileNameInDirectory) => {
     const currentTotalFilePathName = path.join(pathname, fileNameInDirectory);
 

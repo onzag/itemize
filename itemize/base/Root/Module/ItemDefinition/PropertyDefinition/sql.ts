@@ -4,6 +4,9 @@ import { ISQLTableRowValue, ISQLTableDefinitionType } from "../../../sql";
 import { IGQLValue } from "../../../gql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces";
 import Knex from "knex";
+import ItemDefinition from "..";
+import Item from "../Item";
+import { processFileListFor, processSingleFileFor } from "./sql-files";
 
 export function getStandardSQLFnFor(type: string):
   (sqlPrefix: string, id: string, property: PropertyDefinition) => ISQLTableDefinitionType {
@@ -30,6 +33,11 @@ export function stardardSQLInWithJSONStringifyFn(
   sqlPrefix: string,
   id: string,
 ): ISQLTableRowValue {
+  if (value === null) {
+    return {
+      [sqlPrefix + id]: null,
+    };
+  }
   return {
     [sqlPrefix + id]: JSON.stringify(value),
   };
@@ -198,13 +206,17 @@ export function convertSQLValueToGQLValueForProperty(
  * @param prefix the prefix, if we need the SQL values to be prefixed, usually
  * used within items, because item properties need to be prefixed
  */
-export function convertGQLValueToSQLValueForProperty(
+export async function convertGQLValueToSQLValueForProperty(
+  transitoryId: string,
+  itemDefinition: ItemDefinition,
+  item: Item,
   propertyDefinition: PropertyDefinition,
   data: IGQLValue,
+  oldData: IGQLValue,
   knex: Knex,
   dictionary: string,
   prefix: string,
-): ISQLTableRowValue {
+): Promise<ISQLTableRowValue> {
   // and this is the value of the property, again, properties
   // are not prefixed, they are either in their own object
   // or in the root
@@ -224,6 +236,31 @@ export function convertGQLValueToSQLValueForProperty(
   // we also got to set to null any undefined value
   if (typeof gqlPropertyValue === "undefined") {
     gqlPropertyValue = null;
+  }
+
+  const description = propertyDefinition.getPropertyDefinitionDescription();
+  if (description.gqlAddFileToFields) {
+    const oldValue = (oldData && oldData[propertyDefinition.getId()]) || null;
+    const newValue = gqlPropertyValue;
+    if (description.gqlList) {
+      gqlPropertyValue = await processFileListFor(
+        newValue,
+        oldValue,
+        transitoryId,
+        itemDefinition,
+        item,
+        propertyDefinition,
+      );
+    } else {
+      gqlPropertyValue = await processSingleFileFor(
+        newValue,
+        oldValue,
+        transitoryId,
+        itemDefinition,
+        item,
+        propertyDefinition,
+      );
+    }
   }
 
   // so we need the sql in function, from the property description

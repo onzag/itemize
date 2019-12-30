@@ -143,41 +143,55 @@ export function convertSQLValueToGQLValueForItemDefinition(
  * that is nullable but it's forced into some value it will be ignored
  * in a partial field value, don't use partial fields to create
  */
-export function convertGQLValueToSQLValueForItemDefinition(
+export async function convertGQLValueToSQLValueForItemDefinition(
+  transitoryId: string,
   itemDefinition: ItemDefinition,
   data: IGQLValue,
+  oldData: IGQLValue,
   knex: Knex,
   dictionary: string,
   partialFields?: any,
-): ISQLTableRowValue {
+): Promise<ISQLTableRowValue> {
   // first we create the row value
   let result: ISQLTableRowValue = {};
 
-  // now we get all the property definitions and do the same
-  // that we did in the SQLtoGQL but in reverse
-  itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
-    // we only add if partialFields allows it, or we don't have
-    // partialFields set
-    if (
-      (partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
-      !partialFields
-    ) {
-      result = { ...result, ...convertGQLValueToSQLValueForProperty(pd, data, knex, dictionary, "") };
-    }
-  });
-  // also with the items
-  itemDefinition.getAllItems().forEach((item) => {
-    // we only add if partialFields allows it, or we don't have
-    // partialFields set
-    const itemNameInPartialFields = item.getQualifiedIdentifier();
-    if (
-      (partialFields && typeof partialFields[itemNameInPartialFields] !== "undefined") ||
-      !partialFields
-    ) {
-      const innerPartialFields = !partialFields ? null : partialFields[itemNameInPartialFields];
-      result = { ...result, ...convertGQLValueToSQLValueForItem(item, data, knex, dictionary, innerPartialFields) };
-    }
-  });
+  await Promise.all([
+    // now we get all the property definitions and do the same
+    // that we did in the SQLtoGQL but in reverse
+    Promise.all(itemDefinition.getAllPropertyDefinitions().map(async (pd) => {
+      // we only add if partialFields allows it, or we don't have
+      // partialFields set
+      if (
+        (partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
+        !partialFields
+      ) {
+        result = {
+          ...result,
+          ...(await convertGQLValueToSQLValueForProperty(
+            transitoryId, itemDefinition, null, pd, data, oldData, knex, dictionary, "",
+          )),
+        };
+      }
+    })),
+    // also with the items
+    Promise.all(itemDefinition.getAllItems().map(async (item) => {
+      // we only add if partialFields allows it, or we don't have
+      // partialFields set
+      const itemNameInPartialFields = item.getQualifiedIdentifier();
+      if (
+        (partialFields && typeof partialFields[itemNameInPartialFields] !== "undefined") ||
+        !partialFields
+      ) {
+        const innerPartialFields = !partialFields ? null : partialFields[itemNameInPartialFields];
+        result = {
+          ...result,
+          ...(await convertGQLValueToSQLValueForItem(
+            transitoryId, itemDefinition, item, data, oldData, knex, dictionary, innerPartialFields,
+          )),
+        };
+      }
+    })),
+  ]);
 
   return result;
 }
