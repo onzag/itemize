@@ -6,9 +6,9 @@ import CacheWorker from "../workers/cache.worker";
 const isDevelopment = process.env.NODE_ENV === "development";
 let url: string;
 if (isDevelopment) {
-  url = `/rest/resource/cache-worker.development.js?version=${(window as any).BUILD_NUMBER}`;
+  url = "/rest/resource/cache-worker.development.js";
 } else {
-  url = `/rest/resource/cache-worker.production.js?version=${(window as any).BUILD_NUMBER}`;
+  url = "/rest/resource/cache-worker.production.js";
 }
 
 // now we check for indexed db support as it's necessary

@@ -7,7 +7,7 @@
     "install": "tsc",
     "build": "webpack && webpack --config ./webpack.config.production.js && node ./dist/itemize/builder/index.js",
     "webpack-dev": "webpack",
-    "webpack-prod": "webpack --config ./webpack.config.production.js",
+    "webpack": "webpack --config ./webpack.config.production.js",
     "build-data": "node ./dist/itemize/builder/index.js",
     "start": "node ./dist/src/server/index.js",
     "build-database": "node ./dist/itemize/dbbuilder/index.js"

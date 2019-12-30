@@ -125,6 +125,7 @@ export default function restServices(appData: IAppDataType) {
   });
 
   router.use("/resource", express.static(path.resolve(__dirname + "../../../data/")));
+  router.use("/uploads", express.static(path.resolve(__dirname + "../../../uploads/")));
 
   appData.root.getAllModules().forEach(buildRouteForModule);
 

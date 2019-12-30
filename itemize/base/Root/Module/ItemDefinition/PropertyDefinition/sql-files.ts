@@ -84,7 +84,7 @@ async function processOneFileAndItsSameIDReplacement(
   item: Item,
   propertyDefinition: PropertyDefinition,
 ) {
-  const idefLocationPath = path.join("dist", "data", "uploads", itemDefinition.getQualifiedPathName());
+  const idefLocationPath = path.join("dist", "uploads", itemDefinition.getQualifiedPathName());
   const transitoryLocationPath = path.join(idefLocationPath, transitoryId);
   const itemLocationPath = item ?
     path.join(transitoryLocationPath, item.getQualifiedIdentifier()) : transitoryLocationPath;
@@ -146,7 +146,6 @@ async function processOneFileAndItsSameIDReplacement(
 
   const filePath = path.join(propertyLocationPath, newValue.id);
   let standardURLPath = path.join(
-    "uploads",
     itemDefinition.getQualifiedPathName(),
     transitoryId,
   );
@@ -194,7 +193,7 @@ export async function updateTransitoryId(
   originalId: string,
   newId: string,
 ): Promise<void> {
-  const idefLocationPath = path.join("dist", "data", "uploads", itemDefinition.getQualifiedPathName());
+  const idefLocationPath = path.join("dist", "uploads", itemDefinition.getQualifiedPathName());
   const originalTransitoryLocation = path.join(idefLocationPath, originalId);
   const newTransitoryLocation = path.join(idefLocationPath, newId);
 
@@ -205,7 +204,7 @@ export async function deleteEverythingInTransitoryId(
   itemDefinition: ItemDefinition,
   transitoryId: string,
 ): Promise<void> {
-  const idefLocationPath = path.join("dist", "data", "uploads", itemDefinition.getQualifiedPathName());
+  const idefLocationPath = path.join("dist", "uploads", itemDefinition.getQualifiedPathName());
   const transitoryLocationPath = path.join(idefLocationPath, transitoryId);
 
   if (await checkExists(idefLocationPath) && await checkExists(transitoryLocationPath)) {
@@ -252,7 +251,7 @@ async function addFileFor(
   return new Promise((resolve, reject) => {
     writeStream.on("finish", () => {
       resolve({
-        url: path.join("/rest/resource", path.join(standardURLPath, filename)),
+        url: path.join("/rest/uploads", path.join(standardURLPath, filename)),
         type: mimetype.toString(),
       });
     });

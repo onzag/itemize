@@ -171,11 +171,11 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
   // basically, we are going to keep this simple, only update the worker if it's
   // a new url, simple, even for this script the build number applies
   const [initialData, lang] = await Promise.all<any>([
-    fetch(`/rest/resource/build.${initialLang}.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
-    fetch(`/rest/resource/lang.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
+    fetch(`/rest/resource/build.${initialLang}.json`).then((r) => r.json()),
+    fetch("/rest/resource/lang.json").then((r) => r.json()),
 
     initialLang !== "en" ?
-      importScript(`/rest/resource/${initialLang}.moment.js?version=${(window as any).BUILD_NUMBER}`) : null,
+      importScript(`/rest/resource/${initialLang}.moment.js`) : null,
   ]);
 
   // the locale of moment is set, note how await was used, hence all the previous script

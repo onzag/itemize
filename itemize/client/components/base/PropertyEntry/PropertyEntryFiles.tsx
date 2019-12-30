@@ -268,7 +268,6 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
     // the value from the internal source, either recreated or from the internal value
     let valueAsInternal: IInternalURLFileDataWithState[] = this.props.state.internalValue;
     if (!valueAsInternal && this.props.state.value) {
-      console.log(this.props.state.value);
       valueAsInternal = (
         this.props.state.value as PropertyDefinitionSupportedFilesType
       ).map((value) => ({value}));

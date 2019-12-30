@@ -34,6 +34,22 @@ module.exports = {
         use: "null-loader"
       },
       {
+        test: path.resolve(__dirname, "itemize/base/Root/Module/sql.ts"),
+        use: "null-loader"
+      },
+      {
+        test: path.resolve(__dirname, "itemize/base/Root/Module/ItemDefinition/sql.ts"),
+        use: "null-loader"
+      },
+      {
+        test: path.resolve(__dirname, "itemize/base/Root/Module/ItemDefinition/PropertyDefinition/sql.ts"),
+        use: "null-loader"
+      },
+      {
+        test: path.resolve(__dirname, "itemize/base/Root/Module/ItemDefinition/Item/sql.ts"),
+        use: "null-loader"
+      },
+      {
         test: /\.worker.\ts$/,
         use: "null-loader"
       },

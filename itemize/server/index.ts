@@ -173,6 +173,13 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     app.use(custom.customRouter(appData));
   }
 
+  app.get("/sw.development.js", (req, res) => {
+    res.sendFile(path.resolve(__dirname + "../../../data/service-worker.development.js"));
+  });
+  app.get("/sw.production.js", (req, res) => {
+    res.sendFile(path.resolve(__dirname + "../../../data/service-worker.production.js"));
+  });
+
   app.get("*", (req, res) => {
     res.setHeader("content-type", "text/html; charset=utf-8");
     res.end(appData.index);
