@@ -138,7 +138,7 @@ export default class PropertyEntrySelect
       this.props.state.value :
       formatValueAsString(
         this.props.property.getType(),
-        this.props.i18n.number_decimal_separator,
+        this.props.i18n[this.props.language].number_decimal_separator,
         this.props.state.value,
       );
 

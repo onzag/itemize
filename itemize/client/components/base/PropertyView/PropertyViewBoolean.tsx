@@ -12,13 +12,13 @@ export default class PropertyViewBoolean extends React.Component<IPropertyViewPr
     let i18nLabel = null;
     let icon = null;
     if (this.props.state.value === null) {
-      i18nLabel = capitalize(this.props.i18n.unspecified);
+      i18nLabel = capitalize(this.props.i18n[this.props.language].unspecified);
       icon = <Icon>indeterminate_check_box</Icon>;
     } else if (this.props.state.value === true) {
-      i18nLabel = capitalize(this.props.i18n.yes);
+      i18nLabel = capitalize(this.props.i18n[this.props.language].yes);
       icon = <Icon>check_box</Icon>;
     } else if (this.props.state.value === false) {
-      i18nLabel = capitalize(this.props.i18n.no);
+      i18nLabel = capitalize(this.props.i18n[this.props.language].no);
       icon = <Icon>check_box_outline_blank</Icon>;
     }
     return (

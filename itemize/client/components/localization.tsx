@@ -6,7 +6,7 @@ import { GraphQLEndpointErrorType } from "../../base/errors";
 import Root from "../../base/Root";
 import Module from "../../base/Root/Module";
 import ItemDefinition, { IItemDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition";
-import { IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import PropertyDefinition, { IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../imported-resources";
 import { ItemContext } from "../providers/item";
 
@@ -123,57 +123,71 @@ export function I18nReadError(props: II18nReadErrorProps) {
             <DataContext.Consumer>
               {
                 (data) => {
-                  const mod = Root.getModuleRawFor(data.raw, freeError.modulePath);
-                  if (!mod) {
+                  let mod: Module;
+                  try {
+                    mod = data.value.getModuleFor(freeError.modulePath);
+                  } catch {
+                    console.warn("Invalid error module in", freeError);
                     return null;
                   }
 
-                  let itemDef: IItemDefinitionRawJSONDataType;
+                  let itemDef: ItemDefinition;
                   if (freeError.itemIdItemDefPath) {
-                    itemDef = Module.getItemDefinitionRawFor(mod, freeError.itemIdItemDefPath);
-                    if (!itemDef) {
+                    try {
+                      itemDef = mod.getItemDefinitionFor(freeError.itemIdItemDefPath);
+                    } catch {
                       console.warn("failed to display error due to itemIdItemDefPath", freeError);
                       return null;
                     }
                   } else if (freeError.itemDefPath) {
-                    itemDef = Module.getItemDefinitionRawFor(mod, freeError.itemDefPath);
-                    if (!itemDef) {
-                      console.warn("failed to display error due to itemDefPath", freeError);
+                    try {
+                      itemDef = mod.getItemDefinitionFor(freeError.itemDefPath);
+                    } catch {
+                      console.warn("failed to display error due to itemIdItemDefPath", freeError);
                       return null;
                     }
                   }
 
                   if (freeError.propertyId) {
-                    let propertyDef: IPropertyDefinitionRawJSONDataType;
+                    let propertyDef: PropertyDefinition;
                     if (itemDef) {
-                      propertyDef = ItemDefinition.getPropertyDefinitionRawFor(
-                        itemDef,
-                        mod,
-                        freeError.propertyId,
-                        true,
-                      );
+                      try {
+                        propertyDef = itemDef.getPropertyDefinitionFor(
+                          freeError.propertyId,
+                          true,
+                        );
+                      } catch {
+                        console.warn("failed to display error due to propertyId", freeError);
+                        return null;
+                      }
                     } else {
-                      propertyDef = Module.getPropExtensionRawFor(
-                        mod,
-                        freeError.propertyId,
-                      );
-                    }
-                    if (!propertyDef) {
-                      console.warn("failed to display error due to propertyId", freeError);
-                      return null;
+                      try {
+                        propertyDef = mod.getPropExtensionFor(freeError.propertyId);
+                      } catch {
+                        console.warn("failed to display error due to propertyId not extension", freeError);
+                        return null;
+                      }
                     }
 
-                    const i18nErrorValue = propertyDef.i18nData[localeData.language].error[freeError.code];
+                    const i18nData = propertyDef.getI18nDataFor(localeData.language);
+                    const i18nErrorValue = i18nData && i18nData.error && i18nData.error[freeError.code];
                     if (!i18nErrorValue) {
-                      console.warn("failed to display error due to code", freeError);
+                      console.warn("failed to display error due to code or language", freeError);
                       return null;
                     }
                     return i18nErrorValue;
                   } else if (freeError.policyType) {
-                    return itemDef
-                      .i18nData[localeData.language]
-                      .policies[freeError.policyType][freeError.policyName]
-                      .fail;
+                    const i18nData = itemDef.getI18nDataFor(localeData.language);
+                    const i18nErrorValue = i18nData &&
+                      i18nData.policies &&
+                      i18nData.policies[freeError.policyType] &&
+                      i18nData.policies[freeError.policyType][freeError.policyName] &&
+                      i18nData.policies[freeError.policyType][freeError.policyName].fail;
+                    if (!i18nErrorValue) {
+                      console.warn("failed to display error due to code or language", freeError);
+                      return null;
+                    }
+                    return i18nErrorValue;
                   }
                 }
               }

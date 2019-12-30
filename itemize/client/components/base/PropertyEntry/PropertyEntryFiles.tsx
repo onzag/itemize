@@ -125,7 +125,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
       // the reason by default is that is an invalid type
       let reason = isImage ? "image_uploader_invalid_type" : "file_uploader_invalid_type";
       // but if the file is too large
-      if (value.src.size > MAX_FILE_SIZE) {
+      if (value.size > MAX_FILE_SIZE) {
         // change it to that
         reason = isImage ? "image_uploader_file_too_big" : "file_uploader_file_too_big";
       }
@@ -237,12 +237,12 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
 
     // the placeholder when active
     let placeholderActive = singleFile ?
-      this.props.i18n.file_uploader_placeholder_active_single :
-      this.props.i18n.file_uploader_placeholder_active;
+      this.props.i18n[this.props.language].file_uploader_placeholder_active_single :
+      this.props.i18n[this.props.language].file_uploader_placeholder_active;
     if (isExpectingImages) {
       placeholderActive = singleFile ?
-        this.props.i18n.image_uploader_placeholder_active_single :
-        this.props.i18n.image_uploader_placeholder_active;
+        this.props.i18n[this.props.language].image_uploader_placeholder_active_single :
+        this.props.i18n[this.props.language].image_uploader_placeholder_active;
     }
 
     // the invalid reason
@@ -338,7 +338,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                       prettyBytes(value.value.size)
                     })</p>
                     {value.rejected ? <p className={this.props.classes.fileRejectedDescription}>
-                      {localeReplacer(this.props.i18n[value.reason], prettyBytes(MAX_FILE_SIZE))}
+                      {localeReplacer(this.props.i18n[this.props.language][value.reason], prettyBytes(MAX_FILE_SIZE))}
                     </p> : null}
                   </div>
                 );
@@ -366,7 +366,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                       prettyBytes(value.value.size)
                     })</p>
                     {value.rejected ? <p className={this.props.classes.fileRejectedDescription}>
-                      {localeReplacer(this.props.i18n[value.reason], prettyBytes(MAX_FILE_SIZE))}
+                      {localeReplacer(this.props.i18n[this.props.language][value.reason], prettyBytes(MAX_FILE_SIZE))}
                     </p> : null}
                   </div>
                 );
@@ -410,8 +410,8 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                       >
                         {
                           isExpectingImages ?
-                          this.props.i18n.image_uploader_delete_file :
-                          this.props.i18n.file_uploader_delete_file
+                          this.props.i18n[this.props.language].image_uploader_delete_file :
+                          this.props.i18n[this.props.language].file_uploader_delete_file
                         }
                         <Icon className={this.props.classes.filesSingleFileButtonIcon}>remove_circle_outline</Icon>
                       </Button>
@@ -423,8 +423,8 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                       >
                         {
                           isExpectingImages ?
-                          this.props.i18n.image_uploader_select_file :
-                          this.props.i18n.file_uploader_select_file
+                          this.props.i18n[this.props.language].image_uploader_select_file :
+                          this.props.i18n[this.props.language].file_uploader_select_file
                         }
                         <Icon className={this.props.classes.filesSingleFileButtonIcon}>cloud_upload</Icon>
                       </Button>

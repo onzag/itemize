@@ -10,7 +10,6 @@ import {
   IItemRawJSONDataType,
 } from "../base/Root/Module/ItemDefinition/Item";
 import "source-map-support/register";
-import { ILocaleLangDataType } from ".";
 
 /**
  * Cleans up build data from

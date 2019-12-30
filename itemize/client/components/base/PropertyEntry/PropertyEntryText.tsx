@@ -12,29 +12,29 @@ import "react-quill/dist/quill.core.css";
 import "../../../theme/quill.scss";
 
 // TODO implement missing toolbar functionality
-function RichTextEditorToolbar(props: {id: string, i18n: Ii18NType}) {
+function RichTextEditorToolbar(props: {id: string, i18n: Ii18NType, language: string}) {
   return (
     <Toolbar id={props.id}>
       <IconButton
-        title={props.i18n.format_bold}
+        title={props.i18n[props.language].format_bold}
         classes={{root: "ql-bold"}}
       >
         <Icon>format_bold</Icon>
       </IconButton>
       <IconButton
-        title={props.i18n.format_italic}
+        title={props.i18n[props.language].format_italic}
         classes={{ root: "ql-italic" }}
       >
         <Icon>format_italic</Icon>
       </IconButton>
       <IconButton
-        title={props.i18n.format_underline}
+        title={props.i18n[props.language].format_underline}
         classes={{ root: "ql-underline" }}
       >
         <Icon>format_underline</Icon>
       </IconButton>
       <IconButton
-        title={props.i18n.format_title}
+        title={props.i18n[props.language].format_title}
         classes={{ root: "ql-header" }}
         value="1"
       >
@@ -42,21 +42,21 @@ function RichTextEditorToolbar(props: {id: string, i18n: Ii18NType}) {
       </IconButton>
       <span className="ql-divider" />
       <IconButton
-        title={props.i18n.format_quote}
+        title={props.i18n[props.language].format_quote}
         classes={{ root: "ql-blockquote" }}
       >
         <Icon>format_quote</Icon>
       </IconButton>
       <span className="ql-divider" />
       <IconButton
-        title={props.i18n.format_list_numbered}
+        title={props.i18n[props.language].format_list_numbered}
         classes={{ root: "ql-list" }}
         value="ordered"
       >
         <Icon>format_list_numbered</Icon>
       </IconButton>
       <IconButton
-        title={props.i18n.format_list_bulleted}
+        title={props.i18n[props.language].format_list_bulleted}
         classes={{ root: "ql-list" }}
         value="bullet"
       >
@@ -64,19 +64,19 @@ function RichTextEditorToolbar(props: {id: string, i18n: Ii18NType}) {
       </IconButton>
       <span className="ql-divider" />
       <IconButton
-        title={props.i18n.format_add_image}
+        title={props.i18n[props.language].format_add_image}
         classes={{ root: "" }}
       >
         <Icon>insert_photo</Icon>
       </IconButton>
       <IconButton
-        title={props.i18n.format_add_video}
+        title={props.i18n[props.language].format_add_video}
         classes={{ root: "" }}
       >
         <Icon>video_library</Icon>
       </IconButton>
       <IconButton
-        title={props.i18n.format_add_file}
+        title={props.i18n[props.language].format_add_file}
         classes={{ root: "" }}
       >
         <Icon>attach_file</Icon>
@@ -187,7 +187,7 @@ class RichTextEditor extends React.Component<IPropertyEntryProps, IRichTextEdito
           </InputLabel>
           {i18nDescription ? <div className={this.props.classes.description}>
             <Icon>keyboard_arrow_down</Icon>{i18nDescription}</div> : null}
-          <RichTextEditorToolbar id={this.uuid} i18n={this.props.i18n}/>
+          <RichTextEditorToolbar id={this.uuid} i18n={this.props.i18n} language={this.props.language}/>
           <ReactQuill
             className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
             disabled={this.props.state.enforced}

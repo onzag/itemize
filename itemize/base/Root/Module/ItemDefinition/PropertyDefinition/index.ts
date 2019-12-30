@@ -6,6 +6,7 @@ import {
   SELF_METAROLE,
   PREFIX_BUILD,
   POLICY_PREFIXES,
+  MAX_FILE_SIZE,
 } from "../../../../../constants";
 import Module from "../..";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
@@ -317,19 +318,21 @@ export default class PropertyDefinition {
       }
       if (definition.gqlAddFileToFields) {
         if (!(value as any).every((v: IPropertyDefinitionIncludedFileInfoType) => {
-          console.log(v.src);
           return typeof v.id === "string" &&
             typeof v.name === "string" &&
             typeof v.type === "string" &&
             typeof v.url === "string" &&
             typeof v.size === "number" &&
+            v.size <= MAX_FILE_SIZE &&
+            (
               v.src === null ||
               typeof v.src === "undefined" ||
               (v.src as Promise<any>).then ||
               (
                 typeof File !== "undefined" &&
                 v.src instanceof File
-              );
+              )
+            );
         })) {
           return PropertyInvalidReason.INVALID_VALUE;
         }
@@ -341,6 +344,7 @@ export default class PropertyDefinition {
         typeof (value as any).type !== "string" ||
         typeof (value as any).url !== "string" ||
         typeof (value as any).size !== "number" ||
+        (value as any).size > MAX_FILE_SIZE ||
           (
             (value as any).src !== null &&
             typeof value !== "undefined" &&

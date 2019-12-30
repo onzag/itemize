@@ -59,18 +59,22 @@ export default class CacheWorker {
     this.versionHasBeenSet = true;
 
     // now we try to create the promised database
-    try {
-      this.dbPromise = openDB<ICacheDB>(CACHE_NAME, version, {
-        // TODO this function fails sometimes randomly and it's impossible to tell why
-        // it's buggy, figure out why it fails and when
-        upgrade(db) {
+    this.dbPromise = openDB<ICacheDB>(CACHE_NAME, version, {
+      // TODO this function fails sometimes randomly and it's impossible to tell why
+      // it's buggy, figure out why it fails and when
+      upgrade(db) {
+        try {
+          console.log("CLEARING CACHE DUE TO UPGRADE");
+          db.deleteObjectStore(TABLE_NAME);
           const queriesStore = db.createObjectStore(TABLE_NAME);
           queriesStore.createIndex("expires", "timestamp");
-        },
-      });
-    } catch (err) {
-      console.warn(err);
-    }
+        } catch (err) {
+          console.warn(err);
+        }
+      },
+    });
+
+    console.log("CACHE SETUP", version);
 
     // and we request to clean any old data
     this.cleanUpOldRecords();
@@ -193,11 +197,21 @@ export default class CacheWorker {
       console.log("CACHED QUERY REQUESTED", queryName, id, requestedFields);
     }
 
+    if (!this.versionHasBeenSet) {
+      console.log("THIS SUCKS");
+    }
+
     // so we fetch our db like usual
-    const db = await this.dbPromise;
+    let db: any;
+    try {
+      db = await this.dbPromise;
+    } catch (err) {
+      console.log(err);
+    }
 
     // if we don't have a database no match
     if (!db) {
+      console.log("null");
       return null;
     }
 
@@ -233,6 +247,7 @@ export default class CacheWorker {
     }
     // cache didn't match, returning no match
     // something wrong might have happened as well
+    console.log("WTF");
     return null;
   }
 }

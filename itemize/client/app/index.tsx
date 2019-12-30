@@ -1,5 +1,5 @@
 import React from "react";
-import Root, { IRootRawJSONDataType, Ii18NType, IRawJSONBuildDataType } from "../../base/Root";
+import Root, { IRawJSONBuildDataType, Ii18NType } from "../../base/Root";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import { createMuiTheme } from "@material-ui/core";
 import { importScript } from "..";
@@ -24,7 +24,9 @@ if (isDevelopment) {
 // this interface just has basic data for all the available locales
 // usually only containing the name
 export interface ILangLocalesType {
-  [locale: string]: Ii18NType;
+  [locale: string]: {
+    name: string;
+  };
 }
 
 // This is the locale type, which contains the locale
@@ -45,7 +47,6 @@ export interface ILocaleContextType {
 // as how the application is defined to be by the
 // JSON Itemize definition
 export interface IDataContextType {
-  raw: IRootRawJSONDataType;
   value: Root;
   remoteListener: RemoteListener;
 }
@@ -75,7 +76,7 @@ interface IAppProps {
 interface IAppState {
   specifiedCountry: string;
   specifiedCurrency: string;
-  specifiedData: IRawJSONBuildDataType;
+  specifiedI18n: Ii18NType;
   specifiedProcessedRoot: Root;
   localeIsUpdating: boolean;
   localeIsUpdatingFrom: string;
@@ -113,7 +114,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       specifiedCurrency: props.initialCurrency,
       localeIsUpdating: false,
       localeIsUpdatingFrom: null,
-      specifiedData: props.initialData,
+      specifiedI18n: props.initialData.i18n,
       specifiedProcessedRoot: (window as any).ROOT,
     };
 
@@ -212,6 +213,14 @@ export default class App extends React.Component<IAppProps, IAppState> {
       return;
     }
 
+    // if the language is currently loaded in memory, just set it as it is
+    // we don't need to fetch anything
+    if (this.state.specifiedI18n[localeToSet]) {
+      pathNameSplitted[1] = localeToSet;
+      history.push(pathNameSplitted.join("/"));
+      return;
+    }
+
     // otherwise we send the state, this state is part of the context
     this.setState({
       localeIsUpdating: true,
@@ -245,7 +254,10 @@ export default class App extends React.Component<IAppProps, IAppState> {
       this.updateUserProperty("app_language", localeToSet);
     }
     this.setState({
-      specifiedData: newData,
+      specifiedI18n: {
+        ...this.state.specifiedI18n,
+        ...newData.i18n,
+      },
       localeIsUpdating: false,
       localeIsUpdatingFrom: null,
     });
@@ -376,7 +388,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       updating: this.state.localeIsUpdating,
 
       langLocales: this.props.langLocales,
-      i18n: this.state.specifiedData.i18n,
+      i18n: this.state.specifiedI18n,
     };
 
     // Now we return the app with its given locale context
@@ -406,7 +418,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // The data contet passes the raw root and the value
     // that contains the instance that can store values
     const dataContextValue: IDataContextType = {
-      raw: this.state.specifiedData.root,
       value: this.state.specifiedProcessedRoot,
       remoteListener: this.remoteListener,
     };

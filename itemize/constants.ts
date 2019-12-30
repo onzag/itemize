@@ -39,10 +39,10 @@ export const MAX_FILE_BATCH_COUNT = 25; // how many files can be used in one ite
 export const MAX_TOTAL_STORED_FILES = MAX_FILE_SIZE * 100; // how many bytes the user can store
 export const FILE_SUPPORTED_IMAGE_TYPES = [
   "image/png",
-  "image/gif",
   "image/jpeg",
   "image/svg+xml",
   "image/png",
+  "image/webp",
 ];
 
 // The properties for i18n a module should have

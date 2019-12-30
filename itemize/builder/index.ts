@@ -221,11 +221,27 @@ async function buildData(rawData: any) {
     return processRoot(resultJSON, lang);
   });
 
+  const mainResultBuild = processRoot(resultJSON);
+
+  const allBuild = {
+    root: mainResultBuild,
+    i18n: allLangData.locales,
+  };
+
+  const allBuildFileName = path.join("dist", "data", `build.all.json`);
+  console.log("emiting " + colors.green(allBuildFileName));
+  await fsAsync.writeFile(
+    allBuildFileName,
+    JSON.stringify(allBuild),
+  );
+
   await Promise.all(supportedLanguages.map(async (sl, index) => {
     const resultingBuild = resultBuilds[index];
     const resultData = {
       root: resultingBuild,
-      i18n: allLangData.locales[sl],
+      i18n: {
+        [sl]: allLangData.locales[sl],
+      },
     };
     const fileName = path.join("dist", "data", `build.${sl}.json`);
     console.log("emiting " + colors.green(fileName));

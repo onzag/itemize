@@ -84,13 +84,13 @@ function PropertyEntryBooleanAsRadio(props: IPropertyEntryProps) {
   // then we use yes, no or unspecified as the definitions
   const values = [{
     value: "true",
-    label: capitalize(props.i18n.yes),
+    label: capitalize(props.i18n[props.language].yes),
   }, {
     value: "false",
-    label: capitalize(props.i18n.no),
+    label: capitalize(props.i18n[props.language].no),
   }, {
     value: "null",
-    label: capitalize(props.i18n.unspecified),
+    label: capitalize(props.i18n[props.language].unspecified),
   }];
 
   // this is the class that every radio select

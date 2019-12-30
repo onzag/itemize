@@ -16,7 +16,9 @@ export interface IRootRawJSONDataType {
 // contains keys and strings that are the values
 // tslint:disable-next-line: interface-name
 export interface Ii18NType {
-  [key: string]: string;
+  [langLocale: string]: {
+    [key: string]: string;
+  };
 }
 
 // This is the build data that comes raw from the

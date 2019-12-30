@@ -189,7 +189,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   [config, index, rawBuild, autocompleteSource] = await Promise.all([
     fsAsync.readFile("./dist/config.json", "utf8"),
     fsAsync.readFile("./dist/data/index.html", "utf8"),
-    fsAsync.readFile("./dist/data/build.en.json", "utf8"),
+    fsAsync.readFile("./dist/data/build.all.json", "utf8"),
     fsAsync.readFile("./dist/autocomplete.json", "utf8"),
   ]);
   config = JSON.parse(config);

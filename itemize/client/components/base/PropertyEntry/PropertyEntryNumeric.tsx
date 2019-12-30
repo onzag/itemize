@@ -167,21 +167,24 @@ export default class PropertyEntryNumeric
             // from a language that uses different separators
             // but it doesn't hurt if it's the same
             this.props.state.internalValue.replace(
-              prevProps.i18n.number_decimal_separator,
-              this.props.i18n.number_decimal_separator,
+              prevProps.i18n[prevProps.language].number_decimal_separator,
+              this.props.i18n[this.props.language].number_decimal_separator,
             ),
           );
         }
 
       // a decimal separator update in case
-      } else if (prevProps.i18n.number_decimal_separator !== this.props.i18n.number_decimal_separator) {
+      } else if (
+        prevProps.i18n[prevProps.language].number_decimal_separator !==
+        this.props.i18n[this.props.language].number_decimal_separator
+      ) {
         // if the value is not null
         if (this.props.state.value !== null) {
           this.props.onChange(
             this.props.state.value,
             this.props.state.internalValue.replace(
-              prevProps.i18n.number_decimal_separator,
-              this.props.i18n.number_decimal_separator,
+              prevProps.i18n[prevProps.language].number_decimal_separator,
+              this.props.i18n[this.props.language].number_decimal_separator,
             ),
           );
         }
@@ -249,7 +252,9 @@ export default class PropertyEntryNumeric
     let normalizedTextualValueAsString: string;
     if (baseType === BaseType.FLOAT) {
       // get the separator escaped
-      const escapedNumberSeparator = escapeStringRegexp(this.props.i18n.number_decimal_separator);
+      const escapedNumberSeparator = escapeStringRegexp(
+        this.props.i18n[this.props.language].number_decimal_separator,
+      );
       // and replace it for the standard separator
       normalizedTextualValueAsString = textualValue.replace(
         new RegExp(escapedNumberSeparator, "g"), ".");
@@ -282,7 +287,11 @@ export default class PropertyEntryNumeric
     // set the textual value, yes again, in all chances it will be the same
     // but let's say the user pressed "." instead of "," then we need to
     // properly format inormalizedNumericValueAsStringt
-    const newTextualValue = formatValueAsString(type, this.props.i18n.number_decimal_separator, textualValue);
+    const newTextualValue = formatValueAsString(
+      type,
+      this.props.i18n[this.props.language].number_decimal_separator,
+      textualValue,
+    );
 
     // Number line overflow protection
     // the problem is that too many decimals cause it to round
@@ -371,7 +380,7 @@ export default class PropertyEntryNumeric
     if (type === "currency") {
       // depending if the format is N$ or $N we set it end or
       // start
-      const currencyFormat = this.props.i18n.currency_format;
+      const currencyFormat = this.props.i18n[this.props.language].currency_format;
       if (currencyFormat === "N$") {
         appliedInputProps.endAdornment = (
           <InputAdornment position="end">
@@ -417,7 +426,7 @@ export default class PropertyEntryNumeric
       this.props.state.internalValue :
       formatValueAsString(
         this.props.property.getType(),
-        this.props.i18n.number_decimal_separator,
+        this.props.i18n[this.props.language].number_decimal_separator,
         this.props.state.value,
       );
 
@@ -460,10 +469,10 @@ export default class PropertyEntryNumeric
         </div>
         {type === "unit" ? <SelectUnitDialogResponsive
           open={this.state.unitDialogOpen}
-          title={this.props.i18n.unit_dialog_title}
-          others={this.props.i18n.unit_dialog_others}
-          othersMetric={this.props.i18n.unit_dialog_metric}
-          othersImperial={this.props.i18n.unit_dialog_imperial}
+          title={this.props.i18n[this.props.language].unit_dialog_title}
+          others={this.props.i18n[this.props.language].unit_dialog_others}
+          othersMetric={this.props.i18n[this.props.language].unit_dialog_metric}
+          othersImperial={this.props.i18n[this.props.language].unit_dialog_imperial}
           onClose={this.toggleUnitDialog}
           onReplaceUnit={this.changeUnit}
           selectedUnit={this.state.unit}

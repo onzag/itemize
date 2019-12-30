@@ -183,7 +183,7 @@ export async function gqlQuery(query: GQLQuery) {
   formData.append("operations", operations);
   formData.append("map", JSON.stringify(query.getMap()));
   query.getAttachments().forEach((attachment) => {
-    formData.append(attachment.id, attachment.src);
+    formData.append(attachment.id, attachment.src as File);
   });
   const value = await fetch("/graphql", {
     method: "POST",

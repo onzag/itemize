@@ -155,8 +155,8 @@ export default class PropertyEntryDateTime extends
       const L = getLocalizedDateFormat(true);
       const basicProps = {
         autoOk: true,
-        cancelLabel: this.props.i18n.cancel,
-        okLabel: this.props.i18n.ok,
+        cancelLabel: this.props.i18n[this.props.language].cancel,
+        okLabel: this.props.i18n[this.props.language].ok,
         label: i18nLabel,
         placeholder: i18nPlaceholder,
         inputVariant: "filled" as "filled",
@@ -204,8 +204,8 @@ export default class PropertyEntryDateTime extends
       const basicProps = {
         autoOk: true,
         ampm: LLT.includes("A"),
-        cancelLabel: this.props.i18n.cancel,
-        okLabel: this.props.i18n.ok,
+        cancelLabel: this.props.i18n[this.props.language].cancel,
+        okLabel: this.props.i18n[this.props.language].ok,
         label: i18nLabel,
         placeholder: i18nPlaceholder,
         inputVariant: "filled" as "filled",
@@ -253,8 +253,8 @@ export default class PropertyEntryDateTime extends
       const basicProps = {
         autoOk: true,
         ampm: LT.includes("A"),
-        cancelLabel: this.props.i18n.cancel,
-        okLabel: this.props.i18n.ok,
+        cancelLabel: this.props.i18n[this.props.language].cancel,
+        okLabel: this.props.i18n[this.props.language].ok,
         label: i18nLabel,
         placeholder: i18nPlaceholder,
         inputVariant: "filled" as "filled",

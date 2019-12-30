@@ -25,9 +25,10 @@ export async function buildHTML(rawConfig: any) {
     );
   });
 
+  const buildNumber = (new Date()).getTime().toString();
   baseHTML = baseHTML.replace(
     new RegExp(escapeStringRegexp("%{BUILD_NUMBER}"), "g"),
-    (new Date()).getTime().toString(),
+    buildNumber,
   );
 
   baseHTML = htmlMinifier.minify(
@@ -44,6 +45,6 @@ export async function buildHTML(rawConfig: any) {
   );
 
   const fileName = path.join("dist", "data", "index.html");
-  console.log("emiting " + colors.green(fileName));
+  console.log("emiting " + colors.green(fileName), "BUILD_NUMBER:", colors.yellow(buildNumber));
   await fsAsync.writeFile(fileName, baseHTML);
 }

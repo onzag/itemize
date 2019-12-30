@@ -147,7 +147,7 @@ export default class PropertyEntryLocation
     // and set the value to onchange
     this.props.onChange(
       suggestionFound ?
-        processSuggestion(this.props.i18n.word_separator, suggestionFound) :
+        processSuggestion(this.props.i18n[this.props.language].word_separator, suggestionFound) :
         null,
       autosuggestOverride.newValue,
     );
@@ -180,7 +180,7 @@ export default class PropertyEntryLocation
   ) {
     // set a place directly from a suggestion
     this.props.onChange(
-      processSuggestion(this.props.i18n.word_separator, suggestion),
+      processSuggestion(this.props.i18n[this.props.language].word_separator, suggestion),
       suggestion.title,
     );
     // center the viewport there
@@ -246,7 +246,7 @@ export default class PropertyEntryLocation
         // the first one
         this.props.onChange(
           processSuggestion(
-            this.props.i18n.word_separator,
+            this.props.i18n[this.props.language].word_separator,
             results[0],
             value,
           ),
@@ -298,7 +298,7 @@ export default class PropertyEntryLocation
     // call onchange and set the viewport
     this.props.onChange(
       processSuggestion(
-        this.props.i18n.word_separator,
+        this.props.i18n[this.props.language].word_separator,
         newEndpointData,
         this.props.state.internalValue,
       ),
@@ -507,7 +507,7 @@ export default class PropertyEntryLocation
           <div className={this.props.classes.autocompleteMenuItemSubText}>
             {
               suggestion.vicinity ?
-              suggestion.vicinity.replace(/\<br\/\>/g, this.props.i18n.word_separator + " ") :
+              suggestion.vicinity.replace(/\<br\/\>/g, this.props.i18n[this.props.language].word_separator + " ") :
               null
             }
           </div>
@@ -582,7 +582,7 @@ export default class PropertyEntryLocation
 
     // set the change
     this.props.onChange(
-      processSuggestion(this.props.i18n.word_separator, result, this.props.state.internalValue),
+      processSuggestion(this.props.i18n[this.props.language].word_separator, result, this.props.state.internalValue),
       this.props.state.internalValue,
     );
     // set the viewport, and update the index of the marked value

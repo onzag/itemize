@@ -55,7 +55,7 @@ export function yesno(question: string) {
 
   // parse the data
   const data = JSON.parse(await fsAsync.readFile(
-    path.join("dist", "data", "build.en.json"),
+    path.join("dist", "data", "build.all.json"),
     "utf8",
   ));
 
