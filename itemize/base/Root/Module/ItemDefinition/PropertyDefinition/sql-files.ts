@@ -1,9 +1,10 @@
 import PropertyDefinition, { IPropertyDefinitionIncludedFileInfoType } from ".";
 import ItemDefinition from "..";
 import Item from "../Item";
-import fs from "fs";
+import fs, { ReadStream } from "fs";
 import path from "path";
 import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../../constants";
+import { runImageConversions } from "./image-conversions";
 const fsAsync = fs.promises;
 
 /**
@@ -337,19 +338,10 @@ async function addFileFor(
   type: string,
 }> {
   const { filename, mimetype, createReadStream } = await value.src;
-  // if (
-  //   value.type.startsWith("image/") &&
-  //   FILE_SUPPORTED_IMAGE_TYPES.includes(value.type)
-  // ) {
-  //   fsAsync.unlink(mainFilePath + "_SMALL");
-  //   fsAsync.unlink(mainFilePath + "_MEDIUM");
-  //   fsAsync.unlink(mainFilePath + "_LARGE");
-  // }
-  // const filenamesplitted: string[] = filename.split(".");
-  // const originalExtension = filenamesplitted[filenamesplitted.length - 1].toLowerCase();
 
-  const stream = createReadStream();
-  const writeStream = fs.createWriteStream(path.join(mainFilePath, filename));
+  const storedPath = path.join(mainFilePath, filename);
+  const stream: ReadStream = createReadStream();
+  const writeStream = fs.createWriteStream(storedPath);
   stream.pipe(writeStream);
 
   return new Promise((resolve, reject) => {
@@ -358,6 +350,15 @@ async function addFileFor(
         url: path.join("/rest/uploads", path.join(standardURLPath, filename)),
         type: mimetype.toString(),
       });
+
+      const isImage = FILE_SUPPORTED_IMAGE_TYPES.includes(value.type);
+      if (isImage && !value.type.startsWith("svg")) {
+        runImageConversions(
+          filename,
+          storedPath,
+          propertyDefinition,
+        );
+      }
     });
     writeStream.on("error", reject);
   });

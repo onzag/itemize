@@ -68,7 +68,10 @@
             "maxLength": 1,
             "specialProperties": {
                 "accept": "image",
-                "sizes": "24x24 48x48 128x128"
+                "dimensions": "24 24x24 ; 48 48x48",
+                "smallDimension": "96x96",
+                "mediumDimension": "128x128",
+                "largeDimension": "256x256"
             },
             "nullable": true,
             "editRoleAccess": ["SELF", "ADMIN"]

@@ -193,16 +193,16 @@ const typeValue: IPropertyDefinitionSupportedType = {
       required: true,
     },
     {
-      name: "imperial_unit",
+      name: "imperialUnit",
       type: "string",
       required: true,
     },
     {
-      name: "lock_units_to_primaries",
+      name: "lockUnitsToPrimaries",
       type: "boolean",
     },
     {
-      name: "initial_prefill",
+      name: "initialPrefill",
       type: "number",
     },
   ],

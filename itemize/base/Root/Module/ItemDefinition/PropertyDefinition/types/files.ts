@@ -25,15 +25,15 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: "string",
     },
     {
-      name: "small_dimension",
+      name: "smallDimension",
       type: "string",
     },
     {
-      name: "medium_dimension",
+      name: "mediumDimension",
       type: "string",
     },
     {
-      name: "large_dimension",
+      name: "largeDimension",
       type: "string",
     },
   ],

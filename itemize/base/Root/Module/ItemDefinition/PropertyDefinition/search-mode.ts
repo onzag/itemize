@@ -291,9 +291,9 @@ export function buildSearchModePropertyDefinitions(
       maxDecimalCount: 0,
       specialProperties: {
         unit: "km",
-        imperial_unit: "mi",
-        lock_units_to_primaries: true,
-        initial_prefill: 100,
+        imperialUnit: "mi",
+        lockUnitsToPrimaries: true,
+        initialPrefill: 100,
       },
       i18nData: displaceI18NData(newPropDef.i18nData, ["search", "radius"]),
     };
@@ -304,7 +304,7 @@ export function buildSearchModePropertyDefinitions(
     // and we try to use the special property to prefill to user location
     // so it originally points to whatever the user location is set to
     newPropDef.specialProperties = newPropDef.specialProperties || {};
-    newPropDef.specialProperties.prefill_to_user_location_if_possible = true;
+    newPropDef.specialProperties.prefillToUserLocationIfPossible = true;
   }
 
   // we return both if we have both

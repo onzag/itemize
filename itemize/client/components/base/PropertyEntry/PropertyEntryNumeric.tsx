@@ -85,7 +85,7 @@ export default class PropertyEntryNumeric
       unit: props.property.getType() === "unit" ? (
         unitValue !== null ? unitValue.unit : (
           prefersImperial ?
-          props.property.getSpecialProperty("imperial_unit") as string :
+          props.property.getSpecialProperty("imperialUnit") as string :
           props.property.getSpecialProperty("unit") as string
         )
       ) : null,
@@ -100,7 +100,7 @@ export default class PropertyEntryNumeric
   }
 
   public componentDidMount() {
-    const prefill = this.props.property.getSpecialProperty("initial_prefill") as string;
+    const prefill = this.props.property.getSpecialProperty("initialPrefill") as string;
     if (
       typeof prefill !== "undefined" &&
       prefill !== null &&
@@ -479,8 +479,8 @@ export default class PropertyEntryNumeric
           unitType={this.props.property.getSubtype()}
           preferred={this.props.property.getSpecialProperty("unit") as string}
           prefersImperial={this.props.country.code === "US"}
-          preferredImperial={this.props.property.getSpecialProperty("imperial_unit") as string}
-          lock_units_to_primaries={!!this.props.property.getSpecialProperty("lock_units_to_primaries") as boolean}
+          preferredImperial={this.props.property.getSpecialProperty("imperialUnit") as string}
+          lockUnitsToPrimaries={!!this.props.property.getSpecialProperty("lockUnitsToPrimaries") as boolean}
           dialogClassName={this.props.classes.unitDialog}
           subheaderClassName={this.props.classes.unitDialogSubheader}
         /> : null}
@@ -518,7 +518,7 @@ interface ISelectUnitDialogProps {
   preferred: string;
   prefersImperial: boolean;
   preferredImperial: string;
-  lock_units_to_primaries: boolean;
+  lockUnitsToPrimaries: boolean;
   fullScreen?: boolean;
   dialogClassName: string;
   subheaderClassName: string;
@@ -555,7 +555,7 @@ function SelectUnitDialog(props: ISelectUnitDialogProps) {
             <ListItemText primary={formatUnit(secondaryUnit)}/>
           </ListItem>
         </List>
-        {!props.lock_units_to_primaries ? <React.Fragment>
+        {!props.lockUnitsToPrimaries ? <React.Fragment>
           <Divider/>
           <List
             subheader={<ListSubheader

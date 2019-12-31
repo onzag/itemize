@@ -310,7 +310,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
             const {ref, ...rootProps} = getRootProps();
 
             const files = valueAsInternal.map((value, index) => {
-              const isSupportedImage = value.value.type.startsWith("image/") &&
+              const isSupportedImage = value.value.type.indexOf("image/") === 0 &&
                 FILE_SUPPORTED_IMAGE_TYPES.includes(value.value.type);
               const mainFileClassName = this.props.classes.file +
                 (value.rejected ? " " + this.props.classes.fileRejected : "");
@@ -324,14 +324,27 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                   }
                 }
 
-                const reduceSizeURL =
-                  toUseURL.indexOf("blob:") !== 0 ?
-                    (
-                      !singleFile ?
-                      toUseURL : // + "_SMALL" : TODO activate these
-                      toUseURL// + "_MEDIUM"
-                    ) :
-                    toUseURL;
+                let reduceSizeURL = toUseURL;
+                if (
+                  reduceSizeURL.indexOf("blob:") !== 0 &&
+                  value.value.type.indexOf("svg") !== 0
+                ) {
+                  const splittedURL = reduceSizeURL.split("/");
+                  const fileName = splittedURL.pop();
+                  const baseURL = splittedURL.join("/");
+                  const fileNameDotSplitted = fileName.split(".");
+                  fileNameDotSplitted.pop();
+                  const recoveredFileName = fileNameDotSplitted.join(".");
+                  const fileNameWithoutExtension =
+                    recoveredFileName === "" ?
+                    fileName :
+                    recoveredFileName;
+                  if (singleFile) {
+                    reduceSizeURL = baseURL + "/medium_" + fileNameWithoutExtension + ".jpg";
+                  } else {
+                    reduceSizeURL = baseURL + "/small_" + fileNameWithoutExtension + ".jpg";
+                  }
+                }
                 return (
                   <div
                     className={mainFileClassName}
