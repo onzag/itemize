@@ -185,13 +185,13 @@ export async function gqlQuery(query: GQLQuery) {
   query.getAttachments().forEach((attachment) => {
     formData.append(attachment.id, attachment.src as File);
   });
-  const value = await fetch("/graphql", {
-    method: "POST",
-    cache: "no-cache",
-    body: formData,
-  });
 
   try {
+    const value = await fetch("/graphql", {
+      method: "POST",
+      cache: "no-cache",
+      body: formData,
+    });
     return await value.json();
   } catch (err) {
     return null;

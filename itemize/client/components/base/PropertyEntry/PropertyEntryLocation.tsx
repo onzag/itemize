@@ -220,12 +220,17 @@ export default class PropertyEntryLocation
     this.searchTakingPlace = thisUpdateIdentifier;
 
     // make the async request to the here API
-    const results: IHereResult[] = this.lastSearchValueQ === value ? this.lastSearchValue : (await fetch(
-      `${url}?at=${countryLatitude},${countryLongitude}&q=${value}&app_id=${appId}&app_code=${appCode}`,
-      options,
-    ).then((r) => r.json())).results.items.filter((r: IHereResult, index: number, arr: IHereResult[]) => {
-      return arr.findIndex((r2: IHereResult) => equals(r2.position, r.position)) === index;
-    });
+    let results: IHereResult[] = [];
+    try {
+      results = this.lastSearchValueQ === value ? this.lastSearchValue : (await fetch(
+        `${url}?at=${countryLatitude},${countryLongitude}&q=${value}&app_id=${appId}&app_code=${appCode}`,
+        options,
+      ).then((r) => r.json())).results.items.filter((r: IHereResult, index: number, arr: IHereResult[]) => {
+        return arr.findIndex((r2: IHereResult) => equals(r2.position, r.position)) === index;
+      });
+    } catch (err) {
+      // DO NOTHING
+    }
 
     // due to the async nature some crazy stacking might have happened
     // let's check that only the last one can set the state
@@ -540,19 +545,23 @@ export default class PropertyEntryLocation
     const thisUpdateIdentifier = (new Date()).getTime();
     this.updateTakingPlace = thisUpdateIdentifier;
 
-    const data = await fetch(
-      `${url}?at=${countryLatitude},${countryLongitude}&q=${value}&app_id=${appId}&app_code=${appCode}&size=6`,
-      options,
-    ).then((r) => r.json());
+    try {
+      const data = await fetch(
+        `${url}?at=${countryLatitude},${countryLongitude}&q=${value}&app_id=${appId}&app_code=${appCode}&size=6`,
+        options,
+      ).then((r) => r.json());
 
-    data.results = data.results.filter((s: IHereResult) => s.position);
+      data.results = data.results.filter((s: IHereResult) => s.position);
 
-    if (thisUpdateIdentifier === this.updateTakingPlace) {
-      this.lastSuggestionsValue = data.results;
-      this.lastSuggestionsValueQ = value;
-      this.setState({
-        suggestions: data.results,
-      });
+      if (thisUpdateIdentifier === this.updateTakingPlace) {
+        this.lastSuggestionsValue = data.results;
+        this.lastSuggestionsValueQ = value;
+        this.setState({
+          suggestions: data.results,
+        });
+      }
+    } catch (err) {
+      // DO NOTHING
     }
   }
 

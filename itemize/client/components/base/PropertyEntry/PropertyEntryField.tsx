@@ -339,21 +339,20 @@ export default class PropertyEntryField
     // TODO use service workers on this index check given the request is equal, pass the build
     // number on the fetch request, and if the request is equal this means the output should be the same
     // because the build number and everything is the same
-    const result =
-      await fetch("/rest/autocomplete/" + this.props.property.getAutocompleteId(), {
-        method: "POST",
-        cache: "no-cache",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          lang: this.props.property.isAutocompleteLocalized() ? this.props.language : null,
-          query: value,
-          filters: this.props.property.getAutocompletePopulatedFiltersFor(this.props.forId),
-        }),
-      });
-
     try {
+      const result =
+        await fetch("/rest/autocomplete/" + this.props.property.getAutocompleteId(), {
+          method: "POST",
+          cache: "no-cache",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            lang: this.props.property.isAutocompleteLocalized() ? this.props.language : null,
+            query: value,
+            filters: this.props.property.getAutocompletePopulatedFiltersFor(this.props.forId),
+          }),
+        });
       const output: IAutocompleteOutputType[] = await result.json();
       if (currentFetchRequestTimeId === this.lastAutocompleteFetchRequestTime) {
         this.setState({

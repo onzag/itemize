@@ -29,11 +29,15 @@ export default class HTMLResourceLoader
       }
     }
 
-    const htmlContent =
-      await fetch("/rest/resource/" + this.props.location).then((v) => v.text());
-    this.setState({
-      htmlContent,
-    });
+    try {
+      const htmlContent =
+        await fetch("/rest/resource/" + this.props.location).then((v) => v.text());
+      this.setState({
+        htmlContent,
+      });
+    } catch (err) {
+      // DO NOTHING
+    }
   }
   public componentDidMount() {
     this.load();

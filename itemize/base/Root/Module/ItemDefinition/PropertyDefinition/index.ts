@@ -185,18 +185,18 @@ async function clientSideIndexChecker(
   const qualifiedParentName = property.isExtension() ?
     property.getParentModule().getQualifiedPathName() :
     property.getParentItemDefinition().getQualifiedPathName();
-  const result = await fetch("/rest/index-check/" + qualifiedParentName + "/" + property.getId(), {
-    method: "POST",
-    cache: "no-cache",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      value,
-      id,
-    }),
-  });
   try {
+    const result = await fetch("/rest/index-check/" + qualifiedParentName + "/" + property.getId(), {
+      method: "POST",
+      cache: "no-cache",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        value,
+        id,
+      }),
+    });
     const output = await result.json();
     property.stateLastUniqueCheck[id] = {
       valid: !!output,
@@ -229,18 +229,18 @@ async function clientSideAutocompleteChecker(
   }
 
   // TODO this can actually be cached with the build identifier again
-  const result = await fetch("/rest/autocomplete-check/" + autocompleteId, {
-    method: "POST",
-    cache: "no-cache",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      value,
-      filters,
-    }),
-  });
   try {
+    const result = await fetch("/rest/autocomplete-check/" + autocompleteId, {
+      method: "POST",
+      cache: "no-cache",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        value,
+        filters,
+      }),
+    });
     const output = await result.json();
     property.stateLastAutocompleteCheck[id] = {
       valid: !!output,

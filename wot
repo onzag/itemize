@@ -2,21 +2,33 @@ TODO TECH
 
 - Implement some form of triggers, maybe callback functions in the resolvers, we should have some form of user trigger to remove e_validated and
   whatnot
-
-add a canCreateInBehalf ability to items, to items can be created in regards of someone else
-search function should be able to specify an owner id for requests, optional; for any request
-in the server side during search specifying an owner id should change how the request works, SELF rules should apply
-if it matches
-search function should be able to specify an owner id as the current user id for requests
-search function should be able to register a trigger to the remote listener of when new things are added
-to the specific owner id, (maybe pass a token) the server will trigger a search-updated or something event
-with an ID_CONTAINER
-we need a count function as well (can be added later)
-
-The functionality above will allow messaging between users, by creating an item where only the owner
-has read access, allowing other users to create in behalf of that user, and the user will then get an
-event if there's an active search with that userid
-
-these kind of searchs might be cached?...naaaaah
-
 - Implement service workers
+
+Add canCreateInBehalf functionality, this functionality can have roles and stuff, it does not much other
+than create a component with a different owner id
+
+Add owner based searches as so, where SELF is allowed for checking up
+
+
+
+
+
+
+
+
+
+Add parents, should work as
+
+canBeParented   boolean
+mustBeParented  boolean
+canOnlyBeParentedBy {
+    module: path/path/path,
+    itemDefinition: path/path/path,
+}
+
+Searches should have then
+
+parented_by     qualifiedPathName
+
+parented by searches should be able to be updated or something and have some sort
+of listener for parented searches

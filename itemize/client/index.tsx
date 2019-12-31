@@ -106,10 +106,20 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
     // also returns this JSON information, so we process it
     // as text, if it's not available, to have the actual guessed
     // user data, either from local storage or the server side
-    const guessedUserData = JSON.parse(
-      previouslyGuessedData ||
-      await fetch(`/rest/util/country`).then((r) => r.text()),
-    );
+    let guessedUserData: any;
+    try {
+      guessedUserData = JSON.parse(
+        previouslyGuessedData ||
+        await fetch(`/rest/util/country`).then((r) => r.text()),
+      );
+    } catch (err) {
+      console.log("Error while parsing guessed locale data");
+      guessedUserData = {
+        language: "en",
+        country: "FI",
+        currency: "EUR",
+      };
+    }
 
     // and we set it to local storage afterwards, we don't need to waste requests
     localStorage.setItem("guessedData", JSON.stringify(guessedUserData));
@@ -170,32 +180,37 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
   // the reason the build number gets used, is because of use of service workers
   // basically, we are going to keep this simple, only update the worker if it's
   // a new url, simple, even for this script the build number applies
-  const [initialData, lang] = await Promise.all<any>([
-    fetch(`/rest/resource/build.${initialLang}.json`).then((r) => r.json()),
-    fetch("/rest/resource/lang.json").then((r) => r.json()),
+  try {
+    const [initialData, lang] = await Promise.all<any>([
+      fetch(`/rest/resource/build.${initialLang}.json`).then((r) => r.json()),
+      fetch("/rest/resource/lang.json").then((r) => r.json()),
 
-    initialLang !== "en" ?
-      importScript(`/rest/resource/${initialLang}.moment.js`) : null,
-  ]);
+      initialLang !== "en" ?
+        importScript(`/rest/resource/${initialLang}.moment.js`) : null,
+    ]);
 
-  // the locale of moment is set, note how await was used, hence all the previous script
-  // have been imported, and should be available for moment
-  Moment.locale(initialLang);
-  document.body.parentElement.lang = initialLang;
+    // the locale of moment is set, note how await was used, hence all the previous script
+    // have been imported, and should be available for moment
+    Moment.locale(initialLang);
+    document.body.parentElement.lang = initialLang;
 
-  // finally we render the react thing
-  ReactDOM.render(
-    <Router history={history}>
-      <App
-        initialData={initialData}
-        langLocales={lang.locales}
+    // finally we render the react thing
+    ReactDOM.render(
+      <Router history={history}>
+        <App
+          initialData={initialData}
+          langLocales={lang.locales}
 
-        initialCurrency={initialCurrency}
-        initialCountry={initialCountry}
+          initialCurrency={initialCurrency}
+          initialCountry={initialCountry}
 
-        mainComponent={mainComponent}
-      />
-    </Router>,
-    document.getElementById("app"),
-  );
+          mainComponent={mainComponent}
+        />
+      </Router>,
+      document.getElementById("app"),
+    );
+  } catch (err) {
+    console.error("FATAL ERROR");
+    console.error(err.stack);
+  }
 }
