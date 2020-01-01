@@ -157,7 +157,7 @@ export async function searchItemDefinition(
   // the reason is simple, if we can use the query to query
   // the value of something we don't have access to, then, we
   // can brute force the value; for example, let's say we have
-  // a SELF locked phone_number field, another user might wish
+  // a &SELF locked phone_number field, another user might wish
   // to know that phone number, so he starts a search process
   // and uses the EXACT_phone_number field, he will get returned null
   // until he matches the phone number, this is a leak, a weak one
@@ -167,7 +167,7 @@ export async function searchItemDefinition(
     tokenData.role,
     tokenData.id,
     // And we also use -1 for the same reason as before
-    // this is a search, we ignore SELF
+    // this is a search, we ignore &SELF
     UNSPECIFIED_OWNER,
     searchingFields,
     true,

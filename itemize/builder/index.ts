@@ -55,6 +55,7 @@ import {
   POLICY_OPTIONAL_I18N,
 } from "../constants";
 import { buildAutocomplete } from "./autocomplete";
+import { evalRawJSON } from "./evaler";
 
 if (process.env.NODE_ENV === "production") {
   throw new Error("This script cannot run in production mode");
@@ -126,7 +127,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   }
 })();
 
-async function buildData(rawData: any) {
+async function buildData(rawDataConfig: any) {
   const entryPoint = "data";
 
   // lets get the actual location of the item, lets assume first
@@ -174,7 +175,7 @@ async function buildData(rawData: any) {
   );
 
   // lets get the supported languages
-  const supportedLanguages: string[] = rawData.supportedLanguages;
+  const supportedLanguages: string[] = rawDataConfig.supportedLanguages;
 
   // and make the result JSON
   const resultJSON: IRootRawJSONDataType = {
@@ -183,6 +184,7 @@ async function buildData(rawData: any) {
     pointers: fileData.pointers,
     children: fileData.data.includes ?
       (await buildIncludes(
+        rawDataConfig,
         supportedLanguages,
         path.dirname(actualLocation),
         path.dirname(actualLocation),
@@ -283,6 +285,7 @@ async function buildData(rawData: any) {
  * @returns                              an array with raw modules and items
  */
 async function buildIncludes(
+  rawDataConfig: any,
   supportedLanguages: string[],
   parentFolder: string,
   lastModuleDirectory: string,
@@ -352,6 +355,7 @@ async function buildIncludes(
 
       // we would process a module
       result.push(await buildModule(
+        rawDataConfig,
         supportedLanguages,
         actualLocation,
         fileData.data,
@@ -368,6 +372,7 @@ async function buildIncludes(
       }
       // we would process an item
       result.push(await buildItemDefinition(
+        rawDataConfig,
         supportedLanguages,
         actualLocation,
         lastModuleDirectory,
@@ -397,6 +402,7 @@ async function buildIncludes(
  * @returns a raw module
  */
 async function buildModule(
+  rawDataConfig: any,
   supportedLanguages: string[],
   actualLocation: string,
   fileData: IFileModuleDataRawUntreatedJSONDataType,
@@ -404,7 +410,12 @@ async function buildModule(
   raw: string,
   traceback: Traceback,
 ) {
-  ajvCheck(checkModuleSchemaValidate, fileData, traceback);
+  const actualEvaledFileData: IFileModuleDataRawUntreatedJSONDataType =
+    evalRawJSON(
+      rawDataConfig,
+      fileData,
+    );
+  ajvCheck(checkModuleSchemaValidate, actualEvaledFileData, traceback);
 
   const actualName = await getActualFileIdentifier(
     actualLocation,
@@ -480,11 +491,12 @@ async function buildModule(
     i18nDataLocation,
     pointers,
     raw,
-    children: fileData.includes ? await buildIncludes(
+    children: actualEvaledFileData.includes ? await buildIncludes(
+      rawDataConfig,
       supportedLanguages,
       actualLocationDirectory,
       actualLocationDirectory,
-      fileData.includes,
+      actualEvaledFileData.includes,
       false,
       false,
       traceback.newTraceToBit("includes"),
@@ -513,6 +525,7 @@ async function buildModule(
  * @returns a raw treated item
  */
 async function buildItemDefinition(
+  rawDataConfig: any,
   supportedLanguages: string[],
   actualLocation: string,
   lastModuleDirectory: string,
@@ -521,7 +534,12 @@ async function buildItemDefinition(
   raw: string,
   traceback: Traceback,
 ) {
-  ajvCheck(checkItemDefinitionSchemaValidate, fileData, traceback);
+  const actualEvaledFileData: IFileItemDefinitionUntreatedRawJSONDataType =
+    evalRawJSON(
+      rawDataConfig,
+      fileData,
+    );
+  ajvCheck(checkItemDefinitionSchemaValidate, actualEvaledFileData, traceback);
 
   const actualName = await getActualFileIdentifier(
     actualLocation,
@@ -533,13 +551,13 @@ async function buildItemDefinition(
   const i18nData = await getI18nData(
     i18nDataLocation,
     supportedLanguages,
-    fileData.policies,
+    actualEvaledFileData.policies,
     traceback,
   );
 
   // lets get the file definitions that are imported that exist
   await Promise.all(
-    (fileData.imports || []).map((imp, index) => {
+    (actualEvaledFileData.imports || []).map((imp, index) => {
       return getActualFileLocation(
          path.join(lastModuleDirectory, imp),
          traceback.newTraceToBit("imports").newTraceToBit(index),
@@ -550,7 +568,7 @@ async function buildItemDefinition(
   // lets get the file definitions that are imported
   // as an array for use by the browser
   const importedChildDefinitions =
-    ((fileData as
+    ((actualEvaledFileData as
       IFileItemDefinitionUntreatedRawJSONDataType).imports || [])
       .map((l) => l.split("/"));
 
@@ -562,6 +580,7 @@ async function buildItemDefinition(
   if (path.basename(actualLocation) === "index.json") {
     childDefinitions =
       (await buildIncludes(
+        rawDataConfig,
         supportedLanguages,
         path.dirname(actualLocation),
         lastModuleDirectory,
@@ -583,30 +602,30 @@ async function buildItemDefinition(
     i18nDataLocation,
     pointers,
     raw,
-    includes: fileData.includes,
-    properties: fileData.properties,
-    type: fileData.type,
-    policies: fileData.policies,
+    includes: actualEvaledFileData.includes,
+    properties: actualEvaledFileData.properties,
+    type: actualEvaledFileData.type,
+    policies: actualEvaledFileData.policies,
   };
 
-  if (fileData.readRoleAccess) {
-    finalValue.readRoleAccess = fileData.readRoleAccess;
+  if (actualEvaledFileData.readRoleAccess) {
+    finalValue.readRoleAccess = actualEvaledFileData.readRoleAccess;
   }
 
-  if (fileData.createRoleAccess) {
-    finalValue.createRoleAccess = fileData.createRoleAccess;
+  if (actualEvaledFileData.createRoleAccess) {
+    finalValue.createRoleAccess = actualEvaledFileData.createRoleAccess;
   }
 
-  if (fileData.editRoleAccess) {
-    finalValue.editRoleAccess = fileData.editRoleAccess;
+  if (actualEvaledFileData.editRoleAccess) {
+    finalValue.editRoleAccess = actualEvaledFileData.editRoleAccess;
   }
 
-  if (fileData.deleteRoleAccess) {
-    finalValue.deleteRoleAccess = fileData.deleteRoleAccess;
+  if (actualEvaledFileData.deleteRoleAccess) {
+    finalValue.deleteRoleAccess = actualEvaledFileData.deleteRoleAccess;
   }
 
-  if (fileData.ownerIsObjectId) {
-    finalValue.ownerIsObjectId = fileData.ownerIsObjectId;
+  if (actualEvaledFileData.ownerIsObjectId) {
+    finalValue.ownerIsObjectId = actualEvaledFileData.ownerIsObjectId;
   }
 
   if (!finalValue.includes ||

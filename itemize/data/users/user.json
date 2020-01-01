@@ -31,8 +31,8 @@
             "subtype": "email",
             "searchable": false,
             "nullable": true,
-            "readRoleAccess": ["SELF", "ADMIN"],
-            "editRoleAccess": ["SELF", "ADMIN"]
+            "readRoleAccess": ["&SELF", "ADMIN"],
+            "editRoleAccess": ["&SELF", "ADMIN"]
         },
         {
             "id": "e_validated",
@@ -50,12 +50,12 @@
             "htmlAutocomplete": "current-password",
             "disableRetrieval": true,
             "readRoleAccess": [],
-            "editRoleAccess": ["SELF", "ADMIN"]
+            "editRoleAccess": ["&SELF", "ADMIN"]
         },
         {
             "id": "role",
             "type": "string",
-            "values": ["USER", "MODERATOR", "ADMIN"],
+            "values": "$CONFIG:return config.roles;",
             "nullable": true,
             "default": "USER",
             "editRoleAccess": ["ADMIN"],
@@ -74,31 +74,31 @@
                 "largeDimension": "256x256"
             },
             "nullable": true,
-            "editRoleAccess": ["SELF", "ADMIN"]
+            "editRoleAccess": ["&SELF", "ADMIN"]
         },
         {
             "id": "address",
             "type": "location",
             "nullable": true,
-            "readRoleAccess": ["SELF"],
+            "readRoleAccess": ["&SELF"],
             "searchable": false
         }
     ],
     "policies": {
         "edit": {
             "REQUIRES_PASSWORD_CONFIRMATION": {
-                "roles": ["USER", "MODERATOR"],
+                "roles": "$CONFIG:return config.roles.filter((r) => r !== 'ADMIN');",
                 "properties": ["password"],
                 "applyingProperties": ["username", "password"]
             }
         },
         "delete": {
             "REQUIRES_PASSWORD_CONFIRMATION": {
-                "roles": ["USER", "MODERATOR"],
+                "roles": "$CONFIG:return config.roles.filter((r) => r !== 'ADMIN');",
                 "properties": ["password"]
             }
         }
     },
-    "createRoleAccess": ["GUEST", "ADMIN"],
+    "createRoleAccess": ["&GUEST", "ADMIN"],
     "ownerIsObjectId": true
 }
