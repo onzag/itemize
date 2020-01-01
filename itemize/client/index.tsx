@@ -1,4 +1,4 @@
-import "./theme/base.scss";
+import "./internal/theme/base.scss";
 import ReactDOM from "react-dom";
 import React from "react";
 import { Router } from "react-router-dom";

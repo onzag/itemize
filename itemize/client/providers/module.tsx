@@ -1,8 +1,8 @@
 import React from "react";
 import Module from "../../base/Root/Module";
-import { DataContext } from "../app";
+import { DataContext } from "../internal/app";
 import Root from "../../base/Root";
-import { RemoteListener } from "../app/remote-listener";
+import { RemoteListener } from "../internal/app/remote-listener";
 
 export interface IModuleContextType {
   mod: Module;

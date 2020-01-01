@@ -9,7 +9,7 @@ import uuid from "uuid";
 import { Ii18NType } from "../../../../base/Root";
 
 import "react-quill/dist/quill.core.css";
-import "../../../theme/quill.scss";
+import "../../../internal/theme/quill.scss";
 
 // TODO implement missing toolbar functionality
 function RichTextEditorToolbar(props: {id: string, i18n: Ii18NType, language: string}) {
