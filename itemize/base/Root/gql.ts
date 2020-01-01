@@ -56,7 +56,9 @@ export interface IGQLValue {
  * Retrieves the whole structure of the current loaded instance
  * of the schema into a valid graphql schema
  * @param root the Root of he schema
- * @param resolvers the resolvers that will resolve the GET, SEARCH, ADD, EDIT and REMOVE requests
+ * @param customQueries custom queries that are added to the root query
+ * @param customMutations custom mutations that are added to the root mutation
+ * @param resolvers the resolvers
  */
 export function getGQLSchemaForRoot(
   root: Root,

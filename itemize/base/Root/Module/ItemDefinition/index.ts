@@ -11,6 +11,7 @@ import {
   ANYONE_LOGGED_METAROLE,
   GUEST_METAROLE,
   UNSPECIFIED_OWNER,
+  EXCLUSION_STATE_SUFFIX,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { GraphQLEndpointError } from "../../../errors";
@@ -304,11 +305,18 @@ export default class ItemDefinition {
     return this.rawData.name;
   }
 
+  /**
+   * Provides the path of a given item definition from
+   * the module root
+   */
   public getPath(): string[] {
     const parentPath = this.parentItemDefinition ? this.parentItemDefinition.getPath() : [];
     return parentPath.concat(this.getName());
   }
 
+  /**
+   * Provides the module name that contains this item definition
+   */
   public getModuleName(): string {
     return this.parentModule.getName();
   }
@@ -393,10 +401,21 @@ export default class ItemDefinition {
     return definition;
   }
 
+  /**
+   * Checks whether an item included in this item definition
+   * has an specific id
+   * @param id the id of the item
+   */
   public hasItemFor(id: string) {
     return !!this.itemInstances.find((ii) => ii.getId() === id);
   }
 
+  /**
+   * provides an item within this item defintion that has that
+   * specific id
+   * @param id the id of the item
+   * @throws an error if it cannot find the item
+   */
   public getItemFor(id: string) {
     const item = this.itemInstances.find((ii) => ii.getId() === id);
     if (!item) {
@@ -438,10 +457,17 @@ export default class ItemDefinition {
     return this.propertyDefinitions;
   }
 
+  /**
+   * Provides all that property defintiions
+   * including the extensions
+   */
   public getAllPropertyDefinitionsAndExtensions() {
     return this.parentModule.getAllPropExtensions().concat(this.getAllPropertyDefinitions());
   }
 
+  /**
+   * Provides all the item instances
+   */
   public getAllItems() {
     return this.itemInstances;
   }
@@ -482,6 +508,14 @@ export default class ItemDefinition {
     return definition;
   }
 
+  /**
+   * Provides a property definition based on a policy
+   * this is a unique instance that holds its own state
+   * and it's reflected in the item definition state
+   * @param policyType the policy type
+   * @param policyName the policy name
+   * @param id the property id
+   */
   public getPropertyDefinitionForPolicy(
     policyType: string,
     policyName: string,
@@ -505,6 +539,7 @@ export default class ItemDefinition {
    * which are active and match the specific name
    * that means the item is not excluded and the item is
    * matches the name
+   * @param id the id of the current state
    * @param name the name of the item
    */
   public hasAtLeastOneActiveInstanceOf(id: number, name: string): boolean {
@@ -588,7 +623,6 @@ export default class ItemDefinition {
 
   /**
    * Provides the live imported child definitions
-   * without imports
    */
   public getImportedChildDefinitions() {
     return this.importedChildDefinitions.map((icd) => icd.definition);
@@ -630,6 +664,7 @@ export default class ItemDefinition {
    * properties, note property definitions are not fetched in
    * this case
    * @param excludeItems excludes the items in the list
+   * @param excludePolicies excludes all the policies state
    */
   public getStateNoExternalChecking(
     id: number,
@@ -696,6 +731,7 @@ export default class ItemDefinition {
    * properties, note property definitions are not fetched in
    * this case
    * @param excludeItems excludes the items in the list
+   * @param excludePolicies excludes all the policies state bit
    */
   public async getState(
     id: number,
@@ -747,7 +783,14 @@ export default class ItemDefinition {
   }
 
   /**
-   * Applies an item definition value from a graphql data
+   * Applies a value from graphql to the item definition state
+   * @param id the id that this state is for (can be null)
+   * @param value the value itself from graphql, DATA values and flattened values are valid.
+   * @param excludeExtensions whether to exclude the extensions for applying the value
+   * @param graphqlRoleRequester the role that requested this data (can be null)
+   * @param graphqlUserIdRequester the user id that requested this data (can be null)
+   * @param requestFields the fields that were used to request this data (can be null) but be careful
+   * this might be used for catching
    */
   public applyValue(
     id: number,
@@ -759,8 +802,11 @@ export default class ItemDefinition {
     graphqlRoleRequester: string,
     requestFields: any,
   ) {
+    // first we flatten the value if necessary
     const flattenedValue = typeof value.DATA !== "undefined" ? flattenRawGQLValueOrFields(value) : value;
+    // we make it we have an applied value
     this.stateHasAppliedValueTo[id] = true;
+    // and set all the data regarding that value
     this.stateGQLAppliedValue[id] = {
       userIdRequester: graphqlUserIdRequester,
       roleRequester: graphqlRoleRequester,
@@ -769,30 +815,51 @@ export default class ItemDefinition {
       requestFields,
     };
 
+    // now we get all the properties that we are supposed to apply that value to
     const properties =
       excludeExtensions ?
         this.getAllPropertyDefinitions() :
         this.getAllPropertyDefinitionsAndExtensions();
+
+    // and loop loop
     properties.forEach((property) => {
+      // we get the value we are supposed to apply
       let givenValue = flattenedValue[property.getId()];
+
+      // and decide whether we will set it as modified, if the value
+      // is undefined, it acts like a delete, wipe, unmodified default
+      // value
       let setAsModified = true;
       if (typeof givenValue === "undefined") {
         setAsModified = false;
         givenValue = null;
       }
+      // and we apply such value
       property.applyValue(id, givenValue, setAsModified);
     });
+
+    // now we get all the items
     this.getAllItems().forEach((item) => {
+      // and we get the applied value for thae item
       let givenValue = flattenedValue[item.getQualifiedIdentifier()];
       if (typeof givenValue === "undefined") {
         givenValue = null;
       }
+      // and the exclusion state, or excluded if not specified
       const givenExclusionState =
         flattenedValue[item.getQualifiedExclusionStateIdentifier()] || ItemExclusionState.EXCLUDED;
+
+      // and we apply such value
       item.applyValue(id, givenValue, givenExclusionState);
     });
   }
 
+  /**
+   * Provides the owner that applied the value for the
+   * applied value, basically the created_by value
+   * (or id if owner is object id, which is only relevant for users honestly)
+   * @param id the id of the state
+   */
   public getAppliedValueOwnerIfAny(id: number) {
     if (
       !this.stateHasAppliedValueTo[id] ||
@@ -808,26 +875,47 @@ export default class ItemDefinition {
     return this.stateGQLAppliedValue[id].flattenedValue.created_by || UNSPECIFIED_OWNER;
   }
 
+  /**
+   * Wipes down a value and its state and everything out of memory
+   * this might not be important in the client side but very important
+   * in the server side, not cleaning the memory can become a memory leak
+   * @param id the id of the state
+   * @param excludeExtensions whether to include the extensions of the parent
+   */
   public cleanValueFor(id: number, excludeExtensions?: boolean) {
+    // delete all from memory
     delete this.stateHasAppliedValueTo[id];
     delete this.stateGQLAppliedValue[id];
 
+    // gather the properties
     const properties =
       excludeExtensions ?
         this.getAllPropertyDefinitions() :
         this.getAllPropertyDefinitionsAndExtensions();
+
+    // and wipe them
     properties.forEach((property) => {
       property.cleanValueFor(id);
     });
+    // also the items
     this.getAllItems().forEach((item) => {
       item.cleanValueFor(id);
     });
   }
 
+  /**
+   * Checks whether given the state id, there is an applied
+   * value for it
+   * @param id the id
+   */
   public hasAppliedValueTo(id: number): boolean {
-    return !!this.stateHasAppliedValueTo[id];
+    return this.stateHasAppliedValueTo[id];
   }
 
+  /**
+   * Provides the applied value for the id
+   * @param id the id
+   */
   public getGQLAppliedValue(id: number): IItemDefinitionGQLValueType {
     return this.stateGQLAppliedValue[id] || null;
   }
@@ -845,6 +933,10 @@ export default class ItemDefinition {
     );
   }
 
+  /**
+   * Basically only works in search mode item definitions, and provides the standard
+   * counterpart
+   */
   public getStandardCounterpart(): ItemDefinition {
     return this.parentModule.getStandardModule().getItemDefinitionFor(
       this.getModulePath(),
@@ -859,19 +951,40 @@ export default class ItemDefinition {
     return this.parentModule.isInSearchMode();
   }
 
+  /**
+   * Provides the roles that have access to a given
+   * action based on the rules that were set
+   * @param action the action from the ItemDefinitionIOActions
+   */
   public getRolesWithAccessTo(action: ItemDefinitionIOActions) {
     if (action === ItemDefinitionIOActions.READ) {
+      // Anyone can read by default
       return this.rawData.readRoleAccess || [ANYONE_METAROLE];
     } else if (action === ItemDefinitionIOActions.CREATE) {
+      // Anyone logged can create by default
       return this.rawData.createRoleAccess || [ANYONE_LOGGED_METAROLE];
     } else if (action === ItemDefinitionIOActions.EDIT) {
+      // Only the owner of the item can edit by default
       return this.rawData.editRoleAccess || [SELF_METAROLE];
     } else if (action === ItemDefinitionIOActions.DELETE) {
+      // Only the owner of the item can delete it by default
       return this.rawData.deleteRoleAccess || [SELF_METAROLE];
     }
+
+    // ???? really this shouldn't happen
     return [];
   }
 
+  /**
+   * Checks the role access for an action in an item
+   * defintition
+   * @param action the IO action
+   * @param role the role of the user attempting the action
+   * @param userId the user id of the user attempting the action
+   * @param ownerUserId the owner of that item definition
+   * @param requestedFields the requested fields (single properties will be checked as well)
+   * @param throwError whether to throw an error if failed (otherwise returns a boolean)
+   */
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
@@ -880,8 +993,13 @@ export default class ItemDefinition {
     requestedFields: any,
     throwError: boolean,
   ) {
+    // if you are in guest mode, it is considered, that if you
+    // fail, it's because you missed to login
     const notLoggedInWhenShould = role === GUEST_METAROLE;
+    // now let's get the roles that have access to the action
     const rolesWithAccess = this.getRolesWithAccessTo(action);
+    // if anyone is included, or anyone logged is included and you are not
+    // a guest, or your role is included
     const idefLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
     (
       rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
@@ -889,26 +1007,41 @@ export default class ItemDefinition {
       rolesWithAccess.includes(SELF_METAROLE) && userId === ownerUserId
     ) || rolesWithAccess.includes(role);
 
+    // if you got not access
     if (!idefLevelAccess) {
+      // let's check the throw error flag
       if (throwError) {
         throw new GraphQLEndpointError({
           message: `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
           ` only roles ${rolesWithAccess.join(", ")} can be granted access`,
+          // this is where the code comes in handy, it's forbidden by default, and must be logged in for guests
           code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
         });
       }
       return false;
     }
 
+    // if the action is delete and we passsed, there are no properties to check
+    // properties don't have a delete role filter, so we return true
     if (action === ItemDefinitionIOActions.DELETE) {
       return true;
     }
 
+    // otherwise we go in the requested fields, in each one of them
     return Object.keys(requestedFields).every((requestedField) => {
+      // and we check if it's an item (or a exclusion state)
       if (requestedField.startsWith(ITEM_PREFIX)) {
-        const item = this.getItemFor(requestedField.replace(ITEM_PREFIX, ""));
+        // so now we extract the item name from that
+        let requestedFieldItemName = requestedField.replace(ITEM_PREFIX, "");
+        if (requestedFieldItemName.endsWith(EXCLUSION_STATE_SUFFIX)) {
+          requestedFieldItemName = requestedFieldItemName.replace(EXCLUSION_STATE_SUFFIX, "");
+        }
+        // request the item
+        const item = this.getItemFor(requestedFieldItemName);
+        // and check the role access for it
         return item.checkRoleAccessFor(action, role, userId, ownerUserId, requestedFields[requestedField], throwError);
       } else {
+        // also for the property
         const propDef = this.getPropertyDefinitionFor(requestedField, true);
         return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
       }
@@ -958,6 +1091,13 @@ export default class ItemDefinition {
       ]);
   }
 
+  /**
+   * Returns true is one of the property has to be externally checked
+   * either by database or rest endpoints, this is basically unique
+   * and autocomplete indexed values
+   * @param onlyCheckProperties only to check the properties in this list
+   * @param ignoreItems whether to ignore the sinked in properties in the items
+   */
   public containsAnExternallyCheckedProperty(
     onlyCheckProperties?: string[],
     ignoreItems?: boolean,
@@ -986,6 +1126,10 @@ export default class ItemDefinition {
     return PREFIXED_CONCAT(this.parentModule.getQualifiedPathName(), ITEM_DEFINITION_PREFIX + this.getName());
   }
 
+  /**
+   * Provides all policy names included in the policy of type
+   * @param policyType the policy type, "edit" or "delete"
+   */
   public getPolicyNamesFor(policyType: string): string[] {
     if (!this.rawData.policies || !this.rawData.policies[policyType]) {
       return [];
@@ -993,21 +1137,44 @@ export default class ItemDefinition {
     return Object.keys(this.rawData.policies[policyType]);
   }
 
+  /**
+   * Provides all live properties for a policy, these properties
+   * are detached properties, new instances of the old property and hold
+   * their own states
+   * @param type the type "edit", "delete"
+   * @param name the policy name that was set
+   */
   public getPropertiesForPolicy(type: string, name: string): PropertyDefinition[] {
     return this.rawData.policies[type][name].properties.map(
       (propertyId: string) => this.getPropertyDefinitionForPolicy(type, name, propertyId),
     );
   }
 
+  /**
+   * Provides all the property ids that are affected by a given policy
+   * @param type the policy type "edit", "delete"
+   * @param name the policy name
+   */
   public getApplyingPropertyIdsForPolicy(type: string, name: string): string[] {
     const applyingProperties = this.rawData.policies[type][name].applyingProperties;
     return applyingProperties || null;
   }
 
-  public getRolesForPolicy(policy: string, name: string): string[] {
-    return this.rawData.policies[policy][name].roles;
+  /**
+   * Provides all the roles that are affected by a policy
+   * @param type the policy type "edit", "delete"
+   * @param name the policy name
+   */
+  public getRolesForPolicy(type: string, name: string): string[] {
+    return this.rawData.policies[type][name].roles;
   }
 
+  /**
+   * Adds a listener for an string event and id
+   * @param event the event string
+   * @param id the id
+   * @param listener the listener
+   */
   public addListener(event: string, id: number, listener: ListenerType) {
     if (!this.listeners[event]) {
       this.listeners[event] = {};
@@ -1016,6 +1183,12 @@ export default class ItemDefinition {
     this.listeners[event][id].push(listener);
   }
 
+  /**
+   * Removes a listener
+   * @param event the event string
+   * @param id the id
+   * @param listener the listener
+   */
   public removeListener(event: string, id: number, listener: ListenerType) {
     if (!this.listeners[event] || !this.listeners[event][id]) {
       return;
@@ -1026,6 +1199,16 @@ export default class ItemDefinition {
     }
   }
 
+  /**
+   * Triggers a listener for a given id
+   * note this will affect the extensions as well because
+   * their states are correlated
+   * @param event the event
+   * @param id the id
+   * @param but a function not to trigger (one of the listeners)
+   * @param callId a call id, it's an unique identifier for this event, it will be autogenerated if not provided
+   * and it's the best to leave it be autogenerated
+   */
   public triggerListeners(event: string, id: number, but?: ListenerType, callId?: string) {
     if (this.lastListenerCallId !== callId) {
       this.lastListenerCallId = callId || uuid.v4();
@@ -1044,6 +1227,13 @@ export default class ItemDefinition {
     }
   }
 
+  /**
+   * Merges two i18n data components, for example the i18n data for
+   * the english build and the i18n data for the russian build, that way
+   * the state is not lost
+   * @param mod the raw module that is merging
+   * @param idef the raw item definition that is merging
+   */
   public mergeWithI18n(
     mod: IModuleRawJSONDataType,
     idef: IItemDefinitionRawJSONDataType,
@@ -1076,6 +1266,11 @@ export default class ItemDefinition {
     });
   }
 
+  /**
+   * Checks whether the owner of this item definition is not supposed to be
+   * the created_by field but rather the id field, this only makes sense
+   * in users, an user owns itself
+   */
   public isOwnerObjectId() {
     return this.rawData.ownerIsObjectId || false;
   }

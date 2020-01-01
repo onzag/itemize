@@ -33,6 +33,8 @@ import { GraphQLEndpointError } from "../../../errors";
  * @param options.excludeBase whether to exclude the base properties, like created_at, etc..
  * @param options.propertiesAsInput if the properties should be in input form
  * @param options.optionalForm makes all the parameters optional, that is nullable
+ * @param options.includePolicy whether to include the policies in the result, this is a string
+ * that specifies the policy type that is to be included, eg "edit", "delete"
  */
 export function getGQLFieldsDefinitionForItemDefinition(
   itemDefinition: ItemDefinition,
@@ -95,8 +97,8 @@ export function getGQLFieldsDefinitionForItemDefinition(
  * Provides the fields that are required to include policy data for property
  * definitions
  * @param itemDefinition the item definition in question
+ * @param options.policy the policy type that should be included, eg "edit", "delete"
  * @param options.propertiesAsInput if the properties should be in input form
- * @param options.optionalForm makes all the parameters optional, that is nullable
  */
 export function getGQLFieldsDefinitionForItemDefinitionPolicies(
   itemDefinition: ItemDefinition,
@@ -151,20 +153,32 @@ export function getGQLTypeForItemDefinition(itemDefinition: ItemDefinition): Gra
   return itemDefinition._gqlObj;
 }
 
+/**
+ * Provides the query output, that is what a GET_ query provides in an item
+ * being so that the DATA attributes are there and the external attributes
+ * as well, the non flattened form, this is because of blocked rules
+ * @param itemDefinition the item definition in question
+ */
 export function getGQLQueryOutputForItemDefinition(itemDefinition: ItemDefinition): GraphQLObjectType {
+  // first we check if we haven't done it before
   if (!itemDefinition._gqlQueryObj) {
+    // now we get the type, the basic type
     const itemDefinitionObj = getGQLTypeForItemDefinition(itemDefinition);
 
+    // add the fields
     const fields = {
       DATA: {
         type: itemDefinitionObj,
       },
     };
 
+    // add the externally accessible fields nby hand, using the graphql
+    // definition that those externally accessible fields have
     EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
       fields[property] = RESERVED_BASE_PROPERTIES[property];
     });
 
+    // now we define the query object
     itemDefinition._gqlQueryObj = new GraphQLObjectType({
       name: itemDefinition.getQualifiedPathName() + "__QUERY_OBJECT",
       fields,
@@ -176,9 +190,22 @@ export function getGQLQueryOutputForItemDefinition(itemDefinition: ItemDefinitio
     });
   }
 
+  // return the query object
   return itemDefinition._gqlQueryObj;
 }
 
+/**
+ * A generic function to bind in the
+ * server side to resolve in a way that
+ * this catches errors
+ * @param resolveToUse which resolve to use
+ * @param itemDefinition the item definition in question
+ * @param resolvers the resolvers object
+ * @param source parameter source obtained from graphql
+ * @param args obtained from graphql as well
+ * @param context same
+ * @param info also
+ */
 async function resolveGenericFunction(
   resolveToUse: string,
   itemDefinition: ItemDefinition,
@@ -188,8 +215,12 @@ async function resolveGenericFunction(
   context: any,
   info: any,
 ): Promise<any> {
+  // so firstly the value is null
   let value = null;
+  // if we have a resolvers
   if (resolvers) {
+    // we try to get the value, resolvers
+    // are expected to be async functions
     try {
       value = await resolvers[resolveToUse]({
         source,
@@ -198,9 +229,13 @@ async function resolveGenericFunction(
         info,
       }, itemDefinition);
     } catch (err) {
+      // if we catch an error, we check
+      // if it's an expected error the user should see
       if (err instanceof GraphQLEndpointError) {
         throw err;
       }
+      // otherwise this is an internal server error
+      // the user shouldn't receive that
       console.error(err.stack);
       throw new GraphQLEndpointError({
         message: "Internal Server Error",
@@ -208,12 +243,14 @@ async function resolveGenericFunction(
       });
     }
   }
+  // return the value we got
   return value;
 }
 
 /**
- * Provides all the query fields for the given item definition, including all
- * the children item definitions that are included within this item definition
+ * Provides all the GET, GET_LIST and SEARCH query fields for the given item definition, including
+ * all the search queries of the children item definitions as well
+ * @param itemDefinition the item definition that we should retrieve these from
  * @param resolvers the resolvers object that will be used to populate the resolvers
  * of the query fields
  */
@@ -230,6 +267,8 @@ export function getGQLQueryFieldsForItemDefinition(
   // for our query
   const searchModeCounterpart = itemDefinition.getSearchModeCounterpart();
 
+  // so we use the query output, the one that includes DATA and external fields
+  // as the output because that's what we expect
   const type = getGQLQueryOutputForItemDefinition(itemDefinition);
 
   // now we add the queries
@@ -241,12 +280,16 @@ export function getGQLQueryFieldsForItemDefinition(
       // we just pipe the arguments out of the resolver
       resolve: resolveGenericFunction.bind(null, "getItemDefinition", itemDefinition, resolvers),
     },
+    // for the list we just make a list of our basic externalized output with DATA type
     [PREFIX_GET_LIST + itemDefinition.getQualifiedPathName()]: {
       type: GraphQLList(type),
       args: RESERVED_GETTER_LIST_PROPERTIES,
       resolve: resolveGenericFunction.bind(null, "getItemDefinitionList", itemDefinition, resolvers),
     },
-    // now this is the search query
+    // now this is the search query, note how we use the search mode counterpart
+    // retrieval mode is false, properties are meant to be in input mode for the args,
+    // we exclude the base properties, eg. id, type, etc... make all the fields optional,
+    // and don't include any policy (there are no policies in search mode anyway)
     [PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()]: {
       type: ID_CONTAINER_GQL,
       args: {
@@ -271,12 +314,15 @@ export function getGQLQueryFieldsForItemDefinition(
     };
   });
 
+  // return that
   return fields;
 }
 
 /**
  * Provides all the fields for the mutations that are required to take
- * place in order to ADD, EDIT and DELETE item definition values
+ * place in order to ADD, EDIT and DELETE item definition values, this
+ * also goes through all the children
+ * @param itemDefinition the item definition in question
  * @param resolvers the resolvers for the graphql mutations to populate
  */
 export function getGQLMutationFieldsForItemDefinition(
@@ -288,6 +334,7 @@ export function getGQLMutationFieldsForItemDefinition(
     throw new Error("Modules in search mode has no graphql mutations");
   }
 
+  // we get the basic type as well
   const type = getGQLQueryOutputForItemDefinition(itemDefinition);
 
   // now we populate the fields as we need to

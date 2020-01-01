@@ -25,6 +25,8 @@ export function requestFieldsAreContained(requestFieldsSubset: any, requestField
 export function deepMerge(gqlValueOrFieldsOverride: any, gqlValueOfFieldsOverriden: any): any {
   if (typeof gqlValueOrFieldsOverride !== "object" || gqlValueOrFieldsOverride === null) {
     return gqlValueOrFieldsOverride;
+  } else if (Array.isArray(gqlValueOrFieldsOverride)) {
+    return gqlValueOrFieldsOverride;
   }
 
   const newObjMerge = {

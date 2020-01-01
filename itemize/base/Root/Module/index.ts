@@ -166,10 +166,6 @@ export default class Module {
    */
   private propExtensions: PropertyDefinition[];
 
-  private listeners: {
-    [id: number]: ListenerType[],
-  };
-
   /**
    * Builds a module from raw json data
    * @param rawJSON the raw json data of the module
@@ -258,8 +254,6 @@ export default class Module {
       readRoleAccess: this.rawData.readRoleAccess,
     }, this, null);
     this.childPropExtensionItemDefinition.setAsExtensionsInstance();
-
-    this.listeners = [];
   }
 
   /**
@@ -488,6 +482,9 @@ export default class Module {
     return this.parentModule;
   }
 
+  /**
+   * Provides the path of the module from the root
+   */
   public getPath(): string[] {
     const parentPath = this.parentModule ? this.parentModule.getPath() : [];
     return parentPath.concat(this.getName());
@@ -498,28 +495,6 @@ export default class Module {
    */
   public hasParentModule() {
     return !!this.parentModule;
-  }
-
-  public addListener(id: number, listener: ListenerType) {
-    this.listeners[id] = this.listeners[id] || [];
-    this.listeners[id].push(listener);
-  }
-
-  public removeListener(id: number, listener: ListenerType) {
-    if (!this.listeners[id]) {
-      return;
-    }
-    const index = this.listeners[id].indexOf(listener);
-    if (index !== -1) {
-      this.listeners[id].splice(index, 1);
-    }
-  }
-
-  public triggerListeners(id: number, but?: ListenerType) {
-    if (!this.listeners[id]) {
-      return;
-    }
-    this.listeners[id].filter((l) => l !== but).forEach((l) => l());
   }
 
   /**
@@ -548,13 +523,29 @@ export default class Module {
     return [this.getName()];
   }
 
+  /**
+   * Provides the roles that have access to a given
+   * action based on the rules that were set
+   * @param action the action from the ItemDefinitionIOActions
+   */
   public getRolesWithAccessTo(action: ItemDefinitionIOActions) {
+    // in the case of module, only read makes sense as an action
+    // this only happens in module based searches
     if (action === ItemDefinitionIOActions.READ) {
       return this.rawData.readRoleAccess || [ANYONE_METAROLE];
     }
     return [];
   }
 
+  /**
+   * Checks the role access for an action in a module
+   * @param action the IO action (for modules this can only logically be a READ action for module level searches)
+   * @param role the role of the user attempting the action
+   * @param userId the user id of the user attempting the action
+   * @param ownerUserId the owner of that item definition
+   * @param requestedFields the requested fields (single properties will be checked as well)
+   * @param throwError whether to throw an error if failed (otherwise returns a boolean)
+   */
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
@@ -582,6 +573,12 @@ export default class Module {
     });
   }
 
+  /**
+   * Merges two i18n data components, for example the i18n data for
+   * the english build and the i18n data for the russian build, that way
+   * the state is not lost
+   * @param mod the raw module that is merging
+   */
   public mergeWithI18n(
     mod: IModuleRawJSONDataType,
   ) {

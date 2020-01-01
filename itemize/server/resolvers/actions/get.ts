@@ -18,7 +18,7 @@ import {
 } from "../../../constants";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
-import { flattenRawGQLValueOrFields, requestFieldsAreContained, deepMerge } from "../../../gql-util";
+import { flattenRawGQLValueOrFields } from "../../../gql-util";
 
 const getItemDefinitionDebug = Debug("resolvers:getItemDefinition");
 export async function getItemDefinition(

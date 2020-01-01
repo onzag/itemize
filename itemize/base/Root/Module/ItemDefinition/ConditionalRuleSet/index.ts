@@ -101,6 +101,8 @@ export default class ConditionalRuleSet {
    * @param parentPropertyDefinition the property definition that contains the rule
    * located, it might not be available for example for condition
    * in prop extensions
+   * @param parentItem the item that contains this condition, such as in
+   * exclusion rules, it might not be available as well
    */
   constructor(
     rawJSON: IConditionalRuleSetRawJSONDataType,
@@ -123,6 +125,7 @@ export default class ConditionalRuleSet {
   /**
    * Evaluates the result of the conditional value as this current point
    * as defined by the item defintion
+   * @param id the id to be used to retrieve values for properties during evaluation
    */
   public evaluate(id: number): boolean {
     // if this is a property type conditional rule set
