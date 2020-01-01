@@ -110,7 +110,7 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
     try {
       guessedUserData = JSON.parse(
         previouslyGuessedData ||
-        await fetch(`/rest/util/country`).then((r) => r.text()),
+        await fetch("/rest/util/country").then((r) => r.text()),
       );
     } catch (err) {
       console.log("Error while parsing guessed locale data");
@@ -173,6 +173,29 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
   // and this library needs to support any language, in order
   // to import the locale moment data, we need to expose it to the global
   (window as any).moment = Moment;
+
+  let isExpectedToRender = true;
+  try {
+    const response = await fetch("/rest/buildnumber?current=" + (window as any).BUILD_NUMBER);
+    if (response.status === 200) {
+      const actualBuildNumber: string = await response.text();
+      if (actualBuildNumber !== (window as any).BUILD_NUMBER) {
+        console.log("Application has updated");
+        // refer to the setupVersion function in the cache for realization how
+        // the object store in indexed db updates, since indexed db databases
+        // are versioned, we don't need to worry
+        console.log(actualBuildNumber, (window as any).BUILD_NUMBER);
+        isExpectedToRender = false;
+        location.reload(true);
+      }
+    }
+  } catch (err) {
+    console.log("Couldn't check build number");
+  }
+
+  if (!isExpectedToRender) {
+    return;
+  }
 
   // Now we fetch the data for the respective languages and currencies
   // the languag english is the default for moment, so we only import script

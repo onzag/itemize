@@ -228,19 +228,19 @@ async function clientSideAutocompleteChecker(
     return property.stateLastAutocompleteCheck[id].valid;
   }
 
-  // TODO this can actually be cached with the build identifier again
   try {
-    const result = await fetch("/rest/autocomplete-check/" + autocompleteId, {
-      method: "POST",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        value,
-        filters,
-      }),
-    });
+    const result =
+      await fetch("/rest/autocomplete-check/" + autocompleteId +
+        "?body=" + encodeURIComponent(JSON.stringify({
+          value,
+          filters,
+        })),
+        {
+          headers: {
+            "sw-cacheable": "true",
+          },
+        },
+      );
     const output = await result.json();
     property.stateLastAutocompleteCheck[id] = {
       valid: !!output,

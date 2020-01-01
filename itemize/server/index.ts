@@ -59,6 +59,7 @@ export interface IAppDataType {
   redis: RedisClient;
   redisPub: RedisClient;
   redisSub: RedisClient;
+  buildnumber: number;
 }
 
 export interface IServerCustomizationDataType {
@@ -151,7 +152,6 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
 
   app.use(
     "/graphql",
-    // TODO check these fields
     graphqlUploadExpress({
       maxFileSize: MAX_FILE_SIZE,
       maxFiles: MAX_FILE_TOTAL_BATCH_COUNT,
@@ -195,14 +195,17 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   let build: any;
   let root: any;
   let autocompleteSource: string;
-  [config, index, rawBuild, autocompleteSource] = await Promise.all([
-    fsAsync.readFile("./dist/config.json", "utf8"),
-    fsAsync.readFile("./dist/data/index.html", "utf8"),
-    fsAsync.readFile("./dist/data/build.all.json", "utf8"),
-    fsAsync.readFile("./dist/autocomplete.json", "utf8"),
+  let buildnumber: any;
+  [config, index, rawBuild, autocompleteSource, buildnumber] = await Promise.all([
+    fsAsync.readFile(path.join("dist", "config.json"), "utf8"),
+    fsAsync.readFile(path.join("dist", "data", "index.html"), "utf8"),
+    fsAsync.readFile(path.join("dist", "data", "build.all.json"), "utf8"),
+    fsAsync.readFile(path.join("dist", "autocomplete.json"), "utf8"),
+    fsAsync.readFile(path.join("dist", "buildnumber"), "utf8"),
   ]);
   config = JSON.parse(config);
   build = JSON.parse(rawBuild);
+  buildnumber = JSON.parse(buildnumber);
 
   root = new Root(build.root);
 
@@ -254,6 +257,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     redisSub,
     redisPub,
     cache: new Cache(redisClient, knex),
+    buildnumber,
   };
 
   appData.listener = new Listener(appData);
@@ -263,6 +267,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   const server = http.createServer(app);
   server.listen(config.port, () => {
     console.log("listening at", config.port);
+    console.log("build number is", appData.buildnumber);
   });
   const io = ioMain(server);
   io.on("connection", (socket) => {

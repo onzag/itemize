@@ -180,11 +180,6 @@ export default class Autocomplete {
     this.rawJSON = value;
     this.processedJSON = processAutocomplete(this.rawJSON);
   }
-  // TODO we should memoize these functions for greater speeds
-  // and even maybe cache on the client side
-  // these functions always return the same as the process is ran
-  // with the client side it is even possible to use the build number
-  // and just cache it forever
   public findRecommendations(
     matchStr: string,
     specifiedFilter: ISingleFilterRawJSONDataType,

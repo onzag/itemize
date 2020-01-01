@@ -43,11 +43,11 @@ export function I18nRead(props: II18nReadProps) {
                         } else {
                           const i18nIdefData =
                             itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
-                          if (this.props.policyType && this.props.policyName) {
+                          if (props.policyType && props.policyName) {
                             const i18nPolicyTypeValue =
-                              i18nIdefData ? i18nIdefData[this.props.policyType] || null : null;
+                              i18nIdefData ? i18nIdefData[props.policyType] || null : null;
                             const i18nPolicyNameValue =
-                              i18nPolicyTypeValue ? i18nPolicyTypeValue[this.props.policyName] || null : null;
+                              i18nPolicyTypeValue ? i18nPolicyTypeValue[props.policyName] || null : null;
                             i18nValue = i18nPolicyNameValue ? i18nPolicyNameValue[props.id] || null : null;
                           } else {
                             if (i18nIdefData && i18nIdefData.custom && i18nIdefData.custom[props.id]) {

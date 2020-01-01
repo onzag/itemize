@@ -47,4 +47,8 @@ export async function buildHTML(rawConfig: any) {
   const fileName = path.join("dist", "data", "index.html");
   console.log("emiting " + colors.green(fileName), "BUILD_NUMBER:", colors.yellow(buildNumber));
   await fsAsync.writeFile(fileName, baseHTML);
+
+  const buildNumberFileName = path.join("dist", "buildnumber");
+  console.log("emiting " + colors.green(buildNumberFileName));
+  await fsAsync.writeFile(buildNumberFileName, buildNumber.toString());
 }

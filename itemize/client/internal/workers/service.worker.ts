@@ -32,7 +32,7 @@ self.addEventListener("install", (event: any) => {
 });
 
 self.addEventListener("fetch", (event: any) => {
-  if (event.request.method === "POST") {
+  if (event.request.method !== "GET") {
     return false;
   }
 
@@ -61,22 +61,37 @@ self.addEventListener("fetch", (event: any) => {
     return false;
   }
 
-  const shouldBeCachedIfNotFound =
-    !isOurHost ||
-    urlAnalyzed.pathname.indexOf("/rest/resource") === 0;
-
   const shouldServeIndex =
     isOurHost &&
     urlAnalyzed.pathname.indexOf("/rest") !== 0 &&
     urlAnalyzed.pathname.indexOf("/uploads") !== 0;
 
-  const shouldBeRechecked = true;
-
   const actualEventRequest: Request = shouldServeIndex ?
     new Request("/") : event.request;
 
+  // TODO change the functionality of the main request to use cache slots
+  // 1. make a message that says that the application is outdated and needs to reload
+  // for that add an endpoint at /rest/buildnumber that provides the build number
+  // at runtime, if the build number does not match and there is internet, cancel
+  // everything and show a message the user needs to reload the app, basically add
+  // an outdated flag
+  // 2. send that old id to the service worker for the service worker to delete
+  // the cache, somehow, maybe over here as the buildnumber will be send over here
+  // so the service worker should be aware in order to remove the older buildnumbers
+  // 3. delete the indexed db cache as well
+
+  const shouldBeCachedIfNotFound =
+    !isOurHost ||
+    urlAnalyzed.pathname.indexOf("/rest/resource") === 0 ||
+    actualEventRequest.headers.get("sw-cacheable") ||
+    // in rare cases where index would have failed to cache
+    shouldServeIndex;
+
+  const shouldBeRechecked = !isOurHost;
   const acceptHeader = actualEventRequest.headers.get("Accept");
   const expectsImage = acceptHeader && acceptHeader.indexOf("image") === 0;
+  const isBuildNumberCheck = urlAnalyzed.pathname.indexOf("/rest/buildnumber") === 0;
+  const currentBuildNumber = isBuildNumberCheck ? urlAnalyzed.searchParams.get("current") : null;
 
   // otherwise we are going to try to find matches
   // yes even from /rest we try to find matches
@@ -110,12 +125,32 @@ self.addEventListener("fetch", (event: any) => {
         }
 
         const netWorkResponse = await fetch(actualEventRequest);
+        if (isBuildNumberCheck && netWorkResponse.status === 200) {
+          // we clone the response stream
+          const clonedResponse = netWorkResponse.clone();
+          // let's parse the result
+          const serverProvidedBuildNumber = await clonedResponse.text();
+          // if build numbers do not match
+          if (serverProvidedBuildNumber !== currentBuildNumber) {
+            console.log(
+              "Service worker wiping cache due to buildnumber mismatch",
+              serverProvidedBuildNumber,
+              currentBuildNumber,
+            );
+            await caches.delete(CACHE_NAME);
+
+            const recreatedCache = await caches.open(CACHE_NAME);
+            // we do not wait, if this fails that rare case
+            // where index fails to cache will save us
+            await recreatedCache.addAll(urlsToCache);
+          }
+
         // resources are static, but they are language specific
         // so we don't really precache those, for example, the
         // build.en.json files and build.es.json files as well
         // as all the moment files, the term and conditions and so
         // on
-        if (
+        } else if (
           shouldBeCachedIfNotFound &&
           (
             netWorkResponse.status === 200 ||
