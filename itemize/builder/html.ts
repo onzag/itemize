@@ -14,9 +14,9 @@ export async function buildHTML(rawConfig: any) {
 
   let baseHTML: string;
   try {
-    baseHTML = await fsAsync.readFile(path.join("itemize", "client", "index.html"), "utf8");
+    baseHTML = await fsAsync.readFile(path.join("itemize", "client", "internal", "index.html"), "utf8");
   } catch (err) {
-    baseHTML = await fsAsync.readFile(path.join("node_modules", "itemize", "client", "index.html"), "utf8");
+    baseHTML = await fsAsync.readFile(path.join("node_modules", "itemize", "client", "internal", "index.html"), "utf8");
   }
   Object.keys(rawConfig).forEach((key) => {
     baseHTML = baseHTML.replace(

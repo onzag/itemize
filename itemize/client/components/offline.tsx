@@ -1,6 +1,6 @@
 import React from "react";
-import { DataContext } from "../app";
-import { RemoteListener } from "../app/remote-listener";
+import { DataContext } from "../internal/app";
+import { RemoteListener } from "../internal/app/remote-listener";
 
 interface IOfflineStatusRetrieverProps {
   children: (offline: boolean) => any;

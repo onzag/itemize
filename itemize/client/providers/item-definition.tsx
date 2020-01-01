@@ -1,10 +1,10 @@
 import React from "react";
-import { LocaleContext, ILocaleContextType } from "../app";
+import { LocaleContext, ILocaleContextType } from "../internal/app";
 import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
-import { TokenContext, ITokenContextType } from "../app/internal-providers";
+import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
 import {
   PREFIX_GET,
   PREFIX_EDIT,
@@ -12,14 +12,15 @@ import {
   PREFIX_DELETE,
   PREFIX_SEARCH,
 } from "../../constants";
-import { buildGqlQuery, buildGqlMutation, gqlQuery, IGQLQueryObj, GQLEnum, GQLQuery } from "../app/gql-querier";
+import { buildGqlQuery, buildGqlMutation, gqlQuery,
+  IGQLQueryObj, GQLEnum, GQLQuery } from "../internal/app/gql-querier";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
-import CacheWorkerInstance from "../workers/cache";
-import { RemoteListener } from "../app/remote-listener";
+import CacheWorkerInstance from "../internal/workers/cache";
+import { RemoteListener } from "../internal/app/remote-listener";
 import { getFieldsAndArgs } from "../../util";
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE

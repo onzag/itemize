@@ -1,16 +1,16 @@
 import React from "react";
-import { ISearchResult, ItemDefinitionContext, ActualItemDefinitionProvider, SearchItemDefinitionValueContext } from "../providers/item-definition";
+import { ISearchResult, ItemDefinitionContext, SearchItemDefinitionValueContext } from "../providers/item-definition";
 import equals from "deep-equal";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { getFieldsAndArgs } from "../../util";
 import { UNSPECIFIED_OWNER, PREFIX_GET_LIST, PREFIX_GET } from "../../constants";
-import CacheWorkerInstance from "../workers/cache";
+import CacheWorkerInstance from "../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
-import { buildGqlQuery, gqlQuery } from "../app/gql-querier";
-import { LocaleContext, ILocaleContextType } from "../app";
-import { TokenContext, ITokenContextType } from "../app/internal-providers";
+import { buildGqlQuery, gqlQuery } from "../internal/app/gql-querier";
+import { LocaleContext, ILocaleContextType } from "../internal/app";
+import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
 import { GraphQLEndpointErrorType } from "../../base/errors";
-import { RemoteListener } from "../app/remote-listener";
+import { RemoteListener } from "../internal/app/remote-listener";
 
 interface ISearchLoaderProps {
   pageSize: number;

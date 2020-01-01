@@ -1,6 +1,6 @@
 import React from "react";
 import { GraphQLEndpointErrorType } from "../../base/errors";
-import { TokenContext, ITokenContextType } from "../app/internal-providers";
+import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
 import { ItemDefinitionContext, IItemDefinitionContextType } from "../providers/item-definition";
 
 type ActionerFn = (actioner: {

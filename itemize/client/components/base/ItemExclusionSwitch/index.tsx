@@ -1,5 +1,5 @@
 import React from "react";
-import { LocaleContext, ILocaleContextType } from "../../../app";
+import { LocaleContext, ILocaleContextType } from "../../../internal/app";
 import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
 import { style, STANDARD_THEME, IItemExclusionSwitchThemeType } from "./styles";
 import Item, { IItemState, ItemExclusionState } from "../../../../base/Root/Module/ItemDefinition/Item";

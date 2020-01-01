@@ -2,7 +2,7 @@ import "./theme/base.scss";
 import ReactDOM from "react-dom";
 import React from "react";
 import { Router } from "react-router-dom";
-import App from "./app";
+import App from "./internal/app";
 import "babel-polyfill";
 import Moment from "moment";
 import { createBrowserHistory } from "history";

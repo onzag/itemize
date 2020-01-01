@@ -1,9 +1,9 @@
-import ItemDefinition from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import io from "socket.io-client";
-import Root from "../../base/Root";
+import Root from "../../../base/Root";
 import uuid from "uuid";
 import CacheWorkerInstance from "../workers/cache";
-import { PREFIX_GET } from "../../constants";
+import { PREFIX_GET } from "../../../constants";
 
 export class RemoteListener {
   private socket: SocketIOClient.Socket;

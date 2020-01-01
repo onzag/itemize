@@ -1,13 +1,10 @@
 import React from "react";
 import { gqlQuery, buildGqlQuery } from "./gql-querier";
-import { GraphQLEndpointErrorType } from "../../base/errors";
+import { GraphQLEndpointErrorType } from "../../../base/errors";
 import { ILocaleContextType } from ".";
 import { Location } from "history";
-import { GUEST_METAROLE } from "../../constants";
+import { GUEST_METAROLE } from "../../../constants";
 import CacheWorkerInstance from "../workers/cache";
-import { ICacheMatchType } from "../workers/cache.worker";
-import { deepMerge } from "../../gql-util";
-import equals from "deep-equal";
 
 export interface ITokenProviderState {
   token: string;

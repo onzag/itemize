@@ -1,5 +1,5 @@
 import React from "react";
-import { TokenContext } from "../app/internal-providers";
+import { TokenContext } from "../internal/app/internal-providers";
 
 interface IUserIdRetrieverProps {
   children: (id: number) => React.ReactNode;

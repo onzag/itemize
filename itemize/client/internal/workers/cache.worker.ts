@@ -1,6 +1,6 @@
 import { expose } from "comlink";
 import { openDB, DBSchema, IDBPDatabase } from "idb";
-import { requestFieldsAreContained, deepMerge } from "../../gql-util";
+import { requestFieldsAreContained, deepMerge } from "../../../gql-util";
 
 export interface ICacheMatchType {
   value: any;

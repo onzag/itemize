@@ -1,14 +1,14 @@
 import React from "react";
-import Root, { IRawJSONBuildDataType, Ii18NType } from "../../base/Root";
+import Root, { IRawJSONBuildDataType, Ii18NType } from "../../../base/Root";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import { createMuiTheme } from "@material-ui/core";
-import { importScript } from "..";
+import { importScript } from "../..";
 import Moment from "moment";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import { Route } from "react-router";
-import { history } from "..";
-import { countries, currencies } from "../../imported-resources";
+import { history } from "../..";
+import { countries, currencies } from "../../../imported-resources";
 import { TokenProvider, ITokenProviderState, LocationStateContext } from "./internal-providers";
 import { buildGqlMutation, gqlQuery } from "./gql-querier";
 import { RemoteListener } from "./remote-listener";

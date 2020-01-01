@@ -1,4 +1,4 @@
-import { IPropertyDefinitionIncludedFileInfoType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { IPropertyDefinitionIncludedFileInfoType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 export class GQLQuery {
   private processedQueries: IGQLQueryObj[];

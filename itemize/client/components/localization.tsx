@@ -1,17 +1,18 @@
 import React from "react";
-import { LocaleContext, DataContext } from "../app";
+import { LocaleContext, DataContext } from "../internal/app";
 import { ItemDefinitionContext } from "../providers/item-definition";
 import { localeReplacerToArray, localeReplacer } from "../../util";
 import { GraphQLEndpointErrorType } from "../../base/errors";
-import Root from "../../base/Root";
 import Module from "../../base/Root/Module";
-import ItemDefinition, { IItemDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition";
-import PropertyDefinition, { IPropertyDefinitionRawJSONDataType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import ItemDefinition from "../../base/Root/Module/ItemDefinition";
+import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../imported-resources";
 import { ItemContext } from "../providers/item";
 
 interface II18nReadProps {
   id: string;
+  policyType?: string;
+  policyName?: string;
   args?: any[];
   html?: boolean;
   htmlWrappingTag?: string;
@@ -42,10 +43,18 @@ export function I18nRead(props: II18nReadProps) {
                         } else {
                           const i18nIdefData =
                             itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
-                          if (i18nIdefData && i18nIdefData.custom && i18nIdefData.custom[props.id]) {
-                            i18nValue = i18nIdefData.custom[props.id];
+                          if (this.props.policyType && this.props.policyName) {
+                            const i18nPolicyTypeValue =
+                              i18nIdefData ? i18nIdefData[this.props.policyType] || null : null;
+                            const i18nPolicyNameValue =
+                              i18nPolicyTypeValue ? i18nPolicyTypeValue[this.props.policyName] || null : null;
+                            i18nValue = i18nPolicyNameValue ? i18nPolicyNameValue[props.id] || null : null;
                           } else {
-                            i18nValue = i18nIdefData ? i18nIdefData[props.id] || null : null;
+                            if (i18nIdefData && i18nIdefData.custom && i18nIdefData.custom[props.id]) {
+                              i18nValue = i18nIdefData.custom[props.id];
+                            } else {
+                              i18nValue = i18nIdefData ? i18nIdefData[props.id] || null : null;
+                            }
                           }
                         }
                       }

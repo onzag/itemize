@@ -1,6 +1,6 @@
 import React from "react";
 import { Link as RouterLink, LinkProps, Route as RouterRoute, RouteProps } from "react-router-dom";
-import { LocationStateContext } from "../app/internal-providers";
+import { LocationStateContext } from "../internal/app/internal-providers";
 import { Location } from "history";
 import { history } from "..";
 
