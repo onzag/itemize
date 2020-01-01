@@ -993,7 +993,6 @@ export class ActualItemDefinitionProvider extends
       args.id = this.props.forId;
     }
 
-    // TODO add this to the search options
     if (queryPrefix === PREFIX_SEARCH) {
       args.order_by = new GQLEnum(searchOrderBy);
     }

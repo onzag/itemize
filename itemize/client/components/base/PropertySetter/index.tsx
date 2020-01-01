@@ -1,5 +1,5 @@
 import React from "react";
-import PropertyDefinition, { IPropertyDefinitionState } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import equals from "deep-equal";
 import { PropertyDefinitionSupportedType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
@@ -11,7 +11,6 @@ export interface IPropertySetterBaseProps {
   onClearEnforcement: (forId: number) => void;
 }
 
-// TODO title, description to views and flags to hide and show them
 export default class PropertySetter extends React.Component<IPropertySetterBaseProps, {}> {
   constructor(props: IPropertySetterBaseProps) {
     super(props);

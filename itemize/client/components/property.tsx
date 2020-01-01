@@ -54,7 +54,6 @@ interface IPropertyEntryViewReadSetProps {
   value?: PropertyDefinitionSupportedType;
 }
 // TODO optimize
-// TODO EntryViewReadSet in module context only for module level searches
 function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" | "view" | "read" | "set") {
   return (
     <ItemDefinitionContext.Consumer>

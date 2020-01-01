@@ -60,8 +60,6 @@ export default class CacheWorker {
 
     // now we try to create the promised database
     this.dbPromise = openDB<ICacheDB>(CACHE_NAME, version, {
-      // TODO this function fails sometimes randomly and it's impossible to tell why
-      // it's buggy, figure out why it fails and when
       upgrade(db) {
         try {
           console.log("CLEARING CACHE DUE TO UPGRADE");
@@ -112,6 +110,9 @@ export default class CacheWorker {
    * @param queryName the query name
    * @param id the id of the item definition instance
    * @param partialValue the partial value
+   * @param partialFields the fields that represent the partial value
+   * @param touchOrMerge optional, whether this is because of a touch of merge reqeust
+   *                     doesn't do anything in practique, just for logging
    */
   public async setCachedValue(
     queryName: string,
@@ -144,6 +145,29 @@ export default class CacheWorker {
         expires: new Date(Date.now() + (UNUSED_CACHE_DURATION_IN_DAYS * 86400000)),
       };
       await db.put(TABLE_NAME, idbNewValue, queryIdentifier);
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  public async deleteCachedValue(
+    queryName: string,
+    id: number,
+  ) {
+    console.log("REQUESTED TO DELETE", queryName, id);
+
+    // so first we await for our database
+    const db = await this.dbPromise;
+    // if we don't have it
+    if (!db) {
+      // what gives, we return
+      return;
+    }
+
+    const queryIdentifier = `${queryName}.${id}`;
+
+    try {
+      await db.delete(TABLE_NAME, queryIdentifier);
     } catch (err) {
       console.warn(err);
     }
@@ -200,10 +224,6 @@ export default class CacheWorker {
   public async getCachedValue(queryName: string, id: number, requestedFields?: any): Promise<ICacheMatchType> {
     if (requestedFields) {
       console.log("CACHED QUERY REQUESTED", queryName, id, requestedFields);
-    }
-
-    if (!this.versionHasBeenSet) {
-      console.log("THIS SUCKS");
     }
 
     // so we fetch our db like usual

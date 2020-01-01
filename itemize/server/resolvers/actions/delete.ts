@@ -48,7 +48,6 @@ export async function deleteItemDefinition(
   // confirmation for deleting users, we also need to
   // gather the created_by and blocked_at to check the rights
   // of the user
-  // TODO cache
   let userId: number;
   await runPolicyCheck(
     "delete",
@@ -62,7 +61,6 @@ export async function deleteItemDefinition(
     // and we do it for being efficient, because we can run
     // both of these checks with a single SQL query, and the policy
     // checker is built in a way that it demands and expects that
-    // TODO cache
     (content: any) => {
       // if there is no userId then the row was null, we throw an error
       if (!content) {

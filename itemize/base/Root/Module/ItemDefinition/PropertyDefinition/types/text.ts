@@ -49,7 +49,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
       };
     }
 
-    // TODO check if the text content usage actually creates a proper vector
     let escapedText = value;
     let purifiedText = value;
     if (property.isRichText()) {

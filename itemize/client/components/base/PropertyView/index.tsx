@@ -72,7 +72,6 @@ const PropertyViewStylesApplier = withStyles(style)((props: IPropertyViewStylesA
   );
 });
 
-// TODO title, description to views and flags to hide and show them
 export default function PropertyView(props: IPropertyViewBaseProps) {
   let appliedTheme: IPropertyViewThemeType = STANDARD_THEME;
   if (props.theme) {

@@ -448,8 +448,6 @@ export async function serverSideCheckItemDefinitionAgainst(
     itemDefinition.getQualifiedPathName(),
   );
   // we get the current value of the item definition instance
-  // TODO replace this with the function that will retrieve the value
-  // as graphql itself and do a quick check
   const currentValue = await itemDefinition.getState(id);
   serverSideCheckItemDefinitionAgainstDebug(
     "Current value is %j",

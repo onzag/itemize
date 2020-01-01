@@ -176,7 +176,6 @@ export function buildGqlMutation(...mutations: IGQLQueryObj[]) {
   return new GQLQuery("mutation", mutations);
 }
 
-// TODO implement timeouts
 export async function gqlQuery(query: GQLQuery) {
   const formData = new FormData();
   const operations = JSON.stringify(query.getOperations());

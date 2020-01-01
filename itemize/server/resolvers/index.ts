@@ -7,10 +7,6 @@ import { IGraphQLResolversType } from "../../base/Root/gql";
 import { deleteItemDefinitionFn } from "./actions/delete";
 
 // TODO flagging
-// TODO implementation of tokens
-// TODO implement unique in property definition and a resolver to check for such unique values in
-// these, the reason we need them is for unique keys, there should also be a i18n key for that,
-// and the builder and everything
 
 export default function resolvers(appData: IAppDataType): IGraphQLResolversType {
   return {

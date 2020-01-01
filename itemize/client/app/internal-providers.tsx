@@ -135,14 +135,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       this.setState(newState);
       this.props.onProviderStateSet(newState);
 
-      // TODO clear cache?... all of it?...
-      // thinking how loading changes depending of
-      // on the user role; I think this is actually done
-      // but I am not sure as the cache is query based and different
-      // roles have different queries
-
       if (tokenDataId) {
-
         const fields = {
           DATA: {
             app_country: {},
@@ -231,6 +224,10 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       return;
     }
     localStorage.removeItem("TOKEN");
+    CacheWorkerInstance.instance.deleteCachedValue(
+      "GET_MOD_users__IDEF_user",
+      this.state.id,
+    );
     this.setState({
       id: null,
       token: null,

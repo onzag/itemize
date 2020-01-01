@@ -98,7 +98,6 @@ interface IAvatarProps extends WithStyles<typeof avatarStyles> {
   large?: boolean;
 }
 
-// TODO with styles re-renders despite everything on top being optmized
 // TODO profile picture support
 export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
   return (

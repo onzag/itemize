@@ -9,7 +9,8 @@ import { getGQLSchemaForRoot, IGQLQueryFieldsDefinitionType } from "../base/Root
 import Knex from "knex";
 import { types } from "pg";
 import Moment from "moment";
-import { DATETIME_FORMAT, TIME_FORMAT, DATE_FORMAT } from "../constants";
+import { DATETIME_FORMAT, TIME_FORMAT, DATE_FORMAT,
+  MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE } from "../constants";
 import { GraphQLError } from "graphql";
 import { GraphQLEndpointError, GraphQLEndpointErrorType } from "../base/errors";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -152,8 +153,9 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     "/graphql",
     // TODO check these fields
     graphqlUploadExpress({
-      maxFileSize: 10000000,
-      maxFiles: 2,
+      maxFileSize: MAX_FILE_SIZE,
+      maxFiles: MAX_FILE_TOTAL_BATCH_COUNT,
+      maxFieldSize: MAX_FIELD_SIZE,
     }),
     graphqlHTTP({
       schema: getGQLSchemaForRoot(
