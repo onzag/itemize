@@ -122,7 +122,6 @@ export class Cache {
     if (!refresh) {
       const currentValue = await this.getIdefCachedValue(idefQueryIdentifier);
       if (currentValue) {
-        console.log("providing cached", currentValue.value);
         return currentValue.value;
       }
     }

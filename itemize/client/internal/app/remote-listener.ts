@@ -105,6 +105,7 @@ export class RemoteListener {
     const idefPath = itemDefinition.getPath().join("/");
 
     if (this.socket.connected) {
+      console.log("registering", modulePath, idefPath, forId);
       this.socket.emit(
         "register",
         modulePath,

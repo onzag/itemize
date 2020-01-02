@@ -269,7 +269,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     index,
     config,
     knex,
-    listener: null,
+    listener,
     redis: redisClient,
     redisSub,
     redisPub,

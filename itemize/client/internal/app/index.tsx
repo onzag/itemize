@@ -229,13 +229,23 @@ export default class App extends React.Component<IAppProps, IAppState> {
     });
 
     // and we fetch the new data, as relevant, mostly the build, and the moment to patch
-    const [newData] =
-      await Promise.all<any>([
-        fetch(`/rest/resource/build.${localeToSet}.json?version=${(window as any).BUILD_NUMBER}`).then((r) => r.json()),
+    let newData: any;
+    try {
+      [newData] =
+        await Promise.all<any>([
+          fetch(`/rest/resource/build.${localeToSet}.json?version=${(window as any).BUILD_NUMBER}`)
+            .then((r) => r.json()),
 
-        localeToSet !== "en" ?
-          importScript(`/rest/resource/${localeToSet}.moment.js?version=${(window as any).BUILD_NUMBER}`) : null,
-      ]);
+          localeToSet !== "en" ?
+            importScript(`/rest/resource/${localeToSet}.moment.js?version=${(window as any).BUILD_NUMBER}`) : null,
+        ]);
+    } catch {
+      this.setState({
+        localeIsUpdating: false,
+        localeIsUpdatingFrom: null,
+      });
+      return;
+    }
 
     // Now we patch moment
     Moment.locale(localeToSet);
