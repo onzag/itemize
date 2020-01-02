@@ -19,7 +19,6 @@ import restServices from "./rest";
 import { customUserQueries } from "./user/queries";
 import { customUserMutations } from "./user/mutations";
 import Autocomplete, { IAutocompleteRawJSONDataType } from "../base/Autocomplete";
-import ioMain from "socket.io";
 import { Listener } from "./listener";
 import redis, { RedisClient } from "redis";
 import { Cache } from "./cache";
@@ -247,6 +246,23 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
   PropertyDefinition.autocompleteChecker = serverSideAutocompleteChecker.bind(null, autocompletes);
 
+  const cache = new Cache(redisClient, knex);
+
+  const server = http.createServer(app);
+  server.listen(config.port, () => {
+    console.log("listening at", config.port);
+    console.log("build number is", buildnumber);
+  });
+
+  const listener = new Listener(
+    buildnumber,
+    redisSub,
+    redisPub,
+    root,
+    cache,
+    server,
+  );
+
   const appData: IAppDataType = {
     root,
     autocompletes,
@@ -257,36 +273,9 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     redis: redisClient,
     redisSub,
     redisPub,
-    cache: new Cache(redisClient, knex),
+    cache,
     buildnumber,
   };
 
-  appData.listener = new Listener(appData);
-
   initializeApp(appData, custom);
-
-  const server = http.createServer(app);
-  server.listen(config.port, () => {
-    console.log("listening at", config.port);
-    console.log("build number is", appData.buildnumber);
-  });
-  const io = ioMain(server);
-  io.on("connection", (socket) => {
-    appData.listener.addSocket(socket);
-    socket.on("register", (modulePath: string, itemDefinitionPath: string, id: number) => {
-      appData.listener.addListener(socket, modulePath, itemDefinitionPath, id);
-    });
-    socket.on("identify", (uuid: string) => {
-      appData.listener.setUUID(socket, uuid);
-    });
-    socket.on("feedback", (modulePath: string, itemDefinitionPath: string, id: number) => {
-      appData.listener.requestFeedback(socket, modulePath, itemDefinitionPath, id);
-    });
-    socket.on("unregister", (modulePath: string, itemDefinitionPath: string, id: number) => {
-      appData.listener.removeListener(socket, modulePath, itemDefinitionPath, id);
-    });
-    socket.on("disconnect", () => {
-      appData.listener.removeSocket(socket);
-    });
-  });
 }

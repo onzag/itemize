@@ -46,6 +46,15 @@ export class RemoteListener {
   public onPossibleAppUpdateListened(buildNumber: string) {
     this.lastRecievedBuildNumber = buildNumber;
     if (this.isAppUpdated()) {
+      // this will trigger the service worker to realize the app has
+      // updated if any service worker is active
+      try {
+        fetch("/rest/buildnumber?current=" + (window as any).BUILD_NUMBER);
+      } catch (err) {
+        // if it fails the service worker should be able to
+        // handle it stills by reloading twice
+      }
+      // trigger the listeners
       this.appUpdatedListeners.forEach((l) => l());
     }
   }

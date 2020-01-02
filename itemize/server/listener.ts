@@ -1,6 +1,10 @@
 import { Socket } from "socket.io";
-import { IAppDataType } from ".";
 import { ISQLTableRowValue } from "../base/Root/sql";
+import { RedisClient } from "redis";
+import { Cache } from "./cache";
+import { Server } from "http";
+import Root from "../base/Root";
+import ioMain from "socket.io";
 
 interface IListenerList {
   [socketId: string]: {
@@ -15,22 +19,58 @@ interface IListenerList {
 
 export class Listener {
   private listeners: IListenerList = {};
-  private appData: IAppDataType;
-  constructor(appData: IAppDataType) {
-    this.appData = appData;
+  private redisSub: RedisClient;
+  private redisPub: RedisClient;
+  private buildnumber: string;
+  private root: Root;
+  private cache: Cache;
+  constructor(
+    buildnumber: string,
+    redisSub: RedisClient,
+    redisPub: RedisClient,
+    root: Root,
+    cache: Cache,
+    server: Server,
+  ) {
+    this.redisSub = redisSub;
+    this.redisPub = redisPub;
+    this.buildnumber = buildnumber;
+    this.root = root;
+    this.cache = cache;
+
     this.pubSubTriggerListeners = this.pubSubTriggerListeners.bind(this);
 
-    this.appData.redisSub.on("message", this.pubSubTriggerListeners);
+    this.redisSub.on("message", this.pubSubTriggerListeners);
+
+    const io = ioMain(server);
+    io.on("connection", (socket) => {
+      this.addSocket(socket);
+      socket.on("register", (modulePath: string, itemDefinitionPath: string, id: number) => {
+        this.addListener(socket, modulePath, itemDefinitionPath, id);
+      });
+      socket.on("identify", (uuid: string) => {
+        this.identify(socket, uuid);
+      });
+      socket.on("feedback", (modulePath: string, itemDefinitionPath: string, id: number) => {
+        this.requestFeedback(socket, modulePath, itemDefinitionPath, id);
+      });
+      socket.on("unregister", (modulePath: string, itemDefinitionPath: string, id: number) => {
+        this.removeListener(socket, modulePath, itemDefinitionPath, id);
+      });
+      socket.on("disconnect", () => {
+        this.removeSocket(socket);
+      });
+    });
   }
   public addSocket(
     socket: Socket,
   ) {
     socket.emit(
       "buildnumber",
-      this.appData.buildnumber,
+      this.buildnumber,
     );
   }
-  public setUUID(
+  public identify(
     socket: Socket,
     uuid: string,
   ) {
@@ -67,7 +107,7 @@ export class Listener {
 
     const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
-      this.appData.redisSub.subscribe(mergedIndexIdentifier);
+      this.redisSub.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
     }
@@ -79,9 +119,9 @@ export class Listener {
     id: number,
   ) {
     try {
-      const mod = this.appData.root.getModuleFor(modulePath.split("/"));
+      const mod = this.root.getModuleFor(modulePath.split("/"));
       const itemDefinition = mod.getItemDefinitionFor(itemDefinitionPath.split("/"));
-      const queriedResult: ISQLTableRowValue = await this.appData.cache.requestCache(
+      const queriedResult: ISQLTableRowValue = await this.cache.requestCache(
         itemDefinition.getQualifiedPathName(), mod.getQualifiedPathName(), id,
       );
       if (queriedResult) {
@@ -109,7 +149,7 @@ export class Listener {
   ) {
     const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
     if (this.listeners[socket.id].listens[mergedIndexIdentifier]) {
-      this.appData.redisSub.unsubscribe(mergedIndexIdentifier);
+      this.redisSub.unsubscribe(mergedIndexIdentifier);
       delete this.listeners[socket.id].listens[mergedIndexIdentifier];
       this.listeners[socket.id].amount--;
     }
@@ -123,7 +163,7 @@ export class Listener {
   ) {
     console.log("requested trigger on", modulePath, itemDefinitionPath, id, listenerUUID, deleted);
     const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
-    this.appData.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
+    this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
       modulePath,
       itemDefinitionPath,
       id,

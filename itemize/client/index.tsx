@@ -186,6 +186,11 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
         // are versioned, we don't need to worry
         console.log(actualBuildNumber, (window as any).BUILD_NUMBER);
         isExpectedToRender = false;
+        // while for most of the cases this reload is unceccesary there is a reason
+        // it's safer, if the index.html file has changed (say due to google analytics)
+        // changes and whatnot, it also trigger that, the build number is coded in the
+        // index as well, etc... so safer it is to reload, the cache should be cleaned
+        // by the service worker after a mismatch so the next load should be clean
         location.reload(true);
       }
     }
