@@ -26,7 +26,6 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
       <ItemDefinitionProvider
         itemDefinition="user"
         disableExternalChecks={true}
-        optimize={{disableListener: !props.open}}
       >
         <LogActioner>
           {(actioner) => (

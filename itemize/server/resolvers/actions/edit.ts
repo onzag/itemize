@@ -205,7 +205,7 @@ export async function editItemDefinition(
     debug("FAILED due to input data being none");
     throw new GraphQLEndpointError({
       message: "You are not updating anything whatsoever",
-      code: "UNSPECIFIED",
+      code: "NOTHING_TO_UPDATE",
     });
   }
 

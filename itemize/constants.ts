@@ -142,6 +142,7 @@ export const LOCALE_I18N = [
   "error.INVALID_DATA_SUBMIT_REFUSED",
   "error.INTERNAL_SERVER_ERROR",
   "error.UNSPECIFIED",
+  "error.NOTHING_TO_UPDATE",
   "error.MUST_BE_LOGGED_IN",
   "error.FORBIDDEN",
   "error.USER_BLOCKED",
@@ -367,7 +368,7 @@ export const POLICY_PREFIXES = {
   delete: PREFIX_BUILD("POLICY_DELETE"),
 };
 export const POLICY_REQUIRED_I18N = [
-  "label", "placeholder", "fail",
+  "title", "fail",
 ];
 export const POLICY_OPTIONAL_I18N = [
   "description",

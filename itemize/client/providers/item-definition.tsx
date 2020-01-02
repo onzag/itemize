@@ -56,7 +56,7 @@ export interface IActionResponseWithSearchResults extends IBasicActionResponse {
   results: ISearchResult[];
 }
 
-type policyPathType = [string, string, string];
+export type PolicyPathType = [string, string, string];
 
 /**
  * The options for submitting,
@@ -65,9 +65,15 @@ type policyPathType = [string, string, string];
 export interface IActionSubmitOptions {
   onlyIncludeProperties?: string[];
   onlyIncludeItems?: string[];
+  onlyIncludeIfDiffersFromAppliedValue?: boolean;
   unpokeAfterSuccess?: boolean;
   propertiesToCleanOnSuccess?: string[];
-  policiesToCleanOnSuccess?: policyPathType[];
+  policiesToCleanOnSuccess?: PolicyPathType[];
+  beforeSubmit?: (policiesRequested: PolicyPathType[]) => boolean;
+}
+
+export interface IActionDeleteOptions {
+  beforeDelete?: (policiesRequested: PolicyPathType[]) => boolean;
 }
 
 /**
@@ -926,6 +932,7 @@ export class ActualItemDefinitionProvider extends
     options?: {
       onlyIncludeProperties?: string[],
       onlyIncludeItems?: string[],
+      onlyIncludeIfDiffersFromAppliedValue?: boolean,
     },
   ): boolean {
     // let's make this variable to check on whether things are invalid or not
@@ -934,8 +941,36 @@ export class ActualItemDefinitionProvider extends
     let isInvalid = this.state.itemDefinitionState.properties.some((p) => {
       // we return false if we have an only included properties and our property is in there
       // because that means that whether it is valid or not is irrelevant for our query
-      if (options && options.onlyIncludeProperties && !options.onlyIncludeProperties.includes(p.propertyId)) {
+      const isNotIncluded = options && options.onlyIncludeProperties &&
+        !options.onlyIncludeProperties.includes(p.propertyId);
+      if (isNotIncluded) {
         return false;
+      }
+      // now we check if we have the option to only include those that differ
+      // from the applied value
+      if (options && options.onlyIncludeIfDiffersFromAppliedValue) {
+        // we get the current applied value, if any
+        const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
+        // if there is an applied value for that property
+        if (currentAppliedValue && typeof currentAppliedValue.flattenedValue[p.propertyId] !== "undefined") {
+          // let's check if it's differ from what we have in the state
+          const doesNotDifferFromAppliedValue = equals(
+            currentAppliedValue.flattenedValue[p.propertyId],
+            p.value,
+          );
+          // if it does not differ, then it's false as it won't be included
+          if (doesNotDifferFromAppliedValue) {
+            return false;
+          } else {
+            // otherwise it really depends
+            return !p.valid;
+          }
+        } else {
+          // we return false here to basically not check
+          // we cannot compare against the applied value
+          // so this will anyway not be included
+          return false;
+        }
       }
       return !p.valid;
     });
@@ -957,6 +992,36 @@ export class ActualItemDefinitionProvider extends
         return i.itemDefinitionState.properties.some((p) => {
           if (!sinkingPropertyIds.includes(p.propertyId)) {
             return false;
+          }
+          // now we check if we have the option to only include those that differ
+          // from the applied value
+          if (options && options.onlyIncludeIfDiffersFromAppliedValue) {
+            // we get the current applied value, if any
+            const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
+            // if there is an applied value for that property
+            if (currentAppliedValue && currentAppliedValue.flattenedValue[item.getQualifiedIdentifier()]) {
+              const itemAppliedValue = currentAppliedValue.flattenedValue[item.getQualifiedIdentifier()];
+              if (typeof itemAppliedValue[p.propertyId] !== "undefined") {
+                // let's check if it's differ from what we have in the state
+                const doesNotDifferFromAppliedValue = equals(
+                  itemAppliedValue[p.propertyId],
+                  p.value,
+                );
+                // if it does not differ, then it's false, as it won't be included
+                if (doesNotDifferFromAppliedValue) {
+                  return false;
+                } else {
+                  // otherwise it will be included so check
+                  return !p.valid;
+                }
+              } else {
+                // we do not check if not specific item value
+                return false;
+              }
+            } else {
+              // we do not check if no whole applied value
+              return false;
+            }
           }
           return !p.valid;
         });
@@ -1174,12 +1239,17 @@ export class ActualItemDefinitionProvider extends
       getQueryFields: mergedQueryFields,
     };
   }
-  public checkPoliciesAndGetArgs(policyType: string, argumentsToCheckPropertiesAgainst?: any): [boolean, any] {
+  public checkPoliciesAndGetArgs(policyType: string, argumentsToCheckPropertiesAgainst?: any): {
+    isInvalid: boolean;
+    applyingPolicyArgs: any;
+    applyingPolicies: PolicyPathType[];
+  } {
     const applyingPolicyArgs: any = {};
-    return [
-      Object.keys(this.state.itemDefinitionState.policies[policyType]).some((policyName) => {
+    const applyingPolicies: PolicyPathType[] = [];
+    return {
+      isInvalid: Object.keys(this.state.itemDefinitionState.policies[policyType]).map((policyName) => {
         // and for that we check using some again every property that is applied in the policy
-        return this.state.itemDefinitionState.policies[policyType][policyName].some((propertyStateInPolicy) => {
+        return this.state.itemDefinitionState.policies[policyType][policyName].map((propertyStateInPolicy) => {
           // we check regarding the property ids only if we are asked to do so by the arguments for query
           if (argumentsToCheckPropertiesAgainst) {
             // and now we need to check whether the policy is at all necessary, as in, are we modifying
@@ -1195,6 +1265,7 @@ export class ActualItemDefinitionProvider extends
             // if it doesn't match anything, we return false, so technically this policy is valid, regardless on whether
             // the value itself is valid or not because it will not pass to the graphql query
             if (!oneOfApplyingPropertiesApplies) {
+              // the attribute is not included isInvalid is false we ignore
               return false;
             }
           }
@@ -1203,29 +1274,29 @@ export class ActualItemDefinitionProvider extends
           const applyingRoles = this.props.itemDefinitionInstance.getRolesForPolicy(policyType, policyName);
           const oneOfApplyingRolesApplies = applyingRoles.includes(this.props.tokenData.role);
           if (!oneOfApplyingRolesApplies) {
+            // the attribute is not included isInvalid is false
             return false;
           }
-          // otherwise if we find that it is not valid
-          if (!propertyStateInPolicy.valid) {
-            // then we return true, indicating the algorithm to terminate all its execution in this policy
-            // madness and just make isInvalid true and give the emulated invalid error
-            return true;
-          }
+
           // otherwise we are going to set it in the policy arguments that go with the arguments for the
           // query
           const policyProperty =
             this.props.itemDefinitionInstance
               .getPropertyDefinitionForPolicy(policyType, policyName, propertyStateInPolicy.propertyId);
+
           // then we are going to set that value using the qualified identifier that is used
           // in the args
           applyingPolicyArgs[policyProperty.getQualifiedPolicyIdentifier(policyType, policyName)] =
             propertyStateInPolicy.value;
-          // and we return false to indicate success of a valid property value
-          return false;
-        });
-      }),
+          applyingPolicies.push([policyType, policyName, policyProperty.getId()]);
+
+          // otherwise we are going to return whether it is invalid
+          return !propertyStateInPolicy.valid;
+        }).some((isPolicyNameInvalid) => isPolicyNameInvalid);
+      }).some((isPolicyTypeInvalid) => isPolicyTypeInvalid),
       applyingPolicyArgs,
-    ];
+      applyingPolicies,
+    };
   }
   public giveEmulatedInvalidError(
     stateApplied: string,
@@ -1257,14 +1328,18 @@ export class ActualItemDefinitionProvider extends
       };
     }
   }
-  public async delete(): Promise<IBasicActionResponse> {
+  public async delete(options: IActionDeleteOptions = {}): Promise<IBasicActionResponse> {
     if (this.state.deleting || this.props.forId === null) {
       return null;
     }
 
-    const [isInvalid, applyingPolicyArgs] = this.checkPoliciesAndGetArgs(
+    const {isInvalid, applyingPolicyArgs, applyingPolicies} = this.checkPoliciesAndGetArgs(
       "delete",
     );
+
+    if (options.beforeDelete && !options.beforeDelete(applyingPolicies)) {
+      return null;
+    }
 
     if (isInvalid) {
       // if it's not poked already, let's poke it
@@ -1349,6 +1424,7 @@ export class ActualItemDefinitionProvider extends
       onlyIncludeProperties: this.props.optimize && this.props.optimize.onlyIncludeProperties,
       onlyIncludeItemsForArgs: options.onlyIncludeItems,
       onlyIncludePropertiesForArgs: options.onlyIncludeProperties,
+      onlyIncludeArgsIfDiffersFromAppliedValue: options.onlyIncludeIfDiffersFromAppliedValue,
       appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
       userId: this.props.tokenData.id,
       userRole: this.props.tokenData.role,
@@ -1358,16 +1434,26 @@ export class ActualItemDefinitionProvider extends
 
     // super hack in order to get the applying policy args
     let applyingPolicyArgs: any = {};
+    let applyingPolicies: PolicyPathType[] = [];
     // first we only need to run this if it's not invalid, otherwise the values
     // are never really used for the policy state, also this is only useful for
     // edits
     if (this.props.forId && this.state.itemDefinitionState.policies.edit) {
       // now we set the variable by checking all the policies in the state using some
       // we check every policyName included in edit
-      [isInvalid, applyingPolicyArgs] = this.checkPoliciesAndGetArgs(
+      const checkPoliciesResult = this.checkPoliciesAndGetArgs(
         "edit",
         argumentsForQuery,
       );
+      applyingPolicyArgs = checkPoliciesResult.applyingPolicyArgs;
+      isInvalid = checkPoliciesResult.isInvalid;
+      applyingPolicies = checkPoliciesResult.applyingPolicies;
+    }
+
+    // now checking the option for the before submit function, if it returns
+    // false we cancel the submit request, we don't check policies yet
+    if (options && options.beforeSubmit && !options.beforeSubmit(applyingPolicies)) {
+      return null;
     }
 
     // if it's invalid we give the simulated error yet again

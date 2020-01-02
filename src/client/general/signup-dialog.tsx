@@ -24,7 +24,7 @@ function runTwoFunctions(functionA, functionB) {
 export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialogProps) => {
   return (
     <ModuleProvider module="users">
-      <ItemDefinitionProvider itemDefinition="user" optimize={{disableListener: !props.open}}>
+      <ItemDefinitionProvider itemDefinition="user">
         <LogActioner>
           {(actioner) => (
             <I18nRead id="signup">

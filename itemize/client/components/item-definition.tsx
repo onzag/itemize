@@ -7,18 +7,22 @@ import {
   IActionResponseWithSearchResults,
   IItemDefinitionContextType,
   ISearchResult,
+  IActionSubmitOptions,
+  IActionSearchOptions,
 } from "../providers/item-definition";
 import equals from "deep-equal";
 
+export interface IItemDefinitionLoaderInfoArgType {
+  loading: boolean;
+  notFound: boolean;
+  blocked: boolean;
+  hasBlockedAccess: boolean;
+  error: GraphQLEndpointErrorType;
+  reload: () => Promise<IBasicActionResponse>;
+}
+
 interface IItemDefinitionLoader {
-  children: (arg: {
-    loading: boolean,
-    notFound: boolean,
-    blocked: boolean,
-    hasBlockedAccess: boolean,
-    error: GraphQLEndpointErrorType,
-    reload: () => Promise<IBasicActionResponse>,
-  }) => any;
+  children: (arg: IItemDefinitionLoaderInfoArgType) => any;
 }
 
 interface IActualItemDefinitionLoader extends IItemDefinitionLoader {
@@ -62,15 +66,17 @@ export function ItemDefinitionLoader(props: IItemDefinitionLoader) {
   );
 }
 
+export interface ISubmitActionerInfoArgType {
+  submitError: GraphQLEndpointErrorType;
+  dismissError: () => void;
+  dismissSubmitted: () => void;
+  submitting: boolean;
+  submitted: boolean;
+  submit: (options?: IActionSubmitOptions) => Promise<IActionResponseWithId>;
+}
+
 interface ISubmitActionerProps {
-  children: (arg: {
-    submitError: GraphQLEndpointErrorType;
-    dismissError: () => void;
-    dismissSubmitted: () => void;
-    submitting: boolean;
-    submitted: boolean;
-    submit: () => Promise<IActionResponseWithId>;
-  }) => any;
+  children: (arg: ISubmitActionerInfoArgType) => any;
 }
 
 interface IActualSubmitActionerProps extends ISubmitActionerProps {
@@ -106,15 +112,17 @@ export function SubmitActioner(props: ISubmitActionerProps) {
   );
 }
 
+export interface ISearchActionerInfoArgType {
+  searchError: GraphQLEndpointErrorType;
+  dismissSearchResults: () => void;
+  dismissSearchError: () => void;
+  searching: boolean;
+  searchResults: ISearchResult[];
+  search: (options?: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
+}
+
 interface ISearchActionerProps {
-  children: (arg: {
-    searchError: GraphQLEndpointErrorType;
-    dismissSearchResults: () => void;
-    dismissSearchError: () => void;
-    searching: boolean;
-    searchResults: ISearchResult[];
-    search: () => Promise<IActionResponseWithSearchResults>;
-  }) => any;
+  children: (arg: ISearchActionerInfoArgType) => any;
 }
 
 interface IActualSearchActionerProps extends ISearchActionerProps {

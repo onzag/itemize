@@ -19,7 +19,7 @@ export function FrontPage() {
 
         <SearchActioner>
           {(actioner) => {
-            return <button onClick={actioner.search}>search</button>;
+            return <button onClick={actioner.search.bind(null, null)}>search</button>;
           }}
         </SearchActioner>
       </ItemDefinitionProvider>

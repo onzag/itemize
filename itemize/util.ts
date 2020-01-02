@@ -4,6 +4,7 @@ import createDOMPurify from "dompurify";
 import { STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES, EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS, MODERATION_FIELDS } from "./constants";
 import ItemDefinition, { ItemDefinitionIOActions } from "./base/Root/Module/ItemDefinition";
+import equals from "deep-equal";
 
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -163,6 +164,7 @@ export function getFieldsAndArgs(
     onlyIncludeItems?: string[],
     onlyIncludePropertiesForArgs?: string[],
     onlyIncludeItemsForArgs?: string[],
+    onlyIncludeArgsIfDiffersFromAppliedValue?: boolean,
     appliedOwner?: number,
     userRole: string;
     userId: number;
@@ -245,9 +247,26 @@ export function getFieldsAndArgs(
         )
     ) : false;
 
-    // the value for an argument is the value of the property
-    // as it is
-    if (shouldBeIncludedInArgs) {
+    // now we check if we have the option to only include those that differ
+    // from the applied value
+    if (shouldBeIncludedInArgs && options && options.onlyIncludeArgsIfDiffersFromAppliedValue) {
+      // we get the current applied value, if any
+      const currentAppliedValue = options.itemDefinitionInstance.getGQLAppliedValue(options.forId || null);
+      // if there is an applied value for that property
+      if (currentAppliedValue && typeof currentAppliedValue.flattenedValue[pd.getId()] !== "undefined") {
+        const currentValue = pd.getCurrentValue(options.forId || null);
+        // let's check if it's differ from what we have in the state
+        const doesNotDifferFromAppliedValue = equals(
+          currentAppliedValue.flattenedValue[pd.getId()],
+          currentValue,
+        );
+        // if it does not differ, then it is added note how we only add
+        // if there is an applied value
+        if (!doesNotDifferFromAppliedValue) {
+          argumentsForQuery[pd.getId()] = currentValue;
+        }
+      }
+    } else if (shouldBeIncludedInArgs) {
       argumentsForQuery[pd.getId()] = pd.getCurrentValue(options.forId || null);
     }
   });
@@ -310,15 +329,39 @@ export function getFieldsAndArgs(
         requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = sp.getRequestFields();
       }
 
+      const hasRoleAccessToItemProperty = sp.checkRoleAccessFor(
+        !options.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
+        options.userRole,
+        options.userId,
+        appliedOwner,
+        false,
+      );
+
       if (
-        itemShouldBeIncludedInArgs &&
-        sp.checkRoleAccessFor(
-          !options.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
-          options.userRole,
-          options.userId,
-          appliedOwner,
-          false,
-        )
+        itemShouldBeIncludedInArgs && hasRoleAccessToItemProperty &&
+        options && options.onlyIncludeArgsIfDiffersFromAppliedValue
+      ) {
+        // we get the current applied value, if any
+        const currentAppliedValue = options.itemDefinitionInstance.getGQLAppliedValue(options.forId || null);
+        // if there is an applied value for that property
+        if (currentAppliedValue && currentAppliedValue.flattenedValue[item.getQualifiedIdentifier()]) {
+          const itemAppliedValue = currentAppliedValue.flattenedValue[item.getQualifiedIdentifier()];
+          const currentValue = sp.getCurrentValue(options.forId || null);
+          if (typeof itemAppliedValue[sp.getId()] !== "undefined") {
+            // let's check if it's differ from what we have in the state
+            const doesNotDifferFromAppliedValue = equals(
+              itemAppliedValue[sp.getId()],
+              currentValue,
+            );
+            // so we only add if it differs note how we are only adding it
+            // if there is an applied value
+            if (!doesNotDifferFromAppliedValue) {
+              argumentsForQuery[qualifiedId][sp.getId()] = currentValue;
+            }
+          }
+        }
+      } else if (
+        itemShouldBeIncludedInArgs && hasRoleAccessToItemProperty
       ) {
         argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(options.forId || null);
       }
