@@ -119,8 +119,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
       specifiedProcessedRoot: (window as any).ROOT,
     };
 
-    this.remoteListener = new RemoteListener((window as any).ROOT);
-
     // the helper functions that change the state of the whole app
     // to change language, country and currency
     this.changeLanguageTo = this.changeLanguageTo.bind(this);
@@ -129,6 +127,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
     this.renderAppWithLocaleContext = this.renderAppWithLocaleContext.bind(this);
     this.setTokenState = this.setTokenState.bind(this);
     this.updateUserProperty = this.updateUserProperty.bind(this);
+
+    this.remoteListener = new RemoteListener((window as any).ROOT);
   }
 
   public setTokenState(state: ITokenProviderState) {

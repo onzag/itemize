@@ -476,7 +476,11 @@ export class ActualItemDefinitionProvider extends
       // so the remote listener job is to check how does it compare to what we have in our application state
       // do the dates match?... do we even have a value for it?... etc... adding remote listeners is heavy
       // as it will send data either via HTTP or websockets
-      this.props.remoteListener.addListenerFor(this.props.itemDefinitionInstance, this.props.forId);
+      this.props.remoteListener.addItemDefinitionListenerFor(
+        this,
+        this.props.itemDefinitionInstance,
+        this.props.forId,
+      );
     }
   }
   public unSetupListeners() {
@@ -485,7 +489,11 @@ export class ActualItemDefinitionProvider extends
     if (this.props.forId) {
       // remove all the remote listeners
       this.props.itemDefinitionInstance.removeListener("reload", this.props.forId, this.reloadListener);
-      this.props.remoteListener.removeListenerFor(this.props.itemDefinitionInstance, this.props.forId);
+      this.props.remoteListener.removeItemDefinitionListenerFor(
+        this,
+        this.props.itemDefinitionInstance,
+        this.props.forId,
+      );
     }
   }
   public shouldComponentUpdate(
@@ -535,14 +543,18 @@ export class ActualItemDefinitionProvider extends
         prevProps.itemDefinitionInstance.removeListener("change", prevProps.forId || null, this.changeListener);
         if (prevProps.forId) {
           prevProps.itemDefinitionInstance.addListener("reload", prevProps.forId, this.reloadListener);
-          prevProps.remoteListener.removeListenerFor(prevProps.itemDefinitionInstance, prevProps.forId);
+          prevProps.remoteListener.removeItemDefinitionListenerFor(
+            this, prevProps.itemDefinitionInstance, prevProps.forId,
+          );
         }
 
         // add the new listeners
         this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.changeListener);
         if (this.props.forId) {
           this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
-          this.props.remoteListener.addListenerFor(this.props.itemDefinitionInstance, this.props.forId);
+          this.props.remoteListener.addItemDefinitionListenerFor(
+            this, this.props.itemDefinitionInstance, this.props.forId,
+          );
         }
       }
 

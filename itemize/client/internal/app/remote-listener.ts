@@ -12,6 +12,7 @@ export class RemoteListener {
     [qualifiedPathNameWithId: string]: {
       id: number,
       itemDefinition: ItemDefinition;
+      parentInstances: any[],
     },
   };
   private delayedFeedbacks: Array<{
@@ -19,27 +20,52 @@ export class RemoteListener {
     forId: number;
   }> = [];
   private connectionListeners: Array<() => void> = [];
+  private appUpdatedListeners: Array<() => void> = [];
+  private lastRecievedBuildNumber: string;
   private uuid: string = uuid.v4();
   private isReconnect: boolean = false;
   private offline: boolean = false;
   constructor(root: Root) {
     this.reattachListeners = this.reattachListeners.bind(this);
     this.onPossibleChangeListened = this.onPossibleChangeListened.bind(this);
+    this.onPossibleAppUpdateListened = this.onPossibleAppUpdateListened.bind(this);
     this.onDisconnect = this.onDisconnect.bind(this);
 
     this.root = root;
     this.listeners = {};
+    this.connectionListeners = [];
+    this.appUpdatedListeners = [];
+    this.lastRecievedBuildNumber = (window as any).BUILD_NUMBER;
 
     this.socket = io(`${location.protocol}//${location.host}`);
     this.socket.on("connect", this.reattachListeners);
     this.socket.on("changed", this.onPossibleChangeListened);
+    this.socket.on("buildnumber", this.onPossibleAppUpdateListened);
     this.socket.on("disconnect", this.onDisconnect);
+  }
+  public onPossibleAppUpdateListened(buildNumber: string) {
+    this.lastRecievedBuildNumber = buildNumber;
+    if (this.isAppUpdated()) {
+      this.appUpdatedListeners.forEach((l) => l());
+    }
   }
   public getUUID() {
     return this.uuid;
   }
   public isOffline() {
     return this.offline;
+  }
+  public addAppUpdatedListener(listener: () => void) {
+    this.appUpdatedListeners.push(listener);
+  }
+  public removeAppUpdatedListener(listener: () => void) {
+    const index = this.appUpdatedListeners.indexOf(listener);
+    if (index !== -1) {
+      this.appUpdatedListeners.splice(index, 1);
+    }
+  }
+  public isAppUpdated() {
+    return this.lastRecievedBuildNumber !== (window as any).BUILD_NUMBER;
   }
   public addConnectStatusListener(listener: () => void) {
     this.connectionListeners.push(listener);
@@ -50,17 +76,22 @@ export class RemoteListener {
       this.connectionListeners.splice(index, 1);
     }
   }
-  public addListenerFor(itemDefinition: ItemDefinition, forId: number) {
+  public addItemDefinitionListenerFor(parentInstance: any, itemDefinition: ItemDefinition, forId: number) {
     const qualifiedIdentifier = itemDefinition.getQualifiedPathName() + "." + forId;
     if (this.listeners[qualifiedIdentifier]) {
+      this.listeners[qualifiedIdentifier].parentInstances.push(parentInstance);
       return;
     }
 
     this.listeners[qualifiedIdentifier] = {
       id: forId,
       itemDefinition,
+      parentInstances: [parentInstance],
     };
 
+    this.attachItemDefinitionListenerFor(itemDefinition, forId);
+  }
+  public attachItemDefinitionListenerFor(itemDefinition: ItemDefinition, forId: number) {
     const modulePath = itemDefinition.getParentModule().getPath().join("/");
     const idefPath = itemDefinition.getPath().join("/");
 
@@ -85,8 +116,20 @@ export class RemoteListener {
       setTimeout(this.consumeDelayedFeedbacks.bind(this, forId), 70);
     }
   }
-  public removeListenerFor(itemDefinition: ItemDefinition, forId: number) {
-    delete this.listeners[itemDefinition.getQualifiedPathName() + "." + forId];
+  public removeItemDefinitionListenerFor(parentInstance: any, itemDefinition: ItemDefinition, forId: number) {
+    const qualifiedID = itemDefinition.getQualifiedPathName() + "." + forId;
+    const listenerValue = this.listeners[qualifiedID];
+    if (listenerValue) {
+      const newListenerValue = {
+        ...listenerValue,
+        parentInstances: listenerValue.parentInstances.filter((i) => i !== parentInstance),
+      };
+      if (newListenerValue.parentInstances.length === 0) {
+        delete this.listeners[qualifiedID];
+      } else {
+        this.listeners[qualifiedID] = newListenerValue;
+      }
+    }
 
     const modulePath = itemDefinition.getParentModule().getPath().join("/");
     const idefPath = itemDefinition.getPath().join("/");
@@ -170,7 +213,7 @@ export class RemoteListener {
     Object.keys(this.listeners).forEach((listenerKey) => {
       const itemDefinition = this.listeners[listenerKey].itemDefinition;
       const forId = this.listeners[listenerKey].id;
-      this.addListenerFor(itemDefinition, forId);
+      this.attachItemDefinitionListenerFor(itemDefinition, forId);
       if (
         this.isReconnect &&
         this.delayedFeedbacks.every((df) => df.itemDefinition !== itemDefinition && df.forId !== forId)

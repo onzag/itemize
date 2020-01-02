@@ -59,7 +59,7 @@ export interface IAppDataType {
   redis: RedisClient;
   redisPub: RedisClient;
   redisSub: RedisClient;
-  buildnumber: number;
+  buildnumber: string;
 }
 
 export interface IServerCustomizationDataType {
@@ -195,7 +195,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   let build: any;
   let root: any;
   let autocompleteSource: string;
-  let buildnumber: any;
+  let buildnumber: string;
   [config, index, rawBuild, autocompleteSource, buildnumber] = await Promise.all([
     fsAsync.readFile(path.join("dist", "config.json"), "utf8"),
     fsAsync.readFile(path.join("dist", "data", "index.html"), "utf8"),
@@ -205,7 +205,8 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   ]);
   config = JSON.parse(config);
   build = JSON.parse(rawBuild);
-  buildnumber = JSON.parse(buildnumber);
+  // this shouldn't be necessary but we do it anyway
+  buildnumber = buildnumber.replace("\n", "").trim();
 
   root = new Root(build.root);
 
@@ -271,6 +272,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   });
   const io = ioMain(server);
   io.on("connection", (socket) => {
+    appData.listener.addSocket(socket);
     socket.on("register", (modulePath: string, itemDefinitionPath: string, id: number) => {
       appData.listener.addListener(socket, modulePath, itemDefinitionPath, id);
     });

@@ -22,6 +22,14 @@ export class Listener {
 
     this.appData.redisSub.on("message", this.pubSubTriggerListeners);
   }
+  public addSocket(
+    socket: Socket,
+  ) {
+    socket.emit(
+      "buildnumber",
+      this.appData.buildnumber,
+    );
+  }
   public setUUID(
     socket: Socket,
     uuid: string,
