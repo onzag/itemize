@@ -145,19 +145,20 @@ export async function convertGQLValueToSQLValueForItem(
           // are an object within there, we pass that, as all the info should be
           // there, the prefix then represents the fact, we want all the added properties
           // to be prefixed with what we are giving, in this case ITEM_wheel_
+          const addedFieldsByProperty = await convertGQLValueToSQLValueForProperty(
+            transitoryId,
+            itemDefinition,
+            item,
+            sinkingProperty,
+            data[item.getQualifiedIdentifier()],
+            (oldData && oldData[item.getQualifiedIdentifier()]) || null,
+            knex,
+            dictionary,
+            prefix,
+          );
           sqlResult = {
             ...sqlResult,
-            ...(await convertGQLValueToSQLValueForProperty(
-              transitoryId,
-              itemDefinition,
-              item,
-              sinkingProperty,
-              data[item.getQualifiedIdentifier()],
-              (oldData && oldData[item.getQualifiedIdentifier()]) || null,
-              knex,
-              dictionary,
-              prefix,
-            )),
+            ...addedFieldsByProperty,
           };
         }
       }),

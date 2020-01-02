@@ -15,12 +15,6 @@ export function FrontPage() {
         <div>
           <I18nRead id="name"/>
         </div>
-        {/* <ItemProvider item="chasis">
-          <div>
-            <I18nRead id="name"/>
-          </div>
-          <Entry id="material_type" searchVariant="exact"/>
-        </ItemProvider> */}
         <Entry id="propext_test" searchVariant="search"/>
 
         <SearchActioner>

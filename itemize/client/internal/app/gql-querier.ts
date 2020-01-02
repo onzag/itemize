@@ -66,6 +66,10 @@ export class GQLQuery {
       };
     }
 
+    if (arg instanceof GQLEnum || arg instanceof GQLVar) {
+      return arg;
+    }
+
     if (Array.isArray(arg)) {
       return arg.map(this.findFilesAndProcessArgs);
     }
@@ -130,7 +134,7 @@ function buildArgs(
   keyOpenType: string,
   keyCloseType: string,
 ) {
-  if (typeof (args) !== "object" || args === null) {
+  if (typeof args !== "object" || args === null) {
     return JSON.stringify(args);
   }
 

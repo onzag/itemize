@@ -49,30 +49,24 @@ function ActualProfile(props: IActualProfileProps) {
             {(submitActioner) => (
               <React.Fragment>
                 <Entry id="profile_picture"/>
-                {/* <div>
+                <div>
                   <Avatar large={true} hideFlag={true}/>
                   <LanguagePicker/>
                 </div>
                 <Entry id="username"/>
                 <Entry id="email"/>
                 <Entry id="password"/>
-                <Entry id="password" policyType="edit" policyName="REQUIRES_PASSWORD_CONFIRMATION"/> */}
+                <I18nRead id="label" policyType="edit" policyName="REQUIRES_PASSWORD_CONFIRMATION"/>
+                <Entry id="password" policyType="edit" policyName="REQUIRES_PASSWORD_CONFIRMATION"/>
                 <Button onClick={logActioner.logout}>
                   <I18nRead id="logout"/>
                 </Button>
-                {/* <Button
+                <Button
                   onClick={submitActioner.submitError ? null : submitActioner.submit.bind(null, {
-                    onlyIncludeProperties: ["username", "email", "password"],
+                    onlyIncludeProperties: ["username", "email", "password", "profile_picture"],
                     propertiesToCleanOnSuccess: ["password"],
                     policiesToCleanOnSuccess: [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]],
                     unpokeAfterSuccess: true,
-                  })}
-                >
-                  <I18nRead id="update_profile"/>
-                </Button> */}
-                <Button
-                  onClick={submitActioner.submitError ? null : submitActioner.submit.bind(null, {
-                    onlyIncludeProperties: ["profile_picture"],
                   })}
                 >
                   <I18nRead id="update_profile"/>
@@ -89,7 +83,6 @@ function ActualProfile(props: IActualProfileProps) {
                   i18nDisplay="profile_updated_succesfully"
                   onClose={submitActioner.dismissSubmitted}
                 />
-                <StatsForNerds propertyIds={["profile_picture"]}/>
               </React.Fragment>
             )}
           </SubmitActioner>

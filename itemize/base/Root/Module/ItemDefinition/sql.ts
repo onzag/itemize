@@ -165,11 +165,12 @@ export async function convertGQLValueToSQLValueForItemDefinition(
         (partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
         !partialFields
       ) {
+        const addedFieldsByProperty = await convertGQLValueToSQLValueForProperty(
+          transitoryId, itemDefinition, null, pd, data, oldData, knex, dictionary, "",
+        );
         result = {
           ...result,
-          ...(await convertGQLValueToSQLValueForProperty(
-            transitoryId, itemDefinition, null, pd, data, oldData, knex, dictionary, "",
-          )),
+          ...addedFieldsByProperty,
         };
       }
     })),
@@ -183,11 +184,12 @@ export async function convertGQLValueToSQLValueForItemDefinition(
         !partialFields
       ) {
         const innerPartialFields = !partialFields ? null : partialFields[itemNameInPartialFields];
+        const addedFieldsByItem = await convertGQLValueToSQLValueForItem(
+          transitoryId, itemDefinition, item, data, oldData, knex, dictionary, innerPartialFields,
+        );
         result = {
           ...result,
-          ...(await convertGQLValueToSQLValueForItem(
-            transitoryId, itemDefinition, item, data, oldData, knex, dictionary, innerPartialFields,
-          )),
+          ...addedFieldsByItem,
         };
       }
     })),

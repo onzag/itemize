@@ -271,7 +271,7 @@ async function processOneFileAndItsSameIDReplacement(
  * @param originalId the original id that was used
  * @param newId the new id
  */
-export async function updateTransitoryId(
+export async function updateTransitoryIdIfExists(
   itemDefinition: ItemDefinition,
   originalId: string,
   newId: string,
@@ -281,7 +281,9 @@ export async function updateTransitoryId(
   const originalTransitoryLocation = path.join(idefLocationPath, originalId);
   const newTransitoryLocation = path.join(idefLocationPath, newId);
 
-  await fsAsync.rename(originalTransitoryLocation, newTransitoryLocation);
+  if (await checkExists(originalTransitoryLocation)) {
+    await fsAsync.rename(originalTransitoryLocation, newTransitoryLocation);
+  }
 }
 
 /**

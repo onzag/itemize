@@ -77,7 +77,6 @@ class AppBase extends React.Component<IAppBaseProps, {}> {
     return (
       <React.Fragment>
         <Navbar onLoginClick={this.openLoginDialog} loggedUserId={this.props.userId}/>
-        <span>{JSON.stringify(this.props.location)}</span>
         <LoginDialog
           onSignupRequest={this.openSignupDialog}
           open={this.props.location.state.loginDialogOpen || false}

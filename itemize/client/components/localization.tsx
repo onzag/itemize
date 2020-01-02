@@ -45,7 +45,8 @@ export function I18nRead(props: II18nReadProps) {
                             itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
                           if (props.policyType && props.policyName) {
                             const i18nPolicyTypeValue =
-                              i18nIdefData ? i18nIdefData[props.policyType] || null : null;
+                              i18nIdefData ? (i18nIdefData.policies && i18nIdefData.policies[props.policyType])
+                                || null : null;
                             const i18nPolicyNameValue =
                               i18nPolicyTypeValue ? i18nPolicyTypeValue[props.policyName] || null : null;
                             i18nValue = i18nPolicyNameValue ? i18nPolicyNameValue[props.id] || null : null;
@@ -71,6 +72,9 @@ export function I18nRead(props: II18nReadProps) {
                         if (itemDefinitionContextualValue) {
                           errMessage += "; in item definition context for " +
                             itemDefinitionContextualValue.idef.getName();
+                          if (props.policyType && props.policyName) {
+                            errMessage += "; in policy " + props.policyType + " " + props.policyName;
+                          }
                           if (itemContext) {
                             errMessage += "; in item context for " +
                               itemContext.item.getName();

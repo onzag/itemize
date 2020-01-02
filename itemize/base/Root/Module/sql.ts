@@ -92,11 +92,12 @@ export async function convertGQLValueToSQLValueForModule(
         (partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
         !partialFields
       ) {
+        const addedFieldsByProperty = await convertGQLValueToSQLValueForProperty(
+          transitoryId, itemDefinition, null, pd, data, oldData, knex, dictionary, "",
+        );
         result = {
           ...result,
-          ...(await convertGQLValueToSQLValueForProperty(
-            transitoryId, itemDefinition, null, pd, data, oldData, knex, dictionary, "",
-          )),
+          ...addedFieldsByProperty,
         };
       }
     }),

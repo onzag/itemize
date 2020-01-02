@@ -22,7 +22,7 @@ import {
 import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sql";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import uuid from "uuid";
-import { updateTransitoryId } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
+import { updateTransitoryIdIfExists } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
 
 const debug = Debug("resolvers:addItemDefinition");
 export async function addItemDefinition(
@@ -147,7 +147,7 @@ export async function addItemDefinition(
     appData.knex,
     dictionary,
   );
-  const sqlModData: any = convertGQLValueToSQLValueForModule(
+  const sqlModData: any = await convertGQLValueToSQLValueForModule(
     transitoryId,
     itemDefinition.getParentModule(),
     itemDefinition,
@@ -241,7 +241,7 @@ export async function addItemDefinition(
     }
   });
 
-  await updateTransitoryId(
+  await updateTransitoryIdIfExists(
     itemDefinition,
     transitoryId,
     value.id.toString(),
