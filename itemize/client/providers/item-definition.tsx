@@ -1096,25 +1096,18 @@ export class ActualItemDefinitionProvider extends
 
     // otherwise now let's check for the worker
     if (
-      // if we have an id and a GET or EDIT request we want
-      // to get the cached value, always, for update reasons as well
-      (
-        queryPrefix === PREFIX_GET ||
-        queryPrefix === PREFIX_EDIT
-      ) &&
+      // if we have an id and a GET request we want cached value
+      queryPrefix === PREFIX_GET &&
       this.props.forId &&
-      CacheWorkerInstance.isSupported
+      CacheWorkerInstance.isSupported &&
+      returnWorkerCachedValuesForGetRequests
     ) {
       // we ask the worker for the value
       const workerCachedValue =
         await CacheWorkerInstance.instance.getCachedValue(queryName, this.props.forId, requestFields);
       // if we have a GET request and we are allowed to return from the wroker cache and we actually
       // found something in our cache, return that
-      if (
-        queryPrefix === PREFIX_GET &&
-        returnWorkerCachedValuesForGetRequests &&
-        workerCachedValue
-      ) {
+      if (workerCachedValue) {
         return {
           error: null,
           value: workerCachedValue.value,

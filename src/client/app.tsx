@@ -9,6 +9,8 @@ import { TermsAndConditions } from "./pages/terms-and-conditions";
 import { PrivacyPolicy } from "./pages/privacy-policy";
 import { Location } from "history";
 import { UserIdRetriever } from "../../itemize/client/components/user";
+import { OfflineStatusRetriever } from "../../itemize/client/components/offline";
+import { AppIsOutdatedChecker } from "../../itemize/client/components/outdated";
 
 interface IAppBaseProps {
   userId: number;
@@ -77,6 +79,16 @@ class AppBase extends React.Component<IAppBaseProps, {}> {
     return (
       <React.Fragment>
         <Navbar onLoginClick={this.openLoginDialog} loggedUserId={this.props.userId}/>
+        <OfflineStatusRetriever>
+          {(isOffline) => (
+             <div>OFFLINE STATUS: {isOffline ? "OFFLINE" : "ONLINE"}</div>
+          )}
+        </OfflineStatusRetriever>
+        <AppIsOutdatedChecker>
+          {(isOutdated) => (
+            <div>APP STATUS: {isOutdated ? "OUTDATED" : "UP TO DATE"}</div>
+          )}
+        </AppIsOutdatedChecker>
         <LoginDialog
           onSignupRequest={this.openSignupDialog}
           open={this.props.location.state.loginDialogOpen || false}
@@ -105,7 +117,7 @@ export default function App() {
             }
           </LocationStateReader>
         )}
-      </UserIdRetriever>,
+      </UserIdRetriever>
       <Route path="/" exact={true} component={FrontPage} />
       <Route path="/terms-and-conditions" component={TermsAndConditions} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />

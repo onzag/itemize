@@ -23,7 +23,7 @@ class ActualAppIsOutdatedChecker extends
       isOutdated: false,
     };
 
-    this.onAppIsOutdated = this.onAppIsOutdated.bind(this);
+    this.onAppUpdated = this.onAppUpdated.bind(this);
   }
   public shouldComponentUpdate(
     nextProps: IActualAppIsOutdatedCheckerProps, nextState: IActualAppIsOutdatedCheckerState,
@@ -32,12 +32,12 @@ class ActualAppIsOutdatedChecker extends
       nextState.isOutdated !== this.state.isOutdated;
   }
   public componentDidMount() {
-    this.props.remoteListener.addConnectStatusListener(this.onAppIsOutdated);
+    this.props.remoteListener.addAppUpdatedListener(this.onAppUpdated);
   }
   public componentWillUnmount() {
-    this.props.remoteListener.removeConnectStatusListener(this.onAppIsOutdated);
+    this.props.remoteListener.removeAppUpdatedListener(this.onAppUpdated);
   }
-  public onAppIsOutdated() {
+  public onAppUpdated() {
     this.setState({
       isOutdated: this.props.remoteListener.isAppUpdated(),
     });

@@ -25,6 +25,7 @@ export class RemoteListener {
   private uuid: string = uuid.v4();
   private isReconnect: boolean = false;
   private offline: boolean = false;
+  private initialConsideredDisconnectedIfNoAnswerTimeout: NodeJS.Timeout;
   constructor(root: Root) {
     this.reattachListeners = this.reattachListeners.bind(this);
     this.onPossibleChangeListened = this.onPossibleChangeListened.bind(this);
@@ -36,6 +37,12 @@ export class RemoteListener {
     this.connectionListeners = [];
     this.appUpdatedListeners = [];
     this.lastRecievedBuildNumber = (window as any).BUILD_NUMBER;
+
+    this.initialConsideredDisconnectedIfNoAnswerTimeout = setTimeout(() => {
+      this.offline = true;
+      this.isReconnect = true;
+      this.connectionListeners.forEach((l) => l());
+    }, 1000);
 
     this.socket = io(`${location.protocol}//${location.host}`);
     this.socket.on("connect", this.reattachListeners);
@@ -215,6 +222,9 @@ export class RemoteListener {
     });
   }
   private reattachListeners() {
+    this.offline = false;
+    clearTimeout(this.initialConsideredDisconnectedIfNoAnswerTimeout);
+
     this.socket.emit(
       "identify",
       this.uuid,
@@ -239,11 +249,10 @@ export class RemoteListener {
     this.consumeDelayedFeedbacks();
 
     this.isReconnect = true;
-    this.offline = false;
     console.log("reattach listenrs asked");
   }
   private onDisconnect() {
-    this.connectionListeners.forEach((l) => l());
     this.offline = true;
+    this.connectionListeners.forEach((l) => l());
   }
 }
