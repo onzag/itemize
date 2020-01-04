@@ -6,6 +6,7 @@ import { Avatar } from "../general/avatar";
 import { LanguagePicker } from "../general/language-picker";
 import { ItemDefinitionProvider } from "../../../itemize/client/providers/item-definition";
 import { ModuleProvider } from "../../../itemize/client/providers/module";
+import { TitleReader } from "../../../itemize/client/components/util";
 
 const navbarStyles = (theme: Theme) => createStyles({
   container: {
@@ -22,6 +23,11 @@ const navbarStyles = (theme: Theme) => createStyles({
     paddingRight: "1rem",
   },
   appBarSpacer: theme.mixins.toolbar,
+  title: {
+    whiteSpace: "nowrap",
+    paddingLeft: "1rem",
+    paddingRight: "1rem",
+  },
 });
 
 interface INavbarProps extends WithStyles<typeof navbarStyles> {
@@ -37,6 +43,9 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
           <IconButton edge="start" color="inherit" aria-label={"TODO translataion menu"}>
             <Icon>menu</Icon>
           </IconButton>
+          <div className={props.classes.title}>
+            <TitleReader/>
+          </div>
           <div className={props.classes.container}>
             <ModuleProvider module="users">
               <ItemDefinitionProvider

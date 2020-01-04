@@ -6,5 +6,12 @@
     "en": "english",
     "es": "spanish"
   },
-  "roles": ["USER", "MODERATOR", "ADMIN", "MORE_ROLES"]
+  "roles": ["USER", "MODERATOR", "ADMIN", "MORE_ROLES"],
+
+  "manifest": {
+    "macSafariMaskIconThemeColor": "#d30000",
+    "msTileColor": "#d30000",
+    "themeColor": "#ffffff",
+    "backgroundColor": "#ffffff"
+  }
 }

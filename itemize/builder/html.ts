@@ -7,6 +7,21 @@ import fs from "fs";
 import path from "path";
 const fsAsync = fs.promises;
 
+function replaceHTMLKeys(html: string, obj: any, prefix: string): string {
+  let newHTML = html;
+  Object.keys(obj).forEach((key) => {
+    if (Array.isArray(obj[key]) || typeof obj[key] !== "object" || obj[key] === null) {
+      newHTML = newHTML.replace(
+        new RegExp(escapeStringRegexp("%{" + prefix + key + "}"), "g"),
+        Array.isArray(obj[key]) ? obj[key].join(",") : obj[key],
+      );
+    } else {
+      newHTML = replaceHTMLKeys(newHTML, obj[key], prefix + key + ".");
+    }
+  });
+  return newHTML;
+}
+
 export async function buildHTML(rawConfig: any) {
   if (!await checkExists(path.join("dist", "data"))) {
     await fsAsync.mkdir(path.join("dist", "data"));
@@ -26,10 +41,7 @@ export async function buildHTML(rawConfig: any) {
   });
 
   const buildNumber = (new Date()).getTime().toString();
-  baseHTML = baseHTML.replace(
-    new RegExp(escapeStringRegexp("%{BUILD_NUMBER}"), "g"),
-    buildNumber,
-  );
+  baseHTML = replaceHTMLKeys(baseHTML, rawConfig, "");
 
   baseHTML = htmlMinifier.minify(
     baseHTML,

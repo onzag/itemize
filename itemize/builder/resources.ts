@@ -7,6 +7,23 @@ import { checkExists } from "./util";
 const svgo = new Svgo();
 const fsAsync = fs.promises;
 
+const REQUIRED_RESOURCES = [
+  "image-fail.svg",
+  "icons/android-chrome-64x64.png",
+  "icons/android-chrome-192x192.png",
+  "icons/android-chrome-512x512.png",
+  "icons/apple-touch-icon-no-transparency-180x180.png",
+  "icons/favicon.ico",
+  "icons/favicon-16x16.png",
+  "icons/favicon-32x32.png",
+  "icons/mstile-square-70x70.png",
+  "icons/mstile-square-150x150.png",
+  "icons/mstile-square-70x70.png",
+  "icons/mstile-wide-310x150.png",
+  "icons/mstile-square-310x310.png",
+  "icons/macos-safari-monochrome-icon.svg",
+];
+
 async function copyOneDirectoryLevel(pathname: string, constructedPath: string) {
   const filesInDirectory = await fsAsync.readdir(pathname);
 
@@ -77,5 +94,10 @@ export async function buildResources(rawConfig: any) {
   if (!await checkExists(path.join("dist", "data"))) {
     await fsAsync.mkdir(path.join("dist", "data"));
   }
+  await Promise.all(REQUIRED_RESOURCES.map(async (requiredResource) => {
+    if (!await checkExists(path.join("resources", requiredResource))) {
+      console.log("Missing resource file: " + colors.red(requiredResource));
+    }
+  }));
   return copyOneDirectoryLevel("resources", "");
 }

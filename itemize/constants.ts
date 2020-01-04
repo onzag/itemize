@@ -150,6 +150,12 @@ export const LOCALE_I18N = [
   "error.NOT_FOUND",
 ];
 
+export const ROOT_REQUIRED_LOCALE_I18N = [
+  "app_name",
+  "app_short_name",
+  "app_description",
+];
+
 // ATTRIBUTES FOR i18N PROPERTIES
 export const CLASSIC_BASE_I18N = [
   "label",

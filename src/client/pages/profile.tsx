@@ -6,7 +6,7 @@ import { Button, createStyles, withStyles, WithStyles } from "@material-ui/core"
 import { Avatar } from "../general/avatar";
 import { LanguagePicker } from "../general/language-picker";
 import { LogActioner } from "../../../itemize/client/components/login";
-import { Entry, View } from "../../../itemize/client/components/property";
+import { Entry, View, Reader } from "../../../itemize/client/components/property";
 import { I18nRead } from "../../../itemize/client/components/localization";
 import { ItemDefinitionLoader, SubmitActioner, ISubmitActionerInfoArgType } from "../../../itemize/client/components/item-definition";
 import { UserIdRetriever } from "../../../itemize/client/components/user";
@@ -14,6 +14,7 @@ import Snackbar from "../general/snackbar";
 import { ModuleProvider } from "../../../itemize/client/providers/module";
 import { StatsForNerds } from "../../../itemize/client/components/dev";
 import { PolicyConfirmDialog } from "./dialogs/policy-confirm";
+import { TitleSetter } from "../../../itemize/client/components/util";
 
 function SimulatedNotFoundPage() {
   return (
@@ -110,6 +111,11 @@ class ActualProfile extends React.Component<IActualProfileProps, IActualProfileS
             <SubmitActioner>
               {(submitActioner) => (
                 <React.Fragment>
+                  <I18nRead id="my_profile">
+                    {(value: string) => (
+                      <TitleSetter>{value}</TitleSetter>
+                    )}
+                  </I18nRead>
                   <Entry id="profile_picture"/>
                   <div>
                     <Avatar large={true} hideFlag={true}/>
@@ -154,6 +160,11 @@ class ActualProfile extends React.Component<IActualProfileProps, IActualProfileS
     } else {
       content = (
         <React.Fragment>
+          <Reader id="username">
+            {(value: string) => (
+              <TitleSetter>{value}</TitleSetter>
+            )}
+          </Reader>
           <div>
             <Avatar large={true} hideFlag={true}/>
           </div>
