@@ -23,8 +23,6 @@ import { buildSQLQueryForItemDefinition } from "../../../base/Root/Module/ItemDe
 export interface ISearchResultIdentifierType {
   id: number;
   type: string;
-  module_path: string;
-  idef_path: string;
 }
 
 const searchModuleDebug = Debug("resolvers:searchModule");
@@ -86,7 +84,7 @@ export async function searchModule(
 
   // now we build the search query, the search query only matches an id
   // note how we remove blocked_at
-  const searchQuery = appData.knex.select(["id", "type", "module_path", "idef_path"])
+  const searchQuery = appData.knex.select(["id", "type"])
     .from(mod.getQualifiedPathName())
     .where("blocked_at", null);
 
@@ -237,8 +235,6 @@ export async function searchItemDefinition(
 
   // now we get the base result, and convert every row
   const baseResult: ISQLTableRowValue[] = await searchQuery;
-  const modPath = mod.getPath().join("/");
-  const selfPath = itemDefinition.getPath().join("/");
   const finalResult: {
     ids: ISearchResultIdentifierType[];
   } = {
@@ -246,8 +242,6 @@ export async function searchItemDefinition(
       return {
         id: row.id,
         type: selfTable,
-        module_path: modPath,
-        idef_path: selfPath,
       };
     }),
   };

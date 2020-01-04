@@ -1,4 +1,5 @@
 import Module, { IModuleRawJSONDataType } from "./Module";
+import ItemDefinition from "./Module/ItemDefinition";
 
 export interface IRootRawJSONDataType {
   type: "root";
@@ -29,6 +30,9 @@ export interface IRawJSONBuildDataType {
 }
 
 export default class Root {
+  public static Registry: {
+    [qualifiedName: string]: Module | ItemDefinition,
+  } = {};
   public static getModuleRawFor(
     root: IRootRawJSONDataType,
     name: string[],

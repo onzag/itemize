@@ -265,20 +265,6 @@ export async function getModuleList(
     true,
   );
 
-  // same reason as item definition security issue, we need to ensure now that all the types
-  // in the module really belong to the module and the item definition they are being
-  // referred to, otherwise they might inject something, so we prevent that from happening
-  // here by ensuring there's consistency in the searchID type which is the table name
-  resolverArgs.args.ids.forEach((searchID: ISearchResultIdentifierType) => {
-    const expectedType = mod.getItemDefinitionFor(searchID.idef_path.split("/")).getQualifiedPathName();
-    if (expectedType !== searchID.type) {
-      throw new GraphQLEndpointError({
-        message: "type does not match the type of the item definition type at " + searchID.type,
-        code: "UNSPECIFIED",
-      });
-    }
-  });
-
   const moduleTable = mod.getQualifiedPathName();
   const resultValues: ISQLTableRowValue[] = await appData.cache.requestListCache(
     moduleTable,

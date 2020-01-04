@@ -17,6 +17,7 @@ import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { GraphQLEndpointError } from "../../../errors";
 import uuid from "uuid";
 import { flattenRawGQLValueOrFields } from "../../../../gql-util";
+import Root from "../..";
 
 export interface IPolicyValueRawJSONDataType {
   roles: string[];
@@ -31,6 +32,11 @@ export interface IPolicyRawJSONDataType {
 export interface IPoliciesRawJSONDataType {
   edit?: IPolicyRawJSONDataType;
   delete?: IPolicyRawJSONDataType;
+}
+
+export interface IItemDefinitionParentingRawJSONDataType {
+  module: string;
+  itemDefinition?: string;
 }
 
 export interface IItemDefinitionRawJSONDataType {
@@ -69,6 +75,10 @@ export interface IItemDefinitionRawJSONDataType {
 
   // behalf creation
   canCreateInBehalfBy?: string[];
+
+  // parenting
+  canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
+  parentingRoleAccess?: string[];
 }
 
 export interface IPolicyStateType {
@@ -291,6 +301,8 @@ export default class ItemDefinition {
     this.stateGQLAppliedValue = {};
 
     this.listeners = {};
+
+    Root.Registry[this.getQualifiedPathName()] = this;
   }
 
   public setAsExtensionsInstance() {
@@ -1078,7 +1090,7 @@ export default class ItemDefinition {
           code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
         });
       }
-    } else if (!canCreateInBehalf) {
+    } else if (throwError) {
       throw new GraphQLEndpointError({
         message: "can create in behalf is not supported",
         // here we pass always forbidden simply because it's not supported at all
@@ -1087,6 +1099,71 @@ export default class ItemDefinition {
       });
     }
     return canCreateInBehalf;
+  }
+
+  // TODO
+  public checkCanBeParentedBy(modulePath: string, itemDefinitionPath: string, throwError: boolean) {
+    let canBeParentedBy = false;
+    if (this.rawData.canBeParentedBy) {
+      canBeParentedBy = this.rawData.canBeParentedBy.some((parentPossibility) => {
+        if (!parentPossibility.itemDefinition) {
+          return parentPossibility.module === modulePath;
+        }
+        return parentPossibility.module === modulePath && parentPossibility.itemDefinition === itemDefinitionPath;
+      });
+      if (!canBeParentedBy && throwError) {
+        throw new GraphQLEndpointError({
+          message: "parenting with '" + modulePath + "' and '" + itemDefinitionPath + "' is not allowed",
+          // here we pass always forbidden simply because it's not supported at all
+          // and it was not a login mistake
+          code: "FORBIDDEN",
+        });
+      }
+    } else if (throwError) {
+      throw new GraphQLEndpointError({
+        message: "parenting role access is not supported",
+        // here we pass always forbidden simply because it's not supported at all
+        // and it was not a login mistake
+        code: "FORBIDDEN",
+      });
+    }
+    return canBeParentedBy;
+  }
+
+  // TODO
+  public checkRoleAccessForParenting(
+    role: string,
+    userId: number,
+    parentOwnerUserId: number,
+    throwError: boolean,
+  ) {
+    let hasParentingRoleAccess = false;
+    if (this.rawData.parentingRoleAccess) {
+      hasParentingRoleAccess = this.rawData.parentingRoleAccess.includes(ANYONE_METAROLE) ||
+      (
+        this.rawData.parentingRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || (
+        this.rawData.parentingRoleAccess.includes(SELF_METAROLE) && userId === parentOwnerUserId
+      ) || this.rawData.parentingRoleAccess.includes(role);
+
+      const notLoggedInWhenShould = role === GUEST_METAROLE;
+
+      if (!hasParentingRoleAccess && throwError) {
+        throw new GraphQLEndpointError({
+          message: `Forbidden, user ${userId} with role ${role} has no parenting role access to resource ${this.getName()}` +
+          ` only roles ${this.rawData.parentingRoleAccess.join(", ")} can be granted access`,
+          code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
+        });
+      }
+    } else {
+      throw new GraphQLEndpointError({
+        message: "parenting role access is not supported",
+        // here we pass always forbidden simply because it's not supported at all
+        // and it was not a login mistake
+        code: "FORBIDDEN",
+      });
+    }
+    return hasParentingRoleAccess;
   }
 
   /**

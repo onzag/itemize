@@ -25,6 +25,7 @@ import { jwtVerify } from "../token";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import { ISearchResultIdentifierType } from "./actions/search";
+import Root from "../../base/Root";
 
 const buildColumnNamesForModuleTableOnlyDebug = Debug("resolvers:buildColumnNamesForModuleTableOnly");
 /**
@@ -173,6 +174,34 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
   return result;
 }
 
+const validateParentingRulesDebug = Debug("resolvers:validateParentingRules");
+export async function validateParentingRules(
+  appData: IAppDataType,
+  modulePath: string,
+  itemDefPath: string,
+  id: number,
+  itemDefinition: ItemDefinition,
+  userId: number,
+  role: string,
+) {
+  validateParentingRulesDebug("EXECUTED with %s", modulePath, itemDefPath);
+  itemDefinition.checkCanBeParentedBy(modulePath, itemDefPath, true);
+  const parentMod = appData.root.getModuleFor(modulePath.split("/"));
+  const parentIdef = parentMod.getItemDefinitionFor(itemDefPath.split("/"));
+  const result = await appData.cache.requestCache(
+    parentIdef.getQualifiedPathName(), parentMod.getQualifiedPathName(), id,
+  );
+  if (!result) {
+    throw new GraphQLEndpointError({
+      message: "Invalid parent id " + id,
+      code: "NOT_FOUND",
+    });
+  }
+  const parentOwnerId = parentIdef.isOwnerObjectId() ? result.id : result.created_by;
+  itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, true);
+  validateParentingRulesDebug("SUCCEED");
+}
+
 const checkBasicFieldsAreAvailableForRoleDebug = Debug("resolvers:checkBasicFieldsAreAvailableForRole");
 /**
  * Checks if the basic fields are available for the given role, basic
@@ -237,27 +266,23 @@ export function checkListLimit(ids: ISearchResultIdentifierType[]) {
 const checkListTypesDebug = Debug("resolvers:checkListTypes");
 export function checkListTypes(ids: ISearchResultIdentifierType[], mod: Module) {
   checkListTypesDebug("EXECUTED with %j", ids);
-  const moduleQualifiedPathName = mod.getQualifiedPathName();
   ids.forEach((idContainer) => {
-    if (!idContainer.type.startsWith(moduleQualifiedPathName)) {
+    const itemDefinition = Root.Registry[idContainer.type];
+    if (!itemDefinition) {
       throw new GraphQLEndpointError({
         message: "Unknown qualified path name for " + idContainer.type,
         code: "UNSPECIFIED",
       });
-    }
-
-    if (!mod.hasItemDefinitionFor(idContainer.idef_path.split("/"))) {
+    } else if (itemDefinition instanceof Module) {
       throw new GraphQLEndpointError({
-        message: "Unknown idef_path " + idContainer.idef_path,
+        message: "Expected qualified identifier for item definition but got one for module " + idContainer.type,
         code: "UNSPECIFIED",
       });
     }
 
-    const supposedItemDefinition = mod.getItemDefinitionFor(idContainer.idef_path.split("/"));
-    if (supposedItemDefinition.getQualifiedPathName() !== idContainer.type) {
+    if (itemDefinition.getParentModule() !== mod) {
       throw new GraphQLEndpointError({
-        message: "qualfied path names do not match " + idContainer.type + " " +
-          supposedItemDefinition.getQualifiedPathName(),
+        message: "Invalid parent for " + idContainer.type + " expected parent as " + mod.getQualifiedPathName(),
         code: "UNSPECIFIED",
       });
     }

@@ -273,8 +273,7 @@ export async function editItemDefinition(
   (async () => {
     await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, value);
     appData.listener.triggerListeners(
-      mod.getPath().join("/"),
-      itemDefinition.getPath().join("/"),
+      selfTable,
       resolverArgs.args.id,
       resolverArgs.args.listener_uuid,
       false,

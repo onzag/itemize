@@ -125,8 +125,7 @@ export async function deleteItemDefinition(
   (async () => {
     await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, null);
     appData.listener.triggerListeners(
-      mod.getPath().join("/"),
-      itemDefinition.getPath().join("/"),
+      selfTable,
       resolverArgs.args.id,
       resolverArgs.args.listener_uuid,
       true,

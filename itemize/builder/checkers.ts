@@ -1,4 +1,4 @@
-import { IRootRawJSONDataType } from "../base/Root";
+import Root, { IRootRawJSONDataType } from "../base/Root";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import {
@@ -28,6 +28,7 @@ import { IItemRawJSONDataType } from "../base/Root/Module/ItemDefinition/Item";
 import { IPropertiesValueMappingDefinitonRawJSONDataType } from "../base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton";
 import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { IFilterRawJSONDataType, IAutocompleteValueRawJSONDataType } from "../base/Autocomplete";
+import Module from "../base/Root/Module";
 
 export function checkConditionalRuleSet(
   rawData: IConditionalRuleSetRawJSONDataType,
@@ -105,6 +106,7 @@ export function checkConditionalRuleSet(
 }
 
 export function checkItemDefinition(
+  rawRootData: IRootRawJSONDataType,
   rawData: IItemDefinitionRawJSONDataType,
   parentModule: IModuleRawJSONDataType,
   traceback: Traceback,
@@ -120,10 +122,59 @@ export function checkItemDefinition(
     );
   }
 
+  // these two properties are not allowed between each other
+  // you cannot create in behalf and make it be owned by the object id
+  // at the same time
   if (rawData.canCreateInBehalfBy && rawData.ownerIsObjectId) {
     throw new CheckUpError(
       "Cannot be able to create in behalf and have its owner be the object id",
       actualTraceback.newTraceToBit("ownerIsObjectId"),
+    );
+  }
+
+  // if it can be parented
+  if (rawData.canBeParentedBy) {
+    if (!rawData.parentingRoleAccess) {
+      throw new CheckUpError(
+        "Setting canBeParentedBy without parentingRoleAccess specifications",
+        actualTraceback.newTraceToBit("canBeParentedBy"),
+      );
+    }
+
+    // we need to check that all the paths are valid
+    rawData.canBeParentedBy.forEach((parentingRule, index) => {
+      // we get the module path and try to find the module
+      const parentingRuleModulePath = parentingRule.module.split("/");
+      const parentingModule = Root.getModuleRawFor(rawRootData, parentingRuleModulePath);
+      // if we don't find it we throw an error
+      if (!parentingModule) {
+        throw new CheckUpError(
+          "Cannot find module for parenting module rule in root",
+          actualTraceback.newTraceToBit("canBeParentedBy").newTraceToBit(index).newTraceToBit("module"),
+        );
+      }
+
+      // now we try to find the item definition if we have specified one
+      if (parentingRule.itemDefinition) {
+        // and we extract it if possible
+        const itemDefinitionPath = parentingRule.itemDefinition.split("/");
+        const parentingItemDefinition = Module.getItemDefinitionRawFor(parentingModule, itemDefinitionPath);
+
+        // if we have no result it's an error
+        if (!parentingItemDefinition) {
+          throw new CheckUpError(
+            "Cannot find module for parenting item definition in module",
+            actualTraceback.newTraceToBit("canBeParentedBy").newTraceToBit(index).newTraceToBit("itemDefinition"),
+          );
+        }
+      }
+    });
+  }
+
+  if (rawData.parentingRoleAccess && !rawData.canBeParentedBy) {
+    throw new CheckUpError(
+      "Setting parentingRoleAccess without canBeParentedBy rules",
+      actualTraceback.newTraceToBit("parentingRoleAccess"),
     );
   }
 
@@ -198,7 +249,7 @@ export function checkItemDefinition(
   if (rawData.childDefinitions) {
     rawData
     .childDefinitions.forEach((cd) =>
-      checkItemDefinition(cd, parentModule, actualTraceback));
+      checkItemDefinition(rawRootData, cd, parentModule, actualTraceback));
   }
 
   if (rawData.includes) {
@@ -803,6 +854,7 @@ export function checkI18nCustomConsistency(
 }
 
 export function checkModule(
+  rawRootData: IRootRawJSONDataType,
   rawData: IModuleRawJSONDataType,
   traceback: Traceback,
 ) {
@@ -852,9 +904,9 @@ export function checkModule(
   if (rawData.children) {
     rawData.children.forEach((moduleOrItemDef) => {
       if (moduleOrItemDef.type === "module") {
-        checkModule(moduleOrItemDef, actualTraceback);
+        checkModule(rawRootData, moduleOrItemDef, actualTraceback);
       } else {
-        checkItemDefinition(moduleOrItemDef, rawData, actualTraceback);
+        checkItemDefinition(rawRootData, moduleOrItemDef, rawData, actualTraceback);
       }
     });
   }
@@ -869,6 +921,7 @@ export function checkRoot(
   if (rawData.children) {
     rawData.children.forEach((mod, index) => {
       checkModule(
+        rawData,
         mod,
         traceback.newTraceToBit("includes").newTraceToBit(index),
       );

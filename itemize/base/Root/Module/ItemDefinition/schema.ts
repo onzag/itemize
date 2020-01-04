@@ -37,6 +37,20 @@ const policySchema = {
   additionalProperties: false,
 };
 
+const itemDefinitionReferenceSchema = {
+  type: "object",
+  properties: {
+    module: {
+      type: "string",
+    },
+    definition: {
+      type: "string",
+    },
+  },
+  required: ["module"],
+  additionalProperties: false,
+};
+
 export default {
   $id: "ItemDefinition",
   type: "object",
@@ -99,6 +113,17 @@ export default {
       type: "boolean",
     },
     canCreateInBehalfBy: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
+    canBeParentedBy: {
+      type: "array",
+      itemDefinition: itemDefinitionReferenceSchema,
+      minItems: 1,
+    },
+    parentingRoleAccess: {
       type: "array",
       items: {
         type: "string",

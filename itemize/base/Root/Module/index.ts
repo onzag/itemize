@@ -12,6 +12,7 @@ import {
 } from "../../../constants";
 import { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
 import { buildSearchModeModule } from "./search-mode";
+import Root from "..";
 
 export interface IRawJsonI18NSpecificLocaleDataType {
   name: string;
@@ -254,6 +255,8 @@ export default class Module {
       readRoleAccess: this.rawData.readRoleAccess,
     }, this, null);
     this.childPropExtensionItemDefinition.setAsExtensionsInstance();
+
+    Root.Registry[this.getQualifiedPathName()] = this;
   }
 
   /**

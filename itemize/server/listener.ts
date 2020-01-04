@@ -5,6 +5,7 @@ import { Cache } from "./cache";
 import { Server } from "http";
 import Root from "../base/Root";
 import ioMain from "socket.io";
+import ItemDefinition from "../base/Root/Module/ItemDefinition";
 
 interface IListenerList {
   [socketId: string]: {
@@ -45,17 +46,17 @@ export class Listener {
     const io = ioMain(server);
     io.on("connection", (socket) => {
       this.addSocket(socket);
-      socket.on("register", (modulePath: string, itemDefinitionPath: string, id: number) => {
-        this.addListener(socket, modulePath, itemDefinitionPath, id);
+      socket.on("register", (qualifiedPathName: string, id: number) => {
+        this.addListener(socket, qualifiedPathName, id);
       });
       socket.on("identify", (uuid: string) => {
         this.identify(socket, uuid);
       });
-      socket.on("feedback", (modulePath: string, itemDefinitionPath: string, id: number) => {
-        this.requestFeedback(socket, modulePath, itemDefinitionPath, id);
+      socket.on("feedback", (qualifiedPathName: string, id: number) => {
+        this.requestFeedback(socket, qualifiedPathName, id);
       });
-      socket.on("unregister", (modulePath: string, itemDefinitionPath: string, id: number) => {
-        this.removeListener(socket, modulePath, itemDefinitionPath, id);
+      socket.on("unregister", (qualifiedPathName: string, id: number) => {
+        this.removeListener(socket, qualifiedPathName, id);
       });
       socket.on("disconnect", () => {
         this.removeSocket(socket);
@@ -87,8 +88,7 @@ export class Listener {
   }
   public addListener(
     socket: Socket,
-    modulePath: string,
-    itemDefinitionPath: string,
+    qualifiedPathName: string,
     id: number,
   ) {
     if (!this.listeners[socket.id]) {
@@ -105,7 +105,7 @@ export class Listener {
       return;
     }
 
-    const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
+    const mergedIndexIdentifier = qualifiedPathName + "." + id;
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       this.redisSub.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
@@ -114,27 +114,28 @@ export class Listener {
   }
   public async requestFeedback(
     socket: Socket,
-    modulePath: string,
-    itemDefinitionPath: string,
+    qualifiedPathName: string,
     id: number,
   ) {
     try {
-      const mod = this.root.getModuleFor(modulePath.split("/"));
-      const itemDefinition = mod.getItemDefinitionFor(itemDefinitionPath.split("/"));
+      const itemDefinition: ItemDefinition = Root.Registry[qualifiedPathName] as ItemDefinition;
+      if (!itemDefinition) {
+        return;
+      }
+      const mod = itemDefinition.getParentModule();
       const queriedResult: ISQLTableRowValue = await this.cache.requestCache(
         itemDefinition.getQualifiedPathName(), mod.getQualifiedPathName(), id,
       );
       if (queriedResult) {
         socket.emit(
           "changed",
-          modulePath,
-          itemDefinitionPath,
+          qualifiedPathName,
           id,
           "last_modified",
           queriedResult.last_modified,
         );
       } else {
-        socket.emit("changed", modulePath, itemDefinitionPath, id, "not_found", null);
+        socket.emit("changed", qualifiedPathName, id, "not_found", null);
       }
     } catch (err) {
       console.log(err);
@@ -143,11 +144,10 @@ export class Listener {
   }
   public removeListener(
     socket: Socket,
-    modulePath: string,
-    itemDefinitionPath: string,
+    qualifiedPathName: string,
     id: number,
   ) {
-    const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
+    const mergedIndexIdentifier = qualifiedPathName + "." + id;
     if (this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       this.redisSub.unsubscribe(mergedIndexIdentifier);
       delete this.listeners[socket.id].listens[mergedIndexIdentifier];
@@ -155,17 +155,15 @@ export class Listener {
     }
   }
   public triggerListeners(
-    modulePath: string,
-    itemDefinitionPath: string,
+    qualifiedPathName: string,
     id: number,
     listenerUUID: string,
     deleted: boolean,
   ) {
-    console.log("requested trigger on", modulePath, itemDefinitionPath, id, listenerUUID, deleted);
-    const mergedIndexIdentifier = modulePath + "." + itemDefinitionPath + "." + id;
+    console.log("requested trigger on", qualifiedPathName, id, listenerUUID, deleted);
+    const mergedIndexIdentifier = qualifiedPathName + "." + id;
     this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
-      modulePath,
-      itemDefinitionPath,
+      qualifiedPathName,
       id,
       listenerUUID,
       deleted,
@@ -185,8 +183,7 @@ export class Listener {
         console.log("emitting to someone");
         this.listeners[socketKey].socket.emit(
           "changed",
-          parsedContent.modulePath,
-          parsedContent.itemDefinitionPath,
+          parsedContent.qualifiedPathName,
           parsedContent.id,
           parsedContent.deleted ? "not_found" : "modified",
           null,

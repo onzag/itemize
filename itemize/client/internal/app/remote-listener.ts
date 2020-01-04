@@ -108,15 +108,13 @@ export class RemoteListener {
     this.attachItemDefinitionListenerFor(itemDefinition, forId);
   }
   public attachItemDefinitionListenerFor(itemDefinition: ItemDefinition, forId: number) {
-    const modulePath = itemDefinition.getParentModule().getPath().join("/");
-    const idefPath = itemDefinition.getPath().join("/");
+    const qualifiedPathName = itemDefinition.getQualifiedPathName();
 
     if (this.socket.connected) {
-      console.log("registering", modulePath, idefPath, forId);
+      console.log("registering", qualifiedPathName, forId);
       this.socket.emit(
         "register",
-        modulePath,
-        idefPath,
+        qualifiedPathName,
         forId,
       );
     }
@@ -134,7 +132,8 @@ export class RemoteListener {
     }
   }
   public removeItemDefinitionListenerFor(parentInstance: any, itemDefinition: ItemDefinition, forId: number) {
-    const qualifiedID = itemDefinition.getQualifiedPathName() + "." + forId;
+    const qualifiedPathName = itemDefinition.getQualifiedPathName();
+    const qualifiedID = qualifiedPathName + "." + forId;
     const listenerValue = this.listeners[qualifiedID];
     if (listenerValue) {
       const newListenerValue = {
@@ -148,29 +147,23 @@ export class RemoteListener {
       }
     }
 
-    const modulePath = itemDefinition.getParentModule().getPath().join("/");
-    const idefPath = itemDefinition.getPath().join("/");
-
     if (this.socket.connected) {
       this.socket.emit(
         "unregister",
-        modulePath,
-        idefPath,
+        qualifiedPathName,
         forId,
       );
     }
   }
   private onPossibleChangeListened(
-    modulePath: string,
-    itemDefinitionPath: string,
+    qualifiedPathName: string,
     id: number,
     type: "modified" | "not_found" | "last_modified",
     lastModifiedFeedback: string,
   ) {
-    console.log("feedback recieved with", modulePath, itemDefinitionPath, id, type, lastModifiedFeedback);
+    console.log("feedback recieved with", qualifiedPathName, id, type, lastModifiedFeedback);
 
-    const itemDefinition =
-      this.root.getModuleFor(modulePath.split("/")).getItemDefinitionFor(itemDefinitionPath.split("/"));
+    const itemDefinition: ItemDefinition = Root.Registry[qualifiedPathName] as ItemDefinition;
     const appliedGQLValue = itemDefinition.getGQLAppliedValue(id);
     if (appliedGQLValue) {
       if (
@@ -205,13 +198,9 @@ export class RemoteListener {
   private consumeDelayedFeedbacks(forAnSpecificId?: number) {
     this.delayedFeedbacks = this.delayedFeedbacks.filter((df) => {
       if (!forAnSpecificId || forAnSpecificId === df.forId) {
-        const modulePath = df.itemDefinition.getParentModule().getPath().join("/");
-        const idefPath = df.itemDefinition.getPath().join("/");
-
         this.socket.emit(
           "feedback",
-          modulePath,
-          idefPath,
+          df.itemDefinition.getQualifiedPathName(),
           df.forId,
         );
 

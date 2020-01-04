@@ -11,6 +11,7 @@ import {
   PREFIX_ADD,
   PREFIX_DELETE,
   PREFIX_SEARCH,
+  UNSPECIFIED_OWNER,
 } from "../../constants";
 import { buildGqlQuery, buildGqlMutation, gqlQuery,
   IGQLQueryObj, GQLEnum, GQLQuery } from "../internal/app/gql-querier";
@@ -94,8 +95,6 @@ export interface IActionSearchOptions {
  */
 export interface ISearchResult {
   type: string;
-  module_path: string;
-  idef_path: string;
   id: number;
 }
 
@@ -1581,8 +1580,6 @@ export class ActualItemDefinitionProvider extends
       {
         ids: {
           id: {},
-          idef_path: {},
-          module_path: {},
           type: {},
         },
       },
@@ -1657,7 +1654,8 @@ export class ActualItemDefinitionProvider extends
       this.props.tokenData.role,
       this.props.tokenData.id,
       this.props.assumeOwnership ?
-        this.props.tokenData.id : this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId),
+        (this.props.tokenData.id || UNSPECIFIED_OWNER) :
+        this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId),
       {},
       false,
     );
@@ -1670,7 +1668,7 @@ export class ActualItemDefinitionProvider extends
       ItemDefinitionIOActions.CREATE,
       this.props.tokenData.role,
       this.props.tokenData.id,
-      this.props.tokenData.id,
+      this.props.tokenData.id || UNSPECIFIED_OWNER,
       {},
       false,
     );
@@ -1684,7 +1682,8 @@ export class ActualItemDefinitionProvider extends
       this.props.tokenData.role,
       this.props.tokenData.id,
       this.props.assumeOwnership ?
-        this.props.tokenData.id : this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId),
+        (this.props.tokenData.id || UNSPECIFIED_OWNER) :
+        this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId),
       {},
       false,
     );

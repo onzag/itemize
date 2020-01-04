@@ -199,8 +199,6 @@ export const LOCATION_SEARCH_I18N = [
 export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "id",
   "type",
-  "module_path",
-  "idef_path",
   "blocked_at",
   "blocked_by",
   "blocked_until",
@@ -225,13 +223,13 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     type: GraphQLNonNull(GraphQLString),
     description: "The type (qualified name) of the object",
   },
-  module_path: {
-    type: GraphQLNonNull(GraphQLString),
-    description: "The path of the module from root",
+  parent_id: {
+    type: GraphQLInt,
+    description: "If exists, a parent id of this object",
   },
-  idef_path: {
-    type: GraphQLNonNull(GraphQLString),
-    description: "The path of the item definition from the module",
+  parent_type: {
+    type: GraphQLInt,
+    description: "If exists, a parent type of this object",
   },
   created_at: {
     type: GraphQLNonNull(GraphQLString),
@@ -302,13 +300,11 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
     type: "string",
     notNull: true,
   },
-  module_path: {
-    type: "string",
-    notNull: true,
+  parent_id: {
+    type: "integer",
   },
-  idef_path: {
+  parent_type: {
     type: "string",
-    notNull: true,
   },
   created_at: {
     type: "datetime",
@@ -395,12 +391,6 @@ const ID_ELEMENT_FIELDS = {
   type: {
     type: GraphQLNonNull(GraphQLString),
   },
-  module_path: {
-    type: GraphQLNonNull(GraphQLString),
-  },
-  idef_path: {
-    type: GraphQLNonNull(GraphQLString),
-  },
 };
 export const ID_ELEMENT_GQL = new GraphQLObjectType({
   name: "ID_ELEMENT",
@@ -437,18 +427,28 @@ const BASE_QUERY_PROPERTIES = {
     description: "A supported language (dictionary wise) 2 digit code, it is used for FTS purposes and text analysis",
   },
 };
+
+const ORDERBY_RULE = new GraphQLEnumType({
+  name: "RESERVED_SEARCH_PROPERTY_ENUM_ORDER_BY",
+  values: searchOptionsOrderByOptions,
+});
 export const RESERVED_SEARCH_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   order_by: {
-    type: GraphQLNonNull(new GraphQLEnumType({
-      name: "RESERVED_SEARCH_PROPERTY_ENUM_ORDER_BY",
-      values: searchOptionsOrderByOptions,
-    })),
+    type: GraphQLNonNull(ORDERBY_RULE),
     description: "An order type",
   },
   created_by: {
     type: GraphQLInt,
     description: "An specified owner to filter by (this affects permissions)",
+  },
+  parent_id: {
+    type: GraphQLInt,
+    description: "a parent id for the item (must be specified with parent_type)",
+  },
+  parent_type: {
+    type: GraphQLString,
+    description: "a parent item definition qualified path (must be specified with parent_id)",
   },
   search: {
     type: GraphQLString,
@@ -461,9 +461,25 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = {
     type: GraphQLList(GraphQLNonNull(GraphQLString)),
     description: "A list of types (qualified names) to filter by",
   },
+  order_by: {
+    type: GraphQLNonNull(ORDERBY_RULE),
+    description: "An order type",
+  },
   created_by: {
     type: GraphQLInt,
     description: "An specified owner to filter by (this affects permissions)",
+  },
+  parent_id: {
+    type: GraphQLInt,
+    description: "a parent id for the item (must be specified with parent_type)",
+  },
+  parent_type: {
+    type: GraphQLString,
+    description: "a parent item definition qualified path (must be specified with parent_id)",
+  },
+  search: {
+    type: GraphQLString,
+    description: "A search string",
   },
 };
 export const RESERVED_GETTER_PROPERTIES = {
@@ -492,6 +508,14 @@ export const RESERVED_ADD_PROPERTIES = {
   in_behalf_of: {
     type: GraphQLInt,
     description: "an user id that will be the true owner",
+  },
+  parent_id: {
+    type: GraphQLInt,
+    description: "a parent id that will namespace this item (must be specified with parent_module and idef)",
+  },
+  parent_type: {
+    type: GraphQLString,
+    description: "a parent item definition qualified path (must be specified with parent_id)",
   },
 };
 export const USER_ROLES = {
