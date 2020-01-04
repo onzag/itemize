@@ -4,7 +4,6 @@ import {
   ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
   MAX_SQL_LIMIT,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
-  CONNECTOR_SQL_COLUMN_FK_NAME,
   INVALID_POLICY_ERROR,
   RESERVED_BASE_PROPERTIES,
   ITEM_PREFIX,
@@ -319,7 +318,7 @@ export function getDictionary(appData: IAppDataType, args: any): string {
 }
 
 const validateTokenIsntBlockedDebug = Debug("resolvers:validateTokenIsntBlocked");
-export async function validateTokenIsntBlocked(knex: Knex, cache: Cache, tokenData: IServerSideTokenDataType) {
+export async function validateTokenIsntBlocked(cache: Cache, tokenData: IServerSideTokenDataType) {
   validateTokenIsntBlockedDebug("EXECUTED");
   if (tokenData.id) {
     const sqlResult: ISQLTableRowValue = await cache.requestCache("MOD_users__IDEF_user", "MOD_users", tokenData.id);
@@ -337,6 +336,19 @@ export async function validateTokenIsntBlocked(knex: Knex, cache: Cache, tokenDa
     }
   }
   validateTokenIsntBlockedDebug("SUCCEED");
+}
+
+const checkUserExistsDebug = Debug("resolvers:checkUserExists");
+export async function checkUserExists(cache: Cache, id: number) {
+  checkUserExistsDebug("EXECUTED");
+  const sqlResult: ISQLTableRowValue = await cache.requestCache("MOD_users__IDEF_user", "MOD_users", id);
+  if (!sqlResult) {
+    throw new GraphQLEndpointError({
+      message: "User has been removed",
+      code: "USER_REMOVED",
+    });
+  }
+  checkUserExistsDebug("SUCCEED");
 }
 
 export interface IFilteredAndPreparedValueType {

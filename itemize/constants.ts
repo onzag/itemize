@@ -446,6 +446,10 @@ export const RESERVED_SEARCH_PROPERTIES = {
     })),
     description: "An order type",
   },
+  created_by: {
+    type: GraphQLInt,
+    description: "An specified owner to filter by (this affects permissions)",
+  },
   search: {
     type: GraphQLString,
     description: "A search string",
@@ -456,6 +460,10 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = {
   types: {
     type: GraphQLList(GraphQLNonNull(GraphQLString)),
     description: "A list of types (qualified names) to filter by",
+  },
+  created_by: {
+    type: GraphQLInt,
+    description: "An specified owner to filter by (this affects permissions)",
   },
 };
 export const RESERVED_GETTER_PROPERTIES = {
@@ -481,6 +489,10 @@ export const RESERVED_GETTER_LIST_PROPERTIES = {
 };
 export const RESERVED_ADD_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
+  in_behalf_of: {
+    type: GraphQLInt,
+    description: "an user id that will be the true owner",
+  },
 };
 export const USER_ROLES = {
   ADMIN: "ADMIN",

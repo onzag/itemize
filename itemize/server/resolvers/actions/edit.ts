@@ -38,7 +38,7 @@ export async function editItemDefinition(
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // for editing one must be logged in
-  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
+  await validateTokenIsntBlocked(appData.cache, tokenData);
 
   // now we get the requested fields, and check they are available for the given role
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
@@ -217,30 +217,14 @@ export async function editItemDefinition(
   debug("SQL Input data for idef is %j", sqlIdefData);
   debug("SQL Input data for module is %j", sqlModData);
 
-  // we need to build the "returning" attributes from
-  // the updated queries, for that we need to check
-  // which ones comes from where
-  const requestedModuleColumnsSQL = buildColumnNamesForModuleTableOnly(
-    requestedFields,
-    mod,
-  );
-  const requestedIdefColumnsSQL = buildColumnNamesForItemDefinitionTableOnly(
-    requestedFields,
-    itemDefinition,
-  );
-
-  debug("Requested columns for idef are %j", requestedIdefColumnsSQL);
-  debug("Requested columns for module are %j", requestedModuleColumnsSQL);
-
   // we build the transaction for the action
   const value = await appData.knex.transaction(async (transactionKnex) => {
     // and add them if we have them, note that the module will always have
     // something to update because the edited_at field is always added when
     // edition is taking place
-    const updateQueryMod = transactionKnex(moduleTable).update(sqlModData).where("id", resolverArgs.args.id);
-    if (requestedModuleColumnsSQL.length) {
-      updateQueryMod.returning(requestedModuleColumnsSQL);
-    }
+    const updateQueryMod = transactionKnex(moduleTable)
+      .update(sqlModData).where("id", resolverArgs.args.id)
+      .returning("*");
 
     // for the update query of the item definition we have to take several things
     // into consideration, first we set it as an empty object
@@ -251,15 +235,11 @@ export async function editItemDefinition(
       updateOrSelectQueryIdef = transactionKnex(selfTable).update(sqlIdefData).where(
         CONNECTOR_SQL_COLUMN_FK_NAME,
         resolverArgs.args.id,
-      );
-      // we only get to return something in the returning statment if we have something to return
-      if (requestedIdefColumnsSQL.length) {
-        updateOrSelectQueryIdef.returning(requestedIdefColumnsSQL);
-      }
+      ).returning("*");
     // otherwise we check if we are just requesting some fields from the idef
-    } else if (requestedIdefColumnsSQL.length) {
+    } else {
       // and make a simple select query
-      updateOrSelectQueryIdef = transactionKnex(selfTable).select(requestedIdefColumnsSQL)
+      updateOrSelectQueryIdef = transactionKnex(selfTable).select("*")
         .where(CONNECTOR_SQL_COLUMN_FK_NAME, resolverArgs.args.id);
     }
     // if there's nothing to update, or there is nothing to retrieve, it won't touch the idef table
@@ -291,7 +271,7 @@ export async function editItemDefinition(
 
   // we return and this executes after it returns
   (async () => {
-    await appData.cache.requestCache(selfTable, moduleTable, resolverArgs.args.id, true);
+    await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, value);
     appData.listener.triggerListeners(
       mod.getPath().join("/"),
       itemDefinition.getPath().join("/"),

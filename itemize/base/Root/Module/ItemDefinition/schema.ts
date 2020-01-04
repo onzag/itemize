@@ -98,6 +98,12 @@ export default {
     ownerIsObjectId: {
       type: "boolean",
     },
+    canCreateInBehalfBy: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
   },
   definitions: {
     PropertyDefinition: PropertyDefinitionSchema,

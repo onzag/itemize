@@ -19,6 +19,8 @@ import {
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
+import { GraphQLEndpointError } from "../../../base/errors";
+import { ISearchResultIdentifierType } from "./search";
 
 const getItemDefinitionDebug = Debug("resolvers:getItemDefinition");
 export async function getItemDefinition(
@@ -34,7 +36,7 @@ export async function getItemDefinition(
   // right and available
   checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
+  await validateTokenIsntBlocked(appData.cache, tokenData);
 
   // now we find the requested fields that are requested
   // in the get request
@@ -154,26 +156,57 @@ export async function getItemDefinitionList(
     }
   });
   getItemDefinitionListDebug("Extracted requested fields from idef as %j", requestedFieldsInIdef);
-  getItemDefinitionListDebug("Checking global read access");
+
+  const created_by = resolverArgs.args.created_by;
+  let ownerToCheckAgainst = UNSPECIFIED_OWNER;
+  if (created_by) {
+    ownerToCheckAgainst = created_by;
+  }
+
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
-    UNSPECIFIED_OWNER,
+    ownerToCheckAgainst,
     requestedFieldsInIdef,
     true,
   );
 
+  // preventing a security leak here by ensuring that the type that we are searching
+  // in the list is all consistent for the type of this item definition, when requesting
+  // the cache and the query that will be used as a table name, as the type is the same
+  // as the qualified path name and the table name, so by ensuring it's a legit name
+  // we ensure there is no leak
+  const selfTableType = itemDefinition.getQualifiedPathName();
+  resolverArgs.args.ids.forEach((argId: ISearchResultIdentifierType) => {
+    if (argId.type !== selfTableType) {
+      throw new GraphQLEndpointError({
+        message: "Invalid id container type that didn't match the qualified name " + selfTableType,
+        code: "UNSPECIFIED",
+      });
+    }
+  });
+
   // get the module, the module table name, the table for
   // the item definition
   const moduleTable = mod.getQualifiedPathName();
-  const resultValues: ISQLTableRowValue[] = await this.appData.cache.requestListCache(
+  const resultValues: ISQLTableRowValue[] = await appData.cache.requestListCache(
     moduleTable,
     resolverArgs.args.ids,
   );
 
   const finalValues = resultValues.map(
-    (value) => filterAndPrepareGQLValue(value, requestedFields, tokenData.role, itemDefinition),
+    (value) => {
+      // preveting another security leak here, the user might have lied by saying that these
+      // items were all created by this specific creator when doing searches
+      if (created_by && value.created_by !== created_by) {
+        throw new GraphQLEndpointError({
+          message: "created_by mismatch, one of the items requested was not created by whom it was claimed",
+          code: "UNSPECIFIED",
+        });
+      }
+      return filterAndPrepareGQLValue(value, requestedFields, tokenData.role, itemDefinition);
+    },
   );
 
   getItemDefinitionListDebug("SUCCEED");
@@ -198,7 +231,7 @@ export async function getModuleList(
   checkListLimit(resolverArgs.args.ids);
   checkListTypes(resolverArgs.args.ids, mod);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
+  await validateTokenIsntBlocked(appData.cache, tokenData);
 
   // now we find the requested fields that are requested
   // in the get request
@@ -217,25 +250,54 @@ export async function getModuleList(
     "Requested fields calculated as %j",
     requestedFieldsInMod,
   );
-  getModuleListDebug("Checking global role access for read");
+  getModuleListDebug("Checking role access for read");
+  const created_by = resolverArgs.args.created_by;
+  let ownerToCheckAgainst = UNSPECIFIED_OWNER;
+  if (created_by) {
+    ownerToCheckAgainst = created_by;
+  }
   mod.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
-    UNSPECIFIED_OWNER,
+    ownerToCheckAgainst,
     requestedFieldsInMod,
     true,
   );
 
+  // same reason as item definition security issue, we need to ensure now that all the types
+  // in the module really belong to the module and the item definition they are being
+  // referred to, otherwise they might inject something, so we prevent that from happening
+  // here by ensuring there's consistency in the searchID type which is the table name
+  resolverArgs.args.ids.forEach((searchID: ISearchResultIdentifierType) => {
+    const expectedType = mod.getItemDefinitionFor(searchID.idef_path.split("/")).getQualifiedPathName();
+    if (expectedType !== searchID.type) {
+      throw new GraphQLEndpointError({
+        message: "type does not match the type of the item definition type at " + searchID.type,
+        code: "UNSPECIFIED",
+      });
+    }
+  });
+
   const moduleTable = mod.getQualifiedPathName();
-  const resultValues: ISQLTableRowValue[] = await this.appData.cache.requestListCache(
+  const resultValues: ISQLTableRowValue[] = await appData.cache.requestListCache(
     moduleTable,
     resolverArgs.args.ids,
   );
 
   // return if otherwise succeeds
   const finalValues = resultValues.map(
-    (value) => filterAndPrepareGQLValue(value, requestedFields, tokenData.role, mod),
+    (value) => {
+      // preveting another security leak here, the user might have lied by saying that these
+      // items were all created by this specific creator when doing searches
+      if (created_by && value.created_by !== created_by) {
+        throw new GraphQLEndpointError({
+          message: "created_by mismatch, one of the items requested was not created by whom it was claimed",
+          code: "UNSPECIFIED",
+        });
+      }
+      return filterAndPrepareGQLValue(value, requestedFields, tokenData.role, mod);
+    },
   );
 
   getItemDefinitionListDebug("SUCCEED");
@@ -251,5 +313,5 @@ export function getItemDefinitionListFn(appData: IAppDataType): FGraphQLIdefReso
 }
 
 export function getModuleListFn(appData: IAppDataType): FGraphQLModResolverType {
-  return getItemDefinitionList.bind(null, appData);
+  return getModuleList.bind(null, appData);
 }

@@ -8,13 +8,12 @@ import {
   checkBasicFieldsAreAvailableForRole,
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
-  buildColumnNamesForItemDefinitionTableOnly,
-  buildColumnNamesForModuleTableOnly,
   validateTokenIsntBlocked,
+  checkUserExists,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX,
-  UNSPECIFIED_OWNER, EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES } from "../../../constants";
+  UNSPECIFIED_OWNER } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
   convertGQLValueToSQLValueForItemDefinition,
@@ -41,7 +40,7 @@ export async function addItemDefinition(
 
   // check that the user is logged in, for adding, only logged users
   // are valid
-  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
+  await validateTokenIsntBlocked(appData.cache, tokenData);
 
   // now we see which fields are being requested for the answer after adding, first
   // we flatten the fields, remember that we have external and internal fields
@@ -65,6 +64,13 @@ export async function addItemDefinition(
     }
   });
 
+  let finalOwner = tokenData.id || UNSPECIFIED_OWNER;
+  if (resolverArgs.args.in_behalf_of) {
+    itemDefinition.checkRoleCanCreateInBehalf(tokenData.role, true);
+    finalOwner = resolverArgs.args.in_behalf_of;
+    await checkUserExists(appData.cache, finalOwner);
+  }
+
   debug("Fields to add have been extracted as %j", addingFields);
 
   debug("Checking role access for creation...");
@@ -74,7 +80,7 @@ export async function addItemDefinition(
     ItemDefinitionIOActions.CREATE,
     tokenData.role,
     tokenData.id,
-    tokenData.id,
+    finalOwner,
     addingFields,
     true,
   );
@@ -105,7 +111,7 @@ export async function addItemDefinition(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
-    tokenData.id,
+    finalOwner,
     requestedFieldsThatRepresentPropertiesAndItems,
     true,
   );
@@ -168,23 +174,6 @@ export async function addItemDefinition(
   debug("SQL Input data for idef is %j", sqlIdefData);
   debug("SQL Input data for module is %j", sqlModData);
 
-  // now we check what is requested from where, from the module
-  // and from the item definition table
-  const requestedModuleColumnsSQL = buildColumnNamesForModuleTableOnly(
-    requestedFields,
-    mod,
-  );
-  const requestedIdefColumnsSQL = buildColumnNamesForItemDefinitionTableOnly(
-    requestedFields,
-    itemDefinition,
-  );
-
-  // we will need to use this id in order to do the joins, so we request it
-  if (!requestedModuleColumnsSQL.includes("id")) {
-    debug("Adding id to requested sql columns from the module output as it's missing");
-    requestedModuleColumnsSQL.push("id");
-  }
-
   // now let's build the transaction for the insert query which requires
   // two tables to be modified, and it always does so, as item definition information
   // must be added because create requires so
@@ -196,19 +185,14 @@ export async function addItemDefinition(
     // the requested columns in sql, there's always at least 1
     // because we always need the id
     const insertQueryValueMod = await transactionKnex(moduleTable)
-      .insert(sqlModData).returning(requestedModuleColumnsSQL);
+      .insert(sqlModData).returning("*");
 
     // so with that in mind, we add the foreign key column value
     // for combining both and keeping them joined togeher
     sqlIdefData[CONNECTOR_SQL_COLUMN_FK_NAME] = insertQueryValueMod[0].id;
 
     // so now we create the insert query
-    const insertQueryIdef = transactionKnex(selfTable).insert(sqlIdefData);
-    // now we add the returning later, because there mightnot be
-    // returning information, because we might not need it
-    if (requestedIdefColumnsSQL.length) {
-      insertQueryIdef.returning(requestedIdefColumnsSQL);
-    }
+    const insertQueryIdef = transactionKnex(selfTable).insert(sqlIdefData).returning("*");
     // so we call the qery
     const insertQueryValueIdef = await insertQueryIdef;
 
@@ -220,6 +204,8 @@ export async function addItemDefinition(
   });
 
   debug("SQL Output is %j", value);
+  appData.cache.forceCacheInto(selfTable, value.id, value);
+
   // now we convert that SQL value to the respective GQL value
   // the reason we pass the requested fields is to filter by the fields
   // that we actually want, not passing this would make the gql value
@@ -233,23 +219,14 @@ export async function addItemDefinition(
 
   const finalOutput = {
     DATA: gqlValue,
+    ...gqlValue,
   };
-
-  EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
-    if (typeof gqlValue[property] !== "undefined") {
-      finalOutput[property] = gqlValue[property];
-    }
-  });
 
   await updateTransitoryIdIfExists(
     itemDefinition,
     transitoryId,
     value.id.toString(),
   );
-
-  // we don't know what the cached value is, but we assume there is nothing
-  // as it's a new object
-  appData.cache.requestCache(selfTable, moduleTable, value.id, true);
 
   debug("SUCCEED with GQL output %j", finalOutput);
 

@@ -120,6 +120,13 @@ export function checkItemDefinition(
     );
   }
 
+  if (rawData.canCreateInBehalfBy && rawData.ownerIsObjectId) {
+    throw new CheckUpError(
+      "Cannot be able to create in behalf and have its owner be the object id",
+      actualTraceback.newTraceToBit("ownerIsObjectId"),
+    );
+  }
+
   checkI18nCustomConsistency(
     rawData.i18nData,
     actualTraceback.newTraceToLocation(rawData.i18nDataLocation),

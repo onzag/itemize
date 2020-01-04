@@ -41,7 +41,7 @@ export async function searchModule(
   // check language and region
   checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
+  await validateTokenIsntBlocked(appData.cache, tokenData);
 
   // now build the fields we are searching
   const searchingFields = {};
@@ -66,6 +66,12 @@ export async function searchModule(
     searchModeCounterpart.getQualifiedPathName(),
   );
 
+  const created_by = resolverArgs.args.created_by;
+  let ownerToCheckAgainst = UNSPECIFIED_OWNER;
+  if (created_by) {
+    ownerToCheckAgainst = created_by;
+  }
+
   // check role access for those searching fields
   // yes they are not being directly read but they can
   // be brute forced this way, and we are paranoid as hell
@@ -73,8 +79,7 @@ export async function searchModule(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
-    // Same reason as before, with item definitions
-    UNSPECIFIED_OWNER,
+    ownerToCheckAgainst,
     searchingFields,
     true,
   );
@@ -84,6 +89,10 @@ export async function searchModule(
   const searchQuery = appData.knex.select(["id", "type", "module_path", "idef_path"])
     .from(mod.getQualifiedPathName())
     .where("blocked_at", null);
+
+  if (created_by) {
+    searchQuery.where("created_by", created_by);
+  }
 
   // now we build the sql query for the module
   buildSQLQueryForModule(
@@ -123,7 +132,7 @@ export async function searchItemDefinition(
   // check the language and region
   checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
+  await validateTokenIsntBlocked(appData.cache, tokenData);
 
   // now we need to get the fields that we are using to search
   const searchingFields = {};
@@ -153,6 +162,12 @@ export async function searchItemDefinition(
     searchModeCounterpart.getQualifiedPathName(),
   );
 
+  const created_by = resolverArgs.args.created_by;
+  let ownerToCheckAgainst = UNSPECIFIED_OWNER;
+  if (created_by) {
+    ownerToCheckAgainst = created_by;
+  }
+
   // We also check for the role access of the search fields
   // the reason is simple, if we can use the query to query
   // the value of something we don't have access to, then, we
@@ -161,14 +176,12 @@ export async function searchItemDefinition(
   // to know that phone number, so he starts a search process
   // and uses the EXACT_phone_number field, he will get returned null
   // until he matches the phone number, this is a leak, a weak one
-  // but a leak nevertheless
+  // but a leak nevertheless, we are so paranoid we prevent this
   searchModeCounterpart.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
-    // And we also use -1 for the same reason as before
-    // this is a search, we ignore &SELF
-    UNSPECIFIED_OWNER,
+    ownerToCheckAgainst,
     searchingFields,
     true,
   );
@@ -200,6 +213,11 @@ export async function searchItemDefinition(
   // now we build the search query
   const searchQuery = appData.knex.select(["id"]).from(moduleTable)
     .where("blocked_at", null);
+
+  if (created_by) {
+    searchQuery.where("created_by", created_by);
+  }
+
   // and now we call the function that builds the query itself into
   // that parent query, and adds the andWhere as required
   // into such query

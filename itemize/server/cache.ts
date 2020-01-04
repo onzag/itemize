@@ -157,7 +157,7 @@ export class Cache {
   public async requestListCache(
     moduleTable: string,
     ids: ISearchResultIdentifierType[],
-  ): Promise<ISQLTableRowValue> {
+  ): Promise<ISQLTableRowValue[]> {
     const resultValues = await Promise.all(ids.map((idContainer) => {
       return this.requestCache(idContainer.type, moduleTable, idContainer.id);
     }));

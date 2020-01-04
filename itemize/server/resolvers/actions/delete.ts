@@ -29,7 +29,7 @@ export async function deleteItemDefinition(
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
 
   // for deleting we must be logged in
-  await validateTokenIsntBlocked(appData.knex, appData.cache, tokenData);
+  await validateTokenIsntBlocked(appData.cache, tokenData);
 
   // we flatten and get the requested fields
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));

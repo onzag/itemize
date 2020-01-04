@@ -66,6 +66,9 @@ export interface IItemDefinitionRawJSONDataType {
 
   // ownership
   ownerIsObjectId?: boolean;
+
+  // behalf creation
+  canCreateInBehalfBy?: string[];
 }
 
 export interface IPolicyStateType {
@@ -993,6 +996,9 @@ export default class ItemDefinition {
     requestedFields: any,
     throwError: boolean,
   ) {
+    if (ownerUserId === null) {
+      throw new Error("ownerUserId cannot be null");
+    }
     // if you are in guest mode, it is considered, that if you
     // fail, it's because you missed to login
     const notLoggedInWhenShould = role === GUEST_METAROLE;
@@ -1046,6 +1052,41 @@ export default class ItemDefinition {
         return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
       }
     });
+  }
+
+  /**
+   * Tells whether the object can be created in behalf of another user
+   * rather than the user itself, this is incompatible with
+   * ownerIsObjectId
+   * @param role
+   * @param throwError whether to throw an error if failed (otherwise returns a boolean)
+   */
+  public checkRoleCanCreateInBehalf(role: string, throwError: boolean) {
+    let canCreateInBehalf = false;
+    if (this.rawData.canCreateInBehalfBy) {
+      canCreateInBehalf = this.rawData.canCreateInBehalfBy.includes(ANYONE_METAROLE) ||
+        (
+          this.rawData.canCreateInBehalfBy.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+        ) || this.rawData.canCreateInBehalfBy.includes(role);
+
+      const notLoggedInWhenShould = role === GUEST_METAROLE;
+
+      if (!canCreateInBehalf && throwError) {
+        throw new GraphQLEndpointError({
+          message: `Forbidden, role ${role} cannot create in behalf in resource ${this.getName()}` +
+          ` only roles ${this.rawData.canCreateInBehalfBy.join(", ")} can do so`,
+          code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
+        });
+      }
+    } else if (!canCreateInBehalf) {
+      throw new GraphQLEndpointError({
+        message: "can create in behalf is not supported",
+        // here we pass always forbidden simply because it's not supported at all
+        // and it was not a login mistake
+        code: "FORBIDDEN",
+      });
+    }
+    return canCreateInBehalf;
   }
 
   /**
