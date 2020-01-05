@@ -13,7 +13,7 @@ import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Modu
 import { buildSQLQueryForModule } from "../../../base/Root/Module/sql";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import {
-  ITEM_PREFIX,
+  INCLUDE_PREFIX,
   RESERVED_SEARCH_PROPERTIES,
   CONNECTOR_SQL_COLUMN_FK_NAME,
   UNSPECIFIED_OWNER,
@@ -143,7 +143,7 @@ export async function searchItemDefinition(
     // for that they have to be part of the search query
     if (
       searchModeCounterpart.hasPropertyDefinitionFor(arg, true) ||
-      arg.startsWith(ITEM_PREFIX) && searchModeCounterpart.hasItemFor(arg.replace(ITEM_PREFIX, ""))
+      arg.startsWith(INCLUDE_PREFIX) && searchModeCounterpart.hasIncludeFor(arg.replace(INCLUDE_PREFIX, ""))
     ) {
       // add it and isolate it
       searchingFields[arg] = resolverArgs.args[arg];

@@ -353,7 +353,7 @@ export const CONNECTOR_SQL_COLUMN_FK_NAME = "MODULE_ID";
 export const PREFIX_BUILD = (s: string) => s + "_";
 export const SUFFIX_BUILD = (s: string) => "_" + s;
 export const PREFIXED_CONCAT = (...args: string[]) => args.join("__");
-export const ITEM_PREFIX = PREFIX_BUILD("ITEM");
+export const INCLUDE_PREFIX = PREFIX_BUILD("INCLUDE");
 export const MODULE_PREFIX = PREFIX_BUILD("MOD");
 export const SEARCH_MODE_MODULE_PREFIX = PREFIX_BUILD("SEARCH_MODE");
 export const ITEM_DEFINITION_PREFIX = PREFIX_BUILD("IDEF");

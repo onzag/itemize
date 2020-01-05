@@ -1,29 +1,29 @@
 import React from "react";
 import { LocaleContext, ILocaleContextType } from "../../../internal/app";
 import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
-import { style, STANDARD_THEME, IItemExclusionSwitchThemeType } from "./styles";
-import Item, { IItemState, ItemExclusionState } from "../../../../base/Root/Module/ItemDefinition/Item";
+import { style, STANDARD_THEME, IIncludeExclusionSwitchThemeType } from "./styles";
+import Include, { IIncludeState, IncludeExclusionState } from "../../../../base/Root/Module/ItemDefinition/Include";
 import TernaryExclusionSwitch from "./TernaryExclusionSwitch";
 import StandardExclusionSwitch from "./StandardExclusionSwitch";
 
-export interface IItemExclusionSwitchBaseProps {
-  item: Item;
-  state: IItemState;
-  onChange: (newExclusionState: ItemExclusionState) => void;
+export interface IIncludeExclusionSwitchBaseProps {
+  include: Include;
+  state: IIncludeState;
+  onChange: (newExclusionState: IncludeExclusionState) => void;
   forId: number;
-  theme?: Partial<IItemExclusionSwitchThemeType>;
+  theme?: Partial<IIncludeExclusionSwitchThemeType>;
 }
 
-export interface IItemExclusionSwitchProps extends IItemExclusionSwitchBaseProps, WithStyles<typeof style> {
+export interface IIncludeExclusionSwitchProps extends IIncludeExclusionSwitchBaseProps, WithStyles<typeof style> {
   locale: ILocaleContextType;
 }
 
-const ItemExclusionSwitchWithStyles = withStyles(style)((props: IItemExclusionSwitchProps) => {
+const IncludeExclusionSwitchWithStyles = withStyles(style)((props: IIncludeExclusionSwitchProps) => {
   return (
     <div className={props.classes.container}>
       {
-        props.item.canExclusionBeSet(props.forId) ?
-        (props.item.isExclusionTernary() ?
+        props.include.canExclusionBeSet(props.forId) ?
+        (props.include.isExclusionTernary() ?
           <TernaryExclusionSwitch {...props}/> :
           <StandardExclusionSwitch {...props}/>
         ) :
@@ -33,8 +33,8 @@ const ItemExclusionSwitchWithStyles = withStyles(style)((props: IItemExclusionSw
   );
 });
 
-export default function ItemExclusionSwitch(props: IItemExclusionSwitchBaseProps) {
-  let appliedTheme: IItemExclusionSwitchThemeType = STANDARD_THEME;
+export default function IncludeExclusionSwitch(props: IIncludeExclusionSwitchBaseProps) {
+  let appliedTheme: IIncludeExclusionSwitchThemeType = STANDARD_THEME;
   if (props.theme) {
     appliedTheme = {
       ...STANDARD_THEME,
@@ -48,7 +48,7 @@ export default function ItemExclusionSwitch(props: IItemExclusionSwitchBaseProps
       {
         (locale) =>
           <ThemeProvider theme={appliedTheme}>
-            <ItemExclusionSwitchWithStyles
+            <IncludeExclusionSwitchWithStyles
               {...props}
               locale={locale}
             />

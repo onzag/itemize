@@ -19,14 +19,14 @@ import {
 } from "../../../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from ".";
 import { getGQLFieldsDefinitionForProperty } from "./PropertyDefinition/gql";
-import { getGQLFieldsDefinitionForItem } from "./Item/gql";
+import { getGQLFieldsDefinitionForInclude } from "./Include/gql";
 import { getGQLFieldsDefinitionForModule, getGQLInterfaceForModule } from "../gql";
 import { IGQLFieldsDefinitionType, IGraphQLResolversType, IGQLQueryFieldsDefinitionType } from "../../gql";
 import { GraphQLEndpointError } from "../../../errors";
 
 /**
  * Provides all the graphql fields that this item definition contains as well as its
- * items, but only of this specific item definition and does not include its children item
+ * includes, but only of this specific item definition and does not include its children item
  * definition, this includes all extended properties
  * @param itemDefinition the item definition in question
  * @param options.retrievalMode whether it is in retrieval mode
@@ -68,11 +68,11 @@ export function getGQLFieldsDefinitionForItemDefinition(
     };
   });
 
-  // We do the same with the items
-  itemDefinition.getAllItems().forEach((i) => {
+  // We do the same with the includes
+  itemDefinition.getAllIncludes().forEach((i) => {
     fieldsResult = {
       ...fieldsResult,
-      ...getGQLFieldsDefinitionForItem(i, {
+      ...getGQLFieldsDefinitionForInclude(i, {
         propertiesAsInput: options.propertiesAsInput,
         optionalForm: options.optionalForm,
       }),

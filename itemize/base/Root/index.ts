@@ -38,7 +38,7 @@ export default class Root {
     name: string[],
   ): IModuleRawJSONDataType {
     // Search for child items
-    // remember children can be of type module or item
+    // remember children can be of type module or item definition
     // so we got to check
     let finalModule: IModuleRawJSONDataType = root.children
       .find((d) => d.name === name[0]);

@@ -7,26 +7,26 @@ import ConditionalRuleSet, {
 import Module from "../..";
 import PropertyDefinition from "../PropertyDefinition";
 import PropertiesValueMappingDefiniton, { IPropertiesValueMappingDefinitonRawJSONDataType } from "../PropertiesValueMappingDefiniton";
-import { ITEM_PREFIX, PREFIX_BUILD, EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
+import { INCLUDE_PREFIX, PREFIX_BUILD, EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
 
-export enum ItemExclusionState {
+export enum IncludeExclusionState {
   EXCLUDED = "EXCLUDED",
   INCLUDED = "INCLUDED",
   ANY = "ANY",
 }
 
-export interface IItemState {
-  exclusionState: ItemExclusionState;
+export interface IIncludeState {
+  exclusionState: IncludeExclusionState;
   canExclusionBeSet: boolean;
-  itemId: string;
-  itemName: string;
+  includeId: string;
+  itemDefinitionName: string;
   itemDefinitionState: IItemDefinitionStateType;
-  stateExclusion: ItemExclusionState;
+  stateExclusion: IncludeExclusionState;
   stateExclusionModified: boolean;
 }
 
 // this is what our raw json looks like
-export interface IItemRawJSONDataType {
+export interface IIncludeRawJSONDataType {
   id: string;
   name: string;
   i18nData?: {
@@ -83,9 +83,9 @@ export interface IItemRawJSONDataType {
  *
  * An item might also be a group of items with a gate
  */
-export default class Item {
+export default class Include {
   // The basics
-  public rawData: IItemRawJSONDataType;
+  public rawData: IIncludeRawJSONDataType;
   public parentItemDefinition: ItemDefinition;
   public parentModule: Module;
 
@@ -111,14 +111,14 @@ export default class Item {
 
   // representing the state of the class
   private stateExclusion: {
-    [id: number]: ItemExclusionState,
+    [id: number]: IncludeExclusionState,
   };
   private stateExclusionModified: {
     [id: number]: boolean,
   };
 
   /**
-   * The constructor for an Item
+   * The constructor for an Include
    * @param rawJSON the raw data as JSON
    * @param parentModule the parent module
    * @param parentItemDefinition   the item definition that this node is
@@ -126,7 +126,7 @@ export default class Item {
    * would be the vehicle item definition
    */
   constructor(
-    rawJSON: IItemRawJSONDataType,
+    rawJSON: IIncludeRawJSONDataType,
     parentModule: Module,
     parentItemDefinition: ItemDefinition,
   ) {
@@ -236,12 +236,12 @@ export default class Item {
    * Tells whether the current item is excluded
    * @return a boolean whether it's excluded or not
    */
-  public getExclusionState(id: number): ItemExclusionState {
+  public getExclusionState(id: number): IncludeExclusionState {
     // let's check if it's excluded by force
     const isExcludedByForce = this.excludedIf && this.excludedIf.evaluate(id);
 
     if (isExcludedByForce) {
-      return ItemExclusionState.EXCLUDED;
+      return IncludeExclusionState.EXCLUDED;
     }
 
     // if it can be excluded
@@ -256,25 +256,25 @@ export default class Item {
           false;
         // by default the excluded would be false
         if (isDefaultExcluded) {
-          return ItemExclusionState.EXCLUDED;
+          return IncludeExclusionState.EXCLUDED;
         } else if (this.rawData.ternaryExclusionState) {
-          return ItemExclusionState.ANY;
+          return IncludeExclusionState.ANY;
         }
-        return ItemExclusionState.INCLUDED;
+        return IncludeExclusionState.INCLUDED;
       }
 
       if (
         !this.rawData.ternaryExclusionState &&
-        this.stateExclusion[id] === ItemExclusionState.ANY ||
+        this.stateExclusion[id] === IncludeExclusionState.ANY ||
         !this.stateExclusion[id]
       ) {
-        return ItemExclusionState.INCLUDED;
+        return IncludeExclusionState.INCLUDED;
       }
       return this.stateExclusion[id];
     } else if (this.rawData.ternaryExclusionState) {
-      return ItemExclusionState.ANY;
+      return IncludeExclusionState.ANY;
     }
-    return ItemExclusionState.INCLUDED;
+    return IncludeExclusionState.INCLUDED;
   }
 
   /**
@@ -319,7 +319,7 @@ export default class Item {
    * Sets the exclusion state to a new value
    * @param value the value for the exclusion state
    */
-  public setExclusionState(id: number, value: ItemExclusionState) {
+  public setExclusionState(id: number, value: IncludeExclusionState) {
     this.stateExclusion[id] = value;
     this.stateExclusionModified[id] = true;
   }
@@ -341,7 +341,7 @@ export default class Item {
   }
 
   public getQualifiedIdentifier() {
-    return ITEM_PREFIX + this.getId();
+    return INCLUDE_PREFIX + this.getId();
   }
 
   public getPrefixedQualifiedIdentifier() {
@@ -356,17 +356,17 @@ export default class Item {
    * Provides the current value of this item
    * @param id the id of the stored item definition or module
    */
-  public getStateNoExternalChecking(id: number, emulateExternalChecking?: boolean): IItemState {
+  public getStateNoExternalChecking(id: number, emulateExternalChecking?: boolean): IIncludeState {
     const exclusionState = this.getExclusionState(id);
     return {
       exclusionState,
       canExclusionBeSet: this.canExclusionBeSet(id),
-      itemId: this.getId(),
-      itemName: this.getName(),
-      itemDefinitionState: exclusionState === ItemExclusionState.EXCLUDED ? null :
+      includeId: this.getId(),
+      itemDefinitionName: this.getName(),
+      itemDefinitionState: exclusionState === IncludeExclusionState.EXCLUDED ? null :
         this.itemDefinition.getStateNoExternalChecking(id,
           emulateExternalChecking, this.rawData.sinkIn || [], [], true),
-      stateExclusion: this.stateExclusion[id] || ItemExclusionState.ANY,
+      stateExclusion: this.stateExclusion[id] || IncludeExclusionState.ANY,
       stateExclusionModified: this.stateExclusionModified[id] || false,
     };
   }
@@ -375,21 +375,21 @@ export default class Item {
    * Provides the current value of this item
    * @param id the id of the stored item definition or module
    */
-  public async getState(id: number): Promise<IItemState> {
+  public async getState(id: number): Promise<IIncludeState> {
     const exclusionState = this.getExclusionState(id);
     return {
       exclusionState,
       canExclusionBeSet: this.canExclusionBeSet(id),
-      itemId: this.getId(),
-      itemName: this.getName(),
-      itemDefinitionState: exclusionState === ItemExclusionState.EXCLUDED ? null :
+      includeId: this.getId(),
+      itemDefinitionName: this.getName(),
+      itemDefinitionState: exclusionState === IncludeExclusionState.EXCLUDED ? null :
         (await this.itemDefinition.getState(id, this.rawData.sinkIn || [], [], true)),
-      stateExclusion: this.stateExclusion[id] || ItemExclusionState.ANY,
+      stateExclusion: this.stateExclusion[id] || IncludeExclusionState.ANY,
       stateExclusionModified: this.stateExclusionModified[id] || false,
     };
   }
 
-  public applyValue(id: number, value: {[key: string]: any}, exclusionState: ItemExclusionState) {
+  public applyValue(id: number, value: {[key: string]: any}, exclusionState: IncludeExclusionState) {
     this.stateExclusion[id] = exclusionState;
     this.stateExclusionModified[id] = true;
 
@@ -450,11 +450,11 @@ export default class Item {
   }
 
   public mergeWithI18n(
-    itemRaw: IItemRawJSONDataType,
+    includeRaw: IIncludeRawJSONDataType,
   ) {
     this.rawData.i18nData = {
       ...this.rawData.i18nData,
-      ...itemRaw.i18nData,
+      ...includeRaw.i18nData,
     };
   }
 }

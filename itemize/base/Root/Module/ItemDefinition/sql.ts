@@ -7,11 +7,11 @@ import {
 } from "./PropertyDefinition/sql";
 import ItemDefinition from ".";
 import {
-  getSQLTableDefinitionForItem,
-  convertSQLValueToGQLValueForItem,
-  convertGQLValueToSQLValueForItem,
-  buildSQLQueryForItem,
-} from "./Item/sql";
+  getSQLTableDefinitionForInclude,
+  convertSQLValueToGQLValueForInclude,
+  convertGQLValueToSQLValueForInclude,
+  buildSQLQueryForInclude,
+} from "./Include/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue } from "../../sql";
 import { IGQLValue } from "../../gql";
 import Knex from "knex";
@@ -45,8 +45,8 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
   });
 
   // now we loop over the child items
-  itemDefinition.getAllItems().forEach((i) => {
-    resultTableSchema = { ...resultTableSchema, ...getSQLTableDefinitionForItem(i) };
+  itemDefinition.getAllIncludes().forEach((i) => {
+    resultTableSchema = { ...resultTableSchema, ...getSQLTableDefinitionForInclude(i) };
   });
 
   return resultTableSchema;
@@ -114,12 +114,12 @@ export function convertSQLValueToGQLValueForItemDefinition(
   });
 
   // now we do the same for the items
-  itemDefinition.getAllItems().filter(
-    (item) =>  !graphqlFields ? true : graphqlFields[item.getQualifiedIdentifier()],
-  ).forEach((item) => {
+  itemDefinition.getAllIncludes().filter(
+    (include) =>  !graphqlFields ? true : graphqlFields[include.getQualifiedIdentifier()],
+  ).forEach((include) => {
     result = {
-      ...result, ...convertSQLValueToGQLValueForItem(
-        item, row,  !graphqlFields ? null : graphqlFields[item.getQualifiedIdentifier()],
+      ...result, ...convertSQLValueToGQLValueForInclude(
+        include, row, !graphqlFields ? null : graphqlFields[include.getQualifiedIdentifier()],
       ),
     };
   });
@@ -175,21 +175,21 @@ export async function convertGQLValueToSQLValueForItemDefinition(
       }
     })),
     // also with the items
-    Promise.all(itemDefinition.getAllItems().map(async (item) => {
+    Promise.all(itemDefinition.getAllIncludes().map(async (include) => {
       // we only add if partialFields allows it, or we don't have
       // partialFields set
-      const itemNameInPartialFields = item.getQualifiedIdentifier();
+      const includeNameInPartialFields = include.getQualifiedIdentifier();
       if (
-        (partialFields && typeof partialFields[itemNameInPartialFields] !== "undefined") ||
+        (partialFields && typeof partialFields[includeNameInPartialFields] !== "undefined") ||
         !partialFields
       ) {
-        const innerPartialFields = !partialFields ? null : partialFields[itemNameInPartialFields];
-        const addedFieldsByItem = await convertGQLValueToSQLValueForItem(
-          transitoryId, itemDefinition, item, data, oldData, knex, dictionary, innerPartialFields,
+        const innerPartialFields = !partialFields ? null : partialFields[includeNameInPartialFields];
+        const addedFieldsByInclude = await convertGQLValueToSQLValueForInclude(
+          transitoryId, itemDefinition, include, data, oldData, knex, dictionary, innerPartialFields,
         );
         result = {
           ...result,
-          ...addedFieldsByItem,
+          ...addedFieldsByInclude,
         };
       }
     })),
@@ -216,7 +216,7 @@ export function buildSQLQueryForItemDefinition(
         buildSQLQueryForProperty(pd, data, "", knexBuilder, dictionary);
       });
 
-  itemDefinition.getAllItems().forEach((item) => {
-    buildSQLQueryForItem(item, data, knexBuilder, dictionary);
+  itemDefinition.getAllIncludes().forEach((include) => {
+    buildSQLQueryForInclude(include, data, knexBuilder, dictionary);
   });
 }

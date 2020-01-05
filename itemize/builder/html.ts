@@ -33,15 +33,11 @@ export async function buildHTML(rawConfig: any) {
   } catch (err) {
     baseHTML = await fsAsync.readFile(path.join("node_modules", "itemize", "client", "internal", "index.html"), "utf8");
   }
-  Object.keys(rawConfig).forEach((key) => {
-    baseHTML = baseHTML.replace(
-      new RegExp(escapeStringRegexp("%{" + key + "}"), "g"),
-      Array.isArray(rawConfig[key]) ? rawConfig[key].join(",") : rawConfig[key],
-    );
-  });
-
   const buildNumber = (new Date()).getTime().toString();
-  baseHTML = replaceHTMLKeys(baseHTML, rawConfig, "");
+  baseHTML = replaceHTMLKeys(baseHTML, {
+    ...rawConfig,
+    BUILD_NUMBER: buildNumber,
+  }, "");
 
   baseHTML = htmlMinifier.minify(
     baseHTML,

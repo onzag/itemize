@@ -1,7 +1,7 @@
 import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
 } from "../base/Root/Module/ItemDefinition/PropertyDefinition";
-import { IItemRawJSONDataType } from "../base/Root/Module/ItemDefinition/Item";
+import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Include";
 import { IModuleRawJSONDataType, IRawJSONI18NDataType } from "../base/Root/Module";
 import {
   IItemDefinitionRawJSONDataType, IPoliciesRawJSONDataType,
@@ -88,7 +88,7 @@ interface IFileModuleDataRawUntreatedJSONDataType {
 export interface IFileItemDefinitionUntreatedRawJSONDataType {
   type: "item";
   imports?: string[];
-  includes?: IItemRawJSONDataType[];
+  includes?: IIncludeRawJSONDataType[];
   properties?: IPropertyDefinitionRawJSONDataType[];
   createRoleAccess?: string[];
   editRoleAccess?: string[];
@@ -366,7 +366,7 @@ async function buildIncludes(
     } else if (fileData.data.type === "item") {
       if (childrenMustBeModule) {
         throw new CheckUpError(
-          "Item definition as children of root definition",
+          "Include definition as children of root definition",
           externalSpecificIncludeTraceback,
         );
       }
@@ -663,15 +663,15 @@ async function buildItemDefinition(
 
   if (finalValue.includes) {
     const fnCheckExists = async (
-      item: IItemRawJSONDataType,
+      include: IIncludeRawJSONDataType,
       iTraceback: Traceback,
     ) => {
       if (importedChildDefinitions) {
         // if we find such imported definition
         if (importedChildDefinitions.find((idef) => {
           const lastName = idef[idef.length - 1];
-          return (lastName === item.name ||
-            idef.join("/") === item.name);
+          return (lastName === include.name ||
+            idef.join("/") === include.name);
         })) {
           // we return and assume it is valid
           return;
@@ -680,33 +680,33 @@ async function buildItemDefinition(
 
       // otherwise if we don't find any and we know for sure
       // it is meant to be an imported definition
-      if (item.name.indexOf("/") !== -1) {
+      if (include.name.indexOf("/") !== -1) {
         throw new CheckUpError(
-          "Missing imported item definition for " + item,
+          "Missing imported item definition for " + include,
           iTraceback.newTraceToBit("name"),
         );
       }
       // Otherwise we try to get the actual location
       // it will throw an error otherwise
       await getActualFileLocation(
-        path.join(path.dirname(actualLocation), item.name),
+        path.join(path.dirname(actualLocation), include.name),
         iTraceback.newTraceToBit("name"),
       );
     };
 
     const tracebackIncludes = traceback.newTraceToBit("includes");
     await Promise.all(
-      finalValue.includes.map((item, index) => {
-        return fnCheckExists(item, tracebackIncludes.newTraceToBit(index));
+      finalValue.includes.map((include, index) => {
+        return fnCheckExists(include, tracebackIncludes.newTraceToBit(index));
       }),
     );
 
-    finalValue.includes = await Promise.all<IItemRawJSONDataType>
-      (finalValue.includes.map((item, index) => {
-        return getI18nItemData(
+    finalValue.includes = await Promise.all<IIncludeRawJSONDataType>
+      (finalValue.includes.map((include, index) => {
+        return getI18nIncludeData(
           supportedLanguages,
           actualLocation,
-          item,
+          include,
           tracebackIncludes.newTraceToBit(index),
         );
       }));
@@ -849,13 +849,13 @@ async function getI18nData(
  * it specific item name for i18n data, this function is destructive
  * @param supportedLanguages the array of supported languages
  * @param actualLocation the location that the item is being worked on
- * @param item the item itself
+ * @param include the include itself
  * @returns the item modified
  */
-async function getI18nItemData(
+async function getI18nIncludeData(
   supportedLanguages: string[],
   actualLocation: string,
-  item: IItemRawJSONDataType,
+  include: IIncludeRawJSONDataType,
   traceback: Traceback,
 ) {
   // get the language location
@@ -881,9 +881,9 @@ async function getI18nItemData(
 
   const expectedProperties = ITEM_OPTIONAL_I18N
     .map((b) => ({key: b, required: false}))
-    .concat((item.canUserExclude || item.canUserExcludeIf ? ITEM_CAN_BE_EXCLUDED_I18N : [])
+    .concat((include.canUserExclude || include.canUserExcludeIf ? ITEM_CAN_BE_EXCLUDED_I18N : [])
       .map((b) => ({key: b, required: true})))
-    .concat((item.exclusionIsCallout ? ITEM_CALLOUT_EXCLUDED_I18N : [])
+    .concat((include.exclusionIsCallout ? ITEM_CALLOUT_EXCLUDED_I18N : [])
       .map((b) => ({key: b, required: true})));
 
   const localeDataIsRequired = expectedProperties.filter((p) => p.required).length >= 1;
@@ -900,19 +900,19 @@ async function getI18nItemData(
         );
       }
       return;
-    } else if (!properties[locale].items) {
+    } else if (!properties[locale].includes) {
       if (localeDataIsRequired) {
         throw new CheckUpError(
-          "File does not include 'items' data for '" + locale + "'",
+          "File does not include 'includes' data for '" + locale + "'",
           localeFileTraceback,
         );
       }
       return;
-    } else if (!properties[locale].items[item.id]) {
+    } else if (!properties[locale].includes[include.id]) {
       if (localeDataIsRequired) {
         throw new CheckUpError(
-          "Does not include 'items' data for '" + locale + "' in '" +
-            item.id + "'",
+          "Does not include 'includes' data for '" + locale + "' in '" +
+            include.id + "'",
           localeFileTraceback,
         );
       }
@@ -920,7 +920,7 @@ async function getI18nItemData(
     }
 
     expectedProperties.forEach((expectedProperty) => {
-      const result = properties[locale].items[item.id][expectedProperty.key];
+      const result = properties[locale].includes[include.id][expectedProperty.key];
 
       // if we don't find it and it's not required not a big deal
       if (!result && !expectedProperty.required) {
@@ -928,12 +928,12 @@ async function getI18nItemData(
       } else if (!result && expectedProperty.required) {
         // otherwise we throw an error
         throw new CheckUpError("File " + languageFileLocation +
-          " has missing items data for item id '" + item.id +
+          " has missing items data for include id '" + include.id +
           "' in '" + expectedProperty.key + "' in locale " + locale, localeFileTraceback);
       } else if (typeof result !== "string") {
         // also throw an error if it's invalid
         throw new CheckUpError("File " + languageFileLocation +
-          " has invalid items data for item id '" + item.id +
+          " has invalid items data for include id '" + include.id +
           "' in '" + expectedProperty.key + "' in locale " + locale, localeFileTraceback);
       }
       i18nData[locale][expectedProperty.key] = result.trim();
@@ -941,8 +941,8 @@ async function getI18nItemData(
   });
 
   // set it and return the item itself
-  item.i18nData = i18nData;
-  return item;
+  include.i18nData = i18nData;
+  return include;
 }
 
 /**

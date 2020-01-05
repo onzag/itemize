@@ -3,7 +3,7 @@ import { LocaleContext, ILocaleContextType } from "../internal/app";
 import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
+import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
 import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
 import {
   PREFIX_GET,
@@ -65,7 +65,7 @@ export type PolicyPathType = [string, string, string];
  */
 export interface IActionSubmitOptions {
   onlyIncludeProperties?: string[];
-  onlyIncludeItems?: string[];
+  onlyIncludeIncludes?: string[];
   onlyIncludeIfDiffersFromAppliedValue?: boolean;
   unpokeAfterSuccess?: boolean;
   propertiesToCleanOnSuccess?: string[];
@@ -82,7 +82,7 @@ export interface IActionDeleteOptions {
  */
 export interface IActionSearchOptions {
   onlyIncludeSearchPropertiesForProperties?: string[];
-  onlyIncludeItems?: string[];
+  onlyIncludeIncludes?: string[];
   unpokeAfterSuccess?: boolean;
   orderBy?: "DEFAULT";
 }
@@ -185,9 +185,9 @@ export interface IItemDefinitionContextType {
   ) => void;
   // this is yet another passed function that does the same as properties
   // but with exclusion states
-  onItemSetExclusionState: (
-    item: Item,
-    state: ItemExclusionState,
+  onIncludeSetExclusionState: (
+    include: Include,
+    state: IncludeExclusionState,
   ) => void;
   // now this would be used on enforcement, this is used for the setter
   // the reason it also needs to specify the id is because it might
@@ -268,7 +268,7 @@ interface IItemDefinitionProviderProps {
     // in the state
     onlyIncludeProperties?: string[],
     // only includes the items specified in the list in the state
-    onlyIncludeItems?: string[],
+    onlyIncludeIncludes?: string[],
     // excludes the policies from being part of the state
     excludePolicies?: boolean,
     // cleans the value from the memory cache once the object dismounts
@@ -351,7 +351,7 @@ export class ActualItemDefinitionProvider extends
           props.forId || null,
           !props.disableExternalChecks,
           props.optimize && props.optimize.onlyIncludeProperties,
-          props.optimize && props.optimize.onlyIncludeItems,
+          props.optimize && props.optimize.onlyIncludeIncludes,
           props.optimize && props.optimize.excludePolicies,
         ),
       };
@@ -374,7 +374,7 @@ export class ActualItemDefinitionProvider extends
 
     // Just binding all the functions to ensure their context is defined
     this.onPropertyChange = this.onPropertyChange.bind(this);
-    this.onItemSetExclusionState = this.onItemSetExclusionState.bind(this);
+    this.onIncludeSetExclusionState = this.onIncludeSetExclusionState.bind(this);
     this.loadValue = this.loadValue.bind(this);
     this.delete = this.delete.bind(this);
     this.changeListener = this.changeListener.bind(this);
@@ -415,7 +415,7 @@ export class ActualItemDefinitionProvider extends
         this.props.forId || null,
         !this.props.disableExternalChecks,
         this.props.optimize && this.props.optimize.onlyIncludeProperties,
-        this.props.optimize && this.props.optimize.onlyIncludeItems,
+        this.props.optimize && this.props.optimize.onlyIncludeIncludes,
         this.props.optimize && this.props.optimize.excludePolicies,
       ),
       // and we pass all this state
@@ -569,7 +569,7 @@ export class ActualItemDefinitionProvider extends
           this.props.forId || null,
           !this.props.disableExternalChecks,
           this.props.optimize && this.props.optimize.onlyIncludeProperties,
-          this.props.optimize && this.props.optimize.onlyIncludeItems,
+          this.props.optimize && this.props.optimize.onlyIncludeIncludes,
           this.props.optimize && this.props.optimize.excludePolicies,
         ),
       });
@@ -617,7 +617,7 @@ export class ActualItemDefinitionProvider extends
         this.props.forId || null,
         !this.props.disableExternalChecks,
         this.props.optimize && this.props.optimize.onlyIncludeProperties,
-        this.props.optimize && this.props.optimize.onlyIncludeItems,
+        this.props.optimize && this.props.optimize.onlyIncludeIncludes,
         this.props.optimize && this.props.optimize.excludePolicies,
       ),
       // we do this because eg. the search relies on triggering the change listener
@@ -646,7 +646,7 @@ export class ActualItemDefinitionProvider extends
     const { requestFields } = getFieldsAndArgs({
       includeArgs: false,
       includeFields: true,
-      onlyIncludeItems: this.props.optimize && this.props.optimize.onlyIncludeItems,
+      onlyIncludeIncludes: this.props.optimize && this.props.optimize.onlyIncludeIncludes,
       onlyIncludeProperties: this.props.optimize && this.props.optimize.onlyIncludeProperties,
       appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
       userId: this.props.tokenData.id,
@@ -828,7 +828,7 @@ export class ActualItemDefinitionProvider extends
     const newItemDefinitionState = await this.props.itemDefinitionInstance.getState(
       this.props.forId || null,
       this.props.optimize && this.props.optimize.onlyIncludeProperties,
-      this.props.optimize && this.props.optimize.onlyIncludeItems,
+      this.props.optimize && this.props.optimize.onlyIncludeIncludes,
       this.props.optimize && this.props.optimize.excludePolicies,
     );
 
@@ -910,9 +910,9 @@ export class ActualItemDefinitionProvider extends
       this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null);
     }
   }
-  public onItemSetExclusionState(item: Item, state: ItemExclusionState) {
+  public onIncludeSetExclusionState(include: Include, state: IncludeExclusionState) {
     // just sets the exclusion state
-    item.setExclusionState(this.props.forId || null, state);
+    include.setExclusionState(this.props.forId || null, state);
     this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null);
 
     // note how externally checked properties might be affected for this
@@ -930,7 +930,7 @@ export class ActualItemDefinitionProvider extends
   public checkItemDefinitionStateValidity(
     options?: {
       onlyIncludeProperties?: string[],
-      onlyIncludeItems?: string[],
+      onlyIncludeIncludes?: string[],
       onlyIncludeIfDiffersFromAppliedValue?: boolean,
     },
   ): boolean {
@@ -976,16 +976,16 @@ export class ActualItemDefinitionProvider extends
 
     // now we check the next only is it's not already invalid
     if (!isInvalid) {
-      // and we do this time the same but with the items
-      isInvalid = this.state.itemDefinitionState.items.some((i) => {
-        // same using the variable for only include items, same check as before
-        if (options && options.onlyIncludeItems && !options.onlyIncludeItems.includes(i.itemId)) {
+      // and we do this time the same but with the includes
+      isInvalid = this.state.itemDefinitionState.includes.some((i) => {
+        // same using the variable for only include, same check as before
+        if (options && options.onlyIncludeIncludes && !options.onlyIncludeIncludes.includes(i.includeId)) {
           return false;
         }
 
         // and now we get the sinking property ids
-        const item = this.props.itemDefinitionInstance.getItemFor(i.itemId);
-        const sinkingPropertyIds = item.getSinkingPropertiesIds();
+        const include = this.props.itemDefinitionInstance.getIncludeFor(i.includeId);
+        const sinkingPropertyIds = include.getSinkingPropertiesIds();
 
         // and we extract the state only if it's a sinking property
         return i.itemDefinitionState.properties.some((p) => {
@@ -998,12 +998,12 @@ export class ActualItemDefinitionProvider extends
             // we get the current applied value, if any
             const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
             // if there is an applied value for that property
-            if (currentAppliedValue && currentAppliedValue.flattenedValue[item.getQualifiedIdentifier()]) {
-              const itemAppliedValue = currentAppliedValue.flattenedValue[item.getQualifiedIdentifier()];
-              if (typeof itemAppliedValue[p.propertyId] !== "undefined") {
+            if (currentAppliedValue && currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()]) {
+              const includeAppliedValue = currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()];
+              if (typeof includeAppliedValue[p.propertyId] !== "undefined") {
                 // let's check if it's differ from what we have in the state
                 const doesNotDifferFromAppliedValue = equals(
-                  itemAppliedValue[p.propertyId],
+                  includeAppliedValue[p.propertyId],
                   p.value,
                 );
                 // if it does not differ, then it's false, as it won't be included
@@ -1014,7 +1014,7 @@ export class ActualItemDefinitionProvider extends
                   return !p.valid;
                 }
               } else {
-                // we do not check if not specific item value
+                // we do not check if not specific include value
                 return false;
               }
             } else {
@@ -1262,19 +1262,19 @@ export class ActualItemDefinitionProvider extends
             }
 
             // now we do the same but with the items
-            const applyingItemIds = this.props.itemDefinitionInstance
-              .getApplyingItemIdsForPolicy(policyType, policyName);
+            const applyingIncludeIds = this.props.itemDefinitionInstance
+              .getApplyingIncludeIdsForPolicy(policyType, policyName);
 
-            const oneOfApplyingItemsApplies = applyingItemIds
-              .some((itemId) => {
-                const referredItem = this.props.itemDefinitionInstance.getItemFor(itemId);
+            const oneOfApplyingIncludesApplies = applyingIncludeIds
+              .some((includeId) => {
+                const referredInclude = this.props.itemDefinitionInstance.getIncludeFor(includeId);
                 return (
-                  typeof argumentsToCheckPropertiesAgainst[referredItem.getQualifiedIdentifier()] !== "undefined" ||
-                  typeof argumentsToCheckPropertiesAgainst[referredItem.getQualifiedExclusionStateIdentifier()] !== "undefined"
+                  typeof argumentsToCheckPropertiesAgainst[referredInclude.getQualifiedIdentifier()] !== "undefined" ||
+                  typeof argumentsToCheckPropertiesAgainst[referredInclude.getQualifiedExclusionStateIdentifier()] !== "undefined"
                 );
               });
 
-            if (!oneOfApplyingItemsApplies) {
+            if (!oneOfApplyingIncludesApplies) {
               return false;
             }
           }
@@ -1429,9 +1429,9 @@ export class ActualItemDefinitionProvider extends
     } = getFieldsAndArgs({
       includeArgs: true,
       includeFields: true,
-      onlyIncludeItems: this.props.optimize && this.props.optimize.onlyIncludeItems,
+      onlyIncludeIncludes: this.props.optimize && this.props.optimize.onlyIncludeIncludes,
       onlyIncludeProperties: this.props.optimize && this.props.optimize.onlyIncludeProperties,
-      onlyIncludeItemsForArgs: options.onlyIncludeItems,
+      onlyIncludeIncludesForArgs: options.onlyIncludeIncludes,
       onlyIncludePropertiesForArgs: options.onlyIncludeProperties,
       onlyIncludeArgsIfDiffersFromAppliedValue: options.onlyIncludeIfDiffersFromAppliedValue,
       appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
@@ -1579,7 +1579,7 @@ export class ActualItemDefinitionProvider extends
     } = getFieldsAndArgs({
       includeArgs: true,
       includeFields: false,
-      onlyIncludeItemsForArgs: options.onlyIncludeItems,
+      onlyIncludeIncludesForArgs: options.onlyIncludeIncludes,
       onlyIncludePropertiesForArgs,
       appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
       userId: this.props.tokenData.id,
@@ -1717,7 +1717,7 @@ export class ActualItemDefinitionProvider extends
           idef: this.props.itemDefinitionInstance,
           state: this.state.itemDefinitionState,
           onPropertyChange: this.onPropertyChange,
-          onItemSetExclusionState: this.onItemSetExclusionState,
+          onIncludeSetExclusionState: this.onIncludeSetExclusionState,
           onPropertyEnforce: this.onPropertyEnforce,
           onPropertyClearEnforce: this.onPropertyClearEnforce,
           notFound: this.state.notFound,

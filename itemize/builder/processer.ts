@@ -7,8 +7,8 @@ import {
   IItemDefinitionRawJSONDataType,
 } from "../base/Root/Module/ItemDefinition";
 import {
-  IItemRawJSONDataType,
-} from "../base/Root/Module/ItemDefinition/Item";
+  IIncludeRawJSONDataType,
+} from "../base/Root/Module/ItemDefinition/Include";
 import "source-map-support/register";
 
 /**
@@ -42,8 +42,8 @@ export function processItemDefinition(
       processItemDefinition(cd, locale));
 
   nRawData.includes = nRawData.includes &&
-    nRawData.includes.map((itm) =>
-      processItem(itm, locale));
+    nRawData.includes.map((include) =>
+      processInclude(include, locale));
 
   nRawData.properties = nRawData.properties &&
     nRawData.properties
@@ -60,8 +60,8 @@ export function processItemDefinition(
  * @param locale the locale
  * @returns the new json
  */
-export function processItem(
-  rawData: IItemRawJSONDataType,
+export function processInclude(
+  rawData: IIncludeRawJSONDataType,
   locale?: string,
 ) {
   if (!locale) {

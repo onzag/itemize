@@ -6,7 +6,7 @@ import {
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   INVALID_POLICY_ERROR,
   RESERVED_BASE_PROPERTIES,
-  ITEM_PREFIX,
+  INCLUDE_PREFIX,
   EXCLUSION_STATE_SUFFIX,
   GUEST_METAROLE,
 } from "../../constants";
@@ -19,7 +19,7 @@ import { convertSQLValueToGQLValueForModule } from "../../base/Root/Module/sql";
 import { IAppDataType } from "..";
 import equals from "deep-equal";
 import { IGQLValue } from "../../base/Root/gql";
-import Item, { ItemExclusionState } from "../../base/Root/Module/ItemDefinition/Item";
+import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
 import Knex from "knex";
 import { jwtVerify } from "../token";
 import { Cache } from "../cache";
@@ -97,18 +97,18 @@ export function buildColumnNamesForItemDefinitionTableOnly(
 
     // we want to see which type it is, it might be
     // of type ITEM_
-    if (key.startsWith(ITEM_PREFIX)) {
+    if (key.startsWith(INCLUDE_PREFIX)) {
       // now we have to check with a expected clean name
       // by removing the prefix
-      const expectedCleanName = key.replace(ITEM_PREFIX, "");
+      const expectedCleanName = key.replace(INCLUDE_PREFIX, "");
 
       // now we check if it still uses a suffix for exclusion state
       if (expectedCleanName.endsWith(EXCLUSION_STATE_SUFFIX)) {
         result.push(prefix + key);
       // otherwise we check if it's an item itself, it should be
-      } else if (itemDefinition.hasItemFor(expectedCleanName)) {
+      } else if (itemDefinition.hasIncludeFor(expectedCleanName)) {
         // we get the item in question
-        const item = itemDefinition.getItemFor(expectedCleanName);
+        const include = itemDefinition.getIncludeFor(expectedCleanName);
         // and basically call this function recursively and attach
         // its result, adding the prefix for this item
         result = result.concat(
@@ -117,7 +117,7 @@ export function buildColumnNamesForItemDefinitionTableOnly(
             // specific requested fields is passed, it should
             // be an object after all
             requestedFields[key],
-            item.getItemDefinition(),
+            include.getItemDefinition(),
             prefix + PREFIX_BUILD(key),
           ),
         );
@@ -469,15 +469,15 @@ const serverSideCheckItemDefinitionAgainstDebug = Debug("resolvers:serverSideChe
  * @param itemDefinition the item definition in question
  * @param gqlArgValue the arg value that was set
  * @param id the stored item id, if available, or null
- * @param referredItem this is an optional item used to basically
+ * @param referredInclude this is an optional include used to basically
  * provide better error logging
  */
 export async function serverSideCheckItemDefinitionAgainst(
   itemDefinition: ItemDefinition,
   gqlArgValue: IGQLValue,
   id: number,
-  referredItem?: Item,
-  referredParentOfItem?: ItemDefinition,
+  referredInclude?: Include,
+  referredParentOfInclude?: ItemDefinition,
 ) {
   serverSideCheckItemDefinitionAgainstDebug(
     "EXECUTED with value %j for item defintion with qualified name %s",
@@ -504,10 +504,10 @@ export async function serverSideCheckItemDefinitionAgainst(
       throw new GraphQLEndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
         code: propertyValue.invalidReason,
-        modulePath: (referredParentOfItem || itemDefinition).getParentModule().getPath(),
-        itemDefPath: (referredParentOfItem || itemDefinition).getPath(),
-        itemId: referredItem && referredItem.getId(),
-        itemIdItemDefPath: referredParentOfItem && referredParentOfItem.getPath(),
+        modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
+        itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
+        includeId: referredInclude && referredInclude.getId(),
+        includeIdItemDefPath: referredParentOfInclude && referredParentOfInclude.getPath(),
         propertyId: propertyValue.propertyId,
       });
 
@@ -523,66 +523,66 @@ export async function serverSideCheckItemDefinitionAgainst(
       throw new GraphQLEndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated value`,
         code: "UNSPECIFIED",
-        modulePath: (referredParentOfItem || itemDefinition).getParentModule().getPath(),
-        itemDefPath: (referredParentOfItem || itemDefinition).getPath(),
-        itemId: referredItem && referredItem.getId(),
-        itemIdItemDefPath: referredParentOfItem && referredParentOfItem.getPath(),
+        modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
+        itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
+        includeId: referredInclude && referredInclude.getId(),
+        includeIdItemDefPath: referredParentOfInclude && referredParentOfInclude.getPath(),
         propertyId: propertyValue.propertyId,
       });
     }
   });
 
   // we now check the items
-  for (const itemValue of currentValue.items) {
+  for (const includeValue of currentValue.includes) {
     // now we take the item itself
-    const item = itemDefinition.getItemFor(itemValue.itemId);
+    const include = itemDefinition.getIncludeFor(includeValue.includeId);
     // the graphql item value
-    let gqlItemValue = gqlArgValue[item.getQualifiedIdentifier()];
+    let gqlIncludeValue = gqlArgValue[include.getQualifiedIdentifier()];
     // if it's undefined we make it null
-    if (typeof gqlItemValue === "undefined") {
-      gqlItemValue = null;
+    if (typeof gqlIncludeValue === "undefined") {
+      gqlIncludeValue = null;
     }
     // the graphql exclusion state value
-    const gqlExclusionState = gqlArgValue[item.getQualifiedExclusionStateIdentifier()] || null;
+    const gqlExclusionState = gqlArgValue[include.getQualifiedExclusionStateIdentifier()] || null;
     // now we check if the exclusion states match
-    if (itemValue.exclusionState !== gqlExclusionState) {
+    if (includeValue.exclusionState !== gqlExclusionState) {
       serverSideCheckItemDefinitionAgainstDebug(
-        "FAILED due to exclusion state mismatch on item %s where provided was %s and expected %s",
-        itemValue.itemId,
+        "FAILED due to exclusion state mismatch on include %s where provided was %s and expected %s",
+        includeValue.includeId,
         gqlExclusionState,
-        itemValue.exclusionState,
+        includeValue.exclusionState,
       );
       throw new GraphQLEndpointError({
-        message: `validation failed at item ${itemValue.itemId} with a mismatch of exclusion state`,
+        message: `validation failed at include ${includeValue.includeId} with a mismatch of exclusion state`,
         code: "UNSPECIFIED",
-        modulePath: (referredParentOfItem || itemDefinition).getParentModule().getPath(),
-        itemDefPath: (referredParentOfItem || itemDefinition).getPath(),
-        itemId: itemValue.itemId,
-        itemIdItemDefPath: referredParentOfItem && referredParentOfItem.getPath(),
+        modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
+        itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
+        includeId: includeValue.includeId,
+        includeIdItemDefPath: referredParentOfInclude && referredParentOfInclude.getPath(),
       });
     // and we check if the there's a value set despite it being excluded
-    } else if (gqlExclusionState === ItemExclusionState.EXCLUDED && gqlItemValue !== null) {
+    } else if (gqlExclusionState === IncludeExclusionState.EXCLUDED && gqlIncludeValue !== null) {
       serverSideCheckItemDefinitionAgainstDebug(
-        "FAILED due to value set on item %s where it was excluded",
-        itemValue.itemId,
+        "FAILED due to value set on include %s where it was excluded",
+        includeValue.includeId,
       );
       throw new GraphQLEndpointError({
-        message: `validation failed at item ${itemValue.itemId} with an excluded item but data set for it`,
+        message: `validation failed at item ${includeValue.includeId} with an excluded item but data set for it`,
         code: "UNSPECIFIED",
-        modulePath: (referredParentOfItem || itemDefinition).getParentModule().getPath(),
-        itemDefPath: (referredParentOfItem || itemDefinition).getPath(),
-        itemId: itemValue.itemId,
-        itemIdItemDefPath: referredParentOfItem && referredParentOfItem.getPath(),
+        modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
+        itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
+        includeId: includeValue.includeId,
+        includeIdItemDefPath: referredParentOfInclude && referredParentOfInclude.getPath(),
       });
     }
     // now we run a server side check of item definition in the
     // specific item data, that's where we use our referred item
     await serverSideCheckItemDefinitionAgainst(
-      item.getItemDefinition(),
-      gqlItemValue,
+      include.getItemDefinition(),
+      gqlIncludeValue,
       id,
-      item,
-      referredParentOfItem || itemDefinition,
+      include,
+      referredParentOfInclude || itemDefinition,
     );
   }
 
@@ -653,35 +653,35 @@ export async function runPolicyCheck(
       const applyingPropertyIds =
         itemDefinition.getApplyingPropertyIdsForPolicy(policyType, policyName);
 
-      let someItemOrPropertyIsApplied = false;
+      let someIncludeOrPropertyIsApplied = false;
       if (applyingPropertyIds) {
-        someItemOrPropertyIsApplied =
+        someIncludeOrPropertyIsApplied =
           applyingPropertyIds.some(
             (applyingPropertyId) => typeof gqlArgValue[applyingPropertyId] !== "undefined",
           );
       }
 
-      if (!someItemOrPropertyIsApplied) {
-        const applyingItemIds =
-          itemDefinition.getApplyingItemIdsForPolicy(policyType, policyName);
+      if (!someIncludeOrPropertyIsApplied) {
+        const applyingIncludeIds =
+          itemDefinition.getApplyingIncludeIdsForPolicy(policyType, policyName);
 
-        if (applyingItemIds) {
-          someItemOrPropertyIsApplied =
-            applyingItemIds.some(
-              (applyingItemId) => {
-                const item = itemDefinition.getItemFor(applyingItemId);
+        if (applyingIncludeIds) {
+          someIncludeOrPropertyIsApplied =
+            applyingIncludeIds.some(
+              (applyingIncludeId) => {
+                const include = itemDefinition.getIncludeFor(applyingIncludeId);
                 return (
-                  typeof gqlArgValue[item.getQualifiedIdentifier()] !== "undefined" ||
-                  typeof gqlArgValue[item.getQualifiedExclusionStateIdentifier()] !== "undefined"
+                  typeof gqlArgValue[include.getQualifiedIdentifier()] !== "undefined" ||
+                  typeof gqlArgValue[include.getQualifiedExclusionStateIdentifier()] !== "undefined"
                 );
               },
             );
         }
       }
 
-      if (!someItemOrPropertyIsApplied) {
+      if (!someIncludeOrPropertyIsApplied) {
         runPolicyCheckDebug(
-          "ignoring policy %s as there wasno matching applying property or item for %j",
+          "ignoring policy %s as there wasno matching applying property or include for %j",
           policyName,
           applyingPropertyIds,
         );

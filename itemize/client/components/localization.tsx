@@ -7,7 +7,7 @@ import Module from "../../base/Root/Module";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../imported-resources";
-import { ItemContext } from "../providers/item";
+import { IncludeContext } from "../providers/include";
 
 interface II18nReadProps {
   id: string;
@@ -27,18 +27,18 @@ export function I18nRead(props: II18nReadProps) {
           <ItemDefinitionContext.Consumer>
             {
               (itemDefinitionContextualValue) => (
-                <ItemContext.Consumer>
+                <IncludeContext.Consumer>
                   {
-                    (itemContext) => {
+                    (includeContext) => {
 
                       let i18nValue: any = null;
                       if (itemDefinitionContextualValue) {
-                        if (itemContext) {
+                        if (includeContext) {
                           if (props.id === "name") {
-                            i18nValue = itemContext.item.getI18nNameFor(localeContext.language) || null;
+                            i18nValue = includeContext.include.getI18nNameFor(localeContext.language) || null;
                           } else {
-                            const itemI18nData = itemContext.item.getI18nDataFor(localeContext.language);
-                            i18nValue = itemI18nData ? itemI18nData[props.id] || null : null;
+                            const includeI18nData = includeContext.include.getI18nDataFor(localeContext.language);
+                            i18nValue = includeI18nData ? includeI18nData[props.id] || null : null;
                           }
                         } else {
                           const i18nIdefData =
@@ -75,9 +75,9 @@ export function I18nRead(props: II18nReadProps) {
                           if (props.policyType && props.policyName) {
                             errMessage += "; in policy " + props.policyType + " " + props.policyName;
                           }
-                          if (itemContext) {
+                          if (includeContext) {
                             errMessage += "; in item context for " +
-                              itemContext.item.getName();
+                              includeContext.include.getName();
                           }
                         }
                         throw new Error(errMessage);
@@ -109,7 +109,7 @@ export function I18nRead(props: II18nReadProps) {
                       return props.children(finalNode);
                     }
                   }
-                </ItemContext.Consumer>
+                </IncludeContext.Consumer>
               )
             }
           </ItemDefinitionContext.Consumer>
@@ -148,18 +148,18 @@ export function I18nReadError(props: II18nReadErrorProps) {
                   }
 
                   let itemDef: ItemDefinition;
-                  if (freeError.itemIdItemDefPath) {
+                  if (freeError.includeIdItemDefPath) {
                     try {
-                      itemDef = mod.getItemDefinitionFor(freeError.itemIdItemDefPath);
+                      itemDef = mod.getItemDefinitionFor(freeError.includeIdItemDefPath);
                     } catch {
-                      console.warn("failed to display error due to itemIdItemDefPath", freeError);
+                      console.warn("failed to display error due to includeIdItemDefPath", freeError);
                       return null;
                     }
                   } else if (freeError.itemDefPath) {
                     try {
                       itemDef = mod.getItemDefinitionFor(freeError.itemDefPath);
                     } catch {
-                      console.warn("failed to display error due to itemIdItemDefPath", freeError);
+                      console.warn("failed to display error due to includeIdItemDefPath", freeError);
                       return null;
                     }
                   }

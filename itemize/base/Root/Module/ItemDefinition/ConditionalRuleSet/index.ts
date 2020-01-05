@@ -1,7 +1,7 @@
 import { PropertyDefinitionSupportedType } from "../PropertyDefinition/types";
 import PropertyDefinition, { IPropertyDefinitionAlternativePropertyType } from "../PropertyDefinition";
 import ItemDefinition from "..";
-import Item from "../Item";
+import Include from "../Include";
 import Module from "../../../Module";
 
 // Types for the conditions
@@ -88,7 +88,7 @@ export default class ConditionalRuleSet {
   public parentModule: Module;
   public parentItemDefinition: ItemDefinition;
   public parentPropertyDefinition: PropertyDefinition;
-  public parentItem: Item;
+  public parentInclude: Include;
   public rawData: IConditionalRuleSetRawJSONDataType;
 
   private condition: ConditionalRuleSet;
@@ -101,7 +101,7 @@ export default class ConditionalRuleSet {
    * @param parentPropertyDefinition the property definition that contains the rule
    * located, it might not be available for example for condition
    * in prop extensions
-   * @param parentItem the item that contains this condition, such as in
+   * @param parentInclude the item that contains this condition, such as in
    * exclusion rules, it might not be available as well
    */
   constructor(
@@ -109,17 +109,17 @@ export default class ConditionalRuleSet {
     parentModule: Module,
     parentItemDefinition: ItemDefinition,
     parentPropertyDefinition: PropertyDefinition,
-    parentItem: Item,
+    parentInclude: Include,
   ) {
     this.rawData = rawJSON;
     this.condition = rawJSON.condition &&
       new ConditionalRuleSet(rawJSON.condition, parentModule,
-        parentItemDefinition, parentPropertyDefinition, parentItem);
+        parentItemDefinition, parentPropertyDefinition, parentInclude);
 
     this.parentItemDefinition = parentItemDefinition;
     this.parentModule = parentModule;
     this.parentPropertyDefinition = parentPropertyDefinition;
-    this.parentItem = parentItem;
+    this.parentInclude = parentInclude;
   }
 
   /**
@@ -229,7 +229,7 @@ export default class ConditionalRuleSet {
       // let's check whether there is an item instance for that
       // component that are active (aka not excluded)
       const hasOneOf = rawDataAsComponent.component[0] === "#" ?
-        this.parentItemDefinition.hasAnActiveInstanceOfId(id, rawDataAsComponent.component[0].substr(1)) :
+        this.parentItemDefinition.hasAnActiveIncludeInstanceOfId(id, rawDataAsComponent.component[0].substr(1)) :
         this.parentItemDefinition.hasAtLeastOneActiveInstanceOf(id, rawDataAsComponent.component);
 
       // And compare the result against the isIncluded boolean

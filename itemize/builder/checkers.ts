@@ -24,7 +24,7 @@ import PropertyDefinition, {
 import {
   PropertyDefinitionSupportedType,
 } from "../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import { IItemRawJSONDataType } from "../base/Root/Module/ItemDefinition/Item";
+import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Include";
 import { IPropertiesValueMappingDefinitonRawJSONDataType } from "../base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton";
 import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { IFilterRawJSONDataType, IAutocompleteValueRawJSONDataType } from "../base/Autocomplete";
@@ -243,18 +243,18 @@ export function checkItemDefinition(
           });
         }
 
-        if (policyValue.applyingItems) {
-          policyValue.applyingItems.forEach((itemId, index) => {
-            const itemRaw = rawData.includes && rawData.includes.find((i) => i.id === itemId);
-            if (!itemRaw) {
+        if (policyValue.applyingIncludes) {
+          policyValue.applyingIncludes.forEach((includeId, index) => {
+            const includeRaw = rawData.includes && rawData.includes.find((i) => i.id === includeId);
+            if (!includeRaw) {
               throw new CheckUpError(
                 "Policy rule '" + policyRuleKey +
-                  "' contains an invalid item id that cannot be found '" + itemId + "'",
+                  "' contains an invalid item id that cannot be found '" + includeId + "'",
                 actualTraceback
                   .newTraceToBit("policies")
                   .newTraceToBit(policyKey)
                   .newTraceToBit(policyRuleKey)
-                  .newTraceToBit("applyingItems")
+                  .newTraceToBit("applyingIncludes")
                   .newTraceToBit(index),
               );
             }
@@ -273,7 +273,7 @@ export function checkItemDefinition(
   if (rawData.includes) {
     const idPool: string[] = [];
     rawData.includes.forEach((itm, index) =>
-      checkItem(itm, rawData, parentModule, idPool,
+      checkInclude(itm, rawData, parentModule, idPool,
         actualTraceback.newTraceToBit("includes").newTraceToBit(index)));
   }
 
@@ -285,8 +285,8 @@ export function checkItemDefinition(
   }
 }
 
-export function checkItem(
-  rawData: IItemRawJSONDataType,
+export function checkInclude(
+  rawData: IIncludeRawJSONDataType,
   parentItemDefinition: IItemDefinitionRawJSONDataType,
   parentModule: IModuleRawJSONDataType,
   idPool: string[],
@@ -322,29 +322,29 @@ export function checkItem(
   // the item definition because PropertiesValueMappingDefiniton does that
 
   // see if there are shared between both arrays
-  const sharedItems = predefinedPropertiesKeys
+  const sharedProperties = predefinedPropertiesKeys
     .filter((value) => -1 !== enforcedPropertiesKeys.indexOf(value));
 
   // predefined properties and enforced properties must not be shared
   // for the simple reason that enforced properties are set in stone
-  if (sharedItems.length) {
+  if (sharedProperties.length) {
     throw new CheckUpError(
       "predefined and enforced properties collision on " +
-        sharedItems.join(","),
+        sharedProperties.join(","),
       traceback,
     );
   }
 
   // Now we check again this time against the sinkIn properties
-  const sharedItems2 = (rawData.sinkIn || [])
+  const sharedProperties2 = (rawData.sinkIn || [])
     .filter((value) => -1 !== enforcedPropertiesKeys.indexOf(value));
 
   // equally there might not be a collision here, enforced properties
   // need not to sink in
-  if (sharedItems2.length) {
+  if (sharedProperties2.length) {
     throw new CheckUpError(
       "sink in properties and enforced properties collision on " +
-        sharedItems2.join(","),
+        sharedProperties2.join(","),
       traceback,
     );
   }
@@ -552,13 +552,13 @@ export function checkPropertyDefinition(
   }
 
   // we set this constant on whether the type itself is searchable
-  const itemIsSearchable = propertyDefintionTypeStandard.searchable;
+  const propertyIsSearchable = propertyDefintionTypeStandard.searchable;
   const itemSupportsExactAndRange =
     propertyDefintionTypeStandard.searchInterface ===
       PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE;
 
   // if we have a search level but the item is not searchable throw an error
-  if (typeof rawData.searchable !== "undefined" && !itemIsSearchable) {
+  if (typeof rawData.searchable !== "undefined" && !propertyIsSearchable) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' does not support searchable flag " +
       "as it cannot be searched",
@@ -574,7 +574,7 @@ export function checkPropertyDefinition(
     );
 
   // also when it is not searchable
-  } else if (rawData.disableRangedSearch && !itemIsSearchable) {
+  } else if (rawData.disableRangedSearch && !propertyIsSearchable) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' does not support disableRangedSearch " +
       "as it cannot be searched",

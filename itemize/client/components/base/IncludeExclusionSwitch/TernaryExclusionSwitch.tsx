@@ -1,29 +1,29 @@
 import React from "react";
-import { IItemExclusionSwitchProps } from ".";
+import { IIncludeExclusionSwitchProps } from ".";
 import { FormControlLabel, FormLabel, FormControl, RadioGroup, Radio } from "@material-ui/core";
 import { capitalize } from "../../../../util";
-import { ItemExclusionState } from "../../../../base/Root/Module/ItemDefinition/Item";
+import { IncludeExclusionState } from "../../../../base/Root/Module/ItemDefinition/Include";
 
 function handleOnChange(
-  props: IItemExclusionSwitchProps,
+  props: IIncludeExclusionSwitchProps,
   e: React.ChangeEvent<HTMLInputElement>,
 ) {
-  return props.onChange(e.target.value as ItemExclusionState);
+  return props.onChange(e.target.value as IncludeExclusionState);
 }
 
-export default function TernaryExclusionSwitch(props: IItemExclusionSwitchProps) {
+export default function TernaryExclusionSwitch(props: IIncludeExclusionSwitchProps) {
   // let's the get basic data for the entry
-  const i18nData = props.item.getI18nDataFor(props.locale.language);
+  const i18nData = props.include.getI18nDataFor(props.locale.language);
   const i18nLabel = i18nData && i18nData.exclusion_ternary_selector_label;
 
   const values = [{
-    value: ItemExclusionState.EXCLUDED,
+    value: IncludeExclusionState.EXCLUDED,
     label: i18nData && capitalize(i18nData.any_label),
   }, {
-    value: ItemExclusionState.INCLUDED,
+    value: IncludeExclusionState.INCLUDED,
     label: i18nData && capitalize(i18nData.included_label),
   }, {
-    value: ItemExclusionState.ANY,
+    value: IncludeExclusionState.ANY,
     label: i18nData && capitalize(i18nData.excluded_label),
   }];
 

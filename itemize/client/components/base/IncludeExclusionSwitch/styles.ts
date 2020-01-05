@@ -1,14 +1,14 @@
 import { createStyles } from "@material-ui/styles";
 
-export interface IItemExclusionSwitchThemeType {
+export interface IIncludeExclusionSwitchThemeType {
   containerWidth: string | number;
 }
 
-export const STANDARD_THEME: IItemExclusionSwitchThemeType = {
+export const STANDARD_THEME: IIncludeExclusionSwitchThemeType = {
   containerWidth: "100%",
 };
 
-export const style = (theme: IItemExclusionSwitchThemeType) => createStyles({
+export const style = (theme: IIncludeExclusionSwitchThemeType) => createStyles({
   container: {
     width: theme.containerWidth,
   },

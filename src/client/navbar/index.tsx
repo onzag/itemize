@@ -54,7 +54,7 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                 disableExternalChecks={true}
                 assumeOwnership={true}
                 optimize={{
-                  onlyIncludeItems: [],
+                  onlyIncludeIncludes: [],
                   onlyIncludeProperties: ["username", "app_country"],
                   excludePolicies: true,
                 }}

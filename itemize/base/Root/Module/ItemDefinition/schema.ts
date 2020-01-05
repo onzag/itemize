@@ -1,5 +1,5 @@
 import PropertyDefinitionSchema from "./PropertyDefinition/schema";
-import ItemSchema from "./Item/schema";
+import ItemSchema from "./Include/schema";
 import PropertiesValueMappingDefinitionSchema from "./PropertiesValueMappingDefiniton/schema";
 import ConditionalRuleSetSchema from "./ConditionalRuleSet/schema";
 
@@ -30,7 +30,7 @@ const policySchema = {
           },
           minItems: 1,
         },
-        applyingItems: {
+        applyingIncludes: {
           type: "array",
           items: {
             type: "string",
@@ -68,7 +68,7 @@ export default {
     includes: {
       type: "array",
       items: {
-        $ref: "Item",
+        $ref: "Include",
       },
     },
     properties: {
@@ -139,7 +139,7 @@ export default {
   },
   definitions: {
     PropertyDefinition: PropertyDefinitionSchema,
-    Item: ItemSchema,
+    Include: ItemSchema,
     PropertiesValueMappingDefiniton: PropertiesValueMappingDefinitionSchema,
     ConditionalRuleSet: ConditionalRuleSetSchema,
   },

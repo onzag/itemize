@@ -5,7 +5,7 @@ import { IGQLValue } from "../../../gql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces";
 import Knex from "knex";
 import ItemDefinition from "..";
-import Item from "../Item";
+import Include from "../Include";
 import { processFileListFor, processSingleFileFor } from "./sql-files";
 
 export function getStandardSQLFnFor(type: string):
@@ -209,7 +209,7 @@ export function convertSQLValueToGQLValueForProperty(
 export async function convertGQLValueToSQLValueForProperty(
   transitoryId: string,
   itemDefinition: ItemDefinition,
-  item: Item,
+  include: Include,
   propertyDefinition: PropertyDefinition,
   data: IGQLValue,
   oldData: IGQLValue,
@@ -248,7 +248,7 @@ export async function convertGQLValueToSQLValueForProperty(
         oldValue,
         transitoryId,
         itemDefinition,
-        item,
+        include,
         propertyDefinition,
       );
     } else {
@@ -257,7 +257,7 @@ export async function convertGQLValueToSQLValueForProperty(
         oldValue,
         transitoryId,
         itemDefinition,
-        item,
+        include,
         propertyDefinition,
       );
     }

@@ -1,6 +1,6 @@
 import PropertyDefinition, { IPropertyDefinitionIncludedFileInfoType } from ".";
 import ItemDefinition from "..";
-import Item from "../Item";
+import Include from "../Include";
 import fs, { ReadStream } from "fs";
 import path from "path";
 import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../../constants";
@@ -14,7 +14,7 @@ const fsAsync = fs.promises;
  * @param oldValues the old values that this came from
  * @param transitoryId a transitory id on where to store the files (can be changed later)
  * @param itemDefinition the item definition these values are related to
- * @param item the item this values are related to
+ * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
  */
 export async function processFileListFor(
@@ -22,7 +22,7 @@ export async function processFileListFor(
   oldValues: IPropertyDefinitionIncludedFileInfoType[],
   transitoryId: string,
   itemDefinition: ItemDefinition,
-  item: Item,
+  include: Include,
   propertyDefinition: PropertyDefinition,
 ) {
   // the values might be null so let's ensure them
@@ -49,7 +49,7 @@ export async function processFileListFor(
         relativeOldValue,
         transitoryId,
         itemDefinition,
-        item,
+        include,
         propertyDefinition,
       );
     }).concat(removedFiles.map((removedValue) => {
@@ -60,7 +60,7 @@ export async function processFileListFor(
         removedValue,
         transitoryId,
         itemDefinition,
-        item,
+        include,
         propertyDefinition,
       );
     })),
@@ -85,7 +85,7 @@ export async function processFileListFor(
  * @param oldValue the old value
  * @param transitoryId a transitory id on where to store the files (can be changed later)
  * @param itemDefinition the item definition these values are related to
- * @param item the item this values are related to
+ * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
  */
 export async function processSingleFileFor(
@@ -93,7 +93,7 @@ export async function processSingleFileFor(
   oldValue: IPropertyDefinitionIncludedFileInfoType,
   transitoryId: string,
   itemDefinition: ItemDefinition,
-  item: Item,
+  include: Include,
   propertyDefinition: PropertyDefinition,
 ) {
   // basically we run this asa two step process
@@ -104,7 +104,7 @@ export async function processSingleFileFor(
     oldValue,
     transitoryId,
     itemDefinition,
-    item,
+    include,
     propertyDefinition,
   );
   // and return with the same id but no old value, create it
@@ -113,7 +113,7 @@ export async function processSingleFileFor(
     null,
     transitoryId,
     itemDefinition,
-    item,
+    include,
     propertyDefinition,
   );
 }
@@ -124,7 +124,7 @@ export async function processSingleFileFor(
  * @param oldVersion the old version of the file with the same id (or null, creates)
  * @param transitoryId the transitory identifier
  * @param itemDefinition the item definition
- * @param item the item (or null)
+ * @param include the include (or null)
  * @param propertyDefinition the property
  */
 async function processOneFileAndItsSameIDReplacement(
@@ -132,16 +132,16 @@ async function processOneFileAndItsSameIDReplacement(
   oldVersion: IPropertyDefinitionIncludedFileInfoType,
   transitoryId: string,
   itemDefinition: ItemDefinition,
-  item: Item,
+  include: Include,
   propertyDefinition: PropertyDefinition,
 ) {
   // we calculate the paths where we are saving this
   // /dist/uploads/MOD_module__IDEF_item_definition/:id/ITEM_etc/property...
   const idefLocationPath = path.join("dist", "uploads", itemDefinition.getQualifiedPathName());
   const transitoryLocationPath = path.join(idefLocationPath, transitoryId);
-  const itemLocationPath = item ?
-    path.join(transitoryLocationPath, item.getQualifiedIdentifier()) : transitoryLocationPath;
-  const propertyLocationPath = path.join(itemLocationPath, propertyDefinition.getId());
+  const includeLocationPath = include ?
+    path.join(transitoryLocationPath, include.getQualifiedIdentifier()) : transitoryLocationPath;
+  const propertyLocationPath = path.join(includeLocationPath, propertyDefinition.getId());
 
   // if the new version is null, this means that the old file
   // is meant to be removed
@@ -155,7 +155,7 @@ async function processOneFileAndItsSameIDReplacement(
       await checkEntireComboExists(
         idefLocationPath,
         transitoryLocationPath,
-        itemLocationPath,
+        includeLocationPath,
         propertyLocationPath,
         path.join(propertyLocationPath, oldVersion.id),
       )
@@ -214,8 +214,8 @@ async function processOneFileAndItsSameIDReplacement(
     itemDefinition.getQualifiedPathName(),
     transitoryId,
   );
-  if (item) {
-    standardURLPath = path.join(standardURLPath, item.getQualifiedIdentifier());
+  if (include) {
+    standardURLPath = path.join(standardURLPath, include.getQualifiedIdentifier());
   }
   standardURLPath = path.join(standardURLPath, propertyDefinition.getId(), newVersion.id);
 
@@ -226,7 +226,7 @@ async function processOneFileAndItsSameIDReplacement(
     await ensureEntireComboExists(
       idefLocationPath,
       transitoryLocationPath,
-      itemLocationPath,
+      includeLocationPath,
       propertyLocationPath,
       filePath,
     );
@@ -370,21 +370,21 @@ async function addFileFor(
  * Checks that all these folders exists
  * @param idefLocationPath eg /dist/uploads/MOD_module__IDEF_item
  * @param transitoryLocationPath eg /dist/uploads/MOD_module__IDEF_item/1
- * @param itemLocationPath eg /dist/uploads/MOD_module__IDEF_item/1/ITEM_item
+ * @param includeLocationPath eg /dist/uploads/MOD_module__IDEF_item/1/ITEM_item
  * @param propertyLocationPath eg /dist/uploads/MOD_module__IDEF_item/1/property
  * @param filePath eg /dist/uploads/MOD_module__IDEF_item/1/property/FILE0000001
  */
 async function checkEntireComboExists(
   idefLocationPath: string,
   transitoryLocationPath: string,
-  itemLocationPath: string,
+  includeLocationPath: string,
   propertyLocationPath: string,
   filePath: string,
 ) {
   return (
     await checkExists(idefLocationPath) &&
     await checkExists(transitoryLocationPath) &&
-    (transitoryLocationPath === itemLocationPath || await checkExists(itemLocationPath)) &&
+    (transitoryLocationPath === includeLocationPath || await checkExists(includeLocationPath)) &&
     await checkExists(propertyLocationPath) &&
     await checkExists(filePath)
   );
@@ -394,14 +394,14 @@ async function checkEntireComboExists(
  * Builds all these directories if they don't exist
  * @param idefLocationPath eg /dist/uploads/MOD_module__IDEF_item
  * @param transitoryLocationPath eg /dist/uploads/MOD_module__IDEF_item/1
- * @param itemLocationPath eg /dist/uploads/MOD_module__IDEF_item/1/ITEM_item
+ * @param includeLocationPath eg /dist/uploads/MOD_module__IDEF_item/1/ITEM_item
  * @param propertyLocationPath eg /dist/uploads/MOD_module__IDEF_item/1/property
  * @param filePath eg /dist/uploads/MOD_module__IDEF_item/1/property/FILE0000001
  */
 async function ensureEntireComboExists(
   idefLocationPath: string,
   transitoryLocationPath: string,
-  itemLocationPath: string,
+  includeLocationPath: string,
   propertyLocationPath: string,
   filePath: string,
 ) {
@@ -416,10 +416,10 @@ async function ensureEntireComboExists(
     await fsAsync.mkdir(transitoryLocationPath);
   }
   if (
-    transitoryLocationPath !== itemLocationPath &&
-    !await checkExists(itemLocationPath)
+    transitoryLocationPath !== includeLocationPath &&
+    !await checkExists(includeLocationPath)
   ) {
-    await fsAsync.mkdir(itemLocationPath);
+    await fsAsync.mkdir(includeLocationPath);
   }
   if (!await checkExists(propertyLocationPath)) {
     await fsAsync.mkdir(propertyLocationPath);

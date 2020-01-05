@@ -13,7 +13,7 @@ import {
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import {
-  ITEM_PREFIX,
+  INCLUDE_PREFIX,
   UNSPECIFIED_OWNER,
 } from "../../../constants";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
@@ -59,7 +59,7 @@ export async function getItemDefinition(
   Object.keys(requestedFields).forEach((arg) => {
     if (
       itemDefinition.hasPropertyDefinitionFor(arg, true) ||
-      arg.startsWith(ITEM_PREFIX) && itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, ""))
+      arg.startsWith(INCLUDE_PREFIX) && itemDefinition.hasIncludeFor(arg.replace(INCLUDE_PREFIX, ""))
     ) {
       requestedFieldsInIdef[arg] = requestedFields[arg];
     }
@@ -150,7 +150,7 @@ export async function getItemDefinitionList(
   Object.keys(requestedFields).forEach((arg) => {
     if (
       itemDefinition.hasPropertyDefinitionFor(arg, true) ||
-      arg.startsWith(ITEM_PREFIX) && itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, ""))
+      arg.startsWith(INCLUDE_PREFIX) && itemDefinition.hasIncludeFor(arg.replace(INCLUDE_PREFIX, ""))
     ) {
       requestedFieldsInIdef[arg] = requestedFields[arg];
     }

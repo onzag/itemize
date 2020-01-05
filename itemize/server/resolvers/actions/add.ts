@@ -12,7 +12,7 @@ import {
   checkUserExists,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
-import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX,
+import { CONNECTOR_SQL_COLUMN_FK_NAME, INCLUDE_PREFIX,
   UNSPECIFIED_OWNER } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
@@ -58,7 +58,7 @@ export async function addItemDefinition(
   Object.keys(resolverArgs.args).forEach((arg) => {
     if (
       itemDefinition.hasPropertyDefinitionFor(arg, true) ||
-      arg.startsWith(ITEM_PREFIX) && itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, ""))
+      arg.startsWith(INCLUDE_PREFIX) && itemDefinition.hasIncludeFor(arg.replace(INCLUDE_PREFIX, ""))
     ) {
       addingFields[arg] = resolverArgs.args[arg];
     }
@@ -89,19 +89,19 @@ export async function addItemDefinition(
   // and set appart, one user might have the rule to
   // create something but not to read it, it's weird,
   // but a valid option
-  const requestedFieldsThatRepresentPropertiesAndItems = {};
+  const requestedFieldsThatRepresentPropertiesAndIncludes = {};
   Object.keys(requestedFields).forEach((arg) => {
     if (
       itemDefinition.hasPropertyDefinitionFor(arg, true) ||
-      arg.startsWith(ITEM_PREFIX) && itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, ""))
+      arg.startsWith(INCLUDE_PREFIX) && itemDefinition.hasIncludeFor(arg.replace(INCLUDE_PREFIX, ""))
     ) {
-      requestedFieldsThatRepresentPropertiesAndItems[arg] = requestedFields[arg];
+      requestedFieldsThatRepresentPropertiesAndIncludes[arg] = requestedFields[arg];
     }
   });
 
   debug(
     "Fields to be requested from the idef have been extracted as %j",
-    requestedFieldsThatRepresentPropertiesAndItems,
+    requestedFieldsThatRepresentPropertiesAndIncludes,
   );
   debug("Checking role access for read...");
   // so now we check the role access for the reading of
@@ -112,7 +112,7 @@ export async function addItemDefinition(
     tokenData.role,
     tokenData.id,
     finalOwner,
-    requestedFieldsThatRepresentPropertiesAndItems,
+    requestedFieldsThatRepresentPropertiesAndIncludes,
     true,
   );
 

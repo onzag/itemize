@@ -7,7 +7,7 @@ import { RESERVED_BASE_PROPERTIES } from "../../constants";
 import PropertyView, { RawBasePropertyView } from "./base/PropertyView";
 import PropertyEntry from "./base/PropertyEntry";
 import PropertySetter from "./base/PropertySetter";
-import { ItemContext } from "../providers/item";
+import { IncludeContext } from "../providers/include";
 
 type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search";
 
@@ -59,9 +59,9 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
     <ItemDefinitionContext.Consumer>
       {
         (itemDefinitionContextualValue) => (
-          <ItemContext.Consumer>
+          <IncludeContext.Consumer>
             {
-              (itemContextualValue) => {
+              (includeContextualValue) => {
                 if (!itemDefinitionContextualValue) {
                   throw new Error("The Entry/View/Read/Set must be in a ItemDefinitionProvider context");
                 }
@@ -74,8 +74,8 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
 
                 const isMetaProperty = !!RESERVED_BASE_PROPERTIES[actualId];
                 const property = !isMetaProperty ? (
-                    itemContextualValue ?
-                    itemContextualValue.item.getSinkingPropertyFor(actualId) :
+                    includeContextualValue ?
+                    includeContextualValue.include.getSinkingPropertyFor(actualId) :
                     (
                       (props.policyType && props.policyName) ?
                         itemDefinitionContextualValue.idef
@@ -86,11 +86,11 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                   ) : null;
                 let propertyState: IPropertyDefinitionState = null;
                 if (!isMetaProperty) {
-                  if (itemContextualValue) {
+                  if (includeContextualValue) {
                     // this might be null if the state is excluded, which makes the property state
                     // be null and unknown
-                    if (itemContextualValue.state.itemDefinitionState) {
-                      propertyState = itemContextualValue.state.itemDefinitionState.properties
+                    if (includeContextualValue.state.itemDefinitionState) {
+                      propertyState = includeContextualValue.state.itemDefinitionState.properties
                         .find((p) => p.propertyId === actualId);
                     }
                   } else if (props.policyType && props.policyName) {
@@ -183,7 +183,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                 }
               }
             }
-          </ItemContext.Consumer>
+          </IncludeContext.Consumer>
         )
       }
     </ItemDefinitionContext.Consumer>

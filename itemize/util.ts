@@ -161,9 +161,9 @@ export function getFieldsAndArgs(
     includeArgs: boolean,
     includeFields: boolean,
     onlyIncludeProperties?: string[],
-    onlyIncludeItems?: string[],
+    onlyIncludeIncludes?: string[],
     onlyIncludePropertiesForArgs?: string[],
-    onlyIncludeItemsForArgs?: string[],
+    onlyIncludeIncludesForArgs?: string[],
     onlyIncludeArgsIfDiffersFromAppliedValue?: boolean,
     appliedOwner?: number,
     userRole: string;
@@ -272,13 +272,13 @@ export function getFieldsAndArgs(
   });
 
   // now we go for the items
-  options.itemDefinitionInstance.getAllItems().forEach((item) => {
+  options.itemDefinitionInstance.getAllIncludes().forEach((include) => {
     // and now we get the qualified identifier that grapqhl expects
-    const qualifiedId = item.getQualifiedIdentifier();
+    const qualifiedId = include.getQualifiedIdentifier();
 
     if (options.includeFields) {
       // items are always expected to have a value
-      requestFields.DATA[item.getQualifiedExclusionStateIdentifier()] = {};
+      requestFields.DATA[include.getQualifiedExclusionStateIdentifier()] = {};
       requestFields.DATA[qualifiedId] = {};
     }
 
@@ -286,37 +286,37 @@ export function getFieldsAndArgs(
       // we set the exclusion state we expect, it might be a ternary as well
       // like in search mode
       argumentsForQuery[
-        item.getQualifiedExclusionStateIdentifier()
-      ] = item.getExclusionState(options.forId || null);
+        include.getQualifiedExclusionStateIdentifier()
+      ] = include.getExclusionState(options.forId || null);
       // we add it to the data, and we add it to the arguments
       argumentsForQuery[qualifiedId] = {};
     }
 
     // now the conditional for whether we need to have that item properties in the arg
-    const itemShouldBeIncludedInArgs = options.includeArgs ? (
-      options.onlyIncludeItemsForArgs ?
-        options.onlyIncludeItemsForArgs.includes(item.getId()) :
+    const includeShouldBeIncludedInArgs = options.includeArgs ? (
+      options.onlyIncludeIncludesForArgs ?
+        options.onlyIncludeIncludesForArgs.includes(include.getId()) :
         true
     ) : false;
 
     // and for the fields
-    const itemShouldBeIncludedInFields = options.includeFields ? (
-      options.onlyIncludeItems ?
-        options.onlyIncludeItems.includes(item.getId()) :
+    const includeShouldBeIncludedInFields = options.includeFields ? (
+      options.onlyIncludeIncludes ?
+        options.onlyIncludeIncludes.includes(include.getId()) :
         true
     ) : false;
 
-    if (!itemShouldBeIncludedInArgs && !itemShouldBeIncludedInFields) {
+    if (!includeShouldBeIncludedInArgs && !includeShouldBeIncludedInFields) {
       // if we don't we can just skip
       return;
     }
 
     // otherwise we need the sinking properties
     // as only the sinking properties manage
-    item.getSinkingProperties().forEach((sp) => {
+    include.getSinkingProperties().forEach((sp) => {
       // we always check for role access and whether we can retrieve it or not
       if (
-        itemShouldBeIncludedInFields &&
+        includeShouldBeIncludedInFields &&
         !sp.isRetrievalDisabled() &&
         sp.checkRoleAccessFor(
           ItemDefinitionIOActions.READ,
@@ -326,10 +326,10 @@ export function getFieldsAndArgs(
           false,
         )
       ) {
-        requestFields.DATA[qualifiedId][item.getPrefixedQualifiedIdentifier() + sp.getId()] = sp.getRequestFields();
+        requestFields.DATA[qualifiedId][include.getPrefixedQualifiedIdentifier() + sp.getId()] = sp.getRequestFields();
       }
 
-      const hasRoleAccessToItemProperty = sp.checkRoleAccessFor(
+      const hasRoleAccessToIncludeProperty = sp.checkRoleAccessFor(
         !options.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
         options.userRole,
         options.userId,
@@ -338,19 +338,19 @@ export function getFieldsAndArgs(
       );
 
       if (
-        itemShouldBeIncludedInArgs && hasRoleAccessToItemProperty &&
+        includeShouldBeIncludedInArgs && hasRoleAccessToIncludeProperty &&
         options && options.onlyIncludeArgsIfDiffersFromAppliedValue
       ) {
         // we get the current applied value, if any
         const currentAppliedValue = options.itemDefinitionInstance.getGQLAppliedValue(options.forId || null);
         // if there is an applied value for that property
-        if (currentAppliedValue && currentAppliedValue.flattenedValue[item.getQualifiedIdentifier()]) {
-          const itemAppliedValue = currentAppliedValue.flattenedValue[item.getQualifiedIdentifier()];
+        if (currentAppliedValue && currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()]) {
+          const includeAppliedValue = currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()];
           const currentValue = sp.getCurrentValue(options.forId || null);
-          if (typeof itemAppliedValue[sp.getId()] !== "undefined") {
+          if (typeof includeAppliedValue[sp.getId()] !== "undefined") {
             // let's check if it's differ from what we have in the state
             const doesNotDifferFromAppliedValue = equals(
-              itemAppliedValue[sp.getId()],
+              includeAppliedValue[sp.getId()],
               currentValue,
             );
             // so we only add if it differs note how we are only adding it
@@ -361,7 +361,7 @@ export function getFieldsAndArgs(
           }
         }
       } else if (
-        itemShouldBeIncludedInArgs && hasRoleAccessToItemProperty
+        includeShouldBeIncludedInArgs && hasRoleAccessToIncludeProperty
       ) {
         argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(options.forId || null);
       }

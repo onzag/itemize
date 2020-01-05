@@ -1,11 +1,11 @@
-import Item, { IItemRawJSONDataType, IItemState, ItemExclusionState } from "./Item";
+import Include, { IIncludeRawJSONDataType, IIncludeState, IncludeExclusionState } from "./Include";
 import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionState } from "./PropertyDefinition";
 import Module, { IModuleRawJSONDataType, ListenerType, IRawJSONI18NDataType, IRawJsonI18NSpecificLocaleDataType } from "..";
 import {
   PREFIXED_CONCAT,
   ITEM_DEFINITION_PREFIX,
-  ITEM_PREFIX,
+  INCLUDE_PREFIX,
   ANYONE_METAROLE,
   SELF_METAROLE,
   ANYONE_LOGGED_METAROLE,
@@ -23,7 +23,7 @@ export interface IPolicyValueRawJSONDataType {
   roles: string[];
   properties: string[];
   applyingProperties?: string[];
-  applyingItems?: string[];
+  applyingIncludes?: string[];
 }
 
 export interface IPolicyRawJSONDataType {
@@ -55,7 +55,7 @@ export interface IItemDefinitionRawJSONDataType {
   i18nData: IRawJSONI18NDataType;
 
   // original data
-  includes?: IItemRawJSONDataType[];
+  includes?: IIncludeRawJSONDataType[];
   properties?: IPropertyDefinitionRawJSONDataType[];
   // role permissions
   readRoleAccess?: string[];
@@ -95,7 +95,7 @@ export interface IItemDefinitionStateType {
   moduleName: string;
   itemDefQualifiedName: string;
   itemDefName: string;
-  items: IItemState[];
+  includes: IIncludeState[];
   properties: IPropertyDefinitionState[];
   policies: IPoliciesStateType;
   gqlOriginalFlattenedValue: any;
@@ -217,7 +217,7 @@ export default class ItemDefinition {
   // tslint:disable-next-line: variable-name
   public _gqlQueryObj: GraphQLObjectType;
 
-  private itemInstances: Item[];
+  private includeInstances: Include[];
   private childDefinitions: ItemDefinition[];
   private importedChildDefinitions: Array<{
     fullName: string,
@@ -293,10 +293,10 @@ export default class ItemDefinition {
       });
     }
 
-    // assigning the item instances by using the includes
+    // assigning the include instances by using the includes
     // and instantiating those
-    this.itemInstances = rawJSON.includes ? rawJSON.includes
-      .map((i) => (new Item(i, parentModule, this))) : [];
+    this.includeInstances = rawJSON.includes ? rawJSON.includes
+      .map((i) => (new Include(i, parentModule, this))) : [];
 
     this.stateHasAppliedValueTo = {};
     this.stateGQLAppliedValue = {};
@@ -420,24 +420,24 @@ export default class ItemDefinition {
   /**
    * Checks whether an item included in this item definition
    * has an specific id
-   * @param id the id of the item
+   * @param id the id of the include
    */
-  public hasItemFor(id: string) {
-    return !!this.itemInstances.find((ii) => ii.getId() === id);
+  public hasIncludeFor(id: string) {
+    return !!this.includeInstances.find((ii) => ii.getId() === id);
   }
 
   /**
-   * provides an item within this item defintion that has that
+   * provides an include within this item defintion that has that
    * specific id
-   * @param id the id of the item
+   * @param id the id of the include
    * @throws an error if it cannot find the item
    */
-  public getItemFor(id: string) {
-    const item = this.itemInstances.find((ii) => ii.getId() === id);
-    if (!item) {
-      throw new Error("Requested invalid item " + id);
+  public getIncludeFor(id: string) {
+    const include = this.includeInstances.find((ii) => ii.getId() === id);
+    if (!include) {
+      throw new Error("Requested invalid include " + id);
     }
-    return item;
+    return include;
   }
 
   /**
@@ -484,8 +484,8 @@ export default class ItemDefinition {
   /**
    * Provides all the item instances
    */
-  public getAllItems() {
-    return this.itemInstances;
+  public getAllIncludes() {
+    return this.includeInstances;
   }
 
   /**
@@ -560,10 +560,10 @@ export default class ItemDefinition {
    */
   public hasAtLeastOneActiveInstanceOf(id: number, name: string): boolean {
     // we need a list of possible candidates
-    // the might currently contain checks if an item
-    // contains the item with the given name
+    // the might currently contain checks if an include
+    // contains the include with the given name
     // otherwise it's not worth to check for activity
-    const possibleCandidates = this.itemInstances
+    const possibleCandidates = this.includeInstances
       .filter((i) => i.getName() === name);
 
     // if there are no possible candidates return false
@@ -571,24 +571,24 @@ export default class ItemDefinition {
       return false;
     }
 
-    return possibleCandidates.some((c) => c.getExclusionState(id) !== ItemExclusionState.EXCLUDED);
+    return possibleCandidates.some((c) => c.getExclusionState(id) !== IncludeExclusionState.EXCLUDED);
   }
 
   /**
    * Checks whether it has an active instance of an item
-   * given its item id (not its name)
+   * given its include id (not its name)
    * @param id the slot id
-   * @param itemId the id of the item
+   * @param includeId the id of the item
    */
-  public hasAnActiveInstanceOfId(id: number, itemId: string): boolean {
-    const candidate = this.itemInstances
-      .find((i) => i.getId() === itemId);
+  public hasAnActiveIncludeInstanceOfId(id: number, includeId: string): boolean {
+    const candidate = this.includeInstances
+      .find((i) => i.getId() === includeId);
 
     if (!candidate) {
       return false;
     }
 
-    return candidate.getExclusionState(id) !== ItemExclusionState.EXCLUDED;
+    return candidate.getExclusionState(id) !== IncludeExclusionState.EXCLUDED;
   }
 
   /**
@@ -679,14 +679,14 @@ export default class ItemDefinition {
    * @param onlyIncludeProperties only includes these specific
    * properties, note property definitions are not fetched in
    * this case
-   * @param excludeItems excludes the items in the list
+   * @param onlyIncludeIncludes includes the includes in the list
    * @param excludePolicies excludes all the policies state
    */
   public getStateNoExternalChecking(
     id: number,
     emulateExternalChecking?: boolean,
     onlyIncludeProperties?: string[],
-    onlyIncludeItems?: string[],
+    onlyIncludeIncludes?: string[],
     excludePolicies?: boolean,
   ): IItemDefinitionStateType {
     const properties = onlyIncludeProperties ?
@@ -713,12 +713,12 @@ export default class ItemDefinition {
       });
     }
 
-    let items: IItemState[];
-    if (onlyIncludeItems) {
-      items = onlyIncludeItems.map((ii) =>
-        this.getItemFor(ii).getStateNoExternalChecking(id, emulateExternalChecking));
+    let includes: IIncludeState[];
+    if (onlyIncludeIncludes) {
+      includes = onlyIncludeIncludes.map((ii) =>
+        this.getIncludeFor(ii).getStateNoExternalChecking(id, emulateExternalChecking));
     } else {
-      items = this.itemInstances.map((ii) =>
+      includes = this.includeInstances.map((ii) =>
         ii.getStateNoExternalChecking(id, emulateExternalChecking));
     }
 
@@ -727,7 +727,7 @@ export default class ItemDefinition {
       moduleName: this.getModuleName(),
       itemDefQualifiedName: this.getQualifiedPathName(),
       itemDefName: this.getName(),
-      items,
+      includes,
       properties,
       policies,
       gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
@@ -746,13 +746,13 @@ export default class ItemDefinition {
    * @param onlyIncludeProperties only includes these specific
    * properties, note property definitions are not fetched in
    * this case
-   * @param excludeItems excludes the items in the list
+   * @param onlyIncludeIncludes includes the includes in the list
    * @param excludePolicies excludes all the policies state bit
    */
   public async getState(
     id: number,
     onlyIncludeProperties?: string[],
-    onlyIncludeItems?: string[],
+    onlyIncludeIncludes?: string[],
     excludePolicies?: boolean,
   ): Promise<IItemDefinitionStateType> {
     const properties = await Promise.all(onlyIncludeProperties ?
@@ -778,11 +778,11 @@ export default class ItemDefinition {
       }));
     }
 
-    let items: IItemState[];
-    if (onlyIncludeItems) {
-      items = await Promise.all(onlyIncludeItems.map((ii) => this.getItemFor(ii).getState(id)));
+    let includes: IIncludeState[];
+    if (onlyIncludeIncludes) {
+      includes = await Promise.all(onlyIncludeIncludes.map((ii) => this.getIncludeFor(ii).getState(id)));
     } else {
-      items = await Promise.all(this.itemInstances.map((ii: Item) => ii.getState(id)));
+      includes = await Promise.all(this.includeInstances.map((ii: Include) => ii.getState(id)));
     }
 
     const gqlOriginal = this.getGQLAppliedValue(id);
@@ -790,7 +790,7 @@ export default class ItemDefinition {
       moduleName: this.getModuleName(),
       itemDefQualifiedName: this.getQualifiedPathName(),
       itemDefName: this.getName(),
-      items,
+      includes,
       properties,
       policies,
       gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
@@ -855,18 +855,18 @@ export default class ItemDefinition {
     });
 
     // now we get all the items
-    this.getAllItems().forEach((item) => {
+    this.getAllIncludes().forEach((include) => {
       // and we get the applied value for thae item
-      let givenValue = flattenedValue[item.getQualifiedIdentifier()];
+      let givenValue = flattenedValue[include.getQualifiedIdentifier()];
       if (typeof givenValue === "undefined") {
         givenValue = null;
       }
       // and the exclusion state, or excluded if not specified
       const givenExclusionState =
-        flattenedValue[item.getQualifiedExclusionStateIdentifier()] || ItemExclusionState.EXCLUDED;
+        flattenedValue[include.getQualifiedExclusionStateIdentifier()] || IncludeExclusionState.EXCLUDED;
 
       // and we apply such value
-      item.applyValue(id, givenValue, givenExclusionState);
+      include.applyValue(id, givenValue, givenExclusionState);
     });
   }
 
@@ -913,9 +913,9 @@ export default class ItemDefinition {
     properties.forEach((property) => {
       property.cleanValueFor(id);
     });
-    // also the items
-    this.getAllItems().forEach((item) => {
-      item.cleanValueFor(id);
+    // also the includes
+    this.getAllIncludes().forEach((include) => {
+      include.cleanValueFor(id);
     });
   }
 
@@ -1049,16 +1049,18 @@ export default class ItemDefinition {
     // otherwise we go in the requested fields, in each one of them
     return Object.keys(requestedFields).every((requestedField) => {
       // and we check if it's an item (or a exclusion state)
-      if (requestedField.startsWith(ITEM_PREFIX)) {
+      if (requestedField.startsWith(INCLUDE_PREFIX)) {
         // so now we extract the item name from that
-        let requestedFieldItemName = requestedField.replace(ITEM_PREFIX, "");
+        let requestedFieldItemName = requestedField.replace(INCLUDE_PREFIX, "");
         if (requestedFieldItemName.endsWith(EXCLUSION_STATE_SUFFIX)) {
           requestedFieldItemName = requestedFieldItemName.replace(EXCLUSION_STATE_SUFFIX, "");
         }
-        // request the item
-        const item = this.getItemFor(requestedFieldItemName);
+        // request the include
+        const include = this.getIncludeFor(requestedFieldItemName);
         // and check the role access for it
-        return item.checkRoleAccessFor(action, role, userId, ownerUserId, requestedFields[requestedField], throwError);
+        return include.checkRoleAccessFor(
+          action, role, userId, ownerUserId, requestedFields[requestedField], throwError,
+        );
       } else {
         // also for the property
         const propDef = this.getPropertyDefinitionFor(requestedField, true);
@@ -1215,11 +1217,11 @@ export default class ItemDefinition {
    * either by database or rest endpoints, this is basically unique
    * and autocomplete indexed values
    * @param onlyCheckProperties only to check the properties in this list
-   * @param ignoreItems whether to ignore the sinked in properties in the items
+   * @param ignoreIncludes whether to ignore the sinked in properties in the includes
    */
   public containsAnExternallyCheckedProperty(
     onlyCheckProperties?: string[],
-    ignoreItems?: boolean,
+    ignoreIncludes?: boolean,
   ): boolean {
     const existInFirstLayer: boolean =
       this.getAllPropertyDefinitionsAndExtensions()
@@ -1227,10 +1229,10 @@ export default class ItemDefinition {
       .some((pd) => pd.isUnique() || (pd.hasAutocomplete() && pd.isAutocompleteEnforced()));
     if (existInFirstLayer) {
       return true;
-    } else if (ignoreItems) {
+    } else if (ignoreIncludes) {
       return false;
     }
-    return this.getAllItems().some((i) => i.containsAnExternallyCheckedProperty());
+    return this.getAllIncludes().some((i) => i.containsAnExternallyCheckedProperty());
   }
 
   /**
@@ -1279,8 +1281,8 @@ export default class ItemDefinition {
     return applyingProperties || null;
   }
 
-  public getApplyingItemIdsForPolicy(type: string, name: string): string[] {
-    return this.rawData.policies[type][name].applyingItems || null;
+  public getApplyingIncludeIdsForPolicy(type: string, name: string): string[] {
+    return this.rawData.policies[type][name].applyingIncludes || null;
   }
 
   /**
@@ -1380,11 +1382,11 @@ export default class ItemDefinition {
       }
     });
 
-    this.itemInstances.forEach((ii) => {
-      const mergeItemRaw = this.rawData.includes &&
+    this.includeInstances.forEach((ii) => {
+      const mergeIncludeRaw = this.rawData.includes &&
         this.rawData.includes.find((include) => include.id === ii.getId());
-      if (mergeItemRaw) {
-        ii.mergeWithI18n(mergeItemRaw);
+      if (mergeIncludeRaw) {
+        ii.mergeWithI18n(mergeIncludeRaw);
       }
     });
   }

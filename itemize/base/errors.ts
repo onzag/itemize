@@ -18,13 +18,13 @@ interface IGraphQLEndpointErrorOverloadPropertyType {
   propertyId: string;
 }
 
-interface IGraphQLEndpointErrorOverloadPropertyInItemType {
+interface IGraphQLEndpointErrorOverloadPropertyInIncludeType {
   message: string;
   code: string;
   modulePath: string[];
   itemDefPath: string[];
-  itemId: string;
-  itemIdItemDefPath: string[];
+  includeId: string;
+  includeIdItemDefPath: string[];
   propertyId: string;
 }
 
@@ -41,7 +41,7 @@ export type GraphQLEndpointErrorType =
   IGraphQLEndpointErrorBaseType |
   IGraphQLEndpointErrorOverloadPropExtensionType |
   IGraphQLEndpointErrorOverloadPropertyType |
-  IGraphQLEndpointErrorOverloadPropertyInItemType |
+  IGraphQLEndpointErrorOverloadPropertyInIncludeType |
   IGraphQLEndpointErrorOverloadPolicyType;
 
 export class GraphQLEndpointError extends Error {

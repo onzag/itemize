@@ -2,7 +2,7 @@ import ConditionalRuleSetSchema from "../ConditionalRuleSet/schema";
 import PropertiesValueMappingDefinitionSchema from "../PropertiesValueMappingDefiniton/schema";
 
 export default {
-  $id: "Item",
+  $id: "Include",
   type: "object",
   properties: {
     id: {

@@ -5,7 +5,7 @@ import { CalloutWarning, ExclusionSwitch } from "../../../itemize/client/compone
 import { Entry } from "../../../itemize/client/components/property";
 import { StatsForNerds } from "../../../itemize/client/components/dev";
 import { ModuleProvider } from "../../../itemize/client/providers/module";
-import { ItemProvider } from "../../../itemize/client/providers/item";
+import { IncludeProvider } from "../../../itemize/client/providers/item";
 import { SearchActioner } from "../../../itemize/client/components/item-definition";
 
 export function FrontPage() {

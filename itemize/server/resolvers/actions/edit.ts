@@ -14,7 +14,7 @@ import {
   validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
-import { CONNECTOR_SQL_COLUMN_FK_NAME, ITEM_PREFIX, EXCLUSION_STATE_SUFFIX } from "../../../constants";
+import { CONNECTOR_SQL_COLUMN_FK_NAME, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
   convertGQLValueToSQLValueForItemDefinition,
@@ -126,8 +126,8 @@ export async function editItemDefinition(
     if (
       itemDefinition.hasPropertyDefinitionFor(arg, true) ||
       (
-        arg.startsWith(ITEM_PREFIX) &&
-        itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, "").replace(EXCLUSION_STATE_SUFFIX, ""))
+        arg.startsWith(INCLUDE_PREFIX) &&
+        itemDefinition.hasIncludeFor(arg.replace(INCLUDE_PREFIX, "").replace(EXCLUSION_STATE_SUFFIX, ""))
       )
     ) {
       editingFields[arg] = resolverArgs.args[arg];
@@ -141,7 +141,7 @@ export async function editItemDefinition(
   Object.keys(requestedFields).forEach((arg) => {
     if (
       itemDefinition.hasPropertyDefinitionFor(arg, true) ||
-      arg.startsWith(ITEM_PREFIX) && itemDefinition.hasItemFor(arg.replace(ITEM_PREFIX, ""))
+      arg.startsWith(INCLUDE_PREFIX) && itemDefinition.hasIncludeFor(arg.replace(INCLUDE_PREFIX, ""))
     ) {
       requestedFieldsInIdef[arg] = requestedFields[arg];
     }

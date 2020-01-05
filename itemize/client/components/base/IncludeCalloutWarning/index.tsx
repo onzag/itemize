@@ -1,27 +1,27 @@
 import React from "react";
 import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
-import { style, STANDARD_THEME, IItemCalloutWarningThemeType } from "./styles";
-import Item, { IItemState, ItemExclusionState } from "../../../../base/Root/Module/ItemDefinition/Item";
+import { style, STANDARD_THEME, IIncludeCalloutWarningThemeType } from "./styles";
+import Include, { IIncludeState, IncludeExclusionState } from "../../../../base/Root/Module/ItemDefinition/Include";
 import { Icon } from "@material-ui/core";
 import { ILocaleContextType, LocaleContext } from "../../../internal/app";
 
-export interface IItemCalloutWarningBaseProps {
-  item: Item;
-  state: IItemState;
-  theme?: Partial<IItemCalloutWarningThemeType>;
+export interface IIncludeCalloutWarningBaseProps {
+  include: Include;
+  state: IIncludeState;
+  theme?: Partial<IIncludeCalloutWarningThemeType>;
 }
 
-export interface IItemCalloutWarningProps extends IItemCalloutWarningBaseProps, WithStyles<typeof style> {
+export interface IIncludeCalloutWarningProps extends IIncludeCalloutWarningBaseProps, WithStyles<typeof style> {
   locale: ILocaleContextType;
 }
 
-const ItemCalloutWarningWithStyles = withStyles(style)((props: IItemCalloutWarningProps) => {
+const IncludeCalloutWarningWithStyles = withStyles(style)((props: IIncludeCalloutWarningProps) => {
   let calloutExcludedWarning: string = null;
   if (
-    props.item.isExclusionCallout() &&
-    props.state.exclusionState === ItemExclusionState.EXCLUDED
+    props.include.isExclusionCallout() &&
+    props.state.exclusionState === IncludeExclusionState.EXCLUDED
   ) {
-    calloutExcludedWarning = props.item.getI18nDataFor(props.locale.language).callout_excluded_label;
+    calloutExcludedWarning = props.include.getI18nDataFor(props.locale.language).callout_excluded_label;
   }
   return (
     <div className={props.classes.container}>
@@ -33,8 +33,8 @@ const ItemCalloutWarningWithStyles = withStyles(style)((props: IItemCalloutWarni
   );
 });
 
-export default function ItemCalloutWarning(props: IItemCalloutWarningBaseProps) {
-  let appliedTheme: IItemCalloutWarningThemeType = STANDARD_THEME;
+export default function IncludeCalloutWarning(props: IIncludeCalloutWarningBaseProps) {
+  let appliedTheme: IIncludeCalloutWarningThemeType = STANDARD_THEME;
   if (props.theme) {
     appliedTheme = {
       ...STANDARD_THEME,
@@ -48,7 +48,7 @@ export default function ItemCalloutWarning(props: IItemCalloutWarningBaseProps) 
       {
         (locale) =>
           <ThemeProvider theme={appliedTheme}>
-            <ItemCalloutWarningWithStyles
+            <IncludeCalloutWarningWithStyles
               {...props}
               locale={locale}
             />

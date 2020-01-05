@@ -25,7 +25,7 @@ interface ISearchLoaderProps {
     refreshPage: () => void;
   }) => any;
   requestedProperties: string[];
-  requestedItems?: string[];
+  requestedIncludes?: string[];
 }
 
 interface IActualSearchLoaderProps extends ISearchLoaderProps {
@@ -89,7 +89,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       includeArgs: false,
       includeFields: true,
       onlyIncludeProperties: this.props.requestedProperties,
-      onlyIncludeItems: this.props.requestedItems || [],
+      onlyIncludeIncludes: this.props.requestedIncludes || [],
       appliedOwner: UNSPECIFIED_OWNER,
       userId: this.props.tokenData.id,
       userRole: this.props.tokenData.role,
