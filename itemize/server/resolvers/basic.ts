@@ -653,20 +653,39 @@ export async function runPolicyCheck(
       const applyingPropertyIds =
         itemDefinition.getApplyingPropertyIdsForPolicy(policyType, policyName);
 
+      let someItemOrPropertyIsApplied = false;
       if (applyingPropertyIds) {
-        const somePropertyValueIsApplied =
-        applyingPropertyIds.some(
-          (applyingPropertyId) => typeof gqlArgValue[applyingPropertyId] !== "undefined",
-        );
-
-        if (!somePropertyValueIsApplied) {
-          runPolicyCheckDebug(
-            "ignoring policy %s as there wasno matching applying property for %j",
-            policyName,
-            applyingPropertyIds,
+        someItemOrPropertyIsApplied =
+          applyingPropertyIds.some(
+            (applyingPropertyId) => typeof gqlArgValue[applyingPropertyId] !== "undefined",
           );
-          continue;
+      }
+
+      if (!someItemOrPropertyIsApplied) {
+        const applyingItemIds =
+          itemDefinition.getApplyingItemIdsForPolicy(policyType, policyName);
+
+        if (applyingItemIds) {
+          someItemOrPropertyIsApplied =
+            applyingItemIds.some(
+              (applyingItemId) => {
+                const item = itemDefinition.getItemFor(applyingItemId);
+                return (
+                  typeof gqlArgValue[item.getQualifiedIdentifier()] !== "undefined" ||
+                  typeof gqlArgValue[item.getQualifiedExclusionStateIdentifier()] !== "undefined"
+                );
+              },
+            );
         }
+      }
+
+      if (!someItemOrPropertyIsApplied) {
+        runPolicyCheckDebug(
+          "ignoring policy %s as there wasno matching applying property or item for %j",
+          policyName,
+          applyingPropertyIds,
+        );
+        continue;
       }
     }
 

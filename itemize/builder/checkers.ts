@@ -242,6 +242,24 @@ export function checkItemDefinition(
             }
           });
         }
+
+        if (policyValue.applyingItems) {
+          policyValue.applyingItems.forEach((itemId, index) => {
+            const itemRaw = rawData.includes && rawData.includes.find((i) => i.id === itemId);
+            if (!itemRaw) {
+              throw new CheckUpError(
+                "Policy rule '" + policyRuleKey +
+                  "' contains an invalid item id that cannot be found '" + itemId + "'",
+                actualTraceback
+                  .newTraceToBit("policies")
+                  .newTraceToBit(policyKey)
+                  .newTraceToBit(policyRuleKey)
+                  .newTraceToBit("applyingItems")
+                  .newTraceToBit(index),
+              );
+            }
+          });
+        }
       });
     });
   }

@@ -1260,6 +1260,23 @@ export class ActualItemDefinitionProvider extends
               // the attribute is not included isInvalid is false we ignore
               return false;
             }
+
+            // now we do the same but with the items
+            const applyingItemIds = this.props.itemDefinitionInstance
+              .getApplyingItemIdsForPolicy(policyType, policyName);
+
+            const oneOfApplyingItemsApplies = applyingItemIds
+              .some((itemId) => {
+                const referredItem = this.props.itemDefinitionInstance.getItemFor(itemId);
+                return (
+                  typeof argumentsToCheckPropertiesAgainst[referredItem.getQualifiedIdentifier()] !== "undefined" ||
+                  typeof argumentsToCheckPropertiesAgainst[referredItem.getQualifiedExclusionStateIdentifier()] !== "undefined"
+                );
+              });
+
+            if (!oneOfApplyingItemsApplies) {
+              return false;
+            }
           }
           // Here we are doing exactly the same as we did with applying property ids but this time
           // now we do it with the roles

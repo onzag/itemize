@@ -22,7 +22,8 @@ import Root from "../..";
 export interface IPolicyValueRawJSONDataType {
   roles: string[];
   properties: string[];
-  applyingProperties: string[];
+  applyingProperties?: string[];
+  applyingItems?: string[];
 }
 
 export interface IPolicyRawJSONDataType {
@@ -1276,6 +1277,10 @@ export default class ItemDefinition {
   public getApplyingPropertyIdsForPolicy(type: string, name: string): string[] {
     const applyingProperties = this.rawData.policies[type][name].applyingProperties;
     return applyingProperties || null;
+  }
+
+  public getApplyingItemIdsForPolicy(type: string, name: string): string[] {
+    return this.rawData.policies[type][name].applyingItems || null;
   }
 
   /**
