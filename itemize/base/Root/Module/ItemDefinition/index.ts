@@ -33,6 +33,7 @@ export interface IPolicyRawJSONDataType {
 export interface IPoliciesRawJSONDataType {
   edit?: IPolicyRawJSONDataType;
   delete?: IPolicyRawJSONDataType;
+  read?: IPolicyRawJSONDataType;
 }
 
 export interface IItemDefinitionParentingRawJSONDataType {
@@ -74,6 +75,9 @@ export interface IItemDefinitionRawJSONDataType {
   // ownership
   ownerIsObjectId?: boolean;
 
+  // searchable
+  searchable?: boolean;
+
   // behalf creation
   canCreateInBehalfBy?: string[];
 
@@ -89,6 +93,7 @@ export interface IPolicyStateType {
 export interface IPoliciesStateType {
   edit?: IPolicyStateType;
   delete?: IPolicyStateType;
+  read?: IPolicyStateType;
 }
 
 export interface IItemDefinitionStateType {
@@ -124,6 +129,7 @@ export interface IPolicyType {
 export interface IPoliciesType {
   edit?: IPolicyType;
   delete?: IPolicyType;
+  read?: IPolicyType;
 }
 
 /**
@@ -701,7 +707,7 @@ export default class ItemDefinition {
     let policies: IPoliciesStateType = null;
     if (!excludePolicies) {
       policies = {};
-      ["edit", "delete"].map((policyType) => {
+      ["edit", "delete", "read"].map((policyType) => {
         if (this.policyPropertyDefinitions[policyType]) {
           policies[policyType] = {};
           Object.keys(this.policyPropertyDefinitions[policyType]).map((policyName) => {
@@ -767,7 +773,7 @@ export default class ItemDefinition {
     let policies: IPoliciesStateType = null;
     if (!excludePolicies) {
       policies = {};
-      await Promise.all(["edit", "delete"].map(async (policyType) => {
+      await Promise.all(["edit", "delete", "read"].map(async (policyType) => {
         if (this.policyPropertyDefinitions[policyType]) {
           policies[policyType] = {};
           await Promise.all(Object.keys(this.policyPropertyDefinitions[policyType]).map(async (policyName) => {
@@ -954,6 +960,9 @@ export default class ItemDefinition {
    * counterpart
    */
   public getStandardCounterpart(): ItemDefinition {
+    if (this.isExtensionsInstance()) {
+      return this.parentModule.getStandardModule().getPropExtensionItemDefinition();
+    }
     return this.parentModule.getStandardModule().getItemDefinitionFor(
       this.getModulePath(),
     );
@@ -1012,9 +1021,6 @@ export default class ItemDefinition {
     if (ownerUserId === null) {
       throw new Error("ownerUserId cannot be null");
     }
-    // if you are in guest mode, it is considered, that if you
-    // fail, it's because you missed to login
-    const notLoggedInWhenShould = role === GUEST_METAROLE;
     // now let's get the roles that have access to the action
     const rolesWithAccess = this.getRolesWithAccessTo(action);
     // if anyone is included, or anyone logged is included and you are not
@@ -1030,9 +1036,20 @@ export default class ItemDefinition {
     if (!idefLevelAccess) {
       // let's check the throw error flag
       if (throwError) {
+        // if you are in guest mode, it is considered, that if you
+        // fail, it's because you missed to login
+        const notLoggedInWhenShould = role === GUEST_METAROLE;
+        const errorMightHaveBeenAvoidedIfOwnerSpecified = ownerUserId === UNSPECIFIED_OWNER &&
+          rolesWithAccess.includes(SELF_METAROLE);
+        let errorMessage = `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
+          ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
+        if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
+          errorMessage += ", this error might have been avoided if an owner had" +
+          " been specified which matched yourself as there's a self rule, if performing a search" +
+          " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+        }
         throw new GraphQLEndpointError({
-          message: `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
-          ` only roles ${rolesWithAccess.join(", ")} can be granted access`,
+          message: errorMessage,
           // this is where the code comes in handy, it's forbidden by default, and must be logged in for guests
           code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
         });
@@ -1249,7 +1266,7 @@ export default class ItemDefinition {
 
   /**
    * Provides all policy names included in the policy of type
-   * @param policyType the policy type, "edit" or "delete"
+   * @param policyType the policy type, "edit", "read" or "delete"
    */
   public getPolicyNamesFor(policyType: string): string[] {
     if (!this.rawData.policies || !this.rawData.policies[policyType]) {
@@ -1262,7 +1279,7 @@ export default class ItemDefinition {
    * Provides all live properties for a policy, these properties
    * are detached properties, new instances of the old property and hold
    * their own states
-   * @param type the type "edit", "delete"
+   * @param type the type "edit", "delete", "read"
    * @param name the policy name that was set
    */
   public getPropertiesForPolicy(type: string, name: string): PropertyDefinition[] {
@@ -1273,7 +1290,7 @@ export default class ItemDefinition {
 
   /**
    * Provides all the property ids that are affected by a given policy
-   * @param type the policy type "edit", "delete"
+   * @param type the policy type "edit", "delete", "read"
    * @param name the policy name
    */
   public getApplyingPropertyIdsForPolicy(type: string, name: string): string[] {
@@ -1287,7 +1304,7 @@ export default class ItemDefinition {
 
   /**
    * Provides all the roles that are affected by a policy
-   * @param type the policy type "edit", "delete"
+   * @param type the policy type "edit", "delete", "read"
    * @param name the policy name
    */
   public getRolesForPolicy(type: string, name: string): string[] {
@@ -1389,6 +1406,17 @@ export default class ItemDefinition {
         ii.mergeWithI18n(mergeIncludeRaw);
       }
     });
+  }
+
+  /**
+   * Tells whether the item definition supports the search
+   * endpoint and all what it entails
+   */
+  public isSearchable() {
+    if (typeof this.rawData.searchable !== "undefined") {
+      return this.rawData.searchable;
+    }
+    return true;
   }
 
   /**

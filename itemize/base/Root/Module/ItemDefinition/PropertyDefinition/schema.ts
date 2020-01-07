@@ -145,9 +145,6 @@ export default {
     disableRetrieval: {
       type: "boolean",
     },
-    richText: {
-      type: "boolean",
-    },
     specialProperties: {
       type: "object",
       properties: {},

@@ -133,7 +133,7 @@ export function convertSQLValueToGQLValueForModule(mod: Module, row: ISQLTableRo
   // in this item definitions, and convert them one by one
   // with the row data, this basically also gives graphql value
   // in the key:value format
-  mod.getParentModule().getAllPropExtensions().filter(
+  mod.getAllPropExtensions().filter(
     (property) => graphqlFields[property.getId()],
   ).forEach((pd) => {
     result = { ...result, ...convertSQLValueToGQLValueForProperty(pd, row) };

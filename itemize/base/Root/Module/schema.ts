@@ -17,6 +17,9 @@ export default {
         type: "string",
       },
     },
+    searchable: {
+      type: "boolean",
+    },
   },
   required: ["type"],
 };

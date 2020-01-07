@@ -7,6 +7,8 @@ import {
   PREFIX_BUILD,
   POLICY_PREFIXES,
   MAX_FILE_SIZE,
+  GUEST_METAROLE,
+  UNSPECIFIED_OWNER,
 } from "../../../../../constants";
 import Module from "../..";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
@@ -411,7 +413,7 @@ export default class PropertyDefinition {
       } else {
         const dummyElement = DOMWindow.document.createElement("template");
         dummyElement.innerHTML = value.toString();
-        count = dummyElement.innerText.length;
+        count = dummyElement.textContent.length;
         if (dummyElement.querySelector(".ql-cursor")) {
           count--;
         }
@@ -1290,10 +1292,19 @@ export default class PropertyDefinition {
       rolesWithAccess.includes(SELF_METAROLE) && userId === ownerUserId
     ) || rolesWithAccess.includes(role);
     if (!hasAccess && throwError) {
+      const notLoggedInWhenShould = role === GUEST_METAROLE;
+      const errorMightHaveBeenAvoidedIfOwnerSpecified = ownerUserId === UNSPECIFIED_OWNER &&
+        rolesWithAccess.includes(SELF_METAROLE);
+      let errorMessage = `Forbidden, user ${userId} with role ${role} has no ${action} access to property ${this.getId()}` +
+        ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
+      if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
+        errorMessage += ", this error might have been avoided if an owner had" +
+        " been specified which matched yourself as there's a self rule, if performing a search" +
+        " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+      }
       throw new GraphQLEndpointError({
-        message: `Forbidden, user ${userId} with role ${role} has no ${action} access` +
-        ` to property ${this.getId()} only roles ${rolesWithAccess.join(", ")} can be granted access`,
-        code: "FORBIDDEN",
+        message: errorMessage,
+        code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
       });
     }
     return hasAccess;

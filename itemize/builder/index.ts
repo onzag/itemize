@@ -82,6 +82,7 @@ interface IFileRootDataRawUntreatedJSONDataType {
 interface IFileModuleDataRawUntreatedJSONDataType {
   type: "module";
   includes: string[];
+  readRoleAccess?: string[];
 }
 
 // and this is the raw untreated json for an item
@@ -510,6 +511,10 @@ async function buildModule(
     finalValue.propExtRaw = propExtRaw;
     finalValue.propExtPointers = propExtPointers;
     finalValue.propExtLocation = propExtLocation;
+  }
+
+  if (actualEvaledFileData.readRoleAccess) {
+    finalValue.readRoleAccess = actualEvaledFileData.readRoleAccess;
   }
 
   // and return the final value

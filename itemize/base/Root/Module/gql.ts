@@ -7,7 +7,7 @@ import {
   PREFIX_GET_LIST,
   RESERVED_GETTER_LIST_PROPERTIES,
 } from "../../../constants";
-import { GraphQLInterfaceType, GraphQLList, GraphQLObjectType } from "graphql";
+import { GraphQLList, GraphQLObjectType } from "graphql";
 import Module from ".";
 import { getGQLFieldsDefinitionForProperty } from "./ItemDefinition/PropertyDefinition/gql";
 import { getGQLQueryFieldsForItemDefinition, getGQLMutationFieldsForItemDefinition } from "./ItemDefinition/gql";
@@ -59,18 +59,18 @@ export function getGQLFieldsDefinitionForModule(
 }
 
 /**
- * Provides the type (for modules an interface)
+ * Provides the type for the module
  * that represents this module data
  * @param mod the module in question
  */
-export function getGQLInterfaceForModule(mod: Module): GraphQLInterfaceType {
+export function getGQLTypeForModule(mod: Module): GraphQLObjectType {
   // if we don't have already created the module for this
   // instance, we actually reuse, and this is important
   // if we are using this same item in the same schema
   // when calling via the parent
   if (!mod._gqlObj) {
     // we create that object with the data
-    mod._gqlObj = new GraphQLInterfaceType({
+    mod._gqlObj = new GraphQLObjectType({
       name: mod.getQualifiedPathName(),
       fields: getGQLFieldsDefinitionForModule(mod, {
         retrievalMode: true,
@@ -87,11 +87,11 @@ export function getGQLInterfaceForModule(mod: Module): GraphQLInterfaceType {
 
 export function getGQLQueryOutputForModule(mod: Module): GraphQLObjectType {
   if (!mod._gqlQueryObj) {
-    const modInterface = getGQLInterfaceForModule(mod);
+    const moduleType = getGQLTypeForModule(mod);
 
     const fields = {
       DATA: {
-        type: modInterface,
+        type: moduleType,
       },
     };
 
@@ -164,28 +164,42 @@ export function getGQLQueryFieldsForModule(
   const gOuput = getGQLQueryOutputForModule(mod);
 
   // now we setup the fields for the query
-  let fields: IGQLQueryFieldsDefinitionType = {
-    [PREFIX_SEARCH + mod.getSearchModule().getQualifiedPathName()]: {
-      type: ID_CONTAINER_GQL,
-      args: {
-        ...RESERVED_SEARCH_PROPERTIES,
-        // as you can realize the arguments exclude the base and make it into input mode
-        // that means no RESERVED_BASE_PROPERTIES
-        ...getGQLFieldsDefinitionForModule(mod.getSearchModule(), {
-          retrievalMode: false,
-          excludeBase: true,
-          propertiesAsInput: true,
-          optionalForm: true,
-        }),
+  let fields: IGQLQueryFieldsDefinitionType = {};
+
+  if (mod.isSearchable()) {
+    const listTypeForThisRetrieval = new GraphQLObjectType({
+      name: "LIST__" + mod.getQualifiedPathName(),
+      fields: {
+        results: {
+          type: GraphQLList(gOuput),
+        },
       },
-      resolve: resolveGenericFunction.bind(null, "searchModule", mod, resolvers),
-    },
-    [PREFIX_GET_LIST + mod.getQualifiedPathName()]: {
-      type: GraphQLList(gOuput),
-      args: RESERVED_GETTER_LIST_PROPERTIES,
-      resolve: resolveGenericFunction.bind(null, "getModuleList", mod, resolvers),
-    },
-  };
+      description: "An useless container that graphql requests because graphql doesn't like arrays",
+    });
+
+    fields = {
+      [PREFIX_SEARCH + mod.getSearchModule().getQualifiedPathName()]: {
+        type: ID_CONTAINER_GQL,
+        args: {
+          ...RESERVED_SEARCH_PROPERTIES,
+          // as you can realize the arguments exclude the base and make it into input mode
+          // that means no RESERVED_BASE_PROPERTIES
+          ...getGQLFieldsDefinitionForModule(mod.getSearchModule(), {
+            retrievalMode: false,
+            excludeBase: true,
+            propertiesAsInput: true,
+            optionalForm: true,
+          }),
+        },
+        resolve: resolveGenericFunction.bind(null, "searchModule", mod, resolvers),
+      },
+      [PREFIX_GET_LIST + mod.getQualifiedPathName()]: {
+        type: listTypeForThisRetrieval,
+        args: RESERVED_GETTER_LIST_PROPERTIES,
+        resolve: resolveGenericFunction.bind(null, "getModuleList", mod, resolvers),
+      },
+    };
+  }
 
   // now we get all child definitions and add the query
   // fields for each of them
@@ -193,6 +207,12 @@ export function getGQLQueryFieldsForModule(
     fields = {
       ...fields,
       ...getGQLQueryFieldsForItemDefinition(cIdef, resolvers),
+    };
+  });
+  mod.getAllModules().forEach((cMod) => {
+    fields = {
+      ...fields,
+      ...getGQLQueryFieldsForModule(cMod, resolvers),
     };
   });
   return fields;
@@ -221,6 +241,12 @@ export function getGQLMutationFieldsForModule(
     fields = {
       ...fields,
       ...getGQLMutationFieldsForItemDefinition(cIdef, resolvers),
+    };
+  });
+  mod.getAllModules().forEach((cMod) => {
+    fields = {
+      ...fields,
+      ...getGQLMutationFieldsForModule(cMod, resolvers),
     };
   });
   return fields;

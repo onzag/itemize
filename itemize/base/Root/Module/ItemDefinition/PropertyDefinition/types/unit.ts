@@ -95,6 +95,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
     if (typeof data[exactName] !== "undefined" && data[exactName] !== null) {
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", data[exactName].normalizedUnit);
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", data[exactName].normalizedValue);
+    } else if (data[exactName] === null) {
+      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", null);
     }
 
     if (typeof data[fromName] !== "undefined" && data[fromName] !== null) {

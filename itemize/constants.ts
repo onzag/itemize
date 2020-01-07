@@ -502,6 +502,10 @@ export const RESERVED_GETTER_LIST_PROPERTIES = {
     type: GraphQLNonNull(GraphQLList(ID_ELEMENT_INPUT_GQL)),
     description: "the ids list for that item",
   },
+  created_by: {
+    type: GraphQLInt,
+    description: "An specified owner to filter by (this affects permissions)",
+  },
 };
 export const RESERVED_ADD_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,

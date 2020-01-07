@@ -38,8 +38,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlIn: (
     value: PropertyDefinitionSupportedTextType,
     sqlPrefix: string,
-    id: string, property: PropertyDefinition,
-    knex: Knex, dictionary: string,
+    id: string,
+    property: PropertyDefinition,
+    knex: Knex,
+    dictionary: string,
   ) => {
     if (value === null) {
       return {
@@ -54,11 +56,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
     if (property.isRichText()) {
       const dummyElement = DOMWindow.document.createElement("template");
       dummyElement.innerHTML = value.toString();
-      escapedText = dummyElement.innerText;
+      escapedText = dummyElement.textContent;
 
-      purifiedText = DOMPurify.sanitize(dummyElement);
+      purifiedText = DOMPurify.sanitize(value.toString());
     }
 
+    console.log(dictionary, value, escapedText);
     return {
       [id]: purifiedText,
       [id + "_DICTIONARY"]: dictionary,

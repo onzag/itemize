@@ -73,16 +73,16 @@ export function standardSQLSearchFnExactAndRange(
   const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
   const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
 
-  if (typeof data[exactName] !== "undefined" && data[exactName] !== null) {
+  if (typeof data[exactName] !== "undefined") {
     knexBuilder.andWhere(sqlPrefix + id, data[exactName]);
   }
 
   if (typeof data[fromName] !== "undefined" && data[fromName] !== null) {
-    knexBuilder.andWhere(sqlPrefix + id, ">=", data[exactName]);
+    knexBuilder.andWhere(sqlPrefix + id, ">=", data[fromName]);
   }
 
   if (typeof data[toName] !== "undefined" && data[toName] !== null) {
-    knexBuilder.andWhere(sqlPrefix + id, ">=", data[toName]);
+    knexBuilder.andWhere(sqlPrefix + id, "<=", data[toName]);
   }
 }
 
@@ -267,7 +267,7 @@ export async function convertGQLValueToSQLValueForProperty(
   const sqlIn = propertyDefinition.getPropertyDefinitionDescription().sqlIn;
 
   // we return as it is
-  return sqlIn(gqlPropertyValue, prefix, propertyDefinition.getId(), this, knex, dictionary);
+  return sqlIn(gqlPropertyValue, prefix, propertyDefinition.getId(), propertyDefinition, knex, dictionary);
 }
 
 /**

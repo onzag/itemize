@@ -9,10 +9,13 @@ import {
   PREFIXED_CONCAT,
   ANYONE_METAROLE,
   SELF_METAROLE,
+  UNSPECIFIED_OWNER,
+  GUEST_METAROLE,
 } from "../../../constants";
-import { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
+import { GraphQLObjectType } from "graphql";
 import { buildSearchModeModule } from "./search-mode";
 import Root from "..";
+import { GraphQLEndpointError } from "../../errors";
 
 export interface IRawJsonI18NSpecificLocaleDataType {
   name: string;
@@ -31,6 +34,12 @@ export interface IRawJsonI18NSpecificLocaleDataType {
       },
     },
     edit?: {
+      [policyName: string]: {
+        label: string,
+        failed: string,
+      },
+    },
+    read?: {
       [policyName: string]: {
         label: string,
         failed: string,
@@ -63,6 +72,8 @@ export interface IModuleRawJSONDataType {
   i18nData: IRawJSONI18NDataType;
 
   readRoleAccess?: string[];
+
+  searchable?: boolean;
 
   // module data
   children: Array<IModuleRawJSONDataType | IItemDefinitionRawJSONDataType>;
@@ -138,7 +149,7 @@ export default class Module {
 
   // graphql helper
   // tslint:disable-next-line: variable-name
-  public _gqlObj: GraphQLInterfaceType;
+  public _gqlObj: GraphQLObjectType;
   // tslint:disable-next-line: variable-name
   public _gqlQueryObj: GraphQLObjectType;
 
@@ -541,6 +552,16 @@ export default class Module {
   }
 
   /**
+   * Tells whether module based searches are allowed
+   */
+  public isSearchable() {
+    if (typeof this.rawData.searchable !== "undefined") {
+      return this.rawData.searchable;
+    }
+    return true;
+  }
+
+  /**
    * Checks the role access for an action in a module
    * @param action the IO action (for modules this can only logically be a READ action for module level searches)
    * @param role the role of the user attempting the action
@@ -564,8 +585,20 @@ export default class Module {
 
     if (!modLevelAccess) {
       if (throwError) {
-        throw new Error(`Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
-        ` with only roles ${rolesWithAccess.join(", ")} can be granted access`);
+        const notLoggedInWhenShould = role === GUEST_METAROLE;
+        const errorMightHaveBeenAvoidedIfOwnerSpecified = ownerUserId === UNSPECIFIED_OWNER &&
+          rolesWithAccess.includes(SELF_METAROLE);
+        let errorMessage = `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
+          ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
+        if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
+          errorMessage += ", this error might have been avoided if an owner had" +
+          " been specified which matched yourself as there's a self rule, if performing a search" +
+          " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+        }
+        throw new GraphQLEndpointError({
+          message: errorMessage,
+          code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
+        });
       }
       return false;
     }

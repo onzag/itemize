@@ -1,0 +1,17 @@
+[
+    {
+        "id": "name",
+        "type": "text"
+    },
+    {
+        "id": "description",
+        "type": "text",
+        "subtype": "html",
+        "nullable": true
+    },
+    {
+        "id": "security_code",
+        "type": "password",
+        "disableRetrieval": true
+    }
+]

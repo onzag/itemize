@@ -233,11 +233,11 @@ export default class App extends React.Component<IAppProps, IAppState> {
     try {
       [newData] =
         await Promise.all<any>([
-          fetch(`/rest/resource/build.${localeToSet}.json?version=${(window as any).BUILD_NUMBER}`)
+          fetch(`/rest/resource/build.${localeToSet}.json`)
             .then((r) => r.json()),
 
           localeToSet !== "en" ?
-            importScript(`/rest/resource/${localeToSet}.moment.js?version=${(window as any).BUILD_NUMBER}`) : null,
+            importScript(`/rest/resource/${localeToSet}.moment.js`) : null,
         ]);
     } catch {
       this.setState({

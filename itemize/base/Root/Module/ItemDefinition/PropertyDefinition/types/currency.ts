@@ -70,6 +70,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
     if (typeof data[exactName] !== "undefined" && data[exactName] !== null) {
       knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", data[exactName].currency);
       knexBuilder.andWhere(sqlPrefix + id + "_VALUE", data[exactName].value);
+    } else if (data[exactName] === null) {
+      knexBuilder.andWhere(sqlPrefix + id + "_VALUE", null);
     }
 
     if (typeof data[fromName] !== "undefined" && data[fromName] !== null) {

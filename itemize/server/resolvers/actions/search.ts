@@ -8,6 +8,7 @@ import {
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
   validateTokenIsntBlocked,
+  checkReadPoliciesAllowThisUserToSearch,
 } from "../basic";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { buildSQLQueryForModule } from "../../../base/Root/Module/sql";
@@ -130,6 +131,10 @@ export async function searchItemDefinition(
   // check the language and region
   checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
+  checkReadPoliciesAllowThisUserToSearch(
+    itemDefinition,
+    tokenData.role,
+  );
   await validateTokenIsntBlocked(appData.cache, tokenData);
 
   // now we need to get the fields that we are using to search
@@ -200,8 +205,9 @@ export async function searchItemDefinition(
 
   // in this case it works because we are checking raw property names
   // with the search module, it has no items, so it can easily check it up
-  const requiresJoin = Object.keys(resolverArgs.args).some((argName) =>
-      !RESERVED_SEARCH_PROPERTIES[argName] && !searchMod.hasPropExtensionFor(argName));
+  const requiresJoin = Object.keys(resolverArgs.args).some((argName) => {
+    return !RESERVED_SEARCH_PROPERTIES[argName] && !searchMod.hasPropExtensionFor(argName);
+  });
 
   searchItemDefinitionDebug(
     "Join considered as %j",

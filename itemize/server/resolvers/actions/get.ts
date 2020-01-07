@@ -10,6 +10,8 @@ import {
   checkListLimit,
   validateTokenIsntBlocked,
   checkListTypes,
+  runPolicyCheck,
+  checkReadPoliciesAllowThisUserToSearch,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
 import {
@@ -44,14 +46,23 @@ export async function getItemDefinition(
   const requestedFields = flattenRawGQLValueOrFields(rawFields);
   checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
-  // get the module, the module table name, the table for
-  // the item definition
-  const mod = itemDefinition.getParentModule();
-  const moduleTable = mod.getQualifiedPathName();
-  const selfTable = itemDefinition.getQualifiedPathName();
-
-  const selectQueryValue: ISQLTableRowValue =
-    await appData.cache.requestCache(selfTable, moduleTable, resolverArgs.args.id);
+  // so we run the policy check for read, this item definition,
+  // with the given id
+  const selectQueryValue: ISQLTableRowValue = await runPolicyCheck(
+    "read",
+    itemDefinition,
+    resolverArgs.args.id,
+    tokenData.role,
+    resolverArgs.args,
+    appData.cache,
+    (content: ISQLTableRowValue) => {
+      // if there is no content, we force the entire policy check not to
+      // be performed and return null
+      if (!content) {
+        return null;
+      }
+    },
+  );
 
   // we get the requested fields that take part of the item definition
   // description
@@ -138,10 +149,14 @@ export async function getItemDefinitionList(
   const mod = itemDefinition.getParentModule();
   checkListTypes(resolverArgs.args.ids, mod);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
+  checkReadPoliciesAllowThisUserToSearch(
+    itemDefinition,
+    tokenData.role,
+  );
 
   // now we find the requested fields that are requested
   // in the get request
-  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
+  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info).results);
   checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
   // we get the requested fields that take part of the item definition
@@ -205,14 +220,15 @@ export async function getItemDefinitionList(
           code: "UNSPECIFIED",
         });
       }
-      return filterAndPrepareGQLValue(value, requestedFields, tokenData.role, itemDefinition);
+      return filterAndPrepareGQLValue(value, requestedFields, tokenData.role, itemDefinition).toReturnToUser;
     },
   );
 
+  const resultAsObject = {
+    results: finalValues,
+  };
   getItemDefinitionListDebug("SUCCEED");
-
-  // return if otherwise succeeds
-  return finalValues;
+  return resultAsObject;
 }
 
 const getModuleListDebug = Debug("resolvers:getModuleList");
@@ -221,6 +237,7 @@ export async function getModuleList(
   resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
 ) {
+  console.log(mod.getQualifiedPathName());
   getModuleListDebug(
     "EXECUTED for %s",
     mod.getQualifiedPathName(),
@@ -235,7 +252,7 @@ export async function getModuleList(
 
   // now we find the requested fields that are requested
   // in the get request
-  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
+  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info).results);
   checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
 
   // we get the requested fields that take part of the item definition
@@ -282,12 +299,15 @@ export async function getModuleList(
           code: "UNSPECIFIED",
         });
       }
-      return filterAndPrepareGQLValue(value, requestedFields, tokenData.role, mod);
+      return filterAndPrepareGQLValue(value, requestedFields, tokenData.role, mod).toReturnToUser;
     },
   );
 
-  getItemDefinitionListDebug("SUCCEED");
-  return finalValues;
+  const resultAsObject = {
+    results: finalValues,
+  };
+  getModuleListDebug("SUCCEED");
+  return resultAsObject;
 }
 
 export function getItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {

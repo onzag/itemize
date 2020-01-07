@@ -9,6 +9,8 @@ import {
   INCLUDE_PREFIX,
   EXCLUSION_STATE_SUFFIX,
   GUEST_METAROLE,
+  ANYONE_METAROLE,
+  ANYONE_LOGGED_METAROLE,
 } from "../../constants";
 import { GraphQLEndpointError } from "../../base/errors";
 import Debug from "debug";
@@ -589,6 +591,40 @@ export async function serverSideCheckItemDefinitionAgainst(
   serverSideCheckItemDefinitionAgainstDebug("SUCCEED");
 }
 
+const checkReadPoliciesAllowThisUserToSearchDebug = Debug("resolvers:checkReadPoliciesAllowThisUserToSearch");
+/**
+ * Users cannot search if they have an active read policy in their roles
+ * this function checks and throws an error if there's such a thing
+ * @param itemDefinition the item definition to check read policies for
+ * @param role the role
+ */
+export function checkReadPoliciesAllowThisUserToSearch(
+  itemDefinition: ItemDefinition,
+  role: string,
+) {
+  checkReadPoliciesAllowThisUserToSearchDebug(
+    "EXECUTED for %s",
+    role,
+  );
+  const policiesForThisType = itemDefinition.getPolicyNamesFor("read");
+  policiesForThisType.forEach((policyName) => {
+    const roles = itemDefinition.getRolesForPolicy("read", policyName);
+    if (
+      roles.includes(role) ||
+      roles.includes(ANYONE_METAROLE) ||
+      (roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE)
+    ) {
+      throw new GraphQLEndpointError({
+        message: "Searching with an active read policy is not allowed, the policy in question is " + policyName,
+        code: "FORBIDDEN",
+      });
+    }
+  });
+  checkReadPoliciesAllowThisUserToSearchDebug(
+    "SUCCEED",
+  );
+}
+
 const runPolicyCheckDebug = Debug("resolvers:runPolicyCheck");
 /**
  * Runs a policy check on the requested information
@@ -602,7 +638,8 @@ const runPolicyCheckDebug = Debug("resolvers:runPolicyCheck");
  * @param extraSQLColumns extra SQL columns to request, this only exists to avoid needing many SQL calls
  * an asterisk is valid here
  * @param preValidation a validation to do, validate if the row doesn't exist here, and anything else necessary
- * the function will crash by Internal server error if no validation is done if the row is null
+ * the function will crash by Internal server error if no validation is done if the row is null; return
+ * a value if you want to force it to return instead without an error
  */
 export async function runPolicyCheck(
   policyType: string,
@@ -611,7 +648,7 @@ export async function runPolicyCheck(
   role: string,
   gqlArgValue: IGQLValue,
   cache: Cache,
-  preValidation: (content: ISQLTableRowValue) => void,
+  preValidation: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
 ) {
   runPolicyCheckDebug(
     "EXECUTED for policy %s on item definition %s for id %d on role %s for value %j with extra columns %j",
@@ -628,7 +665,10 @@ export async function runPolicyCheck(
   const selectQueryValue: ISQLTableRowValue =
     await cache.requestCache(selfTable, moduleTable, id);
 
-  preValidation(selectQueryValue);
+  const forcedResult = preValidation(selectQueryValue);
+  if (typeof forcedResult !== "undefined") {
+    return forcedResult;
+  }
 
   // let's get all the policies that we have for this policy type group
   const policiesForThisType = itemDefinition.getPolicyNamesFor(policyType);

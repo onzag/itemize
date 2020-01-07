@@ -23,6 +23,8 @@ import { getConversionIds } from "../../base/Root/Module/ItemDefinition/Property
 import CacheWorkerInstance from "../internal/workers/cache";
 import { RemoteListener } from "../internal/app/remote-listener";
 import { getFieldsAndArgs } from "../../util";
+import uuid from "uuid";
+import Root from "../../base/Root";
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
@@ -85,6 +87,7 @@ export interface IActionSearchOptions {
   onlyIncludeIncludes?: string[];
   unpokeAfterSuccess?: boolean;
   orderBy?: "DEFAULT";
+  createdBy?: number;
 }
 
 /**
@@ -146,6 +149,11 @@ export interface IItemDefinitionContextType {
   // the obtained search results from the graphql endpoint
   // just as they come
   searchResults: ISearchResult[];
+  // a search id for the obtained results whether error
+  // or success
+  searchId: string;
+  // a search owner, or null, for the createdBy argument
+  searchOwner: number;
   // poked is a flag that is raised to mean to ignore
   // anything regarding user set statuses and just mark
   // things as they are, for example, by default many fields
@@ -316,6 +324,8 @@ interface IActualItemDefinitionProviderState {
   searchError: GraphQLEndpointErrorType;
   searching: boolean;
   searchResults: ISearchResult[];
+  searchId: string;
+  searchOwner: number;
   poked: boolean;
   canEdit: boolean;
   canDelete: boolean;
@@ -440,6 +450,8 @@ export class ActualItemDefinitionProvider extends
       searchError: null,
       searching: false,
       searchResults: [],
+      searchId: null,
+      searchOwner: null,
 
       poked: false,
 
@@ -749,6 +761,7 @@ export class ActualItemDefinitionProvider extends
       false,
       !denyCache,
       null,
+      null,
     );
 
     // this should never happen honestly as we are giving
@@ -1040,6 +1053,7 @@ export class ActualItemDefinitionProvider extends
     returnMemoryCachedValuesForGetRequests: boolean,
     returnWorkerCachedValuesForGetRequests: boolean,
     searchOrderBy: string,
+    searchCreatedBy: number,
   ): Promise<{
     error: GraphQLEndpointErrorType,
     value: any,
@@ -1072,6 +1086,10 @@ export class ActualItemDefinitionProvider extends
 
     if (queryPrefix === PREFIX_SEARCH) {
       args.order_by = new GQLEnum(searchOrderBy);
+    }
+
+    if (queryPrefix === PREFIX_SEARCH && typeof searchCreatedBy !== "undefined") {
+      args.created_by = searchCreatedBy;
     }
 
     // now we get the currently applied value in memory
@@ -1375,6 +1393,7 @@ export class ActualItemDefinitionProvider extends
       false,
       false,
       null,
+      null,
     );
 
     if (error) {
@@ -1495,6 +1514,7 @@ export class ActualItemDefinitionProvider extends
       false,
       false,
       null,
+      null,
     );
 
     let recievedId: number = null;
@@ -1603,6 +1623,7 @@ export class ActualItemDefinitionProvider extends
       false,
       false,
       options.orderBy || "DEFAULT",
+      options.createdBy || null,
     );
 
     const searchResults: ISearchResult[] = [];
@@ -1611,6 +1632,8 @@ export class ActualItemDefinitionProvider extends
         searchError: error,
         searching: false,
         searchResults,
+        searchId: uuid.v4(),
+        searchOwner: options.createdBy || null,
         poked: true,
       });
     } else {
@@ -1618,6 +1641,8 @@ export class ActualItemDefinitionProvider extends
         searchError: null,
         searching: false,
         searchResults: value ? value.ids : [],
+        searchId: uuid.v4(),
+        searchOwner: options.createdBy || null,
         poked: true,
       });
     }
@@ -1734,6 +1759,8 @@ export class ActualItemDefinitionProvider extends
           searchError: this.state.searchError,
           searching: this.state.searching,
           searchResults: this.state.searchResults,
+          searchId: this.state.searchId,
+          searchOwner: this.state.searchOwner,
           poked: this.state.poked,
           submit: this.submit,
           reload: this.loadValue,
@@ -1778,7 +1805,9 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                           }
                           let valueFor: ItemDefinition;
                           if (props.itemDefinition) {
-                            valueFor = data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+                            valueFor =
+                              Root.Registry[props.itemDefinition] as ItemDefinition ||
+                              data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
                           } else {
                             valueFor = data.mod.getPropExtensionItemDefinition();
                           }

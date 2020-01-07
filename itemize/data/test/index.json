@@ -1,4 +1,4 @@
 {
     "type": "module",
-    "includes": ["vehicle", "item_definition"]
+    "includes": ["sensors"]
 }

@@ -1,6 +1,6 @@
 import { IPropertyViewProps } from "../PropertyView";
 import React from "react";
-import { DOMWindow, DOMPurify } from "../../../../util";
+import { DOMPurify } from "../../../../util";
 
 export default class PropertyViewText extends React.Component<IPropertyViewProps, {}> {
   public shouldComponentUpdate(nextProps: IPropertyViewProps) {
@@ -8,9 +8,7 @@ export default class PropertyViewText extends React.Component<IPropertyViewProps
   }
   public render() {
     if (this.props.property.isRichText()) {
-      const dummyElement = DOMWindow.document.createElement("template");
-      dummyElement.innerHTML = this.props.state.value.toString();
-      const purifiedText = DOMPurify.sanitize(dummyElement);
+      const purifiedText = DOMPurify.sanitize(this.props.state.value.toString());
       return (
         <div className="rich-text" dangerouslySetInnerHTML={{__html: purifiedText}}/>
       );

@@ -11,6 +11,7 @@ import { LocaleContext, ILocaleContextType } from "../internal/app";
 import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "../internal/app/remote-listener";
+import Root from "../../base/Root";
 
 interface ISearchLoaderProps {
   pageSize: number;
@@ -37,6 +38,8 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   // during requests, so that full text search can function
   localeData: ILocaleContextType;
   remoteListener: RemoteListener;
+  searchId: string;
+  searchOwner: number;
 }
 
 interface IActualSearchLoaderState {
@@ -68,7 +71,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       this.props.pageSize * this.props.currentPage,
       this.props.pageSize * (this.props.currentPage + 1),
     );
-    if (!equals(prevState.currentSearchResults, currentSearchResults)) {
+    if (
+      prevProps.searchId !== this.props.searchId ||
+      !equals(this.state.currentSearchResults, currentSearchResults)
+    ) {
       this.loadValues(currentSearchResults);
     }
   }
@@ -85,42 +91,46 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     });
   }
   public async loadValues(currentSearchResults: ISearchResult[]) {
-    const searchFields = getFieldsAndArgs({
+    if (!this.props.searchId) {
+      return;
+    }
+
+    const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
+
+    const searchFieldsAndArgs = getFieldsAndArgs({
       includeArgs: false,
       includeFields: true,
       onlyIncludeProperties: this.props.requestedProperties,
       onlyIncludeIncludes: this.props.requestedIncludes || [],
-      appliedOwner: UNSPECIFIED_OWNER,
+      appliedOwner: this.props.searchOwner || UNSPECIFIED_OWNER,
       userId: this.props.tokenData.id,
       userRole: this.props.tokenData.role,
-      itemDefinitionInstance: this.props.itemDefinitionInstance,
+      itemDefinitionInstance: standardCounterpart,
       forId: null,
     });
+    const searchFields: any = searchFieldsAndArgs.requestFields;
     this.setState({
+      error: null,
       currentlySearching: currentSearchResults,
       currentSearchResults,
       searchFields,
     });
 
-    const queryBase = (this.props.itemDefinitionInstance.isExtensionsInstance() ?
-      this.props.itemDefinitionInstance.getParentModule().getQualifiedPathName() :
-      this.props.itemDefinitionInstance.getQualifiedPathName());
+    const queryBase = (standardCounterpart.isExtensionsInstance() ?
+      standardCounterpart.getParentModule().getQualifiedPathName() :
+      standardCounterpart.getQualifiedPathName());
 
-    let getListQueryName: string;
-    if (this.props.itemDefinitionInstance.isExtensionsInstance()) {
-      getListQueryName = PREFIX_GET_LIST + queryBase;
-    } else {
-      getListQueryName = PREFIX_GET_LIST + queryBase;
-    }
+    const getListQueryName: string = PREFIX_GET_LIST + queryBase;
 
     // this is the query we run
     const singleQueryName = PREFIX_GET + queryBase;
 
     const uncachedResults: ISearchResult[] = [];
     const workerCachedResults = await Promise.all(currentSearchResults.map(async (searchResult: ISearchResult) => {
+      const itemDefintionInQuestion = Root.Registry[searchResult.type] as ItemDefinition;
       // check if it's in memory cache, in such a case the value will have already loaded
       // as the item definition would have applied it initially
-      const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(searchResult.id);
+      const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchResult.id);
       if (
         appliedGQLValue &&
         requestFieldsAreContained(searchFields, appliedGQLValue.requestFields)
@@ -144,6 +154,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         return {
           cachedResult,
           forId: searchResult.id,
+          forType: searchResult.type,
         };
       }
     }));
@@ -154,10 +165,11 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     workerCachedResults.forEach((cr) => {
       if (cr) {
+        const itemDefintionInQuestion = Root.Registry[cr.forType] as ItemDefinition;
         if (cr.cachedResult.value) {
           // we apply the value, whatever we have gotten this will affect all the instances
           // that use the same value
-          this.props.itemDefinitionInstance.applyValue(
+          itemDefintionInQuestion.applyValue(
             cr.forId,
             cr.cachedResult.value,
             false,
@@ -167,25 +179,32 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           );
 
           // and then we trigger the change listener for all the instances
-          this.props.itemDefinitionInstance.triggerListeners("change", cr.forId);
+          itemDefintionInQuestion.triggerListeners("change", cr.forId);
         } else {
-          this.props.itemDefinitionInstance.cleanValueFor(cr.forId);
-          this.props.itemDefinitionInstance.triggerListeners("change", cr.forId);
+          itemDefintionInQuestion.cleanValueFor(cr.forId);
+          itemDefintionInQuestion.triggerListeners("change", cr.forId);
         }
 
-        this.props.remoteListener.requestFeedbackFor(this.props.itemDefinitionInstance, cr.forId);
+        this.props.remoteListener.requestFeedbackFor(itemDefintionInQuestion, cr.forId);
       }
     });
 
     if (uncachedResults.length) {
+      const args: any = {
+        token: this.props.tokenData.token,
+        language: this.props.localeData.language.split("-")[0],
+        ids: uncachedResults,
+      };
+
+      if (this.props.searchOwner) {
+        args.created_by = this.props.searchOwner;
+      }
       const listQuery = buildGqlQuery({
         name: getListQueryName,
-        args: {
-          token: this.props.tokenData.token,
-          language: this.props.localeData.language.split("-")[0],
-          ids: uncachedResults,
+        args,
+        fields: {
+          results: searchFields,
         },
-        fields: searchFields,
       });
       const gqlValue = await gqlQuery(
         listQuery,
@@ -207,9 +226,18 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         error = gqlValue.errors[0].extensions;
       }
 
-      if (!error && gqlValue && gqlValue.data && gqlValue.data[getListQueryName]) {
-        gqlValue.data[getListQueryName].forEach((value, index) => {
+      if (
+        !error &&
+        gqlValue &&
+        gqlValue.data &&
+        gqlValue.data[getListQueryName] &&
+        gqlValue.data[getListQueryName].results
+      ) {
+        gqlValue.data[getListQueryName].results.forEach((value, index) => {
           const forId = uncachedResults[index].id;
+          const forType = uncachedResults[index].type;
+
+          const itemDefintionInQuestion = Root.Registry[forType] as ItemDefinition;
           let valueToApply = value ? {
             ...value,
           } : value;
@@ -219,11 +247,11 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                 singleQueryName, forId, null, null,
               );
             }
-            this.props.itemDefinitionInstance.cleanValueFor(forId);
-            this.props.itemDefinitionInstance.triggerListeners("change", forId);
+            itemDefintionInQuestion.cleanValueFor(forId);
+            itemDefintionInQuestion.triggerListeners("change", forId);
           } else {
             let mergedQueryFields = searchFields;
-            const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(value.id);
+            const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(value.id);
             if (
               appliedGQLValue &&
               appliedGQLValue.rawValue &&
@@ -239,7 +267,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
               );
             }
 
-            this.props.itemDefinitionInstance.applyValue(
+            itemDefintionInQuestion.applyValue(
               valueToApply.id,
               valueToApply,
               false,
@@ -247,7 +275,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
               this.props.tokenData.role,
               mergedQueryFields,
             );
-            this.props.itemDefinitionInstance.triggerListeners("change", forId);
+            itemDefintionInQuestion.triggerListeners("change", forId);
 
             if (CacheWorkerInstance.isSupported) {
               CacheWorkerInstance.instance.mergeCachedValue(
@@ -277,7 +305,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       nextProps.tokenData.id !== this.props.tokenData.id ||
       nextProps.tokenData.role !== this.props.tokenData.role ||
       nextProps.localeData !== this.props.localeData ||
-      !equals(nextProps.searchResults, this.props.searchResults) ||
+      nextProps.searchId !== this.props.searchId ||
       !equals(this.state, nextState);
   }
   public render() {
@@ -293,7 +321,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       >
         {
           this.props.children({
-            searchResults: this.state.currentSearchResults,
+            searchResults: this.state.error ? [] : this.state.currentSearchResults,
             pageCount,
             hasNextPage: this.props.currentPage < pageCount - 1,
             hasPrevPage: this.props.currentPage !== 0,
@@ -322,6 +350,8 @@ export function SearchLoader(props: ISearchLoaderProps) {
                       searchResults={itemDefinitionContext.searchResults}
                       itemDefinitionInstance={itemDefinitionContext.idef}
                       remoteListener={itemDefinitionContext.remoteListener}
+                      searchId={itemDefinitionContext.searchId}
+                      searchOwner={itemDefinitionContext.searchOwner}
                       tokenData={tokenData}
                       localeData={localeData}
                     />

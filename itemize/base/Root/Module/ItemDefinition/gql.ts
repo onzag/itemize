@@ -20,7 +20,7 @@ import {
 import ItemDefinition, { ItemDefinitionIOActions } from ".";
 import { getGQLFieldsDefinitionForProperty } from "./PropertyDefinition/gql";
 import { getGQLFieldsDefinitionForInclude } from "./Include/gql";
-import { getGQLFieldsDefinitionForModule, getGQLInterfaceForModule } from "../gql";
+import { getGQLFieldsDefinitionForModule } from "../gql";
 import { IGQLFieldsDefinitionType, IGraphQLResolversType, IGQLQueryFieldsDefinitionType } from "../../gql";
 import { GraphQLEndpointError } from "../../../errors";
 
@@ -34,7 +34,7 @@ import { GraphQLEndpointError } from "../../../errors";
  * @param options.propertiesAsInput if the properties should be in input form
  * @param options.optionalForm makes all the parameters optional, that is nullable
  * @param options.includePolicy whether to include the policies in the result, this is a string
- * that specifies the policy type that is to be included, eg "edit", "delete"
+ * that specifies the policy type that is to be included, eg "edit", "delete", "read"
  */
 export function getGQLFieldsDefinitionForItemDefinition(
   itemDefinition: ItemDefinition,
@@ -97,7 +97,7 @@ export function getGQLFieldsDefinitionForItemDefinition(
  * Provides the fields that are required to include policy data for property
  * definitions
  * @param itemDefinition the item definition in question
- * @param options.policy the policy type that should be included, eg "edit", "delete"
+ * @param options.policy the policy type that should be included, eg "edit", "delete", "read"
  * @param options.propertiesAsInput if the properties should be in input form
  */
 export function getGQLFieldsDefinitionForItemDefinitionPolicies(
@@ -140,7 +140,6 @@ export function getGQLTypeForItemDefinition(itemDefinition: ItemDefinition): Gra
         optionalForm: false,
         includePolicy: null,
       }),
-      interfaces: [getGQLInterfaceForModule(itemDefinition.getParentModule())],
       description:
         "CREATE ACCESS: " + itemDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.CREATE).join(", ") + " - " +
         "READ ACCESS: " + itemDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.READ).join(", ") + " - " +
@@ -263,10 +262,6 @@ export function getGQLQueryFieldsForItemDefinition(
     throw new Error("Modules in search mode has no graphql queries");
   }
 
-  // but we need that specific search mode counterpart to populate the arguments
-  // for our query
-  const searchModeCounterpart = itemDefinition.getSearchModeCounterpart();
-
   // so we use the query output, the one that includes DATA and external fields
   // as the output because that's what we expect
   const type = getGQLQueryOutputForItemDefinition(itemDefinition);
@@ -276,13 +271,36 @@ export function getGQLQueryFieldsForItemDefinition(
     // basic get query to get an item given an id
     [PREFIX_GET + itemDefinition.getQualifiedPathName()]: {
       type,
-      args: RESERVED_GETTER_PROPERTIES,
+      args: {
+        ...RESERVED_GETTER_PROPERTIES,
+        ...getGQLFieldsDefinitionForItemDefinitionPolicies(itemDefinition, {
+          propertiesAsInput: true,
+          policy: "read",
+        }),
+      },
       // we just pipe the arguments out of the resolver
       resolve: resolveGenericFunction.bind(null, "getItemDefinition", itemDefinition, resolvers),
     },
+  };
+
+  if (itemDefinition.isSearchable()) {
+    // but we need that specific search mode counterpart to populate the arguments
+    // for our query
+    const searchModeCounterpart = itemDefinition.getSearchModeCounterpart();
+
+    const listTypeForThisRetrieval = new GraphQLObjectType({
+      name: "LIST__" + itemDefinition.getQualifiedPathName(),
+      fields: {
+        results: {
+          type: GraphQLList(type),
+        },
+      },
+      description: "An useless container that graphql requests because graphql doesn't like arrays",
+    });
+
     // for the list we just make a list of our basic externalized output with DATA type
-    [PREFIX_GET_LIST + itemDefinition.getQualifiedPathName()]: {
-      type: GraphQLList(type),
+    fields[PREFIX_GET_LIST + itemDefinition.getQualifiedPathName()] = {
+      type: listTypeForThisRetrieval,
       args: RESERVED_GETTER_LIST_PROPERTIES,
       resolve: resolveGenericFunction.bind(null, "getItemDefinitionList", itemDefinition, resolvers),
     },
@@ -290,7 +308,7 @@ export function getGQLQueryFieldsForItemDefinition(
     // retrieval mode is false, properties are meant to be in input mode for the args,
     // we exclude the base properties, eg. id, type, etc... make all the fields optional,
     // and don't include any policy (there are no policies in search mode anyway)
-    [PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()]: {
+    fields[PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()] = {
       type: ID_CONTAINER_GQL,
       args: {
         ...RESERVED_SEARCH_PROPERTIES,
@@ -303,8 +321,8 @@ export function getGQLQueryFieldsForItemDefinition(
         }),
       },
       resolve: resolveGenericFunction.bind(null, "searchItemDefinition", itemDefinition, resolvers),
-    },
-  };
+    };
+  }
 
   // add the child definitions to the queries by adding theirs
   itemDefinition.getChildDefinitions().forEach((cIdef) => {
