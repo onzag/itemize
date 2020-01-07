@@ -6,7 +6,7 @@ import { getFieldsAndArgs } from "../../util";
 import { UNSPECIFIED_OWNER, PREFIX_GET_LIST, PREFIX_GET } from "../../constants";
 import CacheWorkerInstance from "../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
-import { buildGqlQuery, gqlQuery } from "../internal/app/gql-querier";
+import { buildGqlQuery, gqlQuery } from "../../gql-querier";
 import { LocaleContext, ILocaleContextType } from "../internal/app";
 import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
 import { GraphQLEndpointErrorType } from "../../base/errors";

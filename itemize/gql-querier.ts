@@ -1,4 +1,7 @@
-import { IPropertyDefinitionIncludedFileInfoType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { IPropertyDefinitionIncludedFileInfoType } from "./base/Root/Module/ItemDefinition/PropertyDefinition";
+import { Stream } from "stream";
+import FormDataNode from "form-data";
+import fetchNode from "node-fetch";
 
 export class GQLQuery {
   private processedQueries: IGQLQueryObj[];
@@ -53,12 +56,15 @@ export class GQLQuery {
     });
     return args;
   }
-  private findFilesAndProcessArgs(arg: any) {
+  private findFilesAndProcessArgs(arg: any): any {
     if (!arg || arg === null || typeof arg !== "object") {
       return arg;
     }
 
-    if (arg.src instanceof File) {
+    if (
+      (typeof File !== "undefined" && arg.src instanceof File) ||
+      (Stream && arg.src instanceof Stream.Readable)
+    ) {
       this.foundUnprocessedArgFiles.push(arg);
       return {
         ...arg,
@@ -133,7 +139,7 @@ function buildArgs(
   args: any,
   keyOpenType: string,
   keyCloseType: string,
-) {
+): string {
   if (typeof args !== "object" || args === null) {
     return JSON.stringify(args);
   }
@@ -180,8 +186,8 @@ export function buildGqlMutation(...mutations: IGQLQueryObj[]) {
   return new GQLQuery("mutation", mutations);
 }
 
-export async function gqlQuery(query: GQLQuery) {
-  const formData = new FormData();
+export async function gqlQuery(query: GQLQuery, host: string = "") {
+  const formData = typeof FormData !== "undefined" ? new FormData() : new FormDataNode();
   const operations = JSON.stringify(query.getOperations());
   formData.append("operations", operations);
   formData.append("map", JSON.stringify(query.getMap()));
@@ -189,11 +195,17 @@ export async function gqlQuery(query: GQLQuery) {
     formData.append(attachment.id, attachment.src as File);
   });
 
+  const fetchToUse = typeof fetch !== "undefined" ? fetch : fetchNode;
+
+  if (typeof fetch === "undefined" && !host) {
+    throw new Error("You must provide a host when using graphql querier outside of the browser, eg: http://mysite.com");
+  }
+
   try {
-    const value = await fetch("/graphql", {
+    const value = await fetchToUse(host + "/graphql", {
       method: "POST",
       cache: "no-cache",
-      body: formData,
+      body: formData as any,
     });
     return await value.json();
   } catch (err) {

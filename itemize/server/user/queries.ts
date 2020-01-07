@@ -1,11 +1,12 @@
 import { IAppDataType } from "..";
 import { IGQLQueryFieldsDefinitionType } from "../../../itemize/base/Root/gql";
-import { GraphQLString, GraphQLObjectType, GraphQLInt } from "graphql";
+import { GraphQLString } from "graphql";
 import { CONNECTOR_SQL_COLUMN_FK_NAME } from "../../constants";
 import { jwtVerify, jwtSign } from "../token";
 import { GraphQLEndpointError } from "../../../itemize/base/errors";
 import { IServerSideTokenDataType } from "../resolvers/basic";
 import { ISQLTableRowValue } from "../../base/Root/sql";
+import TOKEN_OBJECT from "../custom-token/graphql-token-object";
 
 export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinitionType => {
   const userModule = appData.root.getModuleFor(["users"]);
@@ -22,20 +23,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
   return {
     token: {
-      type: new GraphQLObjectType({
-        name: "TOKEN_OBJECT",
-        fields: {
-          token: {
-            type: GraphQLString,
-          },
-          id: {
-            type: GraphQLInt,
-          },
-          role: {
-            type: GraphQLString,
-          },
-        },
-      }),
+      type: TOKEN_OBJECT,
       args: {
         username: {
           type: GraphQLString,
@@ -112,14 +100,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           resultUserFromSQLQuery = await resultUserQuery;
         }
 
-        let resultUser = resultUserFromSQLQuery;
-        if (resultUser) {
-          resultUser = {
-            id: resultUser.id,
-            role: resultUser.role,
-            blocked_at: resultUser.blocked_at,
-          };
-        }
+        const resultUser = resultUserFromSQLQuery;
         // if we get an user
         if (resultUser) {
           // if the user is blocked
@@ -132,7 +113,10 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           }
           // otherwise we provide the token, either re-give the same token
           // or provide a new one
-          const token = preGeneratedToken || (await jwtSign(resultUser, appData.config.jwtKey, {
+          const token = preGeneratedToken || (await jwtSign({
+            id: resultUser.id,
+            role: resultUser.role,
+          }, appData.config.jwtKey, {
             expiresIn: "7d",
           }));
           // and we return the information back to the user

@@ -30,6 +30,14 @@ module.exports = {
         use: "null-loader"
       },
       {
+        test: path.resolve(__dirname, "node_modules/node-fetch/lib/index.js"),
+        use: "null-loader"
+      },
+      {
+        test: path.resolve(__dirname, "node_modules/form-data/lib/form_data.js"),
+        use: "null-loader"
+      },
+      {
         test: path.resolve(__dirname, "node_modules/bcrypt/bcrypt.js"),
         use: "null-loader"
       },

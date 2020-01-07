@@ -14,7 +14,7 @@ import {
   UNSPECIFIED_OWNER,
 } from "../../constants";
 import { buildGqlQuery, buildGqlMutation, gqlQuery,
-  IGQLQueryObj, GQLEnum, GQLQuery } from "../internal/app/gql-querier";
+  IGQLQueryObj, GQLEnum, GQLQuery } from "../../gql-querier";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";

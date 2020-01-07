@@ -10,7 +10,7 @@ import { Route } from "react-router";
 import { history } from "../..";
 import { countries, currencies } from "../../../imported-resources";
 import { TokenProvider, ITokenProviderState, LocationStateContext } from "./internal-providers";
-import { buildGqlMutation, gqlQuery } from "./gql-querier";
+import { buildGqlMutation, gqlQuery } from "../../../gql-querier";
 import { RemoteListener } from "./remote-listener";
 import "../workers/service";
 

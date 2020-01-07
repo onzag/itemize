@@ -1,3 +1,13 @@
 import { initializeServer } from "../../itemize/server";
 
-initializeServer();
+initializeServer({
+  customTokenGQLQueries: {
+    sensor_token: {
+      resolve() {
+        return {
+          withRole: "SENSOR",
+        };
+      },
+    },
+  },
+});

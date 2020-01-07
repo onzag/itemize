@@ -275,7 +275,7 @@ export async function editItemDefinition(
     appData.listener.triggerListeners(
       selfTable,
       resolverArgs.args.id,
-      resolverArgs.args.listener_uuid,
+      resolverArgs.args.listener_uuid || null,
       false,
     );
   })();

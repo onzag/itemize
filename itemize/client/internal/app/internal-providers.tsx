@@ -1,5 +1,5 @@
 import React from "react";
-import { gqlQuery, buildGqlQuery } from "./gql-querier";
+import { gqlQuery, buildGqlQuery } from "../../../gql-querier";
 import { GraphQLEndpointErrorType } from "../../../base/errors";
 import { ILocaleContextType } from ".";
 import { Location } from "history";

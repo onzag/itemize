@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 import Root from "../base/Root";
 import resolvers from "./resolvers";
-import { getGQLSchemaForRoot, IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
+import { getGQLSchemaForRoot, IGQLQueryFieldsDefinitionType, IGQLFieldsDefinitionType } from "../base/Root/gql";
 import Knex from "knex";
 import { types } from "pg";
 import Moment from "moment";
@@ -23,6 +23,7 @@ import { Listener } from "./listener";
 import redis, { RedisClient } from "redis";
 import { Cache } from "./cache";
 import { graphqlUploadExpress } from "graphql-upload";
+import { buildCustomTokenQueries } from "./custom-token";
 
 // TODO comment and document
 
@@ -61,8 +62,30 @@ export interface IAppDataType {
   buildnumber: string;
 }
 
+export interface IReferredTokenStructure {
+  onBehalfOf?: number;
+  withRole: string;
+  expiresIn?: string;
+  error?: string;
+}
+
+export interface ICustomTokenGQLQueryDefinition {
+  resolve: (appData: IAppDataType, args: {
+    source: any;
+    args: any;
+    context: any;
+    info: any;
+  }) => IReferredTokenStructure | Promise<IReferredTokenStructure>;
+  args?: IGQLFieldsDefinitionType;
+}
+
+export interface ICustomTokensType {
+  [name: string]: ICustomTokenGQLQueryDefinition;
+}
+
 export interface IServerCustomizationDataType {
   customGQLQueries?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;
+  customTokenGQLQueries?: ICustomTokensType;
   customGQLMutations?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;
   customRouterEndpoint?: string;
   customRouter?: (appData: IAppDataType) => express.Router;
@@ -125,12 +148,13 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
 
   const allCustomQueries = {
     ...customUserQueries(appData),
-    ...custom.customGQLQueries && custom.customGQLQueries(appData),
+    ...(custom.customGQLQueries && custom.customGQLQueries(appData)),
+    ...(custom.customTokenGQLQueries && buildCustomTokenQueries(appData, custom.customTokenGQLQueries)),
   };
 
   const allCustomMutations = {
     ...customUserMutations(appData),
-    ...custom.customGQLMutations && custom.customGQLMutations(appData),
+    ...(custom.customGQLMutations && custom.customGQLMutations(appData)),
   };
 
   const finalAllCustomQueries = {};
