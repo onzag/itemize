@@ -50,11 +50,12 @@ export async function deleteItemDefinition(
   // of the user
   let userId: number;
   await runPolicyCheck(
-    "delete",
+    ["delete"],
     itemDefinition,
     resolverArgs.args.id,
     tokenData.role,
     resolverArgs.args,
+    null,
     appData.cache,
 
     // this functions runs before the policy has been checked

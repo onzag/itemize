@@ -43,7 +43,7 @@ export function getGQLFieldsDefinitionForItemDefinition(
     excludeBase: boolean,
     propertiesAsInput: boolean,
     optionalForm: boolean,
-    includePolicy: string;
+    includePolicy: string | string[];
   },
 ): IGQLFieldsDefinitionType {
   // the fields result in graphql field form
@@ -81,6 +81,17 @@ export function getGQLFieldsDefinitionForItemDefinition(
 
   // return that
   if (!options.includePolicy) {
+    return fieldsResult;
+  } else if (Array.isArray(options.includePolicy)) {
+    options.includePolicy.forEach((policyToInclude) => {
+      fieldsResult = {
+        ...fieldsResult,
+        ...getGQLFieldsDefinitionForItemDefinitionPolicies(itemDefinition, {
+          propertiesAsInput: options.propertiesAsInput,
+          policy: policyToInclude,
+        }),
+      };
+    });
     return fieldsResult;
   } else {
     return {
@@ -389,7 +400,7 @@ export function getGQLMutationFieldsForItemDefinition(
           propertiesAsInput: true,
           excludeBase: true,
           optionalForm: true,
-          includePolicy: "edit",
+          includePolicy: ["edit", "read"],
         }),
       },
       resolve: resolveGenericFunction.bind(null, "editItemDefinition", itemDefinition, resolvers),

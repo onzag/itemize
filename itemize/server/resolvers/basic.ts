@@ -642,17 +642,18 @@ const runPolicyCheckDebug = Debug("resolvers:runPolicyCheck");
  * a value if you want to force it to return instead without an error
  */
 export async function runPolicyCheck(
-  policyType: string,
+  policyTypes: string[],
   itemDefinition: ItemDefinition,
   id: number,
   role: string,
   gqlArgValue: IGQLValue,
+  gqlFlattenedRequestedFiels: any,
   cache: Cache,
   preValidation: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
 ) {
   runPolicyCheckDebug(
-    "EXECUTED for policy %s on item definition %s for id %d on role %s for value %j with extra columns %j",
-    policyType,
+    "EXECUTED for policies %j on item definition %s for id %d on role %s for value %j with extra columns %j",
+    policyTypes,
     itemDefinition.getQualifiedPathName(),
     role,
     gqlArgValue,
@@ -670,135 +671,139 @@ export async function runPolicyCheck(
     return forcedResult;
   }
 
-  // let's get all the policies that we have for this policy type group
-  const policiesForThisType = itemDefinition.getPolicyNamesFor(policyType);
+  for (const policyType of policyTypes) {
+    // let's get all the policies that we have for this policy type group
+    const policiesForThisType = itemDefinition.getPolicyNamesFor(policyType);
 
-  // so we loop in these policies
-  for (const policyName of policiesForThisType) {
-    runPolicyCheckDebug("found policy %s", policyName);
-    // and we get the roles that need to apply to this policy
-    const rolesForThisSpecificPolicy = itemDefinition.getRolesForPolicy(policyType, policyName);
-    // if this is not our user, we can just continue with the next
-    if (!rolesForThisSpecificPolicy.includes(role)) {
-      runPolicyCheckDebug(
-        "ignoring policy %s as role %s does not require it but only %j demand it",
-        policyName,
-        role,
-        rolesForThisSpecificPolicy,
-      );
-      continue;
-    }
-
-    if (policyType !== "delete") {
-      const applyingPropertyIds =
-        itemDefinition.getApplyingPropertyIdsForPolicy(policyType, policyName);
-
-      let someIncludeOrPropertyIsApplied = false;
-      if (applyingPropertyIds) {
-        someIncludeOrPropertyIsApplied =
-          applyingPropertyIds.some(
-            (applyingPropertyId) => typeof gqlArgValue[applyingPropertyId] !== "undefined",
-          );
-      }
-
-      if (!someIncludeOrPropertyIsApplied) {
-        const applyingIncludeIds =
-          itemDefinition.getApplyingIncludeIdsForPolicy(policyType, policyName);
-
-        if (applyingIncludeIds) {
-          someIncludeOrPropertyIsApplied =
-            applyingIncludeIds.some(
-              (applyingIncludeId) => {
-                const include = itemDefinition.getIncludeFor(applyingIncludeId);
-                return (
-                  typeof gqlArgValue[include.getQualifiedIdentifier()] !== "undefined" ||
-                  typeof gqlArgValue[include.getQualifiedExclusionStateIdentifier()] !== "undefined"
-                );
-              },
-            );
-        }
-      }
-
-      if (!someIncludeOrPropertyIsApplied) {
+    // so we loop in these policies
+    for (const policyName of policiesForThisType) {
+      runPolicyCheckDebug("found policy %s", policyName);
+      // and we get the roles that need to apply to this policy
+      const rolesForThisSpecificPolicy = itemDefinition.getRolesForPolicy(policyType, policyName);
+      // if this is not our user, we can just continue with the next
+      if (!rolesForThisSpecificPolicy.includes(role)) {
         runPolicyCheckDebug(
-          "ignoring policy %s as there wasno matching applying property or include for %j",
+          "ignoring policy %s as role %s does not require it but only %j demand it",
           policyName,
-          applyingPropertyIds,
+          role,
+          rolesForThisSpecificPolicy,
         );
         continue;
       }
-    }
 
-    // otherwise we need to see which properties are in consideration for this
-    // policy
-    const propertiesInContext = itemDefinition.getPropertiesForPolicy(policyType, policyName);
-    // we loop through those properties
-    for (const property of propertiesInContext) {
-      runPolicyCheckDebug(
-        "Found property in policy %s",
-        property.getId(),
-      );
+      const gqlCheckingElement = policyType === "read" ? gqlFlattenedRequestedFiels : gqlArgValue;
 
-      // now we need the qualified policy identifier, that's where in the args
-      // the value for this policy is stored
-      const qualifiedPolicyIdentifier = property.getQualifiedPolicyIdentifier(policyType, policyName);
-      // and like that we get the value that has been set for that policy
-      let valueForTheProperty = gqlArgValue[qualifiedPolicyIdentifier];
-      // if it's undefined, we set it to null
-      if (typeof valueForTheProperty === "undefined") {
-        valueForTheProperty = null;
+      if (policyType !== "delete") {
+        const applyingPropertyIds =
+          itemDefinition.getApplyingPropertyIdsForPolicy(policyType, policyName);
+
+        let someIncludeOrPropertyIsApplied = false;
+        if (applyingPropertyIds) {
+          someIncludeOrPropertyIsApplied =
+            applyingPropertyIds.some(
+              (applyingPropertyId) => typeof gqlCheckingElement[applyingPropertyId] !== "undefined",
+            );
+        }
+
+        if (!someIncludeOrPropertyIsApplied) {
+          const applyingIncludeIds =
+            itemDefinition.getApplyingIncludeIdsForPolicy(policyType, policyName);
+
+          if (applyingIncludeIds) {
+            someIncludeOrPropertyIsApplied =
+              applyingIncludeIds.some(
+                (applyingIncludeId) => {
+                  const include = itemDefinition.getIncludeFor(applyingIncludeId);
+                  return (
+                    typeof gqlCheckingElement[include.getQualifiedIdentifier()] !== "undefined" ||
+                    typeof gqlCheckingElement[include.getQualifiedExclusionStateIdentifier()] !== "undefined"
+                  );
+                },
+              );
+          }
+        }
+
+        if (!someIncludeOrPropertyIsApplied) {
+          runPolicyCheckDebug(
+            "ignoring policy %s as there wasno matching applying property or include for %j",
+            policyName,
+            applyingPropertyIds,
+          );
+          continue;
+        }
       }
 
-      runPolicyCheckDebug(
-        "Property qualified policy identifier is %s found value set as %j",
-        qualifiedPolicyIdentifier,
-        valueForTheProperty,
-      );
-
-      // now we check if it's a valid value, the value we have given, for the given property
-      // this is a shallow check but works
-      const invalidReason = await property.isValidValue(id, valueForTheProperty);
-
-      // if we get an invalid reason, the policy cannot even pass there
-      if (invalidReason) {
+      // otherwise we need to see which properties are in consideration for this
+      // policy
+      const propertiesInContext = itemDefinition.getPropertiesForPolicy(policyType, policyName);
+      // we loop through those properties
+      for (const property of propertiesInContext) {
         runPolicyCheckDebug(
-          "FAILED due to failing to pass property validation %s",
-          invalidReason,
+          "Found property in policy %s",
+          property.getId(),
         );
-        throw new GraphQLEndpointError({
-          message: `validation failed for ${qualifiedPolicyIdentifier} with reason ${invalidReason}`,
-          code: INVALID_POLICY_ERROR,
-          modulePath: mod.getPath(),
-          itemDefPath: itemDefinition.getPath(),
-          policyType,
-          policyName,
-        });
-      }
 
-      // otherwise we create a selection meta column, for our policy using the sql equal
-      // which will create a column field with the policy name that is going to be
-      // equal to that value, eg. "name" = 'policyValueForProperty' AS "MY_POLICY"
-      // because policies are uppercase this avoids collisions with properties
-      const policyMatches = property.getPropertyDefinitionDescription().sqlLocalEqual(
-        valueForTheProperty,
-        "",
-        property.getId(),
-        selectQueryValue,
-      );
+        // now we need the qualified policy identifier, that's where in the args
+        // the value for this policy is stored
+        const qualifiedPolicyIdentifier = property.getQualifiedPolicyIdentifier(policyType, policyName);
+        // and like that we get the value that has been set for that policy
+        let policyValueForTheProperty = gqlArgValue[qualifiedPolicyIdentifier];
+        // if it's undefined, we set it to null
+        if (typeof policyValueForTheProperty === "undefined") {
+          policyValueForTheProperty = null;
+        }
 
-      if (!policyMatches) {
         runPolicyCheckDebug(
-          "FAILED due to policy %s not passing",
-          policyName,
+          "Property qualified policy identifier is %s found value set as %j",
+          qualifiedPolicyIdentifier,
+          policyValueForTheProperty,
         );
-        throw new GraphQLEndpointError({
-          message: `validation failed for policy ${policyName}`,
-          code: INVALID_POLICY_ERROR,
-          modulePath: mod.getPath(),
-          itemDefPath: itemDefinition.getPath(),
-          policyType,
-          policyName,
-        });
+
+        // now we check if it's a valid value, the value we have given, for the given property
+        // this is a shallow check but works
+        const invalidReason = await property.isValidValue(id, policyValueForTheProperty);
+
+        // if we get an invalid reason, the policy cannot even pass there
+        if (invalidReason) {
+          runPolicyCheckDebug(
+            "FAILED due to failing to pass property validation %s",
+            invalidReason,
+          );
+          throw new GraphQLEndpointError({
+            message: `validation failed for ${qualifiedPolicyIdentifier} with reason ${invalidReason}`,
+            code: INVALID_POLICY_ERROR,
+            modulePath: mod.getPath(),
+            itemDefPath: itemDefinition.getPath(),
+            policyType,
+            policyName,
+          });
+        }
+
+        // otherwise we create a selection meta column, for our policy using the sql equal
+        // which will create a column field with the policy name that is going to be
+        // equal to that value, eg. "name" = 'policyValueForProperty' AS "MY_POLICY"
+        // because policies are uppercase this avoids collisions with properties
+        const policyMatches = property.getPropertyDefinitionDescription().sqlLocalEqual(
+          policyValueForTheProperty,
+          "",
+          property.getId(),
+          selectQueryValue,
+        );
+
+        if (!policyMatches) {
+          runPolicyCheckDebug(
+            "FAILED due to policy %s not passing",
+            policyName,
+          );
+          throw new GraphQLEndpointError({
+            message: `validation failed for policy ${policyName}`,
+            code: INVALID_POLICY_ERROR,
+            modulePath: mod.getPath(),
+            itemDefPath: itemDefinition.getPath(),
+            policyType,
+            policyName,
+          });
+        }
       }
     }
   }

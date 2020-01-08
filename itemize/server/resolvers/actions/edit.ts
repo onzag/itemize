@@ -9,8 +9,6 @@ import {
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
   runPolicyCheck,
-  buildColumnNamesForModuleTableOnly,
-  buildColumnNamesForItemDefinitionTableOnly,
   validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields = require("graphql-fields");
@@ -61,11 +59,12 @@ export async function editItemDefinition(
   // so we run the policy check for edit, this item definition,
   // with the given id
   const wholeSqlStoredValue: ISQLTableRowValue = await runPolicyCheck(
-    "edit",
+    ["edit", "read"],
     itemDefinition,
     resolverArgs.args.id,
     tokenData.role,
     resolverArgs.args,
+    requestedFields,
     appData.cache,
     (content: ISQLTableRowValue) => {
       // if we don't get an user id this means that there's no owner, this is bad input

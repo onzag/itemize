@@ -28,6 +28,7 @@ const securityCode = process.argv[3];
         language: "en",
         id: sensorId,
         POLICY_EDIT_REQUIRES_SECURITY_CODE_security_code: securityCode,
+        POLICY_READ_REQUIRES_SECURITY_CODE_security_code: securityCode,
         // generate random number and crop to two decimal places, itemize doesn't support too many decimals
         temperature: Math.floor((20 + ((Math.random() * 6) + 1)) * 100) / 100,
       },

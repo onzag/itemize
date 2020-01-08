@@ -49,11 +49,12 @@ export async function getItemDefinition(
   // so we run the policy check for read, this item definition,
   // with the given id
   const selectQueryValue: ISQLTableRowValue = await runPolicyCheck(
-    "read",
+    ["read"],
     itemDefinition,
     resolverArgs.args.id,
     tokenData.role,
     resolverArgs.args,
+    requestedFields,
     appData.cache,
     (content: ISQLTableRowValue) => {
       // if there is no content, we force the entire policy check not to
