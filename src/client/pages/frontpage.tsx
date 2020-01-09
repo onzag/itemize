@@ -1,113 +1,73 @@
 import React from "react";
 import { ItemDefinitionProvider } from "../../../itemize/client/providers/item-definition";
-import { I18nRead, I18nReadError } from "../../../itemize/client/components/localization";
-import { Entry, View } from "../../../itemize/client/components/property";
+import { I18nRead } from "../../../itemize/client/components/localization";
+import { Entry } from "../../../itemize/client/components/property";
 import { ModuleProvider } from "../../../itemize/client/providers/module";
-import { SubmitActioner, SearchActioner } from "../../../itemize/client/components/item-definition";
-import { UserIdRetriever } from "../../../itemize/client/components/user";
-import { SearchLoader } from "../../../itemize/client/components/search";
+import { SubmitActioner, ISubmitActionerInfoArgType } from "../../../itemize/client/components/item-definition";
+import { Button } from "@material-ui/core";
+import Snackbar from "../general/snackbar";
+import { TitleSetter } from "../../../itemize/client/components/util";
+import { localizedRedirectTo } from "../../../itemize/client/components/navigaton";
+
+async function submitActionerInContext(actioner: ISubmitActionerInfoArgType) {
+  const result = await actioner.submit();
+  if (result.id) {
+    localizedRedirectTo("/sensors/temperature/" + result.id);
+  }
+}
 
 export function FrontPage() {
   return (
-    <ModuleProvider module="test/sensors">
-      <ItemDefinitionProvider itemDefinition="temperature">
-        <div>
-          <I18nRead id="name"/>
-        </div>
-        <Entry id="name"/>
-        <Entry id="description"/>
-        <Entry id="security_code"/>
+    <React.Fragment>
+      <I18nRead id="app_name">
+        {(value: string) => (
+          <TitleSetter>{value}</TitleSetter>
+        )}
+      </I18nRead>
+      <ModuleProvider module="test/sensors">
+        <ItemDefinitionProvider itemDefinition="temperature">
+          <div>
+            <I18nRead id="name"/>
+          </div>
+          <Entry id="name"/>
+          <Entry id="description"/>
+          <Entry id="security_code"/>
 
-        <SubmitActioner>{(actioner) => (
-          <React.Fragment>
-            <button onClick={actioner.submit.bind(null, {})}><I18nRead id="create"/></button>
-            <div>
-              ERROR:
-              <I18nReadError error={actioner.submitError}/>
-            </div>
-          </React.Fragment>
-        )}</SubmitActioner>
-      </ItemDefinitionProvider>
+          <SubmitActioner>{(actioner) => (
+            <React.Fragment>
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={submitActionerInContext.bind(null, actioner)}
+              >
+                <I18nRead id="create"/>
+              </Button>
+              <Snackbar
+                uniqueId="create-sensor-error"
+                i18nDisplay={actioner.submitError}
+                open={!!actioner.submitError}
+                onClose={actioner.dismissError}
+              />
+            </React.Fragment>
+          )}</SubmitActioner>
 
-      <div>MODULE LEVEL SEARCH</div>
-      <ItemDefinitionProvider searchCounterpart={true}>
-        <Entry id="name" searchVariant="search"/>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={localizedRedirectTo.bind(null, "/sensors/temperature", null)}
+          >
+            <I18nRead id="search"/>
+          </Button>
+        </ItemDefinitionProvider>
 
-        <SearchActioner>{(actioner) => (
-          <React.Fragment>
-            <UserIdRetriever>
-              {(userId) => (
-                <button onClick={actioner.search.bind(null, {createdBy: userId})}><I18nRead id="search"/></button>
-              )}
-            </UserIdRetriever>
-            <div>
-              ERROR:
-              <I18nReadError error={actioner.searchError}/>
-            </div>
-          </React.Fragment>
-        )}</SearchActioner>
-        <div>
-          MODULE LEVEL SEARCH RESULTS
-          <SearchLoader pageSize={10} currentPage={0} requestedProperties={["name"]}>
-            {(loader) => (
-              <React.Fragment>
-                <div>MODULE LEVEL SEARCH ERROR: <I18nReadError error={loader.error}/></div>
-                <div>{
-                  loader.searchResults.map((result) => {
-                    return (
-                      <ItemDefinitionProvider key={result.id} itemDefinition={result.type} forId={result.id}>
-                        <View id="name"/>
-                      </ItemDefinitionProvider>
-                    );
-                  })
-                }</div>
-              </React.Fragment>
-            )}
-          </SearchLoader>
-        </div>
-      </ItemDefinitionProvider>
-
-      <div>SPECIFIC ITEM SEARCH</div>
-      <ItemDefinitionProvider itemDefinition="temperature" searchCounterpart={true}>
-        <Entry id="name" searchVariant="search"/>
-        <Entry id="temperature" searchVariant="from"/>
-        <Entry id="temperature" searchVariant="to"/>
-
-        <SearchActioner>{(actioner) => (
-          <React.Fragment>
-            <UserIdRetriever>
-              {(userId) => (
-                <button onClick={actioner.search.bind(null, {createdBy: userId})}><I18nRead id="search"/></button>
-              )}
-            </UserIdRetriever>
-            <div>
-              ERROR:
-              <I18nReadError error={actioner.searchError}/>
-            </div>
-          </React.Fragment>
-        )}</SearchActioner>
-
-        <div>
-          SPECIFIC SEARCH RESULTS
-          <SearchLoader pageSize={10} currentPage={0} requestedProperties={["name", "temperature"]}>
-            {(loader) => (
-              <React.Fragment>
-                <div>SPECIFIC SEARCH ERROR: <I18nReadError error={loader.error}/></div>
-                <div>{
-                  loader.searchResults.map((result) => {
-                    return (
-                      <ItemDefinitionProvider key={result.id} itemDefinition={result.type} forId={result.id}>
-                        <View id="name"/>
-                        <View id="temperature"/>
-                      </ItemDefinitionProvider>
-                    );
-                  })
-                }</div>
-              </React.Fragment>
-            )}
-          </SearchLoader>
-        </div>
-      </ItemDefinitionProvider>
-    </ModuleProvider>
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={localizedRedirectTo.bind(null, "/sensors", null)}
+        >
+          <I18nRead id="search"/>
+        </Button>
+      </ModuleProvider>
+    </React.Fragment>
   );
 }

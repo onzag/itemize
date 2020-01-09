@@ -6,6 +6,7 @@ import { importScript } from "../..";
 import Moment from "moment";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
+import CssBaseline from "@material-ui/core/CssBaseline";
 import { Route } from "react-router";
 import { history } from "../..";
 import { countries, currencies } from "../../../imported-resources";
@@ -167,7 +168,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
         if (userItemDefinition.hasAppliedValueTo(this.tokenState.id)) {
           console.log("found an instance, triggering update");
           const property = userItemDefinition.getPropertyDefinitionFor(propertyId, false);
-          property.applyValue(this.tokenState.id, actualPropertyResult, false);
+          property.applyValue(this.tokenState.id, actualPropertyResult, false, false);
           userItemDefinition.triggerListeners("change", this.tokenState.id);
         }
       }
@@ -438,6 +439,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // router itself is the parent
     return (
       <MuiThemeProvider theme={theme}>
+        <CssBaseline/>
         <DataContext.Provider value={dataContextValue}>
           <Route
             path="/:lang/"

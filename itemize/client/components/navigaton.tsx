@@ -29,6 +29,19 @@ export function redirectTo(newLocation: string, state?: any) {
   history.push(newLocation, state);
 }
 
+export function localizedRedirectTo(newLocation: string, state?: any) {
+  const currentLocaleFromURL = location.pathname.split("/")[1] || null;
+  if (!currentLocaleFromURL) {
+    return null;
+  }
+  let urlDefined = newLocation;
+  if (urlDefined[0] !== "/") {
+    urlDefined = "/" + urlDefined;
+  }
+  const urlTo = `/${currentLocaleFromURL}${urlDefined}`;
+  return redirectTo(urlTo, state);
+}
+
 interface ICustomLinkProps extends LinkProps {
   to: string;
 }

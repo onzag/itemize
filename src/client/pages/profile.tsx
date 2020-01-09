@@ -12,8 +12,7 @@ import { ItemDefinitionLoader, SubmitActioner, ISubmitActionerInfoArgType } from
 import { UserIdRetriever } from "../../../itemize/client/components/user";
 import Snackbar from "../general/snackbar";
 import { ModuleProvider } from "../../../itemize/client/providers/module";
-import { StatsForNerds } from "../../../itemize/client/components/dev";
-import { PolicyConfirmDialog } from "./dialogs/policy-confirm";
+import { PolicyConfirmDialog } from "../dialogs/policy-confirm";
 import { TitleSetter } from "../../../itemize/client/components/util";
 
 function SimulatedNotFoundPage() {

@@ -696,7 +696,7 @@ export default class ItemDefinition {
     excludePolicies?: boolean,
   ): IItemDefinitionStateType {
     const properties = onlyIncludeProperties ?
-      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, false)
+      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, true)
         .getStateNoExternalChecking(id, emulateExternalChecking)) :
       this.getParentModule().getAllPropExtensions().concat(
         this.getAllPropertyDefinitions(),
@@ -823,6 +823,7 @@ export default class ItemDefinition {
     graphqlUserIdRequester: number,
     graphqlRoleRequester: string,
     requestFields: any,
+    doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
   ) {
     // first we flatten the value if necessary
     const flattenedValue = typeof value.DATA !== "undefined" ? flattenRawGQLValueOrFields(value) : value;
@@ -857,7 +858,7 @@ export default class ItemDefinition {
         givenValue = null;
       }
       // and we apply such value
-      property.applyValue(id, givenValue, setAsModified);
+      property.applyValue(id, givenValue, setAsModified, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
     });
 
     // now we get all the items
@@ -872,7 +873,7 @@ export default class ItemDefinition {
         flattenedValue[include.getQualifiedExclusionStateIdentifier()] || IncludeExclusionState.EXCLUDED;
 
       // and we apply such value
-      include.applyValue(id, givenValue, givenExclusionState);
+      include.applyValue(id, givenValue, givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
     });
   }
 

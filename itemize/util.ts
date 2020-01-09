@@ -265,6 +265,14 @@ export function getFieldsAndArgs(
         if (!doesNotDifferFromAppliedValue) {
           argumentsForQuery[pd.getId()] = currentValue;
         }
+      } else {
+        // otherwise if there is no applied value, we consider the applied value
+        // to be null
+        const currentValue = pd.getCurrentValue(options.forId || null);
+        const doesNotDifferFromAppliedValue = currentValue === null;
+        if (!doesNotDifferFromAppliedValue) {
+          argumentsForQuery[pd.getId()] = currentValue;
+        }
       }
     } else if (shouldBeIncludedInArgs) {
       argumentsForQuery[pd.getId()] = pd.getCurrentValue(options.forId || null);

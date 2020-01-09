@@ -11,6 +11,8 @@ import { Location } from "history";
 import { UserIdRetriever } from "../../itemize/client/components/user";
 import { OfflineStatusRetriever } from "../../itemize/client/components/offline";
 import { AppIsOutdatedChecker } from "../../itemize/client/components/outdated";
+import { SensorsTemperature, SensorsTemperatureIndex } from "./pages/sensors/temperature";
+import { SensorsIndex } from "./pages/sensors";
 
 interface IAppBaseProps {
   userId: number;
@@ -122,6 +124,9 @@ export default function App() {
       <Route path="/terms-and-conditions" component={TermsAndConditions} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/profile/:id" component={Profile} />
+      <Route path="/sensors/temperature/:id" component={SensorsTemperature} />
+      <Route path="/sensors/temperature" component={SensorsTemperatureIndex} exact={true} />
+      <Route path="/sensors" component={SensorsIndex} exact={true} />
     </React.Fragment>
   );
 }

@@ -8,6 +8,7 @@ import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../imported-resources";
 import { IncludeContext } from "../providers/include";
+import { ModuleContext } from "../providers/module";
 
 interface II18nReadProps {
   id: string;
@@ -24,95 +25,111 @@ export function I18nRead(props: II18nReadProps) {
     <LocaleContext.Consumer>
       {
         (localeContext) => (
-          <ItemDefinitionContext.Consumer>
+          <ModuleContext.Consumer>
             {
-              (itemDefinitionContextualValue) => (
-                <IncludeContext.Consumer>
+              (moduleContextualValue) => (
+                <ItemDefinitionContext.Consumer>
                   {
-                    (includeContext) => {
+                    (itemDefinitionContextualValue) => (
+                      <IncludeContext.Consumer>
+                        {
+                          (includeContext) => {
 
-                      let i18nValue: any = null;
-                      if (itemDefinitionContextualValue) {
-                        if (includeContext) {
-                          if (props.id === "name") {
-                            i18nValue = includeContext.include.getI18nNameFor(localeContext.language) || null;
-                          } else {
-                            const includeI18nData = includeContext.include.getI18nDataFor(localeContext.language);
-                            i18nValue = includeI18nData ? includeI18nData[props.id] || null : null;
-                          }
-                        } else {
-                          const i18nIdefData =
-                            itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
-                          if (props.policyType && props.policyName) {
-                            const i18nPolicyTypeValue =
-                              i18nIdefData ? (i18nIdefData.policies && i18nIdefData.policies[props.policyType])
-                                || null : null;
-                            const i18nPolicyNameValue =
-                              i18nPolicyTypeValue ? i18nPolicyTypeValue[props.policyName] || null : null;
-                            i18nValue = i18nPolicyNameValue ? i18nPolicyNameValue[props.id] || null : null;
-                          } else {
-                            if (i18nIdefData && i18nIdefData.custom && i18nIdefData.custom[props.id]) {
-                              i18nValue = i18nIdefData.custom[props.id];
-                            } else {
-                              i18nValue = i18nIdefData ? i18nIdefData[props.id] || null : null;
+                            let i18nValue: any = null;
+                            if (itemDefinitionContextualValue) {
+                              if (includeContext) {
+                                if (props.id === "name") {
+                                  i18nValue = includeContext.include.getI18nNameFor(localeContext.language) || null;
+                                } else {
+                                  const includeI18nData = includeContext.include.getI18nDataFor(localeContext.language);
+                                  i18nValue = includeI18nData ? includeI18nData[props.id] || null : null;
+                                }
+                              } else {
+                                const i18nIdefData =
+                                  itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
+                                if (props.policyType && props.policyName) {
+                                  const i18nPolicyTypeValue =
+                                    i18nIdefData ? (i18nIdefData.policies && i18nIdefData.policies[props.policyType])
+                                      || null : null;
+                                  const i18nPolicyNameValue =
+                                    i18nPolicyTypeValue ? i18nPolicyTypeValue[props.policyName] || null : null;
+                                  i18nValue = i18nPolicyNameValue ? i18nPolicyNameValue[props.id] || null : null;
+                                } else {
+                                  if (i18nIdefData && i18nIdefData.custom && i18nIdefData.custom[props.id]) {
+                                    i18nValue = i18nIdefData.custom[props.id];
+                                  } else {
+                                    i18nValue = i18nIdefData ? i18nIdefData[props.id] || null : null;
+                                  }
+                                }
+                              }
                             }
+
+                            if (moduleContextualValue && i18nValue === null) {
+                              const i18nModData =
+                                moduleContextualValue.mod.getI18nDataFor(localeContext.language);
+                              if (i18nModData && i18nModData.custom && i18nModData.custom[props.id]) {
+                                i18nValue = i18nModData.custom[props.id];
+                              } else {
+                                i18nValue = i18nModData ? i18nModData[props.id] || null : null;
+                              }
+                            }
+
+                            if (i18nValue === null) {
+                              i18nValue = (
+                                localeContext.i18n[localeContext.language] &&
+                                localeContext.i18n[localeContext.language][props.id]
+                              ) || null;
+                            }
+
+                            if (i18nValue === null) {
+                              let errMessage: string = "Unknown key in context: " + props.id;
+                              if (itemDefinitionContextualValue) {
+                                errMessage += "; in item definition context for " +
+                                  itemDefinitionContextualValue.idef.getName();
+                                if (props.policyType && props.policyName) {
+                                  errMessage += "; in policy " + props.policyType + " " + props.policyName;
+                                }
+                                if (includeContext) {
+                                  errMessage += "; in item context for " +
+                                    includeContext.include.getName();
+                                }
+                              }
+                              throw new Error(errMessage);
+                            }
+
+                            if (props.args) {
+                              if (props.args.every((a) => typeof a === "string")) {
+                                i18nValue = localeReplacer(i18nValue, ...props.args);
+                              } else {
+                                i18nValue = localeReplacerToArray(i18nValue, ...props.args).map((output, index) => (
+                                  <React.Fragment key={index}>
+                                    {output}
+                                  </React.Fragment>
+                                ));
+                              }
+                            }
+
+                            let finalNode: string | React.ReactNode = i18nValue;
+                            if (props.html && finalNode !== null) {
+                              const Element: any = props.htmlWrappingTag || "div";
+                              finalNode = (
+                                <Element dangerouslySetInnerHTML={{__html: i18nValue}}/>
+                              );
+                            }
+
+                            if (!props.children) {
+                              return finalNode;
+                            }
+                            return props.children(finalNode);
                           }
                         }
-                      }
-
-                      if (!itemDefinitionContextualValue || i18nValue === null) {
-                        i18nValue = (
-                          localeContext.i18n[localeContext.language] &&
-                          localeContext.i18n[localeContext.language][props.id]
-                        ) || null;
-                      }
-
-                      if (i18nValue === null) {
-                        let errMessage: string = "Unknown key in context: " + props.id;
-                        if (itemDefinitionContextualValue) {
-                          errMessage += "; in item definition context for " +
-                            itemDefinitionContextualValue.idef.getName();
-                          if (props.policyType && props.policyName) {
-                            errMessage += "; in policy " + props.policyType + " " + props.policyName;
-                          }
-                          if (includeContext) {
-                            errMessage += "; in item context for " +
-                              includeContext.include.getName();
-                          }
-                        }
-                        throw new Error(errMessage);
-                      }
-
-                      if (props.args) {
-                        if (props.args.every((a) => typeof a === "string")) {
-                          i18nValue = localeReplacer(i18nValue, ...props.args);
-                        } else {
-                          i18nValue = localeReplacerToArray(i18nValue, ...props.args).map((output, index) => (
-                            <React.Fragment key={index}>
-                              {output}
-                            </React.Fragment>
-                          ));
-                        }
-                      }
-
-                      let finalNode: string | React.ReactNode = i18nValue;
-                      if (props.html && finalNode !== null) {
-                        const Element: any = props.htmlWrappingTag || "div";
-                        finalNode = (
-                          <Element dangerouslySetInnerHTML={{__html: i18nValue}}/>
-                        );
-                      }
-
-                      if (!props.children) {
-                        return finalNode;
-                      }
-                      return props.children(finalNode);
-                    }
+                      </IncludeContext.Consumer>
+                    )
                   }
-                </IncludeContext.Consumer>
+                </ItemDefinitionContext.Consumer>
               )
             }
-          </ItemDefinitionContext.Consumer>
+          </ModuleContext.Consumer>
         )
       }
     </LocaleContext.Consumer>

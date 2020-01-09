@@ -389,11 +389,24 @@ export default class Include {
     };
   }
 
-  public applyValue(id: number, value: {[key: string]: any}, exclusionState: IncludeExclusionState) {
+  public applyValue(
+    id: number,
+    value: {[key: string]: any},
+    exclusionState: IncludeExclusionState,
+    doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
+  ) {
     this.stateExclusion[id] = exclusionState;
     this.stateExclusionModified[id] = true;
 
-    this.itemDefinition.applyValue(id, value || {}, true, null, null, null);
+    this.itemDefinition.applyValue(
+      id,
+      value || {},
+      true,
+      null,
+      null,
+      null,
+      doNotApplyValueInPropertyIfPropertyHasBeenManuallySet,
+    );
   }
 
   public cleanValueFor(

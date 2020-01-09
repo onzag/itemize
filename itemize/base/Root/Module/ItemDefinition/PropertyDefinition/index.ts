@@ -458,13 +458,13 @@ export default class PropertyDefinition {
   private stateSuperEnforcedValue: {
     [slotId: number]: PropertyDefinitionSupportedType,
   };
-  private stateSuperDefaultedValue: {
-    [slotId: number]: PropertyDefinitionSupportedType,
-  };
   private stateValueModified: {
     [slotId: number]: boolean,
   };
-  private stateinternalValue: {
+  private stateValueHasBeenManuallySet: {
+    [slotId: number]: boolean,
+  };
+  private stateInternalValue: {
     [slotId: number]: any,
   };
   // tslint:disable-next-line: member-ordering
@@ -529,7 +529,8 @@ export default class PropertyDefinition {
     // initial value for all namespaces is null
     this.stateValue = {};
     this.stateValueModified = {};
-    this.stateinternalValue = {};
+    this.stateValueHasBeenManuallySet = {};
+    this.stateInternalValue = {};
     this.stateLastUniqueCheck = {};
     this.stateLastAutocompleteCheck = {};
     this.stateSuperEnforcedValue = {};
@@ -734,7 +735,7 @@ export default class PropertyDefinition {
       invalidReason,
       value,
       hidden: this.isCurrentlyHidden(id),
-      internalValue: this.stateValueModified[id] ? this.stateinternalValue[id] : null,
+      internalValue: this.stateValueModified[id] ? this.stateInternalValue[id] : null,
       stateValue: nullIfUndefined(this.stateValue[id]),
       stateValueModified: this.stateValueModified[id] || false,
       propertyId: this.getId(),
@@ -797,7 +798,7 @@ export default class PropertyDefinition {
       invalidReason,
       value,
       hidden: this.isCurrentlyHidden(id),
-      internalValue: this.stateValueModified[id] ? this.stateinternalValue[id] : null,
+      internalValue: this.stateValueModified[id] ? this.stateInternalValue[id] : null,
       stateValue: nullIfUndefined(this.stateValue[id]),
       stateValueModified: this.stateValueModified[id] || false,
       propertyId: this.getId(),
@@ -921,17 +922,30 @@ export default class PropertyDefinition {
     // note that the value is set and never check
     this.stateValue[id] = newActualValue;
     this.stateValueModified[id] = true;
-    this.stateinternalValue[id] = internalValue;
+    this.stateValueHasBeenManuallySet[id] = true;
+    this.stateInternalValue[id] = internalValue;
   }
 
+  // TODO add undo function, canUndo and add the gql applied value
+  // here in order to turn it back to that applied value
   public applyValue(
     id: number,
     value: any,
     modifiedState: boolean,
+    doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
   ) {
-    this.stateValue[id] = value;
-    this.stateValueModified[id] = modifiedState;
-    this.stateinternalValue[id] = null;
+    // if doNotApplyValueInPropertyIfPropertyHasBeenManuallySet
+    // is false, then we don't care and apply the value
+    // however if it's true, we need to check the manually set variable
+    // in order to know where the value comes from
+    if (
+      !doNotApplyValueInPropertyIfPropertyHasBeenManuallySet ||
+      !this.stateValueHasBeenManuallySet[id]
+    ) {
+      this.stateValue[id] = value;
+      this.stateValueModified[id] = modifiedState;
+      this.stateInternalValue[id] = null;
+    }
   }
 
   public cleanValueFor(
@@ -939,7 +953,8 @@ export default class PropertyDefinition {
   ) {
     delete this.stateValue[id];
     delete this.stateValueModified[id];
-    delete this.stateinternalValue[id];
+    delete this.stateInternalValue[id];
+    delete this.stateValueHasBeenManuallySet[id];
     delete this.stateSuperEnforcedValue[id];
   }
 

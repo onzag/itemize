@@ -13,18 +13,36 @@ import { GraphQLEndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "../internal/app/remote-listener";
 import Root from "../../base/Root";
 
+// TODO implement these
+interface ISearchResultWithPopulateData extends ISearchResult {
+  providerProps: {
+    key: number;
+    forId: number;
+    itemDefinition: string;
+    optimize: {
+      onlyIncludeProperties?: string[],
+      onlyIncludeIncludes?: string[],
+      excludePolicies?: boolean,
+      cleanOnDismount?: boolean,
+    }
+  };
+  itemDefinition: ItemDefinition;
+}
+
+interface ISearchLoaderArg {
+  searchResults: ISearchResult[]; // implement it here rather
+  pageCount: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  error: GraphQLEndpointErrorType;
+  dismissError: () => void;
+  refreshPage: () => void;
+}
+
 interface ISearchLoaderProps {
   pageSize: number;
   currentPage: number;
-  children: (arg: {
-    searchResults: ISearchResult[];
-    pageCount: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
-    error: GraphQLEndpointErrorType;
-    dismissError: () => void;
-    refreshPage: () => void;
-  }) => any;
+  children: (arg: ISearchLoaderArg) => any;
   requestedProperties: string[];
   requestedIncludes?: string[];
 }
@@ -122,9 +140,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     const getListQueryName: string = PREFIX_GET_LIST + queryBase;
 
-    // this is the query we run
-    const singleQueryName = PREFIX_GET + queryBase;
-
     const uncachedResults: ISearchResult[] = [];
     const workerCachedResults = await Promise.all(currentSearchResults.map(async (searchResult: ISearchResult) => {
       const itemDefintionInQuestion = Root.Registry[searchResult.type] as ItemDefinition;
@@ -143,7 +158,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         return null;
       } else {
         const cachedResult = await CacheWorkerInstance.instance.getCachedValue(
-          singleQueryName,
+          PREFIX_GET + itemDefintionInQuestion.getQualifiedPathName(),
           searchResult.id,
           searchFields,
         );
@@ -176,6 +191,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             this.props.tokenData.id,
             this.props.tokenData.role,
             cr.cachedResult.fields,
+            true,
           );
 
           // and then we trigger the change listener for all the instances
@@ -244,7 +260,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           if (!valueToApply) {
             if (CacheWorkerInstance.isSupported) {
               CacheWorkerInstance.instance.setCachedValue(
-                singleQueryName, forId, null, null,
+                PREFIX_GET + itemDefintionInQuestion.getQualifiedPathName(), forId, null, null,
               );
             }
             itemDefintionInQuestion.cleanValueFor(forId);
@@ -274,12 +290,13 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
               this.props.tokenData.id,
               this.props.tokenData.role,
               mergedQueryFields,
+              true,
             );
             itemDefintionInQuestion.triggerListeners("change", forId);
 
             if (CacheWorkerInstance.isSupported) {
               CacheWorkerInstance.instance.mergeCachedValue(
-                singleQueryName, forId, valueToApply, mergedQueryFields,
+                PREFIX_GET + itemDefintionInQuestion.getQualifiedPathName(), forId, valueToApply, mergedQueryFields,
               );
             }
           }
@@ -364,4 +381,78 @@ export function SearchLoader(props: ISearchLoaderProps) {
       }
     </LocaleContext.Consumer>
   );
+}
+
+interface IPagedSearchLoaderArg extends ISearchLoaderArg {
+  currentPage: number;
+  goToNextPage: () => void;
+  goToPrevPage: () => void;
+  goToPage: (n: number) => void;
+}
+
+interface IPagedSearchLoaderProps {
+  pageSize: number;
+  requestedProperties: string[];
+  requestedIncludes?: string[];
+  children: (arg: IPagedSearchLoaderArg) => any;
+}
+
+interface IPagedSearchLoaderState {
+  currentPage: number;
+}
+
+export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps, IPagedSearchLoaderState> {
+  constructor(props: IPagedSearchLoaderProps) {
+    super(props);
+
+    this.state = {
+      currentPage: 0,
+    };
+
+    this.goToNextPage = this.goToNextPage.bind(this);
+    this.goToPrevPage = this.goToPrevPage.bind(this);
+    this.goToPage = this.goToPage.bind(this);
+  }
+  public goToNextPage(hasNextPage: boolean) {
+    if (hasNextPage) {
+      this.goToPage(this.state.currentPage + 1);
+    }
+  }
+  public goToPrevPage(hasPrevPage: boolean) {
+    if (hasPrevPage) {
+      this.goToPage(this.state.currentPage - 1);
+    }
+  }
+  public goToPage(n: number) {
+    this.setState({
+      currentPage: n,
+    });
+  }
+  public shouldComponentUpdate(nextProps: IPagedSearchLoaderProps, nextState: IPagedSearchLoaderState) {
+    return !equals(this.state, nextState) ||
+      nextProps.pageSize !== this.props.pageSize ||
+      nextProps.children !== this.props.children ||
+      !equals(this.props.requestedIncludes, nextProps.requestedIncludes) ||
+      !equals(this.props.requestedProperties, nextProps.requestedProperties);
+  }
+  public render() {
+    return (
+      <SearchLoader
+        pageSize={this.props.pageSize}
+        currentPage={this.state.currentPage}
+        requestedProperties={this.props.requestedProperties}
+        requestedIncludes={this.props.requestedIncludes}
+      >
+        {(arg) => {
+          return this.props.children({
+            ...arg,
+            currentPage: this.state.currentPage,
+            goToNextPage: this.goToNextPage.bind(this, arg.hasNextPage),
+            goToPrevPage: this.goToPrevPage.bind(this, arg.hasPrevPage),
+            goToPage: this.goToPage,
+          });
+        }}
+      </SearchLoader>
+    );
+  }
 }

@@ -729,6 +729,7 @@ export class ActualItemDefinitionProvider extends
         this.props.tokenData.id,
         this.props.tokenData.role,
         value.getQueryFields,
+        true,
       );
 
       // and then we trigger the change listener for all the instances
@@ -978,10 +979,14 @@ export class ActualItemDefinitionProvider extends
             return !p.valid;
           }
         } else {
-          // we return false here to basically not check
-          // we cannot compare against the applied value
-          // so this will anyway not be included
-          return false;
+          // otherwise if there's no applied value we consider
+          // the applied value to be null
+          const doesNotDifferFromAppliedValue = p.value === null;
+          if (doesNotDifferFromAppliedValue) {
+            return false;
+          } else {
+            return !p.valid;
+          }
         }
       }
       return !p.valid;
@@ -1266,34 +1271,46 @@ export class ActualItemDefinitionProvider extends
             // any property that would cause this to be needed, for that we get the applying ids
             const applyingPropertyIds = this.props.itemDefinitionInstance
               .getApplyingPropertyIdsForPolicy(policyType, policyName);
-            // and using some yet again we check whether using the argumentsToCheckPropertiesAgainst
-            // which is a gql object
-            // which funnily will contain the same id in case it is there, it will tell us whether one
-            // of the property actually is going to be modified and so our policy applies
-            const oneOfApplyingPropertiesApplies = applyingPropertyIds
-              .some((pid) => typeof argumentsToCheckPropertiesAgainst[pid] !== "undefined");
-            // if it doesn't match anything, we return false, so technically this policy is valid, regardless on whether
-            // the value itself is valid or not because it will not pass to the graphql query
-            if (!oneOfApplyingPropertiesApplies) {
-              // the attribute is not included isInvalid is false we ignore
-              return false;
+
+            // this only matters if there are applying property ids, this might not be the
+            // case and as so be a generic policy that applies to all
+            if (applyingPropertyIds) {
+              // and using some yet again we check whether using the argumentsToCheckPropertiesAgainst
+              // which is a gql object
+              // which funnily will contain the same id in case it is there, it will tell us whether one
+              // of the property actually is going to be modified and so our policy applies
+              const oneOfApplyingPropertiesApplies = applyingPropertyIds
+                .some((pid) => typeof argumentsToCheckPropertiesAgainst[pid] !== "undefined");
+              // if it doesn't match anything, we return false, so technically this policy is valid
+              // regardless on whether
+              // the value itself is valid or not because it will not pass to the graphql query
+              if (!oneOfApplyingPropertiesApplies) {
+                // the attribute is not included isInvalid is false we ignore
+                return false;
+              }
             }
 
             // now we do the same but with the items
             const applyingIncludeIds = this.props.itemDefinitionInstance
               .getApplyingIncludeIdsForPolicy(policyType, policyName);
 
-            const oneOfApplyingIncludesApplies = applyingIncludeIds
-              .some((includeId) => {
-                const referredInclude = this.props.itemDefinitionInstance.getIncludeFor(includeId);
-                return (
-                  typeof argumentsToCheckPropertiesAgainst[referredInclude.getQualifiedIdentifier()] !== "undefined" ||
-                  typeof argumentsToCheckPropertiesAgainst[referredInclude.getQualifiedExclusionStateIdentifier()] !== "undefined"
-                );
-              });
+            if (applyingIncludeIds) {
+              const oneOfApplyingIncludesApplies = applyingIncludeIds
+                .some((includeId) => {
+                  const referredInclude = this.props.itemDefinitionInstance.getIncludeFor(includeId);
+                  return (
+                    typeof argumentsToCheckPropertiesAgainst[
+                      referredInclude.getQualifiedIdentifier()
+                    ] !== "undefined" ||
+                    typeof argumentsToCheckPropertiesAgainst[
+                      referredInclude.getQualifiedExclusionStateIdentifier()
+                    ] !== "undefined"
+                  );
+                });
 
-            if (!oneOfApplyingIncludesApplies) {
-              return false;
+              if (!oneOfApplyingIncludesApplies) {
+                return false;
+              }
             }
           }
           // Here we are doing exactly the same as we did with applying property ids but this time
@@ -1541,6 +1558,7 @@ export class ActualItemDefinitionProvider extends
         this.props.tokenData.id,
         this.props.tokenData.role,
         getQueryFields,
+        true,
       );
       if (options.propertiesToCleanOnSuccess) {
         options.propertiesToCleanOnSuccess.forEach((ptc) => {
