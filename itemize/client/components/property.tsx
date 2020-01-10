@@ -154,6 +154,18 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                     }
                     itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
                   };
+                  let isPoked: boolean = false;
+                  if (props.policyType) {
+                    isPoked = itemDefinitionContextualValue.pokePoliciesType === props.policyType;
+                  } else {
+                    isPoked = !!itemDefinitionContextualValue.pokedElements.find((p) => {
+                      if (includeContextualValue) {
+                        return p.includeId === includeContextualValue.include.getId() &&
+                          p.propertyId === property.getId();
+                      }
+                      return p.propertyId === property.getId();
+                    });
+                  }
                   return (
                     <PropertyEntry
                       property={property}
@@ -162,7 +174,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                       forceInvalid={props.showAsInvalid}
                       icon={props.icon}
                       forId={itemDefinitionContextualValue.forId}
-                      poked={itemDefinitionContextualValue.poked}
+                      poked={isPoked}
                     />
                   );
                 } else {

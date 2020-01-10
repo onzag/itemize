@@ -101,23 +101,27 @@ function goToPage(actualGoToPage: (n: number) => void, e: React.MouseEvent, offs
 
 export function SensorsTemperatureIndex() {
   return (
-    <ModuleProvider module="test/sensors">
-      <ItemDefinitionProvider itemDefinition="temperature" searchCounterpart={true}>
-        <I18nRead id="search">
-          {(value) => (
-            <TitleSetter>
-              {value.toString()}
-            </TitleSetter>
-          )}
-        </I18nRead>
-        <Entry id="name" searchVariant="search" />
-        <Entry id="temperature" searchVariant="from" />
-        <Entry id="temperature" searchVariant="to" />
+    <UserIdRetriever>
+      {(userId) => (
+        <ModuleProvider module="test/sensors">
+          <ItemDefinitionProvider
+            itemDefinition="temperature"
+            searchCounterpart={true}
+            automaticSearch={{createdBy: userId}}
+          >
+            <I18nRead id="search">
+              {(value) => (
+                <TitleSetter>
+                  {value.toString()}
+                </TitleSetter>
+              )}
+            </I18nRead>
+            <Entry id="name" searchVariant="search" />
+            <Entry id="temperature" searchVariant="from" />
+            <Entry id="temperature" searchVariant="to" />
 
-        <SearchActioner>{(actioner) => (
-          <React.Fragment>
-            <UserIdRetriever>
-              {(userId) => (
+            <SearchActioner>{(actioner) => (
+              <React.Fragment>
                 <Button
                   color="primary"
                   variant="contained"
@@ -125,62 +129,57 @@ export function SensorsTemperatureIndex() {
                 >
                   <I18nRead id="search" />
                 </Button>
-              )}
-            </UserIdRetriever>
-            <Snackbar
-              uniqueId="temperature-sensor-search-error"
-              i18nDisplay={actioner.searchError}
-              open={!!actioner.searchError}
-              onClose={actioner.dismissSearchError}
-            />
-          </React.Fragment>
-        )}</SearchActioner>
+                <Snackbar
+                  uniqueId="temperature-sensor-search-error"
+                  i18nDisplay={actioner.searchError}
+                  open={!!actioner.searchError}
+                  onClose={actioner.dismissSearchError}
+                />
+              </React.Fragment>
+            )}</SearchActioner>
 
-        <PagedSearchLoader pageSize={PAGE_SIZE} requestedProperties={["name", "temperature"]}>
-          {(loader) => (
-            <React.Fragment>
-              <ul>{
-                loader.searchResults.map((result) => {
-                  return (
-                    <ItemDefinitionProvider
-                      key={result.id}
-                      itemDefinition={result.type}
-                      forId={result.id}
-                      optimize={{
-                        onlyIncludeProperties: ["name", "temperature"],
-                      }}
-                    >
-                      <li>
-                        <Link to={`/sensors/temperature/${result.id}`}>
-                          <Reader id="name">
-                            {(v) => v}
-                          </Reader> : (
-                            <Reader id="temperature">
-                              {(v) => v}
-                            </Reader>
-                          )
-                        </Link>
-                      </li>
-                    </ItemDefinitionProvider>
-                  );
-                })
-              }</ul>
-              <Pagination
-                total={loader.pageCount * PAGE_SIZE}
-                limit={PAGE_SIZE}
-                offset={loader.currentPage * PAGE_SIZE}
-                onClick={goToPage.bind(null, loader.goToPage)}
-              />
-              <Snackbar
-                uniqueId="temperature-sensor-search-loader-error"
-                i18nDisplay={loader.error}
-                open={!!loader.error}
-                onClose={loader.dismissError}
-              />
-            </React.Fragment>
-          )}
-        </PagedSearchLoader>
-      </ItemDefinitionProvider>
-    </ModuleProvider>
+            <PagedSearchLoader pageSize={PAGE_SIZE} requestedProperties={["name", "temperature"]}>
+              {(loader) => (
+                <React.Fragment>
+                  <ul>{
+                    loader.searchResults.map((result) => {
+                      return (
+                        <ItemDefinitionProvider
+                          {...result.providerProps}
+                        >
+                          <li>
+                            <Link to={`/sensors/temperature/${result.id}`}>
+                              <Reader id="name">
+                                {(v) => v}
+                              </Reader> : (
+                                <Reader id="temperature">
+                                  {(v) => v}
+                                </Reader>
+                              )
+                            </Link>
+                          </li>
+                        </ItemDefinitionProvider>
+                      );
+                    })
+                  }</ul>
+                  <Pagination
+                    total={loader.pageCount * PAGE_SIZE}
+                    limit={PAGE_SIZE}
+                    offset={loader.currentPage * PAGE_SIZE}
+                    onClick={goToPage.bind(null, loader.goToPage)}
+                  />
+                  <Snackbar
+                    uniqueId="temperature-sensor-search-loader-error"
+                    i18nDisplay={loader.error}
+                    open={!!loader.error}
+                    onClose={loader.dismissError}
+                  />
+                </React.Fragment>
+              )}
+            </PagedSearchLoader>
+          </ItemDefinitionProvider>
+        </ModuleProvider>
+      )}
+    </UserIdRetriever>
   );
 }

@@ -13,10 +13,9 @@ import { GraphQLEndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "../internal/app/remote-listener";
 import Root from "../../base/Root";
 
-// TODO implement these
 interface ISearchResultWithPopulateData extends ISearchResult {
   providerProps: {
-    key: number;
+    key: string;
     forId: number;
     itemDefinition: string;
     optimize: {
@@ -24,13 +23,15 @@ interface ISearchResultWithPopulateData extends ISearchResult {
       onlyIncludeIncludes?: string[],
       excludePolicies?: boolean,
       cleanOnDismount?: boolean,
+      static?: boolean,
+      avoidLongTermCaching?: boolean,
     }
   };
   itemDefinition: ItemDefinition;
 }
 
 interface ISearchLoaderArg {
-  searchResults: ISearchResult[]; // implement it here rather
+  searchResults: ISearchResultWithPopulateData[]; // implement it here rather
   pageCount: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
@@ -45,6 +46,9 @@ interface ISearchLoaderProps {
   children: (arg: ISearchLoaderArg) => any;
   requestedProperties: string[];
   requestedIncludes?: string[];
+  excludePolicies?: boolean;
+  cleanOnDismount?: boolean;
+  staticResults?: boolean;
 }
 
 interface IActualSearchLoaderProps extends ISearchLoaderProps {
@@ -258,11 +262,11 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             ...value,
           } : value;
           if (!valueToApply) {
-            if (CacheWorkerInstance.isSupported) {
-              CacheWorkerInstance.instance.setCachedValue(
-                PREFIX_GET + itemDefintionInQuestion.getQualifiedPathName(), forId, null, null,
-              );
-            }
+            // if (CacheWorkerInstance.isSupported) {
+            //   CacheWorkerInstance.instance.setCachedValue(
+            //     PREFIX_GET + itemDefintionInQuestion.getQualifiedPathName(), forId, null, null,
+            //   );
+            // }
             itemDefintionInQuestion.cleanValueFor(forId);
             itemDefintionInQuestion.triggerListeners("change", forId);
           } else {
@@ -294,11 +298,11 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             );
             itemDefintionInQuestion.triggerListeners("change", forId);
 
-            if (CacheWorkerInstance.isSupported) {
-              CacheWorkerInstance.instance.mergeCachedValue(
-                PREFIX_GET + itemDefintionInQuestion.getQualifiedPathName(), forId, valueToApply, mergedQueryFields,
-              );
-            }
+            // if (CacheWorkerInstance.isSupported) {
+            //   CacheWorkerInstance.instance.mergeCachedValue(
+            //     PREFIX_GET + itemDefintionInQuestion.getQualifiedPathName(), forId, valueToApply, mergedQueryFields,
+            //   );
+            // }
           }
         });
       }
@@ -338,7 +342,26 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       >
         {
           this.props.children({
-            searchResults: this.state.error ? [] : this.state.currentSearchResults,
+            searchResults: this.state.error ? [] : this.state.currentSearchResults.map((searchResult) => {
+              const itemDefinition = Root.Registry[searchResult.type] as ItemDefinition;
+              return {
+                ...searchResult,
+                providerProps: {
+                  key: itemDefinition.getQualifiedPathName() + "." + searchResult.id,
+                  forId: searchResult.id,
+                  itemDefinition: searchResult.type,
+                  optimize: {
+                    onlyIncludeProperties: this.props.requestedProperties,
+                    onlyIncludeIncludes: this.props.requestedIncludes,
+                    excludePolicies: this.props.excludePolicies,
+                    cleanOnDismount: this.props.cleanOnDismount,
+                    static: this.props.staticResults,
+                    avoidLongTermCaching: true,
+                  },
+                },
+                itemDefinition,
+              };
+            }),
             pageCount,
             hasNextPage: this.props.currentPage < pageCount - 1,
             hasPrevPage: this.props.currentPage !== 0,

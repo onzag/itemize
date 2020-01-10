@@ -1,21 +1,32 @@
 TODO TECH
 
+A) We need to implement search limiters, search limiters represent properties, eg.
+limitSearchByOwner: boolean
+limitSearchByParent: boolean
+limitSearchByProperties: []
+
+these limiters will allow for reasonable searches
+
+B) We need to implement a way to cache 
+
+C) Historic values for some properties
+We need to add historic values that show how a value has changed
+it will create a property_HISTORIC which will be an array of itself
+and property_HISTORIC_
+and will keep all the historic changes
+
+Actually I am not sure about this, parented items should suffice, but surely
+parented will be a pain in the ass to cache and will take a lot of space compared
+to historic
+
+
+
+
+
 Implement flagging
 
 - Implement some form of triggers, maybe callback functions in the resolvers, we should have some form of user trigger to remove e_validated and
   whatnot
-
-Add canCreateInBehalf functionality, this functionality can have roles and stuff, it does not much other
-than create a component with a different owner id
-
-Add owner based searches as so, where SELF is allowed for checking up
-
-
-
-
-
-
-
 
 
 Add parents, should work as

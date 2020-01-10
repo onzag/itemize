@@ -76,6 +76,8 @@ export interface IActionSubmitOptions {
 }
 
 export interface IActionDeleteOptions {
+  unpokeAfterSuccess?: boolean;
+  policiesToCleanOnSuccess?: PolicyPathType[];
   beforeDelete?: (policiesRequested: PolicyPathType[]) => boolean;
 }
 
@@ -99,6 +101,12 @@ export interface IActionSearchOptions {
 export interface ISearchResult {
   type: string;
   id: number;
+}
+
+export interface IPokeElementType {
+  includeId: string;
+  propertyId: string;
+  isInvalid: boolean;
 }
 
 /**
@@ -161,7 +169,8 @@ export interface IItemDefinitionContextType {
   // it makes no sense to show as invalid immediately
   // poked makes it so that every field shows its true state
   // they are poked
-  poked: boolean;
+  pokedElements: IPokeElementType[];
+  pokePoliciesType: string;
   // specifies whether the current user can create
   canCreate: boolean;
   // specifies whether the current user can delete
@@ -267,6 +276,11 @@ interface IItemDefinitionProviderProps {
   // external check is unecessary; note that disabling external checks has no effect
   // if the item definition has no externally checked properties
   disableExternalChecks?: boolean;
+  // automatic search triggers an automatic search when the item mounts
+  // or it detects a change in the properties, this basically triggers
+  // the .search function with these arguments whenever it is detected
+  // it should do so
+  automaticSearch?: IActionSearchOptions;
   // optimization, these cause no differences in UX/UI or function
   // but they can speed up your app
   // they affect request payloads as well as the application state itself
@@ -282,6 +296,11 @@ interface IItemDefinitionProviderProps {
     // cleans the value from the memory cache once the object dismounts
     // as the memory cache might only grow and grow
     cleanOnDismount?: boolean,
+    // static components do not update remotely
+    static?: boolean,
+    // avoids caching values in the worker cache
+    // the memory cache remains active
+    avoidLongTermCaching?: boolean,
   };
 }
 
@@ -326,7 +345,8 @@ interface IActualItemDefinitionProviderState {
   searchResults: ISearchResult[];
   searchId: string;
   searchOwner: number;
-  poked: boolean;
+  pokedElements: IPokeElementType[];
+  pokePoliciesType: string;
   canEdit: boolean;
   canDelete: boolean;
   canCreate: boolean;
@@ -453,7 +473,8 @@ export class ActualItemDefinitionProvider extends
       searchId: null,
       searchOwner: null,
 
-      poked: false,
+      pokedElements: [],
+      pokePoliciesType: null,
 
       canEdit: this.canEdit(),
       canDelete: this.canDelete(),
@@ -470,6 +491,10 @@ export class ActualItemDefinitionProvider extends
       this.setStateToCurrentValueWithExternalChecking(null);
     }
 
+    if (this.props.automaticSearch) {
+      this.search(this.props.automaticSearch);
+    }
+
     // and we attempt to load the current value
     this.loadValue();
   }
@@ -479,8 +504,10 @@ export class ActualItemDefinitionProvider extends
     /// first the change listener that checks for every change event that happens with the state
     this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.changeListener);
 
+    const isStatic = this.props.optimize && this.props.optimize.static;
+
     // second are the remote listeners, only when there's an id defined
-    if (this.props.forId) {
+    if (this.props.forId && !isStatic) {
       // one is the reload, this gets called when the value of the field has differed from the one that
       // we have gotten (or have cached) this listener is very important for that reason, otherwise our app
       // will get frozen in the past
@@ -503,7 +530,8 @@ export class ActualItemDefinitionProvider extends
   public unSetupListeners() {
     // here we just remove the listeners that we have setup
     this.props.itemDefinitionInstance.removeListener("change", this.props.forId || null, this.changeListener);
-    if (this.props.forId) {
+    const isStatic = this.props.optimize && this.props.optimize.static;
+    if (this.props.forId && !isStatic) {
       // remove all the remote listeners
       this.props.itemDefinitionInstance.removeListener("reload", this.props.forId, this.reloadListener);
       this.props.remoteListener.removeItemDefinitionListenerFor(
@@ -529,6 +557,7 @@ export class ActualItemDefinitionProvider extends
     // all of it if it differs does, the optimization flags
     // children, locale data, and ownership assumption
     return updatedIntoSomethingThatInvalidatesTheState ||
+      !equals(this.state, nextState) ||
       (nextProps.forId || null) !== (this.props.forId || null) ||
       !!nextProps.assumeOwnership !== !!this.props.assumeOwnership ||
       nextProps.children !== this.props.children ||
@@ -536,8 +565,8 @@ export class ActualItemDefinitionProvider extends
       nextProps.tokenData.id !== this.props.tokenData.id ||
       nextProps.tokenData.role !== this.props.tokenData.role ||
       nextProps.remoteListener !== this.props.remoteListener ||
-      !equals(this.props.optimize, nextProps.optimize) ||
-      !equals(this.state, nextState);
+      !equals(nextProps.automaticSearch, this.props.automaticSearch) ||
+      !equals(this.props.optimize, nextProps.optimize);
   }
   public async componentDidUpdate(
     prevProps: IActualItemDefinitionProviderProps,
@@ -553,13 +582,40 @@ export class ActualItemDefinitionProvider extends
       !equals(this.props.optimize, prevProps.optimize) ||
       itemDefinitionWasUpdated
     ) {
+      // now we have to check on whether the current state is static
+      // or not
+      const isStatic = this.props.optimize && this.props.optimize.static;
+      // compared to the previous
+      const wasStatic = prevProps.optimize && prevProps.optimize.static;
+
+      // if it's now static and it was not static before, we got to remove
+      // the remote listeners, note that listeners are only added with an id
+      // so we check for that as well
+      let alreadyRemovedRemoteListeners: boolean = false;
+      let alreadyAddedRemoteListeners: boolean = false;
+      if (isStatic && !wasStatic && prevProps.forId) {
+        // we mark the flag as true
+        alreadyRemovedRemoteListeners = true;
+        // and remove the listeners
+        prevProps.itemDefinitionInstance.removeListener("reload", prevProps.forId, this.reloadListener);
+        prevProps.remoteListener.removeItemDefinitionListenerFor(
+          this, prevProps.itemDefinitionInstance, prevProps.forId,
+        );
+      } else if (!isStatic && wasStatic && this.props.forId) {
+        alreadyAddedRemoteListeners = true;
+        this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
+        this.props.remoteListener.addItemDefinitionListenerFor(
+          this, this.props.itemDefinitionInstance, this.props.forId,
+        );
+      }
 
       // if this was an item definition or id update
       if (itemDefinitionWasUpdated || (prevProps.forId || null) !== (this.props.forId || null)) {
         // we need to remove the old listeners
         prevProps.itemDefinitionInstance.removeListener("change", prevProps.forId || null, this.changeListener);
-        if (prevProps.forId) {
-          prevProps.itemDefinitionInstance.addListener("reload", prevProps.forId, this.reloadListener);
+        // we only remove this listeners if we haven't done it before for other reasons
+        if (prevProps.forId && !wasStatic && !alreadyRemovedRemoteListeners) {
+          prevProps.itemDefinitionInstance.removeListener("reload", prevProps.forId, this.reloadListener);
           prevProps.remoteListener.removeItemDefinitionListenerFor(
             this, prevProps.itemDefinitionInstance, prevProps.forId,
           );
@@ -567,7 +623,7 @@ export class ActualItemDefinitionProvider extends
 
         // add the new listeners
         this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.changeListener);
-        if (this.props.forId) {
+        if (this.props.forId && !isStatic && !alreadyAddedRemoteListeners) {
           this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
           this.props.remoteListener.addItemDefinitionListenerFor(
             this, this.props.itemDefinitionInstance, this.props.forId,
@@ -611,6 +667,14 @@ export class ActualItemDefinitionProvider extends
         canDelete: this.canDelete(),
         canCreate: this.canCreate(),
       });
+    }
+
+    if (!equals(this.props.automaticSearch, prevProps.automaticSearch)) {
+      if (this.props.automaticSearch) {
+        this.search(this.props.automaticSearch);
+      } else {
+        this.dismissSearchResults();
+      }
     }
   }
 
@@ -679,6 +743,24 @@ export class ActualItemDefinitionProvider extends
           error: null,
         });
         this.props.remoteListener.requestFeedbackFor(this.props.itemDefinitionInstance, this.props.forId);
+        // in some situations the value can be in memory but not yet permanently cached
+        // (eg. when there is a search context)
+        // and another item without a search context attempts to load the value this will
+        // make it so that when we are exiting the search context it caches
+        if (
+          CacheWorkerInstance.isSupported &&
+          (
+            !this.props.optimize ||
+            !this.props.optimize.avoidLongTermCaching
+          )
+        ) {
+          CacheWorkerInstance.instance.mergeCachedValue(
+            PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(),
+            this.props.forId,
+            appliedGQLValue.rawValue,
+            appliedGQLValue.requestFields,
+          );
+        }
         return completedValue;
       }
     }
@@ -893,6 +975,10 @@ export class ActualItemDefinitionProvider extends
         600,
       );
     }
+
+    if (this.props.automaticSearch) {
+      this.search(this.props.automaticSearch);
+    }
   }
   public onPropertyEnforce(
     property: PropertyDefinition,
@@ -904,6 +990,10 @@ export class ActualItemDefinitionProvider extends
     // the setter enforces values
     property.setSuperEnforced(givenForId || null, value);
     this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null);
+
+    if (this.props.automaticSearch) {
+      this.search(this.props.automaticSearch);
+    }
   }
   public onPropertyClearEnforce(
     property: PropertyDefinition,
@@ -947,17 +1037,20 @@ export class ActualItemDefinitionProvider extends
       onlyIncludeIncludes?: string[],
       onlyIncludeIfDiffersFromAppliedValue?: boolean,
     },
-  ): boolean {
+  ): {
+    isInvalid: boolean,
+    propertiesToPoke: IPokeElementType[],
+  } {
     // let's make this variable to check on whether things are invalid or not
     // first we check every property, that is included and allowed we use some
     // and return whether it's invalid
-    let isInvalid = this.state.itemDefinitionState.properties.some((p) => {
+    const mainPropertiesIncluded: IPokeElementType[] = this.state.itemDefinitionState.properties.map((p) => {
       // we return false if we have an only included properties and our property is in there
       // because that means that whether it is valid or not is irrelevant for our query
       const isNotIncluded = options && options.onlyIncludeProperties &&
         !options.onlyIncludeProperties.includes(p.propertyId);
       if (isNotIncluded) {
-        return false;
+        return null;
       }
       // now we check if we have the option to only include those that differ
       // from the applied value
@@ -973,79 +1066,113 @@ export class ActualItemDefinitionProvider extends
           );
           // if it does not differ, then it's false as it won't be included
           if (doesNotDifferFromAppliedValue) {
-            return false;
+            return null;
           } else {
             // otherwise it really depends
-            return !p.valid;
+            return {
+              includeId: null,
+              propertyId: p.propertyId,
+              isInvalid: !p.valid,
+            };
           }
         } else {
           // otherwise if there's no applied value we consider
           // the applied value to be null
           const doesNotDifferFromAppliedValue = p.value === null;
           if (doesNotDifferFromAppliedValue) {
-            return false;
+            return null;
           } else {
-            return !p.valid;
+            return {
+              includeId: null,
+              propertyId: p.propertyId,
+              isInvalid: !p.valid,
+            };
           }
         }
       }
-      return !p.valid;
-    });
+      return {
+        includeId: null,
+        propertyId: p.propertyId,
+        isInvalid: !p.valid,
+      };
+    }).filter((v) => !!v);
 
-    // now we check the next only is it's not already invalid
-    if (!isInvalid) {
-      // and we do this time the same but with the includes
-      isInvalid = this.state.itemDefinitionState.includes.some((i) => {
-        // same using the variable for only include, same check as before
-        if (options && options.onlyIncludeIncludes && !options.onlyIncludeIncludes.includes(i.includeId)) {
-          return false;
+    const itemPropertiesIncluded: IPokeElementType[] = [];
+
+    this.state.itemDefinitionState.includes.forEach((i) => {
+      // same using the variable for only include, same check as before
+      if (options && options.onlyIncludeIncludes && !options.onlyIncludeIncludes.includes(i.includeId)) {
+        return;
+      }
+
+      // and now we get the sinking property ids
+      const include = this.props.itemDefinitionInstance.getIncludeFor(i.includeId);
+      const sinkingPropertyIds = include.getSinkingPropertiesIds();
+
+      // and we extract the state only if it's a sinking property
+      return i.itemDefinitionState.properties.some((p) => {
+        if (!sinkingPropertyIds.includes(p.propertyId)) {
+          return;
         }
-
-        // and now we get the sinking property ids
-        const include = this.props.itemDefinitionInstance.getIncludeFor(i.includeId);
-        const sinkingPropertyIds = include.getSinkingPropertiesIds();
-
-        // and we extract the state only if it's a sinking property
-        return i.itemDefinitionState.properties.some((p) => {
-          if (!sinkingPropertyIds.includes(p.propertyId)) {
-            return false;
-          }
-          // now we check if we have the option to only include those that differ
-          // from the applied value
-          if (options && options.onlyIncludeIfDiffersFromAppliedValue) {
-            // we get the current applied value, if any
-            const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
-            // if there is an applied value for that property
-            if (currentAppliedValue && currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()]) {
-              const includeAppliedValue = currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()];
-              if (typeof includeAppliedValue[p.propertyId] !== "undefined") {
-                // let's check if it's differ from what we have in the state
-                const doesNotDifferFromAppliedValue = equals(
-                  includeAppliedValue[p.propertyId],
-                  p.value,
-                );
-                // if it does not differ, then it's false, as it won't be included
-                if (doesNotDifferFromAppliedValue) {
-                  return false;
-                } else {
-                  // otherwise it will be included so check
-                  return !p.valid;
-                }
-              } else {
-                // we do not check if not specific include value
-                return false;
+        // now we check if we have the option to only include those that differ
+        // from the applied value
+        if (options && options.onlyIncludeIfDiffersFromAppliedValue) {
+          // we get the current applied value, if any
+          const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
+          let considerItNull: boolean = false;
+          // if there is an applied value for that property
+          if (currentAppliedValue && currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()]) {
+            const includeAppliedValue = currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()];
+            if (typeof includeAppliedValue[p.propertyId] !== "undefined") {
+              // let's check if it's differ from what we have in the state
+              const doesNotDifferFromAppliedValue = equals(
+                includeAppliedValue[p.propertyId],
+                p.value,
+              );
+              // so if it does differ from applied value
+              if (!doesNotDifferFromAppliedValue) {
+                itemPropertiesIncluded.push({
+                  includeId: i.includeId,
+                  propertyId: p.propertyId,
+                  isInvalid: !p.valid,
+                });
               }
             } else {
-              // we do not check if no whole applied value
-              return false;
+              considerItNull = true;
+            }
+          } else {
+            considerItNull = true;
+          }
+
+          if (considerItNull) {
+            // otherwise if there's no applied value we consider
+            // the applied value to be null
+            const doesNotDifferFromAppliedValue = p.value === null;
+            // so if it does differ from applied value
+            if (!doesNotDifferFromAppliedValue) {
+              itemPropertiesIncluded.push({
+                includeId: i.includeId,
+                propertyId: p.propertyId,
+                isInvalid: !p.valid,
+              });
             }
           }
-          return !p.valid;
-        });
+        } else {
+          itemPropertiesIncluded.push({
+            includeId: i.includeId,
+            propertyId: p.propertyId,
+            isInvalid: !p.valid,
+          });
+        }
       });
-    }
+    });
 
-    return isInvalid;
+    const propertiesToPoke = mainPropertiesIncluded.concat(itemPropertiesIncluded);
+
+    return {
+      propertiesToPoke,
+      isInvalid: propertiesToPoke.some((ptp) => ptp.isInvalid),
+    };
   }
 
   // this is a beast of a function
@@ -1225,7 +1352,14 @@ export class ActualItemDefinitionProvider extends
 
     // now that we have done all that we are going to cache our merged
     // results
-    if (!error && CacheWorkerInstance.isSupported) {
+    if (
+      !error &&
+      CacheWorkerInstance.isSupported &&
+      (
+        !this.props.optimize ||
+        !this.props.optimize.avoidLongTermCaching
+      )
+    ) {
       // in the case of delete, we just cache nulls also
       // the same applies in the case of get and a not found
       // was the output
@@ -1387,11 +1521,9 @@ export class ActualItemDefinitionProvider extends
 
     if (isInvalid) {
       // if it's not poked already, let's poke it
-      if (!this.state.poked) {
-        this.setState({
-          poked: true,
-        });
-      }
+      this.setState({
+        pokePoliciesType: "delete",
+      });
       return this.giveEmulatedInvalidError("deleteError", false, false);
     }
 
@@ -1418,7 +1550,7 @@ export class ActualItemDefinitionProvider extends
         deleteError: error,
         deleting: false,
         deleted: false,
-        poked: true,
+        pokePoliciesType: "delete",
       });
     } else {
       this.props.itemDefinitionInstance.cleanValueFor(this.props.forId);
@@ -1427,8 +1559,14 @@ export class ActualItemDefinitionProvider extends
         deleting: false,
         deleted: true,
         notFound: true,
-        poked: true,
+        pokePoliciesType: options.unpokeAfterSuccess ? null : "delete",
       });
+      if (options.policiesToCleanOnSuccess) {
+        options.policiesToCleanOnSuccess.forEach((policyArray) => {
+          this.props.itemDefinitionInstance
+            .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId);
+        });
+      }
       this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId);
     }
 
@@ -1442,16 +1580,15 @@ export class ActualItemDefinitionProvider extends
       return null;
     }
 
-    let isInvalid = this.checkItemDefinitionStateValidity(options);
+    const {isInvalid, propertiesToPoke} = this.checkItemDefinitionStateValidity(options);
 
     // if it's invalid let's return the emulated error
     if (isInvalid) {
       // if it's not poked already, let's poke it
-      if (!this.state.poked) {
-        this.setState({
-          poked: true,
-        });
-      }
+      this.setState({
+        pokedElements: propertiesToPoke,
+        pokePoliciesType: this.props.forId ? "edit" : null,
+      });
       return this.giveEmulatedInvalidError("submitError", true, false) as IActionResponseWithId;
     }
 
@@ -1480,6 +1617,7 @@ export class ActualItemDefinitionProvider extends
     // super hack in order to get the applying policy args
     let applyingPolicyArgs: any = {};
     let applyingPolicies: PolicyPathType[] = [];
+    let isInvalidByPolicy = false;
     // first we only need to run this if it's not invalid, otherwise the values
     // are never really used for the policy state, also this is only useful for
     // edits
@@ -1491,7 +1629,7 @@ export class ActualItemDefinitionProvider extends
         argumentsForQuery,
       );
       applyingPolicyArgs = checkPoliciesResult.applyingPolicyArgs;
-      isInvalid = checkPoliciesResult.isInvalid;
+      isInvalidByPolicy = checkPoliciesResult.isInvalid;
       applyingPolicies = checkPoliciesResult.applyingPolicies;
     }
 
@@ -1502,13 +1640,11 @@ export class ActualItemDefinitionProvider extends
     }
 
     // if it's invalid we give the simulated error yet again
-    if (isInvalid) {
+    if (isInvalidByPolicy) {
       // if it's not poked already, let's poke it
-      if (!this.state.poked) {
-        this.setState({
-          poked: true,
-        });
-      }
+      this.setState({
+        pokePoliciesType: "edit",
+      });
       return this.giveEmulatedInvalidError("submitError", true, false) as IActionResponseWithId;
     }
 
@@ -1540,14 +1676,18 @@ export class ActualItemDefinitionProvider extends
         submitError: error,
         submitting: false,
         submitted: false,
-        poked: true,
+        pokedElements: propertiesToPoke,
+        pokePoliciesType: this.props.forId ? "edit" : null,
       });
     } else if (value) {
       this.setState({
         submitError: null,
         submitting: false,
         submitted: true,
-        poked: !options.unpokeAfterSuccess,
+        pokedElements: options.unpokeAfterSuccess ? [] : propertiesToPoke,
+        pokePoliciesType: options.unpokeAfterSuccess ? null : (
+          this.props.forId ? "edit" : null
+        ),
       });
 
       recievedId = value.id;
@@ -1585,13 +1725,12 @@ export class ActualItemDefinitionProvider extends
     if (this.state.searching) {
       return null;
     }
-    const isInvalid = this.checkItemDefinitionStateValidity();
+    const {isInvalid, propertiesToPoke} = this.checkItemDefinitionStateValidity();
 
-    if (!this.state.poked) {
-      this.setState({
-        poked: true,
-      });
-    }
+    this.setState({
+      pokedElements: propertiesToPoke,
+      pokePoliciesType: null,
+    });
 
     // if it's invalid let's return the emulated error
     if (isInvalid) {
@@ -1652,7 +1791,8 @@ export class ActualItemDefinitionProvider extends
         searchResults,
         searchId: uuid.v4(),
         searchOwner: options.createdBy || null,
-        poked: true,
+        pokedElements: propertiesToPoke,
+        pokePoliciesType: null,
       });
     } else {
       this.setState({
@@ -1661,7 +1801,8 @@ export class ActualItemDefinitionProvider extends
         searchResults: value ? value.ids : [],
         searchId: uuid.v4(),
         searchOwner: options.createdBy || null,
-        poked: true,
+        pokedElements: options.unpokeAfterSuccess ? [] : propertiesToPoke,
+        pokePoliciesType: null,
       });
     }
 
@@ -1750,7 +1891,8 @@ export class ActualItemDefinitionProvider extends
   }
   public unpoke() {
     this.setState({
-      poked: false,
+      pokePoliciesType: null,
+      pokedElements: [],
     });
   }
   public render() {
@@ -1779,7 +1921,8 @@ export class ActualItemDefinitionProvider extends
           searchResults: this.state.searchResults,
           searchId: this.state.searchId,
           searchOwner: this.state.searchOwner,
-          poked: this.state.poked,
+          pokedElements: this.state.pokedElements,
+          pokePoliciesType: this.state.pokePoliciesType,
           submit: this.submit,
           reload: this.loadValue,
           delete: this.delete,
