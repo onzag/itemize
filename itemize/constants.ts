@@ -40,6 +40,7 @@ export const MAX_FILE_TOTAL_BATCH_COUNT = MAX_FILE_BATCH_COUNT * 10; // how many
 // in a single request, this is more of a security concern
 export const MAX_FIELD_SIZE = 1000000; // equivalent to 1MB, another just a security concern, this
 // is the size of the graphql query, 1MB should be way more than enough for a graphql query
+export const MAX_SEARCH_RESULTS_AT_ONCE_LIMIT = 50; // how many search results can be retrieved at once
 export const FILE_SUPPORTED_IMAGE_TYPES = [
   "image/png",
   "image/jpeg",
@@ -348,7 +349,6 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
     type: "text[]",
   },
 };
-export const MAX_SQL_LIMIT = 25;
 export const CONNECTOR_SQL_COLUMN_FK_NAME = "MODULE_ID";
 export const PREFIX_BUILD = (s: string) => s + "_";
 export const SUFFIX_BUILD = (s: string) => "_" + s;
@@ -408,6 +408,9 @@ export const ID_CONTAINER_GQL = new GraphQLObjectType({
   fields: {
     ids: {
       type: GraphQLList(GraphQLNonNull(ID_ELEMENT_GQL)),
+    },
+    last_record: {
+      type: GraphQLInt,
     },
   },
 });

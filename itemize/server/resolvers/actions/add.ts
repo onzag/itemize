@@ -11,7 +11,7 @@ import {
   validateTokenIsntBlocked,
   checkUserExists,
 } from "../basic";
-import graphqlFields = require("graphql-fields");
+import graphqlFields from "graphql-fields";
 import { CONNECTOR_SQL_COLUMN_FK_NAME, INCLUDE_PREFIX,
   UNSPECIFIED_OWNER } from "../../../constants";
 import {

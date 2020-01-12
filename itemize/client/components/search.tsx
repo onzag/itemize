@@ -1,12 +1,12 @@
 import React from "react";
-import { ISearchResult, ItemDefinitionContext, SearchItemDefinitionValueContext } from "../providers/item-definition";
+import { ItemDefinitionContext, SearchItemDefinitionValueContext } from "../providers/item-definition";
 import equals from "deep-equal";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { getFieldsAndArgs } from "../../util";
 import { UNSPECIFIED_OWNER, PREFIX_GET_LIST, PREFIX_GET } from "../../constants";
 import CacheWorkerInstance from "../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
-import { buildGqlQuery, gqlQuery } from "../../gql-querier";
+import { buildGqlQuery, gqlQuery, ISearchResult } from "../../gql-querier";
 import { LocaleContext, ILocaleContextType } from "../internal/app";
 import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
 import { GraphQLEndpointErrorType } from "../../base/errors";
@@ -31,7 +31,7 @@ interface ISearchResultWithPopulateData extends ISearchResult {
 }
 
 interface ISearchLoaderArg {
-  searchResults: ISearchResultWithPopulateData[]; // implement it here rather
+  searchResults: ISearchResultWithPopulateData[];
   pageCount: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
@@ -44,8 +44,6 @@ interface ISearchLoaderProps {
   pageSize: number;
   currentPage: number;
   children: (arg: ISearchLoaderArg) => any;
-  requestedProperties: string[];
-  requestedIncludes?: string[];
   excludePolicies?: boolean;
   cleanOnDismount?: boolean;
   staticResults?: boolean;
@@ -62,6 +60,9 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   remoteListener: RemoteListener;
   searchId: string;
   searchOwner: number;
+  searchFields: any;
+  searchRequestedProperties: string[];
+  searchRequestedIncludes: string[];
 }
 
 interface IActualSearchLoaderState {
@@ -93,6 +94,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       this.props.pageSize * this.props.currentPage,
       this.props.pageSize * (this.props.currentPage + 1),
     );
+    // it might seem odd but we only really update
+    // the values if we recieve a different search id
+    // for efficiency reasons any change in any parameter of the search
+    // results in a different search id
     if (
       prevProps.searchId !== this.props.searchId ||
       !equals(this.state.currentSearchResults, currentSearchResults)
@@ -119,23 +124,11 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
 
-    const searchFieldsAndArgs = getFieldsAndArgs({
-      includeArgs: false,
-      includeFields: true,
-      onlyIncludeProperties: this.props.requestedProperties,
-      onlyIncludeIncludes: this.props.requestedIncludes || [],
-      appliedOwner: this.props.searchOwner || UNSPECIFIED_OWNER,
-      userId: this.props.tokenData.id,
-      userRole: this.props.tokenData.role,
-      itemDefinitionInstance: standardCounterpart,
-      forId: null,
-    });
-    const searchFields: any = searchFieldsAndArgs.requestFields;
     this.setState({
       error: null,
       currentlySearching: currentSearchResults,
       currentSearchResults,
-      searchFields,
+      searchFields: this.props.searchFields,
     });
 
     const queryBase = (standardCounterpart.isExtensionsInstance() ?
@@ -152,7 +145,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchResult.id);
       if (
         appliedGQLValue &&
-        requestFieldsAreContained(searchFields, appliedGQLValue.requestFields)
+        requestFieldsAreContained(this.props.searchFields, appliedGQLValue.requestFields)
       ) {
         return null;
       }
@@ -164,7 +157,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         const cachedResult = await CacheWorkerInstance.instance.getCachedValue(
           PREFIX_GET + itemDefintionInQuestion.getQualifiedPathName(),
           searchResult.id,
-          searchFields,
+          this.props.searchFields,
         );
         if (!cachedResult) {
           uncachedResults.push(searchResult);
@@ -223,7 +216,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         name: getListQueryName,
         args,
         fields: {
-          results: searchFields,
+          results: this.props.searchFields,
         },
       });
       const gqlValue = await gqlQuery(
@@ -270,7 +263,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             itemDefintionInQuestion.cleanValueFor(forId);
             itemDefintionInQuestion.triggerListeners("change", forId);
           } else {
-            let mergedQueryFields = searchFields;
+            let mergedQueryFields = this.props.searchFields;
             const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(value.id);
             if (
               appliedGQLValue &&
@@ -282,7 +275,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                 appliedGQLValue.rawValue,
               );
               mergedQueryFields = deepMerge(
-                searchFields,
+                this.props.searchFields,
                 appliedGQLValue.requestFields,
               );
             }
@@ -326,6 +319,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       nextProps.tokenData.id !== this.props.tokenData.id ||
       nextProps.tokenData.role !== this.props.tokenData.role ||
       nextProps.localeData !== this.props.localeData ||
+      // note here as well, we only really do reprocess the search and the
+      // arguments of the search if we receive a different search id
       nextProps.searchId !== this.props.searchId ||
       !equals(this.state, nextState);
   }
@@ -351,8 +346,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                   forId: searchResult.id,
                   itemDefinition: searchResult.type,
                   optimize: {
-                    onlyIncludeProperties: this.props.requestedProperties,
-                    onlyIncludeIncludes: this.props.requestedIncludes,
+                    onlyIncludeProperties: this.props.searchRequestedProperties,
+                    onlyIncludeIncludes: this.props.searchRequestedIncludes,
                     excludePolicies: this.props.excludePolicies,
                     cleanOnDismount: this.props.cleanOnDismount,
                     static: this.props.staticResults,
@@ -392,6 +387,9 @@ export function SearchLoader(props: ISearchLoaderProps) {
                       remoteListener={itemDefinitionContext.remoteListener}
                       searchId={itemDefinitionContext.searchId}
                       searchOwner={itemDefinitionContext.searchOwner}
+                      searchRequestedIncludes={itemDefinitionContext.searchRequestedIncludes}
+                      searchRequestedProperties={itemDefinitionContext.searchRequestedProperties}
+                      searchFields={itemDefinitionContext.searchFields}
                       tokenData={tokenData}
                       localeData={localeData}
                     />
@@ -415,8 +413,6 @@ interface IPagedSearchLoaderArg extends ISearchLoaderArg {
 
 interface IPagedSearchLoaderProps {
   pageSize: number;
-  requestedProperties: string[];
-  requestedIncludes?: string[];
   children: (arg: IPagedSearchLoaderArg) => any;
 }
 
@@ -454,17 +450,13 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps, 
   public shouldComponentUpdate(nextProps: IPagedSearchLoaderProps, nextState: IPagedSearchLoaderState) {
     return !equals(this.state, nextState) ||
       nextProps.pageSize !== this.props.pageSize ||
-      nextProps.children !== this.props.children ||
-      !equals(this.props.requestedIncludes, nextProps.requestedIncludes) ||
-      !equals(this.props.requestedProperties, nextProps.requestedProperties);
+      nextProps.children !== this.props.children;
   }
   public render() {
     return (
       <SearchLoader
         pageSize={this.props.pageSize}
         currentPage={this.state.currentPage}
-        requestedProperties={this.props.requestedProperties}
-        requestedIncludes={this.props.requestedIncludes}
       >
         {(arg) => {
           return this.props.children({

@@ -107,7 +107,13 @@ export function SensorsTemperatureIndex() {
           <ItemDefinitionProvider
             itemDefinition="temperature"
             searchCounterpart={true}
-            automaticSearch={{createdBy: userId}}
+            automaticSearch={
+              {
+                createdBy: userId,
+                requestedProperties: ["name", "temperature"],
+                cachePolicy: "by-owner",
+              }
+            }
           >
             <I18nRead id="search">
               {(value) => (
@@ -125,7 +131,11 @@ export function SensorsTemperatureIndex() {
                 <Button
                   color="primary"
                   variant="contained"
-                  onClick={actioner.search.bind(null, { createdBy: userId })}
+                  onClick={actioner.search.bind(null, {
+                    createdBy: userId,
+                    requestedProperties: ["name", "temperature"],
+                    cachePolicy: "by-owner",
+                  })}
                 >
                   <I18nRead id="search" />
                 </Button>
@@ -138,7 +148,7 @@ export function SensorsTemperatureIndex() {
               </React.Fragment>
             )}</SearchActioner>
 
-            <PagedSearchLoader pageSize={PAGE_SIZE} requestedProperties={["name", "temperature"]}>
+            <PagedSearchLoader pageSize={PAGE_SIZE}>
               {(loader) => (
                 <React.Fragment>
                   <ul>{

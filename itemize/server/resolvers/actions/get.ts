@@ -13,7 +13,7 @@ import {
   runPolicyCheck,
   checkReadPoliciesAllowThisUserToSearch,
 } from "../basic";
-import graphqlFields = require("graphql-fields");
+import graphqlFields from "graphql-fields";
 import {
   INCLUDE_PREFIX,
   UNSPECIFIED_OWNER,

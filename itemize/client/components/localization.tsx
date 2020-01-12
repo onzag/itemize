@@ -136,6 +136,7 @@ export function I18nRead(props: II18nReadProps) {
   );
 }
 
+const isDevelopment = process.env.NODE_ENV === "development";
 interface II18nReadErrorProps {
   error: GraphQLEndpointErrorType;
 }
@@ -148,6 +149,9 @@ export function I18nReadError(props: II18nReadErrorProps) {
       {
         (localeData) => {
           const freeError = props.error as any;
+          if (isDevelopment) {
+            console.warn(freeError.message);
+          }
           if (!freeError.modulePath) {
             const errorMessage: string = localeData.i18n[localeData.language].error[props.error.code];
             return errorMessage;

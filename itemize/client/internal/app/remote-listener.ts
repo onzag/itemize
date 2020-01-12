@@ -119,9 +119,17 @@ export class RemoteListener {
       );
     }
   }
-  public requestFeedbackFor(itemDefinition: ItemDefinition, forId: number) {
-    if (
-      this.delayedFeedbacks.every((df) => df.itemDefinition !== itemDefinition && df.forId !== forId)
+  public requestFeedbackFor(itemDefinition: ItemDefinition, forId: number, immediate?: boolean) {
+    if (immediate) {
+      if (this.socket.connected) {
+        this.socket.emit(
+          "feedback",
+          itemDefinition.getQualifiedPathName(),
+          forId,
+        );
+      }
+    } else if (
+      this.delayedFeedbacks.every((df) => df.itemDefinition !== itemDefinition || df.forId !== forId)
     ) {
       this.delayedFeedbacks.push({
         forId,
@@ -198,11 +206,13 @@ export class RemoteListener {
   private consumeDelayedFeedbacks(forAnSpecificId?: number) {
     this.delayedFeedbacks = this.delayedFeedbacks.filter((df) => {
       if (!forAnSpecificId || forAnSpecificId === df.forId) {
-        this.socket.emit(
-          "feedback",
-          df.itemDefinition.getQualifiedPathName(),
-          df.forId,
-        );
+        if (this.socket.connected) {
+          this.socket.emit(
+            "feedback",
+            df.itemDefinition.getQualifiedPathName(),
+            df.forId,
+          );
+        }
 
         return false;
       }
@@ -223,19 +233,14 @@ export class RemoteListener {
       const itemDefinition = this.listeners[listenerKey].itemDefinition;
       const forId = this.listeners[listenerKey].id;
       this.attachItemDefinitionListenerFor(itemDefinition, forId);
-      if (
-        this.isReconnect &&
-        this.delayedFeedbacks.every((df) => df.itemDefinition !== itemDefinition && df.forId !== forId)
-      ) {
-        this.requestFeedbackFor(itemDefinition, forId);
+      if (this.isReconnect) {
+        this.requestFeedbackFor(itemDefinition, forId, true);
       }
     });
 
     if (this.isReconnect) {
       this.connectionListeners.forEach((l) => l());
     }
-
-    this.consumeDelayedFeedbacks();
 
     this.isReconnect = true;
     console.log("reattach listenrs asked");

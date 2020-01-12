@@ -3,6 +3,17 @@ import { Stream } from "stream";
 import FormDataNode from "form-data";
 import fetchNode from "node-fetch";
 
+/**
+ * Search results as they are provided
+ * by the search function, they are based
+ * on the ID_CONTAINER in the graphql types
+ * that graphql returns
+ */
+export interface ISearchResult {
+  type: string;
+  id: number;
+}
+
 export class GQLQuery {
   private processedQueries: IGQLQueryObj[];
   private type: "query" | "mutation";
@@ -76,6 +87,18 @@ export class GQLQuery {
       return arg;
     }
 
+    if (arg.__type__ === "GQLEnum") {
+      return new GQLEnum(arg.value);
+    }
+
+    if (arg.__type__ === "GQLVar") {
+      return new GQLVar(arg.value);
+    }
+
+    if (arg.__type__ === "GQLRaw") {
+      return new GQLRaw(arg.value);
+    }
+
     if (Array.isArray(arg)) {
       return arg.map(this.findFilesAndProcessArgs);
     }
@@ -99,25 +122,31 @@ export interface IGQLQueryObj {
   };
 }
 
-export class GQLEnum {
-  public value: string;
-  constructor(value: string) {
-    this.value = value;
-  }
-}
-
+// The __type__ allows for serialization of args
+// this might happen during RPC events
 export class GQLRaw {
   public value: string;
+  // tslint:disable-next-line: variable-name
+  public __type__: string = "GQLRaw";
   constructor(value: string) {
     this.value = value;
+  }
+  public toJSON() {
+    return {
+      __type__: this.__type__,
+      value: this.value,
+    };
   }
 }
 
-export class GQLVar {
-  public value: string;
-  constructor(value: string) {
-    this.value = value;
-  }
+export class GQLEnum extends GQLRaw {
+  // tslint:disable-next-line: variable-name
+  public __type__: string = "GQLEnum";
+}
+
+export class GQLVar extends GQLRaw {
+  // tslint:disable-next-line: variable-name
+  public __type__: string = "GQLVar";
 }
 
 function buildFields(fields: {

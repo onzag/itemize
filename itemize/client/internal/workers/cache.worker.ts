@@ -2,27 +2,39 @@ import "babel-polyfill";
 import { expose } from "comlink";
 import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { requestFieldsAreContained, deepMerge } from "../../../gql-util";
+import { IGQLQueryObj, ISearchResult, buildGqlQuery, gqlQuery } from "../../../gql-querier";
+import { MAX_SEARCH_RESULTS_AT_ONCE_LIMIT, PREFIX_GET } from "../../../constants";
+import CacheWorkerInstance from "./cache";
+import { GraphQLEndpointErrorType } from "../../../base/errors";
 
 export interface ICacheMatchType {
   value: any;
   fields: any;
-  expires: Date;
+}
+
+export interface ISearchMatchType {
+  fields: any;
+  value: ISearchResult[];
+  allResultsPreloaded: boolean;
+  lastRecord: number;
 }
 
 interface ICacheDB extends DBSchema {
   queries: {
     key: string;
     value: ICacheMatchType;
-    indexes: { expires: Date };
+  };
+  searches: {
+    key: string;
+    value: ISearchMatchType;
   };
 }
 
 // Name of the cache in the indexed db database
 const CACHE_NAME = "ITEMIZE_CACHE";
 // Name of the table
-const TABLE_NAME = "queries";
-// For how long the cache persists before being removed
-const UNUSED_CACHE_DURATION_IN_DAYS = 7;
+const QUERIES_TABLE_NAME = "queries";
+const SEARCHES_TABLE_NAME = "searches";
 
 /**
  * This class represents a worker that works under the hood
@@ -65,13 +77,14 @@ export default class CacheWorker {
         try {
           console.log("CLEARING CACHE DUE TO UPGRADE");
           try {
-            db.deleteObjectStore(TABLE_NAME);
+            db.deleteObjectStore(QUERIES_TABLE_NAME);
+            db.deleteObjectStore(SEARCHES_TABLE_NAME);
           } catch (err) {
             // No way to know if the store is there
             // so must catch the error
           }
-          const queriesStore = db.createObjectStore(TABLE_NAME);
-          queriesStore.createIndex("expires", "timestamp");
+          db.createObjectStore(QUERIES_TABLE_NAME);
+          db.createObjectStore(SEARCHES_TABLE_NAME);
         } catch (err) {
           console.warn(err);
         }
@@ -79,29 +92,6 @@ export default class CacheWorker {
     });
 
     console.log("CACHE SETUP", version);
-
-    // and we request to clean any old data
-    this.cleanUpOldRecords();
-  }
-
-  /**
-   * This was shamessly stolen from an idea from stack overflow
-   * in order to be able to remove old records from a database
-   * as we don't want our cache to linger on forever
-   */
-  public async cleanUpOldRecords() {
-    // https://stackoverflow.com/questions/35511033/how-to-apply-expiry-times-to-keys-in-html5-indexeddb/35518068
-    const db = await this.dbPromise;
-    if (!db) {
-      return;
-    }
-    const tx = db.transaction(TABLE_NAME, "readwrite");
-    const range = IDBKeyRange.upperBound(new Date());
-    let cursor = await tx.objectStore(TABLE_NAME).index("expires").openCursor(range);
-    while (cursor) {
-      await cursor.delete();
-      cursor = await cursor.continue();
-    }
   }
 
   /**
@@ -121,7 +111,7 @@ export default class CacheWorker {
     partialValue: any,
     partialFields: any,
     touchOrMerge?: boolean,
-  ) {
+  ): Promise<boolean> {
     if (!touchOrMerge) {
       console.log("REQUESTED TO STORE", queryName, id, partialValue);
     }
@@ -131,7 +121,7 @@ export default class CacheWorker {
     // if we don't have it
     if (!db) {
       // what gives, we return
-      return;
+      return false;
     }
 
     // otherwise we build the index indentifier, which is simple
@@ -143,18 +133,20 @@ export default class CacheWorker {
       const idbNewValue = {
         value: partialValue,
         fields: partialFields,
-        expires: new Date(Date.now() + (UNUSED_CACHE_DURATION_IN_DAYS * 86400000)),
       };
-      await db.put(TABLE_NAME, idbNewValue, queryIdentifier);
+      await db.put(QUERIES_TABLE_NAME, idbNewValue, queryIdentifier);
     } catch (err) {
       console.warn(err);
+      return false;
     }
+
+    return true;
   }
 
   public async deleteCachedValue(
     queryName: string,
     id: number,
-  ) {
+  ): Promise<boolean> {
     console.log("REQUESTED TO DELETE", queryName, id);
 
     // so first we await for our database
@@ -162,16 +154,19 @@ export default class CacheWorker {
     // if we don't have it
     if (!db) {
       // what gives, we return
-      return;
+      return false;
     }
 
     const queryIdentifier = `${queryName}.${id}`;
 
     try {
-      await db.delete(TABLE_NAME, queryIdentifier);
+      await db.delete(QUERIES_TABLE_NAME, queryIdentifier);
     } catch (err) {
       console.warn(err);
+      return false;
     }
+
+    return true;
   }
 
   public async mergeCachedValue(
@@ -179,7 +174,7 @@ export default class CacheWorker {
     id: number,
     partialValue: any,
     partialFields: any,
-  ) {
+  ): Promise<boolean> {
     console.log("REQUESTED TO MERGE", queryName, id, partialValue);
 
     const currentValue = await this.getCachedValue(queryName, id);
@@ -188,7 +183,7 @@ export default class CacheWorker {
       !currentValue.value ||
       partialValue.last_modified !== currentValue.value.last_modified
     ) {
-      await this.setCachedValue(
+      return await this.setCachedValue(
         queryName,
         id,
         partialValue,
@@ -204,7 +199,7 @@ export default class CacheWorker {
         partialValue,
         currentValue.value,
       );
-      await this.setCachedValue(
+      return await this.setCachedValue(
         queryName,
         id,
         mergedValue,
@@ -232,12 +227,11 @@ export default class CacheWorker {
     try {
       db = await this.dbPromise;
     } catch (err) {
-      console.log(err);
+      console.warn(err);
     }
 
     // if we don't have a database no match
     if (!db) {
-      console.log("null");
       return null;
     }
 
@@ -245,17 +239,14 @@ export default class CacheWorker {
     const queryIdentifier = `${queryName}.${id}`;
     try {
       // and we attempt to get the value from the database
-      const idbValue = await db.get(TABLE_NAME, queryIdentifier);
+      const idbValue: ICacheMatchType = await db.get(QUERIES_TABLE_NAME, queryIdentifier);
       // if we found a value, in this case a null value means
       // no match
       if (idbValue) {
         // let's check what kind of value it is, note this value
         // might be null itself (not found, deleted) elements
         // match like that
-        const value = idbValue.value;
         const fields = idbValue.fields;
-
-        this.setCachedValue(queryName, id, value, fields, true);
 
         if (!requestedFields || requestFieldsAreContained(requestedFields, fields)) {
           if (requestedFields) {
@@ -274,6 +265,329 @@ export default class CacheWorker {
     // cache didn't match, returning no match
     // something wrong might have happened as well
     return null;
+  }
+
+  public async runCachedSearch(
+    searchQueryName: string,
+    searchArgs: any,
+    getListQueryName: string,
+    getListTokenArgs: string,
+    getListLangArgs: string,
+    getListRequestedFields: any,
+    cachePolicy: "by-owner" | "by-parent",
+  ) {
+    // so we fetch our db like usual
+    let db: any;
+    try {
+      db = await this.dbPromise;
+    } catch (err) {
+      console.warn(err);
+    }
+
+    if (!db) {
+      return null;
+    }
+
+    let storeKeyName = searchQueryName + "." + cachePolicy.replace("-", "_") + ".";
+    if (cachePolicy === "by-owner") {
+      storeKeyName += searchArgs.created_by;
+    } else {
+      // TODO
+    }
+
+    // firs we build an array for the results that we need to process
+    // this means results that are not loaded in memory or partially loaded
+    // in memory for some reason, say if the last search failed partially
+    let resultsToProcess: ISearchResult[];
+    // this is what the fields end up being, say that there are two different
+    // cached searches with different fields, we need both to be merged
+    // in order to know what we have retrieved, originally it's just what
+    // we were asked for
+    let resultingGetListRequestedFields: any = getListRequestedFields;
+    let lastRecord: number;
+
+    try {
+      // now we request indexed db for a result
+      const dbValue: ISearchMatchType = await db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      // if the database is not offering anything
+      if (!dbValue) {
+        // we request the server for this, in this case
+        // it might not have been able to connect
+        const query = buildGqlQuery({
+          name: searchQueryName,
+          args: searchArgs,
+          fields: {
+            ids: {
+              id: {},
+              type: {},
+            },
+            last_record: {},
+          },
+        });
+
+        // so we get the server value
+        const serverValue = await gqlQuery(query);
+
+        // if we get an error from the server, return the
+        // server value and let it be handled
+        if (serverValue.errors) {
+          // return it
+          return serverValue;
+        }
+
+        // now these are the results that we need to process
+        // from the search query, the ISearchResult that we
+        // need to process
+        resultsToProcess = serverValue.data[searchQueryName].ids;
+        lastRecord = serverValue.data[searchQueryName].last_record;
+      } else {
+        // otherwise our results to process are the same ones we got
+        // from the database, but do we need to process them for real?
+        // it depends
+        resultsToProcess = dbValue.value;
+        lastRecord = dbValue.lastRecord;
+
+        // if the fields are contained within what the database has loaded
+        // and if all the results were preloaded then they don't need to be
+        // preloaded
+        if (
+          requestFieldsAreContained(getListRequestedFields, dbValue.fields) &&
+          dbValue.allResultsPreloaded
+        ) {
+          // now we can actually start using the args to run a local filtering
+          // function
+
+          // TODO run the filters here using the manual strategy (without loading
+          // everything from memory)
+          return {
+            data: {
+              [searchQueryName]: {
+                ids: resultsToProcess,
+                last_record: lastRecord,
+              },
+            },
+          };
+        }
+
+        // the result get list requested fields will actually end up being a merge as
+        // they are needed by both in such a case, but this is only guaranteed to be
+        // the case if in the previous scenario all the results were preloaded, otherwise
+        // it's the same as the query results, think about it, all the subloaded values are
+        // supposed to be guaranteed to contain these fields, but if some of them failed to
+        // load then it's no such guarantee, not a problem nevertheless, if the failed to load
+        // search request loads again, it will be able to reuse what it failed to load
+        // and actually cached
+        resultingGetListRequestedFields = dbValue.allResultsPreloaded ?
+          deepMerge(getListRequestedFields, dbValue.fields) :
+          getListRequestedFields;
+      }
+    } catch (err) {
+      console.warn(err);
+      // we return null if we hit an error
+      // this will trigger a CANT_CONNECT error in
+      // the parent handler
+      return null;
+    }
+
+    // now we set what we have just gotten from the server (or the database)
+    // and assign the value (maybe again) with the results, the fields we are supposed
+    // to have contained within all the fetched batches at the end and say
+    // false to preloaded because we haven't preloaded anything
+    await db.put(SEARCHES_TABLE_NAME, {
+      value: resultsToProcess,
+      fields: resultingGetListRequestedFields,
+      allResultsPreloaded: false,
+      lastRecord,
+    }, storeKeyName);
+
+    // now we first got to extract what is has actually been loaded from those
+    // results to process and actually has managed to make it to the database
+    // this can happens when something fails in between, or it is loaded by another
+    // part of the application
+    const uncachedResultsToProcess: ISearchResult[] = [];
+    const totalResults: Array<{
+      value: any,
+      searchResult: ISearchResult,
+    }> = [];
+    // so now we check all the results we are asked to process
+    await Promise.all(resultsToProcess.map(async (resultToProcess) => {
+      // and get the cached results, considering the fields
+      // we are asked to request
+      const cachedResult = await this.getCachedValue(
+        PREFIX_GET + resultToProcess.type,
+        resultToProcess.id,
+        getListRequestedFields,
+      );
+      // if there is no cached results
+      if (!cachedResult) {
+        // then we add it to the uncached list we need to process
+        uncachedResultsToProcess.push(resultToProcess);
+      } else {
+        // otherwise add it to the list of total results
+        totalResults.push({
+          value: cachedResult.value,
+          searchResult: resultToProcess,
+        });
+      }
+    }));
+
+    // now it's time to preload, there's a limit on how big the batches can be on the server side
+    // so we have to limit our batches size
+    const batches: ISearchResult[][] = [[]];
+    let lastBatchIndex = 0;
+    // for that we run a each event in all our uncached results
+    uncachedResultsToProcess.forEach((uncachedResultToProcess) => {
+      // and when we hit the limit, we build a new batch
+      if (batches[lastBatchIndex].length === MAX_SEARCH_RESULTS_AT_ONCE_LIMIT) {
+        batches.push([]);
+        lastBatchIndex++;
+      }
+
+      // add this to the batch
+      batches[lastBatchIndex].push(uncachedResultToProcess);
+    });
+
+    // now we need to load all those batches into graphql queries
+    const processedBatches = await Promise.all(batches.map(async (batch) => {
+      const args: any = {
+        token: getListTokenArgs,
+        language: getListLangArgs,
+        ids: batch,
+      };
+      if (searchArgs.created_by) {
+        args.created_by = searchArgs.created_by;
+      }
+      // we build the query, using the get list functionality
+      const listQuery = buildGqlQuery({
+        name: getListQueryName,
+        args,
+        fields: {
+          results: getListRequestedFields,
+        },
+      });
+      // and execute it
+      const gqlValue = await gqlQuery(
+        listQuery,
+      );
+
+      // return the value, whatever it is, null, error, etc..
+      return {gqlValue, batch};
+    }));
+
+    // we will assume one error, whatever we pick at last, to be
+    // the global error and consider everything to be failed even if
+    // just one of them fails, however, we do in fact want still to cache
+    // whatever it is sucesful, so we don't have to retrieve it again
+    // in a second round
+    let somethingFailed = false;
+    let error: GraphQLEndpointErrorType;
+
+    // now we call every processed batch
+    await Promise.all(processedBatches.map(async (processedBatch) => {
+      const originalBatch = processedBatch.batch;
+      const resultingValue = processedBatch.gqlValue;
+      // the resulting value is what gql gave us
+      if (!resultingValue) {
+        // if it's null something has failed, the connection most likely
+        somethingFailed = true;
+      } else if (resultingValue.errors) {
+        // if there's an error, we use that error as the error
+        somethingFailed = true;
+        error = resultingValue.errors[0].extensions;
+      } else if (
+        !resultingValue.data ||
+        !resultingValue.data[getListQueryName] ||
+        !resultingValue.data[getListQueryName].results
+      ) {
+        somethingFailed = true;
+        error = {
+          code: "UNSPECIFIED",
+          message: "There was no data in the resulting value, despite no errors",
+        };
+      } else {
+        // otherwise now we need to set all that in memory right now
+        // and so we will don
+        await Promise.all(resultingValue.data[getListQueryName].results.map(async (value, index) => {
+          const originalBatchRequest = originalBatch[index];
+          totalResults.push({
+            value,
+            searchResult: originalBatchRequest,
+          });
+          let suceedStoring: boolean;
+          if (value === null) {
+            // if the item was deleted, somehow, like it's so unlikely but
+            // still possible, say run a search search fails somehow, and then
+            // later when executed the item is gone, then we mark it as deleted
+            suceedStoring = await this.setCachedValue(
+              PREFIX_GET + originalBatchRequest.type,
+              originalBatchRequest.id,
+              value,
+              null,
+            );
+          } else {
+            // otherwise we do push the value and merge the cache
+            // notice how we consider this an actual resulting value, whereas
+            // we would not even use the deleted as a search result
+            suceedStoring = await this.mergeCachedValue(
+              PREFIX_GET + originalBatchRequest.type,
+              originalBatchRequest.id,
+              value,
+              getListRequestedFields,
+            );
+          }
+
+          // if it didn't succeed strong the value
+          // from the cache then we consider the whole combo
+          // failed, even it's just one
+          if (!suceedStoring) {
+            somethingFailed = true;
+            error = {
+              code: "UNSPECIFIED",
+              message: "Failed to store the cached value",
+            };
+          }
+        }));
+      }
+    }));
+
+    // if something has not failed then we are good to go
+    if (!somethingFailed) {
+      // we mark everything as cached, it has succeed caching
+      // everything!
+      await db.put(SEARCHES_TABLE_NAME, {
+        value: resultsToProcess,
+        fields: resultingGetListRequestedFields,
+        allResultsPreloaded: true,
+        lastRecord,
+      }, storeKeyName);
+
+      // Now we need to filter the search results in order to return what is
+      // appropiate
+
+      // TODO run the search, locally with the data in memory in totalResults
+      return {
+        data: {
+          [searchQueryName]: {
+            ids: resultsToProcess,
+          },
+        },
+      };
+    } else if (error) {
+      // if we managed to catch an error, we pretend
+      // to be graphql
+      return {
+        [searchQueryName]: null,
+        errors: [
+          {
+            extensions: error,
+          },
+        ],
+      };
+    } else {
+      // otherwise it must have been some sort
+      // of connection failure (or database error)
+      return null;
+    }
   }
 }
 

@@ -108,8 +108,9 @@ export async function searchModule(
 
   // return using the base result, and only using the id
   const baseResult: ISearchResultIdentifierType[] = await searchQuery;
-  const finalResult = {
+  const finalResult: any = {
     ids: baseResult,
+    last_record: baseResult.length ? Math.max.apply(null, baseResult.map((r) => r.id)) : null,
   };
 
   searchModuleDebug("SUCCEED with %j", finalResult);
@@ -243,6 +244,7 @@ export async function searchItemDefinition(
   const baseResult: ISQLTableRowValue[] = await searchQuery;
   const finalResult: {
     ids: ISearchResultIdentifierType[];
+    last_record: number;
   } = {
     ids: baseResult.map((row) => {
       return {
@@ -250,6 +252,7 @@ export async function searchItemDefinition(
         type: selfTable,
       };
     }),
+    last_record: baseResult.length ? Math.max.apply(null, baseResult.map((r) => r.id)) : null,
   };
   searchItemDefinitionDebug("SUCCEED with %j", finalResult);
   return finalResult;

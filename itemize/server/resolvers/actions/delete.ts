@@ -9,7 +9,7 @@ import {
   runPolicyCheck,
   validateTokenIsntBlocked,
 } from "../basic";
-import graphqlFields = require("graphql-fields");
+import graphqlFields from "graphql-fields";
 import { GraphQLEndpointError } from "../../../base/errors";
 import { ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS } from "../../../constants";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";

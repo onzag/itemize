@@ -23,7 +23,13 @@ export function SensorsIndex() {
     <UserIdRetriever>
       {(userId) => (
         <ModuleProvider module="test/sensors">
-          <ItemDefinitionProvider searchCounterpart={true} automaticSearch={{ createdBy: userId }}>
+          <ItemDefinitionProvider
+            searchCounterpart={true}
+            automaticSearch={{
+              createdBy: userId,
+              requestedProperties: ["name"],
+            }}
+          >
             <I18nRead id="search">
               {(value) => (
                 <TitleSetter>
@@ -38,7 +44,10 @@ export function SensorsIndex() {
                 <Button
                   color="primary"
                   variant="contained"
-                  onClick={actioner.search.bind(null, { createdBy: userId })}
+                  onClick={actioner.search.bind(null, {
+                    createdBy: userId,
+                    requestedProperties: ["name"],
+                  })}
                 >
                   <I18nRead id="search" />
                 </Button>
@@ -51,7 +60,7 @@ export function SensorsIndex() {
               </React.Fragment>
             )}</SearchActioner>
 
-            <PagedSearchLoader pageSize={PAGE_SIZE} requestedProperties={["name"]}>
+            <PagedSearchLoader pageSize={PAGE_SIZE}>
               {(loader) => (
                 <React.Fragment>
                   <ul>{

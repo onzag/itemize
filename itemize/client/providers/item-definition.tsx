@@ -12,9 +12,10 @@ import {
   PREFIX_DELETE,
   PREFIX_SEARCH,
   UNSPECIFIED_OWNER,
+  PREFIX_GET_LIST,
 } from "../../constants";
 import { buildGqlQuery, buildGqlMutation, gqlQuery,
-  IGQLQueryObj, GQLEnum, GQLQuery } from "../../gql-querier";
+  IGQLQueryObj, GQLEnum, GQLQuery, ISearchResult } from "../../gql-querier";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
 import { GraphQLEndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
@@ -85,22 +86,14 @@ export interface IActionDeleteOptions {
  * The options for searching
  */
 export interface IActionSearchOptions {
+  requestedProperties: string[];
+  requestedIncludes?: string[];
   onlyIncludeSearchPropertiesForProperties?: string[];
   onlyIncludeIncludes?: string[];
   unpokeAfterSuccess?: boolean;
   orderBy?: "DEFAULT";
   createdBy?: number;
-}
-
-/**
- * Search results as they are provided
- * by the search function, they are based
- * on the ID_CONTAINER in the graphql types
- * that graphql returns
- */
-export interface ISearchResult {
-  type: string;
-  id: number;
+  cachePolicy?: "by-owner" | "by-parent" | "none";
 }
 
 export interface IPokeElementType {
@@ -162,6 +155,11 @@ export interface IItemDefinitionContextType {
   searchId: string;
   // a search owner, or null, for the createdBy argument
   searchOwner: number;
+  // the search fields that should be requested according
+  // to the search function
+  searchFields: any;
+  searchRequestedProperties: string[];
+  searchRequestedIncludes: string[];
   // poked is a flag that is raised to mean to ignore
   // anything regarding user set statuses and just mark
   // things as they are, for example, by default many fields
@@ -345,6 +343,9 @@ interface IActualItemDefinitionProviderState {
   searchResults: ISearchResult[];
   searchId: string;
   searchOwner: number;
+  searchRequestedProperties: string[];
+  searchRequestedIncludes: string[];
+  searchFields: any;
   pokedElements: IPokeElementType[];
   pokePoliciesType: string;
   canEdit: boolean;
@@ -472,6 +473,9 @@ export class ActualItemDefinitionProvider extends
       searchResults: [],
       searchId: null,
       searchOwner: null,
+      searchFields: null,
+      searchRequestedIncludes: [],
+      searchRequestedProperties: [],
 
       pokedElements: [],
       pokePoliciesType: null,
@@ -837,15 +841,13 @@ export class ActualItemDefinitionProvider extends
       memoryCached,
       cached,
       getQueryFields,
-    } = await this.runQueryFor(
-      PREFIX_GET,
-      {},
+    } = await this.runQueryFor({
+      queryPrefix: PREFIX_GET,
+      baseArgs: {},
       requestFields,
-      false,
-      !denyCache,
-      null,
-      null,
-    );
+      returnMemoryCachedValuesForGetRequests: false,
+      returnWorkerCachedValuesForGetRequests: !denyCache,
+    });
 
     // this should never happen honestly as we are giving
     // a false flag for return memoryCached value for get requests
@@ -1179,13 +1181,17 @@ export class ActualItemDefinitionProvider extends
   // runs the queries and does the partial caching
   // making use of the partial cache
   public async runQueryFor(
-    queryPrefix: string,
-    baseArgs: any,
-    requestFields: any,
-    returnMemoryCachedValuesForGetRequests: boolean,
-    returnWorkerCachedValuesForGetRequests: boolean,
-    searchOrderBy: string,
-    searchCreatedBy: number,
+    arg: {
+      queryPrefix: string,
+      baseArgs: any,
+      requestFields: any,
+      returnMemoryCachedValuesForGetRequests?: boolean,
+      returnWorkerCachedValuesForGetRequests?: boolean,
+      searchOrderBy?: string,
+      searchCreatedBy?: number,
+      searchCachePolicy?: "by-owner" | "by-parent" | "none",
+      searchRequestedFieldsOnCachePolicy?: any,
+    },
   ): Promise<{
     error: GraphQLEndpointErrorType,
     value: any,
@@ -1202,13 +1208,13 @@ export class ActualItemDefinitionProvider extends
       this.props.itemDefinitionInstance.getQualifiedPathName());
 
     // this is the query we run
-    const queryName = queryPrefix + queryBase;
+    const queryName = arg.queryPrefix + queryBase;
 
     // basic args, the base args usually are for policies and whatnot
     const args = {
       token: this.props.tokenData.token,
       language: this.props.localeData.language.split("-")[0],
-      ...baseArgs,
+      ...arg.baseArgs,
     };
 
     // if there's an id, we add it to the query
@@ -1216,22 +1222,24 @@ export class ActualItemDefinitionProvider extends
       args.id = this.props.forId;
     }
 
-    if (queryPrefix === PREFIX_SEARCH) {
-      args.order_by = new GQLEnum(searchOrderBy);
+    if (arg.queryPrefix === PREFIX_SEARCH) {
+      args.order_by = new GQLEnum(arg.searchOrderBy);
     }
 
-    if (queryPrefix === PREFIX_SEARCH && typeof searchCreatedBy !== "undefined") {
-      args.created_by = searchCreatedBy;
+    if (arg.queryPrefix === PREFIX_SEARCH && typeof arg.searchCreatedBy !== "undefined") {
+      args.created_by = arg.searchCreatedBy;
     }
 
     // now we get the currently applied value in memory
-    const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
+    const appliedGQLValue = arg.queryPrefix !== PREFIX_SEARCH ?
+      this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null) :
+      null;
     // if we have a query to get a value, and we are allowed to return memory cached request
-    if (queryPrefix === PREFIX_GET && returnMemoryCachedValuesForGetRequests) {
+    if (arg.queryPrefix === PREFIX_GET && arg.returnMemoryCachedValuesForGetRequests) {
       // let's check if the memory cached and the requested value match
       if (
         appliedGQLValue &&
-        requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
+        requestFieldsAreContained(arg.requestFields, appliedGQLValue.requestFields)
       ) {
         return {
           error: null,
@@ -1246,14 +1254,14 @@ export class ActualItemDefinitionProvider extends
     // otherwise now let's check for the worker
     if (
       // if we have an id and a GET request we want cached value
-      queryPrefix === PREFIX_GET &&
+      arg.queryPrefix === PREFIX_GET &&
       this.props.forId &&
       CacheWorkerInstance.isSupported &&
-      returnWorkerCachedValuesForGetRequests
+      arg.returnWorkerCachedValuesForGetRequests
     ) {
       // we ask the worker for the value
       const workerCachedValue =
-        await CacheWorkerInstance.instance.getCachedValue(queryName, this.props.forId, requestFields);
+        await CacheWorkerInstance.instance.getCachedValue(queryName, this.props.forId, arg.requestFields);
       // if we have a GET request and we are allowed to return from the wroker cache and we actually
       // found something in our cache, return that
       if (workerCachedValue) {
@@ -1270,28 +1278,57 @@ export class ActualItemDefinitionProvider extends
     // if we are running a EDIT or DELETE query, where we are expected to
     // pass a listener uuid in order to avoid a feedback loop where we inform
     // ourselves of changes we have done, we pass it
-    if (queryPrefix === PREFIX_EDIT || queryPrefix === PREFIX_DELETE) {
+    if (arg.queryPrefix === PREFIX_EDIT || arg.queryPrefix === PREFIX_DELETE) {
       args.listener_uuid = this.props.remoteListener.getUUID();
     }
 
-    // now we build the object query
-    const objQuery: IGQLQueryObj = {
-      name: queryName,
-      args,
-      fields: requestFields,
-    };
-
-    // it's either a query or a mutation, only GET and SEARCH are queries
-    let query: GQLQuery;
-    if (queryPrefix === PREFIX_GET || queryPrefix === PREFIX_SEARCH) {
-      query = buildGqlQuery(objQuery);
+    let gqlValue: any;
+    // if we are in a search with
+    // a cache policy then we should be able
+    // to run the search within the worker as
+    // that is one of the jobs of he cache workers
+    // when it needs to run searches on the client side
+    // for that we would totally relegate the search functionality
+    // and even requesting the server to the cache worker, it will take
+    // as much time as it is necessary
+    if (
+      arg.queryPrefix === PREFIX_SEARCH &&
+      arg.searchCachePolicy !== "none" &&
+      CacheWorkerInstance.isSupported
+    ) {
+      const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
+      const standardCounterpartQueryBase = (standardCounterpart.isExtensionsInstance() ?
+        standardCounterpart.getParentModule().getQualifiedPathName() :
+        standardCounterpart.getQualifiedPathName());
+      gqlValue = await CacheWorkerInstance.instance.runCachedSearch(
+        queryName,
+        args,
+        PREFIX_GET_LIST + standardCounterpartQueryBase,
+        this.props.tokenData.token,
+        this.props.localeData.language.split("-")[0],
+        arg.searchRequestedFieldsOnCachePolicy,
+        arg.searchCachePolicy,
+      );
     } else {
-      query = buildGqlMutation(objQuery);
-    }
+      // now we build the object query
+      const objQuery: IGQLQueryObj = {
+        name: queryName,
+        args,
+        fields: arg.requestFields,
+      };
 
-    // now we get the gql value using the gql query function
-    // and this function will always run using the network
-    const gqlValue = await gqlQuery(query);
+      // it's either a query or a mutation, only GET and SEARCH are queries
+      let query: GQLQuery;
+      if (arg.queryPrefix === PREFIX_GET || arg.queryPrefix === PREFIX_SEARCH) {
+        query = buildGqlQuery(objQuery);
+      } else {
+        query = buildGqlMutation(objQuery);
+      }
+
+      // now we get the gql value using the gql query function
+      // and this function will always run using the network
+      gqlValue = await gqlQuery(query);
+    }
 
     // now we got to check for errors
     let error: GraphQLEndpointErrorType = null;
@@ -1312,7 +1349,7 @@ export class ActualItemDefinitionProvider extends
     // now let's get the returned value
     let value: any = null;
     // and the merged query fields for this value
-    let mergedQueryFields: any = requestFields;
+    let mergedQueryFields: any = arg.requestFields;
     // for first having a graphql value we need to check if
     // we actually have one, so we check all the way up to the
     // query name
@@ -1322,8 +1359,8 @@ export class ActualItemDefinitionProvider extends
       // if we have a GET, EDIT or ADD, then we need to
       // set up the cache
       if (
-        queryPrefix === PREFIX_GET ||
-        queryPrefix === PREFIX_EDIT
+        arg.queryPrefix === PREFIX_GET ||
+        arg.queryPrefix === PREFIX_EDIT
       ) {
         // first we check if we have a value in memory
         // cache and we merge it with what we got
@@ -1343,7 +1380,7 @@ export class ActualItemDefinitionProvider extends
             appliedGQLValue.rawValue,
           );
           mergedQueryFields = deepMerge(
-            requestFields,
+            arg.requestFields,
             appliedGQLValue.requestFields,
           );
         }
@@ -1364,15 +1401,15 @@ export class ActualItemDefinitionProvider extends
       // the same applies in the case of get and a not found
       // was the output
       if (
-        queryPrefix === PREFIX_DELETE ||
-        (queryPrefix === PREFIX_GET && !value)
+        arg.queryPrefix === PREFIX_DELETE ||
+        (arg.queryPrefix === PREFIX_GET && !value)
       ) {
         CacheWorkerInstance.instance.setCachedValue(PREFIX_GET + queryBase, this.props.forId, null, null);
       } else if (
         (
-          queryPrefix === PREFIX_GET ||
-          queryPrefix === PREFIX_EDIT ||
-          queryPrefix === PREFIX_ADD
+          arg.queryPrefix === PREFIX_GET ||
+          arg.queryPrefix === PREFIX_EDIT ||
+          arg.queryPrefix === PREFIX_ADD
         ) &&
         value && mergedQueryFields
       ) {
@@ -1533,17 +1570,13 @@ export class ActualItemDefinitionProvider extends
 
     const {
       error,
-    } = await this.runQueryFor(
-      PREFIX_DELETE,
-      applyingPolicyArgs,
-      {
+    } = await this.runQueryFor({
+      queryPrefix: PREFIX_DELETE,
+      baseArgs: applyingPolicyArgs,
+      requestFields: {
         id: {},
       },
-      false,
-      false,
-      null,
-      null,
-    );
+    });
 
     if (error) {
       this.setState({
@@ -1657,18 +1690,14 @@ export class ActualItemDefinitionProvider extends
       value,
       error,
       getQueryFields,
-    } = await this.runQueryFor(
-      !this.props.forId ? PREFIX_ADD : PREFIX_EDIT,
-      {
+    } = await this.runQueryFor({
+      queryPrefix: !this.props.forId ? PREFIX_ADD : PREFIX_EDIT,
+      baseArgs: {
         ...argumentsForQuery,
         ...applyingPolicyArgs,
       },
       requestFields,
-      false,
-      false,
-      null,
-      null,
-    );
+    });
 
     let recievedId: number = null;
     if (error) {
@@ -1737,16 +1766,21 @@ export class ActualItemDefinitionProvider extends
       return this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithSearchResults;
     }
 
+    if (options.cachePolicy === "by-owner" && !options.createdBy) {
+      throw new Error("A by owner cache policy requires createdBy option to be set");
+    }
+
     this.setState({
       searching: true,
     });
 
+    const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
+
     let onlyIncludePropertiesForArgs: string[] = null;
     if (options.onlyIncludeSearchPropertiesForProperties) {
       onlyIncludePropertiesForArgs = [];
-      const standardIdef = this.props.itemDefinitionInstance.getStandardCounterpart();
       options.onlyIncludeSearchPropertiesForProperties.forEach((propertyId) => {
-        const standardProperty = standardIdef.getPropertyDefinitionFor(propertyId, true);
+        const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
         onlyIncludePropertiesForArgs = onlyIncludePropertiesForArgs.concat(getConversionIds(standardProperty.rawData));
       });
     }
@@ -1765,23 +1799,36 @@ export class ActualItemDefinitionProvider extends
       forId: this.props.forId,
     });
 
+    const searchFieldsAndArgs = getFieldsAndArgs({
+      includeArgs: false,
+      includeFields: true,
+      onlyIncludeProperties: options.requestedProperties,
+      onlyIncludeIncludes: options.requestedIncludes || [],
+      appliedOwner: options.createdBy,
+      userId: this.props.tokenData.id,
+      userRole: this.props.tokenData.role,
+      itemDefinitionInstance: standardCounterpart,
+      forId: null,
+    });
+    const requestedSearchFields = searchFieldsAndArgs.requestFields;
+
     const {
       value,
       error,
-    } = await this.runQueryFor(
-      PREFIX_SEARCH,
-      argumentsForQuery,
-      {
+    } = await this.runQueryFor({
+      queryPrefix: PREFIX_SEARCH,
+      baseArgs: argumentsForQuery,
+      requestFields: {
         ids: {
           id: {},
           type: {},
         },
       },
-      false,
-      false,
-      options.orderBy || "DEFAULT",
-      options.createdBy || null,
-    );
+      searchCachePolicy: options.cachePolicy || "none",
+      searchCreatedBy: options.createdBy || null,
+      searchOrderBy: options.orderBy || "DEFAULT",
+      searchRequestedFieldsOnCachePolicy: requestedSearchFields,
+    });
 
     const searchResults: ISearchResult[] = [];
     if (error) {
@@ -1791,6 +1838,9 @@ export class ActualItemDefinitionProvider extends
         searchResults,
         searchId: uuid.v4(),
         searchOwner: options.createdBy || null,
+        searchFields: requestedSearchFields,
+        searchRequestedProperties: options.requestedProperties,
+        searchRequestedIncludes: options.requestedIncludes || [],
         pokedElements: propertiesToPoke,
         pokePoliciesType: null,
       });
@@ -1801,6 +1851,9 @@ export class ActualItemDefinitionProvider extends
         searchResults: value ? value.ids : [],
         searchId: uuid.v4(),
         searchOwner: options.createdBy || null,
+        searchFields: requestedSearchFields,
+        searchRequestedProperties: options.requestedProperties,
+        searchRequestedIncludes: options.requestedIncludes || [],
         pokedElements: options.unpokeAfterSuccess ? [] : propertiesToPoke,
         pokePoliciesType: null,
       });
@@ -1921,6 +1974,9 @@ export class ActualItemDefinitionProvider extends
           searchResults: this.state.searchResults,
           searchId: this.state.searchId,
           searchOwner: this.state.searchOwner,
+          searchFields: this.state.searchFields,
+          searchRequestedProperties: this.state.searchRequestedProperties,
+          searchRequestedIncludes: this.state.searchRequestedIncludes,
           pokedElements: this.state.pokedElements,
           pokePoliciesType: this.state.pokePoliciesType,
           submit: this.submit,

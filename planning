@@ -7,17 +7,36 @@ limitSearchByProperties: []
 
 these limiters will allow for reasonable searches
 
-B) We need to implement a way to cache 
+B) We need to implement a way to cache searches
 
-C) Historic values for some properties
-We need to add historic values that show how a value has changed
-it will create a property_HISTORIC which will be an array of itself
-and property_HISTORIC_
-and will keep all the historic changes
+The first thing is to remove the cache setting during searches, while cache
+retrieving is fine, the cache setting should be disabled simply because it would
+create a lot of waste data; anyway by default it won't load anything, searches
+are not cached (DONE)
 
-Actually I am not sure about this, parented items should suffice, but surely
-parented will be a pain in the ass to cache and will take a lot of space compared
-to historic
+simply adding a cachePolicy flag to the search function which should
+the cacheEverything flag should work either by owner or by parent filter
+cachePolicy: "by-parent" or cachePolicy: "by-owner", they will require their
+respective filters added, or otherwise it would fail.
+
+1. make the search, by parent or by owner, and create a key in indexed db, SEARCH:SEARCH_ID:BY_WHATEVER:id
+2. Download every page and cache all of them, each one of them, it won't release any results until then
+3. Following searches will be performed locally
+    3.1.    Make the standard search, and get all the search results
+    3.2.    Use some sql local functions to filter and search and emulate the server search
+    3.3.    Make that be the search results
+
+The way that it will update automatically will be by having a ID stored that will be the last created item.
+
+The remote emitter will send such an id once a new one is added either by the parent or by the owner.
+
+Such can be added to the search.
+
+We need to figure out a way to make this work with module based as well.
+
+
+
+
 
 
 

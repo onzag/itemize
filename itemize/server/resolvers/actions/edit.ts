@@ -11,7 +11,7 @@ import {
   runPolicyCheck,
   validateTokenIsntBlocked,
 } from "../basic";
-import graphqlFields = require("graphql-fields");
+import graphqlFields from "graphql-fields";
 import { CONNECTOR_SQL_COLUMN_FK_NAME, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,

@@ -2,7 +2,7 @@ import {
   PREFIX_BUILD,
   MODERATION_FIELDS,
   ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
-  MAX_SQL_LIMIT,
+  MAX_SEARCH_RESULTS_AT_ONCE_LIMIT,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   INVALID_POLICY_ERROR,
   RESERVED_BASE_PROPERTIES,
@@ -22,7 +22,6 @@ import { IAppDataType } from "..";
 import equals from "deep-equal";
 import { IGQLValue } from "../../base/Root/gql";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
-import Knex from "knex";
 import { jwtVerify } from "../token";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
@@ -251,14 +250,14 @@ const checkListLimitDebug = Debug("resolvers:checkListLimit");
  */
 export function checkListLimit(ids: ISearchResultIdentifierType[]) {
   checkListLimitDebug("EXECUTED with %j", ids);
-  if (ids.length > MAX_SQL_LIMIT) {
+  if (ids.length > MAX_SEARCH_RESULTS_AT_ONCE_LIMIT) {
     checkListLimitDebug(
       "FAILED Exceeded limit by requesting %d ids the maximum limit is %d",
       ids.length,
-      MAX_SQL_LIMIT,
+      MAX_SEARCH_RESULTS_AT_ONCE_LIMIT,
     );
     throw new GraphQLEndpointError({
-      message: "Too many ids at once, max is " + MAX_SQL_LIMIT,
+      message: "Too many ids at once, max is " + MAX_SEARCH_RESULTS_AT_ONCE_LIMIT,
       code: "UNSPECIFIED",
     });
   }
