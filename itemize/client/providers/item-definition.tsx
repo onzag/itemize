@@ -399,6 +399,10 @@ export class ActualItemDefinitionProvider extends
   // kitt returns after kitten, which might give an error if they
   // come out of order, so only the last state is relevant
   private lastUpdateId: number;
+  // here we store the last options we used during a search
+  // event this is just to that when the reload is executed these
+  // options are used
+  private lastOptionsUsedForSearch: IActionSearchOptions;
 
   constructor(props: IActualItemDefinitionProviderProps) {
     super(props);
@@ -425,6 +429,7 @@ export class ActualItemDefinitionProvider extends
     this.search = this.search.bind(this);
     this.dismissSearchError = this.dismissSearchError.bind(this);
     this.dismissSearchResults = this.dismissSearchResults.bind(this);
+    this.onSearchReload = this.onSearchReload.bind(this);
 
     // we get the initial state
     this.state = this.setupInitialState();
@@ -532,7 +537,7 @@ export class ActualItemDefinitionProvider extends
     }
   }
   public unSetupListeners() {
-    // TODO remove listener for the search listener if there is one
+    this.removePossibleSearchListeners();
 
     // here we just remove the listeners that we have setup
     this.props.itemDefinitionInstance.removeListener("change", this.props.forId || null, this.changeListener);
@@ -576,6 +581,7 @@ export class ActualItemDefinitionProvider extends
   }
   public async componentDidUpdate(
     prevProps: IActualItemDefinitionProviderProps,
+    prevState: IActualItemDefinitionProviderState,
   ) {
     // whether the item definition was updated
     // and changed
@@ -675,7 +681,20 @@ export class ActualItemDefinitionProvider extends
       });
     }
 
-    if (!equals(this.props.automaticSearch, prevProps.automaticSearch)) {
+    if (
+      !equals(this.props.automaticSearch, prevProps.automaticSearch) ||
+      // these two would cause search results to be dismissed because
+      // the fact the token is a key part of the search itself so we would
+      // dismiss the search in such a case as the token is different
+      // that or the automatic search would be reexecuted
+      itemDefinitionWasUpdated ||
+      prevProps.tokenData.token !== this.props.tokenData.token
+    ) {
+      // we might have a listener in an old item definition
+      // so we need to get rid of it
+      if (itemDefinitionWasUpdated) {
+        this.removePossibleSearchListeners(prevProps, prevState);
+      }
       if (this.props.automaticSearch) {
         this.search(this.props.automaticSearch);
       } else {
@@ -1225,7 +1244,6 @@ export class ActualItemDefinitionProvider extends
     }
 
     if (arg.queryPrefix === PREFIX_SEARCH) {
-      // TODO remove old search listener if there exists one
       args.order_by = new GQLEnum(arg.searchOrderBy);
     }
 
@@ -1316,7 +1334,7 @@ export class ActualItemDefinitionProvider extends
         if (gqlValue.dataMightBeStale) {
           if (arg.searchCachePolicy === "by-owner") {
             this.props.remoteListener.requestOwnedSearchFeedbackFor(
-              this.props.itemDefinitionInstance,
+              this.props.itemDefinitionInstance.getStandardCounterpart(),
               this.props.tokenData.token,
               arg.searchCreatedBy,
               gqlValue.lastRecord,
@@ -1327,14 +1345,12 @@ export class ActualItemDefinitionProvider extends
         }
 
         if (arg.searchCachePolicy === "by-owner") {
-          this.props.remoteListener.addOwnedSearchItemDefinitionListenerFor(
-            this.props.itemDefinitionInstance,
-            // TODO we need to be able to update the token on the registry
+          this.props.remoteListener.addOwnedSearchListenerFor(
+            this.props.itemDefinitionInstance.getStandardCounterpart(),
             this.props.tokenData.token,
             arg.searchCreatedBy,
-            gqlValue.lastRecord || null,
-            // TODO we need to update the last known record in the listener for feedback reasons
-            this,
+            gqlValue.lastRecord,
+            this.onSearchReload,
           );
         } else {
           // TODO
@@ -1801,6 +1817,21 @@ export class ActualItemDefinitionProvider extends
       throw new Error("A by owner cache policy requires createdBy option to be set");
     }
 
+    if (options.cachePolicy === "by-owner") {
+      if (options.createdBy !== this.state.searchOwner) {
+        // this search listener is bad because the search
+        // owner has changed, and the previously registered listener
+        // if any does not match the owner
+        this.removePossibleSearchListeners();
+      }
+    } else if (options.cachePolicy === "by-parent") {
+      // TODO
+    } else {
+      this.removePossibleSearchListeners();
+    }
+
+    this.lastOptionsUsedForSearch = options;
+
     this.setState({
       searching: true,
     });
@@ -1925,9 +1956,27 @@ export class ActualItemDefinitionProvider extends
       searchError: null,
     });
   }
+  public onSearchReload() {
+    this.search(this.lastOptionsUsedForSearch);
+  }
+  public removePossibleSearchListeners(
+    props: IActualItemDefinitionProviderProps = this.props,
+    state: IActualItemDefinitionProviderState = this.state,
+  ) {
+    props.remoteListener.removeOwnedSearchListenerFor(
+      this.onSearchReload,
+      props.itemDefinitionInstance.getStandardCounterpart(),
+      state.searchOwner,
+    );
+  }
   public dismissSearchResults() {
-    // TODO remove listener in case there is one
+    this.removePossibleSearchListeners();
     this.setState({
+      searchId: null,
+      searchFields: null,
+      searchOwner: null,
+      searchRequestedIncludes: [],
+      searchRequestedProperties: [],
       searchResults: [],
     });
   }

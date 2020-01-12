@@ -271,6 +271,44 @@ export default class CacheWorker {
     return null;
   }
 
+  public async addRecordsToCachedSearch(
+    searchQueryName: string,
+    ownerOrParentId: string,
+    newIds: ISearchResult[],
+    newLastRecord: number,
+    cachePolicy: "by-owner" | "by-parent",
+  ) {
+    // so we fetch our db like usual
+    let db: any;
+    try {
+      db = await this.dbPromise;
+    } catch (err) {
+      console.warn(err);
+    }
+
+    if (!db) {
+      return null;
+    }
+
+    let storeKeyName = searchQueryName + "." + cachePolicy.replace("-", "_") + ".";
+    if (cachePolicy === "by-owner") {
+      storeKeyName += ownerOrParentId;
+    } else {
+      // TODO
+    }
+
+    // This is an optimistic update, because it only runs when a current search is
+    // active by default, then we will assume the results will succeed to load
+    // if for some rare reason they fail to do so, the app will still work just
+    // these items will appear as failed to load (until they do)
+    const currentValue: ISearchMatchType = await db.get(SEARCHES_TABLE_NAME, storeKeyName);
+    await db.put({
+      ...currentValue,
+      lastRecord: newLastRecord,
+      value: currentValue.value.concat(newIds),
+    });
+  }
+
   public async runCachedSearch(
     searchQueryName: string,
     searchArgs: any,

@@ -77,6 +77,12 @@ export class Listener {
       socket.on("unregister", (qualifiedPathName: string, id: number) => {
         this.removeListener(socket, qualifiedPathName, id);
       });
+      socket.on("owned-search-unregister", (
+        qualifiedPathName: string,
+        createdBy: number,
+      ) => {
+        this.removeOwnedSearchListener(socket, qualifiedPathName, createdBy);
+      });
       socket.on("disconnect", () => {
         this.removeSocket(socket);
       });
