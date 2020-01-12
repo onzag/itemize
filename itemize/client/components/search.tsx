@@ -255,11 +255,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             ...value,
           } : value;
           if (!valueToApply) {
-            // if (CacheWorkerInstance.isSupported) {
-            //   CacheWorkerInstance.instance.setCachedValue(
-            //     PREFIX_GET + itemDefintionInQuestion.getQualifiedPathName(), forId, null, null,
-            //   );
-            // }
             itemDefintionInQuestion.cleanValueFor(forId);
             itemDefintionInQuestion.triggerListeners("change", forId);
           } else {
@@ -290,12 +285,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
               true,
             );
             itemDefintionInQuestion.triggerListeners("change", forId);
-
-            // if (CacheWorkerInstance.isSupported) {
-            //   CacheWorkerInstance.instance.mergeCachedValue(
-            //     PREFIX_GET + itemDefintionInQuestion.getQualifiedPathName(), forId, valueToApply, mergedQueryFields,
-            //   );
-            // }
           }
         });
       }

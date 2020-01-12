@@ -140,6 +140,10 @@ export default class CacheWorker {
       return false;
     }
 
+    // TODO check when an item is deleted and the cached value is set to null
+    // so you can revisit all the searches where this item might apply and
+    // remove it from the list by slicing it
+
     return true;
   }
 
@@ -305,6 +309,7 @@ export default class CacheWorker {
     // we were asked for
     let resultingGetListRequestedFields: any = getListRequestedFields;
     let lastRecord: number;
+    let dataMightBeStale = false;
 
     try {
       // now we request indexed db for a result
@@ -346,6 +351,7 @@ export default class CacheWorker {
         // it depends
         resultsToProcess = dbValue.value;
         lastRecord = dbValue.lastRecord;
+        dataMightBeStale = true;
 
         // if the fields are contained within what the database has loaded
         // and if all the results were preloaded then they don't need to be
@@ -366,6 +372,8 @@ export default class CacheWorker {
                 last_record: lastRecord,
               },
             },
+            dataMightBeStale,
+            lastRecord,
           };
         }
 
@@ -571,6 +579,8 @@ export default class CacheWorker {
             ids: resultsToProcess,
           },
         },
+        dataMightBeStale,
+        lastRecord,
       };
     } else if (error) {
       // if we managed to catch an error, we pretend
@@ -582,6 +592,8 @@ export default class CacheWorker {
             extensions: error,
           },
         ],
+        dataMightBeStale,
+        lastRecord,
       };
     } else {
       // otherwise it must have been some sort

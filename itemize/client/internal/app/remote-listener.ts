@@ -15,6 +15,15 @@ export class RemoteListener {
       parentInstances: any[],
     },
   };
+  private ownedSearchListeners: {
+    [qualifiedPathNameWithOwnerId: string]: {
+      token: string;
+      createdBy: number,
+      searchModeItemDefinition: ItemDefinition;
+      parentInstances: any[];
+      lastRecord: number;
+    },
+  };
   private delayedFeedbacks: Array<{
     itemDefinition: ItemDefinition;
     forId: number;
@@ -34,6 +43,7 @@ export class RemoteListener {
 
     this.root = root;
     this.listeners = {};
+    this.ownedSearchListeners = {};
     this.connectionListeners = [];
     this.appUpdatedListeners = [];
     this.lastRecievedBuildNumber = (window as any).BUILD_NUMBER;
@@ -118,6 +128,67 @@ export class RemoteListener {
         forId,
       );
     }
+  }
+  public attachOwnedSearchItemDefinitionListenerFor(
+    searchModeItemDefinition: ItemDefinition,
+    token: string,
+    createdBy: number,
+  ) {
+    const standardCounterpart = searchModeItemDefinition.getStandardCounterpart();
+    const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
+      standardCounterpart.getParentModule().getQualifiedPathName() :
+      standardCounterpart.getQualifiedPathName());
+
+    if (this.socket.connected) {
+      console.log("owned-search registering", standardCounterpartQualifiedName, token, createdBy);
+      this.socket.emit(
+        "owned-search-register",
+        standardCounterpartQualifiedName,
+        token,
+        createdBy,
+      );
+    }
+  }
+  public requestOwnedSearchFeedbackFor(
+    searchModeItemDefinition: ItemDefinition,
+    token: string,
+    createdBy: number,
+    lastRecord: number,
+  ) {
+    const standardCounterpart = searchModeItemDefinition.getStandardCounterpart();
+    const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
+      standardCounterpart.getParentModule().getQualifiedPathName() :
+      standardCounterpart.getQualifiedPathName());
+    this.socket.emit(
+      "owned-search-feedback",
+      standardCounterpartQualifiedName,
+      token,
+      createdBy,
+      lastRecord,
+    );
+  }
+  public addOwnedSearchItemDefinitionListenerFor(
+    searchModeItemDefinition: ItemDefinition,
+    token: string,
+    createdBy: number,
+    lastRecord: number,
+    parentInstance: any,
+  ) {
+    const qualifiedIdentifier = searchModeItemDefinition.getQualifiedPathName() + "." + createdBy;
+    if (this.ownedSearchListeners[qualifiedIdentifier]) {
+      this.ownedSearchListeners[qualifiedIdentifier].parentInstances.push(parentInstance);
+      return;
+    }
+
+    this.ownedSearchListeners[qualifiedIdentifier] = {
+      token,
+      createdBy,
+      searchModeItemDefinition,
+      parentInstances: [parentInstance],
+      lastRecord,
+    };
+
+    this.attachOwnedSearchItemDefinitionListenerFor(searchModeItemDefinition, token, createdBy);
   }
   public requestFeedbackFor(itemDefinition: ItemDefinition, forId: number, immediate?: boolean) {
     if (immediate) {
@@ -235,6 +306,17 @@ export class RemoteListener {
       this.attachItemDefinitionListenerFor(itemDefinition, forId);
       if (this.isReconnect) {
         this.requestFeedbackFor(itemDefinition, forId, true);
+      }
+    });
+
+    Object.keys(this.ownedSearchListeners).forEach((listenerKey) => {
+      const searchModeItemDefinition = this.ownedSearchListeners[listenerKey].searchModeItemDefinition;
+      const token = this.ownedSearchListeners[listenerKey].token;
+      const createdBy = this.ownedSearchListeners[listenerKey].createdBy;
+      this.attachOwnedSearchItemDefinitionListenerFor(searchModeItemDefinition, token, createdBy);
+      if (this.isReconnect) {
+        const lastRecord = this.ownedSearchListeners[listenerKey].lastRecord;
+        this.requestOwnedSearchFeedbackFor(searchModeItemDefinition, token, createdBy, lastRecord);
       }
     });
 

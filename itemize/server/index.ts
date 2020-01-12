@@ -284,6 +284,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     redisPub,
     root,
     cache,
+    knex,
     server,
   );
 

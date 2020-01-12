@@ -532,6 +532,8 @@ export class ActualItemDefinitionProvider extends
     }
   }
   public unSetupListeners() {
+    // TODO remove listener for the search listener if there is one
+
     // here we just remove the listeners that we have setup
     this.props.itemDefinitionInstance.removeListener("change", this.props.forId || null, this.changeListener);
     const isStatic = this.props.optimize && this.props.optimize.static;
@@ -1223,6 +1225,7 @@ export class ActualItemDefinitionProvider extends
     }
 
     if (arg.queryPrefix === PREFIX_SEARCH) {
+      // TODO remove old search listener if there exists one
       args.order_by = new GQLEnum(arg.searchOrderBy);
     }
 
@@ -1309,6 +1312,34 @@ export class ActualItemDefinitionProvider extends
         arg.searchRequestedFieldsOnCachePolicy,
         arg.searchCachePolicy,
       );
+      if (gqlValue) {
+        if (gqlValue.dataMightBeStale) {
+          if (arg.searchCachePolicy === "by-owner") {
+            this.props.remoteListener.requestOwnedSearchFeedbackFor(
+              this.props.itemDefinitionInstance,
+              this.props.tokenData.token,
+              arg.searchCreatedBy,
+              gqlValue.lastRecord,
+            );
+          } else {
+            // TODO
+          }
+        }
+
+        if (arg.searchCachePolicy === "by-owner") {
+          this.props.remoteListener.addOwnedSearchItemDefinitionListenerFor(
+            this.props.itemDefinitionInstance,
+            // TODO we need to be able to update the token on the registry
+            this.props.tokenData.token,
+            arg.searchCreatedBy,
+            gqlValue.lastRecord || null,
+            // TODO we need to update the last known record in the listener for feedback reasons
+            this,
+          );
+        } else {
+          // TODO
+        }
+      }
     } else {
       // now we build the object query
       const objQuery: IGQLQueryObj = {
@@ -1895,6 +1926,7 @@ export class ActualItemDefinitionProvider extends
     });
   }
   public dismissSearchResults() {
+    // TODO remove listener in case there is one
     this.setState({
       searchResults: [],
     });

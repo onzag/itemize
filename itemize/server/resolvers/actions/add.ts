@@ -226,6 +226,21 @@ export async function addItemDefinition(
     value.id.toString(),
   );
 
+  appData.listener.triggerOwnedSearchListeners(
+    selfTable,
+    sqlModData.created_by,
+    value.id,
+    selfTable,
+    null, // TODO add the listener uuid, maybe?
+  );
+  appData.listener.triggerOwnedSearchListeners(
+    moduleTable,
+    sqlModData.created_by,
+    value.id,
+    selfTable,
+    null, // TODO add the listener uuid, maybe?
+  );
+
   debug("SUCCEED with GQL output %j", finalOutput);
 
   // items that have just been added cannot be blocked or deleted, hence we just return
