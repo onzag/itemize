@@ -134,6 +134,7 @@ export class Listener {
 
     const mergedIndexIdentifier = qualifiedPathName + "." + id;
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+      console.log("subscribing to", mergedIndexIdentifier);
       this.redisSub.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
@@ -165,8 +166,9 @@ export class Listener {
 
     const mergedIndexIdentifier = "OWNED_SEARCH." + qualifiedPathName + "." + createdBy;
     if (!this.listeners[socket.id].ownedListens[mergedIndexIdentifier]) {
+      console.log("subscribing to", mergedIndexIdentifier);
       this.redisSub.subscribe(mergedIndexIdentifier);
-      this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
+      this.listeners[socket.id].ownedListens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
     }
   }
@@ -262,7 +264,8 @@ export class Listener {
       const noSocketsListeningLeft = Object.keys(this.listeners).every((socketId) => {
         return !this.listeners[socketId].listens[mergedIndexIdentifier];
       });
-      if (!noSocketsListeningLeft) {
+      if (noSocketsListeningLeft) {
+        console.log("unsubscribing to", mergedIndexIdentifier);
         this.redisSub.unsubscribe(mergedIndexIdentifier);
       }
     }
@@ -279,7 +282,8 @@ export class Listener {
       const noSocketsListeningLeft = Object.keys(this.listeners).every((socketId) => {
         return !this.listeners[socketId].ownedListens[mergedIndexIdentifier];
       });
-      if (!noSocketsListeningLeft) {
+      if (noSocketsListeningLeft) {
+        console.log("unsubscribing to", mergedIndexIdentifier);
         this.redisSub.unsubscribe(mergedIndexIdentifier);
       }
     }
@@ -290,8 +294,8 @@ export class Listener {
     listenerUUID: string,
     deleted: boolean,
   ) {
-    console.log("requested trigger on", qualifiedPathName, id, listenerUUID, deleted);
     const mergedIndexIdentifier = qualifiedPathName + "." + id;
+    console.log("publishing to", mergedIndexIdentifier);
     this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
       qualifiedPathName,
       id,
@@ -308,8 +312,8 @@ export class Listener {
     type: string,
     listenerUUID: string,
   ) {
-    console.log("requested owned search trigger on", qualifiedPathName, createdBy, id, type, listenerUUID);
-    const mergedIndexIdentifier = "OWNED_SEARCH." + qualifiedPathName + "." + id;
+    const mergedIndexIdentifier = "OWNED_SEARCH." + qualifiedPathName + "." + createdBy;
+    console.log("publishing to", mergedIndexIdentifier);
     this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
       qualifiedPathName,
       id,
@@ -342,8 +346,11 @@ export class Listener {
         }
       } else if (parsedContent.eventType === "owned-search-added-records") {
         const whatListening = this.listeners[socketKey].ownedListens;
-        if (whatListening[parsedContent.mergedIndexIdentifier] &&
-          this.listeners[socketKey].uuid !== parsedContent.listenerUUID) {
+        console.log(whatListening, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        if (
+          whatListening[parsedContent.mergedIndexIdentifier] &&
+          this.listeners[socketKey].uuid !== parsedContent.listenerUUID
+        ) {
           console.log("emitting to someone");
           this.listeners[socketKey].socket.emit(
             "owned-search-added-records",

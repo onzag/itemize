@@ -60,6 +60,7 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   remoteListener: RemoteListener;
   searchId: string;
   searchOwner: number;
+  searchShouldCache: boolean;
   searchFields: any;
   searchRequestedProperties: string[];
   searchRequestedIncludes: string[];
@@ -340,7 +341,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                     excludePolicies: this.props.excludePolicies,
                     cleanOnDismount: this.props.cleanOnDismount,
                     static: this.props.staticResults,
-                    avoidLongTermCaching: true,
+                    avoidLongTermCaching: !this.props.searchShouldCache,
                   },
                 },
                 itemDefinition,
@@ -376,6 +377,7 @@ export function SearchLoader(props: ISearchLoaderProps) {
                       remoteListener={itemDefinitionContext.remoteListener}
                       searchId={itemDefinitionContext.searchId}
                       searchOwner={itemDefinitionContext.searchOwner}
+                      searchShouldCache={itemDefinitionContext.searchShouldCache}
                       searchRequestedIncludes={itemDefinitionContext.searchRequestedIncludes}
                       searchRequestedProperties={itemDefinitionContext.searchRequestedProperties}
                       searchFields={itemDefinitionContext.searchFields}

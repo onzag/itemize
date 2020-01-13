@@ -3,8 +3,11 @@ import io from "socket.io-client";
 import Root from "../../../base/Root";
 import uuid from "uuid";
 import CacheWorkerInstance from "../workers/cache";
-import { PREFIX_GET, PREFIX_SEARCH, PREFIX_GET_LIST } from "../../../constants";
+import { PREFIX_GET, PREFIX_SEARCH } from "../../../constants";
 import { ISearchResult } from "../../../gql-querier";
+
+// TODO refactor the remote listener and the listener to use one single argument
+// in order to pass data rather than this clusterfuck of many arguments
 
 export class RemoteListener {
   private socket: SocketIOClient.Socket;
@@ -41,6 +44,7 @@ export class RemoteListener {
     this.onPossibleChangeListened = this.onPossibleChangeListened.bind(this);
     this.onPossibleAppUpdateListened = this.onPossibleAppUpdateListened.bind(this);
     this.onDisconnect = this.onDisconnect.bind(this);
+    this.onRecordsAddedToOwnedSearch = this.onRecordsAddedToOwnedSearch.bind(this);
 
     this.root = root;
     this.listeners = {};
@@ -60,6 +64,7 @@ export class RemoteListener {
     this.socket.on("changed", this.onPossibleChangeListened);
     this.socket.on("buildnumber", this.onPossibleAppUpdateListened);
     this.socket.on("disconnect", this.onDisconnect);
+    this.socket.on("owned-search-added-records", this.onRecordsAddedToOwnedSearch);
   }
   public onPossibleAppUpdateListened(buildNumber: string) {
     this.lastRecievedBuildNumber = buildNumber;
@@ -158,13 +163,15 @@ export class RemoteListener {
     const qualifiedNameToRegister = (itemDefinition.isExtensionsInstance() ?
       itemDefinition.getParentModule().getQualifiedPathName() :
       itemDefinition.getQualifiedPathName());
-    this.socket.emit(
-      "owned-search-feedback",
-      qualifiedNameToRegister,
-      token,
-      createdBy,
-      lastRecord,
-    );
+    if (this.socket.connected) {
+      this.socket.emit(
+        "owned-search-feedback",
+        qualifiedNameToRegister,
+        token,
+        createdBy,
+        lastRecord,
+      );
+    }
   }
   public addOwnedSearchListenerFor(
     itemDefinition: ItemDefinition,
@@ -223,17 +230,16 @@ export class RemoteListener {
       };
       if (newListenerValue.parentInstances.length === 0) {
         delete this.listeners[qualifiedID];
+        if (this.socket.connected) {
+          this.socket.emit(
+            "unregister",
+            qualifiedPathName,
+            forId,
+          );
+        }
       } else {
         this.listeners[qualifiedID] = newListenerValue;
       }
-    }
-
-    if (this.socket.connected) {
-      this.socket.emit(
-        "unregister",
-        qualifiedPathName,
-        forId,
-      );
     }
   }
   public removeOwnedSearchListenerFor(
@@ -253,17 +259,16 @@ export class RemoteListener {
       };
       if (newListenerValue.callbacks.length === 0) {
         delete this.ownedSearchListeners[qualifiedIdentifier];
+        if (this.socket.connected) {
+          this.socket.emit(
+            "owned-search-unregister",
+            qualifiedNameToRegister,
+            createdBy,
+          );
+        }
       } else {
         this.ownedSearchListeners[qualifiedIdentifier] = newListenerValue;
       }
-    }
-
-    if (this.socket.connected) {
-      this.socket.emit(
-        "owned-search-unregister",
-        qualifiedNameToRegister,
-        createdBy,
-      );
     }
   }
   private onPossibleChangeListened(
@@ -288,8 +293,12 @@ export class RemoteListener {
       } else if (type === "not_found") {
         itemDefinition.cleanValueFor(id);
         if (CacheWorkerInstance.isSupported) {
-          CacheWorkerInstance.instance.setCachedValue(
-            PREFIX_GET + itemDefinition.getQualifiedPathName(), id, null, null,
+          CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
+            id,
+            itemDefinition.getQualifiedPathName(),
+            PREFIX_GET + itemDefinition.getQualifiedPathName(),
+            PREFIX_SEARCH + itemDefinition.getParentModule().getSearchModule().getQualifiedPathName(),
+            PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
           );
         }
         itemDefinition.triggerListeners("change", id);
@@ -299,14 +308,20 @@ export class RemoteListener {
     } else if (type === "not_found") {
       itemDefinition.cleanValueFor(id);
       if (CacheWorkerInstance.isSupported) {
-        CacheWorkerInstance.instance.setCachedValue(
-          PREFIX_GET + itemDefinition.getQualifiedPathName(), id, null, null,
+        CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
+          id,
+          itemDefinition.getQualifiedPathName(),
+          PREFIX_GET + itemDefinition.getQualifiedPathName(),
+          PREFIX_SEARCH + itemDefinition.getParentModule().getSearchModule().getQualifiedPathName(),
+          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
         );
       }
       itemDefinition.triggerListeners("change", id);
     }
   }
   private consumeDelayedFeedbacks(forAnSpecificId?: number) {
+    // the reason we use delayed feedbacks is for efficiency, while we don't
+    // use this for owned searches, but sometimes a same feedback would be requested twice
     this.delayedFeedbacks = this.delayedFeedbacks.filter((df) => {
       if (!forAnSpecificId || forAnSpecificId === df.forId) {
         if (this.socket.connected) {
@@ -365,12 +380,13 @@ export class RemoteListener {
     newIds: ISearchResult[],
     newLastRecord: number,
   ) {
+    console.log("found records added to owned search", qualifiedPathName, createdBy, newIds, newLastRecord);
     const ownedListener = this.ownedSearchListeners[qualifiedPathName + "." + createdBy];
     if (ownedListener) {
       ownedListener.lastRecord = newLastRecord;
       if (CacheWorkerInstance.isSupported) {
         await CacheWorkerInstance.instance.addRecordsToCachedSearch(
-          PREFIX_SEARCH + qualifiedPathName,
+          PREFIX_SEARCH + ownedListener.itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
           createdBy.toString(),
           newIds,
           newLastRecord,

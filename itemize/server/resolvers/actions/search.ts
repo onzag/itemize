@@ -106,6 +106,12 @@ export async function searchModule(
     searchQuery.andWhere("type", resolverArgs.args.types);
   }
 
+  if (resolverArgs.args.order_by === "DEFAULT") {
+    searchQuery.orderBy("id", "DESC");
+  } else {
+    // TODO
+  }
+
   // return using the base result, and only using the id
   const baseResult: ISearchResultIdentifierType[] = await searchQuery;
   const finalResult: any = {
@@ -221,6 +227,12 @@ export async function searchItemDefinition(
 
   if (created_by) {
     searchQuery.where("created_by", created_by);
+  }
+
+  if (resolverArgs.args.order_by === "DEFAULT") {
+    searchQuery.orderBy("id", "DESC");
+  } else {
+    // TODO
   }
 
   // and now we call the function that builds the query itself into

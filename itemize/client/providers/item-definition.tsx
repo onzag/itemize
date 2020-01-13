@@ -155,6 +155,10 @@ export interface IItemDefinitionContextType {
   searchId: string;
   // a search owner, or null, for the createdBy argument
   searchOwner: number;
+  // passed onto the search to tell it if results that are retrieved
+  // and then updated should be cached into the cache using the
+  // long term strategy, this is usually true when cachePolicy is something
+  searchShouldCache: boolean;
   // the search fields that should be requested according
   // to the search function
   searchFields: any;
@@ -188,7 +192,7 @@ export interface IItemDefinitionContextType {
   // since all items are the same it's totally possible to launch a search
   // in which case you'll just get a searchError you should be in search
   // mode because there are no endpoints otherwise
-  search: () => Promise<IActionResponseWithSearchResults>;
+  search: (options: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
   // this is a listener that basically takes a property, and a new value
   // and internal value, whatever is down the line is not expected to do
   // changes directly, but rather call this function, this function will
@@ -343,6 +347,7 @@ interface IActualItemDefinitionProviderState {
   searchResults: ISearchResult[];
   searchId: string;
   searchOwner: number;
+  searchShouldCache: boolean;
   searchRequestedProperties: string[];
   searchRequestedIncludes: string[];
   searchFields: any;
@@ -478,6 +483,7 @@ export class ActualItemDefinitionProvider extends
       searchResults: [],
       searchId: null,
       searchOwner: null,
+      searchShouldCache: false,
       searchFields: null,
       searchRequestedIncludes: [],
       searchRequestedProperties: [],
@@ -704,7 +710,7 @@ export class ActualItemDefinitionProvider extends
   }
 
   public reloadListener() {
-    console.log("RELOAD LISTENED");
+    console.log("reload requested for", this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId);
     // well this is very simple the app requested a reload
     // because it says that whatever we have in memory is not valid
     // whether it is in the cache or not, so we call it as so, and deny the cache
@@ -1224,12 +1230,12 @@ export class ActualItemDefinitionProvider extends
     // the qualified path name that is used in graphql, when we get the extensions instance
     // this basically means a search requests, so it should be the prefix search but
     // this function is flexible so it allows mistakes
-    const queryBase = (this.props.itemDefinitionInstance.isExtensionsInstance() ?
+    const qualifiedName = (this.props.itemDefinitionInstance.isExtensionsInstance() ?
       this.props.itemDefinitionInstance.getParentModule().getQualifiedPathName() :
       this.props.itemDefinitionInstance.getQualifiedPathName());
 
     // this is the query we run
-    const queryName = arg.queryPrefix + queryBase;
+    const queryName = arg.queryPrefix + qualifiedName;
 
     // basic args, the base args usually are for policies and whatnot
     const args = {
@@ -1303,6 +1309,7 @@ export class ActualItemDefinitionProvider extends
       args.listener_uuid = this.props.remoteListener.getUUID();
     }
 
+    let cached = false;
     let gqlValue: any;
     // if we are in a search with
     // a cache policy then we should be able
@@ -1330,7 +1337,20 @@ export class ActualItemDefinitionProvider extends
         arg.searchRequestedFieldsOnCachePolicy,
         arg.searchCachePolicy,
       );
+      cached = true;
       if (gqlValue) {
+        if (arg.searchCachePolicy === "by-owner") {
+          this.props.remoteListener.addOwnedSearchListenerFor(
+            this.props.itemDefinitionInstance.getStandardCounterpart(),
+            this.props.tokenData.token,
+            arg.searchCreatedBy,
+            gqlValue.lastRecord,
+            this.onSearchReload,
+          );
+        } else {
+          // TODO
+        }
+
         if (gqlValue.dataMightBeStale) {
           if (arg.searchCachePolicy === "by-owner") {
             this.props.remoteListener.requestOwnedSearchFeedbackFor(
@@ -1342,18 +1362,6 @@ export class ActualItemDefinitionProvider extends
           } else {
             // TODO
           }
-        }
-
-        if (arg.searchCachePolicy === "by-owner") {
-          this.props.remoteListener.addOwnedSearchListenerFor(
-            this.props.itemDefinitionInstance.getStandardCounterpart(),
-            this.props.tokenData.token,
-            arg.searchCreatedBy,
-            gqlValue.lastRecord,
-            this.onSearchReload,
-          );
-        } else {
-          // TODO
         }
       }
     } else {
@@ -1451,7 +1459,17 @@ export class ActualItemDefinitionProvider extends
         arg.queryPrefix === PREFIX_DELETE ||
         (arg.queryPrefix === PREFIX_GET && !value)
       ) {
-        CacheWorkerInstance.instance.setCachedValue(PREFIX_GET + queryBase, this.props.forId, null, null);
+        // we are here guaranteed that if we have retrieved something from
+        // the server in an unique value way it is not a module and it's not
+        // a search mode, since we are here, so we can infer the module search
+        // and the item definition search in order to be efficient
+        CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
+          this.props.forId,
+          qualifiedName,
+          PREFIX_GET + qualifiedName,
+          PREFIX_SEARCH + this.props.itemDefinitionInstance.getParentModule().getSearchModule().getQualifiedPathName(),
+          PREFIX_SEARCH + this.props.itemDefinitionInstance.getSearchModeCounterpart().getQualifiedPathName(),
+        );
       } else if (
         (
           arg.queryPrefix === PREFIX_GET ||
@@ -1460,7 +1478,7 @@ export class ActualItemDefinitionProvider extends
         ) &&
         value && mergedQueryFields
       ) {
-        CacheWorkerInstance.instance.mergeCachedValue(PREFIX_GET + queryBase, value.id, value, mergedQueryFields);
+        CacheWorkerInstance.instance.mergeCachedValue(PREFIX_GET + qualifiedName, value.id, value, mergedQueryFields);
       }
     }
 
@@ -1468,7 +1486,8 @@ export class ActualItemDefinitionProvider extends
       error,
       value,
       memoryCached: false,
-      cached: false,
+      // this is basically only true during the search cached
+      cached,
       getQueryFields: mergedQueryFields,
     };
   }
@@ -1797,7 +1816,7 @@ export class ActualItemDefinitionProvider extends
       error,
     };
   }
-  public async search(options?: IActionSearchOptions): Promise<IActionResponseWithSearchResults> {
+  public async search(options: IActionSearchOptions): Promise<IActionResponseWithSearchResults> {
     if (this.state.searching) {
       return null;
     }
@@ -1900,6 +1919,7 @@ export class ActualItemDefinitionProvider extends
         searchResults,
         searchId: uuid.v4(),
         searchOwner: options.createdBy || null,
+        searchShouldCache: !!options.cachePolicy,
         searchFields: requestedSearchFields,
         searchRequestedProperties: options.requestedProperties,
         searchRequestedIncludes: options.requestedIncludes || [],
@@ -1913,6 +1933,7 @@ export class ActualItemDefinitionProvider extends
         searchResults: value ? value.ids : [],
         searchId: uuid.v4(),
         searchOwner: options.createdBy || null,
+        searchShouldCache: !!options.cachePolicy,
         searchFields: requestedSearchFields,
         searchRequestedProperties: options.requestedProperties,
         searchRequestedIncludes: options.requestedIncludes || [],
@@ -1963,11 +1984,13 @@ export class ActualItemDefinitionProvider extends
     props: IActualItemDefinitionProviderProps = this.props,
     state: IActualItemDefinitionProviderState = this.state,
   ) {
-    props.remoteListener.removeOwnedSearchListenerFor(
-      this.onSearchReload,
-      props.itemDefinitionInstance.getStandardCounterpart(),
-      state.searchOwner,
-    );
+    if (props.itemDefinitionInstance.isInSearchMode()) {
+      props.remoteListener.removeOwnedSearchListenerFor(
+        this.onSearchReload,
+        props.itemDefinitionInstance.getStandardCounterpart(),
+        state.searchOwner,
+      );
+    }
   }
   public dismissSearchResults() {
     this.removePossibleSearchListeners();
@@ -1975,6 +1998,7 @@ export class ActualItemDefinitionProvider extends
       searchId: null,
       searchFields: null,
       searchOwner: null,
+      searchShouldCache: false,
       searchRequestedIncludes: [],
       searchRequestedProperties: [],
       searchResults: [],
@@ -2055,6 +2079,7 @@ export class ActualItemDefinitionProvider extends
           searchResults: this.state.searchResults,
           searchId: this.state.searchId,
           searchOwner: this.state.searchOwner,
+          searchShouldCache: this.state.searchShouldCache,
           searchFields: this.state.searchFields,
           searchRequestedProperties: this.state.searchRequestedProperties,
           searchRequestedIncludes: this.state.searchRequestedIncludes,

@@ -2,10 +2,12 @@ import "babel-polyfill";
 import { expose } from "comlink";
 import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { requestFieldsAreContained, deepMerge } from "../../../gql-util";
-import { IGQLQueryObj, ISearchResult, buildGqlQuery, gqlQuery } from "../../../gql-querier";
+import { ISearchResult, buildGqlQuery, gqlQuery, GQLEnum } from "../../../gql-querier";
 import { MAX_SEARCH_RESULTS_AT_ONCE_LIMIT, PREFIX_GET } from "../../../constants";
-import CacheWorkerInstance from "./cache";
 import { GraphQLEndpointErrorType } from "../../../base/errors";
+
+// TODO refactor this as well to use objects as arguments rather than the really long
+// list that is being used
 
 export interface ICacheMatchType {
   value: any;
@@ -95,6 +97,76 @@ export default class CacheWorker {
   }
 
   /**
+   * Sets the cached value as null and updates all the searches
+   * that contained that value to have it sliced from it
+   * @param id the id of the item definition
+   * @param type the type of the item definition
+   * @param queryName the GET query name
+   * @param searchQueryNameModule optional, a search query name module to
+   * be the only one to check against it should be SEARCH prefixed
+   * @param searchQueryNameItemDefinition optional, a search query name
+   * item definition to be the only one to check against it should be SEARCH prefixed
+   *
+   * These optional attributes make it way more efficient as it will allow
+   * the algorithm to ignore something if it knows it won't contain the
+   * item definition
+   */
+  public async setCachedValueAsNullAndUpdateSearches(
+    id: number,
+    type: string,
+    queryName: string,
+    searchQueryNameModule?: string,
+    searchQueryNameItemDefinition?: string,
+  ) {
+    const succeed = await this.setCachedValue(
+      queryName,
+      id,
+      null,
+      null,
+    );
+    if (!succeed) {
+      return false;
+    }
+
+    // so first we await for our database
+    const db = await this.dbPromise;
+    // if we don't have it
+    if (!db) {
+      return succeed;
+    }
+
+    try {
+      const allKeys = await db.getAllKeys(SEARCHES_TABLE_NAME);
+      await Promise.all(allKeys.map(async (key) => {
+        try {
+          const splitted = key.split(".");
+          if (
+            !searchQueryNameModule ||
+            !searchQueryNameItemDefinition ||
+            splitted[0] === searchQueryNameModule ||
+            splitted[0] === searchQueryNameItemDefinition
+          ) {
+            const currentValue: ISearchMatchType = await db.get(SEARCHES_TABLE_NAME, key);
+            const foundIndex = currentValue.value.findIndex((v) => v.id === id && v.type === type);
+            if (foundIndex !== -1) {
+              currentValue.value.splice(foundIndex, 1);
+              await db.put(SEARCHES_TABLE_NAME, currentValue, key);
+            }
+          }
+        } catch (err) {
+          console.warn(err);
+        }
+      }));
+    } catch (err) {
+      console.warn(err);
+    }
+
+    // we consider it sucesful even if they
+    // failed to update
+    return succeed;
+  }
+
+  /**
    * sets a cache value, all of it, using a query name, should
    * be a get query, the id of the item definition and the
    * value that was retrieved, this value can be a partial value
@@ -147,6 +219,13 @@ export default class CacheWorker {
     return true;
   }
 
+  // TODO we need a better method, let's use local storage or some form of solution
+  // whatever can it be to store all the item definitions that are session loaded
+  // as well as searches, using the item-definition.tsx flag as some sort of
+  // cacheSecurityPolicy where you can say "by-session" or "none" once the user
+  // gets logged out all the info in the cacheSecurityPolicy gets removed right
+  // now cached data gets cached forever and this function only calls for when the user
+  // is gone, let's leverage this for searches as well
   public async deleteCachedValue(
     queryName: string,
     id: number,
@@ -297,16 +376,22 @@ export default class CacheWorker {
       // TODO
     }
 
-    // This is an optimistic update, because it only runs when a current search is
-    // active by default, then we will assume the results will succeed to load
-    // if for some rare reason they fail to do so, the app will still work just
-    // these items will appear as failed to load (until they do)
+    // TODO these optimisitic updates are a really bad idea, because if the results get
+    // appended last or are somehow not visible then the new values won't be loaded whatsoever
+    // let's say if a value gets loaded last, make it that somehow the item definition that
+    // searched for this, forces itself to load the values of the new ids as it gets informed
+    // of the new records, somehow, maybe during the search function that is then reexecuted
+    // let the preloader load everything over again and double checking by setting this to false
+
+    // So we say that not all results are preloaded so that when the next iteration of the
+    // search notices (which should be executed shortly afterwards, then the new records are loaded)
     const currentValue: ISearchMatchType = await db.get(SEARCHES_TABLE_NAME, storeKeyName);
-    await db.put({
+    await db.put(SEARCHES_TABLE_NAME, {
       ...currentValue,
       lastRecord: newLastRecord,
       value: currentValue.value.concat(newIds),
-    });
+      allResultsPreloaded: false,
+    }, storeKeyName);
   }
 
   public async runCachedSearch(
@@ -337,7 +422,7 @@ export default class CacheWorker {
       // TODO
     }
 
-    // firs we build an array for the results that we need to process
+    // first we build an array for the results that we need to process
     // this means results that are not loaded in memory or partially loaded
     // in memory for some reason, say if the last search failed partially
     let resultsToProcess: ISearchResult[];
@@ -354,11 +439,25 @@ export default class CacheWorker {
       const dbValue: ISearchMatchType = await db.get(SEARCHES_TABLE_NAME, storeKeyName);
       // if the database is not offering anything
       if (!dbValue) {
+        // we need to remove the specifics of the search
+        // as we are caching everything to the given criteria
+        // and then using client side to filter
+        const actualArgsToUseInGQLSearch: any = {
+          token: searchArgs.token,
+          language: searchArgs.language,
+          order_by: new GQLEnum("DEFAULT"),
+        };
+        if (cachePolicy === "by-owner") {
+          actualArgsToUseInGQLSearch.created_by = searchArgs.created_by;
+        } else {
+          // TODO
+        }
+
         // we request the server for this, in this case
         // it might not have been able to connect
         const query = buildGqlQuery({
           name: searchQueryName,
-          args: searchArgs,
+          args: actualArgsToUseInGQLSearch,
           fields: {
             ids: {
               id: {},
@@ -564,11 +663,15 @@ export default class CacheWorker {
             // if the item was deleted, somehow, like it's so unlikely but
             // still possible, say run a search search fails somehow, and then
             // later when executed the item is gone, then we mark it as deleted
-            suceedStoring = await this.setCachedValue(
-              PREFIX_GET + originalBatchRequest.type,
+            // note that this will have an effect on the query itself of our
+            // current search as deleting values (setting them to null) causes them
+            // to be dropped off searchs where they might have been, this will have
+            // the side effect of updating our search values, yes we use the
+            // inefficient search without the optionals, this is unlikely anyway
+            suceedStoring = await this.setCachedValueAsNullAndUpdateSearches(
               originalBatchRequest.id,
-              value,
-              null,
+              originalBatchRequest.type,
+              PREFIX_GET + originalBatchRequest.type,
             );
           } else {
             // otherwise we do push the value and merge the cache
@@ -599,16 +702,27 @@ export default class CacheWorker {
     // if something has not failed then we are good to go
     if (!somethingFailed) {
       // we mark everything as cached, it has succeed caching
-      // everything!
+      // everything! null results that somehow appeared deleted
+      // were automatically deleted by the setCachedValue function
+      // using null, this is why we must reread our fields as some
+      // records might have been removed from the databse itself
+      // during our process of fetching, this can happen
+      // with incompleted searches where results were partial, and then
+      // some were deleted, eg we get, 1,2,3,4,5 but then only manage to fetch
+      // 1,2,3 because our connection dropped, then using another device the
+      // user deletes 5, then comes back to this device when it's loading
+      // this loader will notice 5 is gone and cache its value as null, which
+      // will in turn go to the 1,2,3,4,5 results and remove the 5 key from the list
+      // so using resultsToProcess variable could be wrong as that would contain
+      // 1,2,3,4,5
+      const actualCurrentSearchValue: ISearchMatchType = await db.get(SEARCHES_TABLE_NAME, storeKeyName);
       await db.put(SEARCHES_TABLE_NAME, {
-        value: resultsToProcess,
-        fields: resultingGetListRequestedFields,
+        ...actualCurrentSearchValue,
         allResultsPreloaded: true,
-        lastRecord,
       }, storeKeyName);
 
       // Now we need to filter the search results in order to return what is
-      // appropiate
+      // appropiate using the actualCurrentSearchValue
 
       // TODO run the search, locally with the data in memory in totalResults
       return {
