@@ -2,8 +2,7 @@ import React from "react";
 import { ItemDefinitionContext, SearchItemDefinitionValueContext } from "../providers/item-definition";
 import equals from "deep-equal";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
-import { getFieldsAndArgs } from "../../util";
-import { UNSPECIFIED_OWNER, PREFIX_GET_LIST, PREFIX_GET } from "../../constants";
+import { PREFIX_GET_LIST, PREFIX_GET } from "../../constants";
 import CacheWorkerInstance from "../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
 import { buildGqlQuery, gqlQuery, ISearchResult } from "../../gql-querier";
@@ -140,7 +139,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     const uncachedResults: ISearchResult[] = [];
     const workerCachedResults = await Promise.all(currentSearchResults.map(async (searchResult: ISearchResult) => {
-      const itemDefintionInQuestion = Root.Registry[searchResult.type] as ItemDefinition;
+      const itemDefintionInQuestion =
+        this.props.itemDefinitionInstance.getParentModule()
+          .getParentRoot().registry[searchResult.type] as ItemDefinition;
       // check if it's in memory cache, in such a case the value will have already loaded
       // as the item definition would have applied it initially
       const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchResult.id);
@@ -178,7 +179,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     workerCachedResults.forEach((cr) => {
       if (cr) {
-        const itemDefintionInQuestion = Root.Registry[cr.forType] as ItemDefinition;
+        const itemDefintionInQuestion = this.props.itemDefinitionInstance.getParentModule()
+          .getParentRoot().registry[cr.forType] as ItemDefinition;
         if (cr.cachedResult.value) {
           // we apply the value, whatever we have gotten this will affect all the instances
           // that use the same value
@@ -251,7 +253,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           const forId = uncachedResults[index].id;
           const forType = uncachedResults[index].type;
 
-          const itemDefintionInQuestion = Root.Registry[forType] as ItemDefinition;
+          const itemDefintionInQuestion = this.props.itemDefinitionInstance.getParentModule()
+            .getParentRoot().registry[forType] as ItemDefinition;
           let valueToApply = value ? {
             ...value,
           } : value;
@@ -328,7 +331,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         {
           this.props.children({
             searchResults: this.state.error ? [] : this.state.currentSearchResults.map((searchResult) => {
-              const itemDefinition = Root.Registry[searchResult.type] as ItemDefinition;
+              const itemDefinition = this.props.itemDefinitionInstance
+                .getParentModule().getParentRoot().registry[searchResult.type] as ItemDefinition;
               return {
                 ...searchResult,
                 providerProps: {

@@ -174,7 +174,7 @@ export class Listener {
     lastKnownRecord: number,
   ) {
     try {
-      const itemDefinitionOrModule = Root.Registry[qualifiedPathName];
+      const itemDefinitionOrModule = this.root.registry[qualifiedPathName];
       if (!itemDefinitionOrModule) {
         return;
       }
@@ -222,8 +222,8 @@ export class Listener {
     id: number,
   ) {
     try {
-      const itemDefinition: ItemDefinition = Root.Registry[qualifiedPathName] as ItemDefinition;
-      if (!itemDefinition) {
+      const itemDefinition: ItemDefinition = this.root.registry[qualifiedPathName] as ItemDefinition;
+      if (!itemDefinition || !(itemDefinition instanceof ItemDefinition)) {
         return;
       }
       const mod = itemDefinition.getParentModule();

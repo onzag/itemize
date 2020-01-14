@@ -309,7 +309,7 @@ export default class ItemDefinition {
 
     this.listeners = {};
 
-    Root.Registry[this.getQualifiedPathName()] = this;
+    this.parentModule.getParentRoot().registry[this.getQualifiedPathName()] = this;
   }
 
   public setAsExtensionsInstance() {

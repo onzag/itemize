@@ -2129,7 +2129,7 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                           let valueFor: ItemDefinition;
                           if (props.itemDefinition) {
                             valueFor =
-                              Root.Registry[props.itemDefinition] as ItemDefinition ||
+                              data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition ||
                               data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
                           } else {
                             valueFor = data.mod.getPropExtensionItemDefinition();

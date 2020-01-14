@@ -279,7 +279,7 @@ export class RemoteListener {
   ) {
     console.log("feedback recieved with", qualifiedPathName, id, type, lastModifiedFeedback);
 
-    const itemDefinition: ItemDefinition = Root.Registry[qualifiedPathName] as ItemDefinition;
+    const itemDefinition: ItemDefinition = this.root.registry[qualifiedPathName] as ItemDefinition;
     const appliedGQLValue = itemDefinition.getGQLAppliedValue(id);
     if (appliedGQLValue) {
       if (

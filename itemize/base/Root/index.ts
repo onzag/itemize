@@ -30,9 +30,6 @@ export interface IRawJSONBuildDataType {
 }
 
 export default class Root {
-  public static Registry: {
-    [qualifiedName: string]: Module | ItemDefinition,
-  } = {};
   public static getModuleRawFor(
     root: IRootRawJSONDataType,
     name: string[],
@@ -69,6 +66,9 @@ export default class Root {
   }
 
   public rawData: IRootRawJSONDataType;
+  public registry: {
+    [qualifiedName: string]: Module | ItemDefinition,
+  } = {};
 
   private childModules: Module[];
 
@@ -80,7 +80,7 @@ export default class Root {
     // If its not production run the checks
     this.rawData = rawJSON;
 
-    this.childModules = rawJSON.children.map((c) => new Module(c, null));
+    this.childModules = rawJSON.children.map((c) => new Module(c, this, null));
   }
 
   /**

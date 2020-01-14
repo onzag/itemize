@@ -5,9 +5,7 @@ import { requestFieldsAreContained, deepMerge } from "../../../gql-util";
 import { ISearchResult, buildGqlQuery, gqlQuery, GQLEnum } from "../../../gql-querier";
 import { MAX_SEARCH_RESULTS_AT_ONCE_LIMIT, PREFIX_GET } from "../../../constants";
 import { GraphQLEndpointErrorType } from "../../../base/errors";
-
-// TODO refactor this as well to use objects as arguments rather than the really long
-// list that is being used
+import { search } from "./cache.worker.search";
 
 export interface ICacheMatchType {
   value: any;
@@ -21,7 +19,7 @@ export interface ISearchMatchType {
   lastRecord: number;
 }
 
-interface ICacheDB extends DBSchema {
+export interface ICacheDB extends DBSchema {
   queries: {
     key: string;
     value: ICacheMatchType;
@@ -33,10 +31,10 @@ interface ICacheDB extends DBSchema {
 }
 
 // Name of the cache in the indexed db database
-const CACHE_NAME = "ITEMIZE_CACHE";
+export const CACHE_NAME = "ITEMIZE_CACHE";
 // Name of the table
-const QUERIES_TABLE_NAME = "queries";
-const SEARCHES_TABLE_NAME = "searches";
+export const QUERIES_TABLE_NAME = "queries";
+export const SEARCHES_TABLE_NAME = "searches";
 
 /**
  * This class represents a worker that works under the hood
@@ -212,10 +210,6 @@ export default class CacheWorker {
       return false;
     }
 
-    // TODO check when an item is deleted and the cached value is set to null
-    // so you can revisit all the searches where this item might apply and
-    // remove it from the list by slicing it
-
     return true;
   }
 
@@ -306,7 +300,7 @@ export default class CacheWorker {
     }
 
     // so we fetch our db like usual
-    let db: any;
+    let db: IDBPDatabase<ICacheDB>;
     try {
       db = await this.dbPromise;
     } catch (err) {
@@ -356,9 +350,9 @@ export default class CacheWorker {
     newIds: ISearchResult[],
     newLastRecord: number,
     cachePolicy: "by-owner" | "by-parent",
-  ) {
+  ): Promise<boolean> {
     // so we fetch our db like usual
-    let db: any;
+    let db: IDBPDatabase<ICacheDB>;
     try {
       db = await this.dbPromise;
     } catch (err) {
@@ -366,7 +360,7 @@ export default class CacheWorker {
     }
 
     if (!db) {
-      return null;
+      return false;
     }
 
     let storeKeyName = searchQueryName + "." + cachePolicy.replace("-", "_") + ".";
@@ -376,22 +370,21 @@ export default class CacheWorker {
       // TODO
     }
 
-    // TODO these optimisitic updates are a really bad idea, because if the results get
-    // appended last or are somehow not visible then the new values won't be loaded whatsoever
-    // let's say if a value gets loaded last, make it that somehow the item definition that
-    // searched for this, forces itself to load the values of the new ids as it gets informed
-    // of the new records, somehow, maybe during the search function that is then reexecuted
-    // let the preloader load everything over again and double checking by setting this to false
-
     // So we say that not all results are preloaded so that when the next iteration of the
     // search notices (which should be executed shortly afterwards, then the new records are loaded)
-    const currentValue: ISearchMatchType = await db.get(SEARCHES_TABLE_NAME, storeKeyName);
-    await db.put(SEARCHES_TABLE_NAME, {
-      ...currentValue,
-      lastRecord: newLastRecord,
-      value: currentValue.value.concat(newIds),
-      allResultsPreloaded: false,
-    }, storeKeyName);
+    try {
+      const currentValue: ISearchMatchType = await db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      await db.put(SEARCHES_TABLE_NAME, {
+        ...currentValue,
+        lastRecord: newLastRecord,
+        value: currentValue.value.concat(newIds),
+        allResultsPreloaded: false,
+      }, storeKeyName);
+    } catch {
+      return false;
+    }
+
+    return true;
   }
 
   public async runCachedSearch(
@@ -404,7 +397,7 @@ export default class CacheWorker {
     cachePolicy: "by-owner" | "by-parent",
   ) {
     // so we fetch our db like usual
-    let db: any;
+    let db: IDBPDatabase<ICacheDB>;
     try {
       db = await this.dbPromise;
     } catch (err) {
@@ -500,12 +493,10 @@ export default class CacheWorker {
           // now we can actually start using the args to run a local filtering
           // function
 
-          // TODO run the filters here using the manual strategy (without loading
-          // everything from memory)
           return {
             data: {
               [searchQueryName]: {
-                ids: resultsToProcess,
+                ids: search(db, resultsToProcess, searchArgs),
                 last_record: lastRecord,
               },
             },
@@ -550,10 +541,6 @@ export default class CacheWorker {
     // this can happens when something fails in between, or it is loaded by another
     // part of the application
     const uncachedResultsToProcess: ISearchResult[] = [];
-    const totalResults: Array<{
-      value: any,
-      searchResult: ISearchResult,
-    }> = [];
     // so now we check all the results we are asked to process
     await Promise.all(resultsToProcess.map(async (resultToProcess) => {
       // and get the cached results, considering the fields
@@ -567,12 +554,6 @@ export default class CacheWorker {
       if (!cachedResult) {
         // then we add it to the uncached list we need to process
         uncachedResultsToProcess.push(resultToProcess);
-      } else {
-        // otherwise add it to the list of total results
-        totalResults.push({
-          value: cachedResult.value,
-          searchResult: resultToProcess,
-        });
       }
     }));
 
@@ -654,10 +635,6 @@ export default class CacheWorker {
         // and so we will don
         await Promise.all(resultingValue.data[getListQueryName].results.map(async (value, index) => {
           const originalBatchRequest = originalBatch[index];
-          totalResults.push({
-            value,
-            searchResult: originalBatchRequest,
-          });
           let suceedStoring: boolean;
           if (value === null) {
             // if the item was deleted, somehow, like it's so unlikely but
@@ -724,11 +701,10 @@ export default class CacheWorker {
       // Now we need to filter the search results in order to return what is
       // appropiate using the actualCurrentSearchValue
 
-      // TODO run the search, locally with the data in memory in totalResults
       return {
         data: {
           [searchQueryName]: {
-            ids: resultsToProcess,
+            ids: search(db, actualCurrentSearchValue.value, searchArgs),
           },
         },
         dataMightBeStale,
@@ -738,7 +714,7 @@ export default class CacheWorker {
       // if we managed to catch an error, we pretend
       // to be graphql
       return {
-        [searchQueryName]: null,
+        data: null,
         errors: [
           {
             extensions: error,

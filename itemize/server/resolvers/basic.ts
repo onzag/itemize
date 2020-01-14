@@ -268,7 +268,7 @@ const checkListTypesDebug = Debug("resolvers:checkListTypes");
 export function checkListTypes(ids: ISearchResultIdentifierType[], mod: Module) {
   checkListTypesDebug("EXECUTED with %j", ids);
   ids.forEach((idContainer) => {
-    const itemDefinition = Root.Registry[idContainer.type];
+    const itemDefinition = mod.getParentRoot().registry[idContainer.type];
     if (!itemDefinition) {
       throw new GraphQLEndpointError({
         message: "Unknown qualified path name for " + idContainer.type,

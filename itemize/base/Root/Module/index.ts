@@ -154,6 +154,10 @@ export default class Module {
   public _gqlQueryObj: GraphQLObjectType;
 
   /**
+   * The root that contains the module
+   */
+  private parentRoot: Root;
+  /**
    * The parent module, if any of this module instance
    * as an instance
    */
@@ -181,6 +185,7 @@ export default class Module {
   /**
    * Builds a module from raw json data
    * @param rawJSON the raw json data of the module
+   * @param parentRoot the root that contains the module
    * @param parentModule the parent module of the module, can be null
    * @param disableSearchModeRetrieval makes the search module be null and it's not calculated
    * this is for use because search modules are generated automatically on every instance
@@ -188,11 +193,14 @@ export default class Module {
    */
   constructor(
     rawJSON: IModuleRawJSONDataType,
+    parentRoot: Root,
     parentModule: Module,
     disableSearchModeRetrieval?: boolean,
   ) {
     // Setting the raw variables
     this.rawData = rawJSON;
+    // setting the root
+    this.parentRoot = parentRoot;
     // the parent module might be null
     this.parentModule = parentModule;
     // Setting this as empty just starting
@@ -205,7 +213,7 @@ export default class Module {
       // with our current raw data, null as parent module because search
       // modules are detached from their parents, and we disable
       // the generation of a search module of this same module
-      this.searchModeModule = new Module(Module.buildSearchMode(this.rawData), this, true);
+      this.searchModeModule = new Module(Module.buildSearchMode(this.rawData), this.parentRoot, this, true);
     }
 
     // if we have prop extensions in the raw data we were provided
@@ -234,6 +242,7 @@ export default class Module {
       if (childRawJSONData.type === "module") {
         const newModule = new Module(
           childRawJSONData,
+          this.parentRoot,
           this,
         );
         this.childModules.push(
@@ -267,7 +276,7 @@ export default class Module {
     }, this, null);
     this.childPropExtensionItemDefinition.setAsExtensionsInstance();
 
-    Root.Registry[this.getQualifiedPathName()] = this;
+    this.parentRoot.registry[this.getQualifiedPathName()] = this;
   }
 
   /**
@@ -494,6 +503,13 @@ export default class Module {
    */
   public getParentModule() {
     return this.parentModule;
+  }
+
+  /**
+   * Just gives the parent root
+   */
+  public getParentRoot() {
+    return this.parentRoot;
   }
 
   /**
