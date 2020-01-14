@@ -15,9 +15,6 @@ interface IListenerList {
     listens: {
       [mergedIndexIdentifier: string]: boolean;
     };
-    ownedListens: {
-      [mergedIndexIdentifier: string]: boolean;
-    };
     amount: number;
     uuid: string;
   };
@@ -104,7 +101,6 @@ export class Listener {
       this.listeners[socket.id] = {
         socket,
         listens: {},
-        ownedListens: {},
         uuid,
         amount: 0,
       };
@@ -121,7 +117,6 @@ export class Listener {
       this.listeners[socket.id] = {
         socket,
         listens: {},
-        ownedListens: {},
         uuid: null,
         amount: 0,
       };
@@ -153,7 +148,6 @@ export class Listener {
       this.listeners[socket.id] = {
         socket,
         listens: {},
-        ownedListens: {},
         uuid: null,
         amount: 0,
       };
@@ -165,10 +159,10 @@ export class Listener {
     }
 
     const mergedIndexIdentifier = "OWNED_SEARCH." + qualifiedPathName + "." + createdBy;
-    if (!this.listeners[socket.id].ownedListens[mergedIndexIdentifier]) {
+    if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       console.log("subscribing to", mergedIndexIdentifier);
       this.redisSub.subscribe(mergedIndexIdentifier);
-      this.listeners[socket.id].ownedListens[mergedIndexIdentifier] = true;
+      this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
     }
   }
@@ -276,11 +270,11 @@ export class Listener {
     createdBy: number,
   ) {
     const mergedIndexIdentifier = "OWNED_SEARCH." + qualifiedPathName + "." + createdBy;
-    if (this.listeners[socket.id].ownedListens[mergedIndexIdentifier]) {
-      delete this.listeners[socket.id].ownedListens[mergedIndexIdentifier];
+    if (this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+      delete this.listeners[socket.id].listens[mergedIndexIdentifier];
       this.listeners[socket.id].amount--;
       const noSocketsListeningLeft = Object.keys(this.listeners).every((socketId) => {
-        return !this.listeners[socketId].ownedListens[mergedIndexIdentifier];
+        return !this.listeners[socketId].listens[mergedIndexIdentifier];
       });
       if (noSocketsListeningLeft) {
         console.log("unsubscribing to", mergedIndexIdentifier);
@@ -345,8 +339,7 @@ export class Listener {
           );
         }
       } else if (parsedContent.eventType === "owned-search-added-records") {
-        const whatListening = this.listeners[socketKey].ownedListens;
-        console.log(whatListening, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        const whatListening = this.listeners[socketKey].listens;
         if (
           whatListening[parsedContent.mergedIndexIdentifier] &&
           this.listeners[socketKey].uuid !== parsedContent.listenerUUID
@@ -369,6 +362,18 @@ export class Listener {
     });
   }
   public removeSocket(socket: Socket) {
+    Object.keys(this.listeners[socket.id].listens).forEach((listensMergedIdentifier) => {
+      const noSocketsListeningLeft = Object.keys(this.listeners).every((socketId) => {
+        if (socketId === socket.id) {
+          return true;
+        }
+        return !this.listeners[socketId].listens[listensMergedIdentifier];
+      });
+      if (noSocketsListeningLeft) {
+        console.log("unsubscribing to", listensMergedIdentifier);
+        this.redisSub.unsubscribe(listensMergedIdentifier);
+      }
+    });
     delete this.listeners[socket.id];
   }
 }

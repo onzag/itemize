@@ -3,7 +3,7 @@ import ConditionalRuleSet,
   { IConditionalRuleSetRawJSONDataType } from "../ConditionalRuleSet";
 import {
   ANYONE_METAROLE,
-  SELF_METAROLE,
+  OWNER_METAROLE,
   PREFIX_BUILD,
   POLICY_PREFIXES,
   MAX_FILE_SIZE,
@@ -1290,7 +1290,7 @@ export default class PropertyDefinition {
     } else if (action === ItemDefinitionIOActions.CREATE) {
       return this.rawData.createRoleAccess || [ANYONE_METAROLE];
     } else if (action === ItemDefinitionIOActions.EDIT) {
-      return this.rawData.editRoleAccess || [SELF_METAROLE];
+      return this.rawData.editRoleAccess || [OWNER_METAROLE];
     }
     return [];
   }
@@ -1304,12 +1304,12 @@ export default class PropertyDefinition {
   ) {
     const rolesWithAccess = this.getRolesWithAccessTo(action);
     const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
-      rolesWithAccess.includes(SELF_METAROLE) && userId === ownerUserId
+      rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
     ) || rolesWithAccess.includes(role);
     if (!hasAccess && throwError) {
       const notLoggedInWhenShould = role === GUEST_METAROLE;
       const errorMightHaveBeenAvoidedIfOwnerSpecified = ownerUserId === UNSPECIFIED_OWNER &&
-        rolesWithAccess.includes(SELF_METAROLE);
+        rolesWithAccess.includes(OWNER_METAROLE);
       let errorMessage = `Forbidden, user ${userId} with role ${role} has no ${action} access to property ${this.getId()}` +
         ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
       if (errorMightHaveBeenAvoidedIfOwnerSpecified) {

@@ -259,7 +259,7 @@ interface IItemDefinitionProviderProps {
   forId?: number;
   // this is an important flag, if ownership is assumed this means
   // that when automatic fetching of properties it will do so assuming
-  // the current user is the owner, so SELF rules pass, put an example,
+  // the current user is the owner, so OWNER rules pass, put an example,
   // loading the current user, you have the current user id, and you need
   // to load the user data, if you assume ownership, fields like email will
   // be fetched, without it, they will not be fetched, use this field

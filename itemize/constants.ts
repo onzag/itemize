@@ -531,7 +531,7 @@ export const USER_ROLES = {
   MODERATOR: "MODERATOR",
   USER: "USER",
 };
-export const SELF_METAROLE = "&SELF";
+export const OWNER_METAROLE = "&OWNER";
 export const ANYONE_METAROLE = "&ANYONE";
 export const ANYONE_LOGGED_METAROLE = "&ANYONE_LOGGED";
 export const GUEST_METAROLE = "&GUEST";

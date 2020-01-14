@@ -31,8 +31,8 @@
             "subtype": "email",
             "searchable": false,
             "nullable": true,
-            "readRoleAccess": ["&SELF", "ADMIN"],
-            "editRoleAccess": ["&SELF", "ADMIN"]
+            "readRoleAccess": ["&OWNER", "ADMIN"],
+            "editRoleAccess": ["&OWNER", "ADMIN"]
         },
         {
             "id": "e_validated",
@@ -50,7 +50,7 @@
             "htmlAutocomplete": "current-password",
             "disableRetrieval": true,
             "readRoleAccess": [],
-            "editRoleAccess": ["&SELF", "ADMIN"]
+            "editRoleAccess": ["&OWNER", "ADMIN"]
         },
         {
             "id": "role",
@@ -74,13 +74,13 @@
                 "largeDimension": "256x256"
             },
             "nullable": true,
-            "editRoleAccess": ["&SELF", "ADMIN"]
+            "editRoleAccess": ["&OWNER", "ADMIN"]
         },
         {
             "id": "address",
             "type": "location",
             "nullable": true,
-            "readRoleAccess": ["&SELF"],
+            "readRoleAccess": ["&OWNER"],
             "searchable": false
         }
     ],

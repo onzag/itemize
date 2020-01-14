@@ -8,7 +8,7 @@ import {
   MODULE_PREFIX,
   PREFIXED_CONCAT,
   ANYONE_METAROLE,
-  SELF_METAROLE,
+  OWNER_METAROLE,
   UNSPECIFIED_OWNER,
   GUEST_METAROLE,
 } from "../../../constants";
@@ -580,14 +580,14 @@ export default class Module {
   ) {
     const rolesWithAccess = this.getRolesWithAccessTo(action);
     const modLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
-      rolesWithAccess.includes(SELF_METAROLE) && userId === ownerUserId
+      rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
     ) || rolesWithAccess.includes(role);
 
     if (!modLevelAccess) {
       if (throwError) {
         const notLoggedInWhenShould = role === GUEST_METAROLE;
         const errorMightHaveBeenAvoidedIfOwnerSpecified = ownerUserId === UNSPECIFIED_OWNER &&
-          rolesWithAccess.includes(SELF_METAROLE);
+          rolesWithAccess.includes(OWNER_METAROLE);
         let errorMessage = `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
           ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
         if (errorMightHaveBeenAvoidedIfOwnerSpecified) {

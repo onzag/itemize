@@ -7,7 +7,7 @@ import {
   ITEM_DEFINITION_PREFIX,
   INCLUDE_PREFIX,
   ANYONE_METAROLE,
-  SELF_METAROLE,
+  OWNER_METAROLE,
   ANYONE_LOGGED_METAROLE,
   GUEST_METAROLE,
   UNSPECIFIED_OWNER,
@@ -991,10 +991,10 @@ export default class ItemDefinition {
       return this.rawData.createRoleAccess || [ANYONE_LOGGED_METAROLE];
     } else if (action === ItemDefinitionIOActions.EDIT) {
       // Only the owner of the item can edit by default
-      return this.rawData.editRoleAccess || [SELF_METAROLE];
+      return this.rawData.editRoleAccess || [OWNER_METAROLE];
     } else if (action === ItemDefinitionIOActions.DELETE) {
       // Only the owner of the item can delete it by default
-      return this.rawData.deleteRoleAccess || [SELF_METAROLE];
+      return this.rawData.deleteRoleAccess || [OWNER_METAROLE];
     }
 
     // ???? really this shouldn't happen
@@ -1030,7 +1030,7 @@ export default class ItemDefinition {
     (
       rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
     ) || (
-      rolesWithAccess.includes(SELF_METAROLE) && userId === ownerUserId
+      rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
     ) || rolesWithAccess.includes(role);
 
     // if you got not access
@@ -1041,7 +1041,7 @@ export default class ItemDefinition {
         // fail, it's because you missed to login
         const notLoggedInWhenShould = role === GUEST_METAROLE;
         const errorMightHaveBeenAvoidedIfOwnerSpecified = ownerUserId === UNSPECIFIED_OWNER &&
-          rolesWithAccess.includes(SELF_METAROLE);
+          rolesWithAccess.includes(OWNER_METAROLE);
         let errorMessage = `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
           ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
         if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
@@ -1164,7 +1164,7 @@ export default class ItemDefinition {
       (
         this.rawData.parentingRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
       ) || (
-        this.rawData.parentingRoleAccess.includes(SELF_METAROLE) && userId === parentOwnerUserId
+        this.rawData.parentingRoleAccess.includes(OWNER_METAROLE) && userId === parentOwnerUserId
       ) || this.rawData.parentingRoleAccess.includes(role);
 
       const notLoggedInWhenShould = role === GUEST_METAROLE;

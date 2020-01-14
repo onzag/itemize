@@ -108,8 +108,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
     super(props);
 
     // set the values in the state to the initial
-    // we expose the root variable just because it makes
-    // some debugging easier afterwards
+    // we expose the root variable because it makes debugging
+    // easy and to allow access to the root registry to web workers
     (window as any).ROOT = new Root(props.initialData.root);
     this.state = {
       specifiedCountry: props.initialCountry,

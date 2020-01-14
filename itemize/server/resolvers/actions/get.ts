@@ -82,7 +82,7 @@ export async function getItemDefinition(
   if (!selectQueryValue) {
     // now there is not much but to run this function
     // as a gimmick, we use -1 as the user id to make
-    // some sort of global user, as SELF rules clearly
+    // some sort of global user, as OWNER rules clearly
     // do not apply, we want to throw an error
     // still to the user even though there is no data
     // to protect because the result comes whole thing

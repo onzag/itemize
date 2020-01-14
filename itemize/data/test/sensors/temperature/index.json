@@ -5,7 +5,7 @@
             "id": "temperature",
             "type": "number",
             "nullable": true,
-            "editRoleAccess": ["&SELF", "SENSOR"]
+            "editRoleAccess": ["&OWNER", "SENSOR"]
         }
     ],
     "policies": {
@@ -23,6 +23,6 @@
             }
         }
     },
-    "readRoleAccess": ["&SELF", "SENSOR"],
-    "editRoleAccess": ["&SELF", "SENSOR"]
+    "readRoleAccess": ["&OWNER", "SENSOR"],
+    "editRoleAccess": ["&OWNER", "SENSOR"]
 }

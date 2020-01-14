@@ -6,7 +6,7 @@ import {
   RESERVED_SEARCH_PROPERTIES,
   RESERVED_GETTER_PROPERTIES,
   RESERVED_CHANGE_PROPERTIES,
-  SELF_METAROLE,
+  OWNER_METAROLE,
 } from "../constants";
 import "source-map-support/register";
 import {
@@ -195,10 +195,10 @@ export function checkItemDefinition(
         }
 
         const policyValue: IPolicyValueRawJSONDataType = rawData.policies[policyKey][policyRuleKey];
-        if (policyValue.roles.includes(SELF_METAROLE)) {
+        if (policyValue.roles.includes(OWNER_METAROLE)) {
           throw new CheckUpError(
             "Policy rule '" + policyRuleKey +
-              "' includes a &SELF role, and this is not allowed",
+              "' includes a &OWNER role, and this is not allowed",
             actualTraceback
               .newTraceToBit("policies")
               .newTraceToBit(policyKey)

@@ -182,7 +182,7 @@ export async function searchItemDefinition(
   // the reason is simple, if we can use the query to query
   // the value of something we don't have access to, then, we
   // can brute force the value; for example, let's say we have
-  // a &SELF locked phone_number field, another user might wish
+  // a &OWNER locked phone_number field, another user might wish
   // to know that phone number, so he starts a search process
   // and uses the EXACT_phone_number field, he will get returned null
   // until he matches the phone number, this is a leak, a weak one
