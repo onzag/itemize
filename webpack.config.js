@@ -1,13 +1,15 @@
 const path = require('path');
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',
   entry: {
-    "service-worker": ["babel-polyfill", "./itemize/client/internal/workers/service.worker.ts"],
-    "cache-worker": ["babel-polyfill", "./itemize/client/internal/workers/cache.worker.ts"],
-    "build": ["babel-polyfill", "./src/client/index.tsx"],
+    "service-worker": ["./itemize/client/internal/workers/service/service.worker.ts"],
+    "cache-worker": ["./itemize/client/internal/workers/cache/cache.worker.ts"],
+    "build": ["./src/client/index.tsx"],
   },
   devtool: 'inline-source-map',
   plugins: [
@@ -15,13 +17,35 @@ module.exports = {
       filename: "build.development.css",
       chunkFilename: "build.development.css"
     }),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new CopyPlugin([
+      {
+        from: "./itemize/client/internal/workers/*/*.js",
+        to: path.resolve(__dirname, 'dist/data'),
+      },
+    ]),
+    new BundleAnalyzerPlugin(),
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.mjs']
   },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          name: 'commons',
+          chunks: 'initial',
+          minChunks: 2
+        },
+      }
+    }
+  },
   module: {
     rules: [
+      {
+        test: path.resolve(__dirname, "node_modules/graphql"),
+        use: "null-loader"
+      },
       {
         test: path.resolve(__dirname, "node_modules/jsdom/lib/api.js"),
         use: "null-loader"
@@ -104,6 +128,8 @@ module.exports = {
   },
   output: {
     filename: '[name].development.js',
-    path: path.resolve(__dirname, 'dist/data')
+    path: path.resolve(__dirname, 'dist/data'),
+    libraryTarget: "umd",
+    globalObject: "this",
   }
 };

@@ -1,11 +1,14 @@
-import "babel-polyfill";
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+
 import { expose } from "comlink";
 import { openDB, DBSchema, IDBPDatabase } from "idb";
-import { requestFieldsAreContained, deepMerge } from "../../../gql-util";
-import { ISearchResult, buildGqlQuery, gqlQuery, GQLEnum } from "../../../gql-querier";
-import { MAX_SEARCH_RESULTS_AT_ONCE_LIMIT, PREFIX_GET } from "../../../constants";
-import { GraphQLEndpointErrorType } from "../../../base/errors";
+import { requestFieldsAreContained, deepMerge } from "../../../../gql-util";
+import { ISearchResult, buildGqlQuery, gqlQuery, GQLEnum } from "../../../../gql-querier";
+import { MAX_SEARCH_RESULTS_AT_ONCE_LIMIT, PREFIX_GET } from "../../../../constants";
+import { GraphQLEndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
+import Root, { IRootRawJSONDataType } from "../../../../base/Root";
 
 export interface ICacheMatchType {
   value: any;
@@ -59,6 +62,12 @@ export default class CacheWorker {
    * when they need the cache, so it simply ignores next calls
    */
   private versionHasBeenSet: boolean = false;
+
+  /**
+   * The comlink proxied root class
+   */
+  private rootProxy: Root;
+
   /**
    * This actually setups the worker
    * @param version pass the build number here
@@ -496,7 +505,7 @@ export default class CacheWorker {
           return {
             data: {
               [searchQueryName]: {
-                ids: search(db, resultsToProcess, searchArgs),
+                ids: search(this.rootProxy, db, resultsToProcess, searchArgs),
                 last_record: lastRecord,
               },
             },
@@ -704,7 +713,7 @@ export default class CacheWorker {
       return {
         data: {
           [searchQueryName]: {
-            ids: search(db, actualCurrentSearchValue.value, searchArgs),
+            ids: search(this.rootProxy, db, actualCurrentSearchValue.value, searchArgs),
           },
         },
         dataMightBeStale,
@@ -728,6 +737,10 @@ export default class CacheWorker {
       // of connection failure (or database error)
       return null;
     }
+  }
+
+  public async proxyRoot(rootProxy: IRootRawJSONDataType) {
+    this.rootProxy = new Root(rootProxy);
   }
 }
 

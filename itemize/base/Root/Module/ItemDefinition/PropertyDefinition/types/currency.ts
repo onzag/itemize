@@ -13,6 +13,7 @@ import {
   CLASSIC_SEARCH_OPTIONAL_I18N,
   CLASSIC_SEARCH_RANGED_I18N,
   CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
+  INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
@@ -27,10 +28,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: "PROPERTY_TYPE__Currency",
   gqlFields: {
     value: {
-      type: GraphQLNonNull(GraphQLFloat),
+      type: GraphQLNonNull && GraphQLNonNull(GraphQLFloat),
     },
     currency: {
-      type: GraphQLNonNull(GraphQLString),
+      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
   },
   sql: (sqlPrefix, id) => {
@@ -82,6 +83,58 @@ const typeValue: IPropertyDefinitionSupportedType = {
     if (typeof data[toName] !== "undefined" && data[toName] !== null) {
       knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", data[toName].currency);
       knexBuilder.andWhere(sqlPrefix + id + "_VALUE", "<=", data[toName].value);
+    }
+  },
+  sqlLocalSearch: (
+    args: IGQLValue,
+    rawData: IGQLValue,
+    id: string,
+    includeId?: string,
+  ) => {
+    // item is deleted
+    if (!rawData) {
+      return false;
+    }
+    // item is blocked
+    if (rawData.DATA === null) {
+      return false;
+    }
+
+    const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
+    const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
+    const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+
+    const usefulArgs = includeId ? args[INCLUDE_PREFIX + includeId] || {} : args;
+
+    const propertyValue: IPropertyDefinitionSupportedCurrencyType =
+      includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+
+    const conditions: boolean[] = [];
+    if (typeof usefulArgs[exactName] !== "undefined") {
+      conditions.push(
+        propertyValue.value === usefulArgs[exactName].value &&
+        propertyValue.currency === usefulArgs[exactName].currency,
+      );
+    }
+
+    if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
+      conditions.push(
+        propertyValue.value >= usefulArgs[fromName].value &&
+        propertyValue.currency === usefulArgs[fromName].currency,
+      );
+    }
+
+    if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
+      conditions.push(
+        propertyValue.value <= usefulArgs[toName].value &&
+        propertyValue.currency === usefulArgs[toName].currency,
+      );
+    }
+
+    if (!conditions.length) {
+      return true;
+    } else {
+      return conditions.every((c) => c);
     }
   },
   sqlEqual: (

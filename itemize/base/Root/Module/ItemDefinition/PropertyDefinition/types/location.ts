@@ -2,10 +2,34 @@ import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
 import { IGQLValue } from "../../../../gql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
-import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N, CLASSIC_SEARCH_OPTIONAL_I18N } from "../../../../../../constants";
+import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N,
+  CLASSIC_SEARCH_OPTIONAL_I18N, INCLUDE_PREFIX } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import Knex from "knex";
 import { ISQLTableRowValue } from "../../../../sql";
+
+// https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+function getDistanceFromLatLonInMeters(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+) {
+  const R = 6371; // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1);
+  const dLon = deg2rad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c; // Distance in km
+  return d * 1000;
+}
+
+function deg2rad(deg: number) {
+  return deg * (Math.PI / 180);
+}
 
 export interface IPropertyDefinitionSupportedLocationType {
   lng: number;
@@ -18,16 +42,16 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: "PROPERTY_TYPE__Location",
   gqlFields: {
     lng: {
-      type: GraphQLNonNull(GraphQLFloat),
+      type: GraphQLNonNull && GraphQLNonNull(GraphQLFloat),
     },
     lat: {
-      type: GraphQLNonNull(GraphQLFloat),
+      type: GraphQLNonNull && GraphQLNonNull(GraphQLFloat),
     },
     txt: {
-      type: GraphQLNonNull(GraphQLString),
+      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
     atxt: {
-      type: GraphQLNonNull(GraphQLString),
+      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
   },
   specialProperties: [
@@ -56,7 +80,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       },
     };
   },
-  sqlIn : (value: IPropertyDefinitionSupportedLocationType, sqlPrefix: string, id, property, knex) => {
+  sqlIn: (value: IPropertyDefinitionSupportedLocationType, sqlPrefix: string, id, property, knex) => {
     if (value === null) {
       return {
         [sqlPrefix + id + "_GEO"]: null,
@@ -75,7 +99,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       [sqlPrefix + id + "_ATXT"]: value.atxt,
     };
   },
-  sqlOut: (data: {[key: string]: any}, sqlPrefix: string, id: string) => {
+  sqlOut: (data: { [key: string]: any }, sqlPrefix: string, id: string) => {
     const result: IPropertyDefinitionSupportedLocationType = {
       lat: data[sqlPrefix + id + "_LAT"],
       lng: data[sqlPrefix + id + "_LNG"],
@@ -87,17 +111,19 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
     return result;
   },
-  sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder) => {
+  sqlSearch: (args: IGQLValue, sqlPrefix: string, id: string, knexBuilder) => {
     const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + id;
     const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + id;
 
     if (
-      typeof data[locationName] !== "undefined" && data[locationName] !== null &&
-      typeof data[radiusName] !== "undefined" && data[radiusName] !== null
+      typeof args[locationName] !== "undefined" && args[locationName] !== null &&
+      typeof args[radiusName] !== "undefined" && args[radiusName] !== null
     ) {
-      const lng = data[locationName].lng || 0;
-      const lat = data[locationName].lat || 0;
-      const distance = (data[radiusName].normalizedValue || 0) * 1000;
+      knexBuilder.andWhere(sqlPrefix + id, "!=", null);
+
+      const lng = args[locationName].lng || 0;
+      const lat = args[locationName].lat || 0;
+      const distance = (args[radiusName].normalizedValue || 0) * 1000;
       knexBuilder.andWhereRaw(
         "ST_DWithin(??, ST_MakePoint(?,?)::geography, ?)",
         [
@@ -108,6 +134,50 @@ const typeValue: IPropertyDefinitionSupportedType = {
         ],
       );
     }
+  },
+  sqlLocalSearch: (
+    args: IGQLValue,
+    rawData: IGQLValue,
+    id: string,
+    includeId?: string,
+  ) => {
+    // item is deleted
+    if (!rawData) {
+      return false;
+    }
+    // item is blocked
+    if (rawData.DATA === null) {
+      return false;
+    }
+
+    const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + id;
+    const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + id;
+
+    const usefulArgs = includeId ? args[INCLUDE_PREFIX + includeId] || {} : args;
+
+    if (
+      typeof usefulArgs[locationName] !== "undefined" && usefulArgs[locationName] !== null &&
+      typeof usefulArgs[radiusName] !== "undefined" && usefulArgs[radiusName] !== null
+    ) {
+      const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+      if (propertyValue === null) {
+        return false;
+      }
+
+      const propertyLng = propertyValue.lng || 0;
+      const propertyLat = propertyValue.lat || 0;
+
+      const lng = usefulArgs[locationName].lng || 0;
+      const lat = usefulArgs[locationName].lat || 0;
+
+      const expectedMaxDistance = (usefulArgs[radiusName].normalizedValue || 0) * 1000;
+
+      const actualDistance = getDistanceFromLatLonInMeters(lat, lng, propertyLat, propertyLng);
+
+      return actualDistance <= expectedMaxDistance;
+    }
+
+    return true;
   },
   sqlEqual: (
     value: IPropertyDefinitionSupportedLocationType,

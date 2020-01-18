@@ -1,9 +1,11 @@
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+
 import "./internal/theme/base.scss";
 import ReactDOM from "react-dom";
 import React from "react";
 import { Router } from "react-router-dom";
 import App from "./internal/app";
-import "babel-polyfill";
 import Moment from "moment";
 import { createBrowserHistory } from "history";
 

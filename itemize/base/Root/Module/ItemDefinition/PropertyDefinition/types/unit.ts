@@ -14,6 +14,7 @@ import {
   CLASSIC_SEARCH_OPTIONAL_I18N,
   CLASSIC_SEARCH_RANGED_I18N,
   CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
+  INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
@@ -31,16 +32,16 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: "PROPERTY_TYPE__Unit",
   gqlFields: {
     value: {
-      type: GraphQLNonNull(GraphQLFloat),
+      type: GraphQLNonNull && GraphQLNonNull(GraphQLFloat),
     },
     unit: {
-      type: GraphQLNonNull(GraphQLString),
+      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
     normalizedValue: {
-      type: GraphQLNonNull(GraphQLFloat),
+      type: GraphQLNonNull && GraphQLNonNull(GraphQLFloat),
     },
     normalizedUnit: {
-      type: GraphQLNonNull(GraphQLString),
+      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
   },
   sql: (sqlPrefix: string, id: string) => {
@@ -107,6 +108,58 @@ const typeValue: IPropertyDefinitionSupportedType = {
     if (typeof data[toName] !== "undefined" && data[toName] !== null) {
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", data[toName].normalizedUnit);
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", data[toName].normalizedValue);
+    }
+  },
+  sqlLocalSearch: (
+    args: IGQLValue,
+    rawData: IGQLValue,
+    id: string,
+    includeId?: string,
+  ) => {
+    // item is deleted
+    if (!rawData) {
+      return false;
+    }
+    // item is blocked
+    if (rawData.DATA === null) {
+      return false;
+    }
+
+    const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
+    const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
+    const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+
+    const usefulArgs = includeId ? args[INCLUDE_PREFIX + includeId] || {} : args;
+
+    const propertyValue: IPropertyDefinitionSupportedUnitType =
+      includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+
+    const conditions: boolean[] = [];
+    if (typeof usefulArgs[exactName] !== "undefined") {
+      conditions.push(
+        propertyValue.normalizedValue === usefulArgs[exactName].normalizedValue &&
+        propertyValue.normalizedUnit === usefulArgs[exactName].normalizedUnit,
+      );
+    }
+
+    if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
+      conditions.push(
+        propertyValue.normalizedValue >= usefulArgs[fromName].normalizedValue &&
+        propertyValue.normalizedUnit === usefulArgs[fromName].normalizedUnit,
+      );
+    }
+
+    if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
+      conditions.push(
+        propertyValue.normalizedValue <= usefulArgs[toName].normalizedValue &&
+        propertyValue.normalizedUnit === usefulArgs[toName].normalizedUnit,
+      );
+    }
+
+    if (!conditions.length) {
+      return true;
+    } else {
+      return conditions.every((c) => c);
     }
   },
   sqlEqual: (

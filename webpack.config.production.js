@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   mode: 'production',
@@ -14,10 +15,22 @@ module.exports = {
       filename: "build.production.css",
       chunkFilename: "build.production.css"
     }),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new BundleAnalyzerPlugin(),
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.mjs']
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          name: 'commons',
+          chunks: 'initial',
+          minChunks: 2
+        },
+      }
+    }
   },
   module: {
     rules: [

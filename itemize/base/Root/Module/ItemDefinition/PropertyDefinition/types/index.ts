@@ -94,12 +94,21 @@ export interface IPropertyDefinitionSupportedType {
   // knexBuilder is the builder that is being used so it can attach the where queries to it
   // and dictionary is the postgres dictionary that can be used for sql searches
   sqlSearch: (
-    data: IGQLValue,
+    args: IGQLValue,
     sqlPrefix: string,
     id: string,
     knexBuilder: Knex.QueryBuilder,
     dictionary: string,
   ) => void;
+  // represents a local search checkup performed locally with a graphql value
+  // raw (that is with DATA) the property id and the include id, the args are
+  // the same
+  sqlLocalSearch: (
+    args: IGQLValue,
+    rawData: IGQLValue,
+    id: string,
+    includeId?: string,
+  ) => boolean;
   // Represents a check for equality of a property against another
   // same with the sql prefix as the search
   // same for the id, and knex is just the knex instance, not a builder

@@ -34,7 +34,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     // we throw an error still
     throw new Error(
-      "Attempted to search user by password",
+      "Attempted to search by password",
+    );
+  },
+  sqlLocalSearch: () => {
+    throw new Error(
+      "Attempted to local search by password",
     );
   },
   sqlEqual: (
@@ -71,7 +76,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     data: ISQLTableRowValue,
   ) => {
     if (value === null) {
-      return data[sqlPrefix + id] === value;
+      return data[sqlPrefix + id] === null;
     } else if (!data[sqlPrefix + id]) {
       return false;
     }

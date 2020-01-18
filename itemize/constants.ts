@@ -217,11 +217,11 @@ export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
 // INVALID RESERVED PROPERTY NAMES
 export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   id: {
-    type: GraphQLNonNull(GraphQLInt),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
     description: "The id of the object",
   },
   type: {
-    type: GraphQLNonNull(GraphQLString),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     description: "The type (qualified name) of the object",
   },
   parent_id: {
@@ -233,11 +233,11 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "If exists, a parent type of this object",
   },
   created_at: {
-    type: GraphQLNonNull(GraphQLString),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     description: "When the item was created",
   },
   created_by: {
-    type: GraphQLNonNull(GraphQLInt),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
     description: "The id of the user who created this item",
   },
   edited_at: {
@@ -257,7 +257,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "The user id who reviewed it",
   },
   last_modified: {
-    type: GraphQLNonNull(GraphQLString),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     description: "An internal variable that represents when the whole object, as a whole " +
     " was last modified, by any factor, edited_at servers a UI purpose when things were " +
     " modified by normal means whereas last_modified is a global factor, it could be the " +
@@ -284,11 +284,11 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "A written text of why it was blocked",
   },
   flagged_by: {
-    type: GraphQLList(GraphQLInt),
+    type: GraphQLList && GraphQLList(GraphQLInt),
     description: "Users who flagged this item",
   },
   flagged_reasons: {
-    type: GraphQLList(GraphQLString),
+    type: GraphQLList && GraphQLList(GraphQLString),
     description: "Users who flagged this item, reason",
   },
 };
@@ -387,27 +387,27 @@ export const DATE_FORMAT = "YYYY-MM-DD";
 
 const ID_ELEMENT_FIELDS = {
   id: {
-    type: GraphQLNonNull(GraphQLInt),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
   },
   type: {
-    type: GraphQLNonNull(GraphQLString),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
   },
 };
-export const ID_ELEMENT_GQL = new GraphQLObjectType({
+export const ID_ELEMENT_GQL = GraphQLObjectType && new GraphQLObjectType({
   name: "ID_ELEMENT",
   fields: ID_ELEMENT_FIELDS,
 });
 
-export const ID_ELEMENT_INPUT_GQL = new GraphQLInputObjectType({
+export const ID_ELEMENT_INPUT_GQL = GraphQLInputObjectType && new GraphQLInputObjectType({
   name: "ID_ELEMENT_INPUT",
   fields: ID_ELEMENT_FIELDS,
 });
 
-export const ID_CONTAINER_GQL = new GraphQLObjectType({
+export const ID_CONTAINER_GQL = GraphQLObjectType && new GraphQLObjectType({
   name: "ID_CONTAINER",
   fields: {
     ids: {
-      type: GraphQLList(GraphQLNonNull(ID_ELEMENT_GQL)),
+      type: GraphQLList && GraphQLList(GraphQLNonNull(ID_ELEMENT_GQL)),
     },
     last_record: {
       type: GraphQLInt,
@@ -427,19 +427,19 @@ const BASE_QUERY_PROPERTIES = {
     description: "the access token provided by the app",
   },
   language: {
-    type: GraphQLNonNull(GraphQLString),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     description: "A supported language (dictionary wise) 2 digit code, it is used for FTS purposes and text analysis",
   },
 };
 
-const ORDERBY_RULE = new GraphQLEnumType({
+const ORDERBY_RULE = GraphQLEnumType && new GraphQLEnumType({
   name: "RESERVED_SEARCH_PROPERTY_ENUM_ORDER_BY",
   values: searchOptionsOrderByOptions,
 });
 export const RESERVED_SEARCH_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   order_by: {
-    type: GraphQLNonNull(ORDERBY_RULE),
+    type: GraphQLNonNull && GraphQLNonNull(ORDERBY_RULE),
     description: "An order type",
   },
   created_by: {
@@ -462,11 +462,11 @@ export const RESERVED_SEARCH_PROPERTIES = {
 export const RESERVED_MODULE_SEARCH_PROPERTIES = {
   ...RESERVED_SEARCH_PROPERTIES,
   types: {
-    type: GraphQLList(GraphQLNonNull(GraphQLString)),
+    type: GraphQLList && GraphQLList(GraphQLNonNull(GraphQLString)),
     description: "A list of types (qualified names) to filter by",
   },
   order_by: {
-    type: GraphQLNonNull(ORDERBY_RULE),
+    type: GraphQLNonNull && GraphQLNonNull(ORDERBY_RULE),
     description: "An order type",
   },
   created_by: {
@@ -489,7 +489,7 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = {
 export const RESERVED_GETTER_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   id: {
-    type: GraphQLNonNull(GraphQLInt),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
     description: "the id for that item",
   },
 };
@@ -503,7 +503,7 @@ export const RESERVED_CHANGE_PROPERTIES = {
 export const RESERVED_GETTER_LIST_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   ids: {
-    type: GraphQLNonNull(GraphQLList(ID_ELEMENT_INPUT_GQL)),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLList(ID_ELEMENT_INPUT_GQL)),
     description: "the ids list for that item",
   },
   created_by: {

@@ -7,6 +7,7 @@ import {
   standardSQLEqualFn,
   getStandardSQLFnFor,
   standardSQLLocalEqualFn,
+  standardSQLLocalSearchExactAndRange,
 } from "../sql";
 import { REDUCED_BASE_I18N, CLASSIC_OPTIONAL_I18N, REDUCED_SEARCH_BASE_I18N, CLASSIC_SEARCH_OPTIONAL_I18N } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
@@ -20,6 +21,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
+  sqlLocalSearch: standardSQLLocalSearchExactAndRange,
   sqlEqual: standardSQLEqualFn,
   sqlLocalEqual: standardSQLLocalEqualFn,
 

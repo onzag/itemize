@@ -14,6 +14,7 @@ import { TokenProvider, ITokenProviderState, LocationStateContext } from "./inte
 import { buildGqlMutation, gqlQuery } from "../../../gql-querier";
 import { RemoteListener } from "./remote-listener";
 import "../workers/service";
+import CacheWorkerInstance from "../workers/cache";
 
 // Just a message for whether is development
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -111,6 +112,9 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // we expose the root variable because it makes debugging
     // easy and to allow access to the root registry to web workers
     (window as any).ROOT = new Root(props.initialData.root);
+    if (CacheWorkerInstance.isSupported) {
+      CacheWorkerInstance.instance.proxyRoot(props.initialData.root);
+    }
     this.state = {
       specifiedCountry: props.initialCountry,
       specifiedCurrency: props.initialCurrency,

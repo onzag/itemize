@@ -1,6 +1,15 @@
 {
   "presets": [
-    "@babel/react", "@babel/typescript", ["@babel/env", { "modules": false }]
+    "@babel/react",
+    "@babel/typescript",
+    [
+      "@babel/env",
+      {
+        "modules": false,
+        "useBuiltIns": "entry",
+        "corejs": 3
+      }
+    ]
   ],
   "plugins": [
     "@babel/plugin-transform-regenerator",

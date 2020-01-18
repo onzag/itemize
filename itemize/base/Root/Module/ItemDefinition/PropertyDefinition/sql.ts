@@ -7,6 +7,7 @@ import Knex from "knex";
 import ItemDefinition from "..";
 import Include from "../Include";
 import { processFileListFor, processSingleFileFor } from "./sql-files";
+import { INCLUDE_PREFIX } from "../../../../../constants";
 
 export function getStandardSQLFnFor(type: string):
   (sqlPrefix: string, id: string, property: PropertyDefinition) => ISQLTableDefinitionType {
@@ -64,7 +65,7 @@ export function standardSQLOutWithJSONParseFn(
 }
 
 export function standardSQLSearchFnExactAndRange(
-  data: IGQLValue,
+  args: IGQLValue,
   sqlPrefix: string,
   id: string,
   knexBuilder: Knex.QueryBuilder,
@@ -73,16 +74,102 @@ export function standardSQLSearchFnExactAndRange(
   const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
   const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
 
-  if (typeof data[exactName] !== "undefined") {
-    knexBuilder.andWhere(sqlPrefix + id, data[exactName]);
+  if (typeof args[exactName] !== "undefined") {
+    knexBuilder.andWhere(sqlPrefix + id, args[exactName]);
   }
 
-  if (typeof data[fromName] !== "undefined" && data[fromName] !== null) {
-    knexBuilder.andWhere(sqlPrefix + id, ">=", data[fromName]);
+  if (typeof args[fromName] !== "undefined" && args[fromName] !== null) {
+    knexBuilder.andWhere(sqlPrefix + id, ">=", args[fromName]);
   }
 
-  if (typeof data[toName] !== "undefined" && data[toName] !== null) {
-    knexBuilder.andWhere(sqlPrefix + id, "<=", data[toName]);
+  if (typeof args[toName] !== "undefined" && args[toName] !== null) {
+    knexBuilder.andWhere(sqlPrefix + id, "<=", args[toName]);
+  }
+}
+
+export function standardSQLLocalSearchExactAndRange(
+  args: IGQLValue,
+  rawData: IGQLValue,
+  id: string,
+  includeId?: string,
+) {
+  // item is deleted
+  if (!rawData) {
+    return false;
+  }
+  // item is blocked
+  if (rawData.DATA === null) {
+    return false;
+  }
+
+  const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
+  const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
+  const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+
+  const usefulArgs = includeId ? args[INCLUDE_PREFIX + includeId] || {} : args;
+
+  const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+
+  const conditions: boolean[] = [];
+  if (typeof usefulArgs[exactName] !== "undefined") {
+    conditions.push(propertyValue === usefulArgs[exactName]);
+  }
+
+  if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
+    conditions.push(propertyValue >= usefulArgs[fromName]);
+  }
+
+  if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
+    conditions.push(propertyValue <= usefulArgs[toName]);
+  }
+
+  if (!conditions.length) {
+    return true;
+  } else {
+    return conditions.every((c) => c);
+  }
+}
+
+export function dateSQLLocalSearchExactAndRange(
+  args: IGQLValue,
+  rawData: IGQLValue,
+  id: string,
+  includeId?: string,
+) {
+  // item is deleted
+  if (!rawData) {
+    return false;
+  }
+  // item is blocked
+  if (rawData.DATA === null) {
+    return false;
+  }
+
+  const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
+  const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
+  const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+
+  const usefulArgs = includeId ? args[INCLUDE_PREFIX + includeId] || {} : args;
+
+  const propertyValue = new Date(includeId ? rawData.DATA[includeId][id] : rawData.DATA[id]).getTime();
+
+  const conditions: boolean[] = [];
+  if (typeof usefulArgs[exactName] !== "undefined") {
+    conditions.push(propertyValue === new Date(usefulArgs[exactName]).getTime());
+  }
+
+  if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
+    conditions.push(propertyValue >= new Date(usefulArgs[fromName]).getTime());
+  }
+
+  if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
+    conditions.push(propertyValue <= new Date(usefulArgs[toName]).getTime());
+  }
+
+  if (!conditions.length) {
+    return true;
+  } else {
+    return conditions.every((c) => c);
   }
 }
 

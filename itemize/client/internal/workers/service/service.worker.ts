@@ -1,4 +1,5 @@
-import "babel-polyfill";
+import "core-js/stable";
+import "regenerator-runtime/runtime";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -7,6 +8,7 @@ const urlsToCache = [
   "/rest/resource/lang.json",
   "/rest/resource/image-fail.svg",
   isDevelopment ? "/rest/resource/build.development.js" : "/rest/resource/build.production.js",
+  isDevelopment ? "/rest/resource/commons.development.js" : "/rest/resource/commons.production.js",
   isDevelopment ? "/rest/resource/build.development.css" : "/rest/resource/build.production.css",
   isDevelopment ? "/rest/resource/cache-worker.development.js" : "/rest/resource/cache-worker.production.js",
 ];
@@ -23,6 +25,7 @@ if (isDevelopment) {
 const CACHE_NAME = "ITEMIZEV1";
 
 self.addEventListener("install", (event: any) => {
+  console.log("SERVICE WORKER EXECUTING");
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {

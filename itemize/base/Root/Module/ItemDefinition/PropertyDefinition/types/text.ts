@@ -11,6 +11,7 @@ import {
   CLASSIC_OPTIONAL_I18N,
   CLASSIC_SEARCH_BASE_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N,
+  INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
@@ -79,6 +80,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + id;
 
     if (typeof data[searchName] !== "undefined" && data[searchName] !== null) {
+      // TODO improve, this only matches exact words
       knexBuilder.andWhereRaw(
         "?? @@ to_tsquery(??, ?)",
         [
@@ -88,6 +90,34 @@ const typeValue: IPropertyDefinitionSupportedType = {
         ],
       );
     }
+  },
+  sqlLocalSearch: (
+    args: IGQLValue,
+    rawData: IGQLValue,
+    id: string,
+    includeId?: string,
+  ) => {
+    // item is deleted
+    if (!rawData) {
+      return false;
+    }
+    // item is blocked
+    if (rawData.DATA === null) {
+      return false;
+    }
+
+    const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + id;
+    const usefulArgs = includeId ? args[INCLUDE_PREFIX + includeId] || {} : args;
+
+    if (typeof usefulArgs[searchName] !== "undefined") {
+      const searchMatch = usefulArgs[searchName];
+      const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+
+      // TODO improve, this is kinda trash FTS
+      return propertyValue.includes(searchMatch);
+    }
+
+    return true;
   },
   sqlEqual: standardSQLEqualFn,
   sqlLocalEqual: standardSQLLocalEqualFn,
