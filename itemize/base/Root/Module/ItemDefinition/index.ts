@@ -1122,9 +1122,24 @@ export default class ItemDefinition {
     return canCreateInBehalf;
   }
 
-  // TODO
-  public checkCanBeParentedBy(modulePath: string, itemDefinitionPath: string, throwError: boolean) {
+  /**
+   * Given an item definition checks if this item definition allows itself to be parented
+   * by it, that means the current item definition will be the children
+   * @param parentItemDefinition the expected parent
+   * @param throwError whether to throw an error if failed
+   */
+  public checkCanBeParentedBy(parentItemDefinition: ItemDefinition, throwError: boolean) {
+    // we need to get the module
+    const parentModuleOfParent = parentItemDefinition.getParentModule();
+
+    // and the paths of both in the slashed form, while the qualified is better
+    // the raw info contains this
+    const modulePath = parentModuleOfParent.getPath().join("/");
+    const itemDefinitionPath = parentItemDefinition.getPath().join("/");
+
+    // so now we check if it can be parented
     let canBeParentedBy = false;
+    // now we check if we even have rules for parenting
     if (this.rawData.canBeParentedBy) {
       canBeParentedBy = this.rawData.canBeParentedBy.some((parentPossibility) => {
         if (!parentPossibility.itemDefinition) {
@@ -1142,7 +1157,7 @@ export default class ItemDefinition {
       }
     } else if (throwError) {
       throw new GraphQLEndpointError({
-        message: "parenting role access is not supported",
+        message: "parenting is not supported",
         // here we pass always forbidden simply because it's not supported at all
         // and it was not a login mistake
         code: "FORBIDDEN",
@@ -1151,7 +1166,14 @@ export default class ItemDefinition {
     return canBeParentedBy;
   }
 
-  // TODO
+  /**
+   * Checks whether the current user, has access to create an item and parent it
+   * according to his role
+   * @param role the role of the user
+   * @param userId the user id
+   * @param parentOwnerUserId the parent owner user id of the item this user is trying to parent
+   * @param throwError whether to throw an error
+   */
   public checkRoleAccessForParenting(
     role: string,
     userId: number,

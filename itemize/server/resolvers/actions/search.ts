@@ -226,7 +226,16 @@ export async function searchItemDefinition(
     .where("blocked_at", null);
 
   if (created_by) {
-    searchQuery.where("created_by", created_by);
+    searchQuery.andWhere("created_by", created_by);
+  }
+
+  if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
+    searchQuery
+      .andWhere("parent_id", resolverArgs.args.parent_id)
+      .andWhere("parent_type", resolverArgs.args.parent_type);
+  } else {
+    searchQuery
+      .andWhere("parent_id", null);
   }
 
   if (resolverArgs.args.order_by === "DEFAULT") {

@@ -20,6 +20,9 @@ interface IListenerList {
   };
 }
 
+// TODO refactor all these methods to be proper objects, this is a mess of arguments
+// do the same in the remote listener in the client side
+
 export class Listener {
   private listeners: IListenerList = {};
   private redisSub: RedisClient;
@@ -51,25 +54,44 @@ export class Listener {
     const io = ioMain(server);
     io.on("connection", (socket) => {
       this.addSocket(socket);
-      socket.on("register", (qualifiedPathName: string, id: number) => {
-        this.addListener(socket, qualifiedPathName, id);
+      // TODO implement token there as well
+      socket.on("register", (qualifiedPathName: string, id: number, token: string) => {
+        this.addListener(socket, qualifiedPathName, id, token);
       });
-      socket.on("owned-search-register", (qualifiedPathName: string, token: string, createdBy: number) => {
-        this.addOwnedSearchListener(socket, qualifiedPathName, token, createdBy);
+      socket.on("owned-search-register", (qualifiedPathName: string, createdBy: number, token: string) => {
+        this.addOwnedSearchListener(socket, qualifiedPathName, createdBy, token);
+      });
+      socket.on("parented-search-register", (
+        qualifiedPathName: string,
+        parentQualifiedPathName: string,
+        parentId: number,
+        token: string,
+      ) => {
+        this.addParentedSearchListener(socket, qualifiedPathName, parentQualifiedPathName, parentId, token);
       });
       socket.on("identify", (uuid: string) => {
         this.identify(socket, uuid);
       });
-      socket.on("feedback", (qualifiedPathName: string, id: number) => {
-        this.requestFeedback(socket, qualifiedPathName, id);
+      socket.on("feedback", (qualifiedPathName: string, id: number, token: string) => {
+        this.requestFeedback(socket, qualifiedPathName, id, token);
       });
       socket.on("owned-search-feedback", (
         qualifiedPathName: string,
-        token: string,
         createdBy: number,
         lastKnownRecord: number,
+        token: string,
       ) => {
-        this.requestOwnedSearchFeedback(socket, qualifiedPathName, token, createdBy, lastKnownRecord);
+        this.requestOwnedSearchFeedback(socket, qualifiedPathName, createdBy, lastKnownRecord, token);
+      });
+      socket.on("parented-search-feedback", (
+        qualifiedPathName: string,
+        parentQualifiedPathName: string,
+        parentId: number,
+        lastKnownRecord: number,
+        token: string,
+      ) => {
+        this.requestParentedSearchFeedback(
+          socket, qualifiedPathName, parentQualifiedPathName, parentId, lastKnownRecord, token);
       });
       socket.on("unregister", (qualifiedPathName: string, id: number) => {
         this.removeListener(socket, qualifiedPathName, id);
@@ -79,6 +101,13 @@ export class Listener {
         createdBy: number,
       ) => {
         this.removeOwnedSearchListener(socket, qualifiedPathName, createdBy);
+      });
+      socket.on("parented-search-unregister", (
+        qualifiedPathName: string,
+        parentQualifiedPathName: string,
+        parentId: number,
+      ) => {
+        this.removeParentedSearchListener(socket, qualifiedPathName, parentQualifiedPathName, parentId);
       });
       socket.on("disconnect", () => {
         this.removeSocket(socket);
@@ -112,7 +141,10 @@ export class Listener {
     socket: Socket,
     qualifiedPathName: string,
     id: number,
+    token: string,
   ) {
+    // TODO check if token allows to listen before adding
+
     if (!this.listeners[socket.id]) {
       this.listeners[socket.id] = {
         socket,
@@ -138,8 +170,8 @@ export class Listener {
   public addOwnedSearchListener(
     socket: Socket,
     qualifiedPathName: string,
-    token: string,
     createdBy: number,
+    token: string,
   ) {
     // TODO check token allows this user to search within here otherwise giving
     // he will be able to see any new records added
@@ -166,12 +198,45 @@ export class Listener {
       this.listeners[socket.id].amount++;
     }
   }
+  public addParentedSearchListener(
+    socket: Socket,
+    qualifiedPathName: string,
+    parentQualifiedPathName: string,
+    parentId: number,
+    token: string,
+  ) {
+    // TODO check token allows this user to search within here otherwise giving
+    // he will be able to see any new records added
+
+    if (!this.listeners[socket.id]) {
+      this.listeners[socket.id] = {
+        socket,
+        listens: {},
+        uuid: null,
+        amount: 0,
+      };
+    }
+
+    // do not allow more than 500 concurrent listeners
+    if (this.listeners[socket.id].amount > 500) {
+      return;
+    }
+
+    const mergedIndexIdentifier = "PARENTED_SEARCH." + qualifiedPathName + "." +
+      parentQualifiedPathName + "." + parentId;
+    if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+      console.log("subscribing to", mergedIndexIdentifier);
+      this.redisSub.subscribe(mergedIndexIdentifier);
+      this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
+      this.listeners[socket.id].amount++;
+    }
+  }
   public async requestOwnedSearchFeedback(
     socket: Socket,
     qualifiedPathName: string,
-    token: string,
     createdBy: number,
     lastKnownRecord: number,
+    token: string,
   ) {
     try {
       const itemDefinitionOrModule = this.root.registry[qualifiedPathName];
@@ -216,11 +281,67 @@ export class Listener {
       // not empty happy now
     }
   }
+  public async requestParentedSearchFeedback(
+    socket: Socket,
+    qualifiedPathName: string,
+    parentQualifiedPathName: string,
+    parentId: number,
+    lastKnownRecord: number,
+    token: string,
+  ) {
+    try {
+      const itemDefinitionOrModule = this.root.registry[qualifiedPathName];
+      if (!itemDefinitionOrModule) {
+        return;
+      }
+
+      let mod: Module;
+      let requiredType: string = null;
+      if (itemDefinitionOrModule instanceof ItemDefinition) {
+        mod = itemDefinitionOrModule.getParentModule();
+        requiredType = qualifiedPathName;
+      } else {
+        mod = itemDefinitionOrModule;
+      }
+
+      // TODO check token allows this user to search within here otherwise giving
+      // 0 as the lastKnownRecord will run the search, check the search.ts to see
+      // how it is done
+
+      const query = this.knex.select(["id", "type"]).from(mod.getQualifiedPathName());
+      if (requiredType) {
+        query.where("type", requiredType);
+      }
+
+      query.andWhere("parent_id", parentId);
+      query.andWhere("parent_type", parentQualifiedPathName);
+      query.andWhere("id", ">", lastKnownRecord);
+
+      const newRecords: ISQLTableRowValue[] = await query;
+
+      if (newRecords.length) {
+        socket.emit(
+          "parented-search-added-records",
+          qualifiedPathName,
+          parentQualifiedPathName,
+          parentId,
+          newRecords,
+          Math.max.apply(null, newRecords.map((r) => r.id)),
+        );
+      }
+    } catch (err) {
+      console.log(err);
+      // not empty happy now
+    }
+  }
   public async requestFeedback(
     socket: Socket,
     qualifiedPathName: string,
     id: number,
+    token: string,
   ) {
+    // TODO check token allows for feedback
+
     try {
       const itemDefinition: ItemDefinition = this.root.registry[qualifiedPathName] as ItemDefinition;
       if (!itemDefinition || !(itemDefinition instanceof ItemDefinition)) {
@@ -282,6 +403,26 @@ export class Listener {
       }
     }
   }
+  public removeParentedSearchListener(
+    socket: Socket,
+    qualifiedPathName: string,
+    parentQualifiedPathName: string,
+    parentId: number,
+  ) {
+    const mergedIndexIdentifier = "PARENTED_SEARCH." + qualifiedPathName + "." + parentQualifiedPathName +
+      "." + parentId;
+    if (this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+      delete this.listeners[socket.id].listens[mergedIndexIdentifier];
+      this.listeners[socket.id].amount--;
+      const noSocketsListeningLeft = Object.keys(this.listeners).every((socketId) => {
+        return !this.listeners[socketId].listens[mergedIndexIdentifier];
+      });
+      if (noSocketsListeningLeft) {
+        console.log("unsubscribing to", mergedIndexIdentifier);
+        this.redisSub.unsubscribe(mergedIndexIdentifier);
+      }
+    }
+  }
   public triggerListeners(
     qualifiedPathName: string,
     id: number,
@@ -302,20 +443,42 @@ export class Listener {
   public triggerOwnedSearchListeners(
     qualifiedPathName: string,
     createdBy: number,
-    id: number,
-    type: string,
+    addedType: string,
+    addedId: number,
     listenerUUID: string,
   ) {
     const mergedIndexIdentifier = "OWNED_SEARCH." + qualifiedPathName + "." + createdBy;
     console.log("publishing to", mergedIndexIdentifier);
     this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
       qualifiedPathName,
-      id,
-      type,
+      addedId,
+      addedType,
       createdBy,
       listenerUUID,
       mergedIndexIdentifier,
       eventType: "owned-search-added-records",
+    }));
+  }
+  public triggerParentedSearchListeners(
+    qualifiedPathName: string,
+    parentQualifiedPathName: string,
+    parentId: number,
+    addedType: string,
+    addedId: number,
+    listenerUUID: string,
+  ) {
+    const mergedIndexIdentifier = "PARENTED_SEARCH." + qualifiedPathName + "." + parentQualifiedPathName +
+      "." + parentId;
+    console.log("publishing to", mergedIndexIdentifier);
+    this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
+      qualifiedPathName,
+      parentQualifiedPathName,
+      parentId,
+      addedType,
+      addedId,
+      listenerUUID,
+      mergedIndexIdentifier,
+      eventType: "parented-search-added-records",
     }));
   }
   public pubSubTriggerListeners(
@@ -351,11 +514,32 @@ export class Listener {
             parsedContent.createdBy,
             [
               {
-                id: parsedContent.id,
-                type: parsedContent.type,
+                id: parsedContent.addedId,
+                type: parsedContent.addedType,
               },
             ],
-            parsedContent.id,
+            parsedContent.addedId,
+          );
+        }
+      } else if (parsedContent.eventType === "parented-search-added-records") {
+        const whatListening = this.listeners[socketKey].listens;
+        if (
+          whatListening[parsedContent.mergedIndexIdentifier] &&
+          this.listeners[socketKey].uuid !== parsedContent.listenerUUID
+        ) {
+          console.log("emitting to someone");
+          this.listeners[socketKey].socket.emit(
+            "parented-search-added-records",
+            parsedContent.qualifiedPathName,
+            parsedContent.parentQualifiedPathName,
+            parsedContent.parentId,
+            [
+              {
+                id: parsedContent.addedId,
+                type: parsedContent.addedType,
+              },
+            ],
+            parsedContent.addedId,
           );
         }
       }

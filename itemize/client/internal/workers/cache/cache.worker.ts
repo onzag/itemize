@@ -355,7 +355,9 @@ export default class CacheWorker {
 
   public async addRecordsToCachedSearch(
     searchQueryName: string,
-    ownerOrParentId: string,
+    createdByIfKnown: number,
+    parentTypeIfKnown: string,
+    parentIdIfKnown: number,
     newIds: ISearchResult[],
     newLastRecord: number,
     cachePolicy: "by-owner" | "by-parent",
@@ -374,9 +376,9 @@ export default class CacheWorker {
 
     let storeKeyName = searchQueryName + "." + cachePolicy.replace("-", "_") + ".";
     if (cachePolicy === "by-owner") {
-      storeKeyName += ownerOrParentId;
+      storeKeyName += createdByIfKnown;
     } else {
-      // TODO
+      storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown;
     }
 
     // So we say that not all results are preloaded so that when the next iteration of the
@@ -421,7 +423,7 @@ export default class CacheWorker {
     if (cachePolicy === "by-owner") {
       storeKeyName += searchArgs.created_by;
     } else {
-      // TODO
+      storeKeyName += searchArgs.parent_type + "." + searchArgs.parent_id;
     }
 
     // first we build an array for the results that we need to process
@@ -452,7 +454,8 @@ export default class CacheWorker {
         if (cachePolicy === "by-owner") {
           actualArgsToUseInGQLSearch.created_by = searchArgs.created_by;
         } else {
-          // TODO
+          actualArgsToUseInGQLSearch.parent_type = searchArgs.parent_type;
+          actualArgsToUseInGQLSearch.parent_id = searchArgs.parent_id;
         }
 
         // we request the server for this, in this case

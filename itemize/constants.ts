@@ -229,7 +229,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "If exists, a parent id of this object",
   },
   parent_type: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "If exists, a parent type of this object",
   },
   created_at: {

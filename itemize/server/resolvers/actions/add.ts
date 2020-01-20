@@ -10,6 +10,7 @@ import {
   serverSideCheckItemDefinitionAgainst,
   validateTokenIsntBlocked,
   checkUserExists,
+  validateParentingRules,
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import { CONNECTOR_SQL_COLUMN_FK_NAME, INCLUDE_PREFIX,
@@ -41,6 +42,19 @@ export async function addItemDefinition(
   // check that the user is logged in, for adding, only logged users
   // are valid
   await validateTokenIsntBlocked(appData.cache, tokenData);
+
+  // now we must check if we are parenting
+  const isParenting = !!(resolverArgs.args.parent_id || resolverArgs.args.parent_type);
+  if (isParenting) {
+    validateParentingRules(
+      appData,
+      resolverArgs.args.parent_id,
+      resolverArgs.args.parent_type,
+      itemDefinition,
+      tokenData.id,
+      tokenData.role,
+    );
+  }
 
   // now we see which fields are being requested for the answer after adding, first
   // we flatten the fields, remember that we have external and internal fields
@@ -169,6 +183,11 @@ export async function addItemDefinition(
   sqlModData.last_modified = appData.knex.fn.now();
   sqlModData.created_by = tokenData.id || UNSPECIFIED_OWNER;
 
+  if (isParenting) {
+    sqlModData.parent_id = resolverArgs.args.parent_id;
+    sqlModData.parent_type = resolverArgs.args.parent_type;
+  }
+
   debug("SQL Input data for idef is %j", sqlIdefData);
   debug("SQL Input data for module is %j", sqlModData);
 
@@ -229,17 +248,36 @@ export async function addItemDefinition(
   appData.listener.triggerOwnedSearchListeners(
     selfTable,
     sqlModData.created_by,
-    value.id,
     selfTable,
+    value.id,
     null, // TODO add the listener uuid, maybe?
   );
   appData.listener.triggerOwnedSearchListeners(
     moduleTable,
     sqlModData.created_by,
-    value.id,
     selfTable,
+    value.id,
     null, // TODO add the listener uuid, maybe?
   );
+
+  if (isParenting) {
+    appData.listener.triggerParentedSearchListeners(
+      selfTable,
+      resolverArgs.args.parent_type,
+      resolverArgs.args.parent_id,
+      selfTable,
+      value.id,
+      null, // TODO add the listener uuid, maybe?
+    );
+    appData.listener.triggerParentedSearchListeners(
+      moduleTable,
+      resolverArgs.args.parent_type,
+      resolverArgs.args.parent_id,
+      selfTable,
+      value.id,
+      null, // TODO add the listener uuid, maybe?
+    );
+  }
 
   debug("SUCCEED with GQL output %j", finalOutput);
 

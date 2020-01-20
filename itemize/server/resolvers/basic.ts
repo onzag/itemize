@@ -178,19 +178,25 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
 const validateParentingRulesDebug = Debug("resolvers:validateParentingRules");
 export async function validateParentingRules(
   appData: IAppDataType,
-  modulePath: string,
-  itemDefPath: string,
   id: number,
+  type: string,
   itemDefinition: ItemDefinition,
   userId: number,
   role: string,
 ) {
-  validateParentingRulesDebug("EXECUTED with %s", modulePath, itemDefPath);
-  itemDefinition.checkCanBeParentedBy(modulePath, itemDefPath, true);
-  const parentMod = appData.root.getModuleFor(modulePath.split("/"));
-  const parentIdef = parentMod.getItemDefinitionFor(itemDefPath.split("/"));
+  validateParentingRulesDebug("EXECUTED with %j %s", id, type);
+  const parentingItemDefinition = appData.root.registry[type] as ItemDefinition;
+  if (!(parentingItemDefinition instanceof ItemDefinition)) {
+    throw new GraphQLEndpointError({
+      message: "Invalid parent type " + type,
+      code: "UNSPECIFIED",
+    });
+  }
+
+  itemDefinition.checkCanBeParentedBy(parentingItemDefinition, true);
+  const parentMod = parentingItemDefinition.getParentModule();
   const result = await appData.cache.requestCache(
-    parentIdef.getQualifiedPathName(), parentMod.getQualifiedPathName(), id,
+    type, parentMod.getQualifiedPathName(), id,
   );
   if (!result) {
     throw new GraphQLEndpointError({
@@ -198,7 +204,7 @@ export async function validateParentingRules(
       code: "NOT_FOUND",
     });
   }
-  const parentOwnerId = parentIdef.isOwnerObjectId() ? result.id : result.created_by;
+  const parentOwnerId = parentingItemDefinition.isOwnerObjectId() ? result.id : result.created_by;
   itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, true);
   validateParentingRulesDebug("SUCCEED");
 }

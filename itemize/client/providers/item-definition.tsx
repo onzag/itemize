@@ -25,7 +25,6 @@ import CacheWorkerInstance from "../internal/workers/cache";
 import { RemoteListener } from "../internal/app/remote-listener";
 import { getFieldsAndArgs } from "../../util";
 import uuid from "uuid";
-import Root from "../../base/Root";
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
@@ -93,6 +92,11 @@ export interface IActionSearchOptions {
   unpokeAfterSuccess?: boolean;
   orderBy?: "DEFAULT";
   createdBy?: number;
+  parentedBy?: {
+    module: string,
+    itemDefinition: string,
+    id: number,
+  };
   cachePolicy?: "by-owner" | "by-parent" | "none";
 }
 
@@ -347,6 +351,7 @@ interface IActualItemDefinitionProviderState {
   searchResults: ISearchResult[];
   searchId: string;
   searchOwner: number;
+  searchParent: [string, number];
   searchShouldCache: boolean;
   searchRequestedProperties: string[];
   searchRequestedIncludes: string[];
@@ -483,6 +488,7 @@ export class ActualItemDefinitionProvider extends
       searchResults: [],
       searchId: null,
       searchOwner: null,
+      searchParent: null,
       searchShouldCache: false,
       searchFields: null,
       searchRequestedIncludes: [],
@@ -539,6 +545,7 @@ export class ActualItemDefinitionProvider extends
         this,
         this.props.itemDefinitionInstance,
         this.props.forId,
+        this.props.tokenData.token,
       );
     }
   }
@@ -623,7 +630,7 @@ export class ActualItemDefinitionProvider extends
         alreadyAddedRemoteListeners = true;
         this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
         this.props.remoteListener.addItemDefinitionListenerFor(
-          this, this.props.itemDefinitionInstance, this.props.forId,
+          this, this.props.itemDefinitionInstance, this.props.forId, this.props.tokenData.token,
         );
       }
 
@@ -644,7 +651,7 @@ export class ActualItemDefinitionProvider extends
         if (this.props.forId && !isStatic && !alreadyAddedRemoteListeners) {
           this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
           this.props.remoteListener.addItemDefinitionListenerFor(
-            this, this.props.itemDefinitionInstance, this.props.forId,
+            this, this.props.itemDefinitionInstance, this.props.forId, this.props.tokenData.token,
           );
         }
       }
@@ -773,7 +780,8 @@ export class ActualItemDefinitionProvider extends
           value: appliedGQLValue.rawValue,
           error: null,
         });
-        this.props.remoteListener.requestFeedbackFor(this.props.itemDefinitionInstance, this.props.forId);
+        this.props.remoteListener.requestFeedbackFor(
+          this.props.itemDefinitionInstance, this.props.forId, this.props.tokenData.token);
         // in some situations the value can be in memory but not yet permanently cached
         // (eg. when there is a search context)
         // and another item without a search context attempts to load the value this will
@@ -896,7 +904,8 @@ export class ActualItemDefinitionProvider extends
     // but the denyCache flag will be active, ensuring the value will be requested
     // from the server
     if (cached) {
-      this.props.remoteListener.requestFeedbackFor(this.props.itemDefinitionInstance, this.props.forId);
+      this.props.remoteListener.requestFeedbackFor(
+        this.props.itemDefinitionInstance, this.props.forId, this.props.tokenData.token);
     }
 
     // now from the waiter we return the value, the error and the fields
@@ -1216,6 +1225,7 @@ export class ActualItemDefinitionProvider extends
       returnWorkerCachedValuesForGetRequests?: boolean,
       searchOrderBy?: string,
       searchCreatedBy?: number,
+      searchParentedBy?: [string, number],
       searchCachePolicy?: "by-owner" | "by-parent" | "none",
       searchRequestedFieldsOnCachePolicy?: any,
     },
@@ -1255,6 +1265,11 @@ export class ActualItemDefinitionProvider extends
 
     if (arg.queryPrefix === PREFIX_SEARCH && typeof arg.searchCreatedBy !== "undefined") {
       args.created_by = arg.searchCreatedBy;
+    }
+
+    if (arg.queryPrefix === PREFIX_SEARCH && typeof arg.searchParentedBy !== "undefined") {
+      args.parent_type = arg.searchParentedBy[0];
+      args.parent_id = arg.searchParentedBy[1];
     }
 
     // now we get the currently applied value in memory
@@ -1348,7 +1363,14 @@ export class ActualItemDefinitionProvider extends
             this.onSearchReload,
           );
         } else {
-          // TODO
+          this.props.remoteListener.addParentedSearchListenerFor(
+            this.props.itemDefinitionInstance.getStandardCounterpart(),
+            this.props.tokenData.token,
+            arg.searchParentedBy[0],
+            arg.searchParentedBy[1],
+            gqlValue.lastRecord,
+            this.onSearchReload,
+          );
         }
 
         if (gqlValue.dataMightBeStale) {
@@ -1360,7 +1382,13 @@ export class ActualItemDefinitionProvider extends
               gqlValue.lastRecord,
             );
           } else {
-            // TODO
+            this.props.remoteListener.requestParentedSearchFeedbackFor(
+              this.props.itemDefinitionInstance.getStandardCounterpart(),
+              this.props.tokenData.token,
+              arg.searchParentedBy[0],
+              arg.searchParentedBy[1],
+              gqlValue.lastRecord,
+            );
           }
         }
       }
@@ -1836,6 +1864,17 @@ export class ActualItemDefinitionProvider extends
       throw new Error("A by owner cache policy requires createdBy option to be set");
     }
 
+    let searchParent: [string, number] = null;
+    if (options.cachePolicy === "by-parent" && !options.parentedBy) {
+      throw new Error("A by owner cache policy requires parentedBy option to be set");
+    } else if (options.parentedBy) {
+      const moduleInQuestion = this.props.itemDefinitionInstance.getParentModule()
+        .getParentRoot().getModuleFor(options.parentedBy.module.split("/"));
+      const itemDefinitionInQuestion = moduleInQuestion.getItemDefinitionFor(
+        options.parentedBy.itemDefinition.split("/"));
+      searchParent = [itemDefinitionInQuestion.getQualifiedPathName(), options.parentedBy.id];
+    }
+
     if (options.cachePolicy === "by-owner") {
       if (options.createdBy !== this.state.searchOwner) {
         // this search listener is bad because the search
@@ -1844,7 +1883,12 @@ export class ActualItemDefinitionProvider extends
         this.removePossibleSearchListeners();
       }
     } else if (options.cachePolicy === "by-parent") {
-      // TODO
+      if (!equals(searchParent, this.state.searchParent)) {
+        // this search listener is bad because the search
+        // owner has changed, and the previously registered listener
+        // if any does not match the owner
+        this.removePossibleSearchListeners();
+      }
     } else {
       this.removePossibleSearchListeners();
     }
@@ -1919,6 +1963,7 @@ export class ActualItemDefinitionProvider extends
         searchResults,
         searchId: uuid.v4(),
         searchOwner: options.createdBy || null,
+        searchParent,
         searchShouldCache: !!options.cachePolicy,
         searchFields: requestedSearchFields,
         searchRequestedProperties: options.requestedProperties,
@@ -1933,6 +1978,7 @@ export class ActualItemDefinitionProvider extends
         searchResults: value ? value.ids : [],
         searchId: uuid.v4(),
         searchOwner: options.createdBy || null,
+        searchParent,
         searchShouldCache: !!options.cachePolicy,
         searchFields: requestedSearchFields,
         searchRequestedProperties: options.requestedProperties,
@@ -1989,6 +2035,12 @@ export class ActualItemDefinitionProvider extends
         this.onSearchReload,
         props.itemDefinitionInstance.getStandardCounterpart(),
         state.searchOwner,
+      );
+      props.remoteListener.removeParentedSearchListenerFor(
+        this.onSearchReload,
+        props.itemDefinitionInstance.getStandardCounterpart(),
+        state.searchParent[0],
+        state.searchParent[1],
       );
     }
   }
