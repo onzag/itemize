@@ -6,9 +6,9 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 module.exports = {
   mode: 'production',
   entry: {
-    "service-worker": ["babel-polyfill", "./itemize/client/internal/workers/service.worker.ts"],
-    "cache-worker": ["babel-polyfill", "./itemize/client/internal/workers/cache.worker.ts"],
-    "build": ["babel-polyfill", "./src/client/index.tsx"],
+    "service-worker": ["./itemize/client/internal/workers/service/service.worker.ts"],
+    "cache-worker": ["./itemize/client/internal/workers/cache/cache.worker.ts"],
+    "build": ["./src/client/index.tsx"],
   },
   plugins: [
     new MiniCssExtractPlugin({
@@ -26,8 +26,10 @@ module.exports = {
       cacheGroups: {
         commons: {
           name: 'commons',
-          chunks: 'initial',
-          minChunks: 2
+          minChunks: 2,
+          chunks(chunk) {
+            return chunk.name !== "service-worker";
+          },
         },
       }
     }

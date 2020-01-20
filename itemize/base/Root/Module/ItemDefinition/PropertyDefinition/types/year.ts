@@ -6,9 +6,11 @@ import {
   standardSQLSearchFnExactAndRange,
   standardSQLEqualFn,
   getStandardSQLFnFor,
+} from "../sql";
+import {
   standardSQLLocalEqualFn,
   standardSQLLocalSearchExactAndRange,
-} from "../sql";
+} from "../local-sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_SUPPORTED_YEAR,

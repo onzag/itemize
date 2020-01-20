@@ -6,9 +6,11 @@ import {
   standardSQLSearchFnExactAndRange,
   standardSQLEqualFn,
   getStandardSQLFnFor,
+} from "../sql";
+import {
   standardSQLLocalEqualFn,
   dateSQLLocalSearchExactAndRange,
-} from "../sql";
+} from "../local-sql";
 import { PropertyDefinitionSupportedDateType } from "./date";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {

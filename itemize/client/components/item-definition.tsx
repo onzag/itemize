@@ -6,11 +6,11 @@ import {
   IActionResponseWithId,
   IActionResponseWithSearchResults,
   IItemDefinitionContextType,
-  ISearchResult,
   IActionSubmitOptions,
   IActionSearchOptions,
 } from "../providers/item-definition";
 import equals from "deep-equal";
+import { ISearchResult } from "../../gql-querier";
 
 export interface IItemDefinitionLoaderInfoArgType {
   loading: boolean;

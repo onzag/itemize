@@ -6,9 +6,11 @@ import {
   standardSQLSearchFnExactAndRange,
   standardSQLEqualFn,
   getStandardSQLFnFor,
+} from "../sql";
+import {
   standardSQLLocalEqualFn,
   standardSQLLocalSearchExactAndRange,
-} from "../sql";
+} from "../local-sql";
 import { REDUCED_BASE_I18N, CLASSIC_OPTIONAL_I18N, REDUCED_SEARCH_BASE_I18N, CLASSIC_SEARCH_OPTIONAL_I18N } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 

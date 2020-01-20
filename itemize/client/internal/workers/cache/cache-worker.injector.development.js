@@ -1,4 +1,4 @@
-var base = location.protocol + "//" + location.host + location.pathname.split("/").slice(0, -1).join("/");
+var base = location.protocol + "//" + location.host;
+window = self;
 
-self.importScripts(base + "/rest/resource/commons.development.js");
-self.importScripts(base + "/rest/resource/cache-worker.development.js");
+self.importScripts(base + "/rest/resource/commons.development.js", base + "/rest/resource/cache-worker.development.js");

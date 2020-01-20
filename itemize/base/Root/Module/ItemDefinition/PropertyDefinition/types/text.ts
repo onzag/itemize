@@ -2,7 +2,10 @@ import {
   IPropertyDefinitionSupportedType,
 } from "../types";
 import { GraphQLString } from "graphql";
-import { standardSQLOutFn, standardSQLEqualFn, standardSQLLocalEqualFn } from "../sql";
+import { standardSQLOutFn, standardSQLEqualFn } from "../sql";
+import {
+  standardSQLLocalEqualFn,
+} from "../local-sql";
 import { IGQLValue } from "../../../../gql";
 import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
@@ -62,7 +65,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
       purifiedText = DOMPurify.sanitize(value.toString());
     }
 
-    console.log(dictionary, value, escapedText);
     return {
       [id]: purifiedText,
       [id + "_DICTIONARY"]: dictionary,
@@ -109,7 +111,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + id;
     const usefulArgs = includeId ? args[INCLUDE_PREFIX + includeId] || {} : args;
 
-    if (typeof usefulArgs[searchName] !== "undefined") {
+    if (typeof usefulArgs[searchName] !== "undefined" && usefulArgs[searchName] !== null) {
       const searchMatch = usefulArgs[searchName];
       const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
 

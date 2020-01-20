@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const CopyPlugin = require('copy-webpack-plugin');
+const WorkerInjectorGeneratorPlugin = require("worker-injector-generator-plugin");
 
 module.exports = {
   mode: 'development',
@@ -18,13 +18,14 @@ module.exports = {
       chunkFilename: "build.development.css"
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new CopyPlugin([
-      {
-        from: "./itemize/client/internal/workers/*/*.js",
-        to: path.resolve(__dirname, 'dist/data'),
-      },
-    ]),
-    new BundleAnalyzerPlugin(),
+    new WorkerInjectorGeneratorPlugin({
+      name: "cache-worker.injector.development.js",
+      importScripts: [
+        "commons.development.js",
+        "cache-worker.development.js",
+      ],
+    }),
+    // new BundleAnalyzerPlugin(),
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.mjs']
@@ -34,8 +35,10 @@ module.exports = {
       cacheGroups: {
         commons: {
           name: 'commons',
-          chunks: 'initial',
-          minChunks: 2
+          minChunks: 2,
+          chunks(chunk) {
+            return chunk.name !== "service-worker";
+          }
         },
       }
     }
@@ -131,5 +134,6 @@ module.exports = {
     path: path.resolve(__dirname, 'dist/data'),
     libraryTarget: "umd",
     globalObject: "this",
+    publicPath: "/rest/resource/",
   }
 };

@@ -67,6 +67,9 @@ async function checkOne(
     const itemDefinition = rootProxy.registry[searchResult.type] as ItemDefinition;
     // now we check every single property using the local search
     shouldBeIncluded = itemDefinition.getAllPropertyDefinitionsAndExtensions().every((pd) => {
+      if (!pd.isSearchable()) {
+        return true;
+      }
       const description = pd.getPropertyDefinitionDescription();
       return description.sqlLocalSearch(searchArgs, value, pd.getId(), null);
     });
@@ -92,6 +95,9 @@ async function checkOne(
         // otherwise if we expect ANY or INCLUDED and it's not excluded, we check every single property
         if (expectedIncludeExclusionState !== "EXCLUDED" && appliedIncludeExclusionState !== "EXCLUDED") {
           return i.getSinkingProperties().every((sp) => {
+            if (!sp.isSearchable()) {
+              return true;
+            }
             const sinkingDescription = sp.getPropertyDefinitionDescription();
             return sinkingDescription.sqlLocalSearch(searchArgs, value, sp.getId(), i.getId());
           });

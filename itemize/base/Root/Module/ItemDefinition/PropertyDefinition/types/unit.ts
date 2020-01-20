@@ -136,10 +136,16 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     const conditions: boolean[] = [];
     if (typeof usefulArgs[exactName] !== "undefined") {
-      conditions.push(
-        propertyValue.normalizedValue === usefulArgs[exactName].normalizedValue &&
-        propertyValue.normalizedUnit === usefulArgs[exactName].normalizedUnit,
-      );
+      if (usefulArgs[exactName] === null) {
+        conditions.push(
+          propertyValue.normalizedValue === null,
+        );
+      } else {
+        conditions.push(
+          propertyValue.normalizedValue === usefulArgs[exactName].normalizedValue &&
+          propertyValue.normalizedUnit === usefulArgs[exactName].normalizedUnit,
+        );
+      }
     }
 
     if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {

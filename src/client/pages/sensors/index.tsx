@@ -28,6 +28,7 @@ export function SensorsIndex() {
             automaticSearch={{
               createdBy: userId,
               requestedProperties: ["name"],
+              cachePolicy: "by-owner",
             }}
           >
             <I18nRead id="search">
@@ -47,6 +48,7 @@ export function SensorsIndex() {
                   onClick={actioner.search.bind(null, {
                     createdBy: userId,
                     requestedProperties: ["name"],
+                    cachePolicy: "by-owner",
                   })}
                 >
                   <I18nRead id="search" />

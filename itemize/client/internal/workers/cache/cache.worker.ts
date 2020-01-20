@@ -505,7 +505,7 @@ export default class CacheWorker {
           return {
             data: {
               [searchQueryName]: {
-                ids: search(this.rootProxy, db, resultsToProcess, searchArgs),
+                ids: await search(this.rootProxy, db, resultsToProcess, searchArgs),
                 last_record: lastRecord,
               },
             },
@@ -713,7 +713,7 @@ export default class CacheWorker {
       return {
         data: {
           [searchQueryName]: {
-            ids: search(this.rootProxy, db, actualCurrentSearchValue.value, searchArgs),
+            ids: await search(this.rootProxy, db, actualCurrentSearchValue.value, searchArgs),
           },
         },
         dataMightBeStale,

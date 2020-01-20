@@ -46,7 +46,8 @@
     "redis": "^2.8.0",
     "regenerator-runtime": "^0.13.3",
     "sharp": "^0.23.4",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "worker-injector-generator-plugin": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",
@@ -85,7 +86,6 @@
     "bcrypt": "^3.0.7",
     "colors": "^1.4.0",
     "convert-units": "^2.3.4",
-    "copy-webpack-plugin": "^5.1.1",
     "css-loader": "^2.1.1",
     "debug": "^4.1.1",
     "deep-equal": "^1.1.1",

@@ -1,4 +1,5 @@
-import "core-js/stable";
+// We don't import corejs in our service worker as we do not really use
+// any of that overall, we only need the regenerator runtime
 import "regenerator-runtime/runtime";
 
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -11,6 +12,7 @@ const urlsToCache = [
   isDevelopment ? "/rest/resource/commons.development.js" : "/rest/resource/commons.production.js",
   isDevelopment ? "/rest/resource/build.development.css" : "/rest/resource/build.production.css",
   isDevelopment ? "/rest/resource/cache-worker.development.js" : "/rest/resource/cache-worker.production.js",
+  isDevelopment ? "/rest/resource/cache-worker.injector.development.js" : "/rest/resource/cache-worker.injector.production.js",
 ];
 // the reason is that app always loads the
 // production css no matter what, but it's then
@@ -25,7 +27,7 @@ if (isDevelopment) {
 const CACHE_NAME = "ITEMIZEV1";
 
 self.addEventListener("install", (event: any) => {
-  console.log("SERVICE WORKER EXECUTING");
+  console.log("SERVICE WORKER INSTALLING");
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {

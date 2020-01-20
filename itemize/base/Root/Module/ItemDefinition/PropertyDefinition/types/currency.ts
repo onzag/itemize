@@ -111,10 +111,16 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     const conditions: boolean[] = [];
     if (typeof usefulArgs[exactName] !== "undefined") {
-      conditions.push(
-        propertyValue.value === usefulArgs[exactName].value &&
-        propertyValue.currency === usefulArgs[exactName].currency,
-      );
+      if (usefulArgs[exactName] === null) {
+        conditions.push(
+          propertyValue.value === null,
+        );
+      } else {
+        conditions.push(
+          propertyValue.value === usefulArgs[exactName].value &&
+          propertyValue.currency === usefulArgs[exactName].currency,
+        );
+      }
     }
 
     if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
