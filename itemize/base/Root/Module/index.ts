@@ -16,6 +16,7 @@ import { GraphQLObjectType } from "graphql";
 import { buildSearchModeModule } from "./search-mode";
 import Root from "..";
 import { EndpointError } from "../../errors";
+import { IGQLRequestFields } from "../../../gql-querier";
 
 export interface IRawJsonI18NSpecificLocaleDataType {
   name: string;
@@ -612,7 +613,7 @@ export default class Module {
     role: string,
     userId: number,
     ownerUserId: number,
-    requestedFields: any,
+    requestedFields: IGQLRequestFields,
     throwError: boolean,
   ) {
     const rolesWithAccess = this.getRolesWithAccessTo(action);

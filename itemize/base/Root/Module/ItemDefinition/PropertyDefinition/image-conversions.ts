@@ -39,7 +39,7 @@ function singleOptionAnalysis(
     return null;
   }
 
-  let fit: any = splitted.shift() || null;
+  let fit: string = splitted.shift() || null;
   if (
     fit !== "cover" &&
     fit !== "contain" &&
@@ -52,7 +52,7 @@ function singleOptionAnalysis(
     name,
     width,
     height,
-    fit,
+    fit: fit as any,
   };
 }
 

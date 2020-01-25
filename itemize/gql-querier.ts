@@ -1,7 +1,7 @@
-import { IPropertyDefinitionIncludedFileInfoType } from "./base/Root/Module/ItemDefinition/PropertyDefinition";
 import { Stream } from "stream";
 import FormDataNode from "form-data";
 import fetchNode from "node-fetch";
+import { EndpointErrorType } from "./base/errors";
 
 /**
  * Search results as they are provided
@@ -9,15 +9,49 @@ import fetchNode from "node-fetch";
  * on the ID_CONTAINER in the graphql types
  * that graphql returns
  */
-export interface ISearchResult {
+export interface IGQLSearchResult {
   type: string;
   id: number;
+}
+
+export interface IGQLFile {
+  name: string;
+  type: string;
+  id: string;
+  url: string;
+  size: number;
+  src?: File | Promise<any>;
+}
+
+export interface IGQLRequestFields {
+  [key: string]: IGQLRequestFields;
+}
+
+type GQLArg = boolean | string | number | null | GQLRaw | GQLEnum | GQLVar | IGQLFile | IGQLSearchResult | IGQLArgs;
+
+export interface IGQLArgs {
+  [key: string]: GQLArg | GQLArg[];
+}
+
+type GQLValue = boolean | string | number | null | IGQLSearchResult | IGQLValue;
+
+export interface IGQLValue {
+  [key: string]: GQLValue | GQLValue[];
+}
+
+export interface IGQLEndpointValue {
+  data: {
+    [key: string]: IGQLValue,
+  };
+  errors?: Array<{
+    extensions: EndpointErrorType,
+  }>;
 }
 
 export class GQLQuery {
   private processedQueries: IGQLQueryObj[];
   private type: "query" | "mutation";
-  private foundUnprocessedArgFiles: IPropertyDefinitionIncludedFileInfoType[];
+  private foundUnprocessedArgFiles: IGQLFile[];
   constructor(
     type: "query" | "mutation",
     queries: IGQLQueryObj[],
@@ -50,7 +84,7 @@ export class GQLQuery {
     });
     return map;
   }
-  public getAttachments(): IPropertyDefinitionIncludedFileInfoType[] {
+  public getAttachments(): IGQLFile[] {
     return this.foundUnprocessedArgFiles;
   }
   private getVariables() {
@@ -67,7 +101,7 @@ export class GQLQuery {
     });
     return args;
   }
-  private findFilesAndProcessArgs(arg: any): any {
+  private findFilesAndProcessArgs(arg: IGQLArgs): any {
     if (!arg || arg === null || typeof arg !== "object") {
       return arg;
     }
@@ -76,10 +110,18 @@ export class GQLQuery {
       (typeof File !== "undefined" && arg.src instanceof File) ||
       (Stream && arg.src instanceof Stream.Readable)
     ) {
-      this.foundUnprocessedArgFiles.push(arg);
+      const detectedUnprocessedFile: IGQLFile = {
+        name: arg.name as string,
+        id: arg.id as string,
+        type: arg.type as string,
+        url: arg.url as string,
+        size: arg.size as number,
+        src: arg.src as any,
+      };
+      this.foundUnprocessedArgFiles.push(detectedUnprocessedFile);
       return {
         ...arg,
-        src: new GQLVar(arg.id),
+        src: new GQLVar(detectedUnprocessedFile.id),
       };
     }
 
@@ -88,15 +130,15 @@ export class GQLQuery {
     }
 
     if (arg.__type__ === "GQLEnum") {
-      return new GQLEnum(arg.value);
+      return new GQLEnum(arg.value as string);
     }
 
     if (arg.__type__ === "GQLVar") {
-      return new GQLVar(arg.value);
+      return new GQLVar(arg.value as string);
     }
 
     if (arg.__type__ === "GQLRaw") {
-      return new GQLRaw(arg.value);
+      return new GQLRaw(arg.value as string);
     }
 
     if (Array.isArray(arg)) {
@@ -105,7 +147,7 @@ export class GQLQuery {
 
     const newResult = {};
     Object.keys(arg).forEach((argKey) => {
-      newResult[argKey] = this.findFilesAndProcessArgs(arg[argKey]);
+      newResult[argKey] = this.findFilesAndProcessArgs(arg[argKey] as IGQLArgs);
     });
 
     return newResult;
@@ -149,9 +191,7 @@ export class GQLVar extends GQLRaw {
   public __type__: string = "GQLVar";
 }
 
-function buildFields(fields: {
-  [key: string]: any;
-}) {
+function buildFields(fields: IGQLRequestFields) {
   let fieldsStr = "{";
   Object.keys(fields).forEach((fieldKey) => {
     fieldsStr += fieldKey;
@@ -165,7 +205,7 @@ function buildFields(fields: {
 }
 
 function buildArgs(
-  args: any,
+  args: IGQLArgs,
   keyOpenType: string,
   keyCloseType: string,
 ): string {
@@ -182,7 +222,7 @@ function buildArgs(
   }
 
   return keyOpenType + Object.keys(args).map((argKey) => {
-    return argKey + ":" + buildArgs(args[argKey], "{", "}");
+    return argKey + ":" + buildArgs(args[argKey] as IGQLArgs, "{", "}");
   }).join(",") + keyCloseType;
 }
 
@@ -215,7 +255,7 @@ export function buildGqlMutation(...mutations: IGQLQueryObj[]) {
   return new GQLQuery("mutation", mutations);
 }
 
-export async function gqlQuery(query: GQLQuery, host: string = "") {
+export async function gqlQuery(query: GQLQuery, host: string = ""): Promise<IGQLEndpointValue> {
   const formData = typeof FormData !== "undefined" ? new FormData() : new FormDataNode();
   const operations = JSON.stringify(query.getOperations());
   formData.append("operations", operations);

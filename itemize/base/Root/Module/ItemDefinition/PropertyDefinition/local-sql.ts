@@ -1,11 +1,11 @@
-import { IGQLValue } from "../../../gql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces";
 import { INCLUDE_PREFIX } from "../../../../../constants";
 import { PropertyDefinitionSupportedType } from "./types";
 import { ISQLTableRowValue } from "../../../sql";
+import { IGQLArgs, IGQLValue } from "../../../../../gql-querier";
 
 export function standardSQLLocalSearchExactAndRange(
-  args: IGQLValue,
+  args: IGQLArgs,
   rawData: IGQLValue,
   id: string,
   includeId?: string,
@@ -48,7 +48,7 @@ export function standardSQLLocalSearchExactAndRange(
 }
 
 export function dateSQLLocalSearchExactAndRange(
-  args: IGQLValue,
+  args: IGQLArgs,
   rawData: IGQLValue,
   id: string,
   includeId?: string,

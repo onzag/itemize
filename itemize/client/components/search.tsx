@@ -5,13 +5,13 @@ import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { PREFIX_GET_LIST, PREFIX_GET } from "../../constants";
 import CacheWorkerInstance from "../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
-import { buildGqlQuery, gqlQuery, ISearchResult } from "../../gql-querier";
+import { buildGqlQuery, gqlQuery, IGQLSearchResult, IGQLRequestFields, IGQLValue } from "../../gql-querier";
 import { LocaleContext, ILocaleContextType } from "../internal/app";
 import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
 import { EndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "../internal/app/remote-listener";
 
-interface ISearchResultWithPopulateData extends ISearchResult {
+interface IGQLSearchResultWithPopulateData extends IGQLSearchResult {
   providerProps: {
     key: string;
     forId: number;
@@ -29,7 +29,7 @@ interface ISearchResultWithPopulateData extends ISearchResult {
 }
 
 interface ISearchLoaderArg {
-  searchResults: ISearchResultWithPopulateData[];
+  searchResults: IGQLSearchResultWithPopulateData[];
   pageCount: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
@@ -48,7 +48,7 @@ interface ISearchLoaderProps {
 }
 
 interface IActualSearchLoaderProps extends ISearchLoaderProps {
-  searchResults: ISearchResult[];
+  searchResults: IGQLSearchResult[];
   itemDefinitionInstance: ItemDefinition;
   // token data to get the current user id, and role, for requests
   tokenData: ITokenContextType;
@@ -59,15 +59,15 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   searchId: string;
   searchOwner: number;
   searchShouldCache: boolean;
-  searchFields: any;
+  searchFields: IGQLRequestFields;
   searchRequestedProperties: string[];
   searchRequestedIncludes: string[];
 }
 
 interface IActualSearchLoaderState {
-  currentlySearching: ISearchResult[];
-  searchFields: any;
-  currentSearchResults: ISearchResult[];
+  currentlySearching: IGQLSearchResult[];
+  searchFields: IGQLRequestFields;
+  currentSearchResults: IGQLSearchResult[];
   error: EndpointErrorType;
 }
 
@@ -116,7 +116,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       error: null,
     });
   }
-  public async loadValues(currentSearchResults: ISearchResult[]) {
+  public async loadValues(currentSearchResults: IGQLSearchResult[]) {
     if (!this.props.searchId) {
       return;
     }
@@ -136,8 +136,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     const getListQueryName: string = PREFIX_GET_LIST + queryBase;
 
-    const uncachedResults: ISearchResult[] = [];
-    const workerCachedResults = await Promise.all(currentSearchResults.map(async (searchResult: ISearchResult) => {
+    const uncachedResults: IGQLSearchResult[] = [];
+    const workerCachedResults = await Promise.all(currentSearchResults.map(async (searchResult: IGQLSearchResult) => {
       const itemDefintionInQuestion =
         this.props.itemDefinitionInstance.getParentModule()
           .getParentRoot().registry[searchResult.type] as ItemDefinition;
@@ -251,7 +251,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         gqlValue.data[getListQueryName] &&
         gqlValue.data[getListQueryName].results
       ) {
-        gqlValue.data[getListQueryName].results.forEach((value, index) => {
+        (gqlValue.data[getListQueryName].results as IGQLValue[]).forEach((value, index) => {
           const forId = uncachedResults[index].id;
           const forType = uncachedResults[index].type;
 
@@ -265,7 +265,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             itemDefintionInQuestion.triggerListeners("change", forId);
           } else {
             let mergedQueryFields = this.props.searchFields;
-            const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(value.id);
+            const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(value.id as number);
             if (
               appliedGQLValue &&
               appliedGQLValue.rawValue &&
@@ -282,7 +282,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             }
 
             itemDefintionInQuestion.applyValue(
-              valueToApply.id,
+              valueToApply.id as number,
               valueToApply,
               false,
               this.props.tokenData.id,

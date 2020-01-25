@@ -1,12 +1,13 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
-import { IGQLValue } from "../../../../gql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N, INCLUDE_PREFIX } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import Knex from "knex";
 import { ISQLTableRowValue } from "../../../../sql";
+import { IGQLValue, IGQLArgs } from "../../../../../../gql-querier";
+import { IPropertyDefinitionSupportedUnitType } from "./unit";
 
 // https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
 function getDistanceFromLatLonInMeters(
@@ -99,7 +100,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       [sqlPrefix + id + "_ATXT"]: value.atxt,
     };
   },
-  sqlOut: (data: { [key: string]: any }, sqlPrefix: string, id: string) => {
+  sqlOut: (data: ISQLTableRowValue, sqlPrefix: string, id: string) => {
     const result: IPropertyDefinitionSupportedLocationType = {
       lat: data[sqlPrefix + id + "_LAT"],
       lng: data[sqlPrefix + id + "_LNG"],
@@ -111,7 +112,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
     return result;
   },
-  sqlSearch: (args: IGQLValue, sqlPrefix: string, id: string, knexBuilder) => {
+  sqlSearch: (args: IGQLArgs, sqlPrefix: string, id: string, knexBuilder) => {
     const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + id;
     const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + id;
 
@@ -121,9 +122,11 @@ const typeValue: IPropertyDefinitionSupportedType = {
     ) {
       knexBuilder.andWhere(sqlPrefix + id, "!=", null);
 
-      const lng = args[locationName].lng || 0;
-      const lat = args[locationName].lat || 0;
-      const distance = (args[radiusName].normalizedValue || 0) * 1000;
+      const argAsLocation: IPropertyDefinitionSupportedLocationType = args[locationName] as any;
+      const lng = argAsLocation.lng || 0;
+      const lat = argAsLocation.lat || 0;
+      const argAsUnit: IPropertyDefinitionSupportedUnitType = args[radiusName] as any;
+      const distance = (argAsUnit.normalizedValue || 0) * 1000;
       knexBuilder.andWhereRaw(
         "ST_DWithin(??, ST_MakePoint(?,?)::geography, ?)",
         [
@@ -136,7 +139,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
   },
   sqlLocalSearch: (
-    args: IGQLValue,
+    args: IGQLArgs,
     rawData: IGQLValue,
     id: string,
     includeId?: string,

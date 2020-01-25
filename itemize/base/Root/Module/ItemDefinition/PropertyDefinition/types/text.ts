@@ -6,7 +6,6 @@ import { standardSQLOutFn, standardSQLEqualFn } from "../sql";
 import {
   standardSQLLocalEqualFn,
 } from "../local-sql";
-import { IGQLValue } from "../../../../gql";
 import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_RAW_TEXT_LENGTH,
@@ -19,6 +18,7 @@ import {
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
 import { DOMWindow, DOMPurify } from "../../../../../../util";
+import { IGQLValue, IGQLArgs } from "../../../../../../gql-querier";
 
 export type PropertyDefinitionSupportedTextType = string;
 const typeValue: IPropertyDefinitionSupportedType = {
@@ -94,7 +94,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
   },
   sqlLocalSearch: (
-    args: IGQLValue,
+    args: IGQLArgs,
     rawData: IGQLValue,
     id: string,
     includeId?: string,

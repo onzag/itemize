@@ -8,9 +8,9 @@ import {
 } from "./ItemDefinition/PropertyDefinition/sql";
 import { getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue } from "../sql";
-import { IGQLValue } from "../gql";
 import Knex from "knex";
 import ItemDefinition from "./ItemDefinition";
+import { IGQLRequestFields, IGQLValue } from "../../../gql-querier";
 
 /**
  * Provides the table that is necesary to include this module and all
@@ -119,7 +119,11 @@ export async function convertGQLValueToSQLValueForModule(
  * in the request provided by grapql fields,
  * eg {id: {}, name: {}}
  */
-export function convertSQLValueToGQLValueForModule(mod: Module, row: ISQLTableRowValue, graphqlFields: any): IGQLValue {
+export function convertSQLValueToGQLValueForModule(
+  mod: Module,
+  row: ISQLTableRowValue,
+  graphqlFields: IGQLRequestFields,
+): IGQLValue {
   // first we create the graphql result
   let result: IGQLValue = {};
 

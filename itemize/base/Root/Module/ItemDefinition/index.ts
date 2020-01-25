@@ -17,6 +17,7 @@ import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { EndpointError } from "../../../errors";
 import uuid from "uuid";
 import { flattenRawGQLValueOrFields } from "../../../../gql-util";
+import { IGQLValue, IGQLRequestFields } from "../../../../gql-querier";
 
 export interface IPolicyValueRawJSONDataType {
   roles: string[];
@@ -111,7 +112,7 @@ export interface IItemDefinitionStateType {
   includes: IIncludeState[];
   properties: IPropertyDefinitionState[];
   policies: IPoliciesStateType;
-  gqlOriginalFlattenedValue: any;
+  gqlOriginalFlattenedValue: IGQLValue;
   forId: number;
 }
 
@@ -125,9 +126,9 @@ export enum ItemDefinitionIOActions {
 export interface IItemDefinitionGQLValueType {
   userIdRequester: number;
   roleRequester: string;
-  rawValue: any;
-  flattenedValue: any;
-  requestFields: any;
+  rawValue: IGQLValue;
+  flattenedValue: IGQLValue;
+  requestFields: IGQLRequestFields;
 }
 
 export interface IPolicyType {
@@ -847,13 +848,11 @@ export default class ItemDefinition {
    */
   public applyValue(
     id: number,
-    value: {
-      [key: string]: any,
-    },
+    value: IGQLValue,
     excludeExtensions: boolean,
     graphqlUserIdRequester: number,
     graphqlRoleRequester: string,
-    requestFields: any,
+    requestFields: IGQLRequestFields,
     doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
   ) {
     // first we flatten the value if necessary
@@ -914,7 +913,7 @@ export default class ItemDefinition {
    * (or id if owner is object id, which is only relevant for users honestly)
    * @param id the id of the state
    */
-  public getAppliedValueOwnerIfAny(id: number) {
+  public getAppliedValueOwnerIfAny(id: number): number {
     if (
       !this.stateHasAppliedValueTo[id] ||
       !this.stateGQLAppliedValue[id] ||
@@ -924,9 +923,9 @@ export default class ItemDefinition {
     }
 
     if (this.isOwnerObjectId()) {
-      return this.stateGQLAppliedValue[id].flattenedValue.id || UNSPECIFIED_OWNER;
+      return (this.stateGQLAppliedValue[id].flattenedValue.id || UNSPECIFIED_OWNER) as number;
     }
-    return this.stateGQLAppliedValue[id].flattenedValue.created_by || UNSPECIFIED_OWNER;
+    return (this.stateGQLAppliedValue[id].flattenedValue.created_by || UNSPECIFIED_OWNER) as number;
   }
 
   /**
@@ -1047,7 +1046,7 @@ export default class ItemDefinition {
     role: string,
     userId: number,
     ownerUserId: number,
-    requestedFields: any,
+    requestedFields: IGQLRequestFields,
     throwError: boolean,
   ) {
     if (ownerUserId === null) {

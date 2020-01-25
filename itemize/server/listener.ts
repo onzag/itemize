@@ -37,7 +37,7 @@ import {
   CHANGED_FEEEDBACK_EVENT,
   IChangedFeedbackEvent,
 } from "../base/remote-protocol";
-import { ISearchResult } from "../gql-querier";
+import { IGQLSearchResult } from "../gql-querier";
 
 interface IListenerList {
   [socketId: string]: {
@@ -256,7 +256,7 @@ export class Listener {
         const event: IOwnedSearchRecordsAddedEvent = {
           createdBy: request.createdBy,
           qualifiedPathName: request.qualifiedPathName,
-          newIds: newRecords as ISearchResult[],
+          newIds: newRecords as IGQLSearchResult[],
           newLastRecordId: Math.max.apply(null, newRecords.map((r) => r.id)),
         };
         socket.emit(
@@ -307,7 +307,7 @@ export class Listener {
           parentId: request.parentId,
           parentType: request.parentType,
           qualifiedPathName: request.qualifiedPathName,
-          newIds: newRecords as ISearchResult[],
+          newIds: newRecords as IGQLSearchResult[],
           newLastRecordId: Math.max.apply(null, newRecords.map((r) => r.id)),
         };
         socket.emit(

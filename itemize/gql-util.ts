@@ -1,4 +1,9 @@
-export function requestFieldsAreContained(requestFieldsSubset: any, requestFieldsOrValueMain: any): boolean {
+import { IGQLRequestFields, IGQLValue } from "./gql-querier";
+
+export function requestFieldsAreContained(
+  requestFieldsSubset: IGQLRequestFields,
+  requestFieldsOrValueMain: IGQLRequestFields | IGQLValue,
+): boolean {
   if (requestFieldsOrValueMain === null) {
     return true;
   }
@@ -16,7 +21,7 @@ export function requestFieldsAreContained(requestFieldsSubset: any, requestField
     }
 
     if (typeof requestFieldsOrValueMain[key] === "object" && requestFieldsOrValueMain[key] !== null) {
-      return requestFieldsAreContained(requestFieldsSubset[key], requestFieldsOrValueMain[key]);
+      return requestFieldsAreContained(requestFieldsSubset[key], requestFieldsOrValueMain[key] as any);
     }
     return true;
   });

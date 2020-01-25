@@ -13,8 +13,8 @@ import {
   buildSQLQueryForInclude,
 } from "./Include/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue } from "../../sql";
-import { IGQLValue } from "../../gql";
 import Knex from "knex";
+import { IGQLValue, IGQLRequestFields } from "../../../../gql-querier";
 
 /**
  * Provides the table that is necesary to include this item definition as a whole
@@ -86,7 +86,7 @@ export function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefiniti
 export function convertSQLValueToGQLValueForItemDefinition(
   itemDefinition: ItemDefinition,
   row: ISQLTableRowValue,
-  graphqlFields?: any,
+  graphqlFields?: IGQLRequestFields,
 ): IGQLValue {
   // first we create the graphql result
   let result: IGQLValue = {};
@@ -150,7 +150,7 @@ export async function convertGQLValueToSQLValueForItemDefinition(
   oldData: IGQLValue,
   knex: Knex,
   dictionary: string,
-  partialFields?: any,
+  partialFields?: IGQLRequestFields,
 ): Promise<ISQLTableRowValue> {
   // first we create the row value
   let result: ISQLTableRowValue = {};

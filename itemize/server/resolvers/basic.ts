@@ -20,13 +20,13 @@ import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Modu
 import { convertSQLValueToGQLValueForModule } from "../../base/Root/Module/sql";
 import { IAppDataType } from "..";
 import equals from "deep-equal";
-import { IGQLValue } from "../../base/Root/gql";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
 import { jwtVerify } from "../token";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { ISearchResultIdentifierType } from "./actions/search";
-import Root from "../../base/Root";
+import { IGQLSearchResultIdentifierType } from "./actions/search";
+import { IGQLValue } from "../../gql-querier";
+import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 const buildColumnNamesForModuleTableOnlyDebug = Debug("resolvers:buildColumnNamesForModuleTableOnly");
 /**
@@ -267,7 +267,7 @@ const checkListLimitDebug = Debug("resolvers:checkListLimit");
  * lists to ensure the request isn't too large
  * @param ids the list ids that have been requested
  */
-export function checkListLimit(ids: ISearchResultIdentifierType[]) {
+export function checkListLimit(ids: IGQLSearchResultIdentifierType[]) {
   checkListLimitDebug("EXECUTED with %j", ids);
   if (ids.length > MAX_SEARCH_RESULTS_AT_ONCE_LIMIT) {
     checkListLimitDebug(
@@ -284,7 +284,7 @@ export function checkListLimit(ids: ISearchResultIdentifierType[]) {
 }
 
 const checkListTypesDebug = Debug("resolvers:checkListTypes");
-export function checkListTypes(ids: ISearchResultIdentifierType[], mod: Module) {
+export function checkListTypes(ids: IGQLSearchResultIdentifierType[], mod: Module) {
   checkListTypesDebug("EXECUTED with %j", ids);
   ids.forEach((idContainer) => {
     const itemDefinition = mod.getParentRoot().registry[idContainer.type];
@@ -599,7 +599,7 @@ export async function serverSideCheckItemDefinitionAgainst(
     // specific item data, that's where we use our referred item
     await serverSideCheckItemDefinitionAgainst(
       include.getItemDefinition(),
-      gqlIncludeValue,
+      gqlIncludeValue as IGQLValue,
       id,
       include,
       referredParentOfInclude || itemDefinition,
@@ -789,7 +789,7 @@ export async function runPolicyCheck(
         // the value for this policy is stored
         const qualifiedPolicyIdentifier = property.getQualifiedPolicyIdentifier(policyType, policyName);
         // and like that we get the value that has been set for that policy
-        let policyValueForTheProperty = arg.gqlArgValue[qualifiedPolicyIdentifier];
+        let policyValueForTheProperty = arg.gqlArgValue[qualifiedPolicyIdentifier] as PropertyDefinitionSupportedType;
         // if it's undefined, we set it to null
         if (typeof policyValueForTheProperty === "undefined") {
           policyValueForTheProperty = null;

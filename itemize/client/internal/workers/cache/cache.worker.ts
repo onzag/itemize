@@ -4,20 +4,28 @@ import "regenerator-runtime/runtime";
 import { expose } from "comlink";
 import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { requestFieldsAreContained, deepMerge } from "../../../../gql-util";
-import { ISearchResult, buildGqlQuery, gqlQuery, GQLEnum } from "../../../../gql-querier";
+import { IGQLSearchResult, buildGqlQuery, gqlQuery, GQLEnum,
+  IGQLValue, IGQLRequestFields, IGQLArgs, IGQLEndpointValue } from "../../../../gql-querier";
 import { MAX_SEARCH_RESULTS_AT_ONCE_LIMIT, PREFIX_GET } from "../../../../constants";
 import { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
 import Root, { IRootRawJSONDataType } from "../../../../base/Root";
 
+// a cache match
 export interface ICacheMatchType {
-  value: any;
-  fields: any;
+  value: IGQLValue;
+  fields: IGQLRequestFields;
+}
+
+export interface ICachedSearchResult {
+  gqlValue: IGQLEndpointValue;
+  dataMightBeStale: boolean;
+  lastRecord: number;
 }
 
 export interface ISearchMatchType {
-  fields: any;
-  value: ISearchResult[];
+  fields: IGQLRequestFields;
+  value: IGQLSearchResult[];
   allResultsPreloaded: boolean;
   lastRecord: number;
 }
@@ -187,8 +195,8 @@ export default class CacheWorker {
   public async setCachedValue(
     queryName: string,
     id: number,
-    partialValue: any,
-    partialFields: any,
+    partialValue: IGQLValue,
+    partialFields: IGQLRequestFields,
     touchOrMerge?: boolean,
   ): Promise<boolean> {
     if (!touchOrMerge) {
@@ -258,8 +266,8 @@ export default class CacheWorker {
   public async mergeCachedValue(
     queryName: string,
     id: number,
-    partialValue: any,
-    partialFields: any,
+    partialValue: IGQLValue,
+    partialFields: IGQLRequestFields,
   ): Promise<boolean> {
     console.log("REQUESTED TO MERGE", queryName, id, partialValue);
 
@@ -303,7 +311,11 @@ export default class CacheWorker {
    * @param id the id of the item definition instance
    * @param requestedFields the requested fields from graphql
    */
-  public async getCachedValue(queryName: string, id: number, requestedFields?: any): Promise<ICacheMatchType> {
+  public async getCachedValue(
+    queryName: string,
+    id: number,
+    requestedFields?: IGQLRequestFields,
+  ): Promise<ICacheMatchType> {
     if (requestedFields) {
       console.log("CACHED QUERY REQUESTED", queryName, id, requestedFields);
     }
@@ -358,7 +370,7 @@ export default class CacheWorker {
     createdByIfKnown: number,
     parentTypeIfKnown: string,
     parentIdIfKnown: number,
-    newIds: ISearchResult[],
+    newIds: IGQLSearchResult[],
     newLastRecord: number,
     cachePolicy: "by-owner" | "by-parent",
   ): Promise<boolean> {
@@ -400,13 +412,13 @@ export default class CacheWorker {
 
   public async runCachedSearch(
     searchQueryName: string,
-    searchArgs: any,
+    searchArgs: IGQLArgs,
     getListQueryName: string,
     getListTokenArgs: string,
     getListLangArgs: string,
-    getListRequestedFields: any,
+    getListRequestedFields: IGQLRequestFields,
     cachePolicy: "by-owner" | "by-parent",
-  ) {
+  ): Promise<ICachedSearchResult> {
     // so we fetch our db like usual
     let db: IDBPDatabase<ICacheDB>;
     try {
@@ -429,12 +441,12 @@ export default class CacheWorker {
     // first we build an array for the results that we need to process
     // this means results that are not loaded in memory or partially loaded
     // in memory for some reason, say if the last search failed partially
-    let resultsToProcess: ISearchResult[];
+    let resultsToProcess: IGQLSearchResult[];
     // this is what the fields end up being, say that there are two different
     // cached searches with different fields, we need both to be merged
     // in order to know what we have retrieved, originally it's just what
     // we were asked for
-    let resultingGetListRequestedFields: any = getListRequestedFields;
+    let resultingGetListRequestedFields: IGQLRequestFields = getListRequestedFields;
     let lastRecord: number;
     let dataMightBeStale = false;
 
@@ -446,7 +458,7 @@ export default class CacheWorker {
         // we need to remove the specifics of the search
         // as we are caching everything to the given criteria
         // and then using client side to filter
-        const actualArgsToUseInGQLSearch: any = {
+        const actualArgsToUseInGQLSearch: IGQLArgs = {
           token: searchArgs.token,
           language: searchArgs.language,
           order_by: new GQLEnum("DEFAULT"),
@@ -479,14 +491,18 @@ export default class CacheWorker {
         // server value and let it be handled
         if (serverValue.errors) {
           // return it
-          return serverValue;
+          return {
+            gqlValue: serverValue,
+            dataMightBeStale: false,
+            lastRecord: null,
+          };
         }
 
         // now these are the results that we need to process
-        // from the search query, the ISearchResult that we
+        // from the search query, the IGQLSearchResult that we
         // need to process
-        resultsToProcess = serverValue.data[searchQueryName].ids;
-        lastRecord = serverValue.data[searchQueryName].last_record;
+        resultsToProcess = serverValue.data[searchQueryName].ids as IGQLSearchResult[];
+        lastRecord = serverValue.data[searchQueryName].last_record as number;
       } else {
         // otherwise our results to process are the same ones we got
         // from the database, but do we need to process them for real?
@@ -505,13 +521,17 @@ export default class CacheWorker {
           // now we can actually start using the args to run a local filtering
           // function
 
-          return {
+          const gqlValue: IGQLEndpointValue = {
             data: {
               [searchQueryName]: {
                 ids: await search(this.rootProxy, db, resultsToProcess, searchArgs),
                 last_record: lastRecord,
               },
             },
+          };
+
+          return {
+            gqlValue,
             dataMightBeStale,
             lastRecord,
           };
@@ -552,7 +572,7 @@ export default class CacheWorker {
     // results to process and actually has managed to make it to the database
     // this can happens when something fails in between, or it is loaded by another
     // part of the application
-    const uncachedResultsToProcess: ISearchResult[] = [];
+    const uncachedResultsToProcess: IGQLSearchResult[] = [];
     // so now we check all the results we are asked to process
     await Promise.all(resultsToProcess.map(async (resultToProcess) => {
       // and get the cached results, considering the fields
@@ -571,7 +591,7 @@ export default class CacheWorker {
 
     // now it's time to preload, there's a limit on how big the batches can be on the server side
     // so we have to limit our batches size
-    const batches: ISearchResult[][] = [[]];
+    const batches: IGQLSearchResult[][] = [[]];
     let lastBatchIndex = 0;
     // for that we run a each event in all our uncached results
     uncachedResultsToProcess.forEach((uncachedResultToProcess) => {
@@ -587,7 +607,7 @@ export default class CacheWorker {
 
     // now we need to load all those batches into graphql queries
     const processedBatches = await Promise.all(batches.map(async (batch) => {
-      const args: any = {
+      const args: IGQLArgs = {
         token: getListTokenArgs,
         language: getListLangArgs,
         ids: batch,
@@ -644,8 +664,9 @@ export default class CacheWorker {
         };
       } else {
         // otherwise now we need to set all that in memory right now
-        // and so we will don
-        await Promise.all(resultingValue.data[getListQueryName].results.map(async (value, index) => {
+        // and so we will do
+        await Promise.all(
+          (resultingValue.data[getListQueryName].results as IGQLValue[]).map(async (value, index) => {
           const originalBatchRequest = originalBatch[index];
           let suceedStoring: boolean;
           if (value === null) {
@@ -713,25 +734,32 @@ export default class CacheWorker {
       // Now we need to filter the search results in order to return what is
       // appropiate using the actualCurrentSearchValue
 
-      return {
+      const gqlValue: IGQLEndpointValue = {
         data: {
           [searchQueryName]: {
             ids: await search(this.rootProxy, db, actualCurrentSearchValue.value, searchArgs),
           },
         },
+      };
+
+      return {
+        gqlValue,
         dataMightBeStale,
         lastRecord,
       };
     } else if (error) {
       // if we managed to catch an error, we pretend
       // to be graphql
-      return {
+      const gqlValue: IGQLEndpointValue = {
         data: null,
         errors: [
           {
             extensions: error,
           },
         ],
+      };
+      return {
+        gqlValue,
         dataMightBeStale,
         lastRecord,
       };

@@ -1,10 +1,11 @@
-import PropertyDefinition, { IPropertyDefinitionIncludedFileInfoType } from ".";
+import PropertyDefinition from ".";
 import ItemDefinition from "..";
 import Include from "../Include";
 import fs, { ReadStream } from "fs";
 import path from "path";
 import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../../constants";
 import { runImageConversions } from "./image-conversions";
+import { IGQLFile } from "../../../../../gql-querier";
 const fsAsync = fs.promises;
 
 /**
@@ -18,8 +19,8 @@ const fsAsync = fs.promises;
  * @param propertyDefinition the property (must be of type file)
  */
 export async function processFileListFor(
-  newValues: IPropertyDefinitionIncludedFileInfoType[],
-  oldValues: IPropertyDefinitionIncludedFileInfoType[],
+  newValues: IGQLFile[],
+  oldValues: IGQLFile[],
   transitoryId: string,
   itemDefinition: ItemDefinition,
   include: Include,
@@ -89,8 +90,8 @@ export async function processFileListFor(
  * @param propertyDefinition the property (must be of type file)
  */
 export async function processSingleFileFor(
-  newValue: IPropertyDefinitionIncludedFileInfoType,
-  oldValue: IPropertyDefinitionIncludedFileInfoType,
+  newValue: IGQLFile,
+  oldValue: IGQLFile,
   transitoryId: string,
   itemDefinition: ItemDefinition,
   include: Include,
@@ -128,8 +129,8 @@ export async function processSingleFileFor(
  * @param propertyDefinition the property
  */
 async function processOneFileAndItsSameIDReplacement(
-  newVersion: IPropertyDefinitionIncludedFileInfoType,
-  oldVersion: IPropertyDefinitionIncludedFileInfoType,
+  newVersion: IGQLFile,
+  oldVersion: IGQLFile,
   transitoryId: string,
   itemDefinition: ItemDefinition,
   include: Include,
@@ -333,7 +334,7 @@ function removeFilesFor(
 async function addFileFor(
   mainFilePath: string,
   standardURLPath: string,
-  value: IPropertyDefinitionIncludedFileInfoType,
+  value: IGQLFile,
   propertyDefinition: PropertyDefinition,
 ): Promise<{
   url: string,

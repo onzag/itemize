@@ -10,7 +10,7 @@ import {
   IActionSearchOptions,
 } from "../providers/item-definition";
 import equals from "deep-equal";
-import { ISearchResult } from "../../gql-querier";
+import { IGQLSearchResult } from "../../gql-querier";
 
 export interface IItemDefinitionLoaderInfoArgType {
   loading: boolean;
@@ -117,7 +117,7 @@ export interface ISearchActionerInfoArgType {
   dismissSearchResults: () => void;
   dismissSearchError: () => void;
   searching: boolean;
-  searchResults: ISearchResult[];
+  searchResults: IGQLSearchResult[];
   search: (options?: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
 }
 

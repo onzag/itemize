@@ -8,6 +8,7 @@ import Module from "../..";
 import PropertyDefinition from "../PropertyDefinition";
 import PropertiesValueMappingDefiniton, { IPropertiesValueMappingDefinitonRawJSONDataType } from "../PropertiesValueMappingDefiniton";
 import { INCLUDE_PREFIX, PREFIX_BUILD, EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
+import { IGQLRequestFields } from "../../../../../gql-querier";
 
 export enum IncludeExclusionState {
   EXCLUDED = "EXCLUDED",
@@ -223,7 +224,7 @@ export default class Include {
     role: string,
     userId: number,
     ownerUserId: number,
-    requestedFields: any,
+    requestedFields: IGQLRequestFields,
     throwError: boolean,
   ) {
     return Object.keys(requestedFields || {}).every((requestedField) => {

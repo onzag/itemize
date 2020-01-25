@@ -48,10 +48,6 @@ export interface IGQLFieldsDefinitionType {
   [fieldName: string]: IGQLSingleFieldDefinitionType;
 }
 
-export interface IGQLValue {
-  [key: string]: any;
-}
-
 /**
  * Retrieves the whole structure of the current loaded instance
  * of the schema into a valid graphql schema

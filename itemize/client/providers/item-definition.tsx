@@ -15,7 +15,7 @@ import {
   PREFIX_GET_LIST,
 } from "../../constants";
 import { buildGqlQuery, buildGqlMutation, gqlQuery,
-  IGQLQueryObj, GQLEnum, GQLQuery, ISearchResult } from "../../gql-querier";
+  IGQLQueryObj, GQLEnum, GQLQuery, IGQLSearchResult, IGQLValue, IGQLEndpointValue } from "../../gql-querier";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
 import { EndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
@@ -56,7 +56,7 @@ export interface IActionResponseWithId extends IBasicActionResponse {
  * A response given by search
  */
 export interface IActionResponseWithSearchResults extends IBasicActionResponse {
-  results: ISearchResult[];
+  results: IGQLSearchResult[];
 }
 
 export type PolicyPathType = [string, string, string];
@@ -153,7 +153,7 @@ export interface IItemDefinitionContextType {
   searching: boolean;
   // the obtained search results from the graphql endpoint
   // just as they come
-  searchResults: ISearchResult[];
+  searchResults: IGQLSearchResult[];
   // a search id for the obtained results whether error
   // or success
   searchId: string;
@@ -242,7 +242,7 @@ export interface IItemDefinitionContextType {
 }
 
 export interface ISearchItemDefinitionValueContextType {
-  currentlySearching: ISearchResult[];
+  currentlySearching: IGQLSearchResult[];
   searchFields: any;
 }
 
@@ -348,7 +348,7 @@ interface IActualItemDefinitionProviderState {
   deleted: boolean;
   searchError: EndpointErrorType;
   searching: boolean;
-  searchResults: ISearchResult[];
+  searchResults: IGQLSearchResult[];
   searchId: string;
   searchOwner: number;
   searchParent: [string, number];
@@ -1328,7 +1328,7 @@ export class ActualItemDefinitionProvider extends
     }
 
     let cached = false;
-    let gqlValue: any;
+    let gqlValue: IGQLEndpointValue;
     // if we are in a search with
     // a cache policy then we should be able
     // to run the search within the worker as
@@ -1346,7 +1346,7 @@ export class ActualItemDefinitionProvider extends
       const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
         standardCounterpart.getParentModule().getQualifiedPathName() :
         standardCounterpart.getQualifiedPathName());
-      gqlValue = await CacheWorkerInstance.instance.runCachedSearch(
+      const cacheWorkerGivenSearchValue = await CacheWorkerInstance.instance.runCachedSearch(
         queryName,
         args,
         PREFIX_GET_LIST + standardCounterpartQualifiedName,
@@ -1355,13 +1355,14 @@ export class ActualItemDefinitionProvider extends
         arg.searchRequestedFieldsOnCachePolicy,
         arg.searchCachePolicy,
       );
+      gqlValue = cacheWorkerGivenSearchValue.gqlValue;
       cached = true;
       if (gqlValue) {
         if (arg.searchCachePolicy === "by-owner") {
           this.props.remoteListener.addOwnedSearchListenerFor(
             standardCounterpartQualifiedName,
             arg.searchCreatedBy,
-            gqlValue.lastRecord,
+            cacheWorkerGivenSearchValue.lastRecord,
             this.onSearchReload,
           );
         } else {
@@ -1369,24 +1370,24 @@ export class ActualItemDefinitionProvider extends
             standardCounterpartQualifiedName,
             arg.searchParentedBy[0],
             arg.searchParentedBy[1],
-            gqlValue.lastRecord,
+            cacheWorkerGivenSearchValue.lastRecord,
             this.onSearchReload,
           );
         }
 
-        if (gqlValue.dataMightBeStale) {
+        if (cacheWorkerGivenSearchValue.dataMightBeStale) {
           if (arg.searchCachePolicy === "by-owner") {
             this.props.remoteListener.requestOwnedSearchFeedbackFor({
               qualifiedPathName: standardCounterpartQualifiedName,
               createdBy: arg.searchCreatedBy,
-              knownLastRecordId: gqlValue.lastRecord as number,
+              knownLastRecordId: cacheWorkerGivenSearchValue.lastRecord,
             });
           } else {
             this.props.remoteListener.requestParentedSearchFeedbackFor({
               qualifiedPathName: standardCounterpartQualifiedName,
               parentType: arg.searchParentedBy[0],
               parentId: arg.searchParentedBy[1],
-              knownLastRecordId: gqlValue.lastRecord as number,
+              knownLastRecordId: cacheWorkerGivenSearchValue.lastRecord,
             });
           }
         }
@@ -1954,7 +1955,7 @@ export class ActualItemDefinitionProvider extends
       searchRequestedFieldsOnCachePolicy: requestedSearchFields,
     });
 
-    const searchResults: ISearchResult[] = [];
+    const searchResults: IGQLSearchResult[] = [];
     if (error) {
       this.setState({
         searchError: error,

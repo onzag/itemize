@@ -1,4 +1,4 @@
-import { ISearchResult } from "../gql-querier";
+import { IGQLSearchResult } from "../gql-querier";
 
 // EVENTS
 export const BUILDNUMBER_EVENT = "buildnumber";
@@ -21,7 +21,7 @@ interface IBaseSearchRecordsAddedEvent {
   // the qualified path name or type of the either module or item definition
   qualifiedPathName: string;
   // the new ids that have been added
-  newIds: ISearchResult[];
+  newIds: IGQLSearchResult[];
   // the new last record id
   newLastRecordId: number;
 }

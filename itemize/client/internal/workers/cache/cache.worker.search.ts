@@ -1,4 +1,4 @@
-import { ISearchResult } from "../../../../gql-querier";
+import { IGQLSearchResult } from "../../../../gql-querier";
 import { IDBPDatabase } from "idb";
 import { ICacheDB, QUERIES_TABLE_NAME } from "./cache.worker";
 import { PREFIX_GET } from "../../../../constants";
@@ -8,11 +8,11 @@ import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 export async function search(
   rootProxy: Root,
   db: IDBPDatabase<ICacheDB>,
-  searchResults: ISearchResult[],
+  searchResults: IGQLSearchResult[],
   searchArgs: any,
-): Promise<ISearchResult[]> {
+): Promise<IGQLSearchResult[]> {
   const sortStrategyFunction = SORT_STRATEGIES[searchArgs.order_by];
-  const newSearchResults: ISearchResult[] = (await Promise.all(
+  const newSearchResults: IGQLSearchResult[] = (await Promise.all(
     searchResults.map(async (result) => {
       try {
         const queryIdentifier = `${PREFIX_GET}${result.type}.${result.id}`;
@@ -38,18 +38,18 @@ export async function search(
   return newSearchResults;
 }
 
-interface ISearchResultChecked {
+interface IGQLSearchResultChecked {
   shouldBeIncluded: boolean;
   value: any;
-  searchResult: ISearchResult;
+  searchResult: IGQLSearchResult;
 }
 
 async function checkOne(
   rootProxy: Root,
-  searchResult: ISearchResult,
+  searchResult: IGQLSearchResult,
   value: any,
   searchArgs: any,
-): Promise<ISearchResultChecked> {
+): Promise<IGQLSearchResultChecked> {
   // so by default we included
   let shouldBeIncluded = true;
 
@@ -115,7 +115,7 @@ async function checkOne(
 }
 
 const SORT_STRATEGIES = {
-  DEFAULT: (a: ISearchResultChecked, b: ISearchResultChecked) => {
+  DEFAULT: (a: IGQLSearchResultChecked, b: IGQLSearchResultChecked) => {
     return b.value.id - a.value.id;
   },
 };

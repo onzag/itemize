@@ -2,7 +2,6 @@ import {
   IPropertyDefinitionSupportedType,
 } from "../types";
 import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
-import { IGQLValue } from "../../../../gql";
 import {
   UNIT_SUBTYPES,
   MAX_SUPPORTED_REAL,
@@ -20,6 +19,7 @@ import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
 import { ISQLTableRowValue } from "../../../../sql";
+import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 
 export interface IPropertyDefinitionSupportedUnitType {
   value: number;
@@ -76,7 +76,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       [sqlPrefix + id + "_NORMALIZED_UNIT"]: value.normalizedUnit,
     };
   },
-  sqlOut: (data: {[key: string]: any}, sqlPrefix: string, id: string) => {
+  sqlOut: (data: ISQLTableRowValue, sqlPrefix: string, id: string) => {
     const result: IPropertyDefinitionSupportedUnitType = {
       value: data[sqlPrefix + id + "_VALUE"],
       unit: data[sqlPrefix + id + "_UNIT"],
@@ -94,24 +94,27 @@ const typeValue: IPropertyDefinitionSupportedType = {
     const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
 
     if (typeof data[exactName] !== "undefined" && data[exactName] !== null) {
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", data[exactName].normalizedUnit);
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", data[exactName].normalizedValue);
+      const exactAsUnit: IPropertyDefinitionSupportedUnitType = data[exactName] as any;
+      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", exactAsUnit.normalizedUnit);
+      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", exactAsUnit.normalizedValue);
     } else if (data[exactName] === null) {
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", null);
     }
 
     if (typeof data[fromName] !== "undefined" && data[fromName] !== null) {
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", data[fromName].normalizedUnit);
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", ">=", data[fromName].normalizedValue);
+      const fromAsUnit: IPropertyDefinitionSupportedUnitType = data[fromName] as any;
+      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", fromAsUnit.normalizedUnit);
+      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", ">=", fromAsUnit.normalizedValue);
     }
 
     if (typeof data[toName] !== "undefined" && data[toName] !== null) {
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", data[toName].normalizedUnit);
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", data[toName].normalizedValue);
+      const toAsUnit: IPropertyDefinitionSupportedUnitType = data[toName] as any;
+      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", toAsUnit.normalizedUnit);
+      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", toAsUnit.normalizedValue);
     }
   },
   sqlLocalSearch: (
-    args: IGQLValue,
+    args: IGQLArgs,
     rawData: IGQLValue,
     id: string,
     includeId?: string,

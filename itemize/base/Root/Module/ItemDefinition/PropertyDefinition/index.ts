@@ -16,15 +16,9 @@ import { EndpointError } from "../../../../errors";
 import { DOMWindow } from "../../../../../util";
 import equals from "deep-equal";
 import { ISingleFilterRawJSONDataType } from "../../../../Autocomplete";
+import { IGQLFile } from "../../../../../gql-querier";
 
-export interface IPropertyDefinitionIncludedFileInfoType {
-  name: string;
-  type: string;
-  id: string;
-  url: string;
-  size: number;
-  src?: File | Promise<any>;
-}
+export type PropertyDefinitionIncludedFileInfoType = IGQLFile;
 
 export enum PropertyInvalidReason {
   INVALID_VALUE = "INVALID_VALUE",
@@ -319,7 +313,7 @@ export default class PropertyDefinition {
         return PropertyInvalidReason.INVALID_VALUE;
       }
       if (definition.gqlAddFileToFields) {
-        if (!(value as any).every((v: IPropertyDefinitionIncludedFileInfoType) => {
+        if (!(value as any).every((v: PropertyDefinitionIncludedFileInfoType) => {
           return typeof v.id === "string" &&
             typeof v.name === "string" &&
             typeof v.type === "string" &&

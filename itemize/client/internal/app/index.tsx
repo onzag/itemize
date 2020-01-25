@@ -166,8 +166,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
         }),
       );
       // Ignore errors, we just go for success
-      if (result && result.data && result.data.DATA && result.data.DATA) {
-        const actualPropertyResult: string = result.data.DATA[propertyId];
+      if (result && result.data && result.data.DATA) {
+        const actualPropertyResult: string = result.data.DATA[propertyId] as string;
         const userItemDefinition = this.state.specifiedProcessedRoot
           .getModuleFor(["users"]).getItemDefinitionFor(["user"]);
         if (userItemDefinition.hasAppliedValueTo(this.tokenState.id)) {

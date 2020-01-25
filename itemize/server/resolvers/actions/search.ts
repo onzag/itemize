@@ -21,7 +21,7 @@ import {
 } from "../../../constants";
 import { buildSQLQueryForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 
-export interface ISearchResultIdentifierType {
+export interface IGQLSearchResultIdentifierType {
   id: number;
   type: string;
 }
@@ -113,7 +113,7 @@ export async function searchModule(
   }
 
   // return using the base result, and only using the id
-  const baseResult: ISearchResultIdentifierType[] = await searchQuery;
+  const baseResult: IGQLSearchResultIdentifierType[] = await searchQuery;
   const finalResult: any = {
     ids: baseResult,
     last_record: baseResult.length ? Math.max.apply(null, baseResult.map((r) => r.id)) : null,
@@ -264,7 +264,7 @@ export async function searchItemDefinition(
   // now we get the base result, and convert every row
   const baseResult: ISQLTableRowValue[] = await searchQuery;
   const finalResult: {
-    ids: ISearchResultIdentifierType[];
+    ids: IGQLSearchResultIdentifierType[];
     last_record: number;
   } = {
     ids: baseResult.map((row) => {

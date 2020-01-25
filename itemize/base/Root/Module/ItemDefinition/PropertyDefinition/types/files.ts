@@ -1,10 +1,10 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { getStandardSQLFnFor, stardardSQLInWithJSONStringifyFn, standardSQLOutWithJSONParseFn } from "../sql";
-import { PropertyInvalidReason, IPropertyDefinitionIncludedFileInfoType } from "../../PropertyDefinition";
+import { PropertyInvalidReason, PropertyDefinitionIncludedFileInfoType } from "../../PropertyDefinition";
 import { MAX_FILE_BATCH_COUNT, CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
 
 // tslint:disable-next-line: no-empty-interface
-export interface IPropertyDefinitionSupportedSingleFilesType extends IPropertyDefinitionIncludedFileInfoType {
+export interface IPropertyDefinitionSupportedSingleFilesType extends PropertyDefinitionIncludedFileInfoType {
 }
 
 export type PropertyDefinitionSupportedFilesType = IPropertyDefinitionSupportedSingleFilesType[];

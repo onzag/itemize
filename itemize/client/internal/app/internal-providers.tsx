@@ -1,5 +1,5 @@
 import React from "react";
-import { gqlQuery, buildGqlQuery } from "../../../gql-querier";
+import { gqlQuery, buildGqlQuery, IGQLValue } from "../../../gql-querier";
 import { EndpointErrorType } from "../../../base/errors";
 import { ILocaleContextType } from ".";
 import { Location } from "history";
@@ -102,9 +102,9 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       const tokenDataRole = tokenData ? tokenData.role : null;
       const tokenDataToken = tokenData ? tokenData.token : null;
       if (tokenDataToken !== null) {
-        localStorage.setItem("TOKEN", tokenDataToken);
-        localStorage.setItem("ROLE", tokenDataRole);
-        localStorage.setItem("ID", tokenDataId);
+        localStorage.setItem("TOKEN", tokenDataToken as string);
+        localStorage.setItem("ROLE", tokenDataRole as string);
+        localStorage.setItem("ID", tokenDataId.toString());
       } else {
         localStorage.removeItem("TOKEN");
         localStorage.removeItem("ROLE");
@@ -114,9 +114,9 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       const error = data.errors ? data.errors[0].extensions : null;
       const newState: ITokenProviderState = {
         isLoggingIn: false,
-        id: tokenDataId,
-        token: tokenDataToken,
-        role: tokenDataRole,
+        id: tokenDataId as number,
+        token: tokenDataToken as string,
+        role: tokenDataRole as string,
         isReady: true,
         // when it's not ready and the login is automatic
         // we might want to ignore errors, user just got
@@ -150,11 +150,12 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         };
         if (CacheWorkerInstance.isSupported) {
           const cachedValue =
-            await CacheWorkerInstance.instance.getCachedValue("GET_MOD_users__IDEF_user", tokenDataId, fields);
+            await CacheWorkerInstance.instance.getCachedValue(
+              "GET_MOD_users__IDEF_user", tokenDataId as number, fields);
           if (cachedValue && cachedValue.value && cachedValue.value.DATA) {
-            cachedData.app_country = cachedValue.value.DATA.app_country;
-            cachedData.app_currency = cachedValue.value.DATA.app_currency;
-            cachedData.app_language = cachedValue.value.DATA.app_language;
+            cachedData.app_country = (cachedValue.value.DATA as IGQLValue).app_country;
+            cachedData.app_currency = (cachedValue.value.DATA as IGQLValue).app_currency;
+            cachedData.app_language = (cachedValue.value.DATA as IGQLValue).app_language;
             console.log("cached user locale is", cachedData);
             if (this.props.localeContext.country !== cachedData.app_country) {
               this.props.localeContext.changeCountryTo(cachedData.app_country, true, true);
@@ -183,7 +184,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         );
 
         if (userLanguageData && userLanguageData.data && userLanguageData.data.GET_MOD_users__IDEF_user) {
-          const localeUserData = userLanguageData.data.GET_MOD_users__IDEF_user.DATA;
+          const localeUserData: IGQLValue = userLanguageData.data.GET_MOD_users__IDEF_user.DATA as IGQLValue;
           // we still check everything just in case the user is blocked
           if (localeUserData) {
             console.log("user locale is", localeUserData);
@@ -191,26 +192,26 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
               localeUserData.app_country !== cachedData.app_country &&
               this.props.localeContext.country !== localeUserData.app_country
             ) {
-              this.props.localeContext.changeCountryTo(localeUserData.app_country, true, true);
+              this.props.localeContext.changeCountryTo(localeUserData.app_country as string, true, true);
             }
             if (
               localeUserData.app_language !== cachedData.app_language &&
               this.props.localeContext.language !== localeUserData.app_language
             ) {
-              this.props.localeContext.changeLanguageTo(localeUserData.app_language, true);
+              this.props.localeContext.changeLanguageTo(localeUserData.app_language as string, true);
             }
             if (
               localeUserData.app_currency !== cachedData.app_currency &&
               this.props.localeContext.currency !== localeUserData.app_currency
             ) {
-              this.props.localeContext.changeCurrencyTo(localeUserData.app_currency, true);
+              this.props.localeContext.changeCurrencyTo(localeUserData.app_currency as string, true);
             }
           }
 
           if (CacheWorkerInstance.isSupported) {
             const newCachedValue = userLanguageData.data.GET_MOD_users__IDEF_user;
             CacheWorkerInstance.instance.mergeCachedValue(
-              "GET_MOD_users__IDEF_user", tokenDataId, newCachedValue, fields,
+              "GET_MOD_users__IDEF_user", tokenDataId as number, newCachedValue, fields,
             );
           }
         }

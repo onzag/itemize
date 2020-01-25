@@ -1,13 +1,12 @@
 import { PropertyDefinitionSupportedType } from "./types";
 import PropertyDefinition from "../PropertyDefinition";
 import { ISQLTableRowValue, ISQLTableDefinitionType } from "../../../sql";
-import { IGQLValue } from "../../../gql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces";
 import Knex from "knex";
 import ItemDefinition from "..";
 import Include from "../Include";
 import { processFileListFor, processSingleFileFor } from "./sql-files";
-import { INCLUDE_PREFIX } from "../../../../../constants";
+import { IGQLArgs, IGQLValue, IGQLFile } from "../../../../../gql-querier";
 
 export function getStandardSQLFnFor(type: string):
   (sqlPrefix: string, id: string, property: PropertyDefinition) => ISQLTableDefinitionType {
@@ -65,7 +64,7 @@ export function standardSQLOutWithJSONParseFn(
 }
 
 export function standardSQLSearchFnExactAndRange(
-  args: IGQLValue,
+  args: IGQLArgs,
   sqlPrefix: string,
   id: string,
   knexBuilder: Knex.QueryBuilder,
@@ -75,15 +74,15 @@ export function standardSQLSearchFnExactAndRange(
   const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
 
   if (typeof args[exactName] !== "undefined") {
-    knexBuilder.andWhere(sqlPrefix + id, args[exactName]);
+    knexBuilder.andWhere(sqlPrefix + id, args[exactName] as string);
   }
 
   if (typeof args[fromName] !== "undefined" && args[fromName] !== null) {
-    knexBuilder.andWhere(sqlPrefix + id, ">=", args[fromName]);
+    knexBuilder.andWhere(sqlPrefix + id, ">=", args[fromName] as string);
   }
 
   if (typeof args[toName] !== "undefined" && args[toName] !== null) {
-    knexBuilder.andWhere(sqlPrefix + id, "<=", args[toName]);
+    knexBuilder.andWhere(sqlPrefix + id, "<=", args[toName] as string);
   }
 }
 
@@ -184,7 +183,7 @@ export function convertSQLValueToGQLValueForProperty(
   // and the properties are into its own object if they
   // happen to be sinking properties
   return {
-    [propertyDefinition.getId()]: colValue,
+    [propertyDefinition.getId()]: colValue as any,
   };
 }
 
@@ -212,7 +211,7 @@ export async function convertGQLValueToSQLValueForProperty(
   // and this is the value of the property, again, properties
   // are not prefixed, they are either in their own object
   // or in the root
-  let gqlPropertyValue = data[propertyDefinition.getId()];
+  let gqlPropertyValue: any = data[propertyDefinition.getId()] as any;
 
   // we treat undefined as null, and set it to default
   // if it is coerced into null
@@ -223,7 +222,7 @@ export async function convertGQLValueToSQLValueForProperty(
       typeof gqlPropertyValue === "undefined"
     )
   ) {
-    gqlPropertyValue = propertyDefinition.getDefaultValue();
+    gqlPropertyValue = propertyDefinition.getDefaultValue() as any;
   }
   // we also got to set to null any undefined value
   if (typeof gqlPropertyValue === "undefined") {
@@ -232,7 +231,7 @@ export async function convertGQLValueToSQLValueForProperty(
 
   const description = propertyDefinition.getPropertyDefinitionDescription();
   if (description.gqlAddFileToFields) {
-    const oldValue = (oldData && oldData[propertyDefinition.getId()]) || null;
+    const oldValue: any = (oldData && oldData[propertyDefinition.getId()]) || null;
     const newValue = gqlPropertyValue;
     if (description.gqlList) {
       gqlPropertyValue = await processFileListFor(
