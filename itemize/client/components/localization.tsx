@@ -2,7 +2,7 @@ import React from "react";
 import { LocaleContext, DataContext } from "../internal/app";
 import { ItemDefinitionContext } from "../providers/item-definition";
 import { localeReplacerToArray, localeReplacer } from "../../util";
-import { GraphQLEndpointErrorType } from "../../base/errors";
+import { EndpointErrorType } from "../../base/errors";
 import Module from "../../base/Root/Module";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -138,7 +138,7 @@ export function I18nRead(props: II18nReadProps) {
 
 const isDevelopment = process.env.NODE_ENV === "development";
 interface II18nReadErrorProps {
-  error: GraphQLEndpointErrorType;
+  error: EndpointErrorType;
 }
 export function I18nReadError(props: II18nReadErrorProps) {
   if (props.error === null) {

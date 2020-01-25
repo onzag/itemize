@@ -6,7 +6,7 @@ import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { requestFieldsAreContained, deepMerge } from "../../../../gql-util";
 import { ISearchResult, buildGqlQuery, gqlQuery, GQLEnum } from "../../../../gql-querier";
 import { MAX_SEARCH_RESULTS_AT_ONCE_LIMIT, PREFIX_GET } from "../../../../constants";
-import { GraphQLEndpointErrorType } from "../../../../base/errors";
+import { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
 import Root, { IRootRawJSONDataType } from "../../../../base/Root";
 
@@ -618,7 +618,7 @@ export default class CacheWorker {
     // whatever it is sucesful, so we don't have to retrieve it again
     // in a second round
     let somethingFailed = false;
-    let error: GraphQLEndpointErrorType;
+    let error: EndpointErrorType;
 
     // now we call every processed batch
     await Promise.all(processedBatches.map(async (processedBatch) => {

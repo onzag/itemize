@@ -21,7 +21,7 @@ import {
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
-import { GraphQLEndpointError } from "../../../base/errors";
+import { EndpointError } from "../../../base/errors";
 import { ISearchResultIdentifierType } from "./search";
 
 const getItemDefinitionDebug = Debug("resolvers:getItemDefinition");
@@ -49,19 +49,21 @@ export async function getItemDefinition(
   // so we run the policy check for read, this item definition,
   // with the given id
   const selectQueryValue: ISQLTableRowValue = await runPolicyCheck(
-    ["read"],
-    itemDefinition,
-    resolverArgs.args.id,
-    tokenData.role,
-    resolverArgs.args,
-    requestedFields,
-    appData.cache,
-    (content: ISQLTableRowValue) => {
-      // if there is no content, we force the entire policy check not to
-      // be performed and return null
-      if (!content) {
-        return null;
-      }
+    {
+      policyTypes: ["read"],
+      itemDefinition,
+      id: resolverArgs.args.id,
+      role: tokenData.role,
+      gqlArgValue: resolverArgs.args,
+      gqlFlattenedRequestedFiels: requestedFields,
+      cache: appData.cache,
+      preValidation: (content: ISQLTableRowValue) => {
+        // if there is no content, we force the entire policy check not to
+        // be performed and return null
+        if (!content) {
+          return null;
+        }
+      },
     },
   );
 
@@ -196,7 +198,7 @@ export async function getItemDefinitionList(
   const selfTableType = itemDefinition.getQualifiedPathName();
   resolverArgs.args.ids.forEach((argId: ISearchResultIdentifierType) => {
     if (argId.type !== selfTableType) {
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: "Invalid id container type that didn't match the qualified name " + selfTableType,
         code: "UNSPECIFIED",
       });
@@ -216,7 +218,7 @@ export async function getItemDefinitionList(
       // preveting another security leak here, the user might have lied by saying that these
       // items were all created by this specific creator when doing searches
       if (created_by && value.created_by !== created_by) {
-        throw new GraphQLEndpointError({
+        throw new EndpointError({
           message: "created_by mismatch, one of the items requested was not created by whom it was claimed",
           code: "UNSPECIFIED",
         });
@@ -295,7 +297,7 @@ export async function getModuleList(
       // preveting another security leak here, the user might have lied by saying that these
       // items were all created by this specific creator when doing searches
       if (created_by && value.created_by !== created_by) {
-        throw new GraphQLEndpointError({
+        throw new EndpointError({
           message: "created_by mismatch, one of the items requested was not created by whom it was claimed",
           code: "UNSPECIFIED",
         });

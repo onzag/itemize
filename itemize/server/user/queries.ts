@@ -3,7 +3,7 @@ import { IGQLQueryFieldsDefinitionType } from "../../../itemize/base/Root/gql";
 import { GraphQLString } from "graphql";
 import { CONNECTOR_SQL_COLUMN_FK_NAME } from "../../constants";
 import { jwtVerify, jwtSign } from "../token";
-import { GraphQLEndpointError } from "../../../itemize/base/errors";
+import { EndpointError } from "../../../itemize/base/errors";
 import { IServerSideTokenDataType } from "../resolvers/basic";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import TOKEN_OBJECT from "../custom-token/graphql-token-object";
@@ -39,7 +39,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         // if there is no username and there is no token
         // the credentials are automatically invalid
         if (!args.username && !args.token) {
-          throw new GraphQLEndpointError({
+          throw new EndpointError({
             message: "Invalid Credentials",
             code: "INVALID_CREDENTIALS",
           });
@@ -73,7 +73,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
             decodedId = decoded.id;
           } catch (err) {
-            throw new GraphQLEndpointError({
+            throw new EndpointError({
               message: "Token is invalid",
               code: "INVALID_CREDENTIALS",
             });
@@ -106,7 +106,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           // if the user is blocked
           if (resultUser.blocked_at) {
             // we give an error for that
-            throw new GraphQLEndpointError({
+            throw new EndpointError({
               message: "User is blocked",
               code: "USER_BLOCKED",
             });
@@ -128,7 +128,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           // if we don't get an user and we previously
           // have used a username and password combination
           // we give an invalid credentials error
-          throw new GraphQLEndpointError({
+          throw new EndpointError({
             message: "Invalid Credentials",
             code: "INVALID_CREDENTIALS",
           });
@@ -136,7 +136,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           // otherwise the user has been removed as the id
           // is not found, this can happen if the user
           // has kept a session active after nuking his account
-          throw new GraphQLEndpointError({
+          throw new EndpointError({
             message: "User has been removed",
             code: "USER_REMOVED",
           });

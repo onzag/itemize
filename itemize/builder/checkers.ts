@@ -132,6 +132,13 @@ export function checkItemDefinition(
     );
   }
 
+  if (rawData.mustBeParented && !rawData.canBeParentedBy) {
+    throw new CheckUpError(
+      "Setting mustBeParented without canBeParentedBy specifications",
+      actualTraceback.newTraceToBit("mustBeParented"),
+    );
+  }
+
   // if it can be parented
   if (rawData.canBeParentedBy) {
     if (!rawData.parentingRoleAccess) {
@@ -207,13 +214,52 @@ export function checkItemDefinition(
           );
         }
 
+        let moduleForPolicy: IModuleRawJSONDataType = parentModule;
+        let itemDefinitionForPolicy: IItemDefinitionRawJSONDataType = rawData;
+        if (policyValue.module) {
+          moduleForPolicy = Root.getModuleRawFor(rawRootData, policyValue.module.split("/"));
+          itemDefinitionForPolicy = null;
+          if (!moduleForPolicy) {
+            throw new CheckUpError(
+              "Policy rule '" + policyRuleKey +
+                "' contains an invalid module that cannot be found '" + policyValue.module + "'",
+              actualTraceback
+                .newTraceToBit("policies")
+                .newTraceToBit(policyKey)
+                .newTraceToBit(policyRuleKey)
+                .newTraceToBit("module"),
+            );
+          }
+
+          if (policyValue.itemDefinition) {
+            itemDefinitionForPolicy = Module.getItemDefinitionRawFor(moduleForPolicy, policyValue.itemDefinition.split("/"));
+            if (!itemDefinitionForPolicy) {
+              throw new CheckUpError(
+                "Policy rule '" + policyRuleKey +
+                  "' contains an invalid item definition that cannot be found '" + policyValue.itemDefinition + "'",
+                actualTraceback
+                  .newTraceToBit("policies")
+                  .newTraceToBit(policyKey)
+                  .newTraceToBit(policyRuleKey)
+                  .newTraceToBit("itemDefinition"),
+              );
+            }
+          }
+        }
+
         policyValue.properties.forEach((propertyId, index) => {
-          const propertyRaw =
-            ItemDefinition.getPropertyDefinitionRawFor(rawData, parentModule, propertyId, true);
+          let propertyRaw: IPropertyDefinitionRawJSONDataType;
+          if (itemDefinitionForPolicy) {
+            propertyRaw = ItemDefinition.getPropertyDefinitionRawFor(
+              itemDefinitionForPolicy, moduleForPolicy, propertyId, true);
+          } else {
+            propertyRaw = Module.getPropExtensionRawFor(moduleForPolicy, propertyId);
+          }
           if (propertyRaw === null) {
             throw new CheckUpError(
               "Policy rule '" + policyRuleKey +
-                "' contains an invalid property that cannot be found '" + propertyId + "'",
+                "' contains an invalid property that cannot be found '" + propertyId +
+                "' in '" + itemDefinitionForPolicy.name + "'",
               actualTraceback
                 .newTraceToBit("policies")
                 .newTraceToBit(policyKey)
@@ -226,12 +272,18 @@ export function checkItemDefinition(
 
         if (policyValue.applyingProperties) {
           policyValue.applyingProperties.forEach((propertyId, index) => {
-            const propertyRaw =
-              ItemDefinition.getPropertyDefinitionRawFor(rawData, parentModule, propertyId, true);
+            let propertyRaw: IPropertyDefinitionRawJSONDataType;
+            if (itemDefinitionForPolicy) {
+              propertyRaw = ItemDefinition.getPropertyDefinitionRawFor(
+                itemDefinitionForPolicy, moduleForPolicy, propertyId, true);
+            } else {
+              propertyRaw = Module.getPropExtensionRawFor(moduleForPolicy, propertyId);
+            }
             if (propertyRaw === null) {
               throw new CheckUpError(
                 "Policy rule '" + policyRuleKey +
-                  "' contains an invalid property that cannot be found '" + propertyId + "'",
+                  "' contains an invalid property that cannot be found '" + propertyId +
+                  "' in '" + itemDefinitionForPolicy.name + "'",
                 actualTraceback
                   .newTraceToBit("policies")
                   .newTraceToBit(policyKey)
@@ -245,7 +297,23 @@ export function checkItemDefinition(
 
         if (policyValue.applyingIncludes) {
           policyValue.applyingIncludes.forEach((includeId, index) => {
-            const includeRaw = rawData.includes && rawData.includes.find((i) => i.id === includeId);
+            let includeRaw: IIncludeRawJSONDataType;
+            if (itemDefinitionForPolicy) {
+              includeRaw = itemDefinitionForPolicy.includes &&
+                itemDefinitionForPolicy.includes.find((i) => i.id === includeId);
+            } else {
+              throw new CheckUpError(
+                "Policy rule '" + policyRuleKey +
+                  "' has set itself as an external module-only rule" +
+                  " but it requests for applying includes '" + includeId + "'",
+                actualTraceback
+                  .newTraceToBit("policies")
+                  .newTraceToBit(policyKey)
+                  .newTraceToBit(policyRuleKey)
+                  .newTraceToBit("applyingIncludes")
+                  .newTraceToBit(index),
+              );
+            }
             if (!includeRaw) {
               throw new CheckUpError(
                 "Policy rule '" + policyRuleKey +

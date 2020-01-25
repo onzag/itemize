@@ -10,10 +10,11 @@ import {
   validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields from "graphql-fields";
-import { GraphQLEndpointError } from "../../../base/errors";
+import { EndpointError } from "../../../base/errors";
 import { ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS } from "../../../constants";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { deleteEverythingInTransitoryId } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
+import { IChangedFeedbackEvent } from "../../../base/remote-protocol";
 
 const debug = Debug("resolvers:deleteItemDefinition");
 export async function deleteItemDefinition(
@@ -50,49 +51,50 @@ export async function deleteItemDefinition(
   // of the user
   let userId: number;
   await runPolicyCheck(
-    ["delete"],
-    itemDefinition,
-    resolverArgs.args.id,
-    tokenData.role,
-    resolverArgs.args,
-    null,
-    appData.cache,
+    {
+      policyTypes: ["delete"],
+      itemDefinition,
+      id: resolverArgs.args.id,
+      role: tokenData.role,
+      gqlArgValue: resolverArgs.args,
+      gqlFlattenedRequestedFiels: null,
+      cache: appData.cache,
+      // this functions runs before the policy has been checked
+      // and we do it for being efficient, because we can run
+      // both of these checks with a single SQL query, and the policy
+      // checker is built in a way that it demands and expects that
+      preValidation: (content: any) => {
+        // if there is no userId then the row was null, we throw an error
+        if (!content) {
+          debug("FAILED due to lack of content data");
+          throw new EndpointError({
+            message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
+            code: "NOT_FOUND",
+          });
+        }
 
-    // this functions runs before the policy has been checked
-    // and we do it for being efficient, because we can run
-    // both of these checks with a single SQL query, and the policy
-    // checker is built in a way that it demands and expects that
-    (content: any) => {
-      // if there is no userId then the row was null, we throw an error
-      if (!content) {
-        debug("FAILED due to lack of content data");
-        throw new GraphQLEndpointError({
-          message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
-          code: "NOT_FOUND",
-        });
-      }
+        // so now we get the content information, which might
+        // be null if nothing was found, so we check too
+        userId = content.created_by;
+        if (itemDefinition.isOwnerObjectId()) {
+          userId = content.id;
+        }
 
-      // so now we get the content information, which might
-      // be null if nothing was found, so we check too
-      userId = content.created_by;
-      if (itemDefinition.isOwnerObjectId()) {
-        userId = content.id;
-      }
-
-      // if the content is blocked, and our role has no special access
-      // to moderation fields, then this content cannot be removed
-      // from the website, no matter what
-      if (
-        content.blocked_at !== null &&
-        !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
-      ) {
-        debug("FAILED due to blocked content and no moderation access for role %s", tokenData.role);
-        throw new GraphQLEndpointError({
-          message: "The item is blocked, only users with role " +
-          ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.join(",") + " can wipe this data",
-          code: "BLOCKED",
-        });
-      }
+        // if the content is blocked, and our role has no special access
+        // to moderation fields, then this content cannot be removed
+        // from the website, no matter what
+        if (
+          content.blocked_at !== null &&
+          !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
+        ) {
+          debug("FAILED due to blocked content and no moderation access for role %s", tokenData.role);
+          throw new EndpointError({
+            message: "The item is blocked, only users with role " +
+            ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.join(",") + " can wipe this data",
+            code: "BLOCKED",
+          });
+        }
+      },
     },
   );
 
@@ -125,11 +127,15 @@ export async function deleteItemDefinition(
   );
   (async () => {
     await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, null);
+    const changeEvent: IChangedFeedbackEvent = {
+      itemDefinition: selfTable,
+      id: resolverArgs.args.id,
+      type: "not_found",
+      lastModified: null,
+    };
     appData.listener.triggerListeners(
-      selfTable,
-      resolverArgs.args.id,
+      changeEvent,
       resolverArgs.args.listener_uuid || null,
-      true,
     );
   })();
 

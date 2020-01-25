@@ -1,5 +1,5 @@
 import React from "react";
-import { GraphQLEndpointErrorType } from "../../base/errors";
+import { EndpointErrorType } from "../../base/errors";
 import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
 import { ItemDefinitionContext, IItemDefinitionContextType } from "../providers/item-definition";
 
@@ -7,7 +7,7 @@ type ActionerFn = (actioner: {
   login: () => Promise<void>,
   signup: () => Promise<void>,
   logout: () => void,
-  error: GraphQLEndpointErrorType,
+  error: EndpointErrorType,
   dismissError: () => void,
 }) => React.ReactNode;
 

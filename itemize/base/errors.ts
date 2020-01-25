@@ -1,16 +1,16 @@
-interface IGraphQLEndpointErrorBaseType {
+interface IEndpointErrorBaseType {
   message: string;
   code: string;
 }
 
-interface IGraphQLEndpointErrorOverloadPropExtensionType {
+interface IEndpointErrorOverloadPropExtensionType {
   message: string;
   code: string;
   modulePath: string[];
   propertyId: string;
 }
 
-interface IGraphQLEndpointErrorOverloadPropertyType {
+interface IEndpointErrorOverloadPropertyType {
   message: string;
   code: string;
   modulePath: string[];
@@ -18,7 +18,7 @@ interface IGraphQLEndpointErrorOverloadPropertyType {
   propertyId: string;
 }
 
-interface IGraphQLEndpointErrorOverloadPropertyInIncludeType {
+interface IEndpointErrorOverloadPropertyInIncludeType {
   message: string;
   code: string;
   modulePath: string[];
@@ -28,7 +28,7 @@ interface IGraphQLEndpointErrorOverloadPropertyInIncludeType {
   propertyId: string;
 }
 
-interface IGraphQLEndpointErrorOverloadPolicyType {
+interface IEndpointErrorOverloadPolicyType {
   message: string;
   code: string;
   modulePath: string[];
@@ -37,22 +37,22 @@ interface IGraphQLEndpointErrorOverloadPolicyType {
   policyType: string;
 }
 
-export type GraphQLEndpointErrorType =
-  IGraphQLEndpointErrorBaseType |
-  IGraphQLEndpointErrorOverloadPropExtensionType |
-  IGraphQLEndpointErrorOverloadPropertyType |
-  IGraphQLEndpointErrorOverloadPropertyInIncludeType |
-  IGraphQLEndpointErrorOverloadPolicyType;
+export type EndpointErrorType =
+  IEndpointErrorBaseType |
+  IEndpointErrorOverloadPropExtensionType |
+  IEndpointErrorOverloadPropertyType |
+  IEndpointErrorOverloadPropertyInIncludeType |
+  IEndpointErrorOverloadPolicyType;
 
-export class GraphQLEndpointError extends Error {
-  public data: GraphQLEndpointErrorType;
+export class EndpointError extends Error {
+  public data: EndpointErrorType;
 
-  constructor(data: GraphQLEndpointErrorType) {
+  constructor(data: EndpointErrorType) {
     super(data.message);
 
     this.data = data;
 
     // Set the prototype explicitly.
-    Object.setPrototypeOf(this, GraphQLEndpointError.prototype);
+    Object.setPrototypeOf(this, EndpointError.prototype);
   }
 }

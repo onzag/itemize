@@ -44,6 +44,39 @@ const policySchema = {
   additionalProperties: false,
 };
 
+const policySchemaWithModuleAndItemDefinition = {
+  type: "object",
+  patternProperties: {
+    "^[A-Z_]+$": {
+      type: "object",
+      properties: {
+        roles: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          minItems: 1,
+        },
+        properties: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          minItems: 1,
+        },
+        module: {
+          type: "string",
+        },
+        itemDefinition: {
+          type: "string",
+        },
+      },
+      required: ["roles", "properties", "module"],
+    },
+  },
+  additionalProperties: false,
+};
+
 const policySchemaNoApplying = {
   type: "object",
   patternProperties: {
@@ -145,6 +178,7 @@ export default {
         edit: policySchema,
         delete: policySchemaNoApplying,
         read: policySchema,
+        parent: policySchemaWithModuleAndItemDefinition,
       },
     },
     ownerIsObjectId: {
@@ -160,6 +194,9 @@ export default {
       type: "array",
       itemDefinition: itemDefinitionReferenceSchema,
       minItems: 1,
+    },
+    mustBeParented: {
+      type: "boolean",
     },
     parentingRoleAccess: {
       type: "array",

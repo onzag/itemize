@@ -14,16 +14,21 @@ import {
   EXCLUSION_STATE_SUFFIX,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
-import { GraphQLEndpointError } from "../../../errors";
+import { EndpointError } from "../../../errors";
 import uuid from "uuid";
 import { flattenRawGQLValueOrFields } from "../../../../gql-util";
-import Root from "../..";
 
 export interface IPolicyValueRawJSONDataType {
   roles: string[];
   properties: string[];
+
+  // unavailable for delete
   applyingProperties?: string[];
   applyingIncludes?: string[];
+
+  // always available for parenting rules, at least module
+  module?: string;
+  itemDefinition?: string;
 }
 
 export interface IPolicyRawJSONDataType {
@@ -34,6 +39,7 @@ export interface IPoliciesRawJSONDataType {
   edit?: IPolicyRawJSONDataType;
   delete?: IPolicyRawJSONDataType;
   read?: IPolicyRawJSONDataType;
+  parent?: IPolicyRawJSONDataType;
 }
 
 export interface IItemDefinitionParentingRawJSONDataType {
@@ -83,6 +89,7 @@ export interface IItemDefinitionRawJSONDataType {
 
   // parenting
   canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
+  mustBeParented?: boolean;
   parentingRoleAccess?: string[];
 }
 
@@ -94,6 +101,7 @@ export interface IPoliciesStateType {
   edit?: IPolicyStateType;
   delete?: IPolicyStateType;
   read?: IPolicyStateType;
+  parent?: IPolicyStateType;
 }
 
 export interface IItemDefinitionStateType {
@@ -130,6 +138,7 @@ export interface IPoliciesType {
   edit?: IPolicyType;
   delete?: IPolicyType;
   read?: IPolicyType;
+  parent?: IPolicyType;
 }
 
 /**
@@ -285,20 +294,6 @@ export default class ItemDefinition {
       .map((i) => (new PropertyDefinition(i, parentModule,
         this, false))) : [];
 
-    this.policyPropertyDefinitions = {};
-    if (rawJSON.policies) {
-      Object.keys(rawJSON.policies).forEach((policyType) => {
-        this.policyPropertyDefinitions[policyType] = {};
-        Object.keys(rawJSON.policies[policyType]).forEach((policyName) => {
-          this.policyPropertyDefinitions[policyType][policyName] =
-            rawJSON.policies[policyType][policyName].properties.map(
-              (propertyId: string) =>
-                this.getPropertyDefinitionFor(propertyId, true).getNewInstance(),
-            );
-        });
-      });
-    }
-
     // assigning the include instances by using the includes
     // and instantiating those
     this.includeInstances = rawJSON.includes ? rawJSON.includes
@@ -310,6 +305,42 @@ export default class ItemDefinition {
     this.listeners = {};
 
     this.parentModule.getParentRoot().registry[this.getQualifiedPathName()] = this;
+  }
+
+  public init() {
+    this.policyPropertyDefinitions = {};
+    if (this.rawData.policies) {
+      Object.keys(this.rawData.policies).forEach((policyType) => {
+        this.policyPropertyDefinitions[policyType] = {};
+        Object.keys(this.rawData.policies[policyType]).forEach((policyName) => {
+
+          const policyValue: IPolicyValueRawJSONDataType = this.rawData.policies[policyType][policyName];
+          const moduleInQuestionPath = policyValue.module;
+          const itemDefinitionInQuestionPath = policyValue.itemDefinition;
+
+          let itemDefinition: ItemDefinition = this;
+          if (moduleInQuestionPath) {
+            const referredModule = this.getParentModule().getParentRoot().getModuleFor(moduleInQuestionPath.split("/"));
+            if (itemDefinitionInQuestionPath) {
+              itemDefinition = referredModule.getItemDefinitionFor(itemDefinitionInQuestionPath.split("/"));
+            } else {
+              itemDefinition = referredModule.getPropExtensionItemDefinition();
+            }
+          }
+
+          this.policyPropertyDefinitions[policyType][policyName] =
+            policyValue.properties.map(
+              (propertyId: string) => {
+                return itemDefinition.getPropertyDefinitionFor(propertyId, true).getNewInstance();
+              },
+            );
+        });
+      });
+    }
+
+    this.childDefinitions.forEach((cd) => {
+      cd.init();
+    });
   }
 
   public setAsExtensionsInstance() {
@@ -707,7 +738,7 @@ export default class ItemDefinition {
     let policies: IPoliciesStateType = null;
     if (!excludePolicies) {
       policies = {};
-      ["edit", "delete", "read"].map((policyType) => {
+      ["edit", "delete", "read", "parent"].map((policyType) => {
         if (this.policyPropertyDefinitions[policyType]) {
           policies[policyType] = {};
           Object.keys(this.policyPropertyDefinitions[policyType]).map((policyName) => {
@@ -773,7 +804,7 @@ export default class ItemDefinition {
     let policies: IPoliciesStateType = null;
     if (!excludePolicies) {
       policies = {};
-      await Promise.all(["edit", "delete", "read"].map(async (policyType) => {
+      await Promise.all(["edit", "delete", "read", "parent"].map(async (policyType) => {
         if (this.policyPropertyDefinitions[policyType]) {
           policies[policyType] = {};
           await Promise.all(Object.keys(this.policyPropertyDefinitions[policyType]).map(async (policyName) => {
@@ -1049,7 +1080,7 @@ export default class ItemDefinition {
           " been specified which matched yourself as there's a self rule, if performing a search" +
           " you might have wanted to add the created_by filter in order to ensure this rule is followed";
         }
-        throw new GraphQLEndpointError({
+        throw new EndpointError({
           message: errorMessage,
           // this is where the code comes in handy, it's forbidden by default, and must be logged in for guests
           code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
@@ -1105,14 +1136,14 @@ export default class ItemDefinition {
       const notLoggedInWhenShould = role === GUEST_METAROLE;
 
       if (!canCreateInBehalf && throwError) {
-        throw new GraphQLEndpointError({
+        throw new EndpointError({
           message: `Forbidden, role ${role} cannot create in behalf in resource ${this.getName()}` +
           ` only roles ${this.rawData.canCreateInBehalfBy.join(", ")} can do so`,
           code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
         });
       }
     } else if (throwError) {
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: "can create in behalf is not supported",
         // here we pass always forbidden simply because it's not supported at all
         // and it was not a login mistake
@@ -1120,6 +1151,13 @@ export default class ItemDefinition {
       });
     }
     return canCreateInBehalf;
+  }
+
+  /**
+   * Tells whether this item definition has parenting enforced
+   */
+  public mustBeParented() {
+    return !!this.rawData.mustBeParented;
   }
 
   /**
@@ -1148,7 +1186,7 @@ export default class ItemDefinition {
         return parentPossibility.module === modulePath && parentPossibility.itemDefinition === itemDefinitionPath;
       });
       if (!canBeParentedBy && throwError) {
-        throw new GraphQLEndpointError({
+        throw new EndpointError({
           message: "parenting with '" + modulePath + "' and '" + itemDefinitionPath + "' is not allowed",
           // here we pass always forbidden simply because it's not supported at all
           // and it was not a login mistake
@@ -1156,7 +1194,7 @@ export default class ItemDefinition {
         });
       }
     } else if (throwError) {
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: "parenting is not supported",
         // here we pass always forbidden simply because it's not supported at all
         // and it was not a login mistake
@@ -1192,14 +1230,14 @@ export default class ItemDefinition {
       const notLoggedInWhenShould = role === GUEST_METAROLE;
 
       if (!hasParentingRoleAccess && throwError) {
-        throw new GraphQLEndpointError({
+        throw new EndpointError({
           message: `Forbidden, user ${userId} with role ${role} has no parenting role access to resource ${this.getName()}` +
           ` only roles ${this.rawData.parentingRoleAccess.join(", ")} can be granted access`,
           code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
         });
       }
     } else {
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: "parenting role access is not supported",
         // here we pass always forbidden simply because it's not supported at all
         // and it was not a login mistake
@@ -1289,7 +1327,7 @@ export default class ItemDefinition {
 
   /**
    * Provides all policy names included in the policy of type
-   * @param policyType the policy type, "edit", "read" or "delete"
+   * @param policyType the policy type, "edit", "read", "delete" or "parent"
    */
   public getPolicyNamesFor(policyType: string): string[] {
     if (!this.rawData.policies || !this.rawData.policies[policyType]) {
@@ -1302,7 +1340,7 @@ export default class ItemDefinition {
    * Provides all live properties for a policy, these properties
    * are detached properties, new instances of the old property and hold
    * their own states
-   * @param type the type "edit", "delete", "read"
+   * @param type the type "edit", "delete", "read" or "parent"
    * @param name the policy name that was set
    */
   public getPropertiesForPolicy(type: string, name: string): PropertyDefinition[] {
@@ -1313,7 +1351,7 @@ export default class ItemDefinition {
 
   /**
    * Provides all the property ids that are affected by a given policy
-   * @param type the policy type "edit", "delete", "read"
+   * @param type the policy type "edit", "delete", "read" or "parent"
    * @param name the policy name
    */
   public getApplyingPropertyIdsForPolicy(type: string, name: string): string[] {
@@ -1327,7 +1365,7 @@ export default class ItemDefinition {
 
   /**
    * Provides all the roles that are affected by a policy
-   * @param type the policy type "edit", "delete", "read"
+   * @param type the policy type "edit", "delete", "read" or "parent"
    * @param name the policy name
    */
   public getRolesForPolicy(type: string, name: string): string[] {

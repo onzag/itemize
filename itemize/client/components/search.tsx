@@ -8,9 +8,8 @@ import { requestFieldsAreContained, deepMerge } from "../../gql-util";
 import { buildGqlQuery, gqlQuery, ISearchResult } from "../../gql-querier";
 import { LocaleContext, ILocaleContextType } from "../internal/app";
 import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
-import { GraphQLEndpointErrorType } from "../../base/errors";
+import { EndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "../internal/app/remote-listener";
-import Root from "../../base/Root";
 
 interface ISearchResultWithPopulateData extends ISearchResult {
   providerProps: {
@@ -34,7 +33,7 @@ interface ISearchLoaderArg {
   pageCount: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
-  error: GraphQLEndpointErrorType;
+  error: EndpointErrorType;
   dismissError: () => void;
   refreshPage: () => void;
 }
@@ -69,7 +68,7 @@ interface IActualSearchLoaderState {
   currentlySearching: ISearchResult[];
   searchFields: any;
   currentSearchResults: ISearchResult[];
-  error: GraphQLEndpointErrorType;
+  error: EndpointErrorType;
 }
 
 class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActualSearchLoaderState> {
@@ -201,7 +200,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           itemDefintionInQuestion.triggerListeners("change", cr.forId);
         }
 
-        this.props.remoteListener.requestFeedbackFor(itemDefintionInQuestion, cr.forId);
+        this.props.remoteListener.requestFeedbackFor({
+          itemDefinition: itemDefintionInQuestion.getQualifiedPathName(),
+          id: cr.forId,
+        });
       }
     });
 
@@ -227,7 +229,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       );
 
       // now we got to check for errors
-      let error: GraphQLEndpointErrorType = null;
+      let error: EndpointErrorType = null;
 
       // no value, for some reason the server didnt return
       // anything, we cant connect to it, it either timed out

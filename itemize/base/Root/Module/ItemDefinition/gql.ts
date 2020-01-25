@@ -22,7 +22,7 @@ import { getGQLFieldsDefinitionForProperty } from "./PropertyDefinition/gql";
 import { getGQLFieldsDefinitionForInclude } from "./Include/gql";
 import { getGQLFieldsDefinitionForModule } from "../gql";
 import { IGQLFieldsDefinitionType, IGraphQLResolversType, IGQLQueryFieldsDefinitionType } from "../../gql";
-import { GraphQLEndpointError } from "../../../errors";
+import { EndpointError } from "../../../errors";
 
 /**
  * Provides all the graphql fields that this item definition contains as well as its
@@ -34,7 +34,7 @@ import { GraphQLEndpointError } from "../../../errors";
  * @param options.propertiesAsInput if the properties should be in input form
  * @param options.optionalForm makes all the parameters optional, that is nullable
  * @param options.includePolicy whether to include the policies in the result, this is a string
- * that specifies the policy type that is to be included, eg "edit", "delete", "read"
+ * that specifies the policy type that is to be included, eg "edit", "delete", "read" and "parent"
  */
 export function getGQLFieldsDefinitionForItemDefinition(
   itemDefinition: ItemDefinition,
@@ -108,7 +108,7 @@ export function getGQLFieldsDefinitionForItemDefinition(
  * Provides the fields that are required to include policy data for property
  * definitions
  * @param itemDefinition the item definition in question
- * @param options.policy the policy type that should be included, eg "edit", "delete", "read"
+ * @param options.policy the policy type that should be included, eg "edit", "delete", "read" and "parent"
  * @param options.propertiesAsInput if the properties should be in input form
  */
 export function getGQLFieldsDefinitionForItemDefinitionPolicies(
@@ -118,6 +118,7 @@ export function getGQLFieldsDefinitionForItemDefinitionPolicies(
     propertiesAsInput: boolean,
   },
 ): IGQLFieldsDefinitionType {
+  // TODO implement parent policy properly according to type
   let fieldsResult: IGQLFieldsDefinitionType = {};
   itemDefinition.getPolicyNamesFor(options.policy).forEach((policyName) => {
     itemDefinition.getPropertiesForPolicy(options.policy, policyName).forEach((pd) => {
@@ -241,13 +242,13 @@ async function resolveGenericFunction(
     } catch (err) {
       // if we catch an error, we check
       // if it's an expected error the user should see
-      if (err instanceof GraphQLEndpointError) {
+      if (err instanceof EndpointError) {
         throw err;
       }
       // otherwise this is an internal server error
       // the user shouldn't receive that
       console.error(err.stack);
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: "Internal Server Error",
         code: "INTERNAL_SERVER_ERROR",
       });
@@ -382,7 +383,7 @@ export function getGQLMutationFieldsForItemDefinition(
           propertiesAsInput: true,
           excludeBase: true,
           optionalForm: true,
-          includePolicy: null,
+          includePolicy: "parent",
         }),
       },
       resolve: resolveGenericFunction.bind(null, "addItemDefinition", itemDefinition, resolvers),

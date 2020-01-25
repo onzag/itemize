@@ -18,9 +18,10 @@ import {
   convertGQLValueToSQLValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sql";
-import { GraphQLEndpointError } from "../../../base/errors";
+import { EndpointError } from "../../../base/errors";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
+import { IChangedFeedbackEvent } from "../../../base/remote-protocol";
 
 const debug = Debug("resolvers:editItemDefinition");
 export async function editItemDefinition(
@@ -59,37 +60,39 @@ export async function editItemDefinition(
   // so we run the policy check for edit, this item definition,
   // with the given id
   const wholeSqlStoredValue: ISQLTableRowValue = await runPolicyCheck(
-    ["edit", "read"],
-    itemDefinition,
-    resolverArgs.args.id,
-    tokenData.role,
-    resolverArgs.args,
-    requestedFields,
-    appData.cache,
-    (content: ISQLTableRowValue) => {
-      // if we don't get an user id this means that there's no owner, this is bad input
-      if (!content) {
-        debug("FAILED due to lack of content data");
-        throw new GraphQLEndpointError({
-          message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
-          code: "NOT_FOUND",
-        });
-      }
+    {
+      policyTypes: ["edit", "read"],
+      itemDefinition,
+      id: resolverArgs.args.id,
+      role: tokenData.role,
+      gqlArgValue: resolverArgs.args,
+      gqlFlattenedRequestedFiels: requestedFields,
+      cache: appData.cache,
+      preValidation: (content: ISQLTableRowValue) => {
+        // if we don't get an user id this means that there's no owner, this is bad input
+        if (!content) {
+          debug("FAILED due to lack of content data");
+          throw new EndpointError({
+            message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
+            code: "NOT_FOUND",
+          });
+        }
 
-      // and fetch the userId
-      userId = content.created_by;
-      if (itemDefinition.isOwnerObjectId()) {
-        userId = content.id;
-      }
+        // and fetch the userId
+        userId = content.created_by;
+        if (itemDefinition.isOwnerObjectId()) {
+          userId = content.id;
+        }
 
-      // also throw an error if it's blocked
-      if (content.blocked_at !== null) {
-        debug("FAILED due to element being blocked");
-        throw new GraphQLEndpointError({
-          message: "The item is blocked",
-          code: "BLOCKED",
-        });
-      }
+        // also throw an error if it's blocked
+        if (content.blocked_at !== null) {
+          debug("FAILED due to element being blocked");
+          throw new EndpointError({
+            message: "The item is blocked",
+            code: "BLOCKED",
+          });
+        }
+      },
     },
   );
 
@@ -202,7 +205,7 @@ export async function editItemDefinition(
     Object.keys(sqlModData).length === 0
   ) {
     debug("FAILED due to input data being none");
-    throw new GraphQLEndpointError({
+    throw new EndpointError({
       message: "You are not updating anything whatsoever",
       code: "NOTHING_TO_UPDATE",
     });
@@ -271,11 +274,15 @@ export async function editItemDefinition(
   // we return and this executes after it returns
   (async () => {
     await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, value);
+    const changeEvent: IChangedFeedbackEvent = {
+      itemDefinition: selfTable,
+      id: resolverArgs.args.id,
+      type: "modified",
+      lastModified: null,
+    };
     appData.listener.triggerListeners(
-      selfTable,
-      resolverArgs.args.id,
+      changeEvent,
       resolverArgs.args.listener_uuid || null,
-      false,
     );
   })();
 

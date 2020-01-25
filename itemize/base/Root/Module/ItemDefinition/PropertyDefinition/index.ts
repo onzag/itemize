@@ -12,7 +12,7 @@ import {
 } from "../../../../../constants";
 import Module from "../..";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
-import { GraphQLEndpointError } from "../../../../errors";
+import { EndpointError } from "../../../../errors";
 import { DOMWindow } from "../../../../../util";
 import equals from "deep-equal";
 import { ISingleFilterRawJSONDataType } from "../../../../Autocomplete";
@@ -1317,7 +1317,7 @@ export default class PropertyDefinition {
         " been specified which matched yourself as there's a self rule, if performing a search" +
         " you might have wanted to add the created_by filter in order to ensure this rule is followed";
       }
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: errorMessage,
         code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
       });

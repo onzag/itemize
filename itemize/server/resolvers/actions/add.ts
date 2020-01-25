@@ -11,6 +11,7 @@ import {
   validateTokenIsntBlocked,
   checkUserExists,
   validateParentingRules,
+  runPolicyCheck,
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import { CONNECTOR_SQL_COLUMN_FK_NAME, INCLUDE_PREFIX,
@@ -23,6 +24,9 @@ import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sq
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import uuid from "uuid";
 import { updateTransitoryIdIfExists } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
+import { IParentedSearchRecordsAddedEvent, IOwnedSearchRecordsAddedEvent } from "../../../base/remote-protocol";
+import { ISQLTableRowValue } from "../../../base/Root/sql";
+import { EndpointError } from "../../../base/errors";
 
 const debug = Debug("resolvers:addItemDefinition");
 export async function addItemDefinition(
@@ -45,16 +49,14 @@ export async function addItemDefinition(
 
   // now we must check if we are parenting
   const isParenting = !!(resolverArgs.args.parent_id || resolverArgs.args.parent_type);
-  if (isParenting) {
-    validateParentingRules(
-      appData,
-      resolverArgs.args.parent_id,
-      resolverArgs.args.parent_type,
-      itemDefinition,
-      tokenData.id,
-      tokenData.role,
-    );
-  }
+  validateParentingRules(
+    appData,
+    resolverArgs.args.parent_id,
+    resolverArgs.args.parent_type,
+    itemDefinition,
+    tokenData.id,
+    tokenData.role,
+  );
 
   // now we see which fields are being requested for the answer after adding, first
   // we flatten the fields, remember that we have external and internal fields
@@ -142,6 +144,45 @@ export async function addItemDefinition(
   // can change the output, and yet keep things valid, so the arg can be invalid
   // if the output is different from it
   await serverSideCheckItemDefinitionAgainst(itemDefinition, resolverArgs.args, null);
+
+  if (isParenting) {
+    const parentModule = (
+      appData.root.registry[resolverArgs.args.parent_type] as ItemDefinition
+    ).getParentModule().getQualifiedPathName();
+    await runPolicyCheck({
+      policyTypes: ["parent"],
+      itemDefinition,
+      id: null,
+      role: tokenData.role,
+      gqlArgValue: resolverArgs.args,
+      gqlFlattenedRequestedFiels: requestedFields,
+      cache: appData.cache,
+      parentModule,
+      parentType: resolverArgs.args.parent_type,
+      parentId: resolverArgs.args.parent_id,
+      preParentValidation: (content: ISQLTableRowValue) => {
+        // this shouldn't really happen because validateParentingRules should have
+        // checked whether it existed, but we check anyway
+        if (!content) {
+          debug("FAILED due to lack of content data");
+          throw new EndpointError({
+            message: `There's no parent ${resolverArgs.args.parent_type} with id ${resolverArgs.args.parent_id}`,
+            code: "NOT_FOUND",
+          });
+        }
+
+        // this should have also not happen because validate should also have done it
+        // but we check anyway
+        if (content.blocked_at !== null) {
+          debug("FAILED due to element being blocked");
+          throw new EndpointError({
+            message: "The parent is blocked",
+            code: "BLOCKED",
+          });
+        }
+      },
+    });
+  }
 
   // extract this information
   const mod = itemDefinition.getParentModule();
@@ -245,36 +286,55 @@ export async function addItemDefinition(
     value.id.toString(),
   );
 
+  const itemDefinitionBasedOwnedEvent: IOwnedSearchRecordsAddedEvent = {
+    qualifiedPathName: selfTable,
+    createdBy: sqlModData.created_by,
+    newIds: [
+      {
+        id: value.id,
+        type: selfTable,
+      },
+    ],
+    newLastRecordId: value.id,
+  };
   appData.listener.triggerOwnedSearchListeners(
-    selfTable,
-    sqlModData.created_by,
-    selfTable,
-    value.id,
+    itemDefinitionBasedOwnedEvent,
     null, // TODO add the listener uuid, maybe?
   );
+
+  const moduleBasedOwnedEvent: IOwnedSearchRecordsAddedEvent = {
+    ...itemDefinitionBasedOwnedEvent,
+    qualifiedPathName: moduleTable,
+  };
   appData.listener.triggerOwnedSearchListeners(
-    moduleTable,
-    sqlModData.created_by,
-    selfTable,
-    value.id,
+    moduleBasedOwnedEvent,
     null, // TODO add the listener uuid, maybe?
   );
 
   if (isParenting) {
+    const itemDefinitionBasedParentedEvent: IParentedSearchRecordsAddedEvent = {
+      qualifiedPathName: selfTable,
+      parentId: resolverArgs.args.parent_id,
+      parentType: resolverArgs.args.parent_type,
+      newIds: [
+        {
+          id: value.id,
+          type: selfTable,
+        },
+      ],
+      newLastRecordId: value.id,
+    };
     appData.listener.triggerParentedSearchListeners(
-      selfTable,
-      resolverArgs.args.parent_type,
-      resolverArgs.args.parent_id,
-      selfTable,
-      value.id,
+      itemDefinitionBasedParentedEvent,
       null, // TODO add the listener uuid, maybe?
     );
+
+    const moduleBasedParentedEvent: IParentedSearchRecordsAddedEvent = {
+      ...itemDefinitionBasedParentedEvent,
+      qualifiedPathName: moduleTable,
+    };
     appData.listener.triggerParentedSearchListeners(
-      moduleTable,
-      resolverArgs.args.parent_type,
-      resolverArgs.args.parent_id,
-      selfTable,
-      value.id,
+      moduleBasedParentedEvent,
       null, // TODO add the listener uuid, maybe?
     );
   }

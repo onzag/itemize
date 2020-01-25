@@ -1,6 +1,6 @@
 import React from "react";
 import { gqlQuery, buildGqlQuery } from "../../../gql-querier";
-import { GraphQLEndpointErrorType } from "../../../base/errors";
+import { EndpointErrorType } from "../../../base/errors";
 import { ILocaleContextType } from ".";
 import { Location } from "history";
 import { GUEST_METAROLE } from "../../../constants";
@@ -10,7 +10,7 @@ export interface ITokenProviderState {
   token: string;
   id: number;
   role: string;
-  error: GraphQLEndpointErrorType;
+  error: EndpointErrorType;
   isLoggingIn: boolean;
   isReady: boolean;
 }
@@ -29,22 +29,24 @@ export interface ITokenContextType extends ITokenProviderState {
 export const TokenContext = React.createContext<ITokenContextType>(null);
 
 export class TokenProvider extends React.Component<ITokenProviderProps, ITokenProviderState> {
+  private hasAutomaticallyLoggedIn: boolean;
   constructor(props: ITokenProviderProps) {
     super(props);
 
-    const hasStoredToken = !!localStorage.getItem("TOKEN");
     this.state = {
       token: null,
       id: null,
       role: GUEST_METAROLE,
       isLoggingIn: false,
-      isReady: !hasStoredToken,
+      isReady: false,
       error: null,
     };
 
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.dismissError = this.dismissError.bind(this);
+
+    this.hasAutomaticallyLoggedIn = false;
   }
   public componentDidMount() {
     const storedToken = localStorage.getItem("TOKEN");
@@ -92,8 +94,8 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         },
         isReady: true,
       };
-      this.setState(newState);
       this.props.onProviderStateSet(newState);
+      this.setState(newState);
     } else {
       const tokenData = data.data && data.data.token;
       const tokenDataId = tokenData ? tokenData.id : null;
@@ -120,7 +122,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         // we might want to ignore errors, user just got
         // logged off automatically, likely his token expired
         // otherwise errors might appear in off places
-        error: this.state.isReady ? error : null,
+        error: !this.hasAutomaticallyLoggedIn ? error : null,
       };
 
       if (tokenDataToken !== null) {
@@ -129,8 +131,8 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         console.log("credentials deemed invalid", error);
       }
 
-      this.setState(newState);
       this.props.onProviderStateSet(newState);
+      this.setState(newState);
 
       if (tokenDataId) {
         const fields = {
@@ -214,6 +216,8 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         }
       }
     }
+
+    this.hasAutomaticallyLoggedIn = true;
   }
   public logout() {
     if (this.state.isLoggingIn) {

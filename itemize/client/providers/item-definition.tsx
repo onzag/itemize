@@ -17,7 +17,7 @@ import {
 import { buildGqlQuery, buildGqlMutation, gqlQuery,
   IGQLQueryObj, GQLEnum, GQLQuery, ISearchResult } from "../../gql-querier";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
-import { GraphQLEndpointErrorType } from "../../base/errors";
+import { EndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
@@ -34,7 +34,7 @@ import uuid from "uuid";
  * loadValue
  */
 export interface IBasicActionResponse {
-  error: GraphQLEndpointErrorType;
+  error: EndpointErrorType;
 }
 
 export interface IActionResponseWithValue extends IBasicActionResponse {
@@ -129,11 +129,11 @@ export interface IItemDefinitionContextType {
   // blocked
   blockedButDataAccessible: boolean;
   // an error that came during loading
-  loadError: GraphQLEndpointErrorType;
+  loadError: EndpointErrorType;
   // whether it is currently loading
   loading: boolean;
   // an error that came during submitting
-  submitError: GraphQLEndpointErrorType;
+  submitError: EndpointErrorType;
   // whether it is currently submitting
   submitting: boolean;
   // whether it has submitted sucesfully, this is a transitory
@@ -141,14 +141,14 @@ export interface IItemDefinitionContextType {
   // is in a success state of submitted
   submitted: boolean;
   // an error that came during deleting
-  deleteError: GraphQLEndpointErrorType;
+  deleteError: EndpointErrorType;
   // whether it is currently deleting
   deleting: boolean;
   // same as submitted, a success flag that says whether the element
   // was deleted
   deleted: boolean;
   // an error that occured during search
-  searchError: GraphQLEndpointErrorType;
+  searchError: EndpointErrorType;
   // whether it is currently searching
   searching: boolean;
   // the obtained search results from the graphql endpoint
@@ -338,15 +338,15 @@ interface IActualItemDefinitionProviderState {
   isBlocked: boolean;
   isBlockedButDataIsAccessible: boolean;
   notFound: boolean;
-  loadError: GraphQLEndpointErrorType;
+  loadError: EndpointErrorType;
   loading: boolean;
-  submitError: GraphQLEndpointErrorType;
+  submitError: EndpointErrorType;
   submitting: boolean;
   submitted: boolean;
-  deleteError: GraphQLEndpointErrorType;
+  deleteError: EndpointErrorType;
   deleting: boolean;
   deleted: boolean;
-  searchError: GraphQLEndpointErrorType;
+  searchError: EndpointErrorType;
   searching: boolean;
   searchResults: ISearchResult[];
   searchId: string;
@@ -543,9 +543,8 @@ export class ActualItemDefinitionProvider extends
       // as it will send data either via HTTP or websockets
       this.props.remoteListener.addItemDefinitionListenerFor(
         this,
-        this.props.itemDefinitionInstance,
+        this.props.itemDefinitionInstance.getQualifiedPathName(),
         this.props.forId,
-        this.props.tokenData.token,
       );
     }
   }
@@ -560,7 +559,7 @@ export class ActualItemDefinitionProvider extends
       this.props.itemDefinitionInstance.removeListener("reload", this.props.forId, this.reloadListener);
       this.props.remoteListener.removeItemDefinitionListenerFor(
         this,
-        this.props.itemDefinitionInstance,
+        this.props.itemDefinitionInstance.getQualifiedPathName(),
         this.props.forId,
       );
     }
@@ -624,13 +623,13 @@ export class ActualItemDefinitionProvider extends
         // and remove the listeners
         prevProps.itemDefinitionInstance.removeListener("reload", prevProps.forId, this.reloadListener);
         prevProps.remoteListener.removeItemDefinitionListenerFor(
-          this, prevProps.itemDefinitionInstance, prevProps.forId,
+          this, prevProps.itemDefinitionInstance.getQualifiedPathName(), prevProps.forId,
         );
       } else if (!isStatic && wasStatic && this.props.forId) {
         alreadyAddedRemoteListeners = true;
         this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
         this.props.remoteListener.addItemDefinitionListenerFor(
-          this, this.props.itemDefinitionInstance, this.props.forId, this.props.tokenData.token,
+          this, this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId,
         );
       }
 
@@ -642,7 +641,7 @@ export class ActualItemDefinitionProvider extends
         if (prevProps.forId && !wasStatic && !alreadyRemovedRemoteListeners) {
           prevProps.itemDefinitionInstance.removeListener("reload", prevProps.forId, this.reloadListener);
           prevProps.remoteListener.removeItemDefinitionListenerFor(
-            this, prevProps.itemDefinitionInstance, prevProps.forId,
+            this, prevProps.itemDefinitionInstance.getQualifiedPathName(), prevProps.forId,
           );
         }
 
@@ -651,7 +650,7 @@ export class ActualItemDefinitionProvider extends
         if (this.props.forId && !isStatic && !alreadyAddedRemoteListeners) {
           this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
           this.props.remoteListener.addItemDefinitionListenerFor(
-            this, this.props.itemDefinitionInstance, this.props.forId, this.props.tokenData.token,
+            this, this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId,
           );
         }
       }
@@ -780,8 +779,10 @@ export class ActualItemDefinitionProvider extends
           value: appliedGQLValue.rawValue,
           error: null,
         });
-        this.props.remoteListener.requestFeedbackFor(
-          this.props.itemDefinitionInstance, this.props.forId, this.props.tokenData.token);
+        this.props.remoteListener.requestFeedbackFor({
+          itemDefinition: this.props.itemDefinitionInstance.getQualifiedPathName(),
+          id: this.props.forId,
+        });
         // in some situations the value can be in memory but not yet permanently cached
         // (eg. when there is a search context)
         // and another item without a search context attempts to load the value this will
@@ -904,8 +905,10 @@ export class ActualItemDefinitionProvider extends
     // but the denyCache flag will be active, ensuring the value will be requested
     // from the server
     if (cached) {
-      this.props.remoteListener.requestFeedbackFor(
-        this.props.itemDefinitionInstance, this.props.forId, this.props.tokenData.token);
+      this.props.remoteListener.requestFeedbackFor({
+        itemDefinition: this.props.itemDefinitionInstance.getQualifiedPathName(),
+        id: this.props.forId,
+      });
     }
 
     // now from the waiter we return the value, the error and the fields
@@ -1230,7 +1233,7 @@ export class ActualItemDefinitionProvider extends
       searchRequestedFieldsOnCachePolicy?: any,
     },
   ): Promise<{
-    error: GraphQLEndpointErrorType,
+    error: EndpointErrorType,
     value: any,
     memoryCached: boolean,
     cached: boolean,
@@ -1340,13 +1343,13 @@ export class ActualItemDefinitionProvider extends
       CacheWorkerInstance.isSupported
     ) {
       const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
-      const standardCounterpartQueryBase = (standardCounterpart.isExtensionsInstance() ?
+      const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
         standardCounterpart.getParentModule().getQualifiedPathName() :
         standardCounterpart.getQualifiedPathName());
       gqlValue = await CacheWorkerInstance.instance.runCachedSearch(
         queryName,
         args,
-        PREFIX_GET_LIST + standardCounterpartQueryBase,
+        PREFIX_GET_LIST + standardCounterpartQualifiedName,
         this.props.tokenData.token,
         this.props.localeData.language.split("-")[0],
         arg.searchRequestedFieldsOnCachePolicy,
@@ -1356,16 +1359,14 @@ export class ActualItemDefinitionProvider extends
       if (gqlValue) {
         if (arg.searchCachePolicy === "by-owner") {
           this.props.remoteListener.addOwnedSearchListenerFor(
-            this.props.itemDefinitionInstance.getStandardCounterpart(),
-            this.props.tokenData.token,
+            standardCounterpartQualifiedName,
             arg.searchCreatedBy,
             gqlValue.lastRecord,
             this.onSearchReload,
           );
         } else {
           this.props.remoteListener.addParentedSearchListenerFor(
-            this.props.itemDefinitionInstance.getStandardCounterpart(),
-            this.props.tokenData.token,
+            standardCounterpartQualifiedName,
             arg.searchParentedBy[0],
             arg.searchParentedBy[1],
             gqlValue.lastRecord,
@@ -1375,20 +1376,18 @@ export class ActualItemDefinitionProvider extends
 
         if (gqlValue.dataMightBeStale) {
           if (arg.searchCachePolicy === "by-owner") {
-            this.props.remoteListener.requestOwnedSearchFeedbackFor(
-              this.props.itemDefinitionInstance.getStandardCounterpart(),
-              this.props.tokenData.token,
-              arg.searchCreatedBy,
-              gqlValue.lastRecord,
-            );
+            this.props.remoteListener.requestOwnedSearchFeedbackFor({
+              qualifiedPathName: standardCounterpartQualifiedName,
+              createdBy: arg.searchCreatedBy,
+              knownLastRecordId: gqlValue.lastRecord as number,
+            });
           } else {
-            this.props.remoteListener.requestParentedSearchFeedbackFor(
-              this.props.itemDefinitionInstance.getStandardCounterpart(),
-              this.props.tokenData.token,
-              arg.searchParentedBy[0],
-              arg.searchParentedBy[1],
-              gqlValue.lastRecord,
-            );
+            this.props.remoteListener.requestParentedSearchFeedbackFor({
+              qualifiedPathName: standardCounterpartQualifiedName,
+              parentType: arg.searchParentedBy[0],
+              parentId: arg.searchParentedBy[1],
+              knownLastRecordId: gqlValue.lastRecord as number,
+            });
           }
         }
       }
@@ -1414,7 +1413,7 @@ export class ActualItemDefinitionProvider extends
     }
 
     // now we got to check for errors
-    let error: GraphQLEndpointErrorType = null;
+    let error: EndpointErrorType = null;
 
     // no value, for some reason the server didnt return
     // anything, we cant connect to it, it either timed out
@@ -1612,7 +1611,7 @@ export class ActualItemDefinitionProvider extends
     withId: boolean,
     withIds: boolean,
   ): IActionResponseWithId | IActionResponseWithValue | IActionResponseWithSearchResults {
-    const emulatedError: GraphQLEndpointErrorType = {
+    const emulatedError: EndpointErrorType = {
       message: "Submit refused due to invalid information in form fields",
       code: "INVALID_DATA_SUBMIT_REFUSED",
     };
@@ -2031,17 +2030,26 @@ export class ActualItemDefinitionProvider extends
     state: IActualItemDefinitionProviderState = this.state,
   ) {
     if (props.itemDefinitionInstance.isInSearchMode()) {
-      props.remoteListener.removeOwnedSearchListenerFor(
-        this.onSearchReload,
-        props.itemDefinitionInstance.getStandardCounterpart(),
-        state.searchOwner,
-      );
-      props.remoteListener.removeParentedSearchListenerFor(
-        this.onSearchReload,
-        props.itemDefinitionInstance.getStandardCounterpart(),
-        state.searchParent[0],
-        state.searchParent[1],
-      );
+      const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
+      const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
+        standardCounterpart.getParentModule().getQualifiedPathName() :
+        standardCounterpart.getQualifiedPathName());
+
+      if (state.searchOwner) {
+        props.remoteListener.removeOwnedSearchListenerFor(
+          this.onSearchReload,
+          standardCounterpartQualifiedName,
+          state.searchOwner,
+        );
+      }
+      if (state.searchParent) {
+        props.remoteListener.removeParentedSearchListenerFor(
+          this.onSearchReload,
+          standardCounterpartQualifiedName,
+          state.searchParent[0],
+          state.searchParent[1],
+        );
+      }
     }
   }
   public dismissSearchResults() {

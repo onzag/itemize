@@ -1,49 +1,63 @@
-import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import io from "socket.io-client";
 import Root from "../../../base/Root";
 import uuid from "uuid";
 import CacheWorkerInstance from "../workers/cache";
 import { PREFIX_GET, PREFIX_SEARCH } from "../../../constants";
-import { ISearchResult } from "../../../gql-querier";
-
-// TODO refactor the remote listener and the listener to use one single argument
-// in order to pass data rather than this clusterfuck of many arguments
+import {
+  IRegisterRequest,
+  IOwnedSearchRegisterRequest,
+  IParentedSearchRegisterRequest,
+  IFeedbackRequest,
+  CHANGED_FEEEDBACK_EVENT,
+  BUILDNUMBER_EVENT,
+  OWNED_SEARCH_RECORDS_ADDED_EVENT,
+  PARENTED_SEARCH_RECORDS_ADDED_EVENT,
+  IBuildNumberEvent,
+  REGISTER_REQUEST,
+  OWNED_SEARCH_REGISTER_REQUEST,
+  PARENTED_SEARCH_REGISTER_REQUEST,
+  IOwnedSearchFeedbackRequest,
+  OWNED_SEARCH_FEEDBACK_REQUEST,
+  IParentedSearchFeedbackRequest,
+  PARENTED_SEARCH_FEEDBACK_REQUEST,
+  UNREGISTER_REQUEST,
+  IUnregisterRequest,
+  FEEDBACK_REQUEST,
+  IOwnedSearchUnregisterRequest,
+  OWNED_SEARCH_UNREGISTER_REQUEST,
+  PARENTED_SEARCH_UNREGISTER_REQUEST,
+  IParentedSearchUnregisterRequest,
+  IChangedFeedbackEvent,
+  IDENTIFY_REQUEST,
+  IOwnedSearchRecordsAddedEvent,
+  IParentedSearchRecordsAddedEvent,
+} from "../../../base/remote-protocol";
+import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 
 export class RemoteListener {
   private socket: SocketIOClient.Socket;
   private root: Root;
   private listeners: {
     [qualifiedPathNameWithId: string]: {
-      id: number,
-      itemDefinition: ItemDefinition;
-      parentInstances: any[],
-      token: string,
+      request: IRegisterRequest;
+      parentInstances: any[];
     },
   };
   private ownedSearchListeners: {
     [qualifiedPathNameWithOwnerId: string]: {
-      token: string;
-      createdBy: number,
-      itemDefinition: ItemDefinition;
+      request: IOwnedSearchRegisterRequest;
+      lastKnownRecord: number;
       callbacks: any[];
-      lastRecord: number;
     },
   };
   private parentedSearchListeners: {
     [qualifiedPathNameWithOwnerId: string]: {
-      token: string;
-      parentId: number,
-      parentType: string,
-      itemDefinition: ItemDefinition;
+      request: IParentedSearchRegisterRequest;
       callbacks: any[];
-      lastRecord: number;
+      lastKnownRecord: number;
     },
   };
-  private delayedFeedbacks: Array<{
-    itemDefinition: ItemDefinition;
-    forId: number;
-    token: string;
-  }> = [];
+  private delayedFeedbacks: IFeedbackRequest[] = [];
   private connectionListeners: Array<() => void> = [];
   private appUpdatedListeners: Array<() => void> = [];
   private lastRecievedBuildNumber: string;
@@ -51,10 +65,13 @@ export class RemoteListener {
   private isReconnect: boolean = false;
   private offline: boolean = false;
   private initialConsideredDisconnectedIfNoAnswerTimeout: NodeJS.Timeout;
+  private token: string = null;
+  private isReady: boolean = false;
+
   constructor(root: Root) {
     this.reattachListeners = this.reattachListeners.bind(this);
-    this.onPossibleChangeListened = this.onPossibleChangeListened.bind(this);
-    this.onPossibleAppUpdateListened = this.onPossibleAppUpdateListened.bind(this);
+    this.onChangeListened = this.onChangeListened.bind(this);
+    this.onBuildnumberListened = this.onBuildnumberListened.bind(this);
     this.onDisconnect = this.onDisconnect.bind(this);
     this.onRecordsAddedToOwnedSearch = this.onRecordsAddedToOwnedSearch.bind(this);
     this.onRecordsAddedToParentedSearch = this.onRecordsAddedToParentedSearch.bind(this);
@@ -75,14 +92,27 @@ export class RemoteListener {
 
     this.socket = io(`${location.protocol}//${location.host}`);
     this.socket.on("connect", this.reattachListeners);
-    this.socket.on("changed", this.onPossibleChangeListened);
-    this.socket.on("buildnumber", this.onPossibleAppUpdateListened);
     this.socket.on("disconnect", this.onDisconnect);
-    this.socket.on("owned-search-added-records", this.onRecordsAddedToOwnedSearch);
-    this.socket.on("parented-search-added-records", this.onRecordsAddedToParentedSearch);
+    this.socket.on(CHANGED_FEEEDBACK_EVENT, this.onChangeListened);
+    this.socket.on(BUILDNUMBER_EVENT, this.onBuildnumberListened);
+    this.socket.on(OWNED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToOwnedSearch);
+    this.socket.on(PARENTED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToParentedSearch);
   }
-  public onPossibleAppUpdateListened(buildNumber: string) {
-    this.lastRecievedBuildNumber = buildNumber;
+  public setToken(token: string) {
+    this.token = token;
+    this.isReady = true;
+    if (this.socket.connected) {
+      this.socket.emit(
+        IDENTIFY_REQUEST,
+        {
+          uuid: this.uuid,
+          token: this.token,
+        },
+      );
+    }
+  }
+  public onBuildnumberListened(build: IBuildNumberEvent) {
+    this.lastRecievedBuildNumber = build.buildnumber;
     if (this.isAppUpdated()) {
       // this will trigger the service worker to realize the app has
       // updated if any service worker is active
@@ -125,197 +155,171 @@ export class RemoteListener {
   }
   public addItemDefinitionListenerFor(
     parentInstance: any,
-    itemDefinition: ItemDefinition,
+    itemDefinitionQualifiedPathName: string,
     forId: number,
-    token: string,
   ) {
-    const qualifiedIdentifier = itemDefinition.getQualifiedPathName() + "." + forId;
+    if (!this.isReady) {
+      throw new Error("Remote listener is not ready");
+    }
+    const qualifiedIdentifier = itemDefinitionQualifiedPathName + "." + forId;
     if (this.listeners[qualifiedIdentifier]) {
       this.listeners[qualifiedIdentifier].parentInstances.push(parentInstance);
       return;
     }
 
-    this.listeners[qualifiedIdentifier] = {
+    const request: IRegisterRequest = {
+      itemDefinition: itemDefinitionQualifiedPathName,
       id: forId,
-      itemDefinition,
+    };
+    this.listeners[qualifiedIdentifier] = {
+      request,
       parentInstances: [parentInstance],
-      token,
     };
 
-    this.attachItemDefinitionListenerFor(itemDefinition, forId, token);
+    this.attachItemDefinitionListenerFor(request);
   }
-  public attachItemDefinitionListenerFor(itemDefinition: ItemDefinition, forId: number, token: string) {
-    const qualifiedPathName = itemDefinition.getQualifiedPathName();
-
+  public attachItemDefinitionListenerFor(request: IRegisterRequest) {
+    if (!this.isReady) {
+      throw new Error("Remote listener is not ready");
+    }
     if (this.socket.connected) {
-      console.log("registering", qualifiedPathName, forId);
       this.socket.emit(
-        "register",
-        qualifiedPathName,
-        forId,
-        token,
+        REGISTER_REQUEST,
+        request,
       );
     }
   }
-  public attachOwnedSearchListenerFor(
-    itemDefinition: ItemDefinition,
-    createdBy: number,
-    token: string,
-  ) {
-    const qualifiedNameToRegister = (itemDefinition.isExtensionsInstance() ?
-      itemDefinition.getParentModule().getQualifiedPathName() :
-      itemDefinition.getQualifiedPathName());
-
+  public attachOwnedSearchListenerFor(request: IOwnedSearchRegisterRequest) {
+    if (!this.isReady) {
+      throw new Error("Remote listener is not ready");
+    }
     if (this.socket.connected) {
-      console.log("owned-search registering", qualifiedNameToRegister, token, createdBy);
       this.socket.emit(
-        "owned-search-register",
-        qualifiedNameToRegister,
-        createdBy,
-        token,
+        OWNED_SEARCH_REGISTER_REQUEST,
+        request,
       );
     }
   }
-  public attachParentedSearchListenerFor(
-    itemDefinition: ItemDefinition,
-    parentType: string,
-    parentId: number,
-    token: string,
-  ) {
-    const qualifiedNameToRegister = (itemDefinition.isExtensionsInstance() ?
-      itemDefinition.getParentModule().getQualifiedPathName() :
-      itemDefinition.getQualifiedPathName());
-
+  public attachParentedSearchListenerFor(request: IParentedSearchRegisterRequest) {
+    if (!this.isReady) {
+      throw new Error("Remote listener is not ready");
+    }
     if (this.socket.connected) {
-      console.log("parented-search registering", qualifiedNameToRegister, token, parentType, parentId);
       this.socket.emit(
-        "parented-search-register",
-        qualifiedNameToRegister,
-        parentType,
-        parentId,
-        token,
+        PARENTED_SEARCH_REGISTER_REQUEST,
+        request,
       );
     }
   }
-  public requestOwnedSearchFeedbackFor(
-    itemDefinition: ItemDefinition,
-    token: string,
-    createdBy: number,
-    lastRecord: number,
-  ) {
-    const qualifiedNameToRegister = (itemDefinition.isExtensionsInstance() ?
-      itemDefinition.getParentModule().getQualifiedPathName() :
-      itemDefinition.getQualifiedPathName());
+  public requestOwnedSearchFeedbackFor(request: IOwnedSearchFeedbackRequest) {
+    if (!this.isReady) {
+      throw new Error("Remote listener is not ready");
+    }
     if (this.socket.connected) {
       this.socket.emit(
-        "owned-search-feedback",
-        qualifiedNameToRegister,
-        createdBy,
-        lastRecord,
-        token,
+        OWNED_SEARCH_FEEDBACK_REQUEST,
+        request,
       );
     }
   }
-  public requestParentedSearchFeedbackFor(
-    itemDefinition: ItemDefinition,
-    token: string,
-    parentType: string,
-    parentId: number,
-    lastRecord: number,
-  ) {
-    const qualifiedNameToRegister = (itemDefinition.isExtensionsInstance() ?
-      itemDefinition.getParentModule().getQualifiedPathName() :
-      itemDefinition.getQualifiedPathName());
+  public requestParentedSearchFeedbackFor(request: IParentedSearchFeedbackRequest) {
+    if (!this.isReady) {
+      throw new Error("Remote listener is not ready");
+    }
     if (this.socket.connected) {
       this.socket.emit(
-        "owned-search-feedback",
-        qualifiedNameToRegister,
-        parentType,
-        parentId,
-        lastRecord,
-        token,
+        PARENTED_SEARCH_FEEDBACK_REQUEST,
+        request,
       );
     }
   }
   public addOwnedSearchListenerFor(
-    itemDefinition: ItemDefinition,
-    token: string,
+    itemDefinitionOrModuleQualifiedPathName: string,
     createdBy: number,
-    lastRecord: number,
+    lastKnownRecord: number,
     callback: () => any,
   ) {
-    const qualifiedNameToRegister = (itemDefinition.isExtensionsInstance() ?
-      itemDefinition.getParentModule().getQualifiedPathName() :
-      itemDefinition.getQualifiedPathName());
-    const qualifiedIdentifier = qualifiedNameToRegister + "." + createdBy;
+    if (!this.isReady) {
+      throw new Error("Remote listener is not ready");
+    }
+
+    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + createdBy;
     if (this.ownedSearchListeners[qualifiedIdentifier]) {
       this.ownedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
       return;
     }
 
-    this.ownedSearchListeners[qualifiedIdentifier] = {
-      token,
+    const request: IOwnedSearchRegisterRequest = {
+      qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
       createdBy,
-      itemDefinition,
+    };
+    this.ownedSearchListeners[qualifiedIdentifier] = {
+      request,
       callbacks: [callback],
-      lastRecord,
+      lastKnownRecord,
     };
 
-    this.attachOwnedSearchListenerFor(itemDefinition, createdBy, token);
+    this.attachOwnedSearchListenerFor(request);
   }
   public addParentedSearchListenerFor(
-    itemDefinition: ItemDefinition,
-    token: string,
+    itemDefinitionOrModuleQualifiedPathName: string,
     parentType: string,
     parentId: number,
-    lastRecord: number,
+    lastKnownRecord: number,
     callback: () => any,
   ) {
-    const qualifiedNameToRegister = (itemDefinition.isExtensionsInstance() ?
-      itemDefinition.getParentModule().getQualifiedPathName() :
-      itemDefinition.getQualifiedPathName());
-    const qualifiedIdentifier = qualifiedNameToRegister + "." + parentType + "." + parentId;
+    if (!this.isReady) {
+      throw new Error("Remote listener is not ready");
+    }
+
+    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + parentType + "." + parentId;
     if (this.parentedSearchListeners[qualifiedIdentifier]) {
       this.parentedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
       return;
     }
 
-    this.parentedSearchListeners[qualifiedIdentifier] = {
-      token,
+    const request: IParentedSearchRegisterRequest = {
+      qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
       parentType,
       parentId,
-      itemDefinition,
+    };
+    this.parentedSearchListeners[qualifiedIdentifier] = {
+      request,
       callbacks: [callback],
-      lastRecord,
+      lastKnownRecord,
     };
 
-    this.attachParentedSearchListenerFor(itemDefinition, parentType, parentId, token);
+    this.attachParentedSearchListenerFor(request);
   }
-  public requestFeedbackFor(itemDefinition: ItemDefinition, forId: number, token: string, immediate?: boolean) {
+  public requestFeedbackFor(
+    request: IFeedbackRequest,
+    immediate?: boolean,
+  ) {
+    if (!this.isReady) {
+      throw new Error("Remote listener is not ready");
+    }
+
     if (immediate) {
       if (this.socket.connected) {
         this.socket.emit(
-          "feedback",
-          itemDefinition.getQualifiedPathName(),
-          forId,
-          token,
+          FEEDBACK_REQUEST,
+          request,
         );
       }
     } else if (
-      this.delayedFeedbacks.every((df) => df.itemDefinition !== itemDefinition || df.forId !== forId)
+      this.delayedFeedbacks.every((df) => df.itemDefinition !== request.itemDefinition || df.id !== request.id)
     ) {
-      this.delayedFeedbacks.push({
-        forId,
-        itemDefinition,
-        token,
-      });
+      this.delayedFeedbacks.push(request);
 
-      setTimeout(this.consumeDelayedFeedbacks.bind(this, forId), 70);
+      setTimeout(this.consumeDelayedFeedbacks.bind(this, request), 70);
     }
   }
-  public removeItemDefinitionListenerFor(parentInstance: any, itemDefinition: ItemDefinition, forId: number) {
-    const qualifiedPathName = itemDefinition.getQualifiedPathName();
-    const qualifiedID = qualifiedPathName + "." + forId;
+  public removeItemDefinitionListenerFor(
+    parentInstance: any,
+    itemDefinitionQualifiedPathName: string,
+    forId: number,
+  ) {
+    const qualifiedID = itemDefinitionQualifiedPathName + "." + forId;
     const listenerValue = this.listeners[qualifiedID];
     if (listenerValue) {
       const newListenerValue = {
@@ -325,10 +329,13 @@ export class RemoteListener {
       if (newListenerValue.parentInstances.length === 0) {
         delete this.listeners[qualifiedID];
         if (this.socket.connected) {
+          const request: IUnregisterRequest = {
+            id: forId,
+            itemDefinition: itemDefinitionQualifiedPathName,
+          };
           this.socket.emit(
-            "unregister",
-            qualifiedPathName,
-            forId,
+            UNREGISTER_REQUEST,
+            request,
           );
         }
       } else {
@@ -338,13 +345,10 @@ export class RemoteListener {
   }
   public removeOwnedSearchListenerFor(
     callback: () => any,
-    itemDefinition: ItemDefinition,
+    itemDefinitionOrModuleQualifiedPathName: string,
     createdBy: number,
   ) {
-    const qualifiedNameToRegister = (itemDefinition.isExtensionsInstance() ?
-      itemDefinition.getParentModule().getQualifiedPathName() :
-      itemDefinition.getQualifiedPathName());
-    const qualifiedIdentifier = qualifiedNameToRegister + "." + createdBy;
+    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + createdBy;
     const listenerValue = this.ownedSearchListeners[qualifiedIdentifier];
     if (listenerValue) {
       const newListenerValue = {
@@ -354,10 +358,13 @@ export class RemoteListener {
       if (newListenerValue.callbacks.length === 0) {
         delete this.ownedSearchListeners[qualifiedIdentifier];
         if (this.socket.connected) {
-          this.socket.emit(
-            "owned-search-unregister",
-            qualifiedNameToRegister,
+          const request: IOwnedSearchUnregisterRequest = {
+            qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
             createdBy,
+          };
+          this.socket.emit(
+            OWNED_SEARCH_UNREGISTER_REQUEST,
+            request,
           );
         }
       } else {
@@ -367,14 +374,11 @@ export class RemoteListener {
   }
   public removeParentedSearchListenerFor(
     callback: () => any,
-    itemDefinition: ItemDefinition,
+    itemDefinitionOrModuleQualifiedPathName: string,
     parentType: string,
     parentId: number,
   ) {
-    const qualifiedNameToRegister = (itemDefinition.isExtensionsInstance() ?
-      itemDefinition.getParentModule().getQualifiedPathName() :
-      itemDefinition.getQualifiedPathName());
-    const qualifiedIdentifier = qualifiedNameToRegister + "." + parentType + "." + parentId;
+    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + parentType + "." + parentId;
     const listenerValue = this.ownedSearchListeners[qualifiedIdentifier];
     if (listenerValue) {
       const newListenerValue = {
@@ -384,11 +388,14 @@ export class RemoteListener {
       if (newListenerValue.callbacks.length === 0) {
         delete this.ownedSearchListeners[qualifiedIdentifier];
         if (this.socket.connected) {
-          this.socket.emit(
-            "parented-search-unregister",
-            qualifiedNameToRegister,
-            parentType,
+          const request: IParentedSearchUnregisterRequest = {
+            qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
             parentId,
+            parentType,
+          };
+          this.socket.emit(
+            PARENTED_SEARCH_UNREGISTER_REQUEST,
+            request,
           );
         }
       } else {
@@ -396,65 +403,61 @@ export class RemoteListener {
       }
     }
   }
-  private onPossibleChangeListened(
-    qualifiedPathName: string,
-    id: number,
-    type: "modified" | "not_found" | "last_modified",
-    lastModifiedFeedback: string,
+  private onChangeListened(
+    event: IChangedFeedbackEvent,
   ) {
-    console.log("feedback recieved with", qualifiedPathName, id, type, lastModifiedFeedback);
-
-    const itemDefinition: ItemDefinition = this.root.registry[qualifiedPathName] as ItemDefinition;
-    const appliedGQLValue = itemDefinition.getGQLAppliedValue(id);
+    const itemDefinition: ItemDefinition = this.root.registry[event.itemDefinition] as ItemDefinition;
+    const appliedGQLValue = itemDefinition.getGQLAppliedValue(event.id);
     if (appliedGQLValue) {
       if (
-        type === "modified" ||
+        event.type === "modified" ||
         (
-          type === "last_modified" &&
-          lastModifiedFeedback !== appliedGQLValue.flattenedValue.last_modified
+          event.type === "last_modified" &&
+          event.lastModified !== appliedGQLValue.flattenedValue.last_modified
         )
       ) {
-        itemDefinition.triggerListeners("reload", id);
-      } else if (type === "not_found") {
-        itemDefinition.cleanValueFor(id);
+        itemDefinition.triggerListeners("reload", event.id);
+      } else if (event.type === "not_found") {
+        itemDefinition.cleanValueFor(event.id);
         if (CacheWorkerInstance.isSupported) {
           CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
-            id,
+            event.id,
             itemDefinition.getQualifiedPathName(),
             PREFIX_GET + itemDefinition.getQualifiedPathName(),
             PREFIX_SEARCH + itemDefinition.getParentModule().getSearchModule().getQualifiedPathName(),
             PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
           );
         }
-        itemDefinition.triggerListeners("change", id);
+        itemDefinition.triggerListeners("change", event.id);
       }
-    } else if (type === "modified" || type === "last_modified") {
-      itemDefinition.triggerListeners("reload", id);
-    } else if (type === "not_found") {
-      itemDefinition.cleanValueFor(id);
+    } else if (event.type === "modified" || event.type === "last_modified") {
+      itemDefinition.triggerListeners("reload", event.id);
+    } else if (event.type === "not_found") {
+      itemDefinition.cleanValueFor(event.id);
       if (CacheWorkerInstance.isSupported) {
         CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
-          id,
+          event.id,
           itemDefinition.getQualifiedPathName(),
           PREFIX_GET + itemDefinition.getQualifiedPathName(),
           PREFIX_SEARCH + itemDefinition.getParentModule().getSearchModule().getQualifiedPathName(),
           PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
         );
       }
-      itemDefinition.triggerListeners("change", id);
+      itemDefinition.triggerListeners("change", event.id);
     }
   }
-  private consumeDelayedFeedbacks(forAnSpecificId?: number) {
+  private consumeDelayedFeedbacks(anSpecificRequest?: IFeedbackRequest) {
     // the reason we use delayed feedbacks is for efficiency, while we don't
     // use this for owned searches, but sometimes a same feedback would be requested twice
     this.delayedFeedbacks = this.delayedFeedbacks.filter((df) => {
-      if (!forAnSpecificId || forAnSpecificId === df.forId) {
+      if (
+        !anSpecificRequest ||
+        (anSpecificRequest.id === df.id && anSpecificRequest.itemDefinition === df.itemDefinition)
+      ) {
         if (this.socket.connected) {
           this.socket.emit(
-            "feedback",
-            df.itemDefinition.getQualifiedPathName(),
-            df.forId,
-            df.token,
+            FEEDBACK_REQUEST,
+            df,
           );
         }
 
@@ -468,29 +471,44 @@ export class RemoteListener {
     this.offline = false;
     clearTimeout(this.initialConsideredDisconnectedIfNoAnswerTimeout);
 
+    if (!this.isReady) {
+      return;
+    }
+
     this.socket.emit(
-      "identify",
-      this.uuid,
+      IDENTIFY_REQUEST,
+      {
+        uuid: this.uuid,
+        token: this.token,
+      },
     );
 
     Object.keys(this.listeners).forEach((listenerKey) => {
-      const itemDefinition = this.listeners[listenerKey].itemDefinition;
-      const forId = this.listeners[listenerKey].id;
-      const token = this.listeners[listenerKey].token;
-      this.attachItemDefinitionListenerFor(itemDefinition, forId, token);
+      this.attachItemDefinitionListenerFor(this.listeners[listenerKey].request);
       if (this.isReconnect) {
-        this.requestFeedbackFor(itemDefinition, forId, token, true);
+        this.requestFeedbackFor(this.listeners[listenerKey].request, true);
       }
     });
 
     Object.keys(this.ownedSearchListeners).forEach((listenerKey) => {
-      const itemDefinition = this.ownedSearchListeners[listenerKey].itemDefinition;
-      const token = this.ownedSearchListeners[listenerKey].token;
-      const createdBy = this.ownedSearchListeners[listenerKey].createdBy;
-      this.attachOwnedSearchListenerFor(itemDefinition, createdBy, token);
+      this.attachOwnedSearchListenerFor(this.ownedSearchListeners[listenerKey].request);
       if (this.isReconnect) {
-        const lastRecord = this.ownedSearchListeners[listenerKey].lastRecord;
-        this.requestOwnedSearchFeedbackFor(itemDefinition, token, createdBy, lastRecord);
+        const lastKnownRecord = this.ownedSearchListeners[listenerKey].lastKnownRecord;
+        this.requestOwnedSearchFeedbackFor({
+          ...this.ownedSearchListeners[listenerKey].request,
+          knownLastRecordId: lastKnownRecord,
+        });
+      }
+    });
+
+    Object.keys(this.parentedSearchListeners).forEach((listenerKey) => {
+      this.attachParentedSearchListenerFor(this.parentedSearchListeners[listenerKey].request);
+      if (this.isReconnect) {
+        const lastKnownRecord = this.parentedSearchListeners[listenerKey].lastKnownRecord;
+        this.requestParentedSearchFeedbackFor({
+          ...this.parentedSearchListeners[listenerKey].request,
+          knownLastRecordId: lastKnownRecord,
+        });
       }
     });
 
@@ -499,26 +517,28 @@ export class RemoteListener {
     }
 
     this.isReconnect = true;
-    console.log("reattach listenrs asked");
   }
   private async onRecordsAddedToOwnedSearch(
-    qualifiedPathName: string,
-    createdBy: number,
-    newIds: ISearchResult[],
-    newLastRecord: number,
+    event: IOwnedSearchRecordsAddedEvent,
   ) {
-    console.log("found records added to owned search", qualifiedPathName, createdBy, newIds, newLastRecord);
-    const ownedListener = this.ownedSearchListeners[qualifiedPathName + "." + createdBy];
+    const ownedListener = this.ownedSearchListeners[event.qualifiedPathName + "." + event.createdBy];
     if (ownedListener) {
-      ownedListener.lastRecord = newLastRecord;
+      ownedListener.lastKnownRecord = event.newLastRecordId;
       if (CacheWorkerInstance.isSupported) {
+        const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
+        let itemDefinition: ItemDefinition;
+        if (itemDefinitionOrModule instanceof ItemDefinition) {
+          itemDefinition = itemDefinitionOrModule;
+        } else {
+          itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
+        }
         await CacheWorkerInstance.instance.addRecordsToCachedSearch(
-          PREFIX_SEARCH + ownedListener.itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
-          createdBy,
+          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+          event.createdBy,
           null,
           null,
-          newIds,
-          newLastRecord,
+          event.newIds,
+          event.newLastRecordId,
           "by-owner",
         );
       }
@@ -526,25 +546,27 @@ export class RemoteListener {
     }
   }
   private async onRecordsAddedToParentedSearch(
-    qualifiedPathName: string,
-    parentType: string,
-    parentId: number,
-    newIds: ISearchResult[],
-    newLastRecord: number,
+    event: IParentedSearchRecordsAddedEvent,
   ) {
-    console.log("found records added to parented search",
-      qualifiedPathName, parentType, parentId, newIds, newLastRecord);
-    const parentedListener = this.parentedSearchListeners[qualifiedPathName + "." + parentType + "." + parentId];
+    const parentedListener = this.parentedSearchListeners[
+      event.qualifiedPathName + "." + event.parentType + "." + event.parentId];
     if (parentedListener) {
-      parentedListener.lastRecord = newLastRecord;
+      parentedListener.lastKnownRecord = event.newLastRecordId;
       if (CacheWorkerInstance.isSupported) {
+        const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
+        let itemDefinition: ItemDefinition;
+        if (itemDefinitionOrModule instanceof ItemDefinition) {
+          itemDefinition = itemDefinitionOrModule;
+        } else {
+          itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
+        }
         await CacheWorkerInstance.instance.addRecordsToCachedSearch(
-          PREFIX_SEARCH + parentedListener.itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
           null,
-          parentType,
-          parentId,
-          newIds,
-          newLastRecord,
+          event.parentType,
+          event.parentId,
+          event.newIds,
+          event.newLastRecordId,
           "by-parent",
         );
       }

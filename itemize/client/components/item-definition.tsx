@@ -1,5 +1,5 @@
 import React from "react";
-import { GraphQLEndpointErrorType } from "../../base/errors";
+import { EndpointErrorType } from "../../base/errors";
 import {
   ItemDefinitionContext,
   IBasicActionResponse,
@@ -17,7 +17,7 @@ export interface IItemDefinitionLoaderInfoArgType {
   notFound: boolean;
   blocked: boolean;
   hasBlockedAccess: boolean;
-  error: GraphQLEndpointErrorType;
+  error: EndpointErrorType;
   reload: () => Promise<IBasicActionResponse>;
 }
 
@@ -67,7 +67,7 @@ export function ItemDefinitionLoader(props: IItemDefinitionLoader) {
 }
 
 export interface ISubmitActionerInfoArgType {
-  submitError: GraphQLEndpointErrorType;
+  submitError: EndpointErrorType;
   dismissError: () => void;
   dismissSubmitted: () => void;
   submitting: boolean;
@@ -113,7 +113,7 @@ export function SubmitActioner(props: ISubmitActionerProps) {
 }
 
 export interface ISearchActionerInfoArgType {
-  searchError: GraphQLEndpointErrorType;
+  searchError: EndpointErrorType;
   dismissSearchResults: () => void;
   dismissSearchError: () => void;
   searching: boolean;

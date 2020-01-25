@@ -369,6 +369,7 @@ export const POLICY_PREFIXES = {
   read: PREFIX_BUILD("POLICY_READ"),
   edit: PREFIX_BUILD("POLICY_EDIT"),
   delete: PREFIX_BUILD("POLICY_DELETE"),
+  parent: PREFIX_BUILD("POLICY_PARENT"),
 };
 export const POLICY_REQUIRED_I18N = [
   "title", "fail",

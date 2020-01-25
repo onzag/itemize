@@ -81,6 +81,10 @@ export default class Root {
     this.rawData = rawJSON;
 
     this.childModules = rawJSON.children.map((c) => new Module(c, this, null));
+
+    this.childModules.forEach((cm) => {
+      cm.init();
+    });
   }
 
   /**

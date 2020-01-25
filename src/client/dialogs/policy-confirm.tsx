@@ -4,13 +4,13 @@ import { DialogResponsive } from "../general/dialog";
 import { I18nRead, I18nReadError } from "../../../itemize/client/components/localization";
 import { PolicyPathType } from "../../../itemize/client/providers/item-definition";
 import { Entry } from "../../../itemize/client/components/property";
-import { GraphQLEndpointErrorType } from "../../../itemize/base/errors";
+import { EndpointErrorType } from "../../../itemize/base/errors";
 
 const PolicyConfirmDialogStyles = createStyles({});
 
 interface IPolicyConfirmDialogProps extends WithStyles<typeof PolicyConfirmDialogStyles> {
   open: boolean;
-  error?: GraphQLEndpointErrorType;
+  error?: EndpointErrorType;
   dismissError: () => void;
   onClose: () => void;
   onSubmit: () => void;

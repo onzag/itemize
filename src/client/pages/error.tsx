@@ -1,8 +1,8 @@
 import React from "react";
-import { GraphQLEndpointErrorType } from "../../../itemize/base/errors";
+import { EndpointErrorType } from "../../../itemize/base/errors";
 import { I18nReadError } from "../../../itemize/client/components/localization";
 
-export function ErrorPage(props: { error: GraphQLEndpointErrorType }) {
+export function ErrorPage(props: { error: EndpointErrorType }) {
   return (
     <React.Fragment>
       <div>

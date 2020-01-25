@@ -15,7 +15,7 @@ import {
 import { GraphQLObjectType } from "graphql";
 import { buildSearchModeModule } from "./search-mode";
 import Root from "..";
-import { GraphQLEndpointError } from "../../errors";
+import { EndpointError } from "../../errors";
 
 export interface IRawJsonI18NSpecificLocaleDataType {
   name: string;
@@ -40,6 +40,12 @@ export interface IRawJsonI18NSpecificLocaleDataType {
       },
     },
     read?: {
+      [policyName: string]: {
+        label: string,
+        failed: string,
+      },
+    },
+    parent?: {
       [policyName: string]: {
         label: string,
         failed: string,
@@ -277,6 +283,21 @@ export default class Module {
     this.childPropExtensionItemDefinition.setAsExtensionsInstance();
 
     this.parentRoot.registry[this.getQualifiedPathName()] = this;
+  }
+
+  public init() {
+    this.childItemDefinitions.forEach((cidef) => {
+      cidef.init();
+    });
+
+    this.childModules.forEach((cmod) => {
+      cmod.init();
+    });
+
+    this.childPropExtensionItemDefinition.init();
+    if (this.searchModeModule) {
+      this.searchModeModule.init();
+    }
   }
 
   /**
@@ -611,7 +632,7 @@ export default class Module {
           " been specified which matched yourself as there's a self rule, if performing a search" +
           " you might have wanted to add the created_by filter in order to ensure this rule is followed";
         }
-        throw new GraphQLEndpointError({
+        throw new EndpointError({
           message: errorMessage,
           code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
         });

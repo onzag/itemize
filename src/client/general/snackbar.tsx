@@ -1,11 +1,11 @@
 import React from "react";
 import { Snackbar as MUISnackbar, IconButton, Icon } from "@material-ui/core";
 import { I18nRead, I18nReadError } from "../../../itemize/client/components/localization";
-import { GraphQLEndpointErrorType } from "../../../itemize/base/errors";
+import { EndpointErrorType } from "../../../itemize/base/errors";
 
 interface ISnackbarProps {
   uniqueId: string;
-  i18nDisplay: GraphQLEndpointErrorType | string;
+  i18nDisplay: EndpointErrorType | string;
   open: boolean;
   onClose: () => void;
 }

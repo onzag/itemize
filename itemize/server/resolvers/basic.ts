@@ -12,7 +12,7 @@ import {
   ANYONE_METAROLE,
   ANYONE_LOGGED_METAROLE,
 } from "../../constants";
-import { GraphQLEndpointError } from "../../base/errors";
+import { EndpointError } from "../../base/errors";
 import Debug from "debug";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import Module from "../../base/Root/Module";
@@ -165,7 +165,7 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
     try {
       result = await jwtVerify<IServerSideTokenDataType>(token, appData.config.jwtKey);
     } catch (err) {
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: "Invalid token that didn't pass verification",
         code: "UNSPECIFIED",
       });
@@ -185,27 +185,40 @@ export async function validateParentingRules(
   role: string,
 ) {
   validateParentingRulesDebug("EXECUTED with %j %s", id, type);
-  const parentingItemDefinition = appData.root.registry[type] as ItemDefinition;
-  if (!(parentingItemDefinition instanceof ItemDefinition)) {
-    throw new GraphQLEndpointError({
-      message: "Invalid parent type " + type,
+  const isParenting = !!(id || type);
+  if (!isParenting && itemDefinition.mustBeParented()) {
+    throw new EndpointError({
+      message: "A parent is required",
       code: "UNSPECIFIED",
     });
-  }
+  } else if (isParenting) {
+    const parentingItemDefinition = appData.root.registry[type] as ItemDefinition;
+    if (!(parentingItemDefinition instanceof ItemDefinition)) {
+      throw new EndpointError({
+        message: "Invalid parent type " + type,
+        code: "UNSPECIFIED",
+      });
+    }
 
-  itemDefinition.checkCanBeParentedBy(parentingItemDefinition, true);
-  const parentMod = parentingItemDefinition.getParentModule();
-  const result = await appData.cache.requestCache(
-    type, parentMod.getQualifiedPathName(), id,
-  );
-  if (!result) {
-    throw new GraphQLEndpointError({
-      message: "Invalid parent id " + id,
-      code: "NOT_FOUND",
-    });
+    itemDefinition.checkCanBeParentedBy(parentingItemDefinition, true);
+    const parentMod = parentingItemDefinition.getParentModule();
+    const result = await appData.cache.requestCache(
+      type, parentMod.getQualifiedPathName(), id,
+    );
+    if (!result) {
+      throw new EndpointError({
+        message: `There's no parent ${type} with id ${id}`,
+        code: "NOT_FOUND",
+      });
+    } else if (result.blocked_at !== null) {
+      throw new EndpointError({
+        message: "The parent is blocked",
+        code: "BLOCKED",
+      });
+    }
+    const parentOwnerId = parentingItemDefinition.isOwnerObjectId() ? result.id : result.created_by;
+    itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, true);
   }
-  const parentOwnerId = parentingItemDefinition.isOwnerObjectId() ? result.id : result.created_by;
-  itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, true);
   validateParentingRulesDebug("SUCCEED");
 }
 
@@ -238,7 +251,7 @@ export function checkBasicFieldsAreAvailableForRole(tokenData: IServerSideTokenD
       ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
     );
     // we throw an error
-    throw new GraphQLEndpointError({
+    throw new EndpointError({
       message: "You have requested to add/edit/view moderation fields with role: " + tokenData.role,
       code: "FORBIDDEN",
     });
@@ -262,7 +275,7 @@ export function checkListLimit(ids: ISearchResultIdentifierType[]) {
       ids.length,
       MAX_SEARCH_RESULTS_AT_ONCE_LIMIT,
     );
-    throw new GraphQLEndpointError({
+    throw new EndpointError({
       message: "Too many ids at once, max is " + MAX_SEARCH_RESULTS_AT_ONCE_LIMIT,
       code: "UNSPECIFIED",
     });
@@ -276,19 +289,19 @@ export function checkListTypes(ids: ISearchResultIdentifierType[], mod: Module) 
   ids.forEach((idContainer) => {
     const itemDefinition = mod.getParentRoot().registry[idContainer.type];
     if (!itemDefinition) {
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: "Unknown qualified path name for " + idContainer.type,
         code: "UNSPECIFIED",
       });
     } else if (itemDefinition instanceof Module) {
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: "Expected qualified identifier for item definition but got one for module " + idContainer.type,
         code: "UNSPECIFIED",
       });
     }
 
     if (itemDefinition.getParentModule() !== mod) {
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: "Invalid parent for " + idContainer.type + " expected parent as " + mod.getQualifiedPathName(),
         code: "UNSPECIFIED",
       });
@@ -312,7 +325,7 @@ export function checkLanguage(appData: IAppDataType, args: any) {
       "FAILED Invalid language code %s",
       args.language,
     );
-    throw new GraphQLEndpointError({
+    throw new EndpointError({
       message: "Please use valid non-regionalized language values",
       code: "UNSPECIFIED",
     });
@@ -326,7 +339,7 @@ export function checkLanguage(appData: IAppDataType, args: any) {
       "FAILED Unavailable/Unsupported language %s",
       args.language,
     );
-    throw new GraphQLEndpointError({
+    throw new EndpointError({
       message: "This language is not supported, as no dictionary has been set",
       code: "UNSPECIFIED",
     });
@@ -355,13 +368,13 @@ export async function validateTokenIsntBlocked(cache: Cache, tokenData: IServerS
   if (tokenData.id) {
     const sqlResult: ISQLTableRowValue = await cache.requestCache("MOD_users__IDEF_user", "MOD_users", tokenData.id);
     if (!sqlResult) {
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: "User has been removed",
         code: "USER_REMOVED",
       });
     }
     if (sqlResult && sqlResult.blocked_at !== null) {
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: "User is Blocked",
         code: "USER_BLOCKED",
       });
@@ -375,7 +388,7 @@ export async function checkUserExists(cache: Cache, id: number) {
   checkUserExistsDebug("EXECUTED");
   const sqlResult: ISQLTableRowValue = await cache.requestCache("MOD_users__IDEF_user", "MOD_users", id);
   if (!sqlResult) {
-    throw new GraphQLEndpointError({
+    throw new EndpointError({
       message: "User has been removed",
       code: "USER_REMOVED",
     });
@@ -508,7 +521,7 @@ export async function serverSideCheckItemDefinitionAgainst(
         propertyValue.invalidReason,
       );
       // throw an error then
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
         code: propertyValue.invalidReason,
         modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
@@ -527,7 +540,7 @@ export async function serverSideCheckItemDefinitionAgainst(
         gqlPropertyValue,
         propertyValue.value,
       );
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated value`,
         code: "UNSPECIFIED",
         modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
@@ -559,7 +572,7 @@ export async function serverSideCheckItemDefinitionAgainst(
         gqlExclusionState,
         includeValue.exclusionState,
       );
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: `validation failed at include ${includeValue.includeId} with a mismatch of exclusion state`,
         code: "UNSPECIFIED",
         modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
@@ -573,7 +586,7 @@ export async function serverSideCheckItemDefinitionAgainst(
         "FAILED due to value set on include %s where it was excluded",
         includeValue.includeId,
       );
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: `validation failed at item ${includeValue.includeId} with an excluded item but data set for it`,
         code: "UNSPECIFIED",
         modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
@@ -619,7 +632,7 @@ export function checkReadPoliciesAllowThisUserToSearch(
       roles.includes(ANYONE_METAROLE) ||
       (roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE)
     ) {
-      throw new GraphQLEndpointError({
+      throw new EndpointError({
         message: "Searching with an active read policy is not allowed, the policy in question is " + policyName,
         code: "FORBIDDEN",
       });
@@ -633,74 +646,98 @@ export function checkReadPoliciesAllowThisUserToSearch(
 const runPolicyCheckDebug = Debug("resolvers:runPolicyCheck");
 /**
  * Runs a policy check on the requested information
- * @param policyType the policy type on which the request is made on, edit, delete
- * @param itemDefinition the item definition in question
- * @param id the id of that item definition on the database
- * @param role the role of the current user
- * @param gqlArgValue the arg value given in the arguments from graphql, where the info should be
+ * @param arg.policyType the policy type on which the request is made on, edit, delete
+ * @param arg.itemDefinition the item definition in question
+ * @param arg.id the id of that item definition on the database
+ * @param arg.role the role of the current user
+ * @param arg.gqlArgValue the arg value given in the arguments from graphql, where the info should be
  * in qualified path names for the policies
- * @param knex the knex instance
- * @param extraSQLColumns extra SQL columns to request, this only exists to avoid needing many SQL calls
- * an asterisk is valid here
- * @param preValidation a validation to do, validate if the row doesn't exist here, and anything else necessary
+ * @param arg.gqlFlattenedRequestedFiels the flattened request fields that have been requested to read
+ * @param arg.cache the cache instance
+ * @param arg.preValidation a validation to do, validate if the row doesn't exist here, and anything else necessary
  * the function will crash by Internal server error if no validation is done if the row is null; return
  * a value if you want to force it to return instead without an error
+ * @param arg.parentModule the parent module to use in a policy type parent
+ * @param arg.parentType the parent type (qualified name and table) to use in a policy type parent
+ * @param arg.parentId the parent id to use in a policy type parent
+ * @param arg.parentPrevalidation a pre validation to run
  */
 export async function runPolicyCheck(
-  policyTypes: string[],
-  itemDefinition: ItemDefinition,
-  id: number,
-  role: string,
-  gqlArgValue: IGQLValue,
-  gqlFlattenedRequestedFiels: any,
-  cache: Cache,
-  preValidation: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
+  arg: {
+    policyTypes: string[],
+    itemDefinition: ItemDefinition,
+    id: number,
+    role: string,
+    gqlArgValue: IGQLValue,
+    gqlFlattenedRequestedFiels: any,
+    cache: Cache,
+    preValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
+    parentModule?: string,
+    parentType?: string,
+    parentId?: number,
+    preParentValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
+  },
 ) {
   runPolicyCheckDebug(
     "EXECUTED for policies %j on item definition %s for id %d on role %s for value %j with extra columns %j",
-    policyTypes,
-    itemDefinition.getQualifiedPathName(),
-    role,
-    gqlArgValue,
+    arg.policyTypes,
+    arg.itemDefinition.getQualifiedPathName(),
+    arg.role,
+    arg.gqlArgValue,
   );
   // so now we get the information we need first
-  const mod = itemDefinition.getParentModule();
+  const mod = arg.itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
-  const selfTable = itemDefinition.getQualifiedPathName();
+  const selfTable = arg.itemDefinition.getQualifiedPathName();
 
-  const selectQueryValue: ISQLTableRowValue =
-    await cache.requestCache(selfTable, moduleTable, id);
-
-  const forcedResult = preValidation(selectQueryValue);
-  if (typeof forcedResult !== "undefined") {
-    return forcedResult;
+  let selectQueryValue: ISQLTableRowValue = null;
+  let parentSelectQueryValue: ISQLTableRowValue = null;
+  if (arg.policyTypes.includes("read") || arg.policyTypes.includes("delete") || arg.policyTypes.includes("edit")) {
+    selectQueryValue = await arg.cache.requestCache(selfTable, moduleTable, arg.id);
+  }
+  if (arg.policyTypes.includes("parent")) {
+    parentSelectQueryValue = await arg.cache.requestCache(arg.parentType, arg.parentModule, arg.id);
   }
 
-  for (const policyType of policyTypes) {
+  if (arg.preValidation) {
+    const forcedResult = arg.preValidation(selectQueryValue);
+    if (typeof forcedResult !== "undefined") {
+      return forcedResult;
+    }
+  }
+
+  if (arg.preParentValidation) {
+    const forcedResult2 = arg.preParentValidation(parentSelectQueryValue);
+    if (typeof forcedResult2 !== "undefined") {
+      return forcedResult2;
+    }
+  }
+
+  for (const policyType of arg.policyTypes) {
     // let's get all the policies that we have for this policy type group
-    const policiesForThisType = itemDefinition.getPolicyNamesFor(policyType);
+    const policiesForThisType = arg.itemDefinition.getPolicyNamesFor(policyType);
 
     // so we loop in these policies
     for (const policyName of policiesForThisType) {
       runPolicyCheckDebug("found policy %s", policyName);
       // and we get the roles that need to apply to this policy
-      const rolesForThisSpecificPolicy = itemDefinition.getRolesForPolicy(policyType, policyName);
+      const rolesForThisSpecificPolicy = arg.itemDefinition.getRolesForPolicy(policyType, policyName);
       // if this is not our user, we can just continue with the next
-      if (!rolesForThisSpecificPolicy.includes(role)) {
+      if (!rolesForThisSpecificPolicy.includes(arg.role)) {
         runPolicyCheckDebug(
           "ignoring policy %s as role %s does not require it but only %j demand it",
           policyName,
-          role,
+          arg.role,
           rolesForThisSpecificPolicy,
         );
         continue;
       }
 
-      const gqlCheckingElement = policyType === "read" ? gqlFlattenedRequestedFiels : gqlArgValue;
+      const gqlCheckingElement = policyType === "read" ? arg.gqlFlattenedRequestedFiels : arg.gqlArgValue;
 
-      if (policyType !== "delete") {
+      if (policyType !== "delete" && policyType !== "parent") {
         const applyingPropertyIds =
-          itemDefinition.getApplyingPropertyIdsForPolicy(policyType, policyName);
+        arg.itemDefinition.getApplyingPropertyIdsForPolicy(policyType, policyName);
 
         let someIncludeOrPropertyIsApplied = false;
         if (applyingPropertyIds) {
@@ -712,13 +749,13 @@ export async function runPolicyCheck(
 
         if (!someIncludeOrPropertyIsApplied) {
           const applyingIncludeIds =
-            itemDefinition.getApplyingIncludeIdsForPolicy(policyType, policyName);
+          arg.itemDefinition.getApplyingIncludeIdsForPolicy(policyType, policyName);
 
           if (applyingIncludeIds) {
             someIncludeOrPropertyIsApplied =
               applyingIncludeIds.some(
                 (applyingIncludeId) => {
-                  const include = itemDefinition.getIncludeFor(applyingIncludeId);
+                  const include = arg.itemDefinition.getIncludeFor(applyingIncludeId);
                   return (
                     typeof gqlCheckingElement[include.getQualifiedIdentifier()] !== "undefined" ||
                     typeof gqlCheckingElement[include.getQualifiedExclusionStateIdentifier()] !== "undefined"
@@ -740,7 +777,7 @@ export async function runPolicyCheck(
 
       // otherwise we need to see which properties are in consideration for this
       // policy
-      const propertiesInContext = itemDefinition.getPropertiesForPolicy(policyType, policyName);
+      const propertiesInContext = arg.itemDefinition.getPropertiesForPolicy(policyType, policyName);
       // we loop through those properties
       for (const property of propertiesInContext) {
         runPolicyCheckDebug(
@@ -752,7 +789,7 @@ export async function runPolicyCheck(
         // the value for this policy is stored
         const qualifiedPolicyIdentifier = property.getQualifiedPolicyIdentifier(policyType, policyName);
         // and like that we get the value that has been set for that policy
-        let policyValueForTheProperty = gqlArgValue[qualifiedPolicyIdentifier];
+        let policyValueForTheProperty = arg.gqlArgValue[qualifiedPolicyIdentifier];
         // if it's undefined, we set it to null
         if (typeof policyValueForTheProperty === "undefined") {
           policyValueForTheProperty = null;
@@ -766,7 +803,7 @@ export async function runPolicyCheck(
 
         // now we check if it's a valid value, the value we have given, for the given property
         // this is a shallow check but works
-        const invalidReason = await property.isValidValue(id, policyValueForTheProperty);
+        const invalidReason = await property.isValidValue(arg.id, policyValueForTheProperty);
 
         // if we get an invalid reason, the policy cannot even pass there
         if (invalidReason) {
@@ -774,11 +811,11 @@ export async function runPolicyCheck(
             "FAILED due to failing to pass property validation %s",
             invalidReason,
           );
-          throw new GraphQLEndpointError({
+          throw new EndpointError({
             message: `validation failed for ${qualifiedPolicyIdentifier} with reason ${invalidReason}`,
             code: INVALID_POLICY_ERROR,
             modulePath: mod.getPath(),
-            itemDefPath: itemDefinition.getPath(),
+            itemDefPath: arg.itemDefinition.getPath(),
             policyType,
             policyName,
           });
@@ -792,7 +829,7 @@ export async function runPolicyCheck(
           policyValueForTheProperty,
           "",
           property.getId(),
-          selectQueryValue,
+          policyType === "parent" ? parentSelectQueryValue : selectQueryValue,
         );
 
         if (!policyMatches) {
@@ -800,11 +837,11 @@ export async function runPolicyCheck(
             "FAILED due to policy %s not passing",
             policyName,
           );
-          throw new GraphQLEndpointError({
+          throw new EndpointError({
             message: `validation failed for policy ${policyName}`,
             code: INVALID_POLICY_ERROR,
             modulePath: mod.getPath(),
-            itemDefPath: itemDefinition.getPath(),
+            itemDefPath: arg.itemDefinition.getPath(),
             policyType,
             policyName,
           });

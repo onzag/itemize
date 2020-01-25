@@ -138,6 +138,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
   public setTokenState(state: ITokenProviderState) {
     this.tokenState = state;
+    this.remoteListener.setToken(state.token);
   }
 
   public async updateUserProperty(propertyId: string, value: string) {

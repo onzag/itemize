@@ -12,7 +12,7 @@ import Moment from "moment";
 import { DATETIME_FORMAT, TIME_FORMAT, DATE_FORMAT,
   MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE } from "../constants";
 import { GraphQLError } from "graphql";
-import { GraphQLEndpointError, GraphQLEndpointErrorType } from "../base/errors";
+import { EndpointError, EndpointErrorType } from "../base/errors";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { serverSideIndexChecker, serverSideAutocompleteChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import restServices from "./rest";
@@ -98,10 +98,10 @@ const customFormatErrorFn = (error: GraphQLError) => {
     constructor = originalError.constructor;
   }
 
-  let extensions: GraphQLEndpointErrorType;
+  let extensions: EndpointErrorType;
   switch (constructor) {
-    case GraphQLEndpointError:
-      const gqlDataInputError = error.originalError as GraphQLEndpointError;
+    case EndpointError:
+      const gqlDataInputError = error.originalError as EndpointError;
       extensions = gqlDataInputError.data;
       break;
     default:
@@ -127,11 +127,11 @@ async function customResolveWrapper(
   try {
     return await fn(source, args, context, info);
   } catch (err) {
-    if (err instanceof GraphQLEndpointError) {
+    if (err instanceof EndpointError) {
       throw err;
     }
     console.error(err.stack);
-    throw new GraphQLEndpointError({
+    throw new EndpointError({
       message: "Internal Server Error",
       code: "INTERNAL_SERVER_ERROR",
     });
