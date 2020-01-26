@@ -1,5 +1,16 @@
+/**
+ * This file contains the critical code that runs the evaluation of the conditions
+ * that are contained within an itemize schema
+ *
+ * Related files are schema.ts and checkers.ts for the build process
+ */
+
 import { PropertyDefinitionSupportedType } from "../PropertyDefinition/types";
-import PropertyDefinition, { IPropertyDefinitionAlternativePropertyType } from "../PropertyDefinition";
+import PropertyDefinition, {
+  PropertyDefinitionValueType,
+  IPropertyDefinitionExactPropertyValue,
+  IPropertyDefinitionReferredPropertyValue,
+} from "../PropertyDefinition";
 import ItemDefinition from "..";
 import Include from "../Include";
 import Module from "../../../Module";
@@ -16,25 +27,38 @@ interface IConditionalRuleSetRawJSONDataBaseType {
   condition?: IConditionalRuleSetRawJSONDataType;
 }
 
+// this is the raw json of a conditional rule set
 export interface IConditionalRuleSetRawJSONDataPropertyType
   extends IConditionalRuleSetRawJSONDataBaseType {
+  // the property to be compared
   property: string;
+  // the attribute of that property, as some properties are objects
   attribute?: string;
+  // the method, default, string or datetime (uses Date)
   method?: "default" | "string" | "datetime";
+  // the comparator, equal, greater than, etc...
   comparator: ConditionalRuleComparatorType;
-  value: PropertyDefinitionSupportedType | IPropertyDefinitionAlternativePropertyType;
+  // the value to be compared against, either a value itself, or alternatively, a property
+  value: PropertyDefinitionValueType;
+  // the attribute of the value, if any
   valueAttribute?: string;
 }
 
-export interface IConditionalRuleSetRawJSONDataComponentType
+// this represents rules that are built for includes
+export interface IConditionalRuleSetRawJSONDataIncludeType
   extends IConditionalRuleSetRawJSONDataBaseType {
-  component: string;
+  // includes can either by matched by id or by name
+  // the id of an include is unique, and is matched by using #identifier
+  // and the name just doesn't include the numeral
+  include: string;
+  // the inclusion state expected for the conditional rule to apply
   isIncluded: boolean;
 }
 
+// both types of conditions combined
 export type IConditionalRuleSetRawJSONDataType =
   IConditionalRuleSetRawJSONDataPropertyType |
-  IConditionalRuleSetRawJSONDataComponentType;
+  IConditionalRuleSetRawJSONDataIncludeType;
 
 /**
  * This class provides conditional rule sets that are set for
@@ -85,12 +109,18 @@ export type IConditionalRuleSetRawJSONDataType =
  */
 export default class ConditionalRuleSet {
 
+  // the parent module of this condition
   public parentModule: Module;
+  // the item definition where it is contained
   public parentItemDefinition: ItemDefinition;
+  // the property that it is contained within, might be null for prop extensions
   public parentPropertyDefinition: PropertyDefinition;
+  // a parent include, if available, might be null
   public parentInclude: Include;
+  // the raw data that was used to generate this conditional rule set
   public rawData: IConditionalRuleSetRawJSONDataType;
 
+  // an internal condition for nested conditions
   private condition: ConditionalRuleSet;
 
   /**
@@ -111,6 +141,7 @@ export default class ConditionalRuleSet {
     parentPropertyDefinition: PropertyDefinition,
     parentInclude: Include,
   ) {
+    // so we setup the initial properties
     this.rawData = rawJSON;
     this.condition = rawJSON.condition &&
       new ConditionalRuleSet(rawJSON.condition, parentModule,
@@ -130,15 +161,22 @@ export default class ConditionalRuleSet {
   public evaluate(id: number): boolean {
     // if this is a property type conditional rule set
     let result: boolean = false;
+
+    // so now let's check as a property
     const rawDataAsProperty: IConditionalRuleSetRawJSONDataPropertyType =
       this.rawData as IConditionalRuleSetRawJSONDataPropertyType;
+
+    // if it's in fact a property type
     if (rawDataAsProperty.property) {
 
       // lets get the property value as for now
       let actualPropertyValue = null;
+      // if the property is this current property
       if (rawDataAsProperty.property === "&this") {
+        // then the value is from it
         actualPropertyValue = this.parentPropertyDefinition.getCurrentValue(id);
       } else {
+        // otherwise we need to find that property, either from main or extensions
         actualPropertyValue = (this.parentItemDefinition ?
           this.parentItemDefinition
             .getPropertyDefinitionFor(rawDataAsProperty.property, true)
@@ -147,21 +185,30 @@ export default class ConditionalRuleSet {
             .getCurrentValue(id));
       }
 
+      // if there is an attribute, then we use that attribute
       if (rawDataAsProperty.attribute && actualPropertyValue !== null) {
         actualPropertyValue = actualPropertyValue[rawDataAsProperty.attribute];
       }
 
-      let actualComparedValue = rawDataAsProperty.value;
-      if (actualComparedValue && (actualComparedValue as IPropertyDefinitionAlternativePropertyType).property) {
-        const propertyInQuestion = (actualComparedValue as IPropertyDefinitionAlternativePropertyType).property;
+      // now let's check what we are comparing against
+      let actualComparedValue: PropertyDefinitionSupportedType;
+      // so if we are talking about a property type
+      if (actualComparedValue && (rawDataAsProperty.value as IPropertyDefinitionReferredPropertyValue).property) {
+        // we get the property in question
+        const propertyInQuestion = (rawDataAsProperty.value as IPropertyDefinitionReferredPropertyValue).property;
+        // and that would represent what we actually comparing against
         actualComparedValue = this.parentItemDefinition ?
           this.parentItemDefinition
             .getPropertyDefinitionFor(propertyInQuestion, true)
             .getCurrentValue(id) :
           this.parentModule.getPropExtensionFor(propertyInQuestion)
             .getCurrentValue(id);
+      } else {
+        // otherwise it's the exact value we have provided
+        actualComparedValue = (rawDataAsProperty.value as IPropertyDefinitionExactPropertyValue).exactValue;
       }
 
+      // we also extract the attribute if necessary
       if (rawDataAsProperty.valueAttribute && actualComparedValue !== null) {
         actualComparedValue = actualComparedValue[rawDataAsProperty.valueAttribute];
       }
@@ -172,6 +219,8 @@ export default class ConditionalRuleSet {
         actualComparedValue = ((actualComparedValue || "").toString()).toLocaleLowerCase();
       }
 
+      // nulls cannot be compared via these methods so it gives false
+      // any comparison involving null and these comparators gives false
       const invalidNullComparators = [
         "greater-than",
         "less-than",
@@ -179,14 +228,19 @@ export default class ConditionalRuleSet {
         "less-or-equal-than",
       ];
 
+      // so we check if we have one of those
       const isAnInvalidNullComparator = invalidNullComparators.includes(rawDataAsProperty.comparator);
+      // and if one of them is null
       if (
         (actualPropertyValue === null || actualComparedValue === null) &&
         isAnInvalidNullComparator
       ) {
         result = false;
+
+      // otherwise using the datetime method
       } else if (
         rawDataAsProperty.method === "datetime" &&
+        // and we have invalid dates, that's also impossible to compare
         (actualPropertyValue === "Invalid Date" || actualComparedValue === "Invalid Date") &&
         isAnInvalidNullComparator
       ) {
@@ -223,14 +277,14 @@ export default class ConditionalRuleSet {
       }
     // Otherwise in case it's a component based one
     } else {
-      const rawDataAsComponent: IConditionalRuleSetRawJSONDataComponentType =
-        this.rawData as IConditionalRuleSetRawJSONDataComponentType;
+      const rawDataAsComponent: IConditionalRuleSetRawJSONDataIncludeType =
+        this.rawData as IConditionalRuleSetRawJSONDataIncludeType;
 
       // let's check whether there is an item instance for that
       // component that are active (aka not excluded)
-      const hasOneOf = rawDataAsComponent.component[0] === "#" ?
-        this.parentItemDefinition.hasAnActiveIncludeInstanceOfId(id, rawDataAsComponent.component[0].substr(1)) :
-        this.parentItemDefinition.hasAtLeastOneActiveInstanceOf(id, rawDataAsComponent.component);
+      const hasOneOf = rawDataAsComponent.include[0] === "#" ?
+        this.parentItemDefinition.hasAnActiveIncludeInstanceOfId(id, rawDataAsComponent.include.substr(1)) :
+        this.parentItemDefinition.hasAtLeastOneActiveInstanceOf(id, rawDataAsComponent.include);
 
       // And compare the result against the isIncluded boolean
       result = (hasOneOf && rawDataAsComponent.isIncluded) ||

@@ -1,3 +1,7 @@
+/**
+ * Contains the date type description
+ */
+
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLString } from "graphql";
 import {

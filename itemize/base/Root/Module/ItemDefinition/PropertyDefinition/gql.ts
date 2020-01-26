@@ -1,9 +1,17 @@
+/**
+ * This file contains all the graphql related helper functions that are used in order to
+ * retrieve and set the values of properties, it doesn't contain the conversion functions
+ * sql.ts does
+ */
+
 import { GraphQLInputObjectType, GraphQLObjectType, GraphQLNonNull, GraphQLList, GraphQLString, GraphQLInt } from "graphql";
 import PropertyDefinition from "../PropertyDefinition";
 import { IGQLFieldsDefinitionType } from "../../../gql";
 import { ItemDefinitionIOActions } from "..";
 import { GraphQLUpload } from "graphql-upload";
 
+// this stores the _In and _Out of the property types
+// that do not fit a basic type, like number or string
 const PROPERTY_TYPE_GQL_POOL = {};
 
 /**
@@ -38,9 +46,9 @@ export function getGQLFieldsDefinitionForProperty(
     // an input or output type, we do this by attaching in or out
     let defName = gqlDef;
     if (options.propertiesAsInput) {
-      defName += "_In";
+      defName += "_IN";
     } else {
-      defName += "_Out";
+      defName += "_OUT";
     }
 
     // now we have to use the pool, since property types are constant
@@ -49,7 +57,11 @@ export function getGQLFieldsDefinitionForProperty(
       const fields: any = {
         ...propertyDescription.gqlFields,
       };
+
+      // so now we add the file to the fields if it's required
       if (propertyDescription.gqlAddFileToFields) {
+
+        // so these are all standard
         fields.id = {
           type: GraphQLNonNull(GraphQLString),
         };
@@ -62,6 +74,9 @@ export function getGQLFieldsDefinitionForProperty(
         fields.size = {
           type: GraphQLNonNull(GraphQLInt),
         };
+
+        // however if we are inputting, we are required
+        // either a url or a src on _IN
         if (options.propertiesAsInput) {
           fields.url = {
             type: GraphQLString,
@@ -70,15 +85,21 @@ export function getGQLFieldsDefinitionForProperty(
             type: GraphQLUpload,
           };
         } else {
+          // and if that's not the case, we are always returning
+          // an url on _OUT
           fields.url = {
             type: GraphQLNonNull(GraphQLString),
           };
         }
       }
+
+      // we build the payload for this graphql object type
       const payload = {
         name: defName,
         fields,
       };
+
+      // and create the result
       let result: any;
       if (options.propertiesAsInput) {
         result = new GraphQLInputObjectType(payload);
@@ -86,11 +107,14 @@ export function getGQLFieldsDefinitionForProperty(
         result = new GraphQLObjectType(payload);
       }
 
+      // if it's a list, then we add it as so to the type
+      // pool
       if (propertyDescription.gqlList) {
         PROPERTY_TYPE_GQL_POOL[defName] = GraphQLList(
           GraphQLNonNull(result),
         );
       } else {
+        // otherwise it's simple
         PROPERTY_TYPE_GQL_POOL[defName] = result;
       }
     }
@@ -99,11 +123,15 @@ export function getGQLFieldsDefinitionForProperty(
     gqlResult = gqlDef;
   }
 
+  // if it's not nullable and we are not demanding the optional
+  // form then we make it not null
   if (!propertyDefinition.isNullable() && !options.optionalForm) {
     gqlResult = GraphQLNonNull(gqlResult);
   }
 
+  // for documentation purposes
   const englishData = propertyDefinition.getI18nDataFor("en");
+  // for the description
   const baseDescription = englishData && englishData.description ||
     englishData && englishData.label ||
     "no description supplied";
@@ -113,9 +141,12 @@ export function getGQLFieldsDefinitionForProperty(
     "READ ACCESS: " + propertyDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.READ).join(", ") + " - " +
     "EDIT ACCESS: " + propertyDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.EDIT).join(", ") + " - ";
 
+  // add it to the result
   resultFieldsSchema[options.prefix + propertyDefinition.getId()] = {
     type: gqlResult,
     description,
   };
+
+  // return it
   return resultFieldsSchema;
 }

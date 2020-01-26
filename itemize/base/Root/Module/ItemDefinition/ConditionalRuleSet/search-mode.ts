@@ -1,4 +1,10 @@
-import { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionAlternativePropertyType } from "../PropertyDefinition";
+/**
+ * This file builds the search mode for a conditional rule set as when the
+ * module tries to convert a module into its search form, this file contains
+ * the instructions specific to the conditional rule set conversion
+ */
+
+import { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionReferredPropertyValue } from "../PropertyDefinition";
 import { getConversionIds } from "../PropertyDefinition/search-mode";
 import { IConditionalRuleSetRawJSONDataType, IConditionalRuleSetRawJSONDataPropertyType } from ".";
 
@@ -52,7 +58,7 @@ export function buildSearchModeConditionalRuleSet(
     }
 
     // we check the value if it uses an alternative value set as property
-    const valueAsAlternative = (newRuleAsProperty.value as IPropertyDefinitionAlternativePropertyType);
+    const valueAsAlternative = (newRuleAsProperty.value as IPropertyDefinitionReferredPropertyValue);
     // if that's the case
     if (valueAsAlternative && valueAsAlternative.property) {
       // we need to convert that one too!

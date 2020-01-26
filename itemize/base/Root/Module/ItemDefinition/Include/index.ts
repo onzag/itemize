@@ -1,5 +1,10 @@
-// lets do the import, item definition depends on conditional rule set
-// and property value mapping
+/**
+ * This file contains the description and class for the Include, contains the state
+ * managing as well as the values applied and naming conventions for includes
+ *
+ * Related files schema.ts and checkers.ts
+ */
+
 import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } from "..";
 import ConditionalRuleSet, {
   IConditionalRuleSetRawJSONDataType,
@@ -8,7 +13,7 @@ import Module from "../..";
 import PropertyDefinition from "../PropertyDefinition";
 import PropertiesValueMappingDefiniton, { IPropertiesValueMappingDefinitonRawJSONDataType } from "../PropertiesValueMappingDefiniton";
 import { INCLUDE_PREFIX, PREFIX_BUILD, EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
-import { IGQLRequestFields } from "../../../../../gql-querier";
+import { IGQLRequestFields, IGQLValue } from "../../../../../gql-querier";
 
 export enum IncludeExclusionState {
   EXCLUDED = "EXCLUDED",
@@ -29,7 +34,7 @@ export interface IIncludeState {
 // this is what our raw json looks like
 export interface IIncludeRawJSONDataType {
   id: string;
-  name: string;
+  definition: string;
   i18nData?: {
     [locale: string]: {
       name?: string;
@@ -146,8 +151,8 @@ export default class Include {
 
     // lets get an instance for the item definition for this
     // item, if there's one, and let's detach it
-    this.itemDefinition = rawJSON.name && parentItemDefinition
-      .getDirectlyAvailableItemDefinitionInContextFor(rawJSON.name).getNewInstance();
+    this.itemDefinition = rawJSON.definition && parentItemDefinition
+      .getDirectlyAvailableItemDefinitionInContextFor(rawJSON.definition).getNewInstance();
     // set the enforced and predefined properties overwrites
     // if needed to
 
@@ -329,8 +334,8 @@ export default class Include {
    * Provides the name for this item, the name represents
    * the item definition children this item is attached to
    */
-  public getName() {
-    return this.rawData.name;
+  public getItemDefinitionName() {
+    return this.rawData.definition;
   }
 
   /**
@@ -341,14 +346,25 @@ export default class Include {
     return this.rawData.id;
   }
 
+  /**
+   * Provides the qualified identifier of the include
+   * that is an INCLUDE prefixed with the identifier
+   */
   public getQualifiedIdentifier() {
     return INCLUDE_PREFIX + this.getId();
   }
 
+  /**
+   * Provides the qualified identifier for prefixing
+   * other things
+   */
   public getPrefixedQualifiedIdentifier() {
     return PREFIX_BUILD(this.getQualifiedIdentifier());
   }
 
+  /**
+   * Provides the qualfiied name for the exclusion state
+   */
   public getQualifiedExclusionStateIdentifier() {
     return this.getPrefixedQualifiedIdentifier() + EXCLUSION_STATE_SUFFIX;
   }
@@ -363,7 +379,7 @@ export default class Include {
       exclusionState,
       canExclusionBeSet: this.canExclusionBeSet(id),
       includeId: this.getId(),
-      itemDefinitionName: this.getName(),
+      itemDefinitionName: this.getItemDefinitionName(),
       itemDefinitionState: exclusionState === IncludeExclusionState.EXCLUDED ? null :
         this.itemDefinition.getStateNoExternalChecking(id,
           emulateExternalChecking, this.rawData.sinkIn || [], [], true),
@@ -382,7 +398,7 @@ export default class Include {
       exclusionState,
       canExclusionBeSet: this.canExclusionBeSet(id),
       includeId: this.getId(),
-      itemDefinitionName: this.getName(),
+      itemDefinitionName: this.getItemDefinitionName(),
       itemDefinitionState: exclusionState === IncludeExclusionState.EXCLUDED ? null :
         (await this.itemDefinition.getState(id, this.rawData.sinkIn || [], [], true)),
       stateExclusion: this.stateExclusion[id] || IncludeExclusionState.ANY,
@@ -390,26 +406,46 @@ export default class Include {
     };
   }
 
+  /**
+   * Applies a value to an include
+   * @param id the slot id to use
+   * @param value the value that is applied
+   * @param exclusionState the exclusion state
+   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet whether if not applying
+   * for manually set values (to avoid overriding user input)
+   */
   public applyValue(
     id: number,
-    value: {[key: string]: any},
+    value: IGQLValue,
     exclusionState: IncludeExclusionState,
     doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
   ) {
+    // update the state
     this.stateExclusion[id] = exclusionState;
     this.stateExclusionModified[id] = true;
 
+    // applying the value in the item definition
+    // which is another instance
     this.itemDefinition.applyValue(
       id,
+      // value might be null
       value || {},
+      // exclude all extensions
       true,
+      // graphql user id, unknown
       null,
+      // grapqhl role, unknown
       null,
+      // graphql requested fields, none
       null,
       doNotApplyValueInPropertyIfPropertyHasBeenManuallySet,
     );
   }
 
+  /**
+   * Memory cleans the value in an item
+   * @param id the slot id
+   */
   public cleanValueFor(
     id: number,
   ) {
@@ -463,6 +499,10 @@ export default class Include {
     return this.itemDefinition;
   }
 
+  /**
+   * Merges the i18n data of another include in another language
+   * @param includeRaw the include itself
+   */
   public mergeWithI18n(
     includeRaw: IIncludeRawJSONDataType,
   ) {

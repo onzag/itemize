@@ -1,3 +1,7 @@
+/**
+ * Contains the boolean type description
+ */
+
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLBoolean } from "graphql";
 import {

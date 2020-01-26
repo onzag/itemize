@@ -1,3 +1,7 @@
+/**
+ * Contains the text type description
+ */
+
 import {
   IPropertyDefinitionSupportedType,
 } from "../types";

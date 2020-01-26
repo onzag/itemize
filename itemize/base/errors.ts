@@ -1,8 +1,10 @@
+// standard error
 interface IEndpointErrorBaseType {
   message: string;
   code: string;
 }
 
+// Error when it occurs in a prop extension
 interface IEndpointErrorOverloadPropExtensionType {
   message: string;
   code: string;
@@ -10,6 +12,7 @@ interface IEndpointErrorOverloadPropExtensionType {
   propertyId: string;
 }
 
+// Error when it occurs in a property
 interface IEndpointErrorOverloadPropertyType {
   message: string;
   code: string;
@@ -18,6 +21,7 @@ interface IEndpointErrorOverloadPropertyType {
   propertyId: string;
 }
 
+// Error when it occurs in a property that belongs to an include
 interface IEndpointErrorOverloadPropertyInIncludeType {
   message: string;
   code: string;
@@ -28,6 +32,7 @@ interface IEndpointErrorOverloadPropertyInIncludeType {
   propertyId: string;
 }
 
+// Errors in policies, all policies have an item definition and module
 interface IEndpointErrorOverloadPolicyType {
   message: string;
   code: string;
@@ -37,6 +42,7 @@ interface IEndpointErrorOverloadPolicyType {
   policyType: string;
 }
 
+// All errors
 export type EndpointErrorType =
   IEndpointErrorBaseType |
   IEndpointErrorOverloadPropExtensionType |
@@ -44,6 +50,10 @@ export type EndpointErrorType =
   IEndpointErrorOverloadPropertyInIncludeType |
   IEndpointErrorOverloadPolicyType;
 
+/**
+ * An instance version of the error that contains
+ * the raw object data of the error
+ */
 export class EndpointError extends Error {
   public data: EndpointErrorType;
 

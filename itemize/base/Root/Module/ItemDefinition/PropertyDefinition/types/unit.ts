@@ -1,3 +1,7 @@
+/**
+ * Contains the unit type description
+ */
+
 import {
   IPropertyDefinitionSupportedType,
 } from "../types";

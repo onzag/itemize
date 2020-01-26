@@ -1,3 +1,10 @@
+/**
+ * This file contains the schema that is used to validate includes within the
+ * item definition using the JSON Schema specification in the compile process
+ *
+ * related files index.ts and checkers.ts
+ */
+
 import ConditionalRuleSetSchema from "../ConditionalRuleSet/schema";
 import PropertiesValueMappingDefinitionSchema from "../PropertiesValueMappingDefiniton/schema";
 
@@ -9,9 +16,9 @@ export default {
       type: "string",
       pattern: "^[a-z_]+$",
     },
-    name: {
+    definition: {
       type: "string",
-      pattern: "^[a-z_]+$",
+      pattern: "^[a-z_/]+$",
     },
     enforcedProperties: {
       $ref: "PropertiesValueMappingDefiniton",

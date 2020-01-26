@@ -1,3 +1,10 @@
+/**
+ * This file represents the schema for the compilation of the the conditional
+ * rule sets in the JSON schema form
+ *
+ * related files are index.ts and checkers.ts
+ */
+
 // The comparators we support
 const comparators = ["equals", "not-equal", "greater-than", "less-than",
   "greater-or-equal-than", "less-or-equal-than"];
@@ -17,7 +24,10 @@ export default {
     {
       properties: {
         // property
-        property: {type: "string"},
+        property: {
+          type: "string",
+          pattern: "^[a-z_]+$|^&this$",
+        },
         // attribute
         attribute: {type: "string"},
         // comparator
@@ -29,22 +39,27 @@ export default {
           type: "string",
           enum: methods,
         },
-        // value sadly the import is buggy, so I have to paste it here
         value: {
-          // oneOf: [
-          //   {
-          //     type: "object",
-          //     properties: {
-          //       property: {
-          //         type: "string",
-          //         pattern: "^[a-z_]+$",
-          //       },
-          //     },
-          //     required: ["property"],
-          //     additionalProperties: false,
-          //   },
-          //   {},
-          // ],
+          type: "object",
+          oneOf: [
+            {
+              properties: {
+                property: {
+                  type: "string",
+                  pattern: "^[a-z_]+$",
+                },
+              },
+              required: ["property"],
+              additionalProperties: false,
+            },
+            {
+              properties: {
+                exactValue: {},
+              },
+              required: ["exactValue"],
+              additionalProperties: false,
+            },
+          ],
         },
         // value attribute
         valueAttribute: {type: "string"},

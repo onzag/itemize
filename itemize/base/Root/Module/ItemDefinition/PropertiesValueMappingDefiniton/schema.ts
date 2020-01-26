@@ -1,28 +1,38 @@
-// The schema for the definition
-// {
-//   "amount": 4,
-//   "type": "car"
-// },
-// properties can be any string
-// the values must be boolean string or number
-// we should have at least one
+/**
+ * This file represents the schema that is used to validate against in order
+ * to use property value mapping definitions using the JSON schema spec in
+ * the compilation step
+ *
+ * related files index.ts and checkers.ts
+ */
+
 export default {
   $id: "PropertiesValueMappingDefiniton",
   type: "object",
-  // oneOf: [
-  //   {
-  //     type: "object",
-  //     properties: {
-  //       property: {
-  //         type: "string",
-  //         pattern: "^[a-z_]+$",
-  //       },
-  //     },
-  //     required: ["property"],
-  //     additionalProperties: false,
-  //   },
-  //   {},
-  // ],
-  additionalProperties: {},
+  patternProperties: {
+    "^[a-z_]+$": {
+      type: "object",
+      oneOf: [
+        {
+          properties: {
+            property: {
+              type: "string",
+              pattern: "^[a-z_]+$",
+            },
+          },
+          required: ["property"],
+          additionalProperties: false,
+        },
+        {
+          properties: {
+            exactValue: {},
+          },
+          required: ["exactValue"],
+          additionalProperties: false,
+        },
+      ],
+    },
+  },
+  additionalProperties: false,
   minProperties: 1,
 };

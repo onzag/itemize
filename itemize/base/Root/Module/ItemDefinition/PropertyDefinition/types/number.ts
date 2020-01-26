@@ -1,3 +1,7 @@
+/**
+ * Contains the number type description
+ */
+
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLFloat } from "graphql";
 import {

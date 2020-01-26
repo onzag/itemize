@@ -1,5 +1,11 @@
+/**
+ * Contains all the supported types within the standard specification of itemize
+ * some mild checkers just in case as well as the types that are used within
+ * typescript, this file acts as a registry of sorts
+ */
+
 import { GraphQLOutputType } from "graphql";
-import { IGQLFieldsDefinitionType, IGQLValue } from "../../../../gql";
+import { IGQLFieldsDefinitionType } from "../../../../gql";
 import { ISQLTableRowValue, ISQLTableDefinitionType } from "../../../../sql";
 import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
 import boolean, { PropertyDefinitionSupportedBooleanType } from "./boolean";
@@ -18,6 +24,7 @@ import files, { PropertyDefinitionSupportedFilesType } from "./files";
 import year, { PropertyDefinitionSupportedYearType } from "./year";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
+import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 
 // All the supported property types
 export type PropertyDefinitionSupportedTypeName =
@@ -94,7 +101,7 @@ export interface IPropertyDefinitionSupportedType {
   // knexBuilder is the builder that is being used so it can attach the where queries to it
   // and dictionary is the postgres dictionary that can be used for sql searches
   sqlSearch: (
-    args: IGQLValue,
+    args: IGQLArgs,
     sqlPrefix: string,
     id: string,
     knexBuilder: Knex.QueryBuilder,
@@ -104,7 +111,7 @@ export interface IPropertyDefinitionSupportedType {
   // raw (that is with DATA) the property id and the include id, the args are
   // the same
   sqlLocalSearch: (
-    args: IGQLValue,
+    args: IGQLArgs,
     rawData: IGQLValue,
     id: string,
     includeId?: string,

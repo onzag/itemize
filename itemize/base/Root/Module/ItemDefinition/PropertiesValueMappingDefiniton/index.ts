@@ -1,13 +1,23 @@
+/**
+ * This file contains the value mapper that specifies how things such as
+ * predefinedProperties and enforcedProperties do behave
+ *
+ * related files schema.ts and checkers.ts
+ */
+
 import { PropertyDefinitionSupportedType } from "../PropertyDefinition/types";
-import PropertyDefinition, { IPropertyDefinitionAlternativePropertyType } from "../PropertyDefinition";
+import PropertyDefinition, {
+  PropertyDefinitionValueType,
+  IPropertyDefinitionExactPropertyValue,
+  IPropertyDefinitionReferredPropertyValue,
+} from "../PropertyDefinition";
 import ItemDefinition from "..";
 
 // Represents the way that properties are stored
 // Check the schema down to see how this relates
 // at PropertiesValueMappingDefiniton.schema
 export interface IPropertiesValueMappingDefinitonRawJSONDataType {
-  [propertyName: string]: PropertyDefinitionSupportedType |
-    IPropertyDefinitionAlternativePropertyType;
+  [propertyName: string]: PropertyDefinitionValueType;
 }
 
 /**
@@ -18,23 +28,15 @@ export interface IPropertiesValueMappingDefinitonRawJSONDataType {
  * a wheelset, and this wheelset has properties of its own
  *
  * {
- *   "name": "wheelset",
+ *   "definition": "wheelset",
  *   "enforcedProperties" : {
- *     "amount": 4,
- *     "type": "car"
+ *     "amount": {
+ *       "exactValue": 4
+ *     },
+ *     "type": {
+ *       "exactValue": "car"
+ *     },
  *   },
- *   "excludedIf": {
- *     "property": "type",
- *     "comparator": "not-equal",
- *     "value": "car"
- *   }
- * },
- *
- * The part defined as
- *
- * "enforcedProperties" : {
- *   "amount": 4,
- *   "type": "car"
  * },
  *
  * represents a list of properties for an specific item named
@@ -101,10 +103,10 @@ export default class PropertiesValueMappingDefiniton {
     PropertyDefinitionSupportedType | PropertyDefinition {
     const value = this.rawData[key];
     const property =
-      (value as IPropertyDefinitionAlternativePropertyType).property;
+      (value as IPropertyDefinitionReferredPropertyValue).property;
     if (property) {
       return this.parentItemDefinition.getPropertyDefinitionFor(property, false);
     }
-    return value as PropertyDefinitionSupportedType;
+    return (value as IPropertyDefinitionExactPropertyValue).exactValue;
   }
 }

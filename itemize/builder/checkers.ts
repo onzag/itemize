@@ -11,19 +11,17 @@ import {
 import "source-map-support/register";
 import {
   IConditionalRuleSetRawJSONDataType,
-  IConditionalRuleSetRawJSONDataComponentType,
+  IConditionalRuleSetRawJSONDataIncludeType,
   IConditionalRuleSetRawJSONDataPropertyType,
 } from "../base/Root/Module/ItemDefinition/ConditionalRuleSet";
 import ItemDefinition, { IItemDefinitionRawJSONDataType, IPolicyValueRawJSONDataType } from "../base/Root/Module/ItemDefinition";
 import { IModuleRawJSONDataType, IRawJSONI18NDataType } from "../base/Root/Module";
 import PropertyDefinition, {
-  IPropertyDefinitionAlternativePropertyType,
   IPropertyDefinitionRawJSONDataType,
   PropertyInvalidReason,
+  IPropertyDefinitionReferredPropertyValue,
+  IPropertyDefinitionExactPropertyValue,
 } from "../base/Root/Module/ItemDefinition/PropertyDefinition";
-import {
-  PropertyDefinitionSupportedType,
-} from "../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Include";
 import { IPropertiesValueMappingDefinitonRawJSONDataType } from "../base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton";
 import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
@@ -39,17 +37,17 @@ export function checkConditionalRuleSet(
   // Let's try to search for the item definition for that given component
   // should be there at least to be valid, even if item instances are never
   // created
-  const component =
-    (rawData as IConditionalRuleSetRawJSONDataComponentType).component;
-  if (component &&
+  const include =
+    (rawData as IConditionalRuleSetRawJSONDataIncludeType).include;
+  if (include &&
     !ItemDefinition.getItemDefinitionRawFor(
       parentItemDefinition,
       parentModule,
-      component,
+      include,
     )) {
     throw new CheckUpError(
       "Conditional rule set item definition not available",
-      traceback.newTraceToBit("component"),
+      traceback.newTraceToBit("include"),
     );
   }
 
@@ -73,32 +71,35 @@ export function checkConditionalRuleSet(
     const valueToCheckAgainst = rawDataAsProperty.value;
     if (
       valueToCheckAgainst &&
-      (valueToCheckAgainst as IPropertyDefinitionAlternativePropertyType).property
+      (valueToCheckAgainst as IPropertyDefinitionReferredPropertyValue).property
     ) {
       const valueToCheckAgainstItemDefinition = ItemDefinition.getItemDefinitionRawFor(
         parentItemDefinition,
         parentModule,
-        (valueToCheckAgainst as IPropertyDefinitionAlternativePropertyType).property,
+        (valueToCheckAgainst as IPropertyDefinitionReferredPropertyValue).property,
         true,
       );
       if (!valueToCheckAgainstItemDefinition) {
         throw new CheckUpError(
           "Conditional rule set value invalid, cannot find property, " +
-            (valueToCheckAgainst as IPropertyDefinitionAlternativePropertyType).property,
+            (valueToCheckAgainst as IPropertyDefinitionReferredPropertyValue).property,
           traceback.newTraceToBit("value").newTraceToBit("property"),
         );
       }
-    } else {
+    } else if (
+      valueToCheckAgainst &&
+      (valueToCheckAgainst as IPropertyDefinitionExactPropertyValue).exactValue
+    ) {
       const invalidReason = PropertyDefinition.isValidValue(
         propDef,
-        valueToCheckAgainst as PropertyDefinitionSupportedType,
+        (valueToCheckAgainst as IPropertyDefinitionExactPropertyValue).exactValue,
         true,
       );
       if (invalidReason) {
         throw new CheckUpError(
           "Conditional rule set value invalid, reason " +
             rawDataAsProperty.property + ": " + invalidReason,
-          traceback.newTraceToBit("value"),
+          traceback.newTraceToBit("value").newTraceToBit("exactValue"),
         );
       }
     }
@@ -371,10 +372,10 @@ export function checkInclude(
   // check whether the item definition exists for this item
   // it must exist to be an item
   if (!ItemDefinition.getItemDefinitionRawFor(
-    parentItemDefinition, parentModule, rawData.name)) {
+    parentItemDefinition, parentModule, rawData.definition)) {
     throw new CheckUpError(
       "Missing item definition",
-      traceback.newTraceToBit("name"),
+      traceback.newTraceToBit("definition"),
     );
   }
 
@@ -418,7 +419,7 @@ export function checkInclude(
   }
 
   const referredItemDefinitionRaw = ItemDefinition.getItemDefinitionRawFor(
-    parentItemDefinition, parentModule, rawData.name);
+    parentItemDefinition, parentModule, rawData.definition);
 
   // Now we check whether this properties exist for sinkin
   if (rawData.sinkIn) {
@@ -535,20 +536,20 @@ export function checkPropertiesValueMappingDefiniton(
 
     const referredPropertyAsValueApplied =
       (propertyValueAppliedToTheReferred as
-        IPropertyDefinitionAlternativePropertyType);
+        IPropertyDefinitionReferredPropertyValue);
     // we must ensure it's not a referred property to do the check
     if (!referredPropertyAsValueApplied.property) {
       // And check whether the value is even valid
       const invalidReason = PropertyDefinition.isValidValue(
         propertyDefinitionOfTheReferredItem,
-        propertyValueAppliedToTheReferred as PropertyDefinitionSupportedType,
+        (propertyValueAppliedToTheReferred as IPropertyDefinitionExactPropertyValue).exactValue,
         true,
       );
       if (invalidReason) {
         throw new CheckUpError(
           `Property value for '${propertyIdOfTheReferredItem}' is invalid` +
           ` for referred '${referredItemDefinition.name}' : ${invalidReason}`,
-          traceback.newTraceToBit(propertyIdOfTheReferredItem),
+          traceback.newTraceToBit(propertyIdOfTheReferredItem).newTraceToBit("exactValue"),
         );
       }
     } else if (referredPropertyAsValueApplied.property !== "&this") {

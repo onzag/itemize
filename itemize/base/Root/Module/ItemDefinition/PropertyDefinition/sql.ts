@@ -265,20 +265,20 @@ export async function convertGQLValueToSQLValueForProperty(
  * Builds a sql search query from a given property definition, the data
  * coming from the search module, a sql prefix to use, and the knex builder
  * @param propertyDefinition the property definition in question
- * @param data the data coming from the search module, in such format
+ * @param args the args coming from the search module in such format
  * @param sqlPrefix a sql prefix to append say if we refer to an item
  * @param knexBuilder the knex building instance
  */
 export function buildSQLQueryForProperty(
   propertyDefinition: PropertyDefinition,
-  data: IGQLValue,
+  args: IGQLArgs,
   sqlPrefix: string,
-  knexBuilder: any,
+  knexBuilder: Knex.QueryBuilder,
   dictionary: string,
 ) {
   const sqlSearchFn = propertyDefinition.getPropertyDefinitionDescription().sqlSearch;
   sqlSearchFn(
-    data,
+    args,
     sqlPrefix,
     propertyDefinition.getId(),
     knexBuilder,

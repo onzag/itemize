@@ -1,3 +1,7 @@
+/**
+ * Contains the password type description
+ */
+
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLString } from "graphql";
 import { standardSQLOutFn, getStandardSQLFnFor } from "../sql";

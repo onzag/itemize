@@ -1,3 +1,7 @@
+/**
+ * Contains the integer type description
+ */
+
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLInt } from "graphql";
 import {

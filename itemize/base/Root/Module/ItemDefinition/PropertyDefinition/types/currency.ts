@@ -1,9 +1,12 @@
+/**
+ * Contains the currency type description
+ */
+
 import { currencies } from "../../../../../../imported-resources";
 import {
   IPropertyDefinitionSupportedType,
 } from "../types";
 import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
-import { IGQLValue } from "../../../../gql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_SUPPORTED_REAL,
@@ -18,6 +21,7 @@ import {
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
 import { ISQLTableRowValue } from "../../../../../Root/sql";
+import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 
 export interface IPropertyDefinitionSupportedCurrencyType {
   value: number;
@@ -63,30 +67,33 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
     return result;
   },
-  sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder) => {
+  sqlSearch: (args: IGQLArgs, sqlPrefix: string, id: string, knexBuilder) => {
     const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
     const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
     const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
 
-    if (typeof data[exactName] !== "undefined" && data[exactName] !== null) {
-      knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", data[exactName].currency);
-      knexBuilder.andWhere(sqlPrefix + id + "_VALUE", data[exactName].value);
-    } else if (data[exactName] === null) {
+    if (typeof args[exactName] !== "undefined" && args[exactName] !== null) {
+      const exactArg = args[exactName] as IGQLArgs;
+      knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", exactArg.currency as string);
+      knexBuilder.andWhere(sqlPrefix + id + "_VALUE", exactArg.value as number);
+    } else if (args[exactName] === null) {
       knexBuilder.andWhere(sqlPrefix + id + "_VALUE", null);
     }
 
-    if (typeof data[fromName] !== "undefined" && data[fromName] !== null) {
-      knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", data[fromName].currency);
-      knexBuilder.andWhere(sqlPrefix + id + "_VALUE", ">=", data[fromName].value);
+    if (typeof args[fromName] !== "undefined" && args[fromName] !== null) {
+      const fromArg = args[fromName] as IGQLArgs;
+      knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", fromArg.currency as string);
+      knexBuilder.andWhere(sqlPrefix + id + "_VALUE", ">=", fromArg.value as number);
     }
 
-    if (typeof data[toName] !== "undefined" && data[toName] !== null) {
-      knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", data[toName].currency);
-      knexBuilder.andWhere(sqlPrefix + id + "_VALUE", "<=", data[toName].value);
+    if (typeof args[toName] !== "undefined" && args[toName] !== null) {
+      const toArg = args[toName] as IGQLArgs;
+      knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", toArg.currency as string);
+      knexBuilder.andWhere(sqlPrefix + id + "_VALUE", "<=", toArg.value as number);
     }
   },
   sqlLocalSearch: (
-    args: IGQLValue,
+    args: IGQLArgs,
     rawData: IGQLValue,
     id: string,
     includeId?: string,

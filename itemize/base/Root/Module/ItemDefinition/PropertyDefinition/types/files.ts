@@ -1,3 +1,7 @@
+/**
+ * Contains the files type description
+ */
+
 import { IPropertyDefinitionSupportedType } from "../types";
 import { getStandardSQLFnFor, stardardSQLInWithJSONStringifyFn, standardSQLOutWithJSONParseFn } from "../sql";
 import { PropertyInvalidReason, PropertyDefinitionIncludedFileInfoType } from "../../PropertyDefinition";

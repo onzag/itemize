@@ -1,3 +1,9 @@
+/**
+ * This file contains the graphql utility functions for managing
+ * Includes that exist within item definitions, it doesn't contain
+ * the conversion function sql.ts does
+ */
+
 import { PREFIXED_CONCAT } from "../../../../../constants";
 import { GraphQLString, GraphQLNonNull, GraphQLInputObjectType, GraphQLObjectType } from "graphql";
 import {

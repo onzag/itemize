@@ -1,3 +1,7 @@
+/**
+ * Contains the location type description
+ */
+
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";

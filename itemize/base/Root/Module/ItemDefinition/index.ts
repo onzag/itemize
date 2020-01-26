@@ -602,7 +602,7 @@ export default class ItemDefinition {
     // contains the include with the given name
     // otherwise it's not worth to check for activity
     const possibleCandidates = this.includeInstances
-      .filter((i) => i.getName() === name);
+      .filter((i) => i.getItemDefinitionName() === name);
 
     // if there are no possible candidates return false
     if (!possibleCandidates.length) {

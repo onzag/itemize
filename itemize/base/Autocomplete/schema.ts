@@ -1,3 +1,15 @@
+/**
+ * This file represents the schema that is used against the autocomplete
+ * json files during the build process so as to ensure that the file
+ * is correct in shape and form
+ *
+ * Making changes to this file might cause breaking changes as old results
+ * won't compile, checkers.ts and index.ts are correlated
+ */
+
+// this is the single filter schema
+// and it represents a single filter
+// that is applied to based on autocomplete properties
 const singleFilterSchema = {
   $id: "SingleFilterSchema",
   type: "object",
@@ -7,6 +19,17 @@ const singleFilterSchema = {
   additionalProperties: false,
 };
 
+// example
+// {
+//    type: "value",
+//    i18n?: {
+//      en: "value translated",
+//      es: "value translated",
+//    },
+//    filter?: {
+//      random: "value",
+//    }
+// }
 const valueSchema = {
   $id: "ValueSchema",
   type: "object",
@@ -33,6 +56,16 @@ const valueSchema = {
   additionalProperties: false,
 };
 
+// this represents a whole filter group to filter
+// autocomplete values
+// {
+//   type: "filter",
+//   values?: bunch of values here...
+//   filters?: other filters groups of this same type...
+//   filter: {
+//     random: "value"
+//   }
+// }
 const filterSchema = {
   $id: "FilterSchema",
   type: "object",
@@ -60,6 +93,7 @@ const filterSchema = {
   required: ["type", "filter"],
 };
 
+// this is the parent autocomplete object
 export default {
   type: "object",
   definitions: {

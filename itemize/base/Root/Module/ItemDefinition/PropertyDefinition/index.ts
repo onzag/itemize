@@ -154,10 +154,15 @@ function nullIfUndefined<T>(value: T): T {
 }
 
 // OTHER EXPORTS
-
-export interface IPropertyDefinitionAlternativePropertyType {
+export interface IPropertyDefinitionExactPropertyValue {
+  exactValue: PropertyDefinitionSupportedType;
+}
+export interface IPropertyDefinitionReferredPropertyValue {
   property: string;
 }
+export type PropertyDefinitionValueType =
+  IPropertyDefinitionExactPropertyValue |
+  IPropertyDefinitionReferredPropertyValue;
 
 export type PropertyDefinitionCheckerFunctionType =
   (property: PropertyDefinition, value: PropertyDefinitionSupportedType, id: number) => Promise<boolean>;

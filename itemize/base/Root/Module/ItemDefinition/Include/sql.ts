@@ -1,3 +1,9 @@
+/**
+ * This file contains utility functionality that is necessary in order to
+ * setup includes into and out of the postgresql database as well
+ * as how to build the definition for the tables
+ */
+
 import { EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
 import {
   getSQLTableDefinitionForProperty,
@@ -7,9 +13,9 @@ import {
 } from "../PropertyDefinition/sql";
 import Include, { IncludeExclusionState } from "../Include";
 import { ISQLTableDefinitionType, ISQLTableRowValue } from "../../../sql";
-import { IGQLValue } from "../../../gql";
 import Knex from "knex";
 import ItemDefinition from "..";
+import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
 
 /**
  * Provides the table bit that is necessary to store include data
@@ -156,8 +162,8 @@ export async function convertGQLValueToSQLValueForInclude(
             itemDefinition,
             include,
             sinkingProperty,
-            data[include.getQualifiedIdentifier()],
-            (oldData && oldData[include.getQualifiedIdentifier()]) || null,
+            data[include.getQualifiedIdentifier()] as IGQLValue,
+            (oldData && oldData[include.getQualifiedIdentifier()] as IGQLValue) || null,
             knex,
             dictionary,
             prefix,
@@ -175,36 +181,51 @@ export async function convertGQLValueToSQLValueForInclude(
   return sqlResult;
 }
 
+/**
+ * Builds a sql query for an include
+ * @param include the include in question
+ * @param args the args as they come from the search module, specific for this item (not nested)
+ * @param knexBuilder the knex query builder
+ * @param dictionary the dictionary to use to build the search
+ */
 export function buildSQLQueryForInclude(
   include: Include,
-  data: IGQLValue,
+  args: IGQLArgs,
   knexBuilder: Knex.QueryBuilder,
   dictionary: string,
 ) {
+  // we need all these prefixes
   const prefix = include.getPrefixedQualifiedIdentifier();
   const exclusionStateQualifiedId = include.getQualifiedExclusionStateIdentifier();
-  const exclusionState = data[exclusionStateQualifiedId];
+  const expectedExclusionState = args[exclusionStateQualifiedId];
 
-  if (exclusionState === IncludeExclusionState.EXCLUDED) {
+  // if the expected exclusion state is to be excluded
+  if (expectedExclusionState === IncludeExclusionState.EXCLUDED) {
+    // we tell knex that is to be the case
     knexBuilder.andWhere(exclusionStateQualifiedId, IncludeExclusionState.EXCLUDED);
   } else {
+    // otherwise if we are expecting something else like ANY and INCLUDED
     knexBuilder.andWhere((builder) => {
-      if (exclusionState !== IncludeExclusionState.EXCLUDED) {
-        builder.andWhere((secondBuilder) => {
-          secondBuilder.where(exclusionStateQualifiedId, IncludeExclusionState.INCLUDED);
+      // we extract a subquery builder
+      builder.andWhere((secondBuilder) => {
+        // and make a where query for all the properties
+        secondBuilder.where(exclusionStateQualifiedId, IncludeExclusionState.INCLUDED);
 
-          const itemData = data[include.getQualifiedIdentifier()];
-          include.getSinkingProperties().forEach((pd) => {
-            if (!pd.isSearchable()) {
-              return;
-            }
+        // get the args for that specific include
+        const itemArgs = args[include.getQualifiedIdentifier()] as IGQLArgs;
 
-            buildSQLQueryForProperty(pd, itemData, prefix, secondBuilder, dictionary);
-          });
+        // and apply the search for all the sinking properties
+        include.getSinkingProperties().forEach((pd) => {
+          if (!pd.isSearchable()) {
+            return;
+          }
+          buildSQLQueryForProperty(pd, itemArgs, prefix, secondBuilder, dictionary);
         });
-      }
+      });
 
-      if (exclusionState === IncludeExclusionState.ANY) {
+      // if we have an specific exclusion state that can be ANY
+      if (expectedExclusionState === IncludeExclusionState.ANY) {
+        // then we add the excluded state to the subquery
         builder.orWhere(prefix + EXCLUSION_STATE_SUFFIX, IncludeExclusionState.EXCLUDED);
       }
     });
