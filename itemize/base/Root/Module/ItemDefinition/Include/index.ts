@@ -3,6 +3,8 @@
  * managing as well as the values applied and naming conventions for includes
  *
  * Related files schema.ts and checkers.ts
+ *
+ * @packageDocumentation
  */
 
 import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } from "..";
@@ -15,23 +17,54 @@ import PropertiesValueMappingDefiniton, { IPropertiesValueMappingDefinitonRawJSO
 import { INCLUDE_PREFIX, PREFIX_BUILD, EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
 import { IGQLRequestFields, IGQLValue } from "../../../../../gql-querier";
 
+/**
+ * These represent the enum of the include and exclusion state of an include
+ */
 export enum IncludeExclusionState {
   EXCLUDED = "EXCLUDED",
   INCLUDED = "INCLUDED",
   ANY = "ANY",
 }
 
+/**
+ * This represents the state of an include as it is fetched via
+ * the getState function (with or without external checking)
+ */
 export interface IIncludeState {
+  /**
+   * The exclusion state as specified, an ANY exclusion state only occurs
+   * in ternary mode
+   */
   exclusionState: IncludeExclusionState;
+  /**
+   * Whether the exclusion can be set according to the current rules
+   */
   canExclusionBeSet: boolean;
+  /**
+   * The include identifier from the item definition
+   */
   includeId: string;
+  /**
+   * The item definition name it contains (not its parent)
+   */
   itemDefinitionName: string;
+  /**
+   * The item definition state it contains (not its parent)
+   */
   itemDefinitionState: IItemDefinitionStateType;
+  /**
+   * The state specified exclusion state by the user or another interaction
+   */
   stateExclusion: IncludeExclusionState;
+  /**
+   * Whether this state has been modified by any action, either apply or set
+   */
   stateExclusionModified: boolean;
 }
 
-// this is what our raw json looks like
+/**
+ * This is the raw json that comes from the json file that defines the schema
+ */
 export interface IIncludeRawJSONDataType {
   id: string;
   definition: string;
@@ -90,9 +123,17 @@ export interface IIncludeRawJSONDataType {
  * An item might also be a group of items with a gate
  */
 export default class Include {
-  // The basics
+  /**
+   * The raw data that comes from the compiled schema
+   */
   public rawData: IIncludeRawJSONDataType;
+  /**
+   * The parent item definition of this include
+   */
   public parentItemDefinition: ItemDefinition;
+  /**
+   * The parent module where this include sits
+   */
   public parentModule: Module;
 
   // graphql helper
@@ -105,20 +146,43 @@ export default class Include {
   // tslint:disable-next-line: variable-name
   public _gqlOutObjOpt: any;
 
-  // the data that comes from the raw json is to be processed here
-  private itemDefinition?: ItemDefinition;
+  /**
+   * The item definition the include refers to
+   */
+  private itemDefinition: ItemDefinition;
+  /**
+   * The excluded if rules (compiled)
+   */
   private excludedIf?: ConditionalRuleSet;
+  /**
+   * The allowance of exclusion (compiled)
+   */
   private canUserExcludeIf?: ConditionalRuleSet;
+  /**
+   * The default exclusion state rule (compiled)
+   */
   private defaultExcludedIf?: ConditionalRuleSet;
 
-  // solo item specific attributes
+  /**
+   * Enforced properties (compiled)
+   */
   private enforcedProperties?: PropertiesValueMappingDefiniton;
+  /**
+   * Predefined properties (compiled)
+   */
   private predefinedProperties?: PropertiesValueMappingDefiniton;
 
-  // representing the state of the class
+  /**
+   * This is the state exclusion of the class, not the defaulted, not
+   * the enforced, but the stateful
+   */
   private stateExclusion: {
     [id: number]: IncludeExclusionState,
   };
+  /**
+   * This also shows whether the state has been modified, either
+   * by the user or a value has been applied
+   */
   private stateExclusionModified: {
     [id: number]: boolean,
   };
@@ -139,6 +203,11 @@ export default class Include {
 
     this.rawData = rawJSON;
 
+    // lets get an instance for the item definition for this
+    // item, if there's one, and let's detach it
+    this.itemDefinition = parentItemDefinition
+      .getDirectlyAvailableItemDefinitionInContextFor(rawJSON.definition).getNewInstance();
+
     // the enforced properties list
     this.enforcedProperties = rawJSON.enforcedProperties &&
       new PropertiesValueMappingDefiniton(rawJSON.enforcedProperties,
@@ -149,13 +218,8 @@ export default class Include {
       new PropertiesValueMappingDefiniton(rawJSON.predefinedProperties,
         parentItemDefinition, this.itemDefinition);
 
-    // lets get an instance for the item definition for this
-    // item, if there's one, and let's detach it
-    this.itemDefinition = rawJSON.definition && parentItemDefinition
-      .getDirectlyAvailableItemDefinitionInContextFor(rawJSON.definition).getNewInstance();
     // set the enforced and predefined properties overwrites
     // if needed to
-
     if (this.enforcedProperties) {
       this.enforcedProperties.getPropertyMap().forEach((p) => {
         this.itemDefinition.getPropertyDefinitionFor(p.id, true)
@@ -207,6 +271,10 @@ export default class Include {
     return this.rawData.sinkIn || [];
   }
 
+  /**
+   * Propvides a single sinking property for a given id
+   * @param id the property id
+   */
   public getSinkingPropertyFor(id: string) {
     if (!this.rawData.sinkIn.includes(id)) {
       throw new Error("Invalid sinking property: " + id);
@@ -224,6 +292,16 @@ export default class Include {
       .map((propertyId) => this.itemDefinition.getPropertyDefinitionFor(propertyId, false));
   }
 
+  /**
+   * Checks the role access for a given include to be accessed given a IO action
+   * @param action the action that wants to be executed
+   * @param role the role of the user wanting to execute that action
+   * @param userId the user id of the user wanting to execute (can be null)
+   * @param ownerUserId the owner of the user wanting to execute (or UNSPECIFIED_OWNER)
+   * @param requestedFields the requested fields that are requested from the include these basically
+   * represent the sinking properties where the IO action is being applied
+   * @param throwError whether to throw an error in failure
+   */
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
@@ -488,6 +566,10 @@ export default class Include {
     return this.rawData;
   }
 
+  /**
+   * Returns true if the item contains a property that needs to be
+   * extenrally checked, either an autocompleted property or an indexed one
+   */
   public containsAnExternallyCheckedProperty(): boolean {
     return this.itemDefinition.containsAnExternallyCheckedProperty(this.rawData.sinkIn, true);
   }

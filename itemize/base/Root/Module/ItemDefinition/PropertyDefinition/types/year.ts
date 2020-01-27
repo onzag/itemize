@@ -1,5 +1,7 @@
 /**
  * Contains the year type description
+ *
+ * @packageDocumentation
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
@@ -28,7 +30,14 @@ import {
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 
+/**
+ * Years are simple integers
+ */
 export type PropertyDefinitionSupportedYearType = number;
+
+/**
+ * The type describes how the year type behaves in the app
+ */
 const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLInt,
   // years can be set as a number

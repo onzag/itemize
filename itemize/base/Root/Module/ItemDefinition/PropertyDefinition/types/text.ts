@@ -1,5 +1,7 @@
 /**
  * Contains the text type description
+ *
+ * @packageDocumentation
  */
 
 import {
@@ -24,7 +26,14 @@ import Knex from "knex";
 import { DOMWindow, DOMPurify } from "../../../../../../util";
 import { IGQLValue, IGQLArgs } from "../../../../../../gql-querier";
 
+/**
+ * The text is described by a string
+ */
 export type PropertyDefinitionSupportedTextType = string;
+
+/**
+ * The type describes how the text type behaves in the app, this includes rich text
+ */
 const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   nullableDefault: "",

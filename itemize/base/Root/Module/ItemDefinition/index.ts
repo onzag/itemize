@@ -1069,7 +1069,7 @@ export default class ItemDefinition {
       if (throwError) {
         // if you are in guest mode, it is considered, that if you
         // fail, it's because you missed to login
-        const notLoggedInWhenShould = role === GUEST_METAROLE;
+        const notLoggedInWhenShould = role === GUEST_METAROLE && rolesWithAccess.length;
         const errorMightHaveBeenAvoidedIfOwnerSpecified = ownerUserId === UNSPECIFIED_OWNER &&
           rolesWithAccess.includes(OWNER_METAROLE);
         let errorMessage = `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +

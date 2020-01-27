@@ -1,5 +1,7 @@
 /**
  * Contains the number type description
+ *
+ * @packageDocumentation
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
@@ -29,7 +31,14 @@ import {
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 
+/**
+ * The number type is described by a simple number
+ */
 export type PropertyDefinitionSupportedNumberType = number;
+
+/**
+ * The type of the number describe how numbers behave in the app
+ */
 const typeValue: IPropertyDefinitionSupportedType = {
   // a number is just a number can be integer or decimal
   json: "number",

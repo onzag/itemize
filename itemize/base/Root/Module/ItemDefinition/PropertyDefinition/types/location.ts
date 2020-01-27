@@ -1,5 +1,7 @@
 /**
  * Contains the location type description
+ *
+ * @packageDocumentation
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
@@ -13,7 +15,14 @@ import { ISQLTableRowValue } from "../../../../sql";
 import { IGQLValue, IGQLArgs } from "../../../../../../gql-querier";
 import { IPropertyDefinitionSupportedUnitType } from "./unit";
 
-// https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+/**
+ * The haversine formula extracted from stackoverflow
+ * https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+ * @param lat1 the latitude 1
+ * @param lon1 the longitude 1
+ * @param lat2 the latitude 2
+ * @param lon2 the longitude 2
+ */
 function getDistanceFromLatLonInMeters(
   lat1: number,
   lon1: number,
@@ -32,10 +41,18 @@ function getDistanceFromLatLonInMeters(
   return d * 1000;
 }
 
+/**
+ * Convert degrees to radians
+ * @param deg the degrees in numbers
+ */
 function deg2rad(deg: number) {
   return deg * (Math.PI / 180);
 }
 
+/**
+ * The location is described by an object with longitude, latitude,
+ * a text description and an alternative text description
+ */
 export interface IPropertyDefinitionSupportedLocationType {
   lng: number;
   lat: number;
@@ -43,6 +60,9 @@ export interface IPropertyDefinitionSupportedLocationType {
   atxt: string;
 }
 
+/**
+ * The type describes the behaviour of the location in the app
+ */
 const typeValue: IPropertyDefinitionSupportedType = {
   gql: "PROPERTY_TYPE__Location",
   gqlFields: {

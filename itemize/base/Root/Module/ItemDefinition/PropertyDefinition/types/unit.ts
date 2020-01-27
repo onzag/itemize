@@ -1,5 +1,7 @@
 /**
  * Contains the unit type description
+ *
+ * @packageDocumentation
  */
 
 import {
@@ -25,6 +27,11 @@ import Knex from "knex";
 import { ISQLTableRowValue } from "../../../../sql";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 
+/**
+ * Units are described by a value and a unit, in either SI
+ * or imperial system, the normalized value is always in SI
+ * in a normalized unit as specified
+ */
 export interface IPropertyDefinitionSupportedUnitType {
   value: number;
   unit: string;
@@ -32,6 +39,9 @@ export interface IPropertyDefinitionSupportedUnitType {
   normalizedUnit: string;
 }
 
+/**
+ * The description of the unit type as it behaves in the app
+ */
 const typeValue: IPropertyDefinitionSupportedType = {
   gql: "PROPERTY_TYPE__Unit",
   gqlFields: {

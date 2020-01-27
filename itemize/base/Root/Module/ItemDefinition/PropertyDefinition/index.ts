@@ -1,3 +1,10 @@
+/**
+ * This file contains the property definition that defines all the interactions
+ * that occur within a property of an item
+ *
+ * @packageDocumentation
+ */
+
 import ItemDefinition, { ItemDefinitionIOActions } from "..";
 import ConditionalRuleSet,
   { IConditionalRuleSetRawJSONDataType } from "../ConditionalRuleSet";
@@ -18,8 +25,9 @@ import equals from "deep-equal";
 import { ISingleFilterRawJSONDataType } from "../../../../Autocomplete";
 import { IGQLFile } from "../../../../../gql-querier";
 
-export type PropertyDefinitionIncludedFileInfoType = IGQLFile;
-
+/**
+ * These are the main errors a property is able to give
+ */
 export enum PropertyInvalidReason {
   INVALID_VALUE = "INVALID_VALUE",
   TOO_LARGE = "TOO_LARGE",
@@ -27,125 +35,283 @@ export enum PropertyInvalidReason {
   TOO_MANY_DECIMALS = "TOO_MANY_DECIMALS",
   TOO_FEW_DECIMALS = "TOO_FEW_DECIMALS",
   NOT_NULLABLE = "NOT_NULLABLE",
+  // some properties have subtypes, eg. string email, this comes with subtypes when they are invalid
   INVALID_SUBTYPE_VALUE = "INVALID_SUBTYPE_VALUE",
+  // come mainly in search modes for the from and to ranged search mode
   FROM_LARGER_THAN_TO = "FROM_LARGER_THAN_TO",
   TO_SMALLER_THAN_FROM = "TO_SMALLER_THAN_FROM",
+  // comes for values where unique is required
   NOT_UNIQUE = "NOT_UNIQUE",
 }
 
+/**
+ * A conditition for conditional values
+ */
 export interface IPropertyDefinitionRawJSONRuleDataType {
   value: PropertyDefinitionSupportedType;
   if: IConditionalRuleSetRawJSONDataType;
 }
 
+/**
+ * A condition to give custom errors when the condition holds true
+ */
 export interface IPropertyDefinitionRawJSONInvalidRuleDataType {
   error: string;
   if: IConditionalRuleSetRawJSONDataType;
 }
 
-export type PropertyDefinitionRarityLevelsType =
-  "standard" | "moderate" | "rare";
-
+/**
+ * this is what a raw property definition looks like
+ */
 export interface IPropertyDefinitionRawJSONDataType {
-  // the property identifier
+  /**
+   * the property identifier
+   */
   id: string;
-  // the locale data, we don't know what it is
-  // the structure is defined in the constants
+  /**
+   * the locale data, we don't know what it is
+   * the structure is defined in the constants
+   */
   i18nData?: {
     [locale: string]: any,
   };
-  // the type of the property
+  /**
+   * the type of the property
+   */
   type: PropertyDefinitionSupportedTypeName;
+  /**
+   * An optional subtype
+   */
   subtype?: string;
+  /**
+   * The minimum accepted value (numeric types)
+   */
   min?: number;
+  /**
+   * The maximum accepted value (numeric types)
+   */
   max?: number;
+  /**
+   * The minimum accepted lenght (composed types)
+   */
   minLength?: number;
+  /**
+   * The maximum accepted lenght (composed types)
+   */
   maxLength?: number;
+  /**
+   * The max accepted decimal count (numeric types)
+   */
   maxDecimalCount?: number;
+  /**
+   * The min accepted decimal count (numeric types)
+   */
   minDecimalCount?: number;
 
-  // values for the property set
+  /**
+   * values for the property set
+   */
   values?: PropertyDefinitionSupportedType[];
-  // whether it is unique
+  /**
+   * whether it is unique, this is an external check
+   */
   unique?: boolean;
-  // whether it can be null or not
+  /**
+   * whether it can be null or not
+   */
   nullable?: boolean;
-  // Makes the value be null if hidden
-  // doe not perform checks so it makes it valid
+  /**
+   * Makes the value be null if hidden
+   * does not perform checks so it makes it valid
+   */
   nullIfHidden?: boolean;
-  // Makes the field hidden if value is enforced
+  /**
+   * Makes the field hidden if value is enforced
+   */
   hiddenIfEnforced?: boolean;
-  // hidden does not show at all
+  /**
+   * hidden does not show at all
+   */
   hidden?: boolean;
-  // autocomplete is an endpoint of some sort that requests
-  // data for autocomplete
+  /**
+   * autocomplete is an endpoint of some sort that requests
+   * data for autocomplete
+   */
   autocomplete?: string;
-  // uses a property attribute
+  /**
+   * uses a property attribute, the keyname
+   * is the filter name, and the string is the property name
+   */
   autocompleteFilterFromProperty?: {
     [keyName: string]: string,
   };
-  // whether it's enforced or not
+  /**
+   * whether it's enforced or not, this is an external check
+   */
   autocompleteIsEnforced?: boolean;
-  // whether the autocomplete supports prefills
-  autocompleteSupportsPrefills?: boolean;
-  // whether the autocomplete supports locale
+  /**
+   * whether the autocomplete supports locale
+   */
   autocompleteSupportsLocale?: boolean;
-  // html style autocomplete
+  /**
+   * html style autocomplete, mainly used for browser level
+   * autocompletition
+   */
   htmlAutocomplete?: string;
-  // default value
+  /**
+   * default value
+   */
   default?: PropertyDefinitionSupportedType;
+  /**
+   * default value if with conditions
+   */
   defaultIf?: IPropertyDefinitionRawJSONRuleDataType[];
-  // invalid value
+  /**
+   * conditional custom invalid value
+   */
   invalidIf?: IPropertyDefinitionRawJSONInvalidRuleDataType[];
-  // enforced values
+  /**
+   * enforced values
+   */
   enforcedValues?: IPropertyDefinitionRawJSONRuleDataType[];
+  /**
+   * Single enforced value
+   */
   enforcedValue?: PropertyDefinitionSupportedType;
-  // hidden if conditional
+  /**
+   * hidden if conditional
+   */
   hiddenIf?: IConditionalRuleSetRawJSONDataType;
-  // search level
+  /**
+   * whether it is searchable or not
+   */
   searchable?: boolean;
-  // disable ranged search
+  /**
+   * disable ranged search and only allow exact
+   */
   disableRangedSearch?: boolean;
-  // disable retrieval, property value is never retrieved
-  // it can only be set or updated
+  /**
+   * disable retrieval, property value is never retrieved
+   * it can only be set or updated, good for sensitive data
+   * like passwords
+   */
   disableRetrieval?: boolean;
-  // Special properties
+  /**
+   * Special properties that are assigned in the type behaviour
+   * description, you set the value here
+   */
   specialProperties: {
     [key: string]: string | boolean | number;
   };
-  // whether nulls are coerced into their default value
+  /**
+   * whether nulls are coerced into their default value this is useful
+   * when creating values where the user is expected to do a partial creation as
+   * he is not allowed access to certain property, eg user role, so it is ensured
+   * that the null value will be coerced into the default
+   */
   coerceNullsIntoDefault?: boolean;
 
-  // role permissions
+  /**
+   * Read role permissions
+   */
   readRoleAccess?: string[];
+  /**
+   * create role permissions
+   */
   createRoleAccess?: string[];
+  /**
+   * Edit role permissions
+   */
   editRoleAccess?: string[];
 }
 
+/**
+ * this is the rule once compiled, notice that it's not raw json anymore
+ */
 export interface IPropertyDefinitionRuleDataType {
   value: PropertyDefinitionSupportedType;
   if: ConditionalRuleSet;
 }
 
+/**
+ * This is the invalid rule once compiled
+ */
 export interface IPropertyDefinitionInvalidRuleDataType {
   error: string;
   if: ConditionalRuleSet;
 }
 
+/**
+ * This is the state you receive from a property once you request it
+ */
 export interface IPropertyDefinitionState {
+  /**
+   * whether this value was user set
+   */
   userSet: boolean;
+  /**
+   * whether it represents a default value (it is not user set in this case)
+   */
   default: boolean;
+  /**
+   * whether the value is enforced (by enforcedProperties or other means), not user set as well
+   */
   enforced: boolean;
+  /**
+   * whether the property is mean to be hidden and not interacted by the user
+   */
   hidden: boolean;
+  /**
+   * whether the value is valid
+   */
   valid: boolean;
+  /**
+   * the reason of why it is not valid (it can also be a custom reason)
+   */
   invalidReason: PropertyInvalidReason | string;
+  /**
+   * the value that the property currently has
+   */
   value: PropertyDefinitionSupportedType;
+  /**
+   * an internal value that can be used for state management
+   * usually used only by react in order to keep its internal state, internal
+   * values are not always guaranteed to come as they are in sync with the value
+   * an internal value is null if it considers itself not in sync in which case
+   * the app should still be able to display something from the value
+   */
   internalValue: any;
+  /**
+   * the state value, the state value consists on the value that is set up
+   * in the state, in most case it is equal to the value; for example in case of
+   * a default value, the state value is null, but the actual value is something else
+   * usually the internal value is correlated to the state value
+   */
   stateValue: any;
+  /**
+   * whether the state value has been modified by any external force, either programatically
+   * or not, this will usually be true for any value other than null, usually becomes true
+   * once the field is touched even once
+   */
   stateValueModified: boolean;
+  /**
+   * unlike state value modified, manually set values are considered manually set once the
+   * value has been updating using the setCurrentValue function rather than applyValue this means
+   * applyValue is used when loading values, whereas setCurrentValue is used for user input
+   * this means you can tell appart modifications of the state value from either computer
+   * or user input as long as it was used accordingly
+   */
+  stateValueHasBeenManuallySet: boolean;
+  /**
+   * the property id in question
+   */
   propertyId: string;
 }
 
+/**
+ * Helper functions returns null if the value is undefined
+ * @param value the value, whatever it is
+ */
 function nullIfUndefined<T>(value: T): T {
   if (typeof value === "undefined") {
     return null;
@@ -153,29 +319,54 @@ function nullIfUndefined<T>(value: T): T {
   return value;
 }
 
-// OTHER EXPORTS
+/**
+ * This represents anything that wants to refer to a property value
+ * in a way that it is an exact value, it's used in conditions to apply
+ * a value to a property
+ */
 export interface IPropertyDefinitionExactPropertyValue {
   exactValue: PropertyDefinitionSupportedType;
 }
+/**
+ * This is the same as before but the value is instead another property
+ * this is also used in conditions
+ */
 export interface IPropertyDefinitionReferredPropertyValue {
   property: string;
 }
+/**
+ * And this is combined
+ */
 export type PropertyDefinitionValueType =
   IPropertyDefinitionExactPropertyValue |
   IPropertyDefinitionReferredPropertyValue;
 
+/**
+ * Represents the external checkers that are used to
+ * check index and autocomplete values
+ */
 export type PropertyDefinitionCheckerFunctionType =
   (property: PropertyDefinition, value: PropertyDefinitionSupportedType, id: number) => Promise<boolean>;
 
+/**
+ * Performs the check of an unique index property against
+ * the server side
+ * @param property the property in question
+ * @param value the value of that property currently
+ * @param id the slot id
+ */
 async function clientSideIndexChecker(
   property: PropertyDefinition,
   value: PropertyDefinitionSupportedType,
   id: number,
 ) {
+  // null values automatically pass
   if (value === null) {
     return true;
   }
 
+  // we are using the cache, the client side has a cache because user input might
+  // be changing all the time and we only want to chek changes
   if (
     property.stateLastUniqueCheck[id] &&
     (property.stateLastUniqueCheck[id].value === value || equals(property.stateLastUniqueCheck[id].value, value))
@@ -183,10 +374,16 @@ async function clientSideIndexChecker(
     return property.stateLastUniqueCheck[id].valid;
   }
 
+  // now we need the qualified name of the item definition or module
+  // where this property is
   const qualifiedParentName = property.isExtension() ?
     property.getParentModule().getQualifiedPathName() :
     property.getParentItemDefinition().getQualifiedPathName();
+
+  // and we call the index check function that should be present on the server side
+  // /rest endpoint, this is not a graphql endpoint, it's just rest
   try {
+    // This should never be cached, indexes might change on the fly
     const result = await fetch("/rest/index-check/" + qualifiedParentName + "/" + property.getId(), {
       method: "POST",
       cache: "no-cache",
@@ -198,29 +395,50 @@ async function clientSideIndexChecker(
         id,
       }),
     });
+
+    // if we get something and it's a good json, this is a simple boolean
     const output = await result.json();
+    // we store it in the property cache
     property.stateLastUniqueCheck[id] = {
       valid: !!output,
       value,
     };
+    // and return that value
     return !!output;
   } catch (err) {
+    // if we fail to fetch we return true, eg, no internet
+    // we cannot check
     return true;
   }
 }
 
+/**
+ * Performs the check of an autocomplete string property
+ * to see whether its value is valid, you might wonder why
+ * this is necessary if the values are autocompleted anyway but
+ * this is because the user might type too fast and get the list out of sync
+ * or just not choose from the list so for sure we should check
+ * @param property the property in question
+ * @param value the value the user put
+ * @param id the slot id
+ */
 async function clientSideAutocompleteChecker(
   property: PropertyDefinition,
   value: PropertyDefinitionSupportedType,
   id: number,
 ) {
+  // null values are automatically true
   if (value === null) {
     return true;
   }
 
+  // now we need the autocomplete filters according to the property
+  // these are related to other properties
   const filters = property.getAutocompletePopulatedFiltersFor(id);
+  // and we get the autocomplete id that is being used
   const autocompleteId = property.getAutocompleteId();
 
+  // just like the index we might have a cache in place
   if (
     property.stateLastAutocompleteCheck[id] &&
     property.stateLastAutocompleteCheck[id].value === value &&
@@ -230,6 +448,9 @@ async function clientSideAutocompleteChecker(
   }
 
   try {
+    // autocomplete requests can and should be cached this is the reason
+    // the request is done via a GET request rather than a post
+    // the sw-cacheable tells the service worker to cache its response
     const result =
       await fetch("/rest/autocomplete-check/" + autocompleteId +
         "?body=" + encodeURIComponent(JSON.stringify({
@@ -242,6 +463,10 @@ async function clientSideAutocompleteChecker(
           },
         },
       );
+
+    // Note that whether the autocomplete uses or not i18n is not
+    // checked in here, the value is the the value that the user might
+    // not see, so we just want to ensure that value is right
     const output = await result.json();
     property.stateLastAutocompleteCheck[id] = {
       valid: !!output,
@@ -250,6 +475,7 @@ async function clientSideAutocompleteChecker(
     };
     return !!output;
   } catch (err) {
+    // same we return true if we fail to check
     return true;
   }
 }
@@ -262,6 +488,11 @@ export default class PropertyDefinition {
   public static indexChecker: PropertyDefinitionCheckerFunctionType = clientSideIndexChecker;
   public static autocompleteChecker: PropertyDefinitionCheckerFunctionType = clientSideAutocompleteChecker;
 
+  /**
+   * A static method that provides the policy prefix for a given policy name and type
+   * @param policyType the policy type
+   * @param policyName the policy name
+   */
   public static getQualifiedPolicyPrefix(policyType: string, policyName: string) {
     return PREFIX_BUILD(
       POLICY_PREFIXES[policyType] + policyName,
@@ -313,78 +544,127 @@ export default class PropertyDefinition {
     if (definition.json && typeof value !== definition.json) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
+
+    // if this is a graphql list
     if (definition.gqlList) {
+      // then we check if it's an array
       if (!Array.isArray(value)) {
+        // if it's not is invalid
         return PropertyInvalidReason.INVALID_VALUE;
       }
+
+      // if this is specified as a file content array data
       if (definition.gqlAddFileToFields) {
-        if (!(value as any).every((v: PropertyDefinitionIncludedFileInfoType) => {
+        // we have to do this madness for every file
+        if (!value.every((v: IGQLFile) => {
+          // check that all the types match
           return typeof v.id === "string" &&
             typeof v.name === "string" &&
             typeof v.type === "string" &&
             typeof v.url === "string" &&
             typeof v.size === "number" &&
+            // check that the file size isn't too large
             v.size <= MAX_FILE_SIZE &&
             (
+              // check that the source is either a promise (aka a readable stream)
               v.src === null ||
               typeof v.src === "undefined" ||
               (v.src as Promise<any>).then ||
+              // or check that the source is a file
               (
                 typeof File !== "undefined" &&
                 v.src instanceof File
               )
             );
         })) {
+          // if any of those checks fail then it's invalid
           return PropertyInvalidReason.INVALID_VALUE;
         }
       }
+
+    // Otherwise if we are adding the file info, but it's not an array
     } else if (definition.gqlAddFileToFields) {
+      // we get is casted as a file
+      const valueAsIGQLFile: IGQLFile = value as unknown as IGQLFile;
+
+      // and now we got to check if any of these, does not match
+      // we are doing the opposite we did before with .every
       if (
-        typeof (value as any).id !== "string" ||
-        typeof (value as any).name !== "string" ||
-        typeof (value as any).type !== "string" ||
-        typeof (value as any).url !== "string" ||
-        typeof (value as any).size !== "number" ||
-        (value as any).size > MAX_FILE_SIZE ||
+        // if any type does not match
+        typeof valueAsIGQLFile.id !== "string" ||
+        typeof valueAsIGQLFile.name !== "string" ||
+        typeof valueAsIGQLFile.type !== "string" ||
+        typeof valueAsIGQLFile.url !== "string" ||
+        typeof valueAsIGQLFile.size !== "number" ||
+        // or file is too large
+        valueAsIGQLFile.size > MAX_FILE_SIZE ||
+          // or the source is not null and not undefined
+          // and it's not a promise and it's not a file
           (
-            (value as any).src !== null &&
-            typeof value !== "undefined" &&
-            !(value as any).src.then && (
+            valueAsIGQLFile.src !== null &&
+            typeof valueAsIGQLFile !== "undefined" &&
+            !(valueAsIGQLFile.src as Promise<any>).then && (
               typeof File === "undefined" ||
-              !((value as any).src instanceof File)
+              !(valueAsIGQLFile.src instanceof File)
             )
           )
       ) {
+        // This means it's an invalid IGQL file structure
         return PropertyInvalidReason.INVALID_VALUE;
       }
     }
+
+    // if we have a validate function
     if (definition.validate) {
+      // run it
       const invalidReason = definition.validate(
         value,
         propertyDefinitionRaw.subtype,
       );
+      // if it gives an invalid reason
       if (invalidReason) {
+        // return it
         return invalidReason;
       }
     }
 
-    // Do the fancy checks
-    if (typeof propertyDefinitionRaw.min !== "undefined" &&
-      ((value as any).value ||
-        value) < propertyDefinitionRaw.min) {
+    // Do the fancy checks this checker will either use
+    // the .value property or the whole value itself
+    let valueToCheck: string | number = value as any;
+    if (typeof (value as any).value !== "undefined") {
+      valueToCheck = (value as any).value;
+    }
+
+    // TOO_SMALL check
+    if (
+      typeof propertyDefinitionRaw.min !== "undefined" &&
+      valueToCheck < propertyDefinitionRaw.min
+    ) {
       return PropertyInvalidReason.TOO_SMALL;
-    } else if (typeof propertyDefinitionRaw.max !== "undefined" &&
-      ((value as any).value ||
-        value) > propertyDefinitionRaw.max) {
+    // TOO_LARGE check
+    } else if (
+      typeof propertyDefinitionRaw.max !== "undefined" &&
+      valueToCheck > propertyDefinitionRaw.max
+    ) {
       return PropertyInvalidReason.TOO_LARGE;
-    } else if (typeof propertyDefinitionRaw.minLength !== "undefined" &&
-      (value as string).length < propertyDefinitionRaw.minLength) {
+    // TO_SMALL check again but lenght based
+    } else if (
+      typeof propertyDefinitionRaw.minLength !== "undefined" &&
+      (valueToCheck as string).length < propertyDefinitionRaw.minLength
+    ) {
       return PropertyInvalidReason.TOO_SMALL;
-    } else if (typeof propertyDefinitionRaw.maxDecimalCount !== "undefined" ||
-      typeof propertyDefinitionRaw.minDecimalCount !== "undefined") {
+    // Now time to count decimals
+    } else if (
+      typeof propertyDefinitionRaw.maxDecimalCount !== "undefined" ||
+      typeof propertyDefinitionRaw.minDecimalCount !== "undefined"
+    ) {
+
+      // we split the value to string
       const splittedDecimals =
-        ((value as any).value || value)
+        valueToCheck
         .toString().split(".");
+
+      // now we count the decimals
       if (
         typeof propertyDefinitionRaw.maxDecimalCount !== "undefined" && splittedDecimals[1] &&
         splittedDecimals[1].length > propertyDefinitionRaw.maxDecimalCount
@@ -398,31 +678,41 @@ export default class PropertyDefinition {
       }
     }
 
-    // Special length check
+    // Special length check for text, string and arrays
     if (
       typeof propertyDefinitionRaw.maxLength !== "undefined" ||
       typeof propertyDefinitionRaw.minLength !== "undefined"
     ) {
+      // we make the count
       let count: number;
+      // and check if its rich text
       const isRichText = propertyDefinitionRaw.type === "text" && propertyDefinitionRaw.subtype === "html";
+      // if it's an array, we use the array length
       if (Array.isArray(value)) {
         count = value.length;
       } else if (!isRichText) {
+        // if it's not rich text we just count the characters
         count = value.toString().length;
       } else {
+        // otherwise we need to create a dummy element and count the characters
         const dummyElement = DOMWindow.document.createElement("template");
         dummyElement.innerHTML = value.toString();
         count = dummyElement.textContent.length;
+
+        // Something that happens with quilljs
         if (dummyElement.querySelector(".ql-cursor")) {
           count--;
         }
       }
 
+      // if we have a max length we throw an error if we
+      // supass it with the count
       if (
         typeof propertyDefinitionRaw.maxLength !== "undefined" &&
         count > propertyDefinitionRaw.maxLength
       ) {
         return PropertyInvalidReason.TOO_LARGE;
+      // also with the minimum
       } else if (
         typeof propertyDefinitionRaw.minLength !== "undefined" &&
         count < propertyDefinitionRaw.minLength
@@ -431,41 +721,65 @@ export default class PropertyDefinition {
       }
     }
 
+    // return no error
     return null;
   }
 
+  // the raw data for the property definition
   public rawData: IPropertyDefinitionRawJSONDataType;
+  // module
   private parentModule: Module;
   private parentItemDefinition: ItemDefinition;
   private propertyIsExtension: boolean;
+  // when a property is instantiated this is the original property which is
+  // directly attached to the tree
   private originatingInstance: PropertyDefinition;
 
+  // compiled rules
   private defaultIf?: IPropertyDefinitionRuleDataType[];
   private invalidIf?: IPropertyDefinitionInvalidRuleDataType[];
   private enforcedValues?: IPropertyDefinitionRuleDataType[];
   private hiddenIf?: ConditionalRuleSet;
 
-  private superEnforcedValue?: PropertyDefinitionSupportedType
+  // enforced values and defaulted values, this is usually set manually
+  // and it applies to includes usually with enforced property values
+  // hence the enforced value is global
+  private globalSuperEnforcedValue?: PropertyDefinitionSupportedType
     | PropertyDefinition;
-  private superDefaultedValue?: PropertyDefinitionSupportedType
+  // this applies for predefined properties basically this is the new
+  // default value
+  private globalSuperDefaultedValue?: PropertyDefinitionSupportedType
     | PropertyDefinition;
 
   // representing the state of the class
   private stateValue: {
     [slotId: number]: PropertyDefinitionSupportedType,
   };
+  // this is less relevant than the single enforced and it
+  // is used when the value is applied manually during
+  // the user interaction, values are enforced
   private stateSuperEnforcedValue: {
     [slotId: number]: PropertyDefinitionSupportedType,
   };
+  // refers to whether the value in the state value
+  // has been modified by any interaction, either by
+  // apply value or set value by user
   private stateValueModified: {
     [slotId: number]: boolean,
   };
+  // this only triggers as true when the value has been modified
+  // when it has been set by the set value function which
+  // is what is supposed to be used by the user
   private stateValueHasBeenManuallySet: {
     [slotId: number]: boolean,
   };
+  // an internal value
   private stateInternalValue: {
     [slotId: number]: any,
   };
+
+  // these are caches builtin the property
+  // to be used in the client side
   // tslint:disable-next-line: member-ordering
   public stateLastUniqueCheck: {
     [slotId: number]: {
@@ -535,13 +849,21 @@ export default class PropertyDefinition {
     this.stateSuperEnforcedValue = {};
   }
 
+  /**
+   * Provides the current enforced value (if any)
+   * to a given slot id
+   * @param id the slot id
+   */
   public getEnforcedValue(id: number): {
     enforced: boolean;
     value?: PropertyDefinitionSupportedType;
   } {
+    // first we check if there is any possibility
+    // of an enforced value
     if (
-      typeof this.superEnforcedValue !== "undefined" ||
+      typeof this.globalSuperEnforcedValue !== "undefined" ||
       typeof this.stateSuperEnforcedValue[id] !== "undefined" ||
+      // this are the compiled enforced values that are conditional
       this.enforcedValues ||
       typeof this.rawData.enforcedValue !== "undefined"
     ) {
@@ -549,12 +871,12 @@ export default class PropertyDefinition {
       // let's check if one matches the current situation
       // we first pick the superEnforcedValue or otherwise the enforcedValue
       // or otherwise the first enforcedValue that evaluates to true
-      const enforcedValue = typeof this.superEnforcedValue !== "undefined" ?
+      const enforcedValue = typeof this.globalSuperEnforcedValue !== "undefined" ?
         // superenforced might be a property definition so we got to
         // extract the value in such case
-        (this.superEnforcedValue instanceof PropertyDefinition ?
-          this.superEnforcedValue.getCurrentValue(id) :
-          this.superEnforcedValue) :
+        (this.globalSuperEnforcedValue instanceof PropertyDefinition ?
+          this.globalSuperEnforcedValue.getCurrentValue(id) :
+          this.globalSuperEnforcedValue) :
 
         (
           // if the global super enforced value failed, we check for
@@ -614,6 +936,11 @@ export default class PropertyDefinition {
     return this.rawData.type;
   }
 
+  /**
+   * Provides the request fields that are necessary
+   * and contained within this property in order to be
+   * graphql requested, these come from the property description
+   */
   public getRequestFields() {
     let requestFields = {};
     // now we get the description for this field
@@ -640,28 +967,38 @@ export default class PropertyDefinition {
     return requestFields;
   }
 
+  /**
+   * Provides the current value of a property (as it is)
+   * for a given slot id
+   * @param id the slot id
+   */
   public getCurrentValue(id: number): PropertyDefinitionSupportedType {
+    // first we check for a possible enforced value
     const possibleEnforcedValue = this.getEnforcedValue(id);
 
+    // if we have one
     if (possibleEnforcedValue.enforced) {
+      // return it
       return possibleEnforcedValue.value;
     }
 
+    // if it's null if hidden and it's hidden
     if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id)) {
       return null;
     }
 
+    // if it has not been modified, we might return a default value
     if (!this.stateValueModified[id]) {
       // lets find the default value, first the super default
       // and we of course extract it in case of property definition
       // or otherwise use the default, which might be undefined
-      let defaultValue = typeof this.superDefaultedValue !== "undefined" ?
-        (this.superDefaultedValue instanceof PropertyDefinition ?
-          this.superDefaultedValue.getCurrentValue(id) :
-          this.superDefaultedValue) : this.rawData.default;
+      let defaultValue = typeof this.globalSuperDefaultedValue !== "undefined" ?
+        (this.globalSuperDefaultedValue instanceof PropertyDefinition ?
+          this.globalSuperDefaultedValue.getCurrentValue(id) :
+          this.globalSuperDefaultedValue) : this.rawData.default;
 
       // Also by condition
-      if (this.defaultIf && typeof this.superDefaultedValue === "undefined") {
+      if (this.defaultIf && typeof this.globalSuperDefaultedValue === "undefined") {
         // find a rule that passes
         const rulePasses = this.defaultIf.find((difRule) => difRule.if.evaluate(id));
         if (rulePasses) {
@@ -673,6 +1010,7 @@ export default class PropertyDefinition {
       return typeof defaultValue === "undefined" ? null : defaultValue;
     }
 
+    // if nothing apply we return the state value or null
     return nullIfUndefined(this.stateValue[id]);
   }
 
@@ -702,6 +1040,7 @@ export default class PropertyDefinition {
         internalValue: null,
         stateValue: nullIfUndefined(this.stateValue[id]),
         stateValueModified: this.stateValueModified[id] || false,
+        stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[id] || false,
         propertyId: this.getId(),
       };
     }
@@ -720,6 +1059,7 @@ export default class PropertyDefinition {
         internalValue: null,
         stateValue: nullIfUndefined(this.stateValue[id]),
         stateValueModified: this.stateValueModified[id] || false,
+        stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[id] || false,
         propertyId: this.getId(),
       };
     }
@@ -737,6 +1077,7 @@ export default class PropertyDefinition {
       internalValue: this.stateValueModified[id] ? this.stateInternalValue[id] : null,
       stateValue: nullIfUndefined(this.stateValue[id]),
       stateValueModified: this.stateValueModified[id] || false,
+      stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[id] || false,
       propertyId: this.getId(),
     };
   }
@@ -765,6 +1106,7 @@ export default class PropertyDefinition {
         internalValue: null,
         stateValue: nullIfUndefined(this.stateValue[id]),
         stateValueModified: this.stateValueModified[id] || false,
+        stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[id] || false,
         propertyId: this.getId(),
       };
     }
@@ -783,6 +1125,7 @@ export default class PropertyDefinition {
         internalValue: null,
         stateValue: nullIfUndefined(this.stateValue[id]),
         stateValueModified: this.stateValueModified[id] || false,
+        stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[id] || false,
         propertyId: this.getId(),
       };
     }
@@ -800,6 +1143,7 @@ export default class PropertyDefinition {
       internalValue: this.stateValueModified[id] ? this.stateInternalValue[id] : null,
       stateValue: nullIfUndefined(this.stateValue[id]),
       stateValueModified: this.stateValueModified[id] || false,
+      stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[id] || false,
       propertyId: this.getId(),
     };
   }
@@ -829,9 +1173,15 @@ export default class PropertyDefinition {
       }
     }
 
-    this.superEnforcedValue = actualValue;
+    this.globalSuperEnforcedValue = actualValue;
   }
 
+  /**
+   * Sets a super enforced value to a given property in a given
+   * slot id, note a super enforced value won't override the global
+   * @param id the slot id
+   * @param value the value that has tobe super enforced
+   */
   public setSuperEnforced(
     id: number,
     value: PropertyDefinitionSupportedType,
@@ -854,6 +1204,10 @@ export default class PropertyDefinition {
     this.stateSuperEnforcedValue[id] = actualValue;
   }
 
+  /**
+   * Clears a super enforced value set in a slot id
+   * @param id the slot id
+   */
   public clearSuperEnforced(
     id: number,
   ) {
@@ -884,7 +1238,7 @@ export default class PropertyDefinition {
       }
     }
 
-    this.superDefaultedValue = actualValue;
+    this.globalSuperDefaultedValue = actualValue;
   }
 
   /**
@@ -947,6 +1301,10 @@ export default class PropertyDefinition {
     }
   }
 
+  /**
+   * Frees the memory of stored values in a given slot id
+   * @param id the slot id
+   */
   public cleanValueFor(
     id: number,
   ) {
@@ -971,42 +1329,62 @@ export default class PropertyDefinition {
     value: PropertyDefinitionSupportedType,
     emulateExternalChecking?: boolean,
   ): PropertyInvalidReason | string {
-    // Cache check
+    // first we check for a standard invalid reason
+    const standardInvalidReason = PropertyDefinition.isValidValue(
+      this.rawData,
+      value,
+      true,
+    );
+    // if we get one of those we return it
+    if (standardInvalidReason) {
+      return standardInvalidReason;
+    }
+
+    // Cache check from the emulation of external checks
     if (emulateExternalChecking) {
+      // check if it has an index
       const hasIndex = this.isUnique();
+      // checking the cache for that index
       if (hasIndex) {
         if (
           this.stateLastUniqueCheck[id] &&
           (this.stateLastUniqueCheck[id].value === value || equals(this.stateLastUniqueCheck[id].value, value)) &&
           !this.stateLastUniqueCheck[id].valid
         ) {
+          // if the cache specifies that it's invalid
           return PropertyInvalidReason.NOT_UNIQUE;
         }
       }
 
+      // check if there's an autocomplete and it is enforced
       if (this.hasAutocomplete() && this.isAutocompleteEnforced()) {
+        // now we check the cache
         const filters = this.getAutocompletePopulatedFiltersFor(id);
         if (
           this.stateLastAutocompleteCheck[id] &&
           this.stateLastAutocompleteCheck[id].value === value &&
           equals(this.stateLastAutocompleteCheck[id].filters, filters)
         ) {
+          // if it specifies that it's invalid
           return PropertyInvalidReason.INVALID_VALUE;
         }
       }
+
+      // We do not actually make the external check
     }
 
+    // if we have invalid if conditions
     if (this.invalidIf) {
+      // we run all of them
       const invalidMatch = this.invalidIf.find((ii) => ii.if.evaluate(id));
+      // if one matches we give an error
       if (invalidMatch) {
         return invalidMatch.error;
       }
     }
-    return PropertyDefinition.isValidValue(
-      this.rawData,
-      value,
-      true,
-    );
+
+    // it passed all the checks
+    return null;
   }
 
   /**
@@ -1021,12 +1399,19 @@ export default class PropertyDefinition {
     id: number,
     value: PropertyDefinitionSupportedType,
   ): Promise<PropertyInvalidReason | string> {
+    // first we just run the standard without external checking, note how we are
+    // avoiding external checking emulation, the static index checker functions
+    // also access the cache so it is unecessary, even when it wouldn't hurt
+    // to add the emulation as well, it's just wasted memory processing
     const standardErrOutput = this.isValidValueNoExternalChecking(id, value);
 
+    // if we get an error
     if (standardErrOutput) {
+      // we return it
       return standardErrOutput;
     }
 
+    // if we have an index
     const hasIndex = this.isUnique();
     if (hasIndex) {
       const isValidIndex = await PropertyDefinition.indexChecker(this, value, id);
@@ -1035,12 +1420,15 @@ export default class PropertyDefinition {
       }
     }
 
+    // or autocomplete
     if (this.hasAutocomplete() && this.isAutocompleteEnforced()) {
       const isValidAutocomplete = await PropertyDefinition.autocompleteChecker(this, value, id);
       if (!isValidAutocomplete) {
         return PropertyInvalidReason.INVALID_VALUE;
       }
     }
+
+    // if it passes everything we return null
     return null;
   }
 
@@ -1151,17 +1539,29 @@ export default class PropertyDefinition {
     return !!this.rawData.autocompleteSupportsLocale;
   }
 
+  /**
+   * Provides the filters for the autocomplete function that are set
+   * for the autocomplete to be used, that is a list of property whose values
+   * are meant to be passed in order to filter
+   * @param id the slot id where to extract the property values
+   */
   public getAutocompletePopulatedFiltersFor(id: number): ISingleFilterRawJSONDataType {
+    // if there's nothing specified to populate the filters
     if (!this.rawData.autocompleteFilterFromProperty) {
+      // the filter is null
       return null;
     }
 
+    // otherwise we get the result
     const result: ISingleFilterRawJSONDataType = {};
+    // we loop for every key for the autocomplete filter, where every key is a property name
     Object.keys(this.rawData.autocompleteFilterFromProperty).forEach((key) => {
+      // and we add it, also considering prop extensions
       result[key] = this.parentItemDefinition
         .getPropertyDefinitionFor(this.rawData.autocompleteFilterFromProperty[key], true).getCurrentValue(id);
     });
 
+    // return it
     return result;
   }
 
@@ -1283,17 +1683,44 @@ export default class PropertyDefinition {
     return this.rawData.i18nData[locale] || null;
   }
 
+  /**
+   * Provides the specified roles with the access to perform an IO
+   * action to the property
+   * @param action the action in question, DELETE is not an allowed
+   * action because properties cannot be deleted, only the item definition
+   * as a whole is deleted so it makes no sense, and while the same can
+   * be said about creation, creation can be done with incomplete values
+   * partial creation is a thing in itemize, and a property can be protected
+   * from an arbitrary value during creation, this comes in handy for example
+   * for the role in the user item, where an user cannot assign itself an arbitrary
+   * role during the IO action of creation
+   */
   public getRolesWithAccessTo(action: ItemDefinitionIOActions) {
     if (action === ItemDefinitionIOActions.READ) {
       return this.rawData.readRoleAccess || [ANYONE_METAROLE];
     } else if (action === ItemDefinitionIOActions.CREATE) {
       return this.rawData.createRoleAccess || [ANYONE_METAROLE];
     } else if (action === ItemDefinitionIOActions.EDIT) {
-      return this.rawData.editRoleAccess || [OWNER_METAROLE];
+      // you might wonder why edit is not OWNER_METAROLE
+      // this is because the item definition role access actually uses
+      // OWNER_METAROLE this would mean that you cannot edit anyway
+      // because the item definition prevents it, having ANYONE_METAROLE
+      // here means that it would inherit whatever the item definition
+      // decides, it's cheap inheritance
+      return this.rawData.editRoleAccess || [ANYONE_METAROLE];
     }
     return [];
   }
 
+  /**
+   * Checks the role access for a specific IO action to a specific role
+   * basically just returns a boolean
+   * @param action the action that wants to be performed
+   * @param role the role that wants to perform that action
+   * @param userId the user id that wants to perform the action (null is allowed for eg. GUEST_METAROLE)
+   * @param ownerUserId the owner of the item definition (provide UNSPECFIED_OWNER when no owner is known)
+   * @param throwError whether to throw an EndpointError during failure rather than returning a boolean
+   */
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
@@ -1301,37 +1728,70 @@ export default class PropertyDefinition {
     ownerUserId: number,
     throwError: boolean,
   ) {
+    // first we get all the roles that have the access
     const rolesWithAccess = this.getRolesWithAccessTo(action);
+    // so if ANYONE_METAROLE is included we have access
     const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
+      // or if OWNER_METAROLE is included and our user matches our owner user
+      // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
+      // because null === null in the case of eg. GUEST_METAROLE
       rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
     ) || rolesWithAccess.includes(role);
+
+    // if we don't have access and we are requested to throw an error
     if (!hasAccess && throwError) {
-      const notLoggedInWhenShould = role === GUEST_METAROLE;
+      // so let's check if we are a guest, if we are a guest, chances are we are required
+      // to log in if there's an alternative role we could have been, and it's not fully blocked
+      const notLoggedInWhenShould = role === GUEST_METAROLE && rolesWithAccess.length;
+      // sometimes also for example when doing searches an error might have been avoided if an owner
+      // of all the searches elements had been specified, like when searching within messages of an user
+      // that only that user has access, this is a client side programming issue, but it's nice
+      // to give a specific error
       const errorMightHaveBeenAvoidedIfOwnerSpecified = ownerUserId === UNSPECIFIED_OWNER &&
         rolesWithAccess.includes(OWNER_METAROLE);
+
+      // this is the error message
       let errorMessage = `Forbidden, user ${userId} with role ${role} has no ${action} access to property ${this.getId()}` +
         ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
       if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
+        // this is the bit we add
         errorMessage += ", this error might have been avoided if an owner had" +
         " been specified which matched yourself as there's a self rule, if performing a search" +
         " you might have wanted to add the created_by filter in order to ensure this rule is followed";
       }
+
+      // and we throw the error
       throw new EndpointError({
         message: errorMessage,
         code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
       });
     }
+
+    // otherwise we return the boolean as it is
     return hasAccess;
   }
 
+  /**
+   * Gets the raw data of the property
+   */
   public toJSON() {
     return this.rawData;
   }
 
+  /**
+   * Provides the qualified property identifier for this specific property
+   * @param policyType the policy type
+   * @param policyName the policy name
+   */
   public getQualifiedPolicyIdentifier(policyType: string, policyName: string) {
     return PropertyDefinition.getQualifiedPolicyPrefix(policyType, policyName) + this.getId();
   }
 
+  /**
+   * Merges the raw json data locale information of this property with another
+   * of the same kind (only its language data)
+   * @param pdef the property definition raw form
+   */
   public mergeWithI18n(
     pdef: IPropertyDefinitionRawJSONDataType,
   ) {

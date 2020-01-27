@@ -1,5 +1,7 @@
 /**
  * Contains the time type description
+ *
+ * @packageDocumentation
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
@@ -29,7 +31,14 @@ import {
 import Moment from "moment";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 
+/**
+ * Time is defined as a string, it's clock time
+ */
 export type PropertyDefinitionSupportedTimeType = string;
+
+/**
+ * The behaviour of the time is described by this type
+ */
 const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   searchable: true,

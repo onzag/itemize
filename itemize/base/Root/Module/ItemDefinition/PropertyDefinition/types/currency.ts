@@ -1,5 +1,7 @@
 /**
  * Contains the currency type description
+ *
+ * @packageDocumentation
  */
 
 import { currencies } from "../../../../../../imported-resources";
@@ -23,11 +25,17 @@ import Knex from "knex";
 import { ISQLTableRowValue } from "../../../../../Root/sql";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 
+/**
+ * The currency definition is described by an object
+ */
 export interface IPropertyDefinitionSupportedCurrencyType {
   value: number;
   currency: string;
 }
 
+/**
+ * The type of a curreny type specifies how it behaves in the app
+ */
 const typeValue: IPropertyDefinitionSupportedType = {
   gql: "PROPERTY_TYPE__Currency",
   gqlFields: {

@@ -623,7 +623,7 @@ export default class Module {
 
     if (!modLevelAccess) {
       if (throwError) {
-        const notLoggedInWhenShould = role === GUEST_METAROLE;
+        const notLoggedInWhenShould = role === GUEST_METAROLE && rolesWithAccess.length;
         const errorMightHaveBeenAvoidedIfOwnerSpecified = ownerUserId === UNSPECIFIED_OWNER &&
           rolesWithAccess.includes(OWNER_METAROLE);
         let errorMessage = `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +

@@ -1,5 +1,7 @@
 /**
  * Contains the password type description
+ *
+ * @packageDocumentation
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
@@ -11,8 +13,14 @@ import Knex from "knex";
 import { ISQLTableRowValue } from "../../../../sql";
 import bcyrpt from "bcrypt";
 
+/**
+ * A password type is described by a string
+ */
 export type PropertyDefinitionSupportedPasswordType = string;
 
+/**
+ * The behaviour of passwords is specified by this type
+ */
 const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   nullableDefault: "",

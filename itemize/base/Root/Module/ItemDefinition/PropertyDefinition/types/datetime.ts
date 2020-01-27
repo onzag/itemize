@@ -1,5 +1,7 @@
 /**
  * Contains the datetime type description
+ *
+ * @packageDocumentation
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
@@ -29,7 +31,14 @@ import {
 import Moment from "moment";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 
+/**
+ * A datetime is represented as a string
+ */
 export type PropertyDefinitionSupportedDateTimeType = string;
+
+/**
+ * The behaviour of a datetime as how it behaves in the app
+ */
 const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   searchable: true,

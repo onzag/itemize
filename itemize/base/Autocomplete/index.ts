@@ -3,19 +3,25 @@
  * for autocompleting values in string property types, either with language or not
  *
  * schema.ts and checkers.ts are correlated
+ *
+ * @packageDocumentation
  */
 
 import diacritics from "diacritics";
 
-// represents a single filter in a raw json form
-// these are the filters that the client sends in order
-// to perform value filtering
+/**
+ * represents a single filter in a raw json form
+ * these are the filters that the client sends in order
+ * to perform value filtering
+ */
 export interface ISingleFilterRawJSONDataType {
   [key: string]: any;
 }
 
-// The autocomplete value that is contained as a single value
-// and might have or not locales included in it
+/**
+ * The autocomplete value that is contained as a single value
+ * and might have or not locales included in it
+ */
 export interface IAutocompleteValueRawJSONDataType {
   type: "value";
   value: string;
@@ -25,8 +31,10 @@ export interface IAutocompleteValueRawJSONDataType {
   };
 }
 
-// the filter raw json type that contains filter groups
-// these contain a bunch of values that are passed into a single filter
+/**
+ * the filter raw json type that contains filter groups
+ * these contain a bunch of values that are passed into a single filter
+ */
 export interface IFilterRawJSONDataType {
   type: "filter";
   filter: ISingleFilterRawJSONDataType;
@@ -34,7 +42,9 @@ export interface IFilterRawJSONDataType {
   values: IAutocompleteValueRawJSONDataType[];
 }
 
-// the parent autocomplete object
+/**
+ * the parent autocomplete object
+ */
 export interface IAutocompleteRawJSONDataType {
   type: "autocomplete";
   name: string;
@@ -42,55 +52,75 @@ export interface IAutocompleteRawJSONDataType {
   values: IAutocompleteValueRawJSONDataType[];
 }
 
-// the main autocomplete as obtained by the file
+/**
+ * the main autocomplete as obtained by the file
+ */
 export interface IFileAutocompleteRawJSONDataType {
   type: "autocomplete";
   filters: IFilterRawJSONDataType[];
   values: IAutocompleteValueRawJSONDataType[];
 }
 
-// this is the output that an autocomplete gives once
-// it has processed a value
+/**
+ * this is the output that an autocomplete gives once
+ * it has processed a value
+ */
 export interface IAutocompleteOutputType {
   value: string;
   valueNorm: string;
   i18n?: string;
   i18nNorm?: string;
 }
-
-// This is processed for speeding up searches to avoid doing the same over and over
-// the structure isn't the best but it's the fastest
-// not intended for use anywhere but here, it's just faster
-// for once we cache the diacritics and for another we merge
-// filters and values together, at the function filterFrom it's
-// easier to deal with them that way (memory wise)
-// type=value
+/**
+ * This is processed for speeding up searches to avoid doing the same over and over
+ * the structure isn't the best but it's the fastest
+ * not intended for use anywhere but here, it's just faster
+ * for once we cache the diacritics and for another we merge
+ * filters and values together, at the function filterFrom it's
+ * easier to deal with them that way (memory wise)
+ * type=value
+ */
 interface IProcessedAutocompleteValueRawJSONDataType {
-  // this is the value
+  /**
+   * this is the value
+   */
   value: string;
-  // the normalized value, without extra spaces and diacritics
+  /**
+   * the normalized value, without extra spaces and diacritics
+   */
   valueNorm: string;
-  // an applied filter for the value
+  /**
+   * an applied filter for the value
+   */
   filter?: ISingleFilterRawJSONDataType;
-  // and the same for the i18n values
+  /**
+   * and the same for the i18n values
+   */
   i18n?: {
     [locale: string]: string,
   };
+  /**
+   * and these are the normalized values
+   */
   i18nNorm?: {
     [locale: string]: string,
   };
 }
 
-// also the same as before, a processed value to speed up searches, filters
-// always have a filter property
-// type=filter
+/**
+ * also the same as before, a processed value to speed up searches, filters
+ * always have a filter property
+ * type=filter
+ */
 interface IProcessedFilterRawJSONDataType {
   filter: ISingleFilterRawJSONDataType;
   values: Array<IProcessedAutocompleteValueRawJSONDataType | IProcessedFilterRawJSONDataType>;
 }
 
-// same as before, we keep everything together, filters and values
-// type=autocomplete
+/**
+ * same as before, we keep everything together, filters and values
+ * type=autocomplete
+ */
 interface IProcessedAutocompleteRawJSONDataType {
   values: Array<IProcessedAutocompleteValueRawJSONDataType | IProcessedFilterRawJSONDataType>;
 }

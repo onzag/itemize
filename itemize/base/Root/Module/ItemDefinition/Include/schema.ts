@@ -3,11 +3,16 @@
  * item definition using the JSON Schema specification in the compile process
  *
  * related files index.ts and checkers.ts
+ *
+ * @packageDocumentation
  */
 
 import ConditionalRuleSetSchema from "../ConditionalRuleSet/schema";
 import PropertiesValueMappingDefinitionSchema from "../PropertiesValueMappingDefiniton/schema";
 
+/**
+ * The default schema for an Include
+ */
 export default {
   $id: "Include",
   type: "object",

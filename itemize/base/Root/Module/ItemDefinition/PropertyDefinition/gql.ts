@@ -2,6 +2,8 @@
  * This file contains all the graphql related helper functions that are used in order to
  * retrieve and set the values of properties, it doesn't contain the conversion functions
  * sql.ts does
+ *
+ * @packageDocumentation
  */
 
 import { GraphQLInputObjectType, GraphQLObjectType, GraphQLNonNull, GraphQLList, GraphQLString, GraphQLInt } from "graphql";
@@ -10,8 +12,10 @@ import { IGQLFieldsDefinitionType } from "../../../gql";
 import { ItemDefinitionIOActions } from "..";
 import { GraphQLUpload } from "graphql-upload";
 
-// this stores the _In and _Out of the property types
-// that do not fit a basic type, like number or string
+/**
+ * this stores the _In and _Out of the property types
+ * that do not fit a basic type, like number or string
+ */
 const PROPERTY_TYPE_GQL_POOL = {};
 
 /**

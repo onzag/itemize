@@ -2,6 +2,8 @@
  * This file contains utility functionality that is necessary in order to
  * setup includes into and out of the postgresql database as well
  * as how to build the definition for the tables
+ *
+ * @packageDocumentation
  */
 
 import { EXCLUSION_STATE_SUFFIX } from "../../../../../constants";

@@ -1,5 +1,7 @@
 /**
  * Contains the boolean type description
+ *
+ * @packageDocumentation
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
@@ -18,7 +20,13 @@ import {
 import { REDUCED_BASE_I18N, CLASSIC_OPTIONAL_I18N, REDUCED_SEARCH_BASE_I18N, CLASSIC_SEARCH_OPTIONAL_I18N } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 
+/**
+ * The representation of a boolean type is equal to a boolean
+ */
 export type PropertyDefinitionSupportedBooleanType = boolean;
+/**
+ * The that specifies how a boolean behaves in the app
+ */
 const typeValue: IPropertyDefinitionSupportedType = {
   // a boolean type can be written as a boolean
   json: "boolean",

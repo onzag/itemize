@@ -3,6 +3,8 @@
  * that are contained within an itemize schema
  *
  * Related files are schema.ts and checkers.ts for the build process
+ *
+ * @packageDocumentation
  */
 
 import { PropertyDefinitionSupportedType } from "../PropertyDefinition/types";
@@ -15,47 +17,75 @@ import ItemDefinition from "..";
 import Include from "../Include";
 import Module from "../../../Module";
 
-// Types for the conditions
+/**
+ * Types for the conditions
+ */
 export type ConditionalRuleComparatorType = "equals" | "not-equal" |
   "greater-than" | "less-than" | "greater-or-equal-than" | "less-or-equal-than";
-// Types for the gates that are available
+/**
+ * Types for the gates that are available
+ */
 export type ConditionalRuleGateType = "or" | "and" | "xor";
 
-// DATA TYPES (only used by the data item)
+/**
+ * DATA TYPES (only used by the data item)
+ */
 interface IConditionalRuleSetRawJSONDataBaseType {
   gate?: ConditionalRuleGateType;
   condition?: IConditionalRuleSetRawJSONDataType;
 }
 
-// this is the raw json of a conditional rule set
+/**
+ * this is the raw json of a conditional rule set
+ */
 export interface IConditionalRuleSetRawJSONDataPropertyType
   extends IConditionalRuleSetRawJSONDataBaseType {
-  // the property to be compared
+  /**
+   * the property to be compared
+   */
   property: string;
-  // the attribute of that property, as some properties are objects
+  /**
+   * the attribute of that property, as some properties are objects
+   */
   attribute?: string;
-  // the method, default, string or datetime (uses Date)
+  /**
+   * the method, default, string or datetime (uses Date)
+   */
   method?: "default" | "string" | "datetime";
-  // the comparator, equal, greater than, etc...
+  /**
+   * the comparator, equal, greater than, etc...
+   */
   comparator: ConditionalRuleComparatorType;
-  // the value to be compared against, either a value itself, or alternatively, a property
+  /**
+   * the value to be compared against, either a value itself, or alternatively, a property
+   */
   value: PropertyDefinitionValueType;
-  // the attribute of the value, if any
+  /**
+   * the attribute of the value, if any
+   */
   valueAttribute?: string;
 }
 
-// this represents rules that are built for includes
+/**
+ * this represents rules that are built for includes
+ */
 export interface IConditionalRuleSetRawJSONDataIncludeType
   extends IConditionalRuleSetRawJSONDataBaseType {
-  // includes can either by matched by id or by name
-  // the id of an include is unique, and is matched by using #identifier
-  // and the name just doesn't include the numeral
+  /**
+   * includes can either by matched by id or by name
+   * the id of an include is unique, and is matched by using #identifier
+   * and the name just doesn't include the numeral
+   */
   include: string;
-  // the inclusion state expected for the conditional rule to apply
+  /**
+   * the inclusion state expected for the conditional rule to apply
+   */
   isIncluded: boolean;
 }
 
-// both types of conditions combined
+/**
+ * both types of conditions combined
+ */
 export type IConditionalRuleSetRawJSONDataType =
   IConditionalRuleSetRawJSONDataPropertyType |
   IConditionalRuleSetRawJSONDataIncludeType;
@@ -109,18 +139,30 @@ export type IConditionalRuleSetRawJSONDataType =
  */
 export default class ConditionalRuleSet {
 
-  // the parent module of this condition
+  /**
+   * the parent module of this condition
+   */
   public parentModule: Module;
-  // the item definition where it is contained
+  /**
+   * the item definition where it is contained
+   */
   public parentItemDefinition: ItemDefinition;
-  // the property that it is contained within, might be null for prop extensions
+  /**
+   * the property that it is contained within, might be null for prop extensions
+   */
   public parentPropertyDefinition: PropertyDefinition;
-  // a parent include, if available, might be null
+  /**
+   * a parent include, if available, might be null
+   */
   public parentInclude: Include;
-  // the raw data that was used to generate this conditional rule set
+  /**
+   * the raw data that was used to generate this conditional rule set
+   */
   public rawData: IConditionalRuleSetRawJSONDataType;
 
-  // an internal condition for nested conditions
+  /**
+   * an internal condition for nested conditions
+   */
   private condition: ConditionalRuleSet;
 
   /**

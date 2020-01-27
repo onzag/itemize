@@ -4,8 +4,13 @@
  * the compilation step
  *
  * related files index.ts and checkers.ts
+ *
+ * @packageDocumentation
  */
 
+ /**
+  * The default property value mapping definition schema
+  */
 export default {
   $id: "PropertiesValueMappingDefiniton",
   type: "object",

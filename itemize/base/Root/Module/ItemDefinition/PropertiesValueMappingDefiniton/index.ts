@@ -3,6 +3,8 @@
  * predefinedProperties and enforcedProperties do behave
  *
  * related files schema.ts and checkers.ts
+ *
+ * @packageDocumentation
  */
 
 import { PropertyDefinitionSupportedType } from "../PropertyDefinition/types";
@@ -13,9 +15,11 @@ import PropertyDefinition, {
 } from "../PropertyDefinition";
 import ItemDefinition from "..";
 
-// Represents the way that properties are stored
-// Check the schema down to see how this relates
-// at PropertiesValueMappingDefiniton.schema
+/**
+ * Represents the way that properties are stored
+ * Check the schema down to see how this relates
+ * at PropertiesValueMappingDefiniton.schema
+ */
 export interface IPropertiesValueMappingDefinitonRawJSONDataType {
   [propertyName: string]: PropertyDefinitionValueType;
 }

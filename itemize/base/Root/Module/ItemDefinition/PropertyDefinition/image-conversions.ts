@@ -2,6 +2,8 @@
  * This file contains the utility functions that take images as input and
  * transform it into all the different sizes that have been specified by the property
  * this is the case for files when a image type is detected
+ *
+ * @packageDocumentation
  */
 
 // TODO move this logic to the Bucket/CDN server kinda thing
@@ -13,7 +15,11 @@ import fs from "fs";
 import path from "path";
 const fsAsync = fs.promises;
 
-// this is what we get as a result
+/**
+ * this is what we get as a result from
+ * the arguments to convert an image
+ * width and/or height can be null
+ */
 interface IImageConversionArguments {
   name: string;
   fit: "cover" | "contain" | "fill";
@@ -21,35 +27,54 @@ interface IImageConversionArguments {
   height: number;
 }
 
+/**
+ * Analyses a single option as written in the shape
+ * "name 200x300 cover" or "200x300 cover" or "name 200x300" or "200x300" or "200x" or "x200", etc...
+ * @param value the string value that needs to be parsed
+ * @param enforcedName the enforced name when a name is enforced, a name is not parsed and not expected
+ */
 function singleOptionAnalysis(
   value: string,
   enforcedName?: string,
 ): IImageConversionArguments {
+
+  // if the value is null we return null
   if (value === null) {
     return null;
   }
 
+  // now we split the whole thing in spaces
   const splitted = value.trim().split(" ");
+
+  // we need the name
   let name: string;
   if (enforcedName) {
     name = enforcedName;
   } else {
+    // if there's no enforced name, it's the first attribute
     name = splitted.shift() || null;
   }
 
+  // if we get no name, eg. empty string, whatever, we give null
   if (!name) {
     return null;
   }
 
+  // now we need the 200x300 part
   const widthXheight = splitted.shift() || null;
+  // we parse it
   const width = parseInt(widthXheight && widthXheight.split("x")[0], 10) || null;
   const height = parseInt(widthXheight && widthXheight.split("x")[1], 10) || null;
 
+  // if none of them were specified aka something like x
+  // return null
   if (!width && !height) {
     return null;
   }
 
+  // now we get the fit, if any remaining
   let fit: string = splitted.shift() || null;
+  // if not fit has been specified or if it's invalid, make it be cover
   if (
     fit !== "cover" &&
     fit !== "contain" &&
@@ -58,14 +83,20 @@ function singleOptionAnalysis(
     fit = "cover";
   }
 
+  // return those options
   return {
     name,
     width,
     height,
+    // we need to cast thanks to typescript funkyness
     fit: fit as any,
   };
 }
 
+/**
+ * Analyzes many ; separated options
+ * @param value the value as many options of many conversions that are required
+ */
 function manyOptionsAnalysis(value: string): IImageConversionArguments[] {
   return value.split(";").map((subvalue) => singleOptionAnalysis(subvalue)).filter((v) => !!v);
 }

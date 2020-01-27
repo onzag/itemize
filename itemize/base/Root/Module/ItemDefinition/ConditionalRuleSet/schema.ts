@@ -3,16 +3,27 @@
  * rule sets in the JSON schema form
  *
  * related files are index.ts and checkers.ts
+ *
+ * @packageDocumentation
  */
 
-// The comparators we support
+/**
+ * The comparators we support
+ */
 const comparators = ["equals", "not-equal", "greater-than", "less-than",
   "greater-or-equal-than", "less-or-equal-than"];
-// The gates
+/**
+ * The gates
+ */
 const gates = ["and", "or", "xor"];
+/**
+ * The methods
+ */
 const methods = ["default", "string", "datetime"];
 
-// The schema
+/**
+ * The schema
+ */
 export default {
   $id: "ConditionalRuleSet",
   type: "object",

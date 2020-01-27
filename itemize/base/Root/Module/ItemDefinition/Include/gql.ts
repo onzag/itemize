@@ -2,6 +2,8 @@
  * This file contains the graphql utility functions for managing
  * Includes that exist within item definitions, it doesn't contain
  * the conversion function sql.ts does
+ *
+ * @packageDocumentation
  */
 
 import { PREFIXED_CONCAT } from "../../../../../constants";

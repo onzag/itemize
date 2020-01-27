@@ -2,6 +2,8 @@
  * This file builds the search mode for a conditional rule set as when the
  * module tries to convert a module into its search form, this file contains
  * the instructions specific to the conditional rule set conversion
+ *
+ * @packageDocumentation
  */
 
 import { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionReferredPropertyValue } from "../PropertyDefinition";
