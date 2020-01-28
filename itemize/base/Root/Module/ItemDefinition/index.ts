@@ -1,3 +1,10 @@
+/**
+ * This is one of the hearts of itemize and represents the item definition
+ * for items as it defines how they are meant to be conformed, by includes and properties
+ *
+ * @packageDocumentation
+ */
+
 import Include, { IIncludeRawJSONDataType, IIncludeState, IncludeExclusionState } from "./Include";
 import PropertyDefinition,
   { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionState } from "./PropertyDefinition";
@@ -19,6 +26,10 @@ import uuid from "uuid";
 import { flattenRawGQLValueOrFields } from "../../../../gql-util";
 import { IGQLValue, IGQLRequestFields } from "../../../../gql-querier";
 
+/**
+ * Policies eg, readRoleAccess, editRoleAccess, createRoleAccess
+ * this is the form they have deep in after the name
+ */
 export interface IPolicyValueRawJSONDataType {
   roles: string[];
   properties: string[];
@@ -32,10 +43,17 @@ export interface IPolicyValueRawJSONDataType {
   itemDefinition?: string;
 }
 
+/**
+ * Because a policy type can have many sub policies this
+ * defines it all
+ */
 export interface IPolicyRawJSONDataType {
   [policyName: string]: IPolicyValueRawJSONDataType;
 }
 
+/**
+ * This is basically the types themselves
+ */
 export interface IPoliciesRawJSONDataType {
   edit?: IPolicyRawJSONDataType;
   delete?: IPolicyRawJSONDataType;
@@ -43,61 +61,145 @@ export interface IPoliciesRawJSONDataType {
   parent?: IPolicyRawJSONDataType;
 }
 
+/**
+ * When parenting is specified to the item definition by
+ * canBeParentedBy this is the shape it comes as
+ */
 export interface IItemDefinitionParentingRawJSONDataType {
   module: string;
   itemDefinition?: string;
 }
 
+/**
+ * The raw form of the item definition from the processed schema
+ */
 export interface IItemDefinitionRawJSONDataType {
-  // Builder data
+  /**
+   * Basic type
+   */
   type: "item";
 
-  // Avaialble for the builder
+  /**
+   * Location only exists during the building process and it's stripped
+   * and represents the file location the file is
+   */
   location?: string;
+  /**
+   * Also stripped after processed, represents the file location for the
+   * i18n properties file
+   */
   i18nDataLocation?: string;
+  /**
+   * The pointers come during the parsing method and are stripped as well
+   * after built and it's used to create tracebacks from the raw data
+   */
   pointers?: any;
+  /**
+   * This is the raw content of the file the pointers came from and it's also
+   * stripped after built is done
+   */
   raw?: string;
 
-  // Avilable after a build
+  /**
+   * The name doesn't exist within the raw unprocessed data but it's added and
+   * it's equal to the file name or the folder name in case of index.json
+   */
   name: string;
+  /**
+   * The i18n data that is attached to that item definition it also doesn't exist
+   * in the unprocessed data but comes from the properties file
+   */
   i18nData: IRawJSONI18NDataType;
 
-  // original data
+  /**
+   * The includes exist within the item definition
+   */
   includes?: IIncludeRawJSONDataType[];
+  /**
+   * The properties represent the list of properties it has
+   */
   properties?: IPropertyDefinitionRawJSONDataType[];
-  // role permissions
+
+  /**
+   * Read role permissions
+   */
   readRoleAccess?: string[];
+  /**
+   * Create role permissions
+   */
   createRoleAccess?: string[];
+  /**
+   * Edit role permissions
+   */
   editRoleAccess?: string[];
+  /**
+   * Delete role permissions
+   */
   deleteRoleAccess?: string[];
 
-  // roperty gets added during procesing and merging
-  // replacing imports, gotta be there even if empty
+  /**
+   * This gets added during the building process
+   * and represents the list of imported definitions
+   * that exist within the module and are used for includes
+   * these are paths
+   */
   importedChildDefinitions?: string[][];
+  /**
+   * The actual child definitions that this item definition contains
+   * this is appended during process as an array of this same object
+   * aka it recurses as a tree
+   */
   childDefinitions?: IItemDefinitionRawJSONDataType[];
 
-  // policies
+  /**
+   * the policies in the raw json form as they are specified
+   * in the unprocessed file
+   */
   policies?: IPoliciesRawJSONDataType;
 
-  // ownership
+  /**
+   * This only really makes sense in the user case and it basically
+   * shifts the ownership of the object to be its id rather than its created_by
+   * attribute
+   */
   ownerIsObjectId?: boolean;
 
-  // searchable
+  /**
+   * Whether the item is searchable
+   */
   searchable?: boolean;
 
-  // behalf creation
+  /**
+   * A list of roles of which this item definition is allowed to be
+   * used to create in behalf
+   */
   canCreateInBehalfBy?: string[];
 
-  // parenting
+  /**
+   * Whether it can be parented by other item definitions, these
+   * represent a list of rules
+   */
   canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
+  /**
+   * Whether it actually must always be parented
+   */
   mustBeParented?: boolean;
+  /**
+   * A list of roles who have access to parenting
+   */
   parentingRoleAccess?: string[];
 }
 
+/**
+ * Represents the state of policies for a given type
+ */
 export interface IPolicyStateType {
   [policyName: string]: IPropertyDefinitionState[];
 }
 
+/**
+ * Represents all the state of policies
+ */
 export interface IPoliciesStateType {
   edit?: IPolicyStateType;
   delete?: IPolicyStateType;
@@ -105,17 +207,48 @@ export interface IPoliciesStateType {
   parent?: IPolicyStateType;
 }
 
+/**
+ * Represents the whole item definition state
+ */
 export interface IItemDefinitionStateType {
+  /**
+   * The module this item definition resides (name only)
+   */
   moduleName: string;
+  /**
+   * The qualified name of the item definition
+   */
   itemDefQualifiedName: string;
+  /**
+   * The name of the item definition
+   */
   itemDefName: string;
+  /**
+   * All the state of the includes within itself
+   */
   includes: IIncludeState[];
+  /**
+   * All the states of the properties included
+   */
   properties: IPropertyDefinitionState[];
+  /**
+   * All the policies state
+   */
   policies: IPoliciesStateType;
+  /**
+   * The original graphql flattened value that was applied (if any)
+   */
   gqlOriginalFlattenedValue: IGQLValue;
+  /**
+   * The id that was used
+   */
   forId: number;
 }
 
+/**
+ * Represents the possible io actions to be performed
+ * within an item definition
+ */
 export enum ItemDefinitionIOActions {
   READ = "READ",
   CREATE = "CREATE",
@@ -123,18 +256,48 @@ export enum ItemDefinitionIOActions {
   DELETE = "DELETE",
 }
 
+/**
+ * This is how graphql applied values are stored within
+ * the item definition, using this structure, for the
+ * application state
+ */
 export interface IItemDefinitionGQLValueType {
+  /**
+   * The user id that requested this
+   */
   userIdRequester: number;
+  /**
+   * The role of the user that requested this
+   */
   roleRequester: string;
+  /**
+   * The value as it came from graphql endpoint
+   */
   rawValue: IGQLValue;
+  /**
+   * The flattened value without DATA fields
+   */
   flattenedValue: IGQLValue;
+  /**
+   * The requested fields that were used
+   */
   requestFields: IGQLRequestFields;
 }
 
+/**
+ * This is the structure used for compiled policies
+ * within the item definition, they are properties
+ * so they are stored in such way, this is for
+ * a single policy type
+ */
 export interface IPolicyType {
   [policyName: string]: PropertyDefinition[];
 }
 
+/**
+ * This is the structure of all the policies
+ * with all the possible types involved
+ */
 export interface IPoliciesType {
   edit?: IPolicyType;
   delete?: IPolicyType;
@@ -226,41 +389,103 @@ export default class ItemDefinition {
     return definition || null;
   }
 
+  /**
+   * The raw data of the item definition as it was
+   * compiled
+   */
   public rawData: IItemDefinitionRawJSONDataType;
-  // Functions for graphql
+  /**
+   * A cached graphql object
+   */
   // tslint:disable-next-line: variable-name
   public _gqlObj: GraphQLOutputType;
+  /**
+   * A cached graphql query object
+   */
   // tslint:disable-next-line: variable-name
   public _gqlQueryObj: GraphQLObjectType;
 
+  /**
+   * The include instances compiled from the raw data
+   */
   private includeInstances: Include[];
+  /**
+   * The child definitions the item definition contains
+   */
   private childDefinitions: ItemDefinition[];
+  /**
+   * Imported definitions that are included in the
+   * raw data using the import mechanism, this is the
+   * compiled form
+   */
   private importedChildDefinitions: Array<{
     fullName: string,
     definition: ItemDefinition,
   }>;
+  /**
+   * All the properties within the item definition
+   */
   private propertyDefinitions: PropertyDefinition[];
+  /**
+   * All the policies within the item definition
+   */
   private policyPropertyDefinitions: IPoliciesType;
+  /**
+   * The parent module
+   */
   private parentModule: Module;
+  /**
+   * A parent item definition or null
+   */
   private parentItemDefinition: ItemDefinition;
+  /**
+   * The originating instance exists only if the current
+   * item definition was instantiated from another and detached from
+   * the tree, this is the tree instance it came from
+   */
   private originatingInstance: ItemDefinition;
+  /**
+   * whether this instance is for prop extensions in the module
+   * that is an emulated item definition that only contains
+   * the prop extensions and is generated in the module
+   */
   private extensionsInstance: boolean = false;
 
+  /**
+   * Listeners are simple callbacks that are added and operate within
+   * the item definition, usually added for UI level functionality
+   */
   private listeners: {
     [event: string]: {
       [id: number]: ListenerType[],
     },
   };
+  /**
+   * Events are triggered accross the tree, so this ensures that the event
+   * doesn't trigger twice and creates a forever loop
+   */
   private lastListenerCallId: string = "";
 
-  // state information
+  /**
+   * Containst state information about applied values to slots
+   */
   private stateHasAppliedValueTo: {
     [id: number]: boolean,
   };
+  /**
+   * Contains the information about the specific applied value to an slot
+   */
   private stateGQLAppliedValue: {
     [id: number]: IItemDefinitionGQLValueType;
   };
 
+  /**
+   * Build a new ItemDefinition instance
+   * @param rawJSON the raw json form
+   * @param parentModule the parent module instance
+   * @param parentItemDefinition the parent item definition (or null)
+   * @param originatingInstance an originating instance (for instantiated detached instances)
+   */
   constructor(
     rawJSON: IItemDefinitionRawJSONDataType,
     parentModule: Module,
@@ -308,27 +533,49 @@ export default class ItemDefinition {
     this.parentModule.getParentRoot().registry[this.getQualifiedPathName()] = this;
   }
 
+  /**
+   * Runs the initialization of the item definition, for cross access, this executes
+   * once the entire tree is ready so this item definition can access other parts of the tree
+   * Root class executes this function recursively
+   */
   public init() {
+    // we need to set the policy property definition, the reason it's done in init
+    // and not in constructor is because we might need to get access to properties in
+    // other item definitions for the purposes of the parenting rules
     this.policyPropertyDefinitions = {};
+
+    // if we have policies at all
     if (this.rawData.policies) {
+      // we loop within the types
       Object.keys(this.rawData.policies).forEach((policyType) => {
         this.policyPropertyDefinitions[policyType] = {};
+
+        // now looping per name
         Object.keys(this.rawData.policies[policyType]).forEach((policyName) => {
 
+          // we get the policy value
           const policyValue: IPolicyValueRawJSONDataType = this.rawData.policies[policyType][policyName];
+          // check if there's a module and item definition in question
           const moduleInQuestionPath = policyValue.module;
           const itemDefinitionInQuestionPath = policyValue.itemDefinition;
 
+          // by default the item definition in question is this same item definiton
+          // and properties referred are the same as this ones
           let itemDefinition: ItemDefinition = this;
+          // but if we have a module specified
           if (moduleInQuestionPath) {
+            // we need to get that referred module
             const referredModule = this.getParentModule().getParentRoot().getModuleFor(moduleInQuestionPath.split("/"));
+            // and extract the item definition from it, notice how there might not be a path specified
             if (itemDefinitionInQuestionPath) {
               itemDefinition = referredModule.getItemDefinitionFor(itemDefinitionInQuestionPath.split("/"));
             } else {
+              // and in such case we use the extensions instance as a way to hack it
               itemDefinition = referredModule.getPropExtensionItemDefinition();
             }
           }
 
+          // now we setup the property definition value by reinstantiating
           this.policyPropertyDefinitions[policyType][policyName] =
             policyValue.properties.map(
               (propertyId: string) => {
@@ -339,37 +586,39 @@ export default class ItemDefinition {
       });
     }
 
+    // now we get all the child definitions and instantiate them
     this.childDefinitions.forEach((cd) => {
       cd.init();
     });
   }
 
+  /**
+   * Flags this item definition into an extensions instance
+   */
   public setAsExtensionsInstance() {
     this.extensionsInstance = true;
   }
 
+  /**
+   * Checks the flag for this item definition as being
+   * an extensions instance
+   * @returns a boolean
+   */
   public isExtensionsInstance() {
     return this.extensionsInstance;
   }
 
   /**
    * provides the raw name of the item definition
+   * @returns the name as a string
    */
   public getName(): string {
     return this.rawData.name;
   }
 
   /**
-   * Provides the path of a given item definition from
-   * the module root
-   */
-  public getPath(): string[] {
-    const parentPath = this.parentItemDefinition ? this.parentItemDefinition.getPath() : [];
-    return parentPath.concat(this.getName());
-  }
-
-  /**
    * Provides the module name that contains this item definition
+   * @returns a string
    */
   public getModuleName(): string {
     return this.parentModule.getName();
@@ -379,6 +628,7 @@ export default class ItemDefinition {
    * Tells whether an item definition has a child item definition for it
    * @param name the name of the item definition
    * @param avoidImports whether to avoid the imported detached definitions
+   * @returns a boolean on whether it does or not
    */
   public hasItemDefinitionFor(
     name: string,
@@ -411,9 +661,9 @@ export default class ItemDefinition {
    * Gets a live item definition for the current item definition
    * either as a children or a detached instance that came from
    * another item definition as an import
-   * @throws an error if the item definition does not exist
    * @param name the name of the item definition
    * @param avoidImports whether to avoid imported items
+   * @returns an item definition, will throw an error if not found
    */
   public getDirectlyAvailableItemDefinitionInContextFor(
     name: string,
@@ -459,6 +709,7 @@ export default class ItemDefinition {
    * Checks whether an item included in this item definition
    * has an specific id
    * @param id the id of the include
+   * @returns a boolean on whether it has such include
    */
   public hasIncludeFor(id: string) {
     return !!this.includeInstances.find((ii) => ii.getId() === id);
@@ -468,7 +719,7 @@ export default class ItemDefinition {
    * provides an include within this item defintion that has that
    * specific id
    * @param id the id of the include
-   * @throws an error if it cannot find the item
+   * @returns the include if any, would throw an error if not found
    */
   public getIncludeFor(id: string) {
     const include = this.includeInstances.find((ii) => ii.getId() === id);
@@ -506,6 +757,7 @@ export default class ItemDefinition {
   /**
    * Provides all the property definitions without
    * including the extensions
+   * @returns a property definiton array
    */
   public getAllPropertyDefinitions() {
     return this.propertyDefinitions;
@@ -514,6 +766,7 @@ export default class ItemDefinition {
   /**
    * Provides all that property defintiions
    * including the extensions
+   * @returns a property definition array
    */
   public getAllPropertyDefinitionsAndExtensions() {
     return this.parentModule.getAllPropExtensions().concat(this.getAllPropertyDefinitions());
@@ -521,6 +774,7 @@ export default class ItemDefinition {
 
   /**
    * Provides all the item instances
+   * @returns an include array
    */
   public getAllIncludes() {
     return this.includeInstances;
@@ -530,6 +784,7 @@ export default class ItemDefinition {
    * Checks whether an item definition has a property definition
    * @param id the property definition id
    * @param includeExtensions whether to include extensions or not
+   * @returns a boolean
    */
   public hasPropertyDefinitionFor(id: string, includeExtensions: boolean) {
     // we use the rawdata to quickly check
@@ -544,9 +799,9 @@ export default class ItemDefinition {
   /**
    * Provides a live property definition for an item definition
    * this property definition can trigger state changes
-   * @throws error if the property does not exist
    * @param id the property definition id
    * @param includeExtensions whether to include extensions or not
+   * @returns a property definition or throws an error if not found
    */
   public getPropertyDefinitionFor(
     id: string,
@@ -569,6 +824,7 @@ export default class ItemDefinition {
    * @param policyType the policy type
    * @param policyName the policy name
    * @param id the property id
+   * @returns a property definition or throws an error if not found
    */
   public getPropertyDefinitionForPolicy(
     policyType: string,
@@ -595,6 +851,7 @@ export default class ItemDefinition {
    * matches the name
    * @param id the id of the current state
    * @param name the name of the item
+   * @returns a boolean
    */
   public hasAtLeastOneActiveInstanceOf(id: number, name: string): boolean {
     // we need a list of possible candidates
@@ -617,6 +874,7 @@ export default class ItemDefinition {
    * given its include id (not its name)
    * @param id the slot id
    * @param includeId the id of the item
+   * @returns a boolean on whether it does
    */
   public hasAnActiveIncludeInstanceOfId(id: number, includeId: string): boolean {
     const candidate = this.includeInstances
@@ -631,6 +889,7 @@ export default class ItemDefinition {
 
   /**
    * Just gives the parent module
+   * @returns a module instance
    */
   public getParentModule() {
     return this.parentModule;
@@ -638,6 +897,7 @@ export default class ItemDefinition {
 
   /**
    * Tells whether it has a parent item definition
+   * @retuns a boolean
    */
   public hasParentItemDefinition() {
     return !!this.parentItemDefinition;
@@ -645,7 +905,7 @@ export default class ItemDefinition {
 
   /**
    * Provides the parent item definition
-   * @throws an error if nothing available
+   * @returns an item definition or throws an error if no such a thing
    */
   public getParentItemDefinition() {
     if (!this.parentItemDefinition) {
@@ -658,6 +918,7 @@ export default class ItemDefinition {
   /**
    * Provides the live child definitions
    * without imports
+   * @returns an array of item definitions
    */
   public getChildDefinitions() {
     return this.childDefinitions;
@@ -666,6 +927,7 @@ export default class ItemDefinition {
   /**
    * Provides the live child definitions
    * without imports, recursively
+   * @returns an array of item definitions
    */
   public getChildDefinitionsRecursive() {
     let childDefinitions = this.getChildDefinitions();
@@ -677,6 +939,7 @@ export default class ItemDefinition {
 
   /**
    * Provides the live imported child definitions
+   * @returns an array of item definitions
    */
   public getImportedChildDefinitions() {
     return this.importedChildDefinitions.map((icd) => icd.definition);
@@ -687,6 +950,7 @@ export default class ItemDefinition {
    * the item definition, uses the same on state change
    * function for state changes so it remains linked to the
    * module
+   * @returns a new ItemDefiniton instance
    */
   public getNewInstance() {
     return new ItemDefinition(this.rawData, this.parentModule, this.parentItemDefinition, this);
@@ -694,7 +958,7 @@ export default class ItemDefinition {
 
   /**
    * Provides the item definition item locale data
-   * @param  locale the locale in iso form
+   * @param locale the locale in iso form
    * @returns an object or null (if locale not valid)
    */
   public getI18nDataFor(locale: string): IRawJsonI18NSpecificLocaleDataType {
@@ -719,6 +983,7 @@ export default class ItemDefinition {
    * this case
    * @param onlyIncludeIncludes includes the includes in the list
    * @param excludePolicies excludes all the policies state
+   * @retrns the item definition state without extenral checks
    */
   public getStateNoExternalChecking(
     id: number,
@@ -786,6 +1051,7 @@ export default class ItemDefinition {
    * this case
    * @param onlyIncludeIncludes includes the includes in the list
    * @param excludePolicies excludes all the policies state bit
+   * @returns a promise for the item definition state
    */
   public async getState(
     id: number,
@@ -845,6 +1111,9 @@ export default class ItemDefinition {
    * @param graphqlUserIdRequester the user id that requested this data (can be null)
    * @param requestFields the fields that were used to request this data (can be null) but be careful
    * this might be used for catching
+   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet to avoid hot updating
+   * values when the user is modifying them and an apply value has been called because
+   * it has been updated somewhere else, we use this to avoid overriding
    */
   public applyValue(
     id: number,
@@ -912,6 +1181,7 @@ export default class ItemDefinition {
    * applied value, basically the created_by value
    * (or id if owner is object id, which is only relevant for users honestly)
    * @param id the id of the state
+   * @returns a number, will return UNSPECIFIED_OWNER if it cannot find anything
    */
   public getAppliedValueOwnerIfAny(id: number): number {
     if (
@@ -919,7 +1189,7 @@ export default class ItemDefinition {
       !this.stateGQLAppliedValue[id] ||
       !this.stateGQLAppliedValue[id].flattenedValue
     ) {
-      return -1;
+      return UNSPECIFIED_OWNER;
     }
 
     if (this.isOwnerObjectId()) {
@@ -960,6 +1230,7 @@ export default class ItemDefinition {
    * Checks whether given the state id, there is an applied
    * value for it
    * @param id the id
+   * @returns a boolean on whether it does or not
    */
   public hasAppliedValueTo(id: number): boolean {
     return this.stateHasAppliedValueTo[id];
@@ -968,6 +1239,7 @@ export default class ItemDefinition {
   /**
    * Provides the applied value for the id
    * @param id the id
+   * @returns the applied value structure
    */
   public getGQLAppliedValue(id: number): IItemDefinitionGQLValueType {
     return this.stateGQLAppliedValue[id] || null;
@@ -976,32 +1248,37 @@ export default class ItemDefinition {
   /**
    * Provides the item definition that represent the search mode of this
    * same item definition
+   * @returns an ItemDefinition, this function will crash if you are already
+   * in the search mode counterpart
    */
   public getSearchModeCounterpart(): ItemDefinition {
     if (this.isExtensionsInstance()) {
       return this.parentModule.getSearchModule().getPropExtensionItemDefinition();
     }
     return this.parentModule.getSearchModule().getItemDefinitionFor(
-      this.getModulePath(),
+      this.getPath(),
     );
   }
 
   /**
    * Basically only works in search mode item definitions, and provides the standard
    * counterpart
+   * @returns an ItemDefinition, this function will crash if you are already
+   * in the standard mode counterpart
    */
   public getStandardCounterpart(): ItemDefinition {
     if (this.isExtensionsInstance()) {
       return this.parentModule.getStandardModule().getPropExtensionItemDefinition();
     }
     return this.parentModule.getStandardModule().getItemDefinitionFor(
-      this.getModulePath(),
+      this.getPath(),
     );
   }
 
   /**
    * Tells whether this item is the search mode item of another
    * item
+   * @returns a boolean on whether it is in search mode
    */
   public isInSearchMode(): boolean {
     return this.parentModule.isInSearchMode();
@@ -1011,6 +1288,7 @@ export default class ItemDefinition {
    * Provides the roles that have access to a given
    * action based on the rules that were set
    * @param action the action from the ItemDefinitionIOActions
+   * @retuns an array of string that represent the roles
    */
   public getRolesWithAccessTo(action: ItemDefinitionIOActions) {
     if (action === ItemDefinitionIOActions.READ) {
@@ -1040,6 +1318,7 @@ export default class ItemDefinition {
    * @param ownerUserId the owner of that item definition
    * @param requestedFields the requested fields (single properties will be checked as well)
    * @param throwError whether to throw an error if failed (otherwise returns a boolean)
+   * @returns a boolean on whether the user is allowed
    */
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,
@@ -1123,6 +1402,7 @@ export default class ItemDefinition {
    * ownerIsObjectId
    * @param role
    * @param throwError whether to throw an error if failed (otherwise returns a boolean)
+   * @return a boolean on whether the user is allowed
    */
   public checkRoleCanCreateInBehalf(role: string, throwError: boolean) {
     let canCreateInBehalf = false;
@@ -1154,6 +1434,7 @@ export default class ItemDefinition {
 
   /**
    * Tells whether this item definition has parenting enforced
+   * @return a boolean on whether parenting is enforced
    */
   public mustBeParented() {
     return !!this.rawData.mustBeParented;
@@ -1164,6 +1445,7 @@ export default class ItemDefinition {
    * by it, that means the current item definition will be the children
    * @param parentItemDefinition the expected parent
    * @param throwError whether to throw an error if failed
+   * @returns a boolean on whether the item definition is an allowed parent
    */
   public checkCanBeParentedBy(parentItemDefinition: ItemDefinition, throwError: boolean) {
     // we need to get the module
@@ -1210,6 +1492,7 @@ export default class ItemDefinition {
    * @param userId the user id
    * @param parentOwnerUserId the parent owner user id of the item this user is trying to parent
    * @param throwError whether to throw an error
+   * @returns a boolean on whether parenting is allowed
    */
   public checkRoleAccessForParenting(
     role: string,
@@ -1249,6 +1532,7 @@ export default class ItemDefinition {
   /**
    * Basically returns the raw data itself
    * doesn't do much
+   * @returns the json form
    */
   public toJSON() {
     return this.rawData;
@@ -1258,11 +1542,13 @@ export default class ItemDefinition {
    * Provides the path from the module
    * base, that is not absolute but a relative
    * path from the parent module
+   * @returns an array of string that represent
+   * the path concatenated all the way to the module path to the root
    */
-  public getModulePath(): string[] {
+  public getPath(): string[] {
     if (this.parentItemDefinition) {
       return this.parentItemDefinition
-        .getModulePath()
+        .getPath()
         .concat([
           this.getName(),
         ]);
@@ -1273,6 +1559,8 @@ export default class ItemDefinition {
   /**
    * Provides the absolute path all the way
    * from the root
+   * @returns an array of string that represents
+   * the whole absolute path from the root
    */
   public getAbsolutePath(): string[] {
     if (this.parentItemDefinition) {
@@ -1283,7 +1571,7 @@ export default class ItemDefinition {
         ]);
     }
     return this.parentModule
-      .getAbsolutePath()
+      .getPath()
       .concat([
         this.getName(),
       ]);
@@ -1295,6 +1583,7 @@ export default class ItemDefinition {
    * and autocomplete indexed values
    * @param onlyCheckProperties only to check the properties in this list
    * @param ignoreIncludes whether to ignore the sinked in properties in the includes
+   * @returns a boolean
    */
   public containsAnExternallyCheckedProperty(
     onlyCheckProperties?: string[],
@@ -1316,6 +1605,7 @@ export default class ItemDefinition {
    * Provides the qualified path name
    * of this item definition, which is unique for
    * this root instance
+   * @returns the very useful qualified path name
    */
   public getQualifiedPathName(): string {
     if (this.parentItemDefinition) {
@@ -1327,6 +1617,7 @@ export default class ItemDefinition {
   /**
    * Provides all policy names included in the policy of type
    * @param policyType the policy type, "edit", "read", "delete" or "parent"
+   * @returns an array with strings of policy names
    */
   public getPolicyNamesFor(policyType: string): string[] {
     if (!this.rawData.policies || !this.rawData.policies[policyType]) {
@@ -1341,6 +1632,7 @@ export default class ItemDefinition {
    * their own states
    * @param type the type "edit", "delete", "read" or "parent"
    * @param name the policy name that was set
+   * @returns an array of properties
    */
   public getPropertiesForPolicy(type: string, name: string): PropertyDefinition[] {
     return this.rawData.policies[type][name].properties.map(
@@ -1352,12 +1644,19 @@ export default class ItemDefinition {
    * Provides all the property ids that are affected by a given policy
    * @param type the policy type "edit", "delete", "read" or "parent"
    * @param name the policy name
+   * @returns an array of string or null (if no applying properties)
    */
   public getApplyingPropertyIdsForPolicy(type: string, name: string): string[] {
     const applyingProperties = this.rawData.policies[type][name].applyingProperties;
     return applyingProperties || null;
   }
 
+  /**
+   * Provides all the include ids that are affected by the given policy
+   * @param type the policy type "edit", "delete", "read" or "parent"
+   * @param name the policy name
+   * @returns an array of string or null (if no applying includes)
+   */
   public getApplyingIncludeIdsForPolicy(type: string, name: string): string[] {
     return this.rawData.policies[type][name].applyingIncludes || null;
   }
@@ -1366,6 +1665,7 @@ export default class ItemDefinition {
    * Provides all the roles that are affected by a policy
    * @param type the policy type "edit", "delete", "read" or "parent"
    * @param name the policy name
+   * @returns an array of string
    */
   public getRolesForPolicy(type: string, name: string): string[] {
     return this.rawData.policies[type][name].roles;
@@ -1471,6 +1771,7 @@ export default class ItemDefinition {
   /**
    * Tells whether the item definition supports the search
    * endpoint and all what it entails
+   * @returns a boolean
    */
   public isSearchable() {
     if (typeof this.rawData.searchable !== "undefined") {
@@ -1483,6 +1784,7 @@ export default class ItemDefinition {
    * Checks whether the owner of this item definition is not supposed to be
    * the created_by field but rather the id field, this only makes sense
    * in users, an user owns itself
+   * @returns a boolean
    */
   public isOwnerObjectId() {
     return this.rawData.ownerIsObjectId || false;

@@ -311,6 +311,7 @@ export interface IPropertyDefinitionState {
 /**
  * Helper functions returns null if the value is undefined
  * @param value the value, whatever it is
+ * @returns null if undefined or the value
  */
 function nullIfUndefined<T>(value: T): T {
   if (typeof value === "undefined") {
@@ -354,6 +355,7 @@ export type PropertyDefinitionCheckerFunctionType =
  * @param property the property in question
  * @param value the value of that property currently
  * @param id the slot id
+ * @returns a boolean on whether the index is right
  */
 async function clientSideIndexChecker(
   property: PropertyDefinition,
@@ -421,6 +423,7 @@ async function clientSideIndexChecker(
  * @param property the property in question
  * @param value the value the user put
  * @param id the slot id
+ * @returns a boolean on whether the autocomplete value is right
  */
 async function clientSideAutocompleteChecker(
   property: PropertyDefinition,
@@ -480,7 +483,10 @@ async function clientSideAutocompleteChecker(
   }
 }
 
-// The class itself
+/**
+ * The property definition class that defines how properties
+ * are to be defined
+ */
 export default class PropertyDefinition {
   public static supportedTypesStandard = supportedTypesStandard;
 
@@ -492,6 +498,7 @@ export default class PropertyDefinition {
    * A static method that provides the policy prefix for a given policy name and type
    * @param policyType the policy type
    * @param policyName the policy name
+   * @returns a prefixed string that represents the qualified policy
    */
   public static getQualifiedPolicyPrefix(policyType: string, policyName: string) {
     return PREFIX_BUILD(
@@ -518,6 +525,7 @@ export default class PropertyDefinition {
    * these enums, but for example, when checking the information on the enums
    * during the checkers.ts process, we don't want to check that because
    * then it will always be valid
+   * @returns a boolean on whether the value is valid
    */
   public static isValidValue(
     propertyDefinitionRaw: IPropertyDefinitionRawJSONDataType,
@@ -725,61 +733,100 @@ export default class PropertyDefinition {
     return null;
   }
 
-  // the raw data for the property definition
+  /**
+   * the raw data for the property definition
+   */
   public rawData: IPropertyDefinitionRawJSONDataType;
-  // module
+  /**
+   * the parent module of the property
+   */
   private parentModule: Module;
+  /**
+   * The parent item definition, if any, not available to extensions
+   */
   private parentItemDefinition: ItemDefinition;
+  /**
+   * Whether the property is an extension
+   */
   private propertyIsExtension: boolean;
-  // when a property is instantiated this is the original property which is
-  // directly attached to the tree
+  /**
+   * when a property is instantiated this is the original property which is
+   * directly attached to the tree
+   */
   private originatingInstance: PropertyDefinition;
 
-  // compiled rules
+  /**
+   * Processed rules for default from the raw data
+   */
   private defaultIf?: IPropertyDefinitionRuleDataType[];
+  /**
+   * Processed rules for invalid if from the raw data
+   */
   private invalidIf?: IPropertyDefinitionInvalidRuleDataType[];
+  /**
+   * Processed enforced values from the raw data
+   */
   private enforcedValues?: IPropertyDefinitionRuleDataType[];
+  /**
+   * Processed hidden conditions from the raw data
+   */
   private hiddenIf?: ConditionalRuleSet;
 
-  // enforced values and defaulted values, this is usually set manually
-  // and it applies to includes usually with enforced property values
-  // hence the enforced value is global
+  /**
+   * enforced values and defaulted values, this is usually set manually
+   * and it applies to includes usually with enforced property values
+   * hence the enforced value is global
+   */
   private globalSuperEnforcedValue?: PropertyDefinitionSupportedType
     | PropertyDefinition;
-  // this applies for predefined properties basically this is the new
-  // default value
+  /**
+   * this applies for predefined properties basically this is the new
+   * default value
+   */
   private globalSuperDefaultedValue?: PropertyDefinitionSupportedType
     | PropertyDefinition;
 
-  // representing the state of the class
+  /**
+   * representing the state of the class
+   */
   private stateValue: {
     [slotId: number]: PropertyDefinitionSupportedType,
   };
-  // this is less relevant than the single enforced and it
-  // is used when the value is applied manually during
-  // the user interaction, values are enforced
+  /**
+   * this is less relevant than the single enforced and it
+   * is used when the value is applied manually during
+   * the user interaction, values are enforced
+   */
   private stateSuperEnforcedValue: {
     [slotId: number]: PropertyDefinitionSupportedType,
   };
-  // refers to whether the value in the state value
-  // has been modified by any interaction, either by
-  // apply value or set value by user
+  /**
+   * refers to whether the value in the state value
+   * has been modified by any interaction, either by
+   * apply value or set value by user
+   */
   private stateValueModified: {
     [slotId: number]: boolean,
   };
-  // this only triggers as true when the value has been modified
-  // when it has been set by the set value function which
-  // is what is supposed to be used by the user
+  /**
+   * this only triggers as true when the value has been modified
+   * when it has been set by the set value function which
+   * is what is supposed to be used by the user
+   */
   private stateValueHasBeenManuallySet: {
     [slotId: number]: boolean,
   };
-  // an internal value
+  /**
+   * an internal value
+   */
   private stateInternalValue: {
     [slotId: number]: any,
   };
 
-  // these are caches builtin the property
-  // to be used in the client side
+  /**
+   * these are caches builtin the property
+   * to be used in the client side
+   */
   // tslint:disable-next-line: member-ordering
   public stateLastUniqueCheck: {
     [slotId: number]: {
@@ -853,6 +900,8 @@ export default class PropertyDefinition {
    * Provides the current enforced value (if any)
    * to a given slot id
    * @param id the slot id
+   * @returns an object that specifies whether the value is enforced, and the value itself if true
+   * the value can be null
    */
   public getEnforcedValue(id: number): {
     enforced: boolean;
@@ -940,6 +989,7 @@ export default class PropertyDefinition {
    * Provides the request fields that are necessary
    * and contained within this property in order to be
    * graphql requested, these come from the property description
+   * @returns the requested fields that are necessary
    */
   public getRequestFields() {
     let requestFields = {};
@@ -971,6 +1021,7 @@ export default class PropertyDefinition {
    * Provides the current value of a property (as it is)
    * for a given slot id
    * @param id the slot id
+   * @returns the current value
    */
   public getCurrentValue(id: number): PropertyDefinitionSupportedType {
     // first we check for a possible enforced value
@@ -1019,7 +1070,7 @@ export default class PropertyDefinition {
    * any external checking, pass the id still as a cache of previously external
    * checked results might apply
    * @param id the id of the current item definition as stored, pass null if not stored
-   * @returns a bunch of information about the current value
+   * @returns the current value state
    */
   public getStateNoExternalChecking(id: number, emulateExternalChecking?: boolean): IPropertyDefinitionState {
     const possibleEnforcedValue = this.getEnforcedValue(id);
@@ -1086,7 +1137,7 @@ export default class PropertyDefinition {
    * provides the current useful value for the property defintion
    * @param id the id of the current item definition as stored, pass null if not stored
    * this also represents the slot
-   * @returns a bunch of information about the current value
+   * @returns a promise for the current value state
    */
   public async getState(id: number): Promise<IPropertyDefinitionState> {
 
@@ -1281,6 +1332,17 @@ export default class PropertyDefinition {
 
   // TODO add undo function, canUndo and add the gql applied value
   // here in order to turn it back to that applied value
+  /**
+   * Applies the value to the property
+   * this is intended to be used for when values are loaded
+   * into this, and not meant for user input
+   * @param id the id of the slot
+   * @param value the value
+   * @param modifiedState a modified state to use
+   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet to avoid hot updating
+   * values when the user is modifying them and an apply value has been called because
+   * it has been updated somewhere else, we use this to avoid overriding
+   */
   public applyValue(
     id: number,
     value: any,
@@ -1322,7 +1384,7 @@ export default class PropertyDefinition {
    *
    * @param value the value to check
    * @param id the id of the item as stored (pass null if new)
-   * @return the invalid reason as a string
+   * @returns the invalid reason as a string
    */
   public isValidValueNoExternalChecking(
     id: number,
@@ -1393,7 +1455,7 @@ export default class PropertyDefinition {
    *
    * @param value the value to check
    * @param id the id of the item as stored (pass null if new)
-   * @return the invalid reason as a string
+   * @returns the invalid reason as a string
    */
   public async isValidValue(
     id: number,
@@ -1437,6 +1499,7 @@ export default class PropertyDefinition {
    * the item definition, uses the same on state change
    * function for state changes so it remains linked to the
    * module
+   * @returns a new instance
    */
   public getNewInstance() {
     return new PropertyDefinition(this.rawData, this.parentModule,
@@ -1446,6 +1509,7 @@ export default class PropertyDefinition {
   /**
    * Provides the property definition description from the
    * supported standards
+   * @returns the property definition description for its type
    */
   public getPropertyDefinitionDescription() {
     return PropertyDefinition.supportedTypesStandard[this.getType()];
@@ -1453,17 +1517,23 @@ export default class PropertyDefinition {
 
   /**
    * Tells whether the current property is nullable
+   * @returns a boolean
    */
   public isNullable() {
     return this.rawData.nullable;
   }
 
+  /**
+   * Tells whether there's an unique index on it
+   * @returns a boolean
+   */
   public isUnique() {
     return this.rawData.unique;
   }
 
   /**
    * Tells whether the current property is defined as being hidden
+   * @returns a boolean
    */
   public isHidden() {
     return this.rawData.hidden;
@@ -1471,6 +1541,7 @@ export default class PropertyDefinition {
 
   /**
    * Checks whether the property can be retrieved
+   * @returns a boolean
    */
   public isRetrievalDisabled() {
     return this.rawData.disableRetrieval || false;
@@ -1478,6 +1549,7 @@ export default class PropertyDefinition {
 
   /**
    * Checks whether the property can be range searched
+   * @returns a boolean
    */
   public isRangedSearchDisabled() {
     return this.rawData.disableRangedSearch || false;
@@ -1486,6 +1558,7 @@ export default class PropertyDefinition {
   /**
    * Tells if it's searchable, either by default or because
    * of a search level
+   * @returns a boolean
    */
   public isSearchable(): boolean {
     if (this.getPropertyDefinitionDescription().searchable) {
@@ -1499,6 +1572,7 @@ export default class PropertyDefinition {
 
   /**
    * Checks whether the property has specific defined valid values
+   * @returns a boolean
    */
   public hasSpecificValidValues() {
     return !!this.rawData.values;
@@ -1506,6 +1580,7 @@ export default class PropertyDefinition {
 
   /**
    * Provides the specific valid values of the given property
+   * @returns a boolean
    */
   public getSpecificValidValues() {
     return this.rawData.values;
@@ -1513,6 +1588,7 @@ export default class PropertyDefinition {
 
   /**
    * Checks whether the property is defined as autocomplete
+   * @returns a booelean
    */
   public hasAutocomplete() {
     return !!this.rawData.autocomplete;
@@ -1520,6 +1596,7 @@ export default class PropertyDefinition {
 
   /**
    * Returns the autocomplete id
+   * @returns a string that is the id
    */
   public getAutocompleteId() {
     return this.rawData.autocomplete;
@@ -1527,6 +1604,7 @@ export default class PropertyDefinition {
 
   /**
    * Checks whether the property autocomplete is enforced
+   * @returns a boolean
    */
   public isAutocompleteEnforced() {
     return !!this.rawData.autocompleteIsEnforced;
@@ -1534,6 +1612,7 @@ export default class PropertyDefinition {
 
   /**
    * Checks whether the property autocomplete supports locale
+   * @returns a boolean
    */
   public isAutocompleteLocalized() {
     return !!this.rawData.autocompleteSupportsLocale;
@@ -1544,6 +1623,7 @@ export default class PropertyDefinition {
    * for the autocomplete to be used, that is a list of property whose values
    * are meant to be passed in order to filter
    * @param id the slot id where to extract the property values
+   * @returns the filter that is to be sent to the autocomplete query
    */
   public getAutocompletePopulatedFiltersFor(id: number): ISingleFilterRawJSONDataType {
     // if there's nothing specified to populate the filters
@@ -1568,6 +1648,7 @@ export default class PropertyDefinition {
   /**
    * Provides the html level as defined as autocomplete="" in the html tag
    * attribute, this is mainly for usability
+   * @returns a string or null
    */
   public getHTMLAutocomplete() {
     return this.rawData.htmlAutocomplete || null;
@@ -1575,6 +1656,7 @@ export default class PropertyDefinition {
 
   /**
    * Provides the subtype of the property, if available
+   * @returns the subtype string or null
    */
   public getSubtype() {
     return this.rawData.subtype || null;
@@ -1582,6 +1664,7 @@ export default class PropertyDefinition {
 
   /**
    * Check whether the type is text, and if it's a rich text type
+   * @returns a boolean
    */
   public isRichText() {
     return this.rawData.type === "text" && this.rawData.subtype === "html";
@@ -1589,6 +1672,7 @@ export default class PropertyDefinition {
 
   /**
    * Provides the max length as defined, or null if not available
+   * @returns a number or null
    */
   public getMaxLength() {
     return typeof this.rawData.maxLength !== "undefined" ?
@@ -1597,6 +1681,7 @@ export default class PropertyDefinition {
 
   /**
    * Provides the min length as defined or null if not available
+   * @returns a number or null
    */
   public getMinLength() {
     return typeof this.rawData.minLength !== "undefined" ?
@@ -1607,6 +1692,7 @@ export default class PropertyDefinition {
    * Provides the max decimal count as defined, does not provide
    * the limits as they are defined in the constant, returns null
    * simply if it's not defined
+   * @returns a number or null
    */
   public getMaxDecimalCount() {
     return this.rawData.maxDecimalCount || null;
@@ -1616,6 +1702,7 @@ export default class PropertyDefinition {
    * Provides the min decimal count as defined, does not provide
    * the limits as they are defined in the constant, returns null
    * simply if it's not defined
+   * @returns a number or null
    */
   public getMinDecimalCount() {
     if (this.getType() === "currency") {
@@ -1628,6 +1715,7 @@ export default class PropertyDefinition {
    * Provides the value of a special property if it's available
    * they can only be of type, boolean, string, or number
    * @param name the name of that specifial property
+   * @returns the special property value, either a boolean, number or string, or null
    */
   public getSpecialProperty(name: string) {
     if (!this.rawData.specialProperties) {
@@ -1639,6 +1727,7 @@ export default class PropertyDefinition {
 
   /**
    * Just gives the parent module
+   * @returns a Module
    */
   public getParentModule() {
     return this.parentModule;
@@ -1646,6 +1735,7 @@ export default class PropertyDefinition {
 
   /**
    * Just gives the parent item definition
+   * @returns a item definition that holds this property if any
    */
   public getParentItemDefinition() {
     return this.parentItemDefinition;
@@ -1654,18 +1744,26 @@ export default class PropertyDefinition {
   /**
    * Tells if the property is an extension
    * from the propext list, they usually have priority
-   * @return a boolean
+   * @returns a boolean
    */
   public isExtension(): boolean {
     return this.propertyIsExtension;
   }
 
+  /**
+   * Tells whether the value is coerced into default when null
+   * @returns a booean
+   */
   public isCoercedIntoDefaultWhenNull(): boolean {
     return !!this.rawData.coerceNullsIntoDefault;
   }
 
+  /**
+   * Gives the default set value
+   * @returns a property definition value, or null
+   */
   public getDefaultValue(): PropertyDefinitionSupportedType {
-    return this.rawData.default;
+    return this.rawData.default || null;
   }
 
   /**
@@ -1694,6 +1792,7 @@ export default class PropertyDefinition {
    * from an arbitrary value during creation, this comes in handy for example
    * for the role in the user item, where an user cannot assign itself an arbitrary
    * role during the IO action of creation
+   * @returns an array of string for the roles
    */
   public getRolesWithAccessTo(action: ItemDefinitionIOActions) {
     if (action === ItemDefinitionIOActions.READ) {
@@ -1720,6 +1819,7 @@ export default class PropertyDefinition {
    * @param userId the user id that wants to perform the action (null is allowed for eg. GUEST_METAROLE)
    * @param ownerUserId the owner of the item definition (provide UNSPECFIED_OWNER when no owner is known)
    * @param throwError whether to throw an EndpointError during failure rather than returning a boolean
+   * @returns a boolean on whether it has been granted access
    */
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,
@@ -1773,6 +1873,7 @@ export default class PropertyDefinition {
 
   /**
    * Gets the raw data of the property
+   * @returns the json form
    */
   public toJSON() {
     return this.rawData;
@@ -1782,6 +1883,7 @@ export default class PropertyDefinition {
    * Provides the qualified property identifier for this specific property
    * @param policyType the policy type
    * @param policyName the policy name
+   * @returns a string for the qualified policy prefix for this specific property id
    */
   public getQualifiedPolicyIdentifier(policyType: string, policyName: string) {
     return PropertyDefinition.getQualifiedPolicyPrefix(policyType, policyName) + this.getId();

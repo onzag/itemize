@@ -24,6 +24,7 @@ const PROPERTY_TYPE_GQL_POOL = {};
  * @param propertyDefinition the property definition in question
  * @param options.propertiesAsInput if the property should be as an input object, for use within args
  * @param options.optionalForm makes all the properties optional, nullable
+ * @returns the partial graphql fields definition for the property
  */
 export function getGQLFieldsDefinitionForProperty(
   propertyDefinition: PropertyDefinition,

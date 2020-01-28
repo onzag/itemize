@@ -23,6 +23,7 @@ import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
  * Provides the table bit that is necessary to store include data
  * for this include when included from the parent definition
  * @param include the include in question
+ * @returns the partial table definition schema for the include
  */
 export function getSQLTableDefinitionForInclude(include: Include): ISQLTableDefinitionType {
   // the exclusion state needs to be stored in the table bit
@@ -62,6 +63,7 @@ export function getSQLTableDefinitionForInclude(include: Include): ISQLTableDefi
  * @param graphqlFields contains the only properties that are required
  * in the request provided by grapql fields,
  * eg {id: {}, name: {}}
+ * @returns a partial graphql value
  */
 export function convertSQLValueToGQLValueForInclude(
   include: Include,
@@ -119,6 +121,7 @@ export function convertSQLValueToGQLValueForInclude(
  * partial fields; for example, if you have a field that has a property
  * that is nullable but it's forced into some value it will be ignored
  * in a partial field value, don't use partial fields to create
+ * @returns the partial sql result to be added into the table
  */
 export async function convertGQLValueToSQLValueForInclude(
   transitoryId: string,

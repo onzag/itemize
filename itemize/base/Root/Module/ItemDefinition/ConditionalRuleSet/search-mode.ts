@@ -31,6 +31,7 @@ export function getConversionRulesetId(
  * not able to manage to do so
  * @param rawData the raw data for the conditional rule set
  * @param otherKnownProperties the properties this set has access to
+ * @returns a raw conditional rule set that is the search mode form of this ruleset
  */
 export function buildSearchModeConditionalRuleSet(
   rawData: IConditionalRuleSetRawJSONDataType,

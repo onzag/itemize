@@ -266,6 +266,7 @@ export default class Include {
 
   /**
    * Provides the ids of the sinking properties
+   * @returns an array of the sinking properties ids
    */
   public getSinkingPropertiesIds(): string[] {
     return this.rawData.sinkIn || [];
@@ -274,6 +275,7 @@ export default class Include {
   /**
    * Propvides a single sinking property for a given id
    * @param id the property id
+   * @returns a single property, if available, otherwise throws an error
    */
   public getSinkingPropertyFor(id: string) {
     if (!this.rawData.sinkIn.includes(id)) {
@@ -286,6 +288,7 @@ export default class Include {
   /**
    * Provides all the sinking properties as property definition
    * instances
+   * @returns all sinking properties as instances
    */
   public getSinkingProperties(): PropertyDefinition[] {
     return this.getSinkingPropertiesIds()
@@ -301,6 +304,7 @@ export default class Include {
    * @param requestedFields the requested fields that are requested from the include these basically
    * represent the sinking properties where the IO action is being applied
    * @param throwError whether to throw an error in failure
+   * @returns a boolean on whether it has role access
    */
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,
@@ -318,7 +322,7 @@ export default class Include {
 
   /**
    * Tells whether the current item is excluded
-   * @return a boolean whether it's excluded or not
+   * @returns a boolean whether it's excluded or not
    */
   public getExclusionState(id: number): IncludeExclusionState {
     // let's check if it's excluded by force
@@ -385,6 +389,7 @@ export default class Include {
    * Checks whether the exclusion state is a ternary type,
    * this basically only exists in search item definition items
    * because it's used during the search mode
+   * @returns a boolean on whether the exclusion is ternary
    */
   public isExclusionTernary(): boolean {
     return this.rawData.ternaryExclusionState || false;
@@ -394,6 +399,7 @@ export default class Include {
    * Checks whether excluding this item (while possible) will cause
    * a callout, that is, a clear display that the item definition
    * instance is missing it, this is for key items, eg. car, wheels missing.
+   * @returns a boolean on whether the exclusion must be called out
    */
   public isExclusionCallout(): boolean {
     return this.rawData.exclusionIsCallout || false;
@@ -411,6 +417,7 @@ export default class Include {
   /**
    * Provides the name for this item, the name represents
    * the item definition children this item is attached to
+   * @returns a string with the item definition name
    */
   public getItemDefinitionName() {
     return this.rawData.definition;
@@ -419,6 +426,7 @@ export default class Include {
   /**
    * Provides the unique id of this item definition
    * the unique id is, well, unique for this item
+   * @returns the unique id of the include
    */
   public getId() {
     return this.rawData.id;
@@ -427,6 +435,7 @@ export default class Include {
   /**
    * Provides the qualified identifier of the include
    * that is an INCLUDE prefixed with the identifier
+   * @returns a string that is the qualified identifier
    */
   public getQualifiedIdentifier() {
     return INCLUDE_PREFIX + this.getId();
@@ -435,6 +444,7 @@ export default class Include {
   /**
    * Provides the qualified identifier for prefixing
    * other things
+   * @returns a prefixed string that is the prefixed qualified identifier
    */
   public getPrefixedQualifiedIdentifier() {
     return PREFIX_BUILD(this.getQualifiedIdentifier());
@@ -442,6 +452,7 @@ export default class Include {
 
   /**
    * Provides the qualfiied name for the exclusion state
+   * @returns the string that represents the exclusion identifier
    */
   public getQualifiedExclusionStateIdentifier() {
     return this.getPrefixedQualifiedIdentifier() + EXCLUSION_STATE_SUFFIX;
@@ -450,6 +461,7 @@ export default class Include {
   /**
    * Provides the current value of this item
    * @param id the id of the stored item definition or module
+   * @returns the state of the include
    */
   public getStateNoExternalChecking(id: number, emulateExternalChecking?: boolean): IIncludeState {
     const exclusionState = this.getExclusionState(id);
@@ -469,6 +481,7 @@ export default class Include {
   /**
    * Provides the current value of this item
    * @param id the id of the stored item definition or module
+   * @returns a promise for the state of the include
    */
   public async getState(id: number): Promise<IIncludeState> {
     const exclusionState = this.getExclusionState(id);
@@ -561,6 +574,7 @@ export default class Include {
 
   /**
    * Basically returns the raw data of this item
+   * @returns the json value raw data
    */
   public toJSON() {
     return this.rawData;
@@ -569,13 +583,15 @@ export default class Include {
   /**
    * Returns true if the item contains a property that needs to be
    * extenrally checked, either an autocompleted property or an indexed one
+   * @returns a boolean on whether it contains such a property or not
    */
   public containsAnExternallyCheckedProperty(): boolean {
     return this.itemDefinition.containsAnExternallyCheckedProperty(this.rawData.sinkIn, true);
   }
 
   /**
-   * Provides the item definition where this item is contained
+   * Provides the item definition that this include refers to
+   * @returns the item definition
    */
   public getItemDefinition() {
     return this.itemDefinition;

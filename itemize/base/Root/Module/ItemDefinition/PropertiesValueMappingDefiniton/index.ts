@@ -74,6 +74,7 @@ export default class PropertiesValueMappingDefiniton {
 
   /**
    * Gives a property map in the form id and value for properties
+   * @returns the property map with property values
    */
   public getPropertyMap(): Array<{
     id: string;
@@ -91,6 +92,7 @@ export default class PropertiesValueMappingDefiniton {
    * Checks whether it contains a property value for a
    * specific property id
    * @param key the property id
+   * @returns a boolean on whether it has such a property value
    */
   public hasPropertyValue(key: string) {
     // null is a valid value so we check for undefined

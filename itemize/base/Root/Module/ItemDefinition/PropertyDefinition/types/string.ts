@@ -15,7 +15,6 @@ import {
 } from "../sql";
 import {
   standardSQLLocalEqualFn,
-  standardSQLLocalSearchExactAndRange,
 } from "../local-sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
@@ -26,6 +25,7 @@ import {
   CLASSIC_SEARCH_OPTIONAL_I18N,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
+import { standardLocalSearchExactAndRange } from "../local-search";
 
 /**
  * The email regex that is used to validate emails
@@ -53,9 +53,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
-  sqlLocalSearch: standardSQLLocalSearchExactAndRange,
   sqlEqual: standardSQLEqualFn,
   sqlLocalEqual: standardSQLLocalEqualFn,
+
+  localSearch: standardLocalSearchExactAndRange,
 
   nullableDefault: "",
   supportsAutocomplete: true,

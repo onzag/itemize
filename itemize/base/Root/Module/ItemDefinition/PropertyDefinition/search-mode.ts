@@ -1,3 +1,11 @@
+/**
+ * Builds the search mode of a property definition that is used within
+ * the search module for used within searches, basically this is an alternative
+ * item definition and alternative property that is used during searches
+ *
+ * @packageDocumentation
+ */
+
 import PropertyDefinition, { IPropertyDefinitionRawJSONDataType, PropertyInvalidReason } from ".";
 import {
   PropertyDefinitionSearchInterfacesType,
@@ -9,6 +17,7 @@ import { IConditionalRuleSetRawJSONDataPropertyType } from "../ConditionalRuleSe
 /**
  * Provides all the ids that a property would be referred to in search mode
  * @param rawData the raw property
+ * @returns an array of string for the ids in search mode for the property
  */
 export function getConversionIds(
   rawData: IPropertyDefinitionRawJSONDataType,
@@ -98,10 +107,6 @@ export function buildSearchModePropertyDefinitions(
   if (newPropDef.type === "text") {
     newPropDef.type = "string";
   }
-
-  // we delete the prefill functionality, as it doesn't make sense
-  // in search mode
-  delete newPropDef.autocompleteSupportsPrefills;
 
   // the default if condition, we need to process
   if (newPropDef.defaultIf) {

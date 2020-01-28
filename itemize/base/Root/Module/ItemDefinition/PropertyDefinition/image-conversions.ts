@@ -32,6 +32,7 @@ interface IImageConversionArguments {
  * "name 200x300 cover" or "200x300 cover" or "name 200x300" or "200x300" or "200x" or "x200", etc...
  * @param value the string value that needs to be parsed
  * @param enforcedName the enforced name when a name is enforced, a name is not parsed and not expected
+ * @returns the image conversion arguments
  */
 function singleOptionAnalysis(
   value: string,
@@ -106,6 +107,7 @@ function manyOptionsAnalysis(value: string): IImageConversionArguments[] {
  * @param fileName the file name that is currently in use in the server side
  * @param filePath the file path that is currently in use in the server side with the file name
  * @param propDef the property definition
+ * @returns a void promise for when this is done
  */
 export async function runImageConversions(
   fileName: string,

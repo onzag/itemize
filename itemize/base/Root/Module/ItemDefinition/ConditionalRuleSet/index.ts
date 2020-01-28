@@ -104,6 +104,7 @@ export type IConditionalRuleSetRawJSONDataType =
  *
  * So we make a rule for this
  *
+ * ```
  * {
  *  "name": "belt",
  *  "excludedIf": {
@@ -117,18 +118,21 @@ export type IConditionalRuleSetRawJSONDataType =
  *      "value": "belt-drive"
  *    }
  *  }
- * },
+ * }
+ * ```
  *
  * Conditional rule sets are chainable and might also include
  * components, components are the same as items, for example
  *
+ * ```
  * {
  *  "name": "belt-keeper",
  *  "excludedIf": {
  *    "component": "belt",
  *    "isIncluded": false
  *  }
- * },
+ * }
+ * ```
  *
  * This means that the belt-keeper item is not available if there is no such
  * thing as a belt included
@@ -199,6 +203,7 @@ export default class ConditionalRuleSet {
    * Evaluates the result of the conditional value as this current point
    * as defined by the item defintion
    * @param id the id to be used to retrieve values for properties during evaluation
+   * @returns a boolean on whether the conditional rule set passes or not
    */
   public evaluate(id: number): boolean {
     // if this is a property type conditional rule set

@@ -1,3 +1,10 @@
+/**
+ * Contains all the graphql functions that are used and generated for and within
+ * the module, refer to this file for the graphql generation side of things
+ *
+ * @packageDocumentation
+ */
+
 import {
   RESERVED_BASE_PROPERTIES,
   PREFIX_SEARCH,
@@ -24,6 +31,7 @@ import { EndpointError } from "../../errors";
  * @param options.excludeBase whether to exclude the base properties, like created_at, etc..
  * @param options.propertiesAsInput if the properties should be in input form
  * @param options.optionalForm makes all the parameters optional, that is nullable
+ * @returns all the fields definition for the module
  */
 export function getGQLFieldsDefinitionForModule(
   mod: Module,
@@ -62,6 +70,7 @@ export function getGQLFieldsDefinitionForModule(
  * Provides the type for the module
  * that represents this module data
  * @param mod the module in question
+ * @returns the module type this module refers to (it is cached)
  */
 export function getGQLTypeForModule(mod: Module): GraphQLObjectType {
   // if we don't have already created the module for this
@@ -85,6 +94,11 @@ export function getGQLTypeForModule(mod: Module): GraphQLObjectType {
   return mod._gqlObj;
 }
 
+/**
+ * Provides the object that represents this module data in
+ * its not flattened form with external properties available
+ * @param mod the module in question
+ */
 export function getGQLQueryOutputForModule(mod: Module): GraphQLObjectType {
   if (!mod._gqlQueryObj) {
     const moduleType = getGQLTypeForModule(mod);
@@ -109,6 +123,22 @@ export function getGQLQueryOutputForModule(mod: Module): GraphQLObjectType {
   return mod._gqlQueryObj;
 }
 
+/**
+ * A generic function that is used for the resolver in the
+ * graphql endpoint in order to specify which resolve to
+ * be used and catch errors, this is what the client
+ * actually recieves, all processing should be done here
+ * this however only affects the generic processing of these
+ * basic resolvers and not the custom ones
+ * @param resolveToUse which resolve to use
+ * @param itemDefinition the item definition in question
+ * @param resolvers the resolvers object
+ * @param source parameter source obtained from graphql
+ * @param args obtained from graphql as well
+ * @param context same
+ * @param info also
+ * @returns a promise that returns whatever the resolvers return
+ */
 async function resolveGenericFunction(
   resolveToUse: string,
   mod: Module,
@@ -150,6 +180,7 @@ async function resolveGenericFunction(
  * @param mod the module in question
  * @param resolvers the resolvers that will be used to resolve the query,
  * these are the generic resolvers that are consumed
+ * @returns the fields for the main query object to do GET_LIST and SEARCH
  */
 export function getGQLQueryFieldsForModule(
   mod: Module,
@@ -224,6 +255,7 @@ export function getGQLQueryFieldsForModule(
  * @param mod the module in question
  * @param resolvers the resolvers that will be used to resolve the query,
  * these are the generic resolvers that are consumed
+ * @returns a query fields definition type for all the sub definitions
  */
 export function getGQLMutationFieldsForModule(
   mod: Module,

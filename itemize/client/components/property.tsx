@@ -113,7 +113,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                     if (typeof gqlValue === "undefined") {
                       gqlValue = null;
                     }
-                    return props.children(gqlValue);
+                    return props.children(gqlValue as any);
                   }
                   // Property has no state, and no internal value, it must be somehow hidden
                   return null;
@@ -138,7 +138,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                       />;
                     } else {
                       return <RawBasePropertyView
-                        value={gqlValue}
+                        value={gqlValue as any}
                       />;
                     }
                   }

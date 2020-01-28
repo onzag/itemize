@@ -1,3 +1,13 @@
+/**
+ * This file contains a json schema for the unprocessed form
+ * of the root leaf
+ *
+ * @packageDocumentation
+ */
+
+/**
+ * The root schema unprocessed and unbuilt
+ */
 export default {
   type: "object",
   properties: {

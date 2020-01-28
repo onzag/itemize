@@ -1,3 +1,11 @@
+/**
+ * This file contains the sql functionaly that is used within modules in order to perform
+ * queries within the module itself as well as to define the parent module table that is
+ * to be used in the item definition for properties in common
+ *
+ * @packageDocumentation
+ */
+
 import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES } from "../../../constants";
 import Module from ".";
 import {
@@ -16,19 +24,20 @@ import { IGQLRequestFields, IGQLValue } from "../../../gql-querier";
  * Provides the table that is necesary to include this module and all
  * its children child definitions into it
  * @param mod the module in question
+ * @returns a whole table schema for the module table
  */
 export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinitionType {
   // add all the standard fields
-  let resultTableSchema: ISQLTableDefinitionType = {
+  const resultTableSchema: ISQLTableDefinitionType = {
     ...RESERVED_BASE_PROPERTIES_SQL,
   };
 
   // now we loop thru every property (they will all become columns)
   mod.getAllPropExtensions().forEach((pd) => {
-    resultTableSchema = {
-      ...resultTableSchema,
-      ...getSQLTableDefinitionForProperty(pd),
-    };
+    Object.assign(
+      resultTableSchema,
+      getSQLTableDefinitionForProperty(pd),
+    );
   });
 
   return resultTableSchema;
@@ -39,19 +48,26 @@ export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinition
  * within this module, you expect one schema per item definition
  * it contains
  * @param mod the module in question
+ * @returns a partial database schema for the module itself, all the child modules, and the item definition
  */
 export function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefinitionType {
   // this is where it will be contained
-  let resultSchema = {
+  const resultSchema = {
     [mod.getQualifiedPathName()]: getSQLTableDefinitionForModule(mod),
   };
   mod.getAllModules().forEach((cModule) => {
     // first with child modules
-    resultSchema = { ...resultSchema, ...getSQLTablesSchemaForModule(cModule) };
+    Object.assign(
+      resultSchema,
+      getSQLTablesSchemaForModule(cModule),
+    );
   });
   // then with child item definitions
   mod.getAllChildItemDefinitions().forEach((cIdef) => {
-    resultSchema = { ...resultSchema, ...getSQLTablesSchemaForItemDefinition(cIdef) };
+    Object.assign(
+      resultSchema,
+      getSQLTablesSchemaForItemDefinition(cIdef),
+    );
   });
   return resultSchema;
 }
@@ -69,6 +85,7 @@ export function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefinitionTy
  * partial fields; for example, if you have a field that has a property
  * that is nullable but it's forced into some value it will be ignored
  * in a partial field value, don't use partial fields to create
+ * @returns a promise for a row value
  */
 export async function convertGQLValueToSQLValueForModule(
   transitoryId: string,
@@ -81,7 +98,7 @@ export async function convertGQLValueToSQLValueForModule(
   partialFields?: any,
 ): Promise<ISQLTableRowValue> {
   // first we create the row value
-  let result: ISQLTableRowValue = {};
+  const result: ISQLTableRowValue = {};
 
   await Promise.all(
     // now we get all the property extensions
@@ -95,10 +112,10 @@ export async function convertGQLValueToSQLValueForModule(
         const addedFieldsByProperty = await convertGQLValueToSQLValueForProperty(
           transitoryId, itemDefinition, null, pd, data, oldData, knex, dictionary, "",
         );
-        result = {
-          ...result,
-          ...addedFieldsByProperty,
-        };
+        Object.assign(
+          result,
+          addedFieldsByProperty,
+        );
       }
     }),
   );
@@ -118,6 +135,7 @@ export async function convertGQLValueToSQLValueForModule(
  * @param graphqlFields contains the only properties that are required
  * in the request provided by grapql fields,
  * eg {id: {}, name: {}}
+ * @returns a graphql value
  */
 export function convertSQLValueToGQLValueForModule(
   mod: Module,
@@ -125,7 +143,7 @@ export function convertSQLValueToGQLValueForModule(
   graphqlFields: IGQLRequestFields,
 ): IGQLValue {
   // first we create the graphql result
-  let result: IGQLValue = {};
+  const result: IGQLValue = {};
 
   // now we take all the base properties that we have
   // in the graphql model
@@ -140,7 +158,10 @@ export function convertSQLValueToGQLValueForModule(
   mod.getAllPropExtensions().filter(
     (property) => graphqlFields[property.getId()],
   ).forEach((pd) => {
-    result = { ...result, ...convertSQLValueToGQLValueForProperty(pd, row) };
+    Object.assign(
+      result,
+      convertSQLValueToGQLValueForProperty(pd, row),
+    );
   });
 
   return result;
@@ -152,6 +173,7 @@ export function convertSQLValueToGQLValueForModule(
  * @param mod the module in question
  * @param data the data for the query from graphql
  * @param knexBuilder the knex builder
+ * @param dictionary the dictionary used
  */
 export function buildSQLQueryForModule(
   mod: Module,

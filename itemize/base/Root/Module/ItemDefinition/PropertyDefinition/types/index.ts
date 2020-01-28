@@ -146,7 +146,7 @@ export interface IPropertyDefinitionSupportedType {
    * raw (that is with DATA) the property id and the include id, the args are
    * the same
    */
-  sqlLocalSearch: (
+  localSearch: (
     args: IGQLArgs,
     rawData: IGQLValue,
     id: string,

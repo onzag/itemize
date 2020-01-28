@@ -1,3 +1,10 @@
+/**
+ * This file contains all the graphql functions that need to be used to request
+ * and process an item definition, from the definition to how it must be queried
+ *
+ * @packageDocumentation
+ */
+
 import { GraphQLOutputType, GraphQLObjectType, GraphQLList } from "graphql";
 import {
   PREFIX_GET,
@@ -35,6 +42,7 @@ import { EndpointError } from "../../../errors";
  * @param options.optionalForm makes all the parameters optional, that is nullable
  * @param options.includePolicy whether to include the policies in the result, this is a string
  * that specifies the policy type that is to be included, eg "edit", "delete", "read" and "parent"
+ * @returns a fields definition object that represents the whole item definition as it was specified
  */
 export function getGQLFieldsDefinitionForItemDefinition(
   itemDefinition: ItemDefinition,
@@ -47,7 +55,7 @@ export function getGQLFieldsDefinitionForItemDefinition(
   },
 ): IGQLFieldsDefinitionType {
   // the fields result in graphql field form
-  let fieldsResult: IGQLFieldsDefinitionType =
+  const fieldsResult: IGQLFieldsDefinitionType =
     getGQLFieldsDefinitionForModule(itemDefinition.getParentModule(), options);
 
   // We get all the properties that this item definition contains
@@ -58,25 +66,25 @@ export function getGQLFieldsDefinitionForItemDefinition(
     }
 
     // and we add them progressively
-    fieldsResult = {
-      ...fieldsResult,
-      ...getGQLFieldsDefinitionForProperty(pd, {
+    Object.assign(
+      fieldsResult,
+      getGQLFieldsDefinitionForProperty(pd, {
         propertiesAsInput: options.propertiesAsInput,
         optionalForm: options.optionalForm,
         prefix: "",
       }),
-    };
+    );
   });
 
   // We do the same with the includes
   itemDefinition.getAllIncludes().forEach((i) => {
-    fieldsResult = {
-      ...fieldsResult,
-      ...getGQLFieldsDefinitionForInclude(i, {
+    Object.assign(
+      fieldsResult,
+      getGQLFieldsDefinitionForInclude(i, {
         propertiesAsInput: options.propertiesAsInput,
         optionalForm: options.optionalForm,
       }),
-    };
+    );
   });
 
   // return that
@@ -84,23 +92,24 @@ export function getGQLFieldsDefinitionForItemDefinition(
     return fieldsResult;
   } else if (Array.isArray(options.includePolicy)) {
     options.includePolicy.forEach((policyToInclude) => {
-      fieldsResult = {
-        ...fieldsResult,
-        ...getGQLFieldsDefinitionForItemDefinitionPolicies(itemDefinition, {
+      Object.assign(
+        fieldsResult,
+        getGQLFieldsDefinitionForItemDefinitionPolicies(itemDefinition, {
           propertiesAsInput: options.propertiesAsInput,
           policy: policyToInclude,
         }),
-      };
+      );
     });
     return fieldsResult;
   } else {
-    return {
-      ...fieldsResult,
-      ...getGQLFieldsDefinitionForItemDefinitionPolicies(itemDefinition, {
+    Object.assign(
+      fieldsResult,
+      getGQLFieldsDefinitionForItemDefinitionPolicies(itemDefinition, {
         propertiesAsInput: options.propertiesAsInput,
         policy: options.includePolicy,
       }),
-    };
+    );
+    return fieldsResult;
   }
 }
 
@@ -110,6 +119,7 @@ export function getGQLFieldsDefinitionForItemDefinition(
  * @param itemDefinition the item definition in question
  * @param options.policy the policy type that should be included, eg "edit", "delete", "read" and "parent"
  * @param options.propertiesAsInput if the properties should be in input form
+ * @returns a partial graphql fields definition that only contains the policies
  */
 export function getGQLFieldsDefinitionForItemDefinitionPolicies(
   itemDefinition: ItemDefinition,
@@ -118,17 +128,21 @@ export function getGQLFieldsDefinitionForItemDefinitionPolicies(
     propertiesAsInput: boolean,
   },
 ): IGQLFieldsDefinitionType {
-  // TODO implement parent policy properly according to type
-  let fieldsResult: IGQLFieldsDefinitionType = {};
+  // building the fields result
+  const fieldsResult: IGQLFieldsDefinitionType = {};
+  // get all the policy names for it
   itemDefinition.getPolicyNamesFor(options.policy).forEach((policyName) => {
+    // get all the properties for that policy
     itemDefinition.getPropertiesForPolicy(options.policy, policyName).forEach((pd) => {
-      fieldsResult = {
-        ...getGQLFieldsDefinitionForProperty(pd, {
+      // and add them
+      Object.assign(
+        fieldsResult,
+        getGQLFieldsDefinitionForProperty(pd, {
           propertiesAsInput: options.propertiesAsInput,
           optionalForm: true,
           prefix: PREFIX_BUILD(POLICY_PREFIXES[options.policy] + policyName),
         }),
-      };
+      );
     });
   });
   return fieldsResult;
@@ -138,6 +152,8 @@ export function getGQLFieldsDefinitionForItemDefinitionPolicies(
  * Provides the graphql type for the given item definition which
  * extends the interface of its parent module already
  * @param itemDefinition the item definition in question
+ * @returns the graphql type that should be used to refer to this item definition, it is always
+ * the same as it's cached once it's first retrieved
  */
 export function getGQLTypeForItemDefinition(itemDefinition: ItemDefinition): GraphQLOutputType {
   // we check if we have an object cached already
@@ -169,6 +185,8 @@ export function getGQLTypeForItemDefinition(itemDefinition: ItemDefinition): Gra
  * being so that the DATA attributes are there and the external attributes
  * as well, the non flattened form, this is because of blocked rules
  * @param itemDefinition the item definition in question
+ * @returns the graphql query object that shows its not flattened form it is always
+ * the same as it's flattened
  */
 export function getGQLQueryOutputForItemDefinition(itemDefinition: ItemDefinition): GraphQLObjectType {
   // first we check if we haven't done it before
@@ -206,9 +224,12 @@ export function getGQLQueryOutputForItemDefinition(itemDefinition: ItemDefinitio
 }
 
 /**
- * A generic function to bind in the
- * server side to resolve in a way that
- * this catches errors
+ * A generic function that is used for the resolver in the
+ * graphql endpoint in order to specify which resolve to
+ * be used and catch errors, this is what the client
+ * actually recieves, all processing should be done here
+ * this however only affects the generic processing of these
+ * basic resolvers and not the custom ones
  * @param resolveToUse which resolve to use
  * @param itemDefinition the item definition in question
  * @param resolvers the resolvers object
@@ -216,6 +237,7 @@ export function getGQLQueryOutputForItemDefinition(itemDefinition: ItemDefinitio
  * @param args obtained from graphql as well
  * @param context same
  * @param info also
+ * @returns a promise that returns whatever the resolvers return
  */
 async function resolveGenericFunction(
   resolveToUse: string,
@@ -264,6 +286,7 @@ async function resolveGenericFunction(
  * @param itemDefinition the item definition that we should retrieve these from
  * @param resolvers the resolvers object that will be used to populate the resolvers
  * of the query fields
+ * @returns the fields for the main query object to do GET, GET_LIST and SEARCH
  */
 export function getGQLQueryFieldsForItemDefinition(
   itemDefinition: ItemDefinition,
@@ -354,6 +377,7 @@ export function getGQLQueryFieldsForItemDefinition(
  * also goes through all the children
  * @param itemDefinition the item definition in question
  * @param resolvers the resolvers for the graphql mutations to populate
+ * @returns the mutation fields for the mutation object to do ADD, EDIT and DELETE
  */
 export function getGQLMutationFieldsForItemDefinition(
   itemDefinition: ItemDefinition,

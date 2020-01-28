@@ -1,3 +1,10 @@
+/**
+ * Contains all the logic that is used within the modules and submodules
+ * modules are containers that offer properties in common for item definitions
+ *
+ * @packageDocumentation
+ */
+
 import ItemDefinition, {
   IItemDefinitionRawJSONDataType, ItemDefinitionIOActions,
 } from "./ItemDefinition";
@@ -18,15 +25,34 @@ import Root from "..";
 import { EndpointError } from "../../errors";
 import { IGQLRequestFields } from "../../../gql-querier";
 
+/**
+ * Specific locale information contained within modules and item
+ * definitions, as this is how the i18n properties parsed from the
+ * properties files comes to be
+ */
 export interface IRawJsonI18NSpecificLocaleDataType {
+  /**
+   * The name of the module or the item definition
+   */
   name: string;
+  /**
+   * The full text search field label for full text search mode
+   */
   fts_search_field_label: string;
+  /**
+   * The full text search placeholder for full text search mode
+   */
   fts_search_field_placeholder: string;
+  /**
+   * Custom translation fields
+   */
   custom?: {
     [key: string]: string;
   };
-  // policies is however not used in module
-  // since policies cannot really be added to modules
+  /**
+   * Policies, which only really exists on item definitions
+   * since modules do not hold policies
+   */
   policies?: {
     delete?: {
       [policyName: string]: {
@@ -55,44 +81,103 @@ export interface IRawJsonI18NSpecificLocaleDataType {
   };
 }
 
+/**
+ * This is the main form of the i18n data which now includes the namespace
+ * for the specific language locale
+ */
 export interface IRawJSONI18NDataType {
   [locale: string]: IRawJsonI18NSpecificLocaleDataType;
 }
 
+/**
+ * This is what a listener looks like in both modules
+ * and item definitions
+ */
 export type ListenerType = () => any;
 
+/**
+ * This is the raw shape of a module after it has been
+ * built and processed
+ */
 export interface IModuleRawJSONDataType {
-  // Builder data
+  /**
+   * The type is module
+   */
   type: "module";
 
-  // Avaialble for the builder, data gets stripped
+  /**
+   * Location only exists during the building process and it's stripped
+   * and represents the file location the file is
+   */
   location?: string;
+  /**
+   * Also stripped after processed, represents the file location for the
+   * i18n properties file
+   */
   i18nDataLocation?: string;
+  /**
+   * The pointers come during the parsing method and are stripped as well
+   * after built and it's used to create tracebacks from the raw data
+   */
   pointers?: any;
+  /**
+   * This is the raw content of the file the pointers came from and it's also
+   * stripped after built is done
+   */
   raw?: string;
+  /**
+   * The prop extensions file location for the module, also stripped
+   */
   propExtLocation?: string;
+  /**
+   * The prop extensions raw file source, stripped down as well
+   */
   propExtRaw?: string;
+  /**
+   * The prop extensions pointers for use within the tracebacks during
+   * the build process, stripped down after done
+   */
   propExtPointers?: any;
 
-  // Available after a build
+  /**
+   * The name of the file that now becomes a property
+   */
   name: string;
+  /**
+   * The internationalization data
+   */
   i18nData: IRawJSONI18NDataType;
 
+  /**
+   * The read role access
+   */
   readRoleAccess?: string[];
-
+  /**
+   * Whether the module, and only the module itself
+   * is searchable
+   */
   searchable?: boolean;
-
-  // module data
+  /**
+   * the children either module or item definition as found during the folder
+   * search
+   */
   children: Array<IModuleRawJSONDataType | IItemDefinitionRawJSONDataType>;
+  /**
+   * The prop extensions properties that this modules gives to all the item definitions
+   */
   propExtensions?: IPropertyDefinitionRawJSONDataType[];
 }
 
+/**
+ * The class module that defines how the module behaves
+ */
 export default class Module {
   /**
    * Builds the search mode of a raw module
    * this gives a module that is the search module
    * of the given module
    * @param rawData the raw data of the module in json
+   * @returns a raw json for the search module
    */
   public static buildSearchMode(
     rawData: IModuleRawJSONDataType,
@@ -100,6 +185,12 @@ export default class Module {
     return buildSearchModeModule(rawData);
   }
 
+  /**
+   * provides the prop exension property for a given raw module and its id
+   * @param parentModuleRaw the parent module in raw form
+   * @param id the id of the property extension
+   * @returns a raw property definition
+   */
   public static getPropExtensionRawFor(parentModuleRaw: IModuleRawJSONDataType, id: string) {
     const propertyDefinition = parentModuleRaw.propExtensions.find((p) => p.id === id);
     return propertyDefinition;
@@ -154,9 +245,16 @@ export default class Module {
    */
   public rawData: IModuleRawJSONDataType;
 
-  // graphql helper
+  /**
+   * The graphql object for this module (cached)
+   * only exists when used the graphql functions
+   */
   // tslint:disable-next-line: variable-name
   public _gqlObj: GraphQLObjectType;
+  /**
+   * The graphql query object for this module (cached)
+   * only exists when used the graphql functions
+   */
   // tslint:disable-next-line: variable-name
   public _gqlQueryObj: GraphQLObjectType;
 
@@ -180,7 +278,14 @@ export default class Module {
    * The children item definitions, as instances
    */
   private childItemDefinitions: ItemDefinition[];
+  /**
+   * The children modules as instances
+   */
   private childModules: Module[];
+  /**
+   * The prop extensions emulated item definition that contains
+   * all the prop extensions as an item definition itself
+   */
   private childPropExtensionItemDefinition: ItemDefinition;
   /**
    * The property definitions that the module itself
@@ -286,6 +391,11 @@ export default class Module {
     this.parentRoot.registry[this.getQualifiedPathName()] = this;
   }
 
+  /**
+   * Runs the initialization of the module, for cross access, this executes
+   * once the entire tree is ready so this module other parts of the tree
+   * Root class executes this function recursively
+   */
   public init() {
     this.childItemDefinitions.forEach((cidef) => {
       cidef.init();
@@ -305,6 +415,7 @@ export default class Module {
    * checks whether a module has an item definition for
    * an specific children given its full path
    * @param name the name path of the definition
+   * @returns a boolean
    */
   public hasItemDefinitionFor(name: string[]): boolean {
     // Try to find the first path
@@ -343,6 +454,7 @@ export default class Module {
    * path
    * @throws an error if this item definition does not exist
    * @param name the full path of the item definition
+   * @returns a raw item definition
    */
   public getItemDefinitionRawFor(name: string[]): IItemDefinitionRawJSONDataType {
     // Use this helper function
@@ -363,6 +475,7 @@ export default class Module {
    * the path has to be full
    * @throws an error if the path finds a dead end
    * @param name the path name for the item definition
+   * @returns an item definition
    */
   public getItemDefinitionFor(name: string[]): ItemDefinition {
     // Search within the child definitions
@@ -398,6 +511,7 @@ export default class Module {
   /**
    * Gets a specific module given its name
    * @param name the name of the module
+   * @returns a module that exists within this module
    */
   public getModuleFor(name: string[]): Module {
     // Search within the child definitions
@@ -423,6 +537,7 @@ export default class Module {
   /**
    * Checks whether a property extension exists in this module
    * @param id the property definition id
+   * @returns a boolean on whether this prop extension exists
    */
   public hasPropExtensionFor(id: string) {
     // we use the rawdata to quickly check
@@ -434,6 +549,7 @@ export default class Module {
    * Provides a prop extension from the module
    * @throws error if the property does not exist
    * @param id the property definition id
+   * @returns a property definition, or throws an error if it doesn't exist
    */
   public getPropExtensionFor(id: string) {
     const propertyDefinition = this.propExtensions.find((p) => p.getId() === id);
@@ -445,6 +561,7 @@ export default class Module {
 
   /**
    * Provides all the prop extensions
+   * @returns a list of property definitions
    */
   public getAllPropExtensions() {
     return this.propExtensions;
@@ -452,6 +569,7 @@ export default class Module {
 
   /**
    * Provides all live child item definitions
+   * @returns a list of item definitions
    */
   public getAllChildItemDefinitions() {
     return this.childItemDefinitions;
@@ -459,6 +577,7 @@ export default class Module {
 
   /**
    * Gives the name of this module
+   * @returns a string
    */
   public getName() {
     return this.rawData.name;
@@ -475,6 +594,7 @@ export default class Module {
 
   /**
    * list all module names it contains
+   * @returns a list of string for the module names
    */
   public listModuleNames() {
     return this.rawData.children.filter((c) => c.type === "module").map((m) => m.name);
@@ -483,6 +603,7 @@ export default class Module {
   /**
    * Provides all the modules it contains
    * should follow
+   * @retuns a list of all the child modules as Module instances
    */
   public getAllModules() {
     return this.childModules;
@@ -491,6 +612,7 @@ export default class Module {
   /**
    * Gets a specific module given its name
    * @param name the name of the module
+   * @returns a Module instance for the child module, or throws an error
    */
   public getChildModule(name: string) {
     const resultModule = this.childModules.find((m) => m.getName() === name);
@@ -501,14 +623,25 @@ export default class Module {
     return resultModule;
   }
 
+  /**
+   * Provides the standard form of this module, will throw an error
+   * if already in the standard form
+   * @returns the standard form of the module
+   */
   public getStandardModule(): Module {
     if (this.searchModeModule) {
       throw new Error("No standard module for " + this.getName());
     }
 
+    // yes this is setup this way
     return this.parentModule;
   }
 
+  /**
+   * Provides the search form of this module, will throw an error if already
+   * in the search form
+   * @returns the search form of the module
+   */
   public getSearchModule(): Module {
     if (!this.searchModeModule) {
       throw new Error("No search module for " + this.getName());
@@ -516,12 +649,17 @@ export default class Module {
     return this.searchModeModule;
   }
 
+  /**
+   * Checks whether the module is in search module
+   * @returns a boolean
+   */
   public isInSearchMode(): boolean {
     return !this.searchModeModule;
   }
 
   /**
    * Just gives the parent module
+   * @returns a module (or null)
    */
   public getParentModule() {
     return this.parentModule;
@@ -529,6 +667,7 @@ export default class Module {
 
   /**
    * Just gives the parent root
+   * @returns the parent root
    */
   public getParentRoot() {
     return this.parentRoot;
@@ -536,6 +675,7 @@ export default class Module {
 
   /**
    * Provides the path of the module from the root
+   * @returns an array of string that represents the path all the way to the root
    */
   public getPath(): string[] {
     const parentPath = this.parentModule ? this.parentModule.getPath() : [];
@@ -544,6 +684,7 @@ export default class Module {
 
   /**
    * Tells whether it has a parent module
+   * @returns a boolean on whether this module is parented
    */
   public hasParentModule() {
     return !!this.parentModule;
@@ -552,27 +693,13 @@ export default class Module {
   /**
    * Provides the full qualified path name that is used for absolute reference of the whole
    * module, this is unique
+   * @returns the string qualified path name
    */
   public getQualifiedPathName(): string {
     if (this.parentModule) {
       return PREFIXED_CONCAT(this.parentModule.getQualifiedPathName(), MODULE_PREFIX + this.getName());
     }
     return MODULE_PREFIX + this.getName();
-  }
-
-  /**
-   * Provides the absolute path of this current module
-   * in its string array of names
-   */
-  public getAbsolutePath(): string[] {
-    if (this.parentModule) {
-      return this.parentModule
-        .getAbsolutePath()
-        .concat([
-          this.getName(),
-        ]);
-    }
-    return [this.getName()];
   }
 
   /**
@@ -591,6 +718,7 @@ export default class Module {
 
   /**
    * Tells whether module based searches are allowed
+   * @returns a boolean on whether the module is setup as searchable
    */
   public isSearchable() {
     if (typeof this.rawData.searchable !== "undefined") {
@@ -607,6 +735,7 @@ export default class Module {
    * @param ownerUserId the owner of that item definition
    * @param requestedFields the requested fields (single properties will be checked as well)
    * @param throwError whether to throw an error if failed (otherwise returns a boolean)
+   * @returns a boolean on whether the user is granted role access
    */
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,

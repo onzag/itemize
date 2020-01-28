@@ -15,7 +15,6 @@ import {
 } from "../sql";
 import {
   standardSQLLocalEqualFn,
-  dateSQLLocalSearchExactAndRange,
 } from "../local-sql";
 import { PropertyDefinitionSupportedDateType } from "./date";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
@@ -30,6 +29,7 @@ import {
 } from "../../../../../../constants";
 import Moment from "moment";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
+import { dateLocalSearchExactAndRange } from "../local-search";
 
 /**
  * A datetime is represented as a string
@@ -47,9 +47,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
-  sqlLocalSearch: dateSQLLocalSearchExactAndRange,
   sqlEqual: standardSQLEqualFn,
   sqlLocalEqual: standardSQLLocalEqualFn,
+
+  localSearch: dateLocalSearchExactAndRange.bind(null, DATETIME_FORMAT),
 
   validate: (d: PropertyDefinitionSupportedDateType) => {
     if (d === "Invalid Date") {

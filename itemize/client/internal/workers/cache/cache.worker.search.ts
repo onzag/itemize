@@ -71,7 +71,7 @@ async function checkOne(
         return true;
       }
       const description = pd.getPropertyDefinitionDescription();
-      return description.sqlLocalSearch(searchArgs, value, pd.getId(), null);
+      return description.localSearch(searchArgs, value, pd.getId(), null);
     });
     // and now we consider whether it should be included by includes if it passed all that
     if (shouldBeIncluded) {
@@ -99,7 +99,7 @@ async function checkOne(
               return true;
             }
             const sinkingDescription = sp.getPropertyDefinitionDescription();
-            return sinkingDescription.sqlLocalSearch(searchArgs, value, sp.getId(), i.getId());
+            return sinkingDescription.localSearch(searchArgs, value, sp.getId(), i.getId());
           });
         }
         // this will occur if it's ANY and it's EXCLUDED

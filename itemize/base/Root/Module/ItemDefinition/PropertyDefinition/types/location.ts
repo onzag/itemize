@@ -22,6 +22,7 @@ import { IPropertyDefinitionSupportedUnitType } from "./unit";
  * @param lon1 the longitude 1
  * @param lat2 the latitude 2
  * @param lon2 the longitude 2
+ * @returns the distance in kilometers
  */
 function getDistanceFromLatLonInMeters(
   lat1: number,
@@ -44,6 +45,7 @@ function getDistanceFromLatLonInMeters(
 /**
  * Convert degrees to radians
  * @param deg the degrees in numbers
+ * @returns the radians of the input
  */
 function deg2rad(deg: number) {
   return deg * (Math.PI / 180);
@@ -162,7 +164,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       );
     }
   },
-  sqlLocalSearch: (
+  localSearch: (
     args: IGQLArgs,
     rawData: IGQLValue,
     id: string,

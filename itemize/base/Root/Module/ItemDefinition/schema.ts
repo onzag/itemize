@@ -1,8 +1,19 @@
+/**
+ * This file contains the schema that defines how item definitions should look like
+ * in the schema form
+ *
+ * @packageDocumentation
+ */
+
 import PropertyDefinitionSchema from "./PropertyDefinition/schema";
 import ItemSchema from "./Include/schema";
 import PropertiesValueMappingDefinitionSchema from "./PropertiesValueMappingDefiniton/schema";
 import ConditionalRuleSetSchema from "./ConditionalRuleSet/schema";
 
+/**
+ * The standard policy schema that defines how policies should look like
+ * in the item definition
+ */
 const policySchema = {
   type: "object",
   patternProperties: {
@@ -44,6 +55,9 @@ const policySchema = {
   additionalProperties: false,
 };
 
+/**
+ * The policy schema, used for parenting
+ */
 const policySchemaWithModuleAndItemDefinition = {
   type: "object",
   patternProperties: {
@@ -77,6 +91,10 @@ const policySchemaWithModuleAndItemDefinition = {
   additionalProperties: false,
 };
 
+/**
+ * The policy schema used for deleting, as it has no applying properties
+ * because all apply
+ */
 const policySchemaNoApplying = {
   type: "object",
   patternProperties: {
@@ -104,6 +122,11 @@ const policySchemaNoApplying = {
   additionalProperties: false,
 };
 
+/**
+ * The reference shema of item definitions
+ * used to refer to other item definitions
+ * whatever module they come from
+ */
 const itemDefinitionReferenceSchema = {
   type: "object",
   properties: {
@@ -118,6 +141,9 @@ const itemDefinitionReferenceSchema = {
   additionalProperties: false,
 };
 
+/**
+ * The main item definition schema object
+ */
 export default {
   $id: "ItemDefinition",
   type: "object",

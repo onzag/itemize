@@ -1,3 +1,13 @@
+/**
+ * Contains the functionality that makes it so that when files come from graphql
+ * streams and are to be stored in the database the files are sent somewhere else
+ * and the url is actually what it's stored
+ *
+ * @packageDocumentation
+ */
+
+// TODO change this to use some form of CDN and not use the hard drive
+
 import PropertyDefinition from ".";
 import ItemDefinition from "..";
 import Include from "../Include";
@@ -17,6 +27,7 @@ const fsAsync = fs.promises;
  * @param itemDefinition the item definition these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
+ * @returns a promise with the new list with the new values
  */
 export async function processFileListFor(
   newValues: IGQLFile[],
@@ -88,6 +99,7 @@ export async function processFileListFor(
  * @param itemDefinition the item definition these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
+ * @returns a promise for the new file value
  */
 export async function processSingleFileFor(
   newValue: IGQLFile,
@@ -127,6 +139,7 @@ export async function processSingleFileFor(
  * @param itemDefinition the item definition
  * @param include the include (or null)
  * @param propertyDefinition the property
+ * @returns a promise for the new the new file value
  */
 async function processOneFileAndItsSameIDReplacement(
   newVersion: IGQLFile,
@@ -271,6 +284,7 @@ async function processOneFileAndItsSameIDReplacement(
  * @param itemDefinition the item defintion in question
  * @param originalId the original id that was used
  * @param newId the new id
+ * @returns a void promise for when it's done
  */
 export async function updateTransitoryIdIfExists(
   itemDefinition: ItemDefinition,
@@ -292,6 +306,7 @@ export async function updateTransitoryIdIfExists(
  * the file data
  * @param itemDefinition the item definition in question
  * @param transitoryId the transitory id to drop
+ * @returns a void promise from when this is done
  */
 export async function deleteEverythingInTransitoryId(
   itemDefinition: ItemDefinition,
@@ -330,6 +345,7 @@ function removeFilesFor(
  * @param standardURLPath the url that should be generated
  * @param value the value that we are storing (this value contains a stream)
  * @param propertyDefinition the property definition
+ * @returns a promise that contains the url and the file type that was taken from the stream
  */
 async function addFileFor(
   mainFilePath: string,
@@ -398,6 +414,7 @@ async function checkEntireComboExists(
  * @param includeLocationPath eg /dist/uploads/MOD_module__IDEF_item/1/ITEM_item
  * @param propertyLocationPath eg /dist/uploads/MOD_module__IDEF_item/1/property
  * @param filePath eg /dist/uploads/MOD_module__IDEF_item/1/property/FILE0000001
+ * @returns a void promise from when it has been ensured
  */
 async function ensureEntireComboExists(
   idefLocationPath: string,
@@ -432,6 +449,7 @@ async function ensureEntireComboExists(
 /**
  * checks if a file exists
  * @param location the path
+ * @returns a boolean promise for when it has been checked
  */
 async function checkExists(
   location: string,

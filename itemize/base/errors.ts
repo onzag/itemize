@@ -1,10 +1,20 @@
-// standard error
+/**
+ * Contains the very important error type and file
+ * which specifies a pattern that is to be used in order
+ * to send errors from the server side to the client side
+ */
+
+/**
+ * This is an standard error
+ */
 interface IEndpointErrorBaseType {
   message: string;
   code: string;
 }
 
-// Error when it occurs in a prop extension
+/**
+ * An error that comes from a prop extension
+ */
 interface IEndpointErrorOverloadPropExtensionType {
   message: string;
   code: string;
@@ -12,7 +22,9 @@ interface IEndpointErrorOverloadPropExtensionType {
   propertyId: string;
 }
 
-// Error when it occurs in a property
+/**
+ * Error when it occurs in a property
+ */
 interface IEndpointErrorOverloadPropertyType {
   message: string;
   code: string;
@@ -21,7 +33,9 @@ interface IEndpointErrorOverloadPropertyType {
   propertyId: string;
 }
 
-// Error when it occurs in a property that belongs to an include
+/**
+ * Error when it occurs in a property that belongs to an include
+ */
 interface IEndpointErrorOverloadPropertyInIncludeType {
   message: string;
   code: string;
@@ -32,7 +46,9 @@ interface IEndpointErrorOverloadPropertyInIncludeType {
   propertyId: string;
 }
 
-// Errors in policies, all policies have an item definition and module
+/**
+ * Errors in policies, all policies have an item definition and module
+ */
 interface IEndpointErrorOverloadPolicyType {
   message: string;
   code: string;
@@ -42,7 +58,9 @@ interface IEndpointErrorOverloadPolicyType {
   policyType: string;
 }
 
-// All errors
+/**
+ * All errors
+ */
 export type EndpointErrorType =
   IEndpointErrorBaseType |
   IEndpointErrorOverloadPropExtensionType |

@@ -1,3 +1,11 @@
+/**
+ * This file specifies all the sql executions functions that are used in order
+ * to query item definitions from the postgresql database, refer to this file
+ * once you need to figure out how resources are requested
+ *
+ * @packageDocumentation
+ */
+
 import { CONNECTOR_SQL_COLUMN_FK_NAME, RESERVED_BASE_PROPERTIES } from "../../../../constants";
 import {
   convertSQLValueToGQLValueForProperty,
@@ -14,7 +22,7 @@ import {
 } from "./Include/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue } from "../../sql";
 import Knex from "knex";
-import { IGQLValue, IGQLRequestFields } from "../../../../gql-querier";
+import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
 
 /**
  * Provides the table that is necesary to include this item definition as a whole
@@ -23,10 +31,11 @@ import { IGQLValue, IGQLRequestFields } from "../../../../gql-querier";
  * from all the properties and all the items, this does not include
  * prop extensions nor module level properties, nor base
  * @param itemDefinition the item definition in question
+ * @returns a complete table definition type
  */
 export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefinition): ISQLTableDefinitionType {
   // add all the standard fields
-  let resultTableSchema: ISQLTableDefinitionType = {
+  const resultTableSchema: ISQLTableDefinitionType = {
     [CONNECTOR_SQL_COLUMN_FK_NAME]: {
       type: "integer",
       notNull: true,
@@ -38,15 +47,18 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
 
   // now we loop thru every property (they will all become columns)
   itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
-    resultTableSchema = {
-      ...resultTableSchema,
-      ...getSQLTableDefinitionForProperty(pd),
-    };
+    Object.assign(
+      resultTableSchema,
+      getSQLTableDefinitionForProperty(pd),
+    );
   });
 
   // now we loop over the child items
   itemDefinition.getAllIncludes().forEach((i) => {
-    resultTableSchema = { ...resultTableSchema, ...getSQLTableDefinitionForInclude(i) };
+    Object.assign(
+      resultTableSchema,
+      getSQLTableDefinitionForInclude(i),
+    );
   });
 
   return resultTableSchema;
@@ -57,15 +69,19 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
  * that are included within this item definition and all the table names
  * that should be used using the qualified name
  * @param itemDefinition the item definition in question
+ * @returns a partial sql schema definition for the whole database (adds tables)
  */
 export function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefinition): ISQLSchemaDefinitionType {
   // we add self
-  let result = {
+  const result = {
     [itemDefinition.getQualifiedPathName()]: getSQLTableDefinitionForItemDefinition(itemDefinition),
   };
   // loop over the children and add each one of them and whatever they have
   itemDefinition.getChildDefinitions().forEach((cIdef) => {
-    result = { ...result, ...getSQLTablesSchemaForItemDefinition(cIdef) };
+    Object.assign(
+      result,
+      getSQLTablesSchemaForItemDefinition(cIdef),
+    );
   });
   // return that
   return result;
@@ -82,6 +98,7 @@ export function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefiniti
  * @param graphqlFields contains the only properties that are required
  * in the request provided by grapql fields,
  * eg {id: {}, name: {}, ITEM_kitten: {purrs: {}}}
+ * @returns a graphql value
  */
 export function convertSQLValueToGQLValueForItemDefinition(
   itemDefinition: ItemDefinition,
@@ -89,7 +106,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
   graphqlFields?: IGQLRequestFields,
 ): IGQLValue {
   // first we create the graphql result
-  let result: IGQLValue = {};
+  const result: IGQLValue = {};
 
   // now we take all the base properties that we have
   // in the graphql model
@@ -110,18 +127,22 @@ export function convertSQLValueToGQLValueForItemDefinition(
       (property) =>  !graphqlFields ? true : graphqlFields[property.getId()],
     ),
   ).forEach((pd) => {
-    result = { ...result, ...convertSQLValueToGQLValueForProperty(pd, row) };
+    Object.assign(
+      result,
+      convertSQLValueToGQLValueForProperty(pd, row),
+    );
   });
 
   // now we do the same for the items
   itemDefinition.getAllIncludes().filter(
     (include) =>  !graphqlFields ? true : graphqlFields[include.getQualifiedIdentifier()],
   ).forEach((include) => {
-    result = {
-      ...result, ...convertSQLValueToGQLValueForInclude(
+    Object.assign(
+      result,
+      convertSQLValueToGQLValueForInclude(
         include, row, !graphqlFields ? null : graphqlFields[include.getQualifiedIdentifier()],
       ),
-    };
+    );
   });
 
   return result;
@@ -142,6 +163,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
  * partial fields; for example, if you have a field that has a property
  * that is nullable but it's forced into some value it will be ignored
  * in a partial field value, don't use partial fields to create
+ * @returns a sql value
  */
 export async function convertGQLValueToSQLValueForItemDefinition(
   transitoryId: string,
@@ -153,7 +175,7 @@ export async function convertGQLValueToSQLValueForItemDefinition(
   partialFields?: IGQLRequestFields,
 ): Promise<ISQLTableRowValue> {
   // first we create the row value
-  let result: ISQLTableRowValue = {};
+  const result: ISQLTableRowValue = {};
 
   await Promise.all([
     // now we get all the property definitions and do the same
@@ -168,10 +190,10 @@ export async function convertGQLValueToSQLValueForItemDefinition(
         const addedFieldsByProperty = await convertGQLValueToSQLValueForProperty(
           transitoryId, itemDefinition, null, pd, data, oldData, knex, dictionary, "",
         );
-        result = {
-          ...result,
-          ...addedFieldsByProperty,
-        };
+        Object.assign(
+          result,
+          addedFieldsByProperty,
+        );
       }
     })),
     // also with the items
@@ -187,10 +209,10 @@ export async function convertGQLValueToSQLValueForItemDefinition(
         const addedFieldsByInclude = await convertGQLValueToSQLValueForInclude(
           transitoryId, itemDefinition, include, data, oldData, knex, dictionary, innerPartialFields,
         );
-        result = {
-          ...result,
-          ...addedFieldsByInclude,
-        };
+        Object.assign(
+          result,
+          addedFieldsByInclude,
+        );
       }
     })),
   ]);
@@ -198,25 +220,31 @@ export async function convertGQLValueToSQLValueForItemDefinition(
   return result;
 }
 
+/**
+ * Builds a sql query for an item definition so that it can be
+ * queried for searches
+ * @param itemDefinition the item definition that is being requested (normal form)
+ * @param args the args from the search mode
+ * @param knexBuilder the knex builder instance
+ * @param dictionary the dictionary being used
+ */
 export function buildSQLQueryForItemDefinition(
   itemDefinition: ItemDefinition,
-  data: IGQLValue,
+  args: IGQLArgs,
   knexBuilder: Knex.QueryBuilder,
   dictionary: string,
 ) {
-  itemDefinition
-    .getParentModule()
-    .getAllPropExtensions()
-    .concat(
-      itemDefinition.getAllPropertyDefinitions()).forEach((pd) => {
-        if (!pd.isSearchable()) {
-          return;
-        }
+  // first we need to get all the prop and extensions and build their query
+  itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+    if (!pd.isSearchable()) {
+      return;
+    }
 
-        buildSQLQueryForProperty(pd, data, "", knexBuilder, dictionary);
-      });
+    buildSQLQueryForProperty(pd, args, "", knexBuilder, dictionary);
+  });
 
+  // then we ned to add all the includes
   itemDefinition.getAllIncludes().forEach((include) => {
-    buildSQLQueryForInclude(include, data, knexBuilder, dictionary);
+    buildSQLQueryForInclude(include, args, knexBuilder, dictionary);
   });
 }

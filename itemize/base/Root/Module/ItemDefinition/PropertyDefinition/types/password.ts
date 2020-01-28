@@ -49,7 +49,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       "Attempted to search by password",
     );
   },
-  sqlLocalSearch: () => {
+  localSearch: () => {
     throw new Error(
       "Attempted to local search by password",
     );

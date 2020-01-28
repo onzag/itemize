@@ -1,5 +1,12 @@
+/**
+ * This file specifies how search mode for item definitions are built
+ * given its raw data
+ *
+ * @packageDocumentation
+ */
+
 import ItemDefinition, { IItemDefinitionRawJSONDataType } from ".";
-import { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionAlternativePropertyType } from "./PropertyDefinition";
+import { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionReferredPropertyValue } from "./PropertyDefinition";
 import { IModuleRawJSONDataType } from "..";
 import { getConversionRulesetId, buildSearchModeConditionalRuleSet } from "./ConditionalRuleSet/search-mode";
 import { getConversionIds, buildSearchModePropertyDefinitions } from "./PropertyDefinition/search-mode";
@@ -9,6 +16,7 @@ import { getConversionIds, buildSearchModePropertyDefinitions } from "./Property
  * @param rawData the raw data for the item definition
  * @param modulePropExtensions the prop extensions coming from the module
  * @param originalModule and the original module that brought those extensions
+ * @returns a raw json item definition form that represents the search mode
  */
 export function buildSearchModeItemDefinition(
   rawData: IItemDefinitionRawJSONDataType,
@@ -43,7 +51,7 @@ export function buildSearchModeItemDefinition(
 
     // otherwise let's get the item definition using the parent module, this includes imported
     // stuff
-    const idef = ItemDefinition.getItemDefinitionRawFor(rawData, originalModule, i.name, false);
+    const idef = ItemDefinition.getItemDefinitionRawFor(rawData, originalModule, i.definition, false);
     // the new include is the same as that include
     const newInclude = {...i};
 
@@ -93,12 +101,12 @@ export function buildSearchModeItemDefinition(
           // we get the value that was given by the new include
           let value = newInclude[objectKey][key];
           // if the value is of type property, the alternative which doesn't represent a value
-          if ((value as IPropertyDefinitionAlternativePropertyType).property) {
+          if ((value as IPropertyDefinitionReferredPropertyValue).property) {
             // then we need to convert that value too!... from the ruleset
             // which returns a single property value, unlike getConversionIds
             value = {
               property: getConversionRulesetId(
-                knownPropMap[(value as IPropertyDefinitionAlternativePropertyType).property],
+                knownPropMap[(value as IPropertyDefinitionReferredPropertyValue).property],
               ),
             };
           }

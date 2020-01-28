@@ -15,7 +15,6 @@ import {
 } from "../sql";
 import {
   standardSQLLocalEqualFn,
-  standardSQLLocalSearchExactAndRange,
 } from "../local-sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
@@ -28,6 +27,7 @@ import {
   CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
+import { standardLocalSearchExactAndRange } from "../local-search";
 
 /**
  * The integer is descibred by a number
@@ -45,9 +45,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
-  sqlLocalSearch: standardSQLLocalSearchExactAndRange,
   sqlEqual: standardSQLEqualFn,
   sqlLocalEqual: standardSQLLocalEqualFn,
+
+  localSearch: standardLocalSearchExactAndRange,
 
   // it gotta be validated to check it's a number
   validate: (n: PropertyDefinitionSupportedIntegerType) => {

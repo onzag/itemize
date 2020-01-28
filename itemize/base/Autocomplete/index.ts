@@ -132,6 +132,7 @@ interface IProcessedAutocompleteRawJSONDataType {
  * @param specifiedFilter the specified filter provided by the client
  * @param matchStr the string that the client specified should be matched (make sure to normalize it)
  * @param locale (optional) the locale that is required for a i18n search
+ * @returns the filtered output
  */
 function filterFrom(
   values: Array<IProcessedAutocompleteValueRawJSONDataType | IProcessedFilterRawJSONDataType>,
@@ -203,6 +204,7 @@ function filterFrom(
  * @param outputs the outputs that it got matched against
  * @param matchStr the string to match to
  * @param locale the locale that is to be used
+ * @returns the sorted output values
  */
 function sortFrom(outputs: IAutocompleteOutputType[], matchStr: string, locale?: string) {
   // if we only have 1, we don't need to
@@ -234,6 +236,7 @@ function sortFrom(outputs: IAutocompleteOutputType[], matchStr: string, locale?:
  * returns a new value with the diacritics removed in its normalized values
  * only affects i18n values
  * @param value the value to modify
+ * @returns the value normalized without diacritics characters
  */
 function removeDiacriticsFromValue(value: IAutocompleteValueRawJSONDataType):
 IProcessedAutocompleteValueRawJSONDataType {
@@ -262,6 +265,7 @@ IProcessedAutocompleteValueRawJSONDataType {
  * Processes standard raw values that come from the autocomplete json and produces new
  * values that are processed
  * @param values the raw values
+ * @returns an array of values but processed
  */
 function processValues(values: Array<IAutocompleteValueRawJSONDataType | IFilterRawJSONDataType>):
 Array<IProcessedAutocompleteValueRawJSONDataType | IProcessedFilterRawJSONDataType> {
@@ -291,6 +295,7 @@ Array<IProcessedAutocompleteValueRawJSONDataType | IProcessedFilterRawJSONDataTy
 /**
  * processes the whole autocomplete object into a processed autocomplete
  * @param value the value of that autocomplete
+ * @returns the processed autocomplete
  */
 function processAutocomplete(value: IAutocompleteRawJSONDataType): IProcessedAutocompleteRawJSONDataType {
   // first we concat all the values and filters
@@ -333,6 +338,7 @@ export default class Autocomplete {
    * filter that is run against the autocomplete
    * @param matchStr the string to match (raw, not normalized, it is normalized)
    * @param specifiedFilter the specified filter object (or null)
+   * @returns the recommendations filtered and sorted
    */
   public findRecommendations(
     matchStr: string,
@@ -354,6 +360,7 @@ export default class Autocomplete {
    * @param matchStr the string to match (raw, not normalized, it is normalized)
    * @param locale the locale string
    * @param specifiedFilter the specified filter
+   * @returns the i18n recommendation sorted and filtered
    */
   public findI18nRecommendations(
     matchStr: string,
@@ -377,6 +384,7 @@ export default class Autocomplete {
    * and it is not normalized, it must be exact, case matters
    * @param value the value
    * @param specifiedFilter the specified filter
+   * @returns the exact value if found, otherwise null
    */
   public findExactValueFor(
     value: string,
@@ -389,6 +397,7 @@ export default class Autocomplete {
 
   /**
    * Provides the autocomplete name
+   * @returns the name
    */
   public getName() {
     return this.rawJSON.name;
@@ -396,6 +405,7 @@ export default class Autocomplete {
 
   /**
    * Returns the raw json form
+   * @returns the json form
    */
   public toJSON() {
     return this.rawJSON;

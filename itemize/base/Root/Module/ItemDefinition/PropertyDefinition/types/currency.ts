@@ -100,7 +100,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       knexBuilder.andWhere(sqlPrefix + id + "_VALUE", "<=", toArg.value as number);
     }
   },
-  sqlLocalSearch: (
+  localSearch: (
     args: IGQLArgs,
     rawData: IGQLValue,
     id: string,

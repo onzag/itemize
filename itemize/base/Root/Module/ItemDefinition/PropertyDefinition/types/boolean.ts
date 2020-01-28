@@ -15,10 +15,10 @@ import {
 } from "../sql";
 import {
   standardSQLLocalEqualFn,
-  standardSQLLocalSearchExactAndRange,
 } from "../local-sql";
 import { REDUCED_BASE_I18N, CLASSIC_OPTIONAL_I18N, REDUCED_SEARCH_BASE_I18N, CLASSIC_SEARCH_OPTIONAL_I18N } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
+import { standardLocalSearchExactAndRange } from "../local-search";
 
 /**
  * The representation of a boolean type is equal to a boolean
@@ -35,9 +35,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
-  sqlLocalSearch: standardSQLLocalSearchExactAndRange,
   sqlEqual: standardSQLEqualFn,
   sqlLocalEqual: standardSQLLocalEqualFn,
+
+  localSearch: standardLocalSearchExactAndRange,
 
   // it is searchable by default
   searchable: true,

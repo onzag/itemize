@@ -1,12 +1,23 @@
+/**
+ * Contains the schema for the property definition as it should
+ * be defined in the json form
+ *
+ * @packageDocumentation
+ */
+
 import ConditionalRuleSetSchema from "../ConditionalRuleSet/schema";
-// The schema for the definition
-// {
-//   "amount": 4,
-//   "type": "car"
-// },
-// properties can be any string
-// the values must be boolean string or number
-// we should have at least one
+/**
+ * The schema for the definition
+ * ```
+ * {
+ *   "amount": 4,
+ *   "type": "car"
+ * }
+ * ```
+ * properties can be any string
+ * the values must be boolean string or number
+ * we should have at least one
+ */
 export default {
   $id: "PropertyDefinition",
   type: "object",

@@ -56,7 +56,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlSearch: () => {
     throw new Error("Attempted to search within files");
   },
-  sqlLocalSearch: () => {
+  localSearch: () => {
     throw new Error("Attempted to search within files locally");
   },
   sqlEqual: () => {

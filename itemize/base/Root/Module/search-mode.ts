@@ -1,3 +1,10 @@
+/**
+ * This file contains the critical build for the search mode build of a module
+ * given an input of a module to be converted into its search form
+ *
+ * @packageDocumentation
+ */
+
 import { IModuleRawJSONDataType } from ".";
 import { buildSearchModeItemDefinition } from "./ItemDefinition/search-mode";
 import { buildSearchModePropertyDefinitions } from "./ItemDefinition/PropertyDefinition/search-mode";
@@ -6,7 +13,7 @@ import { SEARCH_MODE_MODULE_PREFIX } from "../../../constants";
 /**
  * Builds the module based on its raw data
  * @param rawData the raw data for the module
- * @returns a module
+ * @returns a raw module
  */
 export function buildSearchModeModule(
   rawData: IModuleRawJSONDataType,
