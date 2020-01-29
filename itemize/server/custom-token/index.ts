@@ -3,6 +3,7 @@ import { IGQLQueryFieldsDefinitionType } from "../../base/Root/gql";
 import TOKEN_OBJECT from "./graphql-token-object";
 import { EndpointError } from "../../base/errors";
 import { jwtSign } from "../token";
+import { ENDPOINT_ERRORS } from "../../constants";
 
 export function buildCustomTokenQueries(
   appData: IAppDataType,
@@ -24,7 +25,7 @@ export function buildCustomTokenQueries(
         if (value.error) {
           throw new EndpointError({
             message: value.error,
-            code: "INVALID_CREDENTIALS",
+            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
           });
         }
 

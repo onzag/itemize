@@ -12,6 +12,7 @@ import { PagedSearchLoader } from "../../../../itemize/client/components/search"
 import { Button } from "@material-ui/core";
 import Pagination from "material-ui-flat-pagination";
 import { Link } from "../../../../itemize/client/components/navigaton";
+import { ENDPOINT_ERRORS } from "../../../../itemize/constants";
 
 interface ISensorsTemperatureProps {
   match: {
@@ -26,7 +27,7 @@ function SimulatedNotFoundPage() {
     <ErrorPage
       error={{
         message: "Sensor not found",
-        code: "NOT_FOUND",
+        code: ENDPOINT_ERRORS.NOT_FOUND,
       }}
     />
   );

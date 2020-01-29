@@ -3,7 +3,7 @@ import { gqlQuery, buildGqlQuery, IGQLValue } from "../../../gql-querier";
 import { EndpointErrorType } from "../../../base/errors";
 import { ILocaleContextType } from ".";
 import { Location } from "history";
-import { GUEST_METAROLE } from "../../../constants";
+import { GUEST_METAROLE, ENDPOINT_ERRORS } from "../../../constants";
 import CacheWorkerInstance from "../workers/cache";
 
 export interface ITokenProviderState {
@@ -29,34 +29,42 @@ export interface ITokenContextType extends ITokenProviderState {
 export const TokenContext = React.createContext<ITokenContextType>(null);
 
 export class TokenProvider extends React.Component<ITokenProviderProps, ITokenProviderState> {
-  private hasAutomaticallyLoggedIn: boolean;
   constructor(props: ITokenProviderProps) {
     super(props);
 
+    // we get the stored token, if there's none
+    // then we should render right away
+    const storedToken = localStorage.getItem("TOKEN");
     this.state = {
       token: null,
       id: null,
       role: GUEST_METAROLE,
       isLoggingIn: false,
-      isReady: false,
+      // by setting this flag as true if there is none
+      // otherwise we need to check the token for validity or
+      // expiration, if we can
+      isReady: !storedToken,
       error: null,
     };
 
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.dismissError = this.dismissError.bind(this);
-
-    this.hasAutomaticallyLoggedIn = false;
   }
   public componentDidMount() {
     const storedToken = localStorage.getItem("TOKEN");
     if (storedToken !== null) {
-      this.login(null, null, storedToken);
+      this.login(null, null, storedToken, true);
     } else {
       this.props.onProviderStateSet(this.state);
     }
   }
-  public async login(username: string, password: string, token: string) {
+  public async login(
+    username: string,
+    password: string,
+    token: string,
+    doNotShowLoginError?: boolean,
+  ) {
     if (this.state.isLoggingIn) {
       console.warn("Tried to login while logging in");
       return;
@@ -90,7 +98,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         role: localStorage.getItem("ROLE"),
         error: {
           message: "Failed to connect",
-          code: "CANT_CONNECT",
+          code: ENDPOINT_ERRORS.CANT_CONNECT,
         },
         isReady: true,
       };
@@ -122,7 +130,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         // we might want to ignore errors, user just got
         // logged off automatically, likely his token expired
         // otherwise errors might appear in off places
-        error: !this.hasAutomaticallyLoggedIn ? error : null,
+        error: !doNotShowLoginError ? error : null,
       };
 
       if (tokenDataToken !== null) {
@@ -217,8 +225,6 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         }
       }
     }
-
-    this.hasAutomaticallyLoggedIn = true;
   }
   public logout() {
     if (this.state.isLoggingIn) {

@@ -12,35 +12,70 @@ import { ISQLTableDefinitionType } from "./base/Root/sql";
 
 // DATA ATTRIBUTES
 
-// Defines the max supported integer, it should match up the database
+/**
+ * Defines the max supported integer, it should match up the database
+ */
 export const MAX_SUPPORTED_INTEGER = 2147483647;
-// Defines the min supported integer, it should match up the database too
+/**
+ * Defines the min supported integer, it should match up the database too
+ */
 export const MIN_SUPPORTED_INTEGER = -MAX_SUPPORTED_INTEGER;
-// Defines how many decimal points are supported, for the sake of usability
-// the number is set to a precision of 6
+/**
+ * Defines how many decimal points are supported, for the sake of usability
+ * the number is set to a precision of 6
+ */
 export const MAX_DECIMAL_COUNT = 6;
-// Defines how big can decimal numbers get
+/**
+ * Defines how big can decimal numbers get
+ */
 export const MAX_SUPPORTED_REAL = 999999999;
-// Defines how small can decimal numbers get
+/**
+ * Defines how small can decimal numbers get
+ */
 export const MIN_SUPPORTED_REAL = -999999999;
-// Years max
+/**
+ * Years max
+ */
 export const MAX_SUPPORTED_YEAR = 3000;
-// Years min
+/**
+ * Years min
+ */
 export const MIN_SUPPORTED_YEAR = 0;
-// Defines how many characters a string might have
+/**
+ * Defines how many characters a string might have
+ */
 export const MAX_STRING_LENGTH = 10000;
-// Defines how many characters (yes characters) a text might have max
-// please define maxLenght in the property itself for specific checking
-// this check is expensive so checking twice is not good
+/**
+ * Defines how many characters (yes characters) a text might have max
+ * please define maxLenght in the property itself for specific checking
+ * this check is expensive so checking twice is not good
+ */
 export const MAX_RAW_TEXT_LENGTH = 100000;
-// The max file size (for either images and binary files)
+/**
+ * The max file size (for either images and binary files)
+ */
 export const MAX_FILE_SIZE = 5000000; // equivalent to 5MB
-export const MAX_FILE_BATCH_COUNT = 25; // how many files can be used in one item field at once
-export const MAX_FILE_TOTAL_BATCH_COUNT = MAX_FILE_BATCH_COUNT * 10; // how many files can there be total
-// in a single request, this is more of a security concern
-export const MAX_FIELD_SIZE = 1000000; // equivalent to 1MB, another just a security concern, this
-// is the size of the graphql query, 1MB should be way more than enough for a graphql query
-export const MAX_SEARCH_RESULTS_AT_ONCE_LIMIT = 50; // how many search results can be retrieved at once
+/**
+ * how many files can be used in one item field at once
+ */
+export const MAX_FILE_BATCH_COUNT = 25;
+/**
+ * how many files can there be total
+ * in a single request, this is more of a security concern
+ */
+export const MAX_FILE_TOTAL_BATCH_COUNT = MAX_FILE_BATCH_COUNT * 10;
+/**
+ * Another just a security concern, this
+ * is the size of the graphql query, 1MB should be way more than enough for a graphql query
+ */
+export const MAX_FIELD_SIZE = 1000000; // equivalent to 1MB
+/**
+ * how many search results can be retrieved at once
+ */
+export const MAX_SEARCH_RESULTS_AT_ONCE_LIMIT = 50;
+/**
+ * Supported image types
+ */
 export const FILE_SUPPORTED_IMAGE_TYPES = [
   "image/png",
   "image/jpeg",
@@ -49,15 +84,23 @@ export const FILE_SUPPORTED_IMAGE_TYPES = [
   "image/webp",
 ];
 
-// The properties for i18n a module should have
+/**
+ * The properties for i18n a module should have
+ */
 export const MODULE_AND_ITEM_DEF_I18N = [
   "name",
   "fts_search_field_label",
   "fts_search_field_placeholder",
 ];
+/**
+ * The custom key as it is stored in the built file, the custom key
+ * is always custom in the properties
+ */
 export const MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY = "custom";
 
-// The properties for i18n an item that can be excluded should have
+/**
+ * The properties for i18n an item that can be excluded should have
+ */
 export const ITEM_CAN_BE_EXCLUDED_I18N = [
   "exclusion_selector_label",
   "exclusion_ternary_selector_label",
@@ -66,17 +109,44 @@ export const ITEM_CAN_BE_EXCLUDED_I18N = [
   "any_label",
 ];
 
-// The item optional data
+/**
+ * The item optional data
+ */
 export const ITEM_OPTIONAL_I18N = [
   "name",
 ];
 
-// The properties for i18n a callout excluded item should have
+/**
+ * The properties for i18n a callout excluded item should have
+ */
 export const ITEM_CALLOUT_EXCLUDED_I18N = [
   "callout_excluded_label",
 ];
 
-// This is for small use anywhere language data
+/**
+ * Graphql endpoint errors codes that can be thrown
+ */
+export const ENDPOINT_ERRORS =  {
+  UNSPECIFIED: "UNSPECIFIED",
+  INVALID_PROPERTY: "INVALID_PROPERTY", // should include a pcode
+  INVALID_POLICY: "INVALID_POLICY",
+  INVALID_INCLUDE: "INVALID_INCLUDE",
+  INVALID_CREDENTIALS: "INVALID_CREDENTIALS",
+  BLOCKED: "BLOCKED",
+  CANT_CONNECT: "CANT_CONNECT",
+  INVALID_DATA_SUBMIT_REFUSED: "INVALID_DATA_SUBMIT_REFUSED",
+  INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
+  NOTHING_TO_UPDATE: "NOTHING_TO_UPDATE",
+  MUST_BE_LOGGED_IN: "MUST_BE_LOGGED_IN",
+  FORBIDDEN: "FORBIDDEN",
+  USER_BLOCKED: "USER_BLOCKED",
+  USER_REMOVED: "USER_REMOVED",
+  NOT_FOUND: "NOT_FOUND",
+};
+
+/**
+ * This is for small use anywhere language data
+ */
 export const LOCALE_I18N = [
   // language name
   "name",
@@ -135,59 +205,83 @@ export const LOCALE_I18N = [
   "unit_dialog_others",
   "unit_dialog_metric",
   "unit_dialog_imperial",
+].concat(
+  // we add all the endpoint errors
+  Object.keys(ENDPOINT_ERRORS).map(((ee) => `error.${ee}`)),
+);
 
-  // basic base errors
-  "error.INVALID_CREDENTIALS",
-  "error.BLOCKED",
-  "error.CANT_CONNECT",
-  "error.INVALID_DATA_SUBMIT_REFUSED",
-  "error.INTERNAL_SERVER_ERROR",
-  "error.UNSPECIFIED",
-  "error.NOTHING_TO_UPDATE",
-  "error.MUST_BE_LOGGED_IN",
-  "error.FORBIDDEN",
-  "error.USER_BLOCKED",
-  "error.USER_REMOVED",
-  "error.NOT_FOUND",
-];
-
+/**
+ * Root required i18n properties
+ */
 export const ROOT_REQUIRED_LOCALE_I18N = [
   "app_name",
   "app_short_name",
   "app_description",
 ];
 
-// ATTRIBUTES FOR i18N PROPERTIES
+/**
+ * Standard i18n fields required for properties
+ */
 export const CLASSIC_BASE_I18N = [
   "label",
   "placeholder",
 ];
+/**
+ * Standard i18n fields required for properties when
+ * they are searchable
+ */
 export const CLASSIC_SEARCH_BASE_I18N = [
   "search.label",
   "search.placeholder",
 ];
+/**
+ * Reduced i18n required for properties
+ */
 export const REDUCED_BASE_I18N = [
   "label",
 ];
+/**
+ * Reduced i18n required for properties when
+ * they are searchable
+ */
 export const REDUCED_SEARCH_BASE_I18N = [
   "search.label",
 ];
+/**
+ * Optional i18n fields in properties
+ */
 export const CLASSIC_OPTIONAL_I18N = [
   "description",
 ];
+/**
+ * Optional i18n fields in properties when they are
+ * searchable
+ */
 export const CLASSIC_SEARCH_OPTIONAL_I18N = [
   "search.description",
 ];
+/**
+ * Extended required i18n fields required in properties
+ * when they use a ranged search
+ */
 export const CLASSIC_SEARCH_RANGED_I18N = [
   "search.range.from.label",
   "search.range.to.label",
   "search.range.from.placeholder",
   "search.range.to.placeholder",
 ];
+/**
+ * Extended optional i18n fields required in properties
+ * when they use a ranged search
+ */
 export const CLASSIC_SEARCH_RANGED_OPTIONAL_I18N = [
   "search.range.from.description",
   "search.range.to.description",
 ];
+/**
+ * Extended i18n fields required in properties
+ * when they use a location search
+ */
 export const LOCATION_SEARCH_I18N = [
   "search.label",
   "search.placeholder",
@@ -195,8 +289,11 @@ export const LOCATION_SEARCH_I18N = [
   "search.radius.placeholder",
 ];
 
-// properties that are externalized from the property reserved list
-// outside of data
+/**
+ * Graphql values come in a DATA form, because they can be blocked
+ * however some attributes are meant to leak and be externally accessible
+ * these atrributes can only be accessed outside of it
+ */
 export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "id",
   "type",
@@ -206,6 +303,10 @@ export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "blocked_reason",
   "last_modified",
 ];
+/**
+ * These attributes are however protected, they exist only within
+ * the DATA field
+ */
 export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "created_at",
   "created_by",
@@ -214,7 +315,10 @@ export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "reviewed_at",
   "reviewed_by",
 ];
-// INVALID RESERVED PROPERTY NAMES
+/**
+ * The reserved base properties that are exists within every graphql query
+ * and should mirror the database
+ */
 export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   id: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
@@ -292,7 +396,10 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "Users who flagged this item, reason",
   },
 };
-// The same but in SQL
+
+/**
+ * The reserved base properties but in SQL form
+ */
 export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   id: {
     type: "serial",
@@ -349,22 +456,71 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
     type: "text[]",
   },
 };
+
+/**
+ * The column name of the foreign key that connects the module table
+ * with the item definition table
+ */
 export const CONNECTOR_SQL_COLUMN_FK_NAME = "MODULE_ID";
+/**
+ * an utility to build prefixes
+ * @param s the string to turn into a prefix
+ */
 export const PREFIX_BUILD = (s: string) => s + "_";
+/**
+ * an utility to build suffixes
+ * @param s the string to turn into a suffix
+ */
 export const SUFFIX_BUILD = (s: string) => "_" + s;
+/**
+ * an utility to concat prefixes
+ * @param args the string list to concat
+ */
 export const PREFIXED_CONCAT = (...args: string[]) => args.join("__");
+/**
+ * Every include when used within the database or graphql is prefixed with
+ */
 export const INCLUDE_PREFIX = PREFIX_BUILD("INCLUDE");
+/**
+ * Every module when used within the database, graphql or its qualified name is prefixed with
+ */
 export const MODULE_PREFIX = PREFIX_BUILD("MOD");
+/**
+ * The search mode module is prefixed with
+ */
 export const SEARCH_MODE_MODULE_PREFIX = PREFIX_BUILD("SEARCH_MODE");
+/**
+ * Every item definition when used within the database, graphql or its qualified name is prefixed with
+ */
 export const ITEM_DEFINITION_PREFIX = PREFIX_BUILD("IDEF");
+/**
+ * The suffix added to refer to the exclusion state of an include in SQL or graphql
+ */
 export const EXCLUSION_STATE_SUFFIX = SUFFIX_BUILD("EXCLUSION_STATE");
+/**
+ * The prefix used in the graphql endpoint for searches of modules and item definitions
+ */
 export const PREFIX_SEARCH = PREFIX_BUILD("SEARCH");
+/**
+ * The prefix used in the graphql endpoint for getting item definitions
+ */
 export const PREFIX_GET = PREFIX_BUILD("GET");
+/**
+ * The prefix used in the graphql endpoint for getting lists of item definitions and modules
+ */
 export const PREFIX_GET_LIST = PREFIX_BUILD("GET_LIST");
+/**
+ * The prefix used in the graphql endpoint for adding item definitions
+ */
 export const PREFIX_ADD = PREFIX_BUILD("ADD");
+/**
+ * The prefix used in the graphql endpoint for editing item definitions
+ */
 export const PREFIX_EDIT = PREFIX_BUILD("EDIT");
+/**
+ * The prefix used in the graphql endpoint for deleting item definitions
+ */
 export const PREFIX_DELETE = PREFIX_BUILD("DELETE");
-export const INVALID_POLICY_ERROR = "INVALID_POLICY";
 export const POLICY_PREFIXES = {
   read: PREFIX_BUILD("POLICY_READ"),
   edit: PREFIX_BUILD("POLICY_EDIT"),

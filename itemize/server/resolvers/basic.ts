@@ -4,13 +4,13 @@ import {
   ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
   MAX_SEARCH_RESULTS_AT_ONCE_LIMIT,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
-  INVALID_POLICY_ERROR,
   RESERVED_BASE_PROPERTIES,
   INCLUDE_PREFIX,
   EXCLUSION_STATE_SUFFIX,
   GUEST_METAROLE,
   ANYONE_METAROLE,
   ANYONE_LOGGED_METAROLE,
+  ENDPOINT_ERRORS,
 } from "../../constants";
 import { EndpointError } from "../../base/errors";
 import Debug from "debug";
@@ -167,7 +167,7 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
     } catch (err) {
       throw new EndpointError({
         message: "Invalid token that didn't pass verification",
-        code: "UNSPECIFIED",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
       });
     }
   }
@@ -189,14 +189,14 @@ export async function validateParentingRules(
   if (!isParenting && itemDefinition.mustBeParented()) {
     throw new EndpointError({
       message: "A parent is required",
-      code: "UNSPECIFIED",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
     });
   } else if (isParenting) {
     const parentingItemDefinition = appData.root.registry[type] as ItemDefinition;
     if (!(parentingItemDefinition instanceof ItemDefinition)) {
       throw new EndpointError({
         message: "Invalid parent type " + type,
-        code: "UNSPECIFIED",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
       });
     }
 
@@ -208,12 +208,12 @@ export async function validateParentingRules(
     if (!result) {
       throw new EndpointError({
         message: `There's no parent ${type} with id ${id}`,
-        code: "NOT_FOUND",
+        code: ENDPOINT_ERRORS.NOT_FOUND,
       });
     } else if (result.blocked_at !== null) {
       throw new EndpointError({
         message: "The parent is blocked",
-        code: "BLOCKED",
+        code: ENDPOINT_ERRORS.BLOCKED,
       });
     }
     const parentOwnerId = parentingItemDefinition.isOwnerObjectId() ? result.id : result.created_by;
@@ -253,7 +253,7 @@ export function checkBasicFieldsAreAvailableForRole(tokenData: IServerSideTokenD
     // we throw an error
     throw new EndpointError({
       message: "You have requested to add/edit/view moderation fields with role: " + tokenData.role,
-      code: "FORBIDDEN",
+      code: ENDPOINT_ERRORS.FORBIDDEN,
     });
   }
 
@@ -277,7 +277,7 @@ export function checkListLimit(ids: IGQLSearchResultIdentifierType[]) {
     );
     throw new EndpointError({
       message: "Too many ids at once, max is " + MAX_SEARCH_RESULTS_AT_ONCE_LIMIT,
-      code: "UNSPECIFIED",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
     });
   }
   checkListLimitDebug("SUCCEED");
@@ -291,19 +291,19 @@ export function checkListTypes(ids: IGQLSearchResultIdentifierType[], mod: Modul
     if (!itemDefinition) {
       throw new EndpointError({
         message: "Unknown qualified path name for " + idContainer.type,
-        code: "UNSPECIFIED",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
       });
     } else if (itemDefinition instanceof Module) {
       throw new EndpointError({
         message: "Expected qualified identifier for item definition but got one for module " + idContainer.type,
-        code: "UNSPECIFIED",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
       });
     }
 
     if (itemDefinition.getParentModule() !== mod) {
       throw new EndpointError({
         message: "Invalid parent for " + idContainer.type + " expected parent as " + mod.getQualifiedPathName(),
-        code: "UNSPECIFIED",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
       });
     }
   });
@@ -327,7 +327,7 @@ export function checkLanguage(appData: IAppDataType, args: any) {
     );
     throw new EndpointError({
       message: "Please use valid non-regionalized language values",
-      code: "UNSPECIFIED",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
     });
   }
 
@@ -341,7 +341,7 @@ export function checkLanguage(appData: IAppDataType, args: any) {
     );
     throw new EndpointError({
       message: "This language is not supported, as no dictionary has been set",
-      code: "UNSPECIFIED",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
     });
   }
 
@@ -370,13 +370,13 @@ export async function validateTokenIsntBlocked(cache: Cache, tokenData: IServerS
     if (!sqlResult) {
       throw new EndpointError({
         message: "User has been removed",
-        code: "USER_REMOVED",
+        code: ENDPOINT_ERRORS.USER_REMOVED,
       });
     }
     if (sqlResult && sqlResult.blocked_at !== null) {
       throw new EndpointError({
         message: "User is Blocked",
-        code: "USER_BLOCKED",
+        code: ENDPOINT_ERRORS.USER_BLOCKED,
       });
     }
   }
@@ -390,7 +390,7 @@ export async function checkUserExists(cache: Cache, id: number) {
   if (!sqlResult) {
     throw new EndpointError({
       message: "User has been removed",
-      code: "USER_REMOVED",
+      code: ENDPOINT_ERRORS.USER_REMOVED,
     });
   }
   checkUserExistsDebug("SUCCEED");
@@ -523,7 +523,8 @@ export async function serverSideCheckItemDefinitionAgainst(
       // throw an error then
       throw new EndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
-        code: propertyValue.invalidReason,
+        code: ENDPOINT_ERRORS.INVALID_PROPERTY,
+        pcode: propertyValue.invalidReason,
         modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
         itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
         includeId: referredInclude && referredInclude.getId(),
@@ -542,7 +543,11 @@ export async function serverSideCheckItemDefinitionAgainst(
       );
       throw new EndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated value`,
-        code: "UNSPECIFIED",
+        code: ENDPOINT_ERRORS.INVALID_PROPERTY,
+        // someone might have been trying to hack for this to happen
+        // a null pcode is a red flag, well almost all these checks show tampering
+        // this will make the client side give an error nevertheless
+        pcode: null,
         modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
         itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
         includeId: referredInclude && referredInclude.getId(),
@@ -574,7 +579,7 @@ export async function serverSideCheckItemDefinitionAgainst(
       );
       throw new EndpointError({
         message: `validation failed at include ${includeValue.includeId} with a mismatch of exclusion state`,
-        code: "UNSPECIFIED",
+        code: ENDPOINT_ERRORS.INVALID_INCLUDE,
         modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
         itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
         includeId: includeValue.includeId,
@@ -587,8 +592,8 @@ export async function serverSideCheckItemDefinitionAgainst(
         includeValue.includeId,
       );
       throw new EndpointError({
-        message: `validation failed at item ${includeValue.includeId} with an excluded item but data set for it`,
-        code: "UNSPECIFIED",
+        message: `validation failed at include ${includeValue.includeId} with an excluded item but data set for it`,
+        code: ENDPOINT_ERRORS.INVALID_INCLUDE,
         modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
         itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
         includeId: includeValue.includeId,
@@ -634,7 +639,7 @@ export function checkReadPoliciesAllowThisUserToSearch(
     ) {
       throw new EndpointError({
         message: "Searching with an active read policy is not allowed, the policy in question is " + policyName,
-        code: "FORBIDDEN",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
   });
@@ -813,7 +818,7 @@ export async function runPolicyCheck(
           );
           throw new EndpointError({
             message: `validation failed for ${qualifiedPolicyIdentifier} with reason ${invalidReason}`,
-            code: INVALID_POLICY_ERROR,
+            code: ENDPOINT_ERRORS.INVALID_POLICY,
             modulePath: mod.getPath(),
             itemDefPath: arg.itemDefinition.getPath(),
             policyType,
@@ -839,7 +844,7 @@ export async function runPolicyCheck(
           );
           throw new EndpointError({
             message: `validation failed for policy ${policyName}`,
-            code: INVALID_POLICY_ERROR,
+            code: ENDPOINT_ERRORS.INVALID_POLICY,
             modulePath: mod.getPath(),
             itemDefPath: arg.itemDefinition.getPath(),
             policyType,

@@ -19,6 +19,7 @@ import {
   GUEST_METAROLE,
   UNSPECIFIED_OWNER,
   EXCLUSION_STATE_SUFFIX,
+  ENDPOINT_ERRORS,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { EndpointError } from "../../../errors";
@@ -1418,7 +1419,7 @@ export default class ItemDefinition {
         throw new EndpointError({
           message: `Forbidden, role ${role} cannot create in behalf in resource ${this.getName()}` +
           ` only roles ${this.rawData.canCreateInBehalfBy.join(", ")} can do so`,
-          code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
+          code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : ENDPOINT_ERRORS.FORBIDDEN,
         });
       }
     } else if (throwError) {
@@ -1426,7 +1427,7 @@ export default class ItemDefinition {
         message: "can create in behalf is not supported",
         // here we pass always forbidden simply because it's not supported at all
         // and it was not a login mistake
-        code: "FORBIDDEN",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
     return canCreateInBehalf;
@@ -1471,7 +1472,7 @@ export default class ItemDefinition {
           message: "parenting with '" + modulePath + "' and '" + itemDefinitionPath + "' is not allowed",
           // here we pass always forbidden simply because it's not supported at all
           // and it was not a login mistake
-          code: "FORBIDDEN",
+          code: ENDPOINT_ERRORS.FORBIDDEN,
         });
       }
     } else if (throwError) {
@@ -1479,7 +1480,7 @@ export default class ItemDefinition {
         message: "parenting is not supported",
         // here we pass always forbidden simply because it's not supported at all
         // and it was not a login mistake
-        code: "FORBIDDEN",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
     return canBeParentedBy;
@@ -1515,7 +1516,7 @@ export default class ItemDefinition {
         throw new EndpointError({
           message: `Forbidden, user ${userId} with role ${role} has no parenting role access to resource ${this.getName()}` +
           ` only roles ${this.rawData.parentingRoleAccess.join(", ")} can be granted access`,
-          code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
+          code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : ENDPOINT_ERRORS.FORBIDDEN,
         });
       }
     } else {
@@ -1523,7 +1524,7 @@ export default class ItemDefinition {
         message: "parenting role access is not supported",
         // here we pass always forbidden simply because it's not supported at all
         // and it was not a login mistake
-        code: "FORBIDDEN",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
     return hasParentingRoleAccess;

@@ -91,7 +91,7 @@ export function I18nRead(props: II18nReadProps) {
                                 }
                                 if (includeContext) {
                                   errMessage += "; in item context for " +
-                                    includeContext.include.getName();
+                                    includeContext.include.getId();
                                 }
                               }
                               throw new Error(errMessage);
@@ -152,6 +152,8 @@ export function I18nReadError(props: II18nReadErrorProps) {
           if (isDevelopment) {
             console.warn(freeError.message);
           }
+          // cheap way to know if this is a basic error code
+          // without having to check for all types of error code
           if (!freeError.modulePath) {
             const errorMessage: string = localeData.i18n[localeData.language].error[props.error.code];
             return errorMessage;
@@ -207,9 +209,10 @@ export function I18nReadError(props: II18nReadErrorProps) {
                     }
 
                     const i18nData = propertyDef.getI18nDataFor(localeData.language);
-                    const i18nErrorValue = i18nData && i18nData.error && i18nData.error[freeError.code];
+                    const i18nErrorValue = i18nData && i18nData.error && i18nData.error[freeError.pcode];
                     if (!i18nErrorValue) {
-                      console.warn("failed to display error due to code or language", freeError);
+                      // pcode might be null, this can happen by a programming error
+                      console.warn("failed to display error due to pcode or language", freeError);
                       return null;
                     }
                     return i18nErrorValue;

@@ -14,13 +14,14 @@ import Snackbar from "../general/snackbar";
 import { ModuleProvider } from "../../../itemize/client/providers/module";
 import { PolicyConfirmDialog } from "../dialogs/policy-confirm";
 import { TitleSetter } from "../../../itemize/client/components/util";
+import { ENDPOINT_ERRORS } from "../../../itemize/constants";
 
 function SimulatedNotFoundPage() {
   return (
     <ErrorPage
       error={{
         message: "User not found",
-        code: "NOT_FOUND",
+        code: ENDPOINT_ERRORS.NOT_FOUND,
       }}
     />
   );

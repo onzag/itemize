@@ -1,3 +1,11 @@
+/**
+ * Bundles up and creates all the build files that are used as the schema
+ * to generate everything in itemize, from the SQL database, to the endpoints
+ * using the raw unprocessed data into some multiple per language files
+ *
+ * @packageDocumentation
+ */
+
 import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
 } from "../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -57,10 +65,12 @@ import {
 import { buildAutocomplete } from "./autocomplete";
 import { evalRawJSON } from "./evaler";
 
+// Refuse to run in production mode
 if (process.env.NODE_ENV === "production") {
   throw new Error("This script cannot run in production mode");
 }
 
+// 
 interface IKeyValuePairNestedType {
   [key: string]: string | IKeyValuePairNestedType;
 }
@@ -675,8 +685,8 @@ async function buildItemDefinition(
         // if we find such imported definition
         if (importedChildDefinitions.find((idef) => {
           const lastName = idef[idef.length - 1];
-          return (lastName === include.name ||
-            idef.join("/") === include.name);
+          return (lastName === include.definition ||
+            idef.join("/") === include.definition);
         })) {
           // we return and assume it is valid
           return;
@@ -685,7 +695,7 @@ async function buildItemDefinition(
 
       // otherwise if we don't find any and we know for sure
       // it is meant to be an imported definition
-      if (include.name.indexOf("/") !== -1) {
+      if (include.definition.indexOf("/") !== -1) {
         throw new CheckUpError(
           "Missing imported item definition for " + include,
           iTraceback.newTraceToBit("name"),
@@ -694,7 +704,7 @@ async function buildItemDefinition(
       // Otherwise we try to get the actual location
       // it will throw an error otherwise
       await getActualFileLocation(
-        path.join(path.dirname(actualLocation), include.name),
+        path.join(path.dirname(actualLocation), include.definition),
         iTraceback.newTraceToBit("name"),
       );
     };
@@ -832,7 +842,7 @@ async function getI18nData(
     }
 
     if (properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY]) {
-      i18nData[locale].custom = {};
+      i18nData[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY] = {};
       Object.keys(properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY]).forEach((customPropertyInCustomKey) => {
         if (typeof properties[locale][MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY][customPropertyInCustomKey] !== "string") {
           throw new CheckUpError(

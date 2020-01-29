@@ -23,6 +23,7 @@ import {
   POLICY_PREFIXES,
   PREFIX_BUILD,
   RESERVED_CHANGE_PROPERTIES,
+  ENDPOINT_ERRORS,
 } from "../../../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from ".";
 import { getGQLFieldsDefinitionForProperty } from "./PropertyDefinition/gql";
@@ -272,7 +273,7 @@ async function resolveGenericFunction(
       console.error(err.stack);
       throw new EndpointError({
         message: "Internal Server Error",
-        code: "INTERNAL_SERVER_ERROR",
+        code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
       });
     }
   }

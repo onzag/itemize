@@ -10,7 +10,7 @@ import Knex from "knex";
 import { types } from "pg";
 import Moment from "moment";
 import { DATETIME_FORMAT, TIME_FORMAT, DATE_FORMAT,
-  MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE } from "../constants";
+  MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS } from "../constants";
 import { GraphQLError } from "graphql";
 import { EndpointError, EndpointErrorType } from "../base/errors";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -107,7 +107,7 @@ const customFormatErrorFn = (error: GraphQLError) => {
     default:
       extensions = {
         message: "Unspecified Error while parsing data",
-        code: "UNSPECIFIED",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
       };
   }
 
@@ -133,7 +133,7 @@ async function customResolveWrapper(
     console.error(err.stack);
     throw new EndpointError({
       message: "Internal Server Error",
-      code: "INTERNAL_SERVER_ERROR",
+      code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
     });
   }
 }

@@ -11,7 +11,7 @@ import {
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import { EndpointError } from "../../../base/errors";
-import { ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS } from "../../../constants";
+import { ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS, ENDPOINT_ERRORS } from "../../../constants";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { deleteEverythingInTransitoryId } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
 import { IChangedFeedbackEvent } from "../../../base/remote-protocol";
@@ -69,7 +69,7 @@ export async function deleteItemDefinition(
           debug("FAILED due to lack of content data");
           throw new EndpointError({
             message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
-            code: "NOT_FOUND",
+            code: ENDPOINT_ERRORS.NOT_FOUND,
           });
         }
 
@@ -91,7 +91,7 @@ export async function deleteItemDefinition(
           throw new EndpointError({
             message: "The item is blocked, only users with role " +
             ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.join(",") + " can wipe this data",
-            code: "BLOCKED",
+            code: ENDPOINT_ERRORS.BLOCKED,
           });
         }
       },

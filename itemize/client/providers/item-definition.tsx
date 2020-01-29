@@ -13,6 +13,10 @@ import {
   PREFIX_SEARCH,
   UNSPECIFIED_OWNER,
   PREFIX_GET_LIST,
+  ANYONE_METAROLE,
+  ANYONE_LOGGED_METAROLE,
+  GUEST_METAROLE,
+  ENDPOINT_ERRORS,
 } from "../../constants";
 import { buildGqlQuery, buildGqlMutation, gqlQuery,
   IGQLQueryObj, GQLEnum, GQLQuery, IGQLSearchResult, IGQLValue, IGQLEndpointValue } from "../../gql-querier";
@@ -1422,7 +1426,7 @@ export class ActualItemDefinitionProvider extends
     if (!gqlValue) {
       error = {
         message: "Failed to connect",
-        code: "CANT_CONNECT",
+        code: ENDPOINT_ERRORS.CANT_CONNECT,
       };
     } else if (gqlValue.errors) {
       // if the server itself returned an error, we use that error
@@ -1581,7 +1585,10 @@ export class ActualItemDefinitionProvider extends
           // Here we are doing exactly the same as we did with applying property ids but this time
           // now we do it with the roles
           const applyingRoles = this.props.itemDefinitionInstance.getRolesForPolicy(policyType, policyName);
-          const oneOfApplyingRolesApplies = applyingRoles.includes(this.props.tokenData.role);
+          const oneOfApplyingRolesApplies =
+            applyingRoles.includes(this.props.tokenData.role) ||
+            applyingRoles.includes(ANYONE_METAROLE) ||
+            (applyingRoles.includes(ANYONE_LOGGED_METAROLE) && this.props.tokenData.role !== GUEST_METAROLE);
           if (!oneOfApplyingRolesApplies) {
             // the attribute is not included isInvalid is false
             return false;
@@ -1614,7 +1621,7 @@ export class ActualItemDefinitionProvider extends
   ): IActionResponseWithId | IActionResponseWithValue | IActionResponseWithSearchResults {
     const emulatedError: EndpointErrorType = {
       message: "Submit refused due to invalid information in form fields",
-      code: "INVALID_DATA_SUBMIT_REFUSED",
+      code: ENDPOINT_ERRORS.INVALID_DATA_SUBMIT_REFUSED,
     };
     this.setState({
       [stateApplied]: emulatedError,

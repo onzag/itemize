@@ -1,3 +1,12 @@
+/**
+ * Contains checker functions that check the structure of the itemize schema
+ * regarding things and correlations that might have been missed by the
+ * ajv schema checker (because not everything can be setup as a json schema)
+ * eg. interactions, imports, etc...
+ *
+ * @packageDocumentation
+ */
+
 import Root, { IRootRawJSONDataType } from "../base/Root";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
@@ -28,39 +37,58 @@ import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/Item
 import { IFilterRawJSONDataType, IAutocompleteValueRawJSONDataType } from "../base/Autocomplete";
 import Module from "../base/Root/Module";
 
+/**
+ * Checks a conditional rule set so that it is valid and contains valid
+ * includes and rules
+ * @param rawData the raw data of the conditional rule set
+ * @param parentItemDefinition the parent item definition where the ruleset resides (if any,
+ * it is null for prop extensions)
+ * @param parentModule the parent module where the ruleset resides
+ * @param traceback the traceback object
+ */
 export function checkConditionalRuleSet(
   rawData: IConditionalRuleSetRawJSONDataType,
   parentItemDefinition: IItemDefinitionRawJSONDataType,
   parentModule: IModuleRawJSONDataType,
   traceback: Traceback,
 ) {
-  // Let's try to search for the item definition for that given component
-  // should be there at least to be valid, even if item instances are never
-  // created
+  // So first let's check if this conditional rule set is of
+  // the include type that checks if includes are included
   const include =
     (rawData as IConditionalRuleSetRawJSONDataIncludeType).include;
-  if (include &&
+
+  // if that is to be the case
+  if (
+    include &&
+    // we use the static function to request for that
+    // specific include that belongs to that item definition
     !ItemDefinition.getItemDefinitionRawFor(
       parentItemDefinition,
       parentModule,
       include,
-    )) {
+    )
+  ) {
+    // throw an error if not found
     throw new CheckUpError(
       "Conditional rule set item definition not available",
       traceback.newTraceToBit("include"),
     );
   }
 
-  // Let's check the property
+  // Let's check the property if this is one conditional rule
+  // set of that type
   const rawDataAsProperty =
     (rawData as IConditionalRuleSetRawJSONDataPropertyType);
+  // so if our property is a named property
   if (rawDataAsProperty.property && rawDataAsProperty.property !== "&this") {
+    // then we try to find that property, including extensions
     const propDef = ItemDefinition.getPropertyDefinitionRawFor(
       parentItemDefinition,
       parentModule,
       rawDataAsProperty.property,
       true,
     );
+    // if there's not such a thing throw an error
     if (!propDef) {
       throw new CheckUpError(
         "Conditional rule set property not available",
@@ -68,33 +96,52 @@ export function checkConditionalRuleSet(
       );
     }
 
+    // now we need to check that the value that is used in the condition
+    // can actually be compared
     const valueToCheckAgainst = rawDataAsProperty.value;
+    // so the value might be of a referred property as in, a property
+    // as a value to be compared for a dynamic check
     if (
       valueToCheckAgainst &&
       (valueToCheckAgainst as IPropertyDefinitionReferredPropertyValue).property
     ) {
-      const valueToCheckAgainstItemDefinition = ItemDefinition.getItemDefinitionRawFor(
+      // for that we would need to get the property definition in that item
+      // definition
+      const valueToCheckAgainstPropertyDefinition = ItemDefinition.getPropertyDefinitionRawFor(
         parentItemDefinition,
         parentModule,
         (valueToCheckAgainst as IPropertyDefinitionReferredPropertyValue).property,
         true,
       );
-      if (!valueToCheckAgainstItemDefinition) {
+      // if we have none, then this is invalid
+      if (!valueToCheckAgainstPropertyDefinition) {
         throw new CheckUpError(
           "Conditional rule set value invalid, cannot find property, " +
             (valueToCheckAgainst as IPropertyDefinitionReferredPropertyValue).property,
           traceback.newTraceToBit("value").newTraceToBit("property"),
         );
       }
+
+      // due to the fact the checking can be very complex we cannot check the type
+      // itself and give it a guarantee due to the existance of the valueAttribute
+      // that can be used instead
     } else if (
       valueToCheckAgainst &&
-      (valueToCheckAgainst as IPropertyDefinitionExactPropertyValue).exactValue
+      typeof (valueToCheckAgainst as IPropertyDefinitionExactPropertyValue).exactValue !== "undefined"
     ) {
+      // so now we extract what that exact value is supposed to be
+      let exactValue: any = (valueToCheckAgainst as IPropertyDefinitionExactPropertyValue).exactValue;
+      // if we have a value attribute that we are supposed to use
+      if (rawDataAsProperty.valueAttribute) {
+        exactValue = exactValue[rawDataAsProperty.valueAttribute];
+      }
+      // let's check if this value is valid
       const invalidReason = PropertyDefinition.isValidValue(
         propDef,
-        (valueToCheckAgainst as IPropertyDefinitionExactPropertyValue).exactValue,
+        exactValue,
         true,
       );
+      // throw the error if it's invalid
       if (invalidReason) {
         throw new CheckUpError(
           "Conditional rule set value invalid, reason " +
@@ -106,16 +153,29 @@ export function checkConditionalRuleSet(
   }
 }
 
+/**
+ * Checks an item definition so that all its imports, name, and so on
+ * do match the specification as it is required
+ * @param rawRootData the root data
+ * @param rawData the item definition data
+ * @param parentModule the raw parent module
+ * @param traceback the traceback object
+ */
 export function checkItemDefinition(
   rawRootData: IRootRawJSONDataType,
   rawData: IItemDefinitionRawJSONDataType,
   parentModule: IModuleRawJSONDataType,
   traceback: Traceback,
 ) {
+  // so we setup the traceback to the location of the item definition file
   const actualTraceback = traceback.newTraceToLocation(rawData.location);
+  // and setup the pointers for that
   actualTraceback.setupPointers(rawData.pointers, rawData.raw);
 
+  // the schema specifies this character is valid but we really don't
+  // want names starting wiht that
   if (rawData.name.startsWith("_")) {
+    // so we throw an error if so
     throw new CheckUpError(
       "Definition name '" + rawData.name +
         "' starts with underscore, and that's invalid",
@@ -133,6 +193,7 @@ export function checkItemDefinition(
     );
   }
 
+  // Also these two must be specified together
   if (rawData.mustBeParented && !rawData.canBeParentedBy) {
     throw new CheckUpError(
       "Setting mustBeParented without canBeParentedBy specifications",
@@ -179,6 +240,7 @@ export function checkItemDefinition(
     });
   }
 
+  // if we have a parenting role access we must have a can be parented by rule
   if (rawData.parentingRoleAccess && !rawData.canBeParentedBy) {
     throw new CheckUpError(
       "Setting parentingRoleAccess without canBeParentedBy rules",
@@ -186,69 +248,107 @@ export function checkItemDefinition(
     );
   }
 
+  // check the custom consistency so that all custom keys are available
+  // in all languages, note how we move the traceback location
   checkI18nCustomConsistency(
     rawData.i18nData,
     actualTraceback.newTraceToLocation(rawData.i18nDataLocation),
   );
 
+  // if we have policies we need to check them all
+  // this is a bit of a tricky process because policies can
+  // get complex fast
   if (rawData.policies) {
-    Object.keys(rawData.policies).forEach((policyKey) => {
-      Object.keys(rawData.policies[policyKey]).forEach((policyRuleKey) => {
-        if (policyRuleKey.startsWith("_")) {
+
+    // we enter a loop
+    Object.keys(rawData.policies).forEach((policyType) => {
+
+      // the policy types are the edit, delete, create, read, parent
+      Object.keys(rawData.policies[policyType]).forEach((policyName) => {
+
+        // policy names just as the item definition name aren't alowed to be like this
+        if (policyName.startsWith("_")) {
           throw new CheckUpError(
-            "Policy rule '" + policyRuleKey +
+            "Policy rule '" + policyName +
               "' starts with underscore, and that's invalid",
-            actualTraceback.newTraceToBit("policies").newTraceToBit(policyKey).newTraceToBit(policyRuleKey),
+            actualTraceback.newTraceToBit("policies").newTraceToBit(policyType).newTraceToBit(policyName),
           );
         }
 
-        const policyValue: IPolicyValueRawJSONDataType = rawData.policies[policyKey][policyRuleKey];
+        // so we extract the policy value and start checking
+        const policyValue: IPolicyValueRawJSONDataType = rawData.policies[policyType][policyName];
+
+        // Policies do not allow for the owner metarole, and the reason for this is that
+        // it is actually hard to check and enforce, currently it is not checked
+        // an owner metarole is simply ignored, rules that only apply to owners are odd
+        // to start with, why would an owner be subjected to a more complex policy
         if (policyValue.roles.includes(OWNER_METAROLE)) {
           throw new CheckUpError(
-            "Policy rule '" + policyRuleKey +
+            "Policy rule '" + policyName +
               "' includes a &OWNER role, and this is not allowed",
             actualTraceback
               .newTraceToBit("policies")
-              .newTraceToBit(policyKey)
-              .newTraceToBit(policyRuleKey)
+              .newTraceToBit(policyType)
+              .newTraceToBit(policyName)
               .newTraceToBit("roles"),
           );
         }
 
+        // let's get the module and item definition, parent policy uses this
         let moduleForPolicy: IModuleRawJSONDataType = parentModule;
         let itemDefinitionForPolicy: IItemDefinitionRawJSONDataType = rawData;
+
+        // if we have one, we must check that these paths are right
         if (policyValue.module) {
+          // using the root we can call the static function
           moduleForPolicy = Root.getModuleRawFor(rawRootData, policyValue.module.split("/"));
           itemDefinitionForPolicy = null;
           if (!moduleForPolicy) {
             throw new CheckUpError(
-              "Policy rule '" + policyRuleKey +
+              "Policy rule '" + policyName +
                 "' contains an invalid module that cannot be found '" + policyValue.module + "'",
               actualTraceback
                 .newTraceToBit("policies")
-                .newTraceToBit(policyKey)
-                .newTraceToBit(policyRuleKey)
+                .newTraceToBit(policyType)
+                .newTraceToBit(policyName)
                 .newTraceToBit("module"),
             );
           }
 
+          // the same for the item definition
           if (policyValue.itemDefinition) {
             itemDefinitionForPolicy = Module.getItemDefinitionRawFor(moduleForPolicy, policyValue.itemDefinition.split("/"));
             if (!itemDefinitionForPolicy) {
               throw new CheckUpError(
-                "Policy rule '" + policyRuleKey +
+                "Policy rule '" + policyName +
                   "' contains an invalid item definition that cannot be found '" + policyValue.itemDefinition + "'",
                 actualTraceback
                   .newTraceToBit("policies")
-                  .newTraceToBit(policyKey)
-                  .newTraceToBit(policyRuleKey)
+                  .newTraceToBit(policyType)
+                  .newTraceToBit(policyName)
                   .newTraceToBit("itemDefinition"),
               );
             }
           }
+        } else if (policyValue.itemDefinition) {
+          // otherwise if we have an item definition but no module
+          // specified this is bad input
+          throw new CheckUpError(
+            "Policy rule '" + policyName +
+              "' contains an item definition but does not specify the module",
+            actualTraceback
+              .newTraceToBit("policies")
+              .newTraceToBit(policyType)
+              .newTraceToBit(policyName)
+              .newTraceToBit("itemDefinition"),
+          );
         }
 
+        // now we need to go for all the properties of the policy
         policyValue.properties.forEach((propertyId, index) => {
+          // we need to check that each one of them does exists
+          // in the module and item definition we are using, if any
+          // otherwise it's a prop extension
           let propertyRaw: IPropertyDefinitionRawJSONDataType;
           if (itemDefinitionForPolicy) {
             propertyRaw = ItemDefinition.getPropertyDefinitionRawFor(
@@ -256,23 +356,31 @@ export function checkItemDefinition(
           } else {
             propertyRaw = Module.getPropExtensionRawFor(moduleForPolicy, propertyId);
           }
+
+          // if we have no property
           if (propertyRaw === null) {
+            // we throw the error for the missing property
             throw new CheckUpError(
-              "Policy rule '" + policyRuleKey +
+              "Policy rule '" + policyName +
                 "' contains an invalid property that cannot be found '" + propertyId +
                 "' in '" + itemDefinitionForPolicy.name + "'",
               actualTraceback
                 .newTraceToBit("policies")
-                .newTraceToBit(policyKey)
-                .newTraceToBit(policyRuleKey)
+                .newTraceToBit(policyType)
+                .newTraceToBit(policyName)
                 .newTraceToBit("properties")
                 .newTraceToBit(index),
             );
           }
         });
 
+        // Now we got to check applying properties, applying properties exist with create, edit
+        // and read rules, but not parenting nor delete, however policies are generic so we
+        // run a generic check, only the schema checks specifics
         if (policyValue.applyingProperties) {
+          // now we check the applying properties
           policyValue.applyingProperties.forEach((propertyId, index) => {
+            // that all of them do exist, using the same method as before
             let propertyRaw: IPropertyDefinitionRawJSONDataType;
             if (itemDefinitionForPolicy) {
               propertyRaw = ItemDefinition.getPropertyDefinitionRawFor(
@@ -280,15 +388,16 @@ export function checkItemDefinition(
             } else {
               propertyRaw = Module.getPropExtensionRawFor(moduleForPolicy, propertyId);
             }
+            // and if we don't find the property we throw the error
             if (propertyRaw === null) {
               throw new CheckUpError(
-                "Policy rule '" + policyRuleKey +
+                "Policy rule '" + policyName +
                   "' contains an invalid property that cannot be found '" + propertyId +
                   "' in '" + itemDefinitionForPolicy.name + "'",
                 actualTraceback
                   .newTraceToBit("policies")
-                  .newTraceToBit(policyKey)
-                  .newTraceToBit(policyRuleKey)
+                  .newTraceToBit(policyType)
+                  .newTraceToBit(policyName)
                   .newTraceToBit("applyingProperties")
                   .newTraceToBit(index),
               );
@@ -296,33 +405,43 @@ export function checkItemDefinition(
           });
         }
 
+        // Same as applyng properties, in the same fashion, but for includes
         if (policyValue.applyingIncludes) {
+          // so we loop over them
           policyValue.applyingIncludes.forEach((includeId, index) => {
+            // and try to extract it from the item definition
             let includeRaw: IIncludeRawJSONDataType;
+            // this should be the case because the schema should prevent
+            // module only policies to exist to start with that have applyingIncludes
+            // as module and item definition descriptions only exist within
+            // parenting policies
             if (itemDefinitionForPolicy) {
               includeRaw = itemDefinitionForPolicy.includes &&
                 itemDefinitionForPolicy.includes.find((i) => i.id === includeId);
             } else {
               throw new CheckUpError(
-                "Policy rule '" + policyRuleKey +
+                "Policy rule '" + policyName +
                   "' has set itself as an external module-only rule" +
                   " but it requests for applying includes '" + includeId + "'",
                 actualTraceback
                   .newTraceToBit("policies")
-                  .newTraceToBit(policyKey)
-                  .newTraceToBit(policyRuleKey)
+                  .newTraceToBit(policyType)
+                  .newTraceToBit(policyName)
                   .newTraceToBit("applyingIncludes")
                   .newTraceToBit(index),
               );
             }
+
+            // so anyway if we don't find the include
             if (!includeRaw) {
+              // we throw the error
               throw new CheckUpError(
-                "Policy rule '" + policyRuleKey +
+                "Policy rule '" + policyName +
                   "' contains an invalid item id that cannot be found '" + includeId + "'",
                 actualTraceback
                   .newTraceToBit("policies")
-                  .newTraceToBit(policyKey)
-                  .newTraceToBit(policyRuleKey)
+                  .newTraceToBit(policyType)
+                  .newTraceToBit(policyName)
                   .newTraceToBit("applyingIncludes")
                   .newTraceToBit(index),
               );
@@ -333,12 +452,15 @@ export function checkItemDefinition(
     });
   }
 
+  // now we are done with policies and go onto check child definitions
+  // that are item definitions that are children of this
   if (rawData.childDefinitions) {
     rawData
     .childDefinitions.forEach((cd) =>
       checkItemDefinition(rawRootData, cd, parentModule, actualTraceback));
   }
 
+  // and also includes, if they exist
   if (rawData.includes) {
     const idPool: string[] = [];
     rawData.includes.forEach((itm, index) =>
@@ -346,6 +468,7 @@ export function checkItemDefinition(
         actualTraceback.newTraceToBit("includes").newTraceToBit(index)));
   }
 
+  // and then properties
   if (rawData.properties) {
     rawData.properties
       .forEach((p, index) =>
@@ -354,6 +477,17 @@ export function checkItemDefinition(
   }
 }
 
+/**
+ * Checks an include that exist within the item definition, include represents
+ * inclusion of properties as an sub item within another item, it's like prop
+ * extensions but in reverse
+ * @param rawData the raw data of the include
+ * @param parentItemDefinition the parent item definition that contains the include
+ * @param parentModule the parent module that contains the item definition
+ * @param idPool the id pool is a referred array that checks that there are no
+ * duplicate includes with the same id
+ * @param traceback the traceback already pointing to this include
+ */
 export function checkInclude(
   rawData: IIncludeRawJSONDataType,
   parentItemDefinition: IItemDefinitionRawJSONDataType,
@@ -361,18 +495,23 @@ export function checkInclude(
   idPool: string[],
   traceback: Traceback,
 ) {
+  // if we have an include in the id pool already with the same id
   if (idPool.includes(rawData.id)) {
+    // then this is a checkup error as it is repeated
     throw new CheckUpError(
       "Duplicate id in the same item definition",
       traceback.newTraceToBit("id"),
     );
   }
+  // now we add ourselves to the id pool
   idPool.push(rawData.id);
 
   // check whether the item definition exists for this item
-  // it must exist to be an item
-  if (!ItemDefinition.getItemDefinitionRawFor(
-    parentItemDefinition, parentModule, rawData.definition)) {
+  // it must exist to be an item, this also checks for
+  // imported modules
+  const referredItemDefinitionRaw = ItemDefinition.getItemDefinitionRawFor(
+    parentItemDefinition, parentModule, rawData.definition);
+  if (!referredItemDefinitionRaw) {
     throw new CheckUpError(
       "Missing item definition",
       traceback.newTraceToBit("definition"),
@@ -417,9 +556,6 @@ export function checkInclude(
       traceback,
     );
   }
-
-  const referredItemDefinitionRaw = ItemDefinition.getItemDefinitionRawFor(
-    parentItemDefinition, parentModule, rawData.definition);
 
   // Now we check whether this properties exist for sinkin
   if (rawData.sinkIn) {
@@ -488,6 +624,7 @@ export function checkInclude(
     );
   }
 
+  // Check the exclusion rule
   if (rawData.excludedIf) {
     checkConditionalRuleSet(
       rawData.excludedIf,
@@ -498,6 +635,16 @@ export function checkInclude(
   }
 }
 
+/**
+ * Checks the properties value mapping definition that is in use
+ * by predefined and enforced properties
+ * @param rawData the raw data of that value mapping
+ * @param parentItemDefinition the parent item definition
+ * @param referredItemDefinition the referred item definition it refers to as this
+ * is used within includes
+ * @param parentModule the parent module of both item definitions
+ * @param traceback the traceback already pointing to this mapping
+ */
 export function checkPropertiesValueMappingDefiniton(
   rawData: IPropertiesValueMappingDefinitonRawJSONDataType,
   parentItemDefinition: IItemDefinitionRawJSONDataType,
@@ -590,6 +737,14 @@ export function checkPropertiesValueMappingDefiniton(
   }
 }
 
+/**
+ * Checks a property definition to ensure consistency
+ * @param rawData the raw data of the property
+ * @param parentItemDefinition the parent item definition where the property is contained
+ * if any, as it could be a prop extension
+ * @param parentModule the parent module
+ * @param traceback the traceback already pointing to this property
+ */
 export function checkPropertyDefinition(
   rawData: IPropertyDefinitionRawJSONDataType,
   parentItemDefinition: IItemDefinitionRawJSONDataType,
@@ -871,9 +1026,14 @@ export function checkPropertyDefinition(
     }
   }
 
+  // enforced values is what happens when a property meets a condition
+  // and is enforced into a value
   if (rawData.enforcedValues) {
+    // so we need to check and first we build a traceback
     const enforcedValuesTraceback = traceback.newTraceToBit("enforcedValues");
+    // they are conditional rule sets
     rawData.enforcedValues.forEach((ev, index) => {
+      // so we check them as so
       checkConditionalRuleSet(
         ev.if,
         parentItemDefinition,
@@ -881,11 +1041,13 @@ export function checkPropertyDefinition(
         enforcedValuesTraceback.newTraceToBit(index).newTraceToBit("if"),
       );
 
+      // and we also check the value
       const invalidReason = PropertyDefinition.isValidValue(
         rawData,
         ev.value,
         true,
       );
+      // ensure that it's a valid value
       if (invalidReason) {
         throw new CheckUpError(
           "Invalid type for enforcedValues enforced value: " + invalidReason,
@@ -895,6 +1057,7 @@ export function checkPropertyDefinition(
     });
   }
 
+  // check the conditional rule set for the hiddenIf rule
   if (rawData.hiddenIf) {
     checkConditionalRuleSet(
       rawData.hiddenIf,
@@ -905,29 +1068,48 @@ export function checkPropertyDefinition(
   }
 }
 
+/**
+ * Checks the i18n data consistency of custom keys
+ * so that they are present in all languages
+ * @param rawData the raw i18n data
+ * @param traceback the traceback already pointing to this file
+ * the i18n data comes from a .properties file which cannot be pointed
+ */
 export function checkI18nCustomConsistency(
   rawData: IRawJSONI18NDataType,
   traceback: Traceback,
 ) {
+  // so we first analyze all the keys in order to extract all
+  // the custom keys
   const analysis = Object.keys(rawData).map((localeKey: string) => {
+    // for that for every locale we extract the custom fields
     const customData = rawData[localeKey].custom;
+    // if there are no custom fields, then the keys is an empty array
     if (!customData) {
       return {
         keys: [],
         localeKey,
       };
     }
+    // otherwise it is whatever keys were set by the object
     return {
       keys: Object.keys(customData),
       localeKey,
     };
   });
 
+  // now we need to loop to ensure all keys are equal within languages
   analysis.forEach((analysisData) => {
+    // so we loop twice to cross check
     analysis.forEach((analysisDataCompared) => {
+      // and now we check that we are not cross checking the same locale
       if (analysisData.localeKey !== analysisDataCompared.localeKey) {
+        // and as so we check for every key in the locale one by one, we could
+        // use equals but then our error wouldn't be that accurate
         analysisData.keys.forEach((customKeyInLocale) => {
+          // if one key is missing in the second language
           if (!analysisDataCompared.keys.includes(customKeyInLocale)) {
+            // throw the error that is the case
             throw new CheckUpError(
               "Custom i18n in locale " + analysisData.localeKey + " includes custom key '" +
               customKeyInLocale + "' which is not present in locale " + analysisDataCompared.localeKey,
@@ -940,14 +1122,24 @@ export function checkI18nCustomConsistency(
   });
 }
 
+/**
+ * Checks a module for consistency as well as all its prop extensions
+ * @param rawRootData the root data where this module is located
+ * @param rawData the raw data of the module itself
+ * @param traceback the traceback object
+ */
 export function checkModule(
   rawRootData: IRootRawJSONDataType,
   rawData: IModuleRawJSONDataType,
   traceback: Traceback,
 ) {
+  // so first we make it point to our own file where this module
+  // is located
   const actualTraceback = traceback.newTraceToLocation(rawData.location);
+  // setup the pointers
   actualTraceback.setupPointers(rawData.pointers, rawData.raw);
 
+  // and now we check that the name is valid and doesn't start with _
   if (rawData.name.startsWith("_")) {
     throw new CheckUpError(
       "Module name '" + rawData.name + "' starts with underscore, and that's invalid",
@@ -955,17 +1147,23 @@ export function checkModule(
     );
   }
 
+  // check the i18n consistency so that custom keys are valid
   checkI18nCustomConsistency(
     rawData.i18nData,
     traceback.newTraceToLocation(rawData.i18nDataLocation),
   );
 
+  // and we got to check the prop extensions if we have some
   if (rawData.propExtensions) {
+    // and now the prop extension traceback
     const propExtTraceback = actualTraceback
       .newTraceToLocation(rawData.propExtLocation);
+    // setup the pointers
     propExtTraceback.setupPointers(rawData.propExtPointers, rawData.propExtRaw);
 
+    // loop per property
     rawData.propExtensions.forEach((propDef, index) => {
+      // the specific traceback
       const specificPropExtTraceback =
         propExtTraceback.newTraceToBit(index);
 
@@ -988,25 +1186,37 @@ export function checkModule(
    });
   }
 
+  // if we have children
   if (rawData.children) {
+    // we need to check them as well
     rawData.children.forEach((moduleOrItemDef) => {
+      // but it depends on what they are, say they are a module
       if (moduleOrItemDef.type === "module") {
+        // we send them to the checking module function
         checkModule(rawRootData, moduleOrItemDef, actualTraceback);
       } else {
+        // otherwise it must be an item definition
         checkItemDefinition(rawRootData, moduleOrItemDef, rawData, actualTraceback);
       }
     });
   }
 }
 
+/**
+ * Checks the entire root of the itemize schema
+ * @param rawData the root
+ */
 export function checkRoot(
   rawData: IRootRawJSONDataType,
 ) {
+  // we build the traceback and setup the pointers
   const traceback = new Traceback(rawData.location);
   traceback.setupPointers(rawData.pointers, rawData.raw);
 
+  // and go per children
   if (rawData.children) {
     rawData.children.forEach((mod, index) => {
+      // all children in the root are modules
       checkModule(
         rawData,
         mod,
@@ -1016,13 +1226,25 @@ export function checkRoot(
   }
 }
 
+/**
+ * Checks the autocomplete filters and values so that they do match
+ * and have no missing fields
+ * @param rawData the autocomplete filter or value list, whatever it comes
+ * @param supportedLanguages the supported languages we expect
+ * @param traceback the traceback object already pointing
+ */
 export function checkAutocompleteFilterAndValues(
   rawData: Array<IFilterRawJSONDataType | IAutocompleteValueRawJSONDataType>,
   supportedLanguages: string[],
   traceback: Traceback,
 ) {
+  // we are going to loop over that array
   rawData.forEach((value, index) => {
+    // if we have a filter
     if (value.type === "filter") {
+      // we check all the values that it holds
+      // there should be some but it might just be
+      // stacking filters
       if (value.values) {
         checkAutocompleteFilterAndValues(
           value.values,
@@ -1030,7 +1252,9 @@ export function checkAutocompleteFilterAndValues(
           traceback.newTraceToBit(index).newTraceToBit("values"),
         );
       }
+      // if we have filters within itelf, which contain itself values
       if (value.filters) {
+        // we check those as well
         checkAutocompleteFilterAndValues(
           value.filters,
           supportedLanguages,
@@ -1038,10 +1262,16 @@ export function checkAutocompleteFilterAndValues(
         );
       }
     } else {
+      // otherwise if we have a value, we cannot check for much other than
+      // the i18n if there is some
       if (value.i18n) {
+        // this is our traceback if there's i18n data
         const i18nTraceback = traceback.newTraceToBit(index).newTraceToBit("i18n");
+        // all the supported languages must be included
         supportedLanguages.forEach((language) => {
+          // if that is not the case
           if (!value.i18n[language]) {
+            // throw an error
             throw new CheckUpError(
               "Missing locale value for language " + language,
               i18nTraceback,

@@ -2,7 +2,7 @@ import React from "react";
 import { ItemDefinitionContext, SearchItemDefinitionValueContext } from "../providers/item-definition";
 import equals from "deep-equal";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
-import { PREFIX_GET_LIST, PREFIX_GET } from "../../constants";
+import { PREFIX_GET_LIST, PREFIX_GET, ENDPOINT_ERRORS } from "../../constants";
 import CacheWorkerInstance from "../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
 import { buildGqlQuery, gqlQuery, IGQLSearchResult, IGQLRequestFields, IGQLValue } from "../../gql-querier";
@@ -237,7 +237,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       if (!gqlValue) {
         error = {
           message: "Failed to connect",
-          code: "CANT_CONNECT",
+          code: ENDPOINT_ERRORS.CANT_CONNECT,
         };
       } else if (gqlValue.errors) {
         // if the server itself returned an error, we use that error

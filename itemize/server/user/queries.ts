@@ -1,7 +1,7 @@
 import { IAppDataType } from "..";
 import { IGQLQueryFieldsDefinitionType } from "../../../itemize/base/Root/gql";
 import { GraphQLString } from "graphql";
-import { CONNECTOR_SQL_COLUMN_FK_NAME } from "../../constants";
+import { CONNECTOR_SQL_COLUMN_FK_NAME, ENDPOINT_ERRORS } from "../../constants";
 import { jwtVerify, jwtSign } from "../token";
 import { EndpointError } from "../../../itemize/base/errors";
 import { IServerSideTokenDataType } from "../resolvers/basic";
@@ -41,7 +41,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         if (!args.username && !args.token) {
           throw new EndpointError({
             message: "Invalid Credentials",
-            code: "INVALID_CREDENTIALS",
+            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
           });
         }
 
@@ -75,7 +75,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           } catch (err) {
             throw new EndpointError({
               message: "Token is invalid",
-              code: "INVALID_CREDENTIALS",
+              code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
             });
           }
         } else {
@@ -108,7 +108,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             // we give an error for that
             throw new EndpointError({
               message: "User is blocked",
-              code: "USER_BLOCKED",
+              code: ENDPOINT_ERRORS.USER_BLOCKED,
             });
           }
           // otherwise we provide the token, either re-give the same token
@@ -130,7 +130,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           // we give an invalid credentials error
           throw new EndpointError({
             message: "Invalid Credentials",
-            code: "INVALID_CREDENTIALS",
+            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
           });
         } else {
           // otherwise the user has been removed as the id
@@ -138,7 +138,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           // has kept a session active after nuking his account
           throw new EndpointError({
             message: "User has been removed",
-            code: "USER_REMOVED",
+            code: ENDPOINT_ERRORS.USER_REMOVED,
           });
         }
       },

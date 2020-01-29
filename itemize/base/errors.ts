@@ -14,44 +14,47 @@ interface IEndpointErrorBaseType {
 
 /**
  * An error that comes from a prop extension
+ * code should be INVALID_PROPERTY
  */
-interface IEndpointErrorOverloadPropExtensionType {
-  message: string;
-  code: string;
+interface IEndpointErrorOverloadPropExtensionType extends IEndpointErrorBaseType {
+  pcode: string;
   modulePath: string[];
   propertyId: string;
 }
 
 /**
  * Error when it occurs in a property
+ * code should be INVALID_PROPERTY
  */
-interface IEndpointErrorOverloadPropertyType {
-  message: string;
-  code: string;
-  modulePath: string[];
+interface IEndpointErrorOverloadPropertyType extends IEndpointErrorOverloadPropExtensionType {
   itemDefPath: string[];
-  propertyId: string;
 }
 
 /**
- * Error when it occurs in a property that belongs to an include
+ * Error when it occurs in an include
+ * code should be INVALID_INCLUDE
  */
-interface IEndpointErrorOverloadPropertyInIncludeType {
-  message: string;
-  code: string;
+interface IEndpointErrorOverloadIncludeType extends IEndpointErrorBaseType {
   modulePath: string[];
   itemDefPath: string[];
   includeId: string;
   includeIdItemDefPath: string[];
+}
+
+/**
+ * Error when it occurs in a property that belongs to an include
+ * code should be INVALID_PROPERTY
+ */
+interface IEndpointErrorOverloadPropertyInIncludeType extends IEndpointErrorOverloadIncludeType {
+  pcode: string;
   propertyId: string;
 }
 
 /**
  * Errors in policies, all policies have an item definition and module
+ * code should be INVALID_POLICY
  */
-interface IEndpointErrorOverloadPolicyType {
-  message: string;
-  code: string;
+interface IEndpointErrorOverloadPolicyType extends IEndpointErrorBaseType {
   modulePath: string[];
   itemDefPath: string[];
   policyName: string;
@@ -66,7 +69,8 @@ export type EndpointErrorType =
   IEndpointErrorOverloadPropExtensionType |
   IEndpointErrorOverloadPropertyType |
   IEndpointErrorOverloadPropertyInIncludeType |
-  IEndpointErrorOverloadPolicyType;
+  IEndpointErrorOverloadPolicyType |
+  IEndpointErrorOverloadIncludeType;
 
 /**
  * An instance version of the error that contains

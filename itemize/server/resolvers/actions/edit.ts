@@ -12,7 +12,7 @@ import {
   validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields from "graphql-fields";
-import { CONNECTOR_SQL_COLUMN_FK_NAME, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX } from "../../../constants";
+import { CONNECTOR_SQL_COLUMN_FK_NAME, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, ENDPOINT_ERRORS } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
   convertGQLValueToSQLValueForItemDefinition,
@@ -74,7 +74,7 @@ export async function editItemDefinition(
           debug("FAILED due to lack of content data");
           throw new EndpointError({
             message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
-            code: "NOT_FOUND",
+            code: ENDPOINT_ERRORS.NOT_FOUND,
           });
         }
 
@@ -89,7 +89,7 @@ export async function editItemDefinition(
           debug("FAILED due to element being blocked");
           throw new EndpointError({
             message: "The item is blocked",
-            code: "BLOCKED",
+            code: ENDPOINT_ERRORS.BLOCKED,
           });
         }
       },
@@ -207,7 +207,7 @@ export async function editItemDefinition(
     debug("FAILED due to input data being none");
     throw new EndpointError({
       message: "You are not updating anything whatsoever",
-      code: "NOTHING_TO_UPDATE",
+      code: ENDPOINT_ERRORS.NOTHING_TO_UPDATE,
     });
   }
 

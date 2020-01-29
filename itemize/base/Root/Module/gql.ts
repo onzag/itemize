@@ -13,6 +13,7 @@ import {
   ID_CONTAINER_GQL,
   PREFIX_GET_LIST,
   RESERVED_GETTER_LIST_PROPERTIES,
+  ENDPOINT_ERRORS,
 } from "../../../constants";
 import { GraphQLList, GraphQLObjectType } from "graphql";
 import Module from ".";
@@ -164,7 +165,7 @@ async function resolveGenericFunction(
       console.error(err.stack);
       throw new EndpointError({
         message: "Internal Server Error",
-        code: "INTERNAL_SERVER_ERROR",
+        code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
       });
     }
   }

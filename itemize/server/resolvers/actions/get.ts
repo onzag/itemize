@@ -17,6 +17,7 @@ import graphqlFields from "graphql-fields";
 import {
   INCLUDE_PREFIX,
   UNSPECIFIED_OWNER,
+  ENDPOINT_ERRORS,
 } from "../../../constants";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
@@ -200,7 +201,7 @@ export async function getItemDefinitionList(
     if (argId.type !== selfTableType) {
       throw new EndpointError({
         message: "Invalid id container type that didn't match the qualified name " + selfTableType,
-        code: "UNSPECIFIED",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
       });
     }
   });
@@ -220,7 +221,7 @@ export async function getItemDefinitionList(
       if (created_by && value.created_by !== created_by) {
         throw new EndpointError({
           message: "created_by mismatch, one of the items requested was not created by whom it was claimed",
-          code: "UNSPECIFIED",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
         });
       }
       return filterAndPrepareGQLValue(value, requestedFields, tokenData.role, itemDefinition).toReturnToUser;
@@ -299,7 +300,7 @@ export async function getModuleList(
       if (created_by && value.created_by !== created_by) {
         throw new EndpointError({
           message: "created_by mismatch, one of the items requested was not created by whom it was claimed",
-          code: "UNSPECIFIED",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
         });
       }
       return filterAndPrepareGQLValue(value, requestedFields, tokenData.role, mod).toReturnToUser;

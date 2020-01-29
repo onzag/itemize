@@ -6,7 +6,7 @@ import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { requestFieldsAreContained, deepMerge } from "../../../../gql-util";
 import { IGQLSearchResult, buildGqlQuery, gqlQuery, GQLEnum,
   IGQLValue, IGQLRequestFields, IGQLArgs, IGQLEndpointValue } from "../../../../gql-querier";
-import { MAX_SEARCH_RESULTS_AT_ONCE_LIMIT, PREFIX_GET } from "../../../../constants";
+import { MAX_SEARCH_RESULTS_AT_ONCE_LIMIT, PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
 import { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
 import Root, { IRootRawJSONDataType } from "../../../../base/Root";
@@ -659,7 +659,7 @@ export default class CacheWorker {
       ) {
         somethingFailed = true;
         error = {
-          code: "UNSPECIFIED",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
           message: "There was no data in the resulting value, despite no errors",
         };
       } else {
@@ -701,7 +701,7 @@ export default class CacheWorker {
           if (!suceedStoring) {
             somethingFailed = true;
             error = {
-              code: "UNSPECIFIED",
+              code: ENDPOINT_ERRORS.UNSPECIFIED,
               message: "Failed to store the cached value",
             };
           }

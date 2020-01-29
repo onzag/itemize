@@ -14,8 +14,12 @@ import {
   runPolicyCheck,
 } from "../basic";
 import graphqlFields from "graphql-fields";
-import { CONNECTOR_SQL_COLUMN_FK_NAME, INCLUDE_PREFIX,
-  UNSPECIFIED_OWNER } from "../../../constants";
+import {
+  CONNECTOR_SQL_COLUMN_FK_NAME,
+  INCLUDE_PREFIX,
+  UNSPECIFIED_OWNER,
+  ENDPOINT_ERRORS,
+} from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
   convertGQLValueToSQLValueForItemDefinition,
@@ -167,7 +171,7 @@ export async function addItemDefinition(
           debug("FAILED due to lack of content data");
           throw new EndpointError({
             message: `There's no parent ${resolverArgs.args.parent_type} with id ${resolverArgs.args.parent_id}`,
-            code: "NOT_FOUND",
+            code: ENDPOINT_ERRORS.NOT_FOUND,
           });
         }
 
@@ -177,7 +181,7 @@ export async function addItemDefinition(
           debug("FAILED due to element being blocked");
           throw new EndpointError({
             message: "The parent is blocked",
-            code: "BLOCKED",
+            code: ENDPOINT_ERRORS.BLOCKED,
           });
         }
       },
