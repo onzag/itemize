@@ -1,5 +1,5 @@
 import React from "react";
-import Root, { IRawJSONBuildDataType, Ii18NType } from "../../../base/Root";
+import Root, { IRootRawJSONDataType, Ii18NType } from "../../../base/Root";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import { createMuiTheme } from "@material-ui/core";
 import { importScript } from "../..";
@@ -61,7 +61,7 @@ export interface IDataContextType {
 // and don't really change; whereas the initial information, is
 // as said, initial, and takes part of the state
 interface IAppProps {
-  initialData: IRawJSONBuildDataType;
+  initialRoot: IRootRawJSONDataType;
   initialCurrency: string;
   initialCountry: string;
 
@@ -79,7 +79,6 @@ interface IAppProps {
 interface IAppState {
   specifiedCountry: string;
   specifiedCurrency: string;
-  specifiedI18n: Ii18NType;
   specifiedProcessedRoot: Root;
   localeIsUpdating: boolean;
   localeIsUpdatingFrom: string;
@@ -111,16 +110,15 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // set the values in the state to the initial
     // we expose the root variable because it makes debugging
     // easy and to allow access to the root registry to web workers
-    (window as any).ROOT = new Root(props.initialData.root);
+    (window as any).ROOT = new Root(props.initialRoot);
     if (CacheWorkerInstance.isSupported) {
-      CacheWorkerInstance.instance.proxyRoot(props.initialData.root);
+      CacheWorkerInstance.instance.proxyRoot(props.initialRoot);
     }
     this.state = {
       specifiedCountry: props.initialCountry,
       specifiedCurrency: props.initialCurrency,
       localeIsUpdating: false,
       localeIsUpdatingFrom: null,
-      specifiedI18n: props.initialData.i18n,
       specifiedProcessedRoot: (window as any).ROOT,
     };
 
@@ -222,7 +220,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     // if the language is currently loaded in memory, just set it as it is
     // we don't need to fetch anything
-    if (this.state.specifiedI18n[localeToSet]) {
+    if (this.state.specifiedProcessedRoot.getI18nDataFor(localeToSet)) {
       pathNameSplitted[1] = localeToSet;
       history.push(pathNameSplitted.join("/"));
       return;
@@ -271,10 +269,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
       this.updateUserProperty("app_language", localeToSet);
     }
     this.setState({
-      specifiedI18n: {
-        ...this.state.specifiedI18n,
-        ...newData.i18n,
-      },
       localeIsUpdating: false,
       localeIsUpdatingFrom: null,
     });
@@ -405,7 +399,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       updating: this.state.localeIsUpdating,
 
       langLocales: this.props.langLocales,
-      i18n: this.state.specifiedI18n,
+      i18n: this.state.specifiedProcessedRoot.getI18nData(),
     };
 
     // Now we return the app with its given locale context

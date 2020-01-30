@@ -211,7 +211,7 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
   // basically, we are going to keep this simple, only update the worker if it's
   // a new url, simple, even for this script the build number applies
   try {
-    const [initialData, lang] = await Promise.all<any>([
+    const [initialRoot, lang] = await Promise.all<any>([
       fetch(`/rest/resource/build.${initialLang}.json`).then((r) => r.json()),
       fetch("/rest/resource/lang.json").then((r) => r.json()),
 
@@ -228,8 +228,8 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
     ReactDOM.render(
       <Router history={history}>
         <App
-          initialData={initialData}
-          langLocales={lang.locales}
+          initialRoot={initialRoot}
+          langLocales={lang}
 
           initialCurrency={initialCurrency}
           initialCountry={initialCountry}

@@ -1,3 +1,11 @@
+/**
+ * Processes the json schema of itemize in order to remove useless data
+ * like pointers, file information, trackers and location; and also strippes
+ * unecessary language information if deemed required
+ *
+ * @packageDocumentation
+ */
+
 import { IRootRawJSONDataType } from "../base/Root";
 import { IModuleRawJSONDataType } from "../base/Root/Module";
 import {
@@ -169,6 +177,15 @@ export function processRoot(
         locale,
       );
     });
+
+  if (locale) {
+    nRawData.i18nData = {...nRawData.i18nData};
+    Object.keys(nRawData.i18nData).forEach((key) => {
+      if (key !== locale) {
+        delete nRawData.i18nData[key];
+      }
+    });
+  }
 
   return nRawData;
 }

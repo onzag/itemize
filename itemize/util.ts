@@ -1,3 +1,9 @@
+/**
+ * Contains general utility functions to be used within the itemize app
+ *
+ * @packageDocumentation
+ */
+
 import Moment from "moment";
 import { JSDOM } from "jsdom";
 import createDOMPurify from "dompurify";
@@ -6,15 +12,30 @@ import { STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES, EXTERNALLY_ACCESSIBLE_RES
 import ItemDefinition, { ItemDefinitionIOActions } from "./base/Root/Module/ItemDefinition";
 import equals from "deep-equal";
 
+/**
+ * capitalizes a string
+ * @param str the string to capitalize
+ */
 export function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  return str.charAt(0).toLocaleUpperCase() + str.slice(1);
 }
 
+/**
+ * @ignore
+ */
 const matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
+/**
+ * Escapes a string into a regex
+ * @param str the string to escape
+ * @returns a string that is regex ready
+ */
 export function escapeStringRegexp(str: string) {
   return str.replace(matchOperatorsRe, "\\$&");
 }
 
+/**
+ * @ignore
+ */
 const mimeExtensions = {
   "audio/aac": "aac",
   "application/x-abiword": "abw",
@@ -83,14 +104,36 @@ const mimeExtensions = {
   "application/x-7z-compressed": "7z",
 };
 
+/**
+ * Converts a mime type to an extension using a known extension list
+ * @param str the string that represents the mime type
+ * @returns an extension or txt if it doesn't know
+ */
 export function mimeTypeToExtension(str: string) {
   return mimeExtensions[str] || str.split("/")[1] || "txt";
 }
 
+/**
+ * Replaces a string to another for locale usage
+ * eg. `"hello {0} world {1}"` with `["foo", "bar"]` become
+ * `"hello foo world bar"`
+ * @param str the string
+ * @param args the args to pass
+ * @returns a string
+ */
 export function localeReplacer(str: string, ...args: any[]): string {
   return str.replace(/\{(\d+)\}/g, (match, indexMatch) => (args[indexMatch] || "?"));
 }
 
+/**
+ * Replaces a string to an array of whatever it was sent
+ * for locale usage
+ * eg. `"hello {0} world {1}"` with `[<span>foo</span>, <span>bar</span>]` become
+ * `["hello ",<span>foo</span>," world ",<span>bar</span>]`
+ * @param str the string
+ * @param args the args to pass
+ * @returns a an array
+ */
 export function localeReplacerToArray(str: string, ...args: any[]): any[] {
   const splitted: string[] = str.split(/\{(\d+)\}/g);
   const result: any[] = [];
@@ -120,6 +163,7 @@ export function localeReplacerToArray(str: string, ...args: any[]): any[] {
  * regarding input to create a mask, and it only happens with
  * time basically, but here we can override masks
  * @param value the format string
+ * @returns the normalized form
  */
 export function getNormalizedDateTimeFormat(value: string) {
   // Since we cannot have a mask that uses only one H
@@ -136,6 +180,9 @@ export function getNormalizedDateTimeFormat(value: string) {
   return value;
 }
 
+/**
+ * TODO looks wrong check what is wrong
+ */
 export function getLocalizedTimeFormat(normalize: boolean) {
   const LT = (Moment.localeData() as any)._longDateFormat.LT;
   if (!normalize) {
@@ -144,6 +191,9 @@ export function getLocalizedTimeFormat(normalize: boolean) {
   return LT;
 }
 
+/**
+ * TODO looks wrong check what is wrong
+ */
 export function getLocalizedDateFormat(normalize: boolean) {
   const L = (Moment.localeData() as any)._longDateFormat.L;
   if (!normalize) {
@@ -152,10 +202,30 @@ export function getLocalizedDateFormat(normalize: boolean) {
   return getNormalizedDateTimeFormat(L);
 }
 
+/**
+ * TODO looks wrong check what is wrong
+ */
 export function getLocalizedDateTimeFormat(normalize: boolean) {
   return getLocalizedDateFormat(normalize) + " " + getLocalizedTimeFormat(normalize);
 }
 
+/**
+ * Provides the fields and args for an item definition in order
+ * to create a query
+ * @param options.includeArgs whether to include the args at all
+ * @param options.includeFields whether to include fields at all
+ * @param options.onlyIncludeProperties what properties to include in fields
+ * @param options.onlyIncludeIncludes what includes to include in the fields
+ * @param options.onlyIncludePropertiesForArgs what properties to include in args
+ * @param options.onlyIncludeIncludesForArgs what includes to include in args
+ * @param options.onlyIncludeArgsIfDiffersFromAppliedValue only includes something in args if it differs from the
+ * applied value
+ * @param appliedOwner the owner that owns this item
+ * @param userRole the role of the user
+ * @param userId the id of the user
+ * @param itemDefinitionInstance the item definition
+ * @param forId the slot id if any
+ */
 export function getFieldsAndArgs(
   options: {
     includeArgs: boolean,

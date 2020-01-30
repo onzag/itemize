@@ -1,20 +1,41 @@
+/**
+ * This file contains the language utilities that build the primary language
+ * information for the main language file that belongs to the root as well
+ * as for the lang.json file
+ *
+ * @packageDocumentation
+ */
+
 import Traceback from "./Traceback";
-import { ILocaleLangDataType } from ".";
 import { checkExists } from "./util";
 import { LOCALE_I18N, ROOT_REQUIRED_LOCALE_I18N } from "../constants";
 import PropertiesReader from "properties-reader";
 import CheckUpError from "./Error";
+import { Ii18NType } from "../base/Root";
 
+/**
+ * Given the properties information provides all the key names
+ * that exist within that properties information as an array
+ * of string
+ * @param obj the object to recurse
+ * @param prefix the prefix to use
+ * @returns an array of string with the . separated names
+ */
 function getAllKeyNames(obj: any, prefix: string) {
+  // this is the result
   let result: string[] = [];
   Object.keys(obj).forEach((key) => {
+    // so get the value
     const value = obj[key];
+    // if the value is a string, we've hit a leaf
     if (typeof value === "string") {
       result.push(prefix + key);
     } else {
+      // otherwise let's keep getting in
       result = result.concat(getAllKeyNames(value, prefix + key + "."));
     }
   });
+  // return the result
   return result;
 }
 
@@ -24,13 +45,14 @@ function getAllKeyNames(obj: any, prefix: string) {
  * @param supportedLanguages the array of supported languages
  * @param actualRootLocation the root location that sets these languages
  * @param traceback the traceback in the location
+ * @retuns a promise for locale language data
  */
 export async function buildLang(
   supportedLanguages: string[],
   actualRootLocation: string,
   i18nBaseFileLocation: string,
   traceback: Traceback,
-): Promise<ILocaleLangDataType> {
+): Promise<Ii18NType> {
   const languageFileLocation = actualRootLocation
     .replace(".json", ".properties");
   const baseFileLocation = i18nBaseFileLocation;
@@ -52,9 +74,7 @@ export async function buildLang(
 
   const propertiesBase = PropertiesReader(baseFileLocation).path();
   const propertiesRoot = PropertiesReader(languageFileLocation).path();
-  const result: ILocaleLangDataType = {
-    locales: {},
-  };
+  const result: Ii18NType = {};
 
   const extraGatheredProperties: {
     [locale: string]: string[];
@@ -70,7 +90,7 @@ export async function buildLang(
       );
     }
 
-    result.locales[locale] = {};
+    result[locale] = {};
 
     const propertiesToRequest: Array<{base: boolean, property: string}> =
       LOCALE_I18N.map((property) => ({base: true, property}))
@@ -117,7 +137,7 @@ export async function buildLang(
 
       propertyResult = propertyResult.trim();
 
-      let whereToSet: any = result.locales[locale];
+      let whereToSet: any = result[locale];
       // by looping on the splitted value
       propertySplitted.forEach((keyValue, index) => {
         // on the last one we set it as the value
@@ -132,7 +152,7 @@ export async function buildLang(
       });
     });
 
-    result.locales[locale] = {...result.locales[locale], ...propertiesRoot[locale]};
+    result[locale] = {...result[locale], ...propertiesRoot[locale]};
   });
 
   Object.keys(extraGatheredProperties).forEach((locale) => {
@@ -155,12 +175,18 @@ export async function buildLang(
   return result;
 }
 
+/**
+ * Clears language data in such a way that it leaves only the name
+ * and the supported locales
+ * @param rawData the raw locale language data
+ * @returns the new locale language data with only names
+ */
 export function clearLang(
-  rawData: ILocaleLangDataType,
+  rawData: Ii18NType,
 ) {
-  const nRawData: ILocaleLangDataType = {locales: {}};
-  Object.keys(rawData.locales).forEach((locale) => {
-    nRawData.locales[locale] = {name: rawData.locales[locale].name};
+  const nRawData: Ii18NType = {};
+  Object.keys(rawData).forEach((locale) => {
+    nRawData[locale] = {name: rawData[locale].name};
   });
 
   return nRawData;

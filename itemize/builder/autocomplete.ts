@@ -10,7 +10,7 @@ import fs from "fs";
 import Traceback from "./Traceback";
 import { IAutocompleteRawJSONDataType, IFileAutocompleteRawJSONDataType } from "../base/Autocomplete";
 import CheckUpError from "./Error";
-import { ajvCheck, checkAutocompleteSchemaValidate } from "./schemaChecks";
+import { ajvCheck, checkAutocompleteSchemaValidate } from "./schema-checks";
 import path from "path";
 import { checkAutocompleteFilterAndValues } from "./checkers";
 const jsonMap = require("json-source-map");

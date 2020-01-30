@@ -231,7 +231,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   // this shouldn't be necessary but we do it anyway
   buildnumber = buildnumber.replace("\n", "").trim();
 
-  root = new Root(build.root);
+  root = new Root(build);
 
   const autocompletes = JSON.parse(autocompleteSource)
     .map((s: IAutocompleteRawJSONDataType) => (new Autocomplete(s)));

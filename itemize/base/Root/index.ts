@@ -10,6 +10,18 @@ import Module, { IModuleRawJSONDataType } from "./Module";
 import ItemDefinition from "./Module/ItemDefinition";
 
 /**
+ * The standard i18n information for usage
+ * and any custom keys that are added here as extensions
+ * from the i18n file
+ */
+// tslint:disable-next-line: interface-name
+export interface Ii18NType {
+  [langLocale: string]: {
+    [key: string]: string;
+  };
+}
+
+/**
  * This is the raw processed form of the root
  */
 export interface IRootRawJSONDataType {
@@ -35,33 +47,15 @@ export interface IRootRawJSONDataType {
   raw?: string;
 
   /**
+   * The i18n information that comes from the properties file
+   */
+  i18nData: Ii18NType;
+
+  /**
    * All the modules contained within the root it is added after
    * the build
    */
   children: IModuleRawJSONDataType[];
-}
-
-// TODO make it belong to the root, it is very strange to have language
-// that comes with the root, it specified by the root, but doesn't belong to it
-/**
- * The standard i18n information for usage
- * and any custom keys that are added here as extensions
- * from the i18n file, this file doesn't belong per say to the root
- */
-// tslint:disable-next-line: interface-name
-export interface Ii18NType {
-  [langLocale: string]: {
-    [key: string]: string;
-  };
-}
-
-/**
- * This is the build data that comes raw from the
- * server, as it is raw, in the file
- */
-export interface IRawJSONBuildDataType {
-  root: IRootRawJSONDataType;
-  i18n: Ii18NType;
 }
 
 /**
@@ -185,16 +179,36 @@ export default class Root {
   }
 
   /**
-   * Merges the i18n data with another root, since roots
-   * do not contain i18n datas it just merges the entire tree
+   * Merges the i18n data with another root
    * @param root the other root
    */
   public mergeWithI18n(root: IRootRawJSONDataType) {
+    this.rawData.i18nData = {
+      ...this.rawData.i18nData,
+      ...root.i18nData,
+    };
     this.childModules.forEach((mod) => {
       const mergeModuleRaw = Root.getModuleRawFor(root, [mod.getName()]);
       if (mergeModuleRaw) {
         mod.mergeWithI18n(mergeModuleRaw);
       }
     });
+  }
+
+  /**
+   * Provides the whole i18n data object
+   * @returns the whole i18n data object
+   */
+  public getI18nData() {
+    return this.rawData.i18nData;
+  }
+
+  /**
+   * Provides the module locale data
+   * @param  locale the locale in iso form
+   * @returns an object or null (if locale not valid)
+   */
+  public getI18nDataFor(locale: string) {
+    return this.rawData.i18nData[locale] || null;
   }
 }

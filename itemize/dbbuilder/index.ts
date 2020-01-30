@@ -60,7 +60,7 @@ export function yesno(question: string) {
   ));
 
   // build the root from that data
-  const root = new Root(data.root);
+  const root = new Root(data);
 
   // let's get the result by progressively building on top of it
   const result = getSQLTablesSchemaForRoot(root);

@@ -1,3 +1,10 @@
+/**
+ * Some utilities used during the building process, mostly for file
+ * management
+ *
+ * @packageDocumentation
+ */
+
 import path from "path";
 import fs from "fs";
 

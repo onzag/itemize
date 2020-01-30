@@ -521,27 +521,62 @@ export const PREFIX_EDIT = PREFIX_BUILD("EDIT");
  * The prefix used in the graphql endpoint for deleting item definitions
  */
 export const PREFIX_DELETE = PREFIX_BUILD("DELETE");
+/**
+ * The policy prefixes for all the policies that are available within itemize
+ * in order to create complex rules
+ */
 export const POLICY_PREFIXES = {
   read: PREFIX_BUILD("POLICY_READ"),
   edit: PREFIX_BUILD("POLICY_EDIT"),
   delete: PREFIX_BUILD("POLICY_DELETE"),
   parent: PREFIX_BUILD("POLICY_PARENT"),
 };
+/**
+ * The required i18n fields to require for a policy
+ * policies get a title that should be human readable in
+ * the given language, and a fail error message for when they fail
+ */
 export const POLICY_REQUIRED_I18N = [
   "title", "fail",
 ];
+/**
+ * Policies can also recieve an optional description
+ */
 export const POLICY_OPTIONAL_I18N = [
   "description",
 ];
+/**
+ * These represent the ways that ordering can be
+ * executed within itemize, used to order by
+ * in the server side and client side cached values
+ */
 export const ORDER_BY_OPTIONS = {
   DEFAULT: "DEFAULT",
   RELEVANCY: "RELEVANCY",
   DATE: "DATE",
 };
+
+/**
+ * The format that dates are expected to have in order to be exchanged
+ * these represent the SQL form
+ */
 export const DATETIME_FORMAT = "YYYY-MM-DDTHH:mm:ss\\Z";
+/**
+ * The format that time is expected to have in order to be exchanged
+ * this is the SQL form
+ */
 export const TIME_FORMAT = "HH:mm:ss";
+/**
+ * The format date has in order to be exchanged, this is
+ * the SQL form
+ */
 export const DATE_FORMAT = "YYYY-MM-DD";
 
+/**
+ * The ID element fields are the id and type unique identifiers
+ * that make the client able to run requests for a given item id
+ * @ignore
+ */
 const ID_ELEMENT_FIELDS = {
   id: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
@@ -550,16 +585,25 @@ const ID_ELEMENT_FIELDS = {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
   },
 };
+/**
+ * The ID element in graphql form
+ */
 export const ID_ELEMENT_GQL = GraphQLObjectType && new GraphQLObjectType({
   name: "ID_ELEMENT",
   fields: ID_ELEMENT_FIELDS,
 });
-
+/**
+ * The ID element as input form
+ */
 export const ID_ELEMENT_INPUT_GQL = GraphQLInputObjectType && new GraphQLInputObjectType({
   name: "ID_ELEMENT_INPUT",
   fields: ID_ELEMENT_FIELDS,
 });
 
+/**
+ * The id container contains the way that search results are returned
+ * with the ids and the last record of the given ids
+ */
 export const ID_CONTAINER_GQL = GraphQLObjectType && new GraphQLObjectType({
   name: "ID_CONTAINER",
   fields: {
@@ -572,12 +616,21 @@ export const ID_CONTAINER_GQL = GraphQLObjectType && new GraphQLObjectType({
   },
 });
 
+/**
+ * Converting the search options to an enum type
+ * @ignore
+ */
 const searchOptionsOrderByOptions = {};
 Object.keys(ORDER_BY_OPTIONS).forEach((key) => {
   searchOptionsOrderByOptions[key] = {
     value: key,
   };
 });
+
+/**
+ * These are the base query properties that are
+ * used in a search and get list query
+ */
 const BASE_QUERY_PROPERTIES = {
   token: {
     type: GraphQLString,
@@ -589,10 +642,18 @@ const BASE_QUERY_PROPERTIES = {
   },
 };
 
+/**
+ * And this is for the order by rule enum
+ */
 const ORDERBY_RULE = GraphQLEnumType && new GraphQLEnumType({
   name: "RESERVED_SEARCH_PROPERTY_ENUM_ORDER_BY",
   values: searchOptionsOrderByOptions,
 });
+
+/**
+ * The reserved search properties represent how searches are done
+ * and these are included in every search
+ */
 export const RESERVED_SEARCH_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   order_by: {
@@ -616,6 +677,10 @@ export const RESERVED_SEARCH_PROPERTIES = {
     description: "A search string",
   },
 };
+
+/**
+ * These apply when doing module searches
+ */
 export const RESERVED_MODULE_SEARCH_PROPERTIES = {
   ...RESERVED_SEARCH_PROPERTIES,
   types: {
@@ -643,6 +708,10 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = {
     description: "A search string",
   },
 };
+
+/**
+ * Properties required in order to get
+ */
 export const RESERVED_GETTER_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   id: {
@@ -650,6 +719,11 @@ export const RESERVED_GETTER_PROPERTIES = {
     description: "the id for that item",
   },
 };
+
+/**
+ * Properties required in order to change something
+ * either edit or delete
+ */
 export const RESERVED_CHANGE_PROPERTIES = {
   ...RESERVED_GETTER_PROPERTIES,
   listener_uuid: {
@@ -657,6 +731,10 @@ export const RESERVED_CHANGE_PROPERTIES = {
     description: "An uuid to identify the creator of this action",
   },
 };
+
+/**
+ * Properties required in order to get a list
+ */
 export const RESERVED_GETTER_LIST_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   ids: {
@@ -668,6 +746,10 @@ export const RESERVED_GETTER_LIST_PROPERTIES = {
     description: "An specified owner to filter by (this affects permissions)",
   },
 };
+
+/**
+ * Properties required in order to add something
+ */
 export const RESERVED_ADD_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   in_behalf_of: {
@@ -683,24 +765,43 @@ export const RESERVED_ADD_PROPERTIES = {
     description: "a parent item definition qualified path (must be specified with parent_id)",
   },
 };
-export const USER_ROLES = {
-  ADMIN: "ADMIN",
-  MODERATOR: "MODERATOR",
-  USER: "USER",
-};
+
+/**
+ * Role that means the owner of this item
+ */
 export const OWNER_METAROLE = "&OWNER";
+/**
+ * Role that means, well, anyone
+ */
 export const ANYONE_METAROLE = "&ANYONE";
+/**
+ * Role that means anyone logged in
+ */
 export const ANYONE_LOGGED_METAROLE = "&ANYONE_LOGGED";
+/**
+ * Role that means any guest
+ */
 export const GUEST_METAROLE = "&GUEST";
+/**
+ * Moderation fields for flagging
+ */
 export const MODERATION_FIELDS = [
   "flagged_by",
   "flagged_reasons",
 ];
+
+// TODO replace these for modRoleAccess which gives role access to moderation
+// and flagRoleAccess for flagging, the default of the first will be none
+// and the default of the second will be ANYONE_LOGGED
 export const ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS = [
-  USER_ROLES.ADMIN,
-  USER_ROLES.MODERATOR,
+  "ADMIN",
+  "MODERATOR",
 ];
 
+/**
+ * Units that are allowed within the itemize application these
+ * are for the unit subtype
+ */
 export const UNIT_SUBTYPES = [
   "length",
   "area",
@@ -725,5 +826,9 @@ export const UNIT_SUBTYPES = [
   "angle",
 ];
 
+/**
+ * When an owner is not specified, this is the value it holds
+ * null is the user value of &GUEST hence it should not hold
+ * the same value
+ */
 export const UNSPECIFIED_OWNER = -1;
-export const OWNER_ID_AS_OBJECT_ID = -2;

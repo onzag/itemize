@@ -32,7 +32,7 @@ import {
   checkModuleSchemaValidate,
   checkPropertyDefinitionArraySchemaValidate,
   checkItemDefinitionSchemaValidate,
-} from "./schemaChecks";
+} from "./schema-checks";
 import { checkRoot } from "./checkers";
 import { processRoot } from "./processer";
 import { buildLang, clearLang } from "./lang";
@@ -70,16 +70,6 @@ if (process.env.NODE_ENV === "production") {
   throw new Error("This script cannot run in production mode");
 }
 
-// 
-interface IKeyValuePairNestedType {
-  [key: string]: string | IKeyValuePairNestedType;
-}
-export interface ILocaleLangDataType {
-  locales: {
-    [locale: string]: IKeyValuePairNestedType;
-  };
-}
-
 // This is the raw untreated json for the root
 interface IFileRootDataRawUntreatedJSONDataType {
   type: "root";
@@ -88,14 +78,18 @@ interface IFileRootDataRawUntreatedJSONDataType {
   autocomplete?: string[];
 }
 
-// this is the raw untreated json for the module
+/**
+ * this is the raw untreated json for the module
+ */
 interface IFileModuleDataRawUntreatedJSONDataType {
   type: "module";
   includes: string[];
   readRoleAccess?: string[];
 }
 
-// and this is the raw untreated json for an item
+/**
+ * and this is the raw untreated json for an item
+ */
 export interface IFileItemDefinitionUntreatedRawJSONDataType {
   type: "item";
   imports?: string[];
@@ -112,17 +106,27 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
 // Now we execute this code asynchronously
 (async () => {
   try {
+    // first we read the base config
     const rawDataConfigBase = JSON.parse(
       await fsAsync.readFile(path.join("config", "index.json"), "utf8"),
     );
+    // and the sensitive config
     const sensitiveConfigExtra = JSON.parse(await fsAsync.readFile(
       path.join("config", "index.sensitive.json"),
       "utf8",
     ));
+    // and we merge them together
     const rawDataConfig = {
       ...rawDataConfigBase,
       ...sensitiveConfigExtra,
     };
+
+    // ensure the dist directory
+    if (!await checkExists("dist")) {
+      await fsAsync.mkdir("dist");
+    }
+
+    // we run all the build steps
     await Promise.all([
       buildData(rawDataConfig),
       buildConfig(rawDataConfig),
@@ -131,13 +135,20 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
       copyMomentFiles(rawDataConfig),
     ]);
   } catch (err) {
+    // display an error if it's part of a checkup error
     if (err instanceof CheckUpError) {
       err.display();
     }
+    // log the stack
     console.log(err.stack);
   }
 })();
 
+/**
+ * Builds the base data for the root tree
+ * in order to create the build files
+ * @param rawDataConfig the configuration
+ */
 async function buildData(rawDataConfig: any) {
   const entryPoint = "data";
 
@@ -188,11 +199,21 @@ async function buildData(rawDataConfig: any) {
   // lets get the supported languages
   const supportedLanguages: string[] = rawDataConfig.supportedLanguages;
 
+  // now let's build the i18n supported languages
+  // data which contains all the supported languges
+  const i18nData = await buildLang(
+    supportedLanguages,
+    actualLocation,
+    path.join(path.dirname(actualLocation), fileData.data.i18n),
+    traceback,
+  );
+
   // and make the result JSON
   const resultJSON: IRootRawJSONDataType = {
     type: "root",
     location: actualLocation,
     pointers: fileData.pointers,
+    i18nData,
     children: fileData.data.includes ?
       (await buildIncludes(
         rawDataConfig,
@@ -207,67 +228,59 @@ async function buildData(rawDataConfig: any) {
       )) as IModuleRawJSONDataType[] : [],
   };
 
+  // check and run the checkers
   checkRoot(resultJSON);
 
-  if (!await checkExists("dist")) {
-    await fsAsync.mkdir("dist");
-  }
-
+  // ensure the data directory
   if (!await checkExists(path.join("dist", "data"))) {
     await fsAsync.mkdir(path.join("dist", "data"));
   }
 
-  const allLangData = await buildLang(
-    supportedLanguages,
-    actualLocation,
-    path.join(path.dirname(actualLocation), fileData.data.i18n),
-    traceback,
-  );
-
+  // and let's emit such file tht only contains the language name
   console.log("emiting " + colors.green(path.join("dist", "data", "lang.json")));
   await fsAsync.writeFile(
     path.join("dist", "data", "lang.json"),
-    JSON.stringify(clearLang(allLangData)),
+    JSON.stringify(clearLang(i18nData)),
   );
 
+  // now let's produce the build for every language
   const resultBuilds = supportedLanguages.map((lang) => {
     return processRoot(resultJSON, lang);
   });
 
+  // let's process the result for the main output so we remove
+  // unecessary data for the build
   const mainResultBuild = processRoot(resultJSON);
 
-  const allBuild = {
-    root: mainResultBuild,
-    i18n: allLangData.locales,
-  };
-
+  // now let's output the build
   const allBuildFileName = path.join("dist", "data", `build.all.json`);
   console.log("emiting " + colors.green(allBuildFileName));
   await fsAsync.writeFile(
     allBuildFileName,
-    JSON.stringify(allBuild),
+    JSON.stringify(mainResultBuild),
   );
 
+  // and now let's output clean builds for every language that is supported
   await Promise.all(supportedLanguages.map(async (sl, index) => {
+    // so we get a resulting build for the given language
     const resultingBuild = resultBuilds[index];
-    const resultData = {
-      root: resultingBuild,
-      i18n: {
-        [sl]: allLangData.locales[sl],
-      },
-    };
+    // and let's emit such file
     const fileName = path.join("dist", "data", `build.${sl}.json`);
     console.log("emiting " + colors.green(fileName));
     await fsAsync.writeFile(
       fileName,
-      JSON.stringify(resultData),
+      JSON.stringify(resultingBuild),
     );
   }));
 
+  // now let's build the autocomplete file
   let autocomplete: IAutocompleteRawJSONDataType[] = [];
   if (fileData.data.autocomplete) {
+    // for that we find all the autocomplete information
     const autocompleteTraceback = traceback.newTraceToBit("autocomplete");
+    // and run the builder for the autocomplete
     autocomplete = await Promise.all(fileData.data.autocomplete.map((autocompleteSource, index) => {
+      // and just use it as the array it is
       return buildAutocomplete(
         path.join(path.dirname(actualLocation), autocompleteSource),
         supportedLanguages,
@@ -276,6 +289,7 @@ async function buildData(rawDataConfig: any) {
     }));
   }
 
+  // emit that file
   const autocompleteFileName = path.join("dist", "autocomplete.json");
   console.log("emiting " + colors.green(autocompleteFileName));
   await fsAsync.writeFile(
@@ -537,7 +551,7 @@ async function buildModule(
  * @param actualLocation the location path for the item
  * @param lastModuleDirectory the last module directory
  * @param fileData the file data raw and untreated
- * @returns a raw treated item
+ * @returns a raw treated item definition
  */
 async function buildItemDefinition(
   rawDataConfig: any,
@@ -964,10 +978,10 @@ async function getI18nIncludeData(
  * Processes a property to give it the i18n data as
  * defined by the constants for its type
  * this function is destructive
- * @param  supportedLanguages the array of supported languages
- * @param  actualLocation     the location that the item is being worked on
- * @param  property           the property itself
- * @returns                    the property itself
+ * @param supportedLanguages the array of supported languages
+ * @param actualLocation the location that the item is being worked on
+ * @param property the property itself
+ * @returns the property itself
  */
 async function getI18nPropertyData(
   supportedLanguages: string[],
