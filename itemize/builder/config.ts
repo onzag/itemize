@@ -9,6 +9,7 @@ import colors from "colors/safe";
 
 import fs from "fs";
 import path from "path";
+import { IConfigRawJSONDataType } from "../config";
 const fsAsync = fs.promises;
 
 /**
@@ -16,7 +17,7 @@ const fsAsync = fs.promises;
  * directory
  * @param rawConfig the config as parsed
  */
-export async function buildConfig(rawConfig: any) {
+export async function buildConfig(rawConfig: IConfigRawJSONDataType) {
   const fileName = path.join("dist", "config.json");
   console.log("emiting " + colors.green(fileName));
 

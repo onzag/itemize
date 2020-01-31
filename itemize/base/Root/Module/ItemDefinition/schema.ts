@@ -171,6 +171,13 @@ export default {
       minItems: 1,
       additionalItems: false,
     },
+    children: {
+      type: "array",
+      items: {
+        $ref: "Include",
+      },
+      minItems: 1,
+    },
     searchable: {
       type: "boolean",
     },

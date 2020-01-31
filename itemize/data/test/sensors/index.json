@@ -1,5 +1,5 @@
 {
     "type": "module",
-    "includes": ["temperature"],
+    "children": ["temperature"],
     "readRoleAccess": ["&OWNER"]
 }

@@ -1,5 +1,5 @@
 {
     "type": "module",
-    "includes": ["user"],
+    "children": ["user"],
     "searchable": false
 }

@@ -16,6 +16,7 @@ import { buildTables } from "./build-tables";
 import { buildForeignKeys } from "./build-foreign-key";
 import { ISQLSchemaDefinitionType, getSQLTablesSchemaForRoot } from "../base/Root/sql";
 import { buildIndexes } from "./build-index";
+import { IDBConfigRawJSONDataType } from "../config";
 
 const fsAsync = fs.promises;
 
@@ -30,7 +31,7 @@ export function yesno(question: string) {
 
 (async () => {
   // Retrieve the config for the database
-  const dbConfig = JSON.parse(await fsAsync.readFile(
+  const dbConfig: IDBConfigRawJSONDataType = JSON.parse(await fsAsync.readFile(
     path.join("config", "db.sensitive.json"),
     "utf8",
   ));

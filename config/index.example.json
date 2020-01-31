@@ -1,4 +1,5 @@
 {
+  "entry": "the/folder/name/to/act/as/entry",
   "appName": "The Name of Your Application",
   "port": 8080,
   "supportedLanguages": ["en", "es"],

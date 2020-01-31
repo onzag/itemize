@@ -13,6 +13,7 @@ import CheckUpError from "./Error";
 import { ajvCheck, checkAutocompleteSchemaValidate } from "./schema-checks";
 import path from "path";
 import { checkAutocompleteFilterAndValues } from "./checkers";
+import { IConfigRawJSONDataType } from "../config";
 const jsonMap = require("json-source-map");
 const fsAsync = fs.promises;
 
@@ -20,12 +21,12 @@ const fsAsync = fs.promises;
  * Async function to build a single autocomplete file based on an autocomplete source
  * note that the autocompletes json file that is built is a collection of the output
  * of this function
+ * @param rawDataConfig the raw config
  * @param source the source path
- * @param supportedLanguages the supported languages that are expected for autocompletes with i18n support
  * @param traceback the traceback object
  * @returns a single autocomplete object
  */
-export async function buildAutocomplete(source: string, supportedLanguages: string[], traceback: Traceback) {
+export async function buildAutocomplete(rawDataConfig: IConfigRawJSONDataType, source: string, traceback: Traceback) {
   // first we check that the source exists at all
   await checkExists(source, traceback);
 
@@ -72,8 +73,8 @@ export async function buildAutocomplete(source: string, supportedLanguages: stri
   if (resultAutocomplete.values) {
     // we run the checker
     checkAutocompleteFilterAndValues(
+      rawDataConfig,
       resultAutocomplete.values,
-      supportedLanguages,
       internalTraceback.newTraceToBit("values"),
     );
   }
@@ -82,8 +83,8 @@ export async function buildAutocomplete(source: string, supportedLanguages: stri
   if (resultAutocomplete.filters) {
     // do the same thing
     checkAutocompleteFilterAndValues(
+      rawDataConfig,
       resultAutocomplete.filters,
-      supportedLanguages,
       internalTraceback.newTraceToBit("filters"),
     );
   }

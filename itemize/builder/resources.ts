@@ -12,6 +12,7 @@ import colors from "colors/safe";
 import htmlMinifier from "html-minifier";
 import Svgo from "svgo";
 import { checkExists } from "./util";
+import { IConfigRawJSONDataType } from "../config";
 const svgo = new Svgo();
 const fsAsync = fs.promises;
 
@@ -191,7 +192,7 @@ async function copyOneDirectoryLevel(pathname: string, constructedPath: string) 
  * @param rawConfig the raw config
  * @returns a void promise
  */
-export async function buildResources(rawConfig: any) {
+export async function buildResources(rawConfig: IConfigRawJSONDataType) {
   // add the data folder if not there
   if (!await checkExists(path.join("dist", "data"))) {
     await fsAsync.mkdir(path.join("dist", "data"));

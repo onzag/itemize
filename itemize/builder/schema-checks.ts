@@ -13,6 +13,8 @@ import AutocompleteSchema from "../base/Autocomplete/schema";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import "source-map-support/register";
+import { rawPartialSensitiveConfigSchema, rawPartialConfigSchema,
+  rawDBConfigSchema, rawRedisConfigSchema } from "../config";
 
 const ajv = new Ajv();
 
@@ -50,6 +52,30 @@ export const checkAutocompleteSchemaValidate =
  */
 export const checkModuleSchemaValidate =
   ajv.compile(ModuleSchema);
+
+/**
+ * Check the partial sensitive configuration
+ */
+export const checkPartialSensitiveConfig =
+  ajv.compile(rawPartialSensitiveConfigSchema);
+
+/**
+ * Check the partial config (non-sensitive)
+ */
+export const checkPartialConfig =
+  ajv.compile(rawPartialConfigSchema);
+
+/**
+ * Check raw database config
+ */
+export const checkDBConfig =
+  ajv.compile(rawDBConfigSchema);
+
+/**
+ * Check redis config
+ */
+export const checkRedisConfig =
+  ajv.compile(rawRedisConfigSchema);
 
 /**
  * Runs a given ajv check function of the ones avaliable

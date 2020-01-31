@@ -1,6 +1,6 @@
 {
   "type": "root",
-  "includes": [
+  "children": [
     "../itemize/data/test",
     "../itemize/data/users"
   ],

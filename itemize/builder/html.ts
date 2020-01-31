@@ -12,6 +12,7 @@ import htmlMinifier from "html-minifier";
 
 import fs from "fs";
 import path from "path";
+import { IConfigRawJSONDataType } from "../config";
 const fsAsync = fs.promises;
 
 /**
@@ -50,7 +51,7 @@ function replaceHTMLKeys(html: string, obj: any, prefix: string): string {
  * is synchronized within the html file
  * @param rawConfig the configuration that is being used
  */
-export async function buildHTML(rawConfig: any) {
+export async function buildHTML(rawConfig: IConfigRawJSONDataType) {
   // first we check that our data directory exists at all
   if (!await checkExists(path.join("dist", "data"))) {
     await fsAsync.mkdir(path.join("dist", "data"));

@@ -36,6 +36,7 @@ import { IPropertiesValueMappingDefinitonRawJSONDataType } from "../base/Root/Mo
 import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { IFilterRawJSONDataType, IAutocompleteValueRawJSONDataType } from "../base/Autocomplete";
 import Module from "../base/Root/Module";
+import { IConfigRawJSONDataType } from "../config";
 
 /**
  * Checks a conditional rule set so that it is valid and contains valid
@@ -1220,7 +1221,7 @@ export function checkRoot(
       checkModule(
         rawData,
         mod,
-        traceback.newTraceToBit("includes").newTraceToBit(index),
+        traceback.newTraceToBit("children").newTraceToBit(index),
       );
     });
   }
@@ -1234,8 +1235,8 @@ export function checkRoot(
  * @param traceback the traceback object already pointing
  */
 export function checkAutocompleteFilterAndValues(
+  rawDataConfig: IConfigRawJSONDataType,
   rawData: Array<IFilterRawJSONDataType | IAutocompleteValueRawJSONDataType>,
-  supportedLanguages: string[],
   traceback: Traceback,
 ) {
   // we are going to loop over that array
@@ -1247,8 +1248,8 @@ export function checkAutocompleteFilterAndValues(
       // stacking filters
       if (value.values) {
         checkAutocompleteFilterAndValues(
+          rawDataConfig,
           value.values,
-          supportedLanguages,
           traceback.newTraceToBit(index).newTraceToBit("values"),
         );
       }
@@ -1256,8 +1257,8 @@ export function checkAutocompleteFilterAndValues(
       if (value.filters) {
         // we check those as well
         checkAutocompleteFilterAndValues(
+          rawDataConfig,
           value.filters,
-          supportedLanguages,
           traceback.newTraceToBit(index).newTraceToBit("filters"),
         );
       }
@@ -1268,7 +1269,7 @@ export function checkAutocompleteFilterAndValues(
         // this is our traceback if there's i18n data
         const i18nTraceback = traceback.newTraceToBit(index).newTraceToBit("i18n");
         // all the supported languages must be included
-        supportedLanguages.forEach((language) => {
+        rawDataConfig.supportedLanguages.forEach((language) => {
           // if that is not the case
           if (!value.i18n[language]) {
             // throw an error

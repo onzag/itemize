@@ -3,7 +3,7 @@ import graphqlHTTP from "express-graphql";
 import http from "http";
 import path from "path";
 import fs from "fs";
-import Root from "../base/Root";
+import Root, { IRootRawJSONDataType } from "../base/Root";
 import resolvers from "./resolvers";
 import { getGQLSchemaForRoot, IGQLQueryFieldsDefinitionType, IGQLFieldsDefinitionType } from "../base/Root/gql";
 import Knex from "knex";
@@ -24,6 +24,7 @@ import redis, { RedisClient } from "redis";
 import { Cache } from "./cache";
 import { graphqlUploadExpress } from "graphql-upload";
 import { buildCustomTokenQueries } from "./custom-token";
+import { IConfigRawJSONDataType } from "../config";
 
 // TODO comment and document
 
@@ -213,21 +214,20 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
 
 export async function initializeServer(custom: IServerCustomizationDataType = {}) {
   let rawBuild: string;
-  let config: any;
+  let rawConfig: any;
   let index: any;
-  let build: any;
   let root: any;
   let autocompleteSource: string;
   let buildnumber: string;
-  [config, index, rawBuild, autocompleteSource, buildnumber] = await Promise.all([
+  [rawConfig, index, rawBuild, autocompleteSource, buildnumber] = await Promise.all([
     fsAsync.readFile(path.join("dist", "config.json"), "utf8"),
     fsAsync.readFile(path.join("dist", "data", "index.html"), "utf8"),
     fsAsync.readFile(path.join("dist", "data", "build.all.json"), "utf8"),
     fsAsync.readFile(path.join("dist", "autocomplete.json"), "utf8"),
     fsAsync.readFile(path.join("dist", "buildnumber"), "utf8"),
   ]);
-  config = JSON.parse(config);
-  build = JSON.parse(rawBuild);
+  const config: IConfigRawJSONDataType = JSON.parse(rawConfig);
+  const build: IRootRawJSONDataType = JSON.parse(rawBuild);
   // this shouldn't be necessary but we do it anyway
   buildnumber = buildnumber.replace("\n", "").trim();
 

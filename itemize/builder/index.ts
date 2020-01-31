@@ -32,6 +32,8 @@ import {
   checkModuleSchemaValidate,
   checkPropertyDefinitionArraySchemaValidate,
   checkItemDefinitionSchemaValidate,
+  checkPartialConfig,
+  checkPartialSensitiveConfig,
 } from "./schema-checks";
 import { checkRoot } from "./checkers";
 import { processRoot } from "./processer";
@@ -64,6 +66,7 @@ import {
 } from "../constants";
 import { buildAutocomplete } from "./autocomplete";
 import { evalRawJSON } from "./evaler";
+import { IConfigRawJSONDataType } from "../config";
 
 // Refuse to run in production mode
 if (process.env.NODE_ENV === "production") {
@@ -73,7 +76,7 @@ if (process.env.NODE_ENV === "production") {
 // This is the raw untreated json for the root
 interface IFileRootDataRawUntreatedJSONDataType {
   type: "root";
-  includes: string[];
+  children: string[];
   i18n: string;
   autocomplete?: string[];
 }
@@ -83,7 +86,7 @@ interface IFileRootDataRawUntreatedJSONDataType {
  */
 interface IFileModuleDataRawUntreatedJSONDataType {
   type: "module";
-  includes: string[];
+  children: string[];
   readRoleAccess?: string[];
 }
 
@@ -93,6 +96,7 @@ interface IFileModuleDataRawUntreatedJSONDataType {
 export interface IFileItemDefinitionUntreatedRawJSONDataType {
   type: "item";
   imports?: string[];
+  children?: string[];
   includes?: IIncludeRawJSONDataType[];
   properties?: IPropertyDefinitionRawJSONDataType[];
   createRoleAccess?: string[];
@@ -106,17 +110,76 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
 // Now we execute this code asynchronously
 (async () => {
   try {
-    // first we read the base config
-    const rawDataConfigBase = JSON.parse(
-      await fsAsync.readFile(path.join("config", "index.json"), "utf8"),
+    const configTraceback = new Traceback("CONFIG");
+
+    // first we read the base config that contains no sensitive data,
+    // by getting the path
+    const rawDataConfigLocation = path.join("config", "index.json");
+    // extract with json
+    let rawDataConfigBaseFileData: {
+      data: IConfigRawJSONDataType,
+      pointers: any,
+    };
+    let rawDataConfigBaseFileContent: string;
+    try {
+      // the content and the file data
+      rawDataConfigBaseFileContent = await fsAsync.readFile(rawDataConfigLocation, "utf8");
+      rawDataConfigBaseFileData = jsonMap.parse(rawDataConfigBaseFileContent);
+    } catch (err) {
+      throw new CheckUpError(
+        err.message,
+        configTraceback,
+      );
+    }
+
+    // now we can set the result
+    const rawDataConfigBase = rawDataConfigBaseFileData.data;
+
+    // build the traceback for this specific file and check it with the schema checker
+    const rawDataConfigTraceback = configTraceback.newTraceToLocation(rawDataConfigLocation);
+    rawDataConfigTraceback.setupPointers(rawDataConfigBaseFileData.pointers, rawDataConfigBaseFileContent);
+    ajvCheck(
+      checkPartialConfig,
+      rawDataConfigBase,
+      rawDataConfigTraceback,
     );
+
+    // check the sensitive data
+    const rawDataSensitiveConfigLocation = path.join("config", "index.sensitive.json");
+    // extract with json
+    let rawDataSensitiveConfigBaseFileData: {
+      data: IConfigRawJSONDataType,
+      pointers: any,
+    };
+    let rawDataSensitiveConfigBaseFileContent: string;
+    try {
+      // the content and the file data
+      rawDataSensitiveConfigBaseFileContent = await fsAsync.readFile(rawDataSensitiveConfigLocation, "utf8");
+      rawDataSensitiveConfigBaseFileData = jsonMap.parse(rawDataSensitiveConfigBaseFileContent);
+    } catch (err) {
+      throw new CheckUpError(
+        err.message,
+        configTraceback,
+      );
+    }
+
     // and the sensitive config
-    const sensitiveConfigExtra = JSON.parse(await fsAsync.readFile(
-      path.join("config", "index.sensitive.json"),
-      "utf8",
-    ));
+    const sensitiveConfigExtra = rawDataSensitiveConfigBaseFileData.data;
+
+    // build the traceback for this specific file and check it with the schema checker
+    const rawDataSensitiveConfigTraceback = configTraceback.newTraceToLocation(rawDataSensitiveConfigLocation);
+    rawDataSensitiveConfigTraceback.setupPointers(
+      rawDataSensitiveConfigBaseFileData.pointers,
+      rawDataSensitiveConfigBaseFileContent,
+    );
+    ajvCheck(
+      checkPartialSensitiveConfig,
+      sensitiveConfigExtra,
+      rawDataSensitiveConfigTraceback,
+    );
+
     // and we merge them together
-    const rawDataConfig = {
+    const rawDataConfig: IConfigRawJSONDataType = {
       ...rawDataConfigBase,
       ...sensitiveConfigExtra,
     };
@@ -149,8 +212,8 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
  * in order to create the build files
  * @param rawDataConfig the configuration
  */
-async function buildData(rawDataConfig: any) {
-  const entryPoint = "data";
+async function buildData(rawDataConfig: IConfigRawJSONDataType) {
+  const entryPoint = rawDataConfig.entry;
 
   // lets get the actual location of the item, lets assume first
   // it is the given location
@@ -196,13 +259,10 @@ async function buildData(rawDataConfig: any) {
     traceback,
   );
 
-  // lets get the supported languages
-  const supportedLanguages: string[] = rawDataConfig.supportedLanguages;
-
   // now let's build the i18n supported languages
   // data which contains all the supported languges
   const i18nData = await buildLang(
-    supportedLanguages,
+    rawDataConfig,
     actualLocation,
     path.join(path.dirname(actualLocation), fileData.data.i18n),
     traceback,
@@ -214,17 +274,14 @@ async function buildData(rawDataConfig: any) {
     location: actualLocation,
     pointers: fileData.pointers,
     i18nData,
-    children: fileData.data.includes ?
-      (await buildIncludes(
+    children: fileData.data.children ?
+      (await buildChildrenItemDefinitionsOrModules(
         rawDataConfig,
-        supportedLanguages,
         path.dirname(actualLocation),
         path.dirname(actualLocation),
-        fileData.data.includes,
-        false,
-        true,
-        traceback.newTraceToBit("includes"),
-        false,
+        fileData.data.children,
+        "module",
+        traceback.newTraceToBit("children"),
       )) as IModuleRawJSONDataType[] : [],
   };
 
@@ -244,7 +301,7 @@ async function buildData(rawDataConfig: any) {
   );
 
   // now let's produce the build for every language
-  const resultBuilds = supportedLanguages.map((lang) => {
+  const resultBuilds = rawDataConfig.supportedLanguages.map((lang) => {
     return processRoot(resultJSON, lang);
   });
 
@@ -261,7 +318,7 @@ async function buildData(rawDataConfig: any) {
   );
 
   // and now let's output clean builds for every language that is supported
-  await Promise.all(supportedLanguages.map(async (sl, index) => {
+  await Promise.all(rawDataConfig.supportedLanguages.map(async (sl, index) => {
     // so we get a resulting build for the given language
     const resultingBuild = resultBuilds[index];
     // and let's emit such file
@@ -282,8 +339,8 @@ async function buildData(rawDataConfig: any) {
     autocomplete = await Promise.all(fileData.data.autocomplete.map((autocompleteSource, index) => {
       // and just use it as the array it is
       return buildAutocomplete(
+        rawDataConfig,
         path.join(path.dirname(actualLocation), autocompleteSource),
-        supportedLanguages,
         autocompleteTraceback.newTraceToBit(index),
       );
     }));
@@ -301,45 +358,39 @@ async function buildData(rawDataConfig: any) {
 /**
  * this processes all the included files
  * whether modules or items
- * @param  supportedLanguages           an array with things like EN, ES, etc...
- * @param  parentFolder                 the parent folder of whether we got to
- *                                      check for these includes
- * @param  includes                     the includes string name list
- * @param  childrenMustBeItemDefinition throws an error if children are module
- * @param  childrenMustBeModule         throws an error if children is item def
- * @returns                              an array with raw modules and items
+ * @param rawDataConfig the raw configuration
+ * @param parentFolder the parent folder where this is located
+ * @param lastModuleDirectory the module we are currently in in order
+ * to be able to perform checks for imported paths (not children)
+ * @param children the children to add as string
+ * @param childrenMustBeOfType pass null not to specify or a string
+ * @param traceback the traceback of the current children
  */
-async function buildIncludes(
-  rawDataConfig: any,
-  supportedLanguages: string[],
+async function buildChildrenItemDefinitionsOrModules(
+  rawDataConfig: IConfigRawJSONDataType,
   parentFolder: string,
   lastModuleDirectory: string,
-  includes: string[],
-  childrenMustBeItemDefinition: boolean,
-  childrenMustBeModule: boolean,
+  children: string[],
+  childrenMustBeOfType: string,
   traceback: Traceback,
-  avoidTracebackIndex: boolean,
 ): Promise<Array<IModuleRawJSONDataType | IItemDefinitionRawJSONDataType>> {
   // this will be the resulting array, either modules or items
   // in the case of items, it can only have items as children
   const result: Array<IModuleRawJSONDataType | IItemDefinitionRawJSONDataType> = [];
 
   // to loop
-  let include: string;
-  let includeIndex = -1;
+  let child: string;
+  let childIndex = -1;
 
   // so we loop over the includes
-  for (include of includes) {
-    includeIndex++;
+  for (child of children) {
+    childIndex++;
 
-    let specificIncludeTraceback = traceback;
-    if (!avoidTracebackIndex) {
-      specificIncludeTraceback = traceback.newTraceToBit(includeIndex);
-    }
+    const specificIncludeTraceback = traceback.newTraceToBit(childIndex);
 
     // so the actual location is the parent folder and the include name
     const actualLocation = await getActualFileLocation(
-      path.join(parentFolder, include),
+      path.join(parentFolder, child),
       specificIncludeTraceback,
     );
 
@@ -369,19 +420,20 @@ async function buildIncludes(
       fileContent,
     );
 
+    // check the type
+    if (childrenMustBeOfType && childrenMustBeOfType !== fileData.data.type) {
+      throw new CheckUpError(
+        "Invalid type to be a children of '" +
+          fileData.data.type + "' expected '" + childrenMustBeOfType,
+        externalSpecificIncludeTraceback,
+      );
+    }
+
     // now we check the type to see whether we got a module or a item
     if (fileData.data.type === "module") {
-      if (childrenMustBeItemDefinition) {
-        throw new CheckUpError(
-          "Module found as children of item definition",
-          externalSpecificIncludeTraceback,
-        );
-      }
-
       // we would process a module
       result.push(await buildModule(
         rawDataConfig,
-        supportedLanguages,
         actualLocation,
         fileData.data,
         fileData.pointers,
@@ -389,16 +441,9 @@ async function buildIncludes(
         externalSpecificIncludeTraceback,
       ));
     } else if (fileData.data.type === "item") {
-      if (childrenMustBeModule) {
-        throw new CheckUpError(
-          "Include definition as children of root definition",
-          externalSpecificIncludeTraceback,
-        );
-      }
       // we would process an item
       result.push(await buildItemDefinition(
         rawDataConfig,
-        supportedLanguages,
         actualLocation,
         lastModuleDirectory,
         fileData.data,
@@ -420,15 +465,17 @@ async function buildIncludes(
 
 /**
  * Processes a module
- * @param supportedLanguages supported languages
+ * @param rawDataConfig the raw config
  * @param actualLocation the location of the file  we are working on
  * for the module
  * @param fileData the data that file contains
+ * @param pointers the file pointers
+ * @param raw the raw content of the file
+ * @param traceback the traceback object
  * @returns a raw module
  */
 async function buildModule(
-  rawDataConfig: any,
-  supportedLanguages: string[],
+  rawDataConfig: IConfigRawJSONDataType,
   actualLocation: string,
   fileData: IFileModuleDataRawUntreatedJSONDataType,
   pointers: any,
@@ -448,8 +495,8 @@ async function buildModule(
   );
   const i18nDataLocation = actualLocation.replace(".json", ".properties");
   const i18nData = await getI18nData(
+    rawDataConfig,
     i18nDataLocation,
-    supportedLanguages,
     null,
     traceback,
   );
@@ -497,7 +544,7 @@ async function buildModule(
           const specificPropertyTraceback =
             propExtTraceback.newTraceToBit(index);
           return getI18nPropertyData(
-            supportedLanguages,
+            rawDataConfig,
             actualLocation,
             pd,
             specificPropertyTraceback,
@@ -516,16 +563,13 @@ async function buildModule(
     i18nDataLocation,
     pointers,
     raw,
-    children: actualEvaledFileData.includes ? await buildIncludes(
+    children: actualEvaledFileData.children ? await buildChildrenItemDefinitionsOrModules(
       rawDataConfig,
-      supportedLanguages,
       actualLocationDirectory,
       actualLocationDirectory,
-      actualEvaledFileData.includes,
-      false,
-      false,
-      traceback.newTraceToBit("includes"),
-      false,
+      actualEvaledFileData.children,
+      null,
+      traceback.newTraceToBit("children"),
     ) : [],
   };
 
@@ -547,15 +591,17 @@ async function buildModule(
 
 /**
  * Processes an item
- * @param supportedLanguages supported languages
+ * @param rawDataConfig the raw config
  * @param actualLocation the location path for the item
  * @param lastModuleDirectory the last module directory
  * @param fileData the file data raw and untreated
+ * @param pointers the pointers of the file for traceback usage
+ * @param raw the raw content of the file
+ * @param traceback the traceback
  * @returns a raw treated item definition
  */
 async function buildItemDefinition(
-  rawDataConfig: any,
-  supportedLanguages: string[],
+  rawDataConfig: IConfigRawJSONDataType,
   actualLocation: string,
   lastModuleDirectory: string,
   fileData: IFileItemDefinitionUntreatedRawJSONDataType,
@@ -578,8 +624,8 @@ async function buildItemDefinition(
   const i18nDataLocation = actualLocation.replace(".json", ".properties");
 
   const i18nData = await getI18nData(
+    rawDataConfig,
     i18nDataLocation,
-    supportedLanguages,
     actualEvaledFileData.policies,
     traceback,
   );
@@ -607,21 +653,15 @@ async function buildItemDefinition(
   // folder, either files or folders themselves, an item might be made of
   // several smaller sub items
   if (path.basename(actualLocation) === "index.json") {
-    childDefinitions =
-      (await buildIncludes(
+    childDefinitions = actualEvaledFileData.children ?
+      (await buildChildrenItemDefinitionsOrModules(
         rawDataConfig,
-        supportedLanguages,
         path.dirname(actualLocation),
         lastModuleDirectory,
-        (await fsAsync.readdir(path.dirname(actualLocation))).filter((i) => {
-          return i !== "index.json" && !i.endsWith(".propext.json") &&
-            !i.endsWith(".properties");
-          }).map((f) => f.replace(".json", "")),
-        true,
-        false,
-        traceback,
-        true,
-      )) as IItemDefinitionRawJSONDataType[];
+        actualEvaledFileData.children,
+        "item",
+        traceback.newTraceToBit("children"),
+      )) as IItemDefinitionRawJSONDataType[] : [];
   }
 
   const finalValue: IItemDefinitionRawJSONDataType = {
@@ -682,7 +722,7 @@ async function buildItemDefinition(
         const specificPropertyTraceback =
           propertiesTraceback.newTraceToBit(index);
         return getI18nPropertyData(
-          supportedLanguages,
+          rawDataConfig,
           actualLocation,
           pd,
           specificPropertyTraceback,
@@ -733,7 +773,7 @@ async function buildItemDefinition(
     finalValue.includes = await Promise.all<IIncludeRawJSONDataType>
       (finalValue.includes.map((include, index) => {
         return getI18nIncludeData(
-          supportedLanguages,
+          rawDataConfig,
           actualLocation,
           include,
           tracebackIncludes.newTraceToBit(index),
@@ -746,12 +786,15 @@ async function buildItemDefinition(
 
 /**
  * Provides the i18name as given by the language file
- * @param supportedLanguages the supported languages we expect
+ * @param rawDataConfig the raw config
+ * @param languageFileLocation the location of the properties file
+ * @param policies the polcies that are expected to be requested
+ * @param traceback the traceback object
  * @returns the right structure for a i18nName attribute
  */
 async function getI18nData(
+  rawDataConfig: IConfigRawJSONDataType,
   languageFileLocation: string,
-  supportedLanguages: string[],
   policies: IPoliciesRawJSONDataType,
   traceback: Traceback,
 ) {
@@ -770,7 +813,7 @@ async function getI18nData(
     traceback.newTraceToLocation(languageFileLocation);
 
   // now we loop over each lanaguage we support
-  supportedLanguages.forEach((locale) => {
+  rawDataConfig.supportedLanguages.forEach((locale) => {
     // if we find nothing we throw an error
     if (!properties[locale]) {
       throw new CheckUpError(
@@ -876,13 +919,14 @@ async function getI18nData(
 /**
  * Process an item group or item specific id to give
  * it specific item name for i18n data, this function is destructive
- * @param supportedLanguages the array of supported languages
+ * @param rawDataConfig the raw config
  * @param actualLocation the location that the item is being worked on
  * @param include the include itself
+ * @param traceback the traceback object
  * @returns the item modified
  */
 async function getI18nIncludeData(
-  supportedLanguages: string[],
+  rawDataConfig: IConfigRawJSONDataType,
   actualLocation: string,
   include: IIncludeRawJSONDataType,
   traceback: Traceback,
@@ -918,7 +962,7 @@ async function getI18nIncludeData(
   const localeDataIsRequired = expectedProperties.filter((p) => p.required).length >= 1;
 
   // use the same technique we used before to get the name
-  supportedLanguages.forEach((locale) => {
+  rawDataConfig.supportedLanguages.forEach((locale) => {
     i18nData[locale] = {};
 
     if (!properties[locale]) {
@@ -978,13 +1022,14 @@ async function getI18nIncludeData(
  * Processes a property to give it the i18n data as
  * defined by the constants for its type
  * this function is destructive
- * @param supportedLanguages the array of supported languages
+ * @param rawDataConfig the raw config
  * @param actualLocation the location that the item is being worked on
  * @param property the property itself
+ * @param traceback the traceback object
  * @returns the property itself
  */
 async function getI18nPropertyData(
-  supportedLanguages: string[],
+  rawDataConfig: IConfigRawJSONDataType,
   actualLocation: string,
   property: IPropertyDefinitionRawJSONDataType,
   traceback: Traceback,
@@ -1131,7 +1176,7 @@ async function getI18nPropertyData(
     .map((b) => ({key: b, required: true})));
 
   // and start to loop
-  supportedLanguages.forEach((locale) => {
+  rawDataConfig.supportedLanguages.forEach((locale) => {
     // do some checks
     if (!properties[locale]) {
       throw new CheckUpError(

@@ -1,3 +1,5 @@
+import { IConfigRawJSONDataType } from "../config";
+
 /**
  * This file exists as a necessity in order to create dynamic json from config
  * fields in the data
@@ -15,7 +17,7 @@
  * @returns that same json with evaled fields replaced
  */
 export function evalRawJSON<T>(
-  config: any,
+  config: IConfigRawJSONDataType,
   rawJSON: T,
 ): T {
   // so first off it needs to be of type string and have that $CONFIG: thing

@@ -12,6 +12,7 @@ import { LOCALE_I18N, ROOT_REQUIRED_LOCALE_I18N } from "../constants";
 import PropertiesReader from "properties-reader";
 import CheckUpError from "./Error";
 import { Ii18NType } from "../base/Root";
+import { IConfigRawJSONDataType } from "../config";
 
 /**
  * Given the properties information provides all the key names
@@ -48,7 +49,7 @@ function getAllKeyNames(obj: any, prefix: string) {
  * @retuns a promise for locale language data
  */
 export async function buildLang(
-  supportedLanguages: string[],
+  rawDataConfig: IConfigRawJSONDataType,
   actualRootLocation: string,
   i18nBaseFileLocation: string,
   traceback: Traceback,
@@ -81,7 +82,7 @@ export async function buildLang(
   } = {};
 
   // and start to loop
-  supportedLanguages.forEach((locale) => {
+  rawDataConfig.supportedLanguages.forEach((locale) => {
 
     if (!propertiesBase[locale]) {
       throw new CheckUpError(

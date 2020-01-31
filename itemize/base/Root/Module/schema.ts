@@ -14,7 +14,7 @@ export default {
     type: {
       const: "module",
     },
-    includes: {
+    children: {
       type: "array",
       items: {
         type: "string",

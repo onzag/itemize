@@ -1,4 +1,4 @@
 {
   "type": "module",
-  "includes": ["post"]
+  "children": ["post"]
 }
