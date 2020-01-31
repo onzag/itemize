@@ -1,3 +1,10 @@
+/**
+ * Contains the builder that builds the database based on the schema
+ * that is generated during the compiltation process
+ *
+ * @packageDocumentation
+ */
+
 import fs from "fs";
 import path from "path";
 import colors from "colors/safe";
@@ -12,6 +19,11 @@ import { buildIndexes } from "./build-index";
 
 const fsAsync = fs.promises;
 
+/**
+ * Simple function to ask for a question
+ * @param question the question to ask
+ * @returns a boolean on the answer
+ */
 export function yesno(question: string) {
   return (new Confirm(question)).run();
 }
@@ -25,14 +37,14 @@ export function yesno(question: string) {
 
   // Retrieve the past migration configuration
   // if available
-  let oldDatabaseSchema: ISQLSchemaDefinitionType = {};
+  let currentDatabaseSchema: ISQLSchemaDefinitionType = {};
   try {
-    oldDatabaseSchema = JSON.parse(await fsAsync.readFile(
+    currentDatabaseSchema = JSON.parse(await fsAsync.readFile(
       path.join("config", "dbhistory", "db-status.latest.json"),
       "utf8",
     ));
   } catch (e) {
-    console.log(colors.yellow("Could not find a Migration File..."));
+    console.log(colors.yellow("Could not find a Previous Schema File..."));
   }
 
   // Create the connection string
@@ -63,16 +75,13 @@ export function yesno(question: string) {
   const root = new Root(data);
 
   // let's get the result by progressively building on top of it
-  const result = getSQLTablesSchemaForRoot(root);
-
-  // make some copies of that result
-  const optimal = {...result};
-  const actual = {...result};
+  const optimal = getSQLTablesSchemaForRoot(root);
 
   // this function will modify actual
   // for the actual executed functions
+  let actual: ISQLSchemaDefinitionType;
   try {
-    await buildDatabase(knex, oldDatabaseSchema, actual);
+    actual = await buildDatabase(knex, currentDatabaseSchema, optimal);
   } catch (err) {
     console.error(err.stack);
     return;
@@ -110,16 +119,18 @@ export function showErrorStackAndLogMessage(err: Error) {
 /**
  * This function actually does the database calls
  * @param knex the knex instance
- * @param oldDatabaseSchema the previous latest migration config that shows
+ * @param currentDatabaseSchema the current latest migration config that shows
  * the current state of the database
  * @param newDatabaseSchema the new migration config we expect to apply (and we would modify if it changes)
+ * @returns the new database schema that resulted
  */
 async function buildDatabase(
   knex: Knex,
-  oldDatabaseSchema: ISQLSchemaDefinitionType,
+  currentDatabaseSchema: ISQLSchemaDefinitionType,
   newDatabaseSchema: ISQLSchemaDefinitionType,
-) {
-  await buildTables(knex, oldDatabaseSchema, newDatabaseSchema);
-  await buildForeignKeys(knex, oldDatabaseSchema, newDatabaseSchema);
-  await buildIndexes(knex, oldDatabaseSchema, newDatabaseSchema);
+): Promise<ISQLSchemaDefinitionType> {
+  let transitoryCurrentSchema = await buildTables(knex, currentDatabaseSchema, newDatabaseSchema);
+  transitoryCurrentSchema = await buildForeignKeys(knex, transitoryCurrentSchema, newDatabaseSchema);
+  transitoryCurrentSchema = await buildIndexes(knex, transitoryCurrentSchema, newDatabaseSchema);
+  return transitoryCurrentSchema;
 }

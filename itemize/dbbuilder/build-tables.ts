@@ -1,3 +1,11 @@
+/**
+ * Contains the functionality that is used in order to generate
+ * the base structure of the tables and the database itself, by
+ * morphing SQL schemas into one another
+ *
+ * @packageDocumentation
+ */
+
 import colors from "colors/safe";
 import Knex from "knex";
 
@@ -7,13 +15,20 @@ import { buildColumn } from "./build-column";
 
 // COLUMN ADD/UPDATE/REMOVE
 
+/**
+ * Adds a missing column to a table that already exists
+ * @param knex the knex instance
+ * @param tableName the table name in question
+ * @param newColumnName the name of the column
+ * @param newColumnSchema the schema of the column
+ * @returns the new generated column or null if failed to generate
+ */
 export async function addMissingColumnToTable(
   knex: Knex,
-  newColumnSchema: ISQLColumnDefinitionType,
-  newColumnName: string,
-  tableSchema: ISQLTableDefinitionType,
   tableName: string,
-) {
+  newColumnName: string,
+  newColumnSchema: ISQLColumnDefinitionType,
+): Promise<ISQLColumnDefinitionType> {
   // it means that this column is expected to be added
   console.log(colors.yellow("A new column at " + tableName + " has been added named " + newColumnName));
 
@@ -28,33 +43,41 @@ export async function addMissingColumnToTable(
     try {
       console.log(updateQuery.toString());
       await updateQuery;
+      return newColumnSchema;
     } catch (err) {
       showErrorStackAndLogMessage(err);
-      // delete the column from the table schema as it failed
-      delete tableSchema[newColumnName];
+      return null;
     }
   } else {
     // delete from both schemas
-    delete tableSchema[newColumnName];
+    return null;
   }
 }
 
+/**
+ * Drops a column in a table that does not exist in the new schema
+ * but existed in the previous schema
+ * @param knex the knex instance
+ * @param tableName the table in question
+ * @param currentColumnName the column name in question
+ * @param currentColumnSchema the column schema to drop
+ * @returns the result of dropping the column, usually null, but the column schema itself if cancelled
+ */
 export async function dropExtraColumnInTable(
   knex: Knex,
-  oldColumnSchema: ISQLColumnDefinitionType,
-  oldColumnName: string,
-  tableSchema: ISQLTableDefinitionType,
   tableName: string,
+  currentColumnName: string,
+  currentColumnSchema: ISQLColumnDefinitionType,
 ) {
   // if we find it notify
-  console.log(colors.yellow("A column at " + tableName + " has been dropped, named " + oldColumnName));
+  console.log(colors.yellow("A column at " + tableName + " has been dropped, named " + currentColumnName));
 
   // make the query
   const dropQuery = knex.schema.withSchema("public").alterTable(tableName, (table) => {
-    if (oldColumnSchema[oldColumnName].fkTable) {
-      table.dropForeign([oldColumnName]);
+    if (currentColumnSchema.fkTable) {
+      table.dropForeign([currentColumnName]);
     }
-    table.dropColumn(oldColumnName);
+    table.dropColumn(currentColumnName);
   });
 
   // ask, for dropping things it's safe to leave
@@ -63,41 +86,56 @@ export async function dropExtraColumnInTable(
     try {
       console.log(dropQuery.toString());
       await dropQuery;
+      return null;
     } catch (err) {
       // if not change the result schema
       showErrorStackAndLogMessage(err);
-      tableSchema[oldColumnName] = oldColumnSchema;
+      return currentColumnSchema;
     }
   } else {
-    tableSchema[oldColumnName] = oldColumnSchema;
+    return currentColumnSchema;
   }
 }
 
+/**
+ * Updates a column in a table
+ * @param knex the knex instance
+ * @param tableName the table name in question
+ * @param columnName the column name
+ * @param newColumnSchema the new column schema
+ * @param currentColumnSchema the current column schema
+ * @returns the updated result if managed
+ */
 export async function updateColumnInTable(
   knex: Knex,
-  newColumnSchema: ISQLColumnDefinitionType,
-  oldColumnSchema: ISQLColumnDefinitionType,
-  columnName: string,
   tableName: string,
-) {
+  columnName: string,
+  newColumnSchema: ISQLColumnDefinitionType,
+  currentColumnSchema: ISQLColumnDefinitionType,
+): Promise<ISQLColumnDefinitionType> {
   // let's have this flag for weird changes, there is only so little we would like to change
   // that could break the app
   let noOp = false;
   // for example a type change (say from int to boolean), can break stuff
-  if (oldColumnSchema.type !== newColumnSchema.type) {
+  if (currentColumnSchema.type !== newColumnSchema.type) {
     // so we warn and set the noop flag
     console.log(colors.red("A column at " + tableName + "." + columnName +
-      " has been changed type from " + oldColumnSchema.type + " to " +
+      " has been changed type from " + currentColumnSchema.type + " to " +
       newColumnSchema.type + " this is a no-op"));
     noOp = true;
   }
 
   // also to deny nulls, nulls are always active
-  if (!!oldColumnSchema.notNull !== !!newColumnSchema.notNull && newColumnSchema.notNull) {
+  if (!!currentColumnSchema.notNull !== !!newColumnSchema.notNull && newColumnSchema.notNull) {
     // this is a noop too, there might be nulls
     console.log(colors.red("A column has changed from not being nullable to being nullable at " +
       tableName + "." + columnName + " this is a no-op"));
     noOp = true;
+  }
+
+  // let's show a message for the column change
+  if (!noOp) {
+    console.log(colors.yellow("A column has changed at " + tableName + "." + columnName));
   }
 
   // so we create the query anyway
@@ -117,25 +155,30 @@ export async function updateColumnInTable(
     try {
       console.log(updateQuery.toString());
       await updateQuery;
+      return newColumnSchema;
     } catch (err) {
       showErrorStackAndLogMessage(err);
-      newColumnSchema.type = oldColumnSchema.type;
-      newColumnSchema.notNull = oldColumnSchema.notNull;
+      return currentColumnSchema;
     }
   } else {
-    newColumnSchema.type = oldColumnSchema.type;
-    newColumnSchema.notNull = oldColumnSchema.notNull;
+    return currentColumnSchema;
   }
 }
 
 // TABLE CREATE / UPDATE / REMOVE
 
+/**
+ * Creates a table in the database
+ * @param knex the knex instance
+ * @param tableName the table name that needs to be created
+ * @param newTableSchema the new table schema
+ * @returns a promise for the actual table that was built or null if not added
+ */
 export async function createTable(
   knex: Knex,
   tableName: string,
   newTableSchema: ISQLTableDefinitionType,
-  newDatabaseSchema: ISQLSchemaDefinitionType,
-) {
+): Promise<ISQLTableDefinitionType> {
   // that means the new schema expects to add a table
   console.log(colors.yellow("Table for " + tableName + " is missing"));
 
@@ -154,60 +197,86 @@ export async function createTable(
     try {
       console.log(createQuery.toString());
       await createQuery;
+      return newTableSchema;
     } catch (err) {
       showErrorStackAndLogMessage(err);
-      // we delete from the new one, modify it
-      delete newDatabaseSchema[tableName];
+      return null;
     }
   } else {
     // we delete from the new one
-    delete newDatabaseSchema[tableName];
+    return null;
   }
 }
 
+/**
+ * Updates a table that has changed from one form
+ * to another
+ * @param knex the knex instance
+ * @param tableName the table name to update
+ * @param newTableSchema the new schema
+ * @param currentTableSchema the current schema
+ * @returns the actual schema it managed to generate
+ */
 export async function updateTable(
   knex: Knex,
   tableName: string,
   newTableSchema: ISQLTableDefinitionType,
-  oldTableSchema: ISQLTableDefinitionType,
-) {
+  currentTableSchema: ISQLTableDefinitionType,
+): Promise<ISQLTableDefinitionType> {
+  const finalTableSchema: ISQLTableDefinitionType = {
+    ...currentTableSchema,
+  };
+
   // we need to check what changed, so we go thru every single column
   for (const columnName of Object.keys(newTableSchema)) {
     // we get the data from the column
     const newColumnSchema = newTableSchema[columnName];
-    const oldColumnSchema = oldTableSchema[columnName];
+    const currentColumnSchema = currentTableSchema[columnName];
 
     // if there was no such column
-    if (!oldColumnSchema) {
-      await addMissingColumnToTable(knex, newColumnSchema, columnName, newTableSchema, tableName);
+    if (!currentColumnSchema) {
+      finalTableSchema[columnName] =
+        await addMissingColumnToTable(knex, tableName, columnName, newColumnSchema);
       // Otherwise if there was just a change in the column basic information
+      // that is because this is only in charge of the basic structure
     } else if (
-      oldColumnSchema.type !== newColumnSchema.type ||
-      oldColumnSchema.notNull !== newColumnSchema.notNull
+      currentColumnSchema.type !== newColumnSchema.type ||
+      currentColumnSchema.notNull !== newColumnSchema.notNull
     ) {
-      await updateColumnInTable(knex, newColumnSchema, oldColumnSchema, columnName, tableName);
+      finalTableSchema[columnName] =
+        await updateColumnInTable(knex, tableName, columnName, newColumnSchema, currentColumnSchema);
     }
   }
 
-  // now we loop in the old ones
-  for (const columnName of Object.keys(oldTableSchema)) {
+  // now we loop in the current ones
+  for (const columnName of Object.keys(currentTableSchema)) {
     // grab this
     const newColumnSchema = newTableSchema[columnName];
-    const oldColumnSchema = oldTableSchema[columnName];
+    const currentColumnSchema = currentTableSchema[columnName];
 
     // we want to find if there are deleted columns
     if (!newColumnSchema) {
-      await dropExtraColumnInTable(knex, oldColumnSchema, columnName, newTableSchema, tableName);
+      finalTableSchema[columnName] =
+        await dropExtraColumnInTable(knex, tableName, columnName, currentColumnSchema);
     }
   }
+
+  return finalTableSchema;
 }
 
+/**
+ * Drops a table in the database that should not exist anymore
+ * but according to the previous schema exists
+ * @param knex the knex instance
+ * @param tableName the table to drop
+ * @param currentTableSchema the schema of the table to drop
+ * @returns the result of dropping the table, usually null, unless cancelled
+ */
 export async function dropTable(
   knex: Knex,
   tableName: string,
-  oldDatabaseSchema: ISQLSchemaDefinitionType,
-  newDatabaseSchema: ISQLSchemaDefinitionType,
-) {
+  currentTableSchema: ISQLTableDefinitionType,
+): Promise<ISQLTableDefinitionType> {
   // we can assume it's meant to be dropped
   console.log(colors.yellow("Table for " + tableName + " is not required anymore"));
 
@@ -220,53 +289,62 @@ export async function dropTable(
     try {
       console.log(dropQuery.toString());
       await dropQuery;
+      return null;
     } catch (err) {
       showErrorStackAndLogMessage(err);
-      newDatabaseSchema[tableName] = oldDatabaseSchema[tableName];
+      return currentTableSchema;
     }
   } else {
-    newDatabaseSchema[tableName] = oldDatabaseSchema[tableName];
+    return currentTableSchema;
   }
 }
 
 /**
  * This function actually does the database calls
  * @param knex the knex instance
- * @param oldDatabaseSchema the previous latest migration config that shows
+ * @param currentDatabaseSchema the previous latest migration config that shows
  * the current state of the database
  * @param newDatabaseSchema the new migration config we expect to apply (and we would modify if it changes)
+ * @returns a promise with the definition that was actually built
  */
 export async function buildTables(
   knex: Knex,
-  oldDatabaseSchema: ISQLSchemaDefinitionType,
+  currentDatabaseSchema: ISQLSchemaDefinitionType,
   newDatabaseSchema: ISQLSchemaDefinitionType,
-) {
+): Promise<ISQLSchemaDefinitionType> {
+  const finalSchema: ISQLSchemaDefinitionType = {};
+
   // so we start by looping, we use an of-loop because we want
   // to keep things sync, despite being an async function
   for (const tableName of Object.keys(newDatabaseSchema)) {
-    const oldTableSchema = oldDatabaseSchema[tableName];
+    const currentTableSchema = currentDatabaseSchema[tableName];
     const newTableSchema = newDatabaseSchema[tableName];
 
-    // if there is no old schema
-    if (!oldTableSchema) {
-      await createTable(knex, tableName, newTableSchema, newDatabaseSchema);
-      // So if there is an old schema and this is an update
+    // if there is no current schema
+    if (!currentTableSchema) {
+      finalSchema[tableName] =
+        await createTable(knex, tableName, newTableSchema);
+      // So if there is an current schema and this is an update
     } else {
-      await updateTable(knex, tableName, newTableSchema, oldTableSchema);
+      finalSchema[tableName] =
+        await updateTable(knex, tableName, newTableSchema, currentTableSchema);
     }
   }
 
   // now we want to check for dropped tables, by looping on the previous
   // migration config
-  for (const tableName of Object.keys(oldDatabaseSchema)) {
+  for (const tableName of Object.keys(currentDatabaseSchema)) {
     // if we don't find any table data in the new config
     if (!newDatabaseSchema[tableName]) {
-      await dropTable(
-        knex,
-        tableName,
-        oldDatabaseSchema,
-        newDatabaseSchema,
-      );
+      // we call the drop
+      finalSchema[tableName] =
+        await dropTable(
+          knex,
+          tableName,
+          currentDatabaseSchema[tableName],
+        );
     }
   }
+
+  return finalSchema;
 }
