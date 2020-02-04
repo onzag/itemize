@@ -13,6 +13,8 @@ import { ENDPOINT_ERRORS } from "./constants";
 export interface IGQLSearchResult {
   type: string;
   id: number;
+  version: string;
+  created_at: string;
 }
 
 /**

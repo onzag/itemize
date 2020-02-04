@@ -15,7 +15,8 @@ import {
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import {
-  CONNECTOR_SQL_COLUMN_FK_NAME,
+  CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+  CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   INCLUDE_PREFIX,
   UNSPECIFIED_OWNER,
   ENDPOINT_ERRORS,
@@ -31,6 +32,7 @@ import { updateTransitoryIdIfExists } from "../../../base/Root/Module/ItemDefini
 import { IParentedSearchRecordsAddedEvent, IOwnedSearchRecordsAddedEvent } from "../../../base/remote-protocol";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { EndpointError } from "../../../base/errors";
+import { IGQLSearchResult } from "../../../gql-querier";
 
 const debug = Debug("resolvers:addItemDefinition");
 export async function addItemDefinition(
@@ -52,10 +54,13 @@ export async function addItemDefinition(
   await validateTokenIsntBlocked(appData.cache, tokenData);
 
   // now we must check if we are parenting
-  const isParenting = !!(resolverArgs.args.parent_id || resolverArgs.args.parent_type);
+  const isParenting = !!(
+    resolverArgs.args.parent_id || resolverArgs.args.parent_type || resolverArgs.args.parent_version
+  );
   validateParentingRules(
     appData,
     resolverArgs.args.parent_id,
+    resolverArgs.args.parent_version || null,
     resolverArgs.args.parent_type,
     itemDefinition,
     tokenData.id,
@@ -140,14 +145,14 @@ export async function addItemDefinition(
   // the value from graphql, now you should understand how this is handled
   // the values are applied so that the whole item definition value is
   // fulfilled
-  itemDefinition.applyValue(null, resolverArgs.args, false, tokenData.id, tokenData.role, null, false);
+  itemDefinition.applyValue(null, null, resolverArgs.args, false, tokenData.id, tokenData.role, null, false);
   // now we use this function which checks the current value against
   // the value that we have just set, the reason we are sending the args
   // is because we want to ensure that the values that you updated for
   // are the values that are being set, remember rules in item defintions
   // can change the output, and yet keep things valid, so the arg can be invalid
   // if the output is different from it
-  await serverSideCheckItemDefinitionAgainst(itemDefinition, resolverArgs.args, null);
+  await serverSideCheckItemDefinitionAgainst(itemDefinition, resolverArgs.args, null, null);
 
   if (isParenting) {
     const parentModule = (
@@ -157,6 +162,7 @@ export async function addItemDefinition(
       policyTypes: ["parent"],
       itemDefinition,
       id: null,
+      version: null,
       role: tokenData.role,
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: requestedFields,
@@ -164,13 +170,15 @@ export async function addItemDefinition(
       parentModule,
       parentType: resolverArgs.args.parent_type,
       parentId: resolverArgs.args.parent_id,
+      parentVersion: resolverArgs.args.parent_version || null,
       preParentValidation: (content: ISQLTableRowValue) => {
         // this shouldn't really happen because validateParentingRules should have
         // checked whether it existed, but we check anyway
         if (!content) {
           debug("FAILED due to lack of content data");
           throw new EndpointError({
-            message: `There's no parent ${resolverArgs.args.parent_type} with id ${resolverArgs.args.parent_id}`,
+            message: `There's no parent ${resolverArgs.args.parent_type} with ` +
+            `id ${resolverArgs.args.parent_id} and version ${resolverArgs.args.parent_version}`,
             code: ENDPOINT_ERRORS.NOT_FOUND,
           });
         }
@@ -230,6 +238,7 @@ export async function addItemDefinition(
 
   if (isParenting) {
     sqlModData.parent_id = resolverArgs.args.parent_id;
+    sqlModData.parent_version = resolverArgs.args.parent_version || null;
     sqlModData.parent_type = resolverArgs.args.parent_type;
   }
 
@@ -251,7 +260,8 @@ export async function addItemDefinition(
 
     // so with that in mind, we add the foreign key column value
     // for combining both and keeping them joined togeher
-    sqlIdefData[CONNECTOR_SQL_COLUMN_FK_NAME] = insertQueryValueMod[0].id;
+    sqlIdefData[CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod[0].id;
+    sqlIdefData[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod[0].version;
 
     // so now we create the insert query
     const insertQueryIdef = transactionKnex(selfTable).insert(sqlIdefData).returning("*");
@@ -266,7 +276,7 @@ export async function addItemDefinition(
   });
 
   debug("SQL Output is %j", value);
-  appData.cache.forceCacheInto(selfTable, value.id, value);
+  appData.cache.forceCacheInto(selfTable, value.id, value.version, value);
 
   // now we convert that SQL value to the respective GQL value
   // the reason we pass the requested fields is to filter by the fields
@@ -290,16 +300,20 @@ export async function addItemDefinition(
     value.id.toString(),
   );
 
+  const searchResultForThisValue: IGQLSearchResult = {
+    id: value.id,
+    version: value.version,
+    type: selfTable,
+    created_at: value.created_at,
+  };
+
   const itemDefinitionBasedOwnedEvent: IOwnedSearchRecordsAddedEvent = {
     qualifiedPathName: selfTable,
     createdBy: sqlModData.created_by,
     newIds: [
-      {
-        id: value.id,
-        type: selfTable,
-      },
+      searchResultForThisValue,
     ],
-    newLastRecordId: value.id,
+    newLastRecord: searchResultForThisValue,
   };
   appData.listener.triggerOwnedSearchListeners(
     itemDefinitionBasedOwnedEvent,
@@ -319,14 +333,12 @@ export async function addItemDefinition(
     const itemDefinitionBasedParentedEvent: IParentedSearchRecordsAddedEvent = {
       qualifiedPathName: selfTable,
       parentId: resolverArgs.args.parent_id,
+      parentVersion: resolverArgs.args.parent_version || null,
       parentType: resolverArgs.args.parent_type,
       newIds: [
-        {
-          id: value.id,
-          type: selfTable,
-        },
+        searchResultForThisValue,
       ],
-      newLastRecordId: value.id,
+      newLastRecord: searchResultForThisValue,
     };
     appData.listener.triggerParentedSearchListeners(
       itemDefinitionBasedParentedEvent,

@@ -143,7 +143,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           .getParentRoot().registry[searchResult.type] as ItemDefinition;
       // check if it's in memory cache, in such a case the value will have already loaded
       // as the item definition would have applied it initially
-      const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchResult.id);
+      const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchResult.id, searchResult.version);
       if (
         appliedGQLValue &&
         requestFieldsAreContained(this.props.searchFields, appliedGQLValue.requestFields)
@@ -158,6 +158,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         const cachedResult = await CacheWorkerInstance.instance.getCachedValue(
           PREFIX_GET + itemDefintionInQuestion.getQualifiedPathName(),
           searchResult.id,
+          searchResult.version,
           this.props.searchFields,
         );
         if (!cachedResult) {
@@ -168,6 +169,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           cachedResult,
           forId: searchResult.id,
           forType: searchResult.type,
+          forVersion: searchResult.version,
         };
       }
     }));
@@ -185,6 +187,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           // that use the same value
           itemDefintionInQuestion.applyValue(
             cr.forId,
+            cr.forVersion,
             cr.cachedResult.value,
             false,
             this.props.tokenData.id,
@@ -194,15 +197,16 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           );
 
           // and then we trigger the change listener for all the instances
-          itemDefintionInQuestion.triggerListeners("change", cr.forId);
+          itemDefintionInQuestion.triggerListeners("change", cr.forId, cr.forVersion);
         } else {
-          itemDefintionInQuestion.cleanValueFor(cr.forId);
-          itemDefintionInQuestion.triggerListeners("change", cr.forId);
+          itemDefintionInQuestion.cleanValueFor(cr.forId, cr.forVersion);
+          itemDefintionInQuestion.triggerListeners("change", cr.forId, cr.forVersion);
         }
 
         this.props.remoteListener.requestFeedbackFor({
           itemDefinition: itemDefintionInQuestion.getQualifiedPathName(),
           id: cr.forId,
+          version: cr.forVersion,
         });
       }
     });
@@ -253,6 +257,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       ) {
         (gqlValue.data[getListQueryName].results as IGQLValue[]).forEach((value, index) => {
           const forId = uncachedResults[index].id;
+          const forVersion = uncachedResults[index].version;
           const forType = uncachedResults[index].type;
 
           const itemDefintionInQuestion = this.props.itemDefinitionInstance.getParentModule()
@@ -261,11 +266,12 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             ...value,
           } : value;
           if (!valueToApply) {
-            itemDefintionInQuestion.cleanValueFor(forId);
-            itemDefintionInQuestion.triggerListeners("change", forId);
+            itemDefintionInQuestion.cleanValueFor(forId, forVersion);
+            itemDefintionInQuestion.triggerListeners("change", forId, forVersion);
           } else {
             let mergedQueryFields = this.props.searchFields;
-            const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(value.id as number);
+            const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(
+              value.id as number, value.version as string);
             if (
               appliedGQLValue &&
               appliedGQLValue.rawValue &&
@@ -283,6 +289,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
             itemDefintionInQuestion.applyValue(
               valueToApply.id as number,
+              valueToApply.version as string,
               valueToApply,
               false,
               this.props.tokenData.id,
@@ -290,7 +297,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
               mergedQueryFields,
               true,
             );
-            itemDefintionInQuestion.triggerListeners("change", forId);
+            itemDefintionInQuestion.triggerListeners("change", forId, forVersion);
           }
         });
       }

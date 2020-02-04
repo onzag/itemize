@@ -15,7 +15,7 @@ export async function search(
   const newSearchResults: IGQLSearchResult[] = (await Promise.all(
     searchResults.map(async (result) => {
       try {
-        const queryIdentifier = `${PREFIX_GET}${result.type}.${result.id}`;
+        const queryIdentifier = `${PREFIX_GET}${result.type}.${result.id}.${JSON.stringify(result.version)}`;
         const value = await db.get(QUERIES_TABLE_NAME, queryIdentifier);
         if (!value) {
           console.warn("Search function was executed with missing value for ", queryIdentifier);
@@ -116,6 +116,7 @@ async function checkOne(
 
 const SORT_STRATEGIES = {
   DEFAULT: (a: IGQLSearchResultChecked, b: IGQLSearchResultChecked) => {
+    // TODO this should be done by created_at, this will suffice for now
     return b.value.id - a.value.id;
   },
 };

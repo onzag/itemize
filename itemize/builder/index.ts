@@ -32,15 +32,13 @@ import {
   checkModuleSchemaValidate,
   checkPropertyDefinitionArraySchemaValidate,
   checkItemDefinitionSchemaValidate,
-  checkPartialConfig,
-  checkPartialSensitiveConfig,
 } from "./schema-checks";
 import { checkRoot } from "./checkers";
 import { processRoot } from "./processer";
 import { buildLang, clearLang } from "./lang";
 import { buildResources } from "./resources";
 import { buildHTML } from "./html";
-import { buildConfig } from "./config";
+import { buildConfig, extractConfig } from "./config";
 
 import fs from "fs";
 import path from "path";
@@ -110,79 +108,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
 // Now we execute this code asynchronously
 (async () => {
   try {
-    const configTraceback = new Traceback("CONFIG");
-
-    // first we read the base config that contains no sensitive data,
-    // by getting the path
-    const rawDataConfigLocation = path.join("config", "index.json");
-    // extract with json
-    let rawDataConfigBaseFileData: {
-      data: IConfigRawJSONDataType,
-      pointers: any,
-    };
-    let rawDataConfigBaseFileContent: string;
-    try {
-      // the content and the file data
-      rawDataConfigBaseFileContent = await fsAsync.readFile(rawDataConfigLocation, "utf8");
-      rawDataConfigBaseFileData = jsonMap.parse(rawDataConfigBaseFileContent);
-    } catch (err) {
-      throw new CheckUpError(
-        err.message,
-        configTraceback,
-      );
-    }
-
-    // now we can set the result
-    const rawDataConfigBase = rawDataConfigBaseFileData.data;
-
-    // build the traceback for this specific file and check it with the schema checker
-    const rawDataConfigTraceback = configTraceback.newTraceToLocation(rawDataConfigLocation);
-    rawDataConfigTraceback.setupPointers(rawDataConfigBaseFileData.pointers, rawDataConfigBaseFileContent);
-    ajvCheck(
-      checkPartialConfig,
-      rawDataConfigBase,
-      rawDataConfigTraceback,
-    );
-
-    // check the sensitive data
-    const rawDataSensitiveConfigLocation = path.join("config", "index.sensitive.json");
-    // extract with json
-    let rawDataSensitiveConfigBaseFileData: {
-      data: IConfigRawJSONDataType,
-      pointers: any,
-    };
-    let rawDataSensitiveConfigBaseFileContent: string;
-    try {
-      // the content and the file data
-      rawDataSensitiveConfigBaseFileContent = await fsAsync.readFile(rawDataSensitiveConfigLocation, "utf8");
-      rawDataSensitiveConfigBaseFileData = jsonMap.parse(rawDataSensitiveConfigBaseFileContent);
-    } catch (err) {
-      throw new CheckUpError(
-        err.message,
-        configTraceback,
-      );
-    }
-
-    // and the sensitive config
-    const sensitiveConfigExtra = rawDataSensitiveConfigBaseFileData.data;
-
-    // build the traceback for this specific file and check it with the schema checker
-    const rawDataSensitiveConfigTraceback = configTraceback.newTraceToLocation(rawDataSensitiveConfigLocation);
-    rawDataSensitiveConfigTraceback.setupPointers(
-      rawDataSensitiveConfigBaseFileData.pointers,
-      rawDataSensitiveConfigBaseFileContent,
-    );
-    ajvCheck(
-      checkPartialSensitiveConfig,
-      sensitiveConfigExtra,
-      rawDataSensitiveConfigTraceback,
-    );
-
-    // and we merge them together
-    const rawDataConfig: IConfigRawJSONDataType = {
-      ...rawDataConfigBase,
-      ...sensitiveConfigExtra,
-    };
+    const rawDataConfig = await extractConfig();
 
     // ensure the dist directory
     if (!await checkExists("dist")) {

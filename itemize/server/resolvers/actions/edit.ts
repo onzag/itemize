@@ -12,7 +12,13 @@ import {
   validateTokenIsntBlocked,
 } from "../basic";
 import graphqlFields from "graphql-fields";
-import { CONNECTOR_SQL_COLUMN_FK_NAME, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, ENDPOINT_ERRORS } from "../../../constants";
+import {
+  CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+  CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+  INCLUDE_PREFIX,
+  EXCLUSION_STATE_SUFFIX,
+  ENDPOINT_ERRORS,
+} from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
   convertGQLValueToSQLValueForItemDefinition,
@@ -64,6 +70,7 @@ export async function editItemDefinition(
       policyTypes: ["edit", "read"],
       itemDefinition,
       id: resolverArgs.args.id,
+      version: resolverArgs.args.version,
       role: tokenData.role,
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: requestedFields,
@@ -111,15 +118,27 @@ export async function editItemDefinition(
   debug("Expectd GQL value considered as %j, applying such value", expectedUpdatedValue);
   // and as so we apply the value from graphql
   itemDefinition.applyValue(
-    resolverArgs.args.id, expectedUpdatedValue, false, tokenData.id, tokenData.role, null, false);
+    resolverArgs.args.id,
+    resolverArgs.args.version || null,
+    expectedUpdatedValue,
+    false,
+    tokenData.id,
+    tokenData.role,
+    null,
+    false,
+  );
   // and then we check with the entire full value, we want to ensure no changes occurred
   // and that the updated value will be exactly the result and it will be valid
   await serverSideCheckItemDefinitionAgainst(
     itemDefinition,
     expectedUpdatedValue,
     resolverArgs.args.id,
+    resolverArgs.args.version || null,
   );
-  itemDefinition.cleanValueFor(resolverArgs.args.id);
+  itemDefinition.cleanValueFor(
+    resolverArgs.args.id,
+    resolverArgs.args.version || null,
+  );
 
   // now we calculate the fields that we are editing, and the fields that we are
   // requesting
@@ -235,14 +254,22 @@ export async function editItemDefinition(
     if (Object.keys(sqlIdefData).length) {
       // we make the update query
       updateOrSelectQueryIdef = transactionKnex(selfTable).update(sqlIdefData).where(
-        CONNECTOR_SQL_COLUMN_FK_NAME,
+        CONNECTOR_SQL_COLUMN_ID_FK_NAME,
         resolverArgs.args.id,
+      ).andWhere(
+        CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+        resolverArgs.args.version || null,
       ).returning("*");
     // otherwise we check if we are just requesting some fields from the idef
     } else {
       // and make a simple select query
-      updateOrSelectQueryIdef = transactionKnex(selfTable).select("*")
-        .where(CONNECTOR_SQL_COLUMN_FK_NAME, resolverArgs.args.id);
+      updateOrSelectQueryIdef = transactionKnex(selfTable).select("*").where(
+        CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+        resolverArgs.args.id,
+      ).andWhere(
+        CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+        resolverArgs.args.version || null,
+      );
     }
     // if there's nothing to update, or there is nothing to retrieve, it won't touch the idef table
 
@@ -273,10 +300,11 @@ export async function editItemDefinition(
 
   // we return and this executes after it returns
   (async () => {
-    await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, value);
+    await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, resolverArgs.args.version || null, value);
     const changeEvent: IChangedFeedbackEvent = {
       itemDefinition: selfTable,
       id: resolverArgs.args.id,
+      version: resolverArgs.args.version || null,
       type: "modified",
       lastModified: null,
     };

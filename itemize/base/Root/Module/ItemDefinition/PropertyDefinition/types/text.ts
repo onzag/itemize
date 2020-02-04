@@ -48,7 +48,11 @@ const typeValue: IPropertyDefinitionSupportedType = {
       },
       [sqlPrefix + id + "_VECTOR"]: {
         type: "tsvector",
-        index: "gin",
+        index: {
+          type: "gin",
+          id: "FULL_TEXT_SEARCH_GIN_INDEX_" + sqlPrefix + id,
+          level: 0,
+        },
       },
     };
   },

@@ -179,6 +179,7 @@ export async function createTable(
   tableName: string,
   newTableSchema: ISQLTableDefinitionType,
 ): Promise<ISQLTableDefinitionType> {
+  const finalTableSchema: ISQLTableDefinitionType = {};
   // that means the new schema expects to add a table
   console.log(colors.yellow("Table for " + tableName + " is missing"));
 
@@ -188,6 +189,10 @@ export async function createTable(
     Object.keys(newTableSchema).forEach((columnName) => {
       const columnData = newTableSchema[columnName];
       buildColumn(columnName, columnData, table);
+      finalTableSchema[columnName] = {
+        type: columnData.type,
+        notNull: columnData.notNull,
+      };
     });
   });
 
@@ -197,7 +202,7 @@ export async function createTable(
     try {
       console.log(createQuery.toString());
       await createQuery;
-      return newTableSchema;
+      return finalTableSchema;
     } catch (err) {
       showErrorStackAndLogMessage(err);
       return null;

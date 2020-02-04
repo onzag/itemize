@@ -11,6 +11,7 @@ import { ISQLColumnDefinitionType } from "../base/Root/sql";
 const typesForceSpecific = [
   "timestamp",
   "date",
+  "serial",
 ];
 
 /**
@@ -25,21 +26,13 @@ export function buildColumn(
   columnData: ISQLColumnDefinitionType,
   tableBuilder: Knex.CreateTableBuilder,
 ): Knex.ColumnBuilder {
-  // so we first get the type we are requested
-  let actualType = columnData.type;
-  // if we are requested a serial, the postgres serial
-  // in knex is the increments
-  if (actualType === "serial") {
-    actualType = "increments";
-  }
-
   // now we need to execute, if there's no function in the table
   // creator or if it's marked as necessary to use a specific function
-  const tableColumnExec = !tableBuilder[actualType] || typesForceSpecific.includes(actualType) ?
+  const tableColumnExec = !tableBuilder[columnData.type] || typesForceSpecific.includes(columnData.type) ?
     // we use a specific function
-    tableBuilder.specificType(columnName, actualType) :
+    tableBuilder.specificType(columnName, columnData.type) :
     // otherwise we use the actual type
-    tableBuilder[actualType](columnName);
+    tableBuilder[columnData.type](columnName);
 
   // if it's not null
   if (columnData.notNull) {

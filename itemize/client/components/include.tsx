@@ -36,6 +36,7 @@ export function ExclusionSwitch(props: IExclusionSwitchProps) {
                     state={includeContextualValue.state}
                     onChange={onChange}
                     forId={itemDefinitionContextualValue.forId}
+                    forVersion={itemDefinitionContextualValue.forVersion}
                   />
                 );
               }

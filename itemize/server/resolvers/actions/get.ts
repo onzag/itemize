@@ -23,7 +23,7 @@ import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { EndpointError } from "../../../base/errors";
-import { IGQLSearchResultIdentifierType } from "./search";
+import { IGQLSearchResult } from "../../../gql-querier";
 
 const getItemDefinitionDebug = Debug("resolvers:getItemDefinition");
 export async function getItemDefinition(
@@ -54,6 +54,7 @@ export async function getItemDefinition(
       policyTypes: ["read"],
       itemDefinition,
       id: resolverArgs.args.id,
+      version: resolverArgs.args.version || null,
       role: tokenData.role,
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: requestedFields,
@@ -197,7 +198,7 @@ export async function getItemDefinitionList(
   // as the qualified path name and the table name, so by ensuring it's a legit name
   // we ensure there is no leak
   const selfTableType = itemDefinition.getQualifiedPathName();
-  resolverArgs.args.ids.forEach((argId: IGQLSearchResultIdentifierType) => {
+  resolverArgs.args.ids.forEach((argId: IGQLSearchResult) => {
     if (argId.type !== selfTableType) {
       throw new EndpointError({
         message: "Invalid id container type that didn't match the qualified name " + selfTableType,

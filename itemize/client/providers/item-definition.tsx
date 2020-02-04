@@ -100,6 +100,7 @@ export interface IActionSearchOptions {
     module: string,
     itemDefinition: string,
     id: number,
+    version?: string,
   };
   cachePolicy?: "by-owner" | "by-parent" | "none";
 }
@@ -122,6 +123,8 @@ export interface IItemDefinitionContextType {
   // the id of which it was pulled from, this might be
   // null
   forId: number;
+  // the version of which it was pulled from
+  forVersion: string;
   // with ids a not found flag might be set if the item
   // is not found 404
   notFound: boolean;
@@ -223,10 +226,12 @@ export interface IItemDefinitionContextType {
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
     givenForId: number,
+    givenForVersion: string,
   ) => void;
   onPropertyClearEnforce: (
     property: PropertyDefinition,
     givenForId: number,
+    givenForVersion: string,
   ) => void;
 
   // dismisses of he many errors and flags
@@ -265,6 +270,8 @@ interface IItemDefinitionProviderProps {
   itemDefinition?: string;
   // the id, specifying an id makes a huge difference
   forId?: number;
+  // the version
+  forVersion?: string;
   // this is an important flag, if ownership is assumed this means
   // that when automatic fetching of properties it will do so assuming
   // the current user is the owner, so OWNER rules pass, put an example,
@@ -355,7 +362,7 @@ interface IActualItemDefinitionProviderState {
   searchResults: IGQLSearchResult[];
   searchId: string;
   searchOwner: number;
-  searchParent: [string, number];
+  searchParent: [string, number, string];
   searchShouldCache: boolean;
   searchRequestedProperties: string[];
   searchRequestedIncludes: string[];
@@ -394,6 +401,7 @@ export class ActualItemDefinitionProvider extends
       return {
         state: props.itemDefinitionInstance.getStateNoExternalChecking(
           props.forId || null,
+          props.forVersion || null,
           !props.disableExternalChecks,
           props.optimize && props.optimize.onlyIncludeProperties,
           props.optimize && props.optimize.onlyIncludeIncludes,
@@ -463,6 +471,7 @@ export class ActualItemDefinitionProvider extends
       // all the optimization flags
       itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
         this.props.forId || null,
+        this.props.forVersion || null,
         !this.props.disableExternalChecks,
         this.props.optimize && this.props.optimize.onlyIncludeProperties,
         this.props.optimize && this.props.optimize.onlyIncludeIncludes,
@@ -527,7 +536,9 @@ export class ActualItemDefinitionProvider extends
   // setup the listeners is simple
   public setupListeners() {
     /// first the change listener that checks for every change event that happens with the state
-    this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.changeListener);
+    this.props.itemDefinitionInstance.addListener(
+      "change", this.props.forId || null, this.props.forVersion || null, this.changeListener,
+    );
 
     const isStatic = this.props.optimize && this.props.optimize.static;
 
@@ -536,7 +547,9 @@ export class ActualItemDefinitionProvider extends
       // one is the reload, this gets called when the value of the field has differed from the one that
       // we have gotten (or have cached) this listener is very important for that reason, otherwise our app
       // will get frozen in the past
-      this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
+      this.props.itemDefinitionInstance.addListener(
+        "reload", this.props.forId, this.props.forVersion || null, this.reloadListener,
+      );
 
       // note how we used the item definition instance and that's because those events are piped from
       // within this remote listener, the remote listener pipes the events from the websocket
@@ -549,6 +562,7 @@ export class ActualItemDefinitionProvider extends
         this,
         this.props.itemDefinitionInstance.getQualifiedPathName(),
         this.props.forId,
+        this.props.forVersion,
       );
     }
   }
@@ -556,15 +570,20 @@ export class ActualItemDefinitionProvider extends
     this.removePossibleSearchListeners();
 
     // here we just remove the listeners that we have setup
-    this.props.itemDefinitionInstance.removeListener("change", this.props.forId || null, this.changeListener);
+    this.props.itemDefinitionInstance.removeListener(
+      "change", this.props.forId || null, this.props.forVersion || null, this.changeListener,
+    );
     const isStatic = this.props.optimize && this.props.optimize.static;
     if (this.props.forId && !isStatic) {
       // remove all the remote listeners
-      this.props.itemDefinitionInstance.removeListener("reload", this.props.forId, this.reloadListener);
+      this.props.itemDefinitionInstance.removeListener(
+        "reload", this.props.forId, this.props.forVersion || null, this.reloadListener,
+      );
       this.props.remoteListener.removeItemDefinitionListenerFor(
         this,
         this.props.itemDefinitionInstance.getQualifiedPathName(),
         this.props.forId,
+        this.props.forVersion || null,
       );
     }
   }
@@ -625,36 +644,56 @@ export class ActualItemDefinitionProvider extends
         // we mark the flag as true
         alreadyRemovedRemoteListeners = true;
         // and remove the listeners
-        prevProps.itemDefinitionInstance.removeListener("reload", prevProps.forId, this.reloadListener);
+        prevProps.itemDefinitionInstance.removeListener(
+          "reload", prevProps.forId, prevProps.forVersion, this.reloadListener,
+        );
         prevProps.remoteListener.removeItemDefinitionListenerFor(
-          this, prevProps.itemDefinitionInstance.getQualifiedPathName(), prevProps.forId,
+          this, prevProps.itemDefinitionInstance.getQualifiedPathName(),
+          prevProps.forId, prevProps.forVersion || null,
         );
       } else if (!isStatic && wasStatic && this.props.forId) {
         alreadyAddedRemoteListeners = true;
-        this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
+        this.props.itemDefinitionInstance.addListener(
+          "reload", this.props.forId, this.props.forVersion, this.reloadListener,
+        );
         this.props.remoteListener.addItemDefinitionListenerFor(
-          this, this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId,
+          this, this.props.itemDefinitionInstance.getQualifiedPathName(),
+          this.props.forId, this.props.forVersion || null,
         );
       }
 
       // if this was an item definition or id update
-      if (itemDefinitionWasUpdated || (prevProps.forId || null) !== (this.props.forId || null)) {
+      if (
+        itemDefinitionWasUpdated ||
+        (prevProps.forId || null) !== (this.props.forId || null) ||
+        (prevProps.forVersion || null) !== (this.props.forVersion || null)
+      ) {
         // we need to remove the old listeners
-        prevProps.itemDefinitionInstance.removeListener("change", prevProps.forId || null, this.changeListener);
+        prevProps.itemDefinitionInstance.removeListener(
+          "change", prevProps.forId || null, prevProps.forVersion || null, this.changeListener,
+        );
         // we only remove this listeners if we haven't done it before for other reasons
         if (prevProps.forId && !wasStatic && !alreadyRemovedRemoteListeners) {
-          prevProps.itemDefinitionInstance.removeListener("reload", prevProps.forId, this.reloadListener);
+          prevProps.itemDefinitionInstance.removeListener(
+            "reload", prevProps.forId, prevProps.forVersion || null, this.reloadListener,
+          );
           prevProps.remoteListener.removeItemDefinitionListenerFor(
-            this, prevProps.itemDefinitionInstance.getQualifiedPathName(), prevProps.forId,
+            this, prevProps.itemDefinitionInstance.getQualifiedPathName(),
+            prevProps.forId, prevProps.forVersion || null,
           );
         }
 
         // add the new listeners
-        this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.changeListener);
+        this.props.itemDefinitionInstance.addListener(
+          "change", this.props.forId || null, this.props.forVersion || null, this.changeListener,
+        );
         if (this.props.forId && !isStatic && !alreadyAddedRemoteListeners) {
-          this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.reloadListener);
+          this.props.itemDefinitionInstance.addListener(
+            "reload", this.props.forId, this.props.forVersion || null, this.reloadListener,
+          );
           this.props.remoteListener.addItemDefinitionListenerFor(
-            this, this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId,
+            this, this.props.itemDefinitionInstance.getQualifiedPathName(),
+            this.props.forId, this.props.forVersion || null,
           );
         }
       }
@@ -663,6 +702,7 @@ export class ActualItemDefinitionProvider extends
       this.setState({
         itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
           this.props.forId || null,
+          this.props.forVersion || null,
           !this.props.disableExternalChecks,
           this.props.optimize && this.props.optimize.onlyIncludeProperties,
           this.props.optimize && this.props.optimize.onlyIncludeIncludes,
@@ -681,6 +721,7 @@ export class ActualItemDefinitionProvider extends
     // assumption, we need to reload the values if it's so necessary
     if (
       (prevProps.forId || null) !== (this.props.forId || null) ||
+      (prevProps.forVersion || null) !== (this.props.forVersion || null) ||
       prevProps.tokenData.id !== this.props.tokenData.id ||
       prevProps.tokenData.role !== this.props.tokenData.role ||
       prevProps.assumeOwnership !== this.props.assumeOwnership ||
@@ -732,6 +773,7 @@ export class ActualItemDefinitionProvider extends
     this.setState({
       itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
         this.props.forId || null,
+        this.props.forVersion || null,
         !this.props.disableExternalChecks,
         this.props.optimize && this.props.optimize.onlyIncludeProperties,
         this.props.optimize && this.props.optimize.onlyIncludeIncludes,
@@ -742,7 +784,11 @@ export class ActualItemDefinitionProvider extends
       loading: false,
       // also search might do this, and it's true anyway
       notFound:
-        this.props.forId ? !this.props.itemDefinitionInstance.hasAppliedValueTo(this.props.forId || null) : false,
+        // an id is required for this to be true
+        this.props.forId ? !this.props.itemDefinitionInstance.hasAppliedValueTo(
+          this.props.forId || null,
+          this.props.forVersion || null,
+        ) : false,
     });
   }
   public async loadValue(denyCache?: boolean): Promise<IActionResponseWithValue> {
@@ -770,11 +816,14 @@ export class ActualItemDefinitionProvider extends
       userRole: this.props.tokenData.role,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
       forId: this.props.forId,
+      forVersion: this.props.forVersion || null,
     });
 
     if (!denyCache) {
       // Prevent loading at all if value currently available and memoryCached
-      const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId);
+      const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+        this.props.forId, this.props.forVersion || null,
+      );
       if (
         appliedGQLValue &&
         requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
@@ -786,6 +835,7 @@ export class ActualItemDefinitionProvider extends
         this.props.remoteListener.requestFeedbackFor({
           itemDefinition: this.props.itemDefinitionInstance.getQualifiedPathName(),
           id: this.props.forId,
+          version: this.props.forVersion || null,
         });
         // in some situations the value can be in memory but not yet permanently cached
         // (eg. when there is a search context)
@@ -801,6 +851,7 @@ export class ActualItemDefinitionProvider extends
           CacheWorkerInstance.instance.mergeCachedValue(
             PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(),
             this.props.forId,
+            this.props.forVersion || null,
             appliedGQLValue.rawValue,
             appliedGQLValue.requestFields,
           );
@@ -833,7 +884,10 @@ export class ActualItemDefinitionProvider extends
       !denyCache &&
       this.props.searchContext &&
       this.props.searchContext.currentlySearching.find(
-        (s) => s.id === this.props.forId && s.type === this.props.itemDefinitionInstance.getQualifiedPathName(),
+        (s) =>
+          s.id === this.props.forId &&
+          s.version === this.props.forVersion &&
+          s.type === this.props.itemDefinitionInstance.getQualifiedPathName(),
       ) &&
       requestFieldsAreContained(requestFields, this.props.searchContext.searchFields)
     ) {
@@ -850,6 +904,7 @@ export class ActualItemDefinitionProvider extends
       // that use the same value
       this.props.itemDefinitionInstance.applyValue(
         this.props.forId || null,
+        this.props.forVersion || null,
         value.value,
         false,
         this.props.tokenData.id,
@@ -859,7 +914,9 @@ export class ActualItemDefinitionProvider extends
       );
 
       // and then we trigger the change listener for all the instances
-      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null);
+      this.props.itemDefinitionInstance.triggerListeners(
+        "change", this.props.forId || null, this.props.forVersion || null,
+      );
       // and if we have an externally checked property we do the external check
       if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
         this.setStateToCurrentValueWithExternalChecking(null);
@@ -896,9 +953,11 @@ export class ActualItemDefinitionProvider extends
     // that state
     if (memoryCached) {
       return {
-        value: this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId).rawValue,
+        value: this.props.itemDefinitionInstance.getGQLAppliedValue(
+          this.props.forId, this.props.forVersion || null).rawValue,
         error: null,
-        getQueryFields: this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId).requestFields,
+        getQueryFields: this.props.itemDefinitionInstance.getGQLAppliedValue(
+          this.props.forId, this.props.forVersion || null).requestFields,
       };
     }
 
@@ -912,6 +971,7 @@ export class ActualItemDefinitionProvider extends
       this.props.remoteListener.requestFeedbackFor({
         itemDefinition: this.props.itemDefinitionInstance.getQualifiedPathName(),
         id: this.props.forId,
+        version: this.props.forVersion || null,
       });
     }
 
@@ -968,6 +1028,7 @@ export class ActualItemDefinitionProvider extends
     // using the normal get state function which runs async
     const newItemDefinitionState = await this.props.itemDefinitionInstance.getState(
       this.props.forId || null,
+      this.props.forVersion || null,
       this.props.optimize && this.props.optimize.onlyIncludeProperties,
       this.props.optimize && this.props.optimize.onlyIncludeIncludes,
       this.props.optimize && this.props.optimize.excludePolicies,
@@ -983,7 +1044,8 @@ export class ActualItemDefinitionProvider extends
         itemDefinitionState: newItemDefinitionState,
       });
       // and trigger change listeners, all but our listener
-      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null, this.changeListener);
+      this.props.itemDefinitionInstance.triggerListeners(
+        "change", this.props.forId || null, this.props.forVersion || null, this.changeListener);
     }
   }
   public onPropertyChange(
@@ -999,9 +1061,18 @@ export class ActualItemDefinitionProvider extends
     }
 
     // we simply set the current value in the property
-    property.setCurrentValue(this.props.forId || null, value, internalValue);
+    property.setCurrentValue(
+      this.props.forId || null,
+      this.props.forVersion || null,
+      value,
+      internalValue,
+    );
     // trigger the listeners for change so everything updates nicely
-    this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null);
+    this.props.itemDefinitionInstance.triggerListeners(
+      "change",
+      this.props.forId || null,
+      this.props.forVersion || null,
+    );
 
     if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       // so we build an id for this change, for that we simply use
@@ -1029,12 +1100,13 @@ export class ActualItemDefinitionProvider extends
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
     givenForId: number,
+    givenForVersion: string,
   ) {
     // this function is basically run by the setter
     // since they might be out of sync that's why the id is passed
     // the setter enforces values
-    property.setSuperEnforced(givenForId || null, value);
-    this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null);
+    property.setSuperEnforced(givenForId || null, givenForVersion || null, value);
+    this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null);
 
     if (this.props.automaticSearch) {
       this.search(this.props.automaticSearch);
@@ -1043,10 +1115,11 @@ export class ActualItemDefinitionProvider extends
   public onPropertyClearEnforce(
     property: PropertyDefinition,
     givenForId: number,
+    givenForVersion: string,
   ) {
     // same but removes the enforcement
-    property.clearSuperEnforced(givenForId || null);
-    this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null);
+    property.clearSuperEnforced(givenForId || null, givenForVersion || null);
+    this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null);
   }
   public componentWillUnmount() {
     this.unSetupListeners();
@@ -1054,15 +1127,17 @@ export class ActualItemDefinitionProvider extends
     // when unmounting we check our optimization flags to see
     // if we are expecting to clean up the memory cache
     if (this.props.optimize && this.props.optimize.cleanOnDismount) {
-      this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null);
+      this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null, this.props.forVersion || null);
       // this will affect other instances that didn't dismount
-      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null);
+      this.props.itemDefinitionInstance.triggerListeners(
+        "change", this.props.forId || null, this.props.forVersion || null);
     }
   }
   public onIncludeSetExclusionState(include: Include, state: IncludeExclusionState) {
     // just sets the exclusion state
-    include.setExclusionState(this.props.forId || null, state);
-    this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null);
+    include.setExclusionState(this.props.forId || null, this.props.forVersion || null, state);
+    this.props.itemDefinitionInstance.triggerListeners(
+      "change", this.props.forId || null, this.props.forVersion || null);
 
     // note how externally checked properties might be affected for this
     if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
@@ -1101,7 +1176,8 @@ export class ActualItemDefinitionProvider extends
       // from the applied value
       if (options && options.onlyIncludeIfDiffersFromAppliedValue) {
         // we get the current applied value, if any
-        const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
+        const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+          this.props.forId || null, this.props.forVersion || null);
         // if there is an applied value for that property
         if (currentAppliedValue && typeof currentAppliedValue.flattenedValue[p.propertyId] !== "undefined") {
           // let's check if it's differ from what we have in the state
@@ -1163,7 +1239,8 @@ export class ActualItemDefinitionProvider extends
         // from the applied value
         if (options && options.onlyIncludeIfDiffersFromAppliedValue) {
           // we get the current applied value, if any
-          const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null);
+          const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+            this.props.forId || null, this.props.forVersion || null);
           let considerItNull: boolean = false;
           // if there is an applied value for that property
           if (currentAppliedValue && currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()]) {
@@ -1232,7 +1309,7 @@ export class ActualItemDefinitionProvider extends
       returnWorkerCachedValuesForGetRequests?: boolean,
       searchOrderBy?: string,
       searchCreatedBy?: number,
-      searchParentedBy?: [string, number],
+      searchParentedBy?: [string, number, string],
       searchCachePolicy?: "by-owner" | "by-parent" | "none",
       searchRequestedFieldsOnCachePolicy?: any,
     },
@@ -1277,11 +1354,13 @@ export class ActualItemDefinitionProvider extends
     if (arg.queryPrefix === PREFIX_SEARCH && typeof arg.searchParentedBy !== "undefined") {
       args.parent_type = arg.searchParentedBy[0];
       args.parent_id = arg.searchParentedBy[1];
+      args.parent_version = arg.searchParentedBy[2];
     }
 
     // now we get the currently applied value in memory
     const appliedGQLValue = arg.queryPrefix !== PREFIX_SEARCH ?
-      this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null) :
+      this.props.itemDefinitionInstance.getGQLAppliedValue(
+        this.props.forId || null, this.props.forVersion || null) :
       null;
     // if we have a query to get a value, and we are allowed to return memory cached request
     if (arg.queryPrefix === PREFIX_GET && arg.returnMemoryCachedValuesForGetRequests) {
@@ -1374,6 +1453,7 @@ export class ActualItemDefinitionProvider extends
             standardCounterpartQualifiedName,
             arg.searchParentedBy[0],
             arg.searchParentedBy[1],
+            arg.searchParentedBy[2],
             cacheWorkerGivenSearchValue.lastRecord,
             this.onSearchReload,
           );
@@ -1384,14 +1464,15 @@ export class ActualItemDefinitionProvider extends
             this.props.remoteListener.requestOwnedSearchFeedbackFor({
               qualifiedPathName: standardCounterpartQualifiedName,
               createdBy: arg.searchCreatedBy,
-              knownLastRecordId: cacheWorkerGivenSearchValue.lastRecord,
+              knownLastRecord: cacheWorkerGivenSearchValue.lastRecord,
             });
           } else {
             this.props.remoteListener.requestParentedSearchFeedbackFor({
               qualifiedPathName: standardCounterpartQualifiedName,
               parentType: arg.searchParentedBy[0],
               parentId: arg.searchParentedBy[1],
-              knownLastRecordId: cacheWorkerGivenSearchValue.lastRecord,
+              parentVersion: arg.searchParentedBy[2],
+              knownLastRecord: cacheWorkerGivenSearchValue.lastRecord,
             });
           }
         }
@@ -1497,6 +1578,7 @@ export class ActualItemDefinitionProvider extends
         // and the item definition search in order to be efficient
         CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
           this.props.forId,
+          this.props.forVersion,
           qualifiedName,
           PREFIX_GET + qualifiedName,
           PREFIX_SEARCH + this.props.itemDefinitionInstance.getParentModule().getSearchModule().getQualifiedPathName(),
@@ -1510,7 +1592,8 @@ export class ActualItemDefinitionProvider extends
         ) &&
         value && mergedQueryFields
       ) {
-        CacheWorkerInstance.instance.mergeCachedValue(PREFIX_GET + qualifiedName, value.id, value, mergedQueryFields);
+        CacheWorkerInstance.instance.mergeCachedValue(
+          PREFIX_GET + qualifiedName, value.id, value.version, value, mergedQueryFields);
       }
     }
 
@@ -1687,7 +1770,7 @@ export class ActualItemDefinitionProvider extends
         pokePoliciesType: "delete",
       });
     } else {
-      this.props.itemDefinitionInstance.cleanValueFor(this.props.forId);
+      this.props.itemDefinitionInstance.cleanValueFor(this.props.forId, this.props.forVersion || null);
       this.setState({
         deleteError: null,
         deleting: false,
@@ -1698,10 +1781,11 @@ export class ActualItemDefinitionProvider extends
       if (options.policiesToCleanOnSuccess) {
         options.policiesToCleanOnSuccess.forEach((policyArray) => {
           this.props.itemDefinitionInstance
-            .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId);
+            .getPropertyDefinitionForPolicy(...policyArray)
+            .cleanValueFor(this.props.forId, this.props.forVersion || null);
         });
       }
-      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId);
+      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
     }
 
     return {
@@ -1746,6 +1830,7 @@ export class ActualItemDefinitionProvider extends
       userRole: this.props.tokenData.role,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
       forId: this.props.forId,
+      forVersion: this.props.forVersion || null,
     });
 
     // super hack in order to get the applying policy args
@@ -1801,6 +1886,7 @@ export class ActualItemDefinitionProvider extends
     });
 
     let recievedId: number = null;
+    let receivedVersion: string = null;
     if (error) {
       this.setState({
         submitError: error,
@@ -1821,8 +1907,10 @@ export class ActualItemDefinitionProvider extends
       });
 
       recievedId = value.id;
+      receivedVersion = value.version;
       this.props.itemDefinitionInstance.applyValue(
         recievedId,
+        receivedVersion,
         value,
         false,
         this.props.tokenData.id,
@@ -1833,16 +1921,18 @@ export class ActualItemDefinitionProvider extends
       if (options.propertiesToCleanOnSuccess) {
         options.propertiesToCleanOnSuccess.forEach((ptc) => {
           this.props.itemDefinitionInstance
-            .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId);
+            .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId,
+              this.props.forVersion || null);
         });
       }
       if (options.policiesToCleanOnSuccess) {
         options.policiesToCleanOnSuccess.forEach((policyArray) => {
           this.props.itemDefinitionInstance
-            .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId);
+            .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId,
+              this.props.forVersion || null);
         });
       }
-      this.props.itemDefinitionInstance.triggerListeners("change", recievedId);
+      this.props.itemDefinitionInstance.triggerListeners("change", recievedId, receivedVersion);
     }
 
     // happens during an error or whatnot
@@ -1871,7 +1961,7 @@ export class ActualItemDefinitionProvider extends
       throw new Error("A by owner cache policy requires createdBy option to be set");
     }
 
-    let searchParent: [string, number] = null;
+    let searchParent: [string, number, string] = null;
     if (options.cachePolicy === "by-parent" && !options.parentedBy) {
       throw new Error("A by owner cache policy requires parentedBy option to be set");
     } else if (options.parentedBy) {
@@ -1879,7 +1969,11 @@ export class ActualItemDefinitionProvider extends
         .getParentRoot().getModuleFor(options.parentedBy.module.split("/"));
       const itemDefinitionInQuestion = moduleInQuestion.getItemDefinitionFor(
         options.parentedBy.itemDefinition.split("/"));
-      searchParent = [itemDefinitionInQuestion.getQualifiedPathName(), options.parentedBy.id];
+      searchParent = [
+        itemDefinitionInQuestion.getQualifiedPathName(),
+        options.parentedBy.id,
+        options.parentedBy.version || null,
+      ];
     }
 
     if (options.cachePolicy === "by-owner") {
@@ -1929,6 +2023,7 @@ export class ActualItemDefinitionProvider extends
       userRole: this.props.tokenData.role,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
       forId: this.props.forId,
+      forVersion: this.props.forVersion || null,
     });
 
     const searchFieldsAndArgs = getFieldsAndArgs({
@@ -1941,6 +2036,7 @@ export class ActualItemDefinitionProvider extends
       userRole: this.props.tokenData.role,
       itemDefinitionInstance: standardCounterpart,
       forId: null,
+      forVersion: null,
     });
     const requestedSearchFields = searchFieldsAndArgs.requestFields;
 
@@ -2056,6 +2152,7 @@ export class ActualItemDefinitionProvider extends
           standardCounterpartQualifiedName,
           state.searchParent[0],
           state.searchParent[1],
+          state.searchParent[2],
         );
       }
     }
@@ -2082,7 +2179,7 @@ export class ActualItemDefinitionProvider extends
       this.props.tokenData.id,
       this.props.assumeOwnership ?
         (this.props.tokenData.id || UNSPECIFIED_OWNER) :
-        this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId),
+        this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId, this.props.forVersion || null),
       {},
       false,
     );
@@ -2110,7 +2207,7 @@ export class ActualItemDefinitionProvider extends
       this.props.tokenData.id,
       this.props.assumeOwnership ?
         (this.props.tokenData.id || UNSPECIFIED_OWNER) :
-        this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId),
+        this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId, this.props.forVersion || null),
       {},
       false,
     );
@@ -2158,6 +2255,7 @@ export class ActualItemDefinitionProvider extends
           delete: this.delete,
           search: this.search,
           forId: this.props.forId || null,
+          forVersion: this.props.forVersion || null,
           dismissLoadError: this.dismissLoadError,
           dismissSubmitError: this.dismissSubmitError,
           dismissSubmitted: this.dismissSubmitted,

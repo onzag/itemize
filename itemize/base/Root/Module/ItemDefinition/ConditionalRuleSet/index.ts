@@ -203,9 +203,10 @@ export default class ConditionalRuleSet {
    * Evaluates the result of the conditional value as this current point
    * as defined by the item defintion
    * @param id the id to be used to retrieve values for properties during evaluation
+   * @param version the version used to retrieve values as well
    * @returns a boolean on whether the conditional rule set passes or not
    */
-  public evaluate(id: number): boolean {
+  public evaluate(id: number, version: string): boolean {
     // if this is a property type conditional rule set
     let result: boolean = false;
 
@@ -221,15 +222,15 @@ export default class ConditionalRuleSet {
       // if the property is this current property
       if (rawDataAsProperty.property === "&this") {
         // then the value is from it
-        actualPropertyValue = this.parentPropertyDefinition.getCurrentValue(id);
+        actualPropertyValue = this.parentPropertyDefinition.getCurrentValue(id, version);
       } else {
         // otherwise we need to find that property, either from main or extensions
         actualPropertyValue = (this.parentItemDefinition ?
           this.parentItemDefinition
             .getPropertyDefinitionFor(rawDataAsProperty.property, true)
-            .getCurrentValue(id) :
+            .getCurrentValue(id, version) :
           this.parentModule.getPropExtensionFor(rawDataAsProperty.property)
-            .getCurrentValue(id));
+            .getCurrentValue(id, version));
       }
 
       // if there is an attribute, then we use that attribute
@@ -247,9 +248,9 @@ export default class ConditionalRuleSet {
         actualComparedValue = this.parentItemDefinition ?
           this.parentItemDefinition
             .getPropertyDefinitionFor(propertyInQuestion, true)
-            .getCurrentValue(id) :
+            .getCurrentValue(id, version) :
           this.parentModule.getPropExtensionFor(propertyInQuestion)
-            .getCurrentValue(id);
+            .getCurrentValue(id, version);
       } else {
         // otherwise it's the exact value we have provided
         actualComparedValue = (rawDataAsProperty.value as IPropertyDefinitionExactPropertyValue).exactValue;
@@ -330,8 +331,8 @@ export default class ConditionalRuleSet {
       // let's check whether there is an item instance for that
       // component that are active (aka not excluded)
       const hasOneOf = rawDataAsComponent.include[0] === "#" ?
-        this.parentItemDefinition.hasAnActiveIncludeInstanceOfId(id, rawDataAsComponent.include.substr(1)) :
-        this.parentItemDefinition.hasAtLeastOneActiveInstanceOf(id, rawDataAsComponent.include);
+        this.parentItemDefinition.hasAnActiveIncludeInstanceOfId(id, version, rawDataAsComponent.include.substr(1)) :
+        this.parentItemDefinition.hasAtLeastOneActiveInstanceOf(id, version, rawDataAsComponent.include);
 
       // And compare the result against the isIncluded boolean
       result = (hasOneOf && rawDataAsComponent.isIncluded) ||
@@ -347,7 +348,7 @@ export default class ConditionalRuleSet {
       }
 
       // if we do we have to evaluate it
-      const conditionResult = this.condition.evaluate(id);
+      const conditionResult = this.condition.evaluate(id, version);
 
       // and use the gate to calculate the proper result
       switch (this.rawData.gate) {

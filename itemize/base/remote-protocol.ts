@@ -42,6 +42,10 @@ export interface IChangedFeedbackEvent {
    */
   id: number;
   /**
+   * The version of that item definition
+   */
+  version: string;
+  /**
    * The event type
    * modified: means that is has been modified, you should re-request
    * not_found: meants that the item has been deleted
@@ -71,7 +75,7 @@ interface IBaseSearchRecordsAddedEvent {
   /**
    * the new last record id
    */
-  newLastRecordId: number;
+  newLastRecord: IGQLSearchResult;
 }
 
 /**
@@ -99,6 +103,7 @@ export const PARENTED_SEARCH_RECORDS_ADDED_EVENT = "parented-search-records-adde
 export interface IParentedSearchRecordsAddedEvent extends IBaseSearchRecordsAddedEvent {
   parentType: string;
   parentId: number;
+  parentVersion: string;
 }
 
 // REQUESTS
@@ -129,6 +134,7 @@ export const REGISTER_REQUEST = "register";
 export interface IRegisterRequest {
   itemDefinition: string;
   id: number;
+  version: string;
 }
 
 /**
@@ -142,6 +148,7 @@ export const UNREGISTER_REQUEST = "unregister";
 export interface IUnregisterRequest {
   itemDefinition: string;
   id: number;
+  version: string;
 }
 
 /**
@@ -156,6 +163,7 @@ export const FEEDBACK_REQUEST = "feedback";
 export interface IFeedbackRequest {
   itemDefinition: string;
   id: number;
+  version: string;
 }
 
 /**
@@ -194,6 +202,7 @@ export const PARENTED_SEARCH_REGISTER_REQUEST = "parented-search-register";
 export interface IParentedSearchRegisterRequest extends IBaseSearchRegisterRequest {
   parentType: string;
   parentId: number;
+  parentVersion: string;
 }
 
 /**
@@ -226,6 +235,7 @@ export const PARENTED_SEARCH_UNREGISTER_REQUEST = "parented-search-unregister";
 export interface IParentedSearchUnregisterRequest extends IBaseSearchUnregisterRequest {
   parentType: string;
   parentId: number;
+  parentVersion: string;
 }
 
 /**
@@ -244,7 +254,7 @@ interface IBaseSearchFeedbackRequest {
    * since they come in order it's easy to know if
    * something has been added
    */
-  knownLastRecordId: number;
+  knownLastRecord: IGQLSearchResult;
 }
 
 /**
@@ -268,4 +278,5 @@ export const PARENTED_SEARCH_FEEDBACK_REQUEST = "parented-search-feedback";
 export interface IParentedSearchFeedbackRequest extends IBaseSearchFeedbackRequest {
   parentType: string;
   parentId: number;
+  parentVersion: string;
 }

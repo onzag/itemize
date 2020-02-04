@@ -225,6 +225,7 @@ export function getLocalizedDateTimeFormat(normalize: boolean) {
  * @param userId the id of the user
  * @param itemDefinitionInstance the item definition
  * @param forId the slot id if any
+ * @param forVersion the version if any
  */
 export function getFieldsAndArgs(
   options: {
@@ -240,6 +241,7 @@ export function getFieldsAndArgs(
     userId: number;
     itemDefinitionInstance: ItemDefinition;
     forId: number;
+    forVersion: string;
   },
 ) {
   // so the requested fields, at base, it's just nothing
@@ -269,6 +271,7 @@ export function getFieldsAndArgs(
   // is the owner, in the case of null, the applied owner is -1
   const appliedOwner = options.appliedOwner || options.itemDefinitionInstance.getAppliedValueOwnerIfAny(
     options.forId || null,
+    options.forVersion || null,
   );
 
   // Now we get all the property definitions and extensions for the item
@@ -321,10 +324,13 @@ export function getFieldsAndArgs(
     // from the applied value
     if (shouldBeIncludedInArgs && options && options.onlyIncludeArgsIfDiffersFromAppliedValue) {
       // we get the current applied value, if any
-      const currentAppliedValue = options.itemDefinitionInstance.getGQLAppliedValue(options.forId || null);
+      const currentAppliedValue = options.itemDefinitionInstance.getGQLAppliedValue(
+        options.forId || null,
+        options.forVersion || null,
+      );
       // if there is an applied value for that property
       if (currentAppliedValue && typeof currentAppliedValue.flattenedValue[pd.getId()] !== "undefined") {
-        const currentValue = pd.getCurrentValue(options.forId || null);
+        const currentValue = pd.getCurrentValue(options.forId || null, options.forVersion || null);
         // let's check if it's differ from what we have in the state
         const doesNotDifferFromAppliedValue = equals(
           currentAppliedValue.flattenedValue[pd.getId()],
@@ -338,14 +344,14 @@ export function getFieldsAndArgs(
       } else {
         // otherwise if there is no applied value, we consider the applied value
         // to be null
-        const currentValue = pd.getCurrentValue(options.forId || null);
+        const currentValue = pd.getCurrentValue(options.forId || null, options.forVersion || null);
         const doesNotDifferFromAppliedValue = currentValue === null;
         if (!doesNotDifferFromAppliedValue) {
           argumentsForQuery[pd.getId()] = currentValue;
         }
       }
     } else if (shouldBeIncludedInArgs) {
-      argumentsForQuery[pd.getId()] = pd.getCurrentValue(options.forId || null);
+      argumentsForQuery[pd.getId()] = pd.getCurrentValue(options.forId || null, options.forVersion || null);
     }
   });
 
@@ -365,7 +371,7 @@ export function getFieldsAndArgs(
       // like in search mode
       argumentsForQuery[
         include.getQualifiedExclusionStateIdentifier()
-      ] = include.getExclusionState(options.forId || null);
+      ] = include.getExclusionState(options.forId || null, options.forVersion || null);
       // we add it to the data, and we add it to the arguments
       argumentsForQuery[qualifiedId] = {};
     }
@@ -420,11 +426,12 @@ export function getFieldsAndArgs(
         options && options.onlyIncludeArgsIfDiffersFromAppliedValue
       ) {
         // we get the current applied value, if any
-        const currentAppliedValue = options.itemDefinitionInstance.getGQLAppliedValue(options.forId || null);
+        const currentAppliedValue = options.itemDefinitionInstance.getGQLAppliedValue(
+          options.forId || null, options.forVersion || null);
         // if there is an applied value for that property
         if (currentAppliedValue && currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()]) {
           const includeAppliedValue = currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()];
-          const currentValue = sp.getCurrentValue(options.forId || null);
+          const currentValue = sp.getCurrentValue(options.forId || null, options.forVersion || null);
           if (typeof includeAppliedValue[sp.getId()] !== "undefined") {
             // let's check if it's differ from what we have in the state
             const doesNotDifferFromAppliedValue = equals(
@@ -441,7 +448,8 @@ export function getFieldsAndArgs(
       } else if (
         includeShouldBeIncludedInArgs && hasRoleAccessToIncludeProperty
       ) {
-        argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(options.forId || null);
+        argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(
+          options.forId || null, options.forVersion || null);
       }
     });
 

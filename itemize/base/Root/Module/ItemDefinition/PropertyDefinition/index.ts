@@ -347,7 +347,12 @@ export type PropertyDefinitionValueType =
  * check index and autocomplete values
  */
 export type PropertyDefinitionCheckerFunctionType =
-  (property: PropertyDefinition, value: PropertyDefinitionSupportedType, id: number) => Promise<boolean>;
+  (
+    property: PropertyDefinition,
+    value: PropertyDefinitionSupportedType,
+    id: number,
+    version: string,
+  ) => Promise<boolean>;
 
 /**
  * Performs the check of an unique index property against
@@ -355,13 +360,16 @@ export type PropertyDefinitionCheckerFunctionType =
  * @param property the property in question
  * @param value the value of that property currently
  * @param id the slot id
+ * @param version the slot version
  * @returns a boolean on whether the index is right
  */
 async function clientSideIndexChecker(
   property: PropertyDefinition,
   value: PropertyDefinitionSupportedType,
   id: number,
+  version: string,
 ) {
+  const mergedID = id + "." + JSON.stringify(version);
   // null values automatically pass
   if (value === null) {
     return true;
@@ -370,10 +378,11 @@ async function clientSideIndexChecker(
   // we are using the cache, the client side has a cache because user input might
   // be changing all the time and we only want to chek changes
   if (
-    property.stateLastUniqueCheck[id] &&
-    (property.stateLastUniqueCheck[id].value === value || equals(property.stateLastUniqueCheck[id].value, value))
+    property.stateLastUniqueCheck[mergedID] &&
+    (property.stateLastUniqueCheck[mergedID].value === value ||
+      equals(property.stateLastUniqueCheck[mergedID].value, value))
   ) {
-    return property.stateLastUniqueCheck[id].valid;
+    return property.stateLastUniqueCheck[mergedID].valid;
   }
 
   // now we need the qualified name of the item definition or module
@@ -395,13 +404,14 @@ async function clientSideIndexChecker(
       body: JSON.stringify({
         value,
         id,
+        version,
       }),
     });
 
     // if we get something and it's a good json, this is a simple boolean
     const output = await result.json();
     // we store it in the property cache
-    property.stateLastUniqueCheck[id] = {
+    property.stateLastUniqueCheck[mergedID] = {
       valid: !!output,
       value,
     };
@@ -423,13 +433,17 @@ async function clientSideIndexChecker(
  * @param property the property in question
  * @param value the value the user put
  * @param id the slot id
+ * @param version the slot version
  * @returns a boolean on whether the autocomplete value is right
  */
 async function clientSideAutocompleteChecker(
   property: PropertyDefinition,
   value: PropertyDefinitionSupportedType,
   id: number,
+  version: string,
 ) {
+  const mergedID = id + "." + JSON.stringify(version);
+
   // null values are automatically true
   if (value === null) {
     return true;
@@ -437,17 +451,17 @@ async function clientSideAutocompleteChecker(
 
   // now we need the autocomplete filters according to the property
   // these are related to other properties
-  const filters = property.getAutocompletePopulatedFiltersFor(id);
+  const filters = property.getAutocompletePopulatedFiltersFor(id, version);
   // and we get the autocomplete id that is being used
   const autocompleteId = property.getAutocompleteId();
 
   // just like the index we might have a cache in place
   if (
-    property.stateLastAutocompleteCheck[id] &&
-    property.stateLastAutocompleteCheck[id].value === value &&
-    equals(property.stateLastAutocompleteCheck[id].filters, filters)
+    property.stateLastAutocompleteCheck[mergedID] &&
+    property.stateLastAutocompleteCheck[mergedID].value === value &&
+    equals(property.stateLastAutocompleteCheck[mergedID].filters, filters)
   ) {
-    return property.stateLastAutocompleteCheck[id].valid;
+    return property.stateLastAutocompleteCheck[mergedID].valid;
   }
 
   try {
@@ -471,7 +485,7 @@ async function clientSideAutocompleteChecker(
     // checked in here, the value is the the value that the user might
     // not see, so we just want to ensure that value is right
     const output = await result.json();
-    property.stateLastAutocompleteCheck[id] = {
+    property.stateLastAutocompleteCheck[mergedID] = {
       valid: !!output,
       value,
       filters,
@@ -900,18 +914,20 @@ export default class PropertyDefinition {
    * Provides the current enforced value (if any)
    * to a given slot id
    * @param id the slot id
+   * @param version the slot version
    * @returns an object that specifies whether the value is enforced, and the value itself if true
    * the value can be null
    */
-  public getEnforcedValue(id: number): {
+  public getEnforcedValue(id: number, version: string): {
     enforced: boolean;
     value?: PropertyDefinitionSupportedType;
   } {
+    const mergedID = id + "." + JSON.stringify(version);
     // first we check if there is any possibility
     // of an enforced value
     if (
       typeof this.globalSuperEnforcedValue !== "undefined" ||
-      typeof this.stateSuperEnforcedValue[id] !== "undefined" ||
+      typeof this.stateSuperEnforcedValue[mergedID] !== "undefined" ||
       // this are the compiled enforced values that are conditional
       this.enforcedValues ||
       typeof this.rawData.enforcedValue !== "undefined"
@@ -924,14 +940,14 @@ export default class PropertyDefinition {
         // superenforced might be a property definition so we got to
         // extract the value in such case
         (this.globalSuperEnforcedValue instanceof PropertyDefinition ?
-          this.globalSuperEnforcedValue.getCurrentValue(id) :
+          this.globalSuperEnforcedValue.getCurrentValue(id, version) :
           this.globalSuperEnforcedValue) :
 
         (
           // if the global super enforced value failed, we check for
           // the slotted value
-          typeof this.stateSuperEnforcedValue[id] !== "undefined" ?
-          this.stateSuperEnforcedValue[id] :
+          typeof this.stateSuperEnforcedValue[mergedID] !== "undefined" ?
+          this.stateSuperEnforcedValue[mergedID] :
 
           // otherwise in other cases we check the enforced value
           // which has priority
@@ -940,7 +956,7 @@ export default class PropertyDefinition {
             // otherwise we go to for evaluating the enforced values
             // or give undefined if nothing is found
             (this.enforcedValues.find((ev) => {
-              return ev.if.evaluate(id);
+              return ev.if.evaluate(id, version);
             }) || {value: undefined}).value)
         );
 
@@ -961,12 +977,14 @@ export default class PropertyDefinition {
 
   /**
    * checks if it's currently hidden (not phantom)
+   * @param id the id
+   * @param version the version
    * @returns a boolean
    */
-  public isCurrentlyHidden(id: number) {
+  public isCurrentlyHidden(id: number, version: string) {
     return this.rawData.hidden ||
-      (this.rawData.hiddenIfEnforced ? this.getEnforcedValue(id).enforced : false) ||
-      (this.hiddenIf && this.hiddenIf.evaluate(id)) || false;
+      (this.rawData.hiddenIfEnforced ? this.getEnforcedValue(id, version).enforced : false) ||
+      (this.hiddenIf && this.hiddenIf.evaluate(id, version)) || false;
   }
 
   /**
@@ -1021,11 +1039,12 @@ export default class PropertyDefinition {
    * Provides the current value of a property (as it is)
    * for a given slot id
    * @param id the slot id
+   * @param verson the slot version
    * @returns the current value
    */
-  public getCurrentValue(id: number): PropertyDefinitionSupportedType {
+  public getCurrentValue(id: number, version: string): PropertyDefinitionSupportedType {
     // first we check for a possible enforced value
-    const possibleEnforcedValue = this.getEnforcedValue(id);
+    const possibleEnforcedValue = this.getEnforcedValue(id, version);
 
     // if we have one
     if (possibleEnforcedValue.enforced) {
@@ -1034,24 +1053,26 @@ export default class PropertyDefinition {
     }
 
     // if it's null if hidden and it's hidden
-    if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id)) {
+    if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id, version)) {
       return null;
     }
 
+    const mergedID = id + "." + JSON.stringify(version);
+
     // if it has not been modified, we might return a default value
-    if (!this.stateValueModified[id]) {
+    if (!this.stateValueModified[mergedID]) {
       // lets find the default value, first the super default
       // and we of course extract it in case of property definition
       // or otherwise use the default, which might be undefined
       let defaultValue = typeof this.globalSuperDefaultedValue !== "undefined" ?
         (this.globalSuperDefaultedValue instanceof PropertyDefinition ?
-          this.globalSuperDefaultedValue.getCurrentValue(id) :
+          this.globalSuperDefaultedValue.getCurrentValue(id, version) :
           this.globalSuperDefaultedValue) : this.rawData.default;
 
       // Also by condition
       if (this.defaultIf && typeof this.globalSuperDefaultedValue === "undefined") {
         // find a rule that passes
-        const rulePasses = this.defaultIf.find((difRule) => difRule.if.evaluate(id));
+        const rulePasses = this.defaultIf.find((difRule) => difRule.if.evaluate(id, version));
         if (rulePasses) {
           // and set the default value to such
           defaultValue = rulePasses.value;
@@ -1062,7 +1083,7 @@ export default class PropertyDefinition {
     }
 
     // if nothing apply we return the state value or null
-    return nullIfUndefined(this.stateValue[id]);
+    return nullIfUndefined(this.stateValue[mergedID]);
   }
 
   /**
@@ -1070,14 +1091,20 @@ export default class PropertyDefinition {
    * any external checking, pass the id still as a cache of previously external
    * checked results might apply
    * @param id the id of the current item definition as stored, pass null if not stored
+   * @param version the slot version
    * @returns the current value state
    */
-  public getStateNoExternalChecking(id: number, emulateExternalChecking?: boolean): IPropertyDefinitionState {
-    const possibleEnforcedValue = this.getEnforcedValue(id);
+  public getStateNoExternalChecking(
+    id: number,
+    version: string,
+    emulateExternalChecking?: boolean,
+  ): IPropertyDefinitionState {
+    const possibleEnforcedValue = this.getEnforcedValue(id, version);
+    const mergedID = id + "." + JSON.stringify(version);
 
     if (possibleEnforcedValue.enforced) {
       const possibleInvalidEnforcedReason = this.isValidValueNoExternalChecking(
-        id, possibleEnforcedValue.value, emulateExternalChecking,
+        id, version, possibleEnforcedValue.value, emulateExternalChecking,
       );
       // we return the value that was set to be
       return {
@@ -1087,18 +1114,18 @@ export default class PropertyDefinition {
         valid: !possibleInvalidEnforcedReason,
         invalidReason: possibleInvalidEnforcedReason,
         value: possibleEnforcedValue.value,
-        hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id),
+        hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id, version),
         internalValue: null,
-        stateValue: nullIfUndefined(this.stateValue[id]),
-        stateValueModified: this.stateValueModified[id] || false,
-        stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[id] || false,
+        stateValue: nullIfUndefined(this.stateValue[mergedID]),
+        stateValueModified: this.stateValueModified[mergedID] || false,
+        stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
         propertyId: this.getId(),
       };
     }
 
     // make if hidden if null if hidden is set to true
     // note nulls set this way are always valid
-    if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id)) {
+    if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id, version)) {
       return {
         userSet: false,
         enforced: true,
@@ -1108,27 +1135,27 @@ export default class PropertyDefinition {
         value: null,
         hidden: true,
         internalValue: null,
-        stateValue: nullIfUndefined(this.stateValue[id]),
-        stateValueModified: this.stateValueModified[id] || false,
-        stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[id] || false,
+        stateValue: nullIfUndefined(this.stateValue[mergedID]),
+        stateValueModified: this.stateValueModified[mergedID] || false,
+        stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
         propertyId: this.getId(),
       };
     }
 
-    const value = this.getCurrentValue(id);
-    const invalidReason = this.isValidValueNoExternalChecking(id, value, emulateExternalChecking);
+    const value = this.getCurrentValue(id, version);
+    const invalidReason = this.isValidValueNoExternalChecking(id, version, value, emulateExternalChecking);
     return {
-      userSet: this.stateValueModified[id] || false,
+      userSet: this.stateValueModified[mergedID] || false,
       enforced: false,
-      default: !this.stateValueModified[id],
+      default: !this.stateValueModified[mergedID],
       valid: !invalidReason,
       invalidReason,
       value,
-      hidden: this.isCurrentlyHidden(id),
-      internalValue: this.stateValueModified[id] ? this.stateInternalValue[id] : null,
-      stateValue: nullIfUndefined(this.stateValue[id]),
-      stateValueModified: this.stateValueModified[id] || false,
-      stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[id] || false,
+      hidden: this.isCurrentlyHidden(id, version),
+      internalValue: this.stateValueModified[mergedID] ? this.stateInternalValue[mergedID] : null,
+      stateValue: nullIfUndefined(this.stateValue[mergedID]),
+      stateValueModified: this.stateValueModified[mergedID] || false,
+      stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
       propertyId: this.getId(),
     };
   }
@@ -1137,14 +1164,16 @@ export default class PropertyDefinition {
    * provides the current useful value for the property defintion
    * @param id the id of the current item definition as stored, pass null if not stored
    * this also represents the slot
+   * @param version the version
    * @returns a promise for the current value state
    */
-  public async getState(id: number): Promise<IPropertyDefinitionState> {
+  public async getState(id: number, version: string): Promise<IPropertyDefinitionState> {
 
-    const possibleEnforcedValue = this.getEnforcedValue(id);
+    const possibleEnforcedValue = this.getEnforcedValue(id, version);
+    const mergedID = id + "." + JSON.stringify(version);
 
     if (possibleEnforcedValue.enforced) {
-      const possibleInvalidEnforcedReason = await this.isValidValue(id, possibleEnforcedValue.value);
+      const possibleInvalidEnforcedReason = await this.isValidValue(id, version, possibleEnforcedValue.value);
       // we return the value that was set to be
       return {
         userSet: false,
@@ -1153,18 +1182,18 @@ export default class PropertyDefinition {
         valid: !possibleInvalidEnforcedReason,
         invalidReason: possibleInvalidEnforcedReason,
         value: possibleEnforcedValue.value,
-        hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id),
+        hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id, version),
         internalValue: null,
-        stateValue: nullIfUndefined(this.stateValue[id]),
-        stateValueModified: this.stateValueModified[id] || false,
-        stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[id] || false,
+        stateValue: nullIfUndefined(this.stateValue[mergedID]),
+        stateValueModified: this.stateValueModified[mergedID] || false,
+        stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
         propertyId: this.getId(),
       };
     }
 
     // make if hidden if null if hidden is set to true
     // note nulls set this way are always valid
-    if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id)) {
+    if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id, version)) {
       return {
         userSet: false,
         enforced: true,
@@ -1174,27 +1203,27 @@ export default class PropertyDefinition {
         value: null,
         hidden: true,
         internalValue: null,
-        stateValue: nullIfUndefined(this.stateValue[id]),
-        stateValueModified: this.stateValueModified[id] || false,
-        stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[id] || false,
+        stateValue: nullIfUndefined(this.stateValue[mergedID]),
+        stateValueModified: this.stateValueModified[mergedID] || false,
+        stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
         propertyId: this.getId(),
       };
     }
 
-    const value = this.getCurrentValue(id);
-    const invalidReason = await this.isValidValue(id, value);
+    const value = this.getCurrentValue(id, version);
+    const invalidReason = await this.isValidValue(id, version, value);
     return {
-      userSet: this.stateValueModified[id] || false,
+      userSet: this.stateValueModified[mergedID] || false,
       enforced: false,
-      default: !this.stateValueModified[id],
+      default: !this.stateValueModified[mergedID],
       valid: !invalidReason,
       invalidReason,
       value,
-      hidden: this.isCurrentlyHidden(id),
-      internalValue: this.stateValueModified[id] ? this.stateInternalValue[id] : null,
-      stateValue: nullIfUndefined(this.stateValue[id]),
-      stateValueModified: this.stateValueModified[id] || false,
-      stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[id] || false,
+      hidden: this.isCurrentlyHidden(id, version),
+      internalValue: this.stateValueModified[mergedID] ? this.stateInternalValue[mergedID] : null,
+      stateValue: nullIfUndefined(this.stateValue[mergedID]),
+      stateValueModified: this.stateValueModified[mergedID] || false,
+      stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
       propertyId: this.getId(),
     };
   }
@@ -1231,10 +1260,12 @@ export default class PropertyDefinition {
    * Sets a super enforced value to a given property in a given
    * slot id, note a super enforced value won't override the global
    * @param id the slot id
+   * @param version the slot version
    * @param value the value that has tobe super enforced
    */
   public setSuperEnforced(
     id: number,
+    version: string,
     value: PropertyDefinitionSupportedType,
   ) {
     // let's get the definition
@@ -1252,17 +1283,21 @@ export default class PropertyDefinition {
       }
     }
 
-    this.stateSuperEnforcedValue[id] = actualValue;
+    const mergedID = id + "." + JSON.stringify(version);
+    this.stateSuperEnforcedValue[mergedID] = actualValue;
   }
 
   /**
    * Clears a super enforced value set in a slot id
    * @param id the slot id
+   * @param version the slot version
    */
   public clearSuperEnforced(
     id: number,
+    version: string,
   ) {
-    delete this.stateSuperEnforcedValue[id];
+    const mergedID = id + "." + JSON.stringify(version);
+    delete this.stateSuperEnforcedValue[mergedID];
   }
 
   /**
@@ -1301,10 +1336,14 @@ export default class PropertyDefinition {
    * value it will be converted to null
    *
    * @throws an error if the value is invalid by definition
-   * @param  newValue the new value
+   * @param id the slot d
+   * @param version the slot version
+   * @param newValue the new value
+   * @param internalValue the internal value
    */
   public setCurrentValue(
     id: number,
+    version: string,
     newValue: PropertyDefinitionSupportedType,
     internalValue: any,
   ) {
@@ -1323,11 +1362,12 @@ export default class PropertyDefinition {
       }
     }
 
+    const mergedID = id + "." + JSON.stringify(version);
     // note that the value is set and never check
-    this.stateValue[id] = newActualValue;
-    this.stateValueModified[id] = true;
-    this.stateValueHasBeenManuallySet[id] = true;
-    this.stateInternalValue[id] = internalValue;
+    this.stateValue[mergedID] = newActualValue;
+    this.stateValueModified[mergedID] = true;
+    this.stateValueHasBeenManuallySet[mergedID] = true;
+    this.stateInternalValue[mergedID] = internalValue;
   }
 
   // TODO add undo function, canUndo and add the gql applied value
@@ -1337,6 +1377,7 @@ export default class PropertyDefinition {
    * this is intended to be used for when values are loaded
    * into this, and not meant for user input
    * @param id the id of the slot
+   * @param version the slot version
    * @param value the value
    * @param modifiedState a modified state to use
    * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet to avoid hot updating
@@ -1345,6 +1386,7 @@ export default class PropertyDefinition {
    */
   public applyValue(
     id: number,
+    version: string,
     value: any,
     modifiedState: boolean,
     doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
@@ -1353,28 +1395,32 @@ export default class PropertyDefinition {
     // is false, then we don't care and apply the value
     // however if it's true, we need to check the manually set variable
     // in order to know where the value comes from
+    const mergedID = id + "." + JSON.stringify(version);
     if (
       !doNotApplyValueInPropertyIfPropertyHasBeenManuallySet ||
-      !this.stateValueHasBeenManuallySet[id]
+      !this.stateValueHasBeenManuallySet[mergedID]
     ) {
-      this.stateValue[id] = value;
-      this.stateValueModified[id] = modifiedState;
-      this.stateInternalValue[id] = null;
+      this.stateValue[mergedID] = value;
+      this.stateValueModified[mergedID] = modifiedState;
+      this.stateInternalValue[mergedID] = null;
     }
   }
 
   /**
    * Frees the memory of stored values in a given slot id
    * @param id the slot id
+   * @param version the slot version
    */
   public cleanValueFor(
     id: number,
+    version: string,
   ) {
-    delete this.stateValue[id];
-    delete this.stateValueModified[id];
-    delete this.stateInternalValue[id];
-    delete this.stateValueHasBeenManuallySet[id];
-    delete this.stateSuperEnforcedValue[id];
+    const mergedID = id + "." + JSON.stringify(version);
+    delete this.stateValue[mergedID];
+    delete this.stateValueModified[mergedID];
+    delete this.stateInternalValue[mergedID];
+    delete this.stateValueHasBeenManuallySet[mergedID];
+    delete this.stateSuperEnforcedValue[mergedID];
   }
 
   /**
@@ -1384,10 +1430,12 @@ export default class PropertyDefinition {
    *
    * @param value the value to check
    * @param id the id of the item as stored (pass null if new)
+   * @param version the slot version
    * @returns the invalid reason as a string
    */
   public isValidValueNoExternalChecking(
     id: number,
+    version: string,
     value: PropertyDefinitionSupportedType,
     emulateExternalChecking?: boolean,
   ): PropertyInvalidReason | string {
@@ -1404,14 +1452,16 @@ export default class PropertyDefinition {
 
     // Cache check from the emulation of external checks
     if (emulateExternalChecking) {
+      const mergedID = id + "." + JSON.stringify(version);
       // check if it has an index
       const hasIndex = this.isUnique();
       // checking the cache for that index
       if (hasIndex) {
         if (
-          this.stateLastUniqueCheck[id] &&
-          (this.stateLastUniqueCheck[id].value === value || equals(this.stateLastUniqueCheck[id].value, value)) &&
-          !this.stateLastUniqueCheck[id].valid
+          this.stateLastUniqueCheck[mergedID] &&
+          (this.stateLastUniqueCheck[mergedID].value === value ||
+            equals(this.stateLastUniqueCheck[mergedID].value, value)) &&
+          !this.stateLastUniqueCheck[mergedID].valid
         ) {
           // if the cache specifies that it's invalid
           return PropertyInvalidReason.NOT_UNIQUE;
@@ -1421,11 +1471,11 @@ export default class PropertyDefinition {
       // check if there's an autocomplete and it is enforced
       if (this.hasAutocomplete() && this.isAutocompleteEnforced()) {
         // now we check the cache
-        const filters = this.getAutocompletePopulatedFiltersFor(id);
+        const filters = this.getAutocompletePopulatedFiltersFor(id, version);
         if (
-          this.stateLastAutocompleteCheck[id] &&
-          this.stateLastAutocompleteCheck[id].value === value &&
-          equals(this.stateLastAutocompleteCheck[id].filters, filters)
+          this.stateLastAutocompleteCheck[mergedID] &&
+          this.stateLastAutocompleteCheck[mergedID].value === value &&
+          equals(this.stateLastAutocompleteCheck[mergedID].filters, filters)
         ) {
           // if it specifies that it's invalid
           return PropertyInvalidReason.INVALID_VALUE;
@@ -1438,7 +1488,7 @@ export default class PropertyDefinition {
     // if we have invalid if conditions
     if (this.invalidIf) {
       // we run all of them
-      const invalidMatch = this.invalidIf.find((ii) => ii.if.evaluate(id));
+      const invalidMatch = this.invalidIf.find((ii) => ii.if.evaluate(id, version));
       // if one matches we give an error
       if (invalidMatch) {
         return invalidMatch.error;
@@ -1455,17 +1505,19 @@ export default class PropertyDefinition {
    *
    * @param value the value to check
    * @param id the id of the item as stored (pass null if new)
+   * @param version the slot version
    * @returns the invalid reason as a string
    */
   public async isValidValue(
     id: number,
+    version: string,
     value: PropertyDefinitionSupportedType,
   ): Promise<PropertyInvalidReason | string> {
     // first we just run the standard without external checking, note how we are
     // avoiding external checking emulation, the static index checker functions
     // also access the cache so it is unecessary, even when it wouldn't hurt
     // to add the emulation as well, it's just wasted memory processing
-    const standardErrOutput = this.isValidValueNoExternalChecking(id, value);
+    const standardErrOutput = this.isValidValueNoExternalChecking(id, version, value);
 
     // if we get an error
     if (standardErrOutput) {
@@ -1476,7 +1528,7 @@ export default class PropertyDefinition {
     // if we have an index
     const hasIndex = this.isUnique();
     if (hasIndex) {
-      const isValidIndex = await PropertyDefinition.indexChecker(this, value, id);
+      const isValidIndex = await PropertyDefinition.indexChecker(this, value, id, version);
       if (!isValidIndex) {
         return PropertyInvalidReason.NOT_UNIQUE;
       }
@@ -1484,7 +1536,7 @@ export default class PropertyDefinition {
 
     // or autocomplete
     if (this.hasAutocomplete() && this.isAutocompleteEnforced()) {
-      const isValidAutocomplete = await PropertyDefinition.autocompleteChecker(this, value, id);
+      const isValidAutocomplete = await PropertyDefinition.autocompleteChecker(this, value, id, version);
       if (!isValidAutocomplete) {
         return PropertyInvalidReason.INVALID_VALUE;
       }
@@ -1623,9 +1675,10 @@ export default class PropertyDefinition {
    * for the autocomplete to be used, that is a list of property whose values
    * are meant to be passed in order to filter
    * @param id the slot id where to extract the property values
+   * @param version the slot version
    * @returns the filter that is to be sent to the autocomplete query
    */
-  public getAutocompletePopulatedFiltersFor(id: number): ISingleFilterRawJSONDataType {
+  public getAutocompletePopulatedFiltersFor(id: number, version: string): ISingleFilterRawJSONDataType {
     // if there's nothing specified to populate the filters
     if (!this.rawData.autocompleteFilterFromProperty) {
       // the filter is null
@@ -1638,7 +1691,7 @@ export default class PropertyDefinition {
     Object.keys(this.rawData.autocompleteFilterFromProperty).forEach((key) => {
       // and we add it, also considering prop extensions
       result[key] = this.parentItemDefinition
-        .getPropertyDefinitionFor(this.rawData.autocompleteFilterFromProperty[key], true).getCurrentValue(id);
+        .getPropertyDefinitionFor(this.rawData.autocompleteFilterFromProperty[key], true).getCurrentValue(id, version);
     });
 
     // return it

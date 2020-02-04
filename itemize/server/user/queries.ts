@@ -1,7 +1,11 @@
 import { IAppDataType } from "..";
 import { IGQLQueryFieldsDefinitionType } from "../../../itemize/base/Root/gql";
 import { GraphQLString } from "graphql";
-import { CONNECTOR_SQL_COLUMN_FK_NAME, ENDPOINT_ERRORS } from "../../constants";
+import {
+  CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+  CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+  ENDPOINT_ERRORS,
+} from "../../constants";
 import { jwtVerify, jwtSign } from "../token";
 import { EndpointError } from "../../../itemize/base/errors";
 import { IServerSideTokenDataType } from "../resolvers/basic";
@@ -52,7 +56,8 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           "role",
           "blocked_at",
         ).from(moduleTable).join(userTable, (clause) => {
-          clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
+          clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
+          clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
         });
         let failureToGetUserIsCredentials = false;
         let preGeneratedToken: string = null;
@@ -95,6 +100,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             userTable,
             moduleTable,
             decodedId,
+            null,
           );
         } else {
           resultUserFromSQLQuery = await resultUserQuery;

@@ -244,6 +244,10 @@ export interface IItemDefinitionStateType {
    * The id that was used
    */
   forId: number;
+  /**
+   * The version that was used
+   */
+  forVersion: string;
 }
 
 /**
@@ -458,7 +462,7 @@ export default class ItemDefinition {
    */
   private listeners: {
     [event: string]: {
-      [id: number]: ListenerType[],
+      [mergedID: string]: ListenerType[],
     },
   };
   /**
@@ -471,13 +475,13 @@ export default class ItemDefinition {
    * Containst state information about applied values to slots
    */
   private stateHasAppliedValueTo: {
-    [id: number]: boolean,
+    [mergedID: string]: boolean,
   };
   /**
    * Contains the information about the specific applied value to an slot
    */
   private stateGQLAppliedValue: {
-    [id: number]: IItemDefinitionGQLValueType;
+    [mergedID: string]: IItemDefinitionGQLValueType;
   };
 
   /**
@@ -851,10 +855,11 @@ export default class ItemDefinition {
    * that means the item is not excluded and the item is
    * matches the name
    * @param id the id of the current state
+   * @param version the version of the current state
    * @param name the name of the item
    * @returns a boolean
    */
-  public hasAtLeastOneActiveInstanceOf(id: number, name: string): boolean {
+  public hasAtLeastOneActiveInstanceOf(id: number, version: string, name: string): boolean {
     // we need a list of possible candidates
     // the might currently contain checks if an include
     // contains the include with the given name
@@ -867,17 +872,18 @@ export default class ItemDefinition {
       return false;
     }
 
-    return possibleCandidates.some((c) => c.getExclusionState(id) !== IncludeExclusionState.EXCLUDED);
+    return possibleCandidates.some((c) => c.getExclusionState(id, version) !== IncludeExclusionState.EXCLUDED);
   }
 
   /**
    * Checks whether it has an active instance of an item
    * given its include id (not its name)
    * @param id the slot id
+   * @param version the slot version
    * @param includeId the id of the item
    * @returns a boolean on whether it does
    */
-  public hasAnActiveIncludeInstanceOfId(id: number, includeId: string): boolean {
+  public hasAnActiveIncludeInstanceOfId(id: number, version: string, includeId: string): boolean {
     const candidate = this.includeInstances
       .find((i) => i.getId() === includeId);
 
@@ -885,7 +891,7 @@ export default class ItemDefinition {
       return false;
     }
 
-    return candidate.getExclusionState(id) !== IncludeExclusionState.EXCLUDED;
+    return candidate.getExclusionState(id, version) !== IncludeExclusionState.EXCLUDED;
   }
 
   /**
@@ -976,6 +982,7 @@ export default class ItemDefinition {
    * autocomplete checkings; note that you should still pass id
    * in order to get cached previously checked results
    * @param id the stored value of the item definition, pass null if new
+   * @param version the store value of the version, only applies if id specified
    * @param emulateExternalChecking emulates an externally checked
    * property as the get current value async leaves a cache behind
    * and this will use the cache rather than re-requesting
@@ -988,6 +995,7 @@ export default class ItemDefinition {
    */
   public getStateNoExternalChecking(
     id: number,
+    version: string,
     emulateExternalChecking?: boolean,
     onlyIncludeProperties?: string[],
     onlyIncludeIncludes?: string[],
@@ -995,11 +1003,11 @@ export default class ItemDefinition {
   ): IItemDefinitionStateType {
     const properties = onlyIncludeProperties ?
       onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, true)
-        .getStateNoExternalChecking(id, emulateExternalChecking)) :
+        .getStateNoExternalChecking(id, version, emulateExternalChecking)) :
       this.getParentModule().getAllPropExtensions().concat(
         this.getAllPropertyDefinitions(),
       ).map((pd) => {
-        return pd.getStateNoExternalChecking(id, emulateExternalChecking);
+        return pd.getStateNoExternalChecking(id, version, emulateExternalChecking);
       });
 
     let policies: IPoliciesStateType = null;
@@ -1011,7 +1019,7 @@ export default class ItemDefinition {
           Object.keys(this.policyPropertyDefinitions[policyType]).map((policyName) => {
             policies[policyType][policyName] =
               this.getPropertiesForPolicy(policyType, policyName)
-              .map((pd) => pd.getStateNoExternalChecking(id, emulateExternalChecking));
+              .map((pd) => pd.getStateNoExternalChecking(id, version, emulateExternalChecking));
           });
         }
       });
@@ -1020,13 +1028,13 @@ export default class ItemDefinition {
     let includes: IIncludeState[];
     if (onlyIncludeIncludes) {
       includes = onlyIncludeIncludes.map((ii) =>
-        this.getIncludeFor(ii).getStateNoExternalChecking(id, emulateExternalChecking));
+        this.getIncludeFor(ii).getStateNoExternalChecking(id, version, emulateExternalChecking));
     } else {
       includes = this.includeInstances.map((ii) =>
-        ii.getStateNoExternalChecking(id, emulateExternalChecking));
+        ii.getStateNoExternalChecking(id, version, emulateExternalChecking));
     }
 
-    const gqlOriginal = this.getGQLAppliedValue(id);
+    const gqlOriginal = this.getGQLAppliedValue(id, version);
     return {
       moduleName: this.getModuleName(),
       itemDefQualifiedName: this.getQualifiedPathName(),
@@ -1036,6 +1044,7 @@ export default class ItemDefinition {
       policies,
       gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
       forId: id,
+      forVersion: version,
     };
   }
 
@@ -1047,6 +1056,7 @@ export default class ItemDefinition {
    * efficient than calling the functions
    * @param id the stored value of the item definition, pass null if new
    * this also represens the slot
+   * @param version the stored value given a version pass null for default
    * @param onlyIncludeProperties only includes these specific
    * properties, note property definitions are not fetched in
    * this case
@@ -1056,16 +1066,17 @@ export default class ItemDefinition {
    */
   public async getState(
     id: number,
+    version: string,
     onlyIncludeProperties?: string[],
     onlyIncludeIncludes?: string[],
     excludePolicies?: boolean,
   ): Promise<IItemDefinitionStateType> {
     const properties = await Promise.all(onlyIncludeProperties ?
-      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, true).getState(id)) :
+      onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, true).getState(id, version)) :
       this.getParentModule().getAllPropExtensions().concat(
         this.getAllPropertyDefinitions(),
       ).map((pd) => {
-        return pd.getState(id);
+        return pd.getState(id, version);
       }),
     );
 
@@ -1077,7 +1088,8 @@ export default class ItemDefinition {
           policies[policyType] = {};
           await Promise.all(Object.keys(this.policyPropertyDefinitions[policyType]).map(async (policyName) => {
             policies[policyType][policyName] =
-              await Promise.all(this.getPropertiesForPolicy(policyType, policyName).map((pd) => pd.getState(id)));
+              await Promise.all(this.getPropertiesForPolicy(policyType, policyName)
+                .map((pd) => pd.getState(id, version)));
           }));
         }
       }));
@@ -1085,12 +1097,12 @@ export default class ItemDefinition {
 
     let includes: IIncludeState[];
     if (onlyIncludeIncludes) {
-      includes = await Promise.all(onlyIncludeIncludes.map((ii) => this.getIncludeFor(ii).getState(id)));
+      includes = await Promise.all(onlyIncludeIncludes.map((ii) => this.getIncludeFor(ii).getState(id, version)));
     } else {
-      includes = await Promise.all(this.includeInstances.map((ii: Include) => ii.getState(id)));
+      includes = await Promise.all(this.includeInstances.map((ii: Include) => ii.getState(id, version)));
     }
 
-    const gqlOriginal = this.getGQLAppliedValue(id);
+    const gqlOriginal = this.getGQLAppliedValue(id, version);
     return {
       moduleName: this.getModuleName(),
       itemDefQualifiedName: this.getQualifiedPathName(),
@@ -1100,12 +1112,14 @@ export default class ItemDefinition {
       policies,
       gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
       forId: id,
+      forVersion: version,
     };
   }
 
   /**
    * Applies a value from graphql to the item definition state
    * @param id the id that this state is for (can be null)
+   * @param version the version of this state is for (can be null)
    * @param value the value itself from graphql, DATA values and flattened values are valid.
    * @param excludeExtensions whether to exclude the extensions for applying the value
    * @param graphqlRoleRequester the role that requested this data (can be null)
@@ -1118,6 +1132,7 @@ export default class ItemDefinition {
    */
   public applyValue(
     id: number,
+    version: string,
     value: IGQLValue,
     excludeExtensions: boolean,
     graphqlUserIdRequester: number,
@@ -1127,10 +1142,11 @@ export default class ItemDefinition {
   ) {
     // first we flatten the value if necessary
     const flattenedValue = typeof value.DATA !== "undefined" ? flattenRawGQLValueOrFields(value) : value;
+    const mergedID = id + "." + JSON.stringify(version);
     // we make it we have an applied value
-    this.stateHasAppliedValueTo[id] = true;
+    this.stateHasAppliedValueTo[mergedID] = true;
     // and set all the data regarding that value
-    this.stateGQLAppliedValue[id] = {
+    this.stateGQLAppliedValue[mergedID] = {
       userIdRequester: graphqlUserIdRequester,
       roleRequester: graphqlRoleRequester,
       rawValue: value,
@@ -1158,7 +1174,8 @@ export default class ItemDefinition {
         givenValue = null;
       }
       // and we apply such value
-      property.applyValue(id, givenValue, setAsModified, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
+      property.applyValue(id, version, givenValue,
+        setAsModified, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
     });
 
     // now we get all the items
@@ -1173,7 +1190,8 @@ export default class ItemDefinition {
         flattenedValue[include.getQualifiedExclusionStateIdentifier()] || IncludeExclusionState.EXCLUDED;
 
       // and we apply such value
-      include.applyValue(id, givenValue, givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
+      include.applyValue(id, version, givenValue,
+        givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
     });
   }
 
@@ -1182,21 +1200,23 @@ export default class ItemDefinition {
    * applied value, basically the created_by value
    * (or id if owner is object id, which is only relevant for users honestly)
    * @param id the id of the state
+   * @param version the version of the slot
    * @returns a number, will return UNSPECIFIED_OWNER if it cannot find anything
    */
-  public getAppliedValueOwnerIfAny(id: number): number {
+  public getAppliedValueOwnerIfAny(id: number, version: string): number {
+    const mergedID = id + "." + JSON.stringify(version);
     if (
-      !this.stateHasAppliedValueTo[id] ||
-      !this.stateGQLAppliedValue[id] ||
-      !this.stateGQLAppliedValue[id].flattenedValue
+      !this.stateHasAppliedValueTo[mergedID] ||
+      !this.stateGQLAppliedValue[mergedID] ||
+      !this.stateGQLAppliedValue[mergedID].flattenedValue
     ) {
       return UNSPECIFIED_OWNER;
     }
 
     if (this.isOwnerObjectId()) {
-      return (this.stateGQLAppliedValue[id].flattenedValue.id || UNSPECIFIED_OWNER) as number;
+      return (this.stateGQLAppliedValue[mergedID].flattenedValue.id || UNSPECIFIED_OWNER) as number;
     }
-    return (this.stateGQLAppliedValue[id].flattenedValue.created_by || UNSPECIFIED_OWNER) as number;
+    return (this.stateGQLAppliedValue[mergedID].flattenedValue.created_by || UNSPECIFIED_OWNER) as number;
   }
 
   /**
@@ -1204,12 +1224,14 @@ export default class ItemDefinition {
    * this might not be important in the client side but very important
    * in the server side, not cleaning the memory can become a memory leak
    * @param id the id of the state
+   * @param version the version of the state
    * @param excludeExtensions whether to include the extensions of the parent
    */
-  public cleanValueFor(id: number, excludeExtensions?: boolean) {
+  public cleanValueFor(id: number, version: string, excludeExtensions?: boolean) {
     // delete all from memory
-    delete this.stateHasAppliedValueTo[id];
-    delete this.stateGQLAppliedValue[id];
+    const mergedID = id + "." + JSON.stringify(version);
+    delete this.stateHasAppliedValueTo[mergedID];
+    delete this.stateGQLAppliedValue[mergedID];
 
     // gather the properties
     const properties =
@@ -1219,11 +1241,11 @@ export default class ItemDefinition {
 
     // and wipe them
     properties.forEach((property) => {
-      property.cleanValueFor(id);
+      property.cleanValueFor(id, version);
     });
     // also the includes
     this.getAllIncludes().forEach((include) => {
-      include.cleanValueFor(id);
+      include.cleanValueFor(id, version);
     });
   }
 
@@ -1231,19 +1253,23 @@ export default class ItemDefinition {
    * Checks whether given the state id, there is an applied
    * value for it
    * @param id the id
+   * @param version the version
    * @returns a boolean on whether it does or not
    */
-  public hasAppliedValueTo(id: number): boolean {
-    return this.stateHasAppliedValueTo[id];
+  public hasAppliedValueTo(id: number, version: string): boolean {
+    const mergedID = id + "." + JSON.stringify(version);
+    return this.stateHasAppliedValueTo[mergedID];
   }
 
   /**
    * Provides the applied value for the id
    * @param id the id
+   * @param version the version
    * @returns the applied value structure
    */
-  public getGQLAppliedValue(id: number): IItemDefinitionGQLValueType {
-    return this.stateGQLAppliedValue[id] || null;
+  public getGQLAppliedValue(id: number, version: string): IItemDefinitionGQLValueType {
+    const mergedID = id + "." + JSON.stringify(version);
+    return this.stateGQLAppliedValue[mergedID] || null;
   }
 
   /**
@@ -1676,29 +1702,33 @@ export default class ItemDefinition {
    * Adds a listener for an string event and id
    * @param event the event string
    * @param id the id
+   * @param version the version
    * @param listener the listener
    */
-  public addListener(event: string, id: number, listener: ListenerType) {
+  public addListener(event: string, id: number, version: string, listener: ListenerType) {
+    const mergedID = id + "." + JSON.stringify(version);
     if (!this.listeners[event]) {
       this.listeners[event] = {};
     }
-    this.listeners[event][id] = this.listeners[event][id] || [];
-    this.listeners[event][id].push(listener);
+    this.listeners[event][mergedID] = this.listeners[event][mergedID] || [];
+    this.listeners[event][mergedID].push(listener);
   }
 
   /**
    * Removes a listener
    * @param event the event string
    * @param id the id
+   * @param version the version
    * @param listener the listener
    */
-  public removeListener(event: string, id: number, listener: ListenerType) {
-    if (!this.listeners[event] || !this.listeners[event][id]) {
+  public removeListener(event: string, id: number, version: string, listener: ListenerType) {
+    const mergedID = id + "." + JSON.stringify(version);
+    if (!this.listeners[event] || !this.listeners[event][mergedID]) {
       return;
     }
-    const index = this.listeners[event][id].indexOf(listener);
+    const index = this.listeners[event][mergedID].indexOf(listener);
     if (index !== -1) {
-      this.listeners[event][id].splice(index, 1);
+      this.listeners[event][mergedID].splice(index, 1);
     }
   }
 
@@ -1708,25 +1738,29 @@ export default class ItemDefinition {
    * their states are correlated
    * @param event the event
    * @param id the id
+   * @param version the version
    * @param but a function not to trigger (one of the listeners)
    * @param callId a call id, it's an unique identifier for this event, it will be autogenerated if not provided
    * and it's the best to leave it be autogenerated
    */
-  public triggerListeners(event: string, id: number, but?: ListenerType, callId?: string) {
+  public triggerListeners(event: string, id: number, version: string, but?: ListenerType, callId?: string) {
     if (this.lastListenerCallId !== callId) {
       this.lastListenerCallId = callId || uuid.v4();
       if (this.extensionsInstance) {
         this.parentModule.getAllChildItemDefinitions().forEach((cd) => {
-          cd.triggerListeners(event, id, but, this.lastListenerCallId);
+          cd.triggerListeners(event, id, version, but, this.lastListenerCallId);
         });
       } else {
-        this.parentModule.getPropExtensionItemDefinition().triggerListeners(event, id, but, this.lastListenerCallId);
+        this.parentModule.getPropExtensionItemDefinition().triggerListeners(
+          event, id, version, but, this.lastListenerCallId,
+        );
       }
 
-      if (!this.listeners[event] || !this.listeners[event][id]) {
+      const mergedID = id + "." + JSON.stringify(version);
+      if (!this.listeners[event] || !this.listeners[event][mergedID]) {
         return;
       }
-      this.listeners[event][id].filter((l) => l !== but).forEach((l) => l());
+      this.listeners[event][mergedID].filter((l) => l !== but).forEach((l) => l());
     }
   }
 

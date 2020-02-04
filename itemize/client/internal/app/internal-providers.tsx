@@ -159,7 +159,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         if (CacheWorkerInstance.isSupported) {
           const cachedValue =
             await CacheWorkerInstance.instance.getCachedValue(
-              "GET_MOD_users__IDEF_user", tokenDataId as number, fields);
+              "GET_MOD_users__IDEF_user", tokenDataId as number, null, fields);
           if (cachedValue && cachedValue.value && cachedValue.value.DATA) {
             cachedData.app_country = (cachedValue.value.DATA as IGQLValue).app_country;
             cachedData.app_currency = (cachedValue.value.DATA as IGQLValue).app_currency;
@@ -219,7 +219,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
           if (CacheWorkerInstance.isSupported) {
             const newCachedValue = userLanguageData.data.GET_MOD_users__IDEF_user;
             CacheWorkerInstance.instance.mergeCachedValue(
-              "GET_MOD_users__IDEF_user", tokenDataId as number, newCachedValue, fields,
+              "GET_MOD_users__IDEF_user", tokenDataId as number, null, newCachedValue, fields,
             );
           }
         }
@@ -235,6 +235,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     CacheWorkerInstance.instance.deleteCachedValue(
       "GET_MOD_users__IDEF_user",
       this.state.id,
+      null,
     );
     this.setState({
       id: null,

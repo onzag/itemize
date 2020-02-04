@@ -322,19 +322,27 @@ export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
 export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   id: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
-    description: "The id of the object",
+    description: "The id of the item",
+  },
+  version: {
+    type: GraphQLString,
+    description: "An optional version of the item, the item must have versioning enabled",
   },
   type: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    description: "The type (qualified name) of the object",
+    description: "The type (qualified name) of the item",
   },
   parent_id: {
     type: GraphQLInt,
-    description: "If exists, a parent id of this object",
+    description: "If exists, a parent id of this item",
+  },
+  parent_version: {
+    type: GraphQLString,
+    description: "If exists, the parent version of this item",
   },
   parent_type: {
     type: GraphQLString,
-    description: "If exists, a parent type of this object",
+    description: "If exists, a parent type of this item",
   },
   created_at: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
@@ -354,7 +362,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   },
   reviewed_at: {
     type: GraphQLString,
-    description: "When a moderator or admin reviewed this object",
+    description: "When a moderator or admin reviewed this item",
   },
   reviewed_by: {
     type: GraphQLInt,
@@ -362,11 +370,11 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   },
   last_modified: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    description: "An internal variable that represents when the whole object, as a whole " +
+    description: "An internal variable that represents when the whole item, as a whole " +
     " was last modified, by any factor, edited_at servers a UI purpose when things were " +
     " modified by normal means whereas last_modified is a global factor, it could be the " +
     " server that did the change, or a side effect, edited_at can be used in the UI " +
-    " last modified is for usage which checking if objects updated",
+    " last modified is for usage which checking if items updated",
   },
   blocked_at: {
     type: GraphQLString,
@@ -403,6 +411,20 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
 export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   id: {
     type: "serial",
+    notNull: true,
+    index: {
+      id: "PRIMARY_KEY",
+      type: "primary",
+      level: 0,
+    },
+  },
+  version: {
+    type: "string",
+    index: {
+      id: "PRIMARY_KEY",
+      type: "primary",
+      level: 1,
+    },
   },
   type: {
     type: "string",
@@ -410,6 +432,9 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   },
   parent_id: {
     type: "integer",
+  },
+  parent_version: {
+    type: "string",
   },
   parent_type: {
     type: "string",
@@ -461,7 +486,12 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
  * The column name of the foreign key that connects the module table
  * with the item definition table
  */
-export const CONNECTOR_SQL_COLUMN_FK_NAME = "MODULE_ID";
+export const CONNECTOR_SQL_COLUMN_ID_FK_NAME = "MODULE_ID";
+/**
+ * The column name of the foreign key that connects the module table
+ * with the item definition table
+ */
+export const CONNECTOR_SQL_COLUMN_VERSION_FK_NAME = "MODULE_VERSION";
 /**
  * an utility to build prefixes
  * @param s the string to turn into a prefix
@@ -477,6 +507,10 @@ export const SUFFIX_BUILD = (s: string) => "_" + s;
  * @param args the string list to concat
  */
 export const PREFIXED_CONCAT = (...args: string[]) => args.join("__");
+/**
+ * Used for creation of sql contraints
+ */
+export const SQL_CONSTRAINT_PREFIX = PREFIX_BUILD("CONSTRAINT");
 /**
  * Every include when used within the database or graphql is prefixed with
  */
@@ -584,6 +618,12 @@ const ID_ELEMENT_FIELDS = {
   type: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
   },
+  version: {
+    type: GraphQLString,
+  },
+  created_at: {
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
+  },
 };
 /**
  * The ID element in graphql form
@@ -611,7 +651,7 @@ export const ID_CONTAINER_GQL = GraphQLObjectType && new GraphQLObjectType({
       type: GraphQLList && GraphQLList(GraphQLNonNull(ID_ELEMENT_GQL)),
     },
     last_record: {
-      type: GraphQLInt,
+      type: ID_ELEMENT_GQL,
     },
   },
 });
@@ -668,9 +708,18 @@ export const RESERVED_SEARCH_PROPERTIES = {
     type: GraphQLInt,
     description: "a parent id for the item (must be specified with parent_type)",
   },
+  parent_version: {
+    type: GraphQLString,
+    description: "a parent version for the item (must be specified with parent_type)",
+  },
   parent_type: {
     type: GraphQLString,
     description: "a parent item definition qualified path (must be specified with parent_id)",
+  },
+  // TODO
+  version_filter: {
+    type: GraphQLString,
+    description: "Allow only items that are of this version",
   },
   search: {
     type: GraphQLString,
@@ -699,9 +748,18 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = {
     type: GraphQLInt,
     description: "a parent id for the item (must be specified with parent_type)",
   },
+  parent_version: {
+    type: GraphQLString,
+    description: "a parent version for the item (must be specified with parent_type)",
+  },
   parent_type: {
     type: GraphQLString,
     description: "a parent item definition qualified path (must be specified with parent_id)",
+  },
+  // TODO
+  version_filter: {
+    type: GraphQLString,
+    description: "Allow only items that are of this version",
   },
   search: {
     type: GraphQLString,
@@ -718,6 +776,11 @@ export const RESERVED_GETTER_PROPERTIES = {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
     description: "the id for that item",
   },
+  // TODO implement in get resolver
+  version: {
+    type: GraphQLString,
+    description: "a version for this item",
+  },
 };
 
 /**
@@ -725,6 +788,7 @@ export const RESERVED_GETTER_PROPERTIES = {
  * either edit or delete
  */
 export const RESERVED_CHANGE_PROPERTIES = {
+  // TODO implement the versioning in edit resolver
   ...RESERVED_GETTER_PROPERTIES,
   listener_uuid: {
     type: GraphQLString,
@@ -738,6 +802,7 @@ export const RESERVED_CHANGE_PROPERTIES = {
 export const RESERVED_GETTER_LIST_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   ids: {
+    // TODO implement the version in retrieving these lists
     type: GraphQLNonNull && GraphQLNonNull(GraphQLList(ID_ELEMENT_INPUT_GQL)),
     description: "the ids list for that item",
   },
@@ -760,9 +825,25 @@ export const RESERVED_ADD_PROPERTIES = {
     type: GraphQLInt,
     description: "a parent id that will namespace this item (must be specified with parent_module and idef)",
   },
+  parent_version: {
+    type: GraphQLString,
+    description: "a parent version that will namespace this item (must be specified with parent_module and idef)",
+  },
   parent_type: {
     type: GraphQLString,
     description: "a parent item definition qualified path (must be specified with parent_id)",
+  },
+  // TODO implement these madness in the add resolver
+  for_id: {
+    type: GraphQLInt,
+    description: "If specified create this item for this given id, the id must already exist and be of the same type," +
+    " this comes in handy for versioning as you need to specify an id to create different versions, please avoid collisions or" +
+    " it will raise an error",
+  },
+  version: {
+    type: GraphQLString,
+    description: "An optional version, it's possible to set a version without specifying for_id and it's possible to" +
+    " set a for_id without specifying a version",
   },
 };
 

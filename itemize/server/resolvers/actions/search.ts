@@ -16,15 +16,12 @@ import { ISQLTableRowValue } from "../../../base/Root/sql";
 import {
   INCLUDE_PREFIX,
   RESERVED_SEARCH_PROPERTIES,
-  CONNECTOR_SQL_COLUMN_FK_NAME,
+  CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+  CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   UNSPECIFIED_OWNER,
 } from "../../../constants";
 import { buildSQLQueryForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
-
-export interface IGQLSearchResultIdentifierType {
-  id: number;
-  type: string;
-}
+import { IGQLSearchResult } from "../../../gql-querier";
 
 const searchModuleDebug = Debug("resolvers:searchModule");
 export async function searchModule(
@@ -85,7 +82,7 @@ export async function searchModule(
 
   // now we build the search query, the search query only matches an id
   // note how we remove blocked_at
-  const searchQuery = appData.knex.select(["id", "type"])
+  const searchQuery = appData.knex.select(["id", "version", "type", "created_at"])
     .from(mod.getQualifiedPathName())
     .where("blocked_at", null);
 
@@ -107,16 +104,20 @@ export async function searchModule(
   }
 
   if (resolverArgs.args.order_by === "DEFAULT") {
-    searchQuery.orderBy("id", "DESC");
+    searchQuery.orderBy("created_at", "DESC");
   } else {
     // TODO
   }
 
   // return using the base result, and only using the id
-  const baseResult: IGQLSearchResultIdentifierType[] = await searchQuery;
-  const finalResult: any = {
+  const baseResult: IGQLSearchResult[] = await searchQuery;
+  const finalResult: {
+    ids: IGQLSearchResult[];
+    last_record: IGQLSearchResult;
+  } = {
     ids: baseResult,
-    last_record: baseResult.length ? Math.max.apply(null, baseResult.map((r) => r.id)) : null,
+    // TODO manually reorder the real latest by date
+    last_record: baseResult[0] || null,
   };
 
   searchModuleDebug("SUCCEED with %j", finalResult);
@@ -197,10 +198,11 @@ export async function searchItemDefinition(
   );
 
   // Checking search mode counterpart to validate
-  searchModeCounterpart.applyValue(null, resolverArgs.args, false, tokenData.id, tokenData.role, null, false);
+  searchModeCounterpart.applyValue(null, null, resolverArgs.args, false, tokenData.id, tokenData.role, null, false);
   await serverSideCheckItemDefinitionAgainst(
     searchModeCounterpart,
     resolverArgs.args,
+    null,
     null,
   );
 
@@ -222,7 +224,7 @@ export async function searchItemDefinition(
   );
 
   // now we build the search query
-  const searchQuery = appData.knex.select(["id"]).from(moduleTable)
+  const searchQuery = appData.knex.select(["id", "version", "created_at"]).from(moduleTable)
     .where("blocked_at", null);
 
   if (created_by) {
@@ -232,6 +234,7 @@ export async function searchItemDefinition(
   if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
     searchQuery
       .andWhere("parent_id", resolverArgs.args.parent_id)
+      .andWhere("parent_version", resolverArgs.args.parent_version || null)
       .andWhere("parent_type", resolverArgs.args.parent_type);
   } else {
     searchQuery
@@ -239,7 +242,7 @@ export async function searchItemDefinition(
   }
 
   if (resolverArgs.args.order_by === "DEFAULT") {
-    searchQuery.orderBy("id", "DESC");
+    searchQuery.orderBy("created_at", "DESC");
   } else {
     // TODO
   }
@@ -257,23 +260,28 @@ export async function searchItemDefinition(
   // if it requires the join, we add such a join
   if (requiresJoin) {
     searchQuery.join(selfTable, (clause) => {
-      clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
+      clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
+      clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
     });
   }
 
   // now we get the base result, and convert every row
   const baseResult: ISQLTableRowValue[] = await searchQuery;
+  const ids: IGQLSearchResult[] = baseResult.map((row) => {
+    return {
+      id: row.id,
+      type: selfTable,
+      created_at: row.created_at,
+      version: row.version,
+    };
+  });
   const finalResult: {
-    ids: IGQLSearchResultIdentifierType[];
-    last_record: number;
+    ids: IGQLSearchResult[];
+    last_record: IGQLSearchResult;
   } = {
-    ids: baseResult.map((row) => {
-      return {
-        id: row.id,
-        type: selfTable,
-      };
-    }),
-    last_record: baseResult.length ? Math.max.apply(null, baseResult.map((r) => r.id)) : null,
+    ids,
+    // TODO manually reorder the real latest by date
+    last_record: ids[0],
   };
   searchItemDefinitionDebug("SUCCEED with %j", finalResult);
   return finalResult;

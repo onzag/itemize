@@ -40,8 +40,8 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
   public cleanFields() {
     const passwordPdef =
       this.props.itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
-    passwordPdef.cleanValueFor(null);
-    this.props.itemDefinitionContextualValue.idef.triggerListeners("change", null);
+    passwordPdef.cleanValueFor(null, null);
+    this.props.itemDefinitionContextualValue.idef.triggerListeners("change", null, null);
   }
   public async login() {
     const username = this.props.itemDefinitionContextualValue.state.properties

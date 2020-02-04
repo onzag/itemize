@@ -51,11 +51,18 @@ export default function restServices(appData: IAppDataType) {
     const value: any = req.body.value;
     // we get the id
     const id: number = req.body.id;
+    // we get the version
+    const version: string = req.body.version;
 
     // check that they are valid
     if (typeof id !== "number" && id !== null) {
       res.status(400);
       res.end("Invalid Input on id");
+      return;
+    }
+    if (typeof version !== "string" && version !== null) {
+      res.status(400);
+      res.end("Invalid Input on version");
       return;
     }
     // get get the definition description
@@ -86,7 +93,7 @@ export default function restServices(appData: IAppDataType) {
     // now we are ready to return
     res.setHeader("content-type", "application/json; charset=utf-8");
     // we use the server side index checker
-    const isValid = await serverSideIndexChecker(appData.knex, property, value, id);
+    const isValid = await serverSideIndexChecker(appData.knex, property, value, id, version);
     res.end(JSON.stringify(isValid));
   }
 

@@ -8,7 +8,7 @@
 
 import { PropertyDefinitionSupportedType } from "./types";
 import PropertyDefinition from "../PropertyDefinition";
-import { CONNECTOR_SQL_COLUMN_FK_NAME } from "../../../../../constants";
+import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../../../../../constants";
 import Knex from "knex";
 import Autocomplete from "../../../../Autocomplete";
 
@@ -18,6 +18,7 @@ import Autocomplete from "../../../../Autocomplete";
  * @param property the property in question
  * @param value the value of that property as requested to check
  * @param id the slot id
+ * @param version the slot version
  * @returns a boolean on whether the unique index is valid
  */
 export async function serverSideIndexChecker(
@@ -25,6 +26,7 @@ export async function serverSideIndexChecker(
   property: PropertyDefinition,
   value: PropertyDefinitionSupportedType,
   id: number,
+  version: string,
 ) {
   // if the value is null then it's valid
   if (value === null) {
@@ -32,7 +34,8 @@ export async function serverSideIndexChecker(
   }
 
   // now we need to get the table this property is in
-  const moduleIDColumn = property.isExtension() ? "id" : CONNECTOR_SQL_COLUMN_FK_NAME;
+  const moduleIDColumn = property.isExtension() ? "id" : CONNECTOR_SQL_COLUMN_ID_FK_NAME;
+  const moduleVersionColumn = property.isExtension() ? "version" : CONNECTOR_SQL_COLUMN_VERSION_FK_NAME;
 
   // so the qualified represents the table
   const qualifiedParentName = property.isExtension() ?
@@ -42,6 +45,7 @@ export async function serverSideIndexChecker(
   // now the query
   const query = knex.select(
     moduleIDColumn,
+    moduleVersionColumn,
   ).from(qualifiedParentName).where(
     property.getPropertyDefinitionDescription().sqlEqual(value, "", property.getId(), knex),
   );
@@ -52,6 +56,7 @@ export async function serverSideIndexChecker(
   // would match everyt ime
   if (id !== null) {
     query.andWhere(moduleIDColumn, "!=", id);
+    query.andWhere(moduleVersionColumn, "!=", version);
   }
 
   // run the query
@@ -67,6 +72,7 @@ export async function serverSideIndexChecker(
  * @param property the property in question
  * @param value the value to check
  * @param id the slot id, if any
+ * @param version the slot version, if any
  * @returns a boolean on whether the autocomplete is valid or not
  */
 export function serverSideAutocompleteChecker(
@@ -74,6 +80,7 @@ export function serverSideAutocompleteChecker(
   property: PropertyDefinition,
   value: PropertyDefinitionSupportedType,
   id: number,
+  version: string,
 ) {
   // if the value is null it's valid
   if (value === null) {
@@ -81,7 +88,7 @@ export function serverSideAutocompleteChecker(
   }
 
   // otherwise let's ask the given autocomplete
-  const filters = property.getAutocompletePopulatedFiltersFor(id);
+  const filters = property.getAutocompletePopulatedFiltersFor(id, version);
   const autocomplete = autocompletes.find((a) => a.getName() === property.getAutocompleteId());
 
   // if there's no autocomplete, it's invalid

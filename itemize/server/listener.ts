@@ -82,6 +82,9 @@ export class Listener {
 
     this.redisSub.on("message", this.pubSubTriggerListeners);
 
+    // TODO we should validte the forms of every request, right now requests are not
+    // validated
+
     const io = ioMain(server);
     io.on("connection", (socket) => {
       this.addSocket(socket);
@@ -162,7 +165,7 @@ export class Listener {
       return;
     }
 
-    const mergedIndexIdentifier = request.itemDefinition + "." + request.id;
+    const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + JSON.stringify(request.version);
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       console.log("subscribing to", mergedIndexIdentifier);
       this.redisSub.subscribe(mergedIndexIdentifier);
@@ -242,13 +245,17 @@ export class Listener {
       // 0 as the lastKnownRecord will run the search, check the search.ts to see
       // how it is done
 
-      const query = this.knex.select(["id", "type"]).from(mod.getQualifiedPathName());
+      const query = this.knex.select(["id", "version", "type", "created_at"]).from(mod.getQualifiedPathName());
       if (requiredType) {
         query.where("type", requiredType);
       }
 
       query.andWhere("created_by", request.createdBy);
-      query.andWhere("id", ">", request.knownLastRecordId);
+      // the know last record might be null in case of empty searches
+      if (request.knownLastRecord) {
+        query.andWhere("created_at", ">", request.knownLastRecord.created_at);
+      }
+      query.orderBy("created_at", "desc");
 
       const newRecords: ISQLTableRowValue[] = await query;
 
@@ -257,7 +264,8 @@ export class Listener {
           createdBy: request.createdBy,
           qualifiedPathName: request.qualifiedPathName,
           newIds: newRecords as IGQLSearchResult[],
-          newLastRecordId: Math.max.apply(null, newRecords.map((r) => r.id)),
+          // this contains all the data and the new record has the right form
+          newLastRecord: newRecords[0] as any,
         };
         socket.emit(
           OWNED_SEARCH_RECORDS_ADDED_EVENT,
@@ -291,24 +299,30 @@ export class Listener {
       // 0 as the lastKnownRecord will run the search, check the search.ts to see
       // how it is done
 
-      const query = this.knex.select(["id", "type"]).from(mod.getQualifiedPathName());
+      const query = this.knex.select(["id", "version", "type", "created_at"]).from(mod.getQualifiedPathName());
       if (requiredType) {
         query.where("type", requiredType);
       }
 
       query.andWhere("parent_id", request.parentId);
+      query.andWhere("parent_version", request.parentVersion || null);
       query.andWhere("parent_type", request.parentType);
-      query.andWhere("id", ">", request.knownLastRecordId);
+      // the know last record might be null in case of empty searches
+      if (request.knownLastRecord) {
+        query.andWhere("created_at", ">", request.knownLastRecord.created_at);
+      }
+      query.orderBy("created_at", "desc");
 
       const newRecords: ISQLTableRowValue[] = await query;
 
       if (newRecords.length) {
         const event: IParentedSearchRecordsAddedEvent = {
           parentId: request.parentId,
+          parentVersion: request.parentVersion,
           parentType: request.parentType,
           qualifiedPathName: request.qualifiedPathName,
           newIds: newRecords as IGQLSearchResult[],
-          newLastRecordId: Math.max.apply(null, newRecords.map((r) => r.id)),
+          newLastRecord: newRecords[0] as any,
         };
         socket.emit(
           PARENTED_SEARCH_RECORDS_ADDED_EVENT,
@@ -332,12 +346,13 @@ export class Listener {
       }
       const mod = itemDefinition.getParentModule();
       const queriedResult: ISQLTableRowValue = await this.cache.requestCache(
-        itemDefinition.getQualifiedPathName(), mod.getQualifiedPathName(), request.id,
+        itemDefinition.getQualifiedPathName(), mod.getQualifiedPathName(), request.id, request.version,
       );
       if (queriedResult) {
         const event: IChangedFeedbackEvent = {
           itemDefinition: request.itemDefinition,
           id: request.id,
+          version: request.version,
           type: "last_modified",
           lastModified: queriedResult.last_modified,
         };
@@ -349,6 +364,7 @@ export class Listener {
         const event: IChangedFeedbackEvent = {
           itemDefinition: request.itemDefinition,
           id: request.id,
+          version: request.version,
           type: "not_found",
           lastModified: null,
         };
@@ -381,7 +397,7 @@ export class Listener {
     socket: Socket,
     request: IUnregisterRequest,
   ) {
-    const mergedIndexIdentifier = request.itemDefinition + "." + request.id;
+    const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + JSON.stringify(request.version);
     this.removeListener(socket, mergedIndexIdentifier);
   }
   public ownedSearchUnregister(
@@ -403,7 +419,7 @@ export class Listener {
     event: IChangedFeedbackEvent,
     listenerUUID: string,
   ) {
-    const mergedIndexIdentifier = event.itemDefinition + "." + event.id;
+    const mergedIndexIdentifier = event.itemDefinition + "." + event.id + "." + JSON.stringify(event.version);
     console.log("publishing to", mergedIndexIdentifier);
     this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
       event,

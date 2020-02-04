@@ -7,59 +7,23 @@ limitSearchByProperties: []
 
 these limiters will allow for reasonable searches
 
-B) We need to implement a way to cache searches
+B) Implement flagging
 
-The first thing is to remove the cache setting during searches, while cache
-retrieving is fine, the cache setting should be disabled simply because it would
-create a lot of waste data; anyway by default it won't load anything, searches
-are not cached (DONE)
-
-simply adding a cachePolicy flag to the search function which should
-the cacheEverything flag should work either by owner or by parent filter
-cachePolicy: "by-parent" or cachePolicy: "by-owner", they will require their
-respective filters added, or otherwise it would fail.
-
-1. make the search, by parent or by owner, and create a key in indexed db, SEARCH:SEARCH_ID:BY_WHATEVER:id
-2. Download every page and cache all of them, each one of them, it won't release any results until then
-3. Following searches will be performed locally
-    3.1.    Make the standard search, and get all the search results
-    3.2.    Use some sql local functions to filter and search and emulate the server search
-    3.3.    Make that be the search results
-
-The way that it will update automatically will be by having a ID stored that will be the last created item.
-
-The remote emitter will send such an id once a new one is added either by the parent or by the owner.
-
-Such can be added to the search.
-
-We need to figure out a way to make this work with module based as well.
-
-
-
-
-
-
-
-
-
-Implement flagging
-
-- Implement some form of triggers, maybe callback functions in the resolvers, we should have some form of user trigger to remove e_validated and
+C) Implement some form of triggers, maybe callback functions in the resolvers, we should have some form of user trigger to remove e_validated and
   whatnot
 
+D) Design a framework for versioning
+Versions is a module level property, all underlying items are affected.
+it will take part of a SQL property called version
 
-Add parents, should work as
-
-canBeParented   boolean
-mustBeParented  boolean
-canOnlyBeParentedBy {
-    module: path/path/path,
-    itemDefinition: path/path/path,
-}
-
-Searches should have then
-
-parented_by     qualifiedPathName
-
-parented by searches should be able to be updated or something and have some sort
-of listener for parented searches
+id will remain being the serial but the primary key will be the combination of the id + the version
+by default the version is null
+if versioning is enabled (let's start with) an arbitrary string called the version is allowed to be
+set (or null) by the creator
+when retrieving a single value also a version must be set, check out how requestCache function is set
+the ID_CONTAINER now must contain a version, check IGQLSearchResultIdentifierType too
+searches can be done as well by specifying a version that will namespace the search into that version
+The saving in the IndexedDB database must now include the version as well
+this changes how the websockets communicate as version information must now be included
+Registries get affected, everything that relies on an id gets affected
+everything else should remain the same

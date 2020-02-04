@@ -55,6 +55,7 @@ export async function deleteItemDefinition(
       policyTypes: ["delete"],
       itemDefinition,
       id: resolverArgs.args.id,
+      version: resolverArgs.args.version || null,
       role: tokenData.role,
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: null,
@@ -126,10 +127,11 @@ export async function deleteItemDefinition(
     resolverArgs.args.id.toString(),
   );
   (async () => {
-    await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, null);
+    await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, resolverArgs.args.version || null, null);
     const changeEvent: IChangedFeedbackEvent = {
       itemDefinition: selfTable,
       id: resolverArgs.args.id,
+      version: resolverArgs.args.version || null,
       type: "not_found",
       lastModified: null,
     };

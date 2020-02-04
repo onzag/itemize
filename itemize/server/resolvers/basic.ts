@@ -24,8 +24,7 @@ import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefin
 import { jwtVerify } from "../token";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { IGQLSearchResultIdentifierType } from "./actions/search";
-import { IGQLValue } from "../../gql-querier";
+import { IGQLValue, IGQLSearchResult } from "../../gql-querier";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 const buildColumnNamesForModuleTableOnlyDebug = Debug("resolvers:buildColumnNamesForModuleTableOnly");
@@ -179,13 +178,14 @@ const validateParentingRulesDebug = Debug("resolvers:validateParentingRules");
 export async function validateParentingRules(
   appData: IAppDataType,
   id: number,
+  version: string,
   type: string,
   itemDefinition: ItemDefinition,
   userId: number,
   role: string,
 ) {
   validateParentingRulesDebug("EXECUTED with %j %s", id, type);
-  const isParenting = !!(id || type);
+  const isParenting = !!(id || version || type);
   if (!isParenting && itemDefinition.mustBeParented()) {
     throw new EndpointError({
       message: "A parent is required",
@@ -203,7 +203,7 @@ export async function validateParentingRules(
     itemDefinition.checkCanBeParentedBy(parentingItemDefinition, true);
     const parentMod = parentingItemDefinition.getParentModule();
     const result = await appData.cache.requestCache(
-      type, parentMod.getQualifiedPathName(), id,
+      type, parentMod.getQualifiedPathName(), id, version,
     );
     if (!result) {
       throw new EndpointError({
@@ -267,7 +267,7 @@ const checkListLimitDebug = Debug("resolvers:checkListLimit");
  * lists to ensure the request isn't too large
  * @param ids the list ids that have been requested
  */
-export function checkListLimit(ids: IGQLSearchResultIdentifierType[]) {
+export function checkListLimit(ids: IGQLSearchResult[]) {
   checkListLimitDebug("EXECUTED with %j", ids);
   if (ids.length > MAX_SEARCH_RESULTS_AT_ONCE_LIMIT) {
     checkListLimitDebug(
@@ -284,7 +284,7 @@ export function checkListLimit(ids: IGQLSearchResultIdentifierType[]) {
 }
 
 const checkListTypesDebug = Debug("resolvers:checkListTypes");
-export function checkListTypes(ids: IGQLSearchResultIdentifierType[], mod: Module) {
+export function checkListTypes(ids: IGQLSearchResult[], mod: Module) {
   checkListTypesDebug("EXECUTED with %j", ids);
   ids.forEach((idContainer) => {
     const itemDefinition = mod.getParentRoot().registry[idContainer.type];
@@ -366,7 +366,9 @@ const validateTokenIsntBlockedDebug = Debug("resolvers:validateTokenIsntBlocked"
 export async function validateTokenIsntBlocked(cache: Cache, tokenData: IServerSideTokenDataType) {
   validateTokenIsntBlockedDebug("EXECUTED");
   if (tokenData.id) {
-    const sqlResult: ISQLTableRowValue = await cache.requestCache("MOD_users__IDEF_user", "MOD_users", tokenData.id);
+    const sqlResult: ISQLTableRowValue = await cache.requestCache(
+      "MOD_users__IDEF_user", "MOD_users", tokenData.id, null,
+    );
     if (!sqlResult) {
       throw new EndpointError({
         message: "User has been removed",
@@ -386,7 +388,9 @@ export async function validateTokenIsntBlocked(cache: Cache, tokenData: IServerS
 const checkUserExistsDebug = Debug("resolvers:checkUserExists");
 export async function checkUserExists(cache: Cache, id: number) {
   checkUserExistsDebug("EXECUTED");
-  const sqlResult: ISQLTableRowValue = await cache.requestCache("MOD_users__IDEF_user", "MOD_users", id);
+  const sqlResult: ISQLTableRowValue = await cache.requestCache(
+    "MOD_users__IDEF_user", "MOD_users", id, null,
+  );
   if (!sqlResult) {
     throw new EndpointError({
       message: "User has been removed",
@@ -489,6 +493,7 @@ const serverSideCheckItemDefinitionAgainstDebug = Debug("resolvers:serverSideChe
  * @param itemDefinition the item definition in question
  * @param gqlArgValue the arg value that was set
  * @param id the stored item id, if available, or null
+ * @param version the stored item version if avaliable
  * @param referredInclude this is an optional include used to basically
  * provide better error logging
  */
@@ -496,6 +501,7 @@ export async function serverSideCheckItemDefinitionAgainst(
   itemDefinition: ItemDefinition,
   gqlArgValue: IGQLValue,
   id: number,
+  version: string,
   referredInclude?: Include,
   referredParentOfInclude?: ItemDefinition,
 ) {
@@ -505,7 +511,7 @@ export async function serverSideCheckItemDefinitionAgainst(
     itemDefinition.getQualifiedPathName(),
   );
   // we get the current value of the item definition instance
-  const currentValue = await itemDefinition.getState(id);
+  const currentValue = await itemDefinition.getState(id, version);
   serverSideCheckItemDefinitionAgainstDebug(
     "Current value is %j",
     currentValue,
@@ -606,6 +612,7 @@ export async function serverSideCheckItemDefinitionAgainst(
       include.getItemDefinition(),
       gqlIncludeValue as IGQLValue,
       id,
+      version,
       include,
       referredParentOfInclude || itemDefinition,
     );
@@ -654,6 +661,7 @@ const runPolicyCheckDebug = Debug("resolvers:runPolicyCheck");
  * @param arg.policyType the policy type on which the request is made on, edit, delete
  * @param arg.itemDefinition the item definition in question
  * @param arg.id the id of that item definition on the database
+ * @param arg.version the version of the item definition on the database
  * @param arg.role the role of the current user
  * @param arg.gqlArgValue the arg value given in the arguments from graphql, where the info should be
  * in qualified path names for the policies
@@ -672,6 +680,7 @@ export async function runPolicyCheck(
     policyTypes: string[],
     itemDefinition: ItemDefinition,
     id: number,
+    version: string,
     role: string,
     gqlArgValue: IGQLValue,
     gqlFlattenedRequestedFiels: any,
@@ -680,6 +689,7 @@ export async function runPolicyCheck(
     parentModule?: string,
     parentType?: string,
     parentId?: number,
+    parentVersion?: string,
     preParentValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
   },
 ) {
@@ -698,10 +708,12 @@ export async function runPolicyCheck(
   let selectQueryValue: ISQLTableRowValue = null;
   let parentSelectQueryValue: ISQLTableRowValue = null;
   if (arg.policyTypes.includes("read") || arg.policyTypes.includes("delete") || arg.policyTypes.includes("edit")) {
-    selectQueryValue = await arg.cache.requestCache(selfTable, moduleTable, arg.id);
+    selectQueryValue = await arg.cache.requestCache(selfTable, moduleTable, arg.id, arg.version);
   }
   if (arg.policyTypes.includes("parent")) {
-    parentSelectQueryValue = await arg.cache.requestCache(arg.parentType, arg.parentModule, arg.id);
+    parentSelectQueryValue = await arg.cache.requestCache(
+      arg.parentType, arg.parentModule, arg.parentId, arg.parentVersion,
+    );
   }
 
   if (arg.preValidation) {
@@ -808,7 +820,7 @@ export async function runPolicyCheck(
 
         // now we check if it's a valid value, the value we have given, for the given property
         // this is a shallow check but works
-        const invalidReason = await property.isValidValue(arg.id, policyValueForTheProperty);
+        const invalidReason = await property.isValidValue(arg.id, arg.version, policyValueForTheProperty);
 
         // if we get an invalid reason, the policy cannot even pass there
         if (invalidReason) {

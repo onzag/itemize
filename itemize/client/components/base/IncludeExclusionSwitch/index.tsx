@@ -11,6 +11,7 @@ export interface IIncludeExclusionSwitchBaseProps {
   state: IIncludeState;
   onChange: (newExclusionState: IncludeExclusionState) => void;
   forId: number;
+  forVersion: string;
   theme?: Partial<IIncludeExclusionSwitchThemeType>;
 }
 
@@ -22,7 +23,7 @@ const IncludeExclusionSwitchWithStyles = withStyles(style)((props: IIncludeExclu
   return (
     <div className={props.classes.container}>
       {
-        props.include.canExclusionBeSet(props.forId) ?
+        props.include.canExclusionBeSet(props.forId, props.forVersion) ?
         (props.include.isExclusionTernary() ?
           <TernaryExclusionSwitch {...props}/> :
           <StandardExclusionSwitch {...props}/>

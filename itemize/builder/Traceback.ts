@@ -238,7 +238,7 @@ export default class Traceback {
     }
 
     // and now let's show the requested or at file message
-    console.log((requested ? "REQUESTED BY file " : "AT file ") +
+    console.log((requested ? "REQUESTED BY " : "AT ") +
       colors.red(this.location));
 
     // and let's reverse the stack to give line numbers and paths

@@ -1,9 +1,8 @@
 import { RedisClient } from "redis";
-import equals from "deep-equal";
 import Knex from "knex";
-import { CONNECTOR_SQL_COLUMN_FK_NAME } from "../constants";
+import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../constants";
 import { ISQLTableRowValue } from "../base/Root/sql";
-import { IGQLSearchResultIdentifierType } from "./resolvers/actions/search";
+import { IGQLSearchResult } from "../gql-querier";
 
 const CACHE_EXPIRES_DAYS = 2;
 
@@ -13,25 +12,6 @@ export class Cache {
   constructor(redisClient: RedisClient, knex: Knex) {
     this.redisClient = redisClient;
     this.knex = knex;
-  }
-  public getModuleCachedValue(
-    moduleQueryIdentifier: string,
-  ): Promise<{value: ISQLTableRowValue}> {
-    return new Promise((resolve, reject) => {
-      this.redisClient.get(moduleQueryIdentifier, (error, value) => {
-        if (value === null) {
-          resolve(null);
-        }
-        if (!error && value) {
-          this.getIdefCachedValue(value).then(resolve).catch(() => {
-            resolve(null);
-          });
-          this.pokeCache(moduleQueryIdentifier);
-        } else {
-          resolve(null);
-        }
-      });
-    });
   }
   public getIdefCachedValue(
     idefQueryIdentifier: string,
@@ -59,8 +39,8 @@ export class Cache {
   public pokeCache(keyIdentifier: string) {
     this.redisClient.expire(keyIdentifier, CACHE_EXPIRES_DAYS * 86400);
   }
-  public forceCacheInto(idefTable: string, id: number, value: any) {
-    const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString();
+  public forceCacheInto(idefTable: string, id: number, version: string, value: any) {
+    const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + JSON.stringify(version);
     return new Promise((resolve) => {
       this.redisClient.set(idefQueryIdentifier, JSON.stringify(value), (error) => {
         resolve(value);
@@ -70,55 +50,15 @@ export class Cache {
       });
     });
   }
-  public async requestModuleCache(
-    moduleTable: string,
-    id: number,
-    refresh?: boolean,
-  ): Promise<ISQLTableRowValue> {
-    const moduleQueryIdentifier = "MODQUERY:" + moduleTable + "." + id.toString();
-    if (!refresh) {
-      const currentValue = await this.getModuleCachedValue(moduleQueryIdentifier);
-      if (currentValue) {
-        return currentValue.value;
-      }
-    }
-    const modQueryValue = await this.knex.first("*").from(moduleTable).where("id", id);
-    let mergedValue: ISQLTableRowValue = null;
-    let idefQueryIdentifier: string;
-    if (modQueryValue) {
-      idefQueryIdentifier = "IDEFQUERY:" + modQueryValue.type + "." + id.toString();
-      const idefQueryValue =
-        await this.knex.first("*").from(modQueryValue.type).where(CONNECTOR_SQL_COLUMN_FK_NAME, id);
-      mergedValue = {
-        ...modQueryValue,
-        ...idefQueryValue,
-      };
-    }
-
-    if (mergedValue) {
-      this.redisClient.set(idefQueryIdentifier, JSON.stringify(mergedValue), (error) => {
-        if (!error) {
-          this.pokeCache(idefQueryIdentifier);
-        }
-      });
-
-      this.redisClient.set(moduleQueryIdentifier, idefQueryIdentifier, (error) => {
-        if (!error) {
-          this.pokeCache(moduleQueryIdentifier);
-        }
-      });
-    }
-
-    return mergedValue;
-  }
   public async requestCache(
     idefTable: string,
     moduleTable: string,
     id: number,
+    version: string,
     refresh?: boolean,
   ): Promise<ISQLTableRowValue> {
     console.log("requested", idefTable, moduleTable, id);
-    const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString();
+    const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + JSON.stringify(version);
     if (!refresh) {
       const currentValue = await this.getIdefCachedValue(idefQueryIdentifier);
       if (currentValue) {
@@ -126,19 +66,14 @@ export class Cache {
       }
     }
     const queryValue =
-      await this.knex.first("*").from(moduleTable).where("id", id).join(idefTable, (clause) => {
-      clause.on(CONNECTOR_SQL_COLUMN_FK_NAME, "=", "id");
+      await this.knex.first("*").from(moduleTable)
+        .where("id", id).andWhere("version", version).join(idefTable, (clause) => {
+      clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
+      clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
     });
     this.redisClient.set(idefQueryIdentifier, JSON.stringify(queryValue), (error) => {
       if (!error) {
         this.pokeCache(idefQueryIdentifier);
-      }
-    });
-
-    const moduleQueryIdentifier = "MODQUERY:" + moduleTable + "." + id.toString();
-    this.redisClient.set(moduleQueryIdentifier, idefQueryIdentifier, (error) => {
-      if (!error) {
-        this.pokeCache(moduleQueryIdentifier);
       }
     });
     return queryValue;
@@ -156,10 +91,10 @@ export class Cache {
   }
   public async requestListCache(
     moduleTable: string,
-    ids: IGQLSearchResultIdentifierType[],
+    ids: IGQLSearchResult[],
   ): Promise<ISQLTableRowValue[]> {
     const resultValues = await Promise.all(ids.map((idContainer) => {
-      return this.requestCache(idContainer.type, moduleTable, idContainer.id);
+      return this.requestCache(idContainer.type, moduleTable, idContainer.id, idContainer.version);
     }));
     return resultValues;
   }

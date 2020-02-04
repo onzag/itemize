@@ -33,6 +33,7 @@ import {
   IParentedSearchRecordsAddedEvent,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
+import { IGQLSearchResult } from "../../../gql-querier";
 
 export class RemoteListener {
   private socket: SocketIOClient.Socket;
@@ -46,7 +47,7 @@ export class RemoteListener {
   private ownedSearchListeners: {
     [qualifiedPathNameWithOwnerId: string]: {
       request: IOwnedSearchRegisterRequest;
-      lastKnownRecord: number;
+      lastKnownRecord: IGQLSearchResult;
       callbacks: any[];
     },
   };
@@ -54,7 +55,7 @@ export class RemoteListener {
     [qualifiedPathNameWithOwnerId: string]: {
       request: IParentedSearchRegisterRequest;
       callbacks: any[];
-      lastKnownRecord: number;
+      lastKnownRecord: IGQLSearchResult;
     },
   };
   private delayedFeedbacks: IFeedbackRequest[] = [];
@@ -157,11 +158,12 @@ export class RemoteListener {
     parentInstance: any,
     itemDefinitionQualifiedPathName: string,
     forId: number,
+    forVersion: string,
   ) {
     if (!this.isReady) {
       throw new Error("Remote listener is not ready");
     }
-    const qualifiedIdentifier = itemDefinitionQualifiedPathName + "." + forId;
+    const qualifiedIdentifier = itemDefinitionQualifiedPathName + "." + forId + "." + JSON.stringify(forVersion);
     if (this.listeners[qualifiedIdentifier]) {
       this.listeners[qualifiedIdentifier].parentInstances.push(parentInstance);
       return;
@@ -170,6 +172,7 @@ export class RemoteListener {
     const request: IRegisterRequest = {
       itemDefinition: itemDefinitionQualifiedPathName,
       id: forId,
+      version: forVersion,
     };
     this.listeners[qualifiedIdentifier] = {
       request,
@@ -236,7 +239,7 @@ export class RemoteListener {
   public addOwnedSearchListenerFor(
     itemDefinitionOrModuleQualifiedPathName: string,
     createdBy: number,
-    lastKnownRecord: number,
+    lastKnownRecord: IGQLSearchResult,
     callback: () => any,
   ) {
     if (!this.isReady) {
@@ -265,14 +268,16 @@ export class RemoteListener {
     itemDefinitionOrModuleQualifiedPathName: string,
     parentType: string,
     parentId: number,
-    lastKnownRecord: number,
+    parentVersion: string,
+    lastKnownRecord: IGQLSearchResult,
     callback: () => any,
   ) {
     if (!this.isReady) {
       throw new Error("Remote listener is not ready");
     }
 
-    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + parentType + "." + parentId;
+    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." +
+      parentType + "." + parentId + "." + JSON.stringify(parentVersion);
     if (this.parentedSearchListeners[qualifiedIdentifier]) {
       this.parentedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
       return;
@@ -282,6 +287,7 @@ export class RemoteListener {
       qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
       parentType,
       parentId,
+      parentVersion,
     };
     this.parentedSearchListeners[qualifiedIdentifier] = {
       request,
@@ -318,8 +324,9 @@ export class RemoteListener {
     parentInstance: any,
     itemDefinitionQualifiedPathName: string,
     forId: number,
+    forVersion: string,
   ) {
-    const qualifiedID = itemDefinitionQualifiedPathName + "." + forId;
+    const qualifiedID = itemDefinitionQualifiedPathName + "." + forId + "." + JSON.stringify(forVersion);
     const listenerValue = this.listeners[qualifiedID];
     if (listenerValue) {
       const newListenerValue = {
@@ -331,6 +338,7 @@ export class RemoteListener {
         if (this.socket.connected) {
           const request: IUnregisterRequest = {
             id: forId,
+            version: forVersion,
             itemDefinition: itemDefinitionQualifiedPathName,
           };
           this.socket.emit(
@@ -377,8 +385,10 @@ export class RemoteListener {
     itemDefinitionOrModuleQualifiedPathName: string,
     parentType: string,
     parentId: number,
+    parentVersion: string,
   ) {
-    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + parentType + "." + parentId;
+    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName +
+      "." + parentType + "." + parentId + "." + JSON.stringify(parentVersion);
     const listenerValue = this.ownedSearchListeners[qualifiedIdentifier];
     if (listenerValue) {
       const newListenerValue = {
@@ -392,6 +402,7 @@ export class RemoteListener {
             qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
             parentId,
             parentType,
+            parentVersion,
           };
           this.socket.emit(
             PARENTED_SEARCH_UNREGISTER_REQUEST,
@@ -407,7 +418,7 @@ export class RemoteListener {
     event: IChangedFeedbackEvent,
   ) {
     const itemDefinition: ItemDefinition = this.root.registry[event.itemDefinition] as ItemDefinition;
-    const appliedGQLValue = itemDefinition.getGQLAppliedValue(event.id);
+    const appliedGQLValue = itemDefinition.getGQLAppliedValue(event.id, event.version);
     if (appliedGQLValue) {
       if (
         event.type === "modified" ||
@@ -416,34 +427,36 @@ export class RemoteListener {
           event.lastModified !== appliedGQLValue.flattenedValue.last_modified
         )
       ) {
-        itemDefinition.triggerListeners("reload", event.id);
+        itemDefinition.triggerListeners("reload", event.id, event.version);
       } else if (event.type === "not_found") {
-        itemDefinition.cleanValueFor(event.id);
+        itemDefinition.cleanValueFor(event.id, event.version);
         if (CacheWorkerInstance.isSupported) {
           CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
             event.id,
+            event.version,
             itemDefinition.getQualifiedPathName(),
             PREFIX_GET + itemDefinition.getQualifiedPathName(),
             PREFIX_SEARCH + itemDefinition.getParentModule().getSearchModule().getQualifiedPathName(),
             PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
           );
         }
-        itemDefinition.triggerListeners("change", event.id);
+        itemDefinition.triggerListeners("change", event.id, event.version);
       }
     } else if (event.type === "modified" || event.type === "last_modified") {
-      itemDefinition.triggerListeners("reload", event.id);
+      itemDefinition.triggerListeners("reload", event.id, event.version);
     } else if (event.type === "not_found") {
-      itemDefinition.cleanValueFor(event.id);
+      itemDefinition.cleanValueFor(event.id, event.version);
       if (CacheWorkerInstance.isSupported) {
         CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
           event.id,
+          event.version,
           itemDefinition.getQualifiedPathName(),
           PREFIX_GET + itemDefinition.getQualifiedPathName(),
           PREFIX_SEARCH + itemDefinition.getParentModule().getSearchModule().getQualifiedPathName(),
           PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
         );
       }
-      itemDefinition.triggerListeners("change", event.id);
+      itemDefinition.triggerListeners("change", event.id, event.version);
     }
   }
   private consumeDelayedFeedbacks(anSpecificRequest?: IFeedbackRequest) {
@@ -496,7 +509,7 @@ export class RemoteListener {
         const lastKnownRecord = this.ownedSearchListeners[listenerKey].lastKnownRecord;
         this.requestOwnedSearchFeedbackFor({
           ...this.ownedSearchListeners[listenerKey].request,
-          knownLastRecordId: lastKnownRecord,
+          knownLastRecord: lastKnownRecord,
         });
       }
     });
@@ -507,7 +520,7 @@ export class RemoteListener {
         const lastKnownRecord = this.parentedSearchListeners[listenerKey].lastKnownRecord;
         this.requestParentedSearchFeedbackFor({
           ...this.parentedSearchListeners[listenerKey].request,
-          knownLastRecordId: lastKnownRecord,
+          knownLastRecord: lastKnownRecord,
         });
       }
     });
@@ -523,7 +536,7 @@ export class RemoteListener {
   ) {
     const ownedListener = this.ownedSearchListeners[event.qualifiedPathName + "." + event.createdBy];
     if (ownedListener) {
-      ownedListener.lastKnownRecord = event.newLastRecordId;
+      ownedListener.lastKnownRecord = event.newLastRecord;
       if (CacheWorkerInstance.isSupported) {
         const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
         let itemDefinition: ItemDefinition;
@@ -537,8 +550,9 @@ export class RemoteListener {
           event.createdBy,
           null,
           null,
+          null,
           event.newIds,
-          event.newLastRecordId,
+          event.newLastRecord,
           "by-owner",
         );
       }
@@ -549,9 +563,11 @@ export class RemoteListener {
     event: IParentedSearchRecordsAddedEvent,
   ) {
     const parentedListener = this.parentedSearchListeners[
-      event.qualifiedPathName + "." + event.parentType + "." + event.parentId];
+      event.qualifiedPathName + "." + event.parentType + "." +
+      event.parentId + "." + JSON.stringify(event.parentVersion)
+    ];
     if (parentedListener) {
-      parentedListener.lastKnownRecord = event.newLastRecordId;
+      parentedListener.lastKnownRecord = event.newLastRecord;
       if (CacheWorkerInstance.isSupported) {
         const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
         let itemDefinition: ItemDefinition;
@@ -565,8 +581,9 @@ export class RemoteListener {
           null,
           event.parentType,
           event.parentId,
+          event.parentVersion,
           event.newIds,
-          event.newLastRecordId,
+          event.newLastRecord,
           "by-parent",
         );
       }

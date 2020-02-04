@@ -20,14 +20,14 @@ export interface ICacheMatchType {
 export interface ICachedSearchResult {
   gqlValue: IGQLEndpointValue;
   dataMightBeStale: boolean;
-  lastRecord: number;
+  lastRecord: IGQLSearchResult;
 }
 
 export interface ISearchMatchType {
   fields: IGQLRequestFields;
   value: IGQLSearchResult[];
   allResultsPreloaded: boolean;
-  lastRecord: number;
+  lastRecord: IGQLSearchResult;
 }
 
 export interface ICacheDB extends DBSchema {
@@ -115,6 +115,7 @@ export default class CacheWorker {
    * Sets the cached value as null and updates all the searches
    * that contained that value to have it sliced from it
    * @param id the id of the item definition
+   * @param version the version of the item definition
    * @param type the type of the item definition
    * @param queryName the GET query name
    * @param searchQueryNameModule optional, a search query name module to
@@ -128,6 +129,7 @@ export default class CacheWorker {
    */
   public async setCachedValueAsNullAndUpdateSearches(
     id: number,
+    version: string,
     type: string,
     queryName: string,
     searchQueryNameModule?: string,
@@ -136,6 +138,7 @@ export default class CacheWorker {
     const succeed = await this.setCachedValue(
       queryName,
       id,
+      version,
       null,
       null,
     );
@@ -187,6 +190,7 @@ export default class CacheWorker {
    * value that was retrieved, this value can be a partial value
    * @param queryName the query name
    * @param id the id of the item definition instance
+   * @param version the version of the item definition instance
    * @param partialValue the partial value
    * @param partialFields the fields that represent the partial value
    * @param touchOrMerge optional, whether this is because of a touch of merge reqeust
@@ -195,12 +199,13 @@ export default class CacheWorker {
   public async setCachedValue(
     queryName: string,
     id: number,
+    version: string,
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
     touchOrMerge?: boolean,
   ): Promise<boolean> {
     if (!touchOrMerge) {
-      console.log("REQUESTED TO STORE", queryName, id, partialValue);
+      console.log("REQUESTED TO STORE", queryName, id, version, partialValue);
     }
 
     // so first we await for our database
@@ -212,7 +217,7 @@ export default class CacheWorker {
     }
 
     // otherwise we build the index indentifier, which is simple
-    const queryIdentifier = `${queryName}.${id}`;
+    const queryIdentifier = `${queryName}.${id}.${JSON.stringify(version)}`;
 
     // and try to save it in the database, notice how we setup the expirarion
     // date
@@ -240,8 +245,9 @@ export default class CacheWorker {
   public async deleteCachedValue(
     queryName: string,
     id: number,
+    version: string,
   ): Promise<boolean> {
-    console.log("REQUESTED TO DELETE", queryName, id);
+    console.log("REQUESTED TO DELETE", queryName, id, version);
 
     // so first we await for our database
     const db = await this.dbPromise;
@@ -251,7 +257,7 @@ export default class CacheWorker {
       return false;
     }
 
-    const queryIdentifier = `${queryName}.${id}`;
+    const queryIdentifier = `${queryName}.${id}.${JSON.stringify(version)}`;
 
     try {
       await db.delete(QUERIES_TABLE_NAME, queryIdentifier);
@@ -266,12 +272,13 @@ export default class CacheWorker {
   public async mergeCachedValue(
     queryName: string,
     id: number,
+    version: string,
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
   ): Promise<boolean> {
     console.log("REQUESTED TO MERGE", queryName, id, partialValue);
 
-    const currentValue = await this.getCachedValue(queryName, id);
+    const currentValue = await this.getCachedValue(queryName, id, version);
     if (
       !currentValue ||
       !currentValue.value ||
@@ -280,6 +287,7 @@ export default class CacheWorker {
       return await this.setCachedValue(
         queryName,
         id,
+        version,
         partialValue,
         partialFields,
         true,
@@ -296,6 +304,7 @@ export default class CacheWorker {
       return await this.setCachedValue(
         queryName,
         id,
+        version,
         mergedValue,
         mergedFields,
         true,
@@ -309,15 +318,17 @@ export default class CacheWorker {
    * if it doesn't match all the requested fields
    * @param queryName the query name that is necessary to match against
    * @param id the id of the item definition instance
+   * @param version the version of the item definition instance
    * @param requestedFields the requested fields from graphql
    */
   public async getCachedValue(
     queryName: string,
     id: number,
+    version: string,
     requestedFields?: IGQLRequestFields,
   ): Promise<ICacheMatchType> {
     if (requestedFields) {
-      console.log("CACHED QUERY REQUESTED", queryName, id, requestedFields);
+      console.log("CACHED QUERY REQUESTED", queryName, id, version, requestedFields);
     }
 
     // so we fetch our db like usual
@@ -334,7 +345,7 @@ export default class CacheWorker {
     }
 
     // now we build the identifier
-    const queryIdentifier = `${queryName}.${id}`;
+    const queryIdentifier = `${queryName}.${id}.${JSON.stringify(version)}`;
     try {
       // and we attempt to get the value from the database
       const idbValue: ICacheMatchType = await db.get(QUERIES_TABLE_NAME, queryIdentifier);
@@ -348,7 +359,7 @@ export default class CacheWorker {
 
         if (!requestedFields || requestFieldsAreContained(requestedFields, fields)) {
           if (requestedFields) {
-            console.log("RETURNING FROM CACHE", queryName, id, requestedFields, idbValue);
+            console.log("RETURNING FROM CACHE", queryName, id, version, requestedFields, idbValue);
           }
           return idbValue;
         }
@@ -370,8 +381,9 @@ export default class CacheWorker {
     createdByIfKnown: number,
     parentTypeIfKnown: string,
     parentIdIfKnown: number,
+    parentVersionIfKnown: string,
     newIds: IGQLSearchResult[],
-    newLastRecord: number,
+    newLastRecord: IGQLSearchResult,
     cachePolicy: "by-owner" | "by-parent",
   ): Promise<boolean> {
     // so we fetch our db like usual
@@ -390,7 +402,7 @@ export default class CacheWorker {
     if (cachePolicy === "by-owner") {
       storeKeyName += createdByIfKnown;
     } else {
-      storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown;
+      storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown + "." + JSON.stringify(parentVersionIfKnown);
     }
 
     // So we say that not all results are preloaded so that when the next iteration of the
@@ -447,7 +459,7 @@ export default class CacheWorker {
     // in order to know what we have retrieved, originally it's just what
     // we were asked for
     let resultingGetListRequestedFields: IGQLRequestFields = getListRequestedFields;
-    let lastRecord: number;
+    let lastRecord: IGQLSearchResult;
     let dataMightBeStale = false;
 
     try {
@@ -502,7 +514,7 @@ export default class CacheWorker {
         // from the search query, the IGQLSearchResult that we
         // need to process
         resultsToProcess = serverValue.data[searchQueryName].ids as IGQLSearchResult[];
-        lastRecord = serverValue.data[searchQueryName].last_record as number;
+        lastRecord = serverValue.data[searchQueryName].last_record as IGQLSearchResult;
       } else {
         // otherwise our results to process are the same ones we got
         // from the database, but do we need to process them for real?
@@ -580,6 +592,7 @@ export default class CacheWorker {
       const cachedResult = await this.getCachedValue(
         PREFIX_GET + resultToProcess.type,
         resultToProcess.id,
+        resultToProcess.version,
         getListRequestedFields,
       );
       // if there is no cached results
@@ -681,6 +694,7 @@ export default class CacheWorker {
             suceedStoring = await this.setCachedValueAsNullAndUpdateSearches(
               originalBatchRequest.id,
               originalBatchRequest.type,
+              originalBatchRequest.version,
               PREFIX_GET + originalBatchRequest.type,
             );
           } else {
@@ -690,6 +704,7 @@ export default class CacheWorker {
             suceedStoring = await this.mergeCachedValue(
               PREFIX_GET + originalBatchRequest.type,
               originalBatchRequest.id,
+              originalBatchRequest.version,
               value,
               getListRequestedFields,
             );

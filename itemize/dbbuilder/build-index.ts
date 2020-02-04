@@ -11,6 +11,18 @@ import Knex from "knex";
 import { ISQLSchemaDefinitionType } from "../base/Root/sql";
 import { showErrorStackAndLogMessage, yesno } from ".";
 
+interface IProcessedIndexColumn {
+  level: number;
+  columnName: string;
+}
+
+interface IProcessedIndexes {
+  [id: string]: {
+    type: string,
+    columns: IProcessedIndexColumn[],
+  };
+}
+
 /**
  * Builds all the indexes
  * @param knex the knex instance
@@ -49,49 +61,155 @@ export async function buildIndexes(
     // now we copy the current table schema
     finalSchema[tableName] = {...currentTableSchema};
 
+    // so now we check the indexes for that we need to gather them
+    // in the proper form
+    const newTableIndexes: IProcessedIndexes  = {};
+    const currentTableIndexes: IProcessedIndexes = {};
+
+    // so we loop in each column to see in an index has been specified
+    // at this point both newTableSchema and currentTableSchema should have
+    // the same columns so we expect to get both from this
     for (const columnName of Object.keys(newTableSchema)) {
-      // so we get the new schema of the column and the old
-      // note that there might not have been an old one
+      // this way
       const newColumnSchema = newTableSchema[columnName];
       const currentColumnSchema = currentTableSchema[columnName];
 
-      // and let's check what new index type was added
-      const newIndexType = newColumnSchema.index;
+      // if the current has an index specified
+      if (currentColumnSchema.index) {
+        // we need to check if we have one index with the same id, if we don't
+        if (!currentTableIndexes[currentColumnSchema.index.id]) {
+          // we create this new index with only that column
+          currentTableIndexes[currentColumnSchema.index.id] = {
+            type: currentColumnSchema.index.type,
+            columns: [{
+              level: currentColumnSchema.index.level,
+              columnName,
+            }],
+          };
+        } else {
+          // if we do we push the column
+          currentTableIndexes[currentColumnSchema.index.id].columns.push({
+            level: currentColumnSchema.index.level,
+            columnName,
+          });
+          // let's check that the type is congrugent
+          if (currentColumnSchema.index.type !== currentTableIndexes[currentColumnSchema.index.id].type) {
+            console.log(colors.red(
+              `Index with id ${currentColumnSchema.index.id} in current schema` +
+              `schema has unmatching types ${currentColumnSchema.index.type} over stored ` +
+              `${currentTableIndexes[currentColumnSchema.index.id].type} on columns ` +
+              `${currentTableIndexes[currentColumnSchema.index.id].columns.join(", ")}`,
+            ));
+          }
+        }
+      }
+
+      // now let's check the new does it have an index?
+      if (newColumnSchema.index) {
+        // if it has not yet been stored
+        if (!newTableIndexes[newColumnSchema.index.id]) {
+          // create one new with only that columm
+          newTableIndexes[newColumnSchema.index.id] = {
+            type: newColumnSchema.index.type,
+            columns: [{
+              level: newColumnSchema.index.level,
+              columnName,
+            }],
+          };
+        } else {
+          // otherwise add the column
+          newTableIndexes[newColumnSchema.index.id].columns.push({
+            level: newColumnSchema.index.level,
+            columnName,
+          });
+          // notify if there's a mismatch
+          if (newColumnSchema.index.type !== newTableIndexes[newColumnSchema.index.id].type) {
+            console.log(colors.red(
+              `Index with id ${newColumnSchema.index.id} in new schema ` +
+              `schema has unmatching types ${newColumnSchema.index.type} over stored ` +
+              `${newTableIndexes[newColumnSchema.index.id].type} on columns ` +
+              `${newTableIndexes[newColumnSchema.index.id].columns.join(", ")}`,
+            ));
+          }
+        }
+      }
+    }
+
+    // now we build a set of all indexes, these might not be equal, but might collide, so we get
+    // a list of all the unique ids
+    const allIndexes = new Set(Object.keys(newTableIndexes).concat(Object.keys(currentTableIndexes)));
+    // so now we loop in each
+    for (const indexId of allIndexes) {
+      // either of these might be undefined
+      const newIndex = newTableIndexes[indexId];
+      const currentIndex = currentTableIndexes[indexId];
+
+      const newIndexColumnsSorted = newIndex && newIndex.columns.sort((a, b) => {
+        return a.level - b.level;
+      }).map((c) => c.columnName);
+
+      const currentIndexColumnsSorted = currentIndex && currentIndex.columns.sort((a, b) => {
+        return a.level - b.level;
+      }).map((c) => c.columnName);
 
       // this variable is a helper, basically we cannot over
       // set indexes, so we need to drop the current if there
       // is one
       let wasSupposedToDropCurrentIndexButDidnt = false;
 
+      // so if we have a current index for that index
+      // and such an index doesn't match our new index
       if (
-        currentColumnSchema &&
-        currentColumnSchema.index &&
-        currentColumnSchema.index !== newIndexType
+        // so if we have a current index
+        currentIndex &&
+        (
+          // and there's no new index or
+          !newIndex ||
+          (
+            // the index signature does not match
+            currentIndex.type !== newIndex.type ||
+            currentIndexColumnsSorted.join(",") !== newIndexColumnsSorted.join(",")
+          )
+        )
       ) {
-        console.log(colors.yellow(
-          `Index on ${tableName}.${columnName} of type ${currentColumnSchema.index} has` +
-          ` been changed or dropped, the current index needs to be dropped`,
-        ));
+        // show a proper message, update or removed
+        if (newIndex) {
+          console.log(colors.yellow(
+            `Index '${indexId}' of type ${currentIndex.type} has` +
+            ` been changed, the current index needs to be dropped`,
+          ));
+        } else {
+          console.log(colors.yellow(
+            `Index '${indexId}' of type ${currentIndex.type} has` +
+            ` been dropped`,
+          ));
+        }
 
         // ask if we want the index to be dropped
         if (await yesno(
           "drop the index?",
         )) {
+          // we drop the index
           try {
             await knex.schema.withSchema("public").alterTable(tableName, (t) => {
-              if (currentColumnSchema.index === "unique") {
-                t.dropUnique([columnName]);
+              if (currentIndex.type === "unique") {
+                t.dropUnique(currentIndexColumnsSorted);
+              } else if (currentIndex.type === "primary") {
+                t.dropPrimary(tableName + "_" + indexId);
               } else {
-                t.dropIndex([columnName]);
+                t.dropIndex(currentIndexColumnsSorted, tableName + "_" + indexId);
               }
             });
 
-            // copy the column information to reflect the update
-            finalSchema[tableName][columnName] = {
-              ...currentDatabaseSchema[tableName][columnName],
-            };
-            // and now delete the index
-            delete finalSchema[tableName][columnName].index;
+            // now we need to update each column affected
+            currentIndexColumnsSorted.forEach((columnName) => {
+              // copy the column information to reflect the update
+              finalSchema[tableName][columnName] = {
+                ...currentDatabaseSchema[tableName][columnName],
+              };
+              // and now delete the index
+              delete finalSchema[tableName][columnName].index;
+            });
 
           } catch (err) {
             showErrorStackAndLogMessage(err);
@@ -105,13 +223,28 @@ export async function buildIndexes(
       // so now if we have a new index type which is not equal to the old
       // and we actually dropped the old index (if there was any)
       if (
-        newIndexType &&
-        newIndexType !== (currentColumnSchema && currentColumnSchema.index) &&
-        !wasSupposedToDropCurrentIndexButDidnt
+        // if we have the new index
+        newIndex &&
+        // and if we didn't cancel dropping (if we were requested)
+        !wasSupposedToDropCurrentIndexButDidnt &&
+        (
+          // if we do have an entirely new index, as in it's not an update
+          // of a previous index or
+          (
+            newIndex &&
+            !currentIndex
+          ) ||
+          // this is an update
+          (
+            newIndex.type !== currentIndex.type ||
+            currentIndexColumnsSorted.join(",") !== newIndexColumnsSorted.join(",")
+          )
+        )
       ) {
-        // show the message
+        // show the message that the index needs to be created
         console.log(colors.yellow(
-          `Index on ${tableName}.${columnName} of type ${newIndexType} has been created`,
+          `Index '${indexId}' of type ${newIndex.type} ` +
+          ` must now be created which affects columns ${newIndexColumnsSorted.join(", ")}`,
         ));
 
         // ask on whether we create the index
@@ -120,19 +253,28 @@ export async function buildIndexes(
         )) {
           try {
             await knex.schema.withSchema("public").alterTable(tableName, (t) => {
-              if (newIndexType === "unique") {
-                t.unique([columnName]);
+              if (newIndex.type === "unique") {
+                t.unique(newIndexColumnsSorted, tableName + "_" + indexId);
+              } else if (newIndex.type === "primary") {
+                t.primary(newIndexColumnsSorted, tableName + "_" + indexId);
               } else {
-                t.index([columnName], null, newIndexType);
+                t.index(newIndexColumnsSorted, tableName + "_" + indexId, newIndex.type);
               }
             });
 
-            // copy the column information to reflect the update
-            finalSchema[tableName][columnName] = {
-              ...currentDatabaseSchema[tableName][columnName],
-            };
-            // and now set the index
-            finalSchema[tableName][columnName].index = newIndexType;
+            // now we need to update each affected column
+            newIndexColumnsSorted.forEach((columnName, index) => {
+              // copy the column information to reflect the update
+              finalSchema[tableName][columnName] = {
+                ...currentDatabaseSchema[tableName][columnName],
+              };
+              // and now set the index
+              finalSchema[tableName][columnName].index = {
+                id: indexId,
+                type: newIndex.type,
+                level: index,
+              };
+            });
 
           } catch (err) {
             showErrorStackAndLogMessage(err);

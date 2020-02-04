@@ -6,7 +6,11 @@
  * @packageDocumentation
  */
 
-import { CONNECTOR_SQL_COLUMN_FK_NAME, RESERVED_BASE_PROPERTIES } from "../../../../constants";
+import {
+  CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+  CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+  RESERVED_BASE_PROPERTIES,
+} from "../../../../constants";
 import {
   convertSQLValueToGQLValueForProperty,
   getSQLTableDefinitionForProperty,
@@ -35,12 +39,20 @@ import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier"
  */
 export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefinition): ISQLTableDefinitionType {
   // add all the standard fields
+  // TODO fix this to use the new foreignKey and build the key
+  // as the double of the primary key, similar to how indexes are done
   const resultTableSchema: ISQLTableDefinitionType = {
-    [CONNECTOR_SQL_COLUMN_FK_NAME]: {
+    [CONNECTOR_SQL_COLUMN_ID_FK_NAME]: {
       type: "integer",
       notNull: true,
       fkTable: itemDefinition.getParentModule().getQualifiedPathName(),
       fkCol: "id",
+      fkAction: "cascade",
+    },
+    [CONNECTOR_SQL_COLUMN_VERSION_FK_NAME]: {
+      type: "string",
+      fkTable: itemDefinition.getParentModule().getQualifiedPathName(),
+      fkCol: "version",
       fkAction: "cascade",
     },
   };

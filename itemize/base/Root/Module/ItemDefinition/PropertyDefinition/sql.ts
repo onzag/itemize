@@ -14,6 +14,7 @@ import ItemDefinition from "..";
 import Include from "../Include";
 import { processFileListFor, processSingleFileFor } from "./sql-files";
 import { IGQLArgs, IGQLValue } from "../../../../../gql-querier";
+import { SQL_CONSTRAINT_PREFIX } from "../../../../../constants";
 
 /**
  * Provides the sql function that defines the schema that is used to build
@@ -30,7 +31,11 @@ export function getStandardSQLFnFor(type: string):
       // the type is defined
       type,
       // and we add an unique index if this property is deemed unique
-      index: property.isUnique() ? "unique" : null,
+      index: property.isUnique() ? {
+        type: "unique",
+        id: SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
+        level: 0,
+      } : null,
     },
   });
 }

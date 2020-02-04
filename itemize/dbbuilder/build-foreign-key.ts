@@ -5,10 +5,13 @@
  * @packageDocumentation
  */
 
+// TODO implement the multiple foreign key generator like the index, right now it won't work
+// foreign keys aren't even working whatsoever
+
 import colors from "colors/safe";
 import Knex from "knex";
 
-import { ISQLSchemaDefinitionType, ISQLTableDefinitionType } from "../base/Root/sql";
+import { ISQLSchemaDefinitionType } from "../base/Root/sql";
 import { showErrorStackAndLogMessage, yesno } from ".";
 import { buildColumn } from "./build-column";
 

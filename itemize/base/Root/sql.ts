@@ -36,7 +36,20 @@ export interface ISQLColumnDefinitionType {
   /**
    * an index type
    */
-  index?: string;
+  index?: {
+    /**
+     * The id of the index in order to perform double table indexes
+     */
+    id: string,
+    /**
+     * The type of the index, unique, gin, btree...
+     */
+    type: string,
+    /**
+     * The index level a numeric value to sort it as
+     */
+    level: number,
+  };
 }
 
 /**
