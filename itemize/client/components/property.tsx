@@ -174,6 +174,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                       forceInvalid={props.showAsInvalid}
                       icon={props.icon}
                       forId={itemDefinitionContextualValue.forId}
+                      forVersion={itemDefinitionContextualValue.forVersion}
                       poked={isPoked}
                     />
                   );
@@ -189,6 +190,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                       onEnforce={itemDefinitionContextualValue.onPropertyEnforce.bind(null, property)}
                       onClearEnforcement={itemDefinitionContextualValue.onPropertyClearEnforce.bind(null, property)}
                       forId={itemDefinitionContextualValue.forId}
+                      forVersion={itemDefinitionContextualValue.forVersion}
                       value={props.value}
                     />
                   );

@@ -6,9 +6,10 @@ import { PropertyDefinitionSupportedType } from "../../../../base/Root/Module/It
 export interface IPropertySetterBaseProps {
   property: PropertyDefinition;
   forId: number;
+  forVersion?: string;
   value: PropertyDefinitionSupportedType;
-  onEnforce: (value: PropertyDefinitionSupportedType, forId: number) => void;
-  onClearEnforcement: (forId: number) => void;
+  onEnforce: (value: PropertyDefinitionSupportedType, forId: number, forVersion: string) => void;
+  onClearEnforcement: (forId: number, forVersion: string) => void;
 }
 
 export default class PropertySetter extends React.Component<IPropertySetterBaseProps, {}> {
@@ -16,21 +17,23 @@ export default class PropertySetter extends React.Component<IPropertySetterBaseP
     super(props);
   }
   public componentDidMount() {
-    this.props.onEnforce(this.props.value, this.props.forId);
+    this.props.onEnforce(this.props.value, this.props.forId, this.props.forVersion);
   }
   public componentDidUpdate(prevProps: IPropertySetterBaseProps) {
-    if (this.props.forId !== prevProps.forId) {
-      this.props.onClearEnforcement(prevProps.forId);
+    const idHasChanged = this.props.forId !== prevProps.forId ||
+      (this.props.forVersion || null) !== (prevProps.forVersion || null);
+    if (idHasChanged) {
+      this.props.onClearEnforcement(prevProps.forId, prevProps.forVersion || null);
     }
     if (
-      this.props.forId !== prevProps.forId ||
+      idHasChanged ||
       !equals(prevProps.value, this.props.value)
     ) {
-      this.props.onEnforce(this.props.value, this.props.forId);
+      this.props.onEnforce(this.props.value, this.props.forId, this.props.forVersion);
     }
   }
   public componentWillUnmount() {
-    this.props.onClearEnforcement(this.props.forId);
+    this.props.onClearEnforcement(this.props.forId, this.props.forVersion);
   }
   public render() {
     return null;

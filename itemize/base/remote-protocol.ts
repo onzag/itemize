@@ -73,7 +73,7 @@ interface IBaseSearchRecordsAddedEvent {
    */
   newIds: IGQLSearchResult[];
   /**
-   * the new last record id
+   * the new last record search result
    */
   newLastRecord: IGQLSearchResult;
 }

@@ -304,7 +304,7 @@ export function getGQLQueryFieldsForItemDefinition(
 
   // now we add the queries
   let fields: IGQLQueryFieldsDefinitionType = {
-    // basic get query to get an item given an id
+    // basic get query to get an item given an id and optional version
     [PREFIX_GET + itemDefinition.getQualifiedPathName()]: {
       type,
       args: {
@@ -342,7 +342,7 @@ export function getGQLQueryFieldsForItemDefinition(
     },
     // now this is the search query, note how we use the search mode counterpart
     // retrieval mode is false, properties are meant to be in input mode for the args,
-    // we exclude the base properties, eg. id, type, etc... make all the fields optional,
+    // we exclude the base properties, eg. id, version, type, etc... make all the fields optional,
     // and don't include any policy (there are no policies in search mode anyway)
     fields[PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()] = {
       type: ID_CONTAINER_GQL,
@@ -414,7 +414,7 @@ export function getGQLMutationFieldsForItemDefinition(
       resolve: resolveGenericFunction.bind(null, "addItemDefinition", itemDefinition, resolvers),
     },
     // The edition uses the standard getter properties to fetch
-    // an item definition instance given its id and then
+    // an item definition instance given its id, version and then
     // uses the same idea of adding in order to modify the data
     // that is in there
     [PREFIX_EDIT + itemDefinition.getQualifiedPathName()]: {

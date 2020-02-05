@@ -343,7 +343,10 @@ export default class PropertyEntryField
           "?body=" + encodeURIComponent(JSON.stringify({
             lang: this.props.property.isAutocompleteLocalized() ? this.props.language : null,
             query: value,
-            filters: this.props.property.getAutocompletePopulatedFiltersFor(this.props.forId),
+            filters: this.props.property.getAutocompletePopulatedFiltersFor(
+              this.props.forId,
+              this.props.forVersion,
+            ),
           })),
           {
             headers: {

@@ -103,7 +103,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             null,
           );
         } else {
-          resultUserFromSQLQuery = await resultUserQuery;
+          resultUserFromSQLQuery = await resultUserQuery || null;
         }
 
         const resultUser = resultUserFromSQLQuery;

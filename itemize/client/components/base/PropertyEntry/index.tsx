@@ -25,6 +25,7 @@ export interface IPropertyEntryBaseProps {
   state: IPropertyDefinitionState;
   onChange: (newValue: PropertyDefinitionSupportedType, internalValue: any) => void;
   forId: number;
+  forVersion: string;
 
   theme?: Partial<IPropertyEntryThemeType>;
   forceInvalid?: boolean;

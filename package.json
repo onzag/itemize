@@ -47,7 +47,7 @@
     "regenerator-runtime": "^0.13.3",
     "sharp": "^0.23.4",
     "socket.io": "^2.3.0",
-    "worker-injector-generator-plugin": "^1.0.0"
+    "worker-injector-generator-plugin": "^1.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",

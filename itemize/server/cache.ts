@@ -70,7 +70,7 @@ export class Cache {
         .where("id", id).andWhere("version", version).join(idefTable, (clause) => {
       clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
       clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
-    });
+    }) || null;
     this.redisClient.set(idefQueryIdentifier, JSON.stringify(queryValue), (error) => {
       if (!error) {
         this.pokeCache(idefQueryIdentifier);

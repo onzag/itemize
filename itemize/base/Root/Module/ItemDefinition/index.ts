@@ -854,8 +854,8 @@ export default class ItemDefinition {
    * which are active and match the specific name
    * that means the item is not excluded and the item is
    * matches the name
-   * @param id the id of the current state
-   * @param version the version of the current state
+   * @param id the slot id of the current state
+   * @param version the slot version of the current state
    * @param name the name of the item
    * @returns a boolean
    */

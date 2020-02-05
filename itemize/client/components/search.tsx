@@ -15,6 +15,7 @@ interface IGQLSearchResultWithPopulateData extends IGQLSearchResult {
   providerProps: {
     key: string;
     forId: number;
+    forVersion: string;
     itemDefinition: string;
     optimize: {
       onlyIncludeProperties?: string[],
@@ -347,6 +348,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                 providerProps: {
                   key: itemDefinition.getQualifiedPathName() + "." + searchResult.id,
                   forId: searchResult.id,
+                  forVersion: searchResult.version,
                   itemDefinition: searchResult.type,
                   optimize: {
                     onlyIncludeProperties: this.props.searchRequestedProperties,

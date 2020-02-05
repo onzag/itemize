@@ -447,7 +447,8 @@ export default class CacheWorker {
     if (cachePolicy === "by-owner") {
       storeKeyName += searchArgs.created_by;
     } else {
-      storeKeyName += searchArgs.parent_type + "." + searchArgs.parent_id;
+      storeKeyName += searchArgs.parent_type + "." +
+        searchArgs.parent_id + "." + JSON.stringify(searchArgs.parent_version);
     }
 
     // first we build an array for the results that we need to process
@@ -480,6 +481,7 @@ export default class CacheWorker {
         } else {
           actualArgsToUseInGQLSearch.parent_type = searchArgs.parent_type;
           actualArgsToUseInGQLSearch.parent_id = searchArgs.parent_id;
+          actualArgsToUseInGQLSearch.parent_version = searchArgs.parent_version;
         }
 
         // we request the server for this, in this case

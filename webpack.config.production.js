@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const WorkerInjectorGeneratorPlugin = require("worker-injector-generator-plugin");
 
 module.exports = {
   mode: 'production',
@@ -16,6 +17,14 @@ module.exports = {
       chunkFilename: "build.production.css"
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new WorkerInjectorGeneratorPlugin({
+      name: "cache-worker.injector.production.js",
+      importScripts: [
+        "commons.production.js",
+        "cache-worker.production.js",
+      ],
+      isAsync: true,
+    }),
     new BundleAnalyzerPlugin(),
   ],
   resolve: {

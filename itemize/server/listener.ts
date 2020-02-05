@@ -214,7 +214,7 @@ export class Listener {
     }
 
     const mergedIndexIdentifier = "PARENTED_SEARCH." + request.qualifiedPathName + "." +
-      request.parentType + "." + request.parentId;
+      request.parentType + "." + request.parentId + "." + JSON.stringify(request.parentVersion);
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       console.log("subscribing to", mergedIndexIdentifier);
       this.redisSub.subscribe(mergedIndexIdentifier);
@@ -412,7 +412,7 @@ export class Listener {
     request: IParentedSearchUnregisterRequest,
   ) {
     const mergedIndexIdentifier = "PARENTED_SEARCH." + request.qualifiedPathName + "." + request.parentType +
-      "." + request.parentId;
+      "." + request.parentId + "." + JSON.stringify(request.parentVersion);
     this.removeListener(socket, mergedIndexIdentifier);
   }
   public triggerListeners(
@@ -446,7 +446,7 @@ export class Listener {
     listenerUUID: string,
   ) {
     const mergedIndexIdentifier = "PARENTED_SEARCH." + event.qualifiedPathName + "." + event.parentType +
-      "." + event.parentId;
+      "." + event.parentId + "." + JSON.stringify(event.parentVersion);
     console.log("publishing to", mergedIndexIdentifier);
     this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
       event,
