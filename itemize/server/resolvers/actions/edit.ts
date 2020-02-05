@@ -28,6 +28,7 @@ import { EndpointError } from "../../../base/errors";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { IChangedFeedbackEvent } from "../../../base/remote-protocol";
+import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
 
 const debug = Debug("resolvers:editItemDefinition");
 export async function editItemDefinition(
@@ -239,49 +240,51 @@ export async function editItemDefinition(
   debug("SQL Input data for module is %j", sqlModData);
 
   // we build the transaction for the action
-  const value = await appData.knex.transaction(async (transactionKnex) => {
-    // and add them if we have them, note that the module will always have
-    // something to update because the edited_at field is always added when
-    // edition is taking place
-    const updateQueryMod = transactionKnex(moduleTable)
-      .update(sqlModData).where("id", resolverArgs.args.id)
-      .returning("*");
+  const value = convertVersionsIntoNullsWhenNecessary(
+    await appData.knex.transaction(async (transactionKnex) => {
+      // and add them if we have them, note that the module will always have
+      // something to update because the edited_at field is always added when
+      // edition is taking place
+      const updateQueryMod = transactionKnex(moduleTable)
+        .update(sqlModData).where("id", resolverArgs.args.id)
+        .returning("*");
 
-    // for the update query of the item definition we have to take several things
-    // into consideration, first we set it as an empty object
-    let updateOrSelectQueryIdef: any = {};
-    // if we have something to update
-    if (Object.keys(sqlIdefData).length) {
-      // we make the update query
-      updateOrSelectQueryIdef = transactionKnex(selfTable).update(sqlIdefData).where(
-        CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-        resolverArgs.args.id,
-      ).andWhere(
-        CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-        resolverArgs.args.version || null,
-      ).returning("*");
-    // otherwise we check if we are just requesting some fields from the idef
-    } else {
-      // and make a simple select query
-      updateOrSelectQueryIdef = transactionKnex(selfTable).select("*").where(
-        CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-        resolverArgs.args.id,
-      ).andWhere(
-        CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-        resolverArgs.args.version || null,
-      );
-    }
-    // if there's nothing to update, or there is nothing to retrieve, it won't touch the idef table
+      // for the update query of the item definition we have to take several things
+      // into consideration, first we set it as an empty object
+      let updateOrSelectQueryIdef: any = {};
+      // if we have something to update
+      if (Object.keys(sqlIdefData).length) {
+        // we make the update query
+        updateOrSelectQueryIdef = transactionKnex(selfTable).update(sqlIdefData).where(
+          CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+          resolverArgs.args.id,
+        ).andWhere(
+          CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+          resolverArgs.args.version || null,
+        ).returning("*");
+      // otherwise we check if we are just requesting some fields from the idef
+      } else {
+        // and make a simple select query
+        updateOrSelectQueryIdef = transactionKnex(selfTable).select("*").where(
+          CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+          resolverArgs.args.id,
+        ).andWhere(
+          CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+          resolverArgs.args.version || null,
+        );
+      }
+      // if there's nothing to update, or there is nothing to retrieve, it won't touch the idef table
 
-    // now we run both queries
-    const updateQueryValueMod = await updateQueryMod;
-    const updateQueryValueIdef = await updateOrSelectQueryIdef;
+      // now we run both queries
+      const updateQueryValueMod = await updateQueryMod;
+      const updateQueryValueIdef = await updateOrSelectQueryIdef;
 
-    return {
-      ...updateQueryValueMod[0],
-      ...updateQueryValueIdef[0],
-    };
-  });
+      return {
+        ...updateQueryValueMod[0],
+        ...updateQueryValueIdef[0],
+      };
+    }),
+  );
 
   debug("SQL Output is %j", value);
 

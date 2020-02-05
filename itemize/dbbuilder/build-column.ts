@@ -28,7 +28,8 @@ export function buildColumn(
 ): Knex.ColumnBuilder {
   // now we need to execute, if there's no function in the table
   // creator or if it's marked as necessary to use a specific function
-  const tableColumnExec = !tableBuilder[columnData.type] || typesForceSpecific.includes(columnData.type) ?
+  const tableColumnExec: Knex.ColumnBuilder =
+    !tableBuilder[columnData.type] || typesForceSpecific.includes(columnData.type) ?
     // we use a specific function
     tableBuilder.specificType(columnName, columnData.type) :
     // otherwise we use the actual type
@@ -38,6 +39,15 @@ export function buildColumn(
   if (columnData.notNull) {
     // we mark it as so
     tableColumnExec.notNullable();
+  }
+
+  // if it has a default value
+  if (
+    typeof columnData.defaultTo !== "undefined" &&
+    columnData.defaultTo !== null
+  ) {
+    // make the default
+    tableColumnExec.defaultTo(columnData.defaultTo);
   }
 
   // return the same column builder execution

@@ -74,8 +74,10 @@ export async function dropExtraColumnInTable(
 
   // make the query
   const dropQuery = knex.schema.withSchema("public").alterTable(tableName, (table) => {
-    if (currentColumnSchema.fkTable) {
-      table.dropForeign([currentColumnName]);
+    if (currentColumnSchema.foreignKey) {
+      // columns is actually ignored according to docs since we have the id
+      // so we don't need to dive deep
+      table.dropForeign(null, tableName + "__" + currentColumnSchema.foreignKey.id);
     }
     table.dropColumn(currentColumnName);
   });
@@ -192,6 +194,7 @@ export async function createTable(
       finalTableSchema[columnName] = {
         type: columnData.type,
         notNull: columnData.notNull,
+        defaultTo: columnData.defaultTo,
       };
     });
   });
@@ -246,7 +249,8 @@ export async function updateTable(
       // that is because this is only in charge of the basic structure
     } else if (
       currentColumnSchema.type !== newColumnSchema.type ||
-      currentColumnSchema.notNull !== newColumnSchema.notNull
+      currentColumnSchema.notNull !== newColumnSchema.notNull ||
+      currentColumnSchema.defaultTo !== newColumnSchema.defaultTo
     ) {
       finalTableSchema[columnName] =
         await updateColumnInTable(knex, tableName, columnName, newColumnSchema, currentColumnSchema);

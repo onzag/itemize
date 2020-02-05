@@ -1142,7 +1142,7 @@ export default class ItemDefinition {
   ) {
     // first we flatten the value if necessary
     const flattenedValue = typeof value.DATA !== "undefined" ? flattenRawGQLValueOrFields(value) : value;
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     // we make it we have an applied value
     this.stateHasAppliedValueTo[mergedID] = true;
     // and set all the data regarding that value
@@ -1204,7 +1204,7 @@ export default class ItemDefinition {
    * @returns a number, will return UNSPECIFIED_OWNER if it cannot find anything
    */
   public getAppliedValueOwnerIfAny(id: number, version: string): number {
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     if (
       !this.stateHasAppliedValueTo[mergedID] ||
       !this.stateGQLAppliedValue[mergedID] ||
@@ -1229,7 +1229,7 @@ export default class ItemDefinition {
    */
   public cleanValueFor(id: number, version: string, excludeExtensions?: boolean) {
     // delete all from memory
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     delete this.stateHasAppliedValueTo[mergedID];
     delete this.stateGQLAppliedValue[mergedID];
 
@@ -1257,7 +1257,7 @@ export default class ItemDefinition {
    * @returns a boolean on whether it does or not
    */
   public hasAppliedValueTo(id: number, version: string): boolean {
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     return this.stateHasAppliedValueTo[mergedID];
   }
 
@@ -1268,7 +1268,7 @@ export default class ItemDefinition {
    * @returns the applied value structure
    */
   public getGQLAppliedValue(id: number, version: string): IItemDefinitionGQLValueType {
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     return this.stateGQLAppliedValue[mergedID] || null;
   }
 
@@ -1706,7 +1706,7 @@ export default class ItemDefinition {
    * @param listener the listener
    */
   public addListener(event: string, id: number, version: string, listener: ListenerType) {
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     if (!this.listeners[event]) {
       this.listeners[event] = {};
     }
@@ -1722,7 +1722,7 @@ export default class ItemDefinition {
    * @param listener the listener
    */
   public removeListener(event: string, id: number, version: string, listener: ListenerType) {
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     if (!this.listeners[event] || !this.listeners[event][mergedID]) {
       return;
     }
@@ -1756,7 +1756,7 @@ export default class ItemDefinition {
         );
       }
 
-      const mergedID = id + "." + JSON.stringify(version);
+      const mergedID = id + "." + (version || "");
       if (!this.listeners[event] || !this.listeners[event][mergedID]) {
         return;
       }

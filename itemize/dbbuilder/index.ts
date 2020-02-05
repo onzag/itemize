@@ -131,7 +131,7 @@ async function buildDatabase(
   newDatabaseSchema: ISQLSchemaDefinitionType,
 ): Promise<ISQLSchemaDefinitionType> {
   let transitoryCurrentSchema = await buildTables(knex, currentDatabaseSchema, newDatabaseSchema);
-  transitoryCurrentSchema = await buildForeignKeys(knex, transitoryCurrentSchema, newDatabaseSchema);
   transitoryCurrentSchema = await buildIndexes(knex, transitoryCurrentSchema, newDatabaseSchema);
+  transitoryCurrentSchema = await buildForeignKeys(knex, transitoryCurrentSchema, newDatabaseSchema);
   return transitoryCurrentSchema;
 }

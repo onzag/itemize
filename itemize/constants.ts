@@ -296,6 +296,7 @@ export const LOCATION_SEARCH_I18N = [
  */
 export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "id",
+  "version",
   "type",
   "blocked_at",
   "blocked_by",
@@ -420,6 +421,11 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   },
   version: {
     type: "string",
+    notNull: true,
+    // make it default to the invalid version value empty string
+    // this means null only for versions, this trick is done because
+    // it makes sense for the client, at the cost of the server logic
+    defaultTo: "",
     index: {
       id: "PRIMARY_KEY",
       type: "primary",

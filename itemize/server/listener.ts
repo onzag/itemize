@@ -38,6 +38,7 @@ import {
   IChangedFeedbackEvent,
 } from "../base/remote-protocol";
 import { IGQLSearchResult } from "../gql-querier";
+import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 
 interface IListenerList {
   [socketId: string]: {
@@ -165,7 +166,7 @@ export class Listener {
       return;
     }
 
-    const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + JSON.stringify(request.version);
+    const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       console.log("subscribing to", mergedIndexIdentifier);
       this.redisSub.subscribe(mergedIndexIdentifier);
@@ -214,7 +215,7 @@ export class Listener {
     }
 
     const mergedIndexIdentifier = "PARENTED_SEARCH." + request.qualifiedPathName + "." +
-      request.parentType + "." + request.parentId + "." + JSON.stringify(request.parentVersion);
+      request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       console.log("subscribing to", mergedIndexIdentifier);
       this.redisSub.subscribe(mergedIndexIdentifier);
@@ -257,7 +258,7 @@ export class Listener {
       }
       query.orderBy("created_at", "desc");
 
-      const newRecords: ISQLTableRowValue[] = await query;
+      const newRecords: ISQLTableRowValue[] = (await query).map(convertVersionsIntoNullsWhenNecessary);
 
       if (newRecords.length) {
         const event: IOwnedSearchRecordsAddedEvent = {
@@ -313,7 +314,7 @@ export class Listener {
       }
       query.orderBy("created_at", "desc");
 
-      const newRecords: ISQLTableRowValue[] = await query;
+      const newRecords: ISQLTableRowValue[] = (await query).map(convertVersionsIntoNullsWhenNecessary);
 
       if (newRecords.length) {
         const event: IParentedSearchRecordsAddedEvent = {
@@ -397,7 +398,7 @@ export class Listener {
     socket: Socket,
     request: IUnregisterRequest,
   ) {
-    const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + JSON.stringify(request.version);
+    const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
     this.removeListener(socket, mergedIndexIdentifier);
   }
   public ownedSearchUnregister(
@@ -412,14 +413,14 @@ export class Listener {
     request: IParentedSearchUnregisterRequest,
   ) {
     const mergedIndexIdentifier = "PARENTED_SEARCH." + request.qualifiedPathName + "." + request.parentType +
-      "." + request.parentId + "." + JSON.stringify(request.parentVersion);
+      "." + request.parentId + "." + (request.parentVersion || "");
     this.removeListener(socket, mergedIndexIdentifier);
   }
   public triggerListeners(
     event: IChangedFeedbackEvent,
     listenerUUID: string,
   ) {
-    const mergedIndexIdentifier = event.itemDefinition + "." + event.id + "." + JSON.stringify(event.version);
+    const mergedIndexIdentifier = event.itemDefinition + "." + event.id + "." + (event.version || "");
     console.log("publishing to", mergedIndexIdentifier);
     this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
       event,
@@ -446,7 +447,7 @@ export class Listener {
     listenerUUID: string,
   ) {
     const mergedIndexIdentifier = "PARENTED_SEARCH." + event.qualifiedPathName + "." + event.parentType +
-      "." + event.parentId + "." + JSON.stringify(event.parentVersion);
+      "." + event.parentId + "." + (event.parentVersion || "");
     console.log("publishing to", mergedIndexIdentifier);
     this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
       event,

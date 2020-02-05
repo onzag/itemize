@@ -33,6 +33,7 @@ import { IParentedSearchRecordsAddedEvent, IOwnedSearchRecordsAddedEvent } from 
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { EndpointError } from "../../../base/errors";
 import { IGQLSearchResult } from "../../../gql-querier";
+import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
 
 const debug = Debug("resolvers:addItemDefinition");
 export async function addItemDefinition(
@@ -238,7 +239,9 @@ export async function addItemDefinition(
 
   if (isParenting) {
     sqlModData.parent_id = resolverArgs.args.parent_id;
-    sqlModData.parent_version = resolverArgs.args.parent_version || null;
+    // the version can never be null, so we must cast it into the invalid
+    // empty string value
+    sqlModData.parent_version = resolverArgs.args.parent_version || "";
     sqlModData.parent_type = resolverArgs.args.parent_type;
   }
 
@@ -248,32 +251,34 @@ export async function addItemDefinition(
   // now let's build the transaction for the insert query which requires
   // two tables to be modified, and it always does so, as item definition information
   // must be added because create requires so
-  const value = await appData.knex.transaction(async (transactionKnex) => {
-    debug("Inserting...");
-    // so we insert in the module, this is very simple
-    // we use the transaction in the module table
-    // insert the sql data that we got ready, and return
-    // the requested columns in sql, there's always at least 1
-    // because we always need the id
-    const insertQueryValueMod = await transactionKnex(moduleTable)
-      .insert(sqlModData).returning("*");
+  const value: ISQLTableRowValue = convertVersionsIntoNullsWhenNecessary(
+    await appData.knex.transaction(async (transactionKnex) => {
+      debug("Inserting...");
+      // so we insert in the module, this is very simple
+      // we use the transaction in the module table
+      // insert the sql data that we got ready, and return
+      // the requested columns in sql, there's always at least 1
+      // because we always need the id
+      const insertQueryValueMod = await transactionKnex(moduleTable)
+        .insert(sqlModData).returning("*");
 
-    // so with that in mind, we add the foreign key column value
-    // for combining both and keeping them joined togeher
-    sqlIdefData[CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod[0].id;
-    sqlIdefData[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod[0].version;
+      // so with that in mind, we add the foreign key column value
+      // for combining both and keeping them joined togeher
+      sqlIdefData[CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod[0].id;
+      sqlIdefData[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod[0].version;
 
-    // so now we create the insert query
-    const insertQueryIdef = transactionKnex(selfTable).insert(sqlIdefData).returning("*");
-    // so we call the qery
-    const insertQueryValueIdef = await insertQueryIdef;
+      // so now we create the insert query
+      const insertQueryIdef = transactionKnex(selfTable).insert(sqlIdefData).returning("*");
+      // so we call the qery
+      const insertQueryValueIdef = await insertQueryIdef;
 
-    // and we return the joined result
-    return {
-      ...insertQueryValueMod[0],
-      ...insertQueryValueIdef[0],
-    };
-  });
+      // and we return the joined result
+      return {
+        ...insertQueryValueMod[0],
+        ...insertQueryValueIdef[0],
+      };
+    }),
+  );
 
   debug("SQL Output is %j", value);
   appData.cache.forceCacheInto(selfTable, value.id, value.version, value);

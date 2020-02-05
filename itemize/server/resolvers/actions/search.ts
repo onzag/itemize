@@ -22,6 +22,7 @@ import {
 } from "../../../constants";
 import { buildSQLQueryForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { IGQLSearchResult } from "../../../gql-querier";
+import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
 
 const searchModuleDebug = Debug("resolvers:searchModule");
 export async function searchModule(
@@ -110,7 +111,7 @@ export async function searchModule(
   }
 
   // return using the base result, and only using the id
-  const baseResult: IGQLSearchResult[] = await searchQuery;
+  const baseResult: IGQLSearchResult[] = (await searchQuery).map(convertVersionsIntoNullsWhenNecessary);
   const finalResult: {
     ids: IGQLSearchResult[];
     last_record: IGQLSearchResult;
@@ -268,12 +269,12 @@ export async function searchItemDefinition(
   // now we get the base result, and convert every row
   const baseResult: ISQLTableRowValue[] = await searchQuery;
   const ids: IGQLSearchResult[] = baseResult.map((row) => {
-    return {
+    return convertVersionsIntoNullsWhenNecessary({
       id: row.id,
       type: selfTable,
       created_at: row.created_at,
       version: row.version,
-    };
+    }) as IGQLSearchResult;
   });
   const finalResult: {
     ids: IGQLSearchResult[];

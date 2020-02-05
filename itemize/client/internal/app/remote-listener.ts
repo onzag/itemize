@@ -163,7 +163,7 @@ export class RemoteListener {
     if (!this.isReady) {
       throw new Error("Remote listener is not ready");
     }
-    const qualifiedIdentifier = itemDefinitionQualifiedPathName + "." + forId + "." + JSON.stringify(forVersion);
+    const qualifiedIdentifier = itemDefinitionQualifiedPathName + "." + forId + "." + (forVersion || "");
     if (this.listeners[qualifiedIdentifier]) {
       this.listeners[qualifiedIdentifier].parentInstances.push(parentInstance);
       return;
@@ -277,7 +277,7 @@ export class RemoteListener {
     }
 
     const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." +
-      parentType + "." + parentId + "." + JSON.stringify(parentVersion);
+      parentType + "." + parentId + "." + (parentVersion || "");
     if (this.parentedSearchListeners[qualifiedIdentifier]) {
       this.parentedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
       return;
@@ -326,7 +326,7 @@ export class RemoteListener {
     forId: number,
     forVersion: string,
   ) {
-    const qualifiedID = itemDefinitionQualifiedPathName + "." + forId + "." + JSON.stringify(forVersion);
+    const qualifiedID = itemDefinitionQualifiedPathName + "." + forId + "." + (forVersion || "");
     const listenerValue = this.listeners[qualifiedID];
     if (listenerValue) {
       const newListenerValue = {
@@ -388,7 +388,7 @@ export class RemoteListener {
     parentVersion: string,
   ) {
     const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName +
-      "." + parentType + "." + parentId + "." + JSON.stringify(parentVersion);
+      "." + parentType + "." + parentId + "." + (parentVersion || "");
     const listenerValue = this.ownedSearchListeners[qualifiedIdentifier];
     if (listenerValue) {
       const newListenerValue = {
@@ -564,7 +564,7 @@ export class RemoteListener {
   ) {
     const parentedListener = this.parentedSearchListeners[
       event.qualifiedPathName + "." + event.parentType + "." +
-      event.parentId + "." + JSON.stringify(event.parentVersion)
+      event.parentId + "." + (event.parentVersion || "")
     ];
     if (parentedListener) {
       parentedListener.lastKnownRecord = event.newLastRecord;

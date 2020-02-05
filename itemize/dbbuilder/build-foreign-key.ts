@@ -5,15 +5,26 @@
  * @packageDocumentation
  */
 
-// TODO implement the multiple foreign key generator like the index, right now it won't work
-// foreign keys aren't even working whatsoever
-
 import colors from "colors/safe";
 import Knex from "knex";
 
 import { ISQLSchemaDefinitionType } from "../base/Root/sql";
 import { showErrorStackAndLogMessage, yesno } from ".";
-import { buildColumn } from "./build-column";
+
+interface IProcessedForeignKeyColumn {
+  level: number;
+  columnName: string;
+  referencesColumn: string;
+}
+
+interface IProcessedForeignKeys {
+  [id: string]: {
+    targetTable: string;
+    deleteAction: string;
+    updateAction: string;
+    columns: IProcessedForeignKeyColumn[];
+  };
+}
 
 /**
  * Builds all the foreign keys
@@ -41,6 +52,7 @@ export async function buildForeignKeys(
   // Now we want to check for foreign keys we start over, add foreign keys
   // later because we don't know what order were tables added
   for (const tableName of Object.keys(newDatabaseSchema)) {
+
     // the result table schema for that specific table
     const newTableSchema = newDatabaseSchema[tableName];
     const currentTableSchema = currentDatabaseSchema[tableName];
@@ -48,160 +60,305 @@ export async function buildForeignKeys(
     // we cannot operate unless there's a current table schema this could
     // mean a table was not added or something
     if (!currentTableSchema) {
-      return;
+      continue;
     }
 
     // now we copy the current table schema
     finalSchema[tableName] = {...currentTableSchema};
 
+    // so now we check the indexes for that we need to gather them
+    // in the proper form
+    const newTableForeignKeys: IProcessedForeignKeys  = {};
+    const currentTableForeignKeys: IProcessedForeignKeys = {};
+
+    // so we loop in each column to see in an foreign key has been specified
+    // at this point both newTableSchema and currentTableSchema should have
+    // the same columns so we expect to get both from this
     for (const columnName of Object.keys(newTableSchema)) {
-      // we get the data from the column
-      const newColumnData = newTableSchema[columnName];
+      // this way
+      const newColumnSchema = newTableSchema[columnName];
+      const currentColumnSchema = currentTableSchema[columnName];
 
-      // now we try to get what is available (there might be none)
-      const currentColumnData = currentTableSchema && currentTableSchema[columnName];
-      const currentFkTable = currentColumnData && currentColumnData.fkTable;
-      const currentFkColumn = currentColumnData && currentColumnData.fkCol || "id";
-      const currentFkAction = currentColumnData && currentColumnData.fkAction || "cascade";
-
-      // even when we don't know whether it exists or not, we prepare this, if awaited
-      // it will drop the current foreign key that exists in the schema (if any)
-      const currentForeignKeyDrop = knex.schema.withSchema("public").alterTable(tableName, (table) => {
-        table.dropForeign([columnName]);
-      });
-
-      // if we have a new foreign key to add
-      if (newColumnData.fkTable) {
-        // we get the data of the new foreign key to add
-        const newFkTable = newColumnData.fkTable;
-        const newFkColumn = newColumnData.fkCol || "id";
-        const newFkAction = newColumnData.fkAction || "cascade";
-
-        // so this is now the function that is used in order to create the foreign key
-        // note that the table exists already
-        const foreignKeyCreation = knex.schema.withSchema("public").alterTable(tableName, (table) => {
-          // we need to use the build column function in order to refer to it
-          buildColumn(columnName, newTableSchema[columnName], table)
-            .references(newFkColumn).inTable(newFkTable).onDelete(newFkAction)
-            .alter();
-        });
-
-        // so now if we don't have a foreign key there already,
-        // we add it
-        if (!currentFkTable) {
-          console.log(colors.yellow(`Foreign key on ${tableName}.${columnName} which references ${newFkTable}.${newFkColumn} is missing`));
-
-          // ask to add the foreign key
-          if (await yesno(
-            "create the foreign key?",
-          )) {
-            try {
-              console.log(foreignKeyCreation.toString());
-              await foreignKeyCreation;
-
-              // now we copy the column to make it a new value
-              // as we need to modify certain properties as
-              // they had been updated
-              finalSchema[tableName][columnName] = {
-                ...currentDatabaseSchema[tableName][columnName],
-              };
-              // we update the properties as we managed to do
-              finalSchema[tableName][columnName].fkTable = newFkTable;
-              finalSchema[tableName][columnName].fkCol = newFkColumn;
-              finalSchema[tableName][columnName].fkAction = newFkAction;
-            } catch (err) {
-              showErrorStackAndLogMessage(err);
-            }
+      // if the current has an index specified
+      if (currentColumnSchema.foreignKey) {
+        // we need to check if we have one index with the same id, if we don't
+        if (!currentTableForeignKeys[currentColumnSchema.foreignKey.id]) {
+          // we create this new index with only that column
+          currentTableForeignKeys[currentColumnSchema.foreignKey.id] = {
+            targetTable: currentColumnSchema.foreignKey.table,
+            deleteAction: currentColumnSchema.foreignKey.deleteAction,
+            updateAction: currentColumnSchema.foreignKey.updateAction,
+            columns: [{
+              level: currentColumnSchema.foreignKey.level,
+              columnName,
+              referencesColumn: currentColumnSchema.foreignKey.column,
+            }],
+          };
+        } else {
+          // if we do we push the column
+          currentTableForeignKeys[currentColumnSchema.foreignKey.id].columns.push({
+            level: currentColumnSchema.foreignKey.level,
+            columnName,
+            referencesColumn: currentColumnSchema.foreignKey.column,
+          });
+          // let's check that the table is congrugent
+          if (
+            currentColumnSchema.foreignKey.table !==
+            currentTableForeignKeys[currentColumnSchema.foreignKey.id].targetTable
+          ) {
+            console.log(colors.red(
+              `Foreign key with id ${currentColumnSchema.foreignKey.id} in current schema` +
+              `schema has unmatching tables ${currentColumnSchema.foreignKey.table} over stored ` +
+              `${currentTableForeignKeys[currentColumnSchema.foreignKey.id].targetTable}`,
+            ));
           }
 
-        // otherwise if we actually have a currentFkTable
-        // and these do not match
-        } else if (
-          currentFkTable !== newFkTable ||
-          currentFkColumn !== newFkColumn ||
-          currentFkAction !== newFkAction
-        ) {
-          console.log(colors.yellow(
-            `Foreign key on ${tableName}.${columnName} which references ${currentFkTable}.${currentFkColumn} ${currentFkAction} has been changed ` +
-            `to ${newFkTable}.${newFkColumn} ${newFkAction}`,
-          ));
+          // now let's check if the delete action is congrugent
+          if (
+            currentColumnSchema.foreignKey.deleteAction !==
+            currentTableForeignKeys[currentColumnSchema.foreignKey.id].deleteAction
+          ) {
+            console.log(colors.red(
+              `Foreign key with id ${currentColumnSchema.foreignKey.id} in current schema` +
+              `schema has unmatching delete actions ${currentColumnSchema.foreignKey.deleteAction} over stored ` +
+              `${currentTableForeignKeys[currentColumnSchema.foreignKey.id].deleteAction}`,
+            ));
+          }
 
-          // drop current foreign key and create new
-          if (await yesno(
-             "update the foreign key?",
-          )) {
-            // try to drop current foreign key
-            try {
-              console.log(currentForeignKeyDrop.toString());
-              await currentForeignKeyDrop;
-
-              // now we copy the column to make it a new value
-              // as we need to modify certain properties as
-              // they had been updated
-              finalSchema[tableName][columnName] = {
-                ...currentDatabaseSchema[tableName][columnName],
-              };
-
-              // if we succeed and we came here we update the
-              // resulting schema to reflect that the fk is gone
-              delete finalSchema[tableName][columnName].fkTable;
-              delete finalSchema[tableName][columnName].fkAction;
-              delete finalSchema[tableName][columnName].fkCol;
-
-              // now we enter into a second clause
-              // this won't execute if the first one fails
-              try {
-                console.log(foreignKeyCreation.toString());
-                await foreignKeyCreation;
-
-                // now we update to reflect we have added the new
-                // foreign key
-                finalSchema[tableName][columnName].fkTable = newFkTable;
-                finalSchema[tableName][columnName].fkAction = newFkAction;
-                finalSchema[tableName][columnName].fkCol = newFkColumn;
-              } catch (err) {
-                // we show an error
-                showErrorStackAndLogMessage(err);
-              }
-            } catch (err) {
-              // this error only comes if current foriegn key fails to drop
-              showErrorStackAndLogMessage(err);
-            }
+          // now let's check if the update action is congrugent
+          if (
+            currentColumnSchema.foreignKey.updateAction !==
+            currentTableForeignKeys[currentColumnSchema.foreignKey.id].updateAction
+          ) {
+            console.log(colors.red(
+              `Foreign key with id ${currentColumnSchema.foreignKey.id} in current schema` +
+              `schema has unmatching update actions ${currentColumnSchema.foreignKey.updateAction} over stored ` +
+              `${currentTableForeignKeys[currentColumnSchema.foreignKey.id].updateAction}`,
+            ));
           }
         }
+      }
 
-      // Otherwise if there is no new value and there is only
-      // a current value, we are only asking to drop
-      } else if (currentFkTable) {
+      // now let's check the new does it have a foreign key
+      if (newColumnSchema.foreignKey) {
+        // if it has not yet been stored
+        if (!newTableForeignKeys[newColumnSchema.foreignKey.id]) {
+          // create one new with only that columm
+          newTableForeignKeys[newColumnSchema.foreignKey.id] = {
+            targetTable: newColumnSchema.foreignKey.table,
+            deleteAction: newColumnSchema.foreignKey.deleteAction,
+            updateAction: newColumnSchema.foreignKey.updateAction,
+            columns: [{
+              level: newColumnSchema.foreignKey.level,
+              columnName,
+              referencesColumn: newColumnSchema.foreignKey.column,
+            }],
+          };
+        } else {
+          // otherwise add the column
+          newTableForeignKeys[newColumnSchema.foreignKey.id].columns.push({
+            level: newColumnSchema.foreignKey.level,
+            columnName,
+            referencesColumn: newColumnSchema.foreignKey.column,
+          });
+
+          // let's check that the table is congrugent
+          if (
+            newColumnSchema.foreignKey.table !==
+            newTableForeignKeys[newColumnSchema.foreignKey.id].targetTable
+          ) {
+            console.log(colors.red(
+              `Foreign key with id ${newColumnSchema.foreignKey.id} in new schema` +
+              `schema has unmatching tables ${newColumnSchema.foreignKey.table} over stored ` +
+              `${newTableForeignKeys[newColumnSchema.foreignKey.id].targetTable}`,
+            ));
+          }
+
+          // now let's check if the delete action is congrugent
+          if (
+            newColumnSchema.foreignKey.deleteAction !==
+            newTableForeignKeys[newColumnSchema.foreignKey.id].deleteAction
+          ) {
+            console.log(colors.red(
+              `Foreign key with id ${newColumnSchema.foreignKey.id} in new schema` +
+              `schema has unmatching delete actions ${newColumnSchema.foreignKey.deleteAction} over stored ` +
+              `${newTableForeignKeys[newColumnSchema.foreignKey.id].deleteAction}`,
+            ));
+          }
+
+          // now let's check if the update action is congrugent
+          if (
+            newColumnSchema.foreignKey.updateAction !==
+            newTableForeignKeys[newColumnSchema.foreignKey.id].updateAction
+          ) {
+            console.log(colors.red(
+              `Foreign key with id ${newColumnSchema.foreignKey.id} in new schema` +
+              `schema has unmatching update actions ${newColumnSchema.foreignKey.updateAction} over stored ` +
+              `${newTableForeignKeys[newColumnSchema.foreignKey.id].updateAction}`,
+            ));
+          }
+        }
+      }
+    }
+
+    // now we build a set of all foreign keys, these might not be equal, but might collide, so we get
+    // a list of all the unique ids
+    const allForeignKeys = new Set(Object.keys(newTableForeignKeys).concat(Object.keys(currentTableForeignKeys)));
+
+    for (const foreignKeyId of allForeignKeys) {
+      // either of these might be undefined
+      const newForeignKey = newTableForeignKeys[foreignKeyId];
+      const currentForeignKey = currentTableForeignKeys[foreignKeyId];
+
+      const newForeignKeyColumnsSorted = newForeignKey && newForeignKey.columns.sort((a, b) => {
+        return a.level - b.level;
+      });
+
+      const newForeignKeySourceColumnsStored = newForeignKeyColumnsSorted &&
+        newForeignKeyColumnsSorted.map((m) => m.columnName);
+
+      const newForeignKeyReferenceColumnsStored = newForeignKeyColumnsSorted &&
+        newForeignKeyColumnsSorted.map((m) => m.referencesColumn);
+
+      const currentForeignKeyColumnsSorted = currentForeignKey && currentForeignKey.columns.sort((a, b) => {
+        return a.level - b.level;
+      });
+
+      const currentForeignKeySourceColumnsStored = currentForeignKeyColumnsSorted &&
+      currentForeignKeyColumnsSorted.map((m) => m.columnName);
+
+      const currentForeignKeyReferenceColumnsStored = currentForeignKeyColumnsSorted &&
+        currentForeignKeyColumnsSorted.map((m) => m.referencesColumn);
+
+      // this variable is a helper, basically we cannot over
+      // set indexes, so we need to drop the current if there
+      // is one
+      let wasSupposedToDropCurrentForeignKeyButDidnt = false;
+
+      // so if we have a current foreign key
+      // and such foreign key doesn't match our new foreign key
+      if (
+        // so if we have a current foreign key
+        currentForeignKey &&
+        (
+          // and there's no new foreign key or
+          !newForeignKey ||
+          (
+            // the foreign key signature does not match
+            newForeignKey.targetTable !== currentForeignKey.targetTable ||
+            newForeignKey.deleteAction !== currentForeignKey.deleteAction ||
+            newForeignKeySourceColumnsStored.join(",") !== currentForeignKeySourceColumnsStored.join(",") ||
+            newForeignKeyReferenceColumnsStored.join(",") !== currentForeignKeyReferenceColumnsStored.join(",")
+          )
+        )
+      ) {
+        // show a proper message, update or removed
+        if (newForeignKey) {
+          console.log(colors.yellow(
+            `Foreign key '${foreignKeyId}' has been changed, ` +
+            `the current foreign key needs to be dropped`,
+          ));
+        } else {
+          console.log(colors.yellow(
+            `Foreign key '${foreignKeyId}' has been dropped`,
+          ));
+        }
+
+        // ask if we want the index to be dropped
+        if (await yesno(
+          "drop the foreign key?",
+        )) {
+          // we drop the index
+          try {
+            await knex.schema.withSchema("public").alterTable(tableName, (t) => {
+              t.dropForeign(currentForeignKeySourceColumnsStored, tableName + "__" + foreignKeyId);
+            });
+
+            // now we need to update each column affected
+            currentForeignKeySourceColumnsStored.forEach((columnName) => {
+              // copy the column information to reflect the update
+              finalSchema[tableName][columnName] = {
+                ...currentDatabaseSchema[tableName][columnName],
+              };
+              // and now delete the foreign key
+              delete finalSchema[tableName][columnName].foreignKey;
+            });
+
+          } catch (err) {
+            showErrorStackAndLogMessage(err);
+            wasSupposedToDropCurrentForeignKeyButDidnt = true;
+          }
+        } else {
+          wasSupposedToDropCurrentForeignKeyButDidnt = true;
+        }
+      }
+
+      // so now if we have a new foreign type which is not equal to the old
+      // and we actually dropped the old foreign key (if there was any)
+      if (
+        // if we have the new foreign key
+        newForeignKey &&
+        // and if we didn't cancel dropping (if we were requested)
+        !wasSupposedToDropCurrentForeignKeyButDidnt &&
+        (
+          // if we do have an entirely new index, as in it's not an update
+          // of a previous index or
+          (
+            !currentForeignKey
+          ) ||
+          // this is an update
+          (
+            // the foreign key signature does not match
+            newForeignKey.targetTable !== currentForeignKey.targetTable ||
+            newForeignKey.deleteAction !== currentForeignKey.deleteAction ||
+            newForeignKeySourceColumnsStored.join(",") !== currentForeignKeySourceColumnsStored.join(",") ||
+            newForeignKeyReferenceColumnsStored.join(",") !== currentForeignKeyReferenceColumnsStored.join(",")
+          )
+        )
+      ) {
+        // show the message that the foreign key needs to be created
         console.log(colors.yellow(
-          `Foreign key on ${tableName}.${columnName} which references ${currentFkTable}.${currentFkColumn} has been dropped`,
+          `Foreign key '${foreignKeyId}' must now be created, ` +
+          `with relationship ${newForeignKeySourceColumnsStored.join(", ")} ` +
+          `on table ${tableName} relating to the columns ` +
+          `${newForeignKeyReferenceColumnsStored.join(", ")} on table ${newForeignKey.targetTable}`,
         ));
 
-        // drop current foreign key
+        // ask on whether we create the index
         if (await yesno(
-          "Do you wish to remove the foreign key?",
+          "create the foreign key?",
         )) {
           try {
-            console.log(currentForeignKeyDrop.toString());
-            await currentForeignKeyDrop;
+            await knex.schema.withSchema("public").alterTable(tableName, (t) => {
+              t.foreign(newForeignKeySourceColumnsStored, tableName + "__" + foreignKeyId)
+                .references(newForeignKeyReferenceColumnsStored).inTable(newForeignKey.targetTable)
+                .onDelete(newForeignKey.deleteAction).onUpdate(newForeignKey.updateAction);
+            });
 
-            // now we copy the column to make it a new value
-            // as we need to delete
-            finalSchema[tableName][columnName] = {
-              ...currentDatabaseSchema[tableName][columnName],
-            };
+            // now we need to update each affected column
+            newForeignKeySourceColumnsStored.forEach((columnName, index) => {
+              // copy the column information to reflect the update
+              finalSchema[tableName][columnName] = {
+                ...currentDatabaseSchema[tableName][columnName],
+              };
+              // and now set the index
+              finalSchema[tableName][columnName].foreignKey = {
+                id: foreignKeyId,
+                table: newForeignKey.targetTable,
+                level: index,
+                column: newForeignKeyReferenceColumnsStored[index],
+                deleteAction: newForeignKey.deleteAction,
+                updateAction: newForeignKey.updateAction,
+              };
+            });
 
-            // we remove the properties
-            delete finalSchema[tableName][columnName].fkTable;
-            delete finalSchema[tableName][columnName].fkAction;
-            delete finalSchema[tableName][columnName].fkCol;
           } catch (err) {
             showErrorStackAndLogMessage(err);
           }
         }
       }
     }
-
-    return finalSchema;
   }
+
+  return finalSchema;
 }

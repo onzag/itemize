@@ -55,7 +55,7 @@ export async function buildIndexes(
     // we cannot operate unless there's a current table schema this could
     // mean a table was not added or something
     if (!currentTableSchema) {
-      return;
+      continue;
     }
 
     // now we copy the current table schema
@@ -231,7 +231,6 @@ export async function buildIndexes(
           // if we do have an entirely new index, as in it's not an update
           // of a previous index or
           (
-            newIndex &&
             !currentIndex
           ) ||
           // this is an update

@@ -22,20 +22,39 @@ export interface ISQLColumnDefinitionType {
    */
   notNull?: boolean;
   /**
-   * A foreign key table
+   * A value to make it be default to for this column
    */
-  fkTable?: string;
+  defaultTo?: any;
   /**
-   * A foreign key column
+   * A foreign key
    */
-  fkCol?: string;
-  /**
-   * A foreign key action
-   */
-  fkAction?: string;
-  /**
-   * an index type
-   */
+  foreignKey?: {
+    /**
+     * The id of the foreign key relationship being created
+     * so it can relate to others of the same table
+     */
+    id: string;
+    /**
+     * The other table it relates to (this column specifically)
+     */
+    table: string;
+    /**
+     * The other column it relates to (this column specifically)
+     */
+    column: string;
+    /**
+     * The action to take once the relationship is dropped
+     */
+    deleteAction: string;
+    /**
+     * The action to take once the relationship is updated
+     */
+    updateAction: string;
+    /**
+     * The level and ordering of the foreign key
+     */
+    level: number;
+  };
   index?: {
     /**
      * The id of the index in order to perform double table indexes
@@ -46,7 +65,9 @@ export interface ISQLColumnDefinitionType {
      */
     type: string,
     /**
-     * The index level a numeric value to sort it as
+     * The index level a numeric value to sort it as, the level
+     * makes the order of columns in the key which might have
+     * performance effects
      */
     level: number,
   };

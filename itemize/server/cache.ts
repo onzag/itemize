@@ -3,6 +3,7 @@ import Knex from "knex";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../constants";
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { IGQLSearchResult } from "../gql-querier";
+import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 
 const CACHE_EXPIRES_DAYS = 2;
 
@@ -40,7 +41,7 @@ export class Cache {
     this.redisClient.expire(keyIdentifier, CACHE_EXPIRES_DAYS * 86400);
   }
   public forceCacheInto(idefTable: string, id: number, version: string, value: any) {
-    const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + JSON.stringify(version);
+    const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
     return new Promise((resolve) => {
       this.redisClient.set(idefQueryIdentifier, JSON.stringify(value), (error) => {
         resolve(value);
@@ -58,19 +59,21 @@ export class Cache {
     refresh?: boolean,
   ): Promise<ISQLTableRowValue> {
     console.log("requested", idefTable, moduleTable, id);
-    const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + JSON.stringify(version);
+    const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
     if (!refresh) {
       const currentValue = await this.getIdefCachedValue(idefQueryIdentifier);
       if (currentValue) {
         return currentValue.value;
       }
     }
-    const queryValue =
+    const queryValue: ISQLTableRowValue = convertVersionsIntoNullsWhenNecessary(
+      // let's remember versions as null do not exist in the database, instead it uses
+      // the invalid empty string "" value
       await this.knex.first("*").from(moduleTable)
-        .where("id", id).andWhere("version", version).join(idefTable, (clause) => {
+        .where("id", id).andWhere("version", version || "").join(idefTable, (clause) => {
       clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
       clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
-    }) || null;
+    }) || null);
     this.redisClient.set(idefQueryIdentifier, JSON.stringify(queryValue), (error) => {
       if (!error) {
         this.pokeCache(idefQueryIdentifier);

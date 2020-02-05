@@ -369,7 +369,7 @@ async function clientSideIndexChecker(
   id: number,
   version: string,
 ) {
-  const mergedID = id + "." + JSON.stringify(version);
+  const mergedID = id + "." + (version || "");
   // null values automatically pass
   if (value === null) {
     return true;
@@ -442,7 +442,7 @@ async function clientSideAutocompleteChecker(
   id: number,
   version: string,
 ) {
-  const mergedID = id + "." + JSON.stringify(version);
+  const mergedID = id + "." + (version || "");
 
   // null values are automatically true
   if (value === null) {
@@ -922,7 +922,7 @@ export default class PropertyDefinition {
     enforced: boolean;
     value?: PropertyDefinitionSupportedType;
   } {
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     // first we check if there is any possibility
     // of an enforced value
     if (
@@ -1057,7 +1057,7 @@ export default class PropertyDefinition {
       return null;
     }
 
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
 
     // if it has not been modified, we might return a default value
     if (!this.stateValueModified[mergedID]) {
@@ -1100,7 +1100,7 @@ export default class PropertyDefinition {
     emulateExternalChecking?: boolean,
   ): IPropertyDefinitionState {
     const possibleEnforcedValue = this.getEnforcedValue(id, version);
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
 
     if (possibleEnforcedValue.enforced) {
       const possibleInvalidEnforcedReason = this.isValidValueNoExternalChecking(
@@ -1170,7 +1170,7 @@ export default class PropertyDefinition {
   public async getState(id: number, version: string): Promise<IPropertyDefinitionState> {
 
     const possibleEnforcedValue = this.getEnforcedValue(id, version);
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
 
     if (possibleEnforcedValue.enforced) {
       const possibleInvalidEnforcedReason = await this.isValidValue(id, version, possibleEnforcedValue.value);
@@ -1283,7 +1283,7 @@ export default class PropertyDefinition {
       }
     }
 
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     this.stateSuperEnforcedValue[mergedID] = actualValue;
   }
 
@@ -1296,7 +1296,7 @@ export default class PropertyDefinition {
     id: number,
     version: string,
   ) {
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     delete this.stateSuperEnforcedValue[mergedID];
   }
 
@@ -1362,7 +1362,7 @@ export default class PropertyDefinition {
       }
     }
 
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     // note that the value is set and never check
     this.stateValue[mergedID] = newActualValue;
     this.stateValueModified[mergedID] = true;
@@ -1395,7 +1395,7 @@ export default class PropertyDefinition {
     // is false, then we don't care and apply the value
     // however if it's true, we need to check the manually set variable
     // in order to know where the value comes from
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     if (
       !doNotApplyValueInPropertyIfPropertyHasBeenManuallySet ||
       !this.stateValueHasBeenManuallySet[mergedID]
@@ -1415,7 +1415,7 @@ export default class PropertyDefinition {
     id: number,
     version: string,
   ) {
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     delete this.stateValue[mergedID];
     delete this.stateValueModified[mergedID];
     delete this.stateInternalValue[mergedID];
@@ -1452,7 +1452,7 @@ export default class PropertyDefinition {
 
     // Cache check from the emulation of external checks
     if (emulateExternalChecking) {
-      const mergedID = id + "." + JSON.stringify(version);
+      const mergedID = id + "." + (version || "");
       // check if it has an index
       const hasIndex = this.isUnique();
       // checking the cache for that index

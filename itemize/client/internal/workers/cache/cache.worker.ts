@@ -217,7 +217,7 @@ export default class CacheWorker {
     }
 
     // otherwise we build the index indentifier, which is simple
-    const queryIdentifier = `${queryName}.${id}.${JSON.stringify(version)}`;
+    const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
 
     // and try to save it in the database, notice how we setup the expirarion
     // date
@@ -257,7 +257,7 @@ export default class CacheWorker {
       return false;
     }
 
-    const queryIdentifier = `${queryName}.${id}.${JSON.stringify(version)}`;
+    const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
 
     try {
       await db.delete(QUERIES_TABLE_NAME, queryIdentifier);
@@ -276,7 +276,7 @@ export default class CacheWorker {
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
   ): Promise<boolean> {
-    console.log("REQUESTED TO MERGE", queryName, id, partialValue);
+    console.log("REQUESTED TO MERGE", queryName, id, version, partialValue);
 
     const currentValue = await this.getCachedValue(queryName, id, version);
     if (
@@ -345,7 +345,7 @@ export default class CacheWorker {
     }
 
     // now we build the identifier
-    const queryIdentifier = `${queryName}.${id}.${JSON.stringify(version)}`;
+    const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
     try {
       // and we attempt to get the value from the database
       const idbValue: ICacheMatchType = await db.get(QUERIES_TABLE_NAME, queryIdentifier);
@@ -448,7 +448,7 @@ export default class CacheWorker {
       storeKeyName += searchArgs.created_by;
     } else {
       storeKeyName += searchArgs.parent_type + "." +
-        searchArgs.parent_id + "." + JSON.stringify(searchArgs.parent_version);
+        searchArgs.parent_id + "." + (searchArgs.parent_version || "");
     }
 
     // first we build an array for the results that we need to process

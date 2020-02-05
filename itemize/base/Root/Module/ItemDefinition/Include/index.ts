@@ -336,7 +336,7 @@ export default class Include {
     const canBeExcludedByUser = this.rawData.canUserExclude || (this.canUserExcludeIf &&
       this.canUserExcludeIf.evaluate(id, version));
     if (canBeExcludedByUser) {
-      const mergedID = id + "." + JSON.stringify(version);
+      const mergedID = id + "." + (version || "");
       // if it hasn't been modified we return the default state
       if (!this.stateExclusionModified[mergedID]) {
         // depending on the condition
@@ -411,7 +411,7 @@ export default class Include {
    * @param value the value for the exclusion state
    */
   public setExclusionState(id: number, version: string, value: IncludeExclusionState) {
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || null);
     this.stateExclusion[mergedID] = value;
     this.stateExclusionModified[mergedID] = true;
   }
@@ -468,7 +468,7 @@ export default class Include {
    */
   public getStateNoExternalChecking(id: number, version: string, emulateExternalChecking?: boolean): IIncludeState {
     const exclusionState = this.getExclusionState(id, version);
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     return {
       exclusionState,
       canExclusionBeSet: this.canExclusionBeSet(id, version),
@@ -490,7 +490,7 @@ export default class Include {
    */
   public async getState(id: number, version: string): Promise<IIncludeState> {
     const exclusionState = this.getExclusionState(id, version);
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     return {
       exclusionState,
       canExclusionBeSet: this.canExclusionBeSet(id, version),
@@ -519,7 +519,7 @@ export default class Include {
     exclusionState: IncludeExclusionState,
     doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
   ) {
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
 
     // update the state
     this.stateExclusion[mergedID] = exclusionState;
@@ -552,7 +552,7 @@ export default class Include {
     id: number,
     version: string,
   ) {
-    const mergedID = id + "." + JSON.stringify(version);
+    const mergedID = id + "." + (version || "");
     delete this.stateExclusion[mergedID];
     delete this.stateExclusionModified[mergedID];
 

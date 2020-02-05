@@ -41,19 +41,31 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
   // add all the standard fields
   // TODO fix this to use the new foreignKey and build the key
   // as the double of the primary key, similar to how indexes are done
+  const tableToConnect = itemDefinition.getParentModule().getQualifiedPathName();
   const resultTableSchema: ISQLTableDefinitionType = {
     [CONNECTOR_SQL_COLUMN_ID_FK_NAME]: {
       type: "integer",
       notNull: true,
-      fkTable: itemDefinition.getParentModule().getQualifiedPathName(),
-      fkCol: "id",
-      fkAction: "cascade",
+      foreignKey: {
+        id: "ITEM_TO_MODULE_CONNECTION",
+        table: tableToConnect,
+        column: "id",
+        deleteAction: "cascade",
+        updateAction: "cascade",
+        level: 0,
+      },
     },
     [CONNECTOR_SQL_COLUMN_VERSION_FK_NAME]: {
       type: "string",
-      fkTable: itemDefinition.getParentModule().getQualifiedPathName(),
-      fkCol: "version",
-      fkAction: "cascade",
+      notNull: true,
+      foreignKey: {
+        id: "ITEM_TO_MODULE_CONNECTION",
+        table: tableToConnect,
+        column: "version",
+        deleteAction: "cascade",
+        updateAction: "cascade",
+        level: 1,
+      },
     },
   };
 

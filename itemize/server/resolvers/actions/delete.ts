@@ -114,8 +114,10 @@ export async function deleteItemDefinition(
 
   // we run this, not even required to do it as a transaction
   // because the index in the item definition cascades
+  // TODO drop all versions
   await appData.knex(moduleTable).delete().where({
     id: resolverArgs.args.id,
+    version: resolverArgs.args.version,
     type: selfTable,
   });
 
