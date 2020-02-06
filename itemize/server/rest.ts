@@ -151,9 +151,9 @@ export default function restServices(appData: IAppDataType) {
     // This only occurs during development
     if (ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1") {
       res.end(JSON.stringify({
-        country: "FI",
-        currency: "EUR",
-        language: "fi",
+        country: appData.config.fallbackCountryCode,
+        currency: appData.config.fallbackCurrency,
+        language: appData.config.fallbackLanguage,
       }));
       return;
     }
@@ -161,9 +161,9 @@ export default function restServices(appData: IAppDataType) {
     // Occurs during production, we use the ipstack api
     // refer to ipstack
     const standardAPIResponse = JSON.stringify({
-      country: "FI",
-      currency: "EUR",
-      language: "en",
+      country: appData.config.fallbackCountryCode,
+      currency: appData.config.fallbackCurrency,
+      language: appData.config.fallbackLanguage,
     });
     http.get(`http://api.ipstack.com/${ip}?access_key=${appData.config.ipStackAccessKey}`, (resp) => {
       // let's get the response from the stream

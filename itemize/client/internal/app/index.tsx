@@ -291,8 +291,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // This shouldn't really happen, but otherwise we default to Finland
     // because why not
     if (!countryData) {
-      codeToSet = "FI";
-      console.warn("Attempted to set country to unavailable " + code + ", defaulted to Finland");
+      codeToSet = (window as any).FALLBACK_COUNTRY_CODE;
+      console.warn("Attempted to set country to unavailable " + code + ", defaulted to " + codeToSet);
     }
 
     if (!avoidChangingLanguageAndCurrency) {

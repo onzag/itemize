@@ -34,7 +34,7 @@ setup as a library how it should work
 
 npm init
 npm install itemize
-./node_modules/.bin/itemize wizard
+./node_modules/.bin/itemize setup
     request to install redis if not locally available
     request to install postgresql if not locally available
     request to install nginx if not locally available
@@ -70,8 +70,4 @@ npm install itemize
       npm run build-production-database   alias   builds the production database
       npm run build-demo-database         alias   builds the demo database
       npm run analyze-languages           alias   tells in which circumstances the languages in the config would be used
-    npm install tsc
-    npm install webpack
-    npm install mini-css-extract-plugin
-    npm install webpack-bundle-analyzer
-    npm install worker-injector-generator-plugin
+    run all the npm installs

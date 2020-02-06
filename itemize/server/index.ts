@@ -49,7 +49,7 @@ export interface IAppDataType {
   root: Root;
   autocompletes: Autocomplete[];
   index: string;
-  config: any;
+  config: IConfigRawJSONDataType;
   knex: Knex;
   listener: Listener;
   cache: Cache;

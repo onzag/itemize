@@ -13,6 +13,7 @@ import { IConfigRawJSONDataType } from "../config";
 import Traceback from "./Traceback";
 import CheckUpError from "./Error";
 import { ajvCheck, checkPartialConfig, checkPartialSensitiveConfig, checkDBConfig, checkRedisConfig } from "./schema-checks";
+import { countries, currencies } from "../imported-resources";
 import jsonMap from "json-source-map";
 const fsAsync = fs.promises;
 
@@ -68,6 +69,31 @@ export async function extractConfig(): Promise<IConfigRawJSONDataType> {
     rawDataConfigBase,
     rawDataConfigTraceback,
   );
+
+  // let's check the fallback values, first if the country is a valid country
+  if (!countries[rawDataConfigBase.fallbackCountryCode]) {
+    throw new CheckUpError(
+      "Invalid fallback country code",
+      rawDataConfigTraceback.newTraceToBit("fallbackCountryCode"),
+    );
+  }
+
+  // now if the currency is a valid currency
+  if (!currencies[rawDataConfigBase.fallbackCurrency]) {
+    throw new CheckUpError(
+      "Invalid fallback currency code",
+      rawDataConfigTraceback.newTraceToBit("fallbackCurrency"),
+    );
+  }
+
+  // and if the language is a valid language from the supported list in the config
+  // itself
+  if (!rawDataConfigBase.supportedLanguages.includes(rawDataConfigBase.fallbackLanguage)) {
+    throw new CheckUpError(
+      "Invalid fallback language which is not in the list of supported",
+      rawDataConfigTraceback.newTraceToBit("fallbackLanguage"),
+    );
+  }
 
   // index.sensitive.json CHECKING ////////////////
 

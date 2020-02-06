@@ -14,6 +14,11 @@ export interface IConfigRawJSONDataType {
     backgroundColor: string;
   };
 
+  // FALLBACK REGIONALIZATION
+  fallbackCountryCode: string;
+  fallbackLanguage: string;
+  fallbackCurrency: string;
+
   // SENSITIVE
   ipStackAccessKey: string;
   hereAppID: string;
@@ -108,6 +113,24 @@ export const rawPartialConfigSchema = {
         },
       },
     },
+    fallbackCountryCode: {
+      type: "string",
+    },
+    fallbackLanguage: {
+      type: "string",
+    },
+    fallbackCurrency: {
+      type: "string",
+    },
+    developmentHostname: {
+      type: "string",
+    },
+    stagingHostname: {
+      type: "string",
+    },
+    productionHostname: {
+      type: "string",
+    },
   },
   additionalProperties: false,
   required: [
@@ -118,6 +141,12 @@ export const rawPartialConfigSchema = {
     "dictionaries",
     "roles",
     "manifest",
+    "fallbackCountryCode",
+    "fallbackLanguage",
+    "fallbackCurrency",
+    "developmentHostname",
+    "stagingHostname",
+    "productionHostname",
   ],
 };
 
