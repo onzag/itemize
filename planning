@@ -30,10 +30,6 @@ everything else should remain the same
 
 Implement RTL
 
-
-// TODO store dbhistory data in the database itself in some form of JSON or simple text component
-// so that history can be synced all the time rather than in the migration file stuff
-
 setup as a library how it should work
 
 npm init

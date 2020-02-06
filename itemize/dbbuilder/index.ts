@@ -36,18 +36,6 @@ export function yesno(question: string) {
     "utf8",
   ));
 
-  // Retrieve the past migration configuration
-  // if available
-  let currentDatabaseSchema: ISQLSchemaDefinitionType = {};
-  try {
-    currentDatabaseSchema = JSON.parse(await fsAsync.readFile(
-      path.join("config", "dbhistory", "db-status.latest.json"),
-      "utf8",
-    ));
-  } catch (e) {
-    console.log(colors.yellow("Could not find a Previous Schema File..."));
-  }
-
   // Create the connection string
   const dbConnectionKnexConfig = {
     host: dbConfig.host,
@@ -57,6 +45,8 @@ export function yesno(question: string) {
     database: dbConfig.database,
   };
 
+  console.log(colors.yellow(`attempting database connection at ${dbConnectionKnexConfig.host}...`));
+
   // we only need one client instance
   const knex = Knex({
     client: "pg",
@@ -64,53 +54,118 @@ export function yesno(question: string) {
     connection: dbConnectionKnexConfig,
   });
 
-  console.log(colors.yellow(`attempting database connection at ${dbConnectionKnexConfig.host}...`));
-
-  // parse the data
-  const data = JSON.parse(await fsAsync.readFile(
-    path.join("dist", "data", "build.all.json"),
-    "utf8",
-  ));
-
-  // build the root from that data
-  const root = new Root(data);
-
-  // let's get the result by progressively building on top of it
-  const optimal = getSQLTablesSchemaForRoot(root);
-
-  // this function will modify actual
-  // for the actual executed functions
-  let actual: ISQLSchemaDefinitionType;
+  let isCorrupted = false;
   try {
-    actual = await buildDatabase(knex, currentDatabaseSchema, optimal);
-  } catch (err) {
-    console.error(err.stack);
-    return;
+    isCorrupted = JSON.parse(await fsAsync.readFile("db-status.corruption.json", "utf-8"));
+  } catch {
+    // DO nothing
   }
-  knex.destroy();
+
+  let optimal: ISQLSchemaDefinitionType;
+  let actual: ISQLSchemaDefinitionType;
+
+  if (!isCorrupted) {
+    // parse the data
+    const data = JSON.parse(await fsAsync.readFile(
+      path.join("dist", "data", "build.all.json"),
+      "utf8",
+    ));
+
+    // build the root from that data
+    const root = new Root(data);
+
+    // let's get the result by progressively building on top of it
+    optimal = getSQLTablesSchemaForRoot(root);
+
+    // Retrieve the past migration configuration
+    // if available
+    let currentDatabaseSchema: ISQLSchemaDefinitionType = {};
+    const schemaTableExists = await knex.schema.withSchema("public").hasTable("schema");
+    if (schemaTableExists) {
+      const currentSchemaData = await knex.withSchema("public").first("schema", "created_at").from("schema").where({
+        status: "actual",
+      }).orderBy("id", "desc");
+      if (currentSchemaData) {
+        console.log(colors.yellow("Found existing schema created at"), currentSchemaData.created_at);
+        currentDatabaseSchema = JSON.parse(currentSchemaData.schema);
+      } else {
+        console.log(colors.yellow("Could not find a Previous Schema File..."));
+      }
+    } else {
+      await knex.schema.withSchema("public").createTable("schema", (table) => {
+        table.increments();
+        table.text("schema").notNullable();
+        table.text("status").notNullable();
+        table.timestamp("created_at").notNullable().defaultTo(knex.fn.now());
+      });
+      console.log(colors.yellow("Could not find a Previous Schema File..."));
+    }
+
+    // this function will modify actual
+    // for the actual executed functions
+    try {
+      actual = await buildDatabase(knex, currentDatabaseSchema, optimal);
+    } catch (err) {
+      console.error(err.stack);
+      return;
+    }
+
+    await fsAsync.writeFile(
+      "db-status.json",
+      JSON.stringify(actual, null, 2),
+    );
+
+    await fsAsync.writeFile(
+      "db-status.optimal.json",
+      JSON.stringify(optimal, null, 2),
+    );
+  } else {
+    try {
+      actual = JSON.parse(await fsAsync.readFile("db-status.json", "utf-8"));
+      optimal = JSON.parse(await fsAsync.readFile("db-status.optimal.json", "utf-8"));
+    } catch {
+      console.log(colors.red("FAILED TO FIX STATED CORRUPTION"));
+      process.exit(1);
+    }
+  }
 
   // write the resulting actual
-  await fsAsync.writeFile(
-    path.join("config", "dbhistory", "db-status.latest.json"),
-    JSON.stringify(actual, null, 2),
-  );
-  await fsAsync.writeFile(
-    path.join("config", "dbhistory", `db-status.${(new Date()).toISOString().replace(/:/g, ".")}.json`),
-    JSON.stringify(actual, null, 2),
-  );
+  let showAllDone = true;
+  try {
+    await knex.batchInsert("schema", [
+      {
+        schema: JSON.stringify(actual),
+        status: "actual",
+      },
+      {
+        schema: JSON.stringify(optimal),
+        status: "optimal",
+      },
+    ], 2);
 
-  // Write the optimal, what should have been
-  await fsAsync.writeFile(
-    path.join("config", "dbhistory", `db-status.${(new Date()).toISOString().replace(/:/g, ".")}.optimal.json`),
-    JSON.stringify(optimal, null, 2),
-  );
-  await fsAsync.writeFile(
-    path.join("config", "dbhistory", `db-status.latest.optimal.json`),
-    JSON.stringify(optimal, null, 2),
-  );
+    await fsAsync.writeFile(
+      "db-status.corruption.json",
+      "false",
+    );
+  } catch (err) {
+    console.log(colors.red("FAILED TO WRITE UPDATES TO THE DATABASE"));
+    console.log(colors.red("PLEASE DO NOT ATTEMPT TO UPDATE THE SERVER IN THIS STATE AS THIS CAN LEAD TO DATA CORRUPTION"));
+    console.log(colors.red("PLEASE RUN THIS SCRIPT AGAIN TO FIX THIS ONCE YOU FIX THE ISSUE"));
+
+    await fsAsync.writeFile(
+      "db-status.corruption.json",
+      "true",
+    );
+
+    showAllDone = false;
+  }
+
+  knex.destroy();
 
   // say it's all done
-  console.log(colors.green("All done..."));
+  if (showAllDone) {
+    console.log(colors.green("All done..."));
+  }
 })();
 
 export function showErrorStackAndLogMessage(err: Error) {
