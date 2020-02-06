@@ -562,7 +562,7 @@ export class ActualItemDefinitionProvider extends
         this,
         this.props.itemDefinitionInstance.getQualifiedPathName(),
         this.props.forId,
-        this.props.forVersion,
+        this.props.forVersion || null,
       );
     }
   }
@@ -1389,7 +1389,9 @@ export class ActualItemDefinitionProvider extends
     ) {
       // we ask the worker for the value
       const workerCachedValue =
-        await CacheWorkerInstance.instance.getCachedValue(queryName, this.props.forId, arg.requestFields);
+        await CacheWorkerInstance.instance.getCachedValue(
+          queryName, this.props.forId, this.props.forVersion || null, arg.requestFields,
+        );
       // if we have a GET request and we are allowed to return from the wroker cache and we actually
       // found something in our cache, return that
       if (workerCachedValue) {
@@ -1440,7 +1442,7 @@ export class ActualItemDefinitionProvider extends
       );
       gqlValue = cacheWorkerGivenSearchValue.gqlValue;
       cached = true;
-      if (gqlValue) {
+      if (gqlValue && gqlValue.data) {
         if (arg.searchCachePolicy === "by-owner") {
           this.props.remoteListener.addOwnedSearchListenerFor(
             standardCounterpartQualifiedName,
@@ -1501,15 +1503,7 @@ export class ActualItemDefinitionProvider extends
     // now we got to check for errors
     let error: EndpointErrorType = null;
 
-    // no value, for some reason the server didnt return
-    // anything, we cant connect to it, it either timed out
-    // or was an invalid response (maybe the server is dead)
-    if (!gqlValue) {
-      error = {
-        message: "Failed to connect",
-        code: ENDPOINT_ERRORS.CANT_CONNECT,
-      };
-    } else if (gqlValue.errors) {
+    if (gqlValue.errors) {
       // if the server itself returned an error, we use that error
       error = gqlValue.errors[0].extensions;
     }

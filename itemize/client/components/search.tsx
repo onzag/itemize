@@ -235,16 +235,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
       // now we got to check for errors
       let error: EndpointErrorType = null;
-
-      // no value, for some reason the server didnt return
-      // anything, we cant connect to it, it either timed out
-      // or was an invalid response (maybe the server is dead)
-      if (!gqlValue) {
-        error = {
-          message: "Failed to connect",
-          code: ENDPOINT_ERRORS.CANT_CONNECT,
-        };
-      } else if (gqlValue.errors) {
+      if (gqlValue.errors) {
         // if the server itself returned an error, we use that error
         error = gqlValue.errors[0].extensions;
       }

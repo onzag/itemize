@@ -105,7 +105,7 @@ export default class PropertyEntryDateTime extends
       });
     }
   }
-  public handleOnChange(date: Moment) {
+  public handleOnChange(date: any) {
     // just set the state
     this.setState({
       value: date,

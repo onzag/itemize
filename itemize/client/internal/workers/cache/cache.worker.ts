@@ -575,10 +575,24 @@ export default class CacheWorker {
       }
     } catch (err) {
       console.warn(err);
-      // we return null if we hit an error
-      // this will trigger a CANT_CONNECT error in
-      // the parent handler
-      return null;
+      // we return an unspecified error if we hit an error
+      const gqlValue: IGQLEndpointValue = {
+        data: null,
+        errors: [
+          {
+            extensions: {
+              code: ENDPOINT_ERRORS.UNSPECIFIED,
+              message: "Unspecified error in worker",
+            },
+          },
+        ],
+      };
+
+      return {
+        gqlValue,
+        dataMightBeStale,
+        lastRecord,
+      };
     }
 
     // now we set what we have just gotten from the server (or the database)
@@ -670,10 +684,7 @@ export default class CacheWorker {
       const originalBatch = processedBatch.batch;
       const resultingValue = processedBatch.gqlValue;
       // the resulting value is what gql gave us
-      if (!resultingValue) {
-        // if it's null something has failed, the connection most likely
-        somethingFailed = true;
-      } else if (resultingValue.errors) {
+      if (resultingValue.errors) {
         // if there's an error, we use that error as the error
         somethingFailed = true;
         error = resultingValue.errors[0].extensions;
@@ -793,7 +804,24 @@ export default class CacheWorker {
     } else {
       // otherwise it must have been some sort
       // of connection failure (or database error)
-      return null;
+      // we return an unspecified error if we hit an error
+      const gqlValue: IGQLEndpointValue = {
+        data: null,
+        errors: [
+          {
+            extensions: {
+              code: ENDPOINT_ERRORS.UNSPECIFIED,
+              message: "Unspecified error in worker",
+            },
+          },
+        ],
+      };
+
+      return {
+        gqlValue,
+        dataMightBeStale,
+        lastRecord,
+      };
     }
   }
 

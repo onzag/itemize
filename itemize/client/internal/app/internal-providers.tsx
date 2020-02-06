@@ -90,138 +90,122 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       ),
     );
 
-    if (!data) {
-      const newState: ITokenProviderState = {
-        isLoggingIn: false,
-        id: parseInt(localStorage.getItem("ID"), 10),
-        token: localStorage.getItem("TOKEN"),
-        role: localStorage.getItem("ROLE"),
-        error: {
-          message: "Failed to connect",
-          code: ENDPOINT_ERRORS.CANT_CONNECT,
-        },
-        isReady: true,
-      };
-      this.props.onProviderStateSet(newState);
-      this.setState(newState);
+    const tokenData = data.data && data.data.token;
+    const tokenDataId = tokenData ? tokenData.id : null;
+    const tokenDataRole = tokenData ? tokenData.role : null;
+    const tokenDataToken = tokenData ? tokenData.token : null;
+    if (tokenDataToken !== null) {
+      localStorage.setItem("TOKEN", tokenDataToken as string);
+      localStorage.setItem("ROLE", tokenDataRole as string);
+      localStorage.setItem("ID", tokenDataId.toString());
     } else {
-      const tokenData = data.data && data.data.token;
-      const tokenDataId = tokenData ? tokenData.id : null;
-      const tokenDataRole = tokenData ? tokenData.role : null;
-      const tokenDataToken = tokenData ? tokenData.token : null;
-      if (tokenDataToken !== null) {
-        localStorage.setItem("TOKEN", tokenDataToken as string);
-        localStorage.setItem("ROLE", tokenDataRole as string);
-        localStorage.setItem("ID", tokenDataId.toString());
-      } else {
-        localStorage.removeItem("TOKEN");
-        localStorage.removeItem("ROLE");
-        localStorage.removeItem("ID");
-      }
+      localStorage.removeItem("TOKEN");
+      localStorage.removeItem("ROLE");
+      localStorage.removeItem("ID");
+    }
 
-      const error = data.errors ? data.errors[0].extensions : null;
-      const newState: ITokenProviderState = {
-        isLoggingIn: false,
-        id: tokenDataId as number,
-        token: tokenDataToken as string,
-        role: tokenDataRole as string,
-        isReady: true,
-        // when it's not ready and the login is automatic
-        // we might want to ignore errors, user just got
-        // logged off automatically, likely his token expired
-        // otherwise errors might appear in off places
-        error: !doNotShowLoginError ? error : null,
+    const error = data.errors ? data.errors[0].extensions : null;
+    const newState: ITokenProviderState = {
+      isLoggingIn: false,
+      id: tokenDataId as number,
+      token: tokenDataToken as string,
+      role: tokenDataRole as string,
+      isReady: true,
+      // when it's not ready and the login is automatic
+      // we might want to ignore errors, user just got
+      // logged off automatically, likely his token expired
+      // otherwise errors might appear in off places
+      error: !doNotShowLoginError ? error : null,
+    };
+
+    if (tokenDataToken !== null) {
+      console.log("user", tokenDataId, tokenDataRole, "logged in");
+    } else {
+      console.log("credentials deemed invalid", error);
+    }
+
+    this.props.onProviderStateSet(newState);
+    this.setState(newState);
+
+    if (tokenDataId) {
+      const fields = {
+        DATA: {
+          app_country: {},
+          app_language: {},
+          app_currency: {},
+        },
+        last_modified: {},
       };
-
-      if (tokenDataToken !== null) {
-        console.log("user", tokenDataId, tokenDataRole, "logged in");
-      } else {
-        console.log("credentials deemed invalid", error);
+      const cachedData = {
+        app_country: null,
+        app_currency: null,
+        app_language: null,
+      };
+      if (CacheWorkerInstance.isSupported) {
+        const cachedValue =
+          await CacheWorkerInstance.instance.getCachedValue(
+            "GET_MOD_users__IDEF_user", tokenDataId as number, null, fields);
+        if (cachedValue && cachedValue.value && cachedValue.value.DATA) {
+          cachedData.app_country = (cachedValue.value.DATA as IGQLValue).app_country;
+          cachedData.app_currency = (cachedValue.value.DATA as IGQLValue).app_currency;
+          cachedData.app_language = (cachedValue.value.DATA as IGQLValue).app_language;
+          console.log("cached user locale is", cachedData);
+          if (this.props.localeContext.country !== cachedData.app_country) {
+            this.props.localeContext.changeCountryTo(cachedData.app_country, true, true);
+          }
+          if (this.props.localeContext.language !== cachedData.app_language) {
+            this.props.localeContext.changeLanguageTo(cachedData.app_language, true);
+          }
+          if (this.props.localeContext.currency !== cachedData.app_currency) {
+            this.props.localeContext.changeCurrencyTo(cachedData.app_currency, true);
+          }
+        }
       }
 
-      this.props.onProviderStateSet(newState);
-      this.setState(newState);
-
-      if (tokenDataId) {
-        const fields = {
-          DATA: {
-            app_country: {},
-            app_language: {},
-            app_currency: {},
+      const userLanguageData = await gqlQuery(
+        buildGqlQuery(
+          {
+            name: "GET_MOD_users__IDEF_user",
+            args: {
+              token: tokenDataToken,
+              language: this.props.localeContext.language.split("-")[0],
+              id: tokenDataId,
+            },
+            fields,
           },
-          last_modified: {},
-        };
-        const cachedData = {
-          app_country: null,
-          app_currency: null,
-          app_language: null,
-        };
-        if (CacheWorkerInstance.isSupported) {
-          const cachedValue =
-            await CacheWorkerInstance.instance.getCachedValue(
-              "GET_MOD_users__IDEF_user", tokenDataId as number, null, fields);
-          if (cachedValue && cachedValue.value && cachedValue.value.DATA) {
-            cachedData.app_country = (cachedValue.value.DATA as IGQLValue).app_country;
-            cachedData.app_currency = (cachedValue.value.DATA as IGQLValue).app_currency;
-            cachedData.app_language = (cachedValue.value.DATA as IGQLValue).app_language;
-            console.log("cached user locale is", cachedData);
-            if (this.props.localeContext.country !== cachedData.app_country) {
-              this.props.localeContext.changeCountryTo(cachedData.app_country, true, true);
-            }
-            if (this.props.localeContext.language !== cachedData.app_language) {
-              this.props.localeContext.changeLanguageTo(cachedData.app_language, true);
-            }
-            if (this.props.localeContext.currency !== cachedData.app_currency) {
-              this.props.localeContext.changeCurrencyTo(cachedData.app_currency, true);
-            }
+        ),
+      );
+
+      if (userLanguageData && userLanguageData.data && userLanguageData.data.GET_MOD_users__IDEF_user) {
+        const localeUserData: IGQLValue = userLanguageData.data.GET_MOD_users__IDEF_user.DATA as IGQLValue;
+        // we still check everything just in case the user is blocked
+        if (localeUserData) {
+          console.log("user locale is", localeUserData);
+          if (
+            localeUserData.app_country !== cachedData.app_country &&
+            this.props.localeContext.country !== localeUserData.app_country
+          ) {
+            this.props.localeContext.changeCountryTo(localeUserData.app_country as string, true, true);
+          }
+          if (
+            localeUserData.app_language !== cachedData.app_language &&
+            this.props.localeContext.language !== localeUserData.app_language
+          ) {
+            this.props.localeContext.changeLanguageTo(localeUserData.app_language as string, true);
+          }
+          if (
+            localeUserData.app_currency !== cachedData.app_currency &&
+            this.props.localeContext.currency !== localeUserData.app_currency
+          ) {
+            this.props.localeContext.changeCurrencyTo(localeUserData.app_currency as string, true);
           }
         }
 
-        const userLanguageData = await gqlQuery(
-          buildGqlQuery(
-            {
-              name: "GET_MOD_users__IDEF_user",
-              args: {
-                token: tokenDataToken,
-                language: this.props.localeContext.language.split("-")[0],
-                id: tokenDataId,
-              },
-              fields,
-            },
-          ),
-        );
-
-        if (userLanguageData && userLanguageData.data && userLanguageData.data.GET_MOD_users__IDEF_user) {
-          const localeUserData: IGQLValue = userLanguageData.data.GET_MOD_users__IDEF_user.DATA as IGQLValue;
-          // we still check everything just in case the user is blocked
-          if (localeUserData) {
-            console.log("user locale is", localeUserData);
-            if (
-              localeUserData.app_country !== cachedData.app_country &&
-              this.props.localeContext.country !== localeUserData.app_country
-            ) {
-              this.props.localeContext.changeCountryTo(localeUserData.app_country as string, true, true);
-            }
-            if (
-              localeUserData.app_language !== cachedData.app_language &&
-              this.props.localeContext.language !== localeUserData.app_language
-            ) {
-              this.props.localeContext.changeLanguageTo(localeUserData.app_language as string, true);
-            }
-            if (
-              localeUserData.app_currency !== cachedData.app_currency &&
-              this.props.localeContext.currency !== localeUserData.app_currency
-            ) {
-              this.props.localeContext.changeCurrencyTo(localeUserData.app_currency as string, true);
-            }
-          }
-
-          if (CacheWorkerInstance.isSupported) {
-            const newCachedValue = userLanguageData.data.GET_MOD_users__IDEF_user;
-            CacheWorkerInstance.instance.mergeCachedValue(
-              "GET_MOD_users__IDEF_user", tokenDataId as number, null, newCachedValue, fields,
-            );
-          }
+        if (CacheWorkerInstance.isSupported) {
+          const newCachedValue = userLanguageData.data.GET_MOD_users__IDEF_user;
+          CacheWorkerInstance.instance.mergeCachedValue(
+            "GET_MOD_users__IDEF_user", tokenDataId as number, null, newCachedValue, fields,
+          );
         }
       }
     }

@@ -36,6 +36,7 @@ import {
   PARENTED_SEARCH_RECORDS_ADDED_EVENT,
   CHANGED_FEEEDBACK_EVENT,
   IChangedFeedbackEvent,
+  IDENTIFIED_EVENT,
 } from "../base/remote-protocol";
 import { IGQLSearchResult } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
@@ -150,6 +151,10 @@ export class Listener {
       this.listeners[socket.id].uuid = request.uuid;
       this.listeners[socket.id].token = request.token;
     }
+
+    socket.emit(
+      IDENTIFIED_EVENT,
+    );
   }
   public register(
     socket: Socket,

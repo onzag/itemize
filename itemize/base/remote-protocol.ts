@@ -25,6 +25,11 @@ export interface IBuildNumberEvent {
 }
 
 /**
+ * Identified event comes once the user has been identified properly
+ */
+export const IDENTIFIED_EVENT = "identified";
+
+/**
  * Event that comes from the server when something has
  * changed or as an answer from a feedback request
  */

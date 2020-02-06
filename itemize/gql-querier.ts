@@ -485,19 +485,16 @@ export async function gqlQuery(query: GQLQuery, host: string = ""): Promise<IGQL
     });
     return await value.json();
   } catch (err) {
-    // if no connection
-    // TODO return can't connect here?
-    // what are the implications it's kind of silly to return null
-    return null;
-    // return {
-    //   errors: [
-    //     {
-    //       extensions: {
-    //         message: "Failed to connect to the server",
-    //         code: ENDPOINT_ERRORS.CANT_CONNECT,
-    //       },
-    //     },
-    //   ],
-    // };
+    return {
+      data: null,
+      errors: [
+        {
+          extensions: {
+            message: "Failed to connect to the server",
+            code: ENDPOINT_ERRORS.CANT_CONNECT,
+          },
+        },
+      ],
+    };
   }
 }

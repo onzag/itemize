@@ -31,6 +31,7 @@ import {
   IDENTIFY_REQUEST,
   IOwnedSearchRecordsAddedEvent,
   IParentedSearchRecordsAddedEvent,
+  IDENTIFIED_EVENT,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import { IGQLSearchResult } from "../../../gql-querier";
@@ -480,7 +481,21 @@ export class RemoteListener {
       return true;
     });
   }
-  private reattachListeners() {
+  private onIdentificationDone() {
+    if (this.offline) {
+      return;
+    }
+    return new Promise((resolve) => {
+      const doneListener = () => {
+        this.socket.off(IDENTIFIED_EVENT, doneListener);
+        this.socket.off("disconnect", doneListener);
+        resolve();
+      };
+      this.socket.on("disconnect", doneListener);
+      this.socket.on(IDENTIFIED_EVENT, doneListener);
+    });
+  }
+  private async reattachListeners() {
     this.offline = false;
     clearTimeout(this.initialConsideredDisconnectedIfNoAnswerTimeout);
 
@@ -495,6 +510,11 @@ export class RemoteListener {
         token: this.token,
       },
     );
+
+    await this.onIdentificationDone();
+    if (this.offline) {
+      return;
+    }
 
     Object.keys(this.listeners).forEach((listenerKey) => {
       this.attachItemDefinitionListenerFor(this.listeners[listenerKey].request);
