@@ -600,7 +600,7 @@ export const ORDER_BY_OPTIONS = {
  * The format that dates are expected to have in order to be exchanged
  * these represent the SQL form
  */
-export const DATETIME_FORMAT = "YYYY-MM-DDTHH:mm:ss\\Z";
+export const DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss.SSSZ";
 /**
  * The format that time is expected to have in order to be exchanged
  * this is the SQL form

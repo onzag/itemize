@@ -8,9 +8,7 @@ import resolvers from "./resolvers";
 import { getGQLSchemaForRoot, IGQLQueryFieldsDefinitionType, IGQLFieldsDefinitionType } from "../base/Root/gql";
 import Knex from "knex";
 import { types } from "pg";
-import Moment from "moment";
-import { DATETIME_FORMAT, TIME_FORMAT, DATE_FORMAT,
-  MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS } from "../constants";
+import { MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS } from "../constants";
 import { GraphQLError } from "graphql";
 import { EndpointError, EndpointErrorType } from "../base/errors";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -37,13 +35,11 @@ import { IConfigRawJSONDataType } from "../config";
 const TIMESTAMP_OID = 1114;
 const TIMESTAMPTZ_OID = 1184;
 const TIME_OID = 1083;
-const DB_TIME_FORMAT = "HH:mm:ss";
 const DATE_OID = 1082;
-const DB_DATE_FORMAT = "YYYY-MM-DD";
-types.setTypeParser(TIMESTAMP_OID, (val) => Moment(val).utc().format(DATETIME_FORMAT));
-types.setTypeParser(TIMESTAMPTZ_OID, (val) => Moment(val).utc().format(DATETIME_FORMAT));
-types.setTypeParser(TIME_OID, (val) => Moment(val, DB_TIME_FORMAT).format(TIME_FORMAT));
-types.setTypeParser(DATE_OID, (val) => Moment(val, DB_DATE_FORMAT).format(DATE_FORMAT));
+types.setTypeParser(TIMESTAMP_OID, (val) => val);
+types.setTypeParser(TIMESTAMPTZ_OID, (val) => val);
+types.setTypeParser(TIME_OID, (val) => val);
+types.setTypeParser(DATE_OID, (val) => val);
 
 const fsAsync = fs.promises;
 

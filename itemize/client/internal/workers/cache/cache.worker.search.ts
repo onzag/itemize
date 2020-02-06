@@ -15,7 +15,7 @@ export async function search(
   const newSearchResults: IGQLSearchResult[] = (await Promise.all(
     searchResults.map(async (result) => {
       try {
-        const queryIdentifier = `${PREFIX_GET}${result.type}.${result.id}.${JSON.stringify(result.version)}`;
+        const queryIdentifier = `${PREFIX_GET}${result.type}.${result.id}.${result.version || ""}`;
         const value = await db.get(QUERIES_TABLE_NAME, queryIdentifier);
         if (!value) {
           console.warn("Search function was executed with missing value for ", queryIdentifier);

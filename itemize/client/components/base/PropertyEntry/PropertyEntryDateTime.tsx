@@ -34,7 +34,7 @@ function getValue(internalValue: any, actualValue: string, type: string) {
     } else if (type === "time") {
       dbFormat = TIME_FORMAT;
     }
-    return Moment(actualValue, dbFormat);
+    return Moment(actualValue, dbFormat).utc();
   }
   return null;
 }
@@ -105,7 +105,7 @@ export default class PropertyEntryDateTime extends
       });
     }
   }
-  public handleOnChange(date: any) {
+  public handleOnChange(date: Moment) {
     // just set the state
     this.setState({
       value: date,

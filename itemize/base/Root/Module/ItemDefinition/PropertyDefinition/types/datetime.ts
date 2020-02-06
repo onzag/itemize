@@ -57,7 +57,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 
-    const dateForm = Moment(d, DATETIME_FORMAT);
+    const dateForm = Moment(d, DATETIME_FORMAT).utc();
     if (!dateForm.isValid() || dateForm.format(DATETIME_FORMAT) !== d) {
       return PropertyInvalidReason.INVALID_VALUE;
     }

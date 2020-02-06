@@ -492,9 +492,16 @@ export default class CacheWorker {
           fields: {
             ids: {
               id: {},
+              version: {},
               type: {},
+              created_at: {},
             },
-            last_record: {},
+            last_record: {
+              id: {},
+              version: {},
+              type: {},
+              created_at: {},
+            },
           },
         });
 
@@ -535,6 +542,9 @@ export default class CacheWorker {
           // now we can actually start using the args to run a local filtering
           // function
 
+          // TODO do something about corruption, if the data is corrupted
+          // bad stuff happens when running the search as the warning
+          // Search function was executed with missing value for triggers
           const gqlValue: IGQLEndpointValue = {
             data: {
               [searchQueryName]: {

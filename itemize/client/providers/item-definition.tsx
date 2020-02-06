@@ -2049,7 +2049,9 @@ export class ActualItemDefinitionProvider extends
       requestFields: {
         ids: {
           id: {},
+          version: {},
           type: {},
+          created_at: {},
         },
       },
       searchCachePolicy: options.cachePolicy || "none",
