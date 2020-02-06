@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "install": "tsc",
-    "build": "webpack && webpack --config ./webpack.config.production.js && node ./dist/itemize/builder/index.js",
-    "webpack-dev": "webpack",
-    "webpack": "webpack --config ./webpack.config.production.js",
+    "build": "env NODE_ENV=development webpack && webpack && node ./dist/itemize/builder/index.js",
+    "webpack-dev": "env NODE_ENV=development webpack",
+    "webpack": "webpack",
     "build-data": "node ./dist/itemize/builder/index.js",
     "start": "node ./dist/src/server/index.js",
     "build-database": "node ./dist/itemize/dbbuilder/index.js"

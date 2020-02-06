@@ -27,3 +27,55 @@ The saving in the IndexedDB database must now include the version as well
 this changes how the websockets communicate as version information must now be included
 Registries get affected, everything that relies on an id gets affected
 everything else should remain the same
+
+Implement RTL
+
+
+// TODO store dbhistory data in the database itself in some form of JSON or simple text component
+// so that history can be synced all the time rather than in the migration file stuff
+
+setup as a library how it should work
+
+npm init
+npm install itemize
+./node_modules/.bin/itemize wizard
+    request to install redis if not locally available
+    request to install postgresql if not locally available
+    request to install nginx if not locally available
+    set up config and ask for each config (local for local dev and external and demo configs for sensitive builds should differ)
+      request to get an ip stack code (required)
+      -- request to get a mailchimp code (required)
+      -- request to get a S3/OVH object storage code (required)
+        link to the setup to keep it in the same domain for the HTTP endpoint
+      request to get a here maps code (optional)
+    set up nginx for local development
+    set up hosts file for local development
+    provide instructions for enabling service worker in chrome/FF unsafe domains
+    set up template data
+    set up template resources
+    set up template src
+    set up template webpack.config.js
+    set up template tsconfig
+    set up template tslint
+    set up template .gitignore
+    set up template .babelrc
+    set up package.json with
+      npm run install                     runs tsc
+      npm run init                        alias   does this same thing again
+      npm run get-development-deployable  alias   provides a deployable for development
+      npm run get-production-deployable   alias   provides the deployable kubernetes whatnot with data built for the external
+      npm run get-demo-deployable         alias   provides the deployable kubernetes whatnot with data built for demo
+      npm run development-server          runs tsc then the development server
+      npm run webpack                     builds the production version
+      npm run webpack-dev                 builds the development version
+      npm run build                       runs webpack and webpack-dev and build-data
+      npm run build-data                  alias   builds the data that is required for development
+      npm run build-development-database  alias   builds the development database
+      npm run build-production-database   alias   builds the production database
+      npm run build-demo-database         alias   builds the demo database
+      npm run analyze-languages           alias   tells in which circumstances the languages in the config would be used
+    npm install tsc
+    npm install webpack
+    npm install mini-css-extract-plugin
+    npm install webpack-bundle-analyzer
+    npm install worker-injector-generator-plugin

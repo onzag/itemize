@@ -1,12 +1,7 @@
 {
   "type": "root",
   "children": [
-    "../itemize/data/test",
     "../itemize/data/users"
   ],
-  "i18n": "../itemize/data/index.properties",
-  "autocomplete": [
-    "../itemize/data/test.autocomplete.json",
-    "../itemize/data/test-group.autocomplete.json"
-  ]
+  "i18n": "../itemize/data/index.properties"
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, createStyles, withStyles, WithStyles, Icon } from "@material-ui/core";
-import { DialogResponsive } from "../general/dialog";
+import { DialogResponsive } from "./dialog";
 import { I18nRead, I18nReadError } from "../../../itemize/client/components/localization";
 import { PolicyPathType } from "../../../itemize/client/providers/item-definition";
 import { Entry } from "../../../itemize/client/components/property";

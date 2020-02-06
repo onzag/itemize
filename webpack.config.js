@@ -4,29 +4,38 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const WorkerInjectorGeneratorPlugin = require("worker-injector-generator-plugin");
 
+const isDevelopment = process.env.NODE_ENV = "development";
+const mode = isDevelopment ? "development" : "production";
+
+const plugins = [
+  new MiniCssExtractPlugin({
+    filename: "build." + mode + ".css",
+    chunkFilename: "build." + mode + ".css"
+  }),
+  new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+  new WorkerInjectorGeneratorPlugin({
+    name: "cache-worker.injector." + mode + ".js",
+    importScripts: [
+      "commons." + mode + ".js",
+      "cache-worker." + mode + ".js",
+    ],
+    isAsync: !isDevelopment,
+  }),
+]
+
+if (!isDevelopment) {
+  plugins.push(new BundleAnalyzerPlugin());
+}
+
 module.exports = {
-  mode: 'development',
+  mode,
   entry: {
     "service-worker": ["./itemize/client/internal/workers/service/service.worker.ts"],
     "cache-worker": ["./itemize/client/internal/workers/cache/cache.worker.ts"],
     "build": ["./src/client/index.tsx"],
   },
-  devtool: 'inline-source-map',
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: "build.development.css",
-      chunkFilename: "build.development.css"
-    }),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new WorkerInjectorGeneratorPlugin({
-      name: "cache-worker.injector.development.js",
-      importScripts: [
-        "commons.development.js",
-        "cache-worker.development.js",
-      ],
-    }),
-    // new BundleAnalyzerPlugin(),
-  ],
+  devtool: isDevelopment ? 'inline-source-map' : null,
+  plugins,
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.mjs']
   },
@@ -38,17 +47,13 @@ module.exports = {
           minChunks: 2,
           chunks(chunk) {
             return chunk.name !== "service-worker";
-          }
+          },
         },
       }
     }
   },
   module: {
     rules: [
-      {
-        test: path.resolve(__dirname, "node_modules/graphql"),
-        use: "null-loader"
-      },
       {
         test: path.resolve(__dirname, "node_modules/jsdom/lib/api.js"),
         use: "null-loader"
@@ -97,11 +102,6 @@ module.exports = {
         },
       },
       {
-        test: /\.js$/,
-        use: ["source-map-loader"],
-        enforce: "pre"
-      },
-      {
         test: /\.s?css$/,
         use: [
           {
@@ -130,10 +130,7 @@ module.exports = {
     ]
   },
   output: {
-    filename: '[name].development.js',
-    path: path.resolve(__dirname, 'dist/data'),
-    libraryTarget: "umd",
-    globalObject: "this",
-    publicPath: "/rest/resource/",
+    filename: "[name]." + mode + ".js",
+    path: path.resolve(__dirname, 'dist/data')
   }
 };
