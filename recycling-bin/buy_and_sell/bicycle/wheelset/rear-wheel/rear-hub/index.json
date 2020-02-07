@@ -1,9 +1,0 @@
-{
-	"type": "item",
-	"properties": [
-		{
-			"id": "electric",
-			"type": "boolean"
-		}
-	]
-}

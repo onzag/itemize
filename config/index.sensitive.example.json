@@ -1,6 +1,0 @@
-{
-    "ipStackAccessKey": "IP STACK ACCESS KEY https://ipstack.com/",
-    "hereAppID": "HERE MAPS APP ID https://developer.here.com/",
-    "hereAppCode": "HERE MAPS APP CODE https://developer.here.com/",
-    "jwtKey": "YOUR APP TOKEN, JUST GENERATE ONE RANDOM THING"
-}

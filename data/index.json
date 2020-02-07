@@ -1,7 +1,0 @@
-{
-  "type": "root",
-  "children": [
-    "../itemize/data/users"
-  ],
-  "i18n": "../itemize/data/index.properties"
-}
