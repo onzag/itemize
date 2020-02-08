@@ -1,4 +1,7 @@
+#!/usr/bin/env node
+
 import setup from "./setup";
+import { start, stop } from "./dev-environment";
 import colors from "colors";
 
 const action = process.argv[2];
@@ -27,11 +30,11 @@ const actionRegistry: {
     description: "Provides the production docker deployable based on the config"
   },
   "start-development-environment": {
-    fn: null,
+    fn: start,
     description: "Starts the development environment, as configured"
   },
   "stop-development-environment": {
-    fn: null,
+    fn: stop,
     description: "Stops the development environment",
   },
   "build-data": {

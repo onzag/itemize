@@ -147,24 +147,24 @@ export default function restServices(appData: IAppDataType) {
   router.get("/util/country", (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
-    const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-    // This only occurs during development
-    if (ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1") {
-      res.end(JSON.stringify({
-        country: appData.config.fallbackCountryCode,
-        currency: appData.config.fallbackCurrency,
-        language: appData.config.fallbackLanguage,
-      }));
-      return;
-    }
-
-    // Occurs during production, we use the ipstack api
-    // refer to ipstack
     const standardAPIResponse = JSON.stringify({
       country: appData.config.fallbackCountryCode,
       currency: appData.config.fallbackCurrency,
       language: appData.config.fallbackLanguage,
     });
+
+    const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    // This only occurs during development
+    if (
+      ip === "127.0.0.1" ||
+      ip === "::1" ||
+      ip === "::ffff:127.0.0.1" ||
+      !appData.sensitiveConfig.ipStackAccessKey
+    ) {
+      res.end(JSON.stringify(standardAPIResponse));
+      return;
+    }
+
     http.get(`http://api.ipstack.com/${ip}?access_key=${appData.sensitiveConfig.ipStackAccessKey}`, (resp) => {
       // let's get the response from the stream
       let data = "";

@@ -1,4 +1,5 @@
 import read from "read";
+import colors from "colors";
 import Confirm from "prompt-confirm";
 
 export function request(options: read.Options): Promise<{
@@ -17,6 +18,125 @@ export function request(options: read.Options): Promise<{
       }
     });
   });
+}
+
+type FieldRequestType = "strarray" | "string" | "integer" | "strobject";
+
+export async function fieldRequest<T>(
+  type: FieldRequestType,
+  message: string,
+  variableName: string,
+  basedOnValue: T,
+  defaultValue: T,
+  hidden?: boolean,
+  validate?: (value: T) => boolean,
+): Promise<T> {
+  let wasLastValid = true;
+  let currentValue: T = basedOnValue;
+
+  if (message) {
+    console.log("\n" + message);
+  }
+
+  if (type === "strobject") {
+    const keys = await fieldRequest<string[]>(
+      "strarray",
+      null,
+      variableName + "[$key]",
+      basedOnValue ? Object.keys(basedOnValue) : null,
+      Object.keys(defaultValue),
+    );
+
+    const finalValue = {};
+    for (const key of keys) {
+      finalValue[key] = await fieldRequest<string>(
+        "string",
+        null,
+        variableName + "[" + JSON.stringify(key) + "]",
+        basedOnValue ? basedOnValue[key] : null,
+        defaultValue ? defaultValue[key] : "",
+        hidden,
+      );
+    }
+
+    return finalValue as any || null;
+  }
+
+  do {
+    if (!wasLastValid) {
+      if (!hidden) {
+        console.log(JSON.stringify(currentValue) + colors.red(" is deemed invalid"));
+      } else {
+        console.log(colors.red("value is deemed invalid"));
+      }
+    }
+    wasLastValid = false;
+
+    const actualDefaultValue = Array.isArray(defaultValue) ? defaultValue.join(", ") : (defaultValue || "").toString();
+    const retrievedValue = await request({
+      prompt: variableName + ": ",
+      default: (basedOnValue || actualDefaultValue).toString(),
+      edit: !!basedOnValue,
+      silent: hidden,
+      replace: "*",
+    })
+
+    if (type === "integer") {
+      currentValue = parseInt(retrievedValue.result) as any;
+    } else if (type === "strarray") {
+      currentValue = retrievedValue.result.split(",").map(v => v.trim()).filter(v => !!v) as any;
+    } else {
+      currentValue = retrievedValue.result as any;
+    }
+  } while (validate ? !validate(currentValue) : false);
+
+  return currentValue || null;
+}
+
+interface IConfigRequestExtractPoint {
+  type?: FieldRequestType | "config",
+  extractData?: Array<IConfigRequestExtractPoint>,
+  variableName: string,
+  message: string,
+  defaultValue: any,
+  hidden?: boolean,
+  validate?: (config: any, value: any) => boolean,
+};
+
+export async function configRequest<T>(
+  srcConfig: T,
+  message: string,
+  extractData: Array<IConfigRequestExtractPoint>,
+  variableNamePrefix: string = "",
+): Promise<T> {
+  console.log(colors.bgGreen("\nENTER:") + " " + message);
+  const newConfig: T = {
+    ...srcConfig,
+  }
+  for (const extractPoint of extractData) {
+    if (extractPoint.type === "config") {
+      newConfig[extractPoint.variableName] = await configRequest(
+        newConfig[extractPoint.variableName],
+        extractPoint.message,
+        extractPoint.extractData,
+        extractPoint.variableName + ".",
+      );
+    } else {
+      newConfig[extractPoint.variableName] = await fieldRequest(
+        extractPoint.type || "string",
+        extractPoint.message,
+        variableNamePrefix + extractPoint.variableName,
+        newConfig[extractPoint.variableName],
+        extractPoint.defaultValue,
+        extractPoint.hidden,
+        (value) => extractPoint.validate ? extractPoint.validate(value, newConfig) : true,
+      );
+    }
+  }
+
+  console.log(colors.bgGreen("\nEXIT:") + " " + message);
+
+  return newConfig;
 }
 
 export function confirm(question: string): Promise<boolean> {

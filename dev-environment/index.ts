@@ -1,0 +1,148 @@
+import fs from "fs";
+const fsAsync = fs.promises;
+import path from "path";
+import { IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
+import { ensureConfigDirectory } from "../setup";
+import { readConfigFile } from "../setup";
+import colors from "colors";
+import { execSudo } from "../setup/exec";
+
+export async function start() {
+  await ensureConfigDirectory();
+
+  const dbConfigDevelopment: IDBConfigRawJSONDataType = await readConfigFile("db.sensitive.json");
+  const redisConfigDevelopment: IRedisConfigRawJSONDataType = await readConfigFile("redis.sensitive.json");
+
+  let devEnvFolderExists = true;
+  try {
+    await fsAsync.access("devenv", fs.constants.F_OK);
+  } catch (e) {
+    devEnvFolderExists = false;
+  }
+  if (!devEnvFolderExists) {
+    await fsAsync.mkdir("devenv");
+  }
+
+  let pgDataFolderExists = true;
+  try {
+    await fsAsync.access(path.join("devenv", "pgdata"), fs.constants.F_OK);
+  } catch (e) {
+    pgDataFolderExists = false;
+  }
+  if (!pgDataFolderExists) {
+    await fsAsync.mkdir(path.join("devenv", "pgdata"));
+  }
+
+  if (
+    dbConfigDevelopment.host !== "localhost" &&
+    dbConfigDevelopment.host !== "127.0.0.1"
+  ) {
+    console.log(colors.red("Development environment database is not set to localhost but to ") + dbConfigDevelopment.host);
+    console.log(colors.red("As so it cannot be executed"));
+  } else {
+    console.log(colors.yellow("Please allow Itemize to create a docker container for the database"));
+    console.log(colors.yellow("The execution might take a while, please wait..."));
+    try {
+      await execSudo(
+        `docker run --name itemizedevdb -e POSTGRES_PASSWORD=${dbConfigDevelopment.password} ` +
+        `-e POSTGRES_USER=${dbConfigDevelopment.user} -e POSTGRES_DB=${dbConfigDevelopment.database} ` +
+        `-v "$PWD/devenv/pgdata":/var/lib/postgresql/data ` +
+        `-p ${dbConfigDevelopment.port}:5432 -d postgres`,
+        "Itemize Docker Contained PGSQL Database",
+      );
+    } catch (err) {
+      console.log(colors.red(err.message));
+      console.log(colors.yellow("Something went wrong please allow for cleanup..."));
+      await execSudo(
+        "docker rm itemizedevdb",
+        "Itemize Docker Contained PGSQL Database",
+      );
+      throw err;
+    }
+  }
+
+  if (
+    redisConfigDevelopment.host !== "localhost" &&
+    redisConfigDevelopment.host !== "127.0.0.1"
+  ) {
+    console.log(colors.red("Development environment redis is not set to localhost but to ") + redisConfigDevelopment.host);
+    console.log(colors.red("As so it cannot be executed"));
+  } else if (
+    redisConfigDevelopment.password
+  ) {
+    console.log(colors.red("Development environment with redis is set with a password protection"));
+    console.log(colors.red("As so it cannot be executed"));
+  } else if (
+    redisConfigDevelopment.path
+  ) {
+    console.log(colors.red("Development environment with redis is set with an unix socket"));
+    console.log(colors.red("As so it cannot be executed"));
+  } else {
+    console.log(colors.yellow("Please allow Itemize to create a docker container for redis"));
+    console.log(colors.yellow("The execution might take a while, please wait..."));
+    try {
+      await execSudo(
+        `docker run --name itemizedevredis ` +
+        `-p ${redisConfigDevelopment.port}:6379 -d redis`,
+        "Itemize Docker Contained REDIS Database",
+      );
+    } catch (err) {
+      console.log(colors.red(err.message));
+      console.log(colors.yellow("Something went wrong please allow for cleanup..."));
+      await execSudo(
+        "docker rm itemizedevredis",
+        "Itemize Docker Contained REDIS Database",
+      );
+      throw err;
+    }
+  }
+}
+
+export async function stop() {
+  const dbConfigDevelopment: IDBConfigRawJSONDataType = await readConfigFile("db.sensitive.json");
+  const redisConfigDevelopment: IRedisConfigRawJSONDataType = await readConfigFile("redis.sensitive.json");
+
+  if (
+    dbConfigDevelopment.host === "localhost" ||
+    dbConfigDevelopment.host === "127.0.0.1"
+  ) {
+    try {
+      console.log(colors.yellow("Please allow Itemize to stop the PGSQL docker container"));
+      await execSudo(
+        "docker stop itemizedevdb",
+        "Itemize Docker Contained PGSQL Database",
+      );
+
+      console.log(colors.yellow("Now we attempt to remove the PGSQL docker container"));
+      await execSudo(
+        "docker rm itemizedevdb",
+        "Itemize Docker Contained PGSQL Database",
+      );
+    } catch (err) {
+    }
+  }
+
+  if (
+    (
+      redisConfigDevelopment.host === "localhost" ||
+      redisConfigDevelopment.host === "127.0.0.1"
+    ) &&
+    !redisConfigDevelopment.password &&
+    !redisConfigDevelopment.path
+  ) {
+    try {
+      console.log(colors.yellow("Please allow Itemize to stop the REDIS docker container"));
+      await execSudo(
+        "docker stop itemizedevredis",
+        "Itemize Docker Contained REDIS Database",
+      );
+
+      console.log(colors.yellow("Now we attempt to remove the REDIS docker container"));
+      await execSudo(
+        "docker rm itemizedevredis",
+        "Itemize Docker Contained REDIS Database",
+      );
+    } catch (err) {
+    }
+  }
+}

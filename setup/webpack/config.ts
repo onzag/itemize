@@ -23,7 +23,7 @@ const plugins = [
   }),
 ]
 
-if (!isDevelopment) {
+if (process.env.BUNDLE_ANALYZE) {
   plugins.push(new BundleAnalyzerPlugin());
 }
 

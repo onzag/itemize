@@ -19,6 +19,11 @@ export interface IConfigRawJSONDataType {
   fallbackCountryCode: string;
   fallbackLanguage: string;
   fallbackCurrency: string;
+
+  // Generic info
+  developmentHostname: string;
+  stagingHostname: string;
+  productionHostname: string;
 }
 
 export interface ISensitiveConfigRawJSONDataType {
@@ -40,7 +45,8 @@ export interface IRedisConfigRawJSONDataType {
   host?: string;
   port?: number;
   path?: string;
-  url?: string;
+  db?: number;
+  password?: string;
 }
 
 export const rawSensitiveConfigSchema = {
@@ -200,7 +206,10 @@ export const rawRedisConfigSchema = {
     path: {
       type: "string",
     },
-    url: {
+    db: {
+      type: "number",
+    },
+    password: {
       type: "string",
     },
   },

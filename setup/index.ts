@@ -1,9 +1,21 @@
+/**
+ * This file is in charge of running all the steps for the setup of an itemize app
+ * 
+ * @packageDocumentation
+ */
+
 import colors from "colors";
 import dockerSetup from "./docker";
 import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
 import fs from "fs";
 import path from "path";
 import configSetup from "./config";
+import equals from "deep-equal";
+import githubSetup from "./github";
+import packageSetup from "./package";
+import babelSetup from "./babel";
+import webpackSetup from "./webpack";
+import srcSetup from "./src";
 const fsAsync = fs.promises;
 
 export interface ISetupConfigType {
@@ -22,22 +34,27 @@ export interface ISetupConfigType {
 const stepsInOrder: Array<(arg: ISetupConfigType) => Promise<ISetupConfigType>> = [
   dockerSetup,
   configSetup,
+  githubSetup,
+  packageSetup,
+  babelSetup,
+  webpackSetup,
+  srcSetup,
 ];
 
 export default async function setup() {
-  console.log(colors.green("Initializing Setup"));
+  console.log(colors.bgGreen("INITIALIZING SETUP"));
   await ensureConfigDirectory();
 
   const standardConfig: IConfigRawJSONDataType = await readConfigFile("index.json");
   const sensitiveConfigDevelopment: ISensitiveConfigRawJSONDataType = await readConfigFile("index.sensitive.json");
   const dbConfigDevelopment: IDBConfigRawJSONDataType = await readConfigFile("db.sensitive.json");
   const redisConfigDevelopment: IRedisConfigRawJSONDataType = await readConfigFile("redis.sensitive.json");
-  const sensitiveConfigStaging: ISensitiveConfigRawJSONDataType = await readConfigFile("index.sensitive.staging.json");
-  const dbConfigStaging: IDBConfigRawJSONDataType = await readConfigFile("db.sensitive.staging.json");
-  const redisConfigStaging: IRedisConfigRawJSONDataType = await readConfigFile("redis.sensitive.staging.json");
-  const sensitiveConfigProduction: ISensitiveConfigRawJSONDataType = await readConfigFile("index.sensitive.production.json");
-  const dbConfigProduction: IDBConfigRawJSONDataType = await readConfigFile("db.sensitive.production.json");
-  const redisConfigProduction: IRedisConfigRawJSONDataType = await readConfigFile("redis.sensitive.production.json");
+  const sensitiveConfigStaging: ISensitiveConfigRawJSONDataType = await readConfigFile("index.staging.sensitive.json");
+  const dbConfigStaging: IDBConfigRawJSONDataType = await readConfigFile("db.staging.sensitive.json");
+  const redisConfigStaging: IRedisConfigRawJSONDataType = await readConfigFile("redis.staging.sensitive.json");
+  const sensitiveConfigProduction: ISensitiveConfigRawJSONDataType = await readConfigFile("index.production.sensitive.json");
+  const dbConfigProduction: IDBConfigRawJSONDataType = await readConfigFile("db.production.sensitive.json");
+  const redisConfigProduction: IRedisConfigRawJSONDataType = await readConfigFile("redis.production.sensitive.json");
 
   let arg: ISetupConfigType = {
     standardConfig,
@@ -52,24 +69,23 @@ export default async function setup() {
     redisConfigProduction,
   };
 
-  let failed = false;
   for (const step of stepsInOrder) {
-    try {
-      arg = await step(arg);
-    } catch (err) {
-      failed = true;
-      console.log(colors.red(err.toString()));
-      break;
-    }
+    arg = await step(arg);
   }
 
-  if (!failed) {
-    console.log(colors.green("Setup succesful!"));
-    // TODO write the files to disc
-  }
+  await writeConfigFile("index.json", arg.standardConfig, standardConfig);
+  await writeConfigFile("index.sensitive.json", arg.sensitiveConfigDevelopment, sensitiveConfigDevelopment);
+  await writeConfigFile("db.sensitive.json", arg.dbConfigDevelopment, dbConfigDevelopment);
+  await writeConfigFile("redis.sensitive.json", arg.redisConfigDevelopment, redisConfigDevelopment);
+  await writeConfigFile("index.staging.sensitive.json", arg.sensitiveConfigStaging, sensitiveConfigStaging);
+  await writeConfigFile("db.staging.sensitive.json", arg.dbConfigStaging, dbConfigStaging);
+  await writeConfigFile("redis.staging.sensitive.json", arg.redisConfigStaging, redisConfigStaging);
+  await writeConfigFile("index.production.sensitive.json", arg.sensitiveConfigProduction, sensitiveConfigProduction);
+  await writeConfigFile("db.production.sensitive.json", arg.dbConfigProduction, dbConfigProduction);
+  await writeConfigFile("redis.production.sensitive.json", arg.redisConfigProduction, redisConfigProduction);
 }
 
-async function ensureConfigDirectory() {
+export async function ensureConfigDirectory() {
   let exists = true;
   try {
     await fsAsync.access("config", fs.constants.F_OK);
@@ -81,14 +97,19 @@ async function ensureConfigDirectory() {
     await fsAsync.mkdir("config");
   }
 
-  const stat = await fsAsync.stat("config");
-
-  if (!stat.isDirectory()) {
-    throw new Error("config folder cannot be created because a file already exist with its same name");
+  let gitignoreExists = true;
+  try {
+    await fsAsync.access(path.join("config", ".gitignore"), fs.constants.F_OK);
+  } catch (e) {
+    gitignoreExists = false;
+  }
+  if (!gitignoreExists) {
+    console.log("emiting " + colors.green(".gitignore"));
+    await fsAsync.writeFile(path.join("config", ".gitignore"), "*.sensitive.json");
   }
 }
 
-async function readConfigFile(fileName: string) {
+export async function readConfigFile(fileName: string) {
   let exists = true;
   try {
     await fsAsync.access(path.join("config", fileName), fs.constants.F_OK);
@@ -100,8 +121,15 @@ async function readConfigFile(fileName: string) {
     return null;
   }
 
-  console.log(colors.green("reading ") + path.join("config", fileName));
+  console.log("reading " + colors.green(path.join("config", fileName)));
   const content = await fsAsync.readFile(path.join("config", fileName), "utf-8");
 
   return JSON.parse(content);
+}
+
+export async function writeConfigFile(fileName: string, data: any, original: any) {
+  if (!equals(data, original)) {
+    console.log("emiting " + colors.green(path.join("config", fileName)));
+    await fsAsync.writeFile(path.join("config", fileName), JSON.stringify(data, null, 2));
+  }
 }

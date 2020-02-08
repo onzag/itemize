@@ -1,32 +1,14 @@
-import { exec } from "child_process";
-import colors from "colors";
 import { ISetupConfigType } from "..";
+import colors from "colors";
+import { execAsync } from "../exec";
 
-export default function dockerSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
-  // so we return a promise
-  return new Promise((resolve, reject) => {
-    // by checking for docker with the version
-    console.log(colors.yellow("Checking for docker"));
+export default async function dockerSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
+  console.log(colors.bgGreen("DOCKER CHECK"));
 
-    // execute the command
-    exec("docker --version", (error, stdout, stderr) => {
-      // log stdout and stderr if available
-      if (stdout) {
-        console.log(stdout);
-      }
-      if (stderr) {
-        console.error(stderr);
-      }
-      if (error) {
-        console.log(
-          colors.red("Docker not found, please visit ") +
-          colors.green("https://docs.docker.com/install/") +
-          " for instructions",
-        );
-        reject(error);
-      } else {
-        resolve(arg);
-      }
-    });
-  });
+  try {
+    await execAsync("docker --version");
+  } catch (err) {
+    throw new Error("Docker not found, please visit https://docs.docker.com/install/ for instructions")
+  }
+  return arg;
 }
