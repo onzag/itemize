@@ -9,13 +9,16 @@ import colors from "colors/safe";
 
 import fs from "fs";
 import path from "path";
-import { IConfigRawJSONDataType } from "../config";
+import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
 import Traceback from "./Traceback";
 import CheckUpError from "./Error";
-import { ajvCheck, checkPartialConfig, checkPartialSensitiveConfig, checkDBConfig, checkRedisConfig } from "./schema-checks";
+import { ajvCheck, checkConfig, checkSensitiveConfig, checkDBConfig, checkRedisConfig } from "./schema-checks";
 import { countries, currencies } from "../imported-resources";
 import jsonMap from "json-source-map";
 const fsAsync = fs.promises;
+
+// TODO this must be totally redone...
+// it is wrong because of new configuration
 
 /**
  * Stores the config file in the dist
@@ -65,7 +68,7 @@ export async function extractConfig(): Promise<IConfigRawJSONDataType> {
   const rawDataConfigTraceback = configTraceback.newTraceToLocation(rawDataConfigLocation);
   rawDataConfigTraceback.setupPointers(rawDataConfigBaseFileData.pointers, rawDataConfigBaseFileContent);
   ajvCheck(
-    checkPartialConfig,
+    checkConfig,
     rawDataConfigBase,
     rawDataConfigTraceback,
   );
@@ -101,7 +104,7 @@ export async function extractConfig(): Promise<IConfigRawJSONDataType> {
   const rawDataSensitiveConfigLocation = path.join("config", "index.sensitive.json");
   // extract with json
   let rawDataSensitiveConfigBaseFileData: {
-    data: IConfigRawJSONDataType,
+    data: ISensitiveConfigRawJSONDataType,
     pointers: any,
   };
   let rawDataSensitiveConfigBaseFileContent: string;
@@ -126,7 +129,7 @@ export async function extractConfig(): Promise<IConfigRawJSONDataType> {
     rawDataSensitiveConfigBaseFileContent,
   );
   ajvCheck(
-    checkPartialSensitiveConfig,
+    checkSensitiveConfig,
     sensitiveConfigExtra,
     rawDataSensitiveConfigTraceback,
   );

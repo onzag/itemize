@@ -68,7 +68,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         if (args.token) {
           try {
             // we attempt to decode it
-            const decoded = await jwtVerify<IServerSideTokenDataType>(args.token, appData.config.jwtKey);
+            const decoded = await jwtVerify<IServerSideTokenDataType>(args.token, appData.sensitiveConfig.jwtKey);
             // and set the token as the pre generated token so we reuse it
             preGeneratedToken = args.token;
             // the query fullfillment will depend on the decoded id present in the token
@@ -122,7 +122,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           const token = preGeneratedToken || (await jwtSign({
             id: resultUser.id,
             role: resultUser.role,
-          }, appData.config.jwtKey, {
+          }, appData.sensitiveConfig.jwtKey, {
             expiresIn: "7d",
           }));
           // and we return the information back to the user

@@ -22,7 +22,7 @@ import redis, { RedisClient } from "redis";
 import { Cache } from "./cache";
 import { graphqlUploadExpress } from "graphql-upload";
 import { buildCustomTokenQueries } from "./custom-token";
-import { IConfigRawJSONDataType } from "../config";
+import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
 
 // TODO comment and document
 
@@ -50,6 +50,7 @@ export interface IAppDataType {
   autocompletes: Autocomplete[];
   index: string;
   config: IConfigRawJSONDataType;
+  sensitiveConfig: ISensitiveConfigRawJSONDataType;
   knex: Knex;
   listener: Listener;
   cache: Cache;
@@ -210,38 +211,42 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
 
 export async function initializeServer(custom: IServerCustomizationDataType = {}) {
   let rawBuild: string;
-  let rawConfig: any;
-  let index: any;
-  let root: any;
-  let autocompleteSource: string;
+  let rawConfig: string;
+  let rawSensitiveConfig: string;
+  let rawRedisConfig: string;
+  let rawDbConfig: string;
+  let index: string;
+  let rawAutocompleteSource: string;
   let buildnumber: string;
-  [rawConfig, index, rawBuild, autocompleteSource, buildnumber] = await Promise.all([
+  [
+    rawConfig,
+    rawSensitiveConfig,
+    rawRedisConfig,
+    rawDbConfig,
+    index,
+    rawBuild,
+    rawAutocompleteSource,
+    buildnumber,
+  ] = await Promise.all([
     fsAsync.readFile(path.join("dist", "config.json"), "utf8"),
+    fsAsync.readFile(path.join("dist", "sensitive.json"), "utf8"),
+    fsAsync.readFile(path.join("dist", "redis.json"), "utf8"),
+    fsAsync.readFile(path.join("dist", "db.json"), "utf8"),
     fsAsync.readFile(path.join("dist", "data", "index.html"), "utf8"),
     fsAsync.readFile(path.join("dist", "data", "build.all.json"), "utf8"),
     fsAsync.readFile(path.join("dist", "autocomplete.json"), "utf8"),
     fsAsync.readFile(path.join("dist", "buildnumber"), "utf8"),
   ]);
   const config: IConfigRawJSONDataType = JSON.parse(rawConfig);
+  const sensitiveConfig: ISensitiveConfigRawJSONDataType = JSON.parse(rawSensitiveConfig);
+  const dbConfig: IDBConfigRawJSONDataType = JSON.parse(rawDbConfig);
+  const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(rawRedisConfig);
   const build: IRootRawJSONDataType = JSON.parse(rawBuild);
   // this shouldn't be necessary but we do it anyway
   buildnumber = buildnumber.replace("\n", "").trim();
-
-  root = new Root(build);
-
-  const autocompletes = JSON.parse(autocompleteSource)
+  const root = new Root(build);
+  const autocompletes = JSON.parse(rawAutocompleteSource)
     .map((s: IAutocompleteRawJSONDataType) => (new Autocomplete(s)));
-
-  // Retrieve the config for the database
-  const dbConfig = JSON.parse(await fsAsync.readFile(
-    path.join("config", "db.sensitive.json"),
-    "utf8",
-  ));
-
-  const redisConfig = JSON.parse(await fsAsync.readFile(
-    path.join("config", "redis.sensitive.json"),
-    "utf8",
-  ));
 
   // Create the connection string
   const dbConnectionKnexConfig = {
@@ -289,6 +294,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     autocompletes,
     index,
     config,
+    sensitiveConfig,
     knex,
     listener,
     redis: redisClient,

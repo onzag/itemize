@@ -2,7 +2,7 @@ import { exec } from "child_process";
 import colors from "colors";
 import { ISetupConfigType } from "..";
 
-export default function setup(arg: ISetupConfigType): Promise<ISetupConfigType> {
+export default function dockerSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
   // so we return a promise
   return new Promise((resolve, reject) => {
     // by checking for docker with the version

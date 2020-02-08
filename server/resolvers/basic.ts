@@ -162,7 +162,7 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
     };
   } else {
     try {
-      result = await jwtVerify<IServerSideTokenDataType>(token, appData.config.jwtKey);
+      result = await jwtVerify<IServerSideTokenDataType>(token, appData.sensitiveConfig.jwtKey);
     } catch (err) {
       throw new EndpointError({
         message: "Invalid token that didn't pass verification",

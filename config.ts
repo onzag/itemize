@@ -19,8 +19,9 @@ export interface IConfigRawJSONDataType {
   fallbackCountryCode: string;
   fallbackLanguage: string;
   fallbackCurrency: string;
+}
 
-  // SENSITIVE
+export interface ISensitiveConfigRawJSONDataType {
   ipStackAccessKey: string;
   hereAppID: string;
   hereAppCode: string;
@@ -42,7 +43,7 @@ export interface IRedisConfigRawJSONDataType {
   url?: string;
 }
 
-export const rawPartialSensitiveConfigSchema = {
+export const rawSensitiveConfigSchema = {
   type: "object",
   properties: {
     ipStackAccessKey: {
@@ -67,7 +68,7 @@ export const rawPartialSensitiveConfigSchema = {
   ],
 };
 
-export const rawPartialConfigSchema = {
+export const rawConfigSchema = {
   type: "object",
   properties: {
     entry: {

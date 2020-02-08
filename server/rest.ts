@@ -165,7 +165,7 @@ export default function restServices(appData: IAppDataType) {
       currency: appData.config.fallbackCurrency,
       language: appData.config.fallbackLanguage,
     });
-    http.get(`http://api.ipstack.com/${ip}?access_key=${appData.config.ipStackAccessKey}`, (resp) => {
+    http.get(`http://api.ipstack.com/${ip}?access_key=${appData.sensitiveConfig.ipStackAccessKey}`, (resp) => {
       // let's get the response from the stream
       let data = "";
       resp.on("data", (chunk) => {

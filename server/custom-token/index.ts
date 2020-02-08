@@ -37,7 +37,7 @@ export function buildCustomTokenQueries(
         const token = await jwtSign({
           role: value.withRole,
           id: value.onBehalfOf || null,
-        }, appData.config.jwtKey, options);
+        }, appData.sensitiveConfig.jwtKey, options);
 
         return {
           token,
