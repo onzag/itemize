@@ -6,10 +6,11 @@ import colors from "colors";
 
 const action = process.argv[2];
 const toRun = process.argv[3] === "run";
+const remainingArgs = process.argv.slice(4);
 
 const actionRegistry: {
   [fn: string]: {
-    fn: () => Promise<void>;
+    fn: (remainingArgs?: string[]) => Promise<void>;
     description: string;
   }
 } = {
@@ -60,7 +61,7 @@ const actionRegistry: {
   if (actionRegistry[action]) {
     if (toRun) {
       try {
-        await actionRegistry[action].fn();
+        await actionRegistry[action].fn(remainingArgs);
       } catch (err) {
         console.log(colors.red(err.stack));
         process.exit(1);

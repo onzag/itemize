@@ -82,6 +82,9 @@ export default {
   "webpack-cli": "^3.3.10",
   "worker-injector-generator-plugin": "^1.0.1",
 
+  // builder typescript
+  "typescript": "^3.7.4",
+
   // tslint
   "tslint": "^5.20.1",
   "tslint-react": "^3.6.0",

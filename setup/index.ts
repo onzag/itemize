@@ -32,18 +32,47 @@ export interface ISetupConfigType {
   redisConfigProduction: IRedisConfigRawJSONDataType;
 }
 
-const stepsInOrder: Array<(arg: ISetupConfigType) => Promise<ISetupConfigType>> = [
-  dockerSetup,
-  configSetup,
-  githubSetup,
-  packageSetup,
-  babelSetup,
-  typescriptSetup,
-  webpackSetup,
-  srcSetup,
+interface IStepType {
+  fn: (arg: ISetupConfigType) => Promise<ISetupConfigType>,
+  name: string,
+}
+
+const stepsInOrder: IStepType[] = [
+  {
+    fn: dockerSetup,
+    name: "docker",
+  },
+  {
+    fn: configSetup,
+    name: "config",
+  },
+  {
+    fn: githubSetup,
+    name: "github",
+  },
+  {
+    fn: packageSetup,
+    name: "package",
+  },
+  {
+    fn: babelSetup,
+    name: "babel",
+  },
+  {
+    fn: typescriptSetup,
+    name: "typescript",
+  },
+  {
+    fn: webpackSetup,
+    name: "webpack",
+  },
+  {
+    fn: srcSetup,
+    name: "src",
+  }
 ];
 
-export default async function setup() {
+export default async function setup(onlyNames: string[]) {
   console.log(colors.bgGreen("INITIALIZING SETUP"));
   await ensureConfigDirectory();
 
@@ -72,7 +101,10 @@ export default async function setup() {
   };
 
   for (const step of stepsInOrder) {
-    arg = await step(arg);
+    if (onlyNames.length && !onlyNames.includes(step.name)) {
+      continue;
+    }
+    arg = await step.fn(arg);
   }
 
   await writeConfigFile("index.json", arg.standardConfig, standardConfig);

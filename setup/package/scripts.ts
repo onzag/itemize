@@ -1,8 +1,10 @@
 export default {
   "install": "tsc && NODE_ENV=development webpack && NODE_ENV=production webpack",
   "tsc": "tsc",
+  "hard-tsc": "tsc -p node_modules/itemize && itemize setup run src && tsc",
   "webpack": "NODE_ENV=production webpack",
   "webpack-dev": "NODE_ENV=development webpack",
+  "hard-webpack-dev": "itemize setup run src && NODE_ENV=development webpack",
   "webpack-analyze": "NODE_ENV=production BUNDLE_ANALYZE=true webpack",
   "build": "NODE_ENV=development webpack && NODE_ENV=production webpack",
   "run-development-server": "NODE_ENV=development node ./dist/src/server.js",
