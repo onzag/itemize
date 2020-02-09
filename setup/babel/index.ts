@@ -9,13 +9,13 @@ export default async function babelSetup(arg: ISetupConfigType): Promise<ISetupC
 
   let exists = true;
   try {
-    await fsAsync.access(".babelrc", fs.constants.F_OK);
+    await fsAsync.access("babel.config.json", fs.constants.F_OK);
   } catch (e) {
     exists = false;
   }
   if (!exists) {
-    console.log("emiting " + colors.green(".babelrc"));
-    await fsAsync.writeFile(".babelrc", JSON.stringify(rc));
+    console.log("emiting " + colors.green("babel.config.json"));
+    await fsAsync.writeFile("babel.config.json", JSON.stringify(rc, null, 2));
   }
   return arg;
 }

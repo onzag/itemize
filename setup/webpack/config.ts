@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const WorkerInjectorGeneratorPlugin = require("worker-injector-generator-plugin");
 
-const isDevelopment = process.env.NODE_ENV = "development";
+const isDevelopment = process.env.NODE_ENV === "development";
 const mode = isDevelopment ? "development" : "production";
 
 const plugins = [
@@ -30,11 +30,11 @@ if (process.env.BUNDLE_ANALYZE) {
 module.exports = {
   mode,
   entry: {
-    "service-worker": ["./node_modules/itemize/client/internal/workers/service/service.worker.ts"],
-    "cache-worker": ["./node_modules/itemize/client/internal/workers/cache/cache.worker.ts"],
+    "service-worker": ["./itemize/client/internal/workers/service/service.worker.ts"],
+    "cache-worker": ["./itemize/client/internal/workers/cache/cache.worker.ts"],
     "build": ["./src/client/index.tsx"],
   },
-  devtool: isDevelopment ? 'inline-source-map' : null,
+  devtool: isDevelopment ? 'inline-source-map' : false,
   plugins,
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.mjs']
@@ -55,54 +55,45 @@ module.exports = {
   module: {
     rules: [
       {
-        test: path.resolve(__dirname, "node_modules/jsdom/lib/api.js"),
+        test: /graphql/,
         use: "null-loader"
       },
       {
-        test: path.resolve(__dirname, "node_modules/knex/index.js"),
+        test: /jsdom\\/lib\\/api\.js/,
         use: "null-loader"
       },
       {
-        test: path.resolve(__dirname, "node_modules/node-fetch/lib/index.js"),
+        test: /knex/,
         use: "null-loader"
       },
       {
-        test: path.resolve(__dirname, "node_modules/form-data/lib/form_data.js"),
+        test: /node\\-fetch\\/lib\\/index\\.js/,
         use: "null-loader"
       },
       {
-        test: path.resolve(__dirname, "node_modules/bcrypt/bcrypt.js"),
+        test: /form_data\\.js/,
         use: "null-loader"
       },
       {
-        test: path.resolve(__dirname, "itemize/base/Root/Module/sql.ts"),
+        test: /bcrypt\\.js/,
         use: "null-loader"
       },
       {
-        test: path.resolve(__dirname, "itemize/base/Root/Module/ItemDefinition/sql.ts"),
+        test: /itemize\\/[a-zA-Z0-9_\\/]+\\/sql\\.ts/,
         use: "null-loader"
       },
       {
-        test: path.resolve(__dirname, "itemize/base/Root/Module/ItemDefinition/PropertyDefinition/sql.ts"),
+        test: /itemize\\/[a-zA-Z0-9_\\/]+\\.worker\\.ts/,
         use: "null-loader"
       },
       {
-        test: path.resolve(__dirname, "itemize/base/Root/Module/ItemDefinition/Include/sql.ts"),
-        use: "null-loader"
-      },
-      {
-        test: /\.worker.\ts$/,
-        use: "null-loader"
-      },
-      {
-        test: /\.tsx?$/,
-        exclude: /node_modules/,
+        test: /\\.tsx?$/,
         use: {
           loader: "babel-loader"
         },
       },
       {
-        test: /\.s?css$/,
+        test: /\\.s?css$/,
         use: [
           {
             loader: MiniCssExtractPlugin.loader
@@ -116,14 +107,14 @@ module.exports = {
         ]
       },
       {
-        test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
+        test: /\\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
         loader: 'url-loader',
         options: {
           limit: 10000,
         },
       },
       {
-        test: /\.mjs$/,
+        test: /\\.mjs$/,
         include: /node_modules/,
         type: 'javascript/auto'
       }

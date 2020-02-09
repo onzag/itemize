@@ -1,5 +1,6 @@
 export default [
   "/dist",
+  "/itemize",
   "/node_modules",
   "/devenv",
   "npm-debug.log",

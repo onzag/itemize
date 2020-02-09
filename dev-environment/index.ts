@@ -1,7 +1,7 @@
 import fs from "fs";
 const fsAsync = fs.promises;
 import path from "path";
-import { IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
+import { IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType, IConfigRawJSONDataType } from "../config";
 import { ensureConfigDirectory } from "../setup";
 import { readConfigFile } from "../setup";
 import colors from "colors";
@@ -9,6 +9,9 @@ import { execSudo } from "../setup/exec";
 
 export async function start() {
   await ensureConfigDirectory();
+
+  const standardConfig: IConfigRawJSONDataType = await readConfigFile("index.json");
+  const dockerprefixer = standardConfig.appName.replace(/\s/g, "_").toLowerCase();
 
   const dbConfigDevelopment: IDBConfigRawJSONDataType = await readConfigFile("db.sensitive.json");
   const redisConfigDevelopment: IRedisConfigRawJSONDataType = await readConfigFile("redis.sensitive.json");
@@ -44,7 +47,7 @@ export async function start() {
     console.log(colors.yellow("The execution might take a while, please wait..."));
     try {
       await execSudo(
-        `docker run --name itemizedevdb -e POSTGRES_PASSWORD=${dbConfigDevelopment.password} ` +
+        `docker run --name ${dockerprefixer}_devdb -e POSTGRES_PASSWORD=${dbConfigDevelopment.password} ` +
         `-e POSTGRES_USER=${dbConfigDevelopment.user} -e POSTGRES_DB=${dbConfigDevelopment.database} ` +
         `-v "$PWD/devenv/pgdata":/var/lib/postgresql/data ` +
         `-p ${dbConfigDevelopment.port}:5432 -d postgres`,
@@ -54,7 +57,7 @@ export async function start() {
       console.log(colors.red(err.message));
       console.log(colors.yellow("Something went wrong please allow for cleanup..."));
       await execSudo(
-        "docker rm itemizedevdb",
+        `docker rm ${dockerprefixer}_devdb`,
         "Itemize Docker Contained PGSQL Database",
       );
       throw err;
@@ -82,7 +85,7 @@ export async function start() {
     console.log(colors.yellow("The execution might take a while, please wait..."));
     try {
       await execSudo(
-        `docker run --name itemizedevredis ` +
+        `docker run --name ${dockerprefixer}_devredis ` +
         `-p ${redisConfigDevelopment.port}:6379 -d redis`,
         "Itemize Docker Contained REDIS Database",
       );
@@ -90,7 +93,7 @@ export async function start() {
       console.log(colors.red(err.message));
       console.log(colors.yellow("Something went wrong please allow for cleanup..."));
       await execSudo(
-        "docker rm itemizedevredis",
+        `docker rm ${dockerprefixer}_devredis`,
         "Itemize Docker Contained REDIS Database",
       );
       throw err;
@@ -99,6 +102,9 @@ export async function start() {
 }
 
 export async function stop() {
+  const standardConfig: IConfigRawJSONDataType = await readConfigFile("index.json");
+  const dockerprefixer = standardConfig.appName.replace(/\s/g, "_").toLowerCase();
+
   const dbConfigDevelopment: IDBConfigRawJSONDataType = await readConfigFile("db.sensitive.json");
   const redisConfigDevelopment: IRedisConfigRawJSONDataType = await readConfigFile("redis.sensitive.json");
 
@@ -109,13 +115,13 @@ export async function stop() {
     try {
       console.log(colors.yellow("Please allow Itemize to stop the PGSQL docker container"));
       await execSudo(
-        "docker stop itemizedevdb",
+        `docker stop ${dockerprefixer}_devdb`,
         "Itemize Docker Contained PGSQL Database",
       );
 
       console.log(colors.yellow("Now we attempt to remove the PGSQL docker container"));
       await execSudo(
-        "docker rm itemizedevdb",
+        `docker rm ${dockerprefixer}_devdb`,
         "Itemize Docker Contained PGSQL Database",
       );
     } catch (err) {
@@ -133,13 +139,13 @@ export async function stop() {
     try {
       console.log(colors.yellow("Please allow Itemize to stop the REDIS docker container"));
       await execSudo(
-        "docker stop itemizedevredis",
+        `docker stop ${dockerprefixer}_devredis`,
         "Itemize Docker Contained REDIS Database",
       );
 
       console.log(colors.yellow("Now we attempt to remove the REDIS docker container"));
       await execSudo(
-        "docker rm itemizedevredis",
+        `docker rm ${dockerprefixer}_devredis`,
         "Itemize Docker Contained REDIS Database",
       );
     } catch (err) {

@@ -13,7 +13,6 @@ export default async function packageSetup(arg: ISetupConfigType): Promise<ISetu
   const packageJSON = JSON.parse(await fsAsync.readFile("package.json", "utf-8"));
   const dependenciesToInstall: string[] = [];
   Object.keys(dependencies).forEach((dependency) => {
-    console.log(packageJSON, packageJSON.dependencies, dependency);
     if (!packageJSON.dependencies || !packageJSON.dependencies[dependency]) {
       dependenciesToInstall.push(dependency + "@" + dependencies[dependency]);
     }

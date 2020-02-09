@@ -1,3 +1,33 @@
 export default {
+  // various types
+  "@types/autosuggest-highlight": "^3.1.0",
+  "@types/bcrypt": "^3.0.0",
+  "@types/debug": "^4.1.5",
+  "@types/deep-equal": "^1.0.1",
+  "@types/diacritics": "^1.3.1",
+  "@types/dompurify": "^2.0.0",
+  "@types/express": "^4.17.2",
+  "@types/graphql-fields": "^1.3.2",
+  "@types/graphql-upload": "^8.0.3",
+  "@types/html-minifier": "^3.5.3",
+  "@types/jsdom": "^12.2.4",
+  "@types/jsonwebtoken": "^8.3.5",
+  "@types/node": "^13.1.1",
+  "@types/node-fetch": "^2.5.4",
+  "@types/pg": "^7.14.0",
+  "@types/properties-reader": "0.0.1",
+  "@types/react": "^16.9.17",
+  "@types/react-autosuggest": "^9.3.13",
+  "@types/react-dom": "^16.9.4",
+  "@types/react-router-dom": "^5.1.3",
+  "@types/redis": "^2.8.14",
+  "@types/sharp": "^0.23.1",
+  "@types/socket.io": "^2.1.4",
+  "@types/socket.io-client": "^1.4.32",
+  "@types/svgo": "^1.3.0",
+  "@types/uuid": "^3.4.6",
+  "@types/read": "0.0.28",
+
+  // analyze final bundles
   "webpack-bundle-analyzer": "^3.6.0",
 };

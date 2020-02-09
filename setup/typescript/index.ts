@@ -5,7 +5,7 @@ import { ISetupConfigType } from "..";
 import tsconfig from "./tsconfig";
 import tslint from "./tslint";
 
-export default async function githubSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
+export default async function typescriptSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
   console.log(colors.bgGreen("GITHUB SETUP"));
 
   let exists = true;
@@ -16,7 +16,7 @@ export default async function githubSetup(arg: ISetupConfigType): Promise<ISetup
   }
   if (!exists) {
     console.log("emiting " + colors.green("tsconfig.json"));
-    await fsAsync.writeFile("tsconfig.json", JSON.stringify(tsconfig));
+    await fsAsync.writeFile("tsconfig.json", JSON.stringify(tsconfig, null, 2));
   }
 
   exists = true;
@@ -27,7 +27,7 @@ export default async function githubSetup(arg: ISetupConfigType): Promise<ISetup
   }
   if (!exists) {
     console.log("emiting " + colors.green("tslint.json"));
-    await fsAsync.writeFile("tslint.json", JSON.stringify(tslint));
+    await fsAsync.writeFile("tslint.json", JSON.stringify(tslint, null, 2));
   }
   return arg;
 }

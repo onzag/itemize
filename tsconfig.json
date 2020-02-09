@@ -24,7 +24,9 @@
   "compileOnSave": true,
   "exclude": [
     "node_modules",
-    "client"
+    "client",
+    "data",
+    "server",
   ],
   "include": [
     "**/*.ts"

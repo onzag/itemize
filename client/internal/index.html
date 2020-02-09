@@ -28,6 +28,7 @@
         // INITIALIZE SCRIPT
         var script = document.createElement("script");
         var commonsScript = document.createElement("script");
+        var vendorsScript = document.createElement("script");
         var developmentHostname = "%{developmentHostname}";
         var devFlag = localStorage && localStorage.getItem("__dev");
         if (
@@ -41,6 +42,7 @@
         }
         script.type = "text/javascript";
         commonsScript.type = "text/javascript";
+        vendorsScript.type = "text/javascript";
 
         // We use the __dev variable in local storage for using the development build rather
         // than the production build, yes, I know you can see this, I don't care, you could reverse
@@ -48,6 +50,7 @@
         if (devFlag === "true") {
             script.src = "/rest/resource/build.development.js";
             commonsScript.src = "/rest/resource/commons.development.js";
+            vendorsScript.src = "/rest/resource/vendors~build.development.js";
 
             // We remove the production css, which loads by default
             var element = document.getElementsByTagName("link")[0];
@@ -62,6 +65,7 @@
             // We add the production build to the page
             script.src = "/rest/resource/build.production.js";
             commonsScript.src = "/rest/resource/commons.production.js";
+            vendorsScript.src = "/rest/resource/vendors~build.production.js";
 
             // TODO ANALYTICS
         }

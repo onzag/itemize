@@ -1,5 +1,5 @@
 import { IAppDataType } from "..";
-import { IGQLQueryFieldsDefinitionType } from "../../../itemize/base/Root/gql";
+import { IGQLQueryFieldsDefinitionType } from "../../base/Root/gql";
 import { GraphQLString } from "graphql";
 import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME,
@@ -7,7 +7,7 @@ import {
   ENDPOINT_ERRORS,
 } from "../../constants";
 import { jwtVerify, jwtSign } from "../token";
-import { EndpointError } from "../../../itemize/base/errors";
+import { EndpointError } from "../../base/errors";
 import { IServerSideTokenDataType } from "../resolvers/basic";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import TOKEN_OBJECT from "../custom-token/graphql-token-object";

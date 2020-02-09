@@ -16,6 +16,7 @@ import packageSetup from "./package";
 import babelSetup from "./babel";
 import webpackSetup from "./webpack";
 import srcSetup from "./src";
+import typescriptSetup from "./typescript";
 const fsAsync = fs.promises;
 
 export interface ISetupConfigType {
@@ -37,6 +38,7 @@ const stepsInOrder: Array<(arg: ISetupConfigType) => Promise<ISetupConfigType>> 
   githubSetup,
   packageSetup,
   babelSetup,
+  typescriptSetup,
   webpackSetup,
   srcSetup,
 ];

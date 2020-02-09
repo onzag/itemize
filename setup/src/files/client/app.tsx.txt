@@ -1,0 +1,9 @@
+import React from "react";
+
+export default function App()<0>{
+	return (
+		<React.Fragment>
+			IT WORKS
+		</React.Fragment>
+	);
+}
