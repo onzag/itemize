@@ -41,13 +41,13 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
+      chunks(chunk) {
+        return chunk.name !== "service-worker";
+      },
       cacheGroups: {
         commons: {
           name: 'commons',
           minChunks: 2,
-          chunks(chunk) {
-            return chunk.name !== "service-worker";
-          },
         },
       }
     }
@@ -80,10 +80,6 @@ module.exports = {
       },
       {
         test: /itemize\\/[a-zA-Z0-9_\\/]+\\/sql\\.ts/,
-        use: "null-loader"
-      },
-      {
-        test: /itemize\\/[a-zA-Z0-9_\\/]+\\.worker\\.ts/,
         use: "null-loader"
       },
       {

@@ -114,7 +114,7 @@ export default async function srcSetup(arg: ISetupConfigType): Promise<ISetupCon
       path.join("itemize", dirtoCopy),
     );
   }));
-  await Promise.all(["constants.ts", "index.ts", "gql-querier.ts", "gql-util.ts", "util.ts"].map(async (fileToCopy) => {
+  await Promise.all(["constants.ts", "index.ts", "gql-querier.ts", "gql-util.ts", "util.ts", "config.ts"].map(async (fileToCopy) => {
     await fsAsync.copyFile(
       path.join(__dirname, "..", "..", "..", fileToCopy),
       path.join("itemize", fileToCopy),

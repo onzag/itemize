@@ -1,5 +1,5 @@
 export default {
-  "install": "tsc && NODE_ENV=development webpack && NODE_ENV=production webpack",
+  "install": "itemize setup run src && tsc && NODE_ENV=development webpack && NODE_ENV=production webpack",
   "tsc": "tsc",
   "hard-tsc": "tsc -p node_modules/itemize && itemize setup run src && tsc",
   "webpack": "NODE_ENV=production webpack",

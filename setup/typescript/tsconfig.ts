@@ -24,6 +24,7 @@ export default {
   compileOnSave: true,
   exclude: [
     "node_modules",
+    "itemize/client",
     "src/client",
   ],
   include: [
