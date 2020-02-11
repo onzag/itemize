@@ -36,22 +36,22 @@ const actionRegistry = {
         fn: dev_environment_1.stop,
         description: "Stops the development environment",
     },
-    "build-data": {
+    "build-schema": {
         fn: builder_1.default,
         description: "Processes the itemize resources and initializes a new build number",
     },
     "build-developemnt-database": {
         fn: null,
-        description: "Builds the development database (warning you must run build-data before this) " +
+        description: "Builds the development database (warning you must run build-schema before this) " +
             "if using a development environment, remember to run start-development-environment"
     },
     "build-staging-database": {
         fn: null,
-        description: "Builds the staging database (warning you must run build-data before this)",
+        description: "Builds the staging database (warning you must run build-schema before this)",
     },
     "build-production-database": {
         fn: null,
-        description: "Builds the development database (warning you must run build-data before this)"
+        description: "Builds the development database (warning you must run build-schema before this)"
     },
 };
 (async () => {

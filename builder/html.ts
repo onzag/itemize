@@ -52,18 +52,9 @@ function replaceHTMLKeys(html: string, obj: any, prefix: string): string {
  * @param rawConfig the configuration that is being used
  */
 export async function buildHTML(rawConfig: IConfigRawJSONDataType) {
-  // first we check that our data directory exists at all
-  if (!await checkExists(path.join("dist", "data"))) {
-    await fsAsync.mkdir(path.join("dist", "data"));
-  }
-
   // the base html as we read it from either node_modules or an itemize folder
-  let baseHTML: string;
-  try {
-    baseHTML = await fsAsync.readFile(path.join("itemize", "client", "internal", "index.html"), "utf8");
-  } catch (err) {
-    baseHTML = await fsAsync.readFile(path.join("node_modules", "itemize", "client", "internal", "index.html"), "utf8");
-  }
+  let baseHTML: string =
+    await fsAsync.readFile(path.join("node_modules", "itemize", "client", "internal", "index.html"), "utf8");
 
   // we need to make a build number
   const buildNumber = (new Date()).getTime().toString();

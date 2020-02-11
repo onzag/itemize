@@ -114,6 +114,10 @@ export default async function build() {
       await fsAsync.mkdir("dist");
     }
 
+    if (!await checkExists(path.join("dist", "data"))) {
+      await fsAsync.mkdir(path.join("dist", "data"));
+    }
+
     // we run all the build steps
     await Promise.all([
       buildData(rawDataConfig),
@@ -143,7 +147,7 @@ async function buildData(rawDataConfig: IConfigRawJSONDataType) {
   // lets get the actual location of the item, lets assume first
   // it is the given location
   const actualLocation = await getActualFileLocation(
-    entryPoint,
+    ["", entryPoint],
     new Traceback("BUILDER"),
   );
 
@@ -189,7 +193,7 @@ async function buildData(rawDataConfig: IConfigRawJSONDataType) {
   const i18nData = await buildLang(
     rawDataConfig,
     actualLocation,
-    path.join(path.dirname(actualLocation), fileData.data.i18n),
+    fileData.data.i18n,
     traceback,
   );
 
@@ -212,11 +216,6 @@ async function buildData(rawDataConfig: IConfigRawJSONDataType) {
 
   // check and run the checkers
   checkRoot(resultJSON);
-
-  // ensure the data directory
-  if (!await checkExists(path.join("dist", "data"))) {
-    await fsAsync.mkdir(path.join("dist", "data"));
-  }
 
   // and let's emit such file tht only contains the language name
   console.log("emiting " + colors.green(path.join("dist", "data", "lang.json")));
@@ -315,7 +314,7 @@ async function buildChildrenItemDefinitionsOrModules(
 
     // so the actual location is the parent folder and the include name
     const actualLocation = await getActualFileLocation(
-      path.join(parentFolder, child),
+      [parentFolder, child],
       specificIncludeTraceback,
     );
 
@@ -559,7 +558,7 @@ async function buildItemDefinition(
   await Promise.all(
     (actualEvaledFileData.imports || []).map((imp, index) => {
       return getActualFileLocation(
-         path.join(lastModuleDirectory, imp),
+         [lastModuleDirectory, imp],
          traceback.newTraceToBit("imports").newTraceToBit(index),
       );
     }),
@@ -683,7 +682,7 @@ async function buildItemDefinition(
       // Otherwise we try to get the actual location
       // it will throw an error otherwise
       await getActualFileLocation(
-        path.join(path.dirname(actualLocation), include.definition),
+        [path.dirname(actualLocation), include.definition],
         iTraceback.newTraceToBit("name"),
       );
     };

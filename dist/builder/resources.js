@@ -107,10 +107,6 @@ const REQUIRED_RESOURCES = [
  */
 async function copyOneDirectoryLevel(pathname, constructedPath) {
     const filesInDirectory = await fsAsync.readdir(pathname);
-    // TODO eventually remove this after the CDN update
-    if (!await util_1.checkExists(path_1.default.join("dist", "uploads"))) {
-        await fsAsync.mkdir(path_1.default.join("dist", "uploads"));
-    }
     // for every file in the directory
     await Promise.all(filesInDirectory.map(async (fileNameInDirectory) => {
         // let's get the path name
@@ -120,8 +116,8 @@ async function copyOneDirectoryLevel(pathname, constructedPath) {
         // if we have a directory
         if (stat.isDirectory()) {
             // build the folder for that directory
-            if (!await util_1.checkExists(path_1.default.join("dist", "data", constructedPath, fileNameInDirectory))) {
-                await fsAsync.mkdir(path_1.default.join("dist", "data", constructedPath, fileNameInDirectory));
+            if (!await util_1.checkExists(path_1.default.join(constructedPath, fileNameInDirectory))) {
+                await fsAsync.mkdir(path_1.default.join(constructedPath, fileNameInDirectory));
             }
             // and copy that directory level as well
             return copyOneDirectoryLevel(currentTotalFilePathName, path_1.default.join(constructedPath, fileNameInDirectory));
@@ -175,7 +171,7 @@ async function copyOneDirectoryLevel(pathname, constructedPath) {
             minified = content;
         }
         // let's export the file in the directory
-        const exportedFileName = path_1.default.join("dist", "data", constructedPath, fileNameInDirectory);
+        const exportedFileName = path_1.default.join(constructedPath, fileNameInDirectory);
         // and emit it
         console.log("emiting " + safe_1.default.green(exportedFileName) + " OPTIMIZER: " + safe_1.default.yellow(optimizer));
         await fsAsync.writeFile(exportedFileName, minified);
@@ -188,9 +184,9 @@ async function copyOneDirectoryLevel(pathname, constructedPath) {
  * @returns a void promise
  */
 async function buildResources(rawConfig) {
-    // add the data folder if not there
-    if (!await util_1.checkExists(path_1.default.join("dist", "data"))) {
-        await fsAsync.mkdir(path_1.default.join("dist", "data"));
+    // TODO eventually remove this after the CDN update
+    if (!await util_1.checkExists(path_1.default.join("dist", "uploads"))) {
+        await fsAsync.mkdir(path_1.default.join("dist", "uploads"));
     }
     // now let's check for the required resources to see if they are there
     await Promise.all(REQUIRED_RESOURCES.map(async (requiredResource) => {
@@ -198,6 +194,6 @@ async function buildResources(rawConfig) {
             console.log("Missing resource file: " + safe_1.default.red(requiredResource));
         }
     }));
-    return copyOneDirectoryLevel("resources", "");
+    return copyOneDirectoryLevel("resources", path_1.default.join("dist", "data"));
 }
 exports.buildResources = buildResources;

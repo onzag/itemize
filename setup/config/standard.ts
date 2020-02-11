@@ -13,8 +13,8 @@ export async function standardConfigSetup(
     [
       {
         variableName: "entry",
-        message: "Please choose your entry folder, the entry folder contains the data for your itemize app",
-        defaultValue: "data",
+        message: "Please choose your entry schema root, the entry root contains the data for your itemize app",
+        defaultValue: "schema/root",
       },
       {
         variableName: "appName",

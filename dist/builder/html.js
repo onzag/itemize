@@ -10,7 +10,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const util_1 = require("../util");
-const util_2 = require("./util");
 const safe_1 = __importDefault(require("colors/safe"));
 const html_minifier_1 = __importDefault(require("html-minifier"));
 const fs_1 = __importDefault(require("fs"));
@@ -51,18 +50,8 @@ function replaceHTMLKeys(html, obj, prefix) {
  * @param rawConfig the configuration that is being used
  */
 async function buildHTML(rawConfig) {
-    // first we check that our data directory exists at all
-    if (!await util_2.checkExists(path_1.default.join("dist", "data"))) {
-        await fsAsync.mkdir(path_1.default.join("dist", "data"));
-    }
     // the base html as we read it from either node_modules or an itemize folder
-    let baseHTML;
-    try {
-        baseHTML = await fsAsync.readFile(path_1.default.join("itemize", "client", "internal", "index.html"), "utf8");
-    }
-    catch (err) {
-        baseHTML = await fsAsync.readFile(path_1.default.join("node_modules", "itemize", "client", "internal", "index.html"), "utf8");
-    }
+    let baseHTML = await fsAsync.readFile(path_1.default.join("node_modules", "itemize", "client", "internal", "index.html"), "utf8");
     // we need to make a build number
     const buildNumber = (new Date()).getTime().toString();
     baseHTML = replaceHTMLKeys(baseHTML, {

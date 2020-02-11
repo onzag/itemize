@@ -31,8 +31,8 @@
             "subtype": "email",
             "searchable": false,
             "nullable": true,
-            "readRoleAccess": ["&OWNER", "ADMIN"],
-            "editRoleAccess": ["&OWNER", "ADMIN"]
+            "readRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['&OWNER', 'ADMIN']}else{return ['&GUEST']}",
+            "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['&OWNER', 'ADMIN']}else{return ['&GUEST']}"
         },
         {
             "id": "e_validated",
@@ -40,8 +40,8 @@
             "nullable": true,
             "default": false,
             "searchable": false,
-            "createRoleAccess": ["ADMIN"],
-            "editRoleAccess": ["ADMIN"],
+            "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
+            "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
             "coerceNullsIntoDefault": true
         },
         {
@@ -74,7 +74,7 @@
                 "largeDimension": "256x256"
             },
             "nullable": true,
-            "editRoleAccess": ["&OWNER", "ADMIN"]
+            "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['&OWNER', 'ADMIN']}else{return ['&GUEST']}"
         },
         {
             "id": "address",
@@ -99,6 +99,6 @@
             }
         }
     },
-    "createRoleAccess": ["&GUEST", "ADMIN"],
+    "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['&GUEST', 'ADMIN']}else{return ['&GUEST']}",
     "ownerIsObjectId": true
 }

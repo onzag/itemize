@@ -4,70 +4,17 @@ const fsAsync = fs.promises;
 import { ISetupConfigType } from "..";
 import { confirm, fieldRequest } from "../read";
 import path from "path";
+import { IConfigRawJSONDataType } from "../../config";
 
-async function copyAndProcessDirectoryLevelForSource(
-  options: {
-    useSpaces: boolean,
-    spacesSize: number,
-    nextLineOnBrackets: boolean,
-  },
-  pathname: string,
-  constructedPath: string,
-) {
-  const filesInDirectory = await fsAsync.readdir(pathname);
+interface IOptionsForProcessingCode {
+  useSpaces: boolean,
+  spacesSize: number,
+  nextLineOnBrackets: boolean,
+};
 
-  // for every file in the directory
-  await Promise.all(filesInDirectory.map(async (fileNameInDirectory) => {
-    // let's get the path name
-    const currentTotalFilePathName = path.join(pathname, fileNameInDirectory);
-
-    // and let's check what type it is
-    const stat = await fsAsync.lstat(currentTotalFilePathName);
-    // if we have a directory
-    if (stat.isDirectory()) {
-      // build the folder for that directory
-      await fsAsync.mkdir(path.join("src", constructedPath, fileNameInDirectory));
-  
-      // and copy that directory level as well
-      return copyAndProcessDirectoryLevelForSource(
-        options,
-        currentTotalFilePathName,
-        path.join(constructedPath, fileNameInDirectory),
-      );
-    }
-
-    // so we get the content of the file
-    let content = await fsAsync.readFile(currentTotalFilePathName, "utf8");
-    if (options.nextLineOnBrackets) {
-      content = content.replace(/\<(\d+)\>\{/g, (match, digit) => {
-        const digitInQuestion = parseInt(digit);
-        let finalStr = "\n";
-        if (options.useSpaces) {
-          finalStr += " ".repeat(options.spacesSize * digitInQuestion)
-        } else {
-          finalStr += "\t".repeat(digitInQuestion);
-        }
-        finalStr += "{";
-        return finalStr;
-      });
-    } else {
-      content = content.replace(/\<(\d+)\>\{/g, " {");
-    }
-
-    if (options.useSpaces) {
-      content = content.replace(/\t/g, " ".repeat(options.spacesSize));
-    }
-
-    const finalFileName = fileNameInDirectory.replace(".txt", "");
-    // let's export the file in the directory
-    const exportedFileName = path.join("src", constructedPath, finalFileName);
-    // and emit it
-    console.log("emiting " + colors.green(exportedFileName));
-    await fsAsync.writeFile(exportedFileName, content);
-  }));
-}
-
-async function copyDirectoryLevel(
+async function copyAndProcessDirectoryLevelFor(
+  config: IConfigRawJSONDataType,
+  options: IOptionsForProcessingCode,
   pathname: string,
   constructedPath: string,
 ) {
@@ -86,53 +33,145 @@ async function copyDirectoryLevel(
       await fsAsync.mkdir(path.join(constructedPath, fileNameInDirectory));
   
       // and copy that directory level as well
-      return copyDirectoryLevel(
+      return copyAndProcessDirectoryLevelFor(
+        config,
+        options,
         currentTotalFilePathName,
         path.join(constructedPath, fileNameInDirectory),
       );
     }
 
-    await fsAsync.copyFile(currentTotalFilePathName, path.join(constructedPath, fileNameInDirectory));
+    // so we get the content of the file
+    let content = await fsAsync.readFile(currentTotalFilePathName, "utf8");
+    let finalFileName: string = fileNameInDirectory;
+    if (currentTotalFilePathName.endsWith(".code")) {
+      if (options.nextLineOnBrackets) {
+        content = content.replace(/\<(\d+)\>\{/g, (match, digit) => {
+          const digitInQuestion = parseInt(digit);
+          let finalStr = "\n";
+          if (options.useSpaces) {
+            finalStr += " ".repeat(options.spacesSize * digitInQuestion)
+          } else {
+            finalStr += "\t".repeat(digitInQuestion);
+          }
+          finalStr += "{";
+          return finalStr;
+        });
+      } else {
+        content = content.replace(/\<(\d+)\>\{/g, " {");
+      }
+      finalFileName = fileNameInDirectory.replace(".code", "");
+    } else if (currentTotalFilePathName.endsWith(".js")) {
+      content = Function("config", "options", content)(config, options);
+      finalFileName = fileNameInDirectory.replace(".js", "");
+    }
+
+    if (options.useSpaces) {
+      content = content.replace(/\t/g, " ".repeat(options.spacesSize));
+    }
+
+    // let's export the file in the directory
+    const exportedFileName = path.join(constructedPath, finalFileName);
+    // and emit it
+    console.log("emiting " + colors.green(exportedFileName));
+    await fsAsync.writeFile(exportedFileName, content);
   }));
 }
 
-export default async function srcSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
-  console.log(colors.bgGreen("SOURCE SETUP"));
-
+async function copyAllFilesFor(
+  arg: ISetupConfigType,
+  target: string,
+  source: string,
+  previousOptions: IOptionsForProcessingCode,
+  onceDone?: () => Promise<void>,
+) : Promise<IOptionsForProcessingCode> {
   let exists = true;
   try {
-    await fsAsync.access("src", fs.constants.F_OK);
+    await fsAsync.access(target, fs.constants.F_OK);
   } catch (e) {
     exists = false;
   }
+  
+  let options: IOptionsForProcessingCode = previousOptions;
   if (!exists) {
-    console.log(colors.yellow("A source hasn't been determined"));
-    const useSpaces = await confirm("Would you like to use spaces instead of tabs?");
-    let spacesSize = null;
-    if (useSpaces) {
-      spacesSize = await fieldRequest(
-        "integer",
-        "How many spaces?",
-        "spaces",
-        null,
-        2,
-        false,
-        (v) => !isNaN(v),
-      );
-    }
+    console.log(colors.yellow(`A ${target} folder hasn't been determined`));
+    if (!options) {
+      const useSpaces = await confirm("Would you like to use spaces instead of tabs?");
+      let spacesSize = null;
+      if (useSpaces) {
+        spacesSize = await fieldRequest(
+          "integer",
+          "How many spaces?",
+          "spaces",
+          null,
+          2,
+          false,
+          (v) => !isNaN(v),
+        );
+      }
 
-    const nextLineOnBrackets = !(await confirm("Are you a `function() {` same line kind of gal/guy?"));
+      const nextLineOnBrackets = !(await confirm("Are you a `function() {` same line kind of gal/guy?"));
 
-    await fsAsync.mkdir("src");
-    copyAndProcessDirectoryLevelForSource(
-      {
+      options = {
         useSpaces,
         spacesSize,
         nextLineOnBrackets,
-      },
-      path.join(__dirname, "..", "..", "..", "setup", "src", "files"),
-      ""
+      };
+    }
+    await fsAsync.mkdir(target, {recursive: true});
+    await copyAndProcessDirectoryLevelFor(
+      arg.standardConfig,
+      options,
+      path.join(__dirname, "..", "..", "..", "setup", "src", source),
+      target,
     );
+    if (onceDone) {
+      await onceDone();
+    }
   }
+
+  return options;
+}
+export default async function srcSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
+  console.log(colors.bgGreen("SOURCE SETUP"));
+  let options = await copyAllFilesFor(
+    arg,
+    "src",
+    "ts-files",
+    null,
+  )
+  options = await copyAllFilesFor(
+    arg,
+    path.dirname(arg.standardConfig.entry),
+    "schema-files",
+    options,
+    async () => {
+      if (
+        !arg.standardConfig.entry.endsWith("/root") &&
+        !arg.standardConfig.entry.endsWith("/root.json")
+      ) {
+        let newRootFileName = path.basename(arg.standardConfig.entry);
+        if (!newRootFileName.endsWith(".json")) {
+          newRootFileName += ".json";
+        }
+        const newPropertiesFileName = newRootFileName.replace(".json", ".properties");
+        await fsAsync.rename(
+          path.join(path.dirname(arg.standardConfig.entry), "root.json"),
+          path.join(path.dirname(arg.standardConfig.entry), newRootFileName),
+        );
+        await fsAsync.rename(
+          path.join(path.dirname(arg.standardConfig.entry), "root.properties"),
+          path.join(path.dirname(arg.standardConfig.entry), newPropertiesFileName),
+        );
+      }
+    }
+  );
+  // TODO add missing resource files with itemize logo
+  await copyAllFilesFor(
+    arg,
+    "resources",
+    "resource-files",
+    options,
+  )
   return arg;
 }

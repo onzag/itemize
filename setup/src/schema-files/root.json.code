@@ -1,0 +1,7 @@
+{
+	"type": "root",
+	"children": [
+		"itemize/schema/users"
+	],
+	"i18n": "itemize/schema/main-i18n.properties"
+}

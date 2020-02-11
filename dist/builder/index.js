@@ -47,6 +47,9 @@ async function build() {
         if (!await util_1.checkExists("dist")) {
             await fsAsync.mkdir("dist");
         }
+        if (!await util_1.checkExists(path_1.default.join("dist", "data"))) {
+            await fsAsync.mkdir(path_1.default.join("dist", "data"));
+        }
         // we run all the build steps
         await Promise.all([
             buildData(rawDataConfig),
@@ -76,7 +79,7 @@ async function buildData(rawDataConfig) {
     const entryPoint = rawDataConfig.entry;
     // lets get the actual location of the item, lets assume first
     // it is the given location
-    const actualLocation = await util_1.getActualFileLocation(entryPoint, new Traceback_1.default("BUILDER"));
+    const actualLocation = await util_1.getActualFileLocation(["", entryPoint], new Traceback_1.default("BUILDER"));
     // lets create the traceback for this file
     const traceback = new Traceback_1.default(actualLocation);
     // lets read the file, let it fail if it fails
@@ -98,7 +101,7 @@ async function buildData(rawDataConfig) {
     schema_checks_1.ajvCheck(schema_checks_1.checkRootSchemaValidate, fileData.data, traceback);
     // now let's build the i18n supported languages
     // data which contains all the supported languges
-    const i18nData = await lang_1.buildLang(rawDataConfig, actualLocation, path_1.default.join(path_1.default.dirname(actualLocation), fileData.data.i18n), traceback);
+    const i18nData = await lang_1.buildLang(rawDataConfig, actualLocation, fileData.data.i18n, traceback);
     // and make the result JSON
     const resultJSON = {
         type: "root",
@@ -110,10 +113,6 @@ async function buildData(rawDataConfig) {
     };
     // check and run the checkers
     checkers_1.checkRoot(resultJSON);
-    // ensure the data directory
-    if (!await util_1.checkExists(path_1.default.join("dist", "data"))) {
-        await fsAsync.mkdir(path_1.default.join("dist", "data"));
-    }
     // and let's emit such file tht only contains the language name
     console.log("emiting " + safe_1.default.green(path_1.default.join("dist", "data", "lang.json")));
     await fsAsync.writeFile(path_1.default.join("dist", "data", "lang.json"), JSON.stringify(lang_1.clearLang(i18nData, rawDataConfig)));
@@ -176,7 +175,7 @@ async function buildChildrenItemDefinitionsOrModules(rawDataConfig, parentFolder
         childIndex++;
         const specificIncludeTraceback = traceback.newTraceToBit(childIndex);
         // so the actual location is the parent folder and the include name
-        const actualLocation = await util_1.getActualFileLocation(path_1.default.join(parentFolder, child), specificIncludeTraceback);
+        const actualLocation = await util_1.getActualFileLocation([parentFolder, child], specificIncludeTraceback);
         const externalSpecificIncludeTraceback = specificIncludeTraceback.newTraceToLocation(actualLocation);
         // now the file content is read
         const fileContent = await fsAsync.readFile(actualLocation, "utf8");
@@ -299,7 +298,7 @@ async function buildItemDefinition(rawDataConfig, actualLocation, lastModuleDire
     const i18nData = await getI18nData(rawDataConfig, i18nDataLocation, actualEvaledFileData.policies, traceback);
     // lets get the file definitions that are imported that exist
     await Promise.all((actualEvaledFileData.imports || []).map((imp, index) => {
-        return util_1.getActualFileLocation(path_1.default.join(lastModuleDirectory, imp), traceback.newTraceToBit("imports").newTraceToBit(index));
+        return util_1.getActualFileLocation([lastModuleDirectory, imp], traceback.newTraceToBit("imports").newTraceToBit(index));
     }));
     // lets get the file definitions that are imported
     // as an array for use by the browser
@@ -382,7 +381,7 @@ async function buildItemDefinition(rawDataConfig, actualLocation, lastModuleDire
             }
             // Otherwise we try to get the actual location
             // it will throw an error otherwise
-            await util_1.getActualFileLocation(path_1.default.join(path_1.default.dirname(actualLocation), include.definition), iTraceback.newTraceToBit("name"));
+            await util_1.getActualFileLocation([path_1.default.dirname(actualLocation), include.definition], iTraceback.newTraceToBit("name"));
         };
         const tracebackIncludes = traceback.newTraceToBit("includes");
         await Promise.all(finalValue.includes.map((include, index) => {

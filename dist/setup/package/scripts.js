@@ -12,7 +12,7 @@ exports.default = {
     "run-development-server": "NODE_ENV=development node ./dist/src/server.js",
     "run-production-server": "NODE_ENV=production node ./dist/src/server.js",
     "setup": "itemize setup",
-    "build-data": "itemize build-data",
+    "build-schema": "itemize build-schema",
     "build-development-database": "itemize build-development-database",
     "build-staging-database": "itemize build-staging-database",
     "build-production-database": "itemize build-production-database",

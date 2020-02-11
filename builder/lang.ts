@@ -7,12 +7,13 @@
  */
 
 import Traceback from "./Traceback";
-import { checkExists } from "./util";
+import { checkExists, getActualFileLocation } from "./util";
 import { LOCALE_I18N, ROOT_REQUIRED_LOCALE_I18N } from "../constants";
 import PropertiesReader from "properties-reader";
 import CheckUpError from "./Error";
 import { Ii18NType, ILangLocalesType } from "../base/Root";
 import { IConfigRawJSONDataType } from "../config";
+import path from "path";
 
 /**
  * Given the properties information provides all the key names
@@ -56,10 +57,12 @@ export async function buildLang(
 ): Promise<Ii18NType> {
   const languageFileLocation = actualRootLocation
     .replace(".json", ".properties");
-  const baseFileLocation = i18nBaseFileLocation;
 
-  const internalTracebackBaseFile = traceback.newTraceToLocation(i18nBaseFileLocation);
-  const internalTracebackRootFile = traceback.newTraceToLocation(languageFileLocation);
+  const baseFileLocation = await getActualFileLocation(
+    [path.dirname(actualRootLocation), i18nBaseFileLocation],
+    traceback,
+    "properties",
+  );
 
   // this is the root of the index.properties that is used to extend
   // the base
@@ -68,14 +71,12 @@ export async function buildLang(
     traceback,
   );
 
-  await checkExists(
-    i18nBaseFileLocation,
-    traceback,
-  );
-
   const propertiesBase = PropertiesReader(baseFileLocation).path();
   const propertiesRoot = PropertiesReader(languageFileLocation).path();
   const result: Ii18NType = {};
+
+  const internalTracebackBaseFile = traceback.newTraceToLocation(i18nBaseFileLocation);
+  const internalTracebackRootFile = traceback.newTraceToLocation(languageFileLocation);
 
   const extraGatheredProperties: {
     [locale: string]: string[];

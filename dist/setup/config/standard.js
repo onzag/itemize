@@ -6,8 +6,8 @@ async function standardConfigSetup(currentConfig, packageJSON) {
     const newConfig = await read_1.configRequest(currentConfig, "Standard configuration", [
         {
             variableName: "entry",
-            message: "Please choose your entry folder, the entry folder contains the data for your itemize app",
-            defaultValue: "data",
+            message: "Please choose your entry schema root, the entry root contains the data for your itemize app",
+            defaultValue: "schema/root",
         },
         {
             variableName: "appName",

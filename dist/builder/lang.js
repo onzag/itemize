@@ -14,6 +14,7 @@ const util_1 = require("./util");
 const constants_1 = require("../constants");
 const properties_reader_1 = __importDefault(require("properties-reader"));
 const Error_1 = __importDefault(require("./Error"));
+const path_1 = __importDefault(require("path"));
 /**
  * Given the properties information provides all the key names
  * that exist within that properties information as an array
@@ -51,16 +52,15 @@ function getAllKeyNames(obj, prefix) {
 async function buildLang(rawDataConfig, actualRootLocation, i18nBaseFileLocation, traceback) {
     const languageFileLocation = actualRootLocation
         .replace(".json", ".properties");
-    const baseFileLocation = i18nBaseFileLocation;
-    const internalTracebackBaseFile = traceback.newTraceToLocation(i18nBaseFileLocation);
-    const internalTracebackRootFile = traceback.newTraceToLocation(languageFileLocation);
+    const baseFileLocation = await util_1.getActualFileLocation([path_1.default.dirname(actualRootLocation), i18nBaseFileLocation], traceback, "properties");
     // this is the root of the index.properties that is used to extend
     // the base
     await util_1.checkExists(languageFileLocation, traceback);
-    await util_1.checkExists(i18nBaseFileLocation, traceback);
     const propertiesBase = properties_reader_1.default(baseFileLocation).path();
     const propertiesRoot = properties_reader_1.default(languageFileLocation).path();
     const result = {};
+    const internalTracebackBaseFile = traceback.newTraceToLocation(i18nBaseFileLocation);
+    const internalTracebackRootFile = traceback.newTraceToLocation(languageFileLocation);
     const extraGatheredProperties = {};
     // and start to loop
     rawDataConfig.supportedLanguages.forEach((locale) => {

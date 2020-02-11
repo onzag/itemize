@@ -64,39 +64,96 @@ export async function checkIsDirectory(
  * @param  partialLocation  the location in question without the ending
  * @param  traceback        a traceback object, this fn throws an error if it
  *                          does not exist
+ * @param extension the extension it resolves to by default it's json
  * @returns                  a string with the right location
  */
 export async function getActualFileLocation(
-  partialLocation: string,
+  partialUnjoinedLocation: [string, string],
   traceback: Traceback,
-) {
+  extension: string = "json",
+): Promise<string> {
+  const partialLocation = path.join(...partialUnjoinedLocation);
   let actualFileLocation = partialLocation;
+  // a possible node modules location
+  const possibleNodeModulesLocation = partialUnjoinedLocation[1].replace(
+    /^([a-zA-Z1-9_-]+)\//g,
+    "." + path.sep + path.join("node_modules", "$1") + path.sep,
+  );
+  // whether we can get into a node module
+  const canBeReplacedByNodeModule = partialUnjoinedLocation[1] !== possibleNodeModulesLocation;
   // check if exists without throwing an error
   const exists = await checkExists(
-    partialLocation,
+    actualFileLocation,
   );
   // if it exists we must check if it's the right type
   if (exists) {
     // it must be a directory
     const isDirectory = await checkIsDirectory(
-      partialLocation,
+      actualFileLocation,
       traceback,
     );
 
-    // if it's a directory as it should add the index.json
+    // if it's a directory as it should add the index.extension
     if (isDirectory) {
-      actualFileLocation = path.join(partialLocation, "index.json");
+      actualFileLocation = path.join(actualFileLocation, "index." + extension);
     }
-  } else if (!partialLocation.endsWith(".json")) {
-    // otherwise add the json ending
-    actualFileLocation += ".json";
+  }
+  
+  // the location is always expected to end up in extension
+  // even if it was a valid directory
+  if (!actualFileLocation.endsWith("." + extension)) {
+    // otherwise add the extension ending
+    actualFileLocation += "." + extension;
   }
 
   // check that it exists or throw an error
-  await checkExists(
+  // the error is only throw if it cannot be replaced by
+  // a node module
+  const localExists = await checkExists(
     actualFileLocation,
-    traceback,
+    !canBeReplacedByNodeModule ? traceback : null,
   );
+
+  // local exists might be false if it can be replaced by a node module
+  // as errors would have been disabled only if it could have been
+  // replaced by a node module
+  if (!localExists) {
+    let actualNodeModulesLocation = possibleNodeModulesLocation;
+    const nodeModuleLocationExists = await checkExists(
+      actualNodeModulesLocation,
+    );
+
+    // if it exists we must check if it's the right type
+    if (nodeModuleLocationExists) {
+      // it must be a directory
+      const isDirectory = await checkIsDirectory(
+        actualNodeModulesLocation,
+        traceback,
+      );
+
+      // if it's a directory as it should add the index.extension
+      if (isDirectory) {
+        actualNodeModulesLocation = path.join(actualNodeModulesLocation, "index." + extension);
+      }
+    }
+    
+    // the location is always expected to end up in extension
+    // even if it was a valid directory
+    if (!actualNodeModulesLocation.endsWith("." + extension)) {
+      // otherwise add the extension ending
+      actualNodeModulesLocation += "." + extension;
+    }
+
+    // check that it exists or throw an error
+    // the error is only throw if it cannot be replaced by
+    // a node module
+    await checkExists(
+      actualNodeModulesLocation,
+      traceback,
+    );
+
+    return actualNodeModulesLocation;
+  }
 
   return actualFileLocation;
 }
