@@ -3,6 +3,7 @@
 import setup from "./setup";
 import { start, stop } from "./dev-environment";
 import colors from "colors";
+import build from "./builder";
 
 const action = process.argv[2];
 const toRun = process.argv[3] === "run";
@@ -39,7 +40,7 @@ const actionRegistry: {
     description: "Stops the development environment",
   },
   "build-data": {
-    fn: null,
+    fn: build,
     description: "Processes the itemize resources and initializes a new build number",
   },
   "build-developemnt-database": {

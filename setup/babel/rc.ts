@@ -8,6 +8,7 @@ export default {
         modules: false,
         useBuiltIns: "entry",
         corejs: 3,
+        targets: "last 2 versions, not dead"
       },
     ],
   ],

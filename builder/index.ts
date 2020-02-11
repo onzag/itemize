@@ -105,8 +105,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   ownerIsObjectId?: boolean;
 }
 
-// Now we execute this code asynchronously
-(async () => {
+export default async function build() {
   try {
     const rawDataConfig = await extractConfig();
 
@@ -131,7 +130,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
     // log the stack
     console.log(err.stack);
   }
-})();
+};
 
 /**
  * Builds the base data for the root tree

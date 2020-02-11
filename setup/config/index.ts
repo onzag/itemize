@@ -5,9 +5,13 @@ import { confirm } from "../read";
 import { sensitiveConfigSetup } from "./sensitive";
 import { redisConfigSetup } from "./redis";
 import { dbConfigSetup } from "./db";
+import fs from "fs";
+const fsAsync = fs.promises;
 
 export default async function configSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
   console.log(colors.bgGreen("CONFIGURATION SETUP"));
+
+  const packageJSON = JSON.parse(await fsAsync.readFile("package.json", "utf-8"));
 
   const newArg: ISetupConfigType = {
     ...arg,
@@ -34,7 +38,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
     await confirm("Would you like to modify the standard configuration?")
   ) {
     console.log(colors.yellow("Could not find standard configuration file"));
-    newArg.standardConfig = await standardConfigSetup(newArg.standardConfig);
+    newArg.standardConfig = await standardConfigSetup(newArg.standardConfig, packageJSON);
   }
 
   if (
@@ -45,6 +49,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "development",
       newArg.sensitiveConfigDevelopment,
       null,
+      packageJSON,
     );
   }
 
@@ -56,6 +61,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "staging",
       newArg.sensitiveConfigStaging,
       newArg.sensitiveConfigDevelopment,
+      packageJSON,
     );
   }
 
@@ -67,6 +73,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "production",
       newArg.sensitiveConfigProduction,
       newArg.sensitiveConfigDevelopment,
+      packageJSON,
     );
   }
 
@@ -78,6 +85,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "development",
       newArg.redisConfigDevelopment,
       null,
+      packageJSON,
     );
   }
 
@@ -89,6 +97,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "staging",
       newArg.redisConfigStaging,
       newArg.redisConfigDevelopment,
+      packageJSON,
     );
   }
 
@@ -100,6 +109,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "production",
       newArg.redisConfigProduction,
       newArg.redisConfigDevelopment,
+      packageJSON,
     );
   }
 
@@ -111,6 +121,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "development",
       newArg.dbConfigDevelopment,
       null,
+      packageJSON,
     );
   }
 
@@ -122,6 +133,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "staging",
       newArg.dbConfigStaging,
       newArg.dbConfigDevelopment,
+      packageJSON,
     );
   }
 
@@ -133,6 +145,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "production",
       newArg.dbConfigProduction,
       newArg.dbConfigDevelopment,
+      packageJSON,
     );
   }
 

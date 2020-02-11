@@ -3,7 +3,10 @@ import { configRequest } from "../read";
 import { countries, currencies } from "../../imported-resources";
 import colors from "colors";
 
-export async function standardConfigSetup(currentConfig: IConfigRawJSONDataType): Promise<IConfigRawJSONDataType> {
+export async function standardConfigSetup(
+  currentConfig: IConfigRawJSONDataType,
+  packageJSON: any,
+): Promise<IConfigRawJSONDataType> {
   const newConfig = await configRequest(
     currentConfig,
     "Standard configuration",
@@ -16,7 +19,7 @@ export async function standardConfigSetup(currentConfig: IConfigRawJSONDataType)
       {
         variableName: "appName",
         message: "Please choose your app name, your app name is the unique identifier that is used for fallback title and manifests",
-        defaultValue: "itemize",
+        defaultValue: packageJSON.name,
       },
       {
         variableName: "port",
@@ -108,19 +111,19 @@ export async function standardConfigSetup(currentConfig: IConfigRawJSONDataType)
       {
         variableName: "developmentHostname",
         message: "The development host name where you might intend to deploy",
-        defaultValue: "dev.onzasystems.com",
+        defaultValue: "dev." + packageJSON.name + ".com",
         validate: (v) => v.replace(/\s/g, "") === v,
       },
       {
         variableName: "stagingHostname",
         message: "The staging host name where you might intend to deploy",
-        defaultValue: "staging.onzasystems.com",
+        defaultValue: "staging." + packageJSON.name + ".com",
         validate: (v) => v.replace(/\s/g, "") === v,
       },
       {
         variableName: "productionHostname",
         message: "The production host name where you might intend to deploy",
-        defaultValue: "onzasystems.com",
+        defaultValue: packageJSON.name + ".com",
         validate: (v) => v.replace(/\s/g, "") === v,
       }
     ],

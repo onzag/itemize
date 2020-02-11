@@ -14,6 +14,7 @@ export async function sensitiveConfigSetup(
   version: string,
   currentConfig: ISensitiveConfigRawJSONDataType,
   referenceConfig: ISensitiveConfigRawJSONDataType,
+  packageJSON: any,
 ): Promise<ISensitiveConfigRawJSONDataType> {
   const newConfig = await configRequest(
     currentConfig || referenceConfig,

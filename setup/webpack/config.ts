@@ -17,6 +17,7 @@ const plugins = [
     name: "cache-worker.injector." + mode + ".js",
     importScripts: [
       "commons." + mode + ".js",
+      "vendors~cache-worker." + mode + ".js",
       "cache-worker." + mode + ".js",
     ],
     isAsync: !isDevelopment,
@@ -30,8 +31,8 @@ if (process.env.BUNDLE_ANALYZE) {
 module.exports = {
   mode,
   entry: {
-    "service-worker": ["./itemize/client/internal/workers/service/service.worker.ts"],
-    "cache-worker": ["./itemize/client/internal/workers/cache/cache.worker.ts"],
+    "service-worker": ["./node_modules/itemize/client/internal/workers/service/service.worker.ts"],
+    "cache-worker": ["./node_modules/itemize/client/internal/workers/cache/cache.worker.ts"],
     "build": ["./src/client/index.tsx"],
   },
   devtool: isDevelopment ? 'inline-source-map' : false,
@@ -54,6 +55,10 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /readable-stream/,
+        use: "null-loader"
+      },
       {
         test: /graphql/,
         use: "null-loader"

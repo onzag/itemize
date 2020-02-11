@@ -5,6 +5,7 @@ export async function dbConfigSetup(
   version: string,
   currentConfig: IDBConfigRawJSONDataType,
   referenceConfig: IDBConfigRawJSONDataType,
+  packageJSON: any,
 ): Promise<IDBConfigRawJSONDataType> {
   const newConfig = await configRequest(
     currentConfig || referenceConfig,
@@ -25,19 +26,19 @@ export async function dbConfigSetup(
       {
         variableName: "user",
         message: "The user that runs the database",
-        defaultValue: "itemize_user",
+        defaultValue: packageJSON.name + "_user",
         validate: (v) => v.replace(/\s/g, "") === v,
       },
       {
         variableName: "password",
         message: "The passsword to use to connect to the database",
-        defaultValue: "itemize_password",
+        defaultValue: packageJSON.name + "_password",
         hidden: true,
       },
       {
         variableName: "database",
         message: "The database name to use",
-        defaultValue: "itemize",
+        defaultValue: packageJSON.name,
       },
     ],
   );

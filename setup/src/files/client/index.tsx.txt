@@ -1,6 +1,6 @@
 import React from "react";
 import App from "./app";
-import { initializeItemizeApp } from "../../itemize/client";
+import { initializeItemizeApp } from "itemize/client";
 
 initializeItemizeApp(
 	<App/>,

@@ -3,7 +3,7 @@
  * the itemize app
  */
 
-import { IGQLRequestFields, IGQLValue, IGQLArgs } from "./gql-querier";
+import { IGQLRequestFields, IGQLValue } from "./gql-querier";
 
 /**
  * Checks whether a subset is contained within other subset of

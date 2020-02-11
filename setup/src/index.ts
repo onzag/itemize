@@ -99,28 +99,6 @@ async function copyDirectoryLevel(
 export default async function srcSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
   console.log(colors.bgGreen("SOURCE SETUP"));
 
-  try {
-    await fsAsync.access("itemize", fs.constants.F_OK);
-    await fsAsync.rmdir("itemize", {recursive: true});
-  } catch (e) {
-  }
-
-  console.log("emiting " + colors.green("itemize"));
-  await fsAsync.mkdir("itemize");
-  await Promise.all(["base", "client", "data", "imported-resources", "server"].map(async (dirtoCopy) => {
-    await fsAsync.mkdir(path.join("itemize", dirtoCopy));
-    await copyDirectoryLevel(
-      path.join(__dirname, "..", "..", "..", dirtoCopy),
-      path.join("itemize", dirtoCopy),
-    );
-  }));
-  await Promise.all(["constants.ts", "index.ts", "gql-querier.ts", "gql-util.ts", "util.ts", "config.ts"].map(async (fileToCopy) => {
-    await fsAsync.copyFile(
-      path.join(__dirname, "..", "..", "..", fileToCopy),
-      path.join("itemize", fileToCopy),
-    );
-  }));
-
   let exists = true;
   try {
     await fsAsync.access("src", fs.constants.F_OK);

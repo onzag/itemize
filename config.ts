@@ -53,13 +53,34 @@ export const rawSensitiveConfigSchema = {
   type: "object",
   properties: {
     ipStackAccessKey: {
-      type: "string",
+      anyOf: [
+        {
+          "type": "string",
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     hereAppID: {
-      type: "string",
+      anyOf: [
+        {
+          "type": "string",
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     hereAppCode: {
-      type: "string",
+      anyOf: [
+        {
+          "type": "string",
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     jwtKey: {
       type: "string",
@@ -204,14 +225,42 @@ export const rawRedisConfigSchema = {
       type: "number",
     },
     path: {
-      type: "string",
+      anyOf: [
+        {
+          "type": "string",
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     db: {
-      type: "number",
+      anyOf: [
+        {
+          "type": "number",
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     password: {
-      type: "string",
+      anyOf: [
+        {
+          "type": "string",
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
   },
   additionalProperties: false,
+  required: [
+    "host",
+    "port",
+    "path",
+    "db",
+    "password",
+  ],
 };
