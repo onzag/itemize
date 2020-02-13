@@ -67,6 +67,7 @@ const typeValue = {
         return {
             [sqlPrefix + id + "_GEO"]: {
                 type: "GEOMETRY(POINT,4326)",
+                ext: "postgis",
             },
             [sqlPrefix + id + "_LAT"]: {
                 type: "float",

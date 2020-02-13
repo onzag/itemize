@@ -17,6 +17,7 @@ import { buildForeignKeys } from "./build-foreign-key";
 import { ISQLSchemaDefinitionType, getSQLTablesSchemaForRoot } from "../base/Root/sql";
 import { buildIndexes } from "./build-index";
 import { IDBConfigRawJSONDataType } from "../config";
+import { prepareExtensions } from "./extensions";
 
 const fsAsync = fs.promises;
 
@@ -29,10 +30,14 @@ export function yesno(question: string) {
   return (new Confirm(question)).run();
 }
 
-(async () => {
+/**
+ * Actually runs the build
+ */
+export default async function build(version: string) {
   // Retrieve the config for the database
+  let configToUse = version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`;
   const dbConfig: IDBConfigRawJSONDataType = JSON.parse(await fsAsync.readFile(
-    path.join("config", "db.sensitive.json"),
+    path.join("config", configToUse),
     "utf8",
   ));
 
@@ -166,7 +171,7 @@ export function yesno(question: string) {
   if (showAllDone) {
     console.log(colors.green("All done..."));
   }
-})();
+};
 
 export function showErrorStackAndLogMessage(err: Error) {
   console.log(colors.red(err.stack));
@@ -185,6 +190,8 @@ async function buildDatabase(
   currentDatabaseSchema: ISQLSchemaDefinitionType,
   newDatabaseSchema: ISQLSchemaDefinitionType,
 ): Promise<ISQLSchemaDefinitionType> {
+  await prepareExtensions(knex, newDatabaseSchema);
+
   let transitoryCurrentSchema = await buildTables(knex, currentDatabaseSchema, newDatabaseSchema);
   transitoryCurrentSchema = await buildIndexes(knex, transitoryCurrentSchema, newDatabaseSchema);
   transitoryCurrentSchema = await buildForeignKeys(knex, transitoryCurrentSchema, newDatabaseSchema);

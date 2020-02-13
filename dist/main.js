@@ -8,6 +8,7 @@ const setup_1 = __importDefault(require("./setup"));
 const dev_environment_1 = require("./dev-environment");
 const colors_1 = __importDefault(require("colors"));
 const builder_1 = __importDefault(require("./builder"));
+const dbbuilder_1 = __importDefault(require("./dbbuilder"));
 const action = process.argv[2];
 const toRun = process.argv[3] === "run";
 const remainingArgs = process.argv.slice(4);
@@ -36,29 +37,22 @@ const actionRegistry = {
         fn: dev_environment_1.stop,
         description: "Stops the development environment",
     },
-    "build-schema": {
+    "build-data": {
         fn: builder_1.default,
         description: "Processes the itemize resources and initializes a new build number",
     },
-    "build-developemnt-database": {
-        fn: null,
-        description: "Builds the development database (warning you must run build-schema before this) " +
+    "build-database": {
+        fn: dbbuilder_1.default,
+        description: "Builds the database (warning you must run build-data before this) " +
+            "pass the argument development, staging or production in order to specify which config to use " +
             "if using a development environment, remember to run start-development-environment"
-    },
-    "build-staging-database": {
-        fn: null,
-        description: "Builds the staging database (warning you must run build-schema before this)",
-    },
-    "build-production-database": {
-        fn: null,
-        description: "Builds the development database (warning you must run build-schema before this)"
     },
 };
 (async () => {
     if (actionRegistry[action]) {
         if (toRun) {
             try {
-                await actionRegistry[action].fn(remainingArgs);
+                await actionRegistry[action].fn(...remainingArgs);
             }
             catch (err) {
                 console.log(colors_1.default.red(err.stack));

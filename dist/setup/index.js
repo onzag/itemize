@@ -55,7 +55,7 @@ const stepsInOrder = [
         name: "src",
     }
 ];
-async function setup(onlyNames) {
+async function setup(...onlyNames) {
     console.log(colors_1.default.bgGreen("INITIALIZING SETUP"));
     await ensureConfigDirectory();
     const standardConfig = await readConfigFile("index.json");

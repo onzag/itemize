@@ -71,6 +71,11 @@ export interface ISQLColumnDefinitionType {
      */
     level: number,
   };
+  /**
+   * An optional extension that is required for this
+   * type in order to function properly
+   */
+  ext?: string;
 }
 
 /**

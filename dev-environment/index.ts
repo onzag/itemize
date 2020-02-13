@@ -46,19 +46,24 @@ export async function start() {
     console.log(colors.yellow("Please allow Itemize to create a docker container for the database"));
     console.log(colors.yellow("The execution might take a while, please wait..."));
     try {
+      const absPath = path.resolve("./node_modules/itemize/dev-environment/pgsqlpostgis");
+      await execSudo(
+        `docker build -t pgsqlpostgis ${absPath}`,
+        "Itemize Docker Contained PGSQL Postgis Enabled Database",
+      );
       await execSudo(
         `docker run --name ${dockerprefixer}_devdb -e POSTGRES_PASSWORD=${dbConfigDevelopment.password} ` +
         `-e POSTGRES_USER=${dbConfigDevelopment.user} -e POSTGRES_DB=${dbConfigDevelopment.database} ` +
         `-v "$PWD/devenv/pgdata":/var/lib/postgresql/data ` +
-        `-p ${dbConfigDevelopment.port}:5432 -d postgres`,
-        "Itemize Docker Contained PGSQL Database",
+        `-p ${dbConfigDevelopment.port}:5432 -d pgsqlpostgis`,
+        "Itemize Docker Contained PGSQL Postgis Enabled Database",
       );
     } catch (err) {
       console.log(colors.red(err.message));
       console.log(colors.yellow("Something went wrong please allow for cleanup..."));
       await execSudo(
         `docker rm ${dockerprefixer}_devdb`,
-        "Itemize Docker Contained PGSQL Database",
+        "Itemize Docker Contained PGSQL Postgis Enabled Database",
       );
       throw err;
     }

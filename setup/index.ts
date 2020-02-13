@@ -72,7 +72,7 @@ const stepsInOrder: IStepType[] = [
   }
 ];
 
-export default async function setup(onlyNames: string[]) {
+export default async function setup(...onlyNames: string[]) {
   console.log(colors.bgGreen("INITIALIZING SETUP"));
   await ensureConfigDirectory();
 

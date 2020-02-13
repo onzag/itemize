@@ -19,6 +19,7 @@ const build_tables_1 = require("./build-tables");
 const build_foreign_key_1 = require("./build-foreign-key");
 const sql_1 = require("../base/Root/sql");
 const build_index_1 = require("./build-index");
+const extensions_1 = require("./extensions");
 const fsAsync = fs_1.default.promises;
 /**
  * Simple function to ask for a question
@@ -29,9 +30,13 @@ function yesno(question) {
     return (new prompt_confirm_1.default(question)).run();
 }
 exports.yesno = yesno;
-(async () => {
+/**
+ * Actually runs the build
+ */
+async function build(version) {
     // Retrieve the config for the database
-    const dbConfig = JSON.parse(await fsAsync.readFile(path_1.default.join("config", "db.sensitive.json"), "utf8"));
+    let configToUse = version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`;
+    const dbConfig = JSON.parse(await fsAsync.readFile(path_1.default.join("config", configToUse), "utf8"));
     // Create the connection string
     const dbConnectionKnexConfig = {
         host: dbConfig.host,
@@ -137,7 +142,9 @@ exports.yesno = yesno;
     if (showAllDone) {
         console.log(safe_1.default.green("All done..."));
     }
-})();
+}
+exports.default = build;
+;
 function showErrorStackAndLogMessage(err) {
     console.log(safe_1.default.red(err.stack));
 }
@@ -151,6 +158,7 @@ exports.showErrorStackAndLogMessage = showErrorStackAndLogMessage;
  * @returns the new database schema that resulted
  */
 async function buildDatabase(knex, currentDatabaseSchema, newDatabaseSchema) {
+    await extensions_1.prepareExtensions(knex, newDatabaseSchema);
     let transitoryCurrentSchema = await build_tables_1.buildTables(knex, currentDatabaseSchema, newDatabaseSchema);
     transitoryCurrentSchema = await build_index_1.buildIndexes(knex, transitoryCurrentSchema, newDatabaseSchema);
     transitoryCurrentSchema = await build_foreign_key_1.buildForeignKeys(knex, transitoryCurrentSchema, newDatabaseSchema);

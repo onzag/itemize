@@ -13,9 +13,10 @@ const constants_1 = require("../../../../../constants");
  * Provides the sql function that defines the schema that is used to build
  * the partial table definition
  * @param type the postgresql type
+ * @param ext a extension to require for this type
  * @returns a function that returns the partial table definition object with the given type
  */
-function getStandardSQLFnFor(type) {
+function getStandardSQLFnFor(type, ext = null) {
     // so we return the function
     return (sqlPrefix, id, property) => ({
         // the sql prefix defined plus the id, eg for includes
@@ -28,6 +29,7 @@ function getStandardSQLFnFor(type) {
                 id: constants_1.SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
                 level: 0,
             } : null,
+            ext,
         },
     });
 }

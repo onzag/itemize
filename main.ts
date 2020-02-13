@@ -3,7 +3,8 @@
 import setup from "./setup";
 import { start, stop } from "./dev-environment";
 import colors from "colors";
-import build from "./builder";
+import buildData from "./builder";
+import buildDatabase from "./dbbuilder";
 
 const action = process.argv[2];
 const toRun = process.argv[3] === "run";
@@ -11,7 +12,7 @@ const remainingArgs = process.argv.slice(4);
 
 const actionRegistry: {
   [fn: string]: {
-    fn: (remainingArgs?: string[]) => Promise<void>;
+    fn: (...remainingArgs: string[]) => Promise<void>;
     description: string;
   }
 } = {
@@ -40,21 +41,14 @@ const actionRegistry: {
     description: "Stops the development environment",
   },
   "build-data": {
-    fn: build,
+    fn: buildData,
     description: "Processes the itemize resources and initializes a new build number",
   },
-  "build-developemnt-database": {
-    fn: null,
-    description: "Builds the development database (warning you must run build-data before this) " +
+  "build-database": {
+    fn: buildDatabase,
+    description: "Builds the database (warning you must run build-data before this) " +
+    "pass the argument development, staging or production in order to specify which config to use " +
     "if using a development environment, remember to run start-development-environment"
-  },
-  "build-staging-database": {
-    fn: null,
-    description: "Builds the staging database (warning you must run build-data before this)",
-  },
-  "build-production-database": {
-    fn: null,
-    description: "Builds the development database (warning you must run build-data before this)"
   },
 };
 
@@ -62,7 +56,7 @@ const actionRegistry: {
   if (actionRegistry[action]) {
     if (toRun) {
       try {
-        await actionRegistry[action].fn(remainingArgs);
+        await actionRegistry[action].fn(...remainingArgs);
       } catch (err) {
         console.log(colors.red(err.stack));
         process.exit(1);

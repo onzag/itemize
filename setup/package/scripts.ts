@@ -12,12 +12,8 @@ export default {
 
   "setup": "itemize setup",
   "build-data": "itemize build-data",
-  "build-development-database": "itemize build-development-database",
-  "build-staging-database": "itemize build-staging-database",
-  "build-production-database": "itemize build-production-database",
-  "get-development-deployable": "itemize get-development-deployable",
-  "get-staging-deployable": "itemize get-staging-deployable",
-  "get-production-deployable": "itemize get-production-deployable",
+  "build-database": "itemize build-database",
+  "get-deployable": "itemize get-deployable",
   "start-development-environment": "itemize start-development-environment",
   "stop-development-environment": "itemize stop-development-environment",
 }

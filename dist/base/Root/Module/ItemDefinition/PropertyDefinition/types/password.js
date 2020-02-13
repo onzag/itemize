@@ -19,7 +19,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const typeValue = {
     gql: graphql_1.GraphQLString,
     nullableDefault: "",
-    sql: sql_1.getStandardSQLFnFor && sql_1.getStandardSQLFnFor("text"),
+    sql: sql_1.getStandardSQLFnFor && sql_1.getStandardSQLFnFor("text", "pgcrypto"),
     sqlIn: (value, sqlPrefix, id, property, knex) => {
         if (value === null) {
             return {

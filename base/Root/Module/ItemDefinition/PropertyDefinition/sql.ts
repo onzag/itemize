@@ -20,9 +20,10 @@ import { SQL_CONSTRAINT_PREFIX } from "../../../../../constants";
  * Provides the sql function that defines the schema that is used to build
  * the partial table definition
  * @param type the postgresql type
+ * @param ext a extension to require for this type
  * @returns a function that returns the partial table definition object with the given type
  */
-export function getStandardSQLFnFor(type: string):
+export function getStandardSQLFnFor(type: string, ext: string = null):
   (sqlPrefix: string, id: string, property: PropertyDefinition) => ISQLTableDefinitionType {
   // so we return the function
   return (sqlPrefix: string, id: string, property: PropertyDefinition) => ({
@@ -36,6 +37,7 @@ export function getStandardSQLFnFor(type: string):
         id: SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
         level: 0,
       } : null,
+      ext,
     },
   });
 }
