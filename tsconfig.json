@@ -16,17 +16,18 @@
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "rootDir": ".",
-    "outDir": "dist",
+    "outDir": "nodejs",
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": true,
   },
   "compileOnSave": true,
   "exclude": [
     "node_modules",
     "client",
     "data",
-    "server",
+    "nodejs",
   ],
   "include": [
     "**/*.ts"

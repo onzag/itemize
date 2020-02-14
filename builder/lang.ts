@@ -14,6 +14,7 @@ import CheckUpError from "./Error";
 import { Ii18NType, ILangLocalesType } from "../base/Root";
 import { IConfigRawJSONDataType } from "../config";
 import path from "path";
+import { IBuilderBasicConfigType } from "./config";
 
 /**
  * Given the properties information provides all the key names
@@ -50,7 +51,7 @@ function getAllKeyNames(obj: any, prefix: string) {
  * @retuns a promise for locale language data
  */
 export async function buildLang(
-  rawDataConfig: IConfigRawJSONDataType,
+  rawDataConfig: IBuilderBasicConfigType,
   actualRootLocation: string,
   i18nBaseFileLocation: string,
   traceback: Traceback,
@@ -83,7 +84,7 @@ export async function buildLang(
   } = {};
 
   // and start to loop
-  rawDataConfig.supportedLanguages.forEach((locale) => {
+  rawDataConfig.standard.supportedLanguages.forEach((locale) => {
 
     if (!propertiesBase[locale]) {
       throw new CheckUpError(
@@ -186,13 +187,13 @@ export async function buildLang(
  */
 export function clearLang(
   rawData: Ii18NType,
-  rawDataConfig: IConfigRawJSONDataType,
+  rawDataConfig: IBuilderBasicConfigType,
 ) {
   const nRawData: ILangLocalesType = {};
   Object.keys(rawData).forEach((locale) => {
     nRawData[locale] = {
       name: rawData[locale].name,
-      rtl: rawDataConfig.rtlLanguages.includes(locale),
+      rtl: rawDataConfig.standard.rtlLanguages.includes(locale),
     };
   });
 

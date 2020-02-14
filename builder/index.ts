@@ -38,7 +38,7 @@ import { processRoot } from "./processer";
 import { buildLang, clearLang } from "./lang";
 import { buildResources } from "./resources";
 import { buildHTML } from "./html";
-import { buildConfig, extractConfig } from "./config";
+import { buildConfig, extractConfigAndBuildNumber, IBuilderBasicConfigType } from "./config";
 
 import fs from "fs";
 import path from "path";
@@ -64,7 +64,7 @@ import {
 } from "../constants";
 import { buildAutocomplete } from "./autocomplete";
 import { evalRawJSON } from "./evaler";
-import { IConfigRawJSONDataType } from "../config";
+import { buildBuildNumber } from "./buildnumber";
 
 // Refuse to run in production mode
 if (process.env.NODE_ENV === "production") {
@@ -107,7 +107,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
 
 export default async function build() {
   try {
-    const rawDataConfig = await extractConfig();
+    const rawDataConfig = await extractConfigAndBuildNumber();
 
     // ensure the dist directory
     if (!await checkExists("dist")) {
@@ -123,6 +123,7 @@ export default async function build() {
       buildData(rawDataConfig),
       buildConfig(rawDataConfig),
       buildHTML(rawDataConfig),
+      buildBuildNumber(rawDataConfig),
       buildResources(rawDataConfig),
       copyMomentFiles(rawDataConfig),
     ]);
@@ -141,8 +142,8 @@ export default async function build() {
  * in order to create the build files
  * @param rawDataConfig the configuration
  */
-async function buildData(rawDataConfig: IConfigRawJSONDataType) {
-  const entryPoint = rawDataConfig.entry;
+async function buildData(rawDataConfig: IBuilderBasicConfigType) {
+  const entryPoint = rawDataConfig.standard.entry;
 
   // lets get the actual location of the item, lets assume first
   // it is the given location
@@ -225,7 +226,7 @@ async function buildData(rawDataConfig: IConfigRawJSONDataType) {
   );
 
   // now let's produce the build for every language
-  const resultBuilds = rawDataConfig.supportedLanguages.map((lang) => {
+  const resultBuilds = rawDataConfig.standard.supportedLanguages.map((lang) => {
     return processRoot(resultJSON, lang);
   });
 
@@ -242,7 +243,7 @@ async function buildData(rawDataConfig: IConfigRawJSONDataType) {
   );
 
   // and now let's output clean builds for every language that is supported
-  await Promise.all(rawDataConfig.supportedLanguages.map(async (sl, index) => {
+  await Promise.all(rawDataConfig.standard.supportedLanguages.map(async (sl, index) => {
     // so we get a resulting build for the given language
     const resultingBuild = resultBuilds[index];
     // and let's emit such file
@@ -291,7 +292,7 @@ async function buildData(rawDataConfig: IConfigRawJSONDataType) {
  * @param traceback the traceback of the current children
  */
 async function buildChildrenItemDefinitionsOrModules(
-  rawDataConfig: IConfigRawJSONDataType,
+  rawDataConfig: IBuilderBasicConfigType,
   parentFolder: string,
   lastModuleDirectory: string,
   children: string[],
@@ -399,7 +400,7 @@ async function buildChildrenItemDefinitionsOrModules(
  * @returns a raw module
  */
 async function buildModule(
-  rawDataConfig: IConfigRawJSONDataType,
+  rawDataConfig: IBuilderBasicConfigType,
   actualLocation: string,
   fileData: IFileModuleDataRawUntreatedJSONDataType,
   pointers: any,
@@ -525,7 +526,7 @@ async function buildModule(
  * @returns a raw treated item definition
  */
 async function buildItemDefinition(
-  rawDataConfig: IConfigRawJSONDataType,
+  rawDataConfig: IBuilderBasicConfigType,
   actualLocation: string,
   lastModuleDirectory: string,
   fileData: IFileItemDefinitionUntreatedRawJSONDataType,
@@ -717,7 +718,7 @@ async function buildItemDefinition(
  * @returns the right structure for a i18nName attribute
  */
 async function getI18nData(
-  rawDataConfig: IConfigRawJSONDataType,
+  rawDataConfig: IBuilderBasicConfigType,
   languageFileLocation: string,
   policies: IPoliciesRawJSONDataType,
   traceback: Traceback,
@@ -737,7 +738,7 @@ async function getI18nData(
     traceback.newTraceToLocation(languageFileLocation);
 
   // now we loop over each lanaguage we support
-  rawDataConfig.supportedLanguages.forEach((locale) => {
+  rawDataConfig.standard.supportedLanguages.forEach((locale) => {
     // if we find nothing we throw an error
     if (!properties[locale]) {
       throw new CheckUpError(
@@ -850,7 +851,7 @@ async function getI18nData(
  * @returns the item modified
  */
 async function getI18nIncludeData(
-  rawDataConfig: IConfigRawJSONDataType,
+  rawDataConfig: IBuilderBasicConfigType,
   actualLocation: string,
   include: IIncludeRawJSONDataType,
   traceback: Traceback,
@@ -886,7 +887,7 @@ async function getI18nIncludeData(
   const localeDataIsRequired = expectedProperties.filter((p) => p.required).length >= 1;
 
   // use the same technique we used before to get the name
-  rawDataConfig.supportedLanguages.forEach((locale) => {
+  rawDataConfig.standard.supportedLanguages.forEach((locale) => {
     i18nData[locale] = {};
 
     if (!properties[locale]) {
@@ -953,7 +954,7 @@ async function getI18nIncludeData(
  * @returns the property itself
  */
 async function getI18nPropertyData(
-  rawDataConfig: IConfigRawJSONDataType,
+  rawDataConfig: IBuilderBasicConfigType,
   actualLocation: string,
   property: IPropertyDefinitionRawJSONDataType,
   traceback: Traceback,
@@ -1100,7 +1101,7 @@ async function getI18nPropertyData(
     .map((b) => ({key: b, required: true})));
 
   // and start to loop
-  rawDataConfig.supportedLanguages.forEach((locale) => {
+  rawDataConfig.standard.supportedLanguages.forEach((locale) => {
     // do some checks
     if (!properties[locale]) {
       throw new CheckUpError(

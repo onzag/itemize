@@ -8,24 +8,24 @@ import tslint from "./tslint";
 export default async function typescriptSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
   console.log(colors.bgGreen("GITHUB SETUP"));
 
-  let exists = true;
+  let tsconfigExists = true;
   try {
     await fsAsync.access("tsconfig.json", fs.constants.F_OK);
   } catch (e) {
-    exists = false;
+    tsconfigExists = false;
   }
-  if (!exists) {
+  if (!tsconfigExists) {
     console.log("emiting " + colors.green("tsconfig.json"));
     await fsAsync.writeFile("tsconfig.json", JSON.stringify(tsconfig, null, 2));
   }
 
-  exists = true;
+  let tslintExists = true;
   try {
     await fsAsync.access("tslint.json", fs.constants.F_OK);
   } catch (e) {
-    exists = false;
+    tslintExists = false;
   }
-  if (!exists) {
+  if (!tslintExists) {
     console.log("emiting " + colors.green("tslint.json"));
     await fsAsync.writeFile("tslint.json", JSON.stringify(tslint, null, 2));
   }

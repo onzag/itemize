@@ -8,7 +8,7 @@
 import fs from "fs";
 import path from "path";
 import colors from "colors/safe";
-import { IConfigRawJSONDataType } from "../config";
+import { IBuilderBasicConfigType } from "./config";
 const fsAsync = fs.promises;
 
 /**
@@ -18,9 +18,9 @@ const fsAsync = fs.promises;
  * @returns a void promise
  */
 export async function copyMomentFiles(
-  rawConfig: IConfigRawJSONDataType,
+  rawConfig: IBuilderBasicConfigType,
 ) {
-  await Promise.all(rawConfig.supportedLanguages.map((lang) => {
+  await Promise.all(rawConfig.standard.supportedLanguages.map((lang) => {
     if (lang === "en") {
       return;
     }

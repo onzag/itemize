@@ -7,63 +7,61 @@ import buildData from "./builder";
 import buildDatabase from "./dbbuilder";
 
 const action = process.argv[2];
-const toRun = process.argv[3] === "run";
-const remainingArgs = process.argv.slice(4);
+const wantsSpecificHelp = process.argv[3] === "--help";
+const remainingArgs = process.argv.slice(3);
 
 const actionRegistry: {
   [fn: string]: {
     fn: (...remainingArgs: string[]) => Promise<void>;
     description: string;
+    usage: string;
   }
 } = {
   "setup": {
     fn: setup,
-    description: "run the initial setup, you can run this utility over again to re-setup"
+    description: "run the initial setup, you can run this utility over again to re-setup",
+    usage: "itemize setup (step)",
   },
-  "get-development-deployable": {
+  "get-deployable": {
     fn: null,
-    description: "Provides the development docker deployable based on the config"
+    description: "Provides the docker deployable based on the config, make sure to run `build` before running this function",
+    usage: "itemize get-deployable [development|staging|production] [build-name]"
   },
-  "get-staging-deployable": {
-    fn: null,
-    description: "Provides the staging docker deployable based on the config"
-  },
-  "get-production-deployable": {
-    fn: null,
-    description: "Provides the production docker deployable based on the config"
-  },
-  "start-development-environment": {
+  "start-dev-environment": {
     fn: start,
-    description: "Starts the development environment, as configured"
+    description: "Starts the development environment, as configured",
+    usage: "itemize start-dev-environment",
   },
-  "stop-development-environment": {
+  "stop-dev-environment": {
     fn: stop,
     description: "Stops the development environment",
+    usage: "itemize stop-dev-environment",
   },
   "build-data": {
     fn: buildData,
     description: "Processes the itemize resources and initializes a new build number",
+    usage: "itemize build-data",
   },
   "build-database": {
     fn: buildDatabase,
     description: "Builds the database (warning you must run build-data before this) " +
     "pass the argument development, staging or production in order to specify which config to use " +
-    "if using a development environment, remember to run start-development-environment"
+    "if using a development environment, remember to run start-development-environment",
+    usage: "itemize build-database [development|staging|production]",
   },
 };
 
 (async () => {
   if (actionRegistry[action]) {
-    if (toRun) {
+    if (wantsSpecificHelp) {
+      console.log(actionRegistry[action].description);
+    } else {
       try {
         await actionRegistry[action].fn(...remainingArgs);
       } catch (err) {
         console.log(colors.red(err.stack));
         process.exit(1);
       }
-    } else {
-      console.log("use " + colors.yellow(action + " run ") + "to execute");
-      console.log(actionRegistry[action].description);
     }
   } else {
     console.log(colors.green("Welcome to itemize build tool"));

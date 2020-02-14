@@ -13,7 +13,7 @@ import CheckUpError from "./Error";
 import { ajvCheck, checkAutocompleteSchemaValidate } from "./schema-checks";
 import path from "path";
 import { checkAutocompleteFilterAndValues } from "./checkers";
-import { IConfigRawJSONDataType } from "../config";
+import { IBuilderBasicConfigType } from "./config";
 const jsonMap = require("json-source-map");
 const fsAsync = fs.promises;
 
@@ -26,7 +26,7 @@ const fsAsync = fs.promises;
  * @param traceback the traceback object
  * @returns a single autocomplete object
  */
-export async function buildAutocomplete(rawDataConfig: IConfigRawJSONDataType, source: string, traceback: Traceback) {
+export async function buildAutocomplete(rawDataConfig: IBuilderBasicConfigType, source: string, traceback: Traceback) {
   // first we check that the source exists at all
   await checkExists(source, traceback);
 

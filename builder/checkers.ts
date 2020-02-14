@@ -37,6 +37,7 @@ import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/Item
 import { IFilterRawJSONDataType, IAutocompleteValueRawJSONDataType } from "../base/Autocomplete";
 import Module from "../base/Root/Module";
 import { IConfigRawJSONDataType } from "../config";
+import { IBuilderBasicConfigType } from "./config";
 
 /**
  * Checks a conditional rule set so that it is valid and contains valid
@@ -1235,7 +1236,7 @@ export function checkRoot(
  * @param traceback the traceback object already pointing
  */
 export function checkAutocompleteFilterAndValues(
-  rawDataConfig: IConfigRawJSONDataType,
+  rawDataConfig: IBuilderBasicConfigType,
   rawData: Array<IFilterRawJSONDataType | IAutocompleteValueRawJSONDataType>,
   traceback: Traceback,
 ) {
@@ -1269,7 +1270,7 @@ export function checkAutocompleteFilterAndValues(
         // this is our traceback if there's i18n data
         const i18nTraceback = traceback.newTraceToBit(index).newTraceToBit("i18n");
         // all the supported languages must be included
-        rawDataConfig.supportedLanguages.forEach((language) => {
+        rawDataConfig.standard.supportedLanguages.forEach((language) => {
           // if that is not the case
           if (!value.i18n[language]) {
             // throw an error

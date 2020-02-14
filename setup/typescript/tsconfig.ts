@@ -15,7 +15,7 @@ export default {
     removeComments: false,
     noImplicitAny: true,
     suppressImplicitAnyIndexErrors: true,
-    rootDir: ".",
+    rootDir: "src",
     outDir: "dist",
     esModuleInterop: true,
     resolveJsonModule: true,

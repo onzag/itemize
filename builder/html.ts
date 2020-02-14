@@ -13,6 +13,7 @@ import htmlMinifier from "html-minifier";
 import fs from "fs";
 import path from "path";
 import { IConfigRawJSONDataType } from "../config";
+import { IBuilderBasicConfigType } from "./config";
 const fsAsync = fs.promises;
 
 /**
@@ -51,16 +52,15 @@ function replaceHTMLKeys(html: string, obj: any, prefix: string): string {
  * is synchronized within the html file
  * @param rawConfig the configuration that is being used
  */
-export async function buildHTML(rawConfig: IConfigRawJSONDataType) {
+export async function buildHTML(rawConfig: IBuilderBasicConfigType) {
   // the base html as we read it from either node_modules or an itemize folder
   let baseHTML: string =
     await fsAsync.readFile(path.join("node_modules", "itemize", "client", "internal", "index.html"), "utf8");
 
   // we need to make a build number
-  const buildNumber = (new Date()).getTime().toString();
   baseHTML = replaceHTMLKeys(baseHTML, {
     ...rawConfig,
-    BUILD_NUMBER: buildNumber,
+    BUILD_NUMBER: rawConfig.buildnumber.toString(),
   }, "");
 
   // and we minify the html
@@ -79,11 +79,6 @@ export async function buildHTML(rawConfig: IConfigRawJSONDataType) {
 
   // emit the html file
   const fileName = path.join("dist", "data", "index.html");
-  console.log("emiting " + colors.green(fileName), "BUILD_NUMBER:", colors.yellow(buildNumber));
+  console.log("emiting " + colors.green(fileName), "BUILD_NUMBER:", colors.yellow(rawConfig.buildnumber.toString()));
   await fsAsync.writeFile(fileName, baseHTML);
-
-  // emit the build number file
-  const buildNumberFileName = path.join("dist", "buildnumber");
-  console.log("emiting " + colors.green(buildNumberFileName));
-  await fsAsync.writeFile(buildNumberFileName, buildNumber.toString());
 }

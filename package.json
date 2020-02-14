@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "Itemize",
   "bin": {
-    "itemize": "./dist/main.js"
+    "itemize": "./nodejs/main.js"
   },
-  "main": "index.ts",
+  "main": "nodejs/index",
+  "types": "nodejs/index",
   "scripts": {
     "install": "tsc"
   },

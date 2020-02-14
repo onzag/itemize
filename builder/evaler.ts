@@ -1,4 +1,5 @@
 import { IConfigRawJSONDataType } from "../config";
+import { IBuilderBasicConfigType } from "./config";
 
 /**
  * This file exists as a necessity in order to create dynamic json from config
@@ -17,7 +18,7 @@ import { IConfigRawJSONDataType } from "../config";
  * @returns that same json with evaled fields replaced
  */
 export function evalRawJSON<T>(
-  config: IConfigRawJSONDataType,
+  config: IBuilderBasicConfigType,
   rawJSON: T,
 ): T {
   // so first off it needs to be of type string and have that $CONFIG: thing
@@ -27,7 +28,7 @@ export function evalRawJSON<T>(
     // and now we create the function
     const fn = new Function("config", code);
     // and run it with the config
-    return fn(config);
+    return fn(config.standard);
   // if it's an array, we just map it out
   } else if (Array.isArray(rawJSON)) {
     return rawJSON.map((iRawJSON) => evalRawJSON(config, iRawJSON)) as any;

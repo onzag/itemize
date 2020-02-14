@@ -9,46 +9,67 @@ import colors from "colors/safe";
 
 import fs from "fs";
 import path from "path";
-import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
+import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IRedisConfigRawJSONDataType, IDBConfigRawJSONDataType } from "../config";
 import Traceback from "./Traceback";
 import CheckUpError from "./Error";
 import { ajvCheck, checkConfig, checkSensitiveConfig, checkDBConfig, checkRedisConfig } from "./schema-checks";
 import { countries, currencies } from "../imported-resources";
 import jsonMap from "json-source-map";
+import Ajv from "ajv";
 const fsAsync = fs.promises;
 
-// TODO this must be totally redone...
-// it is wrong because of new configuration
+export interface IBuilderBasicConfigType {
+  standard: IConfigRawJSONDataType,
+  sensitive: ISensitiveConfigRawJSONDataType,
+  redis: IRedisConfigRawJSONDataType,
+  db: IDBConfigRawJSONDataType,
+  buildnumber: number,
+};
 
 /**
  * Stores the config file in the dist
  * directory
  * @param rawConfig the config as parsed
  */
-export async function buildConfig(rawConfig: IConfigRawJSONDataType) {
-  const fileName = path.join("dist", "config.json");
-  console.log("emiting " + colors.green(fileName));
+export async function buildConfig(rawConfig: IBuilderBasicConfigType) {
+  const standardFileName = path.join("dist", "config.json");
+  console.log("emiting " + colors.green(standardFileName));
 
-  await fsAsync.writeFile(fileName, JSON.stringify(rawConfig));
+  await fsAsync.writeFile(standardFileName, JSON.stringify(rawConfig.standard));
+
+  const sensitiveFileName = path.join("dist", "sensitive.json");
+  console.log("emiting " + colors.green(sensitiveFileName));
+
+  await fsAsync.writeFile(sensitiveFileName, JSON.stringify(rawConfig.sensitive));
+
+  const dbFileName = path.join("dist", "db.json");
+  console.log("emiting " + colors.green(dbFileName));
+
+  await fsAsync.writeFile(dbFileName, JSON.stringify(rawConfig.db));
+
+  const redisFileName = path.join("dist", "redis.json");
+  console.log("emiting " + colors.green(redisFileName));
+
+  await fsAsync.writeFile(redisFileName, JSON.stringify(rawConfig.redis));
 }
 
-/**
- * Extracts the configuration from the files where it should be located
- * and does data checks on the json files
- */
-export async function extractConfig(): Promise<IConfigRawJSONDataType> {
+export async function extractOneConfig<T>(
+  validator: Ajv.ValidateFunction,
+  mainName: string,
+  version: string,
+  isSensitive: boolean,
+  cb?: (data: T, tb: Traceback) => void,
+): Promise<T> {
   const configTraceback = new Traceback("BUILDER");
-
-  // index.json CHECKING /////////////////////////
-
-  // first we read the base config that contains no sensitive data,
-  // by getting the path
-  const rawDataConfigLocation = path.join("config", "index.json");
-  // extract with json
+  const rawDataConfigLocation = path.join(
+    "config",
+    `${mainName}${version ? "." + version : ""}${isSensitive ? ".sensitive" : ""}.json`,
+  );
   let rawDataConfigBaseFileData: {
-    data: IConfigRawJSONDataType,
+    data: T,
     pointers: any,
   };
+
   let rawDataConfigBaseFileContent: string;
   try {
     // the content and the file data
@@ -68,143 +89,87 @@ export async function extractConfig(): Promise<IConfigRawJSONDataType> {
   const rawDataConfigTraceback = configTraceback.newTraceToLocation(rawDataConfigLocation);
   rawDataConfigTraceback.setupPointers(rawDataConfigBaseFileData.pointers, rawDataConfigBaseFileContent);
   ajvCheck(
-    checkConfig,
+    validator,
     rawDataConfigBase,
     rawDataConfigTraceback,
   );
 
-  // let's check the fallback values, first if the country is a valid country
-  if (!countries[rawDataConfigBase.fallbackCountryCode]) {
-    throw new CheckUpError(
-      "Invalid fallback country code",
-      rawDataConfigTraceback.newTraceToBit("fallbackCountryCode"),
-    );
-  }
+  cb && cb(rawDataConfigBase, rawDataConfigTraceback);
 
-  // now if the currency is a valid currency
-  if (!currencies[rawDataConfigBase.fallbackCurrency]) {
-    throw new CheckUpError(
-      "Invalid fallback currency code",
-      rawDataConfigTraceback.newTraceToBit("fallbackCurrency"),
-    );
-  }
+  return rawDataConfigBase;
+}
 
-  // and if the language is a valid language from the supported list in the config
-  // itself
-  if (!rawDataConfigBase.supportedLanguages.includes(rawDataConfigBase.fallbackLanguage)) {
-    throw new CheckUpError(
-      "Invalid fallback language which is not in the list of supported",
-      rawDataConfigTraceback.newTraceToBit("fallbackLanguage"),
-    );
-  }
+/**
+ * Extracts the configuration from the files where it should be located
+ * and does data checks on the json files
+ */
+export async function extractConfigAndBuildNumber(): Promise<IBuilderBasicConfigType> {
+  // index.json CHECKING /////////////////////////
+  let standardConfigCheckerCallback = (data: IConfigRawJSONDataType, traceback: Traceback) => {
+    // let's check the fallback values, first if the country is a valid country
+    if (!countries[data.fallbackCountryCode]) {
+      throw new CheckUpError(
+        "Invalid fallback country code",
+        traceback.newTraceToBit("fallbackCountryCode"),
+      );
+    }
 
-  // index.sensitive.json CHECKING ////////////////
+    // now if the currency is a valid currency
+    if (!currencies[data.fallbackCurrency]) {
+      throw new CheckUpError(
+        "Invalid fallback currency code",
+        traceback.newTraceToBit("fallbackCurrency"),
+      );
+    }
 
-  // check the sensitive data
-  const rawDataSensitiveConfigLocation = path.join("config", "index.sensitive.json");
-  // extract with json
-  let rawDataSensitiveConfigBaseFileData: {
-    data: ISensitiveConfigRawJSONDataType,
-    pointers: any,
+    // and if the language is a valid language from the supported list in the config
+    // itself
+    if (!data.supportedLanguages.includes(data.fallbackLanguage)) {
+      throw new CheckUpError(
+        "Invalid fallback language which is not in the list of supported",
+        traceback.newTraceToBit("fallbackLanguage"),
+      );
+    }
   };
-  let rawDataSensitiveConfigBaseFileContent: string;
-  try {
-    // the content and the file data
-    rawDataSensitiveConfigBaseFileContent = await fsAsync.readFile(rawDataSensitiveConfigLocation, "utf8");
-    rawDataSensitiveConfigBaseFileData = jsonMap.parse(rawDataSensitiveConfigBaseFileContent);
-  } catch (err) {
-    throw new CheckUpError(
-      err.message,
-      configTraceback,
-    );
-  }
-
-  // and the sensitive config
-  const sensitiveConfigExtra = rawDataSensitiveConfigBaseFileData.data;
-
-  // build the traceback for this specific file and check it with the schema checker
-  const rawDataSensitiveConfigTraceback = configTraceback.newTraceToLocation(rawDataSensitiveConfigLocation);
-  rawDataSensitiveConfigTraceback.setupPointers(
-    rawDataSensitiveConfigBaseFileData.pointers,
-    rawDataSensitiveConfigBaseFileContent,
-  );
-  ajvCheck(
-    checkSensitiveConfig,
-    sensitiveConfigExtra,
-    rawDataSensitiveConfigTraceback,
+  const standardConfig = await extractOneConfig<IConfigRawJSONDataType>(
+    checkConfig, "index", null, false, standardConfigCheckerCallback,
   );
 
-  // and we merge them together
-  const rawDataConfig: IConfigRawJSONDataType = {
-    ...rawDataConfigBase,
-    ...sensitiveConfigExtra,
+  const sensitiveConfig = await extractOneConfig<ISensitiveConfigRawJSONDataType>(
+    checkSensitiveConfig, "index", null, true,
+  );
+  await extractOneConfig(
+    checkSensitiveConfig, "index", "staging", true,
+  );
+  await extractOneConfig(
+    checkSensitiveConfig, "index", "production", true,
+  );
+
+  const redisConfig = await extractOneConfig<IRedisConfigRawJSONDataType>(
+    checkRedisConfig, "redis", null, true,
+  );
+  await extractOneConfig(
+    checkRedisConfig, "redis", "staging", true,
+  );
+  await extractOneConfig(
+    checkRedisConfig, "redis", "production", true,
+  );
+
+  const dbConfig = await extractOneConfig<IDBConfigRawJSONDataType>(
+    checkDBConfig, "db", null, true,
+  );
+  await extractOneConfig(
+    checkDBConfig, "db", "staging", true,
+  );
+  await extractOneConfig(
+    checkDBConfig, "db", "production", true,
+  );
+
+  return {
+    standard: standardConfig,
+    sensitive: sensitiveConfig,
+    redis: redisConfig,
+    db: dbConfig,
+    buildnumber: (new Date()).getTime(),
   };
-
-  // db.sensitive.json CHECKING ///////////////////
-
-  // check the database
-  const rawDBConfigLocation = path.join("config", "db.sensitive.json");
-  // extract with json
-  let rawDBConfigFileData: {
-    data: IConfigRawJSONDataType,
-    pointers: any,
-  };
-  let rawDBConfigFileContent: string;
-  try {
-    // the content and the file data
-    rawDBConfigFileContent = await fsAsync.readFile(rawDBConfigLocation, "utf8");
-    rawDBConfigFileData = jsonMap.parse(rawDBConfigFileContent);
-  } catch (err) {
-    throw new CheckUpError(
-      err.message,
-      configTraceback,
-    );
-  }
-
-  // build the traceback for this specific file and check it with the schema checker
-  const rawDBConfigTraceback = configTraceback.newTraceToLocation(rawDBConfigLocation);
-  rawDBConfigTraceback.setupPointers(
-    rawDBConfigFileData.pointers,
-    rawDBConfigFileContent,
-  );
-  ajvCheck(
-    checkDBConfig,
-    rawDBConfigFileData.data,
-    rawDBConfigTraceback,
-  );
-
-  // redis.sensitive.json CHECKING ///////////////////////
-
-  // check the database
-  const rawRedisConfigLocation = path.join("config", "redis.sensitive.json");
-  // extract with json
-  let rawRedisConfigFileData: {
-    data: IConfigRawJSONDataType,
-    pointers: any,
-  };
-  let rawRedisConfigFileContent: string;
-  try {
-    // the content and the file data
-    rawRedisConfigFileContent = await fsAsync.readFile(rawRedisConfigLocation, "utf8");
-    rawRedisConfigFileData = jsonMap.parse(rawRedisConfigFileContent);
-  } catch (err) {
-    throw new CheckUpError(
-      err.message,
-      configTraceback,
-    );
-  }
-
-  // build the traceback for this specific file and check it with the schema checker
-  const rawRedisConfigTraceback = configTraceback.newTraceToLocation(rawRedisConfigLocation);
-  rawRedisConfigTraceback.setupPointers(
-    rawRedisConfigFileData.pointers,
-    rawRedisConfigFileContent,
-  );
-  ajvCheck(
-    checkRedisConfig,
-    rawRedisConfigFileData.data,
-    rawRedisConfigTraceback,
-  );
-
-  return rawDataConfig;
 }

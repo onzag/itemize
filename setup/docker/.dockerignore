@@ -1,0 +1,4 @@
+**/*.js.map
+dist/db.json
+dist/redis.json
+dist/sensitive.json

@@ -13,6 +13,7 @@ import htmlMinifier from "html-minifier";
 import Svgo from "svgo";
 import { checkExists } from "./util";
 import { IConfigRawJSONDataType } from "../config";
+import { IBuilderBasicConfigType } from "./config";
 const svgo = new Svgo();
 const fsAsync = fs.promises;
 
@@ -187,7 +188,7 @@ async function copyOneDirectoryLevel(pathname: string, constructedPath: string) 
  * @param rawConfig the raw config
  * @returns a void promise
  */
-export async function buildResources(rawConfig: IConfigRawJSONDataType) {
+export async function buildResources(rawConfig: IBuilderBasicConfigType) {
   // TODO eventually remove this after the CDN update
   if (!await checkExists(path.join("dist", "uploads"))) {
     await fsAsync.mkdir(path.join("dist", "uploads"));

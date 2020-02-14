@@ -39,12 +39,12 @@ interface IStepType {
 
 const stepsInOrder: IStepType[] = [
   {
-    fn: dockerSetup,
-    name: "docker",
-  },
-  {
     fn: configSetup,
     name: "config",
+  },
+  {
+    fn: dockerSetup,
+    name: "docker",
   },
   {
     fn: githubSetup,
