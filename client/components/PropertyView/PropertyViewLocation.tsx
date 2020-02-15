@@ -1,12 +1,12 @@
 import React from "react";
-import { IPropertyViewProps } from "../PropertyView";
+import { IPropertyViewProps } from ".";
 import equals from "deep-equal";
 import { Map, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 
 import "leaflet/dist/leaflet.css";
 import "../../../internal/theme/leaflet.scss";
-import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
+import { IPropertyDefinitionSupportedLocationType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 
 // https://github.com/PaulLeCam/react-leaflet/issues/453
 // bug in leaflet

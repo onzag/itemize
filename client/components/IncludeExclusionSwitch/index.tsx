@@ -1,8 +1,8 @@
 import React from "react";
-import { LocaleContext, ILocaleContextType } from "../../../internal/app";
+import { LocaleContext, ILocaleContextType } from "../../internal/app";
 import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
 import { style, STANDARD_THEME, IIncludeExclusionSwitchThemeType } from "./styles";
-import Include, { IIncludeState, IncludeExclusionState } from "../../../../base/Root/Module/ItemDefinition/Include";
+import Include, { IIncludeState, IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
 import TernaryExclusionSwitch from "./TernaryExclusionSwitch";
 import StandardExclusionSwitch from "./StandardExclusionSwitch";
 

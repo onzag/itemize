@@ -1,5 +1,5 @@
 import React from "react";
-import { IPropertyEntryProps } from "../PropertyEntry";
+import { IPropertyEntryProps } from ".";
 import {
   FormControl,
   InputLabel,

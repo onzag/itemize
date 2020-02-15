@@ -1,9 +1,9 @@
 import React from "react";
 import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
 import { style, STANDARD_THEME, IIncludeCalloutWarningThemeType } from "./styles";
-import Include, { IIncludeState, IncludeExclusionState } from "../../../../base/Root/Module/ItemDefinition/Include";
+import Include, { IIncludeState, IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
 import { Icon } from "@material-ui/core";
-import { ILocaleContextType, LocaleContext } from "../../../internal/app";
+import { ILocaleContextType, LocaleContext } from "../../internal/app";
 
 export interface IIncludeCalloutWarningBaseProps {
   include: Include;

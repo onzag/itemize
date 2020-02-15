@@ -1,6 +1,6 @@
 import { IPropertyViewProps } from "../PropertyView";
 import React from "react";
-import { DOMPurify } from "../../../../util";
+import { DOMPurify } from "../../../util";
 
 export default class PropertyViewText extends React.Component<IPropertyViewProps, {}> {
   public shouldComponentUpdate(nextProps: IPropertyViewProps) {

@@ -1,5 +1,5 @@
 import React from "react";
-import { IPropertyEntryProps } from "../PropertyEntry";
+import { IPropertyEntryProps } from ".";
 import TextField from "@material-ui/core/TextField";
 
 import {
@@ -16,11 +16,11 @@ import {
   ListSubheader,
 } from "@material-ui/core";
 import equals from "deep-equal";
-import { escapeStringRegexp } from "../../../../util";
+import { escapeStringRegexp } from "../../../util";
 import convert from "convert-units";
-import { IPropertyDefinitionSupportedUnitType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/unit";
-import { IPropertyDefinitionSupportedCurrencyType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/currency";
-import { MAX_DECIMAL_COUNT } from "../../../../constants";
+import { IPropertyDefinitionSupportedUnitType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/unit";
+import { IPropertyDefinitionSupportedCurrencyType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/currency";
+import { MAX_DECIMAL_COUNT } from "../../../constants";
 import { InputBaseComponentProps } from "@material-ui/core/InputBase";
 
 interface IPropertyEntryNumericState {

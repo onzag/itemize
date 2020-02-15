@@ -1,8 +1,8 @@
-import { IPropertyViewProps } from "../PropertyView";
+import { IPropertyViewProps } from ".";
 import React from "react";
 import Moment from "moment";
-import { getLocalizedDateFormat, getLocalizedDateTimeFormat, getLocalizedTimeFormat } from "../../../../util";
-import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from "../../../../constants";
+import { getLocalizedDateFormat, getLocalizedDateTimeFormat, getLocalizedTimeFormat } from "../../../util";
+import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from "../../../constants";
 
 export default class PropertyViewDateTime extends React.Component<IPropertyViewProps, {}> {
   public shouldComponentUpdate(nextProps: IPropertyViewProps) {

@@ -1,4 +1,4 @@
-import { IPropertyViewProps } from "../PropertyView";
+import { IPropertyViewProps } from ".";
 import React from "react";
 
 export default class PropertyViewField extends React.Component<IPropertyViewProps, {}> {

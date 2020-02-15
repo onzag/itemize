@@ -7,15 +7,15 @@ import {
   TimePicker,
   KeyboardTimePicker,
 } from "@material-ui/pickers";
-import { IPropertyEntryProps } from "../PropertyEntry";
+import { IPropertyEntryProps } from ".";
 import Moment from "moment";
 import { Icon } from "@material-ui/core";
 import equals from "deep-equal";
 import {
   PropertyDefinitionSupportedDateType,
-} from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/date";
-import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from "../../../../constants";
-import { getLocalizedDateFormat, getLocalizedTimeFormat, getLocalizedDateTimeFormat } from "../../../../util";
+} from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/date";
+import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from "../../../constants";
+import { getLocalizedDateFormat, getLocalizedTimeFormat, getLocalizedDateTimeFormat } from "../../../util";
 
 /**
  * Provides the current value of the date given the

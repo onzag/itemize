@@ -1,15 +1,15 @@
 import React from "react";
-import { IPropertyEntryProps } from "../PropertyEntry";
+import { IPropertyEntryProps } from ".";
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import { Paper, RootRef, Icon, FormLabel, IconButton, Button } from "@material-ui/core";
-import { mimeTypeToExtension, localeReplacer } from "../../../../util";
+import { mimeTypeToExtension, localeReplacer } from "../../../util";
 import prettyBytes from "pretty-bytes";
 import equals from "deep-equal";
 import {
   PropertyDefinitionSupportedFilesType,
   IPropertyDefinitionSupportedSingleFilesType,
-} from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
-import { MAX_FILE_SIZE, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
+} from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
+import { MAX_FILE_SIZE, FILE_SUPPORTED_IMAGE_TYPES } from "../../../constants";
 import uuid from "uuid";
 
 // in reality there might be invisible for the property

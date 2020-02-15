@@ -1,7 +1,7 @@
 import React from "react";
-import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import equals from "deep-equal";
-import { PropertyDefinitionSupportedType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 export interface IPropertySetterBaseProps {
   property: PropertyDefinition;

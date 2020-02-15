@@ -1,5 +1,5 @@
 import { createStyles } from "@material-ui/styles";
-import { IPropertyEntryBaseProps } from "../PropertyEntry";
+import { IPropertyEntryBaseProps } from ".";
 
 export interface IPropertyEntryThemeType {
   invalidColor: string;
