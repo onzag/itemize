@@ -11,7 +11,7 @@ import fs from "fs";
 import path from "path";
 import configSetup from "./config";
 import equals from "deep-equal";
-import githubSetup from "./github";
+import gitSetup from "./git";
 import packageSetup from "./package";
 import babelSetup from "./babel";
 import webpackSetup from "./webpack";
@@ -47,8 +47,8 @@ const stepsInOrder: IStepType[] = [
     name: "docker",
   },
   {
-    fn: githubSetup,
-    name: "github",
+    fn: gitSetup,
+    name: "git",
   },
   {
     fn: packageSetup,

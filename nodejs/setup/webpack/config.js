@@ -125,7 +125,8 @@ module.exports = {
   },
   output: {
     filename: "[name]." + mode + ".js",
-    path: path.resolve(__dirname, 'dist/data')
+    path: path.resolve(path.join("dist", "data")),
+    publicPath: "/rest/resource",
   }
 };
 `;

@@ -13,7 +13,6 @@ const urlsToCache = [
   isDevelopment ? "/rest/resource/vendors~build.development.js" : "/rest/resource/vendors~build.production.js",
   isDevelopment ? "/rest/resource/build.development.css" : "/rest/resource/build.production.css",
   isDevelopment ? "/rest/resource/cache-worker.development.js" : "/rest/resource/cache-worker.production.js",
-  isDevelopment ? "/rest/resource/vendors~cache-worker.development.js" : "/rest/resource/vendors~cache-worker.production.js",
   isDevelopment ? "/rest/resource/cache-worker.injector.development.js" : "/rest/resource/cache-worker.injector.production.js",
 ];
 // the reason is that app always loads the

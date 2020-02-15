@@ -830,5 +830,7 @@ export default class CacheWorker {
   }
 }
 
+console.log("CACHE WORKER EXPOSING");
+
 // expose using comlink
 expose(new CacheWorker());

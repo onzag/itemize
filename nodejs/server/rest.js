@@ -137,7 +137,7 @@ function restServices(appData) {
             ip === "::1" ||
             ip === "::ffff:127.0.0.1" ||
             !appData.sensitiveConfig.ipStackAccessKey) {
-            res.end(JSON.stringify(standardAPIResponse));
+            res.end(standardAPIResponse);
             return;
         }
         http_1.default.get(`http://api.ipstack.com/${ip}?access_key=${appData.sensitiveConfig.ipStackAccessKey}`, (resp) => {
@@ -172,8 +172,8 @@ function restServices(appData) {
         });
     });
     // add the static resources
-    router.use("/resource", express_1.default.static(path_1.default.resolve(__dirname + "../../../data/")));
-    router.use("/uploads", express_1.default.static(path_1.default.resolve(__dirname + "../../../uploads/")));
+    router.use("/resource", express_1.default.static(path_1.default.resolve(path_1.default.join("dist", "data"))));
+    router.use("/uploads", express_1.default.static(path_1.default.resolve(path_1.default.join("dist", "uploads"))));
     // now let's get all modules
     appData.root.getAllModules().forEach(buildRouteForModule);
     // now let's get all the autocompletes that we loaded in our application

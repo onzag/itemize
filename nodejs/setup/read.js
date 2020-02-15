@@ -22,7 +22,7 @@ function request(options) {
     });
 }
 exports.request = request;
-async function fieldRequest(type, message, variableName, basedOnValue, defaultValue, hidden, validate) {
+async function fieldRequest(type, message, variableName, basedOnValue, defaultValue, hidden, validate, nullifyFalseValues) {
     let wasLastValid = true;
     let currentValue = basedOnValue;
     if (message) {
@@ -64,7 +64,10 @@ async function fieldRequest(type, message, variableName, basedOnValue, defaultVa
             currentValue = retrievedValue.result;
         }
     } while (validate ? !validate(currentValue) : false);
-    return currentValue || null;
+    if (nullifyFalseValues && !currentValue) {
+        return currentValue || null;
+    }
+    return currentValue;
 }
 exports.fieldRequest = fieldRequest;
 ;
@@ -78,7 +81,7 @@ async function configRequest(srcConfig, message, extractData, variableNamePrefix
             newConfig[extractPoint.variableName] = await configRequest(newConfig[extractPoint.variableName], extractPoint.message, extractPoint.extractData, extractPoint.variableName + ".");
         }
         else {
-            newConfig[extractPoint.variableName] = await fieldRequest(extractPoint.type || "string", extractPoint.message, variableNamePrefix + extractPoint.variableName, newConfig[extractPoint.variableName], extractPoint.defaultValue, extractPoint.hidden, (value) => extractPoint.validate ? extractPoint.validate(value, newConfig) : true);
+            newConfig[extractPoint.variableName] = await fieldRequest(extractPoint.type || "string", extractPoint.message, variableNamePrefix + extractPoint.variableName, newConfig[extractPoint.variableName], extractPoint.defaultValue, extractPoint.hidden, (value) => extractPoint.validate ? extractPoint.validate(value, newConfig) : true, extractPoint.nullifyFalseValues);
         }
     }
     console.log(colors_1.default.bgGreen("\nEXIT:") + " " + message);

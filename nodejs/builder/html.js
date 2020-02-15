@@ -54,7 +54,7 @@ async function buildHTML(rawConfig) {
     let baseHTML = await fsAsync.readFile(path_1.default.join("node_modules", "itemize", "client", "internal", "index.html"), "utf8");
     // we need to make a build number
     baseHTML = replaceHTMLKeys(baseHTML, {
-        ...rawConfig,
+        ...rawConfig.standard,
         BUILD_NUMBER: rawConfig.buildnumber.toString(),
     }, "");
     // and we minify the html

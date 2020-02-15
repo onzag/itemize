@@ -19,18 +19,21 @@ async function sensitiveConfigSetup(version, currentConfig, referenceConfig, pac
                 "Fallbacks are used",
             defaultValue: "",
             hidden: true,
+            nullifyFalseValues: true,
         },
         {
             variableName: "hereAppID",
             message: "Used in order to be able to type addresses and get locations get the ID and code at https://developer.here.com/",
             defaultValue: "",
             hidden: true,
+            nullifyFalseValues: true,
         },
         {
             variableName: "hereAppCode",
             message: "Used in order to be able to type addresses and get locations get the ID and code at https://developer.here.com/",
             defaultValue: "",
             hidden: true,
+            nullifyFalseValues: true,
         },
         {
             variableName: "jwtKey",

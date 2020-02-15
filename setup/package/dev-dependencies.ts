@@ -30,7 +30,7 @@ export default {
   // builder webpack
   "webpack": "^4.41.4",
   "webpack-cli": "^3.3.10",
-  "worker-injector-generator-plugin": "^1.0.1",
+  "worker-injector-generator-plugin": "^1.0.2",
 
   // builder typescript
   "typescript": "^3.7.4",

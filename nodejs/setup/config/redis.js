@@ -7,6 +7,7 @@ async function redisConfigSetup(version, currentConfig, referenceConfig, package
             variableName: "host",
             message: "The host where redis is running",
             defaultValue: "127.0.0.1",
+            nullifyFalseValues: true,
         },
         {
             variableName: "port",
@@ -19,18 +20,21 @@ async function redisConfigSetup(version, currentConfig, referenceConfig, package
             variableName: "path",
             message: "The UNIX socket string of the Redis server, you can leave it blank",
             defaultValue: "",
+            nullifyFalseValues: true,
         },
         {
             variableName: "db",
             message: "If set, client will run Redis select command on connect",
             defaultValue: 0,
             validate: (v) => !isNaN(v),
+            nullifyFalseValues: true,
         },
         {
             variableName: "password",
             message: "If set, client will run Redis auth command on connect",
             defaultValue: "",
             hidden: true,
+            nullifyFalseValues: true,
         },
     ]);
     return newConfig;

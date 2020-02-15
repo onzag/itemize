@@ -4,8 +4,8 @@ const fsAsync = fs.promises;
 import { ISetupConfigType } from "..";
 import ignores from "./ignores";
 
-export default async function githubSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
-  console.log(colors.bgGreen("GITHUB SETUP"));
+export default async function gitSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
+  console.log(colors.bgGreen("GIT SETUP"));
 
   let exists = true;
   try {

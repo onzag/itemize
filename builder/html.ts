@@ -6,13 +6,11 @@
  */
 
 import { escapeStringRegexp } from "../util";
-import { checkExists } from "./util";
 import colors from "colors/safe";
 import htmlMinifier from "html-minifier";
 
 import fs from "fs";
 import path from "path";
-import { IConfigRawJSONDataType } from "../config";
 import { IBuilderBasicConfigType } from "./config";
 const fsAsync = fs.promises;
 
@@ -59,7 +57,7 @@ export async function buildHTML(rawConfig: IBuilderBasicConfigType) {
 
   // we need to make a build number
   baseHTML = replaceHTMLKeys(baseHTML, {
-    ...rawConfig,
+    ...rawConfig.standard,
     BUILD_NUMBER: rawConfig.buildnumber.toString(),
   }, "");
 

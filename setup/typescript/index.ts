@@ -6,7 +6,7 @@ import tsconfig from "./tsconfig";
 import tslint from "./tslint";
 
 export default async function typescriptSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
-  console.log(colors.bgGreen("GITHUB SETUP"));
+  console.log(colors.bgGreen("TYPESCRIPT SETUP"));
 
   let tsconfigExists = true;
   try {

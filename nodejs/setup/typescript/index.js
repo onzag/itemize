@@ -9,7 +9,7 @@ const fsAsync = fs_1.default.promises;
 const tsconfig_1 = __importDefault(require("./tsconfig"));
 const tslint_1 = __importDefault(require("./tslint"));
 async function typescriptSetup(arg) {
-    console.log(colors_1.default.bgGreen("GITHUB SETUP"));
+    console.log(colors_1.default.bgGreen("TYPESCRIPT SETUP"));
     let tsconfigExists = true;
     try {
         await fsAsync.access("tsconfig.json", fs_1.default.constants.F_OK);

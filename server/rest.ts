@@ -161,7 +161,7 @@ export default function restServices(appData: IAppDataType) {
       ip === "::ffff:127.0.0.1" ||
       !appData.sensitiveConfig.ipStackAccessKey
     ) {
-      res.end(JSON.stringify(standardAPIResponse));
+      res.end(standardAPIResponse);
       return;
     }
 
@@ -197,8 +197,8 @@ export default function restServices(appData: IAppDataType) {
   });
 
   // add the static resources
-  router.use("/resource", express.static(path.resolve(__dirname + "../../../data/")));
-  router.use("/uploads", express.static(path.resolve(__dirname + "../../../uploads/")));
+  router.use("/resource", express.static(path.resolve(path.join("dist", "data"))));
+  router.use("/uploads", express.static(path.resolve(path.join("dist", "uploads"))));
 
   // now let's get all modules
   appData.root.getAllModules().forEach(buildRouteForModule);

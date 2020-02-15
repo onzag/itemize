@@ -30,6 +30,7 @@ export async function fieldRequest<T>(
   defaultValue: T,
   hidden?: boolean,
   validate?: (value: T) => boolean,
+  nullifyFalseValues?: boolean,
 ): Promise<T> {
   let wasLastValid = true;
   let currentValue: T = basedOnValue;
@@ -90,7 +91,10 @@ export async function fieldRequest<T>(
     }
   } while (validate ? !validate(currentValue) : false);
 
-  return currentValue || null;
+  if (nullifyFalseValues && !currentValue) {
+    return currentValue || null;
+  }
+  return currentValue;
 }
 
 interface IConfigRequestExtractPoint {
@@ -101,6 +105,7 @@ interface IConfigRequestExtractPoint {
   defaultValue: any,
   hidden?: boolean,
   validate?: (config: any, value: any) => boolean,
+  nullifyFalseValues?: boolean,
 };
 
 export async function configRequest<T>(
@@ -130,6 +135,7 @@ export async function configRequest<T>(
         extractPoint.defaultValue,
         extractPoint.hidden,
         (value) => extractPoint.validate ? extractPoint.validate(value, newConfig) : true,
+        extractPoint.nullifyFalseValues,
       );
     }
   }

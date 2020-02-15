@@ -17,7 +17,6 @@ const plugins = [
     name: "cache-worker.injector." + mode + ".js",
     importScripts: [
       "commons." + mode + ".js",
-      "vendors~cache-worker." + mode + ".js",
       "cache-worker." + mode + ".js",
     ],
     isAsync: !isDevelopment,
@@ -46,6 +45,13 @@ module.exports = {
         return chunk.name !== "service-worker";
       },
       cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          chunks(chunk) {
+            return chunk.name !== "cache-worker" && chunk.name !== "service-worker";
+          },
+        },
         commons: {
           name: 'commons',
           minChunks: 2,
@@ -123,7 +129,8 @@ module.exports = {
   },
   output: {
     filename: "[name]." + mode + ".js",
-    path: path.resolve(__dirname, 'dist/data')
+    path: path.resolve(path.join("dist", "data")),
+    publicPath: "/rest/resource",
   }
 };
 `;

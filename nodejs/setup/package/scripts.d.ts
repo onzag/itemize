@@ -5,8 +5,8 @@ declare const _default: {
     "webpack-dev": string;
     "webpack-analyze": string;
     "build": string;
-    "run-development-server": string;
-    "run-production-server": string;
+    "start-dev-server": string;
+    "start-production-server": string;
     "setup": string;
     "build-data": string;
     "build-database": string;

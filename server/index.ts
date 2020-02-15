@@ -197,10 +197,10 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
   }
 
   app.get("/sw.development.js", (req, res) => {
-    res.sendFile(path.resolve(__dirname + "../../../data/service-worker.development.js"));
+    res.sendFile(path.resolve(path.join("dist", "data", "service-worker.development.js")));
   });
   app.get("/sw.production.js", (req, res) => {
-    res.sendFile(path.resolve(__dirname + "../../../data/service-worker.production.js"));
+    res.sendFile(path.resolve(path.join("dist", "data", "service-worker.production.js")));
   });
 
   app.get("*", (req, res) => {
@@ -242,6 +242,15 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   const dbConfig: IDBConfigRawJSONDataType = JSON.parse(rawDbConfig);
   const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(rawRedisConfig);
   const build: IRootRawJSONDataType = JSON.parse(rawBuild);
+
+  // redis configuration despite instructions actually tries to use null
+  // values as it checks for undefined so we need to strip these if null
+  Object.keys(redisConfig).forEach((key) => {
+    if (redisConfig[key] === null) {
+      delete redisConfig[key];
+    }
+  });
+
   // this shouldn't be necessary but we do it anyway
   buildnumber = buildnumber.replace("\n", "").trim();
   const root = new Root(build);

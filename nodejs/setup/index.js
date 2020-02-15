@@ -14,7 +14,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const config_1 = __importDefault(require("./config"));
 const deep_equal_1 = __importDefault(require("deep-equal"));
-const github_1 = __importDefault(require("./github"));
+const git_1 = __importDefault(require("./git"));
 const package_1 = __importDefault(require("./package"));
 const babel_1 = __importDefault(require("./babel"));
 const webpack_1 = __importDefault(require("./webpack"));
@@ -31,8 +31,8 @@ const stepsInOrder = [
         name: "docker",
     },
     {
-        fn: github_1.default,
-        name: "github",
+        fn: git_1.default,
+        name: "git",
     },
     {
         fn: package_1.default,

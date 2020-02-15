@@ -126,10 +126,10 @@ function initializeApp(appData, custom) {
         app.use(custom.customRouter(appData));
     }
     app.get("/sw.development.js", (req, res) => {
-        res.sendFile(path_1.default.resolve(__dirname + "../../../data/service-worker.development.js"));
+        res.sendFile(path_1.default.resolve(path_1.default.join("dist", "data", "service-worker.development.js")));
     });
     app.get("/sw.production.js", (req, res) => {
-        res.sendFile(path_1.default.resolve(__dirname + "../../../data/service-worker.production.js"));
+        res.sendFile(path_1.default.resolve(path_1.default.join("dist", "data", "service-worker.production.js")));
     });
     app.get("*", (req, res) => {
         res.setHeader("content-type", "text/html; charset=utf-8");
@@ -169,6 +169,13 @@ async function initializeServer(custom = {}) {
     const dbConfig = JSON.parse(rawDbConfig);
     const redisConfig = JSON.parse(rawRedisConfig);
     const build = JSON.parse(rawBuild);
+    // redis configuration despite instructions actually tries to use null
+    // values as it checks for undefined so we need to strip these if null
+    Object.keys(redisConfig).forEach((key) => {
+        if (redisConfig[key] === null) {
+            delete redisConfig[key];
+        }
+    });
     // this shouldn't be necessary but we do it anyway
     buildnumber = buildnumber.replace("\n", "").trim();
     const root = new Root_1.default(build);
