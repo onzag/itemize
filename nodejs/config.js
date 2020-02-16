@@ -81,6 +81,9 @@ exports.rawConfigSchema = {
                 type: "string",
             },
         },
+        fontUrl: {
+            type: "string",
+        },
         manifest: {
             type: "object",
             properties: {
@@ -126,6 +129,7 @@ exports.rawConfigSchema = {
         "rtlLanguages",
         "dictionaries",
         "roles",
+        "fontUrl",
         "manifest",
         "fallbackCountryCode",
         "fallbackLanguage",

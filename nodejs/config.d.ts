@@ -14,6 +14,7 @@ export interface IConfigRawJSONDataType {
         themeColor: string;
         backgroundColor: string;
     };
+    fontUrl: string;
     fallbackCountryCode: string;
     fallbackLanguage: string;
     fallbackCurrency: string;
@@ -101,6 +102,9 @@ export declare const rawConfigSchema: {
             items: {
                 type: string;
             };
+        };
+        fontUrl: {
+            type: string;
         };
         manifest: {
             type: string;

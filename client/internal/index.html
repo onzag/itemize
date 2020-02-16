@@ -9,8 +9,7 @@
             content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no"
         >
         <link rel="stylesheet" href="/rest/resource/build.production.css"/>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="%{fontUrl}">
 
         <link rel="apple-touch-icon" sizes="180x180" href="/rest/resource/icons/apple-touch-icon-no-transparency-180x180.png">
         <link rel="icon" type="image/png" sizes="32x32" href="/rest/resource/icons/favicon-32x32.png">
@@ -29,6 +28,7 @@
         var script = document.createElement("script");
         var commonsScript = document.createElement("script");
         var vendorsScript = document.createElement("script");
+        var polyScript = document.createElement("script");
         var developmentHostname = "%{developmentHostname}";
         var devFlag = localStorage && localStorage.getItem("__dev");
         if (
@@ -43,6 +43,7 @@
         script.type = "text/javascript";
         commonsScript.type = "text/javascript";
         vendorsScript.type = "text/javascript";
+        polyScript.type = "text/javascript";
 
         // We use the __dev variable in local storage for using the development build rather
         // than the production build, yes, I know you can see this, I don't care, you could reverse
@@ -51,6 +52,7 @@
             script.src = "/rest/resource/build.development.js";
             commonsScript.src = "/rest/resource/commons.development.js";
             vendorsScript.src = "/rest/resource/vendors~build.development.js";
+            polyScript.src = "/rest/resource/polyfills.development.js";
 
             // We remove the production css, which loads by default
             var element = document.getElementsByTagName("link")[0];
@@ -66,16 +68,21 @@
             script.src = "/rest/resource/build.production.js";
             commonsScript.src = "/rest/resource/commons.production.js";
             vendorsScript.src = "/rest/resource/vendors~build.production.js";
+            polyScript.src = "/rest/resource/polyfills.production.js";
 
             // TODO ANALYTICS
+            // TODO move this logic to the server side and put a development key of the sorts on document cookie and whatnot
         }
 
         // Load asynchroniously, and add to the page
         script.async = true;
         commonsScript.async = true;
+        vendorsScript.async = true;
+        polyScript.async = true;
         document.head.appendChild(script);
         document.head.appendChild(commonsScript);
         document.head.appendChild(vendorsScript);
+        document.head.appendChild(polyScript);
         
         // Supported languages array
         var SUPPORTED_LANGUAGES = "%{supportedLanguages}".split(",");

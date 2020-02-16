@@ -1,13 +1,11 @@
-import "core-js/stable";
-import "regenerator-runtime/runtime";
-
 import "./internal/theme/base.scss";
 import ReactDOM from "react-dom";
 import React from "react";
 import { Router } from "react-router-dom";
-import App from "./internal/app";
+import App, { ILocaleContextType } from "./internal/app";
 import Moment from "moment";
 import { createBrowserHistory } from "history";
+import { IRendererContext, RendererContext } from "./providers/renderer";
 
 // Create the browser history to feed the router
 export const history = createBrowserHistory();
@@ -41,7 +39,14 @@ export function importScript(src: string) {
   });
 }
 
-export async function initializeItemizeApp(mainComponent: React.ReactElement) {
+export async function initializeItemizeApp(
+  rendererContext: IRendererContext,
+  mainComponent: React.ReactElement,
+  options?: {
+    appWrapper?: (app: React.ReactElement) => React.ReactElement;
+    mainWrapper?: (mainComponet: React.ReactElement, localeContext: ILocaleContextType) => React.ReactElement;
+  }
+) {
   // basically the way this website works is that the
   // language is the first argument of the location url
   // so /en/whatever /fi/whatever, determine the language
@@ -224,18 +229,29 @@ export async function initializeItemizeApp(mainComponent: React.ReactElement) {
     Moment.locale(initialLang);
     document.body.parentElement.lang = initialLang;
 
+    // now we get the app that we are expected to use
+    const app = <App
+      initialRoot={initialRoot}
+      langLocales={lang}
+
+      initialCurrency={initialCurrency}
+      initialCountry={initialCountry}
+
+      mainComponent={mainComponent}
+      mainWrapper={options && options.mainWrapper}
+    />;
+
+    // if a wrapping function was provided, we use it
+    const children = options && options.appWrapper ?
+      options.appWrapper(app) :
+      app;
+
     // finally we render the react thing
     ReactDOM.render(
       <Router history={history}>
-        <App
-          initialRoot={initialRoot}
-          langLocales={lang}
-
-          initialCurrency={initialCurrency}
-          initialCountry={initialCountry}
-
-          mainComponent={mainComponent}
-        />
+        <RendererContext.Provider value={rendererContext}>
+          {children}
+        </RendererContext.Provider>
       </Router>,
       document.getElementById("app"),
     );

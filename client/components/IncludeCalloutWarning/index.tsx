@@ -1,59 +1,81 @@
 import React from "react";
-import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
-import { style, STANDARD_THEME, IIncludeCalloutWarningThemeType } from "./styles";
 import Include, { IIncludeState, IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
-import { Icon } from "@material-ui/core";
 import { ILocaleContextType, LocaleContext } from "../../internal/app";
+import { RendererContext } from "../../providers/renderer";
+import equals from "deep-equal";
+import { IRendererProps } from "../../internal/renderer";
 
-export interface IIncludeCalloutWarningBaseProps {
+interface IIncludeCalloutWarningProps {
   include: Include;
   state: IIncludeState;
-  theme?: Partial<IIncludeCalloutWarningThemeType>;
+  renderer?: (props: IIncludeCalloutWarningRendererProps) => any;
+  rendererArgs?: object;
 }
 
-export interface IIncludeCalloutWarningProps extends IIncludeCalloutWarningBaseProps, WithStyles<typeof style> {
+interface IActualIncludeCalloutWarningProps extends IIncludeCalloutWarningProps {
   locale: ILocaleContextType;
+  renderer: (props: IIncludeCalloutWarningRendererProps) => any;
+  rendererArgs: object;
 }
 
-const IncludeCalloutWarningWithStyles = withStyles(style)((props: IIncludeCalloutWarningProps) => {
-  let calloutExcludedWarning: string = null;
-  if (
-    props.include.isExclusionCallout() &&
-    props.state.exclusionState === IncludeExclusionState.EXCLUDED
-  ) {
-    calloutExcludedWarning = props.include.getI18nDataFor(props.locale.language).callout_excluded_label;
-  }
-  return (
-    <div className={props.classes.container}>
-      {calloutExcludedWarning ? <div className={props.classes.warning}>
-        <Icon className={props.classes.icon}>warning</Icon>
-        {calloutExcludedWarning}
-      </div> : null}
-    </div>
-  );
-});
+export interface IIncludeCalloutWarningRendererProps extends IRendererProps {
+  warning: string;
+  active: boolean;
+}
 
-export default function IncludeCalloutWarning(props: IIncludeCalloutWarningBaseProps) {
-  let appliedTheme: IIncludeCalloutWarningThemeType = STANDARD_THEME;
-  if (props.theme) {
-    appliedTheme = {
-      ...STANDARD_THEME,
-      ...props.theme,
-    };
+class ActualIncludeCalloutWarning extends React.Component<IActualIncludeCalloutWarningProps> {
+  public shouldComponentUpdate(nextProps: IActualIncludeCalloutWarningProps) {
+    return nextProps.locale.language !== this.props.locale.language ||
+      nextProps.locale.rtl !== this.props.locale.rtl ||
+      nextProps.include !== this.props.include ||
+      nextProps.renderer !== this.props.renderer ||
+      !equals(nextProps.rendererArgs, this.props.rendererArgs) ||
+      nextProps.state.exclusionState !== this.props.state.exclusionState;
   }
+  public render() {
+    let warning: string = this.props.include.getI18nDataFor(this.props.locale.language).callout_excluded_label;
+    let active = this.props.include.isExclusionCallout() &&
+      this.props.state.exclusionState === IncludeExclusionState.EXCLUDED;
 
+    return this.props.renderer({
+      warning,
+      active,
+      args: this.props.rendererArgs,
+      rtl: this.props.locale.rtl,
+    });
+  }
+}
+
+export default function IncludeCalloutWarning(props: IIncludeCalloutWarningProps) {
   // Build the context and render sending the right props
+  if (props.renderer) {
+    return (     
+      <LocaleContext.Consumer>
+        {
+          (locale) => <ActualIncludeCalloutWarning
+            {...props} locale={locale}
+            renderer={props.renderer}
+            rendererArgs={props.rendererArgs || null}
+          />
+        }
+      </LocaleContext.Consumer>
+    );
+  }
   return (
-    <LocaleContext.Consumer>
+    <RendererContext.Consumer>
       {
-        (locale) =>
-          <ThemeProvider theme={appliedTheme}>
-            <IncludeCalloutWarningWithStyles
-              {...props}
-              locale={locale}
-            />
-          </ThemeProvider>
+        (renderers) =>
+          <LocaleContext.Consumer>
+            {
+              (locale) => <ActualIncludeCalloutWarning
+                {...props}
+                locale={locale}
+                renderer={renderers.IncludeCalloutWarning}
+                rendererArgs={props.rendererArgs || null}
+              />
+            }
+          </LocaleContext.Consumer>
       }
-    </LocaleContext.Consumer>
+    </RendererContext.Consumer>
   );
 }

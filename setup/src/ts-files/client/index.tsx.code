@@ -1,7 +1,14 @@
 import React from "react";
 import App from "./app";
 import { initializeItemizeApp } from "itemize/client";
+import rendererContext from "itemize/client/fast-prototyping/renderers";
+import { appWrapper, mainWrapper } from "itemize/client/fast-prototyping/wrappers";
 
 initializeItemizeApp(
+	rendererContext,
 	<App/>,
+	{
+		appWrapper,
+		mainWrapper,
+	}
 );

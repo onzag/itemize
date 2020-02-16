@@ -246,6 +246,7 @@ interface IFnAppLanguageRetrieverLanguageFormType {
 type FnAppLanguageRetrieverType = (arg: {
   currentLanguage: IFnAppLanguageRetrieverLanguageFormType,
   availableLanguages: IFnAppLanguageRetrieverLanguageFormType[],
+  rtl: boolean,
   changeLanguageTo: (code: string) => void,
 }) => React.ReactNode;
 export function AppLanguageRetriever(props: {
@@ -269,6 +270,7 @@ export function AppLanguageRetriever(props: {
           return props.children({
             currentLanguage,
             availableLanguages,
+            rtl: localeContext.rtl,
             changeLanguageTo: localeContext.updating ? () => null : localeContext.changeLanguageTo,
           });
         }

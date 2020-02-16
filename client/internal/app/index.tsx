@@ -1,12 +1,7 @@
 import React from "react";
 import Root, { IRootRawJSONDataType, Ii18NType, ILangLocalesType } from "../../../base/Root";
-import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
-import { createMuiTheme } from "@material-ui/core";
 import { importScript } from "../..";
 import Moment from "moment";
-import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import MomentUtils from "@date-io/moment";
-import CssBaseline from "@material-ui/core/CssBaseline";
 import { Route } from "react-router";
 import { history } from "../..";
 import { countries, currencies } from "../../../imported-resources";
@@ -29,6 +24,7 @@ export interface ILocaleContextType {
   changeCurrencyTo: (code: string, avoidUpdatingUser?: boolean) => void;
   changeCountryTo: (code: string, avoidChangingLanguageAndCurrency?: boolean, avoidUpdatingUser?: boolean) => void;
   language: string;
+  rtl: boolean;
   currency: string;
   country: string;
   updating: boolean;
@@ -58,6 +54,7 @@ interface IAppProps {
   langLocales: ILangLocalesType;
 
   mainComponent: React.ReactElement;
+  mainWrapper?: (mainComponent: React.ReactElement, localeContextValue: ILocaleContextType) => React.ReactElement;
 }
 
 // so you can see here, the specified country and currency
@@ -78,16 +75,6 @@ interface IAppState {
 // values for both is null
 export const LocaleContext = React.createContext<ILocaleContextType>(null);
 export const DataContext = React.createContext<IDataContextType>(null);
-
-// we create the material ui theme
-const theme = createMuiTheme({
-  typography: {
-    fontFamily: "'Open Sans', sans-serif",
-    fontWeightLight: 300,
-    fontWeightRegular: 400,
-    fontWeightMedium: 500,
-  },
-});
 
 // now we export the App
 export default class App extends React.Component<IAppProps, IAppState> {
@@ -373,8 +360,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // before having the new language completely loaded a crash is going to happen, hence, we remain onto
     // the old language until the new language data is truly loaded
     const currentActualLanguage = this.state.localeIsUpdating ? this.state.localeIsUpdatingFrom : match.params.lang;
-    const currentActualLanguageDeregionalized = currentActualLanguage.includes("-") ?
-      currentActualLanguage.split("-")[0] : currentActualLanguage;
+
+    const rtl = this.props.langLocales[currentActualLanguage].rtl;
 
     // now we populate the locale context which is used all over the app
     const localeContextValue: ILocaleContextType = {
@@ -383,6 +370,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       changeCurrencyTo: this.changeCurrencyTo,
 
       language: currentActualLanguage,
+      rtl,
       country: this.state.specifiedCountry,
       currency: this.state.specifiedCurrency,
 
@@ -401,15 +389,18 @@ export default class App extends React.Component<IAppProps, IAppState> {
     return (
       <LocaleContext.Provider value={localeContextValue}>
         <TokenProvider localeContext={localeContextValue} onProviderStateSet={this.setTokenState}>
-          <MuiPickersUtilsProvider
-            utils={MomentUtils}
-            locale={currentActualLanguageDeregionalized}
-            libInstance={Moment}
-          >
-            <LocationStateContext.Provider value={location}>
-              {this.props.mainComponent}
-            </LocationStateContext.Provider>
-          </MuiPickersUtilsProvider>
+          <LocationStateContext.Provider value={location}>
+            <div id="main" dir={rtl ? "rtl" : "ltr"}>
+              {
+                this.props.mainWrapper ?
+                this.props.mainWrapper(
+                  this.props.mainComponent,
+                  localeContextValue,
+                ) :
+                this.props.mainComponent
+              }
+            </div>
+          </LocationStateContext.Provider>
         </TokenProvider>
       </LocaleContext.Provider>
     );
@@ -427,15 +418,12 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // our data context, and then pass the react router route, note that the
     // router itself is the parent
     return (
-      <MuiThemeProvider theme={theme}>
-        <CssBaseline/>
-        <DataContext.Provider value={dataContextValue}>
-          <Route
-            path="/:lang/"
-            component={this.renderAppWithLocaleContext}
-          />
-        </DataContext.Provider>
-      </MuiThemeProvider>
+      <DataContext.Provider value={dataContextValue}>
+        <Route
+          path="/:lang/"
+          component={this.renderAppWithLocaleContext}
+        />
+      </DataContext.Provider>
     );
   }
 }

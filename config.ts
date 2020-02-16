@@ -14,6 +14,7 @@ export interface IConfigRawJSONDataType {
     themeColor: string;
     backgroundColor: string;
   };
+  fontUrl: string;
 
   // FALLBACK REGIONALIZATION
   fallbackCountryCode: string;
@@ -131,6 +132,9 @@ export const rawConfigSchema = {
         type: "string",
       },
     },
+    fontUrl: {
+      type: "string",
+    },
     manifest: {
       type: "object",
       properties: {
@@ -176,6 +180,7 @@ export const rawConfigSchema = {
     "rtlLanguages",
     "dictionaries",
     "roles",
+    "fontUrl",
     "manifest",
     "fallbackCountryCode",
     "fallbackLanguage",
