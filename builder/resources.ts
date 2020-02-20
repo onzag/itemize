@@ -122,7 +122,10 @@ async function copyOneDirectoryLevel(pathname: string, constructedPath: string) 
     }
 
     // so we get the content of the file
-    const content = await fsAsync.readFile(currentTotalFilePathName, "utf8");
+    const canBeOptimized =
+      fileNameInDirectory.endsWith(".json") ||
+      fileNameInDirectory.endsWith(".html") ||
+      fileNameInDirectory.endsWith(".svg");
 
     // and we check if we can optimize it
     let minified: string;
@@ -131,7 +134,7 @@ async function copyOneDirectoryLevel(pathname: string, constructedPath: string) 
     if (fileNameInDirectory.endsWith(".json")) {
       // we use this trick
       try {
-        minified = JSON.stringify(JSON.parse(content));
+        minified = JSON.stringify(JSON.parse(await fsAsync.readFile(currentTotalFilePathName, "utf8")));
         optimizer = "JSON PARSE/STRINGIFY";
       } catch (err) {
         console.log("failed to JSON minify " + colors.red(currentTotalFilePathName));
@@ -140,7 +143,7 @@ async function copyOneDirectoryLevel(pathname: string, constructedPath: string) 
       // for an html file we use the html minifier
       try {
         minified = htmlMinifier.minify(
-          content,
+          await fsAsync.readFile(currentTotalFilePathName, "utf8"),
           {
             collapseBooleanAttributes: true,
             collapseInlineTagWhitespace: true,
@@ -158,20 +161,21 @@ async function copyOneDirectoryLevel(pathname: string, constructedPath: string) 
     } else if (fileNameInDirectory.endsWith(".svg")) {
       // for svg images we use svgo
       try {
-        minified = (await svgo.optimize(content)).data;
+        minified = (await svgo.optimize(await fsAsync.readFile(currentTotalFilePathName, "utf8"))).data;
         optimizer = "SVGO";
       } catch (err) {
         console.log("failed to SVG minify " + colors.red(currentTotalFilePathName));
       }
-    } else {
-      // otherwise the minified is equal to the content
-      minified = content;
     }
     // let's export the file in the directory
     const exportedFileName = path.join(constructedPath, fileNameInDirectory);
     // and emit it
     console.log("emiting " + colors.green(exportedFileName) + " OPTIMIZER: " + colors.yellow(optimizer));
-    await fsAsync.writeFile(exportedFileName, minified);
+    await (
+      minified ?
+      fsAsync.writeFile(exportedFileName, minified) :
+      fsAsync.copyFile(currentTotalFilePathName, exportedFileName)
+    );
   }));
 }
 

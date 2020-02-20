@@ -10,7 +10,8 @@ import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../conf
 export interface IAppDataType {
     root: Root;
     autocompletes: Autocomplete[];
-    index: string;
+    indexDevelopment: string;
+    indexProduction: string;
     config: IConfigRawJSONDataType;
     sensitiveConfig: ISensitiveConfigRawJSONDataType;
     knex: Knex;

@@ -37,6 +37,7 @@ const constants_1 = require("../constants");
 const autocomplete_1 = require("./autocomplete");
 const evaler_1 = require("./evaler");
 const buildnumber_1 = require("./buildnumber");
+const manifest_1 = require("./manifest");
 // Refuse to run in production mode
 if (process.env.NODE_ENV === "production") {
     throw new Error("This script cannot run in production mode");
@@ -52,7 +53,7 @@ async function build() {
             await fsAsync.mkdir(path_1.default.join("dist", "data"));
         }
         // we run all the build steps
-        await Promise.all([
+        const [rawRoot] = await Promise.all([
             buildData(rawDataConfig),
             config_1.buildConfig(rawDataConfig),
             html_1.buildHTML(rawDataConfig),
@@ -60,6 +61,7 @@ async function build() {
             resources_1.buildResources(rawDataConfig),
             moment_1.copyMomentFiles(rawDataConfig),
         ]);
+        await manifest_1.buildManifest(rawDataConfig, rawRoot);
     }
     catch (err) {
         // display an error if it's part of a checkup error
@@ -153,6 +155,7 @@ async function buildData(rawDataConfig) {
     const autocompleteFileName = path_1.default.join("dist", "autocomplete.json");
     console.log("emiting " + safe_1.default.green(autocompleteFileName));
     await fsAsync.writeFile(autocompleteFileName, JSON.stringify(autocomplete));
+    return resultJSON;
 }
 /**
  * this processes all the included files

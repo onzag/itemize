@@ -536,3 +536,7 @@ export declare const UNIT_SUBTYPES: string[];
  * the same value
  */
 export declare const UNSPECIFIED_OWNER = -1;
+/**
+ * Resources that are protected from fetching without specifying the devkey
+ */
+export declare const PROTECTED_RESOURCES: string[];

@@ -76,12 +76,6 @@ const REQUIRED_RESOURCES = [
      */
     "icons/mstile-square-150x150.png",
     /**
-     * The metro microsoft edge tile in 70x70 form
-     * allow transparency, the color of the background of the tile
-     * is setup in the manifest config
-     */
-    "icons/mstile-square-70x70.png",
-    /**
      * The metro microsoft edge tile in 310x150 form
      * allow transparency, the color of the background of the tile
      * is setup in the manifest config
@@ -123,7 +117,9 @@ async function copyOneDirectoryLevel(pathname, constructedPath) {
             return copyOneDirectoryLevel(currentTotalFilePathName, path_1.default.join(constructedPath, fileNameInDirectory));
         }
         // so we get the content of the file
-        const content = await fsAsync.readFile(currentTotalFilePathName, "utf8");
+        const canBeOptimized = fileNameInDirectory.endsWith(".json") ||
+            fileNameInDirectory.endsWith(".html") ||
+            fileNameInDirectory.endsWith(".svg");
         // and we check if we can optimize it
         let minified;
         let optimizer = "NONE";
@@ -131,7 +127,7 @@ async function copyOneDirectoryLevel(pathname, constructedPath) {
         if (fileNameInDirectory.endsWith(".json")) {
             // we use this trick
             try {
-                minified = JSON.stringify(JSON.parse(content));
+                minified = JSON.stringify(JSON.parse(await fsAsync.readFile(currentTotalFilePathName, "utf8")));
                 optimizer = "JSON PARSE/STRINGIFY";
             }
             catch (err) {
@@ -141,7 +137,7 @@ async function copyOneDirectoryLevel(pathname, constructedPath) {
         else if (fileNameInDirectory.endsWith(".html")) {
             // for an html file we use the html minifier
             try {
-                minified = html_minifier_1.default.minify(content, {
+                minified = html_minifier_1.default.minify(await fsAsync.readFile(currentTotalFilePathName, "utf8"), {
                     collapseBooleanAttributes: true,
                     collapseInlineTagWhitespace: true,
                     collapseWhitespace: true,
@@ -159,22 +155,20 @@ async function copyOneDirectoryLevel(pathname, constructedPath) {
         else if (fileNameInDirectory.endsWith(".svg")) {
             // for svg images we use svgo
             try {
-                minified = (await svgo.optimize(content)).data;
+                minified = (await svgo.optimize(await fsAsync.readFile(currentTotalFilePathName, "utf8"))).data;
                 optimizer = "SVGO";
             }
             catch (err) {
                 console.log("failed to SVG minify " + safe_1.default.red(currentTotalFilePathName));
             }
         }
-        else {
-            // otherwise the minified is equal to the content
-            minified = content;
-        }
         // let's export the file in the directory
         const exportedFileName = path_1.default.join(constructedPath, fileNameInDirectory);
         // and emit it
         console.log("emiting " + safe_1.default.green(exportedFileName) + " OPTIMIZER: " + safe_1.default.yellow(optimizer));
-        await fsAsync.writeFile(exportedFileName, minified);
+        await (minified ?
+            fsAsync.writeFile(exportedFileName, minified) :
+            fsAsync.copyFile(currentTotalFilePathName, exportedFileName));
     }));
 }
 /**

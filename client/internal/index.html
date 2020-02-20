@@ -3,6 +3,8 @@
     <head>
         <!-- The app name is set dinamically from the config, these attributes come from the config -->
         <title>%{appName}</title>
+        <meta name="application-name" content="%{appName}">
+
         <meta charset="utf-8" />
         <meta 
             name="viewport"
@@ -14,76 +16,22 @@
         <link rel="apple-touch-icon" sizes="180x180" href="/rest/resource/icons/apple-touch-icon-no-transparency-180x180.png">
         <link rel="icon" type="image/png" sizes="32x32" href="/rest/resource/icons/favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/rest/resource/icons/favicon-16x16.png">
-        <link rel="manifest">
         <link rel="mask-icon" href="/rest/resource/icons/macos-safari-monochrome-icon.svg" color="%{manifest.macSafariMaskIconThemeColor}">
         <link rel="shortcut icon" href="/rest/resource/icons/favicon.ico">
+
+        <link rel="manifest">
         <meta name="msapplication-TileColor" content="%{manifest.msTileColor}">
         <meta name="msapplication-config" content="/rest/resource/manifest/browserconfig.xml">
         <meta name="theme-color" content="%{manifest.themeColor}">
+
+        <script src="/rest/resource/polyfills.$MODE.js" defer></script>
+        <script src="/rest/resource/vendors~build.$MODE.js" defer></script>
+        <script src="/rest/resource/commons.$MODE.js" defer></script>
+        <script src="/rest/resource/build.$MODE.js" defer></script>
     </head>
     <!-- The app goes here -->
     <body><div id="root"><div id="app"></div></div></body>
     <script>
-        // INITIALIZE SCRIPT
-        var script = document.createElement("script");
-        var commonsScript = document.createElement("script");
-        var vendorsScript = document.createElement("script");
-        var polyScript = document.createElement("script");
-        var developmentHostname = "%{developmentHostname}";
-        var devFlag = localStorage && localStorage.getItem("__dev");
-        if (
-            !devFlag &&
-            (
-                location.hostname === developmentHostname ||
-                location.hostname === "localhost"
-            )
-        ) {
-            devFlag = "true";
-        }
-        script.type = "text/javascript";
-        commonsScript.type = "text/javascript";
-        vendorsScript.type = "text/javascript";
-        polyScript.type = "text/javascript";
-
-        // We use the __dev variable in local storage for using the development build rather
-        // than the production build, yes, I know you can see this, I don't care, you could reverse
-        // engineer it anyway
-        if (devFlag === "true") {
-            script.src = "/rest/resource/build.development.js";
-            commonsScript.src = "/rest/resource/commons.development.js";
-            vendorsScript.src = "/rest/resource/vendors~build.development.js";
-            polyScript.src = "/rest/resource/polyfills.development.js";
-
-            // We remove the production css, which loads by default
-            var element = document.getElementsByTagName("link")[0];
-            element.parentNode.removeChild(element);
-
-            // and insert the development css instead
-            var newStylesheet = document.createElement("link");
-            newStylesheet.href = "/rest/resource/build.development.css";
-            newStylesheet.rel = "stylesheet";
-            document.head.appendChild(newStylesheet);
-        } else {
-            // We add the production build to the page
-            script.src = "/rest/resource/build.production.js";
-            commonsScript.src = "/rest/resource/commons.production.js";
-            vendorsScript.src = "/rest/resource/vendors~build.production.js";
-            polyScript.src = "/rest/resource/polyfills.production.js";
-
-            // TODO ANALYTICS
-            // TODO move this logic to the server side and put a development key of the sorts on document cookie and whatnot
-        }
-
-        // Load asynchroniously, and add to the page
-        script.async = true;
-        commonsScript.async = true;
-        vendorsScript.async = true;
-        polyScript.async = true;
-        document.head.appendChild(script);
-        document.head.appendChild(commonsScript);
-        document.head.appendChild(vendorsScript);
-        document.head.appendChild(polyScript);
-        
         // Supported languages array
         var SUPPORTED_LANGUAGES = "%{supportedLanguages}".split(",");
         // localization fallbacks
@@ -100,5 +48,10 @@
         // and the here maps app id and app code for client side
         var HERE_APP_ID = "%{hereAppID}";
         var HERE_APP_CODE = "%{hereAppCode}";
+        // set development mode
+        function SET_DEV_MODE(mode, key) {
+            document.cookie = "devmode=" + mode;
+            document.cookie = "devkey=" + key;
+        }
     </script>
 </html>

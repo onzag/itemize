@@ -25,40 +25,47 @@ async function copyAndProcessDirectoryLevelFor(config, options, pathname, constr
             return copyAndProcessDirectoryLevelFor(config, options, currentTotalFilePathName, path_1.default.join(constructedPath, fileNameInDirectory));
         }
         // so we get the content of the file
-        let content = await fsAsync.readFile(currentTotalFilePathName, "utf8");
+        const readAsUtf8 = currentTotalFilePathName.endsWith(".code") ||
+            currentTotalFilePathName.endsWith(".js");
         let finalFileName = fileNameInDirectory;
-        if (currentTotalFilePathName.endsWith(".code")) {
-            if (options.nextLineOnBrackets) {
-                content = content.replace(/\<(\d+)\>\{/g, (match, digit) => {
-                    const digitInQuestion = parseInt(digit);
-                    let finalStr = "\n";
-                    if (options.useSpaces) {
-                        finalStr += " ".repeat(options.spacesSize * digitInQuestion);
-                    }
-                    else {
-                        finalStr += "\t".repeat(digitInQuestion);
-                    }
-                    finalStr += "{";
-                    return finalStr;
-                });
+        let utf8Content;
+        if (readAsUtf8) {
+            utf8Content = await fsAsync.readFile(currentTotalFilePathName, "utf8");
+            if (currentTotalFilePathName.endsWith(".code")) {
+                if (options.nextLineOnBrackets) {
+                    utf8Content = utf8Content.replace(/\<(\d+)\>\{/g, (match, digit) => {
+                        const digitInQuestion = parseInt(digit);
+                        let finalStr = "\n";
+                        if (options.useSpaces) {
+                            finalStr += " ".repeat(options.spacesSize * digitInQuestion);
+                        }
+                        else {
+                            finalStr += "\t".repeat(digitInQuestion);
+                        }
+                        finalStr += "{";
+                        return finalStr;
+                    });
+                }
+                else {
+                    utf8Content = utf8Content.replace(/\<(\d+)\>\{/g, " {");
+                }
+                finalFileName = fileNameInDirectory.replace(".code", "");
             }
-            else {
-                content = content.replace(/\<(\d+)\>\{/g, " {");
+            else if (currentTotalFilePathName.endsWith(".js")) {
+                utf8Content = Function("config", "options", utf8Content)(config, options);
+                finalFileName = fileNameInDirectory.replace(".js", "");
             }
-            finalFileName = fileNameInDirectory.replace(".code", "");
-        }
-        else if (currentTotalFilePathName.endsWith(".js")) {
-            content = Function("config", "options", content)(config, options);
-            finalFileName = fileNameInDirectory.replace(".js", "");
-        }
-        if (options.useSpaces) {
-            content = content.replace(/\t/g, " ".repeat(options.spacesSize));
+            if (options.useSpaces) {
+                utf8Content = utf8Content.replace(/\t/g, " ".repeat(options.spacesSize));
+            }
         }
         // let's export the file in the directory
         const exportedFileName = path_1.default.join(constructedPath, finalFileName);
         // and emit it
         console.log("emiting " + colors_1.default.green(exportedFileName));
-        await fsAsync.writeFile(exportedFileName, content);
+        await (utf8Content ?
+            fsAsync.writeFile(exportedFileName, utf8Content) :
+            fsAsync.copyFile(currentTotalFilePathName, exportedFileName));
     }));
 }
 async function copyAllFilesFor(arg, target, source, previousOptions, onceDone) {

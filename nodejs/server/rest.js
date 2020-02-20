@@ -9,6 +9,8 @@ const path_1 = __importDefault(require("path"));
 const server_checkers_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers");
 const body_parser_1 = __importDefault(require("body-parser"));
 const imported_resources_1 = require("../imported-resources");
+const constants_1 = require("../constants");
+const mode_1 = require("./mode");
 // TODO comment and document
 /**
  * this function contains and build all the rest services
@@ -172,7 +174,16 @@ function restServices(appData) {
         });
     });
     // add the static resources
-    router.use("/resource", express_1.default.static(path_1.default.resolve(path_1.default.join("dist", "data"))));
+    router.use("/resource", (req, res, next) => {
+        const isProtectedResource = constants_1.PROTECTED_RESOURCES.includes(req.path);
+        if (isProtectedResource) {
+            const mode = mode_1.getMode(appData, req);
+            if (mode !== "development") {
+                res.status(403).end("Forbidden you need a devkey to access this resource");
+            }
+        }
+        return express_1.default.static(path_1.default.resolve(path_1.default.join("dist", "data")))(req, res, next);
+    });
     router.use("/uploads", express_1.default.static(path_1.default.resolve(path_1.default.join("dist", "uploads"))));
     // now let's get all modules
     appData.root.getAllModules().forEach(buildRouteForModule);

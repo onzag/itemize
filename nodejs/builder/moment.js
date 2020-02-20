@@ -20,13 +20,18 @@ const fsAsync = fs_1.default.promises;
  * @returns a void promise
  */
 async function copyMomentFiles(rawConfig) {
-    await Promise.all(rawConfig.standard.supportedLanguages.map((lang) => {
+    await Promise.all(rawConfig.standard.supportedLanguages.map(async (lang) => {
         if (lang === "en") {
             return;
         }
         const outputFile = path_1.default.join("dist", "data", lang + ".moment.js");
         console.log("emiting " + safe_1.default.green(outputFile));
-        return fsAsync.copyFile(path_1.default.join("node_modules", "moment", "locale", lang.toLowerCase() + ".js"), outputFile);
+        try {
+            await fsAsync.copyFile(path_1.default.join("node_modules", "moment", "locale", lang.toLowerCase() + ".js"), outputFile);
+        }
+        catch {
+            await fsAsync.copyFile(path_1.default.join("node_modules", "itemize", "node_modules", "moment", "locale", lang.toLowerCase() + ".js"), outputFile);
+        }
     }));
 }
 exports.copyMomentFiles = copyMomentFiles;

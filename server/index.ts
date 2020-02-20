@@ -23,6 +23,7 @@ import { Cache } from "./cache";
 import { graphqlUploadExpress } from "graphql-upload";
 import { buildCustomTokenQueries } from "./custom-token";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
+import { getMode } from "./mode";
 
 // TODO comment and document
 
@@ -48,7 +49,8 @@ const app = express();
 export interface IAppDataType {
   root: Root;
   autocompletes: Autocomplete[];
-  index: string;
+  indexDevelopment: string;
+  indexProduction: string;
   config: IConfigRawJSONDataType;
   sensitiveConfig: ISensitiveConfigRawJSONDataType;
   knex: Knex;
@@ -205,7 +207,12 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
 
   app.get("*", (req, res) => {
     res.setHeader("content-type", "text/html; charset=utf-8");
-    res.end(appData.index);
+    const mode = getMode(appData, req);
+    if (mode === "development") {
+      res.end(appData.indexDevelopment);
+    } else {
+      res.end(appData.indexProduction);
+    }
   });
 }
 
@@ -301,7 +308,8 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   const appData: IAppDataType = {
     root,
     autocompletes,
-    index,
+    indexDevelopment: index.replace(/\$MODE/g, "development"),
+    indexProduction: index.replace(/\$MODE/g, "production"),
     config,
     sensitiveConfig,
     knex,

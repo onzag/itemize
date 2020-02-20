@@ -26,6 +26,7 @@ const redis_1 = __importDefault(require("redis"));
 const cache_1 = require("./cache");
 const graphql_upload_1 = require("graphql-upload");
 const custom_token_1 = require("./custom-token");
+const mode_1 = require("./mode");
 // TODO comment and document
 // Setting the parsers, postgresql comes with
 // its own way to return this data and I want it
@@ -133,7 +134,13 @@ function initializeApp(appData, custom) {
     });
     app.get("*", (req, res) => {
         res.setHeader("content-type", "text/html; charset=utf-8");
-        res.end(appData.index);
+        const mode = mode_1.getMode(appData, req);
+        if (mode === "development") {
+            res.end(appData.indexDevelopment);
+        }
+        else {
+            res.end(appData.indexProduction);
+        }
     });
 }
 async function initializeServer(custom = {}) {
@@ -210,7 +217,8 @@ async function initializeServer(custom = {}) {
     const appData = {
         root,
         autocompletes,
-        index,
+        indexDevelopment: index.replace(/\$MODE/g, "development"),
+        indexProduction: index.replace(/\$MODE/g, "production"),
         config,
         sensitiveConfig,
         knex,

@@ -161,6 +161,8 @@ exports.LOCALE_I18N = [
     "ok",
     // for mostly the aria label of closing dialogs
     "close",
+    // some extras for fast prototyping
+    "menu",
     // for file uploader
     "file_uploader_placeholder_active",
     "image_uploader_placeholder_active",
@@ -874,3 +876,9 @@ exports.UNIT_SUBTYPES = [
  * the same value
  */
 exports.UNSPECIFIED_OWNER = -1;
+/**
+ * Resources that are protected from fetching without specifying the devkey
+ */
+exports.PROTECTED_RESOURCES = [
+    "/build.development.js",
+];

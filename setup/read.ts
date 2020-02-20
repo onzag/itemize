@@ -104,7 +104,7 @@ interface IConfigRequestExtractPoint {
   message: string,
   defaultValue: any,
   hidden?: boolean,
-  validate?: (config: any, value: any) => boolean,
+  validate?: (value: any, config: any) => boolean,
   nullifyFalseValues?: boolean,
 };
 

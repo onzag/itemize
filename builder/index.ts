@@ -65,6 +65,7 @@ import {
 import { buildAutocomplete } from "./autocomplete";
 import { evalRawJSON } from "./evaler";
 import { buildBuildNumber } from "./buildnumber";
+import { buildManifest } from "./manifest";
 
 // Refuse to run in production mode
 if (process.env.NODE_ENV === "production") {
@@ -119,7 +120,7 @@ export default async function build() {
     }
 
     // we run all the build steps
-    await Promise.all([
+    const [rawRoot] = await Promise.all([
       buildData(rawDataConfig),
       buildConfig(rawDataConfig),
       buildHTML(rawDataConfig),
@@ -127,6 +128,8 @@ export default async function build() {
       buildResources(rawDataConfig),
       copyMomentFiles(rawDataConfig),
     ]);
+
+    await buildManifest(rawDataConfig, rawRoot);
   } catch (err) {
     // display an error if it's part of a checkup error
     if (err instanceof CheckUpError) {
@@ -142,7 +145,7 @@ export default async function build() {
  * in order to create the build files
  * @param rawDataConfig the configuration
  */
-async function buildData(rawDataConfig: IBuilderBasicConfigType) {
+async function buildData(rawDataConfig: IBuilderBasicConfigType): Promise<IRootRawJSONDataType> {
   const entryPoint = rawDataConfig.standard.entry;
 
   // lets get the actual location of the item, lets assume first
@@ -278,6 +281,8 @@ async function buildData(rawDataConfig: IBuilderBasicConfigType) {
     autocompleteFileName,
     JSON.stringify(autocomplete),
   );
+
+  return resultJSON;
 }
 
 /**

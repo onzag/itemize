@@ -90,8 +90,20 @@ export async function standardConfigSetup(
           {
             variableName: "msTileColor",
             message: "Please specify a proper css style hex value for the metro icon in edge eg. #00FFAA",
-            defaultValue: "#0000CC",
-          }
+            defaultValue: "#000000",
+          },
+          {
+            variableName: "orientation",
+            message: "The orientation of the app, landscape or portrait",
+            defaultValue: "portrait",
+            validate: (value) => ["portrait", "landscape"].includes(value),
+          },
+          {
+            variableName: "display",
+            message: "The display of the application, fullscreen, standalone, minimal-ui or browser",
+            defaultValue: "standalone",
+            validate: (value) => ["fullscreen", "standalone", "minimal-ui", "browser"].includes(value),
+          },
         ]
       },
       {

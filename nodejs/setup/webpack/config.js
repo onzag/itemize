@@ -35,6 +35,7 @@ module.exports = {
     "service-worker": ["./node_modules/itemize/client/internal/workers/service/service.worker.ts"],
     "cache-worker": ["./node_modules/itemize/client/internal/workers/cache/cache.worker.ts"],
     "build": ["./src/client/index.tsx"],
+    "polyfills": ["./node_modules/itemize/client/internal/polyfills.ts"],
   },
   devtool: isDevelopment ? 'inline-source-map' : false,
   plugins,

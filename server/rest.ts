@@ -9,6 +9,8 @@ import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import bodyParser from "body-parser";
 import { countries } from "../imported-resources";
 import { IAutocompleteOutputType } from "../base/Autocomplete";
+import { PROTECTED_RESOURCES } from "../constants";
+import { getMode } from "./mode";
 
 // TODO comment and document
 
@@ -197,7 +199,16 @@ export default function restServices(appData: IAppDataType) {
   });
 
   // add the static resources
-  router.use("/resource", express.static(path.resolve(path.join("dist", "data"))));
+  router.use("/resource", (req, res, next) => {
+    const isProtectedResource = PROTECTED_RESOURCES.includes(req.path);
+    if (isProtectedResource) {
+      const mode = getMode(appData, req);
+      if (mode !== "development") {
+        res.status(403).end("Forbidden you need a devkey to access this resource");
+      }
+    }
+    return express.static(path.resolve(path.join("dist", "data")))(req, res, next);
+  });
   router.use("/uploads", express.static(path.resolve(path.join("dist", "uploads"))));
 
   // now let's get all modules

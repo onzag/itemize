@@ -34,5 +34,5 @@ initializeItemizeApp(
 		// passing the <App/> above as argument, it isn't static, use this to wrap contexts that are locale sensitive,
 		// in the case of fast prototyping it sets up the moment utils context that is required by material ui pickers.
 		mainWrapper,
-	}
+	},
 );

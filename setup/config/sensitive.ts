@@ -46,15 +46,16 @@ export async function sensitiveConfigSetup(
       {
         variableName: "jwtKey",
         message: "a JSON web token key used for key validation and token generation, leave blank to autogenerate one if not filled",
-        defaultValue: "",
+        defaultValue: genToken(64),
         hidden: true,
       },
+      {
+        variableName: "devKey",
+        message: "a development key that is used to obtain development javascript files in production settings when set as a cookie",
+        defaultValue: genToken(16),
+      }
     ],
   );
-
-  if (!newConfig.jwtKey) {
-    newConfig.jwtKey = genToken(64);
-  }
 
   return newConfig;
 }

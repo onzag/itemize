@@ -182,6 +182,9 @@ export const LOCALE_I18N = [
   // for mostly the aria label of closing dialogs
   "close",
 
+  // some extras for fast prototyping
+  "menu",
+
   // for file uploader
   "file_uploader_placeholder_active",
   "image_uploader_placeholder_active",
@@ -919,3 +922,10 @@ export const UNIT_SUBTYPES = [
  * the same value
  */
 export const UNSPECIFIED_OWNER = -1;
+
+/**
+ * Resources that are protected from fetching without specifying the devkey
+ */
+export const PROTECTED_RESOURCES = [
+  "/build.development.js",
+]

@@ -36,6 +36,9 @@ exports.rawSensitiveConfigSchema = {
         jwtKey: {
             type: "string",
         },
+        devKey: {
+            type: "string",
+        },
     },
     additionalProperties: false,
     required: [
@@ -43,6 +46,7 @@ exports.rawSensitiveConfigSchema = {
         "hereAppID",
         "hereAppCode",
         "jwtKey",
+        "devKey",
     ],
 };
 exports.rawConfigSchema = {
@@ -99,7 +103,24 @@ exports.rawConfigSchema = {
                 backgroundColor: {
                     type: "string",
                 },
+                orientation: {
+                    enum: ["portrait", "landscape"],
+                    type: "string",
+                },
+                display: {
+                    enum: ["fullscreen", "standalone", "minimal-ui", "browser"],
+                    type: "string",
+                }
             },
+            additionalProperties: false,
+            required: [
+                "macSafariMaskIconThemeColor",
+                "msTileColor",
+                "themeColor",
+                "backgroundColor",
+                "orientation",
+                "display",
+            ],
         },
         fallbackCountryCode: {
             type: "string",

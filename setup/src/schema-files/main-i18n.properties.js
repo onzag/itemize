@@ -1,4 +1,4 @@
-[en]
+const en = `[en]
 name = english
 number_decimal_separator = .
 word_separator = ,
@@ -52,7 +52,7 @@ error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
 error.NOT_FOUND = the item cannot be found
 error.FORBIDDEN = forbidden
-error.CANT_CONNECT = canņot communicate with the server
+error.CANT_CONNECT = cannot communicate with the server
 error.INVALID_DATA_SUBMIT_REFUSED = some fields are invalid
 error.INTERNAL_SERVER_ERROR = internal server error
 error.UNSPECIFIED = unspecified error
@@ -62,9 +62,9 @@ error.USER_BLOCKED = you have been banned
 error.USER_REMOVED = the account related to this session has been removed
 error.INVALID_PROPERTY = invalid property
 error.INVALID_INCLUDE = invalid include
-error.INVALID_POLICY = policy security checks have failed
+error.INVALID_POLICY = policy security checks have failed`
 
-[fi]
+const fi = `[fi]
 name = suomi
 number_decimal_separator = ,
 word_separator = ,
@@ -91,19 +91,19 @@ format_add_image = lisää kuva
 format_add_file = lisää tiedosto
 format_add_video = lisää upotettu video
 
-file_uploader_placeholder_active = drop your files here...
-image_uploader_placeholder_active = drop your pictures here...
-file_uploader_placeholder_active_single = drop your file here...
-image_uploader_placeholder_active_single = drop your picture here...
-file_uploader_invalid_type = invalid File Type
-image_uploader_invalid_type = this file is not an image
-file_uploader_file_too_big = file is too big, maximum file size is {0}
-image_uploader_file_too_big = your picture is too big, maximum file size is {0}
-file_uploader_byte_limit_exceed = you have surpassed the limit of {0} for file uploads
-file_uploader_select_file = select File
-image_uploader_select_file = select Picture
-file_uploader_delete_file = delete File
-image_uploader_delete_file = delete Picture
+file_uploader_placeholder_active = pudota tiedostosi tähän...
+image_uploader_placeholder_active = pudota kuvatiedostosi tähän...
+file_uploader_placeholder_active_single = pudota tiedosto tähän...
+image_uploader_placeholder_active_single = pudota kuvatiedosto tähän...
+file_uploader_invalid_type = epäkelpo tiedostotyyppi
+image_uploader_invalid_type = tiedosto ei ole kuvatiedosto
+file_uploader_file_too_big = tiedosto liian suuri, suurin sallittu koko on {0}
+image_uploader_file_too_big = kuvatiedosto liian suuri, suurin sallittu koko on {0}
+file_uploader_byte_limit_exceed = olet ylittänyt tiedostojen latausrajasi, joka on {0}
+file_uploader_select_file = valitse tiedosto
+image_uploader_select_file = valitse kuvatiedosto
+file_uploader_delete_file = poista tiedosto
+image_uploader_delete_file = poista kuvatiedosto
 
 callout_exclude_warning = warning!... this will mark your item as incomplete
 
@@ -128,9 +128,9 @@ error.USER_BLOCKED = you have been banned
 error.USER_REMOVED = the account related to this session has been removed
 error.INVALID_PROPERTY = invalid property
 error.INVALID_INCLUDE = invalid include
-error.INVALID_POLICY = policy security checks have failed
+error.INVALID_POLICY = policy security checks have failed`
 
-[ru]
+const ru = `[ru]
 name = suomi
 number_decimal_separator = ,
 word_separator = ,
@@ -194,9 +194,9 @@ error.USER_BLOCKED = you have been banned
 error.USER_REMOVED = the account related to this session has been removed
 error.INVALID_PROPERTY = invalid property
 error.INVALID_INCLUDE = invalid include
-error.INVALID_POLICY = policy security checks have failed
+error.INVALID_POLICY = policy security checks have failed`
 
-[de]
+const de = `[de]
 name = Deutsch
 number_decimal_separator = ,
 word_separator = ,
@@ -260,9 +260,9 @@ error.USER_BLOCKED = Sie wurden mit einem Verbot belegt
 error.USER_REMOVED = das Konto für diese Sitzung wurde entfernt
 error.INVALID_PROPERTY = ungültige Eigenschaft
 error.INVALID_INCLUDE = ungültige Einbindung
-error.INVALID_POLICY = Sicherheitsabfrage gescheitert
+error.INVALID_POLICY = Sicherheitsabfrage gescheitert`
 
-[es]
+const es = `[es]
 name = Español
 number_decimal_separator = ,
 word_separator = ,
@@ -326,9 +326,9 @@ error.USER_BLOCKED = usted está baneado
 error.USER_REMOVED = la cuenta relacionada con esta sesión ha sido eliminada
 error.INVALID_PROPERTY = propiedad inválida
 error.INVALID_INCLUDE = elemento de inclusión inválido
-error.INVALID_POLICY = chequeos de seguridad han fallado
+error.INVALID_POLICY = chequeos de seguridad han fallado`
 
-[ar]
+const ar = `[ar]
 name = العربية
 number_decimal_separator = ٫
 word_separator = ،
@@ -392,4 +392,17 @@ error.USER_BLOCKED = تم حظرك
 error.USER_REMOVED = تم إزالة الحساب المتعلق بهذه الجلسة
 error.INVALID_PROPERTY = خاصية غير مناسبة
 error.INVALID_INCLUDE = مضمون غير مناسب
-error.INVALID_POLICY = فشل إجراءات السياسة الأمنية
+error.INVALID_POLICY = فشل إجراءات السياسة الأمنية`
+
+const ALL = {en, fi, ru, de, es, ar};
+
+return config.supportedLanguages.map((language) => {
+  const unregionalizedName = language.split("-")[0];
+  if (ALL[language]) {
+    return ALL[language]
+  } else if (ALL[unregionalizedName]) {
+    return ALL[unregionalizedName].replace("[" + unregionalizedName + "]", "[" + language + "]");
+  } else {
+    return ALL.en.replace("[en]", "[" + language + "]");
+  }
+}).join("\n\n");

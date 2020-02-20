@@ -13,6 +13,8 @@ export interface IConfigRawJSONDataType {
     msTileColor: string;
     themeColor: string;
     backgroundColor: string;
+    orientation: "portrait" | "landscape",
+    display: "fullscreen" | "standalone" | "minimal-ui" | "browser",
   };
   fontUrl: string;
 
@@ -32,6 +34,7 @@ export interface ISensitiveConfigRawJSONDataType {
   hereAppID: string;
   hereAppCode: string;
   jwtKey: string;
+  devKey: string;
 }
 
 export interface IDBConfigRawJSONDataType {
@@ -86,6 +89,9 @@ export const rawSensitiveConfigSchema = {
     jwtKey: {
       type: "string",
     },
+    devKey: {
+      type: "string",
+    },
   },
   additionalProperties: false,
   required: [
@@ -93,6 +99,7 @@ export const rawSensitiveConfigSchema = {
     "hereAppID",
     "hereAppCode",
     "jwtKey",
+    "devKey",
   ],
 };
 
@@ -150,7 +157,24 @@ export const rawConfigSchema = {
         backgroundColor: {
           type: "string",
         },
+        orientation: {
+          enum: ["portrait", "landscape"],
+          type: "string",
+        },
+        display: {
+          enum: ["fullscreen", "standalone", "minimal-ui", "browser"],
+          type: "string",
+        }
       },
+      additionalProperties: false,
+      required: [
+        "macSafariMaskIconThemeColor",
+        "msTileColor",
+        "themeColor",
+        "backgroundColor",
+        "orientation",
+        "display",
+      ],
     },
     fallbackCountryCode: {
       type: "string",

@@ -13,6 +13,8 @@ export interface IConfigRawJSONDataType {
         msTileColor: string;
         themeColor: string;
         backgroundColor: string;
+        orientation: "portrait" | "landscape";
+        display: "fullscreen" | "standalone" | "minimal-ui" | "browser";
     };
     fontUrl: string;
     fallbackCountryCode: string;
@@ -27,6 +29,7 @@ export interface ISensitiveConfigRawJSONDataType {
     hereAppID: string;
     hereAppCode: string;
     jwtKey: string;
+    devKey: string;
 }
 export interface IDBConfigRawJSONDataType {
     host: string;
@@ -61,6 +64,9 @@ export declare const rawSensitiveConfigSchema: {
             }[];
         };
         jwtKey: {
+            type: string;
+        };
+        devKey: {
             type: string;
         };
     };
@@ -121,7 +127,17 @@ export declare const rawConfigSchema: {
                 backgroundColor: {
                     type: string;
                 };
+                orientation: {
+                    enum: string[];
+                    type: string;
+                };
+                display: {
+                    enum: string[];
+                    type: string;
+                };
             };
+            additionalProperties: boolean;
+            required: string[];
         };
         fallbackCountryCode: {
             type: string;

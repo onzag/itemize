@@ -228,6 +228,8 @@ export async function initializeItemizeApp(
     // have been imported, and should be available for moment
     Moment.locale(initialLang);
     document.body.parentElement.lang = initialLang;
+    (document.head.querySelector("[rel='manifest']") as HTMLLinkElement).href =
+      "/rest/resource/manifest." + initialLang + ".json";
 
     // now we get the app that we are expected to use
     const app = <App
