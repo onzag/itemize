@@ -12,7 +12,6 @@ import colors from "colors/safe";
 import htmlMinifier from "html-minifier";
 import Svgo from "svgo";
 import { checkExists } from "./util";
-import { IConfigRawJSONDataType } from "../config";
 import { IBuilderBasicConfigType } from "./config";
 const svgo = new Svgo();
 const fsAsync = fs.promises;
@@ -74,12 +73,6 @@ const REQUIRED_RESOURCES = [
    * is setup in the manifest config
    */
   "icons/mstile-square-150x150.png",
-  /**
-   * The metro microsoft edge tile in 70x70 form
-   * allow transparency, the color of the background of the tile
-   * is setup in the manifest config
-   */
-  "icons/mstile-square-70x70.png",
   /**
    * The metro microsoft edge tile in 310x150 form
    * allow transparency, the color of the background of the tile

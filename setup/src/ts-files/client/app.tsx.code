@@ -1,5 +1,17 @@
 import React from "react";
 
+// Remember that when adding fast prototyping components they might demand
+// localization data, if you get an error named
+// Uncaught Error: Unknown key in context: xxxxxxx from localization.tsx
+// this means this is a required localization key you need to go to your
+// schema .properties file, depending on the context, and add the missing key
+// keys are self descriptive on what they should contain, it might be data for
+// hard hearing, tooltips or just display text
+
+// you need to run npm run build-data to rebuild language packs if you are
+// in development mode with the service worker set up as `bypass for network`
+// it should work out of the box after a refresh
+
 export default function App()<0>{
 	return (
 		<React.Fragment>
