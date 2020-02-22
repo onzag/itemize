@@ -24,7 +24,7 @@ async function editItemDefinition(appData, resolverArgs, itemDefinition) {
     await basic_1.validateTokenIsntBlocked(appData.cache, tokenData);
     // now we get the requested fields, and check they are available for the given role
     const requestedFields = gql_util_1.flattenRawGQLValueOrFields(graphql_fields_1.default(resolverArgs.info));
-    basic_1.checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+    basic_1.checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
     // now we get the basic information
     const mod = itemDefinition.getParentModule();
     const moduleTable = mod.getQualifiedPathName();

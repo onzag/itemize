@@ -1,7 +1,6 @@
 import {
   PREFIX_BUILD,
   MODERATION_FIELDS,
-  ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
   MAX_SEARCH_RESULTS_AT_ONCE_LIMIT,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   RESERVED_BASE_PROPERTIES,
@@ -230,7 +229,11 @@ const checkBasicFieldsAreAvailableForRoleDebug = Debug("resolvers:checkBasicFiel
  * function
  * @param requestedFields the requested fields
  */
-export function checkBasicFieldsAreAvailableForRole(tokenData: IServerSideTokenDataType, requestedFields: any) {
+export function checkBasicFieldsAreAvailableForRole(
+  itemDefinitionOrModule: ItemDefinition | Module,
+  tokenData: IServerSideTokenDataType,
+  requestedFields: any,
+) {
   checkBasicFieldsAreAvailableForRoleDebug(
     "EXECUTED with token info %j and requested fields %j",
     tokenData,
@@ -242,19 +245,24 @@ export function checkBasicFieldsAreAvailableForRole(tokenData: IServerSideTokenD
 
   // if they have been requested, and our role has no native access to that
   if (
-    moderationFieldsHaveBeenRequested &&
-    !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
+    moderationFieldsHaveBeenRequested
   ) {
-    checkBasicFieldsAreAvailableForRoleDebug(
-      "FAILED Attempted to access to moderation fields with role %j only %j allowed",
-      tokenData.role,
-      ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS,
-    );
-    // we throw an error
-    throw new EndpointError({
-      message: "You have requested to add/edit/view moderation fields with role: " + tokenData.role,
-      code: ENDPOINT_ERRORS.FORBIDDEN,
-    });
+    const rolesThatHaveAccessToModerationFields = itemDefinitionOrModule.getRolesWithModerationAccess();
+    const hasAccessToModerationFields = rolesThatHaveAccessToModerationFields.includes(ANYONE_METAROLE) ||
+      (rolesThatHaveAccessToModerationFields.includes(ANYONE_LOGGED_METAROLE) && tokenData.role !== GUEST_METAROLE) ||
+      rolesThatHaveAccessToModerationFields.includes(tokenData.role);
+    if (!hasAccessToModerationFields) {
+      checkBasicFieldsAreAvailableForRoleDebug(
+        "FAILED Attempted to access to moderation fields with role %j only %j allowed",
+        tokenData.role,
+        rolesThatHaveAccessToModerationFields,
+      );
+      // we throw an error
+      throw new EndpointError({
+        message: "You have requested to add/edit/view moderation fields with role: " + tokenData.role,
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    }
   }
 
   // That was basically the only thing that function does by so far
@@ -465,15 +473,14 @@ export function filterAndPrepareGQLValue(
     toReturnToUser: actualValue,
     actualValue,
   };
-
-  if (
-    value.blocked_at !== null &&
-    !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(role)
-  ) {
-    valueToProvide.toReturnToUser = {
-      ...valueToProvide.toReturnToUser,
-      DATA: null,
-    };
+  if (value.blocked_at !== null) {
+    const rolesThatHaveAccessToModerationFields = parentModuleOrIdef.getRolesWithModerationAccess();
+    const hasAccessToModerationFields = rolesThatHaveAccessToModerationFields.includes(ANYONE_METAROLE) ||
+      (rolesThatHaveAccessToModerationFields.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE) ||
+      rolesThatHaveAccessToModerationFields.includes(role);
+    if (!hasAccessToModerationFields) {
+      valueToProvide.toReturnToUser.DATA = null;
+    }
   }
 
   filterAndPrepareGQLValueDebug(

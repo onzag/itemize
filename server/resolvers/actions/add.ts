@@ -74,7 +74,7 @@ export async function addItemDefinition(
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
   // now we use the basic functions and we check if the basic fields are available,
   // basic fields are module based, like moderation fields
-  checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+  checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
 
   // now we extract the fields that we are actually adding to the item
   // definition, that is what is valid for adding and nothing else

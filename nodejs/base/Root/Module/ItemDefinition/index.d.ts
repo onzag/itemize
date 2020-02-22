@@ -656,6 +656,17 @@ export default class ItemDefinition {
      */
     getRolesWithAccessTo(action: ItemDefinitionIOActions): string[];
     /**
+     * Provides the roles that have moderation access to
+     * the moderation fileds for a given item definition
+     * given its module rule
+     */
+    getRolesWithModerationAccess(): string[];
+    /**
+     * Provides the roles that are alowed to flag the
+     * contents of an item definition given its module
+     */
+    getRolesWithFlaggingAccess(): string[];
+    /**
      * Checks the role access for an action in an item
      * defintition
      * @param action the IO action

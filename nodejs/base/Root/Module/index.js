@@ -435,6 +435,26 @@ class Module {
         return [];
     }
     /**
+     * Provides the roles that have moderation access to
+     * the moderation fileds for a given item definition
+     */
+    getRolesWithModerationAccess() {
+        if (this.rawData.modRoleAccess) {
+            return this.rawData.modRoleAccess;
+        }
+        return [];
+    }
+    /**
+     * Provides the roles that are alowed to flag the
+     * contents of an item definition
+     */
+    getRolesWithFlaggingAccess() {
+        if (this.rawData.flagRoleAccess) {
+            return this.rawData.flagRoleAccess;
+        }
+        return [constants_1.ANYONE_LOGGED_METAROLE];
+    }
+    /**
      * Tells whether module based searches are allowed
      * @returns a boolean on whether the module is setup as searchable
      */

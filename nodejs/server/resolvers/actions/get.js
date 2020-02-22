@@ -22,7 +22,7 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
     // in the get request
     const rawFields = graphql_fields_1.default(resolverArgs.info);
     const requestedFields = gql_util_1.flattenRawGQLValueOrFields(rawFields);
-    basic_1.checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+    basic_1.checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
     // so we run the policy check for read, this item definition,
     // with the given id
     const selectQueryValue = await basic_1.runPolicyCheck({
@@ -96,7 +96,7 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
     // now we find the requested fields that are requested
     // in the get request
     const requestedFields = gql_util_1.flattenRawGQLValueOrFields(graphql_fields_1.default(resolverArgs.info).results);
-    basic_1.checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+    basic_1.checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
     // we get the requested fields that take part of the item definition
     // description
     const requestedFieldsInIdef = {};
@@ -163,7 +163,7 @@ async function getModuleList(appData, resolverArgs, mod) {
     // now we find the requested fields that are requested
     // in the get request
     const requestedFields = gql_util_1.flattenRawGQLValueOrFields(graphql_fields_1.default(resolverArgs.info).results);
-    basic_1.checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+    basic_1.checkBasicFieldsAreAvailableForRole(mod, tokenData, requestedFields);
     // we get the requested fields that take part of the item definition
     // description
     const requestedFieldsInMod = {};

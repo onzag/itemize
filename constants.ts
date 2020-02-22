@@ -880,14 +880,6 @@ export const MODERATION_FIELDS = [
   "flagged_reasons",
 ];
 
-// TODO replace these for modRoleAccess which gives role access to moderation
-// and flagRoleAccess for flagging, the default of the first will be none
-// and the default of the second will be ANYONE_LOGGED
-export const ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS = [
-  "ADMIN",
-  "MODERATOR",
-];
-
 /**
  * Units that are allowed within the itemize application these
  * are for the unit subtype

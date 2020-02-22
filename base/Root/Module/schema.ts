@@ -27,6 +27,18 @@ export default {
         type: "string",
       },
     },
+    modRoleAccess: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
+    flagRoleAccess: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
     searchable: {
       type: "boolean",
     },

@@ -263,7 +263,7 @@ error.INVALID_INCLUDE = ungültige Einbindung
 error.INVALID_POLICY = Sicherheitsabfrage gescheitert`
 
 const es = `[es]
-name = Español
+name = español
 number_decimal_separator = ,
 word_separator = ,
 currency_format = N$

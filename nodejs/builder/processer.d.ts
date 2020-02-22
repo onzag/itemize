@@ -70,6 +70,8 @@ export declare function processModule(rawData: IModuleRawJSONDataType, locale?: 
     name: string;
     i18nData: import("../base/Root/Module").IRawJSONI18NDataType;
     readRoleAccess?: string[];
+    modRoleAccess?: string[];
+    flagRoleAccess?: string[];
     searchable?: boolean;
     children: (IItemDefinitionRawJSONDataType | IModuleRawJSONDataType)[];
     propExtensions?: IPropertyDefinitionRawJSONDataType[];

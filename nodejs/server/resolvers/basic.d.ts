@@ -37,7 +37,7 @@ export declare function validateParentingRules(appData: IAppDataType, id: number
  * function
  * @param requestedFields the requested fields
  */
-export declare function checkBasicFieldsAreAvailableForRole(tokenData: IServerSideTokenDataType, requestedFields: any): void;
+export declare function checkBasicFieldsAreAvailableForRole(itemDefinitionOrModule: ItemDefinition | Module, tokenData: IServerSideTokenDataType, requestedFields: any): void;
 /**
  * Checks a list provided by the getter functions that use
  * lists to ensure the request isn't too large

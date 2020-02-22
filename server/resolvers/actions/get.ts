@@ -45,7 +45,7 @@ export async function getItemDefinition(
   // in the get request
   const rawFields = graphqlFields(resolverArgs.info);
   const requestedFields = flattenRawGQLValueOrFields(rawFields);
-  checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+  checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
 
   // so we run the policy check for read, this item definition,
   // with the given id
@@ -162,7 +162,7 @@ export async function getItemDefinitionList(
   // now we find the requested fields that are requested
   // in the get request
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info).results);
-  checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+  checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
 
   // we get the requested fields that take part of the item definition
   // description
@@ -258,7 +258,7 @@ export async function getModuleList(
   // now we find the requested fields that are requested
   // in the get request
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info).results);
-  checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+  checkBasicFieldsAreAvailableForRole(mod, tokenData, requestedFields);
 
   // we get the requested fields that take part of the item definition
   // description

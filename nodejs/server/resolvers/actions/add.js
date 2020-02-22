@@ -37,7 +37,7 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
     const requestedFields = gql_util_1.flattenRawGQLValueOrFields(graphql_fields_1.default(resolverArgs.info));
     // now we use the basic functions and we check if the basic fields are available,
     // basic fields are module based, like moderation fields
-    basic_1.checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+    basic_1.checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
     // now we extract the fields that we are actually adding to the item
     // definition, that is what is valid for adding and nothing else
     // for that we loop over the arguments, and we only get what is ITEM_

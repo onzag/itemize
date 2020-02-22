@@ -182,19 +182,24 @@ const checkBasicFieldsAreAvailableForRoleDebug = debug_1.default("resolvers:chec
  * function
  * @param requestedFields the requested fields
  */
-function checkBasicFieldsAreAvailableForRole(tokenData, requestedFields) {
+function checkBasicFieldsAreAvailableForRole(itemDefinitionOrModule, tokenData, requestedFields) {
     checkBasicFieldsAreAvailableForRoleDebug("EXECUTED with token info %j and requested fields %j", tokenData, requestedFields);
     // now we check if moderation fields have been requested
     const moderationFieldsHaveBeenRequested = constants_1.MODERATION_FIELDS.some((field) => requestedFields[field]);
     // if they have been requested, and our role has no native access to that
-    if (moderationFieldsHaveBeenRequested &&
-        !constants_1.ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)) {
-        checkBasicFieldsAreAvailableForRoleDebug("FAILED Attempted to access to moderation fields with role %j only %j allowed", tokenData.role, constants_1.ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS);
-        // we throw an error
-        throw new errors_1.EndpointError({
-            message: "You have requested to add/edit/view moderation fields with role: " + tokenData.role,
-            code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
-        });
+    if (moderationFieldsHaveBeenRequested) {
+        const rolesThatHaveAccessToModerationFields = itemDefinitionOrModule.getRolesWithModerationAccess();
+        const hasAccessToModerationFields = rolesThatHaveAccessToModerationFields.includes(constants_1.ANYONE_METAROLE) ||
+            (rolesThatHaveAccessToModerationFields.includes(constants_1.ANYONE_LOGGED_METAROLE) && tokenData.role !== constants_1.GUEST_METAROLE) ||
+            rolesThatHaveAccessToModerationFields.includes(tokenData.role);
+        if (!hasAccessToModerationFields) {
+            checkBasicFieldsAreAvailableForRoleDebug("FAILED Attempted to access to moderation fields with role %j only %j allowed", tokenData.role, rolesThatHaveAccessToModerationFields);
+            // we throw an error
+            throw new errors_1.EndpointError({
+                message: "You have requested to add/edit/view moderation fields with role: " + tokenData.role,
+                code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+            });
+        }
     }
     // That was basically the only thing that function does by so far
     checkBasicFieldsAreAvailableForRoleDebug("SUCCEED");
@@ -362,12 +367,14 @@ function filterAndPrepareGQLValue(value, requestedFields, role, parentModuleOrId
         toReturnToUser: actualValue,
         actualValue,
     };
-    if (value.blocked_at !== null &&
-        !constants_1.ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(role)) {
-        valueToProvide.toReturnToUser = {
-            ...valueToProvide.toReturnToUser,
-            DATA: null,
-        };
+    if (value.blocked_at !== null) {
+        const rolesThatHaveAccessToModerationFields = parentModuleOrIdef.getRolesWithModerationAccess();
+        const hasAccessToModerationFields = rolesThatHaveAccessToModerationFields.includes(constants_1.ANYONE_METAROLE) ||
+            (rolesThatHaveAccessToModerationFields.includes(constants_1.ANYONE_LOGGED_METAROLE) && role !== constants_1.GUEST_METAROLE) ||
+            rolesThatHaveAccessToModerationFields.includes(role);
+        if (!hasAccessToModerationFields) {
+            valueToProvide.toReturnToUser.DATA = null;
+        }
     }
     filterAndPrepareGQLValueDebug("SUCCEED with %j", valueToProvide);
     return valueToProvide;

@@ -7,8 +7,14 @@
 import Moment from "moment";
 import { JSDOM } from "jsdom";
 import createDOMPurify from "dompurify";
-import { STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES, EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
-  ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS, MODERATION_FIELDS } from "./constants";
+import {
+  STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
+  EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
+  MODERATION_FIELDS,
+  ANYONE_LOGGED_METAROLE,
+  GUEST_METAROLE,
+  ANYONE_METAROLE,
+} from "./constants";
 import ItemDefinition, { ItemDefinitionIOActions } from "./base/Root/Module/ItemDefinition";
 import equals from "deep-equal";
 
@@ -17,7 +23,7 @@ import equals from "deep-equal";
  * @param str the string to capitalize
  */
 export function capitalize(str: string) {
-  return str.charAt(0).toLocaleUpperCase() + str.slice(1);
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 /**
@@ -259,8 +265,14 @@ export function getFieldsAndArgs(
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
     requestFields[p] = {};
   });
+
+  const moderationRoles = options.itemDefinitionInstance.getRolesWithModerationAccess();
+  const canReadModerationFields =
+    moderationRoles.includes(ANYONE_METAROLE) ||
+    (moderationRoles.includes(ANYONE_LOGGED_METAROLE) && options.userRole !== GUEST_METAROLE) ||
+    moderationRoles.includes(options.userRole);
   // and if our role allows it, we add the moderation fields
-  if (ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(options.userRole)) {
+  if (canReadModerationFields) {
     MODERATION_FIELDS.forEach((mf) => {
       requestFields.DATA[mf] = {};
     });

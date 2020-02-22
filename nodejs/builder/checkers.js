@@ -735,6 +735,16 @@ function checkModule(rawRootData, rawData, traceback) {
     }
     // check the i18n consistency so that custom keys are valid
     checkI18nCustomConsistency(rawData.i18nData, traceback.newTraceToLocation(rawData.i18nDataLocation));
+    if (rawData.modRoleAccess &&
+        (rawData.modRoleAccess.includes(constants_1.ANYONE_METAROLE) ||
+            rawData.modRoleAccess.includes(constants_1.GUEST_METAROLE))) {
+        throw new Error_1.default("Allowing the roles for anyone or guests to moderate is not allowed, as this can create a security flaw", actualTraceback.newTraceToBit("modRoleAccess"));
+    }
+    if (rawData.flagRoleAccess &&
+        (rawData.flagRoleAccess.includes(constants_1.ANYONE_METAROLE) ||
+            rawData.flagRoleAccess.includes(constants_1.GUEST_METAROLE))) {
+        throw new Error_1.default("Allowing the roles for anyone or guests to flag is not allowed, as this can create a security flaw", actualTraceback.newTraceToBit("flagRoleAccess"));
+    }
     // and we got to check the prop extensions if we have some
     if (rawData.propExtensions) {
         // and now the prop extension traceback

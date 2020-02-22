@@ -9,6 +9,7 @@ import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDe
 import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../imported-resources";
 import { IncludeContext } from "../providers/include";
 import { ModuleContext } from "../providers/module";
+import { capitalize as utilcapitalize} from "../../util";
 
 interface II18nReadProps {
   id: string;
@@ -278,6 +279,10 @@ export function I18nReadError(props: II18nReadErrorProps) {
       }
     </LocaleContext.Consumer>
   );
+}
+
+export function capitalize(str: string) {
+  return utilcapitalize(str);
 }
 
 interface IFnAppLanguageRetrieverLanguageFormType {

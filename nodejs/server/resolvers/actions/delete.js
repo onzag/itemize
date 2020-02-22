@@ -22,7 +22,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     await basic_1.validateTokenIsntBlocked(appData.cache, tokenData);
     // we flatten and get the requested fields
     const requestedFields = gql_util_1.flattenRawGQLValueOrFields(graphql_fields_1.default(resolverArgs.info));
-    basic_1.checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+    basic_1.checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
     // now we get this basic information
     const mod = itemDefinition.getParentModule();
     const moduleTable = mod.getQualifiedPathName();
@@ -66,14 +66,19 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
             // if the content is blocked, and our role has no special access
             // to moderation fields, then this content cannot be removed
             // from the website, no matter what
-            if (content.blocked_at !== null &&
-                !constants_1.ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)) {
-                debug("FAILED due to blocked content and no moderation access for role %s", tokenData.role);
-                throw new errors_1.EndpointError({
-                    message: "The item is blocked, only users with role " +
-                        constants_1.ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.join(",") + " can wipe this data",
-                    code: constants_1.ENDPOINT_ERRORS.BLOCKED,
-                });
+            if (content.blocked_at !== null) {
+                const rolesThatHaveAccessToModerationFields = itemDefinition.getRolesWithModerationAccess();
+                const hasAccessToModerationFields = rolesThatHaveAccessToModerationFields.includes(constants_1.ANYONE_METAROLE) ||
+                    (rolesThatHaveAccessToModerationFields.includes(constants_1.ANYONE_LOGGED_METAROLE) && tokenData.role !== constants_1.GUEST_METAROLE) ||
+                    rolesThatHaveAccessToModerationFields.includes(tokenData.role);
+                if (!hasAccessToModerationFields) {
+                    debug("FAILED due to blocked content and no moderation access for role %s", tokenData.role);
+                    throw new errors_1.EndpointError({
+                        message: "The item is blocked, only users with role " +
+                            rolesThatHaveAccessToModerationFields.join(",") + " can wipe this data",
+                        code: constants_1.ENDPOINT_ERRORS.BLOCKED,
+                    });
+                }
             }
         },
     });

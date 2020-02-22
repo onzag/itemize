@@ -19,7 +19,7 @@ const deep_equal_1 = __importDefault(require("deep-equal"));
  * @param str the string to capitalize
  */
 function capitalize(str) {
-    return str.charAt(0).toLocaleUpperCase() + str.slice(1);
+    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 exports.capitalize = capitalize;
 /**
@@ -241,8 +241,12 @@ function getFieldsAndArgs(options) {
     constants_1.EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
         requestFields[p] = {};
     });
+    const moderationRoles = options.itemDefinitionInstance.getRolesWithModerationAccess();
+    const canReadModerationFields = moderationRoles.includes(constants_1.ANYONE_METAROLE) ||
+        (moderationRoles.includes(constants_1.ANYONE_LOGGED_METAROLE) && options.userRole !== constants_1.GUEST_METAROLE) ||
+        moderationRoles.includes(options.userRole);
     // and if our role allows it, we add the moderation fields
-    if (constants_1.ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(options.userRole)) {
+    if (canReadModerationFields) {
         constants_1.MODERATION_FIELDS.forEach((mf) => {
             requestFields.DATA[mf] = {};
         });

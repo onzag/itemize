@@ -524,7 +524,6 @@ export declare const GUEST_METAROLE = "&GUEST";
  * Moderation fields for flagging
  */
 export declare const MODERATION_FIELDS: string[];
-export declare const ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS: string[];
 /**
  * Units that are allowed within the itemize application these
  * are for the unit subtype

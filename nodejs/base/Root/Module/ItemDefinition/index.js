@@ -819,6 +819,21 @@ class ItemDefinition {
         return [];
     }
     /**
+     * Provides the roles that have moderation access to
+     * the moderation fileds for a given item definition
+     * given its module rule
+     */
+    getRolesWithModerationAccess() {
+        return this.parentModule.getRolesWithModerationAccess();
+    }
+    /**
+     * Provides the roles that are alowed to flag the
+     * contents of an item definition given its module
+     */
+    getRolesWithFlaggingAccess() {
+        return this.parentModule.getRolesWithFlaggingAccess();
+    }
+    /**
      * Checks the role access for an action in an item
      * defintition
      * @param action the IO action

@@ -121,7 +121,7 @@ function removeDiacriticsFromValue(value) {
     // this is where we are adding the new stuff
     const newValue = {
         value: value.value,
-        valueNorm: value.value.toLocaleLowerCase(),
+        valueNorm: value.value.toLowerCase(),
         filter: value.filter,
     };
     // so we check for a i18n value
@@ -131,7 +131,7 @@ function removeDiacriticsFromValue(value) {
         newValue.i18nNorm = {};
         Object.keys(newValue.i18n).forEach((locale) => {
             // and we remove diacritics one by one
-            newValue.i18nNorm[locale] = diacritics_1.default.remove(newValue.i18n[locale].toLocaleLowerCase());
+            newValue.i18nNorm[locale] = diacritics_1.default.remove(newValue.i18n[locale].toLowerCase());
         });
     }
     return newValue;
@@ -201,7 +201,7 @@ class Autocomplete {
      */
     findRecommendations(matchStr, specifiedFilter) {
         // we normalize the string
-        const normalizedMatchStr = diacritics_1.default.remove(matchStr.toLocaleLowerCase());
+        const normalizedMatchStr = diacritics_1.default.remove(matchStr.toLowerCase());
         // and we call the sort from function
         return sortFrom(
         // from the filtered values
@@ -217,7 +217,7 @@ class Autocomplete {
      */
     findI18nRecommendations(matchStr, locale, specifiedFilter) {
         // we nornalize
-        const normalizedMatchStr = diacritics_1.default.remove(matchStr.toLocaleLowerCase());
+        const normalizedMatchStr = diacritics_1.default.remove(matchStr.toLowerCase());
         // and sort from using the locale
         return sortFrom(
         // from the filtered values using the locale

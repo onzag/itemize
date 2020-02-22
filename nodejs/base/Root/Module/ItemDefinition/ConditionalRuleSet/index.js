@@ -139,8 +139,8 @@ class ConditionalRuleSet {
             }
             // This method swallows the nulls so it's allowed here
             if (rawDataAsProperty.method === "string") {
-                actualPropertyValue = ((actualPropertyValue || "").toString()).toLocaleLowerCase();
-                actualComparedValue = ((actualComparedValue || "").toString()).toLocaleLowerCase();
+                actualPropertyValue = ((actualPropertyValue || "").toString()).toLowerCase();
+                actualComparedValue = ((actualComparedValue || "").toString()).toLowerCase();
             }
             // nulls cannot be compared via these methods so it gives false
             // any comparison involving null and these comparators gives false

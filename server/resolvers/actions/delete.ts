@@ -11,7 +11,8 @@ import {
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import { EndpointError } from "../../../base/errors";
-import { ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS, ENDPOINT_ERRORS } from "../../../constants";
+import { ENDPOINT_ERRORS, ANYONE_LOGGED_METAROLE, ANYONE_METAROLE,
+  GUEST_METAROLE } from "../../../constants";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { deleteEverythingInTransitoryId } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
 import { IChangedFeedbackEvent } from "../../../base/remote-protocol";
@@ -34,7 +35,7 @@ export async function deleteItemDefinition(
 
   // we flatten and get the requested fields
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
-  checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+  checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
 
   // now we get this basic information
   const mod = itemDefinition.getParentModule();
@@ -85,15 +86,20 @@ export async function deleteItemDefinition(
         // to moderation fields, then this content cannot be removed
         // from the website, no matter what
         if (
-          content.blocked_at !== null &&
-          !ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.includes(tokenData.role)
+          content.blocked_at !== null
         ) {
-          debug("FAILED due to blocked content and no moderation access for role %s", tokenData.role);
-          throw new EndpointError({
-            message: "The item is blocked, only users with role " +
-            ROLES_THAT_HAVE_ACCESS_TO_MODERATION_FIELDS.join(",") + " can wipe this data",
-            code: ENDPOINT_ERRORS.BLOCKED,
-          });
+          const rolesThatHaveAccessToModerationFields = itemDefinition.getRolesWithModerationAccess();
+          const hasAccessToModerationFields = rolesThatHaveAccessToModerationFields.includes(ANYONE_METAROLE) ||
+            (rolesThatHaveAccessToModerationFields.includes(ANYONE_LOGGED_METAROLE) && tokenData.role !== GUEST_METAROLE) ||
+            rolesThatHaveAccessToModerationFields.includes(tokenData.role);
+          if (!hasAccessToModerationFields) {
+            debug("FAILED due to blocked content and no moderation access for role %s", tokenData.role);
+            throw new EndpointError({
+              message: "The item is blocked, only users with role " +
+              rolesThatHaveAccessToModerationFields.join(",") + " can wipe this data",
+              code: ENDPOINT_ERRORS.BLOCKED,
+            });
+          }
         }
       },
     },

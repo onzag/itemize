@@ -48,7 +48,7 @@ export async function editItemDefinition(
 
   // now we get the requested fields, and check they are available for the given role
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
-  checkBasicFieldsAreAvailableForRole(tokenData, requestedFields);
+  checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
 
   // now we get the basic information
   const mod = itemDefinition.getParentModule();

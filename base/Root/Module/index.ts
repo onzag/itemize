@@ -18,6 +18,7 @@ import {
   OWNER_METAROLE,
   UNSPECIFIED_OWNER,
   GUEST_METAROLE,
+  ANYONE_LOGGED_METAROLE,
 } from "../../../constants";
 import { GraphQLObjectType } from "graphql";
 import { buildSearchModeModule } from "./search-mode";
@@ -152,6 +153,20 @@ export interface IModuleRawJSONDataType {
    * The read role access
    */
   readRoleAccess?: string[];
+
+  /**
+   * The roles that have moderation capabilities
+   * over the item definitions under this module
+   */
+  modRoleAccess?: string[];
+
+  /**
+   * The roles that have flagging capabilities over
+   * the item definitions of this module, if not
+   * specified defaults to anyone logged
+   */
+  flagRoleAccess?: string[];
+
   /**
    * Whether the module, and only the module itself
    * is searchable
@@ -714,6 +729,28 @@ export default class Module {
       return this.rawData.readRoleAccess || [ANYONE_METAROLE];
     }
     return [];
+  }
+
+  /**
+   * Provides the roles that have moderation access to
+   * the moderation fileds for a given item definition
+   */
+  public getRolesWithModerationAccess(): string[] {
+    if (this.rawData.modRoleAccess) {
+      return this.rawData.modRoleAccess;
+    }
+    return [];
+  }
+
+  /**
+   * Provides the roles that are alowed to flag the
+   * contents of an item definition
+   */
+  public getRolesWithFlaggingAccess(): string[] {
+    if (this.rawData.flagRoleAccess) {
+      return this.rawData.flagRoleAccess;
+    }
+    return [ANYONE_LOGGED_METAROLE];
   }
 
   /**

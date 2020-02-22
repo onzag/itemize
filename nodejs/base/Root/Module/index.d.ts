@@ -131,6 +131,17 @@ export interface IModuleRawJSONDataType {
      */
     readRoleAccess?: string[];
     /**
+     * The roles that have moderation capabilities
+     * over the item definitions under this module
+     */
+    modRoleAccess?: string[];
+    /**
+     * The roles that have flagging capabilities over
+     * the item definitions of this module, if not
+     * specified defaults to anyone logged
+     */
+    flagRoleAccess?: string[];
+    /**
      * Whether the module, and only the module itself
      * is searchable
      */
@@ -366,6 +377,16 @@ export default class Module {
      * @param action the action from the ItemDefinitionIOActions
      */
     getRolesWithAccessTo(action: ItemDefinitionIOActions): string[];
+    /**
+     * Provides the roles that have moderation access to
+     * the moderation fileds for a given item definition
+     */
+    getRolesWithModerationAccess(): string[];
+    /**
+     * Provides the roles that are alowed to flag the
+     * contents of an item definition
+     */
+    getRolesWithFlaggingAccess(): string[];
     /**
      * Tells whether module based searches are allowed
      * @returns a boolean on whether the module is setup as searchable

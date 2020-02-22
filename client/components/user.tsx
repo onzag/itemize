@@ -1,15 +1,21 @@
 import React from "react";
 import { TokenContext } from "../internal/app/internal-providers";
 
-interface IUserIdRetrieverProps {
-  children: (id: number) => React.ReactNode;
+interface IUserDataRetrieverProps {
+  children: (arg: {
+    id: number;
+    role: string;
+  }) => React.ReactNode;
 }
-export function UserIdRetriever(props: IUserIdRetrieverProps) {
+export function UserDataRetriever(props: IUserDataRetrieverProps) {
   return (
     <TokenContext.Consumer>
       {
         (value) => {
-          return props.children(value.id);
+          return props.children({
+            id: value.id,
+            role: value.role,
+          });
         }
       }
     </TokenContext.Consumer>

@@ -22,6 +22,18 @@ declare const _default: {
                 type: string;
             };
         };
+        modRoleAccess: {
+            type: string;
+            items: {
+                type: string;
+            };
+        };
+        flagRoleAccess: {
+            type: string;
+            items: {
+                type: string;
+            };
+        };
         searchable: {
             type: string;
         };

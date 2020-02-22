@@ -16,6 +16,8 @@ import {
   RESERVED_GETTER_PROPERTIES,
   RESERVED_CHANGE_PROPERTIES,
   OWNER_METAROLE,
+  ANYONE_METAROLE,
+  GUEST_METAROLE,
 } from "../constants";
 import "source-map-support/register";
 import {
@@ -36,7 +38,6 @@ import { IPropertiesValueMappingDefinitonRawJSONDataType } from "../base/Root/Mo
 import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { IFilterRawJSONDataType, IAutocompleteValueRawJSONDataType } from "../base/Autocomplete";
 import Module from "../base/Root/Module";
-import { IConfigRawJSONDataType } from "../config";
 import { IBuilderBasicConfigType } from "./config";
 
 /**
@@ -1154,6 +1155,32 @@ export function checkModule(
     rawData.i18nData,
     traceback.newTraceToLocation(rawData.i18nDataLocation),
   );
+
+  if (
+    rawData.modRoleAccess &&
+    (
+      rawData.modRoleAccess.includes(ANYONE_METAROLE) ||
+      rawData.modRoleAccess.includes(GUEST_METAROLE)
+    )
+  ) {
+    throw new CheckUpError(
+      "Allowing the roles for anyone or guests to moderate is not allowed, as this can create a security flaw",
+      actualTraceback.newTraceToBit("modRoleAccess"),
+    );
+  }
+
+  if (
+    rawData.flagRoleAccess &&
+    (
+      rawData.flagRoleAccess.includes(ANYONE_METAROLE) ||
+      rawData.flagRoleAccess.includes(GUEST_METAROLE)
+    )
+  ) {
+    throw new CheckUpError(
+      "Allowing the roles for anyone or guests to flag is not allowed, as this can create a security flaw",
+      actualTraceback.newTraceToBit("flagRoleAccess"),
+    );
+  }
 
   // and we got to check the prop extensions if we have some
   if (rawData.propExtensions) {
