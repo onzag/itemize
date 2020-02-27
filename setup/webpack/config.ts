@@ -63,6 +63,10 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /stream-browserify/,
+        use: "null-loader"
+      },
+      {
         test: /readable-stream/,
         use: "null-loader"
       },

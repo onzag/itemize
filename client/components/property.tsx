@@ -4,9 +4,9 @@ import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefi
 import { ItemDefinitionContext } from "../providers/item-definition";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { RESERVED_BASE_PROPERTIES } from "../../constants";
-import PropertyView, { RawBasePropertyView } from "./base/PropertyView";
-import PropertyEntry from "./base/PropertyEntry";
-import PropertySetter from "./base/PropertySetter";
+import PropertyView, { RawBasePropertyView } from "../internal/components/PropertyView";
+import PropertyEntry from "../internal/components/PropertyEntry";
+import PropertySetter from "../internal/components/PropertySetter";
 import { IncludeContext } from "../providers/include";
 
 type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search";
@@ -145,6 +145,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                   return null;
                 } else if (type === "entry") {
                   // property has no state it must be hidden
+                  // or somehow not accessible eg. it has been optimized for
                   if (!propertyState) {
                     return null;
                   }

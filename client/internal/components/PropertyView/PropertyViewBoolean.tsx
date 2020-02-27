@@ -1,6 +1,6 @@
 import { IPropertyViewProps } from ".";
 import React from "react";
-import { capitalize } from "../../../util";
+import { capitalize } from "../../../../util";
 import { Icon } from "@material-ui/core";
 
 export default class PropertyViewBoolean extends React.Component<IPropertyViewProps, {}> {

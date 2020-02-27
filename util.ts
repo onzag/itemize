@@ -297,7 +297,7 @@ export function getFieldsAndArgs(
     // if taking all it depends on the rules, and the role access
     const shouldBeIncludedInFields = options.includeFields ? (
       options.onlyIncludeProperties ?
-        options.onlyIncludeProperties.includes(pd.getId()) :
+        options.onlyIncludeProperties.includes(pd.getId()) && !pd.isRetrievalDisabled() :
         (
           !pd.isRetrievalDisabled() && pd.checkRoleAccessFor(
             ItemDefinitionIOActions.READ,

@@ -1,20 +1,20 @@
 import React from "react";
-import Include, { IIncludeState, IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
-import { ILocaleContextType, LocaleContext } from "../../internal/app";
-import { RendererContext } from "../../providers/renderer";
+import Include, { IIncludeState, IncludeExclusionState } from "../../../../base/Root/Module/ItemDefinition/Include";
+import { ILocaleContextType, LocaleContext } from "../../app";
+import { RendererContext } from "../../../providers/renderer";
 import equals from "deep-equal";
-import { IRendererProps } from "../../internal/renderer";
+import { IRendererProps } from "../../renderer";
 
 interface IIncludeCalloutWarningProps {
   include: Include;
   state: IIncludeState;
-  renderer?: (props: IIncludeCalloutWarningRendererProps) => any;
+  renderer?: React.ComponentType<IIncludeCalloutWarningRendererProps>
   rendererArgs?: object;
 }
 
 interface IActualIncludeCalloutWarningProps extends IIncludeCalloutWarningProps {
   locale: ILocaleContextType;
-  renderer: (props: IIncludeCalloutWarningRendererProps) => any;
+  renderer: React.ComponentType<IIncludeCalloutWarningRendererProps>;
   rendererArgs: object;
 }
 
@@ -37,12 +37,14 @@ class ActualIncludeCalloutWarning extends React.Component<IActualIncludeCalloutW
     let active = this.props.include.isExclusionCallout() &&
       this.props.state.exclusionState === IncludeExclusionState.EXCLUDED;
 
-    return this.props.renderer({
+    const RendererElement = this.props.renderer;
+    const rendererProps = {
       warning,
       active,
       args: this.props.rendererArgs,
       rtl: this.props.locale.rtl,
-    });
+    };
+    return <RendererElement {...rendererProps}/>
   }
 }
 
@@ -55,7 +57,7 @@ export default function IncludeCalloutWarning(props: IIncludeCalloutWarningProps
           (locale) => <ActualIncludeCalloutWarning
             {...props} locale={locale}
             renderer={props.renderer}
-            rendererArgs={props.rendererArgs || null}
+            rendererArgs={props.rendererArgs || {}}
           />
         }
       </LocaleContext.Consumer>
@@ -71,7 +73,7 @@ export default function IncludeCalloutWarning(props: IIncludeCalloutWarningProps
                 {...props}
                 locale={locale}
                 renderer={renderers.IncludeCalloutWarning}
-                rendererArgs={props.rendererArgs || null}
+                rendererArgs={props.rendererArgs || {}}
               />
             }
           </LocaleContext.Consumer>

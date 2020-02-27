@@ -1,20 +1,20 @@
 import PropertyDefinition, {
   IPropertyDefinitionState,
-} from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+} from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
-import { LocaleContext, ILocaleContextType } from "../../internal/app";
-import { Ii18NType } from "../../../base/Root";
+import { LocaleContext, ILocaleContextType } from "../../app";
+import { Ii18NType } from "../../../../base/Root";
 import {
   PropertyDefinitionSupportedTypeName,
-} from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import { currencies, countries, ICurrencyType, ICountryType } from "../../../imported-resources";
+} from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { currencies, countries, ICurrencyType, ICountryType } from "../../../../imported-resources";
 import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
 import { IPropertyViewThemeType, style, STANDARD_THEME } from "./styles";
-import PropertyViewField from "./PropertyViewField";
-import PropertyViewDateTime from "./PropertyViewDateTime";
-import PropertyViewBoolean from "./PropertyViewBoolean";
-import PropertyViewText from "./PropertyViewText";
-import PropertyViewLocation from "./PropertyViewLocation";
+// import PropertyViewField from "./PropertyViewField";
+// import PropertyViewDateTime from "./PropertyViewDateTime";
+// import PropertyViewBoolean from "./PropertyViewBoolean";
+// import PropertyViewText from "./PropertyViewText";
+// import PropertyViewLocation from "./PropertyViewLocation";
 
 export interface IPropertyViewBaseProps {
   property: PropertyDefinition;
@@ -38,19 +38,32 @@ const typeRegistry:
     PropertyDefinitionSupportedTypeName,
     any
   > = {
-  string: PropertyViewField,
-  integer: PropertyViewField,
-  number: PropertyViewField,
-  boolean: PropertyViewBoolean,
-  text: PropertyViewText,
-  currency: PropertyViewField,
-  unit: PropertyViewField,
-  password: PropertyViewField,
-  year: PropertyViewField,
-  datetime: PropertyViewDateTime,
-  date: PropertyViewDateTime,
-  time: PropertyViewDateTime,
-  location: PropertyViewLocation,
+  // string: PropertyViewField,
+  // integer: PropertyViewField,
+  // number: PropertyViewField,
+  // boolean: PropertyViewBoolean,
+  // text: PropertyViewText,
+  // currency: PropertyViewField,
+  // unit: PropertyViewField,
+  // password: PropertyViewField,
+  // year: PropertyViewField,
+  // datetime: PropertyViewDateTime,
+  // date: PropertyViewDateTime,
+  // time: PropertyViewDateTime,
+  // location: PropertyViewLocation,
+  string: null,
+  integer: null,
+  number: null,
+  boolean: null,
+  text: null,
+  currency: null,
+  unit: null,
+  password: null,
+  year: null,
+  datetime: null,
+  date: null,
+  time: null,
+  location: null,
 
   // TODO
   files: null,

@@ -265,7 +265,7 @@ function getFieldsAndArgs(options) {
         // specific properties that should be included or are we taking all
         // if taking all it depends on the rules, and the role access
         const shouldBeIncludedInFields = options.includeFields ? (options.onlyIncludeProperties ?
-            options.onlyIncludeProperties.includes(pd.getId()) :
+            options.onlyIncludeProperties.includes(pd.getId()) && !pd.isRetrievalDisabled() :
             (!pd.isRetrievalDisabled() && pd.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, options.userRole, options.userId, appliedOwner, false))) : false;
         // so if all that messy conditional passes
         if (shouldBeIncludedInFields) {

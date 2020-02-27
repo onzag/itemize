@@ -210,7 +210,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     });
 
     // and we fetch the new data, as relevant, mostly the build, and the moment to patch
-    let newData: any;
+    let newData: IRootRawJSONDataType;
     try {
       [newData] =
         await Promise.all<any>([
@@ -243,7 +243,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     history.push(newPathName);
 
     // And now we might restore the state, with the new data
-    this.state.specifiedProcessedRoot.mergeWithI18n(newData.root);
+    this.state.specifiedProcessedRoot.mergeWithI18n(newData);
     if (!avoidUpdatingUser) {
       this.updateUserProperty("app_language", localeToSet);
     }

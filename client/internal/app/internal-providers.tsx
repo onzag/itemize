@@ -21,7 +21,7 @@ interface ITokenProviderProps {
 }
 
 export interface ITokenContextType extends ITokenProviderState {
-  login: (username: string, password: string, token: string) => Promise<void>;
+  login: (username: string, password: string, token: string) => Promise<{id: number, role: string}>;
   logout: () => void;
   dismissError: () => void;
 }
@@ -64,10 +64,10 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     password: string,
     token: string,
     doNotShowLoginError?: boolean,
-  ) {
+  ): Promise<{id: number, role: string}> {
     if (this.state.isLoggingIn) {
       console.warn("Tried to login while logging in");
-      return;
+      return null;
     }
     this.setState({
       isLoggingIn: true,
@@ -90,21 +90,33 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       ),
     );
 
-    const tokenData = data.data && data.data.token;
-    const tokenDataId = tokenData ? tokenData.id : null;
-    const tokenDataRole = tokenData ? tokenData.role : null;
-    const tokenDataToken = tokenData ? tokenData.token : null;
-    if (tokenDataToken !== null) {
-      localStorage.setItem("TOKEN", tokenDataToken as string);
-      localStorage.setItem("ROLE", tokenDataRole as string);
-      localStorage.setItem("ID", tokenDataId.toString());
+    const error = data.errors ? data.errors[0].extensions : null;
+    const isOffline = error && error.code === ENDPOINT_ERRORS.CANT_CONNECT;
+
+    let tokenDataId: number = null;
+    let tokenDataRole: string = null;
+    let tokenDataToken: string = null;
+
+    if (!isOffline) {
+      const tokenData = data.data && data.data.token;
+      tokenDataId = tokenData ? tokenData.id as number : null;
+      tokenDataRole = tokenData ? tokenData.role as string : null;
+      tokenDataToken = tokenData ? tokenData.token as string : null;
+      if (tokenDataToken !== null) {
+        localStorage.setItem("TOKEN", tokenDataToken as string);
+        localStorage.setItem("ROLE", tokenDataRole as string);
+        localStorage.setItem("ID", tokenDataId.toString());
+      } else {
+        localStorage.removeItem("TOKEN");
+        localStorage.removeItem("ROLE");
+        localStorage.removeItem("ID");
+      }
     } else {
-      localStorage.removeItem("TOKEN");
-      localStorage.removeItem("ROLE");
-      localStorage.removeItem("ID");
+      tokenDataId = parseInt(localStorage.getItem("ID")) || null;
+      tokenDataRole = localStorage.getItem("ROLE");
+      tokenDataToken = localStorage.getItem("TOKEN");
     }
 
-    const error = data.errors ? data.errors[0].extensions : null;
     const newState: ITokenProviderState = {
       isLoggingIn: false,
       id: tokenDataId as number,
@@ -162,53 +174,60 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         }
       }
 
-      const userLanguageData = await gqlQuery(
-        buildGqlQuery(
-          {
-            name: "GET_MOD_users__IDEF_user",
-            args: {
-              token: tokenDataToken,
-              language: this.props.localeContext.language.split("-")[0],
-              id: tokenDataId,
+      if (!isOffline) {
+        const userLanguageData = await gqlQuery(
+          buildGqlQuery(
+            {
+              name: "GET_MOD_users__IDEF_user",
+              args: {
+                token: tokenDataToken,
+                language: this.props.localeContext.language.split("-")[0],
+                id: tokenDataId,
+              },
+              fields,
             },
-            fields,
-          },
-        ),
-      );
+          ),
+        );
 
-      if (userLanguageData && userLanguageData.data && userLanguageData.data.GET_MOD_users__IDEF_user) {
-        const localeUserData: IGQLValue = userLanguageData.data.GET_MOD_users__IDEF_user.DATA as IGQLValue;
-        // we still check everything just in case the user is blocked
-        if (localeUserData) {
-          console.log("user locale is", localeUserData);
-          if (
-            localeUserData.app_country !== cachedData.app_country &&
-            this.props.localeContext.country !== localeUserData.app_country
-          ) {
-            this.props.localeContext.changeCountryTo(localeUserData.app_country as string, true, true);
+        if (userLanguageData && userLanguageData.data && userLanguageData.data.GET_MOD_users__IDEF_user) {
+          const localeUserData: IGQLValue = userLanguageData.data.GET_MOD_users__IDEF_user.DATA as IGQLValue;
+          // we still check everything just in case the user is blocked
+          if (localeUserData) {
+            console.log("user locale is", localeUserData);
+            if (
+              localeUserData.app_country !== cachedData.app_country &&
+              this.props.localeContext.country !== localeUserData.app_country
+            ) {
+              this.props.localeContext.changeCountryTo(localeUserData.app_country as string, true, true);
+            }
+            if (
+              localeUserData.app_language !== cachedData.app_language &&
+              this.props.localeContext.language !== localeUserData.app_language
+            ) {
+              this.props.localeContext.changeLanguageTo(localeUserData.app_language as string, true);
+            }
+            if (
+              localeUserData.app_currency !== cachedData.app_currency &&
+              this.props.localeContext.currency !== localeUserData.app_currency
+            ) {
+              this.props.localeContext.changeCurrencyTo(localeUserData.app_currency as string, true);
+            }
           }
-          if (
-            localeUserData.app_language !== cachedData.app_language &&
-            this.props.localeContext.language !== localeUserData.app_language
-          ) {
-            this.props.localeContext.changeLanguageTo(localeUserData.app_language as string, true);
-          }
-          if (
-            localeUserData.app_currency !== cachedData.app_currency &&
-            this.props.localeContext.currency !== localeUserData.app_currency
-          ) {
-            this.props.localeContext.changeCurrencyTo(localeUserData.app_currency as string, true);
-          }
-        }
 
-        if (CacheWorkerInstance.isSupported) {
-          const newCachedValue = userLanguageData.data.GET_MOD_users__IDEF_user;
-          CacheWorkerInstance.instance.mergeCachedValue(
-            "GET_MOD_users__IDEF_user", tokenDataId as number, null, newCachedValue, fields,
-          );
+          if (CacheWorkerInstance.isSupported) {
+            const newCachedValue = userLanguageData.data.GET_MOD_users__IDEF_user;
+            CacheWorkerInstance.instance.mergeCachedValue(
+              "GET_MOD_users__IDEF_user", tokenDataId as number, null, newCachedValue, fields,
+            );
+          }
         }
       }
     }
+
+    return tokenDataToken ? {
+      id: tokenDataId as number,
+      role: tokenDataRole as string,
+    } : null;
   }
   public logout() {
     if (this.state.isLoggingIn) {

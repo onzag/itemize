@@ -1,14 +1,16 @@
 import React from "react";
-import { IIncludeCalloutWarningRendererProps } from "../components/IncludeCalloutWarning";
+import { IIncludeCalloutWarningRendererProps } from "../internal/components/IncludeCalloutWarning";
+import { IPropertyEntryFieldRendererProps } from "../internal/components/PropertyEntry/PropertyEntryField";
 
 export interface IRendererContext {
-  IncludeCalloutWarning?: (props: IIncludeCalloutWarningRendererProps) => any,
+  IncludeCalloutWarning?: React.ComponentType<IIncludeCalloutWarningRendererProps>;
+  PropertyEntryField?: React.ComponentType<IPropertyEntryFieldRendererProps>;
 }
 
 export const RendererContext = React.createContext<IRendererContext>(null);
 
 interface IRendererProviderProps extends IRendererContext {
-  children: any,
+  children: React.ReactNode,
 }
 
 export default function RendererProvider(props: IRendererProviderProps) {

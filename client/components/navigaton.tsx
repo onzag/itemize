@@ -4,11 +4,7 @@ import { LocationStateContext } from "../internal/app/internal-providers";
 import { Location } from "history";
 import { history } from "..";
 
-interface IHistorySetStatePartial {
-  [key: string]: any;
-}
-
-export function setHistoryState(location: Location, state: IHistorySetStatePartial, replace?: boolean) {
+export function setHistoryState<S>(location: Location, state: Partial<S>, replace?: boolean) {
   const newState = {...location.state};
   if (state) {
     Object.keys(state).forEach((key) => {
@@ -94,19 +90,23 @@ export function Route(props: RouteProps) {
   return <RouterRoute {...props} path={`/:__lang${urlDefined}`}/>;
 }
 
-interface ILocationStateReaderProps {
-  children: (location: Location, setState: (state: IHistorySetStatePartial, replace?: boolean) => void) => any;
+interface ILocationStateReaderProps<S> {
+  defaultState: S,
+  children: (
+    location: Location<S>,
+    setState: (state: Partial<S>, replace?: boolean) => void,
+  ) => React.ReactNode;
 }
 
-export function LocationStateReader(props: ILocationStateReaderProps) {
+export function LocationStateReader<S>(props: ILocationStateReaderProps<S>) {
   return (
     <LocationStateContext.Consumer>
       {
-        (value: Location) => {
+        (value: Location<S>) => {
           if (!value.state) {
-            const valueWithState = {
+            const valueWithState: Location<S> = {
               ...value,
-              state: {},
+              state: props.defaultState,
             };
             return props.children(valueWithState, setHistoryState.bind(null, valueWithState));
           }

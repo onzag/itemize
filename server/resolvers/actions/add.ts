@@ -314,7 +314,7 @@ export async function addItemDefinition(
 
   const itemDefinitionBasedOwnedEvent: IOwnedSearchRecordsAddedEvent = {
     qualifiedPathName: selfTable,
-    createdBy: sqlModData.created_by,
+    createdBy: itemDefinition.isOwnerObjectId() ? value.id : sqlModData.created_by,
     newIds: [
       searchResultForThisValue,
     ],

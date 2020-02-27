@@ -19,6 +19,7 @@ interface II18nReadProps {
   html?: boolean;
   htmlWrappingTag?: string;
   children?: (value: React.ReactNode) => React.ReactNode;
+  capitalize?: boolean;
 }
 
 export function I18nRead(props: II18nReadProps) {
@@ -127,6 +128,10 @@ export function I18nRead(props: II18nReadProps) {
                               }
                               // throw the error
                               throw new Error(errMessage);
+                            }
+
+                            if (props.capitalize) {
+                              i18nValue = utilcapitalize(i18nValue as string);
                             }
 
                             // if we are passing arguments to replace the {0} {1} etc... numbers

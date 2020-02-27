@@ -1,7 +1,6 @@
 import React from "react";
 import { AppBar, Toolbar, IconButton, Button, createStyles, WithStyles, withStyles, Theme } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
-// import { IfLogStatus } from "../../components/login";
 import { I18nRead } from "../../components/localization";
 import { TitleReader } from "../../components/util";
 import { UserDataRetriever } from "../../components/user";
@@ -9,6 +8,8 @@ import { ModuleProvider } from "../../providers/module";
 import { ItemDefinitionProvider } from "../../providers/item-definition";
 import { IfLogStatus } from "../../components/login";
 import { LanguagePicker } from "./language-picker";
+import { LocationStateReader } from "../../components/navigaton";
+import { Avatar } from "./avatar";
 
 const navbarStyles = (theme: Theme) => createStyles({
   container: {
@@ -33,7 +34,9 @@ const navbarStyles = (theme: Theme) => createStyles({
 });
 
 interface INavbarProps extends WithStyles<typeof navbarStyles> {
-  onLoginClick?: () => void;
+  excludeLanguagePicker?: boolean;
+  LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void}>,
+  SignupDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
 }
 
 const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
@@ -65,20 +68,57 @@ const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                     excludePolicies: true,
                   }}
                 >
-                  <IfLogStatus>
-                    {(status) => {
-                      if (status === "LOGGED_OUT" || status === "LOGGING_IN") {
-                        return <React.Fragment>
-                          <Button color="inherit" variant="outlined" onClick={props.onLoginClick}>
-                            <I18nRead id="login" />
-                          </Button>
-                          <LanguagePicker className={props.classes.languageButton} />
-                        </React.Fragment>;
-                      } else if (status === "LOGGED_IN") {
-                        // return <Avatar />;
-                      }
+                  <LocationStateReader defaultState={{signupDialogOpen: false, loginDialogOpen: false}}>
+                    {(location, setLocationState) => {
+                      const openLoginDialog = () => setLocationState({
+                        loginDialogOpen: true,
+                        signupDialogOpen: false,
+                      }, location.state.signupDialogOpen);
+                      const closeLoginDialog = () => setLocationState({
+                        loginDialogOpen: false,
+                      }, true);
+                      const openSignupDialog = () => setLocationState({
+                        signupDialogOpen: true,
+                        loginDialogOpen: false,
+                      }, location.state.loginDialogOpen);
+                      const closeSignupDialog = () => setLocationState({
+                        signupDialogOpen: false,
+                      }, true);
+                      const LoginDialog = props.LoginDialog;
+                      const SignupDialog = props.SignupDialog;
+                      return (
+                        <IfLogStatus>
+                          {(status) => {
+                            if (status === "LOGGED_OUT" || status === "LOGGING_IN") {
+                              return <React.Fragment>
+                                <Button color="inherit" variant="outlined" onClick={openLoginDialog}>
+                                  <I18nRead id="login" />
+                                </Button>
+                                {
+                                  !props.excludeLanguagePicker ?
+                                  <LanguagePicker className={props.classes.languageButton} /> :
+                                  null
+                                }
+                                <LoginDialog
+                                  open={location.state.loginDialogOpen}
+                                  onClose={closeLoginDialog}
+                                  onSignupRequest={openSignupDialog}
+                                />
+                                <SignupDialog
+                                  open={location.state.signupDialogOpen}
+                                  onClose={closeSignupDialog}
+                                  onLoginRequest={openLoginDialog}
+                                />
+                              </React.Fragment>;
+                            } else if (status === "LOGGED_IN") {
+                              return <Avatar />;
+                            }
+                          }}
+                        </IfLogStatus>
+                      );
                     }}
-                  </IfLogStatus>
+                  </LocationStateReader>
+                  
                 </ItemDefinitionProvider>
               </ModuleProvider>}
             </UserDataRetriever>

@@ -4,11 +4,12 @@ import { TokenContext, ITokenContextType } from "../internal/app/internal-provid
 import { ItemDefinitionContext, IItemDefinitionContextType } from "../providers/item-definition";
 
 type ActionerFn = (actioner: {
-  login: () => Promise<void>,
-  signup: () => Promise<void>,
+  login: (cleanWhenSuccesful?: boolean) => Promise<{id: number, role: string}>,
+  signup: (cleanWhenSuccesful?: boolean) => Promise<{id: number, role: string}>,
   logout: () => void,
   error: EndpointErrorType,
   dismissError: () => void,
+  cleanUnsafeFields: (addDelay?: boolean) => void,
 }) => React.ReactNode;
 
 interface ILogActionerProps {
@@ -28,7 +29,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     this.logout = this.logout.bind(this);
     this.signup = this.signup.bind(this);
     this.dismissError = this.dismissError.bind(this);
-    this.cleanFields = this.cleanFields.bind(this);
+    this.cleanUnsafeFields = this.cleanUnsafeFields.bind(this);
   }
   public shouldComponentUpdate(nextProps: IActualLogActionerProps) {
     return nextProps.children !== this.props.children ||
@@ -37,13 +38,20 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
       nextProps.itemDefinitionContextualValue.submitError !== this.props.itemDefinitionContextualValue.submitError ||
       nextProps.itemDefinitionContextualValue.submitting !== this.props.itemDefinitionContextualValue.submitting;
   }
-  public cleanFields() {
+  public cleanUnsafeFields(addDelay?: boolean) {
+    if (addDelay) {
+      setTimeout(this.cleanUnsafeFields, 300);
+      return;
+    }
     const passwordPdef =
       this.props.itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
     passwordPdef.cleanValueFor(null, null);
     this.props.itemDefinitionContextualValue.idef.triggerListeners("change", null, null);
   }
-  public async login() {
+  public async login(cleanWhenSuccesful: boolean = true): Promise<{
+    id: number;
+    role: string;
+  }> {
     const username = this.props.itemDefinitionContextualValue.state.properties
       .find((pv) => pv.propertyId === "username");
     const password = this.props.itemDefinitionContextualValue.state.properties
@@ -57,19 +65,29 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
 
     const usernameValue = username.value;
     const passwordValue = password.value;
-    await this.props.tokenContextValue.login(usernameValue as string, passwordValue as string, null);
-    // we do it but on a delay in order to avoid flickering for example
-    // in dialogs that are going to close
-    setTimeout(this.cleanFields, 300);
+    const userData = await this.props.tokenContextValue.login(usernameValue as string, passwordValue as string, null);
+
+    // if we get a sucesful login
+    if (cleanWhenSuccesful && userData) {
+      // we do it but on a delay in order to avoid flickering for example
+      // in dialogs that are going to close
+      this.cleanUnsafeFields(true);
+    }
+
+    return userData;
   }
   public logout() {
     this.props.tokenContextValue.logout();
   }
-  public async signup() {
+  public async signup(cleanWhenSuccesful: boolean = true): Promise<{
+    id: number;
+    role: string;
+  }> {
     const result = await this.props.itemDefinitionContextualValue.submit();
     if (!result.error) {
-      await this.login();
+      return await this.login(cleanWhenSuccesful);
     }
+    return null;
   }
   public dismissError() {
     this.props.tokenContextValue.dismissError();
@@ -96,6 +114,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
       logout,
       error: this.props.tokenContextValue.error || this.props.itemDefinitionContextualValue.submitError,
       dismissError,
+      cleanUnsafeFields: this.cleanUnsafeFields,
     });
     return output;
   }

@@ -203,7 +203,7 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
     };
     const itemDefinitionBasedOwnedEvent = {
         qualifiedPathName: selfTable,
-        createdBy: sqlModData.created_by,
+        createdBy: itemDefinition.isOwnerObjectId() ? value.id : sqlModData.created_by,
         newIds: [
             searchResultForThisValue,
         ],
