@@ -25,6 +25,7 @@ const location_1 = __importDefault(require("./location"));
 const files_1 = __importDefault(require("./files"));
 const year_1 = __importDefault(require("./year"));
 const search_interfaces_1 = require("../search-interfaces");
+const file_1 = __importDefault(require("./file"));
 /**
  * The standard definition and registry of all types in itemize
  */
@@ -42,6 +43,7 @@ const supportedTypesStandard = {
     time: time_1.default,
     datetime: datetime_1.default,
     location: location_1.default,
+    file: file_1.default,
     files: files_1.default,
 };
 // Checking that the property descriptions are right

@@ -10,6 +10,7 @@ import { buildGqlMutation, gqlQuery } from "../../../gql-querier";
 import { RemoteListener } from "./remote-listener";
 import "../workers/service";
 import CacheWorkerInstance from "../workers/cache";
+import { proxy } from "comlink";
 
 // Just a message for whether is development
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -38,6 +39,7 @@ export interface ILocaleContextType {
 export interface IDataContextType {
   value: Root;
   remoteListener: RemoteListener;
+  updateIsBlocked: boolean;
 }
 
 // The props for the application, this initial information
@@ -69,6 +71,7 @@ interface IAppState {
   specifiedProcessedRoot: Root;
   localeIsUpdating: boolean;
   localeIsUpdatingFrom: string;
+  updateIsBlocked: boolean;
 }
 
 // we create the contexts that are useful for accessing these, default
@@ -84,12 +87,15 @@ export default class App extends React.Component<IAppProps, IAppState> {
   constructor(props: IAppProps) {
     super(props);
 
+    this.setBlockedCallbackState = this.setBlockedCallbackState.bind(this);
+
     // set the values in the state to the initial
     // we expose the root variable because it makes debugging
     // easy and to allow access to the root registry to web workers
     (window as any).ROOT = new Root(props.initialRoot);
     if (CacheWorkerInstance.isSupported) {
       CacheWorkerInstance.instance.proxyRoot(props.initialRoot);
+      CacheWorkerInstance.instance.setBlockedCallback(proxy(this.setBlockedCallbackState))
     }
     this.state = {
       specifiedCountry: props.initialCountry,
@@ -97,6 +103,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       localeIsUpdating: false,
       localeIsUpdatingFrom: null,
       specifiedProcessedRoot: (window as any).ROOT,
+      updateIsBlocked: false,
     };
 
     // the helper functions that change the state of the whole app
@@ -109,6 +116,14 @@ export default class App extends React.Component<IAppProps, IAppState> {
     this.updateUserProperty = this.updateUserProperty.bind(this);
 
     this.remoteListener = new RemoteListener((window as any).ROOT);
+  }
+
+  public setBlockedCallbackState(state: boolean) {
+    if (this.state.updateIsBlocked !== state) {
+      this.setState({
+        updateIsBlocked: state,
+      });
+    }
   }
 
   public setTokenState(state: ITokenProviderState) {
@@ -414,6 +429,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     const dataContextValue: IDataContextType = {
       value: this.state.specifiedProcessedRoot,
       remoteListener: this.remoteListener,
+      updateIsBlocked: this.state.updateIsBlocked,
     };
 
     // Now we return that with the JSS provider, material ui theme provider,

@@ -11,7 +11,7 @@ exports.rawSensitiveConfigSchema = {
                 {
                     "type": "null"
                 }
-            ]
+            ],
         },
         hereAppID: {
             anyOf: [
@@ -21,7 +21,7 @@ exports.rawSensitiveConfigSchema = {
                 {
                     "type": "null"
                 }
-            ]
+            ],
         },
         hereAppCode: {
             anyOf: [
@@ -31,7 +31,27 @@ exports.rawSensitiveConfigSchema = {
                 {
                     "type": "null"
                 }
-            ]
+            ],
+        },
+        mailgunAPIKey: {
+            anyOf: [
+                {
+                    "type": "string",
+                },
+                {
+                    "type": "null"
+                }
+            ],
+        },
+        mailgunDomain: {
+            anyOf: [
+                {
+                    "type": "string",
+                },
+                {
+                    "type": "null"
+                }
+            ],
         },
         jwtKey: {
             type: "string",
@@ -45,6 +65,8 @@ exports.rawSensitiveConfigSchema = {
         "ipStackAccessKey",
         "hereAppID",
         "hereAppCode",
+        "mailgunAPIKey",
+        "mailgunDomain",
         "jwtKey",
         "devKey",
     ],

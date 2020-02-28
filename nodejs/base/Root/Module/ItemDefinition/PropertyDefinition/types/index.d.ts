@@ -26,6 +26,7 @@ import { PropertyDefinitionSupportedYearType } from "./year";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
+import { PropertyDefinitionSupportedFileType } from "./file";
 /**
  * All the supported property types
  */
@@ -42,6 +43,7 @@ export declare type PropertyDefinitionSupportedTypeName = "boolean" | // A simpl
 "datetime" | // Represented as a date, comparable, stored as a date
 "time" | // Represented as a date, comparable, stored as a date
 "location" | // Represented as an object, non comparable, stored
+"file" | // Represents a single url
 "files";
 /**
  * How every supported type behaviour should be described
@@ -209,5 +211,5 @@ declare const supportedTypesStandard: PropertyDefinitionSupportedTypesStandardTy
 /**
  * All the supported types combined
  */
-export declare type PropertyDefinitionSupportedType = PropertyDefinitionSupportedBooleanType | PropertyDefinitionSupportedIntegerType | PropertyDefinitionSupportedNumberType | IPropertyDefinitionSupportedCurrencyType | IPropertyDefinitionSupportedUnitType | PropertyDefinitionSupportedStringType | PropertyDefinitionSupportedPasswordType | PropertyDefinitionSupportedTextType | PropertyDefinitionSupportedDateType | PropertyDefinitionSupportedDateTimeType | PropertyDefinitionSupportedTimeType | PropertyDefinitionSupportedYearType | IPropertyDefinitionSupportedLocationType | PropertyDefinitionSupportedFilesType;
+export declare type PropertyDefinitionSupportedType = PropertyDefinitionSupportedBooleanType | PropertyDefinitionSupportedIntegerType | PropertyDefinitionSupportedNumberType | IPropertyDefinitionSupportedCurrencyType | IPropertyDefinitionSupportedUnitType | PropertyDefinitionSupportedStringType | PropertyDefinitionSupportedPasswordType | PropertyDefinitionSupportedTextType | PropertyDefinitionSupportedDateType | PropertyDefinitionSupportedDateTimeType | PropertyDefinitionSupportedTimeType | PropertyDefinitionSupportedYearType | IPropertyDefinitionSupportedLocationType | PropertyDefinitionSupportedFileType | PropertyDefinitionSupportedFilesType;
 export default supportedTypesStandard;

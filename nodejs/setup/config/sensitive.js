@@ -36,6 +36,20 @@ async function sensitiveConfigSetup(version, currentConfig, referenceConfig, pac
             nullifyFalseValues: true,
         },
         {
+            variableName: "mailgunAPIKey",
+            message: "Used in order to send emails, get your key at https://www.mailgun.com/",
+            defaultValue: "",
+            hidden: true,
+            nullifyFalseValues: true,
+        },
+        {
+            variableName: "mailgunDomain",
+            message: "Used in order to send emails, get your key at https://www.mailgun.com/",
+            defaultValue: "",
+            hidden: true,
+            nullifyFalseValues: true,
+        },
+        {
             variableName: "jwtKey",
             message: "a JSON web token key used for key validation and token generation, leave blank to autogenerate one if not filled",
             defaultValue: genToken(64),

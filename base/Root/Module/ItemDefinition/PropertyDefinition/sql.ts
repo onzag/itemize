@@ -249,7 +249,7 @@ export function convertSQLValueToGQLValueForProperty(
   // ensure coercion keeps on
   if (
     propertyDefinition.isCoercedIntoDefaultWhenNull() &&
-    colValue == null
+    colValue === null
   ) {
     colValue = propertyDefinition.getDefaultValue();
   }

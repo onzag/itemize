@@ -183,6 +183,35 @@ export function I18nRead(props: II18nReadProps) {
   );
 }
 
+interface Ii18nReadManyProps {
+  data: II18nReadProps[];
+  children: (...results: React.ReactNode[]) => React.ReactNode;
+}
+
+export function I18nReadMany(props: Ii18nReadManyProps): any {
+  if (props.data.length === 0) {
+    return props.children();
+  } else if (props.data.length === 1) {
+    return (
+      <I18nRead {...props.data[0]}>
+        {props.children}
+      </I18nRead>
+    );
+  }
+  const missing = props.data.slice(1);
+  return (
+    <I18nRead {...props.data[0]}>
+      {(result: React.ReactNode) => {
+        return <I18nReadMany data={missing}>
+          {(...results: React.ReactNode[]) => {
+            return props.children(result, ...results);
+          }}
+        </I18nReadMany>
+      }}
+    </I18nRead>
+  )
+}
+
 const isDevelopment = process.env.NODE_ENV === "development";
 interface II18nReadErrorProps {
   error: EndpointErrorType;

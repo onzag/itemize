@@ -77,6 +77,17 @@ export default class CacheWorker {
   private rootProxy: Root;
 
   /**
+   * Whether currently the cache is blocked from
+   * releasing
+   */
+  private isCurrentlyBlocked: boolean;
+
+  /**
+   * a function to call once the blocked changes state
+   */
+  private blockedCallback: (state: boolean) => void;
+
+  /**
    * This actually setups the worker
    * @param version pass the build number here
    */
@@ -90,7 +101,7 @@ export default class CacheWorker {
 
     // now we try to create the promised database
     this.dbPromise = openDB<ICacheDB>(CACHE_NAME, version, {
-      upgrade(db) {
+      upgrade: (db) => {
         try {
           console.log("CLEARING CACHE DUE TO UPGRADE");
           try {
@@ -105,8 +116,48 @@ export default class CacheWorker {
         } catch (err) {
           console.warn(err);
         }
+        this.isCurrentlyBlocked = false;
+        if (this.blockedCallback) {
+          this.blockedCallback(false);
+        }
       },
+      blocked: () => {
+        this.isCurrentlyBlocked = true;
+        if (this.blockedCallback) {
+          this.blockedCallback(true);
+        }
+      }
     });
+
+    // due to a bug in the indexed db implementation
+    // sometimes the blocked event just doesn't get called
+    // this forces me to somehow botch a blocked event
+    // in order to be able to display the proper notification
+    // because, well, bugs... not a single event will be called
+    // so this is the only possible recourse
+    (async () => {
+      // for that we set a timeout
+      const timeout = setTimeout(() => {
+        // if it takes longer than that, we consider
+        // it blocked
+        this.isCurrentlyBlocked = true;
+        if (this.blockedCallback) {
+          this.blockedCallback(true);
+        }
+      }, 300);
+
+      // and so we wait for the indexeddb
+      await this.dbPromise;
+      // clear the timeout and hopefully it will make it before
+      clearTimeout(timeout);
+      // if it is blocked then we set it as unblocked
+      if (this.isCurrentlyBlocked) {
+        this.isCurrentlyBlocked = false;
+        if (this.blockedCallback) {
+          this.blockedCallback(false);
+        }
+      }
+    })();
 
     console.log("CACHE SETUP", version);
   }
@@ -827,6 +878,13 @@ export default class CacheWorker {
 
   public async proxyRoot(rootProxy: IRootRawJSONDataType) {
     this.rootProxy = new Root(rootProxy);
+  }
+
+  public async setBlockedCallback(callback: (state: boolean) => void) {
+    this.blockedCallback = callback;
+    if (this.isCurrentlyBlocked) {
+      callback(this.isCurrentlyBlocked);
+    }
   }
 }
 

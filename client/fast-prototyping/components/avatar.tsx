@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar as MAvatar } from "@material-ui/core";
+import { Avatar as MAvatar, Badge } from "@material-ui/core";
 import { countries } from "../../../imported-resources";
 import { withStyles, WithStyles, createStyles } from "@material-ui/styles";
 import { Reader } from "../../components/property";
@@ -9,8 +9,8 @@ const avatarStyles = createStyles({
   flag: {
     position: "absolute",
     fontSize: "0.8rem",
-    bottom: 0,
-    right: 0,
+    bottom: -2.5,
+    right: -5,
   },
   avatar: {
     "overflow": "visible",
@@ -44,6 +44,9 @@ const avatarStyles = createStyles({
     "&:active::after": {
       opacity: 1,
     },
+  },
+  avatarBadge: {
+    transform: "scale(1) translate(25%, -25%)",
   },
   avatarLarge: {
     width: "200px",
@@ -96,44 +99,79 @@ const avatarStyles = createStyles({
 interface IAvatarProps extends WithStyles<typeof avatarStyles> {
   hideFlag?: boolean;
   large?: boolean;
+  showWarnings?: boolean;
+  profileURLSection?: string;
 }
 
 // TODO profile picture support
 export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
+  const contentFn = (id: number, userNameValue: string, email?: string, eValidated?: boolean) => {
+    const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : null;
+
+    const hasWarningForMissingEmail = !email;
+    const hasWarningForNotValidEmail = !eValidated;
+    const hasWarning = props.showWarnings && (
+      hasWarningForMissingEmail || hasWarningForNotValidEmail
+    );
+
+    const flag = props.hideFlag ? null : (
+      <Reader id="app_country">
+      {
+        (appCountryValue: string) => {
+          let countryEmoji = null;
+          if (appCountryValue && countries[appCountryValue]) {
+            countryEmoji = countries[appCountryValue].emoji;
+          }
+
+          return <div className={props.classes.flag}>{countryEmoji}</div>;
+        }
+      }
+      </Reader>
+    )
+
+    const profileURLSection = props.profileURLSection || "profile";
+
+    const avatar = (
+      <Link to={`/${profileURLSection}/${id}`}>
+        <MAvatar
+          alt={userNameValue}
+          classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.large ? props.classes.avatarLarge : ""}` }}
+        >
+          {userNameValue ? userNameValue[0] : ""}
+          {flag}
+        </MAvatar>
+      </Link>
+    );
+
+    if (props.showWarnings && hasWarning) {
+      return <Badge badgeContent={1} color="secondary" classes={{badge: props.classes.avatarBadge}}>
+        {avatar}
+      </Badge>
+    } else {
+      return avatar;
+    }
+  }
   return (
     <Reader id="id">
       {(id: number) => (
         <Reader id="username">
           {
             (userNameValue: string) => {
-              const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : null;
-              if (props.hideFlag) {
-                return <MAvatar
-                  alt={userNameValue}
-                  classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.large ? props.classes.avatarLarge : ""}` }}
-                >
-                  {userNameValue ? userNameValue[0] : ""}
-                </MAvatar>;
+              if (!props.showWarnings) {
+                return contentFn(id, userNameValue);
               }
-              return <Reader id="app_country">
-                {
-                  (appCountryValue: string) => {
-                    let countryEmoji = null;
-                    if (appCountryValue && countries[appCountryValue]) {
-                      countryEmoji = countries[appCountryValue].emoji;
-                    }
-                    return <Link to={`/profile/${id}`}>
-                      <MAvatar
-                        alt={userNameValue}
-                        classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.large ? props.classes.avatarLarge : ""}` }}
-                      >
-                        {userNameValue ? userNameValue[0] : ""}
-                        <div className={props.classes.flag}>{countryEmoji}</div>
-                      </MAvatar>
-                    </Link>;
-                  }
-                }
-              </Reader>;
+
+              return (
+                <Reader id="email">
+                  {(email: string) => (
+                    <Reader id="e_validated">
+                      {(eValidated: boolean) => {
+                        return contentFn(id, userNameValue, email, eValidated);
+                      }}
+                    </Reader>
+                  )}
+                </Reader>
+              )
             }
           }
         </Reader>

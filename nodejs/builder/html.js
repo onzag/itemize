@@ -33,7 +33,9 @@ function replaceHTMLKeys(html, obj, prefix) {
             // then we replace that for the value using our prefix
             newHTML = newHTML.replace(new RegExp(util_1.escapeStringRegexp("%{" + prefix + key + "}"), "g"), 
             // for arrays we join the value as strings
-            Array.isArray(obj[key]) ? obj[key].join(",") : obj[key]);
+            Array.isArray(obj[key]) ? obj[key].join(",") : (
+            // for null we want empty string
+            obj[key] === null ? "" : obj[key].toString()));
         }
         else {
             // otherwise we just prefix from the prefix and the key to recurse inside

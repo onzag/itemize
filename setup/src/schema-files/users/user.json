@@ -45,6 +45,22 @@
             "coerceNullsIntoDefault": true
         },
         {
+            "id": "e_notifications",
+            "type": "boolean",
+            "default": true,
+            "searchable": false,
+            "readRoleAccess": ["&OWNER"],
+            "editRoleAccess": ["&OWNER", "ADMIN"]
+        },
+        {
+            "id": "e_newsletter",
+            "type": "boolean",
+            "default": true,
+            "searchable": false,
+            "readRoleAccess": ["&OWNER"],
+            "editRoleAccess": ["&OWNER", "ADMIN"]
+        },
+        {
             "id": "password",
             "type": "password",
             "htmlAutocomplete": "current-password",
@@ -64,8 +80,7 @@
         },
         {
             "id": "profile_picture",
-            "type": "files",
-            "maxLength": 1,
+            "type": "file",
             "specialProperties": {
                 "accept": "image",
                 "dimensions": "24 24x24 ; 48 48x48",

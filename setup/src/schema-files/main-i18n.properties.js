@@ -48,6 +48,12 @@ unit_dialog_imperial = imperial
 
 menu = menu
 
+blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
+needs_update_navigation = outdated
+needs_update_title = update app
+needs_update_content  = A new version of the app is currently available
+needs_update_action = update
+
 error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
 error.NOT_FOUND = the item cannot be found
@@ -60,6 +66,7 @@ error.NOTHING_TO_UPDATE = nothing to update
 error.MUST_BE_LOGGED_IN = you must be logged in
 error.USER_BLOCKED = you have been banned
 error.USER_REMOVED = the account related to this session has been removed
+error.USER_EMAIL_TAKEN = this email has been taken already
 error.INVALID_PROPERTY = invalid property
 error.INVALID_INCLUDE = invalid include
 error.INVALID_POLICY = policy security checks have failed`
@@ -114,6 +121,12 @@ unit_dialog_imperial = imperial
 
 menu = menu
 
+blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
+needs_update_navigation = outdated
+needs_update_title = update app
+needs_update_content = A new version of the app is currently available
+needs_update_action = update
+
 error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
 error.NOT_FOUND = the item cannot be found
@@ -126,6 +139,7 @@ error.NOTHING_TO_UPDATE = nothing to update
 error.MUST_BE_LOGGED_IN = you must be logged in
 error.USER_BLOCKED = you have been banned
 error.USER_REMOVED = the account related to this session has been removed
+error.USER_EMAIL_TAKEN = this email has been taken already
 error.INVALID_PROPERTY = invalid property
 error.INVALID_INCLUDE = invalid include
 error.INVALID_POLICY = policy security checks have failed`
@@ -180,6 +194,12 @@ unit_dialog_imperial = imperial
 
 menu = menu
 
+blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
+needs_update_navigation = outdated
+needs_update_title = update app
+needs_update_content = A new version of the app is currently available
+needs_update_action = update
+
 error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
 error.NOT_FOUND = the item cannot be found
@@ -192,6 +212,7 @@ error.NOTHING_TO_UPDATE = nothing to update
 error.MUST_BE_LOGGED_IN = you must be logged in
 error.USER_BLOCKED = you have been banned
 error.USER_REMOVED = the account related to this session has been removed
+error.USER_EMAIL_TAKEN = this email has been taken already
 error.INVALID_PROPERTY = invalid property
 error.INVALID_INCLUDE = invalid include
 error.INVALID_POLICY = policy security checks have failed`
@@ -246,6 +267,12 @@ unit_dialog_imperial = Zoll
 
 menu = Menü
 
+blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
+needs_update_navigation = outdated
+needs_update_title = update app
+needs_update_content = A new version of the app is currently available
+needs_update_action = update
+
 error.INVALID_CREDENTIALS = ungültiger Benutzer oder Password
 error.BLOCKED = der Artikel ist gesperrt
 error.NOT_FOUND = der Artikel wurde nicht gefunden
@@ -258,6 +285,7 @@ error.NOTHING_TO_UPDATE = keine Änderungen
 error.MUST_BE_LOGGED_IN = Sie müssen eingeloggt sein
 error.USER_BLOCKED = Sie wurden mit einem Verbot belegt
 error.USER_REMOVED = das Konto für diese Sitzung wurde entfernt
+error.USER_EMAIL_TAKEN = Diese E-Mail-Adresse ist bereits vergeben.
 error.INVALID_PROPERTY = ungültige Eigenschaft
 error.INVALID_INCLUDE = ungültige Einbindung
 error.INVALID_POLICY = Sicherheitsabfrage gescheitert`
@@ -312,6 +340,12 @@ unit_dialog_imperial = imperiales
 
 menu = menú
 
+blocked_update = Una versión anterior de la aplicación está activa actualmente, por favor cierre la pestaña en cuestión para continuar
+needs_update_navigation = necesita actualizar
+needs_update_title = actualizar aplicación
+needs_update_content = Una nueva versión de la aplicación ha sido publicada
+needs_update_action = Actualizar
+
 error.INVALID_CREDENTIALS = contraseña o usuario inválido
 error.BLOCKED = el item ha sido bloqueado
 error.NOT_FOUND = el item no existe
@@ -324,6 +358,7 @@ error.NOTHING_TO_UPDATE = no existen cambios para actualizar
 error.MUST_BE_LOGGED_IN = debes iniciar sesión para realizar esta acción
 error.USER_BLOCKED = usted está baneado
 error.USER_REMOVED = la cuenta relacionada con esta sesión ha sido eliminada
+error.USER_EMAIL_TAKEN = el email ya ha sido tomado por otro usuario
 error.INVALID_PROPERTY = propiedad inválida
 error.INVALID_INCLUDE = elemento de inclusión inválido
 error.INVALID_POLICY = chequeos de seguridad han fallado`
@@ -378,6 +413,12 @@ unit_dialog_imperial = المقياس البريطاني
 
 menu = لائحة
 
+blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
+needs_update_navigation = outdated
+needs_update_title = update app
+needs_update_content = A new version of the app is currently available
+needs_update_action = update
+
 error.INVALID_CREDENTIALS = مستخدم او كلمة سر غير صحيحة
 error.BLOCKED = المادة تم حظرها
 error.NOT_FOUND = لا يمكن إيجاد هذه المادة
@@ -390,6 +431,7 @@ error.NOTHING_TO_UPDATE = لا يوجد شيء للتحديث
 error.MUST_BE_LOGGED_IN = يجب تسجيل الدخول
 error.USER_BLOCKED = تم حظرك
 error.USER_REMOVED = تم إزالة الحساب المتعلق بهذه الجلسة
+error.USER_EMAIL_TAKEN = هذا البريد مأخوذ حاليا
 error.INVALID_PROPERTY = خاصية غير مناسبة
 error.INVALID_INCLUDE = مضمون غير مناسب
 error.INVALID_POLICY = فشل إجراءات السياسة الأمنية`

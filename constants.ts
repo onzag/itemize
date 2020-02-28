@@ -141,6 +141,7 @@ export const ENDPOINT_ERRORS =  {
   FORBIDDEN: "FORBIDDEN",
   USER_BLOCKED: "USER_BLOCKED",
   USER_REMOVED: "USER_REMOVED",
+  USER_EMAIL_TAKEN: "USER_EMAIL_TAKEN",
   NOT_FOUND: "NOT_FOUND",
 };
 
@@ -208,6 +209,13 @@ export const LOCALE_I18N = [
   "unit_dialog_others",
   "unit_dialog_metric",
   "unit_dialog_imperial",
+
+  // when the app cannot be updated
+  "blocked_update",
+  "needs_update_navigation",
+  "needs_update_title",
+  "needs_update_action",
+  "needs_update_content",
 ].concat(
   // we add all the endpoint errors
   Object.keys(ENDPOINT_ERRORS).map(((ee) => `error.${ee}`)),

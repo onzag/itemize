@@ -87,6 +87,7 @@ const typeRegistry:
   date: null,
   time: null,
   location: null,
+  file: null,
   files: null,
 };
 

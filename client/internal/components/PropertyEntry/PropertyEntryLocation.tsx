@@ -206,6 +206,11 @@ export default class PropertyEntryLocation
     const appId = (window as any).HERE_APP_ID;
     const appCode = (window as any).HERE_APP_CODE;
 
+    if (!appId || !appCode) {
+      console.warn("Here Maps has not been configured and as such search is unavailable");
+      return;
+    }
+
     // we use the language as the main expected result
     const options = {
       method: "GET",

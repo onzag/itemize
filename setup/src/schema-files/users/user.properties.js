@@ -12,6 +12,18 @@ custom.my_profile = my profile
 custom.update_profile = update profile
 custom.profile_updated_succesfully = profile updated!
 
+custom.email_not_validated = your email is not validated
+custom.missing_email = you have not set an email
+
+custom.validate_account = activate your account
+custom.validate_account_template_name =
+custom.validate_account_email_user = validate
+custom.validate_account_user = $APPNAME
+custom.validate_account_title = validate your $APPNAME account
+custom.validate_account_description = In order to validate your account so as to be able to receive notifications and recover it you need to click on this button
+custom.validate_account_activate_button = activate
+custom.validate_account_alt_link = Alternatively you can click on this link
+
 properties.username.label = username
 properties.username.placeholder = type an username
 properties.username.search.label = username
@@ -21,13 +33,19 @@ properties.username.error.TOO_LARGE = username is too long
 properties.username.error.NOT_UNIQUE = username is taken
 
 properties.email.label = email
-properties.email.placeholder = Your email address
+properties.email.placeholder = your email address
 properties.email.description = Your email will not be shared with anyone, it is kept private even to admins and moderators
 properties.email.error.TOO_LARGE = email is too long
 properties.email.error.INVALID_SUBTYPE_VALUE = email is invalid
 
 properties.e_validated.label = email is validated
-properties.e_validated.description = refers to whether the email is validated or not
+properties.e_validated.description = Refers to whether the email is validated or not
+
+properties.e_notifications.label = send email notifications
+properties.e_notifications.description = Do not miss content by recieving email notifications
+
+properties.e_newsletter.label = subscribe to newsletter
+properties.e_newsletter.description = Keep yourself updated with our amazing newsletter
 
 properties.password.label = password
 properties.password.placeholder = password
@@ -72,6 +90,18 @@ custom.login_instead = ¿ya tiene cuenta? inicie sesión
 custom.update_profile = actualizar información
 custom.profile_updated_succesfully = ¡actualización exitosa!
 
+custom.email_not_validated = su correo electrónico no está validado
+custom.missing_email = no tiene un correo electrónico asociado a esta cuenta
+
+custom.validate_account = active su cuenta
+custom.validate_account_template_name =
+custom.validate_account_email_user = activar
+custom.validate_account_user = $APPNAME
+custom.validate_account_title = valide su cuenta de $APPNAME
+custom.validate_account_description = Para poder recuperar su cuenta y poder recibir notificationes debe activar su correo electrónico
+custom.validate_account_activate_button = activar
+custom.validate_account_alt_link = De forma alternativa puede hacer click en éste link
+
 properties.username.label = nombre de usuario
 properties.username.placeholder = escriba un nombre de usuario
 properties.username.search.label = nombre de usuario
@@ -88,6 +118,12 @@ properties.email.error.INVALID_SUBTYPE_VALUE = el correo electrónico es inváli
 
 properties.e_validated.label = el email ha sido confirmado
 properties.e_validated.description = indica si el correo electrónico ha sido confirmado por el usuario
+
+properties.e_notifications.label = notificaciones por correo electrónico
+properties.e_notifications.description = No se pierda de ningún contenido reciviendo notificaciones por correo
+
+properties.e_newsletter.label = recivir noticias
+properties.e_newsletter.description = Manténgase actualizado con nuestro boletín informativo
 
 properties.password.label = contraseña
 properties.password.placeholder = contraseña
@@ -138,4 +174,6 @@ return config.supportedLanguages.map((language) => {
   } else {
     return l.replace("$EXTRAROLES", extraRoles);
   }
+}).map((l) => {
+  return l.replace(/\$APPNAME/g, config.appName.replace(/\s/g, "_"));
 }).join("\n\n");

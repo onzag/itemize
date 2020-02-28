@@ -28,6 +28,8 @@ export interface ISensitiveConfigRawJSONDataType {
     ipStackAccessKey: string;
     hereAppID: string;
     hereAppCode: string;
+    mailgunAPIKey: string;
+    mailgunDomain: string;
     jwtKey: string;
     devKey: string;
 }
@@ -59,6 +61,16 @@ export declare const rawSensitiveConfigSchema: {
             }[];
         };
         hereAppCode: {
+            anyOf: {
+                "type": string;
+            }[];
+        };
+        mailgunAPIKey: {
+            anyOf: {
+                "type": string;
+            }[];
+        };
+        mailgunDomain: {
             anyOf: {
                 "type": string;
             }[];

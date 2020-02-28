@@ -105,6 +105,7 @@ export declare const ENDPOINT_ERRORS: {
     FORBIDDEN: string;
     USER_BLOCKED: string;
     USER_REMOVED: string;
+    USER_EMAIL_TAKEN: string;
     NOT_FOUND: string;
 };
 /**

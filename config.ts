@@ -33,6 +33,8 @@ export interface ISensitiveConfigRawJSONDataType {
   ipStackAccessKey: string;
   hereAppID: string;
   hereAppCode: string;
+  mailgunAPIKey: string;
+  mailgunDomain: string;
   jwtKey: string;
   devKey: string;
 }
@@ -64,7 +66,7 @@ export const rawSensitiveConfigSchema = {
         {
           "type": "null"
         }
-      ]
+      ],
     },
     hereAppID: {
       anyOf: [
@@ -74,7 +76,7 @@ export const rawSensitiveConfigSchema = {
         {
           "type": "null"
         }
-      ]
+      ],
     },
     hereAppCode: {
       anyOf: [
@@ -84,7 +86,27 @@ export const rawSensitiveConfigSchema = {
         {
           "type": "null"
         }
-      ]
+      ],
+    },
+    mailgunAPIKey: {
+      anyOf: [
+        {
+          "type": "string",
+        },
+        {
+          "type": "null"
+        }
+      ],
+    },
+    mailgunDomain: {
+      anyOf: [
+        {
+          "type": "string",
+        },
+        {
+          "type": "null"
+        }
+      ],
     },
     jwtKey: {
       type: "string",
@@ -98,6 +120,8 @@ export const rawSensitiveConfigSchema = {
     "ipStackAccessKey",
     "hereAppID",
     "hereAppCode",
+    "mailgunAPIKey",
+    "mailgunDomain",
     "jwtKey",
     "devKey",
   ],

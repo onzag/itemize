@@ -1816,7 +1816,7 @@ export default class PropertyDefinition {
    * @returns a property definition value, or null
    */
   public getDefaultValue(): PropertyDefinitionSupportedType {
-    return this.rawData.default || null;
+    return typeof this.rawData.default !== "undefined" ? this.rawData.default : null;
   }
 
   /**

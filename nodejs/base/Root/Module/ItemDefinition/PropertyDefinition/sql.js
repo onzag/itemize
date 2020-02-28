@@ -194,7 +194,7 @@ function convertSQLValueToGQLValueForProperty(propertyDefinition, row, prefix) {
     // the value is null, for example, after an update, this will
     // ensure coercion keeps on
     if (propertyDefinition.isCoercedIntoDefaultWhenNull() &&
-        colValue == null) {
+        colValue === null) {
         colValue = propertyDefinition.getDefaultValue();
     }
     // because we are returning from graphql, the information

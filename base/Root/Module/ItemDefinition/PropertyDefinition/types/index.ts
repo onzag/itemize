@@ -27,6 +27,7 @@ import year, { PropertyDefinitionSupportedYearType } from "./year";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
+import file, { PropertyDefinitionSupportedFileType } from "./file";
 
 /**
  * All the supported property types
@@ -50,6 +51,7 @@ export type PropertyDefinitionSupportedTypeName =
   "time" |            // Represented as a date, comparable, stored as a date
   "location" |        // Represented as an object, non comparable, stored
                       // as two values
+  "file" |            // Represents a single url
   "files";            // Represented as a list of urls, non comparable,
                       // stored as a list of urls
 
@@ -276,6 +278,7 @@ const supportedTypesStandard: PropertyDefinitionSupportedTypesStandardType = {
   time,
   datetime,
   location,
+  file,
   files,
 };
 
@@ -321,6 +324,7 @@ export type PropertyDefinitionSupportedType =
   PropertyDefinitionSupportedTimeType |
   PropertyDefinitionSupportedYearType |
   IPropertyDefinitionSupportedLocationType |
+  PropertyDefinitionSupportedFileType |
   PropertyDefinitionSupportedFilesType;
 
 export default supportedTypesStandard;

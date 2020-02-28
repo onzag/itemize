@@ -37,7 +37,7 @@ interface IDialogProps extends WithStyles<typeof dialogStyles> {
   open: boolean;
   title: string;
   onClose: () => void;
-  children: any;
+  children: React.ReactNode;
   fullScreen?: boolean;
   buttons?: React.ReactNode;
   className?: string;

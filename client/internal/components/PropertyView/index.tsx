@@ -66,6 +66,7 @@ const typeRegistry:
   location: null,
 
   // TODO
+  file: null,
   files: null,
 };
 
