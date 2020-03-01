@@ -46,7 +46,7 @@ export declare function convertSQLValueToGQLValueForInclude(include: Include, ro
  * in a partial field value, don't use partial fields to create
  * @returns the partial sql result to be added into the table
  */
-export declare function convertGQLValueToSQLValueForInclude(transitoryId: string, itemDefinition: ItemDefinition, include: Include, data: IGQLValue, oldData: IGQLValue, knex: Knex, dictionary: string, partialFields?: any): Promise<ISQLTableRowValue>;
+export declare function convertGQLValueToSQLValueForInclude(transitoryId: string, itemDefinition: ItemDefinition, include: Include, data: IGQLArgs, oldData: IGQLValue, knex: Knex, dictionary: string, partialFields?: any): Promise<ISQLTableRowValue>;
 /**
  * Builds a sql query for an include
  * @param include the include in question

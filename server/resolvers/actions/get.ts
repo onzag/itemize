@@ -207,11 +207,7 @@ export async function getItemDefinitionList(
     }
   });
 
-  // get the module, the module table name, the table for
-  // the item definition
-  const moduleTable = mod.getQualifiedPathName();
   const resultValues: ISQLTableRowValue[] = await appData.cache.requestListCache(
-    moduleTable,
     resolverArgs.args.ids,
   );
 
@@ -287,9 +283,7 @@ export async function getModuleList(
     true,
   );
 
-  const moduleTable = mod.getQualifiedPathName();
   const resultValues: ISQLTableRowValue[] = await appData.cache.requestListCache(
-    moduleTable,
     resolverArgs.args.ids,
   );
 

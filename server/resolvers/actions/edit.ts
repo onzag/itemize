@@ -10,6 +10,7 @@ import {
   serverSideCheckItemDefinitionAgainst,
   runPolicyCheck,
   validateTokenIsntBlocked,
+  splitArgsInGraphqlQuery,
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import {
@@ -29,6 +30,8 @@ import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { IChangedFeedbackEvent } from "../../../base/remote-protocol";
 import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
+import { IGQLArgs } from "../../../gql-querier";
+import { TriggerActions } from "../triggers";
 
 const debug = Debug("resolvers:editItemDefinition");
 export async function editItemDefinition(
@@ -193,103 +196,83 @@ export async function editItemDefinition(
     true,
   );
 
-  // and we now build both queries for updating
-  // we are telling by setting the partialFields variable
-  // that we only want the editingFields to be returned
-  // into the SQL value, this is valid in here because
-  // we don't want things to be defaulted in the query
-  const dictionary = getDictionary(appData, resolverArgs.args);
-  const sqlIdefData: any = await convertGQLValueToSQLValueForItemDefinition(
-    resolverArgs.args.id.toString(),
-    itemDefinition,
-    resolverArgs.args,
-    currentWholeValueAsGQL,
-    appData.knex,
-    dictionary,
-    editingFields,
-  );
-  const sqlModData: any = await convertGQLValueToSQLValueForModule(
-    resolverArgs.args.id.toString(),
-    itemDefinition.getParentModule(),
-    itemDefinition,
-    resolverArgs.args,
-    currentWholeValueAsGQL,
-    appData.knex,
-    dictionary,
-    editingFields,
-  );
+  // now we need to setup what we want to convert, since the
+  // converting functions can take the whole args with its extra
+  // stuff by default it's just the whole args
+  let gqlValueToConvert: IGQLArgs = resolverArgs.args;
 
-  // now we check if we are updating anything at all
+  // now we need to find the triggers
+  const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
+  const pathOfThisModule = mod.getPath().join("/");
+  // and extract the triggers from the registry
+  const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef]
+  const moduleTrigger = appData.triggers.module[pathOfThisModule];
+  // if we got any of them
   if (
-    Object.keys(sqlIdefData).length === 0 &&
-    Object.keys(sqlModData).length === 0
+    itemDefinitionTrigger || moduleTrigger
   ) {
-    debug("FAILED due to input data being none");
-    throw new EndpointError({
-      message: "You are not updating anything whatsoever",
-      code: ENDPOINT_ERRORS.NOTHING_TO_UPDATE,
-    });
+    // we split the args in the graphql query for that which belongs to the
+    // item definition and that which is extra
+    const [itemDefinitionSpecificArgs, extraArgs] = splitArgsInGraphqlQuery(
+      itemDefinition,
+      resolverArgs.args,
+    );
+    // so now we just want to convert the values setup here, as done
+    // some heavy lifting
+    gqlValueToConvert = itemDefinitionSpecificArgs;
+    // and if we have a module trigger
+    if (moduleTrigger) {
+      // we execute the trigger
+      const newValueAccordingToModule = await moduleTrigger({
+        appData,
+        itemDefinition,
+        module: mod,
+        from: currentWholeValueAsGQL,
+        update: gqlValueToConvert,
+        extraArgs,
+        action: TriggerActions.EDIT,
+      });
+      // and if we have a new value
+      if (newValueAccordingToModule) {
+        // that will be our new value
+        gqlValueToConvert = newValueAccordingToModule;
+      }
+    }
+    // same with the item definition
+    if (itemDefinitionTrigger) {
+      // we call the trigger
+      const newValueAccordingToIdef = await itemDefinitionTrigger({
+        appData,
+        itemDefinition,
+        module: mod,
+        from: currentWholeValueAsGQL,
+        update: gqlValueToConvert,
+        extraArgs,
+        action: TriggerActions.EDIT,
+      });
+      // and make it the new value if such trigger was registered
+      if (newValueAccordingToIdef) {
+        gqlValueToConvert = newValueAccordingToIdef;
+      }
+    }
   }
 
-  // update when it was edited
-  sqlModData.edited_at = appData.knex.fn.now();
-  sqlModData.last_modified = appData.knex.fn.now();
-  sqlModData.edited_by = tokenData.id;
-
-  debug("SQL Input data for idef is %j", sqlIdefData);
-  debug("SQL Input data for module is %j", sqlModData);
-
-  // we build the transaction for the action
-  const value = convertVersionsIntoNullsWhenNecessary(
-    await appData.knex.transaction(async (transactionKnex) => {
-      // and add them if we have them, note that the module will always have
-      // something to update because the edited_at field is always added when
-      // edition is taking place
-      const updateQueryMod = transactionKnex(moduleTable)
-        .update(sqlModData).where("id", resolverArgs.args.id)
-        .returning("*");
-
-      // for the update query of the item definition we have to take several things
-      // into consideration, first we set it as an empty object
-      let updateOrSelectQueryIdef: any = {};
-      // if we have something to update
-      if (Object.keys(sqlIdefData).length) {
-        // we make the update query
-        updateOrSelectQueryIdef = transactionKnex(selfTable).update(sqlIdefData).where(
-          CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-          resolverArgs.args.id,
-        ).andWhere(
-          CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-          resolverArgs.args.version || null,
-        ).returning("*");
-      // otherwise we check if we are just requesting some fields from the idef
-      } else {
-        // and make a simple select query
-        updateOrSelectQueryIdef = transactionKnex(selfTable).select("*").where(
-          CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-          resolverArgs.args.id,
-        ).andWhere(
-          CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-          resolverArgs.args.version || null,
-        );
-      }
-      // if there's nothing to update, or there is nothing to retrieve, it won't touch the idef table
-
-      // now we run both queries
-      const updateQueryValueMod = await updateQueryMod;
-      const updateQueryValueIdef = await updateOrSelectQueryIdef;
-
-      return {
-        ...updateQueryValueMod[0],
-        ...updateQueryValueIdef[0],
-      };
-    }),
+  const dictionary = getDictionary(appData, resolverArgs.args);
+  const sqlValue = await appData.cache.requestUpdate(
+    itemDefinition,
+    resolverArgs.args.id,
+    resolverArgs.args.version || null,
+    gqlValueToConvert,
+    currentWholeValueAsGQL,
+    tokenData.id,
+    dictionary,
+    resolverArgs.args.listener_uuid || null,
   );
 
-  debug("SQL Output is %j", value);
+  debug("SQL Output is %j", sqlValue);
 
   // convert it using the requested fields for that, and ignoring everything else
-  const gqlValue = convertSQLValueToGQLValueForItemDefinition(itemDefinition, value, requestedFields);
+  const gqlValue = convertSQLValueToGQLValueForItemDefinition(itemDefinition, sqlValue, requestedFields);
 
   // we don't need to check for blocked or deleted because such items cannot be edited,
   // see before, so we return immediately, read has been checked already
@@ -300,22 +283,6 @@ export async function editItemDefinition(
   };
 
   debug("SUCCEED with GQL output %j", finalOutput);
-
-  // we return and this executes after it returns
-  (async () => {
-    await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, resolverArgs.args.version || null, value);
-    const changeEvent: IChangedFeedbackEvent = {
-      itemDefinition: selfTable,
-      id: resolverArgs.args.id,
-      version: resolverArgs.args.version || null,
-      type: "modified",
-      lastModified: null,
-    };
-    appData.listener.triggerListeners(
-      changeEvent,
-      resolverArgs.args.listener_uuid || null,
-    );
-  })();
 
   return finalOutput;
 }

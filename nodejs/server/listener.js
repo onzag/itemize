@@ -18,6 +18,7 @@ class Listener {
         this.root = root;
         this.cache = cache;
         this.knex = knex;
+        this.cache.setListener(this);
         this.pubSubTriggerListeners = this.pubSubTriggerListeners.bind(this);
         this.redisSub.on("message", this.pubSubTriggerListeners);
         // TODO we should validte the forms of every request, right now requests are not
@@ -233,8 +234,7 @@ class Listener {
             if (!itemDefinition || !(itemDefinition instanceof ItemDefinition_1.default)) {
                 return;
             }
-            const mod = itemDefinition.getParentModule();
-            const queriedResult = await this.cache.requestCache(itemDefinition.getQualifiedPathName(), mod.getQualifiedPathName(), request.id, request.version);
+            const queriedResult = await this.cache.requestValue(itemDefinition, request.id, request.version);
             if (queriedResult) {
                 const event = {
                     itemDefinition: request.itemDefinition,

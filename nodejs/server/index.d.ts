@@ -1,12 +1,16 @@
 import express from "express";
 import Root from "../base/Root";
-import { IGQLQueryFieldsDefinitionType, IGQLFieldsDefinitionType } from "../base/Root/gql";
+import { IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
 import Knex from "knex";
 import Autocomplete from "../base/Autocomplete";
 import { Listener } from "./listener";
 import { RedisClient } from "redis";
 import { Cache } from "./cache";
+import { ICustomTokensType } from "./custom-graphql";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
+import { ITriggerRegistry } from "./resolvers/triggers";
+import { IPStack } from "./services/ipstack";
+import Mailgun from "mailgun-js";
 export interface IAppDataType {
     root: Root;
     autocompletes: Autocomplete[];
@@ -21,24 +25,9 @@ export interface IAppDataType {
     redisPub: RedisClient;
     redisSub: RedisClient;
     buildnumber: string;
-}
-export interface IReferredTokenStructure {
-    onBehalfOf?: number;
-    withRole: string;
-    expiresIn?: string;
-    error?: string;
-}
-export interface ICustomTokenGQLQueryDefinition {
-    resolve: (appData: IAppDataType, args: {
-        source: any;
-        args: any;
-        context: any;
-        info: any;
-    }) => IReferredTokenStructure | Promise<IReferredTokenStructure>;
-    args?: IGQLFieldsDefinitionType;
-}
-export interface ICustomTokensType {
-    [name: string]: ICustomTokenGQLQueryDefinition;
+    triggers: ITriggerRegistry;
+    ipStack: IPStack;
+    mailgun: Mailgun.Mailgun;
 }
 export interface IServerCustomizationDataType {
     customGQLQueries?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;
@@ -46,5 +35,18 @@ export interface IServerCustomizationDataType {
     customGQLMutations?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;
     customRouterEndpoint?: string;
     customRouter?: (appData: IAppDataType) => express.Router;
+    customTriggers?: ITriggerRegistry;
 }
+/**
+ * Initializes the itemize server with its custom configuration
+ * @param custom the customization details
+ * @param custom.customGQLQueries custom graphql queries
+ * @param custom.customTokenGQLQueries custom token graphql queries for generating custom tokens
+ * while customGQLQueries can be used for the same purpose, this makes it easier and compliant
+ * @param custom.customGQLMutations custom graphql mutations
+ * @param custom.customRouterEndpoint an endpoint to add a custom router, otherwise it gets
+ * attached to the root
+ * @param custom.customRouter a custom router to attach to the rest endpoint
+ * @param custom.customTriggers a registry for custom triggers
+ */
 export declare function initializeServer(custom?: IServerCustomizationDataType): Promise<void>;

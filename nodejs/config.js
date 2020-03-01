@@ -53,6 +53,16 @@ exports.rawSensitiveConfigSchema = {
                 }
             ],
         },
+        mailgunTargetDomain: {
+            anyOf: [
+                {
+                    "type": "string",
+                },
+                {
+                    "type": "null"
+                }
+            ],
+        },
         jwtKey: {
             type: "string",
         },
@@ -67,6 +77,7 @@ exports.rawSensitiveConfigSchema = {
         "hereAppCode",
         "mailgunAPIKey",
         "mailgunDomain",
+        "mailgunTargetDomain",
         "jwtKey",
         "devKey",
     ],

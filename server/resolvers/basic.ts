@@ -23,7 +23,7 @@ import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefin
 import { jwtVerify } from "../token";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { IGQLValue, IGQLSearchResult } from "../../gql-querier";
+import { IGQLValue, IGQLSearchResult, IGQLArgs } from "../../gql-querier";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 const buildColumnNamesForModuleTableOnlyDebug = Debug("resolvers:buildColumnNamesForModuleTableOnly");
@@ -200,9 +200,8 @@ export async function validateParentingRules(
     }
 
     itemDefinition.checkCanBeParentedBy(parentingItemDefinition, true);
-    const parentMod = parentingItemDefinition.getParentModule();
-    const result = await appData.cache.requestCache(
-      type, parentMod.getQualifiedPathName(), id, version,
+    const result = await appData.cache.requestValue(
+      parentingItemDefinition, id, version,
     );
     if (!result) {
       throw new EndpointError({
@@ -371,11 +370,14 @@ export function getDictionary(appData: IAppDataType, args: any): string {
 }
 
 const validateTokenIsntBlockedDebug = Debug("resolvers:validateTokenIsntBlocked");
-export async function validateTokenIsntBlocked(cache: Cache, tokenData: IServerSideTokenDataType) {
+export async function validateTokenIsntBlocked(
+  cache: Cache,
+  tokenData: IServerSideTokenDataType,
+) {
   validateTokenIsntBlockedDebug("EXECUTED");
   if (tokenData.id) {
-    const sqlResult: ISQLTableRowValue = await cache.requestCache(
-      "MOD_users__IDEF_user", "MOD_users", tokenData.id, null,
+    const sqlResult: ISQLTableRowValue = await cache.requestValue(
+      ["MOD_users__IDEF_user", "MOD_users"], tokenData.id, null,
     );
     if (!sqlResult) {
       throw new EndpointError({
@@ -396,8 +398,8 @@ export async function validateTokenIsntBlocked(cache: Cache, tokenData: IServerS
 const checkUserExistsDebug = Debug("resolvers:checkUserExists");
 export async function checkUserExists(cache: Cache, id: number) {
   checkUserExistsDebug("EXECUTED");
-  const sqlResult: ISQLTableRowValue = await cache.requestCache(
-    "MOD_users__IDEF_user", "MOD_users", id, null,
+  const sqlResult: ISQLTableRowValue = await cache.requestValue(
+    ["MOD_users__IDEF_user", "MOD_users"], id, null,
   );
   if (!sqlResult) {
     throw new EndpointError({
@@ -662,6 +664,46 @@ export function checkReadPoliciesAllowThisUserToSearch(
   );
 }
 
+const splitArgsInGraphqlQueryDebug = Debug("resolvers:splitArgsInGraphqlQuery");
+/**
+ * Splits the arguments in a graphql query from what it comes to be part
+ * of the item definition or module in question and what is extra arguments
+ * that are used within the query
+ * @param moduleOrItemDefinition the module or item definition
+ * @param args the arguments to split
+ */
+export function splitArgsInGraphqlQuery(
+  moduleOrItemDefinition: Module | ItemDefinition,
+  args: IGQLArgs,
+): [IGQLArgs, IGQLArgs] {
+  splitArgsInGraphqlQueryDebug(
+    "EXECUTED with %j",
+    args,
+  );
+  const resultingSelfValues: IGQLArgs = {};
+  const resultingExtraArgs: IGQLArgs = {};
+  const propertyIds = (moduleOrItemDefinition instanceof Module ?
+    moduleOrItemDefinition.getAllPropExtensions() :
+    moduleOrItemDefinition.getAllPropertyDefinitionsAndExtensions()).map((p) => p.getId());
+  const includeIds = (moduleOrItemDefinition instanceof Module ? [] :
+    moduleOrItemDefinition.getAllIncludes()).map((i) => i.getQualifiedIdentifier());
+
+  Object.keys(args).forEach((key) => {
+    if (propertyIds.includes(key) || includeIds.includes(key)) {
+      resultingSelfValues[key] = args[key];
+    } else {
+      resultingExtraArgs[key] = args[key];
+    }
+  });
+
+  splitArgsInGraphqlQueryDebug(
+    "SUCCEED with %j",
+    [resultingSelfValues, resultingExtraArgs],
+  );
+
+  return [resultingSelfValues, resultingExtraArgs];
+}
+
 const runPolicyCheckDebug = Debug("resolvers:runPolicyCheck");
 /**
  * Runs a policy check on the requested information
@@ -709,17 +751,15 @@ export async function runPolicyCheck(
   );
   // so now we get the information we need first
   const mod = arg.itemDefinition.getParentModule();
-  const moduleTable = mod.getQualifiedPathName();
-  const selfTable = arg.itemDefinition.getQualifiedPathName();
 
   let selectQueryValue: ISQLTableRowValue = null;
   let parentSelectQueryValue: ISQLTableRowValue = null;
   if (arg.policyTypes.includes("read") || arg.policyTypes.includes("delete") || arg.policyTypes.includes("edit")) {
-    selectQueryValue = await arg.cache.requestCache(selfTable, moduleTable, arg.id, arg.version);
+    selectQueryValue = await arg.cache.requestValue(arg.itemDefinition, arg.id, arg.version);
   }
   if (arg.policyTypes.includes("parent")) {
-    parentSelectQueryValue = await arg.cache.requestCache(
-      arg.parentType, arg.parentModule, arg.parentId, arg.parentVersion,
+    parentSelectQueryValue = await arg.cache.requestValue(
+      [arg.parentType, arg.parentModule], arg.parentId, arg.parentVersion,
     );
   }
 

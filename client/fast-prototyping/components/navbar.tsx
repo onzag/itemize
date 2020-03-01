@@ -119,8 +119,13 @@ const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                   disableExternalChecks={true}
                   assumeOwnership={true}
                   optimize={{
-                    onlyIncludeIncludes: [],
-                    onlyIncludeProperties: ["username", "app_country", "email", "e_validated"],
+                    onlyIncludeProperties: [
+                      "username",
+                      "app_country",
+                      "email",
+                      "e_validated",
+                      "profile_picture",
+                    ],
                     excludePolicies: true,
                   }}
                 >

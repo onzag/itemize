@@ -154,8 +154,7 @@ async function validateParentingRules(appData, id, version, type, itemDefinition
             });
         }
         itemDefinition.checkCanBeParentedBy(parentingItemDefinition, true);
-        const parentMod = parentingItemDefinition.getParentModule();
-        const result = await appData.cache.requestCache(type, parentMod.getQualifiedPathName(), id, version);
+        const result = await appData.cache.requestValue(parentingItemDefinition, id, version);
         if (!result) {
             throw new errors_1.EndpointError({
                 message: `There's no parent ${type} with id ${id}`,
@@ -297,7 +296,7 @@ const validateTokenIsntBlockedDebug = debug_1.default("resolvers:validateTokenIs
 async function validateTokenIsntBlocked(cache, tokenData) {
     validateTokenIsntBlockedDebug("EXECUTED");
     if (tokenData.id) {
-        const sqlResult = await cache.requestCache("MOD_users__IDEF_user", "MOD_users", tokenData.id, null);
+        const sqlResult = await cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], tokenData.id, null);
         if (!sqlResult) {
             throw new errors_1.EndpointError({
                 message: "User has been removed",
@@ -317,7 +316,7 @@ exports.validateTokenIsntBlocked = validateTokenIsntBlocked;
 const checkUserExistsDebug = debug_1.default("resolvers:checkUserExists");
 async function checkUserExists(cache, id) {
     checkUserExistsDebug("EXECUTED");
-    const sqlResult = await cache.requestCache("MOD_users__IDEF_user", "MOD_users", id, null);
+    const sqlResult = await cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], id, null);
     if (!sqlResult) {
         throw new errors_1.EndpointError({
             message: "User has been removed",
@@ -504,6 +503,35 @@ function checkReadPoliciesAllowThisUserToSearch(itemDefinition, role) {
     checkReadPoliciesAllowThisUserToSearchDebug("SUCCEED");
 }
 exports.checkReadPoliciesAllowThisUserToSearch = checkReadPoliciesAllowThisUserToSearch;
+const splitArgsInGraphqlQueryDebug = debug_1.default("resolvers:splitArgsInGraphqlQuery");
+/**
+ * Splits the arguments in a graphql query from what it comes to be part
+ * of the item definition or module in question and what is extra arguments
+ * that are used within the query
+ * @param moduleOrItemDefinition the module or item definition
+ * @param args the arguments to split
+ */
+function splitArgsInGraphqlQuery(moduleOrItemDefinition, args) {
+    splitArgsInGraphqlQueryDebug("EXECUTED with %j", args);
+    const resultingSelfValues = {};
+    const resultingExtraArgs = {};
+    const propertyIds = (moduleOrItemDefinition instanceof Module_1.default ?
+        moduleOrItemDefinition.getAllPropExtensions() :
+        moduleOrItemDefinition.getAllPropertyDefinitionsAndExtensions()).map((p) => p.getId());
+    const includeIds = (moduleOrItemDefinition instanceof Module_1.default ? [] :
+        moduleOrItemDefinition.getAllIncludes()).map((i) => i.getQualifiedIdentifier());
+    Object.keys(args).forEach((key) => {
+        if (propertyIds.includes(key) || includeIds.includes(key)) {
+            resultingSelfValues[key] = args[key];
+        }
+        else {
+            resultingExtraArgs[key] = args[key];
+        }
+    });
+    splitArgsInGraphqlQueryDebug("SUCCEED with %j", [resultingSelfValues, resultingExtraArgs]);
+    return [resultingSelfValues, resultingExtraArgs];
+}
+exports.splitArgsInGraphqlQuery = splitArgsInGraphqlQuery;
 const runPolicyCheckDebug = debug_1.default("resolvers:runPolicyCheck");
 /**
  * Runs a policy check on the requested information
@@ -528,15 +556,13 @@ async function runPolicyCheck(arg) {
     runPolicyCheckDebug("EXECUTED for policies %j on item definition %s for id %d on role %s for value %j with extra columns %j", arg.policyTypes, arg.itemDefinition.getQualifiedPathName(), arg.role, arg.gqlArgValue);
     // so now we get the information we need first
     const mod = arg.itemDefinition.getParentModule();
-    const moduleTable = mod.getQualifiedPathName();
-    const selfTable = arg.itemDefinition.getQualifiedPathName();
     let selectQueryValue = null;
     let parentSelectQueryValue = null;
     if (arg.policyTypes.includes("read") || arg.policyTypes.includes("delete") || arg.policyTypes.includes("edit")) {
-        selectQueryValue = await arg.cache.requestCache(selfTable, moduleTable, arg.id, arg.version);
+        selectQueryValue = await arg.cache.requestValue(arg.itemDefinition, arg.id, arg.version);
     }
     if (arg.policyTypes.includes("parent")) {
-        parentSelectQueryValue = await arg.cache.requestCache(arg.parentType, arg.parentModule, arg.parentId, arg.parentVersion);
+        parentSelectQueryValue = await arg.cache.requestValue([arg.parentType, arg.parentModule], arg.parentId, arg.parentVersion);
     }
     if (arg.preValidation) {
         const forcedResult = arg.preValidation(selectQueryValue);

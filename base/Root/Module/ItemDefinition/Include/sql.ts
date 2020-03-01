@@ -127,7 +127,7 @@ export async function convertGQLValueToSQLValueForInclude(
   transitoryId: string,
   itemDefinition: ItemDefinition,
   include: Include,
-  data: IGQLValue,
+  data: IGQLArgs,
   oldData: IGQLValue,
   knex: Knex,
   dictionary: string,

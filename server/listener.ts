@@ -80,6 +80,8 @@ export class Listener {
     this.cache = cache;
     this.knex = knex;
 
+    this.cache.setListener(this);
+
     this.pubSubTriggerListeners = this.pubSubTriggerListeners.bind(this);
 
     this.redisSub.on("message", this.pubSubTriggerListeners);
@@ -350,9 +352,8 @@ export class Listener {
       if (!itemDefinition || !(itemDefinition instanceof ItemDefinition)) {
         return;
       }
-      const mod = itemDefinition.getParentModule();
-      const queriedResult: ISQLTableRowValue = await this.cache.requestCache(
-        itemDefinition.getQualifiedPathName(), mod.getQualifiedPathName(), request.id, request.version,
+      const queriedResult: ISQLTableRowValue = await this.cache.requestValue(
+        itemDefinition, request.id, request.version,
       );
       if (queriedResult) {
         const event: IChangedFeedbackEvent = {

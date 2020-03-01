@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 import Root, { IRootRawJSONDataType } from "../base/Root";
 import resolvers from "./resolvers";
-import { getGQLSchemaForRoot, IGQLQueryFieldsDefinitionType, IGQLFieldsDefinitionType } from "../base/Root/gql";
+import { getGQLSchemaForRoot, IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
 import Knex from "knex";
 import { types } from "pg";
 import { MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS } from "../constants";
@@ -21,9 +21,14 @@ import { Listener } from "./listener";
 import redis, { RedisClient } from "redis";
 import { Cache } from "./cache";
 import { graphqlUploadExpress } from "graphql-upload";
-import { buildCustomTokenQueries } from "./custom-token";
+import { buildCustomTokenQueries, ICustomTokensType } from "./custom-graphql";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
 import { getMode } from "./mode";
+import { ITriggerRegistry } from "./resolvers/triggers";
+import { customUserTriggers } from "./user/triggers";
+import { setupIPStack, IPStack } from "./services/ipstack";
+import { setupMailgun } from "./services/mailgun";
+import Mailgun from "mailgun-js";
 
 // TODO comment and document
 
@@ -60,27 +65,9 @@ export interface IAppDataType {
   redisPub: RedisClient;
   redisSub: RedisClient;
   buildnumber: string;
-}
-
-export interface IReferredTokenStructure {
-  onBehalfOf?: number;
-  withRole: string;
-  expiresIn?: string;
-  error?: string;
-}
-
-export interface ICustomTokenGQLQueryDefinition {
-  resolve: (appData: IAppDataType, args: {
-    source: any;
-    args: any;
-    context: any;
-    info: any;
-  }) => IReferredTokenStructure | Promise<IReferredTokenStructure>;
-  args?: IGQLFieldsDefinitionType;
-}
-
-export interface ICustomTokensType {
-  [name: string]: ICustomTokenGQLQueryDefinition;
+  triggers: ITriggerRegistry;
+  ipStack: IPStack,
+  mailgun: Mailgun.Mailgun;
 }
 
 export interface IServerCustomizationDataType {
@@ -89,6 +76,7 @@ export interface IServerCustomizationDataType {
   customGQLMutations?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;
   customRouterEndpoint?: string;
   customRouter?: (appData: IAppDataType) => express.Router;
+  customTriggers?: ITriggerRegistry;
 }
 
 const customFormatErrorFn = (error: GraphQLError) => {
@@ -216,7 +204,21 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
   });
 }
 
+/**
+ * Initializes the itemize server with its custom configuration
+ * @param custom the customization details
+ * @param custom.customGQLQueries custom graphql queries
+ * @param custom.customTokenGQLQueries custom token graphql queries for generating custom tokens
+ * while customGQLQueries can be used for the same purpose, this makes it easier and compliant
+ * @param custom.customGQLMutations custom graphql mutations
+ * @param custom.customRouterEndpoint an endpoint to add a custom router, otherwise it gets
+ * attached to the root
+ * @param custom.customRouter a custom router to attach to the rest endpoint
+ * @param custom.customTriggers a registry for custom triggers
+ */
 export async function initializeServer(custom: IServerCustomizationDataType = {}) {
+
+  // first let's read all the configurations
   let rawBuild: string;
   let rawConfig: string;
   let rawSensitiveConfig: string;
@@ -287,13 +289,9 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
   PropertyDefinition.autocompleteChecker = serverSideAutocompleteChecker.bind(null, autocompletes);
 
-  const cache = new Cache(redisClient, knex);
+  const cache = new Cache(redisClient, knex, root);
 
   const server = http.createServer(app);
-  server.listen(config.port, () => {
-    console.log("listening at", config.port);
-    console.log("build number is", buildnumber);
-  });
 
   const listener = new Listener(
     buildnumber,
@@ -304,6 +302,21 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     knex,
     server,
   );
+
+  server.listen(config.port, () => {
+    console.log("listening at", config.port);
+    console.log("build number is", buildnumber);
+  });
+
+  const ipStack = sensitiveConfig.ipStackAccessKey ?
+    setupIPStack(sensitiveConfig.ipStackAccessKey) :
+    null;
+
+  const mailgun = sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain ?
+    setupMailgun({
+      apiKey: sensitiveConfig.mailgunAPIKey,
+      domain: sensitiveConfig.mailgunDomain,
+    }) : null;
 
   const appData: IAppDataType = {
     root,
@@ -319,6 +332,12 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     redisPub,
     cache,
     buildnumber,
+    triggers: {
+      ...customUserTriggers,
+      ...custom.customTriggers,
+    },
+    ipStack,
+    mailgun,
   };
 
   initializeApp(appData, custom);

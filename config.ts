@@ -35,6 +35,7 @@ export interface ISensitiveConfigRawJSONDataType {
   hereAppCode: string;
   mailgunAPIKey: string;
   mailgunDomain: string;
+  mailgunTargetDomain: string;
   jwtKey: string;
   devKey: string;
 }
@@ -108,6 +109,16 @@ export const rawSensitiveConfigSchema = {
         }
       ],
     },
+    mailgunTargetDomain: {
+      anyOf: [
+        {
+          "type": "string",
+        },
+        {
+          "type": "null"
+        }
+      ],
+    },
     jwtKey: {
       type: "string",
     },
@@ -122,6 +133,7 @@ export const rawSensitiveConfigSchema = {
     "hereAppCode",
     "mailgunAPIKey",
     "mailgunDomain",
+    "mailgunTargetDomain",
     "jwtKey",
     "devKey",
   ],

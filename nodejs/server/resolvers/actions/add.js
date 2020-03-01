@@ -9,12 +9,10 @@ const basic_1 = require("../basic");
 const graphql_fields_1 = __importDefault(require("graphql-fields"));
 const constants_1 = require("../../../constants");
 const sql_1 = require("../../../base/Root/Module/ItemDefinition/sql");
-const sql_2 = require("../../../base/Root/Module/sql");
 const gql_util_1 = require("../../../gql-util");
-const uuid_1 = __importDefault(require("uuid"));
-const sql_files_1 = require("../../../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files");
 const errors_1 = require("../../../base/errors");
-const version_null_value_1 = require("../../version-null-value");
+const triggers_1 = require("../triggers");
+// TODO versioning and the for_id madness
 const debug = debug_1.default("resolvers:addItemDefinition");
 async function addItemDefinition(appData, resolverArgs, itemDefinition) {
     debug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
@@ -136,54 +134,69 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
     // field, the fields can use both language and language region combos
     // so we check via dictionaries
     const dictionary = basic_1.getDictionary(appData, resolverArgs.args);
-    const transitoryId = "TEMP" + uuid_1.default.v4().replace(/-/g, "");
-    // now we extract the SQL information for both item definition table
-    // and the module table, this value is database ready, and hence needs
-    // knex and the dictionary to convert fields that need it
-    const sqlIdefData = await sql_1.convertGQLValueToSQLValueForItemDefinition(transitoryId, itemDefinition, resolverArgs.args, null, appData.knex, dictionary);
-    const sqlModData = await sql_2.convertGQLValueToSQLValueForModule(transitoryId, itemDefinition.getParentModule(), itemDefinition, resolverArgs.args, null, appData.knex, dictionary);
-    // this data is added every time when creating
-    sqlModData.type = selfTable;
-    sqlModData.created_at = appData.knex.fn.now();
-    sqlModData.last_modified = appData.knex.fn.now();
-    sqlModData.created_by = tokenData.id || constants_1.UNSPECIFIED_OWNER;
-    if (isParenting) {
-        sqlModData.parent_id = resolverArgs.args.parent_id;
-        // the version can never be null, so we must cast it into the invalid
-        // empty string value
-        sqlModData.parent_version = resolverArgs.args.parent_version || "";
-        sqlModData.parent_type = resolverArgs.args.parent_type;
+    // now we need to setup what we want to convert, since the
+    // converting functions can take the whole args with its extra
+    // stuff by default it's just the whole args
+    let gqlValueToConvert = resolverArgs.args;
+    // however now we need to check if we have triggers, for that we get
+    // the absolute paths
+    const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
+    const pathOfThisModule = mod.getPath().join("/");
+    // and extract the triggers from the registry
+    const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef];
+    const moduleTrigger = appData.triggers.module[pathOfThisModule];
+    // if we got any of them
+    if (itemDefinitionTrigger || moduleTrigger) {
+        // we split the args in the graphql query for that which belongs to the
+        // item definition and that which is extra
+        const [itemDefinitionSpecificArgs, extraArgs] = basic_1.splitArgsInGraphqlQuery(itemDefinition, resolverArgs.args);
+        // so now we just want to convert the values setup here, as done
+        // some heavy lifting
+        gqlValueToConvert = itemDefinitionSpecificArgs;
+        // and if we have a module trigger
+        if (moduleTrigger) {
+            // we execute the trigger
+            const newValueAccordingToModule = await moduleTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                from: null,
+                update: gqlValueToConvert,
+                extraArgs,
+                action: triggers_1.TriggerActions.CREATE,
+            });
+            // and if we have a new value
+            if (newValueAccordingToModule) {
+                // that will be our new value
+                gqlValueToConvert = newValueAccordingToModule;
+            }
+        }
+        // same with the item definition
+        if (itemDefinitionTrigger) {
+            // we call the trigger
+            const newValueAccordingToIdef = await itemDefinitionTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                from: null,
+                update: gqlValueToConvert,
+                extraArgs,
+                action: triggers_1.TriggerActions.CREATE,
+            });
+            // and make it the new value if such trigger was registered
+            if (newValueAccordingToIdef) {
+                gqlValueToConvert = newValueAccordingToIdef;
+            }
+        }
     }
-    debug("SQL Input data for idef is %j", sqlIdefData);
-    debug("SQL Input data for module is %j", sqlModData);
-    // now let's build the transaction for the insert query which requires
-    // two tables to be modified, and it always does so, as item definition information
-    // must be added because create requires so
-    const value = version_null_value_1.convertVersionsIntoNullsWhenNecessary(await appData.knex.transaction(async (transactionKnex) => {
-        debug("Inserting...");
-        // so we insert in the module, this is very simple
-        // we use the transaction in the module table
-        // insert the sql data that we got ready, and return
-        // the requested columns in sql, there's always at least 1
-        // because we always need the id
-        const insertQueryValueMod = await transactionKnex(moduleTable)
-            .insert(sqlModData).returning("*");
-        // so with that in mind, we add the foreign key column value
-        // for combining both and keeping them joined togeher
-        sqlIdefData[constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod[0].id;
-        sqlIdefData[constants_1.CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod[0].version;
-        // so now we create the insert query
-        const insertQueryIdef = transactionKnex(selfTable).insert(sqlIdefData).returning("*");
-        // so we call the qery
-        const insertQueryValueIdef = await insertQueryIdef;
-        // and we return the joined result
-        return {
-            ...insertQueryValueMod[0],
-            ...insertQueryValueIdef[0],
-        };
-    }));
+    const value = await appData.cache.requestCreation(itemDefinition, null, // TODO
+    null, // TODO
+    gqlValueToConvert, tokenData.id, dictionary, isParenting ? {
+        id: resolverArgs.args.parent_id,
+        version: resolverArgs.args.parent_version,
+        type: resolverArgs.args.parent_type,
+    } : null);
     debug("SQL Output is %j", value);
-    appData.cache.forceCacheInto(selfTable, value.id, value.version, value);
     // now we convert that SQL value to the respective GQL value
     // the reason we pass the requested fields is to filter by the fields
     // that we actually want, not passing this would make the gql value
@@ -194,45 +207,6 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
         DATA: gqlValue,
         ...gqlValue,
     };
-    await sql_files_1.updateTransitoryIdIfExists(itemDefinition, transitoryId, value.id.toString());
-    const searchResultForThisValue = {
-        id: value.id,
-        version: value.version,
-        type: selfTable,
-        created_at: value.created_at,
-    };
-    const itemDefinitionBasedOwnedEvent = {
-        qualifiedPathName: selfTable,
-        createdBy: itemDefinition.isOwnerObjectId() ? value.id : sqlModData.created_by,
-        newIds: [
-            searchResultForThisValue,
-        ],
-        newLastRecord: searchResultForThisValue,
-    };
-    appData.listener.triggerOwnedSearchListeners(itemDefinitionBasedOwnedEvent, null);
-    const moduleBasedOwnedEvent = {
-        ...itemDefinitionBasedOwnedEvent,
-        qualifiedPathName: moduleTable,
-    };
-    appData.listener.triggerOwnedSearchListeners(moduleBasedOwnedEvent, null);
-    if (isParenting) {
-        const itemDefinitionBasedParentedEvent = {
-            qualifiedPathName: selfTable,
-            parentId: resolverArgs.args.parent_id,
-            parentVersion: resolverArgs.args.parent_version || null,
-            parentType: resolverArgs.args.parent_type,
-            newIds: [
-                searchResultForThisValue,
-            ],
-            newLastRecord: searchResultForThisValue,
-        };
-        appData.listener.triggerParentedSearchListeners(itemDefinitionBasedParentedEvent, null);
-        const moduleBasedParentedEvent = {
-            ...itemDefinitionBasedParentedEvent,
-            qualifiedPathName: moduleTable,
-        };
-        appData.listener.triggerParentedSearchListeners(moduleBasedParentedEvent, null);
-    }
     debug("SUCCEED with GQL output %j", finalOutput);
     // items that have just been added cannot be blocked or deleted, hence we just return
     // right away without checking

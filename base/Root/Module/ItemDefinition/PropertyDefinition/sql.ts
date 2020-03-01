@@ -283,7 +283,7 @@ export async function convertGQLValueToSQLValueForProperty(
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-  data: IGQLValue,
+  data: IGQLArgs,
   oldData: IGQLValue,
   knex: Knex,
   dictionary: string,

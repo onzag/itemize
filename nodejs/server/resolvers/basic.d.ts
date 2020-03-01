@@ -4,7 +4,7 @@ import { IAppDataType } from "..";
 import Include from "../../base/Root/Module/ItemDefinition/Include";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { IGQLValue, IGQLSearchResult } from "../../gql-querier";
+import { IGQLValue, IGQLSearchResult, IGQLArgs } from "../../gql-querier";
 /**
  * Builds the column names expected for a given module only
  * @param requestedFields the requested fields given by graphql fields and flattened
@@ -98,6 +98,14 @@ export declare function serverSideCheckItemDefinitionAgainst(itemDefinition: Ite
  * @param role the role
  */
 export declare function checkReadPoliciesAllowThisUserToSearch(itemDefinition: ItemDefinition, role: string): void;
+/**
+ * Splits the arguments in a graphql query from what it comes to be part
+ * of the item definition or module in question and what is extra arguments
+ * that are used within the query
+ * @param moduleOrItemDefinition the module or item definition
+ * @param args the arguments to split
+ */
+export declare function splitArgsInGraphqlQuery(moduleOrItemDefinition: Module | ItemDefinition, args: IGQLArgs): [IGQLArgs, IGQLArgs];
 /**
  * Runs a policy check on the requested information
  * @param arg.policyType the policy type on which the request is made on, edit, delete

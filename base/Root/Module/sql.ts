@@ -18,7 +18,7 @@ import { getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue } from "../sql";
 import Knex from "knex";
 import ItemDefinition from "./ItemDefinition";
-import { IGQLRequestFields, IGQLValue } from "../../../gql-querier";
+import { IGQLRequestFields, IGQLValue, IGQLArgs } from "../../../gql-querier";
 
 /**
  * Provides the table that is necesary to include this module and all
@@ -91,11 +91,11 @@ export async function convertGQLValueToSQLValueForModule(
   transitoryId: string,
   mod: Module,
   itemDefinition: ItemDefinition,
-  data: IGQLValue,
+  data: IGQLArgs,
   oldData: IGQLValue,
   knex: Knex,
   dictionary: string,
-  partialFields?: any,
+  partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
 ): Promise<ISQLTableRowValue> {
   // first we create the row value
   const result: ISQLTableRowValue = {};

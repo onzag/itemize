@@ -58,7 +58,7 @@ export declare function convertSQLValueToGQLValueForItemDefinition(itemDefinitio
  * in a partial field value, don't use partial fields to create
  * @returns a sql value
  */
-export declare function convertGQLValueToSQLValueForItemDefinition(transitoryId: string, itemDefinition: ItemDefinition, data: IGQLValue, oldData: IGQLValue, knex: Knex, dictionary: string, partialFields?: IGQLRequestFields): Promise<ISQLTableRowValue>;
+export declare function convertGQLValueToSQLValueForItemDefinition(transitoryId: string, itemDefinition: ItemDefinition, data: IGQLArgs, oldData: IGQLValue, knex: Knex, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): Promise<ISQLTableRowValue>;
 /**
  * Builds a sql query for an item definition so that it can be
  * queried for searches

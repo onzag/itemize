@@ -127,10 +127,7 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
             });
         }
     });
-    // get the module, the module table name, the table for
-    // the item definition
-    const moduleTable = mod.getQualifiedPathName();
-    const resultValues = await appData.cache.requestListCache(moduleTable, resolverArgs.args.ids);
+    const resultValues = await appData.cache.requestListCache(resolverArgs.args.ids);
     const finalValues = resultValues.map((value) => {
         // preveting another security leak here, the user might have lied by saying that these
         // items were all created by this specific creator when doing searches
@@ -180,8 +177,7 @@ async function getModuleList(appData, resolverArgs, mod) {
         ownerToCheckAgainst = created_by;
     }
     mod.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, requestedFieldsInMod, true);
-    const moduleTable = mod.getQualifiedPathName();
-    const resultValues = await appData.cache.requestListCache(moduleTable, resolverArgs.args.ids);
+    const resultValues = await appData.cache.requestListCache(resolverArgs.args.ids);
     // return if otherwise succeeds
     const finalValues = resultValues.map((value) => {
         // preveting another security leak here, the user might have lied by saying that these

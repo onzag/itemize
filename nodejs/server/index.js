@@ -25,8 +25,11 @@ const listener_1 = require("./listener");
 const redis_1 = __importDefault(require("redis"));
 const cache_1 = require("./cache");
 const graphql_upload_1 = require("graphql-upload");
-const custom_token_1 = require("./custom-token");
+const custom_graphql_1 = require("./custom-graphql");
 const mode_1 = require("./mode");
+const triggers_1 = require("./user/triggers");
+const ipstack_1 = require("./services/ipstack");
+const mailgun_1 = require("./services/mailgun");
 // TODO comment and document
 // Setting the parsers, postgresql comes with
 // its own way to return this data and I want it
@@ -91,7 +94,7 @@ function initializeApp(appData, custom) {
     const allCustomQueries = {
         ...queries_1.customUserQueries(appData),
         ...(custom.customGQLQueries && custom.customGQLQueries(appData)),
-        ...(custom.customTokenGQLQueries && custom_token_1.buildCustomTokenQueries(appData, custom.customTokenGQLQueries)),
+        ...(custom.customTokenGQLQueries && custom_graphql_1.buildCustomTokenQueries(appData, custom.customTokenGQLQueries)),
     };
     const allCustomMutations = {
         ...mutations_1.customUserMutations(appData),
@@ -143,7 +146,20 @@ function initializeApp(appData, custom) {
         }
     });
 }
+/**
+ * Initializes the itemize server with its custom configuration
+ * @param custom the customization details
+ * @param custom.customGQLQueries custom graphql queries
+ * @param custom.customTokenGQLQueries custom token graphql queries for generating custom tokens
+ * while customGQLQueries can be used for the same purpose, this makes it easier and compliant
+ * @param custom.customGQLMutations custom graphql mutations
+ * @param custom.customRouterEndpoint an endpoint to add a custom router, otherwise it gets
+ * attached to the root
+ * @param custom.customRouter a custom router to attach to the rest endpoint
+ * @param custom.customTriggers a registry for custom triggers
+ */
 async function initializeServer(custom = {}) {
+    // first let's read all the configurations
     let rawBuild;
     let rawConfig;
     let rawSensitiveConfig;
@@ -207,13 +223,21 @@ async function initializeServer(custom = {}) {
     const redisSub = redis_1.default.createClient(redisConfig);
     PropertyDefinition_1.default.indexChecker = server_checkers_1.serverSideIndexChecker.bind(null, knex);
     PropertyDefinition_1.default.autocompleteChecker = server_checkers_1.serverSideAutocompleteChecker.bind(null, autocompletes);
-    const cache = new cache_1.Cache(redisClient, knex);
+    const cache = new cache_1.Cache(redisClient, knex, root);
     const server = http_1.default.createServer(app);
+    const listener = new listener_1.Listener(buildnumber, redisSub, redisPub, root, cache, knex, server);
     server.listen(config.port, () => {
         console.log("listening at", config.port);
         console.log("build number is", buildnumber);
     });
-    const listener = new listener_1.Listener(buildnumber, redisSub, redisPub, root, cache, knex, server);
+    const ipStack = sensitiveConfig.ipStackAccessKey ?
+        ipstack_1.setupIPStack(sensitiveConfig.ipStackAccessKey) :
+        null;
+    const mailgun = sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain ?
+        mailgun_1.setupMailgun({
+            apiKey: sensitiveConfig.mailgunAPIKey,
+            domain: sensitiveConfig.mailgunDomain,
+        }) : null;
     const appData = {
         root,
         autocompletes,
@@ -228,6 +252,12 @@ async function initializeServer(custom = {}) {
         redisPub,
         cache,
         buildnumber,
+        triggers: {
+            ...triggers_1.customUserTriggers,
+            ...custom.customTriggers,
+        },
+        ipStack,
+        mailgun,
     };
     initializeApp(appData, custom);
 }

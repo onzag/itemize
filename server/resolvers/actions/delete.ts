@@ -14,8 +14,9 @@ import { EndpointError } from "../../../base/errors";
 import { ENDPOINT_ERRORS, ANYONE_LOGGED_METAROLE, ANYONE_METAROLE,
   GUEST_METAROLE } from "../../../constants";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
-import { deleteEverythingInTransitoryId } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
-import { IChangedFeedbackEvent } from "../../../base/remote-protocol";
+import { ISQLTableRowValue } from "../../../base/Root/sql";
+import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
+import { TriggerActions } from "../triggers";
 
 const debug = Debug("resolvers:deleteItemDefinition");
 export async function deleteItemDefinition(
@@ -51,7 +52,7 @@ export async function deleteItemDefinition(
   // gather the created_by and blocked_at to check the rights
   // of the user
   let userId: number;
-  await runPolicyCheck(
+  const wholeSqlStoredValue: ISQLTableRowValue = await runPolicyCheck(
     {
       policyTypes: ["delete"],
       itemDefinition,
@@ -65,7 +66,7 @@ export async function deleteItemDefinition(
       // and we do it for being efficient, because we can run
       // both of these checks with a single SQL query, and the policy
       // checker is built in a way that it demands and expects that
-      preValidation: (content: any) => {
+      preValidation: (content: ISQLTableRowValue) => {
         // if there is no userId then the row was null, we throw an error
         if (!content) {
           debug("FAILED due to lack of content data");
@@ -118,36 +119,57 @@ export async function deleteItemDefinition(
     true,
   );
 
-  // we run this, not even required to do it as a transaction
-  // because the index in the item definition cascades
-  // TODO drop all versions
-  await appData.knex(moduleTable).delete().where({
-    id: resolverArgs.args.id,
-    version: resolverArgs.args.version,
-    type: selfTable,
-  });
+  // however now we need to check if we have triggers, for that we get
+  // the absolute paths
+  const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
+  const pathOfThisModule = mod.getPath().join("/");
+  // and extract the triggers from the registry
+  const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef]
+  const moduleTrigger = appData.triggers.module[pathOfThisModule];
+  // if we got any of them
+  if (
+    itemDefinitionTrigger || moduleTrigger
+  ) {
+    // we need to use the gql stored value for the trigger
+    const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(itemDefinition, wholeSqlStoredValue);
+    debug("Current GQL value found as %j", currentWholeValueAsGQL);
+
+    if (moduleTrigger) {
+      // we execute the trigger
+      await moduleTrigger({
+        appData,
+        itemDefinition,
+        module: mod,
+        from: currentWholeValueAsGQL,
+        update: null,
+        extraArgs: resolverArgs.args,
+        action: TriggerActions.DELETE,
+      });
+    }
+    // same with the item definition
+    if (itemDefinitionTrigger) {
+      // we call the trigger
+      await itemDefinitionTrigger({
+        appData,
+        itemDefinition,
+        module: mod,
+        from: currentWholeValueAsGQL,
+        update: null,
+        extraArgs: resolverArgs.args,
+        action: TriggerActions.DELETE,
+      });
+    }
+  }
+
+  await appData.cache.requestDelete(
+    itemDefinition,
+    resolverArgs.args.id,
+    resolverArgs.args.version,
+    false,
+    resolverArgs.args.listener_uuid || null,
+  );
 
   debug("SUCCEED");
-
-  // we don't want to await any of this
-  deleteEverythingInTransitoryId(
-    itemDefinition,
-    resolverArgs.args.id.toString(),
-  );
-  (async () => {
-    await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, resolverArgs.args.version || null, null);
-    const changeEvent: IChangedFeedbackEvent = {
-      itemDefinition: selfTable,
-      id: resolverArgs.args.id,
-      version: resolverArgs.args.version || null,
-      type: "not_found",
-      lastModified: null,
-    };
-    appData.listener.triggerListeners(
-      changeEvent,
-      resolverArgs.args.listener_uuid || null,
-    );
-  })();
 
   // return null, yep, the output is always null, because it's gone
   // however we are not running the check on the fields that can be read

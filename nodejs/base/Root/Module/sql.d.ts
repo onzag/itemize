@@ -9,7 +9,7 @@ import Module from ".";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue } from "../sql";
 import Knex from "knex";
 import ItemDefinition from "./ItemDefinition";
-import { IGQLRequestFields, IGQLValue } from "../../../gql-querier";
+import { IGQLRequestFields, IGQLValue, IGQLArgs } from "../../../gql-querier";
 /**
  * Provides the table that is necesary to include this module and all
  * its children child definitions into it
@@ -40,7 +40,7 @@ export declare function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefi
  * in a partial field value, don't use partial fields to create
  * @returns a promise for a row value
  */
-export declare function convertGQLValueToSQLValueForModule(transitoryId: string, mod: Module, itemDefinition: ItemDefinition, data: IGQLValue, oldData: IGQLValue, knex: Knex, dictionary: string, partialFields?: any): Promise<ISQLTableRowValue>;
+export declare function convertGQLValueToSQLValueForModule(transitoryId: string, mod: Module, itemDefinition: ItemDefinition, data: IGQLArgs, oldData: IGQLValue, knex: Knex, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): Promise<ISQLTableRowValue>;
 /**
  * Converts a SQL value directly coming from the database as it is
  * to a graphql value for this specific module, this

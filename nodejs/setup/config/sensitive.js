@@ -50,6 +50,14 @@ async function sensitiveConfigSetup(version, currentConfig, referenceConfig, pac
             nullifyFalseValues: true,
         },
         {
+            variableName: "mailgunTargetDomain",
+            message: "The domain that is used in order to generate links, it should be equal the domain name where your app is hosted, " +
+                "if unset it will default to the production hostname, you might want to use localhost when locally developing",
+            defaultValue: "",
+            hidden: true,
+            nullifyFalseValues: true,
+        },
+        {
             variableName: "jwtKey",
             message: "a JSON web token key used for key validation and token generation, leave blank to autogenerate one if not filled",
             defaultValue: genToken(64),

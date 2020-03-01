@@ -192,11 +192,11 @@ export function convertSQLValueToGQLValueForItemDefinition(
 export async function convertGQLValueToSQLValueForItemDefinition(
   transitoryId: string,
   itemDefinition: ItemDefinition,
-  data: IGQLValue,
+  data: IGQLArgs,
   oldData: IGQLValue,
   knex: Knex,
   dictionary: string,
-  partialFields?: IGQLRequestFields,
+  partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
 ): Promise<ISQLTableRowValue> {
   // first we create the row value
   const result: ISQLTableRowValue = {};

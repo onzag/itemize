@@ -1,9 +1,30 @@
-import { IAppDataType, ICustomTokensType } from "..";
-import { IGQLQueryFieldsDefinitionType } from "../../base/Root/gql";
+import { IAppDataType } from "..";
+import { IGQLQueryFieldsDefinitionType, IGQLFieldsDefinitionType } from "../../base/Root/gql";
 import TOKEN_OBJECT from "./graphql-token-object";
 import { EndpointError } from "../../base/errors";
 import { jwtSign } from "../token";
 import { ENDPOINT_ERRORS } from "../../constants";
+
+export interface IReferredTokenStructure {
+  onBehalfOf?: number;
+  withRole: string;
+  expiresIn?: string;
+  error?: string;
+}
+
+export interface ICustomTokenGQLQueryDefinition {
+  resolve: (appData: IAppDataType, args: {
+    source: any;
+    args: any;
+    context: any;
+    info: any;
+  }) => IReferredTokenStructure | Promise<IReferredTokenStructure>;
+  args?: IGQLFieldsDefinitionType;
+}
+
+export interface ICustomTokensType {
+  [name: string]: ICustomTokenGQLQueryDefinition;
+}
 
 export function buildCustomTokenQueries(
   appData: IAppDataType,

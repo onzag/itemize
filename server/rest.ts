@@ -1,15 +1,13 @@
 import { IAppDataType } from ".";
 import express from "express";
-import http from "http";
 import path from "path";
 import Module from "../base/Root/Module";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import bodyParser from "body-parser";
-import { countries } from "../imported-resources";
 import { IAutocompleteOutputType } from "../base/Autocomplete";
-import { PROTECTED_RESOURCES } from "../constants";
+import { PROTECTED_RESOURCES, ENDPOINT_ERRORS } from "../constants";
 import { getMode } from "./mode";
 
 // TODO comment and document
@@ -34,8 +32,12 @@ export default function restServices(appData: IAppDataType) {
   router.use((req, res, next) => {
     bodyParserJSON(req, res, (err) => {
       if (err) {
+        res.setHeader("content-type", "application/json; charset=utf-8");
         res.status(400);
-        res.end("Malformed JSON");
+        res.end(JSON.stringify({
+          message: "malformed json",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        }));
       } else {
         next();
       }
@@ -56,15 +58,24 @@ export default function restServices(appData: IAppDataType) {
     // we get the version
     const version: string = req.body.version;
 
+    // we always return json
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
     // check that they are valid
     if (typeof id !== "number" && id !== null) {
       res.status(400);
-      res.end("Invalid Input on id");
+      res.end(JSON.stringify({
+        message: "Invalid input on id",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      }));
       return;
     }
     if (typeof version !== "string" && version !== null) {
       res.status(400);
-      res.end("Invalid Input on version");
+      res.end(JSON.stringify({
+        message: "Invalid input on version",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      }));
       return;
     }
     // get get the definition description
@@ -73,7 +84,10 @@ export default function restServices(appData: IAppDataType) {
     // if the definition has a json and the value of not of that type
     if (definition.json && typeof value !== definition.json) {
       res.status(400);
-      res.end("Invalid Input on value");
+      res.end(JSON.stringify({
+        message: "Invalid input on value",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      }));
       return;
     }
 
@@ -87,13 +101,14 @@ export default function restServices(appData: IAppDataType) {
       // if the property definition complains
       if (invalidReason) {
         res.status(400);
-        res.end("Invalid Input");
+        res.end(JSON.stringify({
+          message: "Invalid input",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        }));
         return;
       }
     }
 
-    // now we are ready to return
-    res.setHeader("content-type", "application/json; charset=utf-8");
     // we use the server side index checker
     const isValid = await serverSideIndexChecker(appData.knex, property, value, id, version);
     res.end(JSON.stringify(isValid));
@@ -146,14 +161,14 @@ export default function restServices(appData: IAppDataType) {
 
   // now in order to get the country at /rest/util/country
   // which guesses in which country we are
-  router.get("/util/country", (req, res) => {
+  router.get("/util/country", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
-    const standardAPIResponse = JSON.stringify({
+    const standardAPIResponse = {
       country: appData.config.fallbackCountryCode,
       currency: appData.config.fallbackCurrency,
       language: appData.config.fallbackLanguage,
-    });
+    };
 
     const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
     // This only occurs during development
@@ -161,41 +176,14 @@ export default function restServices(appData: IAppDataType) {
       ip === "127.0.0.1" ||
       ip === "::1" ||
       ip === "::ffff:127.0.0.1" ||
-      !appData.sensitiveConfig.ipStackAccessKey
+      !appData.ipStack
     ) {
-      res.end(standardAPIResponse);
+      res.end(JSON.stringify(standardAPIResponse));
       return;
     }
 
-    http.get(`http://api.ipstack.com/${ip}?access_key=${appData.sensitiveConfig.ipStackAccessKey}`, (resp) => {
-      // let's get the response from the stream
-      let data = "";
-      resp.on("data", (chunk) => {
-        data += chunk;
-      });
-      resp.on("error", (err) => {
-        console.error(err.message);
-        res.end(standardAPIResponse);
-      });
-      resp.on("end", () => {
-        // now that we got the answer, let's use our guess
-        try {
-          const parsedData = JSON.parse(data);
-          res.end(JSON.stringify({
-            country: parsedData.country_code,
-            currency: countries[parsedData.country_code] ? countries[parsedData.country_code].currency || "EUR" : "EUR",
-            language: parsedData.languages[0] ? parsedData.languages[0].code :
-              (countries[parsedData.country_code] ? countries[parsedData.country_code].languages[0] || "en" : "en"),
-          }));
-        } catch (err) {
-          console.error(err.message);
-          res.end(standardAPIResponse);
-        }
-      });
-    }).on("error", (err) => {
-      console.error(err.message);
-      res.end(standardAPIResponse);
-    });
+    const ipStackResponse = await appData.ipStack.requestUserInfoForIp(ip.toString(), standardAPIResponse);
+    res.end(JSON.stringify(ipStackResponse));
   });
 
   // add the static resources
@@ -220,12 +208,17 @@ export default function restServices(appData: IAppDataType) {
     // you might wonder why a get request and not a post request
     // this is because autocomplete requests should be able to be cached
     router.get("/autocomplete/" + autocomplete.getName() + "/", (req, res) => {
+      res.setHeader("content-type", "application/json; charset=utf-8");
+
       let body;
       try {
         body = JSON.parse(req.query.body);
       } catch {
         res.status(400);
-        res.end("Malformed JSON");
+        res.end(JSON.stringify({
+          message: "malformed json",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        }));
         return;
       }
       // get the language that is used from the request body
@@ -236,13 +229,19 @@ export default function restServices(appData: IAppDataType) {
       // check it all
       if (typeof languageLocale !== "string" && typeof languageLocale !== "undefined" && languageLocale !== null) {
         res.status(400);
-        res.end("Invalid Input on lang");
+        res.end(JSON.stringify({
+          message: "Invalid input on lang",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        }));
         return;
       }
 
       if (typeof query !== "string") {
         res.status(400);
-        res.end("Invalid Input on query");
+        res.end(JSON.stringify({
+          message: "Invalid input on query",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        }));
         return;
       }
 
@@ -255,19 +254,23 @@ export default function restServices(appData: IAppDataType) {
       }
 
       // send the results
-      res.setHeader("content-type", "application/json; charset=utf-8");
       res.end(JSON.stringify(results));
     });
 
     // to check an autocomplete value as well, also a get request
     // as well because we need it to be cacheable
     router.get("/autocomplete-check/" + autocomplete.getName() + "/", (req, res) => {
+      res.setHeader("content-type", "application/json; charset=utf-8");
+
       let body;
       try {
         body = JSON.parse(req.query.body);
       } catch {
         res.status(400);
-        res.end("Malformed JSON");
+        res.end(JSON.stringify({
+          message: "malformed json",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        }));
         return;
       }
       const value: string = body.value;
@@ -275,11 +278,13 @@ export default function restServices(appData: IAppDataType) {
 
       if (typeof value !== "string") {
         res.status(400);
-        res.end("Invalid Input on query");
+        res.end(JSON.stringify({
+          message: "Invalid input on query",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        }));
         return;
       }
 
-      res.setHeader("content-type", "application/json; charset=utf-8");
       const isValid = !!autocomplete.findExactValueFor(value, filters);
       res.end(JSON.stringify(isValid));
     });
@@ -293,7 +298,11 @@ export default function restServices(appData: IAppDataType) {
   // now we add a 404
   router.use((req, res) => {
     res.status(404);
-    res.end("Unknown Endpoint");
+    res.setHeader("content-type", "application/json; charset=utf-8");
+    res.end(JSON.stringify({
+      message: "nothing to be found here",
+      code: ENDPOINT_ERRORS.NOT_FOUND,
+    }));
   });
 
   // return the router

@@ -10,7 +10,8 @@ const graphql_fields_1 = __importDefault(require("graphql-fields"));
 const errors_1 = require("../../../base/errors");
 const constants_1 = require("../../../constants");
 const gql_util_1 = require("../../../gql-util");
-const sql_files_1 = require("../../../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files");
+const sql_1 = require("../../../base/Root/Module/ItemDefinition/sql");
+const triggers_1 = require("../triggers");
 const debug = debug_1.default("resolvers:deleteItemDefinition");
 async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     debug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
@@ -35,7 +36,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     // gather the created_by and blocked_at to check the rights
     // of the user
     let userId;
-    await basic_1.runPolicyCheck({
+    const wholeSqlStoredValue = await basic_1.runPolicyCheck({
         policyTypes: ["delete"],
         itemDefinition,
         id: resolverArgs.args.id,
@@ -87,28 +88,46 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     // for the delete action
     debug("Checking role access for delete");
     itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.DELETE, tokenData.role, tokenData.id, userId, null, true);
-    // we run this, not even required to do it as a transaction
-    // because the index in the item definition cascades
-    // TODO drop all versions
-    await appData.knex(moduleTable).delete().where({
-        id: resolverArgs.args.id,
-        version: resolverArgs.args.version,
-        type: selfTable,
-    });
+    // however now we need to check if we have triggers, for that we get
+    // the absolute paths
+    const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
+    const pathOfThisModule = mod.getPath().join("/");
+    // and extract the triggers from the registry
+    const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef];
+    const moduleTrigger = appData.triggers.module[pathOfThisModule];
+    // if we got any of them
+    if (itemDefinitionTrigger || moduleTrigger) {
+        // we need to use the gql stored value for the trigger
+        const currentWholeValueAsGQL = sql_1.convertSQLValueToGQLValueForItemDefinition(itemDefinition, wholeSqlStoredValue);
+        debug("Current GQL value found as %j", currentWholeValueAsGQL);
+        if (moduleTrigger) {
+            // we execute the trigger
+            await moduleTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                from: currentWholeValueAsGQL,
+                update: null,
+                extraArgs: resolverArgs.args,
+                action: triggers_1.TriggerActions.DELETE,
+            });
+        }
+        // same with the item definition
+        if (itemDefinitionTrigger) {
+            // we call the trigger
+            await itemDefinitionTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                from: currentWholeValueAsGQL,
+                update: null,
+                extraArgs: resolverArgs.args,
+                action: triggers_1.TriggerActions.DELETE,
+            });
+        }
+    }
+    await appData.cache.requestDelete(itemDefinition, resolverArgs.args.id, resolverArgs.args.version, false, resolverArgs.args.listener_uuid || null);
     debug("SUCCEED");
-    // we don't want to await any of this
-    sql_files_1.deleteEverythingInTransitoryId(itemDefinition, resolverArgs.args.id.toString());
-    (async () => {
-        await appData.cache.forceCacheInto(selfTable, resolverArgs.args.id, resolverArgs.args.version || null, null);
-        const changeEvent = {
-            itemDefinition: selfTable,
-            id: resolverArgs.args.id,
-            version: resolverArgs.args.version || null,
-            type: "not_found",
-            lastModified: null,
-        };
-        appData.listener.triggerListeners(changeEvent, resolverArgs.args.listener_uuid || null);
-    })();
     // return null, yep, the output is always null, because it's gone
     // however we are not running the check on the fields that can be read
     // but anyway there's no usable data, so why would we need a check
