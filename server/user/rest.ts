@@ -11,6 +11,10 @@ export function userRestServices(appData: IAppDataType) {
 
   const router = Router();
   router.get("/validate-email", async (req, res) => {
+    if (!req.query.token) {
+      res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
+    }
+
     let decoded: {
       validateUserId: number;
     };
@@ -38,10 +42,12 @@ export function userRestServices(appData: IAppDataType) {
         e_validated: true,
       });
     
-    if (result && result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] !== user.id) {
-      res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_EMAIL_TAKEN}`);
-    } else if (result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] === user.id) {
-      res.redirect(`/${user.app_language}/?usrmsg=validate_account_success`);
+    if (result) {
+      if (result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] !== user.id) {
+        res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_EMAIL_TAKEN}`);
+      } else if (result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] === user.id) {
+        res.redirect(`/${user.app_language}/?usrmsg=validate_account_success`);
+      }
     }
 
     await appData.cache.requestUpdate(
@@ -59,4 +65,6 @@ export function userRestServices(appData: IAppDataType) {
 
     res.redirect(`/${user.app_language}/?usrmsg=validate_account_success`);
   });
+
+  return router;
 }

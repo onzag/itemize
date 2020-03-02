@@ -592,10 +592,18 @@ async function runPolicyCheck(arg) {
             const gqlCheckingElement = policyType === "read" ? arg.gqlFlattenedRequestedFiels : arg.gqlArgValue;
             if (policyType !== "delete" && policyType !== "parent") {
                 const applyingPropertyIds = arg.itemDefinition.getApplyingPropertyIdsForPolicy(policyType, policyName);
+                const applyingPropertyOnlyAppliesWhenCurrentIsNonNull = arg.itemDefinition.doesApplyingPropertyOnlyAppliesWhenCurrentIsNonNull(policyType, policyName);
                 let someIncludeOrPropertyIsApplied = false;
                 if (applyingPropertyIds) {
                     someIncludeOrPropertyIsApplied =
-                        applyingPropertyIds.some((applyingPropertyId) => typeof gqlCheckingElement[applyingPropertyId] !== "undefined");
+                        applyingPropertyIds.some((applyingPropertyId) => {
+                            const isDefinedInReadOrEdit = typeof gqlCheckingElement[applyingPropertyId] !== "undefined";
+                            const isCurrentlyNull = selectQueryValue[applyingPropertyId] === null;
+                            if (applyingPropertyOnlyAppliesWhenCurrentIsNonNull && isCurrentlyNull) {
+                                return false;
+                            }
+                            return isDefinedInReadOrEdit;
+                        });
                 }
                 if (!someIncludeOrPropertyIsApplied) {
                     const applyingIncludeIds = arg.itemDefinition.getApplyingIncludeIdsForPolicy(policyType, policyName);

@@ -17,6 +17,7 @@ export interface IPolicyValueRawJSONDataType {
     roles: string[];
     properties: string[];
     applyingProperties?: string[];
+    applyingPropertyOnlyAppliesWhenCurrentIsNonNull?: boolean;
     applyingIncludes?: string[];
     module?: string;
     itemDefinition?: string;
@@ -769,6 +770,14 @@ export default class ItemDefinition {
      * @returns an array of string or null (if no applying properties)
      */
     getApplyingPropertyIdsForPolicy(type: string, name: string): string[];
+    /**
+     * Tells whether the list of applying properties only applies when going from a non null
+     * value to a new value
+     * @param type the policy type
+     * @param name the policy name
+     * @return a boolean value
+     */
+    doesApplyingPropertyOnlyAppliesWhenCurrentIsNonNull(type: string, name: string): boolean;
     /**
      * Provides all the include ids that are affected by the given policy
      * @param type the policy type "edit", "delete", "read" or "parent"

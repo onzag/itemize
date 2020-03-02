@@ -34,7 +34,7 @@ interface IPropertyReadProps {
   searchVariant?: SearchVariants;
   policyType?: string;
   policyName?: string;
-  children?: (value: PropertyDefinitionSupportedType) => React.ReactNode;
+  children?: (value: PropertyDefinitionSupportedType, state: IPropertyDefinitionState) => React.ReactNode;
 }
 
 interface IPropertyViewProps {
@@ -47,7 +47,7 @@ interface IPropertyEntryViewReadSetProps {
   searchVariant?: SearchVariants;
   policyType?: string;
   policyName?: string;
-  children?: (value: PropertyDefinitionSupportedType) => React.ReactNode;
+  children?: (value: PropertyDefinitionSupportedType, state: IPropertyDefinitionState) => React.ReactNode;
   showAsInvalid?: boolean;
   icon?: string;
   onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, internalValue?: any) => void;
@@ -105,7 +105,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
 
                 if (type === "read") {
                   if (propertyState) {
-                    return props.children(propertyState.value);
+                    return props.children(propertyState.value, propertyState);
                   }
                   if (isMetaProperty) {
                     let gqlValue = itemDefinitionContextualValue.state.gqlOriginalFlattenedValue &&
@@ -113,7 +113,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                     if (typeof gqlValue === "undefined") {
                       gqlValue = null;
                     }
-                    return props.children(gqlValue as any);
+                    return props.children(gqlValue as any, null);
                   }
                   // Property has no state, and no internal value, it must be somehow hidden
                   return null;

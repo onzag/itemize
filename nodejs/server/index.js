@@ -30,6 +30,7 @@ const mode_1 = require("./mode");
 const triggers_1 = require("./user/triggers");
 const ipstack_1 = require("./services/ipstack");
 const mailgun_1 = require("./services/mailgun");
+const rest_2 = require("./user/rest");
 // TODO comment and document
 // Setting the parsers, postgresql comes with
 // its own way to return this data and I want it
@@ -90,6 +91,13 @@ function initializeApp(appData, custom) {
         res.removeHeader("X-Powered-By");
         next();
     });
+    if (custom.customRouterEndpoint) {
+        app.use(custom.customRouterEndpoint, custom.customRouter(appData));
+    }
+    else if (custom.customRouter) {
+        app.use(custom.customRouter(appData));
+    }
+    app.use("/rest/user", rest_2.userRestServices(appData));
     app.use("/rest", rest_1.default(appData));
     const allCustomQueries = {
         ...queries_1.customUserQueries(appData),
@@ -123,12 +131,6 @@ function initializeApp(appData, custom) {
         graphiql: true,
         customFormatErrorFn,
     }));
-    if (custom.customRouterEndpoint) {
-        app.use(custom.customRouterEndpoint, custom.customRouter(appData));
-    }
-    else if (custom.customRouter) {
-        app.use(custom.customRouter(appData));
-    }
     app.get("/sw.development.js", (req, res) => {
         res.sendFile(path_1.default.resolve(path_1.default.join("dist", "data", "service-worker.development.js")));
     });
@@ -253,6 +255,8 @@ async function initializeServer(custom = {}) {
         cache,
         buildnumber,
         triggers: {
+            module: {},
+            itemDefinition: {},
             ...triggers_1.customUserTriggers,
             ...custom.customTriggers,
         },

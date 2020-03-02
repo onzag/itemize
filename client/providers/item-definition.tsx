@@ -33,6 +33,8 @@ import uuid from "uuid";
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
 
+// TODO this file is too complex, we need to simplify, specially policies they are killing this file
+
 /**
  * A response given by some handlers like
  * loadValue
@@ -1600,6 +1602,8 @@ export class ActualItemDefinitionProvider extends
       getQueryFields: mergedQueryFields,
     };
   }
+
+  // TODO get rid of this function make policies need to be manually set
   public checkPoliciesAndGetArgs(policyType: string, argumentsToCheckPropertiesAgainst?: any): {
     isInvalid: boolean;
     applyingPolicyArgs: any;

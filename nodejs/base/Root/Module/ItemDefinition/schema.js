@@ -44,6 +44,9 @@ const policySchema = {
                     },
                     minItems: 1,
                 },
+                applyingPropertyOnlyAppliesWhenCurrentIsNonNull: {
+                    type: "boolean",
+                },
                 applyingIncludes: {
                     type: "array",
                     items: {

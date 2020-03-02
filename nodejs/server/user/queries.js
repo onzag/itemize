@@ -217,7 +217,7 @@ exports.customUserQueries = (appData) => {
                 }
                 const validateToken = await token_1.jwtSign({ validateUserId: decoded.id }, appData.sensitiveConfig.jwtKey);
                 const validateLink = (appData.sensitiveConfig.mailgunTargetDomain || appData.config.productionHostname) +
-                    "/rest/user/validate-email&token" + encodeURIComponent(validateToken);
+                    "/rest/user/validate-email?token=" + encodeURIComponent(validateToken);
                 const templateToUse = i18nData.custom.validate_account_template_name;
                 const from = `${i18nData.custom.validate_account_user} <${i18nData.custom.validate_account_email_user}@${appData.sensitiveConfig.mailgunDomain}>`;
                 const to = resultUser.email;
@@ -229,11 +229,11 @@ exports.customUserQueries = (appData) => {
                         subject,
                         text: `You do not have a template setup for language ${languageToUse}\n` +
                             `validate_account_link = ${validateLink}\n` +
-                            `validate_account = ${i18nData.custom.validate_account}\n` +
-                            `validate_account_title = ${i18nData.custom.validate_account_title}\n` +
+                            `validate_account = ${util_1.capitalize(i18nData.custom.validate_account)}\n` +
+                            `validate_account_title = ${util_1.capitalize(i18nData.custom.validate_account_title)}\n` +
                             `validate_account_description = ${i18nData.custom.validate_account_description}\n` +
-                            `validate_account_activate_button = ${i18nData.custom.validate_account_activate_button}\n` +
-                            `validate_account_alt_link = ${i18nData.custom.validate_account_alt_link}`
+                            `validate_account_activate_button = ${util_1.capitalize(i18nData.custom.validate_account_activate_button)}\n` +
+                            `validate_account_alt_link = ${util_1.capitalize(i18nData.custom.validate_account_alt_link)}`
                     });
                 }
                 else {
@@ -243,13 +243,16 @@ exports.customUserQueries = (appData) => {
                         subject,
                         template: templateToUse,
                         validate_account_link: validateLink,
-                        validate_account: i18nData.custom.validate_account,
-                        validate_account_title: i18nData.custom.validate_account_title,
+                        validate_account: util_1.capitalize(i18nData.custom.validate_account),
+                        validate_account_title: util_1.capitalize(i18nData.custom.validate_account_title),
                         validate_account_description: i18nData.custom.validate_account_description,
-                        validate_account_activate_button: i18nData.custom.validate_account_activate_button,
-                        validate_account_alt_link: i18nData.custom.validate_account_alt_link,
+                        validate_account_activate_button: util_1.capitalize(i18nData.custom.validate_account_activate_button),
+                        validate_account_alt_link: util_1.capitalize(i18nData.custom.validate_account_alt_link),
                     });
                 }
+                return {
+                    status: "OK",
+                };
             }
         },
     };

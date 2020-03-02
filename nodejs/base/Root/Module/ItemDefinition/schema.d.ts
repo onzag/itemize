@@ -95,6 +95,9 @@ declare const _default: {
                                     };
                                     minItems: number;
                                 };
+                                applyingPropertyOnlyAppliesWhenCurrentIsNonNull: {
+                                    type: string;
+                                };
                                 applyingIncludes: {
                                     type: string;
                                     items: {
@@ -160,6 +163,9 @@ declare const _default: {
                                         type: string;
                                     };
                                     minItems: number;
+                                };
+                                applyingPropertyOnlyAppliesWhenCurrentIsNonNull: {
+                                    type: string;
                                 };
                                 applyingIncludes: {
                                     type: string;
@@ -384,9 +390,6 @@ declare const _default: {
                     type: string;
                 };
                 specialProperties: {
-                    /**
-                     * The main item definition schema object
-                     */
                     type: string;
                     properties: {};
                     additionalProperties: boolean;
@@ -487,11 +490,6 @@ declare const _default: {
                                 type: string;
                                 enum: string[];
                             };
-                            /**
-                             * The reference shema of item definitions
-                             * used to refer to other item definitions
-                             * whatever module they come from
-                             */
                             condition: {
                                 $ref: string;
                             };
@@ -670,11 +668,6 @@ declare const _default: {
                                 type: string;
                                 enum: string[];
                             };
-                            /**
-                             * The reference shema of item definitions
-                             * used to refer to other item definitions
-                             * whatever module they come from
-                             */
                             condition: {
                                 $ref: string;
                             };
@@ -798,11 +791,6 @@ declare const _default: {
                         type: string;
                         enum: string[];
                     };
-                    /**
-                     * The reference shema of item definitions
-                     * used to refer to other item definitions
-                     * whatever module they come from
-                     */
                     condition: {
                         $ref: string;
                     };

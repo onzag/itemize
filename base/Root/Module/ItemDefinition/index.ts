@@ -37,6 +37,7 @@ export interface IPolicyValueRawJSONDataType {
 
   // unavailable for delete
   applyingProperties?: string[];
+  applyingPropertyOnlyAppliesWhenCurrentIsNonNull?: boolean;
   applyingIncludes?: string[];
 
   // always available for parenting rules, at least module
@@ -1693,6 +1694,18 @@ export default class ItemDefinition {
   public getApplyingPropertyIdsForPolicy(type: string, name: string): string[] {
     const applyingProperties = this.rawData.policies[type][name].applyingProperties;
     return applyingProperties || null;
+  }
+
+  /**
+   * Tells whether the list of applying properties only applies when going from a non null
+   * value to a new value
+   * @param type the policy type
+   * @param name the policy name
+   * @return a boolean value
+   */
+  public doesApplyingPropertyOnlyAppliesWhenCurrentIsNonNull(type: string, name: string): boolean {
+    const status = this.rawData.policies[type][name].applyingPropertyOnlyAppliesWhenCurrentIsNonNull;
+    return !!status;
   }
 
   /**

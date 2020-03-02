@@ -26,7 +26,6 @@ async function editItemDefinition(appData, resolverArgs, itemDefinition) {
     basic_1.checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
     // now we get the basic information
     const mod = itemDefinition.getParentModule();
-    const moduleTable = mod.getQualifiedPathName();
     const selfTable = itemDefinition.getQualifiedPathName();
     debug("Making query to get the owner of this item");
     // now we get these variables ready

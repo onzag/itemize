@@ -4,6 +4,7 @@ import { countries } from "../../../imported-resources";
 import { withStyles, WithStyles, createStyles } from "@material-ui/styles";
 import { Reader } from "../../components/property";
 import { Link } from "../../components/navigaton";
+import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 const avatarStyles = createStyles({
   flag: {
@@ -105,12 +106,12 @@ interface IAvatarProps extends WithStyles<typeof avatarStyles> {
 
 // TODO profile picture support
 export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
-  const contentFn = (id: number, userNameValue: string, email?: string, eValidated?: boolean) => {
+  const contentFn = (id: number, userNameValue: string, email?: IPropertyDefinitionState, eValidated?: IPropertyDefinitionState) => {
     const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : null;
 
-    const hasWarningForMissingEmail = !email;
-    const hasWarningForNotValidEmail = !eValidated;
-    const hasWarning = props.showWarnings && (
+    const hasWarningForMissingEmail = !(email && email.value);
+    const hasWarningForNotValidEmail = !(eValidated && eValidated.value);
+    const hasWarning = email.stateValueModified && eValidated.stateValueModified && props.showWarnings && (
       hasWarningForMissingEmail || hasWarningForNotValidEmail
     );
 
@@ -163,10 +164,10 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
 
               return (
                 <Reader id="email">
-                  {(email: string) => (
+                  {(email: string, emailState: IPropertyDefinitionState) => (
                     <Reader id="e_validated">
-                      {(eValidated: boolean) => {
-                        return contentFn(id, userNameValue, email, eValidated);
+                      {(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => {
+                        return contentFn(id, userNameValue, emailState, eValidatedState);
                       }}
                     </Reader>
                   )}

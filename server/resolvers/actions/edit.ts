@@ -14,22 +14,16 @@ import {
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import {
-  CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-  CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   INCLUDE_PREFIX,
   EXCLUSION_STATE_SUFFIX,
   ENDPOINT_ERRORS,
 } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
-  convertGQLValueToSQLValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
-import { convertGQLValueToSQLValueForModule } from "../../../base/Root/Module/sql";
 import { EndpointError } from "../../../base/errors";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
-import { IChangedFeedbackEvent } from "../../../base/remote-protocol";
-import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
 import { IGQLArgs } from "../../../gql-querier";
 import { TriggerActions } from "../triggers";
 
@@ -55,7 +49,6 @@ export async function editItemDefinition(
 
   // now we get the basic information
   const mod = itemDefinition.getParentModule();
-  const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
   debug("Making query to get the owner of this item");

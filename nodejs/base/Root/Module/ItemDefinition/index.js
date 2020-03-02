@@ -1129,6 +1129,17 @@ class ItemDefinition {
         return applyingProperties || null;
     }
     /**
+     * Tells whether the list of applying properties only applies when going from a non null
+     * value to a new value
+     * @param type the policy type
+     * @param name the policy name
+     * @return a boolean value
+     */
+    doesApplyingPropertyOnlyAppliesWhenCurrentIsNonNull(type, name) {
+        const status = this.rawData.policies[type][name].applyingPropertyOnlyAppliesWhenCurrentIsNonNull;
+        return !!status;
+    }
+    /**
      * Provides all the include ids that are affected by the given policy
      * @param type the policy type "edit", "delete", "read" or "parent"
      * @param name the policy name

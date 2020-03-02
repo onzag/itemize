@@ -29,6 +29,7 @@ import { customUserTriggers } from "./user/triggers";
 import { setupIPStack, IPStack } from "./services/ipstack";
 import { setupMailgun } from "./services/mailgun";
 import Mailgun from "mailgun-js";
+import { userRestServices } from "./user/rest";
 
 // TODO comment and document
 
@@ -132,6 +133,12 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     next();
   });
 
+  if (custom.customRouterEndpoint) {
+    app.use(custom.customRouterEndpoint, custom.customRouter(appData));
+  } else if (custom.customRouter) {
+    app.use(custom.customRouter(appData));
+  }
+  app.use("/rest/user", userRestServices(appData));
   app.use("/rest", restServices(appData));
 
   const allCustomQueries = {
@@ -179,12 +186,6 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
       customFormatErrorFn,
     }),
   );
-
-  if (custom.customRouterEndpoint) {
-    app.use(custom.customRouterEndpoint, custom.customRouter(appData));
-  } else if (custom.customRouter) {
-    app.use(custom.customRouter(appData));
-  }
 
   app.get("/sw.development.js", (req, res) => {
     res.sendFile(path.resolve(path.join("dist", "data", "service-worker.development.js")));
@@ -333,6 +334,9 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     cache,
     buildnumber,
     triggers: {
+      module: {},
+      itemDefinition: {},
+
       ...customUserTriggers,
       ...custom.customTriggers,
     },
