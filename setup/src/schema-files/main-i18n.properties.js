@@ -47,12 +47,17 @@ unit_dialog_metric = metric
 unit_dialog_imperial = imperial
 
 menu = menu
+reload = reload
 
 blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
 needs_update_navigation = outdated
 needs_update_title = update app
 needs_update_content  = A new version of the app is currently available
 needs_update_action = update
+
+generic_error = error
+generic_warning = warning
+generic_info = info
 
 error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
@@ -120,12 +125,17 @@ unit_dialog_metric = metric
 unit_dialog_imperial = imperial
 
 menu = menu
+reload = reload
 
 blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
 needs_update_navigation = outdated
 needs_update_title = update app
 needs_update_content = A new version of the app is currently available
 needs_update_action = update
+
+generic_error = error
+generic_warning = warning
+generic_info = info
 
 error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
@@ -193,12 +203,17 @@ unit_dialog_metric = metric
 unit_dialog_imperial = imperial
 
 menu = menu
+reload = reload
 
 blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
 needs_update_navigation = outdated
 needs_update_title = update app
 needs_update_content = A new version of the app is currently available
 needs_update_action = update
+
+generic_error = error
+generic_warning = warning
+generic_info = info
 
 error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
@@ -266,12 +281,17 @@ unit_dialog_metric = Metrisch
 unit_dialog_imperial = Zoll
 
 menu = Menü
+reload = reload
 
 blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
 needs_update_navigation = outdated
 needs_update_title = update app
 needs_update_content = A new version of the app is currently available
 needs_update_action = update
+
+generic_error = error
+generic_warning = warning
+generic_info = info
 
 error.INVALID_CREDENTIALS = ungültiger Benutzer oder Password
 error.BLOCKED = der Artikel ist gesperrt
@@ -339,12 +359,17 @@ unit_dialog_metric = métricas
 unit_dialog_imperial = imperiales
 
 menu = menú
+reload = recargar
 
 blocked_update = Una versión anterior de la aplicación está activa actualmente, por favor cierre la pestaña en cuestión para continuar
 needs_update_navigation = necesita actualizar
 needs_update_title = actualizar aplicación
 needs_update_content = Una nueva versión de la aplicación ha sido publicada
 needs_update_action = Actualizar
+
+generic_error = error
+generic_warning = ¡atención!
+generic_info = información
 
 error.INVALID_CREDENTIALS = contraseña o usuario inválido
 error.BLOCKED = el item ha sido bloqueado
@@ -412,12 +437,17 @@ unit_dialog_metric = المقياس المتري
 unit_dialog_imperial = المقياس البريطاني
 
 menu = لائحة
+reload = reload
 
 blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
 needs_update_navigation = outdated
 needs_update_title = update app
 needs_update_content = A new version of the app is currently available
 needs_update_action = update
+
+generic_error = error
+generic_warning = warning
+generic_info = info
 
 error.INVALID_CREDENTIALS = مستخدم او كلمة سر غير صحيحة
 error.BLOCKED = المادة تم حظرها

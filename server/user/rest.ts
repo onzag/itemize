@@ -46,7 +46,7 @@ export function userRestServices(appData: IAppDataType) {
       if (result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] !== user.id) {
         res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_EMAIL_TAKEN}`);
       } else if (result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] === user.id) {
-        res.redirect(`/${user.app_language}/?usrmsg=validate_account_success`);
+        res.redirect(`/${user.app_language}/?usrmsg=validate_account_success&usrmsgtitle=validate_account_success_title`);
       }
     }
 
@@ -63,7 +63,7 @@ export function userRestServices(appData: IAppDataType) {
       null,
     );
 
-    res.redirect(`/${user.app_language}/?usrmsg=validate_account_success`);
+    res.redirect(`/${user.app_language}/?usrmsg=validate_account_success&usrmsgtitle=validate_account_success_title`);
   });
 
   return router;

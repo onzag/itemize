@@ -11,6 +11,21 @@ import { IncludeContext } from "../providers/include";
 import { ModuleContext } from "../providers/module";
 import { capitalize as utilcapitalize} from "../../util";
 
+function loopForKeyAtTarget(target: any, keySplitted: string[]) {
+  let result = typeof target === "undefined" ? null : target;
+  keySplitted.forEach((key) => {
+    if (
+      result === null ||
+      typeof result === "string"
+    ) {
+      result = null;
+      return;
+    }
+    result = typeof result[key] === "undefined" ? null : result[key];
+  });
+  return result;
+}
+
 interface II18nReadProps {
   id: string;
   policyType?: string;
@@ -36,6 +51,7 @@ export function I18nRead(props: II18nReadProps) {
                       <IncludeContext.Consumer>
                         {
                           (includeContext) => {
+                            const idSplitted = props.id.split(".");
 
                             // so first we go in order of priority of what we want to read
                             let i18nValue: React.ReactNode = null;
@@ -49,8 +65,10 @@ export function I18nRead(props: II18nReadProps) {
                               } else {
                                 // othewise we just extract the i18n data for the include and call it with the id,
                                 // normally there are only specific labels here at this level in the include context
-                                const includeI18nData = includeContext.include.getI18nDataFor(localeContext.language);
-                                i18nValue = includeI18nData ? includeI18nData[props.id] || null : null;
+                                i18nValue = loopForKeyAtTarget(
+                                  includeContext.include.getI18nDataFor(localeContext.language),
+                                  idSplitted,
+                                );
                               }
                             }
 
@@ -62,22 +80,25 @@ export function I18nRead(props: II18nReadProps) {
                               // if we are specifying a policy like if we are in a policy context
                               if (props.policyType && props.policyName) {
                                 // we go for the policy value and the policy name value
-                                const i18nPolicyTypeValue =
-                                  i18nIdefData ? (i18nIdefData.policies && i18nIdefData.policies[props.policyType])
-                                    || null : null;
-                                const i18nPolicyNameValue =
-                                  i18nPolicyTypeValue ? i18nPolicyTypeValue[props.policyName] || null : null;
-                                // and then attempt to extract the actual value if we get anywhere, these policies
-                                // usually contain the label of the policy and the failed message
-                                i18nValue = i18nPolicyNameValue ? i18nPolicyNameValue[props.id] || null : null;
+                                i18nValue = loopForKeyAtTarget(
+                                  i18nIdefData,
+                                  ["policies", props.policyType, props.policyName].concat(idSplitted),
+                                )
                               } else {
+                                const customValue = loopForKeyAtTarget(
+                                  i18nIdefData,
+                                  ["custom"].concat(idSplitted),
+                                );
                                 // otherwise without policy we check if we have custom data in the item definition
                                 // and this custom properties fit the data
-                                if (i18nIdefData && i18nIdefData.custom && i18nIdefData.custom[props.id]) {
-                                  i18nValue = i18nIdefData.custom[props.id];
+                                if (customValue) {
+                                  i18nValue = customValue;
                                 } else {
                                   // otherwise we give an standard property
-                                  i18nValue = i18nIdefData ? i18nIdefData[props.id] || null : null;
+                                  i18nValue = loopForKeyAtTarget(
+                                    i18nIdefData,
+                                    idSplitted,
+                                  );
                                 }
                               }
                             }
@@ -87,10 +108,17 @@ export function I18nRead(props: II18nReadProps) {
                               // modules act similar to item definitions they also support custom properties
                               const i18nModData =
                                 moduleContextualValue.mod.getI18nDataFor(localeContext.language);
-                              if (i18nModData && i18nModData.custom && i18nModData.custom[props.id]) {
-                                i18nValue = i18nModData.custom[props.id];
+                              const customValue = loopForKeyAtTarget(
+                                i18nModData,
+                                ["custom"].concat(idSplitted),
+                              );
+                              if (customValue) {
+                                i18nValue = customValue;
                               } else {
-                                i18nValue = i18nModData ? i18nModData[props.id] || null : null;
+                                i18nValue = loopForKeyAtTarget(
+                                  i18nModData,
+                                  idSplitted,
+                                );
                               }
                             }
 
@@ -98,10 +126,10 @@ export function I18nRead(props: II18nReadProps) {
                             // they are all required
                             if (i18nValue === null) {
                               // for that we extract it
-                              i18nValue = (
-                                localeContext.i18n[localeContext.language] &&
-                                localeContext.i18n[localeContext.language][props.id]
-                              ) || null;
+                              i18nValue = loopForKeyAtTarget(
+                                localeContext.i18n,
+                                [localeContext.language].concat(idSplitted),
+                              );
                             }
 
                             // if we still find nothing in all these contexts
@@ -184,7 +212,7 @@ export function I18nRead(props: II18nReadProps) {
 }
 
 interface Ii18nReadManyProps {
-  data: II18nReadProps[];
+  data: Array<II18nReadProps | II18nReadErrorProps>;
   children: (...results: React.ReactNode[]) => React.ReactNode;
 }
 
@@ -192,29 +220,48 @@ export function I18nReadMany(props: Ii18nReadManyProps): any {
   if (props.data.length === 0) {
     return props.children();
   } else if (props.data.length === 1) {
+    const toProvide = props.data[0];
+    if ((toProvide as II18nReadErrorProps).error) {
+      <I18nReadError {...toProvide as II18nReadErrorProps}>
+        {props.children}
+      </I18nReadError>
+    }
     return (
-      <I18nRead {...props.data[0]}>
+      <I18nRead {...toProvide as II18nReadProps}>
         {props.children}
       </I18nRead>
     );
   }
   const missing = props.data.slice(1);
+  const toProvide = props.data[0];
+  const children = (result: React.ReactNode) => {
+    return (
+      <I18nReadMany data={missing}>
+        {(...results: React.ReactNode[]) => {
+          return props.children(result, ...results);
+        }}
+      </I18nReadMany>
+    );
+  };
+  if ((toProvide as II18nReadErrorProps).error) {
+    return (
+      <I18nReadError {...toProvide as II18nReadErrorProps}>
+        {children}
+      </I18nReadError>
+    );
+  }
   return (
-    <I18nRead {...props.data[0]}>
-      {(result: React.ReactNode) => {
-        return <I18nReadMany data={missing}>
-          {(...results: React.ReactNode[]) => {
-            return props.children(result, ...results);
-          }}
-        </I18nReadMany>
-      }}
+    <I18nRead {...toProvide as II18nReadProps}>
+      {children}
     </I18nRead>
-  )
+  );
 }
 
 const isDevelopment = process.env.NODE_ENV === "development";
 interface II18nReadErrorProps {
   error: EndpointErrorType;
+  capitalize?: boolean;
+  children?: (value: string) => React.ReactNode;
 }
 export function I18nReadError(props: II18nReadErrorProps) {
   if (props.error === null) {
@@ -225,14 +272,17 @@ export function I18nReadError(props: II18nReadErrorProps) {
       {
         (localeData) => {
           const freeError = props.error as any;
-          if (isDevelopment) {
+          if (isDevelopment && freeError.message) {
             console.warn(freeError.message);
           }
           // cheap way to know if this is a basic error code
           // without having to check for all types of error code
           if (!freeError.modulePath) {
-            const errorMessage: string = localeData.i18n[localeData.language].error[props.error.code];
-            return errorMessage;
+            let errorMessage: string = localeData.i18n[localeData.language].error[props.error.code];
+            if (props.capitalize) {
+              errorMessage = capitalize(errorMessage);
+            }
+            return props.children ? props.children(errorMessage) : errorMessage;
           }
           return (
             <DataContext.Consumer>
@@ -285,16 +335,19 @@ export function I18nReadError(props: II18nReadErrorProps) {
                     }
 
                     const i18nData = propertyDef.getI18nDataFor(localeData.language);
-                    const i18nErrorValue = i18nData && i18nData.error && i18nData.error[freeError.pcode];
+                    let i18nErrorValue = i18nData && i18nData.error && i18nData.error[freeError.pcode];
                     if (!i18nErrorValue) {
                       // pcode might be null, this can happen by a programming error
                       console.warn("failed to display error due to pcode or language", freeError);
                       return null;
                     }
-                    return i18nErrorValue;
+                    if (props.capitalize) {
+                      i18nErrorValue = capitalize(i18nErrorValue);
+                    }
+                    return props.children ? props.children(i18nErrorValue) : i18nErrorValue;
                   } else if (freeError.policyType) {
                     const i18nData = itemDef.getI18nDataFor(localeData.language);
-                    const i18nErrorValue = i18nData &&
+                    let i18nErrorValue = i18nData &&
                       i18nData.policies &&
                       i18nData.policies[freeError.policyType] &&
                       i18nData.policies[freeError.policyType][freeError.policyName] &&
@@ -303,7 +356,10 @@ export function I18nReadError(props: II18nReadErrorProps) {
                       console.warn("failed to display error due to code or language", freeError);
                       return null;
                     }
-                    return i18nErrorValue;
+                    if (props.capitalize) {
+                      i18nErrorValue = capitalize(i18nErrorValue);
+                    }
+                    return props.children ? props.children(i18nErrorValue) : i18nErrorValue;
                   }
                 }
               }

@@ -4,7 +4,6 @@
  * @packageDocumentation
  */
 import createDOMPurify from "dompurify";
-import ItemDefinition from "./base/Root/Module/ItemDefinition";
 /**
  * capitalizes a string
  * @param str the string to capitalize
@@ -62,41 +61,5 @@ export declare function getLocalizedDateFormat(normalize: boolean): any;
  * TODO looks wrong check what is wrong
  */
 export declare function getLocalizedDateTimeFormat(normalize: boolean): string;
-/**
- * Provides the fields and args for an item definition in order
- * to create a query
- * @param options.includeArgs whether to include the args at all
- * @param options.includeFields whether to include fields at all
- * @param options.onlyIncludeProperties what properties to include in fields
- * @param options.onlyIncludeIncludes what includes to include in the fields
- * @param options.onlyIncludePropertiesForArgs what properties to include in args
- * @param options.onlyIncludeIncludesForArgs what includes to include in args
- * @param options.onlyIncludeArgsIfDiffersFromAppliedValue only includes something in args if it differs from the
- * applied value
- * @param appliedOwner the owner that owns this item
- * @param userRole the role of the user
- * @param userId the id of the user
- * @param itemDefinitionInstance the item definition
- * @param forId the slot id if any
- * @param forVersion the version if any
- */
-export declare function getFieldsAndArgs(options: {
-    includeArgs: boolean;
-    includeFields: boolean;
-    onlyIncludeProperties?: string[];
-    onlyIncludeIncludes?: string[];
-    onlyIncludePropertiesForArgs?: string[];
-    onlyIncludeIncludesForArgs?: string[];
-    onlyIncludeArgsIfDiffersFromAppliedValue?: boolean;
-    appliedOwner?: number;
-    userRole: string;
-    userId: number;
-    itemDefinitionInstance: ItemDefinition;
-    forId: number;
-    forVersion: string;
-}): {
-    requestFields: any;
-    argumentsForQuery: any;
-};
 export declare const DOMWindow: import("jsdom").DOMWindow | (Window & typeof globalThis);
 export declare const DOMPurify: createDOMPurify.DOMPurifyI;

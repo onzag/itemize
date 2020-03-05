@@ -21,6 +21,34 @@ export function setHistoryState<S>(location: Location, state: Partial<S>, replac
   }
 }
 
+export function setHistoryQSState<S>(location: Location, state: Partial<S>, replace?: boolean) {
+  const searchParams = new URLSearchParams(location.search);
+  let differs: boolean = false;
+  if (state) {
+    Object.keys(state).forEach((key) => {
+      if (
+        !differs &&
+        state[key] !== searchParams.get(key) 
+      ) {
+        differs = true;
+      }
+      if (state[key] === null) {
+        searchParams.delete(key);
+      } else {
+        searchParams.set(key, state[key]);
+      }
+    });
+  }
+  if (!differs) {
+    return;
+  }
+  if (!replace) {
+    history.push(location.pathname + "?" + searchParams.toString() + location.hash, location.state);
+  } else {
+    history.replace(location.pathname + "?" + searchParams.toString() + location.hash, location.state);
+  }
+}
+
 export function redirectTo(newLocation: string, state?: any) {
   history.push(newLocation, state);
 }
@@ -91,9 +119,10 @@ export function Route(props: RouteProps) {
 }
 
 interface ILocationStateReaderProps<S> {
-  defaultState: S,
+  defaultState: S;
+  stateIsInQueryString?: boolean;
   children: (
-    location: Location<S>,
+    state: S,
     setState: (state: Partial<S>, replace?: boolean) => void,
   ) => React.ReactNode;
 }
@@ -102,15 +131,24 @@ export function LocationStateReader<S>(props: ILocationStateReaderProps<S>) {
   return (
     <LocationStateContext.Consumer>
       {
-        (value: Location<S>) => {
-          if (!value.state) {
-            const valueWithState: Location<S> = {
-              ...value,
-              state: props.defaultState,
-            };
-            return props.children(valueWithState, setHistoryState.bind(null, valueWithState));
+        (location: Location<S>) => {
+          if (props.stateIsInQueryString) {
+            const searchParams = new URLSearchParams(location.search);
+            const statefulValue = {};
+            Object.keys(props.defaultState).forEach((key) => {
+              statefulValue[key] = searchParams.has(key) ? searchParams.get(key) : props.defaultState[key];
+            });
+            return props.children(statefulValue as S, setHistoryQSState.bind(null, location))
+          } else {
+            if (!location.state) {
+              return props.children(props.defaultState, setHistoryState.bind(null, location));
+            }
+            const statefulValue = {};
+            Object.keys(props.defaultState).forEach((key) => {
+              statefulValue[key] = typeof location.state[key] !== "undefined" ? location.state[key] : props.defaultState[key];
+            });
+            return props.children(statefulValue as S, setHistoryState.bind(null, location));
           }
-          return props.children(value, setHistoryState.bind(null, value));
         }
       }
     </LocationStateContext.Consumer>

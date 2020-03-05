@@ -1,8 +1,8 @@
 import React from "react";
-import { ItemDefinitionContext, SearchItemDefinitionValueContext } from "../providers/item-definition";
+import { ItemDefinitionContext, SearchItemDefinitionValueContext, IItemDefinitionProviderProps } from "../providers/item-definition";
 import equals from "deep-equal";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
-import { PREFIX_GET_LIST, PREFIX_GET, ENDPOINT_ERRORS } from "../../constants";
+import { PREFIX_GET_LIST, PREFIX_GET } from "../../constants";
 import CacheWorkerInstance from "../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../gql-util";
 import { buildGqlQuery, gqlQuery, IGQLSearchResult, IGQLRequestFields, IGQLValue } from "../../gql-querier";
@@ -11,21 +11,13 @@ import { TokenContext, ITokenContextType } from "../internal/app/internal-provid
 import { EndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "../internal/app/remote-listener";
 
+interface IItemDefinitionProviderPropsWithKey extends
+  Pick<IItemDefinitionProviderProps, Exclude<keyof IItemDefinitionProviderProps, 'children'>> {
+  key: string;
+}
+
 interface IGQLSearchResultWithPopulateData extends IGQLSearchResult {
-  providerProps: {
-    key: string;
-    forId: number;
-    forVersion: string;
-    itemDefinition: string;
-    optimize: {
-      onlyIncludeProperties?: string[],
-      onlyIncludeIncludes?: string[],
-      excludePolicies?: boolean,
-      cleanOnDismount?: boolean,
-      static?: boolean,
-      avoidLongTermCaching?: boolean,
-    }
-  };
+  providerProps: IItemDefinitionProviderPropsWithKey;
   itemDefinition: ItemDefinition;
 }
 
@@ -43,7 +35,7 @@ interface ISearchLoaderProps {
   pageSize: number;
   currentPage: number;
   children: (arg: ISearchLoaderArg) => any;
-  excludePolicies?: boolean;
+  includePolicies?: boolean;
   cleanOnDismount?: boolean;
   staticResults?: boolean;
 }
@@ -337,18 +329,16 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
               return {
                 ...searchResult,
                 providerProps: {
-                  key: itemDefinition.getQualifiedPathName() + "." + searchResult.id,
+                  key: itemDefinition.getQualifiedPathName() + "." + searchResult.id + "." + (searchResult.version || ""),
                   forId: searchResult.id,
                   forVersion: searchResult.version,
                   itemDefinition: searchResult.type,
-                  optimize: {
-                    onlyIncludeProperties: this.props.searchRequestedProperties,
-                    onlyIncludeIncludes: this.props.searchRequestedIncludes,
-                    excludePolicies: this.props.excludePolicies,
-                    cleanOnDismount: this.props.cleanOnDismount,
-                    static: this.props.staticResults,
-                    avoidLongTermCaching: !this.props.searchShouldCache,
-                  },
+                  properties: this.props.searchRequestedProperties,
+                  includes: this.props.searchRequestedIncludes,
+                  includePolicies: this.props.includePolicies,
+                  cleanOnDismount: this.props.cleanOnDismount,
+                  static: this.props.staticResults,
+                  avoidLongTermCaching: !this.props.searchShouldCache,
                 },
                 itemDefinition,
               };

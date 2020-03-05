@@ -37,7 +37,7 @@ interface IDialogProps extends WithStyles<typeof dialogStyles> {
   open: boolean;
   title: string;
   onClose: () => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   fullScreen?: boolean;
   buttons?: React.ReactNode;
   className?: string;
@@ -68,9 +68,9 @@ export const Dialog = withStyles(dialogStyles)((props: IDialogProps) => {
           </Typography>
         </Toolbar>
       </AppBar>
-      <DialogContent className={props.classes.content}>
+      {props.children ? <DialogContent className={props.classes.content}>
         {props.children}
-      </DialogContent>
+      </DialogContent> : null}
       {props.buttons ? <DialogActions className={props.classes.actions}>
         {props.buttons}
       </DialogActions> : null}

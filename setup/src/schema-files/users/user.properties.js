@@ -22,8 +22,9 @@ custom.validate_account_user = $APPNAME
 custom.validate_account_title = validate your $APPNAME account
 custom.validate_account_description = In order to validate your account so as to be able to receive notifications and recover it you need to click on this button
 custom.validate_account_activate_button = activate
-custom.validate_account_alt_link = Alternatively you can click on this link
-custom.validate_account_success = Your account has been successfully activated
+custom.validate_account_alt_link = alternatively you can click on this link
+custom.validate_account_success = your account has been successfully activated
+custom.validate_account_success_title = success!
 
 properties.username.label = username
 properties.username.placeholder = type an username
@@ -101,8 +102,9 @@ custom.validate_account_user = $APPNAME
 custom.validate_account_title = valide su cuenta de $APPNAME
 custom.validate_account_description = Para poder recuperar su cuenta y poder recibir notificationes debe activar su correo electrónico
 custom.validate_account_activate_button = activar
-custom.validate_account_alt_link = De forma alternativa puede hacer click en éste link
-custom.validate_account_success = Su cuenta ha sido activada satisfactoriamente
+custom.validate_account_alt_link = de forma alternativa puede hacer click en éste link
+custom.validate_account_success = su cuenta ha sido activada satisfactoriamente
+custom.validate_account_success_title = ¡validación exitosa!
 
 properties.username.label = nombre de usuario
 properties.username.placeholder = escriba un nombre de usuario

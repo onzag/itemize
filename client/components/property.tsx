@@ -157,14 +157,18 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                   };
                   let isPoked: boolean = false;
                   if (props.policyType) {
-                    isPoked = itemDefinitionContextualValue.pokePoliciesType === props.policyType;
+                    isPoked = !!itemDefinitionContextualValue.pokedElements.policies.find(
+                      pElement =>
+                        pElement[0] === props.policyType &&
+                        pElement[1] === props.policyName &&
+                        pElement[2] === property.getId());
+                  } else if (includeContextualValue) {
+                    isPoked = !!itemDefinitionContextualValue.pokedElements.includes.find((iId) => {
+                      return iId === includeContextualValue.include.getId();
+                    });
                   } else {
-                    isPoked = !!itemDefinitionContextualValue.pokedElements.find((p) => {
-                      if (includeContextualValue) {
-                        return p.includeId === includeContextualValue.include.getId() &&
-                          p.propertyId === property.getId();
-                      }
-                      return p.propertyId === property.getId();
+                    isPoked = !!itemDefinitionContextualValue.pokedElements.properties.find((pId) => {
+                      return pId === property.getId();
                     });
                   }
                   return (

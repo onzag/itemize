@@ -164,6 +164,7 @@ exports.LOCALE_I18N = [
     "close",
     // some extras for fast prototyping
     "menu",
+    "reload",
     // for file uploader
     "file_uploader_placeholder_active",
     "image_uploader_placeholder_active",
@@ -191,6 +192,10 @@ exports.LOCALE_I18N = [
     "needs_update_title",
     "needs_update_action",
     "needs_update_content",
+    // errors
+    "generic_error",
+    "generic_warning",
+    "generic_info",
 ].concat(
 // we add all the endpoint errors
 Object.keys(exports.ENDPOINT_ERRORS).map(((ee) => `error.${ee}`)));

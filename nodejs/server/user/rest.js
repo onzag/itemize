@@ -41,13 +41,13 @@ function userRestServices(appData) {
                 res.redirect(`/${user.app_language}/?err=${constants_1.ENDPOINT_ERRORS.USER_EMAIL_TAKEN}`);
             }
             else if (result[constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME] === user.id) {
-                res.redirect(`/${user.app_language}/?usrmsg=validate_account_success`);
+                res.redirect(`/${user.app_language}/?usrmsg=validate_account_success&usrmsgtitle=validate_account_success_title`);
             }
         }
         await appData.cache.requestUpdate(userIdef, decoded.validateUserId, null, {
             e_validated: true,
         }, null, null, null, null);
-        res.redirect(`/${user.app_language}/?usrmsg=validate_account_success`);
+        res.redirect(`/${user.app_language}/?usrmsg=validate_account_success&usrmsgtitle=validate_account_success_title`);
     });
     return router;
 }

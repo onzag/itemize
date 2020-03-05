@@ -7,28 +7,19 @@ import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefin
 import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
 import {
   PREFIX_GET,
-  PREFIX_EDIT,
-  PREFIX_ADD,
-  PREFIX_DELETE,
-  PREFIX_SEARCH,
   UNSPECIFIED_OWNER,
-  PREFIX_GET_LIST,
-  ANYONE_METAROLE,
-  ANYONE_LOGGED_METAROLE,
-  GUEST_METAROLE,
   ENDPOINT_ERRORS,
 } from "../../constants";
-import { buildGqlQuery, buildGqlMutation, gqlQuery,
-  IGQLQueryObj, GQLEnum, GQLQuery, IGQLSearchResult, IGQLValue, IGQLEndpointValue } from "../../gql-querier";
-import { requestFieldsAreContained, deepMerge } from "../../gql-util";
+import {IGQLSearchResult, IGQLValue, IGQLRequestFields } from "../../gql-querier";
+import { requestFieldsAreContained } from "../../gql-util";
 import { EndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import CacheWorkerInstance from "../internal/workers/cache";
 import { RemoteListener } from "../internal/app/remote-listener";
-import { getFieldsAndArgs } from "../../util";
 import uuid from "uuid";
+import { getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor } from "../internal/gql-client-util";
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
@@ -45,10 +36,6 @@ export interface IBasicActionResponse {
 
 export interface IActionResponseWithValue extends IBasicActionResponse {
   value: any;
-}
-
-interface IActionResponseWithValueAndQueryFields extends IActionResponseWithValue {
-  getQueryFields: any;
 }
 
 /**
@@ -72,19 +59,21 @@ export type PolicyPathType = [string, string, string];
  * aka edit, aka add
  */
 export interface IActionSubmitOptions {
-  onlyIncludeProperties?: string[];
-  onlyIncludeIncludes?: string[];
+  properties: string[];
+  includes?: string[];
+  policies?: PolicyPathType[];
   onlyIncludeIfDiffersFromAppliedValue?: boolean;
   unpokeAfterSuccess?: boolean;
   propertiesToCleanOnSuccess?: string[];
   policiesToCleanOnSuccess?: PolicyPathType[];
-  beforeSubmit?: (policiesRequested: PolicyPathType[]) => boolean;
+  beforeSubmit?: () => boolean;
 }
 
 export interface IActionDeleteOptions {
+  policies?: PolicyPathType[];
   unpokeAfterSuccess?: boolean;
   policiesToCleanOnSuccess?: PolicyPathType[];
-  beforeDelete?: (policiesRequested: PolicyPathType[]) => boolean;
+  beforeDelete?: () => boolean;
 }
 
 /**
@@ -93,8 +82,8 @@ export interface IActionDeleteOptions {
 export interface IActionSearchOptions {
   requestedProperties: string[];
   requestedIncludes?: string[];
-  onlyIncludeSearchPropertiesForProperties?: string[];
-  onlyIncludeIncludes?: string[];
+  searchByProperties: string[];
+  searchByIncludes?: string[];
   unpokeAfterSuccess?: boolean;
   orderBy?: "DEFAULT";
   createdBy?: number;
@@ -107,10 +96,10 @@ export interface IActionSearchOptions {
   cachePolicy?: "by-owner" | "by-parent" | "none";
 }
 
-export interface IPokeElementType {
-  includeId: string;
-  propertyId: string;
-  isInvalid: boolean;
+export interface IPokeElementsType {
+  properties: string[];
+  includes: string[];
+  policies: PolicyPathType[];
 }
 
 /**
@@ -184,8 +173,7 @@ export interface IItemDefinitionContextType {
   // it makes no sense to show as invalid immediately
   // poked makes it so that every field shows its true state
   // they are poked
-  pokedElements: IPokeElementType[];
-  pokePoliciesType: string;
+  pokedElements: IPokeElementsType;
   // specifies whether the current user can create
   canCreate: boolean;
   // specifies whether the current user can delete
@@ -263,7 +251,7 @@ export const SearchItemDefinitionValueContext = React.createContext<ISearchItemD
 
 // Now we pass on the provider, this is what the developer
 // is actually expected to fill
-interface IItemDefinitionProviderProps {
+export interface IItemDefinitionProviderProps {
   // children that will be feed into the context
   children: any;
   // the item definition slash/separated/path
@@ -300,27 +288,21 @@ interface IItemDefinitionProviderProps {
   // the .search function with these arguments whenever it is detected
   // it should do so
   automaticSearch?: IActionSearchOptions;
-  // optimization, these cause no differences in UX/UI or function
-  // but they can speed up your app
-  // they affect request payloads as well as the application state itself
-  // use them carefully as if you mess up it will cause some values not to load
-  optimize?: {
-    // only downloads and includes the properties specified in the list
-    // in the state
-    onlyIncludeProperties?: string[],
-    // only includes the items specified in the list in the state
-    onlyIncludeIncludes?: string[],
-    // excludes the policies from being part of the state
-    excludePolicies?: boolean,
-    // cleans the value from the memory cache once the object dismounts
-    // as the memory cache might only grow and grow
-    cleanOnDismount?: boolean,
-    // static components do not update remotely
-    static?: boolean,
-    // avoids caching values in the worker cache
-    // the memory cache remains active
-    avoidLongTermCaching?: boolean,
-  };
+  // only downloads and includes the properties specified in the list
+  // in the state
+  properties: string[];
+  // only includes the items specified in the list in the state
+  includes?: string[];
+  // excludes the policies from being part of the state
+  includePolicies?: boolean;
+  // cleans the value from the memory cache once the object dismounts
+  // as the memory cache might only grow and grow
+  cleanOnDismount?: boolean;
+  // static components do not update remotely
+  static?: boolean;
+  // avoids caching values in the worker cache
+  // the memory cache remains active
+  avoidLongTermCaching?: boolean;
 }
 
 // This represents the actual provider that does the job, it takes on some extra properties
@@ -369,8 +351,7 @@ interface IActualItemDefinitionProviderState {
   searchRequestedProperties: string[];
   searchRequestedIncludes: string[];
   searchFields: any;
-  pokedElements: IPokeElementType[];
-  pokePoliciesType: string;
+  pokedElements: IPokeElementsType;
   canEdit: boolean;
   canDelete: boolean;
   canCreate: boolean;
@@ -405,9 +386,9 @@ export class ActualItemDefinitionProvider extends
           props.forId || null,
           props.forVersion || null,
           !props.disableExternalChecks,
-          props.optimize && props.optimize.onlyIncludeProperties,
-          props.optimize && props.optimize.onlyIncludeIncludes,
-          props.optimize && props.optimize.excludePolicies,
+          props.properties,
+          props.includes || [],
+          !props.includePolicies,
         ),
       };
     }
@@ -475,9 +456,9 @@ export class ActualItemDefinitionProvider extends
         this.props.forId || null,
         this.props.forVersion || null,
         !this.props.disableExternalChecks,
-        this.props.optimize && this.props.optimize.onlyIncludeProperties,
-        this.props.optimize && this.props.optimize.onlyIncludeIncludes,
-        this.props.optimize && this.props.optimize.excludePolicies,
+        this.props.properties,
+        this.props.includes || [],
+        !this.props.includePolicies,
       ),
       // and we pass all this state
       isBlocked: false,
@@ -509,8 +490,11 @@ export class ActualItemDefinitionProvider extends
       searchRequestedIncludes: [],
       searchRequestedProperties: [],
 
-      pokedElements: [],
-      pokePoliciesType: null,
+      pokedElements: {
+        properties: [],
+        includes: [],
+        policies: [],
+      },
 
       canEdit: this.canEdit(),
       canDelete: this.canDelete(),
@@ -542,10 +526,8 @@ export class ActualItemDefinitionProvider extends
       "change", this.props.forId || null, this.props.forVersion || null, this.changeListener,
     );
 
-    const isStatic = this.props.optimize && this.props.optimize.static;
-
     // second are the remote listeners, only when there's an id defined
-    if (this.props.forId && !isStatic) {
+    if (this.props.forId && !this.props.static) {
       // one is the reload, this gets called when the value of the field has differed from the one that
       // we have gotten (or have cached) this listener is very important for that reason, otherwise our app
       // will get frozen in the past
@@ -575,8 +557,7 @@ export class ActualItemDefinitionProvider extends
     this.props.itemDefinitionInstance.removeListener(
       "change", this.props.forId || null, this.props.forVersion || null, this.changeListener,
     );
-    const isStatic = this.props.optimize && this.props.optimize.static;
-    if (this.props.forId && !isStatic) {
+    if (this.props.forId && !this.props.static) {
       // remove all the remote listeners
       this.props.itemDefinitionInstance.removeListener(
         "reload", this.props.forId, this.props.forVersion || null, this.reloadListener,
@@ -613,8 +594,11 @@ export class ActualItemDefinitionProvider extends
       nextProps.tokenData.id !== this.props.tokenData.id ||
       nextProps.tokenData.role !== this.props.tokenData.role ||
       nextProps.remoteListener !== this.props.remoteListener ||
-      !equals(nextProps.automaticSearch, this.props.automaticSearch) ||
-      !equals(this.props.optimize, nextProps.optimize);
+      !equals(nextProps.properties, this.props.properties) ||
+      !equals(nextProps.includes || [], this.props.includes || []) ||
+      !!nextProps.static !== !!this.props.static ||
+      !!nextProps.includePolicies !== !!this.props.includePolicies ||
+      !equals(nextProps.automaticSearch, this.props.automaticSearch);
   }
   public async componentDidUpdate(
     prevProps: IActualItemDefinitionProviderProps,
@@ -627,15 +611,18 @@ export class ActualItemDefinitionProvider extends
     // now if the id changed, the optimization flags changed, or the item definition
     // itself changed
     if (
+      itemDefinitionWasUpdated ||
       (prevProps.forId || null) !== (this.props.forId || null) ||
-      !equals(this.props.optimize, prevProps.optimize) ||
-      itemDefinitionWasUpdated
+      !equals(prevProps.properties, this.props.properties) ||
+      !equals(prevProps.includes || [], this.props.includes || []) ||
+      !!prevProps.static !== !!this.props.static ||
+      !!prevProps.includePolicies !== !!this.props.includePolicies
     ) {
       // now we have to check on whether the current state is static
       // or not
-      const isStatic = this.props.optimize && this.props.optimize.static;
+      const isStatic = this.props.static;
       // compared to the previous
-      const wasStatic = prevProps.optimize && prevProps.optimize.static;
+      const wasStatic = prevProps.static;
 
       // if it's now static and it was not static before, we got to remove
       // the remote listeners, note that listeners are only added with an id
@@ -706,9 +693,9 @@ export class ActualItemDefinitionProvider extends
           this.props.forId || null,
           this.props.forVersion || null,
           !this.props.disableExternalChecks,
-          this.props.optimize && this.props.optimize.onlyIncludeProperties,
-          this.props.optimize && this.props.optimize.onlyIncludeIncludes,
-          this.props.optimize && this.props.optimize.excludePolicies,
+          this.props.properties,
+          this.props.includes || [],
+          !this.props.includePolicies,
         ),
       });
 
@@ -777,9 +764,9 @@ export class ActualItemDefinitionProvider extends
         this.props.forId || null,
         this.props.forVersion || null,
         !this.props.disableExternalChecks,
-        this.props.optimize && this.props.optimize.onlyIncludeProperties,
-        this.props.optimize && this.props.optimize.onlyIncludeIncludes,
-        this.props.optimize && this.props.optimize.excludePolicies,
+        this.props.properties,
+        this.props.includes || [],
+        !this.props.includePolicies,
       ),
       // we do this because eg. the search relies on triggering the change listener
       // no notify that things aren't loading anymore
@@ -798,7 +785,7 @@ export class ActualItemDefinitionProvider extends
     // elements are assumed into the loading state by the constructor
     // if they have an id
     if (!this.props.forId) {
-      return;
+      return null;
     }
 
     // We get the request fields that we are going to use
@@ -811,8 +798,8 @@ export class ActualItemDefinitionProvider extends
     const { requestFields } = getFieldsAndArgs({
       includeArgs: false,
       includeFields: true,
-      onlyIncludeIncludes: this.props.optimize && this.props.optimize.onlyIncludeIncludes,
-      onlyIncludeProperties: this.props.optimize && this.props.optimize.onlyIncludeProperties,
+      includes: this.props.includes || [],
+      properties: this.props.properties,
       appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
       userId: this.props.tokenData.id,
       userRole: this.props.tokenData.role,
@@ -845,10 +832,7 @@ export class ActualItemDefinitionProvider extends
         // make it so that when we are exiting the search context it caches
         if (
           CacheWorkerInstance.isSupported &&
-          (
-            !this.props.optimize ||
-            !this.props.optimize.avoidLongTermCaching
-          )
+          !this.props.avoidLongTermCaching
         ) {
           CacheWorkerInstance.instance.mergeCachedValue(
             PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(),
@@ -893,75 +877,28 @@ export class ActualItemDefinitionProvider extends
       ) &&
       requestFieldsAreContained(requestFields, this.props.searchContext.searchFields)
     ) {
-      return;
+      return null;
     }
-
-    const value = await this.loadValueWaiter(
-      requestFields,
-      denyCache,
-    );
-
-    if (value.value) {
-      // we apply the value, whatever we have gotten this will affect all the instances
-      // that use the same value
-      this.props.itemDefinitionInstance.applyValue(
-        this.props.forId || null,
-        this.props.forVersion || null,
-        value.value,
-        false,
-        this.props.tokenData.id,
-        this.props.tokenData.role,
-        value.getQueryFields,
-        true,
-      );
-
-      // and then we trigger the change listener for all the instances
-      this.props.itemDefinitionInstance.triggerListeners(
-        "change", this.props.forId || null, this.props.forVersion || null,
-      );
-      // and if we have an externally checked property we do the external check
-      if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
-        this.setStateToCurrentValueWithExternalChecking(null);
-      }
-    }
-
-    this.loadValueCompleted(value);
-  }
-
-  public async loadValueWaiter(requestFields: any, denyCache?: boolean):
-    Promise<IActionResponseWithValueAndQueryFields> {
 
     // remember that this waiter only runs on the first instance
     // that managed to get the memo, it waits for all the other instances
     // and then runs this query
     const {
-      value,
       error,
-      memoryCached,
+      value,
       cached,
       getQueryFields,
-    } = await this.runQueryFor({
-      queryPrefix: PREFIX_GET,
-      baseArgs: {},
-      requestFields,
-      returnMemoryCachedValuesForGetRequests: false,
-      returnWorkerCachedValuesForGetRequests: !denyCache,
+    } = await runGetQueryFor({
+      args: {},
+      fields: requestFields,
+      returnMemoryCachedValues: false,
+      returnWorkerCachedValues: !denyCache,
+      itemDefinition: this.props.itemDefinitionInstance,
+      id: this.props.forId,
+      version: this.props.forVersion || null,
+      token: this.props.tokenData.token,
+      language: this.props.localeData.language,
     });
-
-    // this should never happen honestly as we are giving
-    // a false flag for return memoryCached value for get requests
-    // but we leave it here just in case, memoryCached means the object
-    // is already in memory in the state and already populated because react uses
-    // that state
-    if (memoryCached) {
-      return {
-        value: this.props.itemDefinitionInstance.getGQLAppliedValue(
-          this.props.forId, this.props.forVersion || null).rawValue,
-        error: null,
-        getQueryFields: this.props.itemDefinitionInstance.getGQLAppliedValue(
-          this.props.forId, this.props.forVersion || null).requestFields,
-      };
-    }
 
     // if the item has been cached, as in returned from the indexed db database
     // rather than the server, we don't know if it's actually the current value
@@ -977,13 +914,34 @@ export class ActualItemDefinitionProvider extends
       });
     }
 
-    // now from the waiter we return the value, the error and the fields
-    // we used to query this, the actual ones
-    return {
+    if (value) {
+      // we apply the value, whatever we have gotten this will affect all the instances
+      // that use the same value
+      this.props.itemDefinitionInstance.applyValue(
+        this.props.forId,
+        this.props.forVersion || null,
+        value,
+        false,
+        this.props.tokenData.id,
+        this.props.tokenData.role,
+        getQueryFields,
+        true,
+      );
+
+      // and then we trigger the change listener for all the instances
+      this.props.itemDefinitionInstance.triggerListeners(
+        "change", this.props.forId, this.props.forVersion || null,
+      );
+      // and if we have an externally checked property we do the external check
+      if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+        this.setStateToCurrentValueWithExternalChecking(null);
+      }
+    }
+
+    return this.loadValueCompleted({
       value,
       error,
-      getQueryFields,
-    };
+    });
   }
   public loadValueCompleted(value: IActionResponseWithValue): IActionResponseWithValue {
     // so once everything has been completed this function actually runs per instance
@@ -1019,11 +977,8 @@ export class ActualItemDefinitionProvider extends
       });
     }
 
-    // now we return without the query info
-    return {
-      value: value.value,
-      error: value.error,
-    };
+    // now we return
+    return value;
   }
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
     // so when we want to externally check we first run the external check
@@ -1031,9 +986,9 @@ export class ActualItemDefinitionProvider extends
     const newItemDefinitionState = await this.props.itemDefinitionInstance.getState(
       this.props.forId || null,
       this.props.forVersion || null,
-      this.props.optimize && this.props.optimize.onlyIncludeProperties,
-      this.props.optimize && this.props.optimize.onlyIncludeIncludes,
-      this.props.optimize && this.props.optimize.excludePolicies,
+      this.props.properties,
+      this.props.includes || [],
+      !this.props.includePolicies,
     );
 
     // if the current update id is null (as in always update) or the last update id
@@ -1128,7 +1083,7 @@ export class ActualItemDefinitionProvider extends
 
     // when unmounting we check our optimization flags to see
     // if we are expecting to clean up the memory cache
-    if (this.props.optimize && this.props.optimize.cleanOnDismount) {
+    if (this.props.cleanOnDismount) {
       this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null, this.props.forVersion || null);
       // this will affect other instances that didn't dismount
       this.props.itemDefinitionInstance.triggerListeners(
@@ -1154,29 +1109,21 @@ export class ActualItemDefinitionProvider extends
     }
   }
   public checkItemDefinitionStateValidity(
-    options?: {
-      onlyIncludeProperties?: string[],
-      onlyIncludeIncludes?: string[],
+    options: {
+      properties: string[],
+      includes?: string[],
+      policies?: PolicyPathType[],
       onlyIncludeIfDiffersFromAppliedValue?: boolean,
     },
-  ): {
-    isInvalid: boolean,
-    propertiesToPoke: IPokeElementType[],
-  } {
+  ): boolean {
     // let's make this variable to check on whether things are invalid or not
     // first we check every property, that is included and allowed we use some
     // and return whether it's invalid
-    const mainPropertiesIncluded: IPokeElementType[] = this.state.itemDefinitionState.properties.map((p) => {
-      // we return false if we have an only included properties and our property is in there
-      // because that means that whether it is valid or not is irrelevant for our query
-      const isNotIncluded = options && options.onlyIncludeProperties &&
-        !options.onlyIncludeProperties.includes(p.propertyId);
-      if (isNotIncluded) {
-        return null;
-      }
+    const allIncludedPropertiesValid = options.properties.every((pId) => {
+      const p = this.state.itemDefinitionState.properties.find((p) => p.propertyId === pId);
       // now we check if we have the option to only include those that differ
       // from the applied value
-      if (options && options.onlyIncludeIfDiffersFromAppliedValue) {
+      if (options.onlyIncludeIfDiffersFromAppliedValue) {
         // we get the current applied value, if any
         const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
           this.props.forId || null, this.props.forVersion || null);
@@ -1189,61 +1136,46 @@ export class ActualItemDefinitionProvider extends
           );
           // if it does not differ, then it's false as it won't be included
           if (doesNotDifferFromAppliedValue) {
-            return null;
+            return true;
           } else {
             // otherwise it really depends
-            return {
-              includeId: null,
-              propertyId: p.propertyId,
-              isInvalid: !p.valid,
-            };
+            return p.valid;
           }
         } else {
           // otherwise if there's no applied value we consider
           // the applied value to be null
           const doesNotDifferFromAppliedValue = p.value === null;
           if (doesNotDifferFromAppliedValue) {
-            return null;
+            return true;
           } else {
-            return {
-              includeId: null,
-              propertyId: p.propertyId,
-              isInvalid: !p.valid,
-            };
+            return p.valid;
           }
         }
       }
-      return {
-        includeId: null,
-        propertyId: p.propertyId,
-        isInvalid: !p.valid,
-      };
-    }).filter((v) => !!v);
+      return p.valid;
+    });
 
-    const itemPropertiesIncluded: IPokeElementType[] = [];
+    if (!allIncludedPropertiesValid) {
+      return false;
+    }
 
-    this.state.itemDefinitionState.includes.forEach((i) => {
-      // same using the variable for only include, same check as before
-      if (options && options.onlyIncludeIncludes && !options.onlyIncludeIncludes.includes(i.includeId)) {
-        return;
-      }
-
+    const allIncludedIncludesAreValid = !options.includes ? true : options.includes.every((iId) => {
+      const i = this.state.itemDefinitionState.includes.find((i) => i.includeId === iId);
       // and now we get the sinking property ids
       const include = this.props.itemDefinitionInstance.getIncludeFor(i.includeId);
       const sinkingPropertyIds = include.getSinkingPropertiesIds();
 
       // and we extract the state only if it's a sinking property
-      return i.itemDefinitionState.properties.some((p) => {
+      return i.itemDefinitionState.properties.every((p) => {
         if (!sinkingPropertyIds.includes(p.propertyId)) {
-          return;
+          return true;
         }
         // now we check if we have the option to only include those that differ
         // from the applied value
-        if (options && options.onlyIncludeIfDiffersFromAppliedValue) {
+        if (options.onlyIncludeIfDiffersFromAppliedValue) {
           // we get the current applied value, if any
           const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
             this.props.forId || null, this.props.forVersion || null);
-          let considerItNull: boolean = false;
           // if there is an applied value for that property
           if (currentAppliedValue && currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()]) {
             const includeAppliedValue = currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()];
@@ -1255,446 +1187,32 @@ export class ActualItemDefinitionProvider extends
               );
               // so if it does differ from applied value
               if (!doesNotDifferFromAppliedValue) {
-                itemPropertiesIncluded.push({
-                  includeId: i.includeId,
-                  propertyId: p.propertyId,
-                  isInvalid: !p.valid,
-                });
+                return true;
               }
-            } else {
-              considerItNull = true;
-            }
-          } else {
-            considerItNull = true;
-          }
-
-          if (considerItNull) {
-            // otherwise if there's no applied value we consider
-            // the applied value to be null
-            const doesNotDifferFromAppliedValue = p.value === null;
-            // so if it does differ from applied value
-            if (!doesNotDifferFromAppliedValue) {
-              itemPropertiesIncluded.push({
-                includeId: i.includeId,
-                propertyId: p.propertyId,
-                isInvalid: !p.valid,
-              });
             }
           }
-        } else {
-          itemPropertiesIncluded.push({
-            includeId: i.includeId,
-            propertyId: p.propertyId,
-            isInvalid: !p.valid,
-          });
         }
+
+        return p.valid;
       });
     });
 
-    const propertiesToPoke = mainPropertiesIncluded.concat(itemPropertiesIncluded);
+    if (!allIncludedIncludesAreValid) {
+      return false;
+    }
 
-    return {
-      propertiesToPoke,
-      isInvalid: propertiesToPoke.some((ptp) => ptp.isInvalid),
-    };
+    if (!options.policies) {
+      return true;
+    }
+
+    return options.policies.every((pKeys) => {
+      const [policyType, policyName, propertyId] = pKeys;
+      const propertyInPolicy = this.state.itemDefinitionState.policies[policyType][policyName]
+        .find((p) => p.propertyId === propertyId);
+      return propertyInPolicy.valid;
+    });
   }
 
-  // this is a beast of a function
-  // runs the queries and does the partial caching
-  // making use of the partial cache
-  public async runQueryFor(
-    arg: {
-      queryPrefix: string,
-      baseArgs: any,
-      requestFields: any,
-      returnMemoryCachedValuesForGetRequests?: boolean,
-      returnWorkerCachedValuesForGetRequests?: boolean,
-      searchOrderBy?: string,
-      searchCreatedBy?: number,
-      searchParentedBy?: [string, number, string],
-      searchCachePolicy?: "by-owner" | "by-parent" | "none",
-      searchRequestedFieldsOnCachePolicy?: any,
-    },
-  ): Promise<{
-    error: EndpointErrorType,
-    value: any,
-    memoryCached: boolean,
-    cached: boolean,
-    getQueryFields: any,
-  }> {
-    // so the first thing we need to get what kind of query we are running, first we get
-    // the qualified path name that is used in graphql, when we get the extensions instance
-    // this basically means a search requests, so it should be the prefix search but
-    // this function is flexible so it allows mistakes
-    const qualifiedName = (this.props.itemDefinitionInstance.isExtensionsInstance() ?
-      this.props.itemDefinitionInstance.getParentModule().getQualifiedPathName() :
-      this.props.itemDefinitionInstance.getQualifiedPathName());
-
-    // this is the query we run
-    const queryName = arg.queryPrefix + qualifiedName;
-
-    // basic args, the base args usually are for policies and whatnot
-    const args = {
-      token: this.props.tokenData.token,
-      language: this.props.localeData.language.split("-")[0],
-      ...arg.baseArgs,
-    };
-
-    // if there's an id, we add it to the query
-    if (this.props.forId) {
-      args.id = this.props.forId;
-    }
-
-    if (arg.queryPrefix === PREFIX_SEARCH) {
-      args.order_by = new GQLEnum(arg.searchOrderBy);
-    }
-
-    if (arg.queryPrefix === PREFIX_SEARCH && typeof arg.searchCreatedBy !== "undefined") {
-      args.created_by = arg.searchCreatedBy;
-    }
-
-    if (arg.queryPrefix === PREFIX_SEARCH && typeof arg.searchParentedBy !== "undefined") {
-      args.parent_type = arg.searchParentedBy[0];
-      args.parent_id = arg.searchParentedBy[1];
-      args.parent_version = arg.searchParentedBy[2];
-    }
-
-    // now we get the currently applied value in memory
-    const appliedGQLValue = arg.queryPrefix !== PREFIX_SEARCH ?
-      this.props.itemDefinitionInstance.getGQLAppliedValue(
-        this.props.forId || null, this.props.forVersion || null) :
-      null;
-    // if we have a query to get a value, and we are allowed to return memory cached request
-    if (arg.queryPrefix === PREFIX_GET && arg.returnMemoryCachedValuesForGetRequests) {
-      // let's check if the memory cached and the requested value match
-      if (
-        appliedGQLValue &&
-        requestFieldsAreContained(arg.requestFields, appliedGQLValue.requestFields)
-      ) {
-        return {
-          error: null,
-          value: appliedGQLValue.rawValue,
-          memoryCached: true,
-          cached: false,
-          getQueryFields: appliedGQLValue.requestFields,
-        };
-      }
-    }
-
-    // otherwise now let's check for the worker
-    if (
-      // if we have an id and a GET request we want cached value
-      arg.queryPrefix === PREFIX_GET &&
-      this.props.forId &&
-      CacheWorkerInstance.isSupported &&
-      arg.returnWorkerCachedValuesForGetRequests
-    ) {
-      // we ask the worker for the value
-      const workerCachedValue =
-        await CacheWorkerInstance.instance.getCachedValue(
-          queryName, this.props.forId, this.props.forVersion || null, arg.requestFields,
-        );
-      // if we have a GET request and we are allowed to return from the wroker cache and we actually
-      // found something in our cache, return that
-      if (workerCachedValue) {
-        return {
-          error: null,
-          value: workerCachedValue.value,
-          memoryCached: false,
-          cached: true,
-          getQueryFields: workerCachedValue.fields,
-        };
-      }
-    }
-
-    // if we are running a EDIT or DELETE query, where we are expected to
-    // pass a listener uuid in order to avoid a feedback loop where we inform
-    // ourselves of changes we have done, we pass it
-    if (arg.queryPrefix === PREFIX_EDIT || arg.queryPrefix === PREFIX_DELETE) {
-      args.listener_uuid = this.props.remoteListener.getUUID();
-    }
-
-    let cached = false;
-    let gqlValue: IGQLEndpointValue;
-    // if we are in a search with
-    // a cache policy then we should be able
-    // to run the search within the worker as
-    // that is one of the jobs of he cache workers
-    // when it needs to run searches on the client side
-    // for that we would totally relegate the search functionality
-    // and even requesting the server to the cache worker, it will take
-    // as much time as it is necessary
-    if (
-      arg.queryPrefix === PREFIX_SEARCH &&
-      arg.searchCachePolicy !== "none" &&
-      CacheWorkerInstance.isSupported
-    ) {
-      const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
-      const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
-        standardCounterpart.getParentModule().getQualifiedPathName() :
-        standardCounterpart.getQualifiedPathName());
-      const cacheWorkerGivenSearchValue = await CacheWorkerInstance.instance.runCachedSearch(
-        queryName,
-        args,
-        PREFIX_GET_LIST + standardCounterpartQualifiedName,
-        this.props.tokenData.token,
-        this.props.localeData.language.split("-")[0],
-        arg.searchRequestedFieldsOnCachePolicy,
-        arg.searchCachePolicy,
-      );
-      gqlValue = cacheWorkerGivenSearchValue.gqlValue;
-      cached = true;
-      if (gqlValue && gqlValue.data) {
-        if (arg.searchCachePolicy === "by-owner") {
-          this.props.remoteListener.addOwnedSearchListenerFor(
-            standardCounterpartQualifiedName,
-            arg.searchCreatedBy,
-            cacheWorkerGivenSearchValue.lastRecord,
-            this.onSearchReload,
-          );
-        } else {
-          this.props.remoteListener.addParentedSearchListenerFor(
-            standardCounterpartQualifiedName,
-            arg.searchParentedBy[0],
-            arg.searchParentedBy[1],
-            arg.searchParentedBy[2],
-            cacheWorkerGivenSearchValue.lastRecord,
-            this.onSearchReload,
-          );
-        }
-
-        if (cacheWorkerGivenSearchValue.dataMightBeStale) {
-          if (arg.searchCachePolicy === "by-owner") {
-            this.props.remoteListener.requestOwnedSearchFeedbackFor({
-              qualifiedPathName: standardCounterpartQualifiedName,
-              createdBy: arg.searchCreatedBy,
-              knownLastRecord: cacheWorkerGivenSearchValue.lastRecord,
-            });
-          } else {
-            this.props.remoteListener.requestParentedSearchFeedbackFor({
-              qualifiedPathName: standardCounterpartQualifiedName,
-              parentType: arg.searchParentedBy[0],
-              parentId: arg.searchParentedBy[1],
-              parentVersion: arg.searchParentedBy[2],
-              knownLastRecord: cacheWorkerGivenSearchValue.lastRecord,
-            });
-          }
-        }
-      }
-    } else {
-      // now we build the object query
-      const objQuery: IGQLQueryObj = {
-        name: queryName,
-        args,
-        fields: arg.requestFields,
-      };
-
-      // it's either a query or a mutation, only GET and SEARCH are queries
-      let query: GQLQuery;
-      if (arg.queryPrefix === PREFIX_GET || arg.queryPrefix === PREFIX_SEARCH) {
-        query = buildGqlQuery(objQuery);
-      } else {
-        query = buildGqlMutation(objQuery);
-      }
-
-      // now we get the gql value using the gql query function
-      // and this function will always run using the network
-      gqlValue = await gqlQuery(query);
-    }
-
-    // now we got to check for errors
-    let error: EndpointErrorType = null;
-
-    if (gqlValue.errors) {
-      // if the server itself returned an error, we use that error
-      error = gqlValue.errors[0].extensions;
-    }
-
-    // now let's get the returned value
-    let value: any = null;
-    // and the merged query fields for this value
-    let mergedQueryFields: any = arg.requestFields;
-    // for first having a graphql value we need to check if
-    // we actually have one, so we check all the way up to the
-    // query name
-    if (!error && gqlValue && gqlValue.data && gqlValue.data[queryName]) {
-      // so this is the value that graphql gave
-      value = gqlValue.data[queryName];
-      // if we have a GET, EDIT or ADD, then we need to
-      // set up the cache
-      if (
-        arg.queryPrefix === PREFIX_GET ||
-        arg.queryPrefix === PREFIX_EDIT
-      ) {
-        // first we check if we have a value in memory
-        // cache and we merge it with what we got
-        // note how the first argument takes priority
-        // and the second will be the one overriden
-        // if there's a collision the last_modified attribute
-        // always gets downloaded, and with this we ensure that
-        // the data is cacheable of the same modification date we
-        // don't want data of different versions to be colliding
-        if (
-          appliedGQLValue &&
-          appliedGQLValue.rawValue &&
-          appliedGQLValue.rawValue.last_modified === value.last_modified
-        ) {
-          value = deepMerge(
-            value,
-            appliedGQLValue.rawValue,
-          );
-          mergedQueryFields = deepMerge(
-            arg.requestFields,
-            appliedGQLValue.requestFields,
-          );
-        }
-      }
-    }
-
-    // now that we have done all that we are going to cache our merged
-    // results
-    if (
-      !error &&
-      CacheWorkerInstance.isSupported &&
-      (
-        !this.props.optimize ||
-        !this.props.optimize.avoidLongTermCaching
-      )
-    ) {
-      // in the case of delete, we just cache nulls also
-      // the same applies in the case of get and a not found
-      // was the output
-      if (
-        arg.queryPrefix === PREFIX_DELETE ||
-        (arg.queryPrefix === PREFIX_GET && !value)
-      ) {
-        // we are here guaranteed that if we have retrieved something from
-        // the server in an unique value way it is not a module and it's not
-        // a search mode, since we are here, so we can infer the module search
-        // and the item definition search in order to be efficient
-        CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
-          this.props.forId,
-          this.props.forVersion,
-          qualifiedName,
-          PREFIX_GET + qualifiedName,
-          PREFIX_SEARCH + this.props.itemDefinitionInstance.getParentModule().getSearchModule().getQualifiedPathName(),
-          PREFIX_SEARCH + this.props.itemDefinitionInstance.getSearchModeCounterpart().getQualifiedPathName(),
-        );
-      } else if (
-        (
-          arg.queryPrefix === PREFIX_GET ||
-          arg.queryPrefix === PREFIX_EDIT ||
-          arg.queryPrefix === PREFIX_ADD
-        ) &&
-        value && mergedQueryFields
-      ) {
-        CacheWorkerInstance.instance.mergeCachedValue(
-          PREFIX_GET + qualifiedName, value.id, value.version, value, mergedQueryFields);
-      }
-    }
-
-    return {
-      error,
-      value,
-      memoryCached: false,
-      // this is basically only true during the search cached
-      cached,
-      getQueryFields: mergedQueryFields,
-    };
-  }
-
-  // TODO get rid of this function make policies need to be manually set
-  public checkPoliciesAndGetArgs(policyType: string, argumentsToCheckPropertiesAgainst?: any): {
-    isInvalid: boolean;
-    applyingPolicyArgs: any;
-    applyingPolicies: PolicyPathType[];
-  } {
-    const applyingPolicyArgs: any = {};
-    const applyingPolicies: PolicyPathType[] = [];
-    return {
-      isInvalid: Object.keys(this.state.itemDefinitionState.policies[policyType]).map((policyName) => {
-        // and for that we check using some again every property that is applied in the policy
-        return this.state.itemDefinitionState.policies[policyType][policyName].map((propertyStateInPolicy) => {
-          // we check regarding the property ids only if we are asked to do so by the arguments for query
-          if (argumentsToCheckPropertiesAgainst) {
-            // and now we need to check whether the policy is at all necessary, as in, are we modifying
-            // any property that would cause this to be needed, for that we get the applying ids
-            const applyingPropertyIds = this.props.itemDefinitionInstance
-              .getApplyingPropertyIdsForPolicy(policyType, policyName);
-
-            // this only matters if there are applying property ids, this might not be the
-            // case and as so be a generic policy that applies to all
-            if (applyingPropertyIds) {
-              // and using some yet again we check whether using the argumentsToCheckPropertiesAgainst
-              // which is a gql object
-              // which funnily will contain the same id in case it is there, it will tell us whether one
-              // of the property actually is going to be modified and so our policy applies
-              const oneOfApplyingPropertiesApplies = applyingPropertyIds
-                .some((pid) => typeof argumentsToCheckPropertiesAgainst[pid] !== "undefined");
-              // if it doesn't match anything, we return false, so technically this policy is valid
-              // regardless on whether
-              // the value itself is valid or not because it will not pass to the graphql query
-              if (!oneOfApplyingPropertiesApplies) {
-                // the attribute is not included isInvalid is false we ignore
-                return false;
-              }
-            }
-
-            // now we do the same but with the items
-            const applyingIncludeIds = this.props.itemDefinitionInstance
-              .getApplyingIncludeIdsForPolicy(policyType, policyName);
-
-            if (applyingIncludeIds) {
-              const oneOfApplyingIncludesApplies = applyingIncludeIds
-                .some((includeId) => {
-                  const referredInclude = this.props.itemDefinitionInstance.getIncludeFor(includeId);
-                  return (
-                    typeof argumentsToCheckPropertiesAgainst[
-                      referredInclude.getQualifiedIdentifier()
-                    ] !== "undefined" ||
-                    typeof argumentsToCheckPropertiesAgainst[
-                      referredInclude.getQualifiedExclusionStateIdentifier()
-                    ] !== "undefined"
-                  );
-                });
-
-              if (!oneOfApplyingIncludesApplies) {
-                return false;
-              }
-            }
-          }
-          // Here we are doing exactly the same as we did with applying property ids but this time
-          // now we do it with the roles
-          const applyingRoles = this.props.itemDefinitionInstance.getRolesForPolicy(policyType, policyName);
-          const oneOfApplyingRolesApplies =
-            applyingRoles.includes(this.props.tokenData.role) ||
-            applyingRoles.includes(ANYONE_METAROLE) ||
-            (applyingRoles.includes(ANYONE_LOGGED_METAROLE) && this.props.tokenData.role !== GUEST_METAROLE);
-          if (!oneOfApplyingRolesApplies) {
-            // the attribute is not included isInvalid is false
-            return false;
-          }
-
-          // otherwise we are going to set it in the policy arguments that go with the arguments for the
-          // query
-          const policyProperty =
-            this.props.itemDefinitionInstance
-              .getPropertyDefinitionForPolicy(policyType, policyName, propertyStateInPolicy.propertyId);
-
-          // then we are going to set that value using the qualified identifier that is used
-          // in the args
-          applyingPolicyArgs[policyProperty.getQualifiedPolicyIdentifier(policyType, policyName)] =
-            propertyStateInPolicy.value;
-          applyingPolicies.push([policyType, policyName, policyProperty.getId()]);
-
-          // otherwise we are going to return whether it is invalid
-          return !propertyStateInPolicy.valid;
-        }).some((isPolicyNameInvalid) => isPolicyNameInvalid);
-      }).some((isPolicyTypeInvalid) => isPolicyTypeInvalid),
-      applyingPolicyArgs,
-      applyingPolicies,
-    };
-  }
   public giveEmulatedInvalidError(
     stateApplied: string,
     withId: boolean,
@@ -1730,21 +1248,42 @@ export class ActualItemDefinitionProvider extends
       return null;
     }
 
-    const {isInvalid, applyingPolicyArgs, applyingPolicies} = this.checkPoliciesAndGetArgs(
-      "delete",
-    );
-
-    if (options.beforeDelete && !options.beforeDelete(applyingPolicies)) {
-      return null;
-    }
+    const isInvalid = this.checkItemDefinitionStateValidity({
+      properties: [],
+      ...options,
+    });
 
     if (isInvalid) {
       // if it's not poked already, let's poke it
       this.setState({
-        pokePoliciesType: "delete",
+        pokedElements: {
+          properties: [],
+          includes: [],
+          policies: options.policies || [],
+        },
       });
       return this.giveEmulatedInvalidError("deleteError", false, false);
     }
+
+    if (options.beforeDelete && !options.beforeDelete()) {
+      return null;
+    }
+
+    const {
+      argumentsForQuery,
+    } = getFieldsAndArgs({
+      includeArgs: false,
+      includeFields: true,
+      includesForArgs: [],
+      propertiesForArgs: [],
+      policiesForArgs: options.policies || [],
+      appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
+      userId: this.props.tokenData.id,
+      userRole: this.props.tokenData.role,
+      itemDefinitionInstance: this.props.itemDefinitionInstance,
+      forId: this.props.forId,
+      forVersion: this.props.forVersion || null,
+    });
 
     this.setState({
       deleting: true,
@@ -1752,12 +1291,14 @@ export class ActualItemDefinitionProvider extends
 
     const {
       error,
-    } = await this.runQueryFor({
-      queryPrefix: PREFIX_DELETE,
-      baseArgs: applyingPolicyArgs,
-      requestFields: {
-        id: {},
-      },
+    } = await runDeleteQueryFor({
+      args: argumentsForQuery,
+      itemDefinition: this.props.itemDefinitionInstance,
+      id: this.props.forId,
+      version: this.props.forVersion || null,
+      token: this.props.tokenData.token,
+      language: this.props.localeData.language,
+      listenerUUID: this.props.remoteListener.getUUID(),
     });
 
     if (error) {
@@ -1765,7 +1306,11 @@ export class ActualItemDefinitionProvider extends
         deleteError: error,
         deleting: false,
         deleted: false,
-        pokePoliciesType: "delete",
+        pokedElements: {
+          properties: [],
+          includes: [],
+          policies: options.policies || [],
+        },
       });
     } else {
       this.props.itemDefinitionInstance.cleanValueFor(this.props.forId, this.props.forVersion || null);
@@ -1774,7 +1319,11 @@ export class ActualItemDefinitionProvider extends
         deleting: false,
         deleted: true,
         notFound: true,
-        pokePoliciesType: options.unpokeAfterSuccess ? null : "delete",
+        pokedElements: {
+          properties: [],
+          includes: [],
+          policies: options.unpokeAfterSuccess ? [] : (options.policies || []),
+        },
       });
       if (options.policiesToCleanOnSuccess) {
         options.policiesToCleanOnSuccess.forEach((policyArray) => {
@@ -1790,20 +1339,24 @@ export class ActualItemDefinitionProvider extends
       error,
     };
   }
-  public async submit(options: IActionSubmitOptions = {}): Promise<IActionResponseWithId> {
+  public async submit(options: IActionSubmitOptions): Promise<IActionResponseWithId> {
     // if we are already submitting, we reject the action
     if (this.state.submitting) {
       return null;
     }
 
-    const {isInvalid, propertiesToPoke} = this.checkItemDefinitionStateValidity(options);
+    const isInvalid = this.checkItemDefinitionStateValidity(options);
+    const pokedElements = {
+      properties: options.properties,
+      includes: options.includes || [],
+      policies: options.policies || [],
+    }
 
     // if it's invalid let's return the emulated error
     if (isInvalid) {
       // if it's not poked already, let's poke it
       this.setState({
-        pokedElements: propertiesToPoke,
-        pokePoliciesType: this.props.forId ? "edit" : null,
+        pokedElements,
       });
       return this.giveEmulatedInvalidError("submitError", true, false) as IActionResponseWithId;
     }
@@ -1818,10 +1371,11 @@ export class ActualItemDefinitionProvider extends
     } = getFieldsAndArgs({
       includeArgs: true,
       includeFields: true,
-      onlyIncludeIncludes: this.props.optimize && this.props.optimize.onlyIncludeIncludes,
-      onlyIncludeProperties: this.props.optimize && this.props.optimize.onlyIncludeProperties,
-      onlyIncludeIncludesForArgs: options.onlyIncludeIncludes,
-      onlyIncludePropertiesForArgs: options.onlyIncludeProperties,
+      includes: this.props.includes || [],
+      properties: this.props.properties,
+      includesForArgs: options.includes || [],
+      propertiesForArgs: options.properties,
+      policiesForArgs: options.policies || [],
       onlyIncludeArgsIfDiffersFromAppliedValue: options.onlyIncludeIfDiffersFromAppliedValue,
       appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
       userId: this.props.tokenData.id,
@@ -1831,38 +1385,10 @@ export class ActualItemDefinitionProvider extends
       forVersion: this.props.forVersion || null,
     });
 
-    // super hack in order to get the applying policy args
-    let applyingPolicyArgs: any = {};
-    let applyingPolicies: PolicyPathType[] = [];
-    let isInvalidByPolicy = false;
-    // first we only need to run this if it's not invalid, otherwise the values
-    // are never really used for the policy state, also this is only useful for
-    // edits
-    if (this.props.forId && this.state.itemDefinitionState.policies.edit) {
-      // now we set the variable by checking all the policies in the state using some
-      // we check every policyName included in edit
-      const checkPoliciesResult = this.checkPoliciesAndGetArgs(
-        "edit",
-        argumentsForQuery,
-      );
-      applyingPolicyArgs = checkPoliciesResult.applyingPolicyArgs;
-      isInvalidByPolicy = checkPoliciesResult.isInvalid;
-      applyingPolicies = checkPoliciesResult.applyingPolicies;
-    }
-
     // now checking the option for the before submit function, if it returns
     // false we cancel the submit request, we don't check policies yet
-    if (options && options.beforeSubmit && !options.beforeSubmit(applyingPolicies)) {
+    if (options.beforeSubmit && !options.beforeSubmit()) {
       return null;
-    }
-
-    // if it's invalid we give the simulated error yet again
-    if (isInvalidByPolicy) {
-      // if it's not poked already, let's poke it
-      this.setState({
-        pokePoliciesType: "edit",
-      });
-      return this.giveEmulatedInvalidError("submitError", true, false) as IActionResponseWithId;
     }
 
     // now it's when we are actually submitting
@@ -1870,18 +1396,36 @@ export class ActualItemDefinitionProvider extends
       submitting: true,
     });
 
-    const {
-      value,
-      error,
-      getQueryFields,
-    } = await this.runQueryFor({
-      queryPrefix: !this.props.forId ? PREFIX_ADD : PREFIX_EDIT,
-      baseArgs: {
-        ...argumentsForQuery,
-        ...applyingPolicyArgs,
-      },
-      requestFields,
-    });
+    let value: IGQLValue;
+    let error: EndpointErrorType;
+    let getQueryFields: IGQLRequestFields;
+    if (this.props.forId) {
+      const totalValues = await runEditQueryFor({
+        args: argumentsForQuery,
+        fields: requestFields,
+        itemDefinition: this.props.itemDefinitionInstance,
+        token: this.props.tokenData.token,
+        language: this.props.localeData.language,
+        id: this.props.forId,
+        version: this.props.forVersion,
+        listenerUUID: this.props.remoteListener.getUUID(),
+      });
+      value = totalValues.value;
+      error = totalValues.error;
+      getQueryFields = totalValues.getQueryFields;
+    } else {
+      const totalValues = await runAddQueryFor({
+        args: argumentsForQuery,
+        fields: requestFields,
+        itemDefinition: this.props.itemDefinitionInstance,
+        token: this.props.tokenData.token,
+        language: this.props.localeData.language,
+        listenerUUID: this.props.remoteListener.getUUID(),
+      });
+      value = totalValues.value;
+      error = totalValues.error;
+      getQueryFields = totalValues.getQueryFields;
+    }
 
     let recievedId: number = null;
     let receivedVersion: string = null;
@@ -1890,22 +1434,22 @@ export class ActualItemDefinitionProvider extends
         submitError: error,
         submitting: false,
         submitted: false,
-        pokedElements: propertiesToPoke,
-        pokePoliciesType: this.props.forId ? "edit" : null,
+        pokedElements,
       });
     } else if (value) {
       this.setState({
         submitError: null,
         submitting: false,
         submitted: true,
-        pokedElements: options.unpokeAfterSuccess ? [] : propertiesToPoke,
-        pokePoliciesType: options.unpokeAfterSuccess ? null : (
-          this.props.forId ? "edit" : null
-        ),
+        pokedElements: options.unpokeAfterSuccess ? {
+          properties: [],
+          includes: [],
+          policies: [],
+        } : pokedElements,
       });
 
-      recievedId = value.id;
-      receivedVersion = value.version;
+      recievedId = value.id as number;
+      receivedVersion = value.version as string || null;
       this.props.itemDefinitionInstance.applyValue(
         recievedId,
         receivedVersion,
@@ -1940,18 +1484,30 @@ export class ActualItemDefinitionProvider extends
     };
   }
   public async search(options: IActionSearchOptions): Promise<IActionResponseWithSearchResults> {
+    let propertiesForArgs = [];
+    options.searchByProperties.forEach((propertyId) => {
+      const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
+      propertiesForArgs = propertiesForArgs.concat(getConversionIds(standardProperty.rawData));
+    });
+
     if (this.state.searching) {
       return null;
     }
-    const {isInvalid, propertiesToPoke} = this.checkItemDefinitionStateValidity();
-
-    this.setState({
-      pokedElements: propertiesToPoke,
-      pokePoliciesType: null,
+    const isInvalid = this.checkItemDefinitionStateValidity({
+      properties: propertiesForArgs,
+      includes: options.searchByIncludes || [],
     });
 
     // if it's invalid let's return the emulated error
+    const pokedElements = {
+      properties: propertiesForArgs,
+      includes: options.searchByIncludes || [],
+      policies: [],
+    };
     if (isInvalid) {
+      this.setState({
+        pokedElements,
+      });
       return this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithSearchResults;
     }
 
@@ -2000,23 +1556,14 @@ export class ActualItemDefinitionProvider extends
 
     const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
 
-    let onlyIncludePropertiesForArgs: string[] = null;
-    if (options.onlyIncludeSearchPropertiesForProperties) {
-      onlyIncludePropertiesForArgs = [];
-      options.onlyIncludeSearchPropertiesForProperties.forEach((propertyId) => {
-        const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
-        onlyIncludePropertiesForArgs = onlyIncludePropertiesForArgs.concat(getConversionIds(standardProperty.rawData));
-      });
-    }
-
     const {
       argumentsForQuery,
     } = getFieldsAndArgs({
       includeArgs: true,
       includeFields: false,
-      onlyIncludeIncludesForArgs: options.onlyIncludeIncludes,
-      onlyIncludePropertiesForArgs,
-      appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
+      propertiesForArgs,
+      includesForArgs: options.searchByIncludes || [],
+      appliedOwner: options.createdBy,
       userId: this.props.tokenData.id,
       userRole: this.props.tokenData.role,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
@@ -2027,8 +1574,8 @@ export class ActualItemDefinitionProvider extends
     const searchFieldsAndArgs = getFieldsAndArgs({
       includeArgs: false,
       includeFields: true,
-      onlyIncludeProperties: options.requestedProperties,
-      onlyIncludeIncludes: options.requestedIncludes || [],
+      properties: options.requestedProperties,
+      includes: options.requestedIncludes || [],
       appliedOwner: options.createdBy,
       userId: this.props.tokenData.id,
       userRole: this.props.tokenData.role,
@@ -2037,28 +1584,35 @@ export class ActualItemDefinitionProvider extends
       forVersion: null,
     });
     const requestedSearchFields = searchFieldsAndArgs.requestFields;
+  
+    let parentedBy = null;
+    if (options.parentedBy) {
+      const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
+      const parentIdef = 
+        root.getModuleFor(options.parentedBy.module.split("/"))
+        .getItemDefinitionFor(options.parentedBy.itemDefinition.split("/"));
+      parentedBy = {
+        itemDefinition: parentIdef,
+        id: options.parentedBy.id,
+        version: options.parentedBy.version || null,
+      };
+    }
 
     const {
-      value,
+      searchResults,
       error,
-    } = await this.runQueryFor({
-      queryPrefix: PREFIX_SEARCH,
-      baseArgs: argumentsForQuery,
-      requestFields: {
-        ids: {
-          id: {},
-          version: {},
-          type: {},
-          created_at: {},
-        },
-      },
-      searchCachePolicy: options.cachePolicy || "none",
-      searchCreatedBy: options.createdBy || null,
-      searchOrderBy: options.orderBy || "DEFAULT",
-      searchRequestedFieldsOnCachePolicy: requestedSearchFields,
-    });
+    } = await runSearchQueryFor({
+      args: argumentsForQuery,
+      fields: requestedSearchFields,
+      itemDefinition: this.props.itemDefinitionInstance,
+      cachePolicy: options.cachePolicy || "none",
+      createdBy: options.createdBy || null,
+      orderBy: options.orderBy || "DEFAULT",
+      token: this.props.tokenData.token,
+      language: this.props.localeData.language,
+      parentedBy,
+    }, this.props.remoteListener, this.onSearchReload);
 
-    const searchResults: IGQLSearchResult[] = [];
     if (error) {
       this.setState({
         searchError: error,
@@ -2071,14 +1625,13 @@ export class ActualItemDefinitionProvider extends
         searchFields: requestedSearchFields,
         searchRequestedProperties: options.requestedProperties,
         searchRequestedIncludes: options.requestedIncludes || [],
-        pokedElements: propertiesToPoke,
-        pokePoliciesType: null,
+        pokedElements,
       });
     } else {
       this.setState({
         searchError: null,
         searching: false,
-        searchResults: value ? value.ids : [],
+        searchResults: searchResults || [],
         searchId: uuid.v4(),
         searchOwner: options.createdBy || null,
         searchParent,
@@ -2086,8 +1639,11 @@ export class ActualItemDefinitionProvider extends
         searchFields: requestedSearchFields,
         searchRequestedProperties: options.requestedProperties,
         searchRequestedIncludes: options.requestedIncludes || [],
-        pokedElements: options.unpokeAfterSuccess ? [] : propertiesToPoke,
-        pokePoliciesType: null,
+        pokedElements: options.unpokeAfterSuccess ? {
+          properties: [],
+          includes: [],
+          policies: [],
+        } : pokedElements,
       });
     }
 
@@ -2214,8 +1770,11 @@ export class ActualItemDefinitionProvider extends
   }
   public unpoke() {
     this.setState({
-      pokePoliciesType: null,
-      pokedElements: [],
+      pokedElements: {
+        properties: [],
+        includes: [],
+        policies: [],
+      },
     });
   }
   public render() {
@@ -2249,7 +1808,6 @@ export class ActualItemDefinitionProvider extends
           searchRequestedProperties: this.state.searchRequestedProperties,
           searchRequestedIncludes: this.state.searchRequestedIncludes,
           pokedElements: this.state.pokedElements,
-          pokePoliciesType: this.state.pokePoliciesType,
           submit: this.submit,
           reload: this.loadValue,
           delete: this.delete,
