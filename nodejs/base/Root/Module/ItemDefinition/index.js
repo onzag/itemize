@@ -408,6 +408,16 @@ class ItemDefinition {
         return definition;
     }
     /**
+     * Provides the qualified identifier for a given policy as it is described
+     * @param policyType the policy type
+     * @param policyName the policy name
+     * @param id the property id
+     * @returns a property definition or throws an error if not found
+     */
+    getQualifiedPolicyIdentifier(policyType, policyName, id) {
+        return constants_1.PREFIX_BUILD(constants_1.POLICY_PREFIXES[policyType] + policyName) + id;
+    }
+    /**
      * Tells whether the current item definition has items itself
      * which are active and match the specific name
      * that means the item is not excluded and the item is

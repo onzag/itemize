@@ -4,13 +4,15 @@ import { ItemDefinitionProvider, IActionSubmitOptions } from "../../providers/it
 import { UserDataRetriever } from "../../components/user";
 import { ItemDefinitionLoader } from "../components/item-definition-loader";
 import { TitleSetter } from "../../components/util";
-import { I18nRead } from "../../components/localization";
+import { I18nRead, I18nReadMany } from "../../components/localization";
 import { Entry } from "../../components/property";
 import { Button } from "@material-ui/core";
 import { LogActioner } from "../../components/login";
 import { SubmitButton } from "../components/buttons";
 import { SubmitActioner, DifferingPropertiesRetriever } from "../../components/item-definition";
 import Snackbar from "../components/snackbar";
+import { DialogResponsive } from "../components/dialog";
+import DoneIcon from "@material-ui/icons/Done";
 
 interface ProfileProps {
   match: {
@@ -18,6 +20,48 @@ interface ProfileProps {
       id: string;
     };
   };
+}
+
+interface CustomConfirmationDialogProps {
+  isActive: boolean;
+  onClose: (continueWithProcess: boolean) => void;
+}
+
+function CustomConfirmationDialog(props: CustomConfirmationDialogProps) {
+  return (
+    <I18nReadMany data={
+      [
+        {
+          id: "title",
+          policyType: "edit",
+          policyName: "REQUIRES_PASSWORD_CONFIRMATION",
+        },
+        {
+          id: "ok",
+        },
+      ]
+    }>
+      {(i18nTitle: string, i18nOk: string) => (
+        <DialogResponsive
+          open={props.isActive}
+          onClose={props.onClose.bind(null, false)}
+          title={i18nTitle}
+          buttons={
+            <Button
+              color="primary"
+              aria-label={i18nOk}
+              startIcon={<DoneIcon/>}
+              onClick={props.onClose.bind(null, true)}
+            >
+              {i18nOk}
+            </Button>
+          }
+        >
+          <Entry id="password" policyName="REQUIRES_PASSWORD_CONFIRMATION" policyType="edit"/>
+        </DialogResponsive>
+      )}
+    </I18nReadMany>
+  )
 }
 
 function CurrentUserProfile() {
@@ -29,6 +73,7 @@ function CurrentUserProfile() {
         {(differingProperties) => {
           const options: IActionSubmitOptions = {
             properties: differingProperties,
+            unpokeAfterAny: true,
           }
           if (
             differingProperties.includes("username")
@@ -37,11 +82,12 @@ function CurrentUserProfile() {
             options.policiesToCleanOnAny = [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]];
           }
 
+          let CustomConfirmationComponent = null;
           if (options.policies) {
-            // TODO put dialog
+            CustomConfirmationComponent = CustomConfirmationDialog;
           }
           return (
-            <SubmitButton i18nId="update_profile" options={options}/>
+            <SubmitButton i18nId="update_profile" options={options} CustomConfirmationComponent={CustomConfirmationComponent}/>
           );
         }}
       </DifferingPropertiesRetriever>

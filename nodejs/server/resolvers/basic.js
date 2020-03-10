@@ -528,7 +528,7 @@ function splitArgsInGraphqlQuery(moduleOrItemDefinition, args) {
             resultingExtraArgs[key] = args[key];
         }
     });
-    splitArgsInGraphqlQueryDebug("SUCCEED with %j", [resultingSelfValues, resultingExtraArgs]);
+    splitArgsInGraphqlQueryDebug("SUCCEED with %j and with %j", resultingSelfValues, resultingExtraArgs);
     return [resultingSelfValues, resultingExtraArgs];
 }
 exports.splitArgsInGraphqlQuery = splitArgsInGraphqlQuery;

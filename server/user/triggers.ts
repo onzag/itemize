@@ -13,12 +13,13 @@ export const customUserTriggers: ITriggerRegistry = {
         arg.update &&
         typeof arg.update !== "undefined"
       ) {
-        // so this is the new email, remember this can be null
+        // so this is the new email, remember this can be null and it
+        // can be a partial update in which case it's undefined
         const newEmail = arg.update.email;
         // and this is the email that was changed to
-        const changedEmail = !arg.from || newEmail !== arg.from.email;
+        const changedEmail = !arg.from || (typeof newEmail !== "undefined" && newEmail !== arg.from.email);
         if (
-          changedEmail && newEmail !== null
+          changedEmail && newEmail !== null && typeof newEmail !== "undefined"
         ) {
           // now we try to find another user with such email
           const result = await arg.appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)

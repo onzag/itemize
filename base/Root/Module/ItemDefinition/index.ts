@@ -20,6 +20,8 @@ import {
   UNSPECIFIED_OWNER,
   EXCLUSION_STATE_SUFFIX,
   ENDPOINT_ERRORS,
+  PREFIX_BUILD,
+  POLICY_PREFIXES,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { EndpointError } from "../../../errors";
@@ -848,6 +850,21 @@ export default class ItemDefinition {
       throw new Error("There is no property in policy type " + policyType + " in name " + policyName + " for " + id);
     }
     return definition;
+  }
+
+  /**
+   * Provides the qualified identifier for a given policy as it is described
+   * @param policyType the policy type
+   * @param policyName the policy name
+   * @param id the property id
+   * @returns a property definition or throws an error if not found
+   */
+  public getQualifiedPolicyIdentifier(
+    policyType: string,
+    policyName: string,
+    id: string,
+  ) {
+    return PREFIX_BUILD(POLICY_PREFIXES[policyType] + policyName) + id;
   }
 
   /**

@@ -54,39 +54,42 @@ export interface IActionResponseWithSearchResults extends IBasicActionResponse {
 
 export type PolicyPathType = [string, string, string];
 
+export interface IActionCleanOptions {
+  policiesToCleanOnSuccess?: PolicyPathType[];
+  policiesToCleanOnAny?: PolicyPathType[];
+  policiesToCleanOnFailure?: PolicyPathType[];
+  propertiesToCleanOnSuccess?: string[];
+  propertiesToCleanOnAny?: string[];
+  propertiesToCleanOnFailure?: string[];
+  unpokeAfterSuccess?: boolean;
+  unpokeAfterAny?: boolean;
+  unpokeAfterFailure?: boolean;
+}
+
 /**
  * The options for submitting,
  * aka edit, aka add
  */
-export interface IActionSubmitOptions {
+export interface IActionSubmitOptions extends IActionCleanOptions {
   properties: string[];
   includes?: string[];
   policies?: PolicyPathType[];
-  unpokeAfterSuccess?: boolean;
-  propertiesToCleanOnSuccess?: string[];
-  propertiesToCleanOnAny?: string[];
-  policiesToCleanOnSuccess?: PolicyPathType[];
-  policiesToCleanOnAny?: PolicyPathType[];
   beforeSubmit?: () => boolean;
 }
 
-export interface IActionDeleteOptions {
+export interface IActionDeleteOptions extends IActionCleanOptions {
   policies?: PolicyPathType[];
-  unpokeAfterSuccess?: boolean;
-  policiesToCleanOnSuccess?: PolicyPathType[];
-  policiesToCleanOnAny?: PolicyPathType[];
   beforeDelete?: () => boolean;
 }
 
 /**
  * The options for searching
  */
-export interface IActionSearchOptions {
+export interface IActionSearchOptions extends IActionCleanOptions {
   requestedProperties: string[];
   requestedIncludes?: string[];
   searchByProperties: string[];
   searchByIncludes?: string[];
-  unpokeAfterSuccess?: boolean;
   orderBy?: "DEFAULT";
   createdBy?: number;
   parentedBy?: {
@@ -191,6 +194,8 @@ export interface IItemDefinitionContextType {
   submit: (options: IActionSubmitOptions) => Promise<IActionResponseWithId>;
   // straightwforward, deletes
   delete: () => Promise<IBasicActionResponse>;
+  // cleans performs the cleanup of properties and policies
+  clean: (options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean) => void;
   // performs a search, note that you should be in the searchMode however
   // since all items are the same it's totally possible to launch a search
   // in which case you'll just get a searchError you should be in search
@@ -1264,6 +1269,7 @@ export class ActualItemDefinitionProvider extends
           policies: options.policies || [],
         },
       });
+      this.clean(options, "fail");
       return this.giveEmulatedInvalidError("deleteError", false, false);
     }
 
@@ -1314,14 +1320,7 @@ export class ActualItemDefinitionProvider extends
           policies: options.policies || [],
         },
       });
-      if (options.policiesToCleanOnAny) {
-        options.policiesToCleanOnAny.forEach((policyArray) => {
-          this.props.itemDefinitionInstance
-            .getPropertyDefinitionForPolicy(...policyArray)
-            .cleanValueFor(this.props.forId, this.props.forVersion || null);
-        });
-        this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
-      }
+      this.clean(options, "success");
     } else {
       this.props.itemDefinitionInstance.cleanValueFor(this.props.forId, this.props.forVersion || null);
       this.setState({
@@ -1332,22 +1331,86 @@ export class ActualItemDefinitionProvider extends
         pokedElements: {
           properties: [],
           includes: [],
-          policies: options.unpokeAfterSuccess ? [] : (options.policies || []),
+          policies: (options.policies || []),
         },
       });
-      if (options.policiesToCleanOnSuccess || options.policiesToCleanOnAny) {
-        (options.policiesToCleanOnSuccess || []).concat(options.policiesToCleanOnAny || []).forEach((policyArray) => {
-          this.props.itemDefinitionInstance
-            .getPropertyDefinitionForPolicy(...policyArray)
-            .cleanValueFor(this.props.forId, this.props.forVersion || null);
-        });
-      }
+      this.clean(options, "fail");
       this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
     }
 
     return {
       error,
     };
+  }
+  public clean(
+    options: IActionCleanOptions,
+    state: "success" | "fail",
+    avoidTriggeringUpdate?: boolean,
+  ): void {
+    if (
+      options.unpokeAfterAny ||
+      options.unpokeAfterFailure && state === "fail" ||
+      options.unpokeAfterSuccess && state === "success"
+    ) {
+      this.setState({
+        pokedElements: {
+          properties: [],
+          includes: [],
+          policies: [],
+        }
+      });
+    }
+
+    let needsUpdate: boolean = false;
+    const cleanupPropertyFn = (ptc: string) => {
+      this.props.itemDefinitionInstance
+        .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId,
+          this.props.forVersion || null);
+    };
+    if (
+      options.propertiesToCleanOnSuccess && state === "success"
+    ) {
+      options.propertiesToCleanOnSuccess.forEach(cleanupPropertyFn);
+      needsUpdate = true;
+    }
+    if (
+      options.propertiesToCleanOnAny
+    ) {
+      options.propertiesToCleanOnAny.forEach(cleanupPropertyFn);
+      needsUpdate = true;
+    }
+    if (
+      options.propertiesToCleanOnFailure && state === "fail"
+    ) {
+      options.propertiesToCleanOnAny.forEach(cleanupPropertyFn);
+      needsUpdate = true;
+    }
+    const cleanupPolicyFn = (policyArray: PolicyPathType) => {
+      this.props.itemDefinitionInstance
+        .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId,
+          this.props.forVersion || null);
+    }
+    if (
+      options.policiesToCleanOnSuccess && state === "success"
+    ) {
+      options.policiesToCleanOnSuccess.forEach(cleanupPolicyFn);
+      needsUpdate = true;
+    }
+    if (
+      options.policiesToCleanOnAny
+    ) {
+      options.policiesToCleanOnAny.forEach(cleanupPolicyFn);
+      needsUpdate = true;
+    }
+    if (
+      options.policiesToCleanOnFailure && state === "fail"
+    ) {
+      options.policiesToCleanOnFailure.forEach(cleanupPolicyFn);
+      needsUpdate = true;
+    }
+    if (needsUpdate && !avoidTriggeringUpdate) {
+      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
+    }
   }
   public async submit(options: IActionSubmitOptions): Promise<IActionResponseWithId> {
     // if we are already submitting, we reject the action
@@ -1364,10 +1427,11 @@ export class ActualItemDefinitionProvider extends
 
     // if it's invalid let's return the emulated error
     if (!isValid) {
-      // if it's not poked already, let's poke it
       this.setState({
         pokedElements,
       });
+      this.clean(options, "fail");
+      // if it's not poked already, let's poke it
       return this.giveEmulatedInvalidError("submitError", true, false) as IActionResponseWithId;
     }
 
@@ -1445,33 +1509,13 @@ export class ActualItemDefinitionProvider extends
         submitted: false,
         pokedElements,
       });
-      if (options.propertiesToCleanOnAny || options.propertiesToCleanOnAny) {
-        if (options.propertiesToCleanOnAny) {
-          options.propertiesToCleanOnAny.forEach((ptc) => {
-            this.props.itemDefinitionInstance
-              .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId,
-                this.props.forVersion || null);
-          });
-        }
-        if (options.policiesToCleanOnAny) {
-          options.policiesToCleanOnAny.forEach((policyArray) => {
-            this.props.itemDefinitionInstance
-              .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId,
-                this.props.forVersion || null);
-          });
-        }
-        this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
-      }
+      this.clean(options, "fail");
     } else if (value) {
       this.setState({
         submitError: null,
         submitting: false,
         submitted: true,
-        pokedElements: options.unpokeAfterSuccess ? {
-          properties: [],
-          includes: [],
-          policies: [],
-        } : pokedElements,
+        pokedElements,
       });
 
       recievedId = value.id as number;
@@ -1486,20 +1530,7 @@ export class ActualItemDefinitionProvider extends
         getQueryFields,
         true,
       );
-      if (options.propertiesToCleanOnSuccess || options.policiesToCleanOnAny) {
-        (options.propertiesToCleanOnSuccess || []).concat(options.propertiesToCleanOnAny || []).forEach((ptc) => {
-          this.props.itemDefinitionInstance
-            .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId,
-              this.props.forVersion || null);
-        });
-      }
-      if (options.policiesToCleanOnSuccess || options.policiesToCleanOnAny) {
-        (options.policiesToCleanOnSuccess || []).concat(options.policiesToCleanOnAny || []).forEach((policyArray) => {
-          this.props.itemDefinitionInstance
-            .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId,
-              this.props.forVersion || null);
-        });
-      }
+      this.clean(options, "success", true);
       this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
     }
 
@@ -1534,6 +1565,7 @@ export class ActualItemDefinitionProvider extends
       this.setState({
         pokedElements,
       });
+      this.clean(options, "fail");
       return this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithSearchResults;
     }
 
@@ -1653,6 +1685,7 @@ export class ActualItemDefinitionProvider extends
         searchRequestedIncludes: options.requestedIncludes || [],
         pokedElements,
       });
+      this.clean(options, "fail");
     } else {
       this.setState({
         searchError: null,
@@ -1665,12 +1698,9 @@ export class ActualItemDefinitionProvider extends
         searchFields: requestedSearchFields,
         searchRequestedProperties: options.requestedProperties,
         searchRequestedIncludes: options.requestedIncludes || [],
-        pokedElements: options.unpokeAfterSuccess ? {
-          properties: [],
-          includes: [],
-          policies: [],
-        } : pokedElements,
+        pokedElements,
       });
+      this.clean(options, "success");
     }
 
     return {
@@ -1837,6 +1867,7 @@ export class ActualItemDefinitionProvider extends
           submit: this.submit,
           reload: this.loadValue,
           delete: this.delete,
+          clean: this.clean,
           search: this.search,
           forId: this.props.forId || null,
           forVersion: this.props.forVersion || null,

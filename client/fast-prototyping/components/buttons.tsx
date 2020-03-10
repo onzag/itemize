@@ -31,6 +31,8 @@ export function SubmitButton(props: ISubmitButtonProps) {
           setConfirmationIsActive(false);
           if (continueWithProcess) {
             actioner.submit(props.options);
+          } else {
+            actioner.clean(props.options, "fail");
           }
         }
         return (

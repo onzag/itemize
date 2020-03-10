@@ -697,8 +697,9 @@ export function splitArgsInGraphqlQuery(
   });
 
   splitArgsInGraphqlQueryDebug(
-    "SUCCEED with %j",
-    [resultingSelfValues, resultingExtraArgs],
+    "SUCCEED with %j and with %j",
+    resultingSelfValues,
+    resultingExtraArgs,
   );
 
   return [resultingSelfValues, resultingExtraArgs];

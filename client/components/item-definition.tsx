@@ -7,6 +7,7 @@ import {
   IActionResponseWithSearchResults,
   IItemDefinitionContextType,
   IActionSubmitOptions,
+  IActionCleanOptions,
   IActionSearchOptions,
 } from "../providers/item-definition";
 import equals from "deep-equal";
@@ -73,6 +74,7 @@ export interface ISubmitActionerInfoArgType {
   submitting: boolean;
   submitted: boolean;
   submit: (options: IActionSubmitOptions) => Promise<IActionResponseWithId>;
+  clean: (options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean) => void;
 }
 
 interface ISubmitActionerProps {
@@ -98,6 +100,7 @@ class ActualSubmitActioner extends React.Component<IActualSubmitActionerProps, {
       submit: this.props.itemDefinitionContext.submit,
       dismissError: this.props.itemDefinitionContext.dismissSubmitError,
       dismissSubmitted: this.props.itemDefinitionContext.dismissSubmitted,
+      clean: this.props.itemDefinitionContext.clean,
     });
   }
 }
@@ -119,6 +122,7 @@ export interface ISearchActionerInfoArgType {
   searching: boolean;
   searchResults: IGQLSearchResult[];
   search: (options?: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
+  clean: (options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean) => void;
 }
 
 interface ISearchActionerProps {
@@ -142,6 +146,7 @@ class ActualSearchActioner extends React.Component<IActualSearchActionerProps, {
       searching: this.props.itemDefinitionContext.searching,
       searchResults: this.props.itemDefinitionContext.searchResults,
       search: this.props.itemDefinitionContext.search,
+      clean: this.props.itemDefinitionContext.clean,
       dismissSearchResults: this.props.itemDefinitionContext.dismissSearchResults,
       dismissSearchError: this.props.itemDefinitionContext.dismissSearchError,
     });

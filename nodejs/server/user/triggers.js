@@ -10,11 +10,12 @@ exports.customUserTriggers = {
             // either because of creation or from a normal update
             if (arg.update &&
                 typeof arg.update !== "undefined") {
-                // so this is the new email, remember this can be null
+                // so this is the new email, remember this can be null and it
+                // can be a partial update in which case it's undefined
                 const newEmail = arg.update.email;
                 // and this is the email that was changed to
-                const changedEmail = !arg.from || newEmail !== arg.from.email;
-                if (changedEmail && newEmail !== null) {
+                const changedEmail = !arg.from || (typeof newEmail !== "undefined" && newEmail !== arg.from.email);
+                if (changedEmail && newEmail !== null && typeof newEmail !== "undefined") {
                     // now we try to find another user with such email
                     const result = await arg.appData.knex.first(constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME)
                         .from(arg.itemDefinition.getQualifiedPathName()).where({

@@ -22,10 +22,10 @@ export default class Snackbar extends React.PureComponent<ISnackbarProps> {
     let message: React.ReactNode;
     let autoHideDuration: number;
     if (typeof this.props.i18nDisplay === "string") {
-      message = <I18nRead id={this.props.i18nDisplay} />;
+      message = <I18nRead id={this.props.i18nDisplay} capitalize={true}/>;
       autoHideDuration = 3000;
     } else if (this.props.i18nDisplay) {
-      message = <I18nReadError error={this.props.i18nDisplay} />;
+      message = <I18nReadError error={this.props.i18nDisplay} capitalize={true}/>;
       autoHideDuration = null;
     }
     return (

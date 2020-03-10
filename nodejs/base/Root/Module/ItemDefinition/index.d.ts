@@ -480,6 +480,14 @@ export default class ItemDefinition {
      */
     getPropertyDefinitionForPolicy(policyType: string, policyName: string, id: string): PropertyDefinition;
     /**
+     * Provides the qualified identifier for a given policy as it is described
+     * @param policyType the policy type
+     * @param policyName the policy name
+     * @param id the property id
+     * @returns a property definition or throws an error if not found
+     */
+    getQualifiedPolicyIdentifier(policyType: string, policyName: string, id: string): string;
+    /**
      * Tells whether the current item definition has items itself
      * which are active and match the specific name
      * that means the item is not excluded and the item is

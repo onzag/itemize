@@ -23,17 +23,13 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
   return (
     <ItemDefinitionProvider
       itemDefinition="user"
-      optimize={{
-        onlyIncludeIncludes: [],
-        onlyIncludeProperties: [
-          "username",
-          "password",
-          "app_language",
-          "app_country",
-          "app_currency",
-        ],
-        excludePolicies: true,
-      }}
+      properties={[
+        "username",
+        "password",
+        "app_language",
+        "app_country",
+        "app_currency",
+      ]}
     >
       <LogActioner>
         {(actioner) => (

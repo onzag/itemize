@@ -88,113 +88,103 @@ export function getFieldsAndArgs(
     options.forVersion || null,
   );
 
-  // Now we get all the property definitions and extensions for the item
-  // you might wonder why we check role access one by one and not the total
-  // well, we literally don't care, the developer is reponsible to deny this
-  // to get here, we are just building a query, not preventing a submit
-  options.itemDefinitionInstance.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
-    // now how we tell if it should be included in fields, well first
-    // are we including fields at all? well if yes, then are we specifying
-    // specific properties that should be included or are we taking all
-    // if taking all it depends on the rules, and the role access
-    const shouldBeIncludedInFields = options.includeFields &&
-      options.properties.includes(pd.getId()) && !pd.isRetrievalDisabled();
-
-    // so if all that messy conditional passes
-    if (shouldBeIncludedInFields) {
-      // we add it to the fields we want to add
-      // because it's a property it goes in data
-      requestFields.DATA[pd.getId()] = pd.getRequestFields();
+  if (options.includeFields) {
+    if (options.properties && options.properties.length) {
+      options.properties.forEach((pId) => {
+        const pd = options.itemDefinitionInstance.getPropertyDefinitionFor(pId, true);
+        if (!pd.isRetrievalDisabled()) {
+          // we add it to the fields we want to add
+          // because it's a property it goes in data
+          requestFields.DATA[pd.getId()] = pd.getRequestFields();
+        }
+      });
     }
+    if (options.includes && options.includes.length) {
+      options.includes.forEach((iId) => {
+        const include = options.itemDefinitionInstance.getIncludeFor(iId);
+        // and now we get the qualified identifier that grapqhl expects
+        const qualifiedId = include.getQualifiedIdentifier();
+        requestFields.DATA[include.getQualifiedExclusionStateIdentifier()] = {};
+        requestFields.DATA[qualifiedId] = {};
 
-    // now for the arguments, same rule
-    // are we including arguments at all?
-    // are we specifying which specific arguments?
-    // otherwise use the role access for it
-    const shouldBeIncludedInArgs = options.includeArgs && options.propertiesForArgs.includes(pd.getId());
+        // we need the sinking properties
+        // as only the sinking properties manage
+        include.getSinkingProperties().forEach((sp) => {
+          // we always check for role access and whether we can retrieve it or not
+          if (
+            !sp.isRetrievalDisabled() &&
+            sp.checkRoleAccessFor(
+              ItemDefinitionIOActions.READ,
+              options.userRole,
+              options.userId,
+              appliedOwner,
+              false,
+            )
+          ) {
+            requestFields.DATA[qualifiedId][include.getPrefixedQualifiedIdentifier() + sp.getId()] = sp.getRequestFields();
+          }
+        });
 
-    // now we check if we have the option to only include those that differ
-    // from the applied value
-    if (shouldBeIncludedInArgs) {
-      argumentsForQuery[pd.getId()] = pd.getCurrentValue(options.forId || null, options.forVersion || null);
+        if (Object.keys(requestFields.DATA[qualifiedId]).length === 0) {
+          delete requestFields.DATA[qualifiedId];
+        }
+      });
     }
-  });
-
-  // now we go for the items
-  options.itemDefinitionInstance.getAllIncludes().forEach((include) => {
-    // and now we get the qualified identifier that grapqhl expects
-    const qualifiedId = include.getQualifiedIdentifier();
-
-    if (options.includeFields) {
-      // items are always expected to have a value
-      requestFields.DATA[include.getQualifiedExclusionStateIdentifier()] = {};
-      requestFields.DATA[qualifiedId] = {};
+  }
+  if (options.includeArgs) {
+    if (options.propertiesForArgs && options.propertiesForArgs.length) {
+      options.propertiesForArgs.forEach((pId) => {
+        const pd = options.itemDefinitionInstance.getPropertyDefinitionFor(pId, true);
+        argumentsForQuery[pd.getId()] = pd.getCurrentValue(options.forId || null, options.forVersion || null);
+      });
     }
+    if (options.includesForArgs && options.includesForArgs.length) {
+      options.includesForArgs.forEach((iId) => {
+        const include = options.itemDefinitionInstance.getIncludeFor(iId);
+        // and now we get the qualified identifier that grapqhl expects
+        const qualifiedId = include.getQualifiedIdentifier();
+        // we set the exclusion state we expect, it might be a ternary as well
+        // like in search mode
+        argumentsForQuery[
+          include.getQualifiedExclusionStateIdentifier()
+        ] = include.getExclusionState(options.forId || null, options.forVersion || null);
+        // we add it to the data, and we add it to the arguments
+        argumentsForQuery[qualifiedId] = {};
 
-    if (options.includeArgs) {
-      // we set the exclusion state we expect, it might be a ternary as well
-      // like in search mode
-      argumentsForQuery[
-        include.getQualifiedExclusionStateIdentifier()
-      ] = include.getExclusionState(options.forId || null, options.forVersion || null);
-      // we add it to the data, and we add it to the arguments
-      argumentsForQuery[qualifiedId] = {};
+        // we need the sinking properties
+        // as only the sinking properties manage
+        include.getSinkingProperties().forEach((sp) => {
+          const hasRoleAccessToIncludeProperty = sp.checkRoleAccessFor(
+            !options.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
+            options.userRole,
+            options.userId,
+            appliedOwner,
+            false,
+          );
+    
+          if (
+            hasRoleAccessToIncludeProperty
+          ) {
+            argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(
+              options.forId || null, options.forVersion || null);
+          }
+        });
+
+        if (Object.keys(argumentsForQuery[qualifiedId]).length === 0) {
+          delete argumentsForQuery[qualifiedId];
+        }
+      });
     }
-
-    // now the conditional for whether we need to have that item properties in the arg
-    const includeShouldBeIncludedInArgs = options.includeArgs &&
-      options.includesForArgs.includes(include.getId());
-
-    // and for the fields
-    const includeShouldBeIncludedInFields = options.includeFields &&
-      options.includes.includes(include.getId());
-
-    if (!includeShouldBeIncludedInArgs && !includeShouldBeIncludedInFields) {
-      // if we don't we can just skip
-      return;
+    if (options.policiesForArgs && options.propertiesForArgs.length) {
+      options.policiesForArgs.forEach((policyPath) => {
+        const policy = options.itemDefinitionInstance.getPropertyDefinitionForPolicy(...policyPath);
+        argumentsForQuery[options.itemDefinitionInstance.getQualifiedPolicyIdentifier(...policyPath)] =
+          policy.getCurrentValue(options.forId || null, options.forVersion || null);
+      });
     }
+  }
 
-    // otherwise we need the sinking properties
-    // as only the sinking properties manage
-    include.getSinkingProperties().forEach((sp) => {
-      // we always check for role access and whether we can retrieve it or not
-      if (
-        includeShouldBeIncludedInFields &&
-        !sp.isRetrievalDisabled() &&
-        sp.checkRoleAccessFor(
-          ItemDefinitionIOActions.READ,
-          options.userRole,
-          options.userId,
-          appliedOwner,
-          false,
-        )
-      ) {
-        requestFields.DATA[qualifiedId][include.getPrefixedQualifiedIdentifier() + sp.getId()] = sp.getRequestFields();
-      }
-
-      const hasRoleAccessToIncludeProperty = sp.checkRoleAccessFor(
-        !options.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
-        options.userRole,
-        options.userId,
-        appliedOwner,
-        false,
-      );
-
-      if (
-        includeShouldBeIncludedInArgs && hasRoleAccessToIncludeProperty
-      ) {
-        argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(
-          options.forId || null, options.forVersion || null);
-      }
-    });
-
-    if (Object.keys(requestFields.DATA[qualifiedId]).length === 0) {
-      delete requestFields.DATA[qualifiedId];
-    }
-    if (Object.keys(argumentsForQuery[qualifiedId]).length === 0) {
-      delete argumentsForQuery[qualifiedId];
-    }
-  });
+  options.itemDefinitionInstance.getPropertiesForPolicy
 
   return {requestFields, argumentsForQuery};
 }
