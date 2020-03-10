@@ -10,23 +10,23 @@ import React from "react";
 // import PropertyEntryNumeric from "./PropertyEntryNumeric";
 // import PropertyEntrySelect from "./PropertyEntrySelect";
 import PropertyEntryField from "./PropertyEntryField";
+import PropertyEntryFile from "./PropertyEntryFile";
 import { LocaleContext } from "../../app";
 import { Ii18NType } from "../../../../base/Root";
 import {
-  PropertyDefinitionSupportedType,
-  PropertyDefinitionSupportedTypeName,
+  PropertyDefinitionSupportedTypeName, PropertyDefinitionSupportedType,
 } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { currencies, countries, ICurrencyType, ICountryType } from "../../../../imported-resources";
 import { RendererContext } from "../../../providers/renderer";
 import { IRendererProps } from "../../renderer";
 
-export interface IPropertyEntryRendererProps extends IRendererProps {
+export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
   label?: string;
   placeholder?: string;
   description?: string;
   icon?: React.ReactNode;
 
-  currentValue: string;
+  currentValue: ValueType;
   currentValid: boolean;
   currentInvalidReason?: string;
   currentInternalValue?: any;
@@ -34,13 +34,13 @@ export interface IPropertyEntryRendererProps extends IRendererProps {
   autoFocus: boolean;
   disabled: boolean;
 
-  onChange: (value: string, internalValue: any) => void;
+  onChange: (value: ValueType, internalValue: any) => void;
 }
 
-export interface IPropertyEntryBaseProps<RendererPropsType> {
+export interface IPropertyEntryBaseProps<ValueType, RendererPropsType> {
   property: PropertyDefinition;
   state: IPropertyDefinitionState;
-  onChange: (newValue: PropertyDefinitionSupportedType, internalValue: any) => void;
+  onChange: (newValue: ValueType, internalValue: any) => void;
   forId: number;
   forVersion: string;
   forceInvalid?: boolean;
@@ -52,7 +52,7 @@ export interface IPropertyEntryBaseProps<RendererPropsType> {
   rendererArgs?: object;
 }
 
-export interface IPropertyEntryProps<RendererPropsType> extends IPropertyEntryBaseProps<RendererPropsType> {
+export interface IPropertyEntryProps<ValueType, RendererPropsType> extends IPropertyEntryBaseProps<ValueType, RendererPropsType> {
   language: string;
   rtl: boolean;
   currency: ICurrencyType;
@@ -65,7 +65,7 @@ const typeRegistry:
     PropertyDefinitionSupportedTypeName,
     {
       renderer: string,
-      element: React.ComponentType<IPropertyEntryProps<IRendererProps>>,
+      element: React.ComponentType<IPropertyEntryProps<PropertyDefinitionSupportedType, IRendererProps>>,
     }
   > = {
   string: {
@@ -87,11 +87,16 @@ const typeRegistry:
   date: null,
   time: null,
   location: null,
-  file: null,
+  file: {
+    renderer: "PropertyEntryFile",
+    element: PropertyEntryFile,
+  },
   files: null,
 };
 
-export default function PropertyEntry(props: IPropertyEntryBaseProps<IPropertyEntryRendererProps>) {
+export default function PropertyEntry(
+  props: IPropertyEntryBaseProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>,
+) {
   // First get the element by the type
   const registryEntry = props.property.hasSpecificValidValues() ?
     // TODO PropertyEntrySelect :
@@ -108,7 +113,7 @@ export default function PropertyEntry(props: IPropertyEntryBaseProps<IPropertyEn
           <LocaleContext.Consumer>
             {
               (locale) => {
-                const renderer: React.ComponentType<IPropertyEntryRendererProps> =
+                const renderer: React.ComponentType<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>> =
                   props.renderer || renderers[registryEntry.renderer];
                 return (
                   <Element

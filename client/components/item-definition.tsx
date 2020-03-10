@@ -72,7 +72,7 @@ export interface ISubmitActionerInfoArgType {
   dismissSubmitted: () => void;
   submitting: boolean;
   submitted: boolean;
-  submit: (options?: IActionSubmitOptions) => Promise<IActionResponseWithId>;
+  submit: (options: IActionSubmitOptions) => Promise<IActionResponseWithId>;
 }
 
 interface ISubmitActionerProps {

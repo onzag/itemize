@@ -230,7 +230,7 @@ async function buildModule(rawDataConfig, actualLocation, fileData, pointers, ra
     schema_checks_1.ajvCheck(schema_checks_1.checkModuleSchemaValidate, actualEvaledFileData, traceback);
     const actualName = await util_1.getActualFileIdentifier(actualLocation, traceback);
     const i18nDataLocation = actualLocation.replace(".json", ".properties");
-    const i18nData = await getI18nData(rawDataConfig, i18nDataLocation, null, traceback);
+    const i18nData = await getI18nData(rawDataConfig, typeof actualEvaledFileData.searchable !== "undefined" ? actualEvaledFileData.searchable : true, i18nDataLocation, null, traceback);
     // lets find prop extensions if they are available
     const propExtLocation = actualLocation.replace(".json", ".propext.json");
     // let's check if the file exists
@@ -271,6 +271,9 @@ async function buildModule(rawDataConfig, actualLocation, fileData, pointers, ra
         raw,
         children: actualEvaledFileData.children ? await buildChildrenItemDefinitionsOrModules(rawDataConfig, actualLocationDirectory, actualLocationDirectory, actualEvaledFileData.children, null, traceback.newTraceToBit("children")) : [],
     };
+    if (typeof actualEvaledFileData.searchable !== "undefined") {
+        finalValue.searchable = actualEvaledFileData.searchable;
+    }
     // we add the propExtensions if necessary
     if (propExtensions) {
         finalValue.propExtensions = propExtensions;
@@ -300,7 +303,7 @@ async function buildItemDefinition(rawDataConfig, actualLocation, lastModuleDire
     schema_checks_1.ajvCheck(schema_checks_1.checkItemDefinitionSchemaValidate, actualEvaledFileData, traceback);
     const actualName = await util_1.getActualFileIdentifier(actualLocation, traceback);
     const i18nDataLocation = actualLocation.replace(".json", ".properties");
-    const i18nData = await getI18nData(rawDataConfig, i18nDataLocation, actualEvaledFileData.policies, traceback);
+    const i18nData = await getI18nData(rawDataConfig, typeof actualEvaledFileData.searchable !== "undefined" ? actualEvaledFileData.searchable : true, i18nDataLocation, actualEvaledFileData.policies, traceback);
     // lets get the file definitions that are imported that exist
     await Promise.all((actualEvaledFileData.imports || []).map((imp, index) => {
         return util_1.getActualFileLocation([lastModuleDirectory, imp], traceback.newTraceToBit("imports").newTraceToBit(index));
@@ -330,6 +333,9 @@ async function buildItemDefinition(rawDataConfig, actualLocation, lastModuleDire
         type: actualEvaledFileData.type,
         policies: actualEvaledFileData.policies,
     };
+    if (typeof actualEvaledFileData.searchable !== "undefined") {
+        finalValue.searchable = actualEvaledFileData.searchable;
+    }
     if (actualEvaledFileData.readRoleAccess) {
         finalValue.readRoleAccess = actualEvaledFileData.readRoleAccess;
     }
@@ -406,7 +412,7 @@ async function buildItemDefinition(rawDataConfig, actualLocation, lastModuleDire
  * @param traceback the traceback object
  * @returns the right structure for a i18nName attribute
  */
-async function getI18nData(rawDataConfig, languageFileLocation, policies, traceback) {
+async function getI18nData(rawDataConfig, isSearchable, languageFileLocation, policies, traceback) {
     // we check whether it exists
     await util_1.checkExists(languageFileLocation, traceback);
     // and then we use the properties reader on it
@@ -434,6 +440,14 @@ async function getI18nData(rawDataConfig, languageFileLocation, policies, traceb
             }
             i18nData[locale][localeKey] = properties[locale][localeKey].trim();
         });
+        if (isSearchable) {
+            constants_1.MODULE_AND_ITEM_DEF_I18N_SEARCHABLE.forEach((localeKey) => {
+                if (!properties[locale][localeKey]) {
+                    throw new Error_1.default("File does not include language data for searchable key '" + localeKey + "' for locale " + locale, localeFileTraceback);
+                }
+                i18nData[locale][localeKey] = properties[locale][localeKey].trim();
+            });
+        }
         // if we have policies defined
         if (policies) {
             // we check if we have it setup in the properties

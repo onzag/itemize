@@ -6,6 +6,11 @@ import { ItemDefinitionLoader } from "../components/item-definition-loader";
 import { TitleSetter } from "../../components/util";
 import { I18nRead } from "../../components/localization";
 import { Entry } from "../../components/property";
+import { Button } from "@material-ui/core";
+import { LogActioner } from "../../components/login";
+import { SubmitButton } from "../components/buttons";
+import { SubmitActioner } from "../../components/item-definition";
+import Snackbar from "../components/snackbar";
 
 interface ProfileProps {
   match: {
@@ -18,7 +23,24 @@ interface ProfileProps {
 function CurrentUserProfile() {
   return (
     <React.Fragment>
+      <Entry id="profile_picture"/>
       <Entry id="username"/>
+      <SubmitButton i18nId="update_profile" options={{properties: ["profile_picture", "username"]}}/>
+      <SubmitActioner>
+        {(actioner) => (
+          <React.Fragment>
+            <Snackbar i18nDisplay={actioner.submitError} open={!!actioner.submitError} onClose={actioner.dismissError}/>
+            <Snackbar i18nDisplay="profile_updated_succesfully" open={actioner.submitted} onClose={actioner.dismissSubmitted}/>
+          </React.Fragment>
+        )}
+      </SubmitActioner>
+      <LogActioner>
+        {(actioner) => {
+          return (<Button onClick={actioner.logout}>
+            <I18nRead capitalize={true} id="logout"/>
+          </Button>);
+        }}
+      </LogActioner>
     </React.Fragment>
   );
 }

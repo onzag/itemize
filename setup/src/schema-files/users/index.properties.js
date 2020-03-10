@@ -1,12 +1,8 @@
 const en = `[en]
-name = users
-fts_search_field_label = user search
-fts_search_field_placeholder = insert relevant user data`
+name = users`
 
 const es = `[es]
-name = usuarios
-fts_search_field_label = buscar usuario
-fts_search_field_placeholder = inserte información relevante sobre el usuario`
+name = usuarios`
 
 const ALL = {en, es};
 

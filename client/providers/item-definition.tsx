@@ -62,7 +62,6 @@ export interface IActionSubmitOptions {
   properties: string[];
   includes?: string[];
   policies?: PolicyPathType[];
-  onlyIncludeIfDiffersFromAppliedValue?: boolean;
   unpokeAfterSuccess?: boolean;
   propertiesToCleanOnSuccess?: string[];
   policiesToCleanOnSuccess?: PolicyPathType[];
@@ -186,7 +185,7 @@ export interface IItemDefinitionContextType {
   reload: (denyCache?: boolean) => Promise<IActionResponseWithValue>;
   // submits the current information, when there's no id, this triggers an
   // add action, with an id however this trigger edition
-  submit: (options?: IActionSubmitOptions) => Promise<IActionResponseWithId>;
+  submit: (options: IActionSubmitOptions) => Promise<IActionResponseWithId>;
   // straightwforward, deletes
   delete: () => Promise<IBasicActionResponse>;
   // performs a search, note that you should be in the searchMode however
@@ -1248,12 +1247,12 @@ export class ActualItemDefinitionProvider extends
       return null;
     }
 
-    const isInvalid = this.checkItemDefinitionStateValidity({
+    const isValid = this.checkItemDefinitionStateValidity({
       properties: [],
       ...options,
     });
 
-    if (isInvalid) {
+    if (!isValid) {
       // if it's not poked already, let's poke it
       this.setState({
         pokedElements: {
@@ -1345,7 +1344,7 @@ export class ActualItemDefinitionProvider extends
       return null;
     }
 
-    const isInvalid = this.checkItemDefinitionStateValidity(options);
+    const isValid = this.checkItemDefinitionStateValidity(options);
     const pokedElements = {
       properties: options.properties,
       includes: options.includes || [],
@@ -1353,7 +1352,7 @@ export class ActualItemDefinitionProvider extends
     }
 
     // if it's invalid let's return the emulated error
-    if (isInvalid) {
+    if (!isValid) {
       // if it's not poked already, let's poke it
       this.setState({
         pokedElements,
@@ -1376,7 +1375,6 @@ export class ActualItemDefinitionProvider extends
       includesForArgs: options.includes || [],
       propertiesForArgs: options.properties,
       policiesForArgs: options.policies || [],
-      onlyIncludeArgsIfDiffersFromAppliedValue: options.onlyIncludeIfDiffersFromAppliedValue,
       appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
       userId: this.props.tokenData.id,
       userRole: this.props.tokenData.role,
@@ -1493,7 +1491,7 @@ export class ActualItemDefinitionProvider extends
     if (this.state.searching) {
       return null;
     }
-    const isInvalid = this.checkItemDefinitionStateValidity({
+    const isValid = this.checkItemDefinitionStateValidity({
       properties: propertiesForArgs,
       includes: options.searchByIncludes || [],
     });
@@ -1504,7 +1502,7 @@ export class ActualItemDefinitionProvider extends
       includes: options.searchByIncludes || [],
       policies: [],
     };
-    if (isInvalid) {
+    if (!isValid) {
       this.setState({
         pokedElements,
       });

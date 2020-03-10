@@ -7,7 +7,7 @@ interface IPropertyEntryFieldState {
   suggestions: IAutocompleteOutputType[];
 }
 
-export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRendererProps {
+export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRendererProps<string> {
   autocompleteMode: boolean;
   autocompleteSuggestions: IAutocompleteOutputType[];
   autocompleteIsLocalized: boolean;
@@ -21,11 +21,11 @@ export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRenderer
 }
 
 export default class PropertyEntryField
-  extends React.Component<IPropertyEntryProps<IPropertyEntryFieldRendererProps>, IPropertyEntryFieldState> {
+  extends React.Component<IPropertyEntryProps<string, IPropertyEntryFieldRendererProps>, IPropertyEntryFieldState> {
 
   private lastAutocompleteFetchRequestTime: number;
 
-  constructor(props: IPropertyEntryProps<IPropertyEntryFieldRendererProps>) {
+  constructor(props: IPropertyEntryProps<string, IPropertyEntryFieldRendererProps>) {
     super(props);
 
     // set the state, contains suggestions and whether it is
@@ -40,7 +40,7 @@ export default class PropertyEntryField
   }
 
   public shouldComponentUpdate(
-    nextProps: IPropertyEntryProps<IPropertyEntryFieldRendererProps>,
+    nextProps: IPropertyEntryProps<string, IPropertyEntryFieldRendererProps>,
     nextState: IPropertyEntryFieldState,
   ) {
     // This is optimized to only update for the thing it uses

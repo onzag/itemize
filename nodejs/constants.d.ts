@@ -71,6 +71,10 @@ export declare const FILE_SUPPORTED_IMAGE_TYPES: string[];
  */
 export declare const MODULE_AND_ITEM_DEF_I18N: string[];
 /**
+ * The properties for i18n a searchable module and item definition should have
+ */
+export declare const MODULE_AND_ITEM_DEF_I18N_SEARCHABLE: string[];
+/**
  * The custom key as it is stored in the built file, the custom key
  * is always custom in the properties
  */

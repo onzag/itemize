@@ -20,6 +20,10 @@ const typeValue = {
             type: "string",
         },
         {
+            name: "imageUploader",
+            type: "boolean",
+        },
+        {
             name: "dimensions",
             type: "string",
         },

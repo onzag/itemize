@@ -12,13 +12,11 @@ import {
   PREFIX_EDIT,
   PREFIX_GET_LIST,
 } from "../../constants";
-import equals from "deep-equal";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchResult } from "../../gql-querier";
 import { deepMerge, requestFieldsAreContained } from "../../gql-util";
 import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
-import { IGQLFieldsDefinitionType } from "../../base/Root/gql";
 import { RemoteListener } from "./app/remote-listener";
 
 /**
@@ -30,8 +28,6 @@ import { RemoteListener } from "./app/remote-listener";
  * @param options.includes what includes to include in the fields
  * @param options.onlyIncludePropertiesForArgs what properties to include in args
  * @param options.onlyIncludeIncludesForArgs what includes to include in args
- * @param options.onlyIncludeArgsIfDiffersFromAppliedValue only includes something in args if it differs from the
- * applied value
  * @param appliedOwner the owner that owns this item
  * @param userRole the role of the user
  * @param userId the id of the user
@@ -48,7 +44,6 @@ export function getFieldsAndArgs(
     propertiesForArgs?: string[],
     includesForArgs?: string[],
     policiesForArgs?: [string, string, string][],
-    onlyIncludeArgsIfDiffersFromAppliedValue?: boolean,
     appliedOwner?: number,
     userRole: string;
     userId: number;
@@ -120,35 +115,7 @@ export function getFieldsAndArgs(
 
     // now we check if we have the option to only include those that differ
     // from the applied value
-    if (shouldBeIncludedInArgs && options.onlyIncludeArgsIfDiffersFromAppliedValue) {
-      // we get the current applied value, if any
-      const currentAppliedValue = options.itemDefinitionInstance.getGQLAppliedValue(
-        options.forId || null,
-        options.forVersion || null,
-      );
-      // if there is an applied value for that property
-      if (currentAppliedValue && typeof currentAppliedValue.flattenedValue[pd.getId()] !== "undefined") {
-        const currentValue = pd.getCurrentValue(options.forId || null, options.forVersion || null);
-        // let's check if it's differ from what we have in the state
-        const doesNotDifferFromAppliedValue = equals(
-          currentAppliedValue.flattenedValue[pd.getId()],
-          currentValue,
-        );
-        // if it does not differ, then it is added note how we only add
-        // if there is an applied value
-        if (!doesNotDifferFromAppliedValue) {
-          argumentsForQuery[pd.getId()] = currentValue;
-        }
-      } else {
-        // otherwise if there is no applied value, we consider the applied value
-        // to be null
-        const currentValue = pd.getCurrentValue(options.forId || null, options.forVersion || null);
-        const doesNotDifferFromAppliedValue = currentValue === null;
-        if (!doesNotDifferFromAppliedValue) {
-          argumentsForQuery[pd.getId()] = currentValue;
-        }
-      }
-    } else if (shouldBeIncludedInArgs) {
+    if (shouldBeIncludedInArgs) {
       argumentsForQuery[pd.getId()] = pd.getCurrentValue(options.forId || null, options.forVersion || null);
     }
   });
@@ -214,30 +181,6 @@ export function getFieldsAndArgs(
       );
 
       if (
-        includeShouldBeIncludedInArgs && hasRoleAccessToIncludeProperty &&
-        options && options.onlyIncludeArgsIfDiffersFromAppliedValue
-      ) {
-        // we get the current applied value, if any
-        const currentAppliedValue = options.itemDefinitionInstance.getGQLAppliedValue(
-          options.forId || null, options.forVersion || null);
-        // if there is an applied value for that property
-        if (currentAppliedValue && currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()]) {
-          const includeAppliedValue = currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()];
-          const currentValue = sp.getCurrentValue(options.forId || null, options.forVersion || null);
-          if (typeof includeAppliedValue[sp.getId()] !== "undefined") {
-            // let's check if it's differ from what we have in the state
-            const doesNotDifferFromAppliedValue = equals(
-              includeAppliedValue[sp.getId()],
-              currentValue,
-            );
-            // so we only add if it differs note how we are only adding it
-            // if there is an applied value
-            if (!doesNotDifferFromAppliedValue) {
-              argumentsForQuery[qualifiedId][sp.getId()] = currentValue;
-            }
-          }
-        }
-      } else if (
         includeShouldBeIncludedInArgs && hasRoleAccessToIncludeProperty
       ) {
         argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(

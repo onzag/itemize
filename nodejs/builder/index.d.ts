@@ -24,5 +24,6 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
     readRoleAccess?: string[];
     policies?: IPoliciesRawJSONDataType;
     ownerIsObjectId?: boolean;
+    searchable?: boolean;
 }
 export default function build(): Promise<void>;

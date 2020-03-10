@@ -5,6 +5,8 @@ import { withStyles, WithStyles, createStyles } from "@material-ui/styles";
 import { Reader } from "../../components/property";
 import { Link } from "../../components/navigaton";
 import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { PropertyDefinitionSupportedFileType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
+import { imageSizeRetriever, CacheableImageLoader } from "../../components/util";
 
 const avatarStyles = createStyles({
   flag: {
@@ -14,7 +16,6 @@ const avatarStyles = createStyles({
     right: -5,
   },
   avatar: {
-    "overflow": "visible",
     "cursor": "pointer",
     "&::after": {
       content: "''",
@@ -45,6 +46,9 @@ const avatarStyles = createStyles({
     "&:active::after": {
       opacity: 1,
     },
+  },
+  avatarContainer: {
+    position: "relative",
   },
   avatarBadge: {
     transform: "scale(1) translate(25%, -25%)",
@@ -106,7 +110,13 @@ interface IAvatarProps extends WithStyles<typeof avatarStyles> {
 
 // TODO profile picture support
 export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
-  const contentFn = (id: number, userNameValue: string, email?: IPropertyDefinitionState, eValidated?: IPropertyDefinitionState) => {
+  const contentFn = (
+    id: number,
+    userNameValue: string,
+    profilePictureValue: PropertyDefinitionSupportedFileType,
+    email?: IPropertyDefinitionState,
+    eValidated?: IPropertyDefinitionState,
+  ) => {
     const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : null;
 
     const hasWarningForMissingEmail = !(email && email.value);
@@ -131,16 +141,24 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
     )
 
     const profileURLSection = props.profileURLSection || "profile";
+    const imageSources = imageSizeRetriever(profilePictureValue);
 
     const avatar = (
       <Link to={`/${profileURLSection}/${id}`}>
-        <MAvatar
-          alt={userNameValue}
-          classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.large ? props.classes.avatarLarge : ""}` }}
-        >
-          {userNameValue ? userNameValue[0] : ""}
+        <div className={props.classes.avatarContainer}>
+          <CacheableImageLoader src={imageSources.imageSmallSizeURL}>
+            {(imageSmallSrc) => (
+              <MAvatar
+                alt={userNameValue}
+                classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.large ? props.classes.avatarLarge : ""}` }}
+                src={imageSmallSrc}
+              >
+                {userNameValue ? userNameValue[0] : ""}
+              </MAvatar>
+            )}
+          </CacheableImageLoader>
           {flag}
-        </MAvatar>
+        </div>
       </Link>
     );
 
@@ -155,26 +173,30 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
   return (
     <Reader id="id">
       {(id: number) => (
-        <Reader id="username">
-          {
-            (userNameValue: string) => {
-              if (!props.showWarnings) {
-                return contentFn(id, userNameValue);
-              }
+        <Reader id="profile_picture">
+          {(profilePictureValue: PropertyDefinitionSupportedFileType) => (
+            <Reader id="username">
+              {
+                (userNameValue: string) => {
+                  if (!props.showWarnings) {
+                    return contentFn(id, userNameValue, profilePictureValue);
+                  }
 
-              return (
-                <Reader id="email">
-                  {(email: string, emailState: IPropertyDefinitionState) => (
-                    <Reader id="e_validated">
-                      {(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => {
-                        return contentFn(id, userNameValue, emailState, eValidatedState);
-                      }}
+                  return (
+                    <Reader id="email">
+                      {(email: string, emailState: IPropertyDefinitionState) => (
+                        <Reader id="e_validated">
+                          {(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => {
+                            return contentFn(id, userNameValue, profilePictureValue, emailState, eValidatedState);
+                          }}
+                        </Reader>
+                      )}
                     </Reader>
-                  )}
-                </Reader>
-              )
-            }
-          }
+                  )
+                }
+              }
+            </Reader>
+          )}
         </Reader>
       )}
     </Reader>

@@ -34,6 +34,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: "string",
     },
     {
+      name: "imageUploader",
+      type: "boolean",
+    },
+    {
       name: "dimensions",
       type: "string",
     },

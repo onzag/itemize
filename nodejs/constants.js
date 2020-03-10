@@ -78,6 +78,11 @@ exports.FILE_SUPPORTED_IMAGE_TYPES = [
  */
 exports.MODULE_AND_ITEM_DEF_I18N = [
     "name",
+];
+/**
+ * The properties for i18n a searchable module and item definition should have
+ */
+exports.MODULE_AND_ITEM_DEF_I18N_SEARCHABLE = [
     "fts_search_field_label",
     "fts_search_field_placeholder",
 ];

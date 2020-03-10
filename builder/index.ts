@@ -61,6 +61,7 @@ import {
   MODULE_AND_ITEM_DEF_I18N,
   MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY,
   POLICY_OPTIONAL_I18N,
+  MODULE_AND_ITEM_DEF_I18N_SEARCHABLE,
 } from "../constants";
 import { buildAutocomplete } from "./autocomplete";
 import { evalRawJSON } from "./evaler";
@@ -87,6 +88,7 @@ interface IFileModuleDataRawUntreatedJSONDataType {
   type: "module";
   children: string[];
   readRoleAccess?: string[];
+  searchable?: boolean;
 }
 
 /**
@@ -104,6 +106,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   readRoleAccess?: string[];
   policies?: IPoliciesRawJSONDataType;
   ownerIsObjectId?: boolean;
+  searchable?: boolean;
 }
 
 export default async function build() {
@@ -426,6 +429,7 @@ async function buildModule(
   const i18nDataLocation = actualLocation.replace(".json", ".properties");
   const i18nData = await getI18nData(
     rawDataConfig,
+    typeof actualEvaledFileData.searchable !== "undefined" ? actualEvaledFileData.searchable : true,
     i18nDataLocation,
     null,
     traceback,
@@ -488,7 +492,7 @@ async function buildModule(
   const finalValue: IModuleRawJSONDataType = {
     type: "module",
     name: actualName,
-    i18nData: i18nData as any,
+    i18nData: i18nData,
     location: actualLocation,
     i18nDataLocation,
     pointers,
@@ -502,6 +506,10 @@ async function buildModule(
       traceback.newTraceToBit("children"),
     ) : [],
   };
+
+  if (typeof actualEvaledFileData.searchable !== "undefined") {
+    finalValue.searchable = actualEvaledFileData.searchable;
+  }
 
   // we add the propExtensions if necessary
   if (propExtensions) {
@@ -555,6 +563,7 @@ async function buildItemDefinition(
 
   const i18nData = await getI18nData(
     rawDataConfig,
+    typeof actualEvaledFileData.searchable !== "undefined" ? actualEvaledFileData.searchable : true,
     i18nDataLocation,
     actualEvaledFileData.policies,
     traceback,
@@ -606,6 +615,10 @@ async function buildItemDefinition(
     type: actualEvaledFileData.type,
     policies: actualEvaledFileData.policies,
   };
+
+  if (typeof actualEvaledFileData.searchable !== "undefined") {
+    finalValue.searchable = actualEvaledFileData.searchable;
+  }
 
   if (actualEvaledFileData.readRoleAccess) {
     finalValue.readRoleAccess = actualEvaledFileData.readRoleAccess;
@@ -724,6 +737,7 @@ async function buildItemDefinition(
  */
 async function getI18nData(
   rawDataConfig: IBuilderBasicConfigType,
+  isSearchable: boolean,
   languageFileLocation: string,
   policies: IPoliciesRawJSONDataType,
   traceback: Traceback,
@@ -769,6 +783,18 @@ async function getI18nData(
       }
       i18nData[locale][localeKey] = properties[locale][localeKey].trim();
     });
+
+    if (isSearchable) {
+      MODULE_AND_ITEM_DEF_I18N_SEARCHABLE.forEach((localeKey: string) => {
+        if (!properties[locale][localeKey]) {
+          throw new CheckUpError(
+            "File does not include language data for searchable key '" + localeKey + "' for locale " + locale,
+            localeFileTraceback,
+          );
+        }
+        i18nData[locale][localeKey] = properties[locale][localeKey].trim();
+      });
+    }
 
     // if we have policies defined
     if (policies) {

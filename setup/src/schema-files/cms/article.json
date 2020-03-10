@@ -1,0 +1,21 @@
+{
+    "type": "item",
+    "properties": [
+        {
+            "id": "title",
+            "type": "string"
+        },
+        {
+            "id": "content",
+            "type": "text",
+            "subtype": "html"
+        }
+    ],
+    "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
+    "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
+    "deleteRoleAcess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
+    "allowsVersioning": true,
+    "versionIsLanguageAndCountry": true,
+    "versionIsLanguage": true,
+    "versionIsCountry": true
+}
