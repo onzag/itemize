@@ -200,6 +200,7 @@ class PropertyDefinition {
             new ConditionalRuleSet_1.default(rawJSON.hiddenIf, parentModule, parentItemDefinition, this, null);
         // initial value for all namespaces is null
         this.stateValue = {};
+        this.stateAppliedValue = {};
         this.stateValueModified = {};
         this.stateValueHasBeenManuallySet = {};
         this.stateInternalValue = {};
@@ -576,6 +577,7 @@ class PropertyDefinition {
                 hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id, version),
                 internalValue: null,
                 stateValue: nullIfUndefined(this.stateValue[mergedID]),
+                stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
                 stateValueModified: this.stateValueModified[mergedID] || false,
                 stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
                 propertyId: this.getId(),
@@ -594,6 +596,7 @@ class PropertyDefinition {
                 hidden: true,
                 internalValue: null,
                 stateValue: nullIfUndefined(this.stateValue[mergedID]),
+                stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
                 stateValueModified: this.stateValueModified[mergedID] || false,
                 stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
                 propertyId: this.getId(),
@@ -611,6 +614,7 @@ class PropertyDefinition {
             hidden: this.isCurrentlyHidden(id, version),
             internalValue: this.stateValueModified[mergedID] ? this.stateInternalValue[mergedID] : null,
             stateValue: nullIfUndefined(this.stateValue[mergedID]),
+            stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
             stateValueModified: this.stateValueModified[mergedID] || false,
             stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
             propertyId: this.getId(),
@@ -639,6 +643,7 @@ class PropertyDefinition {
                 hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id, version),
                 internalValue: null,
                 stateValue: nullIfUndefined(this.stateValue[mergedID]),
+                stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
                 stateValueModified: this.stateValueModified[mergedID] || false,
                 stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
                 propertyId: this.getId(),
@@ -657,6 +662,7 @@ class PropertyDefinition {
                 hidden: true,
                 internalValue: null,
                 stateValue: nullIfUndefined(this.stateValue[mergedID]),
+                stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
                 stateValueModified: this.stateValueModified[mergedID] || false,
                 stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
                 propertyId: this.getId(),
@@ -674,6 +680,7 @@ class PropertyDefinition {
             hidden: this.isCurrentlyHidden(id, version),
             internalValue: this.stateValueModified[mergedID] ? this.stateInternalValue[mergedID] : null,
             stateValue: nullIfUndefined(this.stateValue[mergedID]),
+            stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
             stateValueModified: this.stateValueModified[mergedID] || false,
             stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
             propertyId: this.getId(),
@@ -802,22 +809,40 @@ class PropertyDefinition {
      * @param version the slot version
      * @param value the value
      * @param modifiedState a modified state to use
-     * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet to avoid hot updating
+     * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers to avoid hot updating
      * values when the user is modifying them and an apply value has been called because
-     * it has been updated somewhere else, we use this to avoid overriding
+     * it has been updated somewhere else, we use this to avoid overriding, note that the value must also
+     * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
+     * to false as it's been used applyValue on it, it's been set now by the computer
      */
-    applyValue(id, version, value, modifiedState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet) {
-        // if doNotApplyValueInPropertyIfPropertyHasBeenManuallySet
+    applyValue(id, version, value, modifiedState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers) {
+        // if doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers
         // is false, then we don't care and apply the value
         // however if it's true, we need to check the manually set variable
         // in order to know where the value comes from
         const mergedID = id + "." + (version || "");
-        if (!doNotApplyValueInPropertyIfPropertyHasBeenManuallySet ||
-            !this.stateValueHasBeenManuallySet[mergedID]) {
+        // two conditions apply, now we need to check if it differs
+        if (doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers &&
+            this.stateValueHasBeenManuallySet[mergedID]) {
+            const currentValue = this.stateValue[mergedID];
+            const newValue = value;
+            // The two of them are equal which means the internal value
+            // is most likely just the same thing so we won't mess with it
+            // as it's not necessary to modify it, even when this is technically a
+            // new value
+            if (deep_equal_1.default(newValue, currentValue)) {
+                this.stateValueModified[mergedID] = modifiedState;
+                this.stateValueHasBeenManuallySet[mergedID] = false;
+            }
+        }
+        else {
             this.stateValue[mergedID] = value;
             this.stateValueModified[mergedID] = modifiedState;
             this.stateInternalValue[mergedID] = null;
+            this.stateValueHasBeenManuallySet[mergedID] = false;
         }
+        // the new applied value gets applied no matter what
+        this.stateAppliedValue[mergedID] = value;
     }
     /**
      * Frees the memory of stored values in a given slot id

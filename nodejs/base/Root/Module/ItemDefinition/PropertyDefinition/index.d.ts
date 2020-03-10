@@ -243,7 +243,8 @@ export interface IPropertyDefinitionState {
      */
     invalidReason: PropertyInvalidReason | string;
     /**
-     * the value that the property currently has
+     * the value that the property currently has, it can be different from state
+     * values because
      */
     value: PropertyDefinitionSupportedType;
     /**
@@ -251,7 +252,8 @@ export interface IPropertyDefinitionState {
      * usually used only by react in order to keep its internal state, internal
      * values are not always guaranteed to come as they are in sync with the value
      * an internal value is null if it considers itself not in sync in which case
-     * the app should still be able to display something from the value
+     * the app should still be able to display something from the value, internal values
+     * are basically only returned if the state value is the current value
      */
     internalValue: any;
     /**
@@ -261,6 +263,12 @@ export interface IPropertyDefinitionState {
      * usually the internal value is correlated to the state value
      */
     stateValue: any;
+    /**
+     * the applied value, this is the value that is set up in the state by the applying
+     * function and it might differ from the state value as the user modifies it, this is
+     * the original value
+     */
+    stateAppliedValue: PropertyDefinitionSupportedType;
     /**
      * whether the state value has been modified by any external force, either programatically
      * or not, this will usually be true for any value other than null, usually becomes true
@@ -393,6 +401,10 @@ export default class PropertyDefinition {
      * representing the state of the class
      */
     private stateValue;
+    /**
+     * representing the original applied state of the class
+     */
+    private stateAppliedValue;
     /**
      * this is less relevant than the single enforced and it
      * is used when the value is applied manually during
@@ -551,11 +563,13 @@ export default class PropertyDefinition {
      * @param version the slot version
      * @param value the value
      * @param modifiedState a modified state to use
-     * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet to avoid hot updating
+     * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers to avoid hot updating
      * values when the user is modifying them and an apply value has been called because
-     * it has been updated somewhere else, we use this to avoid overriding
+     * it has been updated somewhere else, we use this to avoid overriding, note that the value must also
+     * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
+     * to false as it's been used applyValue on it, it's been set now by the computer
      */
-    applyValue(id: number, version: string, value: any, modifiedState: boolean, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean): void;
+    applyValue(id: number, version: string, value: any, modifiedState: boolean, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean): void;
     /**
      * Frees the memory of stored values in a given slot id
      * @param id the slot id

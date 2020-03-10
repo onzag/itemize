@@ -89,7 +89,7 @@ class Module {
         });
         this.childPropExtensionItemDefinition = new ItemDefinition_1.default({
             type: "item",
-            name: this.rawData.name,
+            name: this.rawData.name + "__PROPEXT_IDEF",
             i18nData: this.rawData.i18nData,
             readRoleAccess: this.rawData.readRoleAccess,
         }, this, null);

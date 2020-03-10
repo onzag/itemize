@@ -1127,9 +1127,11 @@ export default class ItemDefinition {
    * @param graphqlUserIdRequester the user id that requested this data (can be null)
    * @param requestFields the fields that were used to request this data (can be null) but be careful
    * this might be used for catching
-   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet to avoid hot updating
+   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers to avoid hot updating
    * values when the user is modifying them and an apply value has been called because
-   * it has been updated somewhere else, we use this to avoid overriding
+   * it has been updated somewhere else, we use this to avoid overriding, note that the value must also
+   * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
+   * to false as it's been used applyValue on it, it's been set now by the computer
    */
   public applyValue(
     id: number,
@@ -1139,7 +1141,7 @@ export default class ItemDefinition {
     graphqlUserIdRequester: number,
     graphqlRoleRequester: string,
     requestFields: IGQLRequestFields,
-    doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
+    doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean,
   ) {
     // first we flatten the value if necessary
     const flattenedValue = typeof value.DATA !== "undefined" ? flattenRawGQLValueOrFields(value) : value;
@@ -1176,7 +1178,7 @@ export default class ItemDefinition {
       }
       // and we apply such value
       property.applyValue(id, version, givenValue,
-        setAsModified, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
+        setAsModified, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers);
     });
 
     // now we get all the items
@@ -1192,7 +1194,7 @@ export default class ItemDefinition {
 
       // and we apply such value
       include.applyValue(id, version, givenValue,
-        givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
+        givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers);
     });
   }
 

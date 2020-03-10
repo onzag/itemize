@@ -1,6 +1,6 @@
 import React from "react";
 import { ModuleProvider } from "../../providers/module";
-import { ItemDefinitionProvider } from "../../providers/item-definition";
+import { ItemDefinitionProvider, IActionSubmitOptions } from "../../providers/item-definition";
 import { UserDataRetriever } from "../../components/user";
 import { ItemDefinitionLoader } from "../components/item-definition-loader";
 import { TitleSetter } from "../../components/util";
@@ -9,7 +9,7 @@ import { Entry } from "../../components/property";
 import { Button } from "@material-ui/core";
 import { LogActioner } from "../../components/login";
 import { SubmitButton } from "../components/buttons";
-import { SubmitActioner } from "../../components/item-definition";
+import { SubmitActioner, DifferingPropertiesRetriever } from "../../components/item-definition";
 import Snackbar from "../components/snackbar";
 
 interface ProfileProps {
@@ -25,7 +25,26 @@ function CurrentUserProfile() {
     <React.Fragment>
       <Entry id="profile_picture"/>
       <Entry id="username"/>
-      <SubmitButton i18nId="update_profile" options={{properties: ["profile_picture", "username"]}}/>
+      <DifferingPropertiesRetriever mainProperties={["profile_picture", "username"]}>
+        {(differingProperties) => {
+          const options: IActionSubmitOptions = {
+            properties: differingProperties,
+          }
+          if (
+            differingProperties.includes("username")
+          ) {
+            options.policies = [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]];
+            options.policiesToCleanOnAny = [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]];
+          }
+
+          if (options.policies) {
+            // TODO put dialog
+          }
+          return (
+            <SubmitButton i18nId="update_profile" options={options}/>
+          );
+        }}
+      </DifferingPropertiesRetriever>
       <SubmitActioner>
         {(actioner) => (
           <React.Fragment>

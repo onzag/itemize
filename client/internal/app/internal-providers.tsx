@@ -32,18 +32,12 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
   constructor(props: ITokenProviderProps) {
     super(props);
 
-    // we get the stored token, if there's none
-    // then we should render right away
-    const storedToken = localStorage.getItem("TOKEN");
     this.state = {
       token: null,
       id: null,
       role: GUEST_METAROLE,
       isLoggingIn: false,
-      // by setting this flag as true if there is none
-      // otherwise we need to check the token for validity or
-      // expiration, if we can
-      isReady: !storedToken,
+      isReady: false,
       error: null,
     };
 
@@ -56,7 +50,12 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     if (storedToken !== null) {
       this.login(null, null, storedToken, true);
     } else {
-      this.props.onProviderStateSet(this.state);
+      const newState: ITokenProviderState = {
+        ...this.state,
+        isReady: true,
+      };
+      this.props.onProviderStateSet(newState);
+      this.setState(newState);
     }
   }
   public async login(

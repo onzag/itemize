@@ -320,10 +320,13 @@ class Include {
      * @param version the slot version to use
      * @param value the value that is applied
      * @param exclusionState the exclusion state
-     * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet whether if not applying
-     * for manually set values (to avoid overriding user input)
+     * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers to avoid hot updating
+     * values when the user is modifying them and an apply value has been called because
+     * it has been updated somewhere else, we use this to avoid overriding, note that the value must also
+     * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
+     * to false as it's been used applyValue on it, it's been set now by the computer
      */
-    applyValue(id, version, value, exclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet) {
+    applyValue(id, version, value, exclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers) {
         const mergedID = id + "." + (version || "");
         // update the state
         this.stateExclusion[mergedID] = exclusionState;
@@ -340,7 +343,7 @@ class Include {
         // grapqhl role, unknown
         null, 
         // graphql requested fields, none
-        null, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
+        null, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers);
     }
     /**
      * Memory cleans the value in an item

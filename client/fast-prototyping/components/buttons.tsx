@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { SubmitActioner } from "../../components/item-definition";
 import { Button, CircularProgress, PropTypes } from "@material-ui/core";
 import { I18nRead } from "../../components/localization";
@@ -11,24 +11,51 @@ interface ISubmitButtonProps {
   buttonClassName?: string;
   buttonVariant?: "text" | "outlined" | "contained";
   buttonColor?: PropTypes.Color;
+  CustomConfirmationComponent?: React.ComponentType<{isActive: boolean, onClose: (continueWithProcess: boolean) => void}>
 }
 
 export function SubmitButton(props: ISubmitButtonProps) {
+  const [confirmationIsActive, setConfirmationIsActive] = useState(false);
+  const CustomConfirmationComponent = props.CustomConfirmationComponent;
   return (
     <SubmitActioner>
       {(actioner) => {
-        const submitAction = () => actioner.submit(props.options);
+        const submitAction = () => {
+          if (props.CustomConfirmationComponent) {
+            setConfirmationIsActive(true);
+          } else {
+            actioner.submit(props.options);
+          }
+        }
+        const onCloseAction = (continueWithProcess: boolean) => {
+          setConfirmationIsActive(false);
+          if (continueWithProcess) {
+            actioner.submit(props.options);
+          }
+        }
         return (
-          <Button variant={props.buttonVariant} color={props.buttonColor} className={props.buttonClassName} onClick={submitAction}>
-            <I18nRead capitalize={true} id={props.i18nId} />
+          <React.Fragment>
+            <Button
+              variant={props.buttonVariant}
+              color={props.buttonColor}
+              className={props.buttonClassName}
+              onClick={submitAction}
+            >
+              <I18nRead capitalize={true} id={props.i18nId} />
+              {
+                actioner.submitting ?
+                <DelayDisplay duration={700}>
+                  <CircularProgress/>
+                </DelayDisplay> :
+                null
+              }
+            </Button>
             {
-              actioner.submitting ?
-              <DelayDisplay duration={700}>
-                <CircularProgress/>
-              </DelayDisplay> :
-              null
+              CustomConfirmationComponent ?
+                <CustomConfirmationComponent isActive={confirmationIsActive} onClose={onCloseAction}/> :
+                null
             }
-          </Button>
+          </React.Fragment>
         );
       }}
     </SubmitActioner>

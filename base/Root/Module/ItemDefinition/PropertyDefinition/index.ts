@@ -270,7 +270,8 @@ export interface IPropertyDefinitionState {
    */
   invalidReason: PropertyInvalidReason | string;
   /**
-   * the value that the property currently has
+   * the value that the property currently has, it can be different from state
+   * values because 
    */
   value: PropertyDefinitionSupportedType;
   /**
@@ -278,7 +279,8 @@ export interface IPropertyDefinitionState {
    * usually used only by react in order to keep its internal state, internal
    * values are not always guaranteed to come as they are in sync with the value
    * an internal value is null if it considers itself not in sync in which case
-   * the app should still be able to display something from the value
+   * the app should still be able to display something from the value, internal values
+   * are basically only returned if the state value is the current value
    */
   internalValue: any;
   /**
@@ -288,6 +290,12 @@ export interface IPropertyDefinitionState {
    * usually the internal value is correlated to the state value
    */
   stateValue: any;
+  /**
+   * the applied value, this is the value that is set up in the state by the applying
+   * function and it might differ from the state value as the user modifies it, this is
+   * the original value
+   */
+  stateAppliedValue: PropertyDefinitionSupportedType;
   /**
    * whether the state value has been modified by any external force, either programatically
    * or not, this will usually be true for any value other than null, usually becomes true
@@ -804,7 +812,13 @@ export default class PropertyDefinition {
    * representing the state of the class
    */
   private stateValue: {
-    [slotId: number]: PropertyDefinitionSupportedType,
+    [slotId: string]: PropertyDefinitionSupportedType,
+  };
+  /**
+   * representing the original applied state of the class
+   */
+  private stateAppliedValue: {
+    [slotId: string]: PropertyDefinitionSupportedType,
   };
   /**
    * this is less relevant than the single enforced and it
@@ -812,7 +826,7 @@ export default class PropertyDefinition {
    * the user interaction, values are enforced
    */
   private stateSuperEnforcedValue: {
-    [slotId: number]: PropertyDefinitionSupportedType,
+    [slotId: string]: PropertyDefinitionSupportedType,
   };
   /**
    * refers to whether the value in the state value
@@ -820,7 +834,7 @@ export default class PropertyDefinition {
    * apply value or set value by user
    */
   private stateValueModified: {
-    [slotId: number]: boolean,
+    [slotId: string]: boolean,
   };
   /**
    * this only triggers as true when the value has been modified
@@ -828,13 +842,13 @@ export default class PropertyDefinition {
    * is what is supposed to be used by the user
    */
   private stateValueHasBeenManuallySet: {
-    [slotId: number]: boolean,
+    [slotId: string]: boolean,
   };
   /**
    * an internal value
    */
   private stateInternalValue: {
-    [slotId: number]: any,
+    [slotId: string]: any,
   };
 
   /**
@@ -902,6 +916,7 @@ export default class PropertyDefinition {
 
     // initial value for all namespaces is null
     this.stateValue = {};
+    this.stateAppliedValue = {};
     this.stateValueModified = {};
     this.stateValueHasBeenManuallySet = {};
     this.stateInternalValue = {};
@@ -1117,6 +1132,7 @@ export default class PropertyDefinition {
         hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id, version),
         internalValue: null,
         stateValue: nullIfUndefined(this.stateValue[mergedID]),
+        stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
         stateValueModified: this.stateValueModified[mergedID] || false,
         stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
         propertyId: this.getId(),
@@ -1136,6 +1152,7 @@ export default class PropertyDefinition {
         hidden: true,
         internalValue: null,
         stateValue: nullIfUndefined(this.stateValue[mergedID]),
+        stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
         stateValueModified: this.stateValueModified[mergedID] || false,
         stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
         propertyId: this.getId(),
@@ -1154,6 +1171,7 @@ export default class PropertyDefinition {
       hidden: this.isCurrentlyHidden(id, version),
       internalValue: this.stateValueModified[mergedID] ? this.stateInternalValue[mergedID] : null,
       stateValue: nullIfUndefined(this.stateValue[mergedID]),
+      stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
       stateValueModified: this.stateValueModified[mergedID] || false,
       stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
       propertyId: this.getId(),
@@ -1185,6 +1203,7 @@ export default class PropertyDefinition {
         hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id, version),
         internalValue: null,
         stateValue: nullIfUndefined(this.stateValue[mergedID]),
+        stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
         stateValueModified: this.stateValueModified[mergedID] || false,
         stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
         propertyId: this.getId(),
@@ -1204,6 +1223,7 @@ export default class PropertyDefinition {
         hidden: true,
         internalValue: null,
         stateValue: nullIfUndefined(this.stateValue[mergedID]),
+        stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
         stateValueModified: this.stateValueModified[mergedID] || false,
         stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
         propertyId: this.getId(),
@@ -1222,6 +1242,7 @@ export default class PropertyDefinition {
       hidden: this.isCurrentlyHidden(id, version),
       internalValue: this.stateValueModified[mergedID] ? this.stateInternalValue[mergedID] : null,
       stateValue: nullIfUndefined(this.stateValue[mergedID]),
+      stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
       stateValueModified: this.stateValueModified[mergedID] || false,
       stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
       propertyId: this.getId(),
@@ -1380,30 +1401,48 @@ export default class PropertyDefinition {
    * @param version the slot version
    * @param value the value
    * @param modifiedState a modified state to use
-   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet to avoid hot updating
+   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers to avoid hot updating
    * values when the user is modifying them and an apply value has been called because
-   * it has been updated somewhere else, we use this to avoid overriding
+   * it has been updated somewhere else, we use this to avoid overriding, note that the value must also
+   * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
+   * to false as it's been used applyValue on it, it's been set now by the computer
    */
   public applyValue(
     id: number,
     version: string,
     value: any,
     modifiedState: boolean,
-    doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
+    doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean,
   ) {
-    // if doNotApplyValueInPropertyIfPropertyHasBeenManuallySet
+    // if doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers
     // is false, then we don't care and apply the value
     // however if it's true, we need to check the manually set variable
     // in order to know where the value comes from
     const mergedID = id + "." + (version || "");
+    // two conditions apply, now we need to check if it differs
     if (
-      !doNotApplyValueInPropertyIfPropertyHasBeenManuallySet ||
-      !this.stateValueHasBeenManuallySet[mergedID]
+      doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers &&
+      this.stateValueHasBeenManuallySet[mergedID]
     ) {
+      const currentValue = this.stateValue[mergedID];
+      const newValue = value;
+      // The two of them are equal which means the internal value
+      // is most likely just the same thing so we won't mess with it
+      // as it's not necessary to modify it, even when this is technically a
+      // new value
+      if (equals(newValue, currentValue)) {
+        this.stateValueModified[mergedID] = modifiedState;
+        this.stateValueHasBeenManuallySet[mergedID] = false;
+      }
+    } else {
       this.stateValue[mergedID] = value;
       this.stateValueModified[mergedID] = modifiedState;
       this.stateInternalValue[mergedID] = null;
+      this.stateValueHasBeenManuallySet[mergedID] = false;
     }
+
+    // the new applied value gets applied no matter what
+    this.stateAppliedValue[mergedID] = value;
   }
 
   /**

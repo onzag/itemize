@@ -64,7 +64,9 @@ export interface IActionSubmitOptions {
   policies?: PolicyPathType[];
   unpokeAfterSuccess?: boolean;
   propertiesToCleanOnSuccess?: string[];
+  propertiesToCleanOnAny?: string[];
   policiesToCleanOnSuccess?: PolicyPathType[];
+  policiesToCleanOnAny?: PolicyPathType[];
   beforeSubmit?: () => boolean;
 }
 
@@ -72,6 +74,7 @@ export interface IActionDeleteOptions {
   policies?: PolicyPathType[];
   unpokeAfterSuccess?: boolean;
   policiesToCleanOnSuccess?: PolicyPathType[];
+  policiesToCleanOnAny?: PolicyPathType[];
   beforeDelete?: () => boolean;
 }
 
@@ -1311,6 +1314,14 @@ export class ActualItemDefinitionProvider extends
           policies: options.policies || [],
         },
       });
+      if (options.policiesToCleanOnAny) {
+        options.policiesToCleanOnAny.forEach((policyArray) => {
+          this.props.itemDefinitionInstance
+            .getPropertyDefinitionForPolicy(...policyArray)
+            .cleanValueFor(this.props.forId, this.props.forVersion || null);
+        });
+        this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
+      }
     } else {
       this.props.itemDefinitionInstance.cleanValueFor(this.props.forId, this.props.forVersion || null);
       this.setState({
@@ -1324,8 +1335,8 @@ export class ActualItemDefinitionProvider extends
           policies: options.unpokeAfterSuccess ? [] : (options.policies || []),
         },
       });
-      if (options.policiesToCleanOnSuccess) {
-        options.policiesToCleanOnSuccess.forEach((policyArray) => {
+      if (options.policiesToCleanOnSuccess || options.policiesToCleanOnAny) {
+        (options.policiesToCleanOnSuccess || []).concat(options.policiesToCleanOnAny || []).forEach((policyArray) => {
           this.props.itemDefinitionInstance
             .getPropertyDefinitionForPolicy(...policyArray)
             .cleanValueFor(this.props.forId, this.props.forVersion || null);
@@ -1434,6 +1445,23 @@ export class ActualItemDefinitionProvider extends
         submitted: false,
         pokedElements,
       });
+      if (options.propertiesToCleanOnAny || options.propertiesToCleanOnAny) {
+        if (options.propertiesToCleanOnAny) {
+          options.propertiesToCleanOnAny.forEach((ptc) => {
+            this.props.itemDefinitionInstance
+              .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId,
+                this.props.forVersion || null);
+          });
+        }
+        if (options.policiesToCleanOnAny) {
+          options.policiesToCleanOnAny.forEach((policyArray) => {
+            this.props.itemDefinitionInstance
+              .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId,
+                this.props.forVersion || null);
+          });
+        }
+        this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
+      }
     } else if (value) {
       this.setState({
         submitError: null,
@@ -1458,21 +1486,21 @@ export class ActualItemDefinitionProvider extends
         getQueryFields,
         true,
       );
-      if (options.propertiesToCleanOnSuccess) {
-        options.propertiesToCleanOnSuccess.forEach((ptc) => {
+      if (options.propertiesToCleanOnSuccess || options.policiesToCleanOnAny) {
+        (options.propertiesToCleanOnSuccess || []).concat(options.propertiesToCleanOnAny || []).forEach((ptc) => {
           this.props.itemDefinitionInstance
             .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId,
               this.props.forVersion || null);
         });
       }
-      if (options.policiesToCleanOnSuccess) {
-        options.policiesToCleanOnSuccess.forEach((policyArray) => {
+      if (options.policiesToCleanOnSuccess || options.policiesToCleanOnAny) {
+        (options.policiesToCleanOnSuccess || []).concat(options.policiesToCleanOnAny || []).forEach((policyArray) => {
           this.props.itemDefinitionInstance
             .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId,
               this.props.forVersion || null);
         });
       }
-      this.props.itemDefinitionInstance.triggerListeners("change", recievedId, receivedVersion);
+      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
     }
 
     // happens during an error or whatnot

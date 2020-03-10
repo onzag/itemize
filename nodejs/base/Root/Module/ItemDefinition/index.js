@@ -643,11 +643,13 @@ class ItemDefinition {
      * @param graphqlUserIdRequester the user id that requested this data (can be null)
      * @param requestFields the fields that were used to request this data (can be null) but be careful
      * this might be used for catching
-     * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet to avoid hot updating
+     * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers to avoid hot updating
      * values when the user is modifying them and an apply value has been called because
-     * it has been updated somewhere else, we use this to avoid overriding
+     * it has been updated somewhere else, we use this to avoid overriding, note that the value must also
+     * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
+     * to false as it's been used applyValue on it, it's been set now by the computer
      */
-    applyValue(id, version, value, excludeExtensions, graphqlUserIdRequester, graphqlRoleRequester, requestFields, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet) {
+    applyValue(id, version, value, excludeExtensions, graphqlUserIdRequester, graphqlRoleRequester, requestFields, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers) {
         // first we flatten the value if necessary
         const flattenedValue = typeof value.DATA !== "undefined" ? gql_util_1.flattenRawGQLValueOrFields(value) : value;
         const mergedID = id + "." + (version || "");
@@ -678,7 +680,7 @@ class ItemDefinition {
                 givenValue = null;
             }
             // and we apply such value
-            property.applyValue(id, version, givenValue, setAsModified, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
+            property.applyValue(id, version, givenValue, setAsModified, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers);
         });
         // now we get all the items
         this.getAllIncludes().forEach((include) => {
@@ -690,7 +692,7 @@ class ItemDefinition {
             // and the exclusion state, or excluded if not specified
             const givenExclusionState = flattenedValue[include.getQualifiedExclusionStateIdentifier()] || Include_1.IncludeExclusionState.EXCLUDED;
             // and we apply such value
-            include.applyValue(id, version, givenValue, givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
+            include.applyValue(id, version, givenValue, givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers);
         });
     }
     /**
