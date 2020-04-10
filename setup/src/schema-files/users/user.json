@@ -4,6 +4,7 @@
         {
             "id": "username",
             "type": "string",
+            "subtype": "identifier",
             "unique": true,
             "htmlAutocomplete": "username"
         },
@@ -97,6 +98,14 @@
             "nullable": true,
             "readRoleAccess": ["&OWNER"],
             "searchable": false
+        },
+        {
+            "id": "session_id",
+            "type": "integer",
+            "disableRetrieval": true,
+            "searchable": false,
+            "default": 0,
+            "hidden": true
         }
     ],
     "policies": {

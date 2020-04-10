@@ -22,6 +22,13 @@ const EMAIL_REGEX = new RegExp("(?:[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#
     "|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53" +
     "-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
 /**
+ * Represents characters that are not allowed in identifier types, while this seems a bit arbitrary
+ * remember that we try to keep it so that many languages are allowed, this is so usernames in
+ * many languages are achievable, D'L things like that and so on, but we want to avoid characters
+ * that can be used to build other stuff, and can make for confusing user identifiers
+ */
+const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%", "/", "\\", "*", "\""];
+/**
  * The behaviour of strings is described by this type
  */
 const typeValue = {
@@ -37,7 +44,7 @@ const typeValue = {
     localSearch: local_search_1.standardLocalSearchExactAndRange,
     nullableDefault: "",
     supportsAutocomplete: true,
-    supportedSubtypes: ["email"],
+    supportedSubtypes: ["email", "identifier"],
     // validates just the length
     validate: (s, subtype) => {
         if (typeof s !== "string") {
@@ -48,6 +55,12 @@ const typeValue = {
         }
         if (subtype === "email" && !EMAIL_REGEX.test(s)) {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+        }
+        if (subtype === "identifier") {
+            const containsOneOfThose = SPECIAL_CHARACTERS.some((c) => s.indexOf(c) !== -1);
+            if (containsOneOfThose) {
+                return PropertyDefinition_1.PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+            }
         }
         return null;
     },

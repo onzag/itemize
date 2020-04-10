@@ -101,9 +101,16 @@ function CurrentUserProfile() {
       </SubmitActioner>
       <LogActioner>
         {(actioner) => {
-          return (<Button onClick={actioner.logout}>
-            <I18nRead capitalize={true} id="logout"/>
-          </Button>);
+          return (
+            <React.Fragment>
+              <Button onClick={actioner.logout}>
+                <I18nRead capitalize={true} id="logout"/>
+              </Button>
+              <Button onClick={actioner.logoutAll}>
+                <I18nRead capitalize={true} id="logout_all"/>
+              </Button>
+            </React.Fragment>
+          );
         }}
       </LogActioner>
     </React.Fragment>

@@ -22,6 +22,7 @@ export declare function buildColumnNamesForItemDefinitionTableOnly(requestedFiel
 export interface IServerSideTokenDataType {
     id: number;
     role: string;
+    sessionId: number;
 }
 /**
  * Given a token, it validates and provides the role information

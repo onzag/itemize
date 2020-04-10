@@ -1127,7 +1127,14 @@ export class ActualItemDefinitionProvider extends
     // first we check every property, that is included and allowed we use some
     // and return whether it's invalid
     const allIncludedPropertiesValid = options.properties.every((pId) => {
-      const p = this.state.itemDefinitionState.properties.find((p) => p.propertyId === pId);
+      // first lets try to get the state for the current state if any
+      let p = this.state.itemDefinitionState.properties.find((p) => p.propertyId === pId);
+      // in some situations, say when we try to manually submit a property this property might not be avaliable
+      // in the state but yet still exist within the item definition itself
+      if (!p) {
+        p = this.props.itemDefinitionInstance.getPropertyDefinitionFor(pId, true)
+          .getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null, true);
+      }
       // now we check if we have the option to only include those that differ
       // from the applied value
       if (options.onlyIncludeIfDiffersFromAppliedValue) {

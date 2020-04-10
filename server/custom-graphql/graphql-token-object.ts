@@ -12,6 +12,9 @@ const TOKEN_OBJECT = new GraphQLObjectType({
     role: {
       type: GraphQLString,
     },
+    sessionId: {
+      type: GraphQLInt,
+    },
   },
 });
 

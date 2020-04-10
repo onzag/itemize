@@ -1,7 +1,7 @@
 declare const _default: {
     "@types/react": string;
     "@types/react-dom": string;
-    "react": string;
+    react: string;
     "react-dom": string;
     "deep-equal": string;
     "@babel/core": string;
@@ -21,11 +21,11 @@ declare const _default: {
     "sass-loader": string;
     "source-map-loader": string;
     "url-loader": string;
-    "webpack": string;
+    webpack: string;
     "webpack-cli": string;
     "worker-injector-generator-plugin": string;
-    "typescript": string;
-    "tslint": string;
+    typescript: string;
+    tslint: string;
     "tslint-react": string;
     "webpack-bundle-analyzer": string;
 };

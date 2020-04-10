@@ -5,7 +5,7 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { GraphQLString } from "graphql";
+import { GraphQLString, valueFromAST } from "graphql";
 import {
   stardardSQLInFn,
   standardSQLOutFn,
@@ -38,6 +38,14 @@ const EMAIL_REGEX = new RegExp("(?:[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#
   "-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
 
 /**
+ * Represents characters that are not allowed in identifier types, while this seems a bit arbitrary
+ * remember that we try to keep it so that many languages are allowed, this is so usernames in
+ * many languages are achievable, D'L things like that and so on, but we want to avoid characters
+ * that can be used to build other stuff, and can make for confusing user identifiers
+ */
+const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%", "/", "\\", "*", "\""];
+
+/**
  * The string type is described, by, you guessed it, a string
  */
 export type PropertyDefinitionSupportedStringType = string;
@@ -60,7 +68,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
   nullableDefault: "",
   supportsAutocomplete: true,
-  supportedSubtypes: ["email"],
+  supportedSubtypes: ["email", "identifier"],
   // validates just the length
   validate: (s: PropertyDefinitionSupportedStringType, subtype: string) => {
     if (typeof s !== "string") {
@@ -71,6 +79,13 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     if (subtype === "email" && !EMAIL_REGEX.test(s)) {
       return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+    }
+
+    if (subtype === "identifier") {
+      const containsOneOfThose = SPECIAL_CHARACTERS.some((c) => s.indexOf(c) !== -1);
+      if (containsOneOfThose) {
+        return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+      }
     }
 
     return null;

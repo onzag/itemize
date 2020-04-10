@@ -10,7 +10,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const read_1 = __importDefault(require("read"));
 const safe_1 = __importDefault(require("colors/safe"));
+function fastRead(options) {
+    return new Promise((resolve, reject) => {
+        read_1.default(options, (error, result, isDefault) => {
+            if (error) {
+                reject(error);
+            }
+            else {
+                resolve({
+                    result,
+                    isDefault,
+                });
+            }
+        });
+    });
+}
 const _1 = require(".");
 const build_column_1 = require("./build-column");
 // COLUMN ADD/UPDATE/REMOVE
@@ -35,6 +51,15 @@ async function addMissingColumnToTable(knex, tableName, newColumnName, newColumn
         try {
             console.log(updateQuery.toString());
             await updateQuery;
+            if (await _1.yesno("Do you want to set a default value for this newly added column?")) {
+                const updateValue = await fastRead({
+                    prompt: "? = ",
+                    default: "NULL",
+                });
+                await knex.update({
+                    [newColumnName]: knex.raw("?", updateValue),
+                }).table(tableName);
+            }
             return newColumnSchema;
         }
         catch (err) {

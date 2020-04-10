@@ -53,63 +53,79 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           });
         }
 
-        // now we prepare the query we use to get the
-        // user related to this token or credentials
-        const resultUserQuery = appData.knex.first(
-          "id",
-          "role",
-          "blocked_at",
-        ).from(moduleTable).join(userTable, (clause) => {
-          clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
-          clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
-        });
-        let failureToGetUserIsCredentials = false;
         let preGeneratedToken: string = null;
-        let queryHasPasswordCheck: boolean = false;
-        let decodedId: number = null;
+        let resultUser: ISQLTableRowValue = null;
 
         // if we have a token provided
         if (args.token) {
+          let decoded: IServerSideTokenDataType = null;
           try {
             // we attempt to decode it
-            const decoded = await jwtVerify<IServerSideTokenDataType>(args.token, appData.sensitiveConfig.jwtKey);
-            // and set the token as the pre generated token so we reuse it
-            preGeneratedToken = args.token;
-            // the query fullfillment will depend on the decoded id present in the token
-            resultUserQuery
-              .where("id", decoded.id)
-              .andWhere("role", decoded.role);
-
-            decodedId = decoded.id;
+            decoded = await jwtVerify<IServerSideTokenDataType>(args.token, appData.sensitiveConfig.jwtKey);
+            if (
+              typeof decoded.id !== "number" ||
+              typeof decoded.role !== "string" ||
+              typeof decoded.sessionId !== "number"
+            ) {
+              throw new EndpointError({
+                message: "Token is invalid",
+                code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+              });
+            }
           } catch (err) {
             throw new EndpointError({
               message: "Token is invalid",
               code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
             });
           }
+
+          // and set the token as the pre generated token so we reuse it
+          preGeneratedToken = args.token;
+          resultUser = await appData.cache.requestValue(
+            userIdef,
+            decoded.id,
+            null,
+          );
+
+          // now we check the session id to see if it has been cancelled
+          if (resultUser.session_id !== decoded.sessionId) {
+            throw new EndpointError({
+              message: "Session has been cancelled",
+              code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+            });
+          }
+
         } else {
-          // otherwise we are using username and password combo
-          failureToGetUserIsCredentials = true;
-          queryHasPasswordCheck = true;
+          // now we prepare the query we use to get the
+          // user related to this token or credentials
+          const resultUserQuery = appData.knex.first(
+            "id",
+            "role",
+            "session_id",
+            "blocked_at",
+          ).from(moduleTable).join(userTable, (clause) => {
+            clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
+            clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
+          });
           // and we apply as required
+          // TODO login by email
           resultUserQuery
             .where(userNamePropertyDescription.sqlEqual(args.username, "", usernameProperty.getId(), appData.knex))
             .andWhere(passwordPropertyDescription.sqlEqual(args.password, "", passwordProperty.getId(), appData.knex));
+
+          resultUser = await resultUserQuery || null;
+
+          if (!resultUser) {
+            // if we don't get an user and we previously
+            // have used a username and password combination
+            // we give an invalid credentials error
+            throw new EndpointError({
+              message: "Invalid Credentials",
+              code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+            });
+          }
         }
 
-        // now we get the user whichever was the method
-        let resultUserFromSQLQuery: ISQLTableRowValue = null;
-        if (!queryHasPasswordCheck) {
-          resultUserFromSQLQuery = await appData.cache.requestValue(
-            userIdef,
-            decodedId,
-            null,
-          );
-        } else {
-          resultUserFromSQLQuery = await resultUserQuery || null;
-        }
-
-        const resultUser = resultUserFromSQLQuery;
         // if we get an user
         if (resultUser) {
           // if the user is blocked
@@ -125,6 +141,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           const token = preGeneratedToken || (await jwtSign({
             id: resultUser.id,
             role: resultUser.role,
+            sessionId: resultUser.session_id,
           }, appData.sensitiveConfig.jwtKey, {
             expiresIn: "7d",
           }));
@@ -133,14 +150,6 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             ...resultUser,
             token,
           };
-        } else if (failureToGetUserIsCredentials) {
-          // if we don't get an user and we previously
-          // have used a username and password combination
-          // we give an invalid credentials error
-          throw new EndpointError({
-            message: "Invalid Credentials",
-            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
-          });
         } else {
           // otherwise the user has been removed as the id
           // is not found, this can happen if the user

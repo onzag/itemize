@@ -1,13 +1,13 @@
 declare const _default: {
-    "install": string;
-    "tsc": string;
-    "webpack": string;
+    install: string;
+    tsc: string;
+    webpack: string;
     "webpack-dev": string;
     "webpack-analyze": string;
-    "build": string;
+    build: string;
     "start-dev-server": string;
     "start-production-server": string;
-    "setup": string;
+    setup: string;
     "build-data": string;
     "build-database": string;
     "get-deployable": string;

@@ -118,13 +118,21 @@ async function validateTokenAndGetData(appData, token) {
         result = {
             id: null,
             role: constants_1.GUEST_METAROLE,
+            sessionId: null,
         };
     }
     else {
+        let throwErr = false;
         try {
             result = await token_1.jwtVerify(token, appData.sensitiveConfig.jwtKey);
+            throwErr = (typeof result.id !== "number" ||
+                typeof result.role !== "string" ||
+                typeof result.sessionId !== "number");
         }
         catch (err) {
+            throwErr = true;
+        }
+        if (throwErr) {
             throw new errors_1.EndpointError({
                 message: "Invalid token that didn't pass verification",
                 code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
@@ -303,10 +311,16 @@ async function validateTokenIsntBlocked(cache, tokenData) {
                 code: constants_1.ENDPOINT_ERRORS.USER_REMOVED,
             });
         }
-        if (sqlResult && sqlResult.blocked_at !== null) {
+        else if (sqlResult.blocked_at !== null) {
             throw new errors_1.EndpointError({
                 message: "User is Blocked",
                 code: constants_1.ENDPOINT_ERRORS.USER_BLOCKED,
+            });
+        }
+        else if (sqlResult.session_id !== tokenData.sessionId) {
+            throw new errors_1.EndpointError({
+                message: "Token has been rendered invalid",
+                code: constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS,
             });
         }
     }

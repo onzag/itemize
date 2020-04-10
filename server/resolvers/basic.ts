@@ -144,6 +144,7 @@ export function buildColumnNamesForItemDefinitionTableOnly(
 export interface IServerSideTokenDataType {
   id: number;
   role: string;
+  sessionId: number;
 }
 const validateTokenAndGetDataDebug = Debug("resolvers:validateTokenAndGetDataDebug");
 /**
@@ -158,11 +159,21 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
     result = {
       id: null,
       role: GUEST_METAROLE,
+      sessionId: null,
     };
   } else {
+    let throwErr = false;
     try {
       result = await jwtVerify<IServerSideTokenDataType>(token, appData.sensitiveConfig.jwtKey);
+      throwErr = (
+        typeof result.id !== "number" ||
+        typeof result.role !== "string" ||
+        typeof result.sessionId !== "number"
+      );
     } catch (err) {
+      throwErr = true;
+    }
+    if (throwErr) {
       throw new EndpointError({
         message: "Invalid token that didn't pass verification",
         code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -384,11 +395,15 @@ export async function validateTokenIsntBlocked(
         message: "User has been removed",
         code: ENDPOINT_ERRORS.USER_REMOVED,
       });
-    }
-    if (sqlResult && sqlResult.blocked_at !== null) {
+    } else if (sqlResult.blocked_at !== null) {
       throw new EndpointError({
         message: "User is Blocked",
         code: ENDPOINT_ERRORS.USER_BLOCKED,
+      });
+    } else if (sqlResult.session_id !== tokenData.sessionId) {
+      throw new EndpointError({
+        message: "Token has been rendered invalid",
+        code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
       });
     }
   }

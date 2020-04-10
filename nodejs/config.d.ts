@@ -53,32 +53,32 @@ export declare const rawSensitiveConfigSchema: {
     properties: {
         ipStackAccessKey: {
             anyOf: {
-                "type": string;
+                type: string;
             }[];
         };
         hereAppID: {
             anyOf: {
-                "type": string;
+                type: string;
             }[];
         };
         hereAppCode: {
             anyOf: {
-                "type": string;
+                type: string;
             }[];
         };
         mailgunAPIKey: {
             anyOf: {
-                "type": string;
+                type: string;
             }[];
         };
         mailgunDomain: {
             anyOf: {
-                "type": string;
+                type: string;
             }[];
         };
         mailgunTargetDomain: {
             anyOf: {
-                "type": string;
+                type: string;
             }[];
         };
         jwtKey: {
@@ -212,17 +212,17 @@ export declare const rawRedisConfigSchema: {
         };
         path: {
             anyOf: {
-                "type": string;
+                type: string;
             }[];
         };
         db: {
             anyOf: {
-                "type": string;
+                type: string;
             }[];
         };
         password: {
             anyOf: {
-                "type": string;
+                type: string;
             }[];
         };
     };

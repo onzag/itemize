@@ -13,6 +13,9 @@ const TOKEN_OBJECT = new graphql_1.GraphQLObjectType({
         role: {
             type: graphql_1.GraphQLString,
         },
+        sessionId: {
+            type: graphql_1.GraphQLInt,
+        },
     },
 });
 exports.default = TOKEN_OBJECT;

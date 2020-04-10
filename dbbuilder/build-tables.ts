@@ -6,8 +6,27 @@
  * @packageDocumentation
  */
 
+import read from "read";
 import colors from "colors/safe";
 import Knex from "knex";
+
+function fastRead(options: read.Options): Promise<{
+  result: string;
+  isDefault: boolean;
+}> {
+  return new Promise((resolve, reject) => {
+    read(options, (error, result, isDefault) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve({
+          result,
+          isDefault,
+        })
+      }
+    });
+  });
+}
 
 import { ISQLSchemaDefinitionType, ISQLTableDefinitionType, ISQLColumnDefinitionType } from "../base/Root/sql";
 import { showErrorStackAndLogMessage, yesno } from ".";
@@ -43,6 +62,15 @@ export async function addMissingColumnToTable(
     try {
       console.log(updateQuery.toString());
       await updateQuery;
+      if (await yesno("Do you want to set a default value for this newly added column?")) {
+        const updateValue = await fastRead({
+          prompt: "? = ",
+          default: "NULL",
+        });
+        await knex.update({
+          [newColumnName]: knex.raw("?", updateValue),
+        }).table(tableName);
+      }
       return newColumnSchema;
     } catch (err) {
       showErrorStackAndLogMessage(err);
