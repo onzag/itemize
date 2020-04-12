@@ -160,7 +160,7 @@ const typeValue = {
         }
         return true;
     },
-    sqlEqual: (value, sqlPrefix, id, knex, columnName) => {
+    sqlEqual: (value, sqlPrefix, id, isCaseInsensitive, knex, columnName) => {
         if (!columnName) {
             return {
                 [sqlPrefix + id + "_LAT"]: value.lat,

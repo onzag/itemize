@@ -13,9 +13,12 @@ custom.profile = profile
 custom.my_profile = my profile
 custom.update_profile = update profile
 custom.profile_updated_succesfully = profile updated!
-
-custom.email_not_validated = your email is not validated
-custom.missing_email = you have not set an email
+custom.missing_email_warning = Warning! Your email is missing, you won't be able to recover this account you happen to forget your password nor login by email
+custom.missing_email_validation_warning = Warning! Your email has not been verified, you won't be able to recover this account you happen to forget your password nor login by email
+custom.missing_email_warning_title = missing email
+custom.missing_email_validation_warning_title = email needs verification
+custom.missing_email_validation_warning_action = verify email
+custom.email_is_verified = email is verified
 
 custom.validate_account = activate your account
 custom.validate_account_template_name =
@@ -35,7 +38,7 @@ custom.forgot_password_user = $APPNAME
 custom.forgot_password_title = recover your $APPNAME account
 custom.forgot_password_description = In order to reset your account you need to click on this link which will log you in, temporarily into your profile, this will allow to change your password
 custom.forgot_password_recover_button = recover account
-custom.forgot_password_link_target = /en/profile/$
+custom.forgot_password_link_target = /en/reset-password
 custom.forgot_password_alt_link = alternatively you can click on this link
 
 properties.username.label = username
@@ -106,9 +109,12 @@ custom.signup_instead = ¿no tiene cuenta? regístrese
 custom.login_instead = ¿ya tiene cuenta? inicie sesión
 custom.update_profile = actualizar información
 custom.profile_updated_succesfully = ¡actualización exitosa!
-
-custom.email_not_validated = su correo electrónico no está validado
-custom.missing_email = no tiene un correo electrónico asociado a esta cuenta
+custom.missing_email_warning = ¡Atención! Su cuenta no tiene un email asociado a ésta, no será capaz de recuperar su cuenta si se ha olvidado de la contraseña ni iniciar sesión por email
+custom.missing_email_validation_warning = ¡Atención! Su correo electrónico no ha sido verificado, no será capaz de recuperar su cuenta si se ha olvidado de la contraseña ni iniciar sesión por email
+custom.missing_email_warning_title = falta el correo electrónico
+custom.missing_email_validation_warning_title = el correo electrónico necesita ser verificado
+custom.missing_email_validation_warning_action = verificar email
+custom.email_is_verified = el correo ha sido verificado
 
 custom.validate_account = active su cuenta
 custom.validate_account_template_name =
@@ -128,7 +134,7 @@ custom.forgot_password_user = $APPNAME
 custom.forgot_password_title = recupere su cuenta de $APPNAME
 custom.forgot_password_description = Para recuperar su cuenta haga click en éste link, le permitirá iniciar sesión y podrá cambiar su contraseña
 custom.forgot_password_recover_button = recupere su cuenta
-custom.forgot_password_link_target = /en/profile/$
+custom.forgot_password_link_target = /es/reset-password
 custom.forgot_password_alt_link = de forma alternativa puede hacer click en éste link
 
 properties.username.label = nombre de usuario

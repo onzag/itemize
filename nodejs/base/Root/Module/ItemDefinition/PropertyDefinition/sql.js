@@ -127,11 +127,25 @@ exports.standardSQLSearchFnExactAndRange = standardSQLSearchFnExactAndRange;
  * @param value the value of the property
  * @param sqlPrefix the sql prefix used
  * @param id the id of the property
+ * @param isCaseInsensitive whether the check is done in a case insensitive way
  * @param knex knex itself
  * @param columnName an optional column name to name this equality check as
  * @returns a knex valid search or select query object
  */
-function standardSQLEqualFn(value, sqlPrefix, id, knex, columnName) {
+function standardSQLEqualFn(value, sqlPrefix, id, isCaseInsensitive, knex, columnName) {
+    if (isCaseInsensitive) {
+        if (!columnName) {
+            return knex.raw("LOWER(??) = LOWER(?)", [
+                sqlPrefix + id,
+                value,
+            ]);
+        }
+        return knex.raw("LOWER(??) = LOWER(?) AS ??", [
+            sqlPrefix + id,
+            value,
+            columnName,
+        ]);
+    }
     if (!columnName) {
         return {
             [sqlPrefix + id]: value,

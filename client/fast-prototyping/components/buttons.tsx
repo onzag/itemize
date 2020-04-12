@@ -11,6 +11,8 @@ interface ISubmitButtonProps {
   buttonClassName?: string;
   buttonVariant?: "text" | "outlined" | "contained";
   buttonColor?: PropTypes.Color;
+  buttonEndIcon?: React.ReactNode;
+  buttonStartIcon?: React.ReactNode;
   CustomConfirmationComponent?: React.ComponentType<{isActive: boolean, onClose: (continueWithProcess: boolean) => void}>
 }
 
@@ -40,6 +42,8 @@ export function SubmitButton(props: ISubmitButtonProps) {
             <Button
               variant={props.buttonVariant}
               color={props.buttonColor}
+              endIcon={props.buttonEndIcon}
+              startIcon={props.buttonStartIcon}
               className={props.buttonClassName}
               onClick={submitAction}
             >

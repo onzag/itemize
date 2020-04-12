@@ -189,6 +189,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     value: IPropertyDefinitionSupportedUnitType,
     sqlPrefix: string,
     id: string,
+    isCaseInsensitive: boolean,
     knex: Knex,
     columnName?: string,
   ) => {

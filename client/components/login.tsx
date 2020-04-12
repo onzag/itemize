@@ -114,8 +114,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     });
     // if we don't get an error we call logout
     if (!result.error) {
-      console.log("FAKE LOGOUT");
-      // this.props.tokenContextValue.logout();
+      this.props.tokenContextValue.logout();
     }
   }
   public async signup(cleanWhenSuccesful: boolean = true): Promise<{

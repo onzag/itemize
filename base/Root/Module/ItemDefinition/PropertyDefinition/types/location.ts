@@ -213,6 +213,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     value: IPropertyDefinitionSupportedLocationType,
     sqlPrefix: string,
     id: string,
+    isCaseInsensitive: boolean,
     knex: Knex,
     columnName?: string,
   ) => {

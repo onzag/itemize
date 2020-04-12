@@ -42,12 +42,15 @@ export async function serverSideIndexChecker(
     property.getParentModule().getQualifiedPathName() :
     property.getParentItemDefinition().getQualifiedPathName();
 
+  // for case insensitive unique checks
+  const isCaseInsensitive = property.isNonCaseSensitiveUnique();
+
   // now the query
   const query = knex.select(
     moduleIDColumn,
     moduleVersionColumn,
   ).from(qualifiedParentName).where(
-    property.getPropertyDefinitionDescription().sqlEqual(value, "", property.getId(), knex),
+    property.getPropertyDefinitionDescription().sqlEqual(value, "", property.getId(), isCaseInsensitive, knex),
   );
 
   // if the id is not null, it might be null to do whole check

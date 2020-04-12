@@ -6,6 +6,7 @@
             "type": "string",
             "subtype": "identifier",
             "unique": true,
+            "nonCaseSensitiveUnique": true,
             "htmlAutocomplete": "username"
         },
         {

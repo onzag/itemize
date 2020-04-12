@@ -58,6 +58,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     value: PropertyDefinitionSupportedPasswordType,
     sqlPrefix: string,
     id: string,
+    isCaseInsensitive: boolean,
     knex: Knex,
     columnName?: string,
   ) => {

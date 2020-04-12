@@ -117,6 +117,11 @@ export interface IPropertyDefinitionRawJSONDataType {
    */
   unique?: boolean;
   /**
+   * Whether the unique is non sensitive, as in non case sensitive
+   * only valid for string types
+   */
+  nonCaseSensitiveUnique?: boolean;
+  /**
    * whether it can be null or not
    */
   nullable?: boolean;
@@ -1619,7 +1624,15 @@ export default class PropertyDefinition {
    * @returns a boolean
    */
   public isUnique() {
-    return this.rawData.unique;
+    return !!(this.rawData.unique || this.rawData.nonCaseSensitiveUnique);
+  }
+
+  /**
+   * Whether the unique is not case sensitive
+   * @returns a boolean
+   */
+  public isNonCaseSensitiveUnique() {
+    return !!this.rawData.nonCaseSensitiveUnique;
   }
 
   /**

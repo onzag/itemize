@@ -24,6 +24,9 @@ declare const _default: {
         unique: {
             type: string;
         };
+        nonCaseSensitiveUnique: {
+            type: string;
+        };
         min: {
             type: string;
         };

@@ -10,6 +10,7 @@ import { MAX_FILE_SIZE } from "../../../../constants";
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import React from "react";
 import { capitalize } from "../../../components/localization";
+import { Alert } from "@material-ui/lab";
 
 function shouldShowInvalid(props: IPropertyEntryFileRendererProps) {
   return !props.currentValid;
@@ -204,9 +205,9 @@ const ActualPropertyEntryFileRendererWithStyles = withStyles(style)((props: IPro
       >
         {capitalize(props.label)}
       </FormLabel>
-      {props.description ? <div className={props.classes.description}>
+      {props.description ? <Alert severity="info" className={props.classes.description}>
         {props.description}
-      </div> : null}
+      </Alert> : null}
       <Dropzone
         onDropAccepted={onDrop.bind(null, props.onSetFile)}
         onDropRejected={onDrop.bind(null, props.onSetFile)}

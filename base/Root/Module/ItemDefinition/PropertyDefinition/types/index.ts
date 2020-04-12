@@ -164,6 +164,7 @@ export interface IPropertyDefinitionSupportedType {
     value: PropertyDefinitionSupportedType,
     sqlPrefix: string,
     id: string,
+    ignoreCase: boolean,
     knex: Knex,
     columnName?: string,
   ) => any;

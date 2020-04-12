@@ -94,6 +94,11 @@ export interface IPropertyDefinitionRawJSONDataType {
      */
     unique?: boolean;
     /**
+     * Whether the unique is non sensitive, as in non case sensitive
+     * only valid for string types
+     */
+    nonCaseSensitiveUnique?: boolean;
+    /**
      * whether it can be null or not
      */
     nullable?: boolean;
@@ -621,6 +626,11 @@ export default class PropertyDefinition {
      * @returns a boolean
      */
     isUnique(): boolean;
+    /**
+     * Whether the unique is not case sensitive
+     * @returns a boolean
+     */
+    isNonCaseSensitiveUnique(): boolean;
     /**
      * Tells whether the current property is defined as being hidden
      * @returns a boolean

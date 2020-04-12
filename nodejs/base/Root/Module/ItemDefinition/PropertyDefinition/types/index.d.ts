@@ -125,7 +125,7 @@ export interface IPropertyDefinitionSupportedType {
      * same for the id, and knex is just the knex instance, not a builder
      * and an optional column name so that it can be used as select as
      */
-    sqlEqual: (value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, knex: Knex, columnName?: string) => any;
+    sqlEqual: (value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, ignoreCase: boolean, knex: Knex, columnName?: string) => any;
     /**
      * A local equal, ran during cache checks very useful for checking
      * against policies during policy checks and other forms of checks

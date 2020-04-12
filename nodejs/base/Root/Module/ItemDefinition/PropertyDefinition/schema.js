@@ -42,6 +42,9 @@ exports.default = {
         unique: {
             type: "boolean",
         },
+        nonCaseSensitiveUnique: {
+            type: "boolean",
+        },
         min: {
             type: "number",
         },

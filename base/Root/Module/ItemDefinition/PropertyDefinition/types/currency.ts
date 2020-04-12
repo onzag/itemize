@@ -162,6 +162,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     value: IPropertyDefinitionSupportedCurrencyType,
     sqlPrefix: string,
     id: string,
+    isCaseInsensitive: boolean,
     knex: Knex,
     columnName?: string,
   ) => {

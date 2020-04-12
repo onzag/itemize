@@ -982,7 +982,14 @@ class PropertyDefinition {
      * @returns a boolean
      */
     isUnique() {
-        return this.rawData.unique;
+        return !!(this.rawData.unique || this.rawData.nonCaseSensitiveUnique);
+    }
+    /**
+     * Whether the unique is not case sensitive
+     * @returns a boolean
+     */
+    isNonCaseSensitiveUnique() {
+        return !!this.rawData.nonCaseSensitiveUnique;
     }
     /**
      * Tells whether the current property is defined as being hidden

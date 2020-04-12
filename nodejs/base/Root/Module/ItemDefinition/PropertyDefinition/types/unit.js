@@ -134,7 +134,7 @@ const typeValue = {
             return conditions.every((c) => c);
         }
     },
-    sqlEqual: (value, sqlPrefix, id, knex, columnName) => {
+    sqlEqual: (value, sqlPrefix, id, isCaseInsensitive, knex, columnName) => {
         if (!columnName) {
             return {
                 [sqlPrefix + id + "_NORMALIZED_UNIT"]: value.normalizedUnit,

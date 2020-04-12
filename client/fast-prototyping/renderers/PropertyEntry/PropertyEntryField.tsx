@@ -18,9 +18,9 @@ import parse from "autosuggest-highlight/parse";
 import { IPropertyEntryFieldRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryField";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import { IAutocompleteOutputType } from "../../../../base/Autocomplete";
-import IconKeyboardArrowDown from "@material-ui/icons/KeyboardArrowDown";
 import IconVisibilityOff from "@material-ui/icons/VisibilityOff";
 import IconVisibility from "@material-ui/icons/Visibility";
+import { Alert } from "@material-ui/lab";
 
 function shouldShowInvalid(props: IPropertyEntryFieldRendererProps) {
   return !props.currentValid;
@@ -560,10 +560,9 @@ class ActualPropertyEntryFieldRenderer
       <div className={this.props.classes.container}>
         {
           this.props.description ?
-          <div className={this.props.classes.description}>
-            <IconKeyboardArrowDown/>
+          <Alert severity="info" className={this.props.classes.description}>
             {this.props.description}
-          </div> :
+          </Alert> :
           null
         }
         <TextField

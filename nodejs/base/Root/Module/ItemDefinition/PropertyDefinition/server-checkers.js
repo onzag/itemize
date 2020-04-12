@@ -29,8 +29,10 @@ async function serverSideIndexChecker(knex, property, value, id, version) {
     const qualifiedParentName = property.isExtension() ?
         property.getParentModule().getQualifiedPathName() :
         property.getParentItemDefinition().getQualifiedPathName();
+    // for case insensitive unique checks
+    const isCaseInsensitive = property.isNonCaseSensitiveUnique();
     // now the query
-    const query = knex.select(moduleIDColumn, moduleVersionColumn).from(qualifiedParentName).where(property.getPropertyDefinitionDescription().sqlEqual(value, "", property.getId(), knex));
+    const query = knex.select(moduleIDColumn, moduleVersionColumn).from(qualifiedParentName).where(property.getPropertyDefinitionDescription().sqlEqual(value, "", property.getId(), isCaseInsensitive, knex));
     // if the id is not null, it might be null to do whole check
     // or an id specified so that we exclude that id in the search
     // because it will match, eg. we check for usernames but our own username

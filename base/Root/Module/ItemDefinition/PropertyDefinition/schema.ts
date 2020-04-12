@@ -32,10 +32,13 @@ export default {
     type:  {
       type: "string",
     },
-    subtype:  {
+    subtype: {
       type: "string",
     },
-    unique:  {
+    unique: {
+      type: "boolean",
+    },
+    nonCaseSensitiveUnique: {
       type: "boolean",
     },
     min: {
