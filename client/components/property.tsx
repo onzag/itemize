@@ -11,7 +11,7 @@ import { IncludeContext } from "../providers/include";
 
 type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search";
 
-interface IPropertyEntryProps {
+interface IPropertyEntryProps<RendererPropsType> {
   id: string;
   searchVariant?: SearchVariants;
   policyType?: string;
@@ -19,6 +19,8 @@ interface IPropertyEntryProps {
   showAsInvalid?: boolean;
   icon?: string;
   onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, inernalValue?: any) => void;
+  renderer?: React.ComponentType<RendererPropsType>;
+  rendererArgs?: object;
 }
 
 interface IPropertySetterProps {
@@ -42,7 +44,7 @@ interface IPropertyViewProps {
   searchVariant?: SearchVariants;
 }
 
-interface IPropertyEntryViewReadSetProps {
+interface IPropertyEntryViewReadSetProps<RendererPropsType> {
   id: string;
   searchVariant?: SearchVariants;
   policyType?: string;
@@ -52,9 +54,11 @@ interface IPropertyEntryViewReadSetProps {
   icon?: string;
   onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, internalValue?: any) => void;
   value?: PropertyDefinitionSupportedType;
+  renderer?: React.ComponentType<RendererPropsType>;
+  rendererArgs?: object;
 }
 // TODO optimize
-function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" | "view" | "read" | "set") {
+function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "entry" | "view" | "read" | "set") {
   return (
     <ItemDefinitionContext.Consumer>
       {
@@ -181,6 +185,8 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
                       forId={itemDefinitionContextualValue.forId}
                       forVersion={itemDefinitionContextualValue.forVersion}
                       poked={isPoked}
+                      renderer={props.renderer}
+                      rendererArgs={props.rendererArgs}
                     />
                   );
                 } else {
@@ -209,7 +215,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps, type: "entry" |
   );
 }
 
-export function Entry(props: IPropertyEntryProps) {
+export function Entry(props: IPropertyEntryProps<any>) {
   return EntryViewReadSet(props, "entry");
 }
 

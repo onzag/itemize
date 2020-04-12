@@ -122,7 +122,7 @@ export default class PropertyEntryFile
       });
       return;
     } else if (value.size > MAX_FILE_SIZE) {
-      const prettySize = prettyBytes(value.size);
+      const prettySize = prettyBytes(MAX_FILE_SIZE);
       this.setState({
         rejected: true,
         rejectedValue: value,

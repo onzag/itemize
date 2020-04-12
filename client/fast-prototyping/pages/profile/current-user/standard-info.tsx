@@ -10,6 +10,7 @@ import DoneIcon from "@material-ui/icons/Done";
 import { IPropertyDefinitionState } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import DoneOutline from "@material-ui/icons/DoneOutline";
+import { AvatarRenderer } from "../../../components/avatar";
 
 interface CustomConfirmationDialogProps {
   isActive: boolean;
@@ -68,7 +69,7 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
 ((props: WithStyles<typeof currentUserProfileStandardInfoStyles>) => {
   return (
     <Paper className={props.classes.paper}>
-      <Entry id="profile_picture" />
+      <Entry id="profile_picture" renderer={AvatarRenderer}/>
       <Entry id="username" />
       <Reader id="email">
         {(email: string, emailState: IPropertyDefinitionState) => {

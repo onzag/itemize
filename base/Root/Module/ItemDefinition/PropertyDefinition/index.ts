@@ -637,7 +637,7 @@ export default class PropertyDefinition {
           // and it's not a promise and it's not a file
           (
             valueAsIGQLFile.src !== null &&
-            typeof valueAsIGQLFile !== "undefined" &&
+            typeof valueAsIGQLFile.src !== "undefined" &&
             !(valueAsIGQLFile.src as Promise<any>).then && (
               typeof File === "undefined" ||
               !(valueAsIGQLFile.src instanceof File)

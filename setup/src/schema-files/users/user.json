@@ -84,7 +84,7 @@
             "id": "profile_picture",
             "type": "file",
             "specialProperties": {
-                "accept": "image",
+                "imageUploader": true,
                 "dimensions": "24 24x24 ; 48 48x48",
                 "smallDimension": "96x96",
                 "mediumDimension": "128x128",

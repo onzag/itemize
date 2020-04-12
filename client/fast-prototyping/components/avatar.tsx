@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar as MAvatar, Badge } from "@material-ui/core";
+import { Avatar as MAvatar, Badge, RootRef } from "@material-ui/core";
 import { countries } from "../../../imported-resources";
 import { withStyles, WithStyles, createStyles } from "@material-ui/styles";
 import { Reader } from "../../components/property";
@@ -7,6 +7,12 @@ import { Link } from "../../components/navigaton";
 import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedFileType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
 import { imageSizeRetriever, CacheableImageLoader } from "../../components/util";
+import { IPropertyEntryFileRendererProps } from "../../internal/components/PropertyEntry/PropertyEntryFile";
+import Dropzone, { DropzoneRef } from "react-dropzone";
+import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
+import BrokenImageIcon from "@material-ui/icons/BrokenImage";
+import { MAX_FILE_SIZE } from "../../../constants";
+import { Alert } from "@material-ui/lab";
 
 const avatarStyles = createStyles({
   flag: {
@@ -14,6 +20,24 @@ const avatarStyles = createStyles({
     fontSize: "0.8rem",
     bottom: -2.5,
     right: -5,
+  },
+  hoverAddBackdrop: {
+    "cursor": "pointer",
+    "opacity": 0,
+    "width": "100%",
+    "height": "100%",
+    "backgroundColor": "black",
+    "color": "white",
+    "position": "absolute",
+    "alignItems": "center",
+    "justifyContent": "center",
+    "display": "flex",
+    "zIndex": 1,
+    "transition": "opacity 0.3s ease-in-out",
+    "borderRadius": "100%",
+    "&:hover, &.visible": {
+      opacity: 0.5,
+    }
   },
   avatar: {
     "cursor": "pointer",
@@ -49,6 +73,17 @@ const avatarStyles = createStyles({
   },
   avatarContainer: {
     position: "relative",
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "column",
+  },
+  avatarUploadError: {
+    marginTop: "1rem",
+  },
+  avatarContainerLarge: {
+    paddingBottom: "1rem",
   },
   avatarBadge: {
     transform: "scale(1) translate(25%, -25%)",
@@ -108,7 +143,9 @@ interface IAvatarProps extends WithStyles<typeof avatarStyles> {
   profileURLSection?: string;
 }
 
-// TODO profile picture support
+interface IAvatarRendererProps extends IPropertyEntryFileRendererProps, WithStyles<typeof avatarStyles> {
+}
+
 export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
   const contentFn = (
     id: number,
@@ -200,5 +237,69 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
         </Reader>
       )}
     </Reader>
+  );
+});
+
+function onDrop(onSetFile: (file: File) => void, files: File[]) {
+  onSetFile(files[0]);
+}
+
+export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererProps) => {
+  const dropzoneRef = React.useRef<DropzoneRef>();
+  return (
+    <div className={`${props.classes.avatarContainer} ${props.classes.avatarContainerLarge}`}>
+      <Reader id="username">{
+        (username: string) => (
+          <Reader id="id">
+            {(id: number) => {
+              const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : null;
+
+              return (
+                <Dropzone
+                  onDropAccepted={onDrop.bind(null, props.onSetFile)}
+                  onDropRejected={onDrop.bind(null, props.onSetFile)}
+                  maxSize={MAX_FILE_SIZE}
+                  accept={props.accept}
+                  multiple={false}
+                  noClick={false}
+                  ref={dropzoneRef}
+                  disabled={props.disabled}
+                >
+                  {({
+                    getRootProps,
+                    getInputProps,
+                    isDragAccept,
+                    isDragReject,
+                  }) => {
+                    const { ref, ...rootProps } = getRootProps();
+                    return (
+                      <RootRef rootRef={ref}>
+                        <div {...rootProps}>
+                          <input {...getInputProps()} />
+                          <div className={props.classes.avatarContainer}>
+                            <MAvatar
+                              classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.classes.avatarLarge}` }}
+                              src={props.imageSizes.imageStandardSizeURL}
+                            >
+                              {username ? username[0] : ""}
+                            </MAvatar>
+                            <div className={`${props.classes.hoverAddBackdrop} ${isDragAccept || isDragReject ? "visible" : ""}`}>
+                              {isDragReject ? <BrokenImageIcon fontSize="large"/> : <AddAPhotoIcon fontSize="large"/>}
+                            </div>
+                          </div>
+                        </div>
+                      </RootRef>
+                    );
+                  }}
+                </Dropzone>
+              )
+            }}
+          </Reader>
+        )
+      }</Reader>
+      {props.currentInvalidReason || props.rejectedReason ? <Alert classes={{root: props.classes.avatarUploadError}} severity="error">
+        {props.currentInvalidReason || props.rejectedReason}
+      </Alert> : null}
+    </div>
   );
 });
