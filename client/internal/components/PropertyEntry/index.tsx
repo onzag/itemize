@@ -19,6 +19,8 @@ import {
 import { currencies, countries, ICurrencyType, ICountryType } from "../../../../imported-resources";
 import { RendererContext } from "../../../providers/renderer";
 import { IRendererProps } from "../../renderer";
+import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
+import Include from "../../../../base/Root/Module/ItemDefinition/Include";
 
 export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
   label?: string;
@@ -38,6 +40,8 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
 }
 
 export interface IPropertyEntryBaseProps<ValueType, RendererPropsType> {
+  itemDefinition: ItemDefinition;
+  include: Include;
   property: PropertyDefinition;
   state: IPropertyDefinitionState;
   onChange: (newValue: ValueType, internalValue: any) => void;

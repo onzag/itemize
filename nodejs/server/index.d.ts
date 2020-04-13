@@ -11,6 +11,7 @@ import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../conf
 import { ITriggerRegistry } from "./resolvers/triggers";
 import { IPStack } from "./services/ipstack";
 import Mailgun from "mailgun-js";
+import pkgcloud from "pkgcloud";
 export interface IAppDataType {
     root: Root;
     autocompletes: Autocomplete[];
@@ -28,6 +29,8 @@ export interface IAppDataType {
     triggers: ITriggerRegistry;
     ipStack: IPStack;
     mailgun: Mailgun.Mailgun;
+    pkgcloudStorageClient: pkgcloud.storage.Client;
+    pkgcloudUploadsContainer: pkgcloud.storage.Container;
 }
 export interface IServerCustomizationDataType {
     customGQLQueries?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;

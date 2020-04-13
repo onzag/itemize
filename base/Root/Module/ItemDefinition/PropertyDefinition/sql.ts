@@ -292,6 +292,9 @@ export function convertSQLValueToGQLValueForProperty(
 /**
  * Converts a graphql value into a sql value, that is graphql data into row
  * data to be immediately added to the database as it is
+ * @param filesContainerId a folder that will contain the files for this item definition
+ * @param itemDefinition the item definition in question
+ * @param include an include if exist where the property resides
  * @param propertyDefinition the property definition in question
  * @param data the graphql data
  * @param knex the knex instance
@@ -302,7 +305,7 @@ export function convertSQLValueToGQLValueForProperty(
  * that this is a promise because data streams need to be processed
  */
 export async function convertGQLValueToSQLValueForProperty(
-  transitoryId: string,
+  filesContainerId: string,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -341,7 +344,7 @@ export async function convertGQLValueToSQLValueForProperty(
       gqlPropertyValue = await processFileListFor(
         newValue,
         oldValue,
-        transitoryId,
+        filesContainerId,
         itemDefinition,
         include,
         propertyDefinition,
@@ -350,7 +353,7 @@ export async function convertGQLValueToSQLValueForProperty(
       gqlPropertyValue = await processSingleFileFor(
         newValue,
         oldValue,
-        transitoryId,
+        filesContainerId,
         itemDefinition,
         include,
         propertyDefinition,

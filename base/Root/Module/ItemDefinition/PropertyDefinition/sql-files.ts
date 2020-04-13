@@ -23,7 +23,7 @@ const fsAsync = fs.promises;
  * file value
  * @param newValues the new values as a list
  * @param oldValues the old values that this came from
- * @param transitoryId a transitory id on where to store the files (can be changed later)
+ * @param filesContainerId a transitory id on where to store the files (can be changed later)
  * @param itemDefinition the item definition these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
@@ -32,7 +32,7 @@ const fsAsync = fs.promises;
 export async function processFileListFor(
   newValues: IGQLFile[],
   oldValues: IGQLFile[],
-  transitoryId: string,
+  filesContainerId: string,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -59,7 +59,7 @@ export async function processFileListFor(
       return processOneFileAndItsSameIDReplacement(
         newValue,
         relativeOldValue,
-        transitoryId,
+        filesContainerId,
         itemDefinition,
         include,
         propertyDefinition,
@@ -70,7 +70,7 @@ export async function processFileListFor(
       return processOneFileAndItsSameIDReplacement(
         null,
         removedValue,
-        transitoryId,
+        filesContainerId,
         itemDefinition,
         include,
         propertyDefinition,
@@ -95,7 +95,7 @@ export async function processFileListFor(
  * should be of different id
  * @param newValue the new value
  * @param oldValue the old value
- * @param transitoryId a transitory id on where to store the files (can be changed later)
+ * @param filesContainerId an id on where to store the files (can be changed later)
  * @param itemDefinition the item definition these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
@@ -104,31 +104,42 @@ export async function processFileListFor(
 export async function processSingleFileFor(
   newValue: IGQLFile,
   oldValue: IGQLFile,
-  transitoryId: string,
+  filesContainerId: string,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
 ) {
-  // basically we run this asa two step process
-  // first we drop the old value, by using the same id
-  // function giving no new value
-  await processOneFileAndItsSameIDReplacement(
-    null,
-    oldValue,
-    transitoryId,
-    itemDefinition,
-    include,
-    propertyDefinition,
-  );
-  // and return with the same id but no old value, create it
-  return await processOneFileAndItsSameIDReplacement(
-    newValue,
-    null,
-    transitoryId,
-    itemDefinition,
-    include,
-    propertyDefinition,
-  );
+  if (oldValue && oldValue.id === newValue.id) {
+    return await processOneFileAndItsSameIDReplacement(
+      newValue,
+      oldValue,
+      filesContainerId,
+      itemDefinition,
+      include,
+      propertyDefinition,
+    );
+  } else {
+    // basically we run this asa two step process
+    // first we drop the old value, by using the same id
+    // function giving no new value
+    await processOneFileAndItsSameIDReplacement(
+      null,
+      oldValue,
+      filesContainerId,
+      itemDefinition,
+      include,
+      propertyDefinition,
+    );
+    // and return with the same id but no old value, create it
+    return await processOneFileAndItsSameIDReplacement(
+      newValue,
+      null,
+      filesContainerId,
+      itemDefinition,
+      include,
+      propertyDefinition,
+    );
+  }
 }
 
 /**

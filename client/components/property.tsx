@@ -177,6 +177,8 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "ent
                   }
                   return (
                     <PropertyEntry
+                      itemDefinition={itemDefinitionContextualValue.idef}
+                      include={includeContextualValue.include}
                       property={property}
                       state={propertyState}
                       onChange={onChange}

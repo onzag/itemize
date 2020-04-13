@@ -185,6 +185,21 @@ export default class PropertyEntryFile
         ...currentValue,
         url: this.ownedObjectURLPool[currentValue.id],
       };
+    } else {
+      let prefix: string = (window as any).UPLOADS_PREFIX;
+      if (prefix.indexOf("/") !== 0) {
+        prefix = location.protocol + "//" + prefix;
+      }
+      currentValue = {
+        ...currentValue,
+        url:
+          prefix +
+          this.props.itemDefinition.getQualifiedPathName() + "/" +
+          this.props.forId + "." + (this.props.forVersion || null) + "/" +
+          (this.props.include ? this.props.include.getId() + "/" : "") +
+          this.props.property.getId() + "/" +
+          currentValue.id + "/" + currentValue.url,
+      }
     }
 
     const imageSizes = isSupportedImage ? imageSizeRetriever(currentValue) : {

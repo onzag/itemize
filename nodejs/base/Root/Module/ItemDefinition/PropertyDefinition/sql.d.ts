@@ -98,6 +98,9 @@ export declare function convertSQLValueToGQLValueForProperty(propertyDefinition:
 /**
  * Converts a graphql value into a sql value, that is graphql data into row
  * data to be immediately added to the database as it is
+ * @param filesContainerId a folder that will contain the files for this item definition
+ * @param itemDefinition the item definition in question
+ * @param include an include if exist where the property resides
  * @param propertyDefinition the property definition in question
  * @param data the graphql data
  * @param knex the knex instance
@@ -107,7 +110,7 @@ export declare function convertSQLValueToGQLValueForProperty(propertyDefinition:
  * @returns a promise with the partial sql row value to be inputted, note
  * that this is a promise because data streams need to be processed
  */
-export declare function convertGQLValueToSQLValueForProperty(transitoryId: string, itemDefinition: ItemDefinition, include: Include, propertyDefinition: PropertyDefinition, data: IGQLArgs, oldData: IGQLValue, knex: Knex, dictionary: string, prefix: string): Promise<ISQLTableRowValue>;
+export declare function convertGQLValueToSQLValueForProperty(filesContainerId: string, itemDefinition: ItemDefinition, include: Include, propertyDefinition: PropertyDefinition, data: IGQLArgs, oldData: IGQLValue, knex: Knex, dictionary: string, prefix: string): Promise<ISQLTableRowValue>;
 /**
  * Builds a sql search query from a given property definition, the data
  * coming from the search module, a sql prefix to use, and the knex builder

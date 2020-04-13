@@ -27,12 +27,21 @@ export interface IConfigRawJSONDataType {
   developmentHostname: string;
   stagingHostname: string;
   productionHostname: string;
+  
+  // Uploads info
+  uploadsHostnamePrefix: string;
 }
 
 export interface ISensitiveConfigRawJSONDataType {
   ipStackAccessKey: string;
   hereAppID: string;
   hereAppCode: string;
+  openStackUsername: string;
+  openStackPassword: string;
+  openStackRegion: string;
+  openStackDomainName: string;
+  openStackAuthUrl: string;
+  openStackUploadsContainerName: string;
   mailgunAPIKey: string;
   mailgunDomain: string;
   mailgunTargetDomain: string;
@@ -125,6 +134,24 @@ export const rawSensitiveConfigSchema = {
     devKey: {
       type: "string",
     },
+    openStackUsername: {
+      type: "string",
+    },
+    openStackPassword: {
+      type: "string",
+    },
+    openStackRegion: {
+      type: "string",
+    },
+    openStackDomainName: {
+      type: "string",
+    },
+    openStackUploadsContainerName: {
+      type: "string",
+    },
+    openStackAuthUrl: {
+      type: "string",
+    },
   },
   additionalProperties: false,
   required: [
@@ -136,6 +163,12 @@ export const rawSensitiveConfigSchema = {
     "mailgunTargetDomain",
     "jwtKey",
     "devKey",
+    "openStackUsername",
+    "openStackPassword",
+    "openStackRegion",
+    "openStackDomainName",
+    "openStackUploadsContainerName",
+    "openStackAuthUrl",
   ],
 };
 
@@ -230,6 +263,9 @@ export const rawConfigSchema = {
     productionHostname: {
       type: "string",
     },
+    uploadsHostnamePrefix: {
+      type: "string",
+    },
   },
   additionalProperties: false,
   required: [
@@ -248,6 +284,7 @@ export const rawConfigSchema = {
     "developmentHostname",
     "stagingHostname",
     "productionHostname",
+    "uploadsHostnamePrefix",
   ],
 };
 

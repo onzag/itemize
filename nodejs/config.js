@@ -69,6 +69,24 @@ exports.rawSensitiveConfigSchema = {
         devKey: {
             type: "string",
         },
+        openStackUsername: {
+            type: "string",
+        },
+        openStackPassword: {
+            type: "string",
+        },
+        openStackRegion: {
+            type: "string",
+        },
+        openStackDomainName: {
+            type: "string",
+        },
+        openStackUploadsContainerName: {
+            type: "string",
+        },
+        openStackAuthUrl: {
+            type: "string",
+        },
     },
     additionalProperties: false,
     required: [
@@ -80,6 +98,12 @@ exports.rawSensitiveConfigSchema = {
         "mailgunTargetDomain",
         "jwtKey",
         "devKey",
+        "openStackUsername",
+        "openStackPassword",
+        "openStackRegion",
+        "openStackDomainName",
+        "openStackUploadsContainerName",
+        "openStackAuthUrl",
     ],
 };
 exports.rawConfigSchema = {
@@ -173,6 +197,9 @@ exports.rawConfigSchema = {
         productionHostname: {
             type: "string",
         },
+        uploadsHostnamePrefix: {
+            type: "string",
+        },
     },
     additionalProperties: false,
     required: [
@@ -191,6 +218,7 @@ exports.rawConfigSchema = {
         "developmentHostname",
         "stagingHostname",
         "productionHostname",
+        "uploadsHostnamePrefix",
     ],
 };
 exports.rawDBConfigSchema = {

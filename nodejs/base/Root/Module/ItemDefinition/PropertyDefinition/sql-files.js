@@ -20,13 +20,13 @@ const fsAsync = fs_1.default.promises;
  * file value
  * @param newValues the new values as a list
  * @param oldValues the old values that this came from
- * @param transitoryId a transitory id on where to store the files (can be changed later)
+ * @param filesContainerId a transitory id on where to store the files (can be changed later)
  * @param itemDefinition the item definition these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
  * @returns a promise with the new list with the new values
  */
-async function processFileListFor(newValues, oldValues, transitoryId, itemDefinition, include, propertyDefinition) {
+async function processFileListFor(newValues, oldValues, filesContainerId, itemDefinition, include, propertyDefinition) {
     // the values might be null so let's ensure them
     const actualNewValues = newValues || [];
     const actualOldValues = oldValues || [];
@@ -44,11 +44,11 @@ async function processFileListFor(newValues, oldValues, transitoryId, itemDefini
         // let's pass it to the function that does that
         // job, pick the old value, if exists
         const relativeOldValue = actualOldValues.find((oldValue) => oldValue.id === newValue.id) || null;
-        return processOneFileAndItsSameIDReplacement(newValue, relativeOldValue, transitoryId, itemDefinition, include, propertyDefinition);
+        return processOneFileAndItsSameIDReplacement(newValue, relativeOldValue, filesContainerId, itemDefinition, include, propertyDefinition);
     }).concat(removedFiles.map((removedValue) => {
         // for the removed it's the same but the new value
         // is null
-        return processOneFileAndItsSameIDReplacement(null, removedValue, transitoryId, itemDefinition, include, propertyDefinition);
+        return processOneFileAndItsSameIDReplacement(null, removedValue, filesContainerId, itemDefinition, include, propertyDefinition);
     })));
     // let's filter the nulls
     const filteredNewValues = allNewValues.filter((newValue) => newValue !== null);
@@ -66,19 +66,24 @@ exports.processFileListFor = processFileListFor;
  * should be of different id
  * @param newValue the new value
  * @param oldValue the old value
- * @param transitoryId a transitory id on where to store the files (can be changed later)
+ * @param filesContainerId an id on where to store the files (can be changed later)
  * @param itemDefinition the item definition these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
  * @returns a promise for the new file value
  */
-async function processSingleFileFor(newValue, oldValue, transitoryId, itemDefinition, include, propertyDefinition) {
-    // basically we run this asa two step process
-    // first we drop the old value, by using the same id
-    // function giving no new value
-    await processOneFileAndItsSameIDReplacement(null, oldValue, transitoryId, itemDefinition, include, propertyDefinition);
-    // and return with the same id but no old value, create it
-    return await processOneFileAndItsSameIDReplacement(newValue, null, transitoryId, itemDefinition, include, propertyDefinition);
+async function processSingleFileFor(newValue, oldValue, filesContainerId, itemDefinition, include, propertyDefinition) {
+    if (oldValue && oldValue.id === newValue.id) {
+        return await processOneFileAndItsSameIDReplacement(newValue, oldValue, filesContainerId, itemDefinition, include, propertyDefinition);
+    }
+    else {
+        // basically we run this asa two step process
+        // first we drop the old value, by using the same id
+        // function giving no new value
+        await processOneFileAndItsSameIDReplacement(null, oldValue, filesContainerId, itemDefinition, include, propertyDefinition);
+        // and return with the same id but no old value, create it
+        return await processOneFileAndItsSameIDReplacement(newValue, null, filesContainerId, itemDefinition, include, propertyDefinition);
+    }
 }
 exports.processSingleFileFor = processSingleFileFor;
 /**

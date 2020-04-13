@@ -135,7 +135,12 @@ async function standardConfigSetup(currentConfig, packageJSON) {
             message: "The production host name where you might intend to deploy",
             defaultValue: packageJSON.name + ".com",
             validate: (v) => v.replace(/\s/g, "") === v,
-        }
+        },
+        {
+            variableName: "uploadsHostnamePrefix",
+            message: "An url (without protocol) where the upload files are hosted",
+            defaultValue: "/",
+        },
     ]);
     return newConfig;
 }

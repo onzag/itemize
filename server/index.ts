@@ -30,6 +30,7 @@ import { setupIPStack, IPStack } from "./services/ipstack";
 import { setupMailgun } from "./services/mailgun";
 import Mailgun from "mailgun-js";
 import { userRestServices } from "./user/rest";
+import pkgcloud from "pkgcloud";
 
 // TODO comment and document
 
@@ -69,6 +70,8 @@ export interface IAppDataType {
   triggers: ITriggerRegistry;
   ipStack: IPStack,
   mailgun: Mailgun.Mailgun;
+  pkgcloudStorageClient: pkgcloud.storage.Client,
+  pkgcloudUploadsContainer: pkgcloud.storage.Container;
 }
 
 export interface IServerCustomizationDataType {
@@ -205,6 +208,18 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
   });
 }
 
+function getContainerPromisified(client: pkgcloud.storage.Client, containerName: string): Promise<pkgcloud.storage.Container> {
+  return new Promise((resolve, reject) => {
+    client.getContainer(containerName, (err, container) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(container);
+      }
+    });
+  });
+}
+
 /**
  * Initializes the itemize server with its custom configuration
  * @param custom the customization details
@@ -319,6 +334,22 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       domain: sensitiveConfig.mailgunDomain,
     }) : null;
 
+  // due to a bug in the types the create client function is missing
+  // domainId and domainName
+  const pkgcloudStorageClient = pkgcloud.storage.createClient({
+    provider: "openstack",
+    username: sensitiveConfig.openStackUsername,
+    keystoneAuthVersion: 'v3',
+    region: sensitiveConfig.openStackRegion,
+    domainId: "default",
+    domainName: sensitiveConfig.openStackDomainName,
+    password: sensitiveConfig.openStackPassword,
+    authUrl: sensitiveConfig.openStackAuthUrl,
+  } as any);
+
+  const pkgcloudUploadsContainer =
+    await getContainerPromisified(pkgcloudStorageClient, sensitiveConfig.openStackUploadsContainerName);
+
   const appData: IAppDataType = {
     root,
     autocompletes,
@@ -342,6 +373,8 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     },
     ipStack,
     mailgun,
+    pkgcloudStorageClient,
+    pkgcloudUploadsContainer,
   };
 
   initializeApp(appData, custom);

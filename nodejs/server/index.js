@@ -31,6 +31,7 @@ const triggers_1 = require("./user/triggers");
 const ipstack_1 = require("./services/ipstack");
 const mailgun_1 = require("./services/mailgun");
 const rest_2 = require("./user/rest");
+const pkgcloud_1 = __importDefault(require("pkgcloud"));
 // TODO comment and document
 // Setting the parsers, postgresql comes with
 // its own way to return this data and I want it
@@ -148,6 +149,18 @@ function initializeApp(appData, custom) {
         }
     });
 }
+function getContainerPromisified(client, containerName) {
+    return new Promise((resolve, reject) => {
+        client.getContainer(containerName, (err, container) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(container);
+            }
+        });
+    });
+}
 /**
  * Initializes the itemize server with its custom configuration
  * @param custom the customization details
@@ -240,6 +253,19 @@ async function initializeServer(custom = {}) {
             apiKey: sensitiveConfig.mailgunAPIKey,
             domain: sensitiveConfig.mailgunDomain,
         }) : null;
+    // due to a bug in the types the create client function is missing
+    // domainId and domainName
+    const pkgcloudStorageClient = pkgcloud_1.default.storage.createClient({
+        provider: "openstack",
+        username: sensitiveConfig.openStackUsername,
+        keystoneAuthVersion: 'v3',
+        region: sensitiveConfig.openStackRegion,
+        domainId: "default",
+        domainName: sensitiveConfig.openStackDomainName,
+        password: sensitiveConfig.openStackPassword,
+        authUrl: sensitiveConfig.openStackAuthUrl,
+    });
+    const pkgcloudUploadsContainer = await getContainerPromisified(pkgcloudStorageClient, sensitiveConfig.openStackUploadsContainerName);
     const appData = {
         root,
         autocompletes,
@@ -262,6 +288,8 @@ async function initializeServer(custom = {}) {
         },
         ipStack,
         mailgun,
+        pkgcloudStorageClient,
+        pkgcloudUploadsContainer,
     };
     initializeApp(appData, custom);
 }
