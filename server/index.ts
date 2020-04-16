@@ -305,7 +305,23 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
   PropertyDefinition.autocompleteChecker = serverSideAutocompleteChecker.bind(null, autocompletes);
 
-  const cache = new Cache(redisClient, knex, root);
+  // due to a bug in the types the create client function is missing
+  // domainId and domainName
+  const pkgcloudStorageClient = pkgcloud.storage.createClient({
+    provider: "openstack",
+    username: sensitiveConfig.openStackUsername,
+    keystoneAuthVersion: 'v3',
+    region: sensitiveConfig.openStackRegion,
+    domainId: "default",
+    domainName: sensitiveConfig.openStackDomainName,
+    password: sensitiveConfig.openStackPassword,
+    authUrl: sensitiveConfig.openStackAuthUrl,
+  } as any);
+
+  const pkgcloudUploadsContainer =
+    await getContainerPromisified(pkgcloudStorageClient, sensitiveConfig.openStackUploadsContainerName);
+
+  const cache = new Cache(redisClient, knex, pkgcloudUploadsContainer, root);
 
   const server = http.createServer(app);
 
@@ -333,22 +349,6 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       apiKey: sensitiveConfig.mailgunAPIKey,
       domain: sensitiveConfig.mailgunDomain,
     }) : null;
-
-  // due to a bug in the types the create client function is missing
-  // domainId and domainName
-  const pkgcloudStorageClient = pkgcloud.storage.createClient({
-    provider: "openstack",
-    username: sensitiveConfig.openStackUsername,
-    keystoneAuthVersion: 'v3',
-    region: sensitiveConfig.openStackRegion,
-    domainId: "default",
-    domainName: sensitiveConfig.openStackDomainName,
-    password: sensitiveConfig.openStackPassword,
-    authUrl: sensitiveConfig.openStackAuthUrl,
-  } as any);
-
-  const pkgcloudUploadsContainer =
-    await getContainerPromisified(pkgcloudStorageClient, sensitiveConfig.openStackUploadsContainerName);
 
   const appData: IAppDataType = {
     root,

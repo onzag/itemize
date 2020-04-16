@@ -11,9 +11,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sharp_1 = __importDefault(require("sharp"));
-const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const fsAsync = fs_1.default.promises;
+const sql_files_1 = require("./sql-files");
 /**
  * Analyses a single option as written in the shape
  * "name 200x300 cover" or "200x300 cover" or "name 200x300" or "200x300" or "200x" or "x200", etc...
@@ -77,12 +76,9 @@ function manyOptionsAnalysis(value) {
 }
 /**
  * Runs the image conversions and stores them in the specified location
- * @param fileName the file name that is currently in use in the server side
- * @param filePath the file path that is currently in use in the server side with the file name
- * @param propDef the property definition
  * @returns a void promise for when this is done
  */
-async function runImageConversions(fileName, filePath, propDef) {
+async function runImageConversions(imageStream, filePath, fileName, uploadsContainer, propDef) {
     // the properties in question are, smallDimension
     const smallAnalyzed = singleOptionAnalysis(propDef.getSpecialProperty("smallDimension"), "small") || {
         name: "small",
@@ -105,7 +101,7 @@ async function runImageConversions(fileName, filePath, propDef) {
         fit: "cover",
     };
     // so these are the ouputs we are expecting for
-    let outputs = [
+    let imageConversionOutputs = [
         smallAnalyzed,
         mediumAnalyzed,
         largeAnalyzed,
@@ -113,22 +109,32 @@ async function runImageConversions(fileName, filePath, propDef) {
     // but we might have more dimensions that are expected other than that
     const allRemainingSizes = propDef.getSpecialProperty("dimensions");
     if (allRemainingSizes) {
-        outputs = outputs.concat(manyOptionsAnalysis(allRemainingSizes));
+        imageConversionOutputs = imageConversionOutputs.concat(manyOptionsAnalysis(allRemainingSizes));
     }
-    // so we read the file
-    const fileBuffer = await fsAsync.readFile(filePath);
+    const originalImageFilePath = path_1.default.join(filePath, fileName);
     // and now we get the filename without a extension and the dirname
     const fileNameNoExtension = path_1.default.basename(fileName, path_1.default.extname(fileName));
-    const dirName = path_1.default.dirname(filePath);
-    // and we basically create the image for all of those
-    await Promise.all(outputs.map((output) => {
+    // this is the sharp pipeline that will stream the data directly from the network
+    // this stream hasn't been piped before and has been on hold so far
+    const conversionPipeline = sharp_1.default();
+    const conversionPromises = imageConversionOutputs.map((conversionOutput) => {
         // note how we attach the output name before the filename without a extension and make it
         // a jpg extension because that's what we want, the original can be anything
-        const ouputFileName = path_1.default.join(dirName, output.name + "_" + fileNameNoExtension + ".jpg");
-        // this returns a void promise
-        return sharp_1.default(fileBuffer).resize(output.width, output.height, {
-            fit: output.fit,
-        }).jpeg().toFile(ouputFileName);
-    }));
+        const outputFileName = path_1.default.join(filePath, conversionOutput.name + "_" + fileNameNoExtension + ".jpg");
+        // we pass it through a cloned stream for the sharp, and pass the conversion options
+        // note how a converted image is always a jpg image
+        const outputPipeline = conversionPipeline.clone()
+            .resize(conversionOutput.width, conversionOutput.height, {
+            fit: conversionOutput.fit,
+        }).jpeg();
+        return sql_files_1.sqlUploadPipeFile(uploadsContainer, outputPipeline, outputFileName);
+    }).concat([
+        sql_files_1.sqlUploadPipeFile(uploadsContainer, imageStream, originalImageFilePath),
+    ]);
+    // now we pipe the image read stream to the conversion pipeline
+    // that will run the conversions
+    imageStream.pipe(conversionPipeline);
+    // and we basically create the image for all of those
+    await Promise.all(conversionPromises);
 }
 exports.runImageConversions = runImageConversions;

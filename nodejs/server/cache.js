@@ -7,13 +7,9 @@
  *
  * @packageDocumentation
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("../constants");
 const version_null_value_1 = require("./version-null-value");
-const uuid_1 = __importDefault(require("uuid"));
 const sql_1 = require("../base/Root/Module/ItemDefinition/sql");
 const sql_2 = require("../base/Root/Module/sql");
 const sql_files_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files");
@@ -36,10 +32,11 @@ class Cache {
      * @param knex the knex instance
      * @param root the root of itemize
      */
-    constructor(redisClient, knex, root) {
+    constructor(redisClient, knex, uploadsContainer, root) {
         this.redisClient = redisClient;
         this.knex = knex;
         this.root = root;
+        this.uploadsContainer = uploadsContainer;
     }
     /**
      * Sets the listener for the remote interaction with the clients
@@ -130,14 +127,13 @@ class Cache {
      * @returns a total sql combined row value that can be converted into grapqhl
      */
     async requestCreation(itemDefinition, forId, version, value, createdBy, dictionary, parent) {
-        // we create the transitory id that is used to build the folder
-        // structure for where files will be saved
-        const transitoryId = "TEMP" + uuid_1.default.v4().replace(/-/g, "");
         // now we extract the SQL information for both item definition table
         // and the module table, this value is database ready, and hence needs
         // knex and the dictionary to convert fields that need it
-        const sqlIdefData = await sql_1.convertGQLValueToSQLValueForItemDefinition(transitoryId, itemDefinition, value, null, this.knex, dictionary);
-        const sqlModData = await sql_2.convertGQLValueToSQLValueForModule(transitoryId, itemDefinition.getParentModule(), itemDefinition, value, null, this.knex, dictionary);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(itemDefinition, value, null, this.knex, this.uploadsContainer, dictionary);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(itemDefinition.getParentModule(), itemDefinition, value, null, this.knex, this.uploadsContainer, dictionary);
+        const sqlModData = sqlModDataComposed.value;
+        const sqlIdefData = sqlIdefDataComposed.value;
         // this data is added every time when creating
         sqlModData.type = itemDefinition.getQualifiedPathName();
         sqlModData.created_at = this.knex.fn.now();
@@ -178,7 +174,8 @@ class Cache {
             };
         }));
         this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue);
-        await sql_files_1.updateTransitoryIdIfExists(itemDefinition, transitoryId, sqlValue.id.toString());
+        await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+        await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
         const searchResultForThisValue = {
             id: sqlValue.id,
             version: sqlValue.version || null,
@@ -259,8 +256,10 @@ class Cache {
         // that we only want the editingFields to be returned
         // into the SQL value, this is valid in here because
         // we don't want things to be defaulted in the query
-        const sqlIdefData = await sql_1.convertGQLValueToSQLValueForItemDefinition(id.toString(), itemDefinition, update, currentValue, this.knex, dictionary, partialUpdateFields);
-        const sqlModData = await sql_2.convertGQLValueToSQLValueForModule(id.toString(), itemDefinition.getParentModule(), itemDefinition, update, currentValue, this.knex, dictionary, partialUpdateFields);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(itemDefinition, update, currentValue, this.knex, this.uploadsContainer, dictionary, partialUpdateFields);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(itemDefinition.getParentModule(), itemDefinition, update, currentValue, this.knex, this.uploadsContainer, dictionary, partialUpdateFields);
+        const sqlModData = sqlModDataComposed.value;
+        const sqlIdefData = sqlIdefDataComposed.value;
         // now we check if we are updating anything at all
         if (Object.keys(sqlIdefData).length === 0 &&
             Object.keys(sqlModData).length === 0) {
@@ -307,6 +306,8 @@ class Cache {
                 ...updateQueryValueIdef[0],
             };
         }));
+        await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+        await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
         // we return and this executes after it returns
         (async () => {
             await this.forceCacheInto(selfTable, id, version, sqlValue);
@@ -344,7 +345,14 @@ class Cache {
             type: selfTable,
         });
         // we don't want to await any of this
-        sql_files_1.deleteEverythingInTransitoryId(itemDefinition, id.toString());
+        (async () => {
+            try {
+                await sql_files_1.deleteEverythingInFilesContainerId(this.uploadsContainer, itemDefinition, id + "." + (version || null));
+            }
+            catch (err) {
+                // TODO log errors
+            }
+        })();
         (async () => {
             await this.forceCacheInto(selfTable, id, version || null, null);
             const changeEvent = {

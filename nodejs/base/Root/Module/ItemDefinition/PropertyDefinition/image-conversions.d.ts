@@ -5,12 +5,12 @@
  *
  * @packageDocumentation
  */
+/// <reference types="node" />
 import PropertyDefinition from ".";
+import { ReadStream } from "fs";
+import pkgcloud from "pkgcloud";
 /**
  * Runs the image conversions and stores them in the specified location
- * @param fileName the file name that is currently in use in the server side
- * @param filePath the file path that is currently in use in the server side with the file name
- * @param propDef the property definition
  * @returns a void promise for when this is done
  */
-export declare function runImageConversions(fileName: string, filePath: string, propDef: PropertyDefinition): Promise<void>;
+export declare function runImageConversions(imageStream: ReadStream, filePath: string, fileName: string, uploadsContainer: pkgcloud.storage.Container, propDef: PropertyDefinition): Promise<void>;

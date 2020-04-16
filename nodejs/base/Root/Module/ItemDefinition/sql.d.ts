@@ -6,9 +6,10 @@
  * @packageDocumentation
  */
 import ItemDefinition from ".";
-import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue } from "../../sql";
+import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue } from "../../sql";
 import Knex from "knex";
 import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
+import pkgcloud from "pkgcloud";
 /**
  * Provides the table that is necesary to include this item definition as a whole
  * that is, this represents a whole table, that is necessary for this item to
@@ -48,6 +49,7 @@ export declare function convertSQLValueToGQLValueForItemDefinition(itemDefinitio
  * @param itemDefinition the item definition in question
  * @param data the graphql data
  * @param knex the knex instance
+ * @param uploadsContainer the uploads container from openstack
  * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
@@ -58,7 +60,7 @@ export declare function convertSQLValueToGQLValueForItemDefinition(itemDefinitio
  * in a partial field value, don't use partial fields to create
  * @returns a sql value
  */
-export declare function convertGQLValueToSQLValueForItemDefinition(transitoryId: string, itemDefinition: ItemDefinition, data: IGQLArgs, oldData: IGQLValue, knex: Knex, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): Promise<ISQLTableRowValue>;
+export declare function convertGQLValueToSQLValueForItemDefinition(itemDefinition: ItemDefinition, data: IGQLArgs, oldData: IGQLValue, knex: Knex, uploadsContainer: pkgcloud.storage.Container, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): ISQLStreamComposedTableRowValue;
 /**
  * Builds a sql query for an item definition so that it can be
  * queried for searches

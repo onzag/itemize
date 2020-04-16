@@ -57,6 +57,7 @@ exports.getSQLTablesSchemaForModule = getSQLTablesSchemaForModule;
  * @param mod the module in question
  * @param data the graphql data
  * @param knex the knex instance
+ * @param uploadsContainer the uploads container from openstack
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
  * because some properties might treat nulls in a fancy way, when creating
@@ -66,21 +67,26 @@ exports.getSQLTablesSchemaForModule = getSQLTablesSchemaForModule;
  * in a partial field value, don't use partial fields to create
  * @returns a promise for a row value
  */
-async function convertGQLValueToSQLValueForModule(transitoryId, mod, itemDefinition, data, oldData, knex, dictionary, partialFields) {
+function convertGQLValueToSQLValueForModule(mod, itemDefinition, data, oldData, knex, uploadsContainer, dictionary, partialFields) {
     // first we create the row value
     const result = {};
-    await Promise.all(
-    // now we get all the property extensions
-    mod.getAllPropExtensions().map(async (pd) => {
+    const consumeStreamsFns = [];
+    mod.getAllPropExtensions().forEach((pd) => {
         // we only add if partialFields allows it, or we don't have
         // partialFields set
         if ((partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
             !partialFields) {
-            const addedFieldsByProperty = await sql_1.convertGQLValueToSQLValueForProperty(transitoryId, itemDefinition, null, pd, data, oldData, knex, dictionary, "");
-            Object.assign(result, addedFieldsByProperty);
+            const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(itemDefinition, null, pd, data, oldData, knex, uploadsContainer, dictionary, "");
+            Object.assign(result, addedFieldsByProperty.value);
+            consumeStreamsFns.push(addedFieldsByProperty.consumeStreams);
         }
-    }));
-    return result;
+    });
+    return {
+        value: result,
+        consumeStreams: async (containerId) => {
+            await Promise.all(consumeStreamsFns.map(fn => fn(containerId)));
+        }
+    };
 }
 exports.convertGQLValueToSQLValueForModule = convertGQLValueToSQLValueForModule;
 /**

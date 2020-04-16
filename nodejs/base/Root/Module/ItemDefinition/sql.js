@@ -123,6 +123,7 @@ exports.convertSQLValueToGQLValueForItemDefinition = convertSQLValueToGQLValueFo
  * @param itemDefinition the item definition in question
  * @param data the graphql data
  * @param knex the knex instance
+ * @param uploadsContainer the uploads container from openstack
  * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
@@ -133,35 +134,39 @@ exports.convertSQLValueToGQLValueForItemDefinition = convertSQLValueToGQLValueFo
  * in a partial field value, don't use partial fields to create
  * @returns a sql value
  */
-async function convertGQLValueToSQLValueForItemDefinition(transitoryId, itemDefinition, data, oldData, knex, dictionary, partialFields) {
+function convertGQLValueToSQLValueForItemDefinition(itemDefinition, data, oldData, knex, uploadsContainer, dictionary, partialFields) {
     // first we create the row value
     const result = {};
-    await Promise.all([
-        // now we get all the property definitions and do the same
-        // that we did in the SQLtoGQL but in reverse
-        Promise.all(itemDefinition.getAllPropertyDefinitions().map(async (pd) => {
-            // we only add if partialFields allows it, or we don't have
-            // partialFields set
-            if ((partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
-                !partialFields) {
-                const addedFieldsByProperty = await sql_1.convertGQLValueToSQLValueForProperty(transitoryId, itemDefinition, null, pd, data, oldData, knex, dictionary, "");
-                Object.assign(result, addedFieldsByProperty);
-            }
-        })),
-        // also with the items
-        Promise.all(itemDefinition.getAllIncludes().map(async (include) => {
-            // we only add if partialFields allows it, or we don't have
-            // partialFields set
-            const includeNameInPartialFields = include.getQualifiedIdentifier();
-            if ((partialFields && typeof partialFields[includeNameInPartialFields] !== "undefined") ||
-                !partialFields) {
-                const innerPartialFields = !partialFields ? null : partialFields[includeNameInPartialFields];
-                const addedFieldsByInclude = await sql_2.convertGQLValueToSQLValueForInclude(transitoryId, itemDefinition, include, data, oldData, knex, dictionary, innerPartialFields);
-                Object.assign(result, addedFieldsByInclude);
-            }
-        })),
-    ]);
-    return result;
+    const consumeStreamsFns = [];
+    itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
+        // we only add if partialFields allows it, or we don't have
+        // partialFields set
+        if ((partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
+            !partialFields) {
+            const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(itemDefinition, null, pd, data, oldData, knex, uploadsContainer, dictionary, "");
+            Object.assign(result, addedFieldsByProperty.value);
+            consumeStreamsFns.push(addedFieldsByProperty.consumeStreams);
+        }
+    });
+    // also with the items
+    itemDefinition.getAllIncludes().forEach((include) => {
+        // we only add if partialFields allows it, or we don't have
+        // partialFields set
+        const includeNameInPartialFields = include.getQualifiedIdentifier();
+        if ((partialFields && typeof partialFields[includeNameInPartialFields] !== "undefined") ||
+            !partialFields) {
+            const innerPartialFields = !partialFields ? null : partialFields[includeNameInPartialFields];
+            const addedFieldsByInclude = sql_2.convertGQLValueToSQLValueForInclude(itemDefinition, include, data, oldData, knex, uploadsContainer, dictionary, innerPartialFields);
+            Object.assign(result, addedFieldsByInclude.value);
+            consumeStreamsFns.push(addedFieldsByInclude.consumeStreams);
+        }
+    });
+    return {
+        value: result,
+        consumeStreams: async (containerId) => {
+            await Promise.all(consumeStreamsFns.map(fn => fn(containerId)));
+        }
+    };
 }
 exports.convertGQLValueToSQLValueForItemDefinition = convertGQLValueToSQLValueForItemDefinition;
 /**

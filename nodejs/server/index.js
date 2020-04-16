@@ -238,7 +238,20 @@ async function initializeServer(custom = {}) {
     const redisSub = redis_1.default.createClient(redisConfig);
     PropertyDefinition_1.default.indexChecker = server_checkers_1.serverSideIndexChecker.bind(null, knex);
     PropertyDefinition_1.default.autocompleteChecker = server_checkers_1.serverSideAutocompleteChecker.bind(null, autocompletes);
-    const cache = new cache_1.Cache(redisClient, knex, root);
+    // due to a bug in the types the create client function is missing
+    // domainId and domainName
+    const pkgcloudStorageClient = pkgcloud_1.default.storage.createClient({
+        provider: "openstack",
+        username: sensitiveConfig.openStackUsername,
+        keystoneAuthVersion: 'v3',
+        region: sensitiveConfig.openStackRegion,
+        domainId: "default",
+        domainName: sensitiveConfig.openStackDomainName,
+        password: sensitiveConfig.openStackPassword,
+        authUrl: sensitiveConfig.openStackAuthUrl,
+    });
+    const pkgcloudUploadsContainer = await getContainerPromisified(pkgcloudStorageClient, sensitiveConfig.openStackUploadsContainerName);
+    const cache = new cache_1.Cache(redisClient, knex, pkgcloudUploadsContainer, root);
     const server = http_1.default.createServer(app);
     const listener = new listener_1.Listener(buildnumber, redisSub, redisPub, root, cache, knex, server);
     server.listen(config.port, () => {
@@ -253,19 +266,6 @@ async function initializeServer(custom = {}) {
             apiKey: sensitiveConfig.mailgunAPIKey,
             domain: sensitiveConfig.mailgunDomain,
         }) : null;
-    // due to a bug in the types the create client function is missing
-    // domainId and domainName
-    const pkgcloudStorageClient = pkgcloud_1.default.storage.createClient({
-        provider: "openstack",
-        username: sensitiveConfig.openStackUsername,
-        keystoneAuthVersion: 'v3',
-        region: sensitiveConfig.openStackRegion,
-        domainId: "default",
-        domainName: sensitiveConfig.openStackDomainName,
-        password: sensitiveConfig.openStackPassword,
-        authUrl: sensitiveConfig.openStackAuthUrl,
-    });
-    const pkgcloudUploadsContainer = await getContainerPromisified(pkgcloudStorageClient, sensitiveConfig.openStackUploadsContainerName);
     const appData = {
         root,
         autocompletes,

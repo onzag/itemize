@@ -8,6 +8,7 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { CurrentUserProfileStandardInfo } from "./standard-info";
 import { DialogResponsive } from "../../../components/dialog";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import { UserActioner } from "../../../../components/user";
 
 const LogoutDialogStyles = createStyles({
   dialogContent: {

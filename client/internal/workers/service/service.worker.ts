@@ -69,8 +69,7 @@ self.addEventListener("fetch", (event: any) => {
 
   const shouldServeIndex =
     isOurHost &&
-    urlAnalyzed.pathname.indexOf("/rest") !== 0 &&
-    urlAnalyzed.pathname.indexOf("/uploads") !== 0;
+    urlAnalyzed.pathname.indexOf("/rest") !== 0;
 
   const actualEventRequest: Request = shouldServeIndex ?
     new Request("/") : event.request;

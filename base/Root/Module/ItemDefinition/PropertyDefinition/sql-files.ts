@@ -6,17 +6,17 @@
  * @packageDocumentation
  */
 
-// TODO change this to use some form of CDN and not use the hard drive
-
 import PropertyDefinition from ".";
 import ItemDefinition from "..";
 import Include from "../Include";
-import fs, { ReadStream } from "fs";
+import { ReadStream } from "fs";
 import path from "path";
 import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../../constants";
 import { runImageConversions } from "./image-conversions";
 import { IGQLFile } from "../../../../../gql-querier";
-const fsAsync = fs.promises;
+import pkgcloud from "pkgcloud";
+import { ConsumeStreamsFnType } from "../../../sql";
+import sharp from "sharp";
 
 /**
  * Processes an extended list based
@@ -29,14 +29,17 @@ const fsAsync = fs.promises;
  * @param propertyDefinition the property (must be of type file)
  * @returns a promise with the new list with the new values
  */
-export async function processFileListFor(
+export function processFileListFor(
   newValues: IGQLFile[],
   oldValues: IGQLFile[],
-  filesContainerId: string,
+  uploadsContainer: pkgcloud.storage.Container,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-) {
+): {
+  value: IGQLFile[],
+  consumeStreams: ConsumeStreamsFnType;
+} {
   // the values might be null so let's ensure them
   const actualNewValues = newValues || [];
   const actualOldValues = oldValues || [];
@@ -47,46 +50,47 @@ export async function processFileListFor(
     return actualNewValues.findIndex((newValue) => newValue.id === oldValue.id) === -1;
   });
 
-  // and now using the promise let's extract
-  // all this stuff
-  const allNewValues = await Promise.all(
-    // first let's process each file that was
-    // either modified or added
-    actualNewValues.map((newValue) => {
-      // let's pass it to the function that does that
-      // job, pick the old value, if exists
-      const relativeOldValue = actualOldValues.find((oldValue) => oldValue.id === newValue.id) || null;
-      return processOneFileAndItsSameIDReplacement(
-        newValue,
-        relativeOldValue,
-        filesContainerId,
-        itemDefinition,
-        include,
-        propertyDefinition,
-      );
-    }).concat(removedFiles.map((removedValue) => {
-      // for the removed it's the same but the new value
-      // is null
-      return processOneFileAndItsSameIDReplacement(
-        null,
-        removedValue,
-        filesContainerId,
-        itemDefinition,
-        include,
-        propertyDefinition,
-      );
-    })),
-  );
+  // first let's process each file that was
+  // either modified or added
+  const allNewValues = actualNewValues.map((newValue) => {
+    // let's pass it to the function that does that
+    // job, pick the old value, if exists
+    const relativeOldValue = actualOldValues.find((oldValue) => oldValue.id === newValue.id) || null;
+    return processOneFileAndItsSameIDReplacement(
+      newValue,
+      relativeOldValue,
+      uploadsContainer,
+      itemDefinition,
+      include,
+      propertyDefinition,
+    );
+  }).concat(removedFiles.map((removedValue) => {
+    // for the removed it's the same but the new value
+    // is null
+    return processOneFileAndItsSameIDReplacement(
+      null,
+      removedValue,
+      uploadsContainer,
+      itemDefinition,
+      include,
+      propertyDefinition,
+    );
+  }))
 
   // let's filter the nulls
-  const filteredNewValues = allNewValues.filter((newValue) => newValue !== null);
+  let filteredNewValues = allNewValues.map((v) => v.value).filter((newValue) => newValue !== null);
   if (filteredNewValues.length === 0) {
-    // if it's emmpty then return null
-    return null;
+    // if it's emmpty then it is null
+    filteredNewValues = null;
   }
 
   // return what we've got
-  return filteredNewValues;
+  return {
+    value: filteredNewValues,
+    consumeStreams: async (containerId: string) => {
+      await Promise.all(allNewValues.map(fn => fn.consumeStreams(containerId)));
+    }
+  }
 }
 
 /**
@@ -95,25 +99,27 @@ export async function processFileListFor(
  * should be of different id
  * @param newValue the new value
  * @param oldValue the old value
- * @param filesContainerId an id on where to store the files (can be changed later)
  * @param itemDefinition the item definition these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
  * @returns a promise for the new file value
  */
-export async function processSingleFileFor(
+export function processSingleFileFor(
   newValue: IGQLFile,
   oldValue: IGQLFile,
-  filesContainerId: string,
+  uploadsContainer: pkgcloud.storage.Container,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-) {
+): {
+  value: IGQLFile,
+  consumeStreams: ConsumeStreamsFnType;
+} {
   if (oldValue && oldValue.id === newValue.id) {
-    return await processOneFileAndItsSameIDReplacement(
+    return processOneFileAndItsSameIDReplacement(
       newValue,
       oldValue,
-      filesContainerId,
+      uploadsContainer,
       itemDefinition,
       include,
       propertyDefinition,
@@ -122,23 +128,30 @@ export async function processSingleFileFor(
     // basically we run this asa two step process
     // first we drop the old value, by using the same id
     // function giving no new value
-    await processOneFileAndItsSameIDReplacement(
+    const initialStepOutput = processOneFileAndItsSameIDReplacement(
       null,
       oldValue,
-      filesContainerId,
+      uploadsContainer,
       itemDefinition,
       include,
       propertyDefinition,
     );
     // and return with the same id but no old value, create it
-    return await processOneFileAndItsSameIDReplacement(
+    const secondStepOutput = processOneFileAndItsSameIDReplacement(
       newValue,
       null,
-      filesContainerId,
+      uploadsContainer,
       itemDefinition,
       include,
       propertyDefinition,
     );
+
+    return {
+      value: secondStepOutput.value,
+      consumeStreams: async (containerId: string) => {
+        await Promise.all([initialStepOutput, secondStepOutput].map(fn => fn.consumeStreams(containerId)));
+      }
+    }
   }
 }
 
@@ -146,52 +159,58 @@ export async function processSingleFileFor(
  * Processes a single file
  * @param newVersion the new version of the file with the same id (or null, removes)
  * @param oldVersion the old version of the file with the same id (or null, creates)
- * @param transitoryId the transitory identifier
  * @param itemDefinition the item definition
  * @param include the include (or null)
  * @param propertyDefinition the property
  * @returns a promise for the new the new file value
  */
-async function processOneFileAndItsSameIDReplacement(
+function processOneFileAndItsSameIDReplacement(
   newVersion: IGQLFile,
   oldVersion: IGQLFile,
-  transitoryId: string,
+  uploadsContainer: pkgcloud.storage.Container,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-) {
-  // we calculate the paths where we are saving this
-  // /dist/uploads/MOD_module__IDEF_item_definition/:id/ITEM_etc/property...
-  const idefLocationPath = path.join("dist", "uploads", itemDefinition.getQualifiedPathName());
-  const transitoryLocationPath = path.join(idefLocationPath, transitoryId);
-  const includeLocationPath = include ?
-    path.join(transitoryLocationPath, include.getQualifiedIdentifier()) : transitoryLocationPath;
-  const propertyLocationPath = path.join(includeLocationPath, propertyDefinition.getId());
-
+): {
+  value: IGQLFile,
+  consumeStreams: ConsumeStreamsFnType;
+} {
   // if the new version is null, this means that the old file
   // is meant to be removed
   if (newVersion === null) {
-    // however we must still check
-    // is there an old version actually?
-    if (
-      oldVersion &&
-      // check that the entire location where its folder is supposed
-      // to be exists
-      await checkEntireComboExists(
-        idefLocationPath,
-        transitoryLocationPath,
-        includeLocationPath,
-        propertyLocationPath,
-        path.join(propertyLocationPath, oldVersion.id),
-      )
-    ) {
-      // and let's remove that folder
-      removeFilesFor(
-        path.join(propertyLocationPath, oldVersion.id),
-      );
-    }
-    return null;
+    return {
+      value: null,
+      consumeStreams: async (containerId: string) => {
+        // however we must still check
+        // is there an old version actually?
+        if (oldVersion) {
+          // and let's remove that folder, note how we don't
+          // really wait for this, we detatch this function
+          await (async () => {
+            const idefLocationPath = itemDefinition.getQualifiedPathName();
+            const transitoryLocationPath = path.join(idefLocationPath, containerId);
+            const includeLocationPath = include ?
+              path.join(transitoryLocationPath, include.getQualifiedIdentifier()) : transitoryLocationPath;
+            const propertyLocationPath = path.join(includeLocationPath, propertyDefinition.getId());
+            const fileLocationPath = path.join(propertyLocationPath, oldVersion.id);
+            try {
+              await removeFolderFor(uploadsContainer, fileLocationPath);
+            } catch (err) {
+              // TODO something with error
+            }
+          })();
+        }
+      }
+    };
   }
+
+  // given src can be null or undefined
+  // we ensure this it doesn't contain any
+  // just for consistency
+  const newVersionWithoutSrc = {
+    ...newVersion,
+  };
+  delete newVersionWithoutSrc.src;
 
   // if we don't provide a data
   // stream, assume this is either changing
@@ -202,19 +221,26 @@ async function processOneFileAndItsSameIDReplacement(
     // allowed, because this means you are trying
     // to set a url by hand which could be a vulnerability
     // as only trusted local files are allowed
-    if (!newVersion) {
+    if (!oldVersion) {
       // we remove the url and trust the rest of the data
       // the link will be broken, we don't store anything
       return {
-        ...newVersion,
-        url: "",
+        value: {
+          ...newVersionWithoutSrc,
+          url: "",
+        },
+        consumeStreams: () => null,
       };
     }
+    
     // otherwise if we had an old value, we reject
     // any url change, and use the old url
     return {
-      ...newVersion,
-      url: oldVersion.url,
+      value: {
+        ...newVersionWithoutSrc,
+        url: oldVersion.url,
+      },
+      consumeStreams: () => null,
     };
   }
 
@@ -224,129 +250,95 @@ async function processOneFileAndItsSameIDReplacement(
   // so we reject the data stream
   if (newVersion.src && oldVersion) {
     return {
-      ...newVersion,
-      url: oldVersion.url,
+      value: {
+        ...newVersionWithoutSrc,
+        url: oldVersion.url,
+      },
+      consumeStreams: () => null,
     };
   }
 
-  // the file path is a directory where the files are contained
-  // the reason why it's a directory is because the file can have
-  // different variations in the case of media types
-  const filePath = path.join(propertyLocationPath, newVersion.id);
-  // we get the standard url, basically it's like the path, but without
-  // anything to it regarding the folder structure
-  let standardURLPath = path.join(
-    itemDefinition.getQualifiedPathName(),
-    transitoryId,
-  );
-  if (include) {
-    standardURLPath = path.join(standardURLPath, include.getQualifiedIdentifier());
-  }
-  standardURLPath = path.join(standardURLPath, propertyDefinition.getId(), newVersion.id);
+  const curatedFileName = newVersion.name.replace(/\s/g, "_").replace(/\-/g,"_").replace(/[^A-Za-z0-9_\.]/g, "x");
 
-  // now we ensure the file path, basically,
-  // make folders and folder if they don't exist
-  // until we have our file folder
-  try {
-    await ensureEntireComboExists(
-      idefLocationPath,
-      transitoryLocationPath,
-      includeLocationPath,
-      propertyLocationPath,
-      filePath,
-    );
+  const value = {
+    ...newVersionWithoutSrc,
+    url: curatedFileName,
+  };
+  const valueWithStream = {
+    ...newVersion,
+    url: curatedFileName,
+  };
+  return {
+    value,
+    consumeStreams: async (containerId: string) => {
+      // we calculate the paths where we are saving this
+      // /MOD_module__IDEF_item_definition/:id.:version/ITEM_etc/property...
+      const idefLocationPath = itemDefinition.getQualifiedPathName();
+      const transitoryLocationPath = path.join(idefLocationPath, containerId);
+      const includeLocationPath = include ?
+        path.join(transitoryLocationPath, include.getQualifiedIdentifier()) : transitoryLocationPath;
+      const propertyLocationPath = path.join(includeLocationPath, propertyDefinition.getId());
 
-    // and now we call the function
-    // that actually adds the file
-    const {
-      url,
-    } = await addFileFor(
-      filePath,
-      standardURLPath,
-      newVersion,
-      propertyDefinition,
-    );
-    // replace the url with that
-    const appliedValue = {
-      ...newVersion,
-      url,
-    };
-    // delete the stream
-    delete appliedValue.src;
-    return appliedValue;
-  } catch (err) {
-    console.error(err);
-    // build a fallback without an url
-    // as it failed to upload
-    const appliedFallbackValue = {
-      ...newVersion,
-      url: "",
-    };
-    delete appliedFallbackValue.src;
-    return appliedFallbackValue;
-  }
-}
+      // the file path is a directory where the files are contained
+      // the reason why it's a directory is because the file can have
+      // different variations in the case of media types
+      const filePath = path.join(propertyLocationPath, newVersion.id);
 
-/**
- * Updates a transitory id for an item definition
- * that is /dist/uploads/MOD_module__IDEF_item/:id
- * and changes it to something else so that it belongs
- * to that element
- * @param itemDefinition the item defintion in question
- * @param originalId the original id that was used
- * @param newId the new id
- * @returns a void promise for when it's done
- */
-export async function updateTransitoryIdIfExists(
-  itemDefinition: ItemDefinition,
-  originalId: string,
-  newId: string,
-): Promise<void> {
-  // we basically just rename that folder
-  const idefLocationPath = path.join("dist", "uploads", itemDefinition.getQualifiedPathName());
-  const originalTransitoryLocation = path.join(idefLocationPath, originalId);
-  const newTransitoryLocation = path.join(idefLocationPath, newId);
-
-  if (await checkExists(originalTransitoryLocation)) {
-    await fsAsync.rename(originalTransitoryLocation, newTransitoryLocation);
+      // we pass the file with the stream property in it
+      await addFileFor(
+        filePath,
+        curatedFileName,
+        uploadsContainer,
+        valueWithStream,
+        propertyDefinition,
+      )
+    }
   }
 }
 
 /**
  * Deletes the folder that contains all
  * the file data
+ * @param uploadsContainer the container that contains the file
  * @param itemDefinition the item definition in question
- * @param transitoryId the transitory id to drop
+ * @param filesContainerId the transitory id to drop
  * @returns a void promise from when this is done
  */
-export async function deleteEverythingInTransitoryId(
+export function deleteEverythingInFilesContainerId(
+  uploadsContainer: pkgcloud.storage.Container,
   itemDefinition: ItemDefinition,
-  transitoryId: string,
+  filesContainerId: string,
 ): Promise<void> {
   // find the transitory location path
-  const idefLocationPath = path.join("dist", "uploads", itemDefinition.getQualifiedPathName());
-  const transitoryLocationPath = path.join(idefLocationPath, transitoryId);
+  const idefLocationPath = itemDefinition.getQualifiedPathName();
+  const filesContainerPath = path.join(idefLocationPath, filesContainerId);
 
-  // check that it exists
-  if (await checkExists(idefLocationPath) && await checkExists(transitoryLocationPath)) {
-    // and remove it
-    try {
-      await fsAsync.rmdir(transitoryLocationPath, {recursive: true});
-    } catch (err) {
-      console.error(err);
-      // ignore errors, leave an orphaned folder
-    }
-  }
+  return removeFolderFor(uploadsContainer, filesContainerPath);
 }
 
-/**
- * does the same as the previous function but does not check
- * @param mainFilePath the path to drop
- */
-function removeFilesFor(
-  mainFilePath: string,
-) {
-  fsAsync.rmdir(mainFilePath, {recursive: true});
+async function removeFolderFor(
+  uploadsContainer: pkgcloud.storage.Container,
+  mainPath: string,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    (uploadsContainer as any).getFiles({
+      prefix: mainPath,
+    }, (err: pkgcloud.ClientError, files: pkgcloud.storage.File[]) => {
+      if (err) {
+        reject(err);
+      } else if (files && files.length) {
+        (uploadsContainer.client as any).bulkDelete(uploadsContainer, files, (err: pkgcloud.ClientError) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      } else {
+        resolve();
+      }
+    });
+  });
 }
 
 /**
@@ -360,116 +352,48 @@ function removeFilesFor(
  */
 async function addFileFor(
   mainFilePath: string,
-  standardURLPath: string,
+  curatedFileName: string,
+  uploadsContainer: pkgcloud.storage.Container,
   value: IGQLFile,
   propertyDefinition: PropertyDefinition,
-): Promise<{
-  url: string,
-  type: string,
-}> {
-  const { filename, mimetype, createReadStream } = await value.src;
+): Promise<void> {
+  const { createReadStream } = await value.src;
 
-  const storedPath = path.join(mainFilePath, filename);
   const stream: ReadStream = createReadStream();
-  const writeStream = fs.createWriteStream(storedPath);
-  stream.pipe(writeStream);
+  const isImage = FILE_SUPPORTED_IMAGE_TYPES.includes(value.type);
+  const needsImageProcessing = isImage && !value.type.startsWith("svg");
+  if (needsImageProcessing) {
+    await runImageConversions(
+      stream,
+      mainFilePath,
+      curatedFileName,
+      uploadsContainer,
+      propertyDefinition,
+    );
+  } else {
+    await sqlUploadPipeFile(
+      uploadsContainer,
+      stream,
+      path.join(mainFilePath, curatedFileName),
+    );
+  }
+}
+
+export async function sqlUploadPipeFile(
+  uploadsContainer: pkgcloud.storage.Container,
+  readStream: ReadStream | sharp.Sharp,
+  remote: string,
+): Promise<void> {
+  const writeStream = uploadsContainer.client.upload({
+    container: uploadsContainer as any,
+    remote,
+  });
+  readStream.pipe(writeStream);
 
   return new Promise((resolve, reject) => {
     writeStream.on("finish", () => {
-      resolve({
-        url: path.join("/rest/uploads", path.join(standardURLPath, filename)),
-        type: mimetype.toString(),
-      });
-
-      const isImage = FILE_SUPPORTED_IMAGE_TYPES.includes(value.type);
-      if (isImage && !value.type.startsWith("svg")) {
-        runImageConversions(
-          filename,
-          storedPath,
-          propertyDefinition,
-        );
-      }
+      resolve();
     });
     writeStream.on("error", reject);
   });
-}
-
-/**
- * Checks that all these folders exists
- * @param idefLocationPath eg /dist/uploads/MOD_module__IDEF_item
- * @param transitoryLocationPath eg /dist/uploads/MOD_module__IDEF_item/1
- * @param includeLocationPath eg /dist/uploads/MOD_module__IDEF_item/1/ITEM_item
- * @param propertyLocationPath eg /dist/uploads/MOD_module__IDEF_item/1/property
- * @param filePath eg /dist/uploads/MOD_module__IDEF_item/1/property/FILE0000001
- */
-async function checkEntireComboExists(
-  idefLocationPath: string,
-  transitoryLocationPath: string,
-  includeLocationPath: string,
-  propertyLocationPath: string,
-  filePath: string,
-) {
-  return (
-    await checkExists(idefLocationPath) &&
-    await checkExists(transitoryLocationPath) &&
-    (transitoryLocationPath === includeLocationPath || await checkExists(includeLocationPath)) &&
-    await checkExists(propertyLocationPath) &&
-    await checkExists(filePath)
-  );
-}
-
-/**
- * Builds all these directories if they don't exist
- * @param idefLocationPath eg /dist/uploads/MOD_module__IDEF_item
- * @param transitoryLocationPath eg /dist/uploads/MOD_module__IDEF_item/1
- * @param includeLocationPath eg /dist/uploads/MOD_module__IDEF_item/1/ITEM_item
- * @param propertyLocationPath eg /dist/uploads/MOD_module__IDEF_item/1/property
- * @param filePath eg /dist/uploads/MOD_module__IDEF_item/1/property/FILE0000001
- * @returns a void promise from when it has been ensured
- */
-async function ensureEntireComboExists(
-  idefLocationPath: string,
-  transitoryLocationPath: string,
-  includeLocationPath: string,
-  propertyLocationPath: string,
-  filePath: string,
-) {
-  if (await checkExists(filePath)) {
-    return;
-  }
-
-  if (!await checkExists(idefLocationPath)) {
-    await fsAsync.mkdir(idefLocationPath);
-  }
-  if (!await checkExists(transitoryLocationPath)) {
-    await fsAsync.mkdir(transitoryLocationPath);
-  }
-  if (
-    transitoryLocationPath !== includeLocationPath &&
-    !await checkExists(includeLocationPath)
-  ) {
-    await fsAsync.mkdir(includeLocationPath);
-  }
-  if (!await checkExists(propertyLocationPath)) {
-    await fsAsync.mkdir(propertyLocationPath);
-  }
-
-  await fsAsync.mkdir(filePath);
-}
-
-/**
- * checks if a file exists
- * @param location the path
- * @returns a boolean promise for when it has been checked
- */
-async function checkExists(
-  location: string,
-) {
-  let exists = true;
-  try {
-    await fsAsync.access(location, fs.constants.F_OK);
-  } catch (e) {
-    exists = false;
-  }
-  return exists;
 }

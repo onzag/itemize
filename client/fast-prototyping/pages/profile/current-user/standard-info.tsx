@@ -2,7 +2,7 @@ import React from "react";
 import { IActionSubmitOptions } from "../../../../providers/item-definition";
 import { I18nReadMany, I18nRead } from "../../../../components/localization";
 import { Entry, Reader } from "../../../../components/property";
-import { Button, Box, Paper, createStyles, withStyles, WithStyles, Divider } from "@material-ui/core";
+import { Button, Box, Paper, createStyles, withStyles, WithStyles, Divider, CircularProgress } from "@material-ui/core";
 import { SubmitButton } from "../../../components/buttons";
 import { DifferingPropertiesRetriever } from "../../../../components/item-definition";
 import { DialogResponsive } from "../../../components/dialog";
@@ -10,7 +10,10 @@ import DoneIcon from "@material-ui/icons/Done";
 import { IPropertyDefinitionState } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import DoneOutline from "@material-ui/icons/DoneOutline";
+import MailOutline from "@material-ui/icons/MailOutline";
 import { AvatarRenderer } from "../../../components/avatar";
+import { UserActioner } from "../../../../components/user";
+import Snackbar from "../../../components/snackbar";
 
 interface CustomConfirmationDialogProps {
   isActive: boolean;
@@ -62,7 +65,25 @@ const currentUserProfileStandardInfoStyles = createStyles({
     display: "flex",
     justifyContent: "flex-end",
     paddingTop: "1.2rem",
-  }
+  },
+  alertButtonValidateEmailContainer: {
+    paddingTop: "0.75rem",
+  },
+  alertButtonValidateEmailProgressWrapper: {
+    position: "relative",
+    display: "inline-block",
+  },
+  alertButtonValidateEmailProgressElement: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12,
+  },
+  emailInButton: {
+    textTransform: "none",
+    opacity: 0.7,
+  },
 });
 
 export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStandardInfoStyles)
@@ -95,9 +116,41 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
                         <I18nRead capitalize={true} id="missing_email_validation_warning_title"/>
                       </AlertTitle>
                       <I18nRead id="missing_email_validation_warning"/>
-                      <Button>
-                        <I18nRead capitalize={true} id="missing_email_validation_warning_action"/>
-                      </Button>
+                      <div className={props.classes.alertButtonValidateEmailContainer}>
+                        <UserActioner>
+                          {(actioner) => (
+                            <React.Fragment>
+                              <div className={props.classes.alertButtonValidateEmailProgressWrapper}>
+                                <Button
+                                  variant="outlined"
+                                  color="secondary"
+                                  endIcon={<MailOutline/>}
+                                  onClick={actioner.sendValidateEmail}
+                                  disabled={actioner.statefulSendingValidateEmail}
+                                >
+                                  <I18nRead capitalize={true} id="missing_email_validation_warning_action"/>
+                                  <i className={props.classes.emailInButton}>&nbsp;{emailState.stateAppliedValue}</i>
+                                </Button>
+                                {
+                                  actioner.statefulSendingValidateEmail ?
+                                  <CircularProgress size={24} className={props.classes.alertButtonValidateEmailProgressElement}/> :
+                                  null
+                                }
+                              </div>
+                              <Snackbar
+                                i18nDisplay={actioner.statefulError}
+                                open={!!actioner.statefulError}
+                                onClose={actioner.dismissStatefulError}
+                              />
+                              <Snackbar
+                                i18nDisplay="missing_email_validation_warning_action_success"
+                                open={actioner.statefulSendValidateEmailSuccessful}
+                                onClose={actioner.dismissStatefulSendValidateEmailSuccessful}
+                              />
+                            </React.Fragment>
+                          )}
+                        </UserActioner>
+                      </div>
                     </Alert>
                   )
                 }

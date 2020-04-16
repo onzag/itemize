@@ -7,7 +7,7 @@
 
 import { PropertyDefinitionSupportedType } from "./types";
 import PropertyDefinition from "../PropertyDefinition";
-import { ISQLTableRowValue, ISQLTableDefinitionType } from "../../../sql";
+import { ISQLTableRowValue, ISQLTableDefinitionType, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../../../sql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces";
 import Knex from "knex";
 import ItemDefinition from "..";
@@ -15,6 +15,7 @@ import Include from "../Include";
 import { processFileListFor, processSingleFileFor } from "./sql-files";
 import { IGQLArgs, IGQLValue } from "../../../../../gql-querier";
 import { SQL_CONSTRAINT_PREFIX } from "../../../../../constants";
+import pkgcloud from "pkgcloud";
 
 /**
  * Provides the sql function that defines the schema that is used to build
@@ -292,7 +293,6 @@ export function convertSQLValueToGQLValueForProperty(
 /**
  * Converts a graphql value into a sql value, that is graphql data into row
  * data to be immediately added to the database as it is
- * @param filesContainerId a folder that will contain the files for this item definition
  * @param itemDefinition the item definition in question
  * @param include an include if exist where the property resides
  * @param propertyDefinition the property definition in question
@@ -304,17 +304,17 @@ export function convertSQLValueToGQLValueForProperty(
  * @returns a promise with the partial sql row value to be inputted, note
  * that this is a promise because data streams need to be processed
  */
-export async function convertGQLValueToSQLValueForProperty(
-  filesContainerId: string,
+export function convertGQLValueToSQLValueForProperty(
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
   data: IGQLArgs,
   oldData: IGQLValue,
   knex: Knex,
+  uploadsContainer: pkgcloud.storage.Container,
   dictionary: string,
   prefix: string,
-): Promise<ISQLTableRowValue> {
+): ISQLStreamComposedTableRowValue {
   // and this is the value of the property, again, properties
   // are not prefixed, they are either in their own object
   // or in the root
@@ -336,36 +336,46 @@ export async function convertGQLValueToSQLValueForProperty(
     gqlPropertyValue = null;
   }
 
+  let consumeStreams: ConsumeStreamsFnType;
   const description = propertyDefinition.getPropertyDefinitionDescription();
   if (description.gqlAddFileToFields) {
     const oldValue: any = (oldData && oldData[propertyDefinition.getId()]) || null;
     const newValue = gqlPropertyValue;
     if (description.gqlList) {
-      gqlPropertyValue = await processFileListFor(
+      const processedValue = processFileListFor(
         newValue,
         oldValue,
-        filesContainerId,
+        uploadsContainer,
         itemDefinition,
         include,
         propertyDefinition,
       );
+      gqlPropertyValue = processedValue.value;
+      consumeStreams = processedValue.consumeStreams;
     } else {
-      gqlPropertyValue = await processSingleFileFor(
+      const processedValue = processSingleFileFor(
         newValue,
         oldValue,
-        filesContainerId,
+        uploadsContainer,
         itemDefinition,
         include,
         propertyDefinition,
       );
+      gqlPropertyValue = processedValue.value;
+      consumeStreams = processedValue.consumeStreams;
     }
+  } else {
+    consumeStreams = () => null;
   }
 
   // so we need the sql in function, from the property description
   const sqlIn = propertyDefinition.getPropertyDefinitionDescription().sqlIn;
 
   // we return as it is
-  return sqlIn(gqlPropertyValue, prefix, propertyDefinition.getId(), propertyDefinition, knex, dictionary);
+  return {
+    value: sqlIn(gqlPropertyValue, prefix, propertyDefinition.getId(), propertyDefinition, knex, dictionary),
+    consumeStreams,
+  };
 }
 
 /**

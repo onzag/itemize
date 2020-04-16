@@ -11,7 +11,7 @@ import { RedisClient } from "redis";
 import Knex from "knex";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX } from "../constants";
-import { ISQLTableRowValue } from "../base/Root/sql";
+import { ISQLTableRowValue, ISQLStreamComposedTableRowValue } from "../base/Root/sql";
 import { IGQLSearchResult, IGQLArgs, IGQLValue } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
@@ -20,10 +20,11 @@ import Root from "../base/Root";
 import uuid from "uuid";
 import { convertGQLValueToSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
-import { updateTransitoryIdIfExists, deleteEverythingInTransitoryId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
+import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
 import { IOwnedSearchRecordsAddedEvent, IParentedSearchRecordsAddedEvent } from "../base/remote-protocol";
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
 import { EndpointError } from "../base/errors";
+import pkgcloud from "pkgcloud";
 
 const CACHE_EXPIRES_DAYS = 2;
 
@@ -36,6 +37,7 @@ const CACHE_EXPIRES_DAYS = 2;
 export class Cache {
   private redisClient: RedisClient;
   private knex: Knex;
+  private uploadsContainer: pkgcloud.storage.Container;
   private root: Root;
   private listener: Listener;
 
@@ -49,10 +51,11 @@ export class Cache {
    * @param knex the knex instance
    * @param root the root of itemize
    */
-  constructor(redisClient: RedisClient, knex: Knex, root: Root) {
+  constructor(redisClient: RedisClient, knex: Knex, uploadsContainer: pkgcloud.storage.Container, root: Root) {
     this.redisClient = redisClient;
     this.knex = knex;
     this.root = root;
+    this.uploadsContainer = uploadsContainer;
   }
   /**
    * Sets the listener for the remote interaction with the clients
@@ -158,30 +161,28 @@ export class Cache {
       type: string,
     }
   ): Promise<ISQLTableRowValue> {
-    // we create the transitory id that is used to build the folder
-    // structure for where files will be saved
-    const transitoryId = "TEMP" + uuid.v4().replace(/-/g, "");
-
     // now we extract the SQL information for both item definition table
     // and the module table, this value is database ready, and hence needs
     // knex and the dictionary to convert fields that need it
-    const sqlIdefData: any = await convertGQLValueToSQLValueForItemDefinition(
-      transitoryId,
+    const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForItemDefinition(
       itemDefinition,
       value,
       null,
       this.knex,
+      this.uploadsContainer,
       dictionary,
     );
-    const sqlModData: any = await convertGQLValueToSQLValueForModule(
-      transitoryId,
+    const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
       itemDefinition.getParentModule(),
       itemDefinition,
       value,
       null,
       this.knex,
+      this.uploadsContainer,
       dictionary,
     );
+    const sqlModData: ISQLTableRowValue = sqlModDataComposed.value;
+    const sqlIdefData: ISQLTableRowValue = sqlIdefDataComposed.value;
 
     // this data is added every time when creating
     sqlModData.type = itemDefinition.getQualifiedPathName();
@@ -233,11 +234,8 @@ export class Cache {
 
     this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue);
 
-    await updateTransitoryIdIfExists(
-      itemDefinition,
-      transitoryId,
-      sqlValue.id.toString(),
-    );
+    await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+    await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
 
     const searchResultForThisValue: IGQLSearchResult = {
       id: sqlValue.id,
@@ -351,25 +349,27 @@ export class Cache {
     // that we only want the editingFields to be returned
     // into the SQL value, this is valid in here because
     // we don't want things to be defaulted in the query
-    const sqlIdefData: any = await convertGQLValueToSQLValueForItemDefinition(
-      id.toString(),
+    const sqlIdefDataComposed = convertGQLValueToSQLValueForItemDefinition(
       itemDefinition,
       update,
       currentValue,
       this.knex,
+      this.uploadsContainer,
       dictionary,
       partialUpdateFields,
     );
-    const sqlModData: any = await convertGQLValueToSQLValueForModule(
-      id.toString(),
+    const sqlModDataComposed = convertGQLValueToSQLValueForModule(
       itemDefinition.getParentModule(),
       itemDefinition,
       update,
       currentValue,
       this.knex,
+      this.uploadsContainer,
       dictionary,
       partialUpdateFields,
     );
+    const sqlModData: ISQLTableRowValue = sqlModDataComposed.value;
+    const sqlIdefData: ISQLTableRowValue = sqlIdefDataComposed.value;
 
     // now we check if we are updating anything at all
     if (
@@ -439,6 +439,9 @@ export class Cache {
       }),
     );
 
+    await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+    await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+
     // we return and this executes after it returns
     (async () => {
       await this.forceCacheInto(selfTable, id, version, sqlValue);
@@ -488,10 +491,17 @@ export class Cache {
     });
 
     // we don't want to await any of this
-    deleteEverythingInTransitoryId(
-      itemDefinition,
-      id.toString(),
-    );
+    (async () => {
+      try {
+        await deleteEverythingInFilesContainerId(
+          this.uploadsContainer,
+          itemDefinition,
+          id + "." + (version || null),
+        );
+      } catch (err) {
+        // TODO log errors
+      }
+    })();
     (async () => {
       await this.forceCacheInto(selfTable, id, version || null, null);
       const changeEvent: IChangedFeedbackEvent = {

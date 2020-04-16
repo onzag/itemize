@@ -197,7 +197,6 @@ export default function restServices(appData: IAppDataType) {
     }
     return express.static(path.resolve(path.join("dist", "data")))(req, res, next);
   });
-  router.use("/uploads", express.static(path.resolve(path.join("dist", "uploads"))));
 
   // now let's get all modules
   appData.root.getAllModules().forEach(buildRouteForModule);

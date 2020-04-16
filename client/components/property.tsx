@@ -8,6 +8,8 @@ import PropertyView, { RawBasePropertyView } from "../internal/components/Proper
 import PropertyEntry from "../internal/components/PropertyEntry";
 import PropertySetter from "../internal/components/PropertySetter";
 import { IncludeContext } from "../providers/include";
+import { fileURLAbsoluter, fileArrayURLAbsoluter } from "./util";
+import { IGQLFile } from "../../gql-querier";
 
 type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search";
 
@@ -109,6 +111,28 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "ent
 
                 if (type === "read") {
                   if (propertyState) {
+                    const propertyDescription = property.getPropertyDefinitionDescription();
+                    if (propertyDescription.gqlAddFileToFields) {
+                      if (!propertyDescription.gqlList) {
+                        return props.children(fileURLAbsoluter(
+                          propertyState.value as IGQLFile,
+                          itemDefinitionContextualValue.idef,
+                          itemDefinitionContextualValue.forId,
+                          itemDefinitionContextualValue.forVersion,
+                          includeContextualValue && includeContextualValue.include,
+                          property,
+                        ), propertyState);
+                      } else {
+                        return props.children(fileArrayURLAbsoluter(
+                          propertyState.value as IGQLFile[],
+                          itemDefinitionContextualValue.idef,
+                          itemDefinitionContextualValue.forId,
+                          itemDefinitionContextualValue.forVersion,
+                          includeContextualValue && includeContextualValue.include,
+                          property,
+                        ), propertyState);
+                      }
+                    }
                     return props.children(propertyState.value, propertyState);
                   }
                   if (isMetaProperty) {
@@ -178,7 +202,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "ent
                   return (
                     <PropertyEntry
                       itemDefinition={itemDefinitionContextualValue.idef}
-                      include={includeContextualValue.include}
+                      include={(includeContextualValue && includeContextualValue.include) || null}
                       property={property}
                       state={propertyState}
                       onChange={onChange}

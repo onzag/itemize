@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { IGQLFile } from "../../gql-querier";
+import ItemDefinition from "../../base/Root/Module/ItemDefinition";
+import Include from "../../base/Root/Module/ItemDefinition/Include";
+import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 interface ITitleSetterProps {
   children: string;
@@ -51,6 +54,52 @@ export class TitleReader extends React.Component<{}, {}> {
   }
   public render() {
     return document.title;
+  }
+}
+
+export function fileArrayURLAbsoluter(
+  files: IGQLFile[],
+  itemDefinition: ItemDefinition,
+  id: number,
+  version: string,
+  include: Include,
+  property: PropertyDefinition,
+) {
+  if (files === null) {
+    return null;
+  }
+  return files.map((file) => fileURLAbsoluter(file, itemDefinition, id, version, include, property));
+}
+
+export function fileURLAbsoluter(
+  file: IGQLFile,
+  itemDefinition: ItemDefinition,
+  id: number,
+  version: string,
+  include: Include,
+  property: PropertyDefinition,
+) {
+  if (file === null) {
+    return null;
+  }
+
+  if (file.url.indexOf("blob:") === 0) {
+    return file;
+  }
+
+  let prefix: string = (window as any).UPLOADS_PREFIX;
+  if (prefix.indexOf("/") !== 0) {
+    prefix = location.protocol + "//" + prefix;
+  }
+  return {
+    ...file,
+    url:
+      prefix +
+      itemDefinition.getQualifiedPathName() + "/" +
+      id + "." + (version || "") + "/" +
+      (include ? include.getId() + "/" : "") +
+      property.getId() + "/" +
+      file.id + "/" + file.url,
   }
 }
 

@@ -102,6 +102,16 @@ export interface ISQLTableRowValue {
   [columnName: string]: any;
 }
 
+export type ConsumeStreamsFnType = (containerId: string) => Promise<void>;
+
+/**
+ * A sql composed row value
+ */
+export interface ISQLStreamComposedTableRowValue {
+  value: ISQLTableRowValue,
+  consumeStreams: ConsumeStreamsFnType,
+}
+
 /**
  * Provides the whole schema that is necessary to populate
  * in order for all the items contained within this root

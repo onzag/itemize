@@ -277,12 +277,16 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
                         <div {...rootProps}>
                           <input {...getInputProps()} />
                           <div className={props.classes.avatarContainer}>
-                            <MAvatar
-                              classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.classes.avatarLarge}` }}
-                              src={props.imageSizes.imageStandardSizeURL}
-                            >
-                              {username ? username[0] : ""}
-                            </MAvatar>
+                            <CacheableImageLoader src={props.imageSizes.imageLargeSizeURL}>
+                              {(largeImageURL) => (
+                                <MAvatar
+                                  classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.classes.avatarLarge}` }}
+                                  src={largeImageURL}
+                                >
+                                  {username ? username[0] : ""}
+                                </MAvatar>
+                              )}
+                            </CacheableImageLoader>
                             <div className={`${props.classes.hoverAddBackdrop} ${isDragAccept || isDragReject ? "visible" : ""}`}>
                               {isDragReject ? <BrokenImageIcon fontSize="large"/> : <AddAPhotoIcon fontSize="large"/>}
                             </div>

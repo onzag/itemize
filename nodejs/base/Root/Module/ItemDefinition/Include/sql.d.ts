@@ -6,10 +6,11 @@
  * @packageDocumentation
  */
 import Include from "../Include";
-import { ISQLTableDefinitionType, ISQLTableRowValue } from "../../../sql";
+import { ISQLTableDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue } from "../../../sql";
 import Knex from "knex";
 import ItemDefinition from "..";
 import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
+import pkgcloud from "pkgcloud";
 /**
  * Provides the table bit that is necessary to store include data
  * for this include when included from the parent definition
@@ -46,7 +47,7 @@ export declare function convertSQLValueToGQLValueForInclude(include: Include, ro
  * in a partial field value, don't use partial fields to create
  * @returns the partial sql result to be added into the table
  */
-export declare function convertGQLValueToSQLValueForInclude(transitoryId: string, itemDefinition: ItemDefinition, include: Include, data: IGQLArgs, oldData: IGQLValue, knex: Knex, dictionary: string, partialFields?: any): Promise<ISQLTableRowValue>;
+export declare function convertGQLValueToSQLValueForInclude(itemDefinition: ItemDefinition, include: Include, data: IGQLArgs, oldData: IGQLValue, knex: Knex, uploadsContainer: pkgcloud.storage.Container, dictionary: string, partialFields?: any): ISQLStreamComposedTableRowValue;
 /**
  * Builds a sql query for an include
  * @param include the include in question

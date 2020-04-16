@@ -15,10 +15,11 @@ import {
   buildSQLQueryForProperty,
 } from "./ItemDefinition/PropertyDefinition/sql";
 import { getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
-import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue } from "../sql";
+import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../sql";
 import Knex from "knex";
 import ItemDefinition from "./ItemDefinition";
 import { IGQLRequestFields, IGQLValue, IGQLArgs } from "../../../gql-querier";
+import pkgcloud from "pkgcloud";
 
 /**
  * Provides the table that is necesary to include this module and all
@@ -78,6 +79,7 @@ export function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefinitionTy
  * @param mod the module in question
  * @param data the graphql data
  * @param knex the knex instance
+ * @param uploadsContainer the uploads container from openstack
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
  * because some properties might treat nulls in a fancy way, when creating
@@ -87,40 +89,44 @@ export function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefinitionTy
  * in a partial field value, don't use partial fields to create
  * @returns a promise for a row value
  */
-export async function convertGQLValueToSQLValueForModule(
-  transitoryId: string,
+export function convertGQLValueToSQLValueForModule(
   mod: Module,
   itemDefinition: ItemDefinition,
   data: IGQLArgs,
   oldData: IGQLValue,
   knex: Knex,
+  uploadsContainer: pkgcloud.storage.Container,
   dictionary: string,
   partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
-): Promise<ISQLTableRowValue> {
+): ISQLStreamComposedTableRowValue {
   // first we create the row value
   const result: ISQLTableRowValue = {};
+  const consumeStreamsFns: ConsumeStreamsFnType[] = []
 
-  await Promise.all(
-    // now we get all the property extensions
-    mod.getAllPropExtensions().map(async (pd) => {
-      // we only add if partialFields allows it, or we don't have
-      // partialFields set
-      if (
-        (partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
-        !partialFields
-      ) {
-        const addedFieldsByProperty = await convertGQLValueToSQLValueForProperty(
-          transitoryId, itemDefinition, null, pd, data, oldData, knex, dictionary, "",
-        );
-        Object.assign(
-          result,
-          addedFieldsByProperty,
-        );
-      }
-    }),
-  );
+  mod.getAllPropExtensions().forEach((pd) => {
+    // we only add if partialFields allows it, or we don't have
+    // partialFields set
+    if (
+      (partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
+      !partialFields
+    ) {
+      const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
+        itemDefinition, null, pd, data, oldData, knex, uploadsContainer, dictionary, "",
+      );
+      Object.assign(
+        result,
+        addedFieldsByProperty.value,
+      );
+      consumeStreamsFns.push(addedFieldsByProperty.consumeStreams)
+    }
+  });
 
-  return result;
+  return {
+    value: result,
+    consumeStreams: async (containerId: string) => {
+      await Promise.all(consumeStreamsFns.map(fn => fn(containerId)));
+    }
+  };
 }
 
 /**

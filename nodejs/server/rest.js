@@ -170,7 +170,6 @@ function restServices(appData) {
         }
         return express_1.default.static(path_1.default.resolve(path_1.default.join("dist", "data")))(req, res, next);
     });
-    router.use("/uploads", express_1.default.static(path_1.default.resolve(path_1.default.join("dist", "uploads"))));
     // now let's get all modules
     appData.root.getAllModules().forEach(buildRouteForModule);
     // now let's get all the autocompletes that we loaded in our application

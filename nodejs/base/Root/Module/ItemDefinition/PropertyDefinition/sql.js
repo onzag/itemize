@@ -226,7 +226,6 @@ exports.convertSQLValueToGQLValueForProperty = convertSQLValueToGQLValueForPrope
 /**
  * Converts a graphql value into a sql value, that is graphql data into row
  * data to be immediately added to the database as it is
- * @param filesContainerId a folder that will contain the files for this item definition
  * @param itemDefinition the item definition in question
  * @param include an include if exist where the property resides
  * @param propertyDefinition the property definition in question
@@ -238,7 +237,7 @@ exports.convertSQLValueToGQLValueForProperty = convertSQLValueToGQLValueForPrope
  * @returns a promise with the partial sql row value to be inputted, note
  * that this is a promise because data streams need to be processed
  */
-async function convertGQLValueToSQLValueForProperty(filesContainerId, itemDefinition, include, propertyDefinition, data, oldData, knex, dictionary, prefix) {
+function convertGQLValueToSQLValueForProperty(itemDefinition, include, propertyDefinition, data, oldData, knex, uploadsContainer, dictionary, prefix) {
     // and this is the value of the property, again, properties
     // are not prefixed, they are either in their own object
     // or in the root
@@ -254,21 +253,32 @@ async function convertGQLValueToSQLValueForProperty(filesContainerId, itemDefini
     if (typeof gqlPropertyValue === "undefined") {
         gqlPropertyValue = null;
     }
+    let consumeStreams;
     const description = propertyDefinition.getPropertyDefinitionDescription();
     if (description.gqlAddFileToFields) {
         const oldValue = (oldData && oldData[propertyDefinition.getId()]) || null;
         const newValue = gqlPropertyValue;
         if (description.gqlList) {
-            gqlPropertyValue = await sql_files_1.processFileListFor(newValue, oldValue, filesContainerId, itemDefinition, include, propertyDefinition);
+            const processedValue = sql_files_1.processFileListFor(newValue, oldValue, uploadsContainer, itemDefinition, include, propertyDefinition);
+            gqlPropertyValue = processedValue.value;
+            consumeStreams = processedValue.consumeStreams;
         }
         else {
-            gqlPropertyValue = await sql_files_1.processSingleFileFor(newValue, oldValue, filesContainerId, itemDefinition, include, propertyDefinition);
+            const processedValue = sql_files_1.processSingleFileFor(newValue, oldValue, uploadsContainer, itemDefinition, include, propertyDefinition);
+            gqlPropertyValue = processedValue.value;
+            consumeStreams = processedValue.consumeStreams;
         }
+    }
+    else {
+        consumeStreams = () => null;
     }
     // so we need the sql in function, from the property description
     const sqlIn = propertyDefinition.getPropertyDefinitionDescription().sqlIn;
     // we return as it is
-    return sqlIn(gqlPropertyValue, prefix, propertyDefinition.getId(), propertyDefinition, knex, dictionary);
+    return {
+        value: sqlIn(gqlPropertyValue, prefix, propertyDefinition.getId(), propertyDefinition, knex, dictionary),
+        consumeStreams,
+    };
 }
 exports.convertGQLValueToSQLValueForProperty = convertGQLValueToSQLValueForProperty;
 /**

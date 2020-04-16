@@ -103,23 +103,23 @@ exports.convertSQLValueToGQLValueForInclude = convertSQLValueToGQLValueForInclud
  * in a partial field value, don't use partial fields to create
  * @returns the partial sql result to be added into the table
  */
-async function convertGQLValueToSQLValueForInclude(transitoryId, itemDefinition, include, data, oldData, knex, dictionary, partialFields) {
+function convertGQLValueToSQLValueForInclude(itemDefinition, include, data, oldData, knex, uploadsContainer, dictionary, partialFields) {
     // so again we get the prefix as in ITEM_wheel_
     const prefix = include.getPrefixedQualifiedIdentifier();
     // the exclusion state in the graphql information should be included in
     // the root data as ITEM_wheel__EXCLUSION_STATE so we extract it
     const exclusionStateAccordingToGQL = data[include.getQualifiedExclusionStateIdentifier()];
     // we add that data to the sql result
-    let sqlResult = {
+    let result = {
         [include.getQualifiedExclusionStateIdentifier()]: exclusionStateAccordingToGQL,
     };
+    const consumeStreamsFns = [];
     // now the information that is specific about the sql value is only
     // necessary if the state is not excluded, excluded means it should be
     // null, even if the info is there, it will be ignored
     if (exclusionStateAccordingToGQL !== Include_1.IncludeExclusionState.EXCLUDED) {
-        await Promise.all(
         // so we get the sinking properties
-        include.getSinkingProperties().map(async (sinkingProperty) => {
+        include.getSinkingProperties().forEach((sinkingProperty) => {
             // partial fields checkup
             if ((partialFields && partialFields[sinkingProperty.getId()]) ||
                 !partialFields) {
@@ -129,16 +129,19 @@ async function convertGQLValueToSQLValueForInclude(transitoryId, itemDefinition,
                 // are an object within there, we pass that, as all the info should be
                 // there, the prefix then represents the fact, we want all the added properties
                 // to be prefixed with what we are giving, in this case ITEM_wheel_
-                const addedFieldsByProperty = await sql_1.convertGQLValueToSQLValueForProperty(transitoryId, itemDefinition, include, sinkingProperty, data[include.getQualifiedIdentifier()], (oldData && oldData[include.getQualifiedIdentifier()]) || null, knex, dictionary, prefix);
-                sqlResult = {
-                    ...sqlResult,
-                    ...addedFieldsByProperty,
-                };
+                const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(itemDefinition, include, sinkingProperty, data[include.getQualifiedIdentifier()], (oldData && oldData[include.getQualifiedIdentifier()]) || null, knex, uploadsContainer, dictionary, prefix);
+                Object.assign(result, addedFieldsByProperty.value);
+                consumeStreamsFns.push(addedFieldsByProperty.consumeStreams);
             }
-        }));
+        });
     }
     // we return that
-    return sqlResult;
+    return {
+        value: result,
+        consumeStreams: async (containerId) => {
+            await Promise.all(consumeStreamsFns.map(fn => fn(containerId)));
+        }
+    };
 }
 exports.convertGQLValueToSQLValueForInclude = convertGQLValueToSQLValueForInclude;
 /**

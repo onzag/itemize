@@ -18,6 +18,7 @@ custom.missing_email_validation_warning = Warning! Your email has not been verif
 custom.missing_email_warning_title = missing email
 custom.missing_email_validation_warning_title = email needs verification
 custom.missing_email_validation_warning_action = verify email
+custom.missing_email_validation_warning_action_success = verification email sent succesfully
 custom.email_is_verified = email is verified
 
 custom.validate_account = activate your account
@@ -114,6 +115,7 @@ custom.missing_email_validation_warning = ¡Atención! Su correo electrónico no
 custom.missing_email_warning_title = falta el correo electrónico
 custom.missing_email_validation_warning_title = el correo electrónico necesita ser verificado
 custom.missing_email_validation_warning_action = verificar email
+custom.missing_email_validation_warning_action_success = email de verficación ha sido enviado
 custom.email_is_verified = el correo ha sido verificado
 
 custom.validate_account = active su cuenta

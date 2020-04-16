@@ -6,11 +6,12 @@
  */
 import { PropertyDefinitionSupportedType } from "./types";
 import PropertyDefinition from "../PropertyDefinition";
-import { ISQLTableRowValue, ISQLTableDefinitionType } from "../../../sql";
+import { ISQLTableRowValue, ISQLTableDefinitionType, ISQLStreamComposedTableRowValue } from "../../../sql";
 import Knex from "knex";
 import ItemDefinition from "..";
 import Include from "../Include";
 import { IGQLArgs, IGQLValue } from "../../../../../gql-querier";
+import pkgcloud from "pkgcloud";
 /**
  * Provides the sql function that defines the schema that is used to build
  * the partial table definition
@@ -98,7 +99,6 @@ export declare function convertSQLValueToGQLValueForProperty(propertyDefinition:
 /**
  * Converts a graphql value into a sql value, that is graphql data into row
  * data to be immediately added to the database as it is
- * @param filesContainerId a folder that will contain the files for this item definition
  * @param itemDefinition the item definition in question
  * @param include an include if exist where the property resides
  * @param propertyDefinition the property definition in question
@@ -110,7 +110,7 @@ export declare function convertSQLValueToGQLValueForProperty(propertyDefinition:
  * @returns a promise with the partial sql row value to be inputted, note
  * that this is a promise because data streams need to be processed
  */
-export declare function convertGQLValueToSQLValueForProperty(filesContainerId: string, itemDefinition: ItemDefinition, include: Include, propertyDefinition: PropertyDefinition, data: IGQLArgs, oldData: IGQLValue, knex: Knex, dictionary: string, prefix: string): Promise<ISQLTableRowValue>;
+export declare function convertGQLValueToSQLValueForProperty(itemDefinition: ItemDefinition, include: Include, propertyDefinition: PropertyDefinition, data: IGQLArgs, oldData: IGQLValue, knex: Knex, uploadsContainer: pkgcloud.storage.Container, dictionary: string, prefix: string): ISQLStreamComposedTableRowValue;
 /**
  * Builds a sql search query from a given property definition, the data
  * coming from the search module, a sql prefix to use, and the knex builder

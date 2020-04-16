@@ -6,14 +6,12 @@
  * @packageDocumentation
  */
 
-// TODO move this logic to the Bucket/CDN server kinda thing
-// it will require changing how we read the file from the server hard drive
-
 import PropertyDefinition from ".";
 import sharp from "sharp";
-import fs from "fs";
+import { ReadStream } from "fs";
 import path from "path";
-const fsAsync = fs.promises;
+import pkgcloud from "pkgcloud";
+import { sqlUploadPipeFile } from "./sql-files";
 
 /**
  * this is what we get as a result from
@@ -104,14 +102,13 @@ function manyOptionsAnalysis(value: string): IImageConversionArguments[] {
 
 /**
  * Runs the image conversions and stores them in the specified location
- * @param fileName the file name that is currently in use in the server side
- * @param filePath the file path that is currently in use in the server side with the file name
- * @param propDef the property definition
  * @returns a void promise for when this is done
  */
 export async function runImageConversions(
-  fileName: string,
+  imageStream: ReadStream,
   filePath: string,
+  fileName: string,
+  uploadsContainer: pkgcloud.storage.Container,
   propDef: PropertyDefinition,
 ): Promise<void> {
   // the properties in question are, smallDimension
@@ -148,7 +145,7 @@ export async function runImageConversions(
   };
 
   // so these are the ouputs we are expecting for
-  let outputs: IImageConversionArguments[] = [
+  let imageConversionOutputs: IImageConversionArguments[] = [
     smallAnalyzed,
     mediumAnalyzed,
     largeAnalyzed,
@@ -157,29 +154,43 @@ export async function runImageConversions(
   // but we might have more dimensions that are expected other than that
   const allRemainingSizes = propDef.getSpecialProperty("dimensions") as string;
   if (allRemainingSizes) {
-    outputs = outputs.concat(manyOptionsAnalysis(allRemainingSizes));
+    imageConversionOutputs = imageConversionOutputs.concat(manyOptionsAnalysis(allRemainingSizes));
   }
 
-  // so we read the file
-  const fileBuffer = await fsAsync.readFile(
-    filePath,
-  );
-
+  const originalImageFilePath = path.join(filePath, fileName);
   // and now we get the filename without a extension and the dirname
   const fileNameNoExtension = path.basename(fileName, path.extname(fileName));
-  const dirName = path.dirname(filePath);
+  // this is the sharp pipeline that will stream the data directly from the network
+  // this stream hasn't been piped before and has been on hold so far
+  const conversionPipeline = sharp();
+  const conversionPromises = imageConversionOutputs.map((conversionOutput) => {
+    // note how we attach the output name before the filename without a extension and make it
+    // a jpg extension because that's what we want, the original can be anything
+    const outputFileName = path.join(filePath, conversionOutput.name + "_" + fileNameNoExtension + ".jpg");
+
+    // we pass it through a cloned stream for the sharp, and pass the conversion options
+    // note how a converted image is always a jpg image
+    const outputPipeline = conversionPipeline.clone()
+      .resize(conversionOutput.width, conversionOutput.height, {
+        fit: conversionOutput.fit,
+      }).jpeg();
+
+    return sqlUploadPipeFile(
+      uploadsContainer,
+      outputPipeline,
+      outputFileName,
+    );
+  }).concat([
+    sqlUploadPipeFile(
+      uploadsContainer,
+      imageStream,
+      originalImageFilePath,
+    ),
+  ]);
+  // now we pipe the image read stream to the conversion pipeline
+  // that will run the conversions
+  imageStream.pipe(conversionPipeline);
 
   // and we basically create the image for all of those
-  await Promise.all(
-    outputs.map((output) => {
-      // note how we attach the output name before the filename without a extension and make it
-      // a jpg extension because that's what we want, the original can be anything
-      const ouputFileName = path.join(dirName, output.name + "_" + fileNameNoExtension + ".jpg");
-
-      // this returns a void promise
-      return sharp(fileBuffer).resize(output.width, output.height, {
-        fit: output.fit,
-      }).jpeg().toFile(ouputFileName);
-    }),
-  );
+  await Promise.all(conversionPromises);
 }
