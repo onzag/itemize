@@ -11,6 +11,7 @@ import { RemoteListener } from "./remote-listener";
 import "../workers/service";
 import CacheWorkerInstance from "../workers/cache";
 import { proxy } from "comlink";
+import { runEditQueryFor } from "../gql-client-util";
 
 // Just a message for whether is development
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -135,31 +136,28 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // we check that there's an user logged in
     if (this.tokenState && this.tokenState.id) {
       console.log("updating user property", propertyId, value);
-      const result = await gqlQuery(
-        buildGqlMutation({
-          name: "EDIT_MOD_users__IDEF_user",
-          args: {
-            id: this.tokenState.id,
-            token: this.tokenState.token,
-            // the language is irrelevant since we are not setting
-            // text fields, so en will work just fine, getting
-            // the language will be annoying and this will do the job anyway
-            language: "en",
-            listener_uuid: this.remoteListener.getUUID(),
-            [propertyId]: value,
-          },
-          fields: {
-            DATA: {
-              [propertyId]: {},
-            },
-          },
-        }),
-      );
-      // Ignore errors, we just go for success
-      if (result && result.data && result.data.DATA) {
-        const actualPropertyResult: string = result.data.DATA[propertyId] as string;
-        const userItemDefinition = this.state.specifiedProcessedRoot
+      const userItemDefinition = this.state.specifiedProcessedRoot
           .getModuleFor(["users"]).getItemDefinitionFor(["user"]);
+      const result = await runEditQueryFor({
+        args: {
+          [propertyId]: value,
+        },
+        fields: {
+          DATA: {
+            [propertyId]: {},
+          },
+        },
+        itemDefinition: userItemDefinition,
+        token: this.tokenState.token,
+        id: this.tokenState.id,
+        version: null,
+        listenerUUID: this.remoteListener.getUUID(),
+        language: "en",
+      })
+
+      // Ignore errors, we just go for success
+      if (result && result.value && result.value.DATA) {
+        const actualPropertyResult: string = result.value.DATA[propertyId] as string;
         if (userItemDefinition.hasAppliedValueTo(this.tokenState.id, null)) {
           console.log("found an instance, triggering update");
           const property = userItemDefinition.getPropertyDefinitionFor(propertyId, false);
@@ -176,6 +174,28 @@ export default class App extends React.Component<IAppProps, IAppState> {
    */
   public hasLocaleDataFor(locale: string) {
     return !!this.props.langLocales[locale];
+  }
+
+  public finallySetLocaleDataFor(locale: string, avoidUpdatingUser: boolean) {
+    const pathNameSplitted = window.location.pathname.split("/");
+
+    // Now we patch moment
+    Moment.locale(locale);
+
+    // And we set the language via local storage, so it has priority
+    localStorage.setItem("lang", locale);
+    document.body.parentElement.lang = locale;
+    (document.head.querySelector("[rel='manifest']") as HTMLLinkElement).href =
+      "/rest/resource/manifest." + locale + ".json";
+
+    // We set it to the url
+    pathNameSplitted[1] = locale;
+    const newPathName = pathNameSplitted.join("/");
+    history.push(newPathName);
+
+    if (!avoidUpdatingUser) {
+      this.updateUserProperty("app_language", locale);
+    }
   }
 
   /**
@@ -213,8 +233,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // if the language is currently loaded in memory, just set it as it is
     // we don't need to fetch anything
     if (this.state.specifiedProcessedRoot.getI18nDataFor(localeToSet)) {
-      pathNameSplitted[1] = localeToSet;
-      history.push(pathNameSplitted.join("/"));
+      this.finallySetLocaleDataFor(localeToSet, avoidUpdatingUser);
       return;
     }
 
@@ -243,25 +262,13 @@ export default class App extends React.Component<IAppProps, IAppState> {
       return;
     }
 
-    // Now we patch moment
-    Moment.locale(localeToSet);
-
-    // And we set the language via local storage, so it has priority
-    localStorage.setItem("lang", localeToSet);
-    document.body.parentElement.lang = localeToSet;
-    (document.head.querySelector("[rel='manifest']") as HTMLLinkElement).href =
-      "/rest/resource/manifest." + localeToSet + ".json";
-
-    // We set it to the url
-    pathNameSplitted[1] = localeToSet;
-    const newPathName = pathNameSplitted.join("/");
-    history.push(newPathName);
-
-    // And now we might restore the state, with the new data
+    // Now we patch the root
     this.state.specifiedProcessedRoot.mergeWithI18n(newData);
-    if (!avoidUpdatingUser) {
-      this.updateUserProperty("app_language", localeToSet);
-    }
+
+    // set the locale data
+    this.finallySetLocaleDataFor(localeToSet, avoidUpdatingUser);
+
+    // and fix the state
     this.setState({
       localeIsUpdating: false,
       localeIsUpdatingFrom: null,

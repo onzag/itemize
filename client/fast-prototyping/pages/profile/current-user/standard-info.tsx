@@ -14,6 +14,9 @@ import MailOutline from "@material-ui/icons/MailOutline";
 import { AvatarRenderer } from "../../../components/avatar";
 import { UserActioner } from "../../../../components/user";
 import Snackbar from "../../../components/snackbar";
+import { LanguagePicker } from "../../../components/language-picker";
+import { CountryPicker } from "../../../components/country-picker";
+import { CurrencyPicker } from "../../../components/currency-picker";
 
 interface CustomConfirmationDialogProps {
   isActive: boolean;
@@ -66,6 +69,11 @@ const currentUserProfileStandardInfoStyles = createStyles({
     justifyContent: "flex-end",
     paddingTop: "1.2rem",
   },
+  pickers: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   alertButtonValidateEmailContainer: {
     paddingTop: "0.75rem",
   },
@@ -91,6 +99,11 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
   return (
     <Paper className={props.classes.paper}>
       <Entry id="profile_picture" renderer={AvatarRenderer}/>
+      <div className={props.classes.pickers}>
+        <LanguagePicker />
+        <CountryPicker />
+        <CurrencyPicker />
+      </div>
       <Entry id="username" />
       <Reader id="email">
         {(email: string, emailState: IPropertyDefinitionState) => {

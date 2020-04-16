@@ -40,5 +40,21 @@ export interface ICurrencyDataType {
 
 export const countries: ICountryDataType = countriesJSON as any;
 export const currencies: ICurrencyDataType = currenciesJSON as any;
-export const arrCountries: ICountryType[] = Object.keys(countries).map((code) => countries[code]);
-export const arrCurrencies: ICurrencyType[] = Object.keys(currencies).map((code) => currencies[code]);
+export const arrCountries: ICountryType[] = Object.keys(countries).map((code) => countries[code]).sort((a, b) => {
+  if (a.native > b.native) {
+      return 1;
+  }
+  if (b.native > a.native) {
+      return -1;
+  }
+  return 0;
+});
+export const arrCurrencies: ICurrencyType[] = Object.keys(currencies).map((code) => currencies[code]).sort((a, b) => {
+  if (a.name > b.name) {
+      return 1;
+  }
+  if (b.name > a.name) {
+      return -1;
+  }
+  return 0;
+});

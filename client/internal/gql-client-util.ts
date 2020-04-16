@@ -484,7 +484,13 @@ export async function runAddQueryFor(
   const query = buildGqlMutation({
     name: queryName,
     args,
-    fields: arg.fields,
+    // last modified is necessary for cache manipulation
+    // so we add it here if it was not added, normally it gets
+    // added automatically using functions, but that might not be the case
+    fields: !arg.fields.last_modified ? {
+      ...arg.fields,
+      last_modified: {},
+    } : arg.fields,
   })
 
   // now we get the gql value using the gql query function
@@ -552,7 +558,13 @@ export async function runEditQueryFor(
   const query = buildGqlMutation({
     name: queryName,
     args,
-    fields: arg.fields,
+    // last modified is necessary for cache manipulation
+    // so we add it here if it was not added, normally it gets
+    // added automatically using functions, but that might not be the case
+    fields: !arg.fields.last_modified ? {
+      ...arg.fields,
+      last_modified: {},
+    } : arg.fields,
   });
 
   // now we get the gql value using the gql query function
