@@ -94,6 +94,13 @@ const REQUIRED_RESOURCES = [
     "icons/macos-safari-monochrome-icon.svg",
 ];
 /**
+ * Required resources which require localization in some form
+ */
+const REQUIRED_LOCALIZED_RESOURCES = [
+    "privacy-policy/$.html",
+    "terms-and-conditions/$.html",
+];
+/**
  * Given a path copies the entire directory level file by file and stores
  * the content into the constructed path inside the data directory
  * @param pathname the path name to copy
@@ -116,10 +123,6 @@ async function copyOneDirectoryLevel(pathname, constructedPath) {
             // and copy that directory level as well
             return copyOneDirectoryLevel(currentTotalFilePathName, path_1.default.join(constructedPath, fileNameInDirectory));
         }
-        // so we get the content of the file
-        const canBeOptimized = fileNameInDirectory.endsWith(".json") ||
-            fileNameInDirectory.endsWith(".html") ||
-            fileNameInDirectory.endsWith(".svg");
         // and we check if we can optimize it
         let minified;
         let optimizer = "NONE";
@@ -182,8 +185,14 @@ async function buildResources(rawConfig) {
     if (!await util_1.checkExists(path_1.default.join("dist", "uploads"))) {
         await fsAsync.mkdir(path_1.default.join("dist", "uploads"));
     }
+    const actualRequiredResources = REQUIRED_RESOURCES;
+    REQUIRED_LOCALIZED_RESOURCES.forEach((rr) => {
+        rawConfig.standard.supportedLanguages.forEach((sl) => {
+            actualRequiredResources.push(rr.replace("$", sl));
+        });
+    });
     // now let's check for the required resources to see if they are there
-    await Promise.all(REQUIRED_RESOURCES.map(async (requiredResource) => {
+    await Promise.all(actualRequiredResources.map(async (requiredResource) => {
         if (!await util_1.checkExists(path_1.default.join("resources", requiredResource))) {
             console.log("Missing resource file: " + safe_1.default.red(requiredResource));
         }

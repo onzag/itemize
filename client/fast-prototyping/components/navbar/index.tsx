@@ -31,8 +31,9 @@ const navbarStyles = (theme: Theme) => createStyles({
 interface INavbarProps extends WithStyles<typeof navbarStyles> {
   excludeLanguagePicker?: boolean;
   excludeBlockingBackdrop?: boolean;
-  LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void}>,
+  LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void, onRecoverRequest: () => void}>,
   SignupDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
+  RecoverDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
 }
 
 const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
@@ -78,6 +79,7 @@ const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                     excludeLanguagePicker={props.excludeLanguagePicker}
                     LoginDialog={props.LoginDialog}
                     SignupDialog={props.SignupDialog}
+                    RecoverDialog={props.RecoverDialog}
                   />
                   <ExternalDialogs/>
                 </ItemDefinitionProvider>

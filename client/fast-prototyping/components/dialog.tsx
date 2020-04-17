@@ -25,7 +25,11 @@ const dialogStyles = createStyles({
     paddingLeft: "1rem",
     paddingRight: "1rem",
   },
-  content: {},
+  content: {
+    paddingTop: "1.5rem",
+    paddingBottom: "1.5rem",
+    minWidth: "400px",
+  },
   actions: {
     display: "flex",
     borderTop: "solid 1px #ccc",
@@ -78,5 +82,7 @@ export const Dialog = withStyles(dialogStyles)((props: IDialogProps) => {
   );
 });
 
-const DialogResponsive = withMobileDialog<IDialogProps>()(Dialog);
+const DialogResponsive = withMobileDialog<IDialogProps>({
+  breakpoint: "xs",
+})(Dialog);
 export { DialogResponsive };

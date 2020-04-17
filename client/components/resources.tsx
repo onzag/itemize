@@ -1,13 +1,17 @@
 import React from "react";
 
 interface IHTMLResourceLoaderProps {
-  location: string;
+  src: string;
   wrapper?: string;
   wrapperClassName?: string;
+  loadingComponent?: React.ReactNode;
+  failedComponent?: React.ReactNode;
 }
 
 interface IHTMLResourceLoaderState {
   htmlContent: string;
+  loading: boolean;
+  failed: boolean;
 }
 
 export default class HTMLResourceLoader
@@ -17,39 +21,73 @@ export default class HTMLResourceLoader
 
     this.state = {
       htmlContent: null,
+      loading: false,
+      failed: false,
     };
   }
   public async load() {
-    if (this.props.location === null || this.state.htmlContent !== null) {
-      this.setState({
-        htmlContent: null,
-      });
-      if (this.props.location === null) {
-        return;
-      }
+    this.setState({
+      htmlContent: null,
+      failed: false,
+      loading: false,
+    });
+    if (this.props.src === null) {
+      return;
     }
 
+    const waitTimeoutForLoading = setTimeout(() => {
+      this.setState({
+        loading: true,
+      });
+    }, 600);
+
     try {
-      const htmlContent =
-        await fetch("/rest/resource/" + this.props.location).then((v) => v.text());
+      const htmlFetchResponse =
+        await fetch("/rest/resource/" + this.props.src, {
+          headers: {
+            "sw-cacheable": "true",
+          },
+        });
+
+      if (
+        htmlFetchResponse.status !== 200 &&
+        htmlFetchResponse.status !== 0
+      ) {
+        throw new Error("Invalid status code");
+      }
+
+      const htmlContent = await htmlFetchResponse.text();
+      clearTimeout(waitTimeoutForLoading);
       this.setState({
         htmlContent,
+        loading: false,
+        failed: false,
       });
     } catch (err) {
-      // DO NOTHING
+      clearTimeout(waitTimeoutForLoading);
+      this.setState({
+        htmlContent: null,
+        loading: false,
+        failed: true,
+      });
     }
   }
   public componentDidMount() {
     this.load();
   }
   public componentDidUpdate(prevProps: IHTMLResourceLoaderProps) {
-    if (prevProps.location !== this.props.location) {
+    if (prevProps.src !== this.props.src) {
       this.load();
     }
   }
   public render() {
-    const WrapperComponent: any = this.props.wrapper || "div";
+    if (this.state.loading && this.props.loadingComponent) {
+      return this.props.loadingComponent;
+    } else if (this.state.failed && this.props.failedComponent) {
+      return this.props.failedComponent;
+    }
 
+    const WrapperComponent: any = this.props.wrapper || "div";
     return (
       <WrapperComponent
         className={this.props.wrapperClassName}

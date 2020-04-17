@@ -82,7 +82,7 @@ export async function initializeItemizeApp(
     // this will make it so that our url gets setup even before react
     // is initialized
     const newPathName = pathNameSplitted.join("/");
-    history.replace(newPathName);
+    history.replace(newPathName + window.location.search);
   }
 
   // This is for a list of guesed information

@@ -23,6 +23,7 @@ interface IPropertyEntryProps<RendererPropsType> {
   onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, inernalValue?: any) => void;
   renderer?: React.ComponentType<RendererPropsType>;
   rendererArgs?: object;
+  hideDescription?: boolean;
 }
 
 interface IPropertySetterProps {
@@ -58,6 +59,7 @@ interface IPropertyEntryViewReadSetProps<RendererPropsType> {
   value?: PropertyDefinitionSupportedType;
   renderer?: React.ComponentType<RendererPropsType>;
   rendererArgs?: object;
+  hideDescription?: boolean;
 }
 // TODO optimize
 function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "entry" | "view" | "read" | "set") {
@@ -213,6 +215,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "ent
                       poked={isPoked}
                       renderer={props.renderer}
                       rendererArgs={props.rendererArgs}
+                      hideDescription={props.hideDescription}
                     />
                   );
                 } else {

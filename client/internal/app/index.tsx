@@ -191,7 +191,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // We set it to the url
     pathNameSplitted[1] = locale;
     const newPathName = pathNameSplitted.join("/");
-    history.push(newPathName);
+    history.push(newPathName + window.location.search);
 
     if (!avoidUpdatingUser) {
       this.updateUserProperty("app_language", locale);

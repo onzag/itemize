@@ -5,6 +5,11 @@ import { I18nRead } from "../../components/localization";
 import { IActionSubmitOptions } from "../../providers/item-definition";
 import { DelayDisplay } from "./util";
 
+// TODO same as button but has circular progress in it
+export function ProgressingButton() {
+
+}
+
 interface ISubmitButtonProps {
   options: IActionSubmitOptions;
   i18nId: string;

@@ -14,6 +14,7 @@ const util_2 = require("util");
 ;
 const RESET_PASSWORD_EMAIL_RESEND_SECONDS_TIME = 600;
 const RESET_PASSWORD_TOKEN_VALID_SECONDS_TIME = 86400;
+const VERIFY_ACCOUNT_EMAIL_RESEND_SECONDS_TIME = 600;
 exports.customUserQueries = (appData) => {
     const userModule = appData.root.getModuleFor(["users"]);
     const userIdef = userModule.getItemDefinitionFor(["user"]);
@@ -27,9 +28,9 @@ exports.customUserQueries = (appData) => {
     const passwordPropertyDescription = passwordProperty.getPropertyDefinitionDescription();
     const emailPropertyDescription = emailProperty.getPropertyDefinitionDescription();
     const eValidatedPropertyDescription = eValidatedProperty.getPropertyDefinitionDescription();
-    const setPromisified = util_2.promisify(appData.redis.set);
-    const expirePromisified = util_2.promisify(appData.redis.expire);
-    const getPromisified = util_2.promisify(appData.redis.get);
+    const setPromisified = util_2.promisify(appData.redis.set).bind(appData.redis);
+    const expirePromisified = util_2.promisify(appData.redis.expire).bind(appData.redis);
+    const getPromisified = util_2.promisify(appData.redis.get).bind(appData.redis);
     return {
         token: {
             type: graphql_token_object_1.default,
@@ -232,6 +233,14 @@ exports.customUserQueries = (appData) => {
                         code: constants_1.ENDPOINT_ERRORS.USER_EMAIL_TAKEN,
                     });
                 }
+                const avoidSendingEmailEmailTarget = !!(await getPromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString()));
+                if (avoidSendingEmailEmailTarget === resultUser.email) {
+                    return {
+                        status: "OK",
+                    };
+                }
+                await setPromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString(), resultUser.email.toString());
+                await expirePromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString(), VERIFY_ACCOUNT_EMAIL_RESEND_SECONDS_TIME);
                 const appLanguage = resultUser.app_language;
                 let languageToUse = appLanguage;
                 let i18nData = userIdef.getI18nDataFor(appLanguage);
@@ -239,7 +248,10 @@ exports.customUserQueries = (appData) => {
                     languageToUse = "en";
                     i18nData = userIdef.getI18nDataFor("en");
                 }
-                const validateToken = await token_1.jwtSign({ validateUserId: decoded.id }, appData.sensitiveConfig.jwtKey);
+                const validateToken = await token_1.jwtSign({
+                    validateUserId: decoded.id,
+                    validateUserEmail: resultUser.email,
+                }, appData.sensitiveConfig.jwtKey);
                 const validateLink = (appData.sensitiveConfig.mailgunTargetDomain || appData.config.productionHostname) +
                     "/rest/user/validate-email?token=" + encodeURIComponent(validateToken);
                 const templateToUse = i18nData.custom.validate_account_template_name;
@@ -298,8 +310,8 @@ exports.customUserQueries = (appData) => {
                 // you might wonder why not to prevent email that are equal as that user to start with,
                 // well this is to avoid a DDOS attack similar to one that was present at github
                 // where you would set an invalidated email, and that user won't be able to claim its own email
-                const resultUser = await appData.knex.first(constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME, "email", "username").from(userTable)
-                    .where(emailPropertyDescription.sqlEqual(args.username, "", emailProperty.getId(), true, appData.knex))
+                const resultUser = await appData.knex.first(constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME, "email", "username", "app_language").from(userTable)
+                    .where(emailPropertyDescription.sqlEqual(args.email, "", emailProperty.getId(), true, appData.knex))
                     .andWhere(eValidatedPropertyDescription.sqlEqual(true, "", eValidatedProperty.getId(), false, appData.knex));
                 if (!resultUser) {
                     throw new errors_1.EndpointError({
@@ -347,7 +359,8 @@ exports.customUserQueries = (appData) => {
                             `forgot_password_title = ${util_1.capitalize(i18nData.custom.forgot_password_title)}\n` +
                             `forgot_password_description = ${i18nData.custom.forgot_password_description}\n` +
                             `forgot_password_recover_button = ${util_1.capitalize(i18nData.custom.forgot_password_recover_button)}\n` +
-                            `forgot_password_alt_link = ${util_1.capitalize(i18nData.custom.forgot_password_alt_link)}`
+                            `forgot_password_alt_link = ${util_1.capitalize(i18nData.custom.forgot_password_alt_link)}\n` +
+                            `forgot_password_username = ${resultUser.username}`
                     });
                 }
                 else {
@@ -362,6 +375,7 @@ exports.customUserQueries = (appData) => {
                         forgot_password_description: i18nData.custom.forgot_password_description,
                         forgot_password_recover_button: util_1.capitalize(i18nData.custom.forgot_password_recover_button),
                         forgot_password_alt_link: util_1.capitalize(i18nData.custom.forgot_password_alt_link),
+                        forgot_password_username: resultUser.username,
                     });
                 }
                 return {

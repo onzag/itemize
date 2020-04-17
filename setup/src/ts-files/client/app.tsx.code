@@ -1,4 +1,12 @@
 import React from "react";
+import Navbar from "itemize/client/fast-prototyping/components/navbar";
+import { LoginDialog } from "itemize/client/fast-prototyping/components/login-dialog";
+import { SignupDialog } from "itemize/client/fast-prototyping/components/signup-dialog";
+import { RecoverDialog } from "itemize/client/fast-prototyping/components/recover-dialog";
+import { Route } from "itemize/client/components/navigaton";
+import { Profile } from "itemize/client/fast-prototyping/pages/profile";
+import { PrivacyPolicy } from "itemize/client/fast-prototyping/pages/privacy-policy";
+import { TermsAndConditions } from "itemize/client/fast-prototyping/pages/terms-and-conditions";
 
 // Remember that when adding fast prototyping components they might demand
 // localization data, if you get an error named
@@ -15,7 +23,10 @@ import React from "react";
 export default function App()<0>{
 	return (
 		<React.Fragment>
-			IT WORKS
+			<Navbar LoginDialog={LoginDialog} SignupDialog={SignupDialog} RecoverDialog={RecoverDialog}/>
+			<Route path="/profile/:id" component={Profile}/>
+			<Route path="/privacy-policy" component={PrivacyPolicy}/>
+			<Route path="/terms-and-conditions" component={TermsAndConditions}/>
 		</React.Fragment>
 	);
 }

@@ -22,6 +22,7 @@ interface RecoverPasswordTokenType {
 
 const RESET_PASSWORD_EMAIL_RESEND_SECONDS_TIME = 600;
 const RESET_PASSWORD_TOKEN_VALID_SECONDS_TIME = 86400;
+const VERIFY_ACCOUNT_EMAIL_RESEND_SECONDS_TIME = 600;
 
 export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinitionType => {
   const userModule = appData.root.getModuleFor(["users"]);
@@ -40,9 +41,9 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
   const emailPropertyDescription = emailProperty.getPropertyDefinitionDescription();
   const eValidatedPropertyDescription = eValidatedProperty.getPropertyDefinitionDescription();
 
-  const setPromisified = promisify(appData.redis.set);
-  const expirePromisified = promisify(appData.redis.expire);
-  const getPromisified = promisify(appData.redis.get);
+  const setPromisified = promisify(appData.redis.set).bind(appData.redis);
+  const expirePromisified = promisify(appData.redis.expire).bind(appData.redis);
+  const getPromisified = promisify(appData.redis.get).bind(appData.redis);
 
   return {
     token: {
@@ -266,6 +267,17 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           });
         }
 
+        const avoidSendingEmailEmailTarget =
+          !!(await getPromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString()));
+        if (avoidSendingEmailEmailTarget === resultUser.email) {
+          return {
+            status: "OK",
+          };
+        }
+
+        await setPromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString(), resultUser.email.toString());
+        await expirePromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString(), VERIFY_ACCOUNT_EMAIL_RESEND_SECONDS_TIME);
+
         const appLanguage = resultUser.app_language;
         let languageToUse = appLanguage;
         let i18nData = userIdef.getI18nDataFor(appLanguage);
@@ -274,7 +286,10 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           i18nData = userIdef.getI18nDataFor("en");
         }
 
-        const validateToken = await jwtSign({validateUserId: decoded.id}, appData.sensitiveConfig.jwtKey);
+        const validateToken = await jwtSign({
+          validateUserId: decoded.id,
+          validateUserEmail: resultUser.email,
+        }, appData.sensitiveConfig.jwtKey);
         const validateLink = (appData.sensitiveConfig.mailgunTargetDomain || appData.config.productionHostname) +
           "/rest/user/validate-email?token=" + encodeURIComponent(validateToken);
 
@@ -339,8 +354,9 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           CONNECTOR_SQL_COLUMN_ID_FK_NAME,
           "email",
           "username",
+          "app_language",
         ).from(userTable)
-          .where(emailPropertyDescription.sqlEqual(args.username, "", emailProperty.getId(), true, appData.knex))
+          .where(emailPropertyDescription.sqlEqual(args.email, "", emailProperty.getId(), true, appData.knex))
           .andWhere(eValidatedPropertyDescription.sqlEqual(true, "", eValidatedProperty.getId(), false, appData.knex));
 
         if (!resultUser) {
@@ -394,7 +410,8 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             `forgot_password_title = ${capitalize(i18nData.custom.forgot_password_title)}\n` +
             `forgot_password_description = ${i18nData.custom.forgot_password_description}\n` +
             `forgot_password_recover_button = ${capitalize(i18nData.custom.forgot_password_recover_button)}\n` +
-            `forgot_password_alt_link = ${capitalize(i18nData.custom.forgot_password_alt_link)}`
+            `forgot_password_alt_link = ${capitalize(i18nData.custom.forgot_password_alt_link)}\n` +
+            `forgot_password_username = ${resultUser.username}`
           });
         } else {
           await appData.mailgun.messages().send({
@@ -408,6 +425,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             forgot_password_description: i18nData.custom.forgot_password_description,
             forgot_password_recover_button: capitalize(i18nData.custom.forgot_password_recover_button),
             forgot_password_alt_link: capitalize(i18nData.custom.forgot_password_alt_link),
+            forgot_password_username: resultUser.username,
           });
         }
 

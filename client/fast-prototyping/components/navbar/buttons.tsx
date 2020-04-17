@@ -17,17 +17,19 @@ const buttonsStyles = (theme: Theme) => createStyles({
 
 interface ButtonsProps extends WithStyles<typeof buttonsStyles> {
   excludeLanguagePicker: boolean;
-  LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void}>,
+  LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void, onRecoverRequest: () => void}>,
   SignupDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
+  RecoverDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
 }
 
 export const Buttons = withStyles(buttonsStyles)((props: ButtonsProps) => {
   return (
-    <LocationStateReader defaultState={{ signupDialogOpen: false, loginDialogOpen: false }}>
+    <LocationStateReader defaultState={{ signupDialogOpen: false, loginDialogOpen: false, recoverDialogOpen: false }}>
       {(state, setLocationState) => {
         const openLoginDialog = () => setLocationState({
           loginDialogOpen: true,
           signupDialogOpen: false,
+          recoverDialogOpen: false,
         }, state.signupDialogOpen);
         const closeLoginDialog = () => setLocationState({
           loginDialogOpen: false,
@@ -35,12 +37,22 @@ export const Buttons = withStyles(buttonsStyles)((props: ButtonsProps) => {
         const openSignupDialog = () => setLocationState({
           signupDialogOpen: true,
           loginDialogOpen: false,
+          recoverDialogOpen: false,
         }, state.loginDialogOpen);
         const closeSignupDialog = () => setLocationState({
           signupDialogOpen: false,
         }, true);
+        const openRecoverDialog = () => setLocationState({
+          loginDialogOpen: false,
+          signupDialogOpen: false,
+          recoverDialogOpen: true,
+        });
+        const closeRecoverDialog = () => setLocationState({
+          recoverDialogOpen: false,
+        }, true);
         const LoginDialog = props.LoginDialog;
         const SignupDialog = props.SignupDialog;
+        const RecoverDialog = props.RecoverDialog;
         return (
           <IfLogStatus>
             {(status) => {
@@ -58,10 +70,16 @@ export const Buttons = withStyles(buttonsStyles)((props: ButtonsProps) => {
                     open={state.loginDialogOpen}
                     onClose={closeLoginDialog}
                     onSignupRequest={openSignupDialog}
+                    onRecoverRequest={openRecoverDialog}
                   />
                   <SignupDialog
                     open={state.signupDialogOpen}
                     onClose={closeSignupDialog}
+                    onLoginRequest={openLoginDialog}
+                  />
+                  <RecoverDialog
+                    open={state.recoverDialogOpen}
+                    onClose={closeRecoverDialog}
                     onLoginRequest={openLoginDialog}
                   />
                 </React.Fragment>;

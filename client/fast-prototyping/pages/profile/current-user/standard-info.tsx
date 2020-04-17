@@ -139,13 +139,13 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
                                   color="secondary"
                                   endIcon={<MailOutline/>}
                                   onClick={actioner.sendValidateEmail}
-                                  disabled={actioner.statefulSendingValidateEmail}
+                                  disabled={actioner.statefulOnProgress}
                                 >
                                   <I18nRead capitalize={true} id="missing_email_validation_warning_action"/>
                                   <i className={props.classes.emailInButton}>&nbsp;{emailState.stateAppliedValue}</i>
                                 </Button>
                                 {
-                                  actioner.statefulSendingValidateEmail ?
+                                  actioner.statefulOnProgress ?
                                   <CircularProgress size={24} className={props.classes.alertButtonValidateEmailProgressElement}/> :
                                   null
                                 }
@@ -157,8 +157,8 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
                               />
                               <Snackbar
                                 i18nDisplay="missing_email_validation_warning_action_success"
-                                open={actioner.statefulSendValidateEmailSuccessful}
-                                onClose={actioner.dismissStatefulSendValidateEmailSuccessful}
+                                open={actioner.statefulSuccess}
+                                onClose={actioner.dismissStatefulSuccess}
                               />
                             </React.Fragment>
                           )}

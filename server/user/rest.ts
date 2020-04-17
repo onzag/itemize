@@ -17,6 +17,7 @@ export function userRestServices(appData: IAppDataType) {
 
     let decoded: {
       validateUserId: number;
+      validateUserEmail: string;
     };
     try {
       // we attempt to decode it
@@ -25,7 +26,7 @@ export function userRestServices(appData: IAppDataType) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
     };
 
-    if (!decoded.validateUserId) {
+    if (!decoded.validateUserId || !decoded.validateUserEmail) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
     }
 
@@ -34,6 +35,14 @@ export function userRestServices(appData: IAppDataType) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.USER_REMOVED);
     } else if (user.blocked_at !== null) {
       res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_BLOCKED}`);
+    }
+
+    // this happens when the user sends a validation email, then changes the email
+    // immediately and tries to use the previous token to validate the email
+    // a security concern
+    if (user.email !== decoded.validateUserEmail) {
+      // we consider this invalid as credentials it does refer
+      res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
     }
 
     const result = await appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
