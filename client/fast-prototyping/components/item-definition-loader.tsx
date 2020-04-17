@@ -33,7 +33,7 @@ interface ItemDefinitionLoaderProps extends WithStyles<typeof itemDefinitionLoad
   blockedImage?: string;
   errorImage?: string;
   msWaitedToShowLoadingAnimation?: number;
-  children: React.ReactChild;
+  children: React.ReactNode;
 }
 
 export const ItemDefinitionLoader = withStyles(itemDefinitionLoaderStyles)((props: ItemDefinitionLoaderProps) => {

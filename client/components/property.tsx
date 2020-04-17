@@ -24,6 +24,10 @@ interface IPropertyEntryProps<RendererPropsType> {
   renderer?: React.ComponentType<RendererPropsType>;
   rendererArgs?: object;
   hideDescription?: boolean;
+  altDescription?: string;
+  altLabel?: string;
+  altPlaceholder?: string;
+  ignoreErrors?: boolean;
 }
 
 interface IPropertySetterProps {
@@ -60,6 +64,10 @@ interface IPropertyEntryViewReadSetProps<RendererPropsType> {
   renderer?: React.ComponentType<RendererPropsType>;
   rendererArgs?: object;
   hideDescription?: boolean;
+  altDescription?: string;
+  altLabel?: string;
+  altPlaceholder?: string;
+  ignoreErrors?: boolean;
 }
 // TODO optimize
 function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "entry" | "view" | "read" | "set") {
@@ -216,6 +224,10 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "ent
                       renderer={props.renderer}
                       rendererArgs={props.rendererArgs}
                       hideDescription={props.hideDescription}
+                      altDescription={props.altDescription}
+                      altLabel={props.altLabel}
+                      altPlaceholder={props.altPlaceholder}
+                      ignoreErrors={props.ignoreErrors}
                     />
                   );
                 } else {

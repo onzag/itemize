@@ -253,7 +253,7 @@ exports.customUserQueries = (appData) => {
                     validateUserEmail: resultUser.email,
                 }, appData.sensitiveConfig.jwtKey);
                 const validateLink = (appData.sensitiveConfig.mailgunTargetDomain || appData.config.productionHostname) +
-                    "/rest/user/validate-email?token=" + encodeURIComponent(validateToken);
+                    "/rest/user/validate-email?token=" + encodeURIComponent(validateToken) + "&id=" + decoded.id;
                 const templateToUse = i18nData.custom.validate_account_template_name;
                 const from = `${i18nData.custom.validate_account_user} <${i18nData.custom.validate_account_email_user}@${appData.sensitiveConfig.mailgunDomain}>`;
                 const to = resultUser.email;

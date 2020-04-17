@@ -165,7 +165,7 @@ export function SearchActioner(props: ISearchActionerProps) {
 
 interface IDifferingPropertiesRetrieverProps {
   mainProperties: string[];
-  children: (differingProperties: string[]) => React.ReactChild;
+  children: (differingProperties: string[]) => React.ReactNode;
 }
 
 export function DifferingPropertiesRetriever(props: IDifferingPropertiesRetrieverProps) {

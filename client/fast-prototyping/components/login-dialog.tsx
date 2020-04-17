@@ -1,13 +1,14 @@
 import React from "react";
 import { Button, createStyles, withStyles, WithStyles, Typography, Divider } from "@material-ui/core";
 import { DialogResponsive } from "./dialog";
-import { I18nRead } from "../../components/localization";
+import { I18nRead, I18nReadMany } from "../../components/localization";
 import { LogActioner } from "../../components/login";
 import DoneIcon from "@material-ui/icons/Done";
 import { Entry } from "../../components/property";
 import { ItemDefinitionProvider } from "../../providers/item-definition";
 import Snackbar from "./snackbar";
 import { CacheableImageLoader } from "../../components/util";
+import { ProgressingElement } from "./util";
 
 const loginDialogStyles = createStyles({
   welcomeTitle: {
@@ -74,21 +75,37 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
                   </Typography>
                 </div>
                 <form>
-                  <Entry id="username" onChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
+                  <I18nReadMany data={[
+                    {id: "login_alt_field_label"},
+                    {id: "login_alt_field_placeholder"},
+                  ]}>
+                    {(i18nAltLabel: string, i18nAltPlaceholder: string) => (
+                      <Entry
+                        id="username"
+                        onChange={actioner.dismissError}
+                        showAsInvalid={!!actioner.error}
+                        ignoreErrors={true}
+                        altLabel={i18nAltLabel}
+                        altPlaceholder={i18nAltPlaceholder}
+                      />
+                    )}
+                  </I18nReadMany>
                   <Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
 
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    size="large"
-                    aria-label={i18nLogin}
-                    startIcon={<DoneIcon />}
-                    onClick={actioner.login.bind(null, true)}
-                    fullWidth={true}
-                    className={props.classes.loginButton}
-                  >
-                    {i18nLogin}
-                  </Button>
+                  <ProgressingElement isProgressing={actioner.isLoggingIn}>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      size="large"
+                      aria-label={i18nLogin}
+                      startIcon={<DoneIcon />}
+                      onClick={actioner.login.bind(null, true)}
+                      fullWidth={true}
+                      className={props.classes.loginButton}
+                    >
+                      {i18nLogin}
+                    </Button>
+                  </ProgressingElement>
                   <I18nRead id="forgot_password_question">
                     {(i18nForgotPassword: string) => (
                       <Button

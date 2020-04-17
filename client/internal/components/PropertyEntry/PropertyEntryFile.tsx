@@ -75,6 +75,10 @@ export default class PropertyEntryFile
       !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
+      this.props.altDescription !== nextProps.altDescription ||
+      this.props.altPlaceholder !== nextProps.altPlaceholder ||
+      this.props.altLabel !== nextProps.altLabel ||
+      !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
@@ -155,16 +159,17 @@ export default class PropertyEntryFile
   public render() {
     // getting the basic data
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
-    const i18nLabel = i18nData && i18nData.label;
-    const i18nDescription = i18nData && i18nData.description;
-    const i18nPlaceholder = i18nData && i18nData.placeholder;
+    const i18nLabel = this.props.altLabel || (i18nData && i18nData.label);
+    const i18nDescription = this.props.hideDescription ? null : (this.props.altDescription || (i18nData && i18nData.description));
+    const i18nPlaceholder = this.props.altPlaceholder || (i18nData && i18nData.placeholder);
     const isSupportedImage = !this.props.state.value ?
       false :
       FILE_SUPPORTED_IMAGE_TYPES.includes((this.props.state.value as PropertyDefinitionSupportedFileType).type);
 
     // get the invalid reason if any
     const invalidReason = this.props.state.invalidReason;
-    const isCurrentlyShownAsInvalid = (this.props.poked || this.props.state.userSet) && invalidReason;
+    const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
+      (this.props.poked || this.props.state.userSet) && invalidReason;
     let i18nInvalidReason = null;
     if (
       isCurrentlyShownAsInvalid && i18nData &&

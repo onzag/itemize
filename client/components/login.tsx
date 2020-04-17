@@ -17,10 +17,11 @@ import { MAX_SUPPORTED_INTEGER } from "../../constants";
  * as it takes a function that returns a react node
  */
 type ActionerFn = (actioner: {
-  login: (cleanWhenSuccesful?: boolean) => Promise<{id: number, role: string}>,
-  signup: (cleanWhenSuccesful?: boolean) => Promise<{id: number, role: string}>,
+  login: (cleanWhenSuccesful?: boolean) => Promise<{id: number, role: string, error: EndpointErrorType}>,
+  signup: (cleanWhenSuccesful?: boolean) => Promise<{id: number, role: string, error: EndpointErrorType}>,
   logout: () => void,
   logoutAll: () => void,
+  isLoggingIn: boolean,
   error: EndpointErrorType,
   dismissError: () => void,
   cleanUnsafeFields: (addDelay?: boolean) => void,
@@ -60,12 +61,20 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     }
     const passwordPdef =
       this.props.itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
-    passwordPdef.cleanValueFor(null, null);
-    this.props.itemDefinitionContextualValue.idef.triggerListeners("change", null, null);
+    passwordPdef.cleanValueFor(
+      this.props.itemDefinitionContextualValue.forId,
+      this.props.itemDefinitionContextualValue.forVersion,
+    );
+    this.props.itemDefinitionContextualValue.idef.triggerListeners(
+      "change",
+      this.props.itemDefinitionContextualValue.forId,
+      this.props.itemDefinitionContextualValue.forVersion,
+    );
   }
   public async login(cleanWhenSuccesful: boolean = true): Promise<{
     id: number;
     role: string;
+    error: EndpointErrorType;
   }> {
     const username = this.props.itemDefinitionContextualValue.state.properties
       .find((pv) => pv.propertyId === "username");
@@ -83,7 +92,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     const userData = await this.props.tokenContextValue.login(usernameValue as string, passwordValue as string, null);
 
     // if we get a sucesful login
-    if (cleanWhenSuccesful && userData) {
+    if (cleanWhenSuccesful && userData && !userData.error) {
       // we do it but on a delay in order to avoid flickering for example
       // in dialogs that are going to close
       this.cleanUnsafeFields(true);
@@ -120,6 +129,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
   public async signup(cleanWhenSuccesful: boolean = true): Promise<{
     id: number;
     role: string;
+    error: EndpointErrorType;
   }> {
     const result = await this.props.itemDefinitionContextualValue.submit({
       properties: ["username", "password"],
@@ -127,7 +137,11 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     if (!result.error) {
       return await this.login(cleanWhenSuccesful);
     }
-    return null;
+    return {
+      id: null,
+      role: null,
+      error: result.error,
+    };
   }
   public dismissError() {
     this.props.tokenContextValue.dismissError();
@@ -159,6 +173,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
       error: this.props.tokenContextValue.error || this.props.itemDefinitionContextualValue.submitError,
       dismissError,
       cleanUnsafeFields: this.cleanUnsafeFields,
+      isLoggingIn: this.props.tokenContextValue.isLoggingIn || this.props.itemDefinitionContextualValue.submitting,
     });
     return output;
   }

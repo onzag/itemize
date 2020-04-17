@@ -5,6 +5,9 @@ import TranslateIcon from "@material-ui/icons/Translate";
 
 interface ILanguagePickerProps {
   className?: string;
+  shrinkingDisplay?: boolean;
+  shrinkingDisplayStandardClassName?: string;
+  shrinkingDisplayShrunkClassName?: string;
 }
 
 interface ILanguagePickerState {
@@ -50,7 +53,14 @@ export class LanguagePicker extends React.Component<ILanguagePickerProps, ILangu
               startIcon={<TranslateIcon/>}
               onClick={this.handleButtonSelectClick}
             >
-              {languageData.currentLanguage.name}
+              {
+                !this.props.shrinkingDisplay ?
+                  languageData.currentLanguage.name :
+                  <React.Fragment>
+                    <span className={this.props.shrinkingDisplayStandardClassName}>{languageData.currentLanguage.name}</span>
+                    <span className={this.props.shrinkingDisplayShrunkClassName}>{languageData.currentLanguage.code}</span>
+                  </React.Fragment>
+              }
             </Button>
             <Menu
               anchorEl={this.state.anchorEl}

@@ -13,6 +13,20 @@ const buttonsStyles = (theme: Theme) => createStyles({
     paddingLeft: "1rem",
     paddingRight: "1rem",
   },
+  loginButton: {
+    whiteSpace: "nowrap",
+  },
+  standardLanguageButtonLabel: {
+    [theme.breakpoints.down(450)]: {
+      display: "none",
+    }
+  },
+  shrunkLanguageButtonLabel: {
+    display: "none",
+    [theme.breakpoints.down(450)]: {
+      display: "inline",
+    }
+  },
 });
 
 interface ButtonsProps extends WithStyles<typeof buttonsStyles> {
@@ -58,12 +72,17 @@ export const Buttons = withStyles(buttonsStyles)((props: ButtonsProps) => {
             {(status) => {
               if (status === "LOGGED_OUT" || status === "LOGGING_IN") {
                 return <React.Fragment>
-                  <Button color="inherit" variant="outlined" onClick={openLoginDialog}>
+                  <Button color="inherit" variant="outlined" onClick={openLoginDialog} className={props.classes.loginButton}>
                     <I18nRead id="login" />
                   </Button>
                   {
                     !props.excludeLanguagePicker ?
-                      <LanguagePicker className={props.classes.languageButton} /> :
+                      <LanguagePicker
+                        className={props.classes.languageButton}
+                        shrinkingDisplay={true}
+                        shrinkingDisplayStandardClassName={props.classes.standardLanguageButtonLabel}
+                        shrinkingDisplayShrunkClassName={props.classes.shrunkLanguageButtonLabel}
+                      /> :
                       null
                   }
                   <LoginDialog

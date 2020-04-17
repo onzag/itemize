@@ -1,14 +1,9 @@
 import React, { useState } from "react";
 import { SubmitActioner } from "../../components/item-definition";
-import { Button, CircularProgress, PropTypes } from "@material-ui/core";
+import { Button, PropTypes } from "@material-ui/core";
 import { I18nRead } from "../../components/localization";
 import { IActionSubmitOptions } from "../../providers/item-definition";
-import { DelayDisplay } from "./util";
-
-// TODO same as button but has circular progress in it
-export function ProgressingButton() {
-
-}
+import { ProgressingElement } from "./util";
 
 interface ISubmitButtonProps {
   options: IActionSubmitOptions;
@@ -44,23 +39,18 @@ export function SubmitButton(props: ISubmitButtonProps) {
         }
         return (
           <React.Fragment>
-            <Button
-              variant={props.buttonVariant}
-              color={props.buttonColor}
-              endIcon={props.buttonEndIcon}
-              startIcon={props.buttonStartIcon}
-              className={props.buttonClassName}
-              onClick={submitAction}
-            >
-              <I18nRead capitalize={true} id={props.i18nId} />
-              {
-                actioner.submitting ?
-                <DelayDisplay duration={700}>
-                  <CircularProgress/>
-                </DelayDisplay> :
-                null
-              }
-            </Button>
+            <ProgressingElement isProgressing={actioner.submitting}>
+              <Button
+                variant={props.buttonVariant}
+                color={props.buttonColor}
+                endIcon={props.buttonEndIcon}
+                startIcon={props.buttonStartIcon}
+                className={props.buttonClassName}
+                onClick={submitAction}
+              >
+                <I18nRead capitalize={true} id={props.i18nId} />
+              </Button>
+            </ProgressingElement>
             {
               CustomConfirmationComponent ?
                 <CustomConfirmationComponent isActive={confirmationIsActive} onClose={onCloseAction}/> :

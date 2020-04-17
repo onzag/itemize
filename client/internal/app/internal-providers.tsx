@@ -21,7 +21,7 @@ interface ITokenProviderProps {
 }
 
 export interface ITokenContextType extends ITokenProviderState {
-  login: (username: string, password: string, token: string) => Promise<{id: number, role: string}>;
+  login: (username: string, password: string, token: string) => Promise<{id: number, role: string, error: EndpointErrorType}>;
   logout: () => void;
   dismissError: () => void;
 }
@@ -63,7 +63,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     password: string,
     token: string,
     doNotShowLoginError?: boolean,
-  ): Promise<{id: number, role: string}> {
+  ): Promise<{id: number, role: string, error: EndpointErrorType}> {
     if (this.state.isLoggingIn) {
       console.warn("Tried to login while logging in");
       return null;
@@ -223,10 +223,11 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       }
     }
 
-    return tokenDataToken ? {
-      id: tokenDataId as number,
-      role: tokenDataRole as string,
-    } : null;
+    return {
+      id: tokenDataId as number || null,
+      role: tokenDataRole as string || null,
+      error: error || null,
+    };
   }
   public logout() {
     if (this.state.isLoggingIn) {

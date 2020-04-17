@@ -3,6 +3,8 @@ name = user
 fts_search_field_label = user search
 fts_search_field_placeholder = insert relevant user data
 custom.login = login
+custom.login_alt_field_label = username or email
+custom.login_alt_field_placeholder = username or email
 custom.login_welcome = welcome
 custom.logout = logout
 custom.logout_all = logout from all devices
@@ -24,10 +26,18 @@ custom.missing_email_validation_warning_action = verify email
 custom.missing_email_validation_warning_action_success = verification email sent succesfully
 custom.email_is_verified = email is verified
 custom.forgot_password_question = forgot password?
+
 custom.recover_account = account recovery
 custom.recover_account_message = Note that your email needs to be set and validated in order for the recover account to function
 custom.recover_account_action = send email with instructions
 custom.recover_account_action_success = sucessfully sent email
+
+custom.reset_password = reset password
+custom.reset_password_message = Use a strong password with alphanumeric characters and symbols
+custom.reset_password_success = password changed successfully!
+custom.reset_password_field_alt_label = new password
+custom.reset_password_field_alt_placeholder = new password
+custom.reset_password_action = update password
 
 custom.validate_account = activate your account
 custom.validate_account_template_name =
@@ -108,6 +118,8 @@ name = usuario
 fts_search_field_label = buscar usuario
 fts_search_field_placeholder = inserte información relevante sobre el usuario
 custom.login = iniciar sesión
+custom.login_alt_field_label = nombre de usuario o email
+custom.login_alt_field_placeholder = nombre de usuario o email
 custom.login_welcome = bienvenido
 custom.logout = cerrar sesión
 custom.logout_all = cerrar todas las sesiones activas
@@ -129,10 +141,18 @@ custom.missing_email_validation_warning_action = verificar email
 custom.missing_email_validation_warning_action_success = email de verficación ha sido enviado
 custom.email_is_verified = el correo ha sido verificado
 custom.forgot_password_question = ¿Ha olvidado su contraseña?
+
 custom.recover_account = recuperar acceso
 custom.recover_account_message = ¡Atención! su email debe estar validado para poder ser capáz de recuperar su cuenta
 custom.recover_account_action = enviar email con instrucciones
 custom.recover_account_action_success = ¡Correo enviado exitosamente!
+
+custom.reset_password = recuperar contraseña
+custom.reset_password_message = Use una contraseña con caracteres alfanuméricos y símbolos
+custom.reset_password_success = ¡cambio exitoso!
+custom.reset_password_field_alt_label = nueva contraseña
+custom.reset_password_field_alt_placeholder = nueva contraseña
+custom.reset_password_action = actualize la contraseña
 
 custom.validate_account = active su cuenta
 custom.validate_account_template_name =

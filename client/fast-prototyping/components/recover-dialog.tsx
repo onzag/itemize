@@ -8,6 +8,7 @@ import { Alert } from "@material-ui/lab";
 import { ItemDefinitionProvider } from "../../providers/item-definition";
 import { UserActioner } from "../../components/user";
 import Snackbar from "./snackbar";
+import { ProgressingElement } from "./util";
 
 const recoverDialogStyles = createStyles({
   resetPasswordButton: {
@@ -57,18 +58,20 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
                 </form>
                 <I18nRead id="recover_account_action">
                   {(i18nRecoverAction: string) => (
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      size="large"
-                      aria-label={i18nRecoverAction}
-                      startIcon={<MailIcon />}
-                      onClick={actioner.sendResetPassword.bind(null, true)}
-                      fullWidth={true}
-                      className={props.classes.resetPasswordButton}
-                    >
-                      {i18nRecoverAction}
-                    </Button>
+                    <ProgressingElement isProgressing={actioner.statefulOnProgress}>
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        size="large"
+                        aria-label={i18nRecoverAction}
+                        startIcon={<MailIcon />}
+                        onClick={actioner.sendResetPassword.bind(null, true)}
+                        fullWidth={true}
+                        className={props.classes.resetPasswordButton}
+                      >
+                        {i18nRecoverAction}
+                      </Button>
+                    </ProgressingElement>
                   )}
                 </I18nRead>
                 <Divider className={props.classes.divider}/>

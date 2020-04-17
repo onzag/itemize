@@ -8,6 +8,7 @@ import { Entry, Setter } from "../../components/property";
 import { ItemDefinitionProvider } from "../../providers/item-definition";
 import Snackbar from "./snackbar";
 import { Link } from "../../components/navigaton";
+import { ProgressingElement } from "./util";
 
 const signupDialogStyles = createStyles({
   welcomeTitle: {
@@ -96,18 +97,20 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
 
                   <I18nReadError error={actioner.error} />
                 </form>
-                <Button
-                  color="primary"
-                  variant="contained"
-                  size="large"
-                  aria-label={i18nSignup}
-                  startIcon={<DoneIcon />}
-                  onClick={actioner.signup.bind(null, true)}
-                  fullWidth={true}
-                  className={props.classes.signupButton}
-                >
-                  {i18nSignup}
-                </Button>
+                <ProgressingElement isProgressing={actioner.isLoggingIn}>
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    size="large"
+                    aria-label={i18nSignup}
+                    startIcon={<DoneIcon />}
+                    onClick={actioner.signup.bind(null, true)}
+                    fullWidth={true}
+                    className={props.classes.signupButton}
+                  >
+                    {i18nSignup}
+                  </Button>
+                </ProgressingElement>
                 <I18nReadMany data={[{
                   id: "terms_and_conditions",
                 }, {

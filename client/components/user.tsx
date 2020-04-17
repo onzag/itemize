@@ -26,18 +26,20 @@ export function UserDataRetriever(props: IUserDataRetrieverProps) {
   );
 }
 
+export interface IUserActionerArg {
+  sendValidateEmail: () => Promise<{error: EndpointErrorType}>,
+  sendResetPassword: (cleanWhenSuccesful?: boolean) => Promise<{error: EndpointErrorType}>,
+  resetPassword: (token: string, cleanWhenSuccesful?: boolean) => Promise<{error: EndpointErrorType}>,
+  statefulOnProgress: boolean,
+  statefulSuccess: boolean,
+  dismissStatefulSuccess: () => void,
+  statefulError: EndpointErrorType;
+  dismissStatefulError: () => void;
+  cleanUnsafeFields: (addDelay?: boolean) => void;
+};
+
 interface IUserActionerProps {
-  children: (actioner: {
-    sendValidateEmail: () => Promise<void>,
-    sendResetPassword: (cleanWhenSuccesful?: boolean) => Promise<void>,
-    resetPassword: (token: string, cleanWhenSuccesful?: boolean) => Promise<void>,
-    statefulOnProgress: boolean,
-    statefulSuccess: boolean,
-    dismissStatefulSuccess: () => void,
-    statefulError: EndpointErrorType;
-    dismissStatefulError: () => void;
-    cleanUnsafeFields: (addDelay?: boolean) => void;
-  }) => React.ReactNode;
+  children: (actioner: IUserActionerArg) => React.ReactNode;
 }
 
 interface IActualUserActionerProps extends IUserActionerProps {
@@ -79,8 +81,8 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     }
     const passwordPdef =
       this.props.userContext.idef.getPropertyDefinitionFor("password", false);
-    passwordPdef.cleanValueFor(null, null);
-    this.props.userContext.idef.triggerListeners("change", null, null);
+    passwordPdef.cleanValueFor(this.props.userContext.forId, this.props.userContext.forVersion);
+    this.props.userContext.idef.triggerListeners("change", this.props.userContext.forId, this.props.userContext.forVersion);
   }
   async sendValidateEmail() {
     if (this.state.onProgress) {
@@ -118,6 +120,8 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
         onProgress: false,
       });
     }
+
+    return { error };
   }
   async sendResetPassword(cleanWhenSuccesful: boolean = true) {
     if (this.state.onProgress) {
@@ -162,6 +166,8 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     if (cleanWhenSuccesful) {
       this.cleanUnsafeFields(true);
     }
+
+    return { error };
   }
   async resetPassword(token: string, cleanWhenSuccesful: boolean = true) {
     if (this.state.onProgress) {
@@ -207,6 +213,8 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     if (cleanWhenSuccesful) {
       this.cleanUnsafeFields(true);
     }
+
+    return { error };
   }
   public dismissStatefulSuccess() {
     this.setState({

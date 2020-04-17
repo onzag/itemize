@@ -14,8 +14,6 @@ import { OutdatedDialog } from "./outdated-dialog";
 
 const navbarStyles = (theme: Theme) => createStyles({
   container: {
-    flexGrow: 1,
-    flexShrink: 1,
     flexBasis: "100%",
     display: "flex",
     flexDirection: "row-reverse",
@@ -25,6 +23,15 @@ const navbarStyles = (theme: Theme) => createStyles({
     whiteSpace: "nowrap",
     paddingLeft: "1rem",
     paddingRight: "1rem",
+    overflow: "hidden",
+    flexBasis: "100%",
+    [theme.breakpoints.down(400)]: {
+      display: "none",
+    }
+  },
+  titleTypography: {
+    textOverflow: "ellipsis",
+    overflow: "hidden",
   },
 });
 
@@ -52,7 +59,7 @@ const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
             }
           </I18nRead>
           <div className={props.classes.title}>
-            <Typography variant="body1">
+            <Typography variant="body1" className={props.classes.titleTypography}>
               <TitleReader />
               &nbsp;
               &nbsp;

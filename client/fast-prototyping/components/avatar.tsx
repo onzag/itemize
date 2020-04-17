@@ -158,7 +158,7 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
 
     const hasWarningForMissingEmail = !(email && email.value);
     const hasWarningForNotValidEmail = !(eValidated && eValidated.value);
-    const hasWarning = email.stateValueModified && eValidated.stateValueModified && props.showWarnings && (
+    const hasWarning = email && eValidated && email.stateValueModified && eValidated.stateValueModified && props.showWarnings && (
       hasWarningForMissingEmail || hasWarningForNotValidEmail
     );
 
@@ -183,12 +183,12 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
     const avatar = (
       <Link to={`/${profileURLSection}/${id}`}>
         <div className={props.classes.avatarContainer}>
-          <CacheableImageLoader src={imageSources.imageSmallSizeURL}>
-            {(imageSmallSrc) => (
+          <CacheableImageLoader src={props.large ? imageSources.imageLargeSizeURL : imageSources.imageSmallSizeURL}>
+            {(imageSrc) => (
               <MAvatar
                 alt={userNameValue}
                 classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.large ? props.classes.avatarLarge : ""}` }}
-                src={imageSmallSrc}
+                src={imageSrc}
               >
                 {userNameValue ? userNameValue[0] : ""}
               </MAvatar>

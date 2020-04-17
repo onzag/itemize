@@ -44,6 +44,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
   const setPromisified = promisify(appData.redis.set).bind(appData.redis);
   const expirePromisified = promisify(appData.redis.expire).bind(appData.redis);
   const getPromisified = promisify(appData.redis.get).bind(appData.redis);
+  const delPromisified = promisify(appData.redis.del).bind(appData.redis);
 
   return {
     token: {
@@ -291,7 +292,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           validateUserEmail: resultUser.email,
         }, appData.sensitiveConfig.jwtKey);
         const validateLink = (appData.sensitiveConfig.mailgunTargetDomain || appData.config.productionHostname) +
-          "/rest/user/validate-email?token=" + encodeURIComponent(validateToken);
+          "/rest/user/validate-email?token=" + encodeURIComponent(validateToken) + "&id=" + decoded.id;
 
         const templateToUse = i18nData.custom.validate_account_template_name;
         const from = `${i18nData.custom.validate_account_user} <${i18nData.custom.validate_account_email_user}@${appData.sensitiveConfig.mailgunDomain}>`;
@@ -512,6 +513,8 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           null,
           null,
         );
+
+        await delPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
 
         return {
           status: "OK",

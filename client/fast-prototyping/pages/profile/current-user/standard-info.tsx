@@ -2,7 +2,7 @@ import React from "react";
 import { IActionSubmitOptions } from "../../../../providers/item-definition";
 import { I18nReadMany, I18nRead } from "../../../../components/localization";
 import { Entry, Reader } from "../../../../components/property";
-import { Button, Box, Paper, createStyles, withStyles, WithStyles, Divider, CircularProgress } from "@material-ui/core";
+import { Button, Box, Paper, createStyles, withStyles, WithStyles, Divider } from "@material-ui/core";
 import { SubmitButton } from "../../../components/buttons";
 import { DifferingPropertiesRetriever } from "../../../../components/item-definition";
 import { DialogResponsive } from "../../../components/dialog";
@@ -17,6 +17,7 @@ import Snackbar from "../../../components/snackbar";
 import { LanguagePicker } from "../../../components/language-picker";
 import { CountryPicker } from "../../../components/country-picker";
 import { CurrencyPicker } from "../../../components/currency-picker";
+import { ProgressingElement } from "../../../components/util";
 
 interface CustomConfirmationDialogProps {
   isActive: boolean;
@@ -77,17 +78,6 @@ const currentUserProfileStandardInfoStyles = createStyles({
   alertButtonValidateEmailContainer: {
     paddingTop: "0.75rem",
   },
-  alertButtonValidateEmailProgressWrapper: {
-    position: "relative",
-    display: "inline-block",
-  },
-  alertButtonValidateEmailProgressElement: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    marginTop: -12,
-    marginLeft: -12,
-  },
   emailInButton: {
     textTransform: "none",
     opacity: 0.7,
@@ -133,23 +123,17 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
                         <UserActioner>
                           {(actioner) => (
                             <React.Fragment>
-                              <div className={props.classes.alertButtonValidateEmailProgressWrapper}>
+                              <ProgressingElement isProgressing={actioner.statefulOnProgress}>
                                 <Button
                                   variant="outlined"
                                   color="secondary"
                                   endIcon={<MailOutline/>}
                                   onClick={actioner.sendValidateEmail}
-                                  disabled={actioner.statefulOnProgress}
                                 >
                                   <I18nRead capitalize={true} id="missing_email_validation_warning_action"/>
                                   <i className={props.classes.emailInButton}>&nbsp;{emailState.stateAppliedValue}</i>
                                 </Button>
-                                {
-                                  actioner.statefulOnProgress ?
-                                  <CircularProgress size={24} className={props.classes.alertButtonValidateEmailProgressElement}/> :
-                                  null
-                                }
-                              </div>
+                              </ProgressingElement>
                               <Snackbar
                                 i18nDisplay={actioner.statefulError}
                                 open={!!actioner.statefulError}

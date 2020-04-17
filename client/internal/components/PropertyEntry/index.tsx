@@ -49,11 +49,15 @@ export interface IPropertyEntryBaseProps<ValueType, RendererPropsType> {
   forVersion: string;
   forceInvalid?: boolean;
   hideDescription?: boolean;
+  altDescription?: string;
+  altLabel?: string;
+  altPlaceholder?: string;
   poked?: boolean;
   autoFocus?: boolean;
   icon?: React.ReactNode;
   renderer?: React.ComponentType<RendererPropsType>;
   rendererArgs?: object;
+  ignoreErrors?: boolean;
 }
 
 export interface IPropertyEntryProps<ValueType, RendererPropsType> extends IPropertyEntryBaseProps<ValueType, RendererPropsType> {
