@@ -9,6 +9,7 @@ import { ItemDefinitionProvider } from "../../providers/item-definition";
 import Snackbar from "./snackbar";
 import { Link } from "../../components/navigaton";
 import { ProgressingElement } from "./util";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 
 const signupDialogStyles = createStyles({
   welcomeTitle: {
@@ -77,7 +78,7 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
                   </Typography>
                 </div>
                 <form>
-                  <Entry id="username" onChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
+                  <Entry id="username" onChange={actioner.dismissError} showAsInvalid={!!actioner.error} icon={<AccountCircleIcon/>}/>
                   <Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
                   <AppLanguageRetriever>
                     {(languageData) => (

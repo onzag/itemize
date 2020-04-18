@@ -6,6 +6,7 @@ import {
   InputAdornment,
   IconButton,
   ThemeProvider,
+  Typography,
 } from "@material-ui/core";
 import {
   WithStyles,
@@ -549,20 +550,28 @@ class ActualPropertyEntryFieldRenderer
     } else if (this.props.icon) {
       // set it at the end
       appliedInputProps.endAdornment = (
-        <InputAdornment position="end">
+        <InputAdornment position="end" className={this.props.classes.icon}>
           {this.props.icon}
         </InputAdornment>
       );
     }
 
+    const descriptionAsAlert = this.props.args["descriptionAsAlert"];
     // return the complex overengineered component in all its glory
     return (
       <div className={this.props.classes.container}>
         {
-          this.props.description ?
+          this.props.description && descriptionAsAlert ?
           <Alert severity="info" className={this.props.classes.description}>
             {this.props.description}
           </Alert> :
+          null
+        }
+        {
+          this.props.description && !descriptionAsAlert ?
+          <Typography variant="caption" className={this.props.classes.description}>
+            {this.props.description}
+          </Typography> :
           null
         }
         <TextField

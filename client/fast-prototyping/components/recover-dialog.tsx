@@ -9,6 +9,7 @@ import { ItemDefinitionProvider } from "../../providers/item-definition";
 import { UserActioner } from "../../components/user";
 import Snackbar from "./snackbar";
 import { ProgressingElement } from "./util";
+import AlernateEmailIcon from "@material-ui/icons/AlternateEmail";
 
 const recoverDialogStyles = createStyles({
   resetPasswordButton: {
@@ -54,6 +55,7 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
                     onChange={actioner.dismissStatefulError}
                     showAsInvalid={!!actioner.statefulError}
                     hideDescription={true}
+                    icon={<AlernateEmailIcon/>}
                   />
                 </form>
                 <I18nRead id="recover_account_action">

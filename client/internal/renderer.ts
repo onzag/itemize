@@ -1,4 +1,6 @@
 export interface IRendererProps {
   rtl: boolean;
-  args: object;
+  args: {
+    [arg: string]: any;
+  };
 }

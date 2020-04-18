@@ -1,7 +1,7 @@
 import { IPropertyEntryFileRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryFile";
 import { createStyles, WithStyles, withStyles } from "@material-ui/styles";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
-import { ThemeProvider, FormLabel, RootRef, Paper, Button } from "@material-ui/core";
+import { ThemeProvider, FormLabel, RootRef, Paper, Button, Typography } from "@material-ui/core";
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import NoteAddIcon from "@material-ui/icons/NoteAdd";
@@ -11,6 +11,8 @@ import Dropzone, { DropzoneRef } from "react-dropzone";
 import React from "react";
 import { capitalize } from "../../../components/localization";
 import { Alert } from "@material-ui/lab";
+
+// TODO it's missing the icon
 
 function shouldShowInvalid(props: IPropertyEntryFileRendererProps) {
   return !props.currentValid;
@@ -194,8 +196,16 @@ function manuallyTriggerUpload(dropzoneRef: React.MutableRefObject<DropzoneRef>)
 
 const ActualPropertyEntryFileRendererWithStyles = withStyles(style)((props: IPropertyEntryFileRendererWithStylesProps) => {
   const dropzoneRef = React.useRef<DropzoneRef>();
+  // TODO check the icon so that it looks right
+  const descriptionAsAlert = props.args["descriptionAsAlert"];
   return (
     <div className={props.classes.container}>
+      {props.description && descriptionAsAlert ? <Alert severity="info" className={props.classes.description}>
+        {props.description}
+      </Alert> : null}
+      {props.description && !descriptionAsAlert ? <Typography variant="caption" className={props.classes.description}>
+        {props.description}
+      </Typography> : null}
       <FormLabel
         aria-label={props.label}
         classes={{
@@ -204,10 +214,8 @@ const ActualPropertyEntryFileRendererWithStyles = withStyles(style)((props: IPro
         }}
       >
         {capitalize(props.label)}
+        {props.icon ? <span className={props.classes.icon}>{props.icon}</span> : null}
       </FormLabel>
-      {props.description ? <Alert severity="info" className={props.classes.description}>
-        {props.description}
-      </Alert> : null}
       <Dropzone
         onDropAccepted={onDrop.bind(null, props.onSetFile)}
         onDropRejected={onDrop.bind(null, props.onSetFile)}

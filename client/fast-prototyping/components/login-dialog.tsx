@@ -9,6 +9,7 @@ import { ItemDefinitionProvider } from "../../providers/item-definition";
 import Snackbar from "./snackbar";
 import { CacheableImageLoader } from "../../components/util";
 import { ProgressingElement } from "./util";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 
 const loginDialogStyles = createStyles({
   welcomeTitle: {
@@ -87,6 +88,7 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
                         ignoreErrors={true}
                         altLabel={i18nAltLabel}
                         altPlaceholder={i18nAltPlaceholder}
+                        icon={<AccountCircleIcon/>}
                       />
                     )}
                   </I18nReadMany>

@@ -18,6 +18,10 @@ import { LanguagePicker } from "../../../components/language-picker";
 import { CountryPicker } from "../../../components/country-picker";
 import { CurrencyPicker } from "../../../components/currency-picker";
 import { ProgressingElement } from "../../../components/util";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import AlernateEmailIcon from "@material-ui/icons/AlternateEmail";
+import NotificationsIcon from '@material-ui/icons/Notifications';
+import MenuBookIcon from '@material-ui/icons/MenuBook';
 
 interface CustomConfirmationDialogProps {
   isActive: boolean;
@@ -94,7 +98,7 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
         <CountryPicker />
         <CurrencyPicker />
       </div>
-      <Entry id="username" />
+      <Entry id="username" icon={<AccountCircleIcon/>}/>
       <Reader id="email">
         {(email: string, emailState: IPropertyDefinitionState) => {
           const missesEmail = !(emailState && emailState.stateAppliedValue);
@@ -158,10 +162,12 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
           );
         }}
       </Reader>
-      <Entry id="email" />
+      <Entry id="email" rendererArgs={{descriptionAsAlert: true}} icon={<AlernateEmailIcon/>}/>
+      <Entry id="e_notifications" icon={<NotificationsIcon/>}/>
+      <Entry id="e_newsletter" icon={<MenuBookIcon/>}/>
       <Divider />
       <Box className={props.classes.buttonBox}>
-        <DifferingPropertiesRetriever mainProperties={["profile_picture", "username", "email"]}>
+        <DifferingPropertiesRetriever mainProperties={["profile_picture", "username", "email", "e_notifications", "e_newsletter"]}>
           {(differingProperties) => {
             const options: IActionSubmitOptions = {
               properties: differingProperties,

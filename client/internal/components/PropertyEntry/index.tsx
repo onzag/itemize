@@ -2,7 +2,7 @@ import PropertyDefinition, {
   IPropertyDefinitionState,
 } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
-// import PropertyEntryBoolean from "./PropertyEntryBoolean";
+import PropertyEntryBoolean from "./PropertyEntryBoolean";
 // import PropertyEntryText from "./PropertyEntryText";
 // import PropertyEntryDateTime from "./PropertyEntryDateTime";
 // import PropertyEntryLocation from "./PropertyEntryLocation";
@@ -82,7 +82,10 @@ const typeRegistry:
   },
   integer: null,
   number: null,
-  boolean: null,
+  boolean: {
+    renderer: "PropertyEntryBoolean",
+    element: PropertyEntryBoolean,
+  },
   text: null,
   currency: null,
   unit: null,

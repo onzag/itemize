@@ -19,7 +19,7 @@ interface IPropertyEntryProps<RendererPropsType> {
   policyType?: string;
   policyName?: string;
   showAsInvalid?: boolean;
-  icon?: string;
+  icon?: React.ReactNode;
   onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, inernalValue?: any) => void;
   renderer?: React.ComponentType<RendererPropsType>;
   rendererArgs?: object;
@@ -58,7 +58,7 @@ interface IPropertyEntryViewReadSetProps<RendererPropsType> {
   policyName?: string;
   children?: (value: PropertyDefinitionSupportedType, state: IPropertyDefinitionState) => React.ReactNode;
   showAsInvalid?: boolean;
-  icon?: string;
+  icon?: React.ReactNode;
   onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, internalValue?: any) => void;
   value?: PropertyDefinitionSupportedType;
   renderer?: React.ComponentType<RendererPropsType>;
