@@ -1,5 +1,6 @@
 import React from "react";
-import { createStyles, WithStyles, withStyles, Button, CircularProgress } from "@material-ui/core";
+import { createStyles, WithStyles, withStyles, CircularProgress } from "@material-ui/core";
+import "./util.scss";
 
 interface DelayDisplayProps {
   duration: number;
@@ -82,3 +83,62 @@ export const ProgressingElement = withStyles(progressingElementStyle)((props: IP
     }
   </div>);
 });
+
+interface SlowLoadingElementProps {
+  children: React.ReactNode;
+  id: string;
+}
+
+interface SlowLoadingElementState {
+  isReady: boolean;
+  readyForId: string;
+}
+
+export class SlowLoadingElement extends React.Component<SlowLoadingElementProps, SlowLoadingElementState> {
+  public static getDerivedStateFromProps(
+    props: SlowLoadingElementProps,
+    state: SlowLoadingElementState,
+  ): Partial<SlowLoadingElementState> {
+    if (props.id !== state.readyForId) {
+      return {
+        isReady: false,
+        readyForId: props.id,
+      };
+    }
+    return null;
+  }
+  constructor(props: SlowLoadingElementProps) {
+    super(props);
+
+    this.state = {
+      isReady: false,
+      readyForId: props.id || null,
+    }
+  }
+  public makeReady() {
+    setTimeout(() => {
+      this.setState({
+        isReady: true,
+      });
+    }, 10);
+  }
+  public shouldComponentUpdate(nextProps: SlowLoadingElementProps, nextState: SlowLoadingElementState) {
+    return this.state.isReady !== nextState.isReady ||
+      nextProps.id !== this.props.id;
+  }
+  public componentDidMount() {
+    this.makeReady();
+  }
+  public componentDidUpdate() {
+    this.makeReady();
+  }
+  public render() {
+    if (this.state.isReady) {
+      return this.props.children;
+    } else {
+      return <div className="slow-loading-ring-wrapper">
+        <div className="slow-loading-ring"/>
+      </div>
+    }
+  }
+}

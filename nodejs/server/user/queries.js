@@ -31,6 +31,7 @@ exports.customUserQueries = (appData) => {
     const setPromisified = util_2.promisify(appData.redis.set).bind(appData.redis);
     const expirePromisified = util_2.promisify(appData.redis.expire).bind(appData.redis);
     const getPromisified = util_2.promisify(appData.redis.get).bind(appData.redis);
+    const delPromisified = util_2.promisify(appData.redis.del).bind(appData.redis);
     return {
         token: {
             type: graphql_token_object_1.default,
@@ -440,6 +441,7 @@ exports.customUserQueries = (appData) => {
                 await appData.cache.requestUpdate(userIdef, decoded.resetPasswordUserId, null, {
                     password: args.new_password,
                 }, null, null, null, null);
+                await delPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
                 return {
                     status: "OK",
                 };

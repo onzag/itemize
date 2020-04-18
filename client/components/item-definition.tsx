@@ -174,6 +174,9 @@ export function DifferingPropertiesRetriever(props: IDifferingPropertiesRetrieve
       (itemDefinitionContext) => {
         const finalProperties = props.mainProperties.filter((mainProperty: string) => {
           const propertyData = itemDefinitionContext.state.properties.find(p => p.propertyId === mainProperty);
+          if (!propertyData) {
+            return false;
+          }
           return !equals(propertyData.stateAppliedValue, propertyData.value);
         });
         return props.children(finalProperties);

@@ -97,7 +97,7 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
 
                   <I18nReadError error={actioner.error} />
                 </form>
-                <ProgressingElement isProgressing={actioner.isLoggingIn}>
+                <ProgressingElement isProgressing={actioner.isLoggingIn} fullWidth={true}>
                   <Button
                     color="primary"
                     variant="contained"

@@ -58,7 +58,7 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
                 </form>
                 <I18nRead id="recover_account_action">
                   {(i18nRecoverAction: string) => (
-                    <ProgressingElement isProgressing={actioner.statefulOnProgress}>
+                    <ProgressingElement isProgressing={actioner.statefulOnProgress} fullWidth={true}>
                       <Button
                         color="primary"
                         variant="contained"

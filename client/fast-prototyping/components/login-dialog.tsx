@@ -92,7 +92,7 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
                   </I18nReadMany>
                   <Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
 
-                  <ProgressingElement isProgressing={actioner.isLoggingIn}>
+                  <ProgressingElement isProgressing={actioner.isLoggingIn} fullWidth={true}>
                     <Button
                       color="primary"
                       variant="contained"

@@ -5,6 +5,7 @@ import { ILocaleContextType } from ".";
 import { Location } from "history";
 import { GUEST_METAROLE, ENDPOINT_ERRORS } from "../../../constants";
 import CacheWorkerInstance from "../workers/cache";
+import equals from "deep-equal";
 
 export interface ITokenProviderState {
   token: string;
@@ -44,6 +45,10 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.dismissError = this.dismissError.bind(this);
+  }
+  public shouldComponentUpdate(nextProps: ITokenProviderProps, nextState: ITokenProviderState) {
+    return !equals(this.state, nextState) ||
+      nextProps.localeContext !== this.props.localeContext;
   }
   public componentDidMount() {
     const storedToken = localStorage.getItem("TOKEN");
@@ -99,20 +104,22 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     if (!isOffline) {
       const tokenData = data.data && data.data.token;
       tokenDataId = tokenData ? tokenData.id as number : null;
-      tokenDataRole = tokenData ? tokenData.role as string : null;
+      tokenDataRole = tokenData ? tokenData.role as string : GUEST_METAROLE;
       tokenDataToken = tokenData ? tokenData.token as string : null;
       if (tokenDataToken !== null) {
         localStorage.setItem("TOKEN", tokenDataToken as string);
         localStorage.setItem("ROLE", tokenDataRole as string);
         localStorage.setItem("ID", tokenDataId.toString());
+        document.cookie = "token=" + tokenDataToken;
       } else {
         localStorage.removeItem("TOKEN");
         localStorage.removeItem("ROLE");
         localStorage.removeItem("ID");
+        document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
       }
     } else {
       tokenDataId = parseInt(localStorage.getItem("ID")) || null;
-      tokenDataRole = localStorage.getItem("ROLE");
+      tokenDataRole = localStorage.getItem("ROLE") || GUEST_METAROLE;
       tokenDataToken = localStorage.getItem("TOKEN");
     }
 
@@ -225,7 +232,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
 
     return {
       id: tokenDataId as number || null,
-      role: tokenDataRole as string || null,
+      role: tokenDataRole as string || GUEST_METAROLE,
       error: error || null,
     };
   }
