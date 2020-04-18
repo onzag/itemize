@@ -17,15 +17,30 @@ custom.login_instead = already have an account? log in
 custom.profile = profile
 custom.my_profile = my profile
 custom.update_profile = update profile
-custom.profile_updated_succesfully = profile updated!
+custom.profile_updated_successfully = profile updated!
 custom.missing_email_warning = Warning! Your email is missing, you won't be able to recover this account you happen to forget your password nor login by email
 custom.missing_email_validation_warning = Warning! Your email has not been verified, you won't be able to recover this account you happen to forget your password nor login by email
 custom.missing_email_warning_title = missing email
 custom.missing_email_validation_warning_title = email needs verification
 custom.missing_email_validation_warning_action = verify email
-custom.missing_email_validation_warning_action_success = verification email sent succesfully
+custom.missing_email_validation_warning_action_success = verification email sent successfully
 custom.email_is_verified = email is verified
 custom.forgot_password_question = forgot password?
+
+custom.preferences = user preferences
+custom.update_your_preferences = update your preferences
+custom.missing_address = home address not specified
+custom.missing_address_warning = Specifying an address will allow you to find and fill information quicker
+custom.preferences_updated_successfully = preferences updated successfully
+
+custom.change_password = update password
+custom.change_password_current_alt_label = current password
+custom.change_password_current_alt_placeholder = current password
+custom.change_password_new_alt_label = current password
+custom.change_password_new_alt_placeholder = current password
+
+custom.delete_account = delete account
+custom.delete_account_warning = Warning! this will delete your account and all associated data, this action cannot be reversed, do you wish to proceed?
 
 custom.recover_account = account recovery
 custom.recover_account_message = Note that your email needs to be set and validated in order for the recover account to function
@@ -71,7 +86,7 @@ properties.username.error.INVALID_SUBTYPE_VALUE = special characters and spaces 
 
 properties.email.label = email
 properties.email.placeholder = your email address
-properties.email.description = Your email will not be shared with anyone, it is kept private even to admins and moderators
+properties.email.description = Your email will not be shared with anyone, it is kept private to all other users
 properties.email.error.TOO_LARGE = email is too long
 properties.email.error.INVALID_SUBTYPE_VALUE = email is invalid
 
@@ -104,9 +119,9 @@ properties.profile_picture.label = profile picture
 properties.profile_picture.placeholder = upload a profile picture
 properties.profile_picture.error.TOO_LARGE = only one file allowed
 
-properties.address.label = address (optional)
+properties.address.label = address
 properties.address.placeholder = type your address
-properties.address.description = This address is used only for ease of use and it is not shared with anyone, not even admins or mods. It is used to prefill information for transactions.
+properties.address.description = This address is used only for ease of use and it is not shared with anyone. It is used to prefill information for transactions.
 
 policies.edit.REQUIRES_PASSWORD_CONFIRMATION.title = password confirmation
 policies.edit.REQUIRES_PASSWORD_CONFIRMATION.fail = invalid password provided
@@ -132,7 +147,7 @@ custom.my_profile = mi Cuenta
 custom.signup_instead = ¿no tiene cuenta? regístrese
 custom.login_instead = ¿ya tiene cuenta? inicie sesión
 custom.update_profile = actualizar información
-custom.profile_updated_succesfully = ¡actualización exitosa!
+custom.profile_updated_successfully = ¡actualización exitosa!
 custom.missing_email_warning = ¡Atención! Su cuenta no tiene un email asociado a ésta, no será capaz de recuperar su cuenta si se ha olvidado de la contraseña ni iniciar sesión por email
 custom.missing_email_validation_warning = ¡Atención! Su correo electrónico no ha sido verificado, no será capaz de recuperar su cuenta si se ha olvidado de la contraseña ni iniciar sesión por email
 custom.missing_email_warning_title = falta el correo electrónico
@@ -141,6 +156,21 @@ custom.missing_email_validation_warning_action = verificar email
 custom.missing_email_validation_warning_action_success = email de verficación ha sido enviado
 custom.email_is_verified = el correo ha sido verificado
 custom.forgot_password_question = ¿Ha olvidado su contraseña?
+
+custom.preferences = preferencias
+custom.update_your_preferences = actualize sus preferencias
+custom.missing_address = falta la dirección
+custom.missing_address_warning = Al añadir una dirección se hace más sencillo buscar y poner información
+custom.preferences_updated_successfully = preferencias actualizadas exitosamente
+
+custom.change_password = cambiar la contraseña
+custom.change_password_current_alt_label = contraseña actual
+custom.change_password_current_alt_placeholder = contraseña actual
+custom.change_password_new_alt_label = contraseña nueva
+custom.change_password_new_alt_placeholder = contraseña nueva
+
+custom.delete_account = eliminar la cuenta
+custom.delete_account_warning = ¡Atención! esto eliminará su cuenta y todos los datos asociados, la acción no se puede revertir ¿Seguro desea continuar?
 
 custom.recover_account = recuperar acceso
 custom.recover_account_message = ¡Atención! su email debe estar validado para poder ser capáz de recuperar su cuenta
@@ -186,7 +216,7 @@ properties.username.error.INVALID_SUBTYPE_VALUE = los caractéres especiales y e
 
 properties.email.label = email
 properties.email.placeholder = dirección de correo electrónico
-properties.email.description = Tu correo no será compartido con nadie, se mantendrá privado incluso para administradores y moderadores
+properties.email.description = Tu correo no será compartido con nadie, se mantendrá privado para otros usuarios
 properties.email.error.TOO_LARGE = el correo electrónico es demasiado largo
 properties.email.error.INVALID_SUBTYPE_VALUE = el correo electrónico es inválido
 
@@ -219,9 +249,9 @@ properties.profile_picture.label = foto de Perfil
 properties.profile_picture.placeholder = subir Imagen
 properties.profile_picture.error.TOO_LARGE = sólo se permite un archivo
 
-properties.address.label = dirección (opcional)
+properties.address.label = dirección
 properties.address.placeholder = escriba su Dirección
-properties.address.description = La Dirección no será compartida con nadie, ni siquiera admins o moderadores. Sólo existe como utilidad para auto-completar la información de transacciones.
+properties.address.description = La dirección no será compartida con nadie. Sólo existe como utilidad para auto-completar la información de transacciones.
 
 policies.edit.REQUIRES_PASSWORD_CONFIRMATION.title = confirme su contraseña
 policies.edit.REQUIRES_PASSWORD_CONFIRMATION.fail = falló el chequeo de la contraseña

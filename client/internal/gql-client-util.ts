@@ -50,12 +50,27 @@ export function getFieldsAndArgs(
     itemDefinitionInstance: ItemDefinition;
     forId: number;
     forVersion: string;
+    uniteFieldsWithAppliedValue?: boolean;
   },
 ) {
-  // so the requested fields, at base, it's just nothing
-  const requestFields: any = {
+  // so the requested fields, at base
+  // because a lot of these requests want to ensure the side
+  // effects of the applied values we want to ensure that
+  // the queried fields include the applied values
+  let requestFields: any = {
     DATA: {},
   };
+
+  // the reason for this some of these values are meant to be applied, when a value is applied
+  // in an item definition it will erase anything in it, as merging won't work when timestamps,
+  // don't match because during an edit event there might be side effects, this will ensure
+  // values remain updated with whatever is used even in the cache
+  if (options.uniteFieldsWithAppliedValue) {
+    const appliedValue = options.itemDefinitionInstance.getGQLAppliedValue(options.forId, options.forVersion);
+    if (appliedValue && appliedValue.requestFields) {
+      requestFields = appliedValue.requestFields;
+    }
+  }
   // and these would be the arguments for the graphql query
   const argumentsForQuery: any = {};
 

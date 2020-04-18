@@ -380,7 +380,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "Whenever the item was modified, otherwise null",
   },
   edited_by: {
-    type: GraphQLString,
+    type: GraphQLInt,
     description: "Whoever modified this item, otherwise null",
   },
   reviewed_at: {

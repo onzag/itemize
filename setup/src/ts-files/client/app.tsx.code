@@ -5,6 +5,7 @@ import { SignupDialog } from "itemize/client/fast-prototyping/components/signup-
 import { RecoverDialog } from "itemize/client/fast-prototyping/components/recover-dialog";
 import { Route } from "itemize/client/components/navigaton";
 import { Profile } from "itemize/client/fast-prototyping/pages/profile";
+import { Preferences } from "itemize/client/fast-prototyping/pages/preferences";
 import { PrivacyPolicy } from "itemize/client/fast-prototyping/pages/privacy-policy";
 import { TermsAndConditions } from "itemize/client/fast-prototyping/pages/terms-and-conditions";
 import { ResetPassword } from "itemize/client/fast-prototyping/pages/reset-password";
@@ -26,6 +27,7 @@ export default function App()<0>{
 		<React.Fragment>
 			<Navbar LoginDialog={LoginDialog} SignupDialog={SignupDialog} RecoverDialog={RecoverDialog}/>
 			<Route path="/profile/:id" component={Profile}/>
+			<Route path="/preferences" component={Preferences}/>
 			<Route path="/privacy-policy" component={PrivacyPolicy}/>
 			<Route path="/terms-and-conditions" component={TermsAndConditions}/>
 			<Route path="/reset-password" component={ResetPassword}/>

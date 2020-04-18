@@ -22,6 +22,7 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AlernateEmailIcon from "@material-ui/icons/AlternateEmail";
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MenuBookIcon from '@material-ui/icons/MenuBook';
+import { localizedRedirectTo } from "../../../../components/navigaton";
 
 interface CustomConfirmationDialogProps {
   isActive: boolean;
@@ -74,6 +75,12 @@ const currentUserProfileStandardInfoStyles = createStyles({
     justifyContent: "flex-end",
     paddingTop: "1.2rem",
   },
+  containerBox: {
+    paddingBottom: "1rem",
+  },
+  containerBoxButton: {
+    padding: 0,
+  },
   pickers: {
     display: "flex",
     alignItems: "center",
@@ -98,6 +105,35 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
         <CountryPicker />
         <CurrencyPicker />
       </div>
+      <Box className={props.classes.containerBox}>
+        <I18nReadMany data={[
+          {id: "change_password"},
+          {id: "update_your_preferences"},
+        ]}>
+          {(i18nChangePassword: string, i18nPreferences: string) => (
+            <React.Fragment>
+              <Button
+                variant="text"
+                size="small"
+                fullWidth={true}
+                className={props.classes.containerBoxButton}
+                onClick={localizedRedirectTo.bind(null, "/preferences", null)}
+              >
+                {i18nPreferences}
+              </Button>
+              <Button
+                variant="text"
+                size="small"
+                fullWidth={true}
+                className={props.classes.containerBoxButton}
+                onClick={localizedRedirectTo.bind(null, "/update-password", null)}
+              >
+                {i18nChangePassword}
+              </Button>
+            </React.Fragment>
+          )}
+        </I18nReadMany>
+      </Box>
       <Entry id="username" icon={<AccountCircleIcon/>}/>
       <Reader id="email">
         {(email: string, emailState: IPropertyDefinitionState) => {
@@ -163,11 +199,11 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
         }}
       </Reader>
       <Entry id="email" rendererArgs={{descriptionAsAlert: true}} icon={<AlernateEmailIcon/>}/>
-      <Entry id="e_notifications" icon={<NotificationsIcon/>}/>
-      <Entry id="e_newsletter" icon={<MenuBookIcon/>}/>
+      
       <Divider />
+      
       <Box className={props.classes.buttonBox}>
-        <DifferingPropertiesRetriever mainProperties={["profile_picture", "username", "email", "e_notifications", "e_newsletter"]}>
+        <DifferingPropertiesRetriever mainProperties={["profile_picture", "username", "email"]}>
           {(differingProperties) => {
             const options: IActionSubmitOptions = {
               properties: differingProperties,

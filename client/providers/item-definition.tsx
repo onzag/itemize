@@ -805,6 +805,7 @@ export class ActualItemDefinitionProvider extends
     const { requestFields } = getFieldsAndArgs({
       includeArgs: false,
       includeFields: true,
+      uniteFieldsWithAppliedValue: true,
       includes: this.props.includes || [],
       properties: this.props.properties,
       appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
@@ -1289,6 +1290,7 @@ export class ActualItemDefinitionProvider extends
     } = getFieldsAndArgs({
       includeArgs: false,
       includeFields: true,
+      uniteFieldsWithAppliedValue: true,
       includesForArgs: [],
       propertiesForArgs: [],
       policiesForArgs: options.policies || [],
@@ -1452,6 +1454,7 @@ export class ActualItemDefinitionProvider extends
     } = getFieldsAndArgs({
       includeArgs: true,
       includeFields: true,
+      uniteFieldsWithAppliedValue: true,
       includes: this.props.includes || [],
       properties: this.props.properties,
       includesForArgs: options.includes || [],

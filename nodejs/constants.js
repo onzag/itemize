@@ -350,7 +350,7 @@ exports.RESERVED_BASE_PROPERTIES = {
         description: "Whenever the item was modified, otherwise null",
     },
     edited_by: {
-        type: graphql_1.GraphQLString,
+        type: graphql_1.GraphQLInt,
         description: "Whoever modified this item, otherwise null",
     },
     reviewed_at: {
