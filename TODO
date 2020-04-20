@@ -1,0 +1,20 @@
+SITE
+1. Update password function
+2. Public profile
+3. Role picker for admins
+4. Implementation of CMS module
+5. Implementation of Forum module
+6. Implementation of flagging
+7. Bans and Blocks
+
+SEO
+1. SSR Implementation via constructor and SSR rules, SSR rules will be rules specific to an url
+  0. Only public data, user specific data can be loaded client side
+  1. TOKEN, ID, ROLE, LANG, etc... all localstorage data is sent via cookie to create a fakeStorage where info can be fetch
+  2. Routes must have their own SSR rules, these SSR rules allow to set the variable global.DATA that acts as endpoint
+  for initial fetching for data hydration, somehow this data must be accessible as well on the server side, where lifecycles
+  do not get hit
+  3. SSR rules will have their own way to set the title as well as description and other SEO tags
+  4. SlowLoadingComponent must be immediate and be immediately ready on server contexts
+  5. manifest and html set via the SSR rules
+  6. SSR rules should be able to load resources as well

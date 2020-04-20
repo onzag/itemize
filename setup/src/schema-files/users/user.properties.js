@@ -38,6 +38,7 @@ custom.change_password_current_alt_label = current password
 custom.change_password_current_alt_placeholder = current password
 custom.change_password_new_alt_label = current password
 custom.change_password_new_alt_placeholder = current password
+custom.change_password_success = password updated!
 
 custom.delete_account = delete account
 custom.delete_account_warning = Warning! this will delete your account and all associated data, this action cannot be reversed, do you wish to proceed?
@@ -168,6 +169,7 @@ custom.change_password_current_alt_label = contraseña actual
 custom.change_password_current_alt_placeholder = contraseña actual
 custom.change_password_new_alt_label = contraseña nueva
 custom.change_password_new_alt_placeholder = contraseña nueva
+custom.change_password_success = ¡contraseña actualizada!
 
 custom.delete_account = eliminar la cuenta
 custom.delete_account_warning = ¡Atención! esto eliminará su cuenta y todos los datos asociados, la acción no se puede revertir ¿Seguro desea continuar?

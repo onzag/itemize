@@ -16,20 +16,20 @@ export const ExternalDialogs = withStyles(externalDialogsStyle)((props: WithStyl
     <LocationStateReader
       stateIsInQueryString={true}
       defaultState={
-        { err: null, usrmsg: null, usrmsgtitle: null } as
-        { err: string, usrmsg: string, usrmsgtitle: string }
+        { err: null, msg: null, msgtitle: null } as
+        { err: string, msg: string, msgtitle: string }
       }
     >
       {(state, setLocationState) => {
         const clear = () => {
-          setLocationState({ err: null, usrmsg: null, usrmsgtitle: null }, true)
+          setLocationState({ err: null, msg: null, msgtitle: null }, true)
         }
 
-        const title = state.err ? "generic_error" : state.usrmsgtitle;
+        const title = state.err ? "generic_error" : state.msgtitle;
         if (!title) {
           return null;
         }
-        const description = state.err ? `error.${state.err}` : state.usrmsg;
+        const description = state.err ? `error.${state.err}` : state.msg;
 
         return <React.Fragment>
           <I18nReadMany data={[

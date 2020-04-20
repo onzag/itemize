@@ -5,22 +5,20 @@ import { UserDataRetriever } from "../../../components/user";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
 import { TitleSetter } from "../../../components/util";
 import { I18nRead } from "../../../components/localization";
+import { CurrentUserProfile } from "./current-user";
 import { SlowLoadingElement } from "../../components/util";
+import { Redirect } from "../../../components/navigaton";
 
-interface ProfileProps {
-  match: {
-    params: {
-      id: string;
-    };
-  };
-}
-
-export function Profile(props: ProfileProps) {
-  const currentUserId = parseInt(props.match.params.id);
+export function MyProfile() {
   return (
     <SlowLoadingElement id="profile">
       <UserDataRetriever>
         {(userData) => {
+          if (!userData.id) {
+            return (
+              <Redirect to="/"/>
+            );
+          }
           let properties = [
             "username",
             "app_language",
@@ -29,15 +27,22 @@ export function Profile(props: ProfileProps) {
             "e_validated",
             "role",
             "profile_picture",
+            "email",
+            "password",
+            "e_notifications",
+            "e_newsletter",
+            "address",
           ];
           return (
             <ModuleProvider module="users">
               <ItemDefinitionProvider
                 itemDefinition="user"
                 properties={properties}
-                forId={currentUserId}
-                assumeOwnership={false}
-                includePolicies={false}
+                forId={userData.id}
+                assumeOwnership={true}
+                includePolicies={true}
+                longTermCaching={true}
+                markForDestructionOnLogout={true}
               >
                 <I18nRead id="profile" capitalize={true}>
                   {(i18nProfile: string) => {
@@ -49,9 +54,7 @@ export function Profile(props: ProfileProps) {
                   }}
                 </I18nRead>
                 <ItemDefinitionLoader>
-                  {
-                    null
-                  }
+                  <CurrentUserProfile/>
                 </ItemDefinitionLoader>
               </ItemDefinitionProvider>
             </ModuleProvider>

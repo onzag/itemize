@@ -1,17 +1,38 @@
 import React from "react";
-import { Snackbar as MUISnackbar, IconButton } from "@material-ui/core";
+import { Snackbar as MUISnackbar, IconButton, withStyles, WithStyles, createStyles, Theme} from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { EndpointErrorType } from "../../../base/errors";
 import { I18nRead, I18nReadError } from "../../components/localization";
+import { Color } from '@material-ui/lab/Alert';
 import uuid from "uuid";
 
-interface ISnackbarProps {
+const snackbarStyles = (theme: Theme) => createStyles({
+  success: {
+    backgroundColor: theme.palette.success.main,
+    color: theme.palette.success.contrastText,
+  },
+  info: {
+    backgroundColor: theme.palette.info.main,
+    color: theme.palette.info.contrastText,
+  },
+  error: {
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.error.contrastText,
+  },
+  warning: {
+    backgroundColor: theme.palette.warning.main,
+    color: theme.palette.warning.contrastText,
+  },
+});
+
+interface ISnackbarProps extends WithStyles<typeof snackbarStyles> {
   i18nDisplay: EndpointErrorType | string;
+  severity: Color;
   open: boolean;
   onClose: () => void;
 }
 
-export default class Snackbar extends React.PureComponent<ISnackbarProps> {
+class ActualSnackbar extends React.PureComponent<ISnackbarProps> {
   private id: string;
   constructor(props: ISnackbarProps) {
     super(props);
@@ -20,14 +41,14 @@ export default class Snackbar extends React.PureComponent<ISnackbarProps> {
   }
   public render() {
     let message: React.ReactNode;
-    let autoHideDuration: number;
+    const autoHideDuration = this.props.severity === "success" ? 3000 : null;
+
     if (typeof this.props.i18nDisplay === "string") {
       message = <I18nRead id={this.props.i18nDisplay} capitalize={true}/>;
-      autoHideDuration = 3000;
     } else if (this.props.i18nDisplay) {
       message = <I18nReadError error={this.props.i18nDisplay} capitalize={true}/>;
-      autoHideDuration = null;
     }
+
     return (
       <MUISnackbar
         anchorOrigin={{
@@ -39,10 +60,15 @@ export default class Snackbar extends React.PureComponent<ISnackbarProps> {
         onClose={this.props.onClose}
         ContentProps={{
           "aria-describedby": this.id,
+          classes: {
+            root: this.props.classes[this.props.severity],
+          }
         }}
-        message={<span id={this.id}>
-          {message}
-        </span>}
+        message={
+          <span id={this.id}>
+            {message}
+          </span>
+        }
         action={
           <I18nRead id="close">
             {(i18nClose: string) => (
@@ -60,3 +86,5 @@ export default class Snackbar extends React.PureComponent<ISnackbarProps> {
     );
   }
 }
+
+export default withStyles(snackbarStyles)(ActualSnackbar);

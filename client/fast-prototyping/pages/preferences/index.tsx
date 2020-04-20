@@ -48,6 +48,8 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
                 assumeOwnership={true}
                 includePolicies={false}
                 disableExternalChecks={true}
+                longTermCaching={true}
+                markForDestructionOnLogout={true}
               >
                 <I18nRead id="preferences" capitalize={true}>
                   {(i18nPreferences: string) => {
@@ -84,8 +86,18 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
                 <SubmitActioner>
                   {(actioner) => (
                     <React.Fragment>
-                      <Snackbar i18nDisplay={actioner.submitError} open={!!actioner.submitError} onClose={actioner.dismissError} />
-                      <Snackbar i18nDisplay="preferences_updated_successfully" open={actioner.submitted} onClose={actioner.dismissSubmitted} />
+                      <Snackbar
+                        severity="error"
+                        i18nDisplay={actioner.submitError}
+                        open={!!actioner.submitError}
+                        onClose={actioner.dismissError}
+                      />
+                      <Snackbar
+                        severity="success"
+                        i18nDisplay="preferences_updated_successfully"
+                        open={actioner.submitted}
+                        onClose={actioner.dismissSubmitted}
+                      />
                     </React.Fragment>
                   )}
                 </SubmitActioner>

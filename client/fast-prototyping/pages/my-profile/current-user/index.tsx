@@ -111,8 +111,18 @@ export const CurrentUserProfile = withStyles(currentUserProfileStyles)((props: W
         <SubmitActioner>
           {(actioner) => (
             <React.Fragment>
-              <Snackbar i18nDisplay={actioner.submitError} open={!!actioner.submitError} onClose={actioner.dismissError} />
-              <Snackbar i18nDisplay="profile_updated_successfully" open={actioner.submitted} onClose={actioner.dismissSubmitted} />
+              <Snackbar
+                severity="error"
+                i18nDisplay={actioner.submitError}
+                open={!!actioner.submitError}
+                onClose={actioner.dismissError}
+              />
+              <Snackbar
+                severity="success"
+                i18nDisplay="profile_updated_successfully"
+                open={actioner.submitted}
+                onClose={actioner.dismissSubmitted}
+              />
             </React.Fragment>
           )}
         </SubmitActioner>

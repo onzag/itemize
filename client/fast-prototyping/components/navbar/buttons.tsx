@@ -103,7 +103,11 @@ export const Buttons = withStyles(buttonsStyles)((props: ButtonsProps) => {
                   />
                 </React.Fragment>;
               } else if (status === "LOGGED_IN") {
-                return <Avatar showWarnings={true} />;
+                return <Avatar
+                  showWarnings={true}
+                  profileURL="my-profile"
+                  cacheImage={true}
+                />;
               }
             }}
           </IfLogStatus>

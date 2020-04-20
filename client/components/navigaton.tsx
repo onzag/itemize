@@ -1,5 +1,5 @@
 import React from "react";
-import { Link as RouterLink, LinkProps, Route as RouterRoute, RouteProps } from "react-router-dom";
+import { Link as RouterLink, LinkProps, Route as RouterRoute, RouteProps, Redirect as RouterRedirect, RedirectProps } from "react-router-dom";
 import { LocationStateContext } from "../internal/app/internal-providers";
 import { Location } from "history";
 import { history } from "..";
@@ -93,10 +93,10 @@ export function Link(props: ICustomLinkProps) {
     return null;
   }
   let urlDefined = props.to;
-  if (urlDefined[0] !== "/") {
+  if (urlDefined !== null && urlDefined[0] !== "/") {
     urlDefined = "/" + urlDefined;
   }
-  const urlTo = `/${currentLocaleFromURL}${urlDefined}`;
+  const urlTo = urlDefined ? `/${currentLocaleFromURL}${urlDefined}` : null;
   const newProps: LinkProps = {
     ...props,
     to: urlTo,
@@ -116,6 +116,24 @@ export function Route(props: RouteProps) {
     urlDefined = "/" + urlDefined;
   }
   return <RouterRoute {...props} path={`/:__lang${urlDefined}`}/>;
+}
+
+export function Redirect(props: RedirectProps) {
+  const currentLocaleFromURL = location.pathname.split("/")[1] || null;
+  if (!currentLocaleFromURL) {
+    return null;
+  }
+  let urlDefined = props.to;
+  if (urlDefined !== null && urlDefined[0] !== "/") {
+    urlDefined = "/" + urlDefined;
+  }
+  const urlTo = urlDefined ? `/${currentLocaleFromURL}${urlDefined}` : null;
+  const newProps: RedirectProps = {
+    ...props,
+    to: urlTo,
+  };
+
+  return <RouterRedirect {...newProps}/>;
 }
 
 interface ILocationStateReaderProps<S> {

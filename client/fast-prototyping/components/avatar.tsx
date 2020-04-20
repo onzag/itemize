@@ -136,11 +136,14 @@ const avatarStyles = createStyles({
   },
 });
 
+type profileURLFn = (id: number) => string;
+
 interface IAvatarProps extends WithStyles<typeof avatarStyles> {
   hideFlag?: boolean;
   large?: boolean;
   showWarnings?: boolean;
-  profileURLSection?: string;
+  profileURL?: string | profileURLFn;
+  cacheImage?: boolean;
 }
 
 interface IAvatarRendererProps extends IPropertyEntryFileRendererProps, WithStyles<typeof avatarStyles> {
@@ -177,27 +180,37 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
       </Reader>
     )
 
-    const profileURLSection = props.profileURLSection || "profile";
     const imageSources = imageSizeRetriever(profilePictureValue);
 
-    const avatar = (
-      <Link to={`/${profileURLSection}/${id}`}>
-        <div className={props.classes.avatarContainer}>
-          <CacheableImageLoader src={props.large ? imageSources.imageLargeSizeURL : imageSources.imageSmallSizeURL}>
-            {(imageSrc) => (
-              <MAvatar
-                alt={userNameValue}
-                classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.large ? props.classes.avatarLarge : ""}` }}
-                src={imageSrc}
-              >
-                {userNameValue ? userNameValue[0] : ""}
-              </MAvatar>
-            )}
-          </CacheableImageLoader>
-          {flag}
-        </div>
-      </Link>
+    const avatarWithSource = (imageSrc: string) => (
+      <MAvatar
+        alt={userNameValue}
+        classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.large ? props.classes.avatarLarge : ""}` }}
+        src={imageSrc}
+      >
+        {userNameValue ? userNameValue[0] : ""}
+      </MAvatar>
     );
+
+    const imageSrc = props.large ? imageSources.imageLargeSizeURL : imageSources.imageSmallSizeURL;
+
+    const content = (
+      <div className={props.classes.avatarContainer}>
+        {props.cacheImage ?
+          <CacheableImageLoader src={imageSrc}>
+            {avatarWithSource}
+          </CacheableImageLoader> :
+          avatarWithSource(imageSrc)
+        }
+        {flag}
+      </div>
+    );
+
+    const avatar = props.profileURL ? (
+      <Link to={typeof props.profileURL === "string" ? props.profileURL : props.profileURL(id)}>
+        {content}
+      </Link>
+    ) : content;
 
     if (props.showWarnings && hasWarning) {
       return <Badge badgeContent={1} color="secondary" classes={{badge: props.classes.avatarBadge}}>

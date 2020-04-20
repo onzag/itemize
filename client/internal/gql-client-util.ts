@@ -236,6 +236,7 @@ function storeAndCombineStorageValuesFor(
   version: string,
   value: IGQLValue,
   fields: IGQLRequestFields,
+  cacheStore: boolean,
 ) {
   let mergedValue: IGQLValue = value;
   let mergedFields: IGQLRequestFields = fields;
@@ -271,25 +272,27 @@ function storeAndCombineStorageValuesFor(
 
   const qualifiedName = itemDefinition.getQualifiedPathName();
 
-  // in the case of delete, we just cache nulls also
-  // the same applies in the case of get and a not found
-  // was the output
-  if (!value) {
-    // we are here guaranteed that if we have retrieved something from
-    // the server in an unique value way it is not a module and it's not
-    // a search mode, since we are here, so we can infer the module search
-    // and the item definition search in order to be efficient
-    CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
-      id,
-      version,
-      qualifiedName,
-      PREFIX_GET + qualifiedName,
-      PREFIX_SEARCH + itemDefinition.getParentModule().getSearchModule().getQualifiedPathName(),
-      PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
-    );
-  } else {
-    CacheWorkerInstance.instance.mergeCachedValue(
-      PREFIX_GET + qualifiedName, id, version, value, mergedFields);
+  if (cacheStore) {
+    // in the case of delete, we just cache nulls also
+    // the same applies in the case of get and a not found
+    // was the output
+    if (!value) {
+      // we are here guaranteed that if we have retrieved something from
+      // the server in an unique value way it is not a module and it's not
+      // a search mode, since we are here, so we can infer the module search
+      // and the item definition search in order to be efficient
+      CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
+        id,
+        version,
+        qualifiedName,
+        PREFIX_GET + qualifiedName,
+        PREFIX_SEARCH + itemDefinition.getParentModule().getSearchModule().getQualifiedPathName(),
+        PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+      );
+    } else {
+      CacheWorkerInstance.instance.mergeCachedValue(
+        PREFIX_GET + qualifiedName, id, version, value, mergedFields);
+    }
   }
 
   return {
@@ -309,6 +312,7 @@ export async function runGetQueryFor(
     version: string,
     language: string,
     token: string,
+    cacheStore: boolean,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -397,6 +401,7 @@ export async function runGetQueryFor(
       arg.version || null,
       value,
       arg.fields,
+      arg.cacheStore,
     );
     return {
       error,
@@ -425,6 +430,7 @@ export async function runDeleteQueryFor(
     token: string,
     language: string,
     listenerUUID: string,
+    cacheStore: boolean,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -466,6 +472,7 @@ export async function runDeleteQueryFor(
       arg.version || null,
       null,
       null,
+      arg.cacheStore,
     );
   }
 
@@ -482,6 +489,7 @@ export async function runAddQueryFor(
     token: string,
     language: string,
     listenerUUID: string,
+    cacheStore: boolean,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -529,6 +537,7 @@ export async function runAddQueryFor(
       (value.version as string) || null,
       value,
       arg.fields,
+      arg.cacheStore,
     );
     return {
       error,
@@ -554,6 +563,7 @@ export async function runEditQueryFor(
     id: number,
     version: string,
     listenerUUID: string,
+    cacheStore: boolean,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -603,6 +613,7 @@ export async function runEditQueryFor(
       arg.version || null,
       value,
       arg.fields,
+      arg.cacheStore,
     );
     return {
       error,

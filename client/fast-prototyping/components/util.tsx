@@ -87,6 +87,7 @@ export const ProgressingElement = withStyles(progressingElementStyle)((props: IP
 interface SlowLoadingElementProps {
   children: React.ReactNode;
   id: string;
+  inline?: boolean;
 }
 
 interface SlowLoadingElementState {
@@ -135,10 +136,12 @@ export class SlowLoadingElement extends React.Component<SlowLoadingElementProps,
   public render() {
     if (this.state.isReady) {
       return this.props.children;
-    } else {
+    } else if (!this.props.inline) {
       return <div className="slow-loading-ring-wrapper">
         <div className="slow-loading-ring"/>
       </div>
+    } else {
+      return null;
     }
   }
 }

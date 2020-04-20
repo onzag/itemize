@@ -91,11 +91,13 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
                   )}
                 </I18nRead>
                 <Snackbar
+                  severity="error"
                   i18nDisplay={actioner.statefulError}
                   open={!!actioner.statefulError}
                   onClose={actioner.dismissStatefulError}
                 />
                 <Snackbar
+                  severity="success"
                   i18nDisplay="recover_account_action_success"
                   open={!!actioner.statefulSuccess}
                   onClose={actioner.dismissStatefulSuccess}

@@ -241,12 +241,36 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       console.warn("Tried to logout while logging in");
       return;
     }
+
+    // removing the user data
     localStorage.removeItem("TOKEN");
-    CacheWorkerInstance.instance.deleteCachedValue(
-      "GET_MOD_users__IDEF_user",
-      this.state.id,
-      null,
-    );
+    localStorage.removeItem("ID");
+    localStorage.removeItem("ROLE");
+
+    // gathering the destruction markers
+    const destructionMarkers =
+        // if we have memcached them, pick those
+        (window as any).MEMCACHED_DESTRUCTION_MARKERS ||
+        // otherwise get them from local storage
+        JSON.parse(localStorage.getItem("DESTRUCTION_MARKERS") || "{}");
+    // clean them from the memory cache to match local storage
+    (window as any).MEMCACHED_DESTRUCTION_MARKERS = {};
+    // as we delete from local storage as well
+    localStorage.removeItem("DESTRUCTION_MARKERS");
+
+    // now we loop over the destruction markers
+    Object.keys(destructionMarkers).forEach((qualifiedPathName: string) => {
+      destructionMarkers[qualifiedPathName].forEach((marker: [number, string]) => {
+        // and delete everything within it
+        CacheWorkerInstance.instance.deleteCachedValue(
+          qualifiedPathName,
+          marker[0],
+          marker[1],
+        );
+      });
+    });
+    
+    // now we update the state
     this.setState({
       id: null,
       token: null,

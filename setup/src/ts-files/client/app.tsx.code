@@ -4,7 +4,9 @@ import { LoginDialog } from "itemize/client/fast-prototyping/components/login-di
 import { SignupDialog } from "itemize/client/fast-prototyping/components/signup-dialog";
 import { RecoverDialog } from "itemize/client/fast-prototyping/components/recover-dialog";
 import { Route } from "itemize/client/components/navigaton";
+import { MyProfile } from "itemize/client/fast-prototyping/pages/my-profile";
 import { Profile } from "itemize/client/fast-prototyping/pages/profile";
+import { ChangePassword } from "itemize/client/fast-prototyping/pages/change-password";
 import { Preferences } from "itemize/client/fast-prototyping/pages/preferences";
 import { PrivacyPolicy } from "itemize/client/fast-prototyping/pages/privacy-policy";
 import { TermsAndConditions } from "itemize/client/fast-prototyping/pages/terms-and-conditions";
@@ -26,6 +28,8 @@ export default function App()<0>{
 	return (
 		<React.Fragment>
 			<Navbar LoginDialog={LoginDialog} SignupDialog={SignupDialog} RecoverDialog={RecoverDialog}/>
+			<Route path="/my-profile" component={MyProfile}/>
+			<Route path="/change-password" component={ChangePassword}/>
 			<Route path="/profile/:id" component={Profile}/>
 			<Route path="/preferences" component={Preferences}/>
 			<Route path="/privacy-policy" component={PrivacyPolicy}/>

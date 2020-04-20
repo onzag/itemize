@@ -4,6 +4,7 @@ import { Button, PropTypes } from "@material-ui/core";
 import { I18nRead } from "../../components/localization";
 import { IActionSubmitOptions } from "../../providers/item-definition";
 import { ProgressingElement } from "./util";
+import { localizedRedirectTo } from "../../components/navigaton";
 
 interface ISubmitButtonProps {
   options: IActionSubmitOptions;
@@ -13,7 +14,8 @@ interface ISubmitButtonProps {
   buttonColor?: PropTypes.Color;
   buttonEndIcon?: React.ReactNode;
   buttonStartIcon?: React.ReactNode;
-  CustomConfirmationComponent?: React.ComponentType<{isActive: boolean, onClose: (continueWithProcess: boolean) => void}>
+  CustomConfirmationComponent?: React.ComponentType<{isActive: boolean, onClose: (continueWithProcess: boolean) => void}>;
+  redirectOnSuccess?: string;
 }
 
 export function SubmitButton(props: ISubmitButtonProps) {
@@ -22,17 +24,23 @@ export function SubmitButton(props: ISubmitButtonProps) {
   return (
     <SubmitActioner>
       {(actioner) => {
-        const submitAction = () => {
+        const submitAction = async () => {
           if (props.CustomConfirmationComponent) {
             setConfirmationIsActive(true);
           } else {
-            actioner.submit(props.options);
+            const status = await actioner.submit(props.options);
+            if (!status.error && props.redirectOnSuccess) {
+              localizedRedirectTo(props.redirectOnSuccess);
+            }
           }
         }
-        const onCloseAction = (continueWithProcess: boolean) => {
+        const onCloseAction = async (continueWithProcess: boolean) => {
           setConfirmationIsActive(false);
           if (continueWithProcess) {
-            actioner.submit(props.options);
+            const status = await actioner.submit(props.options);
+            if (!status.error && props.redirectOnSuccess) {
+              localizedRedirectTo(props.redirectOnSuccess);
+            }
           } else {
             actioner.clean(props.options, "fail");
           }

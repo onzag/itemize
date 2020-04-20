@@ -17,12 +17,10 @@ import Snackbar from "../../../components/snackbar";
 import { LanguagePicker } from "../../../components/language-picker";
 import { CountryPicker } from "../../../components/country-picker";
 import { CurrencyPicker } from "../../../components/currency-picker";
-import { ProgressingElement } from "../../../components/util";
+import { ProgressingElement, SlowLoadingElement } from "../../../components/util";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AlernateEmailIcon from "@material-ui/icons/AlternateEmail";
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import MenuBookIcon from '@material-ui/icons/MenuBook';
-import { localizedRedirectTo } from "../../../../components/navigaton";
+import { Link } from "../../../../components/navigaton";
 
 interface CustomConfirmationDialogProps {
   isActive: boolean;
@@ -100,11 +98,13 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
   return (
     <Paper className={props.classes.paper}>
       <Entry id="profile_picture" renderer={AvatarRenderer}/>
-      <div className={props.classes.pickers}>
-        <LanguagePicker />
-        <CountryPicker />
-        <CurrencyPicker />
-      </div>
+      <SlowLoadingElement inline={true} id="profile-pickers">
+        <div className={props.classes.pickers}>
+          <LanguagePicker />
+          <CountryPicker />
+          <CurrencyPicker />
+        </div>
+      </SlowLoadingElement>
       <Box className={props.classes.containerBox}>
         <I18nReadMany data={[
           {id: "change_password"},
@@ -112,24 +112,26 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
         ]}>
           {(i18nChangePassword: string, i18nPreferences: string) => (
             <React.Fragment>
-              <Button
-                variant="text"
-                size="small"
-                fullWidth={true}
-                className={props.classes.containerBoxButton}
-                onClick={localizedRedirectTo.bind(null, "/preferences", null)}
-              >
-                {i18nPreferences}
-              </Button>
-              <Button
-                variant="text"
-                size="small"
-                fullWidth={true}
-                className={props.classes.containerBoxButton}
-                onClick={localizedRedirectTo.bind(null, "/update-password", null)}
-              >
-                {i18nChangePassword}
-              </Button>
+              <Link to="/preferences">
+                <Button
+                  variant="text"
+                  size="small"
+                  fullWidth={true}
+                  className={props.classes.containerBoxButton}
+                >
+                  {i18nPreferences}
+                </Button>
+              </Link>
+              <Link to="/change-password">
+                <Button
+                  variant="text"
+                  size="small"
+                  fullWidth={true}
+                  className={props.classes.containerBoxButton}
+                >
+                  {i18nChangePassword}
+                </Button>
+              </Link>
             </React.Fragment>
           )}
         </I18nReadMany>
@@ -175,11 +177,13 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
                                 </Button>
                               </ProgressingElement>
                               <Snackbar
+                                severity="error"
                                 i18nDisplay={actioner.statefulError}
                                 open={!!actioner.statefulError}
                                 onClose={actioner.dismissStatefulError}
                               />
                               <Snackbar
+                                severity="success"
                                 i18nDisplay="missing_email_validation_warning_action_success"
                                 open={actioner.statefulSuccess}
                                 onClose={actioner.dismissStatefulSuccess}

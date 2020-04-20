@@ -139,6 +139,7 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
                   </I18nRead>
                 </form>
                 <Snackbar
+                  severity="error"
                   i18nDisplay={actioner.error}
                   open={!!actioner.error}
                   onClose={actioner.dismissError}

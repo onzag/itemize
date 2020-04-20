@@ -81,6 +81,8 @@ const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                     "e_validated",
                     "profile_picture",
                   ]}
+                  longTermCaching={true}
+                  markForDestructionOnLogout={true}
                 >
                   <Buttons
                     excludeLanguagePicker={props.excludeLanguagePicker}

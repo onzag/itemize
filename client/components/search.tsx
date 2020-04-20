@@ -338,7 +338,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                   includePolicies: this.props.includePolicies,
                   cleanOnDismount: this.props.cleanOnDismount,
                   static: this.props.staticResults,
-                  avoidLongTermCaching: !this.props.searchShouldCache,
+                  longTermCaching: this.props.searchShouldCache,
                 },
                 itemDefinition,
               };

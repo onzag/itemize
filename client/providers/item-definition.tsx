@@ -304,12 +304,15 @@ export interface IItemDefinitionProviderProps {
   includePolicies?: boolean;
   // cleans the value from the memory cache once the object dismounts
   // as the memory cache might only grow and grow
-  cleanOnDismount?: boolean;
+  cleanOnDismount?: boolean | IActionCleanOptions;
   // static components do not update remotely
   static?: boolean;
-  // avoids caching values in the worker cache
-  // the memory cache remains active
-  avoidLongTermCaching?: boolean;
+  // uses long term caching with the worker cache strategy
+  longTermCaching?: boolean;
+  // marks the item for destruction as the user logs out
+  markForDestructionOnLogout?: boolean;
+  // avoids running loadValue
+  avoidLoading?: boolean;
 }
 
 // This represents the actual provider that does the job, it takes on some extra properties
@@ -476,7 +479,7 @@ export class ActualItemDefinitionProvider extends
       // as after mount it will attempt to load such id, in order
       // to avoid pointless refresh we set it up as true from
       // the beggining
-      loading: !!this.props.forId,
+      loading: this.props.avoidLoading ? false : !!this.props.forId,
 
       submitError: null,
       submitting: false,
@@ -508,6 +511,31 @@ export class ActualItemDefinitionProvider extends
       canCreate: this.canCreate(),
     };
   }
+  public markForDestruction() {
+    if (this.props.forId) {
+      const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
+      const forId = this.props.forId;
+      const forVersion = this.props.forVersion || null;
+
+      (window as any).MEMCACHED_DESTRUCTION_MARKERS =
+        (window as any).MEMCACHED_DESTRUCTION_MARKERS ||
+        JSON.parse(localStorage.getItem("DESTRUCTION_MARKERS") || "{}");
+      let changed = false;
+      if (!(window as any).MEMCACHED_DESTRUCTION_MARKERS[qualifiedName]) {
+        (window as any).MEMCACHED_DESTRUCTION_MARKERS[qualifiedName] = [[forId, forVersion]];
+        changed = true;
+      } else {
+        if (!(window as any).MEMCACHED_DESTRUCTION_MARKERS[qualifiedName].find((m) => m[0] === forId && m[1] === forVersion)) {
+          changed = true;
+          (window as any).MEMCACHED_DESTRUCTION_MARKERS[qualifiedName].push([forId, forVersion]);
+        }
+      }
+
+      if (changed) {
+        localStorage.setItem("DESTRUCTION_MARKERS", JSON.stringify((window as any).MEMCACHED_DESTRUCTION_MARKERS));
+      }
+    }
+  }
   // so now we have mounted, what do we do at the start
   public componentDidMount() {
     // first we setup the listeners, this includes the on change listener that would make
@@ -522,8 +550,14 @@ export class ActualItemDefinitionProvider extends
       this.search(this.props.automaticSearch);
     }
 
+    if (this.props.markForDestructionOnLogout) {
+      this.markForDestruction();
+    }
+
     // and we attempt to load the current value
-    this.loadValue();
+    if (!this.props.avoidLoading) {
+      this.loadValue();
+    }
   }
 
   // setup the listeners is simple
@@ -615,11 +649,25 @@ export class ActualItemDefinitionProvider extends
     // and changed
     const itemDefinitionWasUpdated = this.props.itemDefinitionInstance !== prevProps.itemDefinitionInstance;
 
+    // if the mark for destruction has changed in a meaningful way
+    // we recheck it
+    if (
+      this.props.markForDestructionOnLogout &&
+      (
+        itemDefinitionWasUpdated ||
+        (prevProps.forId || null) !== (this.props.forId || null) ||
+        (prevProps.forVersion || null) !== (this.props.forVersion || null)
+      )
+    ) {
+      this.markForDestruction();
+    }
+
     // now if the id changed, the optimization flags changed, or the item definition
     // itself changed
     if (
       itemDefinitionWasUpdated ||
       (prevProps.forId || null) !== (this.props.forId || null) ||
+      (prevProps.forVersion || null) !== (this.props.forVersion || null) ||
       !equals(prevProps.properties, this.props.properties) ||
       !equals(prevProps.includes || [], this.props.includes || []) ||
       !!prevProps.static !== !!this.props.static ||
@@ -723,7 +771,9 @@ export class ActualItemDefinitionProvider extends
       prevProps.assumeOwnership !== this.props.assumeOwnership ||
       itemDefinitionWasUpdated
     ) {
-      await this.loadValue();
+      if (!this.props.avoidLoading) {
+        await this.loadValue();
+      }
 
       // the rules on whether you can create, edit or delete change
       // depending on these variables, so we recalculate them
@@ -762,7 +812,9 @@ export class ActualItemDefinitionProvider extends
     // because it says that whatever we have in memory is not valid
     // whether it is in the cache or not, so we call it as so, and deny the cache
     // passing true
-    this.loadValue(true);
+    if (!this.props.avoidLoading) {
+      this.loadValue(true);
+    }
   }
   public changeListener() {
     // we basically just upgrade the state
@@ -840,7 +892,7 @@ export class ActualItemDefinitionProvider extends
         // make it so that when we are exiting the search context it caches
         if (
           CacheWorkerInstance.isSupported &&
-          !this.props.avoidLongTermCaching
+          this.props.longTermCaching
         ) {
           CacheWorkerInstance.instance.mergeCachedValue(
             PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(),
@@ -906,6 +958,7 @@ export class ActualItemDefinitionProvider extends
       version: this.props.forVersion || null,
       token: this.props.tokenData.token,
       language: this.props.localeData.language,
+      cacheStore: this.props.longTermCaching,
     });
 
     // if the item has been cached, as in returned from the indexed db database
@@ -1092,10 +1145,14 @@ export class ActualItemDefinitionProvider extends
     // when unmounting we check our optimization flags to see
     // if we are expecting to clean up the memory cache
     if (this.props.cleanOnDismount) {
-      this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null, this.props.forVersion || null);
-      // this will affect other instances that didn't dismount
-      this.props.itemDefinitionInstance.triggerListeners(
-        "change", this.props.forId || null, this.props.forVersion || null);
+      if (typeof this.props.cleanOnDismount === "boolean") {
+        this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null, this.props.forVersion || null);
+        // this will affect other instances that didn't dismount
+        this.props.itemDefinitionInstance.triggerListeners(
+          "change", this.props.forId || null, this.props.forVersion || null);
+      } else {
+        this.clean(this.props.cleanOnDismount, "success", false, true);
+      }
     }
   }
   public onIncludeSetExclusionState(include: Include, state: IncludeExclusionState) {
@@ -1316,6 +1373,7 @@ export class ActualItemDefinitionProvider extends
       token: this.props.tokenData.token,
       language: this.props.localeData.language,
       listenerUUID: this.props.remoteListener.getUUID(),
+      cacheStore: this.props.longTermCaching,
     });
 
     if (error) {
@@ -1355,19 +1413,22 @@ export class ActualItemDefinitionProvider extends
     options: IActionCleanOptions,
     state: "success" | "fail",
     avoidTriggeringUpdate?: boolean,
+    avoidTriggeringState?: boolean,
   ): void {
-    if (
-      options.unpokeAfterAny ||
-      options.unpokeAfterFailure && state === "fail" ||
-      options.unpokeAfterSuccess && state === "success"
-    ) {
-      this.setState({
-        pokedElements: {
-          properties: [],
-          includes: [],
-          policies: [],
-        }
-      });
+    if (!avoidTriggeringState) {
+      if (
+        options.unpokeAfterAny ||
+        options.unpokeAfterFailure && state === "fail" ||
+        options.unpokeAfterSuccess && state === "success"
+      ) {
+        this.setState({
+          pokedElements: {
+            properties: [],
+            includes: [],
+            policies: [],
+          }
+        });
+      }
     }
 
     let needsUpdate: boolean = false;
@@ -1492,6 +1553,7 @@ export class ActualItemDefinitionProvider extends
         id: this.props.forId,
         version: this.props.forVersion,
         listenerUUID: this.props.remoteListener.getUUID(),
+        cacheStore: this.props.longTermCaching,
       });
       value = totalValues.value;
       error = totalValues.error;
@@ -1504,6 +1566,7 @@ export class ActualItemDefinitionProvider extends
         token: this.props.tokenData.token,
         language: this.props.localeData.language,
         listenerUUID: this.props.remoteListener.getUUID(),
+        cacheStore: this.props.longTermCaching,
       });
       value = totalValues.value;
       error = totalValues.error;

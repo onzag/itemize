@@ -141,6 +141,7 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
                   )}
                 </I18nRead>
                 <Snackbar
+                  severity="error"
                   i18nDisplay={actioner.error}
                   open={!!actioner.error}
                   onClose={actioner.dismissError}
