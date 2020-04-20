@@ -372,6 +372,10 @@ interface IActualItemDefinitionProviderState {
  */
 export class ActualItemDefinitionProvider extends
   React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
+  // this variable is useful is async tasks like loadValue are still executing after
+  // this component has unmounted, which is a memory leak
+  private isUnmounted: boolean = false;
+
   // sometimes when doing some updates when you change the item
   // definition to another item definition (strange but ok)
   // the state between the item and the expected state will
@@ -743,16 +747,18 @@ export class ActualItemDefinitionProvider extends
       }
 
       // we set the value given we have changed the forId with the new optimization flags
-      this.setState({
-        itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
-          this.props.forId || null,
-          this.props.forVersion || null,
-          !this.props.disableExternalChecks,
-          this.props.properties,
-          this.props.includes || [],
-          !this.props.includePolicies,
-        ),
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
+            this.props.forId || null,
+            this.props.forVersion || null,
+            !this.props.disableExternalChecks,
+            this.props.properties,
+            this.props.includes || [],
+            !this.props.includePolicies,
+          ),
+        });
+      }
 
       // and run the external check
       if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
@@ -777,11 +783,13 @@ export class ActualItemDefinitionProvider extends
 
       // the rules on whether you can create, edit or delete change
       // depending on these variables, so we recalculate them
-      this.setState({
-        canEdit: this.canEdit(),
-        canDelete: this.canDelete(),
-        canCreate: this.canCreate(),
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          canEdit: this.canEdit(),
+          canDelete: this.canDelete(),
+          canCreate: this.canCreate(),
+        });
+      }
     }
 
     if (
@@ -817,6 +825,9 @@ export class ActualItemDefinitionProvider extends
     }
   }
   public changeListener() {
+    if (this.isUnmounted) {
+      return;
+    }
     // we basically just upgrade the state
     this.setState({
       itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
@@ -915,7 +926,7 @@ export class ActualItemDefinitionProvider extends
     // you might wonder why in the loader and not in the waiter
     // well it's because the waiter might only executes for the active
     // instance
-    if (!this.state.loading) {
+    if (!this.state.loading && !this.isUnmounted) {
       this.setState({
         loading: true,
       });
@@ -1005,6 +1016,11 @@ export class ActualItemDefinitionProvider extends
     });
   }
   public loadValueCompleted(value: IActionResponseWithValue): IActionResponseWithValue {
+    // return immediately
+    if (this.isUnmounted) {
+      return value;
+    }
+
     // so once everything has been completed this function actually runs per instance
     if (value.error) {
       // if we got an error we basically have no value
@@ -1058,10 +1074,13 @@ export class ActualItemDefinitionProvider extends
     // reason only the last should be applied
     if (currentUpdateId === null || this.lastUpdateId === currentUpdateId) {
       // we set the state to the new state
-      this.setState({
-        itemDefinitionState: newItemDefinitionState,
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          itemDefinitionState: newItemDefinitionState,
+        });
+      }
       // and trigger change listeners, all but our listener
+      // we still need to trigger all other listeners
       this.props.itemDefinitionInstance.triggerListeners(
         "change", this.props.forId || null, this.props.forVersion || null, this.changeListener);
     }
@@ -1140,6 +1159,8 @@ export class ActualItemDefinitionProvider extends
     this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null);
   }
   public componentWillUnmount() {
+    this.isUnmounted = true;
+
     this.unSetupListeners();
 
     // when unmounting we check our optimization flags to see
@@ -1151,7 +1172,7 @@ export class ActualItemDefinitionProvider extends
         this.props.itemDefinitionInstance.triggerListeners(
           "change", this.props.forId || null, this.props.forVersion || null);
       } else {
-        this.clean(this.props.cleanOnDismount, "success", false, true);
+        this.clean(this.props.cleanOnDismount, "success", false);
       }
     }
   }
@@ -1294,9 +1315,11 @@ export class ActualItemDefinitionProvider extends
       message: "Submit refused due to invalid information in form fields",
       code: ENDPOINT_ERRORS.INVALID_DATA_SUBMIT_REFUSED,
     };
-    this.setState({
-      [stateApplied]: emulatedError,
-    } as any);
+    if (!this.isUnmounted) {
+      this.setState({
+        [stateApplied]: emulatedError,
+      } as any);
+    }
 
     if (withId) {
       return {
@@ -1327,13 +1350,15 @@ export class ActualItemDefinitionProvider extends
 
     if (!isValid) {
       // if it's not poked already, let's poke it
-      this.setState({
-        pokedElements: {
-          properties: [],
-          includes: [],
-          policies: options.policies || [],
-        },
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          pokedElements: {
+            properties: [],
+            includes: [],
+            policies: options.policies || [],
+          },
+        });
+      }
       this.clean(options, "fail");
       return this.giveEmulatedInvalidError("deleteError", false, false);
     }
@@ -1359,9 +1384,11 @@ export class ActualItemDefinitionProvider extends
       forVersion: this.props.forVersion || null,
     });
 
-    this.setState({
-      deleting: true,
-    });
+    if (!this.isUnmounted) {
+      this.setState({
+        deleting: true,
+      });
+    }
 
     const {
       error,
@@ -1377,30 +1404,34 @@ export class ActualItemDefinitionProvider extends
     });
 
     if (error) {
-      this.setState({
-        deleteError: error,
-        deleting: false,
-        deleted: false,
-        pokedElements: {
-          properties: [],
-          includes: [],
-          policies: options.policies || [],
-        },
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          deleteError: error,
+          deleting: false,
+          deleted: false,
+          pokedElements: {
+            properties: [],
+            includes: [],
+            policies: options.policies || [],
+          },
+        });
+      }
       this.clean(options, "success");
     } else {
       this.props.itemDefinitionInstance.cleanValueFor(this.props.forId, this.props.forVersion || null);
-      this.setState({
-        deleteError: null,
-        deleting: false,
-        deleted: true,
-        notFound: true,
-        pokedElements: {
-          properties: [],
-          includes: [],
-          policies: (options.policies || []),
-        },
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          deleteError: null,
+          deleting: false,
+          deleted: true,
+          notFound: true,
+          pokedElements: {
+            properties: [],
+            includes: [],
+            policies: (options.policies || []),
+          },
+        });
+      }
       this.clean(options, "fail");
       this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
     }
@@ -1413,9 +1444,8 @@ export class ActualItemDefinitionProvider extends
     options: IActionCleanOptions,
     state: "success" | "fail",
     avoidTriggeringUpdate?: boolean,
-    avoidTriggeringState?: boolean,
   ): void {
-    if (!avoidTriggeringState) {
+    if (!this.isUnmounted) {
       if (
         options.unpokeAfterAny ||
         options.unpokeAfterFailure && state === "fail" ||
@@ -1497,9 +1527,11 @@ export class ActualItemDefinitionProvider extends
 
     // if it's invalid let's return the emulated error
     if (!isValid) {
-      this.setState({
-        pokedElements,
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          pokedElements,
+        });
+      }
       this.clean(options, "fail");
       // if it's not poked already, let's poke it
       return this.giveEmulatedInvalidError("submitError", true, false) as IActionResponseWithId;
@@ -1536,9 +1568,11 @@ export class ActualItemDefinitionProvider extends
     }
 
     // now it's when we are actually submitting
-    this.setState({
-      submitting: true,
-    });
+    if (!this.isUnmounted) {
+      this.setState({
+        submitting: true,
+      });
+    }
 
     let value: IGQLValue;
     let error: EndpointErrorType;
@@ -1576,20 +1610,24 @@ export class ActualItemDefinitionProvider extends
     let recievedId: number = null;
     let receivedVersion: string = null;
     if (error) {
-      this.setState({
-        submitError: error,
-        submitting: false,
-        submitted: false,
-        pokedElements,
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          submitError: error,
+          submitting: false,
+          submitted: false,
+          pokedElements,
+        });
+      }
       this.clean(options, "fail");
     } else if (value) {
-      this.setState({
-        submitError: null,
-        submitting: false,
-        submitted: true,
-        pokedElements,
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          submitError: null,
+          submitting: false,
+          submitted: true,
+          pokedElements,
+        });
+      }
 
       recievedId = value.id as number;
       receivedVersion = value.version as string || null;
@@ -1635,9 +1673,11 @@ export class ActualItemDefinitionProvider extends
       policies: [],
     };
     if (!isValid) {
-      this.setState({
-        pokedElements,
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          pokedElements,
+        });
+      }
       this.clean(options, "fail");
       return this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithSearchResults;
     }
@@ -1681,9 +1721,11 @@ export class ActualItemDefinitionProvider extends
 
     this.lastOptionsUsedForSearch = options;
 
-    this.setState({
-      searching: true,
-    });
+    if (!this.isUnmounted) {
+      this.setState({
+        searching: true,
+      });
+    }
 
     const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
 
@@ -1745,34 +1787,38 @@ export class ActualItemDefinitionProvider extends
     }, this.props.remoteListener, this.onSearchReload);
 
     if (error) {
-      this.setState({
-        searchError: error,
-        searching: false,
-        searchResults,
-        searchId: uuid.v4(),
-        searchOwner: options.createdBy || null,
-        searchParent,
-        searchShouldCache: !!options.cachePolicy,
-        searchFields: requestedSearchFields,
-        searchRequestedProperties: options.requestedProperties,
-        searchRequestedIncludes: options.requestedIncludes || [],
-        pokedElements,
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          searchError: error,
+          searching: false,
+          searchResults,
+          searchId: uuid.v4(),
+          searchOwner: options.createdBy || null,
+          searchParent,
+          searchShouldCache: !!options.cachePolicy,
+          searchFields: requestedSearchFields,
+          searchRequestedProperties: options.requestedProperties,
+          searchRequestedIncludes: options.requestedIncludes || [],
+          pokedElements,
+        });
+      }
       this.clean(options, "fail");
     } else {
-      this.setState({
-        searchError: null,
-        searching: false,
-        searchResults: searchResults || [],
-        searchId: uuid.v4(),
-        searchOwner: options.createdBy || null,
-        searchParent,
-        searchShouldCache: !!options.cachePolicy,
-        searchFields: requestedSearchFields,
-        searchRequestedProperties: options.requestedProperties,
-        searchRequestedIncludes: options.requestedIncludes || [],
-        pokedElements,
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          searchError: null,
+          searching: false,
+          searchResults: searchResults || [],
+          searchId: uuid.v4(),
+          searchOwner: options.createdBy || null,
+          searchParent,
+          searchShouldCache: !!options.cachePolicy,
+          searchFields: requestedSearchFields,
+          searchRequestedProperties: options.requestedProperties,
+          searchRequestedIncludes: options.requestedIncludes || [],
+          pokedElements,
+        });
+      }
       this.clean(options, "success");
     }
 
@@ -1782,31 +1828,49 @@ export class ActualItemDefinitionProvider extends
     };
   }
   public dismissLoadError() {
+    if (this.isUnmounted) {
+      return;
+    }
     this.setState({
       loadError: null,
     });
   }
   public dismissDeleteError() {
+    if (this.isUnmounted) {
+      return;
+    }
     this.setState({
       deleteError: null,
     });
   }
   public dismissSubmitError() {
+    if (this.isUnmounted) {
+      return;
+    }
     this.setState({
       submitError: null,
     });
   }
   public dismissSubmitted() {
+    if (this.isUnmounted) {
+      return;
+    }
     this.setState({
       submitted: null,
     });
   }
   public dismissDeleted() {
+    if (this.isUnmounted) {
+      return;
+    }
     this.setState({
       deleted: false,
     });
   }
   public dismissSearchError() {
+    if (this.isUnmounted) {
+      return;
+    }
     this.setState({
       searchError: null,
     });
@@ -1844,15 +1908,17 @@ export class ActualItemDefinitionProvider extends
   }
   public dismissSearchResults() {
     this.removePossibleSearchListeners();
-    this.setState({
-      searchId: null,
-      searchFields: null,
-      searchOwner: null,
-      searchShouldCache: false,
-      searchRequestedIncludes: [],
-      searchRequestedProperties: [],
-      searchResults: [],
-    });
+    if (!this.isUnmounted) {
+      this.setState({
+        searchId: null,
+        searchFields: null,
+        searchOwner: null,
+        searchShouldCache: false,
+        searchRequestedIncludes: [],
+        searchRequestedProperties: [],
+        searchResults: [],
+      });
+    }
   }
   public canDelete() {
     if (this.props.forId === null) {
@@ -1898,6 +1964,9 @@ export class ActualItemDefinitionProvider extends
     );
   }
   public unpoke() {
+    if (this.isUnmounted) {
+      return;
+    }
     this.setState({
       pokedElements: {
         properties: [],

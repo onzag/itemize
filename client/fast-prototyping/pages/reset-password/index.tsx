@@ -40,7 +40,7 @@ const resetPasswordStyles = createStyles({
 async function resetPassword(token: string, actioner: IUserActionerArg) {
   const result = await actioner.resetPassword(token, true);
   if (!result.error) {
-    localizedRedirectTo("/?msg=reset_password_success&msgtitle=reset_password");
+    localizedRedirectTo("/?msg=reset_password_success&msgtitle=reset_password", null, true);
   }
 }
 

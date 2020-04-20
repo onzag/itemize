@@ -102,6 +102,8 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
                         buttonStartIcon={<DoneOutline />}
                         buttonVariant="contained"
                         redirectOnSuccess="/my-profile?msg=change_password_success&msgtitle=change_password"
+                        redirectGoBack={true}
+                        redirectReplace={true}
                       />
                       </Box>
                     </Paper>

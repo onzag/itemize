@@ -49,11 +49,15 @@ export function setHistoryQSState<S>(location: Location, state: Partial<S>, repl
   }
 }
 
-export function redirectTo(newLocation: string, state?: any) {
-  history.push(newLocation, state);
+export function redirectTo(newLocation: string, state?: any, replace?: boolean) {
+  if (replace) {
+    history.replace(newLocation, state);
+  } else {
+    history.push(newLocation, state);
+  }
 }
 
-export function localizedRedirectTo(newLocation: string, state?: any) {
+export function localizedRedirectTo(newLocation: string, state?: any, replace?: boolean) {
   const currentLocaleFromURL = location.pathname.split("/")[1] || null;
   if (!currentLocaleFromURL) {
     return null;
@@ -64,6 +68,10 @@ export function localizedRedirectTo(newLocation: string, state?: any) {
   }
   const urlTo = `/${currentLocaleFromURL}${urlDefined}`;
   return redirectTo(urlTo, state);
+}
+
+export function goBack() {
+  history.goBack();
 }
 
 interface ICustomLinkProps extends LinkProps {

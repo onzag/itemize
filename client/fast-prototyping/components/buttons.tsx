@@ -4,7 +4,7 @@ import { Button, PropTypes } from "@material-ui/core";
 import { I18nRead } from "../../components/localization";
 import { IActionSubmitOptions } from "../../providers/item-definition";
 import { ProgressingElement } from "./util";
-import { localizedRedirectTo } from "../../components/navigaton";
+import { localizedRedirectTo, goBack } from "../../components/navigaton";
 
 interface ISubmitButtonProps {
   options: IActionSubmitOptions;
@@ -16,6 +16,8 @@ interface ISubmitButtonProps {
   buttonStartIcon?: React.ReactNode;
   CustomConfirmationComponent?: React.ComponentType<{isActive: boolean, onClose: (continueWithProcess: boolean) => void}>;
   redirectOnSuccess?: string;
+  redirectGoBack?: boolean;
+  redirectReplace?: boolean;
 }
 
 export function SubmitButton(props: ISubmitButtonProps) {
@@ -24,23 +26,30 @@ export function SubmitButton(props: ISubmitButtonProps) {
   return (
     <SubmitActioner>
       {(actioner) => {
-        const submitAction = async () => {
-          if (props.CustomConfirmationComponent) {
-            setConfirmationIsActive(true);
-          } else {
-            const status = await actioner.submit(props.options);
-            if (!status.error && props.redirectOnSuccess) {
-              localizedRedirectTo(props.redirectOnSuccess);
+        const runProcess = async () => {
+          const status = await actioner.submit(props.options);
+          if (!status.error && props.redirectOnSuccess) {
+            if(props.redirectGoBack) {
+              goBack();
+              setTimeout(() => {
+                localizedRedirectTo(props.redirectOnSuccess, null, props.redirectReplace);
+              }, 10);
+            } else {
+              localizedRedirectTo(props.redirectOnSuccess, null, props.redirectReplace);
             }
           }
         }
-        const onCloseAction = async (continueWithProcess: boolean) => {
+        const submitAction = () => {
+          if (props.CustomConfirmationComponent) {
+            setConfirmationIsActive(true);
+          } else {
+            runProcess();
+          }
+        }
+        const onCloseAction = (continueWithProcess: boolean) => {
           setConfirmationIsActive(false);
           if (continueWithProcess) {
-            const status = await actioner.submit(props.options);
-            if (!status.error && props.redirectOnSuccess) {
-              localizedRedirectTo(props.redirectOnSuccess);
-            }
+            runProcess();
           } else {
             actioner.clean(props.options, "fail");
           }
