@@ -3,12 +3,14 @@ import { IIncludeCalloutWarningRendererProps } from "../internal/components/Incl
 import { IPropertyEntryFieldRendererProps } from "../internal/components/PropertyEntry/PropertyEntryField";
 import { IPropertyEntryFileRendererProps } from "../internal/components/PropertyEntry/PropertyEntryFile";
 import { IPropertyEntryBooleanRendererProps } from "../internal/components/PropertyEntry/PropertyEntryBoolean";
+import { IPropertyEntryLocationRendererProps } from "../internal/components/PropertyEntry/PropertyEntryLocation";
 
 export interface IRendererContext {
   IncludeCalloutWarning?: React.ComponentType<IIncludeCalloutWarningRendererProps>;
   PropertyEntryField?: React.ComponentType<IPropertyEntryFieldRendererProps>;
   PropertyEntryFile?: React.ComponentType<IPropertyEntryFileRendererProps>;
   PropertyEntryBoolean?: React.ComponentType<IPropertyEntryBooleanRendererProps>;
+  PropertyEntryLocation?: React.ComponentType<IPropertyEntryLocationRendererProps>;
 }
 
 export const RendererContext = React.createContext<IRendererContext>(null);

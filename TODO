@@ -9,6 +9,7 @@ SITE
 . Implementation of Forum module
 . Implementation of flagging
 . Bans and Blocks
+. boolean 3 way
 
 SEO
 1. SSR Implementation via constructor and SSR rules, SSR rules will be rules specific to an url
@@ -28,5 +29,6 @@ TECH
 . Maybe download a list of base conversions from https://free.currencyconverterapi.com/ automatically every day
 . Currencies ["EEK", "LTL", "GWP"] not supported in API all others supported, these currencies are not in the country list
 so can safely be removed
+. Create sqlMantenience for mantenience of mutable values like this in the type
 
 . Image support in rich text

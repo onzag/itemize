@@ -5,7 +5,7 @@ import React from "react";
 import PropertyEntryBoolean from "./PropertyEntryBoolean";
 // import PropertyEntryText from "./PropertyEntryText";
 // import PropertyEntryDateTime from "./PropertyEntryDateTime";
-// import PropertyEntryLocation from "./PropertyEntryLocation";
+import PropertyEntryLocation from "./PropertyEntryLocation";
 // import PropertyEntryFiles from "./PropertyEntryFiles";
 // import PropertyEntryNumeric from "./PropertyEntryNumeric";
 // import PropertyEntrySelect from "./PropertyEntrySelect";
@@ -97,7 +97,10 @@ const typeRegistry:
   datetime: null,
   date: null,
   time: null,
-  location: null,
+  location: {
+    renderer: "PropertyEntryLocation",
+    element: PropertyEntryLocation,
+  },
   file: {
     renderer: "PropertyEntryFile",
     element: PropertyEntryFile,

@@ -2,7 +2,7 @@ import React from "react";
 import { IActionSubmitOptions } from "../../../../providers/item-definition";
 import { I18nReadMany, I18nRead } from "../../../../components/localization";
 import { Entry, Reader } from "../../../../components/property";
-import { Button, Box, Paper, createStyles, withStyles, WithStyles, Divider } from "@material-ui/core";
+import { Button, Box, Paper, createStyles, withStyles, WithStyles, Divider, Theme } from "@material-ui/core";
 import { SubmitButton } from "../../../components/buttons";
 import { DifferingPropertiesRetriever } from "../../../../components/item-definition";
 import { DialogResponsive } from "../../../components/dialog";
@@ -22,6 +22,7 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AlernateEmailIcon from "@material-ui/icons/AlternateEmail";
 import { Link } from "../../../../components/navigaton";
 import { ItemDefinitionLoader } from "../../../components/item-definition-loader";
+import ErrorIcon from '@material-ui/icons/Error';
 
 interface CustomConfirmationDialogProps {
   isActive: boolean;
@@ -65,7 +66,7 @@ function CustomConfirmationDialog(props: CustomConfirmationDialogProps) {
   )
 }
 
-const currentUserProfileStandardInfoStyles = createStyles({
+const currentUserProfileStandardInfoStyles = (theme: Theme) => createStyles({
   paper: {
     padding: "1rem",
   },
@@ -92,6 +93,9 @@ const currentUserProfileStandardInfoStyles = createStyles({
     textTransform: "none",
     opacity: 0.7,
   },
+  errorIconButton: {
+    color: theme.palette.error.main,
+  },
 });
 
 export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStandardInfoStyles)
@@ -115,14 +119,24 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
             {(i18nChangePassword: string, i18nPreferences: string) => (
               <React.Fragment>
                 <Link to="/preferences">
-                  <Button
-                    variant="text"
-                    size="small"
-                    fullWidth={true}
-                    className={props.classes.containerBoxButton}
-                  >
-                    {i18nPreferences}
-                  </Button>
+                  <Reader id="address">
+                    {(value, stateValue) => {
+                      const hasWarning = !(stateValue && stateValue.stateAppliedValue);
+
+                      return (
+                        <Button
+                          variant="text"
+                          size="small"
+                          fullWidth={true}
+                          className={props.classes.containerBoxButton}
+                          endIcon={<ErrorIcon className={props.classes.errorIconButton}/>}
+                        >
+                          {i18nPreferences}
+                        </Button>
+                      );
+                    }}
+                  </Reader>
+                  
                 </Link>
                 <Link to="/change-password">
                   <Button

@@ -328,7 +328,7 @@ const ActualPropertyEntryFileRendererWithStyles = withStyles(style)((props: IPro
   );
 });
 
-export default function PropertyEntryFieldRenderer(props: IPropertyEntryFileRendererProps) {
+export default function PropertyEntryFileRenderer(props: IPropertyEntryFileRendererProps) {
   let appliedTheme: IPropertyEntryThemeType = STANDARD_THEME;
   if (props.args["theme"]) {
     appliedTheme = {

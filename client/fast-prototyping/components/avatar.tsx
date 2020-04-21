@@ -156,13 +156,15 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
     profilePictureValue: PropertyDefinitionSupportedFileType,
     email?: IPropertyDefinitionState,
     eValidated?: IPropertyDefinitionState,
+    address?: IPropertyDefinitionState,
   ) => {
     const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : null;
 
-    const hasWarningForMissingEmail = !(email && email.value);
-    const hasWarningForNotValidEmail = !(eValidated && eValidated.value);
-    const hasWarning = email && eValidated && email.stateValueModified && eValidated.stateValueModified && props.showWarnings && (
-      hasWarningForMissingEmail || hasWarningForNotValidEmail
+    const hasWarningForMissingEmail = !(email && email.stateAppliedValue);
+    const hasWarningForNotValidEmail = !(eValidated && eValidated.stateAppliedValue);
+    const hasAnotherWarningForMissingAddress = !(address && address.stateAppliedValue);
+    const hasWarning = email && eValidated && address && props.showWarnings && (
+      hasWarningForMissingEmail || hasWarningForNotValidEmail || hasAnotherWarningForMissingAddress
     );
 
     const flag = props.hideFlag ? null : (
@@ -213,7 +215,14 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
     ) : content;
 
     if (props.showWarnings && hasWarning) {
-      return <Badge badgeContent={1} color="secondary" classes={{badge: props.classes.avatarBadge}}>
+      let warningCount = 0;
+      if (hasWarningForMissingEmail || hasWarningForNotValidEmail) {
+        warningCount++;
+      }
+      if (hasAnotherWarningForMissingAddress) {
+        warningCount++;
+      }
+      return <Badge badgeContent={warningCount} color="secondary" classes={{badge: props.classes.avatarBadge}}>
         {avatar}
       </Badge>
     } else {
@@ -236,9 +245,13 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
                     <Reader id="email">
                       {(email: string, emailState: IPropertyDefinitionState) => (
                         <Reader id="e_validated">
-                          {(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => {
-                            return contentFn(id, userNameValue, profilePictureValue, emailState, eValidatedState);
-                          }}
+                          {(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => (
+                            <Reader id="address">
+                              {(address, addressState) => {
+                                return contentFn(id, userNameValue, profilePictureValue, emailState, eValidatedState, addressState);
+                              }}
+                            </Reader> 
+                          )}
                         </Reader>
                       )}
                     </Reader>

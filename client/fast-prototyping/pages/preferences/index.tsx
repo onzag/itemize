@@ -13,6 +13,7 @@ import Snackbar from "../../components/snackbar";
 import MenuBookIcon from '@material-ui/icons/MenuBook';
 import { SubmitActioner } from "../../../components/item-definition";
 import DoneOutline from "@material-ui/icons/DoneOutline";
+import PersonPinIcon from '@material-ui/icons/PersonPin';
 import { SubmitButton } from "../../components/buttons";
 
 const preferencesStyles = createStyles({
@@ -65,6 +66,7 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
                     <Paper className={props.classes.paper}>
                       <Entry id="e_notifications" icon={<NotificationsIcon/>}/>
                       <Entry id="e_newsletter" icon={<MenuBookIcon/>}/>
+                      <Entry id="address" icon={<PersonPinIcon/>}/>
 
                       <Divider />
       
