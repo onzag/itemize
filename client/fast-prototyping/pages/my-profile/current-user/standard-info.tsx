@@ -21,6 +21,7 @@ import { ProgressingElement, SlowLoadingElement } from "../../../components/util
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AlernateEmailIcon from "@material-ui/icons/AlternateEmail";
 import { Link } from "../../../../components/navigaton";
+import { ItemDefinitionLoader } from "../../../components/item-definition-loader";
 
 interface CustomConfirmationDialogProps {
   isActive: boolean;
@@ -97,147 +98,149 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
 ((props: WithStyles<typeof currentUserProfileStandardInfoStyles>) => {
   return (
     <Paper className={props.classes.paper}>
-      <Entry id="profile_picture" renderer={AvatarRenderer}/>
-      <SlowLoadingElement inline={true} id="profile-pickers">
-        <div className={props.classes.pickers}>
-          <LanguagePicker />
-          <CountryPicker />
-          <CurrencyPicker />
-        </div>
-      </SlowLoadingElement>
-      <Box className={props.classes.containerBox}>
-        <I18nReadMany data={[
-          {id: "change_password"},
-          {id: "update_your_preferences"},
-        ]}>
-          {(i18nChangePassword: string, i18nPreferences: string) => (
-            <React.Fragment>
-              <Link to="/preferences">
-                <Button
-                  variant="text"
-                  size="small"
-                  fullWidth={true}
-                  className={props.classes.containerBoxButton}
-                >
-                  {i18nPreferences}
-                </Button>
-              </Link>
-              <Link to="/change-password">
-                <Button
-                  variant="text"
-                  size="small"
-                  fullWidth={true}
-                  className={props.classes.containerBoxButton}
-                >
-                  {i18nChangePassword}
-                </Button>
-              </Link>
-            </React.Fragment>
-          )}
-        </I18nReadMany>
-      </Box>
-      <Entry id="username" icon={<AccountCircleIcon/>}/>
-      <Reader id="email">
-        {(email: string, emailState: IPropertyDefinitionState) => {
-          const missesEmail = !(emailState && emailState.stateAppliedValue);
-          if (missesEmail) {
-            return (
-              <Alert severity="error">
-                <AlertTitle>
-                  <I18nRead capitalize={true} id="missing_email_warning_title"/>
-                </AlertTitle>
-                <I18nRead id="missing_email_warning"/>
-              </Alert>
-            )
-          }
-          return (
-            <Reader id="e_validated">
-              {(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => {
-                const missesValidation = !(eValidatedState && eValidatedState.stateAppliedValue);
-                if (missesValidation) {
-                  return (
-                    <Alert severity="error">
-                      <AlertTitle>
-                        <I18nRead capitalize={true} id="missing_email_validation_warning_title"/>
-                      </AlertTitle>
-                      <I18nRead id="missing_email_validation_warning"/>
-                      <div className={props.classes.alertButtonValidateEmailContainer}>
-                        <UserActioner>
-                          {(actioner) => (
-                            <React.Fragment>
-                              <ProgressingElement isProgressing={actioner.statefulOnProgress}>
-                                <Button
-                                  variant="outlined"
-                                  color="secondary"
-                                  endIcon={<MailOutline/>}
-                                  onClick={actioner.sendValidateEmail}
-                                >
-                                  <I18nRead capitalize={true} id="missing_email_validation_warning_action"/>
-                                  <i className={props.classes.emailInButton}>&nbsp;{emailState.stateAppliedValue}</i>
-                                </Button>
-                              </ProgressingElement>
-                              <Snackbar
-                                severity="error"
-                                i18nDisplay={actioner.statefulError}
-                                open={!!actioner.statefulError}
-                                onClose={actioner.dismissStatefulError}
-                              />
-                              <Snackbar
-                                severity="success"
-                                i18nDisplay="missing_email_validation_warning_action_success"
-                                open={actioner.statefulSuccess}
-                                onClose={actioner.dismissStatefulSuccess}
-                              />
-                            </React.Fragment>
-                          )}
-                        </UserActioner>
-                      </div>
-                    </Alert>
-                  )
-                }
-
-                return null;
-              }}
-            </Reader>
-          );
-        }}
-      </Reader>
-      <Entry id="email" rendererArgs={{descriptionAsAlert: true}} icon={<AlernateEmailIcon/>}/>
-      
-      <Divider />
-      
-      <Box className={props.classes.buttonBox}>
-        <DifferingPropertiesRetriever mainProperties={["profile_picture", "username", "email"]}>
-          {(differingProperties) => {
-            const options: IActionSubmitOptions = {
-              properties: differingProperties,
-              unpokeAfterAny: true,
-            }
-            if (
-              differingProperties.includes("username") ||
-              differingProperties.includes("email")
-            ) {
-              options.policies = [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]];
-              options.policiesToCleanOnAny = [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]];
-            }
-
-            let CustomConfirmationComponent = null;
-            if (options.policies) {
-              CustomConfirmationComponent = CustomConfirmationDialog;
+      <ItemDefinitionLoader>
+        <Entry id="profile_picture" renderer={AvatarRenderer}/>
+        <SlowLoadingElement inline={true} id="profile-pickers">
+          <div className={props.classes.pickers}>
+            <LanguagePicker />
+            <CountryPicker />
+            <CurrencyPicker />
+          </div>
+        </SlowLoadingElement>
+        <Box className={props.classes.containerBox}>
+          <I18nReadMany data={[
+            {id: "change_password"},
+            {id: "update_your_preferences"},
+          ]}>
+            {(i18nChangePassword: string, i18nPreferences: string) => (
+              <React.Fragment>
+                <Link to="/preferences">
+                  <Button
+                    variant="text"
+                    size="small"
+                    fullWidth={true}
+                    className={props.classes.containerBoxButton}
+                  >
+                    {i18nPreferences}
+                  </Button>
+                </Link>
+                <Link to="/change-password">
+                  <Button
+                    variant="text"
+                    size="small"
+                    fullWidth={true}
+                    className={props.classes.containerBoxButton}
+                  >
+                    {i18nChangePassword}
+                  </Button>
+                </Link>
+              </React.Fragment>
+            )}
+          </I18nReadMany>
+        </Box>
+        <Entry id="username" icon={<AccountCircleIcon/>}/>
+        <Reader id="email">
+          {(email: string, emailState: IPropertyDefinitionState) => {
+            const missesEmail = !(emailState && emailState.stateAppliedValue);
+            if (missesEmail) {
+              return (
+                <Alert severity="error">
+                  <AlertTitle>
+                    <I18nRead capitalize={true} id="missing_email_warning_title"/>
+                  </AlertTitle>
+                  <I18nRead id="missing_email_warning"/>
+                </Alert>
+              )
             }
             return (
-              <SubmitButton
-                i18nId="update_profile"
-                options={options}
-                CustomConfirmationComponent={CustomConfirmationComponent}
-                buttonColor="primary"
-                buttonStartIcon={<DoneOutline />}
-                buttonVariant="contained"
-              />
+              <Reader id="e_validated">
+                {(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => {
+                  const missesValidation = !(eValidatedState && eValidatedState.stateAppliedValue);
+                  if (missesValidation) {
+                    return (
+                      <Alert severity="error">
+                        <AlertTitle>
+                          <I18nRead capitalize={true} id="missing_email_validation_warning_title"/>
+                        </AlertTitle>
+                        <I18nRead id="missing_email_validation_warning"/>
+                        <div className={props.classes.alertButtonValidateEmailContainer}>
+                          <UserActioner>
+                            {(actioner) => (
+                              <React.Fragment>
+                                <ProgressingElement isProgressing={actioner.statefulOnProgress}>
+                                  <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    endIcon={<MailOutline/>}
+                                    onClick={actioner.sendValidateEmail}
+                                  >
+                                    <I18nRead capitalize={true} id="missing_email_validation_warning_action"/>
+                                    <i className={props.classes.emailInButton}>&nbsp;{emailState.stateAppliedValue}</i>
+                                  </Button>
+                                </ProgressingElement>
+                                <Snackbar
+                                  severity="error"
+                                  i18nDisplay={actioner.statefulError}
+                                  open={!!actioner.statefulError}
+                                  onClose={actioner.dismissStatefulError}
+                                />
+                                <Snackbar
+                                  severity="success"
+                                  i18nDisplay="missing_email_validation_warning_action_success"
+                                  open={actioner.statefulSuccess}
+                                  onClose={actioner.dismissStatefulSuccess}
+                                />
+                              </React.Fragment>
+                            )}
+                          </UserActioner>
+                        </div>
+                      </Alert>
+                    )
+                  }
+
+                  return null;
+                }}
+              </Reader>
             );
           }}
-        </DifferingPropertiesRetriever>
-      </Box>
+        </Reader>
+        <Entry id="email" rendererArgs={{descriptionAsAlert: true}} icon={<AlernateEmailIcon/>}/>
+        
+        <Divider />
+        
+        <Box className={props.classes.buttonBox}>
+          <DifferingPropertiesRetriever mainProperties={["profile_picture", "username", "email"]}>
+            {(differingProperties) => {
+              const options: IActionSubmitOptions = {
+                properties: differingProperties,
+                unpokeAfterAny: true,
+              }
+              if (
+                differingProperties.includes("username") ||
+                differingProperties.includes("email")
+              ) {
+                options.policies = [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]];
+                options.policiesToCleanOnAny = [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]];
+              }
+
+              let CustomConfirmationComponent = null;
+              if (options.policies) {
+                CustomConfirmationComponent = CustomConfirmationDialog;
+              }
+              return (
+                <SubmitButton
+                  i18nId="update_profile"
+                  options={options}
+                  CustomConfirmationComponent={CustomConfirmationComponent}
+                  buttonColor="primary"
+                  buttonStartIcon={<DoneOutline />}
+                  buttonVariant="contained"
+                />
+              );
+            }}
+          </DifferingPropertiesRetriever>
+        </Box>
+      </ItemDefinitionLoader>
     </Paper>
   )
 });

@@ -28,6 +28,7 @@ function loopForKeyAtTarget(target: any, keySplitted: string[]) {
 
 interface II18nReadProps {
   id: string;
+  propertyId?: string;
   policyType?: string;
   policyName?: string;
   args?: any[];
@@ -60,7 +61,13 @@ export function I18nRead(props: II18nReadProps) {
                             if (includeContext) {
                               // if we have a name we use the include context using the name i18n function
                               // as the name can be inherited from the item definition if not specified
-                              if (props.id === "name") {
+                              if (props.propertyId) {
+                                const property = includeContext.include.getSinkingPropertyFor(props.propertyId);
+                                i18nValue = loopForKeyAtTarget(
+                                  property.getI18nDataFor(localeContext.language),
+                                  idSplitted,
+                                );
+                              } else if (props.id === "name") {
                                 i18nValue = includeContext.include.getI18nNameFor(localeContext.language) || null;
                               } else {
                                 // othewise we just extract the i18n data for the include and call it with the id,
@@ -74,51 +81,67 @@ export function I18nRead(props: II18nReadProps) {
 
                             // so if the include thing failed and we have an item definition context
                             if (itemDefinitionContextualValue && i18nValue === null) {
-                              // so we get the i18n item definition data
-                              const i18nIdefData =
-                                itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
-                              // if we are specifying a policy like if we are in a policy context
-                              if (props.policyType && props.policyName) {
-                                // we go for the policy value and the policy name value
+                              if (props.propertyId) {
+                                const property = itemDefinitionContextualValue.idef.getPropertyDefinitionFor(props.propertyId, true);
                                 i18nValue = loopForKeyAtTarget(
-                                  i18nIdefData,
-                                  ["policies", props.policyType, props.policyName].concat(idSplitted),
-                                )
-                              } else {
-                                const customValue = loopForKeyAtTarget(
-                                  i18nIdefData,
-                                  ["custom"].concat(idSplitted),
+                                  property.getI18nDataFor(localeContext.language),
+                                  idSplitted,
                                 );
-                                // otherwise without policy we check if we have custom data in the item definition
-                                // and this custom properties fit the data
-                                if (customValue) {
-                                  i18nValue = customValue;
-                                } else {
-                                  // otherwise we give an standard property
+                              } else {
+                                // so we get the i18n item definition data
+                                const i18nIdefData =
+                                  itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
+                                // if we are specifying a policy like if we are in a policy context
+                                if (props.policyType && props.policyName) {
+                                  // we go for the policy value and the policy name value
                                   i18nValue = loopForKeyAtTarget(
                                     i18nIdefData,
-                                    idSplitted,
+                                    ["policies", props.policyType, props.policyName].concat(idSplitted),
+                                  )
+                                } else {
+                                  const customValue = loopForKeyAtTarget(
+                                    i18nIdefData,
+                                    ["custom"].concat(idSplitted),
                                   );
+                                  // otherwise without policy we check if we have custom data in the item definition
+                                  // and this custom properties fit the data
+                                  if (customValue) {
+                                    i18nValue = customValue;
+                                  } else {
+                                    // otherwise we give an standard property
+                                    i18nValue = loopForKeyAtTarget(
+                                      i18nIdefData,
+                                      idSplitted,
+                                    );
+                                  }
                                 }
                               }
                             }
 
                             // now in modules
                             if (moduleContextualValue && i18nValue === null) {
-                              // modules act similar to item definitions they also support custom properties
-                              const i18nModData =
-                                moduleContextualValue.mod.getI18nDataFor(localeContext.language);
-                              const customValue = loopForKeyAtTarget(
-                                i18nModData,
-                                ["custom"].concat(idSplitted),
-                              );
-                              if (customValue) {
-                                i18nValue = customValue;
-                              } else {
+                              if (props.propertyId) {
+                                const property = moduleContextualValue.mod.getPropExtensionFor(props.propertyId);
                                 i18nValue = loopForKeyAtTarget(
-                                  i18nModData,
+                                  property.getI18nDataFor(localeContext.language),
                                   idSplitted,
                                 );
+                              } else {
+                                // modules act similar to item definitions they also support custom properties
+                                const i18nModData =
+                                  moduleContextualValue.mod.getI18nDataFor(localeContext.language);
+                                const customValue = loopForKeyAtTarget(
+                                  i18nModData,
+                                  ["custom"].concat(idSplitted),
+                                );
+                                if (customValue) {
+                                  i18nValue = customValue;
+                                } else {
+                                  i18nValue = loopForKeyAtTarget(
+                                    i18nModData,
+                                    idSplitted,
+                                  );
+                                }
                               }
                             }
 
@@ -152,6 +175,12 @@ export function I18nRead(props: II18nReadProps) {
                                 if (includeContext) {
                                   errMessage += "; in item context for " +
                                     includeContext.include.getId();
+                                }
+
+                                // and the include is if so deemed required
+                                if (props.propertyId) {
+                                  errMessage += "; for property id " +
+                                    props.propertyId;
                                 }
                               }
                               // throw the error

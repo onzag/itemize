@@ -1,11 +1,14 @@
 SITE
-1. Update password function
-2. Public profile
-3. Role picker for admins
-4. Implementation of CMS module
-5. Implementation of Forum module
-6. Implementation of flagging
-7. Bans and Blocks
+. Update password function [DONE]
+. Public profile [DONE]
+. Location
+. The first user to sign in is admin
+. Role picker for admins in public profile
+. About me in profile
+. Implementation of CMS module
+. Implementation of Forum module
+. Implementation of flagging
+. Bans and Blocks
 
 SEO
 1. SSR Implementation via constructor and SSR rules, SSR rules will be rules specific to an url
@@ -18,3 +21,12 @@ SEO
   4. SlowLoadingComponent must be immediate and be immediately ready on server contexts
   5. manifest and html set via the SSR rules
   6. SSR rules should be able to load resources as well
+
+TECH
+. Revamp currency to have a normalized_value in dollars
+. Revamp currency search to use normalized_value on mismatch or the value on match
+. Maybe download a list of base conversions from https://free.currencyconverterapi.com/ automatically every day
+. Currencies ["EEK", "LTL", "GWP"] not supported in API all others supported, these currencies are not in the country list
+so can safely be removed
+
+. Image support in rich text

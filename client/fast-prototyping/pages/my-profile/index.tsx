@@ -2,7 +2,6 @@ import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import { UserDataRetriever } from "../../../components/user";
-import { ItemDefinitionLoader } from "../../components/item-definition-loader";
 import { TitleSetter } from "../../../components/util";
 import { I18nRead } from "../../../components/localization";
 import { CurrentUserProfile } from "./current-user";
@@ -53,9 +52,7 @@ export function MyProfile() {
                     );
                   }}
                 </I18nRead>
-                <ItemDefinitionLoader>
-                  <CurrentUserProfile/>
-                </ItemDefinitionLoader>
+                <CurrentUserProfile/>
               </ItemDefinitionProvider>
             </ModuleProvider>
           )
