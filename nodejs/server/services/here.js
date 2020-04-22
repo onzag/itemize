@@ -20,7 +20,7 @@ class Here {
     }
     requestSearchFor(lat, lng, query, lang, sep) {
         const hostname = "places.cit.api.here.com";
-        const path = "places/v1/discover/search";
+        const path = "/places/v1/discover/search";
         const qs = `?at=${lat},${lng}&q=${query}&app_id=${this.appId}&app_code=${this.appCode}`;
         const pathwithqs = path + qs;
         return new Promise((resolve, reject) => {
@@ -37,17 +37,25 @@ class Here {
                     data += chunk;
                 });
                 resp.on("error", (err) => {
-                    reject(err);
+                    // TODO do something with error
+                    console.log(err);
+                    resolve([]);
                 });
                 resp.on("end", () => {
                     // now that we got the answer, let's use our guess
                     try {
                         const parsedData = JSON.parse(data);
-                        parsedData.results = parsedData.results.filter((s) => s.position);
-                        resolve(parsedData.results.map((r) => processHereResult(sep, r, query)));
+                        parsedData.results.items = parsedData.results.items
+                            .filter((r) => r.position)
+                            .filter((r, index, arr) => {
+                            return arr.findIndex((r2) => r.position[0] === r2.position[0] && r.position[1] === r2.position[1]) === index;
+                        });
+                        resolve(parsedData.results.items.map((r) => processHereResult(sep, r, query)));
                     }
                     catch (err) {
-                        reject(err);
+                        // TODO do something with error
+                        console.log(err);
+                        resolve([]);
                     }
                 });
             }).on("error", () => {
@@ -74,7 +82,9 @@ class Here {
                     data += chunk;
                 });
                 resp.on("error", (err) => {
-                    reject(err);
+                    // TODO do something with error
+                    console.log(err);
+                    resolve([]);
                 });
                 resp.on("end", () => {
                     // now that we got the answer, let's use our guess
@@ -84,7 +94,9 @@ class Here {
                         resolve(parsedData.results.map((r) => processHereResult(sep, r)));
                     }
                     catch (err) {
-                        reject(err);
+                        // TODO do something with error
+                        console.log(err);
+                        resolve([]);
                     }
                 });
             }).on("error", () => {

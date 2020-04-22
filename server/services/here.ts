@@ -45,7 +45,7 @@ export class Here {
     sep: string,
   ): Promise<IPropertyDefinitionSupportedLocationType[]> {
     const hostname = "places.cit.api.here.com";
-    const path = "places/v1/discover/search";
+    const path = "/places/v1/discover/search";
     const qs = `?at=${lat},${lng}&q=${query}&app_id=${this.appId}&app_code=${this.appCode}`;
     const pathwithqs = path + qs;
     
@@ -65,20 +65,31 @@ export class Here {
             data += chunk;
           });
           resp.on("error", (err) => {
-            reject(err);
+            // TODO do something with error
+            console.log(err);
+            resolve([]);
           });
           resp.on("end", () => {
             // now that we got the answer, let's use our guess
             try {
               const parsedData = JSON.parse(data);
-              parsedData.results = parsedData.results.filter((s: IHereResult) => s.position);
-              resolve(parsedData.results.map((r: IHereResult) => processHereResult(
+              parsedData.results.items = parsedData.results.items
+                .filter((r: IHereResult) => r.position)
+                .filter((r: IHereResult, index: number, arr: IHereResult[]) => {
+                  return arr.findIndex((r2: IHereResult) =>
+                    r.position[0] === r2.position[0] && r.position[1] === r2.position[1]
+                  ) === index;
+                }
+              );
+              resolve(parsedData.results.items.map((r: IHereResult) => processHereResult(
                 sep,
                 r,
                 query,
               )));
             } catch (err) {
-              reject(err);
+              // TODO do something with error
+              console.log(err);
+              resolve([]);
             }
           });
         }
@@ -115,7 +126,9 @@ export class Here {
             data += chunk;
           });
           resp.on("error", (err) => {
-            reject(err);
+            // TODO do something with error
+            console.log(err);
+            resolve([]);
           });
           resp.on("end", () => {
             // now that we got the answer, let's use our guess
@@ -127,7 +140,9 @@ export class Here {
                 r,
               )));
             } catch (err) {
-              reject(err);
+              // TODO do something with error
+              console.log(err);
+              resolve([]);
             }
           });
         }
