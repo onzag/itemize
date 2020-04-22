@@ -186,6 +186,86 @@ export default function restServices(appData: IAppDataType) {
     res.end(JSON.stringify(ipStackResponse));
   });
 
+  router.get("/util/location-autocomplete", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    if (
+      !appData.here
+    ) {
+      res.status(400);
+      res.end(JSON.stringify({
+        message: "A location fetcher hasn't been set",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      }));
+    }
+
+    if (
+      !req.query.lat || isNaN(req.query.lat as any) ||
+      !req.query.lng || isNaN(req.query.lng as any) ||
+      !req.query.lang ||
+      !req.query.sep ||
+      !req.query.q
+    ) {
+      res.status(400);
+      res.end(JSON.stringify({
+        message: "Invalid request, needs parameters, lat, lng, lang, sep and q",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      }));
+      return;
+    }
+
+    const finalResults = await appData.here.requestAutocompleteFor(
+      req.query.lat as string,
+      req.query.lng as string,
+      req.query.q as string,
+      req.query.lang as string,
+      req.query.sep as string,
+    );
+
+    res.status(200);
+    res.end(JSON.stringify(finalResults));
+  });
+
+  router.get("/util/location-search", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    if (
+      !appData.here
+    ) {
+      res.status(400);
+      res.end(JSON.stringify({
+        message: "A location fetcher hasn't been set",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      }));
+    }
+
+    if (
+      !req.query.lat || isNaN(req.query.lat as any) ||
+      !req.query.lng || isNaN(req.query.lng as any) ||
+      !req.query.lang ||
+      !req.query.sep ||
+      !req.query.q
+    ) {
+      res.status(400);
+      res.end(JSON.stringify({
+        message: "Invalid request, needs parameters, lat, lng, lang, sep and q",
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      }));
+      return;
+    }
+
+    const finalResults = await appData.here.requestSearchFor(
+      req.query.lat as string,
+      req.query.lng as string,
+      req.query.q as string,
+      req.query.lang as string,
+      req.query.sep as string,
+    );
+
+    res.status(200);
+    res.end(JSON.stringify(finalResults));
+  });
+
   // add the static resources
   router.use("/resource", (req, res, next) => {
     const isProtectedResource = PROTECTED_RESOURCES.includes(req.path);
@@ -211,7 +291,7 @@ export default function restServices(appData: IAppDataType) {
 
       let body;
       try {
-        body = JSON.parse(req.query.body);
+        body = JSON.parse(req.query.body as string);
       } catch {
         res.status(400);
         res.end(JSON.stringify({
@@ -263,7 +343,7 @@ export default function restServices(appData: IAppDataType) {
 
       let body;
       try {
-        body = JSON.parse(req.query.body);
+        body = JSON.parse(req.query.body as string);
       } catch {
         res.status(400);
         res.end(JSON.stringify({

@@ -1,4 +1,4 @@
-import http from "http";
+import https from "https";
 import { countries } from "../../imported-resources";
 
 interface IPStackResponse {
@@ -42,7 +42,7 @@ export class IPStack {
   }
   requestInfoFor(ip: string) {
     return new Promise<IPStackResponse>((resolve, reject) => {
-      http.get(`http://api.ipstack.com/${ip}?access_key=${this.apiKey}`, (resp) => {
+      https.get(`http://api.ipstack.com/${ip}?access_key=${this.apiKey}`, (resp) => {
         // let's get the response from the stream
         let data = "";
         resp.on("data", (chunk) => {

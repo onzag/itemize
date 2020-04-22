@@ -47,25 +47,6 @@ export interface IPropertyEntryLocationRendererProps extends IPropertyEntryRende
   searchQuery: string;
 }
 
-// the interface that roughly represents a result from the
-// here we go API, check the API at
-// https://places.demo.api.here.com/places/v1/autosuggest
-interface IHereResult {
-  title: string;
-  highlightedTitle: string;
-  vicinity?: string;
-  highlightedVicinity?: string;
-  position: [number, number];
-  category: string;
-  categoryTitle: string;
-  bbox?: [number, number, number, number];
-  href?: string;
-  type: string;
-  resultType: string;
-  id: string;
-  distance: number;
-}
-
 // location state, sadly it needs a lot in the state
 // department
 interface IPropertyEntryLocationState {
@@ -73,16 +54,6 @@ interface IPropertyEntryLocationState {
   viewport: IViewport;
   searchResults: IPropertyDefinitionSupportedLocationType[];
   searchCurrentlyMarkedValue: number;
-}
-
-// converts a suggestion to our lovely location type
-function processSuggestion(wordSeparator: string, suggestion: IHereResult, overwriteTxt?: string) {
-  return {
-    lat: suggestion.position[0],
-    lng: suggestion.position[1],
-    txt: overwriteTxt || suggestion.title,
-    atxt: suggestion.vicinity ? suggestion.vicinity.replace(/\<br\/\>/g, wordSeparator + " ") : null,
-  };
 }
 
 export default class PropertyEntryLocation
@@ -165,42 +136,27 @@ export default class PropertyEntryLocation
   ) {
     const countryLatitude = this.props.country.latitude;
     const countryLongitude = this.props.country.longitude;
-    const url = "https://places.cit.api.here.com/places/v1/autosuggest";
-    const appId = (window as any).HERE_APP_ID;
-    const appCode = (window as any).HERE_APP_CODE;
-
-    const options = {
-      method: "GET",
-      headers: new Headers({
-        "Accept-Language": `${this.props.language}, en-US;q=0.9, en;q=0.9, es-419;q=0.8, es;q=0.7`,
-      }),
-    };
+    const sep = this.props.i18n[this.props.language].word_separator;
 
     const thisUpdateIdentifier = (new Date()).getTime();
     this.updateTakingPlace = thisUpdateIdentifier;
 
     let finalResults: IPropertyDefinitionSupportedLocationType[];
     try {
-      const data = await fetch(
-        `${url}?at=${countryLatitude},${countryLongitude}&q=${searchQuery}&app_id=${appId}&app_code=${appCode}&size=6`,
-        options,
+      finalResults = await fetch(
+        `/rest/util/location-autocomplete?lat=${countryLatitude}&lng=${countryLongitude}` + 
+        `&q=${encodeURIComponent(searchQuery)}&sep=${encodeURIComponent(sep)}&lang=${this.props.language}`,
       ).then((r) => r.json());
-
-      data.results = data.results.filter((s: IHereResult) => s.position);
-      finalResults = data.results.map((r: IHereResult) => processSuggestion(
-        this.props.i18n[this.props.language].word_separator,
-        r,
-      ));
-
-      if (thisUpdateIdentifier === this.updateTakingPlace) {
-        this.lastSuggestionsValue = finalResults;
-        this.lastSuggestionsValueQ = searchQuery;
-        this.setState({
-          suggestions: data.results,
-        });
-      }
     } catch (err) {
       finalResults = [];
+    }
+
+    if (thisUpdateIdentifier === this.updateTakingPlace) {
+      this.lastSuggestionsValue = finalResults;
+      this.lastSuggestionsValueQ = searchQuery;
+      this.setState({
+        suggestions: finalResults,
+      });
     }
 
     // basically we always have the autosuggest override here
@@ -238,6 +194,9 @@ export default class PropertyEntryLocation
     );
 
     if (dontAutoloadSuggestions) {
+      return;
+    } else if (!searchQuery.trim()) {
+      this.clearSuggestions();
       return;
     }
 
@@ -284,22 +243,7 @@ export default class PropertyEntryLocation
     const value = this.props.state.internalValue;
     const countryLatitude = this.props.country.latitude;
     const countryLongitude = this.props.country.longitude;
-    const url = "https://places.cit.api.here.com/places/v1/discover/search";
-    const appId = (window as any).HERE_APP_ID;
-    const appCode = (window as any).HERE_APP_CODE;
-
-    if (!appId || !appCode) {
-      console.warn("Here Maps has not been configured and as such search is unavailable");
-      return;
-    }
-
-    // we use the language as the main expected result
-    const options = {
-      method: "GET",
-      headers: new Headers({
-        "Accept-Language": `${this.props.language}, en-US;q=0.9, en;q=0.9, es-419;q=0.8, es;q=0.7`,
-      }),
-    };
+    const sep = this.props.i18n[this.props.language].word_separator;
 
     // so this is the update identifier for this update
     const thisUpdateIdentifier = (new Date()).getTime();
@@ -307,26 +251,16 @@ export default class PropertyEntryLocation
     this.searchTakingPlace = thisUpdateIdentifier;
 
     // make the async request to the here API
-    let finalResults: IPropertyDefinitionSupportedLocationType[] = null;
+    let finalResults: IPropertyDefinitionSupportedLocationType[] = [];
     try {
-      const results: IHereResult[] = this.lastSearchValueQ === value ? this.lastSearchValue : (await fetch(
-        `${url}?at=${countryLatitude},${countryLongitude}&q=${value}&app_id=${appId}&app_code=${appCode}`,
-        options,
-      ).then((r) => r.json())).results.items.filter((r: IHereResult, index: number, arr: IHereResult[]) => {
-        return arr.findIndex((r2: IHereResult) => equals(r2.position, r.position)) === index;
-      });
-
-      if (results && results.length !== 0) {
-        finalResults = results.map((r) => processSuggestion(
-          this.props.i18n[this.props.language].word_separator,
-          r,
-          value,
-        ));
-      }
+      finalResults = await fetch(
+        `/rest/util/location-search?lat=${countryLatitude}&lng=${countryLongitude}` + 
+        `&q=${encodeURIComponent(value)}&sep=${encodeURIComponent(sep)}&lang=${this.props.language}`,
+      ).then((r) => r.json());
     } catch (err) {
+      finalResults = [];
     }
     
-
     // due to the async nature some crazy stacking might have happened
     // let's check that only the last one can set the state
     if (thisUpdateIdentifier === this.searchTakingPlace) {
@@ -335,11 +269,11 @@ export default class PropertyEntryLocation
       this.lastSearchValueQ = value;
 
       // if we don't bad luck, null everything
-      if (!finalResults) {
+      if (!finalResults || !finalResults.length) {
         this.props.onChange(null, value);
 
         this.setState({
-          searchResults: null,
+          searchResults: [],
           searchCurrentlyMarkedValue: null,
         });
       } else {

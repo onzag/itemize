@@ -28,6 +28,7 @@ interface IPropertyEntryProps<RendererPropsType> {
   altLabel?: string;
   altPlaceholder?: string;
   ignoreErrors?: boolean;
+  autoFocus?: boolean;
 }
 
 interface IPropertySetterProps {
@@ -68,6 +69,7 @@ interface IPropertyEntryViewReadSetProps<RendererPropsType> {
   altLabel?: string;
   altPlaceholder?: string;
   ignoreErrors?: boolean;
+  autoFocus?: boolean;
 }
 // TODO optimize
 function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "entry" | "view" | "read" | "set") {
@@ -228,6 +230,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "ent
                       altLabel={props.altLabel}
                       altPlaceholder={props.altPlaceholder}
                       ignoreErrors={props.ignoreErrors}
+                      autoFocus={props.autoFocus}
                     />
                   );
                 } else {

@@ -12,6 +12,7 @@ import { ITriggerRegistry } from "./resolvers/triggers";
 import { IPStack } from "./services/ipstack";
 import Mailgun from "mailgun-js";
 import pkgcloud from "pkgcloud";
+import { Here } from "./services/here";
 export interface IAppDataType {
     root: Root;
     autocompletes: Autocomplete[];
@@ -28,6 +29,7 @@ export interface IAppDataType {
     buildnumber: string;
     triggers: ITriggerRegistry;
     ipStack: IPStack;
+    here: Here;
     mailgun: Mailgun.Mailgun;
     pkgcloudStorageClient: pkgcloud.storage.Client;
     pkgcloudUploadsContainer: pkgcloud.storage.Container;

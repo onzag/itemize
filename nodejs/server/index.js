@@ -32,6 +32,7 @@ const ipstack_1 = require("./services/ipstack");
 const mailgun_1 = require("./services/mailgun");
 const rest_2 = require("./user/rest");
 const pkgcloud_1 = __importDefault(require("pkgcloud"));
+const here_1 = require("./services/here");
 // TODO comment and document
 // Setting the parsers, postgresql comes with
 // its own way to return this data and I want it
@@ -266,6 +267,8 @@ async function initializeServer(custom = {}) {
             apiKey: sensitiveConfig.mailgunAPIKey,
             domain: sensitiveConfig.mailgunDomain,
         }) : null;
+    const here = sensitiveConfig.hereAppID && sensitiveConfig.hereAppCode ?
+        here_1.setupHere(sensitiveConfig.hereAppID, sensitiveConfig.hereAppCode) : null;
     const appData = {
         root,
         autocompletes,
@@ -287,6 +290,7 @@ async function initializeServer(custom = {}) {
             ...custom.customTriggers,
         },
         ipStack,
+        here,
         mailgun,
         pkgcloudStorageClient,
         pkgcloudUploadsContainer,

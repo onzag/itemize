@@ -56,6 +56,7 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
                     showAsInvalid={!!actioner.statefulError}
                     hideDescription={true}
                     icon={<AlernateEmailIcon/>}
+                    autoFocus={true}
                   />
                 </form>
                 <I18nRead id="recover_account_action">

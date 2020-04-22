@@ -7,6 +7,7 @@ import {
   Icon,
   IconButton,
   ThemeProvider,
+  Typography,
 } from "@material-ui/core";
 import { createStyles, WithStyles, withStyles } from "@material-ui/styles";
 import Autosuggest from "react-autosuggest";
@@ -21,6 +22,8 @@ import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import { IPropertyEntryLocationRendererProps, IViewportZoomEnumType } from "../../../internal/components/PropertyEntry/PropertyEntryLocation";
 import { IPropertyEntryProps } from "../../../internal/components/PropertyEntry";
+import SearchIcon from "@material-ui/icons/Search";
+import { Alert } from "@material-ui/lab";
 
 // https://github.com/PaulLeCam/react-leaflet/issues/453
 // bug in leaflet
@@ -30,6 +33,12 @@ delete (L.Icon as any).Default.prototype._getIconUrl;
   iconUrl: require("leaflet/dist/images/marker-icon.png"),
   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
 });
+
+const ZOOMS = {
+  "LARGE": 16,
+  "MEDIUM": 14,
+  "SMALL": 4,
+};
 
 function shouldShowInvalid(props: IPropertyEntryLocationRendererProps) {
   return !props.currentValid;
@@ -192,6 +201,8 @@ interface IPropertyEntryLocationRendererWithStylesProps extends IPropertyEntryLo
 }
 
 class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component<IPropertyEntryLocationRendererWithStylesProps> {
+  private inputRef: HTMLInputElement;
+
   constructor(props: IPropertyEntryLocationRendererWithStylesProps) {
     super(props);
 
@@ -200,7 +211,13 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
     this.getSuggestionValue = this.getSuggestionValue.bind(this);
     this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
     this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
+    this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
     this.onKeyPress = this.onKeyPress.bind(this);
+  }
+  public componentDidMount() {
+    if (this.props.autoFocus && this.inputRef) {
+      this.inputRef.focus();
+    }
   }
   public onKeyPress(e: React.KeyboardEvent<HTMLInputElement>) {
     // basically we want to trigger swap or search on enter
@@ -220,8 +237,116 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
   public onSuggestionsFetchRequested({value}) {
     this.props.onSearchQueryChange(value);
   }
-  public renderBody() {
-    return null;
+  public renderBody(textFieldProps?: any) {
+    const viewport = {
+      center: this.props.viewport.center,
+      zoom: ZOOMS[this.props.viewport.zoom] || this.props.viewport.zoom,
+    };
+    let appliedTextFieldProps: any = {
+      className: this.props.classes.entry,
+    };
+    let appliedInputProps: any = {
+      endAdornment: (
+        <InputAdornment position="end">
+          <IconButton
+            disabled={this.props.disabled}
+            classes={{root: this.props.classes.iconButton}}
+            onClick={this.props.onSearch.bind(null, false)}
+          >
+            <SearchIcon />
+          </IconButton>
+        </InputAdornment>
+      ),
+    };
+    if (textFieldProps) {
+      const { inputRef = () => {return; } , ref, ...other } = textFieldProps;
+      appliedTextFieldProps = other;
+      appliedInputProps = {
+        ...appliedInputProps,
+        inputRef: (node: HTMLInputElement) => {
+          ref(node);
+          inputRef(node);
+        },
+      };
+    }
+
+    const descriptionAsAlert = this.props.args["descriptionAsAlert"];
+    return (
+      <div className={this.props.classes.container}>
+        {
+          this.props.description && descriptionAsAlert ?
+          <Alert severity="info" className={this.props.classes.description}>
+            {this.props.description}
+          </Alert> :
+          null
+        }
+        {
+          this.props.description && !descriptionAsAlert ?
+          <Typography variant="caption" className={this.props.classes.description}>
+            {this.props.description}
+          </Typography> :
+          null
+        }
+        <div className={this.props.classes.locationAlternativeTextHeader}>
+          {this.props.currentValue && this.props.currentValue.atxt}
+        </div>
+        <div className={this.props.classes.locationMapContainer}>
+          <Map
+            viewport={viewport}
+          >
+            <TileLayer
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+            />
+            {this.props.currentValue ? <Marker position={[
+              this.props.currentValue.lat, this.props.currentValue.lng,
+            ]}>
+              <Popup>{this.props.currentValue.txt}{this.props.currentValue.atxt ? <br/> : null}{this.props.currentValue.atxt}</Popup>
+            </Marker> : null}
+            {!this.props.disabled && this.props.activeSearchResults ? this.props.activeSearchResults
+              .filter((result) => !equals(this.props.currentValue, result))
+              .map((result) => (
+                <Marker
+                  opacity={0.5}
+                  key={result.lat.toString() + result.lng.toString()}
+                  position={[result.lat, result.lng]}
+                  onClick={this.props.onChangeBySearchResult.bind(this, result)}
+                />
+            )) : null}
+          </Map>
+        </div>
+        <TextField
+          fullWidth={true}
+          type="search"
+          onKeyPress={this.onKeyPress}
+          className={this.props.classes.entry}
+          label={this.props.label}
+          onChange={this.onSearchQueryChange}
+          placeholder={this.props.placeholder}
+          value={this.props.searchQuery}
+          InputProps={{
+            classes: {
+              root: this.props.classes.fieldInput,
+              focused: "focused",
+            },
+            disabled: this.props.disabled,
+            ...appliedInputProps,
+          }}
+          InputLabelProps={{
+            classes: {
+              root: this.props.classes.label,
+              focused: "focused",
+            },
+          }}
+          disabled={this.props.disabled}
+          variant="filled"
+          {...appliedTextFieldProps}
+        />
+        <div className={this.props.classes.errorMessage}>
+          {this.props.currentInvalidReason}
+        </div>
+      </div>
+    );
   }
   public getSuggestionValue(
     suggestion: IPropertyDefinitionSupportedLocationType,

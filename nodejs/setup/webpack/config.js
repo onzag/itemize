@@ -11,8 +11,8 @@ const mode = isDevelopment ? "development" : "production";
 
 const plugins = [
   new MiniCssExtractPlugin({
-    filename: "build." + mode + ".css",
-    chunkFilename: "build." + mode + ".css"
+    filename: "[name]." + mode + ".css",
+    chunkFilename: "[name]." + mode + ".css"
   }),
   new webpack.IgnorePlugin(/^\\.\\/locale$/, /moment$/),
   new WorkerInjectorGeneratorPlugin({

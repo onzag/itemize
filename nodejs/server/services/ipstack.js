@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const http_1 = __importDefault(require("http"));
+const https_1 = __importDefault(require("https"));
 const imported_resources_1 = require("../../imported-resources");
 class IPStack {
     constructor(apiKey) {
@@ -11,7 +11,7 @@ class IPStack {
     }
     requestInfoFor(ip) {
         return new Promise((resolve, reject) => {
-            http_1.default.get(`http://api.ipstack.com/${ip}?access_key=${this.apiKey}`, (resp) => {
+            https_1.default.get(`http://api.ipstack.com/${ip}?access_key=${this.apiKey}`, (resp) => {
                 // let's get the response from the stream
                 let data = "";
                 resp.on("data", (chunk) => {

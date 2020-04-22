@@ -78,7 +78,13 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
                   </Typography>
                 </div>
                 <form>
-                  <Entry id="username" onChange={actioner.dismissError} showAsInvalid={!!actioner.error} icon={<AccountCircleIcon/>}/>
+                  <Entry
+                    id="username"
+                    onChange={actioner.dismissError}
+                    showAsInvalid={!!actioner.error}
+                    icon={<AccountCircleIcon/>}
+                    autoFocus={true}
+                  />
                   <Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
                   <AppLanguageRetriever>
                     {(languageData) => (

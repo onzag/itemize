@@ -89,6 +89,7 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
                         altLabel={i18nAltLabel}
                         altPlaceholder={i18nAltPlaceholder}
                         icon={<AccountCircleIcon/>}
+                        autoFocus={true}
                       />
                     )}
                   </I18nReadMany>

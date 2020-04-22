@@ -31,6 +31,7 @@ import { setupMailgun } from "./services/mailgun";
 import Mailgun from "mailgun-js";
 import { userRestServices } from "./user/rest";
 import pkgcloud from "pkgcloud";
+import { setupHere, Here } from "./services/here";
 
 // TODO comment and document
 
@@ -69,6 +70,7 @@ export interface IAppDataType {
   buildnumber: string;
   triggers: ITriggerRegistry;
   ipStack: IPStack,
+  here: Here,
   mailgun: Mailgun.Mailgun;
   pkgcloudStorageClient: pkgcloud.storage.Client,
   pkgcloudUploadsContainer: pkgcloud.storage.Container;
@@ -350,6 +352,9 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       domain: sensitiveConfig.mailgunDomain,
     }) : null;
 
+  const here = sensitiveConfig.hereAppID && sensitiveConfig.hereAppCode ?
+    setupHere(sensitiveConfig.hereAppID, sensitiveConfig.hereAppCode) : null;
+
   const appData: IAppDataType = {
     root,
     autocompletes,
@@ -372,6 +377,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       ...custom.customTriggers,
     },
     ipStack,
+    here,
     mailgun,
     pkgcloudStorageClient,
     pkgcloudUploadsContainer,

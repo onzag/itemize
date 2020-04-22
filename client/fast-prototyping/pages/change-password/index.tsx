@@ -76,6 +76,7 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
                               policyName="REQUIRES_PASSWORD_CONFIRMATION"
                               altLabel={i18nAltCurrentPasswordLabel}
                               altPlaceholder={i18nAltCurrentPasswordPlaceholder}
+                              autoFocus={true}
                             />
                             <Entry
                               id="password"

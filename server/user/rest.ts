@@ -21,7 +21,7 @@ export function userRestServices(appData: IAppDataType) {
     };
     try {
       // we attempt to decode it
-      decoded = await jwtVerify(req.query.token, appData.sensitiveConfig.jwtKey);
+      decoded = await jwtVerify(req.query.token as string, appData.sensitiveConfig.jwtKey);
     } catch (err) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
     };

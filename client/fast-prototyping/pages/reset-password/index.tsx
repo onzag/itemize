@@ -101,6 +101,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
                               altLabel={i18nAltLabel}
                               altPlaceholder={i18nAltPlaceholder}
                               altDescription={i18nAltDescription}
+                              autoFocus={true}
                             />
                           )}
                         </I18nReadMany>

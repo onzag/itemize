@@ -159,6 +159,56 @@ function restServices(appData) {
         const ipStackResponse = await appData.ipStack.requestUserInfoForIp(ip.toString(), standardAPIResponse);
         res.end(JSON.stringify(ipStackResponse));
     });
+    router.get("/util/location-autocomplete", async (req, res) => {
+        res.setHeader("content-type", "application/json; charset=utf-8");
+        if (!appData.here) {
+            res.status(400);
+            res.end(JSON.stringify({
+                message: "A location fetcher hasn't been set",
+                code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+            }));
+        }
+        if (!req.query.lat || isNaN(req.query.lat) ||
+            !req.query.lng || isNaN(req.query.lng) ||
+            !req.query.lang ||
+            !req.query.sep ||
+            !req.query.q) {
+            res.status(400);
+            res.end(JSON.stringify({
+                message: "Invalid request, needs parameters, lat, lng, lang, sep and q",
+                code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+            }));
+            return;
+        }
+        const finalResults = await appData.here.requestAutocompleteFor(req.query.lat, req.query.lng, req.query.q, req.query.lang, req.query.sep);
+        res.status(200);
+        res.end(JSON.stringify(finalResults));
+    });
+    router.get("/util/location-search", async (req, res) => {
+        res.setHeader("content-type", "application/json; charset=utf-8");
+        if (!appData.here) {
+            res.status(400);
+            res.end(JSON.stringify({
+                message: "A location fetcher hasn't been set",
+                code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+            }));
+        }
+        if (!req.query.lat || isNaN(req.query.lat) ||
+            !req.query.lng || isNaN(req.query.lng) ||
+            !req.query.lang ||
+            !req.query.sep ||
+            !req.query.q) {
+            res.status(400);
+            res.end(JSON.stringify({
+                message: "Invalid request, needs parameters, lat, lng, lang, sep and q",
+                code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+            }));
+            return;
+        }
+        const finalResults = await appData.here.requestSearchFor(req.query.lat, req.query.lng, req.query.q, req.query.lang, req.query.sep);
+        res.status(200);
+        res.end(JSON.stringify(finalResults));
+    });
     // add the static resources
     router.use("/resource", (req, res, next) => {
         const isProtectedResource = constants_1.PROTECTED_RESOURCES.includes(req.path);
