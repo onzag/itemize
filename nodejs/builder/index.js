@@ -34,7 +34,6 @@ const fsAsync = fs_1.default.promises;
 require("source-map-support/register");
 const moment_1 = require("./moment");
 const constants_1 = require("../constants");
-const autocomplete_1 = require("./autocomplete");
 const evaler_1 = require("./evaler");
 const buildnumber_1 = require("./buildnumber");
 const manifest_1 = require("./manifest");
@@ -140,21 +139,6 @@ async function buildData(rawDataConfig) {
         console.log("emiting " + safe_1.default.green(fileName));
         await fsAsync.writeFile(fileName, JSON.stringify(resultingBuild));
     }));
-    // now let's build the autocomplete file
-    let autocomplete = [];
-    if (fileData.data.autocomplete) {
-        // for that we find all the autocomplete information
-        const autocompleteTraceback = traceback.newTraceToBit("autocomplete");
-        // and run the builder for the autocomplete
-        autocomplete = await Promise.all(fileData.data.autocomplete.map((autocompleteSource, index) => {
-            // and just use it as the array it is
-            return autocomplete_1.buildAutocomplete(rawDataConfig, path_1.default.join(path_1.default.dirname(actualLocation), autocompleteSource), autocompleteTraceback.newTraceToBit(index));
-        }));
-    }
-    // emit that file
-    const autocompleteFileName = path_1.default.join("dist", "autocomplete.json");
-    console.log("emiting " + safe_1.default.green(autocompleteFileName));
-    await fsAsync.writeFile(autocompleteFileName, JSON.stringify(autocomplete));
     return resultJSON;
 }
 /**
@@ -645,7 +629,7 @@ async function getI18nPropertyData(rawDataConfig, actualLocation, property, trac
         errorRequiredProperties.push("error.NOT_UNIQUE");
     }
     if (definition.i18n.tooLargeErrorInclude &&
-        !property.values && !property.autocompleteIsEnforced) {
+        !property.values) {
         errorRequiredProperties.push("error.TOO_LARGE");
     }
     if (definition.supportedSubtypes && property.subtype && property.type === "string") {
@@ -658,20 +642,17 @@ async function getI18nPropertyData(rawDataConfig, actualLocation, property, trac
         property.type === "currency" ||
         property.type === "integer" ||
         property.type === "year" ||
-        property.type === "unit" ||
-        property.autocompleteIsEnforced) && !property.values) {
+        property.type === "unit") && !property.values) {
         errorRequiredProperties.push("error.INVALID_VALUE");
     }
     if ((typeof property.minLength !== "undefined" || definition.i18n.tooSmallErrorInclude) &&
-        !property.values && !property.autocompleteIsEnforced) {
+        !property.values) {
         errorRequiredProperties.push("error.TOO_SMALL");
     }
-    if (definition.i18n.tooManyDecimalsErrorInclude &&
-        !property.values && !property.autocompleteIsEnforced) {
+    if (definition.i18n.tooManyDecimalsErrorInclude && !property.values) {
         errorRequiredProperties.push("error.TOO_MANY_DECIMALS");
     }
-    if (typeof property.minDecimalCount !== "undefined" &&
-        !property.values && !property.autocompleteIsEnforced) {
+    if (typeof property.minDecimalCount !== "undefined" && !property.values) {
         errorRequiredProperties.push("error.TOO_FEW_DECIMALS");
     }
     if (definition.searchInterface === search_interfaces_1.PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&

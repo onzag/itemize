@@ -405,6 +405,11 @@ export async function validateTokenIsntBlocked(
         message: "Token has been rendered invalid",
         code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
       });
+    } else if (sqlResult.role !== tokenData.role) {
+      throw new EndpointError({
+        message: "Token has role mismatch",
+        code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+      });
     }
   }
   validateTokenIsntBlockedDebug("SUCCEED");

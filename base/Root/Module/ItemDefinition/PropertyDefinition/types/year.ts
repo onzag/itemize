@@ -14,7 +14,7 @@ import {
   getStandardSQLFnFor,
 } from "../sql";
 import {
-  standardSQLLocalEqualFn,
+  standardSQLLocalEqualFn, standardLocalEqual,
 } from "../local-sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
@@ -50,6 +50,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlLocalEqual: standardSQLLocalEqualFn,
 
   localSearch: standardLocalSearchExactAndRange,
+  localEqual: standardLocalEqual,
 
   // validates
   validate: (n: PropertyDefinitionSupportedYearType) => {

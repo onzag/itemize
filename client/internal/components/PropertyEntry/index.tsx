@@ -22,6 +22,13 @@ import { IRendererProps } from "../../renderer";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import Include from "../../../../base/Root/Module/ItemDefinition/Include";
 
+/**
+ * This is what every renderer gets regardless of type as long as it's an entry
+ * type, it will get this instance as its props, the ValueType represents the property definition
+ * type it epects as its current value
+ * 
+ * Expect these to be extended
+ */
 export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
   label?: string;
   placeholder?: string;
@@ -39,7 +46,13 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
   onChange: (value: ValueType, internalValue: any) => void;
 }
 
-export interface IPropertyEntryBaseProps<ValueType, RendererPropsType> {
+/**
+ * This is what the whole entry react component expects as its properties
+ * this is what should be fed to the generic PropertyEntry and it doesn't extend
+ * anything, an optional renderer and rendererArgs can be passed to modify where
+ * the values are distributed
+ */
+export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
   itemDefinition: ItemDefinition;
   include: Include;
   property: PropertyDefinition;
@@ -55,12 +68,16 @@ export interface IPropertyEntryBaseProps<ValueType, RendererPropsType> {
   poked?: boolean;
   autoFocus?: boolean;
   icon?: React.ReactNode;
+  ignoreErrors?: boolean;
   renderer?: React.ComponentType<RendererPropsType>;
   rendererArgs?: object;
-  ignoreErrors?: boolean;
 }
 
-export interface IPropertyEntryProps<ValueType, RendererPropsType> extends IPropertyEntryBaseProps<ValueType, RendererPropsType> {
+/**
+ * This is what the handler gets, every handler is contained within this folder, it contains every property within
+ * the base that is directly fed as well as these extra that are obtained from the context itself
+ */
+export interface IPropertyEntryHandlerProps<ValueType, RendererPropsType> extends IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
   language: string;
   rtl: boolean;
   currency: ICurrencyType;
@@ -68,30 +85,35 @@ export interface IPropertyEntryProps<ValueType, RendererPropsType> extends IProp
   country: ICountryType;
 }
 
-const typeRegistry:
+interface IRendererHandlerType {
+  renderer: string,
+  handler: React.ComponentType<IPropertyEntryHandlerProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>>,
+};
+
+/**
+ * The type registry contains a list of handlers for a given type
+ */
+const handlerRegistry:
   Record<
     PropertyDefinitionSupportedTypeName,
-    {
-      renderer: string,
-      element: React.ComponentType<IPropertyEntryProps<PropertyDefinitionSupportedType, IRendererProps>>,
-    }
+    IRendererHandlerType
   > = {
   string: {
     renderer: "PropertyEntryField",
-    element: PropertyEntryField,
+    handler: PropertyEntryField,
   },
   integer: null,
   number: null,
   boolean: {
     renderer: "PropertyEntryBoolean",
-    element: PropertyEntryBoolean,
+    handler: PropertyEntryBoolean,
   },
   text: null,
   currency: null,
   unit: null,
   password: {
     renderer: "PropertyEntryField",
-    element: PropertyEntryField,
+    handler: PropertyEntryField,
   },
   year: null,
   datetime: null,
@@ -99,25 +121,29 @@ const typeRegistry:
   time: null,
   location: {
     renderer: "PropertyEntryLocation",
-    element: PropertyEntryLocation,
+    handler: PropertyEntryLocation,
   },
   file: {
     renderer: "PropertyEntryFile",
-    element: PropertyEntryFile,
+    handler: PropertyEntryFile,
   },
   files: null,
 };
 
 export default function PropertyEntry(
-  props: IPropertyEntryBaseProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>,
+  props: IPropertyEntryMainHandlerProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>,
 ) {
-  // First get the element by the type
+  if (props.state.hidden) {
+    return null;
+  }
+
+  // First get the handler by the type
   const registryEntry = props.property.hasSpecificValidValues() ?
     // TODO PropertyEntrySelect :
     null :
-    typeRegistry[props.property.getType()];
+    handlerRegistry[props.property.getType()];
 
-  const Element = registryEntry.element;
+  const Element = registryEntry.handler;
 
   // Build the context and render sending the right props
   return (

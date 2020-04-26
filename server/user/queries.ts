@@ -111,6 +111,11 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
               message: "Session has been cancelled",
               code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
             });
+          } else if (resultUser.role !== decoded.role) {
+            throw new EndpointError({
+              message: "Token role mismatch",
+              code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+            });
           }
 
         } else {

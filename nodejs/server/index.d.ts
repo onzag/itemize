@@ -2,7 +2,6 @@ import express from "express";
 import Root from "../base/Root";
 import { IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
 import Knex from "knex";
-import Autocomplete from "../base/Autocomplete";
 import { Listener } from "./listener";
 import { RedisClient } from "redis";
 import { Cache } from "./cache";
@@ -15,7 +14,6 @@ import pkgcloud from "pkgcloud";
 import { Here } from "./services/here";
 export interface IAppDataType {
     root: Root;
-    autocompletes: Autocomplete[];
     indexDevelopment: string;
     indexProduction: string;
     config: IConfigRawJSONDataType;

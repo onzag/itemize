@@ -25,6 +25,7 @@ const typeValue = {
     sqlSearch: sql_1.standardSQLSearchFnExactAndRange,
     sqlEqual: sql_1.standardSQLEqualFn,
     sqlLocalEqual: local_sql_1.standardSQLLocalEqualFn,
+    localEqual: local_sql_1.standardLocalEqual,
     localSearch: local_search_1.standardLocalSearchExactAndRange,
     // it gotta be validated to check it's a number
     validate: (n) => {

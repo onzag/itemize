@@ -111,7 +111,7 @@ export async function searchModule(
   }
 
   // return using the base result, and only using the id
-  const baseResult: IGQLSearchResult[] = (await searchQuery).map(convertVersionsIntoNullsWhenNecessary);
+  const baseResult: IGQLSearchResult[] = (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchResult[];
   const finalResult: {
     ids: IGQLSearchResult[];
     last_record: IGQLSearchResult;

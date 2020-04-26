@@ -12,11 +12,10 @@ import { MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERR
 import { GraphQLError } from "graphql";
 import { EndpointError, EndpointErrorType } from "../base/errors";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
-import { serverSideIndexChecker, serverSideAutocompleteChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
+import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import restServices from "./rest";
 import { customUserQueries } from "./user/queries";
 import { customUserMutations } from "./user/mutations";
-import Autocomplete, { IAutocompleteRawJSONDataType } from "../base/Autocomplete";
 import { Listener } from "./listener";
 import redis, { RedisClient } from "redis";
 import { Cache } from "./cache";
@@ -56,7 +55,6 @@ const app = express();
 
 export interface IAppDataType {
   root: Root;
-  autocompletes: Autocomplete[];
   indexDevelopment: string;
   indexProduction: string;
   config: IConfigRawJSONDataType;
@@ -243,7 +241,6 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   let rawRedisConfig: string;
   let rawDbConfig: string;
   let index: string;
-  let rawAutocompleteSource: string;
   let buildnumber: string;
   [
     rawConfig,
@@ -252,7 +249,6 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     rawDbConfig,
     index,
     rawBuild,
-    rawAutocompleteSource,
     buildnumber,
   ] = await Promise.all([
     fsAsync.readFile(path.join("dist", "config.json"), "utf8"),
@@ -261,7 +257,6 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     fsAsync.readFile(path.join("dist", "db.json"), "utf8"),
     fsAsync.readFile(path.join("dist", "data", "index.html"), "utf8"),
     fsAsync.readFile(path.join("dist", "data", "build.all.json"), "utf8"),
-    fsAsync.readFile(path.join("dist", "autocomplete.json"), "utf8"),
     fsAsync.readFile(path.join("dist", "buildnumber"), "utf8"),
   ]);
   const config: IConfigRawJSONDataType = JSON.parse(rawConfig);
@@ -281,8 +276,6 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   // this shouldn't be necessary but we do it anyway
   buildnumber = buildnumber.replace("\n", "").trim();
   const root = new Root(build);
-  const autocompletes = JSON.parse(rawAutocompleteSource)
-    .map((s: IAutocompleteRawJSONDataType) => (new Autocomplete(s)));
 
   // Create the connection string
   const dbConnectionKnexConfig = {
@@ -305,7 +298,6 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
   const redisSub: RedisClient = redis.createClient(redisConfig);
 
   PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
-  PropertyDefinition.autocompleteChecker = serverSideAutocompleteChecker.bind(null, autocompletes);
 
   // due to a bug in the types the create client function is missing
   // domainId and domainName
@@ -357,7 +349,6 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
 
   const appData: IAppDataType = {
     root,
-    autocompletes,
     indexDevelopment: index.replace(/\$MODE/g, "development"),
     indexProduction: index.replace(/\$MODE/g, "production"),
     config,

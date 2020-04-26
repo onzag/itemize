@@ -25,6 +25,7 @@ const typeValue = {
     sqlEqual: sql_1.standardSQLEqualFn,
     sqlLocalEqual: local_sql_1.standardSQLLocalEqualFn,
     localSearch: local_search_1.standardLocalSearchExactAndRange,
+    localEqual: local_sql_1.standardLocalEqual,
     // it is searchable by default
     searchable: true,
     searchInterface: search_interfaces_1.PropertyDefinitionSearchInterfacesType.EXACT,

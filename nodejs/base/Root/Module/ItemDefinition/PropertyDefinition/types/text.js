@@ -95,6 +95,7 @@ const typeValue = {
     },
     sqlEqual: sql_1.standardSQLEqualFn,
     sqlLocalEqual: local_sql_1.standardSQLLocalEqualFn,
+    localEqual: local_sql_1.standardLocalEqual,
     // validates the text, texts don't support json value
     validate: (s, subtype) => {
         if (typeof s !== "string") {

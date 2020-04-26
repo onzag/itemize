@@ -20,10 +20,6 @@ export declare const checkItemDefinitionSchemaValidate: Ajv.ValidateFunction;
  */
 export declare const checkPropertyDefinitionArraySchemaValidate: Ajv.ValidateFunction;
 /**
- * Checks an autocomplete
- */
-export declare const checkAutocompleteSchemaValidate: Ajv.ValidateFunction;
-/**
  * Checks a module
  */
 export declare const checkModuleSchemaValidate: Ajv.ValidateFunction;

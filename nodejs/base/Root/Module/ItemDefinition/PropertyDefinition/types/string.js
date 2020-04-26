@@ -42,8 +42,8 @@ const typeValue = {
     sqlEqual: sql_1.standardSQLEqualFn,
     sqlLocalEqual: local_sql_1.standardSQLLocalEqualFn,
     localSearch: local_search_1.standardLocalSearchExactAndRange,
+    localEqual: local_sql_1.standardLocalEqual,
     nullableDefault: "",
-    supportsAutocomplete: true,
     supportedSubtypes: ["email", "identifier"],
     // validates just the length
     validate: (s, subtype) => {

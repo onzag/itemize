@@ -88,6 +88,12 @@ exports.customUserQueries = (appData) => {
                             code: constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS,
                         });
                     }
+                    else if (resultUser.role !== decoded.role) {
+                        throw new errors_1.EndpointError({
+                            message: "Token role mismatch",
+                            code: constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+                        });
+                    }
                 }
                 else {
                     // now we prepare the query we use to get the

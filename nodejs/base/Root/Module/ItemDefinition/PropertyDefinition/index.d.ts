@@ -8,7 +8,6 @@ import ItemDefinition, { ItemDefinitionIOActions } from "..";
 import ConditionalRuleSet, { IConditionalRuleSetRawJSONDataType } from "../ConditionalRuleSet";
 import Module from "../..";
 import { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
-import { ISingleFilterRawJSONDataType } from "../../../../Autocomplete";
 /**
  * These are the main errors a property is able to give
  */
@@ -115,26 +114,6 @@ export interface IPropertyDefinitionRawJSONDataType {
      * hidden does not show at all
      */
     hidden?: boolean;
-    /**
-     * autocomplete is an endpoint of some sort that requests
-     * data for autocomplete
-     */
-    autocomplete?: string;
-    /**
-     * uses a property attribute, the keyname
-     * is the filter name, and the string is the property name
-     */
-    autocompleteFilterFromProperty?: {
-        [keyName: string]: string;
-    };
-    /**
-     * whether it's enforced or not, this is an external check
-     */
-    autocompleteIsEnforced?: boolean;
-    /**
-     * whether the autocomplete supports locale
-     */
-    autocompleteSupportsLocale?: boolean;
     /**
      * html style autocomplete, mainly used for browser level
      * autocompletition
@@ -314,7 +293,7 @@ export interface IPropertyDefinitionReferredPropertyValue {
 export declare type PropertyDefinitionValueType = IPropertyDefinitionExactPropertyValue | IPropertyDefinitionReferredPropertyValue;
 /**
  * Represents the external checkers that are used to
- * check index and autocomplete values
+ * check index values
  */
 export declare type PropertyDefinitionCheckerFunctionType = (property: PropertyDefinition, value: PropertyDefinitionSupportedType, id: number, version: string) => Promise<boolean>;
 /**
@@ -324,7 +303,6 @@ export declare type PropertyDefinitionCheckerFunctionType = (property: PropertyD
 export default class PropertyDefinition {
     static supportedTypesStandard: Record<PropertyDefinitionSupportedTypeName, import("./types").IPropertyDefinitionSupportedType>;
     static indexChecker: PropertyDefinitionCheckerFunctionType;
-    static autocompleteChecker: PropertyDefinitionCheckerFunctionType;
     /**
      * A static method that provides the policy prefix for a given policy name and type
      * @param policyType the policy type
@@ -341,8 +319,7 @@ export default class PropertyDefinition {
      * set rules
      *
      * NOTE!!!!! this function is external events unaware
-     * and hence it cannot check for unique indexes and
-     * autocomplete enforced results
+     * and hence it cannot check for unique indexes
      *
      * @param propertyDefinitionRaw The raw json property definition data
      * @param value the value to check against
@@ -442,13 +419,6 @@ export default class PropertyDefinition {
             valid: boolean;
         };
     };
-    stateLastAutocompleteCheck: {
-        [slotId: number]: {
-            value: PropertyDefinitionSupportedType;
-            valid: boolean;
-            filters: ISingleFilterRawJSONDataType;
-        };
-    };
     /**
      * Builds a property definition
      * @param rawJSON the raw json structure
@@ -499,6 +469,13 @@ export default class PropertyDefinition {
      * @returns the current value
      */
     getCurrentValue(id: number, version: string): PropertyDefinitionSupportedType;
+    /**
+     * Provides the applied value for a property
+     * @param id the id
+     * @param version the version
+     * @returns the applied value
+     */
+    getAppliedValue(id: number, version: string): PropertyDefinitionSupportedType;
     /**
      * provides the current useful value for the property defintion without doing
      * any external checking, pass the id still as a cache of previously external
@@ -662,35 +639,6 @@ export default class PropertyDefinition {
      * @returns a boolean
      */
     getSpecificValidValues(): PropertyDefinitionSupportedType[];
-    /**
-     * Checks whether the property is defined as autocomplete
-     * @returns a booelean
-     */
-    hasAutocomplete(): boolean;
-    /**
-     * Returns the autocomplete id
-     * @returns a string that is the id
-     */
-    getAutocompleteId(): string;
-    /**
-     * Checks whether the property autocomplete is enforced
-     * @returns a boolean
-     */
-    isAutocompleteEnforced(): boolean;
-    /**
-     * Checks whether the property autocomplete supports locale
-     * @returns a boolean
-     */
-    isAutocompleteLocalized(): boolean;
-    /**
-     * Provides the filters for the autocomplete function that are set
-     * for the autocomplete to be used, that is a list of property whose values
-     * are meant to be passed in order to filter
-     * @param id the slot id where to extract the property values
-     * @param version the slot version
-     * @returns the filter that is to be sent to the autocomplete query
-     */
-    getAutocompletePopulatedFiltersFor(id: number, version: string): ISingleFilterRawJSONDataType;
     /**
      * Provides the html level as defined as autocomplete="" in the html tag
      * attribute, this is mainly for usability

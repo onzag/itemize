@@ -14,16 +14,17 @@ import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import equals from "deep-equal";
-import { Map, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
+import { Map, TileLayer, Marker } from "react-leaflet";
+import L, { LeafletMouseEvent } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "../../../internal/theme/leaflet.scss";
 import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
-import { IPropertyEntryLocationRendererProps, IViewportZoomEnumType } from "../../../internal/components/PropertyEntry/PropertyEntryLocation";
-import { IPropertyEntryProps } from "../../../internal/components/PropertyEntry";
+import { IPropertyEntryLocationRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryLocation";
 import SearchIcon from "@material-ui/icons/Search";
+import SwapHorizIcon from "@material-ui/icons/SwapHoriz"
 import { Alert } from "@material-ui/lab";
+import { capitalize } from "../../../../util";
 
 // https://github.com/PaulLeCam/react-leaflet/issues/453
 // bug in leaflet
@@ -41,7 +42,7 @@ const ZOOMS = {
 };
 
 function shouldShowInvalid(props: IPropertyEntryLocationRendererProps) {
-  return !props.currentValid;
+  return !props.currentValid || (props.activeSearchResults && props.activeSearchResults.length === 0);
 }
 export const style = (theme: IPropertyEntryThemeType) => createStyles({
   entry: {
@@ -126,63 +127,63 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
       },
     };
   },
-  autocompleteContainer: {
+  autosuggestContainer: {
     position: "relative",
     display: "block",
     width: "100%",
   },
-  autocompleteContainerOpen: {
+  autosuggestContainerOpen: {
 
   },
-  autocompleteInput: {
+  autosuggestInput: {
 
   },
-  autocompleteInputOpen: {
+  autosuggestInputOpen: {
 
   },
-  autocompleteSuggestionsContainer: {
+  autosuggestSuggestionsContainer: {
     position: "absolute" as "absolute",
     display: "block",
     width: "100%",
     top: `calc(100% - ${theme.errorMessageContainerSize})`,
     zIndex: 1000,
   },
-  autocompleteSuggestionsContainerOpen: {
+  autosuggestSuggestionsContainerOpen: {
 
   },
-  autocompleteSuggestionsList: {
+  autosuggestSuggestionsList: {
 
   },
-  autocompleteSuggestion: {
+  autosuggestSuggestion: {
 
   },
-  autocompleteFirstSuggestion: {
+  autosuggestFirstSuggestion: {
 
   },
-  autocompleteSuggestionHighlighted: {
+  autosuggestSuggestionHighlighted: {
 
   },
-  autocompleteSectionContainer: {
+  autosuggestSectionContainer: {
 
   },
-  autocompleteFirstSectionContainer: {
+  autosuggestFirstSectionContainer: {
 
   },
-  autocompleteSectionTitle: {
+  autosuggestSectionTitle: {
 
   },
-  autocompleteMenuItem: {
+  autosuggestMenuItem: {
     height: "auto",
     paddingTop: 4,
     paddingBottom: 8,
   },
-  autocompleteMenuItemMainText: {
-    fontSize: theme.autocompleteMenuItemFontSize,
-    lineHeight: theme.autocompleteMenuItemFontSize,
+  autosuggestMenuItemMainText: {
+    fontSize: theme.autosuggestMenuItemFontSize,
+    lineHeight: theme.autosuggestMenuItemFontSize,
   },
-  autocompleteMenuItemSubText: {
-    fontSize: theme.autocompleteMenuItemSubFontSize,
-    lineHeight: theme.autocompleteMenuItemSubFontSize,
+  autosuggestMenuItemSubText: {
+    fontSize: theme.autosuggestMenuItemSubFontSize,
+    lineHeight: theme.autosuggestMenuItemSubFontSize,
   },
   locationAlternativeTextHeader: {
     height: theme.locationAlternativeTextHeaderHeight,
@@ -190,9 +191,20 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    borderTop: "solid 1px #ccc",
+  },
+  locationPlaceholder: {
+    opacity: 0.5,
+    fontWeight: 300,
   },
   locationMapContainer: {
 
+  },
+  resultListLabel: {
+    fontWeight: 300,
+    borderLeft: "solid 1px #ccc",
+    paddingLeft: "0.5rem",
+    marginLeft: "0.5rem",
   },
 });
 
@@ -212,6 +224,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
     this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
     this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
     this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
+    this.setLocationManually = this.setLocationManually.bind(this);
     this.onKeyPress = this.onKeyPress.bind(this);
   }
   public componentDidMount() {
@@ -219,11 +232,22 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       this.inputRef.focus();
     }
   }
+  public setLocationManually(e: LeafletMouseEvent) {
+    this.props.onManualPick({
+      lat: e.latlng.lat,
+      lng: e.latlng.lng,
+      txt: this.props.searchQuery,
+      atxt: null,
+      id: null,
+    }, true);
+  }
   public onKeyPress(e: React.KeyboardEvent<HTMLInputElement>) {
     // basically we want to trigger swap or search on enter
     if (e.key === "Enter") {
-      if (this.props.nextSearchResult) {
-        this.props.onChangeBySearchResult(this.props.nextSearchResult);
+      if (this.props.activeSearchResults) {
+        if (this.props.nextSearchResultCircular) {
+          this.props.onChangeBySearchResult(this.props.nextSearchResultCircular);
+        }
       } else {
         this.props.onSearch();
       }
@@ -245,15 +269,28 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
     let appliedTextFieldProps: any = {
       className: this.props.classes.entry,
     };
+    let icon: React.ReactNode;
+    let fn: () => void = null;
+    if (this.props.activeSearchResults) {
+      if (this.props.nextSearchResultCircular) {
+        fn = this.props.onChangeBySearchResult.bind(null, this.props.nextSearchResultCircular, false);
+        icon = <SwapHorizIcon />;
+      } else {
+        icon = <SearchIcon />;
+      }
+    } else {
+      fn = this.props.onSearch.bind(null, false);
+      icon = <SearchIcon />;
+    }
     let appliedInputProps: any = {
       endAdornment: (
         <InputAdornment position="end">
           <IconButton
             disabled={this.props.disabled}
             classes={{root: this.props.classes.iconButton}}
-            onClick={this.props.onSearch.bind(null, false)}
+            onClick={fn}
           >
-            <SearchIcon />
+            {icon}
           </IconButton>
         </InputAdornment>
       ),
@@ -288,11 +325,25 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
           null
         }
         <div className={this.props.classes.locationAlternativeTextHeader}>
-          {this.props.currentValue && this.props.currentValue.atxt}
+          {
+            this.props.currentValue && this.props.currentValue.atxt ||
+            (
+              <span className={this.props.classes.locationPlaceholder}>
+                {capitalize(this.props.placeholder)}
+              </span>
+            )
+          }
+          {
+            this.props.resultOutOfLabel ?
+            <i className={this.props.classes.resultListLabel}>{this.props.resultOutOfLabel}</i> :
+            null
+          }
         </div>
         <div className={this.props.classes.locationMapContainer}>
           <Map
             viewport={viewport}
+            onViewportChange={this.props.onViewportChange}
+            onClick={this.setLocationManually}
           >
             <TileLayer
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -300,17 +351,15 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
             />
             {this.props.currentValue ? <Marker position={[
               this.props.currentValue.lat, this.props.currentValue.lng,
-            ]}>
-              <Popup>{this.props.currentValue.txt}{this.props.currentValue.atxt ? <br/> : null}{this.props.currentValue.atxt}</Popup>
-            </Marker> : null}
+            ]}/>: null}
             {!this.props.disabled && this.props.activeSearchResults ? this.props.activeSearchResults
-              .filter((result) => !equals(this.props.currentValue, result))
+              .filter((result) => this.props.currentValue.id !== result.id)
               .map((result) => (
                 <Marker
                   opacity={0.5}
-                  key={result.lat.toString() + result.lng.toString()}
+                  key={result.id}
                   position={[result.lat, result.lng]}
-                  onClick={this.props.onChangeBySearchResult.bind(this, result)}
+                  onClick={this.props.onChangeBySearchResult.bind(this, result, true)}
                 />
             )) : null}
           </Map>
@@ -344,6 +393,11 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
         />
         <div className={this.props.classes.errorMessage}>
           {this.props.currentInvalidReason}
+          {
+            !this.props.currentInvalidReason && this.props.activeSearchResults && this.props.activeSearchResults.length === 0 ?
+            this.props.noResultsLabel :
+            null
+          }
         </div>
       </div>
     );
@@ -376,14 +430,13 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
 
     return (
       <MenuItem
-        className={this.props.classes.autocompleteMenuItem}
+        className={this.props.classes.autosuggestMenuItem}
         selected={params.isHighlighted}
         component="div"
         onClick={this.props.onChangeBySuggestion.bind(this, suggestion, false)}
-        onMouseOver={this.props.onChangeBySuggestion.bind(this, suggestion, false)}
       >
         <div>
-          <div className={this.props.classes.autocompleteMenuItemMainText}>
+          <div className={this.props.classes.autosuggestMenuItemMainText}>
             {parts.map((part, index) =>
               part.highlight ? (
                 <span key={index} style={{ fontWeight: 500 }}>
@@ -396,7 +449,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
               ),
             )}
           </div>
-          <div className={this.props.classes.autocompleteMenuItemSubText}>
+          <div className={this.props.classes.autosuggestMenuItemSubText}>
             {suggestion.atxt}
           </div>
         </div>
@@ -414,20 +467,20 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
         onSuggestionsClearRequested={this.props.clearSuggestions}
         suggestions={this.props.searchSuggestions}
         theme={{
-          container: this.props.classes.autocompleteContainer,
-          containerOpen: this.props.classes.autocompleteContainerOpen,
-          input: this.props.classes.autocompleteInput,
-          inputOpen: this.props.classes.autocompleteInputOpen,
+          container: this.props.classes.autosuggestContainer,
+          containerOpen: this.props.classes.autosuggestContainerOpen,
+          input: this.props.classes.autosuggestInput,
+          inputOpen: this.props.classes.autosuggestInputOpen,
           inputFocused: "focused",
-          suggestionsContainer: this.props.classes.autocompleteSuggestionsContainer,
-          suggestionsContainerOpen: this.props.classes.autocompleteSuggestionsContainerOpen,
-          suggestionsList: this.props.classes.autocompleteSuggestionsList,
-          suggestion: this.props.classes.autocompleteSuggestion,
-          suggestionFirst: this.props.classes.autocompleteFirstSuggestion,
-          suggestionHighlighted: this.props.classes.autocompleteSuggestionHighlighted,
-          sectionContainer: this.props.classes.autocompleteSectionContainer,
-          sectionContainerFirst: this.props.classes.autocompleteFirstSectionContainer,
-          sectionTitle: this.props.classes.autocompleteSectionTitle,
+          suggestionsContainer: this.props.classes.autosuggestSuggestionsContainer,
+          suggestionsContainerOpen: this.props.classes.autosuggestSuggestionsContainerOpen,
+          suggestionsList: this.props.classes.autosuggestSuggestionsList,
+          suggestion: this.props.classes.autosuggestSuggestion,
+          suggestionFirst: this.props.classes.autosuggestFirstSuggestion,
+          suggestionHighlighted: this.props.classes.autosuggestSuggestionHighlighted,
+          sectionContainer: this.props.classes.autosuggestSectionContainer,
+          sectionContainerFirst: this.props.classes.autosuggestFirstSectionContainer,
+          sectionTitle: this.props.classes.autosuggestSectionTitle,
         }}
         inputProps={{
           value: this.props.searchQuery,

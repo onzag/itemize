@@ -20,7 +20,6 @@ const server_checkers_1 = require("../base/Root/Module/ItemDefinition/PropertyDe
 const rest_1 = __importDefault(require("./rest"));
 const queries_1 = require("./user/queries");
 const mutations_1 = require("./user/mutations");
-const Autocomplete_1 = __importDefault(require("../base/Autocomplete"));
 const listener_1 = require("./listener");
 const redis_1 = __importDefault(require("redis"));
 const cache_1 = require("./cache");
@@ -182,7 +181,6 @@ async function initializeServer(custom = {}) {
     let rawRedisConfig;
     let rawDbConfig;
     let index;
-    let rawAutocompleteSource;
     let buildnumber;
     [
         rawConfig,
@@ -191,7 +189,6 @@ async function initializeServer(custom = {}) {
         rawDbConfig,
         index,
         rawBuild,
-        rawAutocompleteSource,
         buildnumber,
     ] = await Promise.all([
         fsAsync.readFile(path_1.default.join("dist", "config.json"), "utf8"),
@@ -200,7 +197,6 @@ async function initializeServer(custom = {}) {
         fsAsync.readFile(path_1.default.join("dist", "db.json"), "utf8"),
         fsAsync.readFile(path_1.default.join("dist", "data", "index.html"), "utf8"),
         fsAsync.readFile(path_1.default.join("dist", "data", "build.all.json"), "utf8"),
-        fsAsync.readFile(path_1.default.join("dist", "autocomplete.json"), "utf8"),
         fsAsync.readFile(path_1.default.join("dist", "buildnumber"), "utf8"),
     ]);
     const config = JSON.parse(rawConfig);
@@ -218,8 +214,6 @@ async function initializeServer(custom = {}) {
     // this shouldn't be necessary but we do it anyway
     buildnumber = buildnumber.replace("\n", "").trim();
     const root = new Root_1.default(build);
-    const autocompletes = JSON.parse(rawAutocompleteSource)
-        .map((s) => (new Autocomplete_1.default(s)));
     // Create the connection string
     const dbConnectionKnexConfig = {
         host: dbConfig.host,
@@ -238,7 +232,6 @@ async function initializeServer(custom = {}) {
     const redisPub = redis_1.default.createClient(redisConfig);
     const redisSub = redis_1.default.createClient(redisConfig);
     PropertyDefinition_1.default.indexChecker = server_checkers_1.serverSideIndexChecker.bind(null, knex);
-    PropertyDefinition_1.default.autocompleteChecker = server_checkers_1.serverSideAutocompleteChecker.bind(null, autocompletes);
     // due to a bug in the types the create client function is missing
     // domainId and domainName
     const pkgcloudStorageClient = pkgcloud_1.default.storage.createClient({
@@ -271,7 +264,6 @@ async function initializeServer(custom = {}) {
         here_1.setupHere(sensitiveConfig.hereAppID, sensitiveConfig.hereAppCode) : null;
     const appData = {
         root,
-        autocompletes,
         indexDevelopment: index.replace(/\$MODE/g, "development"),
         indexProduction: index.replace(/\$MODE/g, "production"),
         config,

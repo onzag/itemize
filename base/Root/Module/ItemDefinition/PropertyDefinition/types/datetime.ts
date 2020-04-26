@@ -14,7 +14,7 @@ import {
   getStandardSQLFnFor,
 } from "../sql";
 import {
-  standardSQLLocalEqualFn,
+  standardSQLLocalEqualFn, standardLocalEqual,
 } from "../local-sql";
 import { PropertyDefinitionSupportedDateType } from "./date";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
@@ -49,6 +49,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlSearch: standardSQLSearchFnExactAndRange,
   sqlEqual: standardSQLEqualFn,
   sqlLocalEqual: standardSQLLocalEqualFn,
+  localEqual: standardLocalEqual,
 
   localSearch: dateLocalSearchExactAndRange.bind(null, DATETIME_FORMAT),
 

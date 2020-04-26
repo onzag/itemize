@@ -54,6 +54,11 @@ const typeValue: IPropertyDefinitionSupportedType = {
       "Attempted to local search by password",
     );
   },
+  localEqual: () => {
+    throw new Error(
+      "Attempted to local equal a password",
+    );
+  },
   sqlEqual: (
     value: PropertyDefinitionSupportedPasswordType,
     sqlPrefix: string,

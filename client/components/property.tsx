@@ -4,8 +4,8 @@ import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefi
 import { ItemDefinitionContext } from "../providers/item-definition";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { RESERVED_BASE_PROPERTIES } from "../../constants";
-import PropertyView, { RawBasePropertyView } from "../internal/components/PropertyView";
-import PropertyEntry from "../internal/components/PropertyEntry";
+import PropertyView, { RawBasePropertyView, IPropertyViewRendererProps } from "../internal/components/PropertyView";
+import PropertyEntry, { IPropertyEntryRendererProps } from "../internal/components/PropertyEntry";
 import PropertySetter from "../internal/components/PropertySetter";
 import { IncludeContext } from "../providers/include";
 import { fileURLAbsoluter, fileArrayURLAbsoluter } from "./util";
@@ -47,30 +47,17 @@ interface IPropertyReadProps {
   children?: (value: PropertyDefinitionSupportedType, state: IPropertyDefinitionState) => React.ReactNode;
 }
 
-interface IPropertyViewProps {
+interface IPropertyViewProps<RendererPropsType> {
   id: string;
+  capitalize?: boolean;
   searchVariant?: SearchVariants;
-}
-
-interface IPropertyEntryViewReadSetProps<RendererPropsType> {
-  id: string;
-  searchVariant?: SearchVariants;
-  policyType?: string;
-  policyName?: string;
-  children?: (value: PropertyDefinitionSupportedType, state: IPropertyDefinitionState) => React.ReactNode;
-  showAsInvalid?: boolean;
-  icon?: React.ReactNode;
-  onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, internalValue?: any) => void;
-  value?: PropertyDefinitionSupportedType;
   renderer?: React.ComponentType<RendererPropsType>;
   rendererArgs?: object;
-  hideDescription?: boolean;
-  altDescription?: string;
-  altLabel?: string;
-  altPlaceholder?: string;
-  ignoreErrors?: boolean;
-  autoFocus?: boolean;
 }
+
+interface IPropertyEntryViewReadSetProps<RendererPropsType> extends
+  IPropertyEntryProps<RendererPropsType>, IPropertyViewProps<RendererPropsType>, IPropertySetterProps, IPropertyReadProps {}
+
 // TODO optimize
 function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "entry" | "view" | "read" | "set") {
   return (
@@ -163,6 +150,9 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "ent
                       <PropertyView
                         property={property}
                         state={propertyState}
+                        capitalize={props.capitalize}
+                        renderer={props.renderer}
+                        rendererArgs={props.rendererArgs}
                       />
                     );
                   }
@@ -259,18 +249,18 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "ent
   );
 }
 
-export function Entry(props: IPropertyEntryProps<any>) {
-  return EntryViewReadSet(props, "entry");
+export function Entry(props: IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>) {
+  return EntryViewReadSet(props as any, "entry");
 }
 
-export function View(props: IPropertyViewProps) {
-  return EntryViewReadSet(props, "view");
+export function View(props: IPropertyViewProps<IPropertyViewRendererProps>) {
+  return EntryViewReadSet(props as any, "view");
 }
 
 export function Reader(props: IPropertyReadProps) {
-  return EntryViewReadSet(props, "read");
+  return EntryViewReadSet(props as any, "read");
 }
 
 export function Setter(props: IPropertySetterProps) {
-  return EntryViewReadSet(props, "set");
+  return EntryViewReadSet(props as any, "set");
 }

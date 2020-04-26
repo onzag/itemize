@@ -106,64 +106,6 @@ async function clientSideIndexChecker(property, value, id, version) {
     }
 }
 /**
- * Performs the check of an autocomplete string property
- * to see whether its value is valid, you might wonder why
- * this is necessary if the values are autocompleted anyway but
- * this is because the user might type too fast and get the list out of sync
- * or just not choose from the list so for sure we should check
- * @param property the property in question
- * @param value the value the user put
- * @param id the slot id
- * @param version the slot version
- * @returns a boolean on whether the autocomplete value is right
- */
-async function clientSideAutocompleteChecker(property, value, id, version) {
-    const mergedID = id + "." + (version || "");
-    // null values are automatically true
-    if (value === null) {
-        return true;
-    }
-    // now we need the autocomplete filters according to the property
-    // these are related to other properties
-    const filters = property.getAutocompletePopulatedFiltersFor(id, version);
-    // and we get the autocomplete id that is being used
-    const autocompleteId = property.getAutocompleteId();
-    // just like the index we might have a cache in place
-    if (property.stateLastAutocompleteCheck[mergedID] &&
-        property.stateLastAutocompleteCheck[mergedID].value === value &&
-        deep_equal_1.default(property.stateLastAutocompleteCheck[mergedID].filters, filters)) {
-        return property.stateLastAutocompleteCheck[mergedID].valid;
-    }
-    try {
-        // autocomplete requests can and should be cached this is the reason
-        // the request is done via a GET request rather than a post
-        // the sw-cacheable tells the service worker to cache its response
-        const result = await fetch("/rest/autocomplete-check/" + autocompleteId +
-            "?body=" + encodeURIComponent(JSON.stringify({
-            value,
-            filters,
-        })), {
-            headers: {
-                "sw-cacheable": "true",
-            },
-        });
-        // Note that whether the autocomplete uses or not i18n is not
-        // checked in here, the value is the the value that the user might
-        // not see, so we just want to ensure that value is right
-        const output = await result.json();
-        property.stateLastAutocompleteCheck[mergedID] = {
-            valid: !!output,
-            value,
-            filters,
-        };
-        return !!output;
-    }
-    catch (err) {
-        // same we return true if we fail to check
-        return true;
-    }
-}
-/**
  * The property definition class that defines how properties
  * are to be defined
  */
@@ -205,7 +147,6 @@ class PropertyDefinition {
         this.stateValueHasBeenManuallySet = {};
         this.stateInternalValue = {};
         this.stateLastUniqueCheck = {};
-        this.stateLastAutocompleteCheck = {};
         this.stateSuperEnforcedValue = {};
     }
     /**
@@ -226,8 +167,7 @@ class PropertyDefinition {
      * set rules
      *
      * NOTE!!!!! this function is external events unaware
-     * and hence it cannot check for unique indexes and
-     * autocomplete enforced results
+     * and hence it cannot check for unique indexes
      *
      * @param propertyDefinitionRaw The raw json property definition data
      * @param value the value to check against
@@ -554,6 +494,16 @@ class PropertyDefinition {
         return nullIfUndefined(this.stateValue[mergedID]);
     }
     /**
+     * Provides the applied value for a property
+     * @param id the id
+     * @param version the version
+     * @returns the applied value
+     */
+    getAppliedValue(id, version) {
+        const mergedID = id + "." + (version || "");
+        return nullIfUndefined(this.stateAppliedValue[mergedID]);
+    }
+    /**
      * provides the current useful value for the property defintion without doing
      * any external checking, pass the id still as a cache of previously external
      * checked results might apply
@@ -577,7 +527,7 @@ class PropertyDefinition {
                 hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id, version),
                 internalValue: null,
                 stateValue: nullIfUndefined(this.stateValue[mergedID]),
-                stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
+                stateAppliedValue: this.getAppliedValue(id, version),
                 stateValueModified: this.stateValueModified[mergedID] || false,
                 stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
                 propertyId: this.getId(),
@@ -596,7 +546,7 @@ class PropertyDefinition {
                 hidden: true,
                 internalValue: null,
                 stateValue: nullIfUndefined(this.stateValue[mergedID]),
-                stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
+                stateAppliedValue: this.getAppliedValue(id, version),
                 stateValueModified: this.stateValueModified[mergedID] || false,
                 stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
                 propertyId: this.getId(),
@@ -614,7 +564,7 @@ class PropertyDefinition {
             hidden: this.isCurrentlyHidden(id, version),
             internalValue: this.stateValueModified[mergedID] ? this.stateInternalValue[mergedID] : null,
             stateValue: nullIfUndefined(this.stateValue[mergedID]),
-            stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
+            stateAppliedValue: this.getAppliedValue(id, version),
             stateValueModified: this.stateValueModified[mergedID] || false,
             stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
             propertyId: this.getId(),
@@ -643,7 +593,7 @@ class PropertyDefinition {
                 hidden: this.rawData.hiddenIfEnforced ? true : this.isCurrentlyHidden(id, version),
                 internalValue: null,
                 stateValue: nullIfUndefined(this.stateValue[mergedID]),
-                stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
+                stateAppliedValue: this.getAppliedValue(id, version),
                 stateValueModified: this.stateValueModified[mergedID] || false,
                 stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
                 propertyId: this.getId(),
@@ -662,7 +612,7 @@ class PropertyDefinition {
                 hidden: true,
                 internalValue: null,
                 stateValue: nullIfUndefined(this.stateValue[mergedID]),
-                stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
+                stateAppliedValue: this.getAppliedValue(id, version),
                 stateValueModified: this.stateValueModified[mergedID] || false,
                 stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
                 propertyId: this.getId(),
@@ -680,7 +630,7 @@ class PropertyDefinition {
             hidden: this.isCurrentlyHidden(id, version),
             internalValue: this.stateValueModified[mergedID] ? this.stateInternalValue[mergedID] : null,
             stateValue: nullIfUndefined(this.stateValue[mergedID]),
-            stateAppliedValue: nullIfUndefined(this.stateAppliedValue[mergedID]),
+            stateAppliedValue: this.getAppliedValue(id, version),
             stateValueModified: this.stateValueModified[mergedID] || false,
             stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
             propertyId: this.getId(),
@@ -889,17 +839,6 @@ class PropertyDefinition {
                     return PropertyInvalidReason.NOT_UNIQUE;
                 }
             }
-            // check if there's an autocomplete and it is enforced
-            if (this.hasAutocomplete() && this.isAutocompleteEnforced()) {
-                // now we check the cache
-                const filters = this.getAutocompletePopulatedFiltersFor(id, version);
-                if (this.stateLastAutocompleteCheck[mergedID] &&
-                    this.stateLastAutocompleteCheck[mergedID].value === value &&
-                    deep_equal_1.default(this.stateLastAutocompleteCheck[mergedID].filters, filters)) {
-                    // if it specifies that it's invalid
-                    return PropertyInvalidReason.INVALID_VALUE;
-                }
-            }
             // We do not actually make the external check
         }
         // if we have invalid if conditions
@@ -940,13 +879,6 @@ class PropertyDefinition {
             const isValidIndex = await PropertyDefinition.indexChecker(this, value, id, version);
             if (!isValidIndex) {
                 return PropertyInvalidReason.NOT_UNIQUE;
-            }
-        }
-        // or autocomplete
-        if (this.hasAutocomplete() && this.isAutocompleteEnforced()) {
-            const isValidAutocomplete = await PropertyDefinition.autocompleteChecker(this, value, id, version);
-            if (!isValidAutocomplete) {
-                return PropertyInvalidReason.INVALID_VALUE;
             }
         }
         // if it passes everything we return null
@@ -1039,59 +971,6 @@ class PropertyDefinition {
      */
     getSpecificValidValues() {
         return this.rawData.values;
-    }
-    /**
-     * Checks whether the property is defined as autocomplete
-     * @returns a booelean
-     */
-    hasAutocomplete() {
-        return !!this.rawData.autocomplete;
-    }
-    /**
-     * Returns the autocomplete id
-     * @returns a string that is the id
-     */
-    getAutocompleteId() {
-        return this.rawData.autocomplete;
-    }
-    /**
-     * Checks whether the property autocomplete is enforced
-     * @returns a boolean
-     */
-    isAutocompleteEnforced() {
-        return !!this.rawData.autocompleteIsEnforced;
-    }
-    /**
-     * Checks whether the property autocomplete supports locale
-     * @returns a boolean
-     */
-    isAutocompleteLocalized() {
-        return !!this.rawData.autocompleteSupportsLocale;
-    }
-    /**
-     * Provides the filters for the autocomplete function that are set
-     * for the autocomplete to be used, that is a list of property whose values
-     * are meant to be passed in order to filter
-     * @param id the slot id where to extract the property values
-     * @param version the slot version
-     * @returns the filter that is to be sent to the autocomplete query
-     */
-    getAutocompletePopulatedFiltersFor(id, version) {
-        // if there's nothing specified to populate the filters
-        if (!this.rawData.autocompleteFilterFromProperty) {
-            // the filter is null
-            return null;
-        }
-        // otherwise we get the result
-        const result = {};
-        // we loop for every key for the autocomplete filter, where every key is a property name
-        Object.keys(this.rawData.autocompleteFilterFromProperty).forEach((key) => {
-            // and we add it, also considering prop extensions
-            result[key] = this.parentItemDefinition
-                .getPropertyDefinitionFor(this.rawData.autocompleteFilterFromProperty[key], true).getCurrentValue(id, version);
-        });
-        // return it
-        return result;
     }
     /**
      * Provides the html level as defined as autocomplete="" in the html tag
@@ -1325,4 +1204,3 @@ exports.default = PropertyDefinition;
 PropertyDefinition.supportedTypesStandard = types_1.default;
 // this static is required to be set in order to check for indexes
 PropertyDefinition.indexChecker = clientSideIndexChecker;
-PropertyDefinition.autocompleteChecker = clientSideAutocompleteChecker;

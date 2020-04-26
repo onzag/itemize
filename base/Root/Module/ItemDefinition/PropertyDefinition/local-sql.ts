@@ -10,6 +10,7 @@
 
 import { PropertyDefinitionSupportedType } from "./types";
 import { ISQLTableRowValue } from "../../../sql";
+import equals from "deep-equal";
 
 /**
  * This function represents the standard way an equality check
@@ -29,4 +30,11 @@ export function standardSQLLocalEqualFn(
   data: ISQLTableRowValue,
 ): boolean {
   return data[sqlPrefix + id] === value;
+}
+
+export function standardLocalEqual(
+  a: PropertyDefinitionSupportedType,
+  b: PropertyDefinitionSupportedType,
+): boolean {
+  return equals(a, b);
 }

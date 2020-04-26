@@ -26,6 +26,7 @@ const typeValue = {
     sqlEqual: sql_1.standardSQLEqualFn,
     sqlLocalEqual: local_sql_1.standardSQLLocalEqualFn,
     localSearch: local_search_1.standardLocalSearchExactAndRange,
+    localEqual: local_sql_1.standardLocalEqual,
     // the validator
     validate: (n) => {
         if (isNaN(n)) {

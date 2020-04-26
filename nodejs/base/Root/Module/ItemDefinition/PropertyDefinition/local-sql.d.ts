@@ -21,3 +21,4 @@ import { ISQLTableRowValue } from "../../../sql";
  * @returns a boolean on whether it equals
  */
 export declare function standardSQLLocalEqualFn(value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, data: ISQLTableRowValue): boolean;
+export declare function standardLocalEqual(a: PropertyDefinitionSupportedType, b: PropertyDefinitionSupportedType): boolean;

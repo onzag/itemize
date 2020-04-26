@@ -14,8 +14,8 @@ export interface IPropertyEntryThemeType {
   labelInvalidFocusedColor: string;
   locationAlternativeTextHeaderHeight: string;
   locationAlternativeTextHeaderFontSize: string;
-  autocompleteMenuItemFontSize: string;
-  autocompleteMenuItemSubFontSize: string;
+  autosuggestMenuItemFontSize: string;
+  autosuggestMenuItemSubFontSize: string;
 }
 
 export const STANDARD_THEME: IPropertyEntryThemeType = {
@@ -34,6 +34,6 @@ export const STANDARD_THEME: IPropertyEntryThemeType = {
   labelInvalidFocusedColor: "#f44336",
   locationAlternativeTextHeaderHeight: "1.5rem",
   locationAlternativeTextHeaderFontSize: "0.75rem",
-  autocompleteMenuItemFontSize: "1rem",
-  autocompleteMenuItemSubFontSize: "0.75rem",
+  autosuggestMenuItemFontSize: "1rem",
+  autosuggestMenuItemSubFontSize: "0.75rem",
 };

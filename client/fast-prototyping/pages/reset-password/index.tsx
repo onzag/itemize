@@ -66,6 +66,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
                 "username",
                 "profile_picture",
                 "password",
+                "role",
               ]}
               forId={userId}
               cleanOnDismount={{
@@ -81,7 +82,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
                     <Container maxWidth="md" className={props.classes.container}>
                       <Paper className={props.classes.paper}>
                         <ItemDefinitionLoader>
-                          <Avatar large={true}/>
+                          <Avatar size="large"/>
                           <Reader id="username">
                             {(username: string) => (
                               <Typography variant="h4" className={props.classes.username}>{username}</Typography>

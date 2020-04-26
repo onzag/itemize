@@ -2,10 +2,11 @@ import React from "react";
 import { I18nRead, I18nReadMany } from "../../../components/localization";
 import { Container, createStyles, WithStyles, withStyles, Typography, Paper, Theme, Tooltip } from "@material-ui/core";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
-import { Reader } from "../../../components/property";
+import { Reader, View } from "../../../components/property";
 import { Avatar } from "../../components/avatar";
 import { countries } from "../../../../imported-resources";
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
+import { UserDataRetriever } from "../../../components/user";
 
 const publicUserProfileStyles = (theme: Theme) => createStyles({
   container: {
@@ -26,6 +27,12 @@ const publicUserProfileStyles = (theme: Theme) => createStyles({
     marginTop: "0.5rem",
     textAlign: "center",
   },
+  role: {
+    fontWeight: 300,
+    width: "100%",
+    marginTop: "0.5rem",
+    textAlign: "center",
+  },
   verifiedIcon: {
     color: theme.palette.success.main,
   },
@@ -37,7 +44,7 @@ export const PublicUserProfile = withStyles(publicUserProfileStyles)((props: Wit
       <Container maxWidth="md" className={props.classes.container}>
         <Paper className={props.classes.paper}>
           <ItemDefinitionLoader>
-            <Avatar large={true} hideFlag={true}/>
+            <Avatar size="large" hideFlag={true}/>
             <Reader id="e_validated">
               {(eValidated: boolean) => (
                 <Reader id="username">
@@ -67,6 +74,16 @@ export const PublicUserProfile = withStyles(publicUserProfileStyles)((props: Wit
               }
               const countryobj = countries[country];
               return <Typography variant="h5" className={props.classes.country}>{countryobj.emoji} {countryobj.native}</Typography>
+            }}
+          </Reader>
+          <Reader id="role">
+            {(role: string) => {
+              if (role !== "USER") {
+                return <Typography variant="h5" className={props.classes.role}>
+                  <View id="role" capitalize={true}/>
+                </Typography>
+              }
+              return null;
             }}
           </Reader>
         </Paper>

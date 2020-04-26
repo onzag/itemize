@@ -207,6 +207,10 @@ export const LOCALE_I18N = [
   "file_uploader_delete_file",
   "image_uploader_delete_file",
 
+  // for search utilites
+  "no_results",
+  "result_out_of",
+
   // for item definition too
   "callout_exclude_warning",
 

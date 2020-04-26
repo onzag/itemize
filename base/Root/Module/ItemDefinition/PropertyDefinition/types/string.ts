@@ -14,7 +14,7 @@ import {
   getStandardSQLFnFor,
 } from "../sql";
 import {
-  standardSQLLocalEqualFn,
+  standardSQLLocalEqualFn, standardLocalEqual,
 } from "../local-sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
@@ -65,9 +65,9 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlLocalEqual: standardSQLLocalEqualFn,
 
   localSearch: standardLocalSearchExactAndRange,
+  localEqual: standardLocalEqual,
 
   nullableDefault: "",
-  supportsAutocomplete: true,
   supportedSubtypes: ["email", "identifier"],
   // validates just the length
   validate: (s: PropertyDefinitionSupportedStringType, subtype: string) => {

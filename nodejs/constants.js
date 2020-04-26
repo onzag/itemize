@@ -184,6 +184,9 @@ exports.LOCALE_I18N = [
     "image_uploader_select_file",
     "file_uploader_delete_file",
     "image_uploader_delete_file",
+    // for search utilites
+    "no_results",
+    "result_out_of",
     // for item definition too
     "callout_exclude_warning",
     // for showing the dialog message when selecting units

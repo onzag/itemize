@@ -72,6 +72,7 @@ export interface IActionCleanOptions {
  */
 export interface IActionSubmitOptions extends IActionCleanOptions {
   properties: string[];
+  differingPropertiesOnly?: boolean;
   includes?: string[];
   policies?: PolicyPathType[];
   beforeSubmit?: () => boolean;
@@ -1548,6 +1549,7 @@ export class ActualItemDefinitionProvider extends
       includeArgs: true,
       includeFields: true,
       uniteFieldsWithAppliedValue: true,
+      differingPropertiesOnlyForArgs: options.differingPropertiesOnly,
       includes: this.props.includes || [],
       properties: this.props.properties,
       includesForArgs: options.includes || [],

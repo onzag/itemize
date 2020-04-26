@@ -22,12 +22,6 @@ exports.default = {
             },
             minItems: 1,
         },
-        autocomplete: {
-            type: "array",
-            items: {
-                type: "string",
-            },
-        },
         i18n: {
             type: "string",
         },

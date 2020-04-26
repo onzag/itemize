@@ -177,7 +177,10 @@ export function DifferingPropertiesRetriever(props: IDifferingPropertiesRetrieve
           if (!propertyData) {
             return false;
           }
-          return !equals(propertyData.stateAppliedValue, propertyData.value);
+          return !itemDefinitionContext.idef.getPropertyDefinitionFor(mainProperty, true).getPropertyDefinitionDescription().localEqual(
+            propertyData.stateAppliedValue,
+            propertyData.value,
+          );
         });
         return props.children(finalProperties);
       }

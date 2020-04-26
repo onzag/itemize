@@ -13,6 +13,7 @@ export interface IPropertyDefinitionSupportedLocationType {
     lat: number;
     txt: string;
     atxt: string;
+    id: string;
 }
 /**
  * The type describes the behaviour of the location in the app

@@ -18,7 +18,6 @@ import {
   PropertyDefinitionSearchInterfacesType,
 } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { IRootRawJSONDataType } from "../base/Root";
-import { IAutocompleteRawJSONDataType } from "../base/Autocomplete";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import {
@@ -63,7 +62,6 @@ import {
   POLICY_OPTIONAL_I18N,
   MODULE_AND_ITEM_DEF_I18N_SEARCHABLE,
 } from "../constants";
-import { buildAutocomplete } from "./autocomplete";
 import { evalRawJSON } from "./evaler";
 import { buildBuildNumber } from "./buildnumber";
 import { buildManifest } from "./manifest";
@@ -78,7 +76,6 @@ interface IFileRootDataRawUntreatedJSONDataType {
   type: "root";
   children: string[];
   i18n: string;
-  autocomplete?: string[];
 }
 
 /**
@@ -260,30 +257,6 @@ async function buildData(rawDataConfig: IBuilderBasicConfigType): Promise<IRootR
       JSON.stringify(resultingBuild),
     );
   }));
-
-  // now let's build the autocomplete file
-  let autocomplete: IAutocompleteRawJSONDataType[] = [];
-  if (fileData.data.autocomplete) {
-    // for that we find all the autocomplete information
-    const autocompleteTraceback = traceback.newTraceToBit("autocomplete");
-    // and run the builder for the autocomplete
-    autocomplete = await Promise.all(fileData.data.autocomplete.map((autocompleteSource, index) => {
-      // and just use it as the array it is
-      return buildAutocomplete(
-        rawDataConfig,
-        path.join(path.dirname(actualLocation), autocompleteSource),
-        autocompleteTraceback.newTraceToBit(index),
-      );
-    }));
-  }
-
-  // emit that file
-  const autocompleteFileName = path.join("dist", "autocomplete.json");
-  console.log("emiting " + colors.green(autocompleteFileName));
-  await fsAsync.writeFile(
-    autocompleteFileName,
-    JSON.stringify(autocomplete),
-  );
 
   return resultJSON;
 }
@@ -1076,7 +1049,7 @@ async function getI18nPropertyData(
 
   if (
     definition.i18n.tooLargeErrorInclude &&
-    !property.values && !property.autocompleteIsEnforced
+    !property.values
   ) {
     errorRequiredProperties.push("error.TOO_LARGE");
   }
@@ -1094,25 +1067,22 @@ async function getI18nPropertyData(
       property.type === "currency" ||
       property.type === "integer" ||
       property.type === "year" ||
-      property.type === "unit" ||
-      property.autocompleteIsEnforced
+      property.type === "unit"
     ) && !property.values
   ) {
     errorRequiredProperties.push("error.INVALID_VALUE");
   }
 
   if ((typeof property.minLength !== "undefined" || definition.i18n.tooSmallErrorInclude) &&
-    !property.values && !property.autocompleteIsEnforced) {
+    !property.values) {
     errorRequiredProperties.push("error.TOO_SMALL");
   }
 
-  if (definition.i18n.tooManyDecimalsErrorInclude &&
-    !property.values && !property.autocompleteIsEnforced) {
+  if (definition.i18n.tooManyDecimalsErrorInclude && !property.values) {
     errorRequiredProperties.push("error.TOO_MANY_DECIMALS");
   }
 
-  if (typeof property.minDecimalCount !== "undefined" &&
-    !property.values && !property.autocompleteIsEnforced) {
+  if (typeof property.minDecimalCount !== "undefined" && !property.values) {
     errorRequiredProperties.push("error.TOO_FEW_DECIMALS");
   }
 

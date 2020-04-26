@@ -1,9 +1,9 @@
 import React from "react";
-import { IPropertyEntryRendererProps, IPropertyEntryProps } from ".";
+import { IPropertyEntryRendererProps, IPropertyEntryHandlerProps } from ".";
 import { PropertyDefinitionSupportedBooleanType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean";
 import equals from "deep-equal";
 
-// function PropertyEntryBooleanAsSwitch(props: IPropertyEntryProps) {
+// function PropertyEntryBooleanAsSwitch(props: IPropertyEntryHandlerProps) {
 //   // let's the get basic data for the entry
 //   const i18nData = props.property.getI18nDataFor(props.language);
 //   const i18nLabel = i18nData && i18nData.label;
@@ -115,10 +115,10 @@ export interface IPropertyEntryBooleanRendererProps extends IPropertyEntryRender
 }
 
 export default class PropertyEntryBoolean extends React.Component<
-  IPropertyEntryProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>
+  IPropertyEntryHandlerProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>
 > {
   public shouldComponentUpdate(
-    nextProps: IPropertyEntryProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>,
+    nextProps: IPropertyEntryHandlerProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>,
   ) {
     return nextProps.property !== this.props.property ||
       !equals(this.props.state, nextProps.state) ||

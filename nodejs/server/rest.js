@@ -103,7 +103,6 @@ function restServices(appData) {
     }
     /**
      * Builds all the routes for a property, basically only index checks for now
-     * autocomplete checks have nothing to do with properties themselves
      * @param qualifiedPath the qualified path of the item definition
      * @param property the property itself
      */
@@ -158,6 +157,31 @@ function restServices(appData) {
         }
         const ipStackResponse = await appData.ipStack.requestUserInfoForIp(ip.toString(), standardAPIResponse);
         res.end(JSON.stringify(ipStackResponse));
+    });
+    router.get("/util/location-geocode", async (req, res) => {
+        res.setHeader("content-type", "application/json; charset=utf-8");
+        if (!appData.here) {
+            res.status(400);
+            res.end(JSON.stringify({
+                message: "A location fetcher hasn't been set",
+                code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+            }));
+        }
+        if (!req.query.lat || isNaN(req.query.lat) ||
+            !req.query.lng || isNaN(req.query.lng) ||
+            !req.query.lang ||
+            !req.query.sep ||
+            !req.query.q) {
+            res.status(400);
+            res.end(JSON.stringify({
+                message: "Invalid request, needs parameters, lat, lng, lang, sep and q",
+                code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+            }));
+            return;
+        }
+        const finalResult = await appData.here.requestGeocodeFor(req.query.lat, req.query.lng, req.query.q, req.query.lang, req.query.sep);
+        res.status(200);
+        res.end(JSON.stringify(finalResult));
     });
     router.get("/util/location-autocomplete", async (req, res) => {
         res.setHeader("content-type", "application/json; charset=utf-8");
@@ -222,87 +246,6 @@ function restServices(appData) {
     });
     // now let's get all modules
     appData.root.getAllModules().forEach(buildRouteForModule);
-    // now let's get all the autocompletes that we loaded in our application
-    appData.autocompletes.forEach((autocomplete) => {
-        // and add a get request that is used to check them
-        // you might wonder why a get request and not a post request
-        // this is because autocomplete requests should be able to be cached
-        router.get("/autocomplete/" + autocomplete.getName() + "/", (req, res) => {
-            res.setHeader("content-type", "application/json; charset=utf-8");
-            let body;
-            try {
-                body = JSON.parse(req.query.body);
-            }
-            catch {
-                res.status(400);
-                res.end(JSON.stringify({
-                    message: "malformed json",
-                    code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
-                }));
-                return;
-            }
-            // get the language that is used from the request body
-            const languageLocale = body.lang;
-            const query = body.query;
-            const filters = body.filters || {};
-            // check it all
-            if (typeof languageLocale !== "string" && typeof languageLocale !== "undefined" && languageLocale !== null) {
-                res.status(400);
-                res.end(JSON.stringify({
-                    message: "Invalid input on lang",
-                    code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
-                }));
-                return;
-            }
-            if (typeof query !== "string") {
-                res.status(400);
-                res.end(JSON.stringify({
-                    message: "Invalid input on query",
-                    code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
-                }));
-                return;
-            }
-            // and run the autocomplete
-            let results;
-            if (languageLocale) {
-                results = autocomplete.findI18nRecommendations(query, languageLocale, filters);
-            }
-            else {
-                results = autocomplete.findRecommendations(query, filters);
-            }
-            // send the results
-            res.end(JSON.stringify(results));
-        });
-        // to check an autocomplete value as well, also a get request
-        // as well because we need it to be cacheable
-        router.get("/autocomplete-check/" + autocomplete.getName() + "/", (req, res) => {
-            res.setHeader("content-type", "application/json; charset=utf-8");
-            let body;
-            try {
-                body = JSON.parse(req.query.body);
-            }
-            catch {
-                res.status(400);
-                res.end(JSON.stringify({
-                    message: "malformed json",
-                    code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
-                }));
-                return;
-            }
-            const value = body.value;
-            const filters = body.filters || {};
-            if (typeof value !== "string") {
-                res.status(400);
-                res.end(JSON.stringify({
-                    message: "Invalid input on query",
-                    code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
-                }));
-                return;
-            }
-            const isValid = !!autocomplete.findExactValueFor(value, filters);
-            res.end(JSON.stringify(isValid));
-        });
-    });
     router.get("/buildnumber", (req, res) => {
         res.setHeader("content-type", "application/json; charset=utf-8");
         res.end(appData.buildnumber.toString());

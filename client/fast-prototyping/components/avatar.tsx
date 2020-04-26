@@ -94,6 +94,11 @@ const avatarStyles = createStyles({
     color: "rgba(255,255,255,0.7)",
     fontSize: "120px",
   },
+  avatarMedium: {
+    width: "70px",
+    height: "70px",
+    fontSize: "30px",
+  },
   randomColor0: {
     backgroundColor: "#f44336",
     border: "solid 2px #b71c1c",
@@ -134,13 +139,16 @@ const avatarStyles = createStyles({
     backgroundColor: "#607d8b",
     border: "solid 2px #263238",
   },
+  specialUser: {
+    // border: "solid 4px #f44336",
+  },
 });
 
 type profileURLFn = (id: number) => string;
 
 interface IAvatarProps extends WithStyles<typeof avatarStyles> {
   hideFlag?: boolean;
-  large?: boolean;
+  size: "small" | "medium" | "large";
   showWarnings?: boolean;
   profileURL?: string | profileURLFn;
   cacheImage?: boolean;
@@ -152,6 +160,7 @@ interface IAvatarRendererProps extends IPropertyEntryFileRendererProps, WithStyl
 export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
   const contentFn = (
     id: number,
+    role: string,
     userNameValue: string,
     profilePictureValue: PropertyDefinitionSupportedFileType,
     email?: IPropertyDefinitionState,
@@ -166,6 +175,7 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
     const hasWarning = email && eValidated && address && props.showWarnings && (
       hasWarningForMissingEmail || hasWarningForNotValidEmail || hasAnotherWarningForMissingAddress
     );
+    const isSpecialUser = role !== "USER";
 
     const flag = props.hideFlag ? null : (
       <Reader id="app_country">
@@ -187,14 +197,16 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
     const avatarWithSource = (imageSrc: string) => (
       <MAvatar
         alt={userNameValue}
-        classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.large ? props.classes.avatarLarge : ""}` }}
+        classes={{ root: `${props.classes.avatar} ${numberColorClassName} ` +
+          `${props.size === "large" ? props.classes.avatarLarge : ""} ${props.size === "medium" ? props.classes.avatarMedium : ""} ` +
+          `${isSpecialUser ? props.classes.specialUser : ""}` }}
         src={imageSrc}
       >
         {userNameValue ? userNameValue[0] : ""}
       </MAvatar>
     );
 
-    const imageSrc = props.large ? imageSources.imageLargeSizeURL : imageSources.imageSmallSizeURL;
+    const imageSrc = props.size === "large" ? imageSources.imageLargeSizeURL : imageSources.imageSmallSizeURL;
 
     const content = (
       <div className={props.classes.avatarContainer}>
@@ -234,30 +246,34 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
       {(id: number) => (
         <Reader id="profile_picture">
           {(profilePictureValue: PropertyDefinitionSupportedFileType) => (
-            <Reader id="username">
-              {
-                (userNameValue: string) => {
-                  if (!props.showWarnings) {
-                    return contentFn(id, userNameValue, profilePictureValue);
-                  }
-
-                  return (
-                    <Reader id="email">
-                      {(email: string, emailState: IPropertyDefinitionState) => (
-                        <Reader id="e_validated">
-                          {(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => (
-                            <Reader id="address">
-                              {(address, addressState) => {
-                                return contentFn(id, userNameValue, profilePictureValue, emailState, eValidatedState, addressState);
-                              }}
-                            </Reader> 
+            <Reader id="role">
+              {(role: string) => (
+                <Reader id="username">
+                  {
+                    (userNameValue: string) => {
+                      if (!props.showWarnings) {
+                        return contentFn(id, role, userNameValue, profilePictureValue);
+                      }
+    
+                      return (
+                        <Reader id="email">
+                          {(email: string, emailState: IPropertyDefinitionState) => (
+                            <Reader id="e_validated">
+                              {(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => (
+                                <Reader id="address">
+                                  {(address, addressState) => {
+                                    return contentFn(id, role, userNameValue, profilePictureValue, emailState, eValidatedState, addressState);
+                                  }}
+                                </Reader> 
+                              )}
+                            </Reader>
                           )}
                         </Reader>
-                      )}
-                    </Reader>
-                  )
-                }
-              }
+                      )
+                    }
+                  }
+                </Reader>
+              )}
             </Reader>
           )}
         </Reader>
@@ -276,55 +292,62 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
     <div className={`${props.classes.avatarContainer} ${props.classes.avatarContainerLarge}`}>
       <Reader id="username">{
         (username: string) => (
-          <Reader id="id">
-            {(id: number) => {
-              const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : null;
+          <Reader id="role">{
+            (role: string) => (
+              <Reader id="id">
+                {(id: number) => {
+                  const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : "";
+                  const specialUserClassName = role !== "USER" ? props.classes.specialUser : "";
 
-              return (
-                <Dropzone
-                  onDropAccepted={onDrop.bind(null, props.onSetFile)}
-                  onDropRejected={onDrop.bind(null, props.onSetFile)}
-                  maxSize={MAX_FILE_SIZE}
-                  accept={props.accept}
-                  multiple={false}
-                  noClick={false}
-                  ref={dropzoneRef}
-                  disabled={props.disabled}
-                >
-                  {({
-                    getRootProps,
-                    getInputProps,
-                    isDragAccept,
-                    isDragReject,
-                  }) => {
-                    const { ref, ...rootProps } = getRootProps();
-                    return (
-                      <RootRef rootRef={ref}>
-                        <div {...rootProps}>
-                          <input {...getInputProps()} />
-                          <div className={props.classes.avatarContainer}>
-                            <CacheableImageLoader src={props.imageSizes.imageLargeSizeURL}>
-                              {(largeImageURL) => (
-                                <MAvatar
-                                  classes={{ root: `${props.classes.avatar} ${numberColorClassName} ${props.classes.avatarLarge}` }}
-                                  src={largeImageURL}
-                                >
-                                  {username ? username[0] : ""}
-                                </MAvatar>
-                              )}
-                            </CacheableImageLoader>
-                            <div className={`${props.classes.hoverAddBackdrop} ${isDragAccept || isDragReject ? "visible" : ""}`}>
-                              {isDragReject ? <BrokenImageIcon fontSize="large"/> : <AddAPhotoIcon fontSize="large"/>}
+                  return (
+                    <Dropzone
+                      onDropAccepted={onDrop.bind(null, props.onSetFile)}
+                      onDropRejected={onDrop.bind(null, props.onSetFile)}
+                      maxSize={MAX_FILE_SIZE}
+                      accept={props.accept}
+                      multiple={false}
+                      noClick={false}
+                      ref={dropzoneRef}
+                      disabled={props.disabled}
+                    >
+                      {({
+                        getRootProps,
+                        getInputProps,
+                        isDragAccept,
+                        isDragReject,
+                      }) => {
+                        const { ref, ...rootProps } = getRootProps();
+                        return (
+                          <RootRef rootRef={ref}>
+                            <div {...rootProps}>
+                              <input {...getInputProps()} />
+                              <div className={props.classes.avatarContainer}>
+                                <CacheableImageLoader src={props.imageSizes.imageLargeSizeURL}>
+                                  {(largeImageURL) => (
+                                    <MAvatar
+                                      classes={{ root: `${props.classes.avatar} ${numberColorClassName} ` +
+                                        `${props.classes.avatarLarge} ` +
+                                        `${specialUserClassName}` }}
+                                      src={largeImageURL}
+                                    >
+                                      {username ? username[0] : ""}
+                                    </MAvatar>
+                                  )}
+                                </CacheableImageLoader>
+                                <div className={`${props.classes.hoverAddBackdrop} ${isDragAccept || isDragReject ? "visible" : ""}`}>
+                                  {isDragReject ? <BrokenImageIcon fontSize="large" /> : <AddAPhotoIcon fontSize="large" />}
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                      </RootRef>
-                    );
-                  }}
-                </Dropzone>
-              )
-            }}
-          </Reader>
+                          </RootRef>
+                        );
+                      }}
+                    </Dropzone>
+                  )
+                }}
+              </Reader>
+            )  
+          }</Reader>
         )
       }</Reader>
       {props.currentInvalidReason || props.rejectedReason ? <Alert classes={{root: props.classes.avatarUploadError}} severity="error">

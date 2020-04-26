@@ -2,64 +2,78 @@ import PropertyDefinition, {
   IPropertyDefinitionState,
 } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
-import { LocaleContext, ILocaleContextType } from "../../app";
+import { LocaleContext } from "../../app";
 import { Ii18NType } from "../../../../base/Root";
 import {
-  PropertyDefinitionSupportedTypeName,
+  PropertyDefinitionSupportedTypeName, PropertyDefinitionSupportedType,
 } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { currencies, countries, ICurrencyType, ICountryType } from "../../../../imported-resources";
-import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
-import { IPropertyViewThemeType, style, STANDARD_THEME } from "./styles";
-// import PropertyViewField from "./PropertyViewField";
-// import PropertyViewDateTime from "./PropertyViewDateTime";
-// import PropertyViewBoolean from "./PropertyViewBoolean";
-// import PropertyViewText from "./PropertyViewText";
-// import PropertyViewLocation from "./PropertyViewLocation";
+import { IRendererProps } from "../../renderer";
+import { RendererContext } from "../../../providers/renderer";
+import { PropertyViewSimple, IPropertyViewSimpleRendererProps } from "./PropertyViewSimple";
 
-export interface IPropertyViewBaseProps {
+/**
+ * This is what every view renderer gets
+ * 
+ * Expect these to be extended
+ */
+export interface IPropertyViewRendererProps extends IRendererProps {
+  capitalize: boolean;
+}
+
+/**
+ * This is what the general view handler is supposed to get
+ */
+export interface IPropertyViewMainHandlerProps<RendererPropsType> {
   property: PropertyDefinition;
+  capitalize?: boolean;
   state: IPropertyDefinitionState;
-  theme?: Partial<IPropertyViewThemeType>;
+  renderer?: React.ComponentType<RendererPropsType>;
+  rendererArgs?: object;
 }
 
-interface IPropertyViewStylesApplierProps extends IPropertyViewBaseProps, WithStyles<typeof style> {
-  locale: ILocaleContextType;
-}
-
-export interface IPropertyViewProps extends IPropertyViewStylesApplierProps {
+export interface IPropertyViewHandlerProps<RendererPropsType> extends IPropertyViewMainHandlerProps<RendererPropsType> {
   language: string;
+  rtl: boolean;
   currency: ICurrencyType;
   i18n: Ii18NType;
   country: ICountryType;
 }
 
-const typeRegistry:
+interface IRendererHandlerType {
+  renderer: string,
+  handler: React.ComponentType<IPropertyViewHandlerProps<IPropertyViewRendererProps>>,
+};
+
+const handlerRegistry:
   Record<
     PropertyDefinitionSupportedTypeName,
-    any
+    IRendererHandlerType
   > = {
-  // string: PropertyViewField,
-  // integer: PropertyViewField,
-  // number: PropertyViewField,
-  // boolean: PropertyViewBoolean,
-  // text: PropertyViewText,
-  // currency: PropertyViewField,
-  // unit: PropertyViewField,
-  // password: PropertyViewField,
-  // year: PropertyViewField,
-  // datetime: PropertyViewDateTime,
-  // date: PropertyViewDateTime,
-  // time: PropertyViewDateTime,
-  // location: PropertyViewLocation,
-  string: null,
-  integer: null,
-  number: null,
+  string: {
+    renderer: "PropertyViewSimple",
+    handler: PropertyViewSimple,
+  },
+  integer: {
+    renderer: "PropertyViewSimple",
+    handler: PropertyViewSimple,
+  },
+  number: {
+    renderer: "PropertyViewSimple",
+    handler: PropertyViewSimple,
+  },
   boolean: null,
   text: null,
   currency: null,
   unit: null,
-  password: null,
-  year: null,
+  password: {
+    renderer: "PropertyViewSimple",
+    handler: PropertyViewSimple,
+  },
+  year: {
+    renderer: "PropertyViewSimple",
+    handler: PropertyViewSimple,
+  },
   datetime: null,
   date: null,
   time: null,
@@ -70,53 +84,94 @@ const typeRegistry:
   files: null,
 };
 
-const PropertyViewStylesApplier = withStyles(style)((props: IPropertyViewStylesApplierProps) => {
-  // First get the element by the type
-  const Element = typeRegistry[props.property.getType()];
-
-  return (
-    <Element
-      {...props}
-      language={props.locale.language}
-      i18n={props.locale.i18n}
-      currency={currencies[props.locale.currency]}
-      country={countries[props.locale.country]}
-      classes={props.classes}
-    />
-  );
-});
-
-export default function PropertyView(props: IPropertyViewBaseProps) {
-  let appliedTheme: IPropertyViewThemeType = STANDARD_THEME;
-  if (props.theme) {
-    appliedTheme = {
-      ...STANDARD_THEME,
-      ...props.theme,
-    };
-  }
-
+export function RawBasePropertyView(props: {
+  value: string;
+  renderer?: React.ComponentType<IRendererProps>;
+  rendererArgs?: object;
+}) {
   // Build the context and render sending the right props
   return (
-    <LocaleContext.Consumer>
+    <RendererContext.Consumer>
       {
-        (locale) =>
-          <ThemeProvider theme={appliedTheme}>
-            <PropertyViewStylesApplier
-              {...props}
-              locale={locale}
-            />
-          </ThemeProvider>
+        (renderers) =>
+          <LocaleContext.Consumer>
+            {
+              (locale) => {
+                const renderer: React.ComponentType<IPropertyViewSimpleRendererProps> =
+                  props.renderer as React.ComponentType<IPropertyViewSimpleRendererProps> || renderers.PropertyViewSimple;
+                return (
+                  <PropertyViewSimple
+                    property={null}
+                    state={{
+                      userSet: false,
+                      default: null,
+                      enforced: false,
+                      hidden: false,
+                      valid: true,        
+                      value: props.value,
+                      stateValue: props.value,
+                      stateAppliedValue: props.value,
+                      stateValueModified: false,
+                      stateValueHasBeenManuallySet: false,
+                      invalidReason: null,
+                      internalValue: null,
+                      propertyId: null,
+                    }}
+                    language={locale.language}
+                    i18n={locale.i18n}
+                    rtl={locale.rtl}
+                    currency={currencies[locale.currency]}
+                    country={countries[locale.country]}
+                    renderer={renderer}
+                    rendererArgs={props.rendererArgs || {}}
+                  />
+                );
+              }
+            }
+          </LocaleContext.Consumer>
       }
-    </LocaleContext.Consumer>
+    </RendererContext.Consumer>
   );
 }
 
-export function RawBasePropertyView(props: {
-  value: string;
-}) {
+
+export default function PropertyView(
+  props: IPropertyViewMainHandlerProps<IPropertyViewRendererProps>,
+) {
+  if (props.state.hidden) {
+    return null;
+  }
+
+  // First get the handler by the type
+  const registryEntry = handlerRegistry[props.property.getType()];
+  const Element = registryEntry.handler;
+
+  // Build the context and render sending the right props
   return (
-    <div>
-      {props.value}
-    </div>
+    <RendererContext.Consumer>
+      {
+        (renderers) =>
+          <LocaleContext.Consumer>
+            {
+              (locale) => {
+                const renderer: React.ComponentType<IPropertyViewRendererProps> =
+                  props.renderer || renderers[registryEntry.renderer];
+                return (
+                  <Element
+                    {...props}
+                    language={locale.language}
+                    i18n={locale.i18n}
+                    rtl={locale.rtl}
+                    currency={currencies[locale.currency]}
+                    country={countries[locale.country]}
+                    renderer={renderer}
+                    rendererArgs={props.rendererArgs || {}}
+                  />
+                );
+              }
+            }
+          </LocaleContext.Consumer>
+      }
+    </RendererContext.Consumer>
   );
 }

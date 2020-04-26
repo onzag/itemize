@@ -70,25 +70,6 @@ exports.default = {
         nullable: {
             type: "boolean",
         },
-        autocomplete: {
-            type: "string",
-        },
-        autocompleteFilterFromProperty: {
-            type: "object",
-            additionalProperties: {
-                type: "string",
-            },
-            minItems: 1,
-        },
-        autocompleteIsEnforced: {
-            type: "boolean",
-        },
-        autocompleteSupportsPrefills: {
-            type: "boolean",
-        },
-        autocompleteSupportsLocale: {
-            type: "boolean",
-        },
         htmlAutocomplete: {
             type: "string",
         },
@@ -193,12 +174,6 @@ exports.default = {
     additionalProperties: false,
     definitions: {
         ConditionalRuleSet: schema_1.default,
-    },
-    dependencies: {
-        autocompleteFilterFromProperty: ["autocomplete"],
-        autocompleteIsEnforced: ["autocomplete"],
-        autocompleteSupportsPrefills: ["autocomplete"],
-        autocompleteSupportsLocale: ["autocomplete", "autocompleteIsEnforced"],
     },
     required: ["id", "type"],
 };

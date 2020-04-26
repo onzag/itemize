@@ -151,6 +151,7 @@ interface CacheableImageLoaderState {
 }
 
 export class CacheableImageLoader extends React.PureComponent<CacheableImageLoaderProps, CacheableImageLoaderState> {
+  private unmounted: boolean = false;
   constructor(props: CacheableImageLoaderProps) {
     super(props);
 
@@ -166,6 +167,9 @@ export class CacheableImageLoader extends React.PureComponent<CacheableImageLoad
     }
   }
   public async loadImage() {
+    if (this.unmounted) {
+      return;
+    }
     if (this.props.src && this.props.src.indexOf("blob:") === 0) {
       this.setState({
         url: this.props.src,
@@ -182,23 +186,29 @@ export class CacheableImageLoader extends React.PureComponent<CacheableImageLoad
         });
         const blob = await res.blob();
         this.revokeOlderImage();
-        this.setState({
-          url: URL.createObjectURL(blob),
-          irrevokable: false,
-        });
+        if (!this.unmounted) {
+          this.setState({
+            url: URL.createObjectURL(blob),
+            irrevokable: false,
+          });
+        }
       } catch {
         this.revokeOlderImage();
-        this.setState({
-          url: "/rest/resource/image-fail.svg",
-          irrevokable: true,
-        });
+        if (!this.unmounted) {
+          this.setState({
+            url: "/rest/resource/image-fail.svg",
+            irrevokable: true,
+          });
+        }
       }
     } else {
       this.revokeOlderImage();
-      this.setState({
-        url: null,
-        irrevokable: false,
-      });
+      if (!this.unmounted) {
+        this.setState({
+          url: null,
+          irrevokable: false,
+        });
+      }
     }
   }
   public componentDidMount() {
@@ -208,6 +218,9 @@ export class CacheableImageLoader extends React.PureComponent<CacheableImageLoad
     if (prevProps.src !== this.props.src) {
       this.loadImage();
     }
+  }
+  public componentWillUnmount() {
+    
   }
   public render() {
     if (this.props.children) {

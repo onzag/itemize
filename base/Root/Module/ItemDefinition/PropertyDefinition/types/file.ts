@@ -6,6 +6,7 @@ import { IPropertyDefinitionSupportedType } from "../types";
 import { getStandardSQLFnFor, stardardSQLInWithJSONStringifyFn, standardSQLOutWithJSONParseFn } from "../sql";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
 import { IGQLFile } from "../../../../../../gql-querier";
+import { standardLocalEqual } from "../local-sql";
 
 export type PropertyDefinitionSupportedFileType = IGQLFile;
 
@@ -60,6 +61,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlLocalEqual: () => {
     throw new Error("Attempted to local equal within a file");
   },
+  localEqual: standardLocalEqual,
   i18n: {
     base: CLASSIC_BASE_I18N,
     optional: CLASSIC_OPTIONAL_I18N,

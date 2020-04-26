@@ -9,7 +9,6 @@ import Ajv from "ajv";
 import RootSchema from "../base/Root/schema";
 import ItemDefinitionSchema from "../base/Root/Module/ItemDefinition/schema";
 import ModuleSchema from "../base/Root/Module/schema";
-import AutocompleteSchema from "../base/Autocomplete/schema";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import "source-map-support/register";
@@ -40,12 +39,6 @@ export const checkPropertyDefinitionArraySchemaValidate =
       $ref: "ItemDefinition#/definitions/PropertyDefinition",
     },
   });
-
-/**
- * Checks an autocomplete
- */
-export const checkAutocompleteSchemaValidate =
-  ajv.compile(AutocompleteSchema);
 
 /**
  * Checks a module

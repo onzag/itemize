@@ -74,7 +74,7 @@ export declare function standardSQLSearchFnExactAndRange(args: IGQLArgs, sqlPref
  * @param columnName an optional column name to name this equality check as
  * @returns a knex valid search or select query object
  */
-export declare function standardSQLEqualFn(value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, isCaseInsensitive: boolean, knex: Knex, columnName?: string): Knex.Raw | {
+export declare function standardSQLEqualFn(value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, isCaseInsensitive: boolean, knex: Knex, columnName?: string): Knex.Raw<any> | {
     [x: string]: PropertyDefinitionSupportedType;
 };
 /**

@@ -140,6 +140,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       console.log("user", tokenDataId, tokenDataRole, "logged in");
     } else {
       console.log("credentials deemed invalid", error);
+      this.cleanAndDestroyLoggedData();
     }
 
     this.props.onProviderStateSet(newState);
@@ -236,12 +237,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       error: error || null,
     };
   }
-  public logout() {
-    if (this.state.isLoggingIn) {
-      console.warn("Tried to logout while logging in");
-      return;
-    }
-
+  public cleanAndDestroyLoggedData() {
     // removing the user data
     localStorage.removeItem("TOKEN");
     localStorage.removeItem("ID");
@@ -269,6 +265,14 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         );
       });
     });
+  }
+  public logout() {
+    if (this.state.isLoggingIn) {
+      console.warn("Tried to logout while logging in");
+      return;
+    }
+
+    this.cleanAndDestroyLoggedData();
     
     // now we update the state
     this.setState({

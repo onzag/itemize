@@ -323,7 +323,7 @@ export default class Include {
     toJSON(): IIncludeRawJSONDataType;
     /**
      * Returns true if the item contains a property that needs to be
-     * extenrally checked, either an autocompleted property or an indexed one
+     * extenrally checked, either an indexed one
      * @returns a boolean on whether it contains such a property or not
      */
     containsAnExternallyCheckedProperty(): boolean;

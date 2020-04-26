@@ -195,6 +195,16 @@ const typeValue: IPropertyDefinitionSupportedType = {
     return data[sqlPrefix + id + "_VALUE"] === value.value &&
       data[sqlPrefix + id + "_CURRENCY"] === value.currency;
   },
+  localEqual: (
+    a: IPropertyDefinitionSupportedCurrencyType,
+    b: IPropertyDefinitionSupportedCurrencyType,
+  ) => {
+    if (a === b) {
+      return true;
+    }
+
+    return a.value === b.value && a.currency === b.currency;
+  },
   validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
     if (typeof l.value !== "number" ||
       typeof l.currency !== "string") {

@@ -323,6 +323,12 @@ async function validateTokenIsntBlocked(cache, tokenData) {
                 code: constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS,
             });
         }
+        else if (sqlResult.role !== tokenData.role) {
+            throw new errors_1.EndpointError({
+                message: "Token has role mismatch",
+                code: constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+            });
+        }
     }
     validateTokenIsntBlockedDebug("SUCCEED");
 }

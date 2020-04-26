@@ -556,8 +556,7 @@ export default class ItemDefinition {
     /**
      * same as getCurrentValue but ignores external checking
      * so it doesn't have to be async and no need to spend
-     * network resources, checks most, but ignores unique and
-     * autocomplete checkings; note that you should still pass id
+     * network resources, checks most, but ignores unique checkings
      * in order to get cached previously checked results
      * @param id the stored value of the item definition, pass null if new
      * @param version the store value of the version, only applies if id specified
@@ -745,7 +744,7 @@ export default class ItemDefinition {
     /**
      * Returns true is one of the property has to be externally checked
      * either by database or rest endpoints, this is basically unique
-     * and autocomplete indexed values
+     * values
      * @param onlyCheckProperties only to check the properties in this list
      * @param ignoreIncludes whether to ignore the sinked in properties in the includes
      * @returns a boolean

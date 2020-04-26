@@ -10,7 +10,6 @@ import { PropertyDefinitionSupportedType } from "./types";
 import PropertyDefinition from "../PropertyDefinition";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../../../../../constants";
 import Knex from "knex";
-import Autocomplete from "../../../../Autocomplete";
 
 /**
  * The server side index checker checks for unique indexes within properties
@@ -67,38 +66,4 @@ export async function serverSideIndexChecker(
 
   // return whether we found results
   return !result.length;
-}
-
-/**
- * Checks for an autocomplete value as it coming from the given autocomplete
- * @param autocompletes the list of autocompletes from memory
- * @param property the property in question
- * @param value the value to check
- * @param id the slot id, if any
- * @param version the slot version, if any
- * @returns a boolean on whether the autocomplete is valid or not
- */
-export function serverSideAutocompleteChecker(
-  autocompletes: Autocomplete[],
-  property: PropertyDefinition,
-  value: PropertyDefinitionSupportedType,
-  id: number,
-  version: string,
-) {
-  // if the value is null it's valid
-  if (value === null) {
-    return true;
-  }
-
-  // otherwise let's ask the given autocomplete
-  const filters = property.getAutocompletePopulatedFiltersFor(id, version);
-  const autocomplete = autocompletes.find((a) => a.getName() === property.getAutocompleteId());
-
-  // if there's no autocomplete, it's invalid
-  if (!autocomplete) {
-    return false;
-  }
-
-  // return whether we found that exact value
-  return !!autocomplete.findExactValueFor(value.toString(), filters);
 }

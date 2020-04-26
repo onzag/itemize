@@ -81,6 +81,7 @@ const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                     "e_validated",
                     "profile_picture",
                     "address",
+                    "role",
                   ]}
                   longTermCaching={true}
                   markForDestructionOnLogout={true}

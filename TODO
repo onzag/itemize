@@ -1,17 +1,37 @@
 SITE
-. Update password function [DONE]
-. Public profile [DONE]
-. Location
-. The first user to sign in is admin
-. Role picker for admins in public profile
-. About me in profile
-. Implementation of CMS module
-. Implementation of Forum module
+. Update password function [+4] [DONE]
+. Public profile [+5] [DONE]
+. Location [+3] [DONE]
+. The first user to sign in is admin [+1] [NO, USE DATABASE]
+. Role picker for admins in public profile [+2]
+. About me in profile [+5]
+. Implementation of CMS module [+10]
+. Implementation of Forum module [+7]
+. Implementation of mailing module [+7]
+. Test implementation of a sales module for probing includes [+20]
+. String based total search (tags?) [+10]
+
+ONZASYSTEMS [+3]
+. Build a Frontpage with few details
+  . en
+  . es
+  . fi
+  . ru
+  . de
+
+CYCLINGEXCHANGEHUB [+10]
+. Build Initial Frontpage
+. Bicycle Module
+
+RIDINGEXCHANGE [+5]
+. Build Initial Frontpage
+. Horse Module
+
+EXTRA (LOW PRIORITY)
 . Implementation of flagging
 . Bans and Blocks
-. boolean 3 way
 
-SEO
+SEO (LOWEST PRIORITY)
 1. SSR Implementation via constructor and SSR rules, SSR rules will be rules specific to an url
   0. Only public data, user specific data can be loaded client side
   1. TOKEN, ID, ROLE, LANG, etc... all localstorage data is sent via cookie to create a fakeStorage where info can be fetch
@@ -23,7 +43,10 @@ SEO
   5. manifest and html set via the SSR rules
   6. SSR rules should be able to load resources as well
 
-TECH
+TECH (HAPPENS AS IT GOES)
+. Fix floating point imprecision in lat/lng by adding an id to location by smashing lat and lng in the server side that way
+equality can be checked; implement in geocode/search and autocomplete and whatnot; check in preferences by updating twice a manual pick [DONE]
+
 . Revamp currency to have a normalized_value in dollars
 . Revamp currency search to use normalized_value on mismatch or the value on match
 . Maybe download a list of base conversions from https://free.currencyconverterapi.com/ automatically every day
@@ -32,3 +55,9 @@ so can safely be removed
 . Create sqlMantenience for mantenience of mutable values like this in the type
 
 . Image support in rich text
+
+. taglist (predefined tags)
+. list of string
+. Array in SQL
+. maxtags optional as maxlenght
+. mintags optional as minlenght

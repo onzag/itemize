@@ -10,7 +10,7 @@ import {
 import { GraphQLString } from "graphql";
 import { standardSQLOutFn, standardSQLEqualFn } from "../sql";
 import {
-  standardSQLLocalEqualFn,
+  standardSQLLocalEqualFn, standardLocalEqual,
 } from "../local-sql";
 import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
@@ -140,6 +140,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
   sqlEqual: standardSQLEqualFn,
   sqlLocalEqual: standardSQLLocalEqualFn,
+  localEqual: standardLocalEqual,
 
   // validates the text, texts don't support json value
   validate: (s: PropertyDefinitionSupportedTextType, subtype?: string) => {

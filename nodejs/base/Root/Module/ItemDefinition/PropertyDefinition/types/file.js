@@ -5,6 +5,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const sql_1 = require("../sql");
 const constants_1 = require("../../../../../../constants");
+const local_sql_1 = require("../local-sql");
 /**
  * The type value represents the behaviour of files in the app
  */
@@ -55,6 +56,7 @@ const typeValue = {
     sqlLocalEqual: () => {
         throw new Error("Attempted to local equal within a file");
     },
+    localEqual: local_sql_1.standardLocalEqual,
     i18n: {
         base: constants_1.CLASSIC_BASE_I18N,
         optional: constants_1.CLASSIC_OPTIONAL_I18N,

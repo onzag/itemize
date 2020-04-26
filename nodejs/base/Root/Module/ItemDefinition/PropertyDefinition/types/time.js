@@ -30,6 +30,7 @@ const typeValue = {
     sqlEqual: sql_1.standardSQLEqualFn,
     sqlLocalEqual: local_sql_1.standardSQLLocalEqualFn,
     localSearch: local_search_1.dateLocalSearchExactAndRange.bind(null, constants_1.TIME_FORMAT),
+    localEqual: local_sql_1.standardLocalEqual,
     validate: (d) => {
         if (d === "Invalid Date") {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;

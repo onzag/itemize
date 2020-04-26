@@ -612,24 +612,6 @@ function checkPropertyDefinition(rawData, parentItemDefinition, parentModule, tr
             throw new Error_1.default("Invalid type for default: " + invalidReason, traceback.newTraceToBit("default"));
         }
     }
-    if (!propertyDefintionTypeStandard.supportsAutocomplete && rawData.autocomplete) {
-        throw new Error_1.default("Cannot use autocomplete on property type '" + rawData.type + "'", traceback.newTraceToBit("autocomplete"));
-    }
-    if (rawData.values && rawData.autocomplete) {
-        throw new Error_1.default("Cannot use autocomplete and values at the same time", traceback.newTraceToBit("autocomplete"));
-    }
-    // Let's check whether the autocomplete properties are there
-    if (rawData.autocompleteFilterFromProperty) {
-        const autocompleteFilterFromPropertyTraceback = traceback.newTraceToBit("autocompleteFilterFromProperty");
-        Object.keys(rawData.autocompleteFilterFromProperty).forEach((keyId) => {
-            const propertyId = rawData.autocompleteFilterFromProperty[keyId];
-            // Also for property definitions prop extensions are valid
-            // to access in this autocomplete sets
-            if (!ItemDefinition_1.default.getPropertyDefinitionRawFor(parentItemDefinition, parentModule, propertyId, true)) {
-                throw new Error_1.default("Invalid autocomplete property to funnel", autocompleteFilterFromPropertyTraceback.newTraceToBit(keyId));
-            }
-        });
-    }
     // And the default if values are valid
     if (rawData.defaultIf) {
         const defaultIfTraceback = traceback.newTraceToBit("defaultIf");
@@ -803,46 +785,3 @@ function checkRoot(rawData) {
     }
 }
 exports.checkRoot = checkRoot;
-/**
- * Checks the autocomplete filters and values so that they do match
- * and have no missing fields
- * @param rawData the autocomplete filter or value list, whatever it comes
- * @param supportedLanguages the supported languages we expect
- * @param traceback the traceback object already pointing
- */
-function checkAutocompleteFilterAndValues(rawDataConfig, rawData, traceback) {
-    // we are going to loop over that array
-    rawData.forEach((value, index) => {
-        // if we have a filter
-        if (value.type === "filter") {
-            // we check all the values that it holds
-            // there should be some but it might just be
-            // stacking filters
-            if (value.values) {
-                checkAutocompleteFilterAndValues(rawDataConfig, value.values, traceback.newTraceToBit(index).newTraceToBit("values"));
-            }
-            // if we have filters within itelf, which contain itself values
-            if (value.filters) {
-                // we check those as well
-                checkAutocompleteFilterAndValues(rawDataConfig, value.filters, traceback.newTraceToBit(index).newTraceToBit("filters"));
-            }
-        }
-        else {
-            // otherwise if we have a value, we cannot check for much other than
-            // the i18n if there is some
-            if (value.i18n) {
-                // this is our traceback if there's i18n data
-                const i18nTraceback = traceback.newTraceToBit(index).newTraceToBit("i18n");
-                // all the supported languages must be included
-                rawDataConfig.standard.supportedLanguages.forEach((language) => {
-                    // if that is not the case
-                    if (!value.i18n[language]) {
-                        // throw an error
-                        throw new Error_1.default("Missing locale value for language " + language, i18nTraceback);
-                    }
-                });
-            }
-        }
-    });
-}
-exports.checkAutocompleteFilterAndValues = checkAutocompleteFilterAndValues;

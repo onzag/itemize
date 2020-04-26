@@ -40,6 +40,7 @@ export function getFieldsAndArgs(
     includeArgs: boolean,
     includeFields: boolean,
     properties?: string[],
+    differingPropertiesOnlyForArgs?: boolean;
     includes?: string[],
     propertiesForArgs?: string[],
     includesForArgs?: string[],
@@ -68,7 +69,15 @@ export function getFieldsAndArgs(
   if (options.uniteFieldsWithAppliedValue) {
     const appliedValue = options.itemDefinitionInstance.getGQLAppliedValue(options.forId, options.forVersion);
     if (appliedValue && appliedValue.requestFields) {
-      requestFields = appliedValue.requestFields;
+      // Horrible hardest bug ever here, fixed by this, we need to make a clone
+      // because we modify this variable in place, where appliedValue is never supposed
+      // to be modified
+      requestFields = {
+        ...appliedValue.requestFields,
+        DATA: {
+          ...appliedValue.requestFields.DATA,
+        }
+      };
     }
   }
   // and these would be the arguments for the graphql query
@@ -150,7 +159,18 @@ export function getFieldsAndArgs(
     if (options.propertiesForArgs && options.propertiesForArgs.length) {
       options.propertiesForArgs.forEach((pId) => {
         const pd = options.itemDefinitionInstance.getPropertyDefinitionFor(pId, true);
-        argumentsForQuery[pd.getId()] = pd.getCurrentValue(options.forId || null, options.forVersion || null);
+        const currentValue = pd.getCurrentValue(options.forId || null, options.forVersion || null);
+        if (options.differingPropertiesOnlyForArgs) {
+          const appliedGQLValue = pd.getAppliedValue(options.forId || null, options.forVersion || null);
+          const isEqual = pd.getPropertyDefinitionDescription().localEqual(
+            appliedGQLValue,
+            currentValue,
+          );
+          if (isEqual) {
+            return;
+          }
+        }
+        argumentsForQuery[pd.getId()] = currentValue;
       });
     }
     if (options.includesForArgs && options.includesForArgs.length) {

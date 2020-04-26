@@ -996,8 +996,7 @@ export default class ItemDefinition {
   /**
    * same as getCurrentValue but ignores external checking
    * so it doesn't have to be async and no need to spend
-   * network resources, checks most, but ignores unique and
-   * autocomplete checkings; note that you should still pass id
+   * network resources, checks most, but ignores unique checkings
    * in order to get cached previously checked results
    * @param id the stored value of the item definition, pass null if new
    * @param version the store value of the version, only applies if id specified
@@ -1166,13 +1165,13 @@ export default class ItemDefinition {
     // we make it we have an applied value
     this.stateHasAppliedValueTo[mergedID] = true;
     // and set all the data regarding that value
-    this.stateGQLAppliedValue[mergedID] = {
+    this.stateGQLAppliedValue[mergedID] = Object.freeze({
       userIdRequester: graphqlUserIdRequester,
       roleRequester: graphqlRoleRequester,
       rawValue: value,
       flattenedValue,
       requestFields,
-    };
+    });
 
     // now we get all the properties that we are supposed to apply that value to
     const properties =
@@ -1289,7 +1288,8 @@ export default class ItemDefinition {
    */
   public getGQLAppliedValue(id: number, version: string): IItemDefinitionGQLValueType {
     const mergedID = id + "." + (version || "");
-    return this.stateGQLAppliedValue[mergedID] || null;
+    const appliedGQLValue = this.stateGQLAppliedValue[mergedID] || null;
+    return appliedGQLValue;
   }
 
   /**
@@ -1644,7 +1644,7 @@ export default class ItemDefinition {
   /**
    * Returns true is one of the property has to be externally checked
    * either by database or rest endpoints, this is basically unique
-   * and autocomplete indexed values
+   * values
    * @param onlyCheckProperties only to check the properties in this list
    * @param ignoreIncludes whether to ignore the sinked in properties in the includes
    * @returns a boolean
@@ -1656,7 +1656,7 @@ export default class ItemDefinition {
     const existInFirstLayer: boolean =
       this.getAllPropertyDefinitionsAndExtensions()
       .filter((pd) => !onlyCheckProperties ? true : onlyCheckProperties.includes(pd.getId()))
-      .some((pd) => pd.isUnique() || (pd.hasAutocomplete() && pd.isAutocompleteEnforced()));
+      .some((pd) => pd.isUnique());
     if (existInFirstLayer) {
       return true;
     } else if (ignoreIncludes) {

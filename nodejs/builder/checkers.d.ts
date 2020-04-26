@@ -15,8 +15,6 @@ import { IModuleRawJSONDataType, IRawJSONI18NDataType } from "../base/Root/Modul
 import { IPropertyDefinitionRawJSONDataType } from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Include";
 import { IPropertiesValueMappingDefinitonRawJSONDataType } from "../base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton";
-import { IFilterRawJSONDataType, IAutocompleteValueRawJSONDataType } from "../base/Autocomplete";
-import { IBuilderBasicConfigType } from "./config";
 /**
  * Checks a conditional rule set so that it is valid and contains valid
  * includes and rules
@@ -88,11 +86,3 @@ export declare function checkModule(rawRootData: IRootRawJSONDataType, rawData: 
  * @param rawData the root
  */
 export declare function checkRoot(rawData: IRootRawJSONDataType): void;
-/**
- * Checks the autocomplete filters and values so that they do match
- * and have no missing fields
- * @param rawData the autocomplete filter or value list, whatever it comes
- * @param supportedLanguages the supported languages we expect
- * @param traceback the traceback object already pointing
- */
-export declare function checkAutocompleteFilterAndValues(rawDataConfig: IBuilderBasicConfigType, rawData: Array<IFilterRawJSONDataType | IAutocompleteValueRawJSONDataType>, traceback: Traceback): void;

@@ -39,6 +39,9 @@ image_uploader_select_file = select picture
 file_uploader_delete_file = delete file
 image_uploader_delete_file = delete picture
 
+no_results = no results
+result_out_of = result {0} out of {1}
+
 callout_exclude_warning = warning!... this will mark your item as incomplete
 
 unit_dialog_title = select a unit
@@ -116,6 +119,9 @@ file_uploader_select_file = valitse tiedosto
 image_uploader_select_file = valitse kuvatiedosto
 file_uploader_delete_file = poista tiedosto
 image_uploader_delete_file = poista kuvatiedosto
+
+no_results = no results
+result_out_of = result {0} out of {1}
 
 callout_exclude_warning = warning!... this will mark your item as incomplete
 
@@ -195,6 +201,9 @@ image_uploader_select_file = select Picture
 file_uploader_delete_file = delete File
 image_uploader_delete_file = delete Picture
 
+no_results = no results
+result_out_of = result {0} out of {1}
+
 callout_exclude_warning = warning!... this will mark your item as incomplete
 
 unit_dialog_title = select a unit
@@ -272,6 +281,9 @@ file_uploader_select_file = Datei auswählen
 image_uploader_select_file = Bild auswählen
 file_uploader_delete_file = Datei löschen
 image_uploader_delete_file = Bild löschen
+
+no_results = no results
+result_out_of = result {0} out of {1}
 
 callout_exclude_warning = Warnung!... dies wird ihren Artikel als unvollständig markieren
 
@@ -351,6 +363,9 @@ image_uploader_select_file = seleccionar foto
 file_uploader_delete_file = borrar archivo
 image_uploader_delete_file = borrar foto
 
+no_results = no se encontraron resultados
+result_out_of = resultado {0} de {1}
+
 callout_exclude_warning = atención!... esto marcará su item como incompleto
 
 unit_dialog_title = seleccione una unidad
@@ -428,6 +443,9 @@ file_uploader_select_file = اختيار ملف
 image_uploader_select_file = اختيار صورة
 file_uploader_delete_file = حذف ملف
 image_uploader_delete_file = حذف صورة
+
+no_results = no results
+result_out_of = result {0} out of {1}
 
 callout_exclude_warning = تحذير !... هذا سيميز مادتك على أنها غير مكتملة
 

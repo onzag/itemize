@@ -66,25 +66,6 @@ export default {
     nullable: {
       type: "boolean",
     },
-    autocomplete: {
-      type: "string",
-    },
-    autocompleteFilterFromProperty: {
-      type: "object",
-      additionalProperties: {
-        type: "string",
-      },
-      minItems: 1,
-    },
-    autocompleteIsEnforced: {
-      type: "boolean",
-    },
-    autocompleteSupportsPrefills: {
-      type: "boolean",
-    },
-    autocompleteSupportsLocale: {
-      type: "boolean",
-    },
     htmlAutocomplete: {
       type: "string",
     },
@@ -189,12 +170,6 @@ export default {
   additionalProperties: false,
   definitions: {
     ConditionalRuleSet: ConditionalRuleSetSchema,
-  },
-  dependencies: {
-    autocompleteFilterFromProperty: ["autocomplete"],
-    autocompleteIsEnforced: ["autocomplete"],
-    autocompleteSupportsPrefills: ["autocomplete"],
-    autocompleteSupportsLocale: ["autocomplete", "autocompleteIsEnforced"],
   },
   required: ["id", "type"],
 };

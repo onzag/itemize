@@ -55,6 +55,9 @@ const typeValue = {
         atxt: {
             type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLString),
         },
+        id: {
+            type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLString),
+        },
     },
     specialProperties: [
         {
@@ -68,6 +71,9 @@ const typeValue = {
             [sqlPrefix + id + "_GEO"]: {
                 type: "GEOMETRY(POINT,4326)",
                 ext: "postgis",
+            },
+            [sqlPrefix + id + "_ID"]: {
+                type: "text",
             },
             [sqlPrefix + id + "_LAT"]: {
                 type: "float",
@@ -87,6 +93,7 @@ const typeValue = {
         if (value === null) {
             return {
                 [sqlPrefix + id + "_GEO"]: null,
+                [sqlPrefix + id + "_ID"]: null,
                 [sqlPrefix + id + "_LAT"]: null,
                 [sqlPrefix + id + "_LNG"]: null,
                 [sqlPrefix + id + "_TXT"]: null,
@@ -94,7 +101,8 @@ const typeValue = {
             };
         }
         return {
-            [sqlPrefix + id + "_GEO"]: knex.raw("ST_SetSRID(ST_MakePoint(?, ?), 4326);", value.lng, value.lat),
+            [sqlPrefix + id + "_GEO"]: knex.raw("ST_SetSRID(ST_MakePoint(?, ?), 4326)", [value.lng, value.lat]),
+            [sqlPrefix + id + "_ID"]: value.id,
             [sqlPrefix + id + "_LAT"]: value.lat,
             [sqlPrefix + id + "_LNG"]: value.lng,
             [sqlPrefix + id + "_TXT"]: value.txt,
@@ -107,6 +115,7 @@ const typeValue = {
             lng: data[sqlPrefix + id + "_LNG"],
             txt: data[sqlPrefix + id + "_TXT"],
             atxt: data[sqlPrefix + id + "_ATXT"],
+            id: data[sqlPrefix + id + "_ID"],
         };
         if (result.lat === null || result.lng === null) {
             return null;
@@ -163,30 +172,33 @@ const typeValue = {
     sqlEqual: (value, sqlPrefix, id, isCaseInsensitive, knex, columnName) => {
         if (!columnName) {
             return {
-                [sqlPrefix + id + "_LAT"]: value.lat,
-                [sqlPrefix + id + "_LNG"]: value.lng,
+                [sqlPrefix + id + "_ID"]: value.id,
             };
         }
-        return knex.raw("?? = ? AND ?? = ? AS ??", [
-            sqlPrefix + id + "_LAT",
-            value.lat,
-            sqlPrefix + id + "_LNG",
-            value.lng,
+        return knex.raw("?? = ? AS ??", [
+            sqlPrefix + id + "_ID",
+            value.id,
             columnName,
         ]);
     },
     sqlLocalEqual: (value, sqlPrefix, id, data) => {
         if (value === null) {
-            return data[sqlPrefix + id + "_LAT"] === value;
+            return data[sqlPrefix + id + "_ID"] === value;
         }
-        return data[sqlPrefix + id + "_LAT"] === value.lat &&
-            data[sqlPrefix + id + "_LNG"] === value.lng;
+        return data[sqlPrefix + id + "ID"] === value.id;
+    },
+    localEqual: (a, b) => {
+        if (a === b) {
+            return true;
+        }
+        return a.id === b.id;
     },
     // locations just contain this basic data
     validate: (l) => {
         if (typeof l.lat !== "number" ||
             typeof l.lng !== "number" ||
             typeof l.txt !== "string" ||
+            typeof l.id !== "string" ||
             (typeof l.atxt !== "string" && l.atxt !== null)) {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
         }

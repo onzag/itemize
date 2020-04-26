@@ -47,28 +47,3 @@ async function serverSideIndexChecker(knex, property, value, id, version) {
     return !result.length;
 }
 exports.serverSideIndexChecker = serverSideIndexChecker;
-/**
- * Checks for an autocomplete value as it coming from the given autocomplete
- * @param autocompletes the list of autocompletes from memory
- * @param property the property in question
- * @param value the value to check
- * @param id the slot id, if any
- * @param version the slot version, if any
- * @returns a boolean on whether the autocomplete is valid or not
- */
-function serverSideAutocompleteChecker(autocompletes, property, value, id, version) {
-    // if the value is null it's valid
-    if (value === null) {
-        return true;
-    }
-    // otherwise let's ask the given autocomplete
-    const filters = property.getAutocompletePopulatedFiltersFor(id, version);
-    const autocomplete = autocompletes.find((a) => a.getName() === property.getAutocompleteId());
-    // if there's no autocomplete, it's invalid
-    if (!autocomplete) {
-        return false;
-    }
-    // return whether we found that exact value
-    return !!autocomplete.findExactValueFor(value.toString(), filters);
-}
-exports.serverSideAutocompleteChecker = serverSideAutocompleteChecker;

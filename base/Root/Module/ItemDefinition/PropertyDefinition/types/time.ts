@@ -14,7 +14,7 @@ import {
   getStandardSQLFnFor,
 } from "../sql";
 import {
-  standardSQLLocalEqualFn,
+  standardSQLLocalEqualFn, standardLocalEqual,
 } from "../local-sql";
 import { PropertyDefinitionSupportedDateType } from "./date";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
@@ -51,6 +51,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlLocalEqual: standardSQLLocalEqualFn,
 
   localSearch: dateLocalSearchExactAndRange.bind(null, TIME_FORMAT),
+  localEqual: standardLocalEqual,
 
   validate: (d: PropertyDefinitionSupportedDateType) => {
     if (d === "Invalid Date") {

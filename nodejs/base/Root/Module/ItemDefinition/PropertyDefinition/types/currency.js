@@ -135,6 +135,12 @@ const typeValue = {
         return data[sqlPrefix + id + "_VALUE"] === value.value &&
             data[sqlPrefix + id + "_CURRENCY"] === value.currency;
     },
+    localEqual: (a, b) => {
+        if (a === b) {
+            return true;
+        }
+        return a.value === b.value && a.currency === b.currency;
+    },
     validate: (l) => {
         if (typeof l.value !== "number" ||
             typeof l.currency !== "string") {

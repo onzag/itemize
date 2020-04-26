@@ -18,7 +18,6 @@ import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import { IPropertyEntryFieldRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryField";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
-import { IAutocompleteOutputType } from "../../../../base/Autocomplete";
 import IconVisibilityOff from "@material-ui/icons/VisibilityOff";
 import IconVisibility from "@material-ui/icons/Visibility";
 import { Alert } from "@material-ui/lab";
@@ -119,63 +118,63 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     backgroundColor: "white",
     borderBottom: "solid 1px #eee",
   },
-  autocompleteContainer: {
+  autosuggestContainer: {
     position: "relative",
     display: "block",
     width: "100%",
   },
-  autocompleteContainerOpen: {
+  autosuggestContainerOpen: {
 
   },
-  autocompleteInput: {
+  autosuggestInput: {
 
   },
-  autocompleteInputOpen: {
+  autosuggestInputOpen: {
 
   },
-  autocompleteSuggestionsContainer: {
+  autosuggestSuggestionsContainer: {
     position: "absolute" as "absolute",
     display: "block",
     width: "100%",
     top: `calc(100% - ${theme.errorMessageContainerSize})`,
     zIndex: 1000,
   },
-  autocompleteSuggestionsContainerOpen: {
+  autosuggestSuggestionsContainerOpen: {
 
   },
-  autocompleteSuggestionsList: {
+  autosuggestSuggestionsList: {
 
   },
-  autocompleteSuggestion: {
+  autosuggestSuggestion: {
 
   },
-  autocompleteFirstSuggestion: {
+  autosuggestFirstSuggestion: {
 
   },
-  autocompleteSuggestionHighlighted: {
+  autosuggestSuggestionHighlighted: {
 
   },
-  autocompleteSectionContainer: {
+  autosuggestSectionContainer: {
 
   },
-  autocompleteFirstSectionContainer: {
+  autosuggestFirstSectionContainer: {
 
   },
-  autocompleteSectionTitle: {
+  autosuggestSectionTitle: {
 
   },
-  autocompleteMenuItem: {
+  autosuggestMenuItem: {
     height: "auto",
     paddingTop: 4,
     paddingBottom: 8,
   },
-  autocompleteMenuItemMainText: {
-    fontSize: theme.autocompleteMenuItemFontSize,
-    lineHeight: theme.autocompleteMenuItemFontSize,
+  autosuggestMenuItemMainText: {
+    fontSize: theme.autosuggestMenuItemFontSize,
+    lineHeight: theme.autosuggestMenuItemFontSize,
   },
-  autocompleteMenuItemSubText: {
-    fontSize: theme.autocompleteMenuItemSubFontSize,
-    lineHeight: theme.autocompleteMenuItemSubFontSize,
+  autosuggestMenuItemSubText: {
+    fontSize: theme.autosuggestMenuItemSubFontSize,
+    lineHeight: theme.autosuggestMenuItemSubFontSize,
   },
   locationAlternativeTextHeader: {
     height: theme.locationAlternativeTextHeaderHeight,
@@ -380,11 +379,11 @@ class ActualPropertyEntryFieldRenderer
     this.onChangeByHTMLEvent = this.onChangeByHTMLEvent.bind(this);
     this.onChange = this.onChange.bind(this);
     this.renderBasicTextField = this.renderBasicTextField.bind(this);
-    this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
-    this.renderAutosuggestField = this.renderAutosuggestField.bind(this);
-    this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
-    this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
-    this.getSuggestionValue = this.getSuggestionValue.bind(this);
+    // this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
+    // this.renderAutosuggestField = this.renderAutosuggestField.bind(this);
+    // this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
+    // this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
+    // this.getSuggestionValue = this.getSuggestionValue.bind(this);
   }
 
   public componentDidMount() {
@@ -436,9 +435,9 @@ class ActualPropertyEntryFieldRenderer
   }
 
   public render() {
-    if (this.props.autocompleteMode) {
-      return this.renderAutosuggestField();
-    }
+    // if (this.props.autocompleteMode) {
+    //   return this.renderAutosuggestField();
+    // }
 
     return this.renderBasicTextField();
   }
@@ -463,10 +462,6 @@ class ActualPropertyEntryFieldRenderer
     if (autosuggestOverride) {
       value = autosuggestOverride.newValue;
       internalValue = value;
-      if (this.props.autocompleteIsLocalized) {
-        const suggestionFound = this.props.autocompleteSuggestions.find((s) => s.i18n === internalValue);
-        value = suggestionFound ? suggestionFound.value : value;
-      }
     } else {
       value = e.target.value.toString();
       internalValue = value;
@@ -608,109 +603,109 @@ class ActualPropertyEntryFieldRenderer
     );
   }
 
-  public renderAutosuggestContainer(
-    options: Autosuggest.RenderSuggestionsContainerParams,
-  ) {
-    // returns the autosuggest container that contains the stuff
-    // handled by react autossugest
-    return (
-      <Paper
-        {...options.containerProps}
-        square={true}
-      >
-        {options.children}
-      </Paper>
-    );
-  }
+  // public renderAutosuggestContainer(
+  //   options: Autosuggest.RenderSuggestionsContainerParams,
+  // ) {
+  //   // returns the autosuggest container that contains the stuff
+  //   // handled by react autossugest
+  //   return (
+  //     <Paper
+  //       {...options.containerProps}
+  //       square={true}
+  //     >
+  //       {options.children}
+  //     </Paper>
+  //   );
+  // }
 
-  public renderAutosuggestSuggestion(
-    suggestion: IAutocompleteOutputType,
-    params: Autosuggest.RenderSuggestionParams,
-  ) {
-    // returns a specific suggestion
+  // public renderAutosuggestSuggestion(
+  //   suggestion: IAutocompleteOutputType,
+  //   params: Autosuggest.RenderSuggestionParams,
+  // ) {
+  //   // returns a specific suggestion
 
-    // we match the value according to whether is localized or not
-    // because we support numbers and stuff we need to know what value
-    // we are matching against, a localized or non localized one
-    const valueToMatch: string = this.props.autocompleteIsLocalized ?
-      suggestion.i18n :
-      suggestion.value;
-    const matches = match(valueToMatch, params.query);
-    const parts = parse(valueToMatch, matches);
+  //   // we match the value according to whether is localized or not
+  //   // because we support numbers and stuff we need to know what value
+  //   // we are matching against, a localized or non localized one
+  //   const valueToMatch: string = this.props.autocompleteIsLocalized ?
+  //     suggestion.i18n :
+  //     suggestion.value;
+  //   const matches = match(valueToMatch, params.query);
+  //   const parts = parse(valueToMatch, matches);
 
-    return (
-      <MenuItem
-        className={this.props.classes.autocompleteMenuItem}
-        selected={params.isHighlighted}
-        component="div"
-      >
-        <div className={this.props.classes.autocompleteMenuItemMainText}>
-          {
-            parts.map((part, index) =>
-              part.highlight ? (
-                <span key={index} style={{ fontWeight: 500 }}>
-                  {part.text}
-                </span>
-              ) : (
-                <strong key={index} style={{ fontWeight: 300 }}>
-                  {part.text}
-                </strong>
-              ),
-            )
-          }
-        </div>
-      </MenuItem>
-    );
-  }
+  //   return (
+  //     <MenuItem
+  //       className={this.props.classes.autocompleteMenuItem}
+  //       selected={params.isHighlighted}
+  //       component="div"
+  //     >
+  //       <div className={this.props.classes.autocompleteMenuItemMainText}>
+  //         {
+  //           parts.map((part, index) =>
+  //             part.highlight ? (
+  //               <span key={index} style={{ fontWeight: 500 }}>
+  //                 {part.text}
+  //               </span>
+  //             ) : (
+  //               <strong key={index} style={{ fontWeight: 300 }}>
+  //                 {part.text}
+  //               </strong>
+  //             ),
+  //           )
+  //         }
+  //       </div>
+  //     </MenuItem>
+  //   );
+  // }
 
-  public getSuggestionValue(
-    suggestion: IAutocompleteOutputType,
-  ) {
-    // just return the suggestion value as it will want to
-    // be set in the input, we localize it if deemed necessary
-    return this.props.autocompleteIsLocalized ?
-      suggestion.i18n :
-      suggestion.value;
-  }
+  // public getSuggestionValue(
+  //   suggestion: IAutocompleteOutputType,
+  // ) {
+  //   // just return the suggestion value as it will want to
+  //   // be set in the input, we localize it if deemed necessary
+  //   return this.props.autocompleteIsLocalized ?
+  //     suggestion.i18n :
+  //     suggestion.value;
+  // }
 
-  public onSuggestionsFetchRequested({ value }) {
-    this.props.onRequestToFetchSuggestions(value);
-  }
+  // public onSuggestionsFetchRequested({ value }) {
+  //   this.props.onRequestToFetchSuggestions(value);
+  // }
 
-  public renderAutosuggestField() {
-    return (
-      <Autosuggest
-        renderInputComponent={this.renderBasicTextField}
-        renderSuggestionsContainer={this.renderAutosuggestContainer}
-        renderSuggestion={this.renderAutosuggestSuggestion}
-        getSuggestionValue={this.getSuggestionValue}
-        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-        onSuggestionsClearRequested={this.props.onRequestToClearSuggestions}
-        suggestions={this.props.autocompleteSuggestions}
-        theme={{
-          container: this.props.classes.autocompleteContainer,
-          containerOpen: this.props.classes.autocompleteContainerOpen,
-          input: this.props.classes.autocompleteInput,
-          inputOpen: this.props.classes.autocompleteInputOpen,
-          inputFocused: "focused",
-          suggestionsContainer: this.props.classes.autocompleteSuggestionsContainer,
-          suggestionsContainerOpen: this.props.classes.autocompleteSuggestionsContainerOpen,
-          suggestionsList: this.props.classes.autocompleteSuggestionsList,
-          suggestion: this.props.classes.autocompleteSuggestion,
-          suggestionFirst: this.props.classes.autocompleteFirstSuggestion,
-          suggestionHighlighted: this.props.classes.autocompleteSuggestionHighlighted,
-          sectionContainer: this.props.classes.autocompleteSectionContainer,
-          sectionContainerFirst: this.props.classes.autocompleteFirstSectionContainer,
-          sectionTitle: this.props.classes.autocompleteSectionTitle,
-        }}
-        inputProps={{
-          value: this.props.currentInternalValue || this.props.currentValue || "",
-          onChange: this.onChange,
-          disabled: this.props.disabled,
-        }}
-      />
-    );
-  }
+  // public renderAutosuggestField() {
+  //   return (
+  //     <Autosuggest
+  //       renderInputComponent={this.renderBasicTextField}
+  //       renderSuggestionsContainer={this.renderAutosuggestContainer}
+  //       renderSuggestion={this.renderAutosuggestSuggestion}
+  //       getSuggestionValue={this.getSuggestionValue}
+  //       onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+  //       onSuggestionsClearRequested={this.props.onRequestToClearSuggestions}
+  //       suggestions={this.props.autocompleteSuggestions}
+  //       theme={{
+  //         container: this.props.classes.autocompleteContainer,
+  //         containerOpen: this.props.classes.autocompleteContainerOpen,
+  //         input: this.props.classes.autocompleteInput,
+  //         inputOpen: this.props.classes.autocompleteInputOpen,
+  //         inputFocused: "focused",
+  //         suggestionsContainer: this.props.classes.autocompleteSuggestionsContainer,
+  //         suggestionsContainerOpen: this.props.classes.autocompleteSuggestionsContainerOpen,
+  //         suggestionsList: this.props.classes.autocompleteSuggestionsList,
+  //         suggestion: this.props.classes.autocompleteSuggestion,
+  //         suggestionFirst: this.props.classes.autocompleteFirstSuggestion,
+  //         suggestionHighlighted: this.props.classes.autocompleteSuggestionHighlighted,
+  //         sectionContainer: this.props.classes.autocompleteSectionContainer,
+  //         sectionContainerFirst: this.props.classes.autocompleteFirstSectionContainer,
+  //         sectionTitle: this.props.classes.autocompleteSectionTitle,
+  //       }}
+  //       inputProps={{
+  //         value: this.props.currentInternalValue || this.props.currentValue || "",
+  //         onChange: this.onChange,
+  //         disabled: this.props.disabled,
+  //       }}
+  //     />
+  //   );
+  // }
 }
 
 const ActualPropertyEntryFieldRendererWithStyles = withStyles(style)(ActualPropertyEntryFieldRenderer);

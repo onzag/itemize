@@ -13,7 +13,6 @@ const ajv_1 = __importDefault(require("ajv"));
 const schema_1 = __importDefault(require("../base/Root/schema"));
 const schema_2 = __importDefault(require("../base/Root/Module/ItemDefinition/schema"));
 const schema_3 = __importDefault(require("../base/Root/Module/schema"));
-const schema_4 = __importDefault(require("../base/Autocomplete/schema"));
 const Error_1 = __importDefault(require("./Error"));
 require("source-map-support/register");
 const config_1 = require("../config");
@@ -35,10 +34,6 @@ exports.checkPropertyDefinitionArraySchemaValidate = ajv.compile({
         $ref: "ItemDefinition#/definitions/PropertyDefinition",
     },
 });
-/**
- * Checks an autocomplete
- */
-exports.checkAutocompleteSchemaValidate = ajv.compile(schema_4.default);
 /**
  * Checks a module
  */

@@ -222,6 +222,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
     return data[sqlPrefix + id + "_NORMALIZED_VALUE"] === value.normalizedValue &&
       data[sqlPrefix + id + "_NORMALIZED_UNIT"] === value.normalizedUnit;
   },
+  localEqual: (
+    a: IPropertyDefinitionSupportedUnitType,
+    b: IPropertyDefinitionSupportedUnitType,
+  ) => {
+    return a.value === b.value && a.unit === b.unit;
+  },
   supportedSubtypes: UNIT_SUBTYPES,
   validate: (l: IPropertyDefinitionSupportedUnitType) => {
     if (typeof l.value !== "number" ||

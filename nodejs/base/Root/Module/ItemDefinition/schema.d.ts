@@ -299,25 +299,6 @@ declare const _default: {
                 nullable: {
                     type: string;
                 };
-                autocomplete: {
-                    type: string;
-                };
-                autocompleteFilterFromProperty: {
-                    type: string;
-                    additionalProperties: {
-                        type: string;
-                    };
-                    minItems: number;
-                };
-                autocompleteIsEnforced: {
-                    type: string;
-                };
-                autocompleteSupportsPrefills: {
-                    type: string;
-                };
-                autocompleteSupportsLocale: {
-                    type: string;
-                };
                 htmlAutocomplete: {
                     type: string;
                 };
@@ -330,6 +311,9 @@ declare const _default: {
                             if: {
                                 $ref: string;
                             };
+                            /**
+                             * The policy schema, used for parenting
+                             */
                             value: {};
                         };
                         additionalProperties: boolean;
@@ -511,12 +495,6 @@ declare const _default: {
                         additionalProperties: boolean;
                     })[];
                 };
-            };
-            dependencies: {
-                autocompleteFilterFromProperty: string[];
-                autocompleteIsEnforced: string[];
-                autocompleteSupportsPrefills: string[];
-                autocompleteSupportsLocale: string[];
             };
             required: string[];
         };

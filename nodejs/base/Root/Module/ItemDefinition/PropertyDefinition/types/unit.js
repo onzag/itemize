@@ -156,6 +156,9 @@ const typeValue = {
         return data[sqlPrefix + id + "_NORMALIZED_VALUE"] === value.normalizedValue &&
             data[sqlPrefix + id + "_NORMALIZED_UNIT"] === value.normalizedUnit;
     },
+    localEqual: (a, b) => {
+        return a.value === b.value && a.unit === b.unit;
+    },
     supportedSubtypes: constants_1.UNIT_SUBTYPES,
     validate: (l) => {
         if (typeof l.value !== "number" ||

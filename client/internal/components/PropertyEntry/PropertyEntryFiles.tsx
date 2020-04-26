@@ -1,5 +1,5 @@
 import React from "react";
-import { IPropertyEntryProps } from ".";
+import { IPropertyEntryHandlerProps } from ".";
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import { Paper, RootRef, Icon, FormLabel, IconButton, Button } from "@material-ui/core";
 import { mimeTypeToExtension, localeReplacer } from "../../../util";

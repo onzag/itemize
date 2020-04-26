@@ -7,6 +7,7 @@ import { getStandardSQLFnFor, stardardSQLInWithJSONStringifyFn, standardSQLOutWi
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { MAX_FILE_BATCH_COUNT, CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
 import { IGQLFile } from "../../../../../../gql-querier";
+import { standardLocalEqual } from "../local-sql";
 
 // tslint:disable-next-line: no-empty-interface
 export interface IPropertyDefinitionSupportedSingleFilesType extends IGQLFile {
@@ -69,6 +70,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlLocalEqual: () => {
     throw new Error("Attempted to local equal within files");
   },
+  localEqual: standardLocalEqual,
 
   allowsMinMaxLengthDefined: true,
   validate: (l: PropertyDefinitionSupportedFilesType) => {

@@ -133,17 +133,16 @@ export interface IPropertyDefinitionSupportedType {
      */
     sqlLocalEqual: (value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, data: ISQLTableRowValue) => boolean;
     /**
+     * Simply compare two values of the same type, this
+     * is used for differing properties so it might differ
+     * from the sql behaviour
+     */
+    localEqual: (a: PropertyDefinitionSupportedType, b: PropertyDefinitionSupportedType) => boolean;
+    /**
      * represents an item that would mark for null
      * by default it is null itself
      */
     nullableDefault?: any;
-    /**
-     * Items that have this field support fetch for autocomplete
-     * fields using rest endpoints, this includes support for
-     * autocomplete, autocompleteFilterFromProperty, autocompleteIsEnforced
-     * and autocompleteSupportsPreffils
-     */
-    supportsAutocomplete?: boolean;
     /**
      * this is a validation function that checks whether the value
      * is valid,

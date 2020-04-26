@@ -44,6 +44,9 @@ const typeValue = {
     localSearch: () => {
         throw new Error("Attempted to local search by password");
     },
+    localEqual: () => {
+        throw new Error("Attempted to local equal a password");
+    },
     sqlEqual: (value, sqlPrefix, id, isCaseInsensitive, knex, columnName) => {
         if (!columnName) {
             return knex.raw("?? = crypt(?, ??)", [

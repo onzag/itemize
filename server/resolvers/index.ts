@@ -24,6 +24,5 @@ export default function resolvers(appData: IAppDataType): IGraphQLResolversType 
     // addModerationMessage
     // blockItem
     // banItem
-    // autocomplete
   };
 }

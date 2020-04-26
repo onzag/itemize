@@ -1,5 +1,5 @@
 import React from "react";
-import { IPropertyEntryProps, IPropertyEntryRendererProps } from ".";
+import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import equals from "deep-equal";
 import { MAX_FILE_SIZE, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
 import uuid from "uuid";
@@ -43,12 +43,12 @@ function checkFileInAccepts(fileType: string, accept: string) {
 
 export default class PropertyEntryFile
   extends React.Component<
-  IPropertyEntryProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>,
+  IPropertyEntryHandlerProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>,
   IPropertyEntryFileState
   > {
   private ownedObjectURLPool: {[key: string]: string};
 
-  constructor(props: IPropertyEntryProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>) {
+  constructor(props: IPropertyEntryHandlerProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>) {
     super(props);
 
     // the pool is set
@@ -66,7 +66,7 @@ export default class PropertyEntryFile
     this.openFile = this.openFile.bind(this);
   }
   public shouldComponentUpdate(
-    nextProps: IPropertyEntryProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>,
+    nextProps: IPropertyEntryHandlerProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>,
     nextState: IPropertyEntryFileState,
   ) {
     // This is optimized to only update for the thing it uses

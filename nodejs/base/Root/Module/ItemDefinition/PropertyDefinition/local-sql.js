@@ -8,7 +8,11 @@
  *
  * @packageDocumentation
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const deep_equal_1 = __importDefault(require("deep-equal"));
 /**
  * This function represents the standard way an equality check
  * is performed locally in the cache when equality between properties is requests
@@ -24,3 +28,7 @@ function standardSQLLocalEqualFn(value, sqlPrefix, id, data) {
     return data[sqlPrefix + id] === value;
 }
 exports.standardSQLLocalEqualFn = standardSQLLocalEqualFn;
+function standardLocalEqual(a, b) {
+    return deep_equal_1.default(a, b);
+}
+exports.standardLocalEqual = standardLocalEqual;

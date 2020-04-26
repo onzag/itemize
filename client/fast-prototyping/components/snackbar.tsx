@@ -8,20 +8,20 @@ import uuid from "uuid";
 
 const snackbarStyles = (theme: Theme) => createStyles({
   success: {
-    backgroundColor: theme.palette.success.main,
-    color: theme.palette.success.contrastText,
+    backgroundColor: theme.palette.success.light,
+    color: theme.palette.success.dark,
   },
   info: {
-    backgroundColor: theme.palette.info.main,
-    color: theme.palette.info.contrastText,
+    backgroundColor: theme.palette.info.light,
+    color: theme.palette.info.dark,
   },
   error: {
-    backgroundColor: theme.palette.error.main,
-    color: theme.palette.error.contrastText,
+    backgroundColor: theme.palette.error.light,
+    color: theme.palette.error.dark,
   },
   warning: {
-    backgroundColor: theme.palette.warning.main,
-    color: theme.palette.warning.contrastText,
+    backgroundColor: theme.palette.warning.light,
+    color: theme.palette.warning.dark,
   },
 });
 

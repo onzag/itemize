@@ -17,12 +17,6 @@ declare const _default: {
             };
             minItems: number;
         };
-        autocomplete: {
-            type: string;
-            items: {
-                type: string;
-            };
-        };
         i18n: {
             type: string;
         };
