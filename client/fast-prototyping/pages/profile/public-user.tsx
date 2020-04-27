@@ -2,7 +2,7 @@ import React from "react";
 import { I18nRead, I18nReadMany } from "../../../components/localization";
 import { Container, createStyles, WithStyles, withStyles, Typography, Paper, Theme, Tooltip } from "@material-ui/core";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
-import { Reader, View } from "../../../components/property";
+import { Reader, View, Entry } from "../../../components/property";
 import { Avatar } from "../../components/avatar";
 import { countries } from "../../../../imported-resources";
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
@@ -76,16 +76,26 @@ export const PublicUserProfile = withStyles(publicUserProfileStyles)((props: Wit
               return <Typography variant="h5" className={props.classes.country}>{countryobj.emoji} {countryobj.native}</Typography>
             }}
           </Reader>
-          <Reader id="role">
-            {(role: string) => {
-              if (role !== "USER") {
-                return <Typography variant="h5" className={props.classes.role}>
-                  <View id="role" capitalize={true}/>
-                </Typography>
+          <UserDataRetriever>
+            {(userData) => {
+              if (userData.role === "ADMIN") {
+                return <Entry id="role"/>
               }
-              return null;
+
+              return (
+                <Reader id="role">
+                  {(role: string) => {
+                    if (role !== "USER") {
+                      return <Typography variant="h5" className={props.classes.role}>
+                        <View id="role" capitalize={true}/>
+                      </Typography>
+                    }
+                    return null;
+                  }}
+                </Reader>
+              )
             }}
-          </Reader>
+          </UserDataRetriever>
         </Paper>
       </Container>
     </React.Fragment>

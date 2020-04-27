@@ -3,6 +3,8 @@ import PropertyEntryFieldRenderer from "./PropertyEntry/PropertyEntryField";
 import PropertyEntryFileRenderer from "./PropertyEntry/PropertyEntryFile";
 import PropertyEntryBooleanRenderer from "./PropertyEntry/PropertyEntryBoolean";
 import PropertyEntryLocationRenderer from "./PropertyEntry/PropertyEntryLocation";
+import PropertyEntrySelectRenderer from "./PropertyEntry/PropertyEntrySelect";
+
 import PropertyViewSimpleRenderer from "./PropertyView/PropertyViewSimple";
 
 const rendererContext: IRendererContext = {
@@ -10,6 +12,7 @@ const rendererContext: IRendererContext = {
   PropertyEntryFile: PropertyEntryFileRenderer,
   PropertyEntryBoolean: PropertyEntryBooleanRenderer,
   PropertyEntryLocation: PropertyEntryLocationRenderer, 
+  PropertyEntrySelect: PropertyEntrySelectRenderer,
 
   PropertyViewSimple: PropertyViewSimpleRenderer,
 }

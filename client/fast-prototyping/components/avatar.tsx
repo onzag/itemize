@@ -140,7 +140,14 @@ const avatarStyles = createStyles({
     border: "solid 2px #263238",
   },
   specialUser: {
-    // border: "solid 4px #f44336",
+    border: "solid 2px #ffeb3b",
+    boxShadow: "0px 0px 0px 2px #ffeb3b",
+  },
+  specialUserMedium: {
+    boxShadow: "0px 0px 0px 4px #ffeb3b"
+  },
+  specialUserLarge: {
+    boxShadow: "0px 0px 0px 10px #ffeb3b"
   },
 });
 
@@ -199,7 +206,8 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
         alt={userNameValue}
         classes={{ root: `${props.classes.avatar} ${numberColorClassName} ` +
           `${props.size === "large" ? props.classes.avatarLarge : ""} ${props.size === "medium" ? props.classes.avatarMedium : ""} ` +
-          `${isSpecialUser ? props.classes.specialUser : ""}` }}
+          `${isSpecialUser ? props.classes.specialUser : ""} ${isSpecialUser && props.size === "large" ? props.classes.specialUserLarge : ""} ` +
+          `${isSpecialUser && props.size === "medium" ? props.classes.specialUserMedium : ""}` }}
         src={imageSrc}
       >
         {userNameValue ? userNameValue[0] : ""}
@@ -298,6 +306,7 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
                 {(id: number) => {
                   const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : "";
                   const specialUserClassName = role !== "USER" ? props.classes.specialUser : "";
+                  const specialUserSizeClassName = specialUserClassName && props.classes.specialUserLarge;
 
                   return (
                     <Dropzone
@@ -327,7 +336,7 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
                                     <MAvatar
                                       classes={{ root: `${props.classes.avatar} ${numberColorClassName} ` +
                                         `${props.classes.avatarLarge} ` +
-                                        `${specialUserClassName}` }}
+                                        `${specialUserClassName} ${specialUserSizeClassName}` }}
                                       src={largeImageURL}
                                     >
                                       {username ? username[0] : ""}

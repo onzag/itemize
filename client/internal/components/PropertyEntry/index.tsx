@@ -21,6 +21,7 @@ import { RendererContext } from "../../../providers/renderer";
 import { IRendererProps } from "../../renderer";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import Include from "../../../../base/Root/Module/ItemDefinition/Include";
+import PropertyEntrySelect from "./PropertyEntrySelect";
 
 /**
  * This is what every renderer gets regardless of type as long as it's an entry
@@ -90,6 +91,11 @@ interface IRendererHandlerType {
   handler: React.ComponentType<IPropertyEntryHandlerProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>>,
 };
 
+const selectHandler: IRendererHandlerType = {
+  renderer: "PropertyEntrySelect",
+  handler: PropertyEntrySelect,
+}
+
 /**
  * The type registry contains a list of handlers for a given type
  */
@@ -140,7 +146,7 @@ export default function PropertyEntry(
   // First get the handler by the type
   const registryEntry = props.property.hasSpecificValidValues() ?
     // TODO PropertyEntrySelect :
-    null :
+    selectHandler :
     handlerRegistry[props.property.getType()];
 
   const Element = registryEntry.handler;

@@ -129,7 +129,7 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
                           size="small"
                           fullWidth={true}
                           className={props.classes.containerBoxButton}
-                          endIcon={<ErrorIcon className={props.classes.errorIconButton}/>}
+                          endIcon={hasWarning ? <ErrorIcon className={props.classes.errorIconButton}/> : null}
                         >
                           {i18nPreferences}
                         </Button>
