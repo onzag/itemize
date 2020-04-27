@@ -7,6 +7,7 @@ import { Avatar } from "../../components/avatar";
 import { countries } from "../../../../imported-resources";
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 import { UserDataRetriever } from "../../../components/user";
+import { AdminToolbox } from "./admin-toolbox";
 
 const publicUserProfileStyles = (theme: Theme) => createStyles({
   container: {
@@ -76,24 +77,23 @@ export const PublicUserProfile = withStyles(publicUserProfileStyles)((props: Wit
               return <Typography variant="h5" className={props.classes.country}>{countryobj.emoji} {countryobj.native}</Typography>
             }}
           </Reader>
+          <Reader id="role">
+            {(role: string) => {
+              if (role !== "USER") {
+                return <Typography variant="h5" className={props.classes.role}>
+                  <View id="role" capitalize={true} />
+                </Typography>
+              }
+              return null;
+            }}
+          </Reader>
           <UserDataRetriever>
             {(userData) => {
               if (userData.role === "ADMIN") {
-                return <Entry id="role"/>
+                return <AdminToolbox/>
               }
 
-              return (
-                <Reader id="role">
-                  {(role: string) => {
-                    if (role !== "USER") {
-                      return <Typography variant="h5" className={props.classes.role}>
-                        <View id="role" capitalize={true}/>
-                      </Typography>
-                    }
-                    return null;
-                  }}
-                </Reader>
-              )
+              return null;
             }}
           </UserDataRetriever>
         </Paper>

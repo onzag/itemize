@@ -65,7 +65,7 @@ export default class PropertyEntrySelect
       value: v,
     }));
     const currentValue = this.props.state.value as string;
-    const isNullable = this.props.property.isNullable();
+    const isNullable = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNull();
     const nullValue = isNullable ? {
       value: null,
       i18nValue: i18nData.null_value,

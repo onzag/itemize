@@ -35,8 +35,12 @@ export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProp
     const rendererArgs: IPropertyViewSimpleRendererProps = {
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
-      currentValue: (i18nData && i18nData.values[this.props.state.value.toString()]) ||
-        nullValueLabel || this.props.state.value.toString(),
+      currentValue: this.props.state.value === null ?
+        nullValueLabel :
+        (
+          (i18nData && i18nData.values[this.props.state.value.toString()]) ||
+          this.props.state.value.toString()
+        ),
       capitalize: !!this.props.capitalize,
     };
 
