@@ -29,8 +29,6 @@ export function getMode(appData: IAppDataType, req: express.Request) {
     const devmode = getCookie(splittedCookies, "devmode");
     const devkey = getCookie(splittedCookies, "devkey");
 
-    console.log(devmode, devkey, appData.sensitiveConfig.devKey);
-
     if (
       (
         devmode === "production" ||
@@ -41,14 +39,11 @@ export function getMode(appData: IAppDataType, req: express.Request) {
         devmode === "production"
       )
     ) {
-      console.log(devmode);
       return devmode;
     } else {
-      console.log("default");
       return defaultMode;
     }
   } else {
-    console.log("no cookie");
     return defaultMode;
   }
 }

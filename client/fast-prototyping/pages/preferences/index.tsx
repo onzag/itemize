@@ -66,7 +66,8 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
                     <Paper className={props.classes.paper}>
                       <Entry id="e_notifications" icon={<NotificationsIcon/>}/>
                       <Entry id="e_newsletter" icon={<MenuBookIcon/>}/>
-                      <Entry id="address" icon={<PersonPinIcon/>}/>
+
+                      <Entry id="address" icon={<PersonPinIcon/>} rendererArgs={{descriptionAsAlert: true}}/>
 
                       <Divider />
       

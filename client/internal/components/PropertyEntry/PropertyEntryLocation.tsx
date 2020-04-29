@@ -1,5 +1,5 @@
 import React from "react";
-import { IPropertyEntryProps, IPropertyEntryRendererProps } from ".";
+import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import equals from "deep-equal";
 import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { capitalize, localeReplacer } from "../../../../util";
@@ -64,7 +64,7 @@ interface IPropertyEntryLocationState {
 
 export default class PropertyEntryLocation
   extends React.Component<
-    IPropertyEntryProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>,
+    IPropertyEntryHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>,
     IPropertyEntryLocationState
   > {
 
@@ -85,7 +85,7 @@ export default class PropertyEntryLocation
 
   private preventViewportDidUpdateChange: boolean = false;
 
-  constructor(props: IPropertyEntryProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>) {
+  constructor(props: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>) {
     super(props);
 
     const value: IPropertyDefinitionSupportedLocationType = this.props.state.value as IPropertyDefinitionSupportedLocationType;
@@ -117,7 +117,7 @@ export default class PropertyEntryLocation
   }
 
   public shouldComponentUpdate(
-    nextProps: IPropertyEntryProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>,
+    nextProps: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>,
     nextState: IPropertyEntryLocationState,
   ) {
     // This is optimized to only update for the thing it uses
@@ -137,7 +137,7 @@ export default class PropertyEntryLocation
       !equals(this.props.rendererArgs, nextProps.rendererArgs);
   }
 
-  public componentDidUpdate(prevProps: IPropertyEntryProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>) {
+  public componentDidUpdate(prevProps: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>) {
     if (!this.preventViewportDidUpdateChange) {
       const value: IPropertyDefinitionSupportedLocationType = this.props.state.value as IPropertyDefinitionSupportedLocationType;
       if (value) {

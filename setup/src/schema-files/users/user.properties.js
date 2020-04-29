@@ -120,6 +120,10 @@ properties.profile_picture.label = profile picture
 properties.profile_picture.placeholder = upload a profile picture
 properties.profile_picture.error.TOO_LARGE = only one file allowed
 
+properties.about_me.label = about me
+properties.about_me.placeholder = write something about you
+properties.about_me.error.TOO_LARGE = you have written too much
+
 properties.address.label = address
 properties.address.placeholder = type your address
 properties.address.description = This address is used only for ease of use and it is not shared with anyone. It is used to prefill information for transactions.
@@ -250,6 +254,10 @@ properties.role.error.NOT_NULLABLE = falta el Rol
 properties.profile_picture.label = foto de Perfil
 properties.profile_picture.placeholder = subir Imagen
 properties.profile_picture.error.TOO_LARGE = sólo se permite un archivo
+
+properties.about_me.label = descripción personal
+properties.about_me.placeholder = describe quien eres, lo que te apasiona
+properties.about_me.error.TOO_LARGE = su descripción es muy larga
 
 properties.address.label = dirección
 properties.address.placeholder = escriba su Dirección

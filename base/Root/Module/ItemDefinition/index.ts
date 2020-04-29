@@ -1653,6 +1653,7 @@ export default class ItemDefinition {
     onlyCheckProperties?: string[],
     ignoreIncludes?: boolean,
   ): boolean {
+    
     const existInFirstLayer: boolean =
       this.getAllPropertyDefinitionsAndExtensions()
       .filter((pd) => !onlyCheckProperties ? true : onlyCheckProperties.includes(pd.getId()))

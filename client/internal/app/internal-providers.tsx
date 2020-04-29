@@ -3,7 +3,7 @@ import { gqlQuery, buildGqlQuery, IGQLValue } from "../../../gql-querier";
 import { EndpointErrorType } from "../../../base/errors";
 import { ILocaleContextType } from ".";
 import { Location } from "history";
-import { GUEST_METAROLE, ENDPOINT_ERRORS } from "../../../constants";
+import { GUEST_METAROLE, ENDPOINT_ERRORS, MEMCACHED_DESTRUCTION_MARKERS_LOCATION, DESTRUCTION_MARKERS_LOCATION } from "../../../constants";
 import CacheWorkerInstance from "../workers/cache";
 import equals from "deep-equal";
 
@@ -246,13 +246,13 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     // gathering the destruction markers
     const destructionMarkers =
         // if we have memcached them, pick those
-        (window as any).MEMCACHED_DESTRUCTION_MARKERS ||
+        (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION] ||
         // otherwise get them from local storage
-        JSON.parse(localStorage.getItem("DESTRUCTION_MARKERS") || "{}");
+        JSON.parse(localStorage.getItem(DESTRUCTION_MARKERS_LOCATION) || "{}");
     // clean them from the memory cache to match local storage
-    (window as any).MEMCACHED_DESTRUCTION_MARKERS = {};
+    (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION] = {};
     // as we delete from local storage as well
-    localStorage.removeItem("DESTRUCTION_MARKERS");
+    localStorage.removeItem(DESTRUCTION_MARKERS_LOCATION);
 
     // now we loop over the destruction markers
     Object.keys(destructionMarkers).forEach((qualifiedPathName: string) => {

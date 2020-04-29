@@ -3,12 +3,12 @@ import PropertyDefinition, {
 } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
 import PropertyEntryBoolean from "./PropertyEntryBoolean";
-// import PropertyEntryText from "./PropertyEntryText";
+import PropertyEntryText from "./PropertyEntryText";
 // import PropertyEntryDateTime from "./PropertyEntryDateTime";
 import PropertyEntryLocation from "./PropertyEntryLocation";
 // import PropertyEntryFiles from "./PropertyEntryFiles";
 // import PropertyEntryNumeric from "./PropertyEntryNumeric";
-// import PropertyEntrySelect from "./PropertyEntrySelect";
+import PropertyEntrySelect from "./PropertyEntrySelect";
 import PropertyEntryField from "./PropertyEntryField";
 import PropertyEntryFile from "./PropertyEntryFile";
 import { LocaleContext } from "../../app";
@@ -21,7 +21,6 @@ import { RendererContext } from "../../../providers/renderer";
 import { IRendererProps } from "../../renderer";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import Include from "../../../../base/Root/Module/ItemDefinition/Include";
-import PropertyEntrySelect from "./PropertyEntrySelect";
 
 /**
  * This is what every renderer gets regardless of type as long as it's an entry
@@ -114,7 +113,10 @@ const handlerRegistry:
     renderer: "PropertyEntryBoolean",
     handler: PropertyEntryBoolean,
   },
-  text: null,
+  text: {
+    renderer: "PropertyEntryText",
+    handler: PropertyEntryText,
+  },
   currency: null,
   unit: null,
   password: {

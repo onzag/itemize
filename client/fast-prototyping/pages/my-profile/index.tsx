@@ -31,6 +31,7 @@ export function MyProfile() {
             "e_notifications",
             "e_newsletter",
             "address",
+            "about_me",
           ];
           return (
             <ModuleProvider module="users">

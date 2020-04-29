@@ -24,21 +24,17 @@ function getMode(appData, req) {
         const splittedCookies = cookies.split(";");
         const devmode = getCookie(splittedCookies, "devmode");
         const devkey = getCookie(splittedCookies, "devkey");
-        console.log(devmode, devkey, appData.sensitiveConfig.devKey);
         if ((devmode === "production" ||
             devkey === appData.sensitiveConfig.devKey) &&
             (devmode === "development" ||
                 devmode === "production")) {
-            console.log(devmode);
             return devmode;
         }
         else {
-            console.log("default");
             return defaultMode;
         }
     }
     else {
-        console.log("no cookie");
         return defaultMode;
     }
 }

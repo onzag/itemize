@@ -4,7 +4,6 @@ import {
   MenuItem,
   Paper,
   InputAdornment,
-  Icon,
   IconButton,
   ThemeProvider,
   Typography,
@@ -13,7 +12,6 @@ import { createStyles, WithStyles, withStyles } from "@material-ui/styles";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
-import equals from "deep-equal";
 import { Map, TileLayer, Marker } from "react-leaflet";
 import L, { LeafletMouseEvent } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -65,6 +63,10 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
   },
   icon: (props: IPropertyEntryLocationRendererProps) => ({
     color: shouldShowInvalid(props) ? theme.invalidColor : theme.iconColor,
+    marginRight: "0.5rem",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
   }),
   iconButton: {
     "backgroundColor": "#2196f3",
@@ -325,6 +327,9 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
           null
         }
         <div className={this.props.classes.locationAlternativeTextHeader}>
+          {
+            this.props.icon ? <span className={this.props.classes.icon}>{this.props.icon}</span> : null
+          }
           {
             this.props.currentValue && this.props.currentValue.atxt ||
             (

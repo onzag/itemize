@@ -3,7 +3,7 @@ SITE
 . Public profile [+5] [DONE]
 . Location [+3] [DONE]
 . The first user to sign in is admin [+1] [NO, USE DATABASE]
-. Role picker for admins in public profile [+2]
+. Role picker for admins in public profile [+2] [DONE]
 . About me in profile [+5]
 . Implementation of CMS module [+10]
 . Implementation of Forum module [+7]
@@ -30,6 +30,7 @@ RIDINGEXCHANGE [+5]
 EXTRA (LOW PRIORITY)
 . Implementation of flagging
 . Bans and Blocks
+
 
 SEO (LOWEST PRIORITY)
 1. SSR Implementation via constructor and SSR rules, SSR rules will be rules specific to an url

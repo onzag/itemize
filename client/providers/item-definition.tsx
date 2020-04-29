@@ -9,6 +9,8 @@ import {
   PREFIX_GET,
   UNSPECIFIED_OWNER,
   ENDPOINT_ERRORS,
+  MEMCACHED_DESTRUCTION_MARKERS_LOCATION,
+  DESTRUCTION_MARKERS_LOCATION,
 } from "../../constants";
 import {IGQLSearchResult, IGQLValue, IGQLRequestFields } from "../../gql-querier";
 import { requestFieldsAreContained } from "../../gql-util";
@@ -522,22 +524,22 @@ export class ActualItemDefinitionProvider extends
       const forId = this.props.forId;
       const forVersion = this.props.forVersion || null;
 
-      (window as any).MEMCACHED_DESTRUCTION_MARKERS =
-        (window as any).MEMCACHED_DESTRUCTION_MARKERS ||
-        JSON.parse(localStorage.getItem("DESTRUCTION_MARKERS") || "{}");
+      (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION] =
+        (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION] ||
+        JSON.parse(localStorage.getItem(DESTRUCTION_MARKERS_LOCATION) || "{}");
       let changed = false;
-      if (!(window as any).MEMCACHED_DESTRUCTION_MARKERS[qualifiedName]) {
-        (window as any).MEMCACHED_DESTRUCTION_MARKERS[qualifiedName] = [[forId, forVersion]];
+      if (!(window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName]) {
+        (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName] = [[forId, forVersion]];
         changed = true;
       } else {
-        if (!(window as any).MEMCACHED_DESTRUCTION_MARKERS[qualifiedName].find((m) => m[0] === forId && m[1] === forVersion)) {
+        if (!(window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName].find((m) => m[0] === forId && m[1] === forVersion)) {
           changed = true;
-          (window as any).MEMCACHED_DESTRUCTION_MARKERS[qualifiedName].push([forId, forVersion]);
+          (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName].push([forId, forVersion]);
         }
       }
 
       if (changed) {
-        localStorage.setItem("DESTRUCTION_MARKERS", JSON.stringify((window as any).MEMCACHED_DESTRUCTION_MARKERS));
+        localStorage.setItem(DESTRUCTION_MARKERS_LOCATION, JSON.stringify((window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION]));
       }
     }
   }

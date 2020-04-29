@@ -6,6 +6,7 @@ import { IPropertyEntryBooleanRendererProps } from "../internal/components/Prope
 import { IPropertyEntryLocationRendererProps } from "../internal/components/PropertyEntry/PropertyEntryLocation";
 import { IPropertyViewSimpleRendererProps } from "../internal/components/PropertyView/PropertyViewSimple";
 import { IPropertyEntrySelectRendererProps } from "../internal/components/PropertyEntry/PropertyEntrySelect";
+import { IPropertyEntryTextRendererProps } from "../internal/components/PropertyEntry/PropertyEntryText";
 
 export interface IRendererContext {
   IncludeCalloutWarning?: React.ComponentType<IIncludeCalloutWarningRendererProps>;
@@ -15,6 +16,7 @@ export interface IRendererContext {
   PropertyEntryBoolean?: React.ComponentType<IPropertyEntryBooleanRendererProps>;
   PropertyEntryLocation?: React.ComponentType<IPropertyEntryLocationRendererProps>;
   PropertyEntrySelect?: React.ComponentType<IPropertyEntrySelectRendererProps>;
+  PropertyEntryText?: React.ComponentType<IPropertyEntryTextRendererProps>;
 
   PropertyViewSimple?: React.ComponentType<IPropertyViewSimpleRendererProps>;
 }

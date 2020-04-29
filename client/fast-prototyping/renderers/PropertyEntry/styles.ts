@@ -1,3 +1,5 @@
+// TODO move a lot of stuff to this file from the styles once styles are settled
+
 export interface IPropertyEntryThemeType {
   invalidColor: string;
   iconColor: string;
@@ -32,7 +34,7 @@ export const STANDARD_THEME: IPropertyEntryThemeType = {
   labelFocusedColor: "#3f51b5",
   labelInvalidColor: "#f44336",
   labelInvalidFocusedColor: "#f44336",
-  locationAlternativeTextHeaderHeight: "1.5rem",
+  locationAlternativeTextHeaderHeight: "3rem",
   locationAlternativeTextHeaderFontSize: "0.75rem",
   autosuggestMenuItemFontSize: "1rem",
   autosuggestMenuItemSubFontSize: "0.75rem",

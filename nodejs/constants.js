@@ -114,6 +114,18 @@ exports.ITEM_CALLOUT_EXCLUDED_I18N = [
     "callout_excluded_label",
 ];
 /**
+ * Where the destruction markers are located
+ */
+exports.DESTRUCTION_MARKERS_LOCATION = "DESTRUCTION_MARKERS";
+/**
+ * Where destruction markers get memory cached
+ */
+exports.MEMCACHED_DESTRUCTION_MARKERS_LOCATION = "MEMCACHED_" + exports.DESTRUCTION_MARKERS_LOCATION;
+/**
+ * Store a last rich text change size global to use to save memory for lenght calculation
+ */
+exports.LAST_RICH_TEXT_CHANGE_LENGTH = "LAST_RICH_TEXT_CHANGE_LENGTH";
+/**
  * Graphql endpoint errors codes that can be thrown
  */
 exports.ENDPOINT_ERRORS = {

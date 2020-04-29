@@ -20,6 +20,7 @@ import { CurrencyPicker } from "../../../components/currency-picker";
 import { ProgressingElement, SlowLoadingElement } from "../../../components/util";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AlernateEmailIcon from "@material-ui/icons/AlternateEmail";
+import FaceIcon from "@material-ui/icons/Face";
 import { Link } from "../../../../components/navigaton";
 import { ItemDefinitionLoader } from "../../../components/item-definition-loader";
 import ErrorIcon from '@material-ui/icons/Error';
@@ -219,11 +220,12 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
           }}
         </Reader>
         <Entry id="email" rendererArgs={{descriptionAsAlert: true}} icon={<AlernateEmailIcon/>}/>
+        <Entry id="about_me" icon={<FaceIcon/>}/>
         
         <Divider />
         
         <Box className={props.classes.buttonBox}>
-          <DifferingPropertiesRetriever mainProperties={["profile_picture", "username", "email"]}>
+          <DifferingPropertiesRetriever mainProperties={["profile_picture", "username", "email", "about_me"]}>
             {(differingProperties) => {
               const options: IActionSubmitOptions = {
                 properties: differingProperties,

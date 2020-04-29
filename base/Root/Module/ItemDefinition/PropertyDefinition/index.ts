@@ -16,6 +16,7 @@ import {
   MAX_FILE_SIZE,
   GUEST_METAROLE,
   UNSPECIFIED_OWNER,
+  LAST_RICH_TEXT_CHANGE_LENGTH,
 } from "../../../../../constants";
 import Module from "../..";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
@@ -633,14 +634,18 @@ export default class PropertyDefinition {
         // if it's not rich text we just count the characters
         count = value.toString().length;
       } else {
-        // otherwise we need to create a dummy element and count the characters
-        const dummyElement = DOMWindow.document.createElement("template");
-        dummyElement.innerHTML = value.toString();
-        count = dummyElement.textContent.length;
+        if (window && typeof (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] !== "undefined") {
+          count = (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH];
+        } else {
+          // otherwise we need to create a dummy element and count the characters
+          const dummyElement = DOMWindow.document.createElement("div");
+          dummyElement.innerHTML = value.toString();
+          count = dummyElement.textContent.length;
 
-        // Something that happens with quilljs
-        if (dummyElement.querySelector(".ql-cursor")) {
-          count--;
+          // Something that happens with quilljs
+          if (dummyElement.querySelector(".ql-cursor")) {
+            count--;
+          }
         }
       }
 
@@ -658,6 +663,12 @@ export default class PropertyDefinition {
       ) {
         return PropertyInvalidReason.TOO_SMALL;
       }
+    }
+
+    // we delete this if it exists, this global exists to speed up
+    // the ui and it's not truly necessary
+    if (window) {
+      delete (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH];
     }
 
     // return no error
@@ -766,11 +777,19 @@ export default class PropertyDefinition {
    */
   // tslint:disable-next-line: member-ordering
   public stateLastUniqueCheck: {
-    [slotId: number]: {
+    [slotId: string]: {
       value: PropertyDefinitionSupportedType,
       valid: boolean,
     },
   };
+
+  private canCacheState: boolean;
+  public stateLastCached: {
+    [slotId: string]: IPropertyDefinitionState;
+  };
+  public stateLastCachedWithExternal: {
+    [slotId: string]: IPropertyDefinitionState;
+  }
 
   /**
    * Builds a property definition
@@ -815,6 +834,15 @@ export default class PropertyDefinition {
       new ConditionalRuleSet(rawJSON.hiddenIf, parentModule,
         parentItemDefinition, this, null);
 
+    this.canCacheState = true;
+    if (
+      rawJSON.invalidIf &&
+      rawJSON.hiddenIf &&
+      rawJSON.defaultIf
+    ) {
+      this.canCacheState = false;
+    }
+
     // initial value for all namespaces is null
     this.stateValue = {};
     this.stateAppliedValue = {};
@@ -823,6 +851,9 @@ export default class PropertyDefinition {
     this.stateInternalValue = {};
     this.stateLastUniqueCheck = {};
     this.stateSuperEnforcedValue = {};
+
+    this.stateLastCached = {};
+    this.stateLastCachedWithExternal = {};
   }
 
   /**
@@ -1028,15 +1059,23 @@ export default class PropertyDefinition {
     version: string,
     emulateExternalChecking?: boolean,
   ): IPropertyDefinitionState {
-    const possibleEnforcedValue = this.getEnforcedValue(id, version);
     const mergedID = id + "." + (version || "");
+    const mergedIDWithoutExternal = id + "." + (version || "") + "." + (emulateExternalChecking ? "t" : "f");
+    if (
+      this.canCacheState &&
+      this.stateLastCached[mergedIDWithoutExternal]
+    ) {
+      return this.stateLastCached[mergedIDWithoutExternal];
+    }
+
+    const possibleEnforcedValue = this.getEnforcedValue(id, version);
 
     if (possibleEnforcedValue.enforced) {
       const possibleInvalidEnforcedReason = this.isValidValueNoExternalChecking(
         id, version, possibleEnforcedValue.value, emulateExternalChecking,
       );
       // we return the value that was set to be
-      return {
+      const stateValue: IPropertyDefinitionState = {
         userSet: false,
         enforced: true,
         default: false,
@@ -1051,12 +1090,16 @@ export default class PropertyDefinition {
         stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
         propertyId: this.getId(),
       };
+      if (this.canCacheState) {
+        this.stateLastCached[mergedIDWithoutExternal] = stateValue;
+      }
+      return stateValue;
     }
 
     // make if hidden if null if hidden is set to true
     // note nulls set this way are always valid
     if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id, version)) {
-      return {
+      const stateValue: IPropertyDefinitionState = {
         userSet: false,
         enforced: true,
         default: false,
@@ -1071,11 +1114,15 @@ export default class PropertyDefinition {
         stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
         propertyId: this.getId(),
       };
+      if (this.canCacheState) {
+        this.stateLastCached[mergedIDWithoutExternal] = stateValue;
+      }
+      return stateValue;
     }
 
     const value = this.getCurrentValue(id, version);
     const invalidReason = this.isValidValueNoExternalChecking(id, version, value, emulateExternalChecking);
-    return {
+    const stateValue: IPropertyDefinitionState = {
       userSet: this.stateValueModified[mergedID] || false,
       enforced: false,
       default: !this.stateValueModified[mergedID],
@@ -1090,6 +1137,10 @@ export default class PropertyDefinition {
       stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
       propertyId: this.getId(),
     };
+    if (this.canCacheState) {
+      this.stateLastCached[mergedIDWithoutExternal] = stateValue;
+    }
+    return stateValue;
   }
 
   /**
@@ -1100,14 +1151,27 @@ export default class PropertyDefinition {
    * @returns a promise for the current value state
    */
   public async getState(id: number, version: string): Promise<IPropertyDefinitionState> {
+    const mergedID = id + "." + (version || "");
+    if (this.canCacheState && this.stateLastCachedWithExternal[mergedID]) {
+      return this.stateLastCachedWithExternal[mergedID];
+    }
+
+    // containsAnExternallyCheckedProperty
+    // some smart shenanigans
+    if (
+      !this.isUnique() &&
+      this.canCacheState &&
+      (this.stateLastCached[mergedID + ".f"] || this.stateLastCached[mergedID + ".t"])
+    ) {
+      return (this.stateLastCached[mergedID + ".f"] || this.stateLastCached[mergedID + ".t"]);
+    }
 
     const possibleEnforcedValue = this.getEnforcedValue(id, version);
-    const mergedID = id + "." + (version || "");
 
     if (possibleEnforcedValue.enforced) {
       const possibleInvalidEnforcedReason = await this.isValidValue(id, version, possibleEnforcedValue.value);
       // we return the value that was set to be
-      return {
+      const stateValue: IPropertyDefinitionState = {
         userSet: false,
         enforced: true,
         default: false,
@@ -1122,12 +1186,16 @@ export default class PropertyDefinition {
         stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
         propertyId: this.getId(),
       };
+      if (this.canCacheState) {
+        this.stateLastCachedWithExternal[mergedID] = stateValue;
+      }
+      return stateValue;
     }
 
     // make if hidden if null if hidden is set to true
     // note nulls set this way are always valid
     if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id, version)) {
-      return {
+      const stateValue: IPropertyDefinitionState = {
         userSet: false,
         enforced: true,
         default: false,
@@ -1142,11 +1210,15 @@ export default class PropertyDefinition {
         stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
         propertyId: this.getId(),
       };
+      if (this.canCacheState) {
+        this.stateLastCachedWithExternal[mergedID] = stateValue;
+      }
+      return stateValue;
     }
 
     const value = this.getCurrentValue(id, version);
     const invalidReason = await this.isValidValue(id, version, value);
-    return {
+    const stateValue: IPropertyDefinitionState = {
       userSet: this.stateValueModified[mergedID] || false,
       enforced: false,
       default: !this.stateValueModified[mergedID],
@@ -1161,6 +1233,10 @@ export default class PropertyDefinition {
       stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
       propertyId: this.getId(),
     };
+    if (this.canCacheState) {
+      this.stateLastCachedWithExternal[mergedID] = stateValue;
+    }
+    return stateValue;
   }
 
   /**
@@ -1187,6 +1263,10 @@ export default class PropertyDefinition {
         throw new Error("Invalid super enforced " + JSON.stringify(actualValue));
       }
     }
+
+    // clean cached values
+    this.stateLastCached = {};
+    this.stateLastCachedWithExternal = {};
 
     this.globalSuperEnforcedValue = actualValue;
   }
@@ -1220,6 +1300,13 @@ export default class PropertyDefinition {
 
     const mergedID = id + "." + (version || "");
     this.stateSuperEnforcedValue[mergedID] = actualValue;
+
+    // clean cached values
+    const mergedIDWithoutExternal1 = mergedID + ".t";
+    const mergedIDWithoutExternal2 = mergedID + ".f";
+    delete this.stateLastCachedWithExternal[mergedID];
+    delete this.stateLastCached[mergedIDWithoutExternal1];
+    delete this.stateLastCached[mergedIDWithoutExternal2];
   }
 
   /**
@@ -1233,6 +1320,13 @@ export default class PropertyDefinition {
   ) {
     const mergedID = id + "." + (version || "");
     delete this.stateSuperEnforcedValue[mergedID];
+
+    // clean cached values
+    const mergedIDWithoutExternal1 = mergedID + ".t";
+    const mergedIDWithoutExternal2 = mergedID + ".f";
+    delete this.stateLastCachedWithExternal[mergedID];
+    delete this.stateLastCached[mergedIDWithoutExternal1];
+    delete this.stateLastCached[mergedIDWithoutExternal2];
   }
 
   /**
@@ -1260,6 +1354,9 @@ export default class PropertyDefinition {
     }
 
     this.globalSuperDefaultedValue = actualValue;
+
+    this.stateLastCached = {};
+    this.stateLastCachedWithExternal = {};
   }
 
   /**
@@ -1303,6 +1400,13 @@ export default class PropertyDefinition {
     this.stateValueModified[mergedID] = true;
     this.stateValueHasBeenManuallySet[mergedID] = true;
     this.stateInternalValue[mergedID] = internalValue;
+
+    // clean cached values
+    const mergedIDWithoutExternal1 = mergedID + ".t";
+    const mergedIDWithoutExternal2 = mergedID + ".f";
+    delete this.stateLastCachedWithExternal[mergedID];
+    delete this.stateLastCached[mergedIDWithoutExternal1];
+    delete this.stateLastCached[mergedIDWithoutExternal2];
   }
 
   // TODO add undo function, canUndo and add the gql applied value
@@ -1357,6 +1461,13 @@ export default class PropertyDefinition {
 
     // the new applied value gets applied no matter what
     this.stateAppliedValue[mergedID] = value;
+
+    // clean cached values
+    const mergedIDWithoutExternal1 = mergedID + ".t";
+    const mergedIDWithoutExternal2 = mergedID + ".f";
+    delete this.stateLastCachedWithExternal[mergedID];
+    delete this.stateLastCached[mergedIDWithoutExternal1];
+    delete this.stateLastCached[mergedIDWithoutExternal2];
   }
 
   /**
@@ -1374,6 +1485,13 @@ export default class PropertyDefinition {
     delete this.stateInternalValue[mergedID];
     delete this.stateValueHasBeenManuallySet[mergedID];
     delete this.stateSuperEnforcedValue[mergedID];
+
+    // clean cached values
+    const mergedIDWithoutExternal1 = mergedID + ".t";
+    const mergedIDWithoutExternal2 = mergedID + ".f";
+    delete this.stateLastCachedWithExternal[mergedID];
+    delete this.stateLastCached[mergedIDWithoutExternal1];
+    delete this.stateLastCached[mergedIDWithoutExternal2];
   }
 
   /**

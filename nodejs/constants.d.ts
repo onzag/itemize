@@ -92,6 +92,18 @@ export declare const ITEM_OPTIONAL_I18N: string[];
  */
 export declare const ITEM_CALLOUT_EXCLUDED_I18N: string[];
 /**
+ * Where the destruction markers are located
+ */
+export declare const DESTRUCTION_MARKERS_LOCATION = "DESTRUCTION_MARKERS";
+/**
+ * Where destruction markers get memory cached
+ */
+export declare const MEMCACHED_DESTRUCTION_MARKERS_LOCATION: string;
+/**
+ * Store a last rich text change size global to use to save memory for lenght calculation
+ */
+export declare const LAST_RICH_TEXT_CHANGE_LENGTH = "LAST_RICH_TEXT_CHANGE_LENGTH";
+/**
  * Graphql endpoint errors codes that can be thrown
  */
 export declare const ENDPOINT_ERRORS: {

@@ -101,6 +101,12 @@
             "searchable": false
         },
         {
+            "id": "about_me",
+            "type": "text",
+            "nullable": true,
+            "searchable": false
+        },
+        {
             "id": "session_id",
             "type": "integer",
             "disableRetrieval": true,
