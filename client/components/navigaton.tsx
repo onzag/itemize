@@ -113,6 +113,38 @@ export function Link(props: ICustomLinkProps) {
   return <RouterLink {...newProps} onClick={linkOnClick.bind(null, newProps)}/>;
 }
 
+interface PromptProps {
+  when: boolean;
+  message: string;
+}
+
+export class Prompt extends React.PureComponent<PromptProps> {
+  constructor(props: PromptProps) {
+    super(props);
+
+    this.onBeforeUnload = this.onBeforeUnload.bind(this);
+  }
+  onBeforeUnload() {
+
+  }
+  componentDidMount() {
+
+  }
+  componentWillUnmount() {
+
+  }
+}
+
+interface NeedsSubmitPromptProps {
+  properties: string[];
+  includes: string[];
+  message: string;
+}
+
+export function NeedsSubmitPrompt(props: NeedsSubmitPromptProps) {
+
+}
+
 /**
  * Same as the router from react router but takes care of the language
  * and considers the root to be the language source

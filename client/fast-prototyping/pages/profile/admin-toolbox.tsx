@@ -22,7 +22,7 @@ export const AdminToolbox = withStyles(adminToolboxStyles)((props: WithStyles<ty
         i18nId="update_profile"
         options={{
           properties: ["role"],
-          differingPropertiesOnly: true,
+          differingOnly: true,
         }}
         buttonColor="primary"
         buttonStartIcon={<DoneOutline />}

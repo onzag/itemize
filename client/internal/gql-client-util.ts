@@ -18,6 +18,7 @@ import { deepMerge, requestFieldsAreContained } from "../../gql-util";
 import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "./app/remote-listener";
+import { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
 
 /**
  * Provides the fields and args for an item definition in order
@@ -41,6 +42,7 @@ export function getFieldsAndArgs(
     includeFields: boolean,
     properties?: string[],
     differingPropertiesOnlyForArgs?: boolean;
+    differingIncludesOnlyForArgs?: boolean;
     includes?: string[],
     propertiesForArgs?: string[],
     includesForArgs?: string[],
@@ -178,11 +180,30 @@ export function getFieldsAndArgs(
         const include = options.itemDefinitionInstance.getIncludeFor(iId);
         // and now we get the qualified identifier that grapqhl expects
         const qualifiedId = include.getQualifiedIdentifier();
-        // we set the exclusion state we expect, it might be a ternary as well
-        // like in search mode
-        argumentsForQuery[
-          include.getQualifiedExclusionStateIdentifier()
-        ] = include.getExclusionState(options.forId || null, options.forVersion || null);
+        const qualifiedExlcusionStateId = include.getQualifiedExclusionStateIdentifier();
+        const exclusionState = include.getExclusionState(options.forId || null, options.forVersion || null);
+        
+        if (options.differingIncludesOnlyForArgs) {
+          const appliedExclusion = include.getAppliedExclusionState(options.forId || null, options.forVersion || null);
+          if (appliedExclusion !== exclusionState) {
+            // we set the exclusion state we expect, it might be a ternary as well
+            // like in search mode
+            argumentsForQuery[
+              qualifiedExlcusionStateId
+            ] = exclusionState;
+          }
+        } else {
+          // we set the exclusion state we expect, it might be a ternary as well
+          // like in search mode
+          argumentsForQuery[
+            qualifiedExlcusionStateId
+          ] = exclusionState;
+        }
+
+        if (exclusionState === IncludeExclusionState.EXCLUDED) {
+          return;
+        }
+
         // we add it to the data, and we add it to the arguments
         argumentsForQuery[qualifiedId] = {};
 
@@ -200,8 +221,19 @@ export function getFieldsAndArgs(
           if (
             hasRoleAccessToIncludeProperty
           ) {
-            argumentsForQuery[qualifiedId][sp.getId()] = sp.getCurrentValue(
+            const currentValue = sp.getCurrentValue(
               options.forId || null, options.forVersion || null);
+            if (options.differingIncludesOnlyForArgs) {
+              const appliedGQLValue = sp.getAppliedValue(options.forId || null, options.forVersion || null);
+              const isEqual = sp.getPropertyDefinitionDescription().localEqual(
+                appliedGQLValue,
+                currentValue,
+              );
+              if (isEqual) {
+                return;
+              }
+            }
+            argumentsForQuery[qualifiedId][sp.getId()] = currentValue;
           }
         });
 

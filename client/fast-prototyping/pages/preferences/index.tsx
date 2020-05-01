@@ -76,7 +76,7 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
                         i18nId="update_your_preferences"
                         options={{
                           properties: ["e_notifications", "e_newsletter", "address"],
-                          differingPropertiesOnly: true,
+                          differingOnly: true,
                           unpokeAfterAny: true,
                         }}
                         buttonColor="primary"

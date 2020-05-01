@@ -57,9 +57,17 @@ export interface IIncludeState {
    */
   stateExclusion: IncludeExclusionState;
   /**
+   * The state specified exclusion that has been applied using the apply value functionality
+   */
+  stateExclusionApplied: IncludeExclusionState;
+  /**
    * Whether this state has been modified by any action, either apply or set
    */
   stateExclusionModified: boolean;
+  /**
+   * Whether this state has been manually set
+   */
+  stateExclusionHasBeenManuallySet: boolean;
 }
 
 /**
@@ -186,6 +194,19 @@ export default class Include {
   private stateExclusionModified: {
     [mergedID: string]: boolean,
   };
+  /**
+   * The applied exclusion
+   */
+  private stateExclusionApplied: {
+    [mergedID: string]: IncludeExclusionState,
+  };
+  /**
+   * This also shows whether the state has been modified, either
+   * by the user or a value has been applied
+   */
+  private stateExclusionHasBeenManuallySet: {
+    [mergedID: string]: boolean,
+  };
 
   /**
    * The constructor for an Include
@@ -262,6 +283,8 @@ export default class Include {
     this.stateExclusion = {};
     // initially the state hasn't been modified
     this.stateExclusionModified = {};
+    this.stateExclusionApplied = {};
+    this.stateExclusionHasBeenManuallySet = {};
   }
 
   /**
@@ -414,6 +437,7 @@ export default class Include {
     const mergedID = id + "." + (version || null);
     this.stateExclusion[mergedID] = value;
     this.stateExclusionModified[mergedID] = true;
+    this.stateExclusionHasBeenManuallySet[mergedID] = true;
   }
 
   /**
@@ -461,6 +485,21 @@ export default class Include {
   }
 
   /**
+   * Provides the applied value for a property
+   * @param id the id
+   * @param version the version
+   * @returns the applied value
+   */
+  public getAppliedExclusionState(
+    id: number,
+    version: string,
+  ) {
+    const mergedID = id + "." + (version || "");
+    const appliedState = this.stateExclusionApplied[mergedID];
+    return typeof appliedState === "undefined" ? null : appliedState;
+  }
+
+  /**
    * Provides the current value of this item
    * @param id the id of the stored item definition or module
    * @param version the slot version
@@ -479,6 +518,8 @@ export default class Include {
           emulateExternalChecking, this.rawData.sinkIn || [], [], true),
       stateExclusion: this.stateExclusion[mergedID] || IncludeExclusionState.ANY,
       stateExclusionModified: this.stateExclusionModified[mergedID] || false,
+      stateExclusionHasBeenManuallySet: this.stateExclusionHasBeenManuallySet[mergedID] || false,
+      stateExclusionApplied: this.getAppliedExclusionState(id, version),
     };
   }
 
@@ -500,6 +541,8 @@ export default class Include {
         (await this.itemDefinition.getState(id, version, this.rawData.sinkIn || [], [], true)),
       stateExclusion: this.stateExclusion[mergedID] || IncludeExclusionState.ANY,
       stateExclusionModified: this.stateExclusionModified[mergedID] || false,
+      stateExclusionHasBeenManuallySet: this.stateExclusionHasBeenManuallySet[mergedID] || false,
+      stateExclusionApplied: this.getAppliedExclusionState(id, version),
     };
   }
 
@@ -525,8 +568,24 @@ export default class Include {
     const mergedID = id + "." + (version || "");
 
     // update the state
-    this.stateExclusion[mergedID] = exclusionState;
-    this.stateExclusionModified[mergedID] = true;
+    if (
+      doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers &&
+      this.stateExclusionHasBeenManuallySet[mergedID]
+    ) {
+      // The two of them are equal which means the internal value
+      // is most likely just the same thing so we won't mess with it
+      // as it's not necessary to modify it, even when this is technically a
+      // new value
+      if (this.stateExclusion[mergedID] === exclusionState) {
+        this.stateExclusionModified[mergedID] = true;
+        this.stateExclusionHasBeenManuallySet[mergedID] = false;
+      }
+    } else {
+      this.stateExclusion[mergedID] = exclusionState;
+      this.stateExclusionModified[mergedID] = true;
+      this.stateExclusionHasBeenManuallySet[mergedID] = false;
+    }
+    this.stateExclusionApplied[mergedID] = exclusionState;
 
     // applying the value in the item definition
     // which is another instance
@@ -550,6 +609,7 @@ export default class Include {
   /**
    * Memory cleans the value in an item
    * @param id the slot id
+   * @param version the slot version
    */
   public cleanValueFor(
     id: number,
@@ -558,8 +618,33 @@ export default class Include {
     const mergedID = id + "." + (version || "");
     delete this.stateExclusion[mergedID];
     delete this.stateExclusionModified[mergedID];
+    delete this.stateExclusionHasBeenManuallySet[mergedID];
+    delete this.stateExclusionApplied[mergedID];
 
     this.itemDefinition.cleanValueFor(id, version, true);
+  }
+
+  /**
+   * restores the include value to the applied value
+   * @param id the slot id
+   * @param version the slot version
+   */
+  public restoreValueFor(
+    id: number,
+    version: string,
+  ) {
+    const mergedID = id + "." + (version || "");
+    if (typeof this.stateExclusionApplied[mergedID] !== "undefined") {
+      this.stateExclusion[mergedID] = this.stateExclusionApplied[mergedID];
+      this.stateExclusionModified[mergedID] = true;
+      this.stateExclusionHasBeenManuallySet[mergedID] = false;
+    } else {
+      delete this.stateExclusion[mergedID];
+      delete this.stateExclusionModified[mergedID];
+      delete this.stateExclusionHasBeenManuallySet[mergedID];
+    }
+
+    this.itemDefinition.restoreValueFor(id, version, true);
   }
 
   /**

@@ -3,7 +3,7 @@ $quote-background-color: rgba(0, 0, 0, 0.09);
 $quote-highlight-color: #26a69a;
 $quote-text-color: #455a64;
 $icons-color: #000;
-$list-item-color: #ef5350;
+$list-item-color: rgb(63, 81, 181);;
 
 .ql-toolbar {
   background-color: $toolbar-color;
@@ -29,7 +29,7 @@ $list-item-color: #ef5350;
   }
 }
 
-.ql-container, .rich-text {
+.quill .ql-container, .rich-text {
   font-family: 'Open Sans', sans-serif;
   font-size: 1rem;
 
@@ -39,6 +39,10 @@ $list-item-color: #ef5350;
 
   ul {
     list-style: none;
+
+    li {
+      padding-left: 0;
+    }
 
     li::before {
       content: "\2022";
@@ -52,6 +56,10 @@ $list-item-color: #ef5350;
   ol {
     list-style: none;
     counter-reset: item-count;
+
+    li {
+      padding-left: 0;
+    }
 
     li {
       counter-increment: item-count;
@@ -74,7 +82,7 @@ $list-item-color: #ef5350;
     margin: 1rem auto;
     font-style: italic;
     color: $quote-text-color;
-    padding: 1.2rem 30px 1.2rem 75px;
+    padding: 1.2rem 30px 1.2rem 50px;
     border-left: 8px solid $quote-highlight-color;
     line-height: 1.6;
     position: relative;

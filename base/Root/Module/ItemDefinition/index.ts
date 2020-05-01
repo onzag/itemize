@@ -1165,13 +1165,13 @@ export default class ItemDefinition {
     // we make it we have an applied value
     this.stateHasAppliedValueTo[mergedID] = true;
     // and set all the data regarding that value
-    this.stateGQLAppliedValue[mergedID] = Object.freeze({
+    this.stateGQLAppliedValue[mergedID] = {
       userIdRequester: graphqlUserIdRequester,
       roleRequester: graphqlRoleRequester,
       rawValue: value,
       flattenedValue,
       requestFields,
-    });
+    };
 
     // now we get all the properties that we are supposed to apply that value to
     const properties =
@@ -1212,6 +1212,35 @@ export default class ItemDefinition {
       include.applyValue(id, version, givenValue,
         givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers);
     });
+  }
+
+  /**
+   * Restores an applied value to the last applied value
+   * @param id the id
+   * @param version the version
+   * @param excludeExtensions whether to exclude extensions of all this
+   */
+  public restoreValueFor(
+    id: number,
+    version: string,
+    excludeExtensions?: boolean,
+  ) {
+    const mergedID = id + "." + (version || "");
+    if (this.stateHasAppliedValueTo[mergedID]) {
+      const entireValue = this.stateGQLAppliedValue[mergedID];
+      this.applyValue(
+        id,
+        version,
+        entireValue.rawValue,
+        excludeExtensions,
+        entireValue.userIdRequester,
+        entireValue.roleRequester,
+        entireValue.requestFields,
+        false,
+      );
+    } else {
+      this.cleanValueFor(id, version, excludeExtensions);
+    }
   }
 
   /**
@@ -1653,7 +1682,6 @@ export default class ItemDefinition {
     onlyCheckProperties?: string[],
     ignoreIncludes?: boolean,
   ): boolean {
-    
     const existInFirstLayer: boolean =
       this.getAllPropertyDefinitionsAndExtensions()
       .filter((pd) => !onlyCheckProperties ? true : onlyCheckProperties.includes(pd.getId()))

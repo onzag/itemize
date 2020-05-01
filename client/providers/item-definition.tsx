@@ -63,6 +63,15 @@ export interface IActionCleanOptions {
   propertiesToCleanOnSuccess?: string[];
   propertiesToCleanOnAny?: string[];
   propertiesToCleanOnFailure?: string[];
+  propertiesToRestoreOnSuccess?: string[];
+  propertiesToRestoreOnAny?: string[];
+  propertiesToRestoreOnFailure?: string[];
+  includesToCleanOnSuccess?: string[];
+  includesToCleanOnAny?: string[];
+  includesToCleanOnFailure?: string[];
+  includesToRestoreOnSuccess?: string[];
+  includesToRestoreOnAny?: string[];
+  includesToRestoreOnFailure?: string[];
   unpokeAfterSuccess?: boolean;
   unpokeAfterAny?: boolean;
   unpokeAfterFailure?: boolean;
@@ -74,7 +83,7 @@ export interface IActionCleanOptions {
  */
 export interface IActionSubmitOptions extends IActionCleanOptions {
   properties: string[];
-  differingPropertiesOnly?: boolean;
+  differingOnly?: boolean;
   includes?: string[];
   policies?: PolicyPathType[];
   beforeSubmit?: () => boolean;
@@ -262,59 +271,91 @@ export const SearchItemDefinitionValueContext = React.createContext<ISearchItemD
 // Now we pass on the provider, this is what the developer
 // is actually expected to fill
 export interface IItemDefinitionProviderProps {
-  // children that will be feed into the context
-  children: any;
-  // the item definition slash/separated/path
-  // if you don't specify this, the context will be
-  // based on the prop extensions emulated item definition
+  /**
+   * children that will be feed into the context
+   */
+  children: React.ReactNode;
+  /**
+   * the item definition slash/separated/path
+   * if you don't specify this, the context will be
+   * based on the prop extensions emulated item definition
+   */
   itemDefinition?: string;
-  // the id, specifying an id makes a huge difference
+  /**
+   * the id, specifying an id makes a huge difference
+   */
   forId?: number;
-  // the version
+  /**
+   * the version
+   */
   forVersion?: string;
-  // this is an important flag, if ownership is assumed this means
-  // that when automatic fetching of properties it will do so assuming
-  // the current user is the owner, so OWNER rules pass, put an example,
-  // loading the current user, you have the current user id, and you need
-  // to load the user data, if you assume ownership, fields like email will
-  // be fetched, without it, they will not be fetched, use this field
-  // careful as fetching fields without the right credentials
-  // might trigger an error
+  /**
+   * this is an important flag, if ownership is assumed this means
+   * that when automatic fetching of properties it will do so assuming
+   * the current user is the owner, so OWNER rules pass, put an example,
+   * loading the current user, you have the current user id, and you need
+   * to load the user data, if you assume ownership, fields like email will
+   * be fetched, without it, they will not be fetched, use this field
+   * careful as fetching fields without the right credentials
+   * might trigger an error
+   */
   assumeOwnership?: boolean;
-  // whether this is about the search counterpart for using
-  // with searches, this opens a whole can of worms
+  /**
+   * whether this is about the search counterpart for using
+   * with searches, this opens a whole can of worms
+   */
   searchCounterpart?: boolean;
-  // some fields, eg. autocompleted ones and unique ones have rest
-  // endpoints for them that will run checks, you might want to disable
-  // these checks in two circumstances, 1. for efficiency if you don't need them
-  // 2. for an UX reason, for example during login, if the field is constantly checking
-  // that the external check is unique, for an username, then you will have an annoying
-  // error popping on, saying that the username is taken, but you are logging in so that
-  // external check is unecessary; note that disabling external checks has no effect
-  // if the item definition has no externally checked properties
+  /**
+   * some fields, eg. autocompleted ones and unique ones have rest
+   * endpoints for them that will run checks, you might want to disable
+   * these checks in two circumstances, 1. for efficiency if you don't need them
+   * 2. for an UX reason, for example during login, if the field is constantly checking
+   * that the external check is unique, for an username, then you will have an annoying
+   * error popping on, saying that the username is taken, but you are logging in so that
+   * external check is unecessary; note that disabling external checks has no effect
+   * if the item definition has no externally checked properties
+   */
   disableExternalChecks?: boolean;
-  // automatic search triggers an automatic search when the item mounts
-  // or it detects a change in the properties, this basically triggers
-  // the .search function with these arguments whenever it is detected
-  // it should do so
+  /**
+   * automatic search triggers an automatic search when the item mounts
+   * or it detects a change in the properties, this basically triggers
+   * the .search function with these arguments whenever it is detected
+   * it should do so
+   */
   automaticSearch?: IActionSearchOptions;
-  // only downloads and includes the properties specified in the list
-  // in the state
+  /**
+   * only downloads and includes the properties specified in the list
+   * in the state
+   */
   properties: string[];
-  // only includes the items specified in the list in the state
+  /**
+   * only includes the items specified in the list in the state
+   */
   includes?: string[];
-  // excludes the policies from being part of the state
+  /**
+   * excludes the policies from being part of the state
+   */
   includePolicies?: boolean;
-  // cleans the value from the memory cache once the object dismounts
-  // as the memory cache might only grow and grow
+  /**
+   * cleans the value from the memory cache once the object dismounts
+   * as the memory cache might only grow and grow
+   */
   cleanOnDismount?: boolean | IActionCleanOptions;
-  // static components do not update remotely
+  /**
+   * static components do not update remotely
+   */
   static?: boolean;
-  // uses long term caching with the worker cache strategy
+  /**
+   * uses long term caching with the worker cache strategy
+   */
   longTermCaching?: boolean;
-  // marks the item for destruction as the user logs out
+  /**
+   * marks the item for destruction as the user logs out
+   */
   markForDestructionOnLogout?: boolean;
-  // avoids running loadValue
+  /**
+   * avoids running loadValue
+   */
   avoidLoading?: boolean;
 }
 
@@ -1465,6 +1506,8 @@ export class ActualItemDefinitionProvider extends
     }
 
     let needsUpdate: boolean = false;
+
+    // CLEANING PROPERTIES
     const cleanupPropertyFn = (ptc: string) => {
       this.props.itemDefinitionInstance
         .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId,
@@ -1485,9 +1528,85 @@ export class ActualItemDefinitionProvider extends
     if (
       options.propertiesToCleanOnFailure && state === "fail"
     ) {
-      options.propertiesToCleanOnAny.forEach(cleanupPropertyFn);
+      options.propertiesToCleanOnFailure.forEach(cleanupPropertyFn);
       needsUpdate = true;
     }
+
+    // RESTORING PROPERTIES
+    const restorePropertyFn = (ptr: string) => {
+      this.props.itemDefinitionInstance
+        .getPropertyDefinitionFor(ptr, true).restoreValueFor(this.props.forId,
+          this.props.forVersion || null);
+    };
+    if (
+      options.propertiesToRestoreOnSuccess && state === "success"
+    ) {
+      options.propertiesToRestoreOnSuccess.forEach(restorePropertyFn);
+      needsUpdate = true;
+    }
+    if (
+      options.propertiesToRestoreOnAny
+    ) {
+      options.propertiesToRestoreOnAny.forEach(restorePropertyFn);
+      needsUpdate = true;
+    }
+    if (
+      options.propertiesToRestoreOnFailure && state === "fail"
+    ) {
+      options.propertiesToRestoreOnFailure.forEach(restorePropertyFn);
+      needsUpdate = true;
+    }
+
+    // CLEANING INCLUDES
+    const cleanupIncludeFn = (itc: string) => {
+      this.props.itemDefinitionInstance.getIncludeFor(itc).cleanValueFor(this.props.forId,
+        this.props.forVersion || null);
+    };
+    if (
+      options.includesToCleanOnSuccess && state === "success"
+    ) {
+      options.includesToCleanOnSuccess.forEach(cleanupIncludeFn);
+      needsUpdate = true;
+    }
+    if (
+      options.includesToCleanOnAny
+    ) {
+      options.includesToCleanOnAny.forEach(cleanupIncludeFn);
+      needsUpdate = true;
+    }
+    if (
+      options.includesToCleanOnFailure && state === "fail"
+    ) {
+      options.includesToCleanOnFailure.forEach(cleanupPropertyFn);
+      needsUpdate = true;
+    }
+
+    // RESTORING INCLUDES
+    const restoreIncludeFn = (itr: string) => {
+      this.props.itemDefinitionInstance
+        .getIncludeFor(itr).restoreValueFor(this.props.forId,
+          this.props.forVersion || null);
+    };
+    if (
+      options.includesToRestoreOnSuccess && state === "success"
+    ) {
+      options.includesToRestoreOnSuccess.forEach(restoreIncludeFn);
+      needsUpdate = true;
+    }
+    if (
+      options.includesToRestoreOnAny
+    ) {
+      options.includesToRestoreOnAny.forEach(restoreIncludeFn);
+      needsUpdate = true;
+    }
+    if (
+      options.includesToRestoreOnFailure && state === "fail"
+    ) {
+      options.includesToRestoreOnFailure.forEach(restoreIncludeFn);
+      needsUpdate = true;
+    }
+    
+    // CLEANING POLICIES, POLICIES CAN'T BE RESTORED
     const cleanupPolicyFn = (policyArray: PolicyPathType) => {
       this.props.itemDefinitionInstance
         .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId,
@@ -1511,6 +1630,8 @@ export class ActualItemDefinitionProvider extends
       options.policiesToCleanOnFailure.forEach(cleanupPolicyFn);
       needsUpdate = true;
     }
+
+    // NOw we check if we need an update in the listeners and if we are allowed to trigger it
     if (needsUpdate && !avoidTriggeringUpdate) {
       this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
     }
@@ -1551,7 +1672,8 @@ export class ActualItemDefinitionProvider extends
       includeArgs: true,
       includeFields: true,
       uniteFieldsWithAppliedValue: true,
-      differingPropertiesOnlyForArgs: options.differingPropertiesOnly,
+      differingPropertiesOnlyForArgs: options.differingOnly,
+      differingIncludesOnlyForArgs: options.differingOnly,
       includes: this.props.includes || [],
       properties: this.props.properties,
       includesForArgs: options.includes || [],

@@ -1428,7 +1428,7 @@ export default class PropertyDefinition {
   public applyValue(
     id: number,
     version: string,
-    value: any,
+    value: PropertyDefinitionSupportedType,
     modifiedState: boolean,
     doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean,
   ) {
@@ -1492,6 +1492,26 @@ export default class PropertyDefinition {
     delete this.stateLastCachedWithExternal[mergedID];
     delete this.stateLastCached[mergedIDWithoutExternal1];
     delete this.stateLastCached[mergedIDWithoutExternal2];
+  }
+
+  /**
+   * Restores the value of the given slot id to the original
+   * applied value
+   * @param id the slot id
+   * @param version the version
+   */
+  public restoreValueFor(
+    id: number,
+    version: string,
+  ) {
+    const mergedID = id + "." + (version || "");
+    this.applyValue(
+      id,
+      version,
+      this.stateAppliedValue[mergedID] || null,
+      true,
+      false,
+    );
   }
 
   /**
