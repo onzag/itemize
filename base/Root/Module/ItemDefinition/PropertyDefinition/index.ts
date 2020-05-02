@@ -634,7 +634,7 @@ export default class PropertyDefinition {
         // if it's not rich text we just count the characters
         count = value.toString().length;
       } else {
-        if (window && typeof (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] !== "undefined") {
+        if (typeof window !== "undefined" && typeof (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] !== "undefined") {
           count = (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH];
         } else {
           // otherwise we need to create a dummy element and count the characters
@@ -667,7 +667,7 @@ export default class PropertyDefinition {
 
     // we delete this if it exists, this global exists to speed up
     // the ui and it's not truly necessary
-    if (window) {
+    if (typeof window !== "undefined") {
       delete (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH];
     }
 

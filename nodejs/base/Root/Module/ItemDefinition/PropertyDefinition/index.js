@@ -140,6 +140,12 @@ class PropertyDefinition {
         // set the hidden if rule
         this.hiddenIf = rawJSON.hiddenIf &&
             new ConditionalRuleSet_1.default(rawJSON.hiddenIf, parentModule, parentItemDefinition, this, null);
+        this.canCacheState = true;
+        if (rawJSON.invalidIf &&
+            rawJSON.hiddenIf &&
+            rawJSON.defaultIf) {
+            this.canCacheState = false;
+        }
         // initial value for all namespaces is null
         this.stateValue = {};
         this.stateAppliedValue = {};
@@ -148,6 +154,8 @@ class PropertyDefinition {
         this.stateInternalValue = {};
         this.stateLastUniqueCheck = {};
         this.stateSuperEnforcedValue = {};
+        this.stateLastCached = {};
+        this.stateLastCachedWithExternal = {};
     }
     /**
      * A static method that provides the policy prefix for a given policy name and type
@@ -319,13 +327,18 @@ class PropertyDefinition {
                 count = value.toString().length;
             }
             else {
-                // otherwise we need to create a dummy element and count the characters
-                const dummyElement = util_1.DOMWindow.document.createElement("template");
-                dummyElement.innerHTML = value.toString();
-                count = dummyElement.textContent.length;
-                // Something that happens with quilljs
-                if (dummyElement.querySelector(".ql-cursor")) {
-                    count--;
+                if (typeof window !== "undefined" && typeof window[constants_1.LAST_RICH_TEXT_CHANGE_LENGTH] !== "undefined") {
+                    count = window[constants_1.LAST_RICH_TEXT_CHANGE_LENGTH];
+                }
+                else {
+                    // otherwise we need to create a dummy element and count the characters
+                    const dummyElement = util_1.DOMWindow.document.createElement("div");
+                    dummyElement.innerHTML = value.toString();
+                    count = dummyElement.textContent.length;
+                    // Something that happens with quilljs
+                    if (dummyElement.querySelector(".ql-cursor")) {
+                        count--;
+                    }
                 }
             }
             // if we have a max length we throw an error if we
@@ -339,6 +352,11 @@ class PropertyDefinition {
                 count < propertyDefinitionRaw.minLength) {
                 return PropertyInvalidReason.TOO_SMALL;
             }
+        }
+        // we delete this if it exists, this global exists to speed up
+        // the ui and it's not truly necessary
+        if (typeof window !== "undefined") {
+            delete window[constants_1.LAST_RICH_TEXT_CHANGE_LENGTH];
         }
         // return no error
         return null;
@@ -512,12 +530,17 @@ class PropertyDefinition {
      * @returns the current value state
      */
     getStateNoExternalChecking(id, version, emulateExternalChecking) {
-        const possibleEnforcedValue = this.getEnforcedValue(id, version);
         const mergedID = id + "." + (version || "");
+        const mergedIDWithoutExternal = id + "." + (version || "") + "." + (emulateExternalChecking ? "t" : "f");
+        if (this.canCacheState &&
+            this.stateLastCached[mergedIDWithoutExternal]) {
+            return this.stateLastCached[mergedIDWithoutExternal];
+        }
+        const possibleEnforcedValue = this.getEnforcedValue(id, version);
         if (possibleEnforcedValue.enforced) {
             const possibleInvalidEnforcedReason = this.isValidValueNoExternalChecking(id, version, possibleEnforcedValue.value, emulateExternalChecking);
             // we return the value that was set to be
-            return {
+            const stateValue = {
                 userSet: false,
                 enforced: true,
                 default: false,
@@ -532,11 +555,15 @@ class PropertyDefinition {
                 stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
                 propertyId: this.getId(),
             };
+            if (this.canCacheState) {
+                this.stateLastCached[mergedIDWithoutExternal] = stateValue;
+            }
+            return stateValue;
         }
         // make if hidden if null if hidden is set to true
         // note nulls set this way are always valid
         if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id, version)) {
-            return {
+            const stateValue = {
                 userSet: false,
                 enforced: true,
                 default: false,
@@ -551,10 +578,14 @@ class PropertyDefinition {
                 stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
                 propertyId: this.getId(),
             };
+            if (this.canCacheState) {
+                this.stateLastCached[mergedIDWithoutExternal] = stateValue;
+            }
+            return stateValue;
         }
         const value = this.getCurrentValue(id, version);
         const invalidReason = this.isValidValueNoExternalChecking(id, version, value, emulateExternalChecking);
-        return {
+        const stateValue = {
             userSet: this.stateValueModified[mergedID] || false,
             enforced: false,
             default: !this.stateValueModified[mergedID],
@@ -569,6 +600,10 @@ class PropertyDefinition {
             stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
             propertyId: this.getId(),
         };
+        if (this.canCacheState) {
+            this.stateLastCached[mergedIDWithoutExternal] = stateValue;
+        }
+        return stateValue;
     }
     /**
      * provides the current useful value for the property defintion
@@ -578,12 +613,22 @@ class PropertyDefinition {
      * @returns a promise for the current value state
      */
     async getState(id, version) {
-        const possibleEnforcedValue = this.getEnforcedValue(id, version);
         const mergedID = id + "." + (version || "");
+        if (this.canCacheState && this.stateLastCachedWithExternal[mergedID]) {
+            return this.stateLastCachedWithExternal[mergedID];
+        }
+        // containsAnExternallyCheckedProperty
+        // some smart shenanigans
+        if (!this.isUnique() &&
+            this.canCacheState &&
+            (this.stateLastCached[mergedID + ".f"] || this.stateLastCached[mergedID + ".t"])) {
+            return (this.stateLastCached[mergedID + ".f"] || this.stateLastCached[mergedID + ".t"]);
+        }
+        const possibleEnforcedValue = this.getEnforcedValue(id, version);
         if (possibleEnforcedValue.enforced) {
             const possibleInvalidEnforcedReason = await this.isValidValue(id, version, possibleEnforcedValue.value);
             // we return the value that was set to be
-            return {
+            const stateValue = {
                 userSet: false,
                 enforced: true,
                 default: false,
@@ -598,11 +643,15 @@ class PropertyDefinition {
                 stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
                 propertyId: this.getId(),
             };
+            if (this.canCacheState) {
+                this.stateLastCachedWithExternal[mergedID] = stateValue;
+            }
+            return stateValue;
         }
         // make if hidden if null if hidden is set to true
         // note nulls set this way are always valid
         if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id, version)) {
-            return {
+            const stateValue = {
                 userSet: false,
                 enforced: true,
                 default: false,
@@ -617,10 +666,14 @@ class PropertyDefinition {
                 stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
                 propertyId: this.getId(),
             };
+            if (this.canCacheState) {
+                this.stateLastCachedWithExternal[mergedID] = stateValue;
+            }
+            return stateValue;
         }
         const value = this.getCurrentValue(id, version);
         const invalidReason = await this.isValidValue(id, version, value);
-        return {
+        const stateValue = {
             userSet: this.stateValueModified[mergedID] || false,
             enforced: false,
             default: !this.stateValueModified[mergedID],
@@ -635,6 +688,10 @@ class PropertyDefinition {
             stateValueHasBeenManuallySet: this.stateValueHasBeenManuallySet[mergedID] || false,
             propertyId: this.getId(),
         };
+        if (this.canCacheState) {
+            this.stateLastCachedWithExternal[mergedID] = stateValue;
+        }
+        return stateValue;
     }
     /**
      * Sets a super enforced value that superseeds any enforced value or
@@ -657,6 +714,9 @@ class PropertyDefinition {
                 throw new Error("Invalid super enforced " + JSON.stringify(actualValue));
             }
         }
+        // clean cached values
+        this.stateLastCached = {};
+        this.stateLastCachedWithExternal = {};
         this.globalSuperEnforcedValue = actualValue;
     }
     /**
@@ -682,6 +742,12 @@ class PropertyDefinition {
         }
         const mergedID = id + "." + (version || "");
         this.stateSuperEnforcedValue[mergedID] = actualValue;
+        // clean cached values
+        const mergedIDWithoutExternal1 = mergedID + ".t";
+        const mergedIDWithoutExternal2 = mergedID + ".f";
+        delete this.stateLastCachedWithExternal[mergedID];
+        delete this.stateLastCached[mergedIDWithoutExternal1];
+        delete this.stateLastCached[mergedIDWithoutExternal2];
     }
     /**
      * Clears a super enforced value set in a slot id
@@ -691,6 +757,12 @@ class PropertyDefinition {
     clearSuperEnforced(id, version) {
         const mergedID = id + "." + (version || "");
         delete this.stateSuperEnforcedValue[mergedID];
+        // clean cached values
+        const mergedIDWithoutExternal1 = mergedID + ".t";
+        const mergedIDWithoutExternal2 = mergedID + ".f";
+        delete this.stateLastCachedWithExternal[mergedID];
+        delete this.stateLastCached[mergedIDWithoutExternal1];
+        delete this.stateLastCached[mergedIDWithoutExternal2];
     }
     /**
      * Sets a super default value that superseeds any default value or
@@ -713,6 +785,8 @@ class PropertyDefinition {
             }
         }
         this.globalSuperDefaultedValue = actualValue;
+        this.stateLastCached = {};
+        this.stateLastCachedWithExternal = {};
     }
     /**
      * Sets the current value for the item, null is a valid value
@@ -748,6 +822,12 @@ class PropertyDefinition {
         this.stateValueModified[mergedID] = true;
         this.stateValueHasBeenManuallySet[mergedID] = true;
         this.stateInternalValue[mergedID] = internalValue;
+        // clean cached values
+        const mergedIDWithoutExternal1 = mergedID + ".t";
+        const mergedIDWithoutExternal2 = mergedID + ".f";
+        delete this.stateLastCachedWithExternal[mergedID];
+        delete this.stateLastCached[mergedIDWithoutExternal1];
+        delete this.stateLastCached[mergedIDWithoutExternal2];
     }
     // TODO add undo function, canUndo and add the gql applied value
     // here in order to turn it back to that applied value
@@ -793,6 +873,12 @@ class PropertyDefinition {
         }
         // the new applied value gets applied no matter what
         this.stateAppliedValue[mergedID] = value;
+        // clean cached values
+        const mergedIDWithoutExternal1 = mergedID + ".t";
+        const mergedIDWithoutExternal2 = mergedID + ".f";
+        delete this.stateLastCachedWithExternal[mergedID];
+        delete this.stateLastCached[mergedIDWithoutExternal1];
+        delete this.stateLastCached[mergedIDWithoutExternal2];
     }
     /**
      * Frees the memory of stored values in a given slot id
@@ -806,6 +892,22 @@ class PropertyDefinition {
         delete this.stateInternalValue[mergedID];
         delete this.stateValueHasBeenManuallySet[mergedID];
         delete this.stateSuperEnforcedValue[mergedID];
+        // clean cached values
+        const mergedIDWithoutExternal1 = mergedID + ".t";
+        const mergedIDWithoutExternal2 = mergedID + ".f";
+        delete this.stateLastCachedWithExternal[mergedID];
+        delete this.stateLastCached[mergedIDWithoutExternal1];
+        delete this.stateLastCached[mergedIDWithoutExternal2];
+    }
+    /**
+     * Restores the value of the given slot id to the original
+     * applied value
+     * @param id the slot id
+     * @param version the version
+     */
+    restoreValueFor(id, version) {
+        const mergedID = id + "." + (version || "");
+        this.applyValue(id, version, this.stateAppliedValue[mergedID] || null, true, false);
     }
     /**
      * Checks the valid value but ignores external checking

@@ -606,6 +606,13 @@ export default class ItemDefinition {
      */
     applyValue(id: number, version: string, value: IGQLValue, excludeExtensions: boolean, graphqlUserIdRequester: number, graphqlRoleRequester: string, requestFields: IGQLRequestFields, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean): void;
     /**
+     * Restores an applied value to the last applied value
+     * @param id the id
+     * @param version the version
+     * @param excludeExtensions whether to exclude extensions of all this
+     */
+    restoreValueFor(id: number, version: string, excludeExtensions?: boolean): void;
+    /**
      * Provides the owner that applied the value for the
      * applied value, basically the created_by value
      * (or id if owner is object id, which is only relevant for users honestly)

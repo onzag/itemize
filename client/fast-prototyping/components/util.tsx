@@ -96,6 +96,7 @@ interface SlowLoadingElementState {
 }
 
 export class SlowLoadingElement extends React.Component<SlowLoadingElementProps, SlowLoadingElementState> {
+  private unmounted: boolean = false;
   public static getDerivedStateFromProps(
     props: SlowLoadingElementProps,
     state: SlowLoadingElementState,
@@ -118,9 +119,11 @@ export class SlowLoadingElement extends React.Component<SlowLoadingElementProps,
   }
   public makeReady() {
     setTimeout(() => {
-      this.setState({
-        isReady: true,
-      });
+      if (!this.unmounted) {
+        this.setState({
+          isReady: true,
+        });
+      }
     }, 10);
   }
   public shouldComponentUpdate(nextProps: SlowLoadingElementProps, nextState: SlowLoadingElementState) {
@@ -132,6 +135,9 @@ export class SlowLoadingElement extends React.Component<SlowLoadingElementProps,
   }
   public componentDidUpdate() {
     this.makeReady();
+  }
+  public componentWillUnmount() {
+    this.unmounted = true;
   }
   public render() {
     if (this.state.isReady) {

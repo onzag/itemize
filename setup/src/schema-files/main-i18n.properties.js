@@ -62,6 +62,10 @@ generic_error = error
 generic_warning = warning
 generic_info = info
 
+unsaved_changes = you have unsaved changes
+save = save
+discard = discard
+
 error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
 error.NOT_FOUND = the item cannot be found
@@ -142,6 +146,10 @@ needs_update_action = update
 generic_error = error
 generic_warning = warning
 generic_info = info
+
+unsaved_changes = you have unsaved changes
+save = save
+discard = discard
 
 error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
@@ -224,6 +232,10 @@ generic_error = error
 generic_warning = warning
 generic_info = info
 
+unsaved_changes = you have unsaved changes
+save = save
+discard = discard
+
 error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
 error.NOT_FOUND = the item cannot be found
@@ -304,6 +316,10 @@ needs_update_action = update
 generic_error = error
 generic_warning = warning
 generic_info = info
+
+unsaved_changes = you have unsaved changes
+save = save
+discard = discard
 
 error.INVALID_CREDENTIALS = ungültiger Benutzer oder Password
 error.BLOCKED = der Artikel ist gesperrt
@@ -386,6 +402,10 @@ generic_error = error
 generic_warning = ¡atención!
 generic_info = información
 
+unsaved_changes = sus cambios no han sido guardados
+save = guardar
+discard = descartar
+
 error.INVALID_CREDENTIALS = contraseña o usuario inválido
 error.BLOCKED = el item ha sido bloqueado
 error.NOT_FOUND = el item no existe
@@ -466,6 +486,10 @@ needs_update_action = update
 generic_error = error
 generic_warning = warning
 generic_info = info
+
+unsaved_changes = you have unsaved changes
+save = save
+discard = discard
 
 error.INVALID_CREDENTIALS = مستخدم او كلمة سر غير صحيحة
 error.BLOCKED = المادة تم حظرها

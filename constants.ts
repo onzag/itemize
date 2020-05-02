@@ -246,6 +246,11 @@ export const LOCALE_I18N = [
   "generic_error",
   "generic_warning",
   "generic_info",
+
+  // unsaved changes
+  "unsaved_changes",
+  "save",
+  "discard",
 ].concat(
   // we add all the endpoint errors
   Object.keys(ENDPOINT_ERRORS).map(((ee) => `error.${ee}`)),

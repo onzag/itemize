@@ -103,6 +103,8 @@ class Include {
         this.stateExclusion = {};
         // initially the state hasn't been modified
         this.stateExclusionModified = {};
+        this.stateExclusionApplied = {};
+        this.stateExclusionHasBeenManuallySet = {};
     }
     /**
      * Provides the ids of the sinking properties
@@ -234,6 +236,7 @@ class Include {
         const mergedID = id + "." + (version || null);
         this.stateExclusion[mergedID] = value;
         this.stateExclusionModified[mergedID] = true;
+        this.stateExclusionHasBeenManuallySet[mergedID] = true;
     }
     /**
      * Provides the name for this item, the name represents
@@ -275,6 +278,17 @@ class Include {
         return this.getPrefixedQualifiedIdentifier() + constants_1.EXCLUSION_STATE_SUFFIX;
     }
     /**
+     * Provides the applied value for a property
+     * @param id the id
+     * @param version the version
+     * @returns the applied value
+     */
+    getAppliedExclusionState(id, version) {
+        const mergedID = id + "." + (version || "");
+        const appliedState = this.stateExclusionApplied[mergedID];
+        return typeof appliedState === "undefined" ? null : appliedState;
+    }
+    /**
      * Provides the current value of this item
      * @param id the id of the stored item definition or module
      * @param version the slot version
@@ -292,6 +306,8 @@ class Include {
                 this.itemDefinition.getStateNoExternalChecking(id, version, emulateExternalChecking, this.rawData.sinkIn || [], [], true),
             stateExclusion: this.stateExclusion[mergedID] || IncludeExclusionState.ANY,
             stateExclusionModified: this.stateExclusionModified[mergedID] || false,
+            stateExclusionHasBeenManuallySet: this.stateExclusionHasBeenManuallySet[mergedID] || false,
+            stateExclusionApplied: this.getAppliedExclusionState(id, version),
         };
     }
     /**
@@ -312,6 +328,8 @@ class Include {
                 (await this.itemDefinition.getState(id, version, this.rawData.sinkIn || [], [], true)),
             stateExclusion: this.stateExclusion[mergedID] || IncludeExclusionState.ANY,
             stateExclusionModified: this.stateExclusionModified[mergedID] || false,
+            stateExclusionHasBeenManuallySet: this.stateExclusionHasBeenManuallySet[mergedID] || false,
+            stateExclusionApplied: this.getAppliedExclusionState(id, version),
         };
     }
     /**
@@ -329,8 +347,23 @@ class Include {
     applyValue(id, version, value, exclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers) {
         const mergedID = id + "." + (version || "");
         // update the state
-        this.stateExclusion[mergedID] = exclusionState;
-        this.stateExclusionModified[mergedID] = true;
+        if (doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers &&
+            this.stateExclusionHasBeenManuallySet[mergedID]) {
+            // The two of them are equal which means the internal value
+            // is most likely just the same thing so we won't mess with it
+            // as it's not necessary to modify it, even when this is technically a
+            // new value
+            if (this.stateExclusion[mergedID] === exclusionState) {
+                this.stateExclusionModified[mergedID] = true;
+                this.stateExclusionHasBeenManuallySet[mergedID] = false;
+            }
+        }
+        else {
+            this.stateExclusion[mergedID] = exclusionState;
+            this.stateExclusionModified[mergedID] = true;
+            this.stateExclusionHasBeenManuallySet[mergedID] = false;
+        }
+        this.stateExclusionApplied[mergedID] = exclusionState;
         // applying the value in the item definition
         // which is another instance
         this.itemDefinition.applyValue(id, version, 
@@ -348,12 +381,34 @@ class Include {
     /**
      * Memory cleans the value in an item
      * @param id the slot id
+     * @param version the slot version
      */
     cleanValueFor(id, version) {
         const mergedID = id + "." + (version || "");
         delete this.stateExclusion[mergedID];
         delete this.stateExclusionModified[mergedID];
+        delete this.stateExclusionHasBeenManuallySet[mergedID];
+        delete this.stateExclusionApplied[mergedID];
         this.itemDefinition.cleanValueFor(id, version, true);
+    }
+    /**
+     * restores the include value to the applied value
+     * @param id the slot id
+     * @param version the slot version
+     */
+    restoreValueFor(id, version) {
+        const mergedID = id + "." + (version || "");
+        if (typeof this.stateExclusionApplied[mergedID] !== "undefined") {
+            this.stateExclusion[mergedID] = this.stateExclusionApplied[mergedID];
+            this.stateExclusionModified[mergedID] = true;
+            this.stateExclusionHasBeenManuallySet[mergedID] = false;
+        }
+        else {
+            delete this.stateExclusion[mergedID];
+            delete this.stateExclusionModified[mergedID];
+            delete this.stateExclusionHasBeenManuallySet[mergedID];
+        }
+        this.itemDefinition.restoreValueFor(id, version, true);
     }
     /**
      * Gives the i18 name that was specified

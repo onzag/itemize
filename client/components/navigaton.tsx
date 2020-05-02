@@ -1,8 +1,19 @@
 import React from "react";
-import { Link as RouterLink, LinkProps, Route as RouterRoute, RouteProps, Redirect as RouterRedirect, RedirectProps } from "react-router-dom";
+import {
+  Link as RouterLink,
+  LinkProps,
+  Route as RouterRoute,
+  RouteProps,
+  Prompt as RouterPrompt,
+  Redirect as RouterRedirect,
+  RedirectProps,
+} from "react-router-dom";
 import { LocationStateContext } from "../internal/app/internal-providers";
 import { Location } from "history";
 import { history } from "..";
+import { ItemDefinitionContext, IActionSubmitOptions } from "../providers/item-definition";
+import { DifferingPropertiesRetriever, DifferingIncludesRetriever, SubmitActioner, ISubmitActionerInfoArgType } from "./item-definition";
+import { EndpointErrorType } from "../../base/errors";
 
 export function setHistoryState<S>(location: Location, state: Partial<S>, replace?: boolean) {
   const newState = {...location.state};
@@ -113,36 +124,210 @@ export function Link(props: ICustomLinkProps) {
   return <RouterLink {...newProps} onClick={linkOnClick.bind(null, newProps)}/>;
 }
 
+export type PromptDialogComponent = React.ComponentType<{
+  open: boolean,
+  confirming: boolean,
+  confirmationCallbackError: EndpointErrorType,
+  confirmationCallbackErrorClean: () => void;
+  onCancel: () => void,
+  onConfirm: () => void,
+  onDiscard: () => void,
+  args?: any,
+}>;
+
 interface PromptProps {
   when: boolean;
-  message: string;
+  beforeUnloadMessage: string;
+  confirmationCallback?: () => Promise<EndpointErrorType> | EndpointErrorType;
+  confirmationCallbackCleanup?: () => void;
+  dialogArgs?: any;
+  Dialog: PromptDialogComponent;
 }
 
-export class Prompt extends React.PureComponent<PromptProps> {
+interface PromptState {
+  dialogOpened: boolean;
+  dialogOpenedFor: Location;
+  confirming: boolean;
+  confirmationError: EndpointErrorType;
+}
+
+export class Prompt extends React.PureComponent<PromptProps, PromptState> {
+  private originalLocation: Location;
   constructor(props: PromptProps) {
     super(props);
 
+    this.state = {
+      dialogOpened: false,
+      dialogOpenedFor: null,
+      confirming: false,
+      confirmationError: null,
+    }
+
     this.onBeforeUnload = this.onBeforeUnload.bind(this);
+    this.cancelDialog = this.cancelDialog.bind(this);
+    this.discardDialog = this.discardDialog.bind(this);
+    this.confirmDialog = this.confirmDialog.bind(this);
+    this.handleRouterPromptNavigationStep = this.handleRouterPromptNavigationStep.bind(this);
+    this.confirmationCallbackErrorClean = this.confirmationCallbackErrorClean.bind(this);
   }
-  onBeforeUnload() {
-
+  public handleRouterPromptNavigationStep(location: Location) {
+    if (!this.state.dialogOpened) {
+      this.setState({
+        dialogOpened: true,
+        dialogOpenedFor: location,
+      });
+      return false;
+    }
+    return true;
   }
-  componentDidMount() {
-
+  public confirmationCallbackErrorClean() {
+    this.props.confirmationCallbackCleanup();
+    this.setState({
+      confirmationError: null,
+    });
   }
-  componentWillUnmount() {
+  public cancelDialog() {
+    if (location.pathname !== this.originalLocation.pathname) {
+      redirectTo(this.originalLocation.pathname);
+    }
+    this.setState({
+      dialogOpened: false,
+      dialogOpenedFor: null,
+    });
+  }
+  public discardDialog() {
+    if (location.pathname !== this.state.dialogOpenedFor.pathname) {
+      redirectTo(this.state.dialogOpenedFor.pathname);
+    } else {
+      redirectTo(this.state.dialogOpenedFor.pathname, null, true);
+    }
+  }
+  public async confirmDialog() {
+    this.confirmationCallbackErrorClean();
+    if (this.props.confirmationCallback) {      
+      this.setState({
+        confirming: true,
+      });
+      const error = await this.props.confirmationCallback();
+      if (error) {
+        this.setState({
+          confirming: false,
+          confirmationError: error,
+        });
+        return;
+      }
+    }
 
+    this.discardDialog();
+  }
+  public onBeforeUnload(e: BeforeUnloadEvent) {
+    if (this.props.when) {
+      e.returnValue = this.props.beforeUnloadMessage;
+    }
+  }
+  public componentDidMount() {
+    this.originalLocation = history.location;
+    window.addEventListener("beforeunload", this.onBeforeUnload);
+  }
+  public componentWillUnmount() {
+    window.removeEventListener("beforeunload", this.onBeforeUnload);
+  }
+  public render() {
+    const Dialog = this.props.Dialog;
+    return <React.Fragment>
+      <RouterPrompt
+        when={this.props.when}
+        message={this.handleRouterPromptNavigationStep}
+      />
+      <Dialog
+        open={this.state.dialogOpened}
+        onCancel={this.cancelDialog}
+        onConfirm={this.confirmDialog}
+        onDiscard={this.discardDialog}
+        args={this.props.dialogArgs}
+        confirming={this.state.confirming}
+        confirmationCallbackError={this.state.confirmationError}
+        confirmationCallbackErrorClean={this.confirmationCallbackErrorClean}
+      />
+    </React.Fragment>
   }
 }
 
 interface NeedsSubmitPromptProps {
-  properties: string[];
-  includes: string[];
-  message: string;
+  properties?: string[];
+  includes?: string[];
+  confirmationSubmitOptions: IActionSubmitOptions;
+  beforeUnloadMessage: string;
+  dialogArgs?: any;
+  Dialog: PromptDialogComponent;
 }
 
-export function NeedsSubmitPrompt(props: NeedsSubmitPromptProps) {
+export class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPromptProps> {
+  public async confirmationCallback(actioner: ISubmitActionerInfoArgType, ) {
+    const response = await actioner.submit(this.props.confirmationSubmitOptions);
+    if (response.error) {
+      return response.error;
+    }
+    return null;
+  }
+  public buildPrompt(when: boolean) {
+    return (
+      <SubmitActioner>
+        {(actioner) => (
+          <Prompt
+            when={when}
+            beforeUnloadMessage={this.props.beforeUnloadMessage}
+            Dialog={this.props.Dialog}
+            dialogArgs={this.props.dialogArgs}
+            confirmationCallback={this.confirmationCallback.bind(this, actioner)}
+            confirmationCallbackCleanup={actioner.dismissError}
+          />
+         )
+        }
+      </SubmitActioner>
+    )
+  }
+  public render() {
+    const noProperties = (!this.props.properties || !this.props.properties.length);
+    const noIncludes = (!this.props.includes || !this.props.includes.length);
+    if (
+      noProperties &&
+      noIncludes
+    ) {
+      return null;
+    }
 
+    if (noIncludes) {
+      return (
+        <DifferingPropertiesRetriever mainProperties={this.props.properties}>
+          {(differingProperties) => (
+            this.buildPrompt(!!(differingProperties && differingProperties.length))
+          )}
+        </DifferingPropertiesRetriever>
+      );
+    } else if (noProperties) {
+      return (
+        <DifferingIncludesRetriever mainIncludes={this.props.includes}>
+          {(differingIncludes) => (
+            this.buildPrompt(!!(differingIncludes && differingIncludes.length))
+          )}
+        </DifferingIncludesRetriever>
+      );
+    } else {
+      <DifferingPropertiesRetriever mainProperties={this.props.properties}>
+        {(differingProperties) => (
+          <DifferingIncludesRetriever mainIncludes={this.props.includes}>
+            {(differingIncludes) => (
+              this.buildPrompt(
+                !!(differingIncludes && differingIncludes.length) ||
+                !!(differingProperties && differingProperties.length)
+              )
+            )}
+          </DifferingIncludesRetriever>
+        )}
+      </DifferingPropertiesRetriever>
+    }
+  }
 }
 
 /**

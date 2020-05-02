@@ -48,7 +48,7 @@ const typeValue = {
         let escapedText = value;
         let purifiedText = value;
         if (property.isRichText()) {
-            const dummyElement = util_1.DOMWindow.document.createElement("template");
+            const dummyElement = util_1.DOMWindow.document.createElement("div");
             dummyElement.innerHTML = value.toString();
             escapedText = dummyElement.textContent;
             purifiedText = util_1.DOMPurify.sanitize(value.toString());
@@ -101,6 +101,8 @@ const typeValue = {
         if (typeof s !== "string") {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
             // NOTE how the html text lengh is not checked, even when it is possible
+            // this is a raw check for the total character count otherwise we could get spammed
+            // with empty tags, should be large enough not to bother
         }
         else if (s.length > constants_1.MAX_RAW_TEXT_LENGTH) {
             return PropertyDefinition_1.PropertyInvalidReason.TOO_LARGE;

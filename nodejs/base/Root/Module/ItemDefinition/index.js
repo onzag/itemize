@@ -665,13 +665,13 @@ class ItemDefinition {
         // we make it we have an applied value
         this.stateHasAppliedValueTo[mergedID] = true;
         // and set all the data regarding that value
-        this.stateGQLAppliedValue[mergedID] = Object.freeze({
+        this.stateGQLAppliedValue[mergedID] = {
             userIdRequester: graphqlUserIdRequester,
             roleRequester: graphqlRoleRequester,
             rawValue: value,
             flattenedValue,
             requestFields,
-        });
+        };
         // now we get all the properties that we are supposed to apply that value to
         const properties = excludeExtensions ?
             this.getAllPropertyDefinitions() :
@@ -703,6 +703,22 @@ class ItemDefinition {
             // and we apply such value
             include.applyValue(id, version, givenValue, givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers);
         });
+    }
+    /**
+     * Restores an applied value to the last applied value
+     * @param id the id
+     * @param version the version
+     * @param excludeExtensions whether to exclude extensions of all this
+     */
+    restoreValueFor(id, version, excludeExtensions) {
+        const mergedID = id + "." + (version || "");
+        if (this.stateHasAppliedValueTo[mergedID]) {
+            const entireValue = this.stateGQLAppliedValue[mergedID];
+            this.applyValue(id, version, entireValue.rawValue, excludeExtensions, entireValue.userIdRequester, entireValue.roleRequester, entireValue.requestFields, false);
+        }
+        else {
+            this.cleanValueFor(id, version, excludeExtensions);
+        }
     }
     /**
      * Provides the owner that applied the value for the

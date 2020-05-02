@@ -79,7 +79,7 @@ export interface ISubmitActionerInfoArgType {
 }
 
 interface ISubmitActionerProps {
-  children: (arg: ISubmitActionerInfoArgType) => any;
+  children: (arg: ISubmitActionerInfoArgType) => React.ReactNode;
 }
 
 interface IActualSubmitActionerProps extends ISubmitActionerProps {

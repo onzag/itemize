@@ -107,6 +107,7 @@ export const Buttons = withStyles(buttonsStyles)((props: ButtonsProps) => {
                   showWarnings={true}
                   profileURL="my-profile"
                   cacheImage={true}
+                  size="small"
                 />;
               }
             }}

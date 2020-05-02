@@ -7,6 +7,7 @@ import { I18nRead } from "../../../components/localization";
 import { CurrentUserProfile } from "./current-user";
 import { SlowLoadingElement } from "../../components/util";
 import { Redirect } from "../../../components/navigaton";
+import { NeedsSubmitPrompt } from "../../components/needs-submit-prompt";
 
 export function MyProfile() {
   return (
@@ -43,7 +44,26 @@ export function MyProfile() {
                 includePolicies={true}
                 longTermCaching={true}
                 markForDestructionOnLogout={true}
+                cleanOnDismount={{
+                  propertiesToRestoreOnAny: [
+                    "username",
+                    "email",
+                    "about_me",
+                  ]
+                }}
               >
+                <NeedsSubmitPrompt
+                  properties={[
+                    "email",
+                    "username",
+                    "about_me",
+                  ]}
+                  i18nConfirm="update_profile"
+                  confirmationSubmitOptions={{
+                    properties: ["email", "username", "about_me"],
+                    differingOnly: true,
+                  }}
+                />
                 <I18nRead id="profile" capitalize={true}>
                   {(i18nProfile: string) => {
                     return (

@@ -51,9 +51,17 @@ export interface IIncludeState {
      */
     stateExclusion: IncludeExclusionState;
     /**
+     * The state specified exclusion that has been applied using the apply value functionality
+     */
+    stateExclusionApplied: IncludeExclusionState;
+    /**
      * Whether this state has been modified by any action, either apply or set
      */
     stateExclusionModified: boolean;
+    /**
+     * Whether this state has been manually set
+     */
+    stateExclusionHasBeenManuallySet: boolean;
 }
 /**
  * This is the raw json that comes from the json file that defines the schema
@@ -165,6 +173,15 @@ export default class Include {
      */
     private stateExclusionModified;
     /**
+     * The applied exclusion
+     */
+    private stateExclusionApplied;
+    /**
+     * This also shows whether the state has been modified, either
+     * by the user or a value has been applied
+     */
+    private stateExclusionHasBeenManuallySet;
+    /**
      * The constructor for an Include
      * @param rawJSON the raw data as JSON
      * @param parentModule the parent module
@@ -264,6 +281,13 @@ export default class Include {
      */
     getQualifiedExclusionStateIdentifier(): string;
     /**
+     * Provides the applied value for a property
+     * @param id the id
+     * @param version the version
+     * @returns the applied value
+     */
+    getAppliedExclusionState(id: number, version: string): IncludeExclusionState;
+    /**
      * Provides the current value of this item
      * @param id the id of the stored item definition or module
      * @param version the slot version
@@ -293,8 +317,15 @@ export default class Include {
     /**
      * Memory cleans the value in an item
      * @param id the slot id
+     * @param version the slot version
      */
     cleanValueFor(id: number, version: string): void;
+    /**
+     * restores the include value to the applied value
+     * @param id the slot id
+     * @param version the slot version
+     */
+    restoreValueFor(id: number, version: string): void;
     /**
      * Gives the i18 name that was specified
      * or otherwise gives the item definition i18 name

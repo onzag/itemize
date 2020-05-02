@@ -414,10 +414,17 @@ export default class PropertyDefinition {
      * to be used in the client side
      */
     stateLastUniqueCheck: {
-        [slotId: number]: {
+        [slotId: string]: {
             value: PropertyDefinitionSupportedType;
             valid: boolean;
         };
+    };
+    private canCacheState;
+    stateLastCached: {
+        [slotId: string]: IPropertyDefinitionState;
+    };
+    stateLastCachedWithExternal: {
+        [slotId: string]: IPropertyDefinitionState;
     };
     /**
      * Builds a property definition
@@ -551,13 +558,20 @@ export default class PropertyDefinition {
      * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
      * to false as it's been used applyValue on it, it's been set now by the computer
      */
-    applyValue(id: number, version: string, value: any, modifiedState: boolean, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean): void;
+    applyValue(id: number, version: string, value: PropertyDefinitionSupportedType, modifiedState: boolean, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean): void;
     /**
      * Frees the memory of stored values in a given slot id
      * @param id the slot id
      * @param version the slot version
      */
     cleanValueFor(id: number, version: string): void;
+    /**
+     * Restores the value of the given slot id to the original
+     * applied value
+     * @param id the slot id
+     * @param version the version
+     */
+    restoreValueFor(id: number, version: string): void;
     /**
      * Checks the valid value but ignores external checking
      * pass the value still because cache might apply of previous
