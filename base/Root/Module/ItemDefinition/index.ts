@@ -146,9 +146,9 @@ export interface IItemDefinitionRawJSONDataType {
   versionIsLanguage?: boolean;
 
   /**
-   * Whether the version can be optional, aka null
+   * The roles that are allowed to do versioning
    */
-  versionIsOptional?: boolean;
+  versioningRoleAccess?: string[];
 
   /**
    * Read role permissions
@@ -200,10 +200,15 @@ export interface IItemDefinitionRawJSONDataType {
   searchable?: boolean;
 
   /**
+   * Whether an user role can create in behalf
+   */
+  canCreateInBehalf?: boolean;
+
+  /**
    * A list of roles of which this item definition is allowed to be
    * used to create in behalf
    */
-  canCreateInBehalfBy?: string[];
+  createInBehalfRoleAccess?: string[];
 
   /**
    * Whether it can be parented by other item definitions, these
@@ -663,7 +668,7 @@ export default class ItemDefinition {
     }
 
     // otherwise if the version is optional and we provide no version
-    if (this.rawData.versionIsOptional && version === null) {
+    if (version === null) {
       // then it's fine
       return true;
     } else if (
@@ -681,10 +686,13 @@ export default class ItemDefinition {
     const isLanguage = !!supportedLanguages.find((l) => l === version);
 
     const versionSplitted = version.split("-");
+    if (!isCountry && !isLanguage && versionSplitted.length !== 2) {
+      return false;
+    }
     const possibleLanguage = versionSplitted[0];
     const possibleCountry = versionSplitted[1] || null;
     const isLanguageAndCountry = !!possibleCountry &&
-      !!countries[possibleCountry] && supportedLanguages.find((l) => possibleLanguage);
+      !!countries[possibleCountry] && supportedLanguages.find((l) => l === possibleLanguage);
 
     // and check each
     if (
@@ -1591,18 +1599,18 @@ export default class ItemDefinition {
    */
   public checkRoleCanCreateInBehalf(role: string, throwError: boolean) {
     let canCreateInBehalf = false;
-    if (this.rawData.canCreateInBehalfBy) {
-      canCreateInBehalf = this.rawData.canCreateInBehalfBy.includes(ANYONE_METAROLE) ||
+    if (this.rawData.canCreateInBehalf && this.rawData.createInBehalfRoleAccess) {
+      canCreateInBehalf = this.rawData.createInBehalfRoleAccess.includes(ANYONE_METAROLE) ||
         (
-          this.rawData.canCreateInBehalfBy.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-        ) || this.rawData.canCreateInBehalfBy.includes(role);
+          this.rawData.createInBehalfRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+        ) || this.rawData.createInBehalfRoleAccess.includes(role);
 
       const notLoggedInWhenShould = role === GUEST_METAROLE;
 
       if (!canCreateInBehalf && throwError) {
         throw new EndpointError({
           message: `Forbidden, role ${role} cannot create in behalf in resource ${this.getName()}` +
-          ` only roles ${this.rawData.canCreateInBehalfBy.join(", ")} can do so`,
+          ` only roles ${this.rawData.createInBehalfRoleAccess.join(", ")} can do so`,
           code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : ENDPOINT_ERRORS.FORBIDDEN,
         });
       }
@@ -1613,8 +1621,64 @@ export default class ItemDefinition {
         // and it was not a login mistake
         code: ENDPOINT_ERRORS.FORBIDDEN,
       });
+    } else if (this.rawData.canCreateInBehalf) {
+      canCreateInBehalf = true;
     }
     return canCreateInBehalf;
+  }
+
+  /**
+   * Provides the roles that are allowed versioning
+   */
+  public getRolesForVersioning() {
+    if (this.rawData.versioningRoleAccess) {
+      return this.rawData.versioningRoleAccess;
+    }
+    return [OWNER_METAROLE];
+  }
+
+  /**
+   * Checks whether a given role can version an item resources
+   * @param role the role of the user
+   * @param userId the user id of that user
+   * @param ownerUserId the owner of the current unversioned value
+   * @param throwError whether to throw an error in case of failure
+   */
+  public checkRoleCanVersion(
+    role: string,
+    userId: number,
+    ownerUserId: number,
+    throwError: boolean,
+  ) {
+    if (!this.isVersioned()) {
+      if (throwError) {
+        throw new EndpointError({
+          message: "Versioning is disabled",
+          code: ENDPOINT_ERRORS.FORBIDDEN,
+        });
+      }
+
+      return false;
+    }
+
+    const roles = this.getRolesForVersioning();
+
+    const versioningAccess = roles.includes(ANYONE_METAROLE) ||
+    (
+      roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+    ) || (
+      roles.includes(OWNER_METAROLE) && userId === ownerUserId
+    ) || roles.includes(role);
+
+    if (!versioningAccess && throwError) {
+      throw new EndpointError({
+        message: `Forbidden, role ${role} cannot version resource ${this.getName()}` +
+        ` only roles ${roles.join(", ")} can do so`,
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    }
+
+    return versioningAccess;
   }
 
   /**

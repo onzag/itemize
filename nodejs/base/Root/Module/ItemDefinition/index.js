@@ -231,7 +231,7 @@ class ItemDefinition {
             return false;
         }
         // otherwise if the version is optional and we provide no version
-        if (this.rawData.versionIsOptional && version === null) {
+        if (version === null) {
             // then it's fine
             return true;
         }
@@ -247,10 +247,13 @@ class ItemDefinition {
         const isCountry = !!imported_resources_1.countries[version];
         const isLanguage = !!supportedLanguages.find((l) => l === version);
         const versionSplitted = version.split("-");
+        if (!isCountry && !isLanguage && versionSplitted.length !== 2) {
+            return false;
+        }
         const possibleLanguage = versionSplitted[0];
         const possibleCountry = versionSplitted[1] || null;
         const isLanguageAndCountry = !!possibleCountry &&
-            !!imported_resources_1.countries[possibleCountry] && supportedLanguages.find((l) => possibleLanguage);
+            !!imported_resources_1.countries[possibleCountry] && supportedLanguages.find((l) => l === possibleLanguage);
         // and check each
         if (this.rawData.versionIsCountry &&
             isCountry) {
@@ -998,14 +1001,14 @@ class ItemDefinition {
      */
     checkRoleCanCreateInBehalf(role, throwError) {
         let canCreateInBehalf = false;
-        if (this.rawData.canCreateInBehalfBy) {
-            canCreateInBehalf = this.rawData.canCreateInBehalfBy.includes(constants_1.ANYONE_METAROLE) ||
-                (this.rawData.canCreateInBehalfBy.includes(constants_1.ANYONE_LOGGED_METAROLE) && role !== constants_1.GUEST_METAROLE) || this.rawData.canCreateInBehalfBy.includes(role);
+        if (this.rawData.canCreateInBehalf && this.rawData.createInBehalfRoleAccess) {
+            canCreateInBehalf = this.rawData.createInBehalfRoleAccess.includes(constants_1.ANYONE_METAROLE) ||
+                (this.rawData.createInBehalfRoleAccess.includes(constants_1.ANYONE_LOGGED_METAROLE) && role !== constants_1.GUEST_METAROLE) || this.rawData.createInBehalfRoleAccess.includes(role);
             const notLoggedInWhenShould = role === constants_1.GUEST_METAROLE;
             if (!canCreateInBehalf && throwError) {
                 throw new errors_1.EndpointError({
                     message: `Forbidden, role ${role} cannot create in behalf in resource ${this.getName()}` +
-                        ` only roles ${this.rawData.canCreateInBehalfBy.join(", ")} can do so`,
+                        ` only roles ${this.rawData.createInBehalfRoleAccess.join(", ")} can do so`,
                     code: notLoggedInWhenShould ? constants_1.ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : constants_1.ENDPOINT_ERRORS.FORBIDDEN,
                 });
             }
@@ -1018,7 +1021,48 @@ class ItemDefinition {
                 code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
             });
         }
+        else if (this.rawData.canCreateInBehalf) {
+            canCreateInBehalf = true;
+        }
         return canCreateInBehalf;
+    }
+    /**
+     * Provides the roles that are allowed versioning
+     */
+    getRolesForVersioning() {
+        if (this.rawData.versioningRoleAccess) {
+            return this.rawData.versioningRoleAccess;
+        }
+        return [constants_1.OWNER_METAROLE];
+    }
+    /**
+     * Checks whether a given role can version an item resources
+     * @param role the role of the user
+     * @param userId the user id of that user
+     * @param ownerUserId the owner of the current unversioned value
+     * @param throwError whether to throw an error in case of failure
+     */
+    checkRoleCanVersion(role, userId, ownerUserId, throwError) {
+        if (!this.isVersioned()) {
+            if (throwError) {
+                throw new errors_1.EndpointError({
+                    message: "Versioning is disabled",
+                    code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+                });
+            }
+            return false;
+        }
+        const roles = this.getRolesForVersioning();
+        const versioningAccess = roles.includes(constants_1.ANYONE_METAROLE) ||
+            (roles.includes(constants_1.ANYONE_LOGGED_METAROLE) && role !== constants_1.GUEST_METAROLE) || (roles.includes(constants_1.OWNER_METAROLE) && userId === ownerUserId) || roles.includes(role);
+        if (!versioningAccess && throwError) {
+            throw new errors_1.EndpointError({
+                message: `Forbidden, role ${role} cannot version resource ${this.getName()}` +
+                    ` only roles ${roles.join(", ")} can do so`,
+                code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+            });
+        }
+        return versioningAccess;
     }
     /**
      * Tells whether this item definition has parenting enforced

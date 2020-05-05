@@ -7,6 +7,7 @@ import {
 } from "../../providers/item-definition";
 
 export interface IItemDefinitionLoaderInfoArgType {
+  loaded: boolean;
   loading: boolean;
   notFound: boolean;
   blocked: boolean;
@@ -31,11 +32,13 @@ class ActualItemDefinitionLoader extends React.Component<IActualItemDefinitionLo
       nextProps.itemDefinitionContext.blockedButDataAccessible !==
         this.props.itemDefinitionContext.blockedButDataAccessible ||
       nextProps.itemDefinitionContext.notFound !== this.props.itemDefinitionContext.notFound ||
-      nextProps.itemDefinitionContext.loading !== this.props.itemDefinitionContext.loading;
+      nextProps.itemDefinitionContext.loading !== this.props.itemDefinitionContext.loading ||
+      nextProps.itemDefinitionContext.loaded !== this.props.itemDefinitionContext.loaded;
   }
   public render() {
     return this.props.children(
       {
+        loaded: this.props.itemDefinitionContext.loaded,
         loading: this.props.itemDefinitionContext.loading,
         notFound: this.props.itemDefinitionContext.notFound,
         blocked: this.props.itemDefinitionContext.blocked,

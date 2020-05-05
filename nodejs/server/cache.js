@@ -134,11 +134,42 @@ class Cache {
         const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(itemDefinition.getParentModule(), itemDefinition, value, null, this.knex, this.uploadsContainer, dictionary);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
+        const selfTable = itemDefinition.getQualifiedPathName();
+        const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
         // this data is added every time when creating
         sqlModData.type = itemDefinition.getQualifiedPathName();
         sqlModData.created_at = this.knex.fn.now();
         sqlModData.last_modified = this.knex.fn.now();
         sqlModData.created_by = createdBy || constants_1.UNSPECIFIED_OWNER;
+        sqlModData.version = version || "";
+        if (forId && version === null) {
+            throw new errors_1.EndpointError({
+                message: "You can't specify your own id for values without version",
+                code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+            });
+        }
+        else if (forId) {
+            // now this is important
+            sqlModData.id = forId;
+            // let's find if such a value exists already
+            const currentValue = await this.requestValue(itemDefinition, forId, version);
+            // if there's one it's a forbidden action
+            if (currentValue) {
+                throw new errors_1.EndpointError({
+                    message: "You can't override an existant value by requesting creation on top of it",
+                    code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+                });
+            }
+            // otherwise let's find the unversioned value
+            const unversionedValue = await this.requestValue(itemDefinition, forId, null);
+            // if no such value of any version exists
+            if (!unversionedValue) {
+                throw new errors_1.EndpointError({
+                    message: "Theres no unversioned value for this version creation",
+                    code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+                });
+            }
+        }
         if (parent) {
             sqlModData.parent_id = parent.id;
             // the version can never be null, so we must cast it into the invalid
@@ -146,8 +177,6 @@ class Cache {
             sqlModData.parent_version = parent.version || "";
             sqlModData.parent_type = parent.type;
         }
-        const selfTable = itemDefinition.getQualifiedPathName();
-        const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
         // now let's build the transaction for the insert query which requires
         // two tables to be modified, and it always does so, as item definition information
         // must be added because create requires so

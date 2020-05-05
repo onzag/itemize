@@ -219,7 +219,10 @@ exports.default = {
         ownerIsObjectId: {
             type: "boolean",
         },
-        canCreateInBehalfBy: {
+        canCreateInBehalf: {
+            type: "boolean",
+        },
+        createInBehalfRoleAccess: {
             type: "array",
             items: {
                 type: "string",
@@ -242,6 +245,12 @@ exports.default = {
         enableVersioning: {
             type: "boolean",
         },
+        versioningRoleAccess: {
+            type: "array",
+            items: {
+                type: "string",
+            },
+        },
         versionIsLanguageAndCountry: {
             type: "boolean",
         },
@@ -249,9 +258,6 @@ exports.default = {
             type: "boolean",
         },
         versionIsCountry: {
-            type: "boolean",
-        },
-        versionIsOptional: {
             type: "boolean",
         },
     },
@@ -263,10 +269,11 @@ exports.default = {
     },
     required: ["type"],
     dependencies: {
+        createInBehalfRoleAccess: ["canCreateInBehalf"],
+        versioningRoleAccess: ["enableVersioning"],
         versionIsLanguageAndCountry: ["enableVersioning"],
         versionIsLanguage: ["enableVersioning"],
         versionIsCountry: ["enableVersioning"],
-        versionIsOptional: ["enableVersioning"]
     },
     additionalProperties: false,
 };

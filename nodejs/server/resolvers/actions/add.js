@@ -26,6 +26,32 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
     // check that the user is logged in, for adding, only logged users
     // are valid
     await basic_1.validateTokenIsntBlocked(appData.cache, tokenData);
+    // if we are specifying a for_id
+    if (resolverArgs.args.for_id) {
+        if (!resolverArgs.args.version) {
+            throw new errors_1.EndpointError({
+                message: "Specifying for_id without a version is not allowed",
+                code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+            });
+        }
+        const unversionedValue = await appData.cache.requestValue(itemDefinition, resolverArgs.args.for_id, null);
+        // if no such value of any version exists
+        if (!unversionedValue) {
+            throw new errors_1.EndpointError({
+                message: "Theres no unversioned value for this version creation",
+                code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+            });
+        }
+        itemDefinition.checkRoleCanVersion(tokenData.role, tokenData.id, unversionedValue.created_by, true);
+    }
+    // check the version on whether it's a valid value
+    const isValidVersion = itemDefinition.isValidVersion(resolverArgs.args.version || null, appData.config.supportedLanguages);
+    if (!isValidVersion) {
+        throw new errors_1.EndpointError({
+            message: "The provided version " + resolverArgs.args.version + " is deemed invalid",
+            code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+        });
+    }
     // now we must check if we are parenting
     const isParenting = !!(resolverArgs.args.parent_id || resolverArgs.args.parent_type || resolverArgs.args.parent_version);
     basic_1.validateParentingRules(appData, resolverArgs.args.parent_id, resolverArgs.args.parent_version || null, resolverArgs.args.parent_type, itemDefinition, tokenData.id, tokenData.role);
@@ -189,9 +215,9 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
             }
         }
     }
-    const value = await appData.cache.requestCreation(itemDefinition, null, // TODO
-    null, // TODO
-    gqlValueToConvert, tokenData.id, dictionary, isParenting ? {
+    // the creation will ensure that the for_id and version
+    // are valid and do not create strange data structures
+    const value = await appData.cache.requestCreation(itemDefinition, resolverArgs.args.for_id || null, resolverArgs.args.version || null, gqlValueToConvert, tokenData.id, dictionary, isParenting ? {
         id: resolverArgs.args.parent_id,
         version: resolverArgs.args.parent_version,
         type: resolverArgs.args.parent_type,

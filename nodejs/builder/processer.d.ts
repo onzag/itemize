@@ -32,7 +32,7 @@ export declare function processItemDefinition(rawData: IItemDefinitionRawJSONDat
     versionIsLanguageAndCountry?: boolean;
     versionIsCountry?: boolean;
     versionIsLanguage?: boolean;
-    versionIsOptional?: boolean;
+    versioningRoleAccess?: string[];
     readRoleAccess?: string[];
     createRoleAccess?: string[];
     editRoleAccess?: string[];
@@ -42,7 +42,8 @@ export declare function processItemDefinition(rawData: IItemDefinitionRawJSONDat
     policies?: import("../base/Root/Module/ItemDefinition").IPoliciesRawJSONDataType;
     ownerIsObjectId?: boolean;
     searchable?: boolean;
-    canCreateInBehalfBy?: string[];
+    canCreateInBehalf?: boolean;
+    createInBehalfRoleAccess?: string[];
     canBeParentedBy?: import("../base/Root/Module/ItemDefinition").IItemDefinitionParentingRawJSONDataType[];
     mustBeParented?: boolean;
     parentingRoleAccess?: string[];

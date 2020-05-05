@@ -542,6 +542,8 @@ export async function runAddQueryFor(
     language: string,
     listenerUUID: string,
     cacheStore: boolean,
+    forId: number,
+    forVersion: string,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -555,6 +557,12 @@ export async function runAddQueryFor(
     arg.language,
   );
   args.listener_uuid = arg.listenerUUID;
+  if (arg.forId) {
+    args.for_id = arg.forId;
+  }
+  if (arg.forVersion) {
+    args.version = arg.forVersion;
+  }
 
   const query = buildGqlMutation({
     name: queryName,

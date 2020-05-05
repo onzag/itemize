@@ -50,7 +50,7 @@ async function editItemDefinition(appData, resolverArgs, itemDefinition) {
             if (!content) {
                 debug("FAILED due to lack of content data");
                 throw new errors_1.EndpointError({
-                    message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
+                    message: `There's no ${selfTable} with id ${resolverArgs.args.id} and version ${resolverArgs.args.version}`,
                     code: constants_1.ENDPOINT_ERRORS.NOT_FOUND,
                 });
             }

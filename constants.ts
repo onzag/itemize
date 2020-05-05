@@ -869,6 +869,10 @@ export const RESERVED_GETTER_LIST_PROPERTIES = {
  */
 export const RESERVED_ADD_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
+  listener_uuid: {
+    type: GraphQLString,
+    description: "An uuid to identify the creator of this action",
+  },
   in_behalf_of: {
     type: GraphQLInt,
     description: "an user id that will be the true owner",
@@ -885,7 +889,6 @@ export const RESERVED_ADD_PROPERTIES = {
     type: GraphQLString,
     description: "a parent item definition qualified path (must be specified with parent_id)",
   },
-  // TODO implement these madness in the add resolver
   for_id: {
     type: GraphQLInt,
     description: "If specified create this item for this given id, the id must already exist and be of the same type," +
@@ -894,8 +897,7 @@ export const RESERVED_ADD_PROPERTIES = {
   },
   version: {
     type: GraphQLString,
-    description: "An optional version, it's possible to set a version without specifying for_id and it's possible to" +
-    " set a for_id without specifying a version",
+    description: "An optional version set a for_id without specifying a version",
   },
 };
 

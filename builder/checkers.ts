@@ -187,7 +187,7 @@ export function checkItemDefinition(
   // these two properties are not allowed between each other
   // you cannot create in behalf and make it be owned by the object id
   // at the same time
-  if (rawData.canCreateInBehalfBy && rawData.ownerIsObjectId) {
+  if (rawData.createInBehalfRoleAccess && rawData.ownerIsObjectId) {
     throw new CheckUpError(
       "Cannot be able to create in behalf and have its owner be the object id",
       actualTraceback.newTraceToBit("ownerIsObjectId"),

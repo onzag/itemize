@@ -109,9 +109,9 @@ export interface IItemDefinitionRawJSONDataType {
      */
     versionIsLanguage?: boolean;
     /**
-     * Whether the version can be optional, aka null
+     * The roles that are allowed to do versioning
      */
-    versionIsOptional?: boolean;
+    versioningRoleAccess?: string[];
     /**
      * Read role permissions
      */
@@ -157,10 +157,14 @@ export interface IItemDefinitionRawJSONDataType {
      */
     searchable?: boolean;
     /**
+     * Whether an user role can create in behalf
+     */
+    canCreateInBehalf?: boolean;
+    /**
      * A list of roles of which this item definition is allowed to be
      * used to create in behalf
      */
-    canCreateInBehalfBy?: string[];
+    createInBehalfRoleAccess?: string[];
     /**
      * Whether it can be parented by other item definitions, these
      * represent a list of rules
@@ -735,6 +739,18 @@ export default class ItemDefinition {
      * @return a boolean on whether the user is allowed
      */
     checkRoleCanCreateInBehalf(role: string, throwError: boolean): boolean;
+    /**
+     * Provides the roles that are allowed versioning
+     */
+    getRolesForVersioning(): string[];
+    /**
+     * Checks whether a given role can version an item resources
+     * @param role the role of the user
+     * @param userId the user id of that user
+     * @param ownerUserId the owner of the current unversioned value
+     * @param throwError whether to throw an error in case of failure
+     */
+    checkRoleCanVersion(role: string, userId: number, ownerUserId: number, throwError: boolean): boolean;
     /**
      * Tells whether this item definition has parenting enforced
      * @return a boolean on whether parenting is enforced

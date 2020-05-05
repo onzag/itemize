@@ -30,10 +30,10 @@
     "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
     "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
     "deleteRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
-    "allowsVersioning": true,
+    "versioningRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
+    "enableVersioning": true,
     "versionIsLanguageAndCountry": true,
     "versionIsLanguage": true,
     "versionIsCountry": true,
-    "versionIsNull": true,
     "searchable": false
 }

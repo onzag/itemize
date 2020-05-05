@@ -147,6 +147,8 @@ export interface IItemDefinitionContextType {
   loadError: EndpointErrorType;
   // whether it is currently loading
   loading: boolean;
+  // whether it loaded, sucesfully
+  loaded: boolean;
   // an error that came during submitting
   submitError: EndpointErrorType;
   // whether it is currently submitting
@@ -394,6 +396,7 @@ interface IActualItemDefinitionProviderState {
   notFound: boolean;
   loadError: EndpointErrorType;
   loading: boolean;
+  loaded: boolean;
   submitError: EndpointErrorType;
   submitting: boolean;
   submitted: boolean;
@@ -537,6 +540,7 @@ export class ActualItemDefinitionProvider extends
       // to avoid pointless refresh we set it up as true from
       // the beggining
       loading: this.props.avoidLoading ? false : !!this.props.forId,
+      loaded: false,
 
       submitError: null,
       submitting: false,
@@ -985,6 +989,11 @@ export class ActualItemDefinitionProvider extends
     if (!this.state.loading && !this.isUnmounted) {
       this.setState({
         loading: true,
+        loaded: false,
+      });
+    } else if (!this.isUnmounted) {
+      this.setState({
+        loaded: false,
       });
     }
 
@@ -1084,6 +1093,7 @@ export class ActualItemDefinitionProvider extends
         // set the load error and all the logical states, we are not loading
         // anymore
         loadError: value.error,
+        loaded: false,
         isBlocked: false,
         isBlockedButDataIsAccessible: false,
         notFound: false,
@@ -1098,6 +1108,7 @@ export class ActualItemDefinitionProvider extends
         isBlocked: false,
         isBlockedButDataIsAccessible: false,
         loading: false,
+        loaded: true,
       });
     } else if (value.value) {
       // otherwise if we have a value, we check all these options
@@ -1107,6 +1118,7 @@ export class ActualItemDefinitionProvider extends
         isBlocked: !!value.value.blocked_at,
         isBlockedButDataIsAccessible: value.value.blocked_at ? !!value.value.DATA : false,
         loading: false,
+        loaded: true,
       });
     }
 
@@ -1650,7 +1662,8 @@ export class ActualItemDefinitionProvider extends
   }
   public async submit(options: IActionSubmitOptions): Promise<IActionResponseWithId> {
     // if we are already submitting, we reject the action
-    if (this.state.submitting) {
+    // also while loading as we cannot know if it's a edit or add action
+    if (this.state.submitting || this.state.loading) {
       return null;
     }
 
@@ -1726,7 +1739,7 @@ export class ActualItemDefinitionProvider extends
     let value: IGQLValue;
     let error: EndpointErrorType;
     let getQueryFields: IGQLRequestFields;
-    if (this.props.forId) {
+    if (this.props.forId && this.state.loaded && !this.state.notFound) {
       const totalValues = await runEditQueryFor({
         args: argumentsForQuery,
         fields: requestFields,
@@ -1750,6 +1763,8 @@ export class ActualItemDefinitionProvider extends
         language: this.props.localeData.language,
         listenerUUID: this.props.remoteListener.getUUID(),
         cacheStore: this.props.longTermCaching,
+        forId: this.props.forId || null,
+        forVersion: this.props.forVersion || null,
       });
       value = totalValues.value;
       error = totalValues.error;
@@ -2139,6 +2154,7 @@ export class ActualItemDefinitionProvider extends
           blockedButDataAccessible: this.state.isBlockedButDataIsAccessible,
           loadError: this.state.loadError,
           loading: this.state.loading,
+          loaded: this.state.loaded,
           submitError: this.state.submitError,
           submitting: this.state.submitting,
           submitted: this.state.submitted,

@@ -217,7 +217,10 @@ declare const _default: {
         ownerIsObjectId: {
             type: string;
         };
-        canCreateInBehalfBy: {
+        canCreateInBehalf: {
+            type: string;
+        };
+        createInBehalfRoleAccess: {
             type: string;
             items: {
                 type: string;
@@ -252,6 +255,12 @@ declare const _default: {
         enableVersioning: {
             type: string;
         };
+        versioningRoleAccess: {
+            type: string;
+            items: {
+                type: string;
+            };
+        };
         versionIsLanguageAndCountry: {
             type: string;
         };
@@ -259,9 +268,6 @@ declare const _default: {
             type: string;
         };
         versionIsCountry: {
-            type: string;
-        };
-        versionIsOptional: {
             type: string;
         };
     };
@@ -808,10 +814,11 @@ declare const _default: {
     };
     required: string[];
     dependencies: {
+        createInBehalfRoleAccess: string[];
+        versioningRoleAccess: string[];
         versionIsLanguageAndCountry: string[];
         versionIsLanguage: string[];
         versionIsCountry: string[];
-        versionIsOptional: string[];
     };
     additionalProperties: boolean;
 };

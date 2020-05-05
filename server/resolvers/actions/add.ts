@@ -50,6 +50,40 @@ export async function addItemDefinition(
   // are valid
   await validateTokenIsntBlocked(appData.cache, tokenData);
 
+  // if we are specifying a for_id
+  if (resolverArgs.args.for_id) {
+    if (!resolverArgs.args.version) {
+      throw new EndpointError({
+        message: "Specifying for_id without a version is not allowed",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    }
+
+    const unversionedValue = await appData.cache.requestValue(
+      itemDefinition,
+      resolverArgs.args.for_id,
+      null,
+    );
+    // if no such value of any version exists
+    if (!unversionedValue) {
+      throw new EndpointError({
+        message: "Theres no unversioned value for this version creation",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    }
+    itemDefinition.checkRoleCanVersion(tokenData.role, tokenData.id, unversionedValue.created_by as number, true);
+  }
+
+  // check the version on whether it's a valid value
+  const isValidVersion =
+    itemDefinition.isValidVersion(resolverArgs.args.version || null, appData.config.supportedLanguages);
+  if (!isValidVersion) {
+    throw new EndpointError({
+      message: "The provided version " + resolverArgs.args.version + " is deemed invalid",
+      code: ENDPOINT_ERRORS.FORBIDDEN,
+    });
+  }
+
   // now we must check if we are parenting
   const isParenting = !!(
     resolverArgs.args.parent_id || resolverArgs.args.parent_type || resolverArgs.args.parent_version
@@ -266,10 +300,12 @@ export async function addItemDefinition(
     }
   }
 
+  // the creation will ensure that the for_id and version
+  // are valid and do not create strange data structures
   const value = await appData.cache.requestCreation(
     itemDefinition,
-    null, // TODO
-    null, // TODO
+    resolverArgs.args.for_id || null,
+    resolverArgs.args.version || null,
     gqlValueToConvert,
     tokenData.id,
     dictionary,

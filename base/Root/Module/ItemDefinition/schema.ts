@@ -220,7 +220,10 @@ export default {
     ownerIsObjectId: {
       type: "boolean",
     },
-    canCreateInBehalfBy: {
+    canCreateInBehalf: {
+      type: "boolean",
+    },
+    createInBehalfRoleAccess: {
       type: "array",
       items: {
         type: "string",
@@ -243,6 +246,12 @@ export default {
     enableVersioning: {
       type: "boolean",
     },
+    versioningRoleAccess: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
     versionIsLanguageAndCountry: {
       type: "boolean",
     },
@@ -250,9 +259,6 @@ export default {
       type: "boolean",
     },
     versionIsCountry: {
-      type: "boolean",
-    },
-    versionIsOptional: {
       type: "boolean",
     },
   },
@@ -264,10 +270,11 @@ export default {
   },
   required: ["type"],
   dependencies: {
-   versionIsLanguageAndCountry: ["enableVersioning"],
+    createInBehalfRoleAccess: ["canCreateInBehalf"],
+    versioningRoleAccess: ["enableVersioning"],
+    versionIsLanguageAndCountry: ["enableVersioning"],
     versionIsLanguage: ["enableVersioning"],
     versionIsCountry: ["enableVersioning"],
-    versionIsOptional: ["enableVersioning"]
   },
   additionalProperties: false,
 };

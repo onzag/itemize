@@ -77,7 +77,7 @@ export async function editItemDefinition(
         if (!content) {
           debug("FAILED due to lack of content data");
           throw new EndpointError({
-            message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
+            message: `There's no ${selfTable} with id ${resolverArgs.args.id} and version ${resolverArgs.args.version}`,
             code: ENDPOINT_ERRORS.NOT_FOUND,
           });
         }

@@ -488,6 +488,10 @@ export declare const RESERVED_GETTER_LIST_PROPERTIES: {
  * Properties required in order to add something
  */
 export declare const RESERVED_ADD_PROPERTIES: {
+    listener_uuid: {
+        type: import("graphql").GraphQLScalarType;
+        description: string;
+    };
     in_behalf_of: {
         type: import("graphql").GraphQLScalarType;
         description: string;
