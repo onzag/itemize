@@ -1,13 +1,14 @@
 import React from "react";
-import { I18nRead, I18nReadMany } from "../../../components/localization";
 import { Container, createStyles, WithStyles, withStyles, Typography, Paper, Theme, Tooltip } from "@material-ui/core";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
-import { Reader, View, Entry } from "../../../components/property";
 import { Avatar } from "../../components/avatar";
 import { countries } from "../../../../imported-resources";
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
-import { UserDataRetriever } from "../../../components/user";
 import { AdminToolbox } from "./admin-toolbox";
+import Reader from "../../../components/property/Reader";
+import I18nRead from "../../../components/localization/I18nRead";
+import View from "../../../components/property/View";
+import UserDataRetriever from "../../../components/user/UserDataRetriever";
 
 const publicUserProfileStyles = (theme: Theme) => createStyles({
   container: {

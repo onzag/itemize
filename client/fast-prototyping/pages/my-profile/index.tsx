@@ -1,13 +1,13 @@
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
-import { UserDataRetriever } from "../../../components/user";
-import { TitleSetter } from "../../../components/util";
-import { I18nRead } from "../../../components/localization";
 import { CurrentUserProfile } from "./current-user";
 import { SlowLoadingElement } from "../../components/util";
-import { Redirect } from "../../../components/navigaton";
+import Redirect from "../../../components/navigation/Redirect";
 import { NeedsSubmitPrompt } from "../../components/needs-submit-prompt";
+import UserDataRetriever from "../../../components/user/UserDataRetriever";
+import I18nRead from "../../../components/localization/I18nRead";
+import TitleSetter from "../../../components/util/TitleSetter";
 
 export function MyProfile() {
   return (

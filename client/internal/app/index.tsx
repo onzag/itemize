@@ -2,7 +2,7 @@ import React from "react";
 import Root, { IRootRawJSONDataType, Ii18NType, ILangLocalesType } from "../../../base/Root";
 import { importScript } from "../..";
 import Moment from "moment";
-import { Route } from "react-router";
+import { Route } from "react-router-dom";
 import { history } from "../..";
 import { countries, currencies } from "../../../imported-resources";
 import { TokenProvider, ITokenProviderState, LocationStateContext } from "./internal-providers";
@@ -153,6 +153,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
         version: null,
         listenerUUID: this.remoteListener.getUUID(),
         language: "en",
+        cacheStore: true,
       })
 
       // Ignore errors, we just go for success

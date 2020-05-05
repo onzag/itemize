@@ -1,8 +1,8 @@
 import React from "react";
 import { Button } from "@material-ui/core";
-import { I18nRead } from "../../../components/localization";
-import { AppIsOutdatedChecker } from "../../../components/outdated";
 import UpdateIcon from "@material-ui/icons/Update"; 
+import AppIsOutdatedChecker from "../../../components/outdated/AppIsOutdatedChecker";
+import I18nRead from "../../../components/localization/I18nRead";
 
 interface OutdatedTextProps {
   onClick: (e: React.MouseEvent) => void;

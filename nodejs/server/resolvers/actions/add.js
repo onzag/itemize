@@ -145,7 +145,7 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
     // and extract the triggers from the registry
     const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef];
     const moduleTrigger = appData.triggers.module[pathOfThisModule];
-    // if we got any of them
+    // if we got any of them convert
     if (itemDefinitionTrigger || moduleTrigger) {
         // we split the args in the graphql query for that which belongs to the
         // item definition and that which is extra

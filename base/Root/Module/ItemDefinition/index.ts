@@ -28,6 +28,7 @@ import { EndpointError } from "../../../errors";
 import uuid from "uuid";
 import { flattenRawGQLValueOrFields } from "../../../../gql-util";
 import { IGQLValue, IGQLRequestFields } from "../../../../gql-querier";
+import { countries } from "../../../../imported-resources";
 
 /**
  * Policies eg, readRoleAccess, editRoleAccess, createRoleAccess
@@ -123,6 +124,31 @@ export interface IItemDefinitionRawJSONDataType {
    * The properties represent the list of properties it has
    */
   properties?: IPropertyDefinitionRawJSONDataType[];
+
+  /**
+   * Whether versioning is enabled
+   */
+  enableVersioning?: boolean;
+
+  /**
+   * Whether the version can be a country language concat pair such as en-US or fi-FI
+   */
+  versionIsLanguageAndCountry?: boolean;
+
+  /**
+   * Whether the version can be a country
+   */
+  versionIsCountry?: boolean;
+
+  /**
+   * Whether the version can be a language
+   */
+  versionIsLanguage?: boolean;
+
+  /**
+   * Whether the version can be optional, aka null
+   */
+  versionIsOptional?: boolean;
 
   /**
    * Read role permissions
@@ -614,6 +640,72 @@ export default class ItemDefinition {
    */
   public isExtensionsInstance() {
     return this.extensionsInstance;
+  }
+
+  /**
+   * Tells whether this item definition is versioned
+   */
+  public isVersioned() {
+    return !!this.rawData.enableVersioning;
+  }
+
+  /**
+   * Tells whether a version is a valid value for this item definition
+   * @param version the version id
+   * @param supportedLanguages the array list of supported language this function
+   * is unaware of supported languages so it needs to ask in order to check for a version
+   */
+  public isValidVersion(version: string, supportedLanguages: string[]) {
+    // if it's not a versioned item definition and the version is not null
+    if (!this.isVersioned() && version !== null) {
+      // then it's invalid
+      return false;
+    }
+
+    // otherwise if the version is optional and we provide no version
+    if (this.rawData.versionIsOptional && version === null) {
+      // then it's fine
+      return true;
+    } else if (
+      // if there is no complex condition for these localized versions
+      !this.rawData.versionIsCountry &&
+      !this.rawData.versionIsLanguage &&
+      !this.rawData.versionIsLanguageAndCountry
+    ) {
+      // then the version must simply not be null
+      return version !== null;
+    }
+
+    // otherwse let's calculate these booleans
+    const isCountry = !!countries[version];
+    const isLanguage = !!supportedLanguages.find((l) => l === version);
+
+    const versionSplitted = version.split("-");
+    const possibleLanguage = versionSplitted[0];
+    const possibleCountry = versionSplitted[1] || null;
+    const isLanguageAndCountry = !!possibleCountry &&
+      !!countries[possibleCountry] && supportedLanguages.find((l) => possibleLanguage);
+
+    // and check each
+    if (
+      this.rawData.versionIsCountry &&
+      isCountry
+    ) {
+      return true;
+    } else if (
+      this.rawData.versionIsLanguage &&
+      isLanguage
+    ) {
+      return true;
+    } else if (
+      this.rawData.versionIsLanguageAndCountry &&
+      isLanguageAndCountry
+    ) {
+      return true;
+    }
+
+    // if none passes, we return false
+    return false;
   }
 
   /**

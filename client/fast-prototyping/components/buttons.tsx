@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { SubmitActioner } from "../../components/item-definition";
 import { Button, PropTypes } from "@material-ui/core";
-import { I18nRead } from "../../components/localization";
 import { IActionSubmitOptions } from "../../providers/item-definition";
 import { ProgressingElement } from "./util";
-import { localizedRedirectTo, goBack } from "../../components/navigaton";
+import SubmitActioner from "../../components/item-definition/SubmitActioner";
+import { goBack, localizedRedirectTo } from "../../components/navigation";
+import I18nRead from "../../components/localization/I18nRead";
 
 interface ISubmitButtonProps {
   options: IActionSubmitOptions;

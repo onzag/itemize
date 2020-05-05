@@ -1,9 +1,10 @@
 import React from "react";
 import { withStyles, WithStyles, Theme, createStyles, Typography, IconButton, CircularProgress } from "@material-ui/core";
-import { ItemDefinitionLoader as NItemDefinitionLoader } from "../../components/item-definition";
-import { I18nRead, I18nReadError } from "../../components/localization";
+import NItemDefinitionLoader from "../../components/item-definition/ItemDefinitionLoader";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import { DelayDisplay } from "./util";
+import I18nRead from "../../components/localization/I18nRead";
+import I18nReadError from "../../components/localization/I18nReadError";
 
 const itemDefinitionLoaderStyles = (theme: Theme) => createStyles({
   container: {

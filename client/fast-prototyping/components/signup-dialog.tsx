@@ -1,15 +1,21 @@
 import React from "react";
 import { Button, createStyles, withStyles, WithStyles, Typography, Divider } from "@material-ui/core";
 import { DialogResponsive } from "./dialog";
-import { I18nRead, I18nReadError, AppLanguageRetriever, AppCountryRetriever, AppCurrencyRetriever, I18nReadMany } from "../../components/localization";
-import { LogActioner } from "../../components/login";
 import DoneIcon from "@material-ui/icons/Done";
-import { Entry, Setter } from "../../components/property";
 import { ItemDefinitionProvider } from "../../providers/item-definition";
 import Snackbar from "./snackbar";
-import { Link } from "../../components/navigaton";
+import Link from "../../components/navigation/Link";
 import { ProgressingElement } from "./util";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import { LogActioner } from "../../components/login/LogActioner";
+import I18nRead from "../../components/localization/I18nRead";
+import Entry from "../../components/property/Entry";
+import AppLanguageRetriever from "../../components/localization/AppLanguageRetriever";
+import Setter from "../../components/property/Setter";
+import AppCountryRetriever from "../../components/localization/AppCountryRetriever";
+import AppCurrencyRetriever from "../../components/localization/AppCurrencyRetriever";
+import I18nReadError from "../../components/localization/I18nReadError";
+import I18nReadMany from "../../components/localization/I18nReadMany";
 
 const signupDialogStyles = createStyles({
   welcomeTitle: {

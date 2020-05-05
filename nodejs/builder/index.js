@@ -240,7 +240,7 @@ async function buildModule(rawDataConfig, actualLocation, fileData, pointers, ra
         propExtensions =
             await Promise.all(internalFileData.data.map((pd, index) => {
                 const specificPropertyTraceback = propExtTraceback.newTraceToBit(index);
-                return getI18nPropertyData(rawDataConfig, actualLocation, pd, specificPropertyTraceback);
+                return getI18nPropertyData(rawDataConfig, actualLocation, pd, typeof actualEvaledFileData.searchable !== "undefined" ? actualEvaledFileData.searchable : true, specificPropertyTraceback);
             }));
     }
     // and the final value is created
@@ -353,7 +353,7 @@ async function buildItemDefinition(rawDataConfig, actualLocation, lastModuleDire
         const propertiesTraceback = traceback.newTraceToBit("properties");
         finalValue.properties = await Promise.all(finalValue.properties.map((pd, index) => {
             const specificPropertyTraceback = propertiesTraceback.newTraceToBit(index);
-            return getI18nPropertyData(rawDataConfig, actualLocation, pd, specificPropertyTraceback);
+            return getI18nPropertyData(rawDataConfig, actualLocation, pd, typeof finalValue.searchable === "undefined" ? true : finalValue.searchable, specificPropertyTraceback);
         }));
     }
     if (finalValue.includes) {
@@ -569,7 +569,7 @@ async function getI18nIncludeData(rawDataConfig, actualLocation, include, traceb
  * @param traceback the traceback object
  * @returns the property itself
  */
-async function getI18nPropertyData(rawDataConfig, actualLocation, property, traceback) {
+async function getI18nPropertyData(rawDataConfig, actualLocation, property, searchable, traceback) {
     // if it's always hidden
     // it is pointless to request the data
     if (property.hidden) {
@@ -588,7 +588,8 @@ async function getI18nPropertyData(rawDataConfig, actualLocation, property, trac
         throw new Error_1.default(`Unknown type '${property.type}'`, traceback.newTraceToBit("type"));
     }
     const localeFileTraceback = traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
-    const searchIsDisabled = typeof property.searchable !== "undefined" && !property.searchable;
+    const searchIsDisabled = !searchable ||
+        (typeof property.searchable !== "undefined" && !property.searchable);
     let expectedProperties = definition.i18n.base
         .map((b) => ({ key: b, required: true }))
         // concat to optional properties

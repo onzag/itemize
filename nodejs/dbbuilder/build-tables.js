@@ -64,6 +64,9 @@ async function addMissingColumnToTable(knex, tableName, newColumnName, newColumn
         }
         catch (err) {
             _1.showErrorStackAndLogMessage(err);
+            if (await _1.yesno("Consider it successful? The column will be considered as properly added")) {
+                return newColumnSchema;
+            }
             return null;
         }
     }
@@ -105,6 +108,9 @@ async function dropExtraColumnInTable(knex, tableName, currentColumnName, curren
         catch (err) {
             // if not change the result schema
             _1.showErrorStackAndLogMessage(err);
+            if (await _1.yesno("Consider it successful? The column will be considered as properly removed")) {
+                return null;
+            }
             return currentColumnSchema;
         }
     }
@@ -206,6 +212,9 @@ async function createTable(knex, tableName, newTableSchema) {
         }
         catch (err) {
             _1.showErrorStackAndLogMessage(err);
+            if (await _1.yesno("Consider it successful? The table will be considered as properly added")) {
+                return finalTableSchema;
+            }
             return null;
         }
     }
@@ -284,6 +293,9 @@ async function dropTable(knex, tableName, currentTableSchema) {
         }
         catch (err) {
             _1.showErrorStackAndLogMessage(err);
+            if (await _1.yesno("Consider it successful? The table will be considered as properly removed")) {
+                return null;
+            }
             return currentTableSchema;
         }
     }

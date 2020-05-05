@@ -8,12 +8,28 @@
         {
             "id": "content",
             "type": "text",
-            "subtype": "html"
+            "subtype": "html",
+            "specialProperties": {
+                "mediaProperty": "attachments",
+                "supportsImages": true
+            }
+        },
+        {
+            "id": "attachments",
+            "type": "files",
+            "specialProperties": {
+                "accept": "image",
+                "smallDimension": "320x",
+                "mediumDimension": "640x",
+                "largeDimension": "1024x"
+            },
+            "hidden": true,
+            "nullable": true
         }
     ],
     "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
     "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
-    "deleteRoleAcess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
+    "deleteRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
     "allowsVersioning": true,
     "versionIsLanguageAndCountry": true,
     "versionIsLanguage": true,

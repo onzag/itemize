@@ -1,9 +1,9 @@
 import React from "react";
 import { createStyles, WithStyles, withStyles, Theme } from "@material-ui/core";
-import { I18nRead } from "../../../components/localization";
-import { AppIsBlockedFromUpdate } from "../../../components/outdated";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { AppIsBlockedFromUpdate } from "../../../components/outdated/AppIsBlockedFromUpdate";
+import I18nRead from "../../../components/localization/I18nRead";
 
 const blockingBackdropStyles = (theme: Theme) => createStyles({
   backdrop: {

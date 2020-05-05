@@ -7,6 +7,7 @@ export default class PropertyViewText extends React.Component<IPropertyViewProps
     return this.props.state.value !== nextProps.state.value;
   }
   public render() {
+    // TODO process data-src-id attributes if present in order to show files
     if (this.props.property.isRichText()) {
       const purifiedText = DOMPurify.sanitize(this.props.state.value.toString());
       return (

@@ -115,7 +115,8 @@ export default class PropertyEntryFile
     const accept = (
       this.props.property.getSpecialProperty("accept") as string ||
       (isExpectingImages ? FILE_SUPPORTED_IMAGE_TYPES.join(",") : "*")
-    );
+    ).replace(/image(?!\/)/g, FILE_SUPPORTED_IMAGE_TYPES.join(","));
+
     // check if it's images we are accepting
     if (!checkFileInAccepts(value.type, accept)) {
       this.setState({
@@ -213,7 +214,7 @@ export default class PropertyEntryFile
     const accept = (
       this.props.property.getSpecialProperty("accept") as string ||
       (isExpectingImages ? FILE_SUPPORTED_IMAGE_TYPES.join(",") : "*")
-    );
+    ).replace(/image(?!\/)/g, FILE_SUPPORTED_IMAGE_TYPES.join(","));
 
     // the placeholder when active
     let genericActivePlaceholder = this.props.i18n[this.props.language].file_uploader_placeholder_active_single;

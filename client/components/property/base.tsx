@@ -1,19 +1,19 @@
 import React from "react";
-import PropertyDefinition, { IPropertyDefinitionState } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
-import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-import { ItemDefinitionContext } from "../providers/item-definition";
-import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
-import { RESERVED_BASE_PROPERTIES } from "../../constants";
-import PropertyView, { RawBasePropertyView, IPropertyViewRendererProps } from "../internal/components/PropertyView";
-import PropertyEntry, { IPropertyEntryRendererProps } from "../internal/components/PropertyEntry";
-import PropertySetter from "../internal/components/PropertySetter";
-import { IncludeContext } from "../providers/include";
-import { fileURLAbsoluter, fileArrayURLAbsoluter } from "./util";
-import { IGQLFile } from "../../gql-querier";
+import PropertyDefinition, { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { ItemDefinitionContext } from "../../providers/item-definition";
+import { PropertyDefinitionSearchInterfacesPrefixes } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
+import { RESERVED_BASE_PROPERTIES } from "../../../constants";
+import PropertyView, { RawBasePropertyView, IPropertyViewRendererProps } from "../../internal/components/PropertyView";
+import PropertyEntry, { IPropertyEntryRendererProps } from "../../internal/components/PropertyEntry";
+import PropertySetter from "../../internal/components/PropertySetter";
+import { IncludeContext } from "../../providers/include";
+import { fileURLAbsoluter, fileArrayURLAbsoluter } from "../util";
+import { IGQLFile } from "../../../gql-querier";
 
 type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search";
 
-interface IPropertyEntryProps<RendererPropsType> {
+export interface IPropertyEntryProps<RendererPropsType> {
   id: string;
   searchVariant?: SearchVariants;
   policyType?: string;
@@ -31,7 +31,7 @@ interface IPropertyEntryProps<RendererPropsType> {
   autoFocus?: boolean;
 }
 
-interface IPropertySetterProps {
+export interface IPropertySetterProps {
   id: string;
   searchVariant?: SearchVariants;
   policyType?: string;
@@ -39,7 +39,7 @@ interface IPropertySetterProps {
   value: PropertyDefinitionSupportedType;
 }
 
-interface IPropertyReadProps {
+export interface IPropertyReadProps {
   id: string;
   searchVariant?: SearchVariants;
   policyType?: string;
@@ -47,7 +47,7 @@ interface IPropertyReadProps {
   children?: (value: PropertyDefinitionSupportedType, state: IPropertyDefinitionState) => React.ReactNode;
 }
 
-interface IPropertyViewProps<RendererPropsType> {
+export interface IPropertyViewProps<RendererPropsType> {
   id: string;
   capitalize?: boolean;
   searchVariant?: SearchVariants;
@@ -59,7 +59,7 @@ interface IPropertyEntryViewReadSetProps<RendererPropsType> extends
   IPropertyEntryProps<RendererPropsType>, IPropertyViewProps<RendererPropsType>, IPropertySetterProps, IPropertyReadProps {}
 
 // TODO optimize
-function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "entry" | "view" | "read" | "set") {
+export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "entry" | "view" | "read" | "set") {
   return (
     <ItemDefinitionContext.Consumer>
       {
@@ -204,6 +204,7 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "ent
                   return (
                     <PropertyEntry
                       itemDefinition={itemDefinitionContextualValue.idef}
+                      injectSubmitBlockPromise={itemDefinitionContextualValue.injectSubmitBlockPromise}
                       include={(includeContextualValue && includeContextualValue.include) || null}
                       property={property}
                       state={propertyState}
@@ -247,20 +248,4 @@ function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "ent
       }
     </ItemDefinitionContext.Consumer>
   );
-}
-
-export function Entry(props: IPropertyEntryProps<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>) {
-  return EntryViewReadSet(props as any, "entry");
-}
-
-export function View(props: IPropertyViewProps<IPropertyViewRendererProps>) {
-  return EntryViewReadSet(props as any, "view");
-}
-
-export function Reader(props: IPropertyReadProps) {
-  return EntryViewReadSet(props as any, "read");
-}
-
-export function Setter(props: IPropertySetterProps) {
-  return EntryViewReadSet(props as any, "set");
 }

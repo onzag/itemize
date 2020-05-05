@@ -126,6 +126,7 @@ async function runImageConversions(imageStream, filePath, fileName, uploadsConta
         const outputPipeline = conversionPipeline.clone()
             .resize(conversionOutput.width, conversionOutput.height, {
             fit: conversionOutput.fit,
+            withoutEnlargement: true,
         }).jpeg();
         return sql_files_1.sqlUploadPipeFile(uploadsContainer, outputPipeline, outputFileName);
     }).concat([

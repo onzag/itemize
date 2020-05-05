@@ -1,6 +1,11 @@
 import React from "react";
 import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import equals from "deep-equal";
+import { IGQLFile } from "../../../../gql-querier";
+import uuid from "uuid";
+import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
+import { escapeStringRegexp } from "../../../../util";
+import { fileURLAbsoluter } from "../../../components/util";
 
 export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererProps<string> {
   i18nFormat: {
@@ -16,14 +21,120 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
     formatAddFileLabel: string;
   };
 
-  supportsMedia: boolean;
+  isRichText: boolean;
+
+  supportsImages: boolean;
+  supportsFiles: boolean;
+
+  onInsertFile: (file: File) => IPropertyDefinitionSupportedSingleFilesType;
 }
 
 export default class PropertyEntryText
   extends React.Component<IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>> {
 
+  // used to restore when doing undos and whatnot
+  private internalFileCache: {
+    [id: string]: IPropertyDefinitionSupportedSingleFilesType;
+  }
+
   constructor(props: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>) {
     super(props);
+
+    this.internalFileCache = {};
+
+    this.onInsertFile = this.onInsertFile.bind(this);
+    this.onChangeHijacked = this.onChangeHijacked.bind(this);
+  }
+
+  public componentWillUnmount() {
+    Object.keys(this.internalFileCache).forEach((k) => {
+      if (this.internalFileCache[k].url.startsWith("blob:")) {
+        URL.revokeObjectURL(this.internalFileCache[k].url);
+      }
+    });
+  }
+
+  public cacheCurrentFiles() {
+    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
+    const currentValue =
+      relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+    if (currentValue) {
+      currentValue.forEach((v) => {
+        this.internalFileCache[v.id] = v;
+      });
+    }
+  }
+
+  public componentDidMount() {
+    this.cacheCurrentFiles();
+  }
+
+  public componentDidUpdate(prevProps: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>) {
+    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    // we assume that our related property has update if a value has been applied in which case we might want to load
+    // such values in the cache
+    if (relatedPropertyName && prevProps.state.stateAppliedValue !== this.props.state.stateAppliedValue) {
+      this.cacheCurrentFiles();
+    }
+  }
+
+  public onChangeHijacked(value: string, internalValue: any) {
+    // TODO analyze for lost ids that are kept track of in order to delete them out of the property value
+    // remember to revoke old temp urls if there has been any data-src-id is what will be used to keep track
+    // of these files
+    const dataSrcIdRegex = /data\-src\-id\=\"([A-Za-z0-9]+)\"/g
+
+    this.props.onChange(value, internalValue);
+  }
+
+  public onSyncFile(fileId: string) {
+    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
+    const currentValue =
+      relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+
+    // it's almost certain that the file must be in this internal cache to restore files
+    if (!currentValue.find(v => v.id === fileId) && this.internalFileCache[fileId]) {
+      const newValue: PropertyDefinitionSupportedFilesType = currentValue !== null ?
+        [...currentValue] : [];
+
+      newValue.push(this.internalFileCache[fileId]);
+
+      relatedProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
+      this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
+    }
+  }
+
+  public onInsertFile(file: File) {
+    const tempURL = URL.createObjectURL(file);
+    
+    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
+
+    const id = "FILE" + uuid.v4().replace(/-/g, "");
+    const addedFile: IPropertyDefinitionSupportedSingleFilesType = {
+      name: file.name,
+      type: file.type,
+      id,
+      url: tempURL,
+      size: file.size,
+      src: file,
+    };
+
+    const currentValue =
+      relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+
+    const newValue: PropertyDefinitionSupportedFilesType = currentValue !== null ?
+      [...currentValue] : [];
+
+    newValue.push(addedFile);
+    this.internalFileCache[id] = addedFile;
+
+    relatedProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
+    this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
+
+    return addedFile;
   }
 
   public shouldComponentUpdate(
@@ -64,6 +175,36 @@ export default class PropertyEntryText
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
+    const isRichText = this.props.property.isRichText();
+
+    const mediaPropertyId = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const supportsMedia = !!mediaPropertyId && isRichText;
+    const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
+    const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
+
+    let currentValue = this.props.state.value as string;
+    if (supportsMedia && currentValue && !this.props.state.stateValueHasBeenManuallySet) {
+      const mediaProperty = this.props.itemDefinition.getPropertyDefinitionFor(mediaPropertyId, true);
+      const currentFiles: PropertyDefinitionSupportedFilesType =
+        mediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+
+      if (currentFiles && currentFiles.length) {
+        currentFiles.forEach((cf) => {
+          const attrShape = `data-src-id="${cf.id}"`;
+          const attrReplacement = `${attrShape} src="${fileURLAbsoluter(
+            cf,
+            this.props.itemDefinition,
+            this.props.forId,
+            this.props.forVersion || null,
+            this.props.include,
+            this.props.property,
+          )}"`;
+          const attrShapeRegex = new RegExp(escapeStringRegexp(attrShape), "g");
+          currentValue = currentValue.replace(attrShapeRegex, attrReplacement);
+        });
+      }
+    }
+
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryTextRendererProps = {
       args: this.props.rendererArgs,
@@ -73,7 +214,7 @@ export default class PropertyEntryText
       description: i18nDescription,
       icon: this.props.icon,
 
-      currentValue: this.props.state.value as string,
+      currentValue,
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,
@@ -95,9 +236,14 @@ export default class PropertyEntryText
         formatAddFileLabel: this.props.i18n[this.props.language].format_add_file,
       },
 
-      supportsMedia: false,
+      supportsImages,
+      supportsFiles,
 
-      onChange: this.props.onChange,
+      isRichText,
+
+      onChange: supportsMedia ? this.onChangeHijacked : this.props.onChange,
+
+      onInsertFile: this.onInsertFile,
     };
 
     return <RendererElement {...rendererArgs}/>

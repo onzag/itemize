@@ -1,10 +1,10 @@
 import React from "react";
 import { Divider, withStyles, WithStyles, createStyles } from "@material-ui/core";
-import { Entry } from "../../../components/property";
 import DoneOutline from "@material-ui/icons/DoneOutline";
 import { SubmitButton } from "../../components/buttons";
-import { SubmitActioner } from "../../../components/item-definition";
 import Snackbar from "../../components/snackbar";
+import Entry from "../../../components/property/Entry";
+import SubmitActioner from "../../../components/item-definition/SubmitActioner";
 
 const adminToolboxStyles = () => createStyles({
   divider: {

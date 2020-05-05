@@ -55,6 +55,7 @@ export async function buildIndexes(
     // we cannot operate unless there's a current table schema this could
     // mean a table was not added or something
     if (!currentTableSchema) {
+      console.log(colors.red("Can't add indexes at " + tableName));
       continue;
     }
 
@@ -73,6 +74,12 @@ export async function buildIndexes(
       // this way
       const newColumnSchema = newTableSchema[columnName];
       const currentColumnSchema = currentTableSchema[columnName];
+
+      if (!currentColumnSchema) {
+        // this column failed at some point during the process
+        console.log(colors.red("Can't add index at " + tableName + " at " + columnName));
+        continue;
+      }
 
       // if the current has an index specified
       if (currentColumnSchema.index) {

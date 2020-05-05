@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { AppBar, Toolbar, IconButton, createStyles, WithStyles, withStyles, Theme, Typography } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
-import { I18nRead } from "../../../components/localization";
-import { TitleReader } from "../../../components/util";
-import { UserDataRetriever } from "../../../components/user";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import { OutdatedText } from "./outdated-text";
@@ -11,6 +8,10 @@ import { Buttons } from "./buttons";
 import { ExternalDialogs } from "./external-dialogs";
 import { BlockingBackdrop } from "./blocking-backdrop";
 import { OutdatedDialog } from "./outdated-dialog";
+import { Menu } from "./menu";
+import I18nRead from "../../../components/localization/I18nRead";
+import TitleReader from "../../../components/util/TitleReader";
+import UserDataRetriever from "../../../components/user/UserDataRetriever";
 
 const navbarStyles = (theme: Theme) => createStyles({
   container: {
@@ -45,14 +46,15 @@ interface INavbarProps extends WithStyles<typeof navbarStyles> {
 
 const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
   const [isOutdatedDialogAllowedToBeOpen, setIsOutdatedDialogAllowedToBeOpen] = useState(true);
+  const [isMenuOpen, setMenuOpen] = useState(false);
   return (
-    <React.Fragment>
+    <>
       <AppBar>
         <Toolbar>
           <I18nRead id="menu">
             {
               (value: string) => (
-                <IconButton edge="start" color="inherit" aria-label={value}>
+                <IconButton edge="start" color="inherit" aria-label={value} onClick={setMenuOpen.bind(this, true)}>
                   <MenuIcon />
                 </IconButton>
               )
@@ -105,7 +107,8 @@ const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
         isOpenIfOutdated={isOutdatedDialogAllowedToBeOpen}
         onClose={setIsOutdatedDialogAllowedToBeOpen.bind(this, false)}
       />
-    </React.Fragment>
+      <Menu isOpen={isMenuOpen} onClose={setMenuOpen.bind(this, false)} onOpen={setMenuOpen.bind(this, true)}/>
+    </>
   );
 });
 

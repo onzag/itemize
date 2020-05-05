@@ -1,9 +1,8 @@
 import React from "react";
-import PropertyEntryText from "./PropertyEntryText";
-import { InputLabel, Icon, IconButton, ThemeProvider, Typography } from "@material-ui/core";
+import { InputLabel, IconButton, ThemeProvider, Typography } from "@material-ui/core";
 import ReactQuill from "react-quill";
+import Quill from "quill";
 import { DeltaStatic, Sources } from "quill";
-import equals from "deep-equal";
 import Toolbar from "@material-ui/core/Toolbar";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
@@ -29,8 +28,40 @@ import FormatBoldIcon from "@material-ui/icons/FormatBold";
 import "react-quill/dist/quill.core.css";
 import "../../../internal/theme/quill.scss";
 import { capitalize } from "../../../../util";
-import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
+import { LAST_RICH_TEXT_CHANGE_LENGTH, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
+import { IPropertyDefinitionSupportedSingleFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 
+const BlockEmbed = Quill.import("blots/block/embed");
+
+interface ItemizeImageBlotValue {
+  alt: string;
+  src: string;
+  srcId: string;
+}
+
+class ItemizeImageBlot extends BlockEmbed {
+  static create(value: ItemizeImageBlotValue) {
+    let node = super.create();
+    if (value.alt) {
+      node.setAttribute('alt', value.alt);
+    }
+    node.setAttribute('src', value.src);
+    node.dataset.srcId = value.srcId;
+    return node;
+  }
+  
+  static value(node: HTMLImageElement) {
+    return {
+      alt: node.getAttribute('alt'),
+      src: node.getAttribute('src'),
+      srcId: node.dataset.srcId,
+    };
+  }
+}
+ItemizeImageBlot.blotName = 'itemizeimage';
+ItemizeImageBlot.tagName = 'img';
+
+Quill.register(ItemizeImageBlot);
 
 function shouldShowInvalid(props: IPropertyEntryTextRendererProps) {
   return !props.currentValid;
@@ -140,7 +171,8 @@ function RichTextEditorToolbar(props: {
     formatAddVideoLabel: string;
     formatAddFileLabel: string;
   },
-  supportsMedia: boolean;
+  supportsImages: boolean;
+  supportsFiles: boolean;
 }) {
   return (
     <Toolbar id={props.id}>
@@ -192,35 +224,43 @@ function RichTextEditorToolbar(props: {
         <FormatListBulletedIcon/>
       </IconButton>
       {
-        props.supportsMedia ?
+        props.supportsImages || props.supportsFiles ?
         (
-          <React.Fragment>
-            <span className="ql-divider" />
-            <IconButton
-              title={props.i18n.formatAddImageLabel}
-              classes={{ root: "" }}
-            >
-              <InsertPhotoIcon/>
-            </IconButton>
-            <IconButton
-              title={props.i18n.formatAddVideoLabel}
-              classes={{ root: "" }}
-            >
-              <VideoLibraryIcon/>
-            </IconButton>
-            <IconButton
-              title={props.i18n.formatAddFileLabel}
-              classes={{ root: "" }}
-            >
-              <AttachFileIcon/>
-            </IconButton>
-          </React.Fragment>
+          <span className="ql-divider" />
+        ) : null
+      }
+      {
+        props.supportsImages ?
+        (
+          <IconButton
+            title={props.i18n.formatAddImageLabel}
+            classes={{ root: "ql-image" }}
+          >
+            <InsertPhotoIcon/>
+          </IconButton>
+        ) : null
+      }
+      {
+        props.supportsFiles ?
+        (
+          <IconButton
+            title={props.i18n.formatAddFileLabel}
+            classes={{ root: "" }}
+          >
+            <AttachFileIcon/>
+          </IconButton>
         ) : null
       }
     </Toolbar>
   );
 }
-
+// /* <IconButton
+//             title={props.i18n.formatAddVideoLabel}
+//             classes={{ root: "" }}
+//           >
+//             <VideoLibraryIcon/>
+//           </IconButton> */
+        
 interface IPropertyEntryTextRendererWithStylesProps extends IPropertyEntryTextRendererProps, WithStyles<typeof style> {
 }
 
@@ -228,9 +268,19 @@ interface IPropertyEntryTextRendererState {
   focused: boolean;
 }
 
+const CACHED_FORMATS_RICH = ["bold", "italic", "underline", "header", "blockquote", "list", "itemizeimage"];
+const CACHED_FORMATS_NONE = [];
+
 class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRendererWithStylesProps, IPropertyEntryTextRendererState> {
   // this one also gets an uuid
   private uuid: string;
+  private inputImageRef: React.RefObject<HTMLInputElement>;
+
+  private cachedModuleOptionsRich: any;
+  private cachedModuleOptionsNone: any;
+
+  private quill: Quill;
+
   constructor(props: IPropertyEntryTextRendererWithStylesProps) {
     super(props);
 
@@ -240,11 +290,30 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     };
 
     this.uuid =  "uuid-" + uuid.v4();
+    this.inputImageRef = React.createRef();
 
     // basic functions
     this.onChange = this.onChange.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
+    this.customImageHander = this.customImageHander.bind(this);
+    this.onImageLoad = this.onImageLoad.bind(this);
+
+    const _this = this;
+    this.cachedModuleOptionsRich = {
+      toolbar: {
+        container: "#" + this.uuid,
+        handlers: {
+          image: function() {
+            const quill = this.quill;
+            _this.customImageHander(quill);
+          }
+        },
+      }
+    };
+    this.cachedModuleOptionsNone = {
+      toolbar: false,
+    };
   }
   public onChange(value: string, delta: DeltaStatic, sources: Sources, editor: ReactQuill.UnprivilegedEditor) {
     // on change, these values are basically empty
@@ -255,16 +324,38 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       value === "<p><br></p>" ||
       value === "<p><span class=\"ql-cursor\">\ufeff</span></p>"
     ) {
-      if (window) {
-        (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] = 0;
+      // prevent this change where it changes to the same value on focus
+      if (this.props.currentValue !== null) {
+        if (window) {
+          (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] = 0;
+        }
+        this.props.onChange(null, null);
       }
-      this.props.onChange(null, null);
       return;
     } else if (window) {
       const actualLenght = editor.getText().replace(/\n/g, "").length;
       (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] = actualLenght;
     }
     this.props.onChange(value, null);
+  }
+  /**
+   * This image handler is not binded due to quill existing in the this namespace
+   */
+  public customImageHander(quill: Quill) {
+    this.quill = quill;
+    this.inputImageRef.current.click();
+  }
+  public onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files[0];
+    const result = this.props.onInsertFile(file);
+  
+    const range = this.quill.getSelection(true);
+    this.quill.insertEmbed(range.index, "itemizeimage", {
+      alt: null,
+      src: result.url,
+      srcId: result.id,
+    }, (Quill as any).sources.USER);
+    this.quill.setSelection(range.index + 1, 0, (Quill as any).sources.SILENT);
   }
   // basically get the state onto its parent of the focus and blur
   public onFocus() {
@@ -288,6 +379,18 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     ) : null;
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
+
+    const imageInput = this.props.supportsImages ? (
+      <input
+        ref={this.inputImageRef}
+        type="file"
+        accept={FILE_SUPPORTED_IMAGE_TYPES.join(",")}
+        tabIndex={-1}
+        style={{display: "none"}}
+        autoComplete="off"
+        onChange={this.onImageLoad}
+      />
+    ) : null;
 
     // we return the component, note how we set the thing to focused
     // TODO disabled
@@ -317,14 +420,19 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
           >
             {capitalize(this.props.label)}{iconComponent}
           </InputLabel>
-          <RichTextEditorToolbar id={this.uuid} i18n={this.props.i18nFormat} supportsMedia={this.props.supportsMedia}/>
+          {
+            this.props.isRichText ? (
+              <RichTextEditorToolbar
+              id={this.uuid}
+              i18n={this.props.i18nFormat}
+              supportsImages={this.props.supportsImages}
+              supportsFiles={this.props.supportsFiles}
+            />) : null
+          }
           <ReactQuill
             className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
-            modules={{
-              toolbar: {
-                container: "#" + this.uuid,
-              },
-            }}
+            modules={this.props.isRichText ? this.cachedModuleOptionsRich : this.cachedModuleOptionsNone}
+            formats={this.props.isRichText ? CACHED_FORMATS_RICH : CACHED_FORMATS_NONE}
             theme={null}
             placeholder={capitalize(this.props.placeholder)}
             value={editorValue}
@@ -336,6 +444,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         <div className={this.props.classes.errorMessage}>
           {this.props.currentInvalidReason}
         </div>
+        {imageInput}
       </div>
     );
   }

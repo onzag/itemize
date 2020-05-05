@@ -1,10 +1,10 @@
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
-import { TitleSetter } from "../../../components/util";
-import { I18nRead } from "../../../components/localization";
 import { SlowLoadingElement } from "../../components/util";
 import { PublicUserProfile } from "./public-user";
+import I18nRead from "../../../components/localization/I18nRead";
+import TitleSetter from "../../../components/util/TitleSetter";
 
 interface ProfileProps {
   match: {

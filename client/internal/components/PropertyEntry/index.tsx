@@ -54,6 +54,7 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
  */
 export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
   itemDefinition: ItemDefinition;
+  injectSubmitBlockPromise: (arg: Promise<any>) => void;
   include: Include;
   property: PropertyDefinition;
   state: IPropertyDefinitionState;

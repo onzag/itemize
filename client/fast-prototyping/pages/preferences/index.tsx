@@ -1,20 +1,21 @@
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
-import { UserDataRetriever } from "../../../components/user";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
-import { TitleSetter } from "../../../components/util";
-import { I18nRead } from "../../../components/localization";
 import { SlowLoadingElement } from "../../components/util";
 import { Paper, createStyles, withStyles, WithStyles, Container, Divider, Box } from "@material-ui/core";
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { Entry } from "../../../components/property";
 import Snackbar from "../../components/snackbar";
 import MenuBookIcon from '@material-ui/icons/MenuBook';
-import { SubmitActioner } from "../../../components/item-definition";
 import DoneOutline from "@material-ui/icons/DoneOutline";
 import PersonPinIcon from '@material-ui/icons/PersonPin';
 import { SubmitButton } from "../../components/buttons";
+import { NeedsSubmitPrompt } from "../../components/needs-submit-prompt";
+import UserDataRetriever from "../../../components/user/UserDataRetriever";
+import I18nRead from "../../../components/localization/I18nRead";
+import TitleSetter from "../../../components/util/TitleSetter";
+import Entry from "../../../components/property/Entry";
+import SubmitActioner from "../../../components/item-definition/SubmitActioner";
 
 const preferencesStyles = createStyles({
   paper: {
@@ -51,6 +52,9 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
                 disableExternalChecks={true}
                 longTermCaching={true}
                 markForDestructionOnLogout={true}
+                cleanOnDismount={{
+                  propertiesToRestoreOnAny: properties,
+                }}
               >
                 <I18nRead id="preferences" capitalize={true}>
                   {(i18nPreferences: string) => {
@@ -61,6 +65,14 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
                     );
                   }}
                 </I18nRead>
+                <NeedsSubmitPrompt
+                  properties={properties}
+                  i18nConfirm="update_your_preferences"
+                  confirmationSubmitOptions={{
+                    properties: properties,
+                    differingOnly: true,
+                  }}
+                />
                 <ItemDefinitionLoader>
                   <Container maxWidth="md" className={props.classes.container}>
                     <Paper className={props.classes.paper}>

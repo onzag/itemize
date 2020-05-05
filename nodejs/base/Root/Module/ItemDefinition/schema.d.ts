@@ -249,6 +249,21 @@ declare const _default: {
                 type: string;
             };
         };
+        enableVersioning: {
+            type: string;
+        };
+        versionIsLanguageAndCountry: {
+            type: string;
+        };
+        versionIsLanguage: {
+            type: string;
+        };
+        versionIsCountry: {
+            type: string;
+        };
+        versionIsOptional: {
+            type: string;
+        };
     };
     definitions: {
         PropertyDefinition: {
@@ -792,6 +807,12 @@ declare const _default: {
         };
     };
     required: string[];
+    dependencies: {
+        versionIsLanguageAndCountry: string[];
+        versionIsLanguage: string[];
+        versionIsCountry: string[];
+        versionIsOptional: string[];
+    };
     additionalProperties: boolean;
 };
 /**

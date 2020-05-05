@@ -1,9 +1,9 @@
 import React from "react";
 import { Button, Typography, WithStyles, Theme, createStyles, withStyles } from "@material-ui/core";
-import { I18nReadMany } from "../../../components/localization";
-import { LocationStateReader } from "../../../components/navigaton";
 import { DialogResponsive } from "../dialog";
 import DoneIcon from "@material-ui/icons/Done";
+import LocationStateReader from "../../../components/navigation/LocationStateReader";
+import I18nReadMany from "../../../components/localization/I18nReadMany";
 
 const externalDialogsStyle = (theme: Theme) => createStyles({
   needsUpdateContent: {

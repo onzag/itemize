@@ -4,7 +4,7 @@ SITE
 . Location [+3] [DONE]
 . The first user to sign in is admin [+1] [NO, USE DATABASE]
 . Role picker for admins in public profile [+2] [DONE]
-. About me in profile [+5]
+. About me in profile [+5] [DONE]
 . Implementation of CMS module [+10]
 . Implementation of Forum module [+7]
 . Implementation of mailing module [+7]

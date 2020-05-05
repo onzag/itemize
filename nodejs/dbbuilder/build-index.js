@@ -36,6 +36,7 @@ async function buildIndexes(knex, currentDatabaseSchema, newDatabaseSchema) {
         // we cannot operate unless there's a current table schema this could
         // mean a table was not added or something
         if (!currentTableSchema) {
+            console.log(safe_1.default.red("Can't add indexes at " + tableName));
             continue;
         }
         // now we copy the current table schema
@@ -51,6 +52,11 @@ async function buildIndexes(knex, currentDatabaseSchema, newDatabaseSchema) {
             // this way
             const newColumnSchema = newTableSchema[columnName];
             const currentColumnSchema = currentTableSchema[columnName];
+            if (!currentColumnSchema) {
+                // this column failed at some point during the process
+                console.log(safe_1.default.red("Can't add index at " + tableName + " at " + columnName));
+                continue;
+            }
             // if the current has an index specified
             if (currentColumnSchema.index) {
                 // we need to check if we have one index with the same id, if we don't

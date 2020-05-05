@@ -240,6 +240,21 @@ export default {
         type: "string",
       },
     },
+    enableVersioning: {
+      type: "boolean",
+    },
+    versionIsLanguageAndCountry: {
+      type: "boolean",
+    },
+    versionIsLanguage: {
+      type: "boolean",
+    },
+    versionIsCountry: {
+      type: "boolean",
+    },
+    versionIsOptional: {
+      type: "boolean",
+    },
   },
   definitions: {
     PropertyDefinition: PropertyDefinitionSchema,
@@ -248,5 +263,11 @@ export default {
     ConditionalRuleSet: ConditionalRuleSetSchema,
   },
   required: ["type"],
+  dependencies: {
+   versionIsLanguageAndCountry: ["enableVersioning"],
+    versionIsLanguage: ["enableVersioning"],
+    versionIsCountry: ["enableVersioning"],
+    versionIsOptional: ["enableVersioning"]
+  },
   additionalProperties: false,
 };

@@ -216,7 +216,7 @@ export async function addItemDefinition(
   // and extract the triggers from the registry
   const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef]
   const moduleTrigger = appData.triggers.module[pathOfThisModule];
-  // if we got any of them
+  // if we got any of them convert
   if (
     itemDefinitionTrigger || moduleTrigger
   ) {

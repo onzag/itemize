@@ -1,17 +1,18 @@
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
-import { UserDataRetriever } from "../../../components/user";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
-import { TitleSetter } from "../../../components/util";
-import { I18nRead, I18nReadMany } from "../../../components/localization";
 import { SlowLoadingElement } from "../../components/util";
 import { Paper, createStyles, withStyles, WithStyles, Container, Divider, Box } from "@material-ui/core";
-import { Entry } from "../../../components/property";
 import Snackbar from "../../components/snackbar";
-import { SubmitActioner } from "../../../components/item-definition";
 import DoneOutline from "@material-ui/icons/DoneOutline";
 import { SubmitButton } from "../../components/buttons";
+import UserDataRetriever from "../../../components/user/UserDataRetriever";
+import I18nRead from "../../../components/localization/I18nRead";
+import TitleSetter from "../../../components/util/TitleSetter";
+import I18nReadMany from "../../../components/localization/I18nReadMany";
+import Entry from "../../../components/property/Entry";
+import SubmitActioner from "../../../components/item-definition/SubmitActioner";
 
 const changePasswordStyles = createStyles({
   paper: {

@@ -74,6 +74,9 @@ export async function addMissingColumnToTable(
       return newColumnSchema;
     } catch (err) {
       showErrorStackAndLogMessage(err);
+      if (await yesno("Consider it successful? The column will be considered as properly added")) {
+        return newColumnSchema;
+      }
       return null;
     }
   } else {
@@ -120,6 +123,9 @@ export async function dropExtraColumnInTable(
     } catch (err) {
       // if not change the result schema
       showErrorStackAndLogMessage(err);
+      if (await yesno("Consider it successful? The column will be considered as properly removed")) {
+        return null;
+      }
       return currentColumnSchema;
     }
   } else {
@@ -236,6 +242,9 @@ export async function createTable(
       return finalTableSchema;
     } catch (err) {
       showErrorStackAndLogMessage(err);
+      if (await yesno("Consider it successful? The table will be considered as properly added")) {
+        return finalTableSchema;
+      }
       return null;
     }
   } else {
@@ -329,6 +338,9 @@ export async function dropTable(
       return null;
     } catch (err) {
       showErrorStackAndLogMessage(err);
+      if (await yesno("Consider it successful? The table will be considered as properly removed")) {
+        return null;
+      }
       return currentTableSchema;
     }
   } else {

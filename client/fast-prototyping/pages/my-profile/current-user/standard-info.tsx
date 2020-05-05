@@ -1,10 +1,7 @@
 import React from "react";
 import { IActionSubmitOptions } from "../../../../providers/item-definition";
-import { I18nReadMany, I18nRead } from "../../../../components/localization";
-import { Entry, Reader } from "../../../../components/property";
 import { Button, Box, Paper, createStyles, withStyles, WithStyles, Divider, Theme } from "@material-ui/core";
 import { SubmitButton } from "../../../components/buttons";
-import { DifferingPropertiesRetriever } from "../../../../components/item-definition";
 import { DialogResponsive } from "../../../components/dialog";
 import DoneIcon from "@material-ui/icons/Done";
 import { IPropertyDefinitionState } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -12,7 +9,6 @@ import { Alert, AlertTitle } from "@material-ui/lab";
 import DoneOutline from "@material-ui/icons/DoneOutline";
 import MailOutline from "@material-ui/icons/MailOutline";
 import { AvatarRenderer } from "../../../components/avatar";
-import { UserActioner } from "../../../../components/user";
 import Snackbar from "../../../components/snackbar";
 import { LanguagePicker } from "../../../components/language-picker";
 import { CountryPicker } from "../../../components/country-picker";
@@ -21,9 +17,15 @@ import { ProgressingElement, SlowLoadingElement } from "../../../components/util
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AlernateEmailIcon from "@material-ui/icons/AlternateEmail";
 import FaceIcon from "@material-ui/icons/Face";
-import { Link } from "../../../../components/navigaton";
+import Link from "../../../../components/navigation/Link";
 import { ItemDefinitionLoader } from "../../../components/item-definition-loader";
 import ErrorIcon from '@material-ui/icons/Error';
+import I18nReadMany from "../../../../components/localization/I18nReadMany";
+import Entry from "../../../../components/property/Entry";
+import Reader from "../../../../components/property/Reader";
+import I18nRead from "../../../../components/localization/I18nRead";
+import UserActioner from "../../../../components/user/UserActioner";
+import DifferingPropertiesRetriever from "../../../../components/item-definition/DifferingPropertiesRetriever";
 
 interface CustomConfirmationDialogProps {
   isActive: boolean;

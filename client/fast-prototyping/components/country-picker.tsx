@@ -1,6 +1,7 @@
 import React from "react";
-import { AppCountryRetriever, capitalize } from "../../components/localization";
+import { capitalize } from "../../components/localization";
 import { Button, Menu, MenuItem } from "@material-ui/core";
+import AppCountryRetriever from "../../components/localization/AppCountryRetriever";
 
 interface ICountryPickerProps {
   className?: string;

@@ -28,6 +28,11 @@ export declare function processItemDefinition(rawData: IItemDefinitionRawJSONDat
     i18nData: import("../base/Root/Module").IRawJSONI18NDataType;
     includes?: IIncludeRawJSONDataType[];
     properties?: IPropertyDefinitionRawJSONDataType[];
+    enableVersioning?: boolean;
+    versionIsLanguageAndCountry?: boolean;
+    versionIsCountry?: boolean;
+    versionIsLanguage?: boolean;
+    versionIsOptional?: boolean;
     readRoleAccess?: string[];
     createRoleAccess?: string[];
     editRoleAccess?: string[];

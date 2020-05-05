@@ -239,6 +239,21 @@ exports.default = {
                 type: "string",
             },
         },
+        enableVersioning: {
+            type: "boolean",
+        },
+        versionIsLanguageAndCountry: {
+            type: "boolean",
+        },
+        versionIsLanguage: {
+            type: "boolean",
+        },
+        versionIsCountry: {
+            type: "boolean",
+        },
+        versionIsOptional: {
+            type: "boolean",
+        },
     },
     definitions: {
         PropertyDefinition: schema_1.default,
@@ -247,5 +262,11 @@ exports.default = {
         ConditionalRuleSet: schema_4.default,
     },
     required: ["type"],
+    dependencies: {
+        versionIsLanguageAndCountry: ["enableVersioning"],
+        versionIsLanguage: ["enableVersioning"],
+        versionIsCountry: ["enableVersioning"],
+        versionIsOptional: ["enableVersioning"]
+    },
     additionalProperties: false,
 };

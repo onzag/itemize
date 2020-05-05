@@ -1,15 +1,10 @@
 import React from "react";
-import { LocaleContext, DataContext } from "../internal/app";
-import { ItemDefinitionContext } from "../providers/item-definition";
-import { localeReplacerToArray, localeReplacer } from "../../util";
-import { EndpointErrorType } from "../../base/errors";
-import Module from "../../base/Root/Module";
-import ItemDefinition from "../../base/Root/Module/ItemDefinition";
-import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
-import { ICurrencyType, arrCurrencies, currencies, countries, arrCountries, ICountryType } from "../../imported-resources";
-import { IncludeContext } from "../providers/include";
-import { ModuleContext } from "../providers/module";
-import { capitalize as utilcapitalize} from "../../util";
+import { LocaleContext } from "../../internal/app";
+import { ItemDefinitionContext } from "../../providers/item-definition";
+import { localeReplacerToArray, localeReplacer } from "../../../util";
+import { IncludeContext } from "../../providers/include";
+import { ModuleContext } from "../../providers/module";
+import { capitalize } from "../../../util";
 
 function loopForKeyAtTarget(target: any, keySplitted: string[]) {
   let result = typeof target === "undefined" ? null : target;
@@ -26,7 +21,7 @@ function loopForKeyAtTarget(target: any, keySplitted: string[]) {
   return result;
 }
 
-interface II18nReadProps {
+export interface II18nReadProps {
   id: string;
   propertyId?: string;
   policyType?: string;
@@ -38,7 +33,7 @@ interface II18nReadProps {
   capitalize?: boolean;
 }
 
-export function I18nRead(props: II18nReadProps) {
+export default function I18nRead(props: II18nReadProps) {
   return (
     <LocaleContext.Consumer>
       {
@@ -188,7 +183,7 @@ export function I18nRead(props: II18nReadProps) {
                             }
 
                             if (props.capitalize) {
-                              i18nValue = utilcapitalize(i18nValue as string);
+                              i18nValue = capitalize(i18nValue as string);
                             }
 
                             // if we are passing arguments to replace the {0} {1} etc... numbers
@@ -235,256 +230,6 @@ export function I18nRead(props: II18nReadProps) {
             }
           </ModuleContext.Consumer>
         )
-      }
-    </LocaleContext.Consumer>
-  );
-}
-
-interface Ii18nReadManyProps {
-  data: Array<II18nReadProps | II18nReadErrorProps>;
-  children: (...results: React.ReactNode[]) => React.ReactNode;
-}
-
-export function I18nReadMany(props: Ii18nReadManyProps): any {
-  if (props.data.length === 0) {
-    return props.children();
-  } else if (props.data.length === 1) {
-    const toProvide = props.data[0];
-    if ((toProvide as II18nReadErrorProps).error) {
-      <I18nReadError {...toProvide as II18nReadErrorProps}>
-        {props.children}
-      </I18nReadError>
-    }
-    return (
-      <I18nRead {...toProvide as II18nReadProps}>
-        {props.children}
-      </I18nRead>
-    );
-  }
-  const missing = props.data.slice(1);
-  const toProvide = props.data[0];
-  const children = (result: React.ReactNode) => {
-    return (
-      <I18nReadMany data={missing}>
-        {(...results: React.ReactNode[]) => {
-          return props.children(result, ...results);
-        }}
-      </I18nReadMany>
-    );
-  };
-  if ((toProvide as II18nReadErrorProps).error) {
-    return (
-      <I18nReadError {...toProvide as II18nReadErrorProps}>
-        {children}
-      </I18nReadError>
-    );
-  }
-  return (
-    <I18nRead {...toProvide as II18nReadProps}>
-      {children}
-    </I18nRead>
-  );
-}
-
-const isDevelopment = process.env.NODE_ENV === "development";
-interface II18nReadErrorProps {
-  error: EndpointErrorType;
-  capitalize?: boolean;
-  children?: (value: string) => React.ReactNode;
-}
-export function I18nReadError(props: II18nReadErrorProps) {
-  if (props.error === null) {
-    return null;
-  }
-  return (
-    <LocaleContext.Consumer>
-      {
-        (localeData) => {
-          const freeError = props.error as any;
-          if (isDevelopment && freeError.message) {
-            console.warn(freeError.message);
-          }
-          // cheap way to know if this is a basic error code
-          // without having to check for all types of error code
-          if (!freeError.modulePath) {
-            let errorMessage: string = localeData.i18n[localeData.language].error[props.error.code];
-            if (props.capitalize) {
-              errorMessage = capitalize(errorMessage);
-            }
-            return props.children ? props.children(errorMessage) : errorMessage;
-          }
-          return (
-            <DataContext.Consumer>
-              {
-                (data) => {
-                  let mod: Module;
-                  try {
-                    mod = data.value.getModuleFor(freeError.modulePath);
-                  } catch {
-                    console.warn("Invalid error module in", freeError);
-                    return null;
-                  }
-
-                  let itemDef: ItemDefinition;
-                  if (freeError.includeIdItemDefPath) {
-                    try {
-                      itemDef = mod.getItemDefinitionFor(freeError.includeIdItemDefPath);
-                    } catch {
-                      console.warn("failed to display error due to includeIdItemDefPath", freeError);
-                      return null;
-                    }
-                  } else if (freeError.itemDefPath) {
-                    try {
-                      itemDef = mod.getItemDefinitionFor(freeError.itemDefPath);
-                    } catch {
-                      console.warn("failed to display error due to includeIdItemDefPath", freeError);
-                      return null;
-                    }
-                  }
-
-                  if (freeError.propertyId) {
-                    let propertyDef: PropertyDefinition;
-                    if (itemDef) {
-                      try {
-                        propertyDef = itemDef.getPropertyDefinitionFor(
-                          freeError.propertyId,
-                          true,
-                        );
-                      } catch {
-                        console.warn("failed to display error due to propertyId", freeError);
-                        return null;
-                      }
-                    } else {
-                      try {
-                        propertyDef = mod.getPropExtensionFor(freeError.propertyId);
-                      } catch {
-                        console.warn("failed to display error due to propertyId not extension", freeError);
-                        return null;
-                      }
-                    }
-
-                    const i18nData = propertyDef.getI18nDataFor(localeData.language);
-                    let i18nErrorValue = i18nData && i18nData.error && i18nData.error[freeError.pcode];
-                    if (!i18nErrorValue) {
-                      // pcode might be null, this can happen by a programming error
-                      console.warn("failed to display error due to pcode or language", freeError);
-                      return null;
-                    }
-                    if (props.capitalize) {
-                      i18nErrorValue = capitalize(i18nErrorValue);
-                    }
-                    return props.children ? props.children(i18nErrorValue) : i18nErrorValue;
-                  } else if (freeError.policyType) {
-                    const i18nData = itemDef.getI18nDataFor(localeData.language);
-                    let i18nErrorValue = i18nData &&
-                      i18nData.policies &&
-                      i18nData.policies[freeError.policyType] &&
-                      i18nData.policies[freeError.policyType][freeError.policyName] &&
-                      i18nData.policies[freeError.policyType][freeError.policyName].fail;
-                    if (!i18nErrorValue) {
-                      console.warn("failed to display error due to code or language", freeError);
-                      return null;
-                    }
-                    if (props.capitalize) {
-                      i18nErrorValue = capitalize(i18nErrorValue);
-                    }
-                    return props.children ? props.children(i18nErrorValue) : i18nErrorValue;
-                  }
-                }
-              }
-            </DataContext.Consumer>
-          );
-        }
-      }
-    </LocaleContext.Consumer>
-  );
-}
-
-export function capitalize(str: string) {
-  return utilcapitalize(str);
-}
-
-interface IFnAppLanguageRetrieverLanguageFormType {
-  code: string;
-  name: string;
-}
-type FnAppLanguageRetrieverType = (arg: {
-  currentLanguage: IFnAppLanguageRetrieverLanguageFormType,
-  availableLanguages: IFnAppLanguageRetrieverLanguageFormType[],
-  rtl: boolean,
-  changeLanguageTo: (code: string) => void,
-}) => React.ReactNode;
-export function AppLanguageRetriever(props: {
-  children: FnAppLanguageRetrieverType;
-}) {
-  return (
-    <LocaleContext.Consumer>
-      {
-        (localeContext) => {
-          const currentLanguage: IFnAppLanguageRetrieverLanguageFormType = {
-            code: localeContext.language,
-            name: localeContext.langLocales[localeContext.language].name,
-          };
-          const availableLanguages: IFnAppLanguageRetrieverLanguageFormType[] = [];
-          Object.keys(localeContext.langLocales).forEach((code) => {
-            availableLanguages.push({
-              code,
-              name: localeContext.langLocales[code].name,
-            });
-          });
-          return props.children({
-            currentLanguage,
-            availableLanguages,
-            rtl: localeContext.rtl,
-            changeLanguageTo: localeContext.updating ? () => null : localeContext.changeLanguageTo,
-          });
-        }
-      }
-    </LocaleContext.Consumer>
-  );
-}
-
-type FnAppCurrencyRetrieverType = (arg: {
-  currentCurrency: ICurrencyType,
-  availableCurrencies: ICurrencyType[],
-  changeCurrencyTo: (code: string) => void,
-}) => React.ReactNode;
-export function AppCurrencyRetriever(props: {
-  children: FnAppCurrencyRetrieverType;
-}) {
-  return (
-    <LocaleContext.Consumer>
-      {
-        (localeContext) => {
-          return props.children({
-            currentCurrency: currencies[localeContext.currency.toUpperCase()],
-            availableCurrencies: arrCurrencies,
-            changeCurrencyTo: localeContext.updating ? () => null : localeContext.changeCurrencyTo,
-          });
-        }
-      }
-    </LocaleContext.Consumer>
-  );
-}
-
-type FnAppCountryRetrieverType = (arg: {
-  currentCountry: ICountryType,
-  availableCountries: ICountryType[],
-  changeCountryTo: (code: string) => void,
-}) => React.ReactNode;
-export function AppCountryRetriever(props: {
-  children: FnAppCountryRetrieverType;
-}) {
-  return (
-    <LocaleContext.Consumer>
-      {
-        (localeContext) => {
-          return props.children({
-            currentCountry: countries[localeContext.country.toUpperCase()],
-            availableCountries: arrCountries,
-            changeCountryTo: localeContext.updating ? () => null : localeContext.changeCountryTo,
-          });
-        }
       }
     </LocaleContext.Consumer>
   );

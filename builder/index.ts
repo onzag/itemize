@@ -454,6 +454,7 @@ async function buildModule(
             rawDataConfig,
             actualLocation,
             pd,
+            typeof actualEvaledFileData.searchable !== "undefined" ? actualEvaledFileData.searchable : true,
             specificPropertyTraceback,
           );
         }),
@@ -641,6 +642,7 @@ async function buildItemDefinition(
           rawDataConfig,
           actualLocation,
           pd,
+          typeof finalValue.searchable === "undefined" ? true : finalValue.searchable,
           specificPropertyTraceback,
         );
       }));
@@ -961,6 +963,7 @@ async function getI18nPropertyData(
   rawDataConfig: IBuilderBasicConfigType,
   actualLocation: string,
   property: IPropertyDefinitionRawJSONDataType,
+  searchable: boolean,
   traceback: Traceback,
 ) {
   // if it's always hidden
@@ -998,8 +1001,8 @@ async function getI18nPropertyData(
   const localeFileTraceback =
     traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
 
-  const searchIsDisabled =
-    typeof property.searchable !== "undefined" && !property.searchable;
+  const searchIsDisabled = !searchable ||
+    (typeof property.searchable !== "undefined" && !property.searchable);
 
   let expectedProperties = definition.i18n.base
     .map((b) => ({key: b, required: true}))

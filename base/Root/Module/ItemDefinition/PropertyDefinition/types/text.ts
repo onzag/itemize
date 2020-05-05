@@ -38,6 +38,20 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   nullableDefault: "",
   supportedSubtypes: ["html"],
+  specialProperties: [
+    {
+      name: "mediaProperty",
+      type: "string",
+    },
+    {
+      name: "supportsImages",
+      type: "boolean",
+    },
+    {
+      name: "supportsFiles",
+      type: "boolean",
+    },
+  ],
   sql: (sqlPrefix: string, id: string) => {
     return {
       [sqlPrefix + id]: {
@@ -79,7 +93,9 @@ const typeValue: IPropertyDefinitionSupportedType = {
       dummyElement.innerHTML = value.toString();
       escapedText = dummyElement.textContent;
 
-      purifiedText = DOMPurify.sanitize(value.toString());
+      purifiedText = DOMPurify.sanitize(value.toString(), {
+        FORBID_ATTR: ["src"],
+      });
     }
 
     return {

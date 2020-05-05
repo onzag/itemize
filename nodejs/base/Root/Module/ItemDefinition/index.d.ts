@@ -93,6 +93,26 @@ export interface IItemDefinitionRawJSONDataType {
      */
     properties?: IPropertyDefinitionRawJSONDataType[];
     /**
+     * Whether versioning is enabled
+     */
+    enableVersioning?: boolean;
+    /**
+     * Whether the version can be a country language concat pair such as en-US or fi-FI
+     */
+    versionIsLanguageAndCountry?: boolean;
+    /**
+     * Whether the version can be a country
+     */
+    versionIsCountry?: boolean;
+    /**
+     * Whether the version can be a language
+     */
+    versionIsLanguage?: boolean;
+    /**
+     * Whether the version can be optional, aka null
+     */
+    versionIsOptional?: boolean;
+    /**
      * Read role permissions
      */
     readRoleAccess?: string[];
@@ -390,6 +410,17 @@ export default class ItemDefinition {
      * @returns a boolean
      */
     isExtensionsInstance(): boolean;
+    /**
+     * Tells whether this item definition is versioned
+     */
+    isVersioned(): boolean;
+    /**
+     * Tells whether a version is a valid value for this item definition
+     * @param version the version id
+     * @param supportedLanguages the array list of supported language this function
+     * is unaware of supported languages so it needs to ask in order to check for a version
+     */
+    isValidVersion(version: string, supportedLanguages: string[]): boolean;
     /**
      * provides the raw name of the item definition
      * @returns the name as a string

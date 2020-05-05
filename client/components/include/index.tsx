@@ -1,9 +1,9 @@
 import React from "react";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
 import { ItemDefinitionContext } from "../providers/item-definition";
-import IncludeExclusionSwitch from "./base/IncludeExclusionSwitch";
-import IncludeCalloutWarning from "./base/IncludeCalloutWarning";
-import { IncludeContext } from "../providers/include";
+import IncludeExclusionSwitch from "../base/IncludeExclusionSwitch";
+import IncludeCalloutWarning from "../base/IncludeCalloutWarning";
+import { IncludeContext } from "../../providers/include";
 
 interface IExclusionSwitchProps {
   onChange?: (include: Include, newExclusionState: IncludeExclusionState) => void;

@@ -23,6 +23,7 @@ const constants_1 = require("../../../../constants");
 const errors_1 = require("../../../errors");
 const uuid_1 = __importDefault(require("uuid"));
 const gql_util_1 = require("../../../../gql-util");
+const imported_resources_1 = require("../../../../imported-resources");
 /**
  * Represents the possible io actions to be performed
  * within an item definition
@@ -210,6 +211,61 @@ class ItemDefinition {
      */
     isExtensionsInstance() {
         return this.extensionsInstance;
+    }
+    /**
+     * Tells whether this item definition is versioned
+     */
+    isVersioned() {
+        return !!this.rawData.enableVersioning;
+    }
+    /**
+     * Tells whether a version is a valid value for this item definition
+     * @param version the version id
+     * @param supportedLanguages the array list of supported language this function
+     * is unaware of supported languages so it needs to ask in order to check for a version
+     */
+    isValidVersion(version, supportedLanguages) {
+        // if it's not a versioned item definition and the version is not null
+        if (!this.isVersioned() && version !== null) {
+            // then it's invalid
+            return false;
+        }
+        // otherwise if the version is optional and we provide no version
+        if (this.rawData.versionIsOptional && version === null) {
+            // then it's fine
+            return true;
+        }
+        else if (
+        // if there is no complex condition for these localized versions
+        !this.rawData.versionIsCountry &&
+            !this.rawData.versionIsLanguage &&
+            !this.rawData.versionIsLanguageAndCountry) {
+            // then the version must simply not be null
+            return version !== null;
+        }
+        // otherwse let's calculate these booleans
+        const isCountry = !!imported_resources_1.countries[version];
+        const isLanguage = !!supportedLanguages.find((l) => l === version);
+        const versionSplitted = version.split("-");
+        const possibleLanguage = versionSplitted[0];
+        const possibleCountry = versionSplitted[1] || null;
+        const isLanguageAndCountry = !!possibleCountry &&
+            !!imported_resources_1.countries[possibleCountry] && supportedLanguages.find((l) => possibleLanguage);
+        // and check each
+        if (this.rawData.versionIsCountry &&
+            isCountry) {
+            return true;
+        }
+        else if (this.rawData.versionIsLanguage &&
+            isLanguage) {
+            return true;
+        }
+        else if (this.rawData.versionIsLanguageAndCountry &&
+            isLanguageAndCountry) {
+            return true;
+        }
+        // if none passes, we return false
+        return false;
     }
     /**
      * provides the raw name of the item definition

@@ -2,9 +2,10 @@ import React from "react";
 import { Snackbar as MUISnackbar, IconButton, withStyles, WithStyles, createStyles, Theme} from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { EndpointErrorType } from "../../../base/errors";
-import { I18nRead, I18nReadError } from "../../components/localization";
 import { Color } from '@material-ui/lab/Alert';
 import uuid from "uuid";
+import I18nRead from "../../components/localization/I18nRead";
+import I18nReadError from "../../components/localization/I18nReadError";
 
 const snackbarStyles = (theme: Theme) => createStyles({
   success: {

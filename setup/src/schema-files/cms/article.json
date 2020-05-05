@@ -13,7 +13,7 @@
     ],
     "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
     "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
-    "deleteRoleAcess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
+    "deleteRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
     "allowsVersioning": true,
     "versionIsLanguageAndCountry": true,
     "versionIsLanguage": true,

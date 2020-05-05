@@ -1,30 +1,9 @@
 import React from "react";
-import { TokenContext } from "../internal/app/internal-providers";
-import { EndpointErrorType } from "../../base/errors";
-import { gqlQuery, buildGqlQuery } from "../../gql-querier";
-import { ItemDefinitionContext, IItemDefinitionContextType } from "../providers/item-definition";
+import { TokenContext } from "../../internal/app/internal-providers";
+import { EndpointErrorType } from "../../../base/errors";
+import { gqlQuery, buildGqlQuery } from "../../../gql-querier";
+import { ItemDefinitionContext, IItemDefinitionContextType } from "../../providers/item-definition";
 import equals from "deep-equal";
-
-interface IUserDataRetrieverProps {
-  children: (arg: {
-    id: number;
-    role: string;
-  }) => React.ReactNode;
-}
-export function UserDataRetriever(props: IUserDataRetrieverProps) {
-  return (
-    <TokenContext.Consumer>
-      {
-        (value) => {
-          return props.children({
-            id: value.id,
-            role: value.role,
-          });
-        }
-      }
-    </TokenContext.Consumer>
-  );
-}
 
 export interface IUserActionerArg {
   sendValidateEmail: () => Promise<{error: EndpointErrorType}>,
@@ -241,7 +220,7 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
   }
 }
 
-export function UserActioner(props: IUserActionerProps) {
+export default function UserActioner(props: IUserActionerProps) {
   return (
     <TokenContext.Consumer>
       {

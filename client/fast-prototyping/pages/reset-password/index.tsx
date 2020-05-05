@@ -1,17 +1,20 @@
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
-import { UserActioner, IUserActionerArg } from "../../../components/user";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
-import { TitleSetter } from "../../../components/util";
-import { I18nRead, I18nReadMany } from "../../../components/localization";
-import { LocationStateReader, localizedRedirectTo } from "../../../components/navigaton";
 import { Avatar } from "../../components/avatar";
-import { Reader, Entry } from "../../../components/property";
 import { createStyles, withStyles, WithStyles, Typography, Paper, Container, Divider, Button } from "@material-ui/core";
 import { ProgressingElement, SlowLoadingElement } from "../../components/util";
 import DoneIcon from "@material-ui/icons/Done";
 import Snackbar from "../../components/snackbar";
+import UserActioner, { IUserActionerArg } from "../../../components/user/UserActioner";
+import { localizedRedirectTo } from "../../../components/navigation";
+import LocationStateReader from "../../../components/navigation/LocationStateReader";
+import I18nRead from "../../../components/localization/I18nRead";
+import TitleSetter from "../../../components/util/TitleSetter";
+import Reader from "../../../components/property/Reader";
+import I18nReadMany from "../../../components/localization/I18nReadMany";
+import Entry from "../../../components/property/Entry";
 
 const resetPasswordStyles = createStyles({
   container: {

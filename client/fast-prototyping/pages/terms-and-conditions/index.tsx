@@ -1,7 +1,7 @@
 import React from "react";
-import { TitleSetter } from "../../../components/util";
-import { I18nReadMany } from "../../../components/localization";
-import HTMLResourceLoader from "../../../components/resources";
+import I18nReadMany from "../../../components/localization/I18nReadMany";
+import TitleSetter from "../../../components/util/TitleSetter";
+import HTMLResourceLoader from "../../../components/resources/HTMLResourceLoader";
 
 export function TermsAndConditions() {
   return (

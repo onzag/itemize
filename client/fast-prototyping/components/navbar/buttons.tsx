@@ -1,10 +1,10 @@
 import React from "react";
 import { Button, Theme, createStyles, WithStyles, withStyles } from "@material-ui/core";
-import { I18nRead } from "../../../components/localization";
-import { IfLogStatus } from "../../../components/login";
 import { LanguagePicker } from "../language-picker";
-import { LocationStateReader } from "../../../components/navigaton";
 import { Avatar } from "../avatar";
+import LocationStateReader from "../../../components/navigation/LocationStateReader";
+import { IfLogStatus } from "../../../components/login/IfLogStatus";
+import I18nRead from "../../../components/localization/I18nRead";
 
 const buttonsStyles = (theme: Theme) => createStyles({
   languageButton: {

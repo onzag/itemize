@@ -19,6 +19,20 @@ const typeValue = {
     gql: graphql_1.GraphQLString,
     nullableDefault: "",
     supportedSubtypes: ["html"],
+    specialProperties: [
+        {
+            name: "mediaProperty",
+            type: "string",
+        },
+        {
+            name: "supportsImages",
+            type: "boolean",
+        },
+        {
+            name: "supportsFiles",
+            type: "boolean",
+        },
+    ],
     sql: (sqlPrefix, id) => {
         return {
             [sqlPrefix + id]: {
@@ -51,7 +65,9 @@ const typeValue = {
             const dummyElement = util_1.DOMWindow.document.createElement("div");
             dummyElement.innerHTML = value.toString();
             escapedText = dummyElement.textContent;
-            purifiedText = util_1.DOMPurify.sanitize(value.toString());
+            purifiedText = util_1.DOMPurify.sanitize(value.toString(), {
+                FORBID_ATTR: ["src"],
+            });
         }
         return {
             [id]: purifiedText,

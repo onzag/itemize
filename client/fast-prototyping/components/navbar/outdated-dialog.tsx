@@ -1,9 +1,9 @@
 import React from "react";
 import { Button, Typography, withStyles, Theme, createStyles, WithStyles } from "@material-ui/core";
-import { I18nReadMany } from "../../../components/localization";
-import { AppIsOutdatedChecker } from "../../../components/outdated";
 import { DialogResponsive } from "../dialog";
 import UpdateIcon from "@material-ui/icons/Update";
+import AppIsOutdatedChecker from "../../../components/outdated/AppIsOutdatedChecker";
+import I18nReadMany from "../../../components/localization/I18nReadMany";
 
 const outdatedDialogStyles = (theme: Theme) => createStyles({
   dialogContent: {

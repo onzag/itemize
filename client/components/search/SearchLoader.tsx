@@ -1,15 +1,15 @@
 import React from "react";
-import { ItemDefinitionContext, SearchItemDefinitionValueContext, IItemDefinitionProviderProps } from "../providers/item-definition";
+import { ItemDefinitionContext, SearchItemDefinitionValueContext, IItemDefinitionProviderProps } from "../../providers/item-definition";
 import equals from "deep-equal";
-import ItemDefinition from "../../base/Root/Module/ItemDefinition";
-import { PREFIX_GET_LIST, PREFIX_GET } from "../../constants";
-import CacheWorkerInstance from "../internal/workers/cache";
-import { requestFieldsAreContained, deepMerge } from "../../gql-util";
-import { buildGqlQuery, gqlQuery, IGQLSearchResult, IGQLRequestFields, IGQLValue } from "../../gql-querier";
-import { LocaleContext, ILocaleContextType } from "../internal/app";
-import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
-import { EndpointErrorType } from "../../base/errors";
-import { RemoteListener } from "../internal/app/remote-listener";
+import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
+import { PREFIX_GET_LIST, PREFIX_GET } from "../../../constants";
+import CacheWorkerInstance from "../../internal/workers/cache";
+import { requestFieldsAreContained, deepMerge } from "../../../gql-util";
+import { buildGqlQuery, gqlQuery, IGQLSearchResult, IGQLRequestFields, IGQLValue } from "../../../gql-querier";
+import { LocaleContext, ILocaleContextType } from "../../internal/app";
+import { TokenContext, ITokenContextType } from "../../internal/app/internal-providers";
+import { EndpointErrorType } from "../../../base/errors";
+import { RemoteListener } from "../../internal/app/remote-listener";
 
 interface IItemDefinitionProviderPropsWithKey extends
   Pick<IItemDefinitionProviderProps, Exclude<keyof IItemDefinitionProviderProps, 'children'>> {
@@ -21,7 +21,7 @@ interface IGQLSearchResultWithPopulateData extends IGQLSearchResult {
   itemDefinition: ItemDefinition;
 }
 
-interface ISearchLoaderArg {
+export interface ISearchLoaderArg {
   searchResults: IGQLSearchResultWithPopulateData[];
   pageCount: number;
   hasNextPage: boolean;
@@ -31,7 +31,7 @@ interface ISearchLoaderArg {
   refreshPage: () => void;
 }
 
-interface ISearchLoaderProps {
+export interface ISearchLoaderProps {
   pageSize: number;
   currentPage: number;
   children: (arg: ISearchLoaderArg) => any;
@@ -356,7 +356,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   }
 }
 
-export function SearchLoader(props: ISearchLoaderProps) {
+export default function SearchLoader(props: ISearchLoaderProps) {
   return (
     <LocaleContext.Consumer>
       {
@@ -389,72 +389,4 @@ export function SearchLoader(props: ISearchLoaderProps) {
       }
     </LocaleContext.Consumer>
   );
-}
-
-interface IPagedSearchLoaderArg extends ISearchLoaderArg {
-  currentPage: number;
-  goToNextPage: () => void;
-  goToPrevPage: () => void;
-  goToPage: (n: number) => void;
-}
-
-interface IPagedSearchLoaderProps {
-  pageSize: number;
-  children: (arg: IPagedSearchLoaderArg) => any;
-}
-
-interface IPagedSearchLoaderState {
-  currentPage: number;
-}
-
-export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps, IPagedSearchLoaderState> {
-  constructor(props: IPagedSearchLoaderProps) {
-    super(props);
-
-    this.state = {
-      currentPage: 0,
-    };
-
-    this.goToNextPage = this.goToNextPage.bind(this);
-    this.goToPrevPage = this.goToPrevPage.bind(this);
-    this.goToPage = this.goToPage.bind(this);
-  }
-  public goToNextPage(hasNextPage: boolean) {
-    if (hasNextPage) {
-      this.goToPage(this.state.currentPage + 1);
-    }
-  }
-  public goToPrevPage(hasPrevPage: boolean) {
-    if (hasPrevPage) {
-      this.goToPage(this.state.currentPage - 1);
-    }
-  }
-  public goToPage(n: number) {
-    this.setState({
-      currentPage: n,
-    });
-  }
-  public shouldComponentUpdate(nextProps: IPagedSearchLoaderProps, nextState: IPagedSearchLoaderState) {
-    return !equals(this.state, nextState) ||
-      nextProps.pageSize !== this.props.pageSize ||
-      nextProps.children !== this.props.children;
-  }
-  public render() {
-    return (
-      <SearchLoader
-        pageSize={this.props.pageSize}
-        currentPage={this.state.currentPage}
-      >
-        {(arg) => {
-          return this.props.children({
-            ...arg,
-            currentPage: this.state.currentPage,
-            goToNextPage: this.goToNextPage.bind(this, arg.hasNextPage),
-            goToPrevPage: this.goToPrevPage.bind(this, arg.hasPrevPage),
-            goToPage: this.goToPage,
-          });
-        }}
-      </SearchLoader>
-    );
-  }
 }

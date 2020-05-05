@@ -1,6 +1,6 @@
 import React from "react";
-import { DataContext } from "../internal/app";
-import { RemoteListener } from "../internal/app/remote-listener";
+import { DataContext } from "../../internal/app";
+import { RemoteListener } from "../../internal/app/remote-listener";
 
 interface IOfflineStatusRetrieverProps {
   children: (offline: boolean) => any;
@@ -47,7 +47,7 @@ class ActualOfflineStatusRetriever extends
   }
 }
 
-export function OfflineStatusRetriever(props: IOfflineStatusRetrieverProps) {
+export default function OfflineStatusRetriever(props: IOfflineStatusRetrieverProps) {
   return (
     <DataContext.Consumer>
       {(data) => (<ActualOfflineStatusRetriever {...props} remoteListener={data.remoteListener}/>)}

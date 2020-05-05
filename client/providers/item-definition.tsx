@@ -257,6 +257,11 @@ export interface IItemDefinitionContextType {
 
   // the remote listener
   remoteListener: RemoteListener;
+
+  // inject a promise that blocks the submit process, this is currently
+  // not used anywhere but was introduced as a means of blocking submitting
+  // when necessary using promises
+  injectSubmitBlockPromise: (arg: Promise<any>) => void;
 }
 
 export interface ISearchItemDefinitionValueContextType {
@@ -467,6 +472,9 @@ export class ActualItemDefinitionProvider extends
   // options are used
   private lastOptionsUsedForSearch: IActionSearchOptions;
 
+  // the list of submit block promises
+  private submitBlockPromises: Array<Promise<any>> = [];
+
   constructor(props: IActualItemDefinitionProviderProps) {
     super(props);
 
@@ -493,6 +501,7 @@ export class ActualItemDefinitionProvider extends
     this.dismissSearchError = this.dismissSearchError.bind(this);
     this.dismissSearchResults = this.dismissSearchResults.bind(this);
     this.onSearchReload = this.onSearchReload.bind(this);
+    this.injectSubmitBlockPromise = this.injectSubmitBlockPromise.bind(this);
 
     // we get the initial state
     this.state = this.setupInitialState();
@@ -558,6 +567,9 @@ export class ActualItemDefinitionProvider extends
       canDelete: this.canDelete(),
       canCreate: this.canCreate(),
     };
+  }
+  public injectSubmitBlockPromise(p: Promise<any>) {
+    this.submitBlockPromises.push(p);
   }
   public markForDestruction() {
     if (this.props.forId) {
@@ -1661,6 +1673,17 @@ export class ActualItemDefinitionProvider extends
       return this.giveEmulatedInvalidError("submitError", true, false) as IActionResponseWithId;
     }
 
+    if (this.submitBlockPromises.length) {
+      if (!this.isUnmounted) {
+        this.setState({
+          submitting: true,
+        });
+      }
+
+      await Promise.all(this.submitBlockPromises);
+      this.submitBlockPromises = [];
+    }
+
     // now we are going to build our query
     // also we make a check later on for the policies
     // if necessary
@@ -2151,6 +2174,7 @@ export class ActualItemDefinitionProvider extends
           canDelete: this.state.canDelete,
           canEdit: this.state.canEdit,
           remoteListener: this.props.remoteListener,
+          injectSubmitBlockPromise: this.injectSubmitBlockPromise,
         }}
       >
         {this.props.children}
