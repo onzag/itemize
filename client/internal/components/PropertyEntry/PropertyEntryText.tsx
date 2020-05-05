@@ -80,10 +80,39 @@ export default class PropertyEntryText
   }
 
   public onChangeHijacked(value: string, internalValue: any) {
-    // TODO analyze for lost ids that are kept track of in order to delete them out of the property value
-    // remember to revoke old temp urls if there has been any data-src-id is what will be used to keep track
-    // of these files
-    const dataSrcIdRegex = /data\-src\-id\=\"([A-Za-z0-9]+)\"/g
+    // so first we try to read the html content in this fast and dirty way
+    const dataSrcIdRegex = /data\-src\-id\=\"([A-Za-z0-9]+)\"/g;
+    // this array for the ids we find
+    const idsGathered: string[] = [];
+    // and now we build a match loop
+    let match: RegExpExecArray;
+    do {
+      match = dataSrcIdRegex.exec(value);
+      if (match) {
+        const id = match[1];
+        idsGathered.push(id);
+        // we call the sync function to restore the file
+        // into the current value of the property if necessary
+        this.onSyncFile(id);
+      }
+    } while (match);
+
+    // now we need to find the ones that have been deleted and are currently not loaded
+    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
+    const currentValue =
+      relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+
+    // if we got a value
+    if (currentValue) {
+      // we loop within it and see
+      currentValue.forEach((v) => {
+        // if it's not in the gathered list
+        if (!idsGathered.includes(v.id)) {
+          this.onRemoveFile(v.id);
+        }
+      });
+    }
 
     this.props.onChange(value, internalValue);
   }
@@ -95,13 +124,28 @@ export default class PropertyEntryText
       relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
     // it's almost certain that the file must be in this internal cache to restore files
-    if (!currentValue.find(v => v.id === fileId) && this.internalFileCache[fileId]) {
+    if ((!currentValue || !currentValue.find(v => v.id === fileId)) && this.internalFileCache[fileId]) {
       const newValue: PropertyDefinitionSupportedFilesType = currentValue !== null ?
         [...currentValue] : [];
 
       newValue.push(this.internalFileCache[fileId]);
 
       relatedProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
+      this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
+    }
+  }
+
+  public onRemoveFile(fileId: string) {
+    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
+    const currentValue =
+      relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+
+    // delete files but we don't get rid off them from the cache
+    if (currentValue && currentValue.find(v => v.id === fileId)) {
+      const newValue: PropertyDefinitionSupportedFilesType = currentValue.filter((f) => f.id !== fileId);
+
+      relatedProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue.length === 0 ? null : newValue, null);
       this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
     }
   }
