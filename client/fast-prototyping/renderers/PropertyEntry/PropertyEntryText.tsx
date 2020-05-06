@@ -29,9 +29,9 @@ import "react-quill/dist/quill.core.css";
 import "../../../internal/theme/quill.scss";
 import { capitalize } from "../../../../util";
 import { LAST_RICH_TEXT_CHANGE_LENGTH, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
-import { IPropertyDefinitionSupportedSingleFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 
 const BlockEmbed = Quill.import("blots/block/embed");
+const Delta = Quill.import("delta");
 
 interface ItemizeImageBlotValue {
   alt: string;
@@ -271,6 +271,10 @@ interface IPropertyEntryTextRendererState {
 const CACHED_FORMATS_RICH = ["bold", "italic", "underline", "header", "blockquote", "list", "itemizeimage"];
 const CACHED_FORMATS_NONE = [];
 
+function collapseToPlainTextMatcher(node: Node) {
+  return new Delta().insert(node.textContent);
+}
+
 class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRendererWithStylesProps, IPropertyEntryTextRendererState> {
   // this one also gets an uuid
   private uuid: string;
@@ -280,6 +284,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   private cachedModuleOptionsNone: any;
 
   private quill: Quill;
+  private quillRef: React.RefObject<ReactQuill>;
 
   constructor(props: IPropertyEntryTextRendererWithStylesProps) {
     super(props);
@@ -291,6 +296,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
     this.uuid =  "uuid-" + uuid.v4();
     this.inputImageRef = React.createRef();
+    this.quillRef = React.createRef();
 
     // basic functions
     this.onChange = this.onChange.bind(this);
@@ -309,11 +315,45 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
             _this.customImageHander(quill);
           }
         },
+      },
+      clipboard: {
+        matchers: [
+          [Node.ELEMENT_NODE, collapseToPlainTextMatcher],
+        ]
       }
     };
     this.cachedModuleOptionsNone = {
       toolbar: false,
+      clipboard: {
+        matchers: [
+          [Node.ELEMENT_NODE, collapseToPlainTextMatcher],
+        ]
+      }
     };
+  }
+  public componentDidMount() {
+    const editor = this.quillRef.current.getEditor();
+    editor.root.addEventListener('paste', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const clipboardData: DataTransfer = e.clipboardData || (window as any).clipboardData;
+      // support cut by software & copy image file directly
+      const isImage = clipboardData.types.length && clipboardData.types.join('').includes('Files');
+      if (!isImage) {
+        return;
+      }
+      // only support single image paste
+      const file = clipboardData.files[0];
+      const result = this.props.onInsertFile(file);
+  
+      const range = editor.getSelection(true);
+      editor.insertEmbed(range.index, "itemizeimage", {
+        alt: null,
+        src: result.url,
+        srcId: result.id,
+      }, (Quill as any).sources.USER);
+      editor.setSelection(range.index + 2, 0, (Quill as any).sources.SILENT);
+    });
   }
   public onChange(value: string, delta: DeltaStatic, sources: Sources, editor: ReactQuill.UnprivilegedEditor) {
     // on change, these values are basically empty
@@ -355,7 +395,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       src: result.url,
       srcId: result.id,
     }, (Quill as any).sources.USER);
-    this.quill.setSelection(range.index + 1, 0, (Quill as any).sources.SILENT);
+    this.quill.setSelection(range.index + 2, 0, (Quill as any).sources.SILENT);
   }
   // basically get the state onto its parent of the focus and blur
   public onFocus() {
@@ -430,6 +470,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
             />) : null
           }
           <ReactQuill
+            ref={this.quillRef}
             className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
             modules={this.props.isRichText ? this.cachedModuleOptionsRich : this.cachedModuleOptionsNone}
             formats={this.props.isRichText ? CACHED_FORMATS_RICH : CACHED_FORMATS_NONE}
