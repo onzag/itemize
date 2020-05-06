@@ -1,8 +1,6 @@
 import React from "react";
 import { InputLabel, IconButton, ThemeProvider, Typography } from "@material-ui/core";
 import ReactQuill from "react-quill";
-import Quill from "quill";
-import { DeltaStatic, Sources } from "quill";
 import Toolbar from "@material-ui/core/Toolbar";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
@@ -30,8 +28,8 @@ import "../../../internal/theme/quill.scss";
 import { capitalize } from "../../../../util";
 import { LAST_RICH_TEXT_CHANGE_LENGTH, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
 
-const BlockEmbed = Quill.import("blots/block/embed");
-const Delta = Quill.import("delta");
+const BlockEmbed = ReactQuill.Quill.import("blots/block/embed");
+const Delta = ReactQuill.Quill.import("delta");
 
 interface ItemizeImageBlotValue {
   alt: string;
@@ -61,7 +59,7 @@ class ItemizeImageBlot extends BlockEmbed {
 ItemizeImageBlot.blotName = 'itemizeimage';
 ItemizeImageBlot.tagName = 'img';
 
-Quill.register(ItemizeImageBlot);
+ReactQuill.Quill.register(ItemizeImageBlot);
 
 function shouldShowInvalid(props: IPropertyEntryTextRendererProps) {
   return !props.currentValid;
@@ -270,8 +268,12 @@ interface IPropertyEntryTextRendererState {
 
 const CACHED_FORMATS_RICH = ["bold", "italic", "underline", "header", "blockquote", "list", "itemizeimage"];
 const CACHED_FORMATS_NONE = [];
+const CACHED_CLIPBOARD_MATCHERS: ReactQuill.ClipboardMatcher[] = [
+  [Node.ELEMENT_NODE, collapseToPlainTextMatcher],
+];
 
 function collapseToPlainTextMatcher(node: Node) {
+  console.log("collapsing", node);
   return new Delta().insert(node.textContent);
 }
 
@@ -283,7 +285,6 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   private cachedModuleOptionsRich: any;
   private cachedModuleOptionsNone: any;
 
-  private quill: Quill;
   private quillRef: React.RefObject<ReactQuill>;
 
   constructor(props: IPropertyEntryTextRendererWithStylesProps) {
@@ -302,46 +303,43 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     this.onChange = this.onChange.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
-    this.customImageHander = this.customImageHander.bind(this);
+    this.customImageHandler = this.customImageHandler.bind(this);
     this.onImageLoad = this.onImageLoad.bind(this);
 
-    const _this = this;
     this.cachedModuleOptionsRich = {
       toolbar: {
         container: "#" + this.uuid,
         handlers: {
-          image: function() {
-            const quill = this.quill;
-            _this.customImageHander(quill);
-          }
+          image: this.customImageHandler
         },
       },
       clipboard: {
-        matchers: [
-          [Node.ELEMENT_NODE, collapseToPlainTextMatcher],
-        ]
+        matchVisual: false,
+        matchers: CACHED_CLIPBOARD_MATCHERS,
       }
     };
     this.cachedModuleOptionsNone = {
       toolbar: false,
       clipboard: {
-        matchers: [
-          [Node.ELEMENT_NODE, collapseToPlainTextMatcher],
-        ]
+        matchVisual: false,
+        matchers: CACHED_CLIPBOARD_MATCHERS,
       }
     };
   }
   public componentDidMount() {
     const editor = this.quillRef.current.getEditor();
     editor.root.addEventListener('paste', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
       const clipboardData: DataTransfer = e.clipboardData || (window as any).clipboardData;
+      console.log(clipboardData);
       // support cut by software & copy image file directly
       const isImage = clipboardData.types.length && clipboardData.types.join('').includes('Files');
       if (!isImage) {
         return;
       }
+      // prevent default quill behaviour
+      e.preventDefault();
+      e.stopPropagation();
+
       // only support single image paste
       const file = clipboardData.files[0];
       const result = this.props.onInsertFile(file);
@@ -351,11 +349,11 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         alt: null,
         src: result.url,
         srcId: result.id,
-      }, (Quill as any).sources.USER);
-      editor.setSelection(range.index + 2, 0, (Quill as any).sources.SILENT);
+      }, (ReactQuill.Quill as any).sources.USER);
+      editor.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
     });
   }
-  public onChange(value: string, delta: DeltaStatic, sources: Sources, editor: ReactQuill.UnprivilegedEditor) {
+  public onChange(value: string, delta: any, sources: any, editor: ReactQuill.UnprivilegedEditor) {
     // on change, these values are basically empty
     // so we set to null, however in some circumstances
     // they are unavoidable, use a value larger than 1 for min
@@ -381,21 +379,21 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   /**
    * This image handler is not binded due to quill existing in the this namespace
    */
-  public customImageHander(quill: Quill) {
-    this.quill = quill;
+  public customImageHandler() {
     this.inputImageRef.current.click();
   }
   public onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files[0];
     const result = this.props.onInsertFile(file);
   
-    const range = this.quill.getSelection(true);
-    this.quill.insertEmbed(range.index, "itemizeimage", {
+    const quill = this.quillRef.current.getEditor();
+    const range = quill.getSelection(true);
+    quill.insertEmbed(range.index, "itemizeimage", {
       alt: null,
       src: result.url,
       srcId: result.id,
-    }, (Quill as any).sources.USER);
-    this.quill.setSelection(range.index + 2, 0, (Quill as any).sources.SILENT);
+    }, (ReactQuill.Quill as any).sources.USER);
+    quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
   }
   // basically get the state onto its parent of the focus and blur
   public onFocus() {
@@ -480,6 +478,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
             onChange={this.onChange}
             onFocus={this.onFocus}
             onBlur={this.onBlur}
+            disableClipboardMatchersOnUpdate={CACHED_CLIPBOARD_MATCHERS}
           />
         </div>
         <div className={this.props.classes.errorMessage}>

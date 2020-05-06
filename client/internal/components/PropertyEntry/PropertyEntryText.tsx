@@ -234,15 +234,16 @@ export default class PropertyEntryText
 
       if (currentFiles && currentFiles.length) {
         currentFiles.forEach((cf) => {
-          const attrShape = `data-src-id="${cf.id}"`;
-          const attrReplacement = `${attrShape} src="${fileURLAbsoluter(
+          const absolutedFile = fileURLAbsoluter(
             cf,
             this.props.itemDefinition,
             this.props.forId,
             this.props.forVersion || null,
             this.props.include,
-            this.props.property,
-          )}"`;
+            mediaProperty,
+          );
+          const attrShape = `data-src-id="${cf.id}"`;
+          const attrReplacement = `src="${absolutedFile ? absolutedFile.url : "/rest/resource/image-fail.svg"}" ${attrShape}`;
           const attrShapeRegex = new RegExp(escapeStringRegexp(attrShape), "g");
           currentValue = currentValue.replace(attrShapeRegex, attrReplacement);
         });
