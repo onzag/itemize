@@ -35,24 +35,28 @@ interface ItemizeImageBlotValue {
   alt: string;
   src: string;
   srcId: string;
+  srcSet: string;
+  sizes: string;
 }
 
 class ItemizeImageBlot extends BlockEmbed {
   static create(value: ItemizeImageBlotValue) {
     let node = super.create();
-    if (value.alt) {
-      node.setAttribute('alt', value.alt);
-    }
-    node.setAttribute('src', value.src);
+    node.setAttribute("alt", value.alt || "");
+    node.setAttribute("sizes", value.sizes);
+    node.setAttribute("srcset", value.srcSet);
+    node.setAttribute("src", value.src);
     node.dataset.srcId = value.srcId;
     return node;
   }
   
   static value(node: HTMLImageElement) {
     return {
-      alt: node.getAttribute('alt'),
-      src: node.getAttribute('src'),
+      alt: node.getAttribute("alt"),
+      src: node.getAttribute("src"),
       srcId: node.dataset.srcId,
+      srcSet: node.getAttribute("srcset"),
+      sizes: node.getAttribute("sizes"),
     };
   }
 }
@@ -273,7 +277,6 @@ const CACHED_CLIPBOARD_MATCHERS: ReactQuill.ClipboardMatcher[] = [
 ];
 
 function collapseToPlainTextMatcher(node: Node) {
-  console.log("collapsing", node);
   return new Delta().insert(node.textContent);
 }
 
@@ -384,14 +387,21 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   }
   public onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files[0];
+
+    let alt: string = null;
+    if (this.props.args["requestAltOnImages"]) {
+      alt = prompt("Please write an alt for your image:", null) || null;
+    }
     const result = this.props.onInsertFile(file);
   
     const quill = this.quillRef.current.getEditor();
     const range = quill.getSelection(true);
     quill.insertEmbed(range.index, "itemizeimage", {
-      alt: null,
+      alt,
       src: result.url,
       srcId: result.id,
+      srcSet: null,
+      sizes: null,
     }, (ReactQuill.Quill as any).sources.USER);
     quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
   }

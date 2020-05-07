@@ -48,6 +48,25 @@ TECH (HAPPENS AS IT GOES)
 . Fix floating point imprecision in lat/lng by adding an id to location by smashing lat and lng in the server side that way
 equality can be checked; implement in geocode/search and autocomplete and whatnot; check in preferences by updating twice a manual pick [DONE]
 
+. Version searches, searches limited by a version type
+
+. Add limit and offset to the search
+  . Implement by using a maxMatchPageSize required property on the item definition itself, very large values
+  are expected on the transactional mode, whereas smaller values for traditional
+  . Change the result from the ISearchResult[] and its name to ISearchMatch to have a totalCount property so that the offset limiter traditional
+  usage can actually apply
+  . Add the property traditional to the search in order to return actual results and be more straightforward
+    traditional results must be smaller
+  . it provides a list of all the matched search results
+  . its result set is finite the max results it can give are given by maxMatchPageSize
+  . it also will return a count to be consistent in order to know if there has been data loss to this search type
+  . is able to keep itself realtime or not, in main searches you wouldn't want it be realtime
+  . will support cache policies created and parent which means that the search can mantain itself in realtime and be able
+    to cache itself client side and even keep itself updated
+  . really bad if there's no cache support client side as it will be very slow
+  . will also support offset and limit as well we might be able to append more search
+    results to giant sets if the user decides to fetch even more of them
+
 . Revamp currency to have a normalized_value in dollars
 . Revamp currency search to use normalized_value on mismatch or the value on match
 . Maybe download a list of base conversions from https://free.currencyconverterapi.com/ automatically every day
@@ -55,7 +74,9 @@ equality can be checked; implement in geocode/search and autocomplete and whatno
 so can safely be removed
 . Create sqlMantenience for mantenience of mutable values like this in the type
 
-. Image support in rich text
+. Image support in rich text [DONE]
+. File support in rich text
+. Youtube/Vimeo support in rich text
 
 . taglist (predefined tags)
 . list of string

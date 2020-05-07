@@ -273,8 +273,6 @@ export class Cache {
       }),
     );
 
-    this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue);
-
     await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
     await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
 
@@ -332,6 +330,21 @@ export class Cache {
         null, // TODO add the listener uuid, maybe?
       );
     }
+
+    (async () => {
+      await this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue);
+      const changeEvent: IChangedFeedbackEvent = {
+        itemDefinition: selfTable,
+        id: sqlValue.id,
+        version: version || null,
+        type: "created",
+        lastModified: null,
+      };
+      this.listener.triggerChangedListeners(
+        changeEvent,
+        null,
+      );
+    })();
 
     return sqlValue;
   }
@@ -493,7 +506,7 @@ export class Cache {
         type: "modified",
         lastModified: null,
       };
-      this.listener.triggerListeners(
+      this.listener.triggerChangedListeners(
         changeEvent,
         listenerUUID || null,
       );
@@ -552,7 +565,7 @@ export class Cache {
         type: "not_found",
         lastModified: null,
       };
-      this.listener.triggerListeners(
+      this.listener.triggerChangedListeners(
         changeEvent,
         listenerUUID || null,
       );

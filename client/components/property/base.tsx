@@ -148,11 +148,15 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                   if (propertyState) {
                     return (
                       <PropertyView
+                        include={includeContextualValue && includeContextualValue.include}
                         property={property}
                         state={propertyState}
                         capitalize={props.capitalize}
                         renderer={props.renderer}
                         rendererArgs={props.rendererArgs}
+                        forId={itemDefinitionContextualValue.forId}
+                        forVersion={itemDefinitionContextualValue.forVersion}
+                        itemDefinition={itemDefinitionContextualValue.idef}
                       />
                     );
                   }

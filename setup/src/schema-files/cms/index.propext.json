@@ -1,0 +1,27 @@
+[
+    {
+        "id": "title",
+        "type": "string"
+    },
+    {
+        "id": "content",
+        "type": "text",
+        "subtype": "html",
+        "specialProperties": {
+            "mediaProperty": "attachments",
+            "supportsImages": true
+        }
+    },
+    {
+        "id": "attachments",
+        "type": "files",
+        "specialProperties": {
+            "accept": "image",
+            "smallDimension": "320x",
+            "mediumDimension": "640x",
+            "largeDimension": "1024x"
+        },
+        "hidden": true,
+        "nullable": true
+    }
+]

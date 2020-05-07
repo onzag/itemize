@@ -5,7 +5,7 @@ import { IGQLFile } from "../../../../gql-querier";
 import uuid from "uuid";
 import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { escapeStringRegexp } from "../../../../util";
-import { fileURLAbsoluter } from "../../../components/util";
+import { fileURLAbsoluter, imageSrcSetRetriever } from "../../../components/util";
 
 export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererProps<string> {
   i18nFormat: {
@@ -56,25 +56,33 @@ export default class PropertyEntryText
 
   public cacheCurrentFiles() {
     const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
-    const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
-    const currentValue =
-      relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
-    if (currentValue) {
-      currentValue.forEach((v) => {
-        this.internalFileCache[v.id] = v;
-      });
+    if (relatedPropertyName) {
+      const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
+      const currentValue =
+        relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+      if (currentValue) {
+        currentValue.forEach((v) => {
+          this.internalFileCache[v.id] = v;
+        });
+      }
     }
   }
 
   public componentDidMount() {
-    this.cacheCurrentFiles();
+    if (this.props.property.isRichText()) {
+      this.cacheCurrentFiles();
+    }
   }
 
   public componentDidUpdate(prevProps: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>) {
     const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
     // we assume that our related property has update if a value has been applied in which case we might want to load
     // such values in the cache
-    if (relatedPropertyName && prevProps.state.stateAppliedValue !== this.props.state.stateAppliedValue) {
+    if (
+      relatedPropertyName &&
+      prevProps.state.stateAppliedValue !== this.props.state.stateAppliedValue &&
+      this.props.property.isRichText()
+    ) {
       this.cacheCurrentFiles();
     }
   }
@@ -189,6 +197,8 @@ export default class PropertyEntryText
       !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.rtl !== !!nextProps.rtl ||
+      this.props.forId !== nextProps.forId ||
+      this.props.forVersion !== nextProps.forVersion ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       this.props.altDescription !== nextProps.altDescription ||
       this.props.altPlaceholder !== nextProps.altPlaceholder ||
@@ -243,7 +253,9 @@ export default class PropertyEntryText
             mediaProperty,
           );
           const attrShape = `data-src-id="${cf.id}"`;
-          const attrReplacement = `src="${absolutedFile ? absolutedFile.url : "/rest/resource/image-fail.svg"}" ${attrShape}`;
+          const srcSet = `srcset="${imageSrcSetRetriever(absolutedFile, mediaProperty)}"`;
+          const src = `src="${absolutedFile ? absolutedFile.url : "/rest/resource/image-fail.svg"}"`;
+          const attrReplacement = `sizes="70vw" ${srcSet} ${src} ${attrShape}`;
           const attrShapeRegex = new RegExp(escapeStringRegexp(attrShape), "g");
           currentValue = currentValue.replace(attrShapeRegex, attrReplacement);
         });

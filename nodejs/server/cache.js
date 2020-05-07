@@ -202,7 +202,6 @@ class Cache {
                 ...insertQueryValueIdef[0],
             };
         }));
-        this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue);
         await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
         await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
         const searchResultForThisValue = {
@@ -243,6 +242,17 @@ class Cache {
             };
             this.listener.triggerParentedSearchListeners(moduleBasedParentedEvent, null);
         }
+        (async () => {
+            await this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue);
+            const changeEvent = {
+                itemDefinition: selfTable,
+                id: sqlValue.id,
+                version: version || null,
+                type: "created",
+                lastModified: null,
+            };
+            this.listener.triggerChangedListeners(changeEvent, null);
+        })();
         return sqlValue;
     }
     /**
@@ -347,7 +357,7 @@ class Cache {
                 type: "modified",
                 lastModified: null,
             };
-            this.listener.triggerListeners(changeEvent, listenerUUID || null);
+            this.listener.triggerChangedListeners(changeEvent, listenerUUID || null);
         })();
         return sqlValue;
     }
@@ -391,7 +401,7 @@ class Cache {
                 type: "not_found",
                 lastModified: null,
             };
-            this.listener.triggerListeners(changeEvent, listenerUUID || null);
+            this.listener.triggerChangedListeners(changeEvent, listenerUUID || null);
         })();
     }
     /**

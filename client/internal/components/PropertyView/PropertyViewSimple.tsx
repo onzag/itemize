@@ -2,8 +2,8 @@ import React from "react";
 import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
 import equals from "deep-equal";
 
-export interface IPropertyViewSimpleRendererProps extends IPropertyViewRendererProps {
-  currentValue: string;
+export interface IPropertyViewSimpleRendererProps extends IPropertyViewRendererProps<string> {
+  capitalize: boolean;
 }
 
 export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>> {

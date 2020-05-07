@@ -27,7 +27,7 @@ export declare class Listener {
     unregister(socket: Socket, request: IUnregisterRequest): void;
     ownedSearchUnregister(socket: Socket, request: IOwnedSearchUnregisterRequest): void;
     parentedSearchUnregister(socket: Socket, request: IParentedSearchUnregisterRequest): void;
-    triggerListeners(event: IChangedFeedbackEvent, listenerUUID: string): void;
+    triggerChangedListeners(event: IChangedFeedbackEvent, listenerUUID: string): void;
     triggerOwnedSearchListeners(event: IOwnedSearchRecordsAddedEvent, listenerUUID: string): void;
     triggerParentedSearchListeners(event: IParentedSearchRecordsAddedEvent, listenerUUID: string): void;
     pubSubTriggerListeners(channel: string, message: string): void;

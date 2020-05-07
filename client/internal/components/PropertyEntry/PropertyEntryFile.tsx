@@ -74,6 +74,8 @@ export default class PropertyEntryFile
     return nextProps.property !== this.props.property ||
       !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
+      nextProps.forId !== this.props.forId ||
+      nextProps.forVersion !== this.props.forVersion ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       this.props.altDescription !== nextProps.altDescription ||
       this.props.altPlaceholder !== nextProps.altPlaceholder ||
@@ -203,7 +205,7 @@ export default class PropertyEntryFile
       }
     }
 
-    const imageSizes = isSupportedImage ? imageSizeRetriever(currentValue) : {
+    const imageSizes = isSupportedImage ? imageSizeRetriever(currentValue, null) : {
       imageMediumSizeURL: null,
       imageSmallSizeURL: null,
       imageLargeSizeURL: null,

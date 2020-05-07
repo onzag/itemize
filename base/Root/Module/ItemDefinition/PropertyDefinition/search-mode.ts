@@ -342,9 +342,14 @@ function displaceI18NData(i18n: any, path: string[]) {
     });
 
     // we take the label, placeholder and description from our loop result
-    newI18n[language].label = itemInQuestion.label;
-    newI18n[language].placeholder = itemInQuestion.placeholder;
-    newI18n[language].description = itemInQuestion.description;
+    // note how we check whether it exists, the reason for this is that prop extensions
+    // which always build its search mode form might not have this data during the building process
+    // in which case it is left as undefined
+    if (itemInQuestion) {
+      newI18n[language].label = itemInQuestion.label;
+      newI18n[language].placeholder = itemInQuestion.placeholder;
+      newI18n[language].description = itemInQuestion.description;
+    }
   });
 
   // return that

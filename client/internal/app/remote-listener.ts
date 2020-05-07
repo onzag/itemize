@@ -422,7 +422,7 @@ export class RemoteListener {
     const appliedGQLValue = itemDefinition.getGQLAppliedValue(event.id, event.version);
     if (appliedGQLValue) {
       if (
-        event.type === "modified" ||
+        event.type === "modified" || event.type === "created" ||
         (
           event.type === "last_modified" &&
           event.lastModified !== appliedGQLValue.flattenedValue.last_modified
@@ -443,7 +443,7 @@ export class RemoteListener {
         }
         itemDefinition.triggerListeners("change", event.id, event.version);
       }
-    } else if (event.type === "modified" || event.type === "last_modified") {
+    } else if (event.type === "modified" || event.type === "created" || event.type === "last_modified") {
       itemDefinition.triggerListeners("reload", event.id, event.version);
     } else if (event.type === "not_found") {
       itemDefinition.cleanValueFor(event.id, event.version);

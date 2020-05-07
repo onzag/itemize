@@ -422,7 +422,7 @@ export class Listener {
       "." + request.parentId + "." + (request.parentVersion || "");
     this.removeListener(socket, mergedIndexIdentifier);
   }
-  public triggerListeners(
+  public triggerChangedListeners(
     event: IChangedFeedbackEvent,
     listenerUUID: string,
   ) {

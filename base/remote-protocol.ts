@@ -52,13 +52,14 @@ export interface IChangedFeedbackEvent {
   version: string;
   /**
    * The event type
+   * created: similar to modified means the item has been created, you should re-request
    * modified: means that is has been modified, you should re-request
    * not_found: meants that the item has been deleted
    * last_modified: comes as an answer to a feedback request, check for the last_modified attribute
    * in your client cache to see if the server version is more recent and re-request it if that is
    * the case, check the lastModified property
    */
-  type: "modified" | "not_found" | "last_modified";
+  type: "created" | "modified" | "not_found" | "last_modified";
   /**
    * A timestamp that comes when type=last_modified
    */

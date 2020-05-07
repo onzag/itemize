@@ -200,7 +200,7 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
       </Reader>
     )
 
-    const imageSources = imageSizeRetriever(profilePictureValue);
+    const imageSources = imageSizeRetriever(profilePictureValue, null);
 
     const avatarWithSource = (imageSrc: string) => (
       <MAvatar

@@ -94,7 +94,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       escapedText = dummyElement.textContent;
 
       purifiedText = DOMPurify.sanitize(value.toString(), {
-        FORBID_ATTR: ["src"],
+        FORBID_ATTR: ["src", "sizes", "srcset"],
       });
     }
 

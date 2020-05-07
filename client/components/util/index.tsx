@@ -49,11 +49,87 @@ export function fileURLAbsoluter(
   }
 }
 
-export function imageSizeRetriever(fileData: IGQLFile) {
-  let imageMediumSizeURL = fileData && fileData.url;
-  let imageSmallSizeURL = fileData && fileData.url;
-  let imageLargeSizeURL = fileData && fileData.url;
-  let imageStandardSizeURL = fileData && fileData.url;
+export function imageSrcSetRetriever(fileData: IGQLFile, property: PropertyDefinition) {
+  if (
+    fileData &&
+    fileData.url.indexOf("blob:") !== 0 &&
+    fileData.type.indexOf("svg") !== 0
+  ) {
+    const sizes = imageSizeRetriever(fileData, property);
+    let theLargest = 0;
+    let srcset: string[] = [];
+
+    const dimensions = property.getSpecialProperty("dimensions") as string;
+    if (dimensions) {
+      dimensions.split(";").forEach((dimension) => {
+        const dimensionTrimmedSplitted = dimension.trim().split(" ");
+        const name = dimensionTrimmedSplitted[0];
+        const widthXHeight = dimensionTrimmedSplitted[1];
+        const width = parseInt(widthXHeight.split("x")[0]);
+        if (!isNaN(width)) {
+          srcset.push(sizes[name] + " " + width + "w");
+          if (width > theLargest) {
+            theLargest = width;
+          }
+        }
+      });
+    }
+
+    const smallDimension = property.getSpecialProperty("smallDimension") as string;
+    const smallDimensionW = parseInt(smallDimension.trim().split("x")[0]);
+    if (!isNaN(smallDimensionW)) {
+      srcset.push(sizes.imageSmallSizeURL + " " + smallDimensionW + "w");
+      if (smallDimensionW > theLargest) {
+        theLargest = smallDimensionW;
+      }
+    }
+
+    const mediumDimension = property.getSpecialProperty("mediumDimension") as string;
+    const mediumDimensionW = parseInt(mediumDimension.trim().split("x")[0]);
+    if (!isNaN(mediumDimensionW)) {
+      srcset.push(sizes.imageMediumSizeURL + " " + mediumDimensionW + "w");
+      if (mediumDimensionW > theLargest) {
+        theLargest = mediumDimensionW;
+      }
+    }
+
+    const largeDimension = property.getSpecialProperty("largeDimension") as string;
+    const largeDimensionW = parseInt(largeDimension.trim().split("x")[0]);
+    if (!isNaN(largeDimensionW)) {
+      srcset.push(sizes.imageLargeSizeURL + " " + largeDimensionW + "w");
+      if (largeDimensionW > theLargest) {
+        theLargest = largeDimensionW;
+      }
+    }
+
+    srcset.push(sizes.imageStandardSizeURL + " " + (theLargest + 100) + "w")
+
+    return srcset.join(", ");
+  } else {
+    return "";
+  }
+}
+
+/**
+ * Gets all the available image sizes for a given file
+ * @param fileData the file data
+ * @param property if not passed only returns the default image sizes, medium, small, large and the standard one
+ * custom sizes can be used and it needs access to the property in order to know these urls
+ */
+export function imageSizeRetriever(fileData: IGQLFile, property?: PropertyDefinition): {
+  imageMediumSizeURL: string;
+  imageSmallSizeURL: string;
+  imageLargeSizeURL: string;
+  imageStandardSizeURL: string;
+  [others: string]: string;
+} {
+  const finalValue = {
+    imageMediumSizeURL: fileData && fileData.url,
+    imageSmallSizeURL: fileData && fileData.url,
+    imageLargeSizeURL: fileData && fileData.url,
+    imageStandardSizeURL: fileData && fileData.url,
+  }
+
   if (
     fileData &&
     fileData.url.indexOf("blob:") !== 0 &&
@@ -69,15 +145,20 @@ export function imageSizeRetriever(fileData: IGQLFile) {
       recoveredFileName === "" ?
         fileName :
         recoveredFileName;
-    imageMediumSizeURL = baseURL + "/medium_" + fileNameWithoutExtension + ".jpg";
-    imageSmallSizeURL = baseURL + "/small_" + fileNameWithoutExtension + ".jpg";
-    imageLargeSizeURL = baseURL + "/large_" + fileNameWithoutExtension + ".jpg";
+    finalValue.imageMediumSizeURL = baseURL + "/medium_" + fileNameWithoutExtension + ".jpg";
+    finalValue.imageSmallSizeURL = baseURL + "/small_" + fileNameWithoutExtension + ".jpg";
+    finalValue.imageLargeSizeURL = baseURL + "/large_" + fileNameWithoutExtension + ".jpg";
+
+    if (property) {
+      const dimensions = property.getSpecialProperty("dimensions") as string;
+      if (dimensions) {
+        dimensions.split(";").forEach((dimension) => {
+          const name = dimension.trim().split(" ")[0];
+          finalValue[name] = baseURL + "/" + name + "_" + fileNameWithoutExtension + ".jpg";
+        });
+      }
+    }
   }
 
-  return {
-    imageMediumSizeURL,
-    imageSmallSizeURL,
-    imageLargeSizeURL,
-    imageStandardSizeURL,
-  }
+  return finalValue;
 }

@@ -9,17 +9,7 @@ custom.fragment_success = success
 custom.load_fragment = load fragment
 custom.fragment_id = fragment id
 custom.fragment_country = fragment country
-custom.fragment_language = fragment language
-
-properties.title.label = title
-properties.title.placeholder = the title of the fragment
-properties.title.error.NOT_NULLABLE = the title must be set
-properties.title.error.TOO_LARGE = the title is too long
-
-properties.content.label = content
-properties.content.placeholder = the content of the fragment
-properties.content.error.NOT_NULLABLE = the content must be set
-properties.content.error.TOO_LARGE = the content is too long`
+custom.fragment_language = fragment language`
 
 const es = `[es]
 name = fragmento de contenido
@@ -32,17 +22,7 @@ custom.fragment_success = hecho exitosamente
 custom.load_fragment = cargar fragmento
 custom.fragment_id = id del fragmento
 custom.fragment_country = región del fragmento
-custom.fragment_language = lenguaje del fragmento
-
-properties.title.label = título
-properties.title.placeholder = el título del fragmento
-properties.title.error.NOT_NULLABLE = debe tener un título
-properties.title.error.TOO_LARGE = el título es demasiado large
-
-properties.content.label = contenido
-properties.content.placeholder = el contenido del fragmento
-properties.content.error.NOT_NULLABLE = debe ofrecer contenido
-properties.content.error.TOO_LARGE = el contenido es demasiado largo`
+custom.fragment_language = lenguaje del fragmento`
 
 const ALL = {en, es};
 

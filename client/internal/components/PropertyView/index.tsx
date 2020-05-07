@@ -11,20 +11,27 @@ import { currencies, countries, ICurrencyType, ICountryType } from "../../../../
 import { IRendererProps } from "../../renderer";
 import { RendererContext } from "../../../providers/renderer";
 import { PropertyViewSimple, IPropertyViewSimpleRendererProps } from "./PropertyViewSimple";
+import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
+import Include from "../../../../base/Root/Module/ItemDefinition/Include";
+import { PropertyViewText } from "./PropertyViewText";
 
 /**
  * This is what every view renderer gets
  * 
  * Expect these to be extended
  */
-export interface IPropertyViewRendererProps extends IRendererProps {
-  capitalize: boolean;
+export interface IPropertyViewRendererProps<ValueType> extends IRendererProps {
+  currentValue: ValueType;
 }
 
 /**
  * This is what the general view handler is supposed to get
  */
 export interface IPropertyViewMainHandlerProps<RendererPropsType> {
+  include: Include;
+  itemDefinition: ItemDefinition;
+  forId: number;
+  forVersion: string;
   property: PropertyDefinition;
   capitalize?: boolean;
   state: IPropertyDefinitionState;
@@ -42,7 +49,7 @@ export interface IPropertyViewHandlerProps<RendererPropsType> extends IPropertyV
 
 interface IRendererHandlerType {
   renderer: string,
-  handler: React.ComponentType<IPropertyViewHandlerProps<IPropertyViewRendererProps>>,
+  handler: React.ComponentType<IPropertyViewHandlerProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>>,
 };
 
 const handlerRegistry:
@@ -63,7 +70,10 @@ const handlerRegistry:
     handler: PropertyViewSimple,
   },
   boolean: null,
-  text: null,
+  text: {
+    renderer: "PropertyViewText",
+    handler: PropertyViewText,
+  },
   currency: null,
   unit: null,
   password: {
@@ -101,7 +111,11 @@ export function RawBasePropertyView(props: {
                   props.renderer as React.ComponentType<IPropertyViewSimpleRendererProps> || renderers.PropertyViewSimple;
                 return (
                   <PropertyViewSimple
+                    itemDefinition={null}
                     property={null}
+                    include={null}
+                    forId={null}
+                    forVersion={null}
                     state={{
                       userSet: false,
                       default: null,
@@ -136,7 +150,7 @@ export function RawBasePropertyView(props: {
 
 
 export default function PropertyView(
-  props: IPropertyViewMainHandlerProps<IPropertyViewRendererProps>,
+  props: IPropertyViewMainHandlerProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>,
 ) {
   if (props.state.hidden) {
     return null;
@@ -154,7 +168,7 @@ export default function PropertyView(
           <LocaleContext.Consumer>
             {
               (locale) => {
-                const renderer: React.ComponentType<IPropertyViewRendererProps> =
+                const renderer: React.ComponentType<IPropertyViewRendererProps<PropertyDefinitionSupportedType>> =
                   props.renderer || renderers[registryEntry.renderer];
                 return (
                   <Element

@@ -25,5 +25,10 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
     policies?: IPoliciesRawJSONDataType;
     ownerIsObjectId?: boolean;
     searchable?: boolean;
+    versioningRoleAccess?: string[];
+    enableVersioning?: boolean;
+    versionIsLanguageAndCountry?: boolean;
+    versionIsLanguage?: boolean;
+    versionIsCountry?: boolean;
 }
 export default function build(): Promise<void>;

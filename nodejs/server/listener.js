@@ -286,7 +286,7 @@ class Listener {
             "." + request.parentId + "." + (request.parentVersion || "");
         this.removeListener(socket, mergedIndexIdentifier);
     }
-    triggerListeners(event, listenerUUID) {
+    triggerChangedListeners(event, listenerUUID) {
         const mergedIndexIdentifier = event.itemDefinition + "." + event.id + "." + (event.version || "");
         console.log("publishing to", mergedIndexIdentifier);
         this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({

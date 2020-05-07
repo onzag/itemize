@@ -66,7 +66,7 @@ const typeValue = {
             dummyElement.innerHTML = value.toString();
             escapedText = dummyElement.textContent;
             purifiedText = util_1.DOMPurify.sanitize(value.toString(), {
-                FORBID_ATTR: ["src"],
+                FORBID_ATTR: ["src", "sizes", "srcset"],
             });
         }
         return {

@@ -103,7 +103,9 @@ export const CMS = withStyles(cmsStyles)((props: WithStyles<typeof cmsStyles>) =
                     </I18nReadMany>
 
                     <Entry id="title" />
-                    <Entry id="content" />
+                    <Entry id="content" rendererArgs={{
+                      requestAltOnImages: true,
+                    }}/>
 
                     <SubmitButton
                       i18nId="submit"
@@ -121,6 +123,7 @@ export const CMS = withStyles(cmsStyles)((props: WithStyles<typeof cmsStyles>) =
                   <Paper className={props.classes.paper2}>
                     <ItemDefinitionLoader>
                       <Typography variant="h4"><View id="title"/></Typography>
+                      <View id="content"/>
                     </ItemDefinitionLoader>
                   </Paper>
 

@@ -70,7 +70,8 @@ export const MAX_FILE_TOTAL_BATCH_COUNT = MAX_FILE_BATCH_COUNT * 10;
  */
 export const MAX_FIELD_SIZE = 1000000; // equivalent to 1MB
 /**
- * how many search results can be retrieved at once
+ * how many search results can be retrieved at once these are
+ * used for the actual search results
  */
 export const MAX_SEARCH_RESULTS_AT_ONCE_LIMIT = 50;
 /**

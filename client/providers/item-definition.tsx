@@ -915,6 +915,16 @@ export class ActualItemDefinitionProvider extends
     // elements are assumed into the loading state by the constructor
     // if they have an id
     if (!this.props.forId) {
+      if ((this.state.loaded || this.state.loadError) && !this.isUnmounted) {
+        this.setState({
+          loadError: null,
+          loaded: false,
+          isBlocked: false,
+          isBlockedButDataIsAccessible: false,
+          notFound: false,
+          loading: false,
+        });
+      }
       return null;
     }
 

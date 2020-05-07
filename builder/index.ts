@@ -104,6 +104,11 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   policies?: IPoliciesRawJSONDataType;
   ownerIsObjectId?: boolean;
   searchable?: boolean;
+  versioningRoleAccess?: string[];
+  enableVersioning?: boolean;
+  versionIsLanguageAndCountry?: boolean;
+  versionIsLanguage?: boolean;
+  versionIsCountry?: boolean;
 }
 
 export default async function build() {
@@ -417,6 +422,26 @@ async function buildModule(
     propExtLocation,
   );
 
+  // and the final value is created
+  const actualLocationDirectory = path.dirname(actualLocation);
+  const finalValue: IModuleRawJSONDataType = {
+    type: "module",
+    name: actualName,
+    i18nData: i18nData,
+    location: actualLocation,
+    i18nDataLocation,
+    pointers,
+    raw,
+    children: actualEvaledFileData.children ? await buildChildrenItemDefinitionsOrModules(
+      rawDataConfig,
+      actualLocationDirectory,
+      actualLocationDirectory,
+      actualEvaledFileData.children,
+      null,
+      traceback.newTraceToBit("children"),
+    ) : [],
+  };
+
   // propextensions is declared
   let propExtensions: IPropertyDefinitionRawJSONDataType[];
   let propExtRaw: string;
@@ -445,6 +470,30 @@ async function buildModule(
     ajvCheck(checkPropertyDefinitionArraySchemaValidate,
       internalFileData.data, propExtTraceback);
 
+    // modules being searchable and items being searchable can vary and for that reason
+    // we must check whether we need the searchable properties for the properties to displace data
+    let searchableProperties = typeof actualEvaledFileData.searchable !== "undefined" ? actualEvaledFileData.searchable : true;
+    if (!searchableProperties) {
+      const checkAtLeastOneIsSearchable = (idef: IItemDefinitionRawJSONDataType) => {
+        if (searchableProperties) {
+          return;
+        } else if (typeof idef.searchable === "undefined" || idef.searchable) {
+          searchableProperties = true;
+          return;
+        } else if (idef.childDefinitions) {
+          idef.childDefinitions.forEach((cd) => {
+            checkAtLeastOneIsSearchable(idef);
+          });
+        }
+      }
+  
+      finalValue.children.forEach((c) => {
+        if (c.type === "item") {
+          checkAtLeastOneIsSearchable(c);
+        }
+      });
+    }
+
     propExtensions =
       await Promise.all<IPropertyDefinitionRawJSONDataType>(
         internalFileData.data.map((pd, index) => {
@@ -454,32 +503,12 @@ async function buildModule(
             rawDataConfig,
             actualLocation,
             pd,
-            typeof actualEvaledFileData.searchable !== "undefined" ? actualEvaledFileData.searchable : true,
+            searchableProperties,
             specificPropertyTraceback,
           );
         }),
       );
   }
-
-  // and the final value is created
-  const actualLocationDirectory = path.dirname(actualLocation);
-  const finalValue: IModuleRawJSONDataType = {
-    type: "module",
-    name: actualName,
-    i18nData: i18nData,
-    location: actualLocation,
-    i18nDataLocation,
-    pointers,
-    raw,
-    children: actualEvaledFileData.children ? await buildChildrenItemDefinitionsOrModules(
-      rawDataConfig,
-      actualLocationDirectory,
-      actualLocationDirectory,
-      actualEvaledFileData.children,
-      null,
-      traceback.newTraceToBit("children"),
-    ) : [],
-  };
 
   if (typeof actualEvaledFileData.searchable !== "undefined") {
     finalValue.searchable = actualEvaledFileData.searchable;
@@ -612,6 +641,22 @@ async function buildItemDefinition(
 
   if (actualEvaledFileData.ownerIsObjectId) {
     finalValue.ownerIsObjectId = actualEvaledFileData.ownerIsObjectId;
+  }
+
+  if (actualEvaledFileData.enableVersioning) {
+    finalValue.enableVersioning = actualEvaledFileData.enableVersioning;
+
+    if (actualEvaledFileData.versionIsCountry) {
+      finalValue.versionIsCountry = actualEvaledFileData.versionIsCountry;
+    }
+
+    if (actualEvaledFileData.versionIsLanguage) {
+      finalValue.versionIsLanguage = actualEvaledFileData.versionIsLanguage;
+    }
+
+    if (actualEvaledFileData.versionIsLanguageAndCountry) {
+      finalValue.versionIsLanguageAndCountry = actualEvaledFileData.versionIsLanguageAndCountry;
+    }
   }
 
   if (!finalValue.includes ||
