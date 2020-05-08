@@ -12,18 +12,21 @@
         {
             "id": "app_language",
             "type": "string",
+            "subtype": "language",
             "hidden": true,
             "searchable": false
         },
         {
             "id": "app_country",
             "type": "string",
+            "subtype": "country",
             "hidden": true,
             "searchable": false
         },
         {
             "id": "app_currency",
             "type": "string",
+            "subtype": "currency",
             "hidden": true,
             "searchable": false
         },

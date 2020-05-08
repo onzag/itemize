@@ -37,7 +37,7 @@ export type PropertyDefinitionSupportedTextType = string;
 const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   nullableDefault: "",
-  supportedSubtypes: ["html"],
+  supportedSubtypes: ["html", "plain"],
   specialProperties: [
     {
       name: "mediaProperty",

@@ -12,6 +12,7 @@ const PropertyDefinition_1 = require("../../PropertyDefinition");
 const constants_1 = require("../../../../../../constants");
 const search_interfaces_1 = require("../search-interfaces");
 const local_search_1 = require("../local-search");
+const imported_resources_1 = require("../../../../../../imported-resources");
 /**
  * The email regex that is used to validate emails
  */
@@ -44,7 +45,7 @@ const typeValue = {
     localSearch: local_search_1.standardLocalSearchExactAndRange,
     localEqual: local_sql_1.standardLocalEqual,
     nullableDefault: "",
-    supportedSubtypes: ["email", "identifier"],
+    supportedSubtypes: ["email", "identifier", "locale", "comprehensive-locale", "language", "country", "currency"],
     // validates just the length
     validate: (s, subtype) => {
         if (typeof s !== "string") {
@@ -62,6 +63,39 @@ const typeValue = {
                 return PropertyDefinition_1.PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
             }
         }
+        const isComprehensiveLocale = subtype === "comprehensive-locale";
+        if (subtype === "locale" || (isComprehensiveLocale && s.indexOf("-") !== -1)) {
+            const splitted = s.split("-");
+            const language = splitted[0];
+            const country = splitted[1];
+            if (!imported_resources_1.countries[country]) {
+                return PropertyDefinition_1.PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+                // sadly we can't check whether the language is on the actual supported language list
+            }
+            else if (language.length !== 2 || language.toLowerCase() !== language) {
+                return PropertyDefinition_1.PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+            }
+            return null;
+        }
+        else if (subtype === "language" || (isComprehensiveLocale && s.toLowerCase() === s)) {
+            // sadly we can't check whether the language is on the actual supported language list
+            if (s.length !== 2 || s.toLowerCase() !== s) {
+                return PropertyDefinition_1.PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+            }
+            return null;
+        }
+        else if (subtype === "country" || (isComprehensiveLocale && s.toUpperCase() === s)) {
+            if (!imported_resources_1.countries[s]) {
+                return PropertyDefinition_1.PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+            }
+            return null;
+        }
+        else if (subtype === "currency") {
+            if (!imported_resources_1.currencies[s]) {
+                return PropertyDefinition_1.PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+            }
+            return null;
+        }
         return null;
     },
     // it is searchable by an exact value, use text for organic things
@@ -74,7 +108,8 @@ const typeValue = {
         optional: constants_1.CLASSIC_OPTIONAL_I18N,
         searchBase: constants_1.CLASSIC_SEARCH_BASE_I18N,
         searchOptional: constants_1.CLASSIC_SEARCH_OPTIONAL_I18N,
-        tooLargeErrorInclude: true,
+        tooLargeErrorInclude: [null, "email", "identifier"],
+        invalidSubtypeErrorInclude: true,
     },
 };
 exports.default = typeValue;

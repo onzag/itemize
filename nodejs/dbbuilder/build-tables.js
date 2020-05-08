@@ -261,12 +261,19 @@ async function updateTable(knex, tableName, newTableSchema, currentTableSchema) 
         // grab this
         const newColumnSchema = newTableSchema[columnName];
         const currentColumnSchema = currentTableSchema[columnName];
-        // we want to find if there are deleted columns
-        if (!newColumnSchema) {
+        // we want to find if there are deleted column
+        // currentColumnSchema might be null in some situation this has happened in the past
+        // so it's worth a check that the value is set, even when it shouldn't be
+        if (!newColumnSchema && currentColumnSchema) {
             finalTableSchema[columnName] =
                 await dropExtraColumnInTable(knex, tableName, columnName, currentColumnSchema);
         }
     }
+    Object.keys(finalTableSchema).forEach((key) => {
+        if (finalTableSchema[key] === null) {
+            delete finalTableSchema[key];
+        }
+    });
     return finalTableSchema;
 }
 exports.updateTable = updateTable;
@@ -340,6 +347,11 @@ async function buildTables(knex, currentDatabaseSchema, newDatabaseSchema) {
                 await dropTable(knex, tableName, currentDatabaseSchema[tableName]);
         }
     }
+    Object.keys(finalSchema).forEach((key) => {
+        if (finalSchema[key] === null) {
+            delete finalSchema[key];
+        }
+    });
     return finalSchema;
 }
 exports.buildTables = buildTables;

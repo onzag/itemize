@@ -60,7 +60,8 @@ exports.MAX_FILE_TOTAL_BATCH_COUNT = exports.MAX_FILE_BATCH_COUNT * 10;
  */
 exports.MAX_FIELD_SIZE = 1000000; // equivalent to 1MB
 /**
- * how many search results can be retrieved at once
+ * how many search results can be retrieved at once these are
+ * used for the actual search results
  */
 exports.MAX_SEARCH_RESULTS_AT_ONCE_LIMIT = 50;
 /**

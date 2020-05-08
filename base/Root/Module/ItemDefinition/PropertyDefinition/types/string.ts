@@ -26,6 +26,7 @@ import {
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import { standardLocalSearchExactAndRange } from "../local-search";
+import { countries, currencies } from "../../../../../../imported-resources";
 
 /**
  * The email regex that is used to validate emails
@@ -68,7 +69,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   localEqual: standardLocalEqual,
 
   nullableDefault: "",
-  supportedSubtypes: ["email", "identifier"],
+  supportedSubtypes: ["email", "identifier", "locale", "comprehensive-locale", "language", "country", "currency"],
   // validates just the length
   validate: (s: PropertyDefinitionSupportedStringType, subtype: string) => {
     if (typeof s !== "string") {
@@ -87,6 +88,37 @@ const typeValue: IPropertyDefinitionSupportedType = {
         return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
       }
     }
+    
+    const isComprehensiveLocale = subtype === "comprehensive-locale";
+    if (subtype === "locale" || (isComprehensiveLocale && s.indexOf("-") !== -1)) {
+      const splitted = s.split("-");
+      const language = splitted[0];
+      const country = splitted[1];
+
+      if (!countries[country]) {
+        return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+      // sadly we can't check whether the language is on the actual supported language list
+      } else if (language.length !== 2 || language.toLowerCase() !== language) {
+        return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+      }
+      return null;
+    } else if (subtype === "language" || (isComprehensiveLocale && s.toLowerCase() === s)) {
+      // sadly we can't check whether the language is on the actual supported language list
+      if (s.length !== 2 || s.toLowerCase() !== s) {
+        return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+      }
+      return null;
+    } else if (subtype === "country" || (isComprehensiveLocale && s.toUpperCase() === s)) {
+      if (!countries[s]) {
+        return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+      }
+      return null;
+    } else if (subtype === "currency") {
+      if (!currencies[s]) {
+        return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+      }
+      return null;
+    }
 
     return null;
   },
@@ -100,7 +132,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
     optional: CLASSIC_OPTIONAL_I18N,
     searchBase: CLASSIC_SEARCH_BASE_I18N,
     searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
-    tooLargeErrorInclude: true,
+    tooLargeErrorInclude: [null, "email", "identifier"],
+    invalidSubtypeErrorInclude: true,
   },
 };
 export default typeValue;

@@ -1099,11 +1099,29 @@ async function getI18nPropertyData(
     definition.i18n.tooLargeErrorInclude &&
     !property.values
   ) {
-    errorRequiredProperties.push("error.TOO_LARGE");
+    if (Array.isArray(definition.i18n.tooLargeErrorInclude)) {
+      const subtype = property.subtype || null;
+      if (definition.i18n.tooLargeErrorInclude.includes(subtype)) {
+        errorRequiredProperties.push("error.TOO_LARGE");
+      }
+    } else {
+      errorRequiredProperties.push("error.TOO_LARGE");
+    }
   }
 
-  if (definition.supportedSubtypes && property.subtype && property.type === "string") {
-    errorRequiredProperties.push("error.INVALID_SUBTYPE_VALUE");
+  if (
+    definition.supportedSubtypes &&
+    definition.i18n.invalidSubtypeErrorInclude &&
+    property.subtype
+  ) {
+    if (Array.isArray(definition.i18n.invalidSubtypeErrorInclude)) {
+      const subtype = property.subtype || null;
+      if (definition.i18n.invalidSubtypeErrorInclude.includes(subtype)) {
+        errorRequiredProperties.push("error.INVALID_SUBTYPE_VALUE");
+      }
+    } else {
+      errorRequiredProperties.push("error.INVALID_SUBTYPE_VALUE");
+    }
   }
 
   if (
@@ -1121,13 +1139,45 @@ async function getI18nPropertyData(
     errorRequiredProperties.push("error.INVALID_VALUE");
   }
 
-  if ((typeof property.minLength !== "undefined" || definition.i18n.tooSmallErrorInclude) &&
-    !property.values) {
-    errorRequiredProperties.push("error.TOO_SMALL");
+  // if a minlenght is specified in the property it means
+  // that a too small value must exist, eg. a min len of 2
+  // will trigger with one character, but 0 characters will be
+  // null and won't trigger so the error is unecessary,
+  // another circumstance where instead we use a too small
+  // error regardless is with numbers, for negative numbers
+  // they are always necessary
+  if (
+    (
+      typeof property.minLength !== "undefined" ||
+      definition.i18n.tooSmallErrorInclude
+    ) &&
+    !property.values
+  ) {
+    if (
+      typeof property.minLength === "undefined" &&
+      Array.isArray(definition.i18n.tooSmallErrorInclude)
+    ) {
+      const subtype = property.subtype || null;
+      if (definition.i18n.tooSmallErrorInclude.includes(subtype)) {
+        errorRequiredProperties.push("error.TOO_SMALL");
+      }
+    } else {
+      errorRequiredProperties.push("error.TOO_SMALL");
+    }
   }
 
-  if (definition.i18n.tooManyDecimalsErrorInclude && !property.values) {
-    errorRequiredProperties.push("error.TOO_MANY_DECIMALS");
+  if (
+    definition.i18n.tooManyDecimalsErrorInclude &&
+    !property.values
+  ) {
+    if (Array.isArray(definition.i18n.tooManyDecimalsErrorInclude)) {
+      const subtype = property.subtype || null;
+      if (definition.i18n.tooManyDecimalsErrorInclude.includes(subtype)) {
+        errorRequiredProperties.push("error.TOO_MANY_DECIMALS");
+      }
+    } else {
+      errorRequiredProperties.push("error.TOO_MANY_DECIMALS");
+    }
   }
 
   if (typeof property.minDecimalCount !== "undefined" && !property.values) {

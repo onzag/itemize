@@ -91,6 +91,13 @@ interface IRendererHandlerType {
   handler: React.ComponentType<IPropertyEntryHandlerProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>>,
 };
 
+interface IRendererWholeHandlerType extends IRendererHandlerType {
+  defaultSubhandler?: IRendererHandlerType;
+  subhandler?: {
+    [type: string]: IRendererHandlerType;
+  }
+}
+
 const selectHandler: IRendererHandlerType = {
   renderer: "PropertyEntrySelect",
   handler: PropertyEntrySelect,
@@ -102,7 +109,7 @@ const selectHandler: IRendererHandlerType = {
 const handlerRegistry:
   Record<
     PropertyDefinitionSupportedTypeName,
-    IRendererHandlerType
+    IRendererWholeHandlerType
   > = {
   string: {
     renderer: "PropertyEntryField",
@@ -117,6 +124,10 @@ const handlerRegistry:
   text: {
     renderer: "PropertyEntryText",
     handler: PropertyEntryText,
+    defaultSubhandler: {
+      renderer: "PropertyEntryField",
+      handler: PropertyEntryField,
+    }
   },
   currency: null,
   unit: null,
@@ -146,11 +157,19 @@ export default function PropertyEntry(
     return null;
   }
 
+  const type = props.property.getType();
+  const subtype = props.property.getSubtype();
+
   // First get the handler by the type
-  const registryEntry = props.property.hasSpecificValidValues() ?
-    // TODO PropertyEntrySelect :
+  let registryEntry: IRendererWholeHandlerType = props.property.hasSpecificValidValues() ?
     selectHandler :
-    handlerRegistry[props.property.getType()];
+    handlerRegistry[type];
+
+  if (subtype === null && registryEntry.defaultSubhandler) {
+    registryEntry = registryEntry.defaultSubhandler;
+  } else if (subtype && registryEntry.subhandler && registryEntry.subhandler[subtype]) {
+    registryEntry = registryEntry.subhandler[subtype];
+  }
 
   const Element = registryEntry.handler;
 

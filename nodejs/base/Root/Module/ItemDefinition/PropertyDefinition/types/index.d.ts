@@ -193,9 +193,10 @@ export interface IPropertyDefinitionSupportedType {
         searchRangeOptional?: string[];
         searchBase?: string[];
         searchOptional?: string[];
-        tooLargeErrorInclude?: boolean;
-        tooSmallErrorInclude?: boolean;
-        tooManyDecimalsErrorInclude?: boolean;
+        tooLargeErrorInclude?: boolean | string[];
+        tooSmallErrorInclude?: boolean | string[];
+        tooManyDecimalsErrorInclude?: boolean | string[];
+        invalidSubtypeErrorInclude?: boolean | string[];
     };
 }
 /**

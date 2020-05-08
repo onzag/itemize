@@ -18,7 +18,7 @@ const util_1 = require("../../../../../../util");
 const typeValue = {
     gql: graphql_1.GraphQLString,
     nullableDefault: "",
-    supportedSubtypes: ["html"],
+    supportedSubtypes: ["html", "plain"],
     specialProperties: [
         {
             name: "mediaProperty",

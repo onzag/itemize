@@ -1,7 +1,7 @@
 [
     {
         "id": "title",
-        "type": "string"
+        "type": "text"
     },
     {
         "id": "content",

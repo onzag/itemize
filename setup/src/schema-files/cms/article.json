@@ -2,20 +2,18 @@
     "type": "item",
     "properties": [
         {
-            "id": "title",
-            "type": "string"
+            "id": "locale",
+            "type": "string",
+            "subtype": "comprehensive-locale"
         },
         {
-            "id": "content",
+            "id": "summary",
             "type": "text",
-            "subtype": "html"
+            "subtype": "plain",
+            "searchable": false
         }
     ],
     "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
     "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
-    "deleteRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
-    "allowsVersioning": true,
-    "versionIsLanguageAndCountry": true,
-    "versionIsLanguage": true,
-    "versionIsCountry": true
+    "deleteRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}"
 }

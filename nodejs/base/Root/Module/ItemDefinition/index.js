@@ -245,13 +245,14 @@ class ItemDefinition {
         }
         // otherwse let's calculate these booleans
         const isCountry = !!imported_resources_1.countries[version];
-        const isLanguage = !!supportedLanguages.find((l) => l === version);
+        const isLanguageOrEntireLocale = !!supportedLanguages.find((l) => l === version);
         const versionSplitted = version.split("-");
-        if (!isCountry && !isLanguage && versionSplitted.length !== 2) {
+        if (!isCountry && !isLanguageOrEntireLocale && versionSplitted.length !== 2) {
             return false;
         }
         const possibleLanguage = versionSplitted[0];
         const possibleCountry = versionSplitted[1] || null;
+        const isEntireLocale = versionSplitted.length === 2 && isLanguageOrEntireLocale;
         const isLanguageAndCountry = !!possibleCountry &&
             !!imported_resources_1.countries[possibleCountry] && supportedLanguages.find((l) => l === possibleLanguage);
         // and check each
@@ -260,11 +261,11 @@ class ItemDefinition {
             return true;
         }
         else if (this.rawData.versionIsLanguage &&
-            isLanguage) {
+            isLanguageOrEntireLocale) {
             return true;
         }
         else if (this.rawData.versionIsLanguageAndCountry &&
-            isLanguageAndCountry) {
+            (isLanguageAndCountry || isEntireLocale)) {
             return true;
         }
         // if none passes, we return false
