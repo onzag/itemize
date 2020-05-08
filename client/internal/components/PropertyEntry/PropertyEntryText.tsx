@@ -27,6 +27,11 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
   supportsFiles: boolean;
 
   onInsertFile: (file: File) => IPropertyDefinitionSupportedSingleFilesType;
+  onInsertImage: (file: File) => Promise<{
+    result: IPropertyDefinitionSupportedSingleFilesType,
+    width: number,
+    height: number,
+  }>
 }
 
 export default class PropertyEntryText
@@ -43,6 +48,7 @@ export default class PropertyEntryText
     this.internalFileCache = {};
 
     this.onInsertFile = this.onInsertFile.bind(this);
+    this.onInsertImage = this.onInsertImage.bind(this);
     this.onChangeHijacked = this.onChangeHijacked.bind(this);
   }
 
@@ -156,6 +162,31 @@ export default class PropertyEntryText
       relatedProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue.length === 0 ? null : newValue, null);
       this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
     }
+  }
+
+  public async onInsertImage(file: File): Promise<{
+    result: IPropertyDefinitionSupportedSingleFilesType,
+    width: number,
+    height: number,
+  }> {
+    const fileInserted = this.onInsertFile(file);
+
+    const tempURL = fileInserted.url;
+
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        resolve({
+          result: fileInserted,
+          width: img.width,
+          height: img.height,
+        });
+      }
+      img.onerror = (ev) => {
+        resolve(null);
+      }
+      img.src = tempURL;
+    });
   }
 
   public onInsertFile(file: File) {
@@ -301,6 +332,7 @@ export default class PropertyEntryText
       onChange: supportsMedia ? this.onChangeHijacked : this.props.onChange,
 
       onInsertFile: this.onInsertFile,
+      onInsertImage: this.onInsertImage,
     };
 
     return <RendererElement {...rendererArgs}/>

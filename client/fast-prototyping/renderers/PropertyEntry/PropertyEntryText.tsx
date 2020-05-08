@@ -37,26 +37,32 @@ interface ItemizeImageBlotValue {
   srcId: string;
   srcSet: string;
   sizes: string;
+  srcWidth: number;
+  srcHeight: number;
 }
 
 class ItemizeImageBlot extends BlockEmbed {
   static create(value: ItemizeImageBlotValue) {
     let node = super.create();
     node.setAttribute("alt", value.alt || "");
-    node.setAttribute("sizes", value.sizes);
-    node.setAttribute("srcset", value.srcSet);
-    node.setAttribute("src", value.src);
+    node.setAttribute("sizes", value.sizes || "");
+    node.setAttribute("srcset", value.srcSet || "");
+    node.setAttribute("src", value.src || "");
     node.dataset.srcId = value.srcId;
+    node.dataset.srcWidth = value.srcWidth;
+    node.dataset.srcHeight = value.srcHeight;
     return node;
   }
   
   static value(node: HTMLImageElement) {
     return {
-      alt: node.getAttribute("alt"),
+      alt: node.getAttribute("alt") || null,
       src: node.getAttribute("src"),
       srcId: node.dataset.srcId,
-      srcSet: node.getAttribute("srcset"),
-      sizes: node.getAttribute("sizes"),
+      srcSet: node.getAttribute("srcset") || null,
+      sizes: node.getAttribute("sizes") || null,
+      srcWidth: parseInt(node.dataset.srcWidth) || null,
+      srcHeight: parseInt(node.dataset.srcHeight) || null,
     };
   }
 }
@@ -331,7 +337,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   }
   public componentDidMount() {
     const editor = this.quillRef.current.getEditor();
-    editor.root.addEventListener('paste', (e) => {
+    editor.root.addEventListener('paste', async (e) => {
       const clipboardData: DataTransfer = e.clipboardData || (window as any).clipboardData;
       console.log(clipboardData);
       // support cut by software & copy image file directly
@@ -345,13 +351,22 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
       // only support single image paste
       const file = clipboardData.files[0];
-      const result = this.props.onInsertFile(file);
+      const data = await this.props.onInsertImage(file);
+
+      // image failed to load
+      if (!data) {
+        return;
+      }
   
       const range = editor.getSelection(true);
       editor.insertEmbed(range.index, "itemizeimage", {
         alt: null,
-        src: result.url,
-        srcId: result.id,
+        src: data.result.url,
+        srcId: data.result.id,
+        srcSet: null,
+        sizes: null,
+        srcWidth: data.width,
+        srcHeight: data.height,
       }, (ReactQuill.Quill as any).sources.USER);
       editor.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
     });
@@ -385,23 +400,29 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   public customImageHandler() {
     this.inputImageRef.current.click();
   }
-  public onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
+  public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files[0];
 
     let alt: string = null;
     if (this.props.args["requestAltOnImages"]) {
-      alt = prompt("Please write an alt for your image:", null) || null;
+      alt = prompt("Please write an alt for your image:", "") || null;
     }
-    const result = this.props.onInsertFile(file);
+    const data = await this.props.onInsertImage(file);
+
+    if (!data) {
+      return;
+    }
   
     const quill = this.quillRef.current.getEditor();
     const range = quill.getSelection(true);
     quill.insertEmbed(range.index, "itemizeimage", {
       alt,
-      src: result.url,
-      srcId: result.id,
+      src: data.result.url,
+      srcId: data.result.id,
       srcSet: null,
       sizes: null,
+      srcWidth: data.width,
+      srcHeight: data.height,
     }, (ReactQuill.Quill as any).sources.USER);
     quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
   }
