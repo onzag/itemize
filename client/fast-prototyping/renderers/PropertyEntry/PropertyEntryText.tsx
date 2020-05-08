@@ -43,33 +43,66 @@ interface ItemizeImageBlotValue {
 
 class ItemizeImageBlot extends BlockEmbed {
   static create(value: ItemizeImageBlotValue) {
-    let node = super.create();
-    node.setAttribute("alt", value.alt || "");
-    node.setAttribute("sizes", value.sizes || "");
-    node.setAttribute("srcset", value.srcSet || "");
-    node.setAttribute("src", value.src || "");
-    node.dataset.srcId = value.srcId;
-    node.dataset.srcWidth = value.srcWidth;
-    node.dataset.srcHeight = value.srcHeight;
-    return node;
+    const width = value.srcWidth;
+    const height = value.srcHeight;
+    const ratio = height / width;
+    const percentage = ratio * 100;
+
+    const parentContainer = super.create();
+    parentContainer.className = "image-container";
+
+    const childContainer = document.createElement("div");
+    childContainer.className = "image-pad";
+    childContainer.setAttribute("style", "position: relative; width: 100%; padding-bottom: " + percentage + "%");
+    parentContainer.appendChild(childContainer);
+
+    const img = document.createElement("img");
+    img.setAttribute("style", "position: absolute; top: 0; left: 0;");
+    childContainer.appendChild(img);
+
+    img.setAttribute("alt", value.alt || "");
+    img.setAttribute("sizes", value.sizes || "");
+    img.setAttribute("srcset", value.srcSet || "");
+    img.setAttribute("src", value.src || "");
+    img.dataset.srcId = value.srcId;
+    img.dataset.srcWidth = value.srcWidth.toString();
+    img.dataset.srcHeight = value.srcHeight.toString();
+    return parentContainer;
   }
   
-  static value(node: HTMLImageElement) {
+  static value(node: HTMLDivElement) {
+    const img = node.childNodes[0].childNodes[0] as HTMLImageElement;
     return {
-      alt: node.getAttribute("alt") || null,
-      src: node.getAttribute("src"),
-      srcId: node.dataset.srcId,
-      srcSet: node.getAttribute("srcset") || null,
-      sizes: node.getAttribute("sizes") || null,
-      srcWidth: parseInt(node.dataset.srcWidth) || null,
-      srcHeight: parseInt(node.dataset.srcHeight) || null,
+      alt: img.getAttribute("alt") || null,
+      src: img.getAttribute("src"),
+      srcId: img.dataset.srcId,
+      srcSet: img.getAttribute("srcset") || null,
+      sizes: img.getAttribute("sizes") || null,
+      srcWidth: parseInt(img.dataset.srcWidth) || null,
+      srcHeight: parseInt(img.dataset.srcHeight) || null,
     };
   }
 }
 ItemizeImageBlot.blotName = 'itemizeimage';
-ItemizeImageBlot.tagName = 'img';
+ItemizeImageBlot.tagName = 'div';
 
 ReactQuill.Quill.register(ItemizeImageBlot);
+
+interface ItemizeYoutubeBlotValue {
+  alt: string;
+  src: string;
+  srcId: string;
+  srcSet: string;
+  sizes: string;
+  srcWidth: number;
+  srcHeight: number;
+}
+
+class ItemizeYoutubeBlot extends BlockEmbed {
+  static create() {
+
+  }
+}
 
 function shouldShowInvalid(props: IPropertyEntryTextRendererProps) {
   return !props.currentValid;

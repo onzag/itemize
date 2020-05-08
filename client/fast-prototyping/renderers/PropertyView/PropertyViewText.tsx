@@ -59,13 +59,13 @@ function lazyloader(element: HTMLElement, propertySet: Array<[string, string]>) 
   element.dataset.propertySet = propertySet.map((s) => s.join(",")).join(";");
   // now we check if this is an image that has a loading property that uses lazyloading
   // this is supported in modern browsers but only works with images and the likes
-  if (false && (element as any).loading) {
+  if ((element as any).loading) {
     // we restore the info
     restoreElementInfo(element);
     // and mark it as lazy
     (element as any).loading = "lazy";
   // otherwise using the intersection observer if we have it
-  } else if (false && window.IntersectionObserver) {
+  } else if (window.IntersectionObserver) {
     // if we haven't created a main
     if (!io) {
       // we crate the observer
@@ -122,33 +122,13 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     this.cheapdiv.innerHTML = html;
 
     this.cheapdiv.querySelectorAll("img").forEach((img: HTMLImageElement) => {
-      const width = parseInt(img.dataset.srcWidth);
-      const height = parseInt(img.dataset.srcHeight);
-      const ratio = height / width;
-      const percentage = ratio * 100;
-
-      if (!isNaN(percentage)) {
-        const parentContainer = document.createElement("div");
-        parentContainer.className = "image-container";
-
-        const childContainer = document.createElement("div");
-        childContainer.className = "image-pad";
-        childContainer.setAttribute("style", "position: relative; width: 100%; padding-bottom: " + percentage + "%");
-        parentContainer.appendChild(childContainer);
-
-        if (!img.src.startsWith("blob:")) {
-          img.dataset.srcset = img.srcset;
-          img.removeAttribute("srcset");
-          img.dataset.src = img.src;
-          img.removeAttribute("src");
-          img.dataset.sizes = img.sizes;
-          img.removeAttribute("sizes");
-        }
-
-        img.setAttribute("style", "position: absolute; top: 0; left: 0;");
-        img.replaceWith(parentContainer);
-        childContainer.appendChild(img);
-
+      if (!img.src.startsWith("blob:")) {
+        img.dataset.srcset = img.srcset;
+        img.removeAttribute("srcset");
+        img.dataset.src = img.src;
+        img.removeAttribute("src");
+        img.dataset.sizes = img.sizes;
+        img.removeAttribute("sizes");
         lazyloader(img, [["sizes", "sizes"], ["srcset", "srcset"], ["src", "src"]]);
       }
     });
