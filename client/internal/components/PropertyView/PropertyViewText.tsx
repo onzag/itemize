@@ -1,13 +1,86 @@
 import React from "react";
 import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
-import { DOMPurify, escapeStringRegexp } from "../../../../util";
+import { DOMPurify } from "../../../../util";
 import equals from "deep-equal";
 import { PropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
-import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
+import { PropertyDefinitionSupportedFilesType, IPropertyDefinitionSupportedSingleFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { fileURLAbsoluter, imageSrcSetRetriever } from "../../../components/util";
+import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 export interface IPropertyViewTextRendererProps extends IPropertyViewRendererProps<PropertyDefinitionSupportedTextType> {
   isRichText: boolean;
+}
+
+export const PROPERTY_VIEW_SANITIZE_CONFIG = {
+  ADD_TAGS: ["iframe"],
+  ADD_ATTR: ["frameborder", "allow", "allowfullscreen", "scrolling", "src", "spellcheck", "contenteditable"],
+  ALLOW_UNKNOWN_PROTOCOLS: true,
+};
+
+export function propertyViewPostProcessingHook(
+  relatedProperty: PropertyDefinition,
+  currentFiles: IPropertyDefinitionSupportedSingleFilesType[],
+  supportsImages: boolean,
+  supportsVideos: boolean,
+  supportsFiles: boolean,
+  node: HTMLElement,
+) {
+  if (node.tagName === "IFRAME") {
+    if (supportsVideos) {
+      const videoSrc = node.dataset.videoSrc || "";
+      const origin = node.dataset.videoOrigin || "";
+      if (origin === "vimeo") {
+        node.setAttribute("src", `https://player.vimeo.com/video/${videoSrc}?title=0&byline=0&portrait=0&badge=0`);
+      } else if (origin === "youtube") {
+        node.setAttribute("src", `https://youtube.com/embed/${videoSrc}?rel=0`);
+      }
+    } else {
+      node.parentElement && node.parentElement.removeChild(node);
+    }
+  } else if (node.tagName === "IMG" && currentFiles && currentFiles.length) {
+    if (supportsImages) {
+      const srcId = node.dataset.srcId;
+      const currentFile = currentFiles.find((f) => f.id === srcId);
+      if (currentFile) {
+        const absolutedFile = fileURLAbsoluter(
+          currentFile,
+          this.props.itemDefinition,
+          this.props.forId,
+          this.props.forVersion || null,
+          this.props.include,
+          relatedProperty,
+        );
+        const srcset = imageSrcSetRetriever(absolutedFile, relatedProperty);
+        node.setAttribute("sizes", "70vw");
+        node.setAttribute("srcset", srcset);
+        node.setAttribute("src", absolutedFile ? absolutedFile.url : "/rest/resource/image-fail.svg")
+      }
+    } else {
+      node.parentElement && node.parentElement.removeChild(node);
+    }
+  } else if (node.className === "file" && currentFiles && currentFiles.length) {
+    if (supportsFiles) {
+      const srcId = node.dataset.srcId;
+      const currentFile = currentFiles.find((f) => f.id === srcId);
+      if (currentFile) {
+        const absolutedFile = fileURLAbsoluter(
+          currentFile,
+          this.props.itemDefinition,
+          this.props.forId,
+          this.props.forVersion || null,
+          this.props.include,
+          relatedProperty,
+        );
+        if (absolutedFile) {
+          node.dataset.src = absolutedFile.url;
+        }
+      }
+    } else {
+      node.parentElement && node.parentElement.removeChild(node);
+    }
+  }
+
+  return node;
 }
 
 export class PropertyViewText extends React.Component<IPropertyViewHandlerProps<IPropertyViewTextRendererProps>> {
@@ -28,34 +101,23 @@ export class PropertyViewText extends React.Component<IPropertyViewHandlerProps<
   }
   public render() {
     let currentValue: string = this.props.state.value as string;
-    if (this.props.property.isRichText()) {
-      currentValue = DOMPurify.sanitize(currentValue);
 
-      const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
-      if (relatedPropertyName) {
-        const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
-        const currentFiles =
-          relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+    const isRichText = this.props.property.isRichText();
 
-        if (currentFiles && currentFiles.length) {
-          currentFiles.forEach((cf) => {
-            const absolutedFile = fileURLAbsoluter(
-              cf,
-              this.props.itemDefinition,
-              this.props.forId,
-              this.props.forVersion || null,
-              this.props.include,
-              relatedProperty,
-            );
-            const srcset = imageSrcSetRetriever(absolutedFile, relatedProperty);
-            const attrShape = `data-src-id="${cf.id}"`;
-            // TODO check these if they do not represent a vulnerability, escape them otherwise
-            const attrReplacement = `sizes="70vw" srcset="${srcset}" src="${absolutedFile ? absolutedFile.url : "/rest/resource/image-fail.svg"}" ${attrShape}`;
-            const attrShapeRegex = new RegExp(escapeStringRegexp(attrShape), "g");
-            currentValue = currentValue.replace(attrShapeRegex, attrReplacement);
-          });
-        }
-      }
+    const mediaPropertyId = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const supportsMedia = !!mediaPropertyId && isRichText;
+    const supportsVideos = isRichText && !!this.props.property.getSpecialProperty("supportsVideos");
+    const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
+    const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
+
+    if (isRichText) {
+      const mediaProperty = mediaPropertyId && this.props.itemDefinition.getPropertyDefinitionFor(mediaPropertyId, true);
+      const currentFiles = mediaProperty &&
+        mediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+
+      DOMPurify.addHook("afterSanitizeElements", propertyViewPostProcessingHook.bind(this, mediaProperty, currentFiles, supportsImages, supportsVideos, supportsFiles));
+      currentValue = DOMPurify.sanitize(currentValue, PROPERTY_VIEW_SANITIZE_CONFIG);
+      DOMPurify.removeAllHooks();
     }
 
     const RendererElement = this.props.renderer;

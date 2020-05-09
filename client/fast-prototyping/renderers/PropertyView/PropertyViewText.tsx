@@ -30,9 +30,6 @@ function restoreElementInfo(target: HTMLElement) {
     const propertyInAttr = propertySet[1];
 
     // and set the attributes
-    if (propertyInAttr === undefined) {
-      debugger;
-    }
     target.setAttribute(propertyInAttr, target.dataset[propertyInDataSet]);
     target.dataset[propertyInDataSet] = "";
   });
@@ -131,6 +128,23 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
         img.removeAttribute("sizes");
         lazyloader(img, [["sizes", "sizes"], ["srcset", "srcset"], ["src", "src"]]);
       }
+    });
+
+    this.cheapdiv.querySelectorAll("iframe").forEach((iframe: HTMLIFrameElement) => {
+      if (!iframe.src.startsWith("blob:")) {
+        iframe.dataset.src = iframe.src;
+        lazyloader(iframe, [["src", "src"]]);
+      }
+    });
+
+    this.cheapdiv.querySelectorAll(".file").forEach((file: HTMLDivElement) => {
+      const container = file.querySelector(".file-container");
+      const title = file.querySelector(".file-title");
+      container.addEventListener("click", () => {
+        if (file.dataset.src) {
+          window.open(file.dataset.src, title ? title.textContent : "_blank");
+        }
+      });
     });
 
     this.divref.current.innerHTML = "";

@@ -44,6 +44,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: "string",
     },
     {
+      name: "supportsVideos",
+      type: "boolean",
+    },
+    {
       name: "supportsImages",
       type: "boolean",
     },
@@ -94,7 +98,9 @@ const typeValue: IPropertyDefinitionSupportedType = {
       escapedText = dummyElement.textContent;
 
       purifiedText = DOMPurify.sanitize(value.toString(), {
-        FORBID_ATTR: ["src", "sizes", "srcset"],
+        ADD_TAGS: ["iframe"],
+        ADD_ATTR: ["frameborder", "allow", "allowfullscreen", "scrolling", "spellcheck", "contenteditable"],
+        FORBID_ATTR: ["sizes", "srcset", "src", "data-src"],
       });
     }
 

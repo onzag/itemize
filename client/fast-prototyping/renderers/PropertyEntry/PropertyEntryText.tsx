@@ -1,5 +1,5 @@
 import React from "react";
-import { InputLabel, IconButton, ThemeProvider, Typography } from "@material-ui/core";
+import { InputLabel, IconButton, ThemeProvider, Typography, TextField, Button } from "@material-ui/core";
 import ReactQuill from "react-quill";
 import Toolbar from "@material-ui/core/Toolbar";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
@@ -25,10 +25,13 @@ import FormatBoldIcon from "@material-ui/icons/FormatBold";
 
 import "react-quill/dist/quill.core.css";
 import "../../../internal/theme/quill.scss";
-import { capitalize } from "../../../../util";
+import { capitalize, mimeTypeToExtension } from "../../../../util";
 import { LAST_RICH_TEXT_CHANGE_LENGTH, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
+import { Dialog } from "../../components/dialog";
+import prettyBytes from "pretty-bytes";
 
 const BlockEmbed = ReactQuill.Quill.import("blots/block/embed");
+const Embed = ReactQuill.Quill.import("blots/embed");
 const Delta = ReactQuill.Quill.import("delta");
 
 interface ItemizeImageBlotValue {
@@ -48,16 +51,19 @@ class ItemizeImageBlot extends BlockEmbed {
     const ratio = height / width;
     const percentage = ratio * 100;
 
-    const parentContainer = super.create();
+    const mainContainer = super.create();
+    mainContainer.className = "image";
+
+    const parentContainer = document.createElement("div");
     parentContainer.className = "image-container";
+    mainContainer.appendChild(parentContainer);
 
     const childContainer = document.createElement("div");
     childContainer.className = "image-pad";
-    childContainer.setAttribute("style", "position: relative; width: 100%; padding-bottom: " + percentage + "%");
+    childContainer.setAttribute("style", "padding-bottom: " + percentage + "%");
     parentContainer.appendChild(childContainer);
 
     const img = document.createElement("img");
-    img.setAttribute("style", "position: absolute; top: 0; left: 0;");
     childContainer.appendChild(img);
 
     img.setAttribute("alt", value.alt || "");
@@ -67,11 +73,11 @@ class ItemizeImageBlot extends BlockEmbed {
     img.dataset.srcId = value.srcId;
     img.dataset.srcWidth = value.srcWidth.toString();
     img.dataset.srcHeight = value.srcHeight.toString();
-    return parentContainer;
+    return mainContainer;
   }
   
   static value(node: HTMLDivElement) {
-    const img = node.childNodes[0].childNodes[0] as HTMLImageElement;
+    const img = node.childNodes[0].childNodes[0].childNodes[0] as HTMLImageElement;
     return {
       alt: img.getAttribute("alt") || null,
       src: img.getAttribute("src"),
@@ -83,26 +89,122 @@ class ItemizeImageBlot extends BlockEmbed {
     };
   }
 }
-ItemizeImageBlot.blotName = 'itemizeimage';
-ItemizeImageBlot.tagName = 'div';
+ItemizeImageBlot.blotName = "itemizeimage";
+ItemizeImageBlot.className = "image";
+ItemizeImageBlot.tagName = "div";
 
 ReactQuill.Quill.register(ItemizeImageBlot);
 
-interface ItemizeYoutubeBlotValue {
-  alt: string;
+interface ItemizeVideoBlotValue {
   src: string;
-  srcId: string;
-  srcSet: string;
-  sizes: string;
-  srcWidth: number;
-  srcHeight: number;
+  origin: "youtube" | "vimeo";
 }
 
-class ItemizeYoutubeBlot extends BlockEmbed {
-  static create() {
+class ItemizeVideoBlot extends BlockEmbed {
+  static create(value: ItemizeVideoBlotValue) {
+    const mainContainer = super.create();
+    mainContainer.className = "video";
 
+    const parentContainer = document.createElement("div");
+    parentContainer.className = "video-container";
+    mainContainer.appendChild(parentContainer);
+
+    const iframe = document.createElement("iframe");
+    parentContainer.appendChild(iframe);
+
+    iframe.dataset.videoSrc = value.src;
+    iframe.dataset.videoOrigin = value.origin;
+
+    if (value.origin === "youtube") {
+      iframe.src = `https://youtube.com/embed/${value.src}?rel=0`;
+    } else {
+      iframe.src = `https://player.vimeo.com/video/${value.src}?title=0&byline=0&portrait=0&badge=0`;
+    }
+
+    iframe.frameBorder = "0";
+    iframe.allowFullscreen = true;
+
+    return mainContainer;
+  }
+
+  static value(node: HTMLDivElement) {
+    const iframe = node.childNodes[0].childNodes[0] as HTMLIFrameElement;
+    return {
+      src: iframe.dataset.videoSrc,
+      origin: iframe.dataset.videoOrigin,
+    };
   }
 }
+ItemizeVideoBlot.blotName = "itemizevideo";
+ItemizeVideoBlot.className = "video";
+ItemizeVideoBlot.tagName = "div";
+
+ReactQuill.Quill.register(ItemizeVideoBlot);
+
+interface ItemizeFileBlotValue {
+  srcId: string;
+  name: string;
+  extension: string;
+  size: string;
+  src: string;
+}
+
+class ItemizeFileBlot extends Embed {
+  static create(value: ItemizeFileBlotValue) {
+    const mainContainer = super.create();
+    mainContainer.className = "file";
+    mainContainer.spellcheck = false;
+    mainContainer.dataset.srcId = value.srcId;
+    mainContainer.contentEditable = false;
+    mainContainer.dataset.src = value.src;
+
+    const parentContainer = document.createElement("span");
+    parentContainer.className = "file-container";
+    mainContainer.appendChild(parentContainer);
+
+    parentContainer.addEventListener("click", () => {
+      if (value.src) {
+        window.open(value.src, value.name || "_blank");
+      }
+    });
+
+    const icon = document.createElement("span");
+    icon.className = "file-icon";
+    parentContainer.appendChild(icon);
+
+    const extension = document.createElement("span");
+    extension.className = "file-extension";
+    extension.textContent = value.extension;
+    icon.appendChild(extension);
+
+    const name = document.createElement("span");
+    name.className = "file-name";
+    name.textContent = value.name;
+    parentContainer.appendChild(name);
+
+    const size = document.createElement("span");
+    size.className = "file-size";
+    size.textContent = value.size;
+    parentContainer.appendChild(size);
+
+    return mainContainer;
+  }
+
+  static value(node: HTMLDivElement) {
+    return {
+      srcId: node.dataset.srcId,
+      name: node.querySelector(".file-name").textContent,
+      extension: node.querySelector(".file-extension").textContent,
+      size: node.querySelector(".file-size").textContent,
+      src: node.dataset.src,
+    };
+  }
+}
+ItemizeFileBlot.blotName = "itemizefile";
+ItemizeFileBlot.className = "file";
+ItemizeFileBlot.tagName = "span";
+
+ReactQuill.Quill.register(ItemizeFileBlot);
 
 function shouldShowInvalid(props: IPropertyEntryTextRendererProps) {
   return !props.currentValid;
@@ -214,6 +316,7 @@ function RichTextEditorToolbar(props: {
   },
   supportsImages: boolean;
   supportsFiles: boolean;
+  supportsVideos: boolean;
 }) {
   return (
     <Toolbar id={props.id}>
@@ -282,11 +385,22 @@ function RichTextEditorToolbar(props: {
         ) : null
       }
       {
+        props.supportsVideos ?
+        (
+          <IconButton
+            title={props.i18n.formatAddVideoLabel}
+            classes={{ root: "ql-video" }}
+          >
+            <VideoLibraryIcon/>
+          </IconButton>
+        ) : null
+      }
+      {
         props.supportsFiles ?
         (
           <IconButton
             title={props.i18n.formatAddFileLabel}
-            classes={{ root: "" }}
+            classes={{ root: "ql-file" }}
           >
             <AttachFileIcon/>
           </IconButton>
@@ -307,9 +421,12 @@ interface IPropertyEntryTextRendererWithStylesProps extends IPropertyEntryTextRe
 
 interface IPropertyEntryTextRendererState {
   focused: boolean;
+  requestingVideoLink: boolean;
+  invalidVideoLink: boolean;
+  currentVideoLink: string;
 }
 
-const CACHED_FORMATS_RICH = ["bold", "italic", "underline", "header", "blockquote", "list", "itemizeimage"];
+const CACHED_FORMATS_RICH = ["bold", "italic", "underline", "header", "blockquote", "list", "itemizeimage", "itemizevideo", "itemizefile"];
 const CACHED_FORMATS_NONE = [];
 const CACHED_CLIPBOARD_MATCHERS: ReactQuill.ClipboardMatcher[] = [
   [Node.ELEMENT_NODE, collapseToPlainTextMatcher],
@@ -323,6 +440,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   // this one also gets an uuid
   private uuid: string;
   private inputImageRef: React.RefObject<HTMLInputElement>;
+  private fileInputRef: React.RefObject<HTMLInputElement>;
 
   private cachedModuleOptionsRich: any;
   private cachedModuleOptionsNone: any;
@@ -335,24 +453,37 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     // whether it is focused or not
     this.state = {
       focused: false,
+      requestingVideoLink: false,
+      invalidVideoLink: false,
+      currentVideoLink: "",
     };
 
     this.uuid =  "uuid-" + uuid.v4();
     this.inputImageRef = React.createRef();
     this.quillRef = React.createRef();
+    this.fileInputRef = React.createRef();
 
     // basic functions
     this.onChange = this.onChange.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
     this.customImageHandler = this.customImageHandler.bind(this);
+    this.customVideoHandler = this.customVideoHandler.bind(this);
+    this.customFileHandler = this.customFileHandler.bind(this);
+    this.closeVideoRequesting = this.closeVideoRequesting.bind(this);
     this.onImageLoad = this.onImageLoad.bind(this);
+    this.onFileLoad = this.onFileLoad.bind(this);
+    this.submitVideoLink = this.submitVideoLink.bind(this);
+    this.updateCurrentVideoLink = this.updateCurrentVideoLink.bind(this);
+    this.onFileLoad = this.onFileLoad.bind(this);
 
     this.cachedModuleOptionsRich = {
       toolbar: {
         container: "#" + this.uuid,
         handlers: {
-          image: this.customImageHandler
+          image: this.customImageHandler,
+          video: this.customVideoHandler,
+          file: this.customFileHandler,
         },
       },
       clipboard: {
@@ -433,6 +564,110 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   public customImageHandler() {
     this.inputImageRef.current.click();
   }
+  public customFileHandler() {
+    this.fileInputRef.current.click();
+  }
+  public customVideoHandler() {
+    this.setState({
+      currentVideoLink: "",
+      invalidVideoLink: false,
+      requestingVideoLink: true,
+    });
+  }
+  public closeVideoRequesting() {
+    this.setState({
+      requestingVideoLink: false,
+    });
+  }
+  public updateCurrentVideoLink(e: React.ChangeEvent<HTMLInputElement>) {
+    let isValid = false;
+    try {
+      const url = new URL(e.target.value);
+      isValid = url.hostname === "youtube.com" || url.hostname === "player.vimeo.com" || url.hostname === "youtu.be";
+    } catch {
+    }
+    this.setState({
+      currentVideoLink: e.target.value,
+      invalidVideoLink: !isValid,
+    });
+  }
+  public submitVideoLink() {
+    const quill = this.quillRef.current.getEditor();
+    const range = quill.getSelection(true);
+
+    const url = new URL(this.state.currentVideoLink);
+    let src: string;
+    let origin: string;
+
+    if (
+      url.hostname === "youtube.com" ||
+      url.hostname === "www.youtube.com" ||
+      url.hostname === "youtu.be"
+    ) {
+      origin = "youtube";
+      const isClassicYTUrl = (
+        url.hostname === "youtube.com" ||
+        url.hostname === "www.youtube.com"
+      );
+      if (
+        isClassicYTUrl &&
+        url.pathname.startsWith("/embed/")
+      ) {
+        src = url.pathname.split("/")[2];
+      } else if (
+        isClassicYTUrl &&
+        url.pathname.startsWith("/watch")
+      ) {
+        let search = url.search;
+        if (search[0] === "?") {
+          search = search.substr(1);
+        }
+        search.split("&").forEach((v) => {
+          if (v.startsWith("v=")) {
+            src = v.substr(2);
+          }
+        });
+      } else if (
+        url.hostname === "youtu.be"
+      ) {
+        src = url.pathname.split("/")[1];
+      }
+    } else if (
+      url.host === "player.vimeo.com"
+    ) {
+      origin = "vimeo";
+      src = url.pathname.split("/")[2];
+    } else {
+      return;
+    }
+
+    quill.insertEmbed(range.index, "itemizevideo", {
+      src,
+      origin,
+    }, (ReactQuill.Quill as any).sources.USER);
+    quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
+
+    this.closeVideoRequesting();
+  }
+  public onFileLoad(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files[0];
+    const fileData = this.props.onInsertFile(file);
+
+    const prettySize = prettyBytes(fileData.size);
+    const expectedExtension = mimeTypeToExtension(fileData.type);
+  
+    const quill = this.quillRef.current.getEditor();
+    const range = quill.getSelection(true);
+
+    quill.insertEmbed(range.index, "itemizefile", {
+      srcId: fileData.id,
+      src: fileData.url,
+      name: fileData.name,
+      extension: expectedExtension,
+      size: prettySize,
+    }, (ReactQuill.Quill as any).sources.USER);
+    quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
+  }
   public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files[0];
 
@@ -494,6 +729,42 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       />
     ) : null;
 
+    const fileInput = this.props.supportsFiles ? (
+      <input
+        ref={this.fileInputRef}
+        type="file"
+        tabIndex={-1}
+        style={{display: "none"}}
+        autoComplete="off"
+        onChange={this.onFileLoad}
+      />
+    ) : null;
+
+    const uploadVideoDialog = this.props.supportsVideos ? (
+      <Dialog
+        fullScreen={false}
+        open={this.state.requestingVideoLink}
+        onClose={this.closeVideoRequesting}
+        title={this.props.i18nLoadVideo.title}
+        buttons={
+          <Button onClick={this.submitVideoLink}>
+            {this.props.i18nLoadVideo.submit}
+          </Button>
+        }
+      >
+        <div>
+          <TextField
+            fullWidth={true}
+            value={this.state.currentVideoLink}
+            onChange={this.updateCurrentVideoLink}
+            label={this.props.i18nLoadVideo.label}
+            placeholder={this.props.i18nLoadVideo.placeholder}
+          />
+          <div>{this.state.invalidVideoLink ? this.props.i18nLoadVideo.invalid : null}</div>
+        </div>
+      </Dialog>
+    ) : null;
+
     // we return the component, note how we set the thing to focused
     // TODO disabled
     return (
@@ -529,6 +800,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
               i18n={this.props.i18nFormat}
               supportsImages={this.props.supportsImages}
               supportsFiles={this.props.supportsFiles}
+              supportsVideos={this.props.supportsVideos}
             />) : null
           }
           <ReactQuill
@@ -549,6 +821,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
           {this.props.currentInvalidReason}
         </div>
         {imageInput}
+        {fileInput}
+        {uploadVideoDialog}
       </div>
     );
   }

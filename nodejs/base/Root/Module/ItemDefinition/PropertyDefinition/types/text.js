@@ -25,6 +25,10 @@ const typeValue = {
             type: "string",
         },
         {
+            name: "supportsVideos",
+            type: "boolean",
+        },
+        {
             name: "supportsImages",
             type: "boolean",
         },
@@ -66,7 +70,9 @@ const typeValue = {
             dummyElement.innerHTML = value.toString();
             escapedText = dummyElement.textContent;
             purifiedText = util_1.DOMPurify.sanitize(value.toString(), {
-                FORBID_ATTR: ["src", "sizes", "srcset"],
+                ADD_TAGS: ["iframe"],
+                ADD_ATTR: ["frameborder", "allow", "allowfullscreen", "scrolling", "spellcheck", "contenteditable"],
+                FORBID_ATTR: ["sizes", "srcset", "src", "data-src"],
             });
         }
         return {

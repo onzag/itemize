@@ -39,6 +39,12 @@ image_uploader_select_file = select picture
 file_uploader_delete_file = delete file
 image_uploader_delete_file = delete picture
 
+video_loader_title = insert video
+video_loader_label = video url
+video_loader_placeholder = youtube/vimeo url links allowed
+video_loader_invalid = invalid link
+video_loader_submit = submit
+
 no_results = no results
 result_out_of = result {0} out of {1}
 
@@ -123,6 +129,12 @@ file_uploader_select_file = valitse tiedosto
 image_uploader_select_file = valitse kuvatiedosto
 file_uploader_delete_file = poista tiedosto
 image_uploader_delete_file = poista kuvatiedosto
+
+video_loader_title = insert video
+video_loader_label = video url
+video_loader_placeholder = youtube/vimeo url links allowed
+video_loader_invalid = invalid link
+video_loader_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}
@@ -209,6 +221,12 @@ image_uploader_select_file = select Picture
 file_uploader_delete_file = delete File
 image_uploader_delete_file = delete Picture
 
+video_loader_title = insert video
+video_loader_label = video url
+video_loader_placeholder = youtube/vimeo url links allowed
+video_loader_invalid = invalid link
+video_loader_submit = submit
+
 no_results = no results
 result_out_of = result {0} out of {1}
 
@@ -293,6 +311,12 @@ file_uploader_select_file = Datei auswählen
 image_uploader_select_file = Bild auswählen
 file_uploader_delete_file = Datei löschen
 image_uploader_delete_file = Bild löschen
+
+video_loader_title = insert video
+video_loader_label = video url
+video_loader_placeholder = youtube/vimeo url links allowed
+video_loader_invalid = invalid link
+video_loader_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}
@@ -379,6 +403,12 @@ image_uploader_select_file = seleccionar foto
 file_uploader_delete_file = borrar archivo
 image_uploader_delete_file = borrar foto
 
+video_loader_title = insertar video
+video_loader_label = url del video
+video_loader_placeholder = sólo links de youtube/vimeo
+video_loader_invalid = el link es inválido
+video_loader_submit = insertar
+
 no_results = no se encontraron resultados
 result_out_of = resultado {0} de {1}
 
@@ -463,6 +493,12 @@ file_uploader_select_file = اختيار ملف
 image_uploader_select_file = اختيار صورة
 file_uploader_delete_file = حذف ملف
 image_uploader_delete_file = حذف صورة
+
+video_loader_title = insert video
+video_loader_label = video url
+video_loader_placeholder = youtube/vimeo url links allowed
+video_loader_invalid = invalid link
+video_loader_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}

@@ -223,6 +223,13 @@ export const LOCALE_I18N = [
   "file_uploader_delete_file",
   "image_uploader_delete_file",
 
+  // for video
+  "video_loader_title",
+  "video_loader_label",
+  "video_loader_placeholder",
+  "video_loader_invalid",
+  "video_loader_submit",
+
   // for search utilites
   "no_results",
   "result_out_of",

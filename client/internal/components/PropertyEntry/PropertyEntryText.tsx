@@ -1,11 +1,10 @@
 import React from "react";
 import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import equals from "deep-equal";
-import { IGQLFile } from "../../../../gql-querier";
 import uuid from "uuid";
+import { DOMPurify } from "../../../../util";
 import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
-import { escapeStringRegexp } from "../../../../util";
-import { fileURLAbsoluter, imageSrcSetRetriever } from "../../../components/util";
+import { propertyViewPostProcessingHook, PROPERTY_VIEW_SANITIZE_CONFIG } from "../PropertyView/PropertyViewText";
 
 export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererProps<string> {
   i18nFormat: {
@@ -20,11 +19,19 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
     formatAddVideoLabel: string;
     formatAddFileLabel: string;
   };
+  i18nLoadVideo: {
+    invalid: string;
+    label: string;
+    placeholder: string;
+    title: string;
+    submit: string;
+  };
 
   isRichText: boolean;
 
   supportsImages: boolean;
   supportsFiles: boolean;
+  supportsVideos: boolean;
 
   onInsertFile: (file: File) => IPropertyDefinitionSupportedSingleFilesType;
   onInsertImage: (file: File) => Promise<{
@@ -264,6 +271,7 @@ export default class PropertyEntryText
 
     const mediaPropertyId = this.props.property.getSpecialProperty("mediaProperty") as string;
     const supportsMedia = !!mediaPropertyId && isRichText;
+    const supportsVideos = isRichText && !!this.props.property.getSpecialProperty("supportsVideos");
     const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
     const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
 
@@ -273,24 +281,9 @@ export default class PropertyEntryText
       const currentFiles: PropertyDefinitionSupportedFilesType =
         mediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
-      if (currentFiles && currentFiles.length) {
-        currentFiles.forEach((cf) => {
-          const absolutedFile = fileURLAbsoluter(
-            cf,
-            this.props.itemDefinition,
-            this.props.forId,
-            this.props.forVersion || null,
-            this.props.include,
-            mediaProperty,
-          );
-          const attrShape = `data-src-id="${cf.id}"`;
-          const srcSet = `srcset="${imageSrcSetRetriever(absolutedFile, mediaProperty)}"`;
-          const src = `src="${absolutedFile ? absolutedFile.url : "/rest/resource/image-fail.svg"}"`;
-          const attrReplacement = `sizes="70vw" ${srcSet} ${src} ${attrShape}`;
-          const attrShapeRegex = new RegExp(escapeStringRegexp(attrShape), "g");
-          currentValue = currentValue.replace(attrShapeRegex, attrReplacement);
-        });
-      }
+      DOMPurify.addHook("afterSanitizeElements", propertyViewPostProcessingHook.bind(this, mediaProperty, currentFiles, supportsImages, supportsVideos, supportsFiles));
+      currentValue = DOMPurify.sanitize(currentValue, PROPERTY_VIEW_SANITIZE_CONFIG);
+      DOMPurify.removeAllHooks();
     }
 
     const RendererElement = this.props.renderer;
@@ -324,8 +317,17 @@ export default class PropertyEntryText
         formatAddFileLabel: this.props.i18n[this.props.language].format_add_file,
       },
 
+      i18nLoadVideo: {
+        title: this.props.i18n[this.props.language].video_loader_title,
+        label: this.props.i18n[this.props.language].video_loader_label,
+        placeholder: this.props.i18n[this.props.language].video_loader_placeholder,
+        invalid: this.props.i18n[this.props.language].video_loader_invalid,
+        submit: this.props.i18n[this.props.language].video_loader_submit,
+      },
+
       supportsImages,
       supportsFiles,
+      supportsVideos,
 
       isRichText,
 
