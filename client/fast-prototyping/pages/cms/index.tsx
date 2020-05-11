@@ -1,37 +1,57 @@
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
-import { ItemDefinitionProvider } from "../../../providers/item-definition";
-import { ItemDefinitionLoader } from "../../components/item-definition-loader";
 import { SlowLoadingElement } from "../../components/util";
-import { Paper, createStyles, withStyles, WithStyles, Container, TextField, Box, Typography } from "@material-ui/core";
 import I18nRead from "../../../components/localization/I18nRead";
 import TitleSetter from "../../../components/util/TitleSetter";
-import Entry from "../../../components/property/Entry";
-import View from "../../../components/property/View";
-import LocationStateReader from "../../../components/navigation/LocationStateReader";
-import { SubmitButton } from "../../components/buttons";
-import I18nReadMany from "../../../components/localization/I18nReadMany";
+import Route from "../../../components/navigation/Route";
+import { Fragment } from "./fragment";
 import { Alert, AlertTitle } from "@material-ui/lab";
-import Snackbar from "../../components/snackbar";
-import SubmitActioner from "../../../components/item-definition/SubmitActioner";
+import I18nReadMany from "../../../components/localization/I18nReadMany";
+import { AppBar, Tabs, Tab } from "@material-ui/core";
+import { localizedRedirectTo } from "../../../components/navigation";
+import { NoStateItemDefinitionProvider } from "../../../providers/item-definition";
 
-const cmsStyles = createStyles({
-  paper: {
-    padding: "1rem",
-  },
-  paper2: {
-    padding: "1rem",
-    marginTop: "1rem",
-  },
-  container: {
-    paddingTop: "1rem",
-  },
-  box: {
-    paddingBottom: "1rem",
-  },
-});
+interface CMSNavBarProps {
+  location: {
+    pathname: string;
+  }
+}
 
-export const CMS = withStyles(cmsStyles)((props: WithStyles<typeof cmsStyles>) => {
+function handleNavbarChangeEvent(e: React.ChangeEvent, value: string) {
+  if (value === "info") {
+    localizedRedirectTo("/cms");
+    return; 
+  }
+  localizedRedirectTo("/cms/" + value);
+}
+
+function CMSNavBar(props: CMSNavBarProps) {
+  const current = props.location.pathname.split("/")[3] || "info";
+  return (
+    <AppBar position="static" variant="outlined" color="default">
+      <Tabs value={current} onChange={handleNavbarChangeEvent} centered={true}>
+        <Tab label={<I18nRead id="info"/>} value="info" />
+        {["fragment", "article"].map((itemDefinition: string) => {
+          return (
+            <Tab
+              key={itemDefinition}
+              label={
+                <NoStateItemDefinitionProvider
+                  itemDefinition={itemDefinition}
+                >
+                  <I18nRead id="name"/>
+                </NoStateItemDefinitionProvider>
+              }
+              value={itemDefinition}
+            />
+          );
+        })}
+      </Tabs>
+    </AppBar>
+  );
+}
+
+export function CMS() {
   return (
     <SlowLoadingElement id="cms">
       <ModuleProvider module="cms">
@@ -44,114 +64,26 @@ export const CMS = withStyles(cmsStyles)((props: WithStyles<typeof cmsStyles>) =
             );
           }}
         </I18nRead>
-        <LocationStateReader defaultState={{ id: "", version: "" }} stateIsInQueryString={true}>
-          {(locationState, setState) => {
-            const updateLocationState = (which: string, e: React.ChangeEvent<HTMLInputElement>) => {
-              setState({
-                [which]: e.target.value,
-              }, true);
-            }
-            return (
-              <ItemDefinitionProvider
-                itemDefinition="fragment"
-                properties={[
-                  "title",
-                  "content",
-                  "attachments",
-                ]}
-                includePolicies={false}
-                longTermCaching={false}
-                forId={parseInt(locationState.id, 10) || null}
-                forVersion={locationState.version || null}
-              >
-                <Container maxWidth="md" className={props.classes.container}>
-                  <Paper className={props.classes.paper}>
-
-                    <I18nReadMany
-                      data={[
-                        {id: "id", capitalize: true},
-                        {id: "version", capitalize: true},
-                        {id: "generic_warning", capitalize: true},
-                        {id: "warning"}
-                      ]}
-                    >
-                      {(i18nId: string, i18nVersion: string, i18nGenericWarning: string, i18nWarning: string) => (
-                        <>
-                          <Alert severity="error">
-                            <AlertTitle>
-                              {i18nGenericWarning}
-                            </AlertTitle>
-                            {i18nWarning}
-                          </Alert>
-                          <Box className={props.classes.box}>
-                            <TextField
-                              fullWidth={true}
-                              value={locationState.id}
-                              type="number"
-                              onChange={updateLocationState.bind(null, "id")}
-                              placeholder={i18nId}
-                            />
-                            <TextField
-                              fullWidth={true}
-                              value={locationState.version}
-                              onChange={updateLocationState.bind(null, "version")}
-                              placeholder={i18nVersion}
-                            />
-                          </Box>
-                        </>
-                      )}
-                    </I18nReadMany>
-
-                    <Entry id="title" />
-                    <Entry id="content" rendererArgs={{
-                      requestAltOnImages: true,
-                    }}/>
-
-                    <SubmitButton
-                      i18nId="submit"
-                      options={{
-                        properties: [
-                          "title",
-                          "content",
-                          "attachments",
-                        ],
-                      }}
-                    />
-
-                  </Paper>
-                  
-                  <Paper className={props.classes.paper2}>
-                    <ItemDefinitionLoader>
-                      <Typography variant="h4"><View id="title"/></Typography>
-                      <View id="content"/>
-                    </ItemDefinitionLoader>
-                  </Paper>
-
-                </Container>
-
-                <SubmitActioner>
-                  {(actioner) => (
-                    <>
-                      <Snackbar
-                        severity="error"
-                        i18nDisplay={actioner.submitError}
-                        open={!!actioner.submitError}
-                        onClose={actioner.dismissError}
-                      />
-                      <Snackbar
-                        severity="success"
-                        i18nDisplay="fragment_success"
-                        open={actioner.submitted}
-                        onClose={actioner.dismissSubmitted}
-                      />
-                    </>
-                  )}
-                </SubmitActioner>
-                
-              </ItemDefinitionProvider>)
-          }}
-        </LocationStateReader>
+        <Route path="/cms" component={CMSNavBar}/>
+        <Route path="/cms" exact={true}>
+          <I18nReadMany
+            data={[
+              { id: "generic_warning", capitalize: true },
+              { id: "warning" }
+            ]}
+          >
+            {(i18nGenericWarning: string, i18nWarning: string) => (
+              <Alert severity="error">
+                <AlertTitle>
+                  {i18nGenericWarning}
+                </AlertTitle>
+                {i18nWarning}
+              </Alert>
+            )}
+          </I18nReadMany>
+        </Route>
+        <Route path="/cms/fragment" component={Fragment} />
       </ModuleProvider>
     </SlowLoadingElement>
   );
-});
+};

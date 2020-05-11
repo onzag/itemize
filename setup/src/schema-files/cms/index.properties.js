@@ -1,6 +1,9 @@
 const en = `[en]
 name = cms
 
+custom.warning = Warning! this is an internal administrative tool, it lacks proper memory management, and it is not intended to be used by the public
+custom.info = info
+
 properties.title.label = title
 properties.title.search.label = title
 properties.title.placeholder = the title of the fragment or article
@@ -17,6 +20,9 @@ properties.content.error.TOO_LARGE = the content is too long`
 
 const es = `[es]
 name = cms
+
+custom.warning = ¡Atención! esta es una herramienta de administración interna, no tiene sistema de manejo de memoria y no fue diseñada para ser manejada por el público
+custom.info = información
 
 properties.title.label = título
 properties.title.search.label = título

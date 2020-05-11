@@ -2,7 +2,6 @@ const en = `[en]
 name = content fragment
 custom.id = id
 custom.version = version
-custom.warning = Warning! this is an internal administrative tool, it lacks proper memory management, and it is not intended to be used by the public
 custom.submit = create or update
 custom.fragment_success = success`
 
@@ -10,7 +9,6 @@ const es = `[es]
 name = fragmento de contenido
 custom.id = id
 custom.version = versión
-custom.warning = ¡Atención! esta es una herramienta de administración interna, no tiene sistema de manejo de memoria y no fue diseñada para ser manejada por el público
 custom.submit = crear o actualizar
 custom.fragment_success = hecho exitosamente`
 

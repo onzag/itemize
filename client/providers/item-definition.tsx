@@ -12,7 +12,7 @@ import {
   MEMCACHED_DESTRUCTION_MARKERS_LOCATION,
   DESTRUCTION_MARKERS_LOCATION,
 } from "../../constants";
-import {IGQLSearchResult, IGQLValue, IGQLRequestFields } from "../../gql-querier";
+import { IGQLSearchResult, IGQLValue, IGQLRequestFields } from "../../gql-querier";
 import { requestFieldsAreContained } from "../../gql-util";
 import { EndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
@@ -334,7 +334,7 @@ export interface IItemDefinitionProviderProps {
    * only downloads and includes the properties specified in the list
    * in the state
    */
-  properties: string[];
+  properties?: string[];
   /**
    * only includes the items specified in the list in the state
    */
@@ -526,7 +526,7 @@ export class ActualItemDefinitionProvider extends
         this.props.forId || null,
         this.props.forVersion || null,
         !this.props.disableExternalChecks,
-        this.props.properties,
+        this.props.properties || [],
         this.props.includes || [],
         !this.props.includePolicies,
       ),
@@ -589,7 +589,7 @@ export class ActualItemDefinitionProvider extends
         (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName] = [[forId, forVersion]];
         changed = true;
       } else {
-        if (!(window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName].find((m) => m[0] === forId && m[1] === forVersion)) {
+        if (!(window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName].find((m) => m[0] === forId && m[1] === forVersion)) {
           changed = true;
           (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName].push([forId, forVersion]);
         }
@@ -699,7 +699,7 @@ export class ActualItemDefinitionProvider extends
       nextProps.tokenData.id !== this.props.tokenData.id ||
       nextProps.tokenData.role !== this.props.tokenData.role ||
       nextProps.remoteListener !== this.props.remoteListener ||
-      !equals(nextProps.properties, this.props.properties) ||
+      !equals(nextProps.properties || [], this.props.properties || []) ||
       !equals(nextProps.includes || [], this.props.includes || []) ||
       !!nextProps.static !== !!this.props.static ||
       !!nextProps.includePolicies !== !!this.props.includePolicies ||
@@ -732,7 +732,7 @@ export class ActualItemDefinitionProvider extends
       itemDefinitionWasUpdated ||
       (prevProps.forId || null) !== (this.props.forId || null) ||
       (prevProps.forVersion || null) !== (this.props.forVersion || null) ||
-      !equals(prevProps.properties, this.props.properties) ||
+      !equals(prevProps.properties || [], this.props.properties || []) ||
       !equals(prevProps.includes || [], this.props.includes || []) ||
       !!prevProps.static !== !!this.props.static ||
       !!prevProps.includePolicies !== !!this.props.includePolicies
@@ -801,7 +801,7 @@ export class ActualItemDefinitionProvider extends
           );
           this.props.remoteListener.addItemDefinitionListenerFor(
             this, this.props.itemDefinitionInstance.getQualifiedPathName(),
-            this.props.forId, this.props.forVersion || null,
+            this.props.forId, this.props.forVersion || null,
           );
         }
       }
@@ -813,7 +813,7 @@ export class ActualItemDefinitionProvider extends
             this.props.forId || null,
             this.props.forVersion || null,
             !this.props.disableExternalChecks,
-            this.props.properties,
+            this.props.properties || [],
             this.props.includes || [],
             !this.props.includePolicies,
           ),
@@ -894,7 +894,7 @@ export class ActualItemDefinitionProvider extends
         this.props.forId || null,
         this.props.forVersion || null,
         !this.props.disableExternalChecks,
-        this.props.properties,
+        this.props.properties || [],
         this.props.includes || [],
         !this.props.includePolicies,
       ),
@@ -940,7 +940,7 @@ export class ActualItemDefinitionProvider extends
       includeFields: true,
       uniteFieldsWithAppliedValue: true,
       includes: this.props.includes || [],
-      properties: this.props.properties,
+      properties: this.props.properties || [],
       appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
       userId: this.props.tokenData.id,
       userRole: this.props.tokenData.role,
@@ -952,7 +952,7 @@ export class ActualItemDefinitionProvider extends
     if (!denyCache) {
       // Prevent loading at all if value currently available and memoryCached
       const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
-        this.props.forId, this.props.forVersion || null,
+        this.props.forId, this.props.forVersion || null,
       );
       if (
         appliedGQLValue &&
@@ -1109,7 +1109,7 @@ export class ActualItemDefinitionProvider extends
         notFound: false,
         loading: false,
       });
-    // otherwise if there's no value, it means the item is not found
+      // otherwise if there's no value, it means the item is not found
     } else if (!value.value) {
       // we mark it as so, it is not found
       this.setState({
@@ -1141,7 +1141,7 @@ export class ActualItemDefinitionProvider extends
     const newItemDefinitionState = await this.props.itemDefinitionInstance.getState(
       this.props.forId || null,
       this.props.forVersion || null,
-      this.props.properties,
+      this.props.properties || [],
       this.props.includes || [],
       !this.props.includePolicies,
     );
@@ -1545,7 +1545,7 @@ export class ActualItemDefinitionProvider extends
     const cleanupPropertyFn = (ptc: string) => {
       this.props.itemDefinitionInstance
         .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId,
-          this.props.forVersion || null);
+          this.props.forVersion || null);
     };
     if (
       options.propertiesToCleanOnSuccess && state === "success"
@@ -1570,7 +1570,7 @@ export class ActualItemDefinitionProvider extends
     const restorePropertyFn = (ptr: string) => {
       this.props.itemDefinitionInstance
         .getPropertyDefinitionFor(ptr, true).restoreValueFor(this.props.forId,
-          this.props.forVersion || null);
+          this.props.forVersion || null);
     };
     if (
       options.propertiesToRestoreOnSuccess && state === "success"
@@ -1594,7 +1594,7 @@ export class ActualItemDefinitionProvider extends
     // CLEANING INCLUDES
     const cleanupIncludeFn = (itc: string) => {
       this.props.itemDefinitionInstance.getIncludeFor(itc).cleanValueFor(this.props.forId,
-        this.props.forVersion || null);
+        this.props.forVersion || null);
     };
     if (
       options.includesToCleanOnSuccess && state === "success"
@@ -1619,7 +1619,7 @@ export class ActualItemDefinitionProvider extends
     const restoreIncludeFn = (itr: string) => {
       this.props.itemDefinitionInstance
         .getIncludeFor(itr).restoreValueFor(this.props.forId,
-          this.props.forVersion || null);
+          this.props.forVersion || null);
     };
     if (
       options.includesToRestoreOnSuccess && state === "success"
@@ -1639,7 +1639,7 @@ export class ActualItemDefinitionProvider extends
       options.includesToRestoreOnFailure.forEach(restoreIncludeFn);
       needsUpdate = true;
     }
-    
+
     // CLEANING POLICIES, POLICIES CAN'T BE RESTORED
     const cleanupPolicyFn = (policyArray: PolicyPathType) => {
       this.props.itemDefinitionInstance
@@ -1721,7 +1721,7 @@ export class ActualItemDefinitionProvider extends
       differingPropertiesOnlyForArgs: options.differingOnly,
       differingIncludesOnlyForArgs: options.differingOnly,
       includes: this.props.includes || [],
-      properties: this.props.properties,
+      properties: this.props.properties || [],
       includesForArgs: options.includes || [],
       propertiesForArgs: options.properties,
       policiesForArgs: options.policies || [],
@@ -1931,13 +1931,13 @@ export class ActualItemDefinitionProvider extends
       forVersion: null,
     });
     const requestedSearchFields = searchFieldsAndArgs.requestFields;
-  
+
     let parentedBy = null;
     if (options.parentedBy) {
       const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
-      const parentIdef = 
+      const parentIdef =
         root.getModuleFor(options.parentedBy.module.split("/"))
-        .getItemDefinitionFor(options.parentedBy.itemDefinition.split("/"));
+          .getItemDefinitionFor(options.parentedBy.itemDefinition.split("/"));
       parentedBy = {
         itemDefinition: parentIdef,
         id: options.parentedBy.id,
@@ -1982,7 +1982,7 @@ export class ActualItemDefinitionProvider extends
         this.setState({
           searchError: null,
           searching: false,
-          searchResults: searchResults || [],
+          searchResults: searchResults || [],
           searchId: uuid.v4(),
           searchOwner: options.createdBy || null,
           searchParent,
@@ -2228,7 +2228,7 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                           let valueFor: ItemDefinition;
                           if (props.itemDefinition) {
                             valueFor =
-                              data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition ||
+                              data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition ||
                               data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
                           } else {
                             valueFor = data.mod.getPropExtensionItemDefinition();
@@ -2261,4 +2261,61 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
       }
     </LocaleContext.Consumer>
   );
+}
+
+interface INoStateItemDefinitionProviderProps {
+  itemDefinition?: string;
+  children?: React.ReactNode;
+}
+
+interface IActualNoStateItemDefinitionProviderProps extends INoStateItemDefinitionProviderProps {
+  itemDefinitionInstance: ItemDefinition;
+  itemDefinitionQualifiedName: string;
+}
+
+class ActualNoStateItemDefinitionProvider extends React.Component<IActualNoStateItemDefinitionProviderProps> {
+  public shouldComponentUpdate(nextProps: IActualNoStateItemDefinitionProviderProps) {
+    return nextProps.itemDefinitionQualifiedName !== this.props.itemDefinitionQualifiedName;
+  }
+  public render() {
+    return (
+      <ItemDefinitionContext.Provider
+        value={{
+          idef: this.props.itemDefinitionInstance,
+        } as any}
+      >
+        {this.props.children}
+      </ItemDefinitionContext.Provider>
+    );
+  }
+}
+
+export function NoStateItemDefinitionProvider(props: INoStateItemDefinitionProviderProps) {
+  return (
+    <ModuleContext.Consumer>
+      {
+        (data) => {
+          if (!data) {
+            throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
+          }
+          let valueFor: ItemDefinition;
+          if (props.itemDefinition) {
+            valueFor =
+              data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition ||
+              data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+          } else {
+            valueFor = data.mod.getPropExtensionItemDefinition();
+          }
+
+          return (
+            <ActualNoStateItemDefinitionProvider
+              itemDefinitionInstance={valueFor}
+              itemDefinitionQualifiedName={valueFor.getQualifiedPathName()}
+              {...props}
+            />
+          );
+        }
+      }
+    </ModuleContext.Consumer>
+  )
 }
