@@ -20,7 +20,6 @@ export interface IPropertyEntryProps<RendererPropsType> {
   policyName?: string;
   showAsInvalid?: boolean;
   icon?: React.ReactNode;
-  onChange?: (property: PropertyDefinition, newValue: PropertyDefinitionSupportedType, inernalValue?: any) => void;
   renderer?: React.ComponentType<RendererPropsType>;
   rendererArgs?: object;
   hideDescription?: boolean;
@@ -184,11 +183,11 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                     return null;
                   }
                   const onChange = (newValue: PropertyDefinitionSupportedType, internalValue?: any) => {
-                    if (props.onChange) {
-                      props.onChange(property, newValue, internalValue);
-                    }
                     itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
                   };
+                  const onRestore = () => {
+                    itemDefinitionContextualValue.onPropertyRestore(property);
+                  }
                   let isPoked: boolean = false;
                   if (props.policyType) {
                     isPoked = !!itemDefinitionContextualValue.pokedElements.policies.find(
@@ -213,6 +212,7 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                       property={property}
                       state={propertyState}
                       onChange={onChange}
+                      onRestore={onRestore}
                       forceInvalid={props.showAsInvalid}
                       icon={props.icon}
                       forId={itemDefinitionContextualValue.forId}

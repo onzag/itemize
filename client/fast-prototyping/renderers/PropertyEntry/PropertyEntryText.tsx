@@ -30,6 +30,9 @@ import { LAST_RICH_TEXT_CHANGE_LENGTH, FILE_SUPPORTED_IMAGE_TYPES } from "../../
 import { Dialog } from "../../components/dialog";
 import prettyBytes from "pretty-bytes";
 
+import RestoreIcon from '@material-ui/icons/Restore';
+import ClearIcon from '@material-ui/icons/Clear';
+
 const BlockEmbed = ReactQuill.Quill.import("blots/block/embed");
 const Embed = ReactQuill.Quill.import("blots/embed");
 const Delta = ReactQuill.Quill.import("delta");
@@ -409,12 +412,6 @@ function RichTextEditorToolbar(props: {
     </Toolbar>
   );
 }
-// /* <IconButton
-//             title={props.i18n.formatAddVideoLabel}
-//             classes={{ root: "" }}
-//           >
-//             <VideoLibraryIcon/>
-//           </IconButton> */
         
 interface IPropertyEntryTextRendererWithStylesProps extends IPropertyEntryTextRendererProps, WithStyles<typeof style> {
 }
@@ -710,9 +707,18 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     const editorValue = this.props.currentValue as string || "";
 
     // the icon as usual
-    const icon = this.props.icon;
+    let icon: React.ReactNode;
+    if (this.props.canRestore) {
+      if (this.props.currentAppliedValue) {
+        icon = <RestoreIcon />
+      } else {
+        icon = <ClearIcon />
+      }
+    } else if (this.props.icon) {
+      icon = this.props.icon;
+    }
     const iconComponent = icon ? (
-      <span className={this.props.classes.icon}>{icon}</span>
+      <IconButton className={this.props.classes.icon} onClick={this.props.canRestore ? this.props.onRestore : null}>{icon}</IconButton>
     ) : null;
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];

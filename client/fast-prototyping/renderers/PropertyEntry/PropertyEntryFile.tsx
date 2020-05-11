@@ -1,7 +1,7 @@
 import { IPropertyEntryFileRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryFile";
 import { createStyles, WithStyles, withStyles } from "@material-ui/styles";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
-import { ThemeProvider, FormLabel, RootRef, Paper, Button, Typography } from "@material-ui/core";
+import { ThemeProvider, FormLabel, RootRef, Paper, Button, Typography, IconButton } from "@material-ui/core";
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import NoteAddIcon from "@material-ui/icons/NoteAdd";
@@ -11,6 +11,8 @@ import Dropzone, { DropzoneRef } from "react-dropzone";
 import React from "react";
 import { capitalize } from "../../../components/localization";
 import { Alert } from "@material-ui/lab";
+import RestoreIcon from '@material-ui/icons/Restore';
+import ClearIcon from '@material-ui/icons/Clear';
 
 // TODO it's missing the icon
 
@@ -196,7 +198,18 @@ function manuallyTriggerUpload(dropzoneRef: React.MutableRefObject<DropzoneRef>)
 
 const ActualPropertyEntryFileRendererWithStyles = withStyles(style)((props: IPropertyEntryFileRendererWithStylesProps) => {
   const dropzoneRef = React.useRef<DropzoneRef>();
-  // TODO check the icon so that it looks right
+  
+  let icon: React.ReactNode;
+  if (props.canRestore) {
+    if (props.currentAppliedValue) {
+      icon = <RestoreIcon />
+    } else {
+      icon = <ClearIcon />
+    }
+  } else if (props.icon) {
+    icon = props.icon;
+  }
+
   const descriptionAsAlert = props.args["descriptionAsAlert"];
   return (
     <div className={props.classes.container}>
@@ -214,7 +227,7 @@ const ActualPropertyEntryFileRendererWithStyles = withStyles(style)((props: IPro
         }}
       >
         {capitalize(props.label)}
-        {props.icon ? <span className={props.classes.icon}>{props.icon}</span> : null}
+        {icon ? <IconButton className={props.classes.icon} onClick={props.canRestore ? props.onRestore : null}>{icon}</IconButton> : null}
       </FormLabel>
       <Dropzone
         onDropAccepted={onDrop.bind(null, props.onSetFile)}

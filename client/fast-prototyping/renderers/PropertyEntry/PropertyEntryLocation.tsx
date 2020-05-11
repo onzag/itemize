@@ -23,6 +23,8 @@ import SearchIcon from "@material-ui/icons/Search";
 import SwapHorizIcon from "@material-ui/icons/SwapHoriz"
 import { Alert } from "@material-ui/lab";
 import { capitalize } from "../../../../util";
+import RestoreIcon from '@material-ui/icons/Restore';
+import ClearIcon from '@material-ui/icons/Clear';
 
 // https://github.com/PaulLeCam/react-leaflet/issues/453
 // bug in leaflet
@@ -216,6 +218,7 @@ interface IPropertyEntryLocationRendererWithStylesProps extends IPropertyEntryLo
 
 class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component<IPropertyEntryLocationRendererWithStylesProps> {
   private inputRef: HTMLInputElement;
+  private preventNextSearchQueryChange: boolean = false;
 
   constructor(props: IPropertyEntryLocationRendererWithStylesProps) {
     super(props);
@@ -228,6 +231,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
     this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
     this.setLocationManually = this.setLocationManually.bind(this);
     this.onKeyPress = this.onKeyPress.bind(this);
+    this.onChangeBySuggestion = this.onChangeBySuggestion.bind(this);
   }
   public componentDidMount() {
     if (this.props.autoFocus && this.inputRef) {
@@ -255,9 +259,22 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       }
     }
   }
+  public onChangeBySuggestion(suggestion: IPropertyDefinitionSupportedLocationType) {
+    // react autosuggest triggers a search query change when the value is set by selection
+    // however we don't want this to happen, both of them get triggered at the same time
+    // so this causes a bug
+    if (suggestion.txt !== this.props.searchQuery) {
+      this.preventNextSearchQueryChange = true;
+    }
+    this.props.onChangeBySuggestion(suggestion, false);
+  }
   public onSearchQueryChange(
     e: React.ChangeEvent<HTMLInputElement>
   ) {
+    if (this.preventNextSearchQueryChange) {
+      this.preventNextSearchQueryChange = false;
+      return;
+    }
     this.props.onSearchQueryChange(e.target.value, true);
   }
   public onSuggestionsFetchRequested({value}) {
@@ -271,18 +288,18 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
     let appliedTextFieldProps: any = {
       className: this.props.classes.entry,
     };
-    let icon: React.ReactNode;
+    let iconSearch: React.ReactNode;
     let fn: () => void = null;
     if (this.props.activeSearchResults) {
       if (this.props.nextSearchResultCircular) {
         fn = this.props.onChangeBySearchResult.bind(null, this.props.nextSearchResultCircular, false);
-        icon = <SwapHorizIcon />;
+        iconSearch = <SwapHorizIcon />;
       } else {
-        icon = <SearchIcon />;
+        iconSearch = <SearchIcon />;
       }
     } else {
       fn = this.props.onSearch.bind(null, false);
-      icon = <SearchIcon />;
+      iconSearch = <SearchIcon />;
     }
     let appliedInputProps: any = {
       endAdornment: (
@@ -292,7 +309,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
             classes={{root: this.props.classes.iconButton}}
             onClick={fn}
           >
-            {icon}
+            {iconSearch}
           </IconButton>
         </InputAdornment>
       ),
@@ -307,6 +324,17 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
           inputRef(node);
         },
       };
+    }
+
+    let icon: React.ReactNode;
+    if (this.props.canRestore) {
+      if (this.props.currentAppliedValue) {
+        icon = <RestoreIcon />
+      } else {
+        icon = <ClearIcon />
+      }
+    } else if (this.props.icon) {
+      icon = this.props.icon;
     }
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
@@ -328,7 +356,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
         }
         <div className={this.props.classes.locationAlternativeTextHeader}>
           {
-            this.props.icon ? <span className={this.props.classes.icon}>{this.props.icon}</span> : null
+            icon ? <IconButton className={this.props.classes.icon} onClick={this.props.canRestore ? this.props.onRestore : null}>{icon}</IconButton> : null
           }
           {
             this.props.currentValue && this.props.currentValue.atxt ||
@@ -438,7 +466,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
         className={this.props.classes.autosuggestMenuItem}
         selected={params.isHighlighted}
         component="div"
-        onClick={this.props.onChangeBySuggestion.bind(this, suggestion, false)}
+        onClick={this.onChangeBySuggestion.bind(this, suggestion)}
       >
         <div>
           <div className={this.props.classes.autosuggestMenuItemMainText}>

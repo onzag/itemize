@@ -35,6 +35,8 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
   description?: string;
   icon?: React.ReactNode;
 
+  currentAppliedValue: ValueType;
+  canRestore: boolean;
   currentValue: ValueType;
   currentValid: boolean;
   currentInvalidReason?: string;
@@ -44,6 +46,7 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
   disabled: boolean;
 
   onChange: (value: ValueType, internalValue: any) => void;
+  onRestore: () => void;
 }
 
 /**
@@ -59,6 +62,7 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
   property: PropertyDefinition;
   state: IPropertyDefinitionState;
   onChange: (newValue: ValueType, internalValue: any) => void;
+  onRestore: () => void;
   forId: number;
   forVersion: string;
   forceInvalid?: boolean;

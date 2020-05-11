@@ -1,8 +1,6 @@
 import React from "react";
 import TextField from "@material-ui/core/TextField";
 import {
-  MenuItem,
-  Paper,
   InputAdornment,
   IconButton,
   ThemeProvider,
@@ -21,6 +19,8 @@ import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import IconVisibilityOff from "@material-ui/icons/VisibilityOff";
 import IconVisibility from "@material-ui/icons/Visibility";
 import { Alert } from "@material-ui/lab";
+import RestoreIcon from '@material-ui/icons/Restore';
+import ClearIcon from '@material-ui/icons/Clear';
 
 function shouldShowInvalid(props: IPropertyEntryFieldRendererProps) {
   return !props.currentValid;
@@ -44,15 +44,19 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     height: theme.errorMessageContainerSize,
     fontSize: theme.errorMessageFontSize,
   },
-  icon: (props: IPropertyEntryFieldRendererProps) => ({
+  standardAddornment: (props: IPropertyEntryFieldRendererProps) => ({
     color: shouldShowInvalid(props) ? theme.invalidColor : theme.iconColor,
+    marginRight: "-10px",
   }),
-  iconButton: {
+  iconButtonPassword: {
     "backgroundColor": "#2196f3",
     "color": "#fff",
     "&:hover": {
       backgroundColor: "#1976d2",
     },
+  },
+  iconButton: {
+    color: theme.iconColor,
   },
   textButton: {
     border: "solid 1px rgba(0,0,0,0.1)",
@@ -532,7 +536,10 @@ class ActualPropertyEntryFieldRenderer
     if (this.props.type === "password") {
       // set the end addornment for the show and hide button
       appliedInputProps.endAdornment = (
-        <InputAdornment position="end">
+        <InputAdornment
+          position="end"
+          className={this.props.classes.standardAddornment}
+        >
           <IconButton
             classes={{root: this.props.classes.iconButton}}
             onClick={this.toggleVisible}
@@ -542,11 +549,36 @@ class ActualPropertyEntryFieldRenderer
           </IconButton>
         </InputAdornment>
       );
+    } else if (this.props.canRestore) {
+      let icon: React.ReactNode;
+      if (this.props.currentAppliedValue) {
+        icon = <RestoreIcon/>
+      } else {
+        icon = <ClearIcon />
+      }
+      appliedInputProps.endAdornment = (
+        <InputAdornment
+          position="end"
+          className={this.props.classes.standardAddornment}
+        >
+          <IconButton
+            classes={{root: this.props.classes.iconButton}}
+            onClick={this.props.onRestore}
+            onMouseDown={this.catchToggleMouseDownEvent}
+          >
+            {icon}
+          </IconButton>
+        </InputAdornment>
+      );
     } else if (this.props.icon) {
       // set it at the end
       appliedInputProps.endAdornment = (
-        <InputAdornment position="end" className={this.props.classes.icon}>
-          {this.props.icon}
+        <InputAdornment position="end" className={this.props.classes.standardAddornment}>
+          <IconButton
+            classes={{root: this.props.classes.iconButton}}
+          >
+            {this.props.icon}
+          </IconButton>
         </InputAdornment>
       );
     }

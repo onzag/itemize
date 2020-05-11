@@ -114,6 +114,7 @@ export default class PropertyEntryLocation
     this.clearSuggestions = this.clearSuggestions.bind(this);
     this.clearSearchResults = this.clearSearchResults.bind(this);
     this.geocode = this.geocode.bind(this);
+    this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
   }
 
   public shouldComponentUpdate(
@@ -153,6 +154,11 @@ export default class PropertyEntryLocation
         }
       }
     }
+  }
+
+  public onRestoreHijacked() {
+    this.clearSearchResults();
+    this.props.onRestore();
   }
 
   public onViewportChange(
@@ -521,6 +527,7 @@ export default class PropertyEntryLocation
       description: i18nDescription,
       icon: this.props.icon,
 
+      currentAppliedValue: this.props.state.stateAppliedValue as IPropertyDefinitionSupportedLocationType,
       currentValue,
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentInvalidReason: i18nInvalidReason,
@@ -529,6 +536,8 @@ export default class PropertyEntryLocation
       disabled: this.props.state.enforced,
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
+      onRestore: this.onRestoreHijacked,
+      canRestore: !this.props.property.getPropertyDefinitionDescription().localEqual(this.props.state.stateAppliedValue, this.props.state.value),
 
       onChangeBySearchResult: this.onChangeBySearchResult,
       onChangeBySuggestion: this.onChangeBySuggestion,

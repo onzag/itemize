@@ -85,17 +85,20 @@ export default class PropertyEntrySelect
       isNullable,
       nullValue,
 
+      currentAppliedValue: this.props.state.stateAppliedValue as string,
       currentValue,
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,
       currentI18nValue,
+      canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
 
       disabled: this.props.state.enforced,
 
       autoFocus: this.props.autoFocus || false,
 
       onChange: this.props.onChange,
+      onRestore: this.props.onRestore,
     };
 
     return <RendererElement {...rendererArgs}/>

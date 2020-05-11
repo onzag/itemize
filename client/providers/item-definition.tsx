@@ -224,6 +224,10 @@ export interface IItemDefinitionContextType {
     value: PropertyDefinitionSupportedType,
     internalValue: any,
   ) => void;
+  // restores
+  onPropertyRestore: (
+    property: PropertyDefinition,
+  ) => void;
   // this is yet another passed function that does the same as properties
   // but with exclusion states
   onIncludeSetExclusionState: (
@@ -483,6 +487,8 @@ export class ActualItemDefinitionProvider extends
 
     // Just binding all the functions to ensure their context is defined
     this.onPropertyChange = this.onPropertyChange.bind(this);
+    this.onPropertyRestore = this.onPropertyRestore.bind(this);
+    this.onPropertyChangeOrRestoreFinal = this.onPropertyChangeOrRestoreFinal.bind(this);
     this.onIncludeSetExclusionState = this.onIncludeSetExclusionState.bind(this);
     this.loadValue = this.loadValue.bind(this);
     this.delete = this.delete.bind(this);
@@ -1163,25 +1169,7 @@ export class ActualItemDefinitionProvider extends
         "change", this.props.forId || null, this.props.forVersion || null, this.changeListener);
     }
   }
-  public onPropertyChange(
-    property: PropertyDefinition,
-    value: PropertyDefinitionSupportedType,
-    internalValue: any,
-  ) {
-    if (this.state.loading) {
-      // we will deny any change that happens
-      // if the item is loading, as everything
-      // will be removed anyway
-      return;
-    }
-
-    // we simply set the current value in the property
-    property.setCurrentValue(
-      this.props.forId || null,
-      this.props.forVersion || null,
-      value,
-      internalValue,
-    );
+  public onPropertyChangeOrRestoreFinal() {
     // trigger the listeners for change so everything updates nicely
     this.props.itemDefinitionInstance.triggerListeners(
       "change",
@@ -1210,6 +1198,40 @@ export class ActualItemDefinitionProvider extends
     if (this.props.automaticSearch) {
       this.search(this.props.automaticSearch);
     }
+  }
+  public onPropertyRestore(
+    property: PropertyDefinition,
+  ) {
+    if (this.state.loading) {
+      return;
+    }
+
+    property.restoreValueFor(
+      this.props.forId || null,
+      this.props.forVersion || null,
+    );
+    this.onPropertyChangeOrRestoreFinal();
+  }
+  public onPropertyChange(
+    property: PropertyDefinition,
+    value: PropertyDefinitionSupportedType,
+    internalValue: any,
+  ) {
+    if (this.state.loading) {
+      // we will deny any change that happens
+      // if the item is loading, as everything
+      // will be removed anyway
+      return;
+    }
+
+    // we simply set the current value in the property
+    property.setCurrentValue(
+      this.props.forId || null,
+      this.props.forVersion || null,
+      value,
+      internalValue,
+    );
+    this.onPropertyChangeOrRestoreFinal();
   }
   public onPropertyEnforce(
     property: PropertyDefinition,
@@ -2156,6 +2178,7 @@ export class ActualItemDefinitionProvider extends
           idef: this.props.itemDefinitionInstance,
           state: this.state.itemDefinitionState,
           onPropertyChange: this.onPropertyChange,
+          onPropertyRestore: this.onPropertyRestore,
           onIncludeSetExclusionState: this.onIncludeSetExclusionState,
           onPropertyEnforce: this.onPropertyEnforce,
           onPropertyClearEnforce: this.onPropertyClearEnforce,

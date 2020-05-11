@@ -260,6 +260,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
       return true;
     }
 
+    if (a === null && b !== null) {
+      return false;
+    } else if (b === null && a !== null) {
+      return false;
+    }
+
     return a.id === b.id;
   },
   // locations just contain this basic data

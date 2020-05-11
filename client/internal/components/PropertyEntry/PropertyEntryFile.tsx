@@ -249,6 +249,7 @@ export default class PropertyEntryFile
       description: i18nDescription,
       icon: this.props.icon,
 
+      currentAppliedValue: this.props.state.stateAppliedValue as PropertyDefinitionSupportedFileType,
       currentValue,
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentInvalidReason: i18nInvalidReason,
@@ -257,6 +258,8 @@ export default class PropertyEntryFile
       disabled: this.props.state.enforced,
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
+      onRestore: this.props.onRestore,
+      canRestore: !equals(this.props.state.value, this.props.state.stateAppliedValue),
 
       onSetFile: this.onSetFile,
       onRemoveFile: this.onRemoveFile,

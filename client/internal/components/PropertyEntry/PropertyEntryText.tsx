@@ -56,6 +56,7 @@ export default class PropertyEntryText
 
     this.onInsertFile = this.onInsertFile.bind(this);
     this.onInsertImage = this.onInsertImage.bind(this);
+    this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
     this.onChangeHijacked = this.onChangeHijacked.bind(this);
   }
 
@@ -136,6 +137,14 @@ export default class PropertyEntryText
     }
 
     this.props.onChange(value, internalValue);
+  }
+
+  public onRestoreHijacked() {
+    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
+    
+    relatedProperty.restoreValueFor(this.props.forId || null, this.props.forVersion || null);
+    this.props.onRestore();
   }
 
   public onSyncFile(fileId: string) {
@@ -295,10 +304,12 @@ export default class PropertyEntryText
       description: i18nDescription,
       icon: this.props.icon,
 
+      currentAppliedValue: this.props.state.stateAppliedValue as string,
       currentValue,
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,
+      canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
 
       disabled: this.props.state.enforced,
 
@@ -332,6 +343,7 @@ export default class PropertyEntryText
       isRichText,
 
       onChange: supportsMedia ? this.onChangeHijacked : this.props.onChange,
+      onRestore: supportsMedia ? this.onRestoreHijacked : this.props.onRestore,
 
       onInsertFile: this.onInsertFile,
       onInsertImage: this.onInsertImage,

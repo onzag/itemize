@@ -22,6 +22,8 @@ import { IPropertyEntrySelectRendererProps } from "../../../internal/components/
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import uuid from "uuid";
 import { Alert } from "@material-ui/lab";
+import RestoreIcon from '@material-ui/icons/Restore';
+import ClearIcon from '@material-ui/icons/Clear';
 
 function shouldShowInvalid(props: IPropertyEntrySelectRendererProps) {
   return !props.currentValid;
@@ -115,10 +117,20 @@ class ActualPropertyEntrySelectRenderer
 
   public render() {
     // build the icon
-    const icon = this.props.icon;
+    let icon: React.ReactNode;
+    if (this.props.canRestore) {
+      if (this.props.currentAppliedValue) {
+        icon = <RestoreIcon />
+      } else {
+        icon = <ClearIcon />
+      }
+    } else if (this.props.icon) {
+      icon = this.props.icon;
+    }
+
     const addornment = icon ? (
       <InputAdornment position="end">
-        <span className={this.props.classes.icon}>{this.props.icon}</span>
+        <IconButton className={this.props.classes.icon} onClick={this.props.canRestore ? this.props.onRestore : null}>{icon}</IconButton>
       </InputAdornment>
     ) : null;
 

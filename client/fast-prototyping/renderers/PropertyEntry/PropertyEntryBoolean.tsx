@@ -3,8 +3,10 @@ import { createStyles, WithStyles, withStyles } from "@material-ui/styles";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import React from "react";
 import { Alert } from "@material-ui/lab";
-import { ThemeProvider, FormControl, FormControlLabel, Switch, Typography, Radio, RadioGroup, FormLabel } from "@material-ui/core";
+import { ThemeProvider, FormControl, FormControlLabel, Switch, Typography, Radio, RadioGroup, FormLabel, IconButton } from "@material-ui/core";
 import { capitalize } from "../../../components/localization";
+import RestoreIcon from '@material-ui/icons/Restore';
+import ClearIcon from '@material-ui/icons/Clear';
 
 export const style = (theme: IPropertyEntryThemeType) => createStyles({
   entry: {
@@ -63,6 +65,18 @@ function handleOnChange(
 
 const ActualPropertyEntryBooleanRendererWithStyles = withStyles(style)((props: IPropertyEntryBooleanRendererWithStylesProps) => {
   const descriptionAsAlert = props.args["descriptionAsAlert"];
+
+  let icon: React.ReactNode;
+  if (props.canRestore) {
+    if (props.currentAppliedValue !== null) {
+      icon = <RestoreIcon />
+    } else {
+      icon = <ClearIcon />
+    }
+  } else if (props.icon) {
+    icon = props.icon;
+  }
+
   let internalContent: React.ReactNode = null;
   if (props.isTernary) {
     const values = [{
@@ -88,7 +102,7 @@ const ActualPropertyEntryBooleanRendererWithStyles = withStyles(style)((props: I
             focused: "focused",
           }}
         >
-          {props.label}{props.icon}
+          {props.label}{icon ? <IconButton className={props.classes.icon} onClick={props.canRestore ? props.onRestore : null}>{icon}</IconButton> : null}
         </FormLabel>
         <RadioGroup
           value={JSON.stringify(props.currentValue)}
@@ -124,7 +138,7 @@ const ActualPropertyEntryBooleanRendererWithStyles = withStyles(style)((props: I
           }
           label={props.label}
         />
-        {props.icon ? <span className={props.classes.icon}>{props.icon}</span> : null}
+        {icon ? <IconButton className={props.classes.icon} onClick={props.canRestore ? props.onRestore : null}>{icon}</IconButton> : null}
       </FormControl>
     )
   }
