@@ -32,6 +32,7 @@ const mailgun_1 = require("./services/mailgun");
 const rest_2 = require("./user/rest");
 const pkgcloud_1 = __importDefault(require("pkgcloud"));
 const here_1 = require("./services/here");
+const util_1 = require("util");
 // TODO comment and document
 // Setting the parsers, postgresql comes with
 // its own way to return this data and I want it
@@ -287,6 +288,14 @@ async function initializeServer(custom = {}) {
         pkgcloudStorageClient,
         pkgcloudUploadsContainer,
     };
+    const getPromisified = util_1.promisify(appData.redis.get).bind(appData.redis);
+    const setPromisified = util_1.promisify(appData.redis.set).bind(appData.redis);
+    const flushAllPromisified = util_1.promisify(appData.redis.flushall).bind(appData.redis);
+    const buildnumberRedis = await getPromisified("buildnumber");
+    if (buildnumberRedis !== buildnumber) {
+        await flushAllPromisified();
+        await setPromisified("buildnumber", buildnumber);
+    }
     initializeApp(appData, custom);
 }
 exports.initializeServer = initializeServer;

@@ -5,8 +5,8 @@ import I18nRead from "../../../components/localization/I18nRead";
 import TitleSetter from "../../../components/util/TitleSetter";
 import Route from "../../../components/navigation/Route";
 import { Fragment } from "./fragment";
-import { Alert, AlertTitle } from "@material-ui/lab";
-import I18nReadMany from "../../../components/localization/I18nReadMany";
+import { Article } from "./article";
+import { Info } from "./info";
 import { AppBar, Tabs, Tab } from "@material-ui/core";
 import { localizedRedirectTo } from "../../../components/navigation";
 import { NoStateItemDefinitionProvider } from "../../../providers/item-definition";
@@ -65,24 +65,9 @@ export function CMS() {
           }}
         </I18nRead>
         <Route path="/cms" component={CMSNavBar}/>
-        <Route path="/cms" exact={true}>
-          <I18nReadMany
-            data={[
-              { id: "generic_warning", capitalize: true },
-              { id: "warning" }
-            ]}
-          >
-            {(i18nGenericWarning: string, i18nWarning: string) => (
-              <Alert severity="error">
-                <AlertTitle>
-                  {i18nGenericWarning}
-                </AlertTitle>
-                {i18nWarning}
-              </Alert>
-            )}
-          </I18nReadMany>
-        </Route>
+        <Route path="/cms" exact={true} component={Info}/>
         <Route path="/cms/fragment" component={Fragment} />
+        <Route path="/cms/article" component={Article} />
       </ModuleProvider>
     </SlowLoadingElement>
   );

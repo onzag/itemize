@@ -305,6 +305,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       endAdornment: (
         <InputAdornment position="end">
           <IconButton
+            tabIndex={-1}
             disabled={this.props.disabled}
             classes={{root: this.props.classes.iconButton}}
             onClick={fn}
@@ -356,7 +357,10 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
         }
         <div className={this.props.classes.locationAlternativeTextHeader}>
           {
-            icon ? <IconButton className={this.props.classes.icon} onClick={this.props.canRestore ? this.props.onRestore : null}>{icon}</IconButton> : null
+            icon ? <IconButton
+              tabIndex={-1}
+              className={this.props.classes.icon}
+              onClick={this.props.canRestore ? this.props.onRestore : null}>{icon}</IconButton> : null
           }
           {
             this.props.currentValue && this.props.currentValue.atxt ||

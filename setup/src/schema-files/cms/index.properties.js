@@ -3,6 +3,13 @@ name = cms
 
 custom.warning = Warning! this is an internal administrative tool, it lacks proper memory management, and it is not intended to be used by the public
 custom.info = info
+custom.info_content = In this page you can create and modify fragments, fragments are pieces of content meant to the part of the app layout, and meant to be loaded programatically; articles are part of the application content and are meant to be searched and interacted by the user.
+custom.info_content_2 = All the content in this page is kept realtime and synchronized, just as it would be in the app, you can debug content here.
+
+custom.id = id
+custom.version = version
+custom.submit = create or update
+custom.success = success
 
 properties.title.label = title
 properties.title.search.label = title
@@ -23,6 +30,13 @@ name = cms
 
 custom.warning = ¡Atención! esta es una herramienta de administración interna, no tiene sistema de manejo de memoria y no fue diseñada para ser manejada por el público
 custom.info = información
+custom.info_content = En esta página puede crear y modificar fragmentos, los fragmentos son piezas de contenido que son parte de la aplicación misma, y están diseñadas para ser cargadas programáticamente; los artículos a diferencia, contienen contenido para ser buscado y mostrado a los usuarios
+custom.info_content_2 = Todo el contenido de esta sección está en tiempo real y es continuamente sincronizado, así como estaría en la aplicación misma, aquí puedes depurar el contenido.
+
+custom.id = id
+custom.version = versión
+custom.submit = crear o actualizar
+custom.success = hecho exitosamente
 
 properties.title.label = título
 properties.title.search.label = título

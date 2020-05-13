@@ -324,24 +324,28 @@ function RichTextEditorToolbar(props: {
   return (
     <Toolbar id={props.id}>
       <IconButton
+        tabIndex={-1}
         title={props.i18n.formatBoldLabel}
         classes={{root: "ql-bold"}}
       >
         <FormatBoldIcon/>
       </IconButton>
       <IconButton
+        tabIndex={-1}
         title={props.i18n.formatItalicLabel}
         classes={{ root: "ql-italic" }}
       >
         <FormatItalicIcon/>
       </IconButton>
       <IconButton
+        tabIndex={-1}
         title={props.i18n.formatUnderlineLabel}
         classes={{ root: "ql-underline" }}
       >
         <FormatUnderlinedIcon/>
       </IconButton>
       <IconButton
+        tabIndex={-1}
         title={props.i18n.formatTitleLabel}
         classes={{ root: "ql-header" }}
         value="1"
@@ -350,6 +354,7 @@ function RichTextEditorToolbar(props: {
       </IconButton>
       <span className="ql-divider" />
       <IconButton
+        tabIndex={-1}
         title={props.i18n.formatQuoteLabel}
         classes={{ root: "ql-blockquote" }}
       >
@@ -357,6 +362,7 @@ function RichTextEditorToolbar(props: {
       </IconButton>
       <span className="ql-divider" />
       <IconButton
+        tabIndex={-1}
         title={props.i18n.formatListNumberedLabel}
         classes={{ root: "ql-list" }}
         value="ordered"
@@ -364,6 +370,7 @@ function RichTextEditorToolbar(props: {
         <FormatListNumberedIcon/>
       </IconButton>
       <IconButton
+        tabIndex={-1}
         title={props.i18n.formatListBulletedLabel}
         classes={{ root: "ql-list" }}
         value="bullet"
@@ -380,6 +387,7 @@ function RichTextEditorToolbar(props: {
         props.supportsImages ?
         (
           <IconButton
+            tabIndex={-1}
             title={props.i18n.formatAddImageLabel}
             classes={{ root: "ql-image" }}
           >
@@ -391,6 +399,7 @@ function RichTextEditorToolbar(props: {
         props.supportsVideos ?
         (
           <IconButton
+            tabIndex={-1}
             title={props.i18n.formatAddVideoLabel}
             classes={{ root: "ql-video" }}
           >
@@ -402,6 +411,7 @@ function RichTextEditorToolbar(props: {
         props.supportsFiles ?
         (
           <IconButton
+            tabIndex={-1}
             title={props.i18n.formatAddFileLabel}
             classes={{ root: "ql-file" }}
           >
@@ -718,7 +728,13 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       icon = this.props.icon;
     }
     const iconComponent = icon ? (
-      <IconButton className={this.props.classes.icon} onClick={this.props.canRestore ? this.props.onRestore : null}>{icon}</IconButton>
+      <IconButton
+        tabIndex={-1}
+        className={this.props.classes.icon}
+        onClick={this.props.canRestore ? this.props.onRestore : null}
+      >
+          {icon}
+      </IconButton>
     ) : null;
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];

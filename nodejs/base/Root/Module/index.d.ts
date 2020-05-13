@@ -28,6 +28,10 @@ export interface IRawJsonI18NSpecificLocaleDataType {
      */
     fts_search_field_placeholder: string;
     /**
+     * A comma separated list of strings for full text search mode
+     */
+    fts_search_keywords: string;
+    /**
      * Custom translation fields
      */
     custom?: {

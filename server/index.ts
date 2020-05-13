@@ -31,6 +31,7 @@ import Mailgun from "mailgun-js";
 import { userRestServices } from "./user/rest";
 import pkgcloud from "pkgcloud";
 import { setupHere, Here } from "./services/here";
+import { promisify } from "util";
 
 // TODO comment and document
 
@@ -373,6 +374,16 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     pkgcloudStorageClient,
     pkgcloudUploadsContainer,
   };
+
+  const getPromisified = promisify(appData.redis.get).bind(appData.redis);
+  const setPromisified = promisify(appData.redis.set).bind(appData.redis);
+  const flushAllPromisified = promisify(appData.redis.flushall).bind(appData.redis);
+
+  const buildnumberRedis: string = await getPromisified("buildnumber");
+  if (buildnumberRedis !== buildnumber) {
+    await flushAllPromisified();
+    await setPromisified("buildnumber", buildnumber);
+  }
 
   initializeApp(appData, custom);
 }

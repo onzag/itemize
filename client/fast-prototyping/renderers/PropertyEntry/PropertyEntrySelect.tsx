@@ -130,7 +130,13 @@ class ActualPropertyEntrySelectRenderer
 
     const addornment = icon ? (
       <InputAdornment position="end">
-        <IconButton className={this.props.classes.icon} onClick={this.props.canRestore ? this.props.onRestore : null}>{icon}</IconButton>
+        <IconButton
+          tabIndex={-1}
+          className={this.props.classes.icon}
+          onClick={this.props.canRestore ? this.props.onRestore : null}
+        >
+          {icon}
+        </IconButton>
       </InputAdornment>
     ) : null;
 

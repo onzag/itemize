@@ -227,7 +227,11 @@ const ActualPropertyEntryFileRendererWithStyles = withStyles(style)((props: IPro
         }}
       >
         {capitalize(props.label)}
-        {icon ? <IconButton className={props.classes.icon} onClick={props.canRestore ? props.onRestore : null}>{icon}</IconButton> : null}
+        {icon ? <IconButton
+          tabIndex={-1}
+          className={props.classes.icon}
+          onClick={props.canRestore ? props.onRestore : null}
+        >{icon}</IconButton> : null}
       </FormLabel>
       <Dropzone
         onDropAccepted={onDrop.bind(null, props.onSetFile)}

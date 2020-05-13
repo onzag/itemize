@@ -97,6 +97,7 @@ export const MODULE_AND_ITEM_DEF_I18N = [
 export const MODULE_AND_ITEM_DEF_I18N_SEARCHABLE = [
   "fts_search_field_label",
   "fts_search_field_placeholder",
+  "fts_search_keywords",
 ]
 /**
  * The custom key as it is stored in the built file, the custom key

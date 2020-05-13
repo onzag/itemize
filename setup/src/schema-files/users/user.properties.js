@@ -2,6 +2,8 @@ const en = `[en]
 name = user
 fts_search_field_label = user search
 fts_search_field_placeholder = insert relevant user data
+fts_search_keywords = user
+
 custom.login = login
 custom.login_alt_field_label = username or email
 custom.login_alt_field_placeholder = username or email
@@ -137,6 +139,8 @@ const es = `[es]
 name = usuario
 fts_search_field_label = buscar usuario
 fts_search_field_placeholder = inserte información relevante sobre el usuario
+fts_search_keywords = usuario
+
 custom.login = iniciar sesión
 custom.login_alt_field_label = nombre de usuario o email
 custom.login_alt_field_placeholder = nombre de usuario o email

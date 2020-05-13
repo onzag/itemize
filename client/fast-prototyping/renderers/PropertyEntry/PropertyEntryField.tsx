@@ -541,6 +541,7 @@ class ActualPropertyEntryFieldRenderer
           className={this.props.classes.standardAddornment}
         >
           <IconButton
+            tabIndex={-1}
             classes={{root: this.props.classes.iconButton}}
             onClick={this.toggleVisible}
             onMouseDown={this.catchToggleMouseDownEvent}
@@ -562,6 +563,7 @@ class ActualPropertyEntryFieldRenderer
           className={this.props.classes.standardAddornment}
         >
           <IconButton
+            tabIndex={-1}
             classes={{root: this.props.classes.iconButton}}
             onClick={this.props.onRestore}
             onMouseDown={this.catchToggleMouseDownEvent}
@@ -575,6 +577,7 @@ class ActualPropertyEntryFieldRenderer
       appliedInputProps.endAdornment = (
         <InputAdornment position="end" className={this.props.classes.standardAddornment}>
           <IconButton
+            tabIndex={-1}
             classes={{root: this.props.classes.iconButton}}
           >
             {this.props.icon}

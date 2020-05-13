@@ -451,6 +451,7 @@ async function getI18nData(rawDataConfig, isSearchable, languageFileLocation, po
             name: null,
             fts_search_field_label: null,
             fts_search_field_placeholder: null,
+            fts_search_keywords: null,
         };
         // for every locale key we have that we need either for item definition
         // or module as defined by the constants

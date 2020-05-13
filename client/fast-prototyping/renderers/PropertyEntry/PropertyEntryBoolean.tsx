@@ -102,7 +102,11 @@ const ActualPropertyEntryBooleanRendererWithStyles = withStyles(style)((props: I
             focused: "focused",
           }}
         >
-          {props.label}{icon ? <IconButton className={props.classes.icon} onClick={props.canRestore ? props.onRestore : null}>{icon}</IconButton> : null}
+          {props.label}{icon ? <IconButton
+            tabIndex={-1}
+            className={props.classes.icon}
+            onClick={props.canRestore ? props.onRestore : null}
+          >{icon}</IconButton> : null}
         </FormLabel>
         <RadioGroup
           value={JSON.stringify(props.currentValue)}

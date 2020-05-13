@@ -116,7 +116,7 @@ export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fra
                     />
                     <Snackbar
                       severity="success"
-                      i18nDisplay="fragment_success"
+                      i18nDisplay="success"
                       open={actioner.submitted}
                       onClose={actioner.dismissSubmitted}
                     />

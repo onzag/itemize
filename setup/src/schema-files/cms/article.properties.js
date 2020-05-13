@@ -2,6 +2,7 @@ const en = `[en]
 name = article
 fts_search_field_label = search article
 fts_search_field_placeholder = insert relevant information about the article
+fts_search_keywords = article
 
 custom.read_more = read more....
 
@@ -22,6 +23,7 @@ const es = `[es]
 name = artículo
 fts_search_field_label = buscar artículo
 fts_search_field_placeholder = inserte información relevante
+fts_search_keywords = artículo
 
 custom.read_more = leer más...
 

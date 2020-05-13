@@ -1,16 +1,8 @@
 const en = `[en]
-name = content fragment
-custom.id = id
-custom.version = version
-custom.submit = create or update
-custom.fragment_success = success`
+name = content fragment`
 
 const es = `[es]
-name = fragmento de contenido
-custom.id = id
-custom.version = versión
-custom.submit = crear o actualizar
-custom.fragment_success = hecho exitosamente`
+name = fragmento de contenido`
 
 const ALL = {en, es};
 
