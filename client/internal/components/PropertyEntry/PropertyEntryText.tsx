@@ -2,9 +2,12 @@ import React from "react";
 import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import equals from "deep-equal";
 import uuid from "uuid";
-import { DOMPurify } from "../../../../util";
+import { DOMPurify, checkFileInAccepts, processAccepts, localeReplacer } from "../../../../util";
 import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { propertyViewPostProcessingHook, PROPERTY_VIEW_SANITIZE_CONFIG } from "../PropertyView/PropertyViewText";
+import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { FILE_SUPPORTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../../../../constants";
+import prettyBytes from "pretty-bytes";
 
 export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererProps<string> {
   i18nFormat: {
@@ -32,6 +35,11 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
   supportsImages: boolean;
   supportsFiles: boolean;
   supportsVideos: boolean;
+  mediaPropertyAcceptsFiles: string;
+  mediaPropertyAcceptsImages: string;
+
+  lastLoadedFileError: string;
+  dismissLastLoadedFileError: () => void;
 
   onInsertFile: (file: File) => IPropertyDefinitionSupportedSingleFilesType;
   onInsertImage: (file: File) => Promise<{
@@ -41,8 +49,16 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
   }>
 }
 
+interface IPropertyEntryTextState {
+  lastLoadedFileError: string;
+}
+
 export default class PropertyEntryText
-  extends React.Component<IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>> {
+  extends React.Component<IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>, IPropertyEntryTextState> {
+
+  private cachedMediaProperty: PropertyDefinition;
+  private cachedMediaPropertyAcceptsFiles: string;
+  private cachedMediaPropertyAcceptsImages: string;
 
   // used to restore when doing undos and whatnot
   private internalFileCache: {
@@ -52,20 +68,49 @@ export default class PropertyEntryText
   constructor(props: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>) {
     super(props);
 
+    this.state = {
+      lastLoadedFileError: null,
+    }
+
     this.internalFileCache = {};
 
     this.onInsertFile = this.onInsertFile.bind(this);
     this.onInsertImage = this.onInsertImage.bind(this);
     this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
     this.onChangeHijacked = this.onChangeHijacked.bind(this);
+    this.dismissLastLoadedFileError = this.dismissLastLoadedFileError.bind(this);
+
+    this.cacheMediaPropertyInProps(props);
+  }
+
+  public dismissLastLoadedFileError() {
+    this.setState({
+      lastLoadedFileError: null,
+    });
   }
 
   public componentWillUnmount() {
     Object.keys(this.internalFileCache).forEach((k) => {
-      if (this.internalFileCache[k].url.startsWith("blob:")) {
+      if (this.internalFileCache[k].url.startsWith("blob:")) {
         URL.revokeObjectURL(this.internalFileCache[k].url);
       }
     });
+  }
+
+  public cacheMediaPropertyInProps(props: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>) {
+    const mediaPropertyName = props.property.getSpecialProperty("mediaProperty") as string;
+    if (mediaPropertyName) {
+      this.cachedMediaProperty = props.itemDefinition.getPropertyDefinitionFor(mediaPropertyName, true);
+      this.cachedMediaPropertyAcceptsFiles = processAccepts(
+        this.cachedMediaProperty.getSpecialProperty("accept") as string,
+        !!this.cachedMediaProperty.getSpecialProperty("imageUploader"),
+      );
+      this.cachedMediaPropertyAcceptsImages = this.cachedMediaPropertyAcceptsFiles === "*" ?
+        FILE_SUPPORTED_IMAGE_TYPES.join(",") :
+        this.cachedMediaPropertyAcceptsFiles.split(",").filter((accepting) => {
+          return accepting.startsWith("image");
+        }).join(",");
+    }
   }
 
   public cacheCurrentFiles() {
@@ -142,8 +187,8 @@ export default class PropertyEntryText
   public onRestoreHijacked() {
     const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
     const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
-    
-    relatedProperty.restoreValueFor(this.props.forId || null, this.props.forVersion || null);
+
+    relatedProperty.restoreValueFor(this.props.forId || null, this.props.forVersion || null);
     this.props.onRestore();
   }
 
@@ -154,7 +199,7 @@ export default class PropertyEntryText
       relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
     // it's almost certain that the file must be in this internal cache to restore files
-    if ((!currentValue || !currentValue.find(v => v.id === fileId)) && this.internalFileCache[fileId]) {
+    if ((!currentValue || !currentValue.find(v => v.id === fileId)) && this.internalFileCache[fileId]) {
       const newValue: PropertyDefinitionSupportedFilesType = currentValue !== null ?
         [...currentValue] : [];
 
@@ -180,16 +225,22 @@ export default class PropertyEntryText
     }
   }
 
+  /**
+   * Insers an image based on a file into the correlated file field and performs
+   * the required checks
+   * @param file the file to insert
+   * @returns a promise, note that this promise can fail if the file itself fails and provide a generic error
+   */
   public async onInsertImage(file: File): Promise<{
     result: IPropertyDefinitionSupportedSingleFilesType,
     width: number,
     height: number,
   }> {
-    const fileInserted = this.onInsertFile(file);
-
-    const tempURL = fileInserted.url;
-
     return new Promise((resolve, reject) => {
+      const fileInserted = this.onInsertFile(file, true);
+
+      const tempURL = fileInserted.url;
+
       const img = new Image();
       img.onload = () => {
         resolve({
@@ -198,18 +249,45 @@ export default class PropertyEntryText
           height: img.height,
         });
       }
-      img.onerror = (ev) => {
-        resolve(null);
+      img.onerror = () => {
+        this.onRemoveFile(fileInserted.id);
+        this.setState({
+          lastLoadedFileError: "image_uploader_invalid_type",
+        });
+        reject(new Error("Invalid Image"));
       }
       img.src = tempURL;
     });
   }
 
-  public onInsertFile(file: File) {
+  /**
+   * Inserts a file in the media property
+   * @param file the file to insert
+   * @param validateAgainstImages whether the errors and check given will be for image types
+   */
+  public onInsertFile(file: File, validateAgainstImages?: boolean) {
+    // we do this generic check to test whether the file is an image, even when
+    // the file check will do its own check
+    if (validateAgainstImages && !checkFileInAccepts(file.type, this.cachedMediaPropertyAcceptsImages)) {
+      this.setState({
+        lastLoadedFileError: "image_uploader_invalid_type",
+      });
+      throw new Error("Invalid image type");
+    } else if (!validateAgainstImages && !checkFileInAccepts(file.type, this.cachedMediaPropertyAcceptsFiles)) {
+      this.setState({
+        lastLoadedFileError: "file_uploader_invalid_type",
+      });
+      throw new Error("Invalid file type");
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      this.setState({
+        lastLoadedFileError: validateAgainstImages ? "image_uploader_file_too_big" : "file_uploader_file_too_big",
+      });
+      throw new Error("Size of image/file too large");
+    }
+
     const tempURL = URL.createObjectURL(file);
-    
-    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
-    const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
 
     const id = "FILE" + uuid.v4().replace(/-/g, "");
     const addedFile: IPropertyDefinitionSupportedSingleFilesType = {
@@ -222,7 +300,7 @@ export default class PropertyEntryText
     };
 
     const currentValue =
-      relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+      this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
     const newValue: PropertyDefinitionSupportedFilesType = currentValue !== null ?
       [...currentValue] : [];
@@ -230,7 +308,7 @@ export default class PropertyEntryText
     newValue.push(addedFile);
     this.internalFileCache[id] = addedFile;
 
-    relatedProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
+    this.cachedMediaProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
     this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
 
     return addedFile;
@@ -239,8 +317,12 @@ export default class PropertyEntryText
   public shouldComponentUpdate(
     nextProps: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>,
   ) {
+    if (nextProps.property !== this.props.property) {
+      this.cacheMediaPropertyInProps(nextProps);
+    }
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
+      !equals(this.state, nextProps.state) ||
       !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.rtl !== !!nextProps.rtl ||
@@ -265,17 +347,6 @@ export default class PropertyEntryText
     const i18nPlaceholder = this.props.altPlaceholder || (i18nData && i18nData.placeholder);
 
     // get the invalid reason if any
-    const invalidReason = this.props.state.invalidReason;
-    const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
-      (this.props.poked || this.props.state.userSet) && invalidReason;
-    let i18nInvalidReason = null;
-    if (
-      isCurrentlyShownAsInvalid && i18nData &&
-      i18nData.error && i18nData.error[invalidReason]
-    ) {
-      i18nInvalidReason = i18nData.error[invalidReason];
-    }
-
     const isRichText = this.props.property.isRichText();
 
     const mediaPropertyId = this.props.property.getSpecialProperty("mediaProperty") as string;
@@ -285,14 +356,49 @@ export default class PropertyEntryText
     const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
 
     let currentValue = this.props.state.value as string;
-    if (supportsMedia && currentValue && !this.props.state.stateValueHasBeenManuallySet) {
-      const mediaProperty = this.props.itemDefinition.getPropertyDefinitionFor(mediaPropertyId, true);
+    if (supportsMedia && currentValue && !this.props.state.stateValueHasBeenManuallySet) { 
       const currentFiles: PropertyDefinitionSupportedFilesType =
-        mediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+        this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
-      DOMPurify.addHook("afterSanitizeElements", propertyViewPostProcessingHook.bind(this, mediaProperty, currentFiles, supportsImages, supportsVideos, supportsFiles));
+      DOMPurify.addHook("afterSanitizeElements", propertyViewPostProcessingHook.bind(this, this.cachedMediaProperty, currentFiles, supportsImages, supportsVideos, supportsFiles));
       currentValue = DOMPurify.sanitize(currentValue, PROPERTY_VIEW_SANITIZE_CONFIG);
       DOMPurify.removeAllHooks();
+    }
+
+    let invalidReason = this.props.state.invalidReason;
+    let invalidReasonIsMediaProperty = false;
+    if (!invalidReason && supportsMedia) {
+      const mediaPropertyState = this.cachedMediaProperty.getStateNoExternalChecking(
+        this.props.forId || null, this.props.forVersion || null,
+      );
+      if (mediaPropertyState.invalidReason) {
+        invalidReasonIsMediaProperty = true;
+        invalidReason = mediaPropertyState.invalidReason;
+      }
+    }
+    const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
+      (this.props.poked || this.props.state.userSet) && invalidReason;
+    let i18nInvalidReason = null;
+    if (
+      !invalidReasonIsMediaProperty && isCurrentlyShownAsInvalid && i18nData &&
+      i18nData.error && i18nData.error[invalidReason]
+    ) {
+      i18nInvalidReason = i18nData.error[invalidReason];
+    } else if (
+      invalidReasonIsMediaProperty && isCurrentlyShownAsInvalid && i18nData &&
+      i18nData.error && i18nData.error["MEDIA_PROPERTY_" + invalidReason]
+    ) {
+      i18nInvalidReason = i18nData.error["MEDIA_PROPERTY_" + invalidReason];
+    }
+
+    let lastLoadedFileError = this.state.lastLoadedFileError;
+    if (lastLoadedFileError === "image_uploader_file_too_big" || lastLoadedFileError === "file_uploader_file_too_big") {
+      lastLoadedFileError = localeReplacer(
+        this.props.i18n[this.props.language][lastLoadedFileError],
+        prettyBytes(MAX_FILE_SIZE),
+      );
+    } else if (lastLoadedFileError) {
+      lastLoadedFileError = this.props.i18n[this.props.language][lastLoadedFileError];
     }
 
     const RendererElement = this.props.renderer;
@@ -339,8 +445,13 @@ export default class PropertyEntryText
       supportsImages,
       supportsFiles,
       supportsVideos,
+      mediaPropertyAcceptsFiles: this.cachedMediaPropertyAcceptsFiles,
+      mediaPropertyAcceptsImages: this.cachedMediaPropertyAcceptsImages,
 
       isRichText,
+
+      lastLoadedFileError,
+      dismissLastLoadedFileError: this.dismissLastLoadedFileError,
 
       onChange: supportsMedia ? this.onChangeHijacked : this.props.onChange,
       onRestore: supportsMedia ? this.onRestoreHijacked : this.props.onRestore,
@@ -349,6 +460,6 @@ export default class PropertyEntryText
       onInsertImage: this.onInsertImage,
     };
 
-    return <RendererElement {...rendererArgs}/>
+    return <RendererElement {...rendererArgs} />
   }
 }

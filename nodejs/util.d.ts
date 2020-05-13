@@ -15,6 +15,13 @@ export declare function capitalize(str: string): string;
  * @returns a string that is regex ready
  */
 export declare function escapeStringRegexp(str: string): string;
+export declare function processAccepts(accept: string, isExpectingImages?: boolean): string;
+/**
+ * Checks whether the file type exists in the accept property
+ * @param fileType the file.type
+ * @param accept the accept property
+ */
+export declare function checkFileInAccepts(fileType: string, accept: string): boolean;
 /**
  * Converts a mime type to an extension using a known extension list
  * @param str the string that represents the mime type

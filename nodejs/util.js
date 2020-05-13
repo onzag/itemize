@@ -11,6 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const moment_1 = __importDefault(require("moment"));
 const jsdom_1 = require("jsdom");
 const dompurify_1 = __importDefault(require("dompurify"));
+const constants_1 = require("./constants");
 /**
  * capitalizes a string
  * @param str the string to capitalize
@@ -106,6 +107,21 @@ const mimeExtensions = {
     "video/3gpp2": "3g2",
     "application/x-7z-compressed": "7z",
 };
+function processAccepts(accept, isExpectingImages) {
+    return (accept ||
+        (isExpectingImages ? constants_1.FILE_SUPPORTED_IMAGE_TYPES.join(",") : "*")).replace(/image(?!\/)/g, constants_1.FILE_SUPPORTED_IMAGE_TYPES.join(","));
+}
+exports.processAccepts = processAccepts;
+/**
+ * Checks whether the file type exists in the accept property
+ * @param fileType the file.type
+ * @param accept the accept property
+ */
+function checkFileInAccepts(fileType, accept) {
+    var typeRegex = new RegExp(accept.replace(/\*/g, '.\*').replace(/\,/g, '|'));
+    return typeRegex.test(fileType);
+}
+exports.checkFileInAccepts = checkFileInAccepts;
 /**
  * Converts a mime type to an extension using a known extension list
  * @param str the string that represents the mime type

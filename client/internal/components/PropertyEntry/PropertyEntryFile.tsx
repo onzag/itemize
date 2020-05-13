@@ -5,7 +5,7 @@ import { MAX_FILE_SIZE, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants
 import uuid from "uuid";
 import { PropertyDefinitionSupportedFileType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
 import prettyBytes from "pretty-bytes";
-import { localeReplacer, mimeTypeToExtension, capitalize } from "../../../../util";
+import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, processAccepts } from "../../../../util";
 import { imageSizeRetriever, fileURLAbsoluter } from "../../../components/util";
 
 export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererProps<PropertyDefinitionSupportedFileType> {
@@ -34,11 +34,6 @@ interface IPropertyEntryFileState {
   rejectedValue: PropertyDefinitionSupportedFileType;
   rejected: boolean;
   rejectedReason: string;
-}
-
-function checkFileInAccepts(fileType: string, accept: string) {
-  var typeRegex = new RegExp(accept.replace(/\*/g, '.\*').replace(/\,/g, '|'));
-  return typeRegex.test(fileType);
 }
 
 export default class PropertyEntryFile
@@ -114,10 +109,10 @@ export default class PropertyEntryFile
     };
 
     const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
-    const accept = (
-      this.props.property.getSpecialProperty("accept") as string ||
-      (isExpectingImages ? FILE_SUPPORTED_IMAGE_TYPES.join(",") : "*")
-    ).replace(/image(?!\/)/g, FILE_SUPPORTED_IMAGE_TYPES.join(","));
+    const accept = processAccepts(
+      this.props.property.getSpecialProperty("accept") as string,
+      isExpectingImages,
+    );
 
     // check if it's images we are accepting
     if (!checkFileInAccepts(value.type, accept)) {
@@ -213,10 +208,10 @@ export default class PropertyEntryFile
     };
 
     const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
-    const accept = (
-      this.props.property.getSpecialProperty("accept") as string ||
-      (isExpectingImages ? FILE_SUPPORTED_IMAGE_TYPES.join(",") : "*")
-    ).replace(/image(?!\/)/g, FILE_SUPPORTED_IMAGE_TYPES.join(","));
+    const accept = processAccepts(
+      this.props.property.getSpecialProperty("accept") as string,
+      isExpectingImages
+    );
 
     // the placeholder when active
     let genericActivePlaceholder = this.props.i18n[this.props.language].file_uploader_placeholder_active_single;

@@ -23,7 +23,8 @@ properties.content.search.label = content
 properties.content.placeholder = the content of the fragment or article
 properties.content.search.placeholder = search within the content
 properties.content.error.NOT_NULLABLE = the content must be set
-properties.content.error.TOO_LARGE = the content is too long`
+properties.content.error.TOO_LARGE = the content is too long
+properties.content.error.MEDIA_PROPERTY_TOO_LARGE = you have attached too many files`
 
 const es = `[es]
 name = cms
@@ -50,7 +51,8 @@ properties.content.search.label = contenido
 properties.content.placeholder = el contenido del fragmento o artículo
 properties.content.search.placeholder = buscar entre el contenido
 properties.content.error.NOT_NULLABLE = debe ofrecer contenido
-properties.content.error.TOO_LARGE = el contenido es demasiado largo`
+properties.content.error.TOO_LARGE = el contenido es demasiado largo
+properties.content.error.MEDIA_PROPERTY_TOO_LARGE = ha añadido demasiados archivos adjuntos`
 
 const ALL = {en, es};
 

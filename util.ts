@@ -7,6 +7,7 @@
 import Moment from "moment";
 import { JSDOM } from "jsdom";
 import createDOMPurify from "dompurify";
+import { FILE_SUPPORTED_IMAGE_TYPES } from "./constants";
 
 /**
  * capitalizes a string
@@ -107,6 +108,23 @@ const mimeExtensions = {
   "video/3gpp2": "3g2",
   "application/x-7z-compressed": "7z",
 };
+
+export function processAccepts(accept: string, isExpectingImages?: boolean) {
+  return (
+    accept ||
+    (isExpectingImages ? FILE_SUPPORTED_IMAGE_TYPES.join(",") : "*")
+  ).replace(/image(?!\/)/g, FILE_SUPPORTED_IMAGE_TYPES.join(","));
+}
+
+/**
+ * Checks whether the file type exists in the accept property
+ * @param fileType the file.type
+ * @param accept the accept property
+ */
+export function checkFileInAccepts(fileType: string, accept: string) {
+  var typeRegex = new RegExp(accept.replace(/\*/g, '.\*').replace(/\,/g, '|'));
+  return typeRegex.test(fileType);
+}
 
 /**
  * Converts a mime type to an extension using a known extension list

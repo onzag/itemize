@@ -264,6 +264,7 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+    height: "5rem",
   },
   quill: (props: IPropertyEntryTextRendererProps) => {
     const shouldShowInvalidQuill = shouldShowInvalid(props);
@@ -658,6 +659,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   }
   public onFileLoad(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files[0];
+    e.target.value = "";
+
     const fileData = this.props.onInsertFile(file);
 
     const prettySize = prettyBytes(fileData.size);
@@ -666,40 +669,42 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     const quill = this.quillRef.current.getEditor();
     const range = quill.getSelection(true);
 
-    quill.insertEmbed(range.index, "itemizefile", {
-      srcId: fileData.id,
-      src: fileData.url,
-      name: fileData.name,
-      extension: expectedExtension,
-      size: prettySize,
-    }, (ReactQuill.Quill as any).sources.USER);
-    quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
+    try {
+      quill.insertEmbed(range.index, "itemizefile", {
+        srcId: fileData.id,
+        src: fileData.url,
+        name: fileData.name,
+        extension: expectedExtension,
+        size: prettySize,
+      }, (ReactQuill.Quill as any).sources.USER);
+      quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
+    } catch (err) {}
   }
   public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files[0];
+    e.target.value = "";
 
     let alt: string = null;
     if (this.props.args["requestAltOnImages"]) {
       alt = prompt("Please write an alt for your image:", "") || null;
     }
-    const data = await this.props.onInsertImage(file);
-
-    if (!data) {
-      return;
+    try {
+      const data = await this.props.onInsertImage(file);
+    
+      const quill = this.quillRef.current.getEditor();
+      const range = quill.getSelection(true);
+      quill.insertEmbed(range.index, "itemizeimage", {
+        alt,
+        src: data.result.url,
+        srcId: data.result.id,
+        srcSet: null,
+        sizes: null,
+        srcWidth: data.width,
+        srcHeight: data.height,
+      }, (ReactQuill.Quill as any).sources.USER);
+      quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
+    } catch (err) {
     }
-  
-    const quill = this.quillRef.current.getEditor();
-    const range = quill.getSelection(true);
-    quill.insertEmbed(range.index, "itemizeimage", {
-      alt,
-      src: data.result.url,
-      srcId: data.result.id,
-      srcSet: null,
-      sizes: null,
-      srcWidth: data.width,
-      srcHeight: data.height,
-    }, (ReactQuill.Quill as any).sources.USER);
-    quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
   }
   // basically get the state onto its parent of the focus and blur
   public onFocus() {
@@ -733,7 +738,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         className={this.props.classes.icon}
         onClick={this.props.canRestore ? this.props.onRestore : null}
       >
-          {icon}
+        {icon}
       </IconButton>
     ) : null;
 
@@ -743,7 +748,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       <input
         ref={this.inputImageRef}
         type="file"
-        accept={FILE_SUPPORTED_IMAGE_TYPES.join(",")}
+        accept={this.props.mediaPropertyAcceptsImages}
         tabIndex={-1}
         style={{display: "none"}}
         autoComplete="off"
@@ -755,6 +760,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       <input
         ref={this.fileInputRef}
         type="file"
+        accept={this.props.mediaPropertyAcceptsFiles}
         tabIndex={-1}
         style={{display: "none"}}
         autoComplete="off"
@@ -784,6 +790,24 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
           />
           <div>{this.state.invalidVideoLink ? this.props.i18nLoadVideo.invalid : null}</div>
         </div>
+      </Dialog>
+    ) : null;
+
+    const fileLoadErrorDialog = (this.props.supportsImages || this.props.supportsFiles) ? (
+      <Dialog
+        fullScreen={false}
+        open={!!this.props.lastLoadedFileError}
+        onClose={this.props.dismissLastLoadedFileError}
+        title={"test"}
+        buttons={
+          <Button onClick={this.props.dismissLastLoadedFileError}>
+            {"ok"}
+          </Button>
+        }
+      >
+        <Typography>
+          {this.props.lastLoadedFileError}
+        </Typography>
       </Dialog>
     ) : null;
 
@@ -845,6 +869,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         {imageInput}
         {fileInput}
         {uploadVideoDialog}
+        {fileLoadErrorDialog}
       </div>
     );
   }
