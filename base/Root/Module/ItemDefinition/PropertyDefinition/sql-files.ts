@@ -361,12 +361,13 @@ async function addFileFor(
 
   const stream: ReadStream = createReadStream();
   const isImage = FILE_SUPPORTED_IMAGE_TYPES.includes(value.type);
-  const needsImageProcessing = isImage && !value.type.startsWith("svg");
+  const needsImageProcessing = isImage && !value.type.startsWith("image/svg");
   if (needsImageProcessing) {
     await runImageConversions(
       stream,
       mainFilePath,
       curatedFileName,
+      value.type,
       uploadsContainer,
       propertyDefinition,
     );

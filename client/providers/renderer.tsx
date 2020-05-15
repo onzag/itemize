@@ -8,6 +8,7 @@ import { IPropertyViewSimpleRendererProps } from "../internal/components/Propert
 import { IPropertyEntrySelectRendererProps } from "../internal/components/PropertyEntry/PropertyEntrySelect";
 import { IPropertyEntryTextRendererProps } from "../internal/components/PropertyEntry/PropertyEntryText";
 import { IPropertyViewTextRendererProps } from "../internal/components/PropertyView/PropertyViewText";
+import { IPropertyViewFileRendererProps } from "../internal/components/PropertyView/PropertyViewFile";
 
 export interface IRendererContext {
   IncludeCalloutWarning?: React.ComponentType<IIncludeCalloutWarningRendererProps>;
@@ -21,6 +22,7 @@ export interface IRendererContext {
 
   PropertyViewSimple?: React.ComponentType<IPropertyViewSimpleRendererProps>;
   PropertyViewText?: React.ComponentType<IPropertyViewTextRendererProps>;
+  PropertyViewFile?: React.ComponentType<IPropertyViewFileRendererProps>;
 }
 
 export const RendererContext = React.createContext<IRendererContext>(null);

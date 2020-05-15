@@ -5,7 +5,6 @@ import { ThemeProvider, FormLabel, RootRef, Paper, Button, Typography, IconButto
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import NoteAddIcon from "@material-ui/icons/NoteAdd";
-import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
 import { MAX_FILE_SIZE } from "../../../../constants";
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import React from "react";
@@ -51,57 +50,10 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
       color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
     },
   }),
-  file: {
-    "width": "125px",
-    "padding": "25px 0",
-    "alignSelf": "flex-start",
-    "&:hover $imageThumbnail": {
-      boxShadow: "0 0 5px 2px #42a5f5",
-    },
-    "&:hover $fileDeleteButton": {
-      color: "#f44336",
-    },
-  },
-  fileRejected: {
-    "& $imageThumbnail": {
-      boxShadow: "0 0 5px 2px #e57373",
-    },
-    "&:hover $imageThumbnail": {
-      boxShadow: "0 0 5px 2px #f44336",
-    },
-    "& $fileName, & $fileSize, & $fileRejectedDescription, & $fileIcon": {
-      color: "#e57373",
-    },
-    "&:hover $fileName, &:hover $fileSize, &:hover $fileRejectedDescription, &:hover $fileIcon": {
-      color: "#f44336",
-    },
-  },
-  fileDataContainer: {
-    height: "150px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
   fileDeleteButton: {
     top: "-25px",
     right: 0,
     position: "absolute",
-  },
-  fileName: {
-    width: "100%",
-    textAlign: "center",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    fontSize: "0.75rem",
-  },
-  fileSize: {
-    width: "100%",
-    textAlign: "center",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    fontSize: "0.75rem",
-    opacity: "0.75",
   },
   fileRejectedDescription: {
     width: "100%",
@@ -109,21 +61,6 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     overflow: "hidden",
     textOverflow: "ellipsis",
     fontSize: "0.75rem",
-  },
-  fileIcon: {
-    fontSize: "75px",
-    color: "#424242",
-  },
-  fileMimeType: {
-    position: "absolute",
-    color: "white",
-    width: "100%",
-    fontSize: "16px",
-    textAlign: "center",
-    padding: "0 40px",
-    bottom: "15px",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
   },
   paper: {
     marginTop: "5px",
@@ -174,10 +111,6 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
   },
   buttonIcon: {
     marginLeft: "0.75rem",
-  },
-  imageThumbnail: {
-    height: "100%",
-    borderRadius: "3px",
   },
 });
 
@@ -252,36 +185,40 @@ const ActualPropertyEntryFileRendererWithStyles = withStyles(style)((props: IPro
         }) => {
           const { ref, ...rootProps } = getRootProps();
 
-          const mainFileClassName = props.classes.file +
-            (props.rejected ? " " + props.classes.fileRejected : "");
           let displayContent = null;
           if (props.currentValue) {
+            const mainFileClassName = "file" +
+              (props.rejected ? " rejected" : "");
             displayContent = (
               <div
                 className={mainFileClassName}
                 onClick={props.openFile.bind(null, props.currentValue)}
               >
-                {
-                  props.isSupportedImage ? (
-                    <div className={props.classes.fileDataContainer}>
-                      <img src={props.imageSizes.imageMediumSizeURL} className={props.classes.imageThumbnail} />
-                    </div>
-                  ) : (
-                    <div className={props.classes.fileDataContainer}>
-                      <InsertDriveFileIcon className={props.classes.fileIcon}/>
-                      <span className={props.classes.fileMimeType}>{
-                        props.expectedExtension
-                      }</span>
-                    </div>
-                  )
-                }
-                <p className={props.classes.fileName}>{props.currentValue.name}</p>
-                <p className={props.classes.fileSize}>({
-                  props.prettySize
-                })</p>
-                {props.rejected ? <p className={props.classes.fileRejectedDescription}>
-                  {props.rejectedReason}
-                </p> : null}
+                <div className="file-container">
+                  {
+                    props.isSupportedImage ? (
+                      <img
+                        srcSet={props.imageSrcSet}
+                        sizes="100px"
+                        src={props.currentValue.url}
+                        className="thumbnail"
+                      />
+                    ) : (
+                      <div className="file-icon">
+                        <span className="file-extension">{
+                          props.extension
+                        }</span>
+                      </div>
+                    )
+                  }
+                  <p className="file-name">{props.currentValue.name}</p>
+                  <p className="file-size">{
+                    props.prettySize
+                  }</p>
+                  {props.rejected ? <p className={props.classes.fileRejectedDescription}>
+                    {props.rejectedReason}
+                  </p> : null}
+                </div>
               </div>
             )
           } else {

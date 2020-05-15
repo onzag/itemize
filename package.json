@@ -85,6 +85,7 @@
     "react-leaflet": "^2.6.3",
     "react-quill": "git+https://github.com/onzag/react-quill.git",
     "react-router-dom": "^5.1.2",
+    "react-textarea-autosize": "^7.1.2",
     "read": "^1.0.7",
     "redis": "^2.8.0",
     "regenerator-runtime": "^0.13.5",

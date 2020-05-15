@@ -13,7 +13,8 @@ import { RendererContext } from "../../../providers/renderer";
 import { PropertyViewSimple, IPropertyViewSimpleRendererProps } from "./PropertyViewSimple";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import Include from "../../../../base/Root/Module/ItemDefinition/Include";
-import { PropertyViewText } from "./PropertyViewText";
+import PropertyViewText from "./PropertyViewText";
+import PropertyViewFile from "./PropertyViewFile";
 
 /**
  * This is what every view renderer gets
@@ -88,9 +89,10 @@ const handlerRegistry:
   date: null,
   time: null,
   location: null,
-
-  // TODO
-  file: null,
+  file: {
+    renderer: "PropertyViewFile",
+    handler: PropertyViewFile,
+  },
   files: null,
 };
 

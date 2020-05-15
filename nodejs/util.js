@@ -118,7 +118,7 @@ exports.processAccepts = processAccepts;
  * @param accept the accept property
  */
 function checkFileInAccepts(fileType, accept) {
-    var typeRegex = new RegExp(accept.replace(/\*/g, '.\*').replace(/\,/g, '|'));
+    const typeRegex = new RegExp(accept.replace(/\*/g, '.\*').replace(/\,/g, '|').replace(/\+/g, "\\+"));
     return typeRegex.test(fileType);
 }
 exports.checkFileInAccepts = checkFileInAccepts;

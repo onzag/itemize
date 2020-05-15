@@ -26,12 +26,14 @@ import FormatBoldIcon from "@material-ui/icons/FormatBold";
 import "react-quill/dist/quill.core.css";
 import "../../../internal/theme/quill.scss";
 import { capitalize, mimeTypeToExtension } from "../../../../util";
-import { LAST_RICH_TEXT_CHANGE_LENGTH, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
+import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import { Dialog } from "../../components/dialog";
 import prettyBytes from "pretty-bytes";
+import TextareaAutosize from "react-textarea-autosize";
 
 import RestoreIcon from '@material-ui/icons/Restore';
 import ClearIcon from '@material-ui/icons/Clear';
+import { SlowLoadingElement } from "../../components/util";
 
 const BlockEmbed = ReactQuill.Quill.import("blots/block/embed");
 const Embed = ReactQuill.Quill.import("blots/embed");
@@ -49,6 +51,10 @@ interface ItemizeImageBlotValue {
 
 class ItemizeImageBlot extends BlockEmbed {
   static create(value: ItemizeImageBlotValue) {
+    if (value === null) {
+      return null;
+    }
+
     const width = value.srcWidth;
     const height = value.srcHeight;
     const ratio = height / width;
@@ -70,17 +76,20 @@ class ItemizeImageBlot extends BlockEmbed {
     childContainer.appendChild(img);
 
     img.setAttribute("alt", value.alt || "");
-    img.setAttribute("sizes", value.sizes || "");
-    img.setAttribute("srcset", value.srcSet || "");
-    img.setAttribute("src", value.src || "");
+    img.dataset.srcHeight = value.srcHeight.toString();
     img.dataset.srcId = value.srcId;
     img.dataset.srcWidth = value.srcWidth.toString();
-    img.dataset.srcHeight = value.srcHeight.toString();
+    img.setAttribute("sizes", value.sizes || "");
+    img.setAttribute("src", value.src || "");
+    img.setAttribute("srcset", value.srcSet || "");
     return mainContainer;
   }
   
   static value(node: HTMLDivElement) {
     const img = node.childNodes[0].childNodes[0].childNodes[0] as HTMLImageElement;
+    if (!img) {
+      return null;
+    }
     return {
       alt: img.getAttribute("alt") || null,
       src: img.getAttribute("src"),
@@ -105,6 +114,9 @@ interface ItemizeVideoBlotValue {
 
 class ItemizeVideoBlot extends BlockEmbed {
   static create(value: ItemizeVideoBlotValue) {
+    if (value === null) {
+      return null;
+    }
     const mainContainer = super.create();
     mainContainer.className = "video";
 
@@ -115,8 +127,12 @@ class ItemizeVideoBlot extends BlockEmbed {
     const iframe = document.createElement("iframe");
     parentContainer.appendChild(iframe);
 
-    iframe.dataset.videoSrc = value.src;
+    iframe.allowFullscreen = true;
+
     iframe.dataset.videoOrigin = value.origin;
+    iframe.dataset.videoSrc = value.src;
+
+    iframe.frameBorder = "0";
 
     if (value.origin === "youtube") {
       iframe.src = `https://youtube.com/embed/${value.src}?rel=0`;
@@ -124,14 +140,14 @@ class ItemizeVideoBlot extends BlockEmbed {
       iframe.src = `https://player.vimeo.com/video/${value.src}?title=0&byline=0&portrait=0&badge=0`;
     }
 
-    iframe.frameBorder = "0";
-    iframe.allowFullscreen = true;
-
     return mainContainer;
   }
 
   static value(node: HTMLDivElement) {
     const iframe = node.childNodes[0].childNodes[0] as HTMLIFrameElement;
+    if (!iframe) {
+      return null;
+    }
     return {
       src: iframe.dataset.videoSrc,
       origin: iframe.dataset.videoOrigin,
@@ -154,12 +170,16 @@ interface ItemizeFileBlotValue {
 
 class ItemizeFileBlot extends Embed {
   static create(value: ItemizeFileBlotValue) {
+    if (value === null) {
+      return null;
+    }
+
     const mainContainer = super.create();
     mainContainer.className = "file";
-    mainContainer.spellcheck = false;
-    mainContainer.dataset.srcId = value.srcId;
     mainContainer.contentEditable = false;
     mainContainer.dataset.src = value.src;
+    mainContainer.dataset.srcId = value.srcId;
+    mainContainer.spellcheck = false;
 
     const parentContainer = document.createElement("span");
     parentContainer.className = "file-container";
@@ -194,11 +214,17 @@ class ItemizeFileBlot extends Embed {
   }
 
   static value(node: HTMLDivElement) {
+    const fileNameNode = node.querySelector(".file-name");
+    const fileExtensionNode = node.querySelector(".file-extension");
+    const fileSizeNode = node.querySelector(".file-size");
+    if (!fileNameNode || !fileExtensionNode || !fileSizeNode) {
+      return null;
+    }
     return {
       srcId: node.dataset.srcId,
-      name: node.querySelector(".file-name").textContent,
-      extension: node.querySelector(".file-extension").textContent,
-      size: node.querySelector(".file-size").textContent,
+      name: fileNameNode.textContent,
+      extension: fileExtensionNode.textContent,
+      size: fileSizeNode.textContent,
       src: node.dataset.src,
     };
   }
@@ -253,18 +279,26 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     borderRadius: "5px",
   },
   label: (props: IPropertyEntryTextRendererProps) => ({
-    "padding": "1rem 0",
     "color": shouldShowInvalid(props) ? theme.labelInvalidColor : theme.labelColor,
     "&.focused": {
       color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
     },
   }),
   labelSingleLine: {
+    padding: "1rem 0",
     width: "100%",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     height: "5rem",
+  },
+  labelNoToolbar: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    height: "5rem",
+    padding: "1rem 0 0 0",
   },
   quill: (props: IPropertyEntryTextRendererProps) => {
     const shouldShowInvalidQuill = shouldShowInvalid(props);
@@ -301,6 +335,17 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
       },
     };
   },
+  rawTextArea: {
+    width: "100%",
+    border: "none",
+    outline: "none",
+    boxShadow: "none",
+    resize: "none",
+    padding: "12px 15px",
+    fontFamily: "'Open Sans', sans-serif",
+    fontSize: "1rem",
+    overflow: "hidden",
+  }
 });
 
 // TODO implement missing toolbar functionality
@@ -435,7 +480,6 @@ interface IPropertyEntryTextRendererState {
 }
 
 const CACHED_FORMATS_RICH = ["bold", "italic", "underline", "header", "blockquote", "list", "itemizeimage", "itemizevideo", "itemizefile"];
-const CACHED_FORMATS_NONE = [];
 const CACHED_CLIPBOARD_MATCHERS: ReactQuill.ClipboardMatcher[] = [
   [Node.ELEMENT_NODE, collapseToPlainTextMatcher],
 ];
@@ -451,7 +495,6 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   private fileInputRef: React.RefObject<HTMLInputElement>;
 
   private cachedModuleOptionsRich: any;
-  private cachedModuleOptionsNone: any;
 
   private quillRef: React.RefObject<ReactQuill>;
 
@@ -473,6 +516,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
     // basic functions
     this.onChange = this.onChange.bind(this);
+    this.onChangeByTextarea = this.onChangeByTextarea.bind(this);
+    this.addPasteEventOnEditor = this.addPasteEventOnEditor.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
     this.customImageHandler = this.customImageHandler.bind(this);
@@ -499,19 +544,21 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         matchers: CACHED_CLIPBOARD_MATCHERS,
       }
     };
-    this.cachedModuleOptionsNone = {
-      toolbar: false,
-      clipboard: {
-        matchVisual: false,
-        matchers: CACHED_CLIPBOARD_MATCHERS,
-      }
-    };
   }
   public componentDidMount() {
+    if (this.props.isRichText) {
+      this.addPasteEventOnEditor();
+    }
+  }
+  public componentDidUpdate(prevProps: IPropertyEntryTextRendererWithStylesProps, prevState: IPropertyEntryTextRendererState) {
+    if (prevProps.isRichText && !this.props.isRichText) {
+      this.addPasteEventOnEditor();
+    }
+  }
+  public addPasteEventOnEditor() {
     const editor = this.quillRef.current.getEditor();
     editor.root.addEventListener('paste', async (e) => {
       const clipboardData: DataTransfer = e.clipboardData || (window as any).clipboardData;
-      console.log(clipboardData);
       // support cut by software & copy image file directly
       const isImage = clipboardData.types.length && clipboardData.types.join('').includes('Files');
       if (!isImage) {
@@ -543,7 +590,11 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       editor.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
     });
   }
-  public onChange(value: string, delta: any, sources: any, editor: ReactQuill.UnprivilegedEditor) {
+  public onChangeByTextarea(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    const value = e.target.value || null;
+    this.props.onChange(value, null);
+  }
+  public onChange(value: string, delta: any, sources: string, editor: ReactQuill.UnprivilegedEditor) {
     // on change, these values are basically empty
     // so we set to null, however in some circumstances
     // they are unavoidable, use a value larger than 1 for min
@@ -798,10 +849,10 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         fullScreen={false}
         open={!!this.props.lastLoadedFileError}
         onClose={this.props.dismissLastLoadedFileError}
-        title={"test"}
+        title={capitalize(this.props.i18nGenericError)}
         buttons={
           <Button onClick={this.props.dismissLastLoadedFileError}>
-            {"ok"}
+            {capitalize(this.props.i18nOk)}
           </Button>
         }
       >
@@ -832,7 +883,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         <div>
           <InputLabel
             classes={{
-              root: this.props.classes.label + " " + this.props.classes.labelSingleLine,
+              root: this.props.classes.label + " " +
+                (this.props.isRichText ? this.props.classes.labelSingleLine : this.props.classes.labelNoToolbar),
               focused: "focused",
             }}
             focused={this.state.focused}
@@ -841,27 +893,45 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
           </InputLabel>
           {
             this.props.isRichText ? (
-              <RichTextEditorToolbar
-              id={this.uuid}
-              i18n={this.props.i18nFormat}
-              supportsImages={this.props.supportsImages}
-              supportsFiles={this.props.supportsFiles}
-              supportsVideos={this.props.supportsVideos}
-            />) : null
+              <>
+                <RichTextEditorToolbar
+                  id={this.uuid}
+                  i18n={this.props.i18nFormat}
+                  supportsImages={this.props.supportsImages}
+                  supportsFiles={this.props.supportsFiles}
+                  supportsVideos={this.props.supportsVideos}
+                />
+                <ReactQuill
+                  ref={this.quillRef}
+                  className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
+                  modules={this.cachedModuleOptionsRich}
+                  formats={CACHED_FORMATS_RICH}
+                  theme={null}
+                  placeholder={capitalize(this.props.placeholder)}
+                  value={editorValue}
+                  onChange={this.onChange}
+                  onFocus={this.onFocus}
+                  onBlur={this.onBlur}
+                  disableClipboardMatchersOnUpdate={CACHED_CLIPBOARD_MATCHERS}
+                />
+              </>
+            ) : (
+              <div
+                className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
+              >
+                <SlowLoadingElement id="textarea">
+                  <TextareaAutosize
+                    className={this.props.classes.rawTextArea}
+                    onChange={this.onChangeByTextarea}
+                    placeholder={capitalize(this.props.placeholder)}
+                    value={editorValue}
+                    onFocus={this.onFocus}
+                    onBlur={this.onBlur}
+                  />
+                </SlowLoadingElement>
+              </div>
+            )
           }
-          <ReactQuill
-            ref={this.quillRef}
-            className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
-            modules={this.props.isRichText ? this.cachedModuleOptionsRich : this.cachedModuleOptionsNone}
-            formats={this.props.isRichText ? CACHED_FORMATS_RICH : CACHED_FORMATS_NONE}
-            theme={null}
-            placeholder={capitalize(this.props.placeholder)}
-            value={editorValue}
-            onChange={this.onChange}
-            onFocus={this.onFocus}
-            onBlur={this.onBlur}
-            disableClipboardMatchersOnUpdate={CACHED_CLIPBOARD_MATCHERS}
-          />
         </div>
         <div className={this.props.classes.errorMessage}>
           {this.props.currentInvalidReason}

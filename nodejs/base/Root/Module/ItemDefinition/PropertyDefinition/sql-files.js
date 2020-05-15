@@ -260,9 +260,9 @@ async function addFileFor(mainFilePath, curatedFileName, uploadsContainer, value
     const { createReadStream } = await value.src;
     const stream = createReadStream();
     const isImage = constants_1.FILE_SUPPORTED_IMAGE_TYPES.includes(value.type);
-    const needsImageProcessing = isImage && !value.type.startsWith("svg");
+    const needsImageProcessing = isImage && !value.type.startsWith("image/svg");
     if (needsImageProcessing) {
-        await image_conversions_1.runImageConversions(stream, mainFilePath, curatedFileName, uploadsContainer, propertyDefinition);
+        await image_conversions_1.runImageConversions(stream, mainFilePath, curatedFileName, value.type, uploadsContainer, propertyDefinition);
     }
     else {
         await sqlUploadPipeFile(uploadsContainer, stream, path_1.default.join(mainFilePath, curatedFileName));

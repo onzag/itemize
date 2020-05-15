@@ -17,7 +17,12 @@ properties.locale.placeholder = the locale this article is intented to be publis
 properties.locale.search.placeholder = the locale of the article
 properties.locale.description = The locale is either a language, eg. en, a country code eg. US or a combination en-US
 properties.locale.error.NOT_NULLABLE = the locale cannot be empty
-properties.locale.error.INVALID_SUBTYPE_VALUE = invalid locale`
+properties.locale.error.INVALID_SUBTYPE_VALUE = invalid locale
+
+properties.summary_image.label = summary image
+properties.summary_image.placeholder = upload a summary image
+properties.summary_image.error.NOT_NULLABLE = a summary image is required
+properties.summary_image.error.TOO_LARGE = only one image is required`
 
 const es = `[es]
 name = artículo
@@ -38,7 +43,12 @@ properties.locale.placeholder = la región localizada en la que el artículo va 
 properties.locale.search.placeholder = la región del artículo a buscar
 properties.locale.description = La locale puede ser a un lenguaje, eg. es, un código del país eg. ES o una combinación es-ES
 properties.locale.error.NOT_NULLABLE = la opción de regionalización debe ser definida
-properties.locale.error.INVALID_SUBTYPE_VALUE = la configuración regional es inválida`
+properties.locale.error.INVALID_SUBTYPE_VALUE = la configuración regional es inválida
+
+properties.summary_image.label = imagen del sumario
+properties.summary_image.placeholder = suba una imagen
+properties.summary_image.error.NOT_NULLABLE = la imagen de sumario es requerida
+properties.summary_image.error.TOO_LARGE = solo se permite un archivo`
 
 const ALL = {en, es};
 

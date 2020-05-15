@@ -78,7 +78,11 @@ function manyOptionsAnalysis(value) {
  * Runs the image conversions and stores them in the specified location
  * @returns a void promise for when this is done
  */
-async function runImageConversions(imageStream, filePath, fileName, uploadsContainer, propDef) {
+async function runImageConversions(imageStream, filePath, fileName, fileMimeType, uploadsContainer, propDef) {
+    const originalImageFilePath = path_1.default.join(filePath, fileName);
+    if (fileMimeType === "image/svg+xml") {
+        await sql_files_1.sqlUploadPipeFile(uploadsContainer, imageStream, originalImageFilePath);
+    }
     // the properties in question are, smallDimension
     const smallAnalyzed = singleOptionAnalysis(propDef.getSpecialProperty("smallDimension"), "small") || {
         name: "small",
@@ -111,7 +115,6 @@ async function runImageConversions(imageStream, filePath, fileName, uploadsConta
     if (allRemainingSizes) {
         imageConversionOutputs = imageConversionOutputs.concat(manyOptionsAnalysis(allRemainingSizes));
     }
-    const originalImageFilePath = path_1.default.join(filePath, fileName);
     // and now we get the filename without a extension and the dirname
     const fileNameNoExtension = path_1.default.basename(fileName, path_1.default.extname(fileName));
     // this is the sharp pipeline that will stream the data directly from the network
@@ -127,7 +130,7 @@ async function runImageConversions(imageStream, filePath, fileName, uploadsConta
             .resize(conversionOutput.width, conversionOutput.height, {
             fit: conversionOutput.fit,
             withoutEnlargement: true,
-        }).jpeg();
+        }).flatten({ background: { r: 255, g: 255, b: 255, alpha: 1 } }).jpeg();
         return sql_files_1.sqlUploadPipeFile(uploadsContainer, outputPipeline, outputFileName);
     }).concat([
         sql_files_1.sqlUploadPipeFile(uploadsContainer, imageStream, originalImageFilePath),

@@ -2,7 +2,7 @@ import React from "react";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
 import { SlowLoadingElement } from "../../components/util";
-import { Paper, createStyles, withStyles, WithStyles, Container, TextField, Box, Typography } from "@material-ui/core";
+import { Paper, createStyles, withStyles, WithStyles, Container, TextField, Box, Typography, Button } from "@material-ui/core";
 import Entry from "../../../components/property/Entry";
 import View from "../../../components/property/View";
 import LocationStateReader from "../../../components/navigation/LocationStateReader";
@@ -10,6 +10,7 @@ import { SubmitButton } from "../../components/buttons";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
 import Snackbar from "../../components/snackbar";
 import SubmitActioner from "../../../components/item-definition/SubmitActioner";
+import I18nRead from "../../../components/localization/I18nRead";
 
 const fragmentStyles = createStyles({
   paper: {
@@ -24,6 +25,29 @@ const fragmentStyles = createStyles({
   },
   box: {
     paddingBottom: "1rem",
+  },
+  articleContainer: {
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    position: "relative",
+    width: "100%",
+  },
+  articleImageContainer: {
+    position: "relative",
+    width: "50%",
+    paddingRight: "1rem",
+  },
+  articleImage: {
+    width: "100%",
+    borderRadius: 10,
+  },
+  articleText: {
+    width: "50%",
+    position: "relative",
+  },
+  articleSummary: {
+    padding: "1rem 0",
   },
 });
 
@@ -46,6 +70,7 @@ export const Article = withStyles(fragmentStyles)((props: WithStyles<typeof frag
                 "attachments",
                 "locale",
                 "summary",
+                "summary_image",
               ]}
               includePolicies={false}
               longTermCaching={false}
@@ -78,6 +103,7 @@ export const Article = withStyles(fragmentStyles)((props: WithStyles<typeof frag
                     requestAltOnImages: true,
                   }} />
                   <Entry id="summary" />
+                  <Entry id="summary_image" />
 
                   <SubmitButton
                     i18nId="submit"
@@ -88,10 +114,30 @@ export const Article = withStyles(fragmentStyles)((props: WithStyles<typeof frag
                         "attachments",
                         "locale",
                         "summary",
+                        "summary_image",
                       ],
                     }}
                   />
 
+                </Paper>
+
+                <Paper className={props.classes.paper2}>
+                  <ItemDefinitionLoader>
+                    <div className={props.classes.articleContainer}>
+                      <div className={props.classes.articleImageContainer}>
+                        <View id="summary_image" rendererArgs={{imageClassName: props.classes.articleImage}}/>
+                      </div>
+                      <div className={props.classes.articleText}>
+                        <Typography variant="h4"><View id="title" /></Typography>
+                        <div className={props.classes.articleSummary}>
+                          <View id="summary" />
+                        </div>
+                        <Button variant="outlined">
+                          <I18nRead id="read_more"/>
+                        </Button>
+                      </div>
+                    </div>
+                  </ItemDefinitionLoader>
                 </Paper>
 
                 <Paper className={props.classes.paper2}>

@@ -255,8 +255,8 @@ $EXTRAROLES
 properties.role.null_value = sin especificar
 properties.role.error.NOT_NULLABLE = falta el Rol
 
-properties.profile_picture.label = foto de Perfil
-properties.profile_picture.placeholder = subir Imagen
+properties.profile_picture.label = foto de perfil
+properties.profile_picture.placeholder = subir imagen
 properties.profile_picture.error.TOO_LARGE = sólo se permite un archivo
 
 properties.about_me.label = descripción personal

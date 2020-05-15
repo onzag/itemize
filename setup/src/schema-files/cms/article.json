@@ -11,6 +11,17 @@
             "type": "text",
             "subtype": "plain",
             "searchable": false
+        },
+        {
+            "id": "summary_image",
+            "type": "file",
+            "specialProperties": {
+                "imageUploader": true,
+                "smallDimension": "128x",
+                "mediumDimension": "256x",
+                "largeDimension": "512x"
+            },
+            "nullable": true
         }
     ],
     "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",

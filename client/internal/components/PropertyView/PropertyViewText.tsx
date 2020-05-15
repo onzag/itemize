@@ -9,6 +9,7 @@ import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/Prop
 
 export interface IPropertyViewTextRendererProps extends IPropertyViewRendererProps<PropertyDefinitionSupportedTextType> {
   isRichText: boolean;
+  subtype: null | "html" | "plain";
 }
 
 export const PROPERTY_VIEW_SANITIZE_CONFIG = {
@@ -17,6 +18,13 @@ export const PROPERTY_VIEW_SANITIZE_CONFIG = {
   ALLOW_UNKNOWN_PROTOCOLS: true,
 };
 
+function cleanAllAttribs(node: HTMLElement) {
+  Array.prototype.slice.call(node.attributes).forEach((attr: any) => {
+    node.removeAttribute(attr.name);
+  });
+}
+
+// TODO fix this function when https://github.com/cure53/DOMPurify/issues/435 has been fixed 
 export function propertyViewPostProcessingHook(
   relatedProperty: PropertyDefinition,
   currentFiles: IPropertyDefinitionSupportedSingleFilesType[],
@@ -29,19 +37,41 @@ export function propertyViewPostProcessingHook(
     if (supportsVideos) {
       const videoSrc = node.dataset.videoSrc || "";
       const origin = node.dataset.videoOrigin || "";
+      cleanAllAttribs(node);
+
+      // src
       if (origin === "vimeo") {
         node.setAttribute("src", `https://player.vimeo.com/video/${videoSrc}?title=0&byline=0&portrait=0&badge=0`);
       } else if (origin === "youtube") {
         node.setAttribute("src", `https://youtube.com/embed/${videoSrc}?rel=0`);
       }
+
+      // frameborder
+      (node as HTMLIFrameElement).frameBorder = "0";
+
+      // data-video-src
+      node.dataset.videoSrc = videoSrc;
+
+      // data-video-origin
+      node.dataset.videoOrigin = origin;
+
+      // allowfullscreen
+      (node as HTMLIFrameElement).allowFullscreen = true;
     } else {
       node.parentElement && node.parentElement.removeChild(node);
     }
-  } else if (node.tagName === "IMG" && currentFiles && currentFiles.length) {
+  } else if (node.tagName === "IMG") {
     if (supportsImages) {
       const srcId = node.dataset.srcId;
-      const currentFile = currentFiles.find((f) => f.id === srcId);
-      if (currentFile) {
+      const currentFile = currentFiles && currentFiles.find((f) => f.id === srcId);
+      const alt = (node as HTMLImageElement).alt || "";
+      const srcHeight = node.dataset.srcHeight;
+      const srcWidth = node.dataset.srcWidth;
+      cleanAllAttribs(node);
+
+      if (!srcId || !currentFile) {
+        node.parentElement && node.parentElement.removeChild(node);
+      } else {
         const absolutedFile = fileURLAbsoluter(
           currentFile,
           this.props.itemDefinition,
@@ -51,18 +81,36 @@ export function propertyViewPostProcessingHook(
           relatedProperty,
         );
         const srcset = imageSrcSetRetriever(absolutedFile, relatedProperty);
-        node.setAttribute("sizes", "70vw");
+
+        // srcset
         node.setAttribute("srcset", srcset);
-        node.setAttribute("src", absolutedFile ? absolutedFile.url : "/rest/resource/image-fail.svg")
+        // src
+        node.setAttribute("src", absolutedFile ? absolutedFile.url : "/rest/resource/image-fail.svg");
+        // sizes
+        node.setAttribute("sizes", "70vw");
+        // data-src-width
+        node.dataset.srcWidth = srcWidth;
+        // data-src-id
+        node.dataset.srcId = srcId;
+        // data-src-height
+        node.dataset.srcHeight = srcHeight;
+        // alt
+        (node as HTMLImageElement).alt = alt;
       }
     } else {
       node.parentElement && node.parentElement.removeChild(node);
     }
-  } else if (node.className === "file" && currentFiles && currentFiles.length) {
+  } else if (node.className === "file") {
     if (supportsFiles) {
       const srcId = node.dataset.srcId;
-      const currentFile = currentFiles.find((f) => f.id === srcId);
+      const src = node.dataset.src;
+      cleanAllAttribs(node);
+      const currentFile = currentFiles && currentFiles.find((f) => f.id === srcId);
+      
       if (currentFile) {
+        // spellcheck
+        node.spellcheck = false;
+
         const absolutedFile = fileURLAbsoluter(
           currentFile,
           this.props.itemDefinition,
@@ -71,9 +119,23 @@ export function propertyViewPostProcessingHook(
           this.props.include,
           relatedProperty,
         );
+
+        // data-src-id
+        node.dataset.srcId = srcId;
+
+        // data-src
         if (absolutedFile) {
           node.dataset.src = absolutedFile.url;
+        } else {
+          node.dataset.src = src;
         }
+
+        // contenteditable
+        node.contentEditable = "false";
+        // class
+        node.className = "file";
+      } else {
+        node.parentElement && node.parentElement.removeChild(node);
       }
     } else {
       node.parentElement && node.parentElement.removeChild(node);
@@ -83,7 +145,7 @@ export function propertyViewPostProcessingHook(
   return node;
 }
 
-export class PropertyViewText extends React.Component<IPropertyViewHandlerProps<IPropertyViewTextRendererProps>> {
+export default class PropertyViewText extends React.Component<IPropertyViewHandlerProps<IPropertyViewTextRendererProps>> {
   constructor(props: IPropertyViewHandlerProps<IPropertyViewTextRendererProps>) {
     super(props);
   }
@@ -126,6 +188,7 @@ export class PropertyViewText extends React.Component<IPropertyViewHandlerProps<
       rtl: this.props.rtl,
       currentValue,
       isRichText: this.props.property.isRichText(),
+      subtype: this.props.property.getSubtype() as any,
     };
 
     return <RendererElement {...rendererArgs}/>

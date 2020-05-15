@@ -6,7 +6,7 @@ import uuid from "uuid";
 import { PropertyDefinitionSupportedFileType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
 import prettyBytes from "pretty-bytes";
 import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, processAccepts } from "../../../../util";
-import { imageSizeRetriever, fileURLAbsoluter } from "../../../components/util";
+import { fileURLAbsoluter, imageSrcSetRetriever } from "../../../components/util";
 
 export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererProps<PropertyDefinitionSupportedFileType> {
   accept: string;
@@ -17,14 +17,9 @@ export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererP
   isSupportedImage: boolean;
   rejected: boolean;
   rejectedReason: string;
-  imageSizes: {
-    imageMediumSizeURL: string;
-    imageSmallSizeURL: string;
-    imageLargeSizeURL: string;
-    imageStandardSizeURL: string;
-  };
+  imageSrcSet: string;
   prettySize: string;
-  expectedExtension: string;
+  extension: string;
   onSetFile: (file: File) => void;
   onRemoveFile: () => void;
   openFile: (value: PropertyDefinitionSupportedFileType) => void;
@@ -92,7 +87,7 @@ export default class PropertyEntryFile
   public openFile(
     value: PropertyDefinitionSupportedFileType,
   ) {
-    window.open(value.url, "_blank");
+    window.open(value.url, value.name);
   }
   public onSetFile(file: File) {
     // when a drop is accepted, let's check, if it's a single file
@@ -200,12 +195,7 @@ export default class PropertyEntryFile
       }
     }
 
-    const imageSizes = isSupportedImage ? imageSizeRetriever(currentValue, null) : {
-      imageMediumSizeURL: null,
-      imageSmallSizeURL: null,
-      imageLargeSizeURL: null,
-      imageStandardSizeURL: null,
-    };
+    const imageSrcSet = isSupportedImage ? imageSrcSetRetriever(currentValue, this.props.property) : null;
 
     const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
     const accept = processAccepts(
@@ -233,10 +223,10 @@ export default class PropertyEntryFile
     genericSelectLabel = capitalize(genericSelectLabel);
 
     const prettySize = currentValue && prettyBytes(currentValue.size);
-    const expectedExtension = currentValue && mimeTypeToExtension(currentValue.type);
+    const extension = currentValue && mimeTypeToExtension(currentValue.type);
 
     const RendererElement = this.props.renderer;
-    const rendererArgs = {
+    const rendererArgs: IPropertyEntryFileRendererProps = {
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
       label: i18nLabel,
@@ -270,9 +260,9 @@ export default class PropertyEntryFile
       rejectedReason: this.state.rejectedReason,
 
       isSupportedImage,
-      imageSizes,
+      imageSrcSet,
       prettySize,
-      expectedExtension,
+      extension,
     };
 
     return <RendererElement {...rendererArgs} />;

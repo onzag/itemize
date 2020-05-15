@@ -8,6 +8,7 @@ import PropertyEntryTextRenderer from "./PropertyEntry/PropertyEntryText";
 
 import PropertyViewSimpleRenderer from "./PropertyView/PropertyViewSimple";
 import PropertyViewTextRenderer from "./PropertyView/PropertyViewText";
+import PropertyViewFileRenderer from "./PropertyView/PropertyViewFile";
 
 export const rendererContext: IRendererContext = {
   PropertyEntryField: PropertyEntryFieldRenderer,
@@ -16,7 +17,8 @@ export const rendererContext: IRendererContext = {
   PropertyEntryLocation: PropertyEntryLocationRenderer, 
   PropertyEntrySelect: PropertyEntrySelectRenderer,
   PropertyEntryText: PropertyEntryTextRenderer,
-  PropertyViewText: PropertyViewTextRenderer,
 
   PropertyViewSimple: PropertyViewSimpleRenderer,
+  PropertyViewText: PropertyViewTextRenderer,
+  PropertyViewFile: PropertyViewFileRenderer,
 }

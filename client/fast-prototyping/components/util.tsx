@@ -128,7 +128,8 @@ export class SlowLoadingElement extends React.Component<SlowLoadingElementProps,
   }
   public shouldComponentUpdate(nextProps: SlowLoadingElementProps, nextState: SlowLoadingElementState) {
     return this.state.isReady !== nextState.isReady ||
-      nextProps.id !== this.props.id;
+      nextProps.id !== this.props.id ||
+      nextProps.children !== this.props.children;
   }
   public componentDidMount() {
     this.makeReady();

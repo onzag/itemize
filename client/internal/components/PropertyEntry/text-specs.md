@@ -12,7 +12,7 @@ During edition if there is a image the image should be formed in this form
 <div class="image">
   <div class="image-container">
     <div class="image-pad" style="padding-bottom: 50%">
-      <img data-src-id="FILE2132131231231" data-src-width="1000" data-src-height="500">
+      <img alt="" data-src-height="500" data-src-id="FILE2132131231231" data-src-width="1000">
     </div>
   </div>
 </div>
@@ -25,7 +25,7 @@ is still valid and appropiate.
 <div class="image">
   <div class="image-container">
     <div class="image-pad" style="padding-bottom: 50%">
-      <img data-src-id="FILE2132131231231" data-src-width="1000" data-src-height="500" src="blob:xxxxxx" srcset="etc..." sizes="70vw">
+      <img alt="" data-src-height="500" data-src-id="FILE2132131231231" data-src-width="1000" sizes="70vw" src="blob:xxxxxx" srcset="etc...">
     </div>
   </div>
 </div>
@@ -72,7 +72,7 @@ Videos are loaded via iframes, either from youtube or vimeo
 ```html
 <div class="video">
   <div class="video-container">
-    <iframe data-video-src="ID" data-video-origin="youtube" allowfullscreen frameborder="0"></iframe>
+    <iframe allowfullscreen data-video-origin="youtube" data-video-src="ID" frameborder="0"></iframe>
   </div>
 </div>
 ```
@@ -82,7 +82,7 @@ Videos are loaded via iframes, either from youtube or vimeo
 ```html
 <div class="video">
   <div class="video-container">
-    <iframe data-video-src="ID" data-video-origin="vimeo" src="https://player.vimeo.com/video/ID?title=0&byline=0&portrait=0&badge=0" frameborder="0" allowfullscreen>
+    <iframe allowfullscreen data-video-origin="vimeo" data-video-src="ID" frameborder="0" src="https://player.vimeo.com/video/ID?title=0&byline=0&portrait=0&badge=0">
   </div>
 </div>
 ```
@@ -117,7 +117,7 @@ A recommended css is, in order to have a good aspect ratio
 Files can be inserted into the document and work similarly to images
 
 ```html
-<span class="file" data-src-id="FILE2132131231231" spellcheck="false" contenteditable="false">
+<span class="file" contenteditable="false" data-src-id="FILE2132131231231" spellcheck="false">
   <span class="file-container">
     <span class="file-icon">
       <span class="file-extension">txt</span>
@@ -132,7 +132,7 @@ As these are meant to be synced to the file data itself, open the file by using 
 allowed and will be cleared
 
 ```html
-<span class="file" data-src-id="FILE2132131231231" data-src="blob:xxxxxx" spellcheck="false" contenteditable="false">
+<span class="file" contenteditable="false" data-src="blob:xxxxxx" data-src-id="FILE2132131231231" spellcheck="false">
   <span class="file-container">
     <span class="file-icon">
       <span class="file-extension">txt</span>

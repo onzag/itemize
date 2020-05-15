@@ -53,7 +53,7 @@ export function imageSrcSetRetriever(fileData: IGQLFile, property: PropertyDefin
   if (
     fileData &&
     fileData.url.indexOf("blob:") !== 0 &&
-    fileData.type.indexOf("svg") !== 0
+    fileData.type.indexOf("image/svg") !== 0
   ) {
     const sizes = imageSizeRetriever(fileData, property);
     let theLargest = 0;

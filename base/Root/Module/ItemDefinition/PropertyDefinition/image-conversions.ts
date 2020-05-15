@@ -108,9 +108,19 @@ export async function runImageConversions(
   imageStream: ReadStream,
   filePath: string,
   fileName: string,
+  fileMimeType: string,
   uploadsContainer: pkgcloud.storage.Container,
   propDef: PropertyDefinition,
 ): Promise<void> {
+  const originalImageFilePath = path.join(filePath, fileName);
+  if (fileMimeType === "image/svg+xml") {
+    await sqlUploadPipeFile(
+      uploadsContainer,
+      imageStream,
+      originalImageFilePath,
+    );
+  }
+
   // the properties in question are, smallDimension
   const smallAnalyzed: IImageConversionArguments = singleOptionAnalysis(
     propDef.getSpecialProperty("smallDimension") as string,
@@ -157,7 +167,6 @@ export async function runImageConversions(
     imageConversionOutputs = imageConversionOutputs.concat(manyOptionsAnalysis(allRemainingSizes));
   }
 
-  const originalImageFilePath = path.join(filePath, fileName);
   // and now we get the filename without a extension and the dirname
   const fileNameNoExtension = path.basename(fileName, path.extname(fileName));
   // this is the sharp pipeline that will stream the data directly from the network
@@ -174,7 +183,7 @@ export async function runImageConversions(
       .resize(conversionOutput.width, conversionOutput.height, {
         fit: conversionOutput.fit,
         withoutEnlargement: true,
-      }).jpeg();
+      }).flatten({background: {r: 255, g: 255, b: 255, alpha: 1}}).jpeg();
 
     return sqlUploadPipeFile(
       uploadsContainer,

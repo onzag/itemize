@@ -122,7 +122,7 @@ export function processAccepts(accept: string, isExpectingImages?: boolean) {
  * @param accept the accept property
  */
 export function checkFileInAccepts(fileType: string, accept: string) {
-  var typeRegex = new RegExp(accept.replace(/\*/g, '.\*').replace(/\,/g, '|'));
+  const typeRegex = new RegExp(accept.replace(/\*/g, '.\*').replace(/\,/g, '|').replace(/\+/g, "\\+"));
   return typeRegex.test(fileType);
 }
 

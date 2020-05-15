@@ -172,6 +172,12 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
     return (
       <PropertyViewRichTextViewer>{props.currentValue}</PropertyViewRichTextViewer>
     )
+  } else if (props.subtype === "plain") {
+    return (
+      <div className="plain-text">
+        {props.currentValue}
+      </div>
+    );
   }
   return (
     <span>

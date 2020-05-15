@@ -38,6 +38,8 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
   mediaPropertyAcceptsFiles: string;
   mediaPropertyAcceptsImages: string;
 
+  i18nGenericError: string;
+  i18nOk: string;
   lastLoadedFileError: string;
   dismissLastLoadedFileError: () => void;
 
@@ -176,6 +178,7 @@ export default class PropertyEntryText
       currentValue.forEach((v) => {
         // if it's not in the gathered list
         if (!idsGathered.includes(v.id)) {
+          console.log(value, currentValue);
           this.onRemoveFile(v.id);
         }
       });
@@ -354,6 +357,7 @@ export default class PropertyEntryText
     const supportsVideos = isRichText && !!this.props.property.getSpecialProperty("supportsVideos");
     const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
     const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
+    const i18nInLanguage = this.props.i18n[this.props.language];
 
     let currentValue = this.props.state.value as string;
     if (supportsMedia && currentValue && !this.props.state.stateValueHasBeenManuallySet) { 
@@ -394,11 +398,11 @@ export default class PropertyEntryText
     let lastLoadedFileError = this.state.lastLoadedFileError;
     if (lastLoadedFileError === "image_uploader_file_too_big" || lastLoadedFileError === "file_uploader_file_too_big") {
       lastLoadedFileError = localeReplacer(
-        this.props.i18n[this.props.language][lastLoadedFileError],
+        i18nInLanguage[lastLoadedFileError],
         prettyBytes(MAX_FILE_SIZE),
       );
     } else if (lastLoadedFileError) {
-      lastLoadedFileError = this.props.i18n[this.props.language][lastLoadedFileError];
+      lastLoadedFileError = i18nInLanguage[lastLoadedFileError];
     }
 
     const RendererElement = this.props.renderer;
@@ -422,25 +426,28 @@ export default class PropertyEntryText
       autoFocus: this.props.autoFocus || false,
 
       i18nFormat: {
-        formatBoldLabel: this.props.i18n[this.props.language].format_bold,
-        formatItalicLabel: this.props.i18n[this.props.language].format_italic,
-        formatUnderlineLabel: this.props.i18n[this.props.language].format_underline,
-        formatTitleLabel: this.props.i18n[this.props.language].format_title,
-        formatQuoteLabel: this.props.i18n[this.props.language].format_quote,
-        formatListNumberedLabel: this.props.i18n[this.props.language].format_list_numbered,
-        formatListBulletedLabel: this.props.i18n[this.props.language].format_list_bulleted,
-        formatAddImageLabel: this.props.i18n[this.props.language].format_add_image,
-        formatAddVideoLabel: this.props.i18n[this.props.language].format_add_video,
-        formatAddFileLabel: this.props.i18n[this.props.language].format_add_file,
+        formatBoldLabel: i18nInLanguage.format_bold,
+        formatItalicLabel: i18nInLanguage.format_italic,
+        formatUnderlineLabel: i18nInLanguage.format_underline,
+        formatTitleLabel: i18nInLanguage.format_title,
+        formatQuoteLabel: i18nInLanguage.format_quote,
+        formatListNumberedLabel: i18nInLanguage.format_list_numbered,
+        formatListBulletedLabel: i18nInLanguage.format_list_bulleted,
+        formatAddImageLabel: i18nInLanguage.format_add_image,
+        formatAddVideoLabel: i18nInLanguage.format_add_video,
+        formatAddFileLabel: i18nInLanguage.format_add_file,
       },
 
       i18nLoadVideo: {
-        title: this.props.i18n[this.props.language].video_loader_title,
-        label: this.props.i18n[this.props.language].video_loader_label,
-        placeholder: this.props.i18n[this.props.language].video_loader_placeholder,
-        invalid: this.props.i18n[this.props.language].video_loader_invalid,
-        submit: this.props.i18n[this.props.language].video_loader_submit,
+        title: i18nInLanguage.video_loader_title,
+        label: i18nInLanguage.video_loader_label,
+        placeholder: i18nInLanguage.video_loader_placeholder,
+        invalid: i18nInLanguage.video_loader_invalid,
+        submit: i18nInLanguage.video_loader_submit,
       },
+
+      i18nGenericError: i18nInLanguage["generic_error"],
+      i18nOk: i18nInLanguage["ok"],
 
       supportsImages,
       supportsFiles,
