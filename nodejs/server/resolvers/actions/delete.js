@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const __1 = require("../../");
 const ItemDefinition_1 = require("../../../base/Root/Module/ItemDefinition");
-const debug_1 = __importDefault(require("debug"));
 const basic_1 = require("../basic");
 const graphql_fields_1 = __importDefault(require("graphql-fields"));
 const errors_1 = require("../../../base/errors");
@@ -12,9 +12,8 @@ const constants_1 = require("../../../constants");
 const gql_util_1 = require("../../../gql-util");
 const sql_1 = require("../../../base/Root/Module/ItemDefinition/sql");
 const triggers_1 = require("../triggers");
-const debug = debug_1.default("resolvers:deleteItemDefinition");
 async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
-    debug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
+    __1.logger.debug("deleteItemDefinition: executed delete for " + itemDefinition.getQualifiedPathName());
     // do the basic things, check the language and region
     // and get the token data
     basic_1.checkLanguage(appData, resolverArgs.args);
@@ -26,9 +25,8 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     basic_1.checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
     // now we get this basic information
     const mod = itemDefinition.getParentModule();
-    const moduleTable = mod.getQualifiedPathName();
     const selfTable = itemDefinition.getQualifiedPathName();
-    debug("Checking access to the element to delete");
+    __1.logger.debug("deleteItemDefinition: checking policy check for delete");
     // we need to run the policy check for delete,
     // because there might be extra rules for data request
     // for doing a delete, for example, requesting a password
@@ -52,7 +50,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
         preValidation: (content) => {
             // if there is no userId then the row was null, we throw an error
             if (!content) {
-                debug("FAILED due to lack of content data");
+                __1.logger.debug("deleteItemDefinition: failed due to lack of content data");
                 throw new errors_1.EndpointError({
                     message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
                     code: constants_1.ENDPOINT_ERRORS.NOT_FOUND,
@@ -73,7 +71,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
                     (rolesThatHaveAccessToModerationFields.includes(constants_1.ANYONE_LOGGED_METAROLE) && tokenData.role !== constants_1.GUEST_METAROLE) ||
                     rolesThatHaveAccessToModerationFields.includes(tokenData.role);
                 if (!hasAccessToModerationFields) {
-                    debug("FAILED due to blocked content and no moderation access for role %s", tokenData.role);
+                    __1.logger.debug("deleteItemDefinition: failed due to blocked content and no moderation access for role " + tokenData.role);
                     throw new errors_1.EndpointError({
                         message: "The item is blocked, only users with role " +
                             rolesThatHaveAccessToModerationFields.join(",") + " can wipe this data",
@@ -86,7 +84,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     // yet now we check the role access, for the action of delete
     // note how we don't pass requested fields, because that's irrelevant
     // for the delete action
-    debug("Checking role access for delete");
+    __1.logger.debug("deleteItemDefinition: checking role access for delete");
     itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.DELETE, tokenData.role, tokenData.id, userId, null, true);
     // however now we need to check if we have triggers, for that we get
     // the absolute paths
@@ -99,7 +97,6 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     if (itemDefinitionTrigger || moduleTrigger) {
         // we need to use the gql stored value for the trigger
         const currentWholeValueAsGQL = sql_1.convertSQLValueToGQLValueForItemDefinition(itemDefinition, wholeSqlStoredValue);
-        debug("Current GQL value found as %j", currentWholeValueAsGQL);
         if (moduleTrigger) {
             // we execute the trigger
             await moduleTrigger({
@@ -127,7 +124,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
         }
     }
     await appData.cache.requestDelete(itemDefinition, resolverArgs.args.id, resolverArgs.args.version, false, resolverArgs.args.listener_uuid || null);
-    debug("SUCCEED");
+    __1.logger.debug("deleteItemDefinition: done");
     // return null, yep, the output is always null, because it's gone
     // however we are not running the check on the fields that can be read
     // but anyway there's no usable data, so why would we need a check

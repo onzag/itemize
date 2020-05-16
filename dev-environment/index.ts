@@ -6,6 +6,7 @@ import { ensureConfigDirectory } from "../setup";
 import { readConfigFile } from "../setup";
 import colors from "colors";
 import { execSudo } from "../setup/exec";
+import equals from "deep-equal";
 
 export async function start() {
   await ensureConfigDirectory();
@@ -69,19 +70,27 @@ export async function start() {
     }
   }
 
+  if (!equals(redisConfigDevelopment.cache, redisConfigDevelopment.global)) {
+    console.log(colors.red("The dev environment uses a single redis instance (the global), yet cache and global do not match, this will cause issues"));
+  }
+
+  if (!equals(redisConfigDevelopment.pubSub, redisConfigDevelopment.global)) {
+    console.log(colors.red("The dev environment uses a single redis instance (the global), yet pubSub and global do not match, this will cause issues"));
+  }
+
   if (
-    redisConfigDevelopment.host !== "localhost" &&
-    redisConfigDevelopment.host !== "127.0.0.1"
+    redisConfigDevelopment.global.host !== "localhost" &&
+    redisConfigDevelopment.global.host !== "127.0.0.1"
   ) {
-    console.log(colors.red("Development environment redis is not set to localhost but to ") + redisConfigDevelopment.host);
+    console.log(colors.red("Development environment redis is not set to localhost but to ") + redisConfigDevelopment.global.host);
     console.log(colors.red("As so it cannot be executed"));
   } else if (
-    redisConfigDevelopment.password
+    redisConfigDevelopment.global.password
   ) {
     console.log(colors.red("Development environment with redis is set with a password protection"));
     console.log(colors.red("As so it cannot be executed"));
   } else if (
-    redisConfigDevelopment.path
+    redisConfigDevelopment.global.path
   ) {
     console.log(colors.red("Development environment with redis is set with an unix socket"));
     console.log(colors.red("As so it cannot be executed"));
@@ -91,7 +100,7 @@ export async function start() {
     try {
       await execSudo(
         `docker run --name ${dockerprefixer}_devredis ` +
-        `-p ${redisConfigDevelopment.port}:6379 -d redis`,
+        `-p ${redisConfigDevelopment.global.port}:6379 -d redis`,
         "Itemize Docker Contained REDIS Database",
       );
     } catch (err) {
@@ -135,11 +144,11 @@ export async function stop() {
 
   if (
     (
-      redisConfigDevelopment.host === "localhost" ||
-      redisConfigDevelopment.host === "127.0.0.1"
+      redisConfigDevelopment.global.host === "localhost" ||
+      redisConfigDevelopment.global.host === "127.0.0.1"
     ) &&
-    !redisConfigDevelopment.password &&
-    !redisConfigDevelopment.path
+    !redisConfigDevelopment.global.password &&
+    !redisConfigDevelopment.global.path
   ) {
     try {
       console.log(colors.yellow("Please allow Itemize to stop the REDIS docker container"));

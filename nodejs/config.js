@@ -249,7 +249,7 @@ exports.rawDBConfigSchema = {
         "password",
     ],
 };
-exports.rawRedisConfigSchema = {
+exports.rawRedisConfigSchemaPart = {
     type: "object",
     properties: {
         host: {
@@ -296,5 +296,19 @@ exports.rawRedisConfigSchema = {
         "path",
         "db",
         "password",
+    ],
+};
+exports.rawRedisConfigSchema = {
+    type: "object",
+    properties: {
+        global: exports.rawRedisConfigSchemaPart,
+        cache: exports.rawRedisConfigSchemaPart,
+        pubSub: exports.rawRedisConfigSchemaPart,
+    },
+    additionalProperties: false,
+    required: [
+        "global",
+        "cache",
+        "pubSub",
     ],
 };

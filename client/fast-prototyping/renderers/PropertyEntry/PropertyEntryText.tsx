@@ -267,6 +267,9 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
       backgroundColor: "#1976d2",
     },
   },
+  toolbar: {
+    overflow: "auto",
+  },
   textButton: {
     border: "solid 1px rgba(0,0,0,0.1)",
     display: "flex",
@@ -366,9 +369,10 @@ function RichTextEditorToolbar(props: {
   supportsImages: boolean;
   supportsFiles: boolean;
   supportsVideos: boolean;
+  className: string;
 }) {
   return (
-    <Toolbar id={props.id}>
+    <Toolbar id={props.id} className={props.className}>
       <IconButton
         tabIndex={-1}
         title={props.i18n.formatBoldLabel}
@@ -900,6 +904,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
                   supportsImages={this.props.supportsImages}
                   supportsFiles={this.props.supportsFiles}
                   supportsVideos={this.props.supportsVideos}
+                  className={this.props.classes.toolbar}
                 />
                 <ReactQuill
                   ref={this.quillRef}

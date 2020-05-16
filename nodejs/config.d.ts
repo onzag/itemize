@@ -48,12 +48,17 @@ export interface IDBConfigRawJSONDataType {
     password: string;
     database: string;
 }
-export interface IRedisConfigRawJSONDataType {
+export interface ISingleRedisConfigRawJSONDataType {
     host?: string;
     port?: number;
     path?: string;
     db?: number;
     password?: string;
+}
+export interface IRedisConfigRawJSONDataType {
+    global: ISingleRedisConfigRawJSONDataType;
+    cache: ISingleRedisConfigRawJSONDataType;
+    pubSub: ISingleRedisConfigRawJSONDataType;
 }
 export declare const rawSensitiveConfigSchema: {
     type: string;
@@ -229,7 +234,7 @@ export declare const rawDBConfigSchema: {
     additionalProperties: boolean;
     required: string[];
 };
-export declare const rawRedisConfigSchema: {
+export declare const rawRedisConfigSchemaPart: {
     type: string;
     properties: {
         host: {
@@ -252,6 +257,97 @@ export declare const rawRedisConfigSchema: {
             anyOf: {
                 type: string;
             }[];
+        };
+    };
+    additionalProperties: boolean;
+    required: string[];
+};
+export declare const rawRedisConfigSchema: {
+    type: string;
+    properties: {
+        global: {
+            type: string;
+            properties: {
+                host: {
+                    type: string;
+                };
+                port: {
+                    type: string;
+                };
+                path: {
+                    anyOf: {
+                        type: string;
+                    }[];
+                };
+                db: {
+                    anyOf: {
+                        type: string;
+                    }[];
+                };
+                password: {
+                    anyOf: {
+                        type: string;
+                    }[];
+                };
+            };
+            additionalProperties: boolean;
+            required: string[];
+        };
+        cache: {
+            type: string;
+            properties: {
+                host: {
+                    type: string;
+                };
+                port: {
+                    type: string;
+                };
+                path: {
+                    anyOf: {
+                        type: string;
+                    }[];
+                };
+                db: {
+                    anyOf: {
+                        type: string;
+                    }[];
+                };
+                password: {
+                    anyOf: {
+                        type: string;
+                    }[];
+                };
+            };
+            additionalProperties: boolean;
+            required: string[];
+        };
+        pubSub: {
+            type: string;
+            properties: {
+                host: {
+                    type: string;
+                };
+                port: {
+                    type: string;
+                };
+                path: {
+                    anyOf: {
+                        type: string;
+                    }[];
+                };
+                db: {
+                    anyOf: {
+                        type: string;
+                    }[];
+                };
+                password: {
+                    anyOf: {
+                        type: string;
+                    }[];
+                };
+            };
+            additionalProperties: boolean;
+            required: string[];
         };
     };
     additionalProperties: boolean;

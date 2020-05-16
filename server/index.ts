@@ -33,7 +33,27 @@ import pkgcloud from "pkgcloud";
 import { setupHere, Here } from "./services/here";
 import { promisify } from "util";
 
-// TODO comment and document
+import winston from "winston";
+import "winston-daily-rotate-file";
+
+// building the logger
+export const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || (process.env.NODE_ENV !== "production" ? "debug" : "info"),
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.DailyRotateFile({ filename: "logs/error.log", level: "error" }),
+    new winston.transports.DailyRotateFile({ filename: "logs/info.log", level: "info" })
+  ]
+});
+
+// if not production add a console.log
+if (process.env.NODE_ENV !== "production") {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple()
+    })
+  );
+}
 
 // Setting the parsers, postgresql comes with
 // its own way to return this data and I want it
@@ -64,6 +84,7 @@ export interface IAppDataType {
   listener: Listener;
   cache: Cache;
   redis: RedisClient;
+  redisGlobal: RedisClient;
   redisPub: RedisClient;
   redisSub: RedisClient;
   buildnumber: string;
@@ -84,6 +105,11 @@ export interface IServerCustomizationDataType {
   customTriggers?: ITriggerRegistry;
 }
 
+/**
+ * This is the function that catches the errors that are thrown
+ * within graphql
+ * @param error the error that is thrown
+ */
 const customFormatErrorFn = (error: GraphQLError) => {
   const originalError = error.originalError;
   let constructor = null;
@@ -98,6 +124,13 @@ const customFormatErrorFn = (error: GraphQLError) => {
       extensions = gqlDataInputError.data;
       break;
     default:
+      logger.error(
+        "customFormatErrorFn: Caught unexpected error from graphql parsing",
+        {
+          errMessage: error.originalError.message,
+          errStack: error.originalError.stack,
+        },
+      );
       extensions = {
         message: "Unspecified Error while parsing data",
         code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -110,6 +143,15 @@ const customFormatErrorFn = (error: GraphQLError) => {
   };
 };
 
+/**
+ * The resolve wrappers that wraps every resolve function
+ * from graphql
+ * @param fn the function that is supposed to run
+ * @param source graphql source
+ * @param args grapql args
+ * @param context grapql context
+ * @param info graphql info
+ */
 async function customResolveWrapper(
   fn: any,
   source: any,
@@ -123,7 +165,13 @@ async function customResolveWrapper(
     if (err instanceof EndpointError) {
       throw err;
     }
-    console.error(err.stack);
+    logger.error(
+      "customResolveWrapper: Found internal server error",
+      {
+        errStack: err.stack,
+        errMessage: err.message,
+      }
+    );
     throw new EndpointError({
       message: "Internal Server Error",
       code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
@@ -131,31 +179,43 @@ async function customResolveWrapper(
   }
 }
 
+/**
+ * Initializes the server application with its configuration
+ * @param appData the application data to use
+ * @param custom the custom config that has been passed
+ */
 function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataType) {
+  // removing the powered by header
   app.use((req, res, next) => {
     res.removeHeader("X-Powered-By");
     next();
   });
 
+  // if we have a custom router and custom router endpoint rather than the standard
   if (custom.customRouterEndpoint) {
     app.use(custom.customRouterEndpoint, custom.customRouter(appData));
   } else if (custom.customRouter) {
     app.use(custom.customRouter(appData));
   }
+
+  // adding rest services
   app.use("/rest/user", userRestServices(appData));
   app.use("/rest", restServices(appData));
 
+  // custom graphql queries combined
   const allCustomQueries = {
     ...customUserQueries(appData),
     ...(custom.customGQLQueries && custom.customGQLQueries(appData)),
     ...(custom.customTokenGQLQueries && buildCustomTokenQueries(appData, custom.customTokenGQLQueries)),
   };
 
+  // custom mutations combined
   const allCustomMutations = {
     ...customUserMutations(appData),
     ...(custom.customGQLMutations && custom.customGQLMutations(appData)),
   };
 
+  // now we need to combine such queries with the resolvers
   const finalAllCustomQueries = {};
   Object.keys(allCustomQueries).forEach((customQueryKey) => {
     finalAllCustomQueries[customQueryKey] = {
@@ -164,6 +224,7 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     };
   });
 
+  // do the same with the mutations
   const finalAllCustomMutations = {};
   Object.keys(allCustomMutations).forEach((customMutationKey) => {
     finalAllCustomMutations[customMutationKey] = {
@@ -172,6 +233,7 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     };
   });
 
+  // now weadd the graphql endpoint
   app.use(
     "/graphql",
     graphqlUploadExpress({
@@ -191,6 +253,7 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     }),
   );
 
+  // service worker setup
   app.get("/sw.development.js", (req, res) => {
     res.sendFile(path.resolve(path.join("dist", "data", "service-worker.development.js")));
   });
@@ -198,6 +261,7 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     res.sendFile(path.resolve(path.join("dist", "data", "service-worker.production.js")));
   });
 
+  // and now the main index setup
   app.get("*", (req, res) => {
     res.setHeader("content-type", "text/html; charset=utf-8");
     const mode = getMode(appData, req);
@@ -209,6 +273,11 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
   });
 }
 
+/**
+ * Provides the pkgloud client container from ovh
+ * @param client the client to use
+ * @param containerName the container name
+ */
 function getContainerPromisified(client: pkgcloud.storage.Client, containerName: string): Promise<pkgcloud.storage.Container> {
   return new Promise((resolve, reject) => {
     client.getContainer(containerName, (err, container) => {
@@ -234,156 +303,254 @@ function getContainerPromisified(client: pkgcloud.storage.Client, containerName:
  * @param custom.customTriggers a registry for custom triggers
  */
 export async function initializeServer(custom: IServerCustomizationDataType = {}) {
+  try {
+    logger.info(
+      "initializeServer: reading configuration data"
+    );
 
-  // first let's read all the configurations
-  let rawBuild: string;
-  let rawConfig: string;
-  let rawSensitiveConfig: string;
-  let rawRedisConfig: string;
-  let rawDbConfig: string;
-  let index: string;
-  let buildnumber: string;
-  [
-    rawConfig,
-    rawSensitiveConfig,
-    rawRedisConfig,
-    rawDbConfig,
-    index,
-    rawBuild,
-    buildnumber,
-  ] = await Promise.all([
-    fsAsync.readFile(path.join("dist", "config.json"), "utf8"),
-    fsAsync.readFile(path.join("dist", "sensitive.json"), "utf8"),
-    fsAsync.readFile(path.join("dist", "redis.json"), "utf8"),
-    fsAsync.readFile(path.join("dist", "db.json"), "utf8"),
-    fsAsync.readFile(path.join("dist", "data", "index.html"), "utf8"),
-    fsAsync.readFile(path.join("dist", "data", "build.all.json"), "utf8"),
-    fsAsync.readFile(path.join("dist", "buildnumber"), "utf8"),
-  ]);
-  const config: IConfigRawJSONDataType = JSON.parse(rawConfig);
-  const sensitiveConfig: ISensitiveConfigRawJSONDataType = JSON.parse(rawSensitiveConfig);
-  const dbConfig: IDBConfigRawJSONDataType = JSON.parse(rawDbConfig);
-  const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(rawRedisConfig);
-  const build: IRootRawJSONDataType = JSON.parse(rawBuild);
+    // first let's read all the configurations
+    let rawBuild: string;
+    let rawConfig: string;
+    let rawSensitiveConfig: string;
+    let rawRedisConfig: string;
+    let rawDbConfig: string;
+    let index: string;
+    let buildnumber: string;
+    [
+      rawConfig,
+      rawSensitiveConfig,
+      rawRedisConfig,
+      rawDbConfig,
+      index,
+      rawBuild,
+      buildnumber,
+    ] = await Promise.all([
+      fsAsync.readFile(path.join("dist", "config.json"), "utf8"),
+      fsAsync.readFile(path.join("dist", "sensitive.json"), "utf8"),
+      fsAsync.readFile(path.join("dist", "redis.json"), "utf8"),
+      fsAsync.readFile(path.join("dist", "db.json"), "utf8"),
+      fsAsync.readFile(path.join("dist", "data", "index.html"), "utf8"),
+      fsAsync.readFile(path.join("dist", "data", "build.all.json"), "utf8"),
+      fsAsync.readFile(path.join("dist", "buildnumber"), "utf8"),
+    ]);
+    const config: IConfigRawJSONDataType = JSON.parse(rawConfig);
+    const sensitiveConfig: ISensitiveConfigRawJSONDataType = JSON.parse(rawSensitiveConfig);
+    const dbConfig: IDBConfigRawJSONDataType = JSON.parse(rawDbConfig);
+    const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(rawRedisConfig);
+    const build: IRootRawJSONDataType = JSON.parse(rawBuild);
 
-  // redis configuration despite instructions actually tries to use null
-  // values as it checks for undefined so we need to strip these if null
-  Object.keys(redisConfig).forEach((key) => {
-    if (redisConfig[key] === null) {
-      delete redisConfig[key];
+    // redis configuration despite instructions actually tries to use null
+    // values as it checks for undefined so we need to strip these if null
+    Object.keys(redisConfig.cache).forEach((key) => {
+      if (redisConfig.cache[key] === null) {
+        delete redisConfig.cache[key];
+      }
+    });
+    Object.keys(redisConfig.pubSub).forEach((key) => {
+      if (redisConfig.pubSub[key] === null) {
+        delete redisConfig.pubSub[key];
+      }
+    });
+    Object.keys(redisConfig.global).forEach((key) => {
+      if (redisConfig.global[key] === null) {
+        delete redisConfig.global[key];
+      }
+    });
+
+    // this shouldn't be necessary but we do it anyway
+    buildnumber = buildnumber.replace("\n", "").trim();
+    logger.info(
+      "initializeServer: buildnumber is " + buildnumber,
+    );
+
+    logger.info(
+      "initializeServer: initializing itemize server root",
+    );
+    const root = new Root(build);
+
+    // Create the connection string
+    const dbConnectionKnexConfig = {
+      host: dbConfig.host,
+      port: dbConfig.port,
+      user: dbConfig.user,
+      password: dbConfig.password,
+      database: dbConfig.database,
+    };
+
+    logger.info(
+      "initializeServer: setting up database connection to " + dbConfig.host,
+    );
+
+    // we only need one client instance
+    const knex = Knex({
+      client: "pg",
+      debug: process.env.NODE_ENV !== "production",
+      connection: dbConnectionKnexConfig,
+    });
+
+    logger.info(
+      "initializeServer: initializing redis cache client",
+    );
+    const redisClient: RedisClient = redis.createClient(redisConfig.cache);
+    logger.info(
+      "initializeServer: initializing redis global cache client",
+    );
+    const redisGlobalClient: RedisClient = redis.createClient(redisConfig.global);
+
+    logger.info(
+      "initializeServer: initializing redis pub/sub client",
+    );
+    const redisPub: RedisClient = redis.createClient(redisConfig.pubSub);
+    const redisSub: RedisClient = redis.createClient(redisConfig.pubSub);
+
+    PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
+
+    // due to a bug in the types the create client function is missing
+    // domainId and domainName
+    logger.info(
+      "initializeServer: initializing openstack pkgcloud objectstorage client",
+    );
+    const pkgcloudStorageClient = pkgcloud.storage.createClient({
+      provider: "openstack",
+      username: sensitiveConfig.openStackUsername,
+      keystoneAuthVersion: 'v3',
+      region: sensitiveConfig.openStackRegion,
+      domainId: "default",
+      domainName: sensitiveConfig.openStackDomainName,
+      password: sensitiveConfig.openStackPassword,
+      authUrl: sensitiveConfig.openStackAuthUrl,
+    } as any);
+
+    logger.info(
+      "initializeServer: retrieving container " + sensitiveConfig.openStackUploadsContainerName,
+    );
+    const pkgcloudUploadsContainer =
+      await getContainerPromisified(pkgcloudStorageClient, sensitiveConfig.openStackUploadsContainerName);
+
+    logger.info(
+      "initializeServer: initializing cache instance",
+    );
+    const cache = new Cache(redisClient, knex, pkgcloudUploadsContainer, root);
+    logger.info(
+      "initializeServer: creating server",
+    );
+    const server = http.createServer(app);
+
+    logger.info(
+      "initializeServer: setting up websocket socket.io listener",
+    );
+    const listener = new Listener(
+      buildnumber,
+      redisSub,
+      redisPub,
+      root,
+      cache,
+      knex,
+      server,
+    );
+
+    if (sensitiveConfig.ipStackAccessKey) {
+      logger.info(
+        "initializeServer: initializing ipstack connection",
+      );
     }
-  });
+    const ipStack = sensitiveConfig.ipStackAccessKey ?
+      setupIPStack(sensitiveConfig.ipStackAccessKey) :
+      null;
 
-  // this shouldn't be necessary but we do it anyway
-  buildnumber = buildnumber.replace("\n", "").trim();
-  const root = new Root(build);
+    if (sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain) {
+      logger.info(
+        "initializeServer: initializing mailgun connection",
+      );
+    }
+    const mailgun = sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain ?
+      setupMailgun({
+        apiKey: sensitiveConfig.mailgunAPIKey,
+        domain: sensitiveConfig.mailgunDomain,
+      }) : null;
 
-  // Create the connection string
-  const dbConnectionKnexConfig = {
-    host: dbConfig.host,
-    port: dbConfig.port,
-    user: dbConfig.user,
-    password: dbConfig.password,
-    database: dbConfig.database,
-  };
+    if (sensitiveConfig.hereAppID && sensitiveConfig.hereAppCode) {
+      logger.info(
+        "initializeServer: initializing here maps",
+      );
+    }
+    const here = sensitiveConfig.hereAppID && sensitiveConfig.hereAppCode ?
+      setupHere(sensitiveConfig.hereAppID, sensitiveConfig.hereAppCode) : null;
 
-  // we only need one client instance
-  const knex = Knex({
-    client: "pg",
-    debug: process.env.NODE_ENV !== "production",
-    connection: dbConnectionKnexConfig,
-  });
+    logger.info(
+      "initializeServer: configuring app data build",
+    );
+    const appData: IAppDataType = {
+      root,
+      indexDevelopment: index.replace(/\$MODE/g, "development"),
+      indexProduction: index.replace(/\$MODE/g, "production"),
+      config,
+      sensitiveConfig,
+      knex,
+      listener,
+      redis: redisClient,
+      redisGlobal: redisGlobalClient,
+      redisSub,
+      redisPub,
+      cache,
+      buildnumber,
+      triggers: {
+        module: {},
+        itemDefinition: {},
 
-  const redisClient: RedisClient = redis.createClient(redisConfig);
-  const redisPub: RedisClient = redis.createClient(redisConfig);
-  const redisSub: RedisClient = redis.createClient(redisConfig);
+        ...customUserTriggers,
+        ...custom.customTriggers,
+      },
+      ipStack,
+      here,
+      mailgun,
+      pkgcloudStorageClient,
+      pkgcloudUploadsContainer,
+    };
 
-  PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
+    const getPromisified = promisify(appData.redis.get).bind(appData.redis);
+    const setPromisified = promisify(appData.redis.set).bind(appData.redis);
+    const flushAllPromisified = promisify(appData.redis.flushall).bind(appData.redis);
 
-  // due to a bug in the types the create client function is missing
-  // domainId and domainName
-  const pkgcloudStorageClient = pkgcloud.storage.createClient({
-    provider: "openstack",
-    username: sensitiveConfig.openStackUsername,
-    keystoneAuthVersion: 'v3',
-    region: sensitiveConfig.openStackRegion,
-    domainId: "default",
-    domainName: sensitiveConfig.openStackDomainName,
-    password: sensitiveConfig.openStackPassword,
-    authUrl: sensitiveConfig.openStackAuthUrl,
-  } as any);
+    logger.info(
+      "initializeServer: checking redis data integrity",
+    );
+    const buildnumberRedis: string = await getPromisified("buildnumber");
+    if (buildnumberRedis !== buildnumber) {
+      logger.info(
+        "initializeServer: buildnumber is mismatched expecting " + buildnumber + " found " + buildnumberRedis,
+      );
+      logger.info(
+        "initializeServer: flushing redis",
+      );
+      await flushAllPromisified();
+      logger.info(
+        "initializeServer: storing new buildnumber",
+      );
+      await setPromisified("buildnumber", buildnumber);
+    }
 
-  const pkgcloudUploadsContainer =
-    await getContainerPromisified(pkgcloudStorageClient, sensitiveConfig.openStackUploadsContainerName);
+    logger.info(
+      "initializeServer: setting up endpoints",
+    );
+    initializeApp(appData, custom);
 
-  const cache = new Cache(redisClient, knex, pkgcloudUploadsContainer, root);
-
-  const server = http.createServer(app);
-
-  const listener = new Listener(
-    buildnumber,
-    redisSub,
-    redisPub,
-    root,
-    cache,
-    knex,
-    server,
-  );
-
-  server.listen(config.port, () => {
-    console.log("listening at", config.port);
-    console.log("build number is", buildnumber);
-  });
-
-  const ipStack = sensitiveConfig.ipStackAccessKey ?
-    setupIPStack(sensitiveConfig.ipStackAccessKey) :
-    null;
-
-  const mailgun = sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain ?
-    setupMailgun({
-      apiKey: sensitiveConfig.mailgunAPIKey,
-      domain: sensitiveConfig.mailgunDomain,
-    }) : null;
-
-  const here = sensitiveConfig.hereAppID && sensitiveConfig.hereAppCode ?
-    setupHere(sensitiveConfig.hereAppID, sensitiveConfig.hereAppCode) : null;
-
-  const appData: IAppDataType = {
-    root,
-    indexDevelopment: index.replace(/\$MODE/g, "development"),
-    indexProduction: index.replace(/\$MODE/g, "production"),
-    config,
-    sensitiveConfig,
-    knex,
-    listener,
-    redis: redisClient,
-    redisSub,
-    redisPub,
-    cache,
-    buildnumber,
-    triggers: {
-      module: {},
-      itemDefinition: {},
-
-      ...customUserTriggers,
-      ...custom.customTriggers,
-    },
-    ipStack,
-    here,
-    mailgun,
-    pkgcloudStorageClient,
-    pkgcloudUploadsContainer,
-  };
-
-  const getPromisified = promisify(appData.redis.get).bind(appData.redis);
-  const setPromisified = promisify(appData.redis.set).bind(appData.redis);
-  const flushAllPromisified = promisify(appData.redis.flushall).bind(appData.redis);
-
-  const buildnumberRedis: string = await getPromisified("buildnumber");
-  if (buildnumberRedis !== buildnumber) {
-    await flushAllPromisified();
-    await setPromisified("buildnumber", buildnumber);
+    logger.info(
+      "initializeServer: attempting to listen",
+    );
+    server.listen(config.port, () => {
+      logger.info(
+        "initializeServer: listening at " + config.port,
+      );
+    });
+  } catch (err) {
+    logger.error(
+      "initializeServer: Failed to initialize server due to error",
+      {
+        errMessage: err.message,
+        errStack: err.stack,
+      }
+    );
+    process.exit(1);
   }
-
-  initializeApp(appData, custom);
 }

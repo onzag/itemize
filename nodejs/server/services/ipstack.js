@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const https_1 = __importDefault(require("https"));
 const imported_resources_1 = require("../../imported-resources");
+const __1 = require("../");
 class IPStack {
     constructor(apiKey) {
         this.apiKey = apiKey;
@@ -27,10 +28,21 @@ class IPStack {
                         resolve(parsedData);
                     }
                     catch (err) {
+                        __1.logger.error("IPStack.requestInfoFor: request to the ip stack ip returned invalid data", {
+                            errMessage: err.message,
+                            errStack: err.stack,
+                            ip,
+                            data,
+                        });
                         reject(err);
                     }
                 });
             }).on("error", (err) => {
+                __1.logger.error("IPStack.requestInfoFor: https request to ipstack API failed", {
+                    errMessage: err.message,
+                    errStack: err.stack,
+                    ip,
+                });
                 reject(err);
             });
         });

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const __1 = require("..");
 const express_1 = require("express");
 const constants_1 = require("../../constants");
 const token_1 = require("../token");
@@ -24,12 +25,23 @@ function userRestServices(appData) {
         if (!decoded.validateUserId || !decoded.validateUserEmail) {
             res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS);
         }
-        const user = await appData.cache.requestValue(userIdef, decoded.validateUserId, null);
-        if (!user) {
-            res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.USER_REMOVED);
+        let user;
+        try {
+            user = await appData.cache.requestValue(userIdef, decoded.validateUserId, null);
+            if (!user) {
+                res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.USER_REMOVED);
+            }
+            else if (user.blocked_at !== null) {
+                res.redirect(`/${user.app_language}/?err=${constants_1.ENDPOINT_ERRORS.USER_BLOCKED}`);
+            }
         }
-        else if (user.blocked_at !== null) {
-            res.redirect(`/${user.app_language}/?err=${constants_1.ENDPOINT_ERRORS.USER_BLOCKED}`);
+        catch (err) {
+            __1.logger.error("userRestServices/validate-email: failed to retrieve user from token credentials", {
+                errMessage: err.message,
+                errStack: err.stack,
+                decoded,
+            });
+            throw err;
         }
         // this happens when the user sends a validation email, then changes the email
         // immediately and tries to use the previous token to validate the email
@@ -38,22 +50,42 @@ function userRestServices(appData) {
             // we consider this invalid as credentials it does refer
             res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS);
         }
-        const result = await appData.knex.first(constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME)
-            .from(userTable).where({
-            email: user.email,
-            e_validated: true,
-        });
-        if (result) {
-            if (result[constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME] !== user.id) {
-                res.redirect(`/${user.app_language}/?err=${constants_1.ENDPOINT_ERRORS.USER_EMAIL_TAKEN}`);
-            }
-            else if (result[constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME] === user.id) {
-                res.redirect(`/${user.app_language}/?msg=validate_account_success&msgtitle=validate_account_success_title`);
+        try {
+            const result = await appData.knex.first(constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME)
+                .from(userTable).where({
+                email: user.email,
+                e_validated: true,
+            });
+            if (result) {
+                if (result[constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME] !== user.id) {
+                    res.redirect(`/${user.app_language}/?err=${constants_1.ENDPOINT_ERRORS.USER_EMAIL_TAKEN}`);
+                }
+                else if (result[constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME] === user.id) {
+                    res.redirect(`/${user.app_language}/?msg=validate_account_success&msgtitle=validate_account_success_title`);
+                }
             }
         }
-        await appData.cache.requestUpdate(userIdef, decoded.validateUserId, null, {
-            e_validated: true,
-        }, null, null, null, null);
+        catch (err) {
+            __1.logger.error("userRestServices/validate-email: failed to request users by email", {
+                errMessage: err.message,
+                errStack: err.stack,
+                user,
+            });
+            throw err;
+        }
+        try {
+            await appData.cache.requestUpdate(userIdef, decoded.validateUserId, null, {
+                e_validated: true,
+            }, null, null, null, null);
+        }
+        catch (err) {
+            __1.logger.error("userRestServices/validate-email: failed to set e_validated status to true", {
+                errMessage: err.message,
+                errStack: err.stack,
+                user,
+            });
+            throw err;
+        }
         res.redirect(`/${user.app_language}/?msg=validate_account_success&msgtitle=validate_account_success_title`);
     });
     return router;

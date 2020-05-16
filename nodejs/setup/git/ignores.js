@@ -5,6 +5,7 @@ exports.default = [
     "/itemize",
     "/node_modules",
     "/devenv",
+    "/logs",
     "npm-debug.log",
     "db-status.json",
     "db-status.optimal.json",

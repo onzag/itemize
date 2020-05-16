@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const __1 = require("../../");
 const ItemDefinition_1 = require("../../../base/Root/Module/ItemDefinition");
-const debug_1 = __importDefault(require("debug"));
 const basic_1 = require("../basic");
 const graphql_fields_1 = __importDefault(require("graphql-fields"));
 const constants_1 = require("../../../constants");
@@ -13,9 +13,8 @@ const gql_util_1 = require("../../../gql-util");
 const errors_1 = require("../../../base/errors");
 const triggers_1 = require("../triggers");
 // TODO versioning and the for_id madness
-const debug = debug_1.default("resolvers:addItemDefinition");
 async function addItemDefinition(appData, resolverArgs, itemDefinition) {
-    debug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
+    __1.logger.debug("addItemDefinition: executed adding for " + itemDefinition.getQualifiedPathName());
     // First we check the language and the region, based on the args
     // as we expect every request to contain this data and be
     // valid for our app
@@ -79,8 +78,8 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
         finalOwner = resolverArgs.args.in_behalf_of;
         await basic_1.checkUserExists(appData.cache, finalOwner);
     }
-    debug("Fields to add have been extracted as %j", addingFields);
-    debug("Checking role access for creation...");
+    __1.logger.debug("addItemDefinition: Fields to add have been extracted", addingFields);
+    __1.logger.debug("addItemDefinition: Checking basic role access for creation");
     // now we check the role access for the given
     // create action
     itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.CREATE, tokenData.role, tokenData.id, finalOwner, addingFields, true);
@@ -95,8 +94,8 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
             requestedFieldsThatRepresentPropertiesAndIncludes[arg] = requestedFields[arg];
         }
     });
-    debug("Fields to be requested from the idef have been extracted as %j", requestedFieldsThatRepresentPropertiesAndIncludes);
-    debug("Checking role access for read...");
+    __1.logger.debug("addItemDefinition: Fields to be requested have been extracted", requestedFieldsThatRepresentPropertiesAndIncludes);
+    __1.logger.debug("addItemDefinition: Checking basic role access for read");
     // so now we check the role access for the reading of
     // those fields, as you can see we use the userId of the user
     // since he will be the owner as well
@@ -132,7 +131,7 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
                 // this shouldn't really happen because validateParentingRules should have
                 // checked whether it existed, but we check anyway
                 if (!content) {
-                    debug("FAILED due to lack of content data");
+                    __1.logger.debug("addItemDefinition: failed due to lack of content data");
                     throw new errors_1.EndpointError({
                         message: `There's no parent ${resolverArgs.args.parent_type} with ` +
                             `id ${resolverArgs.args.parent_id} and version ${resolverArgs.args.parent_version}`,
@@ -142,7 +141,7 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
                 // this should have also not happen because validate should also have done it
                 // but we check anyway
                 if (content.blocked_at !== null) {
-                    debug("FAILED due to element being blocked");
+                    __1.logger.debug("addItemDefinition: failed due to element being blocked");
                     throw new errors_1.EndpointError({
                         message: "The parent is blocked",
                         code: constants_1.ENDPOINT_ERRORS.BLOCKED,
@@ -153,8 +152,6 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
     }
     // extract this information
     const mod = itemDefinition.getParentModule();
-    const moduleTable = mod.getQualifiedPathName();
-    const selfTable = itemDefinition.getQualifiedPathName();
     // we need to get the dictionary that is used for this specific
     // language, remember, while the API uses a language and region(country)
     // field, the fields can use both language and language region combos
@@ -222,7 +219,7 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
         version: resolverArgs.args.parent_version,
         type: resolverArgs.args.parent_type,
     } : null);
-    debug("SQL Output is %j", value);
+    __1.logger.debug("addItemDefinition: SQL ouput retrieved", value);
     // now we convert that SQL value to the respective GQL value
     // the reason we pass the requested fields is to filter by the fields
     // that we actually want, not passing this would make the gql value
@@ -233,7 +230,7 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
         DATA: gqlValue,
         ...gqlValue,
     };
-    debug("SUCCEED with GQL output %j", finalOutput);
+    __1.logger.debug("addItemDefinition: GQL output calculated", finalOutput);
     // items that have just been added cannot be blocked or deleted, hence we just return
     // right away without checking
     return finalOutput;

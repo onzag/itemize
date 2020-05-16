@@ -40,6 +40,7 @@ import {
 } from "../base/remote-protocol";
 import { IGQLSearchResult } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
+import { logger } from ".";
 
 interface IListenerList {
   [socketId: string]: {
@@ -142,6 +143,9 @@ export class Listener {
     request: IIdentifyRequest,
   ) {
     if (!this.listeners[socket.id]) {
+      logger.debug(
+        "Listener.identify: socket " + socket.id + " provides initial identification",
+      );
       this.listeners[socket.id] = {
         socket,
         listens: {},
@@ -150,6 +154,9 @@ export class Listener {
         amount: 0,
       };
     } else {
+      logger.debug(
+        "Listener.identify: socket " + socket.id + " updates identification criteria",
+      );
       this.listeners[socket.id].uuid = request.uuid;
       this.listeners[socket.id].token = request.token;
     }
@@ -165,17 +172,25 @@ export class Listener {
     // TODO check if token allows to listen before adding
 
     if (!this.listeners[socket.id]) {
+      logger.debug(
+        "Listener.register: can't register listener to an unidentified socket " + socket.id,
+      );
       return;
     }
 
     // do not allow more than 500 concurrent listeners
     if (this.listeners[socket.id].amount > 500) {
+      logger.debug(
+        "Listener.register: socket " + socket.id + " has exceeded the amount of listeners it can attach",
+      );
       return;
     }
 
     const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
-      console.log("subscribing to", mergedIndexIdentifier);
+      logger.debug(
+        "Listener.register: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+      );
       this.redisSub.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
@@ -189,17 +204,25 @@ export class Listener {
     // he will be able to see any new records added
 
     if (!this.listeners[socket.id]) {
+      logger.debug(
+        "Listener.ownedSearchRegister: can't register listener to an unidentified socket " + socket.id,
+      );
       return;
     }
 
     // do not allow more than 500 concurrent listeners
     if (this.listeners[socket.id].amount > 500) {
+      logger.debug(
+        "Listener.ownedSearchRegister: socket " + socket.id + " has exceeded the amount of listeners it can attach",
+      );
       return;
     }
 
     const mergedIndexIdentifier = "OWNED_SEARCH." + request.qualifiedPathName + "." + request.createdBy;
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
-      console.log("subscribing to", mergedIndexIdentifier);
+      logger.debug(
+        "Listener.ownedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+      );
       this.redisSub.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
@@ -213,18 +236,26 @@ export class Listener {
     // he will be able to see any new records added
 
     if (!this.listeners[socket.id]) {
+      logger.debug(
+        "Listener.parentedSearchRegister: can't register listener to an unidentified socket " + socket.id,
+      );
       return;
     }
 
     // do not allow more than 500 concurrent listeners
     if (this.listeners[socket.id].amount > 500) {
+      logger.debug(
+        "Listener.parentedSearchRegister: socket " + socket.id + " has exceeded the amount of listeners it can attach",
+      );
       return;
     }
 
     const mergedIndexIdentifier = "PARENTED_SEARCH." + request.qualifiedPathName + "." +
       request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
-      console.log("subscribing to", mergedIndexIdentifier);
+      logger.debug(
+        "Listener.parentedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+      );
       this.redisSub.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
@@ -237,6 +268,9 @@ export class Listener {
     try {
       const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
       if (!itemDefinitionOrModule) {
+        logger.debug(
+          "Listener.ownedSearchFeedback: could not find " + request.qualifiedPathName,
+        );
         return;
       }
 
@@ -275,13 +309,23 @@ export class Listener {
           // this contains all the data and the new record has the right form
           newLastRecord: newRecords[0] as any,
         };
+        logger.debug(
+          "Listener.ownedSearchFeedback: triggering " + OWNED_SEARCH_RECORDS_ADDED_EVENT,
+          event,
+        );
         socket.emit(
           OWNED_SEARCH_RECORDS_ADDED_EVENT,
           event,
         );
       }
     } catch (err) {
-      console.log(err);
+      logger.error(
+        "Listener.ownedSearchFeedback: failed to provide feedback",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+        }
+      );
     }
   }
   public async parentedSearchFeedback(
@@ -291,6 +335,9 @@ export class Listener {
     try {
       const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
       if (!itemDefinitionOrModule) {
+        logger.debug(
+          "Listener.parentedSearchFeedback: could not find " + request.qualifiedPathName,
+        );
         return;
       }
 
@@ -332,13 +379,23 @@ export class Listener {
           newIds: newRecords as IGQLSearchResult[],
           newLastRecord: newRecords[0] as any,
         };
+        logger.debug(
+          "Listener.parentedSearchFeedback: emmitting " + PARENTED_SEARCH_RECORDS_ADDED_EVENT,
+          event,
+        );
         socket.emit(
           PARENTED_SEARCH_RECORDS_ADDED_EVENT,
           event,
         );
       }
     } catch (err) {
-      console.log(err);
+      logger.error(
+        "Listener.parentedSearchFeedback: failed to provide feedback",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+        }
+      );
     }
   }
   public async feedback(
@@ -350,6 +407,9 @@ export class Listener {
     try {
       const itemDefinition: ItemDefinition = this.root.registry[request.itemDefinition] as ItemDefinition;
       if (!itemDefinition || !(itemDefinition instanceof ItemDefinition)) {
+        logger.debug(
+          "Listener.feedback: could not find " + request.itemDefinition,
+        );
         return;
       }
       const queriedResult: ISQLTableRowValue = await this.cache.requestValue(
@@ -363,6 +423,10 @@ export class Listener {
           type: "last_modified",
           lastModified: queriedResult.last_modified,
         };
+        logger.debug(
+          "Listener.feedback: emitting " + CHANGED_FEEEDBACK_EVENT,
+          event,
+        );
         socket.emit(
           CHANGED_FEEEDBACK_EVENT,
           event,
@@ -375,13 +439,23 @@ export class Listener {
           type: "not_found",
           lastModified: null,
         };
+        logger.debug(
+          "Listener.feedback: emitting " + CHANGED_FEEEDBACK_EVENT,
+          event,
+        );
         socket.emit(
           CHANGED_FEEEDBACK_EVENT,
           event,
         );
       }
     } catch (err) {
-      console.log(err);
+      logger.error(
+        "Listener.feedback: failed to provide feedback",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+        }
+      );
     }
   }
   public removeListener(
@@ -389,13 +463,18 @@ export class Listener {
     mergedIndexIdentifier: string,
   ) {
     if (this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+      logger.debug(
+        "Listener.removeListener: unsubscribing socket " + socket.id + " from " + mergedIndexIdentifier,
+      );
       delete this.listeners[socket.id].listens[mergedIndexIdentifier];
       this.listeners[socket.id].amount--;
       const noSocketsListeningLeft = Object.keys(this.listeners).every((socketId) => {
         return !this.listeners[socketId].listens[mergedIndexIdentifier];
       });
       if (noSocketsListeningLeft) {
-        console.log("unsubscribing to", mergedIndexIdentifier);
+        logger.debug(
+          "Listener.removeListener: founds no sockets left for " + mergedIndexIdentifier + " plugging off redis",
+        );
         this.redisSub.unsubscribe(mergedIndexIdentifier);
       }
     }
@@ -427,26 +506,34 @@ export class Listener {
     listenerUUID: string,
   ) {
     const mergedIndexIdentifier = event.itemDefinition + "." + event.id + "." + (event.version || "");
-    console.log("publishing to", mergedIndexIdentifier);
-    this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
+    const redisEvent = {
       event,
       listenerUUID,
       mergedIndexIdentifier,
       eventType: CHANGED_FEEEDBACK_EVENT,
-    }));
+    };
+    logger.debug(
+      "Listener.triggerChangedListeners: triggering redis event",
+      redisEvent,
+    );
+    this.redisPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
   public triggerOwnedSearchListeners(
     event: IOwnedSearchRecordsAddedEvent,
     listenerUUID: string,
   ) {
     const mergedIndexIdentifier = "OWNED_SEARCH." + event.qualifiedPathName + "." + event.createdBy;
-    console.log("publishing to", mergedIndexIdentifier);
-    this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
+    const redisEvent = {
       event,
       listenerUUID,
       mergedIndexIdentifier,
       eventType: OWNED_SEARCH_RECORDS_ADDED_EVENT,
-    }));
+    };
+    logger.debug(
+      "Listener.triggerOwnedSearchListeners: triggering redis event",
+      redisEvent,
+    );
+    this.redisPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
   public triggerParentedSearchListeners(
     event: IParentedSearchRecordsAddedEvent,
@@ -454,25 +541,34 @@ export class Listener {
   ) {
     const mergedIndexIdentifier = "PARENTED_SEARCH." + event.qualifiedPathName + "." + event.parentType +
       "." + event.parentId + "." + (event.parentVersion || "");
-    console.log("publishing to", mergedIndexIdentifier);
-    this.redisPub.publish(mergedIndexIdentifier, JSON.stringify({
+    const redisEvent = {
       event,
       listenerUUID,
       mergedIndexIdentifier,
       eventType: PARENTED_SEARCH_RECORDS_ADDED_EVENT,
-    }));
+    }
+    logger.debug(
+      "Listener.triggerParentedSearchListeners: triggering redis event",
+      redisEvent,
+    );
+    this.redisPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
   public pubSubTriggerListeners(
     channel: string,
     message: string,
   ) {
     const parsedContent = JSON.parse(message);
-    console.log(parsedContent);
+    logger.debug(
+      "Listener.pubSubTriggerListeners: received redis event",
+      parsedContent,
+    );
     Object.keys(this.listeners).forEach((socketKey) => {
       const whatListening = this.listeners[socketKey].listens;
       if (whatListening[parsedContent.mergedIndexIdentifier] &&
         this.listeners[socketKey].uuid !== parsedContent.listenerUUID) {
-        console.log("emitting to someone");
+        logger.debug(
+          "Listener.pubSubTriggerListeners: socket " + socketKey + " was expecting it, emitting",
+        );
         this.listeners[socketKey].socket.emit(
           parsedContent.eventType,
           parsedContent.event,
@@ -485,6 +581,10 @@ export class Listener {
       return;
     }
 
+    logger.debug(
+      "Listener.removeSocket: removing socket " + socket.id,
+    );
+
     Object.keys(this.listeners[socket.id].listens).forEach((listensMergedIdentifier) => {
       const noSocketsListeningLeft = Object.keys(this.listeners).every((socketId) => {
         if (socketId === socket.id) {
@@ -493,7 +593,9 @@ export class Listener {
         return !this.listeners[socketId].listens[listensMergedIdentifier];
       });
       if (noSocketsListeningLeft) {
-        console.log("unsubscribing to", listensMergedIdentifier);
+        logger.debug(
+          "Listener.removeSocket: redis unsubscribing off " + listensMergedIdentifier,
+        );
         this.redisSub.unsubscribe(listensMergedIdentifier);
       }
     });

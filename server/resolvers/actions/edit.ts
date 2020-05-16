@@ -1,7 +1,6 @@
-import { IAppDataType } from "../../";
+import { IAppDataType, logger } from "../../";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
-import Debug from "debug";
 import {
   checkLanguage,
   validateTokenAndGetData,
@@ -27,13 +26,14 @@ import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { IGQLArgs } from "../../../gql-querier";
 import { TriggerActions } from "../triggers";
 
-const debug = Debug("resolvers:editItemDefinition");
 export async function editItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
-  debug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
+  logger.debug(
+    "editItemDefinition: executed edit for " + itemDefinition.getQualifiedPathName(),
+  );
 
   // First we check the language and region of the item
   checkLanguage(appData, resolverArgs.args);
@@ -51,7 +51,9 @@ export async function editItemDefinition(
   const mod = itemDefinition.getParentModule();
   const selfTable = itemDefinition.getQualifiedPathName();
 
-  debug("Making query to get the owner of this item");
+  logger.debug(
+    "editItemDefinition: retrieving actual owner of this item",
+  );
 
   // now we get these variables ready
   // we need to get the userId and the current
@@ -75,7 +77,9 @@ export async function editItemDefinition(
       preValidation: (content: ISQLTableRowValue) => {
         // if we don't get an user id this means that there's no owner, this is bad input
         if (!content) {
-          debug("FAILED due to lack of content data");
+          logger.debug(
+            "editItemDefinition: failed due to lack of content data",
+          );
           throw new EndpointError({
             message: `There's no ${selfTable} with id ${resolverArgs.args.id} and version ${resolverArgs.args.version}`,
             code: ENDPOINT_ERRORS.NOT_FOUND,
@@ -90,7 +94,9 @@ export async function editItemDefinition(
 
         // also throw an error if it's blocked
         if (content.blocked_at !== null) {
-          debug("FAILED due to element being blocked");
+          logger.debug(
+            "editItemDefinition: failed due to element being blocked",
+          );
           throw new EndpointError({
             message: "The item is blocked",
             code: ENDPOINT_ERRORS.BLOCKED,
@@ -104,7 +110,6 @@ export async function editItemDefinition(
   // definition, we need to convert that value to GQL value, and for that we use the converter
   // note how we don't pass the requested fields because we want it all
   const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(itemDefinition, wholeSqlStoredValue);
-  debug("Current GQL value found as %j", currentWholeValueAsGQL);
   // and now basically we create a new value that is the combination or both, where our new
   // values take precedence, yes there will be pollution, with token, id, and whatnot, but that
   // doesn't matter because the apply function ignores those
@@ -112,7 +117,7 @@ export async function editItemDefinition(
     ...currentWholeValueAsGQL,
     ...resolverArgs.args,
   };
-  debug("Expectd GQL value considered as %j, applying such value", expectedUpdatedValue);
+
   // and as so we apply the value from graphql
   itemDefinition.applyValue(
     resolverArgs.args.id,
@@ -151,8 +156,9 @@ export async function editItemDefinition(
       editingFields[arg] = resolverArgs.args[arg];
     }
   });
-  debug(
-    "Fields to be edited from the idef have been extracted as %j",
+
+  logger.debug(
+    "editItemDefinition: Fields to be edited from the idef have been extracted as",
     editingFields,
   );
   const requestedFieldsInIdef = {};
@@ -164,12 +170,13 @@ export async function editItemDefinition(
       requestedFieldsInIdef[arg] = requestedFields[arg];
     }
   });
-  debug(
-    "Fields to be requested from the idef have been extracted as %j",
+
+  logger.debug(
+    "editItemDefinition: Fields to be requested from the idef have been extracted as",
     requestedFieldsInIdef,
   );
 
-  debug("Checking role access for editing");
+  logger.debug("editItemDefinition: Checking role access for editing");
   // checking the role access for both
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.EDIT,
@@ -179,7 +186,7 @@ export async function editItemDefinition(
     editingFields,
     true,
   );
-  debug("Checking role access for read");
+  logger.debug("editItemDefinition: Checking role access for read");
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
@@ -262,7 +269,10 @@ export async function editItemDefinition(
     resolverArgs.args.listener_uuid || null,
   );
 
-  debug("SQL Output is %j", sqlValue);
+  logger.debug(
+    "editItemDefinition: SQL ouput retrieved",
+    sqlValue,
+  );
 
   // convert it using the requested fields for that, and ignoring everything else
   const gqlValue = convertSQLValueToGQLValueForItemDefinition(itemDefinition, sqlValue, requestedFields);
@@ -275,7 +285,10 @@ export async function editItemDefinition(
     ...gqlValue,
   };
 
-  debug("SUCCEED with GQL output %j", finalOutput);
+  logger.debug(
+    "editItemDefinition: GQL ouput retrieved",
+    finalOutput,
+  );
 
   return finalOutput;
 }

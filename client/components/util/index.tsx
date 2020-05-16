@@ -49,13 +49,13 @@ export function fileURLAbsoluter(
   }
 }
 
-export function imageSrcSetRetriever(fileData: IGQLFile, property: PropertyDefinition) {
+export function imageSrcSetRetriever(fileData: IGQLFile, property: PropertyDefinition, imageSizes?: IImageSizes) {
   if (
     fileData &&
     fileData.url.indexOf("blob:") !== 0 &&
     fileData.type.indexOf("image/svg") !== 0
   ) {
-    const sizes = imageSizeRetriever(fileData, property);
+    const sizes = imageSizes || imageSizeRetriever(fileData, property);
     let theLargest = 0;
     let srcset: string[] = [];
 
@@ -110,19 +110,21 @@ export function imageSrcSetRetriever(fileData: IGQLFile, property: PropertyDefin
   }
 }
 
+export interface IImageSizes {
+  imageMediumSizeURL: string;
+  imageSmallSizeURL: string;
+  imageLargeSizeURL: string;
+  imageStandardSizeURL: string;
+  [others: string]: string;
+};
+
 /**
  * Gets all the available image sizes for a given file
  * @param fileData the file data
  * @param property if not passed only returns the default image sizes, medium, small, large and the standard one
  * custom sizes can be used and it needs access to the property in order to know these urls
  */
-export function imageSizeRetriever(fileData: IGQLFile, property?: PropertyDefinition): {
-  imageMediumSizeURL: string;
-  imageSmallSizeURL: string;
-  imageLargeSizeURL: string;
-  imageStandardSizeURL: string;
-  [others: string]: string;
-} {
+export function imageSizeRetriever(fileData: IGQLFile, property?: PropertyDefinition): IImageSizes  {
   const finalValue = {
     imageMediumSizeURL: fileData && fileData.url,
     imageSmallSizeURL: fileData && fileData.url,

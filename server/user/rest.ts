@@ -1,7 +1,8 @@
-import { IAppDataType } from "..";
+import { IAppDataType, logger } from "..";
 import { Router } from "express";
 import { ENDPOINT_ERRORS, CONNECTOR_SQL_COLUMN_ID_FK_NAME } from "../../constants";
 import { jwtVerify } from "../token";
+import { ISQLTableRowValue } from "../../base/Root/sql";
 
 export function userRestServices(appData: IAppDataType) {
   const userModule = appData.root.getModuleFor(["users"]);
@@ -30,11 +31,25 @@ export function userRestServices(appData: IAppDataType) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
     }
 
-    const user = await appData.cache.requestValue(userIdef, decoded.validateUserId, null);
-    if (!user) {
-      res.redirect("/en/?err=" + ENDPOINT_ERRORS.USER_REMOVED);
-    } else if (user.blocked_at !== null) {
-      res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_BLOCKED}`);
+    let user: ISQLTableRowValue;
+
+    try {
+      user = await appData.cache.requestValue(userIdef, decoded.validateUserId, null);
+      if (!user) {
+        res.redirect("/en/?err=" + ENDPOINT_ERRORS.USER_REMOVED);
+      } else if (user.blocked_at !== null) {
+        res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_BLOCKED}`);
+      }
+    } catch (err) {
+      logger.error(
+        "userRestServices/validate-email: failed to retrieve user from token credentials",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+          decoded,
+        }
+      );
+      throw err;
     }
 
     // this happens when the user sends a validation email, then changes the email
@@ -45,32 +60,56 @@ export function userRestServices(appData: IAppDataType) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
     }
 
-    const result = await appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
-      .from(userTable).where({
-        email: user.email,
-        e_validated: true,
-      });
-    
-    if (result) {
-      if (result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] !== user.id) {
-        res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_EMAIL_TAKEN}`);
-      } else if (result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] === user.id) {
-        res.redirect(`/${user.app_language}/?msg=validate_account_success&msgtitle=validate_account_success_title`);
+    try {
+      const result = await appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
+        .from(userTable).where({
+          email: user.email,
+          e_validated: true,
+        });
+      
+      if (result) {
+        if (result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] !== user.id) {
+          res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_EMAIL_TAKEN}`);
+        } else if (result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] === user.id) {
+          res.redirect(`/${user.app_language}/?msg=validate_account_success&msgtitle=validate_account_success_title`);
+        }
       }
+    } catch (err) {
+      logger.error(
+        "userRestServices/validate-email: failed to request users by email",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+          user,
+        }
+      );
+      throw err;
     }
 
-    await appData.cache.requestUpdate(
-      userIdef,
-      decoded.validateUserId,
-      null,
-      {
-        e_validated: true,
-      },
-      null,
-      null,
-      null,
-      null,
-    );
+    try {
+      await appData.cache.requestUpdate(
+        userIdef,
+        decoded.validateUserId,
+        null,
+        {
+          e_validated: true,
+        },
+        null,
+        null,
+        null,
+        null,
+      );
+    } catch (err) {
+      logger.error(
+        "userRestServices/validate-email: failed to set e_validated status to true",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+          user,
+        }
+      );
+      throw err;
+    }
 
     res.redirect(`/${user.app_language}/?msg=validate_account_success&msgtitle=validate_account_success_title`);
   });

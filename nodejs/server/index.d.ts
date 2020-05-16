@@ -12,6 +12,9 @@ import { IPStack } from "./services/ipstack";
 import Mailgun from "mailgun-js";
 import pkgcloud from "pkgcloud";
 import { Here } from "./services/here";
+import winston from "winston";
+import "winston-daily-rotate-file";
+export declare const logger: winston.Logger;
 export interface IAppDataType {
     root: Root;
     indexDevelopment: string;
@@ -22,6 +25,7 @@ export interface IAppDataType {
     listener: Listener;
     cache: Cache;
     redis: RedisClient;
+    redisGlobal: RedisClient;
     redisPub: RedisClient;
     redisSub: RedisClient;
     buildnumber: string;

@@ -115,7 +115,6 @@ async function srcSetup(arg) {
             await fsAsync.rename(path_1.default.join(path_1.default.dirname(arg.standardConfig.entry), "root.properties"), path_1.default.join(path_1.default.dirname(arg.standardConfig.entry), newPropertiesFileName));
         }
     });
-    // TODO add missing resource files with itemize logo
     await copyAllFilesFor(arg, "resources", "resource-files", options);
     return arg;
 }

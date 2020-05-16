@@ -2,12 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("../../constants");
 const errors_1 = require("../../base/errors");
+const __1 = require("../");
 // TODO mailing lists triggers per language supported
 exports.customUserTriggers = {
     itemDefinition: {
         "users/user": async (arg) => {
             // we add a trigger for when the user updated the email
             // either because of creation or from a normal update
+            // from will be null during creation, this means creation
+            // will trigger this path
             if (arg.update &&
                 typeof arg.update !== "undefined") {
                 // so this is the new email, remember this can be null and it
@@ -15,13 +18,21 @@ exports.customUserTriggers = {
                 const newEmail = arg.update.email;
                 // and this is the email that was changed to
                 const changedEmail = !arg.from || (typeof newEmail !== "undefined" && newEmail !== arg.from.email);
-                if (changedEmail && newEmail !== null && typeof newEmail !== "undefined") {
+                if (changedEmail && newEmail !== null) {
                     // now we try to find another user with such email
-                    const result = await arg.appData.knex.first(constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME)
-                        .from(arg.itemDefinition.getQualifiedPathName()).where({
-                        email: newEmail,
-                        e_validated: true,
-                    });
+                    let result;
+                    try {
+                        result = await arg.appData.knex.first(constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME)
+                            .from(arg.itemDefinition.getQualifiedPathName()).where({
+                            email: newEmail,
+                            e_validated: true,
+                        });
+                    }
+                    catch (err) {
+                        __1.logger.error("customUserTriggers [SERIOUS]: Failed to execute SQL query to check " +
+                            " if email had been taken for email " + newEmail + " this caused the whole user not to be able to update/create");
+                        throw err;
+                    }
                     // if there's no such
                     if (!result) {
                         // then it's allowed and we mark e_validated as false

@@ -57,12 +57,18 @@ export interface IDBConfigRawJSONDataType {
   database: string;
 }
 
-export interface IRedisConfigRawJSONDataType {
+export interface ISingleRedisConfigRawJSONDataType {
   host?: string;
   port?: number;
   path?: string;
   db?: number;
   password?: string;
+}
+
+export interface IRedisConfigRawJSONDataType {
+  global: ISingleRedisConfigRawJSONDataType;
+  cache: ISingleRedisConfigRawJSONDataType;
+  pubSub: ISingleRedisConfigRawJSONDataType;
 }
 
 export const rawSensitiveConfigSchema = {
@@ -317,7 +323,7 @@ export const rawDBConfigSchema = {
   ],
 };
 
-export const rawRedisConfigSchema = {
+export const rawRedisConfigSchemaPart = {
   type: "object",
   properties: {
     host: {
@@ -366,3 +372,18 @@ export const rawRedisConfigSchema = {
     "password",
   ],
 };
+
+export const rawRedisConfigSchema = {
+  type: "object",
+  properties: {
+    global: rawRedisConfigSchemaPart,
+    cache: rawRedisConfigSchemaPart,
+    pubSub: rawRedisConfigSchemaPart,
+  },
+  additionalProperties: false,
+  required: [
+    "global",
+    "cache",
+    "pubSub",
+  ],
+}

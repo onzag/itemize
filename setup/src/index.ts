@@ -174,7 +174,6 @@ export default async function srcSetup(arg: ISetupConfigType): Promise<ISetupCon
       }
     }
   );
-  // TODO add missing resource files with itemize logo
   await copyAllFilesFor(
     arg,
     "resources",

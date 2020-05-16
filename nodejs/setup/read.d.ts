@@ -5,7 +5,7 @@ export declare function request(options: read.Options): Promise<{
 }>;
 declare type FieldRequestType = "strarray" | "string" | "integer" | "strobject";
 export declare function fieldRequest<T>(type: FieldRequestType, message: string, variableName: string, basedOnValue: T, defaultValue: T, hidden?: boolean, validate?: (value: T) => boolean, nullifyFalseValues?: boolean): Promise<T>;
-interface IConfigRequestExtractPoint {
+export interface IConfigRequestExtractPoint {
     type?: FieldRequestType | "config";
     extractData?: Array<IConfigRequestExtractPoint>;
     variableName: string;

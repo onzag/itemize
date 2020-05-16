@@ -1,5 +1,6 @@
 import https from "https";
 import { countries } from "../../imported-resources";
+import { logger } from "../";
 
 interface IPStackResponse {
   ip: string;
@@ -40,7 +41,7 @@ export class IPStack {
   constructor(apiKey: string) {
     this.apiKey = apiKey;
   }
-  requestInfoFor(ip: string) {
+  private requestInfoFor(ip: string) {
     return new Promise<IPStackResponse>((resolve, reject) => {
       https.get(`http://api.ipstack.com/${ip}?access_key=${this.apiKey}`, (resp) => {
         // let's get the response from the stream
@@ -57,10 +58,27 @@ export class IPStack {
             const parsedData = JSON.parse(data);
             resolve(parsedData);
           } catch (err) {
+            logger.error(
+              "IPStack.requestInfoFor: request to the ip stack ip returned invalid data",
+              {
+                errMessage: err.message,
+                errStack: err.stack,
+                ip,
+                data,
+              }
+            );
             reject(err);
           }
         });
       }).on("error", (err) => {
+        logger.error(
+          "IPStack.requestInfoFor: https request to ipstack API failed",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+            ip,
+          }
+        );
         reject(err);
       });
     });

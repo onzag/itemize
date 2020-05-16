@@ -332,7 +332,7 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
                             <div {...rootProps}>
                               <input {...getInputProps()} />
                               <div className={props.classes.avatarContainer}>
-                                <CacheableImageLoader src={props.imageSizes.imageLargeSizeURL}>
+                                <CacheableImageLoader src={props.imageSizes && props.imageSizes.imageLargeSizeURL}>
                                   {(largeImageURL) => (
                                     <MAvatar
                                       classes={{ root: `${props.classes.avatar} ${numberColorClassName} ` +

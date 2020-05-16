@@ -3,16 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const __1 = require("../../");
 const ItemDefinition_1 = require("../../../base/Root/Module/ItemDefinition");
-const debug_1 = __importDefault(require("debug"));
 const basic_1 = require("../basic");
 const graphql_fields_1 = __importDefault(require("graphql-fields"));
 const constants_1 = require("../../../constants");
 const gql_util_1 = require("../../../gql-util");
 const errors_1 = require("../../../base/errors");
-const getItemDefinitionDebug = debug_1.default("resolvers:getItemDefinition");
 async function getItemDefinition(appData, resolverArgs, itemDefinition) {
-    getItemDefinitionDebug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
+    __1.logger.debug("getItemDefinition: executed get for " + itemDefinition.getQualifiedPathName());
     // first we check that the language and region provided are
     // right and available
     basic_1.checkLanguage(appData, resolverArgs.args);
@@ -63,28 +62,27 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
         // null, but still, just to keep some consistency we
         // run this function
         itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, constants_1.UNSPECIFIED_OWNER, requestedFieldsInIdef, true);
-        getItemDefinitionDebug("no result founds, returning null");
+        __1.logger.debug("getItemDefinition: no results found returning null");
         // We do not return the 404, just return null in this case
         return null;
     }
-    getItemDefinitionDebug("SQL result found as %j", selectQueryValue);
-    getItemDefinitionDebug("Checking role access for read");
     let userId = selectQueryValue.created_by;
     if (itemDefinition.isOwnerObjectId()) {
         userId = selectQueryValue.id;
     }
+    __1.logger.debug("getItemDefinition: checking role access for read");
     // now we check the role access, this function will throw an error
     // if that fails, and we only check for the requested fields
     itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, userId, requestedFieldsInIdef, true);
+    __1.logger.debug("getItemDefinition: SQL ouput retrieved", selectQueryValue);
     const valueToProvide = basic_1.filterAndPrepareGQLValue(selectQueryValue, requestedFields, tokenData.role, itemDefinition);
-    getItemDefinitionDebug("SUCCEED with %j", valueToProvide.toReturnToUser);
+    __1.logger.debug("getItemDefinition: GQL ouput retrieved", valueToProvide.toReturnToUser);
     // return if otherwise succeeds
     return valueToProvide.toReturnToUser;
 }
 exports.getItemDefinition = getItemDefinition;
-const getItemDefinitionListDebug = debug_1.default("resolvers:getItemDefinitionList");
 async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
-    getItemDefinitionListDebug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
+    __1.logger.debug("getItemDefinitionList: executed get list for " + itemDefinition.getQualifiedPathName());
     // first we check that the language and region provided are
     // right and available
     basic_1.checkLanguage(appData, resolverArgs.args);
@@ -106,12 +104,13 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
             requestedFieldsInIdef[arg] = requestedFields[arg];
         }
     });
-    getItemDefinitionListDebug("Extracted requested fields from idef as %j", requestedFieldsInIdef);
+    __1.logger.debug("getItemDefinitionList: Extracted requested fields from idef", requestedFields);
     const created_by = resolverArgs.args.created_by;
     let ownerToCheckAgainst = constants_1.UNSPECIFIED_OWNER;
     if (created_by) {
         ownerToCheckAgainst = created_by;
     }
+    __1.logger.debug("getItemDefinitionList: checking role access for read");
     itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, requestedFieldsInIdef, true);
     // preventing a security leak here by ensuring that the type that we are searching
     // in the list is all consistent for the type of this item definition, when requesting
@@ -142,14 +141,12 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
     const resultAsObject = {
         results: finalValues,
     };
-    getItemDefinitionListDebug("SUCCEED");
+    __1.logger.debug("getItemDefinitionList: done");
     return resultAsObject;
 }
 exports.getItemDefinitionList = getItemDefinitionList;
-const getModuleListDebug = debug_1.default("resolvers:getModuleList");
 async function getModuleList(appData, resolverArgs, mod) {
-    console.log(mod.getQualifiedPathName());
-    getModuleListDebug("EXECUTED for %s", mod.getQualifiedPathName());
+    __1.logger.debug("getModuleList: executed get list for " + mod.getQualifiedPathName());
     // first we check that the language and region provided are
     // right and available
     basic_1.checkLanguage(appData, resolverArgs.args);
@@ -169,13 +166,13 @@ async function getModuleList(appData, resolverArgs, mod) {
             requestedFieldsInMod[arg] = requestedFields[arg];
         }
     });
-    getModuleListDebug("Requested fields calculated as %j", requestedFieldsInMod);
-    getModuleListDebug("Checking role access for read");
+    __1.logger.debug("getModuleList: Extracted requested fields from idef", requestedFieldsInMod);
     const created_by = resolverArgs.args.created_by;
     let ownerToCheckAgainst = constants_1.UNSPECIFIED_OWNER;
     if (created_by) {
         ownerToCheckAgainst = created_by;
     }
+    __1.logger.debug("getModuleList: checking role access for read");
     mod.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, requestedFieldsInMod, true);
     const resultValues = await appData.cache.requestListCache(resolverArgs.args.ids);
     // return if otherwise succeeds
@@ -193,7 +190,7 @@ async function getModuleList(appData, resolverArgs, mod) {
     const resultAsObject = {
         results: finalValues,
     };
-    getModuleListDebug("SUCCEED");
+    __1.logger.debug("getModuleList: done");
     return resultAsObject;
 }
 exports.getModuleList = getModuleList;

@@ -97,7 +97,7 @@ export async function fieldRequest<T>(
   return currentValue;
 }
 
-interface IConfigRequestExtractPoint {
+export interface IConfigRequestExtractPoint {
   type?: FieldRequestType | "config",
   extractData?: Array<IConfigRequestExtractPoint>,
   variableName: string,

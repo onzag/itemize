@@ -5,22 +5,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("../../constants");
 const errors_1 = require("../../base/errors");
-const debug_1 = __importDefault(require("debug"));
 const ItemDefinition_1 = __importDefault(require("../../base/Root/Module/ItemDefinition"));
 const Module_1 = __importDefault(require("../../base/Root/Module"));
 const sql_1 = require("../../base/Root/Module/ItemDefinition/sql");
 const sql_2 = require("../../base/Root/Module/sql");
+const __1 = require("..");
 const deep_equal_1 = __importDefault(require("deep-equal"));
 const Include_1 = require("../../base/Root/Module/ItemDefinition/Include");
 const token_1 = require("../token");
-const buildColumnNamesForModuleTableOnlyDebug = debug_1.default("resolvers:buildColumnNamesForModuleTableOnly");
 /**
  * Builds the column names expected for a given module only
  * @param requestedFields the requested fields given by graphql fields and flattened
  * @param mod the module in question
  */
 function buildColumnNamesForModuleTableOnly(requestedFields, mod) {
-    buildColumnNamesForModuleTableOnlyDebug("EXECUTED with %j on module qualified as %s", requestedFields, mod.getQualifiedPathName());
     // this will be the ouput
     let result = [];
     // we start by looping into the requested fields
@@ -45,12 +43,15 @@ function buildColumnNamesForModuleTableOnly(requestedFields, mod) {
             result = result.concat(Object.keys(propDescription.sql("", key, property)));
         }
     });
-    buildColumnNamesForModuleTableOnlyDebug("SUCCEED with %j", result);
+    __1.logger.silly("buildColumnNamesForModuleTableOnly: built column names for", {
+        requestedFields,
+        mod: mod.getQualifiedPathName(),
+        result,
+    });
     // we return all we have gathered
     return result;
 }
 exports.buildColumnNamesForModuleTableOnly = buildColumnNamesForModuleTableOnly;
-const buildColumnNamesForItemDefinitionTableOnlyDebug = debug_1.default("resolvers:buildColumnNamesForItemDefinitionTableOnly");
 /**
  * Builds the column names expected for a given item definition only
  * ignoring all the extensions and base fields
@@ -59,7 +60,6 @@ const buildColumnNamesForItemDefinitionTableOnlyDebug = debug_1.default("resolve
  * @param prefix a prefix to append to everything
  */
 function buildColumnNamesForItemDefinitionTableOnly(requestedFields, itemDefinition, prefix = "") {
-    buildColumnNamesForItemDefinitionTableOnlyDebug("EXECUTED with %j and prefixed with %s on item definition qualified as %s", requestedFields, prefix, itemDefinition.getQualifiedPathName());
     // first we build the result
     let result = [];
     // now we loop into the requested field keys
@@ -100,19 +100,22 @@ function buildColumnNamesForItemDefinitionTableOnly(requestedFields, itemDefinit
             result = result.concat(Object.keys(propDescription.sql(prefix, key, property)));
         }
     });
-    buildColumnNamesForModuleTableOnlyDebug("SUCCEED with %j", result);
+    __1.logger.silly("buildColumnNamesForItemDefinitionTableOnly: built column names for", {
+        requestedFields,
+        prefix,
+        idef: itemDefinition.getQualifiedPathName(),
+        result,
+    });
     // return that thing
     return result;
 }
 exports.buildColumnNamesForItemDefinitionTableOnly = buildColumnNamesForItemDefinitionTableOnly;
-const validateTokenAndGetDataDebug = debug_1.default("resolvers:validateTokenAndGetDataDebug");
 /**
  * Given a token, it validates and provides the role information
  * for use in the system
  * @param token the token passed via the args
  */
 async function validateTokenAndGetData(appData, token) {
-    validateTokenAndGetDataDebug("EXECUTED with %s", token);
     let result;
     if (token === null) {
         result = {
@@ -139,14 +142,26 @@ async function validateTokenAndGetData(appData, token) {
             });
         }
     }
-    validateTokenAndGetDataDebug("SUCCEED with %j", result);
+    __1.logger.silly("validateTokenAndGetData: validating token for user succeed", {
+        token,
+        result,
+    });
     return result;
 }
 exports.validateTokenAndGetData = validateTokenAndGetData;
-const validateParentingRulesDebug = debug_1.default("resolvers:validateParentingRules");
-async function validateParentingRules(appData, id, version, type, itemDefinition, userId, role) {
-    validateParentingRulesDebug("EXECUTED with %j %s", id, type);
-    const isParenting = !!(id || version || type);
+/**
+ * Validates that the parenting rules are respected for the item definition
+ * in question that wants to be created
+ * @param appData the app data
+ * @param parentId the id of the parent item definition
+ * @param parentVersion the version of the parent item definition
+ * @param parentType the type of the parent item definition
+ * @param itemDefinition the item definition that is attempting to child
+ * @param userId the user id
+ * @param role the role
+ */
+async function validateParentingRules(appData, parentId, parentVersion, parentType, itemDefinition, userId, role) {
+    const isParenting = !!(parentId || parentVersion || parentType);
     if (!isParenting && itemDefinition.mustBeParented()) {
         throw new errors_1.EndpointError({
             message: "A parent is required",
@@ -154,18 +169,31 @@ async function validateParentingRules(appData, id, version, type, itemDefinition
         });
     }
     else if (isParenting) {
-        const parentingItemDefinition = appData.root.registry[type];
+        const parentingItemDefinition = appData.root.registry[parentType];
         if (!(parentingItemDefinition instanceof ItemDefinition_1.default)) {
             throw new errors_1.EndpointError({
-                message: "Invalid parent type " + type,
+                message: "Invalid parent type " + parentType,
                 code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
             });
         }
         itemDefinition.checkCanBeParentedBy(parentingItemDefinition, true);
-        const result = await appData.cache.requestValue(parentingItemDefinition, id, version);
+        let result;
+        try {
+            result = await appData.cache.requestValue(parentingItemDefinition, parentId, parentVersion);
+        }
+        catch (err) {
+            __1.logger.error("validateParentingRules [SERIOUS]: could not retrieve item definition value to validate parenting rules", {
+                errStack: err.stack,
+                errMessage: err.message,
+                parentId,
+                parentVersion,
+                parentingItemDefinition,
+            });
+            throw err;
+        }
         if (!result) {
             throw new errors_1.EndpointError({
-                message: `There's no parent ${type} with id ${id}`,
+                message: `There's no parent ${parentType} with id ${parentId}`,
                 code: constants_1.ENDPOINT_ERRORS.NOT_FOUND,
             });
         }
@@ -178,10 +206,9 @@ async function validateParentingRules(appData, id, version, type, itemDefinition
         const parentOwnerId = parentingItemDefinition.isOwnerObjectId() ? result.id : result.created_by;
         itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, true);
     }
-    validateParentingRulesDebug("SUCCEED");
+    __1.logger.silly("validateParentingRules: parenting rules have passed");
 }
 exports.validateParentingRules = validateParentingRules;
-const checkBasicFieldsAreAvailableForRoleDebug = debug_1.default("resolvers:checkBasicFieldsAreAvailableForRole");
 /**
  * Checks if the basic fields are available for the given role, basic
  * fields are of those reserved properties that are in every module
@@ -190,7 +217,6 @@ const checkBasicFieldsAreAvailableForRoleDebug = debug_1.default("resolvers:chec
  * @param requestedFields the requested fields
  */
 function checkBasicFieldsAreAvailableForRole(itemDefinitionOrModule, tokenData, requestedFields) {
-    checkBasicFieldsAreAvailableForRoleDebug("EXECUTED with token info %j and requested fields %j", tokenData, requestedFields);
     // now we check if moderation fields have been requested
     const moderationFieldsHaveBeenRequested = constants_1.MODERATION_FIELDS.some((field) => requestedFields[field]);
     // if they have been requested, and our role has no native access to that
@@ -200,7 +226,10 @@ function checkBasicFieldsAreAvailableForRole(itemDefinitionOrModule, tokenData, 
             (rolesThatHaveAccessToModerationFields.includes(constants_1.ANYONE_LOGGED_METAROLE) && tokenData.role !== constants_1.GUEST_METAROLE) ||
             rolesThatHaveAccessToModerationFields.includes(tokenData.role);
         if (!hasAccessToModerationFields) {
-            checkBasicFieldsAreAvailableForRoleDebug("FAILED Attempted to access to moderation fields with role %j only %j allowed", tokenData.role, rolesThatHaveAccessToModerationFields);
+            __1.logger.silly("checkBasicFieldsAreAvailableForRole: Attempted to access to moderation fields with invalid role", {
+                role: tokenData.role,
+                rolesThatHaveAccessToModerationFields,
+            });
             // we throw an error
             throw new errors_1.EndpointError({
                 message: "You have requested to add/edit/view moderation fields with role: " + tokenData.role,
@@ -208,31 +237,25 @@ function checkBasicFieldsAreAvailableForRole(itemDefinitionOrModule, tokenData, 
             });
         }
     }
-    // That was basically the only thing that function does by so far
-    checkBasicFieldsAreAvailableForRoleDebug("SUCCEED");
+    __1.logger.silly("checkBasicFieldsAreAvailableForRole: basic fields access role succeed");
 }
 exports.checkBasicFieldsAreAvailableForRole = checkBasicFieldsAreAvailableForRole;
-const checkListLimitDebug = debug_1.default("resolvers:checkListLimit");
 /**
  * Checks a list provided by the getter functions that use
  * lists to ensure the request isn't too large
  * @param ids the list ids that have been requested
  */
 function checkListLimit(ids) {
-    checkListLimitDebug("EXECUTED with %j", ids);
     if (ids.length > constants_1.MAX_SEARCH_RESULTS_AT_ONCE_LIMIT) {
-        checkListLimitDebug("FAILED Exceeded limit by requesting %d ids the maximum limit is %d", ids.length, constants_1.MAX_SEARCH_RESULTS_AT_ONCE_LIMIT);
         throw new errors_1.EndpointError({
             message: "Too many ids at once, max is " + constants_1.MAX_SEARCH_RESULTS_AT_ONCE_LIMIT,
             code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
         });
     }
-    checkListLimitDebug("SUCCEED");
+    __1.logger.silly("checkListLimit: checking limits succeed");
 }
 exports.checkListLimit = checkListLimit;
-const checkListTypesDebug = debug_1.default("resolvers:checkListTypes");
 function checkListTypes(ids, mod) {
-    checkListTypesDebug("EXECUTED with %j", ids);
     ids.forEach((idContainer) => {
         const itemDefinition = mod.getParentRoot().registry[idContainer.type];
         if (!itemDefinition) {
@@ -254,9 +277,9 @@ function checkListTypes(ids, mod) {
             });
         }
     });
+    __1.logger.silly("checkListLimit: checking list types succeed");
 }
 exports.checkListTypes = checkListTypes;
-const checkLanguageDebug = debug_1.default("resolvers:checkLanguage");
 /**
  * Checks the language and region given the arguments passed
  * by the graphql resolver
@@ -264,10 +287,8 @@ const checkLanguageDebug = debug_1.default("resolvers:checkLanguage");
  * @param args the args themselves being passed to the resolver
  */
 function checkLanguage(appData, args) {
-    checkLanguageDebug("EXECUTED with args %j", args);
     // basically we check the type and if the lenght is right
     if (typeof args.language !== "string" || args.language.length !== 2) {
-        checkLanguageDebug("FAILED Invalid language code %s", args.language);
         throw new errors_1.EndpointError({
             message: "Please use valid non-regionalized language values",
             code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
@@ -277,16 +298,14 @@ function checkLanguage(appData, args) {
     // a dictionary assigned, only languages with a dictionary
     // assigned can be used by the database
     if (!appData.config.dictionaries[args.language]) {
-        checkLanguageDebug("FAILED Unavailable/Unsupported language %s", args.language);
         throw new errors_1.EndpointError({
             message: "This language is not supported, as no dictionary has been set",
             code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
         });
     }
-    checkLanguageDebug("SUCCEED");
+    __1.logger.silly("checkLanguage: checking limits succeed");
 }
 exports.checkLanguage = checkLanguage;
-const getDictionaryDebug = debug_1.default("resolvers:getDictionary");
 /**
  * This just extracts the dictionary given the app data
  * and the language of choice
@@ -294,17 +313,31 @@ const getDictionaryDebug = debug_1.default("resolvers:getDictionary");
  * @param args the whole args of the graphql request
  */
 function getDictionary(appData, args) {
-    getDictionaryDebug("EXECUTED with %j", args);
     const dictionary = appData.config.dictionaries[args.language];
-    getDictionaryDebug("SUCCEED with %s", dictionary);
+    __1.logger.silly("getDictionary: got dictionary " + dictionary);
     return dictionary;
 }
 exports.getDictionary = getDictionary;
-const validateTokenIsntBlockedDebug = debug_1.default("resolvers:validateTokenIsntBlocked");
+/**
+ * Validates the current token isn't blocked whether it is said so
+ * by the rules of the session id, user is removed, or invalid credentials
+ * @param cache the appdata cache instance
+ * @param tokenData the token data obtained and parsed
+ */
 async function validateTokenIsntBlocked(cache, tokenData) {
-    validateTokenIsntBlockedDebug("EXECUTED");
     if (tokenData.id) {
-        const sqlResult = await cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], tokenData.id, null);
+        let sqlResult;
+        try {
+            sqlResult = await cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], tokenData.id, null);
+        }
+        catch (err) {
+            __1.logger.error("validateTokenIsntBlocked [SERIOUS]: Couldn't validate whether the token is blocked or not", {
+                errStack: err.stack,
+                errMessage: err.message,
+                tokenData,
+            });
+            throw err;
+        }
         if (!sqlResult) {
             throw new errors_1.EndpointError({
                 message: "User has been removed",
@@ -330,23 +363,31 @@ async function validateTokenIsntBlocked(cache, tokenData) {
             });
         }
     }
-    validateTokenIsntBlockedDebug("SUCCEED");
+    __1.logger.silly("validateTokenIsntBlocked: token block checking succeed");
 }
 exports.validateTokenIsntBlocked = validateTokenIsntBlocked;
-const checkUserExistsDebug = debug_1.default("resolvers:checkUserExists");
 async function checkUserExists(cache, id) {
-    checkUserExistsDebug("EXECUTED");
-    const sqlResult = await cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], id, null);
+    let sqlResult;
+    try {
+        sqlResult = await cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], id, null);
+    }
+    catch (err) {
+        __1.logger.error("checkUserExists [SERIOUS]: Couldn't check whether the user exists", {
+            errStack: err.stack,
+            errMessage: err.message,
+            userId: id,
+        });
+        throw err;
+    }
     if (!sqlResult) {
         throw new errors_1.EndpointError({
             message: "User has been removed",
             code: constants_1.ENDPOINT_ERRORS.USER_REMOVED,
         });
     }
-    checkUserExistsDebug("SUCCEED");
+    __1.logger.silly("checkUserExists: check user exist succeed");
 }
 exports.checkUserExists = checkUserExists;
-const filterAndPrepareGQLValueDebug = debug_1.default("resolvers:filterAndPrepareGQLValue");
 /**
  * Filters and prepares a graphql value for output to the rest endpoint
  * given the value that has given by the server, the requested fields
@@ -359,7 +400,6 @@ const filterAndPrepareGQLValueDebug = debug_1.default("resolvers:filterAndPrepar
  * @param parentModuleOrIdef the parent module or item definition the value belongs to
  */
 function filterAndPrepareGQLValue(value, requestedFields, role, parentModuleOrIdef) {
-    filterAndPrepareGQLValueDebug("EXECUTED with value %j, where requested fields are %j for role %s and qualified module/item definition %s", value, requestedFields, role, parentModuleOrIdef.getQualifiedPathName());
     // we are going to get the value for the item
     let valueOfTheItem;
     if (parentModuleOrIdef instanceof ItemDefinition_1.default) {
@@ -395,11 +435,10 @@ function filterAndPrepareGQLValue(value, requestedFields, role, parentModuleOrId
             valueToProvide.toReturnToUser.DATA = null;
         }
     }
-    filterAndPrepareGQLValueDebug("SUCCEED with %j", valueToProvide);
+    __1.logger.silly("validateTokenIsntBlocked: prepared the value to provide", valueToProvide);
     return valueToProvide;
 }
 exports.filterAndPrepareGQLValue = filterAndPrepareGQLValue;
-const serverSideCheckItemDefinitionAgainstDebug = debug_1.default("resolvers:serverSideCheckItemDefinitionAgainst");
 /**
  * Checks that an item definition current state is
  * valid and that the gqlArgValue provided is a match
@@ -414,17 +453,31 @@ const serverSideCheckItemDefinitionAgainstDebug = debug_1.default("resolvers:ser
  * provide better error logging
  */
 async function serverSideCheckItemDefinitionAgainst(itemDefinition, gqlArgValue, id, version, referredInclude, referredParentOfInclude) {
-    serverSideCheckItemDefinitionAgainstDebug("EXECUTED with value %j for item defintion with qualified name %s", gqlArgValue, itemDefinition.getQualifiedPathName());
     // we get the current value of the item definition instance
-    const currentValue = await itemDefinition.getState(id, version);
-    serverSideCheckItemDefinitionAgainstDebug("Current value is %j", currentValue);
+    let currentValue;
+    try {
+        currentValue = await itemDefinition.getState(id, version);
+    }
+    catch (err) {
+        __1.logger.error("serverSideCheckItemDefinitionAgainst [SERIOUS]: Couldn't retrieve item definition state", {
+            errStack: err.stack,
+            errMessage: err.message,
+            id,
+            version,
+            itemDefinition: itemDefinition.getQualifiedPathName(),
+            referredInclude: referredInclude ? referredInclude.getQualifiedIdentifier() : null,
+            referredParentOfInclude: referredParentOfInclude ? referredParentOfInclude.getQualifiedPathName() : null,
+        });
+        throw err;
+    }
+    __1.logger.silly("serverSideCheckItemDefinitionAgainst: current state value for " + id + " and " + version, currentValue);
     // now we are going to loop over the properties of that value
     currentValue.properties.forEach((propertyValue) => {
         // and we get what is set in the graphql value
         const gqlPropertyValue = gqlArgValue[propertyValue.propertyId];
         // now we check if it has an invalid reason
         if (propertyValue.invalidReason) {
-            serverSideCheckItemDefinitionAgainstDebug("FAILED due to property failing %s", propertyValue.invalidReason);
+            __1.logger.silly("serverSideCheckItemDefinitionAgainst: failed due to property " + propertyValue.propertyId + " failing", propertyValue);
             // throw an error then
             throw new errors_1.EndpointError({
                 message: `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
@@ -440,7 +493,10 @@ async function serverSideCheckItemDefinitionAgainst(itemDefinition, gqlArgValue,
             // defined in the graphql value
         }
         else if (typeof gqlPropertyValue !== "undefined" && !deep_equal_1.default(gqlPropertyValue, propertyValue.value)) {
-            serverSideCheckItemDefinitionAgainstDebug("FAILED due to property mismatch on %s where provided was %j and expected was %j", propertyValue.propertyId, gqlPropertyValue, propertyValue.value);
+            __1.logger.silly("serverSideCheckItemDefinitionAgainst: failed due to property " + propertyValue.propertyId + " being unequal", {
+                propertyValue,
+                gqlPropertyValue,
+            });
             throw new errors_1.EndpointError({
                 message: `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated value`,
                 code: constants_1.ENDPOINT_ERRORS.INVALID_PROPERTY,
@@ -470,7 +526,10 @@ async function serverSideCheckItemDefinitionAgainst(itemDefinition, gqlArgValue,
         const gqlExclusionState = gqlArgValue[include.getQualifiedExclusionStateIdentifier()] || null;
         // now we check if the exclusion states match
         if (includeValue.exclusionState !== gqlExclusionState) {
-            serverSideCheckItemDefinitionAgainstDebug("FAILED due to exclusion state mismatch on include %s where provided was %s and expected %s", includeValue.includeId, gqlExclusionState, includeValue.exclusionState);
+            __1.logger.silly("serverSideCheckItemDefinitionAgainst: failed due to exclusion mismatch", {
+                includeValue,
+                gqlExclusionState,
+            });
             throw new errors_1.EndpointError({
                 message: `validation failed at include ${includeValue.includeId} with a mismatch of exclusion state`,
                 code: constants_1.ENDPOINT_ERRORS.INVALID_INCLUDE,
@@ -482,7 +541,10 @@ async function serverSideCheckItemDefinitionAgainst(itemDefinition, gqlArgValue,
             // and we check if the there's a value set despite it being excluded
         }
         else if (gqlExclusionState === Include_1.IncludeExclusionState.EXCLUDED && gqlIncludeValue !== null) {
-            serverSideCheckItemDefinitionAgainstDebug("FAILED due to value set on include %s where it was excluded", includeValue.includeId);
+            __1.logger.silly("serverSideCheckItemDefinitionAgainst: failed due to value set on include where it was excluded", {
+                includeValue,
+                gqlExclusionState,
+            });
             throw new errors_1.EndpointError({
                 message: `validation failed at include ${includeValue.includeId} with an excluded item but data set for it`,
                 code: constants_1.ENDPOINT_ERRORS.INVALID_INCLUDE,
@@ -496,10 +558,9 @@ async function serverSideCheckItemDefinitionAgainst(itemDefinition, gqlArgValue,
         // specific item data, that's where we use our referred item
         await serverSideCheckItemDefinitionAgainst(include.getItemDefinition(), gqlIncludeValue, id, version, include, referredParentOfInclude || itemDefinition);
     }
-    serverSideCheckItemDefinitionAgainstDebug("SUCCEED");
+    __1.logger.silly("serverSideCheckItemDefinitionAgainst: succeed checking item definition consistency");
 }
 exports.serverSideCheckItemDefinitionAgainst = serverSideCheckItemDefinitionAgainst;
-const checkReadPoliciesAllowThisUserToSearchDebug = debug_1.default("resolvers:checkReadPoliciesAllowThisUserToSearch");
 /**
  * Users cannot search if they have an active read policy in their roles
  * this function checks and throws an error if there's such a thing
@@ -507,7 +568,6 @@ const checkReadPoliciesAllowThisUserToSearchDebug = debug_1.default("resolvers:c
  * @param role the role
  */
 function checkReadPoliciesAllowThisUserToSearch(itemDefinition, role) {
-    checkReadPoliciesAllowThisUserToSearchDebug("EXECUTED for %s", role);
     const policiesForThisType = itemDefinition.getPolicyNamesFor("read");
     policiesForThisType.forEach((policyName) => {
         const roles = itemDefinition.getRolesForPolicy("read", policyName);
@@ -520,10 +580,9 @@ function checkReadPoliciesAllowThisUserToSearch(itemDefinition, role) {
             });
         }
     });
-    checkReadPoliciesAllowThisUserToSearchDebug("SUCCEED");
+    __1.logger.silly("checkReadPoliciesAllowThisUserToSearch: succeed checking policies allow user to search");
 }
 exports.checkReadPoliciesAllowThisUserToSearch = checkReadPoliciesAllowThisUserToSearch;
-const splitArgsInGraphqlQueryDebug = debug_1.default("resolvers:splitArgsInGraphqlQuery");
 /**
  * Splits the arguments in a graphql query from what it comes to be part
  * of the item definition or module in question and what is extra arguments
@@ -532,7 +591,6 @@ const splitArgsInGraphqlQueryDebug = debug_1.default("resolvers:splitArgsInGraph
  * @param args the arguments to split
  */
 function splitArgsInGraphqlQuery(moduleOrItemDefinition, args) {
-    splitArgsInGraphqlQueryDebug("EXECUTED with %j", args);
     const resultingSelfValues = {};
     const resultingExtraArgs = {};
     const propertyIds = (moduleOrItemDefinition instanceof Module_1.default ?
@@ -548,11 +606,13 @@ function splitArgsInGraphqlQuery(moduleOrItemDefinition, args) {
             resultingExtraArgs[key] = args[key];
         }
     });
-    splitArgsInGraphqlQueryDebug("SUCCEED with %j and with %j", resultingSelfValues, resultingExtraArgs);
+    __1.logger.silly("splitArgsInGraphqlQuery: succeed splitting args for graphql", {
+        resultingSelfValues,
+        resultingExtraArgs,
+    });
     return [resultingSelfValues, resultingExtraArgs];
 }
 exports.splitArgsInGraphqlQuery = splitArgsInGraphqlQuery;
-const runPolicyCheckDebug = debug_1.default("resolvers:runPolicyCheck");
 /**
  * Runs a policy check on the requested information
  * @param arg.policyType the policy type on which the request is made on, edit, delete
@@ -573,16 +633,37 @@ const runPolicyCheckDebug = debug_1.default("resolvers:runPolicyCheck");
  * @param arg.parentPrevalidation a pre validation to run
  */
 async function runPolicyCheck(arg) {
-    runPolicyCheckDebug("EXECUTED for policies %j on item definition %s for id %d on role %s for value %j with extra columns %j", arg.policyTypes, arg.itemDefinition.getQualifiedPathName(), arg.role, arg.gqlArgValue);
+    __1.logger.silly("runPolicyCheck: Executed policy check for item definition", arg);
     // so now we get the information we need first
     const mod = arg.itemDefinition.getParentModule();
     let selectQueryValue = null;
     let parentSelectQueryValue = null;
     if (arg.policyTypes.includes("read") || arg.policyTypes.includes("delete") || arg.policyTypes.includes("edit")) {
-        selectQueryValue = await arg.cache.requestValue(arg.itemDefinition, arg.id, arg.version);
+        try {
+            selectQueryValue = await arg.cache.requestValue(arg.itemDefinition, arg.id, arg.version);
+        }
+        catch (err) {
+            __1.logger.error("runPolicyCheck [SERIOUS]: could not run policy checks due to cache/database fail", {
+                id: arg.id,
+                version: arg.version,
+                itemDefinition: arg.itemDefinition,
+            });
+            throw err;
+        }
     }
     if (arg.policyTypes.includes("parent")) {
-        parentSelectQueryValue = await arg.cache.requestValue([arg.parentType, arg.parentModule], arg.parentId, arg.parentVersion);
+        try {
+            parentSelectQueryValue = await arg.cache.requestValue([arg.parentType, arg.parentModule], arg.parentId, arg.parentVersion);
+        }
+        catch (err) {
+            __1.logger.error("runPolicyCheck [SERIOUS]: could not run policy checks due to cache/database fail on parent rule", {
+                parentVersion: arg.parentVersion,
+                parentId: arg.parentId,
+                parentType: arg.parentType,
+                parentModule: arg.parentModule
+            });
+            throw err;
+        }
     }
     if (arg.preValidation) {
         const forcedResult = arg.preValidation(selectQueryValue);
@@ -601,12 +682,18 @@ async function runPolicyCheck(arg) {
         const policiesForThisType = arg.itemDefinition.getPolicyNamesFor(policyType);
         // so we loop in these policies
         for (const policyName of policiesForThisType) {
-            runPolicyCheckDebug("found policy %s", policyName);
+            __1.logger.silly("runPolicyCheck: Found policy", {
+                policyName,
+            });
             // and we get the roles that need to apply to this policy
             const rolesForThisSpecificPolicy = arg.itemDefinition.getRolesForPolicy(policyType, policyName);
             // if this is not our user, we can just continue with the next
             if (!rolesForThisSpecificPolicy.includes(arg.role)) {
-                runPolicyCheckDebug("ignoring policy %s as role %s does not require it but only %j demand it", policyName, arg.role, rolesForThisSpecificPolicy);
+                __1.logger.silly("ignoring policy the role does not require it", {
+                    policyName,
+                    role: arg.role,
+                    rolesForThisSpecificPolicy,
+                });
                 continue;
             }
             const gqlCheckingElement = policyType === "read" ? arg.gqlFlattenedRequestedFiels : arg.gqlArgValue;
@@ -637,7 +724,10 @@ async function runPolicyCheck(arg) {
                     }
                 }
                 if (!someIncludeOrPropertyIsApplied) {
-                    runPolicyCheckDebug("ignoring policy %s as there wasno matching applying property or include for %j", policyName, applyingPropertyIds);
+                    __1.logger.silly("runPolicyCheck: ignoring policy as there was no match for applying property or include", {
+                        policyName,
+                        applyingPropertyIds,
+                    });
                     continue;
                 }
             }
@@ -646,7 +736,9 @@ async function runPolicyCheck(arg) {
             const propertiesInContext = arg.itemDefinition.getPropertiesForPolicy(policyType, policyName);
             // we loop through those properties
             for (const property of propertiesInContext) {
-                runPolicyCheckDebug("Found property in policy %s", property.getId());
+                __1.logger.silly("runPolicyCheck: found property in policy", {
+                    propertyId: property.getId(),
+                });
                 // now we need the qualified policy identifier, that's where in the args
                 // the value for this policy is stored
                 const qualifiedPolicyIdentifier = property.getQualifiedPolicyIdentifier(policyType, policyName);
@@ -656,13 +748,29 @@ async function runPolicyCheck(arg) {
                 if (typeof policyValueForTheProperty === "undefined") {
                     policyValueForTheProperty = null;
                 }
-                runPolicyCheckDebug("Property qualified policy identifier is %s found value set as %j", qualifiedPolicyIdentifier, policyValueForTheProperty);
+                __1.logger.silly("runPolicyCheck: Property qualified policy identifier found and value is set", {
+                    qualifiedPolicyIdentifier,
+                    policyValueForTheProperty,
+                });
                 // now we check if it's a valid value, the value we have given, for the given property
                 // this is a shallow check but works
-                const invalidReason = await property.isValidValue(arg.id, arg.version, policyValueForTheProperty);
+                let invalidReason;
+                try {
+                    invalidReason = await property.isValidValue(arg.id, arg.version, policyValueForTheProperty);
+                }
+                catch (err) {
+                    __1.logger.error("runPolicyCheck [SERIOUS]: couldn't check if the value is valid", {
+                        id: arg.id,
+                        version: arg.version,
+                        policyValueForTheProperty,
+                    });
+                    throw err;
+                }
                 // if we get an invalid reason, the policy cannot even pass there
                 if (invalidReason) {
-                    runPolicyCheckDebug("FAILED due to failing to pass property validation %s", invalidReason);
+                    __1.logger.silly("runPolicyCheck: Failed for not passing property validation", {
+                        invalidReason,
+                    });
                     throw new errors_1.EndpointError({
                         message: `validation failed for ${qualifiedPolicyIdentifier} with reason ${invalidReason}`,
                         code: constants_1.ENDPOINT_ERRORS.INVALID_POLICY,
@@ -678,7 +786,9 @@ async function runPolicyCheck(arg) {
                 // because policies are uppercase this avoids collisions with properties
                 const policyMatches = property.getPropertyDefinitionDescription().sqlLocalEqual(policyValueForTheProperty, "", property.getId(), policyType === "parent" ? parentSelectQueryValue : selectQueryValue);
                 if (!policyMatches) {
-                    runPolicyCheckDebug("FAILED due to policy %s not passing", policyName);
+                    __1.logger.silly("runPolicyCheck: Failed due to policy not pasing", {
+                        policyName,
+                    });
                     throw new errors_1.EndpointError({
                         message: `validation failed for policy ${policyName}`,
                         code: constants_1.ENDPOINT_ERRORS.INVALID_POLICY,
@@ -691,7 +801,7 @@ async function runPolicyCheck(arg) {
             }
         }
     }
-    runPolicyCheckDebug("SUCCEED");
+    __1.logger.silly("runPolicyCheck: Completed checking policies");
     return selectQueryValue;
 }
 exports.runPolicyCheck = runPolicyCheck;

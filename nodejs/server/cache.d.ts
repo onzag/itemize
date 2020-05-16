@@ -133,6 +133,7 @@ export declare class Cache {
      */
     requestValue(itemDefinition: ItemDefinition | [string, string], id: number, version: string, refresh?: boolean): Promise<ISQLTableRowValue>;
     /**
+     * TODO Optimize this, right now it retrieves the list one by one
      * Requests a whole list of search results
      * @param ids the ids to request for
      * @returns a list of whole sql combined table row values

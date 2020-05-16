@@ -6,7 +6,7 @@ import uuid from "uuid";
 import { PropertyDefinitionSupportedFileType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
 import prettyBytes from "pretty-bytes";
 import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, processAccepts } from "../../../../util";
-import { fileURLAbsoluter, imageSrcSetRetriever } from "../../../components/util";
+import { fileURLAbsoluter, imageSrcSetRetriever, imageSizeRetriever, IImageSizes } from "../../../components/util";
 
 export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererProps<PropertyDefinitionSupportedFileType> {
   accept: string;
@@ -18,6 +18,7 @@ export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererP
   rejected: boolean;
   rejectedReason: string;
   imageSrcSet: string;
+  imageSizes: IImageSizes;
   prettySize: string;
   extension: string;
   onSetFile: (file: File) => void;
@@ -195,7 +196,8 @@ export default class PropertyEntryFile
       }
     }
 
-    const imageSrcSet = isSupportedImage ? imageSrcSetRetriever(currentValue, this.props.property) : null;
+    const imageSizes = isSupportedImage ? imageSizeRetriever(currentValue, this.props.property) : null;
+    const imageSrcSet = isSupportedImage ? imageSrcSetRetriever(currentValue, this.props.property, imageSizes) : null;
 
     const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
     const accept = processAccepts(
@@ -261,6 +263,7 @@ export default class PropertyEntryFile
 
       isSupportedImage,
       imageSrcSet,
+      imageSizes,
       prettySize,
       extension,
     };

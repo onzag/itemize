@@ -1,5 +1,4 @@
-import Debug from "debug";
-import { IAppDataType } from "../../../server";
+import { IAppDataType, logger } from "../../../server";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType, FGraphQLModResolverType } from "../../../base/Root/gql";
 import Module from "../../../base/Root/Module";
 import {
@@ -24,15 +23,13 @@ import { buildSQLQueryForItemDefinition } from "../../../base/Root/Module/ItemDe
 import { IGQLSearchResult } from "../../../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
 
-const searchModuleDebug = Debug("resolvers:searchModule");
 export async function searchModule(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
 ) {
-  searchModuleDebug(
-    "EXECUTED for %s",
-    mod.getQualifiedPathName(),
+  logger.debug(
+    "searchModule: executed search for " + mod.getQualifiedPathName(),
   );
 
   // check language and region
@@ -53,14 +50,9 @@ export async function searchModule(
     }
   });
 
-  searchModuleDebug(
-    "Searching fields retrieved as %j",
+  logger.debug(
+    "searchModule: retrieved search fields as",
     searchingFields,
-  );
-
-  searchModuleDebug(
-    "Checking read role access based on %s",
-    searchModeCounterpart.getQualifiedPathName(),
   );
 
   const created_by = resolverArgs.args.created_by;
@@ -72,6 +64,9 @@ export async function searchModule(
   // check role access for those searching fields
   // yes they are not being directly read but they can
   // be brute forced this way, and we are paranoid as hell
+  logger.debug(
+    "searchModule: checking read role access based on " + searchModeCounterpart.getQualifiedPathName(),
+  );
   searchModeCounterpart.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
@@ -121,20 +116,20 @@ export async function searchModule(
     last_record: baseResult[0] || null,
   };
 
-  searchModuleDebug("SUCCEED with %j", finalResult);
+  logger.debug(
+    "searchModule: succeed",
+  );
 
   return finalResult;
 }
 
-const searchItemDefinitionDebug = Debug("resolvers:searchItemDefinition");
 export async function searchItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
-  searchItemDefinitionDebug(
-    "EXECUTED for %s",
-    itemDefinition.getQualifiedPathName(),
+  logger.debug(
+    "searchItemDefinition: executed search for " + itemDefinition.getQualifiedPathName(),
   );
 
   // check the language and region
@@ -164,14 +159,9 @@ export async function searchItemDefinition(
     }
   });
 
-  searchItemDefinitionDebug(
-    "Searching fields retrieved as %j",
+  logger.debug(
+    "searchItemDefinition: retrieved search fields as",
     searchingFields,
-  );
-
-  searchItemDefinitionDebug(
-    "Checking read role access based on %s",
-    searchModeCounterpart.getQualifiedPathName(),
   );
 
   const created_by = resolverArgs.args.created_by;
@@ -189,6 +179,9 @@ export async function searchItemDefinition(
   // and uses the EXACT_phone_number field, he will get returned null
   // until he matches the phone number, this is a leak, a weak one
   // but a leak nevertheless, we are so paranoid we prevent this
+  logger.debug(
+    "searchItemDefinition: checking role access based on " + searchModeCounterpart.getQualifiedPathName(),
+  );
   searchModeCounterpart.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
@@ -218,11 +211,6 @@ export async function searchItemDefinition(
   const requiresJoin = Object.keys(resolverArgs.args).some((argName) => {
     return !RESERVED_SEARCH_PROPERTIES[argName] && !searchMod.hasPropExtensionFor(argName);
   });
-
-  searchItemDefinitionDebug(
-    "Join considered as %j",
-    requiresJoin,
-  );
 
   // now we build the search query
   const searchQuery = appData.knex.select(["id", "version", "created_at"]).from(moduleTable)
@@ -284,7 +272,9 @@ export async function searchItemDefinition(
     // TODO manually reorder the real latest by date
     last_record: ids[0],
   };
-  searchItemDefinitionDebug("SUCCEED with %j", finalResult);
+  logger.debug(
+    "searchItemDefinition: done",
+  );
   return finalResult;
 }
 

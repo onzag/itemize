@@ -1,7 +1,6 @@
-import { IAppDataType } from "../../";
+import { IAppDataType, logger } from "../../";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType, FGraphQLModResolverType } from "../../../base/Root/gql";
-import Debug from "debug";
 import {
   checkLanguage,
   validateTokenAndGetData,
@@ -25,15 +24,13 @@ import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { EndpointError } from "../../../base/errors";
 import { IGQLSearchResult } from "../../../gql-querier";
 
-const getItemDefinitionDebug = Debug("resolvers:getItemDefinition");
 export async function getItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
-  getItemDefinitionDebug(
-    "EXECUTED for %s",
-    itemDefinition.getQualifiedPathName(),
+  logger.debug(
+    "getItemDefinition: executed get for " + itemDefinition.getQualifiedPathName(),
   );
   // first we check that the language and region provided are
   // right and available
@@ -100,19 +97,21 @@ export async function getItemDefinition(
       requestedFieldsInIdef,
       true,
     );
-    getItemDefinitionDebug("no result founds, returning null");
+    logger.debug(
+      "getItemDefinition: no results found returning null",
+    );
     // We do not return the 404, just return null in this case
     return null;
   }
-  getItemDefinitionDebug("SQL result found as %j", selectQueryValue);
-
-  getItemDefinitionDebug("Checking role access for read");
 
   let userId = selectQueryValue.created_by;
   if (itemDefinition.isOwnerObjectId()) {
     userId = selectQueryValue.id;
   }
 
+  logger.debug(
+    "getItemDefinition: checking role access for read",
+  );
   // now we check the role access, this function will throw an error
   // if that fails, and we only check for the requested fields
   itemDefinition.checkRoleAccessFor(
@@ -124,6 +123,11 @@ export async function getItemDefinition(
     true,
   );
 
+  logger.debug(
+    "getItemDefinition: SQL ouput retrieved",
+    selectQueryValue,
+  );
+
   const valueToProvide = filterAndPrepareGQLValue(
     selectQueryValue,
     requestedFields,
@@ -131,20 +135,22 @@ export async function getItemDefinition(
     itemDefinition,
   );
 
-  getItemDefinitionDebug("SUCCEED with %j", valueToProvide.toReturnToUser);
+  logger.debug(
+    "getItemDefinition: GQL ouput retrieved",
+    valueToProvide.toReturnToUser,
+  );
+
   // return if otherwise succeeds
   return valueToProvide.toReturnToUser;
 }
 
-const getItemDefinitionListDebug = Debug("resolvers:getItemDefinitionList");
 export async function getItemDefinitionList(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
-  getItemDefinitionListDebug(
-    "EXECUTED for %s",
-    itemDefinition.getQualifiedPathName(),
+  logger.debug(
+    "getItemDefinitionList: executed get list for " + itemDefinition.getQualifiedPathName(),
   );
 
   // first we check that the language and region provided are
@@ -175,7 +181,11 @@ export async function getItemDefinitionList(
       requestedFieldsInIdef[arg] = requestedFields[arg];
     }
   });
-  getItemDefinitionListDebug("Extracted requested fields from idef as %j", requestedFieldsInIdef);
+
+  logger.debug(
+    "getItemDefinitionList: Extracted requested fields from idef",
+    requestedFields,
+  );
 
   const created_by = resolverArgs.args.created_by;
   let ownerToCheckAgainst = UNSPECIFIED_OWNER;
@@ -183,6 +193,9 @@ export async function getItemDefinitionList(
     ownerToCheckAgainst = created_by;
   }
 
+  logger.debug(
+    "getItemDefinitionList: checking role access for read",
+  );
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
@@ -228,20 +241,18 @@ export async function getItemDefinitionList(
   const resultAsObject = {
     results: finalValues,
   };
-  getItemDefinitionListDebug("SUCCEED");
+  logger.debug("getItemDefinitionList: done");
+
   return resultAsObject;
 }
 
-const getModuleListDebug = Debug("resolvers:getModuleList");
 export async function getModuleList(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
 ) {
-  console.log(mod.getQualifiedPathName());
-  getModuleListDebug(
-    "EXECUTED for %s",
-    mod.getQualifiedPathName(),
+  logger.debug(
+    "getModuleList: executed get list for " + mod.getQualifiedPathName(),
   );
   // first we check that the language and region provided are
   // right and available
@@ -264,16 +275,20 @@ export async function getModuleList(
       requestedFieldsInMod[arg] = requestedFields[arg];
     }
   });
-  getModuleListDebug(
-    "Requested fields calculated as %j",
+  logger.debug(
+    "getModuleList: Extracted requested fields from idef",
     requestedFieldsInMod,
   );
-  getModuleListDebug("Checking role access for read");
+
   const created_by = resolverArgs.args.created_by;
   let ownerToCheckAgainst = UNSPECIFIED_OWNER;
   if (created_by) {
     ownerToCheckAgainst = created_by;
   }
+
+  logger.debug(
+    "getModuleList: checking role access for read",
+  );
   mod.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
@@ -305,7 +320,8 @@ export async function getModuleList(
   const resultAsObject = {
     results: finalValues,
   };
-  getModuleListDebug("SUCCEED");
+
+  logger.debug("getModuleList: done");
   return resultAsObject;
 }
 

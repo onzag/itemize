@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const read_1 = require("../read");
 async function redisConfigSetup(version, currentConfig, referenceConfig, packageJSON) {
-    const newConfig = await read_1.configRequest(currentConfig || referenceConfig, "Redis configuration (" + version + ")", [
+    const extractDataRedis = [
         {
             variableName: "host",
             message: "The host where redis is running",
@@ -35,6 +35,30 @@ async function redisConfigSetup(version, currentConfig, referenceConfig, package
             defaultValue: "",
             hidden: true,
             nullifyFalseValues: true,
+        }
+    ];
+    const usedConfig = currentConfig || referenceConfig;
+    const newConfig = await read_1.configRequest(usedConfig, "Redis configuration (" + version + ")", [
+        {
+            variableName: "global",
+            type: "config",
+            defaultValue: null,
+            message: "Cache configuration that is used for the global volatile memory that is shared between instances",
+            extractData: extractDataRedis,
+        },
+        {
+            variableName: "cache",
+            type: "config",
+            defaultValue: null,
+            message: "Cache configuration that is used for the internal service cache",
+            extractData: extractDataRedis,
+        },
+        {
+            variableName: "pubSub",
+            type: "config",
+            defaultValue: null,
+            message: "Pubsub redis instance that is used for notifying variable changes and other notifications",
+            extractData: extractDataRedis,
         },
     ]);
     return newConfig;

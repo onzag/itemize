@@ -1,6 +1,7 @@
 import https from "https";
 import { IPropertyDefinitionSupportedLocationType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import uuidv5 from "uuid/v5";
+import { logger } from "../";
 
 // the interface that roughly represents a result from the
 // here we go API, check the API at
@@ -21,6 +22,8 @@ interface IHereResult {
   distance: number;
 }
 
+// this id can be whatever just to ensure lat and long produce the same id no matter what
+// basically a combination for location, this way we are not tied to any API
 const NAMESPACE = "d27dba52-42ef-4649-81d2-568f9ba341ff";
 function makeIdOutOf(lat: number, lng: number) {
   return "L" + uuidv5(lat.toString() + lng.toString(), NAMESPACE).replace(/-/g, "");
@@ -99,13 +102,36 @@ export class Here {
                 txt: query ? query : addressText,
               });
             } catch (err) {
-              // TODO do something with error
-              console.log(err);
+              logger.error(
+                "Here.requestGeocodeFor [SERIOUS]: here replied with invalid data or with error message",
+                {
+                  errMessage: err.message,
+                  errStack: err.stack,
+                  data,
+                  lat,
+                  lng,
+                  query,
+                  lang,
+                  sep,
+                }
+              );
               resolve(standardResponse);
             }
           });
         }
-      ).on("error", () => {
+      ).on("error", (err) => {
+        logger.error(
+          "Here.requestGeocodeFor [SERIOUS]: https request to here API failed",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+            lat,
+            lng,
+            query,
+            lang,
+            sep,
+          }
+        );
         resolve(standardResponse);
       });
     });
@@ -160,13 +186,36 @@ export class Here {
                 query,
               )));
             } catch (err) {
-              // TODO do something with error
-              console.log(err);
+              logger.error(
+                "Here.requestSearchFor [SERIOUS]: here replied with invalid data or with error message",
+                {
+                  errMessage: err.message,
+                  errStack: err.stack,
+                  data,
+                  lat,
+                  lng,
+                  query,
+                  lang,
+                  sep,
+                }
+              );
               resolve([]);
             }
           });
         }
-      ).on("error", () => {
+      ).on("error", (err) => {
+        logger.error(
+          "Here.requestSearchFor [SERIOUS]: https request to here API failed",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+            lat,
+            lng,
+            query,
+            lang,
+            sep,
+          }
+        );
         resolve([]);
       });
     });
@@ -213,13 +262,36 @@ export class Here {
                 r,
               )));
             } catch (err) {
-              // TODO do something with error
-              console.log(err);
+              logger.error(
+                "Here.requestAutocompleteFor [SERIOUS]: here replied with invalid data or with error message",
+                {
+                  errMessage: err.message,
+                  errStack: err.stack,
+                  data,
+                  lat,
+                  lng,
+                  query,
+                  lang,
+                  sep,
+                }
+              );
               resolve([]);
             }
           });
         }
-      ).on("error", () => {
+      ).on("error", (err) => {
+        logger.error(
+          "Here.requestSearchFor [SERIOUS]: https request to here API failed",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+            lat,
+            lng,
+            query,
+            lang,
+            sep,
+          }
+        );
         resolve([]);
       });
     });

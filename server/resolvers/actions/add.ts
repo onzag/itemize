@@ -1,7 +1,6 @@
-import { IAppDataType } from "../../";
+import { IAppDataType, logger } from "../../";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
-import Debug from "debug";
 import {
   checkLanguage,
   validateTokenAndGetData,
@@ -31,13 +30,15 @@ import { TriggerActions } from "../triggers";
 
 // TODO versioning and the for_id madness
 
-const debug = Debug("resolvers:addItemDefinition");
 export async function addItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
-  debug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
+  logger.debug(
+    "addItemDefinition: executed adding for " + itemDefinition.getQualifiedPathName(),
+  );
+
   // First we check the language and the region, based on the args
   // as we expect every request to contain this data and be
   // valid for our app
@@ -127,9 +128,15 @@ export async function addItemDefinition(
     await checkUserExists(appData.cache, finalOwner);
   }
 
-  debug("Fields to add have been extracted as %j", addingFields);
+  logger.debug(
+    "addItemDefinition: Fields to add have been extracted",
+    addingFields,
+  );
 
-  debug("Checking role access for creation...");
+  logger.debug(
+    "addItemDefinition: Checking basic role access for creation",
+  );
+
   // now we check the role access for the given
   // create action
   itemDefinition.checkRoleAccessFor(
@@ -155,11 +162,15 @@ export async function addItemDefinition(
     }
   });
 
-  debug(
-    "Fields to be requested from the idef have been extracted as %j",
+  logger.debug(
+    "addItemDefinition: Fields to be requested have been extracted",
     requestedFieldsThatRepresentPropertiesAndIncludes,
   );
-  debug("Checking role access for read...");
+
+  logger.debug(
+    "addItemDefinition: Checking basic role access for read",
+  );
+
   // so now we check the role access for the reading of
   // those fields, as you can see we use the userId of the user
   // since he will be the owner as well
@@ -206,7 +217,9 @@ export async function addItemDefinition(
         // this shouldn't really happen because validateParentingRules should have
         // checked whether it existed, but we check anyway
         if (!content) {
-          debug("FAILED due to lack of content data");
+          logger.debug(
+            "addItemDefinition: failed due to lack of content data",
+          );
           throw new EndpointError({
             message: `There's no parent ${resolverArgs.args.parent_type} with ` +
             `id ${resolverArgs.args.parent_id} and version ${resolverArgs.args.parent_version}`,
@@ -217,7 +230,9 @@ export async function addItemDefinition(
         // this should have also not happen because validate should also have done it
         // but we check anyway
         if (content.blocked_at !== null) {
-          debug("FAILED due to element being blocked");
+          logger.debug(
+            "addItemDefinition: failed due to element being blocked",
+          );
           throw new EndpointError({
             message: "The parent is blocked",
             code: ENDPOINT_ERRORS.BLOCKED,
@@ -229,8 +244,6 @@ export async function addItemDefinition(
 
   // extract this information
   const mod = itemDefinition.getParentModule();
-  const moduleTable = mod.getQualifiedPathName();
-  const selfTable = itemDefinition.getQualifiedPathName();
 
   // we need to get the dictionary that is used for this specific
   // language, remember, while the API uses a language and region(country)
@@ -314,8 +327,12 @@ export async function addItemDefinition(
       version: resolverArgs.args.parent_version,
       type: resolverArgs.args.parent_type,
     } : null,
-  )
-  debug("SQL Output is %j", value);
+  );
+
+  logger.debug(
+    "addItemDefinition: SQL ouput retrieved",
+    value,
+  );
 
   // now we convert that SQL value to the respective GQL value
   // the reason we pass the requested fields is to filter by the fields
@@ -333,7 +350,10 @@ export async function addItemDefinition(
     ...gqlValue,
   };
 
-  debug("SUCCEED with GQL output %j", finalOutput);
+  logger.debug(
+    "addItemDefinition: GQL output calculated",
+    finalOutput,
+  );
 
   // items that have just been added cannot be blocked or deleted, hence we just return
   // right away without checking

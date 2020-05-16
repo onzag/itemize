@@ -1,4 +1,4 @@
-import { IAppDataType } from "..";
+import { IAppDataType, logger } from "..";
 import { IGQLQueryFieldsDefinitionType } from "../../base/Root/gql";
 import { GraphQLString, GraphQLNonNull } from "graphql";
 import {
@@ -41,10 +41,10 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
   const emailPropertyDescription = emailProperty.getPropertyDefinitionDescription();
   const eValidatedPropertyDescription = eValidatedProperty.getPropertyDefinitionDescription();
 
-  const setPromisified = promisify(appData.redis.set).bind(appData.redis);
-  const expirePromisified = promisify(appData.redis.expire).bind(appData.redis);
-  const getPromisified = promisify(appData.redis.get).bind(appData.redis);
-  const delPromisified = promisify(appData.redis.del).bind(appData.redis);
+  const setPromisified = promisify(appData.redisGlobal.set).bind(appData.redisGlobal);
+  const expirePromisified = promisify(appData.redisGlobal.expire).bind(appData.redisGlobal);
+  const getPromisified = promisify(appData.redisGlobal.get).bind(appData.redisGlobal);
+  const delPromisified = promisify(appData.redisGlobal.del).bind(appData.redisGlobal);
 
   return {
     token: {
@@ -99,11 +99,23 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
           // and set the token as the pre generated token so we reuse it
           preGeneratedToken = args.token;
-          resultUser = await appData.cache.requestValue(
-            userIdef,
-            decoded.id,
-            null,
-          );
+          try {
+            resultUser = await appData.cache.requestValue(
+              userIdef,
+              decoded.id,
+              null,
+            );
+          } catch (err) {
+            logger.error(
+              "customUserQueries.token [SERIOUS]: failed to retrieve user value from cache/database which caused the user not to login",
+              {
+                errMessage: err.message,
+                errStack: err.stack,
+                id: decoded.id,
+              },
+            );
+            throw err;
+          }
 
           // now we check the session id to see if it has been cancelled
           if (resultUser.session_id !== decoded.sessionId) {
@@ -149,7 +161,20 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             })
             .andWhere(passwordPropertyDescription.sqlEqual(args.password, "", passwordProperty.getId(), false, appData.knex));
 
-          resultUser = await resultUserQuery || null;
+          try {
+            resultUser = await resultUserQuery || null;
+          } catch (err) {
+            logger.error(
+              "customUserQueries.token [SERIOUS]: failed to execute sql query in order to retrieve " +
+              "a user which caused the user to be unable to login",
+              {
+                errMessage: err.message,
+                errStack: err.stack,
+                username: args.username,
+              },
+            );
+            throw err;
+          }
 
           if (!resultUser) {
             // if we don't get an user and we previously
@@ -172,20 +197,33 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
               code: ENDPOINT_ERRORS.USER_BLOCKED,
             });
           }
-          // otherwise we provide the token, either re-give the same token
-          // or provide a new one
-          const token = preGeneratedToken || (await jwtSign({
-            id: resultUser.id,
-            role: resultUser.role,
-            sessionId: resultUser.session_id,
-          }, appData.sensitiveConfig.jwtKey, {
-            expiresIn: "7d",
-          }));
-          // and we return the information back to the user
-          return {
-            ...resultUser,
-            token,
-          };
+
+          try {
+            // otherwise we provide the token, either re-give the same token
+            // or provide a new one
+            const token = preGeneratedToken || (await jwtSign({
+              id: resultUser.id,
+              role: resultUser.role,
+              sessionId: resultUser.session_id,
+            }, appData.sensitiveConfig.jwtKey, {
+              expiresIn: "7d",
+            }));
+            // and we return the information back to the user
+            return {
+              ...resultUser,
+              token,
+            };
+          } catch (err) {
+            logger.error(
+              "customUserQueries.token [SERIOUS]: failed to sign token which caused user to be unable to login",
+              {
+                errMessage: err.message,
+                errStack: err.stack,
+                resultUser,
+              },
+            );
+            throw err;
+          }
         } else {
           // otherwise the user has been removed as the id
           // is not found, this can happen if the user
@@ -223,7 +261,21 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           });
         }
 
-        const resultUser = await appData.cache.requestValue(userIdef, decoded.id, null);
+        let resultUser: ISQLTableRowValue;
+        try {
+          resultUser = await appData.cache.requestValue(userIdef, decoded.id, null);
+        } catch (err) {
+          logger.error(
+            "customUserQueries.send_validate_email [SERIOUS]: failed to retrieve user",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              id: decoded.id,
+            },
+          );
+          throw err;
+        }
+
         // if we get an user
         if (resultUser) {
           // if the user is blocked
@@ -260,12 +312,27 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
         // now we try to find another user with such email that has already validated
         // such
-        const userWithThatEmail = await appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
-          .from(userTable).where({
-            email: resultUser.email,
-            e_validated: true,
-          });
+        let userWithThatEmail: ISQLTableRowValue;
+        try {
+          userWithThatEmail = await appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
+            .from(userTable).where({
+              email: resultUser.email,
+              e_validated: true,
+            });
+        } catch (err) {
+          logger.error(
+            "customUserQueries.send_validate_email [SERIOUS]: could not perform the SQL query to find out if user with same email but " +
+            "validated existed which caused the current user to be unable to send a validation email",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              resultUser,
+            },
+          );
+          throw err;
+        }
 
+        // if we ifind an user with the same email
         if (userWithThatEmail) {
           throw new EndpointError({
             message: "That email is taken",
@@ -273,17 +340,28 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           });
         }
 
-        const avoidSendingEmailEmailTarget =
-          !!(await getPromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString()));
-        if (avoidSendingEmailEmailTarget === resultUser.email) {
-          return {
-            status: "OK",
-          };
+        try {
+          const avoidSendingEmailEmailTarget =
+            !!(await getPromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString()));
+          if (avoidSendingEmailEmailTarget === resultUser.email) {
+            return {
+              status: "OK",
+            };
+          }
+        } catch (err) {
+          logger.error(
+            "customUserQueries.send_validate_email [SERIOUS]: failed to retrieve flag from global redis instance to avoid sending " +
+            "which caused to be unable to send the email at all",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              resultUser,
+            },
+          );
+          throw err;
         }
 
-        await setPromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString(), resultUser.email.toString());
-        await expirePromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString(), VERIFY_ACCOUNT_EMAIL_RESEND_SECONDS_TIME);
-
+        // retrieving user language information
         const appLanguage = resultUser.app_language;
         let languageToUse = appLanguage;
         let i18nData = userIdef.getI18nDataFor(appLanguage);
@@ -292,43 +370,84 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           i18nData = userIdef.getI18nDataFor("en");
         }
 
-        const validateToken = await jwtSign({
-          validateUserId: decoded.id,
-          validateUserEmail: resultUser.email,
-        }, appData.sensitiveConfig.jwtKey);
+        let validateToken: string;
+        try {
+          validateToken = await jwtSign({
+            validateUserId: decoded.id,
+            validateUserEmail: resultUser.email,
+          }, appData.sensitiveConfig.jwtKey);
+        } catch (err) {
+          logger.error(
+            "customUserQueries.send_validate_email [SERIOUS]: could not sign the validation email token",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              resultUser,
+            },
+          );
+          throw err;
+        }
+
+        try {
+          await setPromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString(), resultUser.email.toString());
+          await expirePromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString(), VERIFY_ACCOUNT_EMAIL_RESEND_SECONDS_TIME);
+        } catch (err) {
+          logger.error(
+            "customUserQueries.send_validate_email [SERIOUS]: could not set the global values for the temporary avoid sending email flags",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              resultUser,
+            },
+          );
+          throw err;
+        }
+
         const validateLink = (appData.sensitiveConfig.mailgunTargetDomain || appData.config.productionHostname) +
           "/rest/user/validate-email?token=" + encodeURIComponent(validateToken) + "&id=" + decoded.id;
-
         const templateToUse = i18nData.custom.validate_account_template_name;
         const from = `${i18nData.custom.validate_account_user} <${i18nData.custom.validate_account_email_user}@${appData.sensitiveConfig.mailgunDomain}>`;
         const to = resultUser.email;
         const subject = capitalize(i18nData.custom.validate_account);
-        if (!templateToUse) {
-          await appData.mailgun.messages().send({
-            from,
-            to,
-            subject,
-            text: `You do not have a template setup for language ${languageToUse}\n` +
-            `validate_account_link = ${validateLink}\n` +
-            `validate_account = ${capitalize(i18nData.custom.validate_account)}\n` +
-            `validate_account_title = ${capitalize(i18nData.custom.validate_account_title)}\n` +
-            `validate_account_description = ${i18nData.custom.validate_account_description}\n` +
-            `validate_account_activate_button = ${capitalize(i18nData.custom.validate_account_activate_button)}\n` +
-            `validate_account_alt_link = ${capitalize(i18nData.custom.validate_account_alt_link)}`
-          });
-        } else {
-          await appData.mailgun.messages().send({
-            from,
-            to,
-            subject,
-            template: templateToUse,
-            validate_account_link: validateLink,
-            validate_account: capitalize(i18nData.custom.validate_account),
-            validate_account_title: capitalize(i18nData.custom.validate_account_title),
-            validate_account_description: i18nData.custom.validate_account_description,
-            validate_account_activate_button: capitalize(i18nData.custom.validate_account_activate_button),
-            validate_account_alt_link: capitalize(i18nData.custom.validate_account_alt_link),
-          });
+
+        try {
+          if (!templateToUse) {
+            await appData.mailgun.messages().send({
+              from,
+              to,
+              subject,
+              text: `You do not have a template setup for language ${languageToUse}\n` +
+              `validate_account_link = ${validateLink}\n` +
+              `validate_account = ${capitalize(i18nData.custom.validate_account)}\n` +
+              `validate_account_title = ${capitalize(i18nData.custom.validate_account_title)}\n` +
+              `validate_account_description = ${i18nData.custom.validate_account_description}\n` +
+              `validate_account_activate_button = ${capitalize(i18nData.custom.validate_account_activate_button)}\n` +
+              `validate_account_alt_link = ${capitalize(i18nData.custom.validate_account_alt_link)}`
+            });
+          } else {
+            await appData.mailgun.messages().send({
+              from,
+              to,
+              subject,
+              template: templateToUse,
+              validate_account_link: validateLink,
+              validate_account: capitalize(i18nData.custom.validate_account),
+              validate_account_title: capitalize(i18nData.custom.validate_account_title),
+              validate_account_description: i18nData.custom.validate_account_description,
+              validate_account_activate_button: capitalize(i18nData.custom.validate_account_activate_button),
+              validate_account_alt_link: capitalize(i18nData.custom.validate_account_alt_link),
+            });
+          }
+        } catch (err) {
+          logger.error(
+            "customUserQueries.send_validate_email [SERIOUS]: mailgun API failed to deliver the email",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              resultUser,
+            },
+          );
+          throw err;
         }
 
         return {
@@ -356,14 +475,28 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         // you might wonder why not to prevent email that are equal as that user to start with,
         // well this is to avoid a DDOS attack similar to one that was present at github
         // where you would set an invalidated email, and that user won't be able to claim its own email
-        const resultUser = await appData.knex.first(
-          CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-          "email",
-          "username",
-          "app_language",
-        ).from(userTable)
-          .where(emailPropertyDescription.sqlEqual(args.email, "", emailProperty.getId(), true, appData.knex))
-          .andWhere(eValidatedPropertyDescription.sqlEqual(true, "", eValidatedProperty.getId(), false, appData.knex));
+        let resultUser: ISQLTableRowValue;
+        
+        try {
+          resultUser = await appData.knex.first(
+            CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+            "email",
+            "username",
+            "app_language",
+          ).from(userTable)
+            .where(emailPropertyDescription.sqlEqual(args.email, "", emailProperty.getId(), true, appData.knex))
+            .andWhere(eValidatedPropertyDescription.sqlEqual(true, "", eValidatedProperty.getId(), false, appData.knex));
+        } catch (err) {
+          logger.error(
+            "customUserQueries.send_reset_password [SERIOUS]: could not request user from user table by email",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              email: args.email,
+            },
+          );
+          throw err;
+        }
 
         if (!resultUser) {
           throw new EndpointError({
@@ -381,23 +514,67 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         }
 
         const userId = resultUser[CONNECTOR_SQL_COLUMN_ID_FK_NAME];
-        const avoidSendingEmail = !!(await getPromisified("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString()));
-        if (avoidSendingEmail) {
-          return {
-            status: "OK",
-          };
+
+        try {
+          const avoidSendingEmail = !!(await getPromisified("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString()));
+          if (avoidSendingEmail) {
+            return {
+              status: "OK",
+            };
+          }
+        } catch (err) {
+          logger.error(
+            "customUserQueries.send_reset_password [SERIOUS]: failed to retrieve flag from global redis instance to avoid sending " +
+            "which caused to be unable to send the email at all",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              resultUser,
+            },
+          );
+          throw err;
         }
 
         const randomId = Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER));
-        await setPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId.toString(), userId.toString());
-        await expirePromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId.toString(), RESET_PASSWORD_TOKEN_VALID_SECONDS_TIME);
-        await setPromisified("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString(), userId.toString());
-        await expirePromisified("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString(), RESET_PASSWORD_EMAIL_RESEND_SECONDS_TIME);
 
-        const resetToken = await jwtSign({
-          resetPasswordUserId: userId,
-          resetPasswordTempTokenCode: randomId,
-        }, appData.sensitiveConfig.jwtKey);
+        try {
+          await setPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId.toString(), userId.toString());
+          await expirePromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId.toString(), RESET_PASSWORD_TOKEN_VALID_SECONDS_TIME);
+          await setPromisified("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString(), userId.toString());
+          await expirePromisified("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString(), RESET_PASSWORD_EMAIL_RESEND_SECONDS_TIME);
+        } catch (err) {
+          logger.error(
+            "customUserQueries.send_reset_password [SERIOUS]: failed to set flags into global redis instance to avoid sending " +
+            "which caused to be unable to send the email at all",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              resultUser,
+              randomId,
+            },
+          );
+          throw err;
+        }
+
+        let resetToken: string;
+        try {
+          resetToken = await jwtSign({
+            resetPasswordUserId: userId,
+            resetPasswordTempTokenCode: randomId,
+          }, appData.sensitiveConfig.jwtKey);
+        } catch (err) {
+          logger.error(
+            "customUserQueries.send_reset_password [SERIOUS]: failed to sign reset token",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              resultUser,
+              randomId,
+            },
+          );
+          throw err;
+        }
+
         const resetPasswordLink = (appData.sensitiveConfig.mailgunTargetDomain || appData.config.productionHostname) +
           i18nData.custom.forgot_password_link_target + "?token=" + encodeURIComponent(resetToken);
 
@@ -405,34 +582,48 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         const from = `${i18nData.custom.forgot_password_user} <${i18nData.custom.forgot_password_email_user}@${appData.sensitiveConfig.mailgunDomain}>`;
         const to = resultUser.email;
         const subject = capitalize(i18nData.custom.forgot_password_title);
-        if (!templateToUse) {
-          await appData.mailgun.messages().send({
-            from,
-            to,
-            subject,
-            text: `You do not have a template setup for language ${languageToUse}\n` +
-            `forgot_password_link = ${resetPasswordLink}\n` +
-            `forgot_password = ${capitalize(i18nData.custom.forgot_password)}\n` +
-            `forgot_password_title = ${capitalize(i18nData.custom.forgot_password_title)}\n` +
-            `forgot_password_description = ${i18nData.custom.forgot_password_description}\n` +
-            `forgot_password_recover_button = ${capitalize(i18nData.custom.forgot_password_recover_button)}\n` +
-            `forgot_password_alt_link = ${capitalize(i18nData.custom.forgot_password_alt_link)}\n` +
-            `forgot_password_username = ${resultUser.username}`
-          });
-        } else {
-          await appData.mailgun.messages().send({
-            from,
-            to,
-            subject,
-            template: templateToUse,
-            forgot_password_link: resetPasswordLink,
-            forgot_password: capitalize(i18nData.custom.forgot_password),
-            forgot_password_title: capitalize(i18nData.custom.forgot_password_title),
-            forgot_password_description: i18nData.custom.forgot_password_description,
-            forgot_password_recover_button: capitalize(i18nData.custom.forgot_password_recover_button),
-            forgot_password_alt_link: capitalize(i18nData.custom.forgot_password_alt_link),
-            forgot_password_username: resultUser.username,
-          });
+
+        try {
+          if (!templateToUse) {
+            await appData.mailgun.messages().send({
+              from,
+              to,
+              subject,
+              text: `You do not have a template setup for language ${languageToUse}\n` +
+              `forgot_password_link = ${resetPasswordLink}\n` +
+              `forgot_password = ${capitalize(i18nData.custom.forgot_password)}\n` +
+              `forgot_password_title = ${capitalize(i18nData.custom.forgot_password_title)}\n` +
+              `forgot_password_description = ${i18nData.custom.forgot_password_description}\n` +
+              `forgot_password_recover_button = ${capitalize(i18nData.custom.forgot_password_recover_button)}\n` +
+              `forgot_password_alt_link = ${capitalize(i18nData.custom.forgot_password_alt_link)}\n` +
+              `forgot_password_username = ${resultUser.username}`
+            });
+          } else {
+            await appData.mailgun.messages().send({
+              from,
+              to,
+              subject,
+              template: templateToUse,
+              forgot_password_link: resetPasswordLink,
+              forgot_password: capitalize(i18nData.custom.forgot_password),
+              forgot_password_title: capitalize(i18nData.custom.forgot_password_title),
+              forgot_password_description: i18nData.custom.forgot_password_description,
+              forgot_password_recover_button: capitalize(i18nData.custom.forgot_password_recover_button),
+              forgot_password_alt_link: capitalize(i18nData.custom.forgot_password_alt_link),
+              forgot_password_username: resultUser.username,
+            });
+          }
+        } catch (err) {
+          logger.error(
+            "customUserQueries.send_reset_password [SERIOUS]: failed to send email via the mailgun API",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              resultUser,
+              randomId,
+            },
+          );
+          throw err;
         }
 
         return {
@@ -472,12 +663,24 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           });
         }
 
-        const codeWasSent = await getPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
-        if (!codeWasSent) {
-          throw new EndpointError({
-            message: "Token is invalid",
-            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
-          });
+        try {
+          const codeWasSent = await getPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
+          if (!codeWasSent) {
+            throw new EndpointError({
+              message: "Token is invalid",
+              code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+            });
+          }
+        } catch (err) {
+          logger.error(
+            "customUserQueries.reset_password [SERIOUS]: failed to check the token code that was sent",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              decoded,
+            },
+          );
+          throw err;
         }
 
         const invalidReason =
@@ -493,11 +696,25 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           });
         }
 
-        const resultUser = await appData.cache.requestValue(
-          userIdef,
-          decoded.resetPasswordUserId,
-          null,
-        );
+        let resultUser: ISQLTableRowValue;
+        
+        try {
+          resultUser = await appData.cache.requestValue(
+            userIdef,
+            decoded.resetPasswordUserId,
+            null,
+          );
+        } catch (err) {
+          logger.error(
+            "customUserQueries.reset_password [SERIOUS]: failed to retrieve user",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              decoded,
+            },
+          );
+          throw err;
+        }
 
         if (!resultUser) {
           throw new EndpointError({
@@ -506,20 +723,45 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           });
         }
 
-        await appData.cache.requestUpdate(
-          userIdef,
-          decoded.resetPasswordUserId,
-          null,
-          {
-            password: args.new_password,
-          },
-          null,
-          null,
-          null,
-          null,
-        );
+        try {
+          await appData.cache.requestUpdate(
+            userIdef,
+            decoded.resetPasswordUserId,
+            null,
+            {
+              password: args.new_password,
+            },
+            null,
+            null,
+            null,
+            null,
+          );
+        } catch (err) {
+          logger.error(
+            "customUserQueries.reset_password [SERIOUS]: failed to run password update request",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              decoded,
+            },
+          );
+          throw err;
+        }
 
-        await delPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
+        (async () => {
+          try {
+            await delPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
+          } catch (err) {
+            logger.error(
+              "customUserQueries.reset_password (detached): failed to remove temporary token code for password reset",
+              {
+                errMessage: err.message,
+                errStack: err.stack,
+                decoded,
+              },
+            );
+          }
+        })();
 
         return {
           status: "OK",

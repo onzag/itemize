@@ -1,18 +1,14 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const debug_1 = __importDefault(require("debug"));
+const server_1 = require("../../../server");
 const basic_1 = require("../basic");
 const ItemDefinition_1 = require("../../../base/Root/Module/ItemDefinition");
 const sql_1 = require("../../../base/Root/Module/sql");
 const constants_1 = require("../../../constants");
 const sql_2 = require("../../../base/Root/Module/ItemDefinition/sql");
 const version_null_value_1 = require("../../version-null-value");
-const searchModuleDebug = debug_1.default("resolvers:searchModule");
 async function searchModule(appData, resolverArgs, mod) {
-    searchModuleDebug("EXECUTED for %s", mod.getQualifiedPathName());
+    server_1.logger.debug("searchModule: executed search for " + mod.getQualifiedPathName());
     // check language and region
     basic_1.checkLanguage(appData, resolverArgs.args);
     const tokenData = await basic_1.validateTokenAndGetData(appData, resolverArgs.args.token);
@@ -29,8 +25,7 @@ async function searchModule(appData, resolverArgs, mod) {
             searchingFields[arg] = resolverArgs.args[arg];
         }
     });
-    searchModuleDebug("Searching fields retrieved as %j", searchingFields);
-    searchModuleDebug("Checking read role access based on %s", searchModeCounterpart.getQualifiedPathName());
+    server_1.logger.debug("searchModule: retrieved search fields as", searchingFields);
     const created_by = resolverArgs.args.created_by;
     let ownerToCheckAgainst = constants_1.UNSPECIFIED_OWNER;
     if (created_by) {
@@ -39,6 +34,7 @@ async function searchModule(appData, resolverArgs, mod) {
     // check role access for those searching fields
     // yes they are not being directly read but they can
     // be brute forced this way, and we are paranoid as hell
+    server_1.logger.debug("searchModule: checking read role access based on " + searchModeCounterpart.getQualifiedPathName());
     searchModeCounterpart.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, searchingFields, true);
     // now we build the search query, the search query only matches an id
     // note how we remove blocked_at
@@ -67,13 +63,12 @@ async function searchModule(appData, resolverArgs, mod) {
         // TODO manually reorder the real latest by date
         last_record: baseResult[0] || null,
     };
-    searchModuleDebug("SUCCEED with %j", finalResult);
+    server_1.logger.debug("searchModule: succeed");
     return finalResult;
 }
 exports.searchModule = searchModule;
-const searchItemDefinitionDebug = debug_1.default("resolvers:searchItemDefinition");
 async function searchItemDefinition(appData, resolverArgs, itemDefinition) {
-    searchItemDefinitionDebug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
+    server_1.logger.debug("searchItemDefinition: executed search for " + itemDefinition.getQualifiedPathName());
     // check the language and region
     basic_1.checkLanguage(appData, resolverArgs.args);
     const tokenData = await basic_1.validateTokenAndGetData(appData, resolverArgs.args.token);
@@ -94,8 +89,7 @@ async function searchItemDefinition(appData, resolverArgs, itemDefinition) {
             searchingFields[arg] = resolverArgs.args[arg];
         }
     });
-    searchItemDefinitionDebug("Searching fields retrieved as %j", searchingFields);
-    searchItemDefinitionDebug("Checking read role access based on %s", searchModeCounterpart.getQualifiedPathName());
+    server_1.logger.debug("searchItemDefinition: retrieved search fields as", searchingFields);
     const created_by = resolverArgs.args.created_by;
     let ownerToCheckAgainst = constants_1.UNSPECIFIED_OWNER;
     if (created_by) {
@@ -110,6 +104,7 @@ async function searchItemDefinition(appData, resolverArgs, itemDefinition) {
     // and uses the EXACT_phone_number field, he will get returned null
     // until he matches the phone number, this is a leak, a weak one
     // but a leak nevertheless, we are so paranoid we prevent this
+    server_1.logger.debug("searchItemDefinition: checking role access based on " + searchModeCounterpart.getQualifiedPathName());
     searchModeCounterpart.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, searchingFields, true);
     // Checking search mode counterpart to validate
     searchModeCounterpart.applyValue(null, null, resolverArgs.args, false, tokenData.id, tokenData.role, null, false);
@@ -124,7 +119,6 @@ async function searchItemDefinition(appData, resolverArgs, itemDefinition) {
     const requiresJoin = Object.keys(resolverArgs.args).some((argName) => {
         return !constants_1.RESERVED_SEARCH_PROPERTIES[argName] && !searchMod.hasPropExtensionFor(argName);
     });
-    searchItemDefinitionDebug("Join considered as %j", requiresJoin);
     // now we build the search query
     const searchQuery = appData.knex.select(["id", "version", "created_at"]).from(moduleTable)
         .where("blocked_at", null);
@@ -173,7 +167,7 @@ async function searchItemDefinition(appData, resolverArgs, itemDefinition) {
         // TODO manually reorder the real latest by date
         last_record: ids[0],
     };
-    searchItemDefinitionDebug("SUCCEED with %j", finalResult);
+    server_1.logger.debug("searchItemDefinition: done");
     return finalResult;
 }
 exports.searchItemDefinition = searchItemDefinition;

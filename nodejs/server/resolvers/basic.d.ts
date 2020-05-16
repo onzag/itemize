@@ -30,7 +30,18 @@ export interface IServerSideTokenDataType {
  * @param token the token passed via the args
  */
 export declare function validateTokenAndGetData(appData: IAppDataType, token: string): Promise<IServerSideTokenDataType>;
-export declare function validateParentingRules(appData: IAppDataType, id: number, version: string, type: string, itemDefinition: ItemDefinition, userId: number, role: string): Promise<void>;
+/**
+ * Validates that the parenting rules are respected for the item definition
+ * in question that wants to be created
+ * @param appData the app data
+ * @param parentId the id of the parent item definition
+ * @param parentVersion the version of the parent item definition
+ * @param parentType the type of the parent item definition
+ * @param itemDefinition the item definition that is attempting to child
+ * @param userId the user id
+ * @param role the role
+ */
+export declare function validateParentingRules(appData: IAppDataType, parentId: number, parentVersion: string, parentType: string, itemDefinition: ItemDefinition, userId: number, role: string): Promise<void>;
 /**
  * Checks if the basic fields are available for the given role, basic
  * fields are of those reserved properties that are in every module
@@ -60,6 +71,12 @@ export declare function checkLanguage(appData: IAppDataType, args: any): void;
  * @param args the whole args of the graphql request
  */
 export declare function getDictionary(appData: IAppDataType, args: any): string;
+/**
+ * Validates the current token isn't blocked whether it is said so
+ * by the rules of the session id, user is removed, or invalid credentials
+ * @param cache the appdata cache instance
+ * @param tokenData the token data obtained and parsed
+ */
 export declare function validateTokenIsntBlocked(cache: Cache, tokenData: IServerSideTokenDataType): Promise<void>;
 export declare function checkUserExists(cache: Cache, id: number): Promise<void>;
 export interface IFilteredAndPreparedValueType {

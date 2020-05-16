@@ -1,7 +1,6 @@
-import { IAppDataType } from "../../";
+import { IAppDataType, logger } from "../../";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
-import Debug from "debug";
 import {
   checkLanguage,
   validateTokenAndGetData,
@@ -18,13 +17,14 @@ import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { TriggerActions } from "../triggers";
 
-const debug = Debug("resolvers:deleteItemDefinition");
 export async function deleteItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ): Promise<any> {
-  debug("EXECUTED for %s", itemDefinition.getQualifiedPathName());
+  logger.debug(
+    "deleteItemDefinition: executed delete for " + itemDefinition.getQualifiedPathName(),
+  );
 
   // do the basic things, check the language and region
   // and get the token data
@@ -40,10 +40,11 @@ export async function deleteItemDefinition(
 
   // now we get this basic information
   const mod = itemDefinition.getParentModule();
-  const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
-  debug("Checking access to the element to delete");
+  logger.debug(
+    "deleteItemDefinition: checking policy check for delete",
+  );
 
   // we need to run the policy check for delete,
   // because there might be extra rules for data request
@@ -69,7 +70,9 @@ export async function deleteItemDefinition(
       preValidation: (content: ISQLTableRowValue) => {
         // if there is no userId then the row was null, we throw an error
         if (!content) {
-          debug("FAILED due to lack of content data");
+          logger.debug(
+            "deleteItemDefinition: failed due to lack of content data",
+          );
           throw new EndpointError({
             message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
             code: ENDPOINT_ERRORS.NOT_FOUND,
@@ -94,7 +97,9 @@ export async function deleteItemDefinition(
             (rolesThatHaveAccessToModerationFields.includes(ANYONE_LOGGED_METAROLE) && tokenData.role !== GUEST_METAROLE) ||
             rolesThatHaveAccessToModerationFields.includes(tokenData.role);
           if (!hasAccessToModerationFields) {
-            debug("FAILED due to blocked content and no moderation access for role %s", tokenData.role);
+            logger.debug(
+              "deleteItemDefinition: failed due to blocked content and no moderation access for role " + tokenData.role,
+            );
             throw new EndpointError({
               message: "The item is blocked, only users with role " +
               rolesThatHaveAccessToModerationFields.join(",") + " can wipe this data",
@@ -109,7 +114,9 @@ export async function deleteItemDefinition(
   // yet now we check the role access, for the action of delete
   // note how we don't pass requested fields, because that's irrelevant
   // for the delete action
-  debug("Checking role access for delete");
+  logger.debug(
+    "deleteItemDefinition: checking role access for delete",
+  );
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.DELETE,
     tokenData.role,
@@ -132,7 +139,6 @@ export async function deleteItemDefinition(
   ) {
     // we need to use the gql stored value for the trigger
     const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(itemDefinition, wholeSqlStoredValue);
-    debug("Current GQL value found as %j", currentWholeValueAsGQL);
 
     if (moduleTrigger) {
       // we execute the trigger
@@ -169,7 +175,9 @@ export async function deleteItemDefinition(
     resolverArgs.args.listener_uuid || null,
   );
 
-  debug("SUCCEED");
+  logger.debug(
+    "deleteItemDefinition: done",
+  );
 
   // return null, yep, the output is always null, because it's gone
   // however we are not running the check on the fields that can be read

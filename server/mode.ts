@@ -23,6 +23,7 @@ export function getMode(appData: IAppDataType, req: express.Request) {
   ) {
     defaultMode = "development";
   }
+
   const cookies = req.headers["cookie"];
   if (cookies) {
     const splittedCookies = cookies.split(";");

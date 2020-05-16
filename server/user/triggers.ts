@@ -1,6 +1,8 @@
 import { ITriggerRegistry } from "../resolvers/triggers";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, ENDPOINT_ERRORS } from "../../constants";
 import { EndpointError } from "../../base/errors";
+import { ISQLTableRowValue } from "../../base/Root/sql";
+import { logger } from "../";
 
 // TODO mailing lists triggers per language supported
 
@@ -9,6 +11,8 @@ export const customUserTriggers: ITriggerRegistry = {
     "users/user": async (arg) => {
       // we add a trigger for when the user updated the email
       // either because of creation or from a normal update
+      // from will be null during creation, this means creation
+      // will trigger this path
       if (
         arg.update &&
         typeof arg.update !== "undefined"
@@ -19,14 +23,21 @@ export const customUserTriggers: ITriggerRegistry = {
         // and this is the email that was changed to
         const changedEmail = !arg.from || (typeof newEmail !== "undefined" && newEmail !== arg.from.email);
         if (
-          changedEmail && newEmail !== null && typeof newEmail !== "undefined"
+          changedEmail && newEmail !== null
         ) {
           // now we try to find another user with such email
-          const result = await arg.appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
-            .from(arg.itemDefinition.getQualifiedPathName()).where({
-              email: newEmail,
-              e_validated: true,
-            });
+          let result: ISQLTableRowValue;
+          try {
+            result = await arg.appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
+              .from(arg.itemDefinition.getQualifiedPathName()).where({
+                email: newEmail,
+                e_validated: true,
+              });
+          } catch (err) {
+            logger.error("customUserTriggers [SERIOUS]: Failed to execute SQL query to check " +
+            " if email had been taken for email " + newEmail + " this caused the whole user not to be able to update/create");
+            throw err;
+          }
 
           // if there's no such
           if (!result) {
