@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Button, PropTypes } from "@material-ui/core";
-import { IActionSubmitOptions } from "../../providers/item-definition";
+import { IActionSubmitOptions, IActionResponseWithId } from "../../providers/item-definition";
 import { ProgressingElement } from "./util";
 import SubmitActioner from "../../components/item-definition/SubmitActioner";
 import { goBack, localizedRedirectTo } from "../../components/navigation";
 import I18nRead from "../../components/localization/I18nRead";
+
+type RedirectCallbackFn = (status: IActionResponseWithId) => string;
 
 interface ISubmitButtonProps {
   options: IActionSubmitOptions;
@@ -15,9 +17,10 @@ interface ISubmitButtonProps {
   buttonEndIcon?: React.ReactNode;
   buttonStartIcon?: React.ReactNode;
   CustomConfirmationComponent?: React.ComponentType<{isActive: boolean, onClose: (continueWithProcess: boolean) => void}>;
-  redirectOnSuccess?: string;
+  redirectOnSuccess?: string | RedirectCallbackFn;
   redirectGoBack?: boolean;
   redirectReplace?: boolean;
+  onSubmit?: (status: IActionResponseWithId) => void;
 }
 
 export function SubmitButton(props: ISubmitButtonProps) {
@@ -28,14 +31,18 @@ export function SubmitButton(props: ISubmitButtonProps) {
       {(actioner) => {
         const runProcess = async () => {
           const status = await actioner.submit(props.options);
+          props.onSubmit && props.onSubmit(status);
+
           if (!status.error && props.redirectOnSuccess) {
+            const redirectCalculated: string = typeof props.redirectOnSuccess === "string" ?
+              props.redirectOnSuccess : props.redirectOnSuccess(status);
             if(props.redirectGoBack) {
               goBack();
               setTimeout(() => {
-                localizedRedirectTo(props.redirectOnSuccess, null, props.redirectReplace);
+                localizedRedirectTo(redirectCalculated, null, props.redirectReplace);
               }, 10);
             } else {
-              localizedRedirectTo(props.redirectOnSuccess, null, props.redirectReplace);
+              localizedRedirectTo(redirectCalculated, null, props.redirectReplace);
             }
           }
         }

@@ -117,6 +117,10 @@ export const Article = withStyles(fragmentStyles)((props: WithStyles<typeof frag
                         "summary_image",
                       ],
                     }}
+                    redirectOnSuccess={
+                      (status) => `/cms/article?id=${status.id}`
+                    }
+                    redirectReplace={true}
                   />
 
                 </Paper>

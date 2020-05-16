@@ -92,6 +92,10 @@ export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fra
                         "attachments",
                       ],
                     }}
+                    redirectOnSuccess={
+                      (status) => `/cms/fragment?id=${status.id}&version=${locationState.version || ""}`
+                    }
+                    redirectReplace={true}
                   />
 
                 </Paper>
