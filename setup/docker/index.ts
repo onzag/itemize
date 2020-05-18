@@ -26,8 +26,7 @@ export default async function dockerSetup(arg: ISetupConfigType): Promise<ISetup
       path.join(__dirname, "..", "..", "..", "setup", "docker", "Dockerfile"), "utf-8",
     );
     fileContent = fileContent
-      .replace("SETUP_APP_NAME", arg.standardConfig.appName.replace(/\s/g, "_").toLowerCase())
-      .replace("SETUP_PORT", arg.standardConfig.port.toString());
+      .replace("SETUP_APP_NAME", arg.standardConfig.appName.replace(/\s/g, "_").toLowerCase());
     await fsAsync.writeFile("Dockerfile", fileContent);
   }
 

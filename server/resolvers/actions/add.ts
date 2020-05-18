@@ -331,6 +331,9 @@ export async function addItemDefinition(
 
   logger.debug(
     "addItemDefinition: SQL ouput retrieved",
+  );
+  logger.silly(
+    "addItemDefinition: Value is",
     value,
   );
 

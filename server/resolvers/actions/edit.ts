@@ -271,6 +271,9 @@ export async function editItemDefinition(
 
   logger.debug(
     "editItemDefinition: SQL ouput retrieved",
+  );
+  logger.silly(
+    "editItemDefinition: Value is",
     sqlValue,
   );
 
@@ -287,8 +290,11 @@ export async function editItemDefinition(
 
   logger.debug(
     "editItemDefinition: GQL ouput retrieved",
-    finalOutput,
   );
+  logger.silly(
+    "editItemDefinition: value is",
+    finalOutput,
+  )
 
   return finalOutput;
 }

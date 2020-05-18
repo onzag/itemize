@@ -637,12 +637,13 @@ export class Listener {
     );
 
     Object.keys(this.listeners[socket.id].listens).forEach((listensMergedIdentifier) => {
-      const noSocketsListeningLeft = Object.keys(this.listeners).every((socketId) => {
-        if (socketId === socket.id) {
-          return true;
-        }
-        return !this.listeners[socketId].listens[listensMergedIdentifier];
-      });
+      const noSocketsListeningLeft = !this.listensSS[listensMergedIdentifier] &&
+        Object.keys(this.listeners).every((socketId) => {
+          if (socketId === socket.id) {
+            return true;
+          }
+          return !this.listeners[socketId].listens[listensMergedIdentifier];
+        });
       if (noSocketsListeningLeft) {
         logger.debug(
           "Listener.removeSocket: redis unsubscribing off " + listensMergedIdentifier,

@@ -74,9 +74,11 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
     // now we check the role access, this function will throw an error
     // if that fails, and we only check for the requested fields
     itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, userId, requestedFieldsInIdef, true);
-    __1.logger.debug("getItemDefinition: SQL ouput retrieved", selectQueryValue);
+    __1.logger.debug("getItemDefinition: SQL ouput retrieved");
+    __1.logger.silly("getItemDefinition: value is", selectQueryValue);
     const valueToProvide = basic_1.filterAndPrepareGQLValue(selectQueryValue, requestedFields, tokenData.role, itemDefinition);
-    __1.logger.debug("getItemDefinition: GQL ouput retrieved", valueToProvide.toReturnToUser);
+    __1.logger.debug("getItemDefinition: GQL ouput retrieved");
+    __1.logger.silly("getItemDefinition: value is", valueToProvide.toReturnToUser);
     // return if otherwise succeeds
     return valueToProvide.toReturnToUser;
 }

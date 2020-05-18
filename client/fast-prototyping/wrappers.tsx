@@ -10,7 +10,7 @@ import MomentUtils from "@date-io/moment";
 // we create the material ui theme
 const theme = createMuiTheme({
   typography: {
-    fontFamily: "'Open Sans', sans-serif",
+    fontFamily: "'" + (window as any).FONT_NAME + "', sans-serif",
     fontWeightLight: 300,
     fontWeightRegular: 400,
     fontWeightMedium: 500,

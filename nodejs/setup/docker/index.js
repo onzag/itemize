@@ -27,8 +27,7 @@ async function dockerSetup(arg) {
         console.log("emiting " + colors_1.default.green("Dockerfile"));
         let fileContent = await fsAsync.readFile(path_1.default.join(__dirname, "..", "..", "..", "setup", "docker", "Dockerfile"), "utf-8");
         fileContent = fileContent
-            .replace("SETUP_APP_NAME", arg.standardConfig.appName.replace(/\s/g, "_").toLowerCase())
-            .replace("SETUP_PORT", arg.standardConfig.port.toString());
+            .replace("SETUP_APP_NAME", arg.standardConfig.appName.replace(/\s/g, "_").toLowerCase());
         await fsAsync.writeFile("Dockerfile", fileContent);
     }
     let dockerIgnoreExists = true;

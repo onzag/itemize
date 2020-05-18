@@ -165,7 +165,8 @@ async function editItemDefinition(appData, resolverArgs, itemDefinition) {
     }
     const dictionary = basic_1.getDictionary(appData, resolverArgs.args);
     const sqlValue = await appData.cache.requestUpdate(itemDefinition, resolverArgs.args.id, resolverArgs.args.version || null, gqlValueToConvert, currentWholeValueAsGQL, tokenData.id, dictionary, resolverArgs.args.listener_uuid || null);
-    __1.logger.debug("editItemDefinition: SQL ouput retrieved", sqlValue);
+    __1.logger.debug("editItemDefinition: SQL ouput retrieved");
+    __1.logger.silly("editItemDefinition: Value is", sqlValue);
     // convert it using the requested fields for that, and ignoring everything else
     const gqlValue = sql_1.convertSQLValueToGQLValueForItemDefinition(itemDefinition, sqlValue, requestedFields);
     // we don't need to check for blocked or deleted because such items cannot be edited,
@@ -175,7 +176,8 @@ async function editItemDefinition(appData, resolverArgs, itemDefinition) {
         DATA: gqlValue,
         ...gqlValue,
     };
-    __1.logger.debug("editItemDefinition: GQL ouput retrieved", finalOutput);
+    __1.logger.debug("editItemDefinition: GQL ouput retrieved");
+    __1.logger.silly("editItemDefinition: value is", finalOutput);
     return finalOutput;
 }
 exports.editItemDefinition = editItemDefinition;

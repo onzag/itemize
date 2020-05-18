@@ -1,7 +1,6 @@
 export interface IConfigRawJSONDataType {
   entry: string;
   appName: string;
-  port: number;
   supportedLanguages: string[];
   rtlLanguages: string[];
   dictionaries: {
@@ -17,6 +16,7 @@ export interface IConfigRawJSONDataType {
     display: "fullscreen" | "standalone" | "minimal-ui" | "browser",
   };
   fontUrl: string;
+  fontName: string;
 
   // FALLBACK REGIONALIZATION
   fallbackCountryCode: string;
@@ -187,9 +187,6 @@ export const rawConfigSchema = {
     appName: {
       type: "string",
     },
-    port: {
-      type: "number",
-    },
     supportedLanguages: {
       type: "array",
       items: {
@@ -215,6 +212,9 @@ export const rawConfigSchema = {
       },
     },
     fontUrl: {
+      type: "string",
+    },
+    fontName: {
       type: "string",
     },
     manifest: {
@@ -277,12 +277,12 @@ export const rawConfigSchema = {
   required: [
     "entry",
     "appName",
-    "port",
     "supportedLanguages",
     "rtlLanguages",
     "dictionaries",
     "roles",
     "fontUrl",
+    "fontName",
     "manifest",
     "fallbackCountryCode",
     "fallbackLanguage",

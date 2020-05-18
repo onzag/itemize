@@ -381,9 +381,9 @@ async function initializeServer(custom = {}) {
         await flushAllPromisified();
         exports.logger.info("initializeServer: setting up endpoints");
         initializeApp(appData, custom);
-        exports.logger.info("initializeServer: attempting to listen");
-        server.listen(config.port, () => {
-            exports.logger.info("initializeServer: listening at " + config.port);
+        exports.logger.info("initializeServer: attempting to listen at " + (process.argv[2] || 8000));
+        server.listen(process.argv[2] || 8000, () => {
+            exports.logger.info("initializeServer: listening at " + (process.argv[2] || 8000));
         });
     }
     catch (err) {

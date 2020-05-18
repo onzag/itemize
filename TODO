@@ -6,7 +6,7 @@ SITE
 . Role picker for admins in public profile [+2] [DONE]
 . About me in profile [+5] [DONE]
 . Implementation of CMS module [+10] [DONE]
-. Fix redis synchronization bug [+1]
+. Fix redis synchronization bug [+1] [DONE]
 . Rich Text Editor Raw Mode [+2]
 . Implementation of Forum module [+7]
 . Implementation of mailing module [+7]

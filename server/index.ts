@@ -521,11 +521,11 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     initializeApp(appData, custom);
 
     logger.info(
-      "initializeServer: attempting to listen",
+      "initializeServer: attempting to listen at " + (process.argv[2] || 8000),
     );
-    server.listen(config.port, () => {
+    server.listen(process.argv[2] || 8000, () => {
       logger.info(
-        "initializeServer: listening at " + config.port,
+        "initializeServer: listening at " + (process.argv[2] || 8000),
       );
     });
   } catch (err) {

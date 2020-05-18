@@ -112,7 +112,8 @@ class Cache {
      */
     forceCacheInto(idefTable, id, version, value) {
         const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
-        _1.logger.debug("Cache.forceCacheInto: setting cache value for " + idefQueryIdentifier, value);
+        _1.logger.debug("Cache.forceCacheInto: setting new cache value for " + idefQueryIdentifier);
+        _1.logger.silly("Cache.forceCacheInto: value is", value);
         this.listener.registerSS({
             itemDefinition: idefTable,
             id: id,

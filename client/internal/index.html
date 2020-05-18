@@ -13,6 +13,11 @@
         <link rel="stylesheet" href="/rest/resource/build.$MODE.css"/>
         <link rel="stylesheet" href="/rest/resource/vendors~build.$MODE.css"/>
         <link rel="stylesheet" href="%{fontUrl}">
+        <style>
+            *, html, body, #root, #main, #app {
+                font-family: '%{fontName}', sans-serif;
+            }
+        </style>
 
         <link rel="apple-touch-icon" sizes="180x180" href="/rest/resource/icons/apple-touch-icon-no-transparency-180x180.png">
         <link rel="icon" type="image/png" sizes="32x32" href="/rest/resource/icons/favicon-32x32.png">
@@ -48,6 +53,8 @@
         var APP_NAME = "%{appName}";
         // here the information for the uploads
         var UPLOADS_PREFIX = "%{uploadsHostnamePrefix}";
+        // the font name to use
+        var FONT_NAME = "%{fontName}";
         // set development mode
         function SET_DEV_MODE(mode, key) {
             document.cookie = "devmode=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";

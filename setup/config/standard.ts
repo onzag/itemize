@@ -22,13 +22,6 @@ export async function standardConfigSetup(
         defaultValue: packageJSON.name,
       },
       {
-        variableName: "port",
-        type: "integer",
-        message: "Please enter the port number that the app will be used to be served and exposed",
-        defaultValue: 8000,
-        validate: (v) => !isNaN(v),
-      },
-      {
         variableName: "supportedLanguages",
         type: "strarray",
         message: "Please choose the languages you are supporting as a list of comma separated values eg. en, es; " +
@@ -65,6 +58,11 @@ export async function standardConfigSetup(
         variableName: "fontUrl",
         message: "Specify an url to a font to be the default font for your app, local values are valid, as in /rest/resource/font.css",
         defaultValue: "https://fonts.googleapis.com/css?family=Open+Sans:300,400,500&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese",
+      },
+      {
+        variableName: "fontName",
+        message: "The name of the font to be used from the stylesheet that was included",
+        defaultValue: "Open Sans",
       },
       {
         variableName: "manifest",

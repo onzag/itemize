@@ -115,9 +115,6 @@ exports.rawConfigSchema = {
         appName: {
             type: "string",
         },
-        port: {
-            type: "number",
-        },
         supportedLanguages: {
             type: "array",
             items: {
@@ -143,6 +140,9 @@ exports.rawConfigSchema = {
             },
         },
         fontUrl: {
+            type: "string",
+        },
+        fontName: {
             type: "string",
         },
         manifest: {
@@ -205,12 +205,12 @@ exports.rawConfigSchema = {
     required: [
         "entry",
         "appName",
-        "port",
         "supportedLanguages",
         "rtlLanguages",
         "dictionaries",
         "roles",
         "fontUrl",
+        "fontName",
         "manifest",
         "fallbackCountryCode",
         "fallbackLanguage",

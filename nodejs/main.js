@@ -20,18 +20,18 @@ const actionRegistry = {
     },
     "get-deployable": {
         fn: null,
-        description: "Provides the docker deployable based on the config, make sure to run `build` before running this function",
-        usage: "itemize get-deployable [development|staging|production] [build-name]"
+        description: "Provides the full docker deployable based on the config",
+        usage: "itemize get-deployable [development|staging|production] [dev-env|prod-env] [(portlist)] [build-name]"
     },
     "start-dev-environment": {
         fn: dev_environment_1.start,
         description: "Starts the development environment, as configured",
-        usage: "itemize start-dev-environment",
+        usage: "itemize start-dev-environment [development|staging|production]",
     },
     "stop-dev-environment": {
         fn: dev_environment_1.stop,
         description: "Stops the development environment",
-        usage: "itemize stop-dev-environment",
+        usage: "itemize stop-dev-environment [development|staging|production]",
     },
     "build-data": {
         fn: builder_1.default,

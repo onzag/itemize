@@ -125,8 +125,12 @@ export async function getItemDefinition(
 
   logger.debug(
     "getItemDefinition: SQL ouput retrieved",
+  );
+  logger.silly(
+    "getItemDefinition: value is",
     selectQueryValue,
   );
+  
 
   const valueToProvide = filterAndPrepareGQLValue(
     selectQueryValue,
@@ -137,6 +141,9 @@ export async function getItemDefinition(
 
   logger.debug(
     "getItemDefinition: GQL ouput retrieved",
+  );
+  logger.silly(
+    "getItemDefinition: value is",
     valueToProvide.toReturnToUser,
   );
 

@@ -219,7 +219,8 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
         version: resolverArgs.args.parent_version,
         type: resolverArgs.args.parent_type,
     } : null);
-    __1.logger.debug("addItemDefinition: SQL ouput retrieved", value);
+    __1.logger.debug("addItemDefinition: SQL ouput retrieved");
+    __1.logger.silly("addItemDefinition: Value is", value);
     // now we convert that SQL value to the respective GQL value
     // the reason we pass the requested fields is to filter by the fields
     // that we actually want, not passing this would make the gql value

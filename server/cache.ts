@@ -146,7 +146,10 @@ export class Cache {
   private forceCacheInto(idefTable: string, id: number, version: string, value: ISQLTableRowValue) {
     const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
     logger.debug(
-      "Cache.forceCacheInto: setting cache value for " + idefQueryIdentifier,
+      "Cache.forceCacheInto: setting new cache value for " + idefQueryIdentifier,
+    );
+    logger.silly(
+      "Cache.forceCacheInto: value is",
       value,
     );
     this.listener.registerSS({

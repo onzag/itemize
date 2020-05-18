@@ -1,2 +1,2 @@
-export declare function start(): Promise<void>;
-export declare function stop(): Promise<void>;
+export declare function start(version: string): Promise<void>;
+export declare function stop(version: string): Promise<void>;
