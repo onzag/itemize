@@ -28,6 +28,8 @@ export interface IAppDataType {
     redisGlobal: RedisClient;
     redisPub: RedisClient;
     redisSub: RedisClient;
+    redisLocalPub: RedisClient;
+    redisLocalSub: RedisClient;
     buildnumber: string;
     triggers: ITriggerRegistry;
     ipStack: IPStack;

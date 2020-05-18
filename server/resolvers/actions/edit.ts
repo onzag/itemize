@@ -294,7 +294,7 @@ export async function editItemDefinition(
   logger.silly(
     "editItemDefinition: value is",
     finalOutput,
-  )
+  );
 
   return finalOutput;
 }

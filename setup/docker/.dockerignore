@@ -1,4 +1,7 @@
 **/*.js.map
-dist/db.json
-dist/redis.json
-dist/sensitive.json
+/devenv
+/logs
+npm-debug.log
+db-status.json
+db-status.optimal.json
+db-status.corruption.json

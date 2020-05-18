@@ -1,6 +1,6 @@
 import React from "react";
 import { InputLabel, IconButton, ThemeProvider, Typography, TextField, Button } from "@material-ui/core";
-import ReactQuill from "react-quill";
+import ReactQuill from "@onzag/react-quill";
 import Toolbar from "@material-ui/core/Toolbar";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
@@ -23,7 +23,7 @@ import FormatUnderlinedIcon from "@material-ui/icons/FormatUnderlined";
 import FormatItalicIcon from "@material-ui/icons/FormatItalic";
 import FormatBoldIcon from "@material-ui/icons/FormatBold";
 
-import "react-quill/dist/quill.core.css";
+import "@onzag/react-quill/dist/quill.core.css";
 import "../../../internal/theme/quill.scss";
 import { capitalize, mimeTypeToExtension } from "../../../../util";
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";

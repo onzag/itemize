@@ -8,23 +8,31 @@ const ItemDefinition_1 = __importDefault(require("../base/Root/Module/ItemDefini
 const remote_protocol_1 = require("../base/remote-protocol");
 const version_null_value_1 = require("./version-null-value");
 const _1 = require(".");
-const uuid_1 = __importDefault(require("uuid"));
 // TODO refactor all these methods to be proper objects, this is a mess of arguments
 // do the same in the remote listener in the client side
+const INSTANCE_MODE = process.env.INSTANCE_MODE || "MANAGER";
+const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
+const MANAGER_REGISTER_SS = "MANAGER_REGISTER_SS";
 class Listener {
-    constructor(buildnumber, redisSub, redisPub, root, cache, knex, server) {
+    constructor(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, root, cache, knex, server) {
         this.listeners = {};
         this.listensSS = {};
-        this.uuid = uuid_1.default.v4();
         this.redisSub = redisSub;
         this.redisPub = redisPub;
+        this.redisLocalSub = redisLocalSub;
+        this.redisLocalPub = redisLocalPub;
         this.buildnumber = buildnumber;
         this.root = root;
         this.cache = cache;
         this.knex = knex;
         this.cache.setListener(this);
         this.pubSubTriggerListeners = this.pubSubTriggerListeners.bind(this);
+        this.pubSubLocalTriggerListeners = this.pubSubLocalTriggerListeners.bind(this);
         this.redisSub.on("message", this.pubSubTriggerListeners);
+        if (INSTANCE_MODE === "MANAGER") {
+            this.redisLocalSub.on("message", this.pubSubLocalTriggerListeners);
+            this.redisLocalSub.subscribe(MANAGER_REGISTER_SS);
+        }
         // TODO we should validte the forms of every request, right now requests are not
         // validated
         const io = socket_io_1.default(server);
@@ -90,9 +98,16 @@ class Listener {
     }
     registerSS(request) {
         const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
-        _1.logger.debug("Listener.registerSS: Subscribing server to " + mergedIndexIdentifier);
-        this.redisSub.subscribe(mergedIndexIdentifier);
-        this.listensSS[mergedIndexIdentifier] = true;
+        _1.logger.debug("Listener.registerSS: Server instance requested subscribe to " + mergedIndexIdentifier);
+        if (INSTANCE_MODE !== "MANAGER") {
+            _1.logger.debug("Listener.registerSS: instance is not manager piping request to manager");
+            this.redisLocalPub.publish(MANAGER_REGISTER_SS, JSON.stringify(request));
+        }
+        else {
+            _1.logger.debug("Listener.registerSS: performing subscription as manager");
+            this.redisSub.subscribe(mergedIndexIdentifier);
+            this.listensSS[mergedIndexIdentifier] = true;
+        }
     }
     register(socket, request) {
         // TODO check if token allows to listen before adding
@@ -336,7 +351,7 @@ class Listener {
         const redisEvent = {
             event,
             listenerUUID,
-            severListenerUUID: this.uuid,
+            serverInstanceGroupId: INSTANCE_GROUP_ID,
             mergedIndexIdentifier,
             eventType: remote_protocol_1.CHANGED_FEEEDBACK_EVENT,
             data,
@@ -370,11 +385,12 @@ class Listener {
     pubSubTriggerListeners(channel, message) {
         const parsedContent = JSON.parse(message);
         _1.logger.debug("Listener.pubSubTriggerListeners: received redis event", parsedContent);
+        // only the manager happens to recieve these
         if (this.listensSS[parsedContent.mergedIndexIdentifier]) {
             _1.logger.debug("Listener.pubSubTriggerListeners: our own server is expecting it");
-            const severListenerUUID = parsedContent.severListenerUUID;
-            if (severListenerUUID === this.uuid) {
-                _1.logger.debug("Listener.pubSubTriggerListeners: our own server was the emitter ignoring event");
+            const serverInstanceGroupId = parsedContent.serverInstanceGroupId;
+            if (serverInstanceGroupId === INSTANCE_GROUP_ID) {
+                _1.logger.debug("Listener.pubSubTriggerListeners: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event");
             }
             else {
                 const event = parsedContent.event;
@@ -389,6 +405,11 @@ class Listener {
                 this.listeners[socketKey].socket.emit(parsedContent.eventType, parsedContent.event);
             }
         });
+    }
+    pubSubLocalTriggerListeners(channel, message) {
+        const parsedContent = JSON.parse(message);
+        _1.logger.debug("Listener.pubSubLocalTriggerListeners: manager recieved register event", parsedContent);
+        this.registerSS(parsedContent);
     }
     removeSocket(socket) {
         if (!this.listeners[socket.id]) {

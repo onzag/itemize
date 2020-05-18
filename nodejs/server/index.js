@@ -308,6 +308,9 @@ async function initializeServer(custom = {}) {
         exports.logger.info("initializeServer: initializing redis pub/sub client");
         const redisPub = redis_1.default.createClient(redisConfig.pubSub);
         const redisSub = redis_1.default.createClient(redisConfig.pubSub);
+        exports.logger.info("initializeServer: initializing local redis pub/sub client");
+        const redisLocalPub = redis_1.default.createClient(redisConfig.cache);
+        const redisLocalSub = redis_1.default.createClient(redisConfig.cache);
         PropertyDefinition_1.default.indexChecker = server_checkers_1.serverSideIndexChecker.bind(null, knex);
         // due to a bug in the types the create client function is missing
         // domainId and domainName
@@ -329,7 +332,7 @@ async function initializeServer(custom = {}) {
         exports.logger.info("initializeServer: creating server");
         const server = http_1.default.createServer(app);
         exports.logger.info("initializeServer: setting up websocket socket.io listener");
-        const listener = new listener_1.Listener(buildnumber, redisSub, redisPub, root, cache, knex, server);
+        const listener = new listener_1.Listener(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, root, cache, knex, server);
         if (sensitiveConfig.ipStackAccessKey) {
             exports.logger.info("initializeServer: initializing ipstack connection");
         }
@@ -362,6 +365,8 @@ async function initializeServer(custom = {}) {
             redisGlobal: redisGlobalClient,
             redisSub,
             redisPub,
+            redisLocalPub,
+            redisLocalSub,
             cache,
             buildnumber,
             triggers: {
@@ -376,14 +381,24 @@ async function initializeServer(custom = {}) {
             pkgcloudStorageClient,
             pkgcloudUploadsContainer,
         };
-        const flushAllPromisified = util_1.promisify(appData.redis.flushall).bind(appData.redis);
-        exports.logger.info("initializeServer: flushing redis");
-        await flushAllPromisified();
+        const PORT = process.env.PORT || 8000;
+        const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
+        const INSTANCE_MODE = process.env.INSTANCE_MODE || "MANAGER";
+        exports.logger.info("initializeServer: INSTANCE_GROUP_ID is " + INSTANCE_GROUP_ID);
+        exports.logger.info("initializeServer: INSTANCE_MODE is " + INSTANCE_MODE);
+        if (INSTANCE_MODE === "MANAGER") {
+            exports.logger.info("initializeServer: server initialized in manager mode flushing redis");
+            const flushAllPromisified = util_1.promisify(appData.redis.flushall).bind(appData.redis);
+            await flushAllPromisified();
+        }
+        else {
+            exports.logger.info("initializeServer: server initialized in standard mode, not flushing redis");
+        }
         exports.logger.info("initializeServer: setting up endpoints");
         initializeApp(appData, custom);
-        exports.logger.info("initializeServer: attempting to listen at " + (process.argv[2] || 8000));
-        server.listen(process.argv[2] || 8000, () => {
-            exports.logger.info("initializeServer: listening at " + (process.argv[2] || 8000));
+        exports.logger.info("initializeServer: attempting to listen at " + PORT);
+        server.listen(PORT, () => {
+            exports.logger.info("initializeServer: listening at " + PORT);
         });
     }
     catch (err) {

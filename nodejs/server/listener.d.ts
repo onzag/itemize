@@ -10,14 +10,15 @@ import { IRegisterRequest, IOwnedSearchRegisterRequest, IParentedSearchRegisterR
 export declare class Listener {
     private listeners;
     private listensSS;
-    private uuid;
     private redisSub;
     private redisPub;
+    private redisLocalSub;
+    private redisLocalPub;
     private buildnumber;
     private root;
     private knex;
     private cache;
-    constructor(buildnumber: string, redisSub: RedisClient, redisPub: RedisClient, root: Root, cache: Cache, knex: Knex, server: Server);
+    constructor(buildnumber: string, redisSub: RedisClient, redisPub: RedisClient, redisLocalSub: RedisClient, redisLocalPub: RedisClient, root: Root, cache: Cache, knex: Knex, server: Server);
     addSocket(socket: Socket): void;
     identify(socket: Socket, request: IIdentifyRequest): void;
     registerSS(request: IRegisterRequest): void;
@@ -37,5 +38,6 @@ export declare class Listener {
     triggerOwnedSearchListeners(event: IOwnedSearchRecordsAddedEvent, listenerUUID: string): void;
     triggerParentedSearchListeners(event: IParentedSearchRecordsAddedEvent, listenerUUID: string): void;
     pubSubTriggerListeners(channel: string, message: string): void;
+    pubSubLocalTriggerListeners(channel: string, message: string): void;
     removeSocket(socket: Socket): void;
 }
