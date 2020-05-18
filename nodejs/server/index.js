@@ -35,9 +35,15 @@ const here_1 = require("./services/here");
 const util_1 = require("util");
 const winston_1 = __importDefault(require("winston"));
 require("winston-daily-rotate-file");
+const NODE_ENV = process.env.NODE_ENV;
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const PORT = process.env.PORT || 8000;
+const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
+const INSTANCE_MODE = process.env.INSTANCE_MODE || "MANAGER";
+const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 // building the logger
 exports.logger = winston_1.default.createLogger({
-    level: process.env.LOG_LEVEL || (process.env.NODE_ENV !== "production" ? "debug" : "info"),
+    level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
     format: winston_1.default.format.json(),
     transports: [
         new winston_1.default.transports.DailyRotateFile({ filename: "logs/error.log", level: "error" }),
@@ -45,7 +51,7 @@ exports.logger = winston_1.default.createLogger({
     ]
 });
 // if not production add a console.log
-if (process.env.NODE_ENV !== "production") {
+if (NODE_ENV !== "production") {
     exports.logger.add(new winston_1.default.transports.Console({
         format: winston_1.default.format.simple()
     }));
@@ -251,10 +257,10 @@ async function initializeServer(custom = {}) {
             rawBuild,
             buildnumber,
         ] = await Promise.all([
-            fsAsync.readFile(path_1.default.join("dist", "config.json"), "utf8"),
-            fsAsync.readFile(path_1.default.join("dist", "sensitive.json"), "utf8"),
-            fsAsync.readFile(path_1.default.join("dist", "redis.json"), "utf8"),
-            fsAsync.readFile(path_1.default.join("dist", "db.json"), "utf8"),
+            fsAsync.readFile(path_1.default.join("config", "index.json"), "utf8"),
+            fsAsync.readFile(path_1.default.join("config", NODE_ENV === "development" ? "index.sensitive.json" : `index.${NODE_ENV}.sensitive.json`), "utf8"),
+            fsAsync.readFile(path_1.default.join("config", NODE_ENV === "development" ? "redis.sensitive.json" : `redis.${NODE_ENV}.sensitive.json`), "utf8"),
+            fsAsync.readFile(path_1.default.join("config", NODE_ENV === "development" ? "db.sensitive.json" : `db.${NODE_ENV}.sensitive.json`), "utf8"),
             fsAsync.readFile(path_1.default.join("dist", "data", "index.html"), "utf8"),
             fsAsync.readFile(path_1.default.join("dist", "data", "build.all.json"), "utf8"),
             fsAsync.readFile(path_1.default.join("dist", "buildnumber"), "utf8"),
@@ -281,9 +287,40 @@ async function initializeServer(custom = {}) {
                 delete redisConfig.global[key];
             }
         });
+        exports.logger.info("intializeServer: using docker " + USING_DOCKER);
+        if (USING_DOCKER) {
+            if (redisConfig.cache.host === "127.0.0.1") {
+                redisConfig.cache.host = "redis";
+            }
+            if (redisConfig.pubSub.host === "127.0.0.1") {
+                redisConfig.pubSub.host = "redis";
+            }
+            if (redisConfig.global.host === "127.0.0.1") {
+                redisConfig.global.host = "redis";
+            }
+            if (dbConfig.host === "127.0.0.1" || dbConfig.host === "localhost") {
+                dbConfig.host = "pgsql";
+            }
+        }
         // this shouldn't be necessary but we do it anyway
         buildnumber = buildnumber.replace("\n", "").trim();
         exports.logger.info("initializeServer: buildnumber is " + buildnumber);
+        exports.logger.info("initializeServer: INSTANCE_MODE is " + INSTANCE_MODE);
+        exports.logger.info("initializeServer: initializing redis pub/sub client");
+        const redisPub = redis_1.default.createClient(redisConfig.pubSub);
+        const redisSub = redis_1.default.createClient(redisConfig.pubSub);
+        exports.logger.info("initializeServer: initializing local redis pub/sub client");
+        const redisLocalPub = redis_1.default.createClient(redisConfig.cache);
+        const redisLocalSub = redis_1.default.createClient(redisConfig.cache);
+        exports.logger.info("initializeServer: initializing redis cache client");
+        const redisClient = redis_1.default.createClient(redisConfig.cache);
+        if (INSTANCE_MODE === "MANAGER_EXCLUSIVE") {
+            const cache = new cache_1.Cache(redisClient, null, null, null);
+            new listener_1.Listener(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, null, cache, null, null);
+            return;
+        }
+        exports.logger.info("initializeServer: initializing redis global cache client");
+        const redisGlobalClient = redis_1.default.createClient(redisConfig.global);
         exports.logger.info("initializeServer: initializing itemize server root");
         const root = new Root_1.default(build);
         // Create the connection string
@@ -301,16 +338,6 @@ async function initializeServer(custom = {}) {
             debug: process.env.NODE_ENV !== "production",
             connection: dbConnectionKnexConfig,
         });
-        exports.logger.info("initializeServer: initializing redis cache client");
-        const redisClient = redis_1.default.createClient(redisConfig.cache);
-        exports.logger.info("initializeServer: initializing redis global cache client");
-        const redisGlobalClient = redis_1.default.createClient(redisConfig.global);
-        exports.logger.info("initializeServer: initializing redis pub/sub client");
-        const redisPub = redis_1.default.createClient(redisConfig.pubSub);
-        const redisSub = redis_1.default.createClient(redisConfig.pubSub);
-        exports.logger.info("initializeServer: initializing local redis pub/sub client");
-        const redisLocalPub = redis_1.default.createClient(redisConfig.cache);
-        const redisLocalSub = redis_1.default.createClient(redisConfig.cache);
         PropertyDefinition_1.default.indexChecker = server_checkers_1.serverSideIndexChecker.bind(null, knex);
         // due to a bug in the types the create client function is missing
         // domainId and domainName
@@ -381,11 +408,7 @@ async function initializeServer(custom = {}) {
             pkgcloudStorageClient,
             pkgcloudUploadsContainer,
         };
-        const PORT = process.env.PORT || 8000;
-        const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
-        const INSTANCE_MODE = process.env.INSTANCE_MODE || "MANAGER";
         exports.logger.info("initializeServer: INSTANCE_GROUP_ID is " + INSTANCE_GROUP_ID);
-        exports.logger.info("initializeServer: INSTANCE_MODE is " + INSTANCE_MODE);
         if (INSTANCE_MODE === "MANAGER") {
             exports.logger.info("initializeServer: server initialized in manager mode flushing redis");
             const flushAllPromisified = util_1.promisify(appData.redis.flushall).bind(appData.redis);

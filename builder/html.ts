@@ -56,7 +56,7 @@ function replaceHTMLKeys(html: string, obj: any, prefix: string): string {
 export async function buildHTML(rawConfig: IBuilderBasicConfigType) {
   // the base html as we read it from either node_modules or an itemize folder
   let baseHTML: string =
-    await fsAsync.readFile(path.join("node_modules", "itemize", "client", "internal", "index.html"), "utf8");
+    await fsAsync.readFile(path.join("node_modules", "@onzag", "itemize", "client", "internal", "index.html"), "utf8");
 
   // we need to make a build number
   baseHTML = replaceHTMLKeys(baseHTML, {

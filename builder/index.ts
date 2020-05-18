@@ -37,7 +37,7 @@ import { processRoot } from "./processer";
 import { buildLang, clearLang } from "./lang";
 import { buildResources } from "./resources";
 import { buildHTML } from "./html";
-import { buildConfig, extractConfigAndBuildNumber, IBuilderBasicConfigType } from "./config";
+import { extractConfigAndBuildNumber, IBuilderBasicConfigType } from "./config";
 
 import fs from "fs";
 import path from "path";
@@ -127,7 +127,6 @@ export default async function build() {
     // we run all the build steps
     const [rawRoot] = await Promise.all([
       buildData(rawDataConfig),
-      buildConfig(rawDataConfig),
       buildHTML(rawDataConfig),
       buildBuildNumber(rawDataConfig),
       buildResources(rawDataConfig),

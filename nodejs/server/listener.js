@@ -29,9 +29,12 @@ class Listener {
         this.pubSubTriggerListeners = this.pubSubTriggerListeners.bind(this);
         this.pubSubLocalTriggerListeners = this.pubSubLocalTriggerListeners.bind(this);
         this.redisSub.on("message", this.pubSubTriggerListeners);
-        if (INSTANCE_MODE === "MANAGER") {
+        if (INSTANCE_MODE === "MANAGER" || INSTANCE_MODE === "MANAGER_EXCLUSIVE") {
             this.redisLocalSub.on("message", this.pubSubLocalTriggerListeners);
             this.redisLocalSub.subscribe(MANAGER_REGISTER_SS);
+        }
+        if (server === null) {
+            return;
         }
         // TODO we should validte the forms of every request, right now requests are not
         // validated

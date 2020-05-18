@@ -14,12 +14,6 @@ export interface IBuilderBasicConfigType {
     db: IDBConfigRawJSONDataType;
     buildnumber: number;
 }
-/**
- * Stores the config file in the dist
- * directory
- * @param rawConfig the config as parsed
- */
-export declare function buildConfig(rawConfig: IBuilderBasicConfigType): Promise<void>;
 export declare function extractOneConfig<T>(validator: Ajv.ValidateFunction, mainName: string, version: string, isSensitive: boolean, cb?: (data: T, tb: Traceback) => void): Promise<T>;
 /**
  * Extracts the configuration from the files where it should be located

@@ -30,8 +30,6 @@ exports.default = {
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
     "worker-injector-generator-plugin": "^1.0.2",
-    // builder typescript
-    "typescript": "^3.8.3",
     // tslint
     "tslint": "^5.20.1",
     "tslint-react": "^3.6.0",

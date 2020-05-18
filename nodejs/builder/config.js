@@ -9,7 +9,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const safe_1 = __importDefault(require("colors/safe"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const Traceback_1 = __importDefault(require("./Traceback"));
@@ -19,26 +18,6 @@ const imported_resources_1 = require("../imported-resources");
 const json_source_map_1 = __importDefault(require("json-source-map"));
 const fsAsync = fs_1.default.promises;
 ;
-/**
- * Stores the config file in the dist
- * directory
- * @param rawConfig the config as parsed
- */
-async function buildConfig(rawConfig) {
-    const standardFileName = path_1.default.join("dist", "config.json");
-    console.log("emiting " + safe_1.default.green(standardFileName));
-    await fsAsync.writeFile(standardFileName, JSON.stringify(rawConfig.standard));
-    const sensitiveFileName = path_1.default.join("dist", "sensitive.json");
-    console.log("emiting " + safe_1.default.green(sensitiveFileName));
-    await fsAsync.writeFile(sensitiveFileName, JSON.stringify(rawConfig.sensitive));
-    const dbFileName = path_1.default.join("dist", "db.json");
-    console.log("emiting " + safe_1.default.green(dbFileName));
-    await fsAsync.writeFile(dbFileName, JSON.stringify(rawConfig.db));
-    const redisFileName = path_1.default.join("dist", "redis.json");
-    console.log("emiting " + safe_1.default.green(redisFileName));
-    await fsAsync.writeFile(redisFileName, JSON.stringify(rawConfig.redis));
-}
-exports.buildConfig = buildConfig;
 async function extractOneConfig(validator, mainName, version, isSensitive, cb) {
     const configTraceback = new Traceback_1.default("BUILDER");
     const rawDataConfigLocation = path_1.default.join("config", `${mainName}${version ? "." + version : ""}${isSensitive ? ".sensitive" : ""}.json`);

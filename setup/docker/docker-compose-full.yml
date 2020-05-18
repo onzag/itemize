@@ -1,0 +1,48 @@
+version: '3.8'
+services: 
+    manager:
+        image: SETUP_APP_NAME:latest
+        volumes: 
+            - config:/home/node/app/config
+            - logs:/home/node/app/logs
+        depends_on:
+            - redis
+        environment: 
+            - INSTANCE_GROUP_ID: RANDOM
+            - INSTANCE_MODE: MANAGER_EXCLUSIVE
+            - NODE_ENV: production
+    servers:
+        image: SETUP_APP_NAME:latest
+        depends_on:
+            - redis
+            - pgsql
+        ports:
+            - "8000"
+        volumes:
+            - config:/home/node/app/config
+            - logs:/home/node/app/logs
+        environment: 
+            - INSTANCE_GROUP_ID: RANDOM
+            - INSTANCE_MODE: EXTENDED
+            - NODE_ENV: production
+    redis:
+        image: redis:latest
+        ports:
+            - "SETUP_REDIS_PORT:6379"
+    nginx:
+        depends_on:
+            - servers
+        volumes:
+            - key.pem:/etc/key.pem:ro
+            - cert.pem:/etc/cert.pem:ro
+            - nginx.conf:/etc/nginx/nginx.conf:ro
+    pgsql:
+        image: pgsqlpostgis:latest
+        ports:
+            - "SETUP_DB_PORT:5432"
+        volumes: 
+            - devenv/pgdata:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_USER: SETUP_DB_USER
+            - POSTGRES_PASSWORD_FILE: dbpassword.secret.txt
+            - POSTGRES_DB: SETUP_DB_DB

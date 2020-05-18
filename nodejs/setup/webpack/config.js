@@ -32,10 +32,10 @@ if (process.env.BUNDLE_ANALYZE) {
 module.exports = {
   mode,
   entry: {
-    "service-worker": ["./node_modules/itemize/client/internal/workers/service/service.worker.ts"],
-    "cache-worker": ["./node_modules/itemize/client/internal/workers/cache/cache.worker.ts"],
+    "service-worker": ["./node_modules/@onzag/itemize/client/internal/workers/service/service.worker.ts"],
+    "cache-worker": ["./node_modules/@onzag/itemize/client/internal/workers/cache/cache.worker.ts"],
     "build": ["./src/client/index.tsx"],
-    "polyfills": ["./node_modules/itemize/client/internal/polyfills.ts"],
+    "polyfills": ["./node_modules/@onzag/itemize/client/internal/polyfills.ts"],
   },
   devtool: isDevelopment ? 'inline-source-map' : false,
   plugins,

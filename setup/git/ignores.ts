@@ -4,6 +4,7 @@ export default [
   "/node_modules",
   "/devenv",
   "/logs",
+  "/deployments",
   "npm-debug.log",
   "db-status.json",
   "db-status.optimal.json",

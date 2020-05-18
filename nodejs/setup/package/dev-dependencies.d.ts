@@ -24,7 +24,6 @@ declare const _default: {
     webpack: string;
     "webpack-cli": string;
     "worker-injector-generator-plugin": string;
-    typescript: string;
     tslint: string;
     "tslint-react": string;
     "webpack-bundle-analyzer": string;

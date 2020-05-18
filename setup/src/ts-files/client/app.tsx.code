@@ -1,18 +1,18 @@
 import React from "react";
-import Navbar from "itemize/client/fast-prototyping/components/navbar";
-import Route from "itemize/client/components/navigaton/Route";
-import { LoginDialog } from "itemize/client/fast-prototyping/components/login-dialog";
-import { SignupDialog } from "itemize/client/fast-prototyping/components/signup-dialog";
-import { RecoverDialog } from "itemize/client/fast-prototyping/components/recover-dialog";
-import { MyProfile } from "itemize/client/fast-prototyping/pages/my-profile";
-import { Profile } from "itemize/client/fast-prototyping/pages/profile";
-import { ChangePassword } from "itemize/client/fast-prototyping/pages/change-password";
-import { Preferences } from "itemize/client/fast-prototyping/pages/preferences";
-import { PrivacyPolicy } from "itemize/client/fast-prototyping/pages/privacy-policy";
-import { TermsAndConditions } from "itemize/client/fast-prototyping/pages/terms-and-conditions";
-import { ResetPassword } from "itemize/client/fast-prototyping/pages/reset-password";
+import Navbar from "@onzag/itemize/client/fast-prototyping/components/navbar";
+import Route from "@onzag/itemize/client/components/navigaton/Route";
+import { LoginDialog } from "@onzag/itemize/client/fast-prototyping/components/login-dialog";
+import { SignupDialog } from "@onzag/itemize/client/fast-prototyping/components/signup-dialog";
+import { RecoverDialog } from "@onzag/itemize/client/fast-prototyping/components/recover-dialog";
+import { MyProfile } from "@onzag/itemize/client/fast-prototyping/pages/my-profile";
+import { Profile } from "@onzag/itemize/client/fast-prototyping/pages/profile";
+import { ChangePassword } from "@onzag/itemize/client/fast-prototyping/pages/change-password";
+import { Preferences } from "@onzag/itemize/client/fast-prototyping/pages/preferences";
+import { PrivacyPolicy } from "@onzag/itemize/client/fast-prototyping/pages/privacy-policy";
+import { TermsAndConditions } from "@onzag/itemize/client/fast-prototyping/pages/terms-and-conditions";
+import { ResetPassword } from "@onzag/itemize/client/fast-prototyping/pages/reset-password";
 
-import { CMS } from "itemize/client/fast-prototyping/pages/cms";
+import { CMS } from "@onzag/itemize/client/fast-prototyping/pages/cms";
 
 // Remember that when adding fast prototyping components they might demand
 // localization data, if you get an error named

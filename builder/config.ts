@@ -26,33 +26,6 @@ export interface IBuilderBasicConfigType {
   buildnumber: number,
 };
 
-/**
- * Stores the config file in the dist
- * directory
- * @param rawConfig the config as parsed
- */
-export async function buildConfig(rawConfig: IBuilderBasicConfigType) {
-  const standardFileName = path.join("dist", "config.json");
-  console.log("emiting " + colors.green(standardFileName));
-
-  await fsAsync.writeFile(standardFileName, JSON.stringify(rawConfig.standard));
-
-  const sensitiveFileName = path.join("dist", "sensitive.json");
-  console.log("emiting " + colors.green(sensitiveFileName));
-
-  await fsAsync.writeFile(sensitiveFileName, JSON.stringify(rawConfig.sensitive));
-
-  const dbFileName = path.join("dist", "db.json");
-  console.log("emiting " + colors.green(dbFileName));
-
-  await fsAsync.writeFile(dbFileName, JSON.stringify(rawConfig.db));
-
-  const redisFileName = path.join("dist", "redis.json");
-  console.log("emiting " + colors.green(redisFileName));
-
-  await fsAsync.writeFile(redisFileName, JSON.stringify(rawConfig.redis));
-}
-
 export async function extractOneConfig<T>(
   validator: Ajv.ValidateFunction,
   mainName: string,

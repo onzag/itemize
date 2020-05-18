@@ -36,9 +36,16 @@ import { promisify } from "util";
 import winston from "winston";
 import "winston-daily-rotate-file";
 
+const NODE_ENV = process.env.NODE_ENV;
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const PORT = process.env.PORT || 8000;
+const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
+const INSTANCE_MODE = process.env.INSTANCE_MODE || "MANAGER";
+const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
+
 // building the logger
 export const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || (process.env.NODE_ENV !== "production" ? "debug" : "info"),
+  level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
   format: winston.format.json(),
   transports: [
     new winston.transports.DailyRotateFile({ filename: "logs/error.log", level: "error" }),
@@ -47,7 +54,7 @@ export const logger = winston.createLogger({
 });
 
 // if not production add a console.log
-if (process.env.NODE_ENV !== "production") {
+if (NODE_ENV !== "production") {
   logger.add(
     new winston.transports.Console({
       format: winston.format.simple()
@@ -327,10 +334,10 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       rawBuild,
       buildnumber,
     ] = await Promise.all([
-      fsAsync.readFile(path.join("dist", "config.json"), "utf8"),
-      fsAsync.readFile(path.join("dist", "sensitive.json"), "utf8"),
-      fsAsync.readFile(path.join("dist", "redis.json"), "utf8"),
-      fsAsync.readFile(path.join("dist", "db.json"), "utf8"),
+      fsAsync.readFile(path.join("config", "index.json"), "utf8"),
+      fsAsync.readFile(path.join("config", NODE_ENV === "development" ? "index.sensitive.json" : `index.${NODE_ENV}.sensitive.json`), "utf8"),
+      fsAsync.readFile(path.join("config", NODE_ENV === "development" ? "redis.sensitive.json" : `redis.${NODE_ENV}.sensitive.json`), "utf8"),
+      fsAsync.readFile(path.join("config", NODE_ENV === "development" ? "db.sensitive.json" : `db.${NODE_ENV}.sensitive.json`), "utf8"),
       fsAsync.readFile(path.join("dist", "data", "index.html"), "utf8"),
       fsAsync.readFile(path.join("dist", "data", "build.all.json"), "utf8"),
       fsAsync.readFile(path.join("dist", "buildnumber"), "utf8"),
@@ -359,11 +366,71 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       }
     });
 
+    logger.info(
+      "intializeServer: using docker " + USING_DOCKER,
+    );
+    if (USING_DOCKER) {
+      if (redisConfig.cache.host === "127.0.0.1") {
+        redisConfig.cache.host = "redis";
+      }
+      if (redisConfig.pubSub.host === "127.0.0.1") {
+        redisConfig.pubSub.host = "redis";
+      }
+      if (redisConfig.global.host === "127.0.0.1") {
+        redisConfig.global.host = "redis";
+      }
+      if (dbConfig.host === "127.0.0.1" || dbConfig.host === "localhost") {
+        dbConfig.host = "pgsql";
+      }
+    }
+
     // this shouldn't be necessary but we do it anyway
     buildnumber = buildnumber.replace("\n", "").trim();
     logger.info(
       "initializeServer: buildnumber is " + buildnumber,
     );
+
+    logger.info(
+      "initializeServer: INSTANCE_MODE is " + INSTANCE_MODE,
+    );
+
+    logger.info(
+      "initializeServer: initializing redis pub/sub client",
+    );
+    const redisPub: RedisClient = redis.createClient(redisConfig.pubSub);
+    const redisSub: RedisClient = redis.createClient(redisConfig.pubSub);
+
+    logger.info(
+      "initializeServer: initializing local redis pub/sub client",
+    );
+    const redisLocalPub: RedisClient = redis.createClient(redisConfig.cache);
+    const redisLocalSub: RedisClient = redis.createClient(redisConfig.cache);
+
+    logger.info(
+      "initializeServer: initializing redis cache client",
+    );
+    const redisClient: RedisClient = redis.createClient(redisConfig.cache);
+
+    if (INSTANCE_MODE === "MANAGER_EXCLUSIVE") {
+      const cache = new Cache(redisClient, null, null, null);
+      new Listener(
+        buildnumber,
+        redisSub,
+        redisPub,
+        redisLocalSub,
+        redisLocalPub,
+        null,
+        cache,
+        null,
+        null,
+      );
+      return;
+    }
+
+    logger.info(
+      "initializeServer: initializing redis global cache client",
+    );
+    const redisGlobalClient: RedisClient = redis.createClient(redisConfig.global);
 
     logger.info(
       "initializeServer: initializing itemize server root",
@@ -389,27 +456,6 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       debug: process.env.NODE_ENV !== "production",
       connection: dbConnectionKnexConfig,
     });
-
-    logger.info(
-      "initializeServer: initializing redis cache client",
-    );
-    const redisClient: RedisClient = redis.createClient(redisConfig.cache);
-    logger.info(
-      "initializeServer: initializing redis global cache client",
-    );
-    const redisGlobalClient: RedisClient = redis.createClient(redisConfig.global);
-
-    logger.info(
-      "initializeServer: initializing redis pub/sub client",
-    );
-    const redisPub: RedisClient = redis.createClient(redisConfig.pubSub);
-    const redisSub: RedisClient = redis.createClient(redisConfig.pubSub);
-
-    logger.info(
-      "initializeServer: initializing local redis pub/sub client",
-    );
-    const redisLocalPub: RedisClient = redis.createClient(redisConfig.cache);
-    const redisLocalSub: RedisClient = redis.createClient(redisConfig.cache);
 
     PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
 
@@ -520,16 +566,8 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       pkgcloudUploadsContainer,
     };
 
-    const PORT = process.env.PORT || 8000;
-    const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
-    const INSTANCE_MODE = process.env.INSTANCE_MODE || "MANAGER";
-
     logger.info(
       "initializeServer: INSTANCE_GROUP_ID is " + INSTANCE_GROUP_ID,
-    );
-
-    logger.info(
-      "initializeServer: INSTANCE_MODE is " + INSTANCE_MODE,
     );
 
     if (INSTANCE_MODE === "MANAGER") {

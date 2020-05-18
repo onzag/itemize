@@ -7,6 +7,7 @@ declare const _default: {
     build: string;
     "start-silly-server": string;
     "start-dev-server": string;
+    "start-staging-server": string;
     "start-production-server": string;
     setup: string;
     "build-data": string;

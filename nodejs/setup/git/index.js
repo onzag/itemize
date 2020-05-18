@@ -7,6 +7,7 @@ const colors_1 = __importDefault(require("colors"));
 const fs_1 = __importDefault(require("fs"));
 const fsAsync = fs_1.default.promises;
 const ignores_1 = __importDefault(require("./ignores"));
+const npmrc_1 = __importDefault(require("./npmrc"));
 async function gitSetup(arg) {
     console.log(colors_1.default.bgGreen("GIT SETUP"));
     let exists = true;
@@ -19,6 +20,17 @@ async function gitSetup(arg) {
     if (!exists) {
         console.log("emiting " + colors_1.default.green(".gitignore"));
         await fsAsync.writeFile(".gitignore", ignores_1.default.join("\n"));
+    }
+    let npmrcexists = true;
+    try {
+        await fsAsync.access(".npmrcdocker", fs_1.default.constants.F_OK);
+    }
+    catch (e) {
+        npmrcexists = false;
+    }
+    if (!npmrcexists) {
+        console.log("emiting " + colors_1.default.green(".npmrcdocker"));
+        await fsAsync.writeFile(".npmrcdocker", npmrc_1.default);
     }
     return arg;
 }

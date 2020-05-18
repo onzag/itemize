@@ -24,8 +24,9 @@ const actionRegistry: {
   },
   "get-deployable": {
     fn: null,
-    description: "Provides the full docker deployable based on the config",
-    usage: "itemize get-deployable [development|staging|production] [dev-env|prod-env] [(portlist)] [build-name]"
+    description: "Provides the full docker deployable based on the config, ensure to run `npm run build` before this step " +
+    "your server should work already locally before you attempt to get the deployable",
+    usage: "itemize get-deployable [development|staging|production] [build-name]"
   },
   "start-dev-environment": {
     fn: start,

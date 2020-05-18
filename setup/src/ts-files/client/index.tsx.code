@@ -1,14 +1,14 @@
 import React from "react";
 import App from "./app";
-import { initializeItemizeApp } from "itemize/client";
-import { rendererContext } from "itemize/client/fast-prototyping/renderers";
-import { appWrapper, mainWrapper } from "itemize/client/fast-prototyping/wrappers";
+import { initializeItemizeApp } from "@onzag/itemize/client";
+import { rendererContext } from "@onzag/itemize/client/fast-prototyping/renderers";
+import { appWrapper, mainWrapper } from "@onzag/itemize/client/fast-prototyping/wrappers";
 
 initializeItemizeApp(
 	// the renderer context specifies how property components (viewers and editors) are
 	// rendered, by default itemize contains its own fast prototyping renderers, these use
 	// google's material design; you might want to develop your own renderer context, the primary
-	// renderer context cannot be changed, you might want to check itemize/client/providers/renderer
+	// renderer context cannot be changed, you might want to check @onzag/itemize/client/providers/renderer
 	// in order to change renderer contexts on the fly during app execution, say if you support some form
 	// of theming, but overall you should rely on args for theming.
 	// The rendererContext can be null, but this will mean that entries and views for properties cannot be used.

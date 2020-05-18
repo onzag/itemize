@@ -54,7 +54,6 @@ async function build() {
         // we run all the build steps
         const [rawRoot] = await Promise.all([
             buildData(rawDataConfig),
-            config_1.buildConfig(rawDataConfig),
             html_1.buildHTML(rawDataConfig),
             buildnumber_1.buildBuildNumber(rawDataConfig),
             resources_1.buildResources(rawDataConfig),

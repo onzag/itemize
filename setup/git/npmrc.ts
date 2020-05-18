@@ -1,0 +1,1 @@
+export default "//registry.npmjs.org/:_authToken=${NPM_TOKEN}";

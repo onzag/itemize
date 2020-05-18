@@ -46,7 +46,7 @@ async function start(version) {
         console.log(colors_1.default.yellow("Please allow Itemize to create a docker container for the database"));
         console.log(colors_1.default.yellow("The execution might take a while, please wait..."));
         try {
-            const absPath = path_1.default.resolve("./node_modules/itemize/dev-environment/pgsqlpostgis");
+            const absPath = path_1.default.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis");
             await exec_1.execSudo(`docker build -t pgsqlpostgis ${absPath}`, "Itemize Docker Contained PGSQL Postgis Enabled Database");
             await exec_1.execSudo(`docker run --name ${dockerprefixer}_devdb -e POSTGRES_PASSWORD=${dbConfig.password} ` +
                 `-e POSTGRES_USER=${dbConfig.user} -e POSTGRES_DB=${dbConfig.database} ` +
