@@ -508,27 +508,12 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       pkgcloudUploadsContainer,
     };
 
-    const getPromisified = promisify(appData.redis.get).bind(appData.redis);
-    const setPromisified = promisify(appData.redis.set).bind(appData.redis);
     const flushAllPromisified = promisify(appData.redis.flushall).bind(appData.redis);
 
     logger.info(
-      "initializeServer: checking redis data integrity",
+      "initializeServer: flushing redis",
     );
-    const buildnumberRedis: string = await getPromisified("buildnumber");
-    if (buildnumberRedis !== buildnumber) {
-      logger.info(
-        "initializeServer: buildnumber is mismatched expecting " + buildnumber + " found " + buildnumberRedis,
-      );
-      logger.info(
-        "initializeServer: flushing redis",
-      );
-      await flushAllPromisified();
-      logger.info(
-        "initializeServer: storing new buildnumber",
-      );
-      await setPromisified("buildnumber", buildnumber);
-    }
+    await flushAllPromisified();
 
     logger.info(
       "initializeServer: setting up endpoints",

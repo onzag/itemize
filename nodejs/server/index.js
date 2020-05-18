@@ -376,18 +376,9 @@ async function initializeServer(custom = {}) {
             pkgcloudStorageClient,
             pkgcloudUploadsContainer,
         };
-        const getPromisified = util_1.promisify(appData.redis.get).bind(appData.redis);
-        const setPromisified = util_1.promisify(appData.redis.set).bind(appData.redis);
         const flushAllPromisified = util_1.promisify(appData.redis.flushall).bind(appData.redis);
-        exports.logger.info("initializeServer: checking redis data integrity");
-        const buildnumberRedis = await getPromisified("buildnumber");
-        if (buildnumberRedis !== buildnumber) {
-            exports.logger.info("initializeServer: buildnumber is mismatched expecting " + buildnumber + " found " + buildnumberRedis);
-            exports.logger.info("initializeServer: flushing redis");
-            await flushAllPromisified();
-            exports.logger.info("initializeServer: storing new buildnumber");
-            await setPromisified("buildnumber", buildnumber);
-        }
+        exports.logger.info("initializeServer: flushing redis");
+        await flushAllPromisified();
         exports.logger.info("initializeServer: setting up endpoints");
         initializeApp(appData, custom);
         exports.logger.info("initializeServer: attempting to listen");

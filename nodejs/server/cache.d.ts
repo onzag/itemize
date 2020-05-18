@@ -139,4 +139,13 @@ export declare class Cache {
      * @returns a list of whole sql combined table row values
      */
     requestListCache(ids: IGQLSearchResult[]): Promise<ISQLTableRowValue[]>;
+    /**
+     * This function triggers once the remote listener has detected a change that has been done by
+     * another server instance to a value that we are supposedly currently holding in memory
+     * @param itemDefinition the item definition qualified name
+     * @param id the id of such
+     * @param version the version or null
+     * @param data the entire SQL result
+     */
+    onChangeInformed(itemDefinition: string, id: number, version: string, data: ISQLTableRowValue): void;
 }

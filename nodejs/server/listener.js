@@ -8,11 +8,14 @@ const ItemDefinition_1 = __importDefault(require("../base/Root/Module/ItemDefini
 const remote_protocol_1 = require("../base/remote-protocol");
 const version_null_value_1 = require("./version-null-value");
 const _1 = require(".");
+const uuid_1 = __importDefault(require("uuid"));
 // TODO refactor all these methods to be proper objects, this is a mess of arguments
 // do the same in the remote listener in the client side
 class Listener {
     constructor(buildnumber, redisSub, redisPub, root, cache, knex, server) {
         this.listeners = {};
+        this.listensSS = {};
+        this.uuid = uuid_1.default.v4();
         this.redisSub = redisSub;
         this.redisPub = redisPub;
         this.buildnumber = buildnumber;
@@ -84,6 +87,12 @@ class Listener {
             this.listeners[socket.id].token = request.token;
         }
         socket.emit(remote_protocol_1.IDENTIFIED_EVENT);
+    }
+    registerSS(request) {
+        const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
+        _1.logger.debug("Listener.registerSS: Subscribing server to " + mergedIndexIdentifier);
+        this.redisSub.subscribe(mergedIndexIdentifier);
+        this.listensSS[mergedIndexIdentifier] = true;
     }
     register(socket, request) {
         // TODO check if token allows to listen before adding
@@ -285,18 +294,28 @@ class Listener {
             });
         }
     }
+    removeListenerFinal(mergedIndexIdentifier) {
+        const noSocketsListeningLeft = !this.listensSS[mergedIndexIdentifier] && Object.keys(this.listeners).every((socketId) => {
+            return !this.listeners[socketId].listens[mergedIndexIdentifier];
+        });
+        if (noSocketsListeningLeft) {
+            _1.logger.debug("Listener.removeListenerFinal: founds no sockets left for " + mergedIndexIdentifier + " plugging off redis");
+            this.redisSub.unsubscribe(mergedIndexIdentifier);
+        }
+    }
     removeListener(socket, mergedIndexIdentifier) {
         if (this.listeners[socket.id].listens[mergedIndexIdentifier]) {
             _1.logger.debug("Listener.removeListener: unsubscribing socket " + socket.id + " from " + mergedIndexIdentifier);
             delete this.listeners[socket.id].listens[mergedIndexIdentifier];
             this.listeners[socket.id].amount--;
-            const noSocketsListeningLeft = Object.keys(this.listeners).every((socketId) => {
-                return !this.listeners[socketId].listens[mergedIndexIdentifier];
-            });
-            if (noSocketsListeningLeft) {
-                _1.logger.debug("Listener.removeListener: founds no sockets left for " + mergedIndexIdentifier + " plugging off redis");
-                this.redisSub.unsubscribe(mergedIndexIdentifier);
-            }
+            this.removeListenerFinal(mergedIndexIdentifier);
+        }
+    }
+    unregisterSS(request) {
+        const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
+        if (this.listensSS[mergedIndexIdentifier]) {
+            delete this.listensSS[mergedIndexIdentifier];
+            this.removeListenerFinal(mergedIndexIdentifier);
         }
     }
     unregister(socket, request) {
@@ -312,13 +331,15 @@ class Listener {
             "." + request.parentId + "." + (request.parentVersion || "");
         this.removeListener(socket, mergedIndexIdentifier);
     }
-    triggerChangedListeners(event, listenerUUID) {
+    triggerChangedListeners(event, data, listenerUUID) {
         const mergedIndexIdentifier = event.itemDefinition + "." + event.id + "." + (event.version || "");
         const redisEvent = {
             event,
             listenerUUID,
+            severListenerUUID: this.uuid,
             mergedIndexIdentifier,
             eventType: remote_protocol_1.CHANGED_FEEEDBACK_EVENT,
+            data,
         };
         _1.logger.debug("Listener.triggerChangedListeners: triggering redis event", redisEvent);
         this.redisPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
@@ -349,6 +370,17 @@ class Listener {
     pubSubTriggerListeners(channel, message) {
         const parsedContent = JSON.parse(message);
         _1.logger.debug("Listener.pubSubTriggerListeners: received redis event", parsedContent);
+        if (this.listensSS[parsedContent.mergedIndexIdentifier]) {
+            _1.logger.debug("Listener.pubSubTriggerListeners: our own server is expecting it");
+            const severListenerUUID = parsedContent.severListenerUUID;
+            if (severListenerUUID === this.uuid) {
+                _1.logger.debug("Listener.pubSubTriggerListeners: our own server was the emitter ignoring event");
+            }
+            else {
+                const event = parsedContent.event;
+                this.cache.onChangeInformed(event.itemDefinition, event.id, event.version || null, parsedContent.data);
+            }
+        }
         Object.keys(this.listeners).forEach((socketKey) => {
             const whatListening = this.listeners[socketKey].listens;
             if (whatListening[parsedContent.mergedIndexIdentifier] &&

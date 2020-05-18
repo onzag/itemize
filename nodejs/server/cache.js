@@ -15,7 +15,7 @@ const sql_2 = require("../base/Root/Module/sql");
 const sql_files_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files");
 const errors_1 = require("../base/errors");
 const _1 = require(".");
-const CACHE_EXPIRES_DAYS = 2;
+const CACHE_EXPIRES_DAYS = 14;
 /**
  * The cache class that provides all the functionality that is
  * specified for the cache package, the cache is more than what
@@ -81,7 +81,10 @@ class Cache {
                     }
                 }
                 else {
-                    _1.logger.error("Cache.getIdefCachedValue: could not retrieve value from redis cache client for " + idefQueryIdentifier + " with error", error.stack ? error.stack : error.message);
+                    _1.logger.error("Cache.getIdefCachedValue: could not retrieve value from redis cache client for " + idefQueryIdentifier + " with error", {
+                        errStack: error.stack,
+                        errMessage: error.message,
+                    });
                     // also here
                     resolve(null);
                 }
@@ -110,6 +113,11 @@ class Cache {
     forceCacheInto(idefTable, id, version, value) {
         const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
         _1.logger.debug("Cache.forceCacheInto: setting cache value for " + idefQueryIdentifier, value);
+        this.listener.registerSS({
+            itemDefinition: idefTable,
+            id: id,
+            version: version || null,
+        });
         return new Promise((resolve) => {
             this.redisClient.set(idefQueryIdentifier, JSON.stringify(value), (error) => {
                 resolve(value);
@@ -117,7 +125,10 @@ class Cache {
                     this.pokeCache(idefQueryIdentifier);
                 }
                 else {
-                    _1.logger.error("Cache.forceCacheInto: could not set value for " + idefQueryIdentifier + " with error", error.stack ? error.stack : error.message);
+                    _1.logger.error("Cache.forceCacheInto: could not set value for " + idefQueryIdentifier + " with error", {
+                        errStack: error.stack,
+                        errMessage: error.message,
+                    });
                 }
             });
         });
@@ -250,7 +261,7 @@ class Cache {
                 lastModified: null,
             };
             _1.logger.debug("Cache.requestCreation (detached): built and triggering created change event", changeEvent);
-            this.listener.triggerChangedListeners(changeEvent, null);
+            this.listener.triggerChangedListeners(changeEvent, sqlValue, null);
             const searchResultForThisValue = {
                 id: sqlValue.id,
                 version: sqlValue.version || null,
@@ -421,7 +432,7 @@ class Cache {
                 lastModified: null,
             };
             _1.logger.debug("Cache.requestUpdate (detached): built and triggering created change event", changeEvent);
-            this.listener.triggerChangedListeners(changeEvent, listenerUUID || null);
+            this.listener.triggerChangedListeners(changeEvent, sqlValue, listenerUUID || null);
         })();
         return sqlValue;
     }
@@ -453,7 +464,7 @@ class Cache {
                 type: "not_found",
                 lastModified: null,
             };
-            this.listener.triggerChangedListeners(changeEvent, listenerUUID || null);
+            this.listener.triggerChangedListeners(changeEvent, null, listenerUUID || null);
         };
         try {
             if (dropAllVersions) {
@@ -554,6 +565,40 @@ class Cache {
             return this.requestValue(itemDefinition, idContainer.id, idContainer.version);
         }));
         return resultValues;
+    }
+    /**
+     * This function triggers once the remote listener has detected a change that has been done by
+     * another server instance to a value that we are supposedly currently holding in memory
+     * @param itemDefinition the item definition qualified name
+     * @param id the id of such
+     * @param version the version or null
+     * @param data the entire SQL result
+     */
+    onChangeInformed(itemDefinition, id, version, data) {
+        const idefQueryIdentifier = "IDEFQUERY:" + itemDefinition + "." + id.toString() + "." + (version || "");
+        // first we need to check that we hold such key, while we are listening to this, the values in redis are volatile
+        // and expire and as so we only want to update values that exist already there
+        this.redisClient.exists(idefQueryIdentifier, (error, value) => {
+            // if we have an error log it
+            if (error) {
+                _1.logger.error("Cache.onChangeInformed: could not retrieve existance for " + idefQueryIdentifier, {
+                    errStack: error.stack,
+                    errMessage: error.message,
+                });
+            }
+            else if (value) {
+                // if we have such a value we want to update it
+                this.forceCacheInto(itemDefinition, id, version, data);
+            }
+            else if (!value) {
+                // otherwise we ignore everything and simply unregister the event
+                this.listener.unregisterSS({
+                    itemDefinition,
+                    id,
+                    version,
+                });
+            }
+        });
     }
 }
 exports.Cache = Cache;

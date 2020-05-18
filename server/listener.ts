@@ -41,6 +41,7 @@ import {
 import { IGQLSearchResult } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from ".";
+import uuid from "uuid";
 
 interface IListenerList {
   [socketId: string]: {
@@ -54,17 +55,25 @@ interface IListenerList {
   };
 }
 
+interface IServerListensList {
+  [mergedIndexIdentifier: string]: boolean;
+}
+
 // TODO refactor all these methods to be proper objects, this is a mess of arguments
 // do the same in the remote listener in the client side
 
 export class Listener {
   private listeners: IListenerList = {};
+  private listensSS: IServerListensList = {};
+  private uuid: string = uuid.v4();
+
   private redisSub: RedisClient;
   private redisPub: RedisClient;
   private buildnumber: string;
   private root: Root;
   private knex: Knex;
   private cache: Cache;
+
   constructor(
     buildnumber: string,
     redisSub: RedisClient,
@@ -164,6 +173,16 @@ export class Listener {
     socket.emit(
       IDENTIFIED_EVENT,
     );
+  }
+  public registerSS(
+    request: IRegisterRequest,
+  ) {
+    const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
+    logger.debug(
+      "Listener.registerSS: Subscribing server to " + mergedIndexIdentifier,
+    );
+    this.redisSub.subscribe(mergedIndexIdentifier);
+    this.listensSS[mergedIndexIdentifier] = true;
   }
   public register(
     socket: Socket,
@@ -458,6 +477,19 @@ export class Listener {
       );
     }
   }
+  public removeListenerFinal(
+    mergedIndexIdentifier: string,
+  ) {
+    const noSocketsListeningLeft = !this.listensSS[mergedIndexIdentifier] && Object.keys(this.listeners).every((socketId) => {
+      return !this.listeners[socketId].listens[mergedIndexIdentifier];
+    });
+    if (noSocketsListeningLeft) {
+      logger.debug(
+        "Listener.removeListenerFinal: founds no sockets left for " + mergedIndexIdentifier + " plugging off redis",
+      );
+      this.redisSub.unsubscribe(mergedIndexIdentifier);
+    }
+  }
   public removeListener(
     socket: Socket,
     mergedIndexIdentifier: string,
@@ -468,15 +500,16 @@ export class Listener {
       );
       delete this.listeners[socket.id].listens[mergedIndexIdentifier];
       this.listeners[socket.id].amount--;
-      const noSocketsListeningLeft = Object.keys(this.listeners).every((socketId) => {
-        return !this.listeners[socketId].listens[mergedIndexIdentifier];
-      });
-      if (noSocketsListeningLeft) {
-        logger.debug(
-          "Listener.removeListener: founds no sockets left for " + mergedIndexIdentifier + " plugging off redis",
-        );
-        this.redisSub.unsubscribe(mergedIndexIdentifier);
-      }
+      this.removeListenerFinal(mergedIndexIdentifier);
+    }
+  }
+  public unregisterSS(
+    request: IUnregisterRequest,
+  ) {
+    const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
+    if (this.listensSS[mergedIndexIdentifier]) {
+      delete this.listensSS[mergedIndexIdentifier];
+      this.removeListenerFinal(mergedIndexIdentifier);
     }
   }
   public unregister(
@@ -503,14 +536,17 @@ export class Listener {
   }
   public triggerChangedListeners(
     event: IChangedFeedbackEvent,
+    data: ISQLTableRowValue,
     listenerUUID: string,
   ) {
     const mergedIndexIdentifier = event.itemDefinition + "." + event.id + "." + (event.version || "");
     const redisEvent = {
       event,
       listenerUUID,
+      severListenerUUID: this.uuid,
       mergedIndexIdentifier,
       eventType: CHANGED_FEEEDBACK_EVENT,
+      data,
     };
     logger.debug(
       "Listener.triggerChangedListeners: triggering redis event",
@@ -562,6 +598,21 @@ export class Listener {
       "Listener.pubSubTriggerListeners: received redis event",
       parsedContent,
     );
+    if (this.listensSS[parsedContent.mergedIndexIdentifier]) {
+      logger.debug(
+        "Listener.pubSubTriggerListeners: our own server is expecting it",
+      );
+
+      const severListenerUUID = parsedContent.severListenerUUID;
+      if (severListenerUUID === this.uuid) {
+        logger.debug(
+          "Listener.pubSubTriggerListeners: our own server was the emitter ignoring event",
+        );
+      } else {
+        const event: IChangedFeedbackEvent = parsedContent.event;
+        this.cache.onChangeInformed(event.itemDefinition, event.id, event.version || null, parsedContent.data);
+      }
+    }
     Object.keys(this.listeners).forEach((socketKey) => {
       const whatListening = this.listeners[socketKey].listens;
       if (whatListening[parsedContent.mergedIndexIdentifier] &&
