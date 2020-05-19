@@ -1,7 +1,7 @@
 FROM postgres:12
 
 ENV POSTGIS_MAJOR 3
-ENV POSTGIS_VERSION 3.0.0+dfsg-2~exp1.pgdg100+1
+ENV POSTGIS_VERSION 3.0.1+dfsg-2.pgdg100+1
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

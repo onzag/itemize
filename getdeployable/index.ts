@@ -172,8 +172,8 @@ export default async function build(version: string, buildID: string, services: 
     "\nthe database docker-compose-only-db.yml can be used for this purpose which only spawns the database " +
     "\nonce you do that there's a special mode you can initialize your server which will call itemize build database process" +
     "\nfirst remember to initialize the database image by running `docker load -i pgsqlpostgis.tar.gz` then run" +
-    "\ndocker-compose up -f docker-compose-only-db.yml --detach; and keep it detached so you can run your next docker command" +
-    "\ndocker run -it app -v ./build.all.json:/home/node/app/build.all.json -e \"INSTANCE_MODE=BUILD_DATABASE\" -e \"NODE_ENV=" + version + "\"";
+    "\ndocker-compose -f docker-compose-only-db.yml up -d; and keep it detached so you can run your next docker command" +
+    "\ndocker run -it app -v ./config:/home/node/app/config -e \"INSTANCE_MODE=BUILD_DATABASE\" -e \"NODE_ENV=" + version + "\"";
 
     const absPath = path.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis");
     await execSudo(

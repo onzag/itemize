@@ -195,11 +195,6 @@ async function customResolveWrapper(
  * @param custom the custom config that has been passed
  */
 function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataType) {
-  if (INSTANCE_MODE === "BUILD_DATABASE") {
-    build(NODE_ENV);
-    return;
-  }
-
   // removing the powered by header
   app.use((req, res, next) => {
     res.removeHeader("X-Powered-By");
@@ -318,6 +313,14 @@ function getContainerPromisified(client: pkgcloud.storage.Client, containerName:
  * @param custom.customTriggers a registry for custom triggers
  */
 export async function initializeServer(custom: IServerCustomizationDataType = {}) {
+  if (INSTANCE_MODE === "BUILD_DATABASE") {
+    logger.info(
+      "initializeServer: attempting to build database instead, not initializing server",
+    );
+    build(NODE_ENV);
+    return;
+  }
+
   try {
     logger.info(
       "initializeServer: reading configuration data"

@@ -138,10 +138,6 @@ async function customResolveWrapper(fn, source, args, context, info) {
  * @param custom the custom config that has been passed
  */
 function initializeApp(appData, custom) {
-    if (INSTANCE_MODE === "BUILD_DATABASE") {
-        dbbuilder_1.default(NODE_ENV);
-        return;
-    }
     // removing the powered by header
     app.use((req, res, next) => {
         res.removeHeader("X-Powered-By");
@@ -243,6 +239,11 @@ function getContainerPromisified(client, containerName) {
  * @param custom.customTriggers a registry for custom triggers
  */
 async function initializeServer(custom = {}) {
+    if (INSTANCE_MODE === "BUILD_DATABASE") {
+        exports.logger.info("initializeServer: attempting to build database instead, not initializing server");
+        dbbuilder_1.default(NODE_ENV);
+        return;
+    }
     try {
         exports.logger.info("initializeServer: reading configuration data");
         // first let's read all the configurations
