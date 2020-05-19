@@ -11,7 +11,7 @@ COPY package.json .
 COPY package-lock.json .
 COPY tsconfig.json .
 COPY src src
-COPY .npmrcdocker .npmrc
+COPY .npmrc-docker .npmrc
 
 USER root
 RUN apk --no-cache add --virtual builds-deps build-base python

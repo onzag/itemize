@@ -35,16 +35,17 @@ import { promisify } from "util";
 
 import winston from "winston";
 import "winston-daily-rotate-file";
+import build from "../dbbuilder";
 
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const PORT = process.env.PORT || 8000;
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
-const INSTANCE_MODE = process.env.INSTANCE_MODE || "MANAGER";
+const INSTANCE_MODE: "MANAGER" | "MANAGER_EXCLUSIVE" | "EXTENDED" | "BUILD_DATABASE" = process.env.INSTANCE_MODE || "MANAGER" as any;
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 
 // building the logger
-export const logger = winston.createLogger({
+export const logger: winston.Logger = INSTANCE_MODE === "BUILD_DATABASE" ? null : winston.createLogger({
   level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
   format: winston.format.json(),
   transports: [
@@ -54,7 +55,7 @@ export const logger = winston.createLogger({
 });
 
 // if not production add a console.log
-if (NODE_ENV !== "production") {
+if (NODE_ENV !== "production" && logger) {
   logger.add(
     new winston.transports.Console({
       format: winston.format.simple()
@@ -79,7 +80,7 @@ types.setTypeParser(DATE_OID, (val) => val);
 
 const fsAsync = fs.promises;
 
-const app = express();
+const app = INSTANCE_MODE === "BUILD_DATABASE" ? null : express();
 
 export interface IAppDataType {
   root: Root;
@@ -194,6 +195,11 @@ async function customResolveWrapper(
  * @param custom the custom config that has been passed
  */
 function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataType) {
+  if (INSTANCE_MODE === "BUILD_DATABASE") {
+    build(NODE_ENV);
+    return;
+  }
+
   // removing the powered by header
   app.use((req, res, next) => {
     res.removeHeader("X-Powered-By");
@@ -367,7 +373,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     });
 
     logger.info(
-      "intializeServer: using docker " + USING_DOCKER,
+      "initializeServer: using docker " + USING_DOCKER,
     );
     if (USING_DOCKER) {
       if (redisConfig.cache.host === "127.0.0.1") {

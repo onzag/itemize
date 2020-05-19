@@ -63,7 +63,13 @@ async function build(version) {
     let actual;
     if (!isCorrupted) {
         // parse the data
-        const data = JSON.parse(await fsAsync.readFile(path_1.default.join("dist", "data", "build.all.json"), "utf8"));
+        let data;
+        try {
+            data = JSON.parse(await fsAsync.readFile(path_1.default.join("dist", "data", "build.all.json"), "utf8"));
+        }
+        catch {
+            data = JSON.parse(await fsAsync.readFile("build.all.json", "utf8"));
+        }
         // build the root from that data
         const root = new Root_1.default(data);
         // let's get the result by progressively building on top of it

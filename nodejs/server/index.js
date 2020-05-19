@@ -35,6 +35,7 @@ const here_1 = require("./services/here");
 const util_1 = require("util");
 const winston_1 = __importDefault(require("winston"));
 require("winston-daily-rotate-file");
+const dbbuilder_1 = __importDefault(require("../dbbuilder"));
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const PORT = process.env.PORT || 8000;
@@ -42,7 +43,7 @@ const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
 const INSTANCE_MODE = process.env.INSTANCE_MODE || "MANAGER";
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 // building the logger
-exports.logger = winston_1.default.createLogger({
+exports.logger = INSTANCE_MODE === "BUILD_DATABASE" ? null : winston_1.default.createLogger({
     level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
     format: winston_1.default.format.json(),
     transports: [
@@ -51,7 +52,7 @@ exports.logger = winston_1.default.createLogger({
     ]
 });
 // if not production add a console.log
-if (NODE_ENV !== "production") {
+if (NODE_ENV !== "production" && exports.logger) {
     exports.logger.add(new winston_1.default.transports.Console({
         format: winston_1.default.format.simple()
     }));
@@ -71,7 +72,7 @@ pg_1.types.setTypeParser(TIMESTAMPTZ_OID, (val) => val);
 pg_1.types.setTypeParser(TIME_OID, (val) => val);
 pg_1.types.setTypeParser(DATE_OID, (val) => val);
 const fsAsync = fs_1.default.promises;
-const app = express_1.default();
+const app = INSTANCE_MODE === "BUILD_DATABASE" ? null : express_1.default();
 /**
  * This is the function that catches the errors that are thrown
  * within graphql
@@ -137,6 +138,10 @@ async function customResolveWrapper(fn, source, args, context, info) {
  * @param custom the custom config that has been passed
  */
 function initializeApp(appData, custom) {
+    if (INSTANCE_MODE === "BUILD_DATABASE") {
+        dbbuilder_1.default(NODE_ENV);
+        return;
+    }
     // removing the powered by header
     app.use((req, res, next) => {
         res.removeHeader("X-Powered-By");
@@ -287,7 +292,7 @@ async function initializeServer(custom = {}) {
                 delete redisConfig.global[key];
             }
         });
-        exports.logger.info("intializeServer: using docker " + USING_DOCKER);
+        exports.logger.info("initializeServer: using docker " + USING_DOCKER);
         if (USING_DOCKER) {
             if (redisConfig.cache.host === "127.0.0.1") {
                 redisConfig.cache.host = "redis";

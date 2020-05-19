@@ -50,29 +50,7 @@ async function dockerSetup(arg) {
     }
     if (!dockerComposeExists) {
         console.log("emiting " + colors_1.default.green("docker-compose.yml"));
-        let fileContent = await fsAsync.readFile(path_1.default.join(__dirname, "..", "..", "..", "setup", "docker", "docker-compose.yml"), "utf-8");
-        fileContent = fileContent
-            .replace(/SETUP_APP_NAME/g, arg.standardConfig.appName.replace(/\s/g, "_").toLowerCase())
-            .replace("SETUP_REDIS_PORT", (arg.redisConfigProduction.cache.port || 6379).toString());
-        await fsAsync.writeFile("docker-compose.yml", fileContent);
-    }
-    let dockerComposeFullExists = true;
-    try {
-        await fsAsync.access("docker-compose-full.yml", fs_1.default.constants.F_OK);
-    }
-    catch (e) {
-        dockerComposeFullExists = false;
-    }
-    if (!dockerComposeFullExists) {
-        console.log("emiting " + colors_1.default.green("docker-compose-full.yml"));
-        let fileContent = await fsAsync.readFile(path_1.default.join(__dirname, "..", "..", "..", "setup", "docker", "docker-compose-full.yml"), "utf-8");
-        fileContent = fileContent
-            .replace(/SETUP_APP_NAME/g, arg.standardConfig.appName.replace(/\s/g, "_").toLowerCase())
-            .replace("SETUP_REDIS_PORT", (arg.redisConfigProduction.cache.port || 6379).toString())
-            .replace("SETUP_DB_PORT", arg.dbConfigProduction.port.toString())
-            .replace("SETUP_DB_USER", arg.dbConfigProduction.user)
-            .replace("SETUP_DB_DB", arg.dbConfigProduction.database);
-        await fsAsync.writeFile("docker-compose.yml", fileContent);
+        await fsAsync.copyFile(path_1.default.join(__dirname, "..", "..", "..", "setup", "docker", "docker-compose.yml"), "docker-compose.yml");
     }
     let nginxExists = true;
     try {
@@ -84,6 +62,28 @@ async function dockerSetup(arg) {
     if (!nginxExists) {
         console.log("emiting " + colors_1.default.green("nginx.conf"));
         await fsAsync.copyFile(path_1.default.join(__dirname, "..", "..", "..", "setup", "docker", "nginx.conf"), "nginx.conf");
+    }
+    let startExists = true;
+    try {
+        await fsAsync.access("start.sh", fs_1.default.constants.F_OK);
+    }
+    catch (e) {
+        startExists = false;
+    }
+    if (!startExists) {
+        console.log("emiting " + colors_1.default.green("start.sh"));
+        await fsAsync.copyFile(path_1.default.join(__dirname, "..", "..", "..", "setup", "docker", "start.sh"), "start.sh");
+    }
+    let npmRcExists = true;
+    try {
+        await fsAsync.access(".npmrc-docker", fs_1.default.constants.F_OK);
+    }
+    catch (e) {
+        npmRcExists = false;
+    }
+    if (!npmRcExists) {
+        console.log("emiting " + colors_1.default.green(".npmrc-docker"));
+        await fsAsync.copyFile(path_1.default.join(__dirname, "..", "..", "..", "setup", "docker", ".npmrc-docker"), ".npmrc-docker");
     }
     return arg;
 }

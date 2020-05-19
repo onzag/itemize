@@ -9,6 +9,7 @@ const dev_environment_1 = require("./dev-environment");
 const colors_1 = __importDefault(require("colors"));
 const builder_1 = __importDefault(require("./builder"));
 const dbbuilder_1 = __importDefault(require("./dbbuilder"));
+const getdeployable_1 = __importDefault(require("./getdeployable"));
 const action = process.argv[2];
 const wantsSpecificHelp = process.argv[3] === "--help";
 const remainingArgs = process.argv.slice(3);
@@ -19,10 +20,10 @@ const actionRegistry = {
         usage: "itemize setup (step)",
     },
     "get-deployable": {
-        fn: null,
-        description: "Provides the full docker deployable based on the config, ensure to run `npm run build` before this step " +
+        fn: getdeployable_1.default,
+        description: "Provides the full docker compose deployable based on the config, ensure to run `npm run build` before this step " +
             "your server should work already locally before you attempt to get the deployable",
-        usage: "itemize get-deployable [development|staging|production] [build-name]"
+        usage: "itemize get-deployable [development|staging|production] [build-name] [full|standard|slim|(comma-separated-services)]"
     },
     "start-dev-environment": {
         fn: dev_environment_1.start,

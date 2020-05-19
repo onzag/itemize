@@ -7,6 +7,7 @@ exports.default = [
     "/devenv",
     "/logs",
     "/deployments",
+    ".npm-token",
     "npm-debug.log",
     "db-status.json",
     "db-status.optimal.json",

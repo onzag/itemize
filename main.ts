@@ -5,6 +5,7 @@ import { start, stop } from "./dev-environment";
 import colors from "colors";
 import buildData from "./builder";
 import buildDatabase from "./dbbuilder";
+import getDeployable from "./getdeployable";
 
 const action = process.argv[2];
 const wantsSpecificHelp = process.argv[3] === "--help";
@@ -23,10 +24,10 @@ const actionRegistry: {
     usage: "itemize setup (step)",
   },
   "get-deployable": {
-    fn: null,
-    description: "Provides the full docker deployable based on the config, ensure to run `npm run build` before this step " +
+    fn: getDeployable,
+    description: "Provides the full docker compose deployable based on the config, ensure to run `npm run build` before this step " +
     "your server should work already locally before you attempt to get the deployable",
-    usage: "itemize get-deployable [development|staging|production] [build-name]"
+    usage: "itemize get-deployable [development|staging|production] [build-name] [full|standard|slim|(comma-separated-services)]"
   },
   "start-dev-environment": {
     fn: start,
