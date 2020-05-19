@@ -98,7 +98,7 @@ export async function fieldRequest<T>(
 }
 
 export interface IConfigRequestExtractPoint {
-  type?: FieldRequestType | "config",
+  type?: FieldRequestType | "config" | "multiconfig",
   extractData?: Array<IConfigRequestExtractPoint>,
   variableName: string,
   message: string,
@@ -124,8 +124,29 @@ export async function configRequest<T>(
         newConfig[extractPoint.variableName],
         extractPoint.message,
         extractPoint.extractData,
-        extractPoint.variableName + ".",
+        variableNamePrefix + extractPoint.variableName + ".",
       );
+    } else if (extractPoint.type === "multiconfig") {
+      if (!newConfig[extractPoint.variableName]) {
+        newConfig[extractPoint.variableName] = {};
+      }
+
+      const keys = await fieldRequest<string[]>(
+        "strarray",
+        null,
+        variableNamePrefix + "[$key]",
+        null,
+        Object.keys(newConfig[extractPoint.variableName]),
+      );
+
+      for (const key of keys) {
+        newConfig[extractPoint.variableName][key] = await configRequest(
+          newConfig[extractPoint.variableName][key],
+          extractPoint.message,
+          extractPoint.extractData,
+          variableNamePrefix + extractPoint.variableName + "." + key + ".",
+        );
+      }
     } else {
       newConfig[extractPoint.variableName] = await fieldRequest(
         extractPoint.type || "string",

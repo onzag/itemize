@@ -137,10 +137,13 @@ async function build(version, buildID, services) {
         message += "\n\nYou have included postgres in your build, this is the central database, and it's not expected you do" +
             "\nthis, very often including postgres in the build is a mistake, nevertheless, it might be the case for standalone clusters" +
             "\nremember that the data is saved in pgdata and you need to populate this database, where you intend to deploy " +
-            "\nthe database docker-compose-update-db.yml can be used for this purpose which only spawns the database " +
+            "\nthe database docker-compose-only-db.yml can be used for this purpose which only spawns the database " +
             "\nonce you do that there's a special mode you can initialize your server which will call itemize build database process" +
             "\nfirst remember to initialize the database image by running `docker load -i pgsqlpostgis.tar.gz` then run" +
-            "\ndocker-compose -f docker-compose-update-db.yml up;";
+            "\ndocker-compose -f docker-compose-only-db.yml up; then run the code for accessing the builder" +
+            "\ndocker run -it --network " + buildID.replace(/_/g, "").toLowerCase() +
+            "_default -v $PWD/config:/home/node/app/config -e NODE_ENV=" + version +
+            " -e INSTANCE_MODE=BUILD_DATABASE app:latest";
         const absPath = path_1.default.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis");
         await exec_1.execSudo(`docker build -t pgsqlpostgis ${absPath}`, "Itemize Docker Contained PGSQL Postgis Enabled Database");
         const saveAbsPath = path_1.default.resolve(`./deployments/${buildID}/pgsqlpostgis.tar.gz`);
@@ -154,17 +157,7 @@ async function build(version, buildID, services) {
                 delete parsed.services[service].depends_on;
             }
         });
-        parsed.services["dbbuilder"] = {
-            image: "app:latest",
-            volumes: ["./config:/home/node/app/config"],
-            depends_on: "pgsql",
-            environment: [
-                "INSTANCE_MODE=BUILD_DATABASE",
-                "NODE_ENV=" + version,
-                "USING_DOCKER=true",
-            ],
-        };
-        const yamlPath = path_1.default.join("deployments", buildID, "docker-compose-update-db.yml");
+        const yamlPath = path_1.default.join("deployments", buildID, "docker-compose-only-db.yml");
         console.log("emiting " + safe_1.default.green(yamlPath));
         await fsAsync.writeFile(yamlPath, yaml_1.default.stringify(parsed));
     }

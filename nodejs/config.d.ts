@@ -23,18 +23,29 @@ export interface IConfigRawJSONDataType {
     developmentHostname: string;
     stagingHostname: string;
     productionHostname: string;
-    uploadsHostnamePrefix: string;
+    containersRegionMappers: {
+        [countries: string]: string;
+    };
+    containersHostnamePrefixes: {
+        [containerId: string]: string;
+    };
+}
+export interface ISensitiveConfigOpenstackContainerType {
+    username: string;
+    password: string;
+    region: string;
+    domainId: string;
+    domainName: string;
+    authUrl: string;
+    containerName: string;
 }
 export interface ISensitiveConfigRawJSONDataType {
     ipStackAccessKey: string;
     hereAppID: string;
     hereAppCode: string;
-    openStackUsername: string;
-    openStackPassword: string;
-    openStackRegion: string;
-    openStackDomainName: string;
-    openStackAuthUrl: string;
-    openStackUploadsContainerName: string;
+    openstackContainers: {
+        [containerId: string]: ISensitiveConfigOpenstackContainerType;
+    };
     mailgunAPIKey: string;
     mailgunDomain: string;
     mailgunTargetDomain: string;
@@ -99,23 +110,36 @@ export declare const rawSensitiveConfigSchema: {
         devKey: {
             type: string;
         };
-        openStackUsername: {
+        openstackContainers: {
             type: string;
-        };
-        openStackPassword: {
-            type: string;
-        };
-        openStackRegion: {
-            type: string;
-        };
-        openStackDomainName: {
-            type: string;
-        };
-        openStackUploadsContainerName: {
-            type: string;
-        };
-        openStackAuthUrl: {
-            type: string;
+            additionalProperties: {
+                type: string;
+                properties: {
+                    username: {
+                        type: string;
+                    };
+                    password: {
+                        type: string;
+                    };
+                    region: {
+                        type: string;
+                    };
+                    domainId: {
+                        type: string;
+                    };
+                    domainName: {
+                        type: string;
+                    };
+                    containerName: {
+                        type: string;
+                    };
+                    authUrl: {
+                        type: string;
+                    };
+                };
+                required: string[];
+            };
+            minProperties: number;
         };
     };
     additionalProperties: boolean;
@@ -205,8 +229,19 @@ export declare const rawConfigSchema: {
         productionHostname: {
             type: string;
         };
-        uploadsHostnamePrefix: {
+        containersRegionMappers: {
             type: string;
+            additionalProperties: {
+                type: string;
+            };
+            minProperties: number;
+        };
+        containersHostnamePrefixes: {
+            type: string;
+            additionalProperties: {
+                type: string;
+            };
+            minProperties: number;
         };
     };
     additionalProperties: boolean;

@@ -170,10 +170,13 @@ export default async function build(version: string, buildID: string, services: 
     message += "\n\nYou have included postgres in your build, this is the central database, and it's not expected you do" +
     "\nthis, very often including postgres in the build is a mistake, nevertheless, it might be the case for standalone clusters" +
     "\nremember that the data is saved in pgdata and you need to populate this database, where you intend to deploy " +
-    "\nthe database docker-compose-update-db.yml can be used for this purpose which only spawns the database " +
+    "\nthe database docker-compose-only-db.yml can be used for this purpose which only spawns the database " +
     "\nonce you do that there's a special mode you can initialize your server which will call itemize build database process" +
     "\nfirst remember to initialize the database image by running `docker load -i pgsqlpostgis.tar.gz` then run" +
-    "\ndocker-compose -f docker-compose-update-db.yml up;"
+    "\ndocker-compose -f docker-compose-only-db.yml up; then run the code for accessing the builder" +
+    "\ndocker run -it --network " + buildID.replace(/_/g, "").toLowerCase() +
+    "_default -v $PWD/config:/home/node/app/config -e NODE_ENV=" + version +
+    " -e INSTANCE_MODE=BUILD_DATABASE app:latest"
 
     const absPath = path.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis");
     await execSudo(
@@ -198,18 +201,7 @@ export default async function build(version: string, buildID: string, services: 
       }
     });
 
-    parsed.services["dbbuilder"] = {
-      image: "app:latest",
-      volumes: ["./config:/home/node/app/config"],
-      depends_on: "pgsql",
-      environment: [
-        "INSTANCE_MODE=BUILD_DATABASE",
-        "NODE_ENV=" + version,
-        "USING_DOCKER=true",
-      ],
-    }
-
-    const yamlPath = path.join("deployments", buildID, "docker-compose-update-db.yml");
+    const yamlPath = path.join("deployments", buildID, "docker-compose-only-db.yml");
     console.log("emiting " + colors.green(yamlPath));
     await fsAsync.writeFile(yamlPath, YAML.stringify(parsed));
   }

@@ -12,6 +12,7 @@ import {
   validateParentingRules,
   runPolicyCheck,
   splitArgsInGraphqlQuery,
+  validateContainerIdIsReal,
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import {
@@ -50,6 +51,8 @@ export async function addItemDefinition(
   // check that the user is logged in, for adding, only logged users
   // are valid
   await validateTokenIsntBlocked(appData.cache, tokenData);
+  const containerId: string = resolverArgs.args.container_id;
+  validateContainerIdIsReal(containerId, appData.sensitiveConfig);
 
   // if we are specifying a for_id
   if (resolverArgs.args.for_id) {
@@ -322,6 +325,7 @@ export async function addItemDefinition(
     gqlValueToConvert,
     tokenData.id,
     dictionary,
+    containerId,
     isParenting ? {
       id: resolverArgs.args.parent_id,
       version: resolverArgs.args.parent_version,

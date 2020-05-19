@@ -317,6 +317,7 @@ exports.EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
     "id",
     "version",
     "type",
+    "container_id",
     "blocked_at",
     "blocked_by",
     "blocked_until",
@@ -363,6 +364,10 @@ exports.RESERVED_BASE_PROPERTIES = {
     parent_type: {
         type: graphql_1.GraphQLString,
         description: "If exists, a parent type of this item",
+    },
+    container_id: {
+        type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLString),
+        description: "The storage location id where data is stored",
     },
     created_at: {
         type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLString),
@@ -462,6 +467,10 @@ exports.RESERVED_BASE_PROPERTIES_SQL = {
     },
     parent_type: {
         type: "string",
+    },
+    container_id: {
+        type: "string",
+        notNull: true,
     },
     created_at: {
         type: "datetime",
@@ -847,6 +856,10 @@ exports.RESERVED_ADD_PROPERTIES = {
     parent_type: {
         type: graphql_1.GraphQLString,
         description: "a parent item definition qualified path (must be specified with parent_id)",
+    },
+    container_id: {
+        type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLString),
+        description: "the storage id where storage data is stored according to definitions",
     },
     for_id: {
         type: graphql_1.GraphQLInt,

@@ -33,11 +33,11 @@ class Cache {
      * @param knex the knex instance
      * @param root the root of itemize
      */
-    constructor(redisClient, knex, uploadsContainer, root) {
+    constructor(redisClient, knex, uploadsContainers, root) {
         this.redisClient = redisClient;
         this.knex = knex;
         this.root = root;
-        this.uploadsContainer = uploadsContainer;
+        this.uploadsContainers = uploadsContainers;
     }
     /**
      * Sets the listener for the remote interaction with the clients
@@ -151,7 +151,7 @@ class Cache {
      * @param parent.type the parent type
      * @returns a total sql combined row value that can be converted into grapqhl
      */
-    async requestCreation(itemDefinition, forId, version, value, createdBy, dictionary, parent) {
+    async requestCreation(itemDefinition, forId, version, value, createdBy, dictionary, containerId, parent) {
         const selfTable = itemDefinition.getQualifiedPathName();
         const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
         _1.logger.debug("Cache.requestCreation: requesting creation for " + selfTable + " at module " +
@@ -159,8 +159,8 @@ class Cache {
         // now we extract the SQL information for both item definition table
         // and the module table, this value is database ready, and hence needs
         // knex and the dictionary to convert fields that need it
-        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(itemDefinition, value, null, this.knex, this.uploadsContainer, dictionary);
-        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(itemDefinition.getParentModule(), itemDefinition, value, null, this.knex, this.uploadsContainer, dictionary);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(itemDefinition, value, null, this.knex, this.uploadsContainers[containerId], dictionary);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(itemDefinition.getParentModule(), itemDefinition, value, null, this.knex, this.uploadsContainers[containerId], dictionary);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
         // this data is added every time when creating
@@ -169,6 +169,7 @@ class Cache {
         sqlModData.last_modified = this.knex.fn.now();
         sqlModData.created_by = createdBy || constants_1.UNSPECIFIED_OWNER;
         sqlModData.version = version || "";
+        sqlModData.container_id = containerId;
         if (forId && version === null) {
             throw new errors_1.EndpointError({
                 message: "You can't specify your own id for values without version",
@@ -326,13 +327,16 @@ class Cache {
      * @param dictionary the dictionary to use, just like the current value this is only relevant if you are
      * updating full text search enabled fields, if that is not the case, you can pass null to the dictionary, but
      * be careful
+     * @param containerId the container id where this item is stored, please when using update ensure to select the same
+     * container that the item is already created otherwise this will break the uploads and make them unreachable
+     * if you are passing no uploads it's safe to leave as null
      * @param listenerUUID the listener uuid, from the listener, this ensures that the executor of this action doesn't
      * get a notification, you can pass null for this if this is a computer operation and let every listener to be informed
      * while it doesn't hurt to keep listenerUUID as null, it is expensive to send messages when they will be of no use the
      * listener uuid ensures only those that needs updates will get them
      * @returns a total combined table row value that can be converted into graphql
      */
-    async requestUpdate(itemDefinition, id, version, update, currentValue, editedBy, dictionary, listenerUUID) {
+    async requestUpdate(itemDefinition, id, version, update, currentValue, editedBy, dictionary, containerId, listenerUUID) {
         const selfTable = itemDefinition.getQualifiedPathName();
         const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
         _1.logger.debug("Cache.requestUpdate: requesting update for " + selfTable + " at module " +
@@ -352,8 +356,8 @@ class Cache {
         // that we only want the editingFields to be returned
         // into the SQL value, this is valid in here because
         // we don't want things to be defaulted in the query
-        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(itemDefinition, update, currentValue, this.knex, this.uploadsContainer, dictionary, partialUpdateFields);
-        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(itemDefinition.getParentModule(), itemDefinition, update, currentValue, this.knex, this.uploadsContainer, dictionary, partialUpdateFields);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(itemDefinition, update, currentValue, this.knex, containerId ? this.uploadsContainers[containerId] : null, dictionary, partialUpdateFields);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(itemDefinition.getParentModule(), itemDefinition, update, currentValue, this.knex, containerId ? this.uploadsContainers[containerId] : null, dictionary, partialUpdateFields);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
         // now we check if we are updating anything at all
@@ -443,25 +447,27 @@ class Cache {
      * @param id the id to delete for
      * @param version the version to delete for
      * @param dropAllVersions whether to drop all versions
+     * @param containerId the container id where these files are currently stored, ensure to pass the exact same one
+     * unsafe not to pass so it's required
      * @param listenerUUID the listener uuid, from the listener, this ensures that the executor of this action doesn't
      * get a notification, you can pass null for this if this is a computer operation and let every listener to be informed
      * while it doesn't hurt to keep listenerUUID as null, it is expensive to send messages when they will be of no use the
      * listener uuid ensures only those that needs updates will get them
      */
-    async requestDelete(itemDefinition, id, version, dropAllVersions, listenerUUID) {
+    async requestDelete(itemDefinition, id, version, dropAllVersions, containerId, listenerUUID) {
         const selfTable = itemDefinition.getQualifiedPathName();
         const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
         _1.logger.debug("Cache.requestDelete: requesting delete for " + selfTable + " at module " +
             moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions);
         let deleteFilesInContainer = async (specifiedVersion) => {
-            await sql_files_1.deleteEverythingInFilesContainerId(this.uploadsContainer, itemDefinition, id + "." + (version || null));
+            await sql_files_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId], itemDefinition, id + "." + (specifiedVersion || null));
         };
         let runDetachedEvents = async (specifiedVersion) => {
-            await this.forceCacheInto(selfTable, id, version || null, null);
+            await this.forceCacheInto(selfTable, id, specifiedVersion || null, null);
             const changeEvent = {
                 itemDefinition: selfTable,
                 id,
-                version: version || null,
+                version: specifiedVersion || null,
                 type: "not_found",
                 lastModified: null,
             };

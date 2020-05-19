@@ -39,7 +39,7 @@
     <body><div id="root"><div id="app"></div></div></body>
     <script>
         // Supported languages array
-        var SUPPORTED_LANGUAGES = "%{supportedLanguages}".split(",");
+        var SUPPORTED_LANGUAGES = "%{supportedLanguages}";
         // localization fallbacks
         var FALLBACK_COUNTRY_CODE = "%{fallbackCountryCode}";
         var FALLBACK_CURRENCY = "%{fallbackCurrency}";
@@ -52,7 +52,8 @@
         // the application name
         var APP_NAME = "%{appName}";
         // here the information for the uploads
-        var UPLOADS_PREFIX = "%{uploadsHostnamePrefix}";
+        var CONTAINER_HOSTNAME_PREFIXES = "%{containersHostnamePrefixes}";
+        var CONTAINER_REGION_MAPPERS = "%{containersRegionMappers}";
         // the font name to use
         var FONT_NAME = "%{fontName}";
         // set development mode

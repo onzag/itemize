@@ -509,6 +509,10 @@ export declare const RESERVED_ADD_PROPERTIES: {
         type: import("graphql").GraphQLScalarType;
         description: string;
     };
+    container_id: {
+        type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
+        description: string;
+    };
     for_id: {
         type: import("graphql").GraphQLScalarType;
         description: string;

@@ -13,7 +13,7 @@ import { IGQLSearchResult, IGQLArgs, IGQLValue } from "../gql-querier";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { Listener } from "./listener";
 import Root from "../base/Root";
-import pkgcloud from "pkgcloud";
+import { PkgCloudContainers } from ".";
 /**
  * The cache class that provides all the functionality that is
  * specified for the cache package, the cache is more than what
@@ -23,7 +23,7 @@ import pkgcloud from "pkgcloud";
 export declare class Cache {
     private redisClient;
     private knex;
-    private uploadsContainer;
+    private uploadsContainers;
     private root;
     private listener;
     /**
@@ -36,7 +36,7 @@ export declare class Cache {
      * @param knex the knex instance
      * @param root the root of itemize
      */
-    constructor(redisClient: RedisClient, knex: Knex, uploadsContainer: pkgcloud.storage.Container, root: Root);
+    constructor(redisClient: RedisClient, knex: Knex, uploadsContainers: PkgCloudContainers, root: Root);
     /**
      * Sets the listener for the remote interaction with the clients
      * that are connected, this listener is what informs the client of updates
@@ -81,7 +81,7 @@ export declare class Cache {
      * @param parent.type the parent type
      * @returns a total sql combined row value that can be converted into grapqhl
      */
-    requestCreation(itemDefinition: ItemDefinition, forId: number, version: string, value: IGQLArgs, createdBy: number, dictionary: string, parent: {
+    requestCreation(itemDefinition: ItemDefinition, forId: number, version: string, value: IGQLArgs, createdBy: number, dictionary: string, containerId: string, parent: {
         id: number;
         version: string;
         type: string;
@@ -104,25 +104,30 @@ export declare class Cache {
      * @param dictionary the dictionary to use, just like the current value this is only relevant if you are
      * updating full text search enabled fields, if that is not the case, you can pass null to the dictionary, but
      * be careful
+     * @param containerId the container id where this item is stored, please when using update ensure to select the same
+     * container that the item is already created otherwise this will break the uploads and make them unreachable
+     * if you are passing no uploads it's safe to leave as null
      * @param listenerUUID the listener uuid, from the listener, this ensures that the executor of this action doesn't
      * get a notification, you can pass null for this if this is a computer operation and let every listener to be informed
      * while it doesn't hurt to keep listenerUUID as null, it is expensive to send messages when they will be of no use the
      * listener uuid ensures only those that needs updates will get them
      * @returns a total combined table row value that can be converted into graphql
      */
-    requestUpdate(itemDefinition: ItemDefinition, id: number, version: string, update: IGQLArgs, currentValue: IGQLValue, editedBy: number, dictionary: string, listenerUUID: string): Promise<ISQLTableRowValue>;
+    requestUpdate(itemDefinition: ItemDefinition, id: number, version: string, update: IGQLArgs, currentValue: IGQLValue, editedBy: number, dictionary: string, containerId: string, listenerUUID: string): Promise<ISQLTableRowValue>;
     /**
      * Request the deletition of an item definition value
      * @param itemDefinition the item definition to delete a value for
      * @param id the id to delete for
      * @param version the version to delete for
      * @param dropAllVersions whether to drop all versions
+     * @param containerId the container id where these files are currently stored, ensure to pass the exact same one
+     * unsafe not to pass so it's required
      * @param listenerUUID the listener uuid, from the listener, this ensures that the executor of this action doesn't
      * get a notification, you can pass null for this if this is a computer operation and let every listener to be informed
      * while it doesn't hurt to keep listenerUUID as null, it is expensive to send messages when they will be of no use the
      * listener uuid ensures only those that needs updates will get them
      */
-    requestDelete(itemDefinition: ItemDefinition, id: number, version: string, dropAllVersions: boolean, listenerUUID: string): Promise<void>;
+    requestDelete(itemDefinition: ItemDefinition, id: number, version: string, dropAllVersions: boolean, containerId: string, listenerUUID: string): Promise<void>;
     /**
      * Requests a value from the cache
      * @param itemDefinition the item definition or a [qualifiedItemDefinitionName, qualifiedModuleName] combo

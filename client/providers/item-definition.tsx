@@ -1787,6 +1787,16 @@ export class ActualItemDefinitionProvider extends
       error = totalValues.error;
       getQueryFields = totalValues.getQueryFields;
     } else {
+      const mappers = (window as any).CONTAINER_REGION_MAPPERS;
+      let containerId: string 
+      Object.keys(mappers).forEach((mapper) => {
+        if (mapper.split(";").includes(this.props.localeData.country)) {
+          containerId = mappers[mapper];
+        }
+      });
+      if (!containerId) {
+        containerId = mappers["*"];
+      }
       const totalValues = await runAddQueryFor({
         args: argumentsForQuery,
         fields: requestFields,
@@ -1797,6 +1807,7 @@ export class ActualItemDefinitionProvider extends
         cacheStore: this.props.longTermCaching,
         forId: this.props.forId || null,
         forVersion: this.props.forVersion || null,
+        containerId,
       });
       value = totalValues.value;
       error = totalValues.error;

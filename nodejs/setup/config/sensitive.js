@@ -36,36 +36,49 @@ async function sensitiveConfigSetup(version, currentConfig, referenceConfig, pac
             nullifyFalseValues: true,
         },
         {
-            variableName: "openStackUsername",
-            message: "An username provided by an openstack cloud provider",
-            defaultValue: "",
-        },
-        {
-            variableName: "openStackPassword",
-            message: "The user password provided by an openstack cloud provider",
-            defaultValue: "",
-            hidden: true,
-        },
-        {
-            variableName: "openStackRegion",
-            message: "The region to connect from the openstack cloud provider",
-            defaultValue: "",
-            nullifyFalseValues: true,
-        },
-        {
-            variableName: "openStackDomainName",
-            message: "The domain name of the given openstack project",
-            defaultValue: "",
-        },
-        {
-            variableName: "openStackUploadsContainerName",
-            message: "The name of the container that contains the uploaded files",
-            defaultValue: "",
-        },
-        {
-            variableName: "openStackAuthUrl",
-            message: "The auth url of the service provider that you are utilizing",
-            defaultValue: "",
+            variableName: "openstackContainers",
+            type: "multiconfig",
+            message: "Openstack containers configuration",
+            defaultValue: null,
+            extractData: [
+                {
+                    variableName: "username",
+                    message: "An username provided by an openstack cloud provider",
+                    defaultValue: "",
+                },
+                {
+                    variableName: "password",
+                    message: "The user password provided by an openstack cloud provider",
+                    defaultValue: "",
+                    hidden: true,
+                },
+                {
+                    variableName: "region",
+                    message: "The region to connect from the openstack cloud provider",
+                    defaultValue: "",
+                    nullifyFalseValues: true,
+                },
+                {
+                    variableName: "domainId",
+                    message: "The domain id of the given openstack project",
+                    defaultValue: "default",
+                },
+                {
+                    variableName: "domainName",
+                    message: "The domain name of the given openstack project",
+                    defaultValue: "",
+                },
+                {
+                    variableName: "containerName",
+                    message: "The name of the container that contains the uploaded files",
+                    defaultValue: "",
+                },
+                {
+                    variableName: "authUrl",
+                    message: "The auth url of the service provider that you are utilizing",
+                    defaultValue: "",
+                },
+            ]
         },
         {
             variableName: "mailgunAPIKey",

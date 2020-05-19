@@ -36,6 +36,10 @@ services:
         ports:
             - "%{REDIS_PORT}:6379"
     nginx:
+        image: nginx:latest
+        ports:
+            - "80:80"
+            - "443:443"
         depends_on:
             - servers
         volumes:

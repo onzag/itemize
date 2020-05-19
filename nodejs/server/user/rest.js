@@ -76,7 +76,7 @@ function userRestServices(appData) {
         try {
             await appData.cache.requestUpdate(userIdef, decoded.validateUserId, null, {
                 e_validated: true,
-            }, null, null, null, null);
+            }, null, null, null, null, null);
         }
         catch (err) {
             __1.logger.error("userRestServices/validate-email: failed to set e_validated status to true", {

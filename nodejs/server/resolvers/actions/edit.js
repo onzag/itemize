@@ -33,6 +33,7 @@ async function editItemDefinition(appData, resolverArgs, itemDefinition) {
     // there's an easy way to request that, and now, we do it
     // at the same time we run the policy check
     let userId;
+    let contentId;
     // so we run the policy check for edit, this item definition,
     // with the given id
     const wholeSqlStoredValue = await basic_1.runPolicyCheck({
@@ -58,6 +59,7 @@ async function editItemDefinition(appData, resolverArgs, itemDefinition) {
             if (itemDefinition.isOwnerObjectId()) {
                 userId = content.id;
             }
+            contentId = content.content_id;
             // also throw an error if it's blocked
             if (content.blocked_at !== null) {
                 __1.logger.debug("editItemDefinition: failed due to element being blocked");
@@ -164,7 +166,7 @@ async function editItemDefinition(appData, resolverArgs, itemDefinition) {
         }
     }
     const dictionary = basic_1.getDictionary(appData, resolverArgs.args);
-    const sqlValue = await appData.cache.requestUpdate(itemDefinition, resolverArgs.args.id, resolverArgs.args.version || null, gqlValueToConvert, currentWholeValueAsGQL, tokenData.id, dictionary, resolverArgs.args.listener_uuid || null);
+    const sqlValue = await appData.cache.requestUpdate(itemDefinition, resolverArgs.args.id, resolverArgs.args.version || null, gqlValueToConvert, currentWholeValueAsGQL, tokenData.id, dictionary, contentId, resolverArgs.args.listener_uuid || null);
     __1.logger.debug("editItemDefinition: SQL ouput retrieved");
     __1.logger.silly("editItemDefinition: Value is", sqlValue);
     // convert it using the requested fields for that, and ignoring everything else

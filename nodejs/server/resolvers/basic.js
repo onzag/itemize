@@ -319,6 +319,21 @@ function getDictionary(appData, args) {
 }
 exports.getDictionary = getDictionary;
 /**
+ * Validates and checks that a given container id is valid
+ * to store data in
+ * @param containerId the container id
+ * @param sensitiveConfig the sensitive config
+ */
+function validateContainerIdIsReal(containerId, sensitiveConfig) {
+    if (!sensitiveConfig.openstackContainers[containerId]) {
+        throw new errors_1.EndpointError({
+            message: "Container id " + containerId + " does not exist",
+            code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+    }
+}
+exports.validateContainerIdIsReal = validateContainerIdIsReal;
+/**
  * Validates the current token isn't blocked whether it is said so
  * by the rules of the session id, user is removed, or invalid credentials
  * @param cache the appdata cache instance

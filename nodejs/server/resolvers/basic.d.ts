@@ -5,6 +5,7 @@ import Include from "../../base/Root/Module/ItemDefinition/Include";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import { IGQLValue, IGQLSearchResult, IGQLArgs } from "../../gql-querier";
+import { ISensitiveConfigRawJSONDataType } from "../../config";
 /**
  * Builds the column names expected for a given module only
  * @param requestedFields the requested fields given by graphql fields and flattened
@@ -71,6 +72,13 @@ export declare function checkLanguage(appData: IAppDataType, args: any): void;
  * @param args the whole args of the graphql request
  */
 export declare function getDictionary(appData: IAppDataType, args: any): string;
+/**
+ * Validates and checks that a given container id is valid
+ * to store data in
+ * @param containerId the container id
+ * @param sensitiveConfig the sensitive config
+ */
+export declare function validateContainerIdIsReal(containerId: string, sensitiveConfig: ISensitiveConfigRawJSONDataType): void;
 /**
  * Validates the current token isn't blocked whether it is said so
  * by the rules of the session id, user is removed, or invalid credentials

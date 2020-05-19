@@ -735,6 +735,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             null,
             null,
             null,
+            null,
           );
         } catch (err) {
           logger.error(

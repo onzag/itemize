@@ -624,7 +624,7 @@ exports.customUserQueries = (appData) => {
                 try {
                     await appData.cache.requestUpdate(userIdef, decoded.resetPasswordUserId, null, {
                         password: args.new_password,
-                    }, null, null, null, null);
+                    }, null, null, null, null, null);
                 }
                 catch (err) {
                     __1.logger.error("customUserQueries.reset_password [SERIOUS]: failed to run password update request", {

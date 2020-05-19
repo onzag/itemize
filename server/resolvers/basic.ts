@@ -24,6 +24,7 @@ import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import { IGQLValue, IGQLSearchResult, IGQLArgs } from "../../gql-querier";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { ISensitiveConfigRawJSONDataType } from "../../config";
 
 /**
  * Builds the column names expected for a given module only
@@ -396,6 +397,24 @@ export function getDictionary(appData: IAppDataType, args: any): string {
     "getDictionary: got dictionary " + dictionary,
   );
   return dictionary;
+}
+
+/**
+ * Validates and checks that a given container id is valid
+ * to store data in
+ * @param containerId the container id
+ * @param sensitiveConfig the sensitive config
+ */
+export function validateContainerIdIsReal(
+  containerId: string,
+  sensitiveConfig: ISensitiveConfigRawJSONDataType,
+) {
+  if (!sensitiveConfig.openstackContainers[containerId]) {
+    throw new EndpointError({
+      message: "Container id " + containerId + " does not exist",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  }
 }
 
 /**

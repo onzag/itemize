@@ -110,6 +110,8 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                 if (type === "read") {
                   if (propertyState) {
                     const propertyDescription = property.getPropertyDefinitionDescription();
+                    const containerId: string = itemDefinitionContextualValue.state.gqlOriginalFlattenedValue &&
+                      itemDefinitionContextualValue.state.gqlOriginalFlattenedValue.container_id as string;
                     if (propertyDescription.gqlAddFileToFields) {
                       if (!propertyDescription.gqlList) {
                         return props.children(fileURLAbsoluter(
@@ -117,6 +119,7 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                           itemDefinitionContextualValue.idef,
                           itemDefinitionContextualValue.forId,
                           itemDefinitionContextualValue.forVersion,
+                          containerId,
                           includeContextualValue && includeContextualValue.include,
                           property,
                         ), propertyState);
@@ -126,6 +129,7 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                           itemDefinitionContextualValue.idef,
                           itemDefinitionContextualValue.forId,
                           itemDefinitionContextualValue.forVersion,
+                          containerId,
                           includeContextualValue && includeContextualValue.include,
                           property,
                         ), propertyState);

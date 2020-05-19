@@ -29,17 +29,19 @@ function replaceHTMLKeys(html, obj, prefix) {
     // and loop per key
     Object.keys(obj).forEach((key) => {
         // if we have an array, not an object, or null
-        if (Array.isArray(obj[key]) || typeof obj[key] !== "object" || obj[key] === null) {
+        if (typeof obj[key] !== "object" || obj[key] === null) {
             // then we replace that for the value using our prefix
             newHTML = newHTML.replace(new RegExp(util_1.escapeStringRegexp("%{" + prefix + key + "}"), "g"), 
-            // for arrays we join the value as strings
-            Array.isArray(obj[key]) ? obj[key].join(",") : (
             // for null we want empty string
-            obj[key] === null ? "" : obj[key].toString()));
+            obj[key] === null ? "" : obj[key].toString());
         }
         else {
-            // otherwise we just prefix from the prefix and the key to recurse inside
-            newHTML = replaceHTMLKeys(newHTML, obj[key], prefix + key + ".");
+            // then we replace that for the value using our prefix
+            newHTML = newHTML.replace(new RegExp(util_1.escapeStringRegexp("\"%{" + prefix + key + "}\""), "g"), JSON.stringify(obj[key]));
+            if (!Array.isArray(obj[key])) {
+                // otherwise we just prefix from the prefix and the key to recurse inside
+                newHTML = replaceHTMLKeys(newHTML, obj[key], prefix + key + ".");
+            }
         }
     });
     // return it

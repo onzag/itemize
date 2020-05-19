@@ -8,13 +8,14 @@ export function fileArrayURLAbsoluter(
   itemDefinition: ItemDefinition,
   id: number,
   version: string,
+  containerId: string,
   include: Include,
   property: PropertyDefinition,
 ) {
   if (files === null) {
     return null;
   }
-  return files.map((file) => fileURLAbsoluter(file, itemDefinition, id, version, include, property));
+  return files.map((file) => fileURLAbsoluter(file, itemDefinition, id, version, containerId, include, property));
 }
 
 export function fileURLAbsoluter(
@@ -22,6 +23,7 @@ export function fileURLAbsoluter(
   itemDefinition: ItemDefinition,
   id: number,
   version: string,
+  containerId: string,
   include: Include,
   property: PropertyDefinition,
 ) {
@@ -33,7 +35,7 @@ export function fileURLAbsoluter(
     return file;
   }
 
-  let prefix: string = (window as any).UPLOADS_PREFIX;
+  let prefix: string = (window as any).CONTAINER_HOSTNAME_PREFIXES[containerId];
   if (prefix.indexOf("/") !== 0) {
     prefix = location.protocol + "//" + prefix;
   }

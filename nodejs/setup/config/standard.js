@@ -135,9 +135,22 @@ async function standardConfigSetup(currentConfig, packageJSON) {
             validate: (v) => v.replace(/\s/g, "") === v,
         },
         {
-            variableName: "uploadsHostnamePrefix",
-            message: "An url (without protocol) where the upload files are hosted",
-            defaultValue: "/",
+            variableName: "containersRegionMappers",
+            type: "strobject",
+            message: "Now you need to specify the container region mappers, as a comma separated list of ; separated countries (ISO uppercase) " +
+                "* is a desired and expected value for the default value, you should map all the countries, * maps the default value",
+            defaultValue: {
+                "*": "EU",
+            },
+        },
+        {
+            variableName: "containersHostnamePrefixes",
+            type: "strobject",
+            message: "Now you need to specify the container region mappers, as a comma separated list of values for the given containers " +
+                "the values must be an url (without protocol) where the upload files are hosted for the given container",
+            defaultValue: {
+                "EU": "myhost.com",
+            },
         },
     ]);
     return newConfig;

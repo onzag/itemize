@@ -61,6 +61,7 @@ export async function editItemDefinition(
   // there's an easy way to request that, and now, we do it
   // at the same time we run the policy check
   let userId: number;
+  let contentId: string;
 
   // so we run the policy check for edit, this item definition,
   // with the given id
@@ -91,6 +92,7 @@ export async function editItemDefinition(
         if (itemDefinition.isOwnerObjectId()) {
           userId = content.id;
         }
+        contentId = content.content_id;
 
         // also throw an error if it's blocked
         if (content.blocked_at !== null) {
@@ -266,6 +268,7 @@ export async function editItemDefinition(
     currentWholeValueAsGQL,
     tokenData.id,
     dictionary,
+    contentId,
     resolverArgs.args.listener_uuid || null,
   );
 

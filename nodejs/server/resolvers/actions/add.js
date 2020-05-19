@@ -25,6 +25,8 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
     // check that the user is logged in, for adding, only logged users
     // are valid
     await basic_1.validateTokenIsntBlocked(appData.cache, tokenData);
+    const containerId = resolverArgs.args.container_id;
+    basic_1.validateContainerIdIsReal(containerId, appData.sensitiveConfig);
     // if we are specifying a for_id
     if (resolverArgs.args.for_id) {
         if (!resolverArgs.args.version) {
@@ -214,7 +216,7 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
     }
     // the creation will ensure that the for_id and version
     // are valid and do not create strange data structures
-    const value = await appData.cache.requestCreation(itemDefinition, resolverArgs.args.for_id || null, resolverArgs.args.version || null, gqlValueToConvert, tokenData.id, dictionary, isParenting ? {
+    const value = await appData.cache.requestCreation(itemDefinition, resolverArgs.args.for_id || null, resolverArgs.args.version || null, gqlValueToConvert, tokenData.id, dictionary, containerId, isParenting ? {
         id: resolverArgs.args.parent_id,
         version: resolverArgs.args.parent_version,
         type: resolverArgs.args.parent_type,

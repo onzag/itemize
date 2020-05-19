@@ -29,19 +29,31 @@ export interface IConfigRawJSONDataType {
   productionHostname: string;
   
   // Uploads info
-  uploadsHostnamePrefix: string;
+  containersRegionMappers: {
+    [countries: string]: string;
+  };
+  containersHostnamePrefixes: {
+    [containerId: string]: string;
+  };
+}
+
+export interface ISensitiveConfigOpenstackContainerType {
+  username: string;
+  password: string;
+  region: string;
+  domainId: string;
+  domainName: string;
+  authUrl: string;
+  containerName: string;
 }
 
 export interface ISensitiveConfigRawJSONDataType {
   ipStackAccessKey: string;
   hereAppID: string;
   hereAppCode: string;
-  openStackUsername: string;
-  openStackPassword: string;
-  openStackRegion: string;
-  openStackDomainName: string;
-  openStackAuthUrl: string;
-  openStackUploadsContainerName: string;
+  openstackContainers: {
+    [containerId: string]: ISensitiveConfigOpenstackContainerType,
+  };
   mailgunAPIKey: string;
   mailgunDomain: string;
   mailgunTargetDomain: string;
@@ -140,24 +152,45 @@ export const rawSensitiveConfigSchema = {
     devKey: {
       type: "string",
     },
-    openStackUsername: {
-      type: "string",
-    },
-    openStackPassword: {
-      type: "string",
-    },
-    openStackRegion: {
-      type: "string",
-    },
-    openStackDomainName: {
-      type: "string",
-    },
-    openStackUploadsContainerName: {
-      type: "string",
-    },
-    openStackAuthUrl: {
-      type: "string",
-    },
+    openstackContainers: {
+      type: "object",
+      additionalProperties: {
+        type: "object",
+        properties: {
+          username: {
+            type: "string",
+          },
+          password: {
+            type: "string",
+          },
+          region: {
+            type: "string",
+          },
+          domainId: {
+            type: "string",
+          },
+          domainName: {
+            type: "string",
+          },
+          containerName: {
+            type: "string",
+          },
+          authUrl: {
+            type: "string",
+          },
+        },
+        required: [
+          "username",
+          "password",
+          "region",
+          "domainId",
+          "domainName",
+          "containerName",
+          "authUrl",
+        ],
+      },
+      minProperties: 1,
+    }
   },
   additionalProperties: false,
   required: [
@@ -169,12 +202,6 @@ export const rawSensitiveConfigSchema = {
     "mailgunTargetDomain",
     "jwtKey",
     "devKey",
-    "openStackUsername",
-    "openStackPassword",
-    "openStackRegion",
-    "openStackDomainName",
-    "openStackUploadsContainerName",
-    "openStackAuthUrl",
   ],
 };
 
@@ -269,8 +296,19 @@ export const rawConfigSchema = {
     productionHostname: {
       type: "string",
     },
-    uploadsHostnamePrefix: {
-      type: "string",
+    containersRegionMappers: {
+      type: "object",
+      additionalProperties: {
+        type: "string",
+      },
+      minProperties: 1,
+    },
+    containersHostnamePrefixes: {
+      type: "object",
+      additionalProperties: {
+        type: "string",
+      },
+      minProperties: 1,
     },
   },
   additionalProperties: false,
@@ -290,7 +328,8 @@ export const rawConfigSchema = {
     "developmentHostname",
     "stagingHostname",
     "productionHostname",
-    "uploadsHostnamePrefix",
+    "containersRegionMappers",
+    "containersHostnamePrefixes",
   ],
 };
 

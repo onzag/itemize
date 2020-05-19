@@ -15,6 +15,12 @@ import { Here } from "./services/here";
 import winston from "winston";
 import "winston-daily-rotate-file";
 export declare const logger: winston.Logger;
+export declare type PkgCloudClients = {
+    [containerId: string]: pkgcloud.storage.Client;
+};
+export declare type PkgCloudContainers = {
+    [containerId: string]: pkgcloud.storage.Container;
+};
 export interface IAppDataType {
     root: Root;
     indexDevelopment: string;
@@ -35,8 +41,8 @@ export interface IAppDataType {
     ipStack: IPStack;
     here: Here;
     mailgun: Mailgun.Mailgun;
-    pkgcloudStorageClient: pkgcloud.storage.Client;
-    pkgcloudUploadsContainer: pkgcloud.storage.Container;
+    pkgcloudStorageClients: PkgCloudClients;
+    pkgcloudUploadContainers: PkgCloudContainers;
 }
 export interface IServerCustomizationDataType {
     customGQLQueries?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;

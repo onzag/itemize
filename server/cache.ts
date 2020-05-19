@@ -23,8 +23,7 @@ import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefi
 import { IOwnedSearchRecordsAddedEvent, IParentedSearchRecordsAddedEvent } from "../base/remote-protocol";
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
 import { EndpointError } from "../base/errors";
-import pkgcloud from "pkgcloud";
-import { logger } from ".";
+import { logger, PkgCloudContainers } from ".";
 
 const CACHE_EXPIRES_DAYS = 14;
 
@@ -37,7 +36,7 @@ const CACHE_EXPIRES_DAYS = 14;
 export class Cache {
   private redisClient: RedisClient;
   private knex: Knex;
-  private uploadsContainer: pkgcloud.storage.Container;
+  private uploadsContainers: PkgCloudContainers;
   private root: Root;
   private listener: Listener;
 
@@ -51,11 +50,11 @@ export class Cache {
    * @param knex the knex instance
    * @param root the root of itemize
    */
-  constructor(redisClient: RedisClient, knex: Knex, uploadsContainer: pkgcloud.storage.Container, root: Root) {
+  constructor(redisClient: RedisClient, knex: Knex, uploadsContainers: PkgCloudContainers, root: Root) {
     this.redisClient = redisClient;
     this.knex = knex;
     this.root = root;
-    this.uploadsContainer = uploadsContainer;
+    this.uploadsContainers = uploadsContainers;
   }
   /**
    * Sets the listener for the remote interaction with the clients
@@ -199,6 +198,7 @@ export class Cache {
     value: IGQLArgs,
     createdBy: number,
     dictionary: string,
+    containerId: string,
     parent: {
       id: number,
       version: string,
@@ -220,7 +220,7 @@ export class Cache {
       value,
       null,
       this.knex,
-      this.uploadsContainer,
+      this.uploadsContainers[containerId],
       dictionary,
     );
     const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
@@ -229,7 +229,7 @@ export class Cache {
       value,
       null,
       this.knex,
-      this.uploadsContainer,
+      this.uploadsContainers[containerId],
       dictionary,
     );
     const sqlModData: ISQLTableRowValue = sqlModDataComposed.value;
@@ -241,6 +241,7 @@ export class Cache {
     sqlModData.last_modified = this.knex.fn.now();
     sqlModData.created_by = createdBy || UNSPECIFIED_OWNER;
     sqlModData.version = version || "";
+    sqlModData.container_id = containerId;
 
     if (forId && version === null) {
       throw new EndpointError({
@@ -477,6 +478,9 @@ export class Cache {
    * @param dictionary the dictionary to use, just like the current value this is only relevant if you are
    * updating full text search enabled fields, if that is not the case, you can pass null to the dictionary, but
    * be careful
+   * @param containerId the container id where this item is stored, please when using update ensure to select the same
+   * container that the item is already created otherwise this will break the uploads and make them unreachable
+   * if you are passing no uploads it's safe to leave as null
    * @param listenerUUID the listener uuid, from the listener, this ensures that the executor of this action doesn't
    * get a notification, you can pass null for this if this is a computer operation and let every listener to be informed
    * while it doesn't hurt to keep listenerUUID as null, it is expensive to send messages when they will be of no use the
@@ -491,6 +495,7 @@ export class Cache {
     currentValue: IGQLValue,
     editedBy: number,
     dictionary: string,
+    containerId: string,
     listenerUUID: string,
   ): Promise<ISQLTableRowValue> {
     const selfTable = itemDefinition.getQualifiedPathName();
@@ -526,7 +531,7 @@ export class Cache {
       update,
       currentValue,
       this.knex,
-      this.uploadsContainer,
+      containerId ? this.uploadsContainers[containerId] : null,
       dictionary,
       partialUpdateFields,
     );
@@ -536,7 +541,7 @@ export class Cache {
       update,
       currentValue,
       this.knex,
-      this.uploadsContainer,
+      containerId ? this.uploadsContainers[containerId] : null,
       dictionary,
       partialUpdateFields,
     );
@@ -675,6 +680,8 @@ export class Cache {
    * @param id the id to delete for
    * @param version the version to delete for
    * @param dropAllVersions whether to drop all versions
+   * @param containerId the container id where these files are currently stored, ensure to pass the exact same one
+   * unsafe not to pass so it's required
    * @param listenerUUID the listener uuid, from the listener, this ensures that the executor of this action doesn't
    * get a notification, you can pass null for this if this is a computer operation and let every listener to be informed
    * while it doesn't hurt to keep listenerUUID as null, it is expensive to send messages when they will be of no use the
@@ -685,6 +692,7 @@ export class Cache {
     id: number,
     version: string,
     dropAllVersions: boolean,
+    containerId: string,
     listenerUUID: string,
   ): Promise<void> {
     const selfTable = itemDefinition.getQualifiedPathName();
@@ -697,18 +705,18 @@ export class Cache {
 
     let deleteFilesInContainer = async (specifiedVersion: string) => {
       await deleteEverythingInFilesContainerId(
-        this.uploadsContainer,
+        this.uploadsContainers[containerId],
         itemDefinition,
-        id + "." + (version || null),
+        id + "." + (specifiedVersion || null),
       );
     }
 
     let runDetachedEvents = async (specifiedVersion: string) => {
-      await this.forceCacheInto(selfTable, id, version || null, null);
+      await this.forceCacheInto(selfTable, id, specifiedVersion || null, null);
       const changeEvent: IChangedFeedbackEvent = {
         itemDefinition: selfTable,
         id,
-        version: version || null,
+        version: specifiedVersion || null,
         type: "not_found",
         lastModified: null,
       };

@@ -353,6 +353,7 @@ export const EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "id",
   "version",
   "type",
+  "container_id",
   "blocked_at",
   "blocked_by",
   "blocked_until",
@@ -399,6 +400,10 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   parent_type: {
     type: GraphQLString,
     description: "If exists, a parent type of this item",
+  },
+  container_id: {
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
+    description: "The storage location id where data is stored",
   },
   created_at: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
@@ -499,6 +504,10 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   },
   parent_type: {
     type: "string",
+  },
+  container_id: {
+    type: "string",
+    notNull: true,
   },
   created_at: {
     type: "datetime",
@@ -897,6 +906,10 @@ export const RESERVED_ADD_PROPERTIES = {
   parent_type: {
     type: GraphQLString,
     description: "a parent item definition qualified path (must be specified with parent_id)",
+  },
+  container_id: {
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
+    description: "the storage id where storage data is stored according to definitions",
   },
   for_id: {
     type: GraphQLInt,

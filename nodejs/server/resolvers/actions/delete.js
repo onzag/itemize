@@ -34,6 +34,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     // gather the created_by and blocked_at to check the rights
     // of the user
     let userId;
+    let contentId;
     const wholeSqlStoredValue = await basic_1.runPolicyCheck({
         policyTypes: ["delete"],
         itemDefinition,
@@ -62,6 +63,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
             if (itemDefinition.isOwnerObjectId()) {
                 userId = content.id;
             }
+            contentId = content.content_id;
             // if the content is blocked, and our role has no special access
             // to moderation fields, then this content cannot be removed
             // from the website, no matter what
@@ -123,7 +125,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
             });
         }
     }
-    await appData.cache.requestDelete(itemDefinition, resolverArgs.args.id, resolverArgs.args.version, false, resolverArgs.args.listener_uuid || null);
+    await appData.cache.requestDelete(itemDefinition, resolverArgs.args.id, resolverArgs.args.version, false, contentId, resolverArgs.args.listener_uuid || null);
     __1.logger.debug("deleteItemDefinition: done");
     // return null, yep, the output is always null, because it's gone
     // however we are not running the check on the fields that can be read

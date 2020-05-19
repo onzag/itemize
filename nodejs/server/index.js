@@ -346,21 +346,27 @@ async function initializeServer(custom = {}) {
         PropertyDefinition_1.default.indexChecker = server_checkers_1.serverSideIndexChecker.bind(null, knex);
         // due to a bug in the types the create client function is missing
         // domainId and domainName
-        exports.logger.info("initializeServer: initializing openstack pkgcloud objectstorage client");
-        const pkgcloudStorageClient = pkgcloud_1.default.storage.createClient({
-            provider: "openstack",
-            username: sensitiveConfig.openStackUsername,
-            keystoneAuthVersion: 'v3',
-            region: sensitiveConfig.openStackRegion,
-            domainId: "default",
-            domainName: sensitiveConfig.openStackDomainName,
-            password: sensitiveConfig.openStackPassword,
-            authUrl: sensitiveConfig.openStackAuthUrl,
-        });
-        exports.logger.info("initializeServer: retrieving container " + sensitiveConfig.openStackUploadsContainerName);
-        const pkgcloudUploadsContainer = await getContainerPromisified(pkgcloudStorageClient, sensitiveConfig.openStackUploadsContainerName);
+        exports.logger.info("initializeServer: initializing openstack pkgcloud objectstorage clients");
+        const pkgcloudStorageClients = {};
+        const pkgcloudUploadContainers = {};
+        await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
+            const containerData = sensitiveConfig.openstackContainers[containerIdX];
+            pkgcloudStorageClients[containerIdX] = pkgcloud_1.default.storage.createClient({
+                provider: "openstack",
+                username: containerData.username,
+                keystoneAuthVersion: 'v3',
+                region: containerData.region,
+                domainId: containerData.domainId,
+                domainName: containerData.domainName,
+                password: containerData.password,
+                authUrl: containerData.authUrl,
+            });
+            exports.logger.info("initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX);
+            pkgcloudUploadContainers[containerIdX] =
+                await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName);
+        }));
         exports.logger.info("initializeServer: initializing cache instance");
-        const cache = new cache_1.Cache(redisClient, knex, pkgcloudUploadsContainer, root);
+        const cache = new cache_1.Cache(redisClient, knex, pkgcloudUploadContainers, root);
         exports.logger.info("initializeServer: creating server");
         const server = http_1.default.createServer(app);
         exports.logger.info("initializeServer: setting up websocket socket.io listener");
@@ -410,8 +416,8 @@ async function initializeServer(custom = {}) {
             ipStack,
             here,
             mailgun,
-            pkgcloudStorageClient,
-            pkgcloudUploadsContainer,
+            pkgcloudStorageClients,
+            pkgcloudUploadContainers,
         };
         exports.logger.info("initializeServer: INSTANCE_GROUP_ID is " + INSTANCE_GROUP_ID);
         if (INSTANCE_MODE === "MANAGER") {
