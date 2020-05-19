@@ -34,7 +34,7 @@ ENV INSTANCE_MODE MANAGER
 
 ENV USING_DOCKER true
 
-USER node
+USER root
 RUN mkdir -p /home/node/app
 WORKDIR /home/node/app
 COPY --from=0 /home/node/app/node_modules node_modules

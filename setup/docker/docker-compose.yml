@@ -13,6 +13,7 @@ services:
             - INSTANCE_MODE=MANAGER_EXCLUSIVE
             - NODE_ENV=%{NODE_ENV}
             - LOG_LEVEL=error
+            - USING_DOCKER=true
     servers:
         image: app:latest
         depends_on:
@@ -29,6 +30,7 @@ services:
             - NODE_ENV=%{NODE_ENV}
             - PORT=8000
             - LOG_LEVEL=error
+            - USING_DOCKER=true
     redis:
         image: redis:latest
         ports:

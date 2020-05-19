@@ -20,6 +20,7 @@ const build_foreign_key_1 = require("./build-foreign-key");
 const sql_1 = require("../base/Root/sql");
 const build_index_1 = require("./build-index");
 const extensions_1 = require("./extensions");
+const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 const fsAsync = fs_1.default.promises;
 /**
  * Simple function to ask for a question
@@ -45,6 +46,9 @@ async function build(version) {
         password: dbConfig.password,
         database: dbConfig.database,
     };
+    if (USING_DOCKER && (dbConnectionKnexConfig.host === "localhost" || dbConnectionKnexConfig.host === "127.0.0.1")) {
+        dbConnectionKnexConfig.host = "pgsql";
+    }
     console.log(safe_1.default.yellow(`attempting database connection at ${dbConnectionKnexConfig.host}...`));
     // we only need one client instance
     const knex = knex_1.default({

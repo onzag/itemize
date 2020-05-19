@@ -36,6 +36,7 @@ async function build(version, buildID, services) {
     await fsAsync.mkdir(path_1.default.join("deployments", buildID, "logs"));
     // Retrieve the config for the database
     const dbConfigToUse = version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`;
+    const sensitiveConfigToUse = version === "development" ? "index.sensitive.json" : `index.${version}.sensitive.json`;
     const dbConfig = JSON.parse(await fsAsync.readFile(path_1.default.join("config", dbConfigToUse), "utf8"));
     const redisConfigToUse = version === "development" ? "redis.sensitive.json" : `redis.${version}.sensitive.json`;
     const redisConfig = JSON.parse(await fsAsync.readFile(path_1.default.join("config", redisConfigToUse), "utf8"));
@@ -86,14 +87,14 @@ async function build(version, buildID, services) {
     const yamlPath = path_1.default.join("deployments", buildID, "docker-compose.yml");
     console.log("emiting " + safe_1.default.green(yamlPath));
     await fsAsync.writeFile(yamlPath, yaml_1.default.stringify(parsed));
-    console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "build.all.json")));
-    await fsAsync.copyFile(path_1.default.join("dist", "data", "build.all.json"), path_1.default.join("deployments", buildID, "build.all.json"));
     console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "config", "index.json")));
     await fsAsync.copyFile(path_1.default.join("config", "index.json"), path_1.default.join("deployments", buildID, "config", "index.json"));
     console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "config", dbConfigToUse)));
     await fsAsync.copyFile(path_1.default.join("config", dbConfigToUse), path_1.default.join("deployments", buildID, "config", dbConfigToUse));
     console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "config", redisConfigToUse)));
     await fsAsync.copyFile(path_1.default.join("config", redisConfigToUse), path_1.default.join("deployments", buildID, "config", redisConfigToUse));
+    console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "config", sensitiveConfigToUse)));
+    await fsAsync.copyFile(path_1.default.join("config", sensitiveConfigToUse), path_1.default.join("deployments", buildID, "config", sensitiveConfigToUse));
     console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "start.sh")));
     await fsAsync.copyFile("start.sh", path_1.default.join("deployments", buildID, "start.sh"));
     console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "nginx.conf")));
@@ -136,11 +137,10 @@ async function build(version, buildID, services) {
         message += "\n\nYou have included postgres in your build, this is the central database, and it's not expected you do" +
             "\nthis, very often including postgres in the build is a mistake, nevertheless, it might be the case for standalone clusters" +
             "\nremember that the data is saved in pgdata and you need to populate this database, where you intend to deploy " +
-            "\nthe database docker-compose-only-db.yml can be used for this purpose which only spawns the database " +
+            "\nthe database docker-compose-update-db.yml can be used for this purpose which only spawns the database " +
             "\nonce you do that there's a special mode you can initialize your server which will call itemize build database process" +
             "\nfirst remember to initialize the database image by running `docker load -i pgsqlpostgis.tar.gz` then run" +
-            "\ndocker-compose -f docker-compose-only-db.yml up -d; and keep it detached so you can run your next docker command" +
-            "\ndocker run -it app -v ./config:/home/node/app/config -e \"INSTANCE_MODE=BUILD_DATABASE\" -e \"NODE_ENV=" + version + "\"";
+            "\ndocker-compose -f docker-compose-update-db.yml up;";
         const absPath = path_1.default.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis");
         await exec_1.execSudo(`docker build -t pgsqlpostgis ${absPath}`, "Itemize Docker Contained PGSQL Postgis Enabled Database");
         const saveAbsPath = path_1.default.resolve(`./deployments/${buildID}/pgsqlpostgis.tar.gz`);
@@ -154,7 +154,17 @@ async function build(version, buildID, services) {
                 delete parsed.services[service].depends_on;
             }
         });
-        const yamlPath = path_1.default.join("deployments", buildID, "docker-compose-only-db.yml");
+        parsed.services["dbbuilder"] = {
+            image: "app:latest",
+            volumes: ["./config:/home/node/app/config"],
+            depends_on: "pgsql",
+            environment: [
+                "INSTANCE_MODE=BUILD_DATABASE",
+                "NODE_ENV=" + version,
+                "USING_DOCKER=true",
+            ],
+        };
+        const yamlPath = path_1.default.join("deployments", buildID, "docker-compose-update-db.yml");
         console.log("emiting " + safe_1.default.green(yamlPath));
         await fsAsync.writeFile(yamlPath, yaml_1.default.stringify(parsed));
     }

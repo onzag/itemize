@@ -240,7 +240,6 @@ function getContainerPromisified(client, containerName) {
  */
 async function initializeServer(custom = {}) {
     if (INSTANCE_MODE === "BUILD_DATABASE") {
-        exports.logger.info("initializeServer: attempting to build database instead, not initializing server");
         dbbuilder_1.default(NODE_ENV);
         return;
     }

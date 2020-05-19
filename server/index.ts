@@ -314,9 +314,6 @@ function getContainerPromisified(client: pkgcloud.storage.Client, containerName:
  */
 export async function initializeServer(custom: IServerCustomizationDataType = {}) {
   if (INSTANCE_MODE === "BUILD_DATABASE") {
-    logger.info(
-      "initializeServer: attempting to build database instead, not initializing server",
-    );
     build(NODE_ENV);
     return;
   }

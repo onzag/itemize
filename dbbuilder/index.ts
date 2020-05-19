@@ -19,6 +19,8 @@ import { buildIndexes } from "./build-index";
 import { IDBConfigRawJSONDataType } from "../config";
 import { prepareExtensions } from "./extensions";
 
+const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
+
 const fsAsync = fs.promises;
 
 /**
@@ -49,6 +51,10 @@ export default async function build(version: string) {
     password: dbConfig.password,
     database: dbConfig.database,
   };
+
+  if (USING_DOCKER && (dbConnectionKnexConfig.host === "localhost" || dbConnectionKnexConfig.host === "127.0.0.1")) {
+    dbConnectionKnexConfig.host = "pgsql";
+  }
 
   console.log(colors.yellow(`attempting database connection at ${dbConnectionKnexConfig.host}...`));
 
