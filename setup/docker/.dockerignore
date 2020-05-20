@@ -1,6 +1,7 @@
 **/*.js.map
 /devenv
 /logs
+/node_modules
 npm-debug.log
 db-status.json
 db-status.optimal.json

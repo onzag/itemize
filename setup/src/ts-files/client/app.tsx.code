@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "@onzag/itemize/client/fast-prototyping/components/navbar";
-import Route from "@onzag/itemize/client/components/navigaton/Route";
+import Route from "@onzag/itemize/client/components/navigation/Route";
 import { LoginDialog } from "@onzag/itemize/client/fast-prototyping/components/login-dialog";
 import { SignupDialog } from "@onzag/itemize/client/fast-prototyping/components/signup-dialog";
 import { RecoverDialog } from "@onzag/itemize/client/fast-prototyping/components/recover-dialog";

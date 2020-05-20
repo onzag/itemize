@@ -84,7 +84,7 @@ async function configRequest(srcConfig, message, extractData, variableNamePrefix
             if (!newConfig[extractPoint.variableName]) {
                 newConfig[extractPoint.variableName] = {};
             }
-            const keys = await fieldRequest("strarray", null, variableNamePrefix + "[$key]", null, Object.keys(newConfig[extractPoint.variableName]));
+            const keys = await fieldRequest("strarray", null, variableNamePrefix + extractPoint.variableName + "." + "[$key]", null, Object.keys(newConfig[extractPoint.variableName]));
             for (const key of keys) {
                 newConfig[extractPoint.variableName][key] = await configRequest(newConfig[extractPoint.variableName][key], extractPoint.message, extractPoint.extractData, variableNamePrefix + extractPoint.variableName + "." + key + ".");
             }

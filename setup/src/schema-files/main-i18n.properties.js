@@ -61,7 +61,7 @@ reload = reload
 blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
 needs_update_navigation = outdated
 needs_update_title = update app
-needs_update_content  = A new version of the app is currently available
+needs_update_content = A new version of the app is currently available
 needs_update_action = update
 
 generic_error = error

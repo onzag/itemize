@@ -134,7 +134,7 @@ export async function configRequest<T>(
       const keys = await fieldRequest<string[]>(
         "strarray",
         null,
-        variableNamePrefix + "[$key]",
+        variableNamePrefix + extractPoint.variableName + "." + "[$key]",
         null,
         Object.keys(newConfig[extractPoint.variableName]),
       );

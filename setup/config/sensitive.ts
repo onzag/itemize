@@ -46,7 +46,7 @@ export async function sensitiveConfigSetup(
       {
         variableName: "openstackContainers",
         type: "multiconfig",
-        message: "Openstack containers configuration",
+        message: "Openstack containers configuration, make sure to use the same container reference as in the standard config",
         defaultValue: null,
         extractData: [
           {
