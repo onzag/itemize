@@ -1,4 +1,4 @@
-import { IAppDataType } from ".";
+import { IAppDataType, logger } from ".";
 import express from "express";
 import path from "path";
 import Module from "../base/Root/Module";
@@ -186,6 +186,8 @@ export default function restServices(appData: IAppDataType) {
       res.end(JSON.stringify(standardAPIResponse));
       return;
     }
+
+    logger.info("Requesting location for ip address of " + ip);
 
     const ipStackResponse = await appData.ipStack.requestUserInfoForIp(ip.toString(), standardAPIResponse);
     res.end(JSON.stringify(ipStackResponse));

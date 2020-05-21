@@ -89,6 +89,9 @@ export class IPStack {
   ): Promise<IPStackItemizeSpecificResponse> {
     try {
       const standardResponse = await this.requestInfoFor(ip);
+      if (standardResponse.country_code === null) {
+        return fallback;
+      }
       const languageCode = standardResponse.location && standardResponse.location.languages &&
         standardResponse.location.languages[0] && standardResponse.location.languages[0].code
       return {
