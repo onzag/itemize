@@ -3,7 +3,7 @@ import { gqlQuery, buildGqlQuery, IGQLValue } from "../../../gql-querier";
 import { EndpointErrorType } from "../../../base/errors";
 import { ILocaleContextType } from ".";
 import { Location } from "history";
-import { GUEST_METAROLE, ENDPOINT_ERRORS, MEMCACHED_DESTRUCTION_MARKERS_LOCATION, DESTRUCTION_MARKERS_LOCATION } from "../../../constants";
+import { GUEST_METAROLE, ENDPOINT_ERRORS, MEMCACHED_DESTRUCTION_MARKERS_LOCATION, DESTRUCTION_MARKERS_LOCATION, PREFIX_GET } from "../../../constants";
 import CacheWorkerInstance from "../workers/cache";
 import equals from "deep-equal";
 
@@ -259,7 +259,7 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       destructionMarkers[qualifiedPathName].forEach((marker: [number, string]) => {
         // and delete everything within it
         CacheWorkerInstance.instance.deleteCachedValue(
-          qualifiedPathName,
+          PREFIX_GET + qualifiedPathName,
           marker[0],
           marker[1],
         );

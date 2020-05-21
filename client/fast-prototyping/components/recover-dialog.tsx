@@ -12,7 +12,7 @@ import I18nRead from "../../components/localization/I18nRead";
 import Entry from "../../components/property/Entry";
 
 const recoverDialogStyles = createStyles({
-  resetPasswordButton: {
+  resetPasswordButtonWrapper: {
     marginTop: "1.5rem",
   },
   divider: {
@@ -61,7 +61,11 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
                 </form>
                 <I18nRead id="recover_account_action">
                   {(i18nRecoverAction: string) => (
-                    <ProgressingElement isProgressing={actioner.statefulOnProgress} fullWidth={true}>
+                    <ProgressingElement
+                      isProgressing={actioner.statefulOnProgress}
+                      fullWidth={true}
+                      className={props.classes.resetPasswordButtonWrapper}
+                    >
                       <Button
                         color="primary"
                         variant="contained"
@@ -70,7 +74,6 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
                         startIcon={<MailIcon />}
                         onClick={actioner.sendResetPassword.bind(null, true)}
                         fullWidth={true}
-                        className={props.classes.resetPasswordButton}
                       >
                         {i18nRecoverAction}
                       </Button>

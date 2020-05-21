@@ -53,17 +53,21 @@
             "id": "e_notifications",
             "type": "boolean",
             "default": true,
+            "nullable": true,
             "searchable": false,
             "readRoleAccess": ["&OWNER"],
-            "editRoleAccess": ["&OWNER", "ADMIN"]
+            "editRoleAccess": ["&OWNER", "ADMIN"],
+            "coerceNullsIntoDefault": true
         },
         {
             "id": "e_newsletter",
             "type": "boolean",
             "default": true,
+            "nullable": true,
             "searchable": false,
             "readRoleAccess": ["&OWNER"],
-            "editRoleAccess": ["&OWNER", "ADMIN"]
+            "editRoleAccess": ["&OWNER", "ADMIN"],
+            "coerceNullsIntoDefault": true
         },
         {
             "id": "password",
@@ -116,7 +120,9 @@
             "disableRetrieval": true,
             "searchable": false,
             "default": 0,
-            "hidden": true
+            "nullable": true,
+            "hidden": true,
+            "coerceNullsIntoDefault": true
         }
     ],
     "policies": {

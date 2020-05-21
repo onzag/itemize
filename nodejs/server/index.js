@@ -92,8 +92,8 @@ const customFormatErrorFn = (error) => {
             break;
         default:
             exports.logger.error("customFormatErrorFn: Caught unexpected error from graphql parsing", {
-                errMessage: error.originalError.message,
-                errStack: error.originalError.stack,
+                errMessage: error.message,
+                errStack: error.stack,
             });
             extensions = {
                 message: "Unspecified Error while parsing data",
@@ -377,13 +377,14 @@ async function initializeServer(custom = {}) {
         const ipStack = sensitiveConfig.ipStackAccessKey ?
             ipstack_1.setupIPStack(sensitiveConfig.ipStackAccessKey) :
             null;
-        if (sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain) {
+        if (sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain && sensitiveConfig.mailgunAPIHost) {
             exports.logger.info("initializeServer: initializing mailgun connection");
         }
-        const mailgun = sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain ?
+        const mailgun = sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain && sensitiveConfig.mailgunAPIHost ?
             mailgun_1.setupMailgun({
                 apiKey: sensitiveConfig.mailgunAPIKey,
                 domain: sensitiveConfig.mailgunDomain,
+                host: sensitiveConfig.mailgunAPIHost,
             }) : null;
         if (sensitiveConfig.hereAppID && sensitiveConfig.hereAppCode) {
             exports.logger.info("initializeServer: initializing here maps");

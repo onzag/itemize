@@ -17,7 +17,7 @@ const loginDialogStyles = createStyles({
     paddingBottom: "1rem",
     fontWeight: 300,
   },
-  loginButton: {
+  loginButtonWrapper: {
     marginTop: "1.5rem",
   },
   titleContainer: {
@@ -96,7 +96,11 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
                   </I18nReadMany>
                   <Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
 
-                  <ProgressingElement isProgressing={actioner.isLoggingIn} fullWidth={true}>
+                  <ProgressingElement
+                    isProgressing={actioner.isLoggingIn}
+                    fullWidth={true}
+                    className={props.classes.loginButtonWrapper}
+                  >
                     <Button
                       color="primary"
                       variant="contained"
@@ -105,7 +109,6 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
                       startIcon={<DoneIcon />}
                       onClick={actioner.login.bind(null, true)}
                       fullWidth={true}
-                      className={props.classes.loginButton}
                     >
                       {i18nLogin}
                     </Button>

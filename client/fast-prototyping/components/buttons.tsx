@@ -11,6 +11,7 @@ type RedirectCallbackFn = (status: IActionResponseWithId) => string;
 interface ISubmitButtonProps {
   options: IActionSubmitOptions;
   i18nId: string;
+  wrapperClassName?: string;
   buttonClassName?: string;
   buttonVariant?: "text" | "outlined" | "contained";
   buttonColor?: PropTypes.Color;
@@ -63,7 +64,7 @@ export function SubmitButton(props: ISubmitButtonProps) {
         }
         return (
           <React.Fragment>
-            <ProgressingElement isProgressing={actioner.submitting}>
+            <ProgressingElement isProgressing={actioner.submitting} className={props.wrapperClassName}>
               <Button
                 variant={props.buttonVariant}
                 color={props.buttonColor}

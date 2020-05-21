@@ -15,6 +15,7 @@ type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search"
 
 export interface IPropertyEntryProps<RendererPropsType> {
   id: string;
+  onChange?: (value: PropertyDefinitionSupportedType) => void;
   searchVariant?: SearchVariants;
   policyType?: string;
   policyName?: string;
@@ -107,11 +108,12 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                   }
                 }
 
+                const containerId: string = (itemDefinitionContextualValue.state.gqlOriginalFlattenedValue &&
+                  itemDefinitionContextualValue.state.gqlOriginalFlattenedValue.container_id as string) || null;
+
                 if (type === "read") {
                   if (propertyState) {
                     const propertyDescription = property.getPropertyDefinitionDescription();
-                    const containerId: string = itemDefinitionContextualValue.state.gqlOriginalFlattenedValue &&
-                      itemDefinitionContextualValue.state.gqlOriginalFlattenedValue.container_id as string;
                     if (propertyDescription.gqlAddFileToFields) {
                       if (!propertyDescription.gqlList) {
                         return props.children(fileURLAbsoluter(
@@ -156,6 +158,7 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                         state={propertyState}
                         capitalize={props.capitalize}
                         renderer={props.renderer}
+                        containerId={containerId}
                         rendererArgs={props.rendererArgs}
                         forId={itemDefinitionContextualValue.forId}
                         forVersion={itemDefinitionContextualValue.forVersion}
@@ -187,6 +190,9 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                     return null;
                   }
                   const onChange = (newValue: PropertyDefinitionSupportedType, internalValue?: any) => {
+                    if (props.onChange) {
+                      props.onChange(newValue);
+                    }
                     itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
                   };
                   const onRestore = () => {
@@ -218,6 +224,7 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                       onChange={onChange}
                       onRestore={onRestore}
                       forceInvalid={props.showAsInvalid}
+                      containerId={containerId}
                       icon={props.icon}
                       forId={itemDefinitionContextualValue.forId}
                       forVersion={itemDefinitionContextualValue.forVersion}

@@ -53,6 +53,16 @@ exports.rawSensitiveConfigSchema = {
                 }
             ],
         },
+        mailgunAPIHost: {
+            anyOf: [
+                {
+                    "type": "string",
+                },
+                {
+                    "type": "null"
+                }
+            ],
+        },
         mailgunTargetDomain: {
             anyOf: [
                 {

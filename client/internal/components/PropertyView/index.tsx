@@ -29,6 +29,7 @@ export interface IPropertyViewRendererProps<ValueType> extends IRendererProps {
  * This is what the general view handler is supposed to get
  */
 export interface IPropertyViewMainHandlerProps<RendererPropsType> {
+  containerId: string;
   include: Include;
   itemDefinition: ItemDefinition;
   forId: number;
@@ -118,6 +119,7 @@ export function RawBasePropertyView(props: {
                     include={null}
                     forId={null}
                     forVersion={null}
+                    containerId={null}
                     state={{
                       userSet: false,
                       default: null,

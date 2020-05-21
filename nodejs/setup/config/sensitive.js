@@ -89,8 +89,15 @@ async function sensitiveConfigSetup(version, currentConfig, referenceConfig, pac
         },
         {
             variableName: "mailgunDomain",
-            message: "Used in order to send emails, get your key at https://www.mailgun.com/",
+            message: "Your own domain used in order to send emails, get your key at https://www.mailgun.com/",
             defaultValue: "",
+            hidden: true,
+            nullifyFalseValues: true,
+        },
+        {
+            variableName: "mailgunAPIHost",
+            message: "The mailgun api host, usually api.eu.mailgun.net or api.mailgun.net, get your key at https://www.mailgun.com/",
+            defaultValue: "api.mailgun.net",
             hidden: true,
             nullifyFalseValues: true,
         },

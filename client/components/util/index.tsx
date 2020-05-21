@@ -35,6 +35,10 @@ export function fileURLAbsoluter(
     return file;
   }
 
+  if (!containerId) {
+    return null;
+  }
+
   let prefix: string = (window as any).CONTAINER_HOSTNAME_PREFIXES[containerId];
   if (prefix.indexOf("/") !== 0) {
     prefix = location.protocol + "//" + prefix;

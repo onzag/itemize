@@ -66,11 +66,12 @@ interface IProgressingElementProps extends WithStyles<typeof progressingElementS
   children: React.ReactNode;
   delayDuration?: number;
   fullWidth?: boolean;
+  className?: string;
 }
 
 export const ProgressingElement = withStyles(progressingElementStyle)((props: IProgressingElementProps) => {
   const size = props.progressSize || 24;
-  return (<div className={props.classes.progressWrapper}>
+  return (<div className={`${props.classes.progressWrapper} ${props.className ? props.className : ""}`}>
     {props.children}
     {
       props.isProgressing ?

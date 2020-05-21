@@ -75,7 +75,7 @@ exports.customUserQueries = (appData) => {
                         typeof decoded.role !== "string" ||
                         typeof decoded.sessionId !== "number") {
                         throw new errors_1.EndpointError({
-                            message: "Token is invalid",
+                            message: "Token is invalid due to wrong shape",
                             code: constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS,
                         });
                     }
@@ -93,7 +93,7 @@ exports.customUserQueries = (appData) => {
                         throw err;
                     }
                     // now we check the session id to see if it has been cancelled
-                    if (resultUser.session_id !== decoded.sessionId) {
+                    if ((resultUser.session_id || 0) !== decoded.sessionId) {
                         throw new errors_1.EndpointError({
                             message: "Session has been cancelled",
                             code: constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS,
@@ -169,7 +169,7 @@ exports.customUserQueries = (appData) => {
                         const token = preGeneratedToken || (await token_1.jwtSign({
                             id: resultUser.id,
                             role: resultUser.role,
-                            sessionId: resultUser.session_id,
+                            sessionId: resultUser.session_id || 0,
                         }, appData.sensitiveConfig.jwtKey, {
                             expiresIn: "7d",
                         }));
@@ -564,25 +564,20 @@ exports.customUserQueries = (appData) => {
                 }
                 catch (err) {
                     throw new errors_1.EndpointError({
-                        message: "Token is invalid",
+                        message: "Reset token is invalid",
                         code: constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS,
                     });
                 }
                 if (typeof decoded.resetPasswordUserId !== "number" ||
                     typeof decoded.resetPasswordTempTokenCode !== "number") {
                     throw new errors_1.EndpointError({
-                        message: "Token is invalid",
+                        message: "Reset token is invalid due to wrong shape",
                         code: constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS,
                     });
                 }
+                let codeWasSent;
                 try {
-                    const codeWasSent = await getPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
-                    if (!codeWasSent) {
-                        throw new errors_1.EndpointError({
-                            message: "Token is invalid",
-                            code: constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS,
-                        });
-                    }
+                    codeWasSent = await getPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
                 }
                 catch (err) {
                     __1.logger.error("customUserQueries.reset_password [SERIOUS]: failed to check the token code that was sent", {
@@ -591,6 +586,12 @@ exports.customUserQueries = (appData) => {
                         decoded,
                     });
                     throw err;
+                }
+                if (!codeWasSent) {
+                    throw new errors_1.EndpointError({
+                        message: "Reset token is invalid due to expiration",
+                        code: constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+                    });
                 }
                 const invalidReason = passwordProperty.isValidValueNoExternalChecking(decoded.resetPasswordUserId, null, args.new_password);
                 if (invalidReason) {

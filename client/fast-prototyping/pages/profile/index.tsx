@@ -24,6 +24,7 @@ export function Profile(props: ProfileProps) {
     "e_validated",
     "role",
     "profile_picture",
+    "about_me",
   ];
   return (
     <SlowLoadingElement id="profile">

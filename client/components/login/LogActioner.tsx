@@ -132,7 +132,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     error: EndpointErrorType;
   }> {
     const result = await this.props.itemDefinitionContextualValue.submit({
-      properties: ["username", "password"],
+      properties: ["username", "password", "app_language", "app_country", "app_currency"],
     });
     if (!result.error) {
       return await this.login(cleanWhenSuccesful);

@@ -365,7 +365,7 @@ async function validateTokenIsntBlocked(cache, tokenData) {
                 code: constants_1.ENDPOINT_ERRORS.USER_BLOCKED,
             });
         }
-        else if (sqlResult.session_id !== tokenData.sessionId) {
+        else if ((sqlResult.session_id || 0) !== tokenData.sessionId) {
             throw new errors_1.EndpointError({
                 message: "Token has been rendered invalid",
                 code: constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS,

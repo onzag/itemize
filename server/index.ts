@@ -140,8 +140,8 @@ const customFormatErrorFn = (error: GraphQLError) => {
       logger.error(
         "customFormatErrorFn: Caught unexpected error from graphql parsing",
         {
-          errMessage: error.originalError.message,
-          errStack: error.originalError.stack,
+          errMessage: error.message,
+          errStack: error.stack,
         },
       );
       extensions = {
@@ -422,6 +422,12 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
 
     if (INSTANCE_MODE === "MANAGER_EXCLUSIVE") {
       const cache = new Cache(redisClient, null, null, null);
+      logger.info(
+        "initializeServer: server initialized in manager exclusive mode flushing redis",
+      );
+
+      const flushAllPromisified = promisify(redisClient.flushall).bind(redisClient);
+      await flushAllPromisified();
       new Listener(
         buildnumber,
         redisSub,
@@ -530,15 +536,16 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       setupIPStack(sensitiveConfig.ipStackAccessKey) :
       null;
 
-    if (sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain) {
+    if (sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain && sensitiveConfig.mailgunAPIHost) {
       logger.info(
         "initializeServer: initializing mailgun connection",
       );
     }
-    const mailgun = sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain ?
+    const mailgun = sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain && sensitiveConfig.mailgunAPIHost ?
       setupMailgun({
         apiKey: sensitiveConfig.mailgunAPIKey,
         domain: sensitiveConfig.mailgunDomain,
+        host: sensitiveConfig.mailgunAPIHost,
       }) : null;
 
     if (sensitiveConfig.hereAppID && sensitiveConfig.hereAppCode) {

@@ -565,7 +565,7 @@ export async function runAddQueryFor(
     args.version = arg.forVersion;
   }
 
-  args.containerId = arg.containerId;
+  args.container_id = arg.containerId;
 
   const query = buildGqlMutation({
     name: queryName,

@@ -325,7 +325,7 @@ function getGQLMutationFieldsForItemDefinition(itemDefinition, resolvers) {
                     retrievalMode: false,
                     propertiesAsInput: true,
                     excludeBase: true,
-                    optionalForm: true,
+                    optionalForm: false,
                     includePolicy: "parent",
                 }),
             },

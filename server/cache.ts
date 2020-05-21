@@ -503,7 +503,8 @@ export class Cache {
 
     logger.debug(
       "Cache.requestUpdate: requesting update for " + selfTable + " at module " +
-        moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + dictionary,
+        moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + dictionary + " and " +
+        "container id " + containerId,
     );
 
     // We get only the fields that we expect to be updated

@@ -29,7 +29,7 @@ const signupDialogStyles = createStyles({
     paddingTop: "1rem",
     display: "inline-block",
   },
-  signupButton: {
+  signupButtonWrapper: {
     marginTop: "1.5rem",
   },
   titleContainer: {
@@ -110,7 +110,11 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
 
                   <I18nReadError error={actioner.error} />
                 </form>
-                <ProgressingElement isProgressing={actioner.isLoggingIn} fullWidth={true}>
+                <ProgressingElement
+                  isProgressing={actioner.isLoggingIn}
+                  fullWidth={true}
+                  className={props.classes.signupButtonWrapper}
+                >
                   <Button
                     color="primary"
                     variant="contained"
@@ -119,7 +123,6 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
                     startIcon={<DoneIcon />}
                     onClick={actioner.signup.bind(null, true)}
                     fullWidth={true}
-                    className={props.classes.signupButton}
                   >
                     {i18nSignup}
                   </Button>

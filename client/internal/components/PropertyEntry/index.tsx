@@ -60,6 +60,7 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
   injectSubmitBlockPromise: (arg: Promise<any>) => void;
   include: Include;
   property: PropertyDefinition;
+  containerId: string;
   state: IPropertyDefinitionState;
   onChange: (newValue: ValueType, internalValue: any) => void;
   onRestore: () => void;

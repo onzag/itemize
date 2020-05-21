@@ -51,6 +51,7 @@ export default class PropertyViewFile
         this.props.itemDefinition,
         this.props.forId,
         this.props.forVersion,
+        this.props.containerId,
         this.props.include,
         this.props.property,
       );

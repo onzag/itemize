@@ -17,8 +17,12 @@ exports.customUserTriggers = {
                 // can be a partial update in which case it's undefined
                 const newEmail = arg.update.email;
                 // and this is the email that was changed to
+                // !arg from means this is a new user that has assigned itself an email
+                // or the new Email is not undefined and the new email is not equal to the old
                 const changedEmail = !arg.from || (typeof newEmail !== "undefined" && newEmail !== arg.from.email);
-                if (changedEmail && newEmail !== null) {
+                // newEmail being set is not null, and new email being set is not undefined which means is not
+                // being updated at all
+                if (changedEmail && newEmail !== null && typeof newEmail !== "undefined") {
                     // now we try to find another user with such email
                     let result;
                     try {
@@ -30,7 +34,7 @@ exports.customUserTriggers = {
                     }
                     catch (err) {
                         __1.logger.error("customUserTriggers [SERIOUS]: Failed to execute SQL query to check " +
-                            " if email had been taken for email " + newEmail + " this caused the whole user not to be able to update/create");
+                            "if email had been taken for email " + newEmail + " this caused the whole user not to be able to update/create");
                         throw err;
                     }
                     // if there's no such

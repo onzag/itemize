@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, createStyles, WithStyles, withStyles, Typography, Paper, Theme, Tooltip } from "@material-ui/core";
+import { Container, createStyles, WithStyles, withStyles, Typography, Paper, Theme, Tooltip, Card } from "@material-ui/core";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
 import { Avatar } from "../../components/avatar";
 import { countries } from "../../../../imported-resources";
@@ -38,6 +38,10 @@ const publicUserProfileStyles = (theme: Theme) => createStyles({
   verifiedIcon: {
     color: theme.palette.success.main,
   },
+  aboutMeCard: {
+    marginTop: "1rem",
+    padding: "1rem",
+  }
 });
 
 export const PublicUserProfile = withStyles(publicUserProfileStyles)((props: WithStyles<typeof publicUserProfileStyles>) => {
@@ -97,6 +101,9 @@ export const PublicUserProfile = withStyles(publicUserProfileStyles)((props: Wit
               return null;
             }}
           </UserDataRetriever>
+          <Card className={props.classes.aboutMeCard} variant="outlined">
+            <View id="about_me"/>
+          </Card>
         </Paper>
       </Container>
     </React.Fragment>

@@ -211,7 +211,7 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
           `${isSpecialUser && props.size === "medium" ? props.classes.specialUserMedium : ""}` }}
         src={imageSrc}
       >
-        {userNameValue ? userNameValue[0] : ""}
+        {userNameValue ? userNameValue[0].toUpperCase() : ""}
       </MAvatar>
     );
 
@@ -340,7 +340,7 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
                                         `${specialUserClassName} ${specialUserSizeClassName}` }}
                                       src={largeImageURL}
                                     >
-                                      {username ? username[0] : ""}
+                                      {username ? username[0].toLocaleUpperCase() : ""}
                                     </MAvatar>
                                   )}
                                 </CacheableImageLoader>

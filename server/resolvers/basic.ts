@@ -455,7 +455,7 @@ export async function validateTokenIsntBlocked(
         message: "User is Blocked",
         code: ENDPOINT_ERRORS.USER_BLOCKED,
       });
-    } else if (sqlResult.session_id !== tokenData.sessionId) {
+    } else if ((sqlResult.session_id || 0) !== tokenData.sessionId) {
       throw new EndpointError({
         message: "Token has been rendered invalid",
         code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
