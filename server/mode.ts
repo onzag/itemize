@@ -33,7 +33,7 @@ export function getMode(appData: IAppDataType, req: express.Request) {
 
   const cookies = req.headers["cookie"];
   if (cookies) {
-    const splittedCookies = cookies.split(";");
+    const splittedCookies = cookies.split(";").map((c) => c.trim());
     const devmode = getCookie(splittedCookies, "devmode");
     const devkey = getCookie(splittedCookies, "devkey");
 

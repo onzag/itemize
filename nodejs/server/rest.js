@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const _1 = require(".");
 const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const server_checkers_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers");
@@ -162,6 +163,7 @@ function restServices(appData) {
             res.end(JSON.stringify(standardAPIResponse));
             return;
         }
+        _1.logger.info("Requesting location for ip address of " + ip);
         const ipStackResponse = await appData.ipStack.requestUserInfoForIp(ip.toString(), standardAPIResponse);
         res.end(JSON.stringify(ipStackResponse));
     });

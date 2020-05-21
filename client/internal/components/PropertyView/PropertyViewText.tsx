@@ -77,6 +77,7 @@ export function propertyViewPostProcessingHook(
           this.props.itemDefinition,
           this.props.forId,
           this.props.forVersion || null,
+          this.props.containerId,
           this.props.include,
           relatedProperty,
         );
@@ -116,6 +117,7 @@ export function propertyViewPostProcessingHook(
           this.props.itemDefinition,
           this.props.forId,
           this.props.forVersion || null,
+          this.props.containerId,
           this.props.include,
           relatedProperty,
         );

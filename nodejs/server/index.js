@@ -321,6 +321,9 @@ async function initializeServer(custom = {}) {
         const redisClient = redis_1.default.createClient(redisConfig.cache);
         if (INSTANCE_MODE === "MANAGER_EXCLUSIVE") {
             const cache = new cache_1.Cache(redisClient, null, null, null);
+            exports.logger.info("initializeServer: server initialized in manager exclusive mode flushing redis");
+            const flushAllPromisified = util_1.promisify(redisClient.flushall).bind(redisClient);
+            await flushAllPromisified();
             new listener_1.Listener(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, null, cache, null, null);
             return;
         }

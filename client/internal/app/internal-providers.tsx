@@ -110,12 +110,12 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
         localStorage.setItem("TOKEN", tokenDataToken as string);
         localStorage.setItem("ROLE", tokenDataRole as string);
         localStorage.setItem("ID", tokenDataId.toString());
-        document.cookie = "token=" + tokenDataToken;
+        // document.cookie = "token=" + tokenDataToken;
       } else {
         localStorage.removeItem("TOKEN");
         localStorage.removeItem("ROLE");
         localStorage.removeItem("ID");
-        document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+        // document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
       }
     } else {
       tokenDataId = parseInt(localStorage.getItem("ID")) || null;

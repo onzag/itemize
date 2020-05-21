@@ -116,6 +116,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
       return;
     }
 
+    console.log("SETTING HTML TO", html);
     this.cheapdiv.innerHTML = html;
 
     this.cheapdiv.querySelectorAll("img").forEach((img: HTMLImageElement) => {
@@ -154,6 +155,9 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
 
     triggerOldSchoolListeners();
   }
+  public componentDidMount() {
+    this.updateHTML(this.props.children);
+  }
   public shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps) {
     if (nextProps.children !== this.props.children) {
       this.updateHTML(nextProps.children);
@@ -171,7 +175,7 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
   if (props.isRichText) {
     return (
       <PropertyViewRichTextViewer>{props.currentValue}</PropertyViewRichTextViewer>
-    )
+    );
   } else if (props.subtype === "plain") {
     return (
       <div className="plain-text">
