@@ -141,7 +141,7 @@ export function imageSizeRetriever(fileData: IGQLFile, property?: PropertyDefini
   if (
     fileData &&
     fileData.url.indexOf("blob:") !== 0 &&
-    fileData.type.indexOf("svg") !== 0
+    fileData.type.indexOf("image/svg") !== 0
   ) {
     const splittedURL = fileData.url.split("/");
     const fileName = splittedURL.pop();

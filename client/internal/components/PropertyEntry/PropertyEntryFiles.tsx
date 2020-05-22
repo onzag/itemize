@@ -327,7 +327,7 @@ export default class PropertyEntryFiles extends React.Component<IPropertyEntryPr
                 let reduceSizeURL = toUseURL;
                 if (
                   reduceSizeURL.indexOf("blob:") !== 0 &&
-                  value.value.type.indexOf("svg") !== 0
+                  value.value.type.indexOf("image/svg") !== 0
                 ) {
                   const splittedURL = reduceSizeURL.split("/");
                   const fileName = splittedURL.pop();
