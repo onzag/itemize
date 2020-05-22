@@ -1,4 +1,4 @@
-import https from "https";
+import http from "http";
 import { countries } from "../../imported-resources";
 import { logger } from "../";
 
@@ -43,20 +43,40 @@ export class IPStack {
   }
   private requestInfoFor(ip: string) {
     return new Promise<IPStackResponse>((resolve, reject) => {
-      https.get(`http://api.ipstack.com/${ip}?access_key=${this.apiKey}`, (resp) => {
+      http.get(`http://api.ipstack.com/${ip}?access_key=${this.apiKey}`, (resp) => {
         // let's get the response from the stream
         let data = "";
         resp.on("data", (chunk) => {
           data += chunk;
         });
         resp.on("error", (err) => {
+          logger.error(
+            "IPStack.requestInfoFor: request to the ip stack ip returned error",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              ip,
+            }
+          );
           reject(err);
         });
         resp.on("end", () => {
           // now that we got the answer, let's use our guess
           try {
             const parsedData = JSON.parse(data);
-            resolve(parsedData);
+            if (parsedData.error) {
+              logger.error(
+                "IPStack.requestInfoFor: ipstack provided a custom error",
+                {
+                  errMessage: parsedData.error,
+                  ip,
+                  data,
+                }
+              );
+              reject(new Error(parsedData.error));
+            } else {
+              resolve(parsedData);
+            }
           } catch (err) {
             logger.error(
               "IPStack.requestInfoFor: request to the ip stack ip returned invalid data",
@@ -99,7 +119,7 @@ export class IPStack {
         currency: countries[standardResponse.country_code] ? countries[standardResponse.country_code].currency || "EUR" : "EUR",
         language: languageCode ? languageCode : (countries[standardResponse.country_code].languages[0] || "en"),
       }
-    } catch {
+    } catch (err) {
       return fallback;
     }
   }

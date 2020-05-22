@@ -164,7 +164,7 @@ function restServices(appData) {
             return;
         }
         _1.logger.info("Requesting location for ip address of " + ip);
-        const ipStackResponse = await appData.ipStack.requestUserInfoForIp(ip.toString(), standardAPIResponse);
+        const ipStackResponse = await appData.ipStack.requestUserInfoForIp("107.146.238.164", standardAPIResponse);
         res.end(JSON.stringify(ipStackResponse));
     });
     router.get("/util/location-geocode", async (req, res) => {

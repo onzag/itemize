@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const https_1 = __importDefault(require("https"));
+const http_1 = __importDefault(require("http"));
 const imported_resources_1 = require("../../imported-resources");
 const __1 = require("../");
 class IPStack {
@@ -12,20 +12,35 @@ class IPStack {
     }
     requestInfoFor(ip) {
         return new Promise((resolve, reject) => {
-            https_1.default.get(`http://api.ipstack.com/${ip}?access_key=${this.apiKey}`, (resp) => {
+            http_1.default.get(`http://api.ipstack.com/${ip}?access_key=${this.apiKey}`, (resp) => {
                 // let's get the response from the stream
                 let data = "";
                 resp.on("data", (chunk) => {
                     data += chunk;
                 });
                 resp.on("error", (err) => {
+                    __1.logger.error("IPStack.requestInfoFor: request to the ip stack ip returned error", {
+                        errMessage: err.message,
+                        errStack: err.stack,
+                        ip,
+                    });
                     reject(err);
                 });
                 resp.on("end", () => {
                     // now that we got the answer, let's use our guess
                     try {
                         const parsedData = JSON.parse(data);
-                        resolve(parsedData);
+                        if (parsedData.error) {
+                            __1.logger.error("IPStack.requestInfoFor: ipstack provided a custom error", {
+                                errMessage: parsedData.error,
+                                ip,
+                                data,
+                            });
+                            reject(new Error(parsedData.error));
+                        }
+                        else {
+                            resolve(parsedData);
+                        }
                     }
                     catch (err) {
                         __1.logger.error("IPStack.requestInfoFor: request to the ip stack ip returned invalid data", {
@@ -61,7 +76,7 @@ class IPStack {
                 language: languageCode ? languageCode : (imported_resources_1.countries[standardResponse.country_code].languages[0] || "en"),
             };
         }
-        catch {
+        catch (err) {
             return fallback;
         }
     }
