@@ -21,7 +21,7 @@ const plugins = [
       "commons." + mode + ".js",
       "cache-worker." + mode + ".js",
     ],
-    isAsync: !isDevelopment,
+    isAsync: false,
   }),
 ]
 

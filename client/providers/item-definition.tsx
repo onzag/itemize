@@ -1053,20 +1053,6 @@ export class ActualItemDefinitionProvider extends
       cacheStore: this.props.longTermCaching,
     });
 
-    // if the item has been cached, as in returned from the indexed db database
-    // rather than the server, we don't know if it's actually the current value
-    // so we request feedback from the listener, the listener will kick a reload
-    // event if it finds a mismatch which will cause this function to run again (see above)
-    // but the denyCache flag will be active, ensuring the value will be requested
-    // from the server
-    if (cached) {
-      this.props.remoteListener.requestFeedbackFor({
-        itemDefinition: this.props.itemDefinitionInstance.getQualifiedPathName(),
-        id: this.props.forId,
-        version: this.props.forVersion || null,
-      });
-    }
-
     if (value) {
       // we apply the value, whatever we have gotten this will affect all the instances
       // that use the same value
@@ -1089,6 +1075,20 @@ export class ActualItemDefinitionProvider extends
       if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
         this.setStateToCurrentValueWithExternalChecking(null);
       }
+    }
+
+    // if the item has been cached, as in returned from the indexed db database
+    // rather than the server, we don't know if it's actually the current value
+    // so we request feedback from the listener, the listener will kick a reload
+    // event if it finds a mismatch which will cause this function to run again (see above)
+    // but the denyCache flag will be active, ensuring the value will be requested
+    // from the server
+    if (cached) {
+      this.props.remoteListener.requestFeedbackFor({
+        itemDefinition: this.props.itemDefinitionInstance.getQualifiedPathName(),
+        id: this.props.forId,
+        version: this.props.forVersion || null,
+      });
     }
 
     return this.loadValueCompleted({

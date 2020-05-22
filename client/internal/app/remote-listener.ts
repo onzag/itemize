@@ -66,7 +66,7 @@ export class RemoteListener {
   private uuid: string = uuid.v4();
   private isReconnect: boolean = false;
   private offline: boolean = false;
-  private initialConsideredDisconnectedIfNoAnswerTimeout: NodeJS.Timeout;
+  // private initialConsideredDisconnectedIfNoAnswerTimeout: NodeJS.Timeout;
   private token: string = null;
   private isReady: boolean = false;
 
@@ -86,11 +86,12 @@ export class RemoteListener {
     this.appUpdatedListeners = [];
     this.lastRecievedBuildNumber = (window as any).BUILD_NUMBER;
 
-    this.initialConsideredDisconnectedIfNoAnswerTimeout = setTimeout(() => {
-      this.offline = true;
-      this.isReconnect = true;
-      this.connectionListeners.forEach((l) => l());
-    }, 1000);
+    // Triggers on slow connections too easily causing reloads
+    // this.initialConsideredDisconnectedIfNoAnswerTimeout = setTimeout(() => {
+    //   this.offline = true;
+    //   this.isReconnect = true;
+    //   this.connectionListeners.forEach((l) => l());
+    // }, 1000);
 
     this.socket = io(`${location.protocol}//${location.host}`);
     this.socket.on("connect", this.reattachListeners);
@@ -497,7 +498,7 @@ export class RemoteListener {
   }
   private async reattachListeners() {
     this.offline = false;
-    clearTimeout(this.initialConsideredDisconnectedIfNoAnswerTimeout);
+    // clearTimeout(this.initialConsideredDisconnectedIfNoAnswerTimeout);
 
     if (!this.isReady) {
       return;

@@ -61,7 +61,7 @@ export default class CacheWorker {
    * as the db might be loading even before it is requested
    * to perform any action
    */
-  private dbPromise: Promise<IDBPDatabase<ICacheDB>> = null;
+  private db: IDBPDatabase<ICacheDB> = null;
   /**
    * Specifies whether a version has been set for this
    * database, setting up the version is necessary to setup
@@ -87,11 +87,26 @@ export default class CacheWorker {
    */
   private blockedCallback: (state: boolean) => void;
 
+  private waitForSetupPromise: Promise<void>;
+  private waitForSetupPromiseResolve: () => void;
+  private resolved: boolean = false;
+
+  public constructor() {
+    this.waitForSetupPromise = new Promise((resolve) => {
+      this.waitForSetupPromiseResolve = () => {
+        if (!this.resolved) {
+          this.resolved = true;
+          resolve();
+        }
+      };
+    });
+  }
+
   /**
    * This actually setups the worker
    * @param version pass the build number here
    */
-  public setupVersion(version: number) {
+  public async setupVersion(version: number) {
     // so if the version has been set, we ignore it
     if (this.versionHasBeenSet) {
       return;
@@ -100,64 +115,82 @@ export default class CacheWorker {
     this.versionHasBeenSet = true;
 
     // now we try to create the promised database
-    this.dbPromise = openDB<ICacheDB>(CACHE_NAME, version, {
-      upgrade: (db) => {
-        try {
-          console.log("CLEARING CACHE DUE TO UPGRADE");
+    let dbPromise: Promise<IDBPDatabase<ICacheDB>>;
+    try {
+      dbPromise = openDB<ICacheDB>(CACHE_NAME, version, {
+        upgrade: (db) => {
           try {
-            db.deleteObjectStore(QUERIES_TABLE_NAME);
-            db.deleteObjectStore(SEARCHES_TABLE_NAME);
+            console.log("CLEARING CACHE DUE TO UPGRADE");
+            try {
+              db.deleteObjectStore(QUERIES_TABLE_NAME);
+              db.deleteObjectStore(SEARCHES_TABLE_NAME);
+            } catch (err) {
+              // No way to know if the store is there
+              // so must catch the error
+            }
+            db.createObjectStore(QUERIES_TABLE_NAME);
+            db.createObjectStore(SEARCHES_TABLE_NAME);
           } catch (err) {
-            // No way to know if the store is there
-            // so must catch the error
+            console.warn(err);
           }
-          db.createObjectStore(QUERIES_TABLE_NAME);
-          db.createObjectStore(SEARCHES_TABLE_NAME);
-        } catch (err) {
-          console.warn(err);
-        }
-        this.isCurrentlyBlocked = false;
-        if (this.blockedCallback) {
-          this.blockedCallback(false);
-        }
-      },
-      blocked: () => {
-        this.isCurrentlyBlocked = true;
-        if (this.blockedCallback) {
-          this.blockedCallback(true);
-        }
-      }
-    });
+          this.isCurrentlyBlocked = false;
+          if (this.blockedCallback) {
+            this.blockedCallback(false);
+          }
 
-    // due to a bug in the indexed db implementation
-    // sometimes the blocked event just doesn't get called
-    // this forces me to somehow botch a blocked event
-    // in order to be able to display the proper notification
-    // because, well, bugs... not a single event will be called
-    // so this is the only possible recourse
-    (async () => {
-      // for that we set a timeout
-      const timeout = setTimeout(() => {
-        // if it takes longer than that, we consider
-        // it blocked
-        this.isCurrentlyBlocked = true;
-        if (this.blockedCallback) {
-          this.blockedCallback(true);
+          this.waitForSetupPromiseResolve();
+        },
+        blocked: () => {
+          console.log("BLOCKED");
+          this.isCurrentlyBlocked = true;
+          if (this.blockedCallback) {
+            this.blockedCallback(true);
+          }
+        },
+        terminated: () => {
+          console.log("TERMINATED");
+          this.db = null;
         }
-      }, 300);
+      });
 
-      // and so we wait for the indexeddb
-      await this.dbPromise;
-      // clear the timeout and hopefully it will make it before
-      clearTimeout(timeout);
-      // if it is blocked then we set it as unblocked
-      if (this.isCurrentlyBlocked) {
-        this.isCurrentlyBlocked = false;
-        if (this.blockedCallback) {
-          this.blockedCallback(false);
+      this.db = await dbPromise;
+
+      // due to a bug in the indexed db implementation
+      // sometimes the blocked event just doesn't get called
+      // this forces me to somehow botch a blocked event
+      // in order to be able to display the proper notification
+      // because, well, bugs... not a single event will be called
+      // so this is the only possible recourse
+      (async () => {
+        // for that we set a timeout
+        const timeout = setTimeout(() => {
+          // if it takes longer than that, we consider
+          // it blocked
+          this.isCurrentlyBlocked = true;
+          if (this.blockedCallback) {
+            this.blockedCallback(true);
+          }
+        }, 300);
+
+        // and so we wait for the indexeddb
+        await dbPromise;
+        // clear the timeout and hopefully it will make it before
+        clearTimeout(timeout);
+        // if it is blocked then we set it as unblocked
+        if (this.isCurrentlyBlocked) {
+          this.isCurrentlyBlocked = false;
+          if (this.blockedCallback) {
+            this.blockedCallback(false);
+          }
         }
-      }
-    })();
+
+        this.waitForSetupPromiseResolve();
+      })();
+    } catch (err) {
+      console.log(err);
+      dbPromise = null;
+      this.waitForSetupPromiseResolve();
+    }
 
     console.log("CACHE SETUP", version);
   }
@@ -186,6 +219,8 @@ export default class CacheWorker {
     searchQueryNameModule?: string,
     searchQueryNameItemDefinition?: string,
   ) {
+    await this.waitForSetupPromise;
+
     const succeed = await this.setCachedValue(
       queryName,
       id,
@@ -198,14 +233,12 @@ export default class CacheWorker {
     }
 
     // so first we await for our database
-    const db = await this.dbPromise;
-    // if we don't have it
-    if (!db) {
+    if (!this.db) {
       return succeed;
     }
 
     try {
-      const allKeys = await db.getAllKeys(SEARCHES_TABLE_NAME);
+      const allKeys = await this.db.getAllKeys(SEARCHES_TABLE_NAME);
       await Promise.all(allKeys.map(async (key) => {
         try {
           const splitted = key.split(".");
@@ -215,11 +248,11 @@ export default class CacheWorker {
             splitted[0] === searchQueryNameModule ||
             splitted[0] === searchQueryNameItemDefinition
           ) {
-            const currentValue: ISearchMatchType = await db.get(SEARCHES_TABLE_NAME, key);
+            const currentValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, key);
             const foundIndex = currentValue.value.findIndex((v) => v.id === id && v.type === type);
             if (foundIndex !== -1) {
               currentValue.value.splice(foundIndex, 1);
-              await db.put(SEARCHES_TABLE_NAME, currentValue, key);
+              await this.db.put(SEARCHES_TABLE_NAME, currentValue, key);
             }
           }
         } catch (err) {
@@ -259,10 +292,10 @@ export default class CacheWorker {
       console.log("REQUESTED TO STORE", queryName, id, version, partialValue);
     }
 
+    await this.waitForSetupPromise;
+
     // so first we await for our database
-    const db = await this.dbPromise;
-    // if we don't have it
-    if (!db) {
+    if (!this.db) {
       // what gives, we return
       return false;
     }
@@ -277,7 +310,7 @@ export default class CacheWorker {
         value: partialValue,
         fields: partialFields,
       };
-      await db.put(QUERIES_TABLE_NAME, idbNewValue, queryIdentifier);
+      await this.db.put(QUERIES_TABLE_NAME, idbNewValue, queryIdentifier);
     } catch (err) {
       console.warn(err);
       return false;
@@ -300,10 +333,10 @@ export default class CacheWorker {
   ): Promise<boolean> {
     console.log("REQUESTED TO DELETE", queryName, id, version);
 
-    // so first we await for our database
-    const db = await this.dbPromise;
+    await this.waitForSetupPromise;
+
     // if we don't have it
-    if (!db) {
+    if (!this.db) {
       // what gives, we return
       return false;
     }
@@ -311,7 +344,7 @@ export default class CacheWorker {
     const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
 
     try {
-      await db.delete(QUERIES_TABLE_NAME, queryIdentifier);
+      await this.db.delete(QUERIES_TABLE_NAME, queryIdentifier);
     } catch (err) {
       console.warn(err);
       return false;
@@ -382,16 +415,10 @@ export default class CacheWorker {
       console.log("CACHED QUERY REQUESTED", queryName, id, version, requestedFields);
     }
 
-    // so we fetch our db like usual
-    let db: IDBPDatabase<ICacheDB>;
-    try {
-      db = await this.dbPromise;
-    } catch (err) {
-      console.warn(err);
-    }
+    await this.waitForSetupPromise;
 
     // if we don't have a database no match
-    if (!db) {
+    if (!this.db) {
       return null;
     }
 
@@ -399,7 +426,7 @@ export default class CacheWorker {
     const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
     try {
       // and we attempt to get the value from the database
-      const idbValue: ICacheMatchType = await db.get(QUERIES_TABLE_NAME, queryIdentifier);
+      const idbValue: ICacheMatchType = await this.db.get(QUERIES_TABLE_NAME, queryIdentifier);
       // if we found a value, in this case a null value means
       // no match
       if (idbValue) {
@@ -437,15 +464,10 @@ export default class CacheWorker {
     newLastRecord: IGQLSearchResult,
     cachePolicy: "by-owner" | "by-parent",
   ): Promise<boolean> {
+    await this.waitForSetupPromise;
+  
     // so we fetch our db like usual
-    let db: IDBPDatabase<ICacheDB>;
-    try {
-      db = await this.dbPromise;
-    } catch (err) {
-      console.warn(err);
-    }
-
-    if (!db) {
+    if (!this.db) {
       return false;
     }
 
@@ -459,8 +481,8 @@ export default class CacheWorker {
     // So we say that not all results are preloaded so that when the next iteration of the
     // search notices (which should be executed shortly afterwards, then the new records are loaded)
     try {
-      const currentValue: ISearchMatchType = await db.get(SEARCHES_TABLE_NAME, storeKeyName);
-      await db.put(SEARCHES_TABLE_NAME, {
+      const currentValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      await this.db.put(SEARCHES_TABLE_NAME, {
         ...currentValue,
         lastRecord: newLastRecord,
         value: currentValue.value.concat(newIds),
@@ -482,15 +504,9 @@ export default class CacheWorker {
     getListRequestedFields: IGQLRequestFields,
     cachePolicy: "by-owner" | "by-parent",
   ): Promise<ICachedSearchResult> {
-    // so we fetch our db like usual
-    let db: IDBPDatabase<ICacheDB>;
-    try {
-      db = await this.dbPromise;
-    } catch (err) {
-      console.warn(err);
-    }
+    await this.waitForSetupPromise;
 
-    if (!db) {
+    if (!this.db) {
       return null;
     }
 
@@ -516,7 +532,7 @@ export default class CacheWorker {
 
     try {
       // now we request indexed db for a result
-      const dbValue: ISearchMatchType = await db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      const dbValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
       // if the database is not offering anything
       if (!dbValue) {
         // we need to remove the specifics of the search
@@ -599,7 +615,7 @@ export default class CacheWorker {
           const gqlValue: IGQLEndpointValue = {
             data: {
               [searchQueryName]: {
-                ids: await search(this.rootProxy, db, resultsToProcess, searchArgs),
+                ids: await search(this.rootProxy, this.db, resultsToProcess, searchArgs),
                 last_record: lastRecord,
               },
             },
@@ -650,7 +666,7 @@ export default class CacheWorker {
     // and assign the value (maybe again) with the results, the fields we are supposed
     // to have contained within all the fetched batches at the end and say
     // false to preloaded because we haven't preloaded anything
-    await db.put(SEARCHES_TABLE_NAME, {
+    await this.db.put(SEARCHES_TABLE_NAME, {
       value: resultsToProcess,
       fields: resultingGetListRequestedFields,
       allResultsPreloaded: false,
@@ -814,8 +830,8 @@ export default class CacheWorker {
       // will in turn go to the 1,2,3,4,5 results and remove the 5 key from the list
       // so using resultsToProcess variable could be wrong as that would contain
       // 1,2,3,4,5
-      const actualCurrentSearchValue: ISearchMatchType = await db.get(SEARCHES_TABLE_NAME, storeKeyName);
-      await db.put(SEARCHES_TABLE_NAME, {
+      const actualCurrentSearchValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      await this.db.put(SEARCHES_TABLE_NAME, {
         ...actualCurrentSearchValue,
         allResultsPreloaded: true,
       }, storeKeyName);
@@ -826,7 +842,7 @@ export default class CacheWorker {
       const gqlValue: IGQLEndpointValue = {
         data: {
           [searchQueryName]: {
-            ids: await search(this.rootProxy, db, actualCurrentSearchValue.value, searchArgs),
+            ids: await search(this.rootProxy, this.db, actualCurrentSearchValue.value, searchArgs),
           },
         },
       };
