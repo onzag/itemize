@@ -49,6 +49,9 @@ export interface ISensitiveConfigOpenstackContainerType {
 
 export interface ISensitiveConfigRawJSONDataType {
   ipStackAccessKey: string;
+  ipStackHttpsEnabled: boolean;
+  currencyLayerAccessKey: string;
+  currencyLayerHttpsEnabled: boolean;
   hereAppID: string;
   hereAppCode: string;
   openstackContainers: {
@@ -96,6 +99,22 @@ export const rawSensitiveConfigSchema = {
           "type": "null"
         }
       ],
+    },
+    ipStackHttpsEnabled: {
+      type: "boolean",
+    },
+    currencyLayerAccessKey: {
+      anyOf: [
+        {
+          "type": "string",
+        },
+        {
+          "type": "null"
+        }
+      ],
+    },
+    currencyLayerHttpsEnabled: {
+      type: "boolean",
     },
     hereAppID: {
       anyOf: [
@@ -206,6 +225,9 @@ export const rawSensitiveConfigSchema = {
   additionalProperties: false,
   required: [
     "ipStackAccessKey",
+    "ipStackHttpsEnabled",
+    "currencyLayerAccessKey",
+    "currencyLayerHttpsEnabled",
     "hereAppID",
     "hereAppCode",
     "mailgunAPIKey",

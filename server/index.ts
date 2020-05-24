@@ -8,7 +8,7 @@ import resolvers from "./resolvers";
 import { getGQLSchemaForRoot, IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
 import Knex from "knex";
 import { types } from "pg";
-import { MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS } from "../constants";
+import { MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS, SERVER_DATA_IDENTIFIER } from "../constants";
 import { GraphQLError } from "graphql";
 import { EndpointError, EndpointErrorType } from "../base/errors";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -36,12 +36,13 @@ import { promisify } from "util";
 import winston from "winston";
 import "winston-daily-rotate-file";
 import build from "../dbbuilder";
+import { GlobalManager } from "./global-manager";
 
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const PORT = process.env.PORT || 8000;
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
-const INSTANCE_MODE: "MANAGER" | "MANAGER_EXCLUSIVE" | "EXTENDED" | "BUILD_DATABASE" = process.env.INSTANCE_MODE || "MANAGER" as any;
+const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 
 // building the logger
@@ -107,6 +108,12 @@ export interface IAppDataType {
   mailgun: Mailgun.Mailgun;
   pkgcloudStorageClients: PkgCloudClients;
   pkgcloudUploadContainers: PkgCloudContainers;
+}
+
+export interface IServerDataType {
+  CURRENCY_FACTORS: {
+    [usdto: string]: number;
+  }
 }
 
 export interface IServerCustomizationDataType {
@@ -404,26 +411,32 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     );
 
     logger.info(
-      "initializeServer: initializing redis pub/sub client",
+      INSTANCE_MODE === "GLOBAL_MANAGER" ?
+        "initializeServer: initializing redis global pub client" :
+        "initializeServer: initializing redis global pub/sub client",
     );
     const redisPub: RedisClient = redis.createClient(redisConfig.pubSub);
-    const redisSub: RedisClient = redis.createClient(redisConfig.pubSub);
+    const redisSub: RedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis.createClient(redisConfig.pubSub);
 
-    logger.info(
-      "initializeServer: initializing local redis pub/sub client",
-    );
-    const redisLocalPub: RedisClient = redis.createClient(redisConfig.cache);
-    const redisLocalSub: RedisClient = redis.createClient(redisConfig.cache);
-
-    logger.info(
-      "initializeServer: initializing redis cache client",
-    );
-    const redisClient: RedisClient = redis.createClient(redisConfig.cache);
-
-    if (INSTANCE_MODE === "MANAGER_EXCLUSIVE") {
-      const cache = new Cache(redisClient, null, null, null);
+    if (INSTANCE_MODE !== "GLOBAL_MANAGER") {
       logger.info(
-        "initializeServer: server initialized in manager exclusive mode flushing redis",
+        "initializeServer: initializing local redis pub/sub client",
+      );
+    }
+    const redisLocalPub: RedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis.createClient(redisConfig.cache);
+    const redisLocalSub: RedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis.createClient(redisConfig.cache);
+
+    if (INSTANCE_MODE !== "GLOBAL_MANAGER") {
+      logger.info(
+        "initializeServer: initializing redis cache client",
+      );
+    }
+    const redisClient: RedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis.createClient(redisConfig.cache);
+
+    if (INSTANCE_MODE === "CLUSTER_MANAGER") {
+      const cache = new Cache(redisClient, null, null, null, null);
+      logger.info(
+        "initializeServer: server initialized in cluster manager exclusive mode flushing redis",
       );
 
       const flushAllPromisified = promisify(redisClient.flushall).bind(redisClient);
@@ -472,6 +485,17 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       connection: dbConnectionKnexConfig,
     });
 
+    if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
+      logger.info(
+        "initializeServer: setting up global manager",
+      );
+      const manager = new GlobalManager(root, knex, redisGlobalClient, redisPub, sensitiveConfig);
+      manager.run();
+      if (INSTANCE_MODE === "GLOBAL_MANAGER") {
+        return;
+      }
+    }
+
     PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
 
     // due to a bug in the types the create client function is missing
@@ -502,11 +526,36 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
         await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName);
     }));
 
+    // RETRIEVING INITIAL SERVER DATA
+    logger.info(
+      "initializeServer: attempting to retrieve server data",
+    );
+    const getPromisified = promisify(redisGlobalClient.get).bind(redisGlobalClient);
+    const wait = (time: number) => {
+      return new Promise((resolve) => {
+        setTimeout(resolve, time);
+      });
+    }
+    let serverData: IServerDataType = null;
+    while (serverData === null) {
+      logger.info(
+        "initializeServer: waiting one second",
+      );
+      await wait(1000);
+      const serverDataStr = await getPromisified(SERVER_DATA_IDENTIFIER) || null;
+      if (!serverDataStr) {
+        logger.info(
+          "initializeServer: server data not available, is global cache and global manager running?",
+        );
+      } else {
+        serverData = JSON.parse(serverDataStr);
+      }
+    }
     
     logger.info(
       "initializeServer: initializing cache instance",
     );
-    const cache = new Cache(redisClient, knex, pkgcloudUploadContainers, root);
+    const cache = new Cache(redisClient, knex, pkgcloudUploadContainers, root, serverData);
     logger.info(
       "initializeServer: creating server",
     );
@@ -533,7 +582,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       );
     }
     const ipStack = sensitiveConfig.ipStackAccessKey ?
-      setupIPStack(sensitiveConfig.ipStackAccessKey) :
+      setupIPStack(sensitiveConfig.ipStackAccessKey, !!sensitiveConfig.ipStackHttpsEnabled) :
       null;
 
     if (sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain && sensitiveConfig.mailgunAPIHost) {
@@ -593,9 +642,9 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       "initializeServer: INSTANCE_GROUP_ID is " + INSTANCE_GROUP_ID,
     );
 
-    if (INSTANCE_MODE === "MANAGER") {
+    if (INSTANCE_MODE === "ABSOLUTE") {
       logger.info(
-        "initializeServer: server initialized in manager mode flushing redis",
+        "initializeServer: server initialized in absolute mode flushing redis",
       );
 
       const flushAllPromisified = promisify(appData.redis.flushall).bind(appData.redis);

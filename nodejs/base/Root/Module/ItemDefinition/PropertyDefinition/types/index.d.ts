@@ -133,6 +133,19 @@ export interface IPropertyDefinitionSupportedType {
      */
     sqlLocalEqual: (value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, data: ISQLTableRowValue) => boolean;
     /**
+     * SQL Row mantenience which runs every so often as defined
+     * by the mantenience protocol where row is the entire row
+     * and it expects a partial value, this value should be null
+     * for fields without mantenience
+     */
+    sqlMantenience: (sqlPrefix: string, id: string, knex: Knex) => {
+        columnToSetRaw: Knex.Raw;
+        setColumnToRaw: Knex.Raw;
+        fromListRaw: Knex.Raw;
+        whereRaw: Knex.Raw;
+        updateConditionRaw: Knex.Raw;
+    };
+    /**
      * Simply compare two values of the same type, this
      * is used for differing properties so it might differ
      * from the sql behaviour

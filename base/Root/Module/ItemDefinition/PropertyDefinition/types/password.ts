@@ -100,6 +100,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
     return bcyrpt.compareSync(value, data[sqlPrefix + id]);
   },
+  sqlMantenience: null,
   // validates just the length
   validate: (s: PropertyDefinitionSupportedPasswordType) => {
     if (typeof s !== "string") {

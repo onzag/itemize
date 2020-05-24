@@ -22,6 +22,23 @@ async function sensitiveConfigSetup(version, currentConfig, referenceConfig, pac
             nullifyFalseValues: true,
         },
         {
+            variableName: "ipStackHttpsEnabled",
+            message: "True when your subscription plan supports https, otherwise false",
+            defaultValue: false,
+        },
+        {
+            variableName: "currencyLayerAccessKey",
+            message: "A currency layer access key for currency usage get one at https://currencylayer.com/",
+            defaultValue: "",
+            hidden: true,
+            nullifyFalseValues: true,
+        },
+        {
+            variableName: "currencyLayerHttpsEnabled",
+            message: "True when your subscription plan supports https, otherwise false",
+            defaultValue: false,
+        },
+        {
             variableName: "hereAppID",
             message: "Used in order to be able to type addresses and get locations get the ID and code at https://developer.here.com/",
             defaultValue: "",

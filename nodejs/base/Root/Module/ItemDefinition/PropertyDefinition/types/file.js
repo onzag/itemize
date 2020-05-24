@@ -56,6 +56,7 @@ const typeValue = {
     sqlLocalEqual: () => {
         throw new Error("Attempted to local equal within a file");
     },
+    sqlMantenience: null,
     localEqual: local_sql_1.standardLocalEqual,
     i18n: {
         base: constants_1.CLASSIC_BASE_I18N,

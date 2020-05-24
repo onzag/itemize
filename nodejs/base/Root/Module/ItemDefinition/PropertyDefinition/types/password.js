@@ -71,6 +71,7 @@ const typeValue = {
         }
         return bcrypt_1.default.compareSync(value, data[sqlPrefix + id]);
     },
+    sqlMantenience: null,
     // validates just the length
     validate: (s) => {
         if (typeof s !== "string") {

@@ -96,6 +96,7 @@ const typeValue = {
             ]);
         }
     },
+    sqlMantenience: null,
     localSearch: (args, rawData, id, includeId) => {
         // item is deleted
         if (!rawData) {

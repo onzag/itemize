@@ -988,3 +988,11 @@ export const UNSPECIFIED_OWNER = -1;
 export const PROTECTED_RESOURCES = [
   "/build.development.js",
 ]
+
+export const SERVER_DATA_IDENTIFIER = "SERVER_DATA";
+
+export const CURRENCY_FACTORS_IDENTIFIER = "CURRENCY_FACTORS"
+
+export const WAIT_TIME_PER_BATCH = 300000;
+
+export const SERVER_DATA_MIN_UPDATE_TIME = 259200000;

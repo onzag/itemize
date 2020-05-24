@@ -49,6 +49,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlSearch: standardSQLSearchFnExactAndRange,
   sqlEqual: standardSQLEqualFn,
   sqlLocalEqual: standardSQLLocalEqualFn,
+  sqlMantenience: null,
 
   localSearch: dateLocalSearchExactAndRange.bind(null, TIME_FORMAT),
   localEqual: standardLocalEqual,

@@ -9,7 +9,7 @@ import {
   IPropertyDefinitionSupportedType,
 } from "../types";
 import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
-import { PropertyInvalidReason } from "../../PropertyDefinition";
+import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_SUPPORTED_REAL,
   CLASSIC_BASE_I18N,
@@ -19,6 +19,7 @@ import {
   CLASSIC_SEARCH_RANGED_I18N,
   CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
   INCLUDE_PREFIX,
+  CURRENCY_FACTORS_IDENTIFIER,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
@@ -31,6 +32,7 @@ import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 export interface IPropertyDefinitionSupportedCurrencyType {
   value: number;
   currency: string;
+  normalized: number;
 }
 
 /**
@@ -45,11 +47,15 @@ const typeValue: IPropertyDefinitionSupportedType = {
     currency: {
       type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
+    normalized: {
+      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
+    },
   },
   sql: (sqlPrefix, id) => {
     return {
       [sqlPrefix + id + "_VALUE"]: {type: "float"},
       [sqlPrefix + id + "_CURRENCY"]: {type: "text"},
+      [sqlPrefix + id + "_NORMALIZED_VALUE"]: {type: "float"},
     };
   },
   sqlIn: (value: IPropertyDefinitionSupportedCurrencyType, sqlPrefix: string, id: string) => {
@@ -57,18 +63,21 @@ const typeValue: IPropertyDefinitionSupportedType = {
       return {
         [sqlPrefix + id + "_VALUE"]: null,
         [sqlPrefix + id + "_CURRENCY"]: null,
+        [sqlPrefix + id + "_NORMALIZED_VALUE"]: null,
       };
     }
 
     return {
       [sqlPrefix + id + "_VALUE"]: value.value,
       [sqlPrefix + id + "_CURRENCY"]: value.currency,
+      [sqlPrefix + id + "_NORMALIZED_VALUE"]: value.normalized,
     };
   },
-  sqlOut: (data: {[key: string]: any}, sqlPrefix: string, id: string) => {
+  sqlOut: (data: ISQLTableRowValue, sqlPrefix: string, id: string) => {
     const result: IPropertyDefinitionSupportedCurrencyType = {
       value: data[sqlPrefix + id + "_VALUE"],
       currency: data[sqlPrefix + id + "_CURRENCY"],
+      normalized: data[sqlPrefix + id + "_NORMALIZED_VALUE"],
     };
     if (result.value === null) {
       return null;
@@ -90,14 +99,29 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     if (typeof args[fromName] !== "undefined" && args[fromName] !== null) {
       const fromArg = args[fromName] as IGQLArgs;
-      knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", fromArg.currency as string);
-      knexBuilder.andWhere(sqlPrefix + id + "_VALUE", ">=", fromArg.value as number);
+      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", ">=", fromArg.normalized as number);
     }
 
     if (typeof args[toName] !== "undefined" && args[toName] !== null) {
       const toArg = args[toName] as IGQLArgs;
-      knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", toArg.currency as string);
-      knexBuilder.andWhere(sqlPrefix + id + "_VALUE", "<=", toArg.value as number);
+      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", toArg.normalized as number);
+    }
+  },
+  sqlMantenience: (
+    sqlPrefix: string,
+    id: string,
+    knex: Knex,
+  ) => {
+    const valueId = sqlPrefix + id + "_VALUE";
+    const normalizedValueId = sqlPrefix + id + "_CURRENCY";
+    const currencyId = sqlPrefix + id + "_NORMALIZED_VALUE";
+    const asConversionRule = sqlPrefix + id + "_CURRENCY_FACTORS";
+    return {
+      columnToSetRaw: knex.raw("??", [normalizedValueId]),
+      setColumnToRaw: knex.raw("??*??.??", [valueId, asConversionRule, "factor"]),
+      fromListRaw: knex.raw("?? ??", [CURRENCY_FACTORS_IDENTIFIER, asConversionRule]),
+      whereRaw: knex.raw("??.?? = ??", [asConversionRule, "name", currencyId]),
+      updateConditionRaw: knex.raw("??*??.?? > 0.5", [valueId, asConversionRule, "factor"])
     }
   },
   localSearch: (
@@ -140,15 +164,21 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
       conditions.push(
-        propertyValue.value >= usefulArgs[fromName].value &&
-        propertyValue.currency === usefulArgs[fromName].currency,
+        propertyValue.normalized >= usefulArgs[fromName].normalized ||
+        (
+          propertyValue.currency === usefulArgs[fromName].currency &&
+          propertyValue.value >= usefulArgs[fromName].value
+        ),
       );
     }
 
     if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
       conditions.push(
-        propertyValue.value <= usefulArgs[toName].value &&
-        propertyValue.currency === usefulArgs[toName].currency,
+        propertyValue.normalized <= usefulArgs[toName].normalized ||
+        (
+          propertyValue.currency === usefulArgs[fromName].currency &&
+          propertyValue.value <= usefulArgs[fromName].value
+        ),
       );
     }
 
@@ -206,12 +236,19 @@ const typeValue: IPropertyDefinitionSupportedType = {
     return a.value === b.value && a.currency === b.currency;
   },
   validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
-    if (typeof l.value !== "number" ||
-      typeof l.currency !== "string") {
+    if (
+      typeof l.value !== "number" ||
+      typeof l.currency !== "string" ||
+      typeof l.normalized !== "number"
+    ) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 
     if (isNaN(l.value)) {
+      return PropertyInvalidReason.INVALID_VALUE;
+    }
+
+    if (isNaN(l.normalized)) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 
@@ -220,9 +257,13 @@ const typeValue: IPropertyDefinitionSupportedType = {
     } else if (l.value < 0) {
       return PropertyInvalidReason.TOO_SMALL;
     }
+    const currencyData = currencies[l.currency];
+
+    if (!currencyData) {
+      return PropertyInvalidReason.INVALID_VALUE;
+    }
 
     const splittedDecimals = l.value.toString().split(".");
-    const currencyData = currencies[l.currency];
     const currencyDefinitionDecimals = currencyData.decimals;
     if (!splittedDecimals[1] ||
       splittedDecimals[1].length <= currencyDefinitionDecimals) {

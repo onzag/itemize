@@ -33,11 +33,12 @@ class Cache {
      * @param knex the knex instance
      * @param root the root of itemize
      */
-    constructor(redisClient, knex, uploadsContainers, root) {
+    constructor(redisClient, knex, uploadsContainers, root, initialServerData) {
         this.redisClient = redisClient;
         this.knex = knex;
         this.root = root;
         this.uploadsContainers = uploadsContainers;
+        this.serverData = initialServerData;
     }
     /**
      * Sets the listener for the remote interaction with the clients
@@ -574,6 +575,13 @@ class Cache {
         }));
         return resultValues;
     }
+    getServerData() {
+        return this.serverData;
+    }
+    onServerDataChangeInformed(newData) {
+        _1.logger.debug("Cache.onServerDataChangeInformed: new server data has been informed");
+        this.serverData = newData;
+    }
     /**
      * This function triggers once the remote listener has detected a change that has been done by
      * another server instance to a value that we are supposedly currently holding in memory
@@ -595,8 +603,13 @@ class Cache {
                 });
             }
             else if (value) {
-                // if we have such a value we want to update it
-                this.forceCacheInto(itemDefinition, id, version, data);
+                if (typeof data === "undefined") {
+                    this.requestValue(this.root.registry[itemDefinition], id, version, true);
+                }
+                else {
+                    // if we have such a value we want to update it
+                    this.forceCacheInto(itemDefinition, id, version, data);
+                }
             }
             else if (!value) {
                 // otherwise we ignore everything and simply unregister the event
@@ -607,6 +620,9 @@ class Cache {
                 });
             }
         });
+    }
+    onChangeInformedNoData(itemDefinition, id, version) {
+        this.onChangeInformed(itemDefinition, id, version, undefined);
     }
 }
 exports.Cache = Cache;

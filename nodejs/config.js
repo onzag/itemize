@@ -13,6 +13,22 @@ exports.rawSensitiveConfigSchema = {
                 }
             ],
         },
+        ipStackHttpsEnabled: {
+            type: "boolean",
+        },
+        currencyLayerAccessKey: {
+            anyOf: [
+                {
+                    "type": "string",
+                },
+                {
+                    "type": "null"
+                }
+            ],
+        },
+        currencyLayerHttpsEnabled: {
+            type: "boolean",
+        },
         hereAppID: {
             anyOf: [
                 {
@@ -122,6 +138,9 @@ exports.rawSensitiveConfigSchema = {
     additionalProperties: false,
     required: [
         "ipStackAccessKey",
+        "ipStackHttpsEnabled",
+        "currencyLayerAccessKey",
+        "currencyLayerHttpsEnabled",
         "hereAppID",
         "hereAppCode",
         "mailgunAPIKey",

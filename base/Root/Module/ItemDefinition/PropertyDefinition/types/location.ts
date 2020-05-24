@@ -175,6 +175,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       );
     }
   },
+  sqlMantenience: null,
   localSearch: (
     args: IGQLArgs,
     rawData: IGQLValue,

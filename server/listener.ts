@@ -41,6 +41,7 @@ import {
 import { IGQLSearchResult } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from ".";
+import { SERVER_DATA_IDENTIFIER } from "../constants";
 
 interface IListenerList {
   [socketId: string]: {
@@ -61,10 +62,10 @@ interface IServerListensList {
 // TODO refactor all these methods to be proper objects, this is a mess of arguments
 // do the same in the remote listener in the client side
 
-const INSTANCE_MODE = process.env.INSTANCE_MODE || "MANAGER";
+const INSTANCE_MODE = process.env.INSTANCE_MODE || "ABSOLUTE";
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
 
-const MANAGER_REGISTER_SS = "MANAGER_REGISTER_SS";
+const CLUSTER_MANAGER_REGISTER_SS = "CLUSTER_MANAGER_REGISTER_SS";
 
 export class Listener {
   private listeners: IListenerList = {};
@@ -105,9 +106,10 @@ export class Listener {
     this.pubSubLocalTriggerListeners = this.pubSubLocalTriggerListeners.bind(this);
 
     this.redisSub.on("message", this.pubSubTriggerListeners);
-    if (INSTANCE_MODE === "MANAGER" || INSTANCE_MODE === "MANAGER_EXCLUSIVE") {
+    this.redisSub.subscribe(SERVER_DATA_IDENTIFIER)
+    if (INSTANCE_MODE === "ABSOLUTE" || INSTANCE_MODE === "CLUSTER_MANAGER") {
       this.redisLocalSub.on("message", this.pubSubLocalTriggerListeners);
-      this.redisLocalSub.subscribe(MANAGER_REGISTER_SS);
+      this.redisLocalSub.subscribe(CLUSTER_MANAGER_REGISTER_SS);
     }
 
     if (server === null) {
@@ -200,17 +202,21 @@ export class Listener {
       "Listener.registerSS: Server instance requested subscribe to " + mergedIndexIdentifier,
     );
 
-    if (INSTANCE_MODE !== "MANAGER") {
+    if (INSTANCE_MODE !== "CLUSTER_MANAGER" && INSTANCE_MODE !== "ABSOLUTE") {
       logger.debug(
-        "Listener.registerSS: instance is not manager piping request to manager",
+        "Listener.registerSS: instance is not cluster manager nor absolute piping request to cluster manager",
       );
-      this.redisLocalPub.publish(MANAGER_REGISTER_SS, JSON.stringify(request));
-    } else {
+      this.redisLocalPub.publish(CLUSTER_MANAGER_REGISTER_SS, JSON.stringify(request));
+    } else if (INSTANCE_MODE === "CLUSTER_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
       logger.debug(
-        "Listener.registerSS: performing subscription as manager",
+        "Listener.registerSS: performing subscription as cluster manager",
       );
       this.redisSub.subscribe(mergedIndexIdentifier);
       this.listensSS[mergedIndexIdentifier] = true;
+    } else {
+      logger.debug(
+        "Listener.registerSS: invalid instance attempting a server side registration " + INSTANCE_MODE,
+      );
     }
   }
   public register(
@@ -628,7 +634,12 @@ export class Listener {
       parsedContent,
     );
 
-    // only the manager happens to recieve these
+    if (channel === SERVER_DATA_IDENTIFIER) {
+      this.cache.onServerDataChangeInformed(parsedContent);
+      return;
+    }
+
+    // only the cluster manager and absolute happens to recieve these
     if (this.listensSS[parsedContent.mergedIndexIdentifier]) {
       logger.debug(
         "Listener.pubSubTriggerListeners: our own server is expecting it",
@@ -641,7 +652,11 @@ export class Listener {
         );
       } else {
         const event: IChangedFeedbackEvent = parsedContent.event;
-        this.cache.onChangeInformed(event.itemDefinition, event.id, event.version || null, parsedContent.data);
+        if (typeof parsedContent.data === "undefined") {
+          this.cache.onChangeInformedNoData(event.itemDefinition, event.id, event.version || null);
+        } else {
+          this.cache.onChangeInformed(event.itemDefinition, event.id, event.version || null, parsedContent.data);
+        }
       }
     }
 
@@ -665,7 +680,7 @@ export class Listener {
   ) {
     const parsedContent: IRegisterRequest = JSON.parse(message);
     logger.debug(
-      "Listener.pubSubLocalTriggerListeners: manager recieved register event",
+      "Listener.pubSubLocalTriggerListeners: cluster manager recieved register event",
       parsedContent,
     );
 

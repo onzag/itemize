@@ -50,6 +50,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlEqual: standardSQLEqualFn,
   sqlLocalEqual: standardSQLLocalEqualFn,
   localEqual: standardLocalEqual,
+  sqlMantenience: null,
 
   localSearch: dateLocalSearchExactAndRange.bind(null, DATETIME_FORMAT),
 

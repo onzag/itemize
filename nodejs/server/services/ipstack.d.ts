@@ -5,9 +5,10 @@ interface IPStackItemizeSpecificResponse {
 }
 export declare class IPStack {
     private apiKey;
-    constructor(apiKey: string);
+    private httpsEnabled;
+    constructor(apiKey: string, httpsEnabled: boolean);
     private requestInfoFor;
     requestUserInfoForIp(ip: string, fallback: IPStackItemizeSpecificResponse): Promise<IPStackItemizeSpecificResponse>;
 }
-export declare function setupIPStack(apiKey: string): IPStack;
+export declare function setupIPStack(apiKey: string, httpsEnabled: boolean): IPStack;
 export {};

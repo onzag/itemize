@@ -22,11 +22,15 @@ const typeValue = {
         currency: {
             type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLString),
         },
+        normalized: {
+            type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLString),
+        },
     },
     sql: (sqlPrefix, id) => {
         return {
             [sqlPrefix + id + "_VALUE"]: { type: "float" },
             [sqlPrefix + id + "_CURRENCY"]: { type: "text" },
+            [sqlPrefix + id + "_NORMALIZED_VALUE"]: { type: "float" },
         };
     },
     sqlIn: (value, sqlPrefix, id) => {
@@ -34,17 +38,20 @@ const typeValue = {
             return {
                 [sqlPrefix + id + "_VALUE"]: null,
                 [sqlPrefix + id + "_CURRENCY"]: null,
+                [sqlPrefix + id + "_NORMALIZED_VALUE"]: null,
             };
         }
         return {
             [sqlPrefix + id + "_VALUE"]: value.value,
             [sqlPrefix + id + "_CURRENCY"]: value.currency,
+            [sqlPrefix + id + "_NORMALIZED_VALUE"]: value.normalized,
         };
     },
     sqlOut: (data, sqlPrefix, id) => {
         const result = {
             value: data[sqlPrefix + id + "_VALUE"],
             currency: data[sqlPrefix + id + "_CURRENCY"],
+            normalized: data[sqlPrefix + id + "_NORMALIZED_VALUE"],
         };
         if (result.value === null) {
             return null;
@@ -65,14 +72,25 @@ const typeValue = {
         }
         if (typeof args[fromName] !== "undefined" && args[fromName] !== null) {
             const fromArg = args[fromName];
-            knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", fromArg.currency);
-            knexBuilder.andWhere(sqlPrefix + id + "_VALUE", ">=", fromArg.value);
+            knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", ">=", fromArg.normalized);
         }
         if (typeof args[toName] !== "undefined" && args[toName] !== null) {
             const toArg = args[toName];
-            knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", toArg.currency);
-            knexBuilder.andWhere(sqlPrefix + id + "_VALUE", "<=", toArg.value);
+            knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", toArg.normalized);
         }
+    },
+    sqlMantenience: (sqlPrefix, id, knex) => {
+        const valueId = sqlPrefix + id + "_VALUE";
+        const normalizedValueId = sqlPrefix + id + "_CURRENCY";
+        const currencyId = sqlPrefix + id + "_NORMALIZED_VALUE";
+        const asConversionRule = sqlPrefix + id + "_CURRENCY_FACTORS";
+        return {
+            columnToSetRaw: knex.raw("??", [normalizedValueId]),
+            setColumnToRaw: knex.raw("??*??.??", [valueId, asConversionRule, "factor"]),
+            fromListRaw: knex.raw("?? ??", [constants_1.CURRENCY_FACTORS_IDENTIFIER, asConversionRule]),
+            whereRaw: knex.raw("??.?? = ??", [asConversionRule, "name", currencyId]),
+            updateConditionRaw: knex.raw("??*??.?? > 0.5", [valueId, asConversionRule, "factor"])
+        };
     },
     localSearch: (args, rawData, id, includeId) => {
         // item is deleted
@@ -99,12 +117,14 @@ const typeValue = {
             }
         }
         if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
-            conditions.push(propertyValue.value >= usefulArgs[fromName].value &&
-                propertyValue.currency === usefulArgs[fromName].currency);
+            conditions.push(propertyValue.normalized >= usefulArgs[fromName].normalized ||
+                (propertyValue.currency === usefulArgs[fromName].currency &&
+                    propertyValue.value >= usefulArgs[fromName].value));
         }
         if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
-            conditions.push(propertyValue.value <= usefulArgs[toName].value &&
-                propertyValue.currency === usefulArgs[toName].currency);
+            conditions.push(propertyValue.normalized <= usefulArgs[toName].normalized ||
+                (propertyValue.currency === usefulArgs[fromName].currency &&
+                    propertyValue.value <= usefulArgs[fromName].value));
         }
         if (!conditions.length) {
             return true;
@@ -143,10 +163,14 @@ const typeValue = {
     },
     validate: (l) => {
         if (typeof l.value !== "number" ||
-            typeof l.currency !== "string") {
+            typeof l.currency !== "string" ||
+            typeof l.normalized !== "number") {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
         }
         if (isNaN(l.value)) {
+            return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
+        }
+        if (isNaN(l.normalized)) {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
         }
         if (l.value > constants_1.MAX_SUPPORTED_REAL) {
@@ -155,8 +179,11 @@ const typeValue = {
         else if (l.value < 0) {
             return PropertyDefinition_1.PropertyInvalidReason.TOO_SMALL;
         }
-        const splittedDecimals = l.value.toString().split(".");
         const currencyData = imported_resources_1.currencies[l.currency];
+        if (!currencyData) {
+            return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
+        }
+        const splittedDecimals = l.value.toString().split(".");
         const currencyDefinitionDecimals = currencyData.decimals;
         if (!splittedDecimals[1] ||
             splittedDecimals[1].length <= currencyDefinitionDecimals) {

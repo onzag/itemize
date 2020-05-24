@@ -23,7 +23,7 @@ import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefi
 import { IOwnedSearchRecordsAddedEvent, IParentedSearchRecordsAddedEvent } from "../base/remote-protocol";
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
 import { EndpointError } from "../base/errors";
-import { logger, PkgCloudContainers } from ".";
+import { logger, PkgCloudContainers, IServerDataType } from ".";
 
 const CACHE_EXPIRES_DAYS = 14;
 
@@ -38,6 +38,7 @@ export class Cache {
   private knex: Knex;
   private uploadsContainers: PkgCloudContainers;
   private root: Root;
+  private serverData: IServerDataType;
   private listener: Listener;
 
   /**
@@ -50,11 +51,12 @@ export class Cache {
    * @param knex the knex instance
    * @param root the root of itemize
    */
-  constructor(redisClient: RedisClient, knex: Knex, uploadsContainers: PkgCloudContainers, root: Root) {
+  constructor(redisClient: RedisClient, knex: Knex, uploadsContainers: PkgCloudContainers, root: Root, initialServerData: IServerDataType) {
     this.redisClient = redisClient;
     this.knex = knex;
     this.root = root;
     this.uploadsContainers = uploadsContainers;
+    this.serverData = initialServerData;
   }
   /**
    * Sets the listener for the remote interaction with the clients
@@ -847,6 +849,17 @@ export class Cache {
     return resultValues;
   }
 
+  public getServerData() {
+    return this.serverData;
+  }
+
+  public onServerDataChangeInformed(newData: IServerDataType) {
+    logger.debug(
+      "Cache.onServerDataChangeInformed: new server data has been informed",
+    );
+    this.serverData = newData;
+  }
+
   /**
    * This function triggers once the remote listener has detected a change that has been done by
    * another server instance to a value that we are supposedly currently holding in memory 
@@ -870,8 +883,17 @@ export class Cache {
           },
         );
       } else if (value) {
-        // if we have such a value we want to update it
-        this.forceCacheInto(itemDefinition, id, version, data);
+        if (typeof data === "undefined") {
+          this.requestValue(
+            this.root.registry[itemDefinition] as ItemDefinition,
+            id,
+            version,
+            true,
+          );
+        } else {
+          // if we have such a value we want to update it
+          this.forceCacheInto(itemDefinition, id, version, data);
+        }
       } else if (!value) {
         // otherwise we ignore everything and simply unregister the event
         this.listener.unregisterSS({
@@ -881,5 +903,9 @@ export class Cache {
         });
       }
     });
+  }
+
+  public onChangeInformedNoData(itemDefinition: string, id: number, version: string) {
+    this.onChangeInformed(itemDefinition, id, version, undefined);
   }
 }

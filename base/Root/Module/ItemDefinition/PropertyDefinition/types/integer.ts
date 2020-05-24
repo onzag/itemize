@@ -48,6 +48,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlEqual: standardSQLEqualFn,
   sqlLocalEqual: standardSQLLocalEqualFn,
   localEqual: standardLocalEqual,
+  sqlMantenience: null,
 
   localSearch: standardLocalSearchExactAndRange,
 

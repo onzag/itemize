@@ -36,11 +36,12 @@ const util_1 = require("util");
 const winston_1 = __importDefault(require("winston"));
 require("winston-daily-rotate-file");
 const dbbuilder_1 = __importDefault(require("../dbbuilder"));
+const global_manager_1 = require("./global-manager");
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const PORT = process.env.PORT || 8000;
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
-const INSTANCE_MODE = process.env.INSTANCE_MODE || "MANAGER";
+const INSTANCE_MODE = process.env.INSTANCE_MODE || "ABSOLUTE";
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 // building the logger
 exports.logger = INSTANCE_MODE === "BUILD_DATABASE" ? null : winston_1.default.createLogger({
@@ -311,17 +312,23 @@ async function initializeServer(custom = {}) {
         buildnumber = buildnumber.replace("\n", "").trim();
         exports.logger.info("initializeServer: buildnumber is " + buildnumber);
         exports.logger.info("initializeServer: INSTANCE_MODE is " + INSTANCE_MODE);
-        exports.logger.info("initializeServer: initializing redis pub/sub client");
+        exports.logger.info(INSTANCE_MODE === "GLOBAL_MANAGER" ?
+            "initializeServer: initializing redis global pub client" :
+            "initializeServer: initializing redis global pub/sub client");
         const redisPub = redis_1.default.createClient(redisConfig.pubSub);
-        const redisSub = redis_1.default.createClient(redisConfig.pubSub);
-        exports.logger.info("initializeServer: initializing local redis pub/sub client");
-        const redisLocalPub = redis_1.default.createClient(redisConfig.cache);
-        const redisLocalSub = redis_1.default.createClient(redisConfig.cache);
-        exports.logger.info("initializeServer: initializing redis cache client");
-        const redisClient = redis_1.default.createClient(redisConfig.cache);
-        if (INSTANCE_MODE === "MANAGER_EXCLUSIVE") {
-            const cache = new cache_1.Cache(redisClient, null, null, null);
-            exports.logger.info("initializeServer: server initialized in manager exclusive mode flushing redis");
+        const redisSub = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis_1.default.createClient(redisConfig.pubSub);
+        if (INSTANCE_MODE !== "GLOBAL_MANAGER") {
+            exports.logger.info("initializeServer: initializing local redis pub/sub client");
+        }
+        const redisLocalPub = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis_1.default.createClient(redisConfig.cache);
+        const redisLocalSub = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis_1.default.createClient(redisConfig.cache);
+        if (INSTANCE_MODE !== "GLOBAL_MANAGER") {
+            exports.logger.info("initializeServer: initializing redis cache client");
+        }
+        const redisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis_1.default.createClient(redisConfig.cache);
+        if (INSTANCE_MODE === "CLUSTER_MANAGER") {
+            const cache = new cache_1.Cache(redisClient, null, null, null, null);
+            exports.logger.info("initializeServer: server initialized in cluster manager exclusive mode flushing redis");
             const flushAllPromisified = util_1.promisify(redisClient.flushall).bind(redisClient);
             await flushAllPromisified();
             new listener_1.Listener(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, null, cache, null, null);
@@ -346,6 +353,14 @@ async function initializeServer(custom = {}) {
             debug: process.env.NODE_ENV !== "production",
             connection: dbConnectionKnexConfig,
         });
+        if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
+            exports.logger.info("initializeServer: setting up global manager");
+            const manager = new global_manager_1.GlobalManager(root, knex, redisGlobalClient, redisPub, sensitiveConfig);
+            manager.run();
+            if (INSTANCE_MODE === "GLOBAL_MANAGER") {
+                return;
+            }
+        }
         PropertyDefinition_1.default.indexChecker = server_checkers_1.serverSideIndexChecker.bind(null, knex);
         // due to a bug in the types the create client function is missing
         // domainId and domainName
@@ -368,8 +383,28 @@ async function initializeServer(custom = {}) {
             pkgcloudUploadContainers[containerIdX] =
                 await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName);
         }));
+        // RETRIEVING INITIAL SERVER DATA
+        exports.logger.info("initializeServer: attempting to retrieve server data");
+        const getPromisified = util_1.promisify(redisGlobalClient.get).bind(redisGlobalClient);
+        const wait = (time) => {
+            return new Promise((resolve) => {
+                setTimeout(resolve, time);
+            });
+        };
+        let serverData = null;
+        while (serverData === null) {
+            exports.logger.info("initializeServer: waiting one second");
+            await wait(1000);
+            const serverDataStr = await getPromisified(constants_1.SERVER_DATA_IDENTIFIER) || null;
+            if (!serverDataStr) {
+                exports.logger.info("initializeServer: server data not available, is global cache and global manager running?");
+            }
+            else {
+                serverData = JSON.parse(serverDataStr);
+            }
+        }
         exports.logger.info("initializeServer: initializing cache instance");
-        const cache = new cache_1.Cache(redisClient, knex, pkgcloudUploadContainers, root);
+        const cache = new cache_1.Cache(redisClient, knex, pkgcloudUploadContainers, root, serverData);
         exports.logger.info("initializeServer: creating server");
         const server = http_1.default.createServer(app);
         exports.logger.info("initializeServer: setting up websocket socket.io listener");
@@ -378,7 +413,7 @@ async function initializeServer(custom = {}) {
             exports.logger.info("initializeServer: initializing ipstack connection");
         }
         const ipStack = sensitiveConfig.ipStackAccessKey ?
-            ipstack_1.setupIPStack(sensitiveConfig.ipStackAccessKey) :
+            ipstack_1.setupIPStack(sensitiveConfig.ipStackAccessKey, !!sensitiveConfig.ipStackHttpsEnabled) :
             null;
         if (sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain && sensitiveConfig.mailgunAPIHost) {
             exports.logger.info("initializeServer: initializing mailgun connection");
@@ -424,8 +459,8 @@ async function initializeServer(custom = {}) {
             pkgcloudUploadContainers,
         };
         exports.logger.info("initializeServer: INSTANCE_GROUP_ID is " + INSTANCE_GROUP_ID);
-        if (INSTANCE_MODE === "MANAGER") {
-            exports.logger.info("initializeServer: server initialized in manager mode flushing redis");
+        if (INSTANCE_MODE === "ABSOLUTE") {
+            exports.logger.info("initializeServer: server initialized in absolute mode flushing redis");
             const flushAllPromisified = util_1.promisify(appData.redis.flushall).bind(appData.redis);
             await flushAllPromisified();
         }

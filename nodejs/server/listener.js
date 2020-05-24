@@ -8,11 +8,12 @@ const ItemDefinition_1 = __importDefault(require("../base/Root/Module/ItemDefini
 const remote_protocol_1 = require("../base/remote-protocol");
 const version_null_value_1 = require("./version-null-value");
 const _1 = require(".");
+const constants_1 = require("../constants");
 // TODO refactor all these methods to be proper objects, this is a mess of arguments
 // do the same in the remote listener in the client side
-const INSTANCE_MODE = process.env.INSTANCE_MODE || "MANAGER";
+const INSTANCE_MODE = process.env.INSTANCE_MODE || "ABSOLUTE";
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
-const MANAGER_REGISTER_SS = "MANAGER_REGISTER_SS";
+const CLUSTER_MANAGER_REGISTER_SS = "CLUSTER_MANAGER_REGISTER_SS";
 class Listener {
     constructor(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, root, cache, knex, server) {
         this.listeners = {};
@@ -29,9 +30,10 @@ class Listener {
         this.pubSubTriggerListeners = this.pubSubTriggerListeners.bind(this);
         this.pubSubLocalTriggerListeners = this.pubSubLocalTriggerListeners.bind(this);
         this.redisSub.on("message", this.pubSubTriggerListeners);
-        if (INSTANCE_MODE === "MANAGER" || INSTANCE_MODE === "MANAGER_EXCLUSIVE") {
+        this.redisSub.subscribe(constants_1.SERVER_DATA_IDENTIFIER);
+        if (INSTANCE_MODE === "ABSOLUTE" || INSTANCE_MODE === "CLUSTER_MANAGER") {
             this.redisLocalSub.on("message", this.pubSubLocalTriggerListeners);
-            this.redisLocalSub.subscribe(MANAGER_REGISTER_SS);
+            this.redisLocalSub.subscribe(CLUSTER_MANAGER_REGISTER_SS);
         }
         if (server === null) {
             return;
@@ -102,14 +104,17 @@ class Listener {
     registerSS(request) {
         const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
         _1.logger.debug("Listener.registerSS: Server instance requested subscribe to " + mergedIndexIdentifier);
-        if (INSTANCE_MODE !== "MANAGER") {
-            _1.logger.debug("Listener.registerSS: instance is not manager piping request to manager");
-            this.redisLocalPub.publish(MANAGER_REGISTER_SS, JSON.stringify(request));
+        if (INSTANCE_MODE !== "CLUSTER_MANAGER" && INSTANCE_MODE !== "ABSOLUTE") {
+            _1.logger.debug("Listener.registerSS: instance is not cluster manager nor absolute piping request to cluster manager");
+            this.redisLocalPub.publish(CLUSTER_MANAGER_REGISTER_SS, JSON.stringify(request));
         }
-        else {
-            _1.logger.debug("Listener.registerSS: performing subscription as manager");
+        else if (INSTANCE_MODE === "CLUSTER_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
+            _1.logger.debug("Listener.registerSS: performing subscription as cluster manager");
             this.redisSub.subscribe(mergedIndexIdentifier);
             this.listensSS[mergedIndexIdentifier] = true;
+        }
+        else {
+            _1.logger.debug("Listener.registerSS: invalid instance attempting a server side registration " + INSTANCE_MODE);
         }
     }
     register(socket, request) {
@@ -388,7 +393,11 @@ class Listener {
     pubSubTriggerListeners(channel, message) {
         const parsedContent = JSON.parse(message);
         _1.logger.debug("Listener.pubSubTriggerListeners: received redis event", parsedContent);
-        // only the manager happens to recieve these
+        if (channel === constants_1.SERVER_DATA_IDENTIFIER) {
+            this.cache.onServerDataChangeInformed(parsedContent);
+            return;
+        }
+        // only the cluster manager and absolute happens to recieve these
         if (this.listensSS[parsedContent.mergedIndexIdentifier]) {
             _1.logger.debug("Listener.pubSubTriggerListeners: our own server is expecting it");
             const serverInstanceGroupId = parsedContent.serverInstanceGroupId;
@@ -397,7 +406,12 @@ class Listener {
             }
             else {
                 const event = parsedContent.event;
-                this.cache.onChangeInformed(event.itemDefinition, event.id, event.version || null, parsedContent.data);
+                if (typeof parsedContent.data === "undefined") {
+                    this.cache.onChangeInformedNoData(event.itemDefinition, event.id, event.version || null);
+                }
+                else {
+                    this.cache.onChangeInformed(event.itemDefinition, event.id, event.version || null, parsedContent.data);
+                }
             }
         }
         Object.keys(this.listeners).forEach((socketKey) => {
@@ -411,7 +425,7 @@ class Listener {
     }
     pubSubLocalTriggerListeners(channel, message) {
         const parsedContent = JSON.parse(message);
-        _1.logger.debug("Listener.pubSubLocalTriggerListeners: manager recieved register event", parsedContent);
+        _1.logger.debug("Listener.pubSubLocalTriggerListeners: cluster manager recieved register event", parsedContent);
         this.registerSS(parsedContent);
     }
     removeSocket(socket) {

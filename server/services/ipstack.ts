@@ -1,4 +1,5 @@
 import http from "http";
+import https from "https";
 import { countries } from "../../imported-resources";
 import { logger } from "../";
 
@@ -38,12 +39,14 @@ interface IPStackItemizeSpecificResponse {
 
 export class IPStack {
   private apiKey: string;
-  constructor(apiKey: string) {
+  private httpsEnabled: boolean;
+  constructor(apiKey: string, httpsEnabled: boolean) {
     this.apiKey = apiKey;
+    this.httpsEnabled = httpsEnabled;
   }
   private requestInfoFor(ip: string) {
     return new Promise<IPStackResponse>((resolve, reject) => {
-      http.get(`http://api.ipstack.com/${ip}?access_key=${this.apiKey}`, (resp) => {
+      (this.httpsEnabled ? https : http).get(`http://api.ipstack.com/${ip}?access_key=${this.apiKey}`, (resp) => {
         // let's get the response from the stream
         let data = "";
         resp.on("data", (chunk) => {
@@ -125,6 +128,6 @@ export class IPStack {
   }
 }
 
-export function setupIPStack(apiKey: string) {
-  return new IPStack(apiKey);
+export function setupIPStack(apiKey: string, httpsEnabled: boolean) {
+  return new IPStack(apiKey, httpsEnabled);
 }

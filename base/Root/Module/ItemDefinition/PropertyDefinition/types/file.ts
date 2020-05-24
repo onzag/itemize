@@ -61,6 +61,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlLocalEqual: () => {
     throw new Error("Attempted to local equal within a file");
   },
+  sqlMantenience: null,
   localEqual: standardLocalEqual,
   i18n: {
     base: CLASSIC_BASE_I18N,

@@ -63,11 +63,11 @@ export default async function build(version: string, buildID: string, services: 
 
   let actualServices: string[] = [];
   if (services === "full") {
-    actualServices = ["manager", "servers", "redis", "nginx", "pgsql"];
+    actualServices = ["cluster-manager", "servers", "redis", "nginx", "global-manager", "pgsql"];
   } else if (services === "standard") {
-    actualServices = ["manager", "servers", "redis", "nginx"];
+    actualServices = ["cluster-manager", "servers", "redis", "nginx"];
   } else if (services === "slim") {
-    actualServices = ["manager", "servers", "nginx"];
+    actualServices = ["cluster-manager", "servers", "nginx"];
   } else {
     actualServices = services.split(",");
   }
@@ -127,10 +127,21 @@ export default async function build(version: string, buildID: string, services: 
     "\nthe pub sub is also a centralized database";
   }
 
-  if (actualServices.includes("servers") || actualServices.includes("manager")) {
-    message += "\n\nYou have included servers in your build remember these servers are scalable in order to scale them" +
-    "\nuse the `bash start.sh NUMBER_OF_SCALE` function in order to execute the servers to start, remember to include these" +
-    "\nby running `docker load -i app.tar.gz`";
+  if (actualServices.includes("servers") || actualServices.includes("cluster-manager") || actualServices.includes("global-manager")) {
+    if (actualServices.includes("servers")) {
+      message += "\n\nYou have included servers in your build remember these servers are scalable in order to scale them" +
+      "\nuse the `bash start.sh NUMBER_OF_SCALE` function in order to execute the servers to start, remember to include these" +
+      "\nby running `docker load -i app.tar.gz`";
+    }
+    if (actualServices.includes("cluster-manager")) {
+      message += "\n\nYou have included the cluster manager in your build which is reasonable with any cluster build" +
+      "\nremember to include these by running `docker load -i app.tar.gz`";
+    }
+    if (actualServices.includes("global-manager")) {
+      message += "\n\nYou have included the global manager in your build which is a rare occurrance but expected" +
+      "\nif this is your initial single cluster build or this is your central cluster build, regardless the reason"
+      "\nremember to include these by running `docker load -i app.tar.gz`";
+    }
 
     let npmTokenExists = true;
     try {

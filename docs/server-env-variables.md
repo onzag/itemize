@@ -63,17 +63,21 @@ The mode where this server instance is running, this is because not all server i
 
 ### EXTENDED
 
-The extended mode runs the server and the server only, the extended mode servers are not allowed to listen for registered changes in the local redis cache; rather they will ask their manager to do that for them by sending a local redis pub event informing the manager that they have saved information to the redis database they intend to keep updated.
+The extended mode runs the server and the server only, the extended mode servers are not allowed to listen for registered changes in the local redis cache; rather they will ask their cluster manager to do that for them by sending a local redis pub event informing the cluster manager that they have saved information to the redis database they intend to keep updated.
 
-### MANAGER_EXCLUSIVE
+### CLUSTER_MANAGER
 
-The manager exclusive runs the manager and the manager alone, it doesn't even launch connections to postgreSQL, or would initialize any rest endpoints or API, the manager exclusive recieves pubsub events from the pubsub redis database in order to update its own local redis database, when a manager exclusive instance runs, it wipes its own local redis instance, as it tries to keep track of its cached data in memory.
+The cluster manager runs the cluster manager and the cluster manager alone, it doesn't even launch connections to postgreSQL, or would initialize any rest endpoints or API, the cluster manager recieves pubsub events from the pubsub redis database in order to update its own local redis database, when a cluster manager instance runs, it wipes its own local redis instance, as it tries to keep track of its cached data in memory.
 
 Note that only one manager instace should run at a time, otherwise this will result in useless redis calls and possible data corruption as both instances fight for control of the local redis database.
 
-### MANAGER
+### GLOBAL_MANAGER
 
-The manager is a combination of an extended instance and a manager exclusive instance, not only it manages its local instance, but also performs standard API server logic, this mode is useful when running a dev environment as you want to have as little complexity as possible, even when it doesn't show the reality of a real life cluster where there will be one MANAGER_EXCLUSIVE and as many EXTENDED servers as necessary
+Manager the global manager that connects to postgresql and performs type mantenience tasks, this global manager then sends messages to the cluster managers and extended instances about any updates it has performed to the values in the database, these will in turn keep the users updated, mantaining the realtime of things.
+
+### ABSOLUTE
+
+The absolute is a combination of an extended instance, global manager and cluster manager instance, not only it manages its local instance, but also performs standard API server logic, this mode is useful when running a dev environment as you want to have as little complexity as possible, even when it doesn't show the reality of a real life cluster where there will be one CLUSTER_MANAGER and as many EXTENDED servers as necessary
 
 ### BUILD_DATABASE
 

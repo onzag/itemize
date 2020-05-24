@@ -333,6 +333,11 @@ export default function restServices(appData: IAppDataType) {
     res.end(appData.buildnumber.toString());
   });
 
+  router.get("/currency-factors", (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+    res.end(JSON.stringify(appData.cache.getServerData().CURRENCY_FACTORS));
+  });
+
   // now we add a 404
   router.use((req, res) => {
     res.status(404);

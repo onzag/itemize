@@ -198,6 +198,7 @@ const typeValue = {
         tooLargeErrorInclude: true,
         tooManyDecimalsErrorInclude: true,
     },
+    sqlMantenience: null,
     specialProperties: [
         {
             name: "unit",

@@ -1,6 +1,6 @@
 version: '3.3'
 services: 
-    manager:
+    cluster-manager:
         image: app:latest
         restart: always
         volumes: 
@@ -10,7 +10,7 @@ services:
             - redis
         environment:
             - INSTANCE_GROUP_ID=%{INSTANCE_GROUP_ID}
-            - INSTANCE_MODE=MANAGER_EXCLUSIVE
+            - INSTANCE_MODE=CLUSTER_MANAGER
             - NODE_ENV=%{NODE_ENV}
             - LOG_LEVEL=error
             - USING_DOCKER=true

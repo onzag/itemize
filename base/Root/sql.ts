@@ -7,6 +7,7 @@
 
 import { getSQLTablesSchemaForModule } from "./Module/sql";
 import Root from ".";
+import { CURRENCY_FACTORS_IDENTIFIER } from "../../constants";
 
 /**
  * How a column is to be defined in sql, this is the SQL schema
@@ -120,7 +121,21 @@ export interface ISQLStreamComposedTableRowValue {
  * @returns a total database schema
  */
 export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType {
-  let resultSchema = {};
+  let resultSchema: ISQLSchemaDefinitionType = {
+    [CURRENCY_FACTORS_IDENTIFIER]: {
+      code: {
+        type: "text",
+        index: {
+          id: "code_index",
+          type: "primary",
+          level: 1,
+        },
+      },
+      factor: {
+        type: "float"
+      }
+    }
+  };
   root.getAllModules().forEach((cModule) => {
     // add together the schemas of all the modules
     resultSchema = { ...resultSchema, ...getSQLTablesSchemaForModule(cModule) };

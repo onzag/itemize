@@ -565,3 +565,7 @@ export declare const UNSPECIFIED_OWNER = -1;
  * Resources that are protected from fetching without specifying the devkey
  */
 export declare const PROTECTED_RESOURCES: string[];
+export declare const SERVER_DATA_IDENTIFIER = "SERVER_DATA";
+export declare const CURRENCY_FACTORS_IDENTIFIER = "CURRENCY_FACTORS";
+export declare const WAIT_TIME_PER_BATCH = 300000;
+export declare const SERVER_DATA_MIN_UPDATE_TIME = 259200000;

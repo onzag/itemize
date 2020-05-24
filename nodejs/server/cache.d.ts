@@ -13,7 +13,7 @@ import { IGQLSearchResult, IGQLArgs, IGQLValue } from "../gql-querier";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { Listener } from "./listener";
 import Root from "../base/Root";
-import { PkgCloudContainers } from ".";
+import { PkgCloudContainers, IServerDataType } from ".";
 /**
  * The cache class that provides all the functionality that is
  * specified for the cache package, the cache is more than what
@@ -25,6 +25,7 @@ export declare class Cache {
     private knex;
     private uploadsContainers;
     private root;
+    private serverData;
     private listener;
     /**
      * Builds a new cache instance, before the cache is ready
@@ -36,7 +37,7 @@ export declare class Cache {
      * @param knex the knex instance
      * @param root the root of itemize
      */
-    constructor(redisClient: RedisClient, knex: Knex, uploadsContainers: PkgCloudContainers, root: Root);
+    constructor(redisClient: RedisClient, knex: Knex, uploadsContainers: PkgCloudContainers, root: Root, initialServerData: IServerDataType);
     /**
      * Sets the listener for the remote interaction with the clients
      * that are connected, this listener is what informs the client of updates
@@ -144,6 +145,8 @@ export declare class Cache {
      * @returns a list of whole sql combined table row values
      */
     requestListCache(ids: IGQLSearchResult[]): Promise<ISQLTableRowValue[]>;
+    getServerData(): IServerDataType;
+    onServerDataChangeInformed(newData: IServerDataType): void;
     /**
      * This function triggers once the remote listener has detected a change that has been done by
      * another server instance to a value that we are supposedly currently holding in memory
@@ -153,4 +156,5 @@ export declare class Cache {
      * @param data the entire SQL result
      */
     onChangeInformed(itemDefinition: string, id: number, version: string, data: ISQLTableRowValue): void;
+    onChangeInformedNoData(itemDefinition: string, id: number, version: string): void;
 }

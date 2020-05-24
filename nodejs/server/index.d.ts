@@ -44,6 +44,11 @@ export interface IAppDataType {
     pkgcloudStorageClients: PkgCloudClients;
     pkgcloudUploadContainers: PkgCloudContainers;
 }
+export interface IServerDataType {
+    CURRENCY_FACTORS: {
+        [usdto: string]: number;
+    };
+}
 export interface IServerCustomizationDataType {
     customGQLQueries?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;
     customTokenGQLQueries?: ICustomTokensType;

@@ -270,6 +270,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     tooLargeErrorInclude: true,
     tooManyDecimalsErrorInclude: true,
   },
+  sqlMantenience: null,
 
   specialProperties: [
     {

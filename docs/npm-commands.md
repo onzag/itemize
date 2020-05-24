@@ -48,17 +48,17 @@ The mode needs to be explained in depth
 
 ### full
 
-Same as `manager,servers,redis,nginx,pgsql` includes basically all the services needed for a standalone cluster that needs nothing else but itself, more likely than not either this is the primary cluster where the central database is hosted or is an isolated cluster, eg. say a Chinese cluster; or is some form of development cluster, eg. the staging cluster.
+Same as `cluster-manager,servers,redis,nginx,global-manager,pgsql` includes basically all the services needed for a standalone cluster that needs nothing else but itself, more likely than not either this is the primary cluster where the central database is hosted or is an isolated cluster, eg. say a Chinese cluster; or is some form of development cluster, eg. the staging cluster.
 
 What makes clusters be communicated is the pubsub, global cache and central database; as that means they share the same data.
 
 ### standard
 
-Same as `manager,servers,redis,nginx` a standard cluster build where it includes all it needs to be a single cluster but has no central database, the standard mode to use as there should be a central managed database in your production servers; the redis represents the local cache of the system that is used to speed itself up, in this form it is expected that the global cache and the pubsub are other servers.
+Same as `cluster-manager,servers,redis,nginx` a standard cluster build where it includes all it needs to be a single cluster but has no central database, the standard mode to use as there should be a central managed database in your production servers; the redis represents the local cache of the system that is used to speed itself up, in this form it is expected that the global cache and the pubsub are other servers.
 
 ### slim
 
-Same as `manager,servers,nginx` a slim cluster that doesn't even contain its local redis database, you might want to use this mode if you spawned your local database in some other form.
+Same as `cluster-manager,servers,nginx` a slim cluster that doesn't even contain its local redis database, you might want to use this mode if you spawned your local database in some other form.
 
 ## npm run start-dev-environment [development|staging|production]
 

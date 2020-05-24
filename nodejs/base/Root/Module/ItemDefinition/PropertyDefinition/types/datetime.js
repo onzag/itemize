@@ -30,6 +30,7 @@ const typeValue = {
     sqlEqual: sql_1.standardSQLEqualFn,
     sqlLocalEqual: local_sql_1.standardSQLLocalEqualFn,
     localEqual: local_sql_1.standardLocalEqual,
+    sqlMantenience: null,
     localSearch: local_search_1.dateLocalSearchExactAndRange.bind(null, constants_1.DATETIME_FORMAT),
     validate: (d) => {
         if (d === "Invalid Date") {
