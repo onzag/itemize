@@ -153,7 +153,8 @@ export interface IItemDefinitionRawJSONDataType {
      */
     ownerIsObjectId?: boolean;
     /**
-     * Whether the item is searchable
+     * Whether the item definition is searchable, when a module is searchable
+     * and the item definition is not, the module precedes
      */
     searchable?: boolean;
     /**

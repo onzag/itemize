@@ -10,7 +10,7 @@ import { ENDPOINT_ERRORS } from "./constants";
  * on the ID_CONTAINER in the graphql types
  * that graphql returns
  */
-export interface IGQLSearchResult {
+export interface IGQLSearchMatch {
   type: string;
   id: number;
   version: string;
@@ -66,7 +66,7 @@ export interface IGQLRequestFields {
 /**
  * Single arg, can take many shapes
  */
-type GQLArg = boolean | string | number | null | GQLRaw | GQLEnum | GQLVar | IGQLFile | IGQLSearchResult | IGQLArgs;
+type GQLArg = boolean | string | number | null | GQLRaw | GQLEnum | GQLVar | IGQLFile | IGQLSearchMatch | IGQLArgs;
 
 /**
  * The args field
@@ -78,7 +78,7 @@ export interface IGQLArgs {
 /**
  * A grapqhl single value
  */
-type GQLValue = boolean | string | number | null | IGQLSearchResult | IGQLValue;
+type GQLValue = boolean | string | number | null | IGQLSearchMatch | IGQLValue;
 
 /**
  * A graphql many value

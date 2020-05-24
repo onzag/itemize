@@ -10,7 +10,7 @@ import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
 } from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Include";
-import { IModuleRawJSONDataType, IRawJSONI18NDataType } from "../base/Root/Module";
+import { IModuleRawJSONDataType, IRawJSONI18NDataType, IRequestLimitersType } from "../base/Root/Module";
 import {
   IItemDefinitionRawJSONDataType, IPoliciesRawJSONDataType,
 } from "../base/Root/Module/ItemDefinition";
@@ -86,6 +86,9 @@ interface IFileModuleDataRawUntreatedJSONDataType {
   children: string[];
   readRoleAccess?: string[];
   searchable?: boolean;
+  maxTraditionalSearchResults?: number;
+  maxSearchMatchResults?: number;
+  requestLimiters?: IRequestLimitersType;
 }
 
 /**
@@ -523,6 +526,18 @@ async function buildModule(
 
   if (actualEvaledFileData.readRoleAccess) {
     finalValue.readRoleAccess = actualEvaledFileData.readRoleAccess;
+  }
+
+  if (typeof actualEvaledFileData.maxSearchMatchResults !== "undefined") {
+    finalValue.maxSearchMatchResults = actualEvaledFileData.maxSearchMatchResults;
+  }
+
+  if (typeof actualEvaledFileData.maxTraditionalSearchResults !== "undefined") {
+    finalValue.maxTraditionalSearchResults = actualEvaledFileData.maxTraditionalSearchResults;
+  }
+
+  if (actualEvaledFileData.requestLimiters) {
+    finalValue.requestLimiters = actualEvaledFileData.requestLimiters;
   }
 
   // and return the final value

@@ -9,6 +9,23 @@ import { getSQLTablesSchemaForModule } from "./Module/sql";
 import Root from ".";
 import { CURRENCY_FACTORS_IDENTIFIER } from "../../constants";
 
+export interface ISQLTableIndexType {
+  /**
+   * The id of the index in order to perform double table indexes
+   */
+  id: string,
+  /**
+   * The type of the index, unique, gin, btree...
+   */
+  type: string,
+  /**
+   * The index level a numeric value to sort it as, the level
+   * makes the order of columns in the key which might have
+   * performance effects
+   */
+  level: number,
+}
+
 /**
  * How a column is to be defined in sql, this is the SQL schema
  */
@@ -56,22 +73,7 @@ export interface ISQLColumnDefinitionType {
      */
     level: number;
   };
-  index?: {
-    /**
-     * The id of the index in order to perform double table indexes
-     */
-    id: string,
-    /**
-     * The type of the index, unique, gin, btree...
-     */
-    type: string,
-    /**
-     * The index level a numeric value to sort it as, the level
-     * makes the order of columns in the key which might have
-     * performance effects
-     */
-    level: number,
-  };
+  index?: ISQLTableIndexType;
   /**
    * An optional extension that is required for this
    * type in order to function properly

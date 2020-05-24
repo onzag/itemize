@@ -17,14 +17,86 @@ const sql_2 = require("./ItemDefinition/sql");
  * @returns a whole table schema for the module table
  */
 function getSQLTableDefinitionForModule(mod) {
+    // first we need to calculate the initial combined and added indexes
+    // these are the indexes that get added to the standard module fields
+    // we don't want indexes that won't be used in search so we want to check
+    // what the rules are regarding the added indexes in the limiters
+    const initialCombinedIndexes = [];
+    const initialAddedIndexes = [];
+    // so we recieve the limiters from the module itself
+    const limiters = mod.getRequestLimiters();
+    // now we need to check if we have an AND type limiter, which creates
+    // combined indexes
+    if (limiters && limiters.condition === "AND") {
+        // if the limiter has a created at factor
+        if (limiters.createdAt) {
+            // we request a combined index on it, created_at goes first
+            initialCombinedIndexes.push("created_at");
+        }
+        // if the limitr has a created_by
+        if (limiters.createdBy) {
+            initialCombinedIndexes.push("created_by");
+        }
+        // for the partent that one comes last
+        if (limiters.parenting) {
+            initialCombinedIndexes.push("parent_id");
+            initialCombinedIndexes.push("parent_version");
+            initialCombinedIndexes.push("parent_type");
+        }
+    }
+    else if (limiters) {
+        // now we add OR type limiters, these are basically
+        // independent so the order doesn't really matter that
+        // we are adding these
+        if (limiters.createdAt) {
+            initialAddedIndexes.push("created_at");
+        }
+        if (limiters.createdBy) {
+            initialAddedIndexes.push("created_by");
+        }
+        if (limiters.parenting) {
+            initialAddedIndexes.push("parent_id");
+            initialAddedIndexes.push("parent_version");
+            initialAddedIndexes.push("parent_type");
+        }
+    }
     // add all the standard fields
     const resultTableSchema = {
-        ...constants_1.RESERVED_BASE_PROPERTIES_SQL,
+        ...constants_1.RESERVED_BASE_PROPERTIES_SQL(initialCombinedIndexes, initialAddedIndexes),
     };
     // now we loop thru every property (they will all become columns)
     mod.getAllPropExtensions().forEach((pd) => {
         Object.assign(resultTableSchema, sql_1.getSQLTableDefinitionForProperty(pd));
     });
+    // now we need to add indexes to custom rules
+    if (limiters && limiters.custom) {
+        // if we have a powerful AND limiter
+        if (limiters.condition === "AND") {
+            // we need to offset to the index that we have currently added
+            // these might be zero
+            let indexCombinedOffset = initialCombinedIndexes.length;
+            // now we loop over the rows we plan to index
+            limiters.custom.forEach((columnName, index) => {
+                resultTableSchema[columnName].index = {
+                    id: constants_1.COMBINED_INDEX,
+                    type: "btree",
+                    level: indexCombinedOffset + index,
+                };
+            });
+        }
+        else {
+            // otherwise if it's an OR we add these custom singular indexes
+            limiters.custom.forEach((columnName) => {
+                if (!resultTableSchema[columnName].index) {
+                    resultTableSchema[columnName].index = {
+                        id: columnName + "_CUSTOM_INDEX",
+                        type: "btree",
+                        level: 0,
+                    };
+                }
+            });
+        }
+    }
     return resultTableSchema;
 }
 exports.getSQLTableDefinitionForModule = getSQLTableDefinitionForModule;

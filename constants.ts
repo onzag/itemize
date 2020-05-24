@@ -73,7 +73,12 @@ export const MAX_FIELD_SIZE = 1000000; // equivalent to 1MB
  * how many search results can be retrieved at once these are
  * used for the actual search results
  */
-export const MAX_SEARCH_RESULTS_AT_ONCE_LIMIT = 50;
+export const MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK = 50;
+/**
+ * how many search results can be retrieved at once these are
+ * used for the actual search results
+ */
+export const MAX_MATCHED_SEARCH_RESULTS_FALLBACK = 500;
 /**
  * Supported image types
  */
@@ -466,10 +471,18 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   },
 };
 
+export const CREATED_AT_INDEX = "CREATED_AT_INDEX";
+export const CREATED_BY_INDEX = "CREATED_BY_INDEX";
+export const PARENT_INDEX = "PARENT_INDEX";
+export const COMBINED_INDEX = "COMBINED_INDEX";
+
 /**
  * The reserved base properties but in SQL form
  */
-export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
+export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedIndexes: string[]) => ISQLTableDefinitionType = (
+  combinedIndexes: string[],
+  addedIndexes: string[],
+) => ({
   id: {
     type: "serial",
     notNull: true,
@@ -498,12 +511,27 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   },
   parent_id: {
     type: "integer",
+    index: (combinedIndexes.includes("parent_id") || addedIndexes.includes("parent_id")) ? {
+      id: combinedIndexes.includes("parent_id") ? COMBINED_INDEX : PARENT_INDEX,
+      type: "btree",
+      level: combinedIndexes.includes("parent_id") ? combinedIndexes.indexOf("parent_id") : 0,
+    } : null,
   },
   parent_version: {
     type: "string",
+    index: (combinedIndexes.includes("parent_version") || addedIndexes.includes("parent_version")) ? {
+      id: combinedIndexes.includes("parent_version") ? COMBINED_INDEX : PARENT_INDEX,
+      type: "btree",
+      level: combinedIndexes.includes("parent_version") ? combinedIndexes.indexOf("parent_version") : 1,
+    } : null,
   },
   parent_type: {
     type: "string",
+    index: (combinedIndexes.includes("parent_type") || addedIndexes.includes("parent_type")) ? {
+      id: combinedIndexes.includes("parent_type") ? COMBINED_INDEX : PARENT_INDEX,
+      type: "btree",
+      level: combinedIndexes.includes("parent_type") ? combinedIndexes.indexOf("parent_type") : 2,
+    } : null,
   },
   container_id: {
     type: "string",
@@ -512,10 +540,20 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   created_at: {
     type: "datetime",
     notNull: true,
+    index: (combinedIndexes.includes("created_at") || addedIndexes.includes("created_at")) ? {
+      id: combinedIndexes.includes("created_at") ? COMBINED_INDEX : CREATED_AT_INDEX,
+      type: "btree",
+      level: combinedIndexes.includes("created_at") ? combinedIndexes.indexOf("created_at") : 0,
+    } : null,
   },
   created_by: {
     type: "integer",
     notNull: true,
+    index: (combinedIndexes.includes("created_by") || addedIndexes.includes("created_by")) ? {
+      id: combinedIndexes.includes("created_by") ? COMBINED_INDEX : CREATED_BY_INDEX,
+      type: "btree",
+      level: combinedIndexes.includes("created_by") ? combinedIndexes.indexOf("created_by") : 0,
+    } : null,
   },
   edited_at: {
     type: "datetime",
@@ -550,7 +588,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType = {
   flagged_reasons: {
     type: "text[]",
   },
-};
+});
 
 /**
  * The column name of the foreign key that connects the module table
@@ -605,6 +643,10 @@ export const EXCLUSION_STATE_SUFFIX = SUFFIX_BUILD("EXCLUSION_STATE");
  * The prefix used in the graphql endpoint for searches of modules and item definitions
  */
 export const PREFIX_SEARCH = PREFIX_BUILD("SEARCH");
+/**
+ * The prefix used in the graphql endpoint for searches of modules and item definitions in traditional mode
+ */
+export const PREFIX_TRADITIONAL_SEARCH = PREFIX_BUILD("TSEARCH");
 /**
  * The prefix used in the graphql endpoint for getting item definitions
  */
@@ -681,7 +723,7 @@ export const DATE_FORMAT = "YYYY-MM-DD";
  * that make the client able to run requests for a given item id
  * @ignore
  */
-const ID_ELEMENT_FIELDS = {
+const SEARCH_MATCH_FIELDS = {
   id: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
   },
@@ -698,30 +740,39 @@ const ID_ELEMENT_FIELDS = {
 /**
  * The ID element in graphql form
  */
-export const ID_ELEMENT_GQL = GraphQLObjectType && new GraphQLObjectType({
-  name: "ID_ELEMENT",
-  fields: ID_ELEMENT_FIELDS,
+export const SEARCH_MATCH_GQL = GraphQLObjectType && new GraphQLObjectType({
+  name: "SEARCH_MATCH",
+  fields: SEARCH_MATCH_FIELDS,
 });
 /**
  * The ID element as input form
  */
-export const ID_ELEMENT_INPUT_GQL = GraphQLInputObjectType && new GraphQLInputObjectType({
-  name: "ID_ELEMENT_INPUT",
-  fields: ID_ELEMENT_FIELDS,
+export const SEARCH_MATCH_INPUT_GQL = GraphQLInputObjectType && new GraphQLInputObjectType({
+  name: "SEARCH_MATCH_INPUT",
+  fields: SEARCH_MATCH_FIELDS,
 });
 
 /**
  * The id container contains the way that search results are returned
- * with the ids and the last record of the given ids
+ * with the records and the last record of the given records
  */
-export const ID_CONTAINER_GQL = GraphQLObjectType && new GraphQLObjectType({
-  name: "ID_CONTAINER",
+export const SEARCH_RESULTS_CONTAINER_GQL = GraphQLObjectType && new GraphQLObjectType({
+  name: "SEARCH_RESULTS_CONTAINER",
   fields: {
-    ids: {
-      type: GraphQLList && GraphQLList(GraphQLNonNull(ID_ELEMENT_GQL)),
+    records: {
+      type: GraphQLList && GraphQLList(GraphQLNonNull(SEARCH_MATCH_GQL)),
     },
     last_record: {
-      type: ID_ELEMENT_GQL,
+      type: SEARCH_MATCH_GQL,
+    },
+    count: {
+      type: GraphQLNonNull(GraphQLInt),
+    },
+    limit: {
+      type: GraphQLNonNull(GraphQLInt)
+    },
+    offset: {
+      type: GraphQLNonNull(GraphQLInt)
     },
   },
 });
@@ -871,10 +922,10 @@ export const RESERVED_CHANGE_PROPERTIES = {
  */
 export const RESERVED_GETTER_LIST_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
-  ids: {
+  records: {
     // TODO implement the version in retrieving these lists
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLList(ID_ELEMENT_INPUT_GQL)),
-    description: "the ids list for that item",
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLList(SEARCH_MATCH_INPUT_GQL)),
+    description: "the records to fetch for that item",
   },
   created_by: {
     type: GraphQLInt,

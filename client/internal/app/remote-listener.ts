@@ -34,7 +34,7 @@ import {
   IDENTIFIED_EVENT,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
-import { IGQLSearchResult } from "../../../gql-querier";
+import { IGQLSearchMatch } from "../../../gql-querier";
 
 export class RemoteListener {
   private socket: SocketIOClient.Socket;
@@ -48,7 +48,7 @@ export class RemoteListener {
   private ownedSearchListeners: {
     [qualifiedPathNameWithOwnerId: string]: {
       request: IOwnedSearchRegisterRequest;
-      lastKnownRecord: IGQLSearchResult;
+      lastKnownRecord: IGQLSearchMatch;
       callbacks: any[];
     },
   };
@@ -56,7 +56,7 @@ export class RemoteListener {
     [qualifiedPathNameWithOwnerId: string]: {
       request: IParentedSearchRegisterRequest;
       callbacks: any[];
-      lastKnownRecord: IGQLSearchResult;
+      lastKnownRecord: IGQLSearchMatch;
     },
   };
   private delayedFeedbacks: IFeedbackRequest[] = [];
@@ -241,7 +241,7 @@ export class RemoteListener {
   public addOwnedSearchListenerFor(
     itemDefinitionOrModuleQualifiedPathName: string,
     createdBy: number,
-    lastKnownRecord: IGQLSearchResult,
+    lastKnownRecord: IGQLSearchMatch,
     callback: () => any,
   ) {
     if (!this.isReady) {
@@ -271,7 +271,7 @@ export class RemoteListener {
     parentType: string,
     parentId: number,
     parentVersion: string,
-    lastKnownRecord: IGQLSearchResult,
+    lastKnownRecord: IGQLSearchMatch,
     callback: () => any,
   ) {
     if (!this.isReady) {
@@ -572,7 +572,7 @@ export class RemoteListener {
           null,
           null,
           null,
-          event.newIds,
+          event.newRecords,
           event.newLastRecord,
           "by-owner",
         );
@@ -603,7 +603,7 @@ export class RemoteListener {
           event.parentType,
           event.parentId,
           event.parentVersion,
-          event.newIds,
+          event.newRecords,
           event.newLastRecord,
           "by-parent",
         );

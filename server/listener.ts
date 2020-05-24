@@ -38,7 +38,7 @@ import {
   IChangedFeedbackEvent,
   IDENTIFIED_EVENT,
 } from "../base/remote-protocol";
-import { IGQLSearchResult } from "../gql-querier";
+import { IGQLSearchMatch } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from ".";
 import { SERVER_DATA_IDENTIFIER } from "../constants";
@@ -359,7 +359,7 @@ export class Listener {
         const event: IOwnedSearchRecordsAddedEvent = {
           createdBy: request.createdBy,
           qualifiedPathName: request.qualifiedPathName,
-          newIds: newRecords as IGQLSearchResult[],
+          newRecords: newRecords as IGQLSearchMatch[],
           // this contains all the data and the new record has the right form
           newLastRecord: newRecords[0] as any,
         };
@@ -430,7 +430,7 @@ export class Listener {
           parentVersion: request.parentVersion,
           parentType: request.parentType,
           qualifiedPathName: request.qualifiedPathName,
-          newIds: newRecords as IGQLSearchResult[],
+          newRecords: newRecords as IGQLSearchMatch[],
           newLastRecord: newRecords[0] as any,
         };
         logger.debug(

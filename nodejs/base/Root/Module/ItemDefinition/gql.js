@@ -257,8 +257,36 @@ function getGQLQueryFieldsForItemDefinition(itemDefinition, resolvers) {
                     type: graphql_1.GraphQLList(type),
                 },
             },
-            description: "An useless container that graphql requests because graphql doesn't like arrays",
+            description: "An array of results for the result list",
         });
+        const listTypeForThisRetrievalWithSearchData = new graphql_1.GraphQLObjectType({
+            name: "TLIST__" + itemDefinition.getQualifiedPathName(),
+            fields: {
+                results: {
+                    type: graphql_1.GraphQLList(type),
+                },
+                count: {
+                    type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+                },
+                limit: {
+                    type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+                },
+                offset: {
+                    type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+                },
+            },
+            description: "A traditional array of results for the result list with search data",
+        });
+        const searchArgs = {
+            ...constants_1.RESERVED_SEARCH_PROPERTIES,
+            ...getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, {
+                retrievalMode: false,
+                propertiesAsInput: true,
+                excludeBase: true,
+                optionalForm: true,
+                includePolicy: null,
+            }),
+        };
         // for the list we just make a list of our basic externalized output with DATA type
         fields[constants_1.PREFIX_GET_LIST + itemDefinition.getQualifiedPathName()] = {
             type: listTypeForThisRetrieval,
@@ -270,19 +298,15 @@ function getGQLQueryFieldsForItemDefinition(itemDefinition, resolvers) {
             // we exclude the base properties, eg. id, version, type, etc... make all the fields optional,
             // and don't include any policy (there are no policies in search mode anyway)
             fields[constants_1.PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()] = {
-                type: constants_1.ID_CONTAINER_GQL,
-                args: {
-                    ...constants_1.RESERVED_SEARCH_PROPERTIES,
-                    ...getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, {
-                        retrievalMode: false,
-                        propertiesAsInput: true,
-                        excludeBase: true,
-                        optionalForm: true,
-                        includePolicy: null,
-                    }),
-                },
+                type: constants_1.SEARCH_RESULTS_CONTAINER_GQL,
+                args: searchArgs,
                 resolve: resolveGenericFunction.bind(null, "searchItemDefinition", itemDefinition, resolvers),
             };
+        fields[constants_1.PREFIX_TRADITIONAL_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()] = {
+            type: listTypeForThisRetrievalWithSearchData,
+            args: searchArgs,
+            resolve: resolveGenericFunction.bind(null, "searchItemDefinitionTraditional", itemDefinition, resolvers),
+        };
     }
     // add the child definitions to the queries by adding theirs
     itemDefinition.getChildDefinitions().forEach((cIdef) => {

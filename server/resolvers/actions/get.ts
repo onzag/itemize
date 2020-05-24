@@ -22,7 +22,7 @@ import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { EndpointError } from "../../../base/errors";
-import { IGQLSearchResult } from "../../../gql-querier";
+import { IGQLSearchMatch } from "../../../gql-querier";
 
 export async function getItemDefinition(
   appData: IAppDataType,
@@ -163,9 +163,9 @@ export async function getItemDefinitionList(
   // first we check that the language and region provided are
   // right and available
   checkLanguage(appData, resolverArgs.args);
-  checkListLimit(resolverArgs.args.ids);
+  checkListLimit(resolverArgs.args.records);
   const mod = itemDefinition.getParentModule();
-  checkListTypes(resolverArgs.args.ids, mod);
+  checkListTypes(resolverArgs.args.records, mod);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
   checkReadPoliciesAllowThisUserToSearch(
     itemDefinition,
@@ -218,7 +218,7 @@ export async function getItemDefinitionList(
   // as the qualified path name and the table name, so by ensuring it's a legit name
   // we ensure there is no leak
   const selfTableType = itemDefinition.getQualifiedPathName();
-  resolverArgs.args.ids.forEach((argId: IGQLSearchResult) => {
+  resolverArgs.args.records.forEach((argId: IGQLSearchMatch) => {
     if (argId.type !== selfTableType) {
       throw new EndpointError({
         message: "Invalid id container type that didn't match the qualified name " + selfTableType,
@@ -228,7 +228,7 @@ export async function getItemDefinitionList(
   });
 
   const resultValues: ISQLTableRowValue[] = await appData.cache.requestListCache(
-    resolverArgs.args.ids,
+    resolverArgs.args.records,
   );
 
   const finalValues = resultValues.map(
@@ -264,8 +264,8 @@ export async function getModuleList(
   // first we check that the language and region provided are
   // right and available
   checkLanguage(appData, resolverArgs.args);
-  checkListLimit(resolverArgs.args.ids);
-  checkListTypes(resolverArgs.args.ids, mod);
+  checkListLimit(resolverArgs.args.records);
+  checkListTypes(resolverArgs.args.records, mod);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
   await validateTokenIsntBlocked(appData.cache, tokenData);
 
@@ -306,7 +306,7 @@ export async function getModuleList(
   );
 
   const resultValues: ISQLTableRowValue[] = await appData.cache.requestListCache(
-    resolverArgs.args.ids,
+    resolverArgs.args.records,
   );
 
   // return if otherwise succeeds

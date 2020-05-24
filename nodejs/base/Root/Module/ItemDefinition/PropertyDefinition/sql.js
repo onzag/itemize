@@ -16,22 +16,25 @@ const constants_1 = require("../../../../../constants");
  * @param ext a extension to require for this type
  * @returns a function that returns the partial table definition object with the given type
  */
-function getStandardSQLFnFor(type, ext = null) {
+function getStandardSQLFnFor(type, ext = null, indexCalculator) {
     // so we return the function
-    return (sqlPrefix, id, property) => ({
-        // the sql prefix defined plus the id, eg for includes
-        [sqlPrefix + id]: {
-            // the type is defined
-            type,
-            // and we add an unique index if this property is deemed unique
-            index: property.isUnique() ? {
-                type: "unique",
-                id: constants_1.SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
-                level: 0,
-            } : null,
-            ext,
-        },
-    });
+    return (sqlPrefix, id, property) => {
+        const subtype = property.getSubtype();
+        return {
+            // the sql prefix defined plus the id, eg for includes
+            [sqlPrefix + id]: {
+                // the type is defined
+                type,
+                // and we add an unique index if this property is deemed unique
+                index: property.isUnique() ? {
+                    type: "unique",
+                    id: constants_1.SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
+                    level: 0,
+                } : (indexCalculator ? indexCalculator(subtype, sqlPrefix, id) : null),
+                ext,
+            },
+        };
+    };
 }
 exports.getStandardSQLFnFor = getStandardSQLFnFor;
 /**

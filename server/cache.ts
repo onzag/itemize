@@ -12,7 +12,7 @@ import Knex from "knex";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX } from "../constants";
 import { ISQLTableRowValue, ISQLStreamComposedTableRowValue } from "../base/Root/sql";
-import { IGQLSearchResult, IGQLArgs, IGQLValue } from "../gql-querier";
+import { IGQLSearchMatch, IGQLArgs, IGQLValue } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { Listener } from "./listener";
@@ -385,7 +385,7 @@ export class Cache {
         null,
       );
 
-      const searchResultForThisValue: IGQLSearchResult = {
+      const searchResultForThisValue: IGQLSearchMatch = {
         id: sqlValue.id,
         version: sqlValue.version || null,
         type: selfTable,
@@ -395,7 +395,7 @@ export class Cache {
       const itemDefinitionBasedOwnedEvent: IOwnedSearchRecordsAddedEvent = {
         qualifiedPathName: selfTable,
         createdBy: itemDefinition.isOwnerObjectId() ? sqlValue.id : sqlModData.created_by,
-        newIds: [
+        newRecords: [
           searchResultForThisValue,
         ],
         newLastRecord: searchResultForThisValue,
@@ -430,7 +430,7 @@ export class Cache {
           parentId: parent.id,
           parentVersion: parent.version || null,
           parentType: parent.type,
-          newIds: [
+          newRecords: [
             searchResultForThisValue,
           ],
           newLastRecord: searchResultForThisValue,
@@ -838,13 +838,13 @@ export class Cache {
   /**
    * TODO Optimize this, right now it retrieves the list one by one
    * Requests a whole list of search results
-   * @param ids the ids to request for
+   * @param records the records to request for
    * @returns a list of whole sql combined table row values
    */
-  public async requestListCache(ids: IGQLSearchResult[]): Promise<ISQLTableRowValue[]> {
-    const resultValues = await Promise.all(ids.map((idContainer) => {
-      const itemDefinition = this.root.registry[idContainer.type] as ItemDefinition;
-      return this.requestValue(itemDefinition, idContainer.id, idContainer.version);
+  public async requestListCache(records: IGQLSearchMatch[]): Promise<ISQLTableRowValue[]> {
+    const resultValues = await Promise.all(records.map((recordContainer) => {
+      const itemDefinition = this.root.registry[recordContainer.type] as ItemDefinition;
+      return this.requestValue(itemDefinition, recordContainer.id, recordContainer.version);
     }));
     return resultValues;
   }

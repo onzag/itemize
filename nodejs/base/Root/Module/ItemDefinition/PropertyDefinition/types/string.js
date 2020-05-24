@@ -36,7 +36,16 @@ const typeValue = {
     gql: graphql_1.GraphQLString,
     // a string is a string
     json: "string",
-    sql: sql_1.getStandardSQLFnFor && sql_1.getStandardSQLFnFor("text"),
+    sql: sql_1.getStandardSQLFnFor && sql_1.getStandardSQLFnFor("text", null, (subtype, sqlPrefix, id) => {
+        if (subtype) {
+            return {
+                type: "btree",
+                id: constants_1.SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
+                level: 0,
+            };
+        }
+        return null;
+    }),
     sqlIn: sql_1.stardardSQLInFn,
     sqlOut: sql_1.standardSQLOutFn,
     sqlSearch: sql_1.standardSQLSearchFnExactAndRange,

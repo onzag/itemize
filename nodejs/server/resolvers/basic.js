@@ -243,20 +243,20 @@ exports.checkBasicFieldsAreAvailableForRole = checkBasicFieldsAreAvailableForRol
 /**
  * Checks a list provided by the getter functions that use
  * lists to ensure the request isn't too large
- * @param ids the list ids that have been requested
+ * @param records the list records that have been requested
  */
-function checkListLimit(ids) {
-    if (ids.length > constants_1.MAX_SEARCH_RESULTS_AT_ONCE_LIMIT) {
+function checkListLimit(records) {
+    if (records.length > constants_1.MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK) {
         throw new errors_1.EndpointError({
-            message: "Too many ids at once, max is " + constants_1.MAX_SEARCH_RESULTS_AT_ONCE_LIMIT,
+            message: "Too many records at once, max is " + constants_1.MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK,
             code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
         });
     }
     __1.logger.silly("checkListLimit: checking limits succeed");
 }
 exports.checkListLimit = checkListLimit;
-function checkListTypes(ids, mod) {
-    ids.forEach((idContainer) => {
+function checkListTypes(records, mod) {
+    records.forEach((idContainer) => {
         const itemDefinition = mod.getParentRoot().registry[idContainer.type];
         if (!itemDefinition) {
             throw new errors_1.EndpointError({

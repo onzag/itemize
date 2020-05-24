@@ -6,7 +6,7 @@
  */
 import { PropertyDefinitionSupportedType } from "./types";
 import PropertyDefinition from "../PropertyDefinition";
-import { ISQLTableRowValue, ISQLTableDefinitionType, ISQLStreamComposedTableRowValue } from "../../../sql";
+import { ISQLTableRowValue, ISQLTableDefinitionType, ISQLStreamComposedTableRowValue, ISQLTableIndexType } from "../../../sql";
 import Knex from "knex";
 import ItemDefinition from "..";
 import Include from "../Include";
@@ -19,7 +19,7 @@ import pkgcloud from "pkgcloud";
  * @param ext a extension to require for this type
  * @returns a function that returns the partial table definition object with the given type
  */
-export declare function getStandardSQLFnFor(type: string, ext?: string): (sqlPrefix: string, id: string, property: PropertyDefinition) => ISQLTableDefinitionType;
+export declare function getStandardSQLFnFor(type: string, ext?: string, indexCalculator?: (subtype: string, sqlPrefix: string, id: string) => ISQLTableIndexType): (sqlPrefix: string, id: string, property: PropertyDefinition) => ISQLTableDefinitionType;
 /**
  * The standard sql in function that specifies how a property inputs its value
  * into a table

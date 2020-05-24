@@ -1,4 +1,4 @@
-import { IGQLSearchResult } from "../../../../gql-querier";
+import { IGQLSearchMatch } from "../../../../gql-querier";
 import { IDBPDatabase } from "idb";
 import { ICacheDB, QUERIES_TABLE_NAME } from "./cache.worker";
 import { PREFIX_GET } from "../../../../constants";
@@ -8,11 +8,11 @@ import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 export async function search(
   rootProxy: Root,
   db: IDBPDatabase<ICacheDB>,
-  searchResults: IGQLSearchResult[],
+  searchResults: IGQLSearchMatch[],
   searchArgs: any,
-): Promise<IGQLSearchResult[]> {
+): Promise<IGQLSearchMatch[]> {
   const sortStrategyFunction = SORT_STRATEGIES[searchArgs.order_by];
-  const newSearchResults: IGQLSearchResult[] = (await Promise.all(
+  const newSearchResults: IGQLSearchMatch[] = (await Promise.all(
     searchResults.map(async (result) => {
       try {
         const queryIdentifier = `${PREFIX_GET}${result.type}.${result.id}.${result.version || ""}`;
@@ -38,18 +38,18 @@ export async function search(
   return newSearchResults;
 }
 
-interface IGQLSearchResultChecked {
+interface IGQLSearchMatchChecked {
   shouldBeIncluded: boolean;
   value: any;
-  searchResult: IGQLSearchResult;
+  searchResult: IGQLSearchMatch;
 }
 
 async function checkOne(
   rootProxy: Root,
-  searchResult: IGQLSearchResult,
+  searchResult: IGQLSearchMatch,
   value: any,
   searchArgs: any,
-): Promise<IGQLSearchResultChecked> {
+): Promise<IGQLSearchMatchChecked> {
   // so by default we included
   let shouldBeIncluded = true;
 
@@ -115,7 +115,7 @@ async function checkOne(
 }
 
 const SORT_STRATEGIES = {
-  DEFAULT: (a: IGQLSearchResultChecked, b: IGQLSearchResultChecked) => {
+  DEFAULT: (a: IGQLSearchMatchChecked, b: IGQLSearchMatchChecked) => {
     // TODO this should be done by created_at, this will suffice for now
     return b.value.id - a.value.id;
   },

@@ -4,7 +4,7 @@ import { IAppDataType } from "..";
 import Include from "../../base/Root/Module/ItemDefinition/Include";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { IGQLValue, IGQLSearchResult, IGQLArgs } from "../../gql-querier";
+import { IGQLValue, IGQLSearchMatch, IGQLArgs } from "../../gql-querier";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 /**
  * Builds the column names expected for a given module only
@@ -54,10 +54,10 @@ export declare function checkBasicFieldsAreAvailableForRole(itemDefinitionOrModu
 /**
  * Checks a list provided by the getter functions that use
  * lists to ensure the request isn't too large
- * @param ids the list ids that have been requested
+ * @param records the list records that have been requested
  */
-export declare function checkListLimit(ids: IGQLSearchResult[]): void;
-export declare function checkListTypes(ids: IGQLSearchResult[], mod: Module): void;
+export declare function checkListLimit(records: IGQLSearchMatch[]): void;
+export declare function checkListTypes(records: IGQLSearchMatch[], mod: Module): void;
 /**
  * Checks the language and region given the arguments passed
  * by the graphql resolver

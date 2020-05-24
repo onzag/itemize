@@ -13,7 +13,7 @@ import {
   PREFIX_GET_LIST,
 } from "../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
-import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchResult } from "../../gql-querier";
+import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchMatch } from "../../gql-querier";
 import { deepMerge, requestFieldsAreContained } from "../../gql-util";
 import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
@@ -712,7 +712,7 @@ export async function runSearchQueryFor(
   remoteListenerCallback: () => void,
 ): Promise<{
   error: EndpointErrorType,
-  searchResults: IGQLSearchResult[],
+  searchResults: IGQLSearchMatch[],
 }> {
   const qualifiedName = (this.props.itemDefinitionInstance.isExtensionsInstance() ?
     this.props.itemDefinitionInstance.getParentModule().getQualifiedPathName() :
@@ -804,7 +804,7 @@ export async function runSearchQueryFor(
       name: queryName,
       args,
       fields: {
-        ids: {
+        records: {
           id: {},
           version: {},
           type: {},
@@ -826,9 +826,9 @@ export async function runSearchQueryFor(
     error = gqlValue.errors[0].extensions;
   }
 
-  const searchResults: IGQLSearchResult[] = (
-    gqlValue.data && gqlValue.data[queryName] && gqlValue.data[queryName].ids
-  ) as IGQLSearchResult[] || null;
+  const searchResults: IGQLSearchMatch[] = (
+    gqlValue.data && gqlValue.data[queryName] && gqlValue.data[queryName].records
+  ) as IGQLSearchMatch[] || null;
 
   return {
     error,

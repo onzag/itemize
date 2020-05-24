@@ -1,7 +1,7 @@
 import {
   PREFIX_BUILD,
   MODERATION_FIELDS,
-  MAX_SEARCH_RESULTS_AT_ONCE_LIMIT,
+  MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   RESERVED_BASE_PROPERTIES,
   INCLUDE_PREFIX,
@@ -22,7 +22,7 @@ import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefin
 import { jwtVerify } from "../token";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { IGQLValue, IGQLSearchResult, IGQLArgs } from "../../gql-querier";
+import { IGQLValue, IGQLSearchMatch, IGQLArgs } from "../../gql-querier";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 
@@ -313,12 +313,12 @@ export function checkBasicFieldsAreAvailableForRole(
 /**
  * Checks a list provided by the getter functions that use
  * lists to ensure the request isn't too large
- * @param ids the list ids that have been requested
+ * @param records the list records that have been requested
  */
-export function checkListLimit(ids: IGQLSearchResult[]) {
-  if (ids.length > MAX_SEARCH_RESULTS_AT_ONCE_LIMIT) {
+export function checkListLimit(records: IGQLSearchMatch[]) {
+  if (records.length > MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK) {
     throw new EndpointError({
-      message: "Too many ids at once, max is " + MAX_SEARCH_RESULTS_AT_ONCE_LIMIT,
+      message: "Too many records at once, max is " + MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK,
       code: ENDPOINT_ERRORS.UNSPECIFIED,
     });
   }
@@ -327,8 +327,8 @@ export function checkListLimit(ids: IGQLSearchResult[]) {
   );
 }
 
-export function checkListTypes(ids: IGQLSearchResult[], mod: Module) {
-  ids.forEach((idContainer) => {
+export function checkListTypes(records: IGQLSearchMatch[], mod: Module) {
+  records.forEach((idContainer) => {
     const itemDefinition = mod.getParentRoot().registry[idContainer.type];
     if (!itemDefinition) {
       throw new EndpointError({

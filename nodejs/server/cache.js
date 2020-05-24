@@ -274,7 +274,7 @@ class Cache {
             const itemDefinitionBasedOwnedEvent = {
                 qualifiedPathName: selfTable,
                 createdBy: itemDefinition.isOwnerObjectId() ? sqlValue.id : sqlModData.created_by,
-                newIds: [
+                newRecords: [
                     searchResultForThisValue,
                 ],
                 newLastRecord: searchResultForThisValue,
@@ -293,7 +293,7 @@ class Cache {
                     parentId: parent.id,
                     parentVersion: parent.version || null,
                     parentType: parent.type,
-                    newIds: [
+                    newRecords: [
                         searchResultForThisValue,
                     ],
                     newLastRecord: searchResultForThisValue,
@@ -565,13 +565,13 @@ class Cache {
     /**
      * TODO Optimize this, right now it retrieves the list one by one
      * Requests a whole list of search results
-     * @param ids the ids to request for
+     * @param records the records to request for
      * @returns a list of whole sql combined table row values
      */
-    async requestListCache(ids) {
-        const resultValues = await Promise.all(ids.map((idContainer) => {
-            const itemDefinition = this.root.registry[idContainer.type];
-            return this.requestValue(itemDefinition, idContainer.id, idContainer.version);
+    async requestListCache(records) {
+        const resultValues = await Promise.all(records.map((recordContainer) => {
+            const itemDefinition = this.root.registry[recordContainer.type];
+            return this.requestValue(itemDefinition, recordContainer.id, recordContainer.version);
         }));
         return resultValues;
     }

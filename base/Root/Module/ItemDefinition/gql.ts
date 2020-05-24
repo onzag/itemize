@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-import { GraphQLOutputType, GraphQLObjectType, GraphQLList } from "graphql";
+import { GraphQLOutputType, GraphQLObjectType, GraphQLList, GraphQLNonNull, GraphQLInt } from "graphql";
 import {
   PREFIX_GET,
   RESERVED_GETTER_PROPERTIES,
@@ -17,13 +17,14 @@ import {
   PREFIX_DELETE,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   RESERVED_BASE_PROPERTIES,
-  ID_CONTAINER_GQL,
+  SEARCH_RESULTS_CONTAINER_GQL,
   PREFIX_GET_LIST,
   RESERVED_GETTER_LIST_PROPERTIES,
   POLICY_PREFIXES,
   PREFIX_BUILD,
   RESERVED_CHANGE_PROPERTIES,
   ENDPOINT_ERRORS,
+  PREFIX_TRADITIONAL_SEARCH,
 } from "../../../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from ".";
 import { getGQLFieldsDefinitionForProperty } from "./PropertyDefinition/gql";
@@ -331,8 +332,38 @@ export function getGQLQueryFieldsForItemDefinition(
           type: GraphQLList(type),
         },
       },
-      description: "An useless container that graphql requests because graphql doesn't like arrays",
+      description: "An array of results for the result list",
     });
+
+    const listTypeForThisRetrievalWithSearchData = new GraphQLObjectType({
+      name: "TLIST__" + itemDefinition.getQualifiedPathName(),
+      fields: {
+        results: {
+          type: GraphQLList(type),
+        },
+        count: {
+          type: GraphQLNonNull(GraphQLInt),
+        },
+        limit: {
+          type: GraphQLNonNull(GraphQLInt),
+        },
+        offset: {
+          type: GraphQLNonNull(GraphQLInt),
+        },
+      },
+      description: "A traditional array of results for the result list with search data",
+    });
+
+    const searchArgs = {
+      ...RESERVED_SEARCH_PROPERTIES,
+      ...getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, {
+        retrievalMode: false,
+        propertiesAsInput: true,
+        excludeBase: true,
+        optionalForm: true,
+        includePolicy: null,
+      }),
+    };
 
     // for the list we just make a list of our basic externalized output with DATA type
     fields[PREFIX_GET_LIST + itemDefinition.getQualifiedPathName()] = {
@@ -345,19 +376,15 @@ export function getGQLQueryFieldsForItemDefinition(
     // we exclude the base properties, eg. id, version, type, etc... make all the fields optional,
     // and don't include any policy (there are no policies in search mode anyway)
     fields[PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()] = {
-      type: ID_CONTAINER_GQL,
-      args: {
-        ...RESERVED_SEARCH_PROPERTIES,
-        ...getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, {
-          retrievalMode: false,
-          propertiesAsInput: true,
-          excludeBase: true,
-          optionalForm: true,
-          includePolicy: null,
-        }),
-      },
+      type: SEARCH_RESULTS_CONTAINER_GQL,
+      args: searchArgs,
       resolve: resolveGenericFunction.bind(null, "searchItemDefinition", itemDefinition, resolvers),
     };
+    fields[PREFIX_TRADITIONAL_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()] = {
+      type: listTypeForThisRetrievalWithSearchData,
+      args: searchArgs,
+      resolve: resolveGenericFunction.bind(null, "searchItemDefinitionTraditional", itemDefinition, resolvers),
+    }
   }
 
   // add the child definitions to the queries by adding theirs

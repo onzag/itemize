@@ -7,7 +7,7 @@
 
 import { PropertyDefinitionSupportedType } from "./types";
 import PropertyDefinition from "../PropertyDefinition";
-import { ISQLTableRowValue, ISQLTableDefinitionType, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../../../sql";
+import { ISQLTableRowValue, ISQLTableDefinitionType, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, ISQLTableIndexType } from "../../../sql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces";
 import Knex from "knex";
 import ItemDefinition from "..";
@@ -24,23 +24,28 @@ import pkgcloud from "pkgcloud";
  * @param ext a extension to require for this type
  * @returns a function that returns the partial table definition object with the given type
  */
-export function getStandardSQLFnFor(type: string, ext: string = null):
+export function getStandardSQLFnFor(type: string, ext: string = null, indexCalculator?: (subtype: string, sqlPrefix: string, id: string) => ISQLTableIndexType):
   (sqlPrefix: string, id: string, property: PropertyDefinition) => ISQLTableDefinitionType {
+
   // so we return the function
-  return (sqlPrefix: string, id: string, property: PropertyDefinition) => ({
-    // the sql prefix defined plus the id, eg for includes
-    [sqlPrefix + id]: {
-      // the type is defined
-      type,
-      // and we add an unique index if this property is deemed unique
-      index: property.isUnique() ? {
-        type: "unique",
-        id: SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
-        level: 0,
-      } : null,
-      ext,
-    },
-  });
+  return (sqlPrefix: string, id: string, property: PropertyDefinition) => {
+    const subtype = property.getSubtype();
+
+    return {
+      // the sql prefix defined plus the id, eg for includes
+      [sqlPrefix + id]: {
+        // the type is defined
+        type,
+        // and we add an unique index if this property is deemed unique
+        index: property.isUnique() ? {
+          type: "unique",
+          id: SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
+          level: 0,
+        } : (indexCalculator ? indexCalculator(subtype, sqlPrefix, id) : null),
+        ext,
+      },
+    }
+  };
 }
 
 /**

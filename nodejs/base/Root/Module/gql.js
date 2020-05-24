@@ -169,23 +169,47 @@ function getGQLQueryFieldsForModule(mod, resolvers) {
                     type: graphql_1.GraphQLList(gOuput),
                 },
             },
-            description: "An useless container that graphql requests because graphql doesn't like arrays",
+            description: "An array of results for the result list",
         });
+        const listTypeForThisRetrievalWithSearchData = new graphql_1.GraphQLObjectType({
+            name: "TLIST__" + mod.getQualifiedPathName(),
+            fields: {
+                results: {
+                    type: graphql_1.GraphQLList(gOuput),
+                },
+                count: {
+                    type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+                },
+                limit: {
+                    type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+                },
+                offset: {
+                    type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+                },
+            },
+            description: "A traditional array of results for the result list with search data",
+        });
+        const searchArgs = {
+            ...constants_1.RESERVED_SEARCH_PROPERTIES,
+            // as you can realize the arguments exclude the base and make it into input mode
+            // that means no RESERVED_BASE_PROPERTIES
+            ...getGQLFieldsDefinitionForModule(mod.getSearchModule(), {
+                retrievalMode: false,
+                excludeBase: true,
+                propertiesAsInput: true,
+                optionalForm: true,
+            }),
+        };
         fields = {
             [constants_1.PREFIX_SEARCH + mod.getSearchModule().getQualifiedPathName()]: {
-                type: constants_1.ID_CONTAINER_GQL,
-                args: {
-                    ...constants_1.RESERVED_SEARCH_PROPERTIES,
-                    // as you can realize the arguments exclude the base and make it into input mode
-                    // that means no RESERVED_BASE_PROPERTIES
-                    ...getGQLFieldsDefinitionForModule(mod.getSearchModule(), {
-                        retrievalMode: false,
-                        excludeBase: true,
-                        propertiesAsInput: true,
-                        optionalForm: true,
-                    }),
-                },
+                type: constants_1.SEARCH_RESULTS_CONTAINER_GQL,
+                args: searchArgs,
                 resolve: resolveGenericFunction.bind(null, "searchModule", mod, resolvers),
+            },
+            [constants_1.PREFIX_TRADITIONAL_SEARCH + mod.getSearchModule().getQualifiedPathName()]: {
+                type: listTypeForThisRetrievalWithSearchData,
+                args: searchArgs,
+                resolve: resolveGenericFunction.bind(null, "searchModuleTraditional", mod, resolvers),
             },
             [constants_1.PREFIX_GET_LIST + mod.getQualifiedPathName()]: {
                 type: listTypeForThisRetrieval,

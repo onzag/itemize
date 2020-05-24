@@ -21,6 +21,7 @@ const PropertyDefinition_1 = __importDefault(require("./ItemDefinition/PropertyD
 const constants_1 = require("../../../constants");
 const search_mode_1 = require("./search-mode");
 const errors_1 = require("../../errors");
+;
 /**
  * The class module that defines how the module behaves
  */
@@ -500,6 +501,9 @@ class Module {
             const propDef = this.getPropExtensionFor(requestedField);
             return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
         });
+    }
+    getRequestLimiters() {
+        return this.rawData.requestLimiters || null;
     }
     /**
      * Merges two i18n data components, for example the i18n data for

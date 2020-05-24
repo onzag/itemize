@@ -88,9 +88,9 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
     // first we check that the language and region provided are
     // right and available
     basic_1.checkLanguage(appData, resolverArgs.args);
-    basic_1.checkListLimit(resolverArgs.args.ids);
+    basic_1.checkListLimit(resolverArgs.args.records);
     const mod = itemDefinition.getParentModule();
-    basic_1.checkListTypes(resolverArgs.args.ids, mod);
+    basic_1.checkListTypes(resolverArgs.args.records, mod);
     const tokenData = await basic_1.validateTokenAndGetData(appData, resolverArgs.args.token);
     basic_1.checkReadPoliciesAllowThisUserToSearch(itemDefinition, tokenData.role);
     // now we find the requested fields that are requested
@@ -120,7 +120,7 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
     // as the qualified path name and the table name, so by ensuring it's a legit name
     // we ensure there is no leak
     const selfTableType = itemDefinition.getQualifiedPathName();
-    resolverArgs.args.ids.forEach((argId) => {
+    resolverArgs.args.records.forEach((argId) => {
         if (argId.type !== selfTableType) {
             throw new errors_1.EndpointError({
                 message: "Invalid id container type that didn't match the qualified name " + selfTableType,
@@ -128,7 +128,7 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
             });
         }
     });
-    const resultValues = await appData.cache.requestListCache(resolverArgs.args.ids);
+    const resultValues = await appData.cache.requestListCache(resolverArgs.args.records);
     const finalValues = resultValues.map((value) => {
         // preveting another security leak here, the user might have lied by saying that these
         // items were all created by this specific creator when doing searches
@@ -152,8 +152,8 @@ async function getModuleList(appData, resolverArgs, mod) {
     // first we check that the language and region provided are
     // right and available
     basic_1.checkLanguage(appData, resolverArgs.args);
-    basic_1.checkListLimit(resolverArgs.args.ids);
-    basic_1.checkListTypes(resolverArgs.args.ids, mod);
+    basic_1.checkListLimit(resolverArgs.args.records);
+    basic_1.checkListTypes(resolverArgs.args.records, mod);
     const tokenData = await basic_1.validateTokenAndGetData(appData, resolverArgs.args.token);
     await basic_1.validateTokenIsntBlocked(appData.cache, tokenData);
     // now we find the requested fields that are requested
@@ -176,7 +176,7 @@ async function getModuleList(appData, resolverArgs, mod) {
     }
     __1.logger.debug("getModuleList: checking role access for read");
     mod.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, requestedFieldsInMod, true);
-    const resultValues = await appData.cache.requestListCache(resolverArgs.args.ids);
+    const resultValues = await appData.cache.requestListCache(resolverArgs.args.records);
     // return if otherwise succeeds
     const finalValues = resultValues.map((value) => {
         // preveting another security leak here, the user might have lied by saying that these

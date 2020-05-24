@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import { IGQLSearchResult } from "../gql-querier";
+import { IGQLSearchMatch } from "../gql-querier";
 
 // EVENTS
 
@@ -75,13 +75,13 @@ interface IBaseSearchRecordsAddedEvent {
    */
   qualifiedPathName: string;
   /**
-   * the new ids that have been added
+   * the new records that have been added
    */
-  newIds: IGQLSearchResult[];
+  newRecords: IGQLSearchMatch[];
   /**
    * the new last record search result
    */
-  newLastRecord: IGQLSearchResult;
+  newLastRecord: IGQLSearchMatch;
 }
 
 /**
@@ -260,7 +260,7 @@ interface IBaseSearchFeedbackRequest {
    * since they come in order it's easy to know if
    * something has been added
    */
-  knownLastRecord: IGQLSearchResult;
+  knownLastRecord: IGQLSearchMatch;
 }
 
 /**

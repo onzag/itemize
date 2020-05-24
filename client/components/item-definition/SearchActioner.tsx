@@ -8,14 +8,14 @@ import {
   IActionSearchOptions,
 } from "../../providers/item-definition";
 import equals from "deep-equal";
-import { IGQLSearchResult } from "../../../gql-querier";
+import { IGQLSearchMatch } from "../../../gql-querier";
 
 export interface ISearchActionerInfoArgType {
   searchError: EndpointErrorType;
   dismissSearchResults: () => void;
   dismissSearchError: () => void;
   searching: boolean;
-  searchResults: IGQLSearchResult[];
+  searchResults: IGQLSearchMatch[];
   search: (options?: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
   clean: (options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean) => void;
 }

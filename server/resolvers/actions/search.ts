@@ -20,7 +20,7 @@ import {
   UNSPECIFIED_OWNER,
 } from "../../../constants";
 import { buildSQLQueryForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
-import { IGQLSearchResult } from "../../../gql-querier";
+import { IGQLSearchMatch } from "../../../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
 
 export async function searchModule(
@@ -106,12 +106,12 @@ export async function searchModule(
   }
 
   // return using the base result, and only using the id
-  const baseResult: IGQLSearchResult[] = (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchResult[];
+  const baseResult: IGQLSearchMatch[] = (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchMatch[];
   const finalResult: {
-    ids: IGQLSearchResult[];
-    last_record: IGQLSearchResult;
+    records: IGQLSearchMatch[];
+    last_record: IGQLSearchMatch;
   } = {
-    ids: baseResult,
+    records: baseResult,
     // TODO manually reorder the real latest by date
     last_record: baseResult[0] || null,
   };
@@ -206,6 +206,10 @@ export async function searchItemDefinition(
   const selfTable = itemDefinition.getQualifiedPathName();
   const searchMod = mod.getSearchModule();
 
+  // TODO change this, it'd be better to use the item definition table as the base
+  // because the item definition table has less elements in it than the module table
+  // joins might be preferrable
+
   // in this case it works because we are checking raw property names
   // with the search module, it has no items, so it can easily check it up
   const requiresJoin = Object.keys(resolverArgs.args).some((argName) => {
@@ -256,21 +260,21 @@ export async function searchItemDefinition(
 
   // now we get the base result, and convert every row
   const baseResult: ISQLTableRowValue[] = await searchQuery;
-  const ids: IGQLSearchResult[] = baseResult.map((row) => {
+  const records: IGQLSearchMatch[] = baseResult.map((row) => {
     return convertVersionsIntoNullsWhenNecessary({
       id: row.id,
       type: selfTable,
       created_at: row.created_at,
       version: row.version,
-    }) as IGQLSearchResult;
+    }) as IGQLSearchMatch;
   });
   const finalResult: {
-    ids: IGQLSearchResult[];
-    last_record: IGQLSearchResult;
+    records: IGQLSearchMatch[];
+    last_record: IGQLSearchMatch;
   } = {
-    ids,
+    records,
     // TODO manually reorder the real latest by date
-    last_record: ids[0],
+    last_record: records[0],
   };
   logger.debug(
     "searchItemDefinition: done",

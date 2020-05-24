@@ -4,9 +4,9 @@ import "regenerator-runtime/runtime";
 import { expose } from "comlink";
 import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { requestFieldsAreContained, deepMerge } from "../../../../gql-util";
-import { IGQLSearchResult, buildGqlQuery, gqlQuery, GQLEnum,
+import { IGQLSearchMatch, buildGqlQuery, gqlQuery, GQLEnum,
   IGQLValue, IGQLRequestFields, IGQLArgs, IGQLEndpointValue } from "../../../../gql-querier";
-import { MAX_SEARCH_RESULTS_AT_ONCE_LIMIT, PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
+import { MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK, PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
 import { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
 import Root, { IRootRawJSONDataType } from "../../../../base/Root";
@@ -20,14 +20,14 @@ export interface ICacheMatchType {
 export interface ICachedSearchResult {
   gqlValue: IGQLEndpointValue;
   dataMightBeStale: boolean;
-  lastRecord: IGQLSearchResult;
+  lastRecord: IGQLSearchMatch;
 }
 
 export interface ISearchMatchType {
   fields: IGQLRequestFields;
-  value: IGQLSearchResult[];
+  value: IGQLSearchMatch[];
   allResultsPreloaded: boolean;
-  lastRecord: IGQLSearchResult;
+  lastRecord: IGQLSearchMatch;
 }
 
 export interface ICacheDB extends DBSchema {
@@ -460,8 +460,8 @@ export default class CacheWorker {
     parentTypeIfKnown: string,
     parentIdIfKnown: number,
     parentVersionIfKnown: string,
-    newIds: IGQLSearchResult[],
-    newLastRecord: IGQLSearchResult,
+    newRecords: IGQLSearchMatch[],
+    newLastRecord: IGQLSearchMatch,
     cachePolicy: "by-owner" | "by-parent",
   ): Promise<boolean> {
     await this.waitForSetupPromise;
@@ -485,7 +485,7 @@ export default class CacheWorker {
       await this.db.put(SEARCHES_TABLE_NAME, {
         ...currentValue,
         lastRecord: newLastRecord,
-        value: currentValue.value.concat(newIds),
+        value: currentValue.value.concat(newRecords),
         allResultsPreloaded: false,
       }, storeKeyName);
     } catch {
@@ -521,13 +521,13 @@ export default class CacheWorker {
     // first we build an array for the results that we need to process
     // this means results that are not loaded in memory or partially loaded
     // in memory for some reason, say if the last search failed partially
-    let resultsToProcess: IGQLSearchResult[];
+    let resultsToProcess: IGQLSearchMatch[];
     // this is what the fields end up being, say that there are two different
     // cached searches with different fields, we need both to be merged
     // in order to know what we have retrieved, originally it's just what
     // we were asked for
     let resultingGetListRequestedFields: IGQLRequestFields = getListRequestedFields;
-    let lastRecord: IGQLSearchResult;
+    let lastRecord: IGQLSearchMatch;
     let dataMightBeStale = false;
 
     try {
@@ -557,7 +557,7 @@ export default class CacheWorker {
           name: searchQueryName,
           args: actualArgsToUseInGQLSearch,
           fields: {
-            ids: {
+            records: {
               id: {},
               version: {},
               type: {},
@@ -587,10 +587,10 @@ export default class CacheWorker {
         }
 
         // now these are the results that we need to process
-        // from the search query, the IGQLSearchResult that we
+        // from the search query, the IGQLSearchMatch that we
         // need to process
-        resultsToProcess = serverValue.data[searchQueryName].ids as IGQLSearchResult[];
-        lastRecord = serverValue.data[searchQueryName].last_record as IGQLSearchResult;
+        resultsToProcess = serverValue.data[searchQueryName].records as IGQLSearchMatch[];
+        lastRecord = serverValue.data[searchQueryName].last_record as IGQLSearchMatch;
       } else {
         // otherwise our results to process are the same ones we got
         // from the database, but do we need to process them for real?
@@ -615,7 +615,7 @@ export default class CacheWorker {
           const gqlValue: IGQLEndpointValue = {
             data: {
               [searchQueryName]: {
-                ids: await search(this.rootProxy, this.db, resultsToProcess, searchArgs),
+                records: await search(this.rootProxy, this.db, resultsToProcess, searchArgs),
                 last_record: lastRecord,
               },
             },
@@ -677,7 +677,7 @@ export default class CacheWorker {
     // results to process and actually has managed to make it to the database
     // this can happens when something fails in between, or it is loaded by another
     // part of the application
-    const uncachedResultsToProcess: IGQLSearchResult[] = [];
+    const uncachedResultsToProcess: IGQLSearchMatch[] = [];
     // so now we check all the results we are asked to process
     await Promise.all(resultsToProcess.map(async (resultToProcess) => {
       // and get the cached results, considering the fields
@@ -697,12 +697,12 @@ export default class CacheWorker {
 
     // now it's time to preload, there's a limit on how big the batches can be on the server side
     // so we have to limit our batches size
-    const batches: IGQLSearchResult[][] = [[]];
+    const batches: IGQLSearchMatch[][] = [[]];
     let lastBatchIndex = 0;
     // for that we run a each event in all our uncached results
     uncachedResultsToProcess.forEach((uncachedResultToProcess) => {
       // and when we hit the limit, we build a new batch
-      if (batches[lastBatchIndex].length === MAX_SEARCH_RESULTS_AT_ONCE_LIMIT) {
+      if (batches[lastBatchIndex].length === MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK) {
         batches.push([]);
         lastBatchIndex++;
       }
@@ -716,7 +716,7 @@ export default class CacheWorker {
       const args: IGQLArgs = {
         token: getListTokenArgs,
         language: getListLangArgs,
-        ids: batch,
+        records: batch,
       };
       if (searchArgs.created_by) {
         args.created_by = searchArgs.created_by;
@@ -842,7 +842,7 @@ export default class CacheWorker {
       const gqlValue: IGQLEndpointValue = {
         data: {
           [searchQueryName]: {
-            ids: await search(this.rootProxy, this.db, actualCurrentSearchValue.value, searchArgs),
+            records: await search(this.rootProxy, this.db, actualCurrentSearchValue.value, searchArgs),
           },
         },
       };

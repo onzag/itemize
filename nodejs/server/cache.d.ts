@@ -9,7 +9,7 @@
 import { RedisClient } from "redis";
 import Knex from "knex";
 import { ISQLTableRowValue } from "../base/Root/sql";
-import { IGQLSearchResult, IGQLArgs, IGQLValue } from "../gql-querier";
+import { IGQLSearchMatch, IGQLArgs, IGQLValue } from "../gql-querier";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { Listener } from "./listener";
 import Root from "../base/Root";
@@ -141,10 +141,10 @@ export declare class Cache {
     /**
      * TODO Optimize this, right now it retrieves the list one by one
      * Requests a whole list of search results
-     * @param ids the ids to request for
+     * @param records the records to request for
      * @returns a list of whole sql combined table row values
      */
-    requestListCache(ids: IGQLSearchResult[]): Promise<ISQLTableRowValue[]>;
+    requestListCache(records: IGQLSearchMatch[]): Promise<ISQLTableRowValue[]>;
     getServerData(): IServerDataType;
     onServerDataChangeInformed(newData: IServerDataType): void;
     /**

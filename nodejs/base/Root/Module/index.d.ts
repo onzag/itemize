@@ -80,6 +80,13 @@ export interface IRawJSONI18NDataType {
  * and item definitions
  */
 export declare type ListenerType = () => any;
+export interface IRequestLimitersType {
+    condition: "AND" | "OR";
+    createdAt?: number;
+    createdBy?: boolean;
+    parenting?: boolean;
+    custom?: string[];
+}
 /**
  * This is the raw shape of a module after it has been
  * built and processed
@@ -137,12 +144,14 @@ export interface IModuleRawJSONDataType {
     /**
      * The roles that have moderation capabilities
      * over the item definitions under this module
+     * modding only exist at module level as well
      */
     modRoleAccess?: string[];
     /**
      * The roles that have flagging capabilities over
      * the item definitions of this module, if not
-     * specified defaults to anyone logged
+     * specified defaults to anyone logged, flagging only
+     * exists at module level and affects all the children
      */
     flagRoleAccess?: string[];
     /**
@@ -159,6 +168,30 @@ export interface IModuleRawJSONDataType {
      * The prop extensions properties that this modules gives to all the item definitions
      */
     propExtensions?: IPropertyDefinitionRawJSONDataType[];
+    /**
+     * Affects both the module and the item definition, this determines
+     * how big the page of requested values can be, for the limit and offset,
+     * it also determines the size of GET_LIST query requests as well
+     * that should give a value that is less or equal to this amount, the default for
+     * this value is MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK
+     */
+    maxTraditionalSearchResults?: number;
+    /**
+     * Affects both the module and item definition, this determines the amount of match
+     * results that can be retrieved at once, if not specified fallbacks to
+     * MAX_MATCHED_SEARCH_RESULTS_FALLBACK
+     */
+    maxSearchMatchResults?: number;
+    /**
+     * And AND request limiter is a very powerful one as this would ensure
+     * the creation of database indexes that will match and speed up these searches
+     * createdAt creates a limiter that requests any search to contain created_at
+     * createdBy creates a limiter that requests any search to contain created_by
+     * parenting requests for a parent and custom adds to custom properties that will be
+     * required at module level, these are basically args
+     * And AND index will ensure to add an ordered btree index to these
+     */
+    requestLimiters?: IRequestLimitersType;
 }
 /**
  * The class module that defines how the module behaves
@@ -407,6 +440,7 @@ export default class Module {
      * @returns a boolean on whether the user is granted role access
      */
     checkRoleAccessFor(action: ItemDefinitionIOActions, role: string, userId: number, ownerUserId: number, requestedFields: IGQLRequestFields, throwError: boolean): boolean;
+    getRequestLimiters(): IRequestLimitersType;
     /**
      * Merges two i18n data components, for example the i18n data for
      * the english build and the i18n data for the russian build, that way

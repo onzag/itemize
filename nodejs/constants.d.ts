@@ -62,7 +62,12 @@ export declare const MAX_FIELD_SIZE = 1000000;
  * how many search results can be retrieved at once these are
  * used for the actual search results
  */
-export declare const MAX_SEARCH_RESULTS_AT_ONCE_LIMIT = 50;
+export declare const MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK = 50;
+/**
+ * how many search results can be retrieved at once these are
+ * used for the actual search results
+ */
+export declare const MAX_MATCHED_SEARCH_RESULTS_FALLBACK = 500;
 /**
  * Supported image types
  */
@@ -191,10 +196,14 @@ export declare const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES: string[];
  * and should mirror the database
  */
 export declare const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType;
+export declare const CREATED_AT_INDEX = "CREATED_AT_INDEX";
+export declare const CREATED_BY_INDEX = "CREATED_BY_INDEX";
+export declare const PARENT_INDEX = "PARENT_INDEX";
+export declare const COMBINED_INDEX = "COMBINED_INDEX";
 /**
  * The reserved base properties but in SQL form
  */
-export declare const RESERVED_BASE_PROPERTIES_SQL: ISQLTableDefinitionType;
+export declare const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedIndexes: string[]) => ISQLTableDefinitionType;
 /**
  * The column name of the foreign key that connects the module table
  * with the item definition table
@@ -248,6 +257,10 @@ export declare const EXCLUSION_STATE_SUFFIX: string;
  * The prefix used in the graphql endpoint for searches of modules and item definitions
  */
 export declare const PREFIX_SEARCH: string;
+/**
+ * The prefix used in the graphql endpoint for searches of modules and item definitions in traditional mode
+ */
+export declare const PREFIX_TRADITIONAL_SEARCH: string;
 /**
  * The prefix used in the graphql endpoint for getting item definitions
  */
@@ -316,18 +329,18 @@ export declare const DATE_FORMAT = "YYYY-MM-DD";
 /**
  * The ID element in graphql form
  */
-export declare const ID_ELEMENT_GQL: GraphQLObjectType<any, any, {
+export declare const SEARCH_MATCH_GQL: GraphQLObjectType<any, any, {
     [key: string]: any;
 }>;
 /**
  * The ID element as input form
  */
-export declare const ID_ELEMENT_INPUT_GQL: GraphQLInputObjectType;
+export declare const SEARCH_MATCH_INPUT_GQL: GraphQLInputObjectType;
 /**
  * The id container contains the way that search results are returned
- * with the ids and the last record of the given ids
+ * with the records and the last record of the given records
  */
-export declare const ID_CONTAINER_GQL: GraphQLObjectType<any, any, {
+export declare const SEARCH_RESULTS_CONTAINER_GQL: GraphQLObjectType<any, any, {
     [key: string]: any;
 }>;
 /**
@@ -468,7 +481,7 @@ export declare const RESERVED_CHANGE_PROPERTIES: {
  * Properties required in order to get a list
  */
 export declare const RESERVED_GETTER_LIST_PROPERTIES: {
-    ids: {
+    records: {
         type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
         description: string;
     };

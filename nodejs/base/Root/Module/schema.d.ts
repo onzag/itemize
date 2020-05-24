@@ -37,7 +37,40 @@ declare const _default: {
         searchable: {
             type: string;
         };
+        maxTraditionalSearchResults: {
+            type: string;
+        };
+        maxSearchMatchResults: {
+            type: string;
+        };
+        requestLimiters: {
+            type: string;
+            properties: {
+                condition: {
+                    type: string;
+                    enum: string[];
+                };
+                createdAt: {
+                    type: string;
+                };
+                createdBy: {
+                    type: string;
+                };
+                parenting: {
+                    type: string;
+                };
+                custom: {
+                    type: string;
+                    items: {
+                        type: string;
+                    };
+                };
+            };
+            additionalProperties: boolean;
+            required: string[];
+        };
     };
+    additionalProperties: boolean;
     required: string[];
 };
 /**

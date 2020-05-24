@@ -59,7 +59,7 @@ async function searchModule(appData, resolverArgs, mod) {
     // return using the base result, and only using the id
     const baseResult = (await searchQuery).map(version_null_value_1.convertVersionsIntoNullsWhenNecessary);
     const finalResult = {
-        ids: baseResult,
+        records: baseResult,
         // TODO manually reorder the real latest by date
         last_record: baseResult[0] || null,
     };
@@ -114,6 +114,9 @@ async function searchItemDefinition(appData, resolverArgs, itemDefinition) {
     const moduleTable = mod.getQualifiedPathName();
     const selfTable = itemDefinition.getQualifiedPathName();
     const searchMod = mod.getSearchModule();
+    // TODO change this, it'd be better to use the item definition table as the base
+    // because the item definition table has less elements in it than the module table
+    // joins might be preferrable
     // in this case it works because we are checking raw property names
     // with the search module, it has no items, so it can easily check it up
     const requiresJoin = Object.keys(resolverArgs.args).some((argName) => {
@@ -154,7 +157,7 @@ async function searchItemDefinition(appData, resolverArgs, itemDefinition) {
     }
     // now we get the base result, and convert every row
     const baseResult = await searchQuery;
-    const ids = baseResult.map((row) => {
+    const records = baseResult.map((row) => {
         return version_null_value_1.convertVersionsIntoNullsWhenNecessary({
             id: row.id,
             type: selfTable,
@@ -163,9 +166,9 @@ async function searchItemDefinition(appData, resolverArgs, itemDefinition) {
         });
     });
     const finalResult = {
-        ids,
+        records,
         // TODO manually reorder the real latest by date
-        last_record: ids[0],
+        last_record: records[0],
     };
     server_1.logger.debug("searchItemDefinition: done");
     return finalResult;

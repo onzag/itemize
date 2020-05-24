@@ -42,6 +42,39 @@ export default {
     searchable: {
       type: "boolean",
     },
+    maxTraditionalSearchResults: {
+      type: "number",
+    },
+    maxSearchMatchResults: {
+      type: "number",
+    },
+    requestLimiters: {
+      type: "object",
+      properties: {
+        condition: {
+          type: "string",
+          enum: ["AND", "OR"],
+        },
+        createdAt: {
+          type: "boolean",
+        },
+        createdBy: {
+          type: "boolean",
+        },
+        parenting: {
+          type: "boolean",
+        },
+        custom: {
+          type: "array",
+          items: {
+            type: "string",
+          }
+        }
+      },
+      additionalProperties: false,
+      required: ["condition"],
+    }
   },
+  additionalProperties: false,
   required: ["type"],
 };

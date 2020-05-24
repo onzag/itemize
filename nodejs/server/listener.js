@@ -211,7 +211,7 @@ class Listener {
                 const event = {
                     createdBy: request.createdBy,
                     qualifiedPathName: request.qualifiedPathName,
-                    newIds: newRecords,
+                    newRecords: newRecords,
                     // this contains all the data and the new record has the right form
                     newLastRecord: newRecords[0],
                 };
@@ -264,7 +264,7 @@ class Listener {
                     parentVersion: request.parentVersion,
                     parentType: request.parentType,
                     qualifiedPathName: request.qualifiedPathName,
-                    newIds: newRecords,
+                    newRecords: newRecords,
                     newLastRecord: newRecords[0],
                 };
                 _1.logger.debug("Listener.parentedSearchFeedback: emmitting " + remote_protocol_1.PARENTED_SEARCH_RECORDS_ADDED_EVENT, event);

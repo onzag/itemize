@@ -23,6 +23,7 @@ import {
   CLASSIC_OPTIONAL_I18N,
   CLASSIC_SEARCH_BASE_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N,
+  SQL_CONSTRAINT_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import { standardLocalSearchExactAndRange } from "../local-search";
@@ -58,7 +59,16 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   // a string is a string
   json: "string",
-  sql: getStandardSQLFnFor && getStandardSQLFnFor("text"),
+  sql: getStandardSQLFnFor && getStandardSQLFnFor("text", null, (subtype: string, sqlPrefix: string, id: string) => {
+    if (subtype) {
+      return {
+        type: "btree",
+        id: SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
+        level: 0,
+      }
+    }
+    return null;
+  }),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,

@@ -6,7 +6,7 @@
  *
  * @packageDocumentation
  */
-import { IGQLSearchResult } from "../gql-querier";
+import { IGQLSearchMatch } from "../gql-querier";
 /**
  * The build number event is an event streamed from the
  * server to the client once this client has connected
@@ -68,13 +68,13 @@ interface IBaseSearchRecordsAddedEvent {
      */
     qualifiedPathName: string;
     /**
-     * the new ids that have been added
+     * the new records that have been added
      */
-    newIds: IGQLSearchResult[];
+    newRecords: IGQLSearchMatch[];
     /**
      * the new last record search result
      */
-    newLastRecord: IGQLSearchResult;
+    newLastRecord: IGQLSearchMatch;
 }
 /**
  * When they are owned items, as a search has been cached using a creator
@@ -238,7 +238,7 @@ interface IBaseSearchFeedbackRequest {
      * since they come in order it's easy to know if
      * something has been added
      */
-    knownLastRecord: IGQLSearchResult;
+    knownLastRecord: IGQLSearchMatch;
 }
 /**
  * The feedback version of [[PARENTED_SEARCH_REGISTER_REQUEST]]
