@@ -13,6 +13,7 @@ const __1 = require("..");
 const deep_equal_1 = __importDefault(require("deep-equal"));
 const Include_1 = require("../../base/Root/Module/ItemDefinition/Include");
 const token_1 = require("../token");
+const search_mode_1 = require("../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode");
 /**
  * Builds the column names expected for a given module only
  * @param requestedFields the requested fields given by graphql fields and flattened
@@ -217,6 +218,9 @@ exports.validateParentingRules = validateParentingRules;
  * @param requestedFields the requested fields
  */
 function checkBasicFieldsAreAvailableForRole(itemDefinitionOrModule, tokenData, requestedFields) {
+    if (typeof requestedFields === "undefined" || requestedFields === null) {
+        return true;
+    }
     // now we check if moderation fields have been requested
     const moderationFieldsHaveBeenRequested = constants_1.MODERATION_FIELDS.some((field) => requestedFields[field]);
     // if they have been requested, and our role has no native access to that
@@ -240,21 +244,134 @@ function checkBasicFieldsAreAvailableForRole(itemDefinitionOrModule, tokenData, 
     __1.logger.silly("checkBasicFieldsAreAvailableForRole: basic fields access role succeed");
 }
 exports.checkBasicFieldsAreAvailableForRole = checkBasicFieldsAreAvailableForRole;
-/**
- * Checks a list provided by the getter functions that use
- * lists to ensure the request isn't too large
- * @param records the list records that have been requested
- */
-function checkListLimit(records) {
-    if (records.length > constants_1.MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK) {
+function retrieveSince(args) {
+    if (args.since) {
+        const date = new Date(args.since);
+        if (date instanceof Date && !isNaN(date.getTime())) {
+            return date.toISOString();
+        }
+        else {
+            throw new errors_1.EndpointError({
+                message: "Could not parse since value " + args.since,
+                code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+            });
+        }
+    }
+    return null;
+}
+exports.retrieveSince = retrieveSince;
+function checkLimiters(args, idefOrMod) {
+    const mod = idefOrMod instanceof Module_1.default ? idefOrMod : idefOrMod.getParentModule();
+    const limiters = mod.getRequestLimiters();
+    if (!limiters) {
+        return;
+    }
+    let customError = null;
+    let someCustomLimiterSucceed = false;
+    if (limiters.custom) {
+        someCustomLimiterSucceed = limiters.custom.some((propertyIdLimiter) => {
+            const property = mod.getPropExtensionFor(propertyIdLimiter);
+            const expectedConversionIds = search_mode_1.getConversionIds(property.rawData);
+            const succeed = expectedConversionIds.every((conversionId) => {
+                return typeof args[conversionId] === "undefined";
+            });
+            if (!succeed) {
+                customError = "Missing custom request search limiter required by limiter set by " + propertyIdLimiter + " in module " +
+                    mod.getQualifiedPathName() + " requiring of both " + expectedConversionIds.join(", ");
+            }
+            return succeed;
+        });
+    }
+    if (limiters.condition === "AND" &&
+        customError) {
         throw new errors_1.EndpointError({
-            message: "Too many records at once, max is " + constants_1.MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK,
+            message: customError,
             code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
         });
     }
-    __1.logger.silly("checkListLimit: checking limits succeed");
+    let sinceError = null;
+    let sinceSucceed = false;
+    if (limiters.since) {
+        const sinceArg = args.since ? new Date(args.since) : null;
+        const hasSince = !!sinceArg;
+        if (!hasSince) {
+            sinceError = "Missing since limiter which is a required limiter";
+        }
+        else {
+            const now = (new Date()).getTime();
+            const sinceMs = sinceArg.getTime();
+            if (now - sinceMs > limiters.since) {
+                sinceError = "Since is not respected as it requires a difference of less than " +
+                    limiters.since + "ms but " + sinceMs + " provided";
+            }
+            else {
+                sinceSucceed = true;
+            }
+        }
+    }
+    if (limiters.condition === "AND" &&
+        sinceError) {
+        throw new errors_1.EndpointError({
+            message: sinceError,
+            code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+    }
+    let createdBySucceed = false;
+    if (limiters.createdBy) {
+        createdBySucceed = !!(args.created_by);
+    }
+    if (limiters.condition === "AND" &&
+        !createdBySucceed) {
+        throw new errors_1.EndpointError({
+            message: "Created by is required as a limiter, yet none was specified",
+            code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+    }
+    let parentingSucceed = false;
+    if (limiters.parenting) {
+        parentingSucceed = !!(args.parent_id && args.parent_type);
+    }
+    if (limiters.condition === "AND" &&
+        !parentingSucceed) {
+        throw new errors_1.EndpointError({
+            message: "Parenting is required as a limiter, yet none was specified",
+            code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+    }
+    if (limiters.condition === "OR") {
+        const passedCustom = limiters.custom && someCustomLimiterSucceed;
+        const passedSince = limiters.since && sinceSucceed;
+        const passedCreatedBy = limiters.createdBy && createdBySucceed;
+        const passedParenting = limiters.parenting && parentingSucceed;
+        if (passedCustom ||
+            passedSince ||
+            passedCreatedBy ||
+            passedParenting) {
+            return;
+        }
+        throw new errors_1.EndpointError({
+            message: "None of the OR request limiting conditions passed",
+            code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+    }
 }
-exports.checkListLimit = checkListLimit;
+exports.checkLimiters = checkLimiters;
+/**
+ * Checks that the limit of search results is within the range that the item
+ * defintion allows
+ */
+function checkLimit(limit, idefOrMod, traditional) {
+    const mod = idefOrMod instanceof Module_1.default ? idefOrMod : idefOrMod.getParentModule();
+    const maxSearchResults = traditional ? mod.getMaxSearchResults() : mod.getMaxSearchRecords();
+    if (limit > maxSearchResults) {
+        throw new errors_1.EndpointError({
+            message: "Too many " + (traditional ? "results" : "records") + " at once, max is " + maxSearchResults,
+            code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+    }
+    __1.logger.silly("checkLimit: checking limits succeed");
+}
+exports.checkLimit = checkLimit;
 function checkListTypes(records, mod) {
     records.forEach((idContainer) => {
         const itemDefinition = mod.getParentRoot().registry[idContainer.type];

@@ -61,6 +61,9 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlLocalEqual: () => {
     throw new Error("Attempted to local equal within a file");
   },
+  sqlBtreeIndexable: () => {
+    throw new Error("Attempted to btree index a file, this might mean a file value is in request limiters, don't do that");
+  },
   sqlMantenience: null,
   localEqual: standardLocalEqual,
   i18n: {

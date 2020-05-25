@@ -30,6 +30,7 @@ const typeValue = {
     sqlEqual: sql_1.standardSQLEqualFn,
     sqlLocalEqual: local_sql_1.standardSQLLocalEqualFn,
     localEqual: local_sql_1.standardLocalEqual,
+    sqlBtreeIndexable: sql_1.standardSQLBtreeIndexable,
     sqlMantenience: null,
     localSearch: local_search_1.dateLocalSearchExactAndRange.bind(null, constants_1.DATETIME_FORMAT),
     validate: (d) => {

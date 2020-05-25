@@ -57,6 +57,9 @@ const typeValue = {
     sqlLocalEqual: () => {
         throw new Error("Attempted to local equal within files");
     },
+    sqlBtreeIndexable: () => {
+        throw new Error("Attempted to btree index files, this might mean a files value is in request limiters, don't do that");
+    },
     sqlMantenience: null,
     localEqual: local_sql_1.standardLocalEqual,
     allowsMinMaxLengthDefined: true,

@@ -73,12 +73,12 @@ export const MAX_FIELD_SIZE = 1000000; // equivalent to 1MB
  * how many search results can be retrieved at once these are
  * used for the actual search results
  */
-export const MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK = 50;
+export const MAX_SEARCH_RESULTS_FALLBACK = 50;
 /**
  * how many search results can be retrieved at once these are
  * used for the actual search results
  */
-export const MAX_MATCHED_SEARCH_RESULTS_FALLBACK = 500;
+export const MAX_SEARCH_RECORDS_FALLBACK = 500;
 /**
  * Supported image types
  */
@@ -723,7 +723,7 @@ export const DATE_FORMAT = "YYYY-MM-DD";
  * that make the client able to run requests for a given item id
  * @ignore
  */
-const SEARCH_MATCH_FIELDS = {
+const SEARCH_RECORD_FIELDS = {
   id: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
   },
@@ -740,30 +740,30 @@ const SEARCH_MATCH_FIELDS = {
 /**
  * The ID element in graphql form
  */
-export const SEARCH_MATCH_GQL = GraphQLObjectType && new GraphQLObjectType({
-  name: "SEARCH_MATCH",
-  fields: SEARCH_MATCH_FIELDS,
+export const SEARCH_RECORD_GQL = GraphQLObjectType && new GraphQLObjectType({
+  name: "SEARCH_RECORD",
+  fields: SEARCH_RECORD_FIELDS,
 });
 /**
  * The ID element as input form
  */
-export const SEARCH_MATCH_INPUT_GQL = GraphQLInputObjectType && new GraphQLInputObjectType({
-  name: "SEARCH_MATCH_INPUT",
-  fields: SEARCH_MATCH_FIELDS,
+export const SEARCH_RECORD_INPUT_GQL = GraphQLInputObjectType && new GraphQLInputObjectType({
+  name: "SEARCH_RECORD_INPUT",
+  fields: SEARCH_RECORD_FIELDS,
 });
 
 /**
  * The id container contains the way that search results are returned
  * with the records and the last record of the given records
  */
-export const SEARCH_RESULTS_CONTAINER_GQL = GraphQLObjectType && new GraphQLObjectType({
-  name: "SEARCH_RESULTS_CONTAINER",
+export const SEARCH_RECORDS_CONTAINER_GQL = GraphQLObjectType && new GraphQLObjectType({
+  name: "SEARCH_RECORDS_CONTAINER",
   fields: {
     records: {
-      type: GraphQLList && GraphQLList(GraphQLNonNull(SEARCH_MATCH_GQL)),
+      type: GraphQLList && GraphQLList(GraphQLNonNull(SEARCH_RECORD_GQL)),
     },
-    last_record: {
-      type: SEARCH_MATCH_GQL,
+    last_record_date: {
+      type: GraphQLString,
     },
     count: {
       type: GraphQLNonNull(GraphQLInt),
@@ -817,9 +817,21 @@ const ORDERBY_RULE = GraphQLEnumType && new GraphQLEnumType({
  */
 export const RESERVED_SEARCH_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
+  limit: {
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
+    description: "The SQL limit to use in order to page the amount of results",
+  },
+  offset: {
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
+    description: "The SQL offset to use in order to page the amount of results",
+  },
   order_by: {
     type: GraphQLNonNull && GraphQLNonNull(ORDERBY_RULE),
     description: "An order type",
+  },
+  since: {
+    type: GraphQLString,
+    description: "Basically a limiter that causes the values to only be returned since that date, the date must be an ISO type",
   },
   created_by: {
     type: GraphQLInt,
@@ -837,11 +849,11 @@ export const RESERVED_SEARCH_PROPERTIES = {
     type: GraphQLString,
     description: "a parent item definition qualified path (must be specified with parent_id)",
   },
-  // TODO
   version_filter: {
     type: GraphQLString,
     description: "Allow only items that are of this version",
   },
+  // TODO
   search: {
     type: GraphQLString,
     description: "A search string",
@@ -853,9 +865,21 @@ export const RESERVED_SEARCH_PROPERTIES = {
  */
 export const RESERVED_MODULE_SEARCH_PROPERTIES = {
   ...RESERVED_SEARCH_PROPERTIES,
+  limit: {
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
+    description: "The SQL limit to use in order to page the amount of results",
+  },
+  offset: {
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
+    description: "The SQL offset to use in order to page the amount of results",
+  },
   types: {
     type: GraphQLList && GraphQLList(GraphQLNonNull(GraphQLString)),
     description: "A list of types (qualified names) to filter by",
+  },
+  since: {
+    type: GraphQLString,
+    description: "Basically a limiter that causes the values to only be returned since that date, the date must be an ISO type",
   },
   order_by: {
     type: GraphQLNonNull && GraphQLNonNull(ORDERBY_RULE),
@@ -877,11 +901,11 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = {
     type: GraphQLString,
     description: "a parent item definition qualified path (must be specified with parent_id)",
   },
-  // TODO
   version_filter: {
     type: GraphQLString,
     description: "Allow only items that are of this version",
   },
+  // TODO
   search: {
     type: GraphQLString,
     description: "A search string",
@@ -924,7 +948,7 @@ export const RESERVED_GETTER_LIST_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   records: {
     // TODO implement the version in retrieving these lists
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLList(SEARCH_MATCH_INPUT_GQL)),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLList(SEARCH_RECORD_INPUT_GQL)),
     description: "the records to fetch for that item",
   },
   created_by: {
@@ -1043,6 +1067,8 @@ export const PROTECTED_RESOURCES = [
 export const SERVER_DATA_IDENTIFIER = "SERVER_DATA";
 
 export const CURRENCY_FACTORS_IDENTIFIER = "CURRENCY_FACTORS"
+
+export const CACHED_CURRENCY_LAYER_RESPONSE = "CACHED_CURRENCY_LAYER_RESPONSE";
 
 export const WAIT_TIME_PER_BATCH = 300000;
 

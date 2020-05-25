@@ -86,8 +86,8 @@ interface IFileModuleDataRawUntreatedJSONDataType {
   children: string[];
   readRoleAccess?: string[];
   searchable?: boolean;
-  maxTraditionalSearchResults?: number;
-  maxSearchMatchResults?: number;
+  maxSearchResults?: number;
+  maxSearchRecords?: number;
   requestLimiters?: IRequestLimitersType;
 }
 
@@ -528,12 +528,12 @@ async function buildModule(
     finalValue.readRoleAccess = actualEvaledFileData.readRoleAccess;
   }
 
-  if (typeof actualEvaledFileData.maxSearchMatchResults !== "undefined") {
-    finalValue.maxSearchMatchResults = actualEvaledFileData.maxSearchMatchResults;
+  if (typeof actualEvaledFileData.maxSearchRecords !== "undefined") {
+    finalValue.maxSearchRecords = actualEvaledFileData.maxSearchRecords;
   }
 
-  if (typeof actualEvaledFileData.maxTraditionalSearchResults !== "undefined") {
-    finalValue.maxTraditionalSearchResults = actualEvaledFileData.maxTraditionalSearchResults;
+  if (typeof actualEvaledFileData.maxSearchResults !== "undefined") {
+    finalValue.maxSearchResults = actualEvaledFileData.maxSearchResults;
   }
 
   if (actualEvaledFileData.requestLimiters) {

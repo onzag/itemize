@@ -5,7 +5,7 @@ import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import { PREFIX_GET_LIST, PREFIX_GET } from "../../../constants";
 import CacheWorkerInstance from "../../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../../gql-util";
-import { buildGqlQuery, gqlQuery, IGQLSearchMatch, IGQLRequestFields, IGQLValue } from "../../../gql-querier";
+import { buildGqlQuery, gqlQuery, IGQLSearchRecord, IGQLRequestFields, IGQLValue } from "../../../gql-querier";
 import { LocaleContext, ILocaleContextType } from "../../internal/app";
 import { TokenContext, ITokenContextType } from "../../internal/app/internal-providers";
 import { EndpointErrorType } from "../../../base/errors";
@@ -16,13 +16,13 @@ interface IItemDefinitionProviderPropsWithKey extends
   key: string;
 }
 
-interface IGQLSearchMatchWithPopulateData extends IGQLSearchMatch {
+interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
   providerProps: IItemDefinitionProviderPropsWithKey;
   itemDefinition: ItemDefinition;
 }
 
 export interface ISearchLoaderArg {
-  searchResults: IGQLSearchMatchWithPopulateData[];
+  searchResults: IGQLSearchRecordWithPopulateData[];
   pageCount: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
@@ -41,7 +41,7 @@ export interface ISearchLoaderProps {
 }
 
 interface IActualSearchLoaderProps extends ISearchLoaderProps {
-  searchResults: IGQLSearchMatch[];
+  searchResults: IGQLSearchRecord[];
   itemDefinitionInstance: ItemDefinition;
   // token data to get the current user id, and role, for requests
   tokenData: ITokenContextType;
@@ -58,9 +58,9 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
 }
 
 interface IActualSearchLoaderState {
-  currentlySearching: IGQLSearchMatch[];
+  currentlySearching: IGQLSearchRecord[];
   searchFields: IGQLRequestFields;
-  currentSearchResults: IGQLSearchMatch[];
+  currentSearchResults: IGQLSearchRecord[];
   error: EndpointErrorType;
 }
 
@@ -109,7 +109,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       error: null,
     });
   }
-  public async loadValues(currentSearchResults: IGQLSearchMatch[]) {
+  public async loadValues(currentSearchResults: IGQLSearchRecord[]) {
     if (!this.props.searchId) {
       return;
     }
@@ -129,8 +129,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     const getListQueryName: string = PREFIX_GET_LIST + queryBase;
 
-    const uncachedResults: IGQLSearchMatch[] = [];
-    const workerCachedResults = await Promise.all(currentSearchResults.map(async (searchResult: IGQLSearchMatch) => {
+    const uncachedResults: IGQLSearchRecord[] = [];
+    const workerCachedResults = await Promise.all(currentSearchResults.map(async (searchResult: IGQLSearchRecord) => {
       const itemDefintionInQuestion =
         this.props.itemDefinitionInstance.getParentModule()
           .getParentRoot().registry[searchResult.type] as ItemDefinition;

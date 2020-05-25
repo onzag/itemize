@@ -202,8 +202,8 @@ class Listener {
             }
             query.andWhere("created_by", request.createdBy);
             // the know last record might be null in case of empty searches
-            if (request.knownLastRecord) {
-                query.andWhere("created_at", ">", request.knownLastRecord.created_at);
+            if (request.knownLastRecordDate) {
+                query.andWhere("created_at", ">", request.knownLastRecordDate);
             }
             query.orderBy("created_at", "desc");
             const newRecords = (await query).map(version_null_value_1.convertVersionsIntoNullsWhenNecessary);
@@ -213,7 +213,7 @@ class Listener {
                     qualifiedPathName: request.qualifiedPathName,
                     newRecords: newRecords,
                     // this contains all the data and the new record has the right form
-                    newLastRecord: newRecords[0],
+                    newLastRecordDate: newRecords[0].created_at,
                 };
                 _1.logger.debug("Listener.ownedSearchFeedback: triggering " + remote_protocol_1.OWNED_SEARCH_RECORDS_ADDED_EVENT, event);
                 socket.emit(remote_protocol_1.OWNED_SEARCH_RECORDS_ADDED_EVENT, event);
@@ -253,8 +253,8 @@ class Listener {
             query.andWhere("parent_version", request.parentVersion || null);
             query.andWhere("parent_type", request.parentType);
             // the know last record might be null in case of empty searches
-            if (request.knownLastRecord) {
-                query.andWhere("created_at", ">", request.knownLastRecord.created_at);
+            if (request.knownLastRecordDate) {
+                query.andWhere("created_at", ">", request.knownLastRecordDate);
             }
             query.orderBy("created_at", "desc");
             const newRecords = (await query).map(version_null_value_1.convertVersionsIntoNullsWhenNecessary);
@@ -265,7 +265,7 @@ class Listener {
                     parentType: request.parentType,
                     qualifiedPathName: request.qualifiedPathName,
                     newRecords: newRecords,
-                    newLastRecord: newRecords[0],
+                    newLastRecordDate: newRecords[0].created_at,
                 };
                 _1.logger.debug("Listener.parentedSearchFeedback: emmitting " + remote_protocol_1.PARENTED_SEARCH_RECORDS_ADDED_EVENT, event);
                 socket.emit(remote_protocol_1.PARENTED_SEARCH_RECORDS_ADDED_EVENT, event);

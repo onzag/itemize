@@ -100,6 +100,9 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
     return bcyrpt.compareSync(value, data[sqlPrefix + id]);
   },
+  sqlBtreeIndexable: () => {
+    throw new Error("Attempted to btree index a password, this might mean a files value is in request limiters, don't do that");
+  },
   sqlMantenience: null,
   // validates just the length
   validate: (s: PropertyDefinitionSupportedPasswordType) => {

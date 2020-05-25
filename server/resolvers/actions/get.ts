@@ -6,7 +6,7 @@ import {
   validateTokenAndGetData,
   checkBasicFieldsAreAvailableForRole,
   filterAndPrepareGQLValue,
-  checkListLimit,
+  checkLimit,
   validateTokenIsntBlocked,
   checkListTypes,
   runPolicyCheck,
@@ -22,7 +22,7 @@ import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { EndpointError } from "../../../base/errors";
-import { IGQLSearchMatch } from "../../../gql-querier";
+import { IGQLSearchRecord } from "../../../gql-querier";
 
 export async function getItemDefinition(
   appData: IAppDataType,
@@ -163,7 +163,7 @@ export async function getItemDefinitionList(
   // first we check that the language and region provided are
   // right and available
   checkLanguage(appData, resolverArgs.args);
-  checkListLimit(resolverArgs.args.records);
+  checkLimit((resolverArgs.args.records as IGQLSearchRecord[]).length, itemDefinition, true);
   const mod = itemDefinition.getParentModule();
   checkListTypes(resolverArgs.args.records, mod);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
@@ -218,7 +218,7 @@ export async function getItemDefinitionList(
   // as the qualified path name and the table name, so by ensuring it's a legit name
   // we ensure there is no leak
   const selfTableType = itemDefinition.getQualifiedPathName();
-  resolverArgs.args.records.forEach((argId: IGQLSearchMatch) => {
+  resolverArgs.args.records.forEach((argId: IGQLSearchRecord) => {
     if (argId.type !== selfTableType) {
       throw new EndpointError({
         message: "Invalid id container type that didn't match the qualified name " + selfTableType,
@@ -264,7 +264,7 @@ export async function getModuleList(
   // first we check that the language and region provided are
   // right and available
   checkLanguage(appData, resolverArgs.args);
-  checkListLimit(resolverArgs.args.records);
+  checkLimit((resolverArgs.args.records as IGQLSearchRecord[]).length, mod, true);
   checkListTypes(resolverArgs.args.records, mod);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
   await validateTokenIsntBlocked(appData.cache, tokenData);

@@ -8,7 +8,7 @@ import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N,
-  CLASSIC_SEARCH_OPTIONAL_I18N, INCLUDE_PREFIX } from "../../../../../../constants";
+  CLASSIC_SEARCH_OPTIONAL_I18N, INCLUDE_PREFIX, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import Knex from "knex";
 import { ISQLTableRowValue } from "../../../../sql";
@@ -97,6 +97,11 @@ const typeValue: IPropertyDefinitionSupportedType = {
       [sqlPrefix + id + "_GEO"]: {
         type: "GEOMETRY(POINT,4326)",
         ext: "postgis",
+        index: {
+          type: "gist",
+          id: SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
+          level: 0,
+        },
       },
       [sqlPrefix + id + "_ID"]: {
         type: "text",
@@ -252,6 +257,9 @@ const typeValue: IPropertyDefinitionSupportedType = {
       return data[sqlPrefix + id + "_ID"] === value;
     }
     return data[sqlPrefix + id + "ID"] === value.id;
+  },
+  sqlBtreeIndexable: () => {
+    return null;
   },
   localEqual: (
     a: IPropertyDefinitionSupportedLocationType,

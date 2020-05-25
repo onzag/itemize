@@ -38,7 +38,7 @@ import {
   IChangedFeedbackEvent,
   IDENTIFIED_EVENT,
 } from "../base/remote-protocol";
-import { IGQLSearchMatch } from "../gql-querier";
+import { IGQLSearchRecord } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from ".";
 import { SERVER_DATA_IDENTIFIER } from "../constants";
@@ -348,8 +348,8 @@ export class Listener {
 
       query.andWhere("created_by", request.createdBy);
       // the know last record might be null in case of empty searches
-      if (request.knownLastRecord) {
-        query.andWhere("created_at", ">", request.knownLastRecord.created_at);
+      if (request.knownLastRecordDate) {
+        query.andWhere("created_at", ">", request.knownLastRecordDate);
       }
       query.orderBy("created_at", "desc");
 
@@ -359,9 +359,9 @@ export class Listener {
         const event: IOwnedSearchRecordsAddedEvent = {
           createdBy: request.createdBy,
           qualifiedPathName: request.qualifiedPathName,
-          newRecords: newRecords as IGQLSearchMatch[],
+          newRecords: newRecords as IGQLSearchRecord[],
           // this contains all the data and the new record has the right form
-          newLastRecord: newRecords[0] as any,
+          newLastRecordDate: (newRecords[0] as IGQLSearchRecord).created_at,
         };
         logger.debug(
           "Listener.ownedSearchFeedback: triggering " + OWNED_SEARCH_RECORDS_ADDED_EVENT,
@@ -417,8 +417,8 @@ export class Listener {
       query.andWhere("parent_version", request.parentVersion || null);
       query.andWhere("parent_type", request.parentType);
       // the know last record might be null in case of empty searches
-      if (request.knownLastRecord) {
-        query.andWhere("created_at", ">", request.knownLastRecord.created_at);
+      if (request.knownLastRecordDate) {
+        query.andWhere("created_at", ">", request.knownLastRecordDate);
       }
       query.orderBy("created_at", "desc");
 
@@ -430,8 +430,8 @@ export class Listener {
           parentVersion: request.parentVersion,
           parentType: request.parentType,
           qualifiedPathName: request.qualifiedPathName,
-          newRecords: newRecords as IGQLSearchMatch[],
-          newLastRecord: newRecords[0] as any,
+          newRecords: newRecords as IGQLSearchRecord[],
+          newLastRecordDate: (newRecords[0] as IGQLSearchRecord).created_at,
         };
         logger.debug(
           "Listener.parentedSearchFeedback: emmitting " + PARENTED_SEARCH_RECORDS_ADDED_EVENT,

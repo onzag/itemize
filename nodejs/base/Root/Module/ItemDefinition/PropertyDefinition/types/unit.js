@@ -156,6 +156,9 @@ const typeValue = {
         return data[sqlPrefix + id + "_NORMALIZED_VALUE"] === value.normalizedValue &&
             data[sqlPrefix + id + "_NORMALIZED_UNIT"] === value.normalizedUnit;
     },
+    sqlBtreeIndexable: (sqlPrefix, id) => {
+        return [sqlPrefix + id + "_NORMALIZED_UNIT", sqlPrefix + id + "_NORMALIZED_VALUE"];
+    },
     localEqual: (a, b) => {
         return a.value === b.value && a.unit === b.unit;
     },

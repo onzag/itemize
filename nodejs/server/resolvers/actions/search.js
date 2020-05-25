@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = require("../../../server");
 const basic_1 = require("../basic");
@@ -7,8 +10,46 @@ const sql_1 = require("../../../base/Root/Module/sql");
 const constants_1 = require("../../../constants");
 const sql_2 = require("../../../base/Root/Module/ItemDefinition/sql");
 const version_null_value_1 = require("../../version-null-value");
-async function searchModule(appData, resolverArgs, mod) {
+const gql_util_1 = require("../../../gql-util");
+const graphql_fields_1 = __importDefault(require("graphql-fields"));
+const util_1 = require("../../../util");
+function findLastRecordDateCheatMethod(records) {
+    let maximumRecords = null;
+    let maximumRecordId = null;
+    records.forEach((record) => {
+        if (!maximumRecordId || record.id > maximumRecordId) {
+            maximumRecordId = record.id;
+            maximumRecords = [record];
+        }
+        else if (maximumRecordId === record.id) {
+            maximumRecords.push(record);
+        }
+    });
+    if (!maximumRecords.length) {
+        return null;
+    }
+    if (maximumRecords.length === 1) {
+        return maximumRecords[0].created_at;
+    }
+    if (maximumRecords.length === 2) {
+        const versionedRecord = maximumRecords.find((r) => r.version !== null);
+        return versionedRecord.created_at;
+    }
+    const recordsRespectiveNanoSecondAccuracyArray = maximumRecords.map((r) => new util_1.NanoSecondComposedDate(r.created_at));
+    const maxDate = recordsRespectiveNanoSecondAccuracyArray.reduce((prev, cur) => {
+        return prev.greaterThan(cur) ? prev : cur;
+    });
+    return maxDate.original;
+}
+function searchModuleTraditional(appData, resolverArgs, mod) {
+    return searchModule(appData, resolverArgs, mod, true);
+}
+exports.searchModuleTraditional = searchModuleTraditional;
+async function searchModule(appData, resolverArgs, mod, traditional) {
     server_1.logger.debug("searchModule: executed search for " + mod.getQualifiedPathName());
+    const since = basic_1.retrieveSince(resolverArgs.args);
+    basic_1.checkLimit(resolverArgs.args.limit, mod, traditional);
+    basic_1.checkLimiters(resolverArgs.args, mod);
     // check language and region
     basic_1.checkLanguage(appData, resolverArgs.args);
     const tokenData = await basic_1.validateTokenAndGetData(appData, resolverArgs.args.token);
@@ -36,20 +77,53 @@ async function searchModule(appData, resolverArgs, mod) {
     // be brute forced this way, and we are paranoid as hell
     server_1.logger.debug("searchModule: checking read role access based on " + searchModeCounterpart.getQualifiedPathName());
     searchModeCounterpart.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, searchingFields, true);
+    let fieldsToRequest = ["id", "version", "type", "created_at"];
+    let requestedFields = null;
+    const generalFields = graphql_fields_1.default(resolverArgs.info);
+    if (traditional) {
+        requestedFields = gql_util_1.flattenRawGQLValueOrFields(generalFields.results);
+        basic_1.checkBasicFieldsAreAvailableForRole(mod, tokenData, requestedFields);
+        fieldsToRequest = Object.keys(requestedFields);
+        const requestedFieldsInMod = {};
+        Object.keys(requestedFields || {}).forEach((arg) => {
+            if (mod.hasPropExtensionFor(arg)) {
+                requestedFieldsInMod[arg] = requestedFields[arg];
+            }
+        });
+        server_1.logger.debug("searchModule: Extracted requested fields from module", fieldsToRequest);
+        if (!fieldsToRequest.includes("created_at")) {
+            fieldsToRequest.push("created_at");
+        }
+        if (!fieldsToRequest.includes("blocked_at")) {
+            fieldsToRequest.push("blocked_at");
+        }
+        mod.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, requestedFieldsInMod, true);
+    }
     // now we build the search query, the search query only matches an id
     // note how we remove blocked_at
-    const searchQuery = appData.knex.select(["id", "version", "type", "created_at"])
-        .from(mod.getQualifiedPathName())
+    const queryModel = appData.knex.table(mod.getQualifiedPathName())
         .where("blocked_at", null);
     if (created_by) {
-        searchQuery.where("created_by", created_by);
+        queryModel.andWhere("created_by", created_by);
+    }
+    if (since) {
+        queryModel.andWhere("created_at", ">=", since);
+    }
+    if (typeof resolverArgs.args.version_filter !== "undefined") {
+        queryModel.andWhere("version", resolverArgs.args.version_filter || "");
     }
     // now we build the sql query for the module
-    sql_1.buildSQLQueryForModule(mod, resolverArgs.args, searchQuery, basic_1.getDictionary(appData, resolverArgs.args));
+    sql_1.buildSQLQueryForModule(mod, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args));
     // if we filter by type
     if (resolverArgs.args.types) {
-        searchQuery.andWhere("type", resolverArgs.args.types);
+        queryModel.andWhere("type", resolverArgs.args.types);
     }
+    const searchQuery = queryModel.clone();
+    const limit = resolverArgs.args.limit;
+    const offset = resolverArgs.args.offset;
+    searchQuery.select(fieldsToRequest).limit(limit).offset(offset);
+    const countQuery = queryModel.clone().count();
+    // TODO add limits and offset
     if (resolverArgs.args.order_by === "DEFAULT") {
         searchQuery.orderBy("created_at", "DESC");
     }
@@ -57,18 +131,45 @@ async function searchModule(appData, resolverArgs, mod) {
         // TODO
     }
     // return using the base result, and only using the id
-    const baseResult = (await searchQuery).map(version_null_value_1.convertVersionsIntoNullsWhenNecessary);
-    const finalResult = {
-        records: baseResult,
-        // TODO manually reorder the real latest by date
-        last_record: baseResult[0] || null,
-    };
-    server_1.logger.debug("searchModule: succeed");
-    return finalResult;
+    const baseResult = (generalFields.results || generalFields.records) ?
+        (await searchQuery).map(version_null_value_1.convertVersionsIntoNullsWhenNecessary) :
+        null;
+    const countResult = generalFields.count ? (await countQuery) : null;
+    const count = (countResult[0] && countResult[0].count) || null;
+    if (traditional) {
+        const finalResult = {
+            results: baseResult.map((r) => {
+                return basic_1.filterAndPrepareGQLValue(r, requestedFields, tokenData.role, mod).toReturnToUser;
+            }),
+            limit,
+            offset,
+            count,
+        };
+        server_1.logger.debug("searchModule: succeed traditionally");
+        return finalResult;
+    }
+    else {
+        const finalResult = {
+            records: baseResult,
+            last_record_date: findLastRecordDateCheatMethod(baseResult),
+            limit,
+            offset,
+            count,
+        };
+        server_1.logger.debug("searchModule: succeed with records");
+        return finalResult;
+    }
 }
 exports.searchModule = searchModule;
-async function searchItemDefinition(appData, resolverArgs, itemDefinition) {
+function searchItemDefinitionTraditional(appData, resolverArgs, itemDefinition) {
+    return searchItemDefinition(appData, resolverArgs, itemDefinition, true);
+}
+exports.searchItemDefinitionTraditional = searchItemDefinitionTraditional;
+async function searchItemDefinition(appData, resolverArgs, itemDefinition, traditional) {
     server_1.logger.debug("searchItemDefinition: executed search for " + itemDefinition.getQualifiedPathName());
+    const since = basic_1.retrieveSince(resolverArgs.args);
+    basic_1.checkLimit(resolverArgs.args.limit, itemDefinition, traditional);
+    basic_1.checkLimiters(resolverArgs.args, itemDefinition);
     // check the language and region
     basic_1.checkLanguage(appData, resolverArgs.args);
     const tokenData = await basic_1.validateTokenAndGetData(appData, resolverArgs.args.token);
@@ -113,65 +214,99 @@ async function searchItemDefinition(appData, resolverArgs, itemDefinition) {
     const mod = itemDefinition.getParentModule();
     const moduleTable = mod.getQualifiedPathName();
     const selfTable = itemDefinition.getQualifiedPathName();
-    const searchMod = mod.getSearchModule();
-    // TODO change this, it'd be better to use the item definition table as the base
-    // because the item definition table has less elements in it than the module table
-    // joins might be preferrable
-    // in this case it works because we are checking raw property names
-    // with the search module, it has no items, so it can easily check it up
-    const requiresJoin = Object.keys(resolverArgs.args).some((argName) => {
-        return !constants_1.RESERVED_SEARCH_PROPERTIES[argName] && !searchMod.hasPropExtensionFor(argName);
-    });
+    let fieldsToRequest = ["id", "version", "type", "created_at"];
+    let requestedFields = null;
+    const generalFields = graphql_fields_1.default(resolverArgs.info);
+    if (traditional) {
+        requestedFields = gql_util_1.flattenRawGQLValueOrFields(generalFields.results);
+        basic_1.checkBasicFieldsAreAvailableForRole(mod, tokenData, requestedFields);
+        fieldsToRequest = Object.keys(requestedFields);
+        const requestedFieldsInIdef = {};
+        Object.keys(requestedFields || {}).forEach((arg) => {
+            if (itemDefinition.hasPropertyDefinitionFor(arg, true) ||
+                arg.startsWith(constants_1.INCLUDE_PREFIX) && itemDefinition.hasIncludeFor(arg.replace(constants_1.INCLUDE_PREFIX, ""))) {
+                requestedFieldsInIdef[arg] = requestedFields[arg];
+            }
+        });
+        server_1.logger.debug("searchItemDefinition: Extracted requested fields from module", fieldsToRequest);
+        if (!fieldsToRequest.includes("created_at")) {
+            fieldsToRequest.push("created_at");
+        }
+        if (!fieldsToRequest.includes("blocked_at")) {
+            fieldsToRequest.push("blocked_at");
+        }
+        itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, requestedFieldsInIdef, true);
+    }
     // now we build the search query
-    const searchQuery = appData.knex.select(["id", "version", "created_at"]).from(moduleTable)
-        .where("blocked_at", null);
+    const queryModel = appData.knex.table(selfTable)
+        .join(moduleTable, (clause) => {
+        clause.on("id", "=", constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME);
+        clause.on("version", "=", constants_1.CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
+    }).where("blocked_at", null);
     if (created_by) {
-        searchQuery.andWhere("created_by", created_by);
+        queryModel.andWhere("created_by", created_by);
+    }
+    if (since) {
+        queryModel.andWhere("created_at", ">=", since);
+    }
+    if (typeof resolverArgs.args.version_filter !== "undefined") {
+        queryModel.andWhere("version", resolverArgs.args.version_filter || "");
     }
     if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
-        searchQuery
+        queryModel
             .andWhere("parent_id", resolverArgs.args.parent_id)
             .andWhere("parent_version", resolverArgs.args.parent_version || null)
             .andWhere("parent_type", resolverArgs.args.parent_type);
     }
     else {
-        searchQuery
+        queryModel
             .andWhere("parent_id", null);
     }
+    // and now we call the function that builds the query itself into
+    // that parent query, and adds the andWhere as required
+    // into such query
+    sql_2.buildSQLQueryForItemDefinition(itemDefinition, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args));
+    const searchQuery = queryModel.clone();
+    const limit = resolverArgs.args.limit;
+    const offset = resolverArgs.args.offset;
+    searchQuery.select(fieldsToRequest).limit(limit).offset(offset);
+    // TODO only make count if count requested
+    const countQuery = queryModel.clone().count();
     if (resolverArgs.args.order_by === "DEFAULT") {
         searchQuery.orderBy("created_at", "DESC");
     }
     else {
         // TODO
     }
-    // and now we call the function that builds the query itself into
-    // that parent query, and adds the andWhere as required
-    // into such query
-    sql_2.buildSQLQueryForItemDefinition(itemDefinition, resolverArgs.args, searchQuery, basic_1.getDictionary(appData, resolverArgs.args));
-    // if it requires the join, we add such a join
-    if (requiresJoin) {
-        searchQuery.join(selfTable, (clause) => {
-            clause.on(constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
-            clause.on(constants_1.CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
-        });
+    // return using the base result, and only using the id
+    const baseResult = (generalFields.results || generalFields.records) ?
+        (await searchQuery).map(version_null_value_1.convertVersionsIntoNullsWhenNecessary) :
+        null;
+    const countResult = generalFields.count ? (await countQuery) : null;
+    const count = (countResult[0] && countResult[0].count) || null;
+    if (traditional) {
+        const finalResult = {
+            results: baseResult.map((r) => {
+                return basic_1.filterAndPrepareGQLValue(r, requestedFields, tokenData.role, itemDefinition).toReturnToUser;
+            }),
+            limit,
+            offset,
+            count,
+        };
+        server_1.logger.debug("searchItemDefinition: succeed traditionally");
+        return finalResult;
     }
-    // now we get the base result, and convert every row
-    const baseResult = await searchQuery;
-    const records = baseResult.map((row) => {
-        return version_null_value_1.convertVersionsIntoNullsWhenNecessary({
-            id: row.id,
-            type: selfTable,
-            created_at: row.created_at,
-            version: row.version,
-        });
-    });
-    const finalResult = {
-        records,
-        // TODO manually reorder the real latest by date
-        last_record: records[0],
-    };
-    server_1.logger.debug("searchItemDefinition: done");
-    return finalResult;
+    else {
+        const finalResult = {
+            records: baseResult,
+            last_record_date: findLastRecordDateCheatMethod(baseResult),
+            limit,
+            offset,
+            count,
+        };
+        server_1.logger.debug("searchItemDefinition: succeed with records");
+        return finalResult;
+    }
 }
 exports.searchItemDefinition = searchItemDefinition;
 function searchItemDefinitionFn(appData) {
@@ -182,3 +317,11 @@ function searchModuleFn(appData) {
     return searchModule.bind(null, appData);
 }
 exports.searchModuleFn = searchModuleFn;
+function searchItemDefinitionTraditionalFn(appData) {
+    return searchItemDefinitionTraditional.bind(null, appData);
+}
+exports.searchItemDefinitionTraditionalFn = searchItemDefinitionTraditionalFn;
+function searchModuleTraditionalFn(appData) {
+    return searchModuleTraditional.bind(null, appData);
+}
+exports.searchModuleTraditionalFn = searchModuleTraditionalFn;

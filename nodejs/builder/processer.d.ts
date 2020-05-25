@@ -81,8 +81,8 @@ export declare function processModule(rawData: IModuleRawJSONDataType, locale?: 
     searchable?: boolean;
     children: (IModuleRawJSONDataType | IItemDefinitionRawJSONDataType)[];
     propExtensions?: IPropertyDefinitionRawJSONDataType[];
-    maxTraditionalSearchResults?: number;
-    maxSearchMatchResults?: number;
+    maxSearchResults?: number;
+    maxSearchRecords?: number;
     requestLimiters?: import("../base/Root/Module").IRequestLimitersType;
 };
 /**

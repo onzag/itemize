@@ -48,7 +48,9 @@ export interface IGraphQLResolversType {
   getItemDefinition: FGraphQLIdefResolverType;
   getItemDefinitionList: FGraphQLIdefResolverType;
   searchItemDefinition: FGraphQLIdefResolverType;
+  searchItemDefinitionTraditional: FGraphQLIdefResolverType;
   searchModule: FGraphQLModResolverType;
+  searchModuleTraditional: FGraphQLModResolverType;
   getModuleList: FGraphQLModResolverType;
   addItemDefinition: FGraphQLIdefResolverType;
   editItemDefinition: FGraphQLIdefResolverType;

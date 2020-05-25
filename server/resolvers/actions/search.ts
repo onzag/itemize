@@ -8,29 +8,80 @@ import {
   serverSideCheckItemDefinitionAgainst,
   validateTokenIsntBlocked,
   checkReadPoliciesAllowThisUserToSearch,
+  checkBasicFieldsAreAvailableForRole,
+  filterAndPrepareGQLValue,
+  retrieveSince,
+  checkLimit,
+  checkLimiters,
 } from "../basic";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { buildSQLQueryForModule } from "../../../base/Root/Module/sql";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import {
   INCLUDE_PREFIX,
-  RESERVED_SEARCH_PROPERTIES,
   CONNECTOR_SQL_COLUMN_ID_FK_NAME,
   CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   UNSPECIFIED_OWNER,
 } from "../../../constants";
 import { buildSQLQueryForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
-import { IGQLSearchMatch } from "../../../gql-querier";
+import { IGQLSearchRecord, IGQLSearchRecordsContainer, IGQLSearchResultsContainer } from "../../../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
+import { flattenRawGQLValueOrFields } from "../../../gql-util";
+import graphqlFields from "graphql-fields";
+import { NanoSecondComposedDate } from "../../../util";
+
+function findLastRecordDateCheatMethod(records: IGQLSearchRecord[]): string {
+  let maximumRecords: IGQLSearchRecord[] = null;
+  let maximumRecordId: number = null;
+  records.forEach((record: IGQLSearchRecord) => {
+    if (!maximumRecordId || record.id > maximumRecordId) {
+      maximumRecordId = record.id;
+      maximumRecords = [record];
+    } else if (maximumRecordId === record.id) {
+      maximumRecords.push(record);
+    }
+  });
+
+  if (!maximumRecords.length) {
+    return null;
+  }
+  if (maximumRecords.length === 1) {
+    return maximumRecords[0].created_at;
+  }
+
+  if (maximumRecords.length === 2) {
+    const versionedRecord = maximumRecords.find((r) => r.version !== null);
+    return versionedRecord.created_at;
+  }
+
+  const recordsRespectiveNanoSecondAccuracyArray = maximumRecords.map((r) => new NanoSecondComposedDate(r.created_at));
+  const maxDate = recordsRespectiveNanoSecondAccuracyArray.reduce((prev,cur) => {
+    return prev.greaterThan(cur) ? prev : cur;
+  });
+  return maxDate.original;
+}
+
+export function searchModuleTraditional(
+  appData: IAppDataType,
+  resolverArgs: IGraphQLIdefResolverArgs,
+  mod: Module,
+) {
+  return searchModule(appData, resolverArgs, mod, true);
+}
 
 export async function searchModule(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
+  traditional?: boolean,
 ) {
   logger.debug(
     "searchModule: executed search for " + mod.getQualifiedPathName(),
   );
+
+  const since = retrieveSince(resolverArgs.args);
+  checkLimit(resolverArgs.args.limit as number, mod, traditional);
+  checkLimiters(resolverArgs.args, mod);
 
   // check language and region
   checkLanguage(appData, resolverArgs.args);
@@ -76,28 +127,78 @@ export async function searchModule(
     true,
   );
 
+  let fieldsToRequest: string[] = ["id", "version", "type", "created_at"];
+  let requestedFields: any = null;
+  const generalFields = graphqlFields(resolverArgs.info);
+  if (traditional) {
+    requestedFields = flattenRawGQLValueOrFields(generalFields.results);
+    checkBasicFieldsAreAvailableForRole(mod, tokenData, requestedFields);
+
+    fieldsToRequest = Object.keys(requestedFields);
+
+    const requestedFieldsInMod = {};
+    Object.keys(requestedFields || {}).forEach((arg) => {
+      if (mod.hasPropExtensionFor(arg)) {
+        requestedFieldsInMod[arg] = requestedFields[arg];
+      }
+    });
+    logger.debug(
+      "searchModule: Extracted requested fields from module",
+      fieldsToRequest,
+    );
+    if (!fieldsToRequest.includes("created_at")) {
+      fieldsToRequest.push("created_at");
+    }
+    if (!fieldsToRequest.includes("blocked_at")) {
+      fieldsToRequest.push("blocked_at");
+    }
+    mod.checkRoleAccessFor(
+      ItemDefinitionIOActions.READ,
+      tokenData.role,
+      tokenData.id,
+      ownerToCheckAgainst,
+      requestedFieldsInMod,
+      true,
+    );
+  }
+
   // now we build the search query, the search query only matches an id
   // note how we remove blocked_at
-  const searchQuery = appData.knex.select(["id", "version", "type", "created_at"])
-    .from(mod.getQualifiedPathName())
+  const queryModel = appData.knex.table(mod.getQualifiedPathName())
     .where("blocked_at", null);
 
   if (created_by) {
-    searchQuery.where("created_by", created_by);
+    queryModel.andWhere("created_by", created_by);
+  }
+
+  if (since) {
+    queryModel.andWhere("created_at", ">=", since);
+  }
+
+  if (typeof resolverArgs.args.version_filter !== "undefined") {
+    queryModel.andWhere("version", resolverArgs.args.version_filter || "");
   }
 
   // now we build the sql query for the module
   buildSQLQueryForModule(
     mod,
     resolverArgs.args,
-    searchQuery,
+    queryModel,
     getDictionary(appData, resolverArgs.args),
   );
 
   // if we filter by type
   if (resolverArgs.args.types) {
-    searchQuery.andWhere("type", resolverArgs.args.types);
+    queryModel.andWhere("type", resolverArgs.args.types);
   }
+
+  const searchQuery = queryModel.clone();
+  const limit: number = resolverArgs.args.limit;
+  const offset: number = resolverArgs.args.offset;
+  searchQuery.select(fieldsToRequest).limit(limit).offset(offset);
+  const countQuery = queryModel.clone().count();
+
+  // TODO add limits and offset
 
   if (resolverArgs.args.order_by === "DEFAULT") {
     searchQuery.orderBy("created_at", "DESC");
@@ -106,31 +207,64 @@ export async function searchModule(
   }
 
   // return using the base result, and only using the id
-  const baseResult: IGQLSearchMatch[] = (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchMatch[];
-  const finalResult: {
-    records: IGQLSearchMatch[];
-    last_record: IGQLSearchMatch;
-  } = {
-    records: baseResult,
-    // TODO manually reorder the real latest by date
-    last_record: baseResult[0] || null,
-  };
+  const baseResult: ISQLTableRowValue[] = (generalFields.results || generalFields.records) ?
+    (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
+    null;
+  const countResult: ISQLTableRowValue[] = generalFields.count ? (await countQuery) : null;
+  const count = (countResult[0] && countResult[0].count) || null;
+  if (traditional) {
+    const finalResult: IGQLSearchResultsContainer = {
+      results: baseResult.map((r) => {
+        return filterAndPrepareGQLValue(r, requestedFields, tokenData.role, mod).toReturnToUser;
+      }),
+      limit,
+      offset,
+      count, 
+    }
 
-  logger.debug(
-    "searchModule: succeed",
-  );
+    logger.debug(
+      "searchModule: succeed traditionally",
+    );
 
-  return finalResult;
+    return finalResult;
+  } else {
+    const finalResult: IGQLSearchRecordsContainer = {
+      records: baseResult as IGQLSearchRecord[],
+      last_record_date: findLastRecordDateCheatMethod(baseResult as IGQLSearchRecord[]),
+      limit,
+      offset,
+      count, 
+    };
+  
+    logger.debug(
+      "searchModule: succeed with records",
+    );
+  
+    return finalResult;
+  }
+}
+
+export function searchItemDefinitionTraditional(
+  appData: IAppDataType,
+  resolverArgs: IGraphQLIdefResolverArgs,
+  itemDefinition: ItemDefinition,
+) {
+  return searchItemDefinition(appData, resolverArgs, itemDefinition, true);
 }
 
 export async function searchItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
+  traditional?: boolean,
 ) {
   logger.debug(
     "searchItemDefinition: executed search for " + itemDefinition.getQualifiedPathName(),
   );
+
+  const since = retrieveSince(resolverArgs.args);
+  checkLimit(resolverArgs.args.limit as number, itemDefinition, traditional);
+  checkLimiters(resolverArgs.args, itemDefinition);
 
   // check the language and region
   checkLanguage(appData, resolverArgs.args);
@@ -204,40 +338,72 @@ export async function searchItemDefinition(
   const mod = itemDefinition.getParentModule();
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
-  const searchMod = mod.getSearchModule();
 
-  // TODO change this, it'd be better to use the item definition table as the base
-  // because the item definition table has less elements in it than the module table
-  // joins might be preferrable
+  let fieldsToRequest: string[] = ["id", "version", "type", "created_at"];
+  let requestedFields: any = null;
+  const generalFields = graphqlFields(resolverArgs.info);
+  if (traditional) {
+    requestedFields = flattenRawGQLValueOrFields(generalFields.results);
+    checkBasicFieldsAreAvailableForRole(mod, tokenData, requestedFields);
 
-  // in this case it works because we are checking raw property names
-  // with the search module, it has no items, so it can easily check it up
-  const requiresJoin = Object.keys(resolverArgs.args).some((argName) => {
-    return !RESERVED_SEARCH_PROPERTIES[argName] && !searchMod.hasPropExtensionFor(argName);
-  });
+    fieldsToRequest = Object.keys(requestedFields);
+    const requestedFieldsInIdef = {};
+    Object.keys(requestedFields || {}).forEach((arg) => {
+      if (
+        itemDefinition.hasPropertyDefinitionFor(arg, true) ||
+        arg.startsWith(INCLUDE_PREFIX) && itemDefinition.hasIncludeFor(arg.replace(INCLUDE_PREFIX, ""))
+      ) {
+        requestedFieldsInIdef[arg] = requestedFields[arg];
+      }
+    });
+    logger.debug(
+      "searchItemDefinition: Extracted requested fields from module",
+      fieldsToRequest,
+    );
+    if (!fieldsToRequest.includes("created_at")) {
+      fieldsToRequest.push("created_at");
+    }
+    if (!fieldsToRequest.includes("blocked_at")) {
+      fieldsToRequest.push("blocked_at");
+    }
+
+    itemDefinition.checkRoleAccessFor(
+      ItemDefinitionIOActions.READ,
+      tokenData.role,
+      tokenData.id,
+      ownerToCheckAgainst,
+      requestedFieldsInIdef,
+      true,
+    );
+  }
 
   // now we build the search query
-  const searchQuery = appData.knex.select(["id", "version", "created_at"]).from(moduleTable)
-    .where("blocked_at", null);
+  const queryModel = appData.knex.table(selfTable)
+    .join(moduleTable, (clause) => {
+      clause.on("id", "=", CONNECTOR_SQL_COLUMN_ID_FK_NAME);
+      clause.on("version", "=", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
+    }).where("blocked_at", null);
 
   if (created_by) {
-    searchQuery.andWhere("created_by", created_by);
+    queryModel.andWhere("created_by", created_by);
+  }
+
+  if (since) {
+    queryModel.andWhere("created_at", ">=", since);
+  }
+
+  if (typeof resolverArgs.args.version_filter !== "undefined") {
+    queryModel.andWhere("version", resolverArgs.args.version_filter || "");
   }
 
   if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
-    searchQuery
+    queryModel
       .andWhere("parent_id", resolverArgs.args.parent_id)
       .andWhere("parent_version", resolverArgs.args.parent_version || null)
       .andWhere("parent_type", resolverArgs.args.parent_type);
   } else {
-    searchQuery
+    queryModel
       .andWhere("parent_id", null);
-  }
-
-  if (resolverArgs.args.order_by === "DEFAULT") {
-    searchQuery.orderBy("created_at", "DESC");
-  } else {
-    // TODO
   }
 
   // and now we call the function that builds the query itself into
@@ -246,40 +412,59 @@ export async function searchItemDefinition(
   buildSQLQueryForItemDefinition(
     itemDefinition,
     resolverArgs.args,
-    searchQuery,
+    queryModel,
     getDictionary(appData, resolverArgs.args),
   );
 
-  // if it requires the join, we add such a join
-  if (requiresJoin) {
-    searchQuery.join(selfTable, (clause) => {
-      clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
-      clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
-    });
+  const searchQuery = queryModel.clone();
+  const limit: number = resolverArgs.args.limit;
+  const offset: number = resolverArgs.args.offset;
+  searchQuery.select(fieldsToRequest).limit(limit).offset(offset);
+  // TODO only make count if count requested
+  const countQuery = queryModel.clone().count();
+
+  if (resolverArgs.args.order_by === "DEFAULT") {
+    searchQuery.orderBy("created_at", "DESC");
+  } else {
+    // TODO
   }
 
-  // now we get the base result, and convert every row
-  const baseResult: ISQLTableRowValue[] = await searchQuery;
-  const records: IGQLSearchMatch[] = baseResult.map((row) => {
-    return convertVersionsIntoNullsWhenNecessary({
-      id: row.id,
-      type: selfTable,
-      created_at: row.created_at,
-      version: row.version,
-    }) as IGQLSearchMatch;
-  });
-  const finalResult: {
-    records: IGQLSearchMatch[];
-    last_record: IGQLSearchMatch;
-  } = {
-    records,
-    // TODO manually reorder the real latest by date
-    last_record: records[0],
-  };
-  logger.debug(
-    "searchItemDefinition: done",
-  );
-  return finalResult;
+  // return using the base result, and only using the id
+  const baseResult: ISQLTableRowValue[] = (generalFields.results || generalFields.records) ?
+    (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
+    null;
+  const countResult: ISQLTableRowValue[] = generalFields.count ? (await countQuery) : null;
+  const count = (countResult[0] && countResult[0].count) || null;
+  if (traditional) {
+    const finalResult: IGQLSearchResultsContainer = {
+      results: baseResult.map((r) => {
+        return filterAndPrepareGQLValue(r, requestedFields, tokenData.role, itemDefinition).toReturnToUser;
+      }),
+      limit,
+      offset,
+      count, 
+    }
+
+    logger.debug(
+      "searchItemDefinition: succeed traditionally",
+    );
+
+    return finalResult;
+  } else {
+    const finalResult: IGQLSearchRecordsContainer = {
+      records: baseResult as IGQLSearchRecord[],
+      last_record_date: findLastRecordDateCheatMethod(baseResult as IGQLSearchRecord[]),
+      limit,
+      offset,
+      count, 
+    };
+  
+    logger.debug(
+      "searchItemDefinition: succeed with records",
+    );
+  
+    return finalResult;
+  }
 }
 
 export function searchItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {
@@ -288,4 +473,12 @@ export function searchItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResol
 
 export function searchModuleFn(appData: IAppDataType): FGraphQLModResolverType {
   return searchModule.bind(null, appData);
+}
+
+export function searchItemDefinitionTraditionalFn(appData: IAppDataType): FGraphQLIdefResolverType {
+  return searchItemDefinitionTraditional.bind(null, appData);
+}
+
+export function searchModuleTraditionalFn(appData: IAppDataType): FGraphQLModResolverType {
+  return searchModuleTraditional.bind(null, appData);
 }

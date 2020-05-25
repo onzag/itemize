@@ -42,10 +42,10 @@ export default {
     searchable: {
       type: "boolean",
     },
-    maxTraditionalSearchResults: {
+    maxSearchResults: {
       type: "number",
     },
-    maxSearchMatchResults: {
+    maxSearchRecords: {
       type: "number",
     },
     requestLimiters: {
@@ -55,7 +55,7 @@ export default {
           type: "string",
           enum: ["AND", "OR"],
         },
-        createdAt: {
+        since: {
           type: "boolean",
         },
         createdBy: {

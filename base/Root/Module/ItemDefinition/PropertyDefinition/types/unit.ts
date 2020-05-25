@@ -222,6 +222,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
     return data[sqlPrefix + id + "_NORMALIZED_VALUE"] === value.normalizedValue &&
       data[sqlPrefix + id + "_NORMALIZED_UNIT"] === value.normalizedUnit;
   },
+  sqlBtreeIndexable: (
+    sqlPrefix: string,
+    id: string,
+  ) => {
+    return [sqlPrefix + id + "_NORMALIZED_UNIT", sqlPrefix + id + "_NORMALIZED_VALUE"];
+  },
   localEqual: (
     a: IPropertyDefinitionSupportedUnitType,
     b: IPropertyDefinitionSupportedUnitType,

@@ -277,7 +277,7 @@ class Cache {
                 newRecords: [
                     searchResultForThisValue,
                 ],
-                newLastRecord: searchResultForThisValue,
+                newLastRecordDate: searchResultForThisValue.created_at,
             };
             _1.logger.debug("Cache.requestCreation (detached): built and triggering search result and event for active searches (item definition)", itemDefinitionBasedOwnedEvent);
             this.listener.triggerOwnedSearchListeners(itemDefinitionBasedOwnedEvent, null);
@@ -296,7 +296,7 @@ class Cache {
                     newRecords: [
                         searchResultForThisValue,
                     ],
-                    newLastRecord: searchResultForThisValue,
+                    newLastRecordDate: searchResultForThisValue.created_at,
                 };
                 _1.logger.debug("Cache.requestCreation (detached): built and triggering search result and event for parented active searches (item definition)", itemDefinitionBasedParentedEvent);
                 this.listener.triggerParentedSearchListeners(itemDefinitionBasedParentedEvent, null);

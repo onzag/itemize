@@ -62,12 +62,12 @@ export declare const MAX_FIELD_SIZE = 1000000;
  * how many search results can be retrieved at once these are
  * used for the actual search results
  */
-export declare const MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK = 50;
+export declare const MAX_SEARCH_RESULTS_FALLBACK = 50;
 /**
  * how many search results can be retrieved at once these are
  * used for the actual search results
  */
-export declare const MAX_MATCHED_SEARCH_RESULTS_FALLBACK = 500;
+export declare const MAX_SEARCH_RECORDS_FALLBACK = 500;
 /**
  * Supported image types
  */
@@ -329,18 +329,18 @@ export declare const DATE_FORMAT = "YYYY-MM-DD";
 /**
  * The ID element in graphql form
  */
-export declare const SEARCH_MATCH_GQL: GraphQLObjectType<any, any, {
+export declare const SEARCH_RECORD_GQL: GraphQLObjectType<any, any, {
     [key: string]: any;
 }>;
 /**
  * The ID element as input form
  */
-export declare const SEARCH_MATCH_INPUT_GQL: GraphQLInputObjectType;
+export declare const SEARCH_RECORD_INPUT_GQL: GraphQLInputObjectType;
 /**
  * The id container contains the way that search results are returned
  * with the records and the last record of the given records
  */
-export declare const SEARCH_RESULTS_CONTAINER_GQL: GraphQLObjectType<any, any, {
+export declare const SEARCH_RECORDS_CONTAINER_GQL: GraphQLObjectType<any, any, {
     [key: string]: any;
 }>;
 /**
@@ -348,8 +348,20 @@ export declare const SEARCH_RESULTS_CONTAINER_GQL: GraphQLObjectType<any, any, {
  * and these are included in every search
  */
 export declare const RESERVED_SEARCH_PROPERTIES: {
+    limit: {
+        type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
+        description: string;
+    };
+    offset: {
+        type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
+        description: string;
+    };
     order_by: {
         type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
+        description: string;
+    };
+    since: {
+        type: import("graphql").GraphQLScalarType;
         description: string;
     };
     created_by: {
@@ -389,8 +401,20 @@ export declare const RESERVED_SEARCH_PROPERTIES: {
  * These apply when doing module searches
  */
 export declare const RESERVED_MODULE_SEARCH_PROPERTIES: {
+    limit: {
+        type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
+        description: string;
+    };
+    offset: {
+        type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
+        description: string;
+    };
     types: {
         type: GraphQLList<import("graphql").GraphQLType>;
+        description: string;
+    };
+    since: {
+        type: import("graphql").GraphQLScalarType;
         description: string;
     };
     order_by: {
@@ -580,5 +604,6 @@ export declare const UNSPECIFIED_OWNER = -1;
 export declare const PROTECTED_RESOURCES: string[];
 export declare const SERVER_DATA_IDENTIFIER = "SERVER_DATA";
 export declare const CURRENCY_FACTORS_IDENTIFIER = "CURRENCY_FACTORS";
+export declare const CACHED_CURRENCY_LAYER_RESPONSE = "CACHED_CURRENCY_LAYER_RESPONSE";
 export declare const WAIT_TIME_PER_BATCH = 300000;
 export declare const SERVER_DATA_MIN_UPDATE_TIME = 259200000;

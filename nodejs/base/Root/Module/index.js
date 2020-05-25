@@ -505,6 +505,12 @@ class Module {
     getRequestLimiters() {
         return this.rawData.requestLimiters || null;
     }
+    getMaxSearchRecords() {
+        return this.rawData.maxSearchRecords || constants_1.MAX_SEARCH_RECORDS_FALLBACK;
+    }
+    getMaxSearchResults() {
+        return this.rawData.maxSearchResults || constants_1.MAX_SEARCH_RESULTS_FALLBACK;
+    }
     /**
      * Merges two i18n data components, for example the i18n data for
      * the english build and the i18n data for the russian build, that way

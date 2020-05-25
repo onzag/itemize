@@ -12,7 +12,7 @@ import {
   MEMCACHED_DESTRUCTION_MARKERS_LOCATION,
   DESTRUCTION_MARKERS_LOCATION,
 } from "../../constants";
-import { IGQLSearchMatch, IGQLValue, IGQLRequestFields } from "../../gql-querier";
+import { IGQLSearchRecord, IGQLValue, IGQLRequestFields } from "../../gql-querier";
 import { requestFieldsAreContained } from "../../gql-util";
 import { EndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
@@ -51,7 +51,7 @@ export interface IActionResponseWithId extends IBasicActionResponse {
  * A response given by search
  */
 export interface IActionResponseWithSearchResults extends IBasicActionResponse {
-  results: IGQLSearchMatch[];
+  results: IGQLSearchRecord[];
 }
 
 export type PolicyPathType = [string, string, string];
@@ -170,7 +170,7 @@ export interface IItemDefinitionContextType {
   searching: boolean;
   // the obtained search results from the graphql endpoint
   // just as they come
-  searchResults: IGQLSearchMatch[];
+  searchResults: IGQLSearchRecord[];
   // a search id for the obtained results whether error
   // or success
   searchId: string;
@@ -271,7 +271,7 @@ export interface IItemDefinitionContextType {
 }
 
 export interface ISearchItemDefinitionValueContextType {
-  currentlySearching: IGQLSearchMatch[];
+  currentlySearching: IGQLSearchRecord[];
   searchFields: any;
 }
 
@@ -409,7 +409,7 @@ interface IActualItemDefinitionProviderState {
   deleted: boolean;
   searchError: EndpointErrorType;
   searching: boolean;
-  searchResults: IGQLSearchMatch[];
+  searchResults: IGQLSearchRecord[];
   searchId: string;
   searchOwner: number;
   searchParent: [string, number, string];

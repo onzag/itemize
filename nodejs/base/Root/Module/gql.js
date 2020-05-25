@@ -202,7 +202,7 @@ function getGQLQueryFieldsForModule(mod, resolvers) {
         };
         fields = {
             [constants_1.PREFIX_SEARCH + mod.getSearchModule().getQualifiedPathName()]: {
-                type: constants_1.SEARCH_RESULTS_CONTAINER_GQL,
+                type: constants_1.SEARCH_RECORDS_CONTAINER_GQL,
                 args: searchArgs,
                 resolve: resolveGenericFunction.bind(null, "searchModule", mod, resolvers),
             },

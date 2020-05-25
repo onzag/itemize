@@ -41,7 +41,7 @@ export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinition
   // combined indexes
   if (limiters && limiters.condition === "AND") {
     // if the limiter has a created at factor
-    if (limiters.createdAt) {
+    if (limiters.since) {
       // we request a combined index on it, created_at goes first
       initialCombinedIndexes.push("created_at");
     }
@@ -59,7 +59,7 @@ export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinition
     // now we add OR type limiters, these are basically
     // independent so the order doesn't really matter that
     // we are adding these
-    if (limiters.createdAt) {
+    if (limiters.since) {
       initialAddedIndexes.push("created_at");
     }
     if (limiters.createdBy) {
@@ -93,22 +93,35 @@ export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinition
       // these might be zero
       let indexCombinedOffset = initialCombinedIndexes.length;
       // now we loop over the rows we plan to index
-      limiters.custom.forEach((columnName: string, index: number) => {
-        resultTableSchema[columnName].index = {
-          id: COMBINED_INDEX,
-          type: "btree",
-          level: indexCombinedOffset + index,
+      limiters.custom.forEach((propertyId: string) => {
+        // we get the property
+        const property = mod.getPropExtensionFor(propertyId);
+        // and the columns that are expected to be added to the combined index
+        const columnsToAddLimiter = property.getPropertyDefinitionDescription().sqlBtreeIndexable("", propertyId);
+        if (columnsToAddLimiter) {
+          columnsToAddLimiter.forEach((columnName: string, index: number) => {
+            resultTableSchema[columnName].index = {
+              id: COMBINED_INDEX,
+              type: "btree",
+              level: indexCombinedOffset + index,
+            }
+          });
+          indexCombinedOffset += columnsToAddLimiter.length;
         }
       });
     } else {
       // otherwise if it's an OR we add these custom singular indexes
-      limiters.custom.forEach((columnName: string) => {
-        if (!resultTableSchema[columnName].index) {
-          resultTableSchema[columnName].index = {
-            id: columnName + "_CUSTOM_INDEX",
-            type: "btree",
-            level: 0,
-          }
+      limiters.custom.forEach((propertyId: string) => {
+        const property = mod.getPropExtensionFor(propertyId);
+        const columnsToAddLimiter = property.getPropertyDefinitionDescription().sqlBtreeIndexable("", propertyId);
+        if (columnsToAddLimiter) {
+          columnsToAddLimiter.forEach((columnName: string, index: number) => {
+            resultTableSchema[columnName].index = {
+              id: propertyId + "_CUSTOM_INDEX",
+              type: "btree",
+              level: index,
+            }
+          });
         }
       });
     }

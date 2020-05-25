@@ -1,7 +1,7 @@
 import {
   PREFIX_BUILD,
   MODERATION_FIELDS,
-  MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK,
+  MAX_SEARCH_RESULTS_FALLBACK,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   RESERVED_BASE_PROPERTIES,
   INCLUDE_PREFIX,
@@ -22,9 +22,10 @@ import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefin
 import { jwtVerify } from "../token";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { IGQLValue, IGQLSearchMatch, IGQLArgs } from "../../gql-querier";
+import { IGQLValue, IGQLSearchRecord, IGQLArgs } from "../../gql-querier";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
+import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 
 /**
  * Builds the column names expected for a given module only
@@ -278,6 +279,9 @@ export function checkBasicFieldsAreAvailableForRole(
   tokenData: IServerSideTokenDataType,
   requestedFields: any,
 ) {
+  if (typeof requestedFields === "undefined" || requestedFields === null) {
+    return true;
+  }
   // now we check if moderation fields have been requested
   const moderationFieldsHaveBeenRequested = MODERATION_FIELDS.some((field) => requestedFields[field]);
 
@@ -310,24 +314,155 @@ export function checkBasicFieldsAreAvailableForRole(
   );
 }
 
-/**
- * Checks a list provided by the getter functions that use
- * lists to ensure the request isn't too large
- * @param records the list records that have been requested
- */
-export function checkListLimit(records: IGQLSearchMatch[]) {
-  if (records.length > MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK) {
+export function retrieveSince(args: IGQLArgs): string {
+  if (args.since) {
+    const date = new Date(args.since as string);
+    if (date instanceof Date && !isNaN(date.getTime())) {
+      return date.toISOString();
+    } else {
+      throw new EndpointError({
+        message: "Could not parse since value " + args.since,
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      });
+    }
+  }
+  return null;
+}
+
+export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition) {
+  const mod = idefOrMod instanceof Module ? idefOrMod : idefOrMod.getParentModule();
+  const limiters = mod.getRequestLimiters();
+  if (!limiters) {
+    return;
+  }
+
+  let customError: string = null;
+  let someCustomLimiterSucceed = false;
+  if (limiters.custom) {
+    someCustomLimiterSucceed = limiters.custom.some((propertyIdLimiter: string) => {
+      const property = mod.getPropExtensionFor(propertyIdLimiter);
+      const expectedConversionIds = getConversionIds(property.rawData);
+      const succeed = expectedConversionIds.every((conversionId: string) => {
+        return typeof args[conversionId] === "undefined";
+      });
+      if (!succeed) {
+        customError = "Missing custom request search limiter required by limiter set by " + propertyIdLimiter + " in module " +
+          mod.getQualifiedPathName() + " requiring of both " + expectedConversionIds.join(", ");
+      }
+      return succeed;
+    });
+  }
+
+  if (
+    limiters.condition === "AND" &&
+    customError
+  ) {
     throw new EndpointError({
-      message: "Too many records at once, max is " + MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK,
+      message: customError,
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  }
+
+  let sinceError: string = null;
+  let sinceSucceed = false;
+  if (limiters.since) {
+    const sinceArg = args.since ? new Date(args.since as string) : null;
+    const hasSince = !!sinceArg;
+    if (!hasSince) {
+      sinceError = "Missing since limiter which is a required limiter"
+    } else {
+      const now = (new Date()).getTime();
+      const sinceMs = sinceArg.getTime();
+      if (now - sinceMs > limiters.since) {
+        sinceError = "Since is not respected as it requires a difference of less than " +
+          limiters.since + "ms but " + sinceMs + " provided"
+      } else {
+        sinceSucceed = true;
+      }
+    }
+  }
+
+  if (
+    limiters.condition === "AND" &&
+    sinceError
+  ) {
+    throw new EndpointError({
+      message: sinceError,
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  }
+
+  let createdBySucceed = false;
+  if (limiters.createdBy) {
+    createdBySucceed = !!(args.created_by);
+  }
+
+  if (
+    limiters.condition === "AND" &&
+    !createdBySucceed
+  ) {
+    throw new EndpointError({
+      message: "Created by is required as a limiter, yet none was specified",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  }
+
+  let parentingSucceed = false;
+  if (limiters.parenting) {
+    parentingSucceed = !!(args.parent_id && args.parent_type);
+  }
+
+  if (
+    limiters.condition === "AND" &&
+    !parentingSucceed
+  ) {
+    throw new EndpointError({
+      message: "Parenting is required as a limiter, yet none was specified",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  }
+
+  if (limiters.condition === "OR") {
+    const passedCustom = limiters.custom && someCustomLimiterSucceed;
+    const passedSince = limiters.since && sinceSucceed;
+    const passedCreatedBy = limiters.createdBy && createdBySucceed;
+    const passedParenting = limiters.parenting && parentingSucceed;
+
+    if (
+      passedCustom ||
+      passedSince ||
+      passedCreatedBy ||
+      passedParenting
+    ) {
+      return;
+    }
+
+    throw new EndpointError({
+      message: "None of the OR request limiting conditions passed",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    }); 
+  }
+}
+
+/**
+ * Checks that the limit of search results is within the range that the item
+ * defintion allows
+ */
+export function checkLimit(limit: number, idefOrMod: Module | ItemDefinition, traditional: boolean) {
+  const mod = idefOrMod instanceof Module ? idefOrMod : idefOrMod.getParentModule();
+  const maxSearchResults = traditional ? mod.getMaxSearchResults() : mod.getMaxSearchRecords();
+  if (limit > maxSearchResults) {
+    throw new EndpointError({
+      message: "Too many " + (traditional ? "results" : "records") + " at once, max is " + maxSearchResults,
       code: ENDPOINT_ERRORS.UNSPECIFIED,
     });
   }
   logger.silly(
-    "checkListLimit: checking limits succeed",
+    "checkLimit: checking limits succeed",
   );
 }
 
-export function checkListTypes(records: IGQLSearchMatch[], mod: Module) {
+export function checkListTypes(records: IGQLSearchRecord[], mod: Module) {
   records.forEach((idContainer) => {
     const itemDefinition = mod.getParentRoot().registry[idContainer.type];
     if (!itemDefinition) {

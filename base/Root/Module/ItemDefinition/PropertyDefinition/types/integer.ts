@@ -12,6 +12,7 @@ import {
   standardSQLSearchFnExactAndRange,
   standardSQLEqualFn,
   getStandardSQLFnFor,
+  standardSQLBtreeIndexable,
 } from "../sql";
 import {
   standardSQLLocalEqualFn, standardLocalEqual,
@@ -48,6 +49,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlEqual: standardSQLEqualFn,
   sqlLocalEqual: standardSQLLocalEqualFn,
   localEqual: standardLocalEqual,
+  sqlBtreeIndexable: standardSQLBtreeIndexable,
   sqlMantenience: null,
 
   localSearch: standardLocalSearchExactAndRange,

@@ -82,7 +82,7 @@ export interface IRawJSONI18NDataType {
 export declare type ListenerType = () => any;
 export interface IRequestLimitersType {
     condition: "AND" | "OR";
-    createdAt?: number;
+    since?: number;
     createdBy?: boolean;
     parenting?: boolean;
     custom?: string[];
@@ -173,15 +173,15 @@ export interface IModuleRawJSONDataType {
      * how big the page of requested values can be, for the limit and offset,
      * it also determines the size of GET_LIST query requests as well
      * that should give a value that is less or equal to this amount, the default for
-     * this value is MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK
+     * this value is MAX_SEARCH_RESULTS_FALLBACK
      */
-    maxTraditionalSearchResults?: number;
+    maxSearchResults?: number;
     /**
      * Affects both the module and item definition, this determines the amount of match
      * results that can be retrieved at once, if not specified fallbacks to
-     * MAX_MATCHED_SEARCH_RESULTS_FALLBACK
+     * MAX_SEARCH_RECORDS_FALLBACK
      */
-    maxSearchMatchResults?: number;
+    maxSearchRecords?: number;
     /**
      * And AND request limiter is a very powerful one as this would ensure
      * the creation of database indexes that will match and speed up these searches
@@ -441,6 +441,8 @@ export default class Module {
      */
     checkRoleAccessFor(action: ItemDefinitionIOActions, role: string, userId: number, ownerUserId: number, requestedFields: IGQLRequestFields, throwError: boolean): boolean;
     getRequestLimiters(): IRequestLimitersType;
+    getMaxSearchRecords(): number;
+    getMaxSearchResults(): number;
     /**
      * Merges two i18n data components, for example the i18n data for
      * the english build and the i18n data for the russian build, that way

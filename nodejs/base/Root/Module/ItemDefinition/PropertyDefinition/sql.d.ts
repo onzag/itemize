@@ -77,6 +77,7 @@ export declare function standardSQLSearchFnExactAndRange(args: IGQLArgs, sqlPref
 export declare function standardSQLEqualFn(value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, isCaseInsensitive: boolean, knex: Knex, columnName?: string): Knex.Raw<any> | {
     [x: string]: PropertyDefinitionSupportedType;
 };
+export declare function standardSQLBtreeIndexable(sqlPrefix: string, id: string): string[];
 /**
  * Provides the table bit that is necessary to include this property and
  * this property alone, that is a table bit

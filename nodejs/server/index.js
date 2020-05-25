@@ -462,7 +462,15 @@ async function initializeServer(custom = {}) {
         if (INSTANCE_MODE === "ABSOLUTE") {
             exports.logger.info("initializeServer: server initialized in absolute mode flushing redis");
             const flushAllPromisified = util_1.promisify(appData.redis.flushall).bind(appData.redis);
+            const getPromisified = util_1.promisify(appData.redis.get).bind(appData.redis);
+            const setPromisified = util_1.promisify(appData.redis.set).bind(appData.redis);
+            const currencyLayerCachedResponseRestore = await getPromisified(constants_1.CACHED_CURRENCY_LAYER_RESPONSE);
             await flushAllPromisified();
+            // this cached data is intended for the global, but it might be the same, I need to restore it in order
+            // to avoid draining the currency layer api
+            if (currencyLayerCachedResponseRestore) {
+                await setPromisified(constants_1.CACHED_CURRENCY_LAYER_RESPONSE, currencyLayerCachedResponseRestore);
+            }
         }
         else {
             exports.logger.info("initializeServer: server initialized in standard mode, not flushing redis");

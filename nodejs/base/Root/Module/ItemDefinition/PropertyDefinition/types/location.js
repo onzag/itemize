@@ -71,6 +71,11 @@ const typeValue = {
             [sqlPrefix + id + "_GEO"]: {
                 type: "GEOMETRY(POINT,4326)",
                 ext: "postgis",
+                index: {
+                    type: "gist",
+                    id: constants_1.SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
+                    level: 0,
+                },
             },
             [sqlPrefix + id + "_ID"]: {
                 type: "text",
@@ -187,6 +192,9 @@ const typeValue = {
             return data[sqlPrefix + id + "_ID"] === value;
         }
         return data[sqlPrefix + id + "ID"] === value.id;
+    },
+    sqlBtreeIndexable: () => {
+        return null;
     },
     localEqual: (a, b) => {
         if (a === b) {

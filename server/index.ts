@@ -8,7 +8,7 @@ import resolvers from "./resolvers";
 import { getGQLSchemaForRoot, IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
 import Knex from "knex";
 import { types } from "pg";
-import { MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS, SERVER_DATA_IDENTIFIER } from "../constants";
+import { MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS, SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_LAYER_RESPONSE } from "../constants";
 import { GraphQLError } from "graphql";
 import { EndpointError, EndpointErrorType } from "../base/errors";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -648,7 +648,15 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       );
 
       const flushAllPromisified = promisify(appData.redis.flushall).bind(appData.redis);
+      const getPromisified = promisify(appData.redis.get).bind(appData.redis);
+      const setPromisified = promisify(appData.redis.set).bind(appData.redis);
+      const currencyLayerCachedResponseRestore = await getPromisified(CACHED_CURRENCY_LAYER_RESPONSE);
       await flushAllPromisified();
+      // this cached data is intended for the global, but it might be the same, I need to restore it in order
+      // to avoid draining the currency layer api
+      if (currencyLayerCachedResponseRestore) {
+        await setPromisified(CACHED_CURRENCY_LAYER_RESPONSE, currencyLayerCachedResponseRestore);
+      }
     } else {
       logger.info(
         "initializeServer: server initialized in standard mode, not flushing redis",

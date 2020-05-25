@@ -291,11 +291,11 @@ async function buildModule(rawDataConfig, actualLocation, fileData, pointers, ra
     if (actualEvaledFileData.readRoleAccess) {
         finalValue.readRoleAccess = actualEvaledFileData.readRoleAccess;
     }
-    if (typeof actualEvaledFileData.maxSearchMatchResults !== "undefined") {
-        finalValue.maxSearchMatchResults = actualEvaledFileData.maxSearchMatchResults;
+    if (typeof actualEvaledFileData.maxSearchRecords !== "undefined") {
+        finalValue.maxSearchRecords = actualEvaledFileData.maxSearchRecords;
     }
-    if (typeof actualEvaledFileData.maxTraditionalSearchResults !== "undefined") {
-        finalValue.maxTraditionalSearchResults = actualEvaledFileData.maxTraditionalSearchResults;
+    if (typeof actualEvaledFileData.maxSearchResults !== "undefined") {
+        finalValue.maxSearchResults = actualEvaledFileData.maxSearchResults;
     }
     if (actualEvaledFileData.requestLimiters) {
         finalValue.requestLimiters = actualEvaledFileData.requestLimiters;

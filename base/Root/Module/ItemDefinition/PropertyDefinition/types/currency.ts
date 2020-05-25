@@ -107,6 +107,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", toArg.normalized as number);
     }
   },
+  sqlBtreeIndexable: (
+    sqlPrefix: string,
+    id: string,
+  ) => {
+    return [sqlPrefix + id + "_CURRENCY", sqlPrefix + id + "_NORMALIZED_VALUE"];
+  },
   sqlMantenience: (
     sqlPrefix: string,
     id: string,

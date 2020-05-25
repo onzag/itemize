@@ -34,7 +34,7 @@ import {
   IDENTIFIED_EVENT,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
-import { IGQLSearchMatch } from "../../../gql-querier";
+import { IGQLSearchRecord } from "../../../gql-querier";
 
 export class RemoteListener {
   private socket: SocketIOClient.Socket;
@@ -48,7 +48,7 @@ export class RemoteListener {
   private ownedSearchListeners: {
     [qualifiedPathNameWithOwnerId: string]: {
       request: IOwnedSearchRegisterRequest;
-      lastKnownRecord: IGQLSearchMatch;
+      lastKnownRecordDate: string;
       callbacks: any[];
     },
   };
@@ -56,7 +56,7 @@ export class RemoteListener {
     [qualifiedPathNameWithOwnerId: string]: {
       request: IParentedSearchRegisterRequest;
       callbacks: any[];
-      lastKnownRecord: IGQLSearchMatch;
+      lastKnownRecordDate: string;
     },
   };
   private delayedFeedbacks: IFeedbackRequest[] = [];
@@ -241,7 +241,7 @@ export class RemoteListener {
   public addOwnedSearchListenerFor(
     itemDefinitionOrModuleQualifiedPathName: string,
     createdBy: number,
-    lastKnownRecord: IGQLSearchMatch,
+    lastKnownRecordDate: string,
     callback: () => any,
   ) {
     if (!this.isReady) {
@@ -261,7 +261,7 @@ export class RemoteListener {
     this.ownedSearchListeners[qualifiedIdentifier] = {
       request,
       callbacks: [callback],
-      lastKnownRecord,
+      lastKnownRecordDate,
     };
 
     this.attachOwnedSearchListenerFor(request);
@@ -271,7 +271,7 @@ export class RemoteListener {
     parentType: string,
     parentId: number,
     parentVersion: string,
-    lastKnownRecord: IGQLSearchMatch,
+    lastKnownRecordDate: string,
     callback: () => any,
   ) {
     if (!this.isReady) {
@@ -294,7 +294,7 @@ export class RemoteListener {
     this.parentedSearchListeners[qualifiedIdentifier] = {
       request,
       callbacks: [callback],
-      lastKnownRecord,
+      lastKnownRecordDate,
     };
 
     this.attachParentedSearchListenerFor(request);
@@ -527,10 +527,10 @@ export class RemoteListener {
     Object.keys(this.ownedSearchListeners).forEach((listenerKey) => {
       this.attachOwnedSearchListenerFor(this.ownedSearchListeners[listenerKey].request);
       if (this.isReconnect) {
-        const lastKnownRecord = this.ownedSearchListeners[listenerKey].lastKnownRecord;
+        const lastKnownRecordDate = this.ownedSearchListeners[listenerKey].lastKnownRecordDate;
         this.requestOwnedSearchFeedbackFor({
           ...this.ownedSearchListeners[listenerKey].request,
-          knownLastRecord: lastKnownRecord,
+          knownLastRecordDate: lastKnownRecordDate,
         });
       }
     });
@@ -538,10 +538,10 @@ export class RemoteListener {
     Object.keys(this.parentedSearchListeners).forEach((listenerKey) => {
       this.attachParentedSearchListenerFor(this.parentedSearchListeners[listenerKey].request);
       if (this.isReconnect) {
-        const lastKnownRecord = this.parentedSearchListeners[listenerKey].lastKnownRecord;
+        const lastKnownRecordDate = this.parentedSearchListeners[listenerKey].lastKnownRecordDate;
         this.requestParentedSearchFeedbackFor({
           ...this.parentedSearchListeners[listenerKey].request,
-          knownLastRecord: lastKnownRecord,
+          knownLastRecordDate: lastKnownRecordDate,
         });
       }
     });
@@ -557,7 +557,7 @@ export class RemoteListener {
   ) {
     const ownedListener = this.ownedSearchListeners[event.qualifiedPathName + "." + event.createdBy];
     if (ownedListener) {
-      ownedListener.lastKnownRecord = event.newLastRecord;
+      ownedListener.lastKnownRecordDate = event.newLastRecordDate;
       if (CacheWorkerInstance.isSupported) {
         const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
         let itemDefinition: ItemDefinition;
@@ -573,7 +573,7 @@ export class RemoteListener {
           null,
           null,
           event.newRecords,
-          event.newLastRecord,
+          event.newLastRecordDate,
           "by-owner",
         );
       }
@@ -588,7 +588,7 @@ export class RemoteListener {
       event.parentId + "." + (event.parentVersion || "")
     ];
     if (parentedListener) {
-      parentedListener.lastKnownRecord = event.newLastRecord;
+      parentedListener.lastKnownRecordDate = event.newLastRecordDate;
       if (CacheWorkerInstance.isSupported) {
         const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
         let itemDefinition: ItemDefinition;
@@ -604,7 +604,7 @@ export class RemoteListener {
           event.parentId,
           event.parentVersion,
           event.newRecords,
-          event.newLastRecord,
+          event.newLastRecordDate,
           "by-parent",
         );
       }

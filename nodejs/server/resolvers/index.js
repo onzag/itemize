@@ -10,7 +10,9 @@ function resolvers(appData) {
     return {
         getItemDefinition: get_1.getItemDefinitionFn(appData),
         searchItemDefinition: search_1.searchItemDefinitionFn(appData),
+        searchItemDefinitionTraditional: search_1.searchItemDefinitionTraditionalFn(appData),
         searchModule: search_1.searchModuleFn(appData),
+        searchModuleTraditional: search_1.searchModuleTraditionalFn(appData),
         addItemDefinition: add_1.addItemDefinitionFn(appData),
         editItemDefinition: edit_1.editItemDefinitionFn(appData),
         deleteItemDefinition: delete_1.deleteItemDefinitionFn(appData),

@@ -132,6 +132,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       );
     }
   },
+  sqlBtreeIndexable: () => null,
   sqlMantenience: null,
   localSearch: (
     args: IGQLArgs,

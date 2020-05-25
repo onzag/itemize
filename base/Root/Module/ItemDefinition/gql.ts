@@ -17,7 +17,7 @@ import {
   PREFIX_DELETE,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   RESERVED_BASE_PROPERTIES,
-  SEARCH_RESULTS_CONTAINER_GQL,
+  SEARCH_RECORDS_CONTAINER_GQL,
   PREFIX_GET_LIST,
   RESERVED_GETTER_LIST_PROPERTIES,
   POLICY_PREFIXES,
@@ -376,7 +376,7 @@ export function getGQLQueryFieldsForItemDefinition(
     // we exclude the base properties, eg. id, version, type, etc... make all the fields optional,
     // and don't include any policy (there are no policies in search mode anyway)
     fields[PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()] = {
-      type: SEARCH_RESULTS_CONTAINER_GQL,
+      type: SEARCH_RECORDS_CONTAINER_GQL,
       args: searchArgs,
       resolve: resolveGenericFunction.bind(null, "searchItemDefinition", itemDefinition, resolvers),
     };

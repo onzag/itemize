@@ -37,10 +37,10 @@ declare const _default: {
         searchable: {
             type: string;
         };
-        maxTraditionalSearchResults: {
+        maxSearchResults: {
             type: string;
         };
-        maxSearchMatchResults: {
+        maxSearchRecords: {
             type: string;
         };
         requestLimiters: {
@@ -50,7 +50,7 @@ declare const _default: {
                     type: string;
                     enum: string[];
                 };
-                createdAt: {
+                since: {
                     type: string;
                 };
                 createdBy: {

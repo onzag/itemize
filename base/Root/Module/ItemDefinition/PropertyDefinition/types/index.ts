@@ -144,6 +144,14 @@ export interface IPropertyDefinitionSupportedType {
     dictionary: string,
   ) => void;
   /**
+   * Provides the rows that are expected to be indexed and in the order that they are expected
+   * when an index is added via a request limiter in the module
+   */
+  sqlBtreeIndexable: (
+    sqlPrefix: string,
+    id: string,
+  ) => string[];
+  /**
    * represents a local search checkup performed locally with a graphql value
    * raw (that is with DATA) the property id and the include id, the args are
    * the same

@@ -10,7 +10,7 @@ import {
   PREFIX_SEARCH,
   RESERVED_SEARCH_PROPERTIES,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
-  SEARCH_RESULTS_CONTAINER_GQL,
+  SEARCH_RECORDS_CONTAINER_GQL,
   PREFIX_GET_LIST,
   RESERVED_GETTER_LIST_PROPERTIES,
   ENDPOINT_ERRORS,
@@ -243,7 +243,7 @@ export function getGQLQueryFieldsForModule(
 
     fields = {
       [PREFIX_SEARCH + mod.getSearchModule().getQualifiedPathName()]: {
-        type: SEARCH_RESULTS_CONTAINER_GQL,
+        type: SEARCH_RECORDS_CONTAINER_GQL,
         args: searchArgs,
         resolve: resolveGenericFunction.bind(null, "searchModule", mod, resolvers),
       },

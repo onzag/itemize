@@ -9,7 +9,7 @@
 import { RedisClient } from "redis";
 import Knex from "knex";
 import { ISQLTableRowValue } from "../base/Root/sql";
-import { IGQLSearchMatch, IGQLArgs, IGQLValue } from "../gql-querier";
+import { IGQLSearchRecord, IGQLArgs, IGQLValue } from "../gql-querier";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { Listener } from "./listener";
 import Root from "../base/Root";
@@ -144,7 +144,7 @@ export declare class Cache {
      * @param records the records to request for
      * @returns a list of whole sql combined table row values
      */
-    requestListCache(records: IGQLSearchMatch[]): Promise<ISQLTableRowValue[]>;
+    requestListCache(records: IGQLSearchRecord[]): Promise<ISQLTableRowValue[]>;
     getServerData(): IServerDataType;
     onServerDataChangeInformed(newData: IServerDataType): void;
     /**

@@ -96,6 +96,7 @@ const typeValue = {
             ]);
         }
     },
+    sqlBtreeIndexable: () => null,
     sqlMantenience: null,
     localSearch: (args, rawData, id, includeId) => {
         // item is deleted

@@ -7,14 +7,29 @@ import { ENDPOINT_ERRORS } from "./constants";
 /**
  * Search results as they are provided
  * by the search function, they are based
- * on the ID_CONTAINER in the graphql types
+ * on the SEARCH_RECORD in the graphql types
  * that graphql returns
  */
-export interface IGQLSearchMatch {
+export interface IGQLSearchRecord {
   type: string;
   id: number;
   version: string;
   created_at: string;
+}
+
+export interface IGQLSearchRecordsContainer {
+  records: IGQLSearchRecord[],
+  last_record_date: string,
+  count: number,
+  limit: number,
+  offset: number,
+}
+
+export interface IGQLSearchResultsContainer {
+  results: IGQLValue[],
+  count: number,
+  limit: number,
+  offset: number,
 }
 
 /**
@@ -66,7 +81,7 @@ export interface IGQLRequestFields {
 /**
  * Single arg, can take many shapes
  */
-type GQLArg = boolean | string | number | null | GQLRaw | GQLEnum | GQLVar | IGQLFile | IGQLSearchMatch | IGQLArgs;
+type GQLArg = boolean | string | number | null | GQLRaw | GQLEnum | GQLVar | IGQLFile | IGQLSearchRecord | IGQLArgs;
 
 /**
  * The args field
@@ -78,7 +93,7 @@ export interface IGQLArgs {
 /**
  * A grapqhl single value
  */
-type GQLValue = boolean | string | number | null | IGQLSearchMatch | IGQLValue;
+type GQLValue = boolean | string | number | null | IGQLSearchRecord | IGQLValue;
 
 /**
  * A graphql many value

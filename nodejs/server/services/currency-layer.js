@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = __importDefault(require("http"));
 const https_1 = __importDefault(require("https"));
 const __1 = require("../");
+const constants_1 = require("../../constants");
 class CurrencyLayer {
     constructor(apiKey, globalCache, httpsEnabled) {
         this.apiKey = apiKey;
@@ -14,7 +15,7 @@ class CurrencyLayer {
     }
     requestInfo() {
         return new Promise((resolve, reject) => {
-            this.globalCache.get("CACHED_CURRENCY_LAYER_RESPONSE", (err, cachedData) => {
+            this.globalCache.get(constants_1.CACHED_CURRENCY_LAYER_RESPONSE, (err, cachedData) => {
                 const parsedCachedData = cachedData && !err && JSON.parse(cachedData);
                 if (!parsedCachedData || (new Date()).getTime() - parsedCachedData.timestamp <= 86400000) {
                     __1.logger.info("CurrencyLayer.requestInfo: requesting fresh info");
@@ -43,7 +44,7 @@ class CurrencyLayer {
                                     reject(new Error(parsedData.error));
                                 }
                                 else {
-                                    this.globalCache.set("CACHED_CURRENCY_LAYER_RESPONSE", data);
+                                    this.globalCache.set(constants_1.CACHED_CURRENCY_LAYER_RESPONSE, data);
                                     resolve(parsedData);
                                 }
                             }

@@ -161,6 +161,10 @@ function standardSQLEqualFn(value, sqlPrefix, id, isCaseInsensitive, knex, colum
     ]);
 }
 exports.standardSQLEqualFn = standardSQLEqualFn;
+function standardSQLBtreeIndexable(sqlPrefix, id) {
+    return [sqlPrefix + id];
+}
+exports.standardSQLBtreeIndexable = standardSQLBtreeIndexable;
 /**
  * Provides the table bit that is necessary to include this property and
  * this property alone, that is a table bit

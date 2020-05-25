@@ -88,7 +88,7 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
     // first we check that the language and region provided are
     // right and available
     basic_1.checkLanguage(appData, resolverArgs.args);
-    basic_1.checkListLimit(resolverArgs.args.records);
+    basic_1.checkLimit(resolverArgs.args.records.length, itemDefinition, true);
     const mod = itemDefinition.getParentModule();
     basic_1.checkListTypes(resolverArgs.args.records, mod);
     const tokenData = await basic_1.validateTokenAndGetData(appData, resolverArgs.args.token);
@@ -152,7 +152,7 @@ async function getModuleList(appData, resolverArgs, mod) {
     // first we check that the language and region provided are
     // right and available
     basic_1.checkLanguage(appData, resolverArgs.args);
-    basic_1.checkListLimit(resolverArgs.args.records);
+    basic_1.checkLimit(resolverArgs.args.records.length, mod, true);
     basic_1.checkListTypes(resolverArgs.args.records, mod);
     const tokenData = await basic_1.validateTokenAndGetData(appData, resolverArgs.args.token);
     await basic_1.validateTokenIsntBlocked(appData.cache, tokenData);

@@ -63,12 +63,12 @@ exports.MAX_FIELD_SIZE = 1000000; // equivalent to 1MB
  * how many search results can be retrieved at once these are
  * used for the actual search results
  */
-exports.MAX_TRADITIONAL_SEARCH_RESULTS_FALLBACK = 50;
+exports.MAX_SEARCH_RESULTS_FALLBACK = 50;
 /**
  * how many search results can be retrieved at once these are
  * used for the actual search results
  */
-exports.MAX_MATCHED_SEARCH_RESULTS_FALLBACK = 500;
+exports.MAX_SEARCH_RECORDS_FALLBACK = 500;
 /**
  * Supported image types
  */
@@ -679,7 +679,7 @@ exports.DATE_FORMAT = "YYYY-MM-DD";
  * that make the client able to run requests for a given item id
  * @ignore
  */
-const SEARCH_MATCH_FIELDS = {
+const SEARCH_RECORD_FIELDS = {
     id: {
         type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
     },
@@ -696,29 +696,29 @@ const SEARCH_MATCH_FIELDS = {
 /**
  * The ID element in graphql form
  */
-exports.SEARCH_MATCH_GQL = graphql_1.GraphQLObjectType && new graphql_1.GraphQLObjectType({
-    name: "SEARCH_MATCH",
-    fields: SEARCH_MATCH_FIELDS,
+exports.SEARCH_RECORD_GQL = graphql_1.GraphQLObjectType && new graphql_1.GraphQLObjectType({
+    name: "SEARCH_RECORD",
+    fields: SEARCH_RECORD_FIELDS,
 });
 /**
  * The ID element as input form
  */
-exports.SEARCH_MATCH_INPUT_GQL = graphql_1.GraphQLInputObjectType && new graphql_1.GraphQLInputObjectType({
-    name: "SEARCH_MATCH_INPUT",
-    fields: SEARCH_MATCH_FIELDS,
+exports.SEARCH_RECORD_INPUT_GQL = graphql_1.GraphQLInputObjectType && new graphql_1.GraphQLInputObjectType({
+    name: "SEARCH_RECORD_INPUT",
+    fields: SEARCH_RECORD_FIELDS,
 });
 /**
  * The id container contains the way that search results are returned
  * with the records and the last record of the given records
  */
-exports.SEARCH_RESULTS_CONTAINER_GQL = graphql_1.GraphQLObjectType && new graphql_1.GraphQLObjectType({
-    name: "SEARCH_RESULTS_CONTAINER",
+exports.SEARCH_RECORDS_CONTAINER_GQL = graphql_1.GraphQLObjectType && new graphql_1.GraphQLObjectType({
+    name: "SEARCH_RECORDS_CONTAINER",
     fields: {
         records: {
-            type: graphql_1.GraphQLList && graphql_1.GraphQLList(graphql_1.GraphQLNonNull(exports.SEARCH_MATCH_GQL)),
+            type: graphql_1.GraphQLList && graphql_1.GraphQLList(graphql_1.GraphQLNonNull(exports.SEARCH_RECORD_GQL)),
         },
-        last_record: {
-            type: exports.SEARCH_MATCH_GQL,
+        last_record_date: {
+            type: graphql_1.GraphQLString,
         },
         count: {
             type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
@@ -768,9 +768,21 @@ const ORDERBY_RULE = graphql_1.GraphQLEnumType && new graphql_1.GraphQLEnumType(
  */
 exports.RESERVED_SEARCH_PROPERTIES = {
     ...BASE_QUERY_PROPERTIES,
+    limit: {
+        type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+        description: "The SQL limit to use in order to page the amount of results",
+    },
+    offset: {
+        type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+        description: "The SQL offset to use in order to page the amount of results",
+    },
     order_by: {
         type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(ORDERBY_RULE),
         description: "An order type",
+    },
+    since: {
+        type: graphql_1.GraphQLString,
+        description: "Basically a limiter that causes the values to only be returned since that date, the date must be an ISO type",
     },
     created_by: {
         type: graphql_1.GraphQLInt,
@@ -788,11 +800,11 @@ exports.RESERVED_SEARCH_PROPERTIES = {
         type: graphql_1.GraphQLString,
         description: "a parent item definition qualified path (must be specified with parent_id)",
     },
-    // TODO
     version_filter: {
         type: graphql_1.GraphQLString,
         description: "Allow only items that are of this version",
     },
+    // TODO
     search: {
         type: graphql_1.GraphQLString,
         description: "A search string",
@@ -803,9 +815,21 @@ exports.RESERVED_SEARCH_PROPERTIES = {
  */
 exports.RESERVED_MODULE_SEARCH_PROPERTIES = {
     ...exports.RESERVED_SEARCH_PROPERTIES,
+    limit: {
+        type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+        description: "The SQL limit to use in order to page the amount of results",
+    },
+    offset: {
+        type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+        description: "The SQL offset to use in order to page the amount of results",
+    },
     types: {
         type: graphql_1.GraphQLList && graphql_1.GraphQLList(graphql_1.GraphQLNonNull(graphql_1.GraphQLString)),
         description: "A list of types (qualified names) to filter by",
+    },
+    since: {
+        type: graphql_1.GraphQLString,
+        description: "Basically a limiter that causes the values to only be returned since that date, the date must be an ISO type",
     },
     order_by: {
         type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(ORDERBY_RULE),
@@ -827,11 +851,11 @@ exports.RESERVED_MODULE_SEARCH_PROPERTIES = {
         type: graphql_1.GraphQLString,
         description: "a parent item definition qualified path (must be specified with parent_id)",
     },
-    // TODO
     version_filter: {
         type: graphql_1.GraphQLString,
         description: "Allow only items that are of this version",
     },
+    // TODO
     search: {
         type: graphql_1.GraphQLString,
         description: "A search string",
@@ -871,7 +895,7 @@ exports.RESERVED_GETTER_LIST_PROPERTIES = {
     ...BASE_QUERY_PROPERTIES,
     records: {
         // TODO implement the version in retrieving these lists
-        type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLList(exports.SEARCH_MATCH_INPUT_GQL)),
+        type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLList(exports.SEARCH_RECORD_INPUT_GQL)),
         description: "the records to fetch for that item",
     },
     created_by: {
@@ -983,5 +1007,6 @@ exports.PROTECTED_RESOURCES = [
 ];
 exports.SERVER_DATA_IDENTIFIER = "SERVER_DATA";
 exports.CURRENCY_FACTORS_IDENTIFIER = "CURRENCY_FACTORS";
+exports.CACHED_CURRENCY_LAYER_RESPONSE = "CACHED_CURRENCY_LAYER_RESPONSE";
 exports.WAIT_TIME_PER_BATCH = 300000;
 exports.SERVER_DATA_MIN_UPDATE_TIME = 259200000;

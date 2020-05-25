@@ -13,7 +13,7 @@ import {
   PREFIX_GET_LIST,
 } from "../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
-import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchMatch } from "../../gql-querier";
+import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord } from "../../gql-querier";
 import { deepMerge, requestFieldsAreContained } from "../../gql-util";
 import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
@@ -712,7 +712,7 @@ export async function runSearchQueryFor(
   remoteListenerCallback: () => void,
 ): Promise<{
   error: EndpointErrorType,
-  searchResults: IGQLSearchMatch[],
+  searchResults: IGQLSearchRecord[],
 }> {
   const qualifiedName = (this.props.itemDefinitionInstance.isExtensionsInstance() ?
     this.props.itemDefinitionInstance.getParentModule().getQualifiedPathName() :
@@ -767,7 +767,7 @@ export async function runSearchQueryFor(
         remoteListener.addOwnedSearchListenerFor(
           standardCounterpartQualifiedName,
           arg.createdBy,
-          cacheWorkerGivenSearchValue.lastRecord,
+          cacheWorkerGivenSearchValue.lastRecordDate,
           remoteListenerCallback,
         );
       } else {
@@ -776,7 +776,7 @@ export async function runSearchQueryFor(
           arg.parentedBy.itemDefinition.getQualifiedPathName(),
           arg.parentedBy.id,
           arg.parentedBy.version || null,
-          cacheWorkerGivenSearchValue.lastRecord,
+          cacheWorkerGivenSearchValue.lastRecordDate,
           remoteListenerCallback,
         );
       }
@@ -786,7 +786,7 @@ export async function runSearchQueryFor(
           remoteListener.requestOwnedSearchFeedbackFor({
             qualifiedPathName: standardCounterpartQualifiedName,
             createdBy: arg.createdBy,
-            knownLastRecord: cacheWorkerGivenSearchValue.lastRecord,
+            knownLastRecordDate: cacheWorkerGivenSearchValue.lastRecordDate,
           });
         } else {
           remoteListener.requestParentedSearchFeedbackFor({
@@ -794,7 +794,7 @@ export async function runSearchQueryFor(
             parentType: arg.parentedBy.itemDefinition.getQualifiedPathName(),
             parentId: arg.parentedBy.id,
             parentVersion: arg.parentedBy.version || null,
-            knownLastRecord: cacheWorkerGivenSearchValue.lastRecord,
+            knownLastRecordDate: cacheWorkerGivenSearchValue.lastRecordDate,
           });
         }
       }
@@ -826,9 +826,9 @@ export async function runSearchQueryFor(
     error = gqlValue.errors[0].extensions;
   }
 
-  const searchResults: IGQLSearchMatch[] = (
+  const searchResults: IGQLSearchRecord[] = (
     gqlValue.data && gqlValue.data[queryName] && gqlValue.data[queryName].records
-  ) as IGQLSearchMatch[] || null;
+  ) as IGQLSearchRecord[] || null;
 
   return {
     error,

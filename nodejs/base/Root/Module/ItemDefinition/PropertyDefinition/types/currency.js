@@ -79,6 +79,9 @@ const typeValue = {
             knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", toArg.normalized);
         }
     },
+    sqlBtreeIndexable: (sqlPrefix, id) => {
+        return [sqlPrefix + id + "_CURRENCY", sqlPrefix + id + "_NORMALIZED_VALUE"];
+    },
     sqlMantenience: (sqlPrefix, id, knex) => {
         const valueId = sqlPrefix + id + "_VALUE";
         const normalizedValueId = sqlPrefix + id + "_CURRENCY";

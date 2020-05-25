@@ -215,6 +215,13 @@ export function standardSQLEqualFn(
   );
 }
 
+export function standardSQLBtreeIndexable(
+  sqlPrefix: string,
+  id: string,
+) {
+  return [sqlPrefix + id];
+}
+
 /**
  * Provides the table bit that is necessary to include this property and
  * this property alone, that is a table bit
