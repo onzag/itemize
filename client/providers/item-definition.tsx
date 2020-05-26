@@ -28,6 +28,15 @@ import { getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, r
 
 // TODO this file is too complex, we need to simplify, specially policies they are killing this file
 
+function getPropertyListForSearchMode(properties: string[], standardCounterpart: ItemDefinition) {
+  let result = [];
+  properties.forEach((propertyId) => {
+    const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
+    result = result.concat(getConversionIds(standardProperty.rawData));
+  });
+  return result;
+}
+
 /**
  * A response given by some handlers like
  * loadValue
@@ -38,6 +47,11 @@ export interface IBasicActionResponse {
 
 export interface IActionResponseWithValue extends IBasicActionResponse {
   value: any;
+}
+
+export interface ILoadCompletedPayload extends IActionResponseWithValue {
+  forId: number;
+  forVersion: string;
 }
 
 /**
@@ -51,7 +65,11 @@ export interface IActionResponseWithId extends IBasicActionResponse {
  * A response given by search
  */
 export interface IActionResponseWithSearchResults extends IBasicActionResponse {
-  results: IGQLSearchRecord[];
+  records: IGQLSearchRecord[];
+  results: IGQLValue[];
+  count: number;
+  limit: number;
+  offset: number;
 }
 
 export type PolicyPathType = [string, string, string];
@@ -111,6 +129,9 @@ export interface IActionSearchOptions extends IActionCleanOptions {
     version?: string,
   };
   cachePolicy?: "by-owner" | "by-parent" | "none";
+  traditional?: boolean;
+  limit: number;
+  offset: number;
 }
 
 export interface IPokeElementsType {
@@ -170,7 +191,11 @@ export interface IItemDefinitionContextType {
   searching: boolean;
   // the obtained search results from the graphql endpoint
   // just as they come
-  searchResults: IGQLSearchRecord[];
+  searchRecords: IGQLSearchRecord[];
+  searchResults: IGQLValue[];
+  searchLimit: number;
+  searchOffset: number;
+  searchCount: number;
   // a search id for the obtained results whether error
   // or success
   searchId: string;
@@ -409,7 +434,11 @@ interface IActualItemDefinitionProviderState {
   deleted: boolean;
   searchError: EndpointErrorType;
   searching: boolean;
-  searchResults: IGQLSearchRecord[];
+  searchRecords: IGQLSearchRecord[];
+  searchResults: IGQLValue[];
+  searchLimit: number;
+  searchOffset: number;
+  searchCount: number;
   searchId: string;
   searchOwner: number;
   searchParent: [string, number, string];
@@ -431,6 +460,9 @@ export class ActualItemDefinitionProvider extends
   // this variable is useful is async tasks like loadValue are still executing after
   // this component has unmounted, which is a memory leak
   private isUnmounted: boolean = false;
+
+  private lastLoadingForId: number = null;
+  private lastLoadingForVersion: string = null;
 
   // sometimes when doing some updates when you change the item
   // definition to another item definition (strange but ok)
@@ -456,7 +488,11 @@ export class ActualItemDefinitionProvider extends
           props.forId || null,
           props.forVersion || null,
           !props.disableExternalChecks,
-          props.properties,
+          props.itemDefinitionInstance.isInSearchMode() ?
+            getPropertyListForSearchMode(
+              props.properties || [],
+              props.itemDefinitionInstance.getStandardCounterpart()
+            ) : props.properties || [],
           props.includes || [],
           !props.includePolicies,
         ),
@@ -532,7 +568,11 @@ export class ActualItemDefinitionProvider extends
         this.props.forId || null,
         this.props.forVersion || null,
         !this.props.disableExternalChecks,
-        this.props.properties || [],
+        this.props.itemDefinitionInstance.isInSearchMode() ?
+            getPropertyListForSearchMode(
+              this.props.properties || [],
+              this.props.itemDefinitionInstance.getStandardCounterpart()
+            ) : this.props.properties || [],
         this.props.includes || [],
         !this.props.includePolicies,
       ),
@@ -558,7 +598,11 @@ export class ActualItemDefinitionProvider extends
 
       searchError: null,
       searching: false,
-      searchResults: [],
+      searchResults: null,
+      searchRecords: null,
+      searchLimit: null,
+      searchOffset: null,
+      searchCount: null,
       searchId: null,
       searchOwner: null,
       searchParent: null,
@@ -819,7 +863,11 @@ export class ActualItemDefinitionProvider extends
             this.props.forId || null,
             this.props.forVersion || null,
             !this.props.disableExternalChecks,
-            this.props.properties || [],
+            this.props.itemDefinitionInstance.isInSearchMode() ?
+              getPropertyListForSearchMode(
+                this.props.properties || [],
+                this.props.itemDefinitionInstance.getStandardCounterpart()
+              ) : this.props.properties || [],
             this.props.includes || [],
             !this.props.includePolicies,
           ),
@@ -900,7 +948,11 @@ export class ActualItemDefinitionProvider extends
         this.props.forId || null,
         this.props.forVersion || null,
         !this.props.disableExternalChecks,
-        this.props.properties || [],
+        this.props.itemDefinitionInstance.isInSearchMode() ?
+            getPropertyListForSearchMode(
+              this.props.properties || [],
+              this.props.itemDefinitionInstance.getStandardCounterpart()
+            ) : this.props.properties || [],
         this.props.includes || [],
         !this.props.includePolicies,
       ),
@@ -917,11 +969,17 @@ export class ActualItemDefinitionProvider extends
     });
   }
   public async loadValue(denyCache?: boolean): Promise<IActionResponseWithValue> {
+    const forId = this.props.forId;
+    const forVersion = this.props.forVersion || null;
+
+    this.lastLoadingForId = forId;
+    this.lastLoadingForVersion = forVersion;
+
     // we don't use loading here because there's one big issue
     // elements are assumed into the loading state by the constructor
     // if they have an id
-    if (!this.props.forId) {
-      if ((this.state.loaded || this.state.loadError) && !this.isUnmounted) {
+    if (!forId) {
+      if ((this.state.loading || this.state.loaded || this.state.loadError) && !this.isUnmounted) {
         this.setState({
           loadError: null,
           loaded: false,
@@ -951,14 +1009,14 @@ export class ActualItemDefinitionProvider extends
       userId: this.props.tokenData.id,
       userRole: this.props.tokenData.role,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
-      forId: this.props.forId,
-      forVersion: this.props.forVersion || null,
+      forId: forId,
+      forVersion: forVersion,
     });
 
     if (!denyCache) {
       // Prevent loading at all if value currently available and memoryCached
       const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
-        this.props.forId, this.props.forVersion || null,
+        forId, forVersion,
       );
       if (
         appliedGQLValue &&
@@ -967,11 +1025,13 @@ export class ActualItemDefinitionProvider extends
         const completedValue = this.loadValueCompleted({
           value: appliedGQLValue.rawValue,
           error: null,
+          forId,
+          forVersion,
         });
         this.props.remoteListener.requestFeedbackFor({
           itemDefinition: this.props.itemDefinitionInstance.getQualifiedPathName(),
-          id: this.props.forId,
-          version: this.props.forVersion || null,
+          id: forId,
+          version: forVersion || null,
         });
         // in some situations the value can be in memory but not yet permanently cached
         // (eg. when there is a search context)
@@ -983,8 +1043,8 @@ export class ActualItemDefinitionProvider extends
         ) {
           CacheWorkerInstance.instance.mergeCachedValue(
             PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(),
-            this.props.forId,
-            this.props.forVersion || null,
+            forId,
+            forVersion || null,
             appliedGQLValue.rawValue,
             appliedGQLValue.requestFields,
           );
@@ -1023,14 +1083,19 @@ export class ActualItemDefinitionProvider extends
       this.props.searchContext &&
       this.props.searchContext.currentlySearching.find(
         (s) =>
-          s.id === this.props.forId &&
-          s.version === this.props.forVersion &&
+          s.id === forId &&
+          s.version === forVersion &&
           s.type === this.props.itemDefinitionInstance.getQualifiedPathName(),
       ) &&
       requestFieldsAreContained(requestFields, this.props.searchContext.searchFields)
     ) {
       return null;
     }
+
+    const tokenDataId = this.props.tokenData.id;
+    const tokenDataRole = this.props.tokenData.role;
+    const containsExternallyCheckedProperty = this.props.containsExternallyCheckedProperty;
+    const qualifiedPathName = this.props.itemDefinitionInstance.getQualifiedPathName();
 
     // remember that this waiter only runs on the first instance
     // that managed to get the memo, it waits for all the other instances
@@ -1046,8 +1111,8 @@ export class ActualItemDefinitionProvider extends
       returnMemoryCachedValues: false,
       returnWorkerCachedValues: !denyCache,
       itemDefinition: this.props.itemDefinitionInstance,
-      id: this.props.forId,
-      version: this.props.forVersion || null,
+      id: forId,
+      version: forVersion,
       token: this.props.tokenData.token,
       language: this.props.localeData.language,
       cacheStore: this.props.longTermCaching,
@@ -1057,22 +1122,29 @@ export class ActualItemDefinitionProvider extends
       // we apply the value, whatever we have gotten this will affect all the instances
       // that use the same value
       this.props.itemDefinitionInstance.applyValue(
-        this.props.forId,
-        this.props.forVersion || null,
+        forId,
+        forVersion,
         value,
         false,
-        this.props.tokenData.id,
-        this.props.tokenData.role,
+        tokenDataId,
+        tokenDataRole,
         getQueryFields,
         true,
       );
 
       // and then we trigger the change listener for all the instances
       this.props.itemDefinitionInstance.triggerListeners(
-        "change", this.props.forId, this.props.forVersion || null,
+        "change", forId, forVersion,
       );
       // and if we have an externally checked property we do the external check
-      if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+      // we need to ensure that our current item definition instance hasn't changed
+      // its for id and for version while we were loading
+      if (
+        containsExternallyCheckedProperty &&
+        !this.props.disableExternalChecks &&
+        forId === this.lastLoadingForId &&
+        forVersion === this.lastLoadingForVersion
+      ) {
         this.setStateToCurrentValueWithExternalChecking(null);
       }
     }
@@ -1085,21 +1157,35 @@ export class ActualItemDefinitionProvider extends
     // from the server
     if (cached) {
       this.props.remoteListener.requestFeedbackFor({
-        itemDefinition: this.props.itemDefinitionInstance.getQualifiedPathName(),
-        id: this.props.forId,
-        version: this.props.forVersion || null,
+        itemDefinition: qualifiedPathName,
+        id: forId,
+        version: forVersion,
       });
     }
 
     return this.loadValueCompleted({
       value,
       error,
+      forId,
+      forVersion,
     });
   }
-  public loadValueCompleted(value: IActionResponseWithValue): IActionResponseWithValue {
+  public loadValueCompleted(value: ILoadCompletedPayload): IActionResponseWithValue {
+    // basically if it's unmounted, or what we were updating for does not match
+    // what we are supposed to be updating for, this basically means load value got called once
+    // again before the previous value managed to load, this can happen, when switching forId and/or
+    // for version very rapidly
+    const shouldNotUpdateState =
+      this.isUnmounted ||
+      value.forId !== this.lastLoadingForId ||
+      value.forVersion !== this.lastLoadingForVersion;
+
     // return immediately
-    if (this.isUnmounted) {
-      return value;
+    if (shouldNotUpdateState) {
+      return {
+        value: value.value,
+        error: value.error,
+      };
     }
 
     // so once everything has been completed this function actually runs per instance
@@ -1139,7 +1225,10 @@ export class ActualItemDefinitionProvider extends
     }
 
     // now we return
-    return value;
+    return {
+      value: value.value,
+      error: value.error,
+    };
   }
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
     // so when we want to externally check we first run the external check
@@ -1147,7 +1236,11 @@ export class ActualItemDefinitionProvider extends
     const newItemDefinitionState = await this.props.itemDefinitionInstance.getState(
       this.props.forId || null,
       this.props.forVersion || null,
-      this.props.properties || [],
+      this.props.itemDefinitionInstance.isInSearchMode() ?
+        getPropertyListForSearchMode(
+          this.props.properties || [],
+          this.props.itemDefinitionInstance.getStandardCounterpart()
+        ) : this.props.properties || [],
       this.props.includes || [],
       !this.props.includePolicies,
     );
@@ -1409,7 +1502,7 @@ export class ActualItemDefinitionProvider extends
   public giveEmulatedInvalidError(
     stateApplied: string,
     withId: boolean,
-    withIds: boolean,
+    withSearchResults: boolean,
   ): IActionResponseWithId | IActionResponseWithValue | IActionResponseWithSearchResults {
     const emulatedError: EndpointErrorType = {
       message: "Submit refused due to invalid information in form fields",
@@ -1426,9 +1519,13 @@ export class ActualItemDefinitionProvider extends
         id: null,
         error: emulatedError,
       };
-    } else if (withIds) {
+    } else if (withSearchResults) {
       return {
-        results: [],
+        results: null,
+        records: null,
+        limit: null,
+        offset: null,
+        count: null,
         error: emulatedError,
       };
     } else {
@@ -1859,15 +1956,17 @@ export class ActualItemDefinitionProvider extends
     };
   }
   public async search(options: IActionSearchOptions): Promise<IActionResponseWithSearchResults> {
-    let propertiesForArgs = [];
-    options.searchByProperties.forEach((propertyId) => {
-      const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
-      propertiesForArgs = propertiesForArgs.concat(getConversionIds(standardProperty.rawData));
-    });
-
     if (this.state.searching) {
       return null;
     }
+    // we need the standard counterpart given we are in search mode right now, 
+    const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
+    // first we calculate the properties that are to be submitted, by using the standard counterpart
+    // a search action is only to be executed if the item definition (either a real item definition or
+    // one representing a module) is actually in search mode, otherwise this would crash
+    const propertiesForArgs = getPropertyListForSearchMode(options.searchByProperties, standardCounterpart);
+
+    // now we use this function to check that everything is valid
     const isValid = this.checkItemDefinitionStateValidity({
       properties: propertiesForArgs,
       includes: options.searchByIncludes || [],
@@ -1889,18 +1988,33 @@ export class ActualItemDefinitionProvider extends
       return this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithSearchResults;
     }
 
+    if (
+      options.cachePolicy !== "none" &&
+      typeof options.cachePolicy !== "undefined" &&
+      options.cachePolicy !== null &&
+      options.traditional
+    ) {
+      throw new Error("A cache policy cannot be set with a traditional search");
+    }
+
+    // now we check the cache policy by owner
     if (options.cachePolicy === "by-owner" && !options.createdBy) {
       throw new Error("A by owner cache policy requires createdBy option to be set");
     }
 
+    // and the cache policy by parenting
     let searchParent: [string, number, string] = null;
     if (options.cachePolicy === "by-parent" && !options.parentedBy) {
       throw new Error("A by owner cache policy requires parentedBy option to be set");
     } else if (options.parentedBy) {
+      // because the parenting rule goes by a path, eg.... module/module  and then idef/idef
+      // we need to loop and find it by the path in order to find both
       const moduleInQuestion = this.props.itemDefinitionInstance.getParentModule()
         .getParentRoot().getModuleFor(options.parentedBy.module.split("/"));
       const itemDefinitionInQuestion = moduleInQuestion.getItemDefinitionFor(
         options.parentedBy.itemDefinition.split("/"));
+
+      // and that way we calculate the search parent
       searchParent = [
         itemDefinitionInQuestion.getQualifiedPathName(),
         options.parentedBy.id,
@@ -1912,30 +2026,38 @@ export class ActualItemDefinitionProvider extends
       if (options.createdBy !== this.state.searchOwner) {
         // this search listener is bad because the search
         // owner has changed, and the previously registered listener
-        // if any does not match the owner
+        // if any does not match the owner, remember the search owner is the created by
+        // value, and we are now redoing the search, and we might have a search listener
+        // registered already for this search if that is the case
         this.removePossibleSearchListeners();
       }
     } else if (options.cachePolicy === "by-parent") {
+      // we basically do the exact same here, same logic
       if (!equals(searchParent, this.state.searchParent)) {
         // this search listener is bad because the search
-        // owner has changed, and the previously registered listener
+        // parent has changed, and the previously registered listener
         // if any does not match the owner
         this.removePossibleSearchListeners();
       }
     } else {
+      // otherwise we are removing here because we have no cache policy
+      // and hence no reason to have search listeners at all to listen to changes
       this.removePossibleSearchListeners();
     }
 
+    // we save the last options used for our last search
     this.lastOptionsUsedForSearch = options;
 
+    // and then set the state to searching
     if (!this.isUnmounted) {
       this.setState({
         searching: true,
       });
     }
 
-    const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
-
+    // the args of the item definition depend on the search mode, hence we use
+    // our current item definition instance to get the arguments we want to load
+    // in order to perform the search based on the search mode
     const {
       argumentsForQuery,
     } = getFieldsAndArgs({
@@ -1951,6 +2073,7 @@ export class ActualItemDefinitionProvider extends
       forVersion: this.props.forVersion || null,
     });
 
+    // the fields nevertheless are another story as it uses the standard logic
     const searchFieldsAndArgs = getFieldsAndArgs({
       includeArgs: false,
       includeFields: true,
@@ -1963,6 +2086,9 @@ export class ActualItemDefinitionProvider extends
       forId: null,
       forVersion: null,
     });
+    // while these search fields are of virtually no use for standard searchs
+    // these are used when doing a traditional search and when doing a search
+    // in a cache policy mode
     const requestedSearchFields = searchFieldsAndArgs.requestFields;
 
     let parentedBy = null;
@@ -1979,7 +2105,11 @@ export class ActualItemDefinitionProvider extends
     }
 
     const {
-      searchResults,
+      results,
+      records,
+      count,
+      limit,
+      offset,
       error,
     } = await runSearchQueryFor({
       args: argumentsForQuery,
@@ -1988,8 +2118,11 @@ export class ActualItemDefinitionProvider extends
       cachePolicy: options.cachePolicy || "none",
       createdBy: options.createdBy || null,
       orderBy: options.orderBy || "DEFAULT",
+      traditional: !!options.traditional,
       token: this.props.tokenData.token,
       language: this.props.localeData.language,
+      limit: options.limit,
+      offset: options.offset,
       parentedBy,
     }, this.props.remoteListener, this.onSearchReload);
 
@@ -1998,7 +2131,11 @@ export class ActualItemDefinitionProvider extends
         this.setState({
           searchError: error,
           searching: false,
-          searchResults,
+          searchResults: results,
+          searchRecords: records,
+          searchCount: count,
+          searchLimit: limit,
+          searchOffset: offset,
           searchId: uuid.v4(),
           searchOwner: options.createdBy || null,
           searchParent,
@@ -2015,7 +2152,11 @@ export class ActualItemDefinitionProvider extends
         this.setState({
           searchError: null,
           searching: false,
-          searchResults: searchResults || [],
+          searchResults: results,
+          searchRecords: records,
+          searchCount: count,
+          searchLimit: limit,
+          searchOffset: offset,
           searchId: uuid.v4(),
           searchOwner: options.createdBy || null,
           searchParent,
@@ -2030,7 +2171,11 @@ export class ActualItemDefinitionProvider extends
     }
 
     return {
-      results: searchResults,
+      results,
+      records,
+      count,
+      limit,
+      offset,
       error: null,
     };
   }
@@ -2207,7 +2352,11 @@ export class ActualItemDefinitionProvider extends
           deleted: this.state.deleted,
           searchError: this.state.searchError,
           searching: this.state.searching,
+          searchRecords: this.state.searchRecords,
           searchResults: this.state.searchResults,
+          searchLimit: this.state.searchLimit,
+          searchCount: this.state.searchCount,
+          searchOffset: this.state.searchOffset,
           searchId: this.state.searchId,
           searchOwner: this.state.searchOwner,
           searchShouldCache: this.state.searchShouldCache,

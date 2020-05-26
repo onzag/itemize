@@ -41,7 +41,11 @@ export interface ISearchLoaderProps {
 }
 
 interface IActualSearchLoaderProps extends ISearchLoaderProps {
-  searchResults: IGQLSearchRecord[];
+  searchRecords: IGQLSearchRecord[];
+  searchResults: IGQLValue[];
+  searchCount: number;
+  searchLimit: number;
+  searchOffset: number;
   itemDefinitionInstance: ItemDefinition;
   // token data to get the current user id, and role, for requests
   tokenData: ITokenContextType;
@@ -82,7 +86,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     this.refreshPage();
   }
   public componentDidUpdate(prevProps: IActualSearchLoaderProps, prevState: IActualSearchLoaderState) {
-    const currentSearchResults = this.props.searchResults.slice(
+    const currentSearchResults = (this.props.searchRecords || []).slice(
       this.props.pageSize * this.props.currentPage,
       this.props.pageSize * (this.props.currentPage + 1),
     );
@@ -98,7 +102,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     }
   }
   public refreshPage() {
-    const currentSearchResults = this.props.searchResults.slice(
+    const currentSearchResults = (this.props.searchRecords || []).slice(
       this.props.pageSize * this.props.currentPage,
       this.props.pageSize * (this.props.currentPage + 1),
     );
@@ -111,6 +115,37 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   }
   public async loadValues(currentSearchResults: IGQLSearchRecord[]) {
     if (!this.props.searchId) {
+      return;
+    }
+
+    // this happens for traditional search, we dont need to
+    // do a second re-request round
+    if (this.props.searchResults) {
+      const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
+      this.props.searchResults.forEach((sr) => {
+        const itemDefintionInQuestion = root.registry[sr.type as string] as ItemDefinition;
+        // we apply the value, whatever we have gotten this will affect all the instances
+          // that use the same value
+          itemDefintionInQuestion.applyValue(
+            sr.id as number,
+            sr.version as string,
+            sr,
+            false,
+            this.props.tokenData.id,
+            this.props.tokenData.role,
+            this.props.searchFields,
+            true,
+          );
+
+          // and then we trigger the change listener for all the instances
+          itemDefintionInQuestion.triggerListeners("change", sr.id as number, sr.version as string);
+      });
+      this.setState({
+        error: null,
+        currentlySearching: [],
+        currentSearchResults,
+        searchFields: this.props.searchFields,
+      });
       return;
     }
 
@@ -311,7 +346,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       !equals(this.state, nextState);
   }
   public render() {
-    const pageCount = Math.ceil(this.props.searchResults.length / this.props.pageSize);
+    const pageCount = !this.props.searchCount ? 1 : Math.ceil(this.props.searchCount / this.props.pageSize);
     return (
       <SearchItemDefinitionValueContext.Provider
         value={
@@ -368,7 +403,11 @@ export default function SearchLoader(props: ISearchLoaderProps) {
                   (itemDefinitionContext) => (
                     <ActualSearchLoader
                       {...props}
+                      searchRecords={itemDefinitionContext.searchRecords}
                       searchResults={itemDefinitionContext.searchResults}
+                      searchCount={itemDefinitionContext.searchCount}
+                      searchOffset={itemDefinitionContext.searchOffset}
+                      searchLimit={itemDefinitionContext.searchLimit}
                       itemDefinitionInstance={itemDefinitionContext.idef}
                       remoteListener={itemDefinitionContext.remoteListener}
                       searchId={itemDefinitionContext.searchId}

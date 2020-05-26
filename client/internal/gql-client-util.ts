@@ -11,9 +11,10 @@ import {
   PREFIX_ADD,
   PREFIX_EDIT,
   PREFIX_GET_LIST,
+  PREFIX_TRADITIONAL_SEARCH,
 } from "../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
-import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord } from "../../gql-querier";
+import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum } from "../../gql-querier";
 import { deepMerge, requestFieldsAreContained } from "../../gql-util";
 import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
@@ -705,6 +706,9 @@ export async function runSearchQueryFor(
       version: string,
     };
     cachePolicy: "by-owner" | "by-parent" | "none",
+    traditional: boolean,
+    limit: number,
+    offset: number,
     token: string,
     language: string,
   },
@@ -712,12 +716,16 @@ export async function runSearchQueryFor(
   remoteListenerCallback: () => void,
 ): Promise<{
   error: EndpointErrorType,
-  searchResults: IGQLSearchRecord[],
+  results?: IGQLValue[],
+  records: IGQLSearchRecord[],
+  count: number,
+  limit: number,
+  offset: number,
 }> {
-  const qualifiedName = (this.props.itemDefinitionInstance.isExtensionsInstance() ?
-    this.props.itemDefinitionInstance.getParentModule().getQualifiedPathName() :
-    this.props.itemDefinitionInstance.getQualifiedPathName());
-  const queryName = PREFIX_SEARCH + qualifiedName;
+  const qualifiedName = (arg.itemDefinition.isExtensionsInstance() ?
+    arg.itemDefinition.getParentModule().getQualifiedPathName() :
+    arg.itemDefinition.getQualifiedPathName());
+  const queryName = (arg.traditional ? PREFIX_TRADITIONAL_SEARCH : PREFIX_SEARCH) + qualifiedName;
 
   const args = getQueryArgsFor(
     arg.args,
@@ -748,6 +756,12 @@ export async function runSearchQueryFor(
     arg.cachePolicy !== "none" &&
     CacheWorkerInstance.isSupported
   ) {
+    if (arg.traditional) {
+      throw new Error("Cache policy is set yet search mode is traditional");
+    }
+    if (arg.offset !== 0) {
+      throw new Error("Cache policy is set yet the offset is not 0");
+    }
     const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
     const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
       standardCounterpart.getParentModule().getQualifiedPathName() :
@@ -755,12 +769,16 @@ export async function runSearchQueryFor(
     const cacheWorkerGivenSearchValue = await CacheWorkerInstance.instance.runCachedSearch(
       queryName,
       args,
+      arg.limit,
       PREFIX_GET_LIST + standardCounterpartQualifiedName,
       arg.token,
       arg.language.split("-")[0],
       arg.fields,
       arg.cachePolicy,
     );
+    // note that this value doesn't contain the count, it contains
+    // the limit and the offset but not the count that is because
+    // the count is considered irrelevant for these cache values
     gqlValue = cacheWorkerGivenSearchValue.gqlValue;
     if (gqlValue && gqlValue.data) {
       if (arg.cachePolicy === "by-owner") {
@@ -799,7 +817,10 @@ export async function runSearchQueryFor(
         }
       }
     }
-  } else {
+  } else if (!arg.traditional) {
+    args.order_by = new GQLEnum("DEFAULT");
+    args.limit = arg.limit;
+    args.offset = arg.offset;
     const query = buildGqlQuery({
       name: queryName,
       args,
@@ -810,6 +831,27 @@ export async function runSearchQueryFor(
           type: {},
           created_at: {},
         },
+        count: {},
+        limit: {},
+        offset: {},
+      },
+    });
+
+    // now we get the gql value using the gql query function
+    // and this function will always run using the network
+    gqlValue = await gqlQuery(query);
+  } else {
+    args.order_by = new GQLEnum("DEFAULT");
+    args.limit = arg.limit;
+    args.offset = arg.offset;
+    const query = buildGqlQuery({
+      name: queryName,
+      args,
+      fields: {
+        results: arg.fields,
+        count: {},
+        limit: {},
+        offset: {},
       },
     });
 
@@ -826,12 +868,49 @@ export async function runSearchQueryFor(
     error = gqlValue.errors[0].extensions;
   }
 
-  const searchResults: IGQLSearchRecord[] = (
-    gqlValue.data && gqlValue.data[queryName] && gqlValue.data[queryName].records
-  ) as IGQLSearchRecord[] || null;
+  const data = gqlValue.data && gqlValue.data[queryName] && gqlValue.data[queryName];
+  const limit: number = (data && data.limit as number) || null;
+  const offset: number = (data && data.offset as number) || null;
+  let count: number = (data && data.count as number) || null;
+  if (!arg.traditional) {
+    const records: IGQLSearchRecord[] = (
+      data && data.records
+    ) as IGQLSearchRecord[] || null;
 
-  return {
-    error,
-    searchResults,
-  };
+    // sometimes count is not there, this happens when using the cached search
+    // as the cached search doesn't perform any counting so it doesn't return such data
+    // check out the cache worker to see that it returns records, last_record_date,
+    // limit and offset, but no count, so we collapse the count to all the given results that
+    // were provided
+    if (data && count === null) {
+      count = records.length;
+    }
+  
+    return {
+      error,
+      results: null,
+      records,
+      limit,
+      offset,
+      count,
+    };
+  } else {
+    const records: IGQLSearchRecord[] = (
+      data && (data.results as IGQLValue[]).map((v) => ({
+        type: v.type,
+        version: v.version || null,
+        id: v.id || null,
+        created_at: (v.DATA && (v.DATA as any).created_at) || null
+      }))
+    ) as IGQLSearchRecord[] || null;
+  
+    return {
+      error,
+      results: data && data.results as IGQLValue[],
+      records,
+      limit,
+      offset,
+      count,
+    };
+  }
 }

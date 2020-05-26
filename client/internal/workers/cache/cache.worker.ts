@@ -28,6 +28,7 @@ export interface ISearchMatchType {
   value: IGQLSearchRecord[];
   allResultsPreloaded: boolean;
   lastRecordDate: string;
+  limit: number;
 }
 
 export interface ICacheDB extends DBSchema {
@@ -498,6 +499,7 @@ export default class CacheWorker {
   public async runCachedSearch(
     searchQueryName: string,
     searchArgs: IGQLArgs,
+    limit: number,
     getListQueryName: string,
     getListTokenArgs: string,
     getListLangArgs: string,
@@ -529,12 +531,16 @@ export default class CacheWorker {
     let resultingGetListRequestedFields: IGQLRequestFields = getListRequestedFields;
     let lastRecordDate: string;
     let dataMightBeStale = false;
+    let limitToSetInDb: number;
 
     try {
       // now we request indexed db for a result
       const dbValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
-      // if the database is not offering anything
-      if (!dbValue) {
+      // if the database is not offering anything or the limit is less than
+      // it is supposed to be, this means that we have grown the cache size, but yet
+      // the cache remains constrained by the older size, this only truly matters if
+      // the new limit is larger than the old limit, otherwise it's fine
+      if (!dbValue || dbValue.limit < limit) {
         // we need to remove the specifics of the search
         // as we are caching everything to the given criteria
         // and then using client side to filter
@@ -542,6 +548,8 @@ export default class CacheWorker {
           token: searchArgs.token,
           language: searchArgs.language,
           order_by: new GQLEnum("DEFAULT"),
+          limit,
+          offset: 0,
         };
         if (cachePolicy === "by-owner") {
           actualArgsToUseInGQLSearch.created_by = searchArgs.created_by;
@@ -564,6 +572,8 @@ export default class CacheWorker {
               created_at: {},
             },
             last_record_date: {},
+            limit: {},
+            offset: {},
           },
         });
 
@@ -586,6 +596,7 @@ export default class CacheWorker {
         // need to process
         resultsToProcess = serverValue.data[searchQueryName].records as IGQLSearchRecord[];
         lastRecordDate = serverValue.data[searchQueryName].last_record_date as string;
+        limitToSetInDb = limit;
       } else {
         // otherwise our results to process are the same ones we got
         // from the database, but do we need to process them for real?
@@ -593,6 +604,7 @@ export default class CacheWorker {
         resultsToProcess = dbValue.value;
         lastRecordDate = dbValue.lastRecordDate;
         dataMightBeStale = true;
+        limitToSetInDb = dbValue.limit;
 
         // if the fields are contained within what the database has loaded
         // and if all the results were preloaded then they don't need to be
@@ -607,11 +619,15 @@ export default class CacheWorker {
           // TODO do something about corruption, if the data is corrupted
           // bad stuff happens when running the search as the warning
           // Search function was executed with missing value for triggers
+          const records = await search(this.rootProxy, this.db, resultsToProcess, searchArgs);
           const gqlValue: IGQLEndpointValue = {
             data: {
               [searchQueryName]: {
-                records: await search(this.rootProxy, this.db, resultsToProcess, searchArgs),
+                records,
                 last_record_date: lastRecordDate,
+                // we return the true limit, because records might grow over the limit
+                limit: records.length < limit ? limit : records.length,
+                offset: 0,
               },
             },
           };
@@ -657,6 +673,9 @@ export default class CacheWorker {
       };
     }
 
+    // IT goes here if, not all results were preloaded or
+    // there was nothing stored at all
+
     // now we set what we have just gotten from the server (or the database)
     // and assign the value (maybe again) with the results, the fields we are supposed
     // to have contained within all the fetched batches at the end and say
@@ -666,6 +685,7 @@ export default class CacheWorker {
       fields: resultingGetListRequestedFields,
       allResultsPreloaded: false,
       lastRecordDate,
+      limit: limitToSetInDb,
     }, storeKeyName);
 
     // now we first got to extract what is has actually been loaded from those

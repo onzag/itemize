@@ -11,6 +11,7 @@ import { Preferences } from "@onzag/itemize/client/fast-prototyping/pages/prefer
 import { PrivacyPolicy } from "@onzag/itemize/client/fast-prototyping/pages/privacy-policy";
 import { TermsAndConditions } from "@onzag/itemize/client/fast-prototyping/pages/terms-and-conditions";
 import { ResetPassword } from "@onzag/itemize/client/fast-prototyping/pages/reset-password";
+import { Frontpage } from "@onzag/itemize/client/fast-prototyping/pages/frontpage";
 
 import { CMS } from "@onzag/itemize/client/fast-prototyping/pages/cms";
 
@@ -30,6 +31,9 @@ export default function App()<0>{
 	return (
 		<>
 			<Navbar LoginDialog={LoginDialog} SignupDialog={SignupDialog} RecoverDialog={RecoverDialog}/>
+
+			<Route path="/" exact={true} component={Frontpage}/>
+
 			<Route path="/my-profile" component={MyProfile}/>
 			<Route path="/change-password" component={ChangePassword}/>
 			<Route path="/profile/:id" component={Profile}/>
