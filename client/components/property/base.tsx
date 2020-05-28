@@ -147,6 +147,7 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                     }
                     return props.children(gqlValue as any, null);
                   }
+                  console.warn("Attempted to read property without state", property.getId());
                   // Property has no state, and no internal value, it must be somehow hidden
                   return null;
                 } else if (type === "view") {
@@ -175,10 +176,14 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                     if (typeof gqlValue === "number") {
                       return <RawBasePropertyView
                         value={gqlValue.toString()}
+                        renderer={props.renderer}
+                        rendererArgs={props.rendererArgs}
                       />;
                     } else {
                       return <RawBasePropertyView
                         value={gqlValue as any}
+                        renderer={props.renderer}
+                        rendererArgs={props.rendererArgs}
                       />;
                     }
                   }

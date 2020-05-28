@@ -4,6 +4,7 @@ import equals from "deep-equal";
 
 export interface IPropertyViewSimpleRendererProps extends IPropertyViewRendererProps<string> {
   capitalize: boolean;
+  language: string;
 }
 
 export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>> {
@@ -20,12 +21,13 @@ export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProp
       nextProps.renderer !== this.props.renderer ||
       nextProps.capitalize !== this.props.capitalize ||
       !!this.props.rtl !== !!nextProps.rtl ||
+      this.props.language !== nextProps.language ||
       !equals(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
     let i18nData: any = null;
     let nullValueLabel: any = null;
-    if (this.props.property.hasSpecificValidValues()) {
+    if (this.props.property && this.props.property.hasSpecificValidValues()) {
       i18nData = this.props.property.getI18nDataFor(this.props.language);
       nullValueLabel = this.props.property.isNullable() ?
         i18nData && i18nData.null_value : null;
@@ -35,6 +37,7 @@ export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProp
     const rendererArgs: IPropertyViewSimpleRendererProps = {
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
+      language: this.props.language,
       currentValue: this.props.state.value === null ?
         nullValueLabel :
         (

@@ -116,7 +116,6 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
       return;
     }
 
-    console.log("SETTING HTML TO", html);
     this.cheapdiv.innerHTML = html;
 
     this.cheapdiv.querySelectorAll("img").forEach((img: HTMLImageElement) => {

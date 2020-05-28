@@ -50,7 +50,7 @@ export const PublicUserProfile = withStyles(publicUserProfileStyles)((props: Wit
       <Container maxWidth="md" className={props.classes.container}>
         <Paper className={props.classes.paper}>
           <ItemDefinitionLoader>
-            <Avatar size="large" hideFlag={true}/>
+            <Avatar size="large" hideFlag={true} fullWidth={true}/>
             <Reader id="e_validated">
               {(eValidated: boolean) => (
                 <Reader id="username">

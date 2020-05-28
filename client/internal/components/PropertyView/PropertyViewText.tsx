@@ -18,6 +18,11 @@ export const PROPERTY_VIEW_SANITIZE_CONFIG = {
   ALLOW_UNKNOWN_PROTOCOLS: true,
 };
 
+export const ALLOWED_CLASSES = [
+  "image", "image-container", "image-pad", "video", "video-container",
+  "file", "file-container", "file-icon", "file-extension", "file-size",
+]
+
 function cleanAllAttribs(node: HTMLElement) {
   Array.prototype.slice.call(node.attributes).forEach((attr: any) => {
     node.removeAttribute(attr.name);
@@ -144,6 +149,27 @@ export function propertyViewPostProcessingHook(
     }
   }
 
+  const style = node.getAttribute && node.getAttribute("style");
+  if (style) {
+    const removeStyle =
+      style.indexOf("javascript") !== -1 ||
+      style.indexOf("http") !== -1 ||
+      style.indexOf("://") !== -1 ||
+      node.style.position === "fixed";
+    if (removeStyle) {
+      node.removeAttribute("style");
+    }
+  }
+
+  const classList = node.classList;
+  if (classList) {
+    classList.forEach((className) => {
+      if (!ALLOWED_CLASSES.includes(className)) {
+        node.classList.remove(className);
+      }
+    });
+  }
+
   return node;
 }
 
@@ -180,8 +206,10 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
         mediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
       DOMPurify.addHook("afterSanitizeElements", propertyViewPostProcessingHook.bind(this, mediaProperty, currentFiles, supportsImages, supportsVideos, supportsFiles));
+      console.log("SANITIZING", currentValue);
       currentValue = DOMPurify.sanitize(currentValue, PROPERTY_VIEW_SANITIZE_CONFIG);
       DOMPurify.removeAllHooks();
+      console.log("SANITIZED", currentValue);
     }
 
     const RendererElement = this.props.renderer;

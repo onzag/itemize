@@ -72,9 +72,11 @@ const avatarStyles = createStyles({
       opacity: 1,
     },
   },
+  fullWidth: {
+    width: "100%",
+  },
   avatarContainer: {
     position: "relative",
-    width: "100%",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -160,6 +162,7 @@ interface IAvatarProps extends WithStyles<typeof avatarStyles> {
   showWarnings?: boolean;
   profileURL?: string | profileURLFn;
   cacheImage?: boolean;
+  fullWidth?: boolean;
 }
 
 interface IAvatarRendererProps extends IPropertyEntryFileRendererProps, WithStyles<typeof avatarStyles> {
@@ -218,7 +221,7 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
     const imageSrc = props.size === "large" ? imageSources.imageLargeSizeURL : imageSources.imageSmallSizeURL;
 
     const content = (
-      <div className={props.classes.avatarContainer}>
+      <div className={`${props.classes.avatarContainer} ${props.fullWidth ? props.classes.fullWidth : ""}`}>
         {props.cacheImage ?
           <CacheableImageLoader src={imageSrc}>
             {avatarWithSource}

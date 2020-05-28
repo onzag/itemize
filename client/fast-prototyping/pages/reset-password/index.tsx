@@ -85,7 +85,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
                     <Container maxWidth="md" className={props.classes.container}>
                       <Paper className={props.classes.paper}>
                         <ItemDefinitionLoader>
-                          <Avatar size="large"/>
+                          <Avatar size="large" fullWidth={true}/>
                           <Reader id="username">
                             {(username: string) => (
                               <Typography variant="h4" className={props.classes.username}>{username}</Typography>

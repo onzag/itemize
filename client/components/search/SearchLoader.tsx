@@ -22,7 +22,7 @@ interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
 }
 
 export interface ISearchLoaderArg {
-  searchResults: IGQLSearchRecordWithPopulateData[];
+  searchRecords: IGQLSearchRecordWithPopulateData[];
   pageCount: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
@@ -64,7 +64,7 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
 interface IActualSearchLoaderState {
   currentlySearching: IGQLSearchRecord[];
   searchFields: IGQLRequestFields;
-  currentSearchResults: IGQLSearchRecord[];
+  currentSearchRecords: IGQLSearchRecord[];
   error: EndpointErrorType;
 }
 
@@ -78,7 +78,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     this.state = {
       currentlySearching: [],
       searchFields: {},
-      currentSearchResults: [],
+      currentSearchRecords: [],
       error: null,
     };
   }
@@ -86,7 +86,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     this.refreshPage();
   }
   public componentDidUpdate(prevProps: IActualSearchLoaderProps, prevState: IActualSearchLoaderState) {
-    const currentSearchResults = (this.props.searchRecords || []).slice(
+    const currentSearchRecords = (this.props.searchRecords || []).slice(
       this.props.pageSize * this.props.currentPage,
       this.props.pageSize * (this.props.currentPage + 1),
     );
@@ -96,24 +96,24 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     // results in a different search id
     if (
       prevProps.searchId !== this.props.searchId ||
-      !equals(this.state.currentSearchResults, currentSearchResults)
+      !equals(this.state.currentSearchRecords, currentSearchRecords)
     ) {
-      this.loadValues(currentSearchResults);
+      this.loadValues(currentSearchRecords);
     }
   }
   public refreshPage() {
-    const currentSearchResults = (this.props.searchRecords || []).slice(
+    const currentSearchRecords = (this.props.searchRecords || []).slice(
       this.props.pageSize * this.props.currentPage,
       this.props.pageSize * (this.props.currentPage + 1),
     );
-    this.loadValues(currentSearchResults);
+    this.loadValues(currentSearchRecords);
   }
   public dismissError() {
     this.setState({
       error: null,
     });
   }
-  public async loadValues(currentSearchResults: IGQLSearchRecord[]) {
+  public async loadValues(currentSearchRecords: IGQLSearchRecord[]) {
     if (!this.props.searchId) {
       return;
     }
@@ -143,7 +143,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       this.setState({
         error: null,
         currentlySearching: [],
-        currentSearchResults,
+        currentSearchRecords,
         searchFields: this.props.searchFields,
       });
       return;
@@ -153,8 +153,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     this.setState({
       error: null,
-      currentlySearching: currentSearchResults,
-      currentSearchResults,
+      currentlySearching: currentSearchRecords,
+      currentSearchRecords,
       searchFields: this.props.searchFields,
     });
 
@@ -165,7 +165,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     const getListQueryName: string = PREFIX_GET_LIST + queryBase;
 
     const uncachedResults: IGQLSearchRecord[] = [];
-    const workerCachedResults = await Promise.all(currentSearchResults.map(async (searchResult: IGQLSearchRecord) => {
+    const workerCachedResults = await Promise.all(currentSearchRecords.map(async (searchResult: IGQLSearchRecord) => {
       const itemDefintionInQuestion =
         this.props.itemDefinitionInstance.getParentModule()
           .getParentRoot().registry[searchResult.type] as ItemDefinition;
@@ -358,16 +358,16 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       >
         {
           this.props.children({
-            searchResults: this.state.error ? [] : this.state.currentSearchResults.map((searchResult) => {
+            searchRecords: this.state.error ? [] : this.state.currentSearchRecords.map((searchRecord) => {
               const itemDefinition = this.props.itemDefinitionInstance
-                .getParentModule().getParentRoot().registry[searchResult.type] as ItemDefinition;
+                .getParentModule().getParentRoot().registry[searchRecord.type] as ItemDefinition;
               return {
-                ...searchResult,
+                ...searchRecord,
                 providerProps: {
-                  key: itemDefinition.getQualifiedPathName() + "." + searchResult.id + "." + (searchResult.version || ""),
-                  forId: searchResult.id,
-                  forVersion: searchResult.version,
-                  itemDefinition: searchResult.type,
+                  key: itemDefinition.getQualifiedPathName() + "." + searchRecord.id + "." + (searchRecord.version || ""),
+                  forId: searchRecord.id,
+                  forVersion: searchRecord.version,
+                  itemDefinition: searchRecord.type,
                   properties: this.props.searchRequestedProperties,
                   includes: this.props.searchRequestedIncludes,
                   includePolicies: this.props.includePolicies,

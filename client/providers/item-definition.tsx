@@ -316,7 +316,7 @@ export interface IItemDefinitionProviderProps {
    * if you don't specify this, the context will be
    * based on the prop extensions emulated item definition
    */
-  itemDefinition?: string;
+  itemDefinition?: string | ItemDefinition;
   /**
    * the id, specifying an id makes a huge difference
    */
@@ -2410,9 +2410,13 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                           }
                           let valueFor: ItemDefinition;
                           if (props.itemDefinition) {
-                            valueFor =
-                              data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition ||
-                              data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+                            if (typeof props.itemDefinition === "string") {
+                              valueFor =
+                                data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition ||
+                                data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+                            } else {
+                              valueFor = props.itemDefinition;
+                            }
                           } else {
                             valueFor = data.mod.getPropExtensionItemDefinition();
                           }
