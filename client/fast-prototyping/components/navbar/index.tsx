@@ -44,7 +44,7 @@ interface INavbarProps extends WithStyles<typeof navbarStyles> {
   RecoverDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
 }
 
-const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
+export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
   const [isOutdatedDialogAllowedToBeOpen, setIsOutdatedDialogAllowedToBeOpen] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);
   return (
@@ -111,5 +111,3 @@ const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
     </>
   );
 });
-
-export default Navbar;

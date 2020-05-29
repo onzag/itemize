@@ -37,7 +37,7 @@ export interface ISearchLoaderProps {
   children: (arg: ISearchLoaderArg) => any;
   includePolicies?: boolean;
   cleanOnDismount?: boolean;
-  staticResults?: boolean;
+  static?: "TOTAL" | "NO_LISTENING";
 }
 
 interface IActualSearchLoaderProps extends ISearchLoaderProps {
@@ -372,7 +372,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                   includes: this.props.searchRequestedIncludes,
                   includePolicies: this.props.includePolicies,
                   cleanOnDismount: this.props.cleanOnDismount,
-                  static: this.props.staticResults,
+                  static: this.props.static,
                   longTermCaching: this.props.searchShouldCache,
                 },
                 itemDefinition,

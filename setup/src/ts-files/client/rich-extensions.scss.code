@@ -1,0 +1,20 @@
+/**
+ * Write your rich extensions here they are allowed CSS classes that are for use
+ * in the raw text mode, used by the CMS mostly, in order to build your interface
+ * properly for the property view text, this allows some flexibility to the raw builder
+ * NOTE that these classes can also be accessed by a malicious user, so be wary, don't make
+ * any class with position: fixed or that allows to cover the entire screen, if you truly
+ * need so make sure that they can only be executed under an id eg. #my-element .rich-text--fixed
+ * and that under no circumstance an user element can be accessed that way, as ids are not allowed
+ * and are sanitized, otherwise use an invalid class name for trusted content
+ *
+ * All classes must be prefixed by rich-text-- or they would otherwise not be allowed,
+ * you can also use ids in order to ensure they are only descendants of a children
+ */
+
+.trusted<0>{
+    .rich-text--frontpage-hero<1>{
+        width: 100%;
+        height: 70vh;
+    }
+}

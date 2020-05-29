@@ -170,3 +170,18 @@ export function imageSizeRetriever(fileData: IGQLFile, property?: PropertyDefini
 
   return finalValue;
 }
+
+export function cacheableQSLoader(url: string, recheck?: boolean) {
+  if (!url) {
+    return null;
+  }
+  if (url.indexOf("blob:") === 0) {
+    return url;
+  }
+  const newURL = new URL(url);
+  newURL.searchParams.append("sw-cacheable", "true");
+  if (recheck) {
+    newURL.searchParams.append("sw-recheck", "true");
+  }
+  return newURL.toString();
+}

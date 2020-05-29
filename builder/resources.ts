@@ -98,6 +98,7 @@ const REQUIRED_RESOURCES = [
 const REQUIRED_LOCALIZED_RESOURCES = [
   "privacy-policy/$.html",
   "terms-and-conditions/$.html",
+  "contact/$.html",
 ];
 
 /**

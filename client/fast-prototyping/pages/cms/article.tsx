@@ -11,6 +11,7 @@ import I18nReadMany from "../../../components/localization/I18nReadMany";
 import Snackbar from "../../components/snackbar";
 import SubmitActioner from "../../../components/item-definition/SubmitActioner";
 import I18nRead from "../../../components/localization/I18nRead";
+import { articlesStyles } from "../frontpage/articles";
 
 const fragmentStyles = createStyles({
   paper: {
@@ -26,29 +27,29 @@ const fragmentStyles = createStyles({
   box: {
     paddingBottom: "1rem",
   },
-  articleContainer: {
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "center",
-    position: "relative",
-    width: "100%",
-  },
-  articleImageContainer: {
-    position: "relative",
-    width: "50%",
-    paddingRight: "1rem",
-  },
-  articleImage: {
-    width: "100%",
-    borderRadius: 10,
-  },
-  articleText: {
-    width: "50%",
-    position: "relative",
-  },
-  articleSummary: {
-    padding: "1rem 0",
-  },
+});
+
+const SingleArticle = withStyles(articlesStyles)((props: WithStyles<typeof articlesStyles>) => {
+  return <div className={props.classes.articleContainer}>
+    <div className={props.classes.articleImageContainer}>
+      <View
+        id="summary_image"
+        rendererArgs={{
+          imageClassName: props.classes.articleImage,
+          imageSizes: "300px",
+          lazyLoad: true,
+        }}
+      />
+    </div>
+    <div className={props.classes.articleText}>
+      <Typography variant="h4"><View id="title" /></Typography>
+      <div className={props.classes.articleSummaryContainer}>
+        <div className={props.classes.articleSummary}>
+          <View id="summary" />
+        </div>
+      </div>
+    </div>
+  </div>
 });
 
 export const Article = withStyles(fragmentStyles)((props: WithStyles<typeof fragmentStyles>) => {
@@ -76,7 +77,7 @@ export const Article = withStyles(fragmentStyles)((props: WithStyles<typeof frag
               longTermCaching={false}
               forId={parseInt(locationState.id, 10) || null}
             >
-              <Container maxWidth="md" className={props.classes.container}>
+              <Container maxWidth="md" className={props.classes.container + " trusted"}>
                 <Paper className={props.classes.paper}>
 
                   <I18nReadMany
@@ -101,6 +102,7 @@ export const Article = withStyles(fragmentStyles)((props: WithStyles<typeof frag
                   <Entry id="title" />
                   <Entry id="content" rendererArgs={{
                     requestAltOnImages: true,
+                    supportsRawMode: true,
                   }} />
                   <Entry id="summary" />
                   <Entry id="summary_image" />
@@ -127,20 +129,7 @@ export const Article = withStyles(fragmentStyles)((props: WithStyles<typeof frag
 
                 <Paper className={props.classes.paper2}>
                   <ItemDefinitionLoader>
-                    <div className={props.classes.articleContainer}>
-                      <div className={props.classes.articleImageContainer}>
-                        <View id="summary_image" rendererArgs={{imageClassName: props.classes.articleImage}}/>
-                      </div>
-                      <div className={props.classes.articleText}>
-                        <Typography variant="h4"><View id="title" /></Typography>
-                        <div className={props.classes.articleSummary}>
-                          <View id="summary" />
-                        </div>
-                        <Button variant="outlined">
-                          <I18nRead id="read_more"/>
-                        </Button>
-                      </div>
-                    </div>
+                    <SingleArticle/>
                   </ItemDefinitionLoader>
                 </Paper>
 

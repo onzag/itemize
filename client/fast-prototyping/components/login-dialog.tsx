@@ -8,7 +8,6 @@ import { ProgressingElement } from "./util";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { LogActioner } from "../../components/login/LogActioner";
 import I18nRead from "../../components/localization/I18nRead";
-import CacheableImageLoader from "../../components/util/CacheableImageLoader";
 import I18nReadMany from "../../components/localization/I18nReadMany";
 import Entry from "../../components/property/Entry";
 
@@ -67,11 +66,7 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
                 title={i18nLogin}
               >
                 <div className={props.classes.titleContainer}>
-                  <CacheableImageLoader src="/rest/resource/icons/android-chrome-64x64.png">
-                    {(cachedImgSrc) => (
-                      <img src={cachedImgSrc} className={props.classes.image}/>
-                    )}
-                  </CacheableImageLoader>
+                  <img src="/rest/resource/icons/android-chrome-64x64.png" className={props.classes.image}/>
                   <Typography variant="h4" className={props.classes.welcomeTitle}>
                     <I18nRead id="login_welcome" capitalize={true}/>
                   </Typography>

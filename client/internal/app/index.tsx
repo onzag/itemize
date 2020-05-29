@@ -162,7 +162,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
         if (userItemDefinition.hasAppliedValueTo(this.tokenState.id, null)) {
           console.log("found an instance, triggering update");
           const property = userItemDefinition.getPropertyDefinitionFor(propertyId, false);
-          property.applyValue(this.tokenState.id, null, actualPropertyResult, false, false);
+          property.applyValue(this.tokenState.id, null, actualPropertyResult, true, false);
           userItemDefinition.triggerListeners("change", this.tokenState.id, null);
         }
       }

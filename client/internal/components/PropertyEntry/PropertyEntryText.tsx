@@ -178,7 +178,6 @@ export default class PropertyEntryText
       currentValue.forEach((v) => {
         // if it's not in the gathered list
         if (!idsGathered.includes(v.id)) {
-          console.log(value, currentValue);
           this.onRemoveFile(v.id);
         }
       });

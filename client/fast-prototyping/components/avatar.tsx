@@ -5,7 +5,7 @@ import { withStyles, WithStyles, createStyles } from "@material-ui/styles";
 import Link from "../../components/navigation/Link";
 import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedFileType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
-import { imageSizeRetriever } from "../../components/util";
+import { imageSizeRetriever, cacheableQSLoader } from "../../components/util";
 import { IPropertyEntryFileRendererProps } from "../../internal/components/PropertyEntry/PropertyEntryFile";
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
@@ -13,7 +13,6 @@ import BrokenImageIcon from "@material-ui/icons/BrokenImage";
 import { MAX_FILE_SIZE } from "../../../constants";
 import { Alert } from "@material-ui/lab";
 import Reader from "../../components/property/Reader";
-import CacheableImageLoader from "../../components/util/CacheableImageLoader";
 
 const avatarStyles = createStyles({
   flag: {
@@ -223,9 +222,7 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
     const content = (
       <div className={`${props.classes.avatarContainer} ${props.fullWidth ? props.classes.fullWidth : ""}`}>
         {props.cacheImage ?
-          <CacheableImageLoader src={imageSrc}>
-            {avatarWithSource}
-          </CacheableImageLoader> :
+          avatarWithSource(cacheableQSLoader(imageSrc)) :
           avatarWithSource(imageSrc)
         }
         {flag}
@@ -335,18 +332,16 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
                             <div {...rootProps}>
                               <input {...getInputProps()} />
                               <div className={props.classes.avatarContainer}>
-                                <CacheableImageLoader src={props.imageSizes && props.imageSizes.imageLargeSizeURL}>
-                                  {(largeImageURL) => (
-                                    <MAvatar
-                                      classes={{ root: `${props.classes.avatar} ${numberColorClassName} ` +
-                                        `${props.classes.avatarLarge} ` +
-                                        `${specialUserClassName} ${specialUserSizeClassName}` }}
-                                      src={largeImageURL}
-                                    >
-                                      {username ? username[0].toLocaleUpperCase() : ""}
-                                    </MAvatar>
-                                  )}
-                                </CacheableImageLoader>
+                                <MAvatar
+                                  classes={{
+                                    root: `${props.classes.avatar} ${numberColorClassName} ` +
+                                      `${props.classes.avatarLarge} ` +
+                                      `${specialUserClassName} ${specialUserSizeClassName}`
+                                  }}
+                                  src={cacheableQSLoader(props.imageSizes && props.imageSizes.imageLargeSizeURL)}
+                                >
+                                  {username ? username[0].toLocaleUpperCase() : ""}
+                                </MAvatar>
                                 <div className={`${props.classes.hoverAddBackdrop} ${isDragAccept || isDragReject ? "visible" : ""}`}>
                                   {isDragReject ? <BrokenImageIcon fontSize="large" /> : <AddAPhotoIcon fontSize="large" />}
                                 </div>

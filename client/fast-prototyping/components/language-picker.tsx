@@ -6,6 +6,7 @@ import AppLanguageRetriever from "../../components/localization/AppLanguageRetri
 
 interface ILanguagePickerProps {
   className?: string;
+  useCode?: boolean;
   shrinkingDisplay?: boolean;
   shrinkingDisplayStandardClassName?: string;
   shrinkingDisplayShrunkClassName?: string;
@@ -46,41 +47,44 @@ export class LanguagePicker extends React.Component<ILanguagePickerProps, ILangu
   public render() {
     return (
       <AppLanguageRetriever>
-        {(languageData) => (
-          <React.Fragment>
-            <Button
-              classes={{ root: this.props.className }}
-              color="inherit"
-              startIcon={<TranslateIcon/>}
-              onClick={this.handleButtonSelectClick}
-            >
-              {
-                !this.props.shrinkingDisplay ?
-                  languageData.currentLanguage.name :
-                  <React.Fragment>
-                    <span className={this.props.shrinkingDisplayStandardClassName}>{languageData.currentLanguage.name}</span>
-                    <span className={this.props.shrinkingDisplayShrunkClassName}>{languageData.currentLanguage.code}</span>
-                  </React.Fragment>
-              }
-            </Button>
-            <Menu
-              anchorEl={this.state.anchorEl}
-              keepMounted={true}
-              open={!!this.state.anchorEl}
-              onClose={this.handleMenuClose}
-            >
-              {languageData.availableLanguages.map((al) => (
-                <MenuItem
-                  key={al.code}
-                  selected={al.code === languageData.currentLanguage.code}
-                  onClick={this.handleLanguageChange.bind(this, languageData.changeLanguageTo, al.code)}
-                >
-                  {capitalize(al.name)}
-                </MenuItem>
-              ))}
-            </Menu>
-          </React.Fragment>
-        )}
+        {(languageData) => {
+          const menu = this.state.anchorEl ? <Menu
+            anchorEl={this.state.anchorEl}
+            keepMounted={false}
+            open={!!this.state.anchorEl}
+            onClose={this.handleMenuClose}
+          >
+            {languageData.availableLanguages.map((al) => (
+              <MenuItem
+                key={al.code}
+                selected={al.code === languageData.currentLanguage.code}
+                onClick={this.handleLanguageChange.bind(this, languageData.changeLanguageTo, al.code)}
+              >
+                {capitalize(al.name)}
+              </MenuItem>
+            ))}
+          </Menu> : null;
+          return (
+            <React.Fragment>
+              <Button
+                classes={{ root: this.props.className }}
+                color="inherit"
+                startIcon={<TranslateIcon />}
+                onClick={this.handleButtonSelectClick}
+              >
+                {
+                  !this.props.shrinkingDisplay ?
+                    (this.props.useCode ? languageData.currentLanguage.code : languageData.currentLanguage.name) :
+                    <React.Fragment>
+                      <span className={this.props.shrinkingDisplayStandardClassName}>{languageData.currentLanguage.name}</span>
+                      <span className={this.props.shrinkingDisplayShrunkClassName}>{languageData.currentLanguage.code}</span>
+                    </React.Fragment>
+                }
+              </Button>
+              {menu}
+            </React.Fragment>
+          );
+        }}
       </AppLanguageRetriever>
     );
   }

@@ -5,6 +5,7 @@ import AppCurrencyRetriever from "../../components/localization/AppCurrencyRetri
 
 interface ICurrencyPickerProps {
   className?: string;
+  useCode?: boolean;
 }
 
 interface ICurrencyPickerState {
@@ -42,34 +43,37 @@ export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurre
   public render() {
     return (
       <AppCurrencyRetriever>
-        {(currencyData) => (
-          <React.Fragment>
-            <Button
-              classes={{ root: this.props.className }}
-              color="inherit"
-              startIcon={<b>{currencyData.currentCurrency.symbol}</b>}
-              onClick={this.handleButtonSelectClick}
-            >
-              {currencyData.currentCurrency.name}
-            </Button>
-            <Menu
-              anchorEl={this.state.anchorEl}
-              keepMounted={true}
-              open={!!this.state.anchorEl}
-              onClose={this.handleMenuClose}
-            >
-              {currencyData.availableCurrencies.map((ac) => (
-                <MenuItem
-                  key={ac.code}
-                  selected={ac.code === currencyData.currentCurrency.code}
-                  onClick={this.handleCurrencyChange.bind(this, currencyData.changeCurrencyTo, ac.code)}
-                >
-                  <b>{ac.symbol || ac.code}</b>&nbsp;-&nbsp;{capitalize(ac.name)}
-                </MenuItem>
-              ))}
-            </Menu>
-          </React.Fragment>
-        )}
+        {(currencyData) => {
+          const menu = this.state.anchorEl ? <Menu
+            anchorEl={this.state.anchorEl}
+            keepMounted={false}
+            open={!!this.state.anchorEl}
+            onClose={this.handleMenuClose}
+          >
+            {currencyData.availableCurrencies.map((ac) => (
+              <MenuItem
+                key={ac.code}
+                selected={ac.code === currencyData.currentCurrency.code}
+                onClick={this.handleCurrencyChange.bind(this, currencyData.changeCurrencyTo, ac.code)}
+              >
+                <b>{ac.symbol || ac.code}</b>&nbsp;-&nbsp;{capitalize(ac.name)}
+              </MenuItem>
+            ))}
+          </Menu> : null;
+          return (
+            <React.Fragment>
+              <Button
+                classes={{ root: this.props.className }}
+                color="inherit"
+                startIcon={<b>{currencyData.currentCurrency.symbol}</b>}
+                onClick={this.handleButtonSelectClick}
+              >
+                {this.props.useCode ? currencyData.currentCurrency.code : currencyData.currentCurrency.name}
+              </Button>
+              {menu}
+            </React.Fragment>
+          );
+        }}
       </AppCurrencyRetriever>
     );
   }

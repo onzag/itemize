@@ -37,7 +37,7 @@ function restoreElementInfo(target: HTMLElement) {
 
 // checks whether a component is in view, this is for the old school mode
 function componentIsInView(elem: HTMLElement) {
-  var bounding = elem.getBoundingClientRect();
+  const bounding = elem.getBoundingClientRect();
   return (
     bounding.top >= 0 &&
     bounding.left >= 0 &&

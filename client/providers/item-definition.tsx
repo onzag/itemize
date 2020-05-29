@@ -22,6 +22,8 @@ import CacheWorkerInstance from "../internal/workers/cache";
 import { RemoteListener } from "../internal/app/remote-listener";
 import uuid from "uuid";
 import { getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor } from "../internal/gql-client-util";
+import { IPropertySetterProps } from "../components/property/base";
+import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
@@ -35,6 +37,17 @@ function getPropertyListForSearchMode(properties: string[], standardCounterpart:
     result = result.concat(getConversionIds(standardProperty.rawData));
   });
   return result;
+}
+
+function getPropertyForSetter(setter: IPropertySetterProps, itemDefinition: ItemDefinition) {
+  let actualId: string = setter.id;
+  if (setter.searchVariant) {
+    actualId = PropertyDefinitionSearchInterfacesPrefixes[setter.searchVariant.toUpperCase()] + setter.id;
+  }
+  if (setter.policyName && setter.policyType) {
+    return itemDefinition.getPropertyDefinitionForPolicy(setter.policyType, setter.policyName, actualId);
+  }
+  return itemDefinition.getPropertyDefinitionFor(actualId, true);
 }
 
 /**
@@ -360,6 +373,11 @@ export interface IItemDefinitionProviderProps {
    */
   automaticSearch?: IActionSearchOptions;
   /**
+   * Setters for setting values for the properties within the item definition
+   * itself, useful not to depend on mounting at time
+   */
+  setters?: IPropertySetterProps[];
+  /**
    * only downloads and includes the properties specified in the list
    * in the state
    */
@@ -378,9 +396,13 @@ export interface IItemDefinitionProviderProps {
    */
   cleanOnDismount?: boolean | IActionCleanOptions;
   /**
-   * static components do not update remotely
+   * static components do not update
+   * A no listening static item definition will not update on
+   * remote changes
+   * a total static component does not even ask for feedback
+   * it displays what it initially gets, wherever it comes from
    */
-  static?: boolean;
+  static?: "TOTAL" | "NO_LISTENING";
   /**
    * uses long term caching with the worker cache strategy
    */
@@ -547,6 +569,8 @@ export class ActualItemDefinitionProvider extends
     this.dismissSearchResults = this.dismissSearchResults.bind(this);
     this.onSearchReload = this.onSearchReload.bind(this);
     this.injectSubmitBlockPromise = this.injectSubmitBlockPromise.bind(this);
+    this.installSetters = this.installSetters.bind(this);
+    this.removeSetters = this.removeSetters.bind(this);
 
     // we get the initial state
     this.state = this.setupInitialState();
@@ -650,11 +674,29 @@ export class ActualItemDefinitionProvider extends
       }
     }
   }
+  public installSetters(props: IActualItemDefinitionProviderProps = this.props) {
+    if (props.setters) {
+      props.setters.forEach((setter) => {
+        const property = getPropertyForSetter(setter, props.itemDefinitionInstance);
+        this.onPropertyEnforce(property, setter.value, props.forId, props.forVersion, true);
+      });     
+    }
+  }
+  public removeSetters(props: IActualItemDefinitionProviderProps = this.props) {
+    if (props.setters) {
+      props.setters.forEach((setter) => {
+        const property = getPropertyForSetter(setter, props.itemDefinitionInstance);
+        this.onPropertyClearEnforce(property, props.forId, props.forVersion, true); 
+      });
+    }
+  }
   // so now we have mounted, what do we do at the start
   public componentDidMount() {
     // first we setup the listeners, this includes the on change listener that would make
     // the entire app respond to actions, otherwise the fields might as well be disabled
     this.setupListeners();
+    this.installSetters();
+
     // now we retrieve the externally checked value
     if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
       this.setStateToCurrentValueWithExternalChecking(null);
@@ -753,7 +795,8 @@ export class ActualItemDefinitionProvider extends
       !equals(nextProps.includes || [], this.props.includes || []) ||
       !!nextProps.static !== !!this.props.static ||
       !!nextProps.includePolicies !== !!this.props.includePolicies ||
-      !equals(nextProps.automaticSearch, this.props.automaticSearch);
+      !equals(nextProps.automaticSearch, this.props.automaticSearch) ||
+      !equals(nextProps.setters, this.props.setters);
   }
   public async componentDidUpdate(
     prevProps: IActualItemDefinitionProviderProps,
@@ -762,6 +805,12 @@ export class ActualItemDefinitionProvider extends
     // whether the item definition was updated
     // and changed
     const itemDefinitionWasUpdated = this.props.itemDefinitionInstance !== prevProps.itemDefinitionInstance;
+    const uniqueIDChanged = (prevProps.forId || null) !== (this.props.forId || null) ||
+      (prevProps.forVersion || null) !== (this.props.forVersion || null);
+    const didSomethingThatInvalidatedSetters =
+      !equals(this.props.setters, prevProps.setters) ||
+      uniqueIDChanged ||
+      itemDefinitionWasUpdated;
 
     // if the mark for destruction has changed in a meaningful way
     // we recheck it
@@ -769,19 +818,23 @@ export class ActualItemDefinitionProvider extends
       this.props.markForDestructionOnLogout &&
       (
         itemDefinitionWasUpdated ||
-        (prevProps.forId || null) !== (this.props.forId || null) ||
-        (prevProps.forVersion || null) !== (this.props.forVersion || null)
+        uniqueIDChanged
       )
     ) {
       this.markForDestruction();
+    }
+
+    if (didSomethingThatInvalidatedSetters) {
+      this.removeSetters(prevProps);
+      this.installSetters();
     }
 
     // now if the id changed, the optimization flags changed, or the item definition
     // itself changed
     if (
       itemDefinitionWasUpdated ||
-      (prevProps.forId || null) !== (this.props.forId || null) ||
-      (prevProps.forVersion || null) !== (this.props.forVersion || null) ||
+      uniqueIDChanged ||
+      didSomethingThatInvalidatedSetters ||
       !equals(prevProps.properties || [], this.props.properties || []) ||
       !equals(prevProps.includes || [], this.props.includes || []) ||
       !!prevProps.static !== !!this.props.static ||
@@ -823,8 +876,7 @@ export class ActualItemDefinitionProvider extends
       // if this was an item definition or id update
       if (
         itemDefinitionWasUpdated ||
-        (prevProps.forId || null) !== (this.props.forId || null) ||
-        (prevProps.forVersion || null) !== (this.props.forVersion || null)
+        uniqueIDChanged
       ) {
         // we need to remove the old listeners
         prevProps.itemDefinitionInstance.removeListener(
@@ -913,6 +965,7 @@ export class ActualItemDefinitionProvider extends
       // dismiss the search in such a case as the token is different
       // that or the automatic search would be reexecuted
       itemDefinitionWasUpdated ||
+      didSomethingThatInvalidatedSetters ||
       prevProps.tokenData.token !== this.props.tokenData.token
     ) {
       // we might have a listener in an old item definition
@@ -1028,11 +1081,13 @@ export class ActualItemDefinitionProvider extends
           forId,
           forVersion,
         });
-        this.props.remoteListener.requestFeedbackFor({
-          itemDefinition: this.props.itemDefinitionInstance.getQualifiedPathName(),
-          id: forId,
-          version: forVersion || null,
-        });
+        if (this.props.static !== "TOTAL") {
+          this.props.remoteListener.requestFeedbackFor({
+            itemDefinition: this.props.itemDefinitionInstance.getQualifiedPathName(),
+            id: forId,
+            version: forVersion || null,
+          });
+        }
         // in some situations the value can be in memory but not yet permanently cached
         // (eg. when there is a search context)
         // and another item without a search context attempts to load the value this will
@@ -1155,7 +1210,7 @@ export class ActualItemDefinitionProvider extends
     // event if it finds a mismatch which will cause this function to run again (see above)
     // but the denyCache flag will be active, ensuring the value will be requested
     // from the server
-    if (cached) {
+    if (cached && this.props.static !== "TOTAL") {
       this.props.remoteListener.requestFeedbackFor({
         itemDefinition: qualifiedPathName,
         id: forId,
@@ -1331,14 +1386,19 @@ export class ActualItemDefinitionProvider extends
     value: PropertyDefinitionSupportedType,
     givenForId: number,
     givenForVersion: string,
+    internal?: boolean,
   ) {
     // this function is basically run by the setter
     // since they might be out of sync that's why the id is passed
     // the setter enforces values
     property.setSuperEnforced(givenForId || null, givenForVersion || null, value);
-    this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null);
-
-    if (this.props.automaticSearch) {
+    this.props.itemDefinitionInstance.triggerListeners(
+      "change",
+      givenForId || null,
+      givenForVersion || null,
+      internal ? null : this.changeListener,
+    );
+    if (!internal && this.props.automaticSearch) {
       this.search(this.props.automaticSearch);
     }
   }
@@ -1346,10 +1406,16 @@ export class ActualItemDefinitionProvider extends
     property: PropertyDefinition,
     givenForId: number,
     givenForVersion: string,
+    internal?: boolean,
   ) {
     // same but removes the enforcement
     property.clearSuperEnforced(givenForId || null, givenForVersion || null);
-    this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null);
+    this.props.itemDefinitionInstance.triggerListeners(
+      "change",
+      givenForId || null,
+      givenForVersion || null,
+      internal ? null : this.changeListener,
+    );
   }
   public componentWillUnmount() {
     this.isUnmounted = true;

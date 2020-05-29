@@ -8,6 +8,9 @@ terms_and_conditions_url = terms-and-conditions/$LANGUAGE.html
 
 privacy_policy = privacy policy
 privacy_policy_url = privacy-policy/$LANGUAGE.html
+
+contact = contact
+contact_url = contact/$LANGUAGE.html
 `
 
 const es = `[es]
@@ -20,6 +23,9 @@ terms_and_conditions_url = terms-and-conditions/$LANGUAGE.html
 
 privacy_policy = política de privacidad
 privacy_policy_url = privacy-policy/$LANGUAGE.html
+
+contact = contacto
+contact_url = contact/$LANGUAGE.html
 `
 
 const ALL = { en, es };

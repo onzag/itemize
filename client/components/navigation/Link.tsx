@@ -6,6 +6,7 @@ import {
 
 interface ICustomLinkProps extends LinkProps {
   to: string;
+  as?: "div" | "span" | "a" | "p"
 }
 
 // TODO add analytics
@@ -17,6 +18,11 @@ function linkOnClick(props: ICustomLinkProps, e: React.MouseEvent<HTMLAnchorElem
   if (props.onClick) {
     props.onClick(e);
   }
+}
+
+function LinkCustomComponent(Tag: string, props: any) {
+  const { navigate, ...rest } = props;
+  return <Tag {...rest} onClick={navigate}/>;
 }
 
 /**
@@ -39,6 +45,11 @@ export default function Link(props: ICustomLinkProps) {
     ...props,
     to: urlTo,
   };
+
+  if (props.as) {
+    delete newProps["as"];
+    newProps.component = LinkCustomComponent.bind(null, props.as);
+  }
 
   return <RouterLink {...newProps} onClick={linkOnClick.bind(null, newProps)}/>;
 }

@@ -23,6 +23,10 @@ export const ALLOWED_CLASSES = [
   "file", "file-container", "file-icon", "file-extension", "file-size",
 ]
 
+export const ALLOWED_CLASSES_PREFIXES = [
+  "rich-text--",
+];
+
 function cleanAllAttribs(node: HTMLElement) {
   Array.prototype.slice.call(node.attributes).forEach((attr: any) => {
     node.removeAttribute(attr.name);
@@ -165,9 +169,17 @@ export function propertyViewPostProcessingHook(
   if (classList) {
     classList.forEach((className) => {
       if (!ALLOWED_CLASSES.includes(className)) {
-        node.classList.remove(className);
+        const isPrefixedByAValidPrefix = ALLOWED_CLASSES_PREFIXES.some((prefix) => className.indexOf(prefix) === 0);
+        if (!isPrefixedByAValidPrefix) {
+          node.classList.remove(className);
+        }
       }
     });
+  }
+
+  const id = node.id;
+  if (id) {
+    node.removeAttribute("id");
   }
 
   return node;
@@ -206,10 +218,8 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
         mediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
       DOMPurify.addHook("afterSanitizeElements", propertyViewPostProcessingHook.bind(this, mediaProperty, currentFiles, supportsImages, supportsVideos, supportsFiles));
-      console.log("SANITIZING", currentValue);
       currentValue = DOMPurify.sanitize(currentValue, PROPERTY_VIEW_SANITIZE_CONFIG);
       DOMPurify.removeAllHooks();
-      console.log("SANITIZED", currentValue);
     }
 
     const RendererElement = this.props.renderer;

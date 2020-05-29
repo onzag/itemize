@@ -5,6 +5,7 @@ import AppCountryRetriever from "../../components/localization/AppCountryRetriev
 
 interface ICountryPickerProps {
   className?: string;
+  useCode?: boolean;
 }
 
 interface ICountryPickerState {
@@ -42,34 +43,37 @@ export class CountryPicker extends React.Component<ICountryPickerProps, ICountry
   public render() {
     return (
       <AppCountryRetriever>
-        {(countryData) => (
-          <React.Fragment>
-            <Button
-              classes={{ root: this.props.className }}
-              color="inherit"
-              startIcon={countryData.currentCountry.emoji}
-              onClick={this.handleButtonSelectClick}
-            >
-              {countryData.currentCountry.native}
-            </Button>
-            <Menu
-              anchorEl={this.state.anchorEl}
-              keepMounted={true}
-              open={!!this.state.anchorEl}
-              onClose={this.handleMenuClose}
-            >
-              {countryData.availableCountries.map((ac) => (
-                <MenuItem
-                  key={ac.code}
-                  selected={ac.code === countryData.currentCountry.code}
-                  onClick={this.handleCountryChange.bind(this, countryData.changeCountryTo, ac.code)}
-                >
-                  {ac.emoji} {capitalize(ac.native)}
-                </MenuItem>
-              ))}
-            </Menu>
-          </React.Fragment>
-        )}
+        {(countryData) => {
+          const menu = this.state.anchorEl ? <Menu
+            anchorEl={this.state.anchorEl}
+            keepMounted={false}
+            open={!!this.state.anchorEl}
+            onClose={this.handleMenuClose}
+          >
+            {countryData.availableCountries.map((ac) => (
+              <MenuItem
+                key={ac.code}
+                selected={ac.code === countryData.currentCountry.code}
+                onClick={this.handleCountryChange.bind(this, countryData.changeCountryTo, ac.code)}
+              >
+                {ac.emoji} {capitalize(ac.native)}
+              </MenuItem>
+            ))}
+          </Menu> : null;
+          return (
+            <React.Fragment>
+              <Button
+                classes={{ root: this.props.className }}
+                color="inherit"
+                startIcon={countryData.currentCountry.emoji}
+                onClick={this.handleButtonSelectClick}
+              >
+                {this.props.useCode ? countryData.currentCountry.code : countryData.currentCountry.native}
+              </Button>
+              {menu}
+            </React.Fragment>
+          );
+        }}
       </AppCountryRetriever>
     );
   }

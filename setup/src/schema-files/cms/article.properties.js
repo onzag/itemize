@@ -5,6 +5,7 @@ fts_search_field_placeholder = insert relevant information about the article
 fts_search_keywords = article
 
 custom.read_more = read more....
+custom.news = news
 
 properties.summary.label = summary
 properties.summary.placeholder = write a short summary about the article
@@ -31,6 +32,7 @@ fts_search_field_placeholder = inserte información relevante
 fts_search_keywords = artículo
 
 custom.read_more = leer más...
+custom.news = noticias
 
 properties.summary.label = sumario
 properties.summary.placeholder = escriba un sumario corto sobre el artículo

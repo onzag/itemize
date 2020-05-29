@@ -50,7 +50,7 @@ export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fra
               forId={parseInt(locationState.id, 10) || null}
               forVersion={locationState.version || null}
             >
-              <Container maxWidth="md" className={props.classes.container}>
+              <Container maxWidth="md" className={props.classes.container + " trusted"}>
                 <Paper className={props.classes.paper}>
 
                   <I18nReadMany
@@ -81,6 +81,7 @@ export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fra
                   <Entry id="title" />
                   <Entry id="content" rendererArgs={{
                     requestAltOnImages: true,
+                    supportsRawMode: true,
                   }} />
 
                   <SubmitButton

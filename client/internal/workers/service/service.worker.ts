@@ -16,16 +16,6 @@ const urlsToCache = [
   isDevelopment ? "/rest/resource/cache-worker.development.js" : "/rest/resource/cache-worker.production.js",
   isDevelopment ? "/rest/resource/cache-worker.injector.development.js" : "/rest/resource/cache-worker.injector.production.js",
 ];
-// the reason is that app always loads the
-// production css no matter what, but it's then
-// replaced if it's in development mode, production
-// it's thought first so this would mess up the development
-// environment so we add the production file nonetheless
-if (isDevelopment) {
-  urlsToCache.push(
-    "/rest/resource/build.production.css",
-  );
-}
 const CACHE_NAME = "ITEMIZEV1";
 
 self.addEventListener("install", (event: any) => {
@@ -59,9 +49,11 @@ self.addEventListener("fetch", (event: any) => {
   // and go through the network always
   const isInAtotallyUncachedPath =
     isOurHost &&
-    urlAnalyzed.pathname.indexOf("/graphql") === 0 ||
-    urlAnalyzed.pathname.indexOf("/sw") === 0 ||
-    urlAnalyzed.pathname.indexOf("/socket.io") === 0;
+    (
+      urlAnalyzed.pathname.indexOf("/graphql") === 0 ||
+      urlAnalyzed.pathname.indexOf("/sw") === 0 ||
+      urlAnalyzed.pathname.indexOf("/socket.io") === 0
+    );
 
   // returning false in such case
   if (isInAtotallyUncachedPath) {
@@ -75,25 +67,13 @@ self.addEventListener("fetch", (event: any) => {
   const actualEventRequest: Request = shouldServeIndex ?
     new Request("/") : event.request;
 
-  // TODO change the functionality of the main request to use cache slots
-  // 1. make a message that says that the application is outdated and needs to reload
-  // for that add an endpoint at /rest/buildnumber that provides the build number
-  // at runtime, if the build number does not match and there is internet, cancel
-  // everything and show a message the user needs to reload the app, basically add
-  // an outdated flag
-  // 2. send that old id to the service worker for the service worker to delete
-  // the cache, somehow, maybe over here as the buildnumber will be send over here
-  // so the service worker should be aware in order to remove the older buildnumbers
-  // 3. delete the indexed db cache as well
-
-  const shouldBeCachedIfNotFound =
-    !isOurHost ||
+  const shouldBeCachedIfFound =
+  (!isOurHost && (urlAnalyzed.searchParams.get("sw-cacheable") === "true" || actualEventRequest.headers.get("sw-cacheable") === "true")) ||
     urlAnalyzed.pathname.indexOf("/rest/resource") === 0 ||
-    actualEventRequest.headers.get("sw-cacheable") ||
     // in rare cases where index would have failed to cache
     shouldServeIndex;
 
-  const shouldBeRechecked = !isOurHost;
+  const shouldBeRechecked = (!isOurHost && (urlAnalyzed.searchParams.get("sw-recheck") === "true" || actualEventRequest.headers.get("sw-recheck") === "true"));
   const acceptHeader = actualEventRequest.headers.get("Accept");
   const expectsImage = acceptHeader && acceptHeader.indexOf("image") === 0;
   const isBuildNumberCheck = urlAnalyzed.pathname.indexOf("/rest/buildnumber") === 0;
@@ -157,7 +137,7 @@ self.addEventListener("fetch", (event: any) => {
         // as all the moment files, the term and conditions and so
         // on
         } else if (
-          shouldBeCachedIfNotFound &&
+          shouldBeCachedIfFound &&
           (
             netWorkResponse.status === 200 ||
             netWorkResponse.status === 0
