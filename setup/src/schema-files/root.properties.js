@@ -11,6 +11,17 @@ privacy_policy_url = privacy-policy/$LANGUAGE.html
 
 contact = contact
 contact_url = contact/$LANGUAGE.html
+
+social = join us at
+facebook_url = https://facebook.com
+instagram_url = https://instagram.com
+linkedin_url = https://linkedin.com
+pinterest_url = https://pinterest.com
+reddit_url = https://reddit.com
+twitter_url = https://twitter.com
+vk_url = https://vk.com
+wechat_url = https://wechat.com
+youtube_url = https://youtube.com
 `
 
 const es = `[es]
@@ -26,6 +37,17 @@ privacy_policy_url = privacy-policy/$LANGUAGE.html
 
 contact = contacto
 contact_url = contact/$LANGUAGE.html
+
+social = únase a la comunidad
+facebook_url = https://facebook.com
+instagram_url = https://instagram.com
+linkedin_url = https://linkedin.com
+pinterest_url = https://pinterest.com
+reddit_url = https://reddit.com
+twitter_url = https://twitter.com
+vk_url = https://vk.com
+wechat_url = https://wechat.com
+youtube_url = https://youtube.com
 `
 
 const ALL = { en, es };

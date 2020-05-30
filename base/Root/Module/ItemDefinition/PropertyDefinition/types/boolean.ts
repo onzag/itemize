@@ -15,7 +15,7 @@ import {
   standardSQLBtreeIndexable,
 } from "../sql";
 import {
-  standardSQLLocalEqualFn,
+  standardSQLSSCacheEqualFn,
   standardLocalEqual,
 } from "../local-sql";
 import { REDUCED_BASE_I18N, CLASSIC_OPTIONAL_I18N, REDUCED_SEARCH_BASE_I18N, CLASSIC_SEARCH_OPTIONAL_I18N } from "../../../../../../constants";
@@ -37,10 +37,14 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
+  sqlStrSearch: null,
+  localStrSearch: null,
   sqlEqual: standardSQLEqualFn,
-  sqlLocalEqual: standardSQLLocalEqualFn,
+  sqlSSCacheEqual: standardSQLSSCacheEqualFn,
   sqlBtreeIndexable: standardSQLBtreeIndexable,
   sqlMantenience: null,
+  sqlOrderBy: null,
+  localOrderBy: null,
 
   localSearch: standardLocalSearchExactAndRange,
   localEqual: standardLocalEqual,

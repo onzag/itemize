@@ -412,5 +412,27 @@ export function buildSQLQueryForProperty(
     propertyDefinition.getId(),
     knexBuilder,
     dictionary,
+    args.order_by && args.order_by[sqlPrefix + propertyDefinition.getId()],
   );
+}
+
+export function buildSQLStrSearchQueryForProperty(
+  propertyDefinition: PropertyDefinition,
+  args: IGQLArgs,
+  search: string,
+  sqlPrefix: string,
+  knexBuilder: Knex.QueryBuilder,
+  dictionary: string,
+) {
+  const sqlStrSearchFn = propertyDefinition.getPropertyDefinitionDescription().sqlStrSearch;
+  if (sqlStrSearchFn) {
+    sqlStrSearchFn(
+      search,
+      sqlPrefix,
+      propertyDefinition.getId(),
+      knexBuilder,
+      dictionary,
+      args.order_by && args.order_by[sqlPrefix + propertyDefinition.getId()],
+    );
+  }
 }

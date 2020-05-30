@@ -121,3 +121,4 @@ export declare function convertGQLValueToSQLValueForProperty(itemDefinition: Ite
  * @param knexBuilder the knex building instance
  */
 export declare function buildSQLQueryForProperty(propertyDefinition: PropertyDefinition, args: IGQLArgs, sqlPrefix: string, knexBuilder: Knex.QueryBuilder, dictionary: string): void;
+export declare function buildSQLStrSearchQueryForProperty(propertyDefinition: PropertyDefinition, args: IGQLArgs, search: string, sqlPrefix: string, knexBuilder: Knex.QueryBuilder, dictionary: string): void;

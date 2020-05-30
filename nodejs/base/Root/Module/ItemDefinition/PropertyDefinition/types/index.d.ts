@@ -112,7 +112,12 @@ export interface IPropertyDefinitionSupportedType {
      * knexBuilder is the builder that is being used so it can attach the where queries to it
      * and dictionary is the postgres dictionary that can be used for sql searches
      */
-    sqlSearch: (args: IGQLArgs, sqlPrefix: string, id: string, knexBuilder: Knex.QueryBuilder, dictionary: string) => void;
+    sqlSearch: (args: IGQLArgs, sqlPrefix: string, id: string, knexBuilder: Knex.QueryBuilder, dictionary: string, isOrderedByIt: boolean) => void;
+    /**
+     * Represents a search for an item when the only input has been a string, make it null
+     * to avoid supporting it
+     */
+    sqlStrSearch: (search: string, sqlPrefix: string, id: string, knexBuilder: Knex.QueryBuilder, dictionary: string, isOrderedByIt: boolean) => void;
     /**
      * Provides the rows that are expected to be indexed and in the order that they are expected
      * when an index is added via a request limiter in the module
@@ -125,6 +130,11 @@ export interface IPropertyDefinitionSupportedType {
      */
     localSearch: (args: IGQLArgs, rawData: IGQLValue, id: string, includeId?: string) => boolean;
     /**
+     * represents a local search but done using the single search value instead rather
+     * than the entire value to match against, make it null to avoid supporting it
+     */
+    localStrSearch: (search: string, rawData: IGQLValue, id: string, includeId?: string) => boolean;
+    /**
      * Represents a check for equality of a property against another
      * same with the sql prefix as the search
      * same for the id, and knex is just the knex instance, not a builder
@@ -132,11 +142,30 @@ export interface IPropertyDefinitionSupportedType {
      */
     sqlEqual: (value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, ignoreCase: boolean, knex: Knex, columnName?: string) => any;
     /**
-     * A local equal, ran during cache checks very useful for checking
+     * A server side ran cached equal, ran during cache checks very useful for checking
      * against policies during policy checks and other forms of checks
      * with raw database data
      */
-    sqlLocalEqual: (value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, data: ISQLTableRowValue) => boolean;
+    sqlSSCacheEqual: (value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, data: ISQLTableRowValue) => boolean;
+    /**
+     * Simply compare two values of the same type, this
+     * is used for differing properties so it might differ
+     * from the sql behaviour
+     */
+    localEqual: (a: PropertyDefinitionSupportedType, b: PropertyDefinitionSupportedType) => boolean;
+    /**
+     * The SQL order by function that tells the database how to order
+     * by certain criteria, make it null to specify that this item can't
+     * be ordered by, attempts to order by it will give an error
+     */
+    sqlOrderBy: (sqlPrefix: string, id: string, knex: Knex, direction: "asc" | "desc", wasIncludedInSearch: boolean, wasIncludedInStrSearch: boolean) => [string, string] | any;
+    /**
+     * The local order by function that tells a client how to order by it
+     * basically this is fed to a sort function the same way sorting would
+     * work locally, except a direction is specified, make it null to specify
+     * the item can't be sorted by
+     */
+    localOrderBy: (direction: "asc" | "desc", a: PropertyDefinitionSupportedType, b: PropertyDefinitionSupportedType) => number;
     /**
      * SQL Row mantenience which runs every so often as defined
      * by the mantenience protocol where row is the entire row
@@ -150,12 +179,6 @@ export interface IPropertyDefinitionSupportedType {
         whereRaw: Knex.Raw;
         updateConditionRaw: Knex.Raw;
     };
-    /**
-     * Simply compare two values of the same type, this
-     * is used for differing properties so it might differ
-     * from the sql behaviour
-     */
-    localEqual: (a: PropertyDefinitionSupportedType, b: PropertyDefinitionSupportedType) => boolean;
     /**
      * represents an item that would mark for null
      * by default it is null itself

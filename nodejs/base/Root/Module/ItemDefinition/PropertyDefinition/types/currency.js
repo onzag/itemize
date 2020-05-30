@@ -79,6 +79,10 @@ const typeValue = {
             knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", toArg.normalized);
         }
     },
+    sqlStrSearch: null,
+    localStrSearch: null,
+    sqlOrderBy: null,
+    localOrderBy: null,
     sqlBtreeIndexable: (sqlPrefix, id) => {
         return [sqlPrefix + id + "_CURRENCY", sqlPrefix + id + "_NORMALIZED_VALUE"];
     },
@@ -151,7 +155,7 @@ const typeValue = {
             columnName,
         ]);
     },
-    sqlLocalEqual: (value, sqlPrefix, id, data) => {
+    sqlSSCacheEqual: (value, sqlPrefix, id, data) => {
         if (value === null) {
             return data[sqlPrefix + id + "_VALUE"] === value;
         }

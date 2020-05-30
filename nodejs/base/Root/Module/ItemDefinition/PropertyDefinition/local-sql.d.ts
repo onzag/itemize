@@ -20,5 +20,5 @@ import { ISQLTableRowValue } from "../../../sql";
  * @param data the sql data that has been cached
  * @returns a boolean on whether it equals
  */
-export declare function standardSQLLocalEqualFn(value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, data: ISQLTableRowValue): boolean;
+export declare function standardSQLSSCacheEqualFn(value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, data: ISQLTableRowValue): boolean;
 export declare function standardLocalEqual(a: PropertyDefinitionSupportedType, b: PropertyDefinitionSupportedType): boolean;

@@ -100,9 +100,9 @@ export const MODULE_AND_ITEM_DEF_I18N = [
  * The properties for i18n a searchable module and item definition should have
  */
 export const MODULE_AND_ITEM_DEF_I18N_SEARCHABLE = [
-  "fts_search_field_label",
-  "fts_search_field_placeholder",
-  "fts_search_keywords",
+  "search_field_label",
+  "search_field_placeholder",
+  "search_keywords",
 ]
 /**
  * The custom key as it is stored in the built file, the custom key
@@ -692,14 +692,11 @@ export const POLICY_OPTIONAL_I18N = [
   "description",
 ];
 /**
- * These represent the ways that ordering can be
- * executed within itemize, used to order by
- * in the server side and client side cached values
+ * These represent the ways an item can be ordered by
  */
 export const ORDER_BY_OPTIONS = {
-  DEFAULT: "DEFAULT",
-  RELEVANCY: "RELEVANCY",
-  DATE: "DATE",
+  ASC: "asc",
+  DESC: "desc",
 };
 
 /**
@@ -789,6 +786,14 @@ Object.keys(ORDER_BY_OPTIONS).forEach((key) => {
 });
 
 /**
+ * And this is for the order by rule enum
+ */
+export const ORDERBY_RULE_DIRECTION = GraphQLEnumType && new GraphQLEnumType({
+  name: "RESERVED_SEARCH_PROPERTY_ENUM_ORDER_BY",
+  values: searchOptionsOrderByOptions,
+});
+
+/**
  * These are the base query properties that are
  * used in a search and get list query
  */
@@ -804,18 +809,10 @@ const BASE_QUERY_PROPERTIES = {
 };
 
 /**
- * And this is for the order by rule enum
- */
-const ORDERBY_RULE = GraphQLEnumType && new GraphQLEnumType({
-  name: "RESERVED_SEARCH_PROPERTY_ENUM_ORDER_BY",
-  values: searchOptionsOrderByOptions,
-});
-
-/**
  * The reserved search properties represent how searches are done
  * and these are included in every search
  */
-export const RESERVED_SEARCH_PROPERTIES = {
+export const RESERVED_IDEF_SEARCH_PROPERTIES = (orderByRule: any) => ({
   ...BASE_QUERY_PROPERTIES,
   limit: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
@@ -826,7 +823,7 @@ export const RESERVED_SEARCH_PROPERTIES = {
     description: "The SQL offset to use in order to page the amount of results",
   },
   order_by: {
-    type: GraphQLNonNull && GraphQLNonNull(ORDERBY_RULE),
+    type: orderByRule,
     description: "An order type",
   },
   since: {
@@ -853,18 +850,17 @@ export const RESERVED_SEARCH_PROPERTIES = {
     type: GraphQLString,
     description: "Allow only items that are of this version",
   },
-  // TODO
   search: {
     type: GraphQLString,
-    description: "A search string",
+    description: "A search string, searches within the prop extensions and the prop extensions only",
   },
-};
+});
 
 /**
  * These apply when doing module searches
  */
-export const RESERVED_MODULE_SEARCH_PROPERTIES = {
-  ...RESERVED_SEARCH_PROPERTIES,
+export const RESERVED_MODULE_SEARCH_PROPERTIES = (orderByRule: any) => ({
+  ...RESERVED_IDEF_SEARCH_PROPERTIES,
   limit: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
     description: "The SQL limit to use in order to page the amount of results",
@@ -882,7 +878,7 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = {
     description: "Basically a limiter that causes the values to only be returned since that date, the date must be an ISO type",
   },
   order_by: {
-    type: GraphQLNonNull && GraphQLNonNull(ORDERBY_RULE),
+    type: orderByRule,
     description: "An order type",
   },
   created_by: {
@@ -905,12 +901,11 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = {
     type: GraphQLString,
     description: "Allow only items that are of this version",
   },
-  // TODO
   search: {
     type: GraphQLString,
     description: "A search string",
   },
-};
+});
 
 /**
  * Properties required in order to get

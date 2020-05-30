@@ -24,10 +24,10 @@ const deep_equal_1 = __importDefault(require("deep-equal"));
  * @param data the sql data that has been cached
  * @returns a boolean on whether it equals
  */
-function standardSQLLocalEqualFn(value, sqlPrefix, id, data) {
+function standardSQLSSCacheEqualFn(value, sqlPrefix, id, data) {
     return data[sqlPrefix + id] === value;
 }
-exports.standardSQLLocalEqualFn = standardSQLLocalEqualFn;
+exports.standardSQLSSCacheEqualFn = standardSQLSSCacheEqualFn;
 function standardLocalEqual(a, b) {
     return deep_equal_1.default(a, b);
 }

@@ -69,4 +69,4 @@ export declare function convertGQLValueToSQLValueForItemDefinition(itemDefinitio
  * @param knexBuilder the knex builder instance
  * @param dictionary the dictionary being used
  */
-export declare function buildSQLQueryForItemDefinition(itemDefinition: ItemDefinition, args: IGQLArgs, knexBuilder: Knex.QueryBuilder, dictionary: string): void;
+export declare function buildSQLQueryForItemDefinition(itemDefinition: ItemDefinition, args: IGQLArgs, knexBuilder: Knex.QueryBuilder, dictionary: string, search: string): void;

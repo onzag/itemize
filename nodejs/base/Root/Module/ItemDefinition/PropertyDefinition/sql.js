@@ -298,6 +298,13 @@ exports.convertGQLValueToSQLValueForProperty = convertGQLValueToSQLValueForPrope
  */
 function buildSQLQueryForProperty(propertyDefinition, args, sqlPrefix, knexBuilder, dictionary) {
     const sqlSearchFn = propertyDefinition.getPropertyDefinitionDescription().sqlSearch;
-    sqlSearchFn(args, sqlPrefix, propertyDefinition.getId(), knexBuilder, dictionary);
+    sqlSearchFn(args, sqlPrefix, propertyDefinition.getId(), knexBuilder, dictionary, args.order_by && args.order_by[sqlPrefix + propertyDefinition.getId()]);
 }
 exports.buildSQLQueryForProperty = buildSQLQueryForProperty;
+function buildSQLStrSearchQueryForProperty(propertyDefinition, args, search, sqlPrefix, knexBuilder, dictionary) {
+    const sqlStrSearchFn = propertyDefinition.getPropertyDefinitionDescription().sqlStrSearch;
+    if (sqlStrSearchFn) {
+        sqlStrSearchFn(search, sqlPrefix, propertyDefinition.getId(), knexBuilder, dictionary, args.order_by && args.order_by[sqlPrefix + propertyDefinition.getId()]);
+    }
+}
+exports.buildSQLStrSearchQueryForProperty = buildSQLStrSearchQueryForProperty;

@@ -23,7 +23,7 @@ import equals from "deep-equal";
  * @param data the sql data that has been cached
  * @returns a boolean on whether it equals
  */
-export function standardSQLLocalEqualFn(
+export function standardSQLSSCacheEqualFn(
   value: PropertyDefinitionSupportedType,
   sqlPrefix: string,
   id: string,

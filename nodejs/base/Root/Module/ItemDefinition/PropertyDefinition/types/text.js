@@ -96,6 +96,14 @@ const typeValue = {
             ]);
         }
     },
+    sqlStrSearch: (search, sqlPrefix, id, knexBuilder, dictionary) => {
+        // TODO improve, this only matches exact words
+        knexBuilder.whereRaw("?? @@ to_tsquery(??, ?)", [
+            sqlPrefix + id + "_VECTOR",
+            sqlPrefix + id + "_DICTIONARY",
+            search,
+        ]);
+    },
     sqlBtreeIndexable: () => null,
     sqlMantenience: null,
     localSearch: (args, rawData, id, includeId) => {
@@ -117,9 +125,27 @@ const typeValue = {
         }
         return true;
     },
+    localStrSearch: (search, rawData, id, includeId) => {
+        // item is deleted
+        if (!rawData) {
+            return false;
+        }
+        // item is blocked
+        if (rawData.DATA === null) {
+            return false;
+        }
+        if (search) {
+            const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+            // TODO improve, this is kinda trash FTS
+            return propertyValue.includes(search);
+        }
+        return true;
+    },
     sqlEqual: sql_1.standardSQLEqualFn,
-    sqlLocalEqual: local_sql_1.standardSQLLocalEqualFn,
+    sqlSSCacheEqual: local_sql_1.standardSQLSSCacheEqualFn,
     localEqual: local_sql_1.standardLocalEqual,
+    sqlOrderBy: null,
+    localOrderBy: null,
     // validates the text, texts don't support json value
     validate: (s, subtype) => {
         if (typeof s !== "string") {

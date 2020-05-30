@@ -47,13 +47,17 @@ const typeValue = {
     sqlSearch: () => {
         throw new Error("Attempted to search within a file");
     },
+    sqlStrSearch: null,
+    localStrSearch: null,
+    sqlOrderBy: null,
+    localOrderBy: null,
     localSearch: () => {
         throw new Error("Attempted to search within a file locally");
     },
     sqlEqual: () => {
         throw new Error("Attempted to equal within a file");
     },
-    sqlLocalEqual: () => {
+    sqlSSCacheEqual: () => {
         throw new Error("Attempted to local equal within a file");
     },
     sqlBtreeIndexable: () => {

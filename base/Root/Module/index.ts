@@ -41,15 +41,15 @@ export interface IRawJsonI18NSpecificLocaleDataType {
   /**
    * The full text search field label for full text search mode
    */
-  fts_search_field_label: string;
+  search_field_label: string;
   /**
    * The full text search placeholder for full text search mode
    */
-  fts_search_field_placeholder: string;
+  search_field_placeholder: string;
   /**
    * A comma separated list of strings for full text search mode
    */
-  fts_search_keywords: string;
+  search_keywords: string;
   /**
    * Custom translation fields
    */

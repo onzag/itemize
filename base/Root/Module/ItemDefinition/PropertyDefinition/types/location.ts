@@ -180,7 +180,11 @@ const typeValue: IPropertyDefinitionSupportedType = {
       );
     }
   },
+  sqlStrSearch: null,
+  localStrSearch: null,
   sqlMantenience: null,
+  sqlOrderBy: null,
+  localOrderBy: null,
   localSearch: (
     args: IGQLArgs,
     rawData: IGQLValue,
@@ -247,7 +251,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       ],
     );
   },
-  sqlLocalEqual: (
+  sqlSSCacheEqual: (
     value: IPropertyDefinitionSupportedLocationType,
     sqlPrefix: string,
     id: string,

@@ -12,7 +12,8 @@ import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import {
   RESERVED_BASE_PROPERTIES,
-  RESERVED_SEARCH_PROPERTIES,
+  RESERVED_IDEF_SEARCH_PROPERTIES,
+  RESERVED_MODULE_SEARCH_PROPERTIES,
   RESERVED_GETTER_PROPERTIES,
   RESERVED_CHANGE_PROPERTIES,
   OWNER_METAROLE,
@@ -754,7 +755,8 @@ export function checkPropertyDefinition(
 ) {
   // These properties are not valid, they are reserved
   if (Object.keys(RESERVED_BASE_PROPERTIES).includes(rawData.id) ||
-    Object.keys(RESERVED_SEARCH_PROPERTIES).includes(rawData.id) ||
+    Object.keys(RESERVED_IDEF_SEARCH_PROPERTIES(null)).includes(rawData.id) ||
+    Object.keys(RESERVED_MODULE_SEARCH_PROPERTIES(null)).includes(rawData.id) ||
     Object.keys(RESERVED_GETTER_PROPERTIES).includes(rawData.id) ||
     Object.keys(RESERVED_CHANGE_PROPERTIES).includes(rawData.id)) {
     throw new CheckUpError(

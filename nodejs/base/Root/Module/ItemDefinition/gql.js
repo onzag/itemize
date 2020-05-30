@@ -277,8 +277,66 @@ function getGQLQueryFieldsForItemDefinition(itemDefinition, resolvers) {
             },
             description: "A traditional array of results for the result list with search data",
         });
+        const orderByRuleFields = {
+            created_at: {
+                type: new graphql_1.GraphQLInputObjectType({
+                    name: "ORDERBY_RULE__" + itemDefinition.getQualifiedPathName() + "_created_at",
+                    fields: {
+                        direction: {
+                            type: graphql_1.GraphQLNonNull(constants_1.ORDERBY_RULE_DIRECTION),
+                        },
+                        level: {
+                            type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+                        }
+                    },
+                    description: "Order by the date of creation in any direction"
+                }),
+            },
+            edited_at: {
+                type: new graphql_1.GraphQLInputObjectType({
+                    name: "ORDERBY_RULE__" + itemDefinition.getQualifiedPathName() + "_edited_at",
+                    fields: {
+                        direction: {
+                            type: graphql_1.GraphQLNonNull(constants_1.ORDERBY_RULE_DIRECTION),
+                        },
+                        level: {
+                            type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+                        }
+                    },
+                    description: "Order by the time of edit in any direction"
+                }),
+            },
+        };
+        itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((p) => {
+            if (!p.isExtension()) {
+                return;
+            }
+            const description = p.getPropertyDefinitionDescription();
+            if (!description.sqlOrderBy) {
+                return;
+            }
+            orderByRuleFields[p.getId()] = {
+                type: new graphql_1.GraphQLInputObjectType({
+                    name: "ORDERBY_RULE__" + itemDefinition.getQualifiedPathName() + "_" + p.getId(),
+                    fields: {
+                        direction: {
+                            type: graphql_1.GraphQLNonNull(constants_1.ORDERBY_RULE_DIRECTION),
+                        },
+                        level: {
+                            type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+                        }
+                    },
+                    description: "Order by the property of " + p.getId() + " which is a extension, in any direction",
+                }),
+            };
+        });
+        const orderByRule = new graphql_1.GraphQLInputObjectType({
+            name: "ORDERBY_RULE__" + itemDefinition.getQualifiedPathName(),
+            fields: orderByRuleFields,
+            description: "This object can be ordered by using these rules",
+        });
         const searchArgs = {
-            ...constants_1.RESERVED_SEARCH_PROPERTIES,
+            ...constants_1.RESERVED_IDEF_SEARCH_PROPERTIES(orderByRule),
             ...getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, {
                 retrievalMode: false,
                 propertiesAsInput: true,

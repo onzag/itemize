@@ -1,3 +1,12 @@
+export interface IConfigManifestType {
+  macSafariMaskIconThemeColor: string;
+  msTileColor: string;
+  themeColor: string;
+  backgroundColor: string;
+  orientation: "portrait" | "landscape",
+  display: "fullscreen" | "standalone" | "minimal-ui" | "browser",
+}
+
 export interface IConfigRawJSONDataType {
   entry: string;
   appName: string;
@@ -7,14 +16,7 @@ export interface IConfigRawJSONDataType {
     [key: string]: string,
   };
   roles: string[];
-  manifest: {
-    macSafariMaskIconThemeColor: string;
-    msTileColor: string;
-    themeColor: string;
-    backgroundColor: string;
-    orientation: "portrait" | "landscape",
-    display: "fullscreen" | "standalone" | "minimal-ui" | "browser",
-  };
+  manifest: IConfigManifestType;
   fontUrl: string;
   fontName: string;
 

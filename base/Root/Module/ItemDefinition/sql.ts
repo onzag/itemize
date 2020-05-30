@@ -16,6 +16,7 @@ import {
   getSQLTableDefinitionForProperty,
   convertGQLValueToSQLValueForProperty,
   buildSQLQueryForProperty,
+  buildSQLStrSearchQueryForProperty,
 } from "./PropertyDefinition/sql";
 import ItemDefinition from ".";
 import {
@@ -264,6 +265,7 @@ export function buildSQLQueryForItemDefinition(
   args: IGQLArgs,
   knexBuilder: Knex.QueryBuilder,
   dictionary: string,
+  search: string,
 ) {
   // first we need to get all the prop and extensions and build their query
   itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
@@ -278,4 +280,18 @@ export function buildSQLQueryForItemDefinition(
   itemDefinition.getAllIncludes().forEach((include) => {
     buildSQLQueryForInclude(include, args, knexBuilder, dictionary);
   });
+
+  if (search) {
+    knexBuilder.andWhere((builder) => {
+      itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+        // only extensions and searchable are valid for the search functionality
+        if (!pd.isExtension() && !pd.isSearchable()) {
+          return;
+        }
+        builder.orWhere((orBuilder) => {
+          buildSQLStrSearchQueryForProperty(pd, args, search, "", orBuilder, dictionary);
+        });
+      });
+    });
+  }
 }

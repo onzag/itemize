@@ -185,6 +185,7 @@ export async function searchModule(
     resolverArgs.args,
     queryModel,
     getDictionary(appData, resolverArgs.args),
+    resolverArgs.args.search,
   );
 
   // if we filter by type
@@ -414,6 +415,7 @@ export async function searchItemDefinition(
     resolverArgs.args,
     queryModel,
     getDictionary(appData, resolverArgs.args),
+    resolverArgs.args.search,
   );
 
   const searchQuery = queryModel.clone();

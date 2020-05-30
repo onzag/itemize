@@ -1,11 +1,12 @@
 const en = `[en]
 name = article
-fts_search_field_label = search article
-fts_search_field_placeholder = insert relevant information about the article
-fts_search_keywords = article
+search_field_label = search article
+search_field_placeholder = insert relevant information about the article
+search_keywords = article
 
 custom.read_more = read more....
 custom.news = news
+custom.more_news = more news
 
 properties.summary.label = summary
 properties.summary.placeholder = write a short summary about the article
@@ -27,12 +28,13 @@ properties.summary_image.error.TOO_LARGE = only one image is required`
 
 const es = `[es]
 name = artículo
-fts_search_field_label = buscar artículo
-fts_search_field_placeholder = inserte información relevante
-fts_search_keywords = artículo
+search_field_label = buscar artículo
+search_field_placeholder = inserte información relevante
+search_keywords = artículo
 
 custom.read_more = leer más...
 custom.news = noticias
+custom.more_news = más noticias
 
 properties.summary.label = sumario
 properties.summary.placeholder = escriba un sumario corto sobre el artículo

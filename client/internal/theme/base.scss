@@ -13,9 +13,17 @@
   padding: 0;
 }
   
-html, body, #root, #main, #app {
+html, body, #root, #app {
   height: 100%;
   width: 100%;
+  position: relative;
+}
+
+#main {
+  height: auto;
+  min-height: 100%;
+  width: 100%;
+  position: relative;
 }
   
 ul, ol {

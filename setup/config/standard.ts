@@ -1,7 +1,6 @@
 import { IConfigRawJSONDataType } from "../../config";
 import { configRequest } from "../read";
 import { countries, currencies } from "../../imported-resources";
-import colors from "colors";
 
 export async function standardConfigSetup(
   currentConfig: IConfigRawJSONDataType,

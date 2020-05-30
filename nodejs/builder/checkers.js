@@ -504,7 +504,8 @@ exports.checkPropertiesValueMappingDefiniton = checkPropertiesValueMappingDefini
 function checkPropertyDefinition(rawData, parentItemDefinition, parentModule, traceback) {
     // These properties are not valid, they are reserved
     if (Object.keys(constants_1.RESERVED_BASE_PROPERTIES).includes(rawData.id) ||
-        Object.keys(constants_1.RESERVED_SEARCH_PROPERTIES).includes(rawData.id) ||
+        Object.keys(constants_1.RESERVED_IDEF_SEARCH_PROPERTIES(null)).includes(rawData.id) ||
+        Object.keys(constants_1.RESERVED_MODULE_SEARCH_PROPERTIES(null)).includes(rawData.id) ||
         Object.keys(constants_1.RESERVED_GETTER_PROPERTIES).includes(rawData.id) ||
         Object.keys(constants_1.RESERVED_CHANGE_PROPERTIES).includes(rawData.id)) {
         throw new Error_1.default("Property '" + rawData.id + "' is reserved", traceback.newTraceToBit("id"));

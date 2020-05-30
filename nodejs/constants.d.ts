@@ -1,4 +1,4 @@
-import { GraphQLNonNull, GraphQLList, GraphQLObjectType, GraphQLInputObjectType } from "graphql";
+import { GraphQLNonNull, GraphQLEnumType, GraphQLList, GraphQLObjectType, GraphQLInputObjectType } from "graphql";
 import { IGQLFieldsDefinitionType } from "./base/Root/gql";
 import { ISQLTableDefinitionType } from "./base/Root/sql";
 /**
@@ -302,14 +302,11 @@ export declare const POLICY_REQUIRED_I18N: string[];
  */
 export declare const POLICY_OPTIONAL_I18N: string[];
 /**
- * These represent the ways that ordering can be
- * executed within itemize, used to order by
- * in the server side and client side cached values
+ * These represent the ways an item can be ordered by
  */
 export declare const ORDER_BY_OPTIONS: {
-    DEFAULT: string;
-    RELEVANCY: string;
-    DATE: string;
+    ASC: string;
+    DESC: string;
 };
 /**
  * The format that dates are expected to have in order to be exchanged
@@ -344,10 +341,14 @@ export declare const SEARCH_RECORDS_CONTAINER_GQL: GraphQLObjectType<any, any, {
     [key: string]: any;
 }>;
 /**
+ * And this is for the order by rule enum
+ */
+export declare const ORDERBY_RULE_DIRECTION: GraphQLEnumType;
+/**
  * The reserved search properties represent how searches are done
  * and these are included in every search
  */
-export declare const RESERVED_SEARCH_PROPERTIES: {
+export declare const RESERVED_IDEF_SEARCH_PROPERTIES: (orderByRule: any) => {
     limit: {
         type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
         description: string;
@@ -357,7 +358,7 @@ export declare const RESERVED_SEARCH_PROPERTIES: {
         description: string;
     };
     order_by: {
-        type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
+        type: any;
         description: string;
     };
     since: {
@@ -400,7 +401,7 @@ export declare const RESERVED_SEARCH_PROPERTIES: {
 /**
  * These apply when doing module searches
  */
-export declare const RESERVED_MODULE_SEARCH_PROPERTIES: {
+export declare const RESERVED_MODULE_SEARCH_PROPERTIES: (orderByRule: any) => {
     limit: {
         type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
         description: string;
@@ -418,7 +419,7 @@ export declare const RESERVED_MODULE_SEARCH_PROPERTIES: {
         description: string;
     };
     order_by: {
-        type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
+        type: any;
         description: string;
     };
     created_by: {
@@ -443,14 +444,6 @@ export declare const RESERVED_MODULE_SEARCH_PROPERTIES: {
     };
     search: {
         type: import("graphql").GraphQLScalarType;
-        description: string;
-    };
-    token: {
-        type: import("graphql").GraphQLScalarType;
-        description: string;
-    };
-    language: {
-        type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
         description: string;
     };
 };

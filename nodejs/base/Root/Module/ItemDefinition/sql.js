@@ -177,7 +177,7 @@ exports.convertGQLValueToSQLValueForItemDefinition = convertGQLValueToSQLValueFo
  * @param knexBuilder the knex builder instance
  * @param dictionary the dictionary being used
  */
-function buildSQLQueryForItemDefinition(itemDefinition, args, knexBuilder, dictionary) {
+function buildSQLQueryForItemDefinition(itemDefinition, args, knexBuilder, dictionary, search) {
     // first we need to get all the prop and extensions and build their query
     itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
         if (!pd.isSearchable()) {
@@ -189,5 +189,18 @@ function buildSQLQueryForItemDefinition(itemDefinition, args, knexBuilder, dicti
     itemDefinition.getAllIncludes().forEach((include) => {
         sql_2.buildSQLQueryForInclude(include, args, knexBuilder, dictionary);
     });
+    if (search) {
+        knexBuilder.andWhere((builder) => {
+            itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+                // only extensions and searchable are valid for the search functionality
+                if (!pd.isExtension() && !pd.isSearchable()) {
+                    return;
+                }
+                builder.orWhere((orBuilder) => {
+                    sql_1.buildSQLStrSearchQueryForProperty(pd, args, search, "", orBuilder, dictionary);
+                });
+            });
+        });
+    }
 }
 exports.buildSQLQueryForItemDefinition = buildSQLQueryForItemDefinition;

@@ -916,7 +916,7 @@ async function runPolicyCheck(arg) {
                 // which will create a column field with the policy name that is going to be
                 // equal to that value, eg. "name" = 'policyValueForProperty' AS "MY_POLICY"
                 // because policies are uppercase this avoids collisions with properties
-                const policyMatches = property.getPropertyDefinitionDescription().sqlLocalEqual(policyValueForTheProperty, "", property.getId(), policyType === "parent" ? parentSelectQueryValue : selectQueryValue);
+                const policyMatches = property.getPropertyDefinitionDescription().sqlSSCacheEqual(policyValueForTheProperty, "", property.getId(), policyType === "parent" ? parentSelectQueryValue : selectQueryValue);
                 if (!policyMatches) {
                     __1.logger.silly("runPolicyCheck: Failed due to policy not pasing", {
                         policyName,

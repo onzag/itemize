@@ -66,4 +66,4 @@ export declare function convertSQLValueToGQLValueForModule(mod: Module, row: ISQ
  * @param knexBuilder the knex builder
  * @param dictionary the dictionary used
  */
-export declare function buildSQLQueryForModule(mod: Module, data: IGQLValue, knexBuilder: Knex.QueryBuilder, dictionary: string): void;
+export declare function buildSQLQueryForModule(mod: Module, args: IGQLArgs, knexBuilder: Knex.QueryBuilder, dictionary: string, search: string): void;

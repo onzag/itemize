@@ -10,7 +10,7 @@ import {
 import { GraphQLString } from "graphql";
 import { standardSQLOutFn, standardSQLEqualFn } from "../sql";
 import {
-  standardSQLLocalEqualFn, standardLocalEqual,
+  standardSQLSSCacheEqualFn, standardLocalEqual,
 } from "../local-sql";
 import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
@@ -132,6 +132,17 @@ const typeValue: IPropertyDefinitionSupportedType = {
       );
     }
   },
+  sqlStrSearch: (search: string, sqlPrefix: string, id: string, knexBuilder: any, dictionary: string) => {
+    // TODO improve, this only matches exact words
+    knexBuilder.whereRaw(
+      "?? @@ to_tsquery(??, ?)",
+      [
+        sqlPrefix + id + "_VECTOR",
+        sqlPrefix + id + "_DICTIONARY",
+        search,
+      ],
+    );
+  },
   sqlBtreeIndexable: () => null,
   sqlMantenience: null,
   localSearch: (
@@ -162,9 +173,35 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     return true;
   },
+  localStrSearch: (
+    search: string,
+    rawData: IGQLValue,
+    id: string,
+    includeId?: string,
+  ) => {
+    // item is deleted
+    if (!rawData) {
+      return false;
+    }
+    // item is blocked
+    if (rawData.DATA === null) {
+      return false;
+    }
+
+    if (search) {
+      const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+
+      // TODO improve, this is kinda trash FTS
+      return propertyValue.includes(search);
+    }
+
+    return true;
+  },
   sqlEqual: standardSQLEqualFn,
-  sqlLocalEqual: standardSQLLocalEqualFn,
+  sqlSSCacheEqual: standardSQLSSCacheEqualFn,
   localEqual: standardLocalEqual,
+  sqlOrderBy: null,
+  localOrderBy: null,
 
   // validates the text, texts don't support json value
   validate: (s: PropertyDefinitionSupportedTextType, subtype?: string) => {

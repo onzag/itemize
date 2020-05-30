@@ -113,7 +113,7 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
         queryModel.andWhere("version", resolverArgs.args.version_filter || "");
     }
     // now we build the sql query for the module
-    sql_1.buildSQLQueryForModule(mod, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args));
+    sql_1.buildSQLQueryForModule(mod, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args), resolverArgs.args.search);
     // if we filter by type
     if (resolverArgs.args.types) {
         queryModel.andWhere("type", resolverArgs.args.types);
@@ -265,7 +265,7 @@ async function searchItemDefinition(appData, resolverArgs, itemDefinition, tradi
     // and now we call the function that builds the query itself into
     // that parent query, and adds the andWhere as required
     // into such query
-    sql_2.buildSQLQueryForItemDefinition(itemDefinition, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args));
+    sql_2.buildSQLQueryForItemDefinition(itemDefinition, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args), resolverArgs.args.search);
     const searchQuery = queryModel.clone();
     const limit = resolverArgs.args.limit;
     const offset = resolverArgs.args.offset;

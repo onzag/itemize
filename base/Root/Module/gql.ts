@@ -8,15 +8,16 @@
 import {
   RESERVED_BASE_PROPERTIES,
   PREFIX_SEARCH,
-  RESERVED_SEARCH_PROPERTIES,
+  RESERVED_IDEF_SEARCH_PROPERTIES,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   SEARCH_RECORDS_CONTAINER_GQL,
   PREFIX_GET_LIST,
   RESERVED_GETTER_LIST_PROPERTIES,
   ENDPOINT_ERRORS,
   PREFIX_TRADITIONAL_SEARCH,
+  ORDERBY_RULE_DIRECTION,
 } from "../../../constants";
-import { GraphQLList, GraphQLObjectType, GraphQLScalarType, GraphQLInt, GraphQLNonNull } from "graphql";
+import { GraphQLList, GraphQLObjectType, GraphQLInt, GraphQLNonNull, GraphQLInputObjectType } from "graphql";
 import Module from ".";
 import { getGQLFieldsDefinitionForProperty } from "./ItemDefinition/PropertyDefinition/gql";
 import { getGQLQueryFieldsForItemDefinition, getGQLMutationFieldsForItemDefinition } from "./ItemDefinition/gql";
@@ -229,8 +230,67 @@ export function getGQLQueryFieldsForModule(
       description: "A traditional array of results for the result list with search data",
     });
 
+    const orderByRuleFields = {
+      created_at: {
+        type: new GraphQLInputObjectType({
+          name: "ORDERBY_RULE__" + mod.getQualifiedPathName() + "_created_at",
+          fields: {
+            direction: {
+              type: GraphQLNonNull(ORDERBY_RULE_DIRECTION),
+            },
+            level: {
+              type: GraphQLNonNull(GraphQLInt),
+            }
+          },
+          description: "Order by the date of creation in any direction"
+        }),
+      },
+      edited_at: {
+        type: new GraphQLInputObjectType({
+          name: "ORDERBY_RULE__" + mod.getQualifiedPathName() + "_edited_at",
+          fields: {
+            direction: {
+              type: GraphQLNonNull(ORDERBY_RULE_DIRECTION),
+            },
+            level: {
+              type: GraphQLNonNull(GraphQLInt),
+            }
+          },
+          description: "Order by the time of edit in any direction"
+        }),
+      },
+    };
+
+    mod.getAllPropExtensions().forEach((p) => {
+      const description = p.getPropertyDefinitionDescription();
+      if (!description.sqlOrderBy) {
+        return;
+      }
+
+      orderByRuleFields[p.getId()] = {
+        type: new GraphQLObjectType({
+          name: "ORDERBY_RULE__" + mod.getQualifiedPathName() + "_" + p.getId(),
+          fields: {
+            direction: {
+              type: GraphQLNonNull(ORDERBY_RULE_DIRECTION),
+            },
+            level: {
+              type: GraphQLNonNull(GraphQLInt),
+            }
+          },
+          description: "Order by the property of " + p.getId() + " which is a extension, in any direction",
+        }),
+      };
+    });
+
+    const orderByRule = new GraphQLInputObjectType({
+      name: "ORDERBY_RULE__" + mod.getQualifiedPathName(),
+      fields: orderByRuleFields,
+      description: "This object can be ordered by using these rules",
+    });
+
     const searchArgs = {
-      ...RESERVED_SEARCH_PROPERTIES,
+      ...RESERVED_IDEF_SEARCH_PROPERTIES(orderByRule),
       // as you can realize the arguments exclude the base and make it into input mode
       // that means no RESERVED_BASE_PROPERTIES
       ...getGQLFieldsDefinitionForModule(mod.getSearchModule(), {

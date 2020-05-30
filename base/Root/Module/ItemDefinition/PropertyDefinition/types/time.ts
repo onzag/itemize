@@ -15,7 +15,7 @@ import {
   standardSQLBtreeIndexable,
 } from "../sql";
 import {
-  standardSQLLocalEqualFn, standardLocalEqual,
+  standardSQLSSCacheEqualFn, standardLocalEqual,
 } from "../local-sql";
 import { PropertyDefinitionSupportedDateType } from "./date";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
@@ -49,9 +49,13 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   sqlEqual: standardSQLEqualFn,
-  sqlLocalEqual: standardSQLLocalEqualFn,
+  sqlSSCacheEqual: standardSQLSSCacheEqualFn,
   sqlBtreeIndexable: standardSQLBtreeIndexable,
   sqlMantenience: null,
+  sqlStrSearch: null,
+  localStrSearch: null,
+  sqlOrderBy: null,
+  localOrderBy: null,
 
   localSearch: dateLocalSearchExactAndRange.bind(null, TIME_FORMAT),
   localEqual: standardLocalEqual,

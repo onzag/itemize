@@ -1177,7 +1177,7 @@ export async function runPolicyCheck(
         // which will create a column field with the policy name that is going to be
         // equal to that value, eg. "name" = 'policyValueForProperty' AS "MY_POLICY"
         // because policies are uppercase this avoids collisions with properties
-        const policyMatches = property.getPropertyDefinitionDescription().sqlLocalEqual(
+        const policyMatches = property.getPropertyDefinitionDescription().sqlSSCacheEqual(
           policyValueForTheProperty,
           "",
           property.getId(),

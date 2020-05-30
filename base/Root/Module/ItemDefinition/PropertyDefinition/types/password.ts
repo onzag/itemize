@@ -49,6 +49,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
       "Attempted to search by password",
     );
   },
+  sqlStrSearch: null,
+  localStrSearch: null,
+  sqlOrderBy: null,
+  localOrderBy: null,
   localSearch: () => {
     throw new Error(
       "Attempted to local search by password",
@@ -87,7 +91,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       ],
     );
   },
-  sqlLocalEqual: (
+  sqlSSCacheEqual: (
     value: PropertyDefinitionSupportedPasswordType,
     sqlPrefix: string,
     id: string,

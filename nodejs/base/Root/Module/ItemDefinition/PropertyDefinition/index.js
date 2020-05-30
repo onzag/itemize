@@ -846,6 +846,12 @@ class PropertyDefinition {
      * to false as it's been used applyValue on it, it's been set now by the computer
      */
     applyValue(id, version, value, modifiedState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers) {
+        if (modifiedState === false && value !== null) {
+            console.warn("You have set the modified state of a property as false, which means this" +
+                " property (" + this.rawData.id + ") has never been touched by the user/computer, yet the value specified (" +
+                JSON.stringify(value) + ")" +
+                " was not null, this means that the property is in a null state that defaults to the property default yet it is not null");
+        }
         // if doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers
         // is false, then we don't care and apply the value
         // however if it's true, we need to check the manually set variable

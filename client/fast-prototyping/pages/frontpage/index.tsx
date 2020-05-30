@@ -3,6 +3,7 @@ import I18nRead from "../../../components/localization/I18nRead";
 import TitleSetter from "../../../components/util/TitleSetter";
 import { Articles } from "./articles";
 import { Hero } from "./hero";
+import { Social } from "./social";
 
 export function Frontpage(props: {heroID?: number}) {
   return (
@@ -18,6 +19,7 @@ export function Frontpage(props: {heroID?: number}) {
       </I18nRead>
       <Hero heroID={props.heroID || 1}/>
       <Articles/>
+      <Social/>
     </>
   );
 };

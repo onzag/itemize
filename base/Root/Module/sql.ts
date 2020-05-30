@@ -13,6 +13,7 @@ import {
   convertGQLValueToSQLValueForProperty,
   convertSQLValueToGQLValueForProperty,
   buildSQLQueryForProperty,
+  buildSQLStrSearchQueryForProperty,
 } from "./ItemDefinition/PropertyDefinition/sql";
 import { getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../sql";
@@ -269,15 +270,29 @@ export function convertSQLValueToGQLValueForModule(
  */
 export function buildSQLQueryForModule(
   mod: Module,
-  data: IGQLValue,
+  args: IGQLArgs,
   knexBuilder: Knex.QueryBuilder,
   dictionary: string,
+  search: string,
 ) {
   mod.getAllPropExtensions().forEach((pd) => {
     if (!pd.isSearchable()) {
       return;
     }
 
-    buildSQLQueryForProperty(pd, data, "", knexBuilder, dictionary);
+    buildSQLQueryForProperty(pd, args, "", knexBuilder, dictionary);
   });
+
+  if (search) {
+    knexBuilder.andWhere((builder) => {
+      mod.getAllPropExtensions().forEach((pd) => {
+        if (!pd.isSearchable()) {
+          return;
+        }
+        builder.orWhere((orBuilder) => {
+          buildSQLStrSearchQueryForProperty(pd, args, search, "", orBuilder, dictionary);
+        });
+      });
+    });
+  }
 }

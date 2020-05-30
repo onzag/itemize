@@ -214,12 +214,24 @@ exports.convertSQLValueToGQLValueForModule = convertSQLValueToGQLValueForModule;
  * @param knexBuilder the knex builder
  * @param dictionary the dictionary used
  */
-function buildSQLQueryForModule(mod, data, knexBuilder, dictionary) {
+function buildSQLQueryForModule(mod, args, knexBuilder, dictionary, search) {
     mod.getAllPropExtensions().forEach((pd) => {
         if (!pd.isSearchable()) {
             return;
         }
-        sql_1.buildSQLQueryForProperty(pd, data, "", knexBuilder, dictionary);
+        sql_1.buildSQLQueryForProperty(pd, args, "", knexBuilder, dictionary);
     });
+    if (search) {
+        knexBuilder.andWhere((builder) => {
+            mod.getAllPropExtensions().forEach((pd) => {
+                if (!pd.isSearchable()) {
+                    return;
+                }
+                builder.orWhere((orBuilder) => {
+                    sql_1.buildSQLStrSearchQueryForProperty(pd, args, search, "", orBuilder, dictionary);
+                });
+            });
+        });
+    }
 }
 exports.buildSQLQueryForModule = buildSQLQueryForModule;

@@ -14,13 +14,17 @@ const footerStyles = (theme: Theme) => createStyles({
     alignItems: "center",
     justifyContent: "center",
     marginTop: "3rem",
-    backgroundColor: theme.palette.grey[900],
     flexDirection: "row",
     flexWrap: "wrap",
     padding: "0.5rem 0",
     [theme.breakpoints.down("sm")]: {
       padding: "1rem 0",
     }
+  },
+  containerAbs: {
+    position: "absolute",
+    bottom: 0,
+    backgroundColor: theme.palette.grey[900],
   },
   dataSet: {
     lineHeight: 0,
@@ -35,6 +39,8 @@ const footerStyles = (theme: Theme) => createStyles({
       flex: "1 0 100%",
       padding: "0.5rem 0",
     },
+  },
+  dataSetAbs: {
     "&:first-child": {
       flex: "2 1 0",
     },
@@ -44,6 +50,11 @@ const footerStyles = (theme: Theme) => createStyles({
       }
     }
   },
+  copyInfo: {
+    [theme.breakpoints.down("xs")]: {
+      display: "none",
+    },
+  },
   link: {
     color: "inherit",
     textDecoration: "none",
@@ -52,33 +63,44 @@ const footerStyles = (theme: Theme) => createStyles({
 
 export const Footer = withStyles(footerStyles)((props: WithStyles<typeof footerStyles>) => {
   const year = (new Date()).getUTCFullYear();
-  return <div className={props.classes.container}>
-    <div className={props.classes.dataSet}>
-      <CopyrightIcon/>
-      &nbsp;
-      {year}
-      &nbsp;
-      <I18nRead id="app_name" capitalize={true}/>
-      &nbsp;
-      &nbsp;
-      <LanguagePicker useCode={true}/>
-      <CountryPicker useCode={true}/>
-      <CurrencyPicker useCode={true}/>
+  // the first represents the spacer, the second is the actual footer
+  return <>
+    <div className={props.classes.container}>
+      <div className={props.classes.dataSet}></div>
+      <div className={props.classes.dataSet}></div>
+      <div className={props.classes.dataSet}></div>
+      <div className={props.classes.dataSet}></div>
     </div>
-    <div className={props.classes.dataSet}>
-      <Link to="/contact" className={props.classes.link}>
-        <I18nRead id="contact" capitalize={true}/>
-      </Link>
+    <div className={props.classes.container + " " + props.classes.containerAbs}>
+      <div className={props.classes.dataSet + " " + props.classes.dataSetAbs}>
+        <CopyrightIcon/>
+        &nbsp;
+        {year}
+        <span className={props.classes.copyInfo}>
+          &nbsp;
+          <I18nRead id="app_name" capitalize={true}/>
+        </span>
+        &nbsp;
+        &nbsp;
+        <LanguagePicker useCode={true}/>
+        <CountryPicker useCode={true}/>
+        <CurrencyPicker useCode={true}/>
+      </div>
+      <div className={props.classes.dataSet + " " + props.classes.dataSetAbs}>
+        <Link to="/contact" className={props.classes.link}>
+          <I18nRead id="contact" capitalize={true}/>
+        </Link>
+      </div>
+      <div className={props.classes.dataSet + " " + props.classes.dataSetAbs}>
+        <Link to="/terms-and-conditions" className={props.classes.link}>
+          <I18nRead id="terms_and_conditions" capitalize={true}/>
+        </Link>
+      </div>
+      <div className={props.classes.dataSet + " " + props.classes.dataSetAbs}>
+        <Link to="/privacy-policy" className={props.classes.link}>
+          <I18nRead id="privacy_policy" capitalize={true}/>
+        </Link>
+      </div>
     </div>
-    <div className={props.classes.dataSet}>
-      <Link to="/terms-and-conditions" className={props.classes.link}>
-        <I18nRead id="terms_and_conditions" capitalize={true}/>
-      </Link>
-    </div>
-    <div className={props.classes.dataSet}>
-      <Link to="/privacy-policy" className={props.classes.link}>
-        <I18nRead id="privacy_policy" capitalize={true}/>
-      </Link>
-    </div>
-  </div>
+  </>
 });

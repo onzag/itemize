@@ -4,7 +4,7 @@ import { SlowLoadingElement } from "../../components/util";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import SearchLoader from "../../../components/search/SearchLoader";
 import View from "../../../components/property/View";
-import { withStyles, createStyles, WithStyles, Typography, Paper, Theme, Box, Container } from "@material-ui/core";
+import { withStyles, createStyles, WithStyles, Typography, Paper, Theme, Box, Container, Button } from "@material-ui/core";
 import Reader from "../../../components/property/Reader";
 import { Avatar } from "../../components/avatar";
 import AppLanguageRetriever from "../../../components/localization/AppLanguageRetriever";
@@ -133,14 +133,25 @@ export const articlesStyles = (theme: Theme) => createStyles({
     justifyContent: "center",
     padding: "0 1rem",
     flexDirection: "column",
-  }
+  },
+  moreNewsContainer: {
+    marginTop: "2rem",
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
+  },
+  moreNewsButton: {
+
+  },
 });
 
 export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof articlesStyles>) => {
   return (
     <Container maxWidth="md" className={props.classes.container}>
       <Paper className={props.classes.paper}>
-        <SlowLoadingElement id="frontpage">
+        <SlowLoadingElement id="articles">
           <ModuleProvider module="cms">
             <AppLanguageRetriever>
               {(languageData) => (
@@ -230,6 +241,13 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
                       });
                     }}
                   </SearchLoader>
+                  <div className={props.classes.moreNewsContainer}>
+                    <Link to="/news">
+                      <Button size="large" className={props.classes.moreNewsButton} variant="contained" color="primary">
+                        <I18nRead id="more_news" capitalize={true}/>
+                      </Button>
+                    </Link>
+                  </div>
                 </ItemDefinitionProvider>
               )}
             </AppLanguageRetriever>

@@ -41,6 +41,10 @@ const typeValue = {
         // we throw an error still
         throw new Error("Attempted to search by password");
     },
+    sqlStrSearch: null,
+    localStrSearch: null,
+    sqlOrderBy: null,
+    localOrderBy: null,
     localSearch: () => {
         throw new Error("Attempted to local search by password");
     },
@@ -62,7 +66,7 @@ const typeValue = {
             columnName,
         ]);
     },
-    sqlLocalEqual: (value, sqlPrefix, id, data) => {
+    sqlSSCacheEqual: (value, sqlPrefix, id, data) => {
         if (value === null) {
             return data[sqlPrefix + id] === null;
         }
