@@ -822,7 +822,7 @@ export const ORDERBY_RULE = GraphQLInputObjectType && new GraphQLInputObjectType
 });
 
 export interface IOrderByRuleType {
-  [key: string]: {
+  [property: string]: {
     direction: "asc" | "desc",
     priority: number,
     nulls: "first" | "last",
@@ -859,7 +859,7 @@ export const RESERVED_IDEF_SEARCH_PROPERTIES = (orderByRule: any) => ({
     description: "The SQL offset to use in order to page the amount of results",
   },
   order_by: {
-    type: orderByRule,
+    type: GraphQLNonNull && orderByRule && GraphQLNonNull(orderByRule),
     description: "An order type",
   },
   since: {
@@ -914,7 +914,7 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = (orderByRule: any) => ({
     description: "Basically a limiter that causes the values to only be returned since that date, the date must be an ISO type",
   },
   order_by: {
-    type: orderByRule,
+    type: GraphQLNonNull && orderByRule && GraphQLNonNull(orderByRule),
     description: "An order type",
   },
   created_by: {

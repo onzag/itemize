@@ -28,7 +28,7 @@ import { IGQLSearchRecord, IGQLSearchRecordsContainer, IGQLSearchResultsContaine
 import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import graphqlFields from "graphql-fields";
-import { NanoSecondComposedDate } from "../../../util";
+import { NanoSecondComposedDate } from "../../../nanodate";
 
 function findLastRecordDateCheatMethod(records: IGQLSearchRecord[]): string {
   let maximumRecords: IGQLSearchRecord[] = null;

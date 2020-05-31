@@ -12,6 +12,7 @@ import {
   PREFIX_EDIT,
   PREFIX_GET_LIST,
   PREFIX_TRADITIONAL_SEARCH,
+  IOrderByRuleType,
 } from "../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum } from "../../gql-querier";
@@ -693,12 +694,25 @@ export async function runEditQueryFor(
   }
 }
 
+function convertOrderByRule(orderBy: IOrderByRuleType) {
+  const result = {};
+  Object.keys(orderBy).forEach((property) => {
+    const rule = orderBy[property];
+    result[property] = {
+      priority: rule.priority,
+      nulls: new GQLEnum(rule.nulls.toUpperCase()),
+      direction: new GQLEnum(rule.direction.toUpperCase()),
+    }
+  });
+  return result;
+}
+
 export async function runSearchQueryFor(
   arg: {
     args: IGQLArgs,
     fields: IGQLRequestFields,
     itemDefinition: ItemDefinition,
-    orderBy: "DEFAULT";
+    orderBy: IOrderByRuleType;
     createdBy: number;
     parentedBy: {
       itemDefinition: ItemDefinition,
@@ -727,21 +741,25 @@ export async function runSearchQueryFor(
     arg.itemDefinition.getQualifiedPathName());
   const queryName = (arg.traditional ? PREFIX_TRADITIONAL_SEARCH : PREFIX_SEARCH) + qualifiedName;
 
-  const args = getQueryArgsFor(
+  const searchArgs = getQueryArgsFor(
     arg.args,
     arg.token,
     arg.language,
   );
 
   if (arg.createdBy) {
-    args.created_by = arg.createdBy;
+    searchArgs.created_by = arg.createdBy;
   }
 
   if (arg.parentedBy) {
-    args.parent_type = arg.parentedBy.itemDefinition.getQualifiedPathName();
-    args.parent_id = arg.parentedBy.id;
-    args.parent_version = arg.parentedBy.version || null;
+    searchArgs.parent_type = arg.parentedBy.itemDefinition.getQualifiedPathName();
+    searchArgs.parent_id = arg.parentedBy.id;
+    searchArgs.parent_version = arg.parentedBy.version || null;
   }
+
+  searchArgs.order_by = convertOrderByRule(arg.orderBy);
+  searchArgs.limit = arg.limit;
+  searchArgs.offset = arg.offset;
 
   let gqlValue: IGQLEndpointValue;
   // if we are in a search with
@@ -768,8 +786,7 @@ export async function runSearchQueryFor(
       standardCounterpart.getQualifiedPathName());
     const cacheWorkerGivenSearchValue = await CacheWorkerInstance.instance.runCachedSearch(
       queryName,
-      args,
-      arg.limit,
+      searchArgs,
       PREFIX_GET_LIST + standardCounterpartQualifiedName,
       arg.token,
       arg.language.split("-")[0],
@@ -818,12 +835,9 @@ export async function runSearchQueryFor(
       }
     }
   } else if (!arg.traditional) {
-    args.order_by = new GQLEnum("DEFAULT");
-    args.limit = arg.limit;
-    args.offset = arg.offset;
     const query = buildGqlQuery({
       name: queryName,
-      args,
+      args: searchArgs,
       fields: {
         records: {
           id: {},
@@ -841,12 +855,9 @@ export async function runSearchQueryFor(
     // and this function will always run using the network
     gqlValue = await gqlQuery(query);
   } else {
-    args.order_by = new GQLEnum("DEFAULT");
-    args.limit = arg.limit;
-    args.offset = arg.offset;
     const query = buildGqlQuery({
       name: queryName,
-      args,
+      args: searchArgs,
       fields: {
         results: arg.fields,
         count: {},

@@ -12,7 +12,7 @@ const sql_2 = require("../../../base/Root/Module/ItemDefinition/sql");
 const version_null_value_1 = require("../../version-null-value");
 const gql_util_1 = require("../../../gql-util");
 const graphql_fields_1 = __importDefault(require("graphql-fields"));
-const util_1 = require("../../../util");
+const nanodate_1 = require("../../../nanodate");
 function findLastRecordDateCheatMethod(records) {
     let maximumRecords = null;
     let maximumRecordId = null;
@@ -35,7 +35,7 @@ function findLastRecordDateCheatMethod(records) {
         const versionedRecord = maximumRecords.find((r) => r.version !== null);
         return versionedRecord.created_at;
     }
-    const recordsRespectiveNanoSecondAccuracyArray = maximumRecords.map((r) => new util_1.NanoSecondComposedDate(r.created_at));
+    const recordsRespectiveNanoSecondAccuracyArray = maximumRecords.map((r) => new nanodate_1.NanoSecondComposedDate(r.created_at));
     const maxDate = recordsRespectiveNanoSecondAccuracyArray.reduce((prev, cur) => {
         return prev.greaterThan(cur) ? prev : cur;
     });

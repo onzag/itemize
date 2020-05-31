@@ -343,7 +343,7 @@ export declare const ORDERBY_RULE_DIRECTION: GraphQLEnumType;
 export declare const ORDERBY_NULLS_PRIORITY: GraphQLEnumType;
 export declare const ORDERBY_RULE: GraphQLInputObjectType;
 export interface IOrderByRuleType {
-    [key: string]: {
+    [property: string]: {
         direction: "asc" | "desc";
         priority: number;
         nulls: "first" | "last";
@@ -363,7 +363,7 @@ export declare const RESERVED_IDEF_SEARCH_PROPERTIES: (orderByRule: any) => {
         description: string;
     };
     order_by: {
-        type: any;
+        type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
         description: string;
     };
     since: {
@@ -424,7 +424,7 @@ export declare const RESERVED_MODULE_SEARCH_PROPERTIES: (orderByRule: any) => {
         description: string;
     };
     order_by: {
-        type: any;
+        type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
         description: string;
     };
     created_by: {

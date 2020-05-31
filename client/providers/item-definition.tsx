@@ -11,6 +11,7 @@ import {
   ENDPOINT_ERRORS,
   MEMCACHED_DESTRUCTION_MARKERS_LOCATION,
   DESTRUCTION_MARKERS_LOCATION,
+  IOrderByRuleType,
 } from "../../constants";
 import { IGQLSearchRecord, IGQLValue, IGQLRequestFields } from "../../gql-querier";
 import { requestFieldsAreContained } from "../../gql-util";
@@ -133,7 +134,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   requestedIncludes?: string[];
   searchByProperties: string[];
   searchByIncludes?: string[];
-  orderBy?: "DEFAULT";
+  orderBy?: IOrderByRuleType;
   createdBy?: number;
   parentedBy?: {
     module: string,
@@ -302,6 +303,9 @@ export interface IItemDefinitionContextType {
   // the remote listener
   remoteListener: RemoteListener;
 
+  // an injected parent context if available
+  injectedParentContext: IItemDefinitionContextType;
+
   // inject a promise that blocks the submit process, this is currently
   // not used anywhere but was introduced as a means of blocking submitting
   // when necessary using promises
@@ -415,6 +419,10 @@ export interface IItemDefinitionProviderProps {
    * avoids running loadValue
    */
   avoidLoading?: boolean;
+  /**
+   * allows insertion of the parent context within the children
+   */
+  injectParentContext?: boolean;
 }
 
 // This represents the actual provider that does the job, it takes on some extra properties
@@ -436,6 +444,8 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
   remoteListener: RemoteListener;
   // the searching context to pull values from
   searchContext: ISearchItemDefinitionValueContextType;
+  // injected parent context
+  injectedParentContext: IItemDefinitionContextType;
 }
 
 // This is the state of such, it's basically a copy of the
@@ -796,7 +806,8 @@ export class ActualItemDefinitionProvider extends
       !!nextProps.static !== !!this.props.static ||
       !!nextProps.includePolicies !== !!this.props.includePolicies ||
       !equals(nextProps.automaticSearch, this.props.automaticSearch) ||
-      !equals(nextProps.setters, this.props.setters);
+      !equals(nextProps.setters, this.props.setters) ||
+      !equals(nextProps.injectedParentContext, this.props.injectedParentContext);
   }
   public async componentDidUpdate(
     prevProps: IActualItemDefinitionProviderProps,
@@ -2183,7 +2194,13 @@ export class ActualItemDefinitionProvider extends
       itemDefinition: this.props.itemDefinitionInstance,
       cachePolicy: options.cachePolicy || "none",
       createdBy: options.createdBy || null,
-      orderBy: options.orderBy || "DEFAULT",
+      orderBy: options.orderBy || {
+        created_at: {
+          priority: 0,
+          nulls: "last",
+          direction: "desc",
+        }
+      },
       traditional: !!options.traditional,
       token: this.props.tokenData.token,
       language: this.props.localeData.language,
@@ -2450,6 +2467,7 @@ export class ActualItemDefinitionProvider extends
           canEdit: this.state.canEdit,
           remoteListener: this.props.remoteListener,
           injectSubmitBlockPromise: this.injectSubmitBlockPromise,
+          injectedParentContext: this.props.injectedParentContext,
         }}
       >
         {this.props.children}
@@ -2490,16 +2508,34 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                             valueFor = valueFor.getSearchModeCounterpart();
                           }
 
+                          const actualProps = {
+                            localeData,
+                            tokenData,
+                            itemDefinitionInstance: valueFor,
+                            itemDefinitionQualifiedName: valueFor.getQualifiedPathName(),
+                            containsExternallyCheckedProperty: valueFor.containsAnExternallyCheckedProperty(),
+                            remoteListener: data.remoteListener,
+                            searchContext: searchContext,
+                            ...props,
+                          }
+
+                          if (props.injectParentContext) {
+                            return (
+                              <ItemDefinitionContext.Consumer>{
+                                (value) => (
+                                  <ActualItemDefinitionProvider
+                                    {...actualProps}
+                                    injectedParentContext={value}
+                                  />
+                                )
+                              }</ItemDefinitionContext.Consumer>
+                            );
+                          }
+
                           return (
                             <ActualItemDefinitionProvider
-                              localeData={localeData}
-                              tokenData={tokenData}
-                              itemDefinitionInstance={valueFor}
-                              itemDefinitionQualifiedName={valueFor.getQualifiedPathName()}
-                              containsExternallyCheckedProperty={valueFor.containsAnExternallyCheckedProperty()}
-                              remoteListener={data.remoteListener}
-                              searchContext={searchContext}
-                              {...props}
+                              {...actualProps}
+                              injectedParentContext={null}
                             />
                           );
                         }}
@@ -2570,5 +2606,17 @@ export function NoStateItemDefinitionProvider(props: INoStateItemDefinitionProvi
         }
       }
     </ModuleContext.Consumer>
+  )
+}
+
+export function ParentItemDefinitionContextProvider(props: {children: React.ReactNode}) {
+  return (
+    <ItemDefinitionContext.Consumer>
+      {(value) => (
+        <ItemDefinitionContext.Provider value={value.injectedParentContext}>
+          {props.children}
+        </ItemDefinitionContext.Provider>
+      )}
+    </ItemDefinitionContext.Consumer>
   )
 }

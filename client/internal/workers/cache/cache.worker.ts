@@ -6,7 +6,7 @@ import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { requestFieldsAreContained, deepMerge } from "../../../../gql-util";
 import { IGQLSearchRecord, buildGqlQuery, gqlQuery, GQLEnum,
   IGQLValue, IGQLRequestFields, IGQLArgs, IGQLEndpointValue } from "../../../../gql-querier";
-import { MAX_SEARCH_RESULTS_FALLBACK, PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
+import { MAX_SEARCH_RESULTS_FALLBACK, PREFIX_GET, ENDPOINT_ERRORS, IOrderByRuleType } from "../../../../constants";
 import { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
 import Root, { IRootRawJSONDataType } from "../../../../base/Root";
@@ -499,7 +499,6 @@ export default class CacheWorker {
   public async runCachedSearch(
     searchQueryName: string,
     searchArgs: IGQLArgs,
-    limit: number,
     getListQueryName: string,
     getListTokenArgs: string,
     getListLangArgs: string,
@@ -540,15 +539,21 @@ export default class CacheWorker {
       // it is supposed to be, this means that we have grown the cache size, but yet
       // the cache remains constrained by the older size, this only truly matters if
       // the new limit is larger than the old limit, otherwise it's fine
-      if (!dbValue || dbValue.limit < limit) {
+      if (!dbValue || dbValue.limit < searchArgs.limit) {
         // we need to remove the specifics of the search
         // as we are caching everything to the given criteria
         // and then using client side to filter
         const actualArgsToUseInGQLSearch: IGQLArgs = {
           token: searchArgs.token,
           language: searchArgs.language,
-          order_by: new GQLEnum("DEFAULT"),
-          limit,
+          order_by: {
+            created_at: {
+              nulls: new GQLEnum("LAST"),
+              direction: new GQLEnum("DESC"),
+              priority: 0,
+            },
+          },
+          limit: searchArgs.limit,
           offset: 0,
         };
         if (cachePolicy === "by-owner") {
@@ -596,7 +601,7 @@ export default class CacheWorker {
         // need to process
         resultsToProcess = serverValue.data[searchQueryName].records as IGQLSearchRecord[];
         lastRecordDate = serverValue.data[searchQueryName].last_record_date as string;
-        limitToSetInDb = limit;
+        limitToSetInDb = searchArgs.limit as number;
       } else {
         // otherwise our results to process are the same ones we got
         // from the database, but do we need to process them for real?
@@ -626,7 +631,7 @@ export default class CacheWorker {
                 records,
                 last_record_date: lastRecordDate,
                 // we return the true limit, because records might grow over the limit
-                limit: records.length < limit ? limit : records.length,
+                limit: (records.length < searchArgs.limit ? searchArgs.limit : records.length) as number,
                 offset: 0,
               },
             },

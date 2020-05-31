@@ -1,7 +1,7 @@
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { SlowLoadingElement } from "../../components/util";
-import { ItemDefinitionProvider } from "../../../providers/item-definition";
+import { ItemDefinitionProvider, ParentItemDefinitionContextProvider } from "../../../providers/item-definition";
 import SearchLoader from "../../../components/search/SearchLoader";
 import View from "../../../components/property/View";
 import { withStyles, createStyles, WithStyles, Typography, Paper, Theme, Box, Container, Button } from "@material-ui/core";
@@ -218,17 +218,23 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
                                       itemDefinition="user"
                                       forId={createdBy}
                                       static="TOTAL"
+                                      disableExternalChecks={true}
                                       properties={[
                                         "username",
                                         "profile_picture",
                                         "role",
                                       ]}
+                                      injectParentContext={true}
                                     >
                                       <Box className={props.classes.publisherInfoBox}>
                                         <Avatar hideFlag={true} size="small" profileURL={(id: number) => `/profile/${id}`} />
                                         <Box className={props.classes.publisherInfoDetailsBox}>
                                           <Typography variant="body1"><View id="username" /></Typography>
-                                          <Typography variant="body2"><View id="created_at" rendererArgs={{ dateFormat: "LLL" }} /></Typography>
+                                          <Typography variant="body2">
+                                            <ParentItemDefinitionContextProvider>
+                                              <View id="created_at" rendererArgs={{ dateFormat: "LLL" }} />
+                                            </ParentItemDefinitionContextProvider>
+                                          </Typography>
                                         </Box>
                                       </Box>
                                     </ItemDefinitionProvider>

@@ -1,9 +1,10 @@
 import { IGQLSearchRecord } from "../../../../gql-querier";
 import { IDBPDatabase } from "idb";
 import { ICacheDB, QUERIES_TABLE_NAME } from "./cache.worker";
-import { PREFIX_GET } from "../../../../constants";
+import { PREFIX_GET, IOrderByRuleType } from "../../../../constants";
 import Root from "../../../../base/Root";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
+import { NanoSecondComposedDate } from "../../../../nanodate";
 
 export async function search(
   rootProxy: Root,
@@ -11,8 +12,7 @@ export async function search(
   searchResults: IGQLSearchRecord[],
   searchArgs: any,
 ): Promise<IGQLSearchRecord[]> {
-  const sortStrategyFunction = SORT_STRATEGIES[searchArgs.order_by];
-  const newSearchResults: IGQLSearchRecord[] = (await Promise.all(
+  let newSearchResults: IGQLSearchRecordChecked[] = (await Promise.all(
     searchResults.map(async (result) => {
       try {
         const queryIdentifier = `${PREFIX_GET}${result.type}.${result.id}.${result.version || ""}`;
@@ -34,8 +34,69 @@ export async function search(
         return null;
       }
     }),
-  )).filter((r) => !!r).sort(sortStrategyFunction).map((r) => r.searchResult);
-  return newSearchResults;
+  )).filter((r) => !!r);
+
+  const orderBy: IOrderByRuleType = searchArgs.orderBy;
+  const orderBySorted = Object.keys(orderBy).map((orderByProperty: string) => {
+    return {
+      property: orderByProperty,
+      priority: orderBy[orderByProperty].priority,
+      nulls: orderBy[orderByProperty].nulls,
+      direction: orderBy[orderByProperty].direction,
+    }
+  }).sort((a, b) => a.priority - b.priority);
+
+  orderBySorted.forEach((sortRule) => {
+    if (sortRule.property === "created_at" || sortRule.property === "edited_at") {
+      newSearchResults = newSearchResults.sort((a, b) => {
+        // remember if there's no value.DATA or the item is null or whatever
+        // it would have never gotten here
+        const aValue = a.value.DATA[sortRule.property];
+        const bValue = b.value.DATA[sortRule.property];
+
+        // however the value itself can be null
+        if (aValue === bValue) {
+          return 0;
+        } else if (aValue === null) {
+          return sortRule.nulls === "last" ? 1 : -1;
+        } else if (bValue === null) {
+          return sortRule.nulls === "last" ? -1 : 1;
+        }
+
+        const aComposed = new NanoSecondComposedDate(aValue);
+        const bComposed = new NanoSecondComposedDate(bValue);
+
+        if (aComposed.greaterThan(bComposed)) {
+          return -1;
+        } else {
+          return 1;
+        }
+      });
+      return;
+    }
+
+    newSearchResults = newSearchResults.sort((a, b) => {
+      // remember if there's no value.DATA or the item is null or whatever
+      // it would have never gotten here
+      const aValue = a.value.DATA[sortRule.property];
+      const bValue = b.value.DATA[sortRule.property];
+
+      const itemDefinition = rootProxy.registry[a.searchResult.type] as ItemDefinition;
+      const property = itemDefinition.getPropertyDefinitionFor(sortRule.property, true);
+      const description = property.getPropertyDefinitionDescription();
+      if (!description.localOrderBy) {
+        return 0;
+      }
+      return description.localOrderBy(
+        sortRule.direction,
+        sortRule.nulls,
+        aValue,
+        bValue,
+      );
+    });
+  });
+
+  return newSearchResults.map((r) => r.searchResult);
 }
 
 interface IGQLSearchRecordChecked {
@@ -113,10 +174,3 @@ async function checkOne(
     searchResult,
   };
 }
-
-const SORT_STRATEGIES = {
-  DEFAULT: (a: IGQLSearchRecordChecked, b: IGQLSearchRecordChecked) => {
-    // TODO this should be done by created_at, this will suffice for now
-    return b.value.id - a.value.id;
-  },
-};

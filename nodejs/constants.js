@@ -799,7 +799,7 @@ exports.RESERVED_IDEF_SEARCH_PROPERTIES = (orderByRule) => ({
         description: "The SQL offset to use in order to page the amount of results",
     },
     order_by: {
-        type: orderByRule,
+        type: graphql_1.GraphQLNonNull && orderByRule && graphql_1.GraphQLNonNull(orderByRule),
         description: "An order type",
     },
     since: {
@@ -853,7 +853,7 @@ exports.RESERVED_MODULE_SEARCH_PROPERTIES = (orderByRule) => ({
         description: "Basically a limiter that causes the values to only be returned since that date, the date must be an ISO type",
     },
     order_by: {
-        type: orderByRule,
+        type: graphql_1.GraphQLNonNull && orderByRule && graphql_1.GraphQLNonNull(orderByRule),
         description: "An order type",
     },
     created_by: {
