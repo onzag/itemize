@@ -76,6 +76,7 @@ const typeValue = {
         const fromName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
         const toName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.TO + id;
         const exactName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+        let searchedByIt = false;
         if (typeof data[exactName] !== "undefined" && data[exactName] !== null) {
             const exactAsUnit = data[exactName];
             knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", exactAsUnit.normalizedUnit);
@@ -83,22 +84,42 @@ const typeValue = {
         }
         else if (data[exactName] === null) {
             knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", null);
+            searchedByIt = true;
         }
         if (typeof data[fromName] !== "undefined" && data[fromName] !== null) {
             const fromAsUnit = data[fromName];
             knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", fromAsUnit.normalizedUnit);
             knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", ">=", fromAsUnit.normalizedValue);
+            searchedByIt = true;
         }
         if (typeof data[toName] !== "undefined" && data[toName] !== null) {
             const toAsUnit = data[toName];
             knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", toAsUnit.normalizedUnit);
             knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", toAsUnit.normalizedValue);
+            searchedByIt = true;
         }
+        return searchedByIt;
     },
     sqlStrSearch: null,
     localStrSearch: null,
-    sqlOrderBy: null,
-    localOrderBy: null,
+    sqlOrderBy: (sqlPrefix, id, direction, nulls) => {
+        return [sqlPrefix + id + "_NORMALIZED_VALUE", direction, nulls];
+    },
+    localOrderBy: (direction, nulls, a, b) => {
+        if (a === null && b === null) {
+            return 0;
+        }
+        else if (a === null) {
+            return nulls === "last" ? 1 : -1;
+        }
+        else if (b === null) {
+            return nulls === "last" ? -1 : 1;
+        }
+        if (direction === "desc") {
+            return b.normalizedValue - a.normalizedValue;
+        }
+        return a.normalizedValue - b.normalizedValue;
+    },
     localSearch: (args, rawData, id, includeId) => {
         // item is deleted
         if (!rawData) {

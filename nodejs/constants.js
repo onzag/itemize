@@ -650,13 +650,6 @@ exports.POLICY_OPTIONAL_I18N = [
     "description",
 ];
 /**
- * These represent the ways an item can be ordered by
- */
-exports.ORDER_BY_OPTIONS = {
-    ASC: "asc",
-    DESC: "desc",
-};
-/**
  * The format that dates are expected to have in order to be exchanged
  * these represent the SQL form
  */
@@ -733,9 +726,19 @@ exports.SEARCH_RECORDS_CONTAINER_GQL = graphql_1.GraphQLObjectType && new graphq
  * @ignore
  */
 const searchOptionsOrderByOptions = {};
-Object.keys(exports.ORDER_BY_OPTIONS).forEach((key) => {
+["ASC", "DESC"].forEach((key) => {
     searchOptionsOrderByOptions[key] = {
-        value: key,
+        value: key.toLowerCase(),
+    };
+});
+/**
+ * Converting the search null to an enum type
+ * @ignore
+ */
+const searchOptionsNullOrderOptions = {};
+["FIRST", "LAST"].forEach((key) => {
+    searchOptionsNullOrderOptions[key] = {
+        value: key.toLowerCase(),
     };
 });
 /**
@@ -744,6 +747,28 @@ Object.keys(exports.ORDER_BY_OPTIONS).forEach((key) => {
 exports.ORDERBY_RULE_DIRECTION = graphql_1.GraphQLEnumType && new graphql_1.GraphQLEnumType({
     name: "RESERVED_SEARCH_PROPERTY_ENUM_ORDER_BY",
     values: searchOptionsOrderByOptions,
+});
+/**
+ * And this is for the order by rule enum nulls
+ */
+exports.ORDERBY_NULLS_PRIORITY = graphql_1.GraphQLEnumType && new graphql_1.GraphQLEnumType({
+    name: "RESERVED_SEARCH_PROPERTY_NULLS",
+    values: searchOptionsNullOrderOptions,
+});
+exports.ORDERBY_RULE = graphql_1.GraphQLInputObjectType && new graphql_1.GraphQLInputObjectType({
+    name: "RESERVED_ORDERBY_RULE",
+    fields: {
+        direction: {
+            type: graphql_1.GraphQLNonNull(exports.ORDERBY_RULE_DIRECTION),
+        },
+        priority: {
+            type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
+        },
+        nulls: {
+            type: graphql_1.GraphQLNonNull(exports.ORDERBY_NULLS_PRIORITY),
+        },
+    },
+    description: "Order by the property, which might be an extension, in any direction",
 });
 /**
  * These are the base query properties that are

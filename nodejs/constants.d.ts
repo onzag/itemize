@@ -302,13 +302,6 @@ export declare const POLICY_REQUIRED_I18N: string[];
  */
 export declare const POLICY_OPTIONAL_I18N: string[];
 /**
- * These represent the ways an item can be ordered by
- */
-export declare const ORDER_BY_OPTIONS: {
-    ASC: string;
-    DESC: string;
-};
-/**
  * The format that dates are expected to have in order to be exchanged
  * these represent the SQL form
  */
@@ -344,6 +337,18 @@ export declare const SEARCH_RECORDS_CONTAINER_GQL: GraphQLObjectType<any, any, {
  * And this is for the order by rule enum
  */
 export declare const ORDERBY_RULE_DIRECTION: GraphQLEnumType;
+/**
+ * And this is for the order by rule enum nulls
+ */
+export declare const ORDERBY_NULLS_PRIORITY: GraphQLEnumType;
+export declare const ORDERBY_RULE: GraphQLInputObjectType;
+export interface IOrderByRuleType {
+    [key: string]: {
+        direction: "asc" | "desc";
+        priority: number;
+        nulls: "first" | "last";
+    };
+}
 /**
  * The reserved search properties represent how searches are done
  * and these are included in every search

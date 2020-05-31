@@ -691,13 +691,6 @@ export const POLICY_REQUIRED_I18N = [
 export const POLICY_OPTIONAL_I18N = [
   "description",
 ];
-/**
- * These represent the ways an item can be ordered by
- */
-export const ORDER_BY_OPTIONS = {
-  ASC: "asc",
-  DESC: "desc",
-};
 
 /**
  * The format that dates are expected to have in order to be exchanged
@@ -779,9 +772,20 @@ export const SEARCH_RECORDS_CONTAINER_GQL = GraphQLObjectType && new GraphQLObje
  * @ignore
  */
 const searchOptionsOrderByOptions = {};
-Object.keys(ORDER_BY_OPTIONS).forEach((key) => {
+["ASC", "DESC"].forEach((key) => {
   searchOptionsOrderByOptions[key] = {
-    value: key,
+    value: key.toLowerCase(),
+  };
+});
+
+/**
+ * Converting the search null to an enum type
+ * @ignore
+ */
+const searchOptionsNullOrderOptions = {};
+["FIRST", "LAST"].forEach((key) => {
+  searchOptionsNullOrderOptions[key] = {
+    value: key.toLowerCase(),
   };
 });
 
@@ -792,6 +796,38 @@ export const ORDERBY_RULE_DIRECTION = GraphQLEnumType && new GraphQLEnumType({
   name: "RESERVED_SEARCH_PROPERTY_ENUM_ORDER_BY",
   values: searchOptionsOrderByOptions,
 });
+
+/**
+ * And this is for the order by rule enum nulls
+ */
+export const ORDERBY_NULLS_PRIORITY = GraphQLEnumType && new GraphQLEnumType({
+  name: "RESERVED_SEARCH_PROPERTY_NULLS",
+  values: searchOptionsNullOrderOptions,
+});
+
+export const ORDERBY_RULE = GraphQLInputObjectType && new GraphQLInputObjectType({
+  name: "RESERVED_ORDERBY_RULE",
+  fields: {
+    direction: {
+      type: GraphQLNonNull(ORDERBY_RULE_DIRECTION),
+    },
+    priority: {
+      type: GraphQLNonNull(GraphQLInt),
+    },
+    nulls: {
+      type: GraphQLNonNull(ORDERBY_NULLS_PRIORITY),
+    },
+  },
+  description: "Order by the property, which might be an extension, in any direction",
+});
+
+export interface IOrderByRuleType {
+  [key: string]: {
+    direction: "asc" | "desc",
+    priority: number,
+    nulls: "first" | "last",
+  },
+}
 
 /**
  * These are the base query properties that are

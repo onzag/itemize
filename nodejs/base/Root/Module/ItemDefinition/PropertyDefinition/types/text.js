@@ -85,7 +85,7 @@ const typeValue = {
         };
     },
     sqlOut: sql_1.standardSQLOutFn,
-    sqlSearch: (data, sqlPrefix, id, knexBuilder, dictionary) => {
+    sqlSearch: (data, sqlPrefix, id, knexBuilder, dictionary, isOrderedbyIt) => {
         const searchName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.SEARCH + id;
         if (typeof data[searchName] !== "undefined" && data[searchName] !== null) {
             // TODO improve, this only matches exact words
@@ -94,15 +94,42 @@ const typeValue = {
                 sqlPrefix + id + "_DICTIONARY",
                 data[searchName],
             ]);
+            if (isOrderedbyIt) {
+                return [
+                    "ts_rank(??, to_tsquery(??, ?)) AS ??",
+                    [
+                        sqlPrefix + id + "_VECTOR",
+                        sqlPrefix + id + "_DICTIONARY",
+                        data[searchName],
+                        sqlPrefix + id + "_RANK",
+                    ]
+                ];
+            }
+            return true;
         }
+        return false;
     },
-    sqlStrSearch: (search, sqlPrefix, id, knexBuilder, dictionary) => {
+    sqlStrSearch: (search, sqlPrefix, id, knexBuilder, dictionary, isOrderedbyIt) => {
         // TODO improve, this only matches exact words
-        knexBuilder.whereRaw("?? @@ to_tsquery(??, ?)", [
+        // due to technical limitations with knex, sometimes the builder
+        // isn't available
+        knexBuilder && knexBuilder.whereRaw("?? @@ to_tsquery(??, ?)", [
             sqlPrefix + id + "_VECTOR",
             sqlPrefix + id + "_DICTIONARY",
             search,
         ]);
+        if (isOrderedbyIt) {
+            return [
+                "ts_rank(??, to_tsquery(??, ?)) AS ??",
+                [
+                    sqlPrefix + id + "_VECTOR",
+                    sqlPrefix + id + "_DICTIONARY",
+                    search,
+                    sqlPrefix + id + "_STRRANK",
+                ]
+            ];
+        }
+        return true;
     },
     sqlBtreeIndexable: () => null,
     sqlMantenience: null,
@@ -120,6 +147,9 @@ const typeValue = {
         if (typeof usefulArgs[searchName] !== "undefined" && usefulArgs[searchName] !== null) {
             const searchMatch = usefulArgs[searchName];
             const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+            if (propertyValue === null) {
+                return false;
+            }
             // TODO improve, this is kinda trash FTS
             return propertyValue.includes(searchMatch);
         }
@@ -144,8 +174,19 @@ const typeValue = {
     sqlEqual: sql_1.standardSQLEqualFn,
     sqlSSCacheEqual: local_sql_1.standardSQLSSCacheEqualFn,
     localEqual: local_sql_1.standardLocalEqual,
-    sqlOrderBy: null,
-    localOrderBy: null,
+    sqlOrderBy: (sqlPrefix, id, direction, nulls, wasIncludedInSearch, wasIncludedInStrSearch) => {
+        if (wasIncludedInSearch) {
+            return [sqlPrefix + id + "_RANK", direction, nulls];
+        }
+        else if (wasIncludedInStrSearch) {
+            return [sqlPrefix + id + "_STRRANK", direction, nulls];
+        }
+        return null;
+    },
+    localOrderBy: () => {
+        // can't sort due to ranking limitations
+        return 0;
+    },
     // validates the text, texts don't support json value
     validate: (s, subtype) => {
         if (typeof s !== "string") {

@@ -177,30 +177,81 @@ exports.convertGQLValueToSQLValueForItemDefinition = convertGQLValueToSQLValueFo
  * @param knexBuilder the knex builder instance
  * @param dictionary the dictionary being used
  */
-function buildSQLQueryForItemDefinition(itemDefinition, args, knexBuilder, dictionary, search) {
+function buildSQLQueryForItemDefinition(itemDefinition, args, knexBuilder, dictionary, search, orderBy) {
+    const includedInSearchProperties = [];
+    const includedInStrSearchProperties = [];
+    const addedSelectFields = [];
     // first we need to get all the prop and extensions and build their query
     itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
         if (!pd.isSearchable()) {
             return;
         }
-        sql_1.buildSQLQueryForProperty(pd, args, "", knexBuilder, dictionary);
+        const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
+        const wasSearchedBy = sql_1.buildSQLQueryForProperty(pd, args, "", knexBuilder, dictionary, isOrderedByIt);
+        if (wasSearchedBy) {
+            if (Array.isArray(wasSearchedBy)) {
+                addedSelectFields.push(wasSearchedBy);
+            }
+            includedInSearchProperties.push(pd.getId());
+        }
+        ;
     });
     // then we ned to add all the includes
     itemDefinition.getAllIncludes().forEach((include) => {
         sql_2.buildSQLQueryForInclude(include, args, knexBuilder, dictionary);
     });
     if (search) {
+        // for technical reasons we need to do this twice and use a fake builder
+        // just to know if it needs extra fields
+        itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+            if (!pd.isExtension() || !pd.isSearchable()) {
+                return;
+            }
+            const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
+            const wasStrSearchedBy = sql_1.buildSQLStrSearchQueryForProperty(pd, args, search, "", null, dictionary, isOrderedByIt);
+            if (wasStrSearchedBy) {
+                if (Array.isArray(wasStrSearchedBy)) {
+                    addedSelectFields.push(wasStrSearchedBy);
+                }
+                includedInStrSearchProperties.push(pd.getId());
+            }
+            ;
+        });
+        // because these don't happen in the main, they don't get immediately executed but rather
+        // during the await time
         knexBuilder.andWhere((builder) => {
             itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
                 // only extensions and searchable are valid for the search functionality
-                if (!pd.isExtension() && !pd.isSearchable()) {
+                if (!pd.isExtension() || !pd.isSearchable()) {
                     return;
                 }
+                const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
                 builder.orWhere((orBuilder) => {
-                    sql_1.buildSQLStrSearchQueryForProperty(pd, args, search, "", orBuilder, dictionary);
+                    sql_1.buildSQLStrSearchQueryForProperty(pd, args, search, "", orBuilder, dictionary, isOrderedByIt);
                 });
             });
         });
     }
+    if (orderBy) {
+        const orderBySorted = Object.keys(orderBy).map((orderByProperty) => {
+            return {
+                property: orderByProperty,
+                priority: orderBy[orderByProperty].priority,
+                nulls: orderBy[orderByProperty].nulls,
+                direction: orderBy[orderByProperty].direction,
+            };
+        }).sort((a, b) => a.priority - b.priority);
+        orderBySorted.forEach((pSet) => {
+            if (!itemDefinition.hasPropertyDefinitionFor(pSet.property, true)) {
+                sql_1.buildSQLOrderByForInternalRequiredProperty(pSet.property, knexBuilder, pSet.direction, pSet.nulls);
+                return;
+            }
+            const pd = itemDefinition.getPropertyDefinitionFor(pSet.property, true);
+            const wasIncludedInSearch = includedInSearchProperties.includes(pSet.property);
+            const wasIncludedInStrSearch = includedInStrSearchProperties.includes(pSet.property);
+            sql_1.buildSQLOrderByForProperty(pd, "", knexBuilder, pSet.direction, pSet.nulls, wasIncludedInSearch, wasIncludedInStrSearch);
+        });
+    }
+    return addedSelectFields;
 }
 exports.buildSQLQueryForItemDefinition = buildSQLQueryForItemDefinition;

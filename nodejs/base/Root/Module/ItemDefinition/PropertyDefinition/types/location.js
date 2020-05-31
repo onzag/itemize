@@ -127,7 +127,7 @@ const typeValue = {
         }
         return result;
     },
-    sqlSearch: (args, sqlPrefix, id, knexBuilder) => {
+    sqlSearch: (args, sqlPrefix, id, knexBuilder, dictionary, isOrderedByIt) => {
         const radiusName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.RADIUS + id;
         const locationName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.LOCATION + id;
         if (typeof args[locationName] !== "undefined" && args[locationName] !== null &&
@@ -144,12 +144,30 @@ const typeValue = {
                 lat,
                 distance,
             ]);
+            if (isOrderedByIt) {
+                return [
+                    "ST_Distance(??, ST_MakePoint(?,?)::geography) AS ??",
+                    [
+                        sqlPrefix + id,
+                        lng,
+                        lat,
+                        sqlPrefix + id + "_CALC_RADIUS",
+                    ],
+                ];
+            }
+            return true;
         }
+        return false;
     },
     sqlStrSearch: null,
     localStrSearch: null,
     sqlMantenience: null,
-    sqlOrderBy: null,
+    sqlOrderBy: (sqlPrefix, id, direction, nulls, wasIncludedInSearch) => {
+        if (wasIncludedInSearch) {
+            return [sqlPrefix + id + "_CALC_RADIUS", direction, nulls];
+        }
+        return null;
+    },
     localOrderBy: null,
     localSearch: (args, rawData, id, includeId) => {
         // item is deleted

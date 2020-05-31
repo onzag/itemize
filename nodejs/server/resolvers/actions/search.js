@@ -113,7 +113,7 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
         queryModel.andWhere("version", resolverArgs.args.version_filter || "");
     }
     // now we build the sql query for the module
-    sql_1.buildSQLQueryForModule(mod, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args), resolverArgs.args.search);
+    const addedSearchRaw = sql_1.buildSQLQueryForModule(mod, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args), resolverArgs.args.search, resolverArgs.args.order_by);
     // if we filter by type
     if (resolverArgs.args.types) {
         queryModel.andWhere("type", resolverArgs.args.types);
@@ -121,15 +121,13 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
     const searchQuery = queryModel.clone();
     const limit = resolverArgs.args.limit;
     const offset = resolverArgs.args.offset;
-    searchQuery.select(fieldsToRequest).limit(limit).offset(offset);
+    searchQuery.select(fieldsToRequest);
+    addedSearchRaw.forEach((srApplyArgs) => {
+        searchQuery.select(appData.knex.raw(...srApplyArgs));
+    });
+    searchQuery.limit(limit).offset(offset);
     const countQuery = queryModel.clone().count();
-    // TODO add limits and offset
-    if (resolverArgs.args.order_by === "DEFAULT") {
-        searchQuery.orderBy("created_at", "DESC");
-    }
-    else {
-        // TODO
-    }
+    countQuery.clearOrder();
     // return using the base result, and only using the id
     const baseResult = (generalFields.results || generalFields.records) ?
         (await searchQuery).map(version_null_value_1.convertVersionsIntoNullsWhenNecessary) :
@@ -265,19 +263,17 @@ async function searchItemDefinition(appData, resolverArgs, itemDefinition, tradi
     // and now we call the function that builds the query itself into
     // that parent query, and adds the andWhere as required
     // into such query
-    sql_2.buildSQLQueryForItemDefinition(itemDefinition, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args), resolverArgs.args.search);
+    const addedSearchRaw = sql_2.buildSQLQueryForItemDefinition(itemDefinition, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args), resolverArgs.args.search, resolverArgs.args.order_by);
     const searchQuery = queryModel.clone();
     const limit = resolverArgs.args.limit;
     const offset = resolverArgs.args.offset;
-    searchQuery.select(fieldsToRequest).limit(limit).offset(offset);
-    // TODO only make count if count requested
+    searchQuery.select(fieldsToRequest);
+    addedSearchRaw.forEach((srApplyArgs) => {
+        searchQuery.select(appData.knex.raw(...srApplyArgs));
+    });
+    searchQuery.limit(limit).offset(offset);
     const countQuery = queryModel.clone().count();
-    if (resolverArgs.args.order_by === "DEFAULT") {
-        searchQuery.orderBy("created_at", "DESC");
-    }
-    else {
-        // TODO
-    }
+    countQuery.clearOrder();
     // return using the base result, and only using the id
     const baseResult = (generalFields.results || generalFields.records) ?
         (await searchQuery).map(version_null_value_1.convertVersionsIntoNullsWhenNecessary) :

@@ -15,7 +15,7 @@ import {
   RESERVED_GETTER_LIST_PROPERTIES,
   ENDPOINT_ERRORS,
   PREFIX_TRADITIONAL_SEARCH,
-  ORDERBY_RULE_DIRECTION,
+  ORDERBY_RULE,
 } from "../../../constants";
 import { GraphQLList, GraphQLObjectType, GraphQLInt, GraphQLNonNull, GraphQLInputObjectType } from "graphql";
 import Module from ".";
@@ -232,35 +232,12 @@ export function getGQLQueryFieldsForModule(
 
     const orderByRuleFields = {
       created_at: {
-        type: new GraphQLInputObjectType({
-          name: "ORDERBY_RULE__" + mod.getQualifiedPathName() + "_created_at",
-          fields: {
-            direction: {
-              type: GraphQLNonNull(ORDERBY_RULE_DIRECTION),
-            },
-            level: {
-              type: GraphQLNonNull(GraphQLInt),
-            }
-          },
-          description: "Order by the date of creation in any direction"
-        }),
+        type: ORDERBY_RULE,
       },
       edited_at: {
-        type: new GraphQLInputObjectType({
-          name: "ORDERBY_RULE__" + mod.getQualifiedPathName() + "_edited_at",
-          fields: {
-            direction: {
-              type: GraphQLNonNull(ORDERBY_RULE_DIRECTION),
-            },
-            level: {
-              type: GraphQLNonNull(GraphQLInt),
-            }
-          },
-          description: "Order by the time of edit in any direction"
-        }),
+        type: ORDERBY_RULE,
       },
     };
-
     mod.getAllPropExtensions().forEach((p) => {
       const description = p.getPropertyDefinitionDescription();
       if (!description.sqlOrderBy) {
@@ -268,18 +245,7 @@ export function getGQLQueryFieldsForModule(
       }
 
       orderByRuleFields[p.getId()] = {
-        type: new GraphQLObjectType({
-          name: "ORDERBY_RULE__" + mod.getQualifiedPathName() + "_" + p.getId(),
-          fields: {
-            direction: {
-              type: GraphQLNonNull(ORDERBY_RULE_DIRECTION),
-            },
-            level: {
-              type: GraphQLNonNull(GraphQLInt),
-            }
-          },
-          description: "Order by the property of " + p.getId() + " which is a extension, in any direction",
-        }),
+        type: ORDERBY_RULE,
       };
     });
 

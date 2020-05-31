@@ -62,6 +62,7 @@ const typeValue = {
         const fromName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
         const toName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.TO + id;
         const exactName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+        let searchedByIt = false;
         if (typeof args[exactName] !== "undefined" && args[exactName] !== null) {
             const exactArg = args[exactName];
             knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", exactArg.currency);
@@ -69,20 +70,40 @@ const typeValue = {
         }
         else if (args[exactName] === null) {
             knexBuilder.andWhere(sqlPrefix + id + "_VALUE", null);
+            searchedByIt = true;
         }
         if (typeof args[fromName] !== "undefined" && args[fromName] !== null) {
             const fromArg = args[fromName];
             knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", ">=", fromArg.normalized);
+            searchedByIt = true;
         }
         if (typeof args[toName] !== "undefined" && args[toName] !== null) {
             const toArg = args[toName];
             knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", toArg.normalized);
+            searchedByIt = true;
         }
+        return searchedByIt;
     },
     sqlStrSearch: null,
     localStrSearch: null,
-    sqlOrderBy: null,
-    localOrderBy: null,
+    sqlOrderBy: (sqlPrefix, id, direction, nulls) => {
+        return [sqlPrefix + id + "_NORMALIZED_VALUE", direction, nulls];
+    },
+    localOrderBy: (direction, nulls, a, b) => {
+        if (a === null && b === null) {
+            return 0;
+        }
+        else if (a === null) {
+            return nulls === "last" ? 1 : -1;
+        }
+        else if (b === null) {
+            return nulls === "last" ? -1 : 1;
+        }
+        if (direction === "desc") {
+            return b.normalized - a.normalized;
+        }
+        return a.normalized - b.normalized;
+    },
     sqlBtreeIndexable: (sqlPrefix, id) => {
         return [sqlPrefix + id + "_CURRENCY", sqlPrefix + id + "_NORMALIZED_VALUE"];
     },

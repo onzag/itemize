@@ -34,7 +34,7 @@ export class CurrencyLayer {
         CACHED_CURRENCY_LAYER_RESPONSE,
         (err, cachedData) => {
           const parsedCachedData: CurrencyLayerResponse = cachedData && !err && JSON.parse(cachedData);
-          if (!parsedCachedData || (new Date()).getTime() - parsedCachedData.timestamp <= 86400000) {
+          if (!parsedCachedData || (new Date()).getTime() - (parsedCachedData.timestamp * 1000) >= 86400000) {
             logger.info("CurrencyLayer.requestInfo: requesting fresh info");
             (this.httpsEnabled ? https : http).get(`http://api.currencylayer.com/live?access_key=${this.apiKey}`, (resp) => {
               // let's get the response from the stream

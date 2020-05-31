@@ -13,6 +13,7 @@ import {
   standardSQLEqualFn,
   getStandardSQLFnFor,
   standardSQLBtreeIndexable,
+  standardSQLOrderBy,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
@@ -53,8 +54,25 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlStrSearch: null,
   localStrSearch: null,
   sqlMantenience: null,
-  sqlOrderBy: null,
-  localOrderBy: null,
+  sqlOrderBy: standardSQLOrderBy,
+  localOrderBy: (
+    direction: "asc" | "desc",
+    nulls: "first" | "last",
+    a: PropertyDefinitionSupportedYearType,
+    b: PropertyDefinitionSupportedYearType,
+  ) => {
+    if (a === null && b === null) {
+      return 0;
+    } else if (a === null) {
+      return nulls === "last" ? 1 : -1;
+    } else if (b === null) {
+      return nulls === "last" ? -1 : 1;
+    }
+    if (direction === "desc") {
+      return b - a;
+    }
+    return a - b;
+  },
 
   localSearch: standardLocalSearchExactAndRange,
   localEqual: standardLocalEqual,

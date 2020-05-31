@@ -79,7 +79,7 @@ export declare function processModule(rawData: IModuleRawJSONDataType, locale?: 
     modRoleAccess?: string[];
     flagRoleAccess?: string[];
     searchable?: boolean;
-    children: (IModuleRawJSONDataType | IItemDefinitionRawJSONDataType)[];
+    children: (IItemDefinitionRawJSONDataType | IModuleRawJSONDataType)[];
     propExtensions?: IPropertyDefinitionRawJSONDataType[];
     maxSearchResults?: number;
     maxSearchRecords?: number;

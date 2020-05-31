@@ -180,12 +180,13 @@ export async function searchModule(
   }
 
   // now we build the sql query for the module
-  buildSQLQueryForModule(
+  const addedSearchRaw = buildSQLQueryForModule(
     mod,
     resolverArgs.args,
     queryModel,
     getDictionary(appData, resolverArgs.args),
     resolverArgs.args.search,
+    resolverArgs.args.order_by,
   );
 
   // if we filter by type
@@ -196,16 +197,15 @@ export async function searchModule(
   const searchQuery = queryModel.clone();
   const limit: number = resolverArgs.args.limit;
   const offset: number = resolverArgs.args.offset;
-  searchQuery.select(fieldsToRequest).limit(limit).offset(offset);
+
+  searchQuery.select(fieldsToRequest);
+  addedSearchRaw.forEach((srApplyArgs) => {
+    searchQuery.select(appData.knex.raw(...srApplyArgs));
+  });
+  searchQuery.limit(limit).offset(offset);
+
   const countQuery = queryModel.clone().count();
-
-  // TODO add limits and offset
-
-  if (resolverArgs.args.order_by === "DEFAULT") {
-    searchQuery.orderBy("created_at", "DESC");
-  } else {
-    // TODO
-  }
+  countQuery.clearOrder();
 
   // return using the base result, and only using the id
   const baseResult: ISQLTableRowValue[] = (generalFields.results || generalFields.records) ?
@@ -410,26 +410,26 @@ export async function searchItemDefinition(
   // and now we call the function that builds the query itself into
   // that parent query, and adds the andWhere as required
   // into such query
-  buildSQLQueryForItemDefinition(
+  const addedSearchRaw = buildSQLQueryForItemDefinition(
     itemDefinition,
     resolverArgs.args,
     queryModel,
     getDictionary(appData, resolverArgs.args),
     resolverArgs.args.search,
+    resolverArgs.args.order_by,
   );
 
   const searchQuery = queryModel.clone();
   const limit: number = resolverArgs.args.limit;
   const offset: number = resolverArgs.args.offset;
-  searchQuery.select(fieldsToRequest).limit(limit).offset(offset);
-  // TODO only make count if count requested
-  const countQuery = queryModel.clone().count();
 
-  if (resolverArgs.args.order_by === "DEFAULT") {
-    searchQuery.orderBy("created_at", "DESC");
-  } else {
-    // TODO
-  }
+  searchQuery.select(fieldsToRequest);
+  addedSearchRaw.forEach((srApplyArgs) => {
+    searchQuery.select(appData.knex.raw(...srApplyArgs));
+  });
+  searchQuery.limit(limit).offset(offset);
+  const countQuery = queryModel.clone().count();
+  countQuery.clearOrder();
 
   // return using the base result, and only using the id
   const baseResult: ISQLTableRowValue[] = (generalFields.results || generalFields.records) ?

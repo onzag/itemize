@@ -230,7 +230,7 @@ export function buildSQLQueryForInclude(
           if (!pd.isSearchable()) {
             return;
           }
-          buildSQLQueryForProperty(pd, itemArgs, prefix, secondBuilder, dictionary);
+          buildSQLQueryForProperty(pd, itemArgs, prefix, secondBuilder, dictionary, false);
         });
       });
 

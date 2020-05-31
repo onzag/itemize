@@ -5,6 +5,7 @@
  *
  * @packageDocumentation
  */
+import { IOrderByRuleType } from "../../../constants";
 import Module from ".";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue } from "../sql";
 import Knex from "knex";
@@ -66,4 +67,4 @@ export declare function convertSQLValueToGQLValueForModule(mod: Module, row: ISQ
  * @param knexBuilder the knex builder
  * @param dictionary the dictionary used
  */
-export declare function buildSQLQueryForModule(mod: Module, args: IGQLArgs, knexBuilder: Knex.QueryBuilder, dictionary: string, search: string): void;
+export declare function buildSQLQueryForModule(mod: Module, args: IGQLArgs, knexBuilder: Knex.QueryBuilder, dictionary: string, search: string, orderBy: IOrderByRuleType): [string, any[]][];

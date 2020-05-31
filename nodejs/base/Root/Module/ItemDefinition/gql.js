@@ -279,32 +279,10 @@ function getGQLQueryFieldsForItemDefinition(itemDefinition, resolvers) {
         });
         const orderByRuleFields = {
             created_at: {
-                type: new graphql_1.GraphQLInputObjectType({
-                    name: "ORDERBY_RULE__" + itemDefinition.getQualifiedPathName() + "_created_at",
-                    fields: {
-                        direction: {
-                            type: graphql_1.GraphQLNonNull(constants_1.ORDERBY_RULE_DIRECTION),
-                        },
-                        level: {
-                            type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
-                        }
-                    },
-                    description: "Order by the date of creation in any direction"
-                }),
+                type: constants_1.ORDERBY_RULE,
             },
             edited_at: {
-                type: new graphql_1.GraphQLInputObjectType({
-                    name: "ORDERBY_RULE__" + itemDefinition.getQualifiedPathName() + "_edited_at",
-                    fields: {
-                        direction: {
-                            type: graphql_1.GraphQLNonNull(constants_1.ORDERBY_RULE_DIRECTION),
-                        },
-                        level: {
-                            type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
-                        }
-                    },
-                    description: "Order by the time of edit in any direction"
-                }),
+                type: constants_1.ORDERBY_RULE,
             },
         };
         itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((p) => {
@@ -316,18 +294,7 @@ function getGQLQueryFieldsForItemDefinition(itemDefinition, resolvers) {
                 return;
             }
             orderByRuleFields[p.getId()] = {
-                type: new graphql_1.GraphQLInputObjectType({
-                    name: "ORDERBY_RULE__" + itemDefinition.getQualifiedPathName() + "_" + p.getId(),
-                    fields: {
-                        direction: {
-                            type: graphql_1.GraphQLNonNull(constants_1.ORDERBY_RULE_DIRECTION),
-                        },
-                        level: {
-                            type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
-                        }
-                    },
-                    description: "Order by the property of " + p.getId() + " which is a extension, in any direction",
-                }),
+                type: constants_1.ORDERBY_RULE,
             };
         });
         const orderByRule = new graphql_1.GraphQLInputObjectType({

@@ -214,24 +214,71 @@ exports.convertSQLValueToGQLValueForModule = convertSQLValueToGQLValueForModule;
  * @param knexBuilder the knex builder
  * @param dictionary the dictionary used
  */
-function buildSQLQueryForModule(mod, args, knexBuilder, dictionary, search) {
+function buildSQLQueryForModule(mod, args, knexBuilder, dictionary, search, orderBy) {
+    const includedInSearchProperties = [];
+    const includedInStrSearchProperties = [];
+    const addedSelectFields = [];
     mod.getAllPropExtensions().forEach((pd) => {
         if (!pd.isSearchable()) {
             return;
         }
-        sql_1.buildSQLQueryForProperty(pd, args, "", knexBuilder, dictionary);
+        const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
+        const wasSearchedBy = sql_1.buildSQLQueryForProperty(pd, args, "", knexBuilder, dictionary, isOrderedByIt);
+        if (wasSearchedBy) {
+            if (Array.isArray(wasSearchedBy)) {
+                addedSelectFields.push(wasSearchedBy);
+            }
+            includedInSearchProperties.push(pd.getId());
+        }
+        ;
     });
     if (search) {
+        mod.getAllPropExtensions().forEach((pd) => {
+            if (!pd.isSearchable()) {
+                return;
+            }
+            const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
+            const wasStrSearchedBy = sql_1.buildSQLStrSearchQueryForProperty(pd, args, search, "", null, dictionary, isOrderedByIt);
+            if (wasStrSearchedBy) {
+                if (Array.isArray(wasStrSearchedBy)) {
+                    addedSelectFields.push(wasStrSearchedBy);
+                }
+                includedInStrSearchProperties.push(pd.getId());
+            }
+            ;
+        });
         knexBuilder.andWhere((builder) => {
             mod.getAllPropExtensions().forEach((pd) => {
                 if (!pd.isSearchable()) {
                     return;
                 }
+                const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
                 builder.orWhere((orBuilder) => {
-                    sql_1.buildSQLStrSearchQueryForProperty(pd, args, search, "", orBuilder, dictionary);
+                    sql_1.buildSQLStrSearchQueryForProperty(pd, args, search, "", orBuilder, dictionary, isOrderedByIt);
                 });
             });
         });
     }
+    if (orderBy) {
+        const orderBySorted = Object.keys(orderBy).map((orderByProperty) => {
+            return {
+                property: orderByProperty,
+                priority: orderBy[orderByProperty].priority,
+                nulls: orderBy[orderByProperty].nulls,
+                direction: orderBy[orderByProperty].direction,
+            };
+        }).sort((a, b) => a.priority - b.priority);
+        orderBySorted.forEach((pSet) => {
+            if (!mod.hasPropExtensionFor(pSet.property)) {
+                sql_1.buildSQLOrderByForInternalRequiredProperty(pSet.property, knexBuilder, pSet.direction, pSet.nulls);
+                return;
+            }
+            const pd = mod.getPropExtensionFor(pSet.property);
+            const wasIncludedInSearch = includedInSearchProperties.includes(pSet.property);
+            const wasIncludedInStrSearch = includedInStrSearchProperties.includes(pSet.property);
+            sql_1.buildSQLOrderByForProperty(pd, "", knexBuilder, pSet.direction, pSet.nulls, wasIncludedInSearch, wasIncludedInStrSearch);
+        });
+    }
+    return addedSelectFields;
 }
 exports.buildSQLQueryForModule = buildSQLQueryForModule;

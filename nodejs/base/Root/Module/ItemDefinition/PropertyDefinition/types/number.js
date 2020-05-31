@@ -29,8 +29,22 @@ const typeValue = {
     sqlMantenience: null,
     sqlStrSearch: null,
     localStrSearch: null,
-    sqlOrderBy: null,
-    localOrderBy: null,
+    sqlOrderBy: sql_1.standardSQLOrderBy,
+    localOrderBy: (direction, nulls, a, b) => {
+        if (a === null && b === null) {
+            return 0;
+        }
+        else if (a === null) {
+            return nulls === "last" ? 1 : -1;
+        }
+        else if (b === null) {
+            return nulls === "last" ? -1 : 1;
+        }
+        if (direction === "desc") {
+            return b - a;
+        }
+        return a - b;
+    },
     localSearch: local_search_1.standardLocalSearchExactAndRange,
     localEqual: local_sql_1.standardLocalEqual,
     // the validator

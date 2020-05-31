@@ -106,6 +106,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
     const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
     const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+    let searchedByIt = false;
 
     if (typeof data[exactName] !== "undefined" && data[exactName] !== null) {
       const exactAsUnit: IPropertyDefinitionSupportedUnitType = data[exactName] as any;
@@ -113,24 +114,53 @@ const typeValue: IPropertyDefinitionSupportedType = {
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", exactAsUnit.normalizedValue);
     } else if (data[exactName] === null) {
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", null);
+      searchedByIt = true;
     }
 
     if (typeof data[fromName] !== "undefined" && data[fromName] !== null) {
       const fromAsUnit: IPropertyDefinitionSupportedUnitType = data[fromName] as any;
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", fromAsUnit.normalizedUnit);
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", ">=", fromAsUnit.normalizedValue);
+      searchedByIt = true;
     }
 
     if (typeof data[toName] !== "undefined" && data[toName] !== null) {
       const toAsUnit: IPropertyDefinitionSupportedUnitType = data[toName] as any;
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", toAsUnit.normalizedUnit);
       knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", toAsUnit.normalizedValue);
+      searchedByIt = true;
     }
+
+    return searchedByIt;
   },
   sqlStrSearch: null,
   localStrSearch: null,
-  sqlOrderBy: null,
-  localOrderBy: null,
+  sqlOrderBy: (
+    sqlPrefix: string,
+    id: string,
+    direction: "asc" | "desc",
+    nulls: "first" | "last",
+  ) => {
+    return [sqlPrefix + id + "_NORMALIZED_VALUE", direction, nulls];
+  },
+  localOrderBy: (
+    direction: "asc" | "desc",
+    nulls: "first" | "last",
+    a: IPropertyDefinitionSupportedUnitType,
+    b: IPropertyDefinitionSupportedUnitType,
+  ) => {
+    if (a === null && b === null) {
+      return 0;
+    } else if (a === null) {
+      return nulls === "last" ? 1 : -1;
+    } else if (b === null) {
+      return nulls === "last" ? -1 : 1;
+    }
+    if (direction === "desc") {
+      return b.normalizedValue - a.normalizedValue;
+    }
+    return a.normalizedValue - b.normalizedValue;
+  },
   localSearch: (
     args: IGQLArgs,
     rawData: IGQLValue,

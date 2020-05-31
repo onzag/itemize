@@ -135,6 +135,9 @@ export interface IPropertyDefinitionSupportedType {
    * id is the id of the property
    * knexBuilder is the builder that is being used so it can attach the where queries to it
    * and dictionary is the postgres dictionary that can be used for sql searches
+   * return a boolean on whether it searched by it or it didn't
+   * you might also return an array instead of true for adding custom rows to be added
+   * to the selection, these represent arguments for knex.raw for a select query
    */
   sqlSearch: (
     args: IGQLArgs,
@@ -143,10 +146,14 @@ export interface IPropertyDefinitionSupportedType {
     knexBuilder: Knex.QueryBuilder,
     dictionary: string,
     isOrderedByIt: boolean,
-  ) => void;
+  ) => boolean | [string, any[]];
   /**
    * Represents a search for an item when the only input has been a string, make it null
    * to avoid supporting it
+   * note that the knexBuilder can be null in this case, because of technical limitations
+   * with knex as it only executes subqueries within the subquery and we need to know
+   * the select query beforehand
+   * return a boolean on whether it searched by it or it didn't
    */
   sqlStrSearch: (
     search: string,
@@ -155,7 +162,7 @@ export interface IPropertyDefinitionSupportedType {
     knexBuilder: Knex.QueryBuilder,
     dictionary: string,
     isOrderedByIt: boolean,
-  ) => void;
+  ) => boolean | [string, any[]];
   /**
    * Provides the rows that are expected to be indexed and in the order that they are expected
    * when an index is added via a request limiter in the module
@@ -227,11 +234,11 @@ export interface IPropertyDefinitionSupportedType {
   sqlOrderBy: (
     sqlPrefix: string,
     id: string,
-    knex: Knex,
     direction: "asc" | "desc",
+    nulls: "first" | "last",
     wasIncludedInSearch: boolean,
     wasIncludedInStrSearch: boolean,
-  ) => [string, string] | any,
+  ) => [string, string, string],
   /**
    * The local order by function that tells a client how to order by it
    * basically this is fed to a sort function the same way sorting would
@@ -240,6 +247,7 @@ export interface IPropertyDefinitionSupportedType {
    */
   localOrderBy: (
     direction: "asc" | "desc",
+    nulls: "first" | "last",
     a: PropertyDefinitionSupportedType,
     b: PropertyDefinitionSupportedType,
   ) => number,

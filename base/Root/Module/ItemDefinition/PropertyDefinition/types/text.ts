@@ -117,7 +117,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     };
   },
   sqlOut: standardSQLOutFn,
-  sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any, dictionary: string) => {
+  sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder: any, dictionary: string, isOrderedbyIt: boolean) => {
     const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + id;
 
     if (typeof data[searchName] !== "undefined" && data[searchName] !== null) {
@@ -130,11 +130,30 @@ const typeValue: IPropertyDefinitionSupportedType = {
           data[searchName],
         ],
       );
+
+      if (isOrderedbyIt) {
+        return [
+          "ts_rank(??, to_tsquery(??, ?)) AS ??",
+          [
+            sqlPrefix + id + "_VECTOR",
+            sqlPrefix + id + "_DICTIONARY",
+            data[searchName],
+            sqlPrefix + id + "_RANK",
+          ]
+        ];
+      }
+
+      return true;
     }
+
+    return false;
   },
-  sqlStrSearch: (search: string, sqlPrefix: string, id: string, knexBuilder: any, dictionary: string) => {
+  sqlStrSearch: (search: string, sqlPrefix: string, id: string, knexBuilder: any, dictionary: string, isOrderedbyIt: boolean) => {
     // TODO improve, this only matches exact words
-    knexBuilder.whereRaw(
+
+    // due to technical limitations with knex, sometimes the builder
+    // isn't available
+    knexBuilder && knexBuilder.whereRaw(
       "?? @@ to_tsquery(??, ?)",
       [
         sqlPrefix + id + "_VECTOR",
@@ -142,6 +161,20 @@ const typeValue: IPropertyDefinitionSupportedType = {
         search,
       ],
     );
+
+    if (isOrderedbyIt) {
+      return [
+        "ts_rank(??, to_tsquery(??, ?)) AS ??",
+        [
+          sqlPrefix + id + "_VECTOR",
+          sqlPrefix + id + "_DICTIONARY",
+          search,
+          sqlPrefix + id + "_STRRANK",
+        ]
+      ];
+    }
+
+    return true;
   },
   sqlBtreeIndexable: () => null,
   sqlMantenience: null,
@@ -166,6 +199,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
     if (typeof usefulArgs[searchName] !== "undefined" && usefulArgs[searchName] !== null) {
       const searchMatch = usefulArgs[searchName];
       const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+
+      if (propertyValue === null) {
+        return false;
+      }
 
       // TODO improve, this is kinda trash FTS
       return propertyValue.includes(searchMatch);
@@ -200,8 +237,25 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlEqual: standardSQLEqualFn,
   sqlSSCacheEqual: standardSQLSSCacheEqualFn,
   localEqual: standardLocalEqual,
-  sqlOrderBy: null,
-  localOrderBy: null,
+  sqlOrderBy: (
+    sqlPrefix: string,
+    id: string,
+    direction: "asc" | "desc",
+    nulls: "first" | "last",
+    wasIncludedInSearch: boolean,
+    wasIncludedInStrSearch: boolean,
+  ) => {
+    if (wasIncludedInSearch) {
+      return [sqlPrefix + id + "_RANK", direction, nulls];
+    } else if (wasIncludedInStrSearch) {
+      return [sqlPrefix + id + "_STRRANK", direction, nulls];
+    }
+    return null;
+  },
+  localOrderBy: () => {
+    // can't sort due to ranking limitations
+    return 0;
+  },
 
   // validates the text, texts don't support json value
   validate: (s: PropertyDefinitionSupportedTextType, subtype?: string) => {

@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES, COMBINED_INDEX } from "../../../constants";
+import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES, COMBINED_INDEX, IOrderByRuleType } from "../../../constants";
 import Module from ".";
 import {
   getSQLTableDefinitionForProperty,
@@ -14,10 +14,12 @@ import {
   convertSQLValueToGQLValueForProperty,
   buildSQLQueryForProperty,
   buildSQLStrSearchQueryForProperty,
+  buildSQLOrderByForProperty,
+  buildSQLOrderByForInternalRequiredProperty,
 } from "./ItemDefinition/PropertyDefinition/sql";
 import { getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../sql";
-import Knex from "knex";
+import Knex, { QueryBuilder } from "knex";
 import ItemDefinition from "./ItemDefinition";
 import { IGQLRequestFields, IGQLValue, IGQLArgs } from "../../../gql-querier";
 import pkgcloud from "pkgcloud";
@@ -274,25 +276,91 @@ export function buildSQLQueryForModule(
   knexBuilder: Knex.QueryBuilder,
   dictionary: string,
   search: string,
+  orderBy: IOrderByRuleType,
 ) {
+  const includedInSearchProperties: string[] = [];
+  const includedInStrSearchProperties: string[] = [];
+  const addedSelectFields: Array<[string, any[]]> = [];
+
   mod.getAllPropExtensions().forEach((pd) => {
     if (!pd.isSearchable()) {
       return;
     }
 
-    buildSQLQueryForProperty(pd, args, "", knexBuilder, dictionary);
+    const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
+    const wasSearchedBy = buildSQLQueryForProperty(pd, args, "", knexBuilder, dictionary, isOrderedByIt);
+    if (wasSearchedBy) {
+      if (Array.isArray(wasSearchedBy)) {
+        addedSelectFields.push(wasSearchedBy);
+      }
+      includedInSearchProperties.push(pd.getId());
+    };
   });
 
   if (search) {
+    mod.getAllPropExtensions().forEach((pd) => {
+      if (!pd.isSearchable()) {
+        return;
+      }
+
+      const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
+      const wasStrSearchedBy = buildSQLStrSearchQueryForProperty(pd, args, search, "", null, dictionary, isOrderedByIt);
+      if (wasStrSearchedBy) {
+        if (Array.isArray(wasStrSearchedBy)) {
+          addedSelectFields.push(wasStrSearchedBy);
+        }
+        includedInStrSearchProperties.push(pd.getId());
+      };
+    });
     knexBuilder.andWhere((builder) => {
       mod.getAllPropExtensions().forEach((pd) => {
         if (!pd.isSearchable()) {
           return;
         }
+        const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
         builder.orWhere((orBuilder) => {
-          buildSQLStrSearchQueryForProperty(pd, args, search, "", orBuilder, dictionary);
+          buildSQLStrSearchQueryForProperty(pd, args, search, "", orBuilder, dictionary, isOrderedByIt);
         });
       });
     });
   }
+
+  if (orderBy) {
+    const orderBySorted = Object.keys(orderBy).map((orderByProperty: string) => {
+      return {
+        property: orderByProperty,
+        priority: orderBy[orderByProperty].priority,
+        nulls: orderBy[orderByProperty].nulls,
+        direction: orderBy[orderByProperty].direction,
+      }
+    }).sort((a, b) => a.priority - b.priority);
+
+    orderBySorted.forEach((pSet) => {
+      if (!mod.hasPropExtensionFor(pSet.property)) {
+        buildSQLOrderByForInternalRequiredProperty(
+          pSet.property,
+          knexBuilder,
+          pSet.direction,
+          pSet.nulls,
+        );
+        return;
+      }
+
+      const pd = mod.getPropExtensionFor(pSet.property);
+      const wasIncludedInSearch = includedInSearchProperties.includes(pSet.property);
+      const wasIncludedInStrSearch = includedInStrSearchProperties.includes(pSet.property);
+
+      buildSQLOrderByForProperty(
+        pd,
+        "",
+        knexBuilder,
+        pSet.direction,
+        pSet.nulls,
+        wasIncludedInSearch,
+        wasIncludedInStrSearch,
+      );
+    });
+  }
+
+  return addedSelectFields;
 }

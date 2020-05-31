@@ -175,7 +175,7 @@ function buildSQLQueryForInclude(include, args, knexBuilder, dictionary) {
                     if (!pd.isSearchable()) {
                         return;
                     }
-                    sql_1.buildSQLQueryForProperty(pd, itemArgs, prefix, secondBuilder, dictionary);
+                    sql_1.buildSQLQueryForProperty(pd, itemArgs, prefix, secondBuilder, dictionary, false);
                 });
             });
             // if we have an specific exclusion state that can be ANY

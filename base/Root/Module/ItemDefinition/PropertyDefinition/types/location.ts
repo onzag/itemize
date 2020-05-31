@@ -154,7 +154,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
     return result;
   },
-  sqlSearch: (args: IGQLArgs, sqlPrefix: string, id: string, knexBuilder) => {
+  sqlSearch: (args: IGQLArgs, sqlPrefix: string, id: string, knexBuilder: any, dictionary: string, isOrderedByIt: boolean) => {
     const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + id;
     const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + id;
 
@@ -178,12 +178,39 @@ const typeValue: IPropertyDefinitionSupportedType = {
           distance,
         ],
       );
+      
+      if (isOrderedByIt) {
+        return [
+          "ST_Distance(??, ST_MakePoint(?,?)::geography) AS ??",
+          [
+            sqlPrefix + id,
+            lng,
+            lat,
+            sqlPrefix + id + "_CALC_RADIUS",
+          ],
+        ]
+      }
+
+      return true;
     }
+
+    return false;
   },
   sqlStrSearch: null,
   localStrSearch: null,
   sqlMantenience: null,
-  sqlOrderBy: null,
+  sqlOrderBy: (
+    sqlPrefix: string,
+    id: string,
+    direction: "asc" | "desc",
+    nulls: "first" | "last",
+    wasIncludedInSearch: boolean,
+  ) => {
+    if (wasIncludedInSearch) {
+      return [sqlPrefix + id + "_CALC_RADIUS", direction, nulls];
+    }
+    return null;
+  },
   localOrderBy: null,
   localSearch: (
     args: IGQLArgs,

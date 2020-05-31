@@ -20,6 +20,7 @@ import pkgcloud from "pkgcloud";
  * @returns a function that returns the partial table definition object with the given type
  */
 export declare function getStandardSQLFnFor(type: string, ext?: string, indexCalculator?: (subtype: string, sqlPrefix: string, id: string) => ISQLTableIndexType): (sqlPrefix: string, id: string, property: PropertyDefinition) => ISQLTableDefinitionType;
+export declare function standardSQLOrderBy(sqlPrefix: string, id: string, direction: "asc" | "desc", nulls: "first" | "last"): [string, string, string];
 /**
  * The standard sql in function that specifies how a property inputs its value
  * into a table
@@ -63,7 +64,7 @@ export declare function standardSQLOutWithJSONParseFn(row: ISQLTableRowValue, sq
  * @param id the id of the property
  * @param knexBuilder the query that is being stiched together
  */
-export declare function standardSQLSearchFnExactAndRange(args: IGQLArgs, sqlPrefix: string, id: string, knexBuilder: Knex.QueryBuilder): void;
+export declare function standardSQLSearchFnExactAndRange(args: IGQLArgs, sqlPrefix: string, id: string, knexBuilder: Knex.QueryBuilder): boolean;
 /**
  * The standard function that perfoms equality checks within the database
  * @param value the value of the property
@@ -120,5 +121,7 @@ export declare function convertGQLValueToSQLValueForProperty(itemDefinition: Ite
  * @param sqlPrefix a sql prefix to append say if we refer to an item
  * @param knexBuilder the knex building instance
  */
-export declare function buildSQLQueryForProperty(propertyDefinition: PropertyDefinition, args: IGQLArgs, sqlPrefix: string, knexBuilder: Knex.QueryBuilder, dictionary: string): void;
-export declare function buildSQLStrSearchQueryForProperty(propertyDefinition: PropertyDefinition, args: IGQLArgs, search: string, sqlPrefix: string, knexBuilder: Knex.QueryBuilder, dictionary: string): void;
+export declare function buildSQLQueryForProperty(propertyDefinition: PropertyDefinition, args: IGQLArgs, sqlPrefix: string, knexBuilder: Knex.QueryBuilder, dictionary: string, isOrderedByIt: boolean): boolean | [string, any[]];
+export declare function buildSQLStrSearchQueryForProperty(propertyDefinition: PropertyDefinition, args: IGQLArgs, search: string, sqlPrefix: string, knexBuilder: Knex.QueryBuilder, dictionary: string, isOrderedByIt: boolean): boolean | [string, any[]];
+export declare function buildSQLOrderByForProperty(propertyDefinition: PropertyDefinition, sqlPrefix: string, knexBuilder: Knex.QueryBuilder, direction: "asc" | "desc", nulls: "first" | "last", wasIncludedInSearch: boolean, wasIncludedInStrSearch: boolean): void;
+export declare function buildSQLOrderByForInternalRequiredProperty(which: string, knexBuilder: Knex.QueryBuilder, direction: "asc" | "desc", nulls: "first" | "last"): void;

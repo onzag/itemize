@@ -33,8 +33,27 @@ const typeValue = {
     sqlMantenience: null,
     sqlStrSearch: null,
     localStrSearch: null,
-    sqlOrderBy: null,
-    localOrderBy: null,
+    sqlOrderBy: sql_1.standardSQLOrderBy,
+    localOrderBy: (direction, nulls, a, b) => {
+        if (a === null && b === null) {
+            return 0;
+        }
+        else if (a === null) {
+            return nulls === "last" ? 1 : -1;
+        }
+        else if (b === null) {
+            return nulls === "last" ? -1 : 1;
+        }
+        else if (a === b) {
+            return 0;
+        }
+        const dateA = (new Date(a)).getTime();
+        const dateB = (new Date(b)).getTime();
+        if (direction === "desc") {
+            return dateB - dateA;
+        }
+        return dateA - dateB;
+    },
     localSearch: local_search_1.dateLocalSearchExactAndRange.bind(null, constants_1.DATE_FORMAT),
     localEqual: local_sql_1.standardLocalEqual,
     validate: (d) => {

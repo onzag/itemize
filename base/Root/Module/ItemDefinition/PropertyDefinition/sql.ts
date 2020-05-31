@@ -48,6 +48,15 @@ export function getStandardSQLFnFor(type: string, ext: string = null, indexCalcu
   };
 }
 
+export function standardSQLOrderBy(
+  sqlPrefix: string,
+  id: string,
+  direction: "asc" | "desc",
+  nulls: "first" | "last",
+) {
+  return [sqlPrefix + id, direction, nulls] as [string, string, string];
+}
+
 /**
  * The standard sql in function that specifies how a property inputs its value
  * into a table
@@ -146,18 +155,24 @@ export function standardSQLSearchFnExactAndRange(
   const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
   const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
   const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+  let searchedByIt: boolean = false;
 
   if (typeof args[exactName] !== "undefined") {
     knexBuilder.andWhere(sqlPrefix + id, args[exactName] as string);
+    searchedByIt = true;
   }
 
   if (typeof args[fromName] !== "undefined" && args[fromName] !== null) {
     knexBuilder.andWhere(sqlPrefix + id, ">=", args[fromName] as string);
+    searchedByIt = true;
   }
 
   if (typeof args[toName] !== "undefined" && args[toName] !== null) {
     knexBuilder.andWhere(sqlPrefix + id, "<=", args[toName] as string);
+    searchedByIt = true;
   }
+
+  return searchedByIt;
 }
 
 /**
@@ -404,15 +419,16 @@ export function buildSQLQueryForProperty(
   sqlPrefix: string,
   knexBuilder: Knex.QueryBuilder,
   dictionary: string,
+  isOrderedByIt: boolean,
 ) {
   const sqlSearchFn = propertyDefinition.getPropertyDefinitionDescription().sqlSearch;
-  sqlSearchFn(
+  return sqlSearchFn(
     args,
     sqlPrefix,
     propertyDefinition.getId(),
     knexBuilder,
     dictionary,
-    args.order_by && args.order_by[sqlPrefix + propertyDefinition.getId()],
+    isOrderedByIt,
   );
 }
 
@@ -423,16 +439,79 @@ export function buildSQLStrSearchQueryForProperty(
   sqlPrefix: string,
   knexBuilder: Knex.QueryBuilder,
   dictionary: string,
+  isOrderedByIt: boolean,
 ) {
   const sqlStrSearchFn = propertyDefinition.getPropertyDefinitionDescription().sqlStrSearch;
   if (sqlStrSearchFn) {
-    sqlStrSearchFn(
+    return sqlStrSearchFn(
       search,
       sqlPrefix,
       propertyDefinition.getId(),
       knexBuilder,
       dictionary,
-      args.order_by && args.order_by[sqlPrefix + propertyDefinition.getId()],
+      isOrderedByIt,
+    );
+  }
+
+  return false;
+}
+
+// Just in case to avoid sql injection
+// if for some reason the gql security is taken
+const actualDirection = {
+  "asc": "ASC",
+  "desc": "DESC",
+}
+const actualNulls = {
+  "first": "FIRST",
+  "last": "LAST",
+}
+export function buildSQLOrderByForProperty(
+  propertyDefinition: PropertyDefinition,
+  sqlPrefix: string,
+  knexBuilder: Knex.QueryBuilder,
+  direction: "asc" | "desc",
+  nulls: "first" | "last",
+  wasIncludedInSearch: boolean,
+  wasIncludedInStrSearch: boolean,
+) {
+  const sqlOrderByFn = propertyDefinition.getPropertyDefinitionDescription().sqlOrderBy;
+  if (sqlOrderByFn) {
+    const result = sqlOrderByFn(
+      sqlPrefix,
+      propertyDefinition.getId(),
+      direction,
+      nulls,
+      wasIncludedInSearch,
+      wasIncludedInStrSearch,
+    );
+
+    if (result) {
+      knexBuilder.orderByRaw(
+        `?? ${actualDirection[result[1].toLowerCase()] || "ASC"} NULLS ${actualNulls[result[2].toLowerCase()] || "LAST"}`,
+        [result[0]]
+      );
+    }
+  }
+}
+
+export function buildSQLOrderByForInternalRequiredProperty(
+  which: string,
+  knexBuilder: Knex.QueryBuilder,
+  direction: "asc" | "desc",
+  nulls: "first" | "last",
+) {
+  const result = standardSQLOrderBy(
+    "",
+    which,
+    direction,
+    nulls,
+  );
+
+  if (result) {
+    knexBuilder.orderByRaw(
+      `?? ${actualDirection[result[1].toLowerCase()] || "ASC"} NULLS ${actualNulls[result[2].toLowerCase()] || "LAST"}`,
+      [result[0]]
     );
   }
 }
