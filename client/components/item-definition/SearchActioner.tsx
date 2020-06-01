@@ -15,7 +15,7 @@ export interface ISearchActionerInfoArgType {
   dismissSearchResults: () => void;
   dismissSearchError: () => void;
   searching: boolean;
-  searchResults: IGQLSearchRecord[];
+  searchRecords: IGQLSearchRecord[];
   search: (options?: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
   clean: (options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean) => void;
 }
@@ -29,7 +29,7 @@ interface IActualSearchActionerProps extends ISearchActionerProps {
 }
 
 class ActualSearchActioner extends React.Component<IActualSearchActionerProps, {}> {
-  public shouldComponentUpdate(nextProps) {
+  public shouldComponentUpdate(nextProps: IActualSearchActionerProps) {
     return nextProps.children !== this.props.children ||
       nextProps.itemDefinitionContext.searchError !== this.props.itemDefinitionContext.searchError ||
       nextProps.itemDefinitionContext.searching !== this.props.itemDefinitionContext.searching ||
@@ -39,7 +39,7 @@ class ActualSearchActioner extends React.Component<IActualSearchActionerProps, {
     return this.props.children({
       searchError: this.props.itemDefinitionContext.searchError,
       searching: this.props.itemDefinitionContext.searching,
-      searchResults: this.props.itemDefinitionContext.searchResults,
+      searchRecords: this.props.itemDefinitionContext.searchRecords,
       search: this.props.itemDefinitionContext.search,
       clean: this.props.itemDefinitionContext.clean,
       dismissSearchResults: this.props.itemDefinitionContext.dismissSearchResults,

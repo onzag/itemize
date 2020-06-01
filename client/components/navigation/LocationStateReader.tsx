@@ -1,5 +1,5 @@
 import React from "react";
-import { LocationStateContext } from "../../internal/providers/token-provider";
+import { LocationStateContext } from "../../internal/providers/location-context";
 import { setHistoryQSState, setHistoryState } from ".";
 import { Location } from "history";
 

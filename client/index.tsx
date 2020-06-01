@@ -7,7 +7,7 @@ import Moment from "moment";
 import { createBrowserHistory } from "history";
 import { IRendererContext, RendererContext } from "./providers/renderer";
 import { ISSRContextType, SSRProvider } from "./internal/providers/ssr-provider";
-import { IConfigRawJSONDataType } from "../nodejs/config";
+import { IConfigRawJSONDataType } from "../config";
 import Root from "../base/Root";
 import CacheWorkerInstance from "./internal/workers/cache";
 import { ConfigProvider } from "./internal/providers/config-provider";
@@ -302,6 +302,16 @@ export async function initializeItemizeApp(
     if (serverMode) {
       // needs to be wrapped in the router itself
       return actualApp;
+    }
+
+    if (ssrContext) {
+      ReactDOM.hydrate(
+        <Router history={history}>
+          {actualApp}
+        </Router>,
+        document.getElementById("app"),
+      );
+      return;
     }
 
     // finally we render the react thing

@@ -1,7 +1,7 @@
 import React from "react";
 import { LocaleContext, ILocaleContextType } from "../internal/app";
 import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
-import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import PropertyDefinition, { IPropertyDefinitionState } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
 import { TokenContext, ITokenContextType } from "../internal/providers/token-provider";
@@ -34,7 +34,7 @@ import { IConfigRawJSONDataType } from "../../config";
 // TODO this file is too complex, we need to simplify, specially policies they are killing this file
 
 function getPropertyListForSearchMode(properties: string[], standardCounterpart: ItemDefinition) {
-  let result = [];
+  let result: string[] = [];
   properties.forEach((propertyId) => {
     const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
     result = result.concat(getConversionIds(standardProperty.rawData));
@@ -678,7 +678,8 @@ export class ActualItemDefinitionProvider extends
         (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName] = [[forId, forVersion]];
         changed = true;
       } else {
-        if (!(window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName].find((m) => m[0] === forId && m[1] === forVersion)) {
+        if (!(window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName]
+          .find((m: [number, string]) => m[0] === forId && m[1] === forVersion)) {
           changed = true;
           (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName].push([forId, forVersion]);
         }
@@ -1576,7 +1577,7 @@ export class ActualItemDefinitionProvider extends
     return options.policies.every((pKeys) => {
       const [policyType, policyName, propertyId] = pKeys;
       const propertyInPolicy = this.state.itemDefinitionState.policies[policyType][policyName]
-        .find((p) => p.propertyId === propertyId);
+        .find((p: IPropertyDefinitionState) => p.propertyId === propertyId);
       return propertyInPolicy.valid;
     });
   }
@@ -2054,7 +2055,7 @@ export class ActualItemDefinitionProvider extends
     });
 
     // if it's invalid let's return the emulated error
-    const pokedElements = {
+    const pokedElements: IPokeElementsType = {
       properties: propertiesForArgs,
       includes: options.searchByIncludes || [],
       policies: [],

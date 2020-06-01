@@ -329,8 +329,8 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
                         const { ref, ...rootProps } = getRootProps();
                         return (
                           <RootRef rootRef={ref}>
-                            <div {...rootProps}>
-                              <input {...getInputProps()} />
+                            <div {...(rootProps as any)}>
+                              <input {...(getInputProps() as any)} />
                               <div className={props.classes.avatarContainer}>
                                 <MAvatar
                                   classes={{

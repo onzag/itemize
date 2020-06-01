@@ -18,6 +18,7 @@ declare const _default: {
         esModuleInterop: boolean;
         resolveJsonModule: boolean;
         skipLibCheck: boolean;
+        jsx: string;
     };
     compileOnSave: boolean;
     exclude: string[];

@@ -242,7 +242,7 @@ const ActualPropertyEntryFileRendererWithStyles = withStyles(style)((props: IPro
                   root: props.classes.paper,
                 }}
               >
-                <input {...getInputProps()} />
+                <input {...(getInputProps() as any)} />
                 {displayContent}
                 <div
                   className={props.classes.buttonContainer}

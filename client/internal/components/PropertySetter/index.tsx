@@ -36,6 +36,6 @@ export default class PropertySetter extends React.Component<IPropertySetterBaseP
     this.props.onClearEnforcement(this.props.forId, this.props.forVersion);
   }
   public render() {
-    return null;
+    return null as React.ReactNode;
   }
 }

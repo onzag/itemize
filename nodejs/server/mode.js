@@ -10,6 +10,7 @@ function getCookie(splittedCookie, name) {
     }
     return foundCookie.substr(nameEQ.length) || null;
 }
+exports.getCookie = getCookie;
 function getMode(appData, req) {
     const XFF = req.headers["X-Forwarded-For"] || req.headers["x-forwarded-for"];
     let ip = req.connection.remoteAddress;

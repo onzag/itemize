@@ -1,5 +1,5 @@
 import React from "react";
-import { IGQLValue, IGQLRequestFields } from "../../../nodejs/gql-querier";
+import { IGQLValue, IGQLRequestFields } from "../../../gql-querier";
 
 export interface ISSRContextType {
   queries: {

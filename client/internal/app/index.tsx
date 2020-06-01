@@ -111,10 +111,12 @@ export default class App extends React.Component<IAppProps, IAppState> {
     this.renderAppWithLocaleContext = this.renderAppWithLocaleContext.bind(this);
     this.setTokenState = this.setTokenState.bind(this);
     this.updateUserProperty = this.updateUserProperty.bind(this);
-  }
 
-  public componentDidMount() {
-    this.remoteListener = new RemoteListener(this.props.root);
+    // a sad hack to know if we are in the client side to initialize this
+    // remote listener
+    if (typeof document !== "undefined") {
+      this.remoteListener = new RemoteListener(this.props.root);
+    }
   }
 
   public setBlockedCallbackState(state: boolean) {
@@ -379,7 +381,9 @@ export default class App extends React.Component<IAppProps, IAppState> {
    * Renders the application with the locale context data
    * @param param0 the url match from the router, contains the url language
    */
-  public renderAppWithLocaleContext({ match, location }) {
+  public renderAppWithLocaleContext(routerProps: any) {
+    // typescript being really annoying
+    const { match, location } = routerProps;
     // Now the match.params.lang is actually a quite unreliable way to check for the current language
     // in use during updates, there's a reason, the url changes triggering a react update before the
     // language data has been loaded, this makes the app feel quite responsive and it's important, but

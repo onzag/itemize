@@ -1,7 +1,7 @@
 import express from "express";
 import { IAppDataType } from ".";
 
-function getCookie(splittedCookie: string[], name: string): string {
+export function getCookie(splittedCookie: string[], name: string): string {
   const nameEQ = name + "=";
   const foundCookie = splittedCookie.find((cookieValue) => {
     return cookieValue.startsWith(nameEQ);

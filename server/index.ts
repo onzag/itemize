@@ -37,6 +37,8 @@ import winston from "winston";
 import "winston-daily-rotate-file";
 import build from "../dbbuilder";
 import { GlobalManager } from "./global-manager";
+import { ISSRRuleSet } from "./ssr";
+import { ssrGenerator } from "./ssr/generator";
 
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -88,6 +90,7 @@ export type PkgCloudContainers = {[containerId: string]: pkgcloud.storage.Contai
 
 export interface IAppDataType {
   root: Root;
+  ssrRules: ISSRRuleSet;
   indexDevelopment: string;
   indexProduction: string;
   config: IConfigRawJSONDataType;
@@ -108,6 +111,7 @@ export interface IAppDataType {
   mailgun: Mailgun.Mailgun;
   pkgcloudStorageClients: PkgCloudClients;
   pkgcloudUploadContainers: PkgCloudContainers;
+  customUserTokenQuery: any;
 }
 
 export interface IServerDataType {
@@ -222,9 +226,12 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
   app.use("/rest/user", userRestServices(appData));
   app.use("/rest", restServices(appData));
 
+  const customUserQueriesProcessed = customUserQueries(appData);
+  appData.customUserTokenQuery = customUserQueriesProcessed.token.resolve;
+
   // custom graphql queries combined
   const allCustomQueries = {
-    ...customUserQueries(appData),
+    ...customUserQueriesProcessed,
     ...(custom.customGQLQueries && custom.customGQLQueries(appData)),
     ...(custom.customTokenGQLQueries && buildCustomTokenQueries(appData, custom.customTokenGQLQueries)),
   };
@@ -281,14 +288,26 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     res.sendFile(path.resolve(path.join("dist", "data", "service-worker.production.js")));
   });
 
+  const ssrUrls = Object.keys(appData.ssrRules).forEach((url) => {
+    const rule = appData.ssrRules[url];
+    const actualURL = "/:lang" + (url.startsWith("/") ? url : "/" + url);
+    app.get(actualURL, (req, res) => {
+      const mode = getMode(appData, req);
+      if (mode === "development") {
+        ssrGenerator(req, res, appData.indexDevelopment, appData, rule)
+      } else {
+        ssrGenerator(req, res, appData.indexProduction, appData, rule);
+      }
+    });
+  });
+
   // and now the main index setup
   app.get("*", (req, res) => {
-    res.setHeader("content-type", "text/html; charset=utf-8");
     const mode = getMode(appData, req);
     if (mode === "development") {
-      res.end(appData.indexDevelopment);
+      ssrGenerator(req, res, appData.indexDevelopment, appData, null)
     } else {
-      res.end(appData.indexProduction);
+      ssrGenerator(req, res, appData.indexProduction, appData, null);
     }
   });
 }
@@ -312,6 +331,7 @@ function getContainerPromisified(client: pkgcloud.storage.Client, containerName:
 
 /**
  * Initializes the itemize server with its custom configuration
+ * @param ssrRules the server side rendering rules
  * @param custom the customization details
  * @param custom.customGQLQueries custom graphql queries
  * @param custom.customTokenGQLQueries custom token graphql queries for generating custom tokens
@@ -322,7 +342,7 @@ function getContainerPromisified(client: pkgcloud.storage.Client, containerName:
  * @param custom.customRouter a custom router to attach to the rest endpoint
  * @param custom.customTriggers a registry for custom triggers
  */
-export async function initializeServer(custom: IServerCustomizationDataType = {}) {
+export async function initializeServer(ssrRules: ISSRRuleSet, custom: IServerCustomizationDataType = {}) {
   if (INSTANCE_MODE === "BUILD_DATABASE") {
     build(NODE_ENV);
     return;
@@ -610,6 +630,7 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
     );
     const appData: IAppDataType = {
       root,
+      ssrRules,
       indexDevelopment: index.replace(/\$MODE/g, "development"),
       indexProduction: index.replace(/\$MODE/g, "production"),
       config,
@@ -636,6 +657,8 @@ export async function initializeServer(custom: IServerCustomizationDataType = {}
       mailgun,
       pkgcloudStorageClients,
       pkgcloudUploadContainers,
+      // assigned later during rest setup
+      customUserTokenQuery: null,
     };
 
     logger.info(

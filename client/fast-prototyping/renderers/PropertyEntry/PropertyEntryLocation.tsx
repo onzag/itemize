@@ -277,8 +277,8 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
     }
     this.props.onSearchQueryChange(e.target.value, true);
   }
-  public onSuggestionsFetchRequested({value}) {
-    this.props.onSearchQueryChange(value);
+  public onSuggestionsFetchRequested(arg: {value: string}) {
+    this.props.onSearchQueryChange(arg.value);
   }
   public renderBody(textFieldProps?: any) {
     const viewport = {

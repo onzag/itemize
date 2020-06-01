@@ -1,0 +1,6 @@
+import React from "react";
+import { Theme } from "@material-ui/core";
+export declare const articlesStyles: (theme: Theme) => Record<"container" | "paper" | "newsTitle" | "articleContainer" | "articleImageContainer" | "articleImage" | "articleText" | "articleSummary" | "articleSummaryContainer" | "publisherInfoBox" | "publisherInfoDetailsBox" | "moreNewsContainer" | "moreNewsButton", import("@material-ui/styles").CSSProperties | import("@material-ui/styles").CreateCSSProperties<{}> | ((props: {}) => import("@material-ui/styles").CreateCSSProperties<{}>)>;
+export declare const Articles: React.ComponentType<Pick<{
+    classes: Record<"container" | "paper" | "newsTitle" | "articleContainer" | "articleImageContainer" | "articleImage" | "articleText" | "articleSummary" | "articleSummaryContainer" | "publisherInfoBox" | "publisherInfoDetailsBox" | "moreNewsContainer" | "moreNewsButton", string>;
+}, never> & import("@material-ui/core").StyledComponentProps<"container" | "paper" | "newsTitle" | "articleContainer" | "articleImageContainer" | "articleImage" | "articleText" | "articleSummary" | "articleSummaryContainer" | "publisherInfoBox" | "publisherInfoDetailsBox" | "moreNewsContainer" | "moreNewsButton">>;

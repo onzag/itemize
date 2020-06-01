@@ -30,7 +30,7 @@
         <link rel="mask-icon" href="/rest/resource/icons/macos-safari-monochrome-icon.svg" color="%{manifest.macSafariMaskIconThemeColor}">
         <link rel="shortcut icon" href="/rest/resource/icons/favicon.ico">
 
-        <link rel="manifest" href="/rest/resource/manifest.$SSRLANG.json">
+        <link rel="manifest" href="$SSRMANIFESTSRC">
         <meta name="msapplication-TileColor" content="%{manifest.msTileColor}">
         <meta name="msapplication-config" content="/rest/resource/manifest/browserconfig.xml">
         <meta name="theme-color" content="%{manifest.themeColor}">
@@ -55,7 +55,7 @@
         // the entire configuration
         var CONFIG = "%{}";
         // the SSR data, note that this is runtime calculated, so it differs, just like $MODE
-        var SSR = "$SSR"
+        var SSR = "$SSR";
         // set development mode
         function SET_DEV_MODE(mode, key) {
             document.cookie = "devmode=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";

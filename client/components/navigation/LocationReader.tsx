@@ -1,5 +1,5 @@
 import React from "react";
-import { LocationStateContext } from "../../internal/providers/token-provider";
+import { LocationStateContext } from "../../internal/providers/location-context";
 import { Location } from "history";
 
 interface ILocationReaderArg {

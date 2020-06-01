@@ -9,6 +9,7 @@ import fs from "fs";
 import path from "path";
 import colors from "colors/safe";
 import Knex from "knex";
+// @ts-ignore
 import Confirm from "prompt-confirm";
 
 import Root from "../base/Root";

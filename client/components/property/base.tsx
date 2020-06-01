@@ -104,7 +104,7 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                       } else if (props.policyType && props.policyName) {
                         propertyState = itemDefinitionContextualValue.state
                           .policies[props.policyType][props.policyName]
-                          .find((p) => p.propertyId === actualId);
+                          .find((p: IPropertyDefinitionState) => p.propertyId === actualId);
                       } else {
                         propertyState =
                           itemDefinitionContextualValue.state.properties.find((p) => p.propertyId === actualId);

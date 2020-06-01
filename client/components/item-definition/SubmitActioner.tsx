@@ -27,7 +27,7 @@ interface IActualSubmitActionerProps extends ISubmitActionerProps {
 }
 
 class ActualSubmitActioner extends React.Component<IActualSubmitActionerProps, {}> {
-  public shouldComponentUpdate(nextProps) {
+  public shouldComponentUpdate(nextProps: IActualSubmitActionerProps) {
     return nextProps.children !== this.props.children ||
       nextProps.itemDefinitionContext.submitError !== this.props.itemDefinitionContext.submitError ||
       nextProps.itemDefinitionContext.submitting !== this.props.itemDefinitionContext.submitting ||

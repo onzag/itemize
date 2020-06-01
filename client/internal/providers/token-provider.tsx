@@ -141,12 +141,16 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
         localStorage.setItem("token", tokenDataToken as string);
         localStorage.setItem("role", tokenDataRole as string);
         localStorage.setItem("id", tokenDataId.toString());
-        // document.cookie = "token=" + tokenDataToken;
+        document.cookie = "token=" + tokenDataToken + ";path=/";
+        document.cookie = "role=" + tokenDataRole + ";path=/";
+        document.cookie = "id=" + tokenDataId + ";path=/";
       } else {
         localStorage.removeItem("token");
         localStorage.removeItem("role");
         localStorage.removeItem("id");
-        // document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+        document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+        document.cookie = "role=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+        document.cookie = "id=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
       }
     } else {
       tokenDataId = parseInt(localStorage.getItem("id")) || null;
@@ -187,18 +191,18 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
         last_modified: {},
       };
       const cachedData = {
-        app_country: null,
-        app_currency: null,
-        app_language: null,
+        app_country: null as string,
+        app_currency: null as string,
+        app_language: null as string,
       };
       if (CacheWorkerInstance.isSupported) {
         const cachedValue =
           await CacheWorkerInstance.instance.getCachedValue(
             "GET_MOD_users__IDEF_user", tokenDataId as number, null, fields);
         if (cachedValue && cachedValue.value && cachedValue.value.DATA) {
-          cachedData.app_country = (cachedValue.value.DATA as IGQLValue).app_country;
-          cachedData.app_currency = (cachedValue.value.DATA as IGQLValue).app_currency;
-          cachedData.app_language = (cachedValue.value.DATA as IGQLValue).app_language;
+          cachedData.app_country = (cachedValue.value.DATA as IGQLValue).app_country as string;
+          cachedData.app_currency = (cachedValue.value.DATA as IGQLValue).app_currency as string;
+          cachedData.app_language = (cachedValue.value.DATA as IGQLValue).app_language as string;
           console.log("cached user locale is", cachedData);
           if (this.props.localeContext.country !== cachedData.app_country) {
             this.props.localeContext.changeCountryTo(cachedData.app_country, true, true);

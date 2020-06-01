@@ -37,6 +37,7 @@ const winston_1 = __importDefault(require("winston"));
 require("winston-daily-rotate-file");
 const dbbuilder_1 = __importDefault(require("../dbbuilder"));
 const global_manager_1 = require("./global-manager");
+const generator_1 = require("./ssr/generator");
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const PORT = process.env.PORT || 8000;
@@ -154,9 +155,11 @@ function initializeApp(appData, custom) {
     // adding rest services
     app.use("/rest/user", rest_2.userRestServices(appData));
     app.use("/rest", rest_1.default(appData));
+    const customUserQueriesProcessed = queries_1.customUserQueries(appData);
+    appData.customUserTokenQuery = customUserQueriesProcessed.token.resolve;
     // custom graphql queries combined
     const allCustomQueries = {
-        ...queries_1.customUserQueries(appData),
+        ...customUserQueriesProcessed,
         ...(custom.customGQLQueries && custom.customGQLQueries(appData)),
         ...(custom.customTokenGQLQueries && custom_graphql_1.buildCustomTokenQueries(appData, custom.customTokenGQLQueries)),
     };
@@ -198,15 +201,27 @@ function initializeApp(appData, custom) {
     app.get("/sw.production.js", (req, res) => {
         res.sendFile(path_1.default.resolve(path_1.default.join("dist", "data", "service-worker.production.js")));
     });
+    const ssrUrls = Object.keys(appData.ssrRules).forEach((url) => {
+        const rule = appData.ssrRules[url];
+        const actualURL = "/:lang" + (url.startsWith("/") ? url : "/" + url);
+        app.get(actualURL, (req, res) => {
+            const mode = mode_1.getMode(appData, req);
+            if (mode === "development") {
+                generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, rule);
+            }
+            else {
+                generator_1.ssrGenerator(req, res, appData.indexProduction, appData, rule);
+            }
+        });
+    });
     // and now the main index setup
     app.get("*", (req, res) => {
-        res.setHeader("content-type", "text/html; charset=utf-8");
         const mode = mode_1.getMode(appData, req);
         if (mode === "development") {
-            res.end(appData.indexDevelopment);
+            generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, null);
         }
         else {
-            res.end(appData.indexProduction);
+            generator_1.ssrGenerator(req, res, appData.indexProduction, appData, null);
         }
     });
 }
@@ -229,6 +244,7 @@ function getContainerPromisified(client, containerName) {
 }
 /**
  * Initializes the itemize server with its custom configuration
+ * @param ssrRules the server side rendering rules
  * @param custom the customization details
  * @param custom.customGQLQueries custom graphql queries
  * @param custom.customTokenGQLQueries custom token graphql queries for generating custom tokens
@@ -239,7 +255,7 @@ function getContainerPromisified(client, containerName) {
  * @param custom.customRouter a custom router to attach to the rest endpoint
  * @param custom.customTriggers a registry for custom triggers
  */
-async function initializeServer(custom = {}) {
+async function initializeServer(ssrRules, custom = {}) {
     if (INSTANCE_MODE === "BUILD_DATABASE") {
         dbbuilder_1.default(NODE_ENV);
         return;
@@ -432,6 +448,7 @@ async function initializeServer(custom = {}) {
         exports.logger.info("initializeServer: configuring app data build");
         const appData = {
             root,
+            ssrRules,
             indexDevelopment: index.replace(/\$MODE/g, "development"),
             indexProduction: index.replace(/\$MODE/g, "production"),
             config,
@@ -457,6 +474,8 @@ async function initializeServer(custom = {}) {
             mailgun,
             pkgcloudStorageClients,
             pkgcloudUploadContainers,
+            // assigned later during rest setup
+            customUserTokenQuery: null,
         };
         exports.logger.info("initializeServer: INSTANCE_GROUP_ID is " + INSTANCE_GROUP_ID);
         if (INSTANCE_MODE === "ABSOLUTE") {

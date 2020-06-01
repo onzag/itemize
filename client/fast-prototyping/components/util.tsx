@@ -37,7 +37,7 @@ export class DelayDisplay extends React.PureComponent<DelayDisplayProps, DelayDi
   }
 }
 
-const progressingElementStyle = createStyles({
+const progressingElementStyle: any = createStyles({
   progressWrapper: (props: IProgressingElementProps) => ({
     position: "relative",
     display: "inline-block",

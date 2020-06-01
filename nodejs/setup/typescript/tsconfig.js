@@ -22,13 +22,14 @@ exports.default = {
         esModuleInterop: true,
         resolveJsonModule: true,
         skipLibCheck: true,
+        jsx: "react",
     },
     compileOnSave: true,
     exclude: [
         "node_modules",
-        "src/client",
     ],
     include: [
         "**/*.ts",
+        "**/*.tsx",
     ],
 };

@@ -3,7 +3,8 @@ import SubmitActioner, { ISubmitActionerInfoArgType } from "../item-definition/S
 import DifferingPropertiesRetriever from "../item-definition/DifferingPropertiesRetriever";
 import DifferingIncludesRetriever from "../item-definition/DifferingIncludesRetriever";
 import Prompt, { PromptDialogComponent } from "./Prompt";
-import { IActionSubmitOptions } from "../../providers/item-definition";
+import { IActionSubmitOptions, IActionResponseWithId } from "../../providers/item-definition";
+import { EndpointErrorType } from "../../../base/errors";
 
 interface NeedsSubmitPromptProps {
   properties?: string[];
@@ -15,8 +16,8 @@ interface NeedsSubmitPromptProps {
 }
 
 export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPromptProps> {
-  public async confirmationCallback(actioner: ISubmitActionerInfoArgType, ) {
-    const response = await actioner.submit(this.props.confirmationSubmitOptions);
+  public async confirmationCallback(actioner: ISubmitActionerInfoArgType): Promise<EndpointErrorType> {
+    const response: IActionResponseWithId = await actioner.submit(this.props.confirmationSubmitOptions);
     if (response.error) {
       return response.error;
     }

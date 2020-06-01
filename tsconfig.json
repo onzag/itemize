@@ -21,15 +21,16 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "declaration": true,
+    "jsx": "react"
   },
   "compileOnSave": true,
   "exclude": [
     "node_modules",
-    "client",
     "data",
-    "nodejs",
+    "nodejs"
   ],
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    "**/*.tsx",
   ]
 }

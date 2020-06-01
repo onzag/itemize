@@ -14,6 +14,7 @@ import pkgcloud from "pkgcloud";
 import { Here } from "./services/here";
 import winston from "winston";
 import "winston-daily-rotate-file";
+import { ISSRRuleSet } from "./ssr";
 export declare const logger: winston.Logger;
 export declare type PkgCloudClients = {
     [containerId: string]: pkgcloud.storage.Client;
@@ -23,6 +24,7 @@ export declare type PkgCloudContainers = {
 };
 export interface IAppDataType {
     root: Root;
+    ssrRules: ISSRRuleSet;
     indexDevelopment: string;
     indexProduction: string;
     config: IConfigRawJSONDataType;
@@ -43,6 +45,7 @@ export interface IAppDataType {
     mailgun: Mailgun.Mailgun;
     pkgcloudStorageClients: PkgCloudClients;
     pkgcloudUploadContainers: PkgCloudContainers;
+    customUserTokenQuery: any;
 }
 export interface IServerDataType {
     CURRENCY_FACTORS: {
@@ -59,6 +62,7 @@ export interface IServerCustomizationDataType {
 }
 /**
  * Initializes the itemize server with its custom configuration
+ * @param ssrRules the server side rendering rules
  * @param custom the customization details
  * @param custom.customGQLQueries custom graphql queries
  * @param custom.customTokenGQLQueries custom token graphql queries for generating custom tokens
@@ -69,4 +73,4 @@ export interface IServerCustomizationDataType {
  * @param custom.customRouter a custom router to attach to the rest endpoint
  * @param custom.customTriggers a registry for custom triggers
  */
-export declare function initializeServer(custom?: IServerCustomizationDataType): Promise<void>;
+export declare function initializeServer(ssrRules: ISSRRuleSet, custom?: IServerCustomizationDataType): Promise<void>;

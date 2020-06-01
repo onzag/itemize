@@ -35,6 +35,6 @@ export default class TitleSetter extends React.Component<ITitleSetterProps, {}> 
     TitleSetterInstanceIsLoaded = false;
   }
   public render() {
-    return null;
+    return null as React.ReactNode;
   }
 }
