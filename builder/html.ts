@@ -63,6 +63,11 @@ export async function buildHTML(rawConfig: IBuilderBasicConfigType) {
   let baseHTML: string =
     await fsAsync.readFile(path.join("node_modules", "@onzag", "itemize", "client", "internal", "index.html"), "utf8");
 
+  baseHTML = baseHTML.replace(
+    new RegExp(escapeStringRegexp("\"%{}\""), "g"),
+    JSON.stringify(rawConfig.standard),
+  );
+
   // we need to make a build number
   baseHTML = replaceHTMLKeys(baseHTML, {
     ...rawConfig.standard,

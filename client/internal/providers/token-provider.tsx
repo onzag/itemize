@@ -1,13 +1,13 @@
 import React from "react";
 import { gqlQuery, buildGqlQuery, IGQLValue } from "../../../gql-querier";
 import { EndpointErrorType } from "../../../base/errors";
-import { ILocaleContextType } from ".";
-import { Location } from "history";
+import { ILocaleContextType } from "../app";
 import { GUEST_METAROLE, ENDPOINT_ERRORS, MEMCACHED_DESTRUCTION_MARKERS_LOCATION, DESTRUCTION_MARKERS_LOCATION, PREFIX_GET } from "../../../constants";
 import CacheWorkerInstance from "../workers/cache";
 import equals from "deep-equal";
+import { ISSRContextType, SSRContext } from "./ssr-provider";
 
-export interface ITokenProviderState {
+export interface IActualTokenProviderState {
   token: string;
   id: number;
   role: string;
@@ -18,10 +18,15 @@ export interface ITokenProviderState {
 
 interface ITokenProviderProps {
   localeContext: ILocaleContextType;
-  onProviderStateSet: (state: ITokenProviderState) => void;
+  onProviderStateSet: (state: IActualTokenProviderState) => void;
+  children: React.ReactNode;
 }
 
-export interface ITokenContextType extends ITokenProviderState {
+interface IActualTokenProviderProps extends ITokenProviderProps {
+  ssrContext: ISSRContextType;
+}
+
+export interface ITokenContextType extends IActualTokenProviderState {
   login: (username: string, password: string, token: string) => Promise<{id: number, role: string, error: EndpointErrorType}>;
   logout: () => void;
   dismissError: () => void;
@@ -29,11 +34,21 @@ export interface ITokenContextType extends ITokenProviderState {
 
 export const TokenContext = React.createContext<ITokenContextType>(null);
 
-export class TokenProvider extends React.Component<ITokenProviderProps, ITokenProviderState> {
-  constructor(props: ITokenProviderProps) {
+export function TokenProvider(props: ITokenProviderProps) {
+  return (
+    <SSRContext.Consumer>
+      {(ssrContext) => (
+        <ActualTokenProvider ssrContext={ssrContext} {...props}/>
+      )}
+    </SSRContext.Consumer>
+  )
+}
+
+class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IActualTokenProviderState> {
+  constructor(props: IActualTokenProviderProps) {
     super(props);
 
-    this.state = {
+    const initialState: IActualTokenProviderState = {
       token: null,
       id: null,
       role: GUEST_METAROLE,
@@ -42,20 +57,36 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       error: null,
     };
 
+    if (props.ssrContext) {
+      initialState.token = props.ssrContext.user.token || null;
+      initialState.id = props.ssrContext.user.id || null;
+      initialState.role = props.ssrContext.user.role || GUEST_METAROLE;
+      initialState.isReady = true;
+    }
+    
+    this.state = initialState;
+
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.dismissError = this.dismissError.bind(this);
   }
-  public shouldComponentUpdate(nextProps: ITokenProviderProps, nextState: ITokenProviderState) {
+  public shouldComponentUpdate(nextProps: IActualTokenProviderProps, nextState: IActualTokenProviderState) {
     return !equals(this.state, nextState) ||
       nextProps.localeContext !== this.props.localeContext;
   }
   public componentDidMount() {
-    const storedToken = localStorage.getItem("TOKEN");
+    // happens if SSR happened, it has already
+    // been validated by the server side render service
+    // sometimes this doesn't happen nevertheless
+    if (this.state.isReady) {
+      this.props.onProviderStateSet(this.state);
+      return;
+    }
+    const storedToken = localStorage.getItem("token");
     if (storedToken !== null) {
       this.login(null, null, storedToken, true);
     } else {
-      const newState: ITokenProviderState = {
+      const newState: IActualTokenProviderState = {
         ...this.state,
         isReady: true,
       };
@@ -107,23 +138,23 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
       tokenDataRole = tokenData ? tokenData.role as string : GUEST_METAROLE;
       tokenDataToken = tokenData ? tokenData.token as string : null;
       if (tokenDataToken !== null) {
-        localStorage.setItem("TOKEN", tokenDataToken as string);
-        localStorage.setItem("ROLE", tokenDataRole as string);
-        localStorage.setItem("ID", tokenDataId.toString());
+        localStorage.setItem("token", tokenDataToken as string);
+        localStorage.setItem("role", tokenDataRole as string);
+        localStorage.setItem("id", tokenDataId.toString());
         // document.cookie = "token=" + tokenDataToken;
       } else {
-        localStorage.removeItem("TOKEN");
-        localStorage.removeItem("ROLE");
-        localStorage.removeItem("ID");
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("id");
         // document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
       }
     } else {
-      tokenDataId = parseInt(localStorage.getItem("ID")) || null;
-      tokenDataRole = localStorage.getItem("ROLE") || GUEST_METAROLE;
-      tokenDataToken = localStorage.getItem("TOKEN");
+      tokenDataId = parseInt(localStorage.getItem("id")) || null;
+      tokenDataRole = localStorage.getItem("role") || GUEST_METAROLE;
+      tokenDataToken = localStorage.getItem("token");
     }
 
-    const newState: ITokenProviderState = {
+    const newState: IActualTokenProviderState = {
       isLoggingIn: false,
       id: tokenDataId as number,
       token: tokenDataToken as string,
@@ -304,5 +335,3 @@ export class TokenProvider extends React.Component<ITokenProviderProps, ITokenPr
     );
   }
 }
-
-export const LocationStateContext = React.createContext<Location>(null);

@@ -1,5 +1,5 @@
 import React from "react";
-import { TokenContext } from "../../internal/app/internal-providers";
+import { TokenContext } from "../../internal/providers/token-provider";
 
 interface IUserDataRetrieverProps {
   children: (arg: {

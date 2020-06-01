@@ -47,6 +47,7 @@ export default class PropertyViewFile
       currentValue.url.indexOf("blob:") !== 0
     ) {
       currentValue = fileURLAbsoluter(
+        this.props.config.containersHostnamePrefixes,
         currentValue,
         this.props.itemDefinition,
         this.props.forId,

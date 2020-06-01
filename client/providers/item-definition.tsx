@@ -4,7 +4,7 @@ import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } fro
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
-import { TokenContext, ITokenContextType } from "../internal/app/internal-providers";
+import { TokenContext, ITokenContextType } from "../internal/providers/token-provider";
 import {
   PREFIX_GET,
   UNSPECIFIED_OWNER,
@@ -25,6 +25,8 @@ import uuid from "uuid";
 import { getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor } from "../internal/gql-client-util";
 import { IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
+import { ConfigContext } from "../internal/providers/config-provider";
+import { IConfigRawJSONDataType } from "../../config";
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
@@ -446,6 +448,8 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
   searchContext: ISearchItemDefinitionValueContextType;
   // injected parent context
   injectedParentContext: IItemDefinitionContextType;
+  // config
+  config: IConfigRawJSONDataType;
 }
 
 // This is the state of such, it's basically a copy of the
@@ -586,6 +590,7 @@ export class ActualItemDefinitionProvider extends
     this.state = this.setupInitialState();
 
     // and if we have a cache, which runs behind a worker
+    // won't run in server mode so it's safe
     if (CacheWorkerInstance.isSupported) {
       // let's set it up
       // as you can see this function might run several times per instance
@@ -1961,15 +1966,14 @@ export class ActualItemDefinitionProvider extends
       error = totalValues.error;
       getQueryFields = totalValues.getQueryFields;
     } else {
-      const mappers = (window as any).CONTAINER_REGION_MAPPERS;
       let containerId: string 
-      Object.keys(mappers).forEach((mapper) => {
+      Object.keys(this.props.config.containersRegionMappers).forEach((mapper) => {
         if (mapper.split(";").includes(this.props.localeData.country)) {
-          containerId = mappers[mapper];
+          containerId = this.props.config.containersRegionMappers[mapper];
         }
       });
       if (!containerId) {
-        containerId = mappers["*"];
+        containerId = this.props.config.containersRegionMappers["*"];
       }
       const totalValues = await runAddQueryFor({
         args: argumentsForQuery,
@@ -2478,77 +2482,82 @@ export class ActualItemDefinitionProvider extends
 
 export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
   return (
-    <LocaleContext.Consumer>
-      {
-        (localeData) => (
-          <TokenContext.Consumer>
-            {
-              (tokenData) => (
-                <ModuleContext.Consumer>
-                  {
-                    (data) => (
-                      <SearchItemDefinitionValueContext.Consumer>
-                        {(searchContext) => {
-                          if (!data) {
-                            throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
-                          }
-                          let valueFor: ItemDefinition;
-                          if (props.itemDefinition) {
-                            if (typeof props.itemDefinition === "string") {
-                              valueFor =
-                                data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition ||
-                                data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
-                            } else {
-                              valueFor = props.itemDefinition;
-                            }
-                          } else {
-                            valueFor = data.mod.getPropExtensionItemDefinition();
-                          }
-                          if (props.searchCounterpart) {
-                            valueFor = valueFor.getSearchModeCounterpart();
-                          }
+    <ConfigContext.Consumer>
+      {(config) => (
+        <LocaleContext.Consumer>
+          {
+            (localeData) => (
+              <TokenContext.Consumer>
+                {
+                  (tokenData) => (
+                    <ModuleContext.Consumer>
+                      {
+                        (data) => (
+                          <SearchItemDefinitionValueContext.Consumer>
+                            {(searchContext) => {
+                              if (!data) {
+                                throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
+                              }
+                              let valueFor: ItemDefinition;
+                              if (props.itemDefinition) {
+                                if (typeof props.itemDefinition === "string") {
+                                  valueFor =
+                                    data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition ||
+                                    data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+                                } else {
+                                  valueFor = props.itemDefinition;
+                                }
+                              } else {
+                                valueFor = data.mod.getPropExtensionItemDefinition();
+                              }
+                              if (props.searchCounterpart) {
+                                valueFor = valueFor.getSearchModeCounterpart();
+                              }
 
-                          const actualProps = {
-                            localeData,
-                            tokenData,
-                            itemDefinitionInstance: valueFor,
-                            itemDefinitionQualifiedName: valueFor.getQualifiedPathName(),
-                            containsExternallyCheckedProperty: valueFor.containsAnExternallyCheckedProperty(),
-                            remoteListener: data.remoteListener,
-                            searchContext: searchContext,
-                            ...props,
-                          }
+                              const actualProps = {
+                                localeData,
+                                tokenData,
+                                itemDefinitionInstance: valueFor,
+                                itemDefinitionQualifiedName: valueFor.getQualifiedPathName(),
+                                containsExternallyCheckedProperty: valueFor.containsAnExternallyCheckedProperty(),
+                                remoteListener: data.remoteListener,
+                                searchContext: searchContext,
+                                config: config,
+                                ...props,
+                              }
 
-                          if (props.injectParentContext) {
-                            return (
-                              <ItemDefinitionContext.Consumer>{
-                                (value) => (
-                                  <ActualItemDefinitionProvider
-                                    {...actualProps}
-                                    injectedParentContext={value}
-                                  />
-                                )
-                              }</ItemDefinitionContext.Consumer>
-                            );
-                          }
+                              if (props.injectParentContext) {
+                                return (
+                                  <ItemDefinitionContext.Consumer>{
+                                    (value) => (
+                                      <ActualItemDefinitionProvider
+                                        {...actualProps}
+                                        injectedParentContext={value}
+                                      />
+                                    )
+                                  }</ItemDefinitionContext.Consumer>
+                                );
+                              }
 
-                          return (
-                            <ActualItemDefinitionProvider
-                              {...actualProps}
-                              injectedParentContext={null}
-                            />
-                          );
-                        }}
-                      </SearchItemDefinitionValueContext.Consumer>
-                    )
-                  }
-                </ModuleContext.Consumer>
-              )
-            }
-          </TokenContext.Consumer>
-        )
-      }
-    </LocaleContext.Consumer>
+                              return (
+                                <ActualItemDefinitionProvider
+                                  {...actualProps}
+                                  injectedParentContext={null}
+                                />
+                              );
+                            }}
+                          </SearchItemDefinitionValueContext.Consumer>
+                        )
+                      }
+                    </ModuleContext.Consumer>
+                  )
+                }
+              </TokenContext.Consumer>
+            )
+          }
+        </LocaleContext.Consumer>
+      )}
+    </ConfigContext.Consumer>
   );
 }
 

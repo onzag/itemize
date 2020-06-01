@@ -4,6 +4,9 @@ import Include from "../../../base/Root/Module/ItemDefinition/Include";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 export function fileArrayURLAbsoluter(
+  containerHostnamePrefixes: {
+    [key: string]: string,
+  },
   files: IGQLFile[],
   itemDefinition: ItemDefinition,
   id: number,
@@ -15,10 +18,13 @@ export function fileArrayURLAbsoluter(
   if (files === null) {
     return null;
   }
-  return files.map((file) => fileURLAbsoluter(file, itemDefinition, id, version, containerId, include, property));
+  return files.map((file) => fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property));
 }
 
 export function fileURLAbsoluter(
+  containerHostnamePrefixes: {
+    [key: string]: string,
+  },
   file: IGQLFile,
   itemDefinition: ItemDefinition,
   id: number,
@@ -39,7 +45,7 @@ export function fileURLAbsoluter(
     return null;
   }
 
-  let prefix: string = (window as any).CONTAINER_HOSTNAME_PREFIXES[containerId];
+  let prefix: string = containerHostnamePrefixes[containerId];
   if (prefix.indexOf("/") !== 0) {
     prefix = location.protocol + "//" + prefix;
   }

@@ -1,5 +1,5 @@
 import React from "react";
-import { TokenContext } from "../../internal/app/internal-providers";
+import { TokenContext } from "../../internal/providers/token-provider";
 
 type logStatusType = "LOGGED_IN" | "LOGGED_OUT" | "LOGGING_IN";
 type IfLogStatusCallback = (status: logStatusType) => React.ReactNode;

@@ -82,6 +82,7 @@ export function propertyViewPostProcessingHook(
         node.parentElement && node.parentElement.removeChild(node);
       } else {
         const absolutedFile = fileURLAbsoluter(
+          this.props.config.containersHostnamePrefixes,
           currentFile,
           this.props.itemDefinition,
           this.props.forId,
@@ -122,6 +123,7 @@ export function propertyViewPostProcessingHook(
         node.spellcheck = false;
 
         const absolutedFile = fileURLAbsoluter(
+          this.props.config.containersHostnamePrefixes,
           currentFile,
           this.props.itemDefinition,
           this.props.forId,

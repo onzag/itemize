@@ -1,5 +1,5 @@
 import React from "react";
-import { TokenContext } from "../../internal/app/internal-providers";
+import { TokenContext } from "../../internal/providers/token-provider";
 import { EndpointErrorType } from "../../../base/errors";
 import { gqlQuery, buildGqlQuery } from "../../../gql-querier";
 import { ItemDefinitionContext, IItemDefinitionContextType } from "../../providers/item-definition";

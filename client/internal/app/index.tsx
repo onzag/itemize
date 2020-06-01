@@ -5,13 +5,14 @@ import Moment from "moment";
 import { Route } from "react-router-dom";
 import { history } from "../..";
 import { countries, currencies } from "../../../imported-resources";
-import { TokenProvider, ITokenProviderState, LocationStateContext } from "./internal-providers";
-import { buildGqlMutation, gqlQuery } from "../../../gql-querier";
+import { TokenProvider, IActualTokenProviderState } from "../providers/token-provider";
+import { LocationStateContext } from "../providers/location-context";
 import { RemoteListener } from "./remote-listener";
 import "../workers/service";
+import { runEditQueryFor } from "../gql-client-util";
 import CacheWorkerInstance from "../workers/cache";
 import { proxy } from "comlink";
-import { runEditQueryFor } from "../gql-client-util";
+import { IConfigRawJSONDataType } from "../../../config";
 
 // Just a message for whether is development
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -50,9 +51,11 @@ export interface IDataContextType {
 // and don't really change; whereas the initial information, is
 // as said, initial, and takes part of the state
 interface IAppProps {
-  initialRoot: IRootRawJSONDataType;
+  root: Root;
   initialCurrency: string;
   initialCountry: string;
+
+  config: IConfigRawJSONDataType;
 
   langLocales: ILangLocalesType;
 
@@ -69,7 +72,6 @@ interface IAppProps {
 interface IAppState {
   specifiedCountry: string;
   specifiedCurrency: string;
-  specifiedProcessedRoot: Root;
   localeIsUpdating: boolean;
   localeIsUpdatingFrom: string;
   updateIsBlocked: boolean;
@@ -82,28 +84,22 @@ export const DataContext = React.createContext<IDataContextType>(null);
 
 // now we export the App
 export default class App extends React.Component<IAppProps, IAppState> {
-  private tokenState: ITokenProviderState = null;
+  private tokenState: IActualTokenProviderState = null;
   private remoteListener: RemoteListener = null;
 
   constructor(props: IAppProps) {
     super(props);
 
     this.setBlockedCallbackState = this.setBlockedCallbackState.bind(this);
-
-    // set the values in the state to the initial
-    // we expose the root variable because it makes debugging
-    // easy and to allow access to the root registry to web workers
-    (window as any).ROOT = new Root(props.initialRoot);
     if (CacheWorkerInstance.isSupported) {
-      CacheWorkerInstance.instance.proxyRoot(props.initialRoot);
       CacheWorkerInstance.instance.setBlockedCallback(proxy(this.setBlockedCallbackState))
     }
+
     this.state = {
       specifiedCountry: props.initialCountry,
       specifiedCurrency: props.initialCurrency,
       localeIsUpdating: false,
       localeIsUpdatingFrom: null,
-      specifiedProcessedRoot: (window as any).ROOT,
       updateIsBlocked: false,
     };
 
@@ -115,8 +111,10 @@ export default class App extends React.Component<IAppProps, IAppState> {
     this.renderAppWithLocaleContext = this.renderAppWithLocaleContext.bind(this);
     this.setTokenState = this.setTokenState.bind(this);
     this.updateUserProperty = this.updateUserProperty.bind(this);
+  }
 
-    this.remoteListener = new RemoteListener((window as any).ROOT);
+  public componentDidMount() {
+    this.remoteListener = new RemoteListener(this.props.root);
   }
 
   public setBlockedCallbackState(state: boolean) {
@@ -127,7 +125,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     }
   }
 
-  public setTokenState(state: ITokenProviderState) {
+  public setTokenState(state: IActualTokenProviderState) {
     this.tokenState = state;
     this.remoteListener.setToken(state.token);
   }
@@ -136,7 +134,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // we check that there's an user logged in
     if (this.tokenState && this.tokenState.id) {
       console.log("updating user property", propertyId, value);
-      const userItemDefinition = this.state.specifiedProcessedRoot
+      const userItemDefinition = this.props.root
           .getModuleFor(["users"]).getItemDefinitionFor(["user"]);
       const result = await runEditQueryFor({
         args: {
@@ -185,6 +183,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     // And we set the language via local storage, so it has priority
     localStorage.setItem("lang", locale);
+    document.cookie = "lang=" + locale + ";path=/"
+
     document.body.parentElement.lang = locale;
     (document.head.querySelector("[rel='manifest']") as HTMLLinkElement).href =
       "/rest/resource/manifest." + locale + ".json";
@@ -233,7 +233,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     // if the language is currently loaded in memory, just set it as it is
     // we don't need to fetch anything
-    if (this.state.specifiedProcessedRoot.getI18nDataFor(localeToSet)) {
+    if (this.props.root.getI18nDataFor(localeToSet)) {
       this.finallySetLocaleDataFor(localeToSet, avoidUpdatingUser);
       return;
     }
@@ -264,7 +264,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     }
 
     // Now we patch the root
-    this.state.specifiedProcessedRoot.mergeWithI18n(newData);
+    this.props.root.mergeWithI18n(newData);
 
     // set the locale data
     this.finallySetLocaleDataFor(localeToSet, avoidUpdatingUser);
@@ -293,7 +293,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // This shouldn't really happen, but otherwise we default to Finland
     // because why not
     if (!countryData) {
-      codeToSet = (window as any).FALLBACK_COUNTRY_CODE;
+      codeToSet = this.props.config.fallbackCountryCode;
       console.warn("Attempted to set country to unavailable " + code + ", defaulted to " + codeToSet);
     }
 
@@ -332,6 +332,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     // Now we set the country in local storage
     localStorage.setItem("country", codeToSet);
+    document.cookie = "country=" + codeToSet + ";path=/";
     if (!avoidUpdatingUser) {
       this.updateUserProperty("app_country", codeToSet);
     }
@@ -363,6 +364,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     // We set the currency in local storage
     localStorage.setItem("currency", codeToSet);
+    document.cookie = "currency=" + codeToSet + ";path=/";
     if (!avoidUpdatingUser) {
       this.updateUserProperty("app_currency", codeToSet);
     }
@@ -402,7 +404,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       updating: this.state.localeIsUpdating,
 
       langLocales: this.props.langLocales,
-      i18n: this.state.specifiedProcessedRoot.getI18nData(),
+      i18n: this.props.root.getI18nData(),
     };
 
     // Now we return the app with its given locale context
@@ -435,7 +437,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // The data contet passes the raw root and the value
     // that contains the instance that can store values
     const dataContextValue: IDataContextType = {
-      value: this.state.specifiedProcessedRoot,
+      value: this.props.root,
       remoteListener: this.remoteListener,
       updateIsBlocked: this.state.updateIsBlocked,
     };

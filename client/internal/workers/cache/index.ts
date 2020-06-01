@@ -14,7 +14,7 @@ if (isDevelopment) {
 // now we check for indexed db support as it's necessary
 // for the cache to function, there's no point in loading the browser
 // if the cache is going to misbehave
-const supportsCacheWorker = window.Worker && (
+const supportsCacheWorker = typeof window !== "undefined" && window.Worker && (
   window.indexedDB ||
   (window as any).mozIndexedDB ||
   (window as any).webkitIndexedDB ||

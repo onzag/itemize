@@ -186,6 +186,7 @@ export default class PropertyEntryFile
         };
       } else {
         currentValue = fileURLAbsoluter(
+          this.props.config.containersHostnamePrefixes,
           currentValue,
           this.props.itemDefinition,
           this.props.forId,

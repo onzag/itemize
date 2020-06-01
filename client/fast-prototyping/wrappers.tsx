@@ -6,18 +6,20 @@ import { createMuiTheme } from "@material-ui/core";
 import { ILocaleContextType } from "../internal/app";
 import Moment from "moment";
 import MomentUtils from "@date-io/moment";
+import { IConfigRawJSONDataType } from "../../config";
 
-// we create the material ui theme
-const theme = createMuiTheme({
-  typography: {
-    fontFamily: "'" + (window as any).FONT_NAME + "', sans-serif",
-    fontWeightLight: 300,
-    fontWeightRegular: 400,
-    fontWeightMedium: 500,
-  },
-});
+// TODO add collector somewhere around here
+export function appWrapper(app: React.ReactElement, config: IConfigRawJSONDataType) {
+  // we create the material ui theme
+  const theme = createMuiTheme({
+    typography: {
+      fontFamily: "'" + config.fontName + "', sans-serif",
+      fontWeightLight: 300,
+      fontWeightRegular: 400,
+      fontWeightMedium: 500,
+    },
+  });
 
-export function appWrapper(app: React.ReactElement) {
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline/>

@@ -21,6 +21,8 @@ import { RendererContext } from "../../../providers/renderer";
 import { IRendererProps } from "../../renderer";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import Include from "../../../../base/Root/Module/ItemDefinition/Include";
+import { IConfigRawJSONDataType } from "../../../../config";
+import { ConfigContext } from "../../providers/config-provider";
 
 /**
  * This is what every renderer gets regardless of type as long as it's an entry
@@ -56,6 +58,7 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
  * the values are distributed
  */
 export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
+  config?: IConfigRawJSONDataType;
   itemDefinition: ItemDefinition;
   injectSubmitBlockPromise: (arg: Promise<any>) => void;
   include: Include;
@@ -100,7 +103,8 @@ interface IRendererWholeHandlerType extends IRendererHandlerType {
   defaultSubhandler?: IRendererHandlerType;
   subhandler?: {
     [type: string]: IRendererHandlerType;
-  }
+  },
+  includeConfig?: boolean;
 }
 
 const selectHandler: IRendererHandlerType = {
@@ -132,7 +136,8 @@ const handlerRegistry:
     defaultSubhandler: {
       renderer: "PropertyEntryField",
       handler: PropertyEntryField,
-    }
+    },
+    includeConfig: true,
   },
   currency: null,
   unit: null,
@@ -151,6 +156,7 @@ const handlerRegistry:
   file: {
     renderer: "PropertyEntryFile",
     handler: PropertyEntryFile,
+    includeConfig: true,
   },
   files: null,
 };
@@ -188,6 +194,26 @@ export default function PropertyEntry(
               (locale) => {
                 const renderer: React.ComponentType<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>> =
                   props.renderer || renderers[registryEntry.renderer];
+
+                if (registryEntry.includeConfig) {
+                  return (
+                    <ConfigContext.Consumer>
+                      {(config) => (
+                        <Element
+                          {...props}
+                          language={locale.language}
+                          i18n={locale.i18n}
+                          rtl={locale.rtl}
+                          currency={currencies[locale.currency]}
+                          country={countries[locale.country]}
+                          renderer={renderer}
+                          rendererArgs={props.rendererArgs || {}}
+                          config={config}
+                        />
+                      )}
+                    </ConfigContext.Consumer>
+                  )
+                }
                 return (
                   <Element
                     {...props}

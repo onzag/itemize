@@ -8,7 +8,7 @@
 
 import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
-import { TokenContext, ITokenContextType } from "../../internal/app/internal-providers";
+import { TokenContext, ITokenContextType } from "../../internal/providers/token-provider";
 import { ItemDefinitionContext, IItemDefinitionContextType } from "../../providers/item-definition";
 import { MAX_SUPPORTED_INTEGER } from "../../../constants";
 
