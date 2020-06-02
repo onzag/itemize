@@ -11,6 +11,25 @@ const styles_1 = require("@material-ui/styles");
 const react_autosuggest_1 = __importDefault(require("react-autosuggest"));
 const match_1 = __importDefault(require("autosuggest-highlight/match"));
 const parse_1 = __importDefault(require("autosuggest-highlight/parse"));
+let CMap;
+let CTileLayer;
+let CMarker;
+let L;
+if (typeof document !== "undefined") {
+    const LL = require("react-leaflet");
+    CMap = LL.Map;
+    CTileLayer = LL.TileLayer;
+    CMarker = LL.Marker;
+    L = require("leaflet");
+    // https://github.com/PaulLeCam/react-leaflet/issues/453
+    // bug in leaflet
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+        iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+        iconUrl: require("leaflet/dist/images/marker-icon.png"),
+        shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+    });
+}
 const styles_2 = require("./styles");
 const Search_1 = __importDefault(require("@material-ui/icons/Search"));
 const SwapHoriz_1 = __importDefault(require("@material-ui/icons/SwapHoriz"));
@@ -18,15 +37,6 @@ const lab_1 = require("@material-ui/lab");
 const util_1 = require("../../../../util");
 const Restore_1 = __importDefault(require("@material-ui/icons/Restore"));
 const Clear_1 = __importDefault(require("@material-ui/icons/Clear"));
-// https://github.com/PaulLeCam/react-leaflet/issues/453
-// bug in leaflet
-// delete (L.Icon as any).Default.prototype._getIconUrl;
-// (L.Icon as any).Default.mergeOptions({
-//   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-//   iconUrl: require("leaflet/dist/images/marker-icon.png"),
-//   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
-// });
-// TODOSSRFIX
 const ZOOMS = {
     "LARGE": 16,
     "MEDIUM": 14,
@@ -182,6 +192,9 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
     constructor(props) {
         super(props);
         this.preventNextSearchQueryChange = false;
+        this.state = {
+            readyToMap: false,
+        };
         this.onSearchQueryChange = this.onSearchQueryChange.bind(this);
         this.renderBody = this.renderBody.bind(this);
         this.getSuggestionValue = this.getSuggestionValue.bind(this);
@@ -193,6 +206,9 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
         this.onChangeBySuggestion = this.onChangeBySuggestion.bind(this);
     }
     componentDidMount() {
+        this.setState({
+            readyToMap: true,
+        });
         if (this.props.autoFocus && this.inputRef) {
             this.inputRef.focus();
         }
@@ -289,6 +305,14 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
         else if (this.props.icon) {
             icon = this.props.icon;
         }
+        const map = this.state.readyToMap ? (react_1.default.createElement(CMap, { viewport: viewport, onViewportChange: this.props.onViewportChange, onClick: this.setLocationManually },
+            react_1.default.createElement(CTileLayer, { attribution: '\u00A9 <a href="http://osm.org/copyright">OpenStreetMap</a> contributors', url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png" }),
+            this.props.currentValue ? react_1.default.createElement(CMarker, { position: [
+                    this.props.currentValue.lat, this.props.currentValue.lng,
+                ] }) : null,
+            !this.props.disabled && this.props.activeSearchResults ? this.props.activeSearchResults
+                .filter((result) => this.props.currentValue.id !== result.id)
+                .map((result) => (react_1.default.createElement(CMarker, { opacity: 0.5, key: result.id, position: [result.lat, result.lng], onClick: this.props.onChangeBySearchResult.bind(this, result, true) }))) : null)) : null;
         const descriptionAsAlert = this.props.args["descriptionAsAlert"];
         return (react_1.default.createElement("div", { className: this.props.classes.container },
             this.props.description && descriptionAsAlert ?
@@ -304,7 +328,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
                 this.props.resultOutOfLabel ?
                     react_1.default.createElement("i", { className: this.props.classes.resultListLabel }, this.props.resultOutOfLabel) :
                     null),
-            react_1.default.createElement("div", { className: this.props.classes.locationMapContainer }),
+            react_1.default.createElement("div", { className: this.props.classes.locationMapContainer }, map),
             react_1.default.createElement(TextField_1.default, Object.assign({ fullWidth: true, type: "search", onKeyPress: this.onKeyPress, className: this.props.classes.entry, label: this.props.label, onChange: this.onSearchQueryChange, placeholder: this.props.placeholder, value: this.props.searchQuery, InputProps: {
                     classes: {
                         root: this.props.classes.fieldInput,

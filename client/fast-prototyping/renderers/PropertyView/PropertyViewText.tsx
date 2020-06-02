@@ -1,5 +1,6 @@
 import { IPropertyViewTextRendererProps } from "../../../internal/components/PropertyView/PropertyViewText";
 import React from "react";
+import { DOMWindow } from "../../../../util";
 
 // The current intersection observer
 let io: IntersectionObserver;
@@ -101,20 +102,26 @@ interface IPropertyViewRichTextViewerProps {
   children?: string;
 }
 
-// TODOSSR nothing visible in here and this one is important
-export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRichTextViewerProps> {
+interface IPropertyViewRichTextViewerState {
+  html: string;
+}
+
+export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRichTextViewerProps, IPropertyViewRichTextViewerState> {
   private divref: React.RefObject<HTMLDivElement>;
   private cheapdiv: HTMLDivElement;
   constructor(props: IPropertyViewRichTextViewerProps) {
     super(props);
 
     this.divref = React.createRef<HTMLDivElement>();
-    this.cheapdiv = typeof document !== "undefined" ? document.createElement("div") : null;
+    this.cheapdiv = DOMWindow.document.createElement("div");
+
+    this.state = {
+      html: this.getHTML(props.children),
+    }
   }
-  public updateHTML(html: string) {
+  public getHTML(html: string) {
     if (!html) {
-      this.divref.current.innerHTML = "";
-      return;
+      return null;
     }
 
     this.cheapdiv.innerHTML = html;
@@ -138,7 +145,27 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
       }
     });
 
-    this.cheapdiv.querySelectorAll(".file").forEach((file: HTMLDivElement) => {
+    return this.cheapdiv.innerHTML;
+  }
+  public updateHTML(html: string) {
+    this.setState({
+      html: this.getHTML(html),
+    });
+  }
+  public attachEvents() {
+    this.divref.current.querySelectorAll("img").forEach((img: HTMLImageElement) => {
+      if (!img.src.startsWith("blob:")) {
+        lazyloader(img, [["sizes", "sizes"], ["srcset", "srcset"], ["src", "src"]]);
+      }
+    });
+
+    this.divref.current.querySelectorAll("iframe").forEach((iframe: HTMLIFrameElement) => {
+      if (!iframe.src.startsWith("blob:")) {
+        lazyloader(iframe, [["src", "src"]]);
+      }
+    });
+
+    this.divref.current.querySelectorAll(".file").forEach((file: HTMLDivElement) => {
       const container = file.querySelector(".file-container");
       const title = file.querySelector(".file-title");
       container.addEventListener("click", () => {
@@ -148,25 +175,20 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
       });
     });
 
-    this.divref.current.innerHTML = "";
-    while (this.cheapdiv.childNodes.length) {
-      this.divref.current.appendChild(this.cheapdiv.childNodes[0]);
-    }
-
     triggerOldSchoolListeners();
   }
-  public componentDidMount() {
-    this.updateHTML(this.props.children);
+  public componentDidUpdate() {
+    this.attachEvents();
   }
-  public shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps) {
+  public shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps, nextState: IPropertyViewRichTextViewerState) {
     if (nextProps.children !== this.props.children) {
       this.updateHTML(nextProps.children);
     }
-    return false;
+    return this.state.html !== nextState.html;
   }
   public render() {
     return (
-      <div className="rich-text" ref={this.divref}/>
+      <div className="rich-text" ref={this.divref} dangerouslySetInnerHTML={{__html: this.state.html}}/>
     )
   }
 }

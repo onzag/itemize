@@ -9,6 +9,7 @@ import { initializeItemizeApp } from "../../client";
 import { StaticRouter } from "react-router-dom";
 import ReactDOMServer from 'react-dom/server';
 
+const MEMOIZED_ANSWERS: {[memId: string]: string} = {}
 export async function ssrGenerator(
   req: express.Request,
   res: express.Response,
@@ -37,6 +38,7 @@ export async function ssrGenerator(
       rtl: false,
       languages: config.supportedLanguages,
       forUser: null,
+      memId: "*",
     }
     // this is the root form without any language or any means, there's no SSR data to fill
   } else {
@@ -74,6 +76,21 @@ export async function ssrGenerator(
       languages: config.supportedLanguages,
       forUser: userAfterValidate,
     }
+
+    // language makes the memory specific for it
+    if (appliedRule.memId) {
+      appliedRule.memId += "." + appliedRule.language;
+    }
+    // we don't want to memoize specific user answers
+    // they should be using the service worker at that point
+    if (appliedRule.forUser.id) {
+      appliedRule.memId = null;
+    }
+  }
+
+  if (MEMOIZED_ANSWERS[appliedRule.memId]) {
+    res.end(MEMOIZED_ANSWERS[appliedRule.memId]);
+    return;
   }
 
   if (appliedRule.ogImage.startsWith("/")) {
@@ -108,13 +125,14 @@ export async function ssrGenerator(
     };
 
     newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(ssr));
-    const serverApp = await initializeItemizeApp(
+    const serverAppData = await initializeItemizeApp(
       appData.ssrConfig.rendererContext,
       appData.ssrConfig.mainComponent,
       {
         appWrapper: appData.ssrConfig.appWrapper,
         mainWrapper: appData.ssrConfig.mainWrapper,
         serverMode: {
+          collector: appData.ssrConfig.collector,
           config: appData.config,
           ssrContext: ssr,
           pathname: req.path,
@@ -134,14 +152,22 @@ export async function ssrGenerator(
 
     const app = (
       <StaticRouter location={req.url}>
-        {serverApp}
+        {serverAppData.node}
       </StaticRouter>
     );
     newHTML = newHTML.replace(/\$SSRAPP/g, ReactDOMServer.renderToStaticMarkup(app));
+
+    let finalSSRHead: string = langHrefLangTags;
+    if (serverAppData.id) {
+      finalSSRHead += appData.ssrConfig.collector.retrieve(serverAppData.id);
+    }
     
     // TODO extract css
-    newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
+    newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, finalSSRHead);
   }
 
+  if (appliedRule.memId) {
+    MEMOIZED_ANSWERS[appliedRule.memId] = newHTML;
+  }
   res.end(newHTML);
 }

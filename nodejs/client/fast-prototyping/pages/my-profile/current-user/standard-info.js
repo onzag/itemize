@@ -115,9 +115,7 @@ exports.CurrentUserProfileStandardInfo = core_1.withStyles(currentUserProfileSta
                                     react_1.default.createElement(util_1.ProgressingElement, { isProgressing: actioner.statefulOnProgress },
                                         react_1.default.createElement(core_1.Button, { variant: "outlined", color: "secondary", endIcon: react_1.default.createElement(MailOutline_1.default, null), onClick: actioner.sendValidateEmail },
                                             react_1.default.createElement(I18nRead_1.default, { capitalize: true, id: "missing_email_validation_warning_action" }),
-                                            react_1.default.createElement("i", { className: props.classes.emailInButton },
-                                                "\u00A0",
-                                                emailState.stateAppliedValue))),
+                                            react_1.default.createElement("i", { className: props.classes.emailInButton }, " " + emailState.stateAppliedValue))),
                                     react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.statefulError, open: !!actioner.statefulError, onClose: actioner.dismissStatefulError }),
                                     react_1.default.createElement(snackbar_1.default, { severity: "success", i18nDisplay: "missing_email_validation_warning_action_success", open: actioner.statefulSuccess, onClose: actioner.dismissStatefulSuccess })))))));
                     }

@@ -1,4 +1,11 @@
 import { initializeServer } from "@onzag/itemize/server";
+import { capitalize } from "@onzag/itemize/util";
+
+// Check the client for info on these, we are replicating what is used in the client somewhat
+import React from "react";
+import App from "../client/app";
+import { rendererContext } from "@onzag/itemize/client/fast-prototyping/renderers";
+import { appWrapper, mainWrapper } from "@onzag/itemize/client/fast-prototyping/wrappers";
 
 // Itemize server isn't hot, it won't refresh in realtime and it
 // isn't recommended to attempt to set it up that way
@@ -25,7 +32,26 @@ import { initializeServer } from "@onzag/itemize/server";
 // it will mark the app as outdated and you can have custom logic for outdated apps
 // outdated apps only exists for that session
 
-// also remember to flush your redis cache if you perform any database updates
-// in development this is as easy as stoping and starting the dev environment
-
-initializeServer();
+initializeServer(
+  {
+    ssrRules: {
+      "/": (req, lang, root) => {
+        const i18nData = root.getI18nDataFor(lang);
+        return {
+          title: capitalize(i18nData.app_name),
+          description: i18nData.app_description,
+          ogTitle: capitalize(i18nData.app_name),
+          ogDescription: i18nData.app_description,
+          ogImage: "/rest/resource/icons/android-chrome-512x512.png",
+          collect: [
+            ["cms", "fragment", 1, lang],
+          ],
+        };
+      },
+    },
+    rendererContext,
+    mainComponent: React.createElement(App, null),
+    mainWrapper,
+    appWrapper,
+  },
+);

@@ -9,6 +9,7 @@ export interface ISSRRuleDynamic {
   ogDescription: string;
   ogImage: string;
   collect: Array<[string, string, number, string]>;
+  memId: string;
 }
 
 // this infor can be retrieved via the config and other attributes

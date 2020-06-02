@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
+const util_1 = require("../../../../util");
 // The current intersection observer
 let io;
 // old school listenrs that use the scroll of the document, these are listeners that should
@@ -94,17 +95,18 @@ function lazyloader(element, propertySet) {
         }
     }
 }
-// TODOSSR nothing visible in here and this one is important
 class PropertyViewRichTextViewer extends react_1.default.Component {
     constructor(props) {
         super(props);
         this.divref = react_1.default.createRef();
-        this.cheapdiv = typeof document !== "undefined" ? document.createElement("div") : null;
+        this.cheapdiv = util_1.DOMWindow.document.createElement("div");
+        this.state = {
+            html: this.getHTML(props.children),
+        };
     }
-    updateHTML(html) {
+    getHTML(html) {
         if (!html) {
-            this.divref.current.innerHTML = "";
-            return;
+            return null;
         }
         this.cheapdiv.innerHTML = html;
         this.cheapdiv.querySelectorAll("img").forEach((img) => {
@@ -124,7 +126,25 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
                 lazyloader(iframe, [["src", "src"]]);
             }
         });
-        this.cheapdiv.querySelectorAll(".file").forEach((file) => {
+        return this.cheapdiv.innerHTML;
+    }
+    updateHTML(html) {
+        this.setState({
+            html: this.getHTML(html),
+        });
+    }
+    attachEvents() {
+        this.divref.current.querySelectorAll("img").forEach((img) => {
+            if (!img.src.startsWith("blob:")) {
+                lazyloader(img, [["sizes", "sizes"], ["srcset", "srcset"], ["src", "src"]]);
+            }
+        });
+        this.divref.current.querySelectorAll("iframe").forEach((iframe) => {
+            if (!iframe.src.startsWith("blob:")) {
+                lazyloader(iframe, [["src", "src"]]);
+            }
+        });
+        this.divref.current.querySelectorAll(".file").forEach((file) => {
             const container = file.querySelector(".file-container");
             const title = file.querySelector(".file-title");
             container.addEventListener("click", () => {
@@ -133,23 +153,19 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
                 }
             });
         });
-        this.divref.current.innerHTML = "";
-        while (this.cheapdiv.childNodes.length) {
-            this.divref.current.appendChild(this.cheapdiv.childNodes[0]);
-        }
         triggerOldSchoolListeners();
     }
-    componentDidMount() {
-        this.updateHTML(this.props.children);
+    componentDidUpdate() {
+        this.attachEvents();
     }
-    shouldComponentUpdate(nextProps) {
+    shouldComponentUpdate(nextProps, nextState) {
         if (nextProps.children !== this.props.children) {
             this.updateHTML(nextProps.children);
         }
-        return false;
+        return this.state.html !== nextState.html;
     }
     render() {
-        return (react_1.default.createElement("div", { className: "rich-text", ref: this.divref }));
+        return (react_1.default.createElement("div", { className: "rich-text", ref: this.divref, dangerouslySetInnerHTML: { __html: this.state.html } }));
     }
 }
 exports.PropertyViewRichTextViewer = PropertyViewRichTextViewer;

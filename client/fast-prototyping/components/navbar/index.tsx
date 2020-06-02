@@ -34,6 +34,10 @@ const navbarStyles = (theme: Theme) => createStyles({
     textOverflow: "ellipsis",
     overflow: "hidden",
   },
+  titleMargin: {
+    paddingRight: "12px",
+    display: "inline-block",
+  }
 });
 
 interface INavbarProps extends WithStyles<typeof navbarStyles> {
@@ -62,9 +66,9 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
           </I18nRead>
           <div className={props.classes.title}>
             <Typography variant="body1" className={props.classes.titleTypography}>
-              <TitleReader />
-              &nbsp;
-              &nbsp;
+              <span className={props.classes.titleMargin}>
+                <TitleReader />
+              </span>
               <OutdatedText onClick={setIsOutdatedDialogAllowedToBeOpen.bind(this, true)}/>
             </Typography>
           </div>

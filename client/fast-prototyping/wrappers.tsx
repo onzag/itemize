@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
@@ -8,7 +8,18 @@ import Moment from "moment";
 import MomentUtils from "@date-io/moment";
 import { IConfigRawJSONDataType } from "../../config";
 
-// TODO add collector somewhere around here
+export function SSRSheetsRemover(props: {children: React.ReactNode}) {
+  useEffect(() => {
+    const ssrStyles = document.querySelector('#ssr-sheets');
+    if (ssrStyles) {
+      ssrStyles.parentElement.removeChild(ssrStyles);
+    }
+  }, []);
+
+  // buggy typescript
+  return props.children as any;
+}
+
 export function appWrapper(app: React.ReactElement, config: IConfigRawJSONDataType) {
   // we create the material ui theme
   const theme = createMuiTheme({
@@ -23,7 +34,9 @@ export function appWrapper(app: React.ReactElement, config: IConfigRawJSONDataTy
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline/>
-      {app}
+      <SSRSheetsRemover>
+        {app}
+      </SSRSheetsRemover>
     </MuiThemeProvider>
   );
 }

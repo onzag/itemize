@@ -59,6 +59,11 @@ const footerStyles = (theme: Theme) => createStyles({
     color: "inherit",
     textDecoration: "none",
   },
+  spacer: {
+    width: "6px",
+    display: "inline-block",
+    height: "2px",
+  },
 });
 
 export const Footer = withStyles(footerStyles)((props: WithStyles<typeof footerStyles>) => {
@@ -74,14 +79,15 @@ export const Footer = withStyles(footerStyles)((props: WithStyles<typeof footerS
     <div className={props.classes.container + " " + props.classes.containerAbs}>
       <div className={props.classes.dataSet + " " + props.classes.dataSetAbs}>
         <CopyrightIcon/>
-        &nbsp;
+        <span className={props.classes.spacer}/>
+        <span className={props.classes.spacer}/>
         {year}
         <span className={props.classes.copyInfo}>
-          &nbsp;
+          <span className={props.classes.spacer}/>
           <I18nRead id="app_name" capitalize={true}/>
         </span>
-        &nbsp;
-        &nbsp;
+        <span className={props.classes.spacer}/>
+        <span className={props.classes.spacer}/>
         <LanguagePicker useCode={true}/>
         <CountryPicker useCode={true}/>
         <CurrencyPicker useCode={true}/>

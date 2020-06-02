@@ -4,6 +4,8 @@ import { initializeItemizeApp } from "@onzag/itemize/client";
 import { rendererContext } from "@onzag/itemize/client/fast-prototyping/renderers";
 import { appWrapper, mainWrapper } from "@onzag/itemize/client/fast-prototyping/wrappers";
 
+import "./rich-extensions.scss";
+
 initializeItemizeApp(
 	// the renderer context specifies how property components (viewers and editors) are
 	// rendered, by default itemize contains its own fast prototyping renderers, these use

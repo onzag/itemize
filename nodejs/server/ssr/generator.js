@@ -9,6 +9,7 @@ const mode_1 = require("../mode");
 const client_1 = require("../../client");
 const react_router_dom_1 = require("react-router-dom");
 const server_1 = __importDefault(require("react-dom/server"));
+const MEMOIZED_ANSWERS = {};
 async function ssrGenerator(req, res, html, appData, rule) {
     res.setHeader("content-type", "text/html; charset=utf-8");
     const config = appData.config;
@@ -29,6 +30,7 @@ async function ssrGenerator(req, res, html, appData, rule) {
             rtl: false,
             languages: config.supportedLanguages,
             forUser: null,
+            memId: "*",
         };
         // this is the root form without any language or any means, there's no SSR data to fill
     }
@@ -60,6 +62,19 @@ async function ssrGenerator(req, res, html, appData, rule) {
             languages: config.supportedLanguages,
             forUser: userAfterValidate,
         };
+        // language makes the memory specific for it
+        if (appliedRule.memId) {
+            appliedRule.memId += "." + appliedRule.language;
+        }
+        // we don't want to memoize specific user answers
+        // they should be using the service worker at that point
+        if (appliedRule.forUser.id) {
+            appliedRule.memId = null;
+        }
+    }
+    if (MEMOIZED_ANSWERS[appliedRule.memId]) {
+        res.end(MEMOIZED_ANSWERS[appliedRule.memId]);
+        return;
     }
     if (appliedRule.ogImage.startsWith("/")) {
         appliedRule.ogImage = `${req.protocol}://${req.get("host")}` + appliedRule.ogImage;
@@ -91,10 +106,11 @@ async function ssrGenerator(req, res, html, appData, rule) {
             title: appliedRule.title,
         };
         newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(ssr));
-        const serverApp = await client_1.initializeItemizeApp(appData.ssrConfig.rendererContext, appData.ssrConfig.mainComponent, {
+        const serverAppData = await client_1.initializeItemizeApp(appData.ssrConfig.rendererContext, appData.ssrConfig.mainComponent, {
             appWrapper: appData.ssrConfig.appWrapper,
             mainWrapper: appData.ssrConfig.mainWrapper,
             serverMode: {
+                collector: appData.ssrConfig.collector,
                 config: appData.config,
                 ssrContext: ssr,
                 pathname: req.path,
@@ -110,10 +126,17 @@ async function ssrGenerator(req, res, html, appData, rule) {
                 ipStack: appData.ipStack,
             }
         });
-        const app = (react_1.default.createElement(react_router_dom_1.StaticRouter, { location: req.url }, serverApp));
+        const app = (react_1.default.createElement(react_router_dom_1.StaticRouter, { location: req.url }, serverAppData.node));
         newHTML = newHTML.replace(/\$SSRAPP/g, server_1.default.renderToStaticMarkup(app));
+        let finalSSRHead = langHrefLangTags;
+        if (serverAppData.id) {
+            finalSSRHead += appData.ssrConfig.collector.retrieve(serverAppData.id);
+        }
         // TODO extract css
-        newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
+        newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, finalSSRHead);
+    }
+    if (appliedRule.memId) {
+        MEMOIZED_ANSWERS[appliedRule.memId] = newHTML;
     }
     res.end(newHTML);
 }

@@ -45,6 +45,14 @@ export function importScript(src: string) {
   });
 }
 
+export interface ICollectorType {
+  collect: (app: React.ReactElement) => {
+    node: React.ReactNode,
+    id: string,
+  },
+  retrieve: (id: string) => string,
+}
+
 export async function initializeItemizeApp(
   rendererContext: IRendererContext,
   mainComponent: React.ReactElement,
@@ -52,6 +60,7 @@ export async function initializeItemizeApp(
     appWrapper?: (app: React.ReactElement, config: IConfigRawJSONDataType) => React.ReactElement;
     mainWrapper?: (mainComponet: React.ReactElement, localeContext: ILocaleContextType) => React.ReactElement;
     serverMode?: {
+      collector?: ICollectorType;
       config: IConfigRawJSONDataType,
       ssrContext: ISSRContextType;
       pathname: string,
@@ -173,9 +182,9 @@ export async function initializeItemizeApp(
           !serverMode.ipStack
         ) {
           guessedUserData = standardAPIResponse;
-          return;
+        } else {
+          guessedUserData = await serverMode.ipStack.requestUserInfoForIp(ip, standardAPIResponse);
         }
-        guessedUserData = await serverMode.ipStack.requestUserInfoForIp(ip, standardAPIResponse);
       }
     } catch (err) {
       console.log("Error while parsing guessed locale data");
@@ -336,8 +345,14 @@ export async function initializeItemizeApp(
     );
 
     if (serverMode) {
+      if (serverMode.collector) {
+        return serverMode.collector.collect(actualApp);
+      }
       // needs to be wrapped in the router itself
-      return actualApp;
+      return {
+        node: actualApp,
+        id: null,
+      };
     }
 
     if (ssrContext) {

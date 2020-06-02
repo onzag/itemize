@@ -14,8 +14,30 @@ import { createStyles, WithStyles, withStyles } from "@material-ui/styles";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
-// import { Map, TileLayer, Marker } from "react-leaflet";
+
+import { Map, TileLayer, Marker } from "react-leaflet";
+let CMap: typeof Map;
+let CTileLayer: typeof TileLayer;
+let CMarker: typeof Marker;
+let L: any;
+if (typeof document !== "undefined") {
+  const LL = require("react-leaflet");
+  CMap = LL.Map;
+  CTileLayer = LL.TileLayer;
+  CMarker = LL.Marker;
+  L = require("leaflet");
+
+  // https://github.com/PaulLeCam/react-leaflet/issues/453
+  // bug in leaflet
+  delete (L.Icon as any).Default.prototype._getIconUrl;
+  (L.Icon as any).Default.mergeOptions({
+    iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+    iconUrl: require("leaflet/dist/images/marker-icon.png"),
+    shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+  });
+}
 // import L, { LeafletMouseEvent } from "leaflet";
+
 import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import { IPropertyEntryLocationRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryLocation";
@@ -25,17 +47,6 @@ import { Alert } from "@material-ui/lab";
 import { capitalize } from "../../../../util";
 import RestoreIcon from '@material-ui/icons/Restore';
 import ClearIcon from '@material-ui/icons/Clear';
-
-// https://github.com/PaulLeCam/react-leaflet/issues/453
-// bug in leaflet
-// delete (L.Icon as any).Default.prototype._getIconUrl;
-// (L.Icon as any).Default.mergeOptions({
-//   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-//   iconUrl: require("leaflet/dist/images/marker-icon.png"),
-//   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
-// });
-
-// TODOSSRFIX
 
 const ZOOMS = {
   "LARGE": 16,
@@ -218,12 +229,20 @@ interface IPropertyEntryLocationRendererWithStylesProps extends IPropertyEntryLo
 
 }
 
-class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component<IPropertyEntryLocationRendererWithStylesProps> {
+interface IPropertyEntryLocationRendererState {
+  readyToMap: boolean;
+}
+
+class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component<IPropertyEntryLocationRendererWithStylesProps, IPropertyEntryLocationRendererState> {
   private inputRef: HTMLInputElement;
   private preventNextSearchQueryChange: boolean = false;
 
   constructor(props: IPropertyEntryLocationRendererWithStylesProps) {
     super(props);
+
+    this.state = {
+      readyToMap: false,
+    }
 
     this.onSearchQueryChange = this.onSearchQueryChange.bind(this);
     this.renderBody = this.renderBody.bind(this);
@@ -236,6 +255,9 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
     this.onChangeBySuggestion = this.onChangeBySuggestion.bind(this);
   }
   public componentDidMount() {
+    this.setState({
+      readyToMap: true,
+    });
     if (this.props.autoFocus && this.inputRef) {
       this.inputRef.focus();
     }
@@ -341,6 +363,32 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       icon = this.props.icon;
     }
 
+    const map = this.state.readyToMap ? (
+      <CMap
+        viewport={viewport}
+        onViewportChange={this.props.onViewportChange}
+        onClick={this.setLocationManually}
+      >
+        <CTileLayer
+          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+        />
+        {this.props.currentValue ? <CMarker position={[
+          this.props.currentValue.lat, this.props.currentValue.lng,
+        ]} /> : null}
+        {!this.props.disabled && this.props.activeSearchResults ? this.props.activeSearchResults
+          .filter((result) => this.props.currentValue.id !== result.id)
+          .map((result) => (
+            <CMarker
+              opacity={0.5}
+              key={result.id}
+              position={[result.lat, result.lng]}
+              onClick={this.props.onChangeBySearchResult.bind(this, result, true)}
+            />
+          )) : null}
+      </CMap>
+    ) : null;
+
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
     return (
       <div className={this.props.classes.container}>
@@ -380,29 +428,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
           }
         </div>
         <div className={this.props.classes.locationMapContainer}>
-          {/* <Map
-            viewport={viewport}
-            onViewportChange={this.props.onViewportChange}
-            onClick={this.setLocationManually}
-          >
-            <TileLayer
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-            />
-            {this.props.currentValue ? <Marker position={[
-              this.props.currentValue.lat, this.props.currentValue.lng,
-            ]}/>: null}
-            {!this.props.disabled && this.props.activeSearchResults ? this.props.activeSearchResults
-              .filter((result) => this.props.currentValue.id !== result.id)
-              .map((result) => (
-                <Marker
-                  opacity={0.5}
-                  key={result.id}
-                  position={[result.lat, result.lng]}
-                  onClick={this.props.onChangeBySearchResult.bind(this, result, true)}
-                />
-            )) : null}
-          </Map> */}
+          {map}
         </div>
         <TextField
           fullWidth={true}

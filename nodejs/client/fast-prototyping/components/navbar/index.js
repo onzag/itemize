@@ -45,6 +45,10 @@ const navbarStyles = (theme) => core_1.createStyles({
         textOverflow: "ellipsis",
         overflow: "hidden",
     },
+    titleMargin: {
+        paddingRight: "12px",
+        display: "inline-block",
+    }
 });
 exports.Navbar = core_1.withStyles(navbarStyles)((props) => {
     const [isOutdatedDialogAllowedToBeOpen, setIsOutdatedDialogAllowedToBeOpen] = react_1.useState(true);
@@ -56,8 +60,8 @@ exports.Navbar = core_1.withStyles(navbarStyles)((props) => {
                     react_1.default.createElement(Menu_1.default, null)))),
                 react_1.default.createElement("div", { className: props.classes.title },
                     react_1.default.createElement(core_1.Typography, { variant: "body1", className: props.classes.titleTypography },
-                        react_1.default.createElement(TitleReader_1.default, null),
-                        "\u00A0 \u00A0",
+                        react_1.default.createElement("span", { className: props.classes.titleMargin },
+                            react_1.default.createElement(TitleReader_1.default, null)),
                         react_1.default.createElement(outdated_text_1.OutdatedText, { onClick: setIsOutdatedDialogAllowedToBeOpen.bind(this, true) }))),
                 react_1.default.createElement("div", { className: props.classes.container },
                     react_1.default.createElement(UserDataRetriever_1.default, null, (user) => react_1.default.createElement(module_1.ModuleProvider, { module: "users" },

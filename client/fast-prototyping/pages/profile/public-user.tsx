@@ -41,7 +41,12 @@ const publicUserProfileStyles = (theme: Theme) => createStyles({
   aboutMeCard: {
     marginTop: "1rem",
     padding: "1rem",
-  }
+  },
+  spacer: {
+    width: "6px",
+    height: "2px",
+    display: "inline-block",
+  },
 });
 
 export const PublicUserProfile = withStyles(publicUserProfileStyles)((props: WithStyles<typeof publicUserProfileStyles>) => {
@@ -58,7 +63,7 @@ export const PublicUserProfile = withStyles(publicUserProfileStyles)((props: Wit
                     <Typography variant="h4" className={props.classes.username}>
                       {username}
                       {eValidated ? <span>
-                        &nbsp;
+                        <span className={props.classes.spacer}/>
                         <I18nRead id="label" propertyId="e_validated" capitalize={true}>
                           {(i18nUserValidated: string) => (
                             <Tooltip title={i18nUserValidated}>

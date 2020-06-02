@@ -128,9 +128,10 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
                     ip === "::ffff:127.0.0.1" ||
                     !serverMode.ipStack) {
                     guessedUserData = standardAPIResponse;
-                    return;
                 }
-                guessedUserData = await serverMode.ipStack.requestUserInfoForIp(ip, standardAPIResponse);
+                else {
+                    guessedUserData = await serverMode.ipStack.requestUserInfoForIp(ip, standardAPIResponse);
+                }
             }
         }
         catch (err) {
@@ -259,8 +260,14 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
             react_1.default.createElement(ssr_provider_1.SSRProvider, { value: ssrContext },
                 react_1.default.createElement(renderer_1.RendererContext.Provider, { value: rendererContext }, children))));
         if (serverMode) {
+            if (serverMode.collector) {
+                return serverMode.collector.collect(actualApp);
+            }
             // needs to be wrapped in the router itself
-            return actualApp;
+            return {
+                node: actualApp,
+                id: null,
+            };
         }
         if (ssrContext) {
             react_dom_1.default.hydrate(react_1.default.createElement(react_router_dom_1.Router, { history: exports.history }, actualApp), document.getElementById("app"));

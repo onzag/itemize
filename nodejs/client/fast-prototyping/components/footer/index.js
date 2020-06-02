@@ -63,6 +63,11 @@ const footerStyles = (theme) => core_1.createStyles({
         color: "inherit",
         textDecoration: "none",
     },
+    spacer: {
+        width: "6px",
+        display: "inline-block",
+        height: "2px",
+    },
 });
 exports.Footer = core_1.withStyles(footerStyles)((props) => {
     const year = (new Date()).getUTCFullYear();
@@ -76,12 +81,14 @@ exports.Footer = core_1.withStyles(footerStyles)((props) => {
         react_1.default.createElement("div", { className: props.classes.container + " " + props.classes.containerAbs },
             react_1.default.createElement("div", { className: props.classes.dataSet + " " + props.classes.dataSetAbs },
                 react_1.default.createElement(Copyright_1.default, null),
-                "\u00A0",
+                react_1.default.createElement("span", { className: props.classes.spacer }),
+                react_1.default.createElement("span", { className: props.classes.spacer }),
                 year,
                 react_1.default.createElement("span", { className: props.classes.copyInfo },
-                    "\u00A0",
+                    react_1.default.createElement("span", { className: props.classes.spacer }),
                     react_1.default.createElement(I18nRead_1.default, { id: "app_name", capitalize: true })),
-                "\u00A0 \u00A0",
+                react_1.default.createElement("span", { className: props.classes.spacer }),
+                react_1.default.createElement("span", { className: props.classes.spacer }),
                 react_1.default.createElement(language_picker_1.LanguagePicker, { useCode: true }),
                 react_1.default.createElement(country_picker_1.CountryPicker, { useCode: true }),
                 react_1.default.createElement(currency_picker_1.CurrencyPicker, { useCode: true })),

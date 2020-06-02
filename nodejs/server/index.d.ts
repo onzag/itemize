@@ -18,6 +18,7 @@ import "winston-daily-rotate-file";
 import { ISSRRuleSet } from "./ssr";
 import { IRendererContext } from "../client/providers/renderer";
 import { ILocaleContextType } from "../client/internal/app";
+import { ICollectorType } from "../client";
 export declare const logger: winston.Logger;
 export declare type PkgCloudClients = {
     [containerId: string]: pkgcloud.storage.Client;
@@ -31,6 +32,7 @@ export interface ISSRConfig {
     mainComponent: React.ReactElement;
     appWrapper?: (app: React.ReactElement, config: IConfigRawJSONDataType) => React.ReactElement;
     mainWrapper?: (mainComponet: React.ReactElement, localeContext: ILocaleContextType) => React.ReactElement;
+    collector?: ICollectorType;
 }
 export interface IAppDataType {
     root: Root;

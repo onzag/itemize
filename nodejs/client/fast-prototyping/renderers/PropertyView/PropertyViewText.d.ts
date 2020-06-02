@@ -3,13 +3,18 @@ import React from "react";
 interface IPropertyViewRichTextViewerProps {
     children?: string;
 }
-export declare class PropertyViewRichTextViewer extends React.Component<IPropertyViewRichTextViewerProps> {
+interface IPropertyViewRichTextViewerState {
+    html: string;
+}
+export declare class PropertyViewRichTextViewer extends React.Component<IPropertyViewRichTextViewerProps, IPropertyViewRichTextViewerState> {
     private divref;
     private cheapdiv;
     constructor(props: IPropertyViewRichTextViewerProps);
+    getHTML(html: string): string;
     updateHTML(html: string): void;
-    componentDidMount(): void;
-    shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps): boolean;
+    attachEvents(): void;
+    componentDidUpdate(): void;
+    shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps, nextState: IPropertyViewRichTextViewerState): boolean;
     render(): JSX.Element;
 }
 export default function PropertyViewTextRenderer(props: IPropertyViewTextRendererProps): JSX.Element;

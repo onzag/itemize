@@ -45,7 +45,12 @@ const publicUserProfileStyles = (theme) => core_1.createStyles({
     aboutMeCard: {
         marginTop: "1rem",
         padding: "1rem",
-    }
+    },
+    spacer: {
+        width: "6px",
+        height: "2px",
+        display: "inline-block",
+    },
 });
 exports.PublicUserProfile = core_1.withStyles(publicUserProfileStyles)((props) => {
     return (react_1.default.createElement(react_1.default.Fragment, null,
@@ -56,7 +61,7 @@ exports.PublicUserProfile = core_1.withStyles(publicUserProfileStyles)((props) =
                     react_1.default.createElement(Reader_1.default, { id: "e_validated" }, (eValidated) => (react_1.default.createElement(Reader_1.default, { id: "username" }, (username) => (react_1.default.createElement(core_1.Typography, { variant: "h4", className: props.classes.username },
                         username,
                         eValidated ? react_1.default.createElement("span", null,
-                            "\u00A0",
+                            react_1.default.createElement("span", { className: props.classes.spacer }),
                             react_1.default.createElement(I18nRead_1.default, { id: "label", propertyId: "e_validated", capitalize: true }, (i18nUserValidated) => (react_1.default.createElement(core_1.Tooltip, { title: i18nUserValidated },
                                 react_1.default.createElement(VerifiedUser_1.default, { className: props.classes.verifiedIcon }))))) : null)))))),
                 react_1.default.createElement(Reader_1.default, { id: "app_country" }, (country) => {

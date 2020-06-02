@@ -41,6 +41,7 @@ import { ISSRRuleSet } from "./ssr";
 import { ssrGenerator } from "./ssr/generator";
 import { IRendererContext } from "../client/providers/renderer";
 import { ILocaleContextType } from "../client/internal/app";
+import { ICollectorType } from "../client";
 
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -96,6 +97,7 @@ export interface ISSRConfig {
   mainComponent: React.ReactElement,
   appWrapper?: (app: React.ReactElement, config: IConfigRawJSONDataType) => React.ReactElement;
   mainWrapper?: (mainComponet: React.ReactElement, localeContext: ILocaleContextType) => React.ReactElement;
+  collector?: ICollectorType;
 }
 
 export interface IAppDataType {

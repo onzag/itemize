@@ -192,7 +192,7 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
                                     onClick={actioner.sendValidateEmail}
                                   >
                                     <I18nRead capitalize={true} id="missing_email_validation_warning_action"/>
-                                    <i className={props.classes.emailInButton}>&nbsp;{emailState.stateAppliedValue}</i>
+                                    <i className={props.classes.emailInButton}>{" " + emailState.stateAppliedValue}</i>
                                   </Button>
                                 </ProgressingElement>
                                 <Snackbar

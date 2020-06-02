@@ -2,7 +2,6 @@ import "../../../internal/theme/quill.scss";
 
 import React from "react";
 import { InputLabel, IconButton, ThemeProvider, Typography, TextField, Button } from "@material-ui/core";
-// import ReactQuill from "@onzag/react-quill";
 import Toolbar from "@material-ui/core/Toolbar";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
@@ -35,20 +34,23 @@ import RestoreIcon from '@material-ui/icons/Restore';
 import ClearIcon from '@material-ui/icons/Clear';
 import { SlowLoadingElement } from "../../components/util";
 
-// TODOSSRFIX
-
-const whatever: any = () => null as any;
-
-const ReactQuill = {
-  Quill: {
-    import: whatever,
-    register: whatever,
-  }
+import ReactQuill from "@onzag/react-quill";
+let AReactQuill: typeof ReactQuill;
+if (typeof document !== "undefined") {
+  AReactQuill = require("@onzag/react-quill");
+} else {
+  const dead: any = () => null as any;
+  AReactQuill = {
+    Quill: {
+      import: dead,
+      register: dead,
+    }
+  } as any;
 }
 
-const BlockEmbed = ReactQuill.Quill.import("blots/block/embed");
-const Embed = ReactQuill.Quill.import("blots/embed");
-const Delta = ReactQuill.Quill.import("delta");
+const BlockEmbed = AReactQuill.Quill.import("blots/block/embed");
+const Embed = AReactQuill.Quill.import("blots/embed");
+const Delta = AReactQuill.Quill.import("delta");
 
 interface ItemizeImageBlotValue {
   alt: string;
@@ -116,7 +118,7 @@ ItemizeImageBlot.blotName = "itemizeimage";
 ItemizeImageBlot.className = "image";
 ItemizeImageBlot.tagName = "div";
 
-ReactQuill.Quill.register(ItemizeImageBlot);
+AReactQuill.Quill.register(ItemizeImageBlot);
 
 interface ItemizeVideoBlotValue {
   src: string;
@@ -169,7 +171,7 @@ ItemizeVideoBlot.blotName = "itemizevideo";
 ItemizeVideoBlot.className = "video";
 ItemizeVideoBlot.tagName = "div";
 
-ReactQuill.Quill.register(ItemizeVideoBlot);
+AReactQuill.Quill.register(ItemizeVideoBlot);
 
 interface ItemizeFileBlotValue {
   srcId: string;
@@ -244,7 +246,7 @@ ItemizeFileBlot.blotName = "itemizefile";
 ItemizeFileBlot.className = "file";
 ItemizeFileBlot.tagName = "span";
 
-ReactQuill.Quill.register(ItemizeFileBlot);
+AReactQuill.Quill.register(ItemizeFileBlot);
 
 function shouldShowInvalid(props: IPropertyEntryTextRendererProps) {
   return !props.currentValid;
@@ -509,6 +511,7 @@ interface IPropertyEntryTextRendererState {
   invalidVideoLink: boolean;
   currentVideoLink: string;
   rawMode: boolean;
+  isReadyToType: boolean;
 }
 
 const CACHED_FORMATS_RICH = ["bold", "italic", "underline", "header", "blockquote", "list", "itemizeimage", "itemizevideo", "itemizefile"];
@@ -542,6 +545,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       invalidVideoLink: false,
       currentVideoLink: "",
       rawMode: false,
+      isReadyToType: false,
     };
 
     this.uuid =  "uuid-" + uuid.v4();
@@ -587,6 +591,10 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     });
   }
   public componentDidMount() {
+    // double pass for SSR
+    this.setState({
+      isReadyToType: true,
+    });
     if (this.props.isRichText) {
       this.addPasteEventOnEditor();
     }
@@ -598,7 +606,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   }
   public addPasteEventOnEditor() {
     const editor = this.quillRef.current.getEditor();
-    // TODO any here
+    // Used any not to jinx SSR
     editor.root.addEventListener('paste', async (e: any) => {
       const clipboardData: DataTransfer = e.clipboardData || (window as any).clipboardData;
       // support cut by software & copy image file directly
@@ -628,8 +636,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         sizes: null,
         srcWidth: data.width,
         srcHeight: data.height,
-      }, (ReactQuill.Quill as any).sources.USER);
-      editor.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
+      }, (AReactQuill.Quill as any).sources.USER);
+      editor.setSelection(range.index + 2, 0, (AReactQuill.Quill as any).sources.SILENT);
     });
   }
   public onChangeByTextarea(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -746,8 +754,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     quill.insertEmbed(range.index, "itemizevideo", {
       src,
       origin,
-    }, (ReactQuill.Quill as any).sources.USER);
-    quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
+    }, (AReactQuill.Quill as any).sources.USER);
+    quill.setSelection(range.index + 2, 0, (AReactQuill.Quill as any).sources.SILENT);
 
     this.closeVideoRequesting();
   }
@@ -770,8 +778,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         name: fileData.name,
         extension: expectedExtension,
         size: prettySize,
-      }, (ReactQuill.Quill as any).sources.USER);
-      quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
+      }, (AReactQuill.Quill as any).sources.USER);
+      quill.setSelection(range.index + 2, 0, (AReactQuill.Quill as any).sources.SILENT);
     } catch (err) {}
   }
   public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
@@ -795,8 +803,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         sizes: null,
         srcWidth: data.width,
         srcHeight: data.height,
-      }, (ReactQuill.Quill as any).sources.USER);
-      quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
+      }, (AReactQuill.Quill as any).sources.USER);
+      quill.setSelection(range.index + 2, 0, (AReactQuill.Quill as any).sources.SILENT);
     } catch (err) {
     }
   }
@@ -905,6 +913,35 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       </Dialog>
     ) : null;
 
+    const quill = this.state.isReadyToType ? (
+      <>
+        <RichTextEditorToolbar
+          id={this.uuid}
+          i18n={this.props.i18nFormat}
+          supportsImages={this.props.supportsImages}
+          supportsFiles={this.props.supportsFiles}
+          supportsVideos={this.props.supportsVideos}
+          supportsBasicMode={true}
+          className={this.props.classes.toolbar}
+          supportsRawMode={this.props.args.supportsRawMode}
+          onToggleRawMode={this.toggleRawMode}
+        />
+        <AReactQuill
+          ref={this.quillRef}
+          className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
+          modules={this.cachedModuleOptionsRich}
+          formats={CACHED_FORMATS_RICH}
+          theme={null}
+          placeholder={capitalize(this.props.placeholder)}
+          value={editorValue}
+          onChange={this.onChange}
+          onFocus={this.onFocus}
+          onBlur={this.onBlur}
+          disableClipboardMatchersOnUpdate={CACHED_CLIPBOARD_MATCHERS}
+        />
+      </>
+    ) : null;
+
     // we return the component, note how we set the thing to focused
     // TODO disabled
     return (
@@ -935,34 +972,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
             {capitalize(this.props.label)}{iconComponent}
           </InputLabel>
           {
-            this.props.isRichText && !this.state.rawMode ? (
-              <>
-                <RichTextEditorToolbar
-                  id={this.uuid}
-                  i18n={this.props.i18nFormat}
-                  supportsImages={this.props.supportsImages}
-                  supportsFiles={this.props.supportsFiles}
-                  supportsVideos={this.props.supportsVideos}
-                  supportsBasicMode={true}
-                  className={this.props.classes.toolbar}
-                  supportsRawMode={this.props.args.supportsRawMode}
-                  onToggleRawMode={this.toggleRawMode}
-                />
-                {/* <ReactQuill
-                  ref={this.quillRef}
-                  className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
-                  modules={this.cachedModuleOptionsRich}
-                  formats={CACHED_FORMATS_RICH}
-                  theme={null}
-                  placeholder={capitalize(this.props.placeholder)}
-                  value={editorValue}
-                  onChange={this.onChange}
-                  onFocus={this.onFocus}
-                  onBlur={this.onBlur}
-                  disableClipboardMatchersOnUpdate={CACHED_CLIPBOARD_MATCHERS}
-                /> */}
-              </>
-            ) : (
+            this.props.isRichText && !this.state.rawMode ? quill : (
               <>
                 {this.props.isRichText && this.props.args.supportsRawMode ? <RichTextEditorToolbar
                   id={this.uuid + "-raw-mode-only"}

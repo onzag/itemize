@@ -16,12 +16,11 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
 
     this.refImg = React.createRef<HTMLImageElement>();
     
-    // TODO this won't play nice with SSR TODOSSRFIX
     // loaded represents the properties src and srcset when using native
     // image loading it's unecessary to have them removed as the browser
     // will handle it natively
     this.state = {
-      loaded: props.args.lazyLoad && !supportsImageLoading ? false : true,
+      loaded: false,
     }
   }
   public attachScrollEvent() {
@@ -78,6 +77,14 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
     }
   }
   public componentDidMount() {
+    // we can't know if supports image loading is valid via lazy yet because the constructor
+    // can run within SSR
+    const newLoadedState = this.props.args.lazyLoad && !supportsImageLoading ? false : true;
+    if (newLoadedState !== this.state.loaded) {
+      this.setState({
+        loaded: newLoadedState,
+      });
+    }
     if (this.props.args.lazyLoad) {
       if (!(window as any).IntersectionObserver && !supportsImageLoading) {
         this.checkWhetherInViewOldSchool();
@@ -111,9 +118,11 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
           ref={this.refImg}
           srcSet={!this.state.loaded ? null : this.props.imageSrcSet}
           sizes={imageSizes}
+          data-src={this.props.currentValue.url}
           src={!this.state.loaded ? null : this.props.currentValue.url}
           className={imageClassName}
-          loading={this.props.args.lazyLoad && supportsImageLoading ? "lazy" : null}
+          loading={this.props.args.lazyLoad ? "lazy" : null}
+          alt={this.props.currentValue.name}
         />
       )
     }
