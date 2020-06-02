@@ -1,5 +1,4 @@
 /// <reference types="react" />
-import "leaflet/dist/leaflet.css";
 import "../../../internal/theme/leaflet.scss";
 import { IPropertyEntryThemeType } from "./styles";
 import { IPropertyEntryLocationRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryLocation";

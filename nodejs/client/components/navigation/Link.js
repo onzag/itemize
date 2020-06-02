@@ -26,7 +26,8 @@ function LinkCustomComponent(Tag, props) {
  * @param props the LinkProps
  */
 function Link(props) {
-    const currentLocaleFromURL = location.pathname.split("/")[1] || null;
+    const locationCur = react_router_dom_1.useLocation();
+    const currentLocaleFromURL = locationCur.pathname.split("/")[1] || null;
     if (!currentLocaleFromURL) {
         return null;
     }

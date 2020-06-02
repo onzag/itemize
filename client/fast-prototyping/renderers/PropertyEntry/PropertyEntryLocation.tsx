@@ -1,3 +1,5 @@
+import "../../../internal/theme/leaflet.scss";
+
 import React from "react";
 import TextField from "@material-ui/core/TextField";
 import {
@@ -12,10 +14,8 @@ import { createStyles, WithStyles, withStyles } from "@material-ui/styles";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
-import { Map, TileLayer, Marker } from "react-leaflet";
-import L, { LeafletMouseEvent } from "leaflet";
-import "leaflet/dist/leaflet.css";
-import "../../../internal/theme/leaflet.scss";
+// import { Map, TileLayer, Marker } from "react-leaflet";
+// import L, { LeafletMouseEvent } from "leaflet";
 import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import { IPropertyEntryLocationRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryLocation";
@@ -28,12 +28,14 @@ import ClearIcon from '@material-ui/icons/Clear';
 
 // https://github.com/PaulLeCam/react-leaflet/issues/453
 // bug in leaflet
-delete (L.Icon as any).Default.prototype._getIconUrl;
-(L.Icon as any).Default.mergeOptions({
-  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-  iconUrl: require("leaflet/dist/images/marker-icon.png"),
-  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
-});
+// delete (L.Icon as any).Default.prototype._getIconUrl;
+// (L.Icon as any).Default.mergeOptions({
+//   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+//   iconUrl: require("leaflet/dist/images/marker-icon.png"),
+//   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+// });
+
+// TODOSSRFIX
 
 const ZOOMS = {
   "LARGE": 16,
@@ -238,7 +240,8 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       this.inputRef.focus();
     }
   }
-  public setLocationManually(e: LeafletMouseEvent) {
+  // public setLocationManually(e: LeafletMouseEvent) {
+  public setLocationManually(e: any) {
     this.props.onManualPick({
       lat: e.latlng.lat,
       lng: e.latlng.lng,
@@ -377,7 +380,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
           }
         </div>
         <div className={this.props.classes.locationMapContainer}>
-          <Map
+          {/* <Map
             viewport={viewport}
             onViewportChange={this.props.onViewportChange}
             onClick={this.setLocationManually}
@@ -399,7 +402,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
                   onClick={this.props.onChangeBySearchResult.bind(this, result, true)}
                 />
             )) : null}
-          </Map>
+          </Map> */}
         </div>
         <TextField
           fullWidth={true}

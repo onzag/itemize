@@ -1,4 +1,4 @@
-import { initializeServer } from "@onzag/itemize/nodejs/server";
+import { initializeServer } from "@onzag/itemize/server";
 
 // Itemize server isn't hot, it won't refresh in realtime and it
 // isn't recommended to attempt to set it up that way

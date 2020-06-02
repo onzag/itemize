@@ -1,5 +1,6 @@
+/// <reference types="react" />
 import express from "express";
-import Root from "../base/Root";
+import Root, { ILangLocalesType } from "../base/Root";
 import { IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
 import Knex from "knex";
 import { Listener } from "./listener";
@@ -15,6 +16,8 @@ import { Here } from "./services/here";
 import winston from "winston";
 import "winston-daily-rotate-file";
 import { ISSRRuleSet } from "./ssr";
+import { IRendererContext } from "../client/providers/renderer";
+import { ILocaleContextType } from "../client/internal/app";
 export declare const logger: winston.Logger;
 export declare type PkgCloudClients = {
     [containerId: string]: pkgcloud.storage.Client;
@@ -22,9 +25,17 @@ export declare type PkgCloudClients = {
 export declare type PkgCloudContainers = {
     [containerId: string]: pkgcloud.storage.Container;
 };
+export interface ISSRConfig {
+    ssrRules: ISSRRuleSet;
+    rendererContext: IRendererContext;
+    mainComponent: React.ReactElement;
+    appWrapper?: (app: React.ReactElement, config: IConfigRawJSONDataType) => React.ReactElement;
+    mainWrapper?: (mainComponet: React.ReactElement, localeContext: ILocaleContextType) => React.ReactElement;
+}
 export interface IAppDataType {
     root: Root;
-    ssrRules: ISSRRuleSet;
+    langLocales: ILangLocalesType;
+    ssrConfig: ISSRConfig;
     indexDevelopment: string;
     indexProduction: string;
     config: IConfigRawJSONDataType;
@@ -73,4 +84,4 @@ export interface IServerCustomizationDataType {
  * @param custom.customRouter a custom router to attach to the rest endpoint
  * @param custom.customTriggers a registry for custom triggers
  */
-export declare function initializeServer(ssrRules: ISSRRuleSet, custom?: IServerCustomizationDataType): Promise<void>;
+export declare function initializeServer(ssrConfig: ISSRConfig, custom?: IServerCustomizationDataType): Promise<void>;

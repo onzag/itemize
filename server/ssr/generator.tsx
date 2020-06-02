@@ -1,9 +1,13 @@
 import { IAppDataType } from "..";
+import React from "react";
 import express from "express";
 import { ISSRRule, ISSRRuleDynamic, ISSRRuleSetCb } from ".";
 import { GUEST_METAROLE } from "../../constants";
 import { getCookie } from "../mode";
 import { ISSRContextType } from "../../client/internal/providers/ssr-provider";
+import { initializeItemizeApp } from "../../client";
+import { StaticRouter } from "react-router-dom";
+import ReactDOMServer from 'react-dom/server';
 
 export async function ssrGenerator(
   req: express.Request,
@@ -16,6 +20,10 @@ export async function ssrGenerator(
   const config = appData.config;
   const language = req.path.split("/")[1];
   let appliedRule: ISSRRule;
+
+  const cookies = req.headers["cookie"];
+  const splittedCookies = cookies.split(";").map((c) => c.trim());
+
   if (!rule || !language || !config.supportedLanguages.includes(language)) {
     appliedRule = {
       title: config.appName,
@@ -33,8 +41,6 @@ export async function ssrGenerator(
     // this is the root form without any language or any means, there's no SSR data to fill
   } else {
     const resultRule: ISSRRuleDynamic = typeof rule === "function" ? rule(req, language, appData.root) : rule;
-    const cookies = req.headers["cookie"];
-    const splittedCookies = cookies.split(";").map((c) => c.trim());
 
     let userAfterValidate: {
       id: number,
@@ -95,8 +101,46 @@ export async function ssrGenerator(
     newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
     newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
   } else {
-    // TODO collect
-    const finalData: ISSRContextType = null;
+    const ssr: ISSRContextType = {
+      queries: {},
+      user: appliedRule.forUser,
+      title: appliedRule.title,
+    };
+
+    newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(ssr));
+    const serverApp = await initializeItemizeApp(
+      appData.ssrConfig.rendererContext,
+      appData.ssrConfig.mainComponent,
+      {
+        appWrapper: appData.ssrConfig.appWrapper,
+        mainWrapper: appData.ssrConfig.mainWrapper,
+        serverMode: {
+          config: appData.config,
+          ssrContext: ssr,
+          pathname: req.path,
+          clientDetails: {
+            lang: getCookie(splittedCookies, "lang"),
+            currency: getCookie(splittedCookies, "currency"),
+            country: getCookie(splittedCookies, "country"),
+            guessedData: getCookie(splittedCookies, "guessedData"),
+          },
+          langLocales: appData.langLocales,
+          root: appData.root,
+          req: req,
+          ipStack: appData.ipStack,
+        }
+      }
+    );
+
+    const app = (
+      <StaticRouter location={req.url}>
+        {serverApp}
+      </StaticRouter>
+    );
+    newHTML = newHTML.replace(/\$SSRAPP/g, ReactDOMServer.renderToStaticMarkup(app));
+    
+    // TODO extract css
+    newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
   }
 
   res.end(newHTML);

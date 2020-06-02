@@ -101,6 +101,7 @@ interface IPropertyViewRichTextViewerProps {
   children?: string;
 }
 
+// TODOSSR nothing visible in here and this one is important
 export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRichTextViewerProps> {
   private divref: React.RefObject<HTMLDivElement>;
   private cheapdiv: HTMLDivElement;
@@ -108,7 +109,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     super(props);
 
     this.divref = React.createRef<HTMLDivElement>();
-    this.cheapdiv = document.createElement("div");
+    this.cheapdiv = typeof document !== "undefined" ? document.createElement("div") : null;
   }
   public updateHTML(html: string) {
     if (!html) {

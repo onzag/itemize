@@ -2,6 +2,7 @@ import React from "react";
 import {
   Link as RouterLink,
   LinkProps,
+  useLocation,
 } from "react-router-dom";
 
 interface ICustomLinkProps extends LinkProps {
@@ -33,7 +34,8 @@ function LinkCustomComponent(Tag: string, props: any) {
  * @param props the LinkProps
  */
 export default function Link(props: ICustomLinkProps) {
-  const currentLocaleFromURL = location.pathname.split("/")[1] || null;
+  const locationCur = useLocation();
+  const currentLocaleFromURL = locationCur.pathname.split("/")[1] || null;
   if (!currentLocaleFromURL) {
     return null;
   }

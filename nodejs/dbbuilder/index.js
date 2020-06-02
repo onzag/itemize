@@ -13,7 +13,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const safe_1 = __importDefault(require("colors/safe"));
 const knex_1 = __importDefault(require("knex"));
-// @ts-ignore
+// @ts-nocheck
 const prompt_confirm_1 = __importDefault(require("prompt-confirm"));
 const Root_1 = __importDefault(require("../base/Root"));
 const build_tables_1 = require("./build-tables");

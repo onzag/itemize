@@ -201,8 +201,8 @@ function initializeApp(appData, custom) {
     app.get("/sw.production.js", (req, res) => {
         res.sendFile(path_1.default.resolve(path_1.default.join("dist", "data", "service-worker.production.js")));
     });
-    const ssrUrls = Object.keys(appData.ssrRules).forEach((url) => {
-        const rule = appData.ssrRules[url];
+    Object.keys(appData.ssrConfig.ssrRules).forEach((url) => {
+        const rule = appData.ssrConfig.ssrRules[url];
         const actualURL = "/:lang" + (url.startsWith("/") ? url : "/" + url);
         app.get(actualURL, (req, res) => {
             const mode = mode_1.getMode(appData, req);
@@ -255,7 +255,7 @@ function getContainerPromisified(client, containerName) {
  * @param custom.customRouter a custom router to attach to the rest endpoint
  * @param custom.customTriggers a registry for custom triggers
  */
-async function initializeServer(ssrRules, custom = {}) {
+async function initializeServer(ssrConfig, custom = {}) {
     if (INSTANCE_MODE === "BUILD_DATABASE") {
         dbbuilder_1.default(NODE_ENV);
         return;
@@ -270,6 +270,7 @@ async function initializeServer(ssrRules, custom = {}) {
         let rawDbConfig;
         let index;
         let buildnumber;
+        let rawLangLocales;
         [
             rawConfig,
             rawSensitiveConfig,
@@ -277,6 +278,7 @@ async function initializeServer(ssrRules, custom = {}) {
             rawDbConfig,
             index,
             rawBuild,
+            rawLangLocales,
             buildnumber,
         ] = await Promise.all([
             fsAsync.readFile(path_1.default.join("config", "index.json"), "utf8"),
@@ -285,6 +287,7 @@ async function initializeServer(ssrRules, custom = {}) {
             fsAsync.readFile(path_1.default.join("config", NODE_ENV === "development" ? "db.sensitive.json" : `db.${NODE_ENV}.sensitive.json`), "utf8"),
             fsAsync.readFile(path_1.default.join("dist", "data", "index.html"), "utf8"),
             fsAsync.readFile(path_1.default.join("dist", "data", "build.all.json"), "utf8"),
+            fsAsync.readFile(path_1.default.join("dist", "data", "lang.json"), "utf8"),
             fsAsync.readFile(path_1.default.join("dist", "buildnumber"), "utf8"),
         ]);
         const config = JSON.parse(rawConfig);
@@ -292,6 +295,7 @@ async function initializeServer(ssrRules, custom = {}) {
         const dbConfig = JSON.parse(rawDbConfig);
         const redisConfig = JSON.parse(rawRedisConfig);
         const build = JSON.parse(rawBuild);
+        const langLocales = JSON.parse(rawLangLocales);
         // redis configuration despite instructions actually tries to use null
         // values as it checks for undefined so we need to strip these if null
         Object.keys(redisConfig.cache).forEach((key) => {
@@ -448,7 +452,8 @@ async function initializeServer(ssrRules, custom = {}) {
         exports.logger.info("initializeServer: configuring app data build");
         const appData = {
             root,
-            ssrRules,
+            langLocales,
+            ssrConfig,
             indexDevelopment: index.replace(/\$MODE/g, "development"),
             indexProduction: index.replace(/\$MODE/g, "production"),
             config,

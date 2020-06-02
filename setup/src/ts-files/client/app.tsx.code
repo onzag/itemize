@@ -1,5 +1,6 @@
 import React from "react";
 
+// @ts-ignore
 import "./rich-extensions.scss";
 
 import { Navbar } from "@onzag/itemize/client/fast-prototyping/components/navbar";

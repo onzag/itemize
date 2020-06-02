@@ -1,12 +1,21 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const react_1 = __importDefault(require("react"));
 const constants_1 = require("../../constants");
 const mode_1 = require("../mode");
+const client_1 = require("../../client");
+const react_router_dom_1 = require("react-router-dom");
+const server_1 = __importDefault(require("react-dom/server"));
 async function ssrGenerator(req, res, html, appData, rule) {
     res.setHeader("content-type", "text/html; charset=utf-8");
     const config = appData.config;
     const language = req.path.split("/")[1];
     let appliedRule;
+    const cookies = req.headers["cookie"];
+    const splittedCookies = cookies.split(";").map((c) => c.trim());
     if (!rule || !language || !config.supportedLanguages.includes(language)) {
         appliedRule = {
             title: config.appName,
@@ -25,8 +34,6 @@ async function ssrGenerator(req, res, html, appData, rule) {
     }
     else {
         const resultRule = typeof rule === "function" ? rule(req, language, appData.root) : rule;
-        const cookies = req.headers["cookie"];
-        const splittedCookies = cookies.split(";").map((c) => c.trim());
         let userAfterValidate = {
             id: null,
             role: constants_1.GUEST_METAROLE,
@@ -78,8 +85,35 @@ async function ssrGenerator(req, res, html, appData, rule) {
         newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
     }
     else {
-        // TODO collect
-        const finalData = null;
+        const ssr = {
+            queries: {},
+            user: appliedRule.forUser,
+            title: appliedRule.title,
+        };
+        newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(ssr));
+        const serverApp = await client_1.initializeItemizeApp(appData.ssrConfig.rendererContext, appData.ssrConfig.mainComponent, {
+            appWrapper: appData.ssrConfig.appWrapper,
+            mainWrapper: appData.ssrConfig.mainWrapper,
+            serverMode: {
+                config: appData.config,
+                ssrContext: ssr,
+                pathname: req.path,
+                clientDetails: {
+                    lang: mode_1.getCookie(splittedCookies, "lang"),
+                    currency: mode_1.getCookie(splittedCookies, "currency"),
+                    country: mode_1.getCookie(splittedCookies, "country"),
+                    guessedData: mode_1.getCookie(splittedCookies, "guessedData"),
+                },
+                langLocales: appData.langLocales,
+                root: appData.root,
+                req: req,
+                ipStack: appData.ipStack,
+            }
+        });
+        const app = (react_1.default.createElement(react_router_dom_1.StaticRouter, { location: req.url }, serverApp));
+        newHTML = newHTML.replace(/\$SSRAPP/g, server_1.default.renderToStaticMarkup(app));
+        // TODO extract css
+        newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
     }
     res.end(newHTML);
 }

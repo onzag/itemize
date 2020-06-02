@@ -1,6 +1,8 @@
 import React from "react";
 import { createStyles, WithStyles, withStyles, CircularProgress } from "@material-ui/core";
+
 import "./util.scss";
+import { SSRContext } from "../../internal/providers/ssr-provider";
 
 interface DelayDisplayProps {
   duration: number;
@@ -91,17 +93,21 @@ interface SlowLoadingElementProps {
   inline?: boolean;
 }
 
-interface SlowLoadingElementState {
+interface ActualSlowLoadingElementState {
   isReady: boolean;
   readyForId: string;
 }
 
-export class SlowLoadingElement extends React.Component<SlowLoadingElementProps, SlowLoadingElementState> {
+interface ActualSlowLoadingElementProps extends SlowLoadingElementProps {
+  ssrDisabled: boolean;
+}
+
+export class ActualSlowLoadingElement extends React.Component<ActualSlowLoadingElementProps, ActualSlowLoadingElementState> {
   private unmounted: boolean = false;
   public static getDerivedStateFromProps(
     props: SlowLoadingElementProps,
-    state: SlowLoadingElementState,
-  ): Partial<SlowLoadingElementState> {
+    state: ActualSlowLoadingElementState,
+  ): Partial<ActualSlowLoadingElementState> {
     if (props.id !== state.readyForId) {
       return {
         isReady: false,
@@ -110,15 +116,18 @@ export class SlowLoadingElement extends React.Component<SlowLoadingElementProps,
     }
     return null;
   }
-  constructor(props: SlowLoadingElementProps) {
+  constructor(props: ActualSlowLoadingElementProps) {
     super(props);
 
     this.state = {
-      isReady: false,
+      isReady: props.ssrDisabled ? true : false,
       readyForId: props.id || null,
     }
   }
   public makeReady() {
+    if (this.state.isReady) {
+      return;
+    }
     setTimeout(() => {
       if (!this.unmounted) {
         this.setState({
@@ -127,7 +136,7 @@ export class SlowLoadingElement extends React.Component<SlowLoadingElementProps,
       }
     }, 10);
   }
-  public shouldComponentUpdate(nextProps: SlowLoadingElementProps, nextState: SlowLoadingElementState) {
+  public shouldComponentUpdate(nextProps: SlowLoadingElementProps, nextState: ActualSlowLoadingElementState) {
     return this.state.isReady !== nextState.isReady ||
       nextProps.id !== this.props.id ||
       nextProps.children !== this.props.children;
@@ -152,4 +161,14 @@ export class SlowLoadingElement extends React.Component<SlowLoadingElementProps,
       return null;
     }
   }
+}
+
+export function SlowLoadingElement(props: SlowLoadingElementProps) {
+  return (
+    <SSRContext.Consumer>
+      {(value) => (
+        <ActualSlowLoadingElement {...props} ssrDisabled={!!value}/>
+      )}
+    </SSRContext.Consumer>
+  )
 }

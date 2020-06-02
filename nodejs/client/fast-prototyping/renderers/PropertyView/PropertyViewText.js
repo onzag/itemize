@@ -94,11 +94,12 @@ function lazyloader(element, propertySet) {
         }
     }
 }
+// TODOSSR nothing visible in here and this one is important
 class PropertyViewRichTextViewer extends react_1.default.Component {
     constructor(props) {
         super(props);
         this.divref = react_1.default.createRef();
-        this.cheapdiv = document.createElement("div");
+        this.cheapdiv = typeof document !== "undefined" ? document.createElement("div") : null;
     }
     updateHTML(html) {
         if (!html) {

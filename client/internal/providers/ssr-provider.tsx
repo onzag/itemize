@@ -13,6 +13,7 @@ export interface ISSRContextType {
     id: number;
     token: string;
   },
+  title: string;
 }
 
 export const SSRContext = React.createContext<ISSRContextType>(null);

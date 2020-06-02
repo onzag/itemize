@@ -1,5 +1,5 @@
 import React from "react";
-import TitleReader from "./TitleReader";
+import { ActualTitleReader } from "./TitleReader";
 
 interface ITitleSetterProps {
   children: string;
@@ -7,7 +7,7 @@ interface ITitleSetterProps {
 
 let TitleSetterInstanceIsLoaded = false;
 export default class TitleSetter extends React.Component<ITitleSetterProps, {}> {
-  static changedListeners = new Map<TitleReader, () => void>();
+  static changedListeners = new Map<ActualTitleReader, () => void>();
   private originalTitle: string;
   constructor(props: ITitleSetterProps) {
     super(props);

@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const read_1 = __importDefault(require("read"));
 const colors_1 = __importDefault(require("colors"));
-// @ts-ignore
+// @ts-nocheck
 const prompt_confirm_1 = __importDefault(require("prompt-confirm"));
 function request(options) {
     return new Promise((resolve, reject) => {

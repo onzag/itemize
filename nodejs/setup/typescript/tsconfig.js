@@ -4,8 +4,8 @@ exports.default = {
     compilerOptions: {
         baseUrl: ".",
         paths: {
-            "*": [
-                "types/*",
+            "@onzag/itemize/*": [
+                "./node_modules/@onzag/itemize/nodejs/*",
             ],
         },
         target: "esnext",

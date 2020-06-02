@@ -1,6 +1,8 @@
+import "../../../internal/theme/quill.scss";
+
 import React from "react";
 import { InputLabel, IconButton, ThemeProvider, Typography, TextField, Button } from "@material-ui/core";
-import ReactQuill from "@onzag/react-quill";
+// import ReactQuill from "@onzag/react-quill";
 import Toolbar from "@material-ui/core/Toolbar";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
@@ -23,9 +25,6 @@ import FormatUnderlinedIcon from "@material-ui/icons/FormatUnderlined";
 import FormatItalicIcon from "@material-ui/icons/FormatItalic";
 import FormatBoldIcon from "@material-ui/icons/FormatBold";
 import CodeIcon from "@material-ui/icons/Code";
-
-import "@onzag/react-quill/dist/quill.core.css";
-import "../../../internal/theme/quill.scss";
 import { capitalize, mimeTypeToExtension } from "../../../../util";
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import { Dialog } from "../../components/dialog";
@@ -35,6 +34,17 @@ import TextareaAutosize from "react-textarea-autosize";
 import RestoreIcon from '@material-ui/icons/Restore';
 import ClearIcon from '@material-ui/icons/Clear';
 import { SlowLoadingElement } from "../../components/util";
+
+// TODOSSRFIX
+
+const whatever: any = () => null as any;
+
+const ReactQuill = {
+  Quill: {
+    import: whatever,
+    register: whatever,
+  }
+}
 
 const BlockEmbed = ReactQuill.Quill.import("blots/block/embed");
 const Embed = ReactQuill.Quill.import("blots/embed");
@@ -502,8 +512,9 @@ interface IPropertyEntryTextRendererState {
 }
 
 const CACHED_FORMATS_RICH = ["bold", "italic", "underline", "header", "blockquote", "list", "itemizeimage", "itemizevideo", "itemizefile"];
-const CACHED_CLIPBOARD_MATCHERS: ReactQuill.ClipboardMatcher[] = [
-  [Node.ELEMENT_NODE, collapseToPlainTextMatcher],
+// const CACHED_CLIPBOARD_MATCHERS: ReactQuill.ClipboardMatcher[] = [
+const CACHED_CLIPBOARD_MATCHERS: any = [
+  [typeof Node !== "undefined" ? Node.ELEMENT_NODE : null, collapseToPlainTextMatcher],
 ];
 
 function collapseToPlainTextMatcher(node: Node) {
@@ -518,7 +529,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
   private cachedModuleOptionsRich: any;
 
-  private quillRef: React.RefObject<ReactQuill>;
+  // private quillRef: React.RefObject<ReactQuill>;
+  private quillRef: React.RefObject<any>;
 
   constructor(props: IPropertyEntryTextRendererWithStylesProps) {
     super(props);
@@ -586,7 +598,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   }
   public addPasteEventOnEditor() {
     const editor = this.quillRef.current.getEditor();
-    editor.root.addEventListener('paste', async (e) => {
+    // TODO any here
+    editor.root.addEventListener('paste', async (e: any) => {
       const clipboardData: DataTransfer = e.clipboardData || (window as any).clipboardData;
       // support cut by software & copy image file directly
       const isImage = clipboardData.types.length && clipboardData.types.join('').includes('Files');
@@ -623,7 +636,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     const value = e.target.value || null;
     this.props.onChange(value, null);
   }
-  public onChange(value: string, delta: any, sources: string, editor: ReactQuill.UnprivilegedEditor) {
+  // public onChange(value: string, delta: any, sources: string, editor: ReactQuill.UnprivilegedEditor) {
+  public onChange(value: string, delta: any, sources: string, editor: any) {
     // on change, these values are basically empty
     // so we set to null, however in some circumstances
     // they are unavoidable, use a value larger than 1 for min
@@ -934,7 +948,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
                   supportsRawMode={this.props.args.supportsRawMode}
                   onToggleRawMode={this.toggleRawMode}
                 />
-                <ReactQuill
+                {/* <ReactQuill
                   ref={this.quillRef}
                   className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
                   modules={this.cachedModuleOptionsRich}
@@ -946,7 +960,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
                   onFocus={this.onFocus}
                   onBlur={this.onBlur}
                   disableClipboardMatchersOnUpdate={CACHED_CLIPBOARD_MATCHERS}
-                />
+                /> */}
               </>
             ) : (
               <>

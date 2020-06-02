@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const core_1 = require("@material-ui/core");
 require("./util.scss");
+const ssr_provider_1 = require("../../internal/providers/ssr-provider");
 class DelayDisplay extends react_1.default.PureComponent {
     constructor(props) {
         super(props);
@@ -63,12 +64,12 @@ exports.ProgressingElement = core_1.withStyles(progressingElementStyle)((props) 
                     react_1.default.createElement(core_1.CircularProgress, { size: size, className: props.classes.progressElement }))) :
             null));
 });
-class SlowLoadingElement extends react_1.default.Component {
+class ActualSlowLoadingElement extends react_1.default.Component {
     constructor(props) {
         super(props);
         this.unmounted = false;
         this.state = {
-            isReady: false,
+            isReady: props.ssrDisabled ? true : false,
             readyForId: props.id || null,
         };
     }
@@ -82,6 +83,9 @@ class SlowLoadingElement extends react_1.default.Component {
         return null;
     }
     makeReady() {
+        if (this.state.isReady) {
+            return;
+        }
         setTimeout(() => {
             if (!this.unmounted) {
                 this.setState({
@@ -116,5 +120,9 @@ class SlowLoadingElement extends react_1.default.Component {
             return null;
         }
     }
+}
+exports.ActualSlowLoadingElement = ActualSlowLoadingElement;
+function SlowLoadingElement(props) {
+    return (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (value) => (react_1.default.createElement(ActualSlowLoadingElement, Object.assign({}, props, { ssrDisabled: !!value })))));
 }
 exports.SlowLoadingElement = SlowLoadingElement;

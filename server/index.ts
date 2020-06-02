@@ -3,7 +3,7 @@ import graphqlHTTP from "express-graphql";
 import http from "http";
 import path from "path";
 import fs from "fs";
-import Root, { IRootRawJSONDataType } from "../base/Root";
+import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
 import resolvers from "./resolvers";
 import { getGQLSchemaForRoot, IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
 import Knex from "knex";
@@ -39,6 +39,8 @@ import build from "../dbbuilder";
 import { GlobalManager } from "./global-manager";
 import { ISSRRuleSet } from "./ssr";
 import { ssrGenerator } from "./ssr/generator";
+import { IRendererContext } from "../client/providers/renderer";
+import { ILocaleContextType } from "../client/internal/app";
 
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -88,9 +90,18 @@ const app = INSTANCE_MODE === "BUILD_DATABASE" ? null : express();
 export type PkgCloudClients = {[containerId: string]: pkgcloud.storage.Client};
 export type PkgCloudContainers = {[containerId: string]: pkgcloud.storage.Container};
 
+export interface ISSRConfig {
+  ssrRules: ISSRRuleSet,
+  rendererContext: IRendererContext,
+  mainComponent: React.ReactElement,
+  appWrapper?: (app: React.ReactElement, config: IConfigRawJSONDataType) => React.ReactElement;
+  mainWrapper?: (mainComponet: React.ReactElement, localeContext: ILocaleContextType) => React.ReactElement;
+}
+
 export interface IAppDataType {
   root: Root;
-  ssrRules: ISSRRuleSet;
+  langLocales: ILangLocalesType;
+  ssrConfig: ISSRConfig;
   indexDevelopment: string;
   indexProduction: string;
   config: IConfigRawJSONDataType;
@@ -288,8 +299,8 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     res.sendFile(path.resolve(path.join("dist", "data", "service-worker.production.js")));
   });
 
-  const ssrUrls = Object.keys(appData.ssrRules).forEach((url) => {
-    const rule = appData.ssrRules[url];
+  Object.keys(appData.ssrConfig.ssrRules).forEach((url) => {
+    const rule = appData.ssrConfig.ssrRules[url];
     const actualURL = "/:lang" + (url.startsWith("/") ? url : "/" + url);
     app.get(actualURL, (req, res) => {
       const mode = getMode(appData, req);
@@ -342,7 +353,7 @@ function getContainerPromisified(client: pkgcloud.storage.Client, containerName:
  * @param custom.customRouter a custom router to attach to the rest endpoint
  * @param custom.customTriggers a registry for custom triggers
  */
-export async function initializeServer(ssrRules: ISSRRuleSet, custom: IServerCustomizationDataType = {}) {
+export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCustomizationDataType = {}) {
   if (INSTANCE_MODE === "BUILD_DATABASE") {
     build(NODE_ENV);
     return;
@@ -361,6 +372,7 @@ export async function initializeServer(ssrRules: ISSRRuleSet, custom: IServerCus
     let rawDbConfig: string;
     let index: string;
     let buildnumber: string;
+    let rawLangLocales: string
     [
       rawConfig,
       rawSensitiveConfig,
@@ -368,6 +380,7 @@ export async function initializeServer(ssrRules: ISSRRuleSet, custom: IServerCus
       rawDbConfig,
       index,
       rawBuild,
+      rawLangLocales,
       buildnumber,
     ] = await Promise.all([
       fsAsync.readFile(path.join("config", "index.json"), "utf8"),
@@ -376,6 +389,7 @@ export async function initializeServer(ssrRules: ISSRRuleSet, custom: IServerCus
       fsAsync.readFile(path.join("config", NODE_ENV === "development" ? "db.sensitive.json" : `db.${NODE_ENV}.sensitive.json`), "utf8"),
       fsAsync.readFile(path.join("dist", "data", "index.html"), "utf8"),
       fsAsync.readFile(path.join("dist", "data", "build.all.json"), "utf8"),
+      fsAsync.readFile(path.join("dist", "data", "lang.json"), "utf8"),
       fsAsync.readFile(path.join("dist", "buildnumber"), "utf8"),
     ]);
     const config: IConfigRawJSONDataType = JSON.parse(rawConfig);
@@ -383,6 +397,7 @@ export async function initializeServer(ssrRules: ISSRRuleSet, custom: IServerCus
     const dbConfig: IDBConfigRawJSONDataType = JSON.parse(rawDbConfig);
     const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(rawRedisConfig);
     const build: IRootRawJSONDataType = JSON.parse(rawBuild);
+    const langLocales: ILangLocalesType = JSON.parse(rawLangLocales);
 
     // redis configuration despite instructions actually tries to use null
     // values as it checks for undefined so we need to strip these if null
@@ -630,7 +645,8 @@ export async function initializeServer(ssrRules: ISSRRuleSet, custom: IServerCus
     );
     const appData: IAppDataType = {
       root,
-      ssrRules,
+      langLocales,
+      ssrConfig,
       indexDevelopment: index.replace(/\$MODE/g, "development"),
       indexProduction: index.replace(/\$MODE/g, "production"),
       config,
@@ -657,6 +673,7 @@ export async function initializeServer(ssrRules: ISSRRuleSet, custom: IServerCus
       mailgun,
       pkgcloudStorageClients,
       pkgcloudUploadContainers,
+
       // assigned later during rest setup
       customUserTokenQuery: null,
     };

@@ -4,7 +4,7 @@ import { ILocaleContextType } from "./internal/app";
 import { IRendererContext } from "./providers/renderer";
 import { ISSRContextType } from "./internal/providers/ssr-provider";
 import { IConfigRawJSONDataType } from "../config";
-import Root from "../base/Root";
+import Root, { ILangLocalesType } from "../base/Root";
 export declare const history: import("history").History<{}>;
 /**
  * This function imports a file given a url
@@ -24,6 +24,9 @@ export declare function initializeItemizeApp(rendererContext: IRendererContext, 
             country: string;
             guessedData: string;
         };
+        langLocales: ILangLocalesType;
         root: Root;
+        req: any;
+        ipStack: any;
     };
 }): Promise<JSX.Element>;

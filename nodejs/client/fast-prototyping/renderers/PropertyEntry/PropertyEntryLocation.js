@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("../../../internal/theme/leaflet.scss");
 const react_1 = __importDefault(require("react"));
 const TextField_1 = __importDefault(require("@material-ui/core/TextField"));
 const core_1 = require("@material-ui/core");
@@ -10,10 +11,6 @@ const styles_1 = require("@material-ui/styles");
 const react_autosuggest_1 = __importDefault(require("react-autosuggest"));
 const match_1 = __importDefault(require("autosuggest-highlight/match"));
 const parse_1 = __importDefault(require("autosuggest-highlight/parse"));
-const react_leaflet_1 = require("react-leaflet");
-const leaflet_1 = __importDefault(require("leaflet"));
-require("leaflet/dist/leaflet.css");
-require("../../../internal/theme/leaflet.scss");
 const styles_2 = require("./styles");
 const Search_1 = __importDefault(require("@material-ui/icons/Search"));
 const SwapHoriz_1 = __importDefault(require("@material-ui/icons/SwapHoriz"));
@@ -23,12 +20,13 @@ const Restore_1 = __importDefault(require("@material-ui/icons/Restore"));
 const Clear_1 = __importDefault(require("@material-ui/icons/Clear"));
 // https://github.com/PaulLeCam/react-leaflet/issues/453
 // bug in leaflet
-delete leaflet_1.default.Icon.Default.prototype._getIconUrl;
-leaflet_1.default.Icon.Default.mergeOptions({
-    iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-    iconUrl: require("leaflet/dist/images/marker-icon.png"),
-    shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
-});
+// delete (L.Icon as any).Default.prototype._getIconUrl;
+// (L.Icon as any).Default.mergeOptions({
+//   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+//   iconUrl: require("leaflet/dist/images/marker-icon.png"),
+//   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+// });
+// TODOSSRFIX
 const ZOOMS = {
     "LARGE": 16,
     "MEDIUM": 14,
@@ -199,6 +197,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
             this.inputRef.focus();
         }
     }
+    // public setLocationManually(e: LeafletMouseEvent) {
     setLocationManually(e) {
         this.props.onManualPick({
             lat: e.latlng.lat,
@@ -305,15 +304,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
                 this.props.resultOutOfLabel ?
                     react_1.default.createElement("i", { className: this.props.classes.resultListLabel }, this.props.resultOutOfLabel) :
                     null),
-            react_1.default.createElement("div", { className: this.props.classes.locationMapContainer },
-                react_1.default.createElement(react_leaflet_1.Map, { viewport: viewport, onViewportChange: this.props.onViewportChange, onClick: this.setLocationManually },
-                    react_1.default.createElement(react_leaflet_1.TileLayer, { attribution: '\u00A9 <a href="http://osm.org/copyright">OpenStreetMap</a> contributors', url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png" }),
-                    this.props.currentValue ? react_1.default.createElement(react_leaflet_1.Marker, { position: [
-                            this.props.currentValue.lat, this.props.currentValue.lng,
-                        ] }) : null,
-                    !this.props.disabled && this.props.activeSearchResults ? this.props.activeSearchResults
-                        .filter((result) => this.props.currentValue.id !== result.id)
-                        .map((result) => (react_1.default.createElement(react_leaflet_1.Marker, { opacity: 0.5, key: result.id, position: [result.lat, result.lng], onClick: this.props.onChangeBySearchResult.bind(this, result, true) }))) : null)),
+            react_1.default.createElement("div", { className: this.props.classes.locationMapContainer }),
             react_1.default.createElement(TextField_1.default, Object.assign({ fullWidth: true, type: "search", onKeyPress: this.onKeyPress, className: this.props.classes.entry, label: this.props.label, onChange: this.onSearchQueryChange, placeholder: this.props.placeholder, value: this.props.searchQuery, InputProps: {
                     classes: {
                         root: this.props.classes.fieldInput,

@@ -1,7 +1,7 @@
 import React from "react";
 import { IPropertyViewFileRendererProps } from "../../../internal/components/PropertyView/PropertyViewFile";
 
-const supportsImageLoading = !!(document.createElement("img") as any).loading;
+const supportsImageLoading = typeof document !== "undefined" ? !!(document.createElement("img") as any).loading : false;
 
 interface IPropertyViewFileRendererState {
   loaded: boolean;
@@ -16,6 +16,7 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
 
     this.refImg = React.createRef<HTMLImageElement>();
     
+    // TODO this won't play nice with SSR TODOSSRFIX
     // loaded represents the properties src and srcset when using native
     // image loading it's unecessary to have them removed as the browser
     // will handle it natively

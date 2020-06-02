@@ -3,9 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("../../../internal/theme/quill.scss");
 const react_1 = __importDefault(require("react"));
 const core_1 = require("@material-ui/core");
-const react_quill_1 = __importDefault(require("@onzag/react-quill"));
+// import ReactQuill from "@onzag/react-quill";
 const Toolbar_1 = __importDefault(require("@material-ui/core/Toolbar"));
 const styles_1 = require("./styles");
 const lab_1 = require("@material-ui/lab");
@@ -22,8 +23,6 @@ const FormatUnderlined_1 = __importDefault(require("@material-ui/icons/FormatUnd
 const FormatItalic_1 = __importDefault(require("@material-ui/icons/FormatItalic"));
 const FormatBold_1 = __importDefault(require("@material-ui/icons/FormatBold"));
 const Code_1 = __importDefault(require("@material-ui/icons/Code"));
-require("@onzag/react-quill/dist/quill.core.css");
-require("../../../internal/theme/quill.scss");
 const util_1 = require("../../../../util");
 const constants_1 = require("../../../../constants");
 const dialog_1 = require("../../components/dialog");
@@ -32,9 +31,17 @@ const react_textarea_autosize_1 = __importDefault(require("react-textarea-autosi
 const Restore_1 = __importDefault(require("@material-ui/icons/Restore"));
 const Clear_1 = __importDefault(require("@material-ui/icons/Clear"));
 const util_2 = require("../../components/util");
-const BlockEmbed = react_quill_1.default.Quill.import("blots/block/embed");
-const Embed = react_quill_1.default.Quill.import("blots/embed");
-const Delta = react_quill_1.default.Quill.import("delta");
+// TODOSSRFIX
+const whatever = () => null;
+const ReactQuill = {
+    Quill: {
+        import: whatever,
+        register: whatever,
+    }
+};
+const BlockEmbed = ReactQuill.Quill.import("blots/block/embed");
+const Embed = ReactQuill.Quill.import("blots/embed");
+const Delta = ReactQuill.Quill.import("delta");
 class ItemizeImageBlot extends BlockEmbed {
     static create(value) {
         if (value === null) {
@@ -83,7 +90,7 @@ class ItemizeImageBlot extends BlockEmbed {
 ItemizeImageBlot.blotName = "itemizeimage";
 ItemizeImageBlot.className = "image";
 ItemizeImageBlot.tagName = "div";
-react_quill_1.default.Quill.register(ItemizeImageBlot);
+ReactQuill.Quill.register(ItemizeImageBlot);
 class ItemizeVideoBlot extends BlockEmbed {
     static create(value) {
         if (value === null) {
@@ -122,7 +129,7 @@ class ItemizeVideoBlot extends BlockEmbed {
 ItemizeVideoBlot.blotName = "itemizevideo";
 ItemizeVideoBlot.className = "video";
 ItemizeVideoBlot.tagName = "div";
-react_quill_1.default.Quill.register(ItemizeVideoBlot);
+ReactQuill.Quill.register(ItemizeVideoBlot);
 class ItemizeFileBlot extends Embed {
     static create(value) {
         if (value === null) {
@@ -178,7 +185,7 @@ class ItemizeFileBlot extends Embed {
 ItemizeFileBlot.blotName = "itemizefile";
 ItemizeFileBlot.className = "file";
 ItemizeFileBlot.tagName = "span";
-react_quill_1.default.Quill.register(ItemizeFileBlot);
+ReactQuill.Quill.register(ItemizeFileBlot);
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
@@ -330,8 +337,9 @@ function RichTextEditorToolbar(props) {
                 react_1.default.createElement(Code_1.default, null))) : null));
 }
 const CACHED_FORMATS_RICH = ["bold", "italic", "underline", "header", "blockquote", "list", "itemizeimage", "itemizevideo", "itemizefile"];
+// const CACHED_CLIPBOARD_MATCHERS: ReactQuill.ClipboardMatcher[] = [
 const CACHED_CLIPBOARD_MATCHERS = [
-    [Node.ELEMENT_NODE, collapseToPlainTextMatcher],
+    [typeof Node !== "undefined" ? Node.ELEMENT_NODE : null, collapseToPlainTextMatcher],
 ];
 function collapseToPlainTextMatcher(node) {
     return new Delta().insert(node.textContent);
@@ -399,6 +407,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
     }
     addPasteEventOnEditor() {
         const editor = this.quillRef.current.getEditor();
+        // TODO any here
         editor.root.addEventListener('paste', async (e) => {
             const clipboardData = e.clipboardData || window.clipboardData;
             // support cut by software & copy image file directly
@@ -425,14 +434,15 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
                 sizes: null,
                 srcWidth: data.width,
                 srcHeight: data.height,
-            }, react_quill_1.default.Quill.sources.USER);
-            editor.setSelection(range.index + 2, 0, react_quill_1.default.Quill.sources.SILENT);
+            }, ReactQuill.Quill.sources.USER);
+            editor.setSelection(range.index + 2, 0, ReactQuill.Quill.sources.SILENT);
         });
     }
     onChangeByTextarea(e) {
         const value = e.target.value || null;
         this.props.onChange(value, null);
     }
+    // public onChange(value: string, delta: any, sources: string, editor: ReactQuill.UnprivilegedEditor) {
     onChange(value, delta, sources, editor) {
         // on change, these values are basically empty
         // so we set to null, however in some circumstances
@@ -531,8 +541,8 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         quill.insertEmbed(range.index, "itemizevideo", {
             src,
             origin,
-        }, react_quill_1.default.Quill.sources.USER);
-        quill.setSelection(range.index + 2, 0, react_quill_1.default.Quill.sources.SILENT);
+        }, ReactQuill.Quill.sources.USER);
+        quill.setSelection(range.index + 2, 0, ReactQuill.Quill.sources.SILENT);
         this.closeVideoRequesting();
     }
     onFileLoad(e) {
@@ -550,8 +560,8 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
                 name: fileData.name,
                 extension: expectedExtension,
                 size: prettySize,
-            }, react_quill_1.default.Quill.sources.USER);
-            quill.setSelection(range.index + 2, 0, react_quill_1.default.Quill.sources.SILENT);
+            }, ReactQuill.Quill.sources.USER);
+            quill.setSelection(range.index + 2, 0, ReactQuill.Quill.sources.SILENT);
         }
         catch (err) { }
     }
@@ -574,8 +584,8 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
                 sizes: null,
                 srcWidth: data.width,
                 srcHeight: data.height,
-            }, react_quill_1.default.Quill.sources.USER);
-            quill.setSelection(range.index + 2, 0, react_quill_1.default.Quill.sources.SILENT);
+            }, ReactQuill.Quill.sources.USER);
+            quill.setSelection(range.index + 2, 0, ReactQuill.Quill.sources.SILENT);
         }
         catch (err) {
         }
@@ -635,8 +645,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
                     util_1.capitalize(this.props.label),
                     iconComponent),
                 this.props.isRichText && !this.state.rawMode ? (react_1.default.createElement(react_1.default.Fragment, null,
-                    react_1.default.createElement(RichTextEditorToolbar, { id: this.uuid, i18n: this.props.i18nFormat, supportsImages: this.props.supportsImages, supportsFiles: this.props.supportsFiles, supportsVideos: this.props.supportsVideos, supportsBasicMode: true, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }),
-                    react_1.default.createElement(react_quill_1.default, { ref: this.quillRef, className: this.props.classes.quill + (this.state.focused ? " focused" : ""), modules: this.cachedModuleOptionsRich, formats: CACHED_FORMATS_RICH, theme: null, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onChange: this.onChange, onFocus: this.onFocus, onBlur: this.onBlur, disableClipboardMatchersOnUpdate: CACHED_CLIPBOARD_MATCHERS }))) : (react_1.default.createElement(react_1.default.Fragment, null,
+                    react_1.default.createElement(RichTextEditorToolbar, { id: this.uuid, i18n: this.props.i18nFormat, supportsImages: this.props.supportsImages, supportsFiles: this.props.supportsFiles, supportsVideos: this.props.supportsVideos, supportsBasicMode: true, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }))) : (react_1.default.createElement(react_1.default.Fragment, null,
                     this.props.isRichText && this.props.args.supportsRawMode ? react_1.default.createElement(RichTextEditorToolbar, { id: this.uuid + "-raw-mode-only", i18n: this.props.i18nFormat, supportsImages: false, supportsFiles: false, supportsVideos: false, supportsBasicMode: false, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }) : null,
                     react_1.default.createElement("div", { className: this.props.classes.quill + (this.state.focused ? " focused" : "") },
                         react_1.default.createElement(util_2.SlowLoadingElement, { id: "textarea" },

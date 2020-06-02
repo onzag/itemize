@@ -1,6 +1,6 @@
 import read from "read";
 import colors from "colors";
-// @ts-ignore
+// @ts-nocheck
 import Confirm from "prompt-confirm";
 
 export function request(options: read.Options): Promise<{

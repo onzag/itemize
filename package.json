@@ -1,6 +1,6 @@
 {
   "name": "@onzag/itemize",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "Itemize",
   "bin": {
     "itemize": "./nodejs/main.js"
@@ -8,7 +8,7 @@
   "main": "nodejs/index",
   "types": "nodejs/index",
   "scripts": {
-    "install": "tsc"
+    "install": "tsc && node ./sass-handler.js"
   },
   "author": "Edward Gonzalez",
   "license": "ISC",

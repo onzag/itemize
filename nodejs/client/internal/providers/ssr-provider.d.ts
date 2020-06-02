@@ -12,6 +12,7 @@ export interface ISSRContextType {
         id: number;
         token: string;
     };
+    title: string;
 }
 export declare const SSRContext: React.Context<ISSRContextType>;
 export interface ISSRProviderProps {

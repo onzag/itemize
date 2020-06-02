@@ -43,4 +43,4 @@ COPY dist/data dist/data
 COPY dist/buildnumber dist/
 COPY package.json .
 
-CMD [ "node", "./dist/server/index.js" ]
+CMD [ "node", "-r", "tsconfig-paths/register", "./dist/server/index.js" ]

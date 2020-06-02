@@ -2,7 +2,7 @@ declare const _default: {
     compilerOptions: {
         baseUrl: string;
         paths: {
-            "*": string[];
+            "@onzag/itemize/*": string[];
         };
         target: string;
         module: string;

@@ -16,7 +16,7 @@ const Root_1 = __importDefault(require("../base/Root"));
 const cache_1 = __importDefault(require("./internal/workers/cache"));
 const config_provider_1 = require("./internal/providers/config-provider");
 // Create the browser history to feed the router
-exports.history = history_1.createBrowserHistory();
+exports.history = typeof document !== "undefined" ? history_1.createBrowserHistory() : null;
 // keeping track of imported files in this array
 const importedSrcPool = [];
 /**
@@ -101,8 +101,37 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
         // user data, either from local storage or the server side
         let guessedUserData;
         try {
-            guessedUserData = JSON.parse(previouslyGuessedData ||
-                await fetch("/rest/util/country").then((r) => r.text()));
+            if (!serverMode) {
+                guessedUserData = JSON.parse(previouslyGuessedData ||
+                    await fetch("/rest/util/country").then((r) => r.text()));
+            }
+            else if (previouslyGuessedData) {
+                guessedUserData = JSON.parse(previouslyGuessedData);
+            }
+            else {
+                const standardAPIResponse = {
+                    country: config.fallbackCountryCode,
+                    currency: config.fallbackCurrency,
+                    language: config.fallbackLanguage,
+                };
+                const XFF = serverMode.req.headers["X-Forwarded-For"] || serverMode.req.headers["x-forwarded-for"];
+                let ip = serverMode.req.connection.remoteAddress;
+                if (typeof XFF === "string") {
+                    ip = XFF.split(",")[0].trim();
+                }
+                else if (Array.isArray(XFF)) {
+                    ip = XFF[0];
+                }
+                // This only occurs during development
+                if (ip === "127.0.0.1" ||
+                    ip === "::1" ||
+                    ip === "::ffff:127.0.0.1" ||
+                    !serverMode.ipStack) {
+                    guessedUserData = standardAPIResponse;
+                    return;
+                }
+                guessedUserData = await serverMode.ipStack.requestUserInfoForIp(ip, standardAPIResponse);
+            }
         }
         catch (err) {
             console.log("Error while parsing guessed locale data");
@@ -201,26 +230,27 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
     // basically, we are going to keep this simple, only update the worker if it's
     // a new url, simple, even for this script the build number applies
     try {
-        const [initialRoot, lang] = await Promise.all([
-            fetch(`/rest/resource/build.${initialLang}.json`).then((r) => r.json()),
-            fetch("/rest/resource/lang.json").then((r) => r.json()),
-            initialLang !== "en" ?
-                importScript(`/rest/resource/${initialLang}.moment.js`) : null,
-        ]);
-        // the locale of moment is set, note how await was used, hence all the previous script
-        // have been imported, and should be available for moment
-        moment_1.default.locale(initialLang);
         // set the values in the state to the initial
         // we expose the root variable because it makes debugging
         // easy and to allow access to the root registry to web workers
         if (!serverMode) {
+            const [initialRoot, lang] = await Promise.all([
+                fetch(`/rest/resource/build.${initialLang}.json`).then((r) => r.json()),
+                fetch("/rest/resource/lang.json").then((r) => r.json()),
+                initialLang !== "en" ?
+                    importScript(`/rest/resource/${initialLang}.moment.js`) : null,
+            ]);
             window.ROOT = new Root_1.default(initialRoot);
+            window.LANG = lang;
             if (cache_1.default.isSupported) {
                 cache_1.default.instance.proxyRoot(initialRoot);
             }
         }
+        // the locale of moment is set, note how await was used, hence all the previous script
+        // have been imported, and should be available for moment
+        moment_1.default.locale(initialLang);
         // now we get the app that we are expected to use
-        const app = react_1.default.createElement(app_1.default, { root: serverMode ? serverMode.root : window.ROOT, langLocales: lang, config: config, initialCurrency: initialCurrency, initialCountry: initialCountry, mainComponent: mainComponent, mainWrapper: options && options.mainWrapper });
+        const app = react_1.default.createElement(app_1.default, { root: serverMode ? serverMode.root : window.ROOT, langLocales: serverMode ? serverMode.langLocales : window.LANG, config: config, initialCurrency: initialCurrency, initialCountry: initialCountry, mainComponent: mainComponent, mainWrapper: options && options.mainWrapper });
         // if a wrapping function was provided, we use it
         const children = options && options.appWrapper ?
             options.appWrapper(app, config) :
