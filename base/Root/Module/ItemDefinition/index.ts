@@ -22,6 +22,8 @@ import {
   ENDPOINT_ERRORS,
   PREFIX_BUILD,
   POLICY_PREFIXES,
+  RESERVED_BASE_PROPERTIES,
+  MODERATION_FIELDS,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { EndpointError } from "../../../errors";
@@ -1502,6 +1504,76 @@ export default class ItemDefinition {
    */
   public getRolesWithFlaggingAccess(): string[] {
     return this.parentModule.getRolesWithFlaggingAccess();
+  }
+
+  /**
+   * Returns the FLATTENED fields for the graphql request
+   * @param action 
+   * @param role 
+   * @param userId 
+   * @param ownerUserId 
+   */
+  public buildFieldsForRoleAccess(
+    action: ItemDefinitionIOActions,
+    role: string,
+    userId: number,
+    ownerUserId: number,
+  ) {
+    if (action === ItemDefinitionIOActions.DELETE) {
+      return null;
+    }
+
+    if (ownerUserId === null) {
+      throw new Error("ownerUserId cannot be null");
+    }
+
+    // now let's get the roles that have access to the action
+    const rolesWithAccess = this.getRolesWithAccessTo(action);
+    const idefLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
+    (
+      rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+    ) || (
+      rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
+    ) || rolesWithAccess.includes(role);
+
+    if (!idefLevelAccess) {
+      return null;
+    }
+
+    const requestFields: IGQLRequestFields = {};
+
+    // now we add all the reserver properties
+    Object.keys(RESERVED_BASE_PROPERTIES).forEach((pKey) => {
+      requestFields[pKey] = {};
+    })
+
+    const modFieldsAccess = this.getRolesWithModerationAccess();
+    const modLevelAccess =
+      modFieldsAccess.includes(ANYONE_METAROLE) ||
+      (modFieldsAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE) ||
+      modFieldsAccess.includes(role);
+    if (!modLevelAccess) {
+      MODERATION_FIELDS.forEach((mf) => {
+        delete requestFields[mf];
+      });
+    }
+
+    this.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+      const propertyFields = pd.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
+      if (propertyFields) {
+        requestFields[pd.getId()] = propertyFields;
+      }
+    });
+
+    this.getAllIncludes().forEach((include) => {
+      const includeFields = include.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
+      if (includeFields) {
+        requestFields[INCLUDE_PREFIX + include.getId()] = includeFields;
+        requestFields[INCLUDE_PREFIX + include.getId() + EXCLUSION_STATE_SUFFIX] = {};
+      }
+    });
+
+    return requestFields;
   }
 
   /**

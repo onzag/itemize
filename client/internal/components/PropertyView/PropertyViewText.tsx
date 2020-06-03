@@ -1,10 +1,10 @@
 import React from "react";
 import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
-import { DOMPurify } from "../../../../util";
+import { DOMPurify, fileURLAbsoluter } from "../../../../util";
 import equals from "deep-equal";
 import { PropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 import { PropertyDefinitionSupportedFilesType, IPropertyDefinitionSupportedSingleFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
-import { fileURLAbsoluter, imageSrcSetRetriever } from "../../../components/util";
+import { imageSrcSetRetriever } from "../../../components/util";
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 export interface IPropertyViewTextRendererProps extends IPropertyViewRendererProps<PropertyDefinitionSupportedTextType> {

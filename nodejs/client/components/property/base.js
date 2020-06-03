@@ -18,7 +18,7 @@ const PropertyView_1 = __importStar(require("../../internal/components/PropertyV
 const PropertyEntry_1 = __importDefault(require("../../internal/components/PropertyEntry"));
 const PropertySetter_1 = __importDefault(require("../../internal/components/PropertySetter"));
 const include_1 = require("../../providers/include");
-const util_1 = require("../util");
+const util_1 = require("../../../util");
 const config_provider_1 = require("../../internal/providers/config-provider");
 // TODO optimize
 function EntryViewReadSet(props, type) {

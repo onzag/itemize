@@ -128,7 +128,7 @@ class PropertyEntryFile extends react_1.default.Component {
                 };
             }
             else {
-                currentValue = util_2.fileURLAbsoluter(this.props.config.containersHostnamePrefixes, currentValue, this.props.itemDefinition, this.props.forId, this.props.forVersion, this.props.containerId, this.props.include, this.props.property);
+                currentValue = util_1.fileURLAbsoluter(this.props.config.containersHostnamePrefixes, currentValue, this.props.itemDefinition, this.props.forId, this.props.forVersion, this.props.containerId, this.props.include, this.props.property);
             }
         }
         const imageSizes = isSupportedImage ? util_2.imageSizeRetriever(currentValue, this.props.property) : null;

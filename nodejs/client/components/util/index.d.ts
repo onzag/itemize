@@ -1,13 +1,5 @@
 import { IGQLFile } from "../../../gql-querier";
-import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
-import Include from "../../../base/Root/Module/ItemDefinition/Include";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
-export declare function fileArrayURLAbsoluter(containerHostnamePrefixes: {
-    [key: string]: string;
-}, files: IGQLFile[], itemDefinition: ItemDefinition, id: number, version: string, containerId: string, include: Include, property: PropertyDefinition): IGQLFile[];
-export declare function fileURLAbsoluter(containerHostnamePrefixes: {
-    [key: string]: string;
-}, file: IGQLFile, itemDefinition: ItemDefinition, id: number, version: string, containerId: string, include: Include, property: PropertyDefinition): IGQLFile;
 export declare function imageSrcSetRetriever(fileData: IGQLFile, property: PropertyDefinition, imageSizes?: IImageSizes): string;
 export interface IImageSizes {
     imageMediumSizeURL: string;

@@ -11,6 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const __1 = require("..");
 const ConditionalRuleSet_1 = __importDefault(require("../ConditionalRuleSet"));
 const PropertiesValueMappingDefiniton_1 = __importDefault(require("../PropertiesValueMappingDefiniton"));
 const constants_1 = require("../../../../../constants");
@@ -149,6 +150,22 @@ class Include {
             const propDef = this.itemDefinition.getPropertyDefinitionFor(requestedField, false);
             return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
         });
+    }
+    buildFieldsForRoleAccess(action, role, userId, ownerUserId) {
+        if (action === __1.ItemDefinitionIOActions.DELETE) {
+            return null;
+        }
+        if (ownerUserId === null) {
+            throw new Error("ownerUserId cannot be null");
+        }
+        const requestFields = {};
+        this.getSinkingProperties().forEach((sp) => {
+            const fieldsForProperty = sp.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
+            if (fieldsForProperty) {
+                requestFields[sp.getId()] = fieldsForProperty;
+            }
+        });
+        return requestFields;
     }
     /**
      * Tells whether the current item is excluded

@@ -4,6 +4,10 @@
  * @packageDocumentation
  */
 import createDOMPurify from "dompurify";
+import { IGQLFile } from "./gql-querier";
+import ItemDefinition from "./base/Root/Module/ItemDefinition";
+import Include from "./base/Root/Module/ItemDefinition/Include";
+import PropertyDefinition from "./base/Root/Module/ItemDefinition/PropertyDefinition";
 /**
  * capitalizes a string
  * @param str the string to capitalize
@@ -68,5 +72,22 @@ export declare function getLocalizedDateFormat(normalize: boolean): any;
  * TODO looks wrong check what is wrong
  */
 export declare function getLocalizedDateTimeFormat(normalize: boolean): string;
+/**
+ * Converts a file to its absolute URL counterpart
+ * @param containerHostnamePrefixes
+ * @param file
+ * @param itemDefinition
+ * @param id
+ * @param version
+ * @param containerId
+ * @param include
+ * @param property
+ */
+export declare function fileURLAbsoluter(containerHostnamePrefixes: {
+    [key: string]: string;
+}, file: IGQLFile, itemDefinition: ItemDefinition, id: number, version: string, containerId: string, include: Include, property: PropertyDefinition): IGQLFile;
+export declare function fileArrayURLAbsoluter(containerHostnamePrefixes: {
+    [key: string]: string;
+}, files: IGQLFile[], itemDefinition: ItemDefinition, id: number, version: string, containerId: string, include: Include, property: PropertyDefinition): IGQLFile[];
 export declare const DOMWindow: import("jsdom").DOMWindow | (Window & typeof globalThis);
 export declare const DOMPurify: createDOMPurify.DOMPurifyI;

@@ -82,8 +82,8 @@ export const Footer = withStyles(footerStyles)((props: WithStyles<typeof footerS
         <span className={props.classes.spacer}/>
         <span className={props.classes.spacer}/>
         {year}
+        <span className={props.classes.spacer}/>
         <span className={props.classes.copyInfo}>
-          <span className={props.classes.spacer}/>
           <I18nRead id="app_name" capitalize={true}/>
         </span>
         <span className={props.classes.spacer}/>

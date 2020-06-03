@@ -15,6 +15,7 @@ export declare class RemoteListener {
     private offline;
     private token;
     private isReady;
+    private isReadyCallbacks;
     constructor(root: Root);
     setToken(token: string): void;
     onBuildnumberListened(build: IBuildNumberEvent): void;

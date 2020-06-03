@@ -720,6 +720,14 @@ export default class ItemDefinition {
      */
     getRolesWithFlaggingAccess(): string[];
     /**
+     * Returns the FLATTENED fields for the graphql request
+     * @param action
+     * @param role
+     * @param userId
+     * @param ownerUserId
+     */
+    buildFieldsForRoleAccess(action: ItemDefinitionIOActions, role: string, userId: number, ownerUserId: number): IGQLRequestFields;
+    /**
      * Checks the role access for an action in an item
      * defintition
      * @param action the IO action

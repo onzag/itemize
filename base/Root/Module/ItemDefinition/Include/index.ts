@@ -343,6 +343,32 @@ export default class Include {
     });
   }
 
+  public buildFieldsForRoleAccess(
+    action: ItemDefinitionIOActions,
+    role: string,
+    userId: number,
+    ownerUserId: number,
+  ) {
+    if (action === ItemDefinitionIOActions.DELETE) {
+      return null;
+    }
+
+    if (ownerUserId === null) {
+      throw new Error("ownerUserId cannot be null");
+    }
+
+    const requestFields: IGQLRequestFields = {};
+
+    this.getSinkingProperties().forEach((sp) => {
+      const fieldsForProperty = sp.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
+      if (fieldsForProperty) {
+        requestFields[sp.getId()] = fieldsForProperty;
+      }
+    });
+
+    return requestFields;
+  }
+
   /**
    * Tells whether the current item is excluded
    * @returns a boolean whether it's excluded or not

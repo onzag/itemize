@@ -2,10 +2,10 @@ import React from "react";
 import { IPropertyViewRendererProps, IPropertyViewHandlerProps } from ".";
 import { PropertyDefinitionSupportedFileType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
 import equals from "deep-equal";
-import { fileURLAbsoluter, imageSrcSetRetriever } from "../../../components/util";
+import { imageSrcSetRetriever } from "../../../components/util";
 import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
 import prettyBytes from "pretty-bytes";
-import { mimeTypeToExtension } from "../../../../util";
+import { fileURLAbsoluter, mimeTypeToExtension } from "../../../../util";
 
 export interface IPropertyViewFileRendererProps extends IPropertyViewRendererProps<PropertyDefinitionSupportedFileType> {
   isSupportedImage: boolean;

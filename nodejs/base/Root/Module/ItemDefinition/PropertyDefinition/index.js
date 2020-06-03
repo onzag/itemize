@@ -1232,6 +1232,37 @@ class PropertyDefinition {
         }
         return [];
     }
+    buildFieldsForRoleAccess(action, role, userId, ownerUserId) {
+        if (action === __1.ItemDefinitionIOActions.DELETE) {
+            return null;
+        }
+        if (ownerUserId === null) {
+            throw new Error("ownerUserId cannot be null");
+        }
+        // now let's get the roles that have access to the action
+        // first we get all the roles that have the access
+        const rolesWithAccess = this.getRolesWithAccessTo(action);
+        // so if ANYONE_METAROLE is included we have access
+        const hasAccess = rolesWithAccess.includes(constants_1.ANYONE_METAROLE) || (
+        // or if OWNER_METAROLE is included and our user matches our owner user
+        // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
+        // because null === null in the case of eg. GUEST_METAROLE
+        rolesWithAccess.includes(constants_1.OWNER_METAROLE) && userId === ownerUserId) || rolesWithAccess.includes(role);
+        if (!hasAccess) {
+            return null;
+        }
+        const gqlForm = this.getPropertyDefinitionDescription().gqlFields;
+        if (gqlForm) {
+            const requestFields = {};
+            Object.keys(gqlForm).forEach((key) => {
+                requestFields[key] = {};
+            });
+            return requestFields;
+        }
+        else {
+            return {};
+        }
+    }
     /**
      * Checks the role access for a specific IO action to a specific role
      * basically just returns a boolean

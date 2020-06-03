@@ -219,6 +219,7 @@ export default class Include {
      * @returns a boolean on whether it has role access
      */
     checkRoleAccessFor(action: ItemDefinitionIOActions, role: string, userId: number, ownerUserId: number, requestedFields: IGQLRequestFields, throwError: boolean): boolean;
+    buildFieldsForRoleAccess(action: ItemDefinitionIOActions, role: string, userId: number, ownerUserId: number): IGQLRequestFields;
     /**
      * Tells whether the current item is excluded
      * @returns a boolean whether it's excluded or not

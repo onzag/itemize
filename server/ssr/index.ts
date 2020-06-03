@@ -1,13 +1,17 @@
 import Root from "../../base/Root";
 import express from "express";
+import { IConfigRawJSONDataType } from "../../config";
+
+// could use ISSRCollectedQueryType[] but this makes the querying more painful than it should
+type ISSRRuleDynamicFn = (collectedValues: any[], config: IConfigRawJSONDataType) => string;
 
 // this info should be specified
 export interface ISSRRuleDynamic {
-  title: string;
-  description: string;
-  ogTitle: string;
-  ogDescription: string;
-  ogImage: string;
+  title: string | ISSRRuleDynamicFn;
+  description: string | ISSRRuleDynamicFn;
+  ogTitle: string | ISSRRuleDynamicFn;
+  ogDescription: string | ISSRRuleDynamicFn;
+  ogImage: string | ISSRRuleDynamicFn;
   collect: Array<[string, string, number, string]>;
   memId: string;
 }

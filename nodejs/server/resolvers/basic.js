@@ -550,7 +550,7 @@ function filterAndPrepareGQLValue(value, requestedFields, role, parentModuleOrId
         DATA: valueOfTheItem,
     };
     constants_1.EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
-        if (typeof value[property] !== "undefined") {
+        if (typeof value[property] !== "undefined" && requestedFields[property]) {
             actualValue[property] = value[property];
         }
     });

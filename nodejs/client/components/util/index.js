@@ -1,37 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function fileArrayURLAbsoluter(containerHostnamePrefixes, files, itemDefinition, id, version, containerId, include, property) {
-    if (files === null) {
-        return null;
-    }
-    return files.map((file) => fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property));
-}
-exports.fileArrayURLAbsoluter = fileArrayURLAbsoluter;
-function fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property) {
-    if (file === null) {
-        return null;
-    }
-    if (file.url.indexOf("blob:") === 0) {
-        return file;
-    }
-    if (!containerId) {
-        return null;
-    }
-    let prefix = containerHostnamePrefixes[containerId];
-    if (prefix.indexOf("/") !== 0) {
-        prefix = location.protocol + "//" + prefix;
-    }
-    return {
-        ...file,
-        url: prefix +
-            itemDefinition.getQualifiedPathName() + "/" +
-            id + "." + (version || "") + "/" +
-            (include ? include.getId() + "/" : "") +
-            property.getId() + "/" +
-            file.id + "/" + file.url,
-    };
-}
-exports.fileURLAbsoluter = fileURLAbsoluter;
 function imageSrcSetRetriever(fileData, property, imageSizes) {
     if (fileData &&
         fileData.url.indexOf("blob:") !== 0 &&

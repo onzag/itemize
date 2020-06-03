@@ -1,11 +1,13 @@
 import Root from "../../base/Root";
 import express from "express";
+import { IConfigRawJSONDataType } from "../../config";
+declare type ISSRRuleDynamicFn = (collectedValues: any[], config: IConfigRawJSONDataType) => string;
 export interface ISSRRuleDynamic {
-    title: string;
-    description: string;
-    ogTitle: string;
-    ogDescription: string;
-    ogImage: string;
+    title: string | ISSRRuleDynamicFn;
+    description: string | ISSRRuleDynamicFn;
+    ogTitle: string | ISSRRuleDynamicFn;
+    ogDescription: string | ISSRRuleDynamicFn;
+    ogImage: string | ISSRRuleDynamicFn;
     collect: Array<[string, string, number, string]>;
     memId: string;
 }
@@ -24,3 +26,4 @@ export declare type ISSRRuleSetCb = (req: express.Request, language: string, roo
 export interface ISSRRuleSet {
     [urlWithoutLanguage: string]: ISSRRuleDynamic | ISSRRuleSetCb;
 }
+export {};

@@ -225,5 +225,53 @@ function getLocalizedDateTimeFormat(normalize) {
     return getLocalizedDateFormat(normalize) + " " + getLocalizedTimeFormat(normalize);
 }
 exports.getLocalizedDateTimeFormat = getLocalizedDateTimeFormat;
+/**
+ * Converts a file to its absolute URL counterpart
+ * @param containerHostnamePrefixes
+ * @param file
+ * @param itemDefinition
+ * @param id
+ * @param version
+ * @param containerId
+ * @param include
+ * @param property
+ */
+function fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property) {
+    if (file === null) {
+        return null;
+    }
+    if (file.url.indexOf("blob:") === 0) {
+        return file;
+    }
+    if (!containerId) {
+        return null;
+    }
+    let prefix = containerHostnamePrefixes[containerId];
+    if (prefix.indexOf("/") !== 0) {
+        if (typeof location === "undefined") {
+            prefix = "https://" + prefix;
+        }
+        else {
+            prefix = location.protocol + "//" + prefix;
+        }
+    }
+    return {
+        ...file,
+        url: prefix +
+            itemDefinition.getQualifiedPathName() + "/" +
+            id + "." + (version || "") + "/" +
+            (include ? include.getId() + "/" : "") +
+            property.getId() + "/" +
+            file.id + "/" + file.url,
+    };
+}
+exports.fileURLAbsoluter = fileURLAbsoluter;
+function fileArrayURLAbsoluter(containerHostnamePrefixes, files, itemDefinition, id, version, containerId, include, property) {
+    if (files === null) {
+        return null;
+    }
+    return files.map((file) => fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property));
+}
+exports.fileArrayURLAbsoluter = fileArrayURLAbsoluter;
 exports.DOMWindow = jsdom_1.JSDOM ? (new jsdom_1.JSDOM("")).window : window;
 exports.DOMPurify = dompurify_1.default(exports.DOMWindow);

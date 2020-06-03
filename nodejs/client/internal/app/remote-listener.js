@@ -20,6 +20,7 @@ class RemoteListener {
         // private initialConsideredDisconnectedIfNoAnswerTimeout: NodeJS.Timeout;
         this.token = null;
         this.isReady = false;
+        this.isReadyCallbacks = [];
         this.reattachListeners = this.reattachListeners.bind(this);
         this.onChangeListened = this.onChangeListened.bind(this);
         this.onBuildnumberListened = this.onBuildnumberListened.bind(this);
@@ -101,9 +102,6 @@ class RemoteListener {
         }
     }
     addItemDefinitionListenerFor(parentInstance, itemDefinitionQualifiedPathName, forId, forVersion) {
-        if (!this.isReady) {
-            throw new Error("Remote listener is not ready");
-        }
         const qualifiedIdentifier = itemDefinitionQualifiedPathName + "." + forId + "." + (forVersion || "");
         if (this.listeners[qualifiedIdentifier]) {
             this.listeners[qualifiedIdentifier].parentInstances.push(parentInstance);
@@ -122,7 +120,11 @@ class RemoteListener {
     }
     attachItemDefinitionListenerFor(request) {
         if (!this.isReady) {
-            throw new Error("Remote listener is not ready");
+            this.isReadyCallbacks.push([
+                "attachItemDefinitionListenerFor",
+                [request],
+            ]);
+            return;
         }
         if (this.socket.connected) {
             this.socket.emit(remote_protocol_1.REGISTER_REQUEST, request);
@@ -130,7 +132,10 @@ class RemoteListener {
     }
     attachOwnedSearchListenerFor(request) {
         if (!this.isReady) {
-            throw new Error("Remote listener is not ready");
+            this.isReadyCallbacks.push([
+                "attachOwnedSearchListenerFor",
+                [request],
+            ]);
         }
         if (this.socket.connected) {
             this.socket.emit(remote_protocol_1.OWNED_SEARCH_REGISTER_REQUEST, request);
@@ -138,7 +143,11 @@ class RemoteListener {
     }
     attachParentedSearchListenerFor(request) {
         if (!this.isReady) {
-            throw new Error("Remote listener is not ready");
+            this.isReadyCallbacks.push([
+                "attachParentedSearchListenerFor",
+                [request],
+            ]);
+            return;
         }
         if (this.socket.connected) {
             this.socket.emit(remote_protocol_1.PARENTED_SEARCH_REGISTER_REQUEST, request);
@@ -146,7 +155,11 @@ class RemoteListener {
     }
     requestOwnedSearchFeedbackFor(request) {
         if (!this.isReady) {
-            throw new Error("Remote listener is not ready");
+            this.isReadyCallbacks.push([
+                "requestOwnedSearchFeedbackFor",
+                [request],
+            ]);
+            return;
         }
         if (this.socket.connected) {
             this.socket.emit(remote_protocol_1.OWNED_SEARCH_FEEDBACK_REQUEST, request);
@@ -154,16 +167,17 @@ class RemoteListener {
     }
     requestParentedSearchFeedbackFor(request) {
         if (!this.isReady) {
-            throw new Error("Remote listener is not ready");
+            this.isReadyCallbacks.push([
+                "requestParentedSearchFeedbackFor",
+                [request],
+            ]);
+            return;
         }
         if (this.socket.connected) {
             this.socket.emit(remote_protocol_1.PARENTED_SEARCH_FEEDBACK_REQUEST, request);
         }
     }
     addOwnedSearchListenerFor(itemDefinitionOrModuleQualifiedPathName, createdBy, lastKnownRecordDate, callback) {
-        if (!this.isReady) {
-            throw new Error("Remote listener is not ready");
-        }
         const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + createdBy;
         if (this.ownedSearchListeners[qualifiedIdentifier]) {
             this.ownedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
@@ -181,9 +195,6 @@ class RemoteListener {
         this.attachOwnedSearchListenerFor(request);
     }
     addParentedSearchListenerFor(itemDefinitionOrModuleQualifiedPathName, parentType, parentId, parentVersion, lastKnownRecordDate, callback) {
-        if (!this.isReady) {
-            throw new Error("Remote listener is not ready");
-        }
         const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." +
             parentType + "." + parentId + "." + (parentVersion || "");
         if (this.parentedSearchListeners[qualifiedIdentifier]) {
@@ -204,11 +215,15 @@ class RemoteListener {
         this.attachParentedSearchListenerFor(request);
     }
     requestFeedbackFor(request, immediate) {
-        if (!this.isReady) {
-            throw new Error("Remote listener is not ready");
-        }
         if (immediate) {
-            if (this.socket.connected) {
+            if (!this.isReady) {
+                this.isReadyCallbacks.push([
+                    "requestFeedbackFor",
+                    [request, immediate],
+                ]);
+                return;
+            }
+            else if (this.socket.connected) {
                 this.socket.emit(remote_protocol_1.FEEDBACK_REQUEST, request);
             }
         }
@@ -324,7 +339,11 @@ class RemoteListener {
         this.delayedFeedbacks = this.delayedFeedbacks.filter((df) => {
             if (!anSpecificRequest ||
                 (anSpecificRequest.id === df.id && anSpecificRequest.itemDefinition === df.itemDefinition)) {
-                if (this.socket.connected) {
+                if (!this.isReady) {
+                    setTimeout(this.consumeDelayedFeedbacks.bind(this, anSpecificRequest), 70);
+                    return true;
+                }
+                else if (this.socket.connected) {
                     this.socket.emit(remote_protocol_1.FEEDBACK_REQUEST, df);
                 }
                 return false;

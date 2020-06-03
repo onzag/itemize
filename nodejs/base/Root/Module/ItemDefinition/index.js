@@ -922,6 +922,56 @@ class ItemDefinition {
         return this.parentModule.getRolesWithFlaggingAccess();
     }
     /**
+     * Returns the FLATTENED fields for the graphql request
+     * @param action
+     * @param role
+     * @param userId
+     * @param ownerUserId
+     */
+    buildFieldsForRoleAccess(action, role, userId, ownerUserId) {
+        if (action === ItemDefinitionIOActions.DELETE) {
+            return null;
+        }
+        if (ownerUserId === null) {
+            throw new Error("ownerUserId cannot be null");
+        }
+        // now let's get the roles that have access to the action
+        const rolesWithAccess = this.getRolesWithAccessTo(action);
+        const idefLevelAccess = rolesWithAccess.includes(constants_1.ANYONE_METAROLE) ||
+            (rolesWithAccess.includes(constants_1.ANYONE_LOGGED_METAROLE) && role !== constants_1.GUEST_METAROLE) || (rolesWithAccess.includes(constants_1.OWNER_METAROLE) && userId === ownerUserId) || rolesWithAccess.includes(role);
+        if (!idefLevelAccess) {
+            return null;
+        }
+        const requestFields = {};
+        // now we add all the reserver properties
+        Object.keys(constants_1.RESERVED_BASE_PROPERTIES).forEach((pKey) => {
+            requestFields[pKey] = {};
+        });
+        const modFieldsAccess = this.getRolesWithModerationAccess();
+        const modLevelAccess = modFieldsAccess.includes(constants_1.ANYONE_METAROLE) ||
+            (modFieldsAccess.includes(constants_1.ANYONE_LOGGED_METAROLE) && role !== constants_1.GUEST_METAROLE) ||
+            modFieldsAccess.includes(role);
+        if (!modLevelAccess) {
+            constants_1.MODERATION_FIELDS.forEach((mf) => {
+                delete requestFields[mf];
+            });
+        }
+        this.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+            const propertyFields = pd.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
+            if (propertyFields) {
+                requestFields[pd.getId()] = propertyFields;
+            }
+        });
+        this.getAllIncludes().forEach((include) => {
+            const includeFields = include.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
+            if (includeFields) {
+                requestFields[constants_1.INCLUDE_PREFIX + include.getId()] = includeFields;
+                requestFields[constants_1.INCLUDE_PREFIX + include.getId() + constants_1.EXCLUSION_STATE_SUFFIX] = {};
+            }
+        });
+        return requestFields;
+    }
+    /**
      * Checks the role access for an action in an item
      * defintition
      * @param action the IO action

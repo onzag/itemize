@@ -33,6 +33,7 @@ export declare function getSQLTablesSchemaForItemDefinition(itemDefinition: Item
  * Converts a SQL value directly coming from the database as it is
  * to a graphql value for this specific item definition,
  * this includes the prop extensions and the reserved base properties
+ * This value is FLATTENED
  * @param itemDefinition the item definition in question
  * @param row the row value, with all the columns it has; the row
  * can be overblown with other field data, this will extract only the

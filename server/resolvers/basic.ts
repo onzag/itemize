@@ -22,7 +22,7 @@ import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefin
 import { jwtVerify } from "../token";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { IGQLValue, IGQLSearchRecord, IGQLArgs } from "../../gql-querier";
+import { IGQLValue, IGQLSearchRecord, IGQLArgs, IGQLRequestFields } from "../../gql-querier";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
@@ -652,8 +652,8 @@ export interface IFilteredAndPreparedValueType {
  * @param parentModuleOrIdef the parent module or item definition the value belongs to
  */
 export function filterAndPrepareGQLValue(
-  value: any,
-  requestedFields: any,
+  value: IGQLValue,
+  requestedFields: IGQLRequestFields,
   role: string,
   parentModuleOrIdef: ItemDefinition | Module,
 ): IFilteredAndPreparedValueType {
@@ -683,7 +683,7 @@ export function filterAndPrepareGQLValue(
   };
 
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
-    if (typeof value[property] !== "undefined") {
+    if (typeof value[property] !== "undefined" && requestedFields[property]) {
       actualValue[property] = value[property];
     }
   });

@@ -8,7 +8,7 @@ import PropertyView, { RawBasePropertyView, IPropertyViewRendererProps } from ".
 import PropertyEntry, { IPropertyEntryRendererProps } from "../../internal/components/PropertyEntry";
 import PropertySetter from "../../internal/components/PropertySetter";
 import { IncludeContext } from "../../providers/include";
-import { fileURLAbsoluter, fileArrayURLAbsoluter } from "../util";
+import { fileURLAbsoluter, fileArrayURLAbsoluter } from "../../../util";
 import { IGQLFile } from "../../../gql-querier";
 import { ConfigContext } from "../../internal/providers/config-provider";
 

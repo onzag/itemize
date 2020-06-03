@@ -63,7 +63,7 @@ function propertyViewPostProcessingHook(relatedProperty, currentFiles, supportsI
                 node.parentElement && node.parentElement.removeChild(node);
             }
             else {
-                const absolutedFile = util_2.fileURLAbsoluter(this.props.config.containersHostnamePrefixes, currentFile, this.props.itemDefinition, this.props.forId, this.props.forVersion || null, this.props.containerId, this.props.include, relatedProperty);
+                const absolutedFile = util_1.fileURLAbsoluter(this.props.config.containersHostnamePrefixes, currentFile, this.props.itemDefinition, this.props.forId, this.props.forVersion || null, this.props.containerId, this.props.include, relatedProperty);
                 const srcset = util_2.imageSrcSetRetriever(absolutedFile, relatedProperty);
                 // srcset
                 node.setAttribute("srcset", srcset);
@@ -94,7 +94,7 @@ function propertyViewPostProcessingHook(relatedProperty, currentFiles, supportsI
             if (currentFile) {
                 // spellcheck
                 node.spellcheck = false;
-                const absolutedFile = util_2.fileURLAbsoluter(this.props.config.containersHostnamePrefixes, currentFile, this.props.itemDefinition, this.props.forId, this.props.forVersion || null, this.props.containerId, this.props.include, relatedProperty);
+                const absolutedFile = util_1.fileURLAbsoluter(this.props.config.containersHostnamePrefixes, currentFile, this.props.itemDefinition, this.props.forId, this.props.forVersion || null, this.props.containerId, this.props.include, relatedProperty);
                 // data-src-id
                 node.dataset.srcId = srcId;
                 // data-src

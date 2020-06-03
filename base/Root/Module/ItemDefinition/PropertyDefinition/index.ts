@@ -23,7 +23,7 @@ import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefini
 import { EndpointError } from "../../../../errors";
 import { DOMWindow } from "../../../../../util";
 import equals from "deep-equal";
-import { IGQLFile } from "../../../../../gql-querier";
+import { IGQLFile, IGQLRequestFields } from "../../../../../gql-querier";
 
 /**
  * These are the main errors a property is able to give
@@ -1885,6 +1885,47 @@ export default class PropertyDefinition {
       return this.rawData.editRoleAccess || [ANYONE_METAROLE];
     }
     return [];
+  }
+
+  public buildFieldsForRoleAccess(
+    action: ItemDefinitionIOActions,
+    role: string,
+    userId: number,
+    ownerUserId: number,
+  ) {
+    if (action === ItemDefinitionIOActions.DELETE) {
+      return null;
+    }
+
+    if (ownerUserId === null) {
+      throw new Error("ownerUserId cannot be null");
+    }
+
+    // now let's get the roles that have access to the action
+    // first we get all the roles that have the access
+    const rolesWithAccess = this.getRolesWithAccessTo(action);
+    // so if ANYONE_METAROLE is included we have access
+    const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
+      // or if OWNER_METAROLE is included and our user matches our owner user
+      // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
+      // because null === null in the case of eg. GUEST_METAROLE
+      rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
+    ) || rolesWithAccess.includes(role);
+
+    if (!hasAccess) {
+      return null;
+    }
+
+    const gqlForm = this.getPropertyDefinitionDescription().gqlFields;
+    if (gqlForm) {
+      const requestFields: IGQLRequestFields = {};
+      Object.keys(gqlForm).forEach((key) => {
+        requestFields[key] = {};
+      });
+      return requestFields;
+    } else {
+      return {};
+    }
   }
 
   /**

@@ -1,12 +1,14 @@
 import React from "react";
 import { IGQLValue, IGQLRequestFields } from "../../../gql-querier";
+export interface ISSRCollectedQueryType {
+    idef: string;
+    id: number;
+    version: string;
+    value: IGQLValue;
+    fields: IGQLRequestFields;
+}
 export interface ISSRContextType {
-    queries: {
-        [key: string]: {
-            value: IGQLValue;
-            fields: IGQLRequestFields;
-        };
-    };
+    queries: ISSRCollectedQueryType[];
     user: {
         role: string;
         id: number;

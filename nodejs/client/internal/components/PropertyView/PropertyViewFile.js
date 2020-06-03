@@ -29,7 +29,7 @@ class PropertyViewFile extends react_1.default.Component {
         const isSupportedImage = currentValue && constants_1.FILE_SUPPORTED_IMAGE_TYPES.includes(currentValue.type);
         if (currentValue &&
             currentValue.url.indexOf("blob:") !== 0) {
-            currentValue = util_1.fileURLAbsoluter(this.props.config.containersHostnamePrefixes, currentValue, this.props.itemDefinition, this.props.forId, this.props.forVersion, this.props.containerId, this.props.include, this.props.property);
+            currentValue = util_2.fileURLAbsoluter(this.props.config.containersHostnamePrefixes, currentValue, this.props.itemDefinition, this.props.forId, this.props.forVersion, this.props.containerId, this.props.include, this.props.property);
         }
         const prettySize = currentValue && pretty_bytes_1.default(currentValue.size);
         const extension = currentValue && util_2.mimeTypeToExtension(currentValue.type);

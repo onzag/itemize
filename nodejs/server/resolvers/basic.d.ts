@@ -4,7 +4,7 @@ import { IAppDataType } from "..";
 import Include from "../../base/Root/Module/ItemDefinition/Include";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { IGQLValue, IGQLSearchRecord, IGQLArgs } from "../../gql-querier";
+import { IGQLValue, IGQLSearchRecord, IGQLArgs, IGQLRequestFields } from "../../gql-querier";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 /**
  * Builds the column names expected for a given module only
@@ -103,7 +103,7 @@ export interface IFilteredAndPreparedValueType {
  * @param role the role of the user requesting the data
  * @param parentModuleOrIdef the parent module or item definition the value belongs to
  */
-export declare function filterAndPrepareGQLValue(value: any, requestedFields: any, role: string, parentModuleOrIdef: ItemDefinition | Module): IFilteredAndPreparedValueType;
+export declare function filterAndPrepareGQLValue(value: IGQLValue, requestedFields: IGQLRequestFields, role: string, parentModuleOrIdef: ItemDefinition | Module): IFilteredAndPreparedValueType;
 /**
  * Checks that an item definition current state is
  * valid and that the gqlArgValue provided is a match

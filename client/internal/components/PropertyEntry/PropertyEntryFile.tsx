@@ -5,8 +5,8 @@ import { MAX_FILE_SIZE, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants
 import uuid from "uuid";
 import { PropertyDefinitionSupportedFileType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
 import prettyBytes from "pretty-bytes";
-import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, processAccepts } from "../../../../util";
-import { fileURLAbsoluter, imageSrcSetRetriever, imageSizeRetriever, IImageSizes } from "../../../components/util";
+import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, processAccepts, fileURLAbsoluter } from "../../../../util";
+import { imageSrcSetRetriever, imageSizeRetriever, IImageSizes } from "../../../components/util";
 
 export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererProps<PropertyDefinitionSupportedFileType> {
   accept: string;

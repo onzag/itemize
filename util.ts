@@ -8,6 +8,10 @@ import Moment from "moment";
 import { JSDOM } from "jsdom";
 import createDOMPurify from "dompurify";
 import { FILE_SUPPORTED_IMAGE_TYPES } from "./constants";
+import { IGQLFile } from "./gql-querier";
+import ItemDefinition from "./base/Root/Module/ItemDefinition";
+import Include from "./base/Root/Module/ItemDefinition/Include";
+import PropertyDefinition from "./base/Root/Module/ItemDefinition/PropertyDefinition";
 
 /**
  * capitalizes a string
@@ -229,6 +233,79 @@ export function getLocalizedDateFormat(normalize: boolean) {
  */
 export function getLocalizedDateTimeFormat(normalize: boolean) {
   return getLocalizedDateFormat(normalize) + " " + getLocalizedTimeFormat(normalize);
+}
+
+/**
+ * Converts a file to its absolute URL counterpart
+ * @param containerHostnamePrefixes 
+ * @param file 
+ * @param itemDefinition 
+ * @param id 
+ * @param version 
+ * @param containerId 
+ * @param include 
+ * @param property 
+ */
+export function fileURLAbsoluter(
+  containerHostnamePrefixes: {
+    [key: string]: string,
+  },
+  file: IGQLFile,
+  itemDefinition: ItemDefinition,
+  id: number,
+  version: string,
+  containerId: string,
+  include: Include,
+  property: PropertyDefinition,
+): IGQLFile {
+  if (file === null) {
+    return null;
+  }
+
+  if (file.url.indexOf("blob:") === 0) {
+    return file;
+  }
+
+  if (!containerId) {
+    return null;
+  }
+
+  let prefix: string = containerHostnamePrefixes[containerId];
+  if (prefix.indexOf("/") !== 0) {
+    if (typeof location === "undefined") {
+      prefix = "https://" + prefix;
+    } else {
+      prefix = location.protocol + "//" + prefix;
+    }
+  }
+  return {
+    ...file,
+    url:
+      prefix +
+      itemDefinition.getQualifiedPathName() + "/" +
+      id + "." + (version || "") + "/" +
+      (include ? include.getId() + "/" : "") +
+      property.getId() + "/" +
+      file.id + "/" + file.url,
+  }
+}
+
+export function fileArrayURLAbsoluter(
+  containerHostnamePrefixes: {
+    [key: string]: string,
+  },
+  files: IGQLFile[],
+  itemDefinition: ItemDefinition,
+  id: number,
+  version: string,
+  containerId: string,
+  include: Include,
+  property: PropertyDefinition,
+) {
+  if (files === null) {
+    return null;
+  }
+  return files.map((file) => fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property));
 }
 
 export const DOMWindow = JSDOM ? (new JSDOM("")).window : window;
