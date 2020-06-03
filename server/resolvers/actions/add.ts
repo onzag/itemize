@@ -29,8 +29,6 @@ import { EndpointError } from "../../../base/errors";
 import { IGQLArgs } from "../../../gql-querier";
 import { TriggerActions } from "../triggers";
 
-// TODO versioning and the for_id madness
-
 export async function addItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,

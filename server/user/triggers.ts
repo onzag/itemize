@@ -4,8 +4,6 @@ import { EndpointError } from "../../base/errors";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import { logger } from "../";
 
-// TODO mailing lists triggers per language supported
-
 export const customUserTriggers: ITriggerRegistry = {
   itemDefinition: {
     "users/user": async (arg) => {

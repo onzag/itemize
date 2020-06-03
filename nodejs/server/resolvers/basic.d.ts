@@ -91,6 +91,7 @@ export declare function checkUserExists(cache: Cache, id: number): Promise<void>
 export interface IFilteredAndPreparedValueType {
     toReturnToUser: any;
     actualValue: any;
+    requestFields: any;
 }
 /**
  * Filters and prepares a graphql value for output to the rest endpoint
@@ -99,7 +100,7 @@ export interface IFilteredAndPreparedValueType {
  * and the parent module or item definition this value belongs to,
  * the form comes with the DATA and the externalized fields
  * @param value the value gotten from the sql database
- * @param requestedFields the requested fields
+ * @param requestedFields the requested fields, flattened
  * @param role the role of the user requesting the data
  * @param parentModuleOrIdef the parent module or item definition the value belongs to
  */

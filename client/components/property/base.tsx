@@ -59,7 +59,6 @@ export interface IPropertyViewProps<RendererPropsType> {
 interface IPropertyEntryViewReadSetProps<RendererPropsType> extends
   IPropertyEntryProps<RendererPropsType>, IPropertyViewProps<RendererPropsType>, IPropertySetterProps, IPropertyReadProps { }
 
-// TODO optimize
 export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, type: "entry" | "view" | "read" | "set") {
   return (
     <ConfigContext.Consumer>

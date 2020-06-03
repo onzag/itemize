@@ -20,7 +20,6 @@ const PropertySetter_1 = __importDefault(require("../../internal/components/Prop
 const include_1 = require("../../providers/include");
 const util_1 = require("../../../util");
 const config_provider_1 = require("../../internal/providers/config-provider");
-// TODO optimize
 function EntryViewReadSet(props, type) {
     return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContextualValue) => {
         if (!itemDefinitionContextualValue) {

@@ -4,7 +4,7 @@ import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
 import { Avatar } from "../../components/avatar";
 import { createStyles, withStyles, WithStyles, Typography, Paper, Container, Divider, Button } from "@material-ui/core";
-import { ProgressingElement, SlowLoadingElement } from "../../components/util";
+import { ProgressingElement } from "../../components/util";
 import DoneIcon from "@material-ui/icons/Done";
 import Snackbar from "../../components/snackbar";
 import UserActioner, { IUserActionerArg } from "../../../components/user/UserActioner";
@@ -49,19 +49,18 @@ async function resetPassword(token: string, actioner: IUserActionerArg) {
 
 export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<typeof resetPasswordStyles>) => {
   return (
-    <SlowLoadingElement id="reset-password">
-      <LocationStateReader
-        defaultState={{token: null, id: null} as {token: string, id: string}}
-        stateIsInQueryString={true}
-      >
-        {(state, setState) => {
-          const userId = parseInt(state.id, 10) || null;
+    <LocationStateReader
+      defaultState={{ token: null, id: null } as { token: string, id: string }}
+      stateIsInQueryString={true}
+    >
+      {(state, setState) => {
+        const userId = parseInt(state.id, 10) || null;
 
-          if (!userId) {
-            return null;
-          }
+        if (!userId) {
+          return null;
+        }
 
-          return (
+        return (
           <ModuleProvider module="users">
             <ItemDefinitionProvider
               itemDefinition="user"
@@ -85,19 +84,19 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
                     <Container maxWidth="md" className={props.classes.container}>
                       <Paper className={props.classes.paper}>
                         <ItemDefinitionLoader>
-                          <Avatar size="large" fullWidth={true}/>
+                          <Avatar size="large" fullWidth={true} />
                           <Reader id="username">
                             {(username: string) => (
                               <Typography variant="h4" className={props.classes.username}>{username}</Typography>
                             )}
                           </Reader>
                         </ItemDefinitionLoader>
-                        <Divider className={props.classes.divider}/>
+                        <Divider className={props.classes.divider} />
                         <Typography variant="h6" className={props.classes.recoverTitle}>{i18nResetPassword}</Typography>
                         <I18nReadMany data={[
-                          {id: "reset_password_field_alt_label"},
-                          {id: "reset_password_field_alt_placeholder"},
-                          {id: "reset_password_message"},
+                          { id: "reset_password_field_alt_label" },
+                          { id: "reset_password_field_alt_placeholder" },
+                          { id: "reset_password_message" },
                         ]}>
                           {(i18nAltLabel: string, i18nAltPlaceholder: string, i18nAltDescription: string) => (
                             <Entry
@@ -121,7 +120,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
                                       size="large"
                                       variant="contained"
                                       color="primary"
-                                      endIcon={<DoneIcon/>}
+                                      endIcon={<DoneIcon />}
                                       onClick={resetPassword.bind(null, state.token, actioner)}
                                     >
                                       {i18nUpdatePassword}
@@ -151,9 +150,8 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
               </I18nRead>
             </ItemDefinitionProvider>
           </ModuleProvider>
-          )
-        }}
-      </LocationStateReader>
-    </SlowLoadingElement>
+        )
+      }}
+    </LocationStateReader>
   );
 });

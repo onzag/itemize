@@ -44,8 +44,6 @@ import pkgcloud from "pkgcloud";
  */
 export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefinition): ISQLTableDefinitionType {
   // add all the standard fields
-  // TODO fix this to use the new foreignKey and build the key
-  // as the double of the primary key, similar to how indexes are done
   const tableToConnect = itemDefinition.getParentModule().getQualifiedPathName();
   const resultTableSchema: ISQLTableDefinitionType = {
     [CONNECTOR_SQL_COLUMN_ID_FK_NAME]: {

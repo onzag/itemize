@@ -253,7 +253,7 @@ class PropertyEntryText extends react_1.default.Component {
             util_1.DOMPurify.addHook("afterSanitizeElements", PropertyViewText_1.propertyViewPostProcessingHook.bind(this, this.cachedMediaProperty, currentFiles, supportsImages, supportsVideos, supportsFiles));
             currentValue = util_1.DOMPurify.sanitize(currentValue, PropertyViewText_1.PROPERTY_VIEW_SANITIZE_CONFIG);
             util_1.DOMPurify.removeAllHooks();
-            // TODO ensure proper sorting
+            // TODO IMPORTANT ensure proper sorting
         }
         let invalidReason = this.props.state.invalidReason;
         let invalidReasonIsMediaProperty = false;

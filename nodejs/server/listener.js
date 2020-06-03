@@ -9,8 +9,6 @@ const remote_protocol_1 = require("../base/remote-protocol");
 const version_null_value_1 = require("./version-null-value");
 const _1 = require(".");
 const constants_1 = require("../constants");
-// TODO refactor all these methods to be proper objects, this is a mess of arguments
-// do the same in the remote listener in the client side
 const INSTANCE_MODE = process.env.INSTANCE_MODE || "ABSOLUTE";
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
 const CLUSTER_MANAGER_REGISTER_SS = "CLUSTER_MANAGER_REGISTER_SS";

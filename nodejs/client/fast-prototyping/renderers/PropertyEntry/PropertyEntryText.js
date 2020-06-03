@@ -305,7 +305,6 @@ exports.style = (theme) => styles_2.createStyles({
         overflow: "hidden",
     }
 });
-// TODO implement missing toolbar functionality
 function RichTextEditorToolbar(props) {
     return (react_1.default.createElement(Toolbar_1.default, { id: props.id, className: props.className },
         props.supportsBasicMode ? react_1.default.createElement(react_1.default.Fragment, null,

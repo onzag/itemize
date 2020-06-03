@@ -12,6 +12,7 @@ import { IConfigRawJSONDataType } from "../config";
 import Root, { ILangLocalesType } from "../base/Root";
 import CacheWorkerInstance from "./internal/workers/cache";
 import { ConfigProvider } from "./internal/providers/config-provider";
+import ItemDefinition from "../base/Root/Module/ItemDefinition";
 
 // Create the browser history to feed the router
 export const history = typeof document !== "undefined" ? createBrowserHistory() : null;
@@ -316,9 +317,11 @@ export async function initializeItemizeApp(
     // have been imported, and should be available for moment
     Moment.locale(initialLang);
 
+    const root: Root = serverMode ? serverMode.root : (window as any).ROOT;
+
     // now we get the app that we are expected to use
     const app = <App
-      root={serverMode ? serverMode.root : (window as any).ROOT}
+      root={root}
       langLocales={serverMode ? serverMode.langLocales : (window as any).LANG}
       config={config}
 
@@ -333,6 +336,27 @@ export async function initializeItemizeApp(
     const children = options && options.appWrapper ?
       options.appWrapper(app, config) :
       app;
+
+    // now we need to load all the information that is included
+    // with the SSR into the root
+    ssrContext.queries.forEach((query) => {
+      if (!query || !query.value) {
+        return;
+      }
+      const idef: ItemDefinition = root.registry[query.idef] as ItemDefinition;
+      if (idef) {
+        idef.applyValue(
+          query.id,
+          query.version,
+          query.value,
+          false,
+          ssrContext.user.id,
+          ssrContext.user.role,
+          query.fields,
+          false,
+        );
+      }
+    });
 
     const actualApp = (
       <ConfigProvider value={config}>

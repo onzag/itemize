@@ -189,11 +189,6 @@ async function copyOneDirectoryLevel(pathname: string, constructedPath: string) 
  * @returns a void promise
  */
 export async function buildResources(rawConfig: IBuilderBasicConfigType) {
-  // TODO eventually remove this after the CDN update
-  if (!await checkExists(path.join("dist", "uploads"))) {
-    await fsAsync.mkdir(path.join("dist", "uploads"));
-  }
-
   const actualRequiredResources = REQUIRED_RESOURCES;
   REQUIRED_LOCALIZED_RESOURCES.forEach((rr) => {
     rawConfig.standard.supportedLanguages.forEach((sl) => {

@@ -248,12 +248,7 @@ function fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, v
     }
     let prefix = containerHostnamePrefixes[containerId];
     if (prefix.indexOf("/") !== 0) {
-        if (typeof location === "undefined") {
-            prefix = "https://" + prefix;
-        }
-        else {
-            prefix = location.protocol + "//" + prefix;
-        }
+        prefix = "https://" + prefix;
     }
     return {
         ...file,

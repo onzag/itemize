@@ -103,7 +103,7 @@ export class GlobalManager {
     const countResponse = await this.knex.count("MODULE_ID as COUNT").from(idef.getQualifiedPathName());
     const finalCount = countResponse[0].COUNT;
 
-    // TODO
+    // TODO IMPORTANT
     // UPDATE TABLE "stuffs" SET "normalized_0"=c0."factor"*"value_0", "normalized_1"=c1."factor"*"value_1" FROM "currencyfactors" c0, "currencyfactors" c1 WHERE c0."name"="currency_0" AND c1."name"="currency_1" AND (c0."factor"*s."value_0" > 0.5 OR c1."factor"*"value_1" > 0.5) RETURNING *
 
     // await this.knex.transaction((transactionKnex) => {

@@ -59,9 +59,6 @@ interface IServerListensList {
   [mergedIndexIdentifier: string]: boolean;
 }
 
-// TODO refactor all these methods to be proper objects, this is a mess of arguments
-// do the same in the remote listener in the client side
-
 const INSTANCE_MODE = process.env.INSTANCE_MODE || "ABSOLUTE";
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
 

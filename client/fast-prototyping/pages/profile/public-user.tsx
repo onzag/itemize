@@ -84,7 +84,7 @@ export const PublicUserProfile = withStyles(publicUserProfileStyles)((props: Wit
                 return null;
               }
               const countryobj = countries[country];
-              return <Typography variant="h5" className={props.classes.country}>{countryobj.emoji} {countryobj.native}</Typography>
+              return <Typography variant="h5" className={props.classes.country}>{countryobj.emoji + " " + countryobj.native}</Typography>
             }}
           </Reader>
           <Reader id="role">

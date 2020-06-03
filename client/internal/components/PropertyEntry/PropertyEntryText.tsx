@@ -367,7 +367,7 @@ export default class PropertyEntryText
       currentValue = DOMPurify.sanitize(currentValue, PROPERTY_VIEW_SANITIZE_CONFIG);
       DOMPurify.removeAllHooks();
 
-      // TODO ensure proper sorting
+      // TODO IMPORTANT ensure proper sorting
     }
 
     let invalidReason = this.props.state.invalidReason;

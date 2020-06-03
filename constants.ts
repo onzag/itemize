@@ -952,7 +952,6 @@ export const RESERVED_GETTER_PROPERTIES = {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
     description: "the id for that item",
   },
-  // TODO implement in get resolver
   version: {
     type: GraphQLString,
     description: "a version for this item",
@@ -964,7 +963,6 @@ export const RESERVED_GETTER_PROPERTIES = {
  * either edit or delete
  */
 export const RESERVED_CHANGE_PROPERTIES = {
-  // TODO implement the versioning in edit resolver
   ...RESERVED_GETTER_PROPERTIES,
   listener_uuid: {
     type: GraphQLString,
@@ -978,7 +976,6 @@ export const RESERVED_CHANGE_PROPERTIES = {
 export const RESERVED_GETTER_LIST_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   records: {
-    // TODO implement the version in retrieving these lists
     type: GraphQLNonNull && GraphQLNonNull(GraphQLList(SEARCH_RECORD_INPUT_GQL)),
     description: "the records to fetch for that item",
   },

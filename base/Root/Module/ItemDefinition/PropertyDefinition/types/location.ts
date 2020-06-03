@@ -85,13 +85,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
   },
-  specialProperties: [
-    {
-      // TODO implement
-      name: "prefillToUserLocationIfPossible",
-      type: "boolean",
-    },
-  ],
   sql: (sqlPrefix: string, id: string) => {
     return {
       [sqlPrefix + id + "_GEO"]: {

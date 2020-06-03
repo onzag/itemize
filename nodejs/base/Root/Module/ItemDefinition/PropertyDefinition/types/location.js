@@ -59,13 +59,6 @@ const typeValue = {
             type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLString),
         },
     },
-    specialProperties: [
-        {
-            // TODO implement
-            name: "prefillToUserLocationIfPossible",
-            type: "boolean",
-        },
-    ],
     sql: (sqlPrefix, id) => {
         return {
             [sqlPrefix + id + "_GEO"]: {

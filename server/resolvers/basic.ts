@@ -638,6 +638,7 @@ export async function checkUserExists(cache: Cache, id: number) {
 export interface IFilteredAndPreparedValueType {
   toReturnToUser: any;
   actualValue: any;
+  requestFields: any;
 }
 
 /**
@@ -647,7 +648,7 @@ export interface IFilteredAndPreparedValueType {
  * and the parent module or item definition this value belongs to,
  * the form comes with the DATA and the externalized fields
  * @param value the value gotten from the sql database
- * @param requestedFields the requested fields
+ * @param requestedFields the requested fields, flattened
  * @param role the role of the user requesting the data
  * @param parentModuleOrIdef the parent module or item definition the value belongs to
  */
@@ -681,16 +682,23 @@ export function filterAndPrepareGQLValue(
   const actualValue = {
     DATA: valueOfTheItem,
   };
+  const finalRequestFields = {
+    DATA: {...requestedFields},
+  };
 
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
     if (typeof value[property] !== "undefined" && requestedFields[property]) {
       actualValue[property] = value[property];
+      delete actualValue.DATA[property];
+      finalRequestFields[property] = {};
+      delete finalRequestFields.DATA[property];
     }
   });
 
   const valueToProvide = {
     toReturnToUser: actualValue,
     actualValue,
+    requestFields: finalRequestFields,
   };
   if (value.blocked_at !== null) {
     const rolesThatHaveAccessToModerationFields = parentModuleOrIdef.getRolesWithModerationAccess();

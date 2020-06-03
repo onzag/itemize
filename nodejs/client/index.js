@@ -250,12 +250,24 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
         // the locale of moment is set, note how await was used, hence all the previous script
         // have been imported, and should be available for moment
         moment_1.default.locale(initialLang);
+        const root = serverMode ? serverMode.root : window.ROOT;
         // now we get the app that we are expected to use
-        const app = react_1.default.createElement(app_1.default, { root: serverMode ? serverMode.root : window.ROOT, langLocales: serverMode ? serverMode.langLocales : window.LANG, config: config, initialCurrency: initialCurrency, initialCountry: initialCountry, mainComponent: mainComponent, mainWrapper: options && options.mainWrapper });
+        const app = react_1.default.createElement(app_1.default, { root: root, langLocales: serverMode ? serverMode.langLocales : window.LANG, config: config, initialCurrency: initialCurrency, initialCountry: initialCountry, mainComponent: mainComponent, mainWrapper: options && options.mainWrapper });
         // if a wrapping function was provided, we use it
         const children = options && options.appWrapper ?
             options.appWrapper(app, config) :
             app;
+        // now we need to load all the information that is included
+        // with the SSR into the root
+        ssrContext.queries.forEach((query) => {
+            if (!query || !query.value) {
+                return;
+            }
+            const idef = root.registry[query.idef];
+            if (idef) {
+                idef.applyValue(query.id, query.version, query.value, false, ssrContext.user.id, ssrContext.user.role, query.fields, false);
+            }
+        });
         const actualApp = (react_1.default.createElement(config_provider_1.ConfigProvider, { value: config },
             react_1.default.createElement(ssr_provider_1.SSRProvider, { value: ssrContext },
                 react_1.default.createElement(renderer_1.RendererContext.Provider, { value: rendererContext }, children))));

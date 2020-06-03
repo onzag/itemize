@@ -360,6 +360,9 @@ export default class Include {
     const requestFields: IGQLRequestFields = {};
 
     this.getSinkingProperties().forEach((sp) => {
+      if (sp.isRetrievalDisabled()) {
+        return;
+      }
       const fieldsForProperty = sp.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
       if (fieldsForProperty) {
         requestFields[sp.getId()] = fieldsForProperty;

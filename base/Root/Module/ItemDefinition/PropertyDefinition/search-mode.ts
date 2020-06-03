@@ -305,11 +305,6 @@ export function buildSearchModePropertyDefinitions(
 
     // decorate the default property
     newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + newPropDef.id;
-
-    // and we try to use the special property to prefill to user location
-    // so it originally points to whatever the user location is set to
-    newPropDef.specialProperties = newPropDef.specialProperties || {};
-    newPropDef.specialProperties.prefillToUserLocationIfPossible = true;
   }
 
   // we return both if we have both

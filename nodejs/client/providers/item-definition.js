@@ -115,6 +115,29 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         return null;
     }
     setupInitialState() {
+        // the value might already be available in memory, this is either because it was loaded
+        // by another instance or because of SSR during the initial render
+        const memoryLoaded = !!(this.props.forId && this.props.itemDefinitionInstance.hasAppliedValueTo(this.props.forId, this.props.forVersion || null));
+        let memoryLoadedAndValid = false;
+        if (memoryLoaded) {
+            const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId, this.props.forVersion || null);
+            // this is the same as for loadValue we are tyring to predict
+            const { requestFields } = gql_client_util_1.getFieldsAndArgs({
+                includeArgs: false,
+                includeFields: true,
+                uniteFieldsWithAppliedValue: true,
+                includes: this.props.includes || [],
+                properties: this.props.properties || [],
+                appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
+                userId: this.props.tokenData.id,
+                userRole: this.props.tokenData.role,
+                itemDefinitionInstance: this.props.itemDefinitionInstance,
+                forId: this.props.forId,
+                forVersion: this.props.forVersion,
+            });
+            memoryLoadedAndValid = (appliedGQLValue &&
+                gql_util_1.requestFieldsAreContained(requestFields, appliedGQLValue.requestFields));
+        }
         // so the initial setup
         return {
             // same we get the initial state, without checking it externally and passing
@@ -130,8 +153,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             // as after mount it will attempt to load such id, in order
             // to avoid pointless refresh we set it up as true from
             // the beggining
-            loading: this.props.avoidLoading ? false : !!this.props.forId,
-            loaded: false,
+            loading: memoryLoadedAndValid ? false : (this.props.avoidLoading ? false : !!this.props.forId),
+            loaded: memoryLoadedAndValid,
             submitError: null,
             submitting: false,
             submitted: false,

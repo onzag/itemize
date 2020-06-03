@@ -320,13 +320,6 @@ export default class CacheWorker {
     return true;
   }
 
-  // TODO we need a better method, let's use local storage or some form of solution
-  // whatever can it be to store all the item definitions that are session loaded
-  // as well as searches, using the item-definition.tsx flag as some sort of
-  // cacheSecurityPolicy where you can say "by-session" or "none" once the user
-  // gets logged out all the info in the cacheSecurityPolicy gets removed right
-  // now cached data gets cached forever and this function only calls for when the user
-  // is gone, let's leverage this for searches as well
   public async deleteCachedValue(
     queryName: string,
     id: number,

@@ -12,7 +12,6 @@ const sql_1 = require("../../../base/Root/Module/ItemDefinition/sql");
 const gql_util_1 = require("../../../gql-util");
 const errors_1 = require("../../../base/errors");
 const triggers_1 = require("../triggers");
-// TODO versioning and the for_id madness
 async function addItemDefinition(appData, resolverArgs, itemDefinition) {
     __1.logger.debug("addItemDefinition: executed adding for " + itemDefinition.getQualifiedPathName());
     // First we check the language and the region, based on the args

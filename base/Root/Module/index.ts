@@ -222,8 +222,6 @@ export interface IModuleRawJSONDataType {
    * And AND index will ensure to add an ordered btree index to these
    */
   requestLimiters?: IRequestLimitersType;
-
-  // TODO add optimizers that work at module level function using the created_at -> comprehensive-locale -> created_by indexes and whatnot
 }
 
 /**

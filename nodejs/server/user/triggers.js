@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("../../constants");
 const errors_1 = require("../../base/errors");
 const __1 = require("../");
-// TODO mailing lists triggers per language supported
 exports.customUserTriggers = {
     itemDefinition: {
         "users/user": async (arg) => {

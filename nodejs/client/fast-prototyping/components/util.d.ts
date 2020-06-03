@@ -29,23 +29,19 @@ interface SlowLoadingElementProps {
     id: string;
     inline?: boolean;
 }
-interface ActualSlowLoadingElementState {
+interface SlowLoadingElementState {
     isReady: boolean;
     readyForId: string;
 }
-interface ActualSlowLoadingElementProps extends SlowLoadingElementProps {
-    ssrDisabled: boolean;
-}
-export declare class ActualSlowLoadingElement extends React.Component<ActualSlowLoadingElementProps, ActualSlowLoadingElementState> {
+export declare class SlowLoadingElement extends React.Component<SlowLoadingElementProps, SlowLoadingElementState> {
     private unmounted;
-    static getDerivedStateFromProps(props: SlowLoadingElementProps, state: ActualSlowLoadingElementState): Partial<ActualSlowLoadingElementState>;
-    constructor(props: ActualSlowLoadingElementProps);
+    static getDerivedStateFromProps(props: SlowLoadingElementProps, state: SlowLoadingElementState): Partial<SlowLoadingElementState>;
+    constructor(props: SlowLoadingElementProps);
     makeReady(): void;
-    shouldComponentUpdate(nextProps: SlowLoadingElementProps, nextState: ActualSlowLoadingElementState): boolean;
+    shouldComponentUpdate(nextProps: SlowLoadingElementProps, nextState: SlowLoadingElementState): boolean;
     componentDidMount(): void;
     componentDidUpdate(): void;
     componentWillUnmount(): void;
     render(): {};
 }
-export declare function SlowLoadingElement(props: SlowLoadingElementProps): JSX.Element;
 export {};

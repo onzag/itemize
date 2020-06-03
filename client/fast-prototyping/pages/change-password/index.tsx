@@ -2,7 +2,6 @@ import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
-import { SlowLoadingElement } from "../../components/util";
 import { Paper, createStyles, withStyles, WithStyles, Container, Divider, Box } from "@material-ui/core";
 import Snackbar from "../../components/snackbar";
 import DoneOutline from "@material-ui/icons/DoneOutline";
@@ -30,46 +29,45 @@ const changePasswordStyles = createStyles({
 
 export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyles<typeof changePasswordStyles>) => {
   return (
-    <SlowLoadingElement id="change-password">
-      <UserDataRetriever>
-        {(userData) => {
-          return (
-            <ModuleProvider module="users">
-              <ItemDefinitionProvider
-                itemDefinition="user"
-                properties={[
-                  "password",
-                ]}
-                forId={userData.id}
-                assumeOwnership={true}
-                includePolicies={true}
-                disableExternalChecks={true}
-                avoidLoading={true}
-              >
-                <I18nRead id="change_password" capitalize={true}>
-                  {(i18nChangePassword: string) => {
-                    return (
-                      <TitleSetter>
-                        {i18nChangePassword}
-                      </TitleSetter>
-                    );
-                  }}
-                </I18nRead>
-                <ItemDefinitionLoader>
-                  <Container maxWidth="md" className={props.classes.container}>
-                    <Paper className={props.classes.paper}>
-                      <I18nReadMany data={[
-                        {id: "change_password_current_alt_label"},
-                        {id: "change_password_current_alt_placeholder"},
-                        {id: "change_password_new_alt_label"},
-                        {id: "change_password_new_alt_placeholder"},
-                      ]}>
-                        {(
-                          i18nAltCurrentPasswordLabel: string,
-                          i18nAltCurrentPasswordPlaceholder: string,
-                          i18nAltNewPasswordLabel: string,
-                          i18nAltNewPasswordPlaceholder: string,
-                        ) => (
+    <UserDataRetriever>
+      {(userData) => {
+        return (
+          <ModuleProvider module="users">
+            <ItemDefinitionProvider
+              itemDefinition="user"
+              properties={[
+                "password",
+              ]}
+              forId={userData.id}
+              assumeOwnership={true}
+              includePolicies={true}
+              disableExternalChecks={true}
+              avoidLoading={true}
+            >
+              <I18nRead id="change_password" capitalize={true}>
+                {(i18nChangePassword: string) => {
+                  return (
+                    <TitleSetter>
+                      {i18nChangePassword}
+                    </TitleSetter>
+                  );
+                }}
+              </I18nRead>
+              <ItemDefinitionLoader>
+                <Container maxWidth="md" className={props.classes.container}>
+                  <Paper className={props.classes.paper}>
+                    <I18nReadMany data={[
+                      { id: "change_password_current_alt_label" },
+                      { id: "change_password_current_alt_placeholder" },
+                      { id: "change_password_new_alt_label" },
+                      { id: "change_password_new_alt_placeholder" },
+                    ]}>
+                      {(
+                        i18nAltCurrentPasswordLabel: string,
+                        i18nAltCurrentPasswordPlaceholder: string,
+                        i18nAltNewPasswordLabel: string,
+                        i18nAltNewPasswordPlaceholder: string,
+                      ) => (
                           <form>
                             <Entry
                               id="password"
@@ -86,11 +84,11 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
                             />
                           </form>
                         )}
-                      </I18nReadMany>
+                    </I18nReadMany>
 
-                      <Divider />
-      
-                      <Box className={props.classes.buttonBox}>
+                    <Divider />
+
+                    <Box className={props.classes.buttonBox}>
                       <SubmitButton
                         i18nId="change_password"
                         options={{
@@ -107,24 +105,23 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
                         redirectGoBack={true}
                         redirectReplace={true}
                       />
-                      </Box>
-                    </Paper>
-                  </Container>
-                </ItemDefinitionLoader>
-                <SubmitActioner>
-                  {(actioner) => (
-                    <Snackbar
-                      severity="error"
-                      i18nDisplay={actioner.submitError}
-                      open={!!actioner.submitError} onClose={actioner.dismissError}
-                    />
-                  )}
-                </SubmitActioner>
-              </ItemDefinitionProvider>
-            </ModuleProvider>
-          )
-        }}
-      </UserDataRetriever>
-    </SlowLoadingElement>
+                    </Box>
+                  </Paper>
+                </Container>
+              </ItemDefinitionLoader>
+              <SubmitActioner>
+                {(actioner) => (
+                  <Snackbar
+                    severity="error"
+                    i18nDisplay={actioner.submitError}
+                    open={!!actioner.submitError} onClose={actioner.dismissError}
+                  />
+                )}
+              </SubmitActioner>
+            </ItemDefinitionProvider>
+          </ModuleProvider>
+        )
+      }}
+    </UserDataRetriever>
   );
 });

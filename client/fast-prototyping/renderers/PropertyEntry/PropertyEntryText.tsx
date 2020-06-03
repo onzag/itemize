@@ -364,7 +364,6 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
   }
 });
 
-// TODO implement missing toolbar functionality
 function RichTextEditorToolbar(props: {
   id: string,
   i18n: {

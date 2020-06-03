@@ -160,6 +160,9 @@ class Include {
         }
         const requestFields = {};
         this.getSinkingProperties().forEach((sp) => {
+            if (sp.isRetrievalDisabled()) {
+                return;
+            }
             const fieldsForProperty = sp.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
             if (fieldsForProperty) {
                 requestFields[sp.getId()] = fieldsForProperty;

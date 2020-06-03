@@ -16,7 +16,6 @@ const localization_1 = require("../../../components/localization");
 const lab_1 = require("@material-ui/lab");
 const Restore_1 = __importDefault(require("@material-ui/icons/Restore"));
 const Clear_1 = __importDefault(require("@material-ui/icons/Clear"));
-// TODO it's missing the icon
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }

@@ -10,7 +10,6 @@ const server_checkers_1 = require("../base/Root/Module/ItemDefinition/PropertyDe
 const body_parser_1 = __importDefault(require("body-parser"));
 const constants_1 = require("../constants");
 const mode_1 = require("./mode");
-// TODO comment and document
 /**
  * this function contains and build all the rest services
  * by returning a router that holds them inside the

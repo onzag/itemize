@@ -702,6 +702,8 @@ class ItemDefinition {
             forVersion: version,
         };
     }
+    // TODO add support for null values and null fields so that null values can actually be applied here
+    // this will affect SSR
     /**
      * Applies a value from graphql to the item definition state
      * @param id the id that this state is for (can be null)
@@ -957,6 +959,9 @@ class ItemDefinition {
             });
         }
         this.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+            if (pd.isRetrievalDisabled()) {
+                return;
+            }
             const propertyFields = pd.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
             if (propertyFields) {
                 requestFields[pd.getId()] = propertyFields;

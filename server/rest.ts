@@ -9,8 +9,6 @@ import bodyParser from "body-parser";
 import { PROTECTED_RESOURCES, ENDPOINT_ERRORS } from "../constants";
 import { getMode } from "./mode";
 
-// TODO comment and document
-
 /**
  * this function contains and build all the rest services
  * by returning a router that holds them inside the

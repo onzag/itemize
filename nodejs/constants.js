@@ -890,7 +890,6 @@ exports.RESERVED_GETTER_PROPERTIES = {
         type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
         description: "the id for that item",
     },
-    // TODO implement in get resolver
     version: {
         type: graphql_1.GraphQLString,
         description: "a version for this item",
@@ -901,7 +900,6 @@ exports.RESERVED_GETTER_PROPERTIES = {
  * either edit or delete
  */
 exports.RESERVED_CHANGE_PROPERTIES = {
-    // TODO implement the versioning in edit resolver
     ...exports.RESERVED_GETTER_PROPERTIES,
     listener_uuid: {
         type: graphql_1.GraphQLString,
@@ -914,7 +912,6 @@ exports.RESERVED_CHANGE_PROPERTIES = {
 exports.RESERVED_GETTER_LIST_PROPERTIES = {
     ...BASE_QUERY_PROPERTIES,
     records: {
-        // TODO implement the version in retrieving these lists
         type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLList(exports.SEARCH_RECORD_INPUT_GQL)),
         description: "the records to fetch for that item",
     },

@@ -13,8 +13,6 @@ import { Alert } from "@material-ui/lab";
 import RestoreIcon from '@material-ui/icons/Restore';
 import ClearIcon from '@material-ui/icons/Clear';
 
-// TODO it's missing the icon
-
 function shouldShowInvalid(props: IPropertyEntryFileRendererProps) {
   return !props.currentValid;
 }

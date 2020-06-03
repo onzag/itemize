@@ -107,8 +107,8 @@ async function ssrGenerator(req, res, html, appData, rule) {
                     idef: idef.getQualifiedPathName(),
                     id: collectionPoint[2],
                     version: collectionPoint[3],
-                    value: value ? value.toReturnToUser : value,
-                    fields,
+                    value: value ? value.toReturnToUser : null,
+                    fields: value ? value.requestFields : null,
                 };
             }
             else {
@@ -184,7 +184,6 @@ async function ssrGenerator(req, res, html, appData, rule) {
         if (serverAppData.id) {
             finalSSRHead += appData.ssrConfig.collector.retrieve(serverAppData.id);
         }
-        // TODO extract css
         newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, finalSSRHead);
     }
     if (appliedRule.memId) {

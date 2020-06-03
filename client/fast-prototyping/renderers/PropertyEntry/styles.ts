@@ -1,5 +1,3 @@
-// TODO move a lot of stuff to this file from the styles once styles are settled
-
 export interface IPropertyEntryThemeType {
   invalidColor: string;
   iconColor: string;

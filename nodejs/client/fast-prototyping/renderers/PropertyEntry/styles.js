@@ -1,5 +1,4 @@
 "use strict";
-// TODO move a lot of stuff to this file from the styles once styles are settled
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.STANDARD_THEME = {
     invalidColor: "#f44336",

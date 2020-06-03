@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const module_1 = require("../../../providers/module");
-const util_1 = require("../../components/util");
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
 const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSetter"));
 const Route_1 = __importDefault(require("../../../components/navigation/Route"));
@@ -33,15 +32,14 @@ function CMSNavBar(props) {
             }))));
 }
 function CMS() {
-    return (react_1.default.createElement(util_1.SlowLoadingElement, { id: "cms" },
-        react_1.default.createElement(module_1.ModuleProvider, { module: "cms" },
-            react_1.default.createElement(I18nRead_1.default, { id: "name", capitalize: true }, (i18nCMS) => {
-                return (react_1.default.createElement(TitleSetter_1.default, null, i18nCMS));
-            }),
-            react_1.default.createElement(Route_1.default, { path: "/cms", component: CMSNavBar }),
-            react_1.default.createElement(Route_1.default, { path: "/cms", exact: true, component: info_1.Info }),
-            react_1.default.createElement(Route_1.default, { path: "/cms/fragment", component: fragment_1.Fragment }),
-            react_1.default.createElement(Route_1.default, { path: "/cms/article", component: article_1.Article }))));
+    return (react_1.default.createElement(module_1.ModuleProvider, { module: "cms" },
+        react_1.default.createElement(I18nRead_1.default, { id: "name", capitalize: true }, (i18nCMS) => {
+            return (react_1.default.createElement(TitleSetter_1.default, null, i18nCMS));
+        }),
+        react_1.default.createElement(Route_1.default, { path: "/cms", component: CMSNavBar }),
+        react_1.default.createElement(Route_1.default, { path: "/cms", exact: true, component: info_1.Info }),
+        react_1.default.createElement(Route_1.default, { path: "/cms/fragment", component: fragment_1.Fragment }),
+        react_1.default.createElement(Route_1.default, { path: "/cms/article", component: article_1.Article })));
 }
 exports.CMS = CMS;
 ;

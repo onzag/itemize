@@ -1,6 +1,5 @@
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
-import { SlowLoadingElement } from "../../components/util";
 import { ItemDefinitionProvider, ParentItemDefinitionContextProvider } from "../../../providers/item-definition";
 import SearchLoader from "../../../components/search/SearchLoader";
 import View from "../../../components/property/View";
@@ -151,114 +150,112 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
   return (
     <Container maxWidth="md" className={props.classes.container}>
       <Paper className={props.classes.paper}>
-        <SlowLoadingElement id="articles">
-          <ModuleProvider module="cms">
-            <AppLanguageRetriever>
-              {(languageData) => (
-                <ItemDefinitionProvider
-                  itemDefinition="article"
-                  searchCounterpart={true}
-                  setters={[
-                    {
-                      id: "locale",
-                      searchVariant: "exact",
-                      value: languageData.currentLanguage.code,
-                    }
-                  ]}
-                  automaticSearch={{
-                    requestedProperties: [
-                      "title",
-                      "locale",
-                      "summary",
-                      "summary_image",
-                    ],
-                    searchByProperties: [
-                      "locale",
-                    ],
-                    traditional: true,
-                    limit: 5,
-                    offset: 0,
-                  }}
+        <ModuleProvider module="cms">
+          <AppLanguageRetriever>
+            {(languageData) => (
+              <ItemDefinitionProvider
+                itemDefinition="article"
+                searchCounterpart={true}
+                setters={[
+                  {
+                    id: "locale",
+                    searchVariant: "exact",
+                    value: languageData.currentLanguage.code,
+                  }
+                ]}
+                automaticSearch={{
+                  requestedProperties: [
+                    "title",
+                    "locale",
+                    "summary",
+                    "summary_image",
+                  ],
+                  searchByProperties: [
+                    "locale",
+                  ],
+                  traditional: true,
+                  limit: 5,
+                  offset: 0,
+                }}
+              >
+                <Typography variant="h2" className={props.classes.newsTitle}>
+                  <I18nRead id="news" capitalize={true} />
+                </Typography>
+                <SearchLoader
+                  pageSize={5}
+                  currentPage={0}
+                  static="TOTAL"
                 >
-                  <Typography variant="h2" className={props.classes.newsTitle}>
-                    <I18nRead id="news" capitalize={true}/>
-                  </Typography>
-                  <SearchLoader
-                    pageSize={5}
-                    currentPage={0}
-                    static="TOTAL"
-                  >
-                    {(loader) => {
-                      return loader.searchRecords.map((searchRecord) => {
-                        return (
-                          <ItemDefinitionProvider {...searchRecord.providerProps}>
-                            <Link to={`/news/${searchRecord.id}`} as="div" className={props.classes.articleContainer}>
-                              <div className={props.classes.articleImageContainer}>
-                                <View
-                                  id="summary_image"
-                                  rendererArgs={{
-                                    imageClassName: props.classes.articleImage,
-                                    imageSizes: "300px",
-                                    lazyLoad: true,
-                                  }}
-                                />
-                              </div>
-                              <div className={props.classes.articleText}>
-                                <Typography variant="h4"><View id="title" /></Typography>
-                                <div className={props.classes.articleSummaryContainer}>
-                                  <div className={props.classes.articleSummary}>
-                                    <View id="summary" />
-                                  </div>
+                  {(loader) => {
+                    return loader.searchRecords.map((searchRecord) => {
+                      return (
+                        <ItemDefinitionProvider {...searchRecord.providerProps}>
+                          <Link to={`/news/${searchRecord.id}`} as="div" className={props.classes.articleContainer}>
+                            <div className={props.classes.articleImageContainer}>
+                              <View
+                                id="summary_image"
+                                rendererArgs={{
+                                  imageClassName: props.classes.articleImage,
+                                  imageSizes: "300px",
+                                  lazyLoad: true,
+                                }}
+                              />
+                            </div>
+                            <div className={props.classes.articleText}>
+                              <Typography variant="h4"><View id="title" /></Typography>
+                              <div className={props.classes.articleSummaryContainer}>
+                                <div className={props.classes.articleSummary}>
+                                  <View id="summary" />
                                 </div>
                               </div>
-                              <Reader id="created_by">
-                                {(createdBy: number) => (
-                                  <ModuleProvider module="users">
-                                    <ItemDefinitionProvider
-                                      itemDefinition="user"
-                                      forId={createdBy}
-                                      static="TOTAL"
-                                      disableExternalChecks={true}
-                                      properties={[
-                                        "username",
-                                        "profile_picture",
-                                        "role",
-                                      ]}
-                                      injectParentContext={true}
-                                    >
-                                      <Box className={props.classes.publisherInfoBox}>
-                                        <Avatar hideFlag={true} size="small" profileURL={(id: number) => `/profile/${id}`} />
-                                        <Box className={props.classes.publisherInfoDetailsBox}>
-                                          <Typography variant="body1"><View id="username" /></Typography>
-                                          <Typography variant="body2">
-                                            <ParentItemDefinitionContextProvider>
-                                              <View id="created_at" rendererArgs={{ dateFormat: "LLL" }} />
-                                            </ParentItemDefinitionContextProvider>
-                                          </Typography>
-                                        </Box>
+                            </div>
+                            <Reader id="created_by">
+                              {(createdBy: number) => (
+                                <ModuleProvider module="users">
+                                  <ItemDefinitionProvider
+                                    itemDefinition="user"
+                                    forId={createdBy}
+                                    static="TOTAL"
+                                    disableExternalChecks={true}
+                                    properties={[
+                                      "username",
+                                      "profile_picture",
+                                      "role",
+                                    ]}
+                                    injectParentContext={true}
+                                  >
+                                    <Box className={props.classes.publisherInfoBox}>
+                                      <Avatar hideFlag={true} size="small" profileURL={(id: number) => `/profile/${id}`} />
+                                      <Box className={props.classes.publisherInfoDetailsBox}>
+                                        <Typography variant="body1"><View id="username" /></Typography>
+                                        <Typography variant="body2">
+                                          <ParentItemDefinitionContextProvider>
+                                            <View id="created_at" rendererArgs={{ dateFormat: "LLL" }} />
+                                          </ParentItemDefinitionContextProvider>
+                                        </Typography>
                                       </Box>
-                                    </ItemDefinitionProvider>
-                                  </ModuleProvider>
-                                )}
-                              </Reader>
-                            </Link>
-                          </ItemDefinitionProvider>
-                        );
-                      });
-                    }}
-                  </SearchLoader>
-                  <div className={props.classes.moreNewsContainer}>
-                    <Link to="/news">
-                      <Button size="large" className={props.classes.moreNewsButton} variant="contained" color="primary">
-                        <I18nRead id="more_news" capitalize={true}/>
-                      </Button>
-                    </Link>
-                  </div>
-                </ItemDefinitionProvider>
-              )}
-            </AppLanguageRetriever>
-          </ModuleProvider>
-        </SlowLoadingElement>
+                                    </Box>
+                                  </ItemDefinitionProvider>
+                                </ModuleProvider>
+                              )}
+                            </Reader>
+                          </Link>
+                        </ItemDefinitionProvider>
+                      );
+                    });
+                  }}
+                </SearchLoader>
+                <div className={props.classes.moreNewsContainer}>
+                  <Link to="/news">
+                    <Button size="large" className={props.classes.moreNewsButton} variant="contained" color="primary">
+                      <I18nRead id="more_news" capitalize={true} />
+                    </Button>
+                  </Link>
+                </div>
+              </ItemDefinitionProvider>
+            )}
+          </AppLanguageRetriever>
+        </ModuleProvider>
       </Paper>
     </Container>
   )

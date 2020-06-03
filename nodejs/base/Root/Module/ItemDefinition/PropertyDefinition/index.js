@@ -829,8 +829,6 @@ class PropertyDefinition {
         delete this.stateLastCached[mergedIDWithoutExternal1];
         delete this.stateLastCached[mergedIDWithoutExternal2];
     }
-    // TODO add undo function, canUndo and add the gql applied value
-    // here in order to turn it back to that applied value
     /**
      * Applies the value to the property
      * this is intended to be used for when values are loaded
@@ -1251,17 +1249,7 @@ class PropertyDefinition {
         if (!hasAccess) {
             return null;
         }
-        const gqlForm = this.getPropertyDefinitionDescription().gqlFields;
-        if (gqlForm) {
-            const requestFields = {};
-            Object.keys(gqlForm).forEach((key) => {
-                requestFields[key] = {};
-            });
-            return requestFields;
-        }
-        else {
-            return {};
-        }
+        return this.getRequestFields();
     }
     /**
      * Checks the role access for a specific IO action to a specific role

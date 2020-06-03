@@ -8,7 +8,6 @@ import ItemDefinition, { ItemDefinitionIOActions } from "..";
 import ConditionalRuleSet, { IConditionalRuleSetRawJSONDataType } from "../ConditionalRuleSet";
 import Module from "../..";
 import { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
-import { IGQLRequestFields } from "../../../../../gql-querier";
 /**
  * These are the main errors a property is able to give
  */
@@ -747,7 +746,7 @@ export default class PropertyDefinition {
      * @returns an array of string for the roles
      */
     getRolesWithAccessTo(action: ItemDefinitionIOActions): string[];
-    buildFieldsForRoleAccess(action: ItemDefinitionIOActions, role: string, userId: number, ownerUserId: number): IGQLRequestFields;
+    buildFieldsForRoleAccess(action: ItemDefinitionIOActions, role: string, userId: number, ownerUserId: number): {};
     /**
      * Checks the role access for a specific IO action to a specific role
      * basically just returns a boolean

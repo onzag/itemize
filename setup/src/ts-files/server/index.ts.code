@@ -1,11 +1,13 @@
 import { initializeServer } from "@onzag/itemize/server";
-import { capitalize } from "@onzag/itemize/util";
+import { capitalize, localeReplacer } from "@onzag/itemize/util";
 
 // Check the client for info on these, we are replicating what is used in the client somewhat
 import React from "react";
 import App from "../client/app";
 import { rendererContext } from "@onzag/itemize/client/fast-prototyping/renderers";
 import { appWrapper, mainWrapper } from "@onzag/itemize/client/fast-prototyping/wrappers";
+import { styleCollector } from "@onzag/itemize/client/fast-prototyping/collectors";
+import { fileURLAbsoluter } from "@onzag/itemize/util";
 
 // Itemize server isn't hot, it won't refresh in realtime and it
 // isn't recommended to attempt to set it up that way
@@ -35,7 +37,11 @@ import { appWrapper, mainWrapper } from "@onzag/itemize/client/fast-prototyping/
 initializeServer(
   {
     ssrRules: {
+      // for the frontpage we must watch out this matches what is setup in the client
+      // as this is for SSR, description, og fields, can be set to whatever there's nothing
+      // done for them in the client side
       "/": (req, lang, root) => {
+        // in the client the title is set to the app name
         const i18nData = root.getI18nDataFor(lang);
         return {
           title: capitalize(i18nData.app_name),
@@ -46,12 +52,80 @@ initializeServer(
           collect: [
             ["cms", "fragment", 1, lang],
           ],
+          // mem id is special, this is a memory id that is used to cache the result
+          // make sure to use a different value for different results, do not worry
+          // the timestamp signature of the collected values is used so if any of them
+          // updates the cached value is refreshed, but nothing else
+          memId: "root",
+        };
+      },
+      "/profile/:id": (req, lang, root) => {
+        const userIdef = root.getModuleFor(["users"]).getItemDefinitionFor(["user"]);
+        const i18nData = userIdef.getI18nDataFor(lang);
+        const userId = parseInt(req.params.id, 10);
+        if (isNaN(userId)) {
+          // use the standard this is a path we know nothing
+          // about, that means SSR won't be used, the client will
+          // need to handle all itself
+          return null;
+        }
+        return {
+          // this is the same as specified in our page
+          title: capitalize(i18nData.custom.profile),
+
+          // the description includes our user name, so we need to fetch it
+          // by using a collected function callback
+          description: (collectedValues) => {
+            // forbidden access due to role, not found, value has been flagged and blocked by moderator
+            if (!collectedValues[0] || !collectedValues[0].value || !collectedValues[0].value.DATA) {
+              return null;
+            }
+            return localeReplacer(i18nData.custom.profile_for_description, collectedValues[0].value.DATA.username);
+          },
+          ogTitle: capitalize(i18nData.custom.profile),
+          ogDescription: (collectedValues) => {
+            // forbidden access due to role, not found, value has been flagged and blocked by moderator
+            if (!collectedValues[0] || !collectedValues[0].value || !collectedValues[0].value.DATA) {
+              return null;
+            }
+            return localeReplacer(i18nData.custom.profile_for_description, collectedValues[0].value.DATA.username);
+          },
+          ogImage: (collectedValues, config) => {
+            // forbidden access due to role, not found, value has been flagged and blocked by moderator
+            if (!collectedValues[0] || !collectedValues[0].value || !collectedValues[0].value.DATA) {
+              return null;
+            }
+            const profilePictureProperty = userIdef.getPropertyDefinitionFor("profile_picture", false);
+            // files need to fetch the absolute url with has to be with the
+            // container they are in, because containers aren't centralized
+            // we need to use this function,
+            const absolutedFile = fileURLAbsoluter(
+              config.containersHostnamePrefixes,
+              collectedValues[0].value.DATA.profile_picture,
+              userIdef,
+              collectedValues[0].value.id,
+              collectedValues[0].value.version,
+              collectedValues[0].value.container_id,
+              null,
+              profilePictureProperty,
+            );
+            // no profile picture, absolutedFile might be null, then set it to the standard icon
+            return (absolutedFile && absolutedFile.url) || "/rest/resource/icons/android-chrome-512x512.png";
+          },
+          collect: [
+            ["users", "user", userId, null],
+          ],
+          // note how the memory id here includes the user id
+          memId: "profile." + userId,
         };
       },
     },
+    // These are the same as of the client side
     rendererContext,
     mainComponent: React.createElement(App, null),
     mainWrapper,
     appWrapper,
+    // the style collector which collects style for material UI SSR
+    collector: styleCollector,
   },
 );

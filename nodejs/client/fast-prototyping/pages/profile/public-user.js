@@ -69,10 +69,7 @@ exports.PublicUserProfile = core_1.withStyles(publicUserProfileStyles)((props) =
                         return null;
                     }
                     const countryobj = imported_resources_1.countries[country];
-                    return react_1.default.createElement(core_1.Typography, { variant: "h5", className: props.classes.country },
-                        countryobj.emoji,
-                        " ",
-                        countryobj.native);
+                    return react_1.default.createElement(core_1.Typography, { variant: "h5", className: props.classes.country }, countryobj.emoji + " " + countryobj.native);
                 }),
                 react_1.default.createElement(Reader_1.default, { id: "role" }, (role) => {
                     if (role !== "USER") {
