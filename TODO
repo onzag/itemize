@@ -7,11 +7,12 @@ SITE
 . About me in profile [+5] [DONE]
 . Implementation of CMS module [+10] [DONE]
 . Fix redis synchronization bug [+1] [DONE]
-. Rich Text Editor Raw Mode [+2]
+. Rich Text Editor Raw Mode [+2] [DONE]
+. Fix bug where invalid link appears
 . Implementation of Forum module [+7]
 . Implementation of mailing module [+7]
 . Test implementation of a sales module for probing includes [+20]
-. String based total search (tags?) [+10]
+. String based total search (tags?) [+10] [DONE?]
 
 ONZASYSTEMS [+3]
 . Build a Frontpage with few details
@@ -33,7 +34,7 @@ EXTRA (LOW PRIORITY)
 . Implementation of flagging
 . Bans and Blocks
 
-SEO (LOWEST PRIORITY)
+SEO (LOWEST PRIORITY) [DONE]
 1. SSR Implementation via constructor and SSR rules, SSR rules will be rules specific to an url
   0. Only public data, user specific data can be loaded client side
   1. TOKEN, ID, ROLE, LANG, etc... all localstorage data is sent via cookie to create a fakeStorage where info can be fetch (maybe not render these)
@@ -85,7 +86,7 @@ so can safely be removed
 . maxtags optional as maxlenght
 . mintags optional as minlenght
 
-. Add a storage location mapper
+. Add a storage location mapper [DONE]
   . every object once added gets set a storage server id, these are set by region ids or whatever, any identifier works
   . every one of these identifiers gets its own openstack config in the sensitive config
   . every one of these identifiers gets a uploads hostname in the standard config

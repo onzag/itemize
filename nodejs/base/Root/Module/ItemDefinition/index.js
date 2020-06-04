@@ -702,8 +702,6 @@ class ItemDefinition {
             forVersion: version,
         };
     }
-    // TODO add support for null values and null fields so that null values can actually be applied here
-    // this will affect SSR
     /**
      * Applies a value from graphql to the item definition state
      * @param id the id that this state is for (can be null)
@@ -722,7 +720,7 @@ class ItemDefinition {
      */
     applyValue(id, version, value, excludeExtensions, graphqlUserIdRequester, graphqlRoleRequester, requestFields, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers) {
         // first we flatten the value if necessary
-        const flattenedValue = typeof value.DATA !== "undefined" ? gql_util_1.flattenRawGQLValueOrFields(value) : value;
+        const flattenedValue = value === null ? value : (typeof value.DATA !== "undefined" ? gql_util_1.flattenRawGQLValueOrFields(value) : value);
         const mergedID = id + "." + (version || "");
         // we make it we have an applied value
         this.stateHasAppliedValueTo[mergedID] = true;
@@ -741,7 +739,7 @@ class ItemDefinition {
         // and loop loop
         properties.forEach((property) => {
             // we get the value we are supposed to apply
-            let givenValue = flattenedValue[property.getId()];
+            let givenValue = flattenedValue === null ? undefined : flattenedValue[property.getId()];
             // and decide whether we will set it as modified, if the value
             // is undefined, it acts like a delete, wipe, unmodified default
             // value
@@ -756,12 +754,14 @@ class ItemDefinition {
         // now we get all the items
         this.getAllIncludes().forEach((include) => {
             // and we get the applied value for thae item
-            let givenValue = flattenedValue[include.getQualifiedIdentifier()];
+            let givenValue = flattenedValue === null ? undefined : flattenedValue[include.getQualifiedIdentifier()];
             if (typeof givenValue === "undefined") {
                 givenValue = null;
             }
             // and the exclusion state, or excluded if not specified
-            const givenExclusionState = flattenedValue[include.getQualifiedExclusionStateIdentifier()] || Include_1.IncludeExclusionState.EXCLUDED;
+            const givenExclusionState = flattenedValue !== null ?
+                (flattenedValue[include.getQualifiedExclusionStateIdentifier()] || Include_1.IncludeExclusionState.EXCLUDED) :
+                Include_1.IncludeExclusionState.EXCLUDED;
             // and we apply such value
             include.applyValue(id, version, givenValue, givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers);
         });

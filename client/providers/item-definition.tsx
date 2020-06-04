@@ -12,6 +12,7 @@ import {
   MEMCACHED_DESTRUCTION_MARKERS_LOCATION,
   DESTRUCTION_MARKERS_LOCATION,
   IOrderByRuleType,
+  PREFIX_SEARCH,
 } from "../../constants";
 import { IGQLSearchRecord, IGQLValue, IGQLRequestFields } from "../../gql-querier";
 import { requestFieldsAreContained } from "../../gql-util";
@@ -623,6 +624,7 @@ export class ActualItemDefinitionProvider extends
         forId: this.props.forId,
         forVersion: this.props.forVersion,
       });
+      // this will work even for null values, and null requestFields
       memoryLoadedAndValid = (
         appliedGQLValue &&
         requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
@@ -1142,13 +1144,25 @@ export class ActualItemDefinitionProvider extends
           CacheWorkerInstance.isSupported &&
           this.props.longTermCaching
         ) {
-          CacheWorkerInstance.instance.mergeCachedValue(
-            PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(),
-            forId,
-            forVersion || null,
-            appliedGQLValue.rawValue,
-            appliedGQLValue.requestFields,
-          );
+          const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
+          if (appliedGQLValue.rawValue) {
+            CacheWorkerInstance.instance.mergeCachedValue(
+              PREFIX_GET + qualifiedName,
+              forId,
+              forVersion || null,
+              appliedGQLValue.rawValue,
+              appliedGQLValue.requestFields,
+            );
+          } else {
+            CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
+              forId,
+              forVersion || null,
+              qualifiedName,
+              PREFIX_GET + qualifiedName,
+              PREFIX_SEARCH + this.props.itemDefinitionInstance.getParentModule().getSearchModule().getQualifiedPathName(),
+              PREFIX_SEARCH + this.props.itemDefinitionInstance.getSearchModeCounterpart().getQualifiedPathName(),
+            );
+          }
         }
         return completedValue;
       }
@@ -1219,9 +1233,9 @@ export class ActualItemDefinitionProvider extends
       cacheStore: this.props.longTermCaching,
     });
 
-    if (value) {
+    if (!error) {
       // we apply the value, whatever we have gotten this will affect all the instances
-      // that use the same value
+      // that use the same value, note that value can be null
       this.props.itemDefinitionInstance.applyValue(
         forId,
         forVersion,

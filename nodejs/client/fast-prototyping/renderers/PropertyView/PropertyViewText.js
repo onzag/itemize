@@ -43,12 +43,7 @@ function componentIsInView(elem) {
         bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
         bounding.right <= (window.innerWidth || document.documentElement.clientWidth));
 }
-/**
- * marks an html element to be lazy loaded in 3 ways
- * @param element the element
- * @param propertySet a property set to copy from the dataset to the attribute itself
- */
-function lazyloader(element, propertySet) {
+function lazyLoaderPrepare(element, propertySet) {
     // first we add the property set information that we will use
     element.dataset.propertySet = propertySet.map((s) => s.join(",")).join(";");
     // now we check if this is an image that has a loading property that uses lazyloading
@@ -60,7 +55,18 @@ function lazyloader(element, propertySet) {
         element.loading = "lazy";
         // otherwise using the intersection observer if we have it
     }
-    else if (window.IntersectionObserver) {
+}
+/**
+ * marks an html element to be lazy loaded in 3 ways
+ * @param element the element
+ * @param propertySet a property set to copy from the dataset to the attribute itself
+ */
+function lazyloaderExecute(element) {
+    // has already been lazy loaded using loading=lazy
+    if (!element.dataset.propertySet) {
+        return;
+    }
+    if (window.IntersectionObserver) {
         // if we haven't created a main
         if (!io) {
             // we crate the observer
@@ -117,13 +123,14 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
                 img.removeAttribute("src");
                 img.dataset.sizes = img.sizes;
                 img.removeAttribute("sizes");
-                lazyloader(img, [["sizes", "sizes"], ["srcset", "srcset"], ["src", "src"]]);
+                lazyLoaderPrepare(img, [["sizes", "sizes"], ["srcset", "srcset"], ["src", "src"]]);
             }
         });
         this.cheapdiv.querySelectorAll("iframe").forEach((iframe) => {
             if (!iframe.src.startsWith("blob:")) {
                 iframe.dataset.src = iframe.src;
-                lazyloader(iframe, [["src", "src"]]);
+                iframe.removeAttribute("src");
+                lazyLoaderPrepare(iframe, [["src", "src"]]);
             }
         });
         return this.cheapdiv.innerHTML;
@@ -136,12 +143,12 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
     attachEvents() {
         this.divref.current.querySelectorAll("img").forEach((img) => {
             if (!img.src.startsWith("blob:")) {
-                lazyloader(img, [["sizes", "sizes"], ["srcset", "srcset"], ["src", "src"]]);
+                lazyloaderExecute(img);
             }
         });
         this.divref.current.querySelectorAll("iframe").forEach((iframe) => {
             if (!iframe.src.startsWith("blob:")) {
-                lazyloader(iframe, [["src", "src"]]);
+                lazyloaderExecute(iframe);
             }
         });
         this.divref.current.querySelectorAll(".file").forEach((file) => {

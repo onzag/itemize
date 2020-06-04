@@ -17,6 +17,7 @@ import { IGQLFile } from "../../../../../gql-querier";
 import pkgcloud from "pkgcloud";
 import { ConsumeStreamsFnType } from "../../../sql";
 import sharp from "sharp";
+import { logger } from "../../../../../server";
 
 /**
  * Processes an extended list based
@@ -196,7 +197,13 @@ function processOneFileAndItsSameIDReplacement(
             try {
               await removeFolderFor(uploadsContainer, fileLocationPath);
             } catch (err) {
-              // TODO something with error
+              logger.error(
+                "processOneFileAndItsSameIDReplacement: could not remove folder at container " + uploadsContainer + " in " + fileLocationPath,
+                {
+                  errStack: err.stack,
+                  errMessage: err.message,
+                },
+              );
             }
           })();
         }

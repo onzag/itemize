@@ -339,7 +339,7 @@ export async function initializeItemizeApp(
 
     // now we need to load all the information that is included
     // with the SSR into the root
-    ssrContext.queries.forEach((query) => {
+    ssrContext && ssrContext.queries.forEach((query) => {
       if (!query || !query.value) {
         return;
       }

@@ -34,13 +34,13 @@ import RestoreIcon from '@material-ui/icons/Restore';
 import ClearIcon from '@material-ui/icons/Clear';
 import { SlowLoadingElement } from "../../components/util";
 
-import ReactQuill from "@onzag/react-quill";
-let AReactQuill: typeof ReactQuill;
+import OriginalReactQuill from "@onzag/react-quill";
+let ReactQuill: typeof OriginalReactQuill;
 if (typeof document !== "undefined") {
-  AReactQuill = require("@onzag/react-quill");
+  ReactQuill = require("@onzag/react-quill");
 } else {
   const dead: any = () => null as any;
-  AReactQuill = {
+  ReactQuill = {
     Quill: {
       import: dead,
       register: dead,
@@ -48,9 +48,9 @@ if (typeof document !== "undefined") {
   } as any;
 }
 
-const BlockEmbed = AReactQuill.Quill.import("blots/block/embed");
-const Embed = AReactQuill.Quill.import("blots/embed");
-const Delta = AReactQuill.Quill.import("delta");
+const BlockEmbed = ReactQuill.Quill.import("blots/block/embed");
+const Embed = ReactQuill.Quill.import("blots/embed");
+const Delta = ReactQuill.Quill.import("delta");
 
 interface ItemizeImageBlotValue {
   alt: string;
@@ -99,7 +99,7 @@ class ItemizeImageBlot extends BlockEmbed {
   }
   
   static value(node: HTMLDivElement) {
-    const img = node.childNodes[0].childNodes[0].childNodes[0] as HTMLImageElement;
+    const img = node.querySelector("img") as HTMLImageElement;
     if (!img) {
       return null;
     }
@@ -118,7 +118,7 @@ ItemizeImageBlot.blotName = "itemizeimage";
 ItemizeImageBlot.className = "image";
 ItemizeImageBlot.tagName = "div";
 
-AReactQuill.Quill.register(ItemizeImageBlot);
+ReactQuill.Quill.register(ItemizeImageBlot);
 
 interface ItemizeVideoBlotValue {
   src: string;
@@ -157,7 +157,7 @@ class ItemizeVideoBlot extends BlockEmbed {
   }
 
   static value(node: HTMLDivElement) {
-    const iframe = node.childNodes[0].childNodes[0] as HTMLIFrameElement;
+    const iframe = node.querySelector("iframe") as HTMLIFrameElement;
     if (!iframe) {
       return null;
     }
@@ -171,7 +171,7 @@ ItemizeVideoBlot.blotName = "itemizevideo";
 ItemizeVideoBlot.className = "video";
 ItemizeVideoBlot.tagName = "div";
 
-AReactQuill.Quill.register(ItemizeVideoBlot);
+ReactQuill.Quill.register(ItemizeVideoBlot);
 
 interface ItemizeFileBlotValue {
   srcId: string;
@@ -246,7 +246,7 @@ ItemizeFileBlot.blotName = "itemizefile";
 ItemizeFileBlot.className = "file";
 ItemizeFileBlot.tagName = "span";
 
-AReactQuill.Quill.register(ItemizeFileBlot);
+ReactQuill.Quill.register(ItemizeFileBlot);
 
 function shouldShowInvalid(props: IPropertyEntryTextRendererProps) {
   return !props.currentValid;
@@ -554,6 +554,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
     // basic functions
     this.onChange = this.onChange.bind(this);
+    this.beforeChange = this.beforeChange.bind(this);
     this.onChangeByTextarea = this.onChangeByTextarea.bind(this);
     this.addPasteEventOnEditor = this.addPasteEventOnEditor.bind(this);
     this.onFocus = this.onFocus.bind(this);
@@ -594,12 +595,12 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     this.setState({
       isReadyToType: true,
     });
-    if (this.props.isRichText) {
-      this.addPasteEventOnEditor();
-    }
   }
   public componentDidUpdate(prevProps: IPropertyEntryTextRendererWithStylesProps, prevState: IPropertyEntryTextRendererState) {
-    if (prevProps.isRichText && !this.props.isRichText) {
+    if (
+      (prevProps.isRichText && !this.props.isRichText) ||
+      (prevState.isReadyToType !== this.state.isReadyToType)
+    ) {
       this.addPasteEventOnEditor();
     }
   }
@@ -635,8 +636,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         sizes: null,
         srcWidth: data.width,
         srcHeight: data.height,
-      }, (AReactQuill.Quill as any).sources.USER);
-      editor.setSelection(range.index + 2, 0, (AReactQuill.Quill as any).sources.SILENT);
+      }, (ReactQuill.Quill as any).sources.USER);
+      editor.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
     });
   }
   public onChangeByTextarea(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -666,6 +667,18 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] = actualLenght;
     }
     this.props.onChange(value, null);
+  }
+  public beforeChange(value: string, delta: any, source: string, editor: any) {
+    if (source === "api") {
+      const customElem = document.createElement("div");
+      customElem.innerHTML = value;
+      const customElem2 = document.createElement("div");
+      const editorValue = this.props.currentValue as string || "";
+      customElem2.innerHTML = editorValue;
+
+      return !customElem.isEqualNode(customElem2);
+    }
+    return true;
   }
   /**
    * This image handler is not binded due to quill existing in the this namespace
@@ -753,8 +766,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     quill.insertEmbed(range.index, "itemizevideo", {
       src,
       origin,
-    }, (AReactQuill.Quill as any).sources.USER);
-    quill.setSelection(range.index + 2, 0, (AReactQuill.Quill as any).sources.SILENT);
+    }, (ReactQuill.Quill as any).sources.USER);
+    quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
 
     this.closeVideoRequesting();
   }
@@ -777,8 +790,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         name: fileData.name,
         extension: expectedExtension,
         size: prettySize,
-      }, (AReactQuill.Quill as any).sources.USER);
-      quill.setSelection(range.index + 2, 0, (AReactQuill.Quill as any).sources.SILENT);
+      }, (ReactQuill.Quill as any).sources.USER);
+      quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
     } catch (err) {}
   }
   public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
@@ -802,8 +815,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         sizes: null,
         srcWidth: data.width,
         srcHeight: data.height,
-      }, (AReactQuill.Quill as any).sources.USER);
-      quill.setSelection(range.index + 2, 0, (AReactQuill.Quill as any).sources.SILENT);
+      }, (ReactQuill.Quill as any).sources.USER);
+      quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
     } catch (err) {
     }
   }
@@ -925,7 +938,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
           supportsRawMode={this.props.args.supportsRawMode}
           onToggleRawMode={this.toggleRawMode}
         />
-        <AReactQuill
+        <ReactQuill
           ref={this.quillRef}
           className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
           modules={this.cachedModuleOptionsRich}
@@ -934,6 +947,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
           placeholder={capitalize(this.props.placeholder)}
           value={editorValue}
           onChange={this.onChange}
+          beforeChange={this.beforeChange}
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           disableClipboardMatchersOnUpdate={CACHED_CLIPBOARD_MATCHERS}

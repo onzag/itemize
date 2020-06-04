@@ -33,7 +33,6 @@ function cleanAllAttribs(node: HTMLElement) {
   });
 }
 
-// TODO fix this function when https://github.com/cure53/DOMPurify/issues/435 has been fixed 
 export function propertyViewPostProcessingHook(
   relatedProperty: PropertyDefinition,
   currentFiles: IPropertyDefinitionSupportedSingleFilesType[],
@@ -47,6 +46,8 @@ export function propertyViewPostProcessingHook(
       const videoSrc = node.dataset.videoSrc || "";
       const origin = node.dataset.videoOrigin || "";
       cleanAllAttribs(node);
+
+      (node as HTMLIFrameElement).allowFullscreen = true;
 
       // src
       if (origin === "vimeo") {

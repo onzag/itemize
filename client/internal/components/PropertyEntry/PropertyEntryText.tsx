@@ -366,8 +366,6 @@ export default class PropertyEntryText
       DOMPurify.addHook("afterSanitizeElements", propertyViewPostProcessingHook.bind(this, this.cachedMediaProperty, currentFiles, supportsImages, supportsVideos, supportsFiles));
       currentValue = DOMPurify.sanitize(currentValue, PROPERTY_VIEW_SANITIZE_CONFIG);
       DOMPurify.removeAllHooks();
-
-      // TODO IMPORTANT ensure proper sorting
     }
 
     let invalidReason = this.props.state.invalidReason;

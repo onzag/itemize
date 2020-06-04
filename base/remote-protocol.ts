@@ -128,6 +128,22 @@ export interface IIdentifyRequest {
   token: string;
 }
 
+export const IdentifyRequestSchema = {
+  type: "object",
+  properties: {
+    uuid: {
+      type: "string",
+    },
+    token: {
+      type: ["string", "null"],
+    }
+  },
+  required: [
+    "uuid",
+    "token",
+  ]
+}
+
 /**
  * The request that is sent to the server in order to register
  * a single item definition for updates and changes
@@ -141,6 +157,26 @@ export interface IRegisterRequest {
   itemDefinition: string;
   id: number;
   version: string;
+}
+
+export const RegisterRequestSchema = {
+  type: "object",
+  properties: {
+    itemDefinition: {
+      type: "string",
+    },
+    id: {
+      type: "number",
+    },
+    version: {
+      type: ["string", "null"],
+    }
+  },
+  required: [
+    "itemDefinition",
+    "id",
+    "version",
+  ],
 }
 
 /**
@@ -157,6 +193,26 @@ export interface IUnregisterRequest {
   version: string;
 }
 
+export const UnregisterRequestSchema = {
+  type: "object",
+  properties: {
+    itemDefinition: {
+      type: "string",
+    },
+    id: {
+      type: "number",
+    },
+    version: {
+      type: ["string", "null"],
+    }
+  },
+  required: [
+    "itemDefinition",
+    "id",
+    "version",
+  ],
+}
+
 /**
  * a request that is sent to the server in order to
  * request feedback for a single item definition
@@ -170,6 +226,26 @@ export interface IFeedbackRequest {
   itemDefinition: string;
   id: number;
   version: string;
+}
+
+export const FeedbackRequestSchema = {
+  type: "object",
+  properties: {
+    itemDefinition: {
+      type: "string",
+    },
+    id: {
+      type: "number",
+    },
+    version: {
+      type: ["string", "null"],
+    }
+  },
+  required: [
+    "itemDefinition",
+    "id",
+    "version",
+  ],
 }
 
 /**
@@ -196,6 +272,22 @@ export interface IOwnedSearchRegisterRequest extends IBaseSearchRegisterRequest 
   createdBy: number;
 }
 
+export const OwnedSearchRegisterRequestSchema = {
+  type: "object",
+  properties: {
+    qualifiedPathName: {
+      type: "string",
+    },
+    createdBy: {
+      type: "number",
+    },
+  },
+  required: [
+    "qualifiedPathName",
+    "createdBy",
+  ],
+}
+
 /**
  * this is necessary for parented searches in order to run parented by
  * cached searches and then request for updates
@@ -209,6 +301,29 @@ export interface IParentedSearchRegisterRequest extends IBaseSearchRegisterReque
   parentType: string;
   parentId: number;
   parentVersion: string;
+}
+export const ParentedSearchRegisterRequestSchema = {
+  type: "object",
+  properties: {
+    qualifiedPathName: {
+      type: "string",
+    },
+    parentType: {
+      type: "string",
+    },
+    parentId: {
+      type: "number",
+    },
+    parentVersion: {
+      type: ["string", "null"],
+    },
+  },
+  required: [
+    "qualifiedPathName",
+    "parentType",
+    "parentId",
+    "parentVersion",
+  ],
 }
 
 /**
@@ -230,6 +345,21 @@ export const OWNED_SEARCH_UNREGISTER_REQUEST = "owned-search-unregister";
 export interface IOwnedSearchUnregisterRequest extends IBaseSearchUnregisterRequest {
   createdBy: number;
 }
+export const OwnedSearchUnregisterRequestSchema = {
+  type: "object",
+  properties: {
+    qualifiedPathName: {
+      type: "string",
+    },
+    createdBy: {
+      type: "number",
+    },
+  },
+  required: [
+    "qualifiedPathName",
+    "createdBy",
+  ],
+}
 
 /**
  * The unregister version of [[PARENTED_SEARCH_REGISTER_REQUEST]]
@@ -242,6 +372,29 @@ export interface IParentedSearchUnregisterRequest extends IBaseSearchUnregisterR
   parentType: string;
   parentId: number;
   parentVersion: string;
+}
+export const ParentedSearchUnregisterRequestSchema = {
+  type: "object",
+  properties: {
+    qualifiedPathName: {
+      type: "string",
+    },
+    parentType: {
+      type: "string",
+    },
+    parentId: {
+      type: "number",
+    },
+    parentVersion: {
+      type: ["string", "null"],
+    },
+  },
+  required: [
+    "qualifiedPathName",
+    "parentType",
+    "parentId",
+    "parentVersion",
+  ],
 }
 
 /**
@@ -274,6 +427,26 @@ export interface IOwnedSearchFeedbackRequest extends IBaseSearchFeedbackRequest 
   createdBy: number;
 }
 
+export const OwnedSearchFeedbackRequestSchema = {
+  type: "object",
+  properties: {
+    qualifiedPathName: {
+      type: "string",
+    },
+    knownLastRecordDate: {
+      type: ["string", "null"],
+    },
+    createdBy: {
+      type: "number",
+    },
+  },
+  required: [
+    "qualifiedPathName",
+    "knownLastRecordDate",
+    "createdBy",
+  ],
+}
+
 /**
  * The feedback version of [[PARENTED_SEARCH_REGISTER_REQUEST]]
  */
@@ -285,4 +458,31 @@ export interface IParentedSearchFeedbackRequest extends IBaseSearchFeedbackReque
   parentType: string;
   parentId: number;
   parentVersion: string;
+}
+export const ParentedSearchFeedbackRequestSchema = {
+  type: "object",
+  properties: {
+    qualifiedPathName: {
+      type: "string",
+    },
+    knownLastRecordDate: {
+      type: ["string", "null"],
+    },
+    parentType: {
+      type: "string",
+    },
+    parentId: {
+      type: "number",
+    },
+    parentVersion: {
+      type: ["string", "null"],
+    },
+  },
+  required: [
+    "qualifiedPathName",
+    "knownLastRecordDate",
+    "parentType",
+    "parentId",
+    "parentVersion",
+  ],
 }

@@ -5,7 +5,7 @@ import { Cache } from "./cache";
 import { Server } from "http";
 import Root from "../base/Root";
 import ioMain from "socket.io";
-import ItemDefinition from "../base/Root/Module/ItemDefinition";
+import ItemDefinition, { ItemDefinitionIOActions } from "../base/Root/Module/ItemDefinition";
 import Knex from "knex";
 import Module from "../base/Root/Module";
 import {
@@ -37,11 +37,57 @@ import {
   CHANGED_FEEEDBACK_EVENT,
   IChangedFeedbackEvent,
   IDENTIFIED_EVENT,
+  RegisterRequestSchema,
+  OwnedSearchRegisterRequestSchema,
+  ParentedSearchRegisterRequestSchema,
+  IdentifyRequestSchema,
+  FeedbackRequestSchema,
+  OwnedSearchFeedbackRequestSchema,
+  ParentedSearchFeedbackRequestSchema,
+  UnregisterRequestSchema,
+  OwnedSearchUnregisterRequestSchema,
+  ParentedSearchUnregisterRequestSchema,
 } from "../base/remote-protocol";
 import { IGQLSearchRecord } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from ".";
 import { SERVER_DATA_IDENTIFIER } from "../constants";
+import Ajv from "ajv";
+import { jwtVerify } from "./token";
+import { ISensitiveConfigRawJSONDataType } from "../config";
+import { IServerSideTokenDataType } from "./resolvers/basic";
+
+const ajv = new Ajv();
+
+const checkRegisterRequest =
+  ajv.compile(RegisterRequestSchema);
+
+const checkOwnedSearchRegisterRequest =
+  ajv.compile(OwnedSearchRegisterRequestSchema);
+
+const checkParentedSearchRegisterRequest =
+  ajv.compile(ParentedSearchRegisterRequestSchema);
+
+const checkIdentifyRequest =
+  ajv.compile(IdentifyRequestSchema);
+
+const checkFeedbackRequest =
+  ajv.compile(FeedbackRequestSchema);
+
+const checkOwnedSearchFeedbackRequest =
+  ajv.compile(OwnedSearchFeedbackRequestSchema);
+
+const checkParentedSearchFeedbackRequest =
+  ajv.compile(ParentedSearchFeedbackRequestSchema);
+
+const checkUnregisterRequest =
+  ajv.compile(UnregisterRequestSchema);
+
+const checkOwnedSearchUnregisterRequest =
+  ajv.compile(OwnedSearchUnregisterRequestSchema);
+
+const checkParentedSearchUnregisterRequest =
+  ajv.compile(ParentedSearchUnregisterRequestSchema);
 
 interface IListenerList {
   [socketId: string]: {
@@ -52,6 +98,7 @@ interface IListenerList {
     amount: number;
     uuid: string;
     token: string;
+    user: IServerSideTokenDataType;
   };
 }
 
@@ -76,6 +123,7 @@ export class Listener {
   private root: Root;
   private knex: Knex;
   private cache: Cache;
+  private sensitiveConfig: ISensitiveConfigRawJSONDataType;
 
   constructor(
     buildnumber: string,
@@ -87,6 +135,7 @@ export class Listener {
     cache: Cache,
     knex: Knex,
     server: Server,
+    sensitiveConfig: ISensitiveConfigRawJSONDataType,
   ) {
     this.redisSub = redisSub;
     this.redisPub = redisPub;
@@ -96,6 +145,7 @@ export class Listener {
     this.root = root;
     this.cache = cache;
     this.knex = knex;
+    this.sensitiveConfig = sensitiveConfig;
 
     this.cache.setListener(this);
 
@@ -112,9 +162,6 @@ export class Listener {
     if (server === null) {
       return;
     }
-
-    // TODO we should validte the forms of every request, right now requests are not
-    // validated
 
     const io = ioMain(server);
     io.on("connection", (socket) => {
@@ -164,32 +211,63 @@ export class Listener {
       },
     );
   }
-  public identify(
+  public async identify(
     socket: Socket,
     request: IIdentifyRequest,
   ) {
-    if (!this.listeners[socket.id]) {
+    const valid = checkIdentifyRequest(request);
+    if (!valid) {
       logger.debug(
-        "Listener.identify: socket " + socket.id + " provides initial identification",
+        "Listener.identify: can't indentify due to invalid request",
+        {
+          errors: checkIdentifyRequest.errors,
+        }
       );
-      this.listeners[socket.id] = {
-        socket,
-        listens: {},
-        uuid: request.uuid,
-        token: request.token,
-        amount: 0,
-      };
-    } else {
-      logger.debug(
-        "Listener.identify: socket " + socket.id + " updates identification criteria",
-      );
-      this.listeners[socket.id].uuid = request.uuid;
-      this.listeners[socket.id].token = request.token;
+      return;
     }
 
-    socket.emit(
-      IDENTIFIED_EVENT,
-    );
+    let invalid = false;
+    let result: IServerSideTokenDataType;
+    try {
+      result = await jwtVerify<IServerSideTokenDataType>(request.token, this.sensitiveConfig.jwtKey);
+      invalid = (
+        typeof result.id !== "number" ||
+        typeof result.role !== "string"
+      );
+    } catch (err) {
+      invalid = true;
+    }
+
+    if (invalid) {
+      logger.debug(
+        "Listener.identify: socket " + socket.id + " failed to identify due to invalid token",
+      );
+    } else {
+      if (!this.listeners[socket.id]) {
+        logger.debug(
+          "Listener.identify: socket " + socket.id + " provides initial identification",
+        );
+        this.listeners[socket.id] = {
+          socket,
+          listens: {},
+          uuid: request.uuid,
+          token: request.token,
+          amount: 0,
+          user: result,
+        };
+      } else {
+        logger.debug(
+          "Listener.identify: socket " + socket.id + " updates identification criteria",
+        );
+        this.listeners[socket.id].uuid = request.uuid;
+        this.listeners[socket.id].token = request.token;
+        this.listeners[socket.id].user = result;
+      }
+
+      socket.emit(
+        IDENTIFIED_EVENT,
+      );
+    }
   }
   public registerSS(
     request: IRegisterRequest,
@@ -216,17 +294,56 @@ export class Listener {
       );
     }
   }
-  public register(
+  public async register(
     socket: Socket,
     request: IRegisterRequest,
   ) {
     // TODO check if token allows to listen before adding
 
-    if (!this.listeners[socket.id]) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
       logger.debug(
         "Listener.register: can't register listener to an unidentified socket " + socket.id,
       );
       return;
+    }
+
+    const valid = checkRegisterRequest(request);
+    if (!valid) {
+      logger.debug(
+        "Listener.register: can't register listener due to invalid request",
+        {
+          errors: checkRegisterRequest.errors,
+        }
+      );
+      return;
+    }
+
+    const itemDefinition: ItemDefinition = this.root.registry[request.itemDefinition] as ItemDefinition;
+    if (!itemDefinition || !(itemDefinition instanceof ItemDefinition)) {
+      logger.debug(
+        "Listener.register: could not find " + request.itemDefinition,
+      );
+      return;
+    }
+    const value = await this.cache.requestValue(itemDefinition, request.id, request.version);
+    if (value) {
+      const creator = itemDefinition.isOwnerObjectId() ? value.id : value.created_by;
+      const hasAccess = itemDefinition.checkRoleAccessFor(
+        ItemDefinitionIOActions.READ,
+        listenerData.user.role,
+        listenerData.user.id,
+        creator,
+        {},
+        false,
+      );
+      if (!hasAccess) {
+        logger.debug(
+          "Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
+          " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
+        );
+        return;
+      }
     }
 
     // do not allow more than 500 concurrent listeners
@@ -257,6 +374,17 @@ export class Listener {
     if (!this.listeners[socket.id]) {
       logger.debug(
         "Listener.ownedSearchRegister: can't register listener to an unidentified socket " + socket.id,
+      );
+      return;
+    }
+
+    const valid = checkOwnedSearchRegisterRequest(request);
+    if (!valid) {
+      logger.debug(
+        "Listener.ownedSearchRegister: can't register listener due to invalid request",
+        {
+          errors: checkOwnedSearchRegisterRequest.errors,
+        }
       );
       return;
     }
@@ -293,6 +421,17 @@ export class Listener {
       return;
     }
 
+    const valid = checkParentedSearchRegisterRequest(request);
+    if (!valid) {
+      logger.debug(
+        "Listener.parentedSearchRegister: can't register listener due to invalid request",
+        {
+          errors: checkParentedSearchRegisterRequest.errors,
+        }
+      );
+      return;
+    }
+
     // do not allow more than 500 concurrent listeners
     if (this.listeners[socket.id].amount > 500) {
       logger.debug(
@@ -316,6 +455,16 @@ export class Listener {
     socket: Socket,
     request: IOwnedSearchFeedbackRequest,
   ) {
+    const valid = checkOwnedSearchFeedbackRequest(request);
+    if (!valid) {
+      logger.debug(
+        "Listener.ownedSearchFeedback: can't register listener due to invalid request",
+        {
+          errors: checkOwnedSearchFeedbackRequest.errors,
+        }
+      );
+      return;
+    }
     try {
       const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
       if (!itemDefinitionOrModule) {
@@ -335,7 +484,7 @@ export class Listener {
       }
 
       // TODO check token allows this user to search within here otherwise giving
-      // 0 as the lastKnownRecord will run the search, check the search.ts to see
+      // a low date as the lastKnownRecord will run the search, check the search.ts to see
       // how it is done
 
       const query = this.knex.select(["id", "version", "type", "created_at"]).from(mod.getQualifiedPathName());
@@ -383,6 +532,16 @@ export class Listener {
     socket: Socket,
     request: IParentedSearchFeedbackRequest,
   ) {
+    const valid = checkParentedSearchFeedbackRequest(request);
+    if (!valid) {
+      logger.debug(
+        "Listener.parentedSearchFeedback: can't register listener due to invalid request",
+        {
+          errors: checkParentedSearchFeedbackRequest.errors,
+        }
+      );
+      return;
+    }
     try {
       const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
       if (!itemDefinitionOrModule) {
@@ -454,6 +613,17 @@ export class Listener {
     request: IFeedbackRequest,
   ) {
     // TODO check token allows for feedback
+
+    const valid = checkFeedbackRequest(request);
+    if (!valid) {
+      logger.debug(
+        "Listener.feedback: can't register listener due to invalid request",
+        {
+          errors: checkFeedbackRequest.errors,
+        }
+      );
+      return;
+    }
 
     try {
       const itemDefinition: ItemDefinition = this.root.registry[request.itemDefinition] as ItemDefinition;
@@ -548,6 +718,16 @@ export class Listener {
     socket: Socket,
     request: IUnregisterRequest,
   ) {
+    const valid = checkUnregisterRequest(request);
+    if (!valid) {
+      logger.debug(
+        "Listener.unregister: can't unregister due to invalid request",
+        {
+          errors: checkUnregisterRequest.errors,
+        }
+      );
+      return;
+    }
     const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
     this.removeListener(socket, mergedIndexIdentifier);
   }
@@ -555,6 +735,16 @@ export class Listener {
     socket: Socket,
     request: IOwnedSearchUnregisterRequest,
   ) {
+    const valid = checkOwnedSearchUnregisterRequest(request);
+    if (!valid) {
+      logger.debug(
+        "Listener.ownedSearchUnregister: can't unregister due to invalid request",
+        {
+          errors: checkOwnedSearchUnregisterRequest.errors,
+        }
+      );
+      return;
+    }
     const mergedIndexIdentifier = "OWNED_SEARCH." + request.qualifiedPathName + "." + request.createdBy;
     this.removeListener(socket, mergedIndexIdentifier);
   }
@@ -562,6 +752,16 @@ export class Listener {
     socket: Socket,
     request: IParentedSearchUnregisterRequest,
   ) {
+    const valid = checkParentedSearchUnregisterRequest(request);
+    if (!valid) {
+      logger.debug(
+        "Listener.parentedSearchUnregister: can't unregister due to invalid request",
+        {
+          errors: checkParentedSearchUnregisterRequest.errors,
+        }
+      );
+      return;
+    }
     const mergedIndexIdentifier = "PARENTED_SEARCH." + request.qualifiedPathName + "." + request.parentType +
       "." + request.parentId + "." + (request.parentVersion || "");
     this.removeListener(socket, mergedIndexIdentifier);

@@ -135,6 +135,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 forId: this.props.forId,
                 forVersion: this.props.forVersion,
             });
+            // this will work even for null values, and null requestFields
             memoryLoadedAndValid = (appliedGQLValue &&
                 gql_util_1.requestFieldsAreContained(requestFields, appliedGQLValue.requestFields));
         }
@@ -522,7 +523,13 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 // make it so that when we are exiting the search context it caches
                 if (cache_1.default.isSupported &&
                     this.props.longTermCaching) {
-                    cache_1.default.instance.mergeCachedValue(constants_1.PREFIX_GET + this.props.itemDefinitionInstance.getQualifiedPathName(), forId, forVersion || null, appliedGQLValue.rawValue, appliedGQLValue.requestFields);
+                    const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
+                    if (appliedGQLValue.rawValue) {
+                        cache_1.default.instance.mergeCachedValue(constants_1.PREFIX_GET + qualifiedName, forId, forVersion || null, appliedGQLValue.rawValue, appliedGQLValue.requestFields);
+                    }
+                    else {
+                        cache_1.default.instance.setCachedValueAsNullAndUpdateSearches(forId, forVersion || null, qualifiedName, constants_1.PREFIX_GET + qualifiedName, constants_1.PREFIX_SEARCH + this.props.itemDefinitionInstance.getParentModule().getSearchModule().getQualifiedPathName(), constants_1.PREFIX_SEARCH + this.props.itemDefinitionInstance.getSearchModeCounterpart().getQualifiedPathName());
+                    }
                 }
                 return completedValue;
             }
@@ -579,9 +586,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             language: this.props.localeData.language,
             cacheStore: this.props.longTermCaching,
         });
-        if (value) {
+        if (!error) {
             // we apply the value, whatever we have gotten this will affect all the instances
-            // that use the same value
+            // that use the same value, note that value can be null
             this.props.itemDefinitionInstance.applyValue(forId, forVersion, value, false, tokenDataId, tokenDataRole, getQueryFields, true);
             // and then we trigger the change listener for all the instances
             this.props.itemDefinitionInstance.triggerListeners("change", forId, forVersion);

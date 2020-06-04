@@ -31,6 +31,8 @@ function propertyViewPostProcessingHook(relatedProperty, currentFiles, supportsI
             const videoSrc = node.dataset.videoSrc || "";
             const origin = node.dataset.videoOrigin || "";
             cleanAllAttribs(node);
+            node.allowFullscreen = true;
+            // TODO remember to remove the fake wrong order of the iframe
             // src
             if (origin === "vimeo") {
                 node.setAttribute("src", `https://player.vimeo.com/video/${videoSrc}?title=0&byline=0&portrait=0&badge=0`);
@@ -45,7 +47,7 @@ function propertyViewPostProcessingHook(relatedProperty, currentFiles, supportsI
             // data-video-origin
             node.dataset.videoOrigin = origin;
             // allowfullscreen
-            node.allowFullscreen = true;
+            // (node as HTMLIFrameElement).allowFullscreen = true;
         }
         else {
             node.parentElement && node.parentElement.removeChild(node);
