@@ -4,5 +4,6 @@ interface ILocationStateReaderProps<S> {
     stateIsInQueryString?: boolean;
     children: (state: S, setState: (state: Partial<S>, replace?: boolean) => void) => React.ReactNode;
 }
-export default function LocationStateReader<S>(props: ILocationStateReaderProps<S>): JSX.Element;
-export {};
+declare function FakeLocationStateReader<S>(props: ILocationStateReaderProps<S>): any;
+declare const _default: typeof FakeLocationStateReader;
+export default _default;

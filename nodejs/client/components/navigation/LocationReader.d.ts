@@ -7,5 +7,5 @@ interface ILocationReaderArg {
 interface ILocationReaderProps {
     children: (arg: ILocationReaderArg) => React.ReactNode;
 }
-export default function LocationReader(props: ILocationReaderProps): JSX.Element;
-export {};
+declare const _default: React.ComponentType<ILocationReaderProps>;
+export default _default;

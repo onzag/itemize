@@ -13,6 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(require("path"));
 const constants_1 = require("../../../../../constants");
 const image_conversions_1 = require("./image-conversions");
+const server_1 = require("../../../../../server");
 /**
  * Processes an extended list based
  * file value
@@ -123,7 +124,10 @@ function processOneFileAndItsSameIDReplacement(newVersion, oldVersion, uploadsCo
                             await removeFolderFor(uploadsContainer, fileLocationPath);
                         }
                         catch (err) {
-                            // TODO something with error
+                            server_1.logger.error("processOneFileAndItsSameIDReplacement: could not remove folder at container " + uploadsContainer + " in " + fileLocationPath, {
+                                errStack: err.stack,
+                                errMessage: err.message,
+                            });
                         }
                     })();
                 }

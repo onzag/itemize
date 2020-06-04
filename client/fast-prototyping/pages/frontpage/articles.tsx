@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider, ParentItemDefinitionContextProvider } from "../../../providers/item-definition";
 import SearchLoader from "../../../components/search/SearchLoader";

@@ -10,12 +10,12 @@ const react_router_dom_1 = require("react-router-dom");
 const __2 = require("../..");
 const imported_resources_1 = require("../../../imported-resources");
 const token_provider_1 = require("../providers/token-provider");
-const location_context_1 = require("../providers/location-context");
 const remote_listener_1 = require("./remote-listener");
 require("../workers/service");
 const gql_client_util_1 = require("../gql-client-util");
 const cache_1 = __importDefault(require("../workers/cache"));
 const comlink_1 = require("comlink");
+const deep_equal_1 = __importDefault(require("deep-equal"));
 // Just a message for whether is development
 const isDevelopment = process.env.NODE_ENV === "development";
 if (isDevelopment) {
@@ -25,6 +25,32 @@ if (isDevelopment) {
 // values for both is null
 exports.LocaleContext = react_1.default.createContext(null);
 exports.DataContext = react_1.default.createContext(null);
+class DataContextProvider extends react_1.default.Component {
+    shouldComponentUpdate(nextProps) {
+        return nextProps.children !== this.props.children ||
+            nextProps.value.updateIsBlocked !== this.props.value.updateIsBlocked;
+        // root and remote listener are never really going to change, language
+        // changes should trigger by the locale context and not by this
+    }
+    render() {
+        return (react_1.default.createElement(exports.DataContext.Provider, { value: this.props.value }, this.props.children));
+    }
+}
+exports.DataContextProvider = DataContextProvider;
+class LocaleContextProvider extends react_1.default.Component {
+    shouldComponentUpdate(nextProps) {
+        return nextProps.children !== this.props.children ||
+            nextProps.value.country !== this.props.value.country ||
+            nextProps.value.currency !== this.props.value.currency ||
+            nextProps.value.rtl !== this.props.value.rtl ||
+            nextProps.value.updating !== this.props.value.updating ||
+            !deep_equal_1.default(nextProps.value.i18n, this.props.value.i18n);
+    }
+    render() {
+        return (react_1.default.createElement(exports.LocaleContext.Provider, { value: this.props.value }, this.props.children));
+    }
+}
+exports.LocaleContextProvider = LocaleContextProvider;
 // now we export the App
 class App extends react_1.default.Component {
     constructor(props) {
@@ -314,12 +340,11 @@ class App extends react_1.default.Component {
         // version nevertheless,
         // note how we include the devtools if we are in development mode
         // such a code is stripped if it's production
-        return (react_1.default.createElement(exports.LocaleContext.Provider, { value: localeContextValue },
+        return (react_1.default.createElement(LocaleContextProvider, { value: localeContextValue },
             react_1.default.createElement(token_provider_1.TokenProvider, { localeContext: localeContextValue, onProviderStateSet: this.setTokenState },
-                react_1.default.createElement(location_context_1.LocationStateContext.Provider, { value: location },
-                    react_1.default.createElement("div", { id: "main", dir: rtl ? "rtl" : "ltr" }, this.props.mainWrapper ?
-                        this.props.mainWrapper(this.props.mainComponent, localeContextValue) :
-                        this.props.mainComponent)))));
+                react_1.default.createElement("div", { id: "main", dir: rtl ? "rtl" : "ltr" }, this.props.mainWrapper ?
+                    this.props.mainWrapper(this.props.mainComponent, localeContextValue) :
+                    this.props.mainComponent))));
     }
     render() {
         // The data contet passes the raw root and the value
@@ -332,7 +357,7 @@ class App extends react_1.default.Component {
         // Now we return that with the JSS provider, material ui theme provider,
         // our data context, and then pass the react router route, note that the
         // router itself is the parent
-        return (react_1.default.createElement(exports.DataContext.Provider, { value: dataContextValue },
+        return (react_1.default.createElement(DataContextProvider, { value: dataContextValue },
             react_1.default.createElement(react_router_dom_1.Route, { path: "/:lang/", component: this.renderAppWithLocaleContext })));
     }
 }

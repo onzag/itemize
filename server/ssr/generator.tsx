@@ -1,4 +1,4 @@
-import { IAppDataType } from "..";
+import { IAppDataType, logger } from "..";
 import React from "react";
 import express from "express";
 import { ISSRRule, ISSRRuleDynamic, ISSRRuleSetCb } from ".";
@@ -11,6 +11,8 @@ import ReactDOMServer from 'react-dom/server';
 import { IGQLRequestFields } from "../../gql-querier";
 import { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import { filterAndPrepareGQLValue } from "../resolvers/basic";
+import { ISQLTableRowValue } from "../../base/Root/sql";
+import Root from "../../base/Root";
 
 const MEMOIZED_ANSWERS: {
   [memId: string]: {
@@ -25,6 +27,21 @@ export async function ssrGenerator(
   appData: IAppDataType,
   rule: ISSRRuleDynamic | ISSRRuleSetCb,
 ): Promise<void> {
+  let root: Root;
+  try {
+    root = await appData.rootPool.acquire().promise;
+  } catch (err) {
+    logger.error(
+      "ssrGenerator [SERIOUS]: Could not adquire a root from the pool",
+      {
+        errStack: err.stack,
+        errMessage: err.message,
+      }
+    )
+    res.status(500).end("Internal Server Error");
+    return;
+  }
+
   res.setHeader("content-type", "text/html; charset=utf-8");
   const config = appData.config;
   const language = req.path.split("/")[1];
@@ -35,7 +52,7 @@ export async function ssrGenerator(
 
   let resultRule: ISSRRuleDynamic;
   if (rule && language && config.supportedLanguages.includes(language)) {
-    resultRule = typeof rule === "function" ? rule(req, language, appData.root) : rule;
+    resultRule = typeof rule === "function" ? rule(req, language, root) : rule;
   }
 
   // This is the default, what happens to routes that have nothing setup for them
@@ -101,6 +118,7 @@ export async function ssrGenerator(
   }
 
   let collectionSignature: string = null;
+  let collectionFailed = false;
   const queries: ISSRCollectedQueryType[] = [];
   if (appliedRule.collect) {
     const collectionSignatureArray: string[] = []
@@ -115,10 +133,22 @@ export async function ssrGenerator(
           splittedIdef.shift();
         }
 
-        const mod = appData.root.getModuleFor(splittedModule);
+        const mod = root.getModuleFor(splittedModule);
         const idef = mod.getItemDefinitionFor(splittedIdef);
 
-        const rowValue = await appData.cache.requestValue(idef, collectionPoint[2], collectionPoint[3]);
+        let rowValue: ISQLTableRowValue;
+        try {
+          rowValue = await appData.cache.requestValue(idef, collectionPoint[2], collectionPoint[3]);
+        } catch (err) {
+          logger.error(
+            "ssrGenerator [SERIOUS]: Collection failed due to request not passing",
+            {
+              errStack: err.stack,
+              errMessage: err.message,
+            }
+          )
+          collectionFailed = true;
+        }
 
         if (rowValue === null) {
           collectionSignatureArray[index] = "null";
@@ -151,11 +181,13 @@ export async function ssrGenerator(
   }
 
   if (
+    !collectionFailed &&
     appliedRule.memId &&
     MEMOIZED_ANSWERS[appliedRule.memId] &&
     MEMOIZED_ANSWERS[appliedRule.memId].collectionSignature === collectionSignature
   ) {
     res.end(MEMOIZED_ANSWERS[appliedRule.memId].html);
+    appData.rootPool.release(root);
     return;
   }
 
@@ -185,7 +217,7 @@ export async function ssrGenerator(
     return `<link rel="alternate" href="${req.protocol}://${req.get("host")}/${language}" hreflang="${language}">`
   }).join("");
 
-  if (appliedRule.noData) {
+  if (appliedRule.noData || collectionFailed) {
     newHTML = newHTML.replace(/\$SSRAPP/g, "");
     newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
     newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
@@ -197,30 +229,52 @@ export async function ssrGenerator(
     };
 
     newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(ssr));
-    const serverAppData = await initializeItemizeApp(
-      appData.ssrConfig.rendererContext,
-      appData.ssrConfig.mainComponent,
-      {
-        appWrapper: appData.ssrConfig.appWrapper,
-        mainWrapper: appData.ssrConfig.mainWrapper,
-        serverMode: {
-          collector: appData.ssrConfig.collector,
-          config: appData.config,
-          ssrContext: ssr,
-          pathname: req.path,
-          clientDetails: {
-            lang: getCookie(splittedCookies, "lang"),
-            currency: getCookie(splittedCookies, "currency"),
-            country: getCookie(splittedCookies, "country"),
-            guessedData: getCookie(splittedCookies, "guessedData"),
-          },
-          langLocales: appData.langLocales,
-          root: appData.root,
-          req: req,
-          ipStack: appData.ipStack,
+    let serverAppData: {
+      node: React.ReactNode,
+      id: string;
+    } = null;
+
+    try {
+      serverAppData = await initializeItemizeApp(
+        appData.ssrConfig.rendererContext,
+        appData.ssrConfig.mainComponent,
+        {
+          appWrapper: appData.ssrConfig.appWrapper,
+          mainWrapper: appData.ssrConfig.mainWrapper,
+          serverMode: {
+            collector: appData.ssrConfig.collector,
+            config: appData.config,
+            ssrContext: ssr,
+            pathname: req.path,
+            clientDetails: {
+              lang: getCookie(splittedCookies, "lang"),
+              currency: getCookie(splittedCookies, "currency"),
+              country: getCookie(splittedCookies, "country"),
+              guessedData: getCookie(splittedCookies, "guessedData"),
+            },
+            langLocales: appData.langLocales,
+            root: root,
+            req: req,
+            ipStack: appData.ipStack,
+          }
         }
-      }
-    );
+      );
+    } catch (e) {
+      logger.error(
+        "ssrGenerator [SERIOUS]: Failed to run SSR due to failed initialization",
+        {
+          errStack: e.stack,
+          errMessage: e.message,
+          appliedRule,
+        }
+      );
+      newHTML = newHTML.replace(/\$SSRAPP/g, "");
+      newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
+      newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
+      res.end(newHTML);
+      appData.rootPool.release(root);
+      return;
+    }
 
     const app = (
       <StaticRouter location={req.url}>
@@ -244,4 +298,5 @@ export async function ssrGenerator(
     };
   }
   res.end(newHTML);
+  appData.rootPool.release(root);
 }

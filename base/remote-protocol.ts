@@ -25,6 +25,21 @@ export interface IBuildNumberEvent {
 }
 
 /**
+ * This is streamed to the client once the server hits an error
+ * that was somehow caused by the client, there's no much use
+ * for an error event other than notice invalid requests
+ */
+export const ERROR_EVENT = "listener-error";
+
+/**
+ * The shape of the error itself
+ */
+export interface IErrorEvent {
+  message: string;
+  request: any;
+}
+
+/**
  * Identified event comes once the user has been identified properly
  */
 export const IDENTIFIED_EVENT = "identified";

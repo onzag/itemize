@@ -2,6 +2,10 @@ import React from "react";
 import { WithStyles } from "@material-ui/core";
 declare const heroStyle: {
     heroContainer: {
+        display: string;
+        alignItems: string;
+        justifyContent: string;
+        flexDirection: "column";
         width: string;
         height: string;
         borderBottom: string;

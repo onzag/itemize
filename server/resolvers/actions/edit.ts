@@ -25,12 +25,31 @@ import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { IGQLArgs } from "../../../gql-querier";
 import { TriggerActions } from "../triggers";
+import Root from "../../../base/Root";
 
 export async function editItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
-  itemDefinition: ItemDefinition,
+  resolverItemDefinition: ItemDefinition,
 ) {
+  let pooledRoot: Root;
+  try {
+    pooledRoot = await appData.rootPool.acquire().promise;
+  } catch (err) {
+    logger.error(
+      "addItemDefinition [SERIOUS]: Failed to retrieve root from the pool",
+      {
+        errMessage: err.message,
+        errStack: err.stack,
+      },
+    );
+    throw new EndpointError({
+      message: "Failed to retrieve root from the pool",
+      code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+    });
+  }
+  const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()] as ItemDefinition;
+
   logger.debug(
     "editItemDefinition: executed edit for " + itemDefinition.getQualifiedPathName(),
   );
@@ -298,6 +317,8 @@ export async function editItemDefinition(
     "editItemDefinition: value is",
     finalOutput,
   );
+
+  appData.rootPool.release(pooledRoot);
 
   return finalOutput;
 }

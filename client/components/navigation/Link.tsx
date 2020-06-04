@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Link as RouterLink,
   LinkProps,
@@ -27,6 +27,13 @@ function LinkCustomComponent(Tag: string, props: any) {
   return <Tag {...rest} onClick={navigate}/>;
 }
 
+const customComponents = {
+  "div": LinkCustomComponent.bind(null, "div"),
+  "p": LinkCustomComponent.bind(null, "p"),
+  "span": LinkCustomComponent.bind(null, "span"),
+  "a": LinkCustomComponent.bind(null, "a"),
+}
+
 /**
  * Same as the router link but actually takes
  * care of the current language set and uses such
@@ -51,7 +58,7 @@ export default function Link(props: ICustomLinkProps) {
 
   if (props.as) {
     delete newProps["as"];
-    newProps.component = LinkCustomComponent.bind(null, props.as);
+    newProps.component = customComponents[props.as];
   }
 
   return <RouterLink {...newProps} onClick={linkOnClick.bind(null, newProps)}/>;

@@ -13,6 +13,7 @@ const version_null_value_1 = require("../../version-null-value");
 const gql_util_1 = require("../../../gql-util");
 const graphql_fields_1 = __importDefault(require("graphql-fields"));
 const nanodate_1 = require("../../../nanodate");
+const errors_1 = require("../../../base/errors");
 function findLastRecordDateCheatMethod(records) {
     let maximumRecords = null;
     let maximumRecordId = null;
@@ -163,7 +164,22 @@ function searchItemDefinitionTraditional(appData, resolverArgs, itemDefinition) 
     return searchItemDefinition(appData, resolverArgs, itemDefinition, true);
 }
 exports.searchItemDefinitionTraditional = searchItemDefinitionTraditional;
-async function searchItemDefinition(appData, resolverArgs, itemDefinition, traditional) {
+async function searchItemDefinition(appData, resolverArgs, resolverItemDefinition, traditional) {
+    let pooledRoot;
+    try {
+        pooledRoot = await appData.rootPool.acquire().promise;
+    }
+    catch (err) {
+        server_1.logger.error("addItemDefinition [SERIOUS]: Failed to retrieve root from the pool", {
+            errMessage: err.message,
+            errStack: err.stack,
+        });
+        throw new errors_1.EndpointError({
+            message: "Failed to retrieve root from the pool",
+            code: constants_1.ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+        });
+    }
+    const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()];
     server_1.logger.debug("searchItemDefinition: executed search for " + itemDefinition.getQualifiedPathName());
     const since = basic_1.retrieveSince(resolverArgs.args);
     basic_1.checkLimit(resolverArgs.args.limit, itemDefinition, traditional);
@@ -290,6 +306,7 @@ async function searchItemDefinition(appData, resolverArgs, itemDefinition, tradi
             count,
         };
         server_1.logger.debug("searchItemDefinition: succeed traditionally");
+        appData.rootPool.release(pooledRoot);
         return finalResult;
     }
     else {
@@ -301,6 +318,7 @@ async function searchItemDefinition(appData, resolverArgs, itemDefinition, tradi
             count,
         };
         server_1.logger.debug("searchItemDefinition: succeed with records");
+        appData.rootPool.release(pooledRoot);
         return finalResult;
     }
 }

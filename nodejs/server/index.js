@@ -38,6 +38,7 @@ require("winston-daily-rotate-file");
 const dbbuilder_1 = __importDefault(require("../dbbuilder"));
 const global_manager_1 = require("./global-manager");
 const generator_1 = require("./ssr/generator");
+const rootpool_1 = require("./rootpool");
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const PORT = process.env.PORT || 8000;
@@ -351,7 +352,7 @@ async function initializeServer(ssrConfig, custom = {}) {
             exports.logger.info("initializeServer: server initialized in cluster manager exclusive mode flushing redis");
             const flushAllPromisified = util_1.promisify(redisClient.flushall).bind(redisClient);
             await flushAllPromisified();
-            new listener_1.Listener(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, null, cache, null, null);
+            new listener_1.Listener(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, null, cache, null, null, sensitiveConfig);
             return;
         }
         exports.logger.info("initializeServer: initializing redis global cache client");
@@ -428,7 +429,7 @@ async function initializeServer(ssrConfig, custom = {}) {
         exports.logger.info("initializeServer: creating server");
         const server = http_1.default.createServer(app);
         exports.logger.info("initializeServer: setting up websocket socket.io listener");
-        const listener = new listener_1.Listener(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, root, cache, knex, server);
+        const listener = new listener_1.Listener(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, root, cache, knex, server, sensitiveConfig);
         if (sensitiveConfig.ipStackAccessKey) {
             exports.logger.info("initializeServer: initializing ipstack connection");
         }
@@ -452,6 +453,7 @@ async function initializeServer(ssrConfig, custom = {}) {
         exports.logger.info("initializeServer: configuring app data build");
         const appData = {
             root,
+            rootPool: rootpool_1.retrieveRootPool(root.rawData),
             langLocales,
             ssrConfig,
             indexDevelopment: index.replace(/\$MODE/g, "development"),

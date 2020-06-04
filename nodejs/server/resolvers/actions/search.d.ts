@@ -6,7 +6,7 @@ import { IGQLSearchRecordsContainer, IGQLSearchResultsContainer } from "../../..
 export declare function searchModuleTraditional(appData: IAppDataType, resolverArgs: IGraphQLIdefResolverArgs, mod: Module): Promise<IGQLSearchRecordsContainer | IGQLSearchResultsContainer>;
 export declare function searchModule(appData: IAppDataType, resolverArgs: IGraphQLIdefResolverArgs, mod: Module, traditional?: boolean): Promise<IGQLSearchRecordsContainer | IGQLSearchResultsContainer>;
 export declare function searchItemDefinitionTraditional(appData: IAppDataType, resolverArgs: IGraphQLIdefResolverArgs, itemDefinition: ItemDefinition): Promise<IGQLSearchRecordsContainer | IGQLSearchResultsContainer>;
-export declare function searchItemDefinition(appData: IAppDataType, resolverArgs: IGraphQLIdefResolverArgs, itemDefinition: ItemDefinition, traditional?: boolean): Promise<IGQLSearchRecordsContainer | IGQLSearchResultsContainer>;
+export declare function searchItemDefinition(appData: IAppDataType, resolverArgs: IGraphQLIdefResolverArgs, resolverItemDefinition: ItemDefinition, traditional?: boolean): Promise<IGQLSearchRecordsContainer | IGQLSearchResultsContainer>;
 export declare function searchItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType;
 export declare function searchModuleFn(appData: IAppDataType): FGraphQLModResolverType;
 export declare function searchItemDefinitionTraditionalFn(appData: IAppDataType): FGraphQLIdefResolverType;

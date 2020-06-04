@@ -1,6 +1,6 @@
 import React from "react";
-import { LocationStateContext } from "../../internal/providers/location-context";
 import { Location } from "history";
+import { withRouter } from "react-router-dom";
 
 interface ILocationReaderArg {
   pathname: string;
@@ -12,6 +12,10 @@ interface ILocationReaderProps {
   children: (
     arg: ILocationReaderArg,
   ) => React.ReactNode;
+}
+
+interface ISecondaryLocationReaderProps extends ILocationReaderProps {
+  location: Location;
 }
 
 interface IActualLocationReaderProps extends ILocationReaderProps {
@@ -34,14 +38,9 @@ class ActualLocationReader extends React.PureComponent<IActualLocationReaderProp
   }
 }
 
-export default function LocationReader(props: ILocationReaderProps) {
-  return (
-    <LocationStateContext.Consumer>
-      {
-        (location: Location) => {
-          return <ActualLocationReader pathname={location.pathname} {...props}/>
-        }
-      }
-    </LocationStateContext.Consumer>
-  );
+function SecondaryLocationReader(props: ISecondaryLocationReaderProps) {
+  return (<ActualLocationReader pathname={props.location.pathname} {...props}/>);
 }
+
+// buggy typescript forces me to do it this way
+export default withRouter(SecondaryLocationReader as any) as any as React.ComponentType<ILocationReaderProps>;

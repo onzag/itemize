@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const __1 = require("..");
 const react_1 = __importDefault(require("react"));
 const constants_1 = require("../../constants");
 const mode_1 = require("../mode");
@@ -13,6 +14,18 @@ const ItemDefinition_1 = require("../../base/Root/Module/ItemDefinition");
 const basic_1 = require("../resolvers/basic");
 const MEMOIZED_ANSWERS = {};
 async function ssrGenerator(req, res, html, appData, rule) {
+    let root;
+    try {
+        root = await appData.rootPool.acquire().promise;
+    }
+    catch (err) {
+        __1.logger.error("ssrGenerator [SERIOUS]: Could not adquire a root from the pool", {
+            errStack: err.stack,
+            errMessage: err.message,
+        });
+        res.status(500).end("Internal Server Error");
+        return;
+    }
     res.setHeader("content-type", "text/html; charset=utf-8");
     const config = appData.config;
     const language = req.path.split("/")[1];
@@ -21,7 +34,7 @@ async function ssrGenerator(req, res, html, appData, rule) {
     const splittedCookies = cookies ? cookies.split(";").map((c) => c.trim()) : [];
     let resultRule;
     if (rule && language && config.supportedLanguages.includes(language)) {
-        resultRule = typeof rule === "function" ? rule(req, language, appData.root) : rule;
+        resultRule = typeof rule === "function" ? rule(req, language, root) : rule;
     }
     // This is the default, what happens to routes that have nothing setup for them
     if (!rule || !language || !config.supportedLanguages.includes(language) || !resultRule) {
@@ -79,6 +92,7 @@ async function ssrGenerator(req, res, html, appData, rule) {
         }
     }
     let collectionSignature = null;
+    let collectionFailed = false;
     const queries = [];
     if (appliedRule.collect) {
         const collectionSignatureArray = [];
@@ -91,9 +105,19 @@ async function ssrGenerator(req, res, html, appData, rule) {
             if (splittedIdef[0] === "") {
                 splittedIdef.shift();
             }
-            const mod = appData.root.getModuleFor(splittedModule);
+            const mod = root.getModuleFor(splittedModule);
             const idef = mod.getItemDefinitionFor(splittedIdef);
-            const rowValue = await appData.cache.requestValue(idef, collectionPoint[2], collectionPoint[3]);
+            let rowValue;
+            try {
+                rowValue = await appData.cache.requestValue(idef, collectionPoint[2], collectionPoint[3]);
+            }
+            catch (err) {
+                __1.logger.error("ssrGenerator [SERIOUS]: Collection failed due to request not passing", {
+                    errStack: err.stack,
+                    errMessage: err.message,
+                });
+                collectionFailed = true;
+            }
             if (rowValue === null) {
                 collectionSignatureArray[index] = "null";
             }
@@ -117,10 +141,12 @@ async function ssrGenerator(req, res, html, appData, rule) {
         }));
         collectionSignature = collectionSignatureArray.join(".");
     }
-    if (appliedRule.memId &&
+    if (!collectionFailed &&
+        appliedRule.memId &&
         MEMOIZED_ANSWERS[appliedRule.memId] &&
         MEMOIZED_ANSWERS[appliedRule.memId].collectionSignature === collectionSignature) {
         res.end(MEMOIZED_ANSWERS[appliedRule.memId].html);
+        appData.rootPool.release(root);
         return;
     }
     const finalOgTitle = typeof appliedRule.ogTitle === "string" ? appliedRule.ogTitle : appliedRule.ogTitle(queries, config);
@@ -146,7 +172,7 @@ async function ssrGenerator(req, res, html, appData, rule) {
     const langHrefLangTags = appliedRule.languages.map((language) => {
         return `<link rel="alternate" href="${req.protocol}://${req.get("host")}/${language}" hreflang="${language}">`;
     }).join("");
-    if (appliedRule.noData) {
+    if (appliedRule.noData || collectionFailed) {
         newHTML = newHTML.replace(/\$SSRAPP/g, "");
         newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
         newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
@@ -158,26 +184,42 @@ async function ssrGenerator(req, res, html, appData, rule) {
             title: finalTitle,
         };
         newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(ssr));
-        const serverAppData = await client_1.initializeItemizeApp(appData.ssrConfig.rendererContext, appData.ssrConfig.mainComponent, {
-            appWrapper: appData.ssrConfig.appWrapper,
-            mainWrapper: appData.ssrConfig.mainWrapper,
-            serverMode: {
-                collector: appData.ssrConfig.collector,
-                config: appData.config,
-                ssrContext: ssr,
-                pathname: req.path,
-                clientDetails: {
-                    lang: mode_1.getCookie(splittedCookies, "lang"),
-                    currency: mode_1.getCookie(splittedCookies, "currency"),
-                    country: mode_1.getCookie(splittedCookies, "country"),
-                    guessedData: mode_1.getCookie(splittedCookies, "guessedData"),
-                },
-                langLocales: appData.langLocales,
-                root: appData.root,
-                req: req,
-                ipStack: appData.ipStack,
-            }
-        });
+        let serverAppData = null;
+        try {
+            serverAppData = await client_1.initializeItemizeApp(appData.ssrConfig.rendererContext, appData.ssrConfig.mainComponent, {
+                appWrapper: appData.ssrConfig.appWrapper,
+                mainWrapper: appData.ssrConfig.mainWrapper,
+                serverMode: {
+                    collector: appData.ssrConfig.collector,
+                    config: appData.config,
+                    ssrContext: ssr,
+                    pathname: req.path,
+                    clientDetails: {
+                        lang: mode_1.getCookie(splittedCookies, "lang"),
+                        currency: mode_1.getCookie(splittedCookies, "currency"),
+                        country: mode_1.getCookie(splittedCookies, "country"),
+                        guessedData: mode_1.getCookie(splittedCookies, "guessedData"),
+                    },
+                    langLocales: appData.langLocales,
+                    root: root,
+                    req: req,
+                    ipStack: appData.ipStack,
+                }
+            });
+        }
+        catch (e) {
+            __1.logger.error("ssrGenerator [SERIOUS]: Failed to run SSR due to failed initialization", {
+                errStack: e.stack,
+                errMessage: e.message,
+                appliedRule,
+            });
+            newHTML = newHTML.replace(/\$SSRAPP/g, "");
+            newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
+            newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
+            res.end(newHTML);
+            appData.rootPool.release(root);
+            return;
+        }
         const app = (react_1.default.createElement(react_router_dom_1.StaticRouter, { location: req.url }, serverAppData.node));
         newHTML = newHTML.replace(/\$SSRAPP/g, server_1.default.renderToStaticMarkup(app));
         let finalSSRHead = langHrefLangTags;
@@ -193,5 +235,6 @@ async function ssrGenerator(req, res, html, appData, rule) {
         };
     }
     res.end(newHTML);
+    appData.rootPool.release(root);
 }
 exports.ssrGenerator = ssrGenerator;

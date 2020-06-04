@@ -9,11 +9,16 @@ const item_definition_1 = require("../../../providers/item-definition");
 const View_1 = __importDefault(require("../../../components/property/View"));
 const core_1 = require("@material-ui/core");
 const AppLanguageRetriever_1 = __importDefault(require("../../../components/localization/AppLanguageRetriever"));
+const item_definition_loader_1 = require("../../components/item-definition-loader");
 const heroStyle = {
     heroContainer: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
         width: "100%",
         height: "70vh",
-        borderBottom: "solid 1rem #ccc"
+        borderBottom: "solid 1rem #ccc",
     },
 };
 exports.Hero = core_1.withStyles(heroStyle)((props) => {
@@ -23,5 +28,6 @@ exports.Hero = core_1.withStyles(heroStyle)((props) => {
                     "content",
                     "attachments",
                 ], static: "NO_LISTENING" },
-                react_1.default.createElement(View_1.default, { id: "content" })))))));
+                react_1.default.createElement(item_definition_loader_1.ItemDefinitionLoader, null,
+                    react_1.default.createElement(View_1.default, { id: "content" }))))))));
 });

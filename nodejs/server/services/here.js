@@ -56,8 +56,16 @@ class Here {
                     data += chunk;
                 });
                 resp.on("error", (err) => {
-                    // TODO do something with error
-                    console.log(err);
+                    __1.logger.error("Here.requestGeocodeFor [SERIOUS]: here response cancelled", {
+                        errMessage: err.message,
+                        errStack: err.stack,
+                        data,
+                        lat,
+                        lng,
+                        query,
+                        lang,
+                        sep,
+                    });
                     resolve(standardResponse);
                 });
                 resp.on("end", () => {
@@ -119,8 +127,16 @@ class Here {
                     data += chunk;
                 });
                 resp.on("error", (err) => {
-                    // TODO do something with error
-                    console.log(err);
+                    __1.logger.error("Here.requestSearchFor [SERIOUS]: here response cancelled", {
+                        errMessage: err.message,
+                        errStack: err.stack,
+                        data,
+                        lat,
+                        lng,
+                        query,
+                        lang,
+                        sep,
+                    });
                     resolve([]);
                 });
                 resp.on("end", () => {
@@ -181,8 +197,16 @@ class Here {
                     data += chunk;
                 });
                 resp.on("error", (err) => {
-                    // TODO do something with error
-                    console.log(err);
+                    __1.logger.error("Here.requestAutocompleteFor [SERIOUS]: here response cancelled", {
+                        errMessage: err.message,
+                        errStack: err.stack,
+                        data,
+                        lat,
+                        lng,
+                        query,
+                        lang,
+                        sep,
+                    });
                     resolve([]);
                 });
                 resp.on("end", () => {

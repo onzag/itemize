@@ -19,6 +19,7 @@ import { ISSRRuleSet } from "./ssr";
 import { IRendererContext } from "../client/providers/renderer";
 import { ILocaleContextType } from "../client/internal/app";
 import { ICollectorType } from "../client";
+import { Pool } from "tarn";
 export declare const logger: winston.Logger;
 export declare type PkgCloudClients = {
     [containerId: string]: pkgcloud.storage.Client;
@@ -36,6 +37,7 @@ export interface ISSRConfig {
 }
 export interface IAppDataType {
     root: Root;
+    rootPool: Pool<Root>;
     langLocales: ILangLocalesType;
     ssrConfig: ISSRConfig;
     indexDevelopment: string;

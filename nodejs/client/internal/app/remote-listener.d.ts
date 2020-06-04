@@ -1,5 +1,5 @@
 import Root from "../../../base/Root";
-import { IRegisterRequest, IOwnedSearchRegisterRequest, IParentedSearchRegisterRequest, IFeedbackRequest, IBuildNumberEvent, IOwnedSearchFeedbackRequest, IParentedSearchFeedbackRequest } from "../../../base/remote-protocol";
+import { IRegisterRequest, IOwnedSearchRegisterRequest, IParentedSearchRegisterRequest, IFeedbackRequest, IBuildNumberEvent, IOwnedSearchFeedbackRequest, IParentedSearchFeedbackRequest, IErrorEvent } from "../../../base/remote-protocol";
 export declare class RemoteListener {
     private socket;
     private root;
@@ -17,6 +17,7 @@ export declare class RemoteListener {
     private isReady;
     private isReadyCallbacks;
     constructor(root: Root);
+    onError(event: IErrorEvent): void;
     setToken(token: string): void;
     onBuildnumberListened(build: IBuildNumberEvent): void;
     getUUID(): string;

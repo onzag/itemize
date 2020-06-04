@@ -20,6 +20,19 @@ export interface IBuildNumberEvent {
     buildnumber: string;
 }
 /**
+ * This is streamed to the client once the server hits an error
+ * that was somehow caused by the client, there's no much use
+ * for an error event other than notice invalid requests
+ */
+export declare const ERROR_EVENT = "listener-error";
+/**
+ * The shape of the error itself
+ */
+export interface IErrorEvent {
+    message: string;
+    request: any;
+}
+/**
  * Identified event comes once the user has been identified properly
  */
 export declare const IDENTIFIED_EVENT = "identified";
@@ -115,6 +128,18 @@ export interface IIdentifyRequest {
     uuid: string;
     token: string;
 }
+export declare const IdentifyRequestSchema: {
+    type: string;
+    properties: {
+        uuid: {
+            type: string;
+        };
+        token: {
+            type: string[];
+        };
+    };
+    required: string[];
+};
 /**
  * The request that is sent to the server in order to register
  * a single item definition for updates and changes
@@ -129,6 +154,21 @@ export interface IRegisterRequest {
     id: number;
     version: string;
 }
+export declare const RegisterRequestSchema: {
+    type: string;
+    properties: {
+        itemDefinition: {
+            type: string;
+        };
+        id: {
+            type: string;
+        };
+        version: {
+            type: string[];
+        };
+    };
+    required: string[];
+};
 /**
  * Request to unregister and stop getting notifications from
  * a single item definition
@@ -142,6 +182,21 @@ export interface IUnregisterRequest {
     id: number;
     version: string;
 }
+export declare const UnregisterRequestSchema: {
+    type: string;
+    properties: {
+        itemDefinition: {
+            type: string;
+        };
+        id: {
+            type: string;
+        };
+        version: {
+            type: string[];
+        };
+    };
+    required: string[];
+};
 /**
  * a request that is sent to the server in order to
  * request feedback for a single item definition
@@ -156,6 +211,21 @@ export interface IFeedbackRequest {
     id: number;
     version: string;
 }
+export declare const FeedbackRequestSchema: {
+    type: string;
+    properties: {
+        itemDefinition: {
+            type: string;
+        };
+        id: {
+            type: string;
+        };
+        version: {
+            type: string[];
+        };
+    };
+    required: string[];
+};
 /**
  * A request that is sent to the server to register
  * listening for changes in an owned or parented search
@@ -178,6 +248,18 @@ export declare const OWNED_SEARCH_REGISTER_REQUEST = "owned-search-register";
 export interface IOwnedSearchRegisterRequest extends IBaseSearchRegisterRequest {
     createdBy: number;
 }
+export declare const OwnedSearchRegisterRequestSchema: {
+    type: string;
+    properties: {
+        qualifiedPathName: {
+            type: string;
+        };
+        createdBy: {
+            type: string;
+        };
+    };
+    required: string[];
+};
 /**
  * this is necessary for parented searches in order to run parented by
  * cached searches and then request for updates
@@ -192,6 +274,24 @@ export interface IParentedSearchRegisterRequest extends IBaseSearchRegisterReque
     parentId: number;
     parentVersion: string;
 }
+export declare const ParentedSearchRegisterRequestSchema: {
+    type: string;
+    properties: {
+        qualifiedPathName: {
+            type: string;
+        };
+        parentType: {
+            type: string;
+        };
+        parentId: {
+            type: string;
+        };
+        parentVersion: {
+            type: string[];
+        };
+    };
+    required: string[];
+};
 /**
  * A request that is sent to the server to unregister
  * listening for changes in an owned or parented search
@@ -210,6 +310,18 @@ export declare const OWNED_SEARCH_UNREGISTER_REQUEST = "owned-search-unregister"
 export interface IOwnedSearchUnregisterRequest extends IBaseSearchUnregisterRequest {
     createdBy: number;
 }
+export declare const OwnedSearchUnregisterRequestSchema: {
+    type: string;
+    properties: {
+        qualifiedPathName: {
+            type: string;
+        };
+        createdBy: {
+            type: string;
+        };
+    };
+    required: string[];
+};
 /**
  * The unregister version of [[PARENTED_SEARCH_REGISTER_REQUEST]]
  */
@@ -222,6 +334,24 @@ export interface IParentedSearchUnregisterRequest extends IBaseSearchUnregisterR
     parentId: number;
     parentVersion: string;
 }
+export declare const ParentedSearchUnregisterRequestSchema: {
+    type: string;
+    properties: {
+        qualifiedPathName: {
+            type: string;
+        };
+        parentType: {
+            type: string;
+        };
+        parentId: {
+            type: string;
+        };
+        parentVersion: {
+            type: string[];
+        };
+    };
+    required: string[];
+};
 /**
  * a request that is sent to the server in order to
  * request feedback for a search, either by module
@@ -250,6 +380,21 @@ export declare const OWNED_SEARCH_FEEDBACK_REQUEST = "owned-search-feedback";
 export interface IOwnedSearchFeedbackRequest extends IBaseSearchFeedbackRequest {
     createdBy: number;
 }
+export declare const OwnedSearchFeedbackRequestSchema: {
+    type: string;
+    properties: {
+        qualifiedPathName: {
+            type: string;
+        };
+        knownLastRecordDate: {
+            type: string[];
+        };
+        createdBy: {
+            type: string;
+        };
+    };
+    required: string[];
+};
 /**
  * The feedback version of [[PARENTED_SEARCH_REGISTER_REQUEST]]
  */
@@ -262,4 +407,25 @@ export interface IParentedSearchFeedbackRequest extends IBaseSearchFeedbackReque
     parentId: number;
     parentVersion: string;
 }
+export declare const ParentedSearchFeedbackRequestSchema: {
+    type: string;
+    properties: {
+        qualifiedPathName: {
+            type: string;
+        };
+        knownLastRecordDate: {
+            type: string[];
+        };
+        parentType: {
+            type: string;
+        };
+        parentId: {
+            type: string;
+        };
+        parentVersion: {
+            type: string[];
+        };
+    };
+    required: string[];
+};
 export {};

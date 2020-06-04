@@ -39,6 +39,22 @@ interface IAppState {
 }
 export declare const LocaleContext: React.Context<ILocaleContextType>;
 export declare const DataContext: React.Context<IDataContextType>;
+interface ILocaleContextProviderProps {
+    value: ILocaleContextType;
+    children: React.ReactNode;
+}
+interface IDataContextProviderProps {
+    value: IDataContextType;
+    children: React.ReactNode;
+}
+export declare class DataContextProvider extends React.Component<IDataContextProviderProps> {
+    shouldComponentUpdate(nextProps: IDataContextProviderProps): boolean;
+    render(): JSX.Element;
+}
+export declare class LocaleContextProvider extends React.Component<ILocaleContextProviderProps> {
+    shouldComponentUpdate(nextProps: ILocaleContextProviderProps): boolean;
+    render(): JSX.Element;
+}
 export default class App extends React.Component<IAppProps, IAppState> {
     private tokenState;
     private remoteListener;

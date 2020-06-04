@@ -32,6 +32,8 @@ import {
   IOwnedSearchRecordsAddedEvent,
   IParentedSearchRecordsAddedEvent,
   IDENTIFIED_EVENT,
+  ERROR_EVENT,
+  IErrorEvent,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 
@@ -100,6 +102,17 @@ export class RemoteListener {
     this.socket.on(BUILDNUMBER_EVENT, this.onBuildnumberListened);
     this.socket.on(OWNED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToOwnedSearch);
     this.socket.on(PARENTED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToParentedSearch);
+    this.socket.on(ERROR_EVENT, this.onError)
+  }
+  public onError(event: IErrorEvent) {
+    console.error(
+      event.message,
+    );
+    if (console.table) {
+      console.table(event.request);
+    } else {
+      console.error(event.request);
+    }
   }
   public setToken(token: string) {
     this.token = token;

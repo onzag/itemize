@@ -47,11 +47,13 @@ import {
   UnregisterRequestSchema,
   OwnedSearchUnregisterRequestSchema,
   ParentedSearchUnregisterRequestSchema,
+  ERROR_EVENT,
+  IErrorEvent,
 } from "../base/remote-protocol";
 import { IGQLSearchRecord } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from ".";
-import { SERVER_DATA_IDENTIFIER } from "../constants";
+import { SERVER_DATA_IDENTIFIER, UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE } from "../constants";
 import Ajv from "ajv";
 import { jwtVerify } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
@@ -211,6 +213,20 @@ export class Listener {
       },
     );
   }
+  public emitError(
+    socket: Socket,
+    message: string,
+    request: any,
+  ) {
+    const error: IErrorEvent = {
+      message,
+      request,
+    }
+    socket.emit(
+      ERROR_EVENT,
+      error,
+    );
+  }
   public async identify(
     socket: Socket,
     request: IIdentifyRequest,
@@ -223,25 +239,35 @@ export class Listener {
           errors: checkIdentifyRequest.errors,
         }
       );
+      this.emitError(socket, "can't identify user due to invalid request", request);
       return;
     }
 
     let invalid = false;
     let result: IServerSideTokenDataType;
-    try {
-      result = await jwtVerify<IServerSideTokenDataType>(request.token, this.sensitiveConfig.jwtKey);
-      invalid = (
-        typeof result.id !== "number" ||
-        typeof result.role !== "string"
-      );
-    } catch (err) {
-      invalid = true;
+    if (request.token) {
+      try {
+        result = await jwtVerify<IServerSideTokenDataType>(request.token, this.sensitiveConfig.jwtKey);
+        invalid = (
+          typeof result.id !== "number" ||
+          typeof result.role !== "string"
+        );
+      } catch (err) {
+        invalid = true;
+      }
+    } else {
+      result = {
+        id: null,
+        role: GUEST_METAROLE,
+        sessionId: null,
+      };
     }
 
     if (invalid) {
       logger.debug(
         "Listener.identify: socket " + socket.id + " failed to identify due to invalid token",
       );
+      this.emitError(socket, "failed to identify due to invalid token", request);
     } else {
       if (!this.listeners[socket.id]) {
         logger.debug(
@@ -298,13 +324,12 @@ export class Listener {
     socket: Socket,
     request: IRegisterRequest,
   ) {
-    // TODO check if token allows to listen before adding
-
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       logger.debug(
         "Listener.register: can't register listener to an unidentified socket " + socket.id,
       );
+      this.emitError(socket, "socket is unidentified", request);
       return;
     }
 
@@ -316,6 +341,16 @@ export class Listener {
           errors: checkRegisterRequest.errors,
         }
       );
+      this.emitError(socket, "invalid request", request);
+      return;
+    }
+
+    // do not allow more than MAX_REMOTE_LISTENERS_PER_SOCKET concurrent listeners
+    if (listenerData.amount > MAX_REMOTE_LISTENERS_PER_SOCKET) {
+      logger.debug(
+        "Listener.register: socket " + socket.id + " has exceeded the amount of listeners it can attach",
+      );
+      this.emitError(socket, "exceeded socket max listeners per socket", request);
       return;
     }
 
@@ -324,33 +359,25 @@ export class Listener {
       logger.debug(
         "Listener.register: could not find " + request.itemDefinition,
       );
+      this.emitError(socket, "could not find item definition", request);
       return;
     }
     const value = await this.cache.requestValue(itemDefinition, request.id, request.version);
-    if (value) {
-      const creator = itemDefinition.isOwnerObjectId() ? value.id : value.created_by;
-      const hasAccess = itemDefinition.checkRoleAccessFor(
-        ItemDefinitionIOActions.READ,
-        listenerData.user.role,
-        listenerData.user.id,
-        creator,
-        {},
-        false,
-      );
-      if (!hasAccess) {
-        logger.debug(
-          "Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
-          " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
-        );
-        return;
-      }
-    }
-
-    // do not allow more than 500 concurrent listeners
-    if (this.listeners[socket.id].amount > 500) {
+    const creator = value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : UNSPECIFIED_OWNER;
+    const hasAccess = itemDefinition.checkRoleAccessFor(
+      ItemDefinitionIOActions.READ,
+      listenerData.user.role,
+      listenerData.user.id,
+      creator,
+      {},
+      false,
+    );
+    if (!hasAccess) {
       logger.debug(
-        "Listener.register: socket " + socket.id + " has exceeded the amount of listeners it can attach",
+        "Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
+        " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
       );
+      this.emitError(socket, "user has not access", request);
       return;
     }
 
@@ -368,13 +395,12 @@ export class Listener {
     socket: Socket,
     request: IOwnedSearchRegisterRequest,
   ) {
-    // TODO check token allows this user to search within here otherwise giving
-    // he will be able to see any new records added
-
-    if (!this.listeners[socket.id]) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
       logger.debug(
         "Listener.ownedSearchRegister: can't register listener to an unidentified socket " + socket.id,
       );
+      this.emitError(socket, "socket is unidentified", request);
       return;
     }
 
@@ -386,38 +412,66 @@ export class Listener {
           errors: checkOwnedSearchRegisterRequest.errors,
         }
       );
+      this.emitError(socket, "invalid request", request);
       return;
     }
 
-    // do not allow more than 500 concurrent listeners
-    if (this.listeners[socket.id].amount > 500) {
+    // do not allow more than MAX_REMOTE_LISTENERS_PER_SOCKET concurrent listeners
+    if (listenerData.amount > MAX_REMOTE_LISTENERS_PER_SOCKET) {
       logger.debug(
         "Listener.ownedSearchRegister: socket " + socket.id + " has exceeded the amount of listeners it can attach",
       );
+      this.emitError(socket, "exceeded socket max listeners per socket", request);
+      return;
+    }
+
+    const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
+    let hasAccess: boolean;
+    if (!itemDefinitionOrModule) {
+      logger.debug(
+        "Listener.ownedSearchRegister: could not find item definition or module for " + request.qualifiedPathName,
+      );
+      this.emitError(socket, "could not find item definition or module", request);
+      return;
+    } else {
+      hasAccess = itemDefinitionOrModule.checkRoleAccessFor(
+        ItemDefinitionIOActions.READ,
+        listenerData.user.role,
+        listenerData.user.id,
+        UNSPECIFIED_OWNER,
+        {},
+        false,
+      )
+    }
+    if (!hasAccess) {
+      logger.debug(
+        "Listener.ownedSearchRegister: socket " + socket.id + " with user " + listenerData.user.id +
+        " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+      );
+      this.emitError(socket, "user has not access", request);
       return;
     }
 
     const mergedIndexIdentifier = "OWNED_SEARCH." + request.qualifiedPathName + "." + request.createdBy;
-    if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+    if (!listenerData.listens[mergedIndexIdentifier]) {
       logger.debug(
         "Listener.ownedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
       );
       this.redisSub.subscribe(mergedIndexIdentifier);
-      this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
-      this.listeners[socket.id].amount++;
+      listenerData.listens[mergedIndexIdentifier] = true;
+      listenerData.amount++;
     }
   }
   public parentedSearchRegister(
     socket: Socket,
     request: IParentedSearchRegisterRequest,
   ) {
-    // TODO check token allows this user to search within here otherwise giving
-    // he will be able to see any new records added
-
-    if (!this.listeners[socket.id]) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
       logger.debug(
         "Listener.parentedSearchRegister: can't register listener to an unidentified socket " + socket.id,
       );
+      this.emitError(socket, "socket is unidentified", request);
       return;
     }
 
@@ -429,14 +483,43 @@ export class Listener {
           errors: checkParentedSearchRegisterRequest.errors,
         }
       );
+      this.emitError(socket, "invalid request", request);
       return;
     }
 
-    // do not allow more than 500 concurrent listeners
-    if (this.listeners[socket.id].amount > 500) {
+    // do not allow more than MAX_REMOTE_LISTENERS_PER_SOCKET concurrent listeners
+    if (this.listeners[socket.id].amount > MAX_REMOTE_LISTENERS_PER_SOCKET) {
       logger.debug(
         "Listener.parentedSearchRegister: socket " + socket.id + " has exceeded the amount of listeners it can attach",
       );
+      this.emitError(socket, "exceeded socket max listeners per socket", request);
+      return;
+    }
+
+    const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
+    let hasAccess: boolean;
+    if (!itemDefinitionOrModule) {
+      logger.debug(
+        "Listener.parentedSearchRegister: could not find item definition or module for " + request.qualifiedPathName,
+      );
+      this.emitError(socket, "could not find item definition or module", request);
+      return;
+    } else {
+      hasAccess = itemDefinitionOrModule.checkRoleAccessFor(
+        ItemDefinitionIOActions.READ,
+        listenerData.user.role,
+        listenerData.user.id,
+        UNSPECIFIED_OWNER,
+        {},
+        false,
+      )
+    }
+    if (!hasAccess) {
+      logger.debug(
+        "Listener.parentedSearchRegister: socket " + socket.id + " with user " + listenerData.user.id +
+        " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+      );
+      this.emitError(socket, "user has not access", request);
       return;
     }
 
@@ -455,14 +538,24 @@ export class Listener {
     socket: Socket,
     request: IOwnedSearchFeedbackRequest,
   ) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
+      logger.debug(
+        "Listener.ownedSearchFeedback: can't give feedback to an unidentified socket " + socket.id,
+      );
+      this.emitError(socket, "socket is unidentified", request);
+      return;
+    }
+
     const valid = checkOwnedSearchFeedbackRequest(request);
     if (!valid) {
       logger.debug(
-        "Listener.ownedSearchFeedback: can't register listener due to invalid request",
+        "Listener.ownedSearchFeedback: can't give feedback due to invalid request",
         {
           errors: checkOwnedSearchFeedbackRequest.errors,
         }
       );
+      this.emitError(socket, "invalid request", request);
       return;
     }
     try {
@@ -471,6 +564,7 @@ export class Listener {
         logger.debug(
           "Listener.ownedSearchFeedback: could not find " + request.qualifiedPathName,
         );
+        this.emitError(socket, "could not find item definition or module", request);
         return;
       }
 
@@ -483,9 +577,22 @@ export class Listener {
         mod = itemDefinitionOrModule;
       }
 
-      // TODO check token allows this user to search within here otherwise giving
-      // a low date as the lastKnownRecord will run the search, check the search.ts to see
-      // how it is done
+      const hasAccess = itemDefinitionOrModule.checkRoleAccessFor(
+        ItemDefinitionIOActions.READ,
+        listenerData.user.role,
+        listenerData.user.id,
+        UNSPECIFIED_OWNER,
+        {},
+        false,
+      )
+      if (!hasAccess) {
+        logger.debug(
+          "Listener.ownedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
+          " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+        );
+        this.emitError(socket, "user has not access", request);
+        return;
+      }
 
       const query = this.knex.select(["id", "version", "type", "created_at"]).from(mod.getQualifiedPathName());
       if (requiredType) {
@@ -532,6 +639,15 @@ export class Listener {
     socket: Socket,
     request: IParentedSearchFeedbackRequest,
   ) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
+      logger.debug(
+        "Listener.parentedSearchFeedback: can't give feedback to an unidentified socket " + socket.id,
+      );
+      this.emitError(socket, "socket is unidentified", request);
+      return;
+    }
+    
     const valid = checkParentedSearchFeedbackRequest(request);
     if (!valid) {
       logger.debug(
@@ -540,6 +656,7 @@ export class Listener {
           errors: checkParentedSearchFeedbackRequest.errors,
         }
       );
+      this.emitError(socket, "invalid request", request);
       return;
     }
     try {
@@ -548,6 +665,7 @@ export class Listener {
         logger.debug(
           "Listener.parentedSearchFeedback: could not find " + request.qualifiedPathName,
         );
+        this.emitError(socket, "could not find item definition or module", request);
         return;
       }
 
@@ -560,9 +678,22 @@ export class Listener {
         mod = itemDefinitionOrModule;
       }
 
-      // TODO check token allows this user to search within here otherwise giving
-      // 0 as the lastKnownRecord will run the search, check the search.ts to see
-      // how it is done
+      const hasAccess = itemDefinitionOrModule.checkRoleAccessFor(
+        ItemDefinitionIOActions.READ,
+        listenerData.user.role,
+        listenerData.user.id,
+        UNSPECIFIED_OWNER,
+        {},
+        false,
+      )
+      if (!hasAccess) {
+        logger.debug(
+          "Listener.parentedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
+          " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+        );
+        this.emitError(socket, "user has not access", request);
+        return;
+      }
 
       const query = this.knex.select(["id", "version", "type", "created_at"]).from(mod.getQualifiedPathName());
       if (requiredType) {
@@ -612,7 +743,14 @@ export class Listener {
     socket: Socket,
     request: IFeedbackRequest,
   ) {
-    // TODO check token allows for feedback
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
+      logger.debug(
+        "Listener.feedback: can't give feedback to an unidentified socket " + socket.id,
+      );
+      this.emitError(socket, "socket is unidentified", request);
+      return;
+    }
 
     const valid = checkFeedbackRequest(request);
     if (!valid) {
@@ -622,6 +760,35 @@ export class Listener {
           errors: checkFeedbackRequest.errors,
         }
       );
+      this.emitError(socket, "invalid request", request);
+      return;
+    }
+
+    const itemDefinition: ItemDefinition = this.root.registry[request.itemDefinition] as ItemDefinition;
+    if (!itemDefinition || !(itemDefinition instanceof ItemDefinition)) {
+      logger.debug(
+        "Listener.register: could not find " + request.itemDefinition,
+      );
+      this.emitError(socket, "could not find item definition", request);
+      return;
+    }
+
+    const value = await this.cache.requestValue(itemDefinition, request.id, request.version);
+    const creator = value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : UNSPECIFIED_OWNER;
+    const hasAccess = itemDefinition.checkRoleAccessFor(
+      ItemDefinitionIOActions.READ,
+      listenerData.user.role,
+      listenerData.user.id,
+      creator,
+      {},
+      false,
+    );
+    if (!hasAccess) {
+      logger.debug(
+        "Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
+        " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
+      );
+      this.emitError(socket, "user has not access", request);
       return;
     }
 
@@ -631,6 +798,7 @@ export class Listener {
         logger.debug(
           "Listener.feedback: could not find " + request.itemDefinition,
         );
+        this.emitError(socket, "could not find item definition", request);
         return;
       }
       const queriedResult: ISQLTableRowValue = await this.cache.requestValue(
@@ -696,12 +864,13 @@ export class Listener {
     socket: Socket,
     mergedIndexIdentifier: string,
   ) {
-    if (this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+    const listenerData = this.listeners[socket.id];
+    if (listenerData && listenerData.listens[mergedIndexIdentifier]) {
       logger.debug(
         "Listener.removeListener: unsubscribing socket " + socket.id + " from " + mergedIndexIdentifier,
       );
-      delete this.listeners[socket.id].listens[mergedIndexIdentifier];
-      this.listeners[socket.id].amount--;
+      delete listenerData.listens[mergedIndexIdentifier];
+      listenerData.amount--;
       this.removeListenerFinal(mergedIndexIdentifier);
     }
   }
@@ -718,6 +887,15 @@ export class Listener {
     socket: Socket,
     request: IUnregisterRequest,
   ) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
+      logger.debug(
+        "Listener.unregister: can't unregister an unidentified socket " + socket.id,
+      );
+      this.emitError(socket, "socket is unidentified", request);
+      return;
+    }
+
     const valid = checkUnregisterRequest(request);
     if (!valid) {
       logger.debug(
@@ -726,6 +904,7 @@ export class Listener {
           errors: checkUnregisterRequest.errors,
         }
       );
+      this.emitError(socket, "invalid request", request);
       return;
     }
     const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
@@ -735,6 +914,15 @@ export class Listener {
     socket: Socket,
     request: IOwnedSearchUnregisterRequest,
   ) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
+      logger.debug(
+        "Listener.ownedSearchUnregister: can't owned search unregister an unidentified socket " + socket.id,
+      );
+      this.emitError(socket, "socket is unidentified", request);
+      return;
+    }
+
     const valid = checkOwnedSearchUnregisterRequest(request);
     if (!valid) {
       logger.debug(
@@ -743,6 +931,7 @@ export class Listener {
           errors: checkOwnedSearchUnregisterRequest.errors,
         }
       );
+      this.emitError(socket, "invalid request", request);
       return;
     }
     const mergedIndexIdentifier = "OWNED_SEARCH." + request.qualifiedPathName + "." + request.createdBy;
@@ -752,6 +941,15 @@ export class Listener {
     socket: Socket,
     request: IParentedSearchUnregisterRequest,
   ) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
+      logger.debug(
+        "Listener.parentedSearchUnregister: can't parent search unregister an unidentified socket " + socket.id,
+      );
+      this.emitError(socket, "socket is unidentified", request);
+      return;
+    }
+
     const valid = checkParentedSearchUnregisterRequest(request);
     if (!valid) {
       logger.debug(
@@ -760,6 +958,7 @@ export class Listener {
           errors: checkParentedSearchUnregisterRequest.errors,
         }
       );
+      this.emitError(socket, "invalid request", request);
       return;
     }
     const mergedIndexIdentifier = "PARENTED_SEARCH." + request.qualifiedPathName + "." + request.parentType +
@@ -884,7 +1083,8 @@ export class Listener {
     this.registerSS(parsedContent);
   }
   public removeSocket(socket: Socket) {
-    if (!this.listeners[socket.id]) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
       return;
     }
 
@@ -892,7 +1092,7 @@ export class Listener {
       "Listener.removeSocket: removing socket " + socket.id,
     );
 
-    Object.keys(this.listeners[socket.id].listens).forEach((listensMergedIdentifier) => {
+    Object.keys(listenerData.listens).forEach((listensMergedIdentifier) => {
       const noSocketsListeningLeft = !this.listensSS[listensMergedIdentifier] &&
         Object.keys(this.listeners).every((socketId) => {
           if (socketId === socket.id) {

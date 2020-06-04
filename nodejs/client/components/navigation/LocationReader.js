@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const location_context_1 = require("../../internal/providers/location-context");
+const react_router_dom_1 = require("react-router-dom");
 // the component is pure to deny useless updates that way pathname is checked as location
 // might change without changing the pathname
 class ActualLocationReader extends react_1.default.PureComponent {
@@ -20,9 +20,8 @@ class ActualLocationReader extends react_1.default.PureComponent {
         });
     }
 }
-function LocationReader(props) {
-    return (react_1.default.createElement(location_context_1.LocationStateContext.Consumer, null, (location) => {
-        return react_1.default.createElement(ActualLocationReader, Object.assign({ pathname: location.pathname }, props));
-    }));
+function SecondaryLocationReader(props) {
+    return (react_1.default.createElement(ActualLocationReader, Object.assign({ pathname: props.location.pathname }, props)));
 }
-exports.default = LocationReader;
+// buggy typescript forces me to do it this way
+exports.default = react_router_dom_1.withRouter(SecondaryLocationReader);

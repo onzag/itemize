@@ -47,6 +47,16 @@ class RemoteListener {
         this.socket.on(remote_protocol_1.BUILDNUMBER_EVENT, this.onBuildnumberListened);
         this.socket.on(remote_protocol_1.OWNED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToOwnedSearch);
         this.socket.on(remote_protocol_1.PARENTED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToParentedSearch);
+        this.socket.on(remote_protocol_1.ERROR_EVENT, this.onError);
+    }
+    onError(event) {
+        console.error(event.message);
+        if (console.table) {
+            console.table(event.request);
+        }
+        else {
+            console.error(event.request);
+        }
     }
     setToken(token) {
         this.token = token;

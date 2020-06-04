@@ -24,7 +24,6 @@ function cleanAllAttribs(node) {
         node.removeAttribute(attr.name);
     });
 }
-// TODO fix this function when https://github.com/cure53/DOMPurify/issues/435 has been fixed 
 function propertyViewPostProcessingHook(relatedProperty, currentFiles, supportsImages, supportsVideos, supportsFiles, node) {
     if (node.tagName === "IFRAME") {
         if (supportsVideos) {
@@ -32,7 +31,6 @@ function propertyViewPostProcessingHook(relatedProperty, currentFiles, supportsI
             const origin = node.dataset.videoOrigin || "";
             cleanAllAttribs(node);
             node.allowFullscreen = true;
-            // TODO remember to remove the fake wrong order of the iframe
             // src
             if (origin === "vimeo") {
                 node.setAttribute("src", `https://player.vimeo.com/video/${videoSrc}?title=0&byline=0&portrait=0&badge=0`);
@@ -47,7 +45,7 @@ function propertyViewPostProcessingHook(relatedProperty, currentFiles, supportsI
             // data-video-origin
             node.dataset.videoOrigin = origin;
             // allowfullscreen
-            // (node as HTMLIFrameElement).allowFullscreen = true;
+            node.allowFullscreen = true;
         }
         else {
             node.parentElement && node.parentElement.removeChild(node);

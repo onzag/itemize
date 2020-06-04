@@ -12,7 +12,22 @@ const sql_1 = require("../../../base/Root/Module/ItemDefinition/sql");
 const errors_1 = require("../../../base/errors");
 const gql_util_1 = require("../../../gql-util");
 const triggers_1 = require("../triggers");
-async function editItemDefinition(appData, resolverArgs, itemDefinition) {
+async function editItemDefinition(appData, resolverArgs, resolverItemDefinition) {
+    let pooledRoot;
+    try {
+        pooledRoot = await appData.rootPool.acquire().promise;
+    }
+    catch (err) {
+        __1.logger.error("addItemDefinition [SERIOUS]: Failed to retrieve root from the pool", {
+            errMessage: err.message,
+            errStack: err.stack,
+        });
+        throw new errors_1.EndpointError({
+            message: "Failed to retrieve root from the pool",
+            code: constants_1.ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+        });
+    }
+    const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()];
     __1.logger.debug("editItemDefinition: executed edit for " + itemDefinition.getQualifiedPathName());
     // First we check the language and region of the item
     basic_1.checkLanguage(appData, resolverArgs.args);
@@ -180,6 +195,7 @@ async function editItemDefinition(appData, resolverArgs, itemDefinition) {
     };
     __1.logger.debug("editItemDefinition: GQL ouput retrieved");
     __1.logger.silly("editItemDefinition: value is", finalOutput);
+    appData.rootPool.release(pooledRoot);
     return finalOutput;
 }
 exports.editItemDefinition = editItemDefinition;

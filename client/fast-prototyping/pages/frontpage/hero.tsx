@@ -4,12 +4,17 @@ import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import View from "../../../components/property/View";
 import { withStyles, WithStyles } from "@material-ui/core";
 import AppLanguageRetriever from "../../../components/localization/AppLanguageRetriever";
+import { ItemDefinitionLoader } from "../../components/item-definition-loader";
 
 const heroStyle = {
   heroContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "column" as "column",
     width: "100%",
     height: "70vh",
-    borderBottom: "solid 1rem #ccc"
+    borderBottom: "solid 1rem #ccc",
   },
 };
 
@@ -36,7 +41,9 @@ export const Hero = withStyles(heroStyle)((props: HeroProps) => {
               }
               static="NO_LISTENING"
             >
-              <View id="content"/>
+              <ItemDefinitionLoader>
+                <View id="content"/>
+              </ItemDefinitionLoader>
             </ItemDefinitionProvider>
           )}
         </AppLanguageRetriever>

@@ -19,6 +19,12 @@ function LinkCustomComponent(Tag, props) {
     const { navigate, ...rest } = props;
     return react_1.default.createElement(Tag, Object.assign({}, rest, { onClick: navigate }));
 }
+const customComponents = {
+    "div": LinkCustomComponent.bind(null, "div"),
+    "p": LinkCustomComponent.bind(null, "p"),
+    "span": LinkCustomComponent.bind(null, "span"),
+    "a": LinkCustomComponent.bind(null, "a"),
+};
 /**
  * Same as the router link but actually takes
  * care of the current language set and uses such
@@ -42,7 +48,7 @@ function Link(props) {
     };
     if (props.as) {
         delete newProps["as"];
-        newProps.component = LinkCustomComponent.bind(null, props.as);
+        newProps.component = customComponents[props.as];
     }
     return react_1.default.createElement(react_router_dom_1.Link, Object.assign({}, newProps, { onClick: linkOnClick.bind(null, newProps) }));
 }

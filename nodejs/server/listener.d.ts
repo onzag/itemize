@@ -7,6 +7,7 @@ import { Server } from "http";
 import Root from "../base/Root";
 import Knex from "knex";
 import { IRegisterRequest, IOwnedSearchRegisterRequest, IParentedSearchRegisterRequest, IIdentifyRequest, IFeedbackRequest, IParentedSearchFeedbackRequest, IOwnedSearchFeedbackRequest, IUnregisterRequest, IOwnedSearchUnregisterRequest, IParentedSearchUnregisterRequest, IOwnedSearchRecordsAddedEvent, IParentedSearchRecordsAddedEvent, IChangedFeedbackEvent } from "../base/remote-protocol";
+import { ISensitiveConfigRawJSONDataType } from "../config";
 export declare class Listener {
     private listeners;
     private listensSS;
@@ -18,11 +19,13 @@ export declare class Listener {
     private root;
     private knex;
     private cache;
-    constructor(buildnumber: string, redisSub: RedisClient, redisPub: RedisClient, redisLocalSub: RedisClient, redisLocalPub: RedisClient, root: Root, cache: Cache, knex: Knex, server: Server);
+    private sensitiveConfig;
+    constructor(buildnumber: string, redisSub: RedisClient, redisPub: RedisClient, redisLocalSub: RedisClient, redisLocalPub: RedisClient, root: Root, cache: Cache, knex: Knex, server: Server, sensitiveConfig: ISensitiveConfigRawJSONDataType);
     addSocket(socket: Socket): void;
-    identify(socket: Socket, request: IIdentifyRequest): void;
+    emitError(socket: Socket, message: string, request: any): void;
+    identify(socket: Socket, request: IIdentifyRequest): Promise<void>;
     registerSS(request: IRegisterRequest): void;
-    register(socket: Socket, request: IRegisterRequest): void;
+    register(socket: Socket, request: IRegisterRequest): Promise<void>;
     ownedSearchRegister(socket: Socket, request: IOwnedSearchRegisterRequest): void;
     parentedSearchRegister(socket: Socket, request: IParentedSearchRegisterRequest): void;
     ownedSearchFeedback(socket: Socket, request: IOwnedSearchFeedbackRequest): Promise<void>;

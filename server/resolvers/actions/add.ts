@@ -28,12 +28,31 @@ import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { EndpointError } from "../../../base/errors";
 import { IGQLArgs } from "../../../gql-querier";
 import { TriggerActions } from "../triggers";
+import Root from "../../../base/Root";
 
 export async function addItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
-  itemDefinition: ItemDefinition,
+  resolverItemDefinition: ItemDefinition,
 ) {
+  let pooledRoot: Root;
+  try {
+    pooledRoot = await appData.rootPool.acquire().promise;
+  } catch (err) {
+    logger.error(
+      "addItemDefinition [SERIOUS]: Failed to retrieve root from the pool",
+      {
+        errMessage: err.message,
+        errStack: err.stack,
+      },
+    );
+    throw new EndpointError({
+      message: "Failed to retrieve root from the pool",
+      code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+    });
+  }
+  const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()] as ItemDefinition;
+
   logger.debug(
     "addItemDefinition: executed adding for " + itemDefinition.getQualifiedPathName(),
   );
@@ -203,7 +222,7 @@ export async function addItemDefinition(
     ).getParentModule().getQualifiedPathName();
     await runPolicyCheck({
       policyTypes: ["parent"],
-      itemDefinition,
+      itemDefinition: itemDefinition,
       id: null,
       version: null,
       role: tokenData.role,
@@ -282,7 +301,7 @@ export async function addItemDefinition(
       // we execute the trigger
       const newValueAccordingToModule = await moduleTrigger({
         appData,
-        itemDefinition,
+        itemDefinition: itemDefinition,
         module: mod,
         from: null,
         update: gqlValueToConvert,
@@ -300,7 +319,7 @@ export async function addItemDefinition(
       // we call the trigger
       const newValueAccordingToIdef = await itemDefinitionTrigger({
         appData,
-        itemDefinition,
+        itemDefinition: itemDefinition,
         module: mod,
         from: null,
         update: gqlValueToConvert,
@@ -359,6 +378,8 @@ export async function addItemDefinition(
     "addItemDefinition: GQL output calculated",
     finalOutput,
   );
+
+  appData.rootPool.release(pooledRoot);
 
   // items that have just been added cannot be blocked or deleted, hence we just return
   // right away without checking

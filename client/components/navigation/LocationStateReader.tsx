@@ -1,7 +1,7 @@
 import React from "react";
-import { LocationStateContext } from "../../internal/providers/location-context";
 import { setHistoryQSState, setHistoryState } from ".";
 import { Location } from "history";
+import { withRouter } from "react-router-dom";
 
 interface ILocationStateReaderProps<S> {
   defaultState: S;
@@ -12,30 +12,32 @@ interface ILocationStateReaderProps<S> {
   ) => React.ReactNode;
 }
 
-export default function LocationStateReader<S>(props: ILocationStateReaderProps<S>) {
-  return (
-    <LocationStateContext.Consumer>
-      {
-        (location: Location<S>) => {
-          if (props.stateIsInQueryString) {
-            const searchParams = new URLSearchParams(location.search);
-            const statefulValue = {};
-            Object.keys(props.defaultState).forEach((key) => {
-              statefulValue[key] = searchParams.has(key) ? searchParams.get(key) : props.defaultState[key];
-            });
-            return props.children(statefulValue as S, setHistoryQSState.bind(null, location))
-          } else {
-            if (!location.state) {
-              return props.children(props.defaultState, setHistoryState.bind(null, location));
-            }
-            const statefulValue = {};
-            Object.keys(props.defaultState).forEach((key) => {
-              statefulValue[key] = typeof location.state[key] !== "undefined" ? location.state[key] : props.defaultState[key];
-            });
-            return props.children(statefulValue as S, setHistoryState.bind(null, location));
-          }
-        }
-      }
-    </LocationStateContext.Consumer>
-  );
+interface ILocationStateReaderPropsWithLocation<S> extends ILocationStateReaderProps<S> {
+  location: Location;
 }
+
+function LocationStateReader<S>(props: ILocationStateReaderPropsWithLocation<S>) {
+  if (props.stateIsInQueryString) {
+    const searchParams = new URLSearchParams(props.location.search);
+    const statefulValue = {};
+    Object.keys(props.defaultState).forEach((key) => {
+      statefulValue[key] = searchParams.has(key) ? searchParams.get(key) : props.defaultState[key];
+    });
+    return props.children(statefulValue as S, setHistoryQSState.bind(null, props.location))
+  } else {
+    if (!props.location.state) {
+      return props.children(props.defaultState, setHistoryState.bind(null, props.location));
+    }
+    const statefulValue = {};
+    Object.keys(props.defaultState).forEach((key) => {
+      statefulValue[key] = typeof props.location.state[key] !== "undefined" ? props.location.state[key] : props.defaultState[key];
+    });
+    return props.children(statefulValue as S, setHistoryState.bind(null, props.location));
+  }
+}
+
+// buggy typescript forces me to do it this way
+function FakeLocationStateReader<S>(props: ILocationStateReaderProps<S>) {
+  return null as any;
+}
+export default withRouter(LocationStateReader as any) as any as typeof FakeLocationStateReader;

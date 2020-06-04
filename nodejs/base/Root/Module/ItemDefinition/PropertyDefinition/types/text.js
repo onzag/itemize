@@ -89,6 +89,7 @@ const typeValue = {
         const searchName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.SEARCH + id;
         if (typeof data[searchName] !== "undefined" && data[searchName] !== null) {
             // TODO improve, this only matches exact words
+            // maybe https://github.com/zombodb/zombodb
             knexBuilder.andWhereRaw("?? @@ to_tsquery(??, ?)", [
                 sqlPrefix + id + "_VECTOR",
                 sqlPrefix + id + "_DICTIONARY",
@@ -111,6 +112,7 @@ const typeValue = {
     },
     sqlStrSearch: (search, sqlPrefix, id, knexBuilder, dictionary, isOrderedbyIt) => {
         // TODO improve, this only matches exact words
+        // maybe https://github.com/zombodb/zombodb
         // due to technical limitations with knex, sometimes the builder
         // isn't available
         knexBuilder && knexBuilder.whereRaw("?? @@ to_tsquery(??, ?)", [
@@ -150,7 +152,8 @@ const typeValue = {
             if (propertyValue === null) {
                 return false;
             }
-            // TODO improve, this is kinda trash FTS
+            // this is the FTS in the client side, it's not good, it's not meant
+            // to be good, but it gets the job done
             return propertyValue.includes(searchMatch);
         }
         return true;
@@ -166,7 +169,7 @@ const typeValue = {
         }
         if (search) {
             const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
-            // TODO improve, this is kinda trash FTS
+            // this is the simple FTS that you get in the client
             return propertyValue.includes(search);
         }
         return true;

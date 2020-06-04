@@ -12,7 +12,22 @@ const sql_1 = require("../../../base/Root/Module/ItemDefinition/sql");
 const gql_util_1 = require("../../../gql-util");
 const errors_1 = require("../../../base/errors");
 const triggers_1 = require("../triggers");
-async function addItemDefinition(appData, resolverArgs, itemDefinition) {
+async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) {
+    let pooledRoot;
+    try {
+        pooledRoot = await appData.rootPool.acquire().promise;
+    }
+    catch (err) {
+        __1.logger.error("addItemDefinition [SERIOUS]: Failed to retrieve root from the pool", {
+            errMessage: err.message,
+            errStack: err.stack,
+        });
+        throw new errors_1.EndpointError({
+            message: "Failed to retrieve root from the pool",
+            code: constants_1.ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+        });
+    }
+    const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()];
     __1.logger.debug("addItemDefinition: executed adding for " + itemDefinition.getQualifiedPathName());
     // First we check the language and the region, based on the args
     // as we expect every request to contain this data and be
@@ -117,7 +132,7 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
         const parentModule = appData.root.registry[resolverArgs.args.parent_type].getParentModule().getQualifiedPathName();
         await basic_1.runPolicyCheck({
             policyTypes: ["parent"],
-            itemDefinition,
+            itemDefinition: itemDefinition,
             id: null,
             version: null,
             role: tokenData.role,
@@ -182,7 +197,7 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
             // we execute the trigger
             const newValueAccordingToModule = await moduleTrigger({
                 appData,
-                itemDefinition,
+                itemDefinition: itemDefinition,
                 module: mod,
                 from: null,
                 update: gqlValueToConvert,
@@ -200,7 +215,7 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
             // we call the trigger
             const newValueAccordingToIdef = await itemDefinitionTrigger({
                 appData,
-                itemDefinition,
+                itemDefinition: itemDefinition,
                 module: mod,
                 from: null,
                 update: gqlValueToConvert,
@@ -233,6 +248,7 @@ async function addItemDefinition(appData, resolverArgs, itemDefinition) {
         ...gqlValue,
     };
     __1.logger.debug("addItemDefinition: GQL output calculated", finalOutput);
+    appData.rootPool.release(pooledRoot);
     // items that have just been added cannot be blocked or deleted, hence we just return
     // right away without checking
     return finalOutput;

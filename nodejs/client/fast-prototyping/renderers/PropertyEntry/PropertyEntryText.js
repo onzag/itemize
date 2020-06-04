@@ -365,6 +365,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         this.fileInputRef = react_1.default.createRef();
         // basic functions
         this.onChange = this.onChange.bind(this);
+        this.beforeChange = this.beforeChange.bind(this);
         this.onChangeByTextarea = this.onChangeByTextarea.bind(this);
         this.addPasteEventOnEditor = this.addPasteEventOnEditor.bind(this);
         this.onFocus = this.onFocus.bind(this);
@@ -470,6 +471,17 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
             window[constants_1.LAST_RICH_TEXT_CHANGE_LENGTH] = actualLenght;
         }
         this.props.onChange(value, null);
+    }
+    beforeChange(value, delta, source, editor) {
+        if (source === "api") {
+            const customElem = document.createElement("div");
+            customElem.innerHTML = value;
+            const customElem2 = document.createElement("div");
+            const editorValue = this.props.currentValue || "";
+            customElem2.innerHTML = editorValue;
+            return !customElem.isEqualNode(customElem2);
+        }
+        return true;
     }
     /**
      * This image handler is not binded due to quill existing in the this namespace
@@ -635,7 +647,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
             react_1.default.createElement(core_1.Typography, null, this.props.lastLoadedFileError))) : null;
         const quill = this.state.isReadyToType ? (react_1.default.createElement(react_1.default.Fragment, null,
             react_1.default.createElement(RichTextEditorToolbar, { id: this.uuid, i18n: this.props.i18nFormat, supportsImages: this.props.supportsImages, supportsFiles: this.props.supportsFiles, supportsVideos: this.props.supportsVideos, supportsBasicMode: true, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }),
-            react_1.default.createElement(ReactQuill, { ref: this.quillRef, className: this.props.classes.quill + (this.state.focused ? " focused" : ""), modules: this.cachedModuleOptionsRich, formats: CACHED_FORMATS_RICH, theme: null, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onChange: this.onChange, onFocus: this.onFocus, onBlur: this.onBlur, disableClipboardMatchersOnUpdate: CACHED_CLIPBOARD_MATCHERS }))) : null;
+            react_1.default.createElement(ReactQuill, { ref: this.quillRef, className: this.props.classes.quill + (this.state.focused ? " focused" : ""), modules: this.cachedModuleOptionsRich, formats: CACHED_FORMATS_RICH, theme: null, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onChange: this.onChange, beforeChange: this.beforeChange, onFocus: this.onFocus, onBlur: this.onBlur, disableClipboardMatchersOnUpdate: CACHED_CLIPBOARD_MATCHERS }))) : null;
         // we return the component, note how we set the thing to focused
         // TODO disabled
         return (react_1.default.createElement("div", { className: this.props.classes.container },

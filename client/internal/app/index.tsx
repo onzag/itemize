@@ -6,13 +6,13 @@ import { Route } from "react-router-dom";
 import { history } from "../..";
 import { countries, currencies } from "../../../imported-resources";
 import { TokenProvider, IActualTokenProviderState } from "../providers/token-provider";
-import { LocationStateContext } from "../providers/location-context";
 import { RemoteListener } from "./remote-listener";
 import "../workers/service";
 import { runEditQueryFor } from "../gql-client-util";
 import CacheWorkerInstance from "../workers/cache";
 import { proxy } from "comlink";
 import { IConfigRawJSONDataType } from "../../../config";
+import equals from "deep-equal";
 
 // Just a message for whether is development
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -81,6 +81,50 @@ interface IAppState {
 // values for both is null
 export const LocaleContext = React.createContext<ILocaleContextType>(null);
 export const DataContext = React.createContext<IDataContextType>(null);
+
+interface ILocaleContextProviderProps {
+  value: ILocaleContextType;
+  children: React.ReactNode;
+}
+
+interface IDataContextProviderProps {
+  value: IDataContextType;
+  children: React.ReactNode;
+}
+
+export class DataContextProvider extends React.Component<IDataContextProviderProps> {
+  public shouldComponentUpdate(nextProps: IDataContextProviderProps) {
+    return nextProps.children !== this.props.children ||
+      nextProps.value.updateIsBlocked !== this.props.value.updateIsBlocked;
+    // root and remote listener are never really going to change, language
+    // changes should trigger by the locale context and not by this
+  }
+  public render() {
+    return (
+      <DataContext.Provider value={this.props.value}>
+        {this.props.children}
+      </DataContext.Provider>
+    );
+  }
+}
+
+export class LocaleContextProvider extends React.Component<ILocaleContextProviderProps> {
+  public shouldComponentUpdate(nextProps: ILocaleContextProviderProps) {
+    return nextProps.children !== this.props.children ||
+      nextProps.value.country !== this.props.value.country ||
+      nextProps.value.currency !== this.props.value.currency ||
+      nextProps.value.rtl !==this.props.value.rtl ||
+      nextProps.value.updating !== this.props.value.updating ||
+      !equals(nextProps.value.i18n, this.props.value.i18n);
+  }
+  public render() {
+    return (
+      <LocaleContext.Provider value={this.props.value}>
+        {this.props.children}
+      </LocaleContext.Provider>
+    );
+  }
+}
 
 // now we export the App
 export default class App extends React.Component<IAppProps, IAppState> {
@@ -418,22 +462,20 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // note how we include the devtools if we are in development mode
     // such a code is stripped if it's production
     return (
-      <LocaleContext.Provider value={localeContextValue}>
+      <LocaleContextProvider value={localeContextValue}>
         <TokenProvider localeContext={localeContextValue} onProviderStateSet={this.setTokenState}>
-          <LocationStateContext.Provider value={location}>
-            <div id="main" dir={rtl ? "rtl" : "ltr"}>
-              {
-                this.props.mainWrapper ?
-                this.props.mainWrapper(
-                  this.props.mainComponent,
-                  localeContextValue,
-                ) :
-                this.props.mainComponent
-              }
-            </div>
-          </LocationStateContext.Provider>
+          <div id="main" dir={rtl ? "rtl" : "ltr"}>
+            {
+              this.props.mainWrapper ?
+              this.props.mainWrapper(
+                this.props.mainComponent,
+                localeContextValue,
+              ) :
+              this.props.mainComponent
+            }
+          </div>
         </TokenProvider>
-      </LocaleContext.Provider>
+      </LocaleContextProvider>
     );
   }
 
@@ -450,12 +492,12 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // our data context, and then pass the react router route, note that the
     // router itself is the parent
     return (
-      <DataContext.Provider value={dataContextValue}>
+      <DataContextProvider value={dataContextValue}>
         <Route
           path="/:lang/"
           component={this.renderAppWithLocaleContext}
         />
-      </DataContext.Provider>
+      </DataContextProvider>
     );
   }
 }

@@ -22,6 +22,7 @@ import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME,
   CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   UNSPECIFIED_OWNER,
+  ENDPOINT_ERRORS,
 } from "../../../constants";
 import { buildSQLQueryForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { IGQLSearchRecord, IGQLSearchRecordsContainer, IGQLSearchResultsContainer } from "../../../gql-querier";
@@ -29,6 +30,8 @@ import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value"
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import graphqlFields from "graphql-fields";
 import { NanoSecondComposedDate } from "../../../nanodate";
+import Root from "../../../base/Root";
+import { EndpointError } from "../../../base/errors";
 
 function findLastRecordDateCheatMethod(records: IGQLSearchRecord[]): string {
   let maximumRecords: IGQLSearchRecord[] = null;
@@ -256,9 +259,27 @@ export function searchItemDefinitionTraditional(
 export async function searchItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
-  itemDefinition: ItemDefinition,
+  resolverItemDefinition: ItemDefinition,
   traditional?: boolean,
 ) {
+  let pooledRoot: Root;
+  try {
+    pooledRoot = await appData.rootPool.acquire().promise;
+  } catch (err) {
+    logger.error(
+      "addItemDefinition [SERIOUS]: Failed to retrieve root from the pool",
+      {
+        errMessage: err.message,
+        errStack: err.stack,
+      },
+    );
+    throw new EndpointError({
+      message: "Failed to retrieve root from the pool",
+      code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+    });
+  }
+  const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()] as ItemDefinition;
+
   logger.debug(
     "searchItemDefinition: executed search for " + itemDefinition.getQualifiedPathName(),
   );
@@ -451,6 +472,7 @@ export async function searchItemDefinition(
       "searchItemDefinition: succeed traditionally",
     );
 
+    appData.rootPool.release(pooledRoot);
     return finalResult;
   } else {
     const finalResult: IGQLSearchRecordsContainer = {
@@ -465,6 +487,7 @@ export async function searchItemDefinition(
       "searchItemDefinition: succeed with records",
     );
   
+    appData.rootPool.release(pooledRoot);
     return finalResult;
   }
 }

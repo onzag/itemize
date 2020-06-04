@@ -42,6 +42,8 @@ import { ssrGenerator } from "./ssr/generator";
 import { IRendererContext } from "../client/providers/renderer";
 import { ILocaleContextType } from "../client/internal/app";
 import { ICollectorType } from "../client";
+import { Pool } from "tarn";
+import { retrieveRootPool } from "./rootpool";
 
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -102,6 +104,7 @@ export interface ISSRConfig {
 
 export interface IAppDataType {
   root: Root;
+  rootPool: Pool<Root>,
   langLocales: ILangLocalesType;
   ssrConfig: ISSRConfig;
   indexDevelopment: string;
@@ -488,6 +491,7 @@ export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCus
         cache,
         null,
         null,
+        sensitiveConfig,
       );
       return;
     }
@@ -611,6 +615,7 @@ export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCus
       cache,
       knex,
       server,
+      sensitiveConfig,
     );
 
     if (sensitiveConfig.ipStackAccessKey) {
@@ -647,6 +652,7 @@ export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCus
     );
     const appData: IAppDataType = {
       root,
+      rootPool: retrieveRootPool(root.rawData),
       langLocales,
       ssrConfig,
       indexDevelopment: index.replace(/\$MODE/g, "development"),
