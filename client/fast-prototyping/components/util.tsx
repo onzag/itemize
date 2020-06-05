@@ -90,6 +90,7 @@ interface SlowLoadingElementProps {
   children: React.ReactNode;
   id: string;
   inline?: boolean;
+  onMount?: () => void;
 }
 
 interface SlowLoadingElementState {
@@ -139,7 +140,10 @@ export class SlowLoadingElement extends React.Component<SlowLoadingElementProps,
   public componentDidMount() {
     this.makeReady();
   }
-  public componentDidUpdate() {
+  public componentDidUpdate(prevProps: SlowLoadingElementProps, prevState: SlowLoadingElementState) {
+    if (this.state.isReady && !prevState.isReady && this.props.onMount) {
+      this.props.onMount();
+    }
     this.makeReady();
   }
   public componentWillUnmount() {

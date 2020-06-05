@@ -120,7 +120,7 @@ export default class CacheWorker {
      */
     getCachedValue(queryName: string, id: number, version: string, requestedFields?: IGQLRequestFields): Promise<ICacheMatchType>;
     addRecordsToCachedSearch(searchQueryName: string, createdByIfKnown: number, parentTypeIfKnown: string, parentIdIfKnown: number, parentVersionIfKnown: string, newRecords: IGQLSearchRecord[], newLastRecordDate: string, cachePolicy: "by-owner" | "by-parent"): Promise<boolean>;
-    runCachedSearch(searchQueryName: string, searchArgs: IGQLArgs, getListQueryName: string, getListTokenArgs: string, getListLangArgs: string, getListRequestedFields: IGQLRequestFields, cachePolicy: "by-owner" | "by-parent"): Promise<ICachedSearchResult>;
+    runCachedSearch(searchQueryName: string, searchArgs: IGQLArgs, getListQueryName: string, getListTokenArgs: string, getListLangArgs: string, getListRequestedFields: IGQLRequestFields, cachePolicy: "by-owner" | "by-parent", maxGetListResultsAtOnce: number): Promise<ICachedSearchResult>;
     proxyRoot(rootProxy: IRootRawJSONDataType): Promise<void>;
     setBlockedCallback(callback: (state: boolean) => void): Promise<void>;
 }

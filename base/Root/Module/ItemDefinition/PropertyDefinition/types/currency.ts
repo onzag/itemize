@@ -157,9 +157,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
     const currencyId = sqlPrefix + id + "_NORMALIZED_VALUE";
     const asConversionRule = sqlPrefix + id + "_CURRENCY_FACTORS";
     return {
-      columnToSetRaw: knex.raw("??", [normalizedValueId]),
+      columnToSet: normalizedValueId,
       setColumnToRaw: knex.raw("??*??.??", [valueId, asConversionRule, "factor"]),
-      fromListRaw: knex.raw("?? ??", [CURRENCY_FACTORS_IDENTIFIER, asConversionRule]),
+      from: CURRENCY_FACTORS_IDENTIFIER,
+      fromAs: asConversionRule,
       whereRaw: knex.raw("??.?? = ??", [asConversionRule, "name", currencyId]),
       updateConditionRaw: knex.raw("??*??.?? > 0.5", [valueId, asConversionRule, "factor"])
     }

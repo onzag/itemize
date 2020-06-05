@@ -471,11 +471,12 @@ async function runSearchQueryFor(arg, remoteListener, remoteListenerCallback) {
         if (arg.offset !== 0) {
             throw new Error("Cache policy is set yet the offset is not 0");
         }
-        const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
+        const standardCounterpart = arg.itemDefinition.getStandardCounterpart();
         const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
             standardCounterpart.getParentModule().getQualifiedPathName() :
             standardCounterpart.getQualifiedPathName());
-        const cacheWorkerGivenSearchValue = await cache_1.default.instance.runCachedSearch(queryName, searchArgs, constants_1.PREFIX_GET_LIST + standardCounterpartQualifiedName, arg.token, arg.language.split("-")[0], arg.fields, arg.cachePolicy);
+        const standardCounterpartModule = standardCounterpart.getParentModule();
+        const cacheWorkerGivenSearchValue = await cache_1.default.instance.runCachedSearch(queryName, searchArgs, constants_1.PREFIX_GET_LIST + standardCounterpartQualifiedName, arg.token, arg.language.split("-")[0], arg.fields, arg.cachePolicy, standardCounterpartModule.getMaxSearchResults());
         // note that this value doesn't contain the count, it contains
         // the limit and the offset but not the count that is because
         // the count is considered irrelevant for these cache values

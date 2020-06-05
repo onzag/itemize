@@ -28,6 +28,7 @@ interface SlowLoadingElementProps {
     children: React.ReactNode;
     id: string;
     inline?: boolean;
+    onMount?: () => void;
 }
 interface SlowLoadingElementState {
     isReady: boolean;
@@ -40,7 +41,7 @@ export declare class SlowLoadingElement extends React.Component<SlowLoadingEleme
     makeReady(): void;
     shouldComponentUpdate(nextProps: SlowLoadingElementProps, nextState: SlowLoadingElementState): boolean;
     componentDidMount(): void;
-    componentDidUpdate(): void;
+    componentDidUpdate(prevProps: SlowLoadingElementProps, prevState: SlowLoadingElementState): void;
     componentWillUnmount(): void;
     render(): {};
 }

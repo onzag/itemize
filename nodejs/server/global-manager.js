@@ -16,6 +16,7 @@ class GlobalManager {
         this.globalCache = globalCache;
         this.redisPub = redisPub;
         this.idefNeedsMantenience = [];
+        this.modNeedsMantenience = [];
         this.serverData = null;
         this.currencyLayer = currency_layer_1.setupCurrencyLayer(sensitiveConfig.currencyLayerAccessKey, this.globalCache, sensitiveConfig.currencyLayerHttpsEnabled);
         this.processIdef = this.processIdef.bind(this);
@@ -26,15 +27,34 @@ class GlobalManager {
     }
     processModule(mod) {
         mod.getAllModules().forEach(this.processModule);
+        const hasSqlManteniedProperties = mod.getAllPropExtensions().some((p) => p.getPropertyDefinitionDescription().sqlMantenience && p.isSearchable());
+        if (hasSqlManteniedProperties) {
+            _1.logger.info("GlobalManager.processModule: found module that needs mantenience " + mod.getQualifiedPathName());
+            this.modNeedsMantenience.push(mod);
+            const requestLimiters = mod.getRequestLimiters();
+            const sinceLimiter = requestLimiters && requestLimiters.since;
+            if (!requestLimiters || !sinceLimiter) {
+                _1.logger.info("GlobalManager.processModule: module has definitions that need mantenience but they hold no since request limiter " + mod.getQualifiedPathName());
+            }
+        }
         const childItemDefinitions = mod.getAllChildItemDefinitions();
         childItemDefinitions.forEach(this.processIdef);
     }
     processIdef(idef) {
         idef.getChildDefinitions().forEach(this.processIdef);
-        const properties = idef.getAllPropertyDefinitionsAndExtensions().filter((p) => p.getPropertyDefinitionDescription().sqlMantenience);
-        if (properties.length) {
+        const hasSqlManteniedProperties = idef.getAllPropertyDefinitions().some((p) => p.getPropertyDefinitionDescription().sqlMantenience && p.isSearchable());
+        const hasIncludeSQLManteniedProperties = idef.getAllIncludes().some((i) => {
+            return i.getSinkingProperties().some((sp) => sp.getPropertyDefinitionDescription().sqlMantenience && sp.isSearchable());
+        });
+        if (hasSqlManteniedProperties || hasIncludeSQLManteniedProperties) {
             _1.logger.info("GlobalManager.processIdef: found item definition that needs mantenience " + idef.getQualifiedPathName());
             this.idefNeedsMantenience.push(idef);
+            const mod = idef.getParentModule();
+            const requestLimiters = mod.getRequestLimiters();
+            const sinceLimiter = requestLimiters && requestLimiters.since;
+            if (!requestLimiters || !sinceLimiter) {
+                _1.logger.info("GlobalManager.processIdef: item definition need mantenience but module holds no since request limiter " + idef.getQualifiedPathName());
+            }
         }
     }
     async run() {
@@ -57,21 +77,109 @@ class GlobalManager {
         }
     }
     async runOnce() {
+        for (const mod of this.modNeedsMantenience) {
+            await this.runForModule(mod);
+        }
         for (const idef of this.idefNeedsMantenience) {
             await this.runForIdef(idef);
         }
     }
+    async runForModule(mod) {
+        const propertiesThatNeedMantenience = mod.getAllPropExtensions().filter((p) => p.getPropertyDefinitionDescription().sqlMantenience && p.isSearchable()).map((p) => ({
+            pdef: p,
+            prefix: "",
+        }));
+        const limiters = mod.getRequestLimiters();
+        const since = limiters && limiters.since;
+        await this.runFor(mod.getQualifiedPathName(), true, propertiesThatNeedMantenience, since);
+    }
     async runForIdef(idef) {
-        const propertiesThatNeedMantenience = idef.getAllPropertyDefinitionsAndExtensions().filter((p) => p.getPropertyDefinitionDescription().sqlMantenience);
-        const containsPropertiesInModule = propertiesThatNeedMantenience.some((p) => p.isExtension());
-        const containsPropertiesInIdef = propertiesThatNeedMantenience.some((p) => !p.isExtension());
-        const countResponse = await this.knex.count("MODULE_ID as COUNT").from(idef.getQualifiedPathName());
-        const finalCount = countResponse[0].COUNT;
-        // TODO IMPORTANT
+        const propertiesThatNeedMantenience = idef.getAllPropertyDefinitions().filter((p) => p.getPropertyDefinitionDescription().sqlMantenience && p.isSearchable()).map((p) => ({
+            pdef: p,
+            prefix: "",
+        }));
+        const includePropertiesThatNeedMantenience = idef.getAllIncludes().map((i) => {
+            return i.getSinkingProperties().filter((sp) => sp.getPropertyDefinitionDescription().sqlMantenience && sp.isSearchable()).map((sp) => ({
+                pdef: sp,
+                prefix: i.getPrefixedQualifiedIdentifier(),
+            }));
+        });
+        let totalPropertiesThatNeedMantenience = propertiesThatNeedMantenience;
+        includePropertiesThatNeedMantenience.forEach((includePropArray) => {
+            totalPropertiesThatNeedMantenience = totalPropertiesThatNeedMantenience.concat(includePropArray);
+        });
+        const mod = idef.getParentModule();
+        const limiters = mod.getRequestLimiters();
+        const since = limiters && limiters.since;
+        await this.runFor(idef.getQualifiedPathName(), false, totalPropertiesThatNeedMantenience, since);
+    }
+    async runFor(tableName, isModule, properties, since) {
+        const sinceLimiter = since ? new Date((new Date()).getTime() - since) : null;
+        const updateRules = {};
+        const fromRules = [];
+        const andWhereRules = [];
+        const orWhereRules = [];
+        properties.forEach((p) => {
+            const mantenienceRule = p.pdef.getPropertyDefinitionDescription().sqlMantenience(p.prefix, p.pdef.getId(), this.knex);
+            updateRules[mantenienceRule.columnToSet] = mantenienceRule.setColumnToRaw;
+            if (mantenienceRule.from) {
+                fromRules.push({
+                    from: mantenienceRule.from,
+                    as: mantenienceRule.fromAs,
+                });
+            }
+            if (mantenienceRule.whereRaw) {
+                andWhereRules.push(mantenienceRule.whereRaw);
+            }
+            if (mantenienceRule.updateConditionRaw) {
+                orWhereRules.push(mantenienceRule.updateConditionRaw);
+            }
+        });
+        const updateQuery = this.knex.update(updateRules).table(tableName);
+        if (fromRules.length) {
+            const bindings = [];
+            const structure = fromRules.map((rule) => {
+                bindings.push(rule.from);
+                if (rule.as) {
+                    bindings.push(rule.as);
+                    return "?? ??";
+                }
+                return "??";
+            });
+            const rawFrom = this.knex.raw(structure.join(","), bindings);
+            updateQuery.from(rawFrom);
+        }
+        if (andWhereRules.length) {
+            andWhereRules.forEach((wr) => {
+                updateQuery.andWhere(wr);
+            });
+        }
+        if (sinceLimiter) {
+            updateQuery.andWhere("created_at", ">=", sinceLimiter);
+        }
+        if (orWhereRules.length) {
+            updateQuery.andWhere((orBuilder) => {
+                orWhereRules.forEach((orRule) => {
+                    orBuilder.orWhere(orRule);
+                });
+            });
+        }
+        if (isModule) {
+            updateQuery.returning(["id", "version", "type"]);
+        }
+        else {
+            updateQuery.returning([constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME, constants_1.CONNECTOR_SQL_COLUMN_VERSION_FK_NAME]);
+        }
         // UPDATE TABLE "stuffs" SET "normalized_0"=c0."factor"*"value_0", "normalized_1"=c1."factor"*"value_1" FROM "currencyfactors" c0, "currencyfactors" c1 WHERE c0."name"="currency_0" AND c1."name"="currency_1" AND (c0."factor"*s."value_0" > 0.5 OR c1."factor"*"value_1" > 0.5) RETURNING *
-        // await this.knex.transaction((transactionKnex) => {
-        //   transactionKnex(idef.getQualifiedPathName()).update()
-        // });
+        // buggy typescript again
+        const updateResults = (await updateQuery);
+        updateResults.forEach((result) => {
+            const id = result[isModule ? "id" : constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME];
+            const version = result[isModule ? "version" : constants_1.CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] || null;
+            const idefName = isModule ? result["type"] : tableName;
+            const idef = this.root.registry[idefName];
+            this.informUpdatesFor(idef, id, version);
+        });
     }
     async calculateServerData() {
         try {

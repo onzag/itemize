@@ -3,14 +3,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const cache_worker_1 = require("./cache.worker");
 const constants_1 = require("../../../../constants");
 const nanodate_1 = require("../../../../nanodate");
+/**
+ * An instance version of the error that contains
+ * the raw object data of the error
+ */
+class DataCorruptionError extends Error {
+    constructor(message) {
+        super(message);
+        // Set the prototype explicitly.
+        Object.setPrototypeOf(this, DataCorruptionError.prototype);
+    }
+}
+exports.DataCorruptionError = DataCorruptionError;
 async function search(rootProxy, db, searchResults, searchArgs) {
     let newSearchResults = (await Promise.all(searchResults.map(async (result) => {
         try {
             const queryIdentifier = `${constants_1.PREFIX_GET}${result.type}.${result.id}.${result.version || ""}`;
             const value = await db.get(cache_worker_1.QUERIES_TABLE_NAME, queryIdentifier);
             if (!value) {
-                console.warn("Search function was executed with missing value for ", queryIdentifier);
-                return null;
+                // This means data corruption, we cancel everything, data is corrupted
+                throw new DataCorruptionError("Search function was executed with missing value for " + queryIdentifier);
             }
             else if (value.value === null) {
                 return null;
@@ -24,7 +36,11 @@ async function search(rootProxy, db, searchResults, searchArgs) {
             }
         }
         catch (err) {
-            console.warn(err);
+            console.error(err);
+            // pipe the data corruption error, we need to refetch we can fix this
+            if (err instanceof DataCorruptionError) {
+                throw err;
+            }
             return null;
         }
     }))).filter((r) => !!r);

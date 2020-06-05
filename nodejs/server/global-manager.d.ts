@@ -8,6 +8,7 @@ export declare class GlobalManager {
     private globalCache;
     private redisPub;
     private idefNeedsMantenience;
+    private modNeedsMantenience;
     private serverData;
     private serverDataLastUpdated;
     private currencyLayer;
@@ -16,7 +17,9 @@ export declare class GlobalManager {
     private processIdef;
     run(): Promise<void>;
     private runOnce;
+    private runForModule;
     private runForIdef;
+    private runFor;
     private calculateServerData;
     private informNewServerData;
     private informUpdatesFor;

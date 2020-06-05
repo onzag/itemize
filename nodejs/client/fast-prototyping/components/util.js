@@ -101,7 +101,10 @@ class SlowLoadingElement extends react_1.default.Component {
     componentDidMount() {
         this.makeReady();
     }
-    componentDidUpdate() {
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.isReady && !prevState.isReady && this.props.onMount) {
+            this.props.onMount();
+        }
         this.makeReady();
     }
     componentWillUnmount() {

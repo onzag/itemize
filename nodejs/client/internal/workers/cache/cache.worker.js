@@ -342,7 +342,7 @@ class CacheWorker {
         }
         return true;
     }
-    async runCachedSearch(searchQueryName, searchArgs, getListQueryName, getListTokenArgs, getListLangArgs, getListRequestedFields, cachePolicy) {
+    async runCachedSearch(searchQueryName, searchArgs, getListQueryName, getListTokenArgs, getListLangArgs, getListRequestedFields, cachePolicy, maxGetListResultsAtOnce) {
         await this.waitForSetupPromise;
         if (!this.db) {
             return null;
@@ -363,7 +363,6 @@ class CacheWorker {
         // cached searches with different fields, we need both to be merged
         // in order to know what we have retrieved, originally it's just what
         // we were asked for
-        let resultingGetListRequestedFields = getListRequestedFields;
         let lastRecordDate;
         let dataMightBeStale = false;
         let limitToSetInDb;
@@ -450,42 +449,36 @@ class CacheWorker {
                     dbValue.allResultsPreloaded) {
                     // now we can actually start using the args to run a local filtering
                     // function
-                    // TODO do something about corruption, if the data is corrupted
-                    // bad stuff happens when running the search as the warning
-                    // Search function was executed with missing value for triggers
-                    const records = await cache_worker_search_1.search(this.rootProxy, this.db, resultsToProcess, searchArgs);
-                    const gqlValue = {
-                        data: {
-                            [searchQueryName]: {
-                                records,
-                                last_record_date: lastRecordDate,
-                                // we return the true limit, because records might grow over the limit
-                                limit: (records.length < searchArgs.limit ? searchArgs.limit : records.length),
-                                offset: 0,
+                    try {
+                        const records = await cache_worker_search_1.search(this.rootProxy, this.db, resultsToProcess, searchArgs);
+                        const gqlValue = {
+                            data: {
+                                [searchQueryName]: {
+                                    records,
+                                    last_record_date: lastRecordDate,
+                                    // we return the true limit, because records might grow over the limit
+                                    limit: (records.length < searchArgs.limit ? searchArgs.limit : records.length),
+                                    offset: 0,
+                                },
                             },
-                        },
-                    };
-                    return {
-                        gqlValue,
-                        dataMightBeStale,
-                        lastRecordDate,
-                    };
+                        };
+                        return {
+                            gqlValue,
+                            dataMightBeStale,
+                            lastRecordDate,
+                        };
+                    }
+                    catch (err) {
+                        // It comes here if it finds data corruption during the search and it should
+                        // be handled accordingly by the refetcher
+                        // note how we are suppressing this one error
+                    }
                 }
-                // the result get list requested fields will actually end up being a merge as
-                // they are needed by both in such a case, but this is only guaranteed to be
-                // the case if in the previous scenario all the results were preloaded, otherwise
-                // it's the same as the query results, think about it, all the subloaded values are
-                // supposed to be guaranteed to contain these fields, but if some of them failed to
-                // load then it's no such guarantee, not a problem nevertheless, if the failed to load
-                // search request loads again, it will be able to reuse what it failed to load
-                // and actually cached
-                resultingGetListRequestedFields = dbValue.allResultsPreloaded ?
-                    gql_util_1.deepMerge(getListRequestedFields, dbValue.fields) :
-                    getListRequestedFields;
             }
         }
         catch (err) {
-            console.warn(err);
+            // yet some other errors might come here
+            console.error(err);
             // we return an unspecified error if we hit an error
             const gqlValue = {
                 data: null,
@@ -512,7 +505,7 @@ class CacheWorker {
         // false to preloaded because we haven't preloaded anything
         await this.db.put(exports.SEARCHES_TABLE_NAME, {
             value: resultsToProcess,
-            fields: resultingGetListRequestedFields,
+            fields: getListRequestedFields,
             allResultsPreloaded: false,
             lastRecordDate,
             limit: limitToSetInDb,
@@ -540,7 +533,7 @@ class CacheWorker {
         // for that we run a each event in all our uncached results
         uncachedResultsToProcess.forEach((uncachedResultToProcess) => {
             // and when we hit the limit, we build a new batch
-            if (batches[lastBatchIndex].length === constants_1.MAX_SEARCH_RESULTS_FALLBACK) {
+            if (batches[lastBatchIndex].length === maxGetListResultsAtOnce) {
                 batches.push([]);
                 lastBatchIndex++;
             }

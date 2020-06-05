@@ -603,6 +603,5 @@ export declare const PROTECTED_RESOURCES: string[];
 export declare const SERVER_DATA_IDENTIFIER = "SERVER_DATA";
 export declare const CURRENCY_FACTORS_IDENTIFIER = "CURRENCY_FACTORS";
 export declare const CACHED_CURRENCY_LAYER_RESPONSE = "CACHED_CURRENCY_LAYER_RESPONSE";
-export declare const WAIT_TIME_PER_BATCH = 300000;
 export declare const SERVER_DATA_MIN_UPDATE_TIME = 259200000;
 export declare const MAX_REMOTE_LISTENERS_PER_SOCKET = 500;

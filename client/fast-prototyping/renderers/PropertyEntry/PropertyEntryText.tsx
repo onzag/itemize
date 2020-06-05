@@ -533,6 +533,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
   // private quillRef: React.RefObject<ReactQuill>;
   private quillRef: React.RefObject<any>;
+  private textAreaRef: React.RefObject<HTMLTextAreaElement>;
 
   constructor(props: IPropertyEntryTextRendererWithStylesProps) {
     super(props);
@@ -550,6 +551,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     this.uuid =  "uuid-" + uuid.v4();
     this.inputImageRef = React.createRef();
     this.quillRef = React.createRef();
+    this.textAreaRef = React.createRef();
     this.fileInputRef = React.createRef();
 
     // basic functions
@@ -557,6 +559,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     this.beforeChange = this.beforeChange.bind(this);
     this.onChangeByTextarea = this.onChangeByTextarea.bind(this);
     this.addPasteEventOnEditor = this.addPasteEventOnEditor.bind(this);
+    this.focusIfNecessary = this.focusIfNecessary.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
     this.customImageHandler = this.customImageHandler.bind(this);
@@ -594,6 +597,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     // double pass for SSR
     this.setState({
       isReadyToType: true,
+    }, () => {
+      this.focusIfNecessary();
     });
   }
   public componentDidUpdate(prevProps: IPropertyEntryTextRendererWithStylesProps, prevState: IPropertyEntryTextRendererState) {
@@ -820,6 +825,15 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     } catch (err) {
     }
   }
+  public focusIfNecessary() {
+    if (this.props.autoFocus) {
+      if (this.quillRef.current) {
+        this.quillRef.current.focus();
+      } else if (this.textAreaRef.current) {
+        this.textAreaRef.current.focus();
+      }
+    }
+  }
   // basically get the state onto its parent of the focus and blur
   public onFocus() {
     this.setState({
@@ -951,12 +965,12 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           disableClipboardMatchersOnUpdate={CACHED_CLIPBOARD_MATCHERS}
+          readOnly={this.props.disabled}
         />
       </>
     ) : null;
 
     // we return the component, note how we set the thing to focused
-    // TODO disabled
     return (
       <div className={this.props.classes.container}>
         {
@@ -1001,14 +1015,16 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
                 <div
                   className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
                 >
-                  <SlowLoadingElement id="textarea">
+                  <SlowLoadingElement id="textarea" onMount={this.focusIfNecessary}>
                     <TextareaAutosize
+                      ref={this.textAreaRef as any}
                       className={this.props.classes.rawTextArea}
                       onChange={this.onChangeByTextarea}
                       placeholder={capitalize(this.props.placeholder)}
                       value={editorValue}
                       onFocus={this.onFocus}
                       onBlur={this.onBlur}
+                      disabled={this.props.disabled}
                     />
                   </SlowLoadingElement>
                 </div>

@@ -262,9 +262,10 @@ export interface IPropertyDefinitionSupportedType {
     id: string,
     knex: Knex,
   ) => {
-    columnToSetRaw: Knex.Raw,
+    columnToSet: string,
     setColumnToRaw: Knex.Raw,
-    fromListRaw: Knex.Raw,
+    from: string,
+    fromAs: string,
     whereRaw: Knex.Raw,
     updateConditionRaw: Knex.Raw,
   };

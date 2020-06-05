@@ -6,6 +6,21 @@ import Root from "../../../../base/Root";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import { NanoSecondComposedDate } from "../../../../nanodate";
 
+
+/**
+ * An instance version of the error that contains
+ * the raw object data of the error
+ */
+export class DataCorruptionError extends Error {
+  constructor(message: string) {
+    super(message);
+
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, DataCorruptionError.prototype);
+  }
+}
+
+
 export async function search(
   rootProxy: Root,
   db: IDBPDatabase<ICacheDB>,
@@ -18,8 +33,8 @@ export async function search(
         const queryIdentifier = `${PREFIX_GET}${result.type}.${result.id}.${result.version || ""}`;
         const value = await db.get(QUERIES_TABLE_NAME, queryIdentifier);
         if (!value) {
-          console.warn("Search function was executed with missing value for ", queryIdentifier);
-          return null;
+          // This means data corruption, we cancel everything, data is corrupted
+          throw new DataCorruptionError("Search function was executed with missing value for " + queryIdentifier);
         } else if (value.value === null) {
           return null;
         } else {
@@ -30,7 +45,11 @@ export async function search(
           return checkedValue;
         }
       } catch (err) {
-        console.warn(err);
+        console.error(err);
+        // pipe the data corruption error, we need to refetch we can fix this
+        if (err instanceof DataCorruptionError) {
+          throw err;
+        }
         return null;
       }
     }),

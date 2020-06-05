@@ -362,12 +362,14 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         this.uuid = "uuid-" + uuid_1.default.v4();
         this.inputImageRef = react_1.default.createRef();
         this.quillRef = react_1.default.createRef();
+        this.textAreaRef = react_1.default.createRef();
         this.fileInputRef = react_1.default.createRef();
         // basic functions
         this.onChange = this.onChange.bind(this);
         this.beforeChange = this.beforeChange.bind(this);
         this.onChangeByTextarea = this.onChangeByTextarea.bind(this);
         this.addPasteEventOnEditor = this.addPasteEventOnEditor.bind(this);
+        this.focusIfNecessary = this.focusIfNecessary.bind(this);
         this.onFocus = this.onFocus.bind(this);
         this.onBlur = this.onBlur.bind(this);
         this.customImageHandler = this.customImageHandler.bind(this);
@@ -404,6 +406,8 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         // double pass for SSR
         this.setState({
             isReadyToType: true,
+        }, () => {
+            this.focusIfNecessary();
         });
     }
     componentDidUpdate(prevProps, prevState) {
@@ -608,6 +612,16 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         catch (err) {
         }
     }
+    focusIfNecessary() {
+        if (this.props.autoFocus) {
+            if (this.quillRef.current) {
+                this.quillRef.current.focus();
+            }
+            else if (this.textAreaRef.current) {
+                this.textAreaRef.current.focus();
+            }
+        }
+    }
     // basically get the state onto its parent of the focus and blur
     onFocus() {
         this.setState({
@@ -647,9 +661,8 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
             react_1.default.createElement(core_1.Typography, null, this.props.lastLoadedFileError))) : null;
         const quill = this.state.isReadyToType ? (react_1.default.createElement(react_1.default.Fragment, null,
             react_1.default.createElement(RichTextEditorToolbar, { id: this.uuid, i18n: this.props.i18nFormat, supportsImages: this.props.supportsImages, supportsFiles: this.props.supportsFiles, supportsVideos: this.props.supportsVideos, supportsBasicMode: true, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }),
-            react_1.default.createElement(ReactQuill, { ref: this.quillRef, className: this.props.classes.quill + (this.state.focused ? " focused" : ""), modules: this.cachedModuleOptionsRich, formats: CACHED_FORMATS_RICH, theme: null, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onChange: this.onChange, beforeChange: this.beforeChange, onFocus: this.onFocus, onBlur: this.onBlur, disableClipboardMatchersOnUpdate: CACHED_CLIPBOARD_MATCHERS }))) : null;
+            react_1.default.createElement(ReactQuill, { ref: this.quillRef, className: this.props.classes.quill + (this.state.focused ? " focused" : ""), modules: this.cachedModuleOptionsRich, formats: CACHED_FORMATS_RICH, theme: null, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onChange: this.onChange, beforeChange: this.beforeChange, onFocus: this.onFocus, onBlur: this.onBlur, disableClipboardMatchersOnUpdate: CACHED_CLIPBOARD_MATCHERS, readOnly: this.props.disabled }))) : null;
         // we return the component, note how we set the thing to focused
-        // TODO disabled
         return (react_1.default.createElement("div", { className: this.props.classes.container },
             this.props.description && descriptionAsAlert ?
                 react_1.default.createElement(lab_1.Alert, { severity: "info", className: this.props.classes.description }, this.props.description) :
@@ -668,8 +681,8 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
                 this.props.isRichText && !this.state.rawMode ? quill : (react_1.default.createElement(react_1.default.Fragment, null,
                     this.props.isRichText && this.props.args.supportsRawMode ? react_1.default.createElement(RichTextEditorToolbar, { id: this.uuid + "-raw-mode-only", i18n: this.props.i18nFormat, supportsImages: false, supportsFiles: false, supportsVideos: false, supportsBasicMode: false, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }) : null,
                     react_1.default.createElement("div", { className: this.props.classes.quill + (this.state.focused ? " focused" : "") },
-                        react_1.default.createElement(util_2.SlowLoadingElement, { id: "textarea" },
-                            react_1.default.createElement(react_textarea_autosize_1.default, { className: this.props.classes.rawTextArea, onChange: this.onChangeByTextarea, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onFocus: this.onFocus, onBlur: this.onBlur })))))),
+                        react_1.default.createElement(util_2.SlowLoadingElement, { id: "textarea", onMount: this.focusIfNecessary },
+                            react_1.default.createElement(react_textarea_autosize_1.default, { ref: this.textAreaRef, className: this.props.classes.rawTextArea, onChange: this.onChangeByTextarea, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onFocus: this.onFocus, onBlur: this.onBlur, disabled: this.props.disabled })))))),
             react_1.default.createElement("div", { className: this.props.classes.errorMessage }, this.props.currentInvalidReason),
             imageInput,
             fileInput,
