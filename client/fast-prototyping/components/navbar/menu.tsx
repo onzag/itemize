@@ -52,7 +52,7 @@ export const Menu = withStyles(menuStyles)((props: MenuPropsWithStyles) => {
                   return (
                     <>
                       <List>
-                        <Link to="/cms" className={props.classes.listLink}>
+                        <Link to="/cms" className={props.classes.listLink} propagateClicks={true}>
                           <LocationReader>
                             {(arg) => (
                               <ListItem button={true} selected={arg.pathname === "/cms"}>
@@ -77,10 +77,10 @@ export const Menu = withStyles(menuStyles)((props: MenuPropsWithStyles) => {
             </UserDataRetriever>
           </div>
           <List>
-            <Link to="/news" className={props.classes.listLink}>
+            <Link to="/news" className={props.classes.listLink} propagateClicks={true}>
               <LocationReader>
                 {(arg) => (
-                  <ListItem button={true} selected={arg.pathname === "/cms"}>
+                  <ListItem button={true} selected={arg.pathname === "/news"}>
                     <ListItemIcon>
                       <LibraryBooksIcon />
                     </ListItemIcon>

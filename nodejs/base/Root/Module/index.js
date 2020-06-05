@@ -152,6 +152,13 @@ class Module {
         }
         return finalDefinition;
     }
+    cleanState() {
+        this.childPropExtensionItemDefinition.cleanState();
+        this.searchModeModule && this.searchModeModule.cleanState();
+        this.propExtensions && this.propExtensions.forEach((pe) => pe.cleanState());
+        this.childModules && this.childModules.forEach((cm) => cm.cleanState());
+        this.childItemDefinitions && this.childItemDefinitions.forEach((cidef) => cidef.cleanState());
+    }
     /**
      * Runs the initialization of the module, for cross access, this executes
      * once the entire tree is ready so this module other parts of the tree

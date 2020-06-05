@@ -30,7 +30,7 @@ exports.Menu = core_1.withStyles(menuStyles)((props) => {
                 if (userData.role === "ADMIN") {
                     return (react_1.default.createElement(react_1.default.Fragment, null,
                         react_1.default.createElement(core_1.List, null,
-                            react_1.default.createElement(Link_1.default, { to: "/cms", className: props.classes.listLink },
+                            react_1.default.createElement(Link_1.default, { to: "/cms", className: props.classes.listLink, propagateClicks: true },
                                 react_1.default.createElement(LocationReader_1.default, null, (arg) => (react_1.default.createElement(core_1.ListItem, { button: true, selected: arg.pathname === "/cms" },
                                     react_1.default.createElement(core_1.ListItemIcon, null,
                                         react_1.default.createElement(ImportantDevices_1.default, null)),
@@ -41,8 +41,8 @@ exports.Menu = core_1.withStyles(menuStyles)((props) => {
                 }
             })),
         react_1.default.createElement(core_1.List, null,
-            react_1.default.createElement(Link_1.default, { to: "/news", className: props.classes.listLink },
-                react_1.default.createElement(LocationReader_1.default, null, (arg) => (react_1.default.createElement(core_1.ListItem, { button: true, selected: arg.pathname === "/cms" },
+            react_1.default.createElement(Link_1.default, { to: "/news", className: props.classes.listLink, propagateClicks: true },
+                react_1.default.createElement(LocationReader_1.default, null, (arg) => (react_1.default.createElement(core_1.ListItem, { button: true, selected: arg.pathname === "/news" },
                     react_1.default.createElement(core_1.ListItemIcon, null,
                         react_1.default.createElement(LibraryBooks_1.default, null)),
                     react_1.default.createElement(core_1.ListItemText, null,

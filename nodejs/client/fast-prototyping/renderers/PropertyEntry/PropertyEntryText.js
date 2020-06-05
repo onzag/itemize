@@ -512,7 +512,8 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         let isValid = false;
         try {
             const url = new URL(e.target.value);
-            isValid = url.hostname === "youtube.com" || url.hostname === "player.vimeo.com" || url.hostname === "youtu.be";
+            isValid = url.hostname === "youtube.com" || url.hostname === "www.youtube.com" ||
+                url.hostname === "player.vimeo.com" || url.hostname === "youtu.be";
         }
         catch {
         }

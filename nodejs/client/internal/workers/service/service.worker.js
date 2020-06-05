@@ -39,6 +39,8 @@ self.addEventListener("fetch", (event) => {
     const isInAtotallyUncachedPath = isOurHost &&
         (urlAnalyzed.pathname.indexOf("/graphql") === 0 ||
             urlAnalyzed.pathname.indexOf("/sw") === 0 ||
+            urlAnalyzed.pathname.indexOf("/robots.txt") === 0 ||
+            urlAnalyzed.pathname.indexOf("/favicon") === 0 ||
             urlAnalyzed.pathname.indexOf("/socket.io") === 0);
     // returning false in such case
     if (isInAtotallyUncachedPath) {

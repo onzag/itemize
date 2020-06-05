@@ -7,7 +7,9 @@ const react_1 = __importDefault(require("react"));
 const react_router_dom_1 = require("react-router-dom");
 // TODO add analytics
 function linkOnClick(props, e) {
-    e.stopPropagation();
+    if (!props.propagateClicks) {
+        e.stopPropagation();
+    }
     if (props.to === location.pathname + location.search) {
         e.preventDefault();
     }
@@ -46,10 +48,11 @@ function Link(props) {
         ...props,
         to: urlTo,
     };
+    delete newProps["propagateClicks"];
     if (props.as) {
         delete newProps["as"];
         newProps.component = customComponents[props.as];
     }
-    return react_1.default.createElement(react_router_dom_1.Link, Object.assign({}, newProps, { onClick: linkOnClick.bind(null, newProps) }));
+    return react_1.default.createElement(react_router_dom_1.Link, Object.assign({}, newProps, { onClick: linkOnClick.bind(null, props) }));
 }
 exports.default = Link;

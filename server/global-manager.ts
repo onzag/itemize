@@ -61,10 +61,10 @@ export class GlobalManager {
       this.modNeedsMantenience.push(mod);
 
       const requestLimiters = mod.getRequestLimiters();
-      const sinceLimiter = requestLimiters && requestLimiters.since;
+      const sinceLimiter = requestLimiters && requestLimiters.condition === "AND" && requestLimiters.since;
       if (!requestLimiters || !sinceLimiter) {
         logger.info(
-          "GlobalManager.processModule: module has definitions that need mantenience but they hold no since request limiter " + mod.getQualifiedPathName(),
+          "GlobalManager.processModule: module has definitions that need mantenience but they hold no AND since request limiter " + mod.getQualifiedPathName(),
         );
       }
     }
@@ -90,10 +90,10 @@ export class GlobalManager {
 
       const mod = idef.getParentModule();
       const requestLimiters = mod.getRequestLimiters();
-      const sinceLimiter = requestLimiters && requestLimiters.since;
+      const sinceLimiter = requestLimiters && requestLimiters.condition === "AND" && requestLimiters.since;
       if (!requestLimiters || !sinceLimiter) {
         logger.info(
-          "GlobalManager.processIdef: item definition need mantenience but module holds no since request limiter " + idef.getQualifiedPathName(),
+          "GlobalManager.processIdef: item definition need mantenience but module holds no AND since request limiter " + idef.getQualifiedPathName(),
         );
       }
     }
@@ -136,7 +136,7 @@ export class GlobalManager {
         prefix: "",
       }));
     const limiters = mod.getRequestLimiters();
-    const since = limiters && limiters.since;
+    const since = limiters && limiters.condition === "AND" ? limiters.since : null;
     await this.runFor(mod.getQualifiedPathName(), true, propertiesThatNeedMantenience, since);
   }
   private async runForIdef(idef: ItemDefinition) {
@@ -159,7 +159,7 @@ export class GlobalManager {
     });
     const mod = idef.getParentModule();
     const limiters = mod.getRequestLimiters();
-    const since = limiters && limiters.since;
+    const since = limiters && limiters.condition === "AND" ? limiters.since : null;
     await this.runFor(idef.getQualifiedPathName(), false, totalPropertiesThatNeedMantenience, since);
   }
   private async runFor(tableName: string, isModule: boolean, properties: Array<{pdef: PropertyDefinition, prefix: string}>, since: number) {

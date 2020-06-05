@@ -190,6 +190,7 @@ export default class Include {
      * would be the vehicle item definition
      */
     constructor(rawJSON: IIncludeRawJSONDataType, parentModule: Module, parentItemDefinition: ItemDefinition);
+    cleanState(init?: boolean): void;
     /**
      * Provides the ids of the sinking properties
      * @returns an array of the sinking properties ids

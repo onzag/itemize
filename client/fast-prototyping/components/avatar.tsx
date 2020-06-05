@@ -177,7 +177,7 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
     eValidated?: IPropertyDefinitionState,
     address?: IPropertyDefinitionState,
   ) => {
-    const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : null;
+    const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : "";
 
     const hasWarningForMissingEmail = !(email && email.stateAppliedValue);
     const hasWarningForNotValidEmail = !(eValidated && eValidated.stateAppliedValue);

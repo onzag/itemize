@@ -187,6 +187,7 @@ export async function ssrGenerator(
     MEMOIZED_ANSWERS[appliedRule.memId].collectionSignature === collectionSignature
   ) {
     res.end(MEMOIZED_ANSWERS[appliedRule.memId].html);
+    root.cleanState();
     appData.rootPool.release(root);
     return;
   }
@@ -205,7 +206,7 @@ export async function ssrGenerator(
 
   let newHTML = html;
   newHTML = newHTML.replace(/\$SSRLANG/g, appliedRule.language || "");
-  newHTML = newHTML.replace(/\$SSRMANIFESTSRC/g, appliedRule.language ? `/rest/resources/manifest.${appliedRule.language}.json` : "");
+  newHTML = newHTML.replace(/\$SSRMANIFESTSRC/g, appliedRule.language ? `/rest/resource/manifest.${appliedRule.language}.json` : "");
   newHTML = newHTML.replace(/\$SSRDIR/g, appliedRule.rtl ? "rtl" : "ltr");
   newHTML = newHTML.replace(/\$SSRTITLE/g, finalTitle || "");
   newHTML = newHTML.replace(/\$SSRDESCR/g, finalDescription || "");
@@ -272,6 +273,7 @@ export async function ssrGenerator(
       newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
       newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
       res.end(newHTML);
+      root.cleanState();
       appData.rootPool.release(root);
       return;
     }
@@ -298,5 +300,6 @@ export async function ssrGenerator(
     };
   }
   res.end(newHTML);
+  root.cleanState();
   appData.rootPool.release(root);
 }

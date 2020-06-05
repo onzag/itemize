@@ -52,6 +52,8 @@ self.addEventListener("fetch", (event: any) => {
     (
       urlAnalyzed.pathname.indexOf("/graphql") === 0 ||
       urlAnalyzed.pathname.indexOf("/sw") === 0 ||
+      urlAnalyzed.pathname.indexOf("/robots.txt") === 0 ||
+      urlAnalyzed.pathname.indexOf("/favicon") === 0 ||
       urlAnalyzed.pathname.indexOf("/socket.io") === 0
     );
 

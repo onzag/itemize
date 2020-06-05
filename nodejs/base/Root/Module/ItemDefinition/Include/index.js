@@ -74,6 +74,24 @@ class Include {
         // the predefined properties list
         this.predefinedProperties = rawJSON.predefinedProperties &&
             new PropertiesValueMappingDefiniton_1.default(rawJSON.predefinedProperties, parentItemDefinition, this.itemDefinition);
+        // If this is going to be excluded
+        this.excludedIf = rawJSON.excludedIf &&
+            new ConditionalRuleSet_1.default(rawJSON.excludedIf, parentModule, parentItemDefinition, null, this);
+        // If it might be excluded
+        this.canUserExcludeIf = rawJSON.canUserExcludeIf &&
+            new ConditionalRuleSet_1.default(rawJSON.canUserExcludeIf, parentModule, parentItemDefinition, null, this);
+        // if it's default excluded
+        this.defaultExcludedIf = rawJSON.defaultExcludedIf &&
+            new ConditionalRuleSet_1.default(rawJSON.defaultExcludedIf, parentModule, parentItemDefinition, null, this);
+        // parent item definition
+        this.parentItemDefinition = parentItemDefinition;
+        this.parentModule = parentModule;
+        this.cleanState(true);
+    }
+    cleanState(init) {
+        if (!init) {
+            this.itemDefinition.cleanState();
+        }
         // set the enforced and predefined properties overwrites
         // if needed to
         if (this.enforcedProperties) {
@@ -88,18 +106,6 @@ class Include {
                     .setGlobalSuperDefault(p.value);
             });
         }
-        // If this is going to be excluded
-        this.excludedIf = rawJSON.excludedIf &&
-            new ConditionalRuleSet_1.default(rawJSON.excludedIf, parentModule, parentItemDefinition, null, this);
-        // If it might be excluded
-        this.canUserExcludeIf = rawJSON.canUserExcludeIf &&
-            new ConditionalRuleSet_1.default(rawJSON.canUserExcludeIf, parentModule, parentItemDefinition, null, this);
-        // if it's default excluded
-        this.defaultExcludedIf = rawJSON.defaultExcludedIf &&
-            new ConditionalRuleSet_1.default(rawJSON.defaultExcludedIf, parentModule, parentItemDefinition, null, this);
-        // parent item definition
-        this.parentItemDefinition = parentItemDefinition;
-        this.parentModule = parentModule;
         // State management
         this.stateExclusion = {};
         // initially the state hasn't been modified

@@ -84,8 +84,7 @@ class ItemDefinition {
         // and instantiating those
         this.includeInstances = rawJSON.includes ? rawJSON.includes
             .map((i) => (new Include_1.default(i, parentModule, this))) : [];
-        this.stateHasAppliedValueTo = {};
-        this.stateGQLAppliedValue = {};
+        this.cleanState(true);
         this.listeners = {};
         this.parentModule.getParentRoot().registry[this.getQualifiedPathName()] = this;
     }
@@ -146,6 +145,15 @@ class ItemDefinition {
         }
         // We return the definition or null on its defect
         return definition || null;
+    }
+    cleanState(init) {
+        this.stateHasAppliedValueTo = {};
+        this.stateGQLAppliedValue = {};
+        if (!init) {
+            this.propertyDefinitions && this.propertyDefinitions.forEach((p) => p.cleanState());
+            this.childDefinitions && this.childDefinitions.forEach((cd) => cd.cleanState());
+            this.includeInstances && this.includeInstances.forEach((ii) => ii.cleanState());
+        }
     }
     /**
      * Runs the initialization of the item definition, for cross access, this executes

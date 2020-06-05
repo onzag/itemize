@@ -146,16 +146,7 @@ class PropertyDefinition {
             rawJSON.defaultIf) {
             this.canCacheState = false;
         }
-        // initial value for all namespaces is null
-        this.stateValue = {};
-        this.stateAppliedValue = {};
-        this.stateValueModified = {};
-        this.stateValueHasBeenManuallySet = {};
-        this.stateInternalValue = {};
-        this.stateLastUniqueCheck = {};
-        this.stateSuperEnforcedValue = {};
-        this.stateLastCached = {};
-        this.stateLastCachedWithExternal = {};
+        this.cleanState();
     }
     /**
      * A static method that provides the policy prefix for a given policy name and type
@@ -360,6 +351,18 @@ class PropertyDefinition {
         }
         // return no error
         return null;
+    }
+    cleanState() {
+        // initial value for all namespaces is null
+        this.stateValue = {};
+        this.stateAppliedValue = {};
+        this.stateValueModified = {};
+        this.stateValueHasBeenManuallySet = {};
+        this.stateInternalValue = {};
+        this.stateLastUniqueCheck = {};
+        this.stateSuperEnforcedValue = {};
+        this.stateLastCached = {};
+        this.stateLastCachedWithExternal = {};
     }
     /**
      * Provides the current enforced value (if any)

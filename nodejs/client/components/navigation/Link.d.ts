@@ -3,6 +3,7 @@ import { LinkProps } from "react-router-dom";
 interface ICustomLinkProps extends LinkProps {
     to: string;
     as?: "div" | "span" | "a" | "p";
+    propagateClicks?: boolean;
 }
 /**
  * Same as the router link but actually takes

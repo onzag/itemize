@@ -102,6 +102,16 @@ export interface ISSRConfig {
   collector?: ICollectorType;
 }
 
+export interface ISEORobotsConfig {
+  [userAgent: string]: string[]
+}
+
+export interface ISEOConfig {
+  robots: {
+
+  }
+}
+
 export interface IAppDataType {
   root: Root;
   rootPool: Pool<Root>,

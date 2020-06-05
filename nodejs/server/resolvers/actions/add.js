@@ -248,6 +248,7 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
         ...gqlValue,
     };
     __1.logger.debug("addItemDefinition: GQL output calculated", finalOutput);
+    pooledRoot.cleanState();
     appData.rootPool.release(pooledRoot);
     // items that have just been added cannot be blocked or deleted, hence we just return
     // right away without checking

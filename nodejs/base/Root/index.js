@@ -67,6 +67,9 @@ class Root {
         }
         return finalModule;
     }
+    cleanState() {
+        this.childModules && this.childModules.forEach((cm) => cm.cleanState());
+    }
     /**
      * list all module names it contains
      * @returns an array of string with the module names

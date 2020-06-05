@@ -318,6 +318,7 @@ export async function editItemDefinition(
     finalOutput,
   );
 
+  pooledRoot.cleanState();
   appData.rootPool.release(pooledRoot);
 
   return finalOutput;

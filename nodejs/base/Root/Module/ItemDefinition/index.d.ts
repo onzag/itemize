@@ -399,6 +399,7 @@ export default class ItemDefinition {
      * @param originatingInstance an originating instance (for instantiated detached instances)
      */
     constructor(rawJSON: IItemDefinitionRawJSONDataType, parentModule: Module, parentItemDefinition: ItemDefinition, originatingInstance?: ItemDefinition);
+    cleanState(init?: boolean): void;
     /**
      * Runs the initialization of the item definition, for cross access, this executes
      * once the entire tree is ready so this item definition can access other parts of the tree

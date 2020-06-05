@@ -146,6 +146,7 @@ async function ssrGenerator(req, res, html, appData, rule) {
         MEMOIZED_ANSWERS[appliedRule.memId] &&
         MEMOIZED_ANSWERS[appliedRule.memId].collectionSignature === collectionSignature) {
         res.end(MEMOIZED_ANSWERS[appliedRule.memId].html);
+        root.cleanState();
         appData.rootPool.release(root);
         return;
     }
@@ -162,7 +163,7 @@ async function ssrGenerator(req, res, html, appData, rule) {
     const finalDescription = typeof appliedRule.description === "string" ? appliedRule.description : appliedRule.description(queries, config);
     let newHTML = html;
     newHTML = newHTML.replace(/\$SSRLANG/g, appliedRule.language || "");
-    newHTML = newHTML.replace(/\$SSRMANIFESTSRC/g, appliedRule.language ? `/rest/resources/manifest.${appliedRule.language}.json` : "");
+    newHTML = newHTML.replace(/\$SSRMANIFESTSRC/g, appliedRule.language ? `/rest/resource/manifest.${appliedRule.language}.json` : "");
     newHTML = newHTML.replace(/\$SSRDIR/g, appliedRule.rtl ? "rtl" : "ltr");
     newHTML = newHTML.replace(/\$SSRTITLE/g, finalTitle || "");
     newHTML = newHTML.replace(/\$SSRDESCR/g, finalDescription || "");
@@ -217,6 +218,7 @@ async function ssrGenerator(req, res, html, appData, rule) {
             newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
             newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
             res.end(newHTML);
+            root.cleanState();
             appData.rootPool.release(root);
             return;
         }
@@ -235,6 +237,7 @@ async function ssrGenerator(req, res, html, appData, rule) {
         };
     }
     res.end(newHTML);
+    root.cleanState();
     appData.rootPool.release(root);
 }
 exports.ssrGenerator = ssrGenerator;

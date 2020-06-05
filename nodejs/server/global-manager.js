@@ -32,9 +32,9 @@ class GlobalManager {
             _1.logger.info("GlobalManager.processModule: found module that needs mantenience " + mod.getQualifiedPathName());
             this.modNeedsMantenience.push(mod);
             const requestLimiters = mod.getRequestLimiters();
-            const sinceLimiter = requestLimiters && requestLimiters.since;
+            const sinceLimiter = requestLimiters && requestLimiters.condition === "AND" && requestLimiters.since;
             if (!requestLimiters || !sinceLimiter) {
-                _1.logger.info("GlobalManager.processModule: module has definitions that need mantenience but they hold no since request limiter " + mod.getQualifiedPathName());
+                _1.logger.info("GlobalManager.processModule: module has definitions that need mantenience but they hold no AND since request limiter " + mod.getQualifiedPathName());
             }
         }
         const childItemDefinitions = mod.getAllChildItemDefinitions();
@@ -51,9 +51,9 @@ class GlobalManager {
             this.idefNeedsMantenience.push(idef);
             const mod = idef.getParentModule();
             const requestLimiters = mod.getRequestLimiters();
-            const sinceLimiter = requestLimiters && requestLimiters.since;
+            const sinceLimiter = requestLimiters && requestLimiters.condition === "AND" && requestLimiters.since;
             if (!requestLimiters || !sinceLimiter) {
-                _1.logger.info("GlobalManager.processIdef: item definition need mantenience but module holds no since request limiter " + idef.getQualifiedPathName());
+                _1.logger.info("GlobalManager.processIdef: item definition need mantenience but module holds no AND since request limiter " + idef.getQualifiedPathName());
             }
         }
     }
@@ -90,7 +90,7 @@ class GlobalManager {
             prefix: "",
         }));
         const limiters = mod.getRequestLimiters();
-        const since = limiters && limiters.since;
+        const since = limiters && limiters.condition === "AND" ? limiters.since : null;
         await this.runFor(mod.getQualifiedPathName(), true, propertiesThatNeedMantenience, since);
     }
     async runForIdef(idef) {
@@ -110,7 +110,7 @@ class GlobalManager {
         });
         const mod = idef.getParentModule();
         const limiters = mod.getRequestLimiters();
-        const since = limiters && limiters.since;
+        const since = limiters && limiters.condition === "AND" ? limiters.since : null;
         await this.runFor(idef.getQualifiedPathName(), false, totalPropertiesThatNeedMantenience, since);
     }
     async runFor(tableName, isModule, properties, since) {

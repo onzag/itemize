@@ -567,12 +567,22 @@ export default class ItemDefinition {
     this.includeInstances = rawJSON.includes ? rawJSON.includes
       .map((i) => (new Include(i, parentModule, this))) : [];
 
-    this.stateHasAppliedValueTo = {};
-    this.stateGQLAppliedValue = {};
+    this.cleanState(true);
 
     this.listeners = {};
 
     this.parentModule.getParentRoot().registry[this.getQualifiedPathName()] = this;
+  }
+
+  public cleanState(init?: boolean) {
+    this.stateHasAppliedValueTo = {};
+    this.stateGQLAppliedValue = {};
+
+    if (!init) {
+      this.propertyDefinitions && this.propertyDefinitions.forEach((p) => p.cleanState());
+      this.childDefinitions && this.childDefinitions.forEach((cd) => cd.cleanState());
+      this.includeInstances && this.includeInstances.forEach((ii) => ii.cleanState());
+    }
   }
 
   /**

@@ -195,6 +195,7 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
     };
     __1.logger.debug("editItemDefinition: GQL ouput retrieved");
     __1.logger.silly("editItemDefinition: value is", finalOutput);
+    pooledRoot.cleanState();
     appData.rootPool.release(pooledRoot);
     return finalOutput;
 }

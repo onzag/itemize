@@ -472,6 +472,7 @@ export async function searchItemDefinition(
       "searchItemDefinition: succeed traditionally",
     );
 
+    pooledRoot.cleanState();
     appData.rootPool.release(pooledRoot);
     return finalResult;
   } else {
@@ -487,6 +488,7 @@ export async function searchItemDefinition(
       "searchItemDefinition: succeed with records",
     );
   
+    pooledRoot.cleanState();
     appData.rootPool.release(pooledRoot);
     return finalResult;
   }

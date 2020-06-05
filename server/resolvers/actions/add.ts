@@ -379,6 +379,7 @@ export async function addItemDefinition(
     finalOutput,
   );
 
+  pooledRoot.cleanState();
   appData.rootPool.release(pooledRoot);
 
   // items that have just been added cannot be blocked or deleted, hence we just return

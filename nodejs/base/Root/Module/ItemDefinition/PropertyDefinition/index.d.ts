@@ -432,6 +432,7 @@ export default class PropertyDefinition {
      * @param parentItemDefinition the parent item definition
      */
     constructor(rawJSON: IPropertyDefinitionRawJSONDataType, parentModule: Module, parentItemDefinition: ItemDefinition, isExtension: boolean, originatingInstance?: PropertyDefinition);
+    cleanState(): void;
     /**
      * Provides the current enforced value (if any)
      * to a given slot id

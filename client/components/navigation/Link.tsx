@@ -7,12 +7,15 @@ import {
 
 interface ICustomLinkProps extends LinkProps {
   to: string;
-  as?: "div" | "span" | "a" | "p"
+  as?: "div" | "span" | "a" | "p";
+  propagateClicks?: boolean;
 }
 
 // TODO add analytics
 function linkOnClick(props: ICustomLinkProps, e: React.MouseEvent<HTMLAnchorElement>) {
-  e.stopPropagation();
+  if (!props.propagateClicks) {
+    e.stopPropagation();
+  }
   if (props.to === location.pathname + location.search) {
     e.preventDefault();
   }
@@ -56,10 +59,12 @@ export default function Link(props: ICustomLinkProps) {
     to: urlTo,
   };
 
+  delete newProps["propagateClicks"];
+
   if (props.as) {
     delete newProps["as"];
     newProps.component = customComponents[props.as];
   }
 
-  return <RouterLink {...newProps} onClick={linkOnClick.bind(null, newProps)}/>;
+  return <RouterLink {...newProps} onClick={linkOnClick.bind(null, props)}/>;
 }

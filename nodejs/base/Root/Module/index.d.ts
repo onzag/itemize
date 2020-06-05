@@ -278,6 +278,7 @@ export default class Module {
      * this would create an infite loop if this option wasn't available
      */
     constructor(rawJSON: IModuleRawJSONDataType, parentRoot: Root, parentModule: Module, disableSearchModeRetrieval?: boolean);
+    cleanState(): void;
     /**
      * Runs the initialization of the module, for cross access, this executes
      * once the entire tree is ready so this module other parts of the tree

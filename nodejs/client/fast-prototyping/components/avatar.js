@@ -155,7 +155,7 @@ const avatarStyles = styles_1.createStyles({
 });
 exports.Avatar = styles_1.withStyles(avatarStyles)((props) => {
     const contentFn = (id, role, userNameValue, profilePictureValue, email, eValidated, address) => {
-        const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : null;
+        const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : "";
         const hasWarningForMissingEmail = !(email && email.stateAppliedValue);
         const hasWarningForNotValidEmail = !(eValidated && eValidated.stateAppliedValue);
         const hasAnotherWarningForMissingAddress = !(address && address.stateAppliedValue);

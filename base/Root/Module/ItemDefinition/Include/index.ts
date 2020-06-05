@@ -221,7 +221,6 @@ export default class Include {
     parentModule: Module,
     parentItemDefinition: ItemDefinition,
   ) {
-
     this.rawData = rawJSON;
 
     // lets get an instance for the item definition for this
@@ -238,22 +237,6 @@ export default class Include {
     this.predefinedProperties = rawJSON.predefinedProperties &&
       new PropertiesValueMappingDefiniton(rawJSON.predefinedProperties,
         parentItemDefinition, this.itemDefinition);
-
-    // set the enforced and predefined properties overwrites
-    // if needed to
-    if (this.enforcedProperties) {
-      this.enforcedProperties.getPropertyMap().forEach((p) => {
-        this.itemDefinition.getPropertyDefinitionFor(p.id, true)
-          .setGlobalSuperEnforced(p.value);
-      });
-    }
-
-    if (this.predefinedProperties) {
-      this.predefinedProperties.getPropertyMap().forEach((p) => {
-        this.itemDefinition.getPropertyDefinitionFor(p.id, true)
-          .setGlobalSuperDefault(p.value);
-      });
-    }
 
     // If this is going to be excluded
     this.excludedIf = rawJSON.excludedIf &&
@@ -278,6 +261,30 @@ export default class Include {
     // parent item definition
     this.parentItemDefinition = parentItemDefinition;
     this.parentModule = parentModule;
+
+    this.cleanState(true);
+  }
+
+  public cleanState(init?: boolean) {
+    if (!init) {
+      this.itemDefinition.cleanState();
+    }
+
+    // set the enforced and predefined properties overwrites
+    // if needed to
+    if (this.enforcedProperties) {
+      this.enforcedProperties.getPropertyMap().forEach((p) => {
+        this.itemDefinition.getPropertyDefinitionFor(p.id, true)
+          .setGlobalSuperEnforced(p.value);
+      });
+    }
+
+    if (this.predefinedProperties) {
+      this.predefinedProperties.getPropertyMap().forEach((p) => {
+        this.itemDefinition.getPropertyDefinitionFor(p.id, true)
+          .setGlobalSuperDefault(p.value);
+      });
+    }
 
     // State management
     this.stateExclusion = {};

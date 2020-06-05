@@ -843,6 +843,10 @@ export default class PropertyDefinition {
       this.canCacheState = false;
     }
 
+    this.cleanState();
+  }
+
+  public cleanState() {
     // initial value for all namespaces is null
     this.stateValue = {};
     this.stateAppliedValue = {};

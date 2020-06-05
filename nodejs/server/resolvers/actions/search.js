@@ -306,6 +306,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
             count,
         };
         server_1.logger.debug("searchItemDefinition: succeed traditionally");
+        pooledRoot.cleanState();
         appData.rootPool.release(pooledRoot);
         return finalResult;
     }
@@ -318,6 +319,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
             count,
         };
         server_1.logger.debug("searchItemDefinition: succeed with records");
+        pooledRoot.cleanState();
         appData.rootPool.release(pooledRoot);
         return finalResult;
     }

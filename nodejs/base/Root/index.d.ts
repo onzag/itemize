@@ -87,6 +87,7 @@ export default class Root {
      * @param rawJSON the raw json data
      */
     constructor(rawJSON: IRootRawJSONDataType);
+    cleanState(): void;
     /**
      * list all module names it contains
      * @returns an array of string with the module names
