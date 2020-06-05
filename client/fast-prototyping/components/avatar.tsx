@@ -162,6 +162,7 @@ interface IAvatarProps extends WithStyles<typeof avatarStyles> {
   profileURL?: string | profileURLFn;
   cacheImage?: boolean;
   fullWidth?: boolean;
+  className?: string;
 }
 
 interface IAvatarRendererProps extends IPropertyEntryFileRendererProps, WithStyles<typeof avatarStyles> {
@@ -230,7 +231,7 @@ export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
     );
 
     const avatar = props.profileURL ? (
-      <Link to={typeof props.profileURL === "string" ? props.profileURL : props.profileURL(id)}>
+      <Link className={props.className} to={typeof props.profileURL === "string" ? props.profileURL : props.profileURL(id)}>
         {content}
       </Link>
     ) : content;

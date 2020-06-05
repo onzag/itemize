@@ -31,6 +31,12 @@ RIDINGEXCHANGE [+5]
 . Horse Module
 
 SITEMAPS
+. Sitemaps will work in this way, they will use a MAX_AGE value to pull resources from a table based on the created_at
+. A sitemap location will be marked as dead, and go into the dead sitemaps if it is over that and exists in the current sitemap
+. Dead and live sitemaps are actually split in pieces, they need to be tagged both as dead and live sitemaps in the XML
+. Sitemaps will be handled by a new manager, the sitemap manager,
+  we will need a sitemap manager url, and sitemap manager ip (maybe using DNS) to expose them in order to serve our sitemaps from there
+  this should give disgusing SEO capabilities
 
 EXTRA (LOW PRIORITY)
 . Implementation of flagging

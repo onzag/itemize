@@ -13,6 +13,7 @@ const I18nReadError_1 = __importDefault(require("../../components/localization/I
 const itemDefinitionLoaderStyles = (theme) => core_1.createStyles({
     container: {
         position: "relative",
+        width: "100%",
     },
     flexingContainer: {
         display: "flex",

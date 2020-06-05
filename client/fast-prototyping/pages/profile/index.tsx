@@ -14,7 +14,7 @@ interface ProfileProps {
 }
 
 export function Profile(props: ProfileProps) {
-  const currentUserId = parseInt(props.match.params.id);
+  const currentUserId = parseInt(props.match.params.id) || null;
   const properties = [
     "username",
     "app_language",

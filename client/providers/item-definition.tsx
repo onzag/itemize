@@ -2617,7 +2617,8 @@ interface IActualNoStateItemDefinitionProviderProps extends INoStateItemDefiniti
 
 class ActualNoStateItemDefinitionProvider extends React.Component<IActualNoStateItemDefinitionProviderProps> {
   public shouldComponentUpdate(nextProps: IActualNoStateItemDefinitionProviderProps) {
-    return nextProps.itemDefinitionQualifiedName !== this.props.itemDefinitionQualifiedName;
+    return nextProps.itemDefinitionQualifiedName !== this.props.itemDefinitionQualifiedName ||
+      nextProps.children !== this.props.children;
   }
   public render() {
     return (

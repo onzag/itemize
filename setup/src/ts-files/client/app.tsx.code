@@ -16,6 +16,7 @@ import { TermsAndConditions } from "@onzag/itemize/client/fast-prototyping/pages
 import { Contact } from "@onzag/itemize/client/fast-prototyping/pages/contact";
 import { ResetPassword } from "@onzag/itemize/client/fast-prototyping/pages/reset-password";
 import { Frontpage } from "@onzag/itemize/client/fast-prototyping/pages/frontpage";
+import { News } from "@onzag/itemize/client/fast-prototyping/pages/news";
 
 import { CMS } from "@onzag/itemize/client/fast-prototyping/pages/cms";
 
@@ -48,6 +49,8 @@ export default function App()<0>{
 			<Route path="/reset-password" component={ResetPassword}/>
 
 			<Route path="/cms" component={CMS}/>
+
+			<Route path="/news" component={News}/>
 
 			<Footer/>
 		</>

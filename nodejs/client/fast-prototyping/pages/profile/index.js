@@ -10,7 +10,7 @@ const public_user_1 = require("./public-user");
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
 const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSetter"));
 function Profile(props) {
-    const currentUserId = parseInt(props.match.params.id);
+    const currentUserId = parseInt(props.match.params.id) || null;
     const properties = [
         "username",
         "app_language",

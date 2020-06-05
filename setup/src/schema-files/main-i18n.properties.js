@@ -57,6 +57,7 @@ unit_dialog_imperial = imperial
 
 menu = menu
 reload = reload
+home = home
 
 blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
 needs_update_navigation = outdated
@@ -148,6 +149,7 @@ unit_dialog_imperial = imperial
 
 menu = menu
 reload = reload
+home = home
 
 blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
 needs_update_navigation = outdated
@@ -239,6 +241,7 @@ unit_dialog_imperial = imperial
 
 menu = menu
 reload = reload
+home = home
 
 blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
 needs_update_navigation = outdated
@@ -330,6 +333,7 @@ unit_dialog_imperial = Zoll
 
 menu = Menü
 reload = reload
+home = home
 
 blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
 needs_update_navigation = outdated
@@ -421,6 +425,7 @@ unit_dialog_imperial = imperiales
 
 menu = menú
 reload = recargar
+home = página principal
 
 blocked_update = Una versión anterior de la aplicación está activa actualmente, por favor cierre la pestaña en cuestión para continuar
 needs_update_navigation = necesita actualizar
@@ -512,6 +517,7 @@ unit_dialog_imperial = المقياس البريطاني
 
 menu = لائحة
 reload = reload
+home = home
 
 blocked_update = An older version of the app is currently running which prevents from updating this app, please close the old version in order to proceed
 needs_update_navigation = outdated

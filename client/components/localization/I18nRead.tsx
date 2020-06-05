@@ -189,11 +189,20 @@ export function i18nReadInternal(
       // otherwise we use the locale replacer to array which creates react fragments
       // and returns an array of react nodes, this all depends on the args that the user
       // is passing
-      i18nValue = localeReplacerToArray(i18nValue as string, ...props.args).map((output, index) => (
-        <React.Fragment key={index}>
-          {output}
-        </React.Fragment>
-      ));
+      i18nValue = localeReplacerToArray(i18nValue as string, ...props.args).map((output, index) => {
+        if (typeof output === "string") {
+          return (
+            <span key={index} style={{whiteSpace: "pre-wrap"}}>
+              {output}
+            </span>
+          );
+        }
+        return (
+          <React.Fragment key={index}>
+            {output}
+          </React.Fragment>
+        );
+      });
     }
   }
 

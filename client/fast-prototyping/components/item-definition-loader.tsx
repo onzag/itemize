@@ -25,6 +25,9 @@ const itemDefinitionLoaderStyles = (theme: Theme) => createStyles({
     top: "50%",
     marginTop: "-20px",
   },
+  fullWidthContainer: {
+    width: "100%",
+  }
 });
 
 interface ItemDefinitionLoaderProps extends WithStyles<typeof itemDefinitionLoaderStyles> {
@@ -35,6 +38,7 @@ interface ItemDefinitionLoaderProps extends WithStyles<typeof itemDefinitionLoad
   errorImage?: string;
   msWaitedToShowLoadingAnimation?: number;
   children: React.ReactNode;
+  fullWidth?: boolean;
 }
 
 export const ItemDefinitionLoader = withStyles(itemDefinitionLoaderStyles)((props: ItemDefinitionLoaderProps) => {
@@ -83,7 +87,7 @@ export const ItemDefinitionLoader = withStyles(itemDefinitionLoaderStyles)((prop
           );
         }
     
-        return <div className={props.classes.container}>
+        return <div className={`${props.classes.container} ${props.fullWidth ? props.classes.fullWidthContainer : ""}`}>
           {
             arg.loading ? 
             <DelayDisplay duration={700}>

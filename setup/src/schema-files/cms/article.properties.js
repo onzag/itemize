@@ -7,6 +7,8 @@ search_keywords = article
 custom.read_more = read more....
 custom.news = news
 custom.more_news = more news
+custom.updated_at = updated {0}
+custom.by = by {0}
 
 properties.summary.label = summary
 properties.summary.placeholder = write a short summary about the article
@@ -35,6 +37,8 @@ search_keywords = artículo
 custom.read_more = leer más...
 custom.news = noticias
 custom.more_news = más noticias
+custom.updated_at = actualizada {0}
+custom.by = {0}
 
 properties.summary.label = sumario
 properties.summary.placeholder = escriba un sumario corto sobre el artículo

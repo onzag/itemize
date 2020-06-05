@@ -189,6 +189,7 @@ exports.LOCALE_I18N = [
     // some extras for fast prototyping
     "menu",
     "reload",
+    "home",
     // for file uploader
     "file_uploader_placeholder_active",
     "image_uploader_placeholder_active",

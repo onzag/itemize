@@ -8,6 +8,7 @@ import UserDataRetriever from "../../../components/user/UserDataRetriever";
 import I18nRead from "../../../components/localization/I18nRead";
 import LocationReader from "../../../components/navigation/LocationReader";
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
+import HomeIcon from '@material-ui/icons/Home';
 import { NoStateItemDefinitionProvider } from "../../../providers/item-definition";
 
 interface MenuProps {
@@ -75,27 +76,41 @@ export const Menu = withStyles(menuStyles)((props: MenuPropsWithStyles) => {
                 }
               }}
             </UserDataRetriever>
+            <List>
+              <Link to="/" className={props.classes.listLink} propagateClicks={true}>
+                <LocationReader>
+                  {(arg) => (
+                    <ListItem button={true} selected={arg.pathname === "/"}>
+                      <ListItemIcon>
+                        <HomeIcon />
+                      </ListItemIcon>
+                      <ListItemText>
+                        <I18nRead id="home" capitalize={true} />
+                      </ListItemText>
+                    </ListItem>
+                  )}
+                </LocationReader>
+              </Link>
+              <Link to="/news" className={props.classes.listLink} propagateClicks={true}>
+                <LocationReader>
+                  {(arg) => (
+                    <ListItem button={true} selected={arg.pathname === "/news"}>
+                      <ListItemIcon>
+                        <LibraryBooksIcon />
+                      </ListItemIcon>
+                      <ListItemText>
+                        <ModuleProvider module="cms">
+                          <NoStateItemDefinitionProvider itemDefinition="article">
+                            <I18nRead id="news" capitalize={true} />
+                          </NoStateItemDefinitionProvider>
+                        </ModuleProvider>
+                      </ListItemText>
+                    </ListItem>
+                  )}
+                </LocationReader>
+              </Link>
+            </List>
           </div>
-          <List>
-            <Link to="/news" className={props.classes.listLink} propagateClicks={true}>
-              <LocationReader>
-                {(arg) => (
-                  <ListItem button={true} selected={arg.pathname === "/news"}>
-                    <ListItemIcon>
-                      <LibraryBooksIcon />
-                    </ListItemIcon>
-                    <ListItemText>
-                      <ModuleProvider module="cms">
-                        <NoStateItemDefinitionProvider itemDefinition="article">
-                          <I18nRead id="news" capitalize={true} />
-                        </NoStateItemDefinitionProvider>
-                      </ModuleProvider>
-                    </ListItemText>
-                  </ListItem>
-                )}
-              </LocationReader>
-            </Link>
-          </List>
         </SwipeableDrawer>
       )}
     </AppLanguageRetriever>
