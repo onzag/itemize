@@ -136,7 +136,12 @@ function i18nReadInternal(localeContext, moduleContextualValue, itemDefinitionCo
             // otherwise we use the locale replacer to array which creates react fragments
             // and returns an array of react nodes, this all depends on the args that the user
             // is passing
-            i18nValue = util_1.localeReplacerToArray(i18nValue, ...props.args).map((output, index) => (react_1.default.createElement(react_1.default.Fragment, { key: index }, output)));
+            i18nValue = util_1.localeReplacerToArray(i18nValue, ...props.args).map((output, index) => {
+                if (typeof output === "string") {
+                    return (react_1.default.createElement("span", { key: index, style: { whiteSpace: "pre-wrap" } }, output));
+                }
+                return (react_1.default.createElement(react_1.default.Fragment, { key: index }, output));
+            });
         }
     }
     // now we want to get the final node that we are returning, the react node

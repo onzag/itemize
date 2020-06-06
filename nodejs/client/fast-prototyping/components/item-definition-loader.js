@@ -13,7 +13,6 @@ const I18nReadError_1 = __importDefault(require("../../components/localization/I
 const itemDefinitionLoaderStyles = (theme) => core_1.createStyles({
     container: {
         position: "relative",
-        width: "100%",
     },
     flexingContainer: {
         display: "flex",
@@ -30,6 +29,9 @@ const itemDefinitionLoaderStyles = (theme) => core_1.createStyles({
         top: "50%",
         marginTop: "-20px",
     },
+    fullWidthContainer: {
+        width: "100%",
+    }
 });
 exports.ItemDefinitionLoader = core_1.withStyles(itemDefinitionLoaderStyles)((props) => {
     return (react_1.default.createElement(ItemDefinitionLoader_1.default, null, (arg) => {
@@ -66,7 +68,7 @@ exports.ItemDefinitionLoader = core_1.withStyles(itemDefinitionLoaderStyles)((pr
                 react_1.default.createElement(I18nRead_1.default, { id: "reload" }, (i18nReload) => (react_1.default.createElement(core_1.IconButton, { color: "inherit", onClick: arg.reload, "aria-label": i18nReload },
                     react_1.default.createElement(Refresh_1.default, null))))));
         }
-        return react_1.default.createElement("div", { className: props.classes.container },
+        return react_1.default.createElement("div", { className: `${props.classes.container} ${props.fullWidth ? props.classes.fullWidthContainer : ""}` },
             arg.loading ?
                 react_1.default.createElement(util_1.DelayDisplay, { duration: 700 },
                     react_1.default.createElement(core_1.CircularProgress, { className: props.classes.circularProgress })) :

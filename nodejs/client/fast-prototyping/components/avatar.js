@@ -179,7 +179,7 @@ exports.Avatar = styles_1.withStyles(avatarStyles)((props) => {
                 avatarWithSource(util_1.cacheableQSLoader(imageSrc)) :
                 avatarWithSource(imageSrc),
             flag));
-        const avatar = props.profileURL ? (react_1.default.createElement(Link_1.default, { to: typeof props.profileURL === "string" ? props.profileURL : props.profileURL(id) }, content)) : content;
+        const avatar = props.profileURL ? (react_1.default.createElement(Link_1.default, { className: props.className, to: typeof props.profileURL === "string" ? props.profileURL : props.profileURL(id) }, content)) : content;
         if (props.showWarnings && hasWarning) {
             let warningCount = 0;
             if (hasWarningForMissingEmail || hasWarningForNotValidEmail) {

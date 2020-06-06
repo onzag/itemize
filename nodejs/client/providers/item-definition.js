@@ -1666,7 +1666,8 @@ function ItemDefinitionProvider(props) {
 exports.ItemDefinitionProvider = ItemDefinitionProvider;
 class ActualNoStateItemDefinitionProvider extends react_1.default.Component {
     shouldComponentUpdate(nextProps) {
-        return nextProps.itemDefinitionQualifiedName !== this.props.itemDefinitionQualifiedName;
+        return nextProps.itemDefinitionQualifiedName !== this.props.itemDefinitionQualifiedName ||
+            nextProps.children !== this.props.children;
     }
     render() {
         return (react_1.default.createElement(exports.ItemDefinitionContext.Provider, { value: {
