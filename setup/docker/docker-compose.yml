@@ -14,11 +14,27 @@ services:
             - NODE_ENV=%{NODE_ENV}
             - LOG_LEVEL=error
             - USING_DOCKER=true
+    global-manager:
+        image: app:latest
+        restart: always
+        volumes: 
+            - ./config:/home/node/app/config
+            - ./logs:/home/node/app/logs
+        depends_on:
+            - redis
+            - pgsql
+        environment:
+            - INSTANCE_MODE=GLOBAL_MANAGER
+            - NODE_ENV=%{NODE_ENV}
+            - LOG_LEVEL=error
+            - USING_DOCKER=true
     servers:
         image: app:latest
         depends_on:
             - redis
             - pgsql
+            - global-manager
+            - cluster-manager
         ports:
             - "8000"
         volumes:

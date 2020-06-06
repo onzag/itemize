@@ -12,8 +12,9 @@ const react_router_dom_1 = require("react-router-dom");
 const server_1 = __importDefault(require("react-dom/server"));
 const ItemDefinition_1 = require("../../base/Root/Module/ItemDefinition");
 const basic_1 = require("../resolvers/basic");
+const developmentISSSRMode = process.env.NODE_ENV !== "production";
 const MEMOIZED_ANSWERS = {};
-async function ssrGenerator(req, res, html, appData, rule) {
+async function ssrGenerator(req, res, html, appData, mode, rule) {
     let root;
     try {
         root = await appData.rootPool.acquire().promise;
@@ -26,9 +27,11 @@ async function ssrGenerator(req, res, html, appData, rule) {
         res.status(500).end("Internal Server Error");
         return;
     }
+    const SSRIsDisabledInThisMode = (mode === "development" && !developmentISSSRMode) ||
+        (mode === "production" && developmentISSSRMode);
     res.setHeader("content-type", "text/html; charset=utf-8");
     const config = appData.config;
-    const language = req.path.split("/")[1];
+    const language = req.originalUrl.split("/")[1];
     let appliedRule;
     const cookies = req.headers["cookie"];
     const splittedCookies = cookies ? cookies.split(";").map((c) => c.trim()) : [];
@@ -37,7 +40,11 @@ async function ssrGenerator(req, res, html, appData, rule) {
         resultRule = typeof rule === "function" ? rule(req, language, root) : rule;
     }
     // This is the default, what happens to routes that have nothing setup for them
-    if (!rule || !language || !config.supportedLanguages.includes(language) || !resultRule) {
+    if (!rule ||
+        !language ||
+        !config.supportedLanguages.includes(language) ||
+        !resultRule ||
+        SSRIsDisabledInThisMode) {
         appliedRule = {
             title: config.appName,
             description: config.appName,
@@ -50,7 +57,7 @@ async function ssrGenerator(req, res, html, appData, rule) {
             rtl: false,
             languages: config.supportedLanguages,
             forUser: null,
-            memId: "*",
+            memId: "*." + mode,
         };
         // this is the root form without any language or any means, there's no SSR data to fill
     }
@@ -83,7 +90,7 @@ async function ssrGenerator(req, res, html, appData, rule) {
         };
         // language makes the memory specific for it
         if (appliedRule.memId) {
-            appliedRule.memId += "." + appliedRule.language;
+            appliedRule.memId += "." + mode + "." + appliedRule.language;
         }
         // we don't want to memoize specific user answers
         // they should be using the service worker at that point
@@ -222,7 +229,7 @@ async function ssrGenerator(req, res, html, appData, rule) {
             appData.rootPool.release(root);
             return;
         }
-        const app = (react_1.default.createElement(react_router_dom_1.StaticRouter, { location: req.url }, serverAppData.node));
+        const app = (react_1.default.createElement(react_router_dom_1.StaticRouter, { location: req.originalUrl }, serverAppData.node));
         newHTML = newHTML.replace(/\$SSRAPP/g, server_1.default.renderToStaticMarkup(app));
         let finalSSRHead = langHrefLangTags;
         if (serverAppData.id) {

@@ -27,8 +27,7 @@ const actionRegistry: {
   },
   "get-deployable": {
     fn: getDeployable,
-    description: "Provides the full docker compose deployable based on the config, ensure to run `npm run build` before this step " +
-    "your server should work already locally before you attempt to get the deployable",
+    description: "Provides the full docker compose deployable based on the config",
     usage: "itemize get-deployable [development|staging|production] [build-name] [full|standard|slim|(comma-separated-services)]",
     needsArgs: 3,
   },

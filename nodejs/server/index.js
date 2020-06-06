@@ -50,8 +50,8 @@ exports.logger = INSTANCE_MODE === "BUILD_DATABASE" ? null : winston_1.default.c
     level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
     format: winston_1.default.format.json(),
     transports: [
-        new winston_1.default.transports.DailyRotateFile({ filename: "logs/error.log", level: "error" }),
-        new winston_1.default.transports.DailyRotateFile({ filename: "logs/info.log", level: "info" })
+        new winston_1.default.transports.DailyRotateFile({ filename: `logs/error.${INSTANCE_MODE}.log`, level: "error" }),
+        new winston_1.default.transports.DailyRotateFile({ filename: `logs/info.${INSTANCE_MODE}.log`, level: "info" })
     ]
 });
 // if not production add a console.log
@@ -202,27 +202,35 @@ function initializeApp(appData, custom) {
     app.get("/sw.production.js", (req, res) => {
         res.sendFile(path_1.default.resolve(path_1.default.join("dist", "data", "service-worker.production.js")));
     });
+    const router = express_1.default.Router();
     Object.keys(appData.ssrConfig.ssrRules).forEach((url) => {
         const rule = appData.ssrConfig.ssrRules[url];
-        const actualURL = "/:lang" + (url.startsWith("/") ? url : "/" + url);
-        app.get(actualURL, (req, res) => {
+        const actualURL = url.startsWith("/") ? url : "/" + url;
+        router.get(actualURL, (req, res) => {
             const mode = mode_1.getMode(appData, req);
             if (mode === "development") {
-                generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, rule);
+                generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, mode, rule);
             }
             else {
-                generator_1.ssrGenerator(req, res, appData.indexProduction, appData, rule);
+                generator_1.ssrGenerator(req, res, appData.indexProduction, appData, mode, rule);
             }
         });
+    });
+    app.use("/:lang", (req, res, next) => {
+        if (req.params.lang.length !== 2) {
+            next();
+            return;
+        }
+        router(req, res, next);
     });
     // and now the main index setup
     app.get("*", (req, res) => {
         const mode = mode_1.getMode(appData, req);
         if (mode === "development") {
-            generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, null);
+            generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, mode, null);
         }
         else {
-            generator_1.ssrGenerator(req, res, appData.indexProduction, appData, null);
+            generator_1.ssrGenerator(req, res, appData.indexProduction, appData, mode, null);
         }
     });
 }
@@ -350,8 +358,19 @@ async function initializeServer(ssrConfig, custom = {}) {
         if (INSTANCE_MODE === "CLUSTER_MANAGER") {
             const cache = new cache_1.Cache(redisClient, null, null, null, null);
             exports.logger.info("initializeServer: server initialized in cluster manager exclusive mode flushing redis");
+            // in case both the global and local cluster are the same
+            const getPromisified = util_1.promisify(redisClient.get).bind(redisClient);
+            const setPromisified = util_1.promisify(redisClient.set).bind(redisClient);
+            const serverDataStr = await getPromisified(constants_1.SERVER_DATA_IDENTIFIER) || null;
+            const currencyLayerCachedResponseRestore = await getPromisified(constants_1.CACHED_CURRENCY_LAYER_RESPONSE) || null;
             const flushAllPromisified = util_1.promisify(redisClient.flushall).bind(redisClient);
             await flushAllPromisified();
+            if (serverDataStr) {
+                await setPromisified(constants_1.SERVER_DATA_IDENTIFIER, serverDataStr);
+            }
+            if (currencyLayerCachedResponseRestore) {
+                await setPromisified(constants_1.CACHED_CURRENCY_LAYER_RESPONSE, currencyLayerCachedResponseRestore);
+            }
             new listener_1.Listener(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, null, cache, null, null, sensitiveConfig);
             return;
         }

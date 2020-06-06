@@ -427,7 +427,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
    */
   public renderAppWithLocaleContext(routerProps: any) {
     // typescript being really annoying
-    const { match, location } = routerProps;
+    const { match } = routerProps;
     // Now the match.params.lang is actually a quite unreliable way to check for the current language
     // in use during updates, there's a reason, the url changes triggering a react update before the
     // language data has been loaded, this makes the app feel quite responsive and it's important, but

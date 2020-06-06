@@ -1,9 +1,4 @@
 declare const _default: {
-    "@types/react": string;
-    "@types/react-dom": string;
-    react: string;
-    "react-dom": string;
-    "deep-equal": string;
     "@babel/core": string;
     "@babel/plugin-proposal-class-properties": string;
     "@babel/plugin-transform-regenerator": string;

@@ -124,7 +124,7 @@ export async function stop(version: string) {
   const dbConfig: IDBConfigRawJSONDataType =
     await readConfigFile(version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`);
   const redisConfig: IRedisConfigRawJSONDataType =
-    await readConfigFile(version === "development" ? "redis.sensitive.json" : `reddis.${version}.sensitive.json`);
+    await readConfigFile(version === "development" ? "redis.sensitive.json" : `redis.${version}.sensitive.json`);
 
   if (
     dbConfig.host === "localhost" ||

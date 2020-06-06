@@ -14,6 +14,8 @@ import { filterAndPrepareGQLValue } from "../resolvers/basic";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import Root from "../../base/Root";
 
+const developmentISSSRMode = process.env.NODE_ENV !== "production";
+
 const MEMOIZED_ANSWERS: {
   [memId: string]: {
     html: string,
@@ -25,6 +27,7 @@ export async function ssrGenerator(
   res: express.Response,
   html: string,
   appData: IAppDataType,
+  mode: "development" | "production",
   rule: ISSRRuleDynamic | ISSRRuleSetCb,
 ): Promise<void> {
   let root: Root;
@@ -42,9 +45,13 @@ export async function ssrGenerator(
     return;
   }
 
+  const SSRIsDisabledInThisMode = 
+    (mode === "development" && !developmentISSSRMode) ||
+    (mode === "production" && developmentISSSRMode);
+
   res.setHeader("content-type", "text/html; charset=utf-8");
   const config = appData.config;
-  const language = req.path.split("/")[1];
+  const language = req.originalUrl.split("/")[1];
   let appliedRule: ISSRRule;
 
   const cookies = req.headers["cookie"];
@@ -56,7 +63,13 @@ export async function ssrGenerator(
   }
 
   // This is the default, what happens to routes that have nothing setup for them
-  if (!rule || !language || !config.supportedLanguages.includes(language) || !resultRule) {
+  if (
+    !rule ||
+    !language ||
+    !config.supportedLanguages.includes(language) ||
+    !resultRule ||
+    SSRIsDisabledInThisMode
+  ) {
     appliedRule = {
       title: config.appName,
       description: config.appName,
@@ -69,7 +82,7 @@ export async function ssrGenerator(
       rtl: false,
       languages: config.supportedLanguages,
       forUser: null,
-      memId: "*",
+      memId: "*." + mode,
     }
     // this is the root form without any language or any means, there's no SSR data to fill
   } else {
@@ -108,7 +121,7 @@ export async function ssrGenerator(
 
     // language makes the memory specific for it
     if (appliedRule.memId) {
-      appliedRule.memId += "." + appliedRule.language;
+      appliedRule.memId += "." + mode + "." + appliedRule.language;
     }
     // we don't want to memoize specific user answers
     // they should be using the service worker at that point
@@ -196,9 +209,9 @@ export async function ssrGenerator(
   const finalOgDescription = typeof appliedRule.ogDescription === "string" ? appliedRule.ogDescription : appliedRule.ogDescription(queries, config);
   let finalOgImage = typeof appliedRule.ogImage === "string" ? appliedRule.ogImage : appliedRule.ogImage(queries, config);
   if (finalOgImage && finalOgImage.startsWith("/")) {
-    finalOgImage = `${req.protocol}://${req.get("host")}` + appliedRule.ogImage;
+    finalOgImage = `${req.protocol}://${req.get("host")}` + finalOgImage;
   } else if (finalOgImage && !finalOgImage.includes("://")) {
-    finalOgImage = `${req.protocol}://` + appliedRule.ogImage;
+    finalOgImage = `${req.protocol}://` + finalOgImage;
   }
 
   const finalTitle = typeof appliedRule.title === "string" ? appliedRule.title : appliedRule.title(queries, config);
@@ -279,7 +292,7 @@ export async function ssrGenerator(
     }
 
     const app = (
-      <StaticRouter location={req.url}>
+      <StaticRouter location={req.originalUrl}>
         {serverAppData.node}
       </StaticRouter>
     );

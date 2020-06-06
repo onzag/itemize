@@ -57,8 +57,8 @@ export const logger: winston.Logger = INSTANCE_MODE === "BUILD_DATABASE" ? null 
   level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
   format: winston.format.json(),
   transports: [
-    new winston.transports.DailyRotateFile({ filename: "logs/error.log", level: "error" }),
-    new winston.transports.DailyRotateFile({ filename: "logs/info.log", level: "info" })
+    new winston.transports.DailyRotateFile({ filename: `logs/error.${INSTANCE_MODE}.log`, level: "error" }),
+    new winston.transports.DailyRotateFile({ filename: `logs/info.${INSTANCE_MODE}.log`, level: "info" })
   ]
 });
 
@@ -314,26 +314,37 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     res.sendFile(path.resolve(path.join("dist", "data", "service-worker.production.js")));
   });
 
+  const router = express.Router();
   Object.keys(appData.ssrConfig.ssrRules).forEach((url) => {
     const rule = appData.ssrConfig.ssrRules[url];
-    const actualURL = "/:lang" + (url.startsWith("/") ? url : "/" + url);
-    app.get(actualURL, (req, res) => {
+    const actualURL = url.startsWith("/") ? url : "/" + url;
+    router.get(actualURL, (req, res) => {
       const mode = getMode(appData, req);
       if (mode === "development") {
-        ssrGenerator(req, res, appData.indexDevelopment, appData, rule)
+        ssrGenerator(req, res, appData.indexDevelopment, appData, mode, rule)
       } else {
-        ssrGenerator(req, res, appData.indexProduction, appData, rule);
+        ssrGenerator(req, res, appData.indexProduction, appData, mode, rule);
       }
     });
+  });
+  
+  
+  app.use("/:lang", (req, res, next) => {
+    if (req.params.lang.length !== 2) {
+      next();
+      return;
+    }
+      
+    router(req, res, next);
   });
 
   // and now the main index setup
   app.get("*", (req, res) => {
     const mode = getMode(appData, req);
     if (mode === "development") {
-      ssrGenerator(req, res, appData.indexDevelopment, appData, null)
+      ssrGenerator(req, res, appData.indexDevelopment, appData, mode, null)
     } else {
-      ssrGenerator(req, res, appData.indexProduction, appData, null);
+      ssrGenerator(req, res, appData.indexProduction, appData, mode, null);
     }
   });
 }
@@ -489,8 +500,20 @@ export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCus
         "initializeServer: server initialized in cluster manager exclusive mode flushing redis",
       );
 
+      // in case both the global and local cluster are the same
+      const getPromisified = promisify(redisClient.get).bind(redisClient);
+      const setPromisified = promisify(redisClient.set).bind(redisClient);
+
+      const serverDataStr = await getPromisified(SERVER_DATA_IDENTIFIER) || null;
+      const currencyLayerCachedResponseRestore = await getPromisified(CACHED_CURRENCY_LAYER_RESPONSE) || null;
       const flushAllPromisified = promisify(redisClient.flushall).bind(redisClient);
       await flushAllPromisified();
+      if (serverDataStr) {
+        await setPromisified(SERVER_DATA_IDENTIFIER, serverDataStr);
+      }
+      if (currencyLayerCachedResponseRestore) {
+        await setPromisified(CACHED_CURRENCY_LAYER_RESPONSE, currencyLayerCachedResponseRestore);
+      }
       new Listener(
         buildnumber,
         redisSub,

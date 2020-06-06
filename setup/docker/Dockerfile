@@ -7,16 +7,23 @@ RUN mkdir -p /home/node/app
 WORKDIR /home/node/app
 
 ARG NPM_TOKEN
+# needed by the builder as it checks the configuration
+COPY config config
 COPY package.json .
 COPY package-lock.json .
 COPY tsconfig.json .
 COPY src src
+COPY schema schema
+COPY resources resources
+COPY webpack.config.js webpack.config.js
+COPY babel.config.json babel.config.json
 COPY .npmrc-docker .npmrc
 
 USER root
 RUN apk --no-cache add --virtual builds-deps build-base python
 USER node
-RUN npm install --only=prod --unsafe-perms
+RUN npm install --unsafe-perms
+RUN npm run build
 RUN rm -f .npmrc
 
 ## SECOND STEP TO ACTUALLY COPY THE FILES REQUIRED BY THE SERVER
@@ -39,8 +46,7 @@ RUN mkdir -p /home/node/app
 WORKDIR /home/node/app
 COPY --from=0 /home/node/app/node_modules node_modules
 COPY --from=0 /home/node/app/dist dist
-COPY dist/data dist/data
-COPY dist/buildnumber dist/
 COPY package.json .
+COPY tsconfig.json .
 
 CMD [ "node", "-r", "tsconfig-paths/register", "./dist/server/index.js" ]

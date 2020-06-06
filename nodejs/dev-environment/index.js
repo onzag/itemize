@@ -99,7 +99,7 @@ async function stop(version) {
     const standardConfig = await setup_2.readConfigFile("index.json");
     const dockerprefixer = standardConfig.appName.replace(/\s/g, "_").toLowerCase();
     const dbConfig = await setup_2.readConfigFile(version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`);
-    const redisConfig = await setup_2.readConfigFile(version === "development" ? "redis.sensitive.json" : `reddis.${version}.sensitive.json`);
+    const redisConfig = await setup_2.readConfigFile(version === "development" ? "redis.sensitive.json" : `redis.${version}.sensitive.json`);
     if (dbConfig.host === "localhost" ||
         dbConfig.host === "127.0.0.1") {
         try {

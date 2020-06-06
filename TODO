@@ -13,6 +13,7 @@ SITE
 . Implementation of mailing module [+7]
 . Test implementation of a sales module for probing includes [+20]
 . String based total search (tags?) [+10] [DONE?]
+. Add the GLOBAL_MANAGER to the docker-compose
 
 ONZASYSTEMS [+3]
 . Build a Frontpage with few details

@@ -5,4 +5,10 @@ exports.default = {
     "typescript": "^3.8.3",
     // tsconfig because typescript compiler doesn't get the paths right
     "tsconfig-paths": "^3.9.0",
+    // peer dependencies
+    "@types/react": "^16.9.35",
+    "@types/react-dom": "^16.9.8",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "deep-equal": "^1.1.1",
 };
