@@ -1,11 +1,4 @@
 export default {
-  // peer dependencies
-  "@types/react": "^16.9.32",
-  "@types/react-dom": "^16.9.6",
-  "react": "^16.13.1",
-  "react-dom": "^16.13.1",
-  "deep-equal": "^1.1.1",
-
   // builder babel and presets
   "@babel/core": "^7.9.0",
   "@babel/plugin-proposal-class-properties": "^7.8.3",
