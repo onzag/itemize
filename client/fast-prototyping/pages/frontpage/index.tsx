@@ -5,7 +5,14 @@ import { Articles } from "./articles";
 import { Hero } from "./hero";
 import { Social } from "./social";
 
-export function Frontpage(props: {heroID?: number}) {
+interface FrontpageProps {
+  heroId?: number;
+  noHero?: boolean;
+  noArticles?: boolean;
+  noSocial?: boolean;
+}
+
+export function Frontpage(props: FrontpageProps) {
   return (
     <>
       <I18nRead id="app_name" capitalize={true}>
@@ -17,9 +24,15 @@ export function Frontpage(props: {heroID?: number}) {
           );
         }}
       </I18nRead>
-      <Hero heroID={props.heroID || 1}/>
-      <Articles/>
-      <Social/>
+      {props.noHero ? null : <Hero heroID={props.heroId || 1}/>}
+      {props.noArticles ? null : <Articles/>}
+      {props.noSocial ? null : <Social/>}
     </>
   );
 };
+
+export function frontpageWithProps(props: FrontpageProps) {
+  return () => {
+    <Frontpage {...props}/>
+  }
+}

@@ -5,8 +5,6 @@
  * @packageDocumentation
  */
 
-import colors from "colors/safe";
-
 import fs from "fs";
 import path from "path";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IRedisConfigRawJSONDataType, IDBConfigRawJSONDataType } from "../config";
@@ -112,9 +110,6 @@ export async function extractConfigAndBuildNumber(): Promise<IBuilderBasicConfig
     checkSensitiveConfig, "index", null, true,
   );
   await extractOneConfig(
-    checkSensitiveConfig, "index", "staging", true,
-  );
-  await extractOneConfig(
     checkSensitiveConfig, "index", "production", true,
   );
 
@@ -122,17 +117,11 @@ export async function extractConfigAndBuildNumber(): Promise<IBuilderBasicConfig
     checkRedisConfig, "redis", null, true,
   );
   await extractOneConfig(
-    checkRedisConfig, "redis", "staging", true,
-  );
-  await extractOneConfig(
     checkRedisConfig, "redis", "production", true,
   );
 
   const dbConfig = await extractOneConfig<IDBConfigRawJSONDataType>(
     checkDBConfig, "db", null, true,
-  );
-  await extractOneConfig(
-    checkDBConfig, "db", "staging", true,
   );
   await extractOneConfig(
     checkDBConfig, "db", "production", true,

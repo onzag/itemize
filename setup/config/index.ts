@@ -20,14 +20,11 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
   if (
     newArg.standardConfig &&
     newArg.sensitiveConfigDevelopment &&
-    newArg.sensitiveConfigStaging &&
     newArg.sensitiveConfigProduction &&
     newArg.redisConfigDevelopment &&
     newArg.redisConfigProduction &&
-    newArg.redisConfigStaging &&
     newArg.dbConfigDevelopment &&
     newArg.dbConfigProduction &&
-    newArg.dbConfigStaging &&
     !(await confirm("Would you like to setup the configuration files?"))
   ) {
     return arg;
@@ -49,18 +46,6 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "development",
       newArg.sensitiveConfigDevelopment,
       null,
-      packageJSON,
-    );
-  }
-
-  if (
-    !newArg.sensitiveConfigStaging ||
-    await confirm("Would you like to modify the sensitive staging configuration?")
-  ) {
-    newArg.sensitiveConfigStaging = await sensitiveConfigSetup(
-      "staging",
-      newArg.sensitiveConfigStaging,
-      newArg.sensitiveConfigDevelopment,
       packageJSON,
     );
   }
@@ -90,18 +75,6 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
   }
 
   if (
-    !newArg.redisConfigStaging ||
-    await confirm("Would you like to modify the redis staging configuration?")
-  ) {
-    newArg.redisConfigStaging = await redisConfigSetup(
-      "staging",
-      newArg.redisConfigStaging,
-      newArg.redisConfigDevelopment,
-      packageJSON,
-    );
-  }
-
-  if (
     !newArg.redisConfigProduction ||
     await confirm("Would you like to modify the redis production configuration?")
   ) {
@@ -121,18 +94,6 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "development",
       newArg.dbConfigDevelopment,
       null,
-      packageJSON,
-    );
-  }
-
-  if (
-    !newArg.dbConfigStaging ||
-    await confirm("Would you like to modify the posrgreSQL staging configuration?")
-  ) {
-    newArg.dbConfigStaging = await dbConfigSetup(
-      "staging",
-      newArg.dbConfigStaging,
-      newArg.dbConfigDevelopment,
       packageJSON,
     );
   }

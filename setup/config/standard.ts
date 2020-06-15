@@ -129,12 +129,6 @@ export async function standardConfigSetup(
         validate: (v) => v.replace(/\s/g, "") === v,
       },
       {
-        variableName: "stagingHostname",
-        message: "The staging host name where you might intend to deploy",
-        defaultValue: "staging." + packageJSON.name + ".com",
-        validate: (v) => v.replace(/\s/g, "") === v,
-      },
-      {
         variableName: "productionHostname",
         message: "The production host name where you might intend to deploy",
         defaultValue: packageJSON.name + ".com",

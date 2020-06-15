@@ -22,7 +22,6 @@ export interface IConfigRawJSONDataType {
     fallbackLanguage: string;
     fallbackCurrency: string;
     developmentHostname: string;
-    stagingHostname: string;
     productionHostname: string;
     containersRegionMappers: {
         [countries: string]: string;
@@ -50,6 +49,7 @@ export interface ISensitiveConfigRawJSONDataType {
     openstackContainers: {
         [containerId: string]: ISensitiveConfigOpenstackContainerType;
     };
+    defaultContainerID: string;
     mailgunAPIKey: string;
     mailgunDomain: string;
     mailgunAPIHost: string;
@@ -163,6 +163,9 @@ export declare const rawSensitiveConfigSchema: {
             minProperties: number;
         };
     };
+    defaultContainerID: {
+        type: string;
+    };
     additionalProperties: boolean;
     required: string[];
 };
@@ -242,9 +245,6 @@ export declare const rawConfigSchema: {
             type: string;
         };
         developmentHostname: {
-            type: string;
-        };
-        stagingHostname: {
             type: string;
         };
         productionHostname: {

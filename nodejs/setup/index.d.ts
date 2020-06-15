@@ -9,9 +9,6 @@ export interface ISetupConfigType {
     sensitiveConfigDevelopment: ISensitiveConfigRawJSONDataType;
     dbConfigDevelopment: IDBConfigRawJSONDataType;
     redisConfigDevelopment: IRedisConfigRawJSONDataType;
-    sensitiveConfigStaging: ISensitiveConfigRawJSONDataType;
-    dbConfigStaging: IDBConfigRawJSONDataType;
-    redisConfigStaging: IRedisConfigRawJSONDataType;
     sensitiveConfigProduction: ISensitiveConfigRawJSONDataType;
     dbConfigProduction: IDBConfigRawJSONDataType;
     redisConfigProduction: IRedisConfigRawJSONDataType;

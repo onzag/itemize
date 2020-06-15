@@ -27,13 +27,13 @@ export interface IConfigRawJSONDataType {
 
   // Generic info
   developmentHostname: string;
-  stagingHostname: string;
   productionHostname: string;
   
-  // Uploads info
+  // Uploads info, maps countries to containers id
   containersRegionMappers: {
     [countries: string]: string;
   };
+  // maps container id to the url prefix
   containersHostnamePrefixes: {
     [containerId: string]: string;
   };
@@ -59,6 +59,7 @@ export interface ISensitiveConfigRawJSONDataType {
   openstackContainers: {
     [containerId: string]: ISensitiveConfigOpenstackContainerType,
   };
+  defaultContainerID: string;
   mailgunAPIKey: string;
   mailgunDomain: string;
   mailgunAPIHost: string;
@@ -224,6 +225,9 @@ export const rawSensitiveConfigSchema = {
       minProperties: 1,
     }
   },
+  defaultContainerID: {
+    type: "string",
+  },
   additionalProperties: false,
   required: [
     "ipStackAccessKey",
@@ -325,9 +329,6 @@ export const rawConfigSchema = {
     developmentHostname: {
       type: "string",
     },
-    stagingHostname: {
-      type: "string",
-    },
     productionHostname: {
       type: "string",
     },
@@ -361,7 +362,6 @@ export const rawConfigSchema = {
     "fallbackLanguage",
     "fallbackCurrency",
     "developmentHostname",
-    "stagingHostname",
     "productionHostname",
     "containersRegionMappers",
     "containersHostnamePrefixes",

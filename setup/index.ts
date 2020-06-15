@@ -24,9 +24,6 @@ export interface ISetupConfigType {
   sensitiveConfigDevelopment: ISensitiveConfigRawJSONDataType;
   dbConfigDevelopment: IDBConfigRawJSONDataType;
   redisConfigDevelopment: IRedisConfigRawJSONDataType;
-  sensitiveConfigStaging: ISensitiveConfigRawJSONDataType;
-  dbConfigStaging: IDBConfigRawJSONDataType;
-  redisConfigStaging: IRedisConfigRawJSONDataType;
   sensitiveConfigProduction: ISensitiveConfigRawJSONDataType;
   dbConfigProduction: IDBConfigRawJSONDataType;
   redisConfigProduction: IRedisConfigRawJSONDataType;
@@ -80,9 +77,6 @@ export default async function setup(...onlyNames: string[]) {
   const sensitiveConfigDevelopment: ISensitiveConfigRawJSONDataType = await readConfigFile("index.sensitive.json");
   const dbConfigDevelopment: IDBConfigRawJSONDataType = await readConfigFile("db.sensitive.json");
   const redisConfigDevelopment: IRedisConfigRawJSONDataType = await readConfigFile("redis.sensitive.json");
-  const sensitiveConfigStaging: ISensitiveConfigRawJSONDataType = await readConfigFile("index.staging.sensitive.json");
-  const dbConfigStaging: IDBConfigRawJSONDataType = await readConfigFile("db.staging.sensitive.json");
-  const redisConfigStaging: IRedisConfigRawJSONDataType = await readConfigFile("redis.staging.sensitive.json");
   const sensitiveConfigProduction: ISensitiveConfigRawJSONDataType = await readConfigFile("index.production.sensitive.json");
   const dbConfigProduction: IDBConfigRawJSONDataType = await readConfigFile("db.production.sensitive.json");
   const redisConfigProduction: IRedisConfigRawJSONDataType = await readConfigFile("redis.production.sensitive.json");
@@ -92,9 +86,6 @@ export default async function setup(...onlyNames: string[]) {
     sensitiveConfigDevelopment,
     dbConfigDevelopment,
     redisConfigDevelopment,
-    sensitiveConfigStaging,
-    dbConfigStaging,
-    redisConfigStaging,
     sensitiveConfigProduction,
     dbConfigProduction,
     redisConfigProduction,
@@ -111,9 +102,6 @@ export default async function setup(...onlyNames: string[]) {
   await writeConfigFile("index.sensitive.json", arg.sensitiveConfigDevelopment, sensitiveConfigDevelopment);
   await writeConfigFile("db.sensitive.json", arg.dbConfigDevelopment, dbConfigDevelopment);
   await writeConfigFile("redis.sensitive.json", arg.redisConfigDevelopment, redisConfigDevelopment);
-  await writeConfigFile("index.staging.sensitive.json", arg.sensitiveConfigStaging, sensitiveConfigStaging);
-  await writeConfigFile("db.staging.sensitive.json", arg.dbConfigStaging, dbConfigStaging);
-  await writeConfigFile("redis.staging.sensitive.json", arg.redisConfigStaging, redisConfigStaging);
   await writeConfigFile("index.production.sensitive.json", arg.sensitiveConfigProduction, sensitiveConfigProduction);
   await writeConfigFile("db.production.sensitive.json", arg.dbConfigProduction, dbConfigProduction);
   await writeConfigFile("redis.production.sensitive.json", arg.redisConfigProduction, redisConfigProduction);

@@ -19,14 +19,11 @@ async function configSetup(arg) {
     };
     if (newArg.standardConfig &&
         newArg.sensitiveConfigDevelopment &&
-        newArg.sensitiveConfigStaging &&
         newArg.sensitiveConfigProduction &&
         newArg.redisConfigDevelopment &&
         newArg.redisConfigProduction &&
-        newArg.redisConfigStaging &&
         newArg.dbConfigDevelopment &&
         newArg.dbConfigProduction &&
-        newArg.dbConfigStaging &&
         !(await read_1.confirm("Would you like to setup the configuration files?"))) {
         return arg;
     }
@@ -39,10 +36,6 @@ async function configSetup(arg) {
         await read_1.confirm("Would you like to modify the sensitive development configuration?")) {
         newArg.sensitiveConfigDevelopment = await sensitive_1.sensitiveConfigSetup("development", newArg.sensitiveConfigDevelopment, null, packageJSON);
     }
-    if (!newArg.sensitiveConfigStaging ||
-        await read_1.confirm("Would you like to modify the sensitive staging configuration?")) {
-        newArg.sensitiveConfigStaging = await sensitive_1.sensitiveConfigSetup("staging", newArg.sensitiveConfigStaging, newArg.sensitiveConfigDevelopment, packageJSON);
-    }
     if (!newArg.sensitiveConfigProduction ||
         await read_1.confirm("Would you like to modify the sensitive production configuration?")) {
         newArg.sensitiveConfigProduction = await sensitive_1.sensitiveConfigSetup("production", newArg.sensitiveConfigProduction, newArg.sensitiveConfigDevelopment, packageJSON);
@@ -51,10 +44,6 @@ async function configSetup(arg) {
         await read_1.confirm("Would you like to modify the redis development configuration?")) {
         newArg.redisConfigDevelopment = await redis_1.redisConfigSetup("development", newArg.redisConfigDevelopment, null, packageJSON);
     }
-    if (!newArg.redisConfigStaging ||
-        await read_1.confirm("Would you like to modify the redis staging configuration?")) {
-        newArg.redisConfigStaging = await redis_1.redisConfigSetup("staging", newArg.redisConfigStaging, newArg.redisConfigDevelopment, packageJSON);
-    }
     if (!newArg.redisConfigProduction ||
         await read_1.confirm("Would you like to modify the redis production configuration?")) {
         newArg.redisConfigProduction = await redis_1.redisConfigSetup("production", newArg.redisConfigProduction, newArg.redisConfigDevelopment, packageJSON);
@@ -62,10 +51,6 @@ async function configSetup(arg) {
     if (!newArg.dbConfigDevelopment ||
         await read_1.confirm("Would you like to modify the posrgreSQL development configuration?")) {
         newArg.dbConfigDevelopment = await db_1.dbConfigSetup("development", newArg.dbConfigDevelopment, null, packageJSON);
-    }
-    if (!newArg.dbConfigStaging ||
-        await read_1.confirm("Would you like to modify the posrgreSQL staging configuration?")) {
-        newArg.dbConfigStaging = await db_1.dbConfigSetup("staging", newArg.dbConfigStaging, newArg.dbConfigDevelopment, packageJSON);
     }
     if (!newArg.dbConfigProduction ||
         await read_1.confirm("Would you like to modify the posrgreSQL production configuration?")) {

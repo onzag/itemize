@@ -39,6 +39,7 @@ const dbbuilder_1 = __importDefault(require("../dbbuilder"));
 const global_manager_1 = require("./global-manager");
 const generator_1 = require("./ssr/generator");
 const rootpool_1 = require("./rootpool");
+// get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const PORT = process.env.PORT || 8000;
@@ -48,7 +49,7 @@ const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 // building the logger
 exports.logger = INSTANCE_MODE === "BUILD_DATABASE" ? null : winston_1.default.createLogger({
     level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
-    format: winston_1.default.format.json(),
+    format: winston_1.default.format.combine(winston_1.default.format.timestamp(), winston_1.default.format.json()),
     transports: [
         new winston_1.default.transports.DailyRotateFile({ filename: `logs/error.${INSTANCE_MODE}.log`, level: "error" }),
         new winston_1.default.transports.DailyRotateFile({ filename: `logs/info.${INSTANCE_MODE}.log`, level: "info" })
@@ -61,11 +62,8 @@ if (NODE_ENV !== "production" && exports.logger) {
     }));
 }
 // Setting the parsers, postgresql comes with
-// its own way to return this data and I want it
-// to keep it in sync with all the data that we are
-// currently using, first we set all the timezones to
-// utc and then format it into what the client expects
-// also do the same with time and date
+// its own way to return this data but we don't want it
+// we want raw strings
 const TIMESTAMP_OID = 1114;
 const TIMESTAMPTZ_OID = 1184;
 const TIME_OID = 1083;
@@ -74,7 +72,9 @@ pg_1.types.setTypeParser(TIMESTAMP_OID, (val) => val);
 pg_1.types.setTypeParser(TIMESTAMPTZ_OID, (val) => val);
 pg_1.types.setTypeParser(TIME_OID, (val) => val);
 pg_1.types.setTypeParser(DATE_OID, (val) => val);
+// we need the async fs
 const fsAsync = fs_1.default.promises;
+// now in order to build the database in the cheat mode, we don't need express
 const app = INSTANCE_MODE === "BUILD_DATABASE" ? null : express_1.default();
 /**
  * This is the function that catches the errors that are thrown
@@ -395,7 +395,7 @@ async function initializeServer(ssrConfig, custom = {}) {
         });
         if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
             exports.logger.info("initializeServer: setting up global manager");
-            const manager = new global_manager_1.GlobalManager(root, knex, redisGlobalClient, redisPub, sensitiveConfig);
+            const manager = new global_manager_1.GlobalManager(root, knex, redisGlobalClient, redisPub, config, sensitiveConfig);
             manager.run();
             if (INSTANCE_MODE === "GLOBAL_MANAGER") {
                 return;

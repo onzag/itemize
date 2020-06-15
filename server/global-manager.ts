@@ -4,12 +4,13 @@ import Root from "../base/Root";
 import Module from "../base/Root/Module";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { logger, IServerDataType } from ".";
-import { SERVER_DATA_IDENTIFIER, SERVER_DATA_MIN_UPDATE_TIME, CURRENCY_FACTORS_IDENTIFIER, CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../constants";
+import { SERVER_DATA_IDENTIFIER, SERVER_DATA_MIN_UPDATE_TIME, CURRENCY_FACTORS_IDENTIFIER, CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER } from "../constants";
 import { CHANGED_FEEEDBACK_EVENT } from "../base/remote-protocol";
-import { ISensitiveConfigRawJSONDataType } from "../config";
+import { ISensitiveConfigRawJSONDataType, IConfigRawJSONDataType } from "../config";
 import { CurrencyLayer, setupCurrencyLayer } from "./services/currency-layer";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ISQLTableRowValue } from "../base/Root/sql";
+import uuid from "uuid";
 
 const wait = (time: number) => {
   return new Promise((resolve) => {
@@ -27,11 +28,14 @@ export class GlobalManager {
   private serverData: IServerDataType;
   private serverDataLastUpdated: number;
   private currencyLayer: CurrencyLayer;
+  private sensitiveConfig: ISensitiveConfigRawJSONDataType;
+  private config: IConfigRawJSONDataType;
   constructor(
     root: Root,
     knex: Knex,
     globalCache: RedisClient,
     redisPub: RedisClient,
+    config: IConfigRawJSONDataType,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
   ) {
     this.root = root;
@@ -41,14 +45,99 @@ export class GlobalManager {
     this.idefNeedsMantenience = [];
     this.modNeedsMantenience = [];
     this.serverData = null;
+    this.config = config;
+    this.sensitiveConfig = sensitiveConfig;
+
     this.currencyLayer = setupCurrencyLayer(sensitiveConfig.currencyLayerAccessKey, this.globalCache, sensitiveConfig.currencyLayerHttpsEnabled);
 
     this.processIdef = this.processIdef.bind(this);
     this.processModule = this.processModule.bind(this);
     this.run = this.run.bind(this);
+    this.addAdminUserIfMissing = this.addAdminUserIfMissing.bind(this);
 
     const modules = this.root.getAllModules();
     modules.forEach(this.processModule)
+  }
+  private async addAdminUserIfMissing() {
+    if (!this.config.roles.includes("ADMIN")) {
+      logger.info(
+        "GlobalManager.addAdminUserIfMissing: admin role is not included within the roles, avoiding this check",
+      );
+      return;
+    }
+
+    const userMod = this.root.getModuleFor(["users"]);
+    const userIdef = userMod.getItemDefinitionFor(["user"]);
+    const moduleTable = userMod.getQualifiedPathName();
+    const selfTable = userIdef.getQualifiedPathName();
+    const primaryAdminUser = await this.knex.first("id").from(moduleTable).where("role", "ADMIN");
+
+    if (!primaryAdminUser) {
+      logger.info(
+        "GlobalManager.addAdminUserIfMissing: admin user is considered missing, adding one",
+      );
+
+      const adminUserNameIsViable = await this.knex.first("id").from(selfTable).where("username", "admin");
+      let username = "admin";
+      if (!adminUserNameIsViable) {
+        username = "admin" + (new Date()).getTime();
+      }
+
+      const password = uuid.v4().replace(/\-/g,"");
+
+      const sqlModData = {
+        type: userIdef.getQualifiedPathName(),
+        last_modified: this.knex.fn.now(),
+        created_at: this.knex.fn.now(),
+        created_by: UNSPECIFIED_OWNER,
+        version: "",
+        container_id: this.sensitiveConfig.defaultContainerID,
+      }
+
+      const sqlIdefData = {
+        username,
+        password: this.knex.raw("crypt(?, gen_salt('bf',10))", password),
+        app_language: this.config.fallbackLanguage,
+        app_country: this.config.fallbackCountryCode,
+        app_currency: this.config.fallbackCurrency,
+      }
+
+      try {
+        await this.knex.transaction(async (transactionKnex) => {
+          const insertQueryValueMod = await transactionKnex(moduleTable)
+            .insert(sqlModData).returning("*");
+    
+          sqlIdefData[CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod[0].id;
+          sqlIdefData[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod[0].version;
+    
+          const insertQueryIdef = transactionKnex(selfTable).insert(sqlIdefData).returning("*");
+          const insertQueryValueIdef = await insertQueryIdef;
+    
+          return {
+            ...insertQueryValueMod[0],
+            ...insertQueryValueIdef[0],
+          };
+        });
+      } catch (err) {
+        logger.error(
+          "GlobalManager.addAdminUserIfMissing: Failed to add admin user when it was considered missing",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+            sqlModData,
+            sqlIdefData,
+          }
+        );
+      }
+
+      logger.info(
+        "GlobalManager.addAdminUserIfMissing: Sucessfully added admin user",
+        {
+          username,
+          password,
+        }
+      )
+    }
   }
   private processModule(mod: Module) {
     mod.getAllModules().forEach(this.processModule);

@@ -7,10 +7,10 @@ const react_1 = __importDefault(require("react"));
 const I18nReadMany_1 = __importDefault(require("../../../components/localization/I18nReadMany"));
 const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSetter"));
 const HTMLResourceLoader_1 = __importDefault(require("../../../components/resources/HTMLResourceLoader"));
-function Contact() {
+function Contact(props) {
     return (react_1.default.createElement(I18nReadMany_1.default, { data: [
-            { id: "contact", capitalize: true },
-            { id: "contact_url" },
+            { id: props.titleI18nId || "contact", capitalize: true },
+            { id: props.urlI18nId || "contact_url" },
         ] }, (i18nContact, i18nContactURL) => {
         return (react_1.default.createElement(react_1.default.Fragment, null,
             react_1.default.createElement(TitleSetter_1.default, null, i18nContact),
@@ -18,3 +18,9 @@ function Contact() {
     }));
 }
 exports.Contact = Contact;
+function contactWithProps(props) {
+    return () => {
+        react_1.default.createElement(Contact, Object.assign({}, props));
+    };
+}
+exports.contactWithProps = contactWithProps;

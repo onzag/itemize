@@ -1,7 +1,7 @@
 import Knex from "knex";
 import { RedisClient } from "redis";
 import Root from "../base/Root";
-import { ISensitiveConfigRawJSONDataType } from "../config";
+import { ISensitiveConfigRawJSONDataType, IConfigRawJSONDataType } from "../config";
 export declare class GlobalManager {
     private root;
     private knex;
@@ -12,7 +12,10 @@ export declare class GlobalManager {
     private serverData;
     private serverDataLastUpdated;
     private currencyLayer;
-    constructor(root: Root, knex: Knex, globalCache: RedisClient, redisPub: RedisClient, sensitiveConfig: ISensitiveConfigRawJSONDataType);
+    private sensitiveConfig;
+    private config;
+    constructor(root: Root, knex: Knex, globalCache: RedisClient, redisPub: RedisClient, config: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType);
+    private addAdminUserIfMissing;
     private processModule;
     private processIdef;
     run(): Promise<void>;

@@ -3,11 +3,16 @@ import I18nReadMany from "../../../components/localization/I18nReadMany";
 import TitleSetter from "../../../components/util/TitleSetter";
 import HTMLResourceLoader from "../../../components/resources/HTMLResourceLoader";
 
-export function Contact() {
+interface ContactProps {
+  titleI18nId?: string;
+  urlI18nId?: string;
+}
+
+export function Contact(props: ContactProps) {
   return (
     <I18nReadMany data={[
-      { id: "contact", capitalize: true },
-      { id: "contact_url" },
+      { id: props.titleI18nId || "contact", capitalize: true },
+      { id: props.urlI18nId || "contact_url" },
     ]}>
       {(i18nContact: string, i18nContactURL: string) => {
         return (
@@ -21,4 +26,10 @@ export function Contact() {
       }}
     </I18nReadMany>
   );
+}
+
+export function contactWithProps(props: ContactProps) {
+  return () => {
+    <Contact {...props}/>
+  }
 }

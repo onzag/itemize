@@ -14,9 +14,15 @@ function Frontpage(props) {
         react_1.default.createElement(I18nRead_1.default, { id: "app_name", capitalize: true }, (i18nAppName) => {
             return (react_1.default.createElement(TitleSetter_1.default, null, i18nAppName));
         }),
-        react_1.default.createElement(hero_1.Hero, { heroID: props.heroID || 1 }),
-        react_1.default.createElement(articles_1.Articles, null),
-        react_1.default.createElement(social_1.Social, null)));
+        props.noHero ? null : react_1.default.createElement(hero_1.Hero, { heroID: props.heroId || 1 }),
+        props.noArticles ? null : react_1.default.createElement(articles_1.Articles, null),
+        props.noSocial ? null : react_1.default.createElement(social_1.Social, null)));
 }
 exports.Frontpage = Frontpage;
 ;
+function frontpageWithProps(props) {
+    return () => {
+        react_1.default.createElement(Frontpage, Object.assign({}, props));
+    };
+}
+exports.frontpageWithProps = frontpageWithProps;

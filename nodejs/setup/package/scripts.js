@@ -9,7 +9,6 @@ exports.default = {
     "build": "itemize build-data && tsc && NODE_ENV=development webpack && NODE_ENV=production webpack",
     "start-silly-server": "LOG_LEVEL=silly NODE_ENV=development node -r tsconfig-paths/register ./dist/server/index.js",
     "start-dev-server": "NODE_ENV=development node -r tsconfig-paths/register ./dist/server/index.js",
-    "start-staging-server": "NODE_ENV=staging node -r tsconfig-paths/register ./dist/server/index.js",
     "start-production-server": "NODE_ENV=production node -r tsconfig-paths/register ./dist/server/index.js",
     "setup": "itemize setup",
     "build-data": "itemize build-data",

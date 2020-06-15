@@ -25,7 +25,6 @@ export declare function initializeItemizeApp(rendererContext: IRendererContext, 
         collector?: ICollectorType;
         config: IConfigRawJSONDataType;
         ssrContext: ISSRContextType;
-        pathname: string;
         clientDetails: {
             lang: string;
             currency: string;
@@ -35,6 +34,7 @@ export declare function initializeItemizeApp(rendererContext: IRendererContext, 
         langLocales: ILangLocalesType;
         root: Root;
         req: any;
+        res: any;
         ipStack: any;
     };
 }): Promise<{

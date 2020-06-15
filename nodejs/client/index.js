@@ -50,7 +50,7 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
     // language is the first argument of the location url
     // so /en/whatever /fi/whatever, determine the language
     // there should be an url language set
-    const pathNameSplitted = serverMode ? serverMode.pathname.split("/") : window.location.pathname.split("/");
+    const pathNameSplitted = serverMode ? serverMode.req.originalUrl.split("/") : window.location.pathname.split("/");
     let urlLanguage = pathNameSplitted[1];
     // The stored locale data takes priority over everything
     // The stored locale data has been set manually when fiddling
@@ -63,7 +63,7 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
     // so if we have a stored language, and that stored language
     // that do differ, we need to change it to the stored language
     // because that has priority
-    if (storedLang && storedLang !== urlLanguage && !serverMode) {
+    if (storedLang && storedLang !== urlLanguage) {
         // we are going to reuse the splitted path name array we created
         pathNameSplitted[1] = storedLang;
         // update the variables
@@ -72,7 +72,15 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
         // this will make it so that our url gets setup even before react
         // is initialized
         const newPathName = pathNameSplitted.join("/");
-        exports.history.replace(newPathName + window.location.search);
+        if (!serverMode) {
+            exports.history.replace(newPathName + window.location.search);
+        }
+        else {
+            // in server mode this does contain the query string as it uses the original url
+            serverMode.res.redirect(newPathName);
+            // returning nothing in server mode will cancel further processing of the response
+            return;
+        }
     }
     // This is for a list of guesed information
     let guessedLang = null;
@@ -154,12 +162,21 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
         // able to handle the different languages, but hey, maybe the user
         // wrote the link manually, note that is is basically a first try
         // not only there was no stored language data, but no url data
-        if (!urlLanguage && !serverMode) {
+        if (!urlLanguage) {
             // and set the url language to the guessed values
             urlLanguage = guessedLang;
             pathNameSplitted[1] = guessedLang;
             const newPathName = pathNameSplitted.join("/");
-            exports.history.replace(newPathName);
+            if (!serverMode) {
+                exports.history.replace(newPathName + window.location.search);
+            }
+            else {
+                // do the redirect
+                serverMode.res.redirect(newPathName);
+                // returning nothing will prevent further processing in server mode
+                // and the user will be redirected
+                return;
+            }
         }
     }
     // let's try now to set the initial locale, the initial language

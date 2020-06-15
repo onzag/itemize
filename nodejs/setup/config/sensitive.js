@@ -98,6 +98,13 @@ async function sensitiveConfigSetup(version, currentConfig, referenceConfig, pac
             ]
         },
         {
+            variableName: "defaultContainerID",
+            message: "of all the previous containers id which one is used by default for internal usage only when no country specified",
+            defaultValue: "",
+            hidden: false,
+            nullifyFalseValues: true,
+        },
+        {
             variableName: "mailgunAPIKey",
             message: "Used in order to send emails, get your key at https://www.mailgun.com/",
             defaultValue: "",

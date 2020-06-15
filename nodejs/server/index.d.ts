@@ -21,12 +21,21 @@ import { ILocaleContextType } from "../client/internal/app";
 import { ICollectorType } from "../client";
 import { Pool } from "tarn";
 export declare const logger: winston.Logger;
+/**
+ * Contains all the pkgcloud clients connection for every container id
+ */
 export declare type PkgCloudClients = {
     [containerId: string]: pkgcloud.storage.Client;
 };
+/**
+ * Contains all the pkgcloud containers for every container id
+ */
 export declare type PkgCloudContainers = {
     [containerId: string]: pkgcloud.storage.Container;
 };
+/**
+ * Specifies the SSR configuration for the multiple pages
+ */
 export interface ISSRConfig {
     ssrRules: ISSRRuleSet;
     rendererContext: IRendererContext;

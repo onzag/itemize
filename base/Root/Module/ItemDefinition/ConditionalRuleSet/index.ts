@@ -115,7 +115,9 @@ export type IConditionalRuleSetRawJSONDataType =
  *    "condition": {
  *      "property": "drive-type",
  *      "comparator": "not-equal",
- *      "value": "belt-drive"
+ *      "value": {
+ *        "exactValue": "belt-drive"
+ *      }
  *    }
  *  }
  * }

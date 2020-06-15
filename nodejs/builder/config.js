@@ -64,13 +64,10 @@ async function extractConfigAndBuildNumber() {
     };
     const standardConfig = await extractOneConfig(schema_checks_1.checkConfig, "index", null, false, standardConfigCheckerCallback);
     const sensitiveConfig = await extractOneConfig(schema_checks_1.checkSensitiveConfig, "index", null, true);
-    await extractOneConfig(schema_checks_1.checkSensitiveConfig, "index", "staging", true);
     await extractOneConfig(schema_checks_1.checkSensitiveConfig, "index", "production", true);
     const redisConfig = await extractOneConfig(schema_checks_1.checkRedisConfig, "redis", null, true);
-    await extractOneConfig(schema_checks_1.checkRedisConfig, "redis", "staging", true);
     await extractOneConfig(schema_checks_1.checkRedisConfig, "redis", "production", true);
     const dbConfig = await extractOneConfig(schema_checks_1.checkDBConfig, "db", null, true);
-    await extractOneConfig(schema_checks_1.checkDBConfig, "db", "staging", true);
     await extractOneConfig(schema_checks_1.checkDBConfig, "db", "production", true);
     return {
         standard: standardConfig,

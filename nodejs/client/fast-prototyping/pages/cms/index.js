@@ -23,23 +23,38 @@ function handleNavbarChangeEvent(e, value) {
 }
 function CMSNavBar(props) {
     const current = props.location.pathname.split("/")[3] || "info";
+    let available = [];
+    if (!props.noFragment) {
+        available.push("fragment");
+    }
+    if (!props.noArticle) {
+        available.push("article");
+    }
     return (react_1.default.createElement(core_1.AppBar, { position: "static", variant: "outlined", color: "default" },
         react_1.default.createElement(core_1.Tabs, { value: current, onChange: handleNavbarChangeEvent, centered: true },
             react_1.default.createElement(core_1.Tab, { label: react_1.default.createElement(I18nRead_1.default, { id: "info" }), value: "info" }),
-            ["fragment", "article"].map((itemDefinition) => {
+            available.map((itemDefinition) => {
                 return (react_1.default.createElement(core_1.Tab, { key: itemDefinition, label: react_1.default.createElement(item_definition_1.NoStateItemDefinitionProvider, { itemDefinition: itemDefinition },
                         react_1.default.createElement(I18nRead_1.default, { id: "name" })), value: itemDefinition }));
             }))));
 }
-function CMS() {
+function CMS(props) {
     return (react_1.default.createElement(module_1.ModuleProvider, { module: "cms" },
         react_1.default.createElement(I18nRead_1.default, { id: "name", capitalize: true }, (i18nCMS) => {
             return (react_1.default.createElement(TitleSetter_1.default, null, i18nCMS));
         }),
-        react_1.default.createElement(Route_1.default, { path: "/cms", component: CMSNavBar }),
+        react_1.default.createElement(Route_1.default, { path: "/cms", component: (routeProps) => {
+                return react_1.default.createElement(CMSNavBar, Object.assign({}, props, routeProps));
+            } }),
         react_1.default.createElement(Route_1.default, { path: "/cms", exact: true, component: info_1.Info }),
-        react_1.default.createElement(Route_1.default, { path: "/cms/fragment", component: fragment_1.Fragment }),
-        react_1.default.createElement(Route_1.default, { path: "/cms/article", component: article_1.Article })));
+        props.noFragment ? null : react_1.default.createElement(Route_1.default, { path: "/cms/fragment", component: fragment_1.Fragment }),
+        props.noArticle ? null : react_1.default.createElement(Route_1.default, { path: "/cms/article", component: article_1.Article })));
 }
 exports.CMS = CMS;
 ;
+function cmsWithProps(props) {
+    return () => {
+        react_1.default.createElement(CMS, Object.assign({}, props));
+    };
+}
+exports.cmsWithProps = cmsWithProps;

@@ -45,6 +45,7 @@ import { ICollectorType } from "../client";
 import { Pool } from "tarn";
 import { retrieveRootPool } from "./rootpool";
 
+// get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const PORT = process.env.PORT || 8000;
@@ -55,7 +56,10 @@ const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 // building the logger
 export const logger: winston.Logger = INSTANCE_MODE === "BUILD_DATABASE" ? null : winston.createLogger({
   level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
-  format: winston.format.json(),
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json(),
+  ),
   transports: [
     new winston.transports.DailyRotateFile({ filename: `logs/error.${INSTANCE_MODE}.log`, level: "error" }),
     new winston.transports.DailyRotateFile({ filename: `logs/info.${INSTANCE_MODE}.log`, level: "info" })
@@ -72,11 +76,8 @@ if (NODE_ENV !== "production" && logger) {
 }
 
 // Setting the parsers, postgresql comes with
-// its own way to return this data and I want it
-// to keep it in sync with all the data that we are
-// currently using, first we set all the timezones to
-// utc and then format it into what the client expects
-// also do the same with time and date
+// its own way to return this data but we don't want it
+// we want raw strings
 const TIMESTAMP_OID = 1114;
 const TIMESTAMPTZ_OID = 1184;
 const TIME_OID = 1083;
@@ -86,13 +87,24 @@ types.setTypeParser(TIMESTAMPTZ_OID, (val) => val);
 types.setTypeParser(TIME_OID, (val) => val);
 types.setTypeParser(DATE_OID, (val) => val);
 
+// we need the async fs
 const fsAsync = fs.promises;
 
+// now in order to build the database in the cheat mode, we don't need express
 const app = INSTANCE_MODE === "BUILD_DATABASE" ? null : express();
 
+/**
+ * Contains all the pkgcloud clients connection for every container id
+ */
 export type PkgCloudClients = {[containerId: string]: pkgcloud.storage.Client};
+/**
+ * Contains all the pkgcloud containers for every container id
+ */
 export type PkgCloudContainers = {[containerId: string]: pkgcloud.storage.Container};
 
+/**
+ * Specifies the SSR configuration for the multiple pages
+ */
 export interface ISSRConfig {
   ssrRules: ISSRRuleSet,
   rendererContext: IRendererContext,
@@ -563,7 +575,7 @@ export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCus
       logger.info(
         "initializeServer: setting up global manager",
       );
-      const manager = new GlobalManager(root, knex, redisGlobalClient, redisPub, sensitiveConfig);
+      const manager = new GlobalManager(root, knex, redisGlobalClient, redisPub, config, sensitiveConfig);
       manager.run();
       if (INSTANCE_MODE === "GLOBAL_MANAGER") {
         return;

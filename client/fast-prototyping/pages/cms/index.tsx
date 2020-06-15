@@ -13,7 +13,9 @@ import { NoStateItemDefinitionProvider } from "../../../providers/item-definitio
 interface CMSNavBarProps {
   location: {
     pathname: string;
-  }
+  },
+  noFragment?: boolean;
+  noArticle?: boolean;
 }
 
 function handleNavbarChangeEvent(e: React.ChangeEvent, value: string) {
@@ -26,11 +28,18 @@ function handleNavbarChangeEvent(e: React.ChangeEvent, value: string) {
 
 function CMSNavBar(props: CMSNavBarProps) {
   const current = props.location.pathname.split("/")[3] || "info";
+  let available: string[] = [];
+  if (!props.noFragment) {
+    available.push("fragment");
+  }
+  if (!props.noArticle) {
+    available.push("article");
+  }
   return (
     <AppBar position="static" variant="outlined" color="default">
       <Tabs value={current} onChange={handleNavbarChangeEvent} centered={true}>
         <Tab label={<I18nRead id="info" />} value="info" />
-        {["fragment", "article"].map((itemDefinition: string) => {
+        {available.map((itemDefinition: string) => {
           return (
             <Tab
               key={itemDefinition}
@@ -50,7 +59,12 @@ function CMSNavBar(props: CMSNavBarProps) {
   );
 }
 
-export function CMS() {
+interface CMSProps {
+  noFragment?: boolean;
+  noArticle?: boolean;
+}
+
+export function CMS(props: CMSProps) {
   return (
     <ModuleProvider module="cms">
       <I18nRead id="name" capitalize={true}>
@@ -62,10 +76,18 @@ export function CMS() {
           );
         }}
       </I18nRead>
-      <Route path="/cms" component={CMSNavBar} />
+      <Route path="/cms" component={(routeProps: any) => {
+        return <CMSNavBar {...props} {...routeProps}/>
+      }} />
       <Route path="/cms" exact={true} component={Info} />
-      <Route path="/cms/fragment" component={Fragment} />
-      <Route path="/cms/article" component={Article} />
+      {props.noFragment ? null : <Route path="/cms/fragment" component={Fragment} />}
+      {props.noArticle ? null : <Route path="/cms/article" component={Article} />}
     </ModuleProvider>
   );
 };
+
+export function cmsWithProps(props: CMSProps) {
+  return () => {
+    <CMS {...props}/>
+  }
+}

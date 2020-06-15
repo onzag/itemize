@@ -22,21 +22,20 @@ const actionRegistry = {
     },
     "get-deployable": {
         fn: getdeployable_1.default,
-        description: "Provides the full docker compose deployable based on the config, ensure to run `npm run build` before this step " +
-            "your server should work already locally before you attempt to get the deployable",
-        usage: "itemize get-deployable [development|staging|production] [build-name] [full|standard|slim|(comma-separated-services)]",
+        description: "Provides the full docker compose deployable based on the config",
+        usage: "itemize get-deployable [development|production] [build-name] [full|standard|slim|(comma-separated-services)]",
         needsArgs: 3,
     },
     "start-dev-environment": {
         fn: dev_environment_1.start,
         description: "Starts the development environment, as configured",
-        usage: "itemize start-dev-environment [development|staging|production]",
+        usage: "itemize start-dev-environment [development|production]",
         needsArgs: 1,
     },
     "stop-dev-environment": {
         fn: dev_environment_1.stop,
         description: "Stops the development environment",
-        usage: "itemize stop-dev-environment [development|staging|production]",
+        usage: "itemize stop-dev-environment [development|production]",
         needsArgs: 1,
     },
     "build-data": {
@@ -48,9 +47,9 @@ const actionRegistry = {
     "build-database": {
         fn: dbbuilder_1.default,
         description: "Builds the database (warning you must run build-data before this) " +
-            "pass the argument development, staging or production in order to specify which config to use " +
+            "pass the argument development or production in order to specify which config to use " +
             "if using a development environment, remember to run start-development-environment",
-        usage: "itemize build-database [development|staging|production]",
+        usage: "itemize build-database [development|production]",
         needsArgs: 1,
     },
 };

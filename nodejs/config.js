@@ -135,6 +135,9 @@ exports.rawSensitiveConfigSchema = {
             minProperties: 1,
         }
     },
+    defaultContainerID: {
+        type: "string",
+    },
     additionalProperties: false,
     required: [
         "ipStackAccessKey",
@@ -235,9 +238,6 @@ exports.rawConfigSchema = {
         developmentHostname: {
             type: "string",
         },
-        stagingHostname: {
-            type: "string",
-        },
         productionHostname: {
             type: "string",
         },
@@ -271,7 +271,6 @@ exports.rawConfigSchema = {
         "fallbackLanguage",
         "fallbackCurrency",
         "developmentHostname",
-        "stagingHostname",
         "productionHostname",
         "containersRegionMappers",
         "containersHostnamePrefixes",

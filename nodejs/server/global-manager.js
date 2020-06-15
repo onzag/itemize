@@ -1,16 +1,20 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = require(".");
 const constants_1 = require("../constants");
 const remote_protocol_1 = require("../base/remote-protocol");
 const currency_layer_1 = require("./services/currency-layer");
+const uuid_1 = __importDefault(require("uuid"));
 const wait = (time) => {
     return new Promise((resolve) => {
         setTimeout(resolve, time);
     });
 };
 class GlobalManager {
-    constructor(root, knex, globalCache, redisPub, sensitiveConfig) {
+    constructor(root, knex, globalCache, redisPub, config, sensitiveConfig) {
         this.root = root;
         this.knex = knex;
         this.globalCache = globalCache;
@@ -18,12 +22,76 @@ class GlobalManager {
         this.idefNeedsMantenience = [];
         this.modNeedsMantenience = [];
         this.serverData = null;
+        this.config = config;
+        this.sensitiveConfig = sensitiveConfig;
         this.currencyLayer = currency_layer_1.setupCurrencyLayer(sensitiveConfig.currencyLayerAccessKey, this.globalCache, sensitiveConfig.currencyLayerHttpsEnabled);
         this.processIdef = this.processIdef.bind(this);
         this.processModule = this.processModule.bind(this);
         this.run = this.run.bind(this);
+        this.addAdminUserIfMissing = this.addAdminUserIfMissing.bind(this);
         const modules = this.root.getAllModules();
         modules.forEach(this.processModule);
+    }
+    async addAdminUserIfMissing() {
+        if (!this.config.roles.includes("ADMIN")) {
+            _1.logger.info("GlobalManager.addAdminUserIfMissing: admin role is not included within the roles, avoiding this check");
+            return;
+        }
+        const userMod = this.root.getModuleFor(["users"]);
+        const userIdef = userMod.getItemDefinitionFor(["user"]);
+        const moduleTable = userMod.getQualifiedPathName();
+        const selfTable = userIdef.getQualifiedPathName();
+        const primaryAdminUser = await this.knex.first("id").from(moduleTable).where("role", "ADMIN");
+        if (!primaryAdminUser) {
+            _1.logger.info("GlobalManager.addAdminUserIfMissing: admin user is considered missing, adding one");
+            const adminUserNameIsViable = await this.knex.first("id").from(selfTable).where("username", "admin");
+            let username = "admin";
+            if (!adminUserNameIsViable) {
+                username = "admin" + (new Date()).getTime();
+            }
+            const password = uuid_1.default.v4().replace(/\-/g, "");
+            const sqlModData = {
+                type: userIdef.getQualifiedPathName(),
+                last_modified: this.knex.fn.now(),
+                created_at: this.knex.fn.now(),
+                created_by: constants_1.UNSPECIFIED_OWNER,
+                version: "",
+                container_id: this.sensitiveConfig.defaultContainerID,
+            };
+            const sqlIdefData = {
+                username,
+                password: this.knex.raw("crypt(?, gen_salt('bf',10))", password),
+                app_language: this.config.fallbackLanguage,
+                app_country: this.config.fallbackCountryCode,
+                app_currency: this.config.fallbackCurrency,
+            };
+            try {
+                await this.knex.transaction(async (transactionKnex) => {
+                    const insertQueryValueMod = await transactionKnex(moduleTable)
+                        .insert(sqlModData).returning("*");
+                    sqlIdefData[constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod[0].id;
+                    sqlIdefData[constants_1.CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod[0].version;
+                    const insertQueryIdef = transactionKnex(selfTable).insert(sqlIdefData).returning("*");
+                    const insertQueryValueIdef = await insertQueryIdef;
+                    return {
+                        ...insertQueryValueMod[0],
+                        ...insertQueryValueIdef[0],
+                    };
+                });
+            }
+            catch (err) {
+                _1.logger.error("GlobalManager.addAdminUserIfMissing: Failed to add admin user when it was considered missing", {
+                    errMessage: err.message,
+                    errStack: err.stack,
+                    sqlModData,
+                    sqlIdefData,
+                });
+            }
+            _1.logger.info("GlobalManager.addAdminUserIfMissing: Sucessfully added admin user", {
+                username,
+                password,
+            });
+        }
     }
     processModule(mod) {
         mod.getAllModules().forEach(this.processModule);

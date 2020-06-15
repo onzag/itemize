@@ -49,7 +49,7 @@ const typeValue = {
                 type: "tsvector",
                 index: {
                     type: "gin",
-                    id: "FULL_TEXT_SEARCH_GIN_INDEX_" + sqlPrefix + id,
+                    id: "FTS_" + sqlPrefix + id,
                     level: 0,
                 },
             },

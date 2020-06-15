@@ -33,7 +33,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
  *    "condition": {
  *      "property": "drive-type",
  *      "comparator": "not-equal",
- *      "value": "belt-drive"
+ *      "value": {
+ *        "exactValue": "belt-drive"
+ *      }
  *    }
  *  }
  * }

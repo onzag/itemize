@@ -62,9 +62,6 @@ async function setup(...onlyNames) {
     const sensitiveConfigDevelopment = await readConfigFile("index.sensitive.json");
     const dbConfigDevelopment = await readConfigFile("db.sensitive.json");
     const redisConfigDevelopment = await readConfigFile("redis.sensitive.json");
-    const sensitiveConfigStaging = await readConfigFile("index.staging.sensitive.json");
-    const dbConfigStaging = await readConfigFile("db.staging.sensitive.json");
-    const redisConfigStaging = await readConfigFile("redis.staging.sensitive.json");
     const sensitiveConfigProduction = await readConfigFile("index.production.sensitive.json");
     const dbConfigProduction = await readConfigFile("db.production.sensitive.json");
     const redisConfigProduction = await readConfigFile("redis.production.sensitive.json");
@@ -73,9 +70,6 @@ async function setup(...onlyNames) {
         sensitiveConfigDevelopment,
         dbConfigDevelopment,
         redisConfigDevelopment,
-        sensitiveConfigStaging,
-        dbConfigStaging,
-        redisConfigStaging,
         sensitiveConfigProduction,
         dbConfigProduction,
         redisConfigProduction,
@@ -90,9 +84,6 @@ async function setup(...onlyNames) {
     await writeConfigFile("index.sensitive.json", arg.sensitiveConfigDevelopment, sensitiveConfigDevelopment);
     await writeConfigFile("db.sensitive.json", arg.dbConfigDevelopment, dbConfigDevelopment);
     await writeConfigFile("redis.sensitive.json", arg.redisConfigDevelopment, redisConfigDevelopment);
-    await writeConfigFile("index.staging.sensitive.json", arg.sensitiveConfigStaging, sensitiveConfigStaging);
-    await writeConfigFile("db.staging.sensitive.json", arg.dbConfigStaging, dbConfigStaging);
-    await writeConfigFile("redis.staging.sensitive.json", arg.redisConfigStaging, redisConfigStaging);
     await writeConfigFile("index.production.sensitive.json", arg.sensitiveConfigProduction, sensitiveConfigProduction);
     await writeConfigFile("db.production.sensitive.json", arg.dbConfigProduction, dbConfigProduction);
     await writeConfigFile("redis.production.sensitive.json", arg.redisConfigProduction, redisConfigProduction);
