@@ -4,7 +4,7 @@ import PropertyDefinition, {
 import React from "react";
 import PropertyEntryBoolean from "./PropertyEntryBoolean";
 import PropertyEntryText from "./PropertyEntryText";
-// import PropertyEntryDateTime from "./PropertyEntryDateTime";
+import PropertyEntryDateTime from "./PropertyEntryDateTime";
 import PropertyEntryLocation from "./PropertyEntryLocation";
 // import PropertyEntryFiles from "./PropertyEntryFiles";
 // import PropertyEntryNumeric from "./PropertyEntryNumeric";
@@ -146,9 +146,18 @@ const handlerRegistry:
     handler: PropertyEntryField,
   },
   year: null,
-  datetime: null,
-  date: null,
-  time: null,
+  datetime: {
+    renderer: "PropertyEntryDateTime",
+    handler: PropertyEntryDateTime,
+  },
+  date: {
+    renderer: "PropertyEntryDateTime",
+    handler: PropertyEntryDateTime,
+  },
+  time: {
+    renderer: "PropertyEntryDateTime",
+    handler: PropertyEntryDateTime,
+  },
   location: {
     renderer: "PropertyEntryLocation",
     handler: PropertyEntryLocation,

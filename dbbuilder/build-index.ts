@@ -7,9 +7,16 @@
 
 import colors from "colors/safe";
 import Knex from "knex";
+import uuidv5 from "uuid/v5";
 
 import { ISQLSchemaDefinitionType } from "../base/Root/sql";
 import { showErrorStackAndLogMessage, yesno } from ".";
+
+const NAMESPACE = "23ab5609-df49-4fdf-921b-4604ada284f3";
+function makeIdOutOf(str: string) {
+  return "IDX" + uuidv5(str, NAMESPACE).replace(/-/g, "");
+}
+const MAX_PG_INDEX_SIZE = 60;
 
 interface IProcessedIndexColumn {
   level: number;
@@ -151,6 +158,17 @@ export async function buildIndexes(
       const newIndex = newTableIndexes[indexId];
       const currentIndex = currentTableIndexes[indexId];
 
+      // pg indexes however cannot be longer than 63 characters, so we crop then
+      // this thing is safe so we ensure to crop at 60 characters
+      let pgIndexName = tableName + "_" + indexId;
+      if (pgIndexName.length > MAX_PG_INDEX_SIZE) {
+        pgIndexName = makeIdOutOf(pgIndexName);
+        console.log(colors.yellow(
+          `Index '${indexId}' of type ${currentIndex.type} is too long` +
+          ` so it is renamed to ${pgIndexName} this is consistent and as so nothing has to be done`,
+        ));
+      }
+
       const newIndexColumnsSorted = newIndex && newIndex.columns.sort((a, b) => {
         return a.level - b.level;
       }).map((c) => c.columnName);
@@ -202,9 +220,9 @@ export async function buildIndexes(
               if (currentIndex.type === "unique") {
                 t.dropUnique(currentIndexColumnsSorted);
               } else if (currentIndex.type === "primary") {
-                t.dropPrimary(tableName + "_" + indexId);
+                t.dropPrimary(pgIndexName);
               } else {
-                t.dropIndex(currentIndexColumnsSorted, tableName + "_" + indexId);
+                t.dropIndex(currentIndexColumnsSorted, pgIndexName);
               }
             });
 
@@ -260,11 +278,11 @@ export async function buildIndexes(
           try {
             await knex.schema.withSchema("public").alterTable(tableName, (t) => {
               if (newIndex.type === "unique") {
-                t.unique(newIndexColumnsSorted, tableName + "_" + indexId);
+                t.unique(newIndexColumnsSorted, pgIndexName);
               } else if (newIndex.type === "primary") {
-                t.primary(newIndexColumnsSorted, tableName + "_" + indexId);
+                t.primary(newIndexColumnsSorted, pgIndexName);
               } else {
-                t.index(newIndexColumnsSorted, tableName + "_" + indexId, newIndex.type);
+                t.index(newIndexColumnsSorted, pgIndexName, newIndex.type);
               }
             });
 

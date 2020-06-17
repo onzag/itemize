@@ -13,7 +13,12 @@ SITE
 . Implementation of mailing module [+7]
 . Test implementation of a sales module for probing includes [+20]
 . String based total search (tags?) [+10] [DONE?]
-. Add the GLOBAL_MANAGER to the docker-compose
+. Add the GLOBAL_MANAGER to the docker-compose [DONE]
+. Fix the bug where very long names for indexes will cause invalid indexes names [DONE]
+  . Add support for multiple indexes?
+. Remove normalized in currency for the client side and rather create the value during storing
+  . Client side search does not support normalized anymore
+  . SQL mantenience gets simplified as last modified value should not change after this [DONE]
 
 ONZASYSTEMS [+3]
 . Build a Frontpage with few details

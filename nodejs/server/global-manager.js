@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = require(".");
 const constants_1 = require("../constants");
-const remote_protocol_1 = require("../base/remote-protocol");
 const currency_layer_1 = require("./services/currency-layer");
 const uuid_1 = __importDefault(require("uuid"));
 const wait = (time) => {
@@ -232,22 +231,11 @@ class GlobalManager {
                 });
             });
         }
-        if (isModule) {
-            updateQuery.returning(["id", "version", "type"]);
-        }
-        else {
-            updateQuery.returning([constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME, constants_1.CONNECTOR_SQL_COLUMN_VERSION_FK_NAME]);
-        }
+        // we do not update last_modified in order to avoid useless updates
+        // sql mantenience changes now so that it doesn't inform any client or cluster for changes
+        // it could, but now it's considered a search only property, changes are hence, silent
         // UPDATE TABLE "stuffs" SET "normalized_0"=c0."factor"*"value_0", "normalized_1"=c1."factor"*"value_1" FROM "currencyfactors" c0, "currencyfactors" c1 WHERE c0."name"="currency_0" AND c1."name"="currency_1" AND (c0."factor"*s."value_0" > 0.5 OR c1."factor"*"value_1" > 0.5) RETURNING *
         // buggy typescript again
-        const updateResults = (await updateQuery);
-        updateResults.forEach((result) => {
-            const id = result[isModule ? "id" : constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME];
-            const version = result[isModule ? "version" : constants_1.CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] || null;
-            const idefName = isModule ? result["type"] : tableName;
-            const idef = this.root.registry[idefName];
-            this.informUpdatesFor(idef, id, version);
-        });
     }
     async calculateServerData() {
         try {
@@ -301,18 +289,6 @@ class GlobalManager {
                 });
             }
         });
-    }
-    async informUpdatesFor(idef, id, version) {
-        const mergedIndexIdentifier = idef.getQualifiedPathName() + "." + id + "." + (version || "");
-        const redisEvent = {
-            event,
-            listenerUUID: null,
-            serverInstanceGroupId: null,
-            mergedIndexIdentifier,
-            eventType: remote_protocol_1.CHANGED_FEEEDBACK_EVENT,
-        };
-        _1.logger.debug("Listener.informUpdatesFor: triggering redis event", redisEvent);
-        this.redisPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
     }
 }
 exports.GlobalManager = GlobalManager;

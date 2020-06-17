@@ -10,7 +10,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const safe_1 = __importDefault(require("colors/safe"));
+const v5_1 = __importDefault(require("uuid/v5"));
 const _1 = require(".");
+const NAMESPACE = "23ab5609-df49-4fdf-921b-4604ada284f3";
+function makeIdOutOf(str) {
+    return "IDX" + v5_1.default(str, NAMESPACE).replace(/-/g, "");
+}
+const MAX_PG_INDEX_SIZE = 60;
 /**
  * Builds all the indexes
  * @param knex the knex instance
@@ -122,6 +128,14 @@ async function buildIndexes(knex, currentDatabaseSchema, newDatabaseSchema) {
             // either of these might be undefined
             const newIndex = newTableIndexes[indexId];
             const currentIndex = currentTableIndexes[indexId];
+            // pg indexes however cannot be longer than 63 characters, so we crop then
+            // this thing is safe so we ensure to crop at 60 characters
+            let pgIndexName = tableName + "_" + indexId;
+            if (pgIndexName.length > MAX_PG_INDEX_SIZE) {
+                pgIndexName = makeIdOutOf(pgIndexName);
+                console.log(safe_1.default.yellow(`Index '${indexId}' of type ${currentIndex.type} is too long` +
+                    ` so it is renamed to ${pgIndexName} this is consistent and as so nothing has to be done`));
+            }
             const newIndexColumnsSorted = newIndex && newIndex.columns.sort((a, b) => {
                 return a.level - b.level;
             }).map((c) => c.columnName);
@@ -162,10 +176,10 @@ async function buildIndexes(knex, currentDatabaseSchema, newDatabaseSchema) {
                                 t.dropUnique(currentIndexColumnsSorted);
                             }
                             else if (currentIndex.type === "primary") {
-                                t.dropPrimary(tableName + "_" + indexId);
+                                t.dropPrimary(pgIndexName);
                             }
                             else {
-                                t.dropIndex(currentIndexColumnsSorted, tableName + "_" + indexId);
+                                t.dropIndex(currentIndexColumnsSorted, pgIndexName);
                             }
                         });
                         // now we need to update each column affected
@@ -209,13 +223,13 @@ async function buildIndexes(knex, currentDatabaseSchema, newDatabaseSchema) {
                     try {
                         await knex.schema.withSchema("public").alterTable(tableName, (t) => {
                             if (newIndex.type === "unique") {
-                                t.unique(newIndexColumnsSorted, tableName + "_" + indexId);
+                                t.unique(newIndexColumnsSorted, pgIndexName);
                             }
                             else if (newIndex.type === "primary") {
-                                t.primary(newIndexColumnsSorted, tableName + "_" + indexId);
+                                t.primary(newIndexColumnsSorted, pgIndexName);
                             }
                             else {
-                                t.index(newIndexColumnsSorted, tableName + "_" + indexId, newIndex.type);
+                                t.index(newIndexColumnsSorted, pgIndexName, newIndex.type);
                             }
                         });
                         // now we need to update each affected column

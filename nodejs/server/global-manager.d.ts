@@ -25,5 +25,4 @@ export declare class GlobalManager {
     private runFor;
     private calculateServerData;
     private informNewServerData;
-    private informUpdatesFor;
 }

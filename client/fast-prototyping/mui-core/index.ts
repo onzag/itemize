@@ -1,4 +1,4 @@
-import { Paper, createStyles, withStyles, WithStyles, Container, TextField, Box, Typography } from "@material-ui/core";
+import { Paper, createStyles, withStyles, WithStyles, Container, TextField, Box, Typography, Theme } from "@material-ui/core";
 
 export {
   Paper,
@@ -9,4 +9,5 @@ export {
   TextField,
   Box,
   Typography,
+  Theme,
 }

@@ -191,48 +191,33 @@ export function localeReplacerToArray(str: string, ...args: any[]): any[] {
  * @param value the format string
  * @returns the normalized form
  */
-export function getNormalizedDateTimeFormat(value: string) {
-  // Since we cannot have a mask that uses only one H
-  // we need to return it with two, same for the second
-  // we canot have a one or two digits situation
+// export function getNormalizedDateTimeFormat(value: string) {
+//   // Since we cannot have a mask that uses only one H
+//   // we need to return it with two, same for the second
+//   // we canot have a one or two digits situation
 
-  if (value === "H:mm") {
-    return "HH:mm";
-  } else if (value === "h:mm A") {
-    return "hh:mm A";
-  }
+//   if (value === "H:mm") {
+//     return "HH:mm";
+//   } else if (value === "h:mm A") {
+//     return "hh:mm A";
+//   }
 
-  // any other value is tipically allowed
-  return value;
-}
+//   // any other value is tipically allowed
+//   return value;
+// }
 
-/**
- * TODO looks wrong check what is wrong
- */
-export function getLocalizedTimeFormat(normalize: boolean) {
+export function getLocalizedTimeFormat() {
   const LT = (Moment.localeData() as any)._longDateFormat.LT;
-  if (!normalize) {
-    return LT;
-  }
   return LT;
 }
 
-/**
- * TODO looks wrong check what is wrong
- */
-export function getLocalizedDateFormat(normalize: boolean) {
+export function getLocalizedDateFormat() {
   const L = (Moment.localeData() as any)._longDateFormat.L;
-  if (!normalize) {
-    return L;
-  }
-  return getNormalizedDateTimeFormat(L);
+  return L;
 }
 
-/**
- * TODO looks wrong check what is wrong
- */
-export function getLocalizedDateTimeFormat(normalize: boolean) {
-  return getLocalizedDateFormat(normalize) + " " + getLocalizedTimeFormat(normalize);
+export function getLocalizedDateTimeFormat() {
+  return getLocalizedDateFormat() + " " + getLocalizedTimeFormat();
 }
 
 /**

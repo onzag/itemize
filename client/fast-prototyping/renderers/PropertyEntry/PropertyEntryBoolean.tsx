@@ -159,8 +159,6 @@ const ActualPropertyEntryBooleanRendererWithStyles = withStyles(style)((props: I
   );
 });
 
-// TODO the ternary entry
-
 export default function PropertyEntryFieldRenderer(props: IPropertyEntryBooleanRendererProps) {
   let appliedTheme: IPropertyEntryThemeType = STANDARD_THEME;
   if (props.args["theme"]) {

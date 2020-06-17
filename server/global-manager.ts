@@ -4,12 +4,11 @@ import Root from "../base/Root";
 import Module from "../base/Root/Module";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { logger, IServerDataType } from ".";
-import { SERVER_DATA_IDENTIFIER, SERVER_DATA_MIN_UPDATE_TIME, CURRENCY_FACTORS_IDENTIFIER, CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER } from "../constants";
-import { CHANGED_FEEEDBACK_EVENT } from "../base/remote-protocol";
+import { SERVER_DATA_IDENTIFIER, SERVER_DATA_MIN_UPDATE_TIME, CURRENCY_FACTORS_IDENTIFIER,
+  CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER } from "../constants";
 import { ISensitiveConfigRawJSONDataType, IConfigRawJSONDataType } from "../config";
 import { CurrencyLayer, setupCurrencyLayer } from "./services/currency-layer";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
-import { ISQLTableRowValue } from "../base/Root/sql";
 import uuid from "uuid";
 
 const wait = (time: number) => {
@@ -313,27 +312,12 @@ export class GlobalManager {
       });
     }
 
-    if (isModule) {
-      updateQuery.returning(["id", "version", "type"]);
-    } else {
-      updateQuery.returning([CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME]);
-    }
+    // we do not update last_modified in order to avoid useless updates
+    // sql mantenience changes now so that it doesn't inform any client or cluster for changes
+    // it could, but now it's considered a search only property, changes are hence, silent
 
     // UPDATE TABLE "stuffs" SET "normalized_0"=c0."factor"*"value_0", "normalized_1"=c1."factor"*"value_1" FROM "currencyfactors" c0, "currencyfactors" c1 WHERE c0."name"="currency_0" AND c1."name"="currency_1" AND (c0."factor"*s."value_0" > 0.5 OR c1."factor"*"value_1" > 0.5) RETURNING *
     // buggy typescript again
-    const updateResults = (await updateQuery) as any as ISQLTableRowValue[];
-    updateResults.forEach((result) => {
-      const id = result[isModule ? "id" : CONNECTOR_SQL_COLUMN_ID_FK_NAME];
-      const version = result[isModule ? "version" : CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] || null;
-      const idefName = isModule ? result["type"] : tableName;
-      const idef = this.root.registry[idefName] as ItemDefinition;
-
-      this.informUpdatesFor(
-        idef,
-        id,
-        version,
-      );
-    });
   }
   private async calculateServerData() {
     try {
@@ -409,20 +393,5 @@ export class GlobalManager {
         }
       }
     );
-  }
-  private async informUpdatesFor(idef: ItemDefinition, id: number, version: string) {
-    const mergedIndexIdentifier = idef.getQualifiedPathName() + "." + id + "." + (version || "");
-    const redisEvent = {
-      event,
-      listenerUUID: null as string,
-      serverInstanceGroupId: null as string,
-      mergedIndexIdentifier,
-      eventType: CHANGED_FEEEDBACK_EVENT,
-    };
-    logger.debug(
-      "Listener.informUpdatesFor: triggering redis event",
-      redisEvent,
-    );
-    this.redisPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
 }

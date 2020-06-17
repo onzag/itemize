@@ -9,6 +9,7 @@ import { IPropertyEntrySelectRendererProps } from "../internal/components/Proper
 import { IPropertyEntryTextRendererProps } from "../internal/components/PropertyEntry/PropertyEntryText";
 import { IPropertyViewTextRendererProps } from "../internal/components/PropertyView/PropertyViewText";
 import { IPropertyViewFileRendererProps } from "../internal/components/PropertyView/PropertyViewFile";
+import { IPropertyEntryDateTimeRendererProps } from "../internal/components/PropertyEntry/PropertyEntryDateTime";
 
 export interface IRendererContext {
   IncludeCalloutWarning?: React.ComponentType<IIncludeCalloutWarningRendererProps>;
@@ -19,6 +20,7 @@ export interface IRendererContext {
   PropertyEntryLocation?: React.ComponentType<IPropertyEntryLocationRendererProps>;
   PropertyEntrySelect?: React.ComponentType<IPropertyEntrySelectRendererProps>;
   PropertyEntryText?: React.ComponentType<IPropertyEntryTextRendererProps>;
+  PropertyEntryDateTime?: React.ComponentType<IPropertyEntryDateTimeRendererProps>;
 
   PropertyViewSimple?: React.ComponentType<IPropertyViewSimpleRendererProps>;
   PropertyViewText?: React.ComponentType<IPropertyViewTextRendererProps>;

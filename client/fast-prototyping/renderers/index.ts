@@ -5,6 +5,7 @@ import PropertyEntryBooleanRenderer from "./PropertyEntry/PropertyEntryBoolean";
 import PropertyEntryLocationRenderer from "./PropertyEntry/PropertyEntryLocation";
 import PropertyEntrySelectRenderer from "./PropertyEntry/PropertyEntrySelect";
 import PropertyEntryTextRenderer from "./PropertyEntry/PropertyEntryText";
+import PropertyEntryDateTimeRenderer from "./PropertyEntry/PropertyEntryDateTime";
 
 import PropertyViewSimpleRenderer from "./PropertyView/PropertyViewSimple";
 import PropertyViewTextRenderer from "./PropertyView/PropertyViewText";
@@ -17,6 +18,7 @@ export const rendererContext: IRendererContext = {
   PropertyEntryLocation: PropertyEntryLocationRenderer, 
   PropertyEntrySelect: PropertyEntrySelectRenderer,
   PropertyEntryText: PropertyEntryTextRenderer,
+  PropertyEntryDateTime: PropertyEntryDateTimeRenderer,
 
   PropertyViewSimple: PropertyViewSimpleRenderer,
   PropertyViewText: PropertyViewTextRenderer,

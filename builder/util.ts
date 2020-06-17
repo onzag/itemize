@@ -183,8 +183,8 @@ export async function getActualFileIdentifier(
     name = locationSplitted.pop();
   }
 
-  if (!(/[a-z_]+/g).test(name)) {
-    throw new CheckUpError(`Invalid resulting file name '${name}'`, traceback);
+  if (!(/^[a-z_]+$/g).test(name)) {
+    throw new CheckUpError(`Invalid resulting file name '${name}' only a-z and _ allowed`, traceback);
   }
 
   return name;

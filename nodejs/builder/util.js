@@ -141,8 +141,8 @@ async function getActualFileIdentifier(location, traceback) {
         // so we use the name of the parent folder
         name = locationSplitted.pop();
     }
-    if (!(/[a-z_]+/g).test(name)) {
-        throw new Error_1.default(`Invalid resulting file name '${name}'`, traceback);
+    if (!(/^[a-z_]+$/g).test(name)) {
+        throw new Error_1.default(`Invalid resulting file name '${name}' only a-z and _ allowed`, traceback);
     }
     return name;
 }
