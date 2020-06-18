@@ -13,6 +13,18 @@ export interface IPropertyEntryBooleanRendererProps extends IPropertyEntryRender
 export default class PropertyEntryBoolean extends React.Component<
   IPropertyEntryHandlerProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>
 > {
+  constructor(props: IPropertyEntryHandlerProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>) {
+    super(props);
+
+    this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
+  }
+  public onRestoreHijacked() {
+    if (this.props.state.stateAppliedValue !== null) {
+      this.props.onRestore()
+    } else {
+      this.props.onChange(false, null);
+    }
+  }
   public shouldComponentUpdate(
     nextProps: IPropertyEntryHandlerProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>,
   ) {
@@ -52,6 +64,12 @@ export default class PropertyEntryBoolean extends React.Component<
     const falseLabel = this.props.i18n[this.props.language].no;
     const nullLabel = this.props.i18n[this.props.language].unspecified;
 
+    if (this.props.state.value === null) {
+      console.warn(
+        "Warning!... you should set a default value to a boolean field, got null"
+      );
+    }
+
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryBooleanRendererProps = {
       args: this.props.rendererArgs,
@@ -67,16 +85,16 @@ export default class PropertyEntryBoolean extends React.Component<
       nullLabel,
 
       currentAppliedValue: this.props.state.stateAppliedValue as boolean,
-      currentValue: this.props.state.value as boolean,
+      currentValue: (this.props.state.value as boolean) || false,
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,
-      canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
+      canRestore: (this.props.state.value || false) !== (this.props.state.stateAppliedValue || false),
 
       disabled: this.props.state.enforced,
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
-      onRestore: this.props.onRestore,
+      onRestore: this.onRestoreHijacked,
     };
 
     return <RendererElement {...rendererArgs} />;

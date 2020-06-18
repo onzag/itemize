@@ -9,9 +9,12 @@ const PropertyEntryBoolean_1 = __importDefault(require("./PropertyEntry/Property
 const PropertyEntryLocation_1 = __importDefault(require("./PropertyEntry/PropertyEntryLocation"));
 const PropertyEntrySelect_1 = __importDefault(require("./PropertyEntry/PropertyEntrySelect"));
 const PropertyEntryText_1 = __importDefault(require("./PropertyEntry/PropertyEntryText"));
+const PropertyEntryDateTime_1 = __importDefault(require("./PropertyEntry/PropertyEntryDateTime"));
+const PropertyViewBoolean_1 = __importDefault(require("./PropertyView/PropertyViewBoolean"));
 const PropertyViewSimple_1 = __importDefault(require("./PropertyView/PropertyViewSimple"));
 const PropertyViewText_1 = __importDefault(require("./PropertyView/PropertyViewText"));
 const PropertyViewFile_1 = __importDefault(require("./PropertyView/PropertyViewFile"));
+const PropertyViewDateTime_1 = __importDefault(require("./PropertyView/PropertyViewDateTime"));
 exports.rendererContext = {
     PropertyEntryField: PropertyEntryField_1.default,
     PropertyEntryFile: PropertyEntryFile_1.default,
@@ -19,7 +22,10 @@ exports.rendererContext = {
     PropertyEntryLocation: PropertyEntryLocation_1.default,
     PropertyEntrySelect: PropertyEntrySelect_1.default,
     PropertyEntryText: PropertyEntryText_1.default,
+    PropertyEntryDateTime: PropertyEntryDateTime_1.default,
+    PropertyViewBoolean: PropertyViewBoolean_1.default,
     PropertyViewSimple: PropertyViewSimple_1.default,
     PropertyViewText: PropertyViewText_1.default,
+    PropertyViewDateTime: PropertyViewDateTime_1.default,
     PropertyViewFile: PropertyViewFile_1.default,
 };

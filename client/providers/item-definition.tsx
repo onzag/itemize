@@ -301,6 +301,7 @@ export interface IItemDefinitionContextType {
   dismissSearchResults: () => void;
 
   // to remove the poked status
+  poke: (elements: IPokeElementsType) => void;
   unpoke: () => void;
 
   // the remote listener
@@ -578,6 +579,8 @@ export class ActualItemDefinitionProvider extends
     this.canEdit = this.canEdit.bind(this);
     this.canCreate = this.canCreate.bind(this);
     this.canDelete = this.canDelete.bind(this);
+    this.clean = this.clean.bind(this);
+    this.poke = this.poke.bind(this);
     this.unpoke = this.unpoke.bind(this);
     this.search = this.search.bind(this);
     this.dismissSearchError = this.dismissSearchError.bind(this);
@@ -2446,6 +2449,15 @@ export class ActualItemDefinitionProvider extends
       false,
     );
   }
+  public poke(elements: IPokeElementsType) {
+    if (this.isUnmounted) {
+      return;
+    }
+
+    this.setState({
+      pokedElements: elements,
+    });
+  }
   public unpoke() {
     if (this.isUnmounted) {
       return;
@@ -2509,6 +2521,7 @@ export class ActualItemDefinitionProvider extends
           dismissDeleted: this.dismissDeleted,
           dismissSearchError: this.dismissSearchError,
           dismissSearchResults: this.dismissSearchResults,
+          poke: this.poke,
           unpoke: this.unpoke,
           canCreate: this.state.canCreate,
           canDelete: this.state.canDelete,

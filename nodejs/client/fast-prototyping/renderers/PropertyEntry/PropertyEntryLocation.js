@@ -383,6 +383,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
             }, inputProps: {
                 value: this.props.searchQuery,
                 onChange: this.onSearchQueryChange,
+                autoComplete: "off",
             } }));
     }
 }

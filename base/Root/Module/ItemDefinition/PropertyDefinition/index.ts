@@ -836,8 +836,8 @@ export default class PropertyDefinition {
 
     this.canCacheState = true;
     if (
-      rawJSON.invalidIf &&
-      rawJSON.hiddenIf &&
+      rawJSON.invalidIf ||
+      rawJSON.hiddenIf ||
       rawJSON.defaultIf
     ) {
       this.canCacheState = false;

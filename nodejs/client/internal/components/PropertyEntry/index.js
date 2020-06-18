@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const PropertyEntryBoolean_1 = __importDefault(require("./PropertyEntryBoolean"));
 const PropertyEntryText_1 = __importDefault(require("./PropertyEntryText"));
-// import PropertyEntryDateTime from "./PropertyEntryDateTime";
+const PropertyEntryDateTime_1 = __importDefault(require("./PropertyEntryDateTime"));
 const PropertyEntryLocation_1 = __importDefault(require("./PropertyEntryLocation"));
 // import PropertyEntryFiles from "./PropertyEntryFiles";
 // import PropertyEntryNumeric from "./PropertyEntryNumeric";
@@ -52,9 +52,18 @@ const handlerRegistry = {
         handler: PropertyEntryField_1.default,
     },
     year: null,
-    datetime: null,
-    date: null,
-    time: null,
+    datetime: {
+        renderer: "PropertyEntryDateTime",
+        handler: PropertyEntryDateTime_1.default,
+    },
+    date: {
+        renderer: "PropertyEntryDateTime",
+        handler: PropertyEntryDateTime_1.default,
+    },
+    time: {
+        renderer: "PropertyEntryDateTime",
+        handler: PropertyEntryDateTime_1.default,
+    },
     location: {
         renderer: "PropertyEntryLocation",
         handler: PropertyEntryLocation_1.default,

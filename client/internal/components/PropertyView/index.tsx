@@ -17,6 +17,8 @@ import PropertyViewText from "./PropertyViewText";
 import PropertyViewFile from "./PropertyViewFile";
 import { IConfigRawJSONDataType } from "../../../../config";
 import { ConfigContext } from "../../providers/config-provider";
+import { PropertyViewBoolean } from "./PropertyViewBoolean";
+import { PropertyViewDateTime } from "./PropertyViewDateTime";
 
 /**
  * This is what every view renderer gets
@@ -75,7 +77,10 @@ const handlerRegistry:
     renderer: "PropertyViewSimple",
     handler: PropertyViewSimple,
   },
-  boolean: null,
+  boolean: {
+    renderer: "PropertyViewBoolean",
+    handler: PropertyViewBoolean,
+  },
   text: {
     renderer: "PropertyViewText",
     handler: PropertyViewText,
@@ -91,9 +96,18 @@ const handlerRegistry:
     renderer: "PropertyViewSimple",
     handler: PropertyViewSimple,
   },
-  datetime: null,
-  date: null,
-  time: null,
+  datetime: {
+    renderer: "PropertyViewDateTime",
+    handler: PropertyViewDateTime,
+  },
+  date: {
+    renderer: "PropertyViewDateTime",
+    handler: PropertyViewDateTime,
+  },
+  time: {
+    renderer: "PropertyViewDateTime",
+    handler: PropertyViewDateTime,
+  },
   location: null,
   file: {
     renderer: "PropertyViewFile",

@@ -18,6 +18,9 @@ import PropertyDefinition from "./base/Root/Module/ItemDefinition/PropertyDefini
  * @param str the string to capitalize
  */
 export function capitalize(str: string) {
+  if (!str) {
+    return str;
+  }
   if (
     (
       str.charAt(0) === "¡" ||

@@ -66,12 +66,10 @@ function handleOnChange(
 const ActualPropertyEntryBooleanRendererWithStyles = withStyles(style)((props: IPropertyEntryBooleanRendererWithStylesProps) => {
   const descriptionAsAlert = props.args["descriptionAsAlert"];
 
-  let icon: React.ReactNode;
+  let icon: React.ReactNode = null;
   if (props.canRestore) {
     if (props.currentAppliedValue !== null) {
       icon = <RestoreIcon />
-    } else {
-      icon = <ClearIcon />
     }
   } else if (props.icon) {
     icon = props.icon;
@@ -105,7 +103,7 @@ const ActualPropertyEntryBooleanRendererWithStyles = withStyles(style)((props: I
           {props.label}{icon ? <IconButton
             tabIndex={-1}
             className={props.classes.icon}
-            onClick={props.canRestore ? props.onRestore : null}
+            onClick={props.canRestore && props.currentAppliedValue ? props.onRestore : null}
           >{icon}</IconButton> : null}
         </FormLabel>
         <RadioGroup

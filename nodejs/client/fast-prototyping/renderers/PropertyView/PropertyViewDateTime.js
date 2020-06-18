@@ -4,15 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const util_1 = require("../../../../util");
-const moment_1 = __importDefault(require("moment"));
-function PropertyViewSimpleRenderer(props) {
+function PropertyViewDateTimeRenderer(props) {
     let value;
     if (props.args.dateFormat) {
-        value = props.currentValue ? moment_1.default(props.currentValue).format(props.args.dateFormat) : props.currentValue;
+        value = props.momentValue ? props.momentValue.format(props.args.dateFormat) : null;
     }
     else {
-        value = props.capitalize ? util_1.capitalize(props.currentValue) : props.currentValue;
+        value = props.defaultFormattedValue;
     }
     if (value === null && props.args.NullComponent) {
         const NullComponent = props.args.NullComponent;
@@ -21,4 +19,4 @@ function PropertyViewSimpleRenderer(props) {
     }
     return (react_1.default.createElement("span", null, value));
 }
-exports.default = PropertyViewSimpleRenderer;
+exports.default = PropertyViewDateTimeRenderer;

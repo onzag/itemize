@@ -8,3 +8,4 @@ exports.Container = core_1.Container;
 exports.TextField = core_1.TextField;
 exports.Box = core_1.Box;
 exports.Typography = core_1.Typography;
+exports.Button = core_1.Button;

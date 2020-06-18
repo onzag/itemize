@@ -103,6 +103,11 @@ class PropertyViewFileRenderer extends react_1.default.Component {
     }
     render() {
         if (!this.props.currentValue) {
+            if (this.props.args.NullComponent) {
+                const NullComponent = this.props.args.NullComponent;
+                const nullArgs = this.props.args.nullComponentArgs;
+                return react_1.default.createElement(NullComponent, Object.assign({}, nullArgs));
+            }
             return null;
         }
         if (this.props.isSupportedImage) {

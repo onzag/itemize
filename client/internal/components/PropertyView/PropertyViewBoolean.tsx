@@ -1,30 +1,45 @@
-// import { IPropertyViewHandlerProps } from ".";
-// import React from "react";
-// import { capitalize } from "../../../../util";
-// import { Icon } from "@material-ui/core";
+import React from "react";
+import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
+import equals from "deep-equal";
+import { capitalize } from "../../../../util";
 
-// export default class PropertyViewBoolean extends React.Component<IPropertyViewHandlerProps<IPropertyView, {}> {
-//   public shouldComponentUpdate(nextProps: IPropertyViewHandlerProps) {
-//     return this.props.i18n !== nextProps.i18n ||
-//       this.props.state.value !== nextProps.state.value;
-//   }
-//   public render() {
-//     let i18nLabel = null;
-//     let icon = null;
-//     if (this.props.state.value === null) {
-//       i18nLabel = capitalize(this.props.i18n[this.props.language].unspecified);
-//       icon = <Icon>indeterminate_check_box</Icon>;
-//     } else if (this.props.state.value === true) {
-//       i18nLabel = capitalize(this.props.i18n[this.props.language].yes);
-//       icon = <Icon>check_box</Icon>;
-//     } else if (this.props.state.value === false) {
-//       i18nLabel = capitalize(this.props.i18n[this.props.language].no);
-//       icon = <Icon>check_box_outline_blank</Icon>;
-//     }
-//     return (
-//       <div className={this.props.classes.container}>
-//         {i18nLabel}{icon}
-//       </div>
-//     );
-//   }
-// }
+export interface IPropertyViewBooleanRendererProps extends IPropertyViewRendererProps<boolean> {
+  i18nYes: string;
+  i18nNo: string;
+  i18nUnspecified: string;
+}
+
+export class PropertyViewBoolean extends React.Component<IPropertyViewHandlerProps<IPropertyViewBooleanRendererProps>> {
+  constructor(props: IPropertyViewHandlerProps<IPropertyViewBooleanRendererProps>) {
+    super(props);
+  }
+  public shouldComponentUpdate(
+    nextProps: IPropertyViewHandlerProps<IPropertyViewBooleanRendererProps>,
+  ) {
+    // This is optimized to only update for the thing it uses
+    return this.props.state.value !== nextProps.state.value ||
+      nextProps.language !== this.props.language ||
+      nextProps.property !== this.props.property ||
+      nextProps.renderer !== this.props.renderer ||
+      !!this.props.rtl !== !!nextProps.rtl ||
+      this.props.language !== nextProps.language ||
+      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+  }
+  public render() {
+    const i18nYes = capitalize(this.props.i18n[this.props.language].yes);
+    const i18nNo = capitalize(this.props.i18n[this.props.language].no);
+    const i18nUnspecified = capitalize(this.props.i18n[this.props.language].unspecified);
+
+    const RendererElement = this.props.renderer;
+    const rendererArgs: IPropertyViewBooleanRendererProps = {
+      args: this.props.rendererArgs,
+      rtl: this.props.rtl,
+      currentValue: this.props.state.value as boolean,
+      i18nNo,
+      i18nYes,
+      i18nUnspecified,
+    };
+
+    return <RendererElement {...rendererArgs}/>
+  }
+}

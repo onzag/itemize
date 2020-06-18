@@ -108,6 +108,11 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
   }
   public render() {
     if (!this.props.currentValue) {
+      if (this.props.args.NullComponent) {
+        const NullComponent = this.props.args.NullComponent;
+        const nullArgs = this.props.args.nullComponentArgs;
+        return <NullComponent {...nullArgs}/>;
+      }
       return null;
     }
     if (this.props.isSupportedImage) {

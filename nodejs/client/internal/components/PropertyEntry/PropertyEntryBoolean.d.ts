@@ -8,6 +8,8 @@ export interface IPropertyEntryBooleanRendererProps extends IPropertyEntryRender
     nullLabel?: string;
 }
 export default class PropertyEntryBoolean extends React.Component<IPropertyEntryHandlerProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>> {
+    constructor(props: IPropertyEntryHandlerProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>);
+    onRestoreHijacked(): void;
     shouldComponentUpdate(nextProps: IPropertyEntryHandlerProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>): boolean;
     render(): JSX.Element;
 }

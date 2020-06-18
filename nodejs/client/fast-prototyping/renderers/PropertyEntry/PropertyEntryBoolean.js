@@ -10,7 +10,6 @@ const lab_1 = require("@material-ui/lab");
 const core_1 = require("@material-ui/core");
 const localization_1 = require("../../../components/localization");
 const Restore_1 = __importDefault(require("@material-ui/icons/Restore"));
-const Clear_1 = __importDefault(require("@material-ui/icons/Clear"));
 exports.style = (theme) => styles_1.createStyles({
     entry: {
         width: "100%",
@@ -60,13 +59,10 @@ function handleOnChange(props, e) {
 }
 const ActualPropertyEntryBooleanRendererWithStyles = styles_1.withStyles(exports.style)((props) => {
     const descriptionAsAlert = props.args["descriptionAsAlert"];
-    let icon;
+    let icon = null;
     if (props.canRestore) {
         if (props.currentAppliedValue !== null) {
             icon = react_1.default.createElement(Restore_1.default, null);
-        }
-        else {
-            icon = react_1.default.createElement(Clear_1.default, null);
         }
     }
     else if (props.icon) {
@@ -90,7 +86,7 @@ const ActualPropertyEntryBooleanRendererWithStyles = styles_1.withStyles(exports
                     focused: "focused",
                 } },
                 props.label,
-                icon ? react_1.default.createElement(core_1.IconButton, { tabIndex: -1, className: props.classes.icon, onClick: props.canRestore ? props.onRestore : null }, icon) : null),
+                icon ? react_1.default.createElement(core_1.IconButton, { tabIndex: -1, className: props.classes.icon, onClick: props.canRestore && props.currentAppliedValue ? props.onRestore : null }, icon) : null),
             react_1.default.createElement(core_1.RadioGroup, { value: JSON.stringify(props.currentValue), onChange: handleOnChange.bind(this, props) }, values.map((v) => react_1.default.createElement(core_1.FormControlLabel, { key: v.value, classes: {
                     label: props.classes.label
                 }, value: v.value, control: react_1.default.createElement(core_1.Radio, null), label: v.label, disabled: props.disabled })))));
@@ -107,7 +103,6 @@ const ActualPropertyEntryBooleanRendererWithStyles = styles_1.withStyles(exports
         internalContent,
         props.description && !descriptionAsAlert ? react_1.default.createElement(core_1.Typography, { variant: "caption", className: props.classes.description }, props.description) : null));
 });
-// TODO the ternary entry
 function PropertyEntryFieldRenderer(props) {
     let appliedTheme = styles_2.STANDARD_THEME;
     if (props.args["theme"]) {

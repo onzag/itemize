@@ -10,7 +10,6 @@ const styles_2 = require("./styles");
 const uuid_1 = __importDefault(require("uuid"));
 const lab_1 = require("@material-ui/lab");
 const Restore_1 = __importDefault(require("@material-ui/icons/Restore"));
-const Clear_1 = __importDefault(require("@material-ui/icons/Clear"));
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
@@ -88,21 +87,19 @@ class ActualPropertyEntrySelectRenderer extends react_1.default.Component {
         this.props.onChange(textualValue || null, null);
     }
     render() {
+        // let's avoid restoration to null values in these
         // build the icon
-        let icon;
+        let icon = null;
         if (this.props.canRestore) {
             if (this.props.currentAppliedValue) {
                 icon = react_1.default.createElement(Restore_1.default, null);
-            }
-            else {
-                icon = react_1.default.createElement(Clear_1.default, null);
             }
         }
         else if (this.props.icon) {
             icon = this.props.icon;
         }
         const addornment = icon ? (react_1.default.createElement(core_1.InputAdornment, { position: "end" },
-            react_1.default.createElement(core_1.IconButton, { tabIndex: -1, className: this.props.classes.icon, onClick: this.props.canRestore ? this.props.onRestore : null }, icon))) : null;
+            react_1.default.createElement(core_1.IconButton, { tabIndex: -1, className: this.props.classes.icon, onClick: this.props.canRestore && this.props.currentAppliedValue ? this.props.onRestore : null }, icon))) : null;
         const descriptionAsAlert = this.props.args["descriptionAsAlert"];
         return (react_1.default.createElement("div", { className: this.props.classes.container },
             this.props.description && descriptionAsAlert ?

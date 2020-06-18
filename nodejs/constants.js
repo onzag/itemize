@@ -652,7 +652,7 @@ exports.POLICY_OPTIONAL_I18N = [
 ];
 /**
  * The format that dates are expected to have in order to be exchanged
- * these represent the SQL form
+ * these represent the SQL form, does not support nano date
  */
 exports.DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss.SSSZ";
 /**

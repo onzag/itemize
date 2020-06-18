@@ -11,6 +11,8 @@ const PropertyViewSimple_1 = require("./PropertyViewSimple");
 const PropertyViewText_1 = __importDefault(require("./PropertyViewText"));
 const PropertyViewFile_1 = __importDefault(require("./PropertyViewFile"));
 const config_provider_1 = require("../../providers/config-provider");
+const PropertyViewBoolean_1 = require("./PropertyViewBoolean");
+const PropertyViewDateTime_1 = require("./PropertyViewDateTime");
 ;
 const handlerRegistry = {
     string: {
@@ -25,7 +27,10 @@ const handlerRegistry = {
         renderer: "PropertyViewSimple",
         handler: PropertyViewSimple_1.PropertyViewSimple,
     },
-    boolean: null,
+    boolean: {
+        renderer: "PropertyViewBoolean",
+        handler: PropertyViewBoolean_1.PropertyViewBoolean,
+    },
     text: {
         renderer: "PropertyViewText",
         handler: PropertyViewText_1.default,
@@ -41,9 +46,18 @@ const handlerRegistry = {
         renderer: "PropertyViewSimple",
         handler: PropertyViewSimple_1.PropertyViewSimple,
     },
-    datetime: null,
-    date: null,
-    time: null,
+    datetime: {
+        renderer: "PropertyViewDateTime",
+        handler: PropertyViewDateTime_1.PropertyViewDateTime,
+    },
+    date: {
+        renderer: "PropertyViewDateTime",
+        handler: PropertyViewDateTime_1.PropertyViewDateTime,
+    },
+    time: {
+        renderer: "PropertyViewDateTime",
+        handler: PropertyViewDateTime_1.PropertyViewDateTime,
+    },
     location: null,
     file: {
         renderer: "PropertyViewFile",

@@ -141,8 +141,8 @@ class PropertyDefinition {
         this.hiddenIf = rawJSON.hiddenIf &&
             new ConditionalRuleSet_1.default(rawJSON.hiddenIf, parentModule, parentItemDefinition, this, null);
         this.canCacheState = true;
-        if (rawJSON.invalidIf &&
-            rawJSON.hiddenIf &&
+        if (rawJSON.invalidIf ||
+            rawJSON.hiddenIf ||
             rawJSON.defaultIf) {
             this.canCacheState = false;
         }

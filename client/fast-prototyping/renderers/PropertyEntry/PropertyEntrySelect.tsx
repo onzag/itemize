@@ -23,7 +23,6 @@ import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import uuid from "uuid";
 import { Alert } from "@material-ui/lab";
 import RestoreIcon from '@material-ui/icons/Restore';
-import ClearIcon from '@material-ui/icons/Clear';
 
 function shouldShowInvalid(props: IPropertyEntrySelectRendererProps) {
   return !props.currentValid;
@@ -116,13 +115,13 @@ class ActualPropertyEntrySelectRenderer
   }
 
   public render() {
+
+    // let's avoid restoration to null values in these
     // build the icon
-    let icon: React.ReactNode;
+    let icon: React.ReactNode = null;
     if (this.props.canRestore) {
       if (this.props.currentAppliedValue) {
         icon = <RestoreIcon />
-      } else {
-        icon = <ClearIcon />
       }
     } else if (this.props.icon) {
       icon = this.props.icon;
@@ -133,7 +132,7 @@ class ActualPropertyEntrySelectRenderer
         <IconButton
           tabIndex={-1}
           className={this.props.classes.icon}
-          onClick={this.props.canRestore ? this.props.onRestore : null}
+          onClick={this.props.canRestore && this.props.currentAppliedValue ? this.props.onRestore : null}
         >
           {icon}
         </IconButton>

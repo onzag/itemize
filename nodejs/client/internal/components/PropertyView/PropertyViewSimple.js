@@ -12,7 +12,6 @@ class PropertyViewSimple extends react_1.default.Component {
     shouldComponentUpdate(nextProps) {
         // This is optimized to only update for the thing it uses
         return !deep_equal_1.default(this.props.state.value, nextProps.state.value) ||
-            nextProps.language !== this.props.language ||
             nextProps.property !== this.props.property ||
             nextProps.renderer !== this.props.renderer ||
             nextProps.capitalize !== this.props.capitalize ||

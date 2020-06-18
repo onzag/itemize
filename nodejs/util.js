@@ -17,6 +17,9 @@ const constants_1 = require("./constants");
  * @param str the string to capitalize
  */
 function capitalize(str) {
+    if (!str) {
+        return str;
+    }
     if ((str.charAt(0) === "¡" ||
         str.charAt(0) === "¿") && str.length > 1) {
         return str.charAt(0) + str.charAt(1).toUpperCase() + str.slice(2);
@@ -182,47 +185,30 @@ exports.localeReplacerToArray = localeReplacerToArray;
  * @param value the format string
  * @returns the normalized form
  */
-function getNormalizedDateTimeFormat(value) {
-    // Since we cannot have a mask that uses only one H
-    // we need to return it with two, same for the second
-    // we canot have a one or two digits situation
-    if (value === "H:mm") {
-        return "HH:mm";
-    }
-    else if (value === "h:mm A") {
-        return "hh:mm A";
-    }
-    // any other value is tipically allowed
-    return value;
-}
-exports.getNormalizedDateTimeFormat = getNormalizedDateTimeFormat;
-/**
- * TODO looks wrong check what is wrong
- */
-function getLocalizedTimeFormat(normalize) {
+// export function getNormalizedDateTimeFormat(value: string) {
+//   // Since we cannot have a mask that uses only one H
+//   // we need to return it with two, same for the second
+//   // we canot have a one or two digits situation
+//   if (value === "H:mm") {
+//     return "HH:mm";
+//   } else if (value === "h:mm A") {
+//     return "hh:mm A";
+//   }
+//   // any other value is tipically allowed
+//   return value;
+// }
+function getLocalizedTimeFormat() {
     const LT = moment_1.default.localeData()._longDateFormat.LT;
-    if (!normalize) {
-        return LT;
-    }
     return LT;
 }
 exports.getLocalizedTimeFormat = getLocalizedTimeFormat;
-/**
- * TODO looks wrong check what is wrong
- */
-function getLocalizedDateFormat(normalize) {
+function getLocalizedDateFormat() {
     const L = moment_1.default.localeData()._longDateFormat.L;
-    if (!normalize) {
-        return L;
-    }
-    return getNormalizedDateTimeFormat(L);
+    return L;
 }
 exports.getLocalizedDateFormat = getLocalizedDateFormat;
-/**
- * TODO looks wrong check what is wrong
- */
-function getLocalizedDateTimeFormat(normalize) {
-    return getLocalizedDateFormat(normalize) + " " + getLocalizedTimeFormat(normalize);
+function getLocalizedDateTimeFormat() {
+    return getLocalizedDateFormat() + " " + getLocalizedTimeFormat();
 }
 exports.getLocalizedDateTimeFormat = getLocalizedDateTimeFormat;
 /**

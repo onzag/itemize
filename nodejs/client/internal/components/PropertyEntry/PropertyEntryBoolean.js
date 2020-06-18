@@ -6,6 +6,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const deep_equal_1 = __importDefault(require("deep-equal"));
 class PropertyEntryBoolean extends react_1.default.Component {
+    constructor(props) {
+        super(props);
+        this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
+    }
+    onRestoreHijacked() {
+        if (this.props.state.stateAppliedValue !== null) {
+            this.props.onRestore();
+        }
+        else {
+            this.props.onChange(false, null);
+        }
+    }
     shouldComponentUpdate(nextProps) {
         return nextProps.property !== this.props.property ||
             !deep_equal_1.default(this.props.state, nextProps.state) ||
@@ -38,6 +50,9 @@ class PropertyEntryBoolean extends react_1.default.Component {
         const trueLabel = this.props.i18n[this.props.language].yes;
         const falseLabel = this.props.i18n[this.props.language].no;
         const nullLabel = this.props.i18n[this.props.language].unspecified;
+        if (this.props.state.value === null) {
+            console.warn("Warning!... you should set a default value to a boolean field, got null");
+        }
         const RendererElement = this.props.renderer;
         const rendererArgs = {
             args: this.props.rendererArgs,
@@ -51,15 +66,15 @@ class PropertyEntryBoolean extends react_1.default.Component {
             falseLabel,
             nullLabel,
             currentAppliedValue: this.props.state.stateAppliedValue,
-            currentValue: this.props.state.value,
+            currentValue: this.props.state.value || false,
             currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
             currentInvalidReason: i18nInvalidReason,
             currentInternalValue: this.props.state.internalValue,
-            canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
+            canRestore: (this.props.state.value || false) !== (this.props.state.stateAppliedValue || false),
             disabled: this.props.state.enforced,
             autoFocus: this.props.autoFocus || false,
             onChange: this.props.onChange,
-            onRestore: this.props.onRestore,
+            onRestore: this.onRestoreHijacked,
         };
         return react_1.default.createElement(RendererElement, Object.assign({}, rendererArgs));
     }

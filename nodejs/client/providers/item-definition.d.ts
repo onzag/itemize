@@ -157,6 +157,7 @@ export interface IItemDefinitionContextType {
     dismissDeleted: () => void;
     dismissSearchError: () => void;
     dismissSearchResults: () => void;
+    poke: (elements: IPokeElementsType) => void;
     unpoke: () => void;
     remoteListener: RemoteListener;
     injectedParentContext: IItemDefinitionContextType;
@@ -373,6 +374,7 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     canDelete(): boolean;
     canCreate(): boolean;
     canEdit(): boolean;
+    poke(elements: IPokeElementsType): void;
     unpoke(): void;
     render(): JSX.Element;
 }

@@ -74,6 +74,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         this.canEdit = this.canEdit.bind(this);
         this.canCreate = this.canCreate.bind(this);
         this.canDelete = this.canDelete.bind(this);
+        this.clean = this.clean.bind(this);
+        this.poke = this.poke.bind(this);
         this.unpoke = this.unpoke.bind(this);
         this.search = this.search.bind(this);
         this.dismissSearchError = this.dismissSearchError.bind(this);
@@ -1552,6 +1554,14 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             (this.props.tokenData.id || constants_1.UNSPECIFIED_OWNER) :
             this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId, this.props.forVersion || null), {}, false);
     }
+    poke(elements) {
+        if (this.isUnmounted) {
+            return;
+        }
+        this.setState({
+            pokedElements: elements,
+        });
+    }
     unpoke() {
         if (this.isUnmounted) {
             return;
@@ -1613,6 +1623,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 dismissDeleted: this.dismissDeleted,
                 dismissSearchError: this.dismissSearchError,
                 dismissSearchResults: this.dismissSearchResults,
+                poke: this.poke,
                 unpoke: this.unpoke,
                 canCreate: this.state.canCreate,
                 canDelete: this.state.canDelete,

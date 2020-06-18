@@ -59,19 +59,9 @@ export declare function localeReplacerToArray(str: string, ...args: any[]): any[
  * @param value the format string
  * @returns the normalized form
  */
-export declare function getNormalizedDateTimeFormat(value: string): string;
-/**
- * TODO looks wrong check what is wrong
- */
-export declare function getLocalizedTimeFormat(normalize: boolean): any;
-/**
- * TODO looks wrong check what is wrong
- */
-export declare function getLocalizedDateFormat(normalize: boolean): any;
-/**
- * TODO looks wrong check what is wrong
- */
-export declare function getLocalizedDateTimeFormat(normalize: boolean): string;
+export declare function getLocalizedTimeFormat(): any;
+export declare function getLocalizedDateFormat(): any;
+export declare function getLocalizedDateTimeFormat(): string;
 /**
  * Converts a file to its absolute URL counterpart
  * @param containerHostnamePrefixes

@@ -16,7 +16,6 @@ export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProp
   ) {
     // This is optimized to only update for the thing it uses
     return !equals(this.props.state.value, nextProps.state.value) ||
-      nextProps.language !== this.props.language ||
       nextProps.property !== this.props.property ||
       nextProps.renderer !== this.props.renderer ||
       nextProps.capitalize !== this.props.capitalize ||

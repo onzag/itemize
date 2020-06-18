@@ -177,6 +177,11 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
 }
 exports.PropertyViewRichTextViewer = PropertyViewRichTextViewer;
 function PropertyViewTextRenderer(props) {
+    if (props.args.NullComponent && props.currentValue === null) {
+        const NullComponent = props.args.NullComponent;
+        const nullArgs = props.args.nullComponentArgs;
+        return react_1.default.createElement(NullComponent, Object.assign({}, nullArgs));
+    }
     if (props.isRichText) {
         return (react_1.default.createElement(PropertyViewRichTextViewer, null, props.currentValue));
     }

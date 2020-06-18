@@ -303,7 +303,7 @@ export declare const POLICY_REQUIRED_I18N: string[];
 export declare const POLICY_OPTIONAL_I18N: string[];
 /**
  * The format that dates are expected to have in order to be exchanged
- * these represent the SQL form
+ * these represent the SQL form, does not support nano date
  */
 export declare const DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss.SSSZ";
 /**

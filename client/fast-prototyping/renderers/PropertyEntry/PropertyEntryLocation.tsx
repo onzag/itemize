@@ -551,6 +551,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
         inputProps={{
           value: this.props.searchQuery,
           onChange: this.onSearchQueryChange,
+          autoComplete: "off",
         }}
       />
     );

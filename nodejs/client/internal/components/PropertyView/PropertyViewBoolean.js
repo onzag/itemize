@@ -1,29 +1,39 @@
-// import { IPropertyViewHandlerProps } from ".";
-// import React from "react";
-// import { capitalize } from "../../../../util";
-// import { Icon } from "@material-ui/core";
-// export default class PropertyViewBoolean extends React.Component<IPropertyViewHandlerProps<IPropertyView, {}> {
-//   public shouldComponentUpdate(nextProps: IPropertyViewHandlerProps) {
-//     return this.props.i18n !== nextProps.i18n ||
-//       this.props.state.value !== nextProps.state.value;
-//   }
-//   public render() {
-//     let i18nLabel = null;
-//     let icon = null;
-//     if (this.props.state.value === null) {
-//       i18nLabel = capitalize(this.props.i18n[this.props.language].unspecified);
-//       icon = <Icon>indeterminate_check_box</Icon>;
-//     } else if (this.props.state.value === true) {
-//       i18nLabel = capitalize(this.props.i18n[this.props.language].yes);
-//       icon = <Icon>check_box</Icon>;
-//     } else if (this.props.state.value === false) {
-//       i18nLabel = capitalize(this.props.i18n[this.props.language].no);
-//       icon = <Icon>check_box_outline_blank</Icon>;
-//     }
-//     return (
-//       <div className={this.props.classes.container}>
-//         {i18nLabel}{icon}
-//       </div>
-//     );
-//   }
-// }
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const react_1 = __importDefault(require("react"));
+const deep_equal_1 = __importDefault(require("deep-equal"));
+const util_1 = require("../../../../util");
+class PropertyViewBoolean extends react_1.default.Component {
+    constructor(props) {
+        super(props);
+    }
+    shouldComponentUpdate(nextProps) {
+        // This is optimized to only update for the thing it uses
+        return this.props.state.value !== nextProps.state.value ||
+            nextProps.language !== this.props.language ||
+            nextProps.property !== this.props.property ||
+            nextProps.renderer !== this.props.renderer ||
+            !!this.props.rtl !== !!nextProps.rtl ||
+            this.props.language !== nextProps.language ||
+            !deep_equal_1.default(this.props.rendererArgs, nextProps.rendererArgs);
+    }
+    render() {
+        const i18nYes = util_1.capitalize(this.props.i18n[this.props.language].yes);
+        const i18nNo = util_1.capitalize(this.props.i18n[this.props.language].no);
+        const i18nUnspecified = util_1.capitalize(this.props.i18n[this.props.language].unspecified);
+        const RendererElement = this.props.renderer;
+        const rendererArgs = {
+            args: this.props.rendererArgs,
+            rtl: this.props.rtl,
+            currentValue: this.props.state.value,
+            i18nNo,
+            i18nYes,
+            i18nUnspecified,
+        };
+        return react_1.default.createElement(RendererElement, Object.assign({}, rendererArgs));
+    }
+}
+exports.PropertyViewBoolean = PropertyViewBoolean;
