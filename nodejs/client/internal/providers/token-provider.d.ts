@@ -11,7 +11,7 @@ export interface IActualTokenProviderState {
 }
 interface ITokenProviderProps {
     localeContext: ILocaleContextType;
-    onProviderStateSet: (state: IActualTokenProviderState) => void;
+    onProviderStateSet: (state: IActualTokenProviderState, logout: () => void) => void;
     children: React.ReactNode;
 }
 export interface ITokenContextType extends IActualTokenProviderState {

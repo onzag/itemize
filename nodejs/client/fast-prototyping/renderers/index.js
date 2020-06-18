@@ -15,6 +15,7 @@ const PropertyViewSimple_1 = __importDefault(require("./PropertyView/PropertyVie
 const PropertyViewText_1 = __importDefault(require("./PropertyView/PropertyViewText"));
 const PropertyViewFile_1 = __importDefault(require("./PropertyView/PropertyViewFile"));
 const PropertyViewDateTime_1 = __importDefault(require("./PropertyView/PropertyViewDateTime"));
+const PropertyViewLocation_1 = __importDefault(require("./PropertyView/PropertyViewLocation"));
 exports.rendererContext = {
     PropertyEntryField: PropertyEntryField_1.default,
     PropertyEntryFile: PropertyEntryFile_1.default,
@@ -28,4 +29,5 @@ exports.rendererContext = {
     PropertyViewText: PropertyViewText_1.default,
     PropertyViewDateTime: PropertyViewDateTime_1.default,
     PropertyViewFile: PropertyViewFile_1.default,
+    PropertyViewLocation: PropertyViewLocation_1.default,
 };

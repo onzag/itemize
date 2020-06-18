@@ -37,6 +37,12 @@ export interface IErrorEvent {
  */
 export declare const IDENTIFIED_EVENT = "identified";
 /**
+ * Event that occurs when the user has been kicked, when log out
+ * from all devices has been triggered, users are kicked out and forcefully
+ * logged out, this even also occurs on an invalid identified event
+ */
+export declare const KICKED_EVENT = "kicked";
+/**
  * Event that comes from the server when something has
  * changed or as an answer from a feedback request
  */

@@ -6,7 +6,7 @@ export declare enum IViewportZoomEnumType {
     MEDIUM = "MEDIUM",
     LARGE = "LARGE"
 }
-interface IViewport {
+export interface IViewport {
     center: [number, number];
     zoom: IViewportZoomEnumType | number;
 }

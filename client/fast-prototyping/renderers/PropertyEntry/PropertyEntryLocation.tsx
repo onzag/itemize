@@ -48,7 +48,7 @@ import { capitalize } from "../../../../util";
 import RestoreIcon from '@material-ui/icons/Restore';
 import ClearIcon from '@material-ui/icons/Clear';
 
-const ZOOMS = {
+export const ZOOMS = {
   "LARGE": 16,
   "MEDIUM": 14,
   "SMALL": 4,
@@ -551,7 +551,8 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
         inputProps={{
           value: this.props.searchQuery,
           onChange: this.onSearchQueryChange,
-          autoComplete: "off",
+          autoComplete: "new-address",
+          type: "search",
         }}
       />
     );

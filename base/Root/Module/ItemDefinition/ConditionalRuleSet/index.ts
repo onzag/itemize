@@ -51,7 +51,7 @@ export interface IConditionalRuleSetRawJSONDataPropertyType
   /**
    * the method, default, string or datetime (uses Date)
    */
-  method?: "default" | "string" | "datetime";
+  method?: "default" | "string" | "date" | "datetime" | "time";
   /**
    * the comparator, equal, greater than, etc...
    */
@@ -243,7 +243,7 @@ export default class ConditionalRuleSet {
       // now let's check what we are comparing against
       let actualComparedValue: PropertyDefinitionSupportedType;
       // so if we are talking about a property type
-      if (actualComparedValue && (rawDataAsProperty.value as IPropertyDefinitionReferredPropertyValue).property) {
+      if ((rawDataAsProperty.value as IPropertyDefinitionReferredPropertyValue).property) {
         // we get the property in question
         const propertyInQuestion = (rawDataAsProperty.value as IPropertyDefinitionReferredPropertyValue).property;
         // and that would represent what we actually comparing against
@@ -289,7 +289,7 @@ export default class ConditionalRuleSet {
 
       // otherwise using the datetime method
       } else if (
-        rawDataAsProperty.method === "datetime" &&
+        (rawDataAsProperty.method === "date" || rawDataAsProperty.method === "datetime" || rawDataAsProperty.method === "time") &&
         // and we have invalid dates, that's also impossible to compare
         (actualPropertyValue === "Invalid Date" || actualComparedValue === "Invalid Date") &&
         isAnInvalidNullComparator
@@ -298,9 +298,12 @@ export default class ConditionalRuleSet {
       } else {
 
         // null datetimes should be considered so the null check has to be in place
-        if (rawDataAsProperty.method === "datetime") {
+        if (rawDataAsProperty.method === "datetime" || rawDataAsProperty.method === "date") {
           actualPropertyValue = (new Date(actualPropertyValue as string)).getTime();
           actualComparedValue = (new Date(actualComparedValue as string)).getTime();
+        } else if (rawDataAsProperty.method === "time") {
+          actualComparedValue = (new Date("1970-01-01T" + actualPropertyValue + "Z")).getTime();
+          actualComparedValue = (new Date("1970-01-01T" + actualComparedValue + "Z")).getTime();
         }
 
         // lets fiddle with the comparator

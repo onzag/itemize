@@ -18,7 +18,7 @@ export interface IActualTokenProviderState {
 
 interface ITokenProviderProps {
   localeContext: ILocaleContextType;
-  onProviderStateSet: (state: IActualTokenProviderState) => void;
+  onProviderStateSet: (state: IActualTokenProviderState, logout: () => void) => void;
   children: React.ReactNode;
 }
 
@@ -79,7 +79,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
     // been validated by the server side render service
     // sometimes this doesn't happen nevertheless
     if (this.state.isReady) {
-      this.props.onProviderStateSet(this.state);
+      this.props.onProviderStateSet(this.state, this.logout);
       return;
     }
     const storedToken = localStorage.getItem("token");
@@ -90,7 +90,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
         ...this.state,
         isReady: true,
       };
-      this.props.onProviderStateSet(newState);
+      this.props.onProviderStateSet(newState, this.logout);
       this.setState(newState);
     }
   }
@@ -178,7 +178,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       this.cleanAndDestroyLoggedData();
     }
 
-    this.props.onProviderStateSet(newState);
+    this.props.onProviderStateSet(newState, this.logout);
     this.setState(newState);
 
     if (tokenDataId) {

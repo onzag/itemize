@@ -19,6 +19,7 @@ SITE
 . Remove normalized in currency for the client side and rather create the value during storing
   . Client side search does not support normalized anymore
   . SQL mantenience gets simplified as last modified value should not change after this [DONE]
+. Rewrite all the styles to use the mui-core instead
 
 ONZASYSTEMS [+3]
 . Build a Frontpage with few details

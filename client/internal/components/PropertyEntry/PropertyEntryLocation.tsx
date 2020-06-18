@@ -11,7 +11,7 @@ export enum IViewportZoomEnumType {
 }
 
 // the viewport for the map
-interface IViewport {
+export interface IViewport {
   center: [number, number];
   zoom: IViewportZoomEnumType | number;
 }

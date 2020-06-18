@@ -49,11 +49,13 @@ import {
   ParentedSearchUnregisterRequestSchema,
   ERROR_EVENT,
   IErrorEvent,
+  KICKED_EVENT,
 } from "../base/remote-protocol";
 import { IGQLSearchRecord } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from ".";
-import { SERVER_DATA_IDENTIFIER, UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE } from "../constants";
+import { SERVER_DATA_IDENTIFIER, SERVER_USER_KICK_IDENTIFIER,
+  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE } from "../constants";
 import Ajv from "ajv";
 import { jwtVerify } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
@@ -155,7 +157,7 @@ export class Listener {
     this.pubSubLocalTriggerListeners = this.pubSubLocalTriggerListeners.bind(this);
 
     this.redisSub.on("message", this.pubSubTriggerListeners);
-    this.redisSub.subscribe(SERVER_DATA_IDENTIFIER)
+    this.redisSub.subscribe(SERVER_DATA_IDENTIFIER);
     if (INSTANCE_MODE === "ABSOLUTE" || INSTANCE_MODE === "CLUSTER_MANAGER") {
       this.redisLocalSub.on("message", this.pubSubLocalTriggerListeners);
       this.redisLocalSub.subscribe(CLUSTER_MANAGER_REGISTER_SS);
@@ -227,6 +229,41 @@ export class Listener {
       error,
     );
   }
+  public sendKickEvent(
+    userId: number,
+  ) {
+    this.onReceiveKickEvent(userId);
+    this.redisPub.publish(SERVER_USER_KICK_IDENTIFIER, JSON.stringify({
+      userId,
+      serverInstanceGroupId: INSTANCE_GROUP_ID,
+    }));
+  }
+  public onReceiveKickEvent(
+    userId: number,
+  ) {
+    Object.keys(this.listeners).forEach((socketKey) => {
+      const socket = this.listeners[socketKey].socket;
+      const user = this.listeners[socketKey].user;
+      if (user.id === userId) {
+        this.kick(socket);
+      }
+    });
+  }
+  public kick(
+    socket: Socket,
+  ) {
+    this.removeSocket(socket);
+    socket.emit(
+      KICKED_EVENT,
+    );
+
+    // Force to reidentify and reattach everything
+    setTimeout(() => {
+      if (socket.connected) {
+        socket.disconnect();
+      }
+    }, 300);
+  }
   public async identify(
     socket: Socket,
     request: IIdentifyRequest,
@@ -244,16 +281,39 @@ export class Listener {
     }
 
     let invalid = false;
+    let invalidReason: string;
     let result: IServerSideTokenDataType;
     if (request.token) {
       try {
         result = await jwtVerify<IServerSideTokenDataType>(request.token, this.sensitiveConfig.jwtKey);
         invalid = (
           typeof result.id !== "number" ||
-          typeof result.role !== "string"
+          typeof result.role !== "string" ||
+          typeof result.sessionId !== "number"
         );
       } catch (err) {
         invalid = true;
+        invalidReason = "invalid token";
+      }
+
+      if (!invalid) {
+        const sqlResult = await this.cache.requestValue(
+          ["MOD_users__IDEF_user", "MOD_users"], result.id, null,
+        );
+
+        if (!sqlResult) {
+          invalid = true;
+          invalidReason = "user deleted";
+        } else if (sqlResult.blocked_at) {
+          invalid = true;
+          invalidReason = "user blocked";
+        } else if ((sqlResult.session_id || 0) !== result.sessionId) {
+          invalid = true;
+          invalidReason = "session id mismatch";
+        } else if (sqlResult.role !== result.role) {
+          invalid = true;
+          invalidReason = "role mismatch";
+        }
       }
     } else {
       result = {
@@ -265,9 +325,12 @@ export class Listener {
 
     if (invalid) {
       logger.debug(
-        "Listener.identify: socket " + socket.id + " failed to identify due to invalid token",
+        "Listener.identify: socket " + socket.id + " failed to identify due to " + invalidReason,
       );
-      this.emitError(socket, "failed to identify due to invalid token", request);
+      this.emitError(socket, "failed to identify due to " + invalidReason, request);
+
+      // yes kick the socket, why was it using an invalid token to start with, that's fishy
+      this.kick(socket);
     } else {
       if (!this.listeners[socket.id]) {
         logger.debug(
@@ -874,6 +937,11 @@ export class Listener {
       this.removeListenerFinal(mergedIndexIdentifier);
     }
   }
+
+  /**
+   * This method only reasonable gets called by the CLUSTER_MANAGER or in absolute mode
+   * @param request 
+   */
   public unregisterSS(
     request: IUnregisterRequest,
   ) {
@@ -1032,6 +1100,18 @@ export class Listener {
 
     if (channel === SERVER_DATA_IDENTIFIER) {
       this.cache.onServerDataChangeInformed(parsedContent);
+      return;
+    }
+
+    if (channel === SERVER_USER_KICK_IDENTIFIER) {
+      const serverInstanceGroupId = parsedContent.serverInstanceGroupId;
+      if (serverInstanceGroupId === INSTANCE_GROUP_ID) {
+        logger.debug(
+          "Listener.pubSubTriggerListeners: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event",
+        );
+      } else if (typeof parsedContent.userId === "number") {
+        this.onReceiveKickEvent(parsedContent.userId);
+      }
       return;
     }
 

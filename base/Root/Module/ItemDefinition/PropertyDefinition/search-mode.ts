@@ -305,6 +305,9 @@ export function buildSearchModePropertyDefinitions(
 
     // decorate the default property
     newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + newPropDef.id;
+    if (newPropDef.i18nData) {
+      newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search"]);
+    }
   }
 
   // we return both if we have both

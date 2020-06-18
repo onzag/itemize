@@ -107,6 +107,32 @@ class Listener {
         };
         socket.emit(remote_protocol_1.ERROR_EVENT, error);
     }
+    sendKickEvent(userId) {
+        this.onReceiveKickEvent(userId);
+        this.redisPub.publish(constants_1.SERVER_USER_KICK_IDENTIFIER, JSON.stringify({
+            userId,
+            serverInstanceGroupId: INSTANCE_GROUP_ID,
+        }));
+    }
+    onReceiveKickEvent(userId) {
+        Object.keys(this.listeners).forEach((socketKey) => {
+            const socket = this.listeners[socketKey].socket;
+            const user = this.listeners[socketKey].user;
+            if (user.id === userId) {
+                this.kick(socket);
+            }
+        });
+    }
+    kick(socket) {
+        this.removeSocket(socket);
+        socket.emit(remote_protocol_1.KICKED_EVENT);
+        // Force to reidentify and reattach everything
+        setTimeout(() => {
+            if (socket.connected) {
+                socket.disconnect();
+            }
+        }, 300);
+    }
     async identify(socket, request) {
         const valid = checkIdentifyRequest(request);
         if (!valid) {
@@ -117,15 +143,37 @@ class Listener {
             return;
         }
         let invalid = false;
+        let invalidReason;
         let result;
         if (request.token) {
             try {
                 result = await token_1.jwtVerify(request.token, this.sensitiveConfig.jwtKey);
                 invalid = (typeof result.id !== "number" ||
-                    typeof result.role !== "string");
+                    typeof result.role !== "string" ||
+                    typeof result.sessionId !== "number");
             }
             catch (err) {
                 invalid = true;
+                invalidReason = "invalid token";
+            }
+            if (!invalid) {
+                const sqlResult = await this.cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], result.id, null);
+                if (!sqlResult) {
+                    invalid = true;
+                    invalidReason = "user deleted";
+                }
+                else if (sqlResult.blocked_at) {
+                    invalid = true;
+                    invalidReason = "user blocked";
+                }
+                else if ((sqlResult.session_id || 0) !== result.sessionId) {
+                    invalid = true;
+                    invalidReason = "session id mismatch";
+                }
+                else if (sqlResult.role !== result.role) {
+                    invalid = true;
+                    invalidReason = "role mismatch";
+                }
             }
         }
         else {
@@ -136,8 +184,10 @@ class Listener {
             };
         }
         if (invalid) {
-            _1.logger.debug("Listener.identify: socket " + socket.id + " failed to identify due to invalid token");
-            this.emitError(socket, "failed to identify due to invalid token", request);
+            _1.logger.debug("Listener.identify: socket " + socket.id + " failed to identify due to " + invalidReason);
+            this.emitError(socket, "failed to identify due to " + invalidReason, request);
+            // yes kick the socket, why was it using an invalid token to start with, that's fishy
+            this.kick(socket);
         }
         else {
             if (!this.listeners[socket.id]) {
@@ -536,6 +586,10 @@ class Listener {
             this.removeListenerFinal(mergedIndexIdentifier);
         }
     }
+    /**
+     * This method only reasonable gets called by the CLUSTER_MANAGER or in absolute mode
+     * @param request
+     */
     unregisterSS(request) {
         const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
         if (this.listensSS[mergedIndexIdentifier]) {
@@ -639,6 +693,16 @@ class Listener {
         _1.logger.debug("Listener.pubSubTriggerListeners: received redis event", parsedContent);
         if (channel === constants_1.SERVER_DATA_IDENTIFIER) {
             this.cache.onServerDataChangeInformed(parsedContent);
+            return;
+        }
+        if (channel === constants_1.SERVER_USER_KICK_IDENTIFIER) {
+            const serverInstanceGroupId = parsedContent.serverInstanceGroupId;
+            if (serverInstanceGroupId === INSTANCE_GROUP_ID) {
+                _1.logger.debug("Listener.pubSubTriggerListeners: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event");
+            }
+            else if (typeof parsedContent.userId === "number") {
+                this.onReceiveKickEvent(parsedContent.userId);
+            }
             return;
         }
         // only the cluster manager and absolute happens to recieve these

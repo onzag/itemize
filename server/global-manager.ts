@@ -55,7 +55,9 @@ export class GlobalManager {
     this.addAdminUserIfMissing = this.addAdminUserIfMissing.bind(this);
 
     const modules = this.root.getAllModules();
-    modules.forEach(this.processModule)
+    modules.forEach(this.processModule);
+
+    this.addAdminUserIfMissing();
   }
   private async addAdminUserIfMissing() {
     if (!this.config.roles.includes("ADMIN")) {
@@ -69,16 +71,17 @@ export class GlobalManager {
     const userIdef = userMod.getItemDefinitionFor(["user"]);
     const moduleTable = userMod.getQualifiedPathName();
     const selfTable = userIdef.getQualifiedPathName();
-    const primaryAdminUser = await this.knex.first("id").from(moduleTable).where("role", "ADMIN");
+    const primaryAdminUser = await this.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("role", "ADMIN");
 
     if (!primaryAdminUser) {
       logger.info(
         "GlobalManager.addAdminUserIfMissing: admin user is considered missing, adding one",
       );
 
-      const adminUserNameIsViable = await this.knex.first("id").from(selfTable).where("username", "admin");
+      const currentAdminUserWithSuchUsername =
+        await this.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("username", "admin");
       let username = "admin";
-      if (!adminUserNameIsViable) {
+      if (currentAdminUserWithSuchUsername) {
         username = "admin" + (new Date()).getTime();
       }
 
@@ -96,6 +99,7 @@ export class GlobalManager {
       const sqlIdefData = {
         username,
         password: this.knex.raw("crypt(?, gen_salt('bf',10))", password),
+        role: "ADMIN",
         app_language: this.config.fallbackLanguage,
         app_country: this.config.fallbackCountryCode,
         app_currency: this.config.fallbackCurrency,
@@ -123,8 +127,6 @@ export class GlobalManager {
           {
             errMessage: err.message,
             errStack: err.stack,
-            sqlModData,
-            sqlIdefData,
           }
         );
       }

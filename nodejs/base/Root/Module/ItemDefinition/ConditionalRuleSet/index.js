@@ -120,7 +120,7 @@ class ConditionalRuleSet {
             // now let's check what we are comparing against
             let actualComparedValue;
             // so if we are talking about a property type
-            if (actualComparedValue && rawDataAsProperty.value.property) {
+            if (rawDataAsProperty.value.property) {
                 // we get the property in question
                 const propertyInQuestion = rawDataAsProperty.value.property;
                 // and that would represent what we actually comparing against
@@ -160,7 +160,7 @@ class ConditionalRuleSet {
                 result = false;
                 // otherwise using the datetime method
             }
-            else if (rawDataAsProperty.method === "datetime" &&
+            else if ((rawDataAsProperty.method === "date" || rawDataAsProperty.method === "datetime" || rawDataAsProperty.method === "time") &&
                 // and we have invalid dates, that's also impossible to compare
                 (actualPropertyValue === "Invalid Date" || actualComparedValue === "Invalid Date") &&
                 isAnInvalidNullComparator) {
@@ -168,9 +168,13 @@ class ConditionalRuleSet {
             }
             else {
                 // null datetimes should be considered so the null check has to be in place
-                if (rawDataAsProperty.method === "datetime") {
+                if (rawDataAsProperty.method === "datetime" || rawDataAsProperty.method === "date") {
                     actualPropertyValue = (new Date(actualPropertyValue)).getTime();
                     actualComparedValue = (new Date(actualComparedValue)).getTime();
+                }
+                else if (rawDataAsProperty.method === "time") {
+                    actualComparedValue = (new Date("1970-01-01T" + actualPropertyValue + "Z")).getTime();
+                    actualComparedValue = (new Date("1970-01-01T" + actualComparedValue + "Z")).getTime();
                 }
                 // lets fiddle with the comparator
                 switch (rawDataAsProperty.comparator) {

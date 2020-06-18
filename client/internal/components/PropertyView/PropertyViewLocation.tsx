@@ -1,118 +1,114 @@
-// import React from "react";
-// import { IPropertyViewProps } from ".";
-// import equals from "deep-equal";
-// import { Map, TileLayer, Marker, Popup } from "react-leaflet";
-// import L from "leaflet";
+import React from "react";
+import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
+import equals from "deep-equal";
+import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
+import { IViewport, IViewportZoomEnumType } from "../PropertyEntry/PropertyEntryLocation";
 
-// import "leaflet/dist/leaflet.css";
-// import "../../../internal/theme/leaflet.scss";
-// import { IPropertyDefinitionSupportedLocationType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
+export interface IPropertyViewLocationRendererProps extends IPropertyViewRendererProps<IPropertyDefinitionSupportedLocationType> {
+  viewport: IViewport;
+  onViewportChange: (viewport: IViewport) => void;
+  onResetViewportCenter: () => void;
+  canResetViewportCenter: boolean;
+}
 
-// // https://github.com/PaulLeCam/react-leaflet/issues/453
-// // bug in leaflet
-// delete (L.Icon as any).Default.prototype._getIconUrl;
-// (L.Icon as any).Default.mergeOptions({
-//   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-//   iconUrl: require("leaflet/dist/images/marker-icon.png"),
-//   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
-// });
+interface IPropertyViewLocationRendererState {
+  viewport: IViewport;
+}
 
-// // the viewport for the map
-// interface IViewport {
-//   center: [number, number];
-//   zoom: number;
-// }
+export class PropertyViewLocation extends React.Component<
+  IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>,
+  IPropertyViewLocationRendererState
+> {
+  private preventViewportDidUpdateChange: boolean = false;
+  constructor(props: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>) {
+    super(props);
 
-// // location state, sadly it needs a lot in the state
-// // department
-// interface IPropertyViewLocationState {
-//   viewport: IViewport;
-// }
+    const value: IPropertyDefinitionSupportedLocationType = this.props.state.value as IPropertyDefinitionSupportedLocationType;
 
-// export default class PropertyViewLocation
-//   extends React.Component<IPropertyViewProps, IPropertyViewLocationState> {
+    const center: [number, number] =  value ? [value.lat, value.lng] : [props.country.latitude, props.country.longitude];
+    const zoom = value ? IViewportZoomEnumType.LARGE : IViewportZoomEnumType.SMALL;
 
-//   public static getDerivedStateFromProps(
-//     props: IPropertyViewProps,
-//     state: IPropertyViewLocationState,
-//   ): Partial<IPropertyViewLocationState> {
-//     const valueAsLocation = props.state.value as IPropertyDefinitionSupportedLocationType;
-//     const latitude = valueAsLocation ? valueAsLocation.lat : props.country.latitude;
-//     const longitude = valueAsLocation ? valueAsLocation.lng : props.country.longitude;
-//     const newViewport: IViewport = {
-//       center: [latitude, longitude],
-//       zoom: valueAsLocation ? 16 : 4,
-//     };
+    this.state = {
+      viewport: {
+        center,
+        zoom,
+      }
+    }
 
-//     if (!equals(newViewport, state.viewport)) {
-//       return {
-//         viewport: newViewport,
-//       };
-//     }
-//     return null;
-//   }
+    this.onViewportChange = this.onViewportChange.bind(this);
+    this.onResetViewportCenter = this.onResetViewportCenter.bind(this);
+  }
+  public componentDidUpdate(prevProps: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>) {
+    if (!this.preventViewportDidUpdateChange) {
+      const value: IPropertyDefinitionSupportedLocationType = this.props.state.value as IPropertyDefinitionSupportedLocationType;
+      if (value) {
+        const oldValue: IPropertyDefinitionSupportedLocationType = prevProps.state.value as IPropertyDefinitionSupportedLocationType;
 
-//   constructor(props: IPropertyViewProps) {
-//     super(props);
+        if (!equals(value, oldValue)) {
+          this.setState({
+            viewport: {
+              center: [value.lat, value.lng],
+              zoom: IViewportZoomEnumType.LARGE,
+            },
+          })
+        }
+      }
+    }
+  }
+  public onViewportChange(viewport: IViewport) {
+    this.preventViewportDidUpdateChange = true;
+    this.setState({
+      viewport,
+    });
+  }
+  public onResetViewportCenter() {
+    this.preventViewportDidUpdateChange = false;
 
-//     const valueAsLocation = props.state.value as IPropertyDefinitionSupportedLocationType;
-//     const latitude = valueAsLocation ? valueAsLocation.lat : props.country.latitude;
-//     const longitude = valueAsLocation ? valueAsLocation.lng : props.country.longitude;
+    const value: IPropertyDefinitionSupportedLocationType = this.props.state.value as IPropertyDefinitionSupportedLocationType;
+    if (value) {
+      this.setState({
+        viewport: {
+          center: [value.lat, value.lng],
+          zoom: IViewportZoomEnumType.LARGE,
+        },
+      });
+    }
+  }
+  public shouldComponentUpdate(
+    nextProps: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>,
+    nextState: IPropertyViewLocationRendererState,
+  ) {
+    // This is optimized to only update for the thing it uses
+    return !equals(this.props.state.value, nextProps.state.value) ||
+      !equals(this.state, nextState) ||
+      nextProps.property !== this.props.property ||
+      nextProps.renderer !== this.props.renderer ||
+      nextProps.country !== this.props.country ||
+      !!this.props.rtl !== !!nextProps.rtl ||
+      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+  }
+  public render() {
+    const value: IPropertyDefinitionSupportedLocationType = this.props.state.value as IPropertyDefinitionSupportedLocationType;
+    let canResetViewportCenter: boolean = false;
+    if (value) {
+      const expectedViewport = {
+        center: [value.lat, value.lng],
+        zoom: IViewportZoomEnumType.LARGE,
+      };
+      canResetViewportCenter = !equals(expectedViewport, this.state.viewport);
+    }
+    
+    const RendererElement = this.props.renderer;
+    const rendererArgs: IPropertyViewLocationRendererProps = {
+      args: this.props.rendererArgs,
+      rtl: this.props.rtl,
+      currentValue: this.props.state.value as IPropertyDefinitionSupportedLocationType,
+      viewport: this.state.viewport,
+      onViewportChange: this.onViewportChange,
+      onResetViewportCenter: this.onResetViewportCenter,
+      canResetViewportCenter,
+    };
 
-//     // set the initial state
-//     this.state = {
-//       viewport: {
-//         center: [latitude, longitude],
-//         zoom: valueAsLocation ? 16 : 4,
-//       },
-//     };
-//   }
-
-//   public shouldComponentUpdate(
-//     nextProps: IPropertyViewProps,
-//     nextState: IPropertyViewLocationState,
-//   ) {
-//     // This is optimized to only update for the thing it uses
-//     return nextProps.property !== this.props.property ||
-//       !equals(this.state, nextState) ||
-//       !equals(this.props.state, nextProps.state) ||
-//       nextProps.country !== this.props.country;
-//   }
-
-//   public render() {
-//     // the location to mark is the currently set value
-//     const currentLocationToMark = this.props.state.value && [
-//       (this.props.state.value as IPropertyDefinitionSupportedLocationType).lat,
-//       (this.props.state.value as IPropertyDefinitionSupportedLocationType).lng,
-//     ];
-
-//     // the txt
-//     const currentLocationDataTxt = this.props.state.value &&
-//       (this.props.state.value as IPropertyDefinitionSupportedLocationType).txt;
-
-//     // and the alternative txt data
-//     const currentLocationDataATxt = this.props.state.value &&
-//       (this.props.state.value as IPropertyDefinitionSupportedLocationType).atxt;
-
-//     return (
-//       <div className={this.props.classes.container}>
-//         <div>
-//           {currentLocationDataATxt}
-//         </div>
-//         <div>
-//           <Map
-//             viewport={this.state.viewport}
-//           >
-//             <TileLayer
-//               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-//               url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-//             />
-//             {currentLocationToMark ? <Marker position={currentLocationToMark}>
-//               <Popup>{currentLocationDataTxt}{currentLocationDataATxt ? <br/> : null}{currentLocationDataATxt}</Popup>
-//             </Marker> : null}
-//           </Map>
-//         </div>
-//       </div>
-//     );
-//   }
-// }
+    return <RendererElement {...rendererArgs}/>
+  }
+}

@@ -23,6 +23,9 @@ export declare class Listener {
     constructor(buildnumber: string, redisSub: RedisClient, redisPub: RedisClient, redisLocalSub: RedisClient, redisLocalPub: RedisClient, root: Root, cache: Cache, knex: Knex, server: Server, sensitiveConfig: ISensitiveConfigRawJSONDataType);
     addSocket(socket: Socket): void;
     emitError(socket: Socket, message: string, request: any): void;
+    sendKickEvent(userId: number): void;
+    onReceiveKickEvent(userId: number): void;
+    kick(socket: Socket): void;
     identify(socket: Socket, request: IIdentifyRequest): Promise<void>;
     registerSS(request: IRegisterRequest): void;
     register(socket: Socket, request: IRegisterRequest): Promise<void>;
@@ -33,6 +36,10 @@ export declare class Listener {
     feedback(socket: Socket, request: IFeedbackRequest): Promise<void>;
     removeListenerFinal(mergedIndexIdentifier: string): void;
     removeListener(socket: Socket, mergedIndexIdentifier: string): void;
+    /**
+     * This method only reasonable gets called by the CLUSTER_MANAGER or in absolute mode
+     * @param request
+     */
     unregisterSS(request: IUnregisterRequest): void;
     unregister(socket: Socket, request: IUnregisterRequest): void;
     ownedSearchUnregister(socket: Socket, request: IOwnedSearchUnregisterRequest): void;

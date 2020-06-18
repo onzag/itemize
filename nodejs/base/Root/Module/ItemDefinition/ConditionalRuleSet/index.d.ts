@@ -40,7 +40,7 @@ export interface IConditionalRuleSetRawJSONDataPropertyType extends IConditional
     /**
      * the method, default, string or datetime (uses Date)
      */
-    method?: "default" | "string" | "datetime";
+    method?: "default" | "string" | "date" | "datetime" | "time";
     /**
      * the comparator, equal, greater than, etc...
      */

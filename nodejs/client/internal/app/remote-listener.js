@@ -27,6 +27,7 @@ class RemoteListener {
         this.onDisconnect = this.onDisconnect.bind(this);
         this.onRecordsAddedToOwnedSearch = this.onRecordsAddedToOwnedSearch.bind(this);
         this.onRecordsAddedToParentedSearch = this.onRecordsAddedToParentedSearch.bind(this);
+        this.onKicked = this.onKicked.bind(this);
         this.root = root;
         this.listeners = {};
         this.ownedSearchListeners = {};
@@ -43,11 +44,20 @@ class RemoteListener {
         this.socket = socket_io_client_1.default(`${location.protocol}//${location.host}`);
         this.socket.on("connect", this.reattachListeners);
         this.socket.on("disconnect", this.onDisconnect);
+        this.socket.on(remote_protocol_1.KICKED_EVENT, this.onKicked);
         this.socket.on(remote_protocol_1.CHANGED_FEEEDBACK_EVENT, this.onChangeListened);
         this.socket.on(remote_protocol_1.BUILDNUMBER_EVENT, this.onBuildnumberListened);
         this.socket.on(remote_protocol_1.OWNED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToOwnedSearch);
         this.socket.on(remote_protocol_1.PARENTED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToParentedSearch);
         this.socket.on(remote_protocol_1.ERROR_EVENT, this.onError);
+    }
+    setLogoutHandler(logout) {
+        this.logout = logout;
+    }
+    onKicked() {
+        // it would indeed be very weird if logout wasn't ready
+        // but we still check
+        this.logout && this.logout();
     }
     onError(event) {
         console.error(event.message);

@@ -223,10 +223,10 @@ export const rawSensitiveConfigSchema = {
         ],
       },
       minProperties: 1,
-    }
-  },
-  defaultContainerID: {
-    type: "string",
+    },
+    defaultContainerID: {
+      type: "string",
+    },
   },
   additionalProperties: false,
   required: [
@@ -234,6 +234,7 @@ export const rawSensitiveConfigSchema = {
     "ipStackHttpsEnabled",
     "currencyLayerAccessKey",
     "currencyLayerHttpsEnabled",
+    "defaultContainerID",
     "hereAppID",
     "hereAppCode",
     "mailgunAPIKey",

@@ -60,7 +60,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     private remoteListener;
     constructor(props: IAppProps);
     setBlockedCallbackState(state: boolean): void;
-    setTokenState(state: IActualTokenProviderState): void;
+    setTokenState(state: IActualTokenProviderState, logout: () => void): void;
     updateUserProperty(propertyId: string, value: string): Promise<void>;
     /**
      * Checks whether there is a locale data for a given language

@@ -16,7 +16,10 @@ export declare class RemoteListener {
     private token;
     private isReady;
     private isReadyCallbacks;
+    private logout;
     constructor(root: Root);
+    setLogoutHandler(logout: () => void): void;
+    onKicked(): void;
     onError(event: IErrorEvent): void;
     setToken(token: string): void;
     onBuildnumberListened(build: IBuildNumberEvent): void;

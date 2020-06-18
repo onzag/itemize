@@ -170,9 +170,7 @@ exports.customUserQueries = (appData) => {
                             id: resultUser.id,
                             role: resultUser.role,
                             sessionId: resultUser.session_id || 0,
-                        }, appData.sensitiveConfig.jwtKey, {
-                            expiresIn: "7d",
-                        }));
+                        }, appData.sensitiveConfig.jwtKey));
                         // and we return the information back to the user
                         return {
                             ...resultUser,

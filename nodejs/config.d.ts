@@ -162,9 +162,9 @@ export declare const rawSensitiveConfigSchema: {
             };
             minProperties: number;
         };
-    };
-    defaultContainerID: {
-        type: string;
+        defaultContainerID: {
+            type: string;
+        };
     };
     additionalProperties: boolean;
     required: string[];

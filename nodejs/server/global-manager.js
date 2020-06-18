@@ -30,6 +30,7 @@ class GlobalManager {
         this.addAdminUserIfMissing = this.addAdminUserIfMissing.bind(this);
         const modules = this.root.getAllModules();
         modules.forEach(this.processModule);
+        this.addAdminUserIfMissing();
     }
     async addAdminUserIfMissing() {
         if (!this.config.roles.includes("ADMIN")) {
@@ -40,12 +41,12 @@ class GlobalManager {
         const userIdef = userMod.getItemDefinitionFor(["user"]);
         const moduleTable = userMod.getQualifiedPathName();
         const selfTable = userIdef.getQualifiedPathName();
-        const primaryAdminUser = await this.knex.first("id").from(moduleTable).where("role", "ADMIN");
+        const primaryAdminUser = await this.knex.first(constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("role", "ADMIN");
         if (!primaryAdminUser) {
             _1.logger.info("GlobalManager.addAdminUserIfMissing: admin user is considered missing, adding one");
-            const adminUserNameIsViable = await this.knex.first("id").from(selfTable).where("username", "admin");
+            const currentAdminUserWithSuchUsername = await this.knex.first(constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("username", "admin");
             let username = "admin";
-            if (!adminUserNameIsViable) {
+            if (currentAdminUserWithSuchUsername) {
                 username = "admin" + (new Date()).getTime();
             }
             const password = uuid_1.default.v4().replace(/\-/g, "");
@@ -60,6 +61,7 @@ class GlobalManager {
             const sqlIdefData = {
                 username,
                 password: this.knex.raw("crypt(?, gen_salt('bf',10))", password),
+                role: "ADMIN",
                 app_language: this.config.fallbackLanguage,
                 app_country: this.config.fallbackCountryCode,
                 app_currency: this.config.fallbackCurrency,
@@ -82,8 +84,6 @@ class GlobalManager {
                 _1.logger.error("GlobalManager.addAdminUserIfMissing: Failed to add admin user when it was considered missing", {
                     errMessage: err.message,
                     errStack: err.stack,
-                    sqlModData,
-                    sqlIdefData,
                 });
             }
             _1.logger.info("GlobalManager.addAdminUserIfMissing: Sucessfully added admin user", {

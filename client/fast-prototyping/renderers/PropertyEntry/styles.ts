@@ -1,3 +1,4 @@
+// TODO drop this, they are more annoying than anything else
 export interface IPropertyEntryThemeType {
   invalidColor: string;
   iconColor: string;

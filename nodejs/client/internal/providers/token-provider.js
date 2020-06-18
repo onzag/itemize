@@ -45,7 +45,7 @@ class ActualTokenProvider extends react_1.default.Component {
         // been validated by the server side render service
         // sometimes this doesn't happen nevertheless
         if (this.state.isReady) {
-            this.props.onProviderStateSet(this.state);
+            this.props.onProviderStateSet(this.state, this.logout);
             return;
         }
         const storedToken = localStorage.getItem("token");
@@ -57,7 +57,7 @@ class ActualTokenProvider extends react_1.default.Component {
                 ...this.state,
                 isReady: true,
             };
-            this.props.onProviderStateSet(newState);
+            this.props.onProviderStateSet(newState, this.logout);
             this.setState(newState);
         }
     }
@@ -133,7 +133,7 @@ class ActualTokenProvider extends react_1.default.Component {
             console.log("credentials deemed invalid", error);
             this.cleanAndDestroyLoggedData();
         }
-        this.props.onProviderStateSet(newState);
+        this.props.onProviderStateSet(newState, this.logout);
         this.setState(newState);
         if (tokenDataId) {
             const fields = {

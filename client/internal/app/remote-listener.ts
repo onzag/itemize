@@ -34,6 +34,7 @@ import {
   IDENTIFIED_EVENT,
   ERROR_EVENT,
   IErrorEvent,
+  KICKED_EVENT,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 
@@ -71,6 +72,7 @@ export class RemoteListener {
   private token: string = null;
   private isReady: boolean = false;
   private isReadyCallbacks: Array<[string, any[]]> = [];
+  private logout: () => void;
 
   constructor(root: Root) {
     this.reattachListeners = this.reattachListeners.bind(this);
@@ -79,6 +81,7 @@ export class RemoteListener {
     this.onDisconnect = this.onDisconnect.bind(this);
     this.onRecordsAddedToOwnedSearch = this.onRecordsAddedToOwnedSearch.bind(this);
     this.onRecordsAddedToParentedSearch = this.onRecordsAddedToParentedSearch.bind(this);
+    this.onKicked = this.onKicked.bind(this);
 
     this.root = root;
     this.listeners = {};
@@ -98,11 +101,20 @@ export class RemoteListener {
     this.socket = io(`${location.protocol}//${location.host}`);
     this.socket.on("connect", this.reattachListeners);
     this.socket.on("disconnect", this.onDisconnect);
+    this.socket.on(KICKED_EVENT, this.onKicked);
     this.socket.on(CHANGED_FEEEDBACK_EVENT, this.onChangeListened);
     this.socket.on(BUILDNUMBER_EVENT, this.onBuildnumberListened);
     this.socket.on(OWNED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToOwnedSearch);
     this.socket.on(PARENTED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToParentedSearch);
     this.socket.on(ERROR_EVENT, this.onError)
+  }
+  public setLogoutHandler(logout: () => void) {
+    this.logout = logout;
+  }
+  public onKicked() {
+    // it would indeed be very weird if logout wasn't ready
+    // but we still check
+    this.logout && this.logout();
   }
   public onError(event: IErrorEvent) {
     console.error(

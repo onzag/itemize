@@ -37,7 +37,7 @@ const lab_1 = require("@material-ui/lab");
 const util_1 = require("../../../../util");
 const Restore_1 = __importDefault(require("@material-ui/icons/Restore"));
 const Clear_1 = __importDefault(require("@material-ui/icons/Clear"));
-const ZOOMS = {
+exports.ZOOMS = {
     "LARGE": 16,
     "MEDIUM": 14,
     "SMALL": 4,
@@ -258,7 +258,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
     renderBody(textFieldProps) {
         const viewport = {
             center: this.props.viewport.center,
-            zoom: ZOOMS[this.props.viewport.zoom] || this.props.viewport.zoom,
+            zoom: exports.ZOOMS[this.props.viewport.zoom] || this.props.viewport.zoom,
         };
         let appliedTextFieldProps = {
             className: this.props.classes.entry,
@@ -383,7 +383,8 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
             }, inputProps: {
                 value: this.props.searchQuery,
                 onChange: this.onSearchQueryChange,
-                autoComplete: "off",
+                autoComplete: "new-address",
+                type: "search",
             } }));
     }
 }

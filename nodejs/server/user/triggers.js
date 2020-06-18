@@ -6,12 +6,21 @@ const __1 = require("../");
 exports.customUserTriggers = {
     itemDefinition: {
         "users/user": async (arg) => {
+            // check for sessionId changes in order to trigger a whole kick
+            // event
+            if (arg.from &&
+                arg.update) {
+                const newSessionId = arg.update.sessionId;
+                const oldSessionId = arg.from.sessionId;
+                if (newSessionId && newSessionId !== oldSessionId) {
+                    arg.appData.listener.sendKickEvent(arg.from.id);
+                }
+            }
             // we add a trigger for when the user updated the email
             // either because of creation or from a normal update
             // from will be null during creation, this means creation
             // will trigger this path
-            if (arg.update &&
-                typeof arg.update !== "undefined") {
+            if (arg.update) {
                 // so this is the new email, remember this can be null and it
                 // can be a partial update in which case it's undefined
                 const newEmail = arg.update.email;

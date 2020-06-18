@@ -171,8 +171,9 @@ export default class App extends React.Component<IAppProps, IAppState> {
     }
   }
 
-  public setTokenState(state: IActualTokenProviderState) {
+  public setTokenState(state: IActualTokenProviderState, logout: () => void) {
     this.tokenState = state;
+    this.remoteListener.setLogoutHandler(logout);
     this.remoteListener.setToken(state.token);
   }
 

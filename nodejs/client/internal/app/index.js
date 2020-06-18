@@ -89,8 +89,9 @@ class App extends react_1.default.Component {
             });
         }
     }
-    setTokenState(state) {
+    setTokenState(state, logout) {
         this.tokenState = state;
+        this.remoteListener.setLogoutHandler(logout);
         this.remoteListener.setToken(state.token);
     }
     async updateUserProperty(propertyId, value) {

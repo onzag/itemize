@@ -12,6 +12,7 @@ import PropertyViewSimpleRenderer from "./PropertyView/PropertyViewSimple";
 import PropertyViewTextRenderer from "./PropertyView/PropertyViewText";
 import PropertyViewFileRenderer from "./PropertyView/PropertyViewFile";
 import PropertyViewDateTimeRenderer from "./PropertyView/PropertyViewDateTime";
+import PropertyViewLocationRenderer from "./PropertyView/PropertyViewLocation";
 
 export const rendererContext: IRendererContext = {
   PropertyEntryField: PropertyEntryFieldRenderer,
@@ -27,4 +28,5 @@ export const rendererContext: IRendererContext = {
   PropertyViewText: PropertyViewTextRenderer,
   PropertyViewDateTime: PropertyViewDateTimeRenderer,
   PropertyViewFile: PropertyViewFileRenderer,
+  PropertyViewLocation: PropertyViewLocationRenderer,
 }

@@ -64,9 +64,9 @@ export default class PropertyEntryBoolean extends React.Component<
     const falseLabel = this.props.i18n[this.props.language].no;
     const nullLabel = this.props.i18n[this.props.language].unspecified;
 
-    if (this.props.state.value === null) {
+    if (this.props.state.value === null && !isTernary) {
       console.warn(
-        "Warning!... you should set a default value to a boolean field, got null"
+        "Warning!... you should set a default value to a non ternary boolean field, got null"
       );
     }
 
@@ -85,7 +85,7 @@ export default class PropertyEntryBoolean extends React.Component<
       nullLabel,
 
       currentAppliedValue: this.props.state.stateAppliedValue as boolean,
-      currentValue: (this.props.state.value as boolean) || false,
+      currentValue: isTernary ? (this.props.state.value as boolean) : ((this.props.state.value as boolean) || false),
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,

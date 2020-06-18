@@ -13,6 +13,7 @@ const PropertyViewFile_1 = __importDefault(require("./PropertyViewFile"));
 const config_provider_1 = require("../../providers/config-provider");
 const PropertyViewBoolean_1 = require("./PropertyViewBoolean");
 const PropertyViewDateTime_1 = require("./PropertyViewDateTime");
+const PropertyViewLocation_1 = require("./PropertyViewLocation");
 ;
 const handlerRegistry = {
     string: {
@@ -58,7 +59,10 @@ const handlerRegistry = {
         renderer: "PropertyViewDateTime",
         handler: PropertyViewDateTime_1.PropertyViewDateTime,
     },
-    location: null,
+    location: {
+        renderer: "PropertyViewLocation",
+        handler: PropertyViewLocation_1.PropertyViewLocation,
+    },
     file: {
         renderer: "PropertyViewFile",
         handler: PropertyViewFile_1.default,
