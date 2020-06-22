@@ -58,76 +58,77 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
   },
-  sql: (sqlPrefix: string, id: string) => {
+  sql: (arg) => {
     return {
-      [sqlPrefix + id + "_VALUE"]: {
+      [arg.prefix + arg.id + "_VALUE"]: {
         type: "float",
       },
-      [sqlPrefix + id + "_UNIT"]: {
+      [arg.prefix + arg.id + "_UNIT"]: {
         type: "text",
       },
-      [sqlPrefix + id + "_NORMALIZED_VALUE"]: {
+      [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {
         type: "float",
       },
-      [sqlPrefix + id + "_NORMALIZED_UNIT"]: {
+      [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: {
         type: "text",
       },
     };
   },
-  sqlIn: (value: IPropertyDefinitionSupportedUnitType, sqlPrefix: string, id: string) => {
-    if (value === null) {
+  sqlIn: (arg) => {
+    if (arg.value === null) {
       return {
-        [sqlPrefix + id + "_VALUE"]: null,
-        [sqlPrefix + id + "_UNIT"]: null,
-        [sqlPrefix + id + "_NORMALIZED_VALUE"]: null,
-        [sqlPrefix + id + "_NORMALIZED_UNIT"]: null,
+        [arg.prefix + arg.id + "_VALUE"]: null,
+        [arg.prefix + arg.id + "_UNIT"]: null,
+        [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: null,
+        [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: null,
       };
     }
+    const value = arg.value as IPropertyDefinitionSupportedUnitType;
     return {
-      [sqlPrefix + id + "_VALUE"]: value.value,
-      [sqlPrefix + id + "_UNIT"]: value.unit,
-      [sqlPrefix + id + "_NORMALIZED_VALUE"]: value.normalizedValue,
-      [sqlPrefix + id + "_NORMALIZED_UNIT"]: value.normalizedUnit,
+      [arg.prefix + arg.id + "_VALUE"]: value.value,
+      [arg.prefix + arg.id + "_UNIT"]: value.unit,
+      [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: value.normalizedValue,
+      [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: value.normalizedUnit,
     };
   },
-  sqlOut: (data: ISQLTableRowValue, sqlPrefix: string, id: string) => {
+  sqlOut: (arg) => {
     const result: IPropertyDefinitionSupportedUnitType = {
-      value: data[sqlPrefix + id + "_VALUE"],
-      unit: data[sqlPrefix + id + "_UNIT"],
-      normalizedValue: data[sqlPrefix + id + "_NORMALIZED_VALUE"],
-      normalizedUnit: data[sqlPrefix + id + "_NORMALIZED_UNIT"],
+      value: arg.row[arg.prefix + arg.id + "_VALUE"],
+      unit: arg.row[arg.prefix + arg.id + "_UNIT"],
+      normalizedValue: arg.row[arg.prefix + arg.id + "_NORMALIZED_VALUE"],
+      normalizedUnit: arg.row[arg.prefix + arg.id + "_NORMALIZED_UNIT"],
     };
     if (result.value === null) {
       return null;
     }
     return result;
   },
-  sqlSearch: (data: IGQLValue, sqlPrefix: string, id: string, knexBuilder) => {
-    const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
-    const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
-    const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+  sqlSearch: (arg) => {
+    const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
+    const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix +arg.id;
+    const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
     let searchedByIt = false;
 
-    if (typeof data[exactName] !== "undefined" && data[exactName] !== null) {
-      const exactAsUnit: IPropertyDefinitionSupportedUnitType = data[exactName] as any;
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", exactAsUnit.normalizedUnit);
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", exactAsUnit.normalizedValue);
-    } else if (data[exactName] === null) {
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", null);
+    if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
+      const exactAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[exactName] as any;
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_UNIT", exactAsUnit.normalizedUnit);
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", exactAsUnit.normalizedValue);
+    } else if (arg.args[exactName] === null) {
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", null);
       searchedByIt = true;
     }
 
-    if (typeof data[fromName] !== "undefined" && data[fromName] !== null) {
-      const fromAsUnit: IPropertyDefinitionSupportedUnitType = data[fromName] as any;
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", fromAsUnit.normalizedUnit);
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", ">=", fromAsUnit.normalizedValue);
+    if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
+      const fromAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[fromName] as any;
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_UNIT", fromAsUnit.normalizedUnit);
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", fromAsUnit.normalizedValue);
       searchedByIt = true;
     }
 
-    if (typeof data[toName] !== "undefined" && data[toName] !== null) {
-      const toAsUnit: IPropertyDefinitionSupportedUnitType = data[toName] as any;
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_UNIT", toAsUnit.normalizedUnit);
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", toAsUnit.normalizedValue);
+    if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
+      const toAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[toName] as any;
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_UNIT", toAsUnit.normalizedUnit);
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", toAsUnit.normalizedValue);
       searchedByIt = true;
     }
 
@@ -135,55 +136,42 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
   sqlStrSearch: null,
   localStrSearch: null,
-  sqlOrderBy: (
-    sqlPrefix: string,
-    id: string,
-    direction: "asc" | "desc",
-    nulls: "first" | "last",
-  ) => {
-    return [sqlPrefix + id + "_NORMALIZED_VALUE", direction, nulls];
+  sqlOrderBy: (arg) => {
+    return [arg.prefix + arg.id + "_NORMALIZED_VALUE", arg.direction, arg.nulls];
   },
-  localOrderBy: (
-    direction: "asc" | "desc",
-    nulls: "first" | "last",
-    a: IPropertyDefinitionSupportedUnitType,
-    b: IPropertyDefinitionSupportedUnitType,
-  ) => {
-    if (a === null && b === null) {
+  localOrderBy: (arg) => {
+    if (arg.a === null && arg.b === null) {
       return 0;
-    } else if (a === null) {
-      return nulls === "last" ? 1 : -1;
-    } else if (b === null) {
-      return nulls === "last" ? -1 : 1;
+    } else if (arg.a === null) {
+      return arg.nulls === "last" ? 1 : -1;
+    } else if (arg.b === null) {
+      return arg.nulls === "last" ? -1 : 1;
     }
-    if (direction === "desc") {
-      return b.normalizedValue - a.normalizedValue;
+    if (arg.direction === "desc") {
+      return (arg.b as IPropertyDefinitionSupportedUnitType).normalizedValue -
+        (arg.a as IPropertyDefinitionSupportedUnitType).normalizedValue;
     }
-    return a.normalizedValue - b.normalizedValue;
+    return (arg.a as IPropertyDefinitionSupportedUnitType).normalizedValue -
+      (arg.b as IPropertyDefinitionSupportedUnitType).normalizedValue;
   },
-  localSearch: (
-    args: IGQLArgs,
-    rawData: IGQLValue,
-    id: string,
-    includeId?: string,
-  ) => {
+  localSearch: (arg) => {
     // item is deleted
-    if (!rawData) {
+    if (!arg.gqlValue) {
       return false;
     }
     // item is blocked
-    if (rawData.DATA === null) {
+    if (arg.gqlValue.DATA === null) {
       return false;
     }
 
-    const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
-    const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
-    const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+    const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
+    const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix +arg.id;
+    const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
 
-    const usefulArgs = includeId ? args[INCLUDE_PREFIX + includeId] || {} : args;
+    const usefulArgs = arg.include ? arg.args[INCLUDE_PREFIX + arg.include.getId()] || {} : arg.args;
 
     const propertyValue: IPropertyDefinitionSupportedUnitType =
-      includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+      arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
 
     const conditions: boolean[] = [];
     if (typeof usefulArgs[exactName] !== "undefined") {
@@ -219,53 +207,33 @@ const typeValue: IPropertyDefinitionSupportedType = {
       return conditions.every((c) => c);
     }
   },
-  sqlEqual: (
-    value: IPropertyDefinitionSupportedUnitType,
-    sqlPrefix: string,
-    id: string,
-    isCaseInsensitive: boolean,
-    knex: Knex,
-    columnName?: string,
-  ) => {
-    if (!columnName) {
-      return {
-        [sqlPrefix + id + "_NORMALIZED_UNIT"]: value.normalizedUnit,
-        [sqlPrefix + id + "_NORMALIZED_VALUE"]: value.normalizedValue,
-      };
+  sqlEqual: (arg) => {
+    return {
+      [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: (arg.value as IPropertyDefinitionSupportedUnitType).normalizedUnit,
+      [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: (arg.value as IPropertyDefinitionSupportedUnitType).normalizedValue,
+    };
+  },
+  sqlSSCacheEqual: (arg) => {
+    if (arg.value === null) {
+      return arg.row[arg.prefix + arg.id + "_NORMALIZED_VALUE"] === null;
     }
-    return knex.raw(
-      "?? = ? AND ?? = ? AS ??",
-      [
-        sqlPrefix + id + "_NORMALIZED_UNIT",
-        value.normalizedUnit,
-        sqlPrefix + id + "_NORMALIZED_VALUE",
-        value.normalizedValue,
-        columnName,
-      ],
-    );
+    const value = arg.value as IPropertyDefinitionSupportedUnitType;
+    return arg.row[arg.prefix + arg.id + "_NORMALIZED_VALUE"] === value.normalizedValue &&
+      arg.row[arg.prefix + arg.id + "_NORMALIZED_UNIT"] === value.normalizedUnit;
   },
-  sqlSSCacheEqual: (
-    value: IPropertyDefinitionSupportedUnitType,
-    sqlPrefix: string,
-    id: string,
-    data: ISQLTableRowValue,
-  ) => {
-    if (value === null) {
-      return data[sqlPrefix + id + "_NORMALIZED_VALUE"] === value;
+  sqlBtreeIndexable: (arg) => {
+    return [arg.prefix + arg.id + "_NORMALIZED_UNIT", arg.prefix + arg.id + "_NORMALIZED_VALUE"];
+  },
+  localEqual: (arg) => {
+    const a = arg.a as IPropertyDefinitionSupportedUnitType;
+    const b = arg.b as IPropertyDefinitionSupportedUnitType;
+
+    if (a === b) {
+      return true;
+    } else if (a === null || b === null) {
+      return false;
     }
-    return data[sqlPrefix + id + "_NORMALIZED_VALUE"] === value.normalizedValue &&
-      data[sqlPrefix + id + "_NORMALIZED_UNIT"] === value.normalizedUnit;
-  },
-  sqlBtreeIndexable: (
-    sqlPrefix: string,
-    id: string,
-  ) => {
-    return [sqlPrefix + id + "_NORMALIZED_UNIT", sqlPrefix + id + "_NORMALIZED_VALUE"];
-  },
-  localEqual: (
-    a: IPropertyDefinitionSupportedUnitType,
-    b: IPropertyDefinitionSupportedUnitType,
-  ) => {
+
     return a.value === b.value && a.unit === b.unit;
   },
   supportedSubtypes: UNIT_SUBTYPES,

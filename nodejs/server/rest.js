@@ -98,7 +98,7 @@ function restServices(appData) {
             }
         }
         // we use the server side index checker
-        const isValid = await server_checkers_1.serverSideIndexChecker(appData.knex, property, value, id, version);
+        const isValid = await server_checkers_1.serverSideIndexChecker(appData, property.getParentItemDefinition(), null, property, value, id, version);
         res.end(JSON.stringify(isValid));
     }
     /**

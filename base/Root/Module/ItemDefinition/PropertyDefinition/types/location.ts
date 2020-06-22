@@ -10,9 +10,6 @@ import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N, INCLUDE_PREFIX, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
-import Knex from "knex";
-import { ISQLTableRowValue } from "../../../../sql";
-import { IGQLValue, IGQLArgs } from "../../../../../../gql-querier";
 import { IPropertyDefinitionSupportedUnitType } from "./unit";
 
 /**
@@ -85,101 +82,102 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
   },
-  sql: (sqlPrefix: string, id: string) => {
+  sql: (arg) => {
     return {
-      [sqlPrefix + id + "_GEO"]: {
+      [arg.prefix + arg.id + "_GEO"]: {
         type: "GEOMETRY(POINT,4326)",
         ext: "postgis",
         index: {
           type: "gist",
-          id: SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
+          id: SQL_CONSTRAINT_PREFIX + arg.prefix + arg.id,
           level: 0,
         },
       },
-      [sqlPrefix + id + "_ID"]: {
+      [arg.prefix + arg.id + "_ID"]: {
         type: "text",
       },
-      [sqlPrefix + id + "_LAT"]: {
+      [arg.prefix + arg.id + "_LAT"]: {
         type: "float",
       },
-      [sqlPrefix + id + "_LNG"]: {
+      [arg.prefix + arg.id + "_LNG"]: {
         type: "float",
       },
-      [sqlPrefix + id + "_TXT"]: {
+      [arg.prefix + arg.id + "_TXT"]: {
         type: "text",
       },
-      [sqlPrefix + id + "_ATXT"]: {
+      [arg.prefix + arg.id + "_ATXT"]: {
         type: "text",
       },
     };
   },
-  sqlIn: (value: IPropertyDefinitionSupportedLocationType, sqlPrefix: string, id, property, knex) => {
-    if (value === null) {
+  sqlIn: (arg) => {
+    if (arg.value === null) {
       return {
-        [sqlPrefix + id + "_GEO"]: null,
-        [sqlPrefix + id + "_ID"]: null,
-        [sqlPrefix + id + "_LAT"]: null,
-        [sqlPrefix + id + "_LNG"]: null,
-        [sqlPrefix + id + "_TXT"]: null,
-        [sqlPrefix + id + "_ATXT"]: null,
+        [arg.prefix + arg.id + "_GEO"]: null,
+        [arg.prefix + arg.id + "_ID"]: null,
+        [arg.prefix + arg.id + "_LAT"]: null,
+        [arg.prefix + arg.id + "_LNG"]: null,
+        [arg.prefix + arg.id + "_TXT"]: null,
+        [arg.prefix + arg.id + "_ATXT"]: null,
       };
     }
 
+    const value = arg.value as IPropertyDefinitionSupportedLocationType;
     return {
-      [sqlPrefix + id + "_GEO"]: knex.raw("ST_SetSRID(ST_MakePoint(?, ?), 4326)", [value.lng, value.lat]),
-      [sqlPrefix + id + "_ID"]: value.id,
-      [sqlPrefix + id + "_LAT"]: value.lat,
-      [sqlPrefix + id + "_LNG"]: value.lng,
-      [sqlPrefix + id + "_TXT"]: value.txt,
-      [sqlPrefix + id + "_ATXT"]: value.atxt,
+      [arg.prefix + arg.id + "_GEO"]: arg.knex.raw("ST_SetSRID(ST_MakePoint(?, ?), 4326)", [value.lng, value.lat]),
+      [arg.prefix + arg.id + "_ID"]: value.id,
+      [arg.prefix + arg.id + "_LAT"]: value.lat,
+      [arg.prefix + arg.id + "_LNG"]: value.lng,
+      [arg.prefix + arg.id + "_TXT"]: value.txt,
+      [arg.prefix + arg.id + "_ATXT"]: value.atxt,
     };
   },
-  sqlOut: (data: ISQLTableRowValue, sqlPrefix: string, id: string) => {
+  sqlOut: (arg) => {
     const result: IPropertyDefinitionSupportedLocationType = {
-      lat: data[sqlPrefix + id + "_LAT"],
-      lng: data[sqlPrefix + id + "_LNG"],
-      txt: data[sqlPrefix + id + "_TXT"],
-      atxt: data[sqlPrefix + id + "_ATXT"],
-      id: data[sqlPrefix + id + "_ID"],
+      lat: arg.row[arg.prefix + arg.id + "_LAT"],
+      lng: arg.row[arg.prefix + arg.id + "_LNG"],
+      txt: arg.row[arg.prefix + arg.id + "_TXT"],
+      atxt: arg.row[arg.prefix + arg.id + "_ATXT"],
+      id: arg.row[arg.prefix + arg.id + "_ID"],
     };
     if (result.lat === null || result.lng === null) {
       return null;
     }
     return result;
   },
-  sqlSearch: (args: IGQLArgs, sqlPrefix: string, id: string, knexBuilder: any, dictionary: string, isOrderedByIt: boolean) => {
-    const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + id;
-    const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + id;
+  sqlSearch: (arg) => {
+    const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + arg.prefix + arg.id;
+    const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + arg.prefix + arg.id;
 
     if (
-      typeof args[locationName] !== "undefined" && args[locationName] !== null &&
-      typeof args[radiusName] !== "undefined" && args[radiusName] !== null
+      typeof arg.args[locationName] !== "undefined" && arg.args[locationName] !== null &&
+      typeof arg.args[radiusName] !== "undefined" && arg.args[radiusName] !== null
     ) {
-      knexBuilder.andWhere(sqlPrefix + id, "!=", null);
+      arg.knexBuilder.andWhere(arg.prefix + arg.id, "!=", null);
 
-      const argAsLocation: IPropertyDefinitionSupportedLocationType = args[locationName] as any;
+      const argAsLocation: IPropertyDefinitionSupportedLocationType = arg.args[locationName] as any;
       const lng = argAsLocation.lng || 0;
       const lat = argAsLocation.lat || 0;
-      const argAsUnit: IPropertyDefinitionSupportedUnitType = args[radiusName] as any;
+      const argAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[radiusName] as any;
       const distance = (argAsUnit.normalizedValue || 0) * 1000;
-      knexBuilder.andWhereRaw(
+      arg.knexBuilder.andWhereRaw(
         "ST_DWithin(??, ST_MakePoint(?,?)::geography, ?)",
         [
-          sqlPrefix + id,
+          arg.prefix + arg.id,
           lng,
           lat,
           distance,
         ],
       );
       
-      if (isOrderedByIt) {
+      if (arg.isOrderedByIt) {
         return [
           "ST_Distance(??, ST_MakePoint(?,?)::geography) AS ??",
           [
-            sqlPrefix + id,
+            arg.prefix + arg.id,
             lng,
             lat,
-            sqlPrefix + id + "_CALC_RADIUS",
+            arg.prefix + arg.id + "_CALC_RADIUS",
           ],
         ]
       }
@@ -192,44 +190,33 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlStrSearch: null,
   localStrSearch: null,
   sqlMantenience: null,
-  sqlOrderBy: (
-    sqlPrefix: string,
-    id: string,
-    direction: "asc" | "desc",
-    nulls: "first" | "last",
-    wasIncludedInSearch: boolean,
-  ) => {
-    if (wasIncludedInSearch) {
-      return [sqlPrefix + id + "_CALC_RADIUS", direction, nulls];
+  sqlOrderBy: (arg) => {
+    if (arg.wasIncludedInSearch) {
+      return [arg.prefix + arg.id + "_CALC_RADIUS", arg.direction, arg.nulls];
     }
     return null;
   },
   localOrderBy: null,
-  localSearch: (
-    args: IGQLArgs,
-    rawData: IGQLValue,
-    id: string,
-    includeId?: string,
-  ) => {
+  localSearch: (arg) => {
     // item is deleted
-    if (!rawData) {
+    if (!arg.gqlValue) {
       return false;
     }
     // item is blocked
-    if (rawData.DATA === null) {
+    if (arg.gqlValue.DATA === null) {
       return false;
     }
 
-    const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + id;
-    const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + id;
+    const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + arg.id;
+    const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + arg.id;
 
-    const usefulArgs = includeId ? args[INCLUDE_PREFIX + includeId] || {} : args;
+    const usefulArgs = arg.include ? arg.args[INCLUDE_PREFIX + arg.include.getId()] || {} : arg.args;
 
     if (
       typeof usefulArgs[locationName] !== "undefined" && usefulArgs[locationName] !== null &&
       typeof usefulArgs[radiusName] !== "undefined" && usefulArgs[radiusName] !== null
     ) {
-      const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
       if (propertyValue === null) {
         return false;
       }
@@ -249,57 +236,37 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     return true;
   },
-  sqlEqual: (
-    value: IPropertyDefinitionSupportedLocationType,
-    sqlPrefix: string,
-    id: string,
-    isCaseInsensitive: boolean,
-    knex: Knex,
-    columnName?: string,
-  ) => {
-    if (!columnName) {
+  sqlEqual: (arg) => {
+    if (arg.value === null) {
       return {
-        [sqlPrefix + id + "_ID"]: value.id,
+        [arg.prefix + arg.id + "_ID"]: null,
       };
     }
-    return knex.raw(
-      "?? = ? AS ??",
-      [
-        sqlPrefix + id + "_ID",
-        value.id,
-        columnName,
-      ],
-    );
+    return {
+      [arg.prefix + arg.id + "_ID"]: (arg.value as IPropertyDefinitionSupportedLocationType).id,
+    };
   },
-  sqlSSCacheEqual: (
-    value: IPropertyDefinitionSupportedLocationType,
-    sqlPrefix: string,
-    id: string,
-    data: ISQLTableRowValue,
-  ) => {
-    if (value === null) {
-      return data[sqlPrefix + id + "_ID"] === value;
+  sqlSSCacheEqual: (arg) => {
+    if (arg.value === null) {
+      return arg.row[arg.prefix + arg.id + "_ID"] === arg.value;
     }
-    return data[sqlPrefix + id + "ID"] === value.id;
+    return arg.row[arg.prefix + arg.id + "ID"] === (arg.value as IPropertyDefinitionSupportedLocationType).id;
   },
   sqlBtreeIndexable: () => {
     return null;
   },
-  localEqual: (
-    a: IPropertyDefinitionSupportedLocationType,
-    b: IPropertyDefinitionSupportedLocationType,
-  ) => {
-    if (a === b) {
+  localEqual: (arg) => {
+    if (arg.a === arg.b) {
       return true;
     }
 
-    if (a === null && b !== null) {
+    if (arg.a === null && arg.b !== null) {
       return false;
-    } else if (b === null && a !== null) {
+    } else if (arg.b === null && arg.a !== null) {
       return false;
     }
 
-    return a.id === b.id;
+    return (arg.a as IPropertyDefinitionSupportedLocationType).id === (arg.b as IPropertyDefinitionSupportedLocationType).id;
   },
   // locations just contain this basic data
   validate: (l: IPropertyDefinitionSupportedLocationType) => {

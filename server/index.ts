@@ -582,8 +582,6 @@ export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCus
       }
     }
 
-    PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, knex);
-
     // due to a bug in the types the create client function is missing
     // domainId and domainName
     logger.info(
@@ -730,6 +728,9 @@ export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCus
       // assigned later during rest setup
       customUserTokenQuery: null,
     };
+
+    // we setup the index checker now that we have the server data
+    PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, appData);
 
     logger.info(
       "initializeServer: INSTANCE_GROUP_ID is " + INSTANCE_GROUP_ID,

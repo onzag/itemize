@@ -15,103 +15,6 @@ const Include_1 = require("../../base/Root/Module/ItemDefinition/Include");
 const token_1 = require("../token");
 const search_mode_1 = require("../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode");
 /**
- * Builds the column names expected for a given module only
- * @param requestedFields the requested fields given by graphql fields and flattened
- * @param mod the module in question
- */
-function buildColumnNamesForModuleTableOnly(requestedFields, mod) {
-    // this will be the ouput
-    let result = [];
-    // we start by looping into the requested fields
-    Object.keys(requestedFields).forEach((key) => {
-        // if it's one of the reserved properties, then we can be
-        // sure that it's expected in the module table
-        if (constants_1.RESERVED_BASE_PROPERTIES[key]) {
-            result.push(key);
-            // also if it's a prop extension
-        }
-        else if (mod.hasPropExtensionFor(key)) {
-            // we get the property
-            const property = mod.getPropExtensionFor(key);
-            // just to access the property description
-            const propDescription = property.getPropertyDefinitionDescription();
-            // now we need to see how it is in sql form and get the instructions
-            // of table formation, a string means, use the property name
-            // we pass it to the function, to see
-            // what it splits on, the function returns an object
-            // eg. kitten_SIZE: {type: float, ...} kitten_VALUE
-            // so we want only the keys with represent column names
-            result = result.concat(Object.keys(propDescription.sql("", key, property)));
-        }
-    });
-    __1.logger.silly("buildColumnNamesForModuleTableOnly: built column names for", {
-        requestedFields,
-        mod: mod.getQualifiedPathName(),
-        result,
-    });
-    // we return all we have gathered
-    return result;
-}
-exports.buildColumnNamesForModuleTableOnly = buildColumnNamesForModuleTableOnly;
-/**
- * Builds the column names expected for a given item definition only
- * ignoring all the extensions and base fields
- * @param requestedFields the requested fields given by graphql fields and flattened
- * @param itemDefinition item definition in question
- * @param prefix a prefix to append to everything
- */
-function buildColumnNamesForItemDefinitionTableOnly(requestedFields, itemDefinition, prefix = "") {
-    // first we build the result
-    let result = [];
-    // now we loop into the requested field keys
-    Object.keys(requestedFields).forEach((key) => {
-        // we want to see which type it is, it might be
-        // of type ITEM_
-        if (key.startsWith(constants_1.INCLUDE_PREFIX)) {
-            // now we have to check with a expected clean name
-            // by removing the prefix
-            const expectedCleanName = key.replace(constants_1.INCLUDE_PREFIX, "");
-            // now we check if it still uses a suffix for exclusion state
-            if (expectedCleanName.endsWith(constants_1.EXCLUSION_STATE_SUFFIX)) {
-                result.push(prefix + key);
-                // otherwise we check if it's an item itself, it should be
-            }
-            else if (itemDefinition.hasIncludeFor(expectedCleanName)) {
-                // we get the item in question
-                const include = itemDefinition.getIncludeFor(expectedCleanName);
-                // and basically call this function recursively and attach
-                // its result, adding the prefix for this item
-                result = result.concat(buildColumnNamesForItemDefinitionTableOnly(
-                // as you can see only the data of the
-                // specific requested fields is passed, it should
-                // be an object after all
-                requestedFields[key], include.getItemDefinition(), prefix + constants_1.PREFIX_BUILD(key)));
-            }
-            // now we check for properties, ignoring extensions
-        }
-        else if (itemDefinition.hasPropertyDefinitionFor(key, false)) {
-            // so we get it
-            const property = itemDefinition.getPropertyDefinitionFor(key, false);
-            // and now we check for a description
-            const propDescription = property.getPropertyDefinitionDescription();
-            // if we have a simple string, it means it's just the id, but don't forget
-            // to prefix that thing
-            // basically the same that we did in the module, but also passing
-            // the prefix
-            result = result.concat(Object.keys(propDescription.sql(prefix, key, property)));
-        }
-    });
-    __1.logger.silly("buildColumnNamesForItemDefinitionTableOnly: built column names for", {
-        requestedFields,
-        prefix,
-        idef: itemDefinition.getQualifiedPathName(),
-        result,
-    });
-    // return that thing
-    return result;
-}
-exports.buildColumnNamesForItemDefinitionTableOnly = buildColumnNamesForItemDefinitionTableOnly;
-/**
  * Given a token, it validates and provides the role information
  * for use in the system
  * @param token the token passed via the args
@@ -531,17 +434,17 @@ exports.checkUserExists = checkUserExists;
  * @param role the role of the user requesting the data
  * @param parentModuleOrIdef the parent module or item definition the value belongs to
  */
-function filterAndPrepareGQLValue(value, requestedFields, role, parentModuleOrIdef) {
+function filterAndPrepareGQLValue(knex, serverData, value, requestedFields, role, parentModuleOrIdef) {
     // we are going to get the value for the item
     let valueOfTheItem;
     if (parentModuleOrIdef instanceof ItemDefinition_1.default) {
         // we convert the value we were provided, of course, we only need
         // to process what was requested
-        valueOfTheItem = sql_1.convertSQLValueToGQLValueForItemDefinition(parentModuleOrIdef, value, requestedFields);
+        valueOfTheItem = sql_1.convertSQLValueToGQLValueForItemDefinition(knex, serverData, parentModuleOrIdef, value, requestedFields);
     }
     else {
         // same for modules
-        valueOfTheItem = sql_2.convertSQLValueToGQLValueForModule(parentModuleOrIdef, value, requestedFields);
+        valueOfTheItem = sql_2.convertSQLValueToGQLValueForModule(knex, serverData, parentModuleOrIdef, value, requestedFields);
     }
     // we add the object like this, all the non requested data, eg.
     // values inside that should be outside, and outside that will be inside
@@ -923,7 +826,16 @@ async function runPolicyCheck(arg) {
                 // which will create a column field with the policy name that is going to be
                 // equal to that value, eg. "name" = 'policyValueForProperty' AS "MY_POLICY"
                 // because policies are uppercase this avoids collisions with properties
-                const policyMatches = property.getPropertyDefinitionDescription().sqlSSCacheEqual(policyValueForTheProperty, "", property.getId(), policyType === "parent" ? parentSelectQueryValue : selectQueryValue);
+                const policyMatches = property.getPropertyDefinitionDescription().sqlSSCacheEqual({
+                    id: property.getId(),
+                    value: policyValueForTheProperty,
+                    prefix: "",
+                    row: policyType === "parent" ? parentSelectQueryValue : selectQueryValue,
+                    property,
+                    knex: arg.knex,
+                    serverData: arg.cache.getServerData(),
+                    itemDefinition: arg.itemDefinition,
+                });
                 if (!policyMatches) {
                     __1.logger.silly("runPolicyCheck: Failed due to policy not pasing", {
                         policyName,

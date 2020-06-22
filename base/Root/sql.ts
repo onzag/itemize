@@ -8,6 +8,7 @@
 import { getSQLTablesSchemaForModule } from "./Module/sql";
 import Root from ".";
 import { CURRENCY_FACTORS_IDENTIFIER } from "../../constants";
+import Knex from "knex";
 
 export interface ISQLTableIndexType {
   /**
@@ -122,7 +123,7 @@ export interface ISQLStreamComposedTableRowValue {
  * @param root The root in question
  * @returns a total database schema
  */
-export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType {
+export function getSQLTablesSchemaForRoot(knex: Knex, root: Root): ISQLSchemaDefinitionType {
   let resultSchema: ISQLSchemaDefinitionType = {
     [CURRENCY_FACTORS_IDENTIFIER]: {
       code: {
@@ -140,7 +141,7 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
   };
   root.getAllModules().forEach((cModule) => {
     // add together the schemas of all the modules
-    resultSchema = { ...resultSchema, ...getSQLTablesSchemaForModule(cModule) };
+    resultSchema = { ...resultSchema, ...getSQLTablesSchemaForModule(knex, cModule) };
   });
   // return that
   return resultSchema;

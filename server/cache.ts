@@ -218,19 +218,20 @@ export class Cache {
     // and the module table, this value is database ready, and hence needs
     // knex and the dictionary to convert fields that need it
     const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForItemDefinition(
+      this.knex,
+      this.serverData,
       itemDefinition,
       value,
       null,
-      this.knex,
       this.uploadsContainers[containerId],
       dictionary,
     );
     const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
+      this.knex,
+      this.serverData,
       itemDefinition.getParentModule(),
-      itemDefinition,
       value,
       null,
-      this.knex,
       this.uploadsContainers[containerId],
       dictionary,
     );
@@ -530,20 +531,21 @@ export class Cache {
     // into the SQL value, this is valid in here because
     // we don't want things to be defaulted in the query
     const sqlIdefDataComposed = convertGQLValueToSQLValueForItemDefinition(
+      this.knex,
+      this.serverData,
       itemDefinition,
       update,
       currentValue,
-      this.knex,
       containerId ? this.uploadsContainers[containerId] : null,
       dictionary,
       partialUpdateFields,
     );
     const sqlModDataComposed = convertGQLValueToSQLValueForModule(
+      this.knex,
+      this.serverData,
       itemDefinition.getParentModule(),
-      itemDefinition,
       update,
       currentValue,
-      this.knex,
       containerId ? this.uploadsContainers[containerId] : null,
       dictionary,
       partialUpdateFields,

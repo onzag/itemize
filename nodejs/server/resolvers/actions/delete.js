@@ -44,6 +44,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
         gqlArgValue: resolverArgs.args,
         gqlFlattenedRequestedFiels: null,
         cache: appData.cache,
+        knex: appData.knex,
         // this functions runs before the policy has been checked
         // and we do it for being efficient, because we can run
         // both of these checks with a single SQL query, and the policy
@@ -98,7 +99,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     // if we got any of them
     if (itemDefinitionTrigger || moduleTrigger) {
         // we need to use the gql stored value for the trigger
-        const currentWholeValueAsGQL = sql_1.convertSQLValueToGQLValueForItemDefinition(itemDefinition, wholeSqlStoredValue);
+        const currentWholeValueAsGQL = sql_1.convertSQLValueToGQLValueForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, wholeSqlStoredValue);
         if (moduleTrigger) {
             // we execute the trigger
             await moduleTrigger({

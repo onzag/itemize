@@ -22,119 +22,123 @@ const typeValue = {
         currency: {
             type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLString),
         },
-        normalized: {
-            type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLString),
-        },
     },
-    sql: (sqlPrefix, id) => {
+    sql: (arg) => {
         return {
-            [sqlPrefix + id + "_VALUE"]: { type: "float" },
-            [sqlPrefix + id + "_CURRENCY"]: { type: "text" },
-            [sqlPrefix + id + "_NORMALIZED_VALUE"]: { type: "float" },
+            [arg.prefix + arg.id + "_VALUE"]: { type: "float" },
+            [arg.prefix + arg.id + "_CURRENCY"]: { type: "text" },
+            [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: { type: "float" },
         };
     },
-    sqlIn: (value, sqlPrefix, id) => {
-        if (value === null) {
+    sqlIn: (arg) => {
+        const value = arg.value;
+        if (arg.value === null) {
             return {
-                [sqlPrefix + id + "_VALUE"]: null,
-                [sqlPrefix + id + "_CURRENCY"]: null,
-                [sqlPrefix + id + "_NORMALIZED_VALUE"]: null,
+                [arg.prefix + arg.id + "_VALUE"]: null,
+                [arg.prefix + arg.id + "_CURRENCY"]: null,
+                [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: null,
             };
         }
+        const factor = arg.serverData[constants_1.CURRENCY_FACTORS_IDENTIFIER][value.currency];
+        const normalized = factor ? (1 / factor) * value.value : null;
         return {
-            [sqlPrefix + id + "_VALUE"]: value.value,
-            [sqlPrefix + id + "_CURRENCY"]: value.currency,
-            [sqlPrefix + id + "_NORMALIZED_VALUE"]: value.normalized,
+            [arg.prefix + arg.id + "_VALUE"]: value.value,
+            [arg.prefix + arg.id + "_CURRENCY"]: value.currency,
+            [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: normalized,
         };
     },
-    sqlOut: (data, sqlPrefix, id) => {
+    sqlOut: (arg) => {
         const result = {
-            value: data[sqlPrefix + id + "_VALUE"],
-            currency: data[sqlPrefix + id + "_CURRENCY"],
-            normalized: data[sqlPrefix + id + "_NORMALIZED_VALUE"],
+            value: arg.row[arg.prefix + arg.id + "_VALUE"],
+            currency: arg.row[arg.prefix + arg.id + "_CURRENCY"],
         };
         if (result.value === null) {
             return null;
         }
         return result;
     },
-    sqlSearch: (args, sqlPrefix, id, knexBuilder) => {
-        const fromName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
-        const toName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.TO + id;
-        const exactName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+    sqlSearch: (arg) => {
+        const fromName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
+        const toName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
+        const exactName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
         let searchedByIt = false;
-        if (typeof args[exactName] !== "undefined" && args[exactName] !== null) {
-            const exactArg = args[exactName];
-            knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", exactArg.currency);
-            knexBuilder.andWhere(sqlPrefix + id + "_VALUE", exactArg.value);
+        if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
+            const exactArg = arg.args[exactName];
+            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_CURRENCY", exactArg.currency);
+            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_VALUE", exactArg.value);
         }
-        else if (args[exactName] === null) {
-            knexBuilder.andWhere(sqlPrefix + id + "_VALUE", null);
+        else if (arg.args[exactName] === null) {
+            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_VALUE", null);
             searchedByIt = true;
         }
-        if (typeof args[fromName] !== "undefined" && args[fromName] !== null) {
-            const fromArg = args[fromName];
-            knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", ">=", fromArg.normalized);
+        if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
+            const fromArg = arg.args[fromName];
+            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", fromArg.normalized);
             searchedByIt = true;
         }
-        if (typeof args[toName] !== "undefined" && args[toName] !== null) {
-            const toArg = args[toName];
-            knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", toArg.normalized);
+        if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
+            const toArg = arg.args[toName];
+            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", toArg.normalized);
             searchedByIt = true;
         }
         return searchedByIt;
     },
     sqlStrSearch: null,
     localStrSearch: null,
-    sqlOrderBy: (sqlPrefix, id, direction, nulls) => {
-        return [sqlPrefix + id + "_NORMALIZED_VALUE", direction, nulls];
+    sqlOrderBy: (arg) => {
+        return [arg.prefix + arg.id + "_NORMALIZED_VALUE", arg.direction, arg.nulls];
     },
-    localOrderBy: (direction, nulls, a, b) => {
-        if (a === null && b === null) {
+    localOrderBy: (arg) => {
+        if (arg.a === null && arg.b === null) {
             return 0;
         }
-        else if (a === null) {
-            return nulls === "last" ? 1 : -1;
+        else if (arg.a === null) {
+            return arg.nulls === "last" ? 1 : -1;
         }
-        else if (b === null) {
-            return nulls === "last" ? -1 : 1;
+        else if (arg.b === null) {
+            return arg.nulls === "last" ? -1 : 1;
         }
-        if (direction === "desc") {
-            return b.normalized - a.normalized;
+        // locally currencies are ignored because it's too expensive
+        // for the client, it's possible to read server data here nevertheless
+        const a = arg.a;
+        const b = arg.b;
+        if (arg.direction === "desc") {
+            return b.value - a.value;
         }
-        return a.normalized - b.normalized;
+        return a.value - b.value;
     },
-    sqlBtreeIndexable: (sqlPrefix, id) => {
-        return [sqlPrefix + id + "_CURRENCY", sqlPrefix + id + "_NORMALIZED_VALUE"];
+    sqlBtreeIndexable: (arg) => {
+        return [arg.prefix + arg.id + "_CURRENCY", arg.prefix + arg.id + "_NORMALIZED_VALUE"];
     },
-    sqlMantenience: (sqlPrefix, id, knex) => {
-        const valueId = sqlPrefix + id + "_VALUE";
-        const normalizedValueId = sqlPrefix + id + "_CURRENCY";
-        const currencyId = sqlPrefix + id + "_NORMALIZED_VALUE";
-        const asConversionRule = sqlPrefix + id + "_CURRENCY_FACTORS";
+    sqlMantenience: (arg) => {
+        const valueId = arg.prefix + arg.id + "_VALUE";
+        const normalizedValueId = arg.prefix + arg.id + "_CURRENCY";
+        const currencyId = arg.prefix + arg.id + "_NORMALIZED_VALUE";
+        const asConversionRule = arg.prefix + arg.id + "_CURRENCY_FACTORS";
         return {
             columnToSet: normalizedValueId,
-            setColumnToRaw: knex.raw("??*??.??", [valueId, asConversionRule, "factor"]),
+            setColumnToRaw: arg.knex.raw("??*??.??", [valueId, asConversionRule, "factor"]),
             from: constants_1.CURRENCY_FACTORS_IDENTIFIER,
             fromAs: asConversionRule,
-            whereRaw: knex.raw("??.?? = ??", [asConversionRule, "name", currencyId]),
-            updateConditionRaw: knex.raw("??*??.?? > 0.5", [valueId, asConversionRule, "factor"])
+            whereRaw: arg.knex.raw("??.?? = ??", [asConversionRule, "name", currencyId]),
+            updateConditionRaw: arg.knex.raw("??*??.?? > 0.5", [valueId, asConversionRule, "factor"])
         };
     },
-    localSearch: (args, rawData, id, includeId) => {
+    localSearch: (arg) => {
         // item is deleted
-        if (!rawData) {
+        if (!arg.gqlValue) {
             return false;
         }
         // item is blocked
-        if (rawData.DATA === null) {
+        if (!arg.gqlValue.DATA === null) {
             return false;
         }
-        const fromName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
-        const toName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.TO + id;
-        const exactName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
-        const usefulArgs = includeId ? args[constants_1.INCLUDE_PREFIX + includeId] || {} : args;
-        const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+        const fromName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
+        const toName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
+        const exactName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
+        const includeId = arg.include ? arg.include.getId() : null;
+        const usefulArgs = includeId ? arg.args[constants_1.INCLUDE_PREFIX + includeId] || {} : arg.args;
+        const propertyValue = includeId ? arg.gqlValue.DATA[includeId][arg.id] : arg.gqlValue.DATA[arg.id];
         const conditions = [];
         if (typeof usefulArgs[exactName] !== "undefined") {
             if (usefulArgs[exactName] === null) {
@@ -146,14 +150,12 @@ const typeValue = {
             }
         }
         if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
-            conditions.push(propertyValue.normalized >= usefulArgs[fromName].normalized ||
-                (propertyValue.currency === usefulArgs[fromName].currency &&
-                    propertyValue.value >= usefulArgs[fromName].value));
+            conditions.push(propertyValue.currency === usefulArgs[fromName].currency &&
+                propertyValue.value >= usefulArgs[fromName].value);
         }
         if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
-            conditions.push(propertyValue.normalized <= usefulArgs[toName].normalized ||
-                (propertyValue.currency === usefulArgs[fromName].currency &&
-                    propertyValue.value <= usefulArgs[fromName].value));
+            conditions.push(propertyValue.currency === usefulArgs[fromName].currency &&
+                propertyValue.value <= usefulArgs[fromName].value);
         }
         if (!conditions.length) {
             return true;
@@ -162,44 +164,36 @@ const typeValue = {
             return conditions.every((c) => c);
         }
     },
-    sqlEqual: (value, sqlPrefix, id, isCaseInsensitive, knex, columnName) => {
-        if (!columnName) {
-            return {
-                [sqlPrefix + id + "_CURRENCY"]: value.currency,
-                [sqlPrefix + id + "_VALUE"]: value.value,
-            };
-        }
-        return knex.raw("?? = ? AND ?? = ? AS ??", [
-            sqlPrefix + id + "_CURRENCY",
-            value.currency,
-            sqlPrefix + id + "_VALUE",
-            value.value,
-            columnName,
-        ]);
+    sqlEqual: (arg) => {
+        return {
+            [arg.prefix + arg.id + "_CURRENCY"]: arg.value.currency,
+            [arg.prefix + arg.id + "_VALUE"]: arg.value.value,
+        };
     },
-    sqlSSCacheEqual: (value, sqlPrefix, id, data) => {
-        if (value === null) {
-            return data[sqlPrefix + id + "_VALUE"] === value;
+    sqlSSCacheEqual: (arg) => {
+        if (arg.value === null) {
+            return arg.row[arg.prefix + arg.id + "_VALUE"] === null;
         }
-        return data[sqlPrefix + id + "_VALUE"] === value.value &&
-            data[sqlPrefix + id + "_CURRENCY"] === value.currency;
+        return arg.row[arg.prefix + arg.id + "_VALUE"] === arg.value.value &&
+            arg.row[arg.prefix + arg.id + "_CURRENCY"] === arg.value.currency;
     },
-    localEqual: (a, b) => {
+    localEqual: (arg) => {
+        const a = arg.a;
+        const b = arg.b;
         if (a === b) {
             return true;
+        }
+        else if (a === null || b === null) {
+            return false;
         }
         return a.value === b.value && a.currency === b.currency;
     },
     validate: (l) => {
         if (typeof l.value !== "number" ||
-            typeof l.currency !== "string" ||
-            typeof l.normalized !== "number") {
+            typeof l.currency !== "string") {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
         }
         if (isNaN(l.value)) {
-            return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
-        }
-        if (isNaN(l.normalized)) {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
         }
         if (l.value > constants_1.MAX_SUPPORTED_REAL) {

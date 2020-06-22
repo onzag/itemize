@@ -6,20 +6,7 @@ import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import { IGQLValue, IGQLSearchRecord, IGQLArgs, IGQLRequestFields } from "../../gql-querier";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
-/**
- * Builds the column names expected for a given module only
- * @param requestedFields the requested fields given by graphql fields and flattened
- * @param mod the module in question
- */
-export declare function buildColumnNamesForModuleTableOnly(requestedFields: any, mod: Module): string[];
-/**
- * Builds the column names expected for a given item definition only
- * ignoring all the extensions and base fields
- * @param requestedFields the requested fields given by graphql fields and flattened
- * @param itemDefinition item definition in question
- * @param prefix a prefix to append to everything
- */
-export declare function buildColumnNamesForItemDefinitionTableOnly(requestedFields: any, itemDefinition: ItemDefinition, prefix?: string): string[];
+import Knex from "knex";
 export interface IServerSideTokenDataType {
     id: number;
     role: string;
@@ -104,7 +91,7 @@ export interface IFilteredAndPreparedValueType {
  * @param role the role of the user requesting the data
  * @param parentModuleOrIdef the parent module or item definition the value belongs to
  */
-export declare function filterAndPrepareGQLValue(value: IGQLValue, requestedFields: IGQLRequestFields, role: string, parentModuleOrIdef: ItemDefinition | Module): IFilteredAndPreparedValueType;
+export declare function filterAndPrepareGQLValue(knex: Knex, serverData: any, value: IGQLValue, requestedFields: IGQLRequestFields, role: string, parentModuleOrIdef: ItemDefinition | Module): IFilteredAndPreparedValueType;
 /**
  * Checks that an item definition current state is
  * valid and that the gqlArgValue provided is a match
@@ -162,6 +149,7 @@ export declare function runPolicyCheck(arg: {
     gqlArgValue: IGQLValue;
     gqlFlattenedRequestedFiels: any;
     cache: Cache;
+    knex: Knex;
     preValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue;
     parentModule?: string;
     parentType?: string;

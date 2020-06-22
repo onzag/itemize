@@ -8,6 +8,7 @@ import ItemDefinition, { ItemDefinitionIOActions } from "..";
 import ConditionalRuleSet, { IConditionalRuleSetRawJSONDataType } from "../ConditionalRuleSet";
 import Module from "../..";
 import { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
+import Include from "../Include";
 /**
  * These are the main errors a property is able to give
  */
@@ -295,7 +296,7 @@ export declare type PropertyDefinitionValueType = IPropertyDefinitionExactProper
  * Represents the external checkers that are used to
  * check index values
  */
-export declare type PropertyDefinitionCheckerFunctionType = (property: PropertyDefinition, value: PropertyDefinitionSupportedType, id: number, version: string) => Promise<boolean>;
+export declare type PropertyDefinitionCheckerFunctionType = (itemDefinition: ItemDefinition, include: Include, property: PropertyDefinition, value: PropertyDefinitionSupportedType, id: number, version: string) => Promise<boolean>;
 /**
  * The property definition class that defines how properties
  * are to be defined

@@ -118,7 +118,17 @@ exports.customUserQueries = (appData) => {
                         .where((subQueryBuilder) => {
                         // now for email login to be possible
                         subQueryBuilder
-                            .where(userNamePropertyDescription.sqlEqual(args.username, "", usernameProperty.getId(), true, appData.knex))
+                            .where(userNamePropertyDescription.sqlEqual({
+                            id: usernameProperty.getId(),
+                            prefix: "",
+                            ignoreCase: true,
+                            knex: appData.knex,
+                            serverData: appData.cache.getServerData(),
+                            itemDefinition: userIdef,
+                            include: null,
+                            value: args.username,
+                            property: usernameProperty,
+                        }))
                             .orWhere((innerSuqueryBuilder) => {
                             // only emails that have been validated are valid, the reason is simple, otherwise this would allow any user to use
                             // another invalidated email that other user has and has a chance to login as them
@@ -126,11 +136,41 @@ exports.customUserQueries = (appData) => {
                             // email as that user to start with, well this is to avoid a DDOS attack similar to one that was present at github
                             // where you would set an invalidated email, and that user won't be able to claim its own email
                             innerSuqueryBuilder
-                                .where(emailPropertyDescription.sqlEqual(args.username, "", emailProperty.getId(), true, appData.knex))
-                                .andWhere(eValidatedPropertyDescription.sqlEqual(true, "", eValidatedProperty.getId(), false, appData.knex));
+                                .where(emailPropertyDescription.sqlEqual({
+                                id: emailProperty.getId(),
+                                prefix: "",
+                                ignoreCase: true,
+                                knex: appData.knex,
+                                serverData: appData.cache.getServerData(),
+                                itemDefinition: userIdef,
+                                include: null,
+                                value: args.username,
+                                property: usernameProperty,
+                            }))
+                                .andWhere(eValidatedPropertyDescription.sqlEqual({
+                                id: eValidatedProperty.getId(),
+                                prefix: "",
+                                ignoreCase: true,
+                                knex: appData.knex,
+                                serverData: appData.cache.getServerData(),
+                                itemDefinition: userIdef,
+                                include: null,
+                                value: true,
+                                property: eValidatedProperty,
+                            }));
                         });
                     })
-                        .andWhere(passwordPropertyDescription.sqlEqual(args.password, "", passwordProperty.getId(), false, appData.knex));
+                        .andWhere(passwordPropertyDescription.sqlEqual({
+                        id: passwordProperty.getId(),
+                        prefix: "",
+                        ignoreCase: true,
+                        knex: appData.knex,
+                        serverData: appData.cache.getServerData(),
+                        itemDefinition: userIdef,
+                        include: null,
+                        value: args.password,
+                        property: passwordProperty,
+                    }));
                     try {
                         resultUser = await resultUserQuery || null;
                     }
@@ -417,8 +457,28 @@ exports.customUserQueries = (appData) => {
                 let resultUser;
                 try {
                     resultUser = await appData.knex.first(constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME, "email", "username", "app_language").from(userTable)
-                        .where(emailPropertyDescription.sqlEqual(args.email, "", emailProperty.getId(), true, appData.knex))
-                        .andWhere(eValidatedPropertyDescription.sqlEqual(true, "", eValidatedProperty.getId(), false, appData.knex));
+                        .where(emailPropertyDescription.sqlEqual({
+                        id: emailProperty.getId(),
+                        prefix: "",
+                        ignoreCase: true,
+                        knex: appData.knex,
+                        serverData: appData.cache.getServerData(),
+                        itemDefinition: userIdef,
+                        include: null,
+                        value: args.email,
+                        property: eValidatedProperty,
+                    }))
+                        .andWhere(eValidatedPropertyDescription.sqlEqual({
+                        id: eValidatedProperty.getId(),
+                        prefix: "",
+                        ignoreCase: true,
+                        knex: appData.knex,
+                        serverData: appData.cache.getServerData(),
+                        itemDefinition: userIdef,
+                        include: null,
+                        value: true,
+                        property: eValidatedProperty,
+                    }));
                 }
                 catch (err) {
                     __1.logger.error("customUserQueries.send_reset_password [SERIOUS]: could not request user from user table by email", {

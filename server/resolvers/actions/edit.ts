@@ -94,6 +94,7 @@ export async function editItemDefinition(
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: requestedFields,
       cache: appData.cache,
+      knex: appData.knex,
       preValidation: (content: ISQLTableRowValue) => {
         // if we don't get an user id this means that there's no owner, this is bad input
         if (!content) {
@@ -130,7 +131,12 @@ export async function editItemDefinition(
   // Now that the policies have been checked, and that we get the value of the entire item
   // definition, we need to convert that value to GQL value, and for that we use the converter
   // note how we don't pass the requested fields because we want it all
-  const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(itemDefinition, wholeSqlStoredValue);
+  const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+    appData.knex,
+    appData.cache.getServerData(),
+    itemDefinition,
+    wholeSqlStoredValue,
+  );
   // and now basically we create a new value that is the combination or both, where our new
   // values take precedence, yes there will be pollution, with token, id, and whatnot, but that
   // doesn't matter because the apply function ignores those
@@ -300,7 +306,13 @@ export async function editItemDefinition(
   );
 
   // convert it using the requested fields for that, and ignoring everything else
-  const gqlValue = convertSQLValueToGQLValueForItemDefinition(itemDefinition, sqlValue, requestedFields);
+  const gqlValue = convertSQLValueToGQLValueForItemDefinition(
+    appData.knex,
+    appData.cache.getServerData(),
+    itemDefinition,
+    sqlValue,
+    requestedFields,
+  );
 
   // we don't need to check for blocked or deleted because such items cannot be edited,
   // see before, so we return immediately, read has been checked already

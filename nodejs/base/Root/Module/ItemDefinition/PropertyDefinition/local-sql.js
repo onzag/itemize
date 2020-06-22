@@ -18,17 +18,13 @@ const deep_equal_1 = __importDefault(require("deep-equal"));
  * is performed locally in the cache when equality between properties is requests
  * this local equal is ran against SQL cached properties, that is redis cache
  * it is used for check for policies
- * @param value the value of the property
- * @param sqlPrefix the prefix of sql this is for ITEM_ form stuff
- * @param id the id of the property
- * @param data the sql data that has been cached
  * @returns a boolean on whether it equals
  */
-function standardSQLSSCacheEqualFn(value, sqlPrefix, id, data) {
-    return data[sqlPrefix + id] === value;
+function standardSQLSSCacheEqualFn(arg) {
+    return arg.row[arg.prefix + arg.id] === arg.value;
 }
 exports.standardSQLSSCacheEqualFn = standardSQLSSCacheEqualFn;
-function standardLocalEqual(a, b) {
-    return deep_equal_1.default(a, b);
+function standardLocalEqual(arg) {
+    return deep_equal_1.default(arg.a, arg.b);
 }
 exports.standardLocalEqual = standardLocalEqual;

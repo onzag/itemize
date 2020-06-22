@@ -56,24 +56,19 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: standardSQLOrderBy,
-  localOrderBy: (
-    direction: "asc" | "desc",
-    nulls: "first" | "last",
-    a: PropertyDefinitionSupportedDateType,
-    b: PropertyDefinitionSupportedDateType,
-  ) => {
-    if (a === null && b === null) {
+  localOrderBy: (arg) => {
+    if (arg.a === null && arg.b === null) {
       return 0;
-    } else if (a === null) {
-      return nulls === "last" ? 1 : -1;
-    } else if (b === null) {
-      return nulls === "last" ? -1 : 1;
-    } else if (a === b) {
+    } else if (arg.a === null) {
+      return arg.nulls === "last" ? 1 : -1;
+    } else if (arg.b === null) {
+      return arg.nulls === "last" ? -1 : 1;
+    } else if (arg.a === arg.b) {
       return 0;
     }
-    const dateA = (new Date(a)).getTime();
-    const dateB = (new Date(b)).getTime();
-    if (direction === "desc") {
+    const dateA = (new Date("1970-01-01T" + arg.a as string)).getTime();
+    const dateB = (new Date("1970-01-01T" + arg.b as string)).getTime();
+    if (arg.direction === "desc") {
       return dateB - dateA;
     }
     return dateA - dateB;

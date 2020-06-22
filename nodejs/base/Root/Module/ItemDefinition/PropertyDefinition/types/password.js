@@ -20,14 +20,14 @@ const typeValue = {
     gql: graphql_1.GraphQLString,
     nullableDefault: "",
     sql: sql_1.getStandardSQLFnFor && sql_1.getStandardSQLFnFor("text", "pgcrypto"),
-    sqlIn: (value, sqlPrefix, id, property, knex) => {
-        if (value === null) {
+    sqlIn: (arg) => {
+        if (arg.value === null) {
             return {
-                [sqlPrefix + id]: null,
+                [arg.prefix + arg.id]: null,
             };
         }
         return {
-            [sqlPrefix + id]: knex.raw("crypt(?, gen_salt('bf',10))", value),
+            [arg.prefix + arg.id]: arg.knex.raw("crypt(?, gen_salt('bf',10))", arg.value),
         };
     },
     sqlOut: sql_1.standardSQLOutFn,
@@ -51,29 +51,26 @@ const typeValue = {
     localEqual: () => {
         throw new Error("Attempted to local equal a password");
     },
-    sqlEqual: (value, sqlPrefix, id, isCaseInsensitive, knex, columnName) => {
-        if (!columnName) {
-            return knex.raw("?? = crypt(?, ??)", [
-                sqlPrefix + id,
-                value,
-                sqlPrefix + id,
-            ]);
-        }
-        return knex.raw("?? = crypt(?, ??) AS ??", [
-            sqlPrefix + id,
-            value,
-            sqlPrefix + id,
-            columnName,
+    sqlEqual: (arg) => {
+        return arg.knex.raw("?? = crypt(?, ??)", [
+            arg.prefix + arg.id,
+            arg.value,
+            arg.prefix + arg.id,
         ]);
     },
-    sqlSSCacheEqual: (value, sqlPrefix, id, data) => {
-        if (value === null) {
-            return data[sqlPrefix + id] === null;
+    sqlSSCacheEqual: (arg) => {
+        if (arg.value === null) {
+            return arg.row[arg.prefix + arg.id] === null;
         }
-        else if (!data[sqlPrefix + id]) {
+        else if (!arg.row[arg.prefix + arg.id]) {
             return false;
         }
-        return bcrypt_1.default.compareSync(value, data[sqlPrefix + id]);
+        try {
+            return bcrypt_1.default.compareSync(arg.value, arg.row[arg.prefix + arg.id]);
+        }
+        catch (err) {
+            return false;
+        }
     },
     sqlBtreeIndexable: () => {
         throw new Error("Attempted to btree index a password, this might mean a files value is in request limiters, don't do that");

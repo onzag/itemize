@@ -92,7 +92,16 @@ async function search(rootProxy, db, searchResults, searchArgs) {
             if (!description.localOrderBy) {
                 return 0;
             }
-            return description.localOrderBy(sortRule.direction, sortRule.nulls, aValue, bValue);
+            return description.localOrderBy({
+                direction: sortRule.direction,
+                nulls: sortRule.nulls,
+                a: aValue,
+                b: bValue,
+                id: property.getId(),
+                prefix: "",
+                property,
+                itemDefinition,
+            });
         });
     });
     return newSearchResults.map((r) => r.searchResult);
@@ -119,7 +128,15 @@ async function checkOne(rootProxy, searchResult, value, searchArgs) {
                 return true;
             }
             const description = pd.getPropertyDefinitionDescription();
-            return description.localSearch(searchArgs, value, pd.getId(), null);
+            return description.localSearch({
+                args: searchArgs,
+                gqlValue: value,
+                property: pd,
+                id: pd.getId(),
+                prefix: "",
+                itemDefinition,
+                include: null,
+            });
         });
         // and now we consider whether it should be included by includes if it passed all that
         if (shouldBeIncluded) {
@@ -145,7 +162,15 @@ async function checkOne(rootProxy, searchResult, value, searchArgs) {
                             return true;
                         }
                         const sinkingDescription = sp.getPropertyDefinitionDescription();
-                        return sinkingDescription.localSearch(searchArgs, value, sp.getId(), i.getId());
+                        return sinkingDescription.localSearch({
+                            args: searchArgs,
+                            gqlValue: value,
+                            property: sp,
+                            id: sp.getId(),
+                            prefix: i.getPrefixedQualifiedIdentifier(),
+                            itemDefinition,
+                            include: i,
+                        });
                     });
                 }
                 // this will occur if it's ANY and it's EXCLUDED

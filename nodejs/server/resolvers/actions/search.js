@@ -114,7 +114,7 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
         queryModel.andWhere("version", resolverArgs.args.version_filter || "");
     }
     // now we build the sql query for the module
-    const addedSearchRaw = sql_1.buildSQLQueryForModule(mod, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args), resolverArgs.args.search, resolverArgs.args.order_by);
+    const addedSearchRaw = sql_1.buildSQLQueryForModule(appData.knex, appData.cache.getServerData(), mod, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args), resolverArgs.args.search, resolverArgs.args.order_by);
     // if we filter by type
     if (resolverArgs.args.types) {
         queryModel.andWhere("type", resolverArgs.args.types);
@@ -138,7 +138,7 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
     if (traditional) {
         const finalResult = {
             results: baseResult.map((r) => {
-                return basic_1.filterAndPrepareGQLValue(r, requestedFields, tokenData.role, mod).toReturnToUser;
+                return basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), r, requestedFields, tokenData.role, mod).toReturnToUser;
             }),
             limit,
             offset,
@@ -279,7 +279,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
     // and now we call the function that builds the query itself into
     // that parent query, and adds the andWhere as required
     // into such query
-    const addedSearchRaw = sql_2.buildSQLQueryForItemDefinition(itemDefinition, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args), resolverArgs.args.search, resolverArgs.args.order_by);
+    const addedSearchRaw = sql_2.buildSQLQueryForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, resolverArgs.args, queryModel, basic_1.getDictionary(appData, resolverArgs.args), resolverArgs.args.search, resolverArgs.args.order_by);
     const searchQuery = queryModel.clone();
     const limit = resolverArgs.args.limit;
     const offset = resolverArgs.args.offset;
@@ -299,7 +299,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
     if (traditional) {
         const finalResult = {
             results: baseResult.map((r) => {
-                return basic_1.filterAndPrepareGQLValue(r, requestedFields, tokenData.role, itemDefinition).toReturnToUser;
+                return basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), r, requestedFields, tokenData.role, itemDefinition).toReturnToUser;
             }),
             limit,
             offset,

@@ -7,16 +7,13 @@
  * @packageDocumentation
  */
 import { IGQLArgs, IGQLValue } from "../../../../../gql-querier";
+import { ILocalSearchInfo } from "./types";
 /**
  * Performs a local search of an exact and ranged search for
  * a property value
- * @param args the whole raw arguments from graphql
- * @param rawData the raw data non flattened of the current value being questioned (often from indexeddb)
- * @param id the id of the property that is being searched
- * @param includeId an include id (if available) where the property is contained
  * @returns a boolean on whether it matches
  */
-export declare function standardLocalSearchExactAndRange(args: IGQLArgs, rawData: IGQLValue, id: string, includeId?: string): boolean;
+export declare function standardLocalSearchExactAndRange(arg: ILocalSearchInfo): boolean;
 /**
  * Runs the same as the standard sql search exact and range but using the date
  * functionality

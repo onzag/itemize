@@ -160,8 +160,8 @@ class Cache {
         // now we extract the SQL information for both item definition table
         // and the module table, this value is database ready, and hence needs
         // knex and the dictionary to convert fields that need it
-        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(itemDefinition, value, null, this.knex, this.uploadsContainers[containerId], dictionary);
-        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(itemDefinition.getParentModule(), itemDefinition, value, null, this.knex, this.uploadsContainers[containerId], dictionary);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, value, null, this.uploadsContainers[containerId], dictionary);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), value, null, this.uploadsContainers[containerId], dictionary);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
         // this data is added every time when creating
@@ -358,8 +358,8 @@ class Cache {
         // that we only want the editingFields to be returned
         // into the SQL value, this is valid in here because
         // we don't want things to be defaulted in the query
-        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(itemDefinition, update, currentValue, this.knex, containerId ? this.uploadsContainers[containerId] : null, dictionary, partialUpdateFields);
-        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(itemDefinition.getParentModule(), itemDefinition, update, currentValue, this.knex, containerId ? this.uploadsContainers[containerId] : null, dictionary, partialUpdateFields);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, update, currentValue, containerId ? this.uploadsContainers[containerId] : null, dictionary, partialUpdateFields);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), update, currentValue, containerId ? this.uploadsContainers[containerId] : null, dictionary, partialUpdateFields);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
         // now we check if we are updating anything at all

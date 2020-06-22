@@ -35,7 +35,16 @@ function DifferingIncludesRetriever(props) {
                 if (!propertyData) {
                     return false;
                 }
-                return !itemDefinition.getPropertyDefinitionFor(mainProperty, true).getPropertyDefinitionDescription().localEqual(propertyData.stateAppliedValue, propertyData.value);
+                const property = include.getSinkingPropertyFor(mainProperty);
+                return !itemDefinition.getPropertyDefinitionFor(mainProperty, true).getPropertyDefinitionDescription().localEqual({
+                    itemDefinition,
+                    include,
+                    property,
+                    id: property.getId(),
+                    prefix: include.getPrefixedQualifiedIdentifier(),
+                    a: propertyData.stateAppliedValue,
+                    b: propertyData.value,
+                });
             });
             if (!exclusionStateDiffers && differingProperties.length === 0) {
                 return null;

@@ -7,18 +7,13 @@
  *
  * @packageDocumentation
  */
-import { PropertyDefinitionSupportedType } from "./types";
-import { ISQLTableRowValue } from "../../../sql";
+import { ISQLSSCacheEqualInfo, ILocalEqualInfo } from "./types";
 /**
  * This function represents the standard way an equality check
  * is performed locally in the cache when equality between properties is requests
  * this local equal is ran against SQL cached properties, that is redis cache
  * it is used for check for policies
- * @param value the value of the property
- * @param sqlPrefix the prefix of sql this is for ITEM_ form stuff
- * @param id the id of the property
- * @param data the sql data that has been cached
  * @returns a boolean on whether it equals
  */
-export declare function standardSQLSSCacheEqualFn(value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, data: ISQLTableRowValue): boolean;
-export declare function standardLocalEqual(a: PropertyDefinitionSupportedType, b: PropertyDefinitionSupportedType): boolean;
+export declare function standardSQLSSCacheEqualFn(arg: ISQLSSCacheEqualInfo): boolean;
+export declare function standardLocalEqual(arg: ILocalEqualInfo): boolean;

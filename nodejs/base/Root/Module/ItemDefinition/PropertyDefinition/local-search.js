@@ -17,30 +17,26 @@ const moment_1 = __importDefault(require("moment"));
 /**
  * Performs a local search of an exact and ranged search for
  * a property value
- * @param args the whole raw arguments from graphql
- * @param rawData the raw data non flattened of the current value being questioned (often from indexeddb)
- * @param id the id of the property that is being searched
- * @param includeId an include id (if available) where the property is contained
  * @returns a boolean on whether it matches
  */
-function standardLocalSearchExactAndRange(args, rawData, id, includeId) {
+function standardLocalSearchExactAndRange(arg) {
     // item is deleted
-    if (!rawData) {
+    if (!arg.gqlValue) {
         return false;
     }
     // item is blocked
-    if (rawData.DATA === null) {
+    if (arg.gqlValue.DATA === null) {
         return false;
     }
     // now we get the names according to the interface
-    const fromName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
-    const toName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.TO + id;
-    const exactName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+    const fromName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
+    const toName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
+    const exactName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
     // the args come as a whole so we need to extract what we are using in the search mode
-    const usefulArgs = includeId ? args[constants_1.INCLUDE_PREFIX + includeId] || {} : args;
+    const usefulArgs = arg.include ? arg.args[constants_1.INCLUDE_PREFIX + arg.include.getId()] || {} : arg.args;
     // the property value also comes from the value as a whole, the value is not
     // flattened
-    const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+    const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
     // now we check each condition
     const conditions = [];
     if (typeof usefulArgs[exactName] !== "undefined") {

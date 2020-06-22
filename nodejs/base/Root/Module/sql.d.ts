@@ -9,7 +9,6 @@ import { IOrderByRuleType } from "../../../constants";
 import Module from ".";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue } from "../sql";
 import Knex from "knex";
-import ItemDefinition from "./ItemDefinition";
 import { IGQLRequestFields, IGQLValue, IGQLArgs } from "../../../gql-querier";
 import pkgcloud from "pkgcloud";
 /**
@@ -18,7 +17,7 @@ import pkgcloud from "pkgcloud";
  * @param mod the module in question
  * @returns a whole table schema for the module table
  */
-export declare function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinitionType;
+export declare function getSQLTableDefinitionForModule(knex: Knex, mod: Module): ISQLTableDefinitionType;
 /**
  * Provides the SQL table schemas that are contained
  * within this module, you expect one schema per item definition
@@ -26,7 +25,7 @@ export declare function getSQLTableDefinitionForModule(mod: Module): ISQLTableDe
  * @param mod the module in question
  * @returns a partial database schema for the module itself, all the child modules, and the item definition
  */
-export declare function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefinitionType;
+export declare function getSQLTablesSchemaForModule(knex: Knex, mod: Module): ISQLSchemaDefinitionType;
 /**
  * Converts a graphql value, with all its items and everything it
  * has into a SQL row data value for this specific module
@@ -43,7 +42,7 @@ export declare function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefi
  * in a partial field value, don't use partial fields to create
  * @returns a promise for a row value
  */
-export declare function convertGQLValueToSQLValueForModule(mod: Module, itemDefinition: ItemDefinition, data: IGQLArgs, oldData: IGQLValue, knex: Knex, uploadsContainer: pkgcloud.storage.Container, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): ISQLStreamComposedTableRowValue;
+export declare function convertGQLValueToSQLValueForModule(knex: Knex, serverData: any, mod: Module, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): ISQLStreamComposedTableRowValue;
 /**
  * Converts a SQL value directly coming from the database as it is
  * to a graphql value for this specific module, this
@@ -58,7 +57,7 @@ export declare function convertGQLValueToSQLValueForModule(mod: Module, itemDefi
  * eg {id: {}, name: {}}
  * @returns a graphql value
  */
-export declare function convertSQLValueToGQLValueForModule(mod: Module, row: ISQLTableRowValue, graphqlFields: IGQLRequestFields): IGQLValue;
+export declare function convertSQLValueToGQLValueForModule(knex: Knex, serverData: any, mod: Module, row: ISQLTableRowValue, graphqlFields: IGQLRequestFields): IGQLValue;
 /**
  * Builds a sql query specific for this module to search
  * within itself in the database
@@ -67,4 +66,4 @@ export declare function convertSQLValueToGQLValueForModule(mod: Module, row: ISQ
  * @param knexBuilder the knex builder
  * @param dictionary the dictionary used
  */
-export declare function buildSQLQueryForModule(mod: Module, args: IGQLArgs, knexBuilder: Knex.QueryBuilder, dictionary: string, search: string, orderBy: IOrderByRuleType): [string, any[]][];
+export declare function buildSQLQueryForModule(knex: Knex, serverData: any, mod: Module, args: IGQLArgs, knexBuilder: Knex.QueryBuilder, dictionary: string, search: string, orderBy: IOrderByRuleType): [string, any[]][];

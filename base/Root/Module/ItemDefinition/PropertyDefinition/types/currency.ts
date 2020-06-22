@@ -9,7 +9,7 @@ import {
   IPropertyDefinitionSupportedType,
 } from "../types";
 import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
-import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
+import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_SUPPORTED_REAL,
   CLASSIC_BASE_I18N,
@@ -22,9 +22,7 @@ import {
   CURRENCY_FACTORS_IDENTIFIER,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import Knex from "knex";
-import { ISQLTableRowValue } from "../../../../../Root/sql";
-import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
+import { IGQLArgs } from "../../../../../../gql-querier";
 
 /**
  * The currency definition is described by an object
@@ -32,7 +30,6 @@ import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 export interface IPropertyDefinitionSupportedCurrencyType {
   value: number;
   currency: string;
-  normalized: number;
 }
 
 /**
@@ -47,67 +44,67 @@ const typeValue: IPropertyDefinitionSupportedType = {
     currency: {
       type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
-    normalized: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    },
   },
-  sql: (sqlPrefix, id) => {
+  sql: (arg) => {
     return {
-      [sqlPrefix + id + "_VALUE"]: {type: "float"},
-      [sqlPrefix + id + "_CURRENCY"]: {type: "text"},
-      [sqlPrefix + id + "_NORMALIZED_VALUE"]: {type: "float"},
+      [arg.prefix + arg.id + "_VALUE"]: {type: "float"},
+      [arg.prefix + arg.id + "_CURRENCY"]: {type: "text"},
+      [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {type: "float"},
     };
   },
-  sqlIn: (value: IPropertyDefinitionSupportedCurrencyType, sqlPrefix: string, id: string) => {
-    if (value === null) {
+  sqlIn: (arg) => {
+    const value: IPropertyDefinitionSupportedCurrencyType = arg.value as IPropertyDefinitionSupportedCurrencyType;
+    if (arg.value === null) {
       return {
-        [sqlPrefix + id + "_VALUE"]: null,
-        [sqlPrefix + id + "_CURRENCY"]: null,
-        [sqlPrefix + id + "_NORMALIZED_VALUE"]: null,
+        [arg.prefix + arg.id + "_VALUE"]: null,
+        [arg.prefix + arg.id + "_CURRENCY"]: null,
+        [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: null,
       };
     }
 
+    const factor: number = arg.serverData[CURRENCY_FACTORS_IDENTIFIER][value.currency];
+    const normalized = factor ? (1/factor)*value.value : null;
+
     return {
-      [sqlPrefix + id + "_VALUE"]: value.value,
-      [sqlPrefix + id + "_CURRENCY"]: value.currency,
-      [sqlPrefix + id + "_NORMALIZED_VALUE"]: value.normalized,
+      [arg.prefix + arg.id + "_VALUE"]: value.value,
+      [arg.prefix + arg.id + "_CURRENCY"]: value.currency,
+      [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: normalized,
     };
   },
-  sqlOut: (data: ISQLTableRowValue, sqlPrefix: string, id: string) => {
+  sqlOut: (arg) => {
     const result: IPropertyDefinitionSupportedCurrencyType = {
-      value: data[sqlPrefix + id + "_VALUE"],
-      currency: data[sqlPrefix + id + "_CURRENCY"],
-      normalized: data[sqlPrefix + id + "_NORMALIZED_VALUE"],
+      value: arg.row[arg.prefix + arg.id + "_VALUE"],
+      currency: arg.row[arg.prefix + arg.id + "_CURRENCY"],
     };
     if (result.value === null) {
       return null;
     }
     return result;
   },
-  sqlSearch: (args: IGQLArgs, sqlPrefix: string, id: string, knexBuilder) => {
-    const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
-    const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
-    const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+  sqlSearch: (arg) => {
+    const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
+    const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
+    const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
     let searchedByIt = false;
 
-    if (typeof args[exactName] !== "undefined" && args[exactName] !== null) {
-      const exactArg = args[exactName] as IGQLArgs;
-      knexBuilder.andWhere(sqlPrefix + id + "_CURRENCY", exactArg.currency as string);
-      knexBuilder.andWhere(sqlPrefix + id + "_VALUE", exactArg.value as number);
-    } else if (args[exactName] === null) {
-      knexBuilder.andWhere(sqlPrefix + id + "_VALUE", null);
+    if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
+      const exactArg = arg.args[exactName] as IGQLArgs;
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_CURRENCY", exactArg.currency as string);
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_VALUE", exactArg.value as number);
+    } else if (arg.args[exactName] === null) {
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_VALUE", null);
       searchedByIt = true;
     }
 
-    if (typeof args[fromName] !== "undefined" && args[fromName] !== null) {
-      const fromArg = args[fromName] as IGQLArgs;
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", ">=", fromArg.normalized as number);
+    if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
+      const fromArg = arg.args[fromName] as IGQLArgs;
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", fromArg.normalized as number);
       searchedByIt = true;
     }
 
-    if (typeof args[toName] !== "undefined" && args[toName] !== null) {
-      const toArg = args[toName] as IGQLArgs;
-      knexBuilder.andWhere(sqlPrefix + id + "_NORMALIZED_VALUE", "<=", toArg.normalized as number);
+    if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
+      const toArg = arg.args[toName] as IGQLArgs;
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", toArg.normalized as number);
       searchedByIt = true;
     }
 
@@ -115,79 +112,63 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
   sqlStrSearch: null,
   localStrSearch: null,
-  sqlOrderBy: (
-    sqlPrefix: string,
-    id: string,
-    direction: "asc" | "desc",
-    nulls: "first" | "last",
-  ) => {
-    return [sqlPrefix + id + "_NORMALIZED_VALUE", direction, nulls];
+  sqlOrderBy: (arg) => {
+    return [arg.prefix + arg.id + "_NORMALIZED_VALUE", arg.direction, arg.nulls];
   },
-  localOrderBy: (
-    direction: "asc" | "desc",
-    nulls: "first" | "last",
-    a: IPropertyDefinitionSupportedCurrencyType,
-    b: IPropertyDefinitionSupportedCurrencyType,
-  ) => {
-    if (a === null && b === null) {
+  localOrderBy: (arg) => {
+    if (arg.a === null && arg.b === null) {
       return 0;
-    } else if (a === null) {
-      return nulls === "last" ? 1 : -1;
-    } else if (b === null) {
-      return nulls === "last" ? -1 : 1;
+    } else if (arg.a === null) {
+      return arg.nulls === "last" ? 1 : -1;
+    } else if (arg.b === null) {
+      return arg.nulls === "last" ? -1 : 1;
     }
-    if (direction === "desc") {
-      return b.normalized - a.normalized;
+
+    // locally currencies are ignored because it's too expensive
+    // for the client, it's possible to read server data here nevertheless
+    const a = arg.a as IPropertyDefinitionSupportedCurrencyType;
+    const b = arg.b as IPropertyDefinitionSupportedCurrencyType;
+    if (arg.direction === "desc") {
+      return b.value - a.value;
     }
-    return a.normalized - b.normalized;
+    return a.value - b.value;
   },
-  sqlBtreeIndexable: (
-    sqlPrefix: string,
-    id: string,
-  ) => {
-    return [sqlPrefix + id + "_CURRENCY", sqlPrefix + id + "_NORMALIZED_VALUE"];
+  sqlBtreeIndexable: (arg) => {
+    return [arg.prefix + arg.id + "_CURRENCY", arg.prefix + arg.id + "_NORMALIZED_VALUE"];
   },
-  sqlMantenience: (
-    sqlPrefix: string,
-    id: string,
-    knex: Knex,
-  ) => {
-    const valueId = sqlPrefix + id + "_VALUE";
-    const normalizedValueId = sqlPrefix + id + "_CURRENCY";
-    const currencyId = sqlPrefix + id + "_NORMALIZED_VALUE";
-    const asConversionRule = sqlPrefix + id + "_CURRENCY_FACTORS";
+  sqlMantenience: (arg) => {
+    const valueId = arg.prefix + arg.id + "_VALUE";
+    const normalizedValueId = arg.prefix + arg.id + "_CURRENCY";
+    const currencyId = arg.prefix + arg.id + "_NORMALIZED_VALUE";
+    const asConversionRule = arg.prefix + arg.id + "_CURRENCY_FACTORS";
     return {
       columnToSet: normalizedValueId,
-      setColumnToRaw: knex.raw("??*??.??", [valueId, asConversionRule, "factor"]),
+      setColumnToRaw: arg.knex.raw("??*??.??", [valueId, asConversionRule, "factor"]),
       from: CURRENCY_FACTORS_IDENTIFIER,
       fromAs: asConversionRule,
-      whereRaw: knex.raw("??.?? = ??", [asConversionRule, "name", currencyId]),
-      updateConditionRaw: knex.raw("??*??.?? > 0.5", [valueId, asConversionRule, "factor"])
+      whereRaw: arg.knex.raw("??.?? = ??", [asConversionRule, "name", currencyId]),
+      updateConditionRaw: arg.knex.raw("??*??.?? > 0.5", [valueId, asConversionRule, "factor"])
     }
   },
-  localSearch: (
-    args: IGQLArgs,
-    rawData: IGQLValue,
-    id: string,
-    includeId?: string,
-  ) => {
+  localSearch: (arg) => {
     // item is deleted
-    if (!rawData) {
+    if (!arg.gqlValue) {
       return false;
     }
     // item is blocked
-    if (rawData.DATA === null) {
+    if (!arg.gqlValue.DATA === null) {
       return false;
     }
 
-    const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
-    const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
-    const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+    const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
+    const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
+    const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
 
-    const usefulArgs = includeId ? args[INCLUDE_PREFIX + includeId] || {} : args;
+    const includeId = arg.include ? arg.include.getId() : null;
+    const usefulArgs = includeId ? arg.args[INCLUDE_PREFIX + includeId] || {} : arg.args;
 
     const propertyValue: IPropertyDefinitionSupportedCurrencyType =
-      includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+      includeId ? arg.gqlValue.DATA[includeId][arg.id] : arg.gqlValue.DATA[arg.id];
 
     const conditions: boolean[] = [];
     if (typeof usefulArgs[exactName] !== "undefined") {
@@ -205,21 +186,15 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
       conditions.push(
-        propertyValue.normalized >= usefulArgs[fromName].normalized ||
-        (
-          propertyValue.currency === usefulArgs[fromName].currency &&
-          propertyValue.value >= usefulArgs[fromName].value
-        ),
+        propertyValue.currency === usefulArgs[fromName].currency &&
+        propertyValue.value >= usefulArgs[fromName].value
       );
     }
 
     if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
       conditions.push(
-        propertyValue.normalized <= usefulArgs[toName].normalized ||
-        (
-          propertyValue.currency === usefulArgs[fromName].currency &&
-          propertyValue.value <= usefulArgs[fromName].value
-        ),
+        propertyValue.currency === usefulArgs[fromName].currency &&
+        propertyValue.value <= usefulArgs[fromName].value
       );
     }
 
@@ -229,49 +204,27 @@ const typeValue: IPropertyDefinitionSupportedType = {
       return conditions.every((c) => c);
     }
   },
-  sqlEqual: (
-    value: IPropertyDefinitionSupportedCurrencyType,
-    sqlPrefix: string,
-    id: string,
-    isCaseInsensitive: boolean,
-    knex: Knex,
-    columnName?: string,
-  ) => {
-    if (!columnName) {
-      return {
-        [sqlPrefix + id + "_CURRENCY"]: value.currency,
-        [sqlPrefix + id + "_VALUE"]: value.value,
-      };
-    }
-    return knex.raw(
-      "?? = ? AND ?? = ? AS ??",
-      [
-        sqlPrefix + id + "_CURRENCY",
-        value.currency,
-        sqlPrefix + id + "_VALUE",
-        value.value,
-        columnName,
-      ],
-    );
+  sqlEqual: (arg) => {
+    return {
+      [arg.prefix + arg.id + "_CURRENCY"]: (arg.value as IPropertyDefinitionSupportedCurrencyType).currency,
+      [arg.prefix + arg.id + "_VALUE"]: (arg.value as IPropertyDefinitionSupportedCurrencyType).value,
+    };
   },
-  sqlSSCacheEqual: (
-    value: IPropertyDefinitionSupportedCurrencyType,
-    sqlPrefix: string,
-    id: string,
-    data: ISQLTableRowValue,
-  ) => {
-    if (value === null) {
-      return data[sqlPrefix + id + "_VALUE"] === value;
+  sqlSSCacheEqual: (arg) => {
+    if (arg.value === null) {
+      return arg.row[arg.prefix + arg.id + "_VALUE"] === null;
     }
-    return data[sqlPrefix + id + "_VALUE"] === value.value &&
-      data[sqlPrefix + id + "_CURRENCY"] === value.currency;
+    return arg.row[arg.prefix + arg.id + "_VALUE"] === (arg.value as IPropertyDefinitionSupportedCurrencyType).value &&
+      arg.row[arg.prefix + arg.id + "_CURRENCY"] === (arg.value as IPropertyDefinitionSupportedCurrencyType).currency;
   },
-  localEqual: (
-    a: IPropertyDefinitionSupportedCurrencyType,
-    b: IPropertyDefinitionSupportedCurrencyType,
-  ) => {
+  localEqual: (arg) => {
+    const a = arg.a as IPropertyDefinitionSupportedCurrencyType;
+    const b = arg.b as IPropertyDefinitionSupportedCurrencyType;
+
     if (a === b) {
       return true;
+    } else if (a === null || b === null) {
+      return false;
     }
 
     return a.value === b.value && a.currency === b.currency;
@@ -279,17 +232,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
   validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
     if (
       typeof l.value !== "number" ||
-      typeof l.currency !== "string" ||
-      typeof l.normalized !== "number"
+      typeof l.currency !== "string"
     ) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 
     if (isNaN(l.value)) {
-      return PropertyInvalidReason.INVALID_VALUE;
-    }
-
-    if (isNaN(l.normalized)) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 

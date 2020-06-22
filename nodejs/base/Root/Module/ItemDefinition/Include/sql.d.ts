@@ -14,10 +14,11 @@ import pkgcloud from "pkgcloud";
 /**
  * Provides the table bit that is necessary to store include data
  * for this include when included from the parent definition
+ * @param itemDefinition the item definition that contains the include (not the referred)
  * @param include the include in question
  * @returns the partial table definition schema for the include
  */
-export declare function getSQLTableDefinitionForInclude(include: Include): ISQLTableDefinitionType;
+export declare function getSQLTableDefinitionForInclude(knex: Knex, itemDefinition: ItemDefinition, include: Include): ISQLTableDefinitionType;
 /**
  * Given a SQL row it converts the value of the data contained
  * within that row into the valid graphql value for that data
@@ -28,15 +29,15 @@ export declare function getSQLTableDefinitionForInclude(include: Include): ISQLT
  * eg {id: {}, name: {}}
  * @returns a partial graphql value
  */
-export declare function convertSQLValueToGQLValueForInclude(include: Include, row: ISQLTableRowValue, graphqlFields?: any): IGQLValue;
+export declare function convertSQLValueToGQLValueForInclude(knex: Knex, serverData: any, itemDefinition: ItemDefinition, include: Include, row: ISQLTableRowValue, graphqlFields?: any): IGQLValue;
 /**
  * Converts a GraphQL value into a SQL row data, it takes apart a complex
  * graphql value and converts it into a serializable sql form
- * @param transitoryId the transitory id where things are stored
+ * @param knex the knex instance
+ * @param serverData the server data
  * @param itemDefinition the item definition in question
  * @param include the include in question
  * @param data the graphql data value
- * @param knex the knex instance
  * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
@@ -47,7 +48,7 @@ export declare function convertSQLValueToGQLValueForInclude(include: Include, ro
  * in a partial field value, don't use partial fields to create
  * @returns the partial sql result to be added into the table
  */
-export declare function convertGQLValueToSQLValueForInclude(itemDefinition: ItemDefinition, include: Include, data: IGQLArgs, oldData: IGQLValue, knex: Knex, uploadsContainer: pkgcloud.storage.Container, dictionary: string, partialFields?: any): ISQLStreamComposedTableRowValue;
+export declare function convertGQLValueToSQLValueForInclude(knex: Knex, serverData: any, itemDefinition: ItemDefinition, include: Include, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, dictionary: string, partialFields?: any): ISQLStreamComposedTableRowValue;
 /**
  * Builds a sql query for an include
  * @param include the include in question
@@ -55,4 +56,4 @@ export declare function convertGQLValueToSQLValueForInclude(itemDefinition: Item
  * @param knexBuilder the knex query builder
  * @param dictionary the dictionary to use to build the search
  */
-export declare function buildSQLQueryForInclude(include: Include, args: IGQLArgs, knexBuilder: Knex.QueryBuilder, dictionary: string): void;
+export declare function buildSQLQueryForInclude(knex: Knex, serverData: any, itemDefinition: ItemDefinition, include: Include, args: IGQLArgs, knexBuilder: Knex.QueryBuilder, dictionary: string): void;

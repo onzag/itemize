@@ -184,6 +184,8 @@ export async function searchModule(
 
   // now we build the sql query for the module
   const addedSearchRaw = buildSQLQueryForModule(
+    appData.knex,
+    appData.cache.getServerData(),
     mod,
     resolverArgs.args,
     queryModel,
@@ -219,7 +221,14 @@ export async function searchModule(
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
       results: baseResult.map((r) => {
-        return filterAndPrepareGQLValue(r, requestedFields, tokenData.role, mod).toReturnToUser;
+        return filterAndPrepareGQLValue(
+          appData.knex,
+          appData.cache.getServerData(),
+          r,
+          requestedFields,
+          tokenData.role,
+          mod,
+        ).toReturnToUser;
       }),
       limit,
       offset,
@@ -432,6 +441,8 @@ export async function searchItemDefinition(
   // that parent query, and adds the andWhere as required
   // into such query
   const addedSearchRaw = buildSQLQueryForItemDefinition(
+    appData.knex,
+    appData.cache.getServerData(),
     itemDefinition,
     resolverArgs.args,
     queryModel,
@@ -461,7 +472,14 @@ export async function searchItemDefinition(
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
       results: baseResult.map((r) => {
-        return filterAndPrepareGQLValue(r, requestedFields, tokenData.role, itemDefinition).toReturnToUser;
+        return filterAndPrepareGQLValue(
+          appData.knex,
+          appData.cache.getServerData(),
+          r,
+          requestedFields,
+          tokenData.role,
+          itemDefinition,
+        ).toReturnToUser;
       }),
       limit,
       offset,

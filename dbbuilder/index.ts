@@ -95,7 +95,7 @@ export default async function build(version: string) {
     const root = new Root(data);
 
     // let's get the result by progressively building on top of it
-    optimal = getSQLTablesSchemaForRoot(root);
+    optimal = getSQLTablesSchemaForRoot(knex, root);
 
     // Retrieve the past migration configuration
     // if available

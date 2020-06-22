@@ -19,7 +19,7 @@ const sql_2 = require("./Include/sql");
  * @param itemDefinition the item definition in question
  * @returns a complete table definition type
  */
-function getSQLTableDefinitionForItemDefinition(itemDefinition) {
+function getSQLTableDefinitionForItemDefinition(knex, itemDefinition) {
     // add all the standard fields
     const tableToConnect = itemDefinition.getParentModule().getQualifiedPathName();
     const resultTableSchema = {
@@ -50,11 +50,11 @@ function getSQLTableDefinitionForItemDefinition(itemDefinition) {
     };
     // now we loop thru every property (they will all become columns)
     itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
-        Object.assign(resultTableSchema, sql_1.getSQLTableDefinitionForProperty(pd));
+        Object.assign(resultTableSchema, sql_1.getSQLTableDefinitionForProperty(knex, itemDefinition, null, pd));
     });
     // now we loop over the child items
     itemDefinition.getAllIncludes().forEach((i) => {
-        Object.assign(resultTableSchema, sql_2.getSQLTableDefinitionForInclude(i));
+        Object.assign(resultTableSchema, sql_2.getSQLTableDefinitionForInclude(knex, itemDefinition, i));
     });
     return resultTableSchema;
 }
@@ -66,14 +66,14 @@ exports.getSQLTableDefinitionForItemDefinition = getSQLTableDefinitionForItemDef
  * @param itemDefinition the item definition in question
  * @returns a partial sql schema definition for the whole database (adds tables)
  */
-function getSQLTablesSchemaForItemDefinition(itemDefinition) {
+function getSQLTablesSchemaForItemDefinition(knex, itemDefinition) {
     // we add self
     const result = {
-        [itemDefinition.getQualifiedPathName()]: getSQLTableDefinitionForItemDefinition(itemDefinition),
+        [itemDefinition.getQualifiedPathName()]: getSQLTableDefinitionForItemDefinition(knex, itemDefinition),
     };
     // loop over the children and add each one of them and whatever they have
     itemDefinition.getChildDefinitions().forEach((cIdef) => {
-        Object.assign(result, getSQLTablesSchemaForItemDefinition(cIdef));
+        Object.assign(result, getSQLTablesSchemaForItemDefinition(knex, cIdef));
     });
     // return that
     return result;
@@ -93,7 +93,7 @@ exports.getSQLTablesSchemaForItemDefinition = getSQLTablesSchemaForItemDefinitio
  * eg {id: {}, name: {}, ITEM_kitten: {purrs: {}}}
  * @returns a graphql value
  */
-function convertSQLValueToGQLValueForItemDefinition(itemDefinition, row, graphqlFields) {
+function convertSQLValueToGQLValueForItemDefinition(knex, serverData, itemDefinition, row, graphqlFields) {
     // first we create the graphql result
     const result = {};
     // now we take all the base properties that we have
@@ -106,11 +106,11 @@ function convertSQLValueToGQLValueForItemDefinition(itemDefinition, row, graphql
     // with the row data, this basically also gives graphql value
     // in the key:value format
     itemDefinition.getParentModule().getAllPropExtensions().filter((property) => !graphqlFields ? true : graphqlFields[property.getId()]).concat(itemDefinition.getAllPropertyDefinitions().filter((property) => !graphqlFields ? true : graphqlFields[property.getId()])).forEach((pd) => {
-        Object.assign(result, sql_1.convertSQLValueToGQLValueForProperty(pd, row));
+        Object.assign(result, sql_1.convertSQLValueToGQLValueForProperty(knex, serverData, itemDefinition, null, pd, row));
     });
     // now we do the same for the items
     itemDefinition.getAllIncludes().filter((include) => !graphqlFields ? true : graphqlFields[include.getQualifiedIdentifier()]).forEach((include) => {
-        Object.assign(result, sql_2.convertSQLValueToGQLValueForInclude(include, row, !graphqlFields ? null : graphqlFields[include.getQualifiedIdentifier()]));
+        Object.assign(result, sql_2.convertSQLValueToGQLValueForInclude(knex, serverData, itemDefinition, include, row, !graphqlFields ? null : graphqlFields[include.getQualifiedIdentifier()]));
     });
     return result;
 }
@@ -133,7 +133,7 @@ exports.convertSQLValueToGQLValueForItemDefinition = convertSQLValueToGQLValueFo
  * in a partial field value, don't use partial fields to create
  * @returns a sql value
  */
-function convertGQLValueToSQLValueForItemDefinition(itemDefinition, data, oldData, knex, uploadsContainer, dictionary, partialFields) {
+function convertGQLValueToSQLValueForItemDefinition(knex, serverData, itemDefinition, data, oldData, uploadsContainer, dictionary, partialFields) {
     // first we create the row value
     const result = {};
     const consumeStreamsFns = [];
@@ -142,7 +142,7 @@ function convertGQLValueToSQLValueForItemDefinition(itemDefinition, data, oldDat
         // partialFields set
         if ((partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
             !partialFields) {
-            const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(itemDefinition, null, pd, data, oldData, knex, uploadsContainer, dictionary, "");
+            const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition, null, pd, data, oldData, uploadsContainer, dictionary);
             Object.assign(result, addedFieldsByProperty.value);
             consumeStreamsFns.push(addedFieldsByProperty.consumeStreams);
         }
@@ -155,7 +155,7 @@ function convertGQLValueToSQLValueForItemDefinition(itemDefinition, data, oldDat
         if ((partialFields && typeof partialFields[includeNameInPartialFields] !== "undefined") ||
             !partialFields) {
             const innerPartialFields = !partialFields ? null : partialFields[includeNameInPartialFields];
-            const addedFieldsByInclude = sql_2.convertGQLValueToSQLValueForInclude(itemDefinition, include, data, oldData, knex, uploadsContainer, dictionary, innerPartialFields);
+            const addedFieldsByInclude = sql_2.convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, include, data, oldData, uploadsContainer, dictionary, innerPartialFields);
             Object.assign(result, addedFieldsByInclude.value);
             consumeStreamsFns.push(addedFieldsByInclude.consumeStreams);
         }
@@ -176,7 +176,7 @@ exports.convertGQLValueToSQLValueForItemDefinition = convertGQLValueToSQLValueFo
  * @param knexBuilder the knex builder instance
  * @param dictionary the dictionary being used
  */
-function buildSQLQueryForItemDefinition(itemDefinition, args, knexBuilder, dictionary, search, orderBy) {
+function buildSQLQueryForItemDefinition(knex, serverData, itemDefinition, args, knexBuilder, dictionary, search, orderBy) {
     const includedInSearchProperties = [];
     const includedInStrSearchProperties = [];
     const addedSelectFields = [];
@@ -186,7 +186,7 @@ function buildSQLQueryForItemDefinition(itemDefinition, args, knexBuilder, dicti
             return;
         }
         const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
-        const wasSearchedBy = sql_1.buildSQLQueryForProperty(pd, args, "", knexBuilder, dictionary, isOrderedByIt);
+        const wasSearchedBy = sql_1.buildSQLQueryForProperty(knex, serverData, itemDefinition, null, pd, args, knexBuilder, dictionary, isOrderedByIt);
         if (wasSearchedBy) {
             if (Array.isArray(wasSearchedBy)) {
                 addedSelectFields.push(wasSearchedBy);
@@ -197,7 +197,7 @@ function buildSQLQueryForItemDefinition(itemDefinition, args, knexBuilder, dicti
     });
     // then we ned to add all the includes
     itemDefinition.getAllIncludes().forEach((include) => {
-        sql_2.buildSQLQueryForInclude(include, args, knexBuilder, dictionary);
+        sql_2.buildSQLQueryForInclude(knex, serverData, itemDefinition, include, args, knexBuilder, dictionary);
     });
     if (search) {
         // for technical reasons we need to do this twice and use a fake builder
@@ -207,7 +207,8 @@ function buildSQLQueryForItemDefinition(itemDefinition, args, knexBuilder, dicti
                 return;
             }
             const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
-            const wasStrSearchedBy = sql_1.buildSQLStrSearchQueryForProperty(pd, args, search, "", null, dictionary, isOrderedByIt);
+            const wasStrSearchedBy = sql_1.buildSQLStrSearchQueryForProperty(knex, serverData, itemDefinition, null, pd, args, search, null, // note knex builder being null
+            dictionary, isOrderedByIt);
             if (wasStrSearchedBy) {
                 if (Array.isArray(wasStrSearchedBy)) {
                     addedSelectFields.push(wasStrSearchedBy);
@@ -226,7 +227,7 @@ function buildSQLQueryForItemDefinition(itemDefinition, args, knexBuilder, dicti
                 }
                 const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
                 builder.orWhere((orBuilder) => {
-                    sql_1.buildSQLStrSearchQueryForProperty(pd, args, search, "", orBuilder, dictionary, isOrderedByIt);
+                    sql_1.buildSQLStrSearchQueryForProperty(knex, serverData, itemDefinition, null, pd, args, search, orBuilder, dictionary, isOrderedByIt);
                 });
             });
         });
@@ -242,13 +243,13 @@ function buildSQLQueryForItemDefinition(itemDefinition, args, knexBuilder, dicti
         }).sort((a, b) => a.priority - b.priority);
         orderBySorted.forEach((pSet) => {
             if (!itemDefinition.hasPropertyDefinitionFor(pSet.property, true)) {
-                sql_1.buildSQLOrderByForInternalRequiredProperty(pSet.property, knexBuilder, pSet.direction, pSet.nulls);
+                sql_1.buildSQLOrderByForInternalRequiredProperty(knex, itemDefinition, pSet.property, knexBuilder, pSet.direction, pSet.nulls);
                 return;
             }
             const pd = itemDefinition.getPropertyDefinitionFor(pSet.property, true);
             const wasIncludedInSearch = includedInSearchProperties.includes(pSet.property);
             const wasIncludedInStrSearch = includedInStrSearchProperties.includes(pSet.property);
-            sql_1.buildSQLOrderByForProperty(pd, "", knexBuilder, pSet.direction, pSet.nulls, wasIncludedInSearch, wasIncludedInStrSearch);
+            sql_1.buildSQLOrderByForProperty(knex, serverData, itemDefinition, null, pd, knexBuilder, pSet.direction, pSet.nulls, wasIncludedInSearch, wasIncludedInStrSearch);
         });
     }
     return addedSelectFields;

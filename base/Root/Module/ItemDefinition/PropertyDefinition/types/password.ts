@@ -25,14 +25,14 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   nullableDefault: "",
   sql: getStandardSQLFnFor && getStandardSQLFnFor("text", "pgcrypto"),
-  sqlIn: (value: PropertyDefinitionSupportedPasswordType, sqlPrefix, id, property, knex) => {
-    if (value === null) {
+  sqlIn: (arg) => {
+    if (arg.value === null) {
       return  {
-        [sqlPrefix + id]: null,
+        [arg.prefix + arg.id]: null,
       };
     }
     return  {
-      [sqlPrefix + id]: knex.raw("crypt(?, gen_salt('bf',10))", value),
+      [arg.prefix + arg.id]: arg.knex.raw("crypt(?, gen_salt('bf',10))", arg.value as string),
     };
   },
   sqlOut: standardSQLOutFn,
@@ -63,46 +63,27 @@ const typeValue: IPropertyDefinitionSupportedType = {
       "Attempted to local equal a password",
     );
   },
-  sqlEqual: (
-    value: PropertyDefinitionSupportedPasswordType,
-    sqlPrefix: string,
-    id: string,
-    isCaseInsensitive: boolean,
-    knex: Knex,
-    columnName?: string,
-  ) => {
-    if (!columnName) {
-      return knex.raw(
-        "?? = crypt(?, ??)",
-        [
-          sqlPrefix + id,
-          value,
-          sqlPrefix + id,
-        ],
-      );
-    }
-    return knex.raw(
-      "?? = crypt(?, ??) AS ??",
+  sqlEqual: (arg) => {
+    return arg.knex.raw(
+      "?? = crypt(?, ??)",
       [
-        sqlPrefix + id,
-        value,
-        sqlPrefix + id,
-        columnName,
+        arg.prefix + arg.id,
+        arg.value as string,
+        arg.prefix + arg.id,
       ],
     );
   },
-  sqlSSCacheEqual: (
-    value: PropertyDefinitionSupportedPasswordType,
-    sqlPrefix: string,
-    id: string,
-    data: ISQLTableRowValue,
-  ) => {
-    if (value === null) {
-      return data[sqlPrefix + id] === null;
-    } else if (!data[sqlPrefix + id]) {
+  sqlSSCacheEqual: (arg) => {
+    if (arg.value === null) {
+      return arg.row[arg.prefix + arg.id] === null;
+    } else if (!arg.row[arg.prefix + arg.id]) {
       return false;
     }
-    return bcyrpt.compareSync(value, data[sqlPrefix + id]);
+    try {
+      return bcyrpt.compareSync(arg.value, arg.row[arg.prefix + arg.id]);
+    } catch (err) {
+      return false;
+    }
   },
   sqlBtreeIndexable: () => {
     throw new Error("Attempted to btree index a password, this might mean a files value is in request limiters, don't do that");

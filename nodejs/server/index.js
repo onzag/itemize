@@ -401,7 +401,6 @@ async function initializeServer(ssrConfig, custom = {}) {
                 return;
             }
         }
-        PropertyDefinition_1.default.indexChecker = server_checkers_1.serverSideIndexChecker.bind(null, knex);
         // due to a bug in the types the create client function is missing
         // domainId and domainName
         exports.logger.info("initializeServer: initializing openstack pkgcloud objectstorage clients");
@@ -503,6 +502,8 @@ async function initializeServer(ssrConfig, custom = {}) {
             // assigned later during rest setup
             customUserTokenQuery: null,
         };
+        // we setup the index checker now that we have the server data
+        PropertyDefinition_1.default.indexChecker = server_checkers_1.serverSideIndexChecker.bind(null, appData);
         exports.logger.info("initializeServer: INSTANCE_GROUP_ID is " + INSTANCE_GROUP_ID);
         if (INSTANCE_MODE === "ABSOLUTE") {
             exports.logger.info("initializeServer: server initialized in absolute mode flushing redis");

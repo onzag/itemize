@@ -139,6 +139,7 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
             gqlArgValue: resolverArgs.args,
             gqlFlattenedRequestedFiels: requestedFields,
             cache: appData.cache,
+            knex: appData.knex,
             parentModule,
             parentType: resolverArgs.args.parent_type,
             parentId: resolverArgs.args.parent_id,
@@ -242,7 +243,7 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
     // that we actually want, not passing this would make the gql value
     // be full (of nulls) our value is incomplete, so we need to
     // pass the requestedFields anyway
-    const gqlValue = sql_1.convertSQLValueToGQLValueForItemDefinition(itemDefinition, value, requestedFields);
+    const gqlValue = sql_1.convertSQLValueToGQLValueForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, value, requestedFields);
     const finalOutput = {
         DATA: gqlValue,
         ...gqlValue,

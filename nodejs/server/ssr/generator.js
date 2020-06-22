@@ -188,7 +188,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             // which is possible
             if (fields) {
                 // we build the value for the given role with the given fields
-                const value = rowValue === null ? null : basic_1.filterAndPrepareGQLValue(rowValue, fields, appliedRule.forUser.role, idef);
+                const value = rowValue === null ? null : basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), rowValue, fields, appliedRule.forUser.role, idef);
                 // and now we build the query in the given index
                 // the queries[index] can be null, no access
                 // queries[index].value = null, not found

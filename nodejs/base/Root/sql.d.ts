@@ -5,6 +5,7 @@
  * @packageDocumentation
  */
 import Root from ".";
+import Knex from "knex";
 export interface ISQLTableIndexType {
     /**
      * The id of the index in order to perform double table indexes
@@ -111,4 +112,4 @@ export interface ISQLStreamComposedTableRowValue {
  * @param root The root in question
  * @returns a total database schema
  */
-export declare function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType;
+export declare function getSQLTablesSchemaForRoot(knex: Knex, root: Root): ISQLSchemaDefinitionType;

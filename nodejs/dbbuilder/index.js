@@ -78,7 +78,7 @@ async function build(version) {
         // build the root from that data
         const root = new Root_1.default(data);
         // let's get the result by progressively building on top of it
-        optimal = sql_1.getSQLTablesSchemaForRoot(root);
+        optimal = sql_1.getSQLTablesSchemaForRoot(knex, root);
         // Retrieve the past migration configuration
         // if available
         let currentDatabaseSchema = {};

@@ -35,22 +35,22 @@ const typeValue = {
     sqlStrSearch: null,
     localStrSearch: null,
     sqlOrderBy: sql_1.standardSQLOrderBy,
-    localOrderBy: (direction, nulls, a, b) => {
-        if (a === null && b === null) {
+    localOrderBy: (arg) => {
+        if (arg.a === null && arg.b === null) {
             return 0;
         }
-        else if (a === null) {
-            return nulls === "last" ? 1 : -1;
+        else if (arg.a === null) {
+            return arg.nulls === "last" ? 1 : -1;
         }
-        else if (b === null) {
-            return nulls === "last" ? -1 : 1;
+        else if (arg.b === null) {
+            return arg.nulls === "last" ? -1 : 1;
         }
-        else if (a === b) {
+        else if (arg.a === arg.b) {
             return 0;
         }
-        const dateA = (new Date(a)).getTime();
-        const dateB = (new Date(b)).getTime();
-        if (direction === "desc") {
+        const dateA = (new Date(arg.a)).getTime();
+        const dateB = (new Date(arg.b)).getTime();
+        if (arg.direction === "desc") {
             return dateB - dateA;
         }
         return dateA - dateB;

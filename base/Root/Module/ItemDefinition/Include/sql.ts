@@ -23,10 +23,11 @@ import pkgcloud from "pkgcloud";
 /**
  * Provides the table bit that is necessary to store include data
  * for this include when included from the parent definition
+ * @param itemDefinition the item definition that contains the include (not the referred)
  * @param include the include in question
  * @returns the partial table definition schema for the include
  */
-export function getSQLTableDefinitionForInclude(include: Include): ISQLTableDefinitionType {
+export function getSQLTableDefinitionForInclude(knex: Knex, itemDefinition: ItemDefinition, include: Include): ISQLTableDefinitionType {
   // the exclusion state needs to be stored in the table bit
   // so we basically need to get a prefix for this item definition
   // this is usually INCLUDE_ the include prefix, and the id of the include
@@ -48,7 +49,12 @@ export function getSQLTableDefinitionForInclude(include: Include): ISQLTableDefi
   include.getSinkingProperties().forEach((sinkingProperty) => {
     resultTableSchema = {
       ...resultTableSchema,
-      ...getSQLTableDefinitionForProperty(sinkingProperty, prefix),
+      ...getSQLTableDefinitionForProperty(
+        knex,
+        itemDefinition,
+        include,
+        sinkingProperty,
+      ),
     };
   });
 
@@ -67,6 +73,9 @@ export function getSQLTableDefinitionForInclude(include: Include): ISQLTableDefi
  * @returns a partial graphql value
  */
 export function convertSQLValueToGQLValueForInclude(
+  knex: Knex,
+  serverData: any,
+  itemDefinition: ItemDefinition, 
   include: Include,
   row: ISQLTableRowValue,
   graphqlFields?: any,
@@ -94,7 +103,14 @@ export function convertSQLValueToGQLValueForInclude(
     // the sql data with ITEM_wheel_
     gqlParentResult = {
       ...gqlParentResult,
-      ...convertSQLValueToGQLValueForProperty(sinkingProperty, row, prefix),
+      ...convertSQLValueToGQLValueForProperty(
+        knex,
+        serverData,
+        itemDefinition,
+        include,
+        sinkingProperty,
+        row,
+      ),
     };
   });
 
@@ -109,11 +125,11 @@ export function convertSQLValueToGQLValueForInclude(
 /**
  * Converts a GraphQL value into a SQL row data, it takes apart a complex
  * graphql value and converts it into a serializable sql form
- * @param transitoryId the transitory id where things are stored
+ * @param knex the knex instance
+ * @param serverData the server data
  * @param itemDefinition the item definition in question
  * @param include the include in question
  * @param data the graphql data value
- * @param knex the knex instance
  * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
@@ -125,17 +141,16 @@ export function convertSQLValueToGQLValueForInclude(
  * @returns the partial sql result to be added into the table
  */
 export function convertGQLValueToSQLValueForInclude(
+  knex: Knex,
+  serverData: any,
   itemDefinition: ItemDefinition,
   include: Include,
   data: IGQLArgs,
   oldData: IGQLValue,
-  knex: Knex,
   uploadsContainer: pkgcloud.storage.Container,
   dictionary: string,
   partialFields?: any,
 ): ISQLStreamComposedTableRowValue {
-  // so again we get the prefix as in ITEM_wheel_
-  const prefix = include.getPrefixedQualifiedIdentifier();
   // the exclusion state in the graphql information should be included in
   // the root data as ITEM_wheel__EXCLUSION_STATE so we extract it
   const exclusionStateAccordingToGQL = data[include.getQualifiedExclusionStateIdentifier()];
@@ -164,15 +179,15 @@ export function convertGQLValueToSQLValueForInclude(
         // there, the prefix then represents the fact, we want all the added properties
         // to be prefixed with what we are giving, in this case ITEM_wheel_
         const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
+          knex,
+          serverData,
           itemDefinition,
           include,
           sinkingProperty,
           data[include.getQualifiedIdentifier()] as IGQLValue,
           (oldData && oldData[include.getQualifiedIdentifier()] as IGQLValue) || null,
-          knex,
           uploadsContainer,
           dictionary,
-          prefix,
         );
         Object.assign(
           result,
@@ -200,6 +215,9 @@ export function convertGQLValueToSQLValueForInclude(
  * @param dictionary the dictionary to use to build the search
  */
 export function buildSQLQueryForInclude(
+  knex: Knex,
+  serverData: any,
+  itemDefinition: ItemDefinition,
   include: Include,
   args: IGQLArgs,
   knexBuilder: Knex.QueryBuilder,
@@ -223,14 +241,24 @@ export function buildSQLQueryForInclude(
         secondBuilder.where(exclusionStateQualifiedId, IncludeExclusionState.INCLUDED);
 
         // get the args for that specific include
-        const itemArgs = args[include.getQualifiedIdentifier()] as IGQLArgs;
+        const includeArgs = args[include.getQualifiedIdentifier()] as IGQLArgs;
 
         // and apply the search for all the sinking properties
         include.getSinkingProperties().forEach((pd) => {
           if (!pd.isSearchable()) {
             return;
           }
-          buildSQLQueryForProperty(pd, itemArgs, prefix, secondBuilder, dictionary, false);
+          buildSQLQueryForProperty(
+            knex,
+            serverData,
+            itemDefinition,
+            include,
+            pd,
+            includeArgs,
+            secondBuilder,
+            dictionary,
+            false,            
+          );
         });
       });
 

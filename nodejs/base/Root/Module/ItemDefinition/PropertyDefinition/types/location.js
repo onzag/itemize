@@ -59,92 +59,93 @@ const typeValue = {
             type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLString),
         },
     },
-    sql: (sqlPrefix, id) => {
+    sql: (arg) => {
         return {
-            [sqlPrefix + id + "_GEO"]: {
+            [arg.prefix + arg.id + "_GEO"]: {
                 type: "GEOMETRY(POINT,4326)",
                 ext: "postgis",
                 index: {
                     type: "gist",
-                    id: constants_1.SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
+                    id: constants_1.SQL_CONSTRAINT_PREFIX + arg.prefix + arg.id,
                     level: 0,
                 },
             },
-            [sqlPrefix + id + "_ID"]: {
+            [arg.prefix + arg.id + "_ID"]: {
                 type: "text",
             },
-            [sqlPrefix + id + "_LAT"]: {
+            [arg.prefix + arg.id + "_LAT"]: {
                 type: "float",
             },
-            [sqlPrefix + id + "_LNG"]: {
+            [arg.prefix + arg.id + "_LNG"]: {
                 type: "float",
             },
-            [sqlPrefix + id + "_TXT"]: {
+            [arg.prefix + arg.id + "_TXT"]: {
                 type: "text",
             },
-            [sqlPrefix + id + "_ATXT"]: {
+            [arg.prefix + arg.id + "_ATXT"]: {
                 type: "text",
             },
         };
     },
-    sqlIn: (value, sqlPrefix, id, property, knex) => {
-        if (value === null) {
+    sqlIn: (arg) => {
+        if (arg.value === null) {
             return {
-                [sqlPrefix + id + "_GEO"]: null,
-                [sqlPrefix + id + "_ID"]: null,
-                [sqlPrefix + id + "_LAT"]: null,
-                [sqlPrefix + id + "_LNG"]: null,
-                [sqlPrefix + id + "_TXT"]: null,
-                [sqlPrefix + id + "_ATXT"]: null,
+                [arg.prefix + arg.id + "_GEO"]: null,
+                [arg.prefix + arg.id + "_ID"]: null,
+                [arg.prefix + arg.id + "_LAT"]: null,
+                [arg.prefix + arg.id + "_LNG"]: null,
+                [arg.prefix + arg.id + "_TXT"]: null,
+                [arg.prefix + arg.id + "_ATXT"]: null,
             };
         }
+        const value = arg.value;
         return {
-            [sqlPrefix + id + "_GEO"]: knex.raw("ST_SetSRID(ST_MakePoint(?, ?), 4326)", [value.lng, value.lat]),
-            [sqlPrefix + id + "_ID"]: value.id,
-            [sqlPrefix + id + "_LAT"]: value.lat,
-            [sqlPrefix + id + "_LNG"]: value.lng,
-            [sqlPrefix + id + "_TXT"]: value.txt,
-            [sqlPrefix + id + "_ATXT"]: value.atxt,
+            [arg.prefix + arg.id + "_GEO"]: arg.knex.raw("ST_SetSRID(ST_MakePoint(?, ?), 4326)", [value.lng, value.lat]),
+            [arg.prefix + arg.id + "_ID"]: value.id,
+            [arg.prefix + arg.id + "_LAT"]: value.lat,
+            [arg.prefix + arg.id + "_LNG"]: value.lng,
+            [arg.prefix + arg.id + "_TXT"]: value.txt,
+            [arg.prefix + arg.id + "_ATXT"]: value.atxt,
         };
     },
-    sqlOut: (data, sqlPrefix, id) => {
+    sqlOut: (arg) => {
         const result = {
-            lat: data[sqlPrefix + id + "_LAT"],
-            lng: data[sqlPrefix + id + "_LNG"],
-            txt: data[sqlPrefix + id + "_TXT"],
-            atxt: data[sqlPrefix + id + "_ATXT"],
-            id: data[sqlPrefix + id + "_ID"],
+            lat: arg.row[arg.prefix + arg.id + "_LAT"],
+            lng: arg.row[arg.prefix + arg.id + "_LNG"],
+            txt: arg.row[arg.prefix + arg.id + "_TXT"],
+            atxt: arg.row[arg.prefix + arg.id + "_ATXT"],
+            id: arg.row[arg.prefix + arg.id + "_ID"],
         };
         if (result.lat === null || result.lng === null) {
             return null;
         }
         return result;
     },
-    sqlSearch: (args, sqlPrefix, id, knexBuilder, dictionary, isOrderedByIt) => {
-        const radiusName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.RADIUS + id;
-        const locationName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.LOCATION + id;
-        if (typeof args[locationName] !== "undefined" && args[locationName] !== null &&
-            typeof args[radiusName] !== "undefined" && args[radiusName] !== null) {
-            knexBuilder.andWhere(sqlPrefix + id, "!=", null);
-            const argAsLocation = args[locationName];
+    sqlSearch: (arg) => {
+        const radiusName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.RADIUS + arg.prefix + arg.id;
+        const locationName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.LOCATION + arg.prefix + arg.id;
+        if (typeof arg.args[locationName] !== "undefined" && arg.args[locationName] !== null &&
+            typeof arg.args[radiusName] !== "undefined" && arg.args[radiusName] !== null) {
+            arg.knexBuilder.andWhere(arg.prefix + arg.id, "!=", null);
+            const argAsLocation = arg.args[locationName];
             const lng = argAsLocation.lng || 0;
             const lat = argAsLocation.lat || 0;
-            const argAsUnit = args[radiusName];
+            const argAsUnit = arg.args[radiusName];
             const distance = (argAsUnit.normalizedValue || 0) * 1000;
-            knexBuilder.andWhereRaw("ST_DWithin(??, ST_MakePoint(?,?)::geography, ?)", [
-                sqlPrefix + id,
+            arg.knexBuilder.andWhereRaw("ST_DWithin(??, ST_MakePoint(?,?)::geography, ?)", [
+                arg.prefix + arg.id,
                 lng,
                 lat,
                 distance,
             ]);
-            if (isOrderedByIt) {
+            if (arg.isOrderedByIt) {
                 return [
                     "ST_Distance(??, ST_MakePoint(?,?)::geography) AS ??",
                     [
-                        sqlPrefix + id,
+                        arg.prefix + arg.id,
                         lng,
                         lat,
-                        sqlPrefix + id + "_CALC_RADIUS",
+                        arg.prefix + arg.id + "_CALC_RADIUS",
                     ],
                 ];
             }
@@ -155,28 +156,28 @@ const typeValue = {
     sqlStrSearch: null,
     localStrSearch: null,
     sqlMantenience: null,
-    sqlOrderBy: (sqlPrefix, id, direction, nulls, wasIncludedInSearch) => {
-        if (wasIncludedInSearch) {
-            return [sqlPrefix + id + "_CALC_RADIUS", direction, nulls];
+    sqlOrderBy: (arg) => {
+        if (arg.wasIncludedInSearch) {
+            return [arg.prefix + arg.id + "_CALC_RADIUS", arg.direction, arg.nulls];
         }
         return null;
     },
     localOrderBy: null,
-    localSearch: (args, rawData, id, includeId) => {
+    localSearch: (arg) => {
         // item is deleted
-        if (!rawData) {
+        if (!arg.gqlValue) {
             return false;
         }
         // item is blocked
-        if (rawData.DATA === null) {
+        if (arg.gqlValue.DATA === null) {
             return false;
         }
-        const radiusName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.RADIUS + id;
-        const locationName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.LOCATION + id;
-        const usefulArgs = includeId ? args[constants_1.INCLUDE_PREFIX + includeId] || {} : args;
+        const radiusName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.RADIUS + arg.id;
+        const locationName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.LOCATION + arg.id;
+        const usefulArgs = arg.include ? arg.args[constants_1.INCLUDE_PREFIX + arg.include.getId()] || {} : arg.args;
         if (typeof usefulArgs[locationName] !== "undefined" && usefulArgs[locationName] !== null &&
             typeof usefulArgs[radiusName] !== "undefined" && usefulArgs[radiusName] !== null) {
-            const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+            const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
             if (propertyValue === null) {
                 return false;
             }
@@ -190,38 +191,36 @@ const typeValue = {
         }
         return true;
     },
-    sqlEqual: (value, sqlPrefix, id, isCaseInsensitive, knex, columnName) => {
-        if (!columnName) {
+    sqlEqual: (arg) => {
+        if (arg.value === null) {
             return {
-                [sqlPrefix + id + "_ID"]: value.id,
+                [arg.prefix + arg.id + "_ID"]: null,
             };
         }
-        return knex.raw("?? = ? AS ??", [
-            sqlPrefix + id + "_ID",
-            value.id,
-            columnName,
-        ]);
+        return {
+            [arg.prefix + arg.id + "_ID"]: arg.value.id,
+        };
     },
-    sqlSSCacheEqual: (value, sqlPrefix, id, data) => {
-        if (value === null) {
-            return data[sqlPrefix + id + "_ID"] === value;
+    sqlSSCacheEqual: (arg) => {
+        if (arg.value === null) {
+            return arg.row[arg.prefix + arg.id + "_ID"] === arg.value;
         }
-        return data[sqlPrefix + id + "ID"] === value.id;
+        return arg.row[arg.prefix + arg.id + "ID"] === arg.value.id;
     },
     sqlBtreeIndexable: () => {
         return null;
     },
-    localEqual: (a, b) => {
-        if (a === b) {
+    localEqual: (arg) => {
+        if (arg.a === arg.b) {
             return true;
         }
-        if (a === null && b !== null) {
+        if (arg.a === null && arg.b !== null) {
             return false;
         }
-        else if (b === null && a !== null) {
+        else if (arg.b === null && arg.a !== null) {
             return false;
         }
-        return a.id === b.id;
+        return arg.a.id === arg.b.id;
     },
     // locations just contain this basic data
     validate: (l) => {

@@ -10,6 +10,13 @@ import { ISensitiveConfigRawJSONDataType, IConfigRawJSONDataType } from "../conf
 import { CurrencyLayer, setupCurrencyLayer } from "./services/currency-layer";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import uuid from "uuid";
+import Include from "../base/Root/Module/ItemDefinition/Include";
+
+interface IMantainProp {
+  pdef: PropertyDefinition;
+  itemDefinition: ItemDefinition;
+  include: Include;
+};
 
 const wait = (time: number) => {
   return new Promise((resolve) => {
@@ -220,30 +227,33 @@ export class GlobalManager {
     }
   }
   private async runForModule(mod: Module) {
-    const propertiesThatNeedMantenience =
+    const propertiesThatNeedMantenience: IMantainProp[] =
       mod.getAllPropExtensions().filter((p) => p.getPropertyDefinitionDescription().sqlMantenience && p.isSearchable()).map((p) => ({
         pdef: p,
-        prefix: "",
+        itemDefinition: null,
+        include: null,
       }));
     const limiters = mod.getRequestLimiters();
     const since = limiters && limiters.condition === "AND" ? limiters.since : null;
     await this.runFor(mod.getQualifiedPathName(), true, propertiesThatNeedMantenience, since);
   }
   private async runForIdef(idef: ItemDefinition) {
-    const propertiesThatNeedMantenience =
+    const propertiesThatNeedMantenience: IMantainProp[] =
       idef.getAllPropertyDefinitions().filter((p) => p.getPropertyDefinitionDescription().sqlMantenience && p.isSearchable()).map((p) => ({
         pdef: p,
-        prefix: "",
+        itemDefinition: idef,
+        include: null,
       }));
 
-    const includePropertiesThatNeedMantenience = idef.getAllIncludes().map((i) => {
+    const includePropertiesThatNeedMantenience: IMantainProp[][] = idef.getAllIncludes().map((i) => {
       return i.getSinkingProperties().filter((sp) => sp.getPropertyDefinitionDescription().sqlMantenience && sp.isSearchable()).map((sp) => ({
         pdef: sp,
-        prefix: i.getPrefixedQualifiedIdentifier(),
+        include: i,
+        itemDefinition: idef,
       }));
     });
 
-    let totalPropertiesThatNeedMantenience = propertiesThatNeedMantenience;
+    let totalPropertiesThatNeedMantenience: IMantainProp[] = propertiesThatNeedMantenience;
     includePropertiesThatNeedMantenience.forEach((includePropArray) => {
       totalPropertiesThatNeedMantenience = totalPropertiesThatNeedMantenience.concat(includePropArray);
     });
@@ -252,7 +262,7 @@ export class GlobalManager {
     const since = limiters && limiters.condition === "AND" ? limiters.since : null;
     await this.runFor(idef.getQualifiedPathName(), false, totalPropertiesThatNeedMantenience, since);
   }
-  private async runFor(tableName: string, isModule: boolean, properties: Array<{pdef: PropertyDefinition, prefix: string}>, since: number) {
+  private async runFor(tableName: string, isModule: boolean, properties: IMantainProp[], since: number) {
     const sinceLimiter = since ? new Date((new Date()).getTime() - since) : null;
 
     const updateRules: any = {};
@@ -263,11 +273,14 @@ export class GlobalManager {
     const andWhereRules: any[] = [];
     const orWhereRules: any[] = [];
     properties.forEach((p) => {
-      const mantenienceRule = p.pdef.getPropertyDefinitionDescription().sqlMantenience(
-        p.prefix,
-        p.pdef.getId(),
-        this.knex,
-      );
+      const mantenienceRule = p.pdef.getPropertyDefinitionDescription().sqlMantenience({
+        knex: this.knex,
+        serverData: null,
+        id: p.pdef.getId(),
+        prefix: p.include ? p.include.getPrefixedQualifiedIdentifier() : "",
+        property: p.pdef,
+        itemDefinition: p.itemDefinition,
+      });
       updateRules[mantenienceRule.columnToSet] = mantenienceRule.setColumnToRaw;
       if (mantenienceRule.from) {
         fromRules.push({

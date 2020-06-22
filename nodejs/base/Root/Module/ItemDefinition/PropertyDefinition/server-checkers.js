@@ -17,7 +17,7 @@ const constants_1 = require("../../../../../constants");
  * @param version the slot version
  * @returns a boolean on whether the unique index is valid
  */
-async function serverSideIndexChecker(knex, property, value, id, version) {
+async function serverSideIndexChecker(appData, itemDefinition, include, property, value, id, version) {
     // if the value is null then it's valid
     if (value === null) {
         return true;
@@ -32,7 +32,17 @@ async function serverSideIndexChecker(knex, property, value, id, version) {
     // for case insensitive unique checks
     const isCaseInsensitive = property.isNonCaseSensitiveUnique();
     // now the query
-    const query = knex.select(moduleIDColumn, moduleVersionColumn).from(qualifiedParentName).where(property.getPropertyDefinitionDescription().sqlEqual(value, "", property.getId(), isCaseInsensitive, knex));
+    const query = appData.knex.select(moduleIDColumn, moduleVersionColumn).from(qualifiedParentName).where(property.getPropertyDefinitionDescription().sqlEqual({
+        knex: appData.knex,
+        serverData: appData.cache.getServerData(),
+        value,
+        ignoreCase: isCaseInsensitive,
+        id: property.getId(),
+        include,
+        itemDefinition,
+        prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+        property,
+    }));
     // if the id is not null, it might be null to do whole check
     // or an id specified so that we exclude that id in the search
     // because it will match, eg. we check for usernames but our own username

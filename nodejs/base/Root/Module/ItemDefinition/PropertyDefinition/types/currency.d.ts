@@ -10,7 +10,6 @@ import { IPropertyDefinitionSupportedType } from "../types";
 export interface IPropertyDefinitionSupportedCurrencyType {
     value: number;
     currency: string;
-    normalized: number;
 }
 /**
  * The type of a curreny type specifies how it behaves in the app

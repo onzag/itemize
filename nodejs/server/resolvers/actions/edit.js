@@ -60,6 +60,7 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
         gqlArgValue: resolverArgs.args,
         gqlFlattenedRequestedFiels: requestedFields,
         cache: appData.cache,
+        knex: appData.knex,
         preValidation: (content) => {
             // if we don't get an user id this means that there's no owner, this is bad input
             if (!content) {
@@ -88,7 +89,7 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
     // Now that the policies have been checked, and that we get the value of the entire item
     // definition, we need to convert that value to GQL value, and for that we use the converter
     // note how we don't pass the requested fields because we want it all
-    const currentWholeValueAsGQL = sql_1.convertSQLValueToGQLValueForItemDefinition(itemDefinition, wholeSqlStoredValue);
+    const currentWholeValueAsGQL = sql_1.convertSQLValueToGQLValueForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, wholeSqlStoredValue);
     // and now basically we create a new value that is the combination or both, where our new
     // values take precedence, yes there will be pollution, with token, id, and whatnot, but that
     // doesn't matter because the apply function ignores those
@@ -185,7 +186,7 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
     __1.logger.debug("editItemDefinition: SQL ouput retrieved");
     __1.logger.silly("editItemDefinition: Value is", sqlValue);
     // convert it using the requested fields for that, and ignoring everything else
-    const gqlValue = sql_1.convertSQLValueToGQLValueForItemDefinition(itemDefinition, sqlValue, requestedFields);
+    const gqlValue = sql_1.convertSQLValueToGQLValueForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, sqlValue, requestedFields);
     // we don't need to check for blocked or deleted because such items cannot be edited,
     // see before, so we return immediately, read has been checked already
     // we use the same strategy, all extra data will be chopped anyway by graphql

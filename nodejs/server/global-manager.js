@@ -7,6 +7,7 @@ const _1 = require(".");
 const constants_1 = require("../constants");
 const currency_layer_1 = require("./services/currency-layer");
 const uuid_1 = __importDefault(require("uuid"));
+;
 const wait = (time) => {
     return new Promise((resolve) => {
         setTimeout(resolve, time);
@@ -154,7 +155,8 @@ class GlobalManager {
     async runForModule(mod) {
         const propertiesThatNeedMantenience = mod.getAllPropExtensions().filter((p) => p.getPropertyDefinitionDescription().sqlMantenience && p.isSearchable()).map((p) => ({
             pdef: p,
-            prefix: "",
+            itemDefinition: null,
+            include: null,
         }));
         const limiters = mod.getRequestLimiters();
         const since = limiters && limiters.condition === "AND" ? limiters.since : null;
@@ -163,12 +165,14 @@ class GlobalManager {
     async runForIdef(idef) {
         const propertiesThatNeedMantenience = idef.getAllPropertyDefinitions().filter((p) => p.getPropertyDefinitionDescription().sqlMantenience && p.isSearchable()).map((p) => ({
             pdef: p,
-            prefix: "",
+            itemDefinition: idef,
+            include: null,
         }));
         const includePropertiesThatNeedMantenience = idef.getAllIncludes().map((i) => {
             return i.getSinkingProperties().filter((sp) => sp.getPropertyDefinitionDescription().sqlMantenience && sp.isSearchable()).map((sp) => ({
                 pdef: sp,
-                prefix: i.getPrefixedQualifiedIdentifier(),
+                include: i,
+                itemDefinition: idef,
             }));
         });
         let totalPropertiesThatNeedMantenience = propertiesThatNeedMantenience;
@@ -187,7 +191,14 @@ class GlobalManager {
         const andWhereRules = [];
         const orWhereRules = [];
         properties.forEach((p) => {
-            const mantenienceRule = p.pdef.getPropertyDefinitionDescription().sqlMantenience(p.prefix, p.pdef.getId(), this.knex);
+            const mantenienceRule = p.pdef.getPropertyDefinitionDescription().sqlMantenience({
+                knex: this.knex,
+                serverData: null,
+                id: p.pdef.getId(),
+                prefix: p.include ? p.include.getPrefixedQualifiedIdentifier() : "",
+                property: p.pdef,
+                itemDefinition: p.itemDefinition,
+            });
             updateRules[mantenienceRule.columnToSet] = mantenienceRule.setColumnToRaw;
             if (mantenienceRule.from) {
                 fromRules.push({

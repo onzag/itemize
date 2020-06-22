@@ -107,7 +107,9 @@ export default function restServices(appData: IAppDataType) {
     }
 
     // we use the server side index checker
-    const isValid = await serverSideIndexChecker(appData.knex, property, value, id, version);
+    const isValid = await serverSideIndexChecker(
+      appData, property.getParentItemDefinition(), null, property, value, id, version,
+    );
     res.end(JSON.stringify(isValid));
   }
 

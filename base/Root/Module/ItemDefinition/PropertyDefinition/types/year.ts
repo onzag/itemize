@@ -55,23 +55,18 @@ const typeValue: IPropertyDefinitionSupportedType = {
   localStrSearch: null,
   sqlMantenience: null,
   sqlOrderBy: standardSQLOrderBy,
-  localOrderBy: (
-    direction: "asc" | "desc",
-    nulls: "first" | "last",
-    a: PropertyDefinitionSupportedYearType,
-    b: PropertyDefinitionSupportedYearType,
-  ) => {
-    if (a === null && b === null) {
+  localOrderBy: (arg) => {
+    if (arg.a === null && arg.b === null) {
       return 0;
-    } else if (a === null) {
-      return nulls === "last" ? 1 : -1;
-    } else if (b === null) {
-      return nulls === "last" ? -1 : 1;
+    } else if (arg.a === null) {
+      return arg.nulls === "last" ? 1 : -1;
+    } else if (arg.b === null) {
+      return arg.nulls === "last" ? -1 : 1;
     }
-    if (direction === "desc") {
-      return b - a;
+    if (arg.direction === "desc") {
+      return (arg.b as number) - (arg.a as number);
     }
-    return a - b;
+    return (arg.a as number) - (arg.b as number);
   },
 
   localSearch: standardLocalSearchExactAndRange,

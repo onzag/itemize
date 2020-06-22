@@ -37,72 +37,72 @@ const typeValue = {
             type: "boolean",
         },
     ],
-    sql: (sqlPrefix, id) => {
+    sql: (arg) => {
         return {
-            [sqlPrefix + id]: {
+            [arg.prefix + arg.id]: {
                 type: "text",
             },
-            [sqlPrefix + id + "_DICTIONARY"]: {
+            [arg.prefix + arg.id + "_DICTIONARY"]: {
                 type: "regconfig",
             },
-            [sqlPrefix + id + "_VECTOR"]: {
+            [arg.prefix + arg.id + "_VECTOR"]: {
                 type: "tsvector",
                 index: {
                     type: "gin",
-                    id: "FTS_" + sqlPrefix + id,
+                    id: "FTS_" + arg.prefix + arg.id,
                     level: 0,
                 },
             },
         };
     },
-    sqlIn: (value, sqlPrefix, id, property, knex, dictionary) => {
-        if (value === null) {
+    sqlIn: (arg) => {
+        if (arg.value === null) {
             return {
-                [sqlPrefix + id]: null,
-                [sqlPrefix + id + "_VECTOR"]: null,
-                [sqlPrefix + id + "_DICTIONARY"]: dictionary,
+                [arg.prefix + arg.id]: null,
+                [arg.prefix + arg.id + "_VECTOR"]: null,
+                [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
             };
         }
-        let escapedText = value;
-        let purifiedText = value;
-        if (property.isRichText()) {
+        let escapedText = arg.value;
+        let purifiedText = arg.value;
+        if (arg.property.isRichText()) {
             const dummyElement = util_1.DOMWindow.document.createElement("div");
-            dummyElement.innerHTML = value.toString();
+            dummyElement.innerHTML = arg.value.toString();
             escapedText = dummyElement.textContent;
-            purifiedText = util_1.DOMPurify.sanitize(value.toString(), {
+            purifiedText = util_1.DOMPurify.sanitize(arg.value.toString(), {
                 ADD_TAGS: ["iframe"],
                 ADD_ATTR: ["frameborder", "allow", "allowfullscreen", "scrolling", "spellcheck", "contenteditable"],
                 FORBID_ATTR: ["sizes", "srcset", "src", "data-src"],
             });
         }
         return {
-            [id]: purifiedText,
-            [id + "_DICTIONARY"]: dictionary,
-            [id + "_VECTOR"]: knex.raw("to_tsvector(?, ?)", [
-                dictionary,
+            [arg.prefix + arg.id]: purifiedText,
+            [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
+            [arg.prefix + arg.id + "_VECTOR"]: arg.knex.raw("to_tsvector(?, ?)", [
+                arg.dictionary,
                 escapedText,
             ]),
         };
     },
     sqlOut: sql_1.standardSQLOutFn,
-    sqlSearch: (data, sqlPrefix, id, knexBuilder, dictionary, isOrderedbyIt) => {
-        const searchName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.SEARCH + id;
-        if (typeof data[searchName] !== "undefined" && data[searchName] !== null) {
+    sqlSearch: (arg) => {
+        const searchName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
+        if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
             // TODO improve, this only matches exact words
             // maybe https://github.com/zombodb/zombodb
-            knexBuilder.andWhereRaw("?? @@ to_tsquery(??, ?)", [
-                sqlPrefix + id + "_VECTOR",
-                sqlPrefix + id + "_DICTIONARY",
-                data[searchName],
+            arg.knexBuilder.andWhereRaw("?? @@ to_tsquery(??, ?)", [
+                arg.prefix + arg.id + "_VECTOR",
+                arg.prefix + arg.id + "_DICTIONARY",
+                arg.args[searchName],
             ]);
-            if (isOrderedbyIt) {
+            if (arg.isOrderedByIt) {
                 return [
                     "ts_rank(??, to_tsquery(??, ?)) AS ??",
                     [
-                        sqlPrefix + id + "_VECTOR",
-                        sqlPrefix + id + "_DICTIONARY",
-                        data[searchName],
-                        sqlPrefix + id + "_RANK",
+                        arg.prefix + arg.id + "_VECTOR",
+                        arg.prefix + arg.id + "_DICTIONARY",
+                        arg.args[searchName],
+                        arg.prefix + arg.id + "_RANK",
                     ]
                 ];
             }
@@ -110,24 +110,24 @@ const typeValue = {
         }
         return false;
     },
-    sqlStrSearch: (search, sqlPrefix, id, knexBuilder, dictionary, isOrderedbyIt) => {
+    sqlStrSearch: (arg) => {
         // TODO improve, this only matches exact words
         // maybe https://github.com/zombodb/zombodb
         // due to technical limitations with knex, sometimes the builder
         // isn't available
-        knexBuilder && knexBuilder.whereRaw("?? @@ to_tsquery(??, ?)", [
-            sqlPrefix + id + "_VECTOR",
-            sqlPrefix + id + "_DICTIONARY",
-            search,
+        arg.knexBuilder && arg.knexBuilder.whereRaw("?? @@ to_tsquery(??, ?)", [
+            arg.prefix + arg.id + "_VECTOR",
+            arg.prefix + arg.id + "_DICTIONARY",
+            arg.search,
         ]);
-        if (isOrderedbyIt) {
+        if (arg.isOrderedByIt) {
             return [
                 "ts_rank(??, to_tsquery(??, ?)) AS ??",
                 [
-                    sqlPrefix + id + "_VECTOR",
-                    sqlPrefix + id + "_DICTIONARY",
-                    search,
-                    sqlPrefix + id + "_STRRANK",
+                    arg.prefix + arg.id + "_VECTOR",
+                    arg.prefix + arg.id + "_DICTIONARY",
+                    arg.search,
+                    arg.prefix + arg.id + "_STRRANK",
                 ]
             ];
         }
@@ -135,20 +135,20 @@ const typeValue = {
     },
     sqlBtreeIndexable: () => null,
     sqlMantenience: null,
-    localSearch: (args, rawData, id, includeId) => {
+    localSearch: (arg) => {
         // item is deleted
-        if (!rawData) {
+        if (!arg.gqlValue) {
             return false;
         }
         // item is blocked
-        if (rawData.DATA === null) {
+        if (arg.gqlValue.DATA === null) {
             return false;
         }
-        const searchName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.SEARCH + id;
-        const usefulArgs = includeId ? args[constants_1.INCLUDE_PREFIX + includeId] || {} : args;
+        const searchName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.id;
+        const usefulArgs = arg.include ? arg.args[constants_1.INCLUDE_PREFIX + arg.include.getId()] || {} : arg.args;
         if (typeof usefulArgs[searchName] !== "undefined" && usefulArgs[searchName] !== null) {
             const searchMatch = usefulArgs[searchName];
-            const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+            const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
             if (propertyValue === null) {
                 return false;
             }
@@ -158,31 +158,31 @@ const typeValue = {
         }
         return true;
     },
-    localStrSearch: (search, rawData, id, includeId) => {
+    localStrSearch: (arg) => {
         // item is deleted
-        if (!rawData) {
+        if (!arg.gqlValue) {
             return false;
         }
         // item is blocked
-        if (rawData.DATA === null) {
+        if (arg.gqlValue.DATA === null) {
             return false;
         }
-        if (search) {
-            const propertyValue = includeId ? rawData.DATA[includeId][id] : rawData.DATA[id];
+        if (arg.search) {
+            const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
             // this is the simple FTS that you get in the client
-            return propertyValue.includes(search);
+            return propertyValue.includes(arg.search);
         }
         return true;
     },
     sqlEqual: sql_1.standardSQLEqualFn,
     sqlSSCacheEqual: local_sql_1.standardSQLSSCacheEqualFn,
     localEqual: local_sql_1.standardLocalEqual,
-    sqlOrderBy: (sqlPrefix, id, direction, nulls, wasIncludedInSearch, wasIncludedInStrSearch) => {
-        if (wasIncludedInSearch) {
-            return [sqlPrefix + id + "_RANK", direction, nulls];
+    sqlOrderBy: (arg) => {
+        if (arg.wasIncludedInSearch) {
+            return [arg.prefix + arg.id + "_RANK", arg.direction, arg.nulls];
         }
-        else if (wasIncludedInStrSearch) {
-            return [sqlPrefix + id + "_STRRANK", direction, nulls];
+        else if (arg.wasIncludedInStrSearch) {
+            return [arg.prefix + arg.id + "_STRRANK", arg.direction, arg.nulls];
         }
         return null;
     },

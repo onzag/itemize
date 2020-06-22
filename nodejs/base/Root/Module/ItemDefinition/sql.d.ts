@@ -20,7 +20,7 @@ import pkgcloud from "pkgcloud";
  * @param itemDefinition the item definition in question
  * @returns a complete table definition type
  */
-export declare function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefinition): ISQLTableDefinitionType;
+export declare function getSQLTableDefinitionForItemDefinition(knex: Knex, itemDefinition: ItemDefinition): ISQLTableDefinitionType;
 /**
  * Provides all the schema of all the items, self and its children
  * that are included within this item definition and all the table names
@@ -28,7 +28,7 @@ export declare function getSQLTableDefinitionForItemDefinition(itemDefinition: I
  * @param itemDefinition the item definition in question
  * @returns a partial sql schema definition for the whole database (adds tables)
  */
-export declare function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefinition): ISQLSchemaDefinitionType;
+export declare function getSQLTablesSchemaForItemDefinition(knex: Knex, itemDefinition: ItemDefinition): ISQLSchemaDefinitionType;
 /**
  * Converts a SQL value directly coming from the database as it is
  * to a graphql value for this specific item definition,
@@ -43,7 +43,7 @@ export declare function getSQLTablesSchemaForItemDefinition(itemDefinition: Item
  * eg {id: {}, name: {}, ITEM_kitten: {purrs: {}}}
  * @returns a graphql value
  */
-export declare function convertSQLValueToGQLValueForItemDefinition(itemDefinition: ItemDefinition, row: ISQLTableRowValue, graphqlFields?: IGQLRequestFields): IGQLValue;
+export declare function convertSQLValueToGQLValueForItemDefinition(knex: Knex, serverData: any, itemDefinition: ItemDefinition, row: ISQLTableRowValue, graphqlFields?: IGQLRequestFields): IGQLValue;
 /**
  * Converts a graphql value, with all its items and everything it
  * has into a SQL row data value for this specific item definition
@@ -62,7 +62,7 @@ export declare function convertSQLValueToGQLValueForItemDefinition(itemDefinitio
  * in a partial field value, don't use partial fields to create
  * @returns a sql value
  */
-export declare function convertGQLValueToSQLValueForItemDefinition(itemDefinition: ItemDefinition, data: IGQLArgs, oldData: IGQLValue, knex: Knex, uploadsContainer: pkgcloud.storage.Container, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): ISQLStreamComposedTableRowValue;
+export declare function convertGQLValueToSQLValueForItemDefinition(knex: Knex, serverData: any, itemDefinition: ItemDefinition, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): ISQLStreamComposedTableRowValue;
 /**
  * Builds a sql query for an item definition so that it can be
  * queried for searches
@@ -71,4 +71,4 @@ export declare function convertGQLValueToSQLValueForItemDefinition(itemDefinitio
  * @param knexBuilder the knex builder instance
  * @param dictionary the dictionary being used
  */
-export declare function buildSQLQueryForItemDefinition(itemDefinition: ItemDefinition, args: IGQLArgs, knexBuilder: Knex.QueryBuilder, dictionary: string, search: string, orderBy: IOrderByRuleType): [string, any[]][];
+export declare function buildSQLQueryForItemDefinition(knex: Knex, serverData: any, itemDefinition: ItemDefinition, args: IGQLArgs, knexBuilder: Knex.QueryBuilder, dictionary: string, search: string, orderBy: IOrderByRuleType): [string, any[]][];

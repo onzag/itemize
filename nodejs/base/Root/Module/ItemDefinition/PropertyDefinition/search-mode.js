@@ -264,6 +264,9 @@ function buildSearchModePropertyDefinitions(rawData, otherKnownProperties) {
         };
         // decorate the default property
         newPropDef.id = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.LOCATION + newPropDef.id;
+        if (newPropDef.i18nData) {
+            newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search"]);
+        }
     }
     // we return both if we have both
     if (newPropDef2) {

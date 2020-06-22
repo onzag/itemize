@@ -55,7 +55,7 @@ function nullIfUndefined(value) {
  * @param version the slot version
  * @returns a boolean on whether the index is right
  */
-async function clientSideIndexChecker(property, value, id, version) {
+async function clientSideIndexChecker(itemDefinition, include, property, value, id, version) {
     const mergedID = id + "." + (version || "");
     // null values automatically pass
     if (value === null) {
@@ -985,7 +985,7 @@ class PropertyDefinition {
         // if we have an index
         const hasIndex = this.isUnique();
         if (hasIndex) {
-            const isValidIndex = await PropertyDefinition.indexChecker(this, value, id, version);
+            const isValidIndex = await PropertyDefinition.indexChecker(this.parentItemDefinition, null, this, value, id, version);
             if (!isValidIndex) {
                 return PropertyInvalidReason.NOT_UNIQUE;
             }

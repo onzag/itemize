@@ -42,7 +42,7 @@ import pkgcloud from "pkgcloud";
  * @param itemDefinition the item definition in question
  * @returns a complete table definition type
  */
-export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefinition): ISQLTableDefinitionType {
+export function getSQLTableDefinitionForItemDefinition(knex: Knex, itemDefinition: ItemDefinition): ISQLTableDefinitionType {
   // add all the standard fields
   const tableToConnect = itemDefinition.getParentModule().getQualifiedPathName();
   const resultTableSchema: ISQLTableDefinitionType = {
@@ -76,7 +76,7 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
   itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
     Object.assign(
       resultTableSchema,
-      getSQLTableDefinitionForProperty(pd),
+      getSQLTableDefinitionForProperty(knex, itemDefinition, null, pd),
     );
   });
 
@@ -84,7 +84,7 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
   itemDefinition.getAllIncludes().forEach((i) => {
     Object.assign(
       resultTableSchema,
-      getSQLTableDefinitionForInclude(i),
+      getSQLTableDefinitionForInclude(knex, itemDefinition, i),
     );
   });
 
@@ -98,16 +98,16 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
  * @param itemDefinition the item definition in question
  * @returns a partial sql schema definition for the whole database (adds tables)
  */
-export function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefinition): ISQLSchemaDefinitionType {
+export function getSQLTablesSchemaForItemDefinition(knex: Knex, itemDefinition: ItemDefinition): ISQLSchemaDefinitionType {
   // we add self
   const result = {
-    [itemDefinition.getQualifiedPathName()]: getSQLTableDefinitionForItemDefinition(itemDefinition),
+    [itemDefinition.getQualifiedPathName()]: getSQLTableDefinitionForItemDefinition(knex, itemDefinition),
   };
   // loop over the children and add each one of them and whatever they have
   itemDefinition.getChildDefinitions().forEach((cIdef) => {
     Object.assign(
       result,
-      getSQLTablesSchemaForItemDefinition(cIdef),
+      getSQLTablesSchemaForItemDefinition(knex, cIdef),
     );
   });
   // return that
@@ -129,6 +129,8 @@ export function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefiniti
  * @returns a graphql value
  */
 export function convertSQLValueToGQLValueForItemDefinition(
+  knex: Knex,
+  serverData: any,
   itemDefinition: ItemDefinition,
   row: ISQLTableRowValue,
   graphqlFields?: IGQLRequestFields,
@@ -157,7 +159,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
   ).forEach((pd) => {
     Object.assign(
       result,
-      convertSQLValueToGQLValueForProperty(pd, row),
+      convertSQLValueToGQLValueForProperty(knex, serverData, itemDefinition, null, pd, row),
     );
   });
 
@@ -168,7 +170,12 @@ export function convertSQLValueToGQLValueForItemDefinition(
     Object.assign(
       result,
       convertSQLValueToGQLValueForInclude(
-        include, row, !graphqlFields ? null : graphqlFields[include.getQualifiedIdentifier()],
+        knex,
+        serverData,
+        itemDefinition,
+        include,
+        row,
+        !graphqlFields ? null : graphqlFields[include.getQualifiedIdentifier()],
       ),
     );
   });
@@ -195,10 +202,11 @@ export function convertSQLValueToGQLValueForItemDefinition(
  * @returns a sql value
  */
 export function convertGQLValueToSQLValueForItemDefinition(
+  knex: Knex,
+  serverData: any,
   itemDefinition: ItemDefinition,
   data: IGQLArgs,
   oldData: IGQLValue,
-  knex: Knex,
   uploadsContainer: pkgcloud.storage.Container,
   dictionary: string,
   partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
@@ -215,7 +223,15 @@ export function convertGQLValueToSQLValueForItemDefinition(
       !partialFields
     ) {
       const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
-        itemDefinition, null, pd, data, oldData, knex, uploadsContainer, dictionary, "",
+        knex,
+        serverData,
+        itemDefinition,
+        null,
+        pd,
+        data,
+        oldData,
+        uploadsContainer,
+        dictionary,
       );
       Object.assign(
         result,
@@ -236,7 +252,15 @@ export function convertGQLValueToSQLValueForItemDefinition(
     ) {
       const innerPartialFields = !partialFields ? null : partialFields[includeNameInPartialFields];
       const addedFieldsByInclude = convertGQLValueToSQLValueForInclude(
-        itemDefinition, include, data, oldData, knex, uploadsContainer, dictionary, innerPartialFields,
+        knex,
+        serverData,
+        itemDefinition,
+        include,
+        data,
+        oldData,
+        uploadsContainer,
+        dictionary,
+        innerPartialFields,
       );
       Object.assign(
         result,
@@ -263,6 +287,8 @@ export function convertGQLValueToSQLValueForItemDefinition(
  * @param dictionary the dictionary being used
  */
 export function buildSQLQueryForItemDefinition(
+  knex: Knex,
+  serverData: any,
   itemDefinition: ItemDefinition,
   args: IGQLArgs,
   knexBuilder: Knex.QueryBuilder,
@@ -281,7 +307,17 @@ export function buildSQLQueryForItemDefinition(
     }
 
     const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
-    const wasSearchedBy = buildSQLQueryForProperty(pd, args, "", knexBuilder, dictionary, isOrderedByIt);
+    const wasSearchedBy = buildSQLQueryForProperty(
+      knex,
+      serverData,
+      itemDefinition,
+      null,
+      pd,
+      args,
+      knexBuilder,
+      dictionary,
+      isOrderedByIt,
+    );
     if (wasSearchedBy) {
       if (Array.isArray(wasSearchedBy)) {
         addedSelectFields.push(wasSearchedBy);
@@ -292,7 +328,14 @@ export function buildSQLQueryForItemDefinition(
 
   // then we ned to add all the includes
   itemDefinition.getAllIncludes().forEach((include) => {
-    buildSQLQueryForInclude(include, args, knexBuilder, dictionary);
+    buildSQLQueryForInclude(knex,
+      serverData,
+      itemDefinition,
+      include,
+      args,
+      knexBuilder,
+      dictionary,
+    );
   });
 
   if (search) {
@@ -304,7 +347,18 @@ export function buildSQLQueryForItemDefinition(
       }
 
       const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
-      const wasStrSearchedBy = buildSQLStrSearchQueryForProperty(pd, args, search, "", null, dictionary, isOrderedByIt);
+      const wasStrSearchedBy = buildSQLStrSearchQueryForProperty(
+        knex,
+        serverData,
+        itemDefinition,
+        null,
+        pd,
+        args,
+        search,
+        null, // note knex builder being null
+        dictionary,
+        isOrderedByIt,
+      );
       if (wasStrSearchedBy) {
         if (Array.isArray(wasStrSearchedBy)) {
           addedSelectFields.push(wasStrSearchedBy);
@@ -312,6 +366,7 @@ export function buildSQLQueryForItemDefinition(
         includedInStrSearchProperties.push(pd.getId());
       };
     });
+
     // because these don't happen in the main, they don't get immediately executed but rather
     // during the await time
     knexBuilder.andWhere((builder) => {
@@ -322,7 +377,18 @@ export function buildSQLQueryForItemDefinition(
         }
         const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
         builder.orWhere((orBuilder) => {
-          buildSQLStrSearchQueryForProperty(pd, args, search, "", orBuilder, dictionary, isOrderedByIt);
+          buildSQLStrSearchQueryForProperty(
+            knex,
+            serverData,
+            itemDefinition,
+            null,
+            pd,
+            args,
+            search,
+            orBuilder,
+            dictionary,
+            isOrderedByIt,
+          );
         });
       });
     });
@@ -341,6 +407,8 @@ export function buildSQLQueryForItemDefinition(
     orderBySorted.forEach((pSet) => {
       if (!itemDefinition.hasPropertyDefinitionFor(pSet.property, true)) {
         buildSQLOrderByForInternalRequiredProperty(
+          knex,
+          itemDefinition,
           pSet.property,
           knexBuilder,
           pSet.direction,
@@ -354,8 +422,11 @@ export function buildSQLQueryForItemDefinition(
       const wasIncludedInStrSearch = includedInStrSearchProperties.includes(pSet.property);
 
       buildSQLOrderByForProperty(
+        knex,
+        serverData,
+        itemDefinition,
+        null,
         pd,
-        "",
         knexBuilder,
         pSet.direction,
         pSet.nulls,

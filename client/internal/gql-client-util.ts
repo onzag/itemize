@@ -166,10 +166,15 @@ export function getFieldsAndArgs(
         const currentValue = pd.getCurrentValue(options.forId || null, options.forVersion || null);
         if (options.differingPropertiesOnlyForArgs) {
           const appliedGQLValue = pd.getAppliedValue(options.forId || null, options.forVersion || null);
-          const isEqual = pd.getPropertyDefinitionDescription().localEqual(
-            appliedGQLValue,
-            currentValue,
-          );
+          const isEqual = pd.getPropertyDefinitionDescription().localEqual({
+            itemDefinition: options.itemDefinitionInstance,
+            property: pd,
+            include: null,
+            a: appliedGQLValue,
+            b: currentValue,
+            id: pd.getId(),
+            prefix: "",
+          });
           if (isEqual) {
             return;
           }
@@ -227,10 +232,15 @@ export function getFieldsAndArgs(
               options.forId || null, options.forVersion || null);
             if (options.differingIncludesOnlyForArgs) {
               const appliedGQLValue = sp.getAppliedValue(options.forId || null, options.forVersion || null);
-              const isEqual = sp.getPropertyDefinitionDescription().localEqual(
-                appliedGQLValue,
-                currentValue,
-              );
+              const isEqual = sp.getPropertyDefinitionDescription().localEqual({
+                itemDefinition: options.itemDefinitionInstance,
+                property: sp,
+                include,
+                a: appliedGQLValue,
+                b: currentValue,
+                id: sp.getId(),
+                prefix: include.getPrefixedQualifiedIdentifier(),
+              });
               if (isEqual) {
                 return;
               }

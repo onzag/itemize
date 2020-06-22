@@ -537,7 +537,17 @@ export default class PropertyEntryLocation
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.onRestoreHijacked,
-      canRestore: !this.props.property.getPropertyDefinitionDescription().localEqual(this.props.state.stateAppliedValue, this.props.state.value),
+      canRestore: !this.props.property.getPropertyDefinitionDescription().localEqual(
+        {
+          itemDefinition: this.props.itemDefinition, 
+          a: this.props.state.stateAppliedValue,
+          b: this.props.state.value,
+          id: this.props.property.getId(),
+          include: null,
+          prefix: "",
+          property: this.props.property,
+        }
+      ),
 
       onChangeBySearchResult: this.onChangeBySearchResult,
       onChangeBySuggestion: this.onChangeBySuggestion,

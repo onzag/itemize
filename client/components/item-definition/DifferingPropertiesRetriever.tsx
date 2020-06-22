@@ -17,10 +17,16 @@ export default function DifferingPropertiesRetriever(props: IDifferingProperties
           if (!propertyData) {
             return false;
           }
-          return !itemDefinitionContext.idef.getPropertyDefinitionFor(mainProperty, true).getPropertyDefinitionDescription().localEqual(
-            propertyData.stateAppliedValue,
-            propertyData.value,
-          );
+          const property = itemDefinitionContext.idef.getPropertyDefinitionFor(mainProperty, true);
+          return !itemDefinitionContext.idef.getPropertyDefinitionFor(mainProperty, true).getPropertyDefinitionDescription().localEqual({
+            itemDefinition: itemDefinitionContext.idef,
+            include: null,
+            property,
+            id: property.getId(),
+            prefix: "",
+            a: propertyData.stateAppliedValue,
+            b: propertyData.value,
+          });
         });
         return props.children(finalProperties);
       }

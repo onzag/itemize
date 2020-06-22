@@ -27,6 +27,8 @@ import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import Knex from "knex";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 import { PropertyDefinitionSupportedFileType } from "./file";
+import ItemDefinition from "../..";
+import Include from "../../Include";
 /**
  * All the supported property types
  */
@@ -45,6 +47,70 @@ export declare type PropertyDefinitionSupportedTypeName = "boolean" | // A simpl
 "location" | // Represented as an object, non comparable, stored
 "file" | // Represents a single url
 "files";
+export interface IArgInfo {
+    id: string;
+    prefix: string;
+    property: PropertyDefinition;
+    itemDefinition: ItemDefinition;
+    include?: Include;
+}
+export interface ISQLArgInfo extends IArgInfo {
+    knex: Knex;
+    serverData: any;
+}
+export interface ISQLInInfo extends ISQLArgInfo {
+    value: PropertyDefinitionSupportedType;
+    dictionary: string;
+}
+export interface ISQLOutInfo extends ISQLArgInfo {
+    row: ISQLTableRowValue;
+}
+export interface ISQLSearchInfo extends ISQLArgInfo {
+    dictionary: string;
+    knexBuilder: Knex.QueryBuilder;
+    args: IGQLArgs;
+    isOrderedByIt: boolean;
+}
+export interface ISQLStrSearchInfo extends ISQLArgInfo {
+    dictionary: string;
+    knexBuilder: Knex.QueryBuilder;
+    search: string;
+    isOrderedByIt: boolean;
+}
+export interface ISQLEqualInfo extends ISQLArgInfo {
+    value: PropertyDefinitionSupportedType;
+    ignoreCase: boolean;
+}
+export interface ISQLSSCacheEqualInfo extends ISQLArgInfo {
+    value: PropertyDefinitionSupportedType;
+    row: ISQLTableRowValue;
+}
+export interface ISQLOrderByInfo extends ISQLArgInfo {
+    direction: "asc" | "desc";
+    nulls: "first" | "last";
+    wasIncludedInSearch: boolean;
+    wasIncludedInStrSearch: boolean;
+}
+export interface ISQLBtreeIndexableInfo extends ISQLArgInfo {
+}
+export interface ILocalSearchInfo extends IArgInfo {
+    args: IGQLArgs;
+    gqlValue: IGQLValue;
+}
+export interface ILocalStrSearchInfo extends IArgInfo {
+    search: string;
+    gqlValue: IGQLValue;
+}
+export interface ILocalEqualInfo extends IArgInfo {
+    a: PropertyDefinitionSupportedType;
+    b: PropertyDefinitionSupportedType;
+}
+export interface ILocalOrderByInfo extends IArgInfo {
+    direction: "asc" | "desc";
+    nulls: "first" | "last";
+    a: PropertyDefinitionSupportedType;
+    b: PropertyDefinitionSupportedType;
+}
 /**
  * How every supported type behaviour should be described
  */
@@ -90,20 +156,20 @@ export interface IPropertyDefinitionSupportedType {
      * however if it's a complex value you might need to set the row
      * names and their types by hand
      */
-    sql: ((sqlPrefix: string, id: string, property: PropertyDefinition) => ISQLTableDefinitionType);
+    sql: (arg: ISQLArgInfo) => ISQLTableDefinitionType;
     /**
      * specifies how data is stored, by default it just sets the row value
      * to whatever is given, however if you have a complex value you should
      * set this, the raw function is the raw knex function, that allows to build raw queries,
      * by default if not set this function just sets {property_id: value}
      */
-    sqlIn: (value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, property: PropertyDefinition, knex: Knex, dictionary: string) => ISQLTableRowValue;
+    sqlIn: (arg: ISQLInInfo) => ISQLTableRowValue;
     /**
      * sqlOut basically gives the entire table as data, and the property id where it expects
      * retrieval of that data; by default this function takes the table and does
      * data[property_id]
      */
-    sqlOut: (row: ISQLTableRowValue, sqlPrefix: string, id: string, property: PropertyDefinition) => PropertyDefinitionSupportedType;
+    sqlOut: (arg: ISQLOutInfo) => PropertyDefinitionSupportedType;
     /**
      * Represents a search for an item
      * data is the graphql value obtained from the search query mode item definition
@@ -115,7 +181,7 @@ export interface IPropertyDefinitionSupportedType {
      * you might also return an array instead of true for adding custom rows to be added
      * to the selection, these represent arguments for knex.raw for a select query
      */
-    sqlSearch: (args: IGQLArgs, sqlPrefix: string, id: string, knexBuilder: Knex.QueryBuilder, dictionary: string, isOrderedByIt: boolean) => boolean | [string, any[]];
+    sqlSearch: (arg: ISQLSearchInfo) => boolean | [string, any[]];
     /**
      * Represents a search for an item when the only input has been a string, make it null
      * to avoid supporting it
@@ -124,62 +190,62 @@ export interface IPropertyDefinitionSupportedType {
      * the select query beforehand
      * return a boolean on whether it searched by it or it didn't
      */
-    sqlStrSearch: (search: string, sqlPrefix: string, id: string, knexBuilder: Knex.QueryBuilder, dictionary: string, isOrderedByIt: boolean) => boolean | [string, any[]];
+    sqlStrSearch: (arg: ISQLStrSearchInfo) => boolean | [string, any[]];
     /**
      * Provides the rows that are expected to be indexed and in the order that they are expected
      * when an index is added via a request limiter in the module
      */
-    sqlBtreeIndexable: (sqlPrefix: string, id: string) => string[];
+    sqlBtreeIndexable: (arg: ISQLBtreeIndexableInfo) => string[];
     /**
      * represents a local search checkup performed locally with a graphql value
      * raw (that is with DATA) the property id and the include id, the args are
      * the same
      */
-    localSearch: (args: IGQLArgs, rawData: IGQLValue, id: string, includeId?: string) => boolean;
+    localSearch: (arg: ILocalSearchInfo) => boolean;
     /**
      * represents a local search but done using the single search value instead rather
      * than the entire value to match against, make it null to avoid supporting it
      */
-    localStrSearch: (search: string, rawData: IGQLValue, id: string, includeId?: string) => boolean;
+    localStrSearch: (arg: ILocalStrSearchInfo) => boolean;
     /**
      * Represents a check for equality of a property against another
      * same with the sql prefix as the search
      * same for the id, and knex is just the knex instance, not a builder
      * and an optional column name so that it can be used as select as
      */
-    sqlEqual: (value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, ignoreCase: boolean, knex: Knex, columnName?: string) => any;
+    sqlEqual: (arg: ISQLEqualInfo) => any;
     /**
      * A server side ran cached equal, ran during cache checks very useful for checking
      * against policies during policy checks and other forms of checks
      * with raw database data
      */
-    sqlSSCacheEqual: (value: PropertyDefinitionSupportedType, sqlPrefix: string, id: string, data: ISQLTableRowValue) => boolean;
+    sqlSSCacheEqual: (arg: ISQLSSCacheEqualInfo) => boolean;
     /**
      * Simply compare two values of the same type, this
      * is used for differing properties so it might differ
      * from the sql behaviour
      */
-    localEqual: (a: PropertyDefinitionSupportedType, b: PropertyDefinitionSupportedType) => boolean;
+    localEqual: (arg: ILocalEqualInfo) => boolean;
     /**
      * The SQL order by function that tells the database how to order
      * by certain criteria, make it null to specify that this item can't
      * be ordered by, attempts to order by it will give an error
      */
-    sqlOrderBy: (sqlPrefix: string, id: string, direction: "asc" | "desc", nulls: "first" | "last", wasIncludedInSearch: boolean, wasIncludedInStrSearch: boolean) => [string, string, string];
+    sqlOrderBy: (arg: ISQLOrderByInfo) => [string, string, string];
     /**
      * The local order by function that tells a client how to order by it
      * basically this is fed to a sort function the same way sorting would
      * work locally, except a direction is specified, make it null to specify
      * the item can't be sorted by
      */
-    localOrderBy: (direction: "asc" | "desc", nulls: "first" | "last", a: PropertyDefinitionSupportedType, b: PropertyDefinitionSupportedType) => number;
+    localOrderBy: (arg: ILocalOrderByInfo) => number;
     /**
      * SQL Row mantenience which runs every so often as defined
      * by the mantenience protocol where row is the entire row
      * and it expects a partial value, this value should be null
      * for fields without mantenience
      */
-    sqlMantenience: (sqlPrefix: string, id: string, knex: Knex) => {
+    sqlMantenience: (arg: ISQLArgInfo) => {
         columnToSet: string;
         setColumnToRaw: Knex.Raw;
         from: string;

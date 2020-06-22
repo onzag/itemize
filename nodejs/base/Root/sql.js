@@ -15,7 +15,7 @@ const constants_1 = require("../../constants");
  * @param root The root in question
  * @returns a total database schema
  */
-function getSQLTablesSchemaForRoot(root) {
+function getSQLTablesSchemaForRoot(knex, root) {
     let resultSchema = {
         [constants_1.CURRENCY_FACTORS_IDENTIFIER]: {
             code: {
@@ -33,7 +33,7 @@ function getSQLTablesSchemaForRoot(root) {
     };
     root.getAllModules().forEach((cModule) => {
         // add together the schemas of all the modules
-        resultSchema = { ...resultSchema, ...sql_1.getSQLTablesSchemaForModule(cModule) };
+        resultSchema = { ...resultSchema, ...sql_1.getSQLTablesSchemaForModule(knex, cModule) };
     });
     // return that
     return resultSchema;

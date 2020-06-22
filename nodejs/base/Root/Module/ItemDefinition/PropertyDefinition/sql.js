@@ -18,60 +18,56 @@ const constants_1 = require("../../../../../constants");
  */
 function getStandardSQLFnFor(type, ext = null, indexCalculator) {
     // so we return the function
-    return (sqlPrefix, id, property) => {
-        const subtype = property.getSubtype();
+    return (arg) => {
+        const subtype = arg.property.getSubtype();
         return {
             // the sql prefix defined plus the id, eg for includes
-            [sqlPrefix + id]: {
+            [arg.prefix + arg.id]: {
                 // the type is defined
                 type,
                 // and we add an unique index if this property is deemed unique
-                index: property.isUnique() ? {
+                index: arg.property.isUnique() ? {
                     type: "unique",
-                    id: constants_1.SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
+                    id: constants_1.SQL_CONSTRAINT_PREFIX + arg.prefix + arg.id,
                     level: 0,
-                } : (indexCalculator ? indexCalculator(subtype, sqlPrefix, id) : null),
+                } : (indexCalculator ? indexCalculator(subtype, arg.prefix, arg.id) : null),
                 ext,
             },
         };
     };
 }
 exports.getStandardSQLFnFor = getStandardSQLFnFor;
-function standardSQLOrderBy(sqlPrefix, id, direction, nulls) {
-    return [sqlPrefix + id, direction, nulls];
+function standardSQLOrderBy(arg) {
+    return [arg.prefix + arg.id, arg.direction, arg.nulls];
 }
 exports.standardSQLOrderBy = standardSQLOrderBy;
 /**
  * The standard sql in function that specifies how a property inputs its value
  * into a table
- * @param value the value of the property
- * @param sqlPrefix the sql prefix, eg. for Includes
- * @param id the id of the property
+ * @param arg the in arg
  * @returns the partial row value
  */
-function stardardSQLInFn(value, sqlPrefix, id) {
+function stardardSQLInFn(arg) {
     // as simple as this
     return {
-        [sqlPrefix + id]: value,
+        [arg.prefix + arg.id]: arg.value,
     };
 }
 exports.stardardSQLInFn = stardardSQLInFn;
 /**
  * The standard sql in function that inputs its value but
  * uses JSON stringify as a serialization tool
- * @param value the value of the property
- * @param sqlPrefix the sql prefix, eg. for Includes
- * @param id the id of the property
+ * @param arg the in arg
  * @returns the partial row value
  */
-function stardardSQLInWithJSONStringifyFn(value, sqlPrefix, id) {
-    if (value === null) {
+function stardardSQLInWithJSONStringifyFn(arg) {
+    if (arg.value === null) {
         return {
-            [sqlPrefix + id]: null,
+            [arg.prefix + arg.id]: null,
         };
     }
     return {
-        [sqlPrefix + id]: JSON.stringify(value),
+        [arg.prefix + arg.id]: JSON.stringify(arg.value),
     };
 }
 exports.stardardSQLInWithJSONStringifyFn = stardardSQLInWithJSONStringifyFn;
@@ -79,28 +75,23 @@ exports.stardardSQLInWithJSONStringifyFn = stardardSQLInWithJSONStringifyFn;
  * The standard sql out function that defines
  * how a value for a property is extracted from a given
  * row
- * @param row the entire row value
- * @param sqlPrefix the sql prefix eg. for Includes
- * @param id the property id
+ * @param arg the out arg info
  * @returns the property value out
  */
-function standardSQLOutFn(row, sqlPrefix, id) {
-    return row[sqlPrefix + id];
+function standardSQLOutFn(arg) {
+    return arg.row[arg.prefix + arg.id];
 }
 exports.standardSQLOutFn = standardSQLOutFn;
 /**
  * The standard sql out function that deserializes values
  * as they are expected to be stored serialized
- * @param row the entire row value
- * @param sqlPrefix the sql prefix eg. for Includes
- * @param id the property id
  */
-function standardSQLOutWithJSONParseFn(row, sqlPrefix, id) {
-    if (row[sqlPrefix + id] === null) {
+function standardSQLOutWithJSONParseFn(arg) {
+    if (arg.row[arg.prefix + arg.id] === null) {
         return null;
     }
     try {
-        return JSON.parse(row[sqlPrefix + id]);
+        return JSON.parse(arg.row[arg.prefix + arg.id]);
     }
     catch {
         return null;
@@ -109,26 +100,22 @@ function standardSQLOutWithJSONParseFn(row, sqlPrefix, id) {
 exports.standardSQLOutWithJSONParseFn = standardSQLOutWithJSONParseFn;
 /**
  * The standard function that build queries for the property
- * @param args the partial args (if within an include, these are the args within the include)
- * @param sqlPrefix the sql prefix
- * @param id the id of the property
- * @param knexBuilder the query that is being stiched together
  */
-function standardSQLSearchFnExactAndRange(args, sqlPrefix, id, knexBuilder) {
-    const fromName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
-    const toName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.TO + id;
-    const exactName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+function standardSQLSearchFnExactAndRange(arg) {
+    const fromName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
+    const toName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
+    const exactName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
     let searchedByIt = false;
-    if (typeof args[exactName] !== "undefined") {
-        knexBuilder.andWhere(sqlPrefix + id, args[exactName]);
+    if (typeof arg.args[exactName] !== "undefined") {
+        arg.knexBuilder.andWhere(arg.prefix + arg.id, arg.args[exactName]);
         searchedByIt = true;
     }
-    if (typeof args[fromName] !== "undefined" && args[fromName] !== null) {
-        knexBuilder.andWhere(sqlPrefix + id, ">=", args[fromName]);
+    if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
+        arg.knexBuilder.andWhere(arg.prefix + arg.id, ">=", arg.args[fromName]);
         searchedByIt = true;
     }
-    if (typeof args[toName] !== "undefined" && args[toName] !== null) {
-        knexBuilder.andWhere(sqlPrefix + id, "<=", args[toName]);
+    if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
+        arg.knexBuilder.andWhere(arg.prefix + arg.id, "<=", arg.args[toName]);
         searchedByIt = true;
     }
     return searchedByIt;
@@ -136,72 +123,65 @@ function standardSQLSearchFnExactAndRange(args, sqlPrefix, id, knexBuilder) {
 exports.standardSQLSearchFnExactAndRange = standardSQLSearchFnExactAndRange;
 /**
  * The standard function that perfoms equality checks within the database
- * @param value the value of the property
- * @param sqlPrefix the sql prefix used
- * @param id the id of the property
- * @param isCaseInsensitive whether the check is done in a case insensitive way
- * @param knex knex itself
- * @param columnName an optional column name to name this equality check as
  * @returns a knex valid search or select query object
  */
-function standardSQLEqualFn(value, sqlPrefix, id, isCaseInsensitive, knex, columnName) {
-    if (isCaseInsensitive) {
-        if (!columnName) {
-            return knex.raw("LOWER(??) = LOWER(?)", [
-                sqlPrefix + id,
-                value,
-            ]);
-        }
-        return knex.raw("LOWER(??) = LOWER(?) AS ??", [
-            sqlPrefix + id,
-            value,
-            columnName,
+function standardSQLEqualFn(arg) {
+    if (arg.ignoreCase) {
+        return arg.knex.raw("LOWER(??) = LOWER(?)", [
+            arg.prefix + arg.id,
+            arg.value,
         ]);
     }
-    if (!columnName) {
-        return {
-            [sqlPrefix + id]: value,
-        };
-    }
-    return knex.raw("?? = ? AS ??", [
-        sqlPrefix + id,
-        value,
-        columnName,
-    ]);
+    return {
+        [arg.prefix + arg.id]: arg.value,
+    };
 }
 exports.standardSQLEqualFn = standardSQLEqualFn;
-function standardSQLBtreeIndexable(sqlPrefix, id) {
-    return [sqlPrefix + id];
+function standardSQLBtreeIndexable(arg) {
+    return [arg.prefix, arg.id];
 }
 exports.standardSQLBtreeIndexable = standardSQLBtreeIndexable;
 /**
  * Provides the table bit that is necessary to include this property and
  * this property alone, that is a table bit
+ * @param knex the knex instance
+ * @param itemDefinition the item definition that contains the property
+ * @param include the include within the item definition, or null
  * @param propertyDefinition the property definition in question
  * @param prefix a prefix to prefix the table row names, this is
  * used to prefix item specific properties that are sinked in from
  * the parent in the item
  * @returns the partial sql table definition for the property
  */
-function getSQLTableDefinitionForProperty(propertyDefinition, prefix) {
-    const actualPrefix = prefix ? prefix : "";
+function getSQLTableDefinitionForProperty(knex, itemDefinition, include, propertyDefinition) {
     // get the sql def based on the property definition
     const sqlDef = propertyDefinition.getPropertyDefinitionDescription().sql;
     // let's get it based on the function it is
-    return sqlDef(actualPrefix, propertyDefinition.getId(), propertyDefinition);
+    return sqlDef({
+        prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+        id: propertyDefinition.getId(),
+        property: propertyDefinition,
+        knex,
+        itemDefinition,
+        include,
+        // server data unavailable
+        serverData: null,
+    });
 }
 exports.getSQLTableDefinitionForProperty = getSQLTableDefinitionForProperty;
 /**
  * Takes row data information that is in the SQL form and converts
  * it into a graphql form, only for this specific property
+ * @param knex the knex instance
+ * @param serverData the server data
+ * @param itemDefinition the item definition that contains the property
+ * @param include the include within the item definition, or null
  * @param propertyDefinition the property definition in question
  * @param row the row that we want to extract information from
  * @param prefix the prefix, if the information happens to be prefixed
  * @returns the graphql value for the property
  */
-function convertSQLValueToGQLValueForProperty(propertyDefinition, row, prefix) {
-    // we get an actual prefix, because it's an optional attribute
-    const actualPrefix = prefix ? prefix : "";
+function convertSQLValueToGQLValueForProperty(knex, serverData, itemDefinition, include, propertyDefinition, row) {
     // we get the column name we are supposed to extract the data
     // from, usually properties in sql are stored as their raw id, eg.
     // "distance", "size", etc... but they might be prefixed
@@ -217,7 +197,16 @@ function convertSQLValueToGQLValueForProperty(propertyDefinition, row, prefix) {
     // need 2 rows to store the field data, the currency, and the value
     // eg. ITEM_wheel_price might become ITEM_wheel_price_CURRENCY and ITEM_wheel_price_VALUE
     // which will in turn once extracted with sqlOut become {currency: ..., value: ...}
-    let colValue = sqlOut(row, actualPrefix, propertyDefinition.getId(), this);
+    let colValue = sqlOut({
+        row,
+        prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+        knex,
+        serverData,
+        itemDefinition,
+        include,
+        property: propertyDefinition,
+        id: propertyDefinition.getId(),
+    });
     // we check for null coersion, while this shouldn't really
     // happen, because it should have never saved nulls in the
     // database to begin with, we might have such a case where
@@ -242,18 +231,20 @@ exports.convertSQLValueToGQLValueForProperty = convertSQLValueToGQLValueForPrope
 /**
  * Converts a graphql value into a sql value, that is graphql data into row
  * data to be immediately added to the database as it is
- * @param itemDefinition the item definition in question
- * @param include an include if exist where the property resides
+ * @param knex the knex instance
+ * @param serverData the server data
+ * @param itemDefinition the item definition that contains the property
+ * @param include the include within the item definition, or null
+ * @param propertyDefinition the property definition in question
  * @param propertyDefinition the property definition in question
  * @param data the graphql data
+ * @param oldData the old graphql data
  * @param knex the knex instance
  * @param dictionary the dictionary to use in full text search mode
- * @param prefix the prefix, if we need the SQL values to be prefixed, usually
- * used within items, because item properties need to be prefixed
  * @returns a promise with the partial sql row value to be inputted, note
  * that this is a promise because data streams need to be processed
  */
-function convertGQLValueToSQLValueForProperty(itemDefinition, include, propertyDefinition, data, oldData, knex, uploadsContainer, dictionary, prefix) {
+function convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition, include, propertyDefinition, data, oldData, uploadsContainer, dictionary) {
     // and this is the value of the property, again, properties
     // are not prefixed, they are either in their own object
     // or in the root
@@ -292,7 +283,17 @@ function convertGQLValueToSQLValueForProperty(itemDefinition, include, propertyD
     const sqlIn = propertyDefinition.getPropertyDefinitionDescription().sqlIn;
     // we return as it is
     return {
-        value: sqlIn(gqlPropertyValue, prefix, propertyDefinition.getId(), propertyDefinition, knex, dictionary),
+        value: sqlIn({
+            value: gqlPropertyValue,
+            prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+            knex,
+            serverData,
+            itemDefinition,
+            include,
+            property: propertyDefinition,
+            id: propertyDefinition.getId(),
+            dictionary,
+        }),
         consumeStreams,
     };
 }
@@ -300,20 +301,46 @@ exports.convertGQLValueToSQLValueForProperty = convertGQLValueToSQLValueForPrope
 /**
  * Builds a sql search query from a given property definition, the data
  * coming from the search module, a sql prefix to use, and the knex builder
+ * @param knex the knex instance
+ * @param serverData the server data
+ * @param itemDefinition the item definition that contains the property
+ * @param include the include within the item definition, or null
  * @param propertyDefinition the property definition in question
  * @param args the args coming from the search module in such format
- * @param sqlPrefix a sql prefix to append say if we refer to an item
  * @param knexBuilder the knex building instance
+ * @param isOrderedByIt whether there will be a subsequent order by request
  */
-function buildSQLQueryForProperty(propertyDefinition, args, sqlPrefix, knexBuilder, dictionary, isOrderedByIt) {
+function buildSQLQueryForProperty(knex, serverData, itemDefinition, include, propertyDefinition, args, knexBuilder, dictionary, isOrderedByIt) {
     const sqlSearchFn = propertyDefinition.getPropertyDefinitionDescription().sqlSearch;
-    return sqlSearchFn(args, sqlPrefix, propertyDefinition.getId(), knexBuilder, dictionary, isOrderedByIt);
+    return sqlSearchFn({
+        knex,
+        serverData,
+        itemDefinition,
+        args,
+        prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+        id: propertyDefinition.getId(),
+        knexBuilder,
+        dictionary,
+        isOrderedByIt,
+        property: propertyDefinition,
+    });
 }
 exports.buildSQLQueryForProperty = buildSQLQueryForProperty;
-function buildSQLStrSearchQueryForProperty(propertyDefinition, args, search, sqlPrefix, knexBuilder, dictionary, isOrderedByIt) {
+function buildSQLStrSearchQueryForProperty(knex, serverData, itemDefinition, include, propertyDefinition, args, search, knexBuilder, dictionary, isOrderedByIt) {
     const sqlStrSearchFn = propertyDefinition.getPropertyDefinitionDescription().sqlStrSearch;
     if (sqlStrSearchFn) {
-        return sqlStrSearchFn(search, sqlPrefix, propertyDefinition.getId(), knexBuilder, dictionary, isOrderedByIt);
+        return sqlStrSearchFn({
+            knex,
+            serverData,
+            itemDefinition,
+            search,
+            prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+            id: propertyDefinition.getId(),
+            knexBuilder,
+            dictionary,
+            isOrderedByIt,
+            property: propertyDefinition,
+        });
     }
     return false;
 }
@@ -328,18 +355,42 @@ const actualNulls = {
     "first": "FIRST",
     "last": "LAST",
 };
-function buildSQLOrderByForProperty(propertyDefinition, sqlPrefix, knexBuilder, direction, nulls, wasIncludedInSearch, wasIncludedInStrSearch) {
+function buildSQLOrderByForProperty(knex, serverData, itemDefinition, include, propertyDefinition, knexBuilder, direction, nulls, wasIncludedInSearch, wasIncludedInStrSearch) {
     const sqlOrderByFn = propertyDefinition.getPropertyDefinitionDescription().sqlOrderBy;
     if (sqlOrderByFn) {
-        const result = sqlOrderByFn(sqlPrefix, propertyDefinition.getId(), direction, nulls, wasIncludedInSearch, wasIncludedInStrSearch);
+        const result = sqlOrderByFn({
+            knex,
+            serverData,
+            itemDefinition,
+            include,
+            property: propertyDefinition,
+            id: propertyDefinition.getId(),
+            prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+            direction,
+            nulls,
+            wasIncludedInSearch,
+            wasIncludedInStrSearch,
+        });
         if (result) {
             knexBuilder.orderByRaw(`?? ${actualDirection[result[1].toLowerCase()] || "ASC"} NULLS ${actualNulls[result[2].toLowerCase()] || "LAST"}`, [result[0]]);
         }
     }
 }
 exports.buildSQLOrderByForProperty = buildSQLOrderByForProperty;
-function buildSQLOrderByForInternalRequiredProperty(which, knexBuilder, direction, nulls) {
-    const result = standardSQLOrderBy("", which, direction, nulls);
+function buildSQLOrderByForInternalRequiredProperty(knex, itemDefinition, which, knexBuilder, direction, nulls) {
+    const result = standardSQLOrderBy({
+        prefix: "",
+        id: which,
+        property: null,
+        include: null,
+        itemDefinition,
+        direction,
+        nulls,
+        wasIncludedInSearch: null,
+        wasIncludedInStrSearch: null,
+        knex,
+        serverData: null,
+    });
     if (result) {
         knexBuilder.orderByRaw(`?? ${actualDirection[result[1].toLowerCase()] || "ASC"} NULLS ${actualNulls[result[2].toLowerCase()] || "LAST"}`, [result[0]]);
     }

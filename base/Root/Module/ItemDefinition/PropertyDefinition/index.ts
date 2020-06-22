@@ -24,6 +24,7 @@ import { EndpointError } from "../../../../errors";
 import { DOMWindow } from "../../../../../util";
 import equals from "deep-equal";
 import { IGQLFile, IGQLRequestFields } from "../../../../../gql-querier";
+import Include from "../Include";
 
 /**
  * These are the main errors a property is able to give
@@ -341,6 +342,8 @@ export type PropertyDefinitionValueType =
  */
 export type PropertyDefinitionCheckerFunctionType =
   (
+    itemDefinition: ItemDefinition,
+    include: Include,
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
     id: number,
@@ -357,6 +360,8 @@ export type PropertyDefinitionCheckerFunctionType =
  * @returns a boolean on whether the index is right
  */
 async function clientSideIndexChecker(
+  itemDefinition: ItemDefinition,
+  include: Include,
   property: PropertyDefinition,
   value: PropertyDefinitionSupportedType,
   id: number,
@@ -1613,7 +1618,7 @@ export default class PropertyDefinition {
     // if we have an index
     const hasIndex = this.isUnique();
     if (hasIndex) {
-      const isValidIndex = await PropertyDefinition.indexChecker(this, value, id, version);
+      const isValidIndex = await PropertyDefinition.indexChecker(this.parentItemDefinition, null, this, value, id, version);
       if (!isValidIndex) {
         return PropertyInvalidReason.NOT_UNIQUE;
       }

@@ -10,6 +10,9 @@ import { PropertyDefinitionSupportedType } from "./types";
 import PropertyDefinition from "../PropertyDefinition";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../../../../../constants";
 import Knex from "knex";
+import ItemDefinition from "..";
+import Include from "../Include";
+import { IAppDataType } from "../../../../../server";
 
 /**
  * The server side index checker checks for unique indexes within properties
@@ -21,7 +24,9 @@ import Knex from "knex";
  * @returns a boolean on whether the unique index is valid
  */
 export async function serverSideIndexChecker(
-  knex: Knex,
+  appData: IAppDataType,
+  itemDefinition: ItemDefinition,
+  include: Include,
   property: PropertyDefinition,
   value: PropertyDefinitionSupportedType,
   id: number,
@@ -45,11 +50,21 @@ export async function serverSideIndexChecker(
   const isCaseInsensitive = property.isNonCaseSensitiveUnique();
 
   // now the query
-  const query = knex.select(
+  const query = appData.knex.select(
     moduleIDColumn,
     moduleVersionColumn,
   ).from(qualifiedParentName).where(
-    property.getPropertyDefinitionDescription().sqlEqual(value, "", property.getId(), isCaseInsensitive, knex),
+    property.getPropertyDefinitionDescription().sqlEqual({
+      knex: appData.knex,
+      serverData: appData.cache.getServerData(),
+      value,
+      ignoreCase: isCaseInsensitive,
+      id: property.getId(),
+      include,
+      itemDefinition,
+      prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+      property,
+    }),
   );
 
   // if the id is not null, it might be null to do whole check

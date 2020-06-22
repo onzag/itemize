@@ -56,6 +56,7 @@ export async function getItemDefinition(
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: requestedFields,
       cache: appData.cache,
+      knex: appData.knex,
       preValidation: (content: ISQLTableRowValue) => {
         // if there is no content, we force the entire policy check not to
         // be performed and return null
@@ -133,6 +134,8 @@ export async function getItemDefinition(
   
 
   const valueToProvide = filterAndPrepareGQLValue(
+    appData.knex,
+    appData.cache.getServerData(),
     selectQueryValue,
     requestedFields,
     tokenData.role,
@@ -241,7 +244,14 @@ export async function getItemDefinitionList(
           code: ENDPOINT_ERRORS.UNSPECIFIED,
         });
       }
-      return filterAndPrepareGQLValue(value, requestedFields, tokenData.role, itemDefinition).toReturnToUser;
+      return filterAndPrepareGQLValue(
+        appData.knex,
+        appData.cache.getServerData(),
+        value,
+        requestedFields,
+        tokenData.role,
+        itemDefinition,
+      ).toReturnToUser;
     },
   );
 
@@ -320,7 +330,14 @@ export async function getModuleList(
           code: ENDPOINT_ERRORS.UNSPECIFIED,
         });
       }
-      return filterAndPrepareGQLValue(value, requestedFields, tokenData.role, mod).toReturnToUser;
+      return filterAndPrepareGQLValue(
+        appData.knex,
+        appData.cache.getServerData(),
+        value,
+        requestedFields,
+        tokenData.role,
+        mod,
+      ).toReturnToUser;
     },
   );
 

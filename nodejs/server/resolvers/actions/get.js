@@ -33,6 +33,7 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
         gqlArgValue: resolverArgs.args,
         gqlFlattenedRequestedFiels: requestedFields,
         cache: appData.cache,
+        knex: appData.knex,
         preValidation: (content) => {
             // if there is no content, we force the entire policy check not to
             // be performed and return null
@@ -76,7 +77,7 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
     itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, userId, requestedFieldsInIdef, true);
     __1.logger.debug("getItemDefinition: SQL ouput retrieved");
     __1.logger.silly("getItemDefinition: value is", selectQueryValue);
-    const valueToProvide = basic_1.filterAndPrepareGQLValue(selectQueryValue, requestedFields, tokenData.role, itemDefinition);
+    const valueToProvide = basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), selectQueryValue, requestedFields, tokenData.role, itemDefinition);
     __1.logger.debug("getItemDefinition: GQL ouput retrieved");
     __1.logger.silly("getItemDefinition: value is", valueToProvide.toReturnToUser);
     // return if otherwise succeeds
@@ -138,7 +139,7 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
                 code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
             });
         }
-        return basic_1.filterAndPrepareGQLValue(value, requestedFields, tokenData.role, itemDefinition).toReturnToUser;
+        return basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), value, requestedFields, tokenData.role, itemDefinition).toReturnToUser;
     });
     const resultAsObject = {
         results: finalValues,
@@ -187,7 +188,7 @@ async function getModuleList(appData, resolverArgs, mod) {
                 code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
             });
         }
-        return basic_1.filterAndPrepareGQLValue(value, requestedFields, tokenData.role, mod).toReturnToUser;
+        return basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), value, requestedFields, tokenData.role, mod).toReturnToUser;
     });
     const resultAsObject = {
         results: finalValues,

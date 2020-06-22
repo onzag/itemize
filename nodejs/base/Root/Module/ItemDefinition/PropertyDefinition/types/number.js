@@ -30,20 +30,20 @@ const typeValue = {
     sqlStrSearch: null,
     localStrSearch: null,
     sqlOrderBy: sql_1.standardSQLOrderBy,
-    localOrderBy: (direction, nulls, a, b) => {
-        if (a === null && b === null) {
+    localOrderBy: (arg) => {
+        if (arg.a === null && arg.b === null) {
             return 0;
         }
-        else if (a === null) {
-            return nulls === "last" ? 1 : -1;
+        else if (arg.a === null) {
+            return arg.nulls === "last" ? 1 : -1;
         }
-        else if (b === null) {
-            return nulls === "last" ? -1 : 1;
+        else if (arg.b === null) {
+            return arg.nulls === "last" ? -1 : 1;
         }
-        if (direction === "desc") {
-            return b - a;
+        if (arg.direction === "desc") {
+            return arg.b - arg.a;
         }
-        return a - b;
+        return arg.a - arg.b;
     },
     localSearch: local_search_1.standardLocalSearchExactAndRange,
     localEqual: local_sql_1.standardLocalEqual,

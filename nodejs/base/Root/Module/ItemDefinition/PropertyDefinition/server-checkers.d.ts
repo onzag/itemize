@@ -7,7 +7,9 @@
  */
 import { PropertyDefinitionSupportedType } from "./types";
 import PropertyDefinition from "../PropertyDefinition";
-import Knex from "knex";
+import ItemDefinition from "..";
+import Include from "../Include";
+import { IAppDataType } from "../../../../../server";
 /**
  * The server side index checker checks for unique indexes within properties
  * @param knex the Knex instance
@@ -17,4 +19,4 @@ import Knex from "knex";
  * @param version the slot version
  * @returns a boolean on whether the unique index is valid
  */
-export declare function serverSideIndexChecker(knex: Knex, property: PropertyDefinition, value: PropertyDefinitionSupportedType, id: number, version: string): Promise<boolean>;
+export declare function serverSideIndexChecker(appData: IAppDataType, itemDefinition: ItemDefinition, include: Include, property: PropertyDefinition, value: PropertyDefinitionSupportedType, id: number, version: string): Promise<boolean>;

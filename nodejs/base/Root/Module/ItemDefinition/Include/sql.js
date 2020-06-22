@@ -13,10 +13,11 @@ const Include_1 = require("../Include");
 /**
  * Provides the table bit that is necessary to store include data
  * for this include when included from the parent definition
+ * @param itemDefinition the item definition that contains the include (not the referred)
  * @param include the include in question
  * @returns the partial table definition schema for the include
  */
-function getSQLTableDefinitionForInclude(include) {
+function getSQLTableDefinitionForInclude(knex, itemDefinition, include) {
     // the exclusion state needs to be stored in the table bit
     // so we basically need to get a prefix for this item definition
     // this is usually INCLUDE_ the include prefix, and the id of the include
@@ -37,7 +38,7 @@ function getSQLTableDefinitionForInclude(include) {
     include.getSinkingProperties().forEach((sinkingProperty) => {
         resultTableSchema = {
             ...resultTableSchema,
-            ...sql_1.getSQLTableDefinitionForProperty(sinkingProperty, prefix),
+            ...sql_1.getSQLTableDefinitionForProperty(knex, itemDefinition, include, sinkingProperty),
         };
     });
     // we return the resulting schema
@@ -54,7 +55,7 @@ exports.getSQLTableDefinitionForInclude = getSQLTableDefinitionForInclude;
  * eg {id: {}, name: {}}
  * @returns a partial graphql value
  */
-function convertSQLValueToGQLValueForInclude(include, row, graphqlFields) {
+function convertSQLValueToGQLValueForInclude(knex, serverData, itemDefinition, include, row, graphqlFields) {
     // first we create a prefix, the prefix is basically ITEM_wheel_
     // this prefix is added as you remember for every item extra property as
     // wheel as the item itself
@@ -74,7 +75,7 @@ function convertSQLValueToGQLValueForInclude(include, row, graphqlFields) {
         // the sql data with ITEM_wheel_
         gqlParentResult = {
             ...gqlParentResult,
-            ...sql_1.convertSQLValueToGQLValueForProperty(sinkingProperty, row, prefix),
+            ...sql_1.convertSQLValueToGQLValueForProperty(knex, serverData, itemDefinition, include, sinkingProperty, row),
         };
     });
     // now we return both info, the exclusion state, and the item data
@@ -88,11 +89,11 @@ exports.convertSQLValueToGQLValueForInclude = convertSQLValueToGQLValueForInclud
 /**
  * Converts a GraphQL value into a SQL row data, it takes apart a complex
  * graphql value and converts it into a serializable sql form
- * @param transitoryId the transitory id where things are stored
+ * @param knex the knex instance
+ * @param serverData the server data
  * @param itemDefinition the item definition in question
  * @param include the include in question
  * @param data the graphql data value
- * @param knex the knex instance
  * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
@@ -103,9 +104,7 @@ exports.convertSQLValueToGQLValueForInclude = convertSQLValueToGQLValueForInclud
  * in a partial field value, don't use partial fields to create
  * @returns the partial sql result to be added into the table
  */
-function convertGQLValueToSQLValueForInclude(itemDefinition, include, data, oldData, knex, uploadsContainer, dictionary, partialFields) {
-    // so again we get the prefix as in ITEM_wheel_
-    const prefix = include.getPrefixedQualifiedIdentifier();
+function convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, include, data, oldData, uploadsContainer, dictionary, partialFields) {
     // the exclusion state in the graphql information should be included in
     // the root data as ITEM_wheel__EXCLUSION_STATE so we extract it
     const exclusionStateAccordingToGQL = data[include.getQualifiedExclusionStateIdentifier()];
@@ -129,7 +128,7 @@ function convertGQLValueToSQLValueForInclude(itemDefinition, include, data, oldD
                 // are an object within there, we pass that, as all the info should be
                 // there, the prefix then represents the fact, we want all the added properties
                 // to be prefixed with what we are giving, in this case ITEM_wheel_
-                const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(itemDefinition, include, sinkingProperty, data[include.getQualifiedIdentifier()], (oldData && oldData[include.getQualifiedIdentifier()]) || null, knex, uploadsContainer, dictionary, prefix);
+                const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition, include, sinkingProperty, data[include.getQualifiedIdentifier()], (oldData && oldData[include.getQualifiedIdentifier()]) || null, uploadsContainer, dictionary);
                 Object.assign(result, addedFieldsByProperty.value);
                 consumeStreamsFns.push(addedFieldsByProperty.consumeStreams);
             }
@@ -151,7 +150,7 @@ exports.convertGQLValueToSQLValueForInclude = convertGQLValueToSQLValueForInclud
  * @param knexBuilder the knex query builder
  * @param dictionary the dictionary to use to build the search
  */
-function buildSQLQueryForInclude(include, args, knexBuilder, dictionary) {
+function buildSQLQueryForInclude(knex, serverData, itemDefinition, include, args, knexBuilder, dictionary) {
     // we need all these prefixes
     const prefix = include.getPrefixedQualifiedIdentifier();
     const exclusionStateQualifiedId = include.getQualifiedExclusionStateIdentifier();
@@ -169,13 +168,13 @@ function buildSQLQueryForInclude(include, args, knexBuilder, dictionary) {
                 // and make a where query for all the properties
                 secondBuilder.where(exclusionStateQualifiedId, Include_1.IncludeExclusionState.INCLUDED);
                 // get the args for that specific include
-                const itemArgs = args[include.getQualifiedIdentifier()];
+                const includeArgs = args[include.getQualifiedIdentifier()];
                 // and apply the search for all the sinking properties
                 include.getSinkingProperties().forEach((pd) => {
                     if (!pd.isSearchable()) {
                         return;
                     }
-                    sql_1.buildSQLQueryForProperty(pd, itemArgs, prefix, secondBuilder, dictionary, false);
+                    sql_1.buildSQLQueryForProperty(knex, serverData, itemDefinition, include, pd, includeArgs, secondBuilder, dictionary, false);
                 });
             });
             // if we have an specific exclusion state that can be ANY
