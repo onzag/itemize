@@ -10,6 +10,8 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import RootRef from '@material-ui/core/RootRef';
 import {
@@ -37,6 +39,7 @@ export {
   ExpansionPanelDetails,
   Badge,
   RootRef,
-
+  InputAdornment,
+  IconButton,
   ExpandMoreIcon,
 }

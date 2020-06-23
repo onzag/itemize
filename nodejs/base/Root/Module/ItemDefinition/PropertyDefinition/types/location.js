@@ -236,6 +236,24 @@ const typeValue = {
     // they are searchable
     searchable: true,
     searchInterface: search_interfaces_1.PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS,
+    specialProperties: [
+        {
+            name: "maxSearchRadius",
+            type: "number",
+        },
+        {
+            name: "searchRadiusInitialPrefill",
+            type: "number",
+        },
+        {
+            name: "searchRadiusUnit",
+            type: "string",
+        },
+        {
+            name: "searchRadiusImperialUnit",
+            type: "string",
+        }
+    ],
     // i18n with the distance attributes
     i18n: {
         base: constants_1.CLASSIC_BASE_I18N,

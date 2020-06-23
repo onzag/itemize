@@ -1,16 +1,13 @@
 import React from "react";
-import TextField from "@material-ui/core/TextField";
-import {
-  InputAdornment,
-  IconButton,
-  ThemeProvider,
-  Typography,
-} from "@material-ui/core";
 import {
   WithStyles,
   withStyles,
   createStyles,
-} from "@material-ui/styles";
+  InputAdornment,
+  IconButton,
+  Typography,
+  TextField,
+} from "../../mui-core/index";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
@@ -25,7 +22,7 @@ import ClearIcon from '@material-ui/icons/Clear';
 function shouldShowInvalid(props: IPropertyEntryFieldRendererProps) {
   return !props.currentValid;
 }
-export const style = (theme: IPropertyEntryThemeType) => createStyles({
+export const style = createStyles({
   entry: {
     width: "100%",
     display: "flex",
@@ -34,18 +31,18 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     justifyContent: "space-between",
   },
   container: {
-    width: theme.containerWidth,
+    width: "100%",
   },
   description: {
     width: "100%",
   },
   errorMessage: {
-    color: theme.invalidColor,
-    height: theme.errorMessageContainerSize,
-    fontSize: theme.errorMessageFontSize,
+    color: "#f44336",
+    height: "1.3rem",
+    fontSize: "0.85rem",
   },
   standardAddornment: (props: IPropertyEntryFieldRendererProps) => ({
-    color: shouldShowInvalid(props) ? theme.invalidColor : theme.iconColor,
+    color: shouldShowInvalid(props) ? "#f44336" : "#424242",
     marginRight: "-10px",
   }),
   iconButtonPassword: {
@@ -56,7 +53,7 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     },
   },
   iconButton: {
-    color: theme.iconColor,
+    color: "#424242",
   },
   textButton: {
     border: "solid 1px rgba(0,0,0,0.1)",
@@ -70,9 +67,9 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     borderRadius: "5px",
   },
   label: (props: IPropertyEntryFieldRendererProps) => ({
-    "color": shouldShowInvalid(props) ? theme.labelInvalidColor : theme.labelColor,
+    "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
     "&.focused": {
-      color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
+      color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
     },
   }),
   labelSingleLine: {
@@ -87,33 +84,30 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
         "width": "100%",
         // this is the colur when the field is out of focus
         "&::before": {
-          borderBottomColor: theme.fieldBorderInvalidColor,
+          borderBottomColor: "#e57373",
         },
         // the color that pops up when the field is in focus
         "&::after": {
-          borderBottomColor: theme.fieldBorderInvalidColorFocused,
+          borderBottomColor: "#f44336",
         },
         // during the hover event
         "&:hover::before": {
-          borderBottomColor: props.disabled ? theme.fieldBorderColor : theme.fieldBorderInvalidColorFocused,
+          borderBottomColor: props.disabled ? "rgba(0,0,0,0.42)" : "#f44336",
         },
       };
     }
     return {
       "width": "100%",
       "&::before": {
-        borderBottomColor: theme.fieldBorderColor,
+        borderBottomColor: "rgba(0,0,0,0.42)",
       },
       "&::after": {
-        borderBottomColor: theme.fieldBorderColorFocused,
+        borderBottomColor: "#3f51b5",
       },
       "&:hover::before": {
-        borderBottomColor: theme.fieldBorderColorFocused,
+        borderBottomColor: "#3f51b5",
       },
     };
-  },
-  selectFieldIconWhenAddornmentIsActive: {
-    right: "46px",
   },
   unitDialog: {
     minWidth: "400px",
@@ -127,59 +121,59 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     display: "block",
     width: "100%",
   },
-  autosuggestContainerOpen: {
+  // autosuggestContainerOpen: {
 
-  },
-  autosuggestInput: {
+  // },
+  // autosuggestInput: {
 
-  },
-  autosuggestInputOpen: {
+  // },
+  // autosuggestInputOpen: {
 
-  },
-  autosuggestSuggestionsContainer: {
-    position: "absolute" as "absolute",
-    display: "block",
-    width: "100%",
-    top: `calc(100% - ${theme.errorMessageContainerSize})`,
-    zIndex: 1000,
-  },
-  autosuggestSuggestionsContainerOpen: {
+  // },
+  // autosuggestSuggestionsContainer: {
+  //   position: "absolute" as "absolute",
+  //   display: "block",
+  //   width: "100%",
+  //   top: "calc(100% - 1.3rem)",
+  //   zIndex: 1000,
+  // },
+  // autosuggestSuggestionsContainerOpen: {
 
-  },
-  autosuggestSuggestionsList: {
+  // },
+  // autosuggestSuggestionsList: {
 
-  },
-  autosuggestSuggestion: {
+  // },
+  // autosuggestSuggestion: {
 
-  },
-  autosuggestFirstSuggestion: {
+  // },
+  // autosuggestFirstSuggestion: {
 
-  },
-  autosuggestSuggestionHighlighted: {
+  // },
+  // autosuggestSuggestionHighlighted: {
 
-  },
-  autosuggestSectionContainer: {
+  // },
+  // autosuggestSectionContainer: {
 
-  },
-  autosuggestFirstSectionContainer: {
+  // },
+  // autosuggestFirstSectionContainer: {
 
-  },
-  autosuggestSectionTitle: {
+  // },
+  // autosuggestSectionTitle: {
 
-  },
-  autosuggestMenuItem: {
-    height: "auto",
-    paddingTop: 4,
-    paddingBottom: 8,
-  },
-  autosuggestMenuItemMainText: {
-    fontSize: theme.autosuggestMenuItemFontSize,
-    lineHeight: theme.autosuggestMenuItemFontSize,
-  },
-  autosuggestMenuItemSubText: {
-    fontSize: theme.autosuggestMenuItemSubFontSize,
-    lineHeight: theme.autosuggestMenuItemSubFontSize,
-  },
+  // },
+  // autosuggestMenuItem: {
+  //   height: "auto",
+  //   paddingTop: 4,
+  //   paddingBottom: 8,
+  // },
+  // autosuggestMenuItemMainText: {
+  //   fontSize: theme.autosuggestMenuItemFontSize,
+  //   lineHeight: theme.autosuggestMenuItemFontSize,
+  // },
+  // autosuggestMenuItemSubText: {
+  //   fontSize: theme.autosuggestMenuItemSubFontSize,
+  //   lineHeight: theme.autosuggestMenuItemSubFontSize,
+  // },
 });
 
 
@@ -296,6 +290,11 @@ class ActualPropertyEntryFieldRenderer
       internalValue = value;
     }
 
+    if (this.props.isNumericType) {
+      this.props.onChangeByNumber(value);
+      return;
+    }
+
     this.props.onChange(value, internalValue);
   }
 
@@ -375,6 +374,56 @@ class ActualPropertyEntryFieldRenderer
           </IconButton>
         </InputAdornment>
       );
+    } else if (this.props.type === "currency") {
+      // TODO restore
+      if (this.props.currencyFormat === "$N") {
+        appliedInputProps.startAdornent = (
+          <InputAdornment
+            position="start"
+            className={this.props.classes.standardAddornment}
+          >
+            <IconButton
+              tabIndex={-1}
+              classes={{root: this.props.classes.iconButton}}
+              onMouseDown={this.catchToggleMouseDownEvent}
+            >
+              {this.props.currency.symbol}
+            </IconButton>
+          </InputAdornment>
+        );
+      } else {
+        appliedInputProps.endAdornment = (
+          <InputAdornment
+            position="end"
+            className={this.props.classes.standardAddornment}
+          >
+            <IconButton
+              tabIndex={-1}
+              classes={{root: this.props.classes.iconButton}}
+              onMouseDown={this.catchToggleMouseDownEvent}
+            >
+              {this.props.currency.symbol}
+            </IconButton>
+          </InputAdornment>
+        )
+      }
+    } else if (this.props.type === "unit") {
+      // TODO restore
+      // TODO change unit
+      appliedInputProps.endAdornment = (
+        <InputAdornment
+          position="end"
+          className={this.props.classes.standardAddornment}
+        >
+          <IconButton
+            tabIndex={-1}
+            classes={{ root: this.props.classes.iconButton }}
+            onMouseDown={this.catchToggleMouseDownEvent}
+          >
+            {this.props.unitToNode(this.props.unit)}
+          </IconButton>
+        </InputAdornment>
+      )
     } else if (this.props.canRestore) {
       let icon: React.ReactNode;
       if (this.props.currentAppliedValue) {
@@ -435,7 +484,11 @@ class ActualPropertyEntryFieldRenderer
           className={this.props.classes.entry}
           label={this.props.label}
           placeholder={this.props.placeholder}
-          value={this.props.currentInternalValue || this.props.currentValue || ""}
+          value={
+            this.props.currentInternalStrOnlyValue ||
+            this.props.currentStrOnlyValue ||
+            ""
+          }
           onChange={this.onChangeByHTMLEvent}
           InputProps={{
             classes: {
@@ -568,19 +621,5 @@ class ActualPropertyEntryFieldRenderer
   // }
 }
 
-const ActualPropertyEntryFieldRendererWithStyles = withStyles(style)(ActualPropertyEntryFieldRenderer);
-
-export default function PropertyEntryFieldRenderer(props: IPropertyEntryFieldRendererProps) {
-  let appliedTheme: IPropertyEntryThemeType = STANDARD_THEME;
-  if (props.args["theme"]) {
-    appliedTheme = {
-      ...STANDARD_THEME,
-      ...props.args["theme"],
-    };
-  }
-  return (
-    <ThemeProvider theme={appliedTheme}>
-      <ActualPropertyEntryFieldRendererWithStyles {...props}/>
-    </ThemeProvider>
-  )
-}
+const PropertyEntryFieldRenderer = withStyles(style)(ActualPropertyEntryFieldRenderer);
+export default PropertyEntryFieldRenderer;

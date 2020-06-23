@@ -1217,6 +1217,17 @@ async function getI18nPropertyData(
     errorRequiredProperties.push("error.TO_SMALLER_THAN_FROM");
   }
 
+  if (
+    definition.searchInterface === PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS &&
+    !searchIsDisabled
+  ) {
+    errorRequiredProperties.push("error.RADIUS_MUST_BE_SPECIFIED");
+    errorRequiredProperties.push("error.RADIUS_TOO_MANY_DECIMALS");
+    errorRequiredProperties.push("error.RADIUS_TOO_LARGE");
+    errorRequiredProperties.push("error.RADIUS_TOO_SMALL");
+    errorRequiredProperties.push("error.RADIUS_INVALID_VALUE");
+  }
+
   expectedProperties = expectedProperties.concat(errorRequiredProperties
     .map((b) => ({key: b, required: true})));
 

@@ -23,9 +23,6 @@ import {
 } from "../../../../../../constants";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import Knex from "knex";
-import { ISQLTableRowValue } from "../../../../sql";
-import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 
 /**
  * Units are described by a value and a unit, in either SI

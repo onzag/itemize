@@ -109,6 +109,7 @@
     "react-dom": "^16.13.1"
   },
   "devDependencies": {
+    "@types/convert-units": "^2.3.2",
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
     "deep-equal": "^1.1.1",

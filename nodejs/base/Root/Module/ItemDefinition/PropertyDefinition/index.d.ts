@@ -22,7 +22,8 @@ export declare enum PropertyInvalidReason {
     INVALID_SUBTYPE_VALUE = "INVALID_SUBTYPE_VALUE",
     FROM_LARGER_THAN_TO = "FROM_LARGER_THAN_TO",
     TO_SMALLER_THAN_FROM = "TO_SMALLER_THAN_FROM",
-    NOT_UNIQUE = "NOT_UNIQUE"
+    NOT_UNIQUE = "NOT_UNIQUE",
+    MUST_BE_SPECIFIED = "MUST_BE_SPECIFIED"
 }
 /**
  * A conditition for conditional values
@@ -162,7 +163,7 @@ export interface IPropertyDefinitionRawJSONDataType {
      * Special properties that are assigned in the type behaviour
      * description, you set the value here
      */
-    specialProperties: {
+    specialProperties?: {
         [key: string]: string | boolean | number;
     };
     /**

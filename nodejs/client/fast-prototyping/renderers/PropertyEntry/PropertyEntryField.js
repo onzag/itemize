@@ -4,10 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const TextField_1 = __importDefault(require("@material-ui/core/TextField"));
-const core_1 = require("@material-ui/core");
-const styles_1 = require("@material-ui/styles");
-const styles_2 = require("./styles");
+const index_1 = require("../../mui-core/index");
 const VisibilityOff_1 = __importDefault(require("@material-ui/icons/VisibilityOff"));
 const Visibility_1 = __importDefault(require("@material-ui/icons/Visibility"));
 const lab_1 = require("@material-ui/lab");
@@ -16,7 +13,7 @@ const Clear_1 = __importDefault(require("@material-ui/icons/Clear"));
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
-exports.style = (theme) => styles_1.createStyles({
+exports.style = index_1.createStyles({
     entry: {
         width: "100%",
         display: "flex",
@@ -25,18 +22,18 @@ exports.style = (theme) => styles_1.createStyles({
         justifyContent: "space-between",
     },
     container: {
-        width: theme.containerWidth,
+        width: "100%",
     },
     description: {
         width: "100%",
     },
     errorMessage: {
-        color: theme.invalidColor,
-        height: theme.errorMessageContainerSize,
-        fontSize: theme.errorMessageFontSize,
+        color: "#f44336",
+        height: "1.3rem",
+        fontSize: "0.85rem",
     },
     standardAddornment: (props) => ({
-        color: shouldShowInvalid(props) ? theme.invalidColor : theme.iconColor,
+        color: shouldShowInvalid(props) ? "#f44336" : "#424242",
         marginRight: "-10px",
     }),
     iconButtonPassword: {
@@ -47,7 +44,7 @@ exports.style = (theme) => styles_1.createStyles({
         },
     },
     iconButton: {
-        color: theme.iconColor,
+        color: "#424242",
     },
     textButton: {
         border: "solid 1px rgba(0,0,0,0.1)",
@@ -61,9 +58,9 @@ exports.style = (theme) => styles_1.createStyles({
         borderRadius: "5px",
     },
     label: (props) => ({
-        "color": shouldShowInvalid(props) ? theme.labelInvalidColor : theme.labelColor,
+        "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
         "&.focused": {
-            color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
+            color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
         },
     }),
     labelSingleLine: {
@@ -78,33 +75,30 @@ exports.style = (theme) => styles_1.createStyles({
                 "width": "100%",
                 // this is the colur when the field is out of focus
                 "&::before": {
-                    borderBottomColor: theme.fieldBorderInvalidColor,
+                    borderBottomColor: "#e57373",
                 },
                 // the color that pops up when the field is in focus
                 "&::after": {
-                    borderBottomColor: theme.fieldBorderInvalidColorFocused,
+                    borderBottomColor: "#f44336",
                 },
                 // during the hover event
                 "&:hover::before": {
-                    borderBottomColor: props.disabled ? theme.fieldBorderColor : theme.fieldBorderInvalidColorFocused,
+                    borderBottomColor: props.disabled ? "rgba(0,0,0,0.42)" : "#f44336",
                 },
             };
         }
         return {
             "width": "100%",
             "&::before": {
-                borderBottomColor: theme.fieldBorderColor,
+                borderBottomColor: "rgba(0,0,0,0.42)",
             },
             "&::after": {
-                borderBottomColor: theme.fieldBorderColorFocused,
+                borderBottomColor: "#3f51b5",
             },
             "&:hover::before": {
-                borderBottomColor: theme.fieldBorderColorFocused,
+                borderBottomColor: "#3f51b5",
             },
         };
-    },
-    selectFieldIconWhenAddornmentIsActive: {
-        right: "46px",
     },
     unitDialog: {
         minWidth: "400px",
@@ -117,37 +111,6 @@ exports.style = (theme) => styles_1.createStyles({
         position: "relative",
         display: "block",
         width: "100%",
-    },
-    autosuggestContainerOpen: {},
-    autosuggestInput: {},
-    autosuggestInputOpen: {},
-    autosuggestSuggestionsContainer: {
-        position: "absolute",
-        display: "block",
-        width: "100%",
-        top: `calc(100% - ${theme.errorMessageContainerSize})`,
-        zIndex: 1000,
-    },
-    autosuggestSuggestionsContainerOpen: {},
-    autosuggestSuggestionsList: {},
-    autosuggestSuggestion: {},
-    autosuggestFirstSuggestion: {},
-    autosuggestSuggestionHighlighted: {},
-    autosuggestSectionContainer: {},
-    autosuggestFirstSectionContainer: {},
-    autosuggestSectionTitle: {},
-    autosuggestMenuItem: {
-        height: "auto",
-        paddingTop: 4,
-        paddingBottom: 8,
-    },
-    autosuggestMenuItemMainText: {
-        fontSize: theme.autosuggestMenuItemFontSize,
-        lineHeight: theme.autosuggestMenuItemFontSize,
-    },
-    autosuggestMenuItemSubText: {
-        fontSize: theme.autosuggestMenuItemSubFontSize,
-        lineHeight: theme.autosuggestMenuItemSubFontSize,
     },
 });
 class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
@@ -228,6 +191,10 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
             value = e.target.value.toString();
             internalValue = value;
         }
+        if (this.props.isNumericType) {
+            this.props.onChangeByNumber(value);
+            return;
+        }
         this.props.onChange(value, internalValue);
     }
     renderBasicTextField(textFieldProps) {
@@ -283,8 +250,25 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
         // if the type is a password
         if (this.props.type === "password") {
             // set the end addornment for the show and hide button
-            appliedInputProps.endAdornment = (react_1.default.createElement(core_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
-                react_1.default.createElement(core_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onClick: this.toggleVisible, onMouseDown: this.catchToggleMouseDownEvent }, this.state.visible ? react_1.default.createElement(Visibility_1.default, null) : react_1.default.createElement(VisibilityOff_1.default, null))));
+            appliedInputProps.endAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
+                react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onClick: this.toggleVisible, onMouseDown: this.catchToggleMouseDownEvent }, this.state.visible ? react_1.default.createElement(Visibility_1.default, null) : react_1.default.createElement(VisibilityOff_1.default, null))));
+        }
+        else if (this.props.type === "currency") {
+            // TODO restore
+            if (this.props.currencyFormat === "$N") {
+                appliedInputProps.startAdornent = (react_1.default.createElement(index_1.InputAdornment, { position: "start", className: this.props.classes.standardAddornment },
+                    react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onMouseDown: this.catchToggleMouseDownEvent }, this.props.currency.symbol)));
+            }
+            else {
+                appliedInputProps.endAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
+                    react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onMouseDown: this.catchToggleMouseDownEvent }, this.props.currency.symbol)));
+            }
+        }
+        else if (this.props.type === "unit") {
+            // TODO restore
+            // TODO change unit
+            appliedInputProps.endAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
+                react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onMouseDown: this.catchToggleMouseDownEvent }, this.props.unitToNode(this.props.unit))));
         }
         else if (this.props.canRestore) {
             let icon;
@@ -294,13 +278,13 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
             else {
                 icon = react_1.default.createElement(Clear_1.default, null);
             }
-            appliedInputProps.endAdornment = (react_1.default.createElement(core_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
-                react_1.default.createElement(core_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onClick: this.props.onRestore, onMouseDown: this.catchToggleMouseDownEvent }, icon)));
+            appliedInputProps.endAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
+                react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onClick: this.props.onRestore, onMouseDown: this.catchToggleMouseDownEvent }, icon)));
         }
         else if (this.props.icon) {
             // set it at the end
-            appliedInputProps.endAdornment = (react_1.default.createElement(core_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
-                react_1.default.createElement(core_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton } }, this.props.icon)));
+            appliedInputProps.endAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
+                react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton } }, this.props.icon)));
         }
         const descriptionAsAlert = this.props.args["descriptionAsAlert"];
         // return the complex overengineered component in all its glory
@@ -309,9 +293,11 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
                 react_1.default.createElement(lab_1.Alert, { severity: "info", className: this.props.classes.description }, this.props.description) :
                 null,
             this.props.description && !descriptionAsAlert ?
-                react_1.default.createElement(core_1.Typography, { variant: "caption", className: this.props.classes.description }, this.props.description) :
+                react_1.default.createElement(index_1.Typography, { variant: "caption", className: this.props.classes.description }, this.props.description) :
                 null,
-            react_1.default.createElement(TextField_1.default, Object.assign({ fullWidth: true, type: this.state.visible ? "text" : "password", className: this.props.classes.entry, label: this.props.label, placeholder: this.props.placeholder, value: this.props.currentInternalValue || this.props.currentValue || "", onChange: this.onChangeByHTMLEvent, InputProps: {
+            react_1.default.createElement(index_1.TextField, Object.assign({ fullWidth: true, type: this.state.visible ? "text" : "password", className: this.props.classes.entry, label: this.props.label, placeholder: this.props.placeholder, value: this.props.currentInternalStrOnlyValue ||
+                    this.props.currentStrOnlyValue ||
+                    "", onChange: this.onChangeByHTMLEvent, InputProps: {
                     classes: {
                         root: this.props.classes.fieldInput,
                         focused: "focused",
@@ -327,16 +313,5 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
             react_1.default.createElement("div", { className: this.props.classes.errorMessage }, this.props.currentInvalidReason)));
     }
 }
-const ActualPropertyEntryFieldRendererWithStyles = styles_1.withStyles(exports.style)(ActualPropertyEntryFieldRenderer);
-function PropertyEntryFieldRenderer(props) {
-    let appliedTheme = styles_2.STANDARD_THEME;
-    if (props.args["theme"]) {
-        appliedTheme = {
-            ...styles_2.STANDARD_THEME,
-            ...props.args["theme"],
-        };
-    }
-    return (react_1.default.createElement(core_1.ThemeProvider, { theme: appliedTheme },
-        react_1.default.createElement(ActualPropertyEntryFieldRendererWithStyles, Object.assign({}, props))));
-}
+const PropertyEntryFieldRenderer = index_1.withStyles(exports.style)(ActualPropertyEntryFieldRenderer);
 exports.default = PropertyEntryFieldRenderer;

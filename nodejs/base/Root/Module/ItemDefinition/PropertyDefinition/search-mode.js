@@ -253,14 +253,46 @@ function buildSearchModePropertyDefinitions(rawData, otherKnownProperties) {
             subtype: "length",
             id: search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.RADIUS + newPropDef.id,
             min: 1,
-            maxDecimalCount: 0,
+            maxDecimalCount: 2,
+            max: (newPropDef.specialProperties && newPropDef.specialProperties["maxSearchRadius"]) || 1000,
             specialProperties: {
-                unit: "km",
-                imperialUnit: "mi",
+                unit: (newPropDef.specialProperties && newPropDef.specialProperties["searchRadiusUnit"]) || "km",
+                imperialUnit: (newPropDef.specialProperties && newPropDef.specialProperties["searchRadiusImperialUnit"]) || "mi",
                 lockUnitsToPrimaries: true,
-                initialPrefill: 100,
+                initialPrefill: (newPropDef.specialProperties && newPropDef.specialProperties["searchRadiusInitialPrefill"]) || 100,
             },
-            i18nData: displaceI18NData(newPropDef.i18nData, ["search", "radius"]),
+            nullable: true,
+            invalidIf: [
+                {
+                    error: _1.PropertyInvalidReason.MUST_BE_SPECIFIED,
+                    if: {
+                        property: "&this",
+                        comparator: "equals",
+                        value: {
+                            exactValue: null,
+                        },
+                        gate: "and",
+                        condition: {
+                            property: search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.LOCATION + newPropDef.id,
+                            comparator: "not-equal",
+                            value: {
+                                exactValue: null,
+                            },
+                        },
+                    },
+                }
+            ],
+            i18nData: displaceI18NData(newPropDef.i18nData, ["search", "radius"], (i18nData) => {
+                return {
+                    error: {
+                        MUST_BE_SPECIFIED: i18nData.error && i18nData.error.RADIUS_MUST_BE_SPECIFIED,
+                        TOO_LARGE: i18nData.error && i18nData.error.RADIUS_TOO_LARGE,
+                        TOO_SMALL: i18nData.error && i18nData.error.RADIUS_TOO_SMALL,
+                        TOO_MANY_DECIMALS: i18nData.error && i18nData.error.RADIUS_TOO_MANY_DECIMALS,
+                        INVALID_VALUE: i18nData.error && i18nData.error.RADIUS_INVALID_VALUE,
+                    },
+                };
+            }),
         };
         // decorate the default property
         newPropDef.id = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.LOCATION + newPropDef.id;
@@ -282,7 +314,7 @@ exports.buildSearchModePropertyDefinitions = buildSearchModePropertyDefinitions;
  * @param path the path we want to displace data from
  * @returns the new i18n object with data overwritten
  */
-function displaceI18NData(i18n, path) {
+function displaceI18NData(i18n, path, callback) {
     // make a copy
     const newI18n = { ...i18n };
     // for each language we are supporting there
@@ -294,14 +326,17 @@ function displaceI18NData(i18n, path) {
         path.forEach((pbit) => {
             itemInQuestion = itemInQuestion[pbit];
         });
-        // we take the label, placeholder and description from our loop result
+        if (callback) {
+            Object.assign(newI18n[language], callback(newI18n[language] || {}));
+        }
+        // we everything from the loop result
         // note how we check whether it exists, the reason for this is that prop extensions
         // which always build its search mode form might not have this data during the building process
         // in which case it is left as undefined
         if (itemInQuestion) {
-            newI18n[language].label = itemInQuestion.label;
-            newI18n[language].placeholder = itemInQuestion.placeholder;
-            newI18n[language].description = itemInQuestion.description;
+            Object.keys(itemInQuestion).forEach((key) => {
+                newI18n[language][key] = itemInQuestion[key];
+            });
         }
     });
     // return that

@@ -55,9 +55,9 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // the i18n attributes
   i18n: {
     base: REDUCED_BASE_I18N,
-    optional: CLASSIC_OPTIONAL_I18N,
+    optional: CLASSIC_OPTIONAL_I18N.concat("true_label", "false_label", "null_label"),
     searchBase: REDUCED_SEARCH_BASE_I18N,
-    searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
+    searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N.concat("search.true_label", "search.false_label", "search.null_label"),
   },
 };
 export default typeValue;

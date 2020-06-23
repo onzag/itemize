@@ -124,8 +124,14 @@ const handlerRegistry:
     renderer: "PropertyEntryField",
     handler: PropertyEntryField,
   },
-  integer: null,
-  number: null,
+  integer: {
+    renderer: "PropertyEntryField",
+    handler: PropertyEntryField,
+  },
+  number: {
+    renderer: "PropertyEntryField",
+    handler: PropertyEntryField,
+  },
   boolean: {
     renderer: "PropertyEntryBoolean",
     handler: PropertyEntryBoolean,
@@ -139,13 +145,22 @@ const handlerRegistry:
     },
     includeConfig: true,
   },
-  currency: null,
-  unit: null,
+  currency: {
+    renderer: "PropertyEntryField",
+    handler: PropertyEntryField,
+  },
+  unit: {
+    renderer: "PropertyEntryField",
+    handler: PropertyEntryField,
+  },
   password: {
     renderer: "PropertyEntryField",
     handler: PropertyEntryField,
   },
-  year: null,
+  year: {
+    renderer: "PropertyEntryField",
+    handler: PropertyEntryField,
+  },
   datetime: {
     renderer: "PropertyEntryDateTime",
     handler: PropertyEntryDateTime,

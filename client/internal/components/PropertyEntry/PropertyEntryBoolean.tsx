@@ -59,10 +59,13 @@ export default class PropertyEntryBoolean extends React.Component<
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
+    const i18nTrue = i18nData.true_label;
+    const i18nFalse = i18nData.false_label;
+    const i18nNull = i18nData.null_label;
     const isTernary = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNull();
-    const trueLabel = this.props.i18n[this.props.language].yes;
-    const falseLabel = this.props.i18n[this.props.language].no;
-    const nullLabel = this.props.i18n[this.props.language].unspecified;
+    const trueLabel = i18nTrue || this.props.i18n[this.props.language].yes;
+    const falseLabel = i18nFalse || this.props.i18n[this.props.language].no;
+    const nullLabel = i18nNull || this.props.i18n[this.props.language].unspecified;
 
     if (this.props.state.value === null && !isTernary) {
       console.warn(

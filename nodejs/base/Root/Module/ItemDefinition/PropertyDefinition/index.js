@@ -34,6 +34,9 @@ var PropertyInvalidReason;
     PropertyInvalidReason["TO_SMALLER_THAN_FROM"] = "TO_SMALLER_THAN_FROM";
     // comes for values where unique is required
     PropertyInvalidReason["NOT_UNIQUE"] = "NOT_UNIQUE";
+    // similar to non-nullable, but usually it's tied to a condition
+    // used for radius whe a location is specified yet the radius is null
+    PropertyInvalidReason["MUST_BE_SPECIFIED"] = "MUST_BE_SPECIFIED";
 })(PropertyInvalidReason = exports.PropertyInvalidReason || (exports.PropertyInvalidReason = {}));
 /**
  * Helper functions returns null if the value is undefined

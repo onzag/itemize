@@ -30,8 +30,14 @@ const handlerRegistry = {
         renderer: "PropertyEntryField",
         handler: PropertyEntryField_1.default,
     },
-    integer: null,
-    number: null,
+    integer: {
+        renderer: "PropertyEntryField",
+        handler: PropertyEntryField_1.default,
+    },
+    number: {
+        renderer: "PropertyEntryField",
+        handler: PropertyEntryField_1.default,
+    },
     boolean: {
         renderer: "PropertyEntryBoolean",
         handler: PropertyEntryBoolean_1.default,
@@ -45,13 +51,22 @@ const handlerRegistry = {
         },
         includeConfig: true,
     },
-    currency: null,
-    unit: null,
+    currency: {
+        renderer: "PropertyEntryField",
+        handler: PropertyEntryField_1.default,
+    },
+    unit: {
+        renderer: "PropertyEntryField",
+        handler: PropertyEntryField_1.default,
+    },
     password: {
         renderer: "PropertyEntryField",
         handler: PropertyEntryField_1.default,
     },
-    year: null,
+    year: {
+        renderer: "PropertyEntryField",
+        handler: PropertyEntryField_1.default,
+    },
     datetime: {
         renderer: "PropertyEntryDateTime",
         handler: PropertyEntryDateTime_1.default,

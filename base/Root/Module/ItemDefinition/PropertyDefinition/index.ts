@@ -43,6 +43,9 @@ export enum PropertyInvalidReason {
   TO_SMALLER_THAN_FROM = "TO_SMALLER_THAN_FROM",
   // comes for values where unique is required
   NOT_UNIQUE = "NOT_UNIQUE",
+  // similar to non-nullable, but usually it's tied to a condition
+  // used for radius whe a location is specified yet the radius is null
+  MUST_BE_SPECIFIED = "MUST_BE_SPECIFIED",
 }
 
 /**
@@ -186,7 +189,7 @@ export interface IPropertyDefinitionRawJSONDataType {
    * Special properties that are assigned in the type behaviour
    * description, you set the value here
    */
-  specialProperties: {
+  specialProperties?: {
     [key: string]: string | boolean | number;
   };
   /**

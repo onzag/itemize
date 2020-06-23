@@ -5,9 +5,81 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const deep_equal_1 = __importDefault(require("deep-equal"));
+const util_1 = require("../../../../util");
+const constants_1 = require("../../../../constants");
+const imported_resources_1 = require("../../../../imported-resources");
+const convert_units_1 = __importDefault(require("convert-units"));
+var NumericType;
+(function (NumericType) {
+    NumericType[NumericType["FLOAT"] = 0] = "FLOAT";
+    NumericType[NumericType["INTEGER"] = 1] = "INTEGER";
+})(NumericType || (NumericType = {}));
+function getNumericType(type) {
+    if (type === "number" || type === "currency" || type === "unit") {
+        return NumericType.FLOAT;
+    }
+    return NumericType.INTEGER;
+}
+function formatValueAsString(numericType, numberSeparator, value) {
+    const actualValue = value === null || typeof value === "undefined" ? value : (typeof value.value !== "undefined" ? value.value : value);
+    if (actualValue === null) {
+        return "";
+    }
+    if (numericType === NumericType.FLOAT) {
+        return actualValue.toString().replace(/\./g, numberSeparator);
+    }
+    return actualValue.toString();
+}
 class PropertyEntryField extends react_1.default.Component {
     constructor(props) {
         super(props);
+        this.onChangeByNumber = this.onChangeByNumber.bind(this);
+        this.unitToNode = this.unitToNode.bind(this);
+        this.onChangeUnit = this.onChangeUnit.bind(this);
+        this.getCurrentUnit = this.getCurrentUnit.bind(this);
+    }
+    unitToNode(unit) {
+        if (unit === "l") {
+            return react_1.default.createElement("span", null, "L");
+        }
+        else if (unit === "ml" || unit === "cl" || unit === "dl" || unit === "kl") {
+            return react_1.default.createElement("span", null,
+                unit[0],
+                "L");
+        }
+        else if (unit === "C" || unit === "K" || unit === "F" || unit === "R") {
+            return react_1.default.createElement("span", null,
+                "\u00B0",
+                unit);
+        }
+        return (react_1.default.createElement("span", null, unit.split(/(\d+)/).filter((m) => !!m).map((m, i) => isNaN(m) ?
+            react_1.default.createElement("span", { key: i }, m) : react_1.default.createElement("sup", { key: i }, m))));
+    }
+    componentDidUpdate(prevProps) {
+        if (prevProps.currency.code !== this.props.currency.code &&
+            this.props.property.getType() === "currency" &&
+            this.props.state.value) {
+            this.props.onChange({
+                value: this.props.state.value.value,
+                currency: this.props.currency.code,
+            }, this.props.state.internalValue);
+        }
+        else if (prevProps.country.code !== this.props.country.code &&
+            this.props.property.getType() === "unit" &&
+            (this.props.state.value || this.props.state.internalValue)) {
+            const wasImperial = prevProps.country.code === "US";
+            const isImperial = this.props.country.code === "US";
+            if (wasImperial !== isImperial) {
+                if (!isImperial) {
+                    const metricUnit = this.props.property.getSpecialProperty("unit");
+                    this.onChangeUnit(metricUnit);
+                }
+                else {
+                    const imperialUnit = this.props.property.getSpecialProperty("imperialUnit");
+                    this.onChangeUnit(imperialUnit);
+                }
+            }
+        }
     }
     shouldComponentUpdate(nextProps) {
         // This is optimized to only update for the thing it uses
@@ -16,6 +88,8 @@ class PropertyEntryField extends react_1.default.Component {
             !!this.props.poked !== !!nextProps.poked ||
             !!this.props.rtl !== !!nextProps.rtl ||
             !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
+            nextProps.currency.code !== this.props.currency.code ||
+            nextProps.country.code !== this.props.country.code ||
             this.props.altDescription !== nextProps.altDescription ||
             this.props.altPlaceholder !== nextProps.altPlaceholder ||
             this.props.altLabel !== nextProps.altLabel ||
@@ -25,6 +99,130 @@ class PropertyEntryField extends react_1.default.Component {
             nextProps.icon !== this.props.icon ||
             nextProps.renderer !== this.props.renderer ||
             !deep_equal_1.default(this.props.rendererArgs, nextProps.rendererArgs);
+    }
+    onChangeUnit(newUnit) {
+        if (!this.props.state.value) {
+            this.props.onChange(this.props.state.value, {
+                ...this.props.state.internalValue,
+                unit: newUnit,
+            });
+            return;
+        }
+        const value = this.props.state.value.value;
+        const oldUnit = this.props.state.value.unit;
+        const valueInNewUnit = convert_units_1.default(value).from(oldUnit).to(newUnit);
+        this.props.onChange({
+            ...this.props.state.value,
+            unit: newUnit,
+            value: valueInNewUnit,
+        }, {
+            ...this.props.state.internalValue,
+            unit: newUnit,
+        });
+    }
+    getCurrentUnit() {
+        const prefersImperial = this.props.country.code === "US";
+        const imperialUnit = this.props.property.getSpecialProperty("imperialUnit");
+        const standardUnit = this.props.property.getSpecialProperty("unit");
+        const usedUnit = prefersImperial ? imperialUnit : standardUnit;
+        const currentUnit = (this.props.state.value ?
+            this.props.state.value.unit :
+            (this.props.state.internalValue && this.props.state.internalValue.unit)) || usedUnit;
+        return [currentUnit, standardUnit, imperialUnit, prefersImperial];
+    }
+    onChangeByNumber(textualValue) {
+        if (textualValue.trim() === "") {
+            this.props.onChange(null, textualValue);
+            return;
+        }
+        // let's get the type and the base type
+        const type = this.props.property.getType();
+        const numericType = getNumericType(type);
+        // like if we have a float
+        let numericValue;
+        let normalizedTextualValueAsString;
+        if (numericType === NumericType.FLOAT) {
+            // get the separator escaped
+            const escapedNumberSeparator = util_1.escapeStringRegexp(this.props.i18n[this.props.language].number_decimal_separator);
+            // and replace it for the standard separator
+            normalizedTextualValueAsString = textualValue.replace(new RegExp(escapedNumberSeparator, "g"), ".");
+            // we set the numeric value from the normalized by parsing it
+            // NaN is a possibility
+            numericValue = parseFloat(normalizedTextualValueAsString);
+            // if we have an integer of course the normalized value is the same
+        }
+        else if (numericType === NumericType.INTEGER) {
+            // we just set the numeric value
+            // NaN is a possibility
+            numericValue = parseInt(textualValue, 10);
+            normalizedTextualValueAsString = textualValue;
+        }
+        if (isNaN(numericValue) ||
+            // buggy typescript definition which doesn't expect strings
+            // need to cast to any
+            isNaN(normalizedTextualValueAsString)) {
+            // we send a nan so it gives invalid number
+            if (type === "unit") {
+                const [newUnit] = this.getCurrentUnit();
+                this.props.onChange(NaN, {
+                    unit: newUnit,
+                    value: textualValue,
+                });
+            }
+            else {
+                this.props.onChange(NaN, textualValue);
+            }
+            return;
+        }
+        else if (numericType === NumericType.INTEGER) {
+            this.props.onChange(numericValue, textualValue);
+            return;
+        }
+        // set the textual value, yes again, in all chances it will be the same
+        // but let's say the user pressed "." instead of "," then we need to
+        // properly format inormalizedNumericValueAsStringt
+        const newTextualValue = formatValueAsString(numericType, this.props.i18n[this.props.language].number_decimal_separator, textualValue);
+        // Number line overflow protection
+        // the problem is that too many decimals cause it to round
+        // so let's only send 1 max of the maximum number of decimals
+        // if there are decimals
+        let actualNumericValue = numericValue;
+        const baseValue = normalizedTextualValueAsString.split(".")[0];
+        const decimalValue = normalizedTextualValueAsString.split(".")[1] || "";
+        const decimalCount = decimalValue.length;
+        // For some cases like in currency this value is null so set it up to max decimal count
+        // as a fallback
+        const maxDecimalCount = this.props.property.getMaxDecimalCount() || constants_1.MAX_DECIMAL_COUNT;
+        // if we have too many decimals from the string count
+        if (maxDecimalCount < decimalCount) {
+            // cut the line as an overflow protection, we need to set the last as 9
+            actualNumericValue = parseFloat(baseValue + "." + decimalValue.substr(0, maxDecimalCount) + "9");
+        }
+        // if the type is a currency
+        if (type === "currency") {
+            // do the onchange with the currency code
+            this.props.onChange({
+                value: actualNumericValue,
+                currency: this.props.currency.code,
+            }, newTextualValue);
+        }
+        else if (type === "unit") {
+            const [newUnit, standardUnit] = this.getCurrentUnit();
+            this.props.onChange({
+                value: actualNumericValue,
+                unit: newUnit,
+                normalizedValue: convert_units_1.default(actualNumericValue)
+                    .from(newUnit).to(standardUnit),
+                normalizedUnit: standardUnit,
+            }, {
+                unit: newUnit,
+                value: newTextualValue,
+            });
+        }
+        else {
+            // do the on change
+            this.props.onChange(actualNumericValue, newTextualValue);
+        }
     }
     render() {
         const i18nData = this.props.property.getI18nDataFor(this.props.language);
@@ -45,6 +243,28 @@ class PropertyEntryField extends react_1.default.Component {
         // different keys
         const type = this.props.property.getType();
         const subtype = this.props.property.getSubtype();
+        let currency = null;
+        let currencyFormat = null;
+        if (type === "currency") {
+            currency = this.props.state.value ?
+                imported_resources_1.currencies[this.props.state.value.currency] :
+                this.props.currency;
+            currencyFormat = this.props.i18n[this.props.language].currency_format;
+        }
+        let unitPrefersImperial;
+        let unitIsLockedToPrimaries;
+        let unitOptions;
+        let unitImperialOptions;
+        let unit;
+        if (type === "unit") {
+            const answer = this.getCurrentUnit();
+            unit = answer[0];
+            unitPrefersImperial = answer[3];
+            unitIsLockedToPrimaries = this.props.property.getSpecialProperty("lockUnitsToPrimaries");
+            const availableUnits = convert_units_1.default().list(subtype);
+            unitOptions = unitIsLockedToPrimaries ? [unit] : availableUnits.filter((unit) => unit.system === "metric").map((u) => u.abbr);
+            unitImperialOptions = unitIsLockedToPrimaries ? [] : availableUnits.filter((unit) => unit.system === "imperial").map((u) => u.abbr);
+        }
         const RendererElement = this.props.renderer;
         const rendererArgs = {
             args: this.props.rendererArgs,
@@ -61,11 +281,26 @@ class PropertyEntryField extends react_1.default.Component {
             currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
             currentInvalidReason: i18nInvalidReason,
             currentInternalValue: this.props.state.internalValue,
+            currentInternalStrOnlyValue: type === "unit" && this.props.state.internalValue ?
+                this.props.state.internalValue.value : this.props.state.internalValue,
+            currentStrOnlyValue: (type === "unit" || type === "currency") && this.props.state.value ?
+                this.props.state.value.value.toString() : (this.props.state.value && this.props.state.value.toString()),
             canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
             disabled: this.props.state.enforced,
             autoFocus: this.props.autoFocus || false,
             onChange: this.props.onChange,
+            onChangeByNumber: this.onChangeByNumber,
             onRestore: this.props.onRestore,
+            currency,
+            currencyFormat: currencyFormat,
+            isNumericType: type === "currency" || type === "unit" || type === "number" || type === "integer" || type === "year",
+            unitPrefersImperial,
+            unitOptions,
+            unitImperialOptions,
+            unit,
+            unitIsLockedToPrimaries,
+            unitToNode: this.unitToNode,
+            onChangeUnit: this.onChangeUnit,
         };
         return react_1.default.createElement(RendererElement, Object.assign({}, rendererArgs));
     }

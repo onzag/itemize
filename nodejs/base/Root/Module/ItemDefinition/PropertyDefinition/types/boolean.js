@@ -38,9 +38,9 @@ const typeValue = {
     // the i18n attributes
     i18n: {
         base: constants_1.REDUCED_BASE_I18N,
-        optional: constants_1.CLASSIC_OPTIONAL_I18N,
+        optional: constants_1.CLASSIC_OPTIONAL_I18N.concat("true_label", "false_label", "null_label"),
         searchBase: constants_1.REDUCED_SEARCH_BASE_I18N,
-        searchOptional: constants_1.CLASSIC_SEARCH_OPTIONAL_I18N,
+        searchOptional: constants_1.CLASSIC_SEARCH_OPTIONAL_I18N.concat("search.true_label", "search.false_label", "search.null_label"),
     },
 };
 exports.default = typeValue;
