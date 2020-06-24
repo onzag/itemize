@@ -432,7 +432,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
         </div>
         <TextField
           fullWidth={true}
-          type="search"
+          type="text"
           onKeyPress={this.onKeyPress}
           className={this.props.classes.entry}
           label={this.props.label}
@@ -552,7 +552,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
           value: this.props.searchQuery,
           onChange: this.onSearchQueryChange,
           autoComplete: "new-address",
-          type: "search",
+          type: "text",
         }}
       />
     );

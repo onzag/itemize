@@ -3,6 +3,12 @@ import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import { IPropertyDefinitionSupportedCurrencyType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/currency";
 import { ICurrencyType } from "../../../../imported-resources";
 import { IPropertyDefinitionSupportedUnitType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/unit";
+interface IUnitI18nType {
+    title: string;
+    others: string;
+    metric: string;
+    imperial: string;
+}
 export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRendererProps<string> {
     currentInternalStrOnlyValue: string;
     currentStrOnlyValue: string;
@@ -14,10 +20,13 @@ export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRenderer
     currency?: ICurrencyType;
     currencyFormat?: "$N" | "N$";
     unit?: string;
+    unitPrimary?: string;
+    unitPrimaryImperial?: string;
     unitOptions?: string[];
     unitImperialOptions?: string[];
     unitPrefersImperial?: boolean;
     unitIsLockedToPrimaries?: boolean;
+    unitI18n?: IUnitI18nType;
     unitToNode?: (unit: string) => React.ReactNode;
     onChangeUnit?: (unit: string) => void;
 }

@@ -117,6 +117,7 @@ properties.role.values.MODERATOR = moderator
 properties.role.values.ADMIN = admin
 $EXTRAROLES
 properties.role.null_value = unspecified
+properties.role.search.null_value = any
 properties.role.error.NOT_NULLABLE = missing role
 
 properties.profile_picture.label = profile picture
@@ -255,6 +256,7 @@ properties.role.values.MODERATOR = moderador
 properties.role.values.ADMIN = administrador
 $EXTRAROLES
 properties.role.null_value = sin especificar
+properties.role.search.null_value = cualquiera
 properties.role.error.NOT_NULLABLE = falta el Rol
 
 properties.profile_picture.label = foto de perfil

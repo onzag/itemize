@@ -579,7 +579,12 @@ export default class PropertyDefinition {
     // Do the fancy checks this checker will either use
     // the .value property or the whole value itself
     let valueToCheck: string | number = value as any;
-    if (typeof (value as any).value !== "undefined") {
+    // also the normalized value has priority to the check
+    // otherwise on unit checks the user might send 100 MegaMeters
+    // and it will get validated as meters if that was the original unit
+    if (typeof (value as any).normalizedValue !== "undefined") {
+      valueToCheck = (value as any).normalizedValue;
+    } else if (typeof (value as any).value !== "undefined") {
       valueToCheck = (value as any).value;
     }
 

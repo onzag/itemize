@@ -30,6 +30,7 @@ function formatValueAsString(numericType, numberSeparator, value) {
     }
     return actualValue.toString();
 }
+;
 class PropertyEntryField extends react_1.default.Component {
     constructor(props) {
         super(props);
@@ -256,14 +257,25 @@ class PropertyEntryField extends react_1.default.Component {
         let unitOptions;
         let unitImperialOptions;
         let unit;
+        let unitPrimary;
+        let unitPrimaryImperial;
+        let unitI18n;
         if (type === "unit") {
             const answer = this.getCurrentUnit();
             unit = answer[0];
+            unitPrimary = answer[1];
+            unitPrimaryImperial = answer[2];
             unitPrefersImperial = answer[3];
             unitIsLockedToPrimaries = this.props.property.getSpecialProperty("lockUnitsToPrimaries");
             const availableUnits = convert_units_1.default().list(subtype);
-            unitOptions = unitIsLockedToPrimaries ? [unit] : availableUnits.filter((unit) => unit.system === "metric").map((u) => u.abbr);
-            unitImperialOptions = unitIsLockedToPrimaries ? [] : availableUnits.filter((unit) => unit.system === "imperial").map((u) => u.abbr);
+            unitOptions = unitIsLockedToPrimaries ? null : availableUnits.filter((unit) => unit.system === "metric" && unit.abbr !== unitPrimary).map((u) => u.abbr);
+            unitImperialOptions = unitIsLockedToPrimaries ? null : availableUnits.filter((unit) => unit.system === "imperial" && unit.abbr !== unitPrimaryImperial).map((u) => u.abbr);
+            unitI18n = {
+                title: this.props.i18n[this.props.language].unit_dialog_title,
+                others: this.props.i18n[this.props.language].unit_dialog_others,
+                metric: this.props.i18n[this.props.language].unit_dialog_metric,
+                imperial: this.props.i18n[this.props.language].unit_dialog_imperial,
+            };
         }
         const RendererElement = this.props.renderer;
         const rendererArgs = {
@@ -297,7 +309,10 @@ class PropertyEntryField extends react_1.default.Component {
             unitPrefersImperial,
             unitOptions,
             unitImperialOptions,
+            unitPrimary,
+            unitPrimaryImperial,
             unit,
+            unitI18n,
             unitIsLockedToPrimaries,
             unitToNode: this.unitToNode,
             onChangeUnit: this.onChangeUnit,

@@ -329,7 +329,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
                     react_1.default.createElement("i", { className: this.props.classes.resultListLabel }, this.props.resultOutOfLabel) :
                     null),
             react_1.default.createElement("div", { className: this.props.classes.locationMapContainer }, map),
-            react_1.default.createElement(TextField_1.default, Object.assign({ fullWidth: true, type: "search", onKeyPress: this.onKeyPress, className: this.props.classes.entry, label: this.props.label, onChange: this.onSearchQueryChange, placeholder: this.props.placeholder, value: this.props.searchQuery, InputProps: {
+            react_1.default.createElement(TextField_1.default, Object.assign({ fullWidth: true, type: "text", onKeyPress: this.onKeyPress, className: this.props.classes.entry, label: this.props.label, onChange: this.onSearchQueryChange, placeholder: this.props.placeholder, value: this.props.searchQuery, InputProps: {
                     classes: {
                         root: this.props.classes.fieldInput,
                         focused: "focused",
@@ -384,7 +384,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
                 value: this.props.searchQuery,
                 onChange: this.onSearchQueryChange,
                 autoComplete: "new-address",
-                type: "search",
+                type: "text",
             } }));
     }
 }

@@ -1098,6 +1098,8 @@ async function getI18nPropertyData(
       })))
     .concat((property.values ? ["null_value"] : [])
       .map((b) => ({key: b, required: true})))
+    .concat((!searchIsDisabled && property.values ? ["search.null_value"] : [])
+      .map((b) => ({key: b, required: true})))
     .concat(
       (property.specialProperties && property.specialProperties["mediaProperty"] && !property.hidden) ? [{
         key: "error.MEDIA_PROPERTY_TOO_LARGE",

@@ -113,17 +113,44 @@ exports.style = index_1.createStyles({
         width: "100%",
     },
 });
+function SelectUnitDialog(props) {
+    const closeAndChangeUnit = (unit) => {
+        props.onClose();
+        props.onChangeUnit(unit);
+    };
+    return (react_1.default.createElement(index_1.Dialog, { classes: {
+            paper: "props.dialogClassName",
+        }, open: props.open, onClose: props.onClose, "aria-labelledby": "unit-dialog-title", fullScreen: props.fullScreen },
+        react_1.default.createElement(index_1.DialogTitle, { id: "unit-dialog-title" }, props.unitI18n.title),
+        react_1.default.createElement("div", null,
+            react_1.default.createElement(index_1.List, null,
+                react_1.default.createElement(index_1.ListItem, { selected: props.unitPrimary === props.unit, button: true, onClick: closeAndChangeUnit.bind(null, props.unitPrimary) },
+                    react_1.default.createElement(index_1.ListItemText, { primary: props.unitToNode(props.unitPrimary) })),
+                react_1.default.createElement(index_1.ListItem, { selected: props.unitPrimaryImperial === props.unit, button: true, onClick: closeAndChangeUnit.bind(null, props.unitPrimaryImperial) },
+                    react_1.default.createElement(index_1.ListItemText, { primary: props.unitToNode(props.unitPrimaryImperial) }))),
+            !props.unitIsLockedToPrimaries ? react_1.default.createElement(react_1.default.Fragment, null,
+                react_1.default.createElement(index_1.Divider, null),
+                react_1.default.createElement(index_1.List, { subheader: react_1.default.createElement(index_1.ListSubheader, { classes: { root: "props.subheaderClassName" } }, props.unitI18n.others) }, (props.unitPrefersImperial ? props.unitImperialOptions : props.unitOptions).map((unit) => (react_1.default.createElement(index_1.ListItem, { selected: unit === props.unit, button: true, onClick: closeAndChangeUnit.bind(null, unit), key: unit },
+                    react_1.default.createElement(index_1.ListItemText, { primary: props.unitToNode(unit) }))))),
+                react_1.default.createElement(index_1.Divider, null),
+                react_1.default.createElement(index_1.List, { subheader: react_1.default.createElement(index_1.ListSubheader, { classes: { root: "props.subheaderClassName" } }, props.unitPrefersImperial ? props.unitI18n.metric : props.unitI18n.imperial) }, (props.unitPrefersImperial ? props.unitOptions : props.unitImperialOptions).map((unit) => (react_1.default.createElement(index_1.ListItem, { selected: unit === props.unit, button: true, onClick: closeAndChangeUnit.bind(null, unit), key: unit },
+                    react_1.default.createElement(index_1.ListItemText, { primary: props.unitToNode(unit) })))))) : null)));
+}
+const SelectUnitDialogResponsive = index_1.withMobileDialog()(SelectUnitDialog);
 class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
     constructor(props) {
         super(props);
         this.state = {
             visible: props.type !== "password",
+            unitDialogOpen: false,
         };
         this.toggleVisible = this.toggleVisible.bind(this);
         this.catchToggleMouseDownEvent = this.catchToggleMouseDownEvent.bind(this);
         this.onChangeByHTMLEvent = this.onChangeByHTMLEvent.bind(this);
         this.onChange = this.onChange.bind(this);
         this.renderBasicTextField = this.renderBasicTextField.bind(this);
+        this.closeUnitDialog = this.closeUnitDialog.bind(this);
+        this.openUnitDialog = this.openUnitDialog.bind(this);
         // this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
         // this.renderAutosuggestField = this.renderAutosuggestField.bind(this);
         // this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
@@ -197,6 +224,16 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
         }
         this.props.onChange(value, internalValue);
     }
+    openUnitDialog() {
+        this.setState({
+            unitDialogOpen: true,
+        });
+    }
+    closeUnitDialog() {
+        this.setState({
+            unitDialogOpen: false,
+        });
+    }
     renderBasicTextField(textFieldProps) {
         // set the input mode, this is for mobile,
         // basically according to our input we need
@@ -254,7 +291,6 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
                 react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onClick: this.toggleVisible, onMouseDown: this.catchToggleMouseDownEvent }, this.state.visible ? react_1.default.createElement(Visibility_1.default, null) : react_1.default.createElement(VisibilityOff_1.default, null))));
         }
         else if (this.props.type === "currency") {
-            // TODO restore
             if (this.props.currencyFormat === "$N") {
                 appliedInputProps.startAdornent = (react_1.default.createElement(index_1.InputAdornment, { position: "start", className: this.props.classes.standardAddornment },
                     react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onMouseDown: this.catchToggleMouseDownEvent }, this.props.currency.symbol)));
@@ -265,10 +301,8 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
             }
         }
         else if (this.props.type === "unit") {
-            // TODO restore
-            // TODO change unit
             appliedInputProps.endAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
-                react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onMouseDown: this.catchToggleMouseDownEvent }, this.props.unitToNode(this.props.unit))));
+                react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onMouseDown: this.catchToggleMouseDownEvent, onClick: this.openUnitDialog }, this.props.unitToNode(this.props.unit))));
         }
         else if (this.props.canRestore) {
             let icon;
@@ -286,6 +320,7 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
             appliedInputProps.endAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
                 react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton } }, this.props.icon)));
         }
+        const unitDialog = this.props.type === "unit" ? (react_1.default.createElement(SelectUnitDialogResponsive, Object.assign({}, this.props, { open: this.state.unitDialogOpen, onClose: this.closeUnitDialog }))) : null;
         const descriptionAsAlert = this.props.args["descriptionAsAlert"];
         // return the complex overengineered component in all its glory
         return (react_1.default.createElement("div", { className: this.props.classes.container },
@@ -310,7 +345,8 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
                         focused: "focused",
                     },
                 }, inputProps: inputProps, disabled: this.props.disabled, variant: "filled" }, appliedTextFieldProps)),
-            react_1.default.createElement("div", { className: this.props.classes.errorMessage }, this.props.currentInvalidReason)));
+            react_1.default.createElement("div", { className: this.props.classes.errorMessage }, this.props.currentInvalidReason),
+            unitDialog));
     }
 }
 const PropertyEntryFieldRenderer = index_1.withStyles(exports.style)(ActualPropertyEntryFieldRenderer);

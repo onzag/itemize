@@ -7,17 +7,25 @@ import {
   IconButton,
   Typography,
   TextField,
+  Dialog,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemText,
+  ListSubheader,
+  Divider,
+  withMobileDialog,
 } from "../../mui-core/index";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import { IPropertyEntryFieldRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryField";
-import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import IconVisibilityOff from "@material-ui/icons/VisibilityOff";
 import IconVisibility from "@material-ui/icons/Visibility";
 import { Alert } from "@material-ui/lab";
 import RestoreIcon from '@material-ui/icons/Restore';
 import ClearIcon from '@material-ui/icons/Clear';
+import { type } from "os";
 
 function shouldShowInvalid(props: IPropertyEntryFieldRendererProps) {
   return !props.currentValid;
@@ -182,7 +190,92 @@ interface IPropertyEntryFieldRendererWithStylesProps extends IPropertyEntryField
 
 interface IPropertyEntryFieldRendererState {
   visible: boolean;
+  unitDialogOpen: boolean;
 }
+
+interface ISelectUnitDialogProps extends IPropertyEntryFieldRendererWithStylesProps {
+  open: boolean;
+  onClose: () => void;
+  fullScreen: boolean;
+}
+
+function SelectUnitDialog(props: ISelectUnitDialogProps) {
+  const closeAndChangeUnit = (unit: string) => {
+    props.onClose();
+    props.onChangeUnit(unit);
+  }
+  return (
+    <Dialog
+      classes={{
+        paper: "props.dialogClassName",
+      }}
+      open={props.open}
+      onClose={props.onClose}
+      aria-labelledby="unit-dialog-title"
+      fullScreen={props.fullScreen}
+    >
+      <DialogTitle id="unit-dialog-title">{props.unitI18n.title}</DialogTitle>
+      <div>
+        <List>
+          <ListItem
+            selected={props.unitPrimary === props.unit}
+            button={true}
+            onClick={closeAndChangeUnit.bind(null, props.unitPrimary)}
+          >
+            <ListItemText primary={props.unitToNode(props.unitPrimary)}/>
+          </ListItem>
+          <ListItem
+            selected={props.unitPrimaryImperial === props.unit}
+            button={true}
+            onClick={closeAndChangeUnit.bind(null, props.unitPrimaryImperial)}
+          >
+            <ListItemText primary={props.unitToNode(props.unitPrimaryImperial)}/>
+          </ListItem>
+        </List>
+        {!props.unitIsLockedToPrimaries ? <>
+          <Divider/>
+          <List
+            subheader={<ListSubheader
+              classes={{root: "props.subheaderClassName"}}
+            >
+              {props.unitI18n.others}
+            </ListSubheader>}
+          >
+            {(props.unitPrefersImperial ? props.unitImperialOptions : props.unitOptions).map((unit) => (
+              <ListItem
+                selected={unit === props.unit}
+                button={true}
+                onClick={closeAndChangeUnit.bind(null, unit)}
+                key={unit}
+              >
+                <ListItemText primary={props.unitToNode(unit)}/>
+              </ListItem>
+            ))}
+          </List>
+          <Divider/>
+          <List
+            subheader={<ListSubheader classes={{root: "props.subheaderClassName"}}>
+              {props.unitPrefersImperial ? props.unitI18n.metric : props.unitI18n.imperial}
+            </ListSubheader>}
+          >
+            {(props.unitPrefersImperial ? props.unitOptions : props.unitImperialOptions).map((unit) => (
+              <ListItem
+                selected={unit === props.unit}
+                button={true}
+                onClick={closeAndChangeUnit.bind(null, unit)}
+                key={unit}
+              >
+                <ListItemText primary={props.unitToNode(unit)}/>
+              </ListItem>
+            ))}
+          </List>
+        </> : null}
+      </div>
+    </Dialog>
+  );
+}
+
+const SelectUnitDialogResponsive = withMobileDialog<ISelectUnitDialogProps>()(SelectUnitDialog);
 
 class ActualPropertyEntryFieldRenderer
   extends React.Component<IPropertyEntryFieldRendererWithStylesProps, IPropertyEntryFieldRendererState> {
@@ -195,6 +288,7 @@ class ActualPropertyEntryFieldRenderer
 
     this.state = {
       visible: props.type !== "password",
+      unitDialogOpen: false,
     }
 
     this.toggleVisible = this.toggleVisible.bind(this);
@@ -202,6 +296,8 @@ class ActualPropertyEntryFieldRenderer
     this.onChangeByHTMLEvent = this.onChangeByHTMLEvent.bind(this);
     this.onChange = this.onChange.bind(this);
     this.renderBasicTextField = this.renderBasicTextField.bind(this);
+    this.closeUnitDialog = this.closeUnitDialog.bind(this);
+    this.openUnitDialog = this.openUnitDialog.bind(this);
     // this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
     // this.renderAutosuggestField = this.renderAutosuggestField.bind(this);
     // this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
@@ -298,6 +394,18 @@ class ActualPropertyEntryFieldRenderer
     this.props.onChange(value, internalValue);
   }
 
+  public openUnitDialog() {
+    this.setState({
+      unitDialogOpen: true,
+    });
+  }
+
+  public closeUnitDialog() {
+    this.setState({
+      unitDialogOpen: false,
+    });
+  }
+
   public renderBasicTextField(textFieldProps?: any) {
     // set the input mode, this is for mobile,
     // basically according to our input we need
@@ -375,7 +483,6 @@ class ActualPropertyEntryFieldRenderer
         </InputAdornment>
       );
     } else if (this.props.type === "currency") {
-      // TODO restore
       if (this.props.currencyFormat === "$N") {
         appliedInputProps.startAdornent = (
           <InputAdornment
@@ -405,11 +512,9 @@ class ActualPropertyEntryFieldRenderer
               {this.props.currency.symbol}
             </IconButton>
           </InputAdornment>
-        )
+        );
       }
     } else if (this.props.type === "unit") {
-      // TODO restore
-      // TODO change unit
       appliedInputProps.endAdornment = (
         <InputAdornment
           position="end"
@@ -419,11 +524,12 @@ class ActualPropertyEntryFieldRenderer
             tabIndex={-1}
             classes={{ root: this.props.classes.iconButton }}
             onMouseDown={this.catchToggleMouseDownEvent}
+            onClick={this.openUnitDialog}
           >
             {this.props.unitToNode(this.props.unit)}
           </IconButton>
         </InputAdornment>
-      )
+      );
     } else if (this.props.canRestore) {
       let icon: React.ReactNode;
       if (this.props.currentAppliedValue) {
@@ -459,6 +565,14 @@ class ActualPropertyEntryFieldRenderer
         </InputAdornment>
       );
     }
+
+    const unitDialog = this.props.type === "unit" ? (
+      <SelectUnitDialogResponsive
+        {...this.props}
+        open={this.state.unitDialogOpen}
+        onClose={this.closeUnitDialog}
+      />
+    ) : null;
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
     // return the complex overengineered component in all its glory
@@ -512,6 +626,8 @@ class ActualPropertyEntryFieldRenderer
         <div className={this.props.classes.errorMessage}>
           {this.props.currentInvalidReason}
         </div>
+
+        {unitDialog}
       </div>
     );
   }

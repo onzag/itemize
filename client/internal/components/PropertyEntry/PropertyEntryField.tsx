@@ -32,7 +32,13 @@ function formatValueAsString(numericType: NumericType, numberSeparator: string, 
   }
   return actualValue.toString();
 }
-  
+
+interface IUnitI18nType {
+  title: string;
+  others: string;
+  metric: string;
+  imperial: string;
+};
 
 export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRendererProps<string> {
   currentInternalStrOnlyValue: string;
@@ -48,12 +54,15 @@ export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRenderer
   currency?: ICurrencyType;
   currencyFormat?: "$N" | "N$",
 
-  unit?: string,
-  unitOptions?: string[],
-  unitImperialOptions?: string[],
-  unitPrefersImperial?: boolean,
-  unitIsLockedToPrimaries?: boolean,
-  unitToNode?: (unit: string) => React.ReactNode,
+  unit?: string;
+  unitPrimary?: string;
+  unitPrimaryImperial?: string;
+  unitOptions?: string[];
+  unitImperialOptions?: string[];
+  unitPrefersImperial?: boolean;
+  unitIsLockedToPrimaries?: boolean;
+  unitI18n?: IUnitI18nType;
+  unitToNode?: (unit: string) => React.ReactNode;
   onChangeUnit?: (unit: string) => void;
 }
 
@@ -85,6 +94,17 @@ export default class PropertyEntryField
           <span key={i}>{m}</span> : <sup key={i}>{m}</sup>)}
       </span>
     );
+  }
+
+  public componentDidMount() {
+    const initialPrefill = this.props.property.getSpecialProperty("initialPrefill") as number;
+    if (
+      typeof initialPrefill !== "undefined" &&
+      initialPrefill !== null &&
+      !this.props.state.value
+    ) {
+      this.onChangeByNumber(initialPrefill.toString().replace(".", this.props.i18n[this.props.language].number_decimal_separator));
+    }
   }
 
   public componentDidUpdate(
@@ -155,7 +175,8 @@ export default class PropertyEntryField
     const value = (this.props.state.value as IPropertyDefinitionSupportedUnitType).value;
     const oldUnit = (this.props.state.value as IPropertyDefinitionSupportedUnitType).unit;
 
-    const valueInNewUnit = convert(value).from(oldUnit as any).to(newUnit as any);
+    const maxDecimalCount = this.props.property.getMaxDecimalCount() || MAX_DECIMAL_COUNT;
+    const valueInNewUnit = parseFloat(convert(value).from(oldUnit as any).to(newUnit as any).toFixed(maxDecimalCount));
 
     this.props.onChange(
       {
@@ -164,7 +185,7 @@ export default class PropertyEntryField
         value: valueInNewUnit,
       },
       {
-        ...this.props.state.internalValue,
+        value: valueInNewUnit.toString().replace(".", this.props.i18n[this.props.language].number_decimal_separator),
         unit: newUnit,
       }
     );
@@ -328,16 +349,32 @@ export default class PropertyEntryField
     let unitOptions: string[];
     let unitImperialOptions: string[];
     let unit: string;
+    let unitPrimary: string;
+    let unitPrimaryImperial: string;
+    let unitI18n: IUnitI18nType;
     if (type === "unit") {
       const answer = this.getCurrentUnit();
       unit = answer[0];
+      unitPrimary = answer[1];
+      unitPrimaryImperial = answer[2];
       unitPrefersImperial = answer[3];
 
       unitIsLockedToPrimaries = this.props.property.getSpecialProperty("lockUnitsToPrimaries") as boolean;
 
       const availableUnits = convert().list(subtype as any);
-      unitOptions = unitIsLockedToPrimaries ? [unit] : availableUnits.filter((unit) => unit.system === "metric").map((u) => u.abbr);
-      unitImperialOptions = unitIsLockedToPrimaries ? [] : availableUnits.filter((unit) => unit.system === "imperial").map((u) => u.abbr);
+      unitOptions = unitIsLockedToPrimaries ? null : availableUnits.filter(
+        (unit) => unit.system === "metric" && unit.abbr !== unitPrimary
+      ).map((u) => u.abbr);
+      unitImperialOptions = unitIsLockedToPrimaries ? null : availableUnits.filter(
+        (unit) => unit.system === "imperial" && unit.abbr !== unitPrimaryImperial
+      ).map((u) => u.abbr);
+
+      unitI18n = {
+        title: this.props.i18n[this.props.language].unit_dialog_title,
+        others: this.props.i18n[this.props.language].unit_dialog_others,
+        metric: this.props.i18n[this.props.language].unit_dialog_metric,
+        imperial: this.props.i18n[this.props.language].unit_dialog_imperial,
+      };
     }
 
     const RendererElement = this.props.renderer;
@@ -380,7 +417,10 @@ export default class PropertyEntryField
       unitPrefersImperial,
       unitOptions,
       unitImperialOptions,
+      unitPrimary,
+      unitPrimaryImperial,
       unit,
+      unitI18n,
       unitIsLockedToPrimaries,
       unitToNode: this.unitToNode,
       onChangeUnit: this.onChangeUnit,

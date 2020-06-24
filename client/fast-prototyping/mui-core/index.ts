@@ -14,12 +14,20 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import RootRef from '@material-ui/core/RootRef';
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListSubheader from "@material-ui/core/ListSubheader";
+import Divider from "@material-ui/core/Divider";
 import {
   createStyles,
   withStyles,
   WithStyles,
   Theme,
 } from '@material-ui/core/styles';
+import withMobileDialog from "@material-ui/core/withMobileDialog";
 
 export {
   Avatar,
@@ -42,4 +50,12 @@ export {
   InputAdornment,
   IconButton,
   ExpandMoreIcon,
+  Dialog,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemText,
+  ListSubheader,
+  withMobileDialog,
+  Divider,
 }
