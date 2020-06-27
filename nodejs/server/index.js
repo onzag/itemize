@@ -39,6 +39,7 @@ const dbbuilder_1 = __importDefault(require("../dbbuilder"));
 const global_manager_1 = require("./global-manager");
 const generator_1 = require("./ssr/generator");
 const rootpool_1 = require("./rootpool");
+const sql_files_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files");
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -75,7 +76,7 @@ pg_1.types.setTypeParser(DATE_OID, (val) => val);
 // we need the async fs
 const fsAsync = fs_1.default.promises;
 // now in order to build the database in the cheat mode, we don't need express
-const app = INSTANCE_MODE === "BUILD_DATABASE" ? null : express_1.default();
+const app = INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "CLEAN_STORAGE" ? null : express_1.default();
 /**
  * This is the function that catches the errors that are thrown
  * within graphql
@@ -419,9 +420,24 @@ async function initializeServer(ssrConfig, custom = {}) {
                 authUrl: containerData.authUrl,
             });
             exports.logger.info("initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX);
-            pkgcloudUploadContainers[containerIdX] =
-                await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName);
+            let prefix = config.containersHostnamePrefixes[containerIdX];
+            if (prefix.indexOf("/") !== 0) {
+                prefix = "https://" + prefix;
+            }
+            pkgcloudUploadContainers[containerIdX] = {
+                prefix,
+                container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
+            };
         }));
+        if (INSTANCE_MODE === "CLEAN_STORAGE") {
+            exports.logger.info("initializeServer: cleaning storage");
+            await Promise.all(Object.keys(pkgcloudUploadContainers).map(async (containerId) => {
+                exports.logger.info("initializeServer: cleaning " + containerId);
+                const container = pkgcloudUploadContainers[containerId];
+                await sql_files_1.removeFolderFor(container.container, "");
+            }));
+            process.exit(0);
+        }
         // RETRIEVING INITIAL SERVER DATA
         exports.logger.info("initializeServer: attempting to retrieve server data");
         const getPromisified = util_1.promisify(redisGlobalClient.get).bind(redisGlobalClient);

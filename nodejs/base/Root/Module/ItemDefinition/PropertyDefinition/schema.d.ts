@@ -56,6 +56,7 @@ declare const _default: {
             type: string;
         };
         default: {};
+        searchDefault: {};
         defaultIf: {
             type: string;
             items: {
@@ -71,6 +72,7 @@ declare const _default: {
             };
             minItems: number;
         };
+        searchDefaultIf: {};
         invalidIf: {
             type: string;
             items: {
@@ -114,7 +116,13 @@ declare const _default: {
         hidden: {
             type: string;
         };
+        searchHidden: {
+            type: string;
+        };
         hiddenIf: {
+            $ref: string;
+        };
+        searchHiddenIf: {
             $ref: string;
         };
         searchable: {

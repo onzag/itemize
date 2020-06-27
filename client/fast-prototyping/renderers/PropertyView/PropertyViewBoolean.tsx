@@ -10,11 +10,11 @@ export default function PropertyViewBooleanRenderer(props: IPropertyViewBooleanR
       return <NullComponent {...nullArgs}/>;
     }
 
-    i18nLabel = props.args.hideLabel ? null : props.i18nUnspecified;
+    i18nLabel = props.i18nUnspecified;
   } else if (props.currentValue === true) {
-    i18nLabel = props.args.hideLabel ? null : props.i18nYes;
+    i18nLabel = props.i18nYes;
   } else if (props.currentValue === false) {
-    i18nLabel = props.args.hideLabel ? null : props.i18nNo;
+    i18nLabel = props.i18nNo;
   }
 
   return (

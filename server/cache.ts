@@ -223,7 +223,8 @@ export class Cache {
       itemDefinition,
       value,
       null,
-      this.uploadsContainers[containerId],
+      this.uploadsContainers[containerId].container,
+      this.uploadsContainers[containerId].prefix,
       dictionary,
     );
     const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
@@ -232,7 +233,8 @@ export class Cache {
       itemDefinition.getParentModule(),
       value,
       null,
-      this.uploadsContainers[containerId],
+      this.uploadsContainers[containerId].container,
+      this.uploadsContainers[containerId].prefix,
       dictionary,
     );
     const sqlModData: ISQLTableRowValue = sqlModDataComposed.value;
@@ -536,7 +538,8 @@ export class Cache {
       itemDefinition,
       update,
       currentValue,
-      containerId ? this.uploadsContainers[containerId] : null,
+      containerId ? this.uploadsContainers[containerId].container : null,
+      containerId ? this.uploadsContainers[containerId].prefix : null,
       dictionary,
       partialUpdateFields,
     );
@@ -546,7 +549,8 @@ export class Cache {
       itemDefinition.getParentModule(),
       update,
       currentValue,
-      containerId ? this.uploadsContainers[containerId] : null,
+      containerId ? this.uploadsContainers[containerId].container : null,
+      containerId ? this.uploadsContainers[containerId].prefix : null,
       dictionary,
       partialUpdateFields,
     );
@@ -709,11 +713,24 @@ export class Cache {
     );
 
     let deleteFilesInContainer = async (specifiedVersion: string) => {
-      await deleteEverythingInFilesContainerId(
-        this.uploadsContainers[containerId],
-        itemDefinition,
-        id + "." + (specifiedVersion || null),
-      );
+      const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
+        .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
+      const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
+        .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
+      if (someFilesInItemDef) {
+        await deleteEverythingInFilesContainerId(
+          this.uploadsContainers[containerId].container,
+          itemDefinition,
+          id + "." + (specifiedVersion || null),
+        );
+      }
+      if (someFilesInModule) {
+        await deleteEverythingInFilesContainerId(
+          this.uploadsContainers[containerId].container,
+          itemDefinition.getParentModule(),
+          id + "." + (specifiedVersion || null),
+        );
+      }
     }
 
     let runDetachedEvents = async (specifiedVersion: string) => {

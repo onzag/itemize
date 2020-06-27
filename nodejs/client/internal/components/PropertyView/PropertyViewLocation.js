@@ -10,7 +10,9 @@ class PropertyViewLocation extends react_1.default.Component {
     constructor(props) {
         super(props);
         this.preventViewportDidUpdateChange = false;
-        const value = this.props.state.value;
+        const value = (this.props.useAppliedValue ?
+            this.props.state.stateAppliedValue :
+            this.props.state.value);
         const center = value ? [value.lat, value.lng] : [props.country.latitude, props.country.longitude];
         const zoom = value ? PropertyEntryLocation_1.IViewportZoomEnumType.LARGE : PropertyEntryLocation_1.IViewportZoomEnumType.SMALL;
         this.state = {
@@ -24,9 +26,13 @@ class PropertyViewLocation extends react_1.default.Component {
     }
     componentDidUpdate(prevProps) {
         if (!this.preventViewportDidUpdateChange) {
-            const value = this.props.state.value;
+            const value = (this.props.useAppliedValue ?
+                this.props.state.stateAppliedValue :
+                this.props.state.value);
             if (value) {
-                const oldValue = prevProps.state.value;
+                let oldValue = (prevProps.useAppliedValue ?
+                    prevProps.state.stateAppliedValue :
+                    prevProps.state.value);
                 if (!deep_equal_1.default(value, oldValue)) {
                     this.setState({
                         viewport: {
@@ -46,7 +52,9 @@ class PropertyViewLocation extends react_1.default.Component {
     }
     onResetViewportCenter() {
         this.preventViewportDidUpdateChange = false;
-        const value = this.props.state.value;
+        const value = (this.props.useAppliedValue ?
+            this.props.state.stateAppliedValue :
+            this.props.state.value);
         if (value) {
             this.setState({
                 viewport: {
@@ -58,7 +66,9 @@ class PropertyViewLocation extends react_1.default.Component {
     }
     shouldComponentUpdate(nextProps, nextState) {
         // This is optimized to only update for the thing it uses
-        return !deep_equal_1.default(this.props.state.value, nextProps.state.value) ||
+        return this.props.useAppliedValue !== nextProps.useAppliedValue ||
+            (!this.props.useAppliedValue && !deep_equal_1.default(this.props.state.value, nextProps.state.value)) ||
+            (this.props.useAppliedValue && !deep_equal_1.default(this.props.state.stateAppliedValue, nextProps.state.stateAppliedValue)) ||
             !deep_equal_1.default(this.state, nextState) ||
             nextProps.property !== this.props.property ||
             nextProps.renderer !== this.props.renderer ||
@@ -67,7 +77,9 @@ class PropertyViewLocation extends react_1.default.Component {
             !deep_equal_1.default(this.props.rendererArgs, nextProps.rendererArgs);
     }
     render() {
-        const value = this.props.state.value;
+        const value = (this.props.useAppliedValue ?
+            this.props.state.stateAppliedValue :
+            this.props.state.value);
         let canResetViewportCenter = false;
         if (value) {
             const expectedViewport = {
@@ -80,7 +92,7 @@ class PropertyViewLocation extends react_1.default.Component {
         const rendererArgs = {
             args: this.props.rendererArgs,
             rtl: this.props.rtl,
-            currentValue: this.props.state.value,
+            currentValue: value,
             viewport: this.state.viewport,
             onViewportChange: this.onViewportChange,
             onResetViewportCenter: this.onResetViewportCenter,

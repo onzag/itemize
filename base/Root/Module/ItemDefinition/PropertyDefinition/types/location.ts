@@ -153,7 +153,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       typeof arg.args[locationName] !== "undefined" && arg.args[locationName] !== null &&
       typeof arg.args[radiusName] !== "undefined" && arg.args[radiusName] !== null
     ) {
-      arg.knexBuilder.andWhere(arg.prefix + arg.id, "!=", null);
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_GEO", "is not", null);
 
       const argAsLocation: IPropertyDefinitionSupportedLocationType = arg.args[locationName] as any;
       const lng = argAsLocation.lng || 0;
@@ -163,7 +163,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       arg.knexBuilder.andWhereRaw(
         "ST_DWithin(??, ST_MakePoint(?,?)::geography, ?)",
         [
-          arg.prefix + arg.id,
+          arg.prefix + arg.id + "_GEO",
           lng,
           lat,
           distance,
@@ -174,7 +174,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
         return [
           "ST_Distance(??, ST_MakePoint(?,?)::geography) AS ??",
           [
-            arg.prefix + arg.id,
+            arg.prefix + arg.id + "_GEO",
             lng,
             lat,
             arg.prefix + arg.id + "_CALC_RADIUS",

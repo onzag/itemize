@@ -411,6 +411,12 @@ class ItemDefinition {
      * @returns a property definition array
      */
     getAllPropertyDefinitionsAndExtensions() {
+        if (this.isInSearchMode()) {
+            // This is a case where a collision might exist and the local takes priority
+            // it is rare that this would run anyway
+            return this.parentModule.getAllPropExtensions().filter((p) => p.getId() === "search")
+                .concat(this.getAllPropertyDefinitions());
+        }
         return this.parentModule.getAllPropExtensions().concat(this.getAllPropertyDefinitions());
     }
     /**
@@ -617,7 +623,7 @@ class ItemDefinition {
         const properties = onlyIncludeProperties ?
             onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, true)
                 .getStateNoExternalChecking(id, version, emulateExternalChecking)) :
-            this.getParentModule().getAllPropExtensions().concat(this.getAllPropertyDefinitions()).map((pd) => {
+            this.getAllPropertyDefinitionsAndExtensions().map((pd) => {
                 return pd.getStateNoExternalChecking(id, version, emulateExternalChecking);
             });
         let policies = null;
@@ -673,7 +679,7 @@ class ItemDefinition {
     async getState(id, version, onlyIncludeProperties, onlyIncludeIncludes, excludePolicies) {
         const properties = await Promise.all(onlyIncludeProperties ?
             onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, true).getState(id, version)) :
-            this.getParentModule().getAllPropExtensions().concat(this.getAllPropertyDefinitions()).map((pd) => {
+            this.getAllPropertyDefinitionsAndExtensions().map((pd) => {
                 return pd.getState(id, version);
             }));
         let policies = null;

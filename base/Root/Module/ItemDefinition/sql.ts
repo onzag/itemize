@@ -208,6 +208,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
   data: IGQLArgs,
   oldData: IGQLValue,
   uploadsContainer: pkgcloud.storage.Container,
+  uploadsPrefix: string,
   dictionary: string,
   partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
 ): ISQLStreamComposedTableRowValue {
@@ -225,12 +226,14 @@ export function convertGQLValueToSQLValueForItemDefinition(
       const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
         knex,
         serverData,
+        itemDefinition.getParentModule(),
         itemDefinition,
         null,
         pd,
         data,
         oldData,
         uploadsContainer,
+        uploadsPrefix,
         dictionary,
       );
       Object.assign(
@@ -259,6 +262,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
         data,
         oldData,
         uploadsContainer,
+        uploadsPrefix,
         dictionary,
         innerPartialFields,
       );
@@ -342,7 +346,7 @@ export function buildSQLQueryForItemDefinition(
     // for technical reasons we need to do this twice and use a fake builder
     // just to know if it needs extra fields
     itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
-      if (!pd.isExtension() || !pd.isSearchable()) {
+      if (!pd.isSearchable()) {
         return;
       }
 
@@ -371,8 +375,7 @@ export function buildSQLQueryForItemDefinition(
     // during the await time
     knexBuilder.andWhere((builder) => {
       itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
-        // only extensions and searchable are valid for the search functionality
-        if (!pd.isExtension() || !pd.isSearchable()) {
+        if (!pd.isSearchable()) {
           return;
         }
         const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
@@ -391,6 +394,8 @@ export function buildSQLQueryForItemDefinition(
           );
         });
       });
+
+      //TODO add includes in the search
     });
   }
 

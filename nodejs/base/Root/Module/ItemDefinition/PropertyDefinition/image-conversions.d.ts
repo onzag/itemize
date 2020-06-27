@@ -13,4 +13,4 @@ import pkgcloud from "pkgcloud";
  * Runs the image conversions and stores them in the specified location
  * @returns a void promise for when this is done
  */
-export declare function runImageConversions(imageStream: ReadStream, filePath: string, fileName: string, fileMimeType: string, uploadsContainer: pkgcloud.storage.Container, propDef: PropertyDefinition): Promise<void>;
+export declare function runImageConversions(imageStream: ReadStream, filePath: string, fileName: string, fileMimeType: string, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, propDef: PropertyDefinition): Promise<void>;

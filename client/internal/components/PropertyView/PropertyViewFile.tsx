@@ -24,7 +24,9 @@ export default class PropertyViewFile
   ) {
     // This is optimized to only update for the thing it uses
     // This is optimized to only update for the thing it uses
-    return this.props.state.value !== nextProps.state.value ||
+    return this.props.useAppliedValue !== nextProps.useAppliedValue ||
+      (!this.props.useAppliedValue && !equals(this.props.state.value, nextProps.state.value)) ||
+      (this.props.useAppliedValue && !equals(this.props.state.stateAppliedValue, nextProps.state.stateAppliedValue)) ||
       nextProps.renderer !== this.props.renderer ||
       nextProps.property !== this.props.property ||
       nextProps.forId !== this.props.forId ||
@@ -38,7 +40,11 @@ export default class PropertyViewFile
     window.open(value.url, value.name);
   }
   public render() {
-    let currentValue = this.props.state.value as PropertyDefinitionSupportedFileType;
+    let currentValue = (
+      this.props.useAppliedValue ?
+        this.props.state.stateAppliedValue :
+        this.props.state.value
+      ) as PropertyDefinitionSupportedFileType;
 
     const isSupportedImage = currentValue && FILE_SUPPORTED_IMAGE_TYPES.includes(currentValue.type);
 

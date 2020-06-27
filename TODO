@@ -20,6 +20,10 @@ SITE
   . Client side search does not support normalized anymore
   . SQL mantenience gets simplified as last modified value should not change after this [DONE]
 . Rewrite all the styles to use the mui-core instead
+. Fix the EXACT procedure to have two conversion ids types, so there's the EXACT search variant and the EXACT_NULL variant which
+is going to be a boolean, that is hidden by default to match only null values and use is null and only appears if the parent field is nullable
+. Fix the EXACT_AND_RANGE procedure to actually have the exact and also include the EXACT_NULL variant boolean if the field is nullable
+. In fact LOCATION_RADIUS and FTS should also have a exact null field, all of them should
 
 ONZASYSTEMS [+3]
 . Build a Frontpage with few details

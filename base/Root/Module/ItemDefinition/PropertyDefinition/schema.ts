@@ -70,6 +70,7 @@ export default {
       type: "string",
     },
     default: {},
+    searchDefault: {},
     defaultIf: {
       type: "array",
       items: {
@@ -85,6 +86,7 @@ export default {
       },
       minItems: 1,
     },
+    searchDefaultIf: {},
     invalidIf: {
       type: "array",
       items: {
@@ -128,7 +130,13 @@ export default {
     hidden: {
       type: "boolean",
     },
+    searchHidden: {
+      type: "boolean",
+    },
     hiddenIf: {
+      $ref: "ConditionalRuleSet",
+    },
+    searchHiddenIf: {
       $ref: "ConditionalRuleSet",
     },
     searchable: {

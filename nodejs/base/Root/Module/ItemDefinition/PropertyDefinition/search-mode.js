@@ -89,10 +89,13 @@ function buildSearchModePropertyDefinitions(rawData, otherKnownProperties) {
     if (newPropDef.type === "text") {
         newPropDef.type = "string";
     }
+    if (typeof newPropDef.searchDefault !== "undefined") {
+        newPropDef.default = newPropDef.searchDefault;
+    }
     // the default if condition, we need to process
-    if (newPropDef.defaultIf) {
+    if (newPropDef.searchDefaultIf || newPropDef.defaultIf) {
         // so since it has values and conditions (and the value is raw)
-        newPropDef.defaultIf = newPropDef.defaultIf.map((di) => {
+        newPropDef.defaultIf = (newPropDef.searchDefaultIf || newPropDef.defaultIf).map((di) => {
             return {
                 value: di.value,
                 if: search_mode_1.buildSearchModeConditionalRuleSet(di.if, otherKnownProperties),
@@ -117,9 +120,12 @@ function buildSearchModePropertyDefinitions(rawData, otherKnownProperties) {
             delete newPropDef.enforcedValues;
         }
     }
+    if (typeof newPropDef.searchHidden !== "undefined") {
+        newPropDef.hidden = newPropDef.searchHidden;
+    }
     // also with hidden if, kinda, since it's a single condition
-    if (newPropDef.hiddenIf) {
-        newPropDef.hiddenIf = search_mode_1.buildSearchModeConditionalRuleSet(newPropDef.hiddenIf, otherKnownProperties);
+    if (newPropDef.searchHiddenIf || newPropDef.hiddenIf) {
+        newPropDef.hiddenIf = search_mode_1.buildSearchModeConditionalRuleSet(newPropDef.searchHiddenIf || newPropDef.hiddenIf, otherKnownProperties);
         if (!newPropDef.hiddenIf) {
             delete newPropDef.hiddenIf;
         }
@@ -294,6 +300,12 @@ function buildSearchModePropertyDefinitions(rawData, otherKnownProperties) {
                 };
             }),
         };
+        if (newPropDef.hidden) {
+            newPropDef2.hidden = true;
+        }
+        if (newPropDef.hiddenIf) {
+            newPropDef2.hiddenIf = newPropDef.hiddenIf;
+        }
         // decorate the default property
         newPropDef.id = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.LOCATION + newPropDef.id;
         if (newPropDef.i18nData) {

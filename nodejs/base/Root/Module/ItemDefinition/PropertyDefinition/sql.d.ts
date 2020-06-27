@@ -12,6 +12,7 @@ import ItemDefinition from "..";
 import Include from "../Include";
 import { IGQLArgs, IGQLValue } from "../../../../../gql-querier";
 import pkgcloud from "pkgcloud";
+import Module from "../..";
 /**
  * Provides the sql function that defines the schema that is used to build
  * the partial table definition
@@ -102,7 +103,7 @@ export declare function convertSQLValueToGQLValueForProperty(knex: Knex, serverD
  * @returns a promise with the partial sql row value to be inputted, note
  * that this is a promise because data streams need to be processed
  */
-export declare function convertGQLValueToSQLValueForProperty(knex: Knex, serverData: any, itemDefinition: ItemDefinition, include: Include, propertyDefinition: PropertyDefinition, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, dictionary: string): ISQLStreamComposedTableRowValue;
+export declare function convertGQLValueToSQLValueForProperty(knex: Knex, serverData: any, mod: Module, itemDefinition: ItemDefinition, include: Include, propertyDefinition: PropertyDefinition, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, dictionary: string): ISQLStreamComposedTableRowValue;
 /**
  * Builds a sql search query from a given property definition, the data
  * coming from the search module, a sql prefix to use, and the knex builder

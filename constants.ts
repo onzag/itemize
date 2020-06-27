@@ -80,6 +80,10 @@ export const MAX_SEARCH_RESULTS_FALLBACK = 50;
  */
 export const MAX_SEARCH_RECORDS_FALLBACK = 500;
 /**
+ * Size in characters of the search field
+ */
+export const MAX_SEARCH_FIELD_SIZE = 1024;
+/**
  * Supported image types
  */
 export const FILE_SUPPORTED_IMAGE_TYPES = [
@@ -103,6 +107,7 @@ export const MODULE_AND_ITEM_DEF_I18N_SEARCHABLE = [
   "search_field_label",
   "search_field_placeholder",
   "search_keywords",
+  "search_value_too_large",
 ]
 /**
  * The custom key as it is stored in the built file, the custom key

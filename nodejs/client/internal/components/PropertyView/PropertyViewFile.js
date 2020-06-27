@@ -13,7 +13,9 @@ class PropertyViewFile extends react_1.default.Component {
     shouldComponentUpdate(nextProps) {
         // This is optimized to only update for the thing it uses
         // This is optimized to only update for the thing it uses
-        return this.props.state.value !== nextProps.state.value ||
+        return this.props.useAppliedValue !== nextProps.useAppliedValue ||
+            (!this.props.useAppliedValue && !deep_equal_1.default(this.props.state.value, nextProps.state.value)) ||
+            (this.props.useAppliedValue && !deep_equal_1.default(this.props.state.stateAppliedValue, nextProps.state.stateAppliedValue)) ||
             nextProps.renderer !== this.props.renderer ||
             nextProps.property !== this.props.property ||
             nextProps.forId !== this.props.forId ||
@@ -25,7 +27,9 @@ class PropertyViewFile extends react_1.default.Component {
         window.open(value.url, value.name);
     }
     render() {
-        let currentValue = this.props.state.value;
+        let currentValue = (this.props.useAppliedValue ?
+            this.props.state.stateAppliedValue :
+            this.props.state.value);
         const isSupportedImage = currentValue && constants_1.FILE_SUPPORTED_IMAGE_TYPES.includes(currentValue.type);
         if (currentValue &&
             currentValue.url.indexOf("blob:") !== 0) {

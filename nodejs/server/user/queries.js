@@ -553,7 +553,7 @@ exports.customUserQueries = (appData) => {
                     throw err;
                 }
                 const resetPasswordLink = (appData.sensitiveConfig.mailgunTargetDomain || appData.config.productionHostname) +
-                    i18nData.custom.forgot_password_link_target + "?token=" + encodeURIComponent(resetToken);
+                    i18nData.custom.forgot_password_link_target + "?token=" + encodeURIComponent(resetToken) + "&id=" + userId;
                 const templateToUse = i18nData.custom.forgot_password_template_name;
                 const from = `${i18nData.custom.forgot_password_user} <${i18nData.custom.forgot_password_email_user}@${appData.sensitiveConfig.mailgunDomain}>`;
                 const to = resultUser.email;

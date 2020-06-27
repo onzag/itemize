@@ -47,6 +47,10 @@ export interface IRawJsonI18NSpecificLocaleDataType {
    */
   search_field_placeholder: string;
   /**
+   * The error that comes from the full text search mode when you have input too much data
+   */
+  search_value_too_large: string;
+  /**
    * A comma separated list of strings for full text search mode
    */
   search_keywords: string;

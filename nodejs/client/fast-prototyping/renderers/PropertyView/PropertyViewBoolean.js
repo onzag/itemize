@@ -12,13 +12,13 @@ function PropertyViewBooleanRenderer(props) {
             const nullArgs = props.args.nullComponentArgs;
             return react_1.default.createElement(NullComponent, Object.assign({}, nullArgs));
         }
-        i18nLabel = props.args.hideLabel ? null : props.i18nUnspecified;
+        i18nLabel = props.i18nUnspecified;
     }
     else if (props.currentValue === true) {
-        i18nLabel = props.args.hideLabel ? null : props.i18nYes;
+        i18nLabel = props.i18nYes;
     }
     else if (props.currentValue === false) {
-        i18nLabel = props.args.hideLabel ? null : props.i18nNo;
+        i18nLabel = props.i18nNo;
     }
     return (react_1.default.createElement("span", null, i18nLabel));
 }

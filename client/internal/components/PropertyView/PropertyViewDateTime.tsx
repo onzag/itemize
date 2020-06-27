@@ -57,7 +57,9 @@ export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerPr
     nextProps: IPropertyViewHandlerProps<IPropertyViewDateTimeRendererProps>,
   ) {
     // This is optimized to only update for the thing it uses
-    return !equals(this.props.state.value, nextProps.state.value) ||
+    return this.props.useAppliedValue !== nextProps.useAppliedValue ||
+      (!this.props.useAppliedValue && !equals(this.props.state.value, nextProps.state.value)) ||
+      (this.props.useAppliedValue && !equals(this.props.state.stateAppliedValue, nextProps.state.stateAppliedValue)) ||
       nextProps.property !== this.props.property ||
       nextProps.renderer !== this.props.renderer ||
       nextProps.capitalize !== this.props.capitalize ||
@@ -81,8 +83,9 @@ export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerPr
     }
 
     let momentValue: any = null;
-    if (this.props.state.value && this.props.state.value !== "Invalid Date") {
-      momentValue = Moment(this.props.state.value as string, dbFormat).utc();
+    const valueToUse: string = (this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value) as string;
+    if (valueToUse && valueToUse !== "Invalid Date") {
+      momentValue = Moment(valueToUse, dbFormat).utc();
       if (!momentValue.isValid()) {
         momentValue = null;
       }
@@ -92,7 +95,7 @@ export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerPr
     const rendererArgs: IPropertyViewDateTimeRendererProps = {
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
-      currentValue: this.props.state.value as string,
+      currentValue: valueToUse,
       momentValue,
       dbFormat,
       defaultFormat: format,

@@ -44,13 +44,14 @@ import { ILocaleContextType } from "../client/internal/app";
 import { ICollectorType } from "../client";
 import { Pool } from "tarn";
 import { retrieveRootPool } from "./rootpool";
+import { removeFolderFor } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
 
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const PORT = process.env.PORT || 8000;
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
-const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
+const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "CLEAN_STORAGE" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 
 // building the logger
@@ -91,7 +92,7 @@ types.setTypeParser(DATE_OID, (val) => val);
 const fsAsync = fs.promises;
 
 // now in order to build the database in the cheat mode, we don't need express
-const app = INSTANCE_MODE === "BUILD_DATABASE" ? null : express();
+const app = INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "CLEAN_STORAGE" ? null : express();
 
 /**
  * Contains all the pkgcloud clients connection for every container id
@@ -100,7 +101,12 @@ export type PkgCloudClients = {[containerId: string]: pkgcloud.storage.Client};
 /**
  * Contains all the pkgcloud containers for every container id
  */
-export type PkgCloudContainers = {[containerId: string]: pkgcloud.storage.Container};
+export type PkgCloudContainers = {
+  [containerId: string]: {
+    prefix: string,
+    container: pkgcloud.storage.Container,
+  }
+};
 
 /**
  * Specifies the SSR configuration for the multiple pages
@@ -606,9 +612,31 @@ export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCus
       logger.info(
         "initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX,
       );
-      pkgcloudUploadContainers[containerIdX] =
-        await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName);
+      let prefix = config.containersHostnamePrefixes[containerIdX];
+      if (prefix.indexOf("/") !== 0) {
+        prefix = "https://" + prefix;
+      }
+      pkgcloudUploadContainers[containerIdX] = {
+        prefix,
+        container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
+      };
     }));
+
+    if (INSTANCE_MODE === "CLEAN_STORAGE") {
+      logger.info(
+        "initializeServer: cleaning storage",
+      );
+
+      await Promise.all(Object.keys(pkgcloudUploadContainers).map(async (containerId) => {
+        logger.info(
+          "initializeServer: cleaning " + containerId,
+        );
+        const container = pkgcloudUploadContainers[containerId];
+        await removeFolderFor(container.container, "");
+      }));
+
+      process.exit(0);
+    }
 
     // RETRIEVING INITIAL SERVER DATA
     logger.info(

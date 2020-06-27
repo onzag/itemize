@@ -143,6 +143,10 @@ export interface IPropertyDefinitionRawJSONDataType {
    */
   hidden?: boolean;
   /**
+   * hidden in search mode
+   */
+  searchHidden?: boolean;
+  /**
    * html style autocomplete, mainly used for browser level
    * autocompletition
    */
@@ -152,9 +156,17 @@ export interface IPropertyDefinitionRawJSONDataType {
    */
   default?: PropertyDefinitionSupportedType;
   /**
+   * default value for search mode
+   */
+  searchDefault?: PropertyDefinitionSupportedType;
+  /**
    * default value if with conditions
    */
   defaultIf?: IPropertyDefinitionRawJSONRuleDataType[];
+  /**
+   * default value for search mode
+   */
+  searchDefaultIf?: IPropertyDefinitionRawJSONRuleDataType[];
   /**
    * conditional custom invalid value
    */
@@ -171,6 +183,10 @@ export interface IPropertyDefinitionRawJSONDataType {
    * hidden if conditional
    */
   hiddenIf?: IConditionalRuleSetRawJSONDataType;
+  /**
+   * hidden in search mode
+   */
+  searchHiddenIf?: IConditionalRuleSetRawJSONDataType;
   /**
    * whether it is searchable or not
    */

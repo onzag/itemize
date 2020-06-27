@@ -805,6 +805,7 @@ async function getI18nData(
       search_field_label: null,
       search_field_placeholder: null,
       search_keywords: null,
+      search_value_too_large: null,
     };
 
     // for every locale key we have that we need either for item definition

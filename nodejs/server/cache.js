@@ -160,8 +160,8 @@ class Cache {
         // now we extract the SQL information for both item definition table
         // and the module table, this value is database ready, and hence needs
         // knex and the dictionary to convert fields that need it
-        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, value, null, this.uploadsContainers[containerId], dictionary);
-        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), value, null, this.uploadsContainers[containerId], dictionary);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, value, null, this.uploadsContainers[containerId].container, this.uploadsContainers[containerId].prefix, dictionary);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), value, null, this.uploadsContainers[containerId].container, this.uploadsContainers[containerId].prefix, dictionary);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
         // this data is added every time when creating
@@ -358,8 +358,8 @@ class Cache {
         // that we only want the editingFields to be returned
         // into the SQL value, this is valid in here because
         // we don't want things to be defaulted in the query
-        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, update, currentValue, containerId ? this.uploadsContainers[containerId] : null, dictionary, partialUpdateFields);
-        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), update, currentValue, containerId ? this.uploadsContainers[containerId] : null, dictionary, partialUpdateFields);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, update, currentValue, containerId ? this.uploadsContainers[containerId].container : null, containerId ? this.uploadsContainers[containerId].prefix : null, dictionary, partialUpdateFields);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), update, currentValue, containerId ? this.uploadsContainers[containerId].container : null, containerId ? this.uploadsContainers[containerId].prefix : null, dictionary, partialUpdateFields);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
         // now we check if we are updating anything at all
@@ -462,7 +462,16 @@ class Cache {
         _1.logger.debug("Cache.requestDelete: requesting delete for " + selfTable + " at module " +
             moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions);
         let deleteFilesInContainer = async (specifiedVersion) => {
-            await sql_files_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId], itemDefinition, id + "." + (specifiedVersion || null));
+            const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
+                .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
+            const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
+                .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
+            if (someFilesInItemDef) {
+                await sql_files_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId].container, itemDefinition, id + "." + (specifiedVersion || null));
+            }
+            if (someFilesInModule) {
+                await sql_files_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId].container, itemDefinition.getParentModule(), id + "." + (specifiedVersion || null));
+            }
         };
         let runDetachedEvents = async (specifiedVersion) => {
             await this.forceCacheInto(selfTable, id, specifiedVersion || null, null);

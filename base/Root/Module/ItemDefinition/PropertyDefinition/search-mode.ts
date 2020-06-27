@@ -108,10 +108,14 @@ export function buildSearchModePropertyDefinitions(
     newPropDef.type = "string";
   }
 
+  if (typeof newPropDef.searchDefault !== "undefined") {
+    newPropDef.default = newPropDef.searchDefault;
+  }
+
   // the default if condition, we need to process
-  if (newPropDef.defaultIf) {
+  if (newPropDef.searchDefaultIf || newPropDef.defaultIf) {
     // so since it has values and conditions (and the value is raw)
-    newPropDef.defaultIf = newPropDef.defaultIf.map((di) => {
+    newPropDef.defaultIf = (newPropDef.searchDefaultIf || newPropDef.defaultIf).map((di) => {
       return {
         value: di.value,
         if: buildSearchModeConditionalRuleSet(di.if, otherKnownProperties),
@@ -139,9 +143,13 @@ export function buildSearchModePropertyDefinitions(
     }
   }
 
+  if (typeof newPropDef.searchHidden !== "undefined") {
+    newPropDef.hidden = newPropDef.searchHidden;
+  }
+
   // also with hidden if, kinda, since it's a single condition
-  if (newPropDef.hiddenIf) {
-    newPropDef.hiddenIf = buildSearchModeConditionalRuleSet(newPropDef.hiddenIf, otherKnownProperties);
+  if (newPropDef.searchHiddenIf || newPropDef.hiddenIf) {
+    newPropDef.hiddenIf = buildSearchModeConditionalRuleSet(newPropDef.searchHiddenIf || newPropDef.hiddenIf, otherKnownProperties);
     if (!newPropDef.hiddenIf) {
       delete newPropDef.hiddenIf;
     }
@@ -334,6 +342,14 @@ export function buildSearchModePropertyDefinitions(
         };
       }),
     };
+
+    if (newPropDef.hidden) {
+      newPropDef2.hidden = true;
+    }
+
+    if (newPropDef.hiddenIf) {
+      newPropDef2.hiddenIf = newPropDef.hiddenIf;
+    }
 
     // decorate the default property
     newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + newPropDef.id;

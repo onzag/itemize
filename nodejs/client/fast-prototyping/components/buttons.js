@@ -16,6 +16,7 @@ const util_1 = require("./util");
 const SubmitActioner_1 = __importDefault(require("../../components/item-definition/SubmitActioner"));
 const navigation_1 = require("../../components/navigation");
 const I18nRead_1 = __importDefault(require("../../components/localization/I18nRead"));
+const SearchActioner_1 = __importDefault(require("../../components/search/SearchActioner"));
 function SubmitButton(props) {
     const [confirmationIsActive, setConfirmationIsActive] = react_1.useState(false);
     const CustomConfirmationComponent = props.CustomConfirmationComponent;
@@ -64,7 +65,13 @@ function SubmitButton(props) {
     }));
 }
 exports.SubmitButton = SubmitButton;
-function SearchButton() {
+function SearchButton(props) {
+    return (react_1.default.createElement(SearchActioner_1.default, null, (actioner) => {
+        return (react_1.default.createElement(react_1.default.Fragment, null,
+            react_1.default.createElement(util_1.ProgressingElement, { isProgressing: actioner.searching, className: props.wrapperClassName },
+                react_1.default.createElement(core_1.Button, { variant: props.buttonVariant, color: props.buttonColor, endIcon: props.buttonEndIcon, startIcon: props.buttonStartIcon, className: props.buttonClassName, onClick: actioner.search.bind(null, props.options) },
+                    react_1.default.createElement(I18nRead_1.default, { capitalize: true, id: props.i18nId })))));
+    }));
 }
 exports.SearchButton = SearchButton;
 function DeleteButton() {

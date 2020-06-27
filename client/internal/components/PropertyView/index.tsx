@@ -45,6 +45,7 @@ export interface IPropertyViewMainHandlerProps<RendererPropsType> {
   state: IPropertyDefinitionState;
   renderer?: React.ComponentType<RendererPropsType>;
   rendererArgs?: object;
+  useAppliedValue?: boolean;
 }
 
 export interface IPropertyViewHandlerProps<RendererPropsType> extends IPropertyViewMainHandlerProps<RendererPropsType> {

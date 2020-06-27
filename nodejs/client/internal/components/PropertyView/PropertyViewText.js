@@ -14,7 +14,7 @@ exports.PROPERTY_VIEW_SANITIZE_CONFIG = {
 };
 exports.ALLOWED_CLASSES = [
     "image", "image-container", "image-pad", "video", "video-container",
-    "file", "file-container", "file-icon", "file-extension", "file-size",
+    "file", "file-container", "file-icon", "file-name", "file-extension", "file-size",
 ];
 exports.ALLOWED_CLASSES_PREFIXES = [
     "rich-text--",
@@ -151,7 +151,9 @@ class PropertyViewText extends react_1.default.Component {
     }
     shouldComponentUpdate(nextProps) {
         // This is optimized to only update for the thing it uses
-        return this.props.state.value !== nextProps.state.value ||
+        return this.props.useAppliedValue !== nextProps.useAppliedValue ||
+            (!this.props.useAppliedValue && this.props.state.value !== nextProps.state.value) ||
+            (this.props.useAppliedValue && this.props.state.stateAppliedValue !== nextProps.state.stateAppliedValue) ||
             nextProps.renderer !== this.props.renderer ||
             nextProps.property !== this.props.property ||
             nextProps.forId !== this.props.forId ||
@@ -160,7 +162,9 @@ class PropertyViewText extends react_1.default.Component {
             !deep_equal_1.default(this.props.rendererArgs, nextProps.rendererArgs);
     }
     render() {
-        let currentValue = this.props.state.value;
+        let currentValue = (this.props.useAppliedValue ?
+            this.props.state.stateAppliedValue :
+            this.props.state.value);
         const isRichText = this.props.property.isRichText();
         const mediaPropertyId = this.props.property.getSpecialProperty("mediaProperty");
         const supportsMedia = !!mediaPropertyId && isRichText;

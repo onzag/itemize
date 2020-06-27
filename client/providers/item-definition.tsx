@@ -37,6 +37,10 @@ import { IConfigRawJSONDataType } from "../../config";
 function getPropertyListForSearchMode(properties: string[], standardCounterpart: ItemDefinition) {
   let result: string[] = [];
   properties.forEach((propertyId) => {
+    if (propertyId === "search") {
+      result.push("search");
+      return;
+    }
     const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
     result = result.concat(getConversionIds(standardProperty.rawData));
   });
@@ -501,6 +505,9 @@ export class ActualItemDefinitionProvider extends
 
   private lastLoadingForId: number = null;
   private lastLoadingForVersion: string = null;
+  private lastLoadValuePromise: Promise<void> = null;
+  private lastLoadValuePromiseIsResolved: boolean = true;
+  private lastLoadValuePromiseResolve: () => void = null;
 
   // sometimes when doing some updates when you change the item
   // definition to another item definition (strange but ok)
@@ -659,7 +666,9 @@ export class ActualItemDefinitionProvider extends
       // to avoid pointless refresh we set it up as true from
       // the beggining
       loading: memoryLoadedAndValid ? false : (this.props.avoidLoading ? false : !!this.props.forId),
-      loaded: memoryLoadedAndValid,
+      // loaded will be whether is loaded or not only if there is an id
+      // otherwise it's technically loaded
+      loaded: this.props.forId ? memoryLoadedAndValid : true,
 
       submitError: null,
       submitting: false,
@@ -1079,6 +1088,17 @@ export class ActualItemDefinitionProvider extends
     this.lastLoadingForId = forId;
     this.lastLoadingForVersion = forVersion;
 
+    // we wil reuse the old promise in case
+    // there's an overlapping value being loaded
+    // the old call won't trigger the promise
+    // as it won't match the current signature
+    if (this.lastLoadValuePromiseIsResolved) {
+      this.lastLoadValuePromise = new Promise((resolve) => {
+        this.lastLoadValuePromiseResolve = resolve;
+      });
+      this.lastLoadValuePromiseIsResolved = false;
+    }
+
     // we don't use loading here because there's one big issue
     // elements are assumed into the loading state by the constructor
     // if they have an id
@@ -1341,6 +1361,9 @@ export class ActualItemDefinitionProvider extends
         loaded: true,
       });
     }
+
+    this.lastLoadValuePromiseIsResolved = true;
+    this.lastLoadValuePromiseResolve();
 
     // now we return
     return {
@@ -1919,9 +1942,20 @@ export class ActualItemDefinitionProvider extends
     }
   }
   public async submit(options: IActionSubmitOptions): Promise<IActionResponseWithId> {
+    // the reason we might need to wait for load is because unless we have avoided
+    // loading the applied value matters in order to unite the applied fields, however
+    // if we are avoiding loading this doesn't really matter as it's truly loading and somehow
+    // the submit button was pressed really fast
+    const waitingForLoad = this.props.forId && !this.state.loaded && !this.props.avoidLoading;
+    if (waitingForLoad) {
+      console.warn(
+        "Attempted to submit so fast that the value was not yet loaded in memory, this is not an error, just means the app is sluggish",
+      );
+      await this.lastLoadValuePromise;
+    }
+
     // if we are already submitting, we reject the action
-    // also while loading as we cannot know if it's a edit or add action
-    if (this.state.submitting || this.state.loading) {
+    if (this.state.submitting) {
       return null;
     }
 
@@ -1997,21 +2031,35 @@ export class ActualItemDefinitionProvider extends
     let value: IGQLValue;
     let error: EndpointErrorType;
     let getQueryFields: IGQLRequestFields;
-    if (this.props.forId && this.state.loaded && !this.state.notFound) {
-      const totalValues = await runEditQueryFor({
-        args: argumentsForQuery,
-        fields: requestFields,
-        itemDefinition: this.props.itemDefinitionInstance,
-        token: this.props.tokenData.token,
-        language: this.props.localeData.language,
-        id: this.props.forId,
-        version: this.props.forVersion,
-        listenerUUID: this.props.remoteListener.getUUID(),
-        cacheStore: this.props.longTermCaching,
-      });
-      value = totalValues.value;
-      error = totalValues.error;
-      getQueryFields = totalValues.getQueryFields;
+    if (this.props.forId) {
+      if (!this.state.notFound) {
+        const totalValues = await runEditQueryFor({
+          args: argumentsForQuery,
+          fields: requestFields,
+          itemDefinition: this.props.itemDefinitionInstance,
+          token: this.props.tokenData.token,
+          language: this.props.localeData.language,
+          id: this.props.forId,
+          version: this.props.forVersion,
+          listenerUUID: this.props.remoteListener.getUUID(),
+          cacheStore: this.props.longTermCaching,
+        });
+        value = totalValues.value;
+        error = totalValues.error;
+        getQueryFields = totalValues.getQueryFields;
+      } else {
+        if (!this.isUnmounted) {
+          this.setState({
+            submitError: {
+              message: "Edit refused due to item not found",
+              code: "NOT_FOUND",
+            },
+            submitting: false,
+            submitted: false,
+          });
+        }
+        return;
+      }
     } else {
       let containerId: string 
       Object.keys(this.props.config.containersRegionMappers).forEach((mapper) => {

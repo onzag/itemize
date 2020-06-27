@@ -110,12 +110,14 @@ export async function runImageConversions(
   fileName: string,
   fileMimeType: string,
   uploadsContainer: pkgcloud.storage.Container,
+  uploadsPrefix: string,
   propDef: PropertyDefinition,
 ): Promise<void> {
   const originalImageFilePath = path.join(filePath, fileName);
   if (fileMimeType === "image/svg+xml") {
     await sqlUploadPipeFile(
       uploadsContainer,
+      uploadsPrefix,
       imageStream,
       originalImageFilePath,
     );
@@ -187,12 +189,14 @@ export async function runImageConversions(
 
     return sqlUploadPipeFile(
       uploadsContainer,
+      uploadsPrefix,
       outputPipeline,
       outputFileName,
     );
   }).concat([
     sqlUploadPipeFile(
       uploadsContainer,
+      uploadsPrefix,
       imageStream,
       originalImageFilePath,
     ),

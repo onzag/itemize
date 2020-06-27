@@ -87,7 +87,7 @@ function EntryViewReadSet(props, type) {
         }
         else if (type === "view") {
             if (propertyState) {
-                return (react_1.default.createElement(PropertyView_1.default, { include: includeContextualValue && includeContextualValue.include, property: property, state: propertyState, capitalize: props.capitalize, renderer: props.renderer, containerId: containerId, rendererArgs: props.rendererArgs, forId: itemDefinitionContextualValue.forId, forVersion: itemDefinitionContextualValue.forVersion, itemDefinition: itemDefinitionContextualValue.idef }));
+                return (react_1.default.createElement(PropertyView_1.default, { include: includeContextualValue && includeContextualValue.include, property: property, state: propertyState, capitalize: props.capitalize, renderer: props.renderer, containerId: containerId, rendererArgs: props.rendererArgs, forId: itemDefinitionContextualValue.forId, forVersion: itemDefinitionContextualValue.forVersion, itemDefinition: itemDefinitionContextualValue.idef, useAppliedValue: props.useAppliedValue }));
             }
             if (isMetaProperty) {
                 let gqlValue = itemDefinitionContextualValue.state.gqlOriginalFlattenedValue &&

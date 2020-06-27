@@ -15,7 +15,9 @@ export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProp
     nextProps: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>,
   ) {
     // This is optimized to only update for the thing it uses
-    return !equals(this.props.state.value, nextProps.state.value) ||
+    return this.props.useAppliedValue !== nextProps.useAppliedValue ||
+      (!this.props.useAppliedValue && this.props.state.value !== nextProps.state.value) ||
+      (this.props.useAppliedValue && this.props.state.stateAppliedValue !== nextProps.state.stateAppliedValue) ||
       nextProps.property !== this.props.property ||
       nextProps.renderer !== this.props.renderer ||
       nextProps.capitalize !== this.props.capitalize ||
@@ -32,16 +34,22 @@ export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProp
         i18nData && i18nData.null_value : null;
     }
 
+    const value = (
+      this.props.useAppliedValue ?
+      this.props.state.stateAppliedValue :
+      this.props.state.value
+    );
+
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyViewSimpleRendererProps = {
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
       language: this.props.language,
-      currentValue: this.props.state.value === null ?
+      currentValue: value === null ?
         nullValueLabel :
         (
-          (i18nData && i18nData.values[this.props.state.value.toString()]) ||
-          this.props.state.value.toString()
+          (i18nData && i18nData.values[value.toString()]) ||
+          value.toString()
         ),
       capitalize: !!this.props.capitalize,
     };

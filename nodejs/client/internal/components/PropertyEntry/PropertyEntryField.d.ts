@@ -34,6 +34,7 @@ declare type ValueType = string | number | IPropertyDefinitionSupportedCurrencyT
 export default class PropertyEntryField extends React.Component<IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>> {
     constructor(props: IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>);
     unitToNode(unit: string): JSX.Element;
+    componentDidMount(): void;
     componentDidUpdate(prevProps: IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>): void;
     shouldComponentUpdate(nextProps: IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>): boolean;
     onChangeUnit(newUnit: string): void;

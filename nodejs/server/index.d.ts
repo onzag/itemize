@@ -31,7 +31,10 @@ export declare type PkgCloudClients = {
  * Contains all the pkgcloud containers for every container id
  */
 export declare type PkgCloudContainers = {
-    [containerId: string]: pkgcloud.storage.Container;
+    [containerId: string]: {
+        prefix: string;
+        container: pkgcloud.storage.Container;
+    };
 };
 /**
  * Specifies the SSR configuration for the multiple pages

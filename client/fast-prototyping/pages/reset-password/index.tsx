@@ -84,7 +84,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
                     <Container maxWidth="md" className={props.classes.container}>
                       <Paper className={props.classes.paper}>
                         <ItemDefinitionLoader>
-                          <Avatar size="large" fullWidth={true} />
+                          <Avatar size="large" fullWidth={true} hideFlag={true}/>
                           <Reader id="username">
                             {(username: string) => (
                               <Typography variant="h4" className={props.classes.username}>{username}</Typography>
@@ -136,7 +136,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
                               />
                               <Snackbar
                                 severity="success"
-                                i18nDisplay=""
+                                i18nDisplay="reset_password_success"
                                 open={!!actioner.statefulSuccess}
                                 onClose={actioner.dismissStatefulSuccess}
                               />

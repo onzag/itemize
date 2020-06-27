@@ -148,6 +148,7 @@ export function convertGQLValueToSQLValueForInclude(
   data: IGQLArgs,
   oldData: IGQLValue,
   uploadsContainer: pkgcloud.storage.Container,
+  uploadsPrefix: string,
   dictionary: string,
   partialFields?: any,
 ): ISQLStreamComposedTableRowValue {
@@ -181,12 +182,14 @@ export function convertGQLValueToSQLValueForInclude(
         const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
           knex,
           serverData,
+          itemDefinition.getParentModule(),
           itemDefinition,
           include,
           sinkingProperty,
           data[include.getQualifiedIdentifier()] as IGQLValue,
           (oldData && oldData[include.getQualifiedIdentifier()] as IGQLValue) || null,
           uploadsContainer,
+          uploadsPrefix,
           dictionary,
         );
         Object.assign(

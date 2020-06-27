@@ -69,6 +69,10 @@ export declare const MAX_SEARCH_RESULTS_FALLBACK = 50;
  */
 export declare const MAX_SEARCH_RECORDS_FALLBACK = 500;
 /**
+ * Size in characters of the search field
+ */
+export declare const MAX_SEARCH_FIELD_SIZE = 1024;
+/**
  * Supported image types
  */
 export declare const FILE_SUPPORTED_IMAGE_TYPES: string[];

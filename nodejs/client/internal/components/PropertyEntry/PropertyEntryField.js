@@ -56,6 +56,14 @@ class PropertyEntryField extends react_1.default.Component {
         return (react_1.default.createElement("span", null, unit.split(/(\d+)/).filter((m) => !!m).map((m, i) => isNaN(m) ?
             react_1.default.createElement("span", { key: i }, m) : react_1.default.createElement("sup", { key: i }, m))));
     }
+    componentDidMount() {
+        const initialPrefill = this.props.property.getSpecialProperty("initialPrefill");
+        if (typeof initialPrefill !== "undefined" &&
+            initialPrefill !== null &&
+            !this.props.state.value) {
+            this.onChangeByNumber(initialPrefill.toString().replace(".", this.props.i18n[this.props.language].number_decimal_separator));
+        }
+    }
     componentDidUpdate(prevProps) {
         if (prevProps.currency.code !== this.props.currency.code &&
             this.props.property.getType() === "currency" &&
@@ -111,13 +119,14 @@ class PropertyEntryField extends react_1.default.Component {
         }
         const value = this.props.state.value.value;
         const oldUnit = this.props.state.value.unit;
-        const valueInNewUnit = convert_units_1.default(value).from(oldUnit).to(newUnit);
+        const maxDecimalCount = this.props.property.getMaxDecimalCount() || constants_1.MAX_DECIMAL_COUNT;
+        const valueInNewUnit = parseFloat(convert_units_1.default(value).from(oldUnit).to(newUnit).toFixed(maxDecimalCount));
         this.props.onChange({
             ...this.props.state.value,
             unit: newUnit,
             value: valueInNewUnit,
         }, {
-            ...this.props.state.internalValue,
+            value: valueInNewUnit.toString().replace(".", this.props.i18n[this.props.language].number_decimal_separator),
             unit: newUnit,
         });
     }

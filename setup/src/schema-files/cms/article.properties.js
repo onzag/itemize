@@ -2,6 +2,7 @@ const en = `[en]
 name = article
 search_field_label = search article
 search_field_placeholder = insert relevant information about the article
+search_value_too_large = your search is too long
 search_keywords = article
 
 custom.read_more = read more....
@@ -32,6 +33,7 @@ const es = `[es]
 name = artículo
 search_field_label = buscar artículo
 search_field_placeholder = inserte información relevante
+search_value_too_large = su búsqueda es demasiado grande
 search_keywords = artículo
 
 custom.read_more = leer más...

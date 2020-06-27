@@ -2,6 +2,7 @@ const en = `[en]
 name = user
 search_field_label = user search
 search_field_placeholder = insert relevant user data
+search_value_too_large = your search is too long, please narrow it down
 search_keywords = user
 
 custom.login = login
@@ -39,8 +40,8 @@ custom.preferences_updated_successfully = preferences updated successfully
 custom.change_password = update password
 custom.change_password_current_alt_label = current password
 custom.change_password_current_alt_placeholder = current password
-custom.change_password_new_alt_label = current password
-custom.change_password_new_alt_placeholder = current password
+custom.change_password_new_alt_label = new password
+custom.change_password_new_alt_placeholder = new password
 custom.change_password_success = password updated!
 
 custom.delete_account = delete account
@@ -141,6 +142,7 @@ const es = `[es]
 name = usuario
 search_field_label = buscar usuario
 search_field_placeholder = inserte información relevante sobre el usuario
+search_value_too_large = su busqueda es demasiado larga, por favor reduzca su tamaño
 search_keywords = usuario
 
 custom.login = iniciar sesión

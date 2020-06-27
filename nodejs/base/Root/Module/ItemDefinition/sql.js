@@ -133,7 +133,7 @@ exports.convertSQLValueToGQLValueForItemDefinition = convertSQLValueToGQLValueFo
  * in a partial field value, don't use partial fields to create
  * @returns a sql value
  */
-function convertGQLValueToSQLValueForItemDefinition(knex, serverData, itemDefinition, data, oldData, uploadsContainer, dictionary, partialFields) {
+function convertGQLValueToSQLValueForItemDefinition(knex, serverData, itemDefinition, data, oldData, uploadsContainer, uploadsPrefix, dictionary, partialFields) {
     // first we create the row value
     const result = {};
     const consumeStreamsFns = [];
@@ -142,7 +142,7 @@ function convertGQLValueToSQLValueForItemDefinition(knex, serverData, itemDefini
         // partialFields set
         if ((partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
             !partialFields) {
-            const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition, null, pd, data, oldData, uploadsContainer, dictionary);
+            const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition.getParentModule(), itemDefinition, null, pd, data, oldData, uploadsContainer, uploadsPrefix, dictionary);
             Object.assign(result, addedFieldsByProperty.value);
             consumeStreamsFns.push(addedFieldsByProperty.consumeStreams);
         }
@@ -155,7 +155,7 @@ function convertGQLValueToSQLValueForItemDefinition(knex, serverData, itemDefini
         if ((partialFields && typeof partialFields[includeNameInPartialFields] !== "undefined") ||
             !partialFields) {
             const innerPartialFields = !partialFields ? null : partialFields[includeNameInPartialFields];
-            const addedFieldsByInclude = sql_2.convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, include, data, oldData, uploadsContainer, dictionary, innerPartialFields);
+            const addedFieldsByInclude = sql_2.convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, include, data, oldData, uploadsContainer, uploadsPrefix, dictionary, innerPartialFields);
             Object.assign(result, addedFieldsByInclude.value);
             consumeStreamsFns.push(addedFieldsByInclude.consumeStreams);
         }
@@ -203,7 +203,7 @@ function buildSQLQueryForItemDefinition(knex, serverData, itemDefinition, args, 
         // for technical reasons we need to do this twice and use a fake builder
         // just to know if it needs extra fields
         itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
-            if (!pd.isExtension() || !pd.isSearchable()) {
+            if (!pd.isSearchable()) {
                 return;
             }
             const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
@@ -221,8 +221,7 @@ function buildSQLQueryForItemDefinition(knex, serverData, itemDefinition, args, 
         // during the await time
         knexBuilder.andWhere((builder) => {
             itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
-                // only extensions and searchable are valid for the search functionality
-                if (!pd.isExtension() || !pd.isSearchable()) {
+                if (!pd.isSearchable()) {
                     return;
                 }
                 const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
@@ -230,6 +229,7 @@ function buildSQLQueryForItemDefinition(knex, serverData, itemDefinition, args, 
                     sql_1.buildSQLStrSearchQueryForProperty(knex, serverData, itemDefinition, null, pd, args, search, orBuilder, dictionary, isOrderedByIt);
                 });
             });
+            //TODO add includes in the search
         });
     }
     if (orderBy) {

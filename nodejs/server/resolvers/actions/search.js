@@ -15,7 +15,7 @@ const graphql_fields_1 = __importDefault(require("graphql-fields"));
 const nanodate_1 = require("../../../nanodate");
 const errors_1 = require("../../../base/errors");
 function findLastRecordDateCheatMethod(records) {
-    let maximumRecords = null;
+    let maximumRecords = [];
     let maximumRecordId = null;
     records.forEach((record) => {
         if (!maximumRecordId || record.id > maximumRecordId) {

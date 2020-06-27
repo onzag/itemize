@@ -30,6 +30,7 @@ export interface IPropertyEntryProps<RendererPropsType> {
   altPlaceholder?: string;
   ignoreErrors?: boolean;
   autoFocus?: boolean;
+  useAppliedValue?: boolean;
 }
 
 export interface IPropertySetterProps {
@@ -54,6 +55,7 @@ export interface IPropertyViewProps<RendererPropsType> {
   searchVariant?: SearchVariants;
   renderer?: React.ComponentType<RendererPropsType>;
   rendererArgs?: object;
+  useAppliedValue?: boolean;
 }
 
 interface IPropertyEntryViewReadSetProps<RendererPropsType> extends
@@ -168,6 +170,7 @@ export function EntryViewReadSet(props: IPropertyEntryViewReadSetProps<any>, typ
                             forId={itemDefinitionContextualValue.forId}
                             forVersion={itemDefinitionContextualValue.forVersion}
                             itemDefinition={itemDefinitionContextualValue.idef}
+                            useAppliedValue={props.useAppliedValue}
                           />
                         );
                       }

@@ -24,6 +24,8 @@ interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
 export interface ISearchLoaderArg {
   searchRecords: IGQLSearchRecordWithPopulateData[];
   pageCount: number;
+  totalCount: number;
+  accessibleCount: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
   error: EndpointErrorType;
@@ -346,7 +348,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       !equals(this.state, nextState);
   }
   public render() {
-    const pageCount = !this.props.searchCount ? 1 : Math.ceil(this.props.searchCount / this.props.pageSize);
+    const pageCount = Math.ceil(this.props.searchRecords.length / this.props.pageSize);
+    const accessibleCount = this.props.searchRecords.length;
+    const totalCount = this.props.searchCount;
     return (
       <SearchItemDefinitionValueContext.Provider
         value={
@@ -379,6 +383,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
               };
             }),
             pageCount,
+            accessibleCount,
+            totalCount,
             hasNextPage: this.props.currentPage < pageCount - 1,
             hasPrevPage: this.props.currentPage !== 0,
             error: this.state.error,

@@ -42,7 +42,7 @@ export declare function getSQLTablesSchemaForModule(knex: Knex, mod: Module): IS
  * in a partial field value, don't use partial fields to create
  * @returns a promise for a row value
  */
-export declare function convertGQLValueToSQLValueForModule(knex: Knex, serverData: any, mod: Module, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): ISQLStreamComposedTableRowValue;
+export declare function convertGQLValueToSQLValueForModule(knex: Knex, serverData: any, mod: Module, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): ISQLStreamComposedTableRowValue;
 /**
  * Converts a SQL value directly coming from the database as it is
  * to a graphql value for this specific module, this

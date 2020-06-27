@@ -239,7 +239,9 @@ function fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, v
     return {
         ...file,
         url: prefix +
-            itemDefinition.getQualifiedPathName() + "/" +
+            (property.isExtension() ?
+                itemDefinition.getParentModule().getQualifiedPathName() :
+                itemDefinition.getQualifiedPathName()) + "/" +
             id + "." + (version || "") + "/" +
             (include ? include.getId() + "/" : "") +
             property.getId() + "/" +

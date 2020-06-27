@@ -106,7 +106,7 @@ function standardSQLSearchFnExactAndRange(arg) {
     const toName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
     const exactName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
     let searchedByIt = false;
-    if (typeof arg.args[exactName] !== "undefined") {
+    if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
         arg.knexBuilder.andWhere(arg.prefix + arg.id, arg.args[exactName]);
         searchedByIt = true;
     }
@@ -126,10 +126,10 @@ exports.standardSQLSearchFnExactAndRange = standardSQLSearchFnExactAndRange;
  * @returns a knex valid search or select query object
  */
 function standardSQLEqualFn(arg) {
-    if (arg.ignoreCase) {
-        return arg.knex.raw("LOWER(??) = LOWER(?)", [
+    if (arg.ignoreCase && typeof arg.value === "string") {
+        return arg.knex.raw("LOWER(??) = ?", [
             arg.prefix + arg.id,
-            arg.value,
+            arg.value.toLowerCase(),
         ]);
     }
     return {
@@ -244,7 +244,7 @@ exports.convertSQLValueToGQLValueForProperty = convertSQLValueToGQLValueForPrope
  * @returns a promise with the partial sql row value to be inputted, note
  * that this is a promise because data streams need to be processed
  */
-function convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition, include, propertyDefinition, data, oldData, uploadsContainer, dictionary) {
+function convertGQLValueToSQLValueForProperty(knex, serverData, mod, itemDefinition, include, propertyDefinition, data, oldData, uploadsContainer, uploadsPrefix, dictionary) {
     // and this is the value of the property, again, properties
     // are not prefixed, they are either in their own object
     // or in the root
@@ -266,12 +266,12 @@ function convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition, 
         const oldValue = (oldData && oldData[propertyDefinition.getId()]) || null;
         const newValue = gqlPropertyValue;
         if (description.gqlList) {
-            const processedValue = sql_files_1.processFileListFor(newValue, oldValue, uploadsContainer, itemDefinition, include, propertyDefinition);
+            const processedValue = sql_files_1.processFileListFor(newValue, oldValue, uploadsContainer, uploadsPrefix, itemDefinition || mod, include, propertyDefinition);
             gqlPropertyValue = processedValue.value;
             consumeStreams = processedValue.consumeStreams;
         }
         else {
-            const processedValue = sql_files_1.processSingleFileFor(newValue, oldValue, uploadsContainer, itemDefinition, include, propertyDefinition);
+            const processedValue = sql_files_1.processSingleFileFor(newValue, oldValue, uploadsContainer, uploadsPrefix, itemDefinition || mod, include, propertyDefinition);
             gqlPropertyValue = processedValue.value;
             consumeStreams = processedValue.consumeStreams;
         }

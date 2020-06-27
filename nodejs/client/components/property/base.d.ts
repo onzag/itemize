@@ -18,6 +18,7 @@ export interface IPropertyEntryProps<RendererPropsType> {
     altPlaceholder?: string;
     ignoreErrors?: boolean;
     autoFocus?: boolean;
+    useAppliedValue?: boolean;
 }
 export interface IPropertySetterProps {
     id: string;
@@ -39,6 +40,7 @@ export interface IPropertyViewProps<RendererPropsType> {
     searchVariant?: SearchVariants;
     renderer?: React.ComponentType<RendererPropsType>;
     rendererArgs?: object;
+    useAppliedValue?: boolean;
 }
 interface IPropertyEntryViewReadSetProps<RendererPropsType> extends IPropertyEntryProps<RendererPropsType>, IPropertyViewProps<RendererPropsType>, IPropertySetterProps, IPropertyReadProps {
 }

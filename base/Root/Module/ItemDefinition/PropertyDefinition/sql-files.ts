@@ -18,6 +18,8 @@ import pkgcloud from "pkgcloud";
 import { ConsumeStreamsFnType } from "../../../sql";
 import sharp from "sharp";
 import { logger } from "../../../../../server";
+import Module from "../..";
+import https from "https";
 
 /**
  * Processes an extended list based
@@ -25,7 +27,7 @@ import { logger } from "../../../../../server";
  * @param newValues the new values as a list
  * @param oldValues the old values that this came from
  * @param filesContainerId a transitory id on where to store the files (can be changed later)
- * @param itemDefinition the item definition these values are related to
+ * @param itemDefinitionOrModule the item definition or module (for prop extension) these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
  * @returns a promise with the new list with the new values
@@ -34,7 +36,8 @@ export function processFileListFor(
   newValues: IGQLFile[],
   oldValues: IGQLFile[],
   uploadsContainer: pkgcloud.storage.Container,
-  itemDefinition: ItemDefinition,
+  uploadsPrefix: string,
+  itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
   propertyDefinition: PropertyDefinition,
 ): {
@@ -61,7 +64,8 @@ export function processFileListFor(
       newValue,
       relativeOldValue,
       uploadsContainer,
-      itemDefinition,
+      uploadsPrefix,
+      itemDefinitionOrModule,
       include,
       propertyDefinition,
     );
@@ -72,7 +76,8 @@ export function processFileListFor(
       null,
       removedValue,
       uploadsContainer,
-      itemDefinition,
+      uploadsPrefix,
+      itemDefinitionOrModule,
       include,
       propertyDefinition,
     );
@@ -100,7 +105,7 @@ export function processFileListFor(
  * should be of different id
  * @param newValue the new value
  * @param oldValue the old value
- * @param itemDefinition the item definition these values are related to
+ * @param itemDefinitionOrModule the item definition or module these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
  * @returns a promise for the new file value
@@ -109,7 +114,8 @@ export function processSingleFileFor(
   newValue: IGQLFile,
   oldValue: IGQLFile,
   uploadsContainer: pkgcloud.storage.Container,
-  itemDefinition: ItemDefinition,
+  uploadsPrefix: string,
+  itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
   propertyDefinition: PropertyDefinition,
 ): {
@@ -121,7 +127,8 @@ export function processSingleFileFor(
       newValue,
       oldValue,
       uploadsContainer,
-      itemDefinition,
+      uploadsPrefix,
+      itemDefinitionOrModule,
       include,
       propertyDefinition,
     );
@@ -133,7 +140,8 @@ export function processSingleFileFor(
       null,
       oldValue,
       uploadsContainer,
-      itemDefinition,
+      uploadsPrefix,
+      itemDefinitionOrModule,
       include,
       propertyDefinition,
     );
@@ -142,7 +150,8 @@ export function processSingleFileFor(
       newValue,
       null,
       uploadsContainer,
-      itemDefinition,
+      uploadsPrefix,
+      itemDefinitionOrModule,
       include,
       propertyDefinition,
     );
@@ -160,7 +169,7 @@ export function processSingleFileFor(
  * Processes a single file
  * @param newVersion the new version of the file with the same id (or null, removes)
  * @param oldVersion the old version of the file with the same id (or null, creates)
- * @param itemDefinition the item definition
+ * @param itemDefinitionOrModule the item definition or module (for prop extensions) this field is related to
  * @param include the include (or null)
  * @param propertyDefinition the property
  * @returns a promise for the new the new file value
@@ -169,7 +178,8 @@ function processOneFileAndItsSameIDReplacement(
   newVersion: IGQLFile,
   oldVersion: IGQLFile,
   uploadsContainer: pkgcloud.storage.Container,
-  itemDefinition: ItemDefinition,
+  uploadsPrefix: string,
+  itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
   propertyDefinition: PropertyDefinition,
 ): {
@@ -188,8 +198,8 @@ function processOneFileAndItsSameIDReplacement(
           // and let's remove that folder, note how we don't
           // really wait for this, we detatch this function
           await (async () => {
-            const idefLocationPath = itemDefinition.getQualifiedPathName();
-            const transitoryLocationPath = path.join(idefLocationPath, containerId);
+            const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
+            const transitoryLocationPath = path.join(idefOrModLocationPath, containerId);
             const includeLocationPath = include ?
               path.join(transitoryLocationPath, include.getQualifiedIdentifier()) : transitoryLocationPath;
             const propertyLocationPath = path.join(includeLocationPath, propertyDefinition.getId());
@@ -279,9 +289,9 @@ function processOneFileAndItsSameIDReplacement(
     value,
     consumeStreams: async (containerId: string) => {
       // we calculate the paths where we are saving this
-      // /MOD_module__IDEF_item_definition/:id.:version/ITEM_etc/property...
-      const idefLocationPath = itemDefinition.getQualifiedPathName();
-      const transitoryLocationPath = path.join(idefLocationPath, containerId);
+      // /MOD_module__idefOrMod_item_definition/:id.:version/ITEM_etc/property...
+      const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
+      const transitoryLocationPath = path.join(idefOrModLocationPath, containerId);
       const includeLocationPath = include ?
         path.join(transitoryLocationPath, include.getQualifiedIdentifier()) : transitoryLocationPath;
       const propertyLocationPath = path.join(includeLocationPath, propertyDefinition.getId());
@@ -296,6 +306,7 @@ function processOneFileAndItsSameIDReplacement(
         filePath,
         curatedFileName,
         uploadsContainer,
+        uploadsPrefix,
         valueWithStream,
         propertyDefinition,
       )
@@ -307,33 +318,36 @@ function processOneFileAndItsSameIDReplacement(
  * Deletes the folder that contains all
  * the file data
  * @param uploadsContainer the container that contains the file
- * @param itemDefinition the item definition in question
+ * @param itemDefinitionOrModule the item definition or module in question
  * @param filesContainerId the transitory id to drop
  * @returns a void promise from when this is done
  */
 export function deleteEverythingInFilesContainerId(
   uploadsContainer: pkgcloud.storage.Container,
-  itemDefinition: ItemDefinition,
+  itemDefinitionOrModule: ItemDefinition | Module,
   filesContainerId: string,
 ): Promise<void> {
   // find the transitory location path
-  const idefLocationPath = itemDefinition.getQualifiedPathName();
-  const filesContainerPath = path.join(idefLocationPath, filesContainerId);
+  const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
+  const filesContainerPath = path.join(idefOrModLocationPath, filesContainerId);
 
   return removeFolderFor(uploadsContainer, filesContainerPath);
 }
 
-async function removeFolderFor(
+export async function removeFolderFor(
   uploadsContainer: pkgcloud.storage.Container,
   mainPath: string,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
+    logger.debug("Deleting folder for", {mainPath});
+
     (uploadsContainer as any).getFiles({
       prefix: mainPath,
     }, (err: pkgcloud.ClientError, files: pkgcloud.storage.File[]) => {
       if (err) {
         reject(err);
       } else if (files && files.length) {
+        logger.debug("Bulk deleting", {files});
         (uploadsContainer.client as any).bulkDelete(uploadsContainer, files, (err: pkgcloud.ClientError) => {
           if (err) {
             reject(err);
@@ -342,6 +356,7 @@ async function removeFolderFor(
           }
         });
       } else {
+        logger.debug("Could not find any files");
         resolve();
       }
     });
@@ -361,6 +376,7 @@ async function addFileFor(
   mainFilePath: string,
   curatedFileName: string,
   uploadsContainer: pkgcloud.storage.Container,
+  uploadsPrefix: string,
   value: IGQLFile,
   propertyDefinition: PropertyDefinition,
 ): Promise<void> {
@@ -376,11 +392,13 @@ async function addFileFor(
       curatedFileName,
       value.type,
       uploadsContainer,
+      uploadsPrefix,
       propertyDefinition,
     );
   } else {
     await sqlUploadPipeFile(
       uploadsContainer,
+      uploadsPrefix,
       stream,
       path.join(mainFilePath, curatedFileName),
     );
@@ -389,9 +407,12 @@ async function addFileFor(
 
 export async function sqlUploadPipeFile(
   uploadsContainer: pkgcloud.storage.Container,
+  uploadsPrefix: string,
   readStream: ReadStream | sharp.Sharp,
   remote: string,
 ): Promise<void> {
+  logger.debug("Uploading", {remote});
+
   const writeStream = uploadsContainer.client.upload({
     container: uploadsContainer as any,
     remote,
@@ -400,8 +421,30 @@ export async function sqlUploadPipeFile(
 
   return new Promise((resolve, reject) => {
     writeStream.on("finish", () => {
-      resolve();
+      logger.debug("Finished uploading", {remote});
+      verifyResourceIsReady(
+        new URL(uploadsPrefix + remote),
+        resolve,
+      );
     });
     writeStream.on("error", reject);
+  });
+}
+
+function verifyResourceIsReady(url: URL, done: () => void) {
+  const strURL = url.toString();
+  logger.debug("Verifying readiness of " + strURL);
+  https.get({
+    method: "HEAD",
+    host: url.host,
+    path: url.pathname,
+  }, (resp) => {
+    if (resp.statusCode === 200 || resp.statusCode === 0) {
+      logger.debug("Verification succeed " + strURL);
+      done();
+    } else {
+      logger.debug("Resource is not yet ready " + strURL);
+      setTimeout(verifyResourceIsReady.bind(null, url, done), 100);
+    }
   });
 }

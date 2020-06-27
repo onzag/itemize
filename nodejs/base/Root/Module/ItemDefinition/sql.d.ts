@@ -62,7 +62,7 @@ export declare function convertSQLValueToGQLValueForItemDefinition(knex: Knex, s
  * in a partial field value, don't use partial fields to create
  * @returns a sql value
  */
-export declare function convertGQLValueToSQLValueForItemDefinition(knex: Knex, serverData: any, itemDefinition: ItemDefinition, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): ISQLStreamComposedTableRowValue;
+export declare function convertGQLValueToSQLValueForItemDefinition(knex: Knex, serverData: any, itemDefinition: ItemDefinition, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): ISQLStreamComposedTableRowValue;
 /**
  * Builds a sql query for an item definition so that it can be
  * queried for searches

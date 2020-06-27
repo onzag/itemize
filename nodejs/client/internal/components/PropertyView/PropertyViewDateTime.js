@@ -48,7 +48,9 @@ class PropertyViewDateTime extends react_1.default.Component {
     }
     shouldComponentUpdate(nextProps) {
         // This is optimized to only update for the thing it uses
-        return !deep_equal_1.default(this.props.state.value, nextProps.state.value) ||
+        return this.props.useAppliedValue !== nextProps.useAppliedValue ||
+            (!this.props.useAppliedValue && !deep_equal_1.default(this.props.state.value, nextProps.state.value)) ||
+            (this.props.useAppliedValue && !deep_equal_1.default(this.props.state.stateAppliedValue, nextProps.state.stateAppliedValue)) ||
             nextProps.property !== this.props.property ||
             nextProps.renderer !== this.props.renderer ||
             nextProps.capitalize !== this.props.capitalize ||
@@ -73,8 +75,9 @@ class PropertyViewDateTime extends react_1.default.Component {
             dbFormat = constants_1.TIME_FORMAT;
         }
         let momentValue = null;
-        if (this.props.state.value && this.props.state.value !== "Invalid Date") {
-            momentValue = moment_1.default(this.props.state.value, dbFormat).utc();
+        const valueToUse = (this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value);
+        if (valueToUse && valueToUse !== "Invalid Date") {
+            momentValue = moment_1.default(valueToUse, dbFormat).utc();
             if (!momentValue.isValid()) {
                 momentValue = null;
             }
@@ -83,7 +86,7 @@ class PropertyViewDateTime extends react_1.default.Component {
         const rendererArgs = {
             args: this.props.rendererArgs,
             rtl: this.props.rtl,
-            currentValue: this.props.state.value,
+            currentValue: valueToUse,
             momentValue,
             dbFormat,
             defaultFormat: format,

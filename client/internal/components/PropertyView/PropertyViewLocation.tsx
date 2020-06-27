@@ -23,7 +23,11 @@ export class PropertyViewLocation extends React.Component<
   constructor(props: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>) {
     super(props);
 
-    const value: IPropertyDefinitionSupportedLocationType = this.props.state.value as IPropertyDefinitionSupportedLocationType;
+    const value = (
+      this.props.useAppliedValue ?
+      this.props.state.stateAppliedValue :
+      this.props.state.value
+    ) as IPropertyDefinitionSupportedLocationType;
 
     const center: [number, number] =  value ? [value.lat, value.lng] : [props.country.latitude, props.country.longitude];
     const zoom = value ? IViewportZoomEnumType.LARGE : IViewportZoomEnumType.SMALL;
@@ -40,9 +44,18 @@ export class PropertyViewLocation extends React.Component<
   }
   public componentDidUpdate(prevProps: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>) {
     if (!this.preventViewportDidUpdateChange) {
-      const value: IPropertyDefinitionSupportedLocationType = this.props.state.value as IPropertyDefinitionSupportedLocationType;
+      const value = (
+        this.props.useAppliedValue ?
+        this.props.state.stateAppliedValue :
+        this.props.state.value
+      ) as IPropertyDefinitionSupportedLocationType;
+
       if (value) {
-        const oldValue: IPropertyDefinitionSupportedLocationType = prevProps.state.value as IPropertyDefinitionSupportedLocationType;
+        let oldValue: IPropertyDefinitionSupportedLocationType = (
+          prevProps.useAppliedValue ?
+          prevProps.state.stateAppliedValue :
+          prevProps.state.value
+        ) as IPropertyDefinitionSupportedLocationType;
 
         if (!equals(value, oldValue)) {
           this.setState({
@@ -64,7 +77,12 @@ export class PropertyViewLocation extends React.Component<
   public onResetViewportCenter() {
     this.preventViewportDidUpdateChange = false;
 
-    const value: IPropertyDefinitionSupportedLocationType = this.props.state.value as IPropertyDefinitionSupportedLocationType;
+    const value = (
+      this.props.useAppliedValue ?
+      this.props.state.stateAppliedValue :
+      this.props.state.value
+    ) as IPropertyDefinitionSupportedLocationType;
+
     if (value) {
       this.setState({
         viewport: {
@@ -79,7 +97,9 @@ export class PropertyViewLocation extends React.Component<
     nextState: IPropertyViewLocationRendererState,
   ) {
     // This is optimized to only update for the thing it uses
-    return !equals(this.props.state.value, nextProps.state.value) ||
+    return this.props.useAppliedValue !== nextProps.useAppliedValue ||
+      (!this.props.useAppliedValue && !equals(this.props.state.value, nextProps.state.value)) ||
+      (this.props.useAppliedValue && !equals(this.props.state.stateAppliedValue, nextProps.state.stateAppliedValue)) ||
       !equals(this.state, nextState) ||
       nextProps.property !== this.props.property ||
       nextProps.renderer !== this.props.renderer ||
@@ -88,7 +108,12 @@ export class PropertyViewLocation extends React.Component<
       !equals(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
-    const value: IPropertyDefinitionSupportedLocationType = this.props.state.value as IPropertyDefinitionSupportedLocationType;
+    const value = (
+      this.props.useAppliedValue ?
+      this.props.state.stateAppliedValue :
+      this.props.state.value
+    ) as IPropertyDefinitionSupportedLocationType;
+
     let canResetViewportCenter: boolean = false;
     if (value) {
       const expectedViewport = {
@@ -102,7 +127,7 @@ export class PropertyViewLocation extends React.Component<
     const rendererArgs: IPropertyViewLocationRendererProps = {
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
-      currentValue: this.props.state.value as IPropertyDefinitionSupportedLocationType,
+      currentValue: value,
       viewport: this.state.viewport,
       onViewportChange: this.onViewportChange,
       onResetViewportCenter: this.onResetViewportCenter,

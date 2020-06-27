@@ -321,6 +321,9 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     private isUnmounted;
     private lastLoadingForId;
     private lastLoadingForVersion;
+    private lastLoadValuePromise;
+    private lastLoadValuePromiseIsResolved;
+    private lastLoadValuePromiseResolve;
     static getDerivedStateFromProps(props: IActualItemDefinitionProviderProps, state: IActualItemDefinitionProviderState): {
         state: IItemDefinitionStateType;
     };

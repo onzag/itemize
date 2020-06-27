@@ -12,7 +12,9 @@ class PropertyViewBoolean extends react_1.default.Component {
     }
     shouldComponentUpdate(nextProps) {
         // This is optimized to only update for the thing it uses
-        return this.props.state.value !== nextProps.state.value ||
+        return this.props.useAppliedValue !== nextProps.useAppliedValue ||
+            (!this.props.useAppliedValue && this.props.state.value !== nextProps.state.value) ||
+            (this.props.useAppliedValue && this.props.state.stateAppliedValue !== nextProps.state.stateAppliedValue) ||
             nextProps.language !== this.props.language ||
             nextProps.property !== this.props.property ||
             nextProps.renderer !== this.props.renderer ||
@@ -28,7 +30,9 @@ class PropertyViewBoolean extends react_1.default.Component {
         const rendererArgs = {
             args: this.props.rendererArgs,
             rtl: this.props.rtl,
-            currentValue: this.props.state.value,
+            currentValue: this.props.useAppliedValue ?
+                this.props.state.stateAppliedValue :
+                this.props.state.value,
             i18nNo,
             i18nYes,
             i18nUnspecified,

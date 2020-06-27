@@ -34,7 +34,7 @@ import Root from "../../../base/Root";
 import { EndpointError } from "../../../base/errors";
 
 function findLastRecordDateCheatMethod(records: IGQLSearchRecord[]): string {
-  let maximumRecords: IGQLSearchRecord[] = null;
+  let maximumRecords: IGQLSearchRecord[] = [];
   let maximumRecordId: number = null;
   records.forEach((record: IGQLSearchRecord) => {
     if (!maximumRecordId || record.id > maximumRecordId) {

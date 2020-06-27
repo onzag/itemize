@@ -35,6 +35,29 @@ function buildSearchModeModule(rawData) {
             .map((pe) => search_mode_2.buildSearchModePropertyDefinitions(pe, knownPropExtMap))
             .reduce((arr, peArr) => [...arr, ...peArr]);
     }
+    // it might not be searchable, search mode modules are always built since
+    // their children might have search functionality
+    if (typeof newModule.searchable === "undefined" || newModule.searchable) {
+        if (!newModule.propExtensions) {
+            newModule.propExtensions = [];
+        }
+        const searchI18nData = {};
+        Object.keys(newModule.i18nData).forEach((locale) => {
+            searchI18nData[locale] = {};
+            searchI18nData[locale].label = newModule.i18nData[locale].search_field_label;
+            searchI18nData[locale].placeholder = newModule.i18nData[locale].search_field_placeholder;
+            searchI18nData[locale].error = {
+                TOO_LARGE: newModule.i18nData[locale].search_value_too_large,
+            };
+        });
+        newModule.propExtensions.push({
+            id: "search",
+            type: "string",
+            nullable: true,
+            maxLength: constants_1.MAX_SEARCH_FIELD_SIZE,
+            i18nData: searchI18nData,
+        });
+    }
     // if we have children in this module, which should be the case
     if (newModule.children) {
         // we map them

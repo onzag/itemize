@@ -10,6 +10,7 @@ import { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionReferredProperty
 import { IModuleRawJSONDataType } from "..";
 import { getConversionRulesetId, buildSearchModeConditionalRuleSet } from "./ConditionalRuleSet/search-mode";
 import { getConversionIds, buildSearchModePropertyDefinitions } from "./PropertyDefinition/search-mode";
+import { MAX_SEARCH_FIELD_SIZE } from "../../../../constants";
 
 /**
  * This builds item definitions
@@ -46,6 +47,27 @@ export function buildSearchModeItemDefinition(
         // we need to combine the resulting arrays and flatten them
         .reduce((arr, pArr) => [...arr, ...pArr]);
     }
+
+    if (!newItemDef.properties) {
+      newItemDef.properties = [];
+    }
+
+    const searchI18nData = {};
+    Object.keys(newItemDef.i18nData).forEach((locale) => {
+      searchI18nData[locale] = {};
+      searchI18nData[locale].label = newItemDef.i18nData[locale].search_field_label;
+      searchI18nData[locale].placeholder = newItemDef.i18nData[locale].search_field_placeholder;
+      searchI18nData[locale].error = {
+        TOO_LARGE: newItemDef.i18nData[locale].search_value_too_large,
+      };
+    });
+    newItemDef.properties.push({
+      id: "search",
+      type: "string",
+      nullable: true,
+      maxLength: MAX_SEARCH_FIELD_SIZE,
+      i18nData: searchI18nData,
+    });
 
     // now we go over the includes, aka the items
     newItemDef.includes = newItemDef.includes && newItemDef.includes.map((i) => {

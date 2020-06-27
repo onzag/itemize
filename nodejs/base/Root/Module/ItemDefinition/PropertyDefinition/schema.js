@@ -74,6 +74,7 @@ exports.default = {
             type: "string",
         },
         default: {},
+        searchDefault: {},
         defaultIf: {
             type: "array",
             items: {
@@ -89,6 +90,7 @@ exports.default = {
             },
             minItems: 1,
         },
+        searchDefaultIf: {},
         invalidIf: {
             type: "array",
             items: {
@@ -132,7 +134,13 @@ exports.default = {
         hidden: {
             type: "boolean",
         },
+        searchHidden: {
+            type: "boolean",
+        },
         hiddenIf: {
+            $ref: "ConditionalRuleSet",
+        },
+        searchHiddenIf: {
             $ref: "ConditionalRuleSet",
         },
         searchable: {

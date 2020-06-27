@@ -18,6 +18,7 @@ import { processFileListFor, processSingleFileFor } from "./sql-files";
 import { IGQLArgs, IGQLValue } from "../../../../../gql-querier";
 import { SQL_CONSTRAINT_PREFIX } from "../../../../../constants";
 import pkgcloud from "pkgcloud";
+import Module from "../..";
 
 /**
  * Provides the sql function that defines the schema that is used to build
@@ -120,18 +121,18 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
   const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
   let searchedByIt: boolean = false;
 
-  if (typeof arg.args[exactName] !== "undefined") {
-    arg.knexBuilder.andWhere(arg.prefix + arg.id, arg.args[exactName] as string);
+  if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
+    arg.knexBuilder.andWhere(arg.prefix + arg.id, arg.args[exactName] as any);
     searchedByIt = true;
   }
 
   if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
-    arg.knexBuilder.andWhere(arg.prefix + arg.id, ">=", arg.args[fromName] as string);
+    arg.knexBuilder.andWhere(arg.prefix + arg.id, ">=", arg.args[fromName] as any);
     searchedByIt = true;
   }
 
   if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
-    arg.knexBuilder.andWhere(arg.prefix + arg.id, "<=", arg.args[toName] as string);
+    arg.knexBuilder.andWhere(arg.prefix + arg.id, "<=", arg.args[toName] as any);
     searchedByIt = true;
   }
 
@@ -143,12 +144,12 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
  * @returns a knex valid search or select query object
  */
 export function standardSQLEqualFn(arg: ISQLEqualInfo) {
-  if (arg.ignoreCase) {
+  if (arg.ignoreCase && typeof arg.value === "string") {
     return arg.knex.raw(
-      "LOWER(??) = LOWER(?)",
+      "LOWER(??) = ?",
       [
         arg.prefix + arg.id,
-        arg.value as any,
+        arg.value.toLowerCase(),
       ],
     ); 
   }
@@ -287,12 +288,14 @@ export function convertSQLValueToGQLValueForProperty(
 export function convertGQLValueToSQLValueForProperty(
   knex: Knex,
   serverData: any,
+  mod: Module,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
   data: IGQLArgs,
   oldData: IGQLValue,
   uploadsContainer: pkgcloud.storage.Container,
+  uploadsPrefix: string,
   dictionary: string,
 ): ISQLStreamComposedTableRowValue {
   // and this is the value of the property, again, properties
@@ -326,7 +329,8 @@ export function convertGQLValueToSQLValueForProperty(
         newValue,
         oldValue,
         uploadsContainer,
-        itemDefinition,
+        uploadsPrefix,
+        itemDefinition || mod,
         include,
         propertyDefinition,
       );
@@ -337,7 +341,8 @@ export function convertGQLValueToSQLValueForProperty(
         newValue,
         oldValue,
         uploadsContainer,
-        itemDefinition,
+        uploadsPrefix,
+        itemDefinition || mod,
         include,
         propertyDefinition,
       );

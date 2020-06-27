@@ -20,7 +20,7 @@ export const PROPERTY_VIEW_SANITIZE_CONFIG = {
 
 export const ALLOWED_CLASSES = [
   "image", "image-container", "image-pad", "video", "video-container",
-  "file", "file-container", "file-icon", "file-extension", "file-size",
+  "file", "file-container", "file-icon", "file-name", "file-extension", "file-size",
 ]
 
 export const ALLOWED_CLASSES_PREFIXES = [
@@ -196,7 +196,9 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
     nextProps: IPropertyViewHandlerProps<IPropertyViewTextRendererProps>,
   ) {
     // This is optimized to only update for the thing it uses
-    return this.props.state.value !== nextProps.state.value ||
+    return this.props.useAppliedValue !== nextProps.useAppliedValue ||
+      (!this.props.useAppliedValue && this.props.state.value !== nextProps.state.value) ||
+      (this.props.useAppliedValue && this.props.state.stateAppliedValue !== nextProps.state.stateAppliedValue) ||
       nextProps.renderer !== this.props.renderer ||
       nextProps.property !== this.props.property ||
       nextProps.forId !== this.props.forId ||
@@ -205,7 +207,11 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
       !equals(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
-    let currentValue: string = this.props.state.value as string;
+    let currentValue = (
+      this.props.useAppliedValue ?
+      this.props.state.stateAppliedValue :
+      this.props.state.value
+    ) as string;
 
     const isRichText = this.props.property.isRichText();
 

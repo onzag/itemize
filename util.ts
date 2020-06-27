@@ -262,11 +262,16 @@ export function fileURLAbsoluter(
   if (prefix.indexOf("/") !== 0) {
     prefix = "https://" + prefix;
   }
+
   return {
     ...file,
     url:
       prefix +
-      itemDefinition.getQualifiedPathName() + "/" +
+      (
+        property.isExtension() ?
+        itemDefinition.getParentModule().getQualifiedPathName() :
+        itemDefinition.getQualifiedPathName()
+      ) + "/" +
       id + "." + (version || "") + "/" +
       (include ? include.getId() + "/" : "") +
       property.getId() + "/" +
