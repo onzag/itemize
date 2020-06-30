@@ -3,7 +3,7 @@ import Reader from "../../../components/property/Reader";
 import TitleSetter from "../../../components/util/TitleSetter";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider, NoStateItemDefinitionProvider } from "../../../providers/item-definition";
-import { Container, WithStyles, withStyles, Theme, createStyles, Paper, Typography, Divider } from "@material-ui/core";
+import { Container, WithStyles, withStyles, Theme, createStyles, Paper, Typography, Divider } from "../../mui-core";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
 import View from "../../../components/property/View";
 import I18nRead from "../../../components/localization/I18nRead";

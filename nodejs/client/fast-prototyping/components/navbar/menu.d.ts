@@ -1,5 +1,5 @@
 import React from "react";
-import { WithStyles } from "@material-ui/core";
+import { WithStyles } from "../../mui-core";
 interface MenuProps {
     isOpen: boolean;
     onOpen: () => void;
@@ -8,5 +8,5 @@ interface MenuProps {
 declare const menuStyles: Record<"list" | "listLink", import("@material-ui/styles").CSSProperties | import("@material-ui/styles").CreateCSSProperties<{}> | ((props: {}) => import("@material-ui/styles").CreateCSSProperties<{}>)>;
 interface MenuPropsWithStyles extends WithStyles<typeof menuStyles>, MenuProps {
 }
-export declare const Menu: React.ComponentType<Pick<MenuPropsWithStyles, "onClose" | "onOpen" | "isOpen"> & import("@material-ui/core").StyledComponentProps<"list" | "listLink">>;
+export declare const Menu: React.ComponentType<Pick<MenuPropsWithStyles, "onClose" | "onOpen" | "isOpen"> & import("@material-ui/styles").StyledComponentProps<"list" | "listLink">>;
 export {};

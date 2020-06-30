@@ -1,7 +1,6 @@
 import React from "react";
 import { capitalize } from "../../components/localization";
-import { Button, Menu, MenuItem } from "@material-ui/core";
-import TranslateIcon from "@material-ui/icons/Translate";
+import { Button, Menu, MenuItem, TranslateIcon } from "../mui-core";
 import AppLanguageRetriever from "../../components/localization/AppLanguageRetriever";
 
 interface ILanguagePickerProps {

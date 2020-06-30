@@ -7,9 +7,8 @@ const react_1 = __importDefault(require("react"));
 const module_1 = require("../../../providers/module");
 const item_definition_1 = require("../../../providers/item-definition");
 const item_definition_loader_1 = require("../../components/item-definition-loader");
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("../../mui-core");
 const snackbar_1 = __importDefault(require("../../components/snackbar"));
-const DoneOutline_1 = __importDefault(require("@material-ui/icons/DoneOutline"));
 const buttons_1 = require("../../components/buttons");
 const UserDataRetriever_1 = __importDefault(require("../../../components/user/UserDataRetriever"));
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
@@ -17,7 +16,7 @@ const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSet
 const I18nReadMany_1 = __importDefault(require("../../../components/localization/I18nReadMany"));
 const Entry_1 = __importDefault(require("../../../components/property/Entry"));
 const SubmitActioner_1 = __importDefault(require("../../../components/item-definition/SubmitActioner"));
-const changePasswordStyles = core_1.createStyles({
+const changePasswordStyles = mui_core_1.createStyles({
     paper: {
         padding: "1rem",
     },
@@ -30,7 +29,7 @@ const changePasswordStyles = core_1.createStyles({
         paddingTop: "1.2rem",
     },
 });
-exports.ChangePassword = core_1.withStyles(changePasswordStyles)((props) => {
+exports.ChangePassword = mui_core_1.withStyles(changePasswordStyles)((props) => {
     return (react_1.default.createElement(UserDataRetriever_1.default, null, (userData) => {
         return (react_1.default.createElement(module_1.ModuleProvider, { module: "users" },
             react_1.default.createElement(item_definition_1.ItemDefinitionProvider, { itemDefinition: "user", properties: [
@@ -40,8 +39,8 @@ exports.ChangePassword = core_1.withStyles(changePasswordStyles)((props) => {
                     return (react_1.default.createElement(TitleSetter_1.default, null, i18nChangePassword));
                 }),
                 react_1.default.createElement(item_definition_loader_1.ItemDefinitionLoader, null,
-                    react_1.default.createElement(core_1.Container, { maxWidth: "md", className: props.classes.container },
-                        react_1.default.createElement(core_1.Paper, { className: props.classes.paper },
+                    react_1.default.createElement(mui_core_1.Container, { maxWidth: "md", className: props.classes.container },
+                        react_1.default.createElement(mui_core_1.Paper, { className: props.classes.paper },
                             react_1.default.createElement(I18nReadMany_1.default, { data: [
                                     { id: "change_password_current_alt_label" },
                                     { id: "change_password_current_alt_placeholder" },
@@ -50,15 +49,15 @@ exports.ChangePassword = core_1.withStyles(changePasswordStyles)((props) => {
                                 ] }, (i18nAltCurrentPasswordLabel, i18nAltCurrentPasswordPlaceholder, i18nAltNewPasswordLabel, i18nAltNewPasswordPlaceholder) => (react_1.default.createElement("form", null,
                                 react_1.default.createElement(Entry_1.default, { id: "password", policyType: "edit", policyName: "REQUIRES_PASSWORD_CONFIRMATION", altLabel: i18nAltCurrentPasswordLabel, altPlaceholder: i18nAltCurrentPasswordPlaceholder, autoFocus: true }),
                                 react_1.default.createElement(Entry_1.default, { id: "password", altLabel: i18nAltNewPasswordLabel, altPlaceholder: i18nAltNewPasswordPlaceholder })))),
-                            react_1.default.createElement(core_1.Divider, null),
-                            react_1.default.createElement(core_1.Box, { className: props.classes.buttonBox },
+                            react_1.default.createElement(mui_core_1.Divider, null),
+                            react_1.default.createElement(mui_core_1.Box, { className: props.classes.buttonBox },
                                 react_1.default.createElement(buttons_1.SubmitButton, { i18nId: "change_password", options: {
                                         properties: ["password"],
                                         propertiesToCleanOnSuccess: ["password"],
                                         policies: [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]],
                                         policiesToCleanOnSuccess: [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]],
                                         unpokeAfterAny: true,
-                                    }, buttonColor: "primary", buttonStartIcon: react_1.default.createElement(DoneOutline_1.default, null), buttonVariant: "contained", redirectOnSuccess: "/my-profile?msg=change_password_success&msgtitle=change_password", redirectGoBack: true, redirectReplace: true }))))),
+                                    }, buttonColor: "primary", buttonStartIcon: react_1.default.createElement(mui_core_1.DoneOutlineIcon, null), buttonVariant: "contained", redirectOnSuccess: "/my-profile?msg=change_password_success&msgtitle=change_password", redirectGoBack: true, redirectReplace: true }))))),
                 react_1.default.createElement(SubmitActioner_1.default, null, (actioner) => (react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }))))));
     }));
 });

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Button, PropTypes } from "@material-ui/core";
 import { IActionSubmitOptions, IActionResponseWithId, IActionSearchOptions } from "../../providers/item-definition";
 import { ProgressingElement } from "./util";
 import SubmitActioner from "../../components/item-definition/SubmitActioner";
 import { goBack, localizedRedirectTo } from "../../components/navigation";
 import I18nRead from "../../components/localization/I18nRead";
 import SearchActioner from "../../components/search/SearchActioner";
+import { Button, PropTypes } from "../mui-core";
 
 type RedirectCallbackFn = (status: IActionResponseWithId) => string;
 

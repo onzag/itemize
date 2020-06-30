@@ -1,6 +1,5 @@
 import React from "react";
-import { Button } from "@material-ui/core";
-import UpdateIcon from "@material-ui/icons/Update"; 
+import { Button, UpdateIcon } from "../../mui-core";
 import AppIsOutdatedChecker from "../../../components/outdated/AppIsOutdatedChecker";
 import I18nRead from "../../../components/localization/I18nRead";
 

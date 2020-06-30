@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const item_definition_1 = require("../../../providers/item-definition");
 const item_definition_loader_1 = require("../../components/item-definition-loader");
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("../../mui-core");
 const Entry_1 = __importDefault(require("../../../components/property/Entry"));
 const View_1 = __importDefault(require("../../../components/property/View"));
 const LocationStateReader_1 = __importDefault(require("../../../components/navigation/LocationStateReader"));
@@ -15,7 +15,7 @@ const I18nReadMany_1 = __importDefault(require("../../../components/localization
 const snackbar_1 = __importDefault(require("../../components/snackbar"));
 const SubmitActioner_1 = __importDefault(require("../../../components/item-definition/SubmitActioner"));
 const articles_1 = require("../frontpage/articles");
-const fragmentStyles = core_1.createStyles({
+const fragmentStyles = mui_core_1.createStyles({
     paper: {
         padding: "1rem",
     },
@@ -30,7 +30,7 @@ const fragmentStyles = core_1.createStyles({
         paddingBottom: "1rem",
     },
 });
-const SingleArticle = core_1.withStyles(articles_1.articlesStyles)((props) => {
+const SingleArticle = mui_core_1.withStyles(articles_1.articlesStyles)((props) => {
     return react_1.default.createElement("div", { className: props.classes.articleContainer },
         react_1.default.createElement("div", { className: props.classes.articleImageContainer },
             react_1.default.createElement(View_1.default, { id: "summary_image", rendererArgs: {
@@ -39,13 +39,13 @@ const SingleArticle = core_1.withStyles(articles_1.articlesStyles)((props) => {
                     lazyLoad: true,
                 } })),
         react_1.default.createElement("div", { className: props.classes.articleText },
-            react_1.default.createElement(core_1.Typography, { variant: "h4" },
+            react_1.default.createElement(mui_core_1.Typography, { variant: "h4" },
                 react_1.default.createElement(View_1.default, { id: "title" })),
             react_1.default.createElement("div", { className: props.classes.articleSummaryContainer },
                 react_1.default.createElement("div", { className: props.classes.articleSummary },
                     react_1.default.createElement(View_1.default, { id: "summary" })))));
 });
-exports.Article = core_1.withStyles(fragmentStyles)((props) => {
+exports.Article = mui_core_1.withStyles(fragmentStyles)((props) => {
     return (react_1.default.createElement(LocationStateReader_1.default, { defaultState: { id: "" }, stateIsInQueryString: true }, (locationState, setState) => {
         const updateLocationId = (e) => {
             setState({
@@ -60,12 +60,12 @@ exports.Article = core_1.withStyles(fragmentStyles)((props) => {
                 "summary",
                 "summary_image",
             ], includePolicies: false, longTermCaching: false, forId: parseInt(locationState.id, 10) || null },
-            react_1.default.createElement(core_1.Container, { maxWidth: "md", className: props.classes.container + " trusted" },
-                react_1.default.createElement(core_1.Paper, { className: props.classes.paper },
+            react_1.default.createElement(mui_core_1.Container, { maxWidth: "md", className: props.classes.container + " trusted" },
+                react_1.default.createElement(mui_core_1.Paper, { className: props.classes.paper },
                     react_1.default.createElement(I18nReadMany_1.default, { data: [
                             { id: "id", capitalize: true },
-                        ] }, (i18nId) => (react_1.default.createElement(core_1.Box, { className: props.classes.box },
-                        react_1.default.createElement(core_1.TextField, { fullWidth: true, value: locationState.id, type: "number", onChange: updateLocationId, placeholder: i18nId })))),
+                        ] }, (i18nId) => (react_1.default.createElement(mui_core_1.Box, { className: props.classes.box },
+                        react_1.default.createElement(mui_core_1.TextField, { fullWidth: true, value: locationState.id, type: "number", onChange: updateLocationId, placeholder: i18nId })))),
                     react_1.default.createElement(Entry_1.default, { id: "locale" }),
                     react_1.default.createElement(Entry_1.default, { id: "title" }),
                     react_1.default.createElement(Entry_1.default, { id: "content", rendererArgs: {
@@ -84,12 +84,12 @@ exports.Article = core_1.withStyles(fragmentStyles)((props) => {
                                 "summary_image",
                             ],
                         }, redirectOnSuccess: (status) => `/cms/article?id=${status.id}`, redirectReplace: true })),
-                react_1.default.createElement(core_1.Paper, { className: props.classes.paper2 },
+                react_1.default.createElement(mui_core_1.Paper, { className: props.classes.paper2 },
                     react_1.default.createElement(item_definition_loader_1.ItemDefinitionLoader, null,
                         react_1.default.createElement(SingleArticle, null))),
-                react_1.default.createElement(core_1.Paper, { className: props.classes.paper2 },
+                react_1.default.createElement(mui_core_1.Paper, { className: props.classes.paper2 },
                     react_1.default.createElement(item_definition_loader_1.ItemDefinitionLoader, null,
-                        react_1.default.createElement(core_1.Typography, { variant: "h4" },
+                        react_1.default.createElement(mui_core_1.Typography, { variant: "h4" },
                             react_1.default.createElement(View_1.default, { id: "title" })),
                         react_1.default.createElement(View_1.default, { id: "content" })))),
             react_1.default.createElement(SubmitActioner_1.default, null, (actioner) => (react_1.default.createElement(react_1.default.Fragment, null,

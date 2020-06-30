@@ -1,12 +1,10 @@
 import React from "react";
 import ONeedsSubmitPrompt from "../../components/navigation/NeedsSubmitPrompt";
 import { Dialog } from "./dialog";
-import { Button, Typography, WithStyles, createStyles, withStyles, Theme } from "@material-ui/core";
-import DoneIcon from "@material-ui/icons/Done";
+import { Button, Typography, WithStyles, createStyles, withStyles, Theme, DoneIcon, CloseIcon } from "../mui-core";
 import { EndpointErrorType } from "../../../base/errors";
 import { IActionSubmitOptions } from "../../providers/item-definition";
 import { ProgressingElement } from "./util";
-import CloseIcon from "@material-ui/icons/Close";
 import I18nReadError from "../../components/localization/I18nReadError";
 import I18nReadMany from "../../components/localization/I18nReadMany";
 

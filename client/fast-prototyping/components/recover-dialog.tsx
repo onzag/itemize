@@ -1,12 +1,9 @@
 import React from "react";
-import { Button, createStyles, withStyles, WithStyles, Divider } from "@material-ui/core";
+import { Button, createStyles, withStyles, WithStyles, Divider, MailIcon, AlernateEmailIcon, Alert } from "../mui-core";
 import { DialogResponsive } from "./dialog";
-import MailIcon from "@material-ui/icons/MailOutline";
-import { Alert } from "@material-ui/lab";
 import { ItemDefinitionProvider } from "../../providers/item-definition";
 import Snackbar from "./snackbar";
 import { ProgressingElement } from "./util";
-import AlernateEmailIcon from "@material-ui/icons/AlternateEmail";
 import UserActioner from "../../components/user/UserActioner";
 import I18nRead from "../../components/localization/I18nRead";
 import Entry from "../../components/property/Entry";

@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider, ParentItemDefinitionContextProvider } from "../../../providers/item-definition";
 import SearchLoader from "../../../components/search/SearchLoader";
 import View from "../../../components/property/View";
-import { withStyles, createStyles, WithStyles, Typography, Paper, Theme, Box, Container, Button } from "@material-ui/core";
+import { withStyles, createStyles, WithStyles, Typography, Paper, Theme, Box, Container, Button } from "../../mui-core";
 import Reader from "../../../components/property/Reader";
 import { Avatar } from "../../components/avatar";
 import AppLanguageRetriever from "../../../components/localization/AppLanguageRetriever";

@@ -1,8 +1,5 @@
 import React, {useEffect} from "react";
-import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import { createMuiTheme } from "@material-ui/core";
+import { ThemeProvider as MuiThemeProvider, MuiPickersUtilsProvider, createMuiTheme, CssBaseline } from "./mui-core";
 import { ILocaleContextType } from "../internal/app";
 import Moment from "moment";
 import MomentUtils from "@date-io/moment";

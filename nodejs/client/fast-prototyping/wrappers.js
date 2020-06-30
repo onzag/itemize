@@ -11,10 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importStar(require("react"));
-const styles_1 = require("@material-ui/core/styles");
-const CssBaseline_1 = __importDefault(require("@material-ui/core/CssBaseline"));
-const pickers_1 = require("@material-ui/pickers");
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("./mui-core");
 const moment_1 = __importDefault(require("moment"));
 const moment_2 = __importDefault(require("@date-io/moment"));
 function SSRSheetsRemover(props) {
@@ -30,7 +27,7 @@ function SSRSheetsRemover(props) {
 exports.SSRSheetsRemover = SSRSheetsRemover;
 function appWrapper(app, config) {
     // we create the material ui theme
-    const theme = core_1.createMuiTheme({
+    const theme = mui_core_1.createMuiTheme({
         typography: {
             fontFamily: "'" + config.fontName + "', sans-serif",
             fontWeightLight: 300,
@@ -38,14 +35,14 @@ function appWrapper(app, config) {
             fontWeightMedium: 500,
         },
     });
-    return (react_1.default.createElement(styles_1.ThemeProvider, { theme: theme },
-        react_1.default.createElement(CssBaseline_1.default, null),
+    return (react_1.default.createElement(mui_core_1.ThemeProvider, { theme: theme },
+        react_1.default.createElement(mui_core_1.CssBaseline, null),
         react_1.default.createElement(SSRSheetsRemover, null, app)));
 }
 exports.appWrapper = appWrapper;
 function mainWrapper(mainComponent, localeContext) {
     const languageDeregionalized = localeContext.language.includes("-") ?
         localeContext.language.split("-")[0] : localeContext.language;
-    return (react_1.default.createElement(pickers_1.MuiPickersUtilsProvider, { utils: moment_2.default, locale: languageDeregionalized, libInstance: moment_1.default }, mainComponent));
+    return (react_1.default.createElement(mui_core_1.MuiPickersUtilsProvider, { utils: moment_2.default, locale: languageDeregionalized, libInstance: moment_1.default }, mainComponent));
 }
 exports.mainWrapper = mainWrapper;

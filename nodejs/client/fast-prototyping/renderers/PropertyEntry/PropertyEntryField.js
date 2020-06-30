@@ -5,11 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const index_1 = require("../../mui-core/index");
-const VisibilityOff_1 = __importDefault(require("@material-ui/icons/VisibilityOff"));
-const Visibility_1 = __importDefault(require("@material-ui/icons/Visibility"));
-const lab_1 = require("@material-ui/lab");
-const Restore_1 = __importDefault(require("@material-ui/icons/Restore"));
-const Clear_1 = __importDefault(require("@material-ui/icons/Clear"));
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
@@ -288,7 +283,7 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
         if (this.props.type === "password") {
             // set the end addornment for the show and hide button
             appliedInputProps.endAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
-                react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onClick: this.toggleVisible, onMouseDown: this.catchToggleMouseDownEvent }, this.state.visible ? react_1.default.createElement(Visibility_1.default, null) : react_1.default.createElement(VisibilityOff_1.default, null))));
+                react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onClick: this.toggleVisible, onMouseDown: this.catchToggleMouseDownEvent }, this.state.visible ? react_1.default.createElement(index_1.IconVisibility, null) : react_1.default.createElement(index_1.IconVisibilityOff, null))));
         }
         else if (this.props.type === "currency") {
             if (this.props.currencyFormat === "$N") {
@@ -307,10 +302,10 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
         else if (this.props.canRestore) {
             let icon;
             if (this.props.currentAppliedValue) {
-                icon = react_1.default.createElement(Restore_1.default, null);
+                icon = react_1.default.createElement(index_1.RestoreIcon, null);
             }
             else {
-                icon = react_1.default.createElement(Clear_1.default, null);
+                icon = react_1.default.createElement(index_1.ClearIcon, null);
             }
             appliedInputProps.endAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
                 react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onClick: this.props.onRestore, onMouseDown: this.catchToggleMouseDownEvent }, icon)));
@@ -325,7 +320,7 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
         // return the complex overengineered component in all its glory
         return (react_1.default.createElement("div", { className: this.props.classes.container },
             this.props.description && descriptionAsAlert ?
-                react_1.default.createElement(lab_1.Alert, { severity: "info", className: this.props.classes.description }, this.props.description) :
+                react_1.default.createElement(index_1.Alert, { severity: "info", className: this.props.classes.description }, this.props.description) :
                 null,
             this.props.description && !descriptionAsAlert ?
                 react_1.default.createElement(index_1.Typography, { variant: "caption", className: this.props.classes.description }, this.props.description) :

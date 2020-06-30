@@ -1,17 +1,15 @@
 import React from "react";
-import { Avatar as MAvatar, Badge, RootRef } from "@material-ui/core";
+import { Avatar as MAvatar, Badge, RootRef, withStyles,
+  WithStyles, createStyles, Alert, BrokenImageIcon, AddAPhotoIcon} from "../mui-core";
 import { countries } from "../../../imported-resources";
-import { withStyles, WithStyles, createStyles } from "@material-ui/styles";
 import Link from "../../components/navigation/Link";
 import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedFileType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
 import { imageSizeRetriever, cacheableQSLoader } from "../../components/util";
 import { IPropertyEntryFileRendererProps } from "../../internal/components/PropertyEntry/PropertyEntryFile";
 import Dropzone, { DropzoneRef } from "react-dropzone";
-import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
-import BrokenImageIcon from "@material-ui/icons/BrokenImage";
 import { MAX_FILE_SIZE } from "../../../constants";
-import { Alert } from "@material-ui/lab";
+
 import Reader from "../../components/property/Reader";
 
 const avatarStyles = createStyles({

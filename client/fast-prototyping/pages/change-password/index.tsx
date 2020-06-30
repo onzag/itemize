@@ -2,9 +2,8 @@ import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
-import { Paper, createStyles, withStyles, WithStyles, Container, Divider, Box } from "@material-ui/core";
+import { Paper, createStyles, withStyles, WithStyles, Container, Divider, Box, DoneOutlineIcon } from "../../mui-core";
 import Snackbar from "../../components/snackbar";
-import DoneOutline from "@material-ui/icons/DoneOutline";
 import { SubmitButton } from "../../components/buttons";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
 import I18nRead from "../../../components/localization/I18nRead";
@@ -99,7 +98,7 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
                           unpokeAfterAny: true,
                         }}
                         buttonColor="primary"
-                        buttonStartIcon={<DoneOutline />}
+                        buttonStartIcon={<DoneOutlineIcon />}
                         buttonVariant="contained"
                         redirectOnSuccess="/my-profile?msg=change_password_success&msgtitle=change_password"
                         redirectGoBack={true}

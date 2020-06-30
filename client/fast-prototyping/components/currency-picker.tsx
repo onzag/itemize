@@ -1,6 +1,6 @@
 import React from "react";
 import { capitalize } from "../../components/localization";
-import { Button, Menu, MenuItem } from "@material-ui/core";
+import { Button, Menu, MenuItem } from "../mui-core";
 import AppCurrencyRetriever from "../../components/localization/AppCurrencyRetriever";
 
 interface ICurrencyPickerProps {

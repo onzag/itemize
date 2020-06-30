@@ -6,7 +6,7 @@ import Route from "../../../components/navigation/Route";
 import { Fragment } from "./fragment";
 import { Article } from "./article";
 import { Info } from "./info";
-import { AppBar, Tabs, Tab } from "@material-ui/core";
+import { AppBar, Tabs, Tab } from "../../mui-core";
 import { localizedRedirectTo } from "../../../components/navigation";
 import { NoStateItemDefinitionProvider } from "../../../providers/item-definition";
 

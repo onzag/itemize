@@ -4,9 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("../../mui-core");
 const PropertyEntryLocation_1 = require("../PropertyEntry/PropertyEntryLocation");
-const GpsFixed_1 = __importDefault(require("@material-ui/icons/GpsFixed"));
 let CMap;
 let CTileLayer;
 let CMarker;
@@ -26,7 +25,7 @@ if (typeof document !== "undefined") {
         shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
     });
 }
-const locationMapStyles = core_1.createStyles({
+const locationMapStyles = mui_core_1.createStyles({
     container: {
         width: "100%",
     },
@@ -87,12 +86,12 @@ class ActualPropertyViewLocationMap extends react_1.default.Component {
             react_1.default.createElement("div", { className: this.props.classes.locationMapContainer },
                 map,
                 this.props.canResetViewportCenter ?
-                    react_1.default.createElement(core_1.IconButton, { onClick: this.props.onResetViewportCenter },
-                        react_1.default.createElement(GpsFixed_1.default, null))
+                    react_1.default.createElement(mui_core_1.IconButton, { onClick: this.props.onResetViewportCenter },
+                        react_1.default.createElement(mui_core_1.GpsFixedIcon, null))
                     : null)));
     }
 }
-const PropertyViewLocationMap = core_1.withStyles(locationMapStyles)(ActualPropertyViewLocationMap);
+const PropertyViewLocationMap = mui_core_1.withStyles(locationMapStyles)(ActualPropertyViewLocationMap);
 function PropertyViewLocationRenderer(props) {
     if (props.currentValue === null && props.args.NullComponent && !props.args.nullComponentInMap) {
         const NullComponent = props.args.NullComponent;

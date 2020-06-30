@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const item_definition_1 = require("../../../providers/item-definition");
 const item_definition_loader_1 = require("../../components/item-definition-loader");
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("../../mui-core");
 const Entry_1 = __importDefault(require("../../../components/property/Entry"));
 const View_1 = __importDefault(require("../../../components/property/View"));
 const LocationStateReader_1 = __importDefault(require("../../../components/navigation/LocationStateReader"));
@@ -14,7 +14,7 @@ const buttons_1 = require("../../components/buttons");
 const I18nReadMany_1 = __importDefault(require("../../../components/localization/I18nReadMany"));
 const snackbar_1 = __importDefault(require("../../components/snackbar"));
 const SubmitActioner_1 = __importDefault(require("../../../components/item-definition/SubmitActioner"));
-const fragmentStyles = core_1.createStyles({
+const fragmentStyles = mui_core_1.createStyles({
     paper: {
         padding: "1rem",
     },
@@ -29,7 +29,7 @@ const fragmentStyles = core_1.createStyles({
         paddingBottom: "1rem",
     },
 });
-exports.Fragment = core_1.withStyles(fragmentStyles)((props) => {
+exports.Fragment = mui_core_1.withStyles(fragmentStyles)((props) => {
     return (react_1.default.createElement(LocationStateReader_1.default, { defaultState: { id: "", version: "" }, stateIsInQueryString: true }, (locationState, setState) => {
         const updateLocationState = (which, e) => {
             setState({
@@ -41,14 +41,14 @@ exports.Fragment = core_1.withStyles(fragmentStyles)((props) => {
                 "content",
                 "attachments",
             ], includePolicies: false, longTermCaching: false, forId: parseInt(locationState.id, 10) || null, forVersion: locationState.version || null },
-            react_1.default.createElement(core_1.Container, { maxWidth: "md", className: props.classes.container + " trusted" },
-                react_1.default.createElement(core_1.Paper, { className: props.classes.paper },
+            react_1.default.createElement(mui_core_1.Container, { maxWidth: "md", className: props.classes.container + " trusted" },
+                react_1.default.createElement(mui_core_1.Paper, { className: props.classes.paper },
                     react_1.default.createElement(I18nReadMany_1.default, { data: [
                             { id: "id", capitalize: true },
                             { id: "version", capitalize: true },
-                        ] }, (i18nId, i18nVersion) => (react_1.default.createElement(core_1.Box, { className: props.classes.box },
-                        react_1.default.createElement(core_1.TextField, { fullWidth: true, value: locationState.id, type: "number", onChange: updateLocationState.bind(null, "id"), placeholder: i18nId }),
-                        react_1.default.createElement(core_1.TextField, { fullWidth: true, value: locationState.version, onChange: updateLocationState.bind(null, "version"), placeholder: i18nVersion })))),
+                        ] }, (i18nId, i18nVersion) => (react_1.default.createElement(mui_core_1.Box, { className: props.classes.box },
+                        react_1.default.createElement(mui_core_1.TextField, { fullWidth: true, value: locationState.id, type: "number", onChange: updateLocationState.bind(null, "id"), placeholder: i18nId }),
+                        react_1.default.createElement(mui_core_1.TextField, { fullWidth: true, value: locationState.version, onChange: updateLocationState.bind(null, "version"), placeholder: i18nVersion })))),
                     react_1.default.createElement(Entry_1.default, { id: "title" }),
                     react_1.default.createElement(Entry_1.default, { id: "content", rendererArgs: {
                             requestAltOnImages: true,
@@ -61,9 +61,9 @@ exports.Fragment = core_1.withStyles(fragmentStyles)((props) => {
                                 "attachments",
                             ],
                         }, redirectOnSuccess: (status) => `/cms/fragment?id=${status.id}&version=${locationState.version || ""}`, redirectReplace: true })),
-                react_1.default.createElement(core_1.Paper, { className: props.classes.paper2 },
+                react_1.default.createElement(mui_core_1.Paper, { className: props.classes.paper2 },
                     react_1.default.createElement(item_definition_loader_1.ItemDefinitionLoader, null,
-                        react_1.default.createElement(core_1.Typography, { variant: "h4" },
+                        react_1.default.createElement(mui_core_1.Typography, { variant: "h4" },
                             react_1.default.createElement(View_1.default, { id: "title" })),
                         react_1.default.createElement(View_1.default, { id: "content" })))),
             react_1.default.createElement(SubmitActioner_1.default, null, (actioner) => (react_1.default.createElement(react_1.default.Fragment, null,

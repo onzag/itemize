@@ -5,30 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("../../../internal/theme/quill.scss");
 const react_1 = __importDefault(require("react"));
-const core_1 = require("@material-ui/core");
-const Toolbar_1 = __importDefault(require("@material-ui/core/Toolbar"));
-const styles_1 = require("./styles");
-const lab_1 = require("@material-ui/lab");
-const styles_2 = require("@material-ui/styles");
+const mui_core_1 = require("../../mui-core");
 const uuid_1 = __importDefault(require("uuid"));
-const AttachFile_1 = __importDefault(require("@material-ui/icons/AttachFile"));
-const VideoLibrary_1 = __importDefault(require("@material-ui/icons/VideoLibrary"));
-const InsertPhoto_1 = __importDefault(require("@material-ui/icons/InsertPhoto"));
-const FormatListBulleted_1 = __importDefault(require("@material-ui/icons/FormatListBulleted"));
-const FormatListNumbered_1 = __importDefault(require("@material-ui/icons/FormatListNumbered"));
-const FormatQuote_1 = __importDefault(require("@material-ui/icons/FormatQuote"));
-const Title_1 = __importDefault(require("@material-ui/icons/Title"));
-const FormatUnderlined_1 = __importDefault(require("@material-ui/icons/FormatUnderlined"));
-const FormatItalic_1 = __importDefault(require("@material-ui/icons/FormatItalic"));
-const FormatBold_1 = __importDefault(require("@material-ui/icons/FormatBold"));
-const Code_1 = __importDefault(require("@material-ui/icons/Code"));
 const util_1 = require("../../../../util");
 const constants_1 = require("../../../../constants");
 const dialog_1 = require("../../components/dialog");
 const pretty_bytes_1 = __importDefault(require("pretty-bytes"));
 const react_textarea_autosize_1 = __importDefault(require("react-textarea-autosize"));
-const Restore_1 = __importDefault(require("@material-ui/icons/Restore"));
-const Clear_1 = __importDefault(require("@material-ui/icons/Clear"));
 const util_2 = require("../../components/util");
 let ReactQuill;
 if (typeof document !== "undefined") {
@@ -193,7 +176,7 @@ ReactQuill.Quill.register(ItemizeFileBlot);
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
-exports.style = (theme) => styles_2.createStyles({
+exports.style = mui_core_1.createStyles({
     entry: {
         width: "100%",
         display: "flex",
@@ -202,19 +185,19 @@ exports.style = (theme) => styles_2.createStyles({
         justifyContent: "space-between",
     },
     container: {
-        width: theme.containerWidth,
+        width: "100%",
     },
     description: {
         width: "100%",
     },
     errorMessage: {
-        color: theme.invalidColor,
-        height: theme.errorMessageContainerSize,
-        fontSize: theme.errorMessageFontSize,
+        color: "#f44336",
+        height: "1.3rem",
+        fontSize: "0.85rem",
     },
-    icon: (props) => ({
-        color: shouldShowInvalid(props) ? theme.invalidColor : theme.iconColor,
-    }),
+    icon: {
+        color: "#424242",
+    },
     iconButton: {
         "backgroundColor": "#2196f3",
         "color": "#fff",
@@ -237,9 +220,9 @@ exports.style = (theme) => styles_2.createStyles({
         borderRadius: "5px",
     },
     label: (props) => ({
-        "color": shouldShowInvalid(props) ? theme.labelInvalidColor : theme.labelColor,
+        "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
         "&.focused": {
-            color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
+            color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
         },
     }),
     labelSingleLine: {
@@ -271,7 +254,7 @@ exports.style = (theme) => styles_2.createStyles({
                 position: "absolute",
                 transition: "border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
                 borderBottom: "1px solid " +
-                    (shouldShowInvalidQuill ? theme.fieldBorderInvalidColor : theme.fieldBorderColor),
+                    (shouldShowInvalidQuill ? "#e57373" : "rgba(0,0,0,0.42)"),
                 pointerEvents: "none",
             },
             // the color that pops up when the field is in focus
@@ -284,7 +267,7 @@ exports.style = (theme) => styles_2.createStyles({
                 transform: "scaleX(0)",
                 transition: "transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
                 borderBottom: "2px solid " +
-                    (shouldShowInvalidQuill ? theme.fieldBorderInvalidColorFocused : theme.fieldBorderColorFocused),
+                    (shouldShowInvalidQuill ? "#f44336" : "#3f51b5"),
                 pointerEvents: "none",
             },
             // during the hover event
@@ -306,38 +289,38 @@ exports.style = (theme) => styles_2.createStyles({
     }
 });
 function RichTextEditorToolbar(props) {
-    return (react_1.default.createElement(Toolbar_1.default, { id: props.id, className: props.className },
+    return (react_1.default.createElement(mui_core_1.Toolbar, { id: props.id, className: props.className },
         props.supportsBasicMode ? react_1.default.createElement(react_1.default.Fragment, null,
-            react_1.default.createElement(core_1.IconButton, { tabIndex: -1, title: props.i18n.formatBoldLabel, classes: { root: "ql-bold" } },
-                react_1.default.createElement(FormatBold_1.default, null)),
-            react_1.default.createElement(core_1.IconButton, { tabIndex: -1, title: props.i18n.formatItalicLabel, classes: { root: "ql-italic" } },
-                react_1.default.createElement(FormatItalic_1.default, null)),
-            react_1.default.createElement(core_1.IconButton, { tabIndex: -1, title: props.i18n.formatUnderlineLabel, classes: { root: "ql-underline" } },
-                react_1.default.createElement(FormatUnderlined_1.default, null)),
-            react_1.default.createElement(core_1.IconButton, { tabIndex: -1, title: props.i18n.formatTitleLabel, classes: { root: "ql-header" }, value: "1" },
-                react_1.default.createElement(Title_1.default, null)),
+            react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, title: props.i18n.formatBoldLabel, classes: { root: "ql-bold" } },
+                react_1.default.createElement(mui_core_1.FormatBoldIcon, null)),
+            react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, title: props.i18n.formatItalicLabel, classes: { root: "ql-italic" } },
+                react_1.default.createElement(mui_core_1.FormatItalicIcon, null)),
+            react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, title: props.i18n.formatUnderlineLabel, classes: { root: "ql-underline" } },
+                react_1.default.createElement(mui_core_1.FormatUnderlinedIcon, null)),
+            react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, title: props.i18n.formatTitleLabel, classes: { root: "ql-header" }, value: "1" },
+                react_1.default.createElement(mui_core_1.TitleIcon, null)),
             react_1.default.createElement("span", { className: "ql-divider" }),
-            react_1.default.createElement(core_1.IconButton, { tabIndex: -1, title: props.i18n.formatQuoteLabel, classes: { root: "ql-blockquote" } },
-                react_1.default.createElement(FormatQuote_1.default, null)),
+            react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, title: props.i18n.formatQuoteLabel, classes: { root: "ql-blockquote" } },
+                react_1.default.createElement(mui_core_1.FormatQuoteIcon, null)),
             react_1.default.createElement("span", { className: "ql-divider" }),
-            react_1.default.createElement(core_1.IconButton, { tabIndex: -1, title: props.i18n.formatListNumberedLabel, classes: { root: "ql-list" }, value: "ordered" },
-                react_1.default.createElement(FormatListNumbered_1.default, null)),
-            react_1.default.createElement(core_1.IconButton, { tabIndex: -1, title: props.i18n.formatListBulletedLabel, classes: { root: "ql-list" }, value: "bullet" },
-                react_1.default.createElement(FormatListBulleted_1.default, null)),
+            react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, title: props.i18n.formatListNumberedLabel, classes: { root: "ql-list" }, value: "ordered" },
+                react_1.default.createElement(mui_core_1.FormatListNumberedIcon, null)),
+            react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, title: props.i18n.formatListBulletedLabel, classes: { root: "ql-list" }, value: "bullet" },
+                react_1.default.createElement(mui_core_1.FormatListBulletedIcon, null)),
             props.supportsImages || props.supportsFiles ?
                 (react_1.default.createElement("span", { className: "ql-divider" })) : null,
             props.supportsImages ?
-                (react_1.default.createElement(core_1.IconButton, { tabIndex: -1, title: props.i18n.formatAddImageLabel, classes: { root: "ql-image" } },
-                    react_1.default.createElement(InsertPhoto_1.default, null))) : null,
+                (react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, title: props.i18n.formatAddImageLabel, classes: { root: "ql-image" } },
+                    react_1.default.createElement(mui_core_1.InsertPhotoIcon, null))) : null,
             props.supportsVideos ?
-                (react_1.default.createElement(core_1.IconButton, { tabIndex: -1, title: props.i18n.formatAddVideoLabel, classes: { root: "ql-video" } },
-                    react_1.default.createElement(VideoLibrary_1.default, null))) : null,
+                (react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, title: props.i18n.formatAddVideoLabel, classes: { root: "ql-video" } },
+                    react_1.default.createElement(mui_core_1.VideoLibraryIcon, null))) : null,
             props.supportsFiles ?
-                (react_1.default.createElement(core_1.IconButton, { tabIndex: -1, title: props.i18n.formatAddFileLabel, classes: { root: "ql-file" } },
-                    react_1.default.createElement(AttachFile_1.default, null))) : null) : null,
+                (react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, title: props.i18n.formatAddFileLabel, classes: { root: "ql-file" } },
+                    react_1.default.createElement(mui_core_1.AttachFileIcon, null))) : null) : null,
         props.supportsRawMode ?
-            (react_1.default.createElement(core_1.IconButton, { tabIndex: -1, onClick: props.onToggleRawMode },
-                react_1.default.createElement(Code_1.default, null))) : null));
+            (react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, onClick: props.onToggleRawMode },
+                react_1.default.createElement(mui_core_1.CodeIcon, null))) : null));
 }
 const CACHED_FORMATS_RICH = ["bold", "italic", "underline", "header", "blockquote", "list", "itemizeimage", "itemizevideo", "itemizefile"];
 // const CACHED_CLIPBOARD_MATCHERS: ReactQuill.ClipboardMatcher[] = [
@@ -641,38 +624,38 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         let icon;
         if (this.props.canRestore) {
             if (this.props.currentAppliedValue) {
-                icon = react_1.default.createElement(Restore_1.default, null);
+                icon = react_1.default.createElement(mui_core_1.RestoreIcon, null);
             }
             else {
-                icon = react_1.default.createElement(Clear_1.default, null);
+                icon = react_1.default.createElement(mui_core_1.ClearIcon, null);
             }
         }
         else if (this.props.icon) {
             icon = this.props.icon;
         }
-        const iconComponent = icon ? (react_1.default.createElement(core_1.IconButton, { tabIndex: -1, className: this.props.classes.icon, onClick: this.props.canRestore ? this.props.onRestore : null }, icon)) : null;
+        const iconComponent = icon ? (react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, className: this.props.classes.icon, onClick: this.props.canRestore ? this.props.onRestore : null }, icon)) : null;
         const descriptionAsAlert = this.props.args["descriptionAsAlert"];
         const imageInput = this.props.supportsImages ? (react_1.default.createElement("input", { ref: this.inputImageRef, type: "file", accept: this.props.mediaPropertyAcceptsImages, tabIndex: -1, style: { display: "none" }, autoComplete: "off", onChange: this.onImageLoad })) : null;
         const fileInput = this.props.supportsFiles ? (react_1.default.createElement("input", { ref: this.fileInputRef, type: "file", accept: this.props.mediaPropertyAcceptsFiles, tabIndex: -1, style: { display: "none" }, autoComplete: "off", onChange: this.onFileLoad })) : null;
-        const uploadVideoDialog = this.props.supportsVideos ? (react_1.default.createElement(dialog_1.Dialog, { fullScreen: false, open: this.state.requestingVideoLink, onClose: this.closeVideoRequesting, title: this.props.i18nLoadVideo.title, buttons: react_1.default.createElement(core_1.Button, { onClick: this.submitVideoLink }, this.props.i18nLoadVideo.submit) },
+        const uploadVideoDialog = this.props.supportsVideos ? (react_1.default.createElement(dialog_1.Dialog, { fullScreen: false, open: this.state.requestingVideoLink, onClose: this.closeVideoRequesting, title: this.props.i18nLoadVideo.title, buttons: react_1.default.createElement(mui_core_1.Button, { onClick: this.submitVideoLink }, this.props.i18nLoadVideo.submit) },
             react_1.default.createElement("div", null,
-                react_1.default.createElement(core_1.TextField, { fullWidth: true, value: this.state.currentVideoLink, onChange: this.updateCurrentVideoLink, label: this.props.i18nLoadVideo.label, placeholder: this.props.i18nLoadVideo.placeholder }),
+                react_1.default.createElement(mui_core_1.TextField, { fullWidth: true, value: this.state.currentVideoLink, onChange: this.updateCurrentVideoLink, label: this.props.i18nLoadVideo.label, placeholder: this.props.i18nLoadVideo.placeholder }),
                 react_1.default.createElement("div", null, this.state.invalidVideoLink ? this.props.i18nLoadVideo.invalid : null)))) : null;
-        const fileLoadErrorDialog = (this.props.supportsImages || this.props.supportsFiles) ? (react_1.default.createElement(dialog_1.Dialog, { fullScreen: false, open: !!this.props.lastLoadedFileError, onClose: this.props.dismissLastLoadedFileError, title: util_1.capitalize(this.props.i18nGenericError), buttons: react_1.default.createElement(core_1.Button, { onClick: this.props.dismissLastLoadedFileError }, util_1.capitalize(this.props.i18nOk)) },
-            react_1.default.createElement(core_1.Typography, null, this.props.lastLoadedFileError))) : null;
+        const fileLoadErrorDialog = (this.props.supportsImages || this.props.supportsFiles) ? (react_1.default.createElement(dialog_1.Dialog, { fullScreen: false, open: !!this.props.lastLoadedFileError, onClose: this.props.dismissLastLoadedFileError, title: util_1.capitalize(this.props.i18nGenericError), buttons: react_1.default.createElement(mui_core_1.Button, { onClick: this.props.dismissLastLoadedFileError }, util_1.capitalize(this.props.i18nOk)) },
+            react_1.default.createElement(mui_core_1.Typography, null, this.props.lastLoadedFileError))) : null;
         const quill = this.state.isReadyToType ? (react_1.default.createElement(react_1.default.Fragment, null,
             react_1.default.createElement(RichTextEditorToolbar, { id: this.uuid, i18n: this.props.i18nFormat, supportsImages: this.props.supportsImages, supportsFiles: this.props.supportsFiles, supportsVideos: this.props.supportsVideos, supportsBasicMode: true, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }),
             react_1.default.createElement(ReactQuill, { ref: this.quillRef, className: this.props.classes.quill + (this.state.focused ? " focused" : ""), modules: this.cachedModuleOptionsRich, formats: CACHED_FORMATS_RICH, theme: null, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onChange: this.onChange, beforeChange: this.beforeChange, onFocus: this.onFocus, onBlur: this.onBlur, disableClipboardMatchersOnUpdate: CACHED_CLIPBOARD_MATCHERS, readOnly: this.props.disabled }))) : null;
         // we return the component, note how we set the thing to focused
         return (react_1.default.createElement("div", { className: this.props.classes.container },
             this.props.description && descriptionAsAlert ?
-                react_1.default.createElement(lab_1.Alert, { severity: "info", className: this.props.classes.description }, this.props.description) :
+                react_1.default.createElement(mui_core_1.Alert, { severity: "info", className: this.props.classes.description }, this.props.description) :
                 null,
             this.props.description && !descriptionAsAlert ?
-                react_1.default.createElement(core_1.Typography, { variant: "caption", className: this.props.classes.description }, this.props.description) :
+                react_1.default.createElement(mui_core_1.Typography, { variant: "caption", className: this.props.classes.description }, this.props.description) :
                 null,
             react_1.default.createElement("div", null,
-                react_1.default.createElement(core_1.InputLabel, { classes: {
+                react_1.default.createElement(mui_core_1.InputLabel, { classes: {
                         root: this.props.classes.label + " " +
                             (this.props.isRichText ? this.props.classes.labelSingleLine : this.props.classes.labelNoToolbar),
                         focused: "focused",
@@ -691,16 +674,5 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
             fileLoadErrorDialog));
     }
 }
-const ActualPropertyEntryTextRendererWithStyles = styles_2.withStyles(exports.style)(ActualPropertyEntryTextRenderer);
-function PropertyEntryTextRenderer(props) {
-    let appliedTheme = styles_1.STANDARD_THEME;
-    if (props.args["theme"]) {
-        appliedTheme = {
-            ...styles_1.STANDARD_THEME,
-            ...props.args["theme"],
-        };
-    }
-    return (react_1.default.createElement(core_1.ThemeProvider, { theme: appliedTheme },
-        react_1.default.createElement(ActualPropertyEntryTextRendererWithStyles, Object.assign({}, props))));
-}
+const PropertyEntryTextRenderer = mui_core_1.withStyles(exports.style)(ActualPropertyEntryTextRenderer);
 exports.default = PropertyEntryTextRenderer;

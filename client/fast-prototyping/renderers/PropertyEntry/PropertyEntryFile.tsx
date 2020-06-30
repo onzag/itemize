@@ -1,22 +1,18 @@
 import { IPropertyEntryFileRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryFile";
-import { createStyles, WithStyles, withStyles } from "@material-ui/styles";
-import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
-import { ThemeProvider, FormLabel, RootRef, Paper, Button, Typography, IconButton } from "@material-ui/core";
-import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
-import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import NoteAddIcon from "@material-ui/icons/NoteAdd";
+import {
+  FormLabel, RootRef, Paper, Button, Typography, IconButton,
+  RemoveCircleOutlineIcon, NoteAddIcon, CloudUploadIcon,
+  createStyles, WithStyles, withStyles, Alert, RestoreIcon, ClearIcon,
+} from "../../mui-core";
 import { MAX_FILE_SIZE } from "../../../../constants";
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import React from "react";
 import { capitalize } from "../../../components/localization";
-import { Alert } from "@material-ui/lab";
-import RestoreIcon from '@material-ui/icons/Restore';
-import ClearIcon from '@material-ui/icons/Clear';
 
 function shouldShowInvalid(props: IPropertyEntryFileRendererProps) {
   return !props.currentValid;
 }
-export const style = (theme: IPropertyEntryThemeType) => createStyles({
+export const style = createStyles({
   entry: {
     width: "100%",
     display: "flex",
@@ -25,27 +21,27 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     justifyContent: "space-between",
   },
   container: {
-    width: theme.containerWidth,
+    width: "100%",
   },
   description: {
     width: "100%",
   },
   errorMessage: {
-    color: theme.invalidColor,
-    height: theme.errorMessageContainerSize,
-    fontSize: theme.errorMessageFontSize,
+    color: "#f44336",
+    height: "1.3rem",
+    fontSize: "0.85rem",
   },
-  icon: (props: IPropertyEntryFileRendererProps) => ({
-    color: shouldShowInvalid(props) ? theme.invalidColor : theme.iconColor,
-  }),
+  icon: {
+    color: "#424242",
+  },
   label: (props: IPropertyEntryFileRendererProps) => ({
-    "color": shouldShowInvalid(props) ? theme.labelInvalidColor : theme.labelColor,
+    "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
     "width": "100%",
     "display": "flex",
     "alignItems": "center",
     "justifyContent": "space-between",
     "&.focused": {
-      color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
+      color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
     },
   }),
   fileDeleteButton: {
@@ -127,7 +123,7 @@ function manuallyTriggerUpload(dropzoneRef: React.MutableRefObject<DropzoneRef>)
   }
 }
 
-const ActualPropertyEntryFileRendererWithStyles = withStyles(style)((props: IPropertyEntryFileRendererWithStylesProps) => {
+const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRendererWithStylesProps) => {
   const dropzoneRef = React.useRef<DropzoneRef>();
   
   let icon: React.ReactNode;
@@ -280,17 +276,4 @@ const ActualPropertyEntryFileRendererWithStyles = withStyles(style)((props: IPro
   );
 });
 
-export default function PropertyEntryFileRenderer(props: IPropertyEntryFileRendererProps) {
-  let appliedTheme: IPropertyEntryThemeType = STANDARD_THEME;
-  if (props.args["theme"]) {
-    appliedTheme = {
-      ...STANDARD_THEME,
-      ...props.args["theme"],
-    };
-  }
-  return (
-    <ThemeProvider theme={appliedTheme}>
-      <ActualPropertyEntryFileRendererWithStyles {...props} />
-    </ThemeProvider>
-  )
-}
+export default PropertyEntryFileRenderer;

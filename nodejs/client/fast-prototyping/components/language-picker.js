@@ -5,8 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const localization_1 = require("../../components/localization");
-const core_1 = require("@material-ui/core");
-const Translate_1 = __importDefault(require("@material-ui/icons/Translate"));
+const mui_core_1 = require("../mui-core");
 const AppLanguageRetriever_1 = __importDefault(require("../../components/localization/AppLanguageRetriever"));
 class LanguagePicker extends react_1.default.Component {
     constructor(props) {
@@ -36,9 +35,9 @@ class LanguagePicker extends react_1.default.Component {
     }
     render() {
         return (react_1.default.createElement(AppLanguageRetriever_1.default, null, (languageData) => {
-            const menu = this.state.anchorEl ? react_1.default.createElement(core_1.Menu, { anchorEl: this.state.anchorEl, keepMounted: false, open: !!this.state.anchorEl, onClose: this.handleMenuClose }, languageData.availableLanguages.map((al) => (react_1.default.createElement(core_1.MenuItem, { key: al.code, selected: al.code === languageData.currentLanguage.code, onClick: this.handleLanguageChange.bind(this, languageData.changeLanguageTo, al.code) }, localization_1.capitalize(al.name))))) : null;
+            const menu = this.state.anchorEl ? react_1.default.createElement(mui_core_1.Menu, { anchorEl: this.state.anchorEl, keepMounted: false, open: !!this.state.anchorEl, onClose: this.handleMenuClose }, languageData.availableLanguages.map((al) => (react_1.default.createElement(mui_core_1.MenuItem, { key: al.code, selected: al.code === languageData.currentLanguage.code, onClick: this.handleLanguageChange.bind(this, languageData.changeLanguageTo, al.code) }, localization_1.capitalize(al.name))))) : null;
             return (react_1.default.createElement(react_1.default.Fragment, null,
-                react_1.default.createElement(core_1.Button, { classes: { root: this.props.className }, color: "inherit", startIcon: react_1.default.createElement(Translate_1.default, null), onClick: this.handleButtonSelectClick }, !this.props.shrinkingDisplay ?
+                react_1.default.createElement(mui_core_1.Button, { classes: { root: this.props.className }, color: "inherit", startIcon: react_1.default.createElement(mui_core_1.TranslateIcon, null), onClick: this.handleButtonSelectClick }, !this.props.shrinkingDisplay ?
                     (this.props.useCode ? languageData.currentLanguage.code : languageData.currentLanguage.name) :
                     react_1.default.createElement(react_1.default.Fragment, null,
                         react_1.default.createElement("span", { className: this.props.shrinkingDisplayStandardClassName }, languageData.currentLanguage.name),

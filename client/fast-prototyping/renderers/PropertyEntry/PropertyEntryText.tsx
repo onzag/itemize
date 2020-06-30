@@ -1,37 +1,20 @@
 import "../../../internal/theme/quill.scss";
 
 import React from "react";
-import { InputLabel, IconButton, ThemeProvider, Typography, TextField, Button } from "@material-ui/core";
-import Toolbar from "@material-ui/core/Toolbar";
+import { InputLabel, IconButton, Typography, RestoreIcon, ClearIcon,
+  TextField, Button, Toolbar, WithStyles, withStyles, createStyles,
+  Alert, AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
+  FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
+  FormatBoldIcon, CodeIcon } from "../../mui-core";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
-import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
-import { Alert } from "@material-ui/lab";
-import {
-  WithStyles,
-  withStyles,
-  createStyles,
-} from "@material-ui/styles";
 import uuid from "uuid";
 
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
-import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
-import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
-import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
-import FormatQuoteIcon from "@material-ui/icons/FormatQuote";
-import TitleIcon from "@material-ui/icons/Title";
-import FormatUnderlinedIcon from "@material-ui/icons/FormatUnderlined";
-import FormatItalicIcon from "@material-ui/icons/FormatItalic";
-import FormatBoldIcon from "@material-ui/icons/FormatBold";
-import CodeIcon from "@material-ui/icons/Code";
 import { capitalize, mimeTypeToExtension } from "../../../../util";
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import { Dialog } from "../../components/dialog";
 import prettyBytes from "pretty-bytes";
 import TextareaAutosize from "react-textarea-autosize";
 
-import RestoreIcon from '@material-ui/icons/Restore';
-import ClearIcon from '@material-ui/icons/Clear';
 import { SlowLoadingElement } from "../../components/util";
 
 import OriginalReactQuill from "@onzag/react-quill";
@@ -251,7 +234,7 @@ ReactQuill.Quill.register(ItemizeFileBlot);
 function shouldShowInvalid(props: IPropertyEntryTextRendererProps) {
   return !props.currentValid;
 }
-export const style = (theme: IPropertyEntryThemeType) => createStyles({
+export const style = createStyles({
   entry: {
     width: "100%",
     display: "flex",
@@ -260,19 +243,19 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     justifyContent: "space-between",
   },
   container: {
-    width: theme.containerWidth,
+    width: "100%",
   },
   description: {
     width: "100%",
   },
   errorMessage: {
-    color: theme.invalidColor,
-    height: theme.errorMessageContainerSize,
-    fontSize: theme.errorMessageFontSize,
+    color: "#f44336",
+    height: "1.3rem",
+    fontSize: "0.85rem",
   },
-  icon: (props: IPropertyEntryTextRendererProps) => ({
-    color: shouldShowInvalid(props) ? theme.invalidColor : theme.iconColor,
-  }),
+  icon: {
+    color: "#424242",
+  },
   iconButton: {
     "backgroundColor": "#2196f3",
     "color": "#fff",
@@ -295,9 +278,9 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     borderRadius: "5px",
   },
   label: (props: IPropertyEntryTextRendererProps) => ({
-    "color": shouldShowInvalid(props) ? theme.labelInvalidColor : theme.labelColor,
+    "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
     "&.focused": {
-      color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
+      color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
     },
   }),
   labelSingleLine: {
@@ -329,7 +312,7 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
         position: "absolute",
         transition: "border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
         borderBottom: "1px solid " +
-          (shouldShowInvalidQuill ? theme.fieldBorderInvalidColor : theme.fieldBorderColor),
+          (shouldShowInvalidQuill ? "#e57373" : "rgba(0,0,0,0.42)"),
         pointerEvents: "none",
       },
       // the color that pops up when the field is in focus
@@ -342,7 +325,7 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
         transform: "scaleX(0)",
         transition: "transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
         borderBottom: "2px solid " +
-          (shouldShowInvalidQuill ? theme.fieldBorderInvalidColorFocused : theme.fieldBorderColorFocused),
+          (shouldShowInvalidQuill ? "#f44336" : "#3f51b5"),
         pointerEvents: "none",
       },
       // during the hover event
@@ -1045,19 +1028,5 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   }
 }
 
-const ActualPropertyEntryTextRendererWithStyles = withStyles(style)(ActualPropertyEntryTextRenderer);
-
-export default function PropertyEntryTextRenderer(props: IPropertyEntryTextRendererProps) {
-  let appliedTheme: IPropertyEntryThemeType = STANDARD_THEME;
-  if (props.args["theme"]) {
-    appliedTheme = {
-      ...STANDARD_THEME,
-      ...props.args["theme"],
-    };
-  }
-  return (
-    <ThemeProvider theme={appliedTheme}>
-      <ActualPropertyEntryTextRendererWithStyles {...props}/>
-    </ThemeProvider>
-  )
-}
+const PropertyEntryTextRenderer = withStyles(style)(ActualPropertyEntryTextRenderer);
+export default PropertyEntryTextRenderer;

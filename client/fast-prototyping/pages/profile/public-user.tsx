@@ -1,9 +1,9 @@
 import React from "react";
-import { Container, createStyles, WithStyles, withStyles, Typography, Paper, Theme, Tooltip, Card } from "@material-ui/core";
+import { Container, createStyles, WithStyles, withStyles,
+  Typography, Paper, Theme, Tooltip, Card, VerifiedUserIcon } from "../../mui-core";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
 import { Avatar } from "../../components/avatar";
 import { countries } from "../../../../imported-resources";
-import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 import { AdminToolbox } from "./admin-toolbox";
 import Reader from "../../../components/property/Reader";
 import I18nRead from "../../../components/localization/I18nRead";

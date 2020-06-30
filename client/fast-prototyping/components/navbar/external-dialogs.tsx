@@ -1,7 +1,6 @@
 import React from "react";
-import { Button, Typography, WithStyles, Theme, createStyles, withStyles } from "@material-ui/core";
+import { Button, Typography, WithStyles, Theme, createStyles, withStyles, DoneIcon } from "../../mui-core";
 import { DialogResponsive } from "../dialog";
-import DoneIcon from "@material-ui/icons/Done";
 import LocationStateReader from "../../../components/navigation/LocationStateReader";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
 

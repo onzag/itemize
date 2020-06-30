@@ -3,23 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const styles_1 = require("@material-ui/styles");
-const styles_2 = require("./styles");
-const core_1 = require("@material-ui/core");
-const RemoveCircleOutline_1 = __importDefault(require("@material-ui/icons/RemoveCircleOutline"));
-const CloudUpload_1 = __importDefault(require("@material-ui/icons/CloudUpload"));
-const NoteAdd_1 = __importDefault(require("@material-ui/icons/NoteAdd"));
+const mui_core_1 = require("../../mui-core");
 const constants_1 = require("../../../../constants");
 const react_dropzone_1 = __importDefault(require("react-dropzone"));
 const react_1 = __importDefault(require("react"));
 const localization_1 = require("../../../components/localization");
-const lab_1 = require("@material-ui/lab");
-const Restore_1 = __importDefault(require("@material-ui/icons/Restore"));
-const Clear_1 = __importDefault(require("@material-ui/icons/Clear"));
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
-exports.style = (theme) => styles_1.createStyles({
+exports.style = mui_core_1.createStyles({
     entry: {
         width: "100%",
         display: "flex",
@@ -28,27 +20,27 @@ exports.style = (theme) => styles_1.createStyles({
         justifyContent: "space-between",
     },
     container: {
-        width: theme.containerWidth,
+        width: "100%",
     },
     description: {
         width: "100%",
     },
     errorMessage: {
-        color: theme.invalidColor,
-        height: theme.errorMessageContainerSize,
-        fontSize: theme.errorMessageFontSize,
+        color: "#f44336",
+        height: "1.3rem",
+        fontSize: "0.85rem",
     },
-    icon: (props) => ({
-        color: shouldShowInvalid(props) ? theme.invalidColor : theme.iconColor,
-    }),
+    icon: {
+        color: "#424242",
+    },
     label: (props) => ({
-        "color": shouldShowInvalid(props) ? theme.labelInvalidColor : theme.labelColor,
+        "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
         "width": "100%",
         "display": "flex",
         "alignItems": "center",
         "justifyContent": "space-between",
         "&.focused": {
-            color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
+            color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
         },
     }),
     fileDeleteButton: {
@@ -124,15 +116,15 @@ function manuallyTriggerUpload(dropzoneRef) {
         dropzoneRef.current.open();
     }
 }
-const ActualPropertyEntryFileRendererWithStyles = styles_1.withStyles(exports.style)((props) => {
+const PropertyEntryFileRenderer = mui_core_1.withStyles(exports.style)((props) => {
     const dropzoneRef = react_1.default.useRef();
     let icon;
     if (props.canRestore) {
         if (props.currentAppliedValue) {
-            icon = react_1.default.createElement(Restore_1.default, null);
+            icon = react_1.default.createElement(mui_core_1.RestoreIcon, null);
         }
         else {
-            icon = react_1.default.createElement(Clear_1.default, null);
+            icon = react_1.default.createElement(mui_core_1.ClearIcon, null);
         }
     }
     else if (props.icon) {
@@ -140,14 +132,14 @@ const ActualPropertyEntryFileRendererWithStyles = styles_1.withStyles(exports.st
     }
     const descriptionAsAlert = props.args["descriptionAsAlert"];
     return (react_1.default.createElement("div", { className: props.classes.container },
-        props.description && descriptionAsAlert ? react_1.default.createElement(lab_1.Alert, { severity: "info", className: props.classes.description }, props.description) : null,
-        props.description && !descriptionAsAlert ? react_1.default.createElement(core_1.Typography, { variant: "caption", className: props.classes.description }, props.description) : null,
-        react_1.default.createElement(core_1.FormLabel, { "aria-label": props.label, classes: {
+        props.description && descriptionAsAlert ? react_1.default.createElement(mui_core_1.Alert, { severity: "info", className: props.classes.description }, props.description) : null,
+        props.description && !descriptionAsAlert ? react_1.default.createElement(mui_core_1.Typography, { variant: "caption", className: props.classes.description }, props.description) : null,
+        react_1.default.createElement(mui_core_1.FormLabel, { "aria-label": props.label, classes: {
                 root: props.classes.label,
                 focused: "focused",
             } },
             localization_1.capitalize(props.label),
-            icon ? react_1.default.createElement(core_1.IconButton, { tabIndex: -1, className: props.classes.icon, onClick: props.canRestore ? props.onRestore : null }, icon) : null),
+            icon ? react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, className: props.classes.icon, onClick: props.canRestore ? props.onRestore : null }, icon) : null),
         react_1.default.createElement(react_dropzone_1.default, { onDropAccepted: onDrop.bind(null, props.onSetFile), onDropRejected: onDrop.bind(null, props.onSetFile), maxSize: constants_1.MAX_FILE_SIZE, accept: props.accept, multiple: false, noClick: !!props.currentValue, ref: dropzoneRef, disabled: props.disabled }, ({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject, }) => {
             const { ref, ...rootProps } = getRootProps();
             let displayContent = null;
@@ -167,33 +159,22 @@ const ActualPropertyEntryFileRendererWithStyles = styles_1.withStyles(exports.st
                         props.classes.paperPlaceholderAccepting : ""} ${isDragReject ?
                         props.classes.paperPlaceholderRejecting : ""}` },
                     react_1.default.createElement("p", null, isDragActive ? localization_1.capitalize(props.genericActivePlaceholder) : localization_1.capitalize(props.placeholder)),
-                    react_1.default.createElement(NoteAdd_1.default, { className: props.classes.paperIconAdd })));
+                    react_1.default.createElement(mui_core_1.NoteAddIcon, { className: props.classes.paperIconAdd })));
             }
-            return (react_1.default.createElement(core_1.RootRef, { rootRef: ref },
-                react_1.default.createElement(core_1.Paper, Object.assign({}, rootProps, { classes: {
+            return (react_1.default.createElement(mui_core_1.RootRef, { rootRef: ref },
+                react_1.default.createElement(mui_core_1.Paper, Object.assign({}, rootProps, { classes: {
                         root: props.classes.paper,
                     } }),
                     react_1.default.createElement("input", Object.assign({}, getInputProps())),
                     displayContent,
                     react_1.default.createElement("div", { className: props.classes.buttonContainer },
-                        react_1.default.createElement(core_1.Button, { className: props.classes.button, variant: "contained", color: "secondary", "aria-label": props.genericDeleteLabel, onClick: props.onRemoveFile },
+                        react_1.default.createElement(mui_core_1.Button, { className: props.classes.button, variant: "contained", color: "secondary", "aria-label": props.genericDeleteLabel, onClick: props.onRemoveFile },
                             props.genericDeleteLabel,
-                            react_1.default.createElement(RemoveCircleOutline_1.default, { className: props.classes.buttonIcon })),
-                        react_1.default.createElement(core_1.Button, { className: props.classes.button, variant: "contained", color: "primary", "aria-label": props.genericSelectLabel, onClick: manuallyTriggerUpload.bind(null, dropzoneRef) },
+                            react_1.default.createElement(mui_core_1.RemoveCircleOutlineIcon, { className: props.classes.buttonIcon })),
+                        react_1.default.createElement(mui_core_1.Button, { className: props.classes.button, variant: "contained", color: "primary", "aria-label": props.genericSelectLabel, onClick: manuallyTriggerUpload.bind(null, dropzoneRef) },
                             props.genericSelectLabel,
-                            react_1.default.createElement(CloudUpload_1.default, { className: props.classes.buttonIcon }))))));
+                            react_1.default.createElement(mui_core_1.CloudUploadIcon, { className: props.classes.buttonIcon }))))));
         }),
         react_1.default.createElement("div", { className: props.classes.errorMessage }, props.currentInvalidReason)));
 });
-function PropertyEntryFileRenderer(props) {
-    let appliedTheme = styles_2.STANDARD_THEME;
-    if (props.args["theme"]) {
-        appliedTheme = {
-            ...styles_2.STANDARD_THEME,
-            ...props.args["theme"],
-        };
-    }
-    return (react_1.default.createElement(core_1.ThemeProvider, { theme: appliedTheme },
-        react_1.default.createElement(ActualPropertyEntryFileRendererWithStyles, Object.assign({}, props))));
-}
 exports.default = PropertyEntryFileRenderer;

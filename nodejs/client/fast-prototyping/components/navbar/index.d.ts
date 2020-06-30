@@ -1,5 +1,5 @@
 import React from "react";
-import { WithStyles, Theme } from "@material-ui/core";
+import { WithStyles, Theme } from "../../mui-core";
 declare const navbarStyles: (theme: Theme) => Record<"title" | "container" | "appBarSpacer" | "titleTypography" | "titleMargin", import("@material-ui/styles").CSSProperties | import("@material-ui/styles").CreateCSSProperties<{}> | ((props: {}) => import("@material-ui/styles").CreateCSSProperties<{}>)>;
 interface INavbarProps extends WithStyles<typeof navbarStyles> {
     excludeLanguagePicker?: boolean;
@@ -21,5 +21,5 @@ interface INavbarProps extends WithStyles<typeof navbarStyles> {
         onLoginRequest: () => void;
     }>;
 }
-export declare const Navbar: React.ComponentType<Pick<INavbarProps, "excludeLanguagePicker" | "LoginDialog" | "SignupDialog" | "RecoverDialog" | "excludeBlockingBackdrop"> & import("@material-ui/core").StyledComponentProps<"title" | "container" | "appBarSpacer" | "titleTypography" | "titleMargin">>;
+export declare const Navbar: React.ComponentType<Pick<INavbarProps, "excludeLanguagePicker" | "LoginDialog" | "SignupDialog" | "RecoverDialog" | "excludeBlockingBackdrop"> & import("@material-ui/styles").StyledComponentProps<"title" | "container" | "appBarSpacer" | "titleTypography" | "titleMargin">>;
 export {};

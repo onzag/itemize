@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Button, Container, createStyles, WithStyles, withStyles, Box, Typography} from "@material-ui/core";
+import { Button, Container, createStyles, WithStyles, withStyles, 
+  Box, Typography, ExitToAppIcon, ArrowBackIcon} from "../../../mui-core";
 import Snackbar from "../../../components/snackbar";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { CurrentUserProfileStandardInfo } from "./standard-info";
 import { DialogResponsive } from "../../../components/dialog";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import I18nReadMany from "../../../../components/localization/I18nReadMany";
 import { LogActioner } from "../../../../components/login/LogActioner";
 import I18nRead from "../../../../components/localization/I18nRead";

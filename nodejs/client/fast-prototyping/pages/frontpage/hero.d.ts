@@ -1,5 +1,5 @@
 import React from "react";
-import { WithStyles } from "@material-ui/core";
+import { WithStyles } from "../../mui-core";
 declare const heroStyle: {
     heroContainer: {
         display: string;
@@ -14,5 +14,5 @@ declare const heroStyle: {
 interface HeroProps extends WithStyles<typeof heroStyle> {
     heroID: number;
 }
-export declare const Hero: React.ComponentType<Pick<HeroProps, "heroID"> & import("@material-ui/core").StyledComponentProps<"heroContainer">>;
+export declare const Hero: React.ComponentType<Pick<HeroProps, "heroID"> & import("@material-ui/styles").StyledComponentProps<"heroContainer">>;
 export {};

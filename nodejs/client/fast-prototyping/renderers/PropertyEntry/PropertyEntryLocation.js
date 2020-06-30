@@ -5,9 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("../../../internal/theme/leaflet.scss");
 const react_1 = __importDefault(require("react"));
-const TextField_1 = __importDefault(require("@material-ui/core/TextField"));
-const core_1 = require("@material-ui/core");
-const styles_1 = require("@material-ui/styles");
+const mui_core_1 = require("../../mui-core");
 const react_autosuggest_1 = __importDefault(require("react-autosuggest"));
 const match_1 = __importDefault(require("autosuggest-highlight/match"));
 const parse_1 = __importDefault(require("autosuggest-highlight/parse"));
@@ -30,13 +28,7 @@ if (typeof document !== "undefined") {
         shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
     });
 }
-const styles_2 = require("./styles");
-const Search_1 = __importDefault(require("@material-ui/icons/Search"));
-const SwapHoriz_1 = __importDefault(require("@material-ui/icons/SwapHoriz"));
-const lab_1 = require("@material-ui/lab");
 const util_1 = require("../../../../util");
-const Restore_1 = __importDefault(require("@material-ui/icons/Restore"));
-const Clear_1 = __importDefault(require("@material-ui/icons/Clear"));
 exports.ZOOMS = {
     "LARGE": 16,
     "MEDIUM": 14,
@@ -45,7 +37,7 @@ exports.ZOOMS = {
 function shouldShowInvalid(props) {
     return !props.currentValid || (props.activeSearchResults && props.activeSearchResults.length === 0);
 }
-exports.style = (theme) => styles_1.createStyles({
+exports.style = mui_core_1.createStyles({
     entry: {
         width: "100%",
         display: "flex",
@@ -54,23 +46,23 @@ exports.style = (theme) => styles_1.createStyles({
         justifyContent: "space-between",
     },
     container: {
-        width: theme.containerWidth,
+        width: "100%",
     },
     description: {
         width: "100%",
     },
     errorMessage: {
-        color: theme.invalidColor,
-        height: theme.errorMessageContainerSize,
-        fontSize: theme.errorMessageFontSize,
+        color: "#f44336",
+        height: "1.3rem",
+        fontSize: "0.85rem",
     },
-    icon: (props) => ({
-        color: shouldShowInvalid(props) ? theme.invalidColor : theme.iconColor,
+    icon: {
+        color: "#424242",
         marginRight: "0.5rem",
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-    }),
+    },
     iconButton: {
         "backgroundColor": "#2196f3",
         "color": "#fff",
@@ -90,9 +82,9 @@ exports.style = (theme) => styles_1.createStyles({
         borderRadius: "5px",
     },
     label: (props) => ({
-        "color": shouldShowInvalid(props) ? theme.labelInvalidColor : theme.labelColor,
+        "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
         "&.focused": {
-            color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
+            color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
         },
     }),
     labelSingleLine: {
@@ -107,28 +99,28 @@ exports.style = (theme) => styles_1.createStyles({
                 "width": "100%",
                 // this is the colur when the field is out of focus
                 "&::before": {
-                    borderBottomColor: theme.fieldBorderInvalidColor,
+                    borderBottomColor: "#e57373",
                 },
                 // the color that pops up when the field is in focus
                 "&::after": {
-                    borderBottomColor: theme.fieldBorderInvalidColorFocused,
+                    borderBottomColor: "#f44336",
                 },
                 // during the hover event
                 "&:hover::before": {
-                    borderBottomColor: props.disabled ? theme.fieldBorderColor : theme.fieldBorderInvalidColorFocused,
+                    borderBottomColor: props.disabled ? "rgba(0,0,0,0.42)" : "#f44336",
                 },
             };
         }
         return {
             "width": "100%",
             "&::before": {
-                borderBottomColor: theme.fieldBorderColor,
+                borderBottomColor: "rgba(0,0,0,0.42)",
             },
             "&::after": {
-                borderBottomColor: theme.fieldBorderColorFocused,
+                borderBottomColor: "#3f51b5",
             },
             "&:hover::before": {
-                borderBottomColor: theme.fieldBorderColorFocused,
+                borderBottomColor: "#3f51b5",
             },
         };
     },
@@ -144,7 +136,7 @@ exports.style = (theme) => styles_1.createStyles({
         position: "absolute",
         display: "block",
         width: "100%",
-        top: `calc(100% - ${theme.errorMessageContainerSize})`,
+        top: `calc(100% - 1.3rem)`,
         zIndex: 1000,
     },
     autosuggestSuggestionsContainerOpen: {},
@@ -161,16 +153,16 @@ exports.style = (theme) => styles_1.createStyles({
         paddingBottom: 8,
     },
     autosuggestMenuItemMainText: {
-        fontSize: theme.autosuggestMenuItemFontSize,
-        lineHeight: theme.autosuggestMenuItemFontSize,
+        fontSize: "1rem",
+        lineHeight: "1rem",
     },
     autosuggestMenuItemSubText: {
-        fontSize: theme.autosuggestMenuItemSubFontSize,
-        lineHeight: theme.autosuggestMenuItemSubFontSize,
+        fontSize: "0.75rem",
+        lineHeight: "0.75rem",
     },
     locationAlternativeTextHeader: {
-        height: theme.locationAlternativeTextHeaderHeight,
-        fontSize: theme.locationAlternativeTextHeaderFontSize,
+        height: "3rem",
+        fontSize: "0.75rem",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -268,19 +260,19 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
         if (this.props.activeSearchResults) {
             if (this.props.nextSearchResultCircular) {
                 fn = this.props.onChangeBySearchResult.bind(null, this.props.nextSearchResultCircular, false);
-                iconSearch = react_1.default.createElement(SwapHoriz_1.default, null);
+                iconSearch = react_1.default.createElement(mui_core_1.SwapHorizIcon, null);
             }
             else {
-                iconSearch = react_1.default.createElement(Search_1.default, null);
+                iconSearch = react_1.default.createElement(mui_core_1.SearchIcon, null);
             }
         }
         else {
             fn = this.props.onSearch.bind(null, false);
-            iconSearch = react_1.default.createElement(Search_1.default, null);
+            iconSearch = react_1.default.createElement(mui_core_1.SearchIcon, null);
         }
         let appliedInputProps = {
-            endAdornment: (react_1.default.createElement(core_1.InputAdornment, { position: "end" },
-                react_1.default.createElement(core_1.IconButton, { tabIndex: -1, disabled: this.props.disabled, classes: { root: this.props.classes.iconButton }, onClick: fn }, iconSearch))),
+            endAdornment: (react_1.default.createElement(mui_core_1.InputAdornment, { position: "end" },
+                react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, disabled: this.props.disabled, classes: { root: this.props.classes.iconButton }, onClick: fn }, iconSearch))),
         };
         if (textFieldProps) {
             const { inputRef = () => { return; }, ref, ...other } = textFieldProps;
@@ -296,10 +288,10 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
         let icon;
         if (this.props.canRestore) {
             if (this.props.currentAppliedValue) {
-                icon = react_1.default.createElement(Restore_1.default, null);
+                icon = react_1.default.createElement(mui_core_1.RestoreIcon, null);
             }
             else {
-                icon = react_1.default.createElement(Clear_1.default, null);
+                icon = react_1.default.createElement(mui_core_1.ClearIcon, null);
             }
         }
         else if (this.props.icon) {
@@ -316,20 +308,20 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
         const descriptionAsAlert = this.props.args["descriptionAsAlert"];
         return (react_1.default.createElement("div", { className: this.props.classes.container },
             this.props.description && descriptionAsAlert ?
-                react_1.default.createElement(lab_1.Alert, { severity: "info", className: this.props.classes.description }, this.props.description) :
+                react_1.default.createElement(mui_core_1.Alert, { severity: "info", className: this.props.classes.description }, this.props.description) :
                 null,
             this.props.description && !descriptionAsAlert ?
-                react_1.default.createElement(core_1.Typography, { variant: "caption", className: this.props.classes.description }, this.props.description) :
+                react_1.default.createElement(mui_core_1.Typography, { variant: "caption", className: this.props.classes.description }, this.props.description) :
                 null,
             react_1.default.createElement("div", { className: this.props.classes.locationAlternativeTextHeader },
-                icon ? react_1.default.createElement(core_1.IconButton, { tabIndex: -1, className: this.props.classes.icon, onClick: this.props.canRestore ? this.props.onRestore : null }, icon) : null,
+                icon ? react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, className: this.props.classes.icon, onClick: this.props.canRestore ? this.props.onRestore : null }, icon) : null,
                 this.props.currentValue && this.props.currentValue.atxt ||
                     (react_1.default.createElement("span", { className: this.props.classes.locationPlaceholder }, util_1.capitalize(this.props.placeholder))),
                 this.props.resultOutOfLabel ?
                     react_1.default.createElement("i", { className: this.props.classes.resultListLabel }, this.props.resultOutOfLabel) :
                     null),
             react_1.default.createElement("div", { className: this.props.classes.locationMapContainer }, map),
-            react_1.default.createElement(TextField_1.default, Object.assign({ fullWidth: true, type: "text", onKeyPress: this.onKeyPress, className: this.props.classes.entry, label: this.props.label, onChange: this.onSearchQueryChange, placeholder: this.props.placeholder, value: this.props.searchQuery, InputProps: {
+            react_1.default.createElement(mui_core_1.TextField, Object.assign({ fullWidth: true, type: "text", onKeyPress: this.onKeyPress, className: this.props.classes.entry, label: this.props.label, onChange: this.onSearchQueryChange, placeholder: this.props.placeholder, value: this.props.searchQuery, InputProps: {
                     classes: {
                         root: this.props.classes.fieldInput,
                         focused: "focused",
@@ -354,12 +346,12 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
     }
     renderAutosuggestContainer(options) {
         // same renders the autosuggest container
-        return (react_1.default.createElement(core_1.Paper, Object.assign({}, options.containerProps, { square: true }), options.children));
+        return (react_1.default.createElement(mui_core_1.Paper, Object.assign({}, options.containerProps, { square: true }), options.children));
     }
     renderAutosuggestSuggestion(suggestion, params) {
         const matches = match_1.default(suggestion.txt, params.query);
         const parts = parse_1.default(suggestion.txt, matches);
-        return (react_1.default.createElement(core_1.MenuItem, { className: this.props.classes.autosuggestMenuItem, selected: params.isHighlighted, component: "div", onClick: this.onChangeBySuggestion.bind(this, suggestion) },
+        return (react_1.default.createElement(mui_core_1.MenuItem, { className: this.props.classes.autosuggestMenuItem, selected: params.isHighlighted, component: "div", onClick: this.onChangeBySuggestion.bind(this, suggestion) },
             react_1.default.createElement("div", null,
                 react_1.default.createElement("div", { className: this.props.classes.autosuggestMenuItemMainText }, parts.map((part, index) => part.highlight ? (react_1.default.createElement("span", { key: index, style: { fontWeight: 500 } }, part.text)) : (react_1.default.createElement("strong", { key: index, style: { fontWeight: 300 } }, part.text)))),
                 react_1.default.createElement("div", { className: this.props.classes.autosuggestMenuItemSubText }, suggestion.atxt))));
@@ -388,16 +380,5 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
             } }));
     }
 }
-const ActualPropertyEntryLocationRendererWithStyles = styles_1.withStyles(exports.style)(ActualPropertyEntryLocationRendererWithStylesClass);
-function PropertyEntryLocationRenderer(props) {
-    let appliedTheme = styles_2.STANDARD_THEME;
-    if (props.args["theme"]) {
-        appliedTheme = {
-            ...styles_2.STANDARD_THEME,
-            ...props.args["theme"],
-        };
-    }
-    return (react_1.default.createElement(core_1.ThemeProvider, { theme: appliedTheme },
-        react_1.default.createElement(ActualPropertyEntryLocationRendererWithStyles, Object.assign({}, props))));
-}
+const PropertyEntryLocationRenderer = mui_core_1.withStyles(exports.style)(ActualPropertyEntryLocationRendererWithStylesClass);
 exports.default = PropertyEntryLocationRenderer;

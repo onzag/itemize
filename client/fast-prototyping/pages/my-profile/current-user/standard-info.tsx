@@ -1,25 +1,19 @@
 import React from "react";
 import { IActionSubmitOptions } from "../../../../providers/item-definition";
-import { Button, Box, Paper, createStyles, withStyles, WithStyles, Divider, Theme } from "@material-ui/core";
+import { Button, Box, Paper, createStyles, withStyles, WithStyles,
+  Divider, Theme, DoneIcon, DoneOutlineIcon, MailIcon,
+  Alert, AlertTitle, FaceIcon, ErrorIcon, AccountCircleIcon, AlernateEmailIcon } from "../../../mui-core";
 import { SubmitButton } from "../../../components/buttons";
 import { DialogResponsive } from "../../../components/dialog";
-import DoneIcon from "@material-ui/icons/Done";
 import { IPropertyDefinitionState } from "../../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
-import { Alert, AlertTitle } from "@material-ui/lab";
-import DoneOutline from "@material-ui/icons/DoneOutline";
-import MailOutline from "@material-ui/icons/MailOutline";
 import { AvatarRenderer } from "../../../components/avatar";
 import Snackbar from "../../../components/snackbar";
 import { LanguagePicker } from "../../../components/language-picker";
 import { CountryPicker } from "../../../components/country-picker";
 import { CurrencyPicker } from "../../../components/currency-picker";
 import { ProgressingElement } from "../../../components/util";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import AlernateEmailIcon from "@material-ui/icons/AlternateEmail";
-import FaceIcon from "@material-ui/icons/Face";
 import Link from "../../../../components/navigation/Link";
 import { ItemDefinitionLoader } from "../../../components/item-definition-loader";
-import ErrorIcon from '@material-ui/icons/Error';
 import I18nReadMany from "../../../../components/localization/I18nReadMany";
 import Entry from "../../../../components/property/Entry";
 import Reader from "../../../../components/property/Reader";
@@ -186,7 +180,7 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
                                     <Button
                                       variant="outlined"
                                       color="secondary"
-                                      endIcon={<MailOutline />}
+                                      endIcon={<MailIcon />}
                                       onClick={actioner.sendValidateEmail}
                                     >
                                       <I18nRead capitalize={true} id="missing_email_validation_warning_action" />
@@ -249,7 +243,7 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
                     options={options}
                     CustomConfirmationComponent={CustomConfirmationComponent}
                     buttonColor="primary"
-                    buttonStartIcon={<DoneOutline />}
+                    buttonStartIcon={<DoneOutlineIcon />}
                     buttonVariant="contained"
                   />
                 );

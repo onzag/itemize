@@ -4,18 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("../mui-core");
 const imported_resources_1 = require("../../../imported-resources");
-const styles_1 = require("@material-ui/styles");
 const Link_1 = __importDefault(require("../../components/navigation/Link"));
 const util_1 = require("../../components/util");
 const react_dropzone_1 = __importDefault(require("react-dropzone"));
-const AddAPhoto_1 = __importDefault(require("@material-ui/icons/AddAPhoto"));
-const BrokenImage_1 = __importDefault(require("@material-ui/icons/BrokenImage"));
 const constants_1 = require("../../../constants");
-const lab_1 = require("@material-ui/lab");
 const Reader_1 = __importDefault(require("../../components/property/Reader"));
-const avatarStyles = styles_1.createStyles({
+const avatarStyles = mui_core_1.createStyles({
     flag: {
         position: "absolute",
         fontSize: "0.8rem",
@@ -153,7 +149,7 @@ const avatarStyles = styles_1.createStyles({
         boxShadow: "0px 0px 0px 10px #ffeb3b"
     },
 });
-exports.Avatar = styles_1.withStyles(avatarStyles)((props) => {
+exports.Avatar = mui_core_1.withStyles(avatarStyles)((props) => {
     const contentFn = (id, role, userNameValue, profilePictureValue, email, eValidated, address) => {
         const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : "";
         const hasWarningForMissingEmail = !(email && email.stateAppliedValue);
@@ -169,7 +165,7 @@ exports.Avatar = styles_1.withStyles(avatarStyles)((props) => {
             return react_1.default.createElement("div", { className: props.classes.flag }, countryEmoji);
         }));
         const imageSources = util_1.imageSizeRetriever(profilePictureValue, null);
-        const avatarWithSource = (imageSrc) => (react_1.default.createElement(core_1.Avatar, { alt: userNameValue, classes: { root: `${props.classes.avatar} ${numberColorClassName} ` +
+        const avatarWithSource = (imageSrc) => (react_1.default.createElement(mui_core_1.Avatar, { alt: userNameValue, classes: { root: `${props.classes.avatar} ${numberColorClassName} ` +
                     `${props.size === "large" ? props.classes.avatarLarge : ""} ${props.size === "medium" ? props.classes.avatarMedium : ""} ` +
                     `${isSpecialUser ? props.classes.specialUser : ""} ${isSpecialUser && props.size === "large" ? props.classes.specialUserLarge : ""} ` +
                     `${isSpecialUser && props.size === "medium" ? props.classes.specialUserMedium : ""}` }, src: imageSrc }, userNameValue ? userNameValue[0].toUpperCase() : ""));
@@ -188,7 +184,7 @@ exports.Avatar = styles_1.withStyles(avatarStyles)((props) => {
             if (hasAnotherWarningForMissingAddress) {
                 warningCount++;
             }
-            return react_1.default.createElement(core_1.Badge, { badgeContent: warningCount, color: "secondary", classes: { badge: props.classes.avatarBadge } }, avatar);
+            return react_1.default.createElement(mui_core_1.Badge, { badgeContent: warningCount, color: "secondary", classes: { badge: props.classes.avatarBadge } }, avatar);
         }
         else {
             return avatar;
@@ -206,7 +202,7 @@ exports.Avatar = styles_1.withStyles(avatarStyles)((props) => {
 function onDrop(onSetFile, files) {
     onSetFile(files[0]);
 }
-exports.AvatarRenderer = styles_1.withStyles(avatarStyles)((props) => {
+exports.AvatarRenderer = mui_core_1.withStyles(avatarStyles)((props) => {
     const dropzoneRef = react_1.default.useRef();
     return (react_1.default.createElement("div", { className: `${props.classes.avatarContainer} ${props.classes.avatarContainerLarge}` },
         react_1.default.createElement(Reader_1.default, { id: "username" }, (username) => (react_1.default.createElement(Reader_1.default, { id: "role" }, (role) => (react_1.default.createElement(Reader_1.default, { id: "id" }, (id) => {
@@ -215,17 +211,17 @@ exports.AvatarRenderer = styles_1.withStyles(avatarStyles)((props) => {
             const specialUserSizeClassName = specialUserClassName && props.classes.specialUserLarge;
             return (react_1.default.createElement(react_dropzone_1.default, { onDropAccepted: onDrop.bind(null, props.onSetFile), onDropRejected: onDrop.bind(null, props.onSetFile), maxSize: constants_1.MAX_FILE_SIZE, accept: props.accept, multiple: false, noClick: false, ref: dropzoneRef, disabled: props.disabled }, ({ getRootProps, getInputProps, isDragAccept, isDragReject, }) => {
                 const { ref, ...rootProps } = getRootProps();
-                return (react_1.default.createElement(core_1.RootRef, { rootRef: ref },
+                return (react_1.default.createElement(mui_core_1.RootRef, { rootRef: ref },
                     react_1.default.createElement("div", Object.assign({}, rootProps),
                         react_1.default.createElement("input", Object.assign({}, getInputProps())),
                         react_1.default.createElement("div", { className: props.classes.avatarContainer },
-                            react_1.default.createElement(core_1.Avatar, { classes: {
+                            react_1.default.createElement(mui_core_1.Avatar, { classes: {
                                     root: `${props.classes.avatar} ${numberColorClassName} ` +
                                         `${props.classes.avatarLarge} ` +
                                         `${specialUserClassName} ${specialUserSizeClassName}`
                                 }, src: util_1.cacheableQSLoader(props.imageSizes && props.imageSizes.imageLargeSizeURL) }, username ? username[0].toLocaleUpperCase() : ""),
-                            react_1.default.createElement("div", { className: `${props.classes.hoverAddBackdrop} ${isDragAccept || isDragReject ? "visible" : ""}` }, isDragReject ? react_1.default.createElement(BrokenImage_1.default, { fontSize: "large" }) : react_1.default.createElement(AddAPhoto_1.default, { fontSize: "large" }))))));
+                            react_1.default.createElement("div", { className: `${props.classes.hoverAddBackdrop} ${isDragAccept || isDragReject ? "visible" : ""}` }, isDragReject ? react_1.default.createElement(mui_core_1.BrokenImageIcon, { fontSize: "large" }) : react_1.default.createElement(mui_core_1.AddAPhotoIcon, { fontSize: "large" }))))));
             }));
         }))))),
-        props.currentInvalidReason || props.rejectedReason ? react_1.default.createElement(lab_1.Alert, { classes: { root: props.classes.avatarUploadError }, severity: "error" }, props.currentInvalidReason || props.rejectedReason) : null));
+        props.currentInvalidReason || props.rejectedReason ? react_1.default.createElement(mui_core_1.Alert, { classes: { root: props.classes.avatarUploadError }, severity: "error" }, props.currentInvalidReason || props.rejectedReason) : null));
 });

@@ -1,7 +1,6 @@
 import React from "react";
-import { withStyles, WithStyles, Theme, createStyles, Typography, IconButton, CircularProgress } from "@material-ui/core";
+import { withStyles, WithStyles, Theme, createStyles, Typography, IconButton, CircularProgress, RefreshIcon } from "../mui-core";
 import NItemDefinitionLoader from "../../components/item-definition/ItemDefinitionLoader";
-import RefreshIcon from "@material-ui/icons/Refresh";
 import { DelayDisplay } from "./util";
 import I18nRead from "../../components/localization/I18nRead";
 import I18nReadError from "../../components/localization/I18nReadError";

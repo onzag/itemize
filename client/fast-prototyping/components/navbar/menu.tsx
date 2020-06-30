@@ -1,14 +1,13 @@
 import React from "react";
-import ImportantDevicesIcon from "@material-ui/icons/ImportantDevices";
 import Link from "../../../components/navigation/Link";
-import { SwipeableDrawer, List, Divider, ListItem, ListItemIcon, ListItemText, createStyles, WithStyles, withStyles } from "@material-ui/core";
+import { SwipeableDrawer, List, Divider, ListItem, ListItemIcon,
+  ListItemText, createStyles, WithStyles, withStyles,
+  LibraryBooksIcon, HomeIcon, ImportantDevicesIcon } from "../../mui-core";
 import { ModuleProvider } from "../../../providers/module";
 import AppLanguageRetriever from "../../../components/localization/AppLanguageRetriever";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
 import I18nRead from "../../../components/localization/I18nRead";
 import LocationReader from "../../../components/navigation/LocationReader";
-import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
-import HomeIcon from '@material-ui/icons/Home';
 import { NoStateItemDefinitionProvider } from "../../../providers/item-definition";
 
 interface MenuProps {

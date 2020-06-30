@@ -8,12 +8,12 @@ const Reader_1 = __importDefault(require("../../../components/property/Reader"))
 const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSetter"));
 const module_1 = require("../../../providers/module");
 const item_definition_1 = require("../../../providers/item-definition");
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("../../mui-core");
 const item_definition_loader_1 = require("../../components/item-definition-loader");
 const View_1 = __importDefault(require("../../../components/property/View"));
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
 const avatar_1 = require("../../components/avatar");
-const articleContentStyles = (theme) => core_1.createStyles({
+const articleContentStyles = (theme) => mui_core_1.createStyles({
     container: {
         padding: 0,
     },
@@ -93,9 +93,9 @@ const articleContentStyles = (theme) => core_1.createStyles({
         margin: "0 0.7rem",
     }
 });
-const ArticleContent = core_1.withStyles(articleContentStyles)((props) => {
-    return (react_1.default.createElement(core_1.Container, { maxWidth: "md", className: props.classes.container },
-        react_1.default.createElement(core_1.Paper, { className: props.classes.paper },
+const ArticleContent = mui_core_1.withStyles(articleContentStyles)((props) => {
+    return (react_1.default.createElement(mui_core_1.Container, { maxWidth: "md", className: props.classes.container },
+        react_1.default.createElement(mui_core_1.Paper, { className: props.classes.paper },
             react_1.default.createElement(item_definition_loader_1.ItemDefinitionLoader, { fullWidth: true },
                 react_1.default.createElement("div", { className: props.classes.headerImageContainer },
                     react_1.default.createElement(View_1.default, { id: "summary_image", rendererArgs: {
@@ -103,7 +103,7 @@ const ArticleContent = core_1.withStyles(articleContentStyles)((props) => {
                             imageSizes: "70vw",
                         } }),
                     react_1.default.createElement("div", { className: props.classes.headerOverlay }),
-                    react_1.default.createElement(core_1.Typography, { variant: "h3", className: props.classes.title },
+                    react_1.default.createElement(mui_core_1.Typography, { variant: "h3", className: props.classes.title },
                         react_1.default.createElement(Reader_1.default, { id: "title" }, (title) => title)),
                     react_1.default.createElement(Reader_1.default, { id: "created_by" }, (createdBy) => (react_1.default.createElement(module_1.ModuleProvider, { module: "users" },
                         react_1.default.createElement(item_definition_1.ItemDefinitionProvider, { itemDefinition: "user", forId: createdBy, static: "TOTAL", disableExternalChecks: true, properties: [
@@ -113,18 +113,18 @@ const ArticleContent = core_1.withStyles(articleContentStyles)((props) => {
                             ] },
                             react_1.default.createElement(Reader_1.default, { id: "username" }, (username) => (react_1.default.createElement(module_1.ModuleProvider, { module: "cms" },
                                 react_1.default.createElement(item_definition_1.NoStateItemDefinitionProvider, { itemDefinition: "article" },
-                                    react_1.default.createElement(core_1.Typography, { variant: "h3", className: props.classes.publisher },
+                                    react_1.default.createElement(mui_core_1.Typography, { variant: "h3", className: props.classes.publisher },
                                         react_1.default.createElement(I18nRead_1.default, { id: "by", args: [username] })))))),
                             react_1.default.createElement(avatar_1.Avatar, { className: props.classes.publisherAvatar, hideFlag: true, size: "medium", profileURL: (id) => `/profile/${id}` })))))),
                 react_1.default.createElement("div", { className: props.classes.innerContainer + " trusted" },
                     react_1.default.createElement("div", { className: props.classes.dateInfo },
-                        react_1.default.createElement(core_1.Typography, { variant: "body2" },
+                        react_1.default.createElement(mui_core_1.Typography, { variant: "body2" },
                             react_1.default.createElement(View_1.default, { id: "created_at", rendererArgs: { dateFormat: "LLLL" } })),
                         react_1.default.createElement(Reader_1.default, { id: "edited_at" }, (editedAt) => {
                             if (editedAt) {
                                 return (react_1.default.createElement(react_1.default.Fragment, null,
-                                    react_1.default.createElement(core_1.Divider, { orientation: "vertical", flexItem: true, className: props.classes.divider }),
-                                    react_1.default.createElement(I18nRead_1.default, { id: "updated_at", capitalize: true, args: [react_1.default.createElement(core_1.Typography, { variant: "body2" },
+                                    react_1.default.createElement(mui_core_1.Divider, { orientation: "vertical", flexItem: true, className: props.classes.divider }),
+                                    react_1.default.createElement(I18nRead_1.default, { id: "updated_at", capitalize: true, args: [react_1.default.createElement(mui_core_1.Typography, { variant: "body2" },
                                                 react_1.default.createElement(View_1.default, { id: "edited_at", rendererArgs: { dateFormat: "ll" } }))] })));
                             }
                             return null;

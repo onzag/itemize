@@ -1,7 +1,6 @@
 import React from "react";
-import { createStyles, WithStyles, withStyles, Theme } from "@material-ui/core";
+import { createStyles, WithStyles, withStyles, Theme, CopyrightIcon } from "../../mui-core";
 import I18nRead from "../../../components/localization/I18nRead";
-import CopyrightIcon from '@material-ui/icons/Copyright';
 import Link from "../../../components/navigation/Link";
 import { LanguagePicker } from "../language-picker";
 import { CurrencyPicker } from "../currency-picker";

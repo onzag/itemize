@@ -348,9 +348,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       !equals(this.state, nextState);
   }
   public render() {
-    const pageCount = Math.ceil(this.props.searchRecords.length / this.props.pageSize);
-    const accessibleCount = this.props.searchRecords.length;
-    const totalCount = this.props.searchCount;
+    const accessibleCount = (this.props.searchRecords || []).length;
+    const pageCount = accessibleCount === 0 ? 0 : Math.ceil(accessibleCount / this.props.pageSize);
+    const totalCount = this.props.searchCount || 0;
     return (
       <SearchItemDefinitionValueContext.Provider
         value={

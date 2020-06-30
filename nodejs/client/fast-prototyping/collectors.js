@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const uuid_1 = __importDefault(require("uuid"));
-const styles_1 = require("@material-ui/core/styles");
+const mui_core_1 = require("./mui-core");
 const STYLE_COLLECTION = {};
 exports.styleCollector = {
     collect(app) {
         const id = uuid_1.default.v4();
-        const sheets = new styles_1.ServerStyleSheets();
+        const sheets = new mui_core_1.ServerStyleSheets();
         STYLE_COLLECTION[id] = sheets;
         return {
             node: sheets.collect(app),

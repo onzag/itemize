@@ -8,13 +8,13 @@ const module_1 = require("../../../providers/module");
 const item_definition_1 = require("../../../providers/item-definition");
 const SearchLoader_1 = __importDefault(require("../../../components/search/SearchLoader"));
 const View_1 = __importDefault(require("../../../components/property/View"));
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("../../mui-core");
 const Reader_1 = __importDefault(require("../../../components/property/Reader"));
 const avatar_1 = require("../../components/avatar");
 const AppLanguageRetriever_1 = __importDefault(require("../../../components/localization/AppLanguageRetriever"));
 const Link_1 = __importDefault(require("../../../components/navigation/Link"));
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
-exports.articlesStyles = (theme) => core_1.createStyles({
+exports.articlesStyles = (theme) => mui_core_1.createStyles({
     newsTitle: {
         marginTop: "2rem",
         paddingLeft: "1rem",
@@ -147,9 +147,9 @@ exports.articlesStyles = (theme) => core_1.createStyles({
     },
     moreNewsButton: {},
 });
-exports.Articles = core_1.withStyles(exports.articlesStyles)((props) => {
-    return (react_1.default.createElement(core_1.Container, { maxWidth: "md", className: props.classes.container },
-        react_1.default.createElement(core_1.Paper, { className: props.classes.paper },
+exports.Articles = mui_core_1.withStyles(exports.articlesStyles)((props) => {
+    return (react_1.default.createElement(mui_core_1.Container, { maxWidth: "md", className: props.classes.container },
+        react_1.default.createElement(mui_core_1.Paper, { className: props.classes.paper },
             react_1.default.createElement(module_1.ModuleProvider, { module: "cms" },
                 react_1.default.createElement(AppLanguageRetriever_1.default, null, (languageData) => (react_1.default.createElement(item_definition_1.ItemDefinitionProvider, { itemDefinition: "article", searchCounterpart: true, setters: [
                         {
@@ -171,7 +171,7 @@ exports.Articles = core_1.withStyles(exports.articlesStyles)((props) => {
                         limit: 5,
                         offset: 0,
                     } },
-                    react_1.default.createElement(core_1.Typography, { variant: "h2", className: props.classes.newsTitle },
+                    react_1.default.createElement(mui_core_1.Typography, { variant: "h2", className: props.classes.newsTitle },
                         react_1.default.createElement(I18nRead_1.default, { id: "news", capitalize: true })),
                     react_1.default.createElement(SearchLoader_1.default, { pageSize: 5, currentPage: 0, static: "TOTAL" }, (loader) => {
                         return loader.searchRecords.map((searchRecord) => {
@@ -184,7 +184,7 @@ exports.Articles = core_1.withStyles(exports.articlesStyles)((props) => {
                                                 lazyLoad: true,
                                             } })),
                                     react_1.default.createElement("div", { className: props.classes.articleText },
-                                        react_1.default.createElement(core_1.Typography, { variant: "h4" },
+                                        react_1.default.createElement(mui_core_1.Typography, { variant: "h4" },
                                             react_1.default.createElement(View_1.default, { id: "title" })),
                                         react_1.default.createElement("div", { className: props.classes.articleSummaryContainer },
                                             react_1.default.createElement("div", { className: props.classes.articleSummary },
@@ -195,18 +195,18 @@ exports.Articles = core_1.withStyles(exports.articlesStyles)((props) => {
                                                 "profile_picture",
                                                 "role",
                                             ], injectParentContext: true },
-                                            react_1.default.createElement(core_1.Box, { className: props.classes.publisherInfoBox },
+                                            react_1.default.createElement(mui_core_1.Box, { className: props.classes.publisherInfoBox },
                                                 react_1.default.createElement(avatar_1.Avatar, { hideFlag: true, size: "small", profileURL: (id) => `/profile/${id}` }),
-                                                react_1.default.createElement(core_1.Box, { className: props.classes.publisherInfoDetailsBox },
-                                                    react_1.default.createElement(core_1.Typography, { variant: "body1" },
+                                                react_1.default.createElement(mui_core_1.Box, { className: props.classes.publisherInfoDetailsBox },
+                                                    react_1.default.createElement(mui_core_1.Typography, { variant: "body1" },
                                                         react_1.default.createElement(View_1.default, { id: "username" })),
-                                                    react_1.default.createElement(core_1.Typography, { variant: "body2" },
+                                                    react_1.default.createElement(mui_core_1.Typography, { variant: "body2" },
                                                         react_1.default.createElement(item_definition_1.ParentItemDefinitionContextProvider, null,
                                                             react_1.default.createElement(View_1.default, { id: "created_at", rendererArgs: { dateFormat: "LLL" } }))))))))))));
                         });
                     }),
                     react_1.default.createElement("div", { className: props.classes.moreNewsContainer },
                         react_1.default.createElement(Link_1.default, { to: "/news" },
-                            react_1.default.createElement(core_1.Button, { size: "large", className: props.classes.moreNewsButton, variant: "contained", color: "primary" },
+                            react_1.default.createElement(mui_core_1.Button, { size: "large", className: props.classes.moreNewsButton, variant: "contained", color: "primary" },
                                 react_1.default.createElement(I18nRead_1.default, { id: "more_news", capitalize: true })))))))))));
 });

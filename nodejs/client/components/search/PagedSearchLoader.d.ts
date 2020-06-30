@@ -1,6 +1,6 @@
 import React from "react";
 import { ISearchLoaderArg } from "./SearchLoader";
-interface IPagedSearchLoaderArg extends ISearchLoaderArg {
+export interface IPagedSearchLoaderArg extends ISearchLoaderArg {
     currentPage: number;
     goToNextPage: () => void;
     goToPrevPage: () => void;

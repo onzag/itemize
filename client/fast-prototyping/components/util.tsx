@@ -1,5 +1,5 @@
 import React from "react";
-import { createStyles, WithStyles, withStyles, CircularProgress } from "@material-ui/core";
+import { createStyles, WithStyles, withStyles, CircularProgress } from "../mui-core";
 
 import "./util.scss";
 

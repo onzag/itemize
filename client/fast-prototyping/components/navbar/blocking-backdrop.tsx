@@ -1,7 +1,5 @@
 import React from "react";
-import { createStyles, WithStyles, withStyles, Theme } from "@material-ui/core";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import { createStyles, WithStyles, withStyles, Theme, Backdrop, CircularProgress } from "../../mui-core";
 import { AppIsBlockedFromUpdate } from "../../../components/outdated/AppIsBlockedFromUpdate";
 import I18nRead from "../../../components/localization/I18nRead";
 

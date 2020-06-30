@@ -1,7 +1,6 @@
 import React from "react";
-import { Paper, createStyles, withStyles, WithStyles, Container, TextField, Box, Typography } from "@material-ui/core";
+import { Paper, createStyles, withStyles, WithStyles, Container, Typography, Alert, AlertTitle } from "../../mui-core";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
-import { Alert, AlertTitle } from "@material-ui/lab";
 
 const infoStyles = createStyles({
   paper: {

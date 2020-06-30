@@ -1,8 +1,6 @@
 import React from "react";
-import { Snackbar as MUISnackbar, IconButton, withStyles, WithStyles, createStyles, Theme} from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+import { Snackbar as MUISnackbar, IconButton, withStyles, WithStyles, createStyles, Theme, CloseIcon } from "../mui-core";
 import { EndpointErrorType } from "../../../base/errors";
-import { Color } from '@material-ui/lab/Alert';
 import uuid from "uuid";
 import I18nRead from "../../components/localization/I18nRead";
 import I18nReadError from "../../components/localization/I18nReadError";
@@ -32,7 +30,7 @@ const snackbarStyles = (theme: Theme) => createStyles({
 
 interface ISnackbarProps extends WithStyles<typeof snackbarStyles> {
   i18nDisplay: EndpointErrorType | string;
-  severity: Color;
+  severity: "primary" | "secondary" | "success" | "error";
   open: boolean;
   onClose: () => void;
 }

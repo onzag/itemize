@@ -15,16 +15,16 @@ import {
   ListSubheader,
   Divider,
   withMobileDialog,
+  ClearIcon,
+  RestoreIcon,
+  IconVisibility,
+  IconVisibilityOff,
+  Alert,
 } from "../../mui-core/index";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import { IPropertyEntryFieldRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryField";
-import IconVisibilityOff from "@material-ui/icons/VisibilityOff";
-import IconVisibility from "@material-ui/icons/Visibility";
-import { Alert } from "@material-ui/lab";
-import RestoreIcon from '@material-ui/icons/Restore';
-import ClearIcon from '@material-ui/icons/Clear';
 import { type } from "os";
 
 function shouldShowInvalid(props: IPropertyEntryFieldRendererProps) {

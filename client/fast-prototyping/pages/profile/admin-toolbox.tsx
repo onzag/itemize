@@ -1,6 +1,5 @@
 import React from "react";
-import { Divider, withStyles, WithStyles, createStyles } from "@material-ui/core";
-import DoneOutline from "@material-ui/icons/DoneOutline";
+import { Divider, withStyles, WithStyles, createStyles, DoneOutlineIcon } from "../../mui-core";
 import { SubmitButton } from "../../components/buttons";
 import Snackbar from "../../components/snackbar";
 import Entry from "../../../components/property/Entry";
@@ -25,7 +24,7 @@ export const AdminToolbox = withStyles(adminToolboxStyles)((props: WithStyles<ty
           differingOnly: true,
         }}
         buttonColor="primary"
-        buttonStartIcon={<DoneOutline />}
+        buttonStartIcon={<DoneOutlineIcon />}
         buttonVariant="contained"
       />
       <SubmitActioner>

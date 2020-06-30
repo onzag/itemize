@@ -13,6 +13,8 @@ interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
 export interface ISearchLoaderArg {
     searchRecords: IGQLSearchRecordWithPopulateData[];
     pageCount: number;
+    totalCount: number;
+    accessibleCount: number;
     hasNextPage: boolean;
     hasPrevPage: boolean;
     error: EndpointErrorType;

@@ -1,6 +1,6 @@
 import React from "react";
-import { PropTypes } from "@material-ui/core";
 import { IActionSubmitOptions, IActionResponseWithId, IActionSearchOptions } from "../../providers/item-definition";
+import { PropTypes } from "../mui-core";
 declare type RedirectCallbackFn = (status: IActionResponseWithId) => string;
 interface ISubmitButtonProps {
     options: IActionSubmitOptions;

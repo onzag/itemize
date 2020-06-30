@@ -1,9 +1,8 @@
 import React from "react";
 import { Map, TileLayer, Marker } from "react-leaflet";
 import { IPropertyViewLocationRendererProps } from "../../../internal/components/PropertyView/PropertyViewLocation";
-import { createStyles, withStyles, WithStyles, IconButton } from "@material-ui/core";
+import { createStyles, withStyles, WithStyles, IconButton, GpsFixedIcon } from "../../mui-core";
 import { ZOOMS } from "../PropertyEntry/PropertyEntryLocation";
-import GpsFixedIcon from '@material-ui/icons/GpsFixed';
 
 let CMap: typeof Map;
 let CTileLayer: typeof TileLayer;

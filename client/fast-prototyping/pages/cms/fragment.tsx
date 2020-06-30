@@ -1,7 +1,7 @@
 import React from "react";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
-import { Paper, createStyles, withStyles, WithStyles, Container, TextField, Box, Typography } from "@material-ui/core";
+import { Paper, createStyles, withStyles, WithStyles, Container, TextField, Box, Typography } from "../../mui-core";
 import Entry from "../../../components/property/Entry";
 import View from "../../../components/property/View";
 import LocationStateReader from "../../../components/navigation/LocationStateReader";

@@ -217,7 +217,9 @@ class ActualSearchLoader extends react_1.default.Component {
             !deep_equal_1.default(this.state, nextState);
     }
     render() {
-        const pageCount = !this.props.searchCount ? 1 : Math.ceil(this.props.searchCount / this.props.pageSize);
+        const accessibleCount = (this.props.searchRecords || []).length;
+        const pageCount = accessibleCount === 0 ? 0 : Math.ceil(accessibleCount / this.props.pageSize);
+        const totalCount = this.props.searchCount || 0;
         return (react_1.default.createElement(item_definition_1.SearchItemDefinitionValueContext.Provider, { value: {
                 currentlySearching: this.state.currentlySearching,
                 searchFields: this.state.searchFields,
@@ -243,6 +245,8 @@ class ActualSearchLoader extends react_1.default.Component {
                 };
             }),
             pageCount,
+            accessibleCount,
+            totalCount,
             hasNextPage: this.props.currentPage < pageCount - 1,
             hasPrevPage: this.props.currentPage !== 0,
             error: this.state.error,

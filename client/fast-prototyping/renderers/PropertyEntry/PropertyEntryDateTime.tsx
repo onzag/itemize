@@ -7,19 +7,14 @@ import {
   TimePicker,
   KeyboardTimePicker,
 } from "@material-ui/pickers";
-import { Icon, ThemeProvider, Typography } from "@material-ui/core";
+import { Alert, Typography, createStyles, WithStyles, withStyles } from "../../mui-core";
 import { getLocalizedDateFormat, getLocalizedTimeFormat, getLocalizedDateTimeFormat } from "../../../../util";
-import { createStyles, WithStyles, withStyles } from "@material-ui/styles";
-import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import { IPropertyEntryDateTimeRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryDateTime";
-import { Alert } from "@material-ui/lab";
-import RestoreIcon from '@material-ui/icons/Restore';
-import ClearIcon from '@material-ui/icons/Clear';
 
 function shouldShowInvalid(props: IPropertyEntryDateTimeRendererProps) {
   return !props.currentValid;
 }
-export const style = (theme: IPropertyEntryThemeType) => createStyles({
+export const style = createStyles({
   entry: {
     width: "100%",
     display: "flex",
@@ -28,23 +23,23 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     justifyContent: "space-between",
   },
   container: {
-    width: theme.containerWidth,
+    width: "100%",
   },
   description: {
     width: "100%",
   },
   errorMessage: {
-    color: theme.invalidColor,
-    height: theme.errorMessageContainerSize,
-    fontSize: theme.errorMessageFontSize,
+    color: "#f44336",
+    height: "1.3rem",
+    fontSize: "0.85rem",
   },
   iconButton: {
-    color: theme.iconColor,
+    color: "#424242",
   },
   label: (props: IPropertyEntryDateTimeRendererProps) => ({
-    "color": shouldShowInvalid(props) ? theme.labelInvalidColor : theme.labelColor,
+    "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
     "&.focused": {
-      color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
+      color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
     },
   }),
   fieldInput: (props: IPropertyEntryDateTimeRendererProps) => {
@@ -53,28 +48,28 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
         "width": "100%",
         // this is the colur when the field is out of focus
         "&::before": {
-          borderBottomColor: theme.fieldBorderInvalidColor,
+          borderBottomColor: "#e57373",
         },
         // the color that pops up when the field is in focus
         "&::after": {
-          borderBottomColor: theme.fieldBorderInvalidColorFocused,
+          borderBottomColor: "#f44336",
         },
         // during the hover event
         "&:hover::before": {
-          borderBottomColor: props.disabled ? theme.fieldBorderColor : theme.fieldBorderInvalidColorFocused,
+          borderBottomColor: props.disabled ? "rgba(0,0,0,0.42)" : "#f44336",
         },
       };
     }
     return {
       "width": "100%",
       "&::before": {
-        borderBottomColor: theme.fieldBorderColor,
+        borderBottomColor: "rgba(0,0,0,0.42)",
       },
       "&::after": {
-        borderBottomColor: theme.fieldBorderColorFocused,
+        borderBottomColor: "#3f51b5",
       },
       "&:hover::before": {
-        borderBottomColor: theme.fieldBorderColorFocused,
+        borderBottomColor: "#3f51b5",
       },
     };
   },
@@ -83,7 +78,7 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
 interface IPropertyEntryDateTimeRendererWithStylesProps extends IPropertyEntryDateTimeRendererProps, WithStyles<typeof style> {
 }
 
-const ActualPropertyEntryDateTimeRendererWithStyles = withStyles(style)((props: IPropertyEntryDateTimeRendererWithStylesProps) => {
+const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDateTimeRendererWithStylesProps) => {
   // we want this to be a double pass because we can't do SSR on this component
   // because we are dependant on the phone or pad property that can only be calculated on the client side
   // so we render null initially
@@ -271,19 +266,6 @@ const ActualPropertyEntryDateTimeRendererWithStyles = withStyles(style)((props: 
       </div>
     </div>
   );
-})
+});
 
-export default function PropertyEntryDateTimeRenderer(props: IPropertyEntryDateTimeRendererProps) {
-  let appliedTheme: IPropertyEntryThemeType = STANDARD_THEME;
-  if (props.args["theme"]) {
-    appliedTheme = {
-      ...STANDARD_THEME,
-      ...props.args["theme"],
-    };
-  }
-  return (
-    <ThemeProvider theme={appliedTheme}>
-      <ActualPropertyEntryDateTimeRendererWithStyles {...props} />
-    </ThemeProvider>
-  )
-}
+export default PropertyEntryDateTimeRenderer;

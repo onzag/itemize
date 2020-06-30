@@ -1,12 +1,10 @@
 import React from "react";
-import { Button, createStyles, withStyles, WithStyles, Typography, Divider } from "@material-ui/core";
+import { Button, createStyles, withStyles, WithStyles, Typography, Divider, DoneIcon, AccountCircleIcon } from "../mui-core";
 import { DialogResponsive } from "./dialog";
-import DoneIcon from "@material-ui/icons/Done";
 import { ItemDefinitionProvider } from "../../providers/item-definition";
 import Snackbar from "./snackbar";
 import Link from "../../components/navigation/Link";
 import { ProgressingElement } from "./util";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { LogActioner } from "../../components/login/LogActioner";
 import I18nRead from "../../components/localization/I18nRead";
 import Entry from "../../components/property/Entry";

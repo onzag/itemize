@@ -2,12 +2,9 @@ import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
-import { Paper, createStyles, withStyles, WithStyles, Container, Divider, Box } from "@material-ui/core";
-import NotificationsIcon from '@material-ui/icons/Notifications';
+import { Paper, createStyles, withStyles, WithStyles, Container, Divider, Box,
+  NotificationsIcon, MenuBookIcon, DoneOutlineIcon, PersonPinIcon } from "../../mui-core";
 import Snackbar from "../../components/snackbar";
-import MenuBookIcon from '@material-ui/icons/MenuBook';
-import DoneOutline from "@material-ui/icons/DoneOutline";
-import PersonPinIcon from '@material-ui/icons/PersonPin';
 import { SubmitButton } from "../../components/buttons";
 import { NeedsSubmitPrompt } from "../../components/needs-submit-prompt";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
@@ -90,7 +87,7 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
                           unpokeAfterAny: true,
                         }}
                         buttonColor="primary"
-                        buttonStartIcon={<DoneOutline />}
+                        buttonStartIcon={<DoneOutlineIcon />}
                         buttonVariant="contained"
                       />
                     </Box>

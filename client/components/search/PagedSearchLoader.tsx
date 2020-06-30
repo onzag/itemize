@@ -2,7 +2,7 @@ import React from "react";
 import equals from "deep-equal";
 import SearchLoader, { ISearchLoaderArg } from "./SearchLoader";
 
-interface IPagedSearchLoaderArg extends ISearchLoaderArg {
+export interface IPagedSearchLoaderArg extends ISearchLoaderArg {
   currentPage: number;
   goToNextPage: () => void;
   goToPrevPage: () => void;

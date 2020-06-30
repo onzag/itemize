@@ -2,7 +2,7 @@ import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import View from "../../../components/property/View";
-import { withStyles, WithStyles } from "@material-ui/core";
+import { withStyles, WithStyles } from "../../mui-core";
 import AppLanguageRetriever from "../../../components/localization/AppLanguageRetriever";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
 

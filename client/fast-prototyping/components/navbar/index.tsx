@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { AppBar, Toolbar, IconButton, createStyles, WithStyles, withStyles, Theme, Typography } from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
+import { AppBar, Toolbar, IconButton, createStyles, WithStyles, withStyles, Theme, Typography, MenuIcon } from "../../mui-core";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import { OutdatedText } from "./outdated-text";

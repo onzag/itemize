@@ -11,8 +11,8 @@ import {
   createStyles,
   WithStyles,
   withStyles,
-} from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+  CloseIcon,
+} from "../mui-core";
 import I18nRead from "../../components/localization/I18nRead";
 
 const dialogStyles = createStyles({

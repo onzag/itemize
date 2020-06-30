@@ -4,14 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("../../mui-core");
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
-const Copyright_1 = __importDefault(require("@material-ui/icons/Copyright"));
 const Link_1 = __importDefault(require("../../../components/navigation/Link"));
 const language_picker_1 = require("../language-picker");
 const currency_picker_1 = require("../currency-picker");
 const country_picker_1 = require("../country-picker");
-const footerStyles = (theme) => core_1.createStyles({
+const footerStyles = (theme) => mui_core_1.createStyles({
     container: {
         width: "100%",
         display: "flex",
@@ -69,7 +68,7 @@ const footerStyles = (theme) => core_1.createStyles({
         height: "2px",
     },
 });
-exports.Footer = core_1.withStyles(footerStyles)((props) => {
+exports.Footer = mui_core_1.withStyles(footerStyles)((props) => {
     const year = (new Date()).getUTCFullYear();
     // the first represents the spacer, the second is the actual footer
     return react_1.default.createElement(react_1.default.Fragment, null,
@@ -80,7 +79,7 @@ exports.Footer = core_1.withStyles(footerStyles)((props) => {
             react_1.default.createElement("div", { className: props.classes.dataSet })),
         react_1.default.createElement("div", { className: props.classes.container + " " + props.classes.containerAbs },
             react_1.default.createElement("div", { className: props.classes.dataSet + " " + props.classes.dataSetAbs },
-                react_1.default.createElement(Copyright_1.default, null),
+                react_1.default.createElement(mui_core_1.CopyrightIcon, null),
                 react_1.default.createElement("span", { className: props.classes.spacer }),
                 react_1.default.createElement("span", { className: props.classes.spacer }),
                 year,

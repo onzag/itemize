@@ -1,8 +1,6 @@
 import React from "react";
-import TextField from "@material-ui/core/TextField";
 import {
   MenuItem,
-  Paper,
   InputAdornment,
   IconButton,
   ThemeProvider,
@@ -12,22 +10,19 @@ import {
   Select,
   FilledInput,
   Divider,
-} from "@material-ui/core";
-import {
   WithStyles,
   withStyles,
   createStyles,
-} from "@material-ui/styles";
+  Alert,
+  RestoreIcon,
+} from "../../mui-core";
 import { IPropertyEntrySelectRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntrySelect";
-import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import uuid from "uuid";
-import { Alert } from "@material-ui/lab";
-import RestoreIcon from '@material-ui/icons/Restore';
 
 function shouldShowInvalid(props: IPropertyEntrySelectRendererProps) {
   return !props.currentValid;
 }
-export const style = (theme: IPropertyEntryThemeType) => createStyles({
+export const style = createStyles({
   entry: {
     width: "100%",
     display: "flex",
@@ -36,23 +31,23 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     justifyContent: "space-between",
   },
   container: {
-    width: theme.containerWidth,
+    width: "100%",
   },
   description: {
     width: "100%",
   },
   errorMessage: {
-    color: theme.invalidColor,
-    height: theme.errorMessageContainerSize,
-    fontSize: theme.errorMessageFontSize,
+    color: "#f44336",
+    height: "1.3rem",
+    fontSize: "0.85rem",
   },
-  icon: (props: IPropertyEntrySelectRendererProps) => ({
-    color: shouldShowInvalid(props) ? theme.invalidColor : theme.iconColor,
-  }),
+  icon: {
+    color: "#424242",
+  },
   label: (props: IPropertyEntrySelectRendererProps) => ({
-    "color": shouldShowInvalid(props) ? theme.labelInvalidColor : theme.labelColor,
+    "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
     "&.focused": {
-      color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
+      color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
     },
   }),
   fieldInput: (props: IPropertyEntrySelectRendererProps) => {
@@ -61,28 +56,28 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
         "width": "100%",
         // this is the colur when the field is out of focus
         "&::before": {
-          borderBottomColor: theme.fieldBorderInvalidColor,
+          borderBottomColor: "#e57373",
         },
         // the color that pops up when the field is in focus
         "&::after": {
-          borderBottomColor: theme.fieldBorderInvalidColorFocused,
+          borderBottomColor: "#f44336",
         },
         // during the hover event
         "&:hover::before": {
-          borderBottomColor: props.disabled ? theme.fieldBorderColor : theme.fieldBorderInvalidColorFocused,
+          borderBottomColor: props.disabled ? "rgba(0,0,0,0.42)" : "#f44336",
         },
       };
     }
     return {
       "width": "100%",
       "&::before": {
-        borderBottomColor: theme.fieldBorderColor,
+        borderBottomColor: "rgba(0,0,0,0.42)",
       },
       "&::after": {
-        borderBottomColor: theme.fieldBorderColorFocused,
+        borderBottomColor: "#3f51b5",
       },
       "&:hover::before": {
-        borderBottomColor: theme.fieldBorderColorFocused,
+        borderBottomColor: "#3f51b5",
       },
     };
   },
@@ -221,19 +216,5 @@ class ActualPropertyEntrySelectRenderer
   }
 }
 
-const ActualPropertyEntrySelectRendererWithStyles = withStyles(style)(ActualPropertyEntrySelectRenderer);
-
-export default function PropertyEntrySelectRenderer(props: IPropertyEntrySelectRendererProps) {
-  let appliedTheme: IPropertyEntryThemeType = STANDARD_THEME;
-  if (props.args["theme"]) {
-    appliedTheme = {
-      ...STANDARD_THEME,
-      ...props.args["theme"],
-    };
-  }
-  return (
-    <ThemeProvider theme={appliedTheme}>
-      <ActualPropertyEntrySelectRendererWithStyles {...props}/>
-    </ThemeProvider>
-  )
-}
+const PropertyEntrySelectRenderer = withStyles(style)(ActualPropertyEntrySelectRenderer);
+export default PropertyEntrySelectRenderer;

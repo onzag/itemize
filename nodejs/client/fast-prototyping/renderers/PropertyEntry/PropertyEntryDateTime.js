@@ -9,15 +9,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importStar(require("react"));
 const pickers_1 = require("@material-ui/pickers");
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("../../mui-core");
 const util_1 = require("../../../../util");
-const styles_1 = require("@material-ui/styles");
-const styles_2 = require("./styles");
-const lab_1 = require("@material-ui/lab");
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
-exports.style = (theme) => styles_1.createStyles({
+exports.style = mui_core_1.createStyles({
     entry: {
         width: "100%",
         display: "flex",
@@ -26,23 +23,23 @@ exports.style = (theme) => styles_1.createStyles({
         justifyContent: "space-between",
     },
     container: {
-        width: theme.containerWidth,
+        width: "100%",
     },
     description: {
         width: "100%",
     },
     errorMessage: {
-        color: theme.invalidColor,
-        height: theme.errorMessageContainerSize,
-        fontSize: theme.errorMessageFontSize,
+        color: "#f44336",
+        height: "1.3rem",
+        fontSize: "0.85rem",
     },
     iconButton: {
-        color: theme.iconColor,
+        color: "#424242",
     },
     label: (props) => ({
-        "color": shouldShowInvalid(props) ? theme.labelInvalidColor : theme.labelColor,
+        "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
         "&.focused": {
-            color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
+            color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
         },
     }),
     fieldInput: (props) => {
@@ -51,33 +48,33 @@ exports.style = (theme) => styles_1.createStyles({
                 "width": "100%",
                 // this is the colur when the field is out of focus
                 "&::before": {
-                    borderBottomColor: theme.fieldBorderInvalidColor,
+                    borderBottomColor: "#e57373",
                 },
                 // the color that pops up when the field is in focus
                 "&::after": {
-                    borderBottomColor: theme.fieldBorderInvalidColorFocused,
+                    borderBottomColor: "#f44336",
                 },
                 // during the hover event
                 "&:hover::before": {
-                    borderBottomColor: props.disabled ? theme.fieldBorderColor : theme.fieldBorderInvalidColorFocused,
+                    borderBottomColor: props.disabled ? "rgba(0,0,0,0.42)" : "#f44336",
                 },
             };
         }
         return {
             "width": "100%",
             "&::before": {
-                borderBottomColor: theme.fieldBorderColor,
+                borderBottomColor: "rgba(0,0,0,0.42)",
             },
             "&::after": {
-                borderBottomColor: theme.fieldBorderColorFocused,
+                borderBottomColor: "#3f51b5",
             },
             "&:hover::before": {
-                borderBottomColor: theme.fieldBorderColorFocused,
+                borderBottomColor: "#3f51b5",
             },
         };
     },
 });
-const ActualPropertyEntryDateTimeRendererWithStyles = styles_1.withStyles(exports.style)((props) => {
+const PropertyEntryDateTimeRenderer = mui_core_1.withStyles(exports.style)((props) => {
     // we want this to be a double pass because we can't do SSR on this component
     // because we are dependant on the phone or pad property that can only be calculated on the client side
     // so we render null initially
@@ -223,23 +220,12 @@ const ActualPropertyEntryDateTimeRendererWithStyles = styles_1.withStyles(export
     // return it
     return (react_1.default.createElement("div", { className: props.classes.container },
         props.description && descriptionAsAlert ?
-            react_1.default.createElement(lab_1.Alert, { severity: "info", className: props.classes.description }, props.description) :
+            react_1.default.createElement(mui_core_1.Alert, { severity: "info", className: props.classes.description }, props.description) :
             null,
         props.description && !descriptionAsAlert ?
-            react_1.default.createElement(core_1.Typography, { variant: "caption", className: props.classes.description }, props.description) :
+            react_1.default.createElement(mui_core_1.Typography, { variant: "caption", className: props.classes.description }, props.description) :
             null,
         component,
         react_1.default.createElement("div", { className: props.classes.errorMessage }, props.currentInvalidReason)));
 });
-function PropertyEntryDateTimeRenderer(props) {
-    let appliedTheme = styles_2.STANDARD_THEME;
-    if (props.args["theme"]) {
-        appliedTheme = {
-            ...styles_2.STANDARD_THEME,
-            ...props.args["theme"],
-        };
-    }
-    return (react_1.default.createElement(core_1.ThemeProvider, { theme: appliedTheme },
-        react_1.default.createElement(ActualPropertyEntryDateTimeRendererWithStyles, Object.assign({}, props))));
-}
 exports.default = PropertyEntryDateTimeRenderer;

@@ -4,12 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const core_1 = require("@material-ui/core");
-const Close_1 = __importDefault(require("@material-ui/icons/Close"));
+const mui_core_1 = require("../mui-core");
 const uuid_1 = __importDefault(require("uuid"));
 const I18nRead_1 = __importDefault(require("../../components/localization/I18nRead"));
 const I18nReadError_1 = __importDefault(require("../../components/localization/I18nReadError"));
-const snackbarStyles = (theme) => core_1.createStyles({
+const snackbarStyles = (theme) => mui_core_1.createStyles({
     success: {
         backgroundColor: theme.palette.success.main,
         color: theme.palette.success.contrastText,
@@ -45,7 +44,7 @@ class ActualSnackbar extends react_1.default.PureComponent {
         else if (this.props.i18nDisplay) {
             message = react_1.default.createElement(I18nReadError_1.default, { error: this.props.i18nDisplay, capitalize: true });
         }
-        return (react_1.default.createElement(core_1.Snackbar, { anchorOrigin: {
+        return (react_1.default.createElement(mui_core_1.Snackbar, { anchorOrigin: {
                 vertical: "bottom",
                 horizontal: "left",
             }, open: this.props.open, autoHideDuration: autoHideDuration, onClose: this.props.onClose, ContentProps: {
@@ -53,8 +52,8 @@ class ActualSnackbar extends react_1.default.PureComponent {
                 classes: {
                     root: this.props.classes[this.props.severity],
                 }
-            }, message: react_1.default.createElement("span", { id: this.id }, message), action: react_1.default.createElement(I18nRead_1.default, { id: "close" }, (i18nClose) => (react_1.default.createElement(core_1.IconButton, { "aria-label": i18nClose, color: "inherit", onClick: this.props.onClose },
-                react_1.default.createElement(Close_1.default, null)))) }));
+            }, message: react_1.default.createElement("span", { id: this.id }, message), action: react_1.default.createElement(I18nRead_1.default, { id: "close" }, (i18nClose) => (react_1.default.createElement(mui_core_1.IconButton, { "aria-label": i18nClose, color: "inherit", onClick: this.props.onClose },
+                react_1.default.createElement(mui_core_1.CloseIcon, null)))) }));
     }
 }
-exports.default = core_1.withStyles(snackbarStyles)(ActualSnackbar);
+exports.default = mui_core_1.withStyles(snackbarStyles)(ActualSnackbar);

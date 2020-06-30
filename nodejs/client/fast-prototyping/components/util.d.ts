@@ -1,5 +1,5 @@
 import React from "react";
-import { WithStyles } from "@material-ui/core";
+import { WithStyles } from "../mui-core";
 import "./util.scss";
 interface DelayDisplayProps {
     duration: number;
@@ -23,7 +23,7 @@ interface IProgressingElementProps extends WithStyles<typeof progressingElementS
     fullWidth?: boolean;
     className?: string;
 }
-export declare const ProgressingElement: React.ComponentType<Pick<IProgressingElementProps, "children" | "className" | "fullWidth" | "isProgressing" | "progressSize" | "delayDuration"> & import("@material-ui/core").StyledComponentProps<string>>;
+export declare const ProgressingElement: React.ComponentType<Pick<IProgressingElementProps, "children" | "className" | "fullWidth" | "isProgressing" | "progressSize" | "delayDuration"> & import("@material-ui/styles").StyledComponentProps<string>>;
 interface SlowLoadingElementProps {
     children: React.ReactNode;
     id: string;

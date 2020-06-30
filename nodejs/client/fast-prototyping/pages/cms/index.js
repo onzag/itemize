@@ -11,7 +11,7 @@ const Route_1 = __importDefault(require("../../../components/navigation/Route"))
 const fragment_1 = require("./fragment");
 const article_1 = require("./article");
 const info_1 = require("./info");
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("../../mui-core");
 const navigation_1 = require("../../../components/navigation");
 const item_definition_1 = require("../../../providers/item-definition");
 function handleNavbarChangeEvent(e, value) {
@@ -30,11 +30,11 @@ function CMSNavBar(props) {
     if (!props.noArticle) {
         available.push("article");
     }
-    return (react_1.default.createElement(core_1.AppBar, { position: "static", variant: "outlined", color: "default" },
-        react_1.default.createElement(core_1.Tabs, { value: current, onChange: handleNavbarChangeEvent, centered: true },
-            react_1.default.createElement(core_1.Tab, { label: react_1.default.createElement(I18nRead_1.default, { id: "info" }), value: "info" }),
+    return (react_1.default.createElement(mui_core_1.AppBar, { position: "static", variant: "outlined", color: "default" },
+        react_1.default.createElement(mui_core_1.Tabs, { value: current, onChange: handleNavbarChangeEvent, centered: true },
+            react_1.default.createElement(mui_core_1.Tab, { label: react_1.default.createElement(I18nRead_1.default, { id: "info" }), value: "info" }),
             available.map((itemDefinition) => {
-                return (react_1.default.createElement(core_1.Tab, { key: itemDefinition, label: react_1.default.createElement(item_definition_1.NoStateItemDefinitionProvider, { itemDefinition: itemDefinition },
+                return (react_1.default.createElement(mui_core_1.Tab, { key: itemDefinition, label: react_1.default.createElement(item_definition_1.NoStateItemDefinitionProvider, { itemDefinition: itemDefinition },
                         react_1.default.createElement(I18nRead_1.default, { id: "name" })), value: itemDefinition }));
             }))));
 }

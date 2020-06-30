@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("../mui-core");
 require("./util.scss");
 class DelayDisplay extends react_1.default.PureComponent {
     constructor(props) {
@@ -31,7 +31,7 @@ class DelayDisplay extends react_1.default.PureComponent {
     }
 }
 exports.DelayDisplay = DelayDisplay;
-const progressingElementStyle = core_1.createStyles({
+const progressingElementStyle = mui_core_1.createStyles({
     progressWrapper: (props) => ({
         position: "relative",
         display: "inline-block",
@@ -53,14 +53,14 @@ const progressingElementStyle = core_1.createStyles({
         backgroundColor: "rgba(255, 255, 255, 0.65)",
     }
 });
-exports.ProgressingElement = core_1.withStyles(progressingElementStyle)((props) => {
+exports.ProgressingElement = mui_core_1.withStyles(progressingElementStyle)((props) => {
     const size = props.progressSize || 24;
     return (react_1.default.createElement("div", { className: `${props.classes.progressWrapper} ${props.className ? props.className : ""}` },
         props.children,
         props.isProgressing ?
             react_1.default.createElement(DelayDisplay, { duration: props.delayDuration || 300 },
                 react_1.default.createElement("div", { className: props.classes.cover },
-                    react_1.default.createElement(core_1.CircularProgress, { size: size, className: props.classes.progressElement }))) :
+                    react_1.default.createElement(mui_core_1.CircularProgress, { size: size, className: props.classes.progressElement }))) :
             null));
 });
 class SlowLoadingElement extends react_1.default.Component {

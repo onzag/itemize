@@ -1,16 +1,22 @@
 import "../../../internal/theme/leaflet.scss";
 
 import React from "react";
-import TextField from "@material-ui/core/TextField";
 import {
   MenuItem,
   Paper,
   InputAdornment,
   IconButton,
-  ThemeProvider,
   Typography,
-} from "@material-ui/core";
-import { createStyles, WithStyles, withStyles } from "@material-ui/styles";
+  createStyles,
+  WithStyles,
+  withStyles,
+  Alert,
+  RestoreIcon,
+  ClearIcon,
+  SearchIcon,
+  SwapHorizIcon,
+  TextField,
+} from "../../mui-core";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
@@ -39,14 +45,8 @@ if (typeof document !== "undefined") {
 // import L, { LeafletMouseEvent } from "leaflet";
 
 import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
-import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import { IPropertyEntryLocationRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryLocation";
-import SearchIcon from "@material-ui/icons/Search";
-import SwapHorizIcon from "@material-ui/icons/SwapHoriz"
-import { Alert } from "@material-ui/lab";
 import { capitalize } from "../../../../util";
-import RestoreIcon from '@material-ui/icons/Restore';
-import ClearIcon from '@material-ui/icons/Clear';
 
 export const ZOOMS = {
   "LARGE": 16,
@@ -57,7 +57,7 @@ export const ZOOMS = {
 function shouldShowInvalid(props: IPropertyEntryLocationRendererProps) {
   return !props.currentValid || (props.activeSearchResults && props.activeSearchResults.length === 0);
 }
-export const style = (theme: IPropertyEntryThemeType) => createStyles({
+export const style = createStyles({
   entry: {
     width: "100%",
     display: "flex",
@@ -66,23 +66,23 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     justifyContent: "space-between",
   },
   container: {
-    width: theme.containerWidth,
+    width: "100%",
   },
   description: {
     width: "100%",
   },
   errorMessage: {
-    color: theme.invalidColor,
-    height: theme.errorMessageContainerSize,
-    fontSize: theme.errorMessageFontSize,
+    color: "#f44336",
+    height: "1.3rem",
+    fontSize: "0.85rem",
   },
-  icon: (props: IPropertyEntryLocationRendererProps) => ({
-    color: shouldShowInvalid(props) ? theme.invalidColor : theme.iconColor,
+  icon: {
+    color: "#424242",
     marginRight: "0.5rem",
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
-  }),
+  },
   iconButton: {
     "backgroundColor": "#2196f3",
     "color": "#fff",
@@ -102,9 +102,9 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     borderRadius: "5px",
   },
   label: (props: IPropertyEntryLocationRendererProps) => ({
-    "color": shouldShowInvalid(props) ? theme.labelInvalidColor : theme.labelColor,
+    "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
     "&.focused": {
-      color: shouldShowInvalid(props) ? theme.labelInvalidFocusedColor : theme.labelFocusedColor,
+      color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
     },
   }),
   labelSingleLine: {
@@ -119,28 +119,28 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
         "width": "100%",
         // this is the colur when the field is out of focus
         "&::before": {
-          borderBottomColor: theme.fieldBorderInvalidColor,
+          borderBottomColor: "#e57373",
         },
         // the color that pops up when the field is in focus
         "&::after": {
-          borderBottomColor: theme.fieldBorderInvalidColorFocused,
+          borderBottomColor: "#f44336",
         },
         // during the hover event
         "&:hover::before": {
-          borderBottomColor: props.disabled ? theme.fieldBorderColor : theme.fieldBorderInvalidColorFocused,
+          borderBottomColor: props.disabled ? "rgba(0,0,0,0.42)" : "#f44336",
         },
       };
     }
     return {
       "width": "100%",
       "&::before": {
-        borderBottomColor: theme.fieldBorderColor,
+        borderBottomColor: "rgba(0,0,0,0.42)",
       },
       "&::after": {
-        borderBottomColor: theme.fieldBorderColorFocused,
+        borderBottomColor: "#3f51b5",
       },
       "&:hover::before": {
-        borderBottomColor: theme.fieldBorderColorFocused,
+        borderBottomColor: "#3f51b5",
       },
     };
   },
@@ -162,7 +162,7 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     position: "absolute" as "absolute",
     display: "block",
     width: "100%",
-    top: `calc(100% - ${theme.errorMessageContainerSize})`,
+    top: `calc(100% - 1.3rem)`,
     zIndex: 1000,
   },
   autosuggestSuggestionsContainerOpen: {
@@ -195,16 +195,16 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     paddingBottom: 8,
   },
   autosuggestMenuItemMainText: {
-    fontSize: theme.autosuggestMenuItemFontSize,
-    lineHeight: theme.autosuggestMenuItemFontSize,
+    fontSize: "1rem",
+    lineHeight: "1rem",
   },
   autosuggestMenuItemSubText: {
-    fontSize: theme.autosuggestMenuItemSubFontSize,
-    lineHeight: theme.autosuggestMenuItemSubFontSize,
+    fontSize: "0.75rem",
+    lineHeight: "0.75rem",
   },
   locationAlternativeTextHeader: {
-    height: theme.locationAlternativeTextHeaderHeight,
-    fontSize: theme.locationAlternativeTextHeaderFontSize,
+    height: "3rem",
+    fontSize: "0.75rem",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -559,19 +559,5 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
   }
 }
 
-const ActualPropertyEntryLocationRendererWithStyles = withStyles(style)(ActualPropertyEntryLocationRendererWithStylesClass);
-
-export default function PropertyEntryLocationRenderer(props: IPropertyEntryLocationRendererProps) {
-  let appliedTheme: IPropertyEntryThemeType = STANDARD_THEME;
-  if (props.args["theme"]) {
-    appliedTheme = {
-      ...STANDARD_THEME,
-      ...props.args["theme"],
-    };
-  }
-  return (
-    <ThemeProvider theme={appliedTheme}>
-      <ActualPropertyEntryLocationRendererWithStyles {...props} />
-    </ThemeProvider>
-  )
-}
+const PropertyEntryLocationRenderer = withStyles(style)(ActualPropertyEntryLocationRendererWithStylesClass);
+export default PropertyEntryLocationRenderer;

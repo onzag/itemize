@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Theme, createStyles, WithStyles, withStyles } from "@material-ui/core";
+import { Button, Theme, createStyles, WithStyles, withStyles } from "../../mui-core";
 import { LanguagePicker } from "../language-picker";
 import { Avatar } from "../avatar";
 import LocationStateReader from "../../../components/navigation/LocationStateReader";

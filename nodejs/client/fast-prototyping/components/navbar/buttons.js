@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const core_1 = require("@material-ui/core");
+const mui_core_1 = require("../../mui-core");
 const language_picker_1 = require("../language-picker");
 const avatar_1 = require("../avatar");
 const LocationStateReader_1 = __importDefault(require("../../../components/navigation/LocationStateReader"));
 const IfLogStatus_1 = require("../../../components/login/IfLogStatus");
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
-const buttonsStyles = (theme) => core_1.createStyles({
+const buttonsStyles = (theme) => mui_core_1.createStyles({
     languageButton: {
         marginLeft: "1rem",
         marginRight: "1rem",
@@ -32,7 +32,7 @@ const buttonsStyles = (theme) => core_1.createStyles({
         }
     },
 });
-exports.Buttons = core_1.withStyles(buttonsStyles)((props) => {
+exports.Buttons = mui_core_1.withStyles(buttonsStyles)((props) => {
     return (react_1.default.createElement(LocationStateReader_1.default, { defaultState: { signupDialogOpen: false, loginDialogOpen: false, recoverDialogOpen: false } }, (state, setLocationState) => {
         const openLoginDialog = () => setLocationState({
             loginDialogOpen: true,
@@ -64,7 +64,7 @@ exports.Buttons = core_1.withStyles(buttonsStyles)((props) => {
         return (react_1.default.createElement(IfLogStatus_1.IfLogStatus, null, (status) => {
             if (status === "LOGGED_OUT" || status === "LOGGING_IN") {
                 return react_1.default.createElement(react_1.default.Fragment, null,
-                    react_1.default.createElement(core_1.Button, { color: "inherit", variant: "outlined", onClick: openLoginDialog, className: props.classes.loginButton },
+                    react_1.default.createElement(mui_core_1.Button, { color: "inherit", variant: "outlined", onClick: openLoginDialog, className: props.classes.loginButton },
                         react_1.default.createElement(I18nRead_1.default, { id: "login" })),
                     !props.excludeLanguagePicker ?
                         react_1.default.createElement(language_picker_1.LanguagePicker, { className: props.classes.languageButton, shrinkingDisplay: true, shrinkingDisplayStandardClassName: props.classes.standardLanguageButtonLabel, shrinkingDisplayShrunkClassName: props.classes.shrunkLanguageButtonLabel }) :

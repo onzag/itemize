@@ -1,14 +1,11 @@
 import { IPropertyEntryBooleanRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryBoolean";
-import { createStyles, WithStyles, withStyles } from "@material-ui/styles";
-import { IPropertyEntryThemeType, STANDARD_THEME } from "./styles";
 import React from "react";
-import { Alert } from "@material-ui/lab";
-import { ThemeProvider, FormControl, FormControlLabel, Switch, Typography, Radio, RadioGroup, FormLabel, IconButton } from "@material-ui/core";
+import { Alert, FormControl, FormControlLabel, Switch,
+  Typography, Radio, RadioGroup, FormLabel, IconButton,
+  createStyles, WithStyles, withStyles, RestoreIcon } from "../../mui-core";
 import { capitalize } from "../../../components/localization";
-import RestoreIcon from '@material-ui/icons/Restore';
-import ClearIcon from '@material-ui/icons/Clear';
 
-export const style = (theme: IPropertyEntryThemeType) => createStyles({
+export const style = createStyles({
   entry: {
     width: "100%",
     display: "flex",
@@ -17,23 +14,23 @@ export const style = (theme: IPropertyEntryThemeType) => createStyles({
     justifyContent: "space-between",
   },
   container: {
-    width: theme.containerWidth,
-    paddingBottom: theme.errorMessageContainerSize,
+    width: "100%",
+    paddingBottom: "1.3rem",
   },
   description: {
     width: "100%",
   },
   icon: {
-    color: theme.iconColor,
+    color: "#424242",
   },
   label: {
-    "color": theme.labelColor,
+    "color": "rgb(66, 66, 66)",
     "width": "100%",
     "display": "flex",
     "alignItems": "center",
     "justifyContent": "space-between",
     "&.focused": {
-      color: theme.labelFocusedColor,
+      color: "#3f51b5",
     },
   },
   labelSingleLine: {
@@ -63,7 +60,7 @@ function handleOnChange(
   return props.onChange(value === "true", null);
 }
 
-const ActualPropertyEntryBooleanRendererWithStyles = withStyles(style)((props: IPropertyEntryBooleanRendererWithStylesProps) => {
+const PropertyEntryBooleanRenderer = withStyles(style)((props: IPropertyEntryBooleanRendererWithStylesProps) => {
   const descriptionAsAlert = props.args["descriptionAsAlert"];
 
   let icon: React.ReactNode = null;
@@ -157,17 +154,4 @@ const ActualPropertyEntryBooleanRendererWithStyles = withStyles(style)((props: I
   );
 });
 
-export default function PropertyEntryFieldRenderer(props: IPropertyEntryBooleanRendererProps) {
-  let appliedTheme: IPropertyEntryThemeType = STANDARD_THEME;
-  if (props.args["theme"]) {
-    appliedTheme = {
-      ...STANDARD_THEME,
-      ...props.args["theme"],
-    };
-  }
-  return (
-    <ThemeProvider theme={appliedTheme}>
-      <ActualPropertyEntryBooleanRendererWithStyles {...props} />
-    </ThemeProvider>
-  )
-}
+export default PropertyEntryBooleanRenderer;
