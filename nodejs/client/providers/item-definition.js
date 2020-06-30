@@ -45,6 +45,7 @@ function getPropertyForSetter(setter, itemDefinition) {
 // This is the context that will serve it
 exports.ItemDefinitionContext = react_1.default.createContext(null);
 exports.SearchItemDefinitionValueContext = react_1.default.createContext(null);
+;
 /**
  * Here it is, the mighty
  */
@@ -126,10 +127,10 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
     setupInitialState() {
         // the value might already be available in memory, this is either because it was loaded
         // by another instance or because of SSR during the initial render
-        const memoryLoaded = !!(this.props.forId && this.props.itemDefinitionInstance.hasAppliedValueTo(this.props.forId, this.props.forVersion || null));
+        const memoryLoaded = !!(this.props.forId && this.props.itemDefinitionInstance.hasAppliedValueTo(this.props.forId || null, this.props.forVersion || null));
         let memoryLoadedAndValid = false;
         if (memoryLoaded) {
-            const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId, this.props.forVersion || null);
+            const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null, this.props.forVersion || null);
             // this is the same as for loadValue we are tyring to predict
             const { requestFields } = gql_client_util_1.getFieldsAndArgs({
                 includeArgs: false,
@@ -147,6 +148,26 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             // this will work even for null values, and null requestFields
             memoryLoadedAndValid = (appliedGQLValue &&
                 gql_util_1.requestFieldsAreContained(requestFields, appliedGQLValue.requestFields));
+        }
+        let searchState = {
+            searchError: null,
+            searching: false,
+            searchResults: null,
+            searchRecords: null,
+            searchLimit: null,
+            searchOffset: null,
+            searchCount: null,
+            searchId: null,
+            searchOwner: null,
+            searchParent: null,
+            searchShouldCache: false,
+            searchFields: null,
+            searchRequestedIncludes: [],
+            searchRequestedProperties: [],
+        };
+        const internalState = this.props.itemDefinitionInstance.getInternalState(this.props.forId || null, this.props.forVersion || null);
+        if (internalState) {
+            searchState = internalState;
         }
         // so the initial setup
         return {
@@ -173,20 +194,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             deleteError: null,
             deleting: false,
             deleted: false,
-            searchError: null,
-            searching: false,
-            searchResults: null,
-            searchRecords: null,
-            searchLimit: null,
-            searchOffset: null,
-            searchCount: null,
-            searchId: null,
-            searchOwner: null,
-            searchParent: null,
-            searchShouldCache: false,
-            searchFields: null,
-            searchRequestedIncludes: [],
-            searchRequestedProperties: [],
+            ...searchState,
             pokedElements: {
                 properties: [],
                 includes: [],
@@ -749,6 +757,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             return;
         }
         property.restoreValueFor(this.props.forId || null, this.props.forVersion || null);
+        this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
         this.onPropertyChangeOrRestoreFinal();
     }
     onPropertyChange(property, value, internalValue) {
@@ -760,6 +769,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
         // we simply set the current value in the property
         property.setCurrentValue(this.props.forId || null, this.props.forVersion || null, value, internalValue);
+        this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
         this.onPropertyChangeOrRestoreFinal();
     }
     onPropertyEnforce(property, value, givenForId, givenForVersion, internal) {
@@ -767,6 +777,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         // since they might be out of sync that's why the id is passed
         // the setter enforces values
         property.setSuperEnforced(givenForId || null, givenForVersion || null, value);
+        this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
         this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null, internal ? null : this.changeListener);
         if (!internal && this.props.automaticSearch) {
             this.search(this.props.automaticSearch);
@@ -775,6 +786,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
     onPropertyClearEnforce(property, givenForId, givenForVersion, internal) {
         // same but removes the enforcement
         property.clearSuperEnforced(givenForId || null, givenForVersion || null);
+        this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
         this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null, internal ? null : this.changeListener);
     }
     componentWillUnmount() {
@@ -1120,6 +1132,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             options.policiesToCleanOnFailure.forEach(cleanupPolicyFn);
             needsUpdate = true;
         }
+        if (options.cleanSearchResultsOnAny ||
+            options.cleanSearchResultsOnFailure && state === "fail" ||
+            options.cleanSearchResultsOnSuccess && state === "success") {
+            debugger;
+            this.props.itemDefinitionInstance.cleanInternalState(this.props.forId, this.props.forVersion || null);
+        }
         // NOw we check if we need an update in the listeners and if we are allowed to trigger it
         if (needsUpdate && !avoidTriggeringUpdate) {
             this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
@@ -1445,44 +1463,60 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             parentedBy,
         }, this.props.remoteListener, this.onSearchReload);
         if (error) {
+            const searchStateInfo = {
+                searchError: error,
+                searching: false,
+                searchResults: results,
+                searchRecords: records,
+                searchCount: count,
+                searchLimit: limit,
+                searchOffset: offset,
+                searchId: uuid_1.default.v4(),
+                searchOwner: options.createdBy || null,
+                searchParent,
+                searchShouldCache: !!options.cachePolicy,
+                searchFields: requestedSearchFields,
+                searchRequestedProperties: options.requestedProperties,
+                searchRequestedIncludes: options.requestedIncludes || [],
+            };
+            // this would be a wasted instruction otherwise as it'd be reversed
+            if (!options.cleanSearchResultsOnAny &&
+                !options.cleanSearchResultsOnFailure) {
+                this.props.itemDefinitionInstance.setInternalState(this.props.forId || null, this.props.forVersion || null, searchStateInfo);
+            }
             if (!this.isUnmounted) {
                 this.setState({
-                    searchError: error,
-                    searching: false,
-                    searchResults: results,
-                    searchRecords: records,
-                    searchCount: count,
-                    searchLimit: limit,
-                    searchOffset: offset,
-                    searchId: uuid_1.default.v4(),
-                    searchOwner: options.createdBy || null,
-                    searchParent,
-                    searchShouldCache: !!options.cachePolicy,
-                    searchFields: requestedSearchFields,
-                    searchRequestedProperties: options.requestedProperties,
-                    searchRequestedIncludes: options.requestedIncludes || [],
+                    ...searchStateInfo,
                     pokedElements,
                 });
             }
             this.clean(options, "fail");
         }
         else {
+            const searchStateInfo = {
+                searchError: null,
+                searching: false,
+                searchResults: results,
+                searchRecords: records,
+                searchCount: count,
+                searchLimit: limit,
+                searchOffset: offset,
+                searchId: uuid_1.default.v4(),
+                searchOwner: options.createdBy || null,
+                searchParent,
+                searchShouldCache: !!options.cachePolicy,
+                searchFields: requestedSearchFields,
+                searchRequestedProperties: options.requestedProperties,
+                searchRequestedIncludes: options.requestedIncludes || [],
+            };
+            // this would be a wasted instruction otherwise as it'd be reversed
+            if (!options.cleanSearchResultsOnAny &&
+                !options.cleanSearchResultsOnSuccess) {
+                this.props.itemDefinitionInstance.setInternalState(this.props.forId || null, this.props.forVersion || null, searchStateInfo);
+            }
             if (!this.isUnmounted) {
                 this.setState({
-                    searchError: null,
-                    searching: false,
-                    searchResults: results,
-                    searchRecords: records,
-                    searchCount: count,
-                    searchLimit: limit,
-                    searchOffset: offset,
-                    searchId: uuid_1.default.v4(),
-                    searchOwner: options.createdBy || null,
-                    searchParent,
-                    searchShouldCache: !!options.cachePolicy,
-                    searchFields: requestedSearchFields,
-                    searchRequestedProperties: options.requestedProperties,
-                    searchRequestedIncludes: options.requestedIncludes || [],
+                    ...searchStateInfo,
                     pokedElements,
                 });
             }

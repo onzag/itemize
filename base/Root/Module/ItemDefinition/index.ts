@@ -285,6 +285,13 @@ export interface IItemDefinitionStateType {
    * The version that was used
    */
   forVersion: string;
+  /**
+   * An internal state for this state in the given slot, in practise
+   * this is used in the search mode in order to store search results as a way
+   * to keep them linked to the state that is used in that way some data
+   * might be assigned to this state
+   */
+  internalState: any;
 }
 
 /**
@@ -520,6 +527,12 @@ export default class ItemDefinition {
   private stateGQLAppliedValue: {
     [mergedID: string]: IItemDefinitionGQLValueType;
   };
+  /**
+   * The internal state
+   */
+  private stateInternal: {
+    [mergedID: string]: any;
+  }
 
   /**
    * Build a new ItemDefinition instance
@@ -577,6 +590,7 @@ export default class ItemDefinition {
   public cleanState(init?: boolean) {
     this.stateHasAppliedValueTo = {};
     this.stateGQLAppliedValue = {};
+    this.stateInternal = {};
 
     if (!init) {
       this.propertyDefinitions && this.propertyDefinitions.forEach((p) => p.cleanState());
@@ -1170,6 +1184,7 @@ export default class ItemDefinition {
     }
 
     const gqlOriginal = this.getGQLAppliedValue(id, version);
+    const internalState = this.getInternalState(id, version);
     return {
       moduleName: this.getModuleName(),
       itemDefQualifiedName: this.getQualifiedPathName(),
@@ -1180,6 +1195,7 @@ export default class ItemDefinition {
       gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
       forId: id,
       forVersion: version,
+      internalState,
     };
   }
 
@@ -1236,6 +1252,7 @@ export default class ItemDefinition {
     }
 
     const gqlOriginal = this.getGQLAppliedValue(id, version);
+    const internalState = this.getInternalState(id, version);
     return {
       moduleName: this.getModuleName(),
       itemDefQualifiedName: this.getQualifiedPathName(),
@@ -1246,6 +1263,7 @@ export default class ItemDefinition {
       gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
       forId: id,
       forVersion: version,
+      internalState,
     };
   }
 
@@ -1280,6 +1298,7 @@ export default class ItemDefinition {
     const mergedID = id + "." + (version || "");
     // we make it we have an applied value
     this.stateHasAppliedValueTo[mergedID] = true;
+    this.stateInternal[mergedID] = null;
     // and set all the data regarding that value
     this.stateGQLAppliedValue[mergedID] = {
       userIdRequester: graphqlUserIdRequester,
@@ -1397,6 +1416,7 @@ export default class ItemDefinition {
     const mergedID = id + "." + (version || "");
     delete this.stateHasAppliedValueTo[mergedID];
     delete this.stateGQLAppliedValue[mergedID];
+    delete this.stateInternal[mergedID];
 
     // gather the properties
     const properties =
@@ -1424,6 +1444,37 @@ export default class ItemDefinition {
   public hasAppliedValueTo(id: number, version: string): boolean {
     const mergedID = id + "." + (version || "");
     return this.stateHasAppliedValueTo[mergedID];
+  }
+
+  /**
+   * Provides the internal state of the current state
+   * @param id 
+   * @param version 
+   */
+  public getInternalState(id: number, version: string): any {
+    const mergedID = id + "." + (version || "");
+    return this.stateInternal[mergedID] || null;
+  }
+
+  /**
+   * Sets the internal state with a given value
+   * @param id 
+   * @param version 
+   * @param value 
+   */
+  public setInternalState(id: number, version: string, value: any) {
+    const mergedID = id + "." + (version || "");
+    this.stateInternal[mergedID] = value;
+  }
+
+  /**
+   * Clears the internal state
+   * @param id 
+   * @param version 
+   */
+  public cleanInternalState(id: number, version: string) {
+    const mergedID = id + "." + (version || "");
+    delete this.stateInternal[mergedID];
   }
 
   /**

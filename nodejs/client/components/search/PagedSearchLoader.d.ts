@@ -10,15 +10,21 @@ interface IPagedSearchLoaderProps {
     pageSize: number;
     children: (arg: IPagedSearchLoaderArg) => any;
 }
-interface IPagedSearchLoaderState {
-    currentPage: number;
-}
-export declare class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps, IPagedSearchLoaderState> {
+export declare class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> {
     constructor(props: IPagedSearchLoaderProps);
-    goToNextPage(hasNextPage: boolean): void;
-    goToPrevPage(hasPrevPage: boolean): void;
-    goToPage(n: number): void;
-    shouldComponentUpdate(nextProps: IPagedSearchLoaderProps, nextState: IPagedSearchLoaderState): boolean;
+    goToNextPage(currentPage: number, hasNextPage: boolean, setState: (qs: {
+        p: any;
+    }) => void): void;
+    goToPrevPage(currentPage: number, hasPrevPage: boolean, setState: (qs: {
+        p: any;
+    }) => void): void;
+    goToPage(setState: (qs: {
+        p: any;
+    }) => void, page: number): void;
+    shouldComponentUpdate(nextProps: IPagedSearchLoaderProps): boolean;
+    onSearchDataChange(setState: (qs: {
+        p: any;
+    }) => void): number;
     render(): JSX.Element;
 }
 export {};

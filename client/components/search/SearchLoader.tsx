@@ -40,6 +40,8 @@ export interface ISearchLoaderProps {
   includePolicies?: boolean;
   cleanOnDismount?: boolean;
   static?: "TOTAL" | "NO_LISTENING";
+  useSearchHistory?: boolean;
+  onSearchDataChange?: () => number | void;
 }
 
 interface IActualSearchLoaderProps extends ISearchLoaderProps {
@@ -86,19 +88,46 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   }
   public componentDidMount() {
     this.refreshPage();
+    if (this.props.useSearchHistory) {
+      this.loadFromQS();
+    }
   }
-  public componentDidUpdate(prevProps: IActualSearchLoaderProps, prevState: IActualSearchLoaderState) {
+  public refreshSearchQS() {
+    // TODO update the search querystring to match if necessary
+  }
+  public loadFromQS() {
+    // TODO load and execute a search based on the querystring value, we need to
+    // ensure to execute search from the parent based on the QS data
+  }
+  public componentDidUpdate(prevProps: IActualSearchLoaderProps) {
+    let currentPage = this.props.currentPage;
+    if (
+      prevProps.searchId !== this.props.searchId
+    ) {
+      if (this.props.onSearchDataChange) {
+        const newPage = this.props.onSearchDataChange();
+        if (typeof newPage === "number") {
+          currentPage = newPage;
+        }
+      }
+
+      if (this.props.useSearchHistory) {
+        this.refreshSearchQS();
+      }
+    }
+
     const currentSearchRecords = (this.props.searchRecords || []).slice(
-      this.props.pageSize * this.props.currentPage,
-      this.props.pageSize * (this.props.currentPage + 1),
+      this.props.pageSize * currentPage,
+      this.props.pageSize * (currentPage + 1),
     );
     // it might seem odd but we only really update
     // the values if we recieve a different search id
     // for efficiency reasons any change in any parameter of the search
     // results in a different search id
+
     if (
-      prevProps.searchId !== this.props.searchId ||
-      !equals(this.state.currentSearchRecords, currentSearchRecords)
+      !equals(this.state.currentSearchRecords, currentSearchRecords) ||
+      prevProps.searchId !== this.props.searchId
     ) {
       this.loadValues(currentSearchRecords);
     }
@@ -409,14 +438,14 @@ export default function SearchLoader(props: ISearchLoaderProps) {
                   (itemDefinitionContext) => (
                     <ActualSearchLoader
                       {...props}
+                      itemDefinitionInstance={itemDefinitionContext.idef}
+                      remoteListener={itemDefinitionContext.remoteListener}
+                      searchId={itemDefinitionContext.searchId}
                       searchRecords={itemDefinitionContext.searchRecords}
                       searchResults={itemDefinitionContext.searchResults}
                       searchCount={itemDefinitionContext.searchCount}
                       searchOffset={itemDefinitionContext.searchOffset}
                       searchLimit={itemDefinitionContext.searchLimit}
-                      itemDefinitionInstance={itemDefinitionContext.idef}
-                      remoteListener={itemDefinitionContext.remoteListener}
-                      searchId={itemDefinitionContext.searchId}
                       searchOwner={itemDefinitionContext.searchOwner}
                       searchShouldCache={itemDefinitionContext.searchShouldCache}
                       searchRequestedIncludes={itemDefinitionContext.searchRequestedIncludes}

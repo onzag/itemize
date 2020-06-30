@@ -298,6 +298,7 @@ class ActualPropertyEntryFieldRenderer
     this.renderBasicTextField = this.renderBasicTextField.bind(this);
     this.closeUnitDialog = this.closeUnitDialog.bind(this);
     this.openUnitDialog = this.openUnitDialog.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
     // this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
     // this.renderAutosuggestField = this.renderAutosuggestField.bind(this);
     // this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
@@ -404,6 +405,12 @@ class ActualPropertyEntryFieldRenderer
     this.setState({
       unitDialogOpen: false,
     });
+  }
+
+  public onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (this.props.args.onEnter && e.keyCode === 13) {
+      this.props.args.onEnter();      
+    }
   }
 
   public renderBasicTextField(textFieldProps?: any) {
@@ -604,6 +611,7 @@ class ActualPropertyEntryFieldRenderer
             ""
           }
           onChange={this.onChangeByHTMLEvent}
+          onKeyDown={this.onKeyDown}
           InputProps={{
             classes: {
               root: this.props.classes.fieldInput,

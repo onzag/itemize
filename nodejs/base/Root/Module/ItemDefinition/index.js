@@ -149,6 +149,7 @@ class ItemDefinition {
     cleanState(init) {
         this.stateHasAppliedValueTo = {};
         this.stateGQLAppliedValue = {};
+        this.stateInternal = {};
         if (!init) {
             this.propertyDefinitions && this.propertyDefinitions.forEach((p) => p.cleanState());
             this.childDefinitions && this.childDefinitions.forEach((cd) => cd.cleanState());
@@ -648,6 +649,7 @@ class ItemDefinition {
             includes = this.includeInstances.map((ii) => ii.getStateNoExternalChecking(id, version, emulateExternalChecking));
         }
         const gqlOriginal = this.getGQLAppliedValue(id, version);
+        const internalState = this.getInternalState(id, version);
         return {
             moduleName: this.getModuleName(),
             itemDefQualifiedName: this.getQualifiedPathName(),
@@ -658,6 +660,7 @@ class ItemDefinition {
             gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
             forId: id,
             forVersion: version,
+            internalState,
         };
     }
     /**
@@ -704,6 +707,7 @@ class ItemDefinition {
             includes = await Promise.all(this.includeInstances.map((ii) => ii.getState(id, version)));
         }
         const gqlOriginal = this.getGQLAppliedValue(id, version);
+        const internalState = this.getInternalState(id, version);
         return {
             moduleName: this.getModuleName(),
             itemDefQualifiedName: this.getQualifiedPathName(),
@@ -714,6 +718,7 @@ class ItemDefinition {
             gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
             forId: id,
             forVersion: version,
+            internalState,
         };
     }
     /**
@@ -738,6 +743,7 @@ class ItemDefinition {
         const mergedID = id + "." + (version || "");
         // we make it we have an applied value
         this.stateHasAppliedValueTo[mergedID] = true;
+        this.stateInternal[mergedID] = null;
         // and set all the data regarding that value
         this.stateGQLAppliedValue[mergedID] = {
             userIdRequester: graphqlUserIdRequester,
@@ -829,6 +835,7 @@ class ItemDefinition {
         const mergedID = id + "." + (version || "");
         delete this.stateHasAppliedValueTo[mergedID];
         delete this.stateGQLAppliedValue[mergedID];
+        delete this.stateInternal[mergedID];
         // gather the properties
         const properties = excludeExtensions ?
             this.getAllPropertyDefinitions() :
@@ -852,6 +859,34 @@ class ItemDefinition {
     hasAppliedValueTo(id, version) {
         const mergedID = id + "." + (version || "");
         return this.stateHasAppliedValueTo[mergedID];
+    }
+    /**
+     * Provides the internal state of the current state
+     * @param id
+     * @param version
+     */
+    getInternalState(id, version) {
+        const mergedID = id + "." + (version || "");
+        return this.stateInternal[mergedID] || null;
+    }
+    /**
+     * Sets the internal state with a given value
+     * @param id
+     * @param version
+     * @param value
+     */
+    setInternalState(id, version, value) {
+        const mergedID = id + "." + (version || "");
+        this.stateInternal[mergedID] = value;
+    }
+    /**
+     * Clears the internal state
+     * @param id
+     * @param version
+     */
+    cleanInternalState(id, version) {
+        const mergedID = id + "." + (version || "");
+        delete this.stateInternal[mergedID];
     }
     /**
      * Provides the applied value for the id

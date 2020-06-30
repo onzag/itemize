@@ -235,6 +235,13 @@ export interface IItemDefinitionStateType {
      * The version that was used
      */
     forVersion: string;
+    /**
+     * An internal state for this state in the given slot, in practise
+     * this is used in the search mode in order to store search results as a way
+     * to keep them linked to the state that is used in that way some data
+     * might be assigned to this state
+     */
+    internalState: any;
 }
 /**
  * Represents the possible io actions to be performed
@@ -391,6 +398,10 @@ export default class ItemDefinition {
      * Contains the information about the specific applied value to an slot
      */
     private stateGQLAppliedValue;
+    /**
+     * The internal state
+     */
+    private stateInternal;
     /**
      * Build a new ItemDefinition instance
      * @param rawJSON the raw json form
@@ -675,6 +686,25 @@ export default class ItemDefinition {
      * @returns a boolean on whether it does or not
      */
     hasAppliedValueTo(id: number, version: string): boolean;
+    /**
+     * Provides the internal state of the current state
+     * @param id
+     * @param version
+     */
+    getInternalState(id: number, version: string): any;
+    /**
+     * Sets the internal state with a given value
+     * @param id
+     * @param version
+     * @param value
+     */
+    setInternalState(id: number, version: string, value: any): void;
+    /**
+     * Clears the internal state
+     * @param id
+     * @param version
+     */
+    cleanInternalState(id: number, version: string): void;
     /**
      * Provides the applied value for the id
      * @param id the id

@@ -26,15 +26,37 @@ class ActualSearchLoader extends react_1.default.Component {
     }
     componentDidMount() {
         this.refreshPage();
+        if (this.props.useSearchHistory) {
+            this.loadFromQS();
+        }
     }
-    componentDidUpdate(prevProps, prevState) {
-        const currentSearchRecords = (this.props.searchRecords || []).slice(this.props.pageSize * this.props.currentPage, this.props.pageSize * (this.props.currentPage + 1));
+    refreshSearchQS() {
+        // TODO update the search querystring to match if necessary
+    }
+    loadFromQS() {
+        // TODO load and execute a search based on the querystring value, we need to
+        // ensure to execute search from the parent based on the QS data
+    }
+    componentDidUpdate(prevProps) {
+        let currentPage = this.props.currentPage;
+        if (prevProps.searchId !== this.props.searchId) {
+            if (this.props.onSearchDataChange) {
+                const newPage = this.props.onSearchDataChange();
+                if (typeof newPage === "number") {
+                    currentPage = newPage;
+                }
+            }
+            if (this.props.useSearchHistory) {
+                this.refreshSearchQS();
+            }
+        }
+        const currentSearchRecords = (this.props.searchRecords || []).slice(this.props.pageSize * currentPage, this.props.pageSize * (currentPage + 1));
         // it might seem odd but we only really update
         // the values if we recieve a different search id
         // for efficiency reasons any change in any parameter of the search
         // results in a different search id
-        if (prevProps.searchId !== this.props.searchId ||
-            !deep_equal_1.default(this.state.currentSearchRecords, currentSearchRecords)) {
+        if (!deep_equal_1.default(this.state.currentSearchRecords, currentSearchRecords) ||
+            prevProps.searchId !== this.props.searchId) {
             this.loadValues(currentSearchRecords);
         }
     }
@@ -256,6 +278,6 @@ class ActualSearchLoader extends react_1.default.Component {
     }
 }
 function SearchLoader(props) {
-    return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeData) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContext) => (react_1.default.createElement(ActualSearchLoader, Object.assign({}, props, { searchRecords: itemDefinitionContext.searchRecords, searchResults: itemDefinitionContext.searchResults, searchCount: itemDefinitionContext.searchCount, searchOffset: itemDefinitionContext.searchOffset, searchLimit: itemDefinitionContext.searchLimit, itemDefinitionInstance: itemDefinitionContext.idef, remoteListener: itemDefinitionContext.remoteListener, searchId: itemDefinitionContext.searchId, searchOwner: itemDefinitionContext.searchOwner, searchShouldCache: itemDefinitionContext.searchShouldCache, searchRequestedIncludes: itemDefinitionContext.searchRequestedIncludes, searchRequestedProperties: itemDefinitionContext.searchRequestedProperties, searchFields: itemDefinitionContext.searchFields, tokenData: tokenData, localeData: localeData })))))))));
+    return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeData) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContext) => (react_1.default.createElement(ActualSearchLoader, Object.assign({}, props, { itemDefinitionInstance: itemDefinitionContext.idef, remoteListener: itemDefinitionContext.remoteListener, searchId: itemDefinitionContext.searchId, searchRecords: itemDefinitionContext.searchRecords, searchResults: itemDefinitionContext.searchResults, searchCount: itemDefinitionContext.searchCount, searchOffset: itemDefinitionContext.searchOffset, searchLimit: itemDefinitionContext.searchLimit, searchOwner: itemDefinitionContext.searchOwner, searchShouldCache: itemDefinitionContext.searchShouldCache, searchRequestedIncludes: itemDefinitionContext.searchRequestedIncludes, searchRequestedProperties: itemDefinitionContext.searchRequestedProperties, searchFields: itemDefinitionContext.searchFields, tokenData: tokenData, localeData: localeData })))))))));
 }
 exports.default = SearchLoader;

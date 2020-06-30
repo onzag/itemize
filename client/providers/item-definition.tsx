@@ -114,6 +114,9 @@ export interface IActionCleanOptions {
   unpokeAfterSuccess?: boolean;
   unpokeAfterAny?: boolean;
   unpokeAfterFailure?: boolean;
+  cleanSearchResultsOnSuccess?: boolean;
+  cleanSearchResultsOnAny?: boolean;
+  cleanSearchResultsOnFailure?: boolean;
 }
 
 /**
@@ -458,22 +461,7 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
   config: IConfigRawJSONDataType;
 }
 
-// This is the state of such, it's basically a copy of the
-// context, so refer to that, the context is avobe
-interface IActualItemDefinitionProviderState {
-  itemDefinitionState: IItemDefinitionStateType;
-  isBlocked: boolean;
-  isBlockedButDataIsAccessible: boolean;
-  notFound: boolean;
-  loadError: EndpointErrorType;
-  loading: boolean;
-  loaded: boolean;
-  submitError: EndpointErrorType;
-  submitting: boolean;
-  submitted: boolean;
-  deleteError: EndpointErrorType;
-  deleting: boolean;
-  deleted: boolean;
+interface IACtualItemDefinitionProviderSearchState {
   searchError: EndpointErrorType;
   searching: boolean;
   searchRecords: IGQLSearchRecord[];
@@ -488,6 +476,24 @@ interface IActualItemDefinitionProviderState {
   searchRequestedProperties: string[];
   searchRequestedIncludes: string[];
   searchFields: any;
+};
+
+// This is the state of such, it's basically a copy of the
+// context, so refer to that, the context is avobe
+interface IActualItemDefinitionProviderState extends IACtualItemDefinitionProviderSearchState {
+  itemDefinitionState: IItemDefinitionStateType;
+  isBlocked: boolean;
+  isBlockedButDataIsAccessible: boolean;
+  notFound: boolean;
+  loadError: EndpointErrorType;
+  loading: boolean;
+  loaded: boolean;
+  submitError: EndpointErrorType;
+  submitting: boolean;
+  submitted: boolean;
+  deleteError: EndpointErrorType;
+  deleting: boolean;
+  deleted: boolean;
   pokedElements: IPokeElementsType;
   canEdit: boolean;
   canDelete: boolean;
@@ -613,12 +619,12 @@ export class ActualItemDefinitionProvider extends
     // the value might already be available in memory, this is either because it was loaded
     // by another instance or because of SSR during the initial render
     const memoryLoaded = !!(this.props.forId && this.props.itemDefinitionInstance.hasAppliedValueTo(
-      this.props.forId, this.props.forVersion || null,
+      this.props.forId || null, this.props.forVersion || null,
     ));
     let memoryLoadedAndValid = false;
     if (memoryLoaded) {
       const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
-        this.props.forId, this.props.forVersion || null,
+        this.props.forId || null, this.props.forVersion || null,
       );
       // this is the same as for loadValue we are tyring to predict
       const { requestFields } = getFieldsAndArgs({
@@ -640,6 +646,30 @@ export class ActualItemDefinitionProvider extends
         requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
       );
     }
+
+    let searchState: IACtualItemDefinitionProviderSearchState = {
+      searchError: null,
+      searching: false,
+      searchResults: null,
+      searchRecords: null,
+      searchLimit: null,
+      searchOffset: null,
+      searchCount: null,
+      searchId: null,
+      searchOwner: null,
+      searchParent: null,
+      searchShouldCache: false,
+      searchFields: null,
+      searchRequestedIncludes: [],
+      searchRequestedProperties: [],
+    };
+    const internalState = this.props.itemDefinitionInstance.getInternalState(
+      this.props.forId || null, this.props.forVersion || null,
+    );
+    if (internalState) {
+      searchState = internalState;
+    }
+
     // so the initial setup
     return {
       // same we get the initial state, without checking it externally and passing
@@ -678,20 +708,7 @@ export class ActualItemDefinitionProvider extends
       deleting: false,
       deleted: false,
 
-      searchError: null,
-      searching: false,
-      searchResults: null,
-      searchRecords: null,
-      searchLimit: null,
-      searchOffset: null,
-      searchCount: null,
-      searchId: null,
-      searchOwner: null,
-      searchParent: null,
-      searchShouldCache: false,
-      searchFields: null,
-      searchRequestedIncludes: [],
-      searchRequestedProperties: [],
+      ...searchState,
 
       pokedElements: {
         properties: [],
@@ -1444,6 +1461,7 @@ export class ActualItemDefinitionProvider extends
       this.props.forId || null,
       this.props.forVersion || null,
     );
+    this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyChangeOrRestoreFinal();
   }
   public onPropertyChange(
@@ -1465,6 +1483,7 @@ export class ActualItemDefinitionProvider extends
       value,
       internalValue,
     );
+    this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyChangeOrRestoreFinal();
   }
   public onPropertyEnforce(
@@ -1478,6 +1497,7 @@ export class ActualItemDefinitionProvider extends
     // since they might be out of sync that's why the id is passed
     // the setter enforces values
     property.setSuperEnforced(givenForId || null, givenForVersion || null, value);
+    this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
     this.props.itemDefinitionInstance.triggerListeners(
       "change",
       givenForId || null,
@@ -1496,6 +1516,7 @@ export class ActualItemDefinitionProvider extends
   ) {
     // same but removes the enforcement
     property.clearSuperEnforced(givenForId || null, givenForVersion || null);
+    this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
     this.props.itemDefinitionInstance.triggerListeners(
       "change",
       givenForId || null,
@@ -1936,6 +1957,15 @@ export class ActualItemDefinitionProvider extends
       needsUpdate = true;
     }
 
+    if (
+      options.cleanSearchResultsOnAny ||
+      options.cleanSearchResultsOnFailure && state === "fail" ||
+      options.cleanSearchResultsOnSuccess && state === "success"
+    ) {
+      debugger;
+      this.props.itemDefinitionInstance.cleanInternalState(this.props.forId, this.props.forVersion || null);
+    }
+
     // NOw we check if we need an update in the listeners and if we are allowed to trigger it
     if (needsUpdate && !avoidTriggeringUpdate) {
       this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
@@ -2309,43 +2339,75 @@ export class ActualItemDefinitionProvider extends
     }, this.props.remoteListener, this.onSearchReload);
 
     if (error) {
+      const searchStateInfo = {
+        searchError: error,
+        searching: false,
+        searchResults: results,
+        searchRecords: records,
+        searchCount: count,
+        searchLimit: limit,
+        searchOffset: offset,
+        searchId: uuid.v4(),
+        searchOwner: options.createdBy || null,
+        searchParent,
+        searchShouldCache: !!options.cachePolicy,
+        searchFields: requestedSearchFields,
+        searchRequestedProperties: options.requestedProperties,
+        searchRequestedIncludes: options.requestedIncludes || [],
+      };
+
+      // this would be a wasted instruction otherwise as it'd be reversed
+      if (
+        !options.cleanSearchResultsOnAny &&
+        !options.cleanSearchResultsOnFailure
+      ) {
+        this.props.itemDefinitionInstance.setInternalState(
+          this.props.forId || null,
+          this.props.forVersion || null,
+          searchStateInfo,
+        );
+      }
+
       if (!this.isUnmounted) {
         this.setState({
-          searchError: error,
-          searching: false,
-          searchResults: results,
-          searchRecords: records,
-          searchCount: count,
-          searchLimit: limit,
-          searchOffset: offset,
-          searchId: uuid.v4(),
-          searchOwner: options.createdBy || null,
-          searchParent,
-          searchShouldCache: !!options.cachePolicy,
-          searchFields: requestedSearchFields,
-          searchRequestedProperties: options.requestedProperties,
-          searchRequestedIncludes: options.requestedIncludes || [],
+          ...searchStateInfo,
           pokedElements,
         });
       }
       this.clean(options, "fail");
     } else {
+      const searchStateInfo = {
+        searchError: null as any,
+        searching: false,
+        searchResults: results,
+        searchRecords: records,
+        searchCount: count,
+        searchLimit: limit,
+        searchOffset: offset,
+        searchId: uuid.v4(),
+        searchOwner: options.createdBy || null,
+        searchParent,
+        searchShouldCache: !!options.cachePolicy,
+        searchFields: requestedSearchFields,
+        searchRequestedProperties: options.requestedProperties,
+        searchRequestedIncludes: options.requestedIncludes || [],
+      };
+
+      // this would be a wasted instruction otherwise as it'd be reversed
+      if (
+        !options.cleanSearchResultsOnAny &&
+        !options.cleanSearchResultsOnSuccess
+      ) {
+        this.props.itemDefinitionInstance.setInternalState(
+          this.props.forId || null,
+          this.props.forVersion || null,
+          searchStateInfo,
+        );
+      }
+
       if (!this.isUnmounted) {
         this.setState({
-          searchError: null,
-          searching: false,
-          searchResults: results,
-          searchRecords: records,
-          searchCount: count,
-          searchLimit: limit,
-          searchOffset: offset,
-          searchId: uuid.v4(),
-          searchOwner: options.createdBy || null,
-          searchParent,
-          searchShouldCache: !!options.cachePolicy,
-          searchFields: requestedSearchFields,
-          searchRequestedProperties: options.requestedProperties,
-          searchRequestedIncludes: options.requestedIncludes || [],
+          ...searchStateInfo,
           pokedElements,
         });
       }

@@ -61,6 +61,9 @@ export interface IActionCleanOptions {
     unpokeAfterSuccess?: boolean;
     unpokeAfterAny?: boolean;
     unpokeAfterFailure?: boolean;
+    cleanSearchResultsOnSuccess?: boolean;
+    cleanSearchResultsOnAny?: boolean;
+    cleanSearchResultsOnFailure?: boolean;
 }
 /**
  * The options for submitting,
@@ -281,20 +284,7 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
     injectedParentContext: IItemDefinitionContextType;
     config: IConfigRawJSONDataType;
 }
-interface IActualItemDefinitionProviderState {
-    itemDefinitionState: IItemDefinitionStateType;
-    isBlocked: boolean;
-    isBlockedButDataIsAccessible: boolean;
-    notFound: boolean;
-    loadError: EndpointErrorType;
-    loading: boolean;
-    loaded: boolean;
-    submitError: EndpointErrorType;
-    submitting: boolean;
-    submitted: boolean;
-    deleteError: EndpointErrorType;
-    deleting: boolean;
-    deleted: boolean;
+interface IACtualItemDefinitionProviderSearchState {
     searchError: EndpointErrorType;
     searching: boolean;
     searchRecords: IGQLSearchRecord[];
@@ -309,6 +299,21 @@ interface IActualItemDefinitionProviderState {
     searchRequestedProperties: string[];
     searchRequestedIncludes: string[];
     searchFields: any;
+}
+interface IActualItemDefinitionProviderState extends IACtualItemDefinitionProviderSearchState {
+    itemDefinitionState: IItemDefinitionStateType;
+    isBlocked: boolean;
+    isBlockedButDataIsAccessible: boolean;
+    notFound: boolean;
+    loadError: EndpointErrorType;
+    loading: boolean;
+    loaded: boolean;
+    submitError: EndpointErrorType;
+    submitting: boolean;
+    submitted: boolean;
+    deleteError: EndpointErrorType;
+    deleting: boolean;
+    deleted: boolean;
     pokedElements: IPokeElementsType;
     canEdit: boolean;
     canDelete: boolean;

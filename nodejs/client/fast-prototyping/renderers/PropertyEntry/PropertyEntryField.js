@@ -146,6 +146,7 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
         this.renderBasicTextField = this.renderBasicTextField.bind(this);
         this.closeUnitDialog = this.closeUnitDialog.bind(this);
         this.openUnitDialog = this.openUnitDialog.bind(this);
+        this.onKeyDown = this.onKeyDown.bind(this);
         // this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
         // this.renderAutosuggestField = this.renderAutosuggestField.bind(this);
         // this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
@@ -228,6 +229,11 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
         this.setState({
             unitDialogOpen: false,
         });
+    }
+    onKeyDown(e) {
+        if (this.props.args.onEnter && e.keyCode === 13) {
+            this.props.args.onEnter();
+        }
     }
     renderBasicTextField(textFieldProps) {
         // set the input mode, this is for mobile,
@@ -327,7 +333,7 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
                 null,
             react_1.default.createElement(index_1.TextField, Object.assign({ fullWidth: true, type: this.state.visible ? "text" : "password", className: this.props.classes.entry, label: this.props.label, placeholder: this.props.placeholder, value: this.props.currentInternalStrOnlyValue ||
                     this.props.currentStrOnlyValue ||
-                    "", onChange: this.onChangeByHTMLEvent, InputProps: {
+                    "", onChange: this.onChangeByHTMLEvent, onKeyDown: this.onKeyDown, InputProps: {
                     classes: {
                         root: this.props.classes.fieldInput,
                         focused: "focused",
