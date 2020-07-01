@@ -6,10 +6,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const deep_equal_1 = __importDefault(require("deep-equal"));
 const PropertyEntryLocation_1 = require("../PropertyEntry/PropertyEntryLocation");
+function isCenterBasicallyEquals(one, two) {
+    const diffA = Math.abs(one[0] - two[0]);
+    const diffB = Math.abs(one[1] - two[1]);
+    if (diffA < 0.0001 && diffB < 0.001) {
+        return true;
+    }
+    return false;
+}
+exports.isCenterBasicallyEquals = isCenterBasicallyEquals;
 class PropertyViewLocation extends react_1.default.Component {
     constructor(props) {
         super(props);
-        this.preventViewportDidUpdateChange = false;
         const value = (this.props.useAppliedValue ?
             this.props.state.stateAppliedValue :
             this.props.state.value);
@@ -25,43 +33,47 @@ class PropertyViewLocation extends react_1.default.Component {
         this.onResetViewportCenter = this.onResetViewportCenter.bind(this);
     }
     componentDidUpdate(prevProps) {
-        if (!this.preventViewportDidUpdateChange) {
-            const value = (this.props.useAppliedValue ?
-                this.props.state.stateAppliedValue :
-                this.props.state.value);
-            if (value) {
-                let oldValue = (prevProps.useAppliedValue ?
-                    prevProps.state.stateAppliedValue :
-                    prevProps.state.value);
-                if (!deep_equal_1.default(value, oldValue)) {
-                    this.setState({
-                        viewport: {
-                            center: [value.lat, value.lng],
-                            zoom: PropertyEntryLocation_1.IViewportZoomEnumType.LARGE,
-                        },
-                    });
-                }
+        const oldValue = (prevProps.useAppliedValue ?
+            prevProps.state.stateAppliedValue :
+            prevProps.state.value);
+        const newValue = (this.props.useAppliedValue ?
+            this.props.state.stateAppliedValue :
+            this.props.state.value);
+        if (newValue && !deep_equal_1.default(newValue, oldValue)) {
+            let isCenteredToOldValue = false;
+            if (oldValue) {
+                const oldCenter = [oldValue.lat, oldValue.lng];
+                isCenteredToOldValue = isCenterBasicallyEquals(this.state.viewport.center, oldCenter);
+            }
+            if (isCenteredToOldValue || !oldValue) {
+                this.setState({
+                    viewport: {
+                        center: [newValue.lat, newValue.lng],
+                        zoom: !oldValue ? PropertyEntryLocation_1.IViewportZoomEnumType.LARGE : this.state.viewport.zoom,
+                    },
+                });
             }
         }
     }
     onViewportChange(viewport) {
-        this.preventViewportDidUpdateChange = true;
         this.setState({
             viewport,
         });
     }
     onResetViewportCenter() {
-        this.preventViewportDidUpdateChange = false;
         const value = (this.props.useAppliedValue ?
             this.props.state.stateAppliedValue :
             this.props.state.value);
         if (value) {
-            this.setState({
-                viewport: {
-                    center: [value.lat, value.lng],
-                    zoom: PropertyEntryLocation_1.IViewportZoomEnumType.LARGE,
-                },
-            });
+            const newViewport = {
+                center: [value.lat, value.lng],
+                zoom: PropertyEntryLocation_1.IViewportZoomEnumType.LARGE,
+            };
+            if (!deep_equal_1.default(newViewport, this.state.viewport)) {
+                this.setState({
+                    viewport: newViewport,
+                });
+            }
         }
     }
     shouldComponentUpdate(nextProps, nextState) {
@@ -82,11 +94,8 @@ class PropertyViewLocation extends react_1.default.Component {
             this.props.state.value);
         let canResetViewportCenter = false;
         if (value) {
-            const expectedViewport = {
-                center: [value.lat, value.lng],
-                zoom: PropertyEntryLocation_1.IViewportZoomEnumType.LARGE,
-            };
-            canResetViewportCenter = !deep_equal_1.default(expectedViewport, this.state.viewport);
+            const expectedViewportCenter = [value.lat, value.lng];
+            canResetViewportCenter = !isCenterBasicallyEquals(expectedViewportCenter, this.state.viewport.center);
         }
         const RendererElement = this.props.renderer;
         const rendererArgs = {

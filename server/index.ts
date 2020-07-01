@@ -712,13 +712,13 @@ export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCus
         host: sensitiveConfig.mailgunAPIHost,
       }) : null;
 
-    if (sensitiveConfig.hereAppID && sensitiveConfig.hereAppCode) {
+    if (sensitiveConfig.hereApiKey) {
       logger.info(
         "initializeServer: initializing here maps",
       );
     }
-    const here = sensitiveConfig.hereAppID && sensitiveConfig.hereAppCode ?
-      setupHere(sensitiveConfig.hereAppID, sensitiveConfig.hereAppCode) : null;
+    const here = sensitiveConfig.hereApiKey ?
+      setupHere(sensitiveConfig.hereApiKey) : null;
 
     logger.info(
       "initializeServer: configuring app data build",

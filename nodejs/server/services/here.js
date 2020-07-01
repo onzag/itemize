@@ -24,14 +24,13 @@ function processHereResult(wordSeparator, suggestion, overwriteTxt) {
     };
 }
 class Here {
-    constructor(appId, appCode) {
-        this.appId = appId;
-        this.appCode = appCode;
+    constructor(apiKey) {
+        this.apiKey = apiKey;
     }
     requestGeocodeFor(lat, lng, query, lang, sep) {
-        const hostname = "places.cit.api.here.com";
+        const hostname = "places.ls.hereapi.com";
         const path = "/places/v1/discover/here";
-        const qs = `?at=${lat},${lng}&cat=none&app_id=${this.appId}&app_code=${this.appCode}`;
+        const qs = `?at=${lat},${lng}&cat=none&apiKey=${this.apiKey}`;
         const pathwithqs = path + qs;
         const latp = typeof lat === "number" ? lat : parseFloat(lat);
         const lngp = typeof lng === "number" ? lng : parseFloat(lng);
@@ -109,9 +108,9 @@ class Here {
         });
     }
     requestSearchFor(lat, lng, query, lang, sep) {
-        const hostname = "places.cit.api.here.com";
+        const hostname = "places.ls.hereapi.com";
         const path = "/places/v1/discover/search";
-        const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&app_id=${this.appId}&app_code=${this.appCode}`;
+        const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&apiKey=${this.apiKey}`;
         const pathwithqs = path + qs;
         return new Promise((resolve, reject) => {
             https_1.default.get({
@@ -179,9 +178,9 @@ class Here {
         });
     }
     requestAutocompleteFor(lat, lng, query, lang, sep) {
-        const hostname = "places.cit.api.here.com";
+        const hostname = "places.ls.hereapi.com";
         const path = "/places/v1/autosuggest";
-        const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&app_id=${this.appId}&app_code=${this.appCode}&size=6`;
+        const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&apiKey=${this.apiKey}&size=6`;
         const pathwithqs = path + qs;
         return new Promise((resolve, reject) => {
             https_1.default.get({
@@ -246,7 +245,7 @@ class Here {
     }
 }
 exports.Here = Here;
-function setupHere(appId, appCode) {
-    return new Here(appId, appCode);
+function setupHere(apiKey) {
+    return new Here(apiKey);
 }
 exports.setupHere = setupHere;

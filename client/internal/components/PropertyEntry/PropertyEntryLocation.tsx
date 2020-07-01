@@ -3,6 +3,7 @@ import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import equals from "deep-equal";
 import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { capitalize, localeReplacer } from "../../../../util";
+import { isCenterBasicallyEquals } from "../PropertyView/PropertyViewLocation";
 
 export enum IViewportZoomEnumType {
   SMALL = "SMALL",
@@ -83,8 +84,6 @@ export default class PropertyEntryLocation
   private lastSearchValue: IPropertyDefinitionSupportedLocationType[];
   private lastSearchValueQ: string;
 
-  private preventViewportDidUpdateChange: boolean = false;
-
   constructor(props: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>) {
     super(props);
 
@@ -139,19 +138,23 @@ export default class PropertyEntryLocation
   }
 
   public componentDidUpdate(prevProps: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>) {
-    if (!this.preventViewportDidUpdateChange) {
-      const value: IPropertyDefinitionSupportedLocationType = this.props.state.value as IPropertyDefinitionSupportedLocationType;
-      if (value) {
-        const oldValue: IPropertyDefinitionSupportedLocationType = prevProps.state.value as IPropertyDefinitionSupportedLocationType;
+    const oldValue = prevProps.state.value as IPropertyDefinitionSupportedLocationType;
+    const newValue = this.props.state.value as IPropertyDefinitionSupportedLocationType;
 
-        if (!equals(value, oldValue)) {
-          this.setState({
-            viewport: {
-              center: [value.lat, value.lng],
-              zoom: IViewportZoomEnumType.LARGE,
-            },
-          })
-        }
+    if (newValue && !equals(newValue, oldValue)) {
+      let isCenteredToOldValue = false;
+      if (oldValue) {
+        const oldCenter = [oldValue.lat, oldValue.lng] as [number, number];
+        isCenteredToOldValue = isCenterBasicallyEquals(this.state.viewport.center, oldCenter);
+      }
+
+      if (isCenteredToOldValue || !oldValue) {
+        this.setState({
+          viewport: {
+            center: [newValue.lat, newValue.lng],
+            zoom: !oldValue ? IViewportZoomEnumType.LARGE : this.state.viewport.zoom,
+          },
+        });
       }
     }
   }
@@ -164,7 +167,6 @@ export default class PropertyEntryLocation
   public onViewportChange(
     viewport: IViewport,
   ) {
-    this.preventViewportDidUpdateChange = true;
     this.setState({
       viewport,
     });

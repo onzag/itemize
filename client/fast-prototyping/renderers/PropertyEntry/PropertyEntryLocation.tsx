@@ -306,10 +306,11 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
     this.props.onSearchQueryChange(arg.value);
   }
   public renderBody(textFieldProps?: any) {
-    const viewport = {
+    const viewport = ZOOMS[this.props.viewport.zoom] ? {
       center: this.props.viewport.center,
-      zoom: ZOOMS[this.props.viewport.zoom] || this.props.viewport.zoom,
-    };
+      zoom: ZOOMS[this.props.viewport.zoom],
+    } : this.props.viewport;
+
     let appliedTextFieldProps: any = {
       className: this.props.classes.entry,
     };
@@ -366,7 +367,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
     const map = this.state.readyToMap ? (
       <CMap
         viewport={viewport}
-        onViewportChange={this.props.onViewportChange}
+        onViewportChanged={this.props.onViewportChange}
         onClick={this.setLocationManually}
       >
         <CTileLayer

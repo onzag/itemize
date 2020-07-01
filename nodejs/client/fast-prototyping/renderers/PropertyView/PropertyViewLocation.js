@@ -49,6 +49,18 @@ const locationMapStyles = mui_core_1.createStyles({
         position: "relative",
         width: "100%",
     },
+    restoreButton: {
+        position: "absolute",
+        zIndex: 1000,
+        bottom: 10,
+        left: 10,
+        backgroundColor: "white",
+        border: "solid 1px #ccc",
+        boxShadow: "0 1px 5px rgba(0,0,0,0.65)",
+        "&:hover": {
+            backgroundColor: "white",
+        },
+    }
 });
 class ActualPropertyViewLocationMap extends react_1.default.Component {
     constructor(props) {
@@ -63,15 +75,19 @@ class ActualPropertyViewLocationMap extends react_1.default.Component {
         });
     }
     render() {
-        const viewport = {
+        let viewport = PropertyEntryLocation_1.ZOOMS[this.props.viewport.zoom] ? {
             center: this.props.viewport.center,
-            zoom: PropertyEntryLocation_1.ZOOMS[this.props.viewport.zoom] || this.props.viewport.zoom,
-        };
-        const map = this.state.readyToMap ? (react_1.default.createElement(CMap, { viewport: viewport, onViewportChange: this.props.onViewportChange },
+            zoom: PropertyEntryLocation_1.ZOOMS[this.props.viewport.zoom],
+        } : this.props.viewport;
+        const map = this.state.readyToMap ? (react_1.default.createElement(CMap, { viewport: viewport, onViewportChanged: this.props.onViewportChange },
             react_1.default.createElement(CTileLayer, { attribution: '\u00A9 <a href="http://osm.org/copyright">OpenStreetMap</a> contributors', url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png" }),
             this.props.currentValue ? react_1.default.createElement(CMarker, { position: [
                     this.props.currentValue.lat, this.props.currentValue.lng,
-                ] }) : null)) : null;
+                ] }) : null,
+            this.props.canResetViewportCenter ?
+                react_1.default.createElement(mui_core_1.IconButton, { onClick: this.props.onResetViewportCenter, className: this.props.classes.restoreButton },
+                    react_1.default.createElement(mui_core_1.GpsFixedIcon, null))
+                : null)) : null;
         let textHeader = null;
         if (this.props.currentValue === null && this.props.args.NullComponent) {
             const NullComponent = this.props.args.NullComponent;
@@ -83,12 +99,7 @@ class ActualPropertyViewLocationMap extends react_1.default.Component {
         }
         return (react_1.default.createElement("div", { className: this.props.classes.container },
             react_1.default.createElement("div", { className: this.props.classes.locationTextHeader }, textHeader),
-            react_1.default.createElement("div", { className: this.props.classes.locationMapContainer },
-                map,
-                this.props.canResetViewportCenter ?
-                    react_1.default.createElement(mui_core_1.IconButton, { onClick: this.props.onResetViewportCenter },
-                        react_1.default.createElement(mui_core_1.GpsFixedIcon, null))
-                    : null)));
+            react_1.default.createElement("div", { className: this.props.classes.locationMapContainer }, map)));
     }
 }
 const PropertyViewLocationMap = mui_core_1.withStyles(locationMapStyles)(ActualPropertyViewLocationMap);

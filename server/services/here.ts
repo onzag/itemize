@@ -42,11 +42,9 @@ function processHereResult(wordSeparator: string, suggestion: IHereResult, overw
 }
 
 export class Here {
-  private appId: string;
-  private appCode: string;
-  constructor(appId: string, appCode: string) {
-    this.appId = appId;
-    this.appCode = appCode;
+  private apiKey: string;
+  constructor(apiKey: string) {
+    this.apiKey = apiKey;
   }
   requestGeocodeFor(
     lat: string | number,
@@ -55,9 +53,9 @@ export class Here {
     lang: string,
     sep: string,
   ): Promise<IPropertyDefinitionSupportedLocationType> {
-    const hostname = "places.cit.api.here.com";
+    const hostname = "places.ls.hereapi.com";
     const path = "/places/v1/discover/here";
-    const qs = `?at=${lat},${lng}&cat=none&app_id=${this.appId}&app_code=${this.appCode}`;
+    const qs = `?at=${lat},${lng}&cat=none&apiKey=${this.apiKey}`;
     const pathwithqs = path + qs;
 
     const latp = typeof lat === "number" ? lat : parseFloat(lat);
@@ -154,9 +152,9 @@ export class Here {
     lang: string,
     sep: string,
   ): Promise<IPropertyDefinitionSupportedLocationType[]> {
-    const hostname = "places.cit.api.here.com";
+    const hostname = "places.ls.hereapi.com";
     const path = "/places/v1/discover/search";
-    const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&app_id=${this.appId}&app_code=${this.appCode}`;
+    const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&apiKey=${this.apiKey}`;
     const pathwithqs = path + qs;
     
     return new Promise<IPropertyDefinitionSupportedLocationType[]>((resolve, reject) => {
@@ -249,9 +247,9 @@ export class Here {
     lang: string,
     sep: string,
   ): Promise<IPropertyDefinitionSupportedLocationType[]> {
-    const hostname = "places.cit.api.here.com";
+    const hostname = "places.ls.hereapi.com";
     const path = "/places/v1/autosuggest";
-    const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&app_id=${this.appId}&app_code=${this.appCode}&size=6`;
+    const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&apiKey=${this.apiKey}&size=6`;
     const pathwithqs = path + qs;
     
     return new Promise<IPropertyDefinitionSupportedLocationType[]>((resolve, reject) => {
@@ -331,6 +329,6 @@ export class Here {
   }
 }
 
-export function setupHere(appId: string, appCode: string) {
-  return new Here(appId, appCode);
+export function setupHere(apiKey: string) {
+  return new Here(apiKey);
 }

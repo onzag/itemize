@@ -49,6 +49,18 @@ const locationMapStyles = createStyles({
     position: "relative",
     width: "100%",
   },
+  restoreButton: {
+    position: "absolute",
+    zIndex: 1000,
+    bottom: 10,
+    left: 10,
+    backgroundColor: "white",
+    border: "solid 1px #ccc",
+    boxShadow: "0 1px 5px rgba(0,0,0,0.65)",
+    "&:hover": {
+      backgroundColor: "white",
+    },
+  }
 });
 
 interface ActualPropertyViewLocationMapProps extends WithStyles<typeof locationMapStyles>, IPropertyViewLocationRendererProps {
@@ -72,15 +84,15 @@ class ActualPropertyViewLocationMap extends React.Component<ActualPropertyViewLo
     });
   }
   public render() {
-    const viewport = {
+    let viewport = ZOOMS[this.props.viewport.zoom] ? {
       center: this.props.viewport.center,
-      zoom: ZOOMS[this.props.viewport.zoom] || this.props.viewport.zoom,
-    };
-    
+      zoom: ZOOMS[this.props.viewport.zoom],
+    } : this.props.viewport;
+
     const map = this.state.readyToMap ? (
       <CMap
         viewport={viewport}
-        onViewportChange={this.props.onViewportChange}
+        onViewportChanged={this.props.onViewportChange}
       >
         <CTileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -89,6 +101,11 @@ class ActualPropertyViewLocationMap extends React.Component<ActualPropertyViewLo
         {this.props.currentValue ? <CMarker position={[
           this.props.currentValue.lat, this.props.currentValue.lng,
         ]} /> : null}
+        {this.props.canResetViewportCenter ?
+          <IconButton onClick={this.props.onResetViewportCenter} className={this.props.classes.restoreButton}>
+            <GpsFixedIcon/>
+          </IconButton>
+        : null}
       </CMap>
     ) : null;
 
@@ -108,11 +125,6 @@ class ActualPropertyViewLocationMap extends React.Component<ActualPropertyViewLo
         </div>
         <div className={this.props.classes.locationMapContainer}>
           {map}
-          {this.props.canResetViewportCenter ?
-            <IconButton onClick={this.props.onResetViewportCenter}>
-              <GpsFixedIcon/>
-            </IconButton>
-          : null}
         </div>
       </div>
     )

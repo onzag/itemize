@@ -39,15 +39,8 @@ async function sensitiveConfigSetup(version, currentConfig, referenceConfig, pac
             defaultValue: false,
         },
         {
-            variableName: "hereAppID",
-            message: "Used in order to be able to type addresses and get locations get the ID and code at https://developer.here.com/",
-            defaultValue: "",
-            hidden: true,
-            nullifyFalseValues: true,
-        },
-        {
-            variableName: "hereAppCode",
-            message: "Used in order to be able to type addresses and get locations get the ID and code at https://developer.here.com/",
+            variableName: "hereApiKey",
+            message: "Used in order to be able to type addresses and get locations get key at https://developer.here.com/",
             defaultValue: "",
             hidden: true,
             nullifyFalseValues: true,

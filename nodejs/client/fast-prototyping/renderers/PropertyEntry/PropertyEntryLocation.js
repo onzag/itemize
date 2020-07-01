@@ -248,10 +248,10 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
         this.props.onSearchQueryChange(arg.value);
     }
     renderBody(textFieldProps) {
-        const viewport = {
+        const viewport = exports.ZOOMS[this.props.viewport.zoom] ? {
             center: this.props.viewport.center,
-            zoom: exports.ZOOMS[this.props.viewport.zoom] || this.props.viewport.zoom,
-        };
+            zoom: exports.ZOOMS[this.props.viewport.zoom],
+        } : this.props.viewport;
         let appliedTextFieldProps = {
             className: this.props.classes.entry,
         };
@@ -297,7 +297,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends react_1.default
         else if (this.props.icon) {
             icon = this.props.icon;
         }
-        const map = this.state.readyToMap ? (react_1.default.createElement(CMap, { viewport: viewport, onViewportChange: this.props.onViewportChange, onClick: this.setLocationManually },
+        const map = this.state.readyToMap ? (react_1.default.createElement(CMap, { viewport: viewport, onViewportChanged: this.props.onViewportChange, onClick: this.setLocationManually },
             react_1.default.createElement(CTileLayer, { attribution: '\u00A9 <a href="http://osm.org/copyright">OpenStreetMap</a> contributors', url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png" }),
             this.props.currentValue ? react_1.default.createElement(CMarker, { position: [
                     this.props.currentValue.lat, this.props.currentValue.lng,

@@ -29,17 +29,7 @@ exports.rawSensitiveConfigSchema = {
         currencyLayerHttpsEnabled: {
             type: "boolean",
         },
-        hereAppID: {
-            anyOf: [
-                {
-                    "type": "string",
-                },
-                {
-                    "type": "null"
-                }
-            ],
-        },
-        hereAppCode: {
+        hereApiKey: {
             anyOf: [
                 {
                     "type": "string",
@@ -145,8 +135,7 @@ exports.rawSensitiveConfigSchema = {
         "currencyLayerAccessKey",
         "currencyLayerHttpsEnabled",
         "defaultContainerID",
-        "hereAppID",
-        "hereAppCode",
+        "hereApiKey",
         "mailgunAPIKey",
         "mailgunDomain",
         "mailgunTargetDomain",

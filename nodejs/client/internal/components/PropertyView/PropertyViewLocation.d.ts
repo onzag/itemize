@@ -11,8 +11,8 @@ export interface IPropertyViewLocationRendererProps extends IPropertyViewRendere
 interface IPropertyViewLocationRendererState {
     viewport: IViewport;
 }
+export declare function isCenterBasicallyEquals(one: [number, number], two: [number, number]): boolean;
 export declare class PropertyViewLocation extends React.Component<IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>, IPropertyViewLocationRendererState> {
-    private preventViewportDidUpdateChange;
     constructor(props: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>);
     componentDidUpdate(prevProps: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>): void;
     onViewportChange(viewport: IViewport): void;

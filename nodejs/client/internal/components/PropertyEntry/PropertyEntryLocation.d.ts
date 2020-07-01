@@ -45,7 +45,6 @@ export default class PropertyEntryLocation extends React.Component<IPropertyEntr
     private lastSuggestionsValueQ;
     private lastSearchValue;
     private lastSearchValueQ;
-    private preventViewportDidUpdateChange;
     constructor(props: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>);
     shouldComponentUpdate(nextProps: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>, nextState: IPropertyEntryLocationState): boolean;
     componentDidUpdate(prevProps: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>): void;

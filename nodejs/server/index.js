@@ -481,11 +481,11 @@ async function initializeServer(ssrConfig, custom = {}) {
                 domain: sensitiveConfig.mailgunDomain,
                 host: sensitiveConfig.mailgunAPIHost,
             }) : null;
-        if (sensitiveConfig.hereAppID && sensitiveConfig.hereAppCode) {
+        if (sensitiveConfig.hereApiKey) {
             exports.logger.info("initializeServer: initializing here maps");
         }
-        const here = sensitiveConfig.hereAppID && sensitiveConfig.hereAppCode ?
-            here_1.setupHere(sensitiveConfig.hereAppID, sensitiveConfig.hereAppCode) : null;
+        const here = sensitiveConfig.hereApiKey ?
+            here_1.setupHere(sensitiveConfig.hereApiKey) : null;
         exports.logger.info("initializeServer: configuring app data build");
         const appData = {
             root,

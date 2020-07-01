@@ -15,11 +15,21 @@ interface IPropertyViewLocationRendererState {
   viewport: IViewport;
 }
 
+export function isCenterBasicallyEquals(one: [number, number], two: [number, number]) {
+  const diffA = Math.abs(one[0] - two[0]);
+  const diffB = Math.abs(one[1] - two[1]);
+
+  if (diffA < 0.0001 && diffB < 0.001) {
+    return true;
+  }
+
+  return false;
+}
+
 export class PropertyViewLocation extends React.Component<
   IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>,
   IPropertyViewLocationRendererState
 > {
-  private preventViewportDidUpdateChange: boolean = false;
   constructor(props: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>) {
     super(props);
 
@@ -42,41 +52,42 @@ export class PropertyViewLocation extends React.Component<
     this.onViewportChange = this.onViewportChange.bind(this);
     this.onResetViewportCenter = this.onResetViewportCenter.bind(this);
   }
-  public componentDidUpdate(prevProps: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>) {
-    if (!this.preventViewportDidUpdateChange) {
-      const value = (
-        this.props.useAppliedValue ?
-        this.props.state.stateAppliedValue :
-        this.props.state.value
-      ) as IPropertyDefinitionSupportedLocationType;
+  public componentDidUpdate(
+    prevProps: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>,
+  ) {
+    const oldValue = (
+      prevProps.useAppliedValue ?
+      prevProps.state.stateAppliedValue :
+      prevProps.state.value
+    ) as IPropertyDefinitionSupportedLocationType;
+    const newValue = (
+      this.props.useAppliedValue ?
+      this.props.state.stateAppliedValue :
+      this.props.state.value
+    ) as IPropertyDefinitionSupportedLocationType;
 
-      if (value) {
-        let oldValue: IPropertyDefinitionSupportedLocationType = (
-          prevProps.useAppliedValue ?
-          prevProps.state.stateAppliedValue :
-          prevProps.state.value
-        ) as IPropertyDefinitionSupportedLocationType;
-
-        if (!equals(value, oldValue)) {
-          this.setState({
-            viewport: {
-              center: [value.lat, value.lng],
-              zoom: IViewportZoomEnumType.LARGE,
-            },
-          })
-        }
+    if (newValue && !equals(newValue, oldValue)) {
+      let isCenteredToOldValue = false;
+      if (oldValue) {
+        const oldCenter = [oldValue.lat, oldValue.lng] as [number, number];
+        isCenteredToOldValue = isCenterBasicallyEquals(this.state.viewport.center, oldCenter);
+      }
+      if (isCenteredToOldValue || !oldValue) {
+        this.setState({
+          viewport: {
+            center: [newValue.lat, newValue.lng],
+            zoom: !oldValue ? IViewportZoomEnumType.LARGE : this.state.viewport.zoom,
+          },
+        })
       }
     }
   }
   public onViewportChange(viewport: IViewport) {
-    this.preventViewportDidUpdateChange = true;
     this.setState({
       viewport,
     });
   }
   public onResetViewportCenter() {
-    this.preventViewportDidUpdateChange = false;
-
     const value = (
       this.props.useAppliedValue ?
       this.props.state.stateAppliedValue :
@@ -84,12 +95,15 @@ export class PropertyViewLocation extends React.Component<
     ) as IPropertyDefinitionSupportedLocationType;
 
     if (value) {
-      this.setState({
-        viewport: {
-          center: [value.lat, value.lng],
-          zoom: IViewportZoomEnumType.LARGE,
-        },
-      });
+      const newViewport: IViewport = {
+        center: [value.lat, value.lng],
+        zoom: IViewportZoomEnumType.LARGE,
+      };
+      if (!equals(newViewport, this.state.viewport)) {
+        this.setState({
+          viewport: newViewport,
+        });
+      }
     }
   }
   public shouldComponentUpdate(
@@ -116,11 +130,8 @@ export class PropertyViewLocation extends React.Component<
 
     let canResetViewportCenter: boolean = false;
     if (value) {
-      const expectedViewport = {
-        center: [value.lat, value.lng],
-        zoom: IViewportZoomEnumType.LARGE,
-      };
-      canResetViewportCenter = !equals(expectedViewport, this.state.viewport);
+      const expectedViewportCenter = [value.lat, value.lng] as [number, number];
+      canResetViewportCenter = !isCenterBasicallyEquals(expectedViewportCenter, this.state.viewport.center);
     }
     
     const RendererElement = this.props.renderer;
