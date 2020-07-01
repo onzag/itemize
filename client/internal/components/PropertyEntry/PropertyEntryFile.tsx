@@ -231,6 +231,8 @@ export default class PropertyEntryFile
 
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryFileRendererProps = {
+      propertyId: this.props.property.getId(),
+
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
       label: i18nLabel,

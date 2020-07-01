@@ -57,7 +57,7 @@ function lazyLoaderPrepare(element: HTMLElement, propertySet: Array<[string, str
     restoreElementInfo(element);
     // and mark it as lazy
     (element as any).loading = "lazy";
-  // otherwise using the intersection observer if we have it
+    // otherwise using the intersection observer if we have it
   }
 }
 
@@ -142,7 +142,6 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
         img.removeAttribute("src");
         img.dataset.sizes = img.sizes;
         img.removeAttribute("sizes");
-        lazyLoaderPrepare(img, [["sizes", "sizes"], ["srcset", "srcset"], ["src", "src"]]);
       }
     });
 
@@ -150,11 +149,23 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
       if (!iframe.src.startsWith("blob:")) {
         iframe.dataset.src = iframe.src;
         iframe.removeAttribute("src");
-        lazyLoaderPrepare(iframe, [["src", "src"]]);
       }
     });
 
     return this.cheapdiv.innerHTML;
+  }
+  public prepareLazyLoader() {
+    this.divref.current.querySelectorAll("img").forEach((img: HTMLImageElement) => {
+      if (img.dataset.src) {
+        lazyLoaderPrepare(img, [["sizes", "sizes"], ["srcset", "srcset"], ["src", "src"]]);
+      }
+    });
+
+    this.divref.current.querySelectorAll("iframe").forEach((iframe: HTMLIFrameElement) => {
+      if (iframe.dataset.src) {
+        lazyLoaderPrepare(iframe, [["src", "src"]]);
+      }
+    });
   }
   public updateHTML(html: string) {
     this.setState({
@@ -163,13 +174,13 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
   }
   public attachEvents() {
     this.divref.current.querySelectorAll("img").forEach((img: HTMLImageElement) => {
-      if (!img.src.startsWith("blob:")) {
+      if (img.dataset.src) {
         lazyloaderExecute(img);
       }
     });
 
     this.divref.current.querySelectorAll("iframe").forEach((iframe: HTMLIFrameElement) => {
-      if (!iframe.src.startsWith("blob:")) {
+      if (iframe.dataset.src) {
         lazyloaderExecute(iframe);
       }
     });
@@ -186,7 +197,12 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
 
     triggerOldSchoolListeners();
   }
+  public componentDidMount() {
+    this.prepareLazyLoader();
+    this.attachEvents();
+  }
   public componentDidUpdate() {
+    this.prepareLazyLoader();
     this.attachEvents();
   }
   public shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps, nextState: IPropertyViewRichTextViewerState) {

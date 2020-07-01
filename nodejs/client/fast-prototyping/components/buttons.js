@@ -24,7 +24,10 @@ function SubmitButton(props) {
         const runProcess = async () => {
             const status = await actioner.submit(props.options);
             props.onSubmit && props.onSubmit(status);
-            if (!status.error && props.redirectOnSuccess) {
+            if (!status.error && !props.redirectOnSuccess && props.redirectGoBack) {
+                navigation_1.goBack();
+            }
+            else if (!status.error && props.redirectOnSuccess) {
                 const redirectCalculated = typeof props.redirectOnSuccess === "string" ?
                     props.redirectOnSuccess : props.redirectOnSuccess(status);
                 if (props.redirectGoBack) {

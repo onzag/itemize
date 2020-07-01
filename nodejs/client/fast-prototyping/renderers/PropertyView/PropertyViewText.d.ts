@@ -11,8 +11,10 @@ export declare class PropertyViewRichTextViewer extends React.Component<IPropert
     private cheapdiv;
     constructor(props: IPropertyViewRichTextViewerProps);
     getHTML(html: string): string;
+    prepareLazyLoader(): void;
     updateHTML(html: string): void;
     attachEvents(): void;
+    componentDidMount(): void;
     componentDidUpdate(): void;
     shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps, nextState: IPropertyViewRichTextViewerState): boolean;
     render(): JSX.Element;

@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const mui_core_1 = require("../../mui-core");
-const uuid_1 = __importDefault(require("uuid"));
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
@@ -75,7 +74,6 @@ exports.style = mui_core_1.createStyles({
 class ActualPropertyEntrySelectRenderer extends react_1.default.Component {
     constructor(props) {
         super(props);
-        this.uuid = uuid_1.default.v4();
         this.onChange = this.onChange.bind(this);
     }
     onChange(e) {
@@ -105,13 +103,13 @@ class ActualPropertyEntrySelectRenderer extends react_1.default.Component {
                 react_1.default.createElement(mui_core_1.Typography, { variant: "caption", className: this.props.classes.description }, this.props.description) :
                 null,
             react_1.default.createElement(mui_core_1.FormControl, { variant: "filled", className: this.props.classes.entry },
-                react_1.default.createElement(mui_core_1.InputLabel, { htmlFor: this.uuid, classes: {
+                react_1.default.createElement(mui_core_1.InputLabel, { htmlFor: this.props.propertyId, classes: {
                         root: this.props.classes.label,
                         focused: "focused",
                     }, shrink: this.props.isNullable ? true : undefined }, this.props.label),
                 react_1.default.createElement(mui_core_1.Select, { value: this.props.currentValue || "", onChange: this.onChange, displayEmpty: true, disabled: this.props.disabled, variant: "filled", classes: {
                         icon: addornment ? this.props.classes.selectFieldIconWhenAddornmentIsActive : null,
-                    }, input: react_1.default.createElement(mui_core_1.FilledInput, { id: this.uuid, placeholder: this.props.placeholder, endAdornment: addornment, classes: {
+                    }, input: react_1.default.createElement(mui_core_1.FilledInput, { id: this.props.propertyId, placeholder: this.props.placeholder, endAdornment: addornment, classes: {
                             root: this.props.classes.fieldInput,
                             focused: "focused",
                         } }) },

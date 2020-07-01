@@ -123,17 +123,27 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
                 img.removeAttribute("src");
                 img.dataset.sizes = img.sizes;
                 img.removeAttribute("sizes");
-                lazyLoaderPrepare(img, [["sizes", "sizes"], ["srcset", "srcset"], ["src", "src"]]);
             }
         });
         this.cheapdiv.querySelectorAll("iframe").forEach((iframe) => {
             if (!iframe.src.startsWith("blob:")) {
                 iframe.dataset.src = iframe.src;
                 iframe.removeAttribute("src");
-                lazyLoaderPrepare(iframe, [["src", "src"]]);
             }
         });
         return this.cheapdiv.innerHTML;
+    }
+    prepareLazyLoader() {
+        this.divref.current.querySelectorAll("img").forEach((img) => {
+            if (img.dataset.src) {
+                lazyLoaderPrepare(img, [["sizes", "sizes"], ["srcset", "srcset"], ["src", "src"]]);
+            }
+        });
+        this.divref.current.querySelectorAll("iframe").forEach((iframe) => {
+            if (iframe.dataset.src) {
+                lazyLoaderPrepare(iframe, [["src", "src"]]);
+            }
+        });
     }
     updateHTML(html) {
         this.setState({
@@ -142,12 +152,12 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
     }
     attachEvents() {
         this.divref.current.querySelectorAll("img").forEach((img) => {
-            if (!img.src.startsWith("blob:")) {
+            if (img.dataset.src) {
                 lazyloaderExecute(img);
             }
         });
         this.divref.current.querySelectorAll("iframe").forEach((iframe) => {
-            if (!iframe.src.startsWith("blob:")) {
+            if (iframe.dataset.src) {
                 lazyloaderExecute(iframe);
             }
         });
@@ -162,7 +172,12 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
         });
         triggerOldSchoolListeners();
     }
+    componentDidMount() {
+        this.prepareLazyLoader();
+        this.attachEvents();
+    }
     componentDidUpdate() {
+        this.prepareLazyLoader();
         this.attachEvents();
     }
     shouldComponentUpdate(nextProps, nextState) {

@@ -32,6 +32,8 @@ import { ConfigContext } from "../../providers/config-provider";
  * Expect these to be extended
  */
 export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
+  propertyId: string;
+
   label?: string;
   placeholder?: string;
   description?: string;

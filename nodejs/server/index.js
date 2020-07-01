@@ -204,17 +204,19 @@ function initializeApp(appData, custom) {
         res.sendFile(path_1.default.resolve(path_1.default.join("dist", "data", "service-worker.production.js")));
     });
     const router = express_1.default.Router();
-    Object.keys(appData.ssrConfig.ssrRules).forEach((url) => {
-        const rule = appData.ssrConfig.ssrRules[url];
-        const actualURL = url.startsWith("/") ? url : "/" + url;
-        router.get(actualURL, (req, res) => {
-            const mode = mode_1.getMode(appData, req);
-            if (mode === "development") {
-                generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, mode, rule);
-            }
-            else {
-                generator_1.ssrGenerator(req, res, appData.indexProduction, appData, mode, rule);
-            }
+    Object.keys(appData.ssrConfig.ssrRules).forEach((urlCombo) => {
+        const rule = appData.ssrConfig.ssrRules[urlCombo];
+        urlCombo.split(",").forEach((url) => {
+            const actualURL = url.startsWith("/") ? url : "/" + url;
+            router.get(actualURL, (req, res) => {
+                const mode = mode_1.getMode(appData, req);
+                if (mode === "development") {
+                    generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, mode, rule);
+                }
+                else {
+                    generator_1.ssrGenerator(req, res, appData.indexProduction, appData, mode, rule);
+                }
+            });
         });
     });
     app.use("/:lang", (req, res, next) => {

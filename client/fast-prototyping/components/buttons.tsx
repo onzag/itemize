@@ -35,10 +35,12 @@ export function SubmitButton(props: ISubmitButtonProps) {
           const status = await actioner.submit(props.options);
           props.onSubmit && props.onSubmit(status);
 
-          if (!status.error && props.redirectOnSuccess) {
+          if (!status.error && !props.redirectOnSuccess && props.redirectGoBack) {
+            goBack();
+          } else if (!status.error && props.redirectOnSuccess) {
             const redirectCalculated: string = typeof props.redirectOnSuccess === "string" ?
               props.redirectOnSuccess : props.redirectOnSuccess(status);
-            if(props.redirectGoBack) {
+            if (props.redirectGoBack) {
               goBack();
               setTimeout(() => {
                 localizedRedirectTo(redirectCalculated, null, props.redirectReplace);

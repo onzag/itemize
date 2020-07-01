@@ -518,6 +518,8 @@ export default class PropertyEntryLocation
 
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryLocationRendererProps = {
+      propertyId: this.props.property.getId(),
+
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
       label: i18nLabel,

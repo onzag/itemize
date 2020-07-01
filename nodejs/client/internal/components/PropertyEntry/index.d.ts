@@ -15,6 +15,7 @@ import { IConfigRawJSONDataType } from "../../../../config";
  * Expect these to be extended
  */
 export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
+    propertyId: string;
     label?: string;
     placeholder?: string;
     description?: string;

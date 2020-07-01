@@ -13,7 +13,7 @@ const server_1 = __importDefault(require("react-dom/server"));
 const ItemDefinition_1 = require("../../base/Root/Module/ItemDefinition");
 const basic_1 = require("../resolvers/basic");
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
-const MEMOIZED_ANSWERS = {};
+;
 async function ssrGenerator(req, res, html, appData, mode, rule) {
     // first we need a root instance, because this will be used
     // like an UI thread we need a clean instance from the pool
@@ -131,9 +131,17 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         // users, because they are different, only guests really matter, so we want
         // to drop the memId in such a case completely, no caching of speciifc user id answers
         // we don't want to memoize specific user answers
-        // they should be using the service worker at that point
         if (appliedRule.forUser.id) {
             appliedRule.memId = null;
+            if (appliedRule.collect) {
+                const isFindingCurrentUser = appliedRule.collect.some((collectionPoint) => collectionPoint[0] === "users" &&
+                    collectionPoint[1] === "user" &&
+                    collectionPoint[2] === appliedRule.forUser.id &&
+                    collectionPoint[3] === null);
+                if (!isFindingCurrentUser) {
+                    appliedRule.collect = [...appliedRule.collect, ["users", "user", appliedRule.forUser.id, null]];
+                }
+            }
         }
     }
     // now we start collecting the information
@@ -183,7 +191,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
                 collectionSignatureArray[index] = rowValue.last_modified;
             }
             // now we build the fileds for the given role access
-            const fields = idef.buildFieldsForRoleAccess(ItemDefinition_1.ItemDefinitionIOActions.READ, appliedRule.forUser.role, appliedRule.forUser.id, rowValue ? rowValue.created_by : constants_1.UNSPECIFIED_OWNER);
+            const fields = idef.buildFieldsForRoleAccess(ItemDefinition_1.ItemDefinitionIOActions.READ, appliedRule.forUser.role, appliedRule.forUser.id, rowValue ? (idef.isOwnerObjectId() ? rowValue.id : rowValue.created_by) : constants_1.UNSPECIFIED_OWNER);
             // and if we have fields at all, such user might not even have access to them at all
             // which is possible
             if (fields) {
@@ -213,16 +221,17 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
     // and we have a memoized answer for that memory id which matches
     // the collection signature
     if (!collectionFailed &&
-        appliedRule.memId &&
-        MEMOIZED_ANSWERS[appliedRule.memId] &&
-        MEMOIZED_ANSWERS[appliedRule.memId].collectionSignature === collectionSignature) {
-        // we are done just serve what is in memory and the chicken is done
-        res.setHeader("content-type", "text/html; charset=utf-8");
-        res.end(MEMOIZED_ANSWERS[appliedRule.memId].html);
-        // remember to clean before release, we don't want to pollute anything
-        root.cleanState();
-        appData.rootPool.release(root);
-        return;
+        appliedRule.memId) {
+        const memoizedAnswer = await appData.cache.getRaw("MEM." + appliedRule.memId);
+        if (memoizedAnswer && memoizedAnswer.value && memoizedAnswer.value.collectionSignature === collectionSignature) {
+            // we are done just serve what is in memory and the chicken is done
+            res.setHeader("content-type", "text/html; charset=utf-8");
+            res.end(memoizedAnswer.value.html);
+            // remember to clean before release, we don't want to pollute anything
+            root.cleanState();
+            appData.rootPool.release(root);
+            return;
+        }
     }
     // now we calculate the og fields that are final, given they can be functions
     // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
@@ -343,10 +352,12 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
     // if we have a valid memory id after all
     if (appliedRule.memId) {
         // we memoize our answer
-        MEMOIZED_ANSWERS[appliedRule.memId] = {
-            html: newHTML,
-            collectionSignature,
-        };
+        (async () => {
+            await appData.cache.setRaw("MEM." + appliedRule.memId, {
+                html: newHTML,
+                collectionSignature,
+            });
+        })();
     }
     // and finally answer the client
     res.setHeader("content-type", "text/html; charset=utf-8");

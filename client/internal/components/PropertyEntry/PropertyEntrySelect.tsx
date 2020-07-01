@@ -74,6 +74,8 @@ export default class PropertyEntrySelect
 
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntrySelectRendererProps = {
+      propertyId: this.props.property.getId(),
+
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
       label: i18nLabel,

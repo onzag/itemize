@@ -48,14 +48,12 @@ self.addEventListener("fetch", (event) => {
     }
     const shouldServeIndex = isOurHost &&
         urlAnalyzed.pathname.indexOf("/rest") !== 0;
-    const actualEventRequest = shouldServeIndex ?
-        new Request("/") : event.request;
-    const shouldBeCachedIfFound = (!isOurHost && (urlAnalyzed.searchParams.get("sw-cacheable") === "true" || actualEventRequest.headers.get("sw-cacheable") === "true")) ||
-        urlAnalyzed.pathname.indexOf("/rest/resource") === 0 ||
-        // in rare cases where index would have failed to cache
-        shouldServeIndex;
-    const shouldBeRechecked = (!isOurHost && (urlAnalyzed.searchParams.get("sw-recheck") === "true" || actualEventRequest.headers.get("sw-recheck") === "true"));
-    const acceptHeader = actualEventRequest.headers.get("Accept");
+    // const actualEventRequest: Request = shouldServeIndex ?
+    //   new Request("/") : event.request;
+    const shouldBeCachedIfFound = (!isOurHost && (urlAnalyzed.searchParams.get("sw-cacheable") === "true" || event.request.headers.get("sw-cacheable") === "true")) ||
+        urlAnalyzed.pathname.indexOf("/rest/resource") === 0;
+    const shouldBeRechecked = (!isOurHost && (urlAnalyzed.searchParams.get("sw-recheck") === "true" || event.request.headers.get("sw-recheck") === "true"));
+    const acceptHeader = event.request.headers.get("Accept");
     const expectsImage = acceptHeader && acceptHeader.indexOf("image") === 0;
     const isBuildNumberCheck = urlAnalyzed.pathname.indexOf("/rest/buildnumber") === 0;
     const currentBuildNumber = isBuildNumberCheck ? urlAnalyzed.searchParams.get("current") : null;
@@ -65,28 +63,30 @@ self.addEventListener("fetch", (event) => {
     // resources which are hard cached
     event.respondWith((async () => {
         try {
-            const cachedResponse = await caches.match(actualEventRequest);
+            // we don't even try to get the cache if it's one of our index paths, we will try
+            // network first
+            const cachedResponse = shouldServeIndex ? null : await caches.match(event.request);
             // if we get a match in our cache
             if (cachedResponse) {
                 // if it should be rechecked
                 if (shouldBeRechecked) {
                     // we basically run this fetch request, outside, notice
                     // how we don't return into it
-                    fetch(actualEventRequest).then((recheckedNetworkResponse) => {
+                    fetch(event.request).then((recheckedNetworkResponse) => {
                         // fetch it if we can, and if we get the right status code
                         if (recheckedNetworkResponse.status === 200 ||
                             recheckedNetworkResponse.status === 0) {
                             // then add to the cache
                             return caches.open(CACHE_NAME).then((cache) => {
-                                cache.put(actualEventRequest, recheckedNetworkResponse);
+                                cache.put(event.request, recheckedNetworkResponse);
                             });
                         }
                     }).catch(() => null);
                 }
-                console.log("Service worker cache hit for ", actualEventRequest.url);
+                console.log("Service worker cache hit for ", event.request.url);
                 return cachedResponse;
             }
-            const netWorkResponse = await fetch(actualEventRequest);
+            const netWorkResponse = await fetch(event.request);
             if (isBuildNumberCheck && netWorkResponse.status === 200) {
                 // we clone the response stream
                 const clonedResponse = netWorkResponse.clone();
@@ -101,6 +101,16 @@ self.addEventListener("fetch", (event) => {
                     // where index fails to cache will save us
                     await recreatedCache.addAll(urlsToCache);
                 }
+                // now for the index logic
+            }
+            else if (shouldServeIndex &&
+                netWorkResponse.status !== 200) {
+                console.log("invalid network response, using cached for index request");
+                const indexCached = await caches.match(new Request("/"));
+                if (indexCached) {
+                    console.log("Service worker cache hit for index request");
+                    return indexCached;
+                }
                 // resources are static, but they are language specific
                 // so we don't really precache those, for example, the
                 // build.en.json files and build.es.json files as well
@@ -110,10 +120,10 @@ self.addEventListener("fetch", (event) => {
             else if (shouldBeCachedIfFound &&
                 (netWorkResponse.status === 200 ||
                     netWorkResponse.status === 0)) {
-                console.log("caching request ", actualEventRequest.url);
+                console.log("caching request ", event.request.url);
                 const networkResponseClone = netWorkResponse.clone();
                 caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(actualEventRequest, networkResponseClone);
+                    cache.put(event.request, networkResponseClone);
                 }).catch((err) => {
                     console.warn("could not catch", err);
                 });
@@ -129,6 +139,19 @@ self.addEventListener("fetch", (event) => {
                 try {
                     const imageCachedResponse = await caches.match("/rest/resource/image-fail.svg");
                     return imageCachedResponse;
+                }
+                catch (err) {
+                    // Nothing happens
+                }
+            }
+            if (shouldServeIndex) {
+                try {
+                    console.log("network not available, using cached for index request");
+                    const indexCached = await caches.match(new Request("/"));
+                    if (indexCached) {
+                        console.log("Service worker cache hit for index request");
+                        return indexCached;
+                    }
                 }
                 catch (err) {
                     // Nothing happens

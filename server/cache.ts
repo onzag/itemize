@@ -70,20 +70,20 @@ export class Cache {
   }
 
   /**
-   * A private function that provides a cached value from its identifier
-   * @param idefQueryIdentifier the identifier
-   * @returns a promise with the sql value
+   * Provides a cached value from its identifier
+   * @param key the identifier
+   * @returns a promise with the value
    */
-  private getIdefCachedValue(
-    idefQueryIdentifier: string,
-  ): Promise<{value: ISQLTableRowValue}> {
+  public getRaw<T>(
+    key: string,
+  ): Promise<{value: T}> {
     logger.debug(
-      "Cache.getIdefCachedValue: requesting " + idefQueryIdentifier,
+      "Cache.getRaw: requesting " + key,
     );
     // we build the promise
     return new Promise((resolve) => {
       // and call redis, note how we never reject
-      this.redisClient.get(idefQueryIdentifier, (error, value) => {
+      this.redisClient.get(key, (error, value) => {
         // we just resolve to null if we have to
         if (value === null) {
           resolve(null);
@@ -96,10 +96,10 @@ export class Cache {
               value: JSON.parse(value),
             });
             // and poke the cache to reset the clock for expiration
-            this.pokeCache(idefQueryIdentifier);
+            this.pokeCache(key);
           } catch (err) {
             logger.error(
-              "Cache.getIdefCachedValue: could not JSON parse value from idef cache in " + idefQueryIdentifier,
+              "Cache.getRaw: could not JSON parse value from cache in " + key,
               value,
             );
             // resolve it to null in case of problem
@@ -107,7 +107,7 @@ export class Cache {
           }
         } else {
           logger.error(
-            "Cache.getIdefCachedValue: could not retrieve value from redis cache client for " + idefQueryIdentifier + " with error",
+            "Cache.getRaw: could not retrieve value from redis cache client for " + key + " with error",
             {
               errStack: error.stack,
               errMessage: error.message,
@@ -115,6 +115,28 @@ export class Cache {
           );
           // also here
           resolve(null);
+        }
+      });
+    });
+  }
+
+  public setRaw(key: string, value: any) {
+    logger.debug(
+      "Cache.setRaw: setting " + key,
+    );
+    return new Promise((resolve) => {
+      this.redisClient.set(key, JSON.stringify(value), (error) => {
+        resolve(value);
+        if (!error) {
+          this.pokeCache(key);
+        } else {
+          logger.error(
+            "Cache.forceCacheInto: could not set value for " + key + " with error",
+            {
+              errStack: error.stack,
+              errMessage: error.message,
+            },
+          );
         }
       });
     });
@@ -158,22 +180,7 @@ export class Cache {
       id: id,
       version: version || null,
     });
-    return new Promise((resolve) => {
-      this.redisClient.set(idefQueryIdentifier, JSON.stringify(value), (error) => {
-        resolve(value);
-        if (!error) {
-          this.pokeCache(idefQueryIdentifier);
-        } else {
-          logger.error(
-            "Cache.forceCacheInto: could not set value for " + idefQueryIdentifier + " with error",
-            {
-              errStack: error.stack,
-              errMessage: error.message,
-            },
-          );
-        }
-      });
-    });
+    return this.setRaw(idefQueryIdentifier, value);
   }
 
   /**
@@ -816,7 +823,7 @@ export class Cache {
 
     if (!refresh) {
       const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
-      const currentValue = await this.getIdefCachedValue(idefQueryIdentifier);
+      const currentValue = await this.getRaw<ISQLTableRowValue>(idefQueryIdentifier);
       if (currentValue) {
         return currentValue.value;
       }

@@ -16,12 +16,11 @@ import Root from "../../base/Root";
 
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
 
-const MEMOIZED_ANSWERS: {
-  [memId: string]: {
-    html: string,
-    collectionSignature: string,
-  }
-} = {}
+interface IMemoizedAnswer {
+  html: string,
+  collectionSignature: string,
+};
+
 export async function ssrGenerator(
   req: express.Request,
   res: express.Response,
@@ -163,9 +162,21 @@ export async function ssrGenerator(
     // users, because they are different, only guests really matter, so we want
     // to drop the memId in such a case completely, no caching of speciifc user id answers
     // we don't want to memoize specific user answers
-    // they should be using the service worker at that point
     if (appliedRule.forUser.id) {
       appliedRule.memId = null;
+
+      if (appliedRule.collect) {
+        const isFindingCurrentUser = appliedRule.collect.some(
+          (collectionPoint) =>
+            collectionPoint[0] === "users" &&
+            collectionPoint[1] === "user" &&
+            collectionPoint[2] === appliedRule.forUser.id &&
+            collectionPoint[3] === null
+          );
+        if (!isFindingCurrentUser) {
+          appliedRule.collect = [...appliedRule.collect, ["users", "user", appliedRule.forUser.id, null]];
+        }
+      }
     }
   }
 
@@ -229,7 +240,7 @@ export async function ssrGenerator(
           ItemDefinitionIOActions.READ,
           appliedRule.forUser.role,
           appliedRule.forUser.id,
-          rowValue ? rowValue.created_by : UNSPECIFIED_OWNER,
+          rowValue ? (idef.isOwnerObjectId() ? rowValue.id : rowValue.created_by) : UNSPECIFIED_OWNER,
         );
 
         // and if we have fields at all, such user might not even have access to them at all
@@ -267,18 +278,19 @@ export async function ssrGenerator(
   // the collection signature
   if (
     !collectionFailed &&
-    appliedRule.memId &&
-    MEMOIZED_ANSWERS[appliedRule.memId] &&
-    MEMOIZED_ANSWERS[appliedRule.memId].collectionSignature === collectionSignature
+    appliedRule.memId
   ) {
-    // we are done just serve what is in memory and the chicken is done
-    res.setHeader("content-type", "text/html; charset=utf-8");
-    res.end(MEMOIZED_ANSWERS[appliedRule.memId].html);
+    const memoizedAnswer = await appData.cache.getRaw<IMemoizedAnswer>("MEM." + appliedRule.memId);
+    if (memoizedAnswer && memoizedAnswer.value && memoizedAnswer.value.collectionSignature === collectionSignature) {
+      // we are done just serve what is in memory and the chicken is done
+      res.setHeader("content-type", "text/html; charset=utf-8");
+      res.end(memoizedAnswer.value.html);
 
-    // remember to clean before release, we don't want to pollute anything
-    root.cleanState();
-    appData.rootPool.release(root);
-    return;
+      // remember to clean before release, we don't want to pollute anything
+      root.cleanState();
+      appData.rootPool.release(root);
+      return;
+    }
   }
 
   // now we calculate the og fields that are final, given they can be functions
@@ -426,10 +438,12 @@ export async function ssrGenerator(
   // if we have a valid memory id after all
   if (appliedRule.memId) {
     // we memoize our answer
-    MEMOIZED_ANSWERS[appliedRule.memId] = {
-      html: newHTML,
-      collectionSignature,
-    };
+    (async () => {
+      await appData.cache.setRaw("MEM." + appliedRule.memId, {
+        html: newHTML,
+        collectionSignature,
+      })
+    })();
   }
 
   // and finally answer the client

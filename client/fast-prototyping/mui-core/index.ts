@@ -116,6 +116,7 @@ import CodeIcon from "@material-ui/icons/Code";
 import IconVisibilityOff from "@material-ui/icons/VisibilityOff";
 import IconVisibility from "@material-ui/icons/Visibility";
 import GpsFixedIcon from '@material-ui/icons/GpsFixed';
+import EditIcon from '@material-ui/icons/Edit';
 
 export {
   Tooltip,
@@ -235,4 +236,5 @@ export {
   IconVisibilityOff,
   IconVisibility,
   GpsFixedIcon,
+  EditIcon,
 }

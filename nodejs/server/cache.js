@@ -51,16 +51,16 @@ class Cache {
         this.listener = listener;
     }
     /**
-     * A private function that provides a cached value from its identifier
-     * @param idefQueryIdentifier the identifier
-     * @returns a promise with the sql value
+     * Provides a cached value from its identifier
+     * @param key the identifier
+     * @returns a promise with the value
      */
-    getIdefCachedValue(idefQueryIdentifier) {
-        _1.logger.debug("Cache.getIdefCachedValue: requesting " + idefQueryIdentifier);
+    getRaw(key) {
+        _1.logger.debug("Cache.getRaw: requesting " + key);
         // we build the promise
         return new Promise((resolve) => {
             // and call redis, note how we never reject
-            this.redisClient.get(idefQueryIdentifier, (error, value) => {
+            this.redisClient.get(key, (error, value) => {
                 // we just resolve to null if we have to
                 if (value === null) {
                     resolve(null);
@@ -73,21 +73,38 @@ class Cache {
                             value: JSON.parse(value),
                         });
                         // and poke the cache to reset the clock for expiration
-                        this.pokeCache(idefQueryIdentifier);
+                        this.pokeCache(key);
                     }
                     catch (err) {
-                        _1.logger.error("Cache.getIdefCachedValue: could not JSON parse value from idef cache in " + idefQueryIdentifier, value);
+                        _1.logger.error("Cache.getRaw: could not JSON parse value from cache in " + key, value);
                         // resolve it to null in case of problem
                         resolve(null);
                     }
                 }
                 else {
-                    _1.logger.error("Cache.getIdefCachedValue: could not retrieve value from redis cache client for " + idefQueryIdentifier + " with error", {
+                    _1.logger.error("Cache.getRaw: could not retrieve value from redis cache client for " + key + " with error", {
                         errStack: error.stack,
                         errMessage: error.message,
                     });
                     // also here
                     resolve(null);
+                }
+            });
+        });
+    }
+    setRaw(key, value) {
+        _1.logger.debug("Cache.setRaw: setting " + key);
+        return new Promise((resolve) => {
+            this.redisClient.set(key, JSON.stringify(value), (error) => {
+                resolve(value);
+                if (!error) {
+                    this.pokeCache(key);
+                }
+                else {
+                    _1.logger.error("Cache.forceCacheInto: could not set value for " + key + " with error", {
+                        errStack: error.stack,
+                        errMessage: error.message,
+                    });
                 }
             });
         });
@@ -120,20 +137,7 @@ class Cache {
             id: id,
             version: version || null,
         });
-        return new Promise((resolve) => {
-            this.redisClient.set(idefQueryIdentifier, JSON.stringify(value), (error) => {
-                resolve(value);
-                if (!error) {
-                    this.pokeCache(idefQueryIdentifier);
-                }
-                else {
-                    _1.logger.error("Cache.forceCacheInto: could not set value for " + idefQueryIdentifier + " with error", {
-                        errStack: error.stack,
-                        errMessage: error.message,
-                    });
-                }
-            });
-        });
+        return this.setRaw(idefQueryIdentifier, value);
     }
     /**
      * Request the creation of a new item definition value for an specific item definition
@@ -540,7 +544,7 @@ class Cache {
             moduleTable + " for id " + id + " and version " + version + " with refresh " + !!refresh);
         if (!refresh) {
             const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
-            const currentValue = await this.getIdefCachedValue(idefQueryIdentifier);
+            const currentValue = await this.getRaw(idefQueryIdentifier);
             if (currentValue) {
                 return currentValue.value;
             }

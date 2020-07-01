@@ -47,11 +47,14 @@ export declare class Cache {
      */
     setListener(listener: Listener): void;
     /**
-     * A private function that provides a cached value from its identifier
-     * @param idefQueryIdentifier the identifier
-     * @returns a promise with the sql value
+     * Provides a cached value from its identifier
+     * @param key the identifier
+     * @returns a promise with the value
      */
-    private getIdefCachedValue;
+    getRaw<T>(key: string): Promise<{
+        value: T;
+    }>;
+    setRaw(key: string, value: any): Promise<unknown>;
     /**
      * Resets the expiration clock of a given identifier
      * @param keyIdentifier the identifier

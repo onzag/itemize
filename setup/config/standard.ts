@@ -56,7 +56,7 @@ export async function standardConfigSetup(
       {
         variableName: "fontUrl",
         message: "Specify an url to a font to be the default font for your app, local values are valid, as in /rest/resource/font.css",
-        defaultValue: "https://fonts.googleapis.com/css?family=Open+Sans:300,400,500&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese",
+        defaultValue: "https://fonts.googleapis.com/css?family=Open+Sans:300,400,500&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese&sw-cacheable=true",
       },
       {
         variableName: "fontName",

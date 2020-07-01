@@ -3,7 +3,6 @@ import {
   MenuItem,
   InputAdornment,
   IconButton,
-  ThemeProvider,
   Typography,
   FormControl,
   InputLabel,
@@ -17,7 +16,6 @@ import {
   RestoreIcon,
 } from "../../mui-core";
 import { IPropertyEntrySelectRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntrySelect";
-import uuid from "uuid";
 
 function shouldShowInvalid(props: IPropertyEntrySelectRendererProps) {
   return !props.currentValid;
@@ -93,12 +91,9 @@ interface IPropertyEntrySelectRendererWithStylesProps extends IPropertyEntrySele
 class ActualPropertyEntrySelectRenderer
   extends React.Component<IPropertyEntrySelectRendererWithStylesProps> {
 
-  private uuid: string;
-
   constructor(props: IPropertyEntrySelectRendererWithStylesProps) {
     super(props);
 
-    this.uuid = uuid.v4();
     this.onChange = this.onChange.bind(this);
   }
 
@@ -156,7 +151,7 @@ class ActualPropertyEntrySelectRenderer
           className={this.props.classes.entry}
         >
           <InputLabel
-            htmlFor={this.uuid}
+            htmlFor={this.props.propertyId}
             classes={{
               root: this.props.classes.label,
               focused: "focused",
@@ -176,7 +171,7 @@ class ActualPropertyEntrySelectRenderer
             }}
             input={
               <FilledInput
-                id={this.uuid}
+                id={this.props.propertyId}
                 placeholder={this.props.placeholder}
                 endAdornment={addornment}
                 classes={{

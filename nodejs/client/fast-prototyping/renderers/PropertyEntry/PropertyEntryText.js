@@ -283,7 +283,7 @@ exports.style = mui_core_1.createStyles({
         boxShadow: "none",
         resize: "none",
         padding: "12px 15px",
-        fontFamily: "'" + window.FONT_NAME + "', sans-serif",
+        // fontFamily: "'" + (window as any).FONT_NAME + "', sans-serif",
         fontSize: "1rem",
         overflow: "hidden",
     }
