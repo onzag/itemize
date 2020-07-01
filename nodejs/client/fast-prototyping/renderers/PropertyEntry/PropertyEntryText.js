@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("../../../internal/theme/quill.scss");
 const react_1 = __importDefault(require("react"));
 const mui_core_1 = require("../../mui-core");
-const uuid_1 = __importDefault(require("uuid"));
 const util_1 = require("../../../../util");
 const constants_1 = require("../../../../constants");
 const dialog_1 = require("../../components/dialog");
@@ -342,7 +341,6 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
             rawMode: false,
             isReadyToType: false,
         };
-        this.uuid = "uuid-" + uuid_1.default.v4();
         this.inputImageRef = react_1.default.createRef();
         this.quillRef = react_1.default.createRef();
         this.textAreaRef = react_1.default.createRef();
@@ -367,7 +365,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         this.toggleRawMode = this.toggleRawMode.bind(this);
         this.cachedModuleOptionsRich = {
             toolbar: {
-                container: "#" + this.uuid,
+                container: "#" + this.props.propertyId,
                 handlers: {
                     image: this.customImageHandler,
                     video: this.customVideoHandler,
@@ -643,9 +641,9 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
                 react_1.default.createElement("div", null, this.state.invalidVideoLink ? this.props.i18nLoadVideo.invalid : null)))) : null;
         const fileLoadErrorDialog = (this.props.supportsImages || this.props.supportsFiles) ? (react_1.default.createElement(dialog_1.Dialog, { fullScreen: false, open: !!this.props.lastLoadedFileError, onClose: this.props.dismissLastLoadedFileError, title: util_1.capitalize(this.props.i18nGenericError), buttons: react_1.default.createElement(mui_core_1.Button, { onClick: this.props.dismissLastLoadedFileError }, util_1.capitalize(this.props.i18nOk)) },
             react_1.default.createElement(mui_core_1.Typography, null, this.props.lastLoadedFileError))) : null;
-        const quill = this.state.isReadyToType ? (react_1.default.createElement(react_1.default.Fragment, null,
-            react_1.default.createElement(RichTextEditorToolbar, { id: this.uuid, i18n: this.props.i18nFormat, supportsImages: this.props.supportsImages, supportsFiles: this.props.supportsFiles, supportsVideos: this.props.supportsVideos, supportsBasicMode: true, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }),
-            react_1.default.createElement(ReactQuill, { ref: this.quillRef, className: this.props.classes.quill + (this.state.focused ? " focused" : ""), modules: this.cachedModuleOptionsRich, formats: CACHED_FORMATS_RICH, theme: null, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onChange: this.onChange, beforeChange: this.beforeChange, onFocus: this.onFocus, onBlur: this.onBlur, disableClipboardMatchersOnUpdate: CACHED_CLIPBOARD_MATCHERS, readOnly: this.props.disabled }))) : null;
+        const quill = react_1.default.createElement(react_1.default.Fragment, null,
+            react_1.default.createElement(RichTextEditorToolbar, { id: this.props.propertyId, i18n: this.props.i18nFormat, supportsImages: this.props.supportsImages, supportsFiles: this.props.supportsFiles, supportsVideos: this.props.supportsVideos, supportsBasicMode: true, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }),
+            this.state.isReadyToType ? react_1.default.createElement(ReactQuill, { ref: this.quillRef, className: this.props.classes.quill + (this.state.focused ? " focused" : ""), modules: this.cachedModuleOptionsRich, formats: CACHED_FORMATS_RICH, theme: null, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onChange: this.onChange, beforeChange: this.beforeChange, onFocus: this.onFocus, onBlur: this.onBlur, disableClipboardMatchersOnUpdate: CACHED_CLIPBOARD_MATCHERS, readOnly: this.props.disabled }) : null);
         // we return the component, note how we set the thing to focused
         return (react_1.default.createElement("div", { className: this.props.classes.container },
             this.props.description && descriptionAsAlert ?
@@ -663,7 +661,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
                     util_1.capitalize(this.props.label),
                     iconComponent),
                 this.props.isRichText && !this.state.rawMode ? quill : (react_1.default.createElement(react_1.default.Fragment, null,
-                    this.props.isRichText && this.props.args.supportsRawMode ? react_1.default.createElement(RichTextEditorToolbar, { id: this.uuid + "-raw-mode-only", i18n: this.props.i18nFormat, supportsImages: false, supportsFiles: false, supportsVideos: false, supportsBasicMode: false, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }) : null,
+                    this.props.isRichText && this.props.args.supportsRawMode ? react_1.default.createElement(RichTextEditorToolbar, { id: this.props.propertyId + "-raw-mode-only", i18n: this.props.i18nFormat, supportsImages: false, supportsFiles: false, supportsVideos: false, supportsBasicMode: false, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }) : null,
                     react_1.default.createElement("div", { className: this.props.classes.quill + (this.state.focused ? " focused" : "") },
                         react_1.default.createElement(util_2.SlowLoadingElement, { id: "textarea", onMount: this.focusIfNecessary },
                             react_1.default.createElement(react_textarea_autosize_1.default, { ref: this.textAreaRef, className: this.props.classes.rawTextArea, onChange: this.onChangeByTextarea, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onFocus: this.onFocus, onBlur: this.onBlur, disabled: this.props.disabled })))))),

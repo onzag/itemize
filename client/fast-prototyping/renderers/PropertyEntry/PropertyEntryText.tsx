@@ -7,7 +7,6 @@ import { InputLabel, IconButton, Typography, RestoreIcon, ClearIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
   FormatBoldIcon, CodeIcon } from "../../mui-core";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
-import uuid from "uuid";
 
 import { capitalize, mimeTypeToExtension } from "../../../../util";
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
@@ -508,7 +507,6 @@ function collapseToPlainTextMatcher(node: Node) {
 
 class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRendererWithStylesProps, IPropertyEntryTextRendererState> {
   // this one also gets an uuid
-  private uuid: string;
   private inputImageRef: React.RefObject<HTMLInputElement>;
   private fileInputRef: React.RefObject<HTMLInputElement>;
 
@@ -531,7 +529,6 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       isReadyToType: false,
     };
 
-    this.uuid =  "uuid-" + uuid.v4();
     this.inputImageRef = React.createRef();
     this.quillRef = React.createRef();
     this.textAreaRef = React.createRef();
@@ -558,7 +555,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
     this.cachedModuleOptionsRich = {
       toolbar: {
-        container: "#" + this.uuid,
+        container: "#" + this.props.propertyId,
         handlers: {
           image: this.customImageHandler,
           video: this.customVideoHandler,
@@ -923,36 +920,34 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       </Dialog>
     ) : null;
 
-    const quill = this.state.isReadyToType ? (
-      <>
-        <RichTextEditorToolbar
-          id={this.uuid}
-          i18n={this.props.i18nFormat}
-          supportsImages={this.props.supportsImages}
-          supportsFiles={this.props.supportsFiles}
-          supportsVideos={this.props.supportsVideos}
-          supportsBasicMode={true}
-          className={this.props.classes.toolbar}
-          supportsRawMode={this.props.args.supportsRawMode}
-          onToggleRawMode={this.toggleRawMode}
-        />
-        <ReactQuill
-          ref={this.quillRef}
-          className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
-          modules={this.cachedModuleOptionsRich}
-          formats={CACHED_FORMATS_RICH}
-          theme={null}
-          placeholder={capitalize(this.props.placeholder)}
-          value={editorValue}
-          onChange={this.onChange}
-          beforeChange={this.beforeChange}
-          onFocus={this.onFocus}
-          onBlur={this.onBlur}
-          disableClipboardMatchersOnUpdate={CACHED_CLIPBOARD_MATCHERS}
-          readOnly={this.props.disabled}
-        />
-      </>
-    ) : null;
+    const quill = <>
+      <RichTextEditorToolbar
+        id={this.props.propertyId}
+        i18n={this.props.i18nFormat}
+        supportsImages={this.props.supportsImages}
+        supportsFiles={this.props.supportsFiles}
+        supportsVideos={this.props.supportsVideos}
+        supportsBasicMode={true}
+        className={this.props.classes.toolbar}
+        supportsRawMode={this.props.args.supportsRawMode}
+        onToggleRawMode={this.toggleRawMode}
+      />
+      {this.state.isReadyToType ? <ReactQuill
+        ref={this.quillRef}
+        className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
+        modules={this.cachedModuleOptionsRich}
+        formats={CACHED_FORMATS_RICH}
+        theme={null}
+        placeholder={capitalize(this.props.placeholder)}
+        value={editorValue}
+        onChange={this.onChange}
+        beforeChange={this.beforeChange}
+        onFocus={this.onFocus}
+        onBlur={this.onBlur}
+        disableClipboardMatchersOnUpdate={CACHED_CLIPBOARD_MATCHERS}
+        readOnly={this.props.disabled}
+      /> : null}
+    </>;
 
     // we return the component, note how we set the thing to focused
     return (
@@ -986,7 +981,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
             this.props.isRichText && !this.state.rawMode ? quill : (
               <>
                 {this.props.isRichText && this.props.args.supportsRawMode ? <RichTextEditorToolbar
-                  id={this.uuid + "-raw-mode-only"}
+                  id={this.props.propertyId + "-raw-mode-only"}
                   i18n={this.props.i18nFormat}
                   supportsImages={false}
                   supportsFiles={false}

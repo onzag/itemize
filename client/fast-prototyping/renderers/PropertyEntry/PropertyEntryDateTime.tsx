@@ -7,7 +7,7 @@ import {
   TimePicker,
   KeyboardTimePicker,
 } from "@material-ui/pickers";
-import { Alert, Typography, createStyles, WithStyles, withStyles } from "../../mui-core";
+import { Alert, Typography, createStyles, WithStyles, withStyles, TextField } from "../../mui-core";
 import { getLocalizedDateFormat, getLocalizedTimeFormat, getLocalizedDateTimeFormat } from "../../../../util";
 import { IPropertyEntryDateTimeRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryDateTime";
 
@@ -88,13 +88,9 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
     // TODO autofocus
   }, []);
 
-  if (!isReady) {
-    return null;
-  }
-
   // setting up the component
   let component = null;
-  if (props.type === "date") {
+  if (isReady && props.type === "date") {
     // let's extract the locale format from moment for a long date
     const L = getLocalizedDateFormat();
     const basicProps = {
@@ -142,7 +138,7 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
         <DatePicker {...basicProps} />
       );
     }
-  } else if (props.type === "datetime") {
+  } else if (isReady && props.type === "datetime") {
     // let's use the long format with the time format
     const LLT = getLocalizedDateTimeFormat();
     const basicProps = {
@@ -191,7 +187,7 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
         <DateTimePicker {...basicProps} />
       );
     }
-  } else if (props.type === "time") {
+  } else if (isReady && props.type === "time") {
     // and the time only
     const LT = getLocalizedTimeFormat();
     const basicProps = {
@@ -240,6 +236,31 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
         <TimePicker {...basicProps} />
       );
     }
+  } else {
+    // it's not ready let's make a textfield instead this
+    // is some form of pretty placeholder
+    component = (
+      <TextField
+        disabled={props.disabled}
+        InputProps={{
+          classes: {
+            root: props.classes.fieldInput,
+            focused: "focused",
+          },
+        }}
+        InputLabelProps={{
+          classes: {
+            root: props.classes.label,
+            focused: "focused",
+          },
+        }}
+        fullWidth={true}
+        label={props.label}
+        placeholder={props.placeholder}
+        variant="filled"
+        className={props.classes.entry}
+      />
+    )
   }
 
   const descriptionAsAlert = props.args["descriptionAsAlert"];

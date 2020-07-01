@@ -1,20 +1,13 @@
 import React from "react";
 import Link from "../../../components/navigation/Link";
 import { SwipeableDrawer, List, Divider, ListItem, ListItemIcon,
-  ListItemText, createStyles, WithStyles, withStyles,
-  LibraryBooksIcon, HomeIcon, ImportantDevicesIcon } from "../../mui-core";
+  ListItemText, createStyles, WithStyles, withStyles } from "../../mui-core";
 import { ModuleProvider } from "../../../providers/module";
 import AppLanguageRetriever from "../../../components/localization/AppLanguageRetriever";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
-import I18nRead from "../../../components/localization/I18nRead";
+import I18nRead, { II18nReadProps } from "../../../components/localization/I18nRead";
 import LocationReader from "../../../components/navigation/LocationReader";
 import { NoStateItemDefinitionProvider } from "../../../providers/item-definition";
-
-interface MenuProps {
-  isOpen: boolean;
-  onOpen: () => void;
-  onClose: () => void;
-}
 
 const menuStyles = createStyles({
   list: {
@@ -26,7 +19,61 @@ const menuStyles = createStyles({
   },
 });
 
-interface MenuPropsWithStyles extends WithStyles<typeof menuStyles>, MenuProps {
+export interface MenuEntry {
+  path: string;
+  icon: React.ReactNode,
+  module?: string,
+  idef?: string,
+  i18nProps: II18nReadProps,
+}
+
+interface MenuPropsWithStyles extends WithStyles<typeof menuStyles> {
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  adminEntries: MenuEntry[];
+  entries: MenuEntry[];
+}
+
+function buildEntryFromList(entries: MenuEntry[], className: string) {
+  return entries.map((entry) => {
+    let i18nNodeInfo: React.ReactNode = null;
+    if (entry.idef && entry.module) {
+      i18nNodeInfo = 
+        (
+          <ModuleProvider module={entry.module}>
+            <NoStateItemDefinitionProvider itemDefinition={entry.idef}>
+              <I18nRead {...entry.i18nProps} />
+            </NoStateItemDefinitionProvider>
+          </ModuleProvider>
+        );
+    } else if (entry.module) {
+      i18nNodeInfo =
+        (
+          <ModuleProvider module={entry.module}>
+            <I18nRead {...entry.i18nProps} />
+          </ModuleProvider>
+        );
+    } else {
+      i18nNodeInfo = <I18nRead {...entry.i18nProps} />;
+    }
+    return (
+      <Link to={entry.path} className={className} propagateClicks={true} key={entry.path}>
+        <LocationReader>
+          {(arg) => (
+            <ListItem button={true} selected={arg.pathname === entry.path}>
+              <ListItemIcon>
+                {entry.icon}
+              </ListItemIcon>
+              <ListItemText>
+                {i18nNodeInfo}
+              </ListItemText>
+            </ListItem>
+          )}
+        </LocationReader>
+      </Link>
+    );
+  })
 }
 
 export const Menu = withStyles(menuStyles)((props: MenuPropsWithStyles) => {
@@ -46,68 +93,24 @@ export const Menu = withStyles(menuStyles)((props: MenuPropsWithStyles) => {
             onClick={props.onClose}
             onKeyDown={props.onClose}
           >
-            <UserDataRetriever>
-              {(userData) => {
-                if (userData.role === "ADMIN") {
-                  return (
-                    <>
-                      <List>
-                        <Link to="/cms" className={props.classes.listLink} propagateClicks={true}>
-                          <LocationReader>
-                            {(arg) => (
-                              <ListItem button={true} selected={arg.pathname === "/cms"}>
-                                <ListItemIcon>
-                                  <ImportantDevicesIcon />
-                                </ListItemIcon>
-                                <ModuleProvider module="cms">
-                                  <ListItemText>
-                                    <I18nRead id="name" capitalize={true} />
-                                  </ListItemText>
-                                </ModuleProvider>
-                              </ListItem>
-                            )}
-                          </LocationReader>
-                        </Link>
-                      </List>
-                      <Divider />
-                    </>
-                  )
-                }
-              }}
-            </UserDataRetriever>
+            {props.adminEntries.length ? (
+              <UserDataRetriever>
+                {(userData) => {
+                  if (userData.role === "ADMIN") {
+                    return (
+                      <>
+                        <List>
+                          {buildEntryFromList(props.adminEntries, props.classes.listLink)}
+                        </List>
+                        <Divider />
+                      </>
+                    )
+                  }
+                }}
+              </UserDataRetriever>
+            ) : null}
             <List>
-              <Link to="/" className={props.classes.listLink} propagateClicks={true}>
-                <LocationReader>
-                  {(arg) => (
-                    <ListItem button={true} selected={arg.pathname === "/"}>
-                      <ListItemIcon>
-                        <HomeIcon />
-                      </ListItemIcon>
-                      <ListItemText>
-                        <I18nRead id="home" capitalize={true} />
-                      </ListItemText>
-                    </ListItem>
-                  )}
-                </LocationReader>
-              </Link>
-              <Link to="/news" className={props.classes.listLink} propagateClicks={true}>
-                <LocationReader>
-                  {(arg) => (
-                    <ListItem button={true} selected={arg.pathname === "/news"}>
-                      <ListItemIcon>
-                        <LibraryBooksIcon />
-                      </ListItemIcon>
-                      <ListItemText>
-                        <ModuleProvider module="cms">
-                          <NoStateItemDefinitionProvider itemDefinition="article">
-                            <I18nRead id="news" capitalize={true} />
-                          </NoStateItemDefinitionProvider>
-                        </ModuleProvider>
-                      </ListItemText>
-                    </ListItem>
-                  )}
-                </LocationReader>
-              </Link>
+              {buildEntryFromList(props.entries, props.classes.listLink)}
             </List>
           </div>
         </SwipeableDrawer>

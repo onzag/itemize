@@ -49,6 +49,37 @@ const navbarStyles = (theme) => mui_core_1.createStyles({
         display: "inline-block",
     }
 });
+const defaultMenuAdminEntries = [
+    {
+        path: "/cms",
+        icon: react_1.default.createElement(mui_core_1.ImportantDevicesIcon, null),
+        module: "cms",
+        i18nProps: {
+            id: "name",
+            capitalize: true,
+        },
+    },
+];
+const defaultMenuEntries = [
+    {
+        path: "/",
+        icon: react_1.default.createElement(mui_core_1.HomeIcon, null),
+        i18nProps: {
+            id: "home",
+            capitalize: true,
+        },
+    },
+    {
+        path: "/news",
+        icon: react_1.default.createElement(mui_core_1.LibraryBooksIcon, null),
+        module: "cms",
+        idef: "article",
+        i18nProps: {
+            id: "home",
+            capitalize: true,
+        },
+    },
+];
 exports.Navbar = mui_core_1.withStyles(navbarStyles)((props) => {
     const [isOutdatedDialogAllowedToBeOpen, setIsOutdatedDialogAllowedToBeOpen] = react_1.useState(true);
     const [isMenuOpen, setMenuOpen] = react_1.useState(false);
@@ -78,5 +109,5 @@ exports.Navbar = mui_core_1.withStyles(navbarStyles)((props) => {
         react_1.default.createElement("div", { className: props.classes.appBarSpacer }),
         react_1.default.createElement(blocking_backdrop_1.BlockingBackdrop, { exclude: props.excludeBlockingBackdrop }),
         react_1.default.createElement(outdated_dialog_1.OutdatedDialog, { isOpenIfOutdated: isOutdatedDialogAllowedToBeOpen, onClose: setIsOutdatedDialogAllowedToBeOpen.bind(this, false) }),
-        react_1.default.createElement(menu_1.Menu, { isOpen: isMenuOpen, onClose: setMenuOpen.bind(this, false), onOpen: setMenuOpen.bind(this, true) })));
+        react_1.default.createElement(menu_1.Menu, { isOpen: isMenuOpen, onClose: setMenuOpen.bind(this, false), onOpen: setMenuOpen.bind(this, true), adminEntries: props.menuAdminEntries || defaultMenuAdminEntries, entries: props.menuEntries || defaultMenuEntries })));
 });

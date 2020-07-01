@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { AppBar, Toolbar, IconButton, createStyles, WithStyles, withStyles, Theme, Typography, MenuIcon } from "../../mui-core";
+import { AppBar, Toolbar, IconButton, createStyles, WithStyles, withStyles, Theme, Typography, MenuIcon,
+  ImportantDevicesIcon, LibraryBooksIcon, HomeIcon } from "../../mui-core";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import { OutdatedText } from "./outdated-text";
@@ -7,7 +8,7 @@ import { Buttons } from "./buttons";
 import { ExternalDialogs } from "./external-dialogs";
 import { BlockingBackdrop } from "./blocking-backdrop";
 import { OutdatedDialog } from "./outdated-dialog";
-import { Menu } from "./menu";
+import { Menu, MenuEntry } from "./menu";
 import I18nRead from "../../../components/localization/I18nRead";
 import TitleReader from "../../../components/util/TitleReader";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
@@ -45,7 +46,42 @@ interface INavbarProps extends WithStyles<typeof navbarStyles> {
   LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void, onRecoverRequest: () => void}>,
   SignupDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
   RecoverDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
+  menuAdminEntries?: MenuEntry[];
+  menuEntries?: MenuEntry[];
 }
+
+const defaultMenuAdminEntries: MenuEntry[] = [
+  {
+    path: "/cms",
+    icon: <ImportantDevicesIcon/>,
+    module: "cms",
+    i18nProps: {
+      id: "name",
+      capitalize: true,
+    },
+  },
+]
+
+const defaultMenuEntries: MenuEntry[] = [
+  {
+    path: "/",
+    icon: <HomeIcon />,
+    i18nProps: {
+      id: "home",
+      capitalize: true,
+    },
+  },
+  {
+    path: "/news",
+    icon: <LibraryBooksIcon />,
+    module: "cms",
+    idef: "article",
+    i18nProps: {
+      id: "home",
+      capitalize: true,
+    },
+  },
+]
 
 export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
   const [isOutdatedDialogAllowedToBeOpen, setIsOutdatedDialogAllowedToBeOpen] = useState(true);
@@ -110,7 +146,13 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
         isOpenIfOutdated={isOutdatedDialogAllowedToBeOpen}
         onClose={setIsOutdatedDialogAllowedToBeOpen.bind(this, false)}
       />
-      <Menu isOpen={isMenuOpen} onClose={setMenuOpen.bind(this, false)} onOpen={setMenuOpen.bind(this, true)}/>
+      <Menu
+        isOpen={isMenuOpen}
+        onClose={setMenuOpen.bind(this, false)}
+        onOpen={setMenuOpen.bind(this, true)}
+        adminEntries={props.menuAdminEntries || defaultMenuAdminEntries}
+        entries={props.menuEntries || defaultMenuEntries}
+      />
     </>
   );
 });

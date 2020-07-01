@@ -83,12 +83,9 @@ const PropertyEntryDateTimeRenderer = mui_core_1.withStyles(exports.style)((prop
         setReady(true);
         // TODO autofocus
     }, []);
-    if (!isReady) {
-        return null;
-    }
     // setting up the component
     let component = null;
-    if (props.type === "date") {
+    if (isReady && props.type === "date") {
         // let's extract the locale format from moment for a long date
         const L = util_1.getLocalizedDateFormat();
         const basicProps = {
@@ -130,7 +127,7 @@ const PropertyEntryDateTimeRenderer = mui_core_1.withStyles(exports.style)((prop
             component = (react_1.default.createElement(pickers_1.DatePicker, Object.assign({}, basicProps)));
         }
     }
-    else if (props.type === "datetime") {
+    else if (isReady && props.type === "datetime") {
         // let's use the long format with the time format
         const LLT = util_1.getLocalizedDateTimeFormat();
         const basicProps = {
@@ -173,7 +170,7 @@ const PropertyEntryDateTimeRenderer = mui_core_1.withStyles(exports.style)((prop
             component = (react_1.default.createElement(pickers_1.DateTimePicker, Object.assign({}, basicProps)));
         }
     }
-    else if (props.type === "time") {
+    else if (isReady && props.type === "time") {
         // and the time only
         const LT = util_1.getLocalizedTimeFormat();
         const basicProps = {
@@ -215,6 +212,21 @@ const PropertyEntryDateTimeRenderer = mui_core_1.withStyles(exports.style)((prop
         else {
             component = (react_1.default.createElement(pickers_1.TimePicker, Object.assign({}, basicProps)));
         }
+    }
+    else {
+        // it's not ready let's make a textfield instead this
+        // is some form of pretty placeholder
+        component = (react_1.default.createElement(mui_core_1.TextField, { disabled: props.disabled, InputProps: {
+                classes: {
+                    root: props.classes.fieldInput,
+                    focused: "focused",
+                },
+            }, InputLabelProps: {
+                classes: {
+                    root: props.classes.label,
+                    focused: "focused",
+                },
+            }, fullWidth: true, label: props.label, placeholder: props.placeholder, variant: "filled", className: props.classes.entry }));
     }
     const descriptionAsAlert = props.args["descriptionAsAlert"];
     // return it
