@@ -35,6 +35,7 @@ import {
   ERROR_EVENT,
   IErrorEvent,
   KICKED_EVENT,
+  CURRENCY_FACTORS_UPDATED_EVENT,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 
@@ -71,8 +72,9 @@ export class RemoteListener {
   // private initialConsideredDisconnectedIfNoAnswerTimeout: NodeJS.Timeout;
   private token: string = null;
   private isReady: boolean = false;
-  private isReadyCallbacks: Array<[string, any[]]> = [];
   private logout: () => void;
+
+  private currencyFactorsHandler: () => void;
 
   constructor(root: Root) {
     this.reattachListeners = this.reattachListeners.bind(this);
@@ -82,6 +84,8 @@ export class RemoteListener {
     this.onRecordsAddedToOwnedSearch = this.onRecordsAddedToOwnedSearch.bind(this);
     this.onRecordsAddedToParentedSearch = this.onRecordsAddedToParentedSearch.bind(this);
     this.onKicked = this.onKicked.bind(this);
+    this.setCurrencyFactorsHandler = this.setCurrencyFactorsHandler.bind(this);
+    this.triggerCurrencyFactorsHandler = this.triggerCurrencyFactorsHandler.bind(this);
 
     this.root = root;
     this.listeners = {};
@@ -106,7 +110,14 @@ export class RemoteListener {
     this.socket.on(BUILDNUMBER_EVENT, this.onBuildnumberListened);
     this.socket.on(OWNED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToOwnedSearch);
     this.socket.on(PARENTED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToParentedSearch);
-    this.socket.on(ERROR_EVENT, this.onError)
+    this.socket.on(ERROR_EVENT, this.onError);
+    this.socket.on(CURRENCY_FACTORS_UPDATED_EVENT, this.triggerCurrencyFactorsHandler);
+  }
+  public triggerCurrencyFactorsHandler() {
+    this.currencyFactorsHandler();
+  }
+  public setCurrencyFactorsHandler(handler: () => void) {
+    this.currencyFactorsHandler = handler;
   }
   public setLogoutHandler(logout: () => void) {
     this.logout = logout;
@@ -126,9 +137,8 @@ export class RemoteListener {
       console.error(event.request);
     }
   }
-  public setToken(token: string) {
+  public async setToken(token: string) {
     this.token = token;
-    this.isReady = true;
     if (this.socket.connected) {
       this.socket.emit(
         IDENTIFY_REQUEST,
@@ -137,6 +147,8 @@ export class RemoteListener {
           token: this.token,
         },
       );
+      await this.onIdentificationDone();
+      this.isReady = true;
     }
   }
   public onBuildnumberListened(build: IBuildNumberEvent) {
@@ -205,88 +217,77 @@ export class RemoteListener {
 
     this.attachItemDefinitionListenerFor(request);
   }
-  public attachItemDefinitionListenerFor(request: IRegisterRequest) {
-    if (!this.isReady) {
-      this.isReadyCallbacks.push(
-        [
-          "attachItemDefinitionListenerFor",
-          [request],
-        ],
-      );
-      return;
-    }
+  public async attachItemDefinitionListenerFor(request: IRegisterRequest) {
     if (this.socket.connected) {
-      this.socket.emit(
-        REGISTER_REQUEST,
-        request,
-      );
+      if (!this.isReady) {
+        await this.onIdentificationDone();
+      }
+      // check if still connected after a possible await
+      if (this.socket.connected) {
+        this.socket.emit(
+          REGISTER_REQUEST,
+          request,
+        );
+      }
     }
   }
-  public attachOwnedSearchListenerFor(request: IOwnedSearchRegisterRequest) {
-    if (!this.isReady) {
-      this.isReadyCallbacks.push(
-        [
-          "attachOwnedSearchListenerFor",
-          [request],
-        ],
-      );
-    }
+  public async attachOwnedSearchListenerFor(request: IOwnedSearchRegisterRequest) {
     if (this.socket.connected) {
-      this.socket.emit(
-        OWNED_SEARCH_REGISTER_REQUEST,
-        request,
-      );
+      if (!this.isReady) {
+        await this.onIdentificationDone();
+      }
+      // check if still connected after a possible await
+      if (this.socket.connected) {
+        this.socket.emit(
+          OWNED_SEARCH_REGISTER_REQUEST,
+          request,
+        );
+      }
     }
   }
-  public attachParentedSearchListenerFor(request: IParentedSearchRegisterRequest) {
-    if (!this.isReady) {
-      this.isReadyCallbacks.push(
-        [
-          "attachParentedSearchListenerFor",
-          [request],
-        ],
-      );
-      return;
-    }
+  public async attachParentedSearchListenerFor(request: IParentedSearchRegisterRequest) {
     if (this.socket.connected) {
-      this.socket.emit(
-        PARENTED_SEARCH_REGISTER_REQUEST,
-        request,
-      );
+      if (!this.isReady) {
+        await this.onIdentificationDone();
+      }
+
+      // check if still connected after a possible await
+      if (this.socket.connected) {
+        this.socket.emit(
+          PARENTED_SEARCH_REGISTER_REQUEST,
+          request,
+        );
+      }
     }
   }
-  public requestOwnedSearchFeedbackFor(request: IOwnedSearchFeedbackRequest) {
-    if (!this.isReady) {
-      this.isReadyCallbacks.push(
-        [
-          "requestOwnedSearchFeedbackFor",
-          [request],
-        ],
-      );
-      return;
-    }
+  public async requestOwnedSearchFeedbackFor(request: IOwnedSearchFeedbackRequest) {
     if (this.socket.connected) {
-      this.socket.emit(
-        OWNED_SEARCH_FEEDBACK_REQUEST,
-        request,
-      );
+      if (!this.isReady) {
+        await this.onIdentificationDone();
+      }
+    
+      // check if still connected after a possible await
+      if (this.socket.connected) {
+        this.socket.emit(
+          OWNED_SEARCH_FEEDBACK_REQUEST,
+          request,
+        );
+      }
     }
   }
-  public requestParentedSearchFeedbackFor(request: IParentedSearchFeedbackRequest) {
-    if (!this.isReady) {
-      this.isReadyCallbacks.push(
-        [
-          "requestParentedSearchFeedbackFor",
-          [request],
-        ],
-      );
-      return;
-    }
+  public async requestParentedSearchFeedbackFor(request: IParentedSearchFeedbackRequest) {
     if (this.socket.connected) {
-      this.socket.emit(
-        PARENTED_SEARCH_FEEDBACK_REQUEST,
-        request,
-      );
+      if (!this.isReady) {
+        await this.onIdentificationDone();
+      }
+
+      // check if still connected after a possible await
+      if (this.socket.connected) {
+        this.socket.emit(
+          PARENTED_SEARCH_FEEDBACK_REQUEST,
+          request,
+        );
+      }
     }
   }
   public addOwnedSearchListenerFor(
@@ -342,24 +343,21 @@ export class RemoteListener {
 
     this.attachParentedSearchListenerFor(request);
   }
-  public requestFeedbackFor(
+  public async requestFeedbackFor(
     request: IFeedbackRequest,
     immediate?: boolean,
   ) {
     if (immediate) {
-      if (!this.isReady) {
-        this.isReadyCallbacks.push(
-          [
-            "requestFeedbackFor",
-            [request, immediate],
-          ],
-        );
-        return;
-      } else if (this.socket.connected) {
-        this.socket.emit(
-          FEEDBACK_REQUEST,
-          request,
-        );
+      if (this.socket.connected) {
+        if (!this.isReady) {
+          await this.onIdentificationDone();
+        }
+        if (this.socket.connected) {
+          this.socket.emit(
+            FEEDBACK_REQUEST,
+            request,
+          );
+        }
       }
     } else if (
       this.delayedFeedbacks.every((df) => df.itemDefinition !== request.itemDefinition || df.id !== request.id)
@@ -508,7 +506,12 @@ export class RemoteListener {
       itemDefinition.triggerListeners("change", event.id, event.version);
     }
   }
-  private consumeDelayedFeedbacks(anSpecificRequest?: IFeedbackRequest) {
+  private async consumeDelayedFeedbacks(anSpecificRequest?: IFeedbackRequest) {
+    // we wait if not ready
+    if (this.socket.connected && !this.isReady) {
+      await this.onIdentificationDone();
+    }
+
     // the reason we use delayed feedbacks is for efficiency, while we don't
     // use this for owned searches, but sometimes a same feedback would be requested twice
     this.delayedFeedbacks = this.delayedFeedbacks.filter((df) => {
@@ -516,10 +519,8 @@ export class RemoteListener {
         !anSpecificRequest ||
         (anSpecificRequest.id === df.id && anSpecificRequest.itemDefinition === df.itemDefinition)
       ) {
-        if (!this.isReady) {
-          setTimeout(this.consumeDelayedFeedbacks.bind(this, anSpecificRequest), 70);
-          return true;
-        } else if (this.socket.connected) {
+        // and yet we recheck, as we need to be connected even as we emit
+        if (this.socket.connected) {
           this.socket.emit(
             FEEDBACK_REQUEST,
             df,
@@ -536,6 +537,9 @@ export class RemoteListener {
     if (this.offline) {
       return;
     }
+    if (this.isReady) {
+      return;
+    }
     return new Promise((resolve) => {
       const doneListener = () => {
         this.socket.off(IDENTIFIED_EVENT, doneListener);
@@ -550,10 +554,16 @@ export class RemoteListener {
     this.offline = false;
     // clearTimeout(this.initialConsideredDisconnectedIfNoAnswerTimeout);
 
-    if (!this.isReady) {
+    // this prevents the request from triggering on the initial connection
+    // as setToken is expected to be called in order to set things to be ready
+    // this is more for reconnection purposes
+    if (!this.isReconnect) {
+      // the next time this hits it will be a reconnect, such are the subsequent times
+      this.isReconnect = true;
       return;
     }
 
+    // so we attempt to reidentify as soon as we are connected
     this.socket.emit(
       IDENTIFY_REQUEST,
       {
@@ -562,44 +572,46 @@ export class RemoteListener {
       },
     );
 
+    // now we await for identification to be sucesful
     await this.onIdentificationDone();
+
+    // if we happened to die during the event then we return
     if (this.offline) {
       return;
     }
 
+    // if we survived that then we are ready
+    this.isReady = true;
+
+    // now we reconnect the listeners again
     Object.keys(this.listeners).forEach((listenerKey) => {
       this.attachItemDefinitionListenerFor(this.listeners[listenerKey].request);
-      if (this.isReconnect) {
-        this.requestFeedbackFor(this.listeners[listenerKey].request, true);
-      }
+      this.requestFeedbackFor(this.listeners[listenerKey].request, true);
     });
 
     Object.keys(this.ownedSearchListeners).forEach((listenerKey) => {
       this.attachOwnedSearchListenerFor(this.ownedSearchListeners[listenerKey].request);
-      if (this.isReconnect) {
-        const lastKnownRecordDate = this.ownedSearchListeners[listenerKey].lastKnownRecordDate;
-        this.requestOwnedSearchFeedbackFor({
-          ...this.ownedSearchListeners[listenerKey].request,
-          knownLastRecordDate: lastKnownRecordDate,
-        });
-      }
+
+      const lastKnownRecordDate = this.ownedSearchListeners[listenerKey].lastKnownRecordDate;
+      this.requestOwnedSearchFeedbackFor({
+        ...this.ownedSearchListeners[listenerKey].request,
+        knownLastRecordDate: lastKnownRecordDate,
+      });
     });
 
     Object.keys(this.parentedSearchListeners).forEach((listenerKey) => {
       this.attachParentedSearchListenerFor(this.parentedSearchListeners[listenerKey].request);
-      if (this.isReconnect) {
-        const lastKnownRecordDate = this.parentedSearchListeners[listenerKey].lastKnownRecordDate;
-        this.requestParentedSearchFeedbackFor({
-          ...this.parentedSearchListeners[listenerKey].request,
-          knownLastRecordDate: lastKnownRecordDate,
-        });
-      }
+
+      const lastKnownRecordDate = this.parentedSearchListeners[listenerKey].lastKnownRecordDate;
+      this.requestParentedSearchFeedbackFor({
+        ...this.parentedSearchListeners[listenerKey].request,
+        knownLastRecordDate: lastKnownRecordDate,
+      });
     });
 
-    if (this.isReconnect) {
-      this.connectionListeners.forEach((l) => l());
-    }
+    this.connectionListeners.forEach((l) => l());
 
+    this.triggerCurrencyFactorsHandler();
     this.isReconnect = true;
   }
   private async onRecordsAddedToOwnedSearch(
@@ -663,6 +675,7 @@ export class RemoteListener {
   }
   private onDisconnect() {
     this.offline = true;
+    this.isReady = false;
     this.connectionListeners.forEach((l) => l());
   }
 }

@@ -11,6 +11,9 @@ export interface ILocaleContextType {
     language: string;
     rtl: boolean;
     currency: string;
+    currencyFactors: {
+        [code: string]: number;
+    };
     country: string;
     updating: boolean;
     langLocales: ILangLocalesType;
@@ -24,6 +27,9 @@ export interface IDataContextType {
 interface IAppProps {
     root: Root;
     initialCurrency: string;
+    initialCurrencyFactors: {
+        [code: string]: number;
+    };
     initialCountry: string;
     config: IConfigRawJSONDataType;
     langLocales: ILangLocalesType;
@@ -33,6 +39,9 @@ interface IAppProps {
 interface IAppState {
     specifiedCountry: string;
     specifiedCurrency: string;
+    specifiedCurrencyFactors: {
+        [code: string]: number;
+    };
     localeIsUpdating: boolean;
     localeIsUpdatingFrom: string;
     updateIsBlocked: boolean;
@@ -59,6 +68,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     private tokenState;
     private remoteListener;
     constructor(props: IAppProps);
+    updateCurrencyFactorsIfNecessary(): Promise<void>;
     setBlockedCallbackState(state: boolean): void;
     setTokenState(state: IActualTokenProviderState, logout: () => void): void;
     updateUserProperty(propertyId: string, value: string): Promise<void>;

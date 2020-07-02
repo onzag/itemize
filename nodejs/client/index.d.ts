@@ -23,6 +23,9 @@ export declare function initializeItemizeApp(rendererContext: IRendererContext, 
     mainWrapper?: (mainComponet: React.ReactElement, localeContext: ILocaleContextType) => React.ReactElement;
     serverMode?: {
         collector?: ICollectorType;
+        currencyFactors: {
+            [code: string]: number;
+        };
         config: IConfigRawJSONDataType;
         ssrContext: ISSRContextType;
         clientDetails: {

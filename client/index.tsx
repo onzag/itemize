@@ -62,6 +62,9 @@ export async function initializeItemizeApp(
     mainWrapper?: (mainComponet: React.ReactElement, localeContext: ILocaleContextType) => React.ReactElement;
     serverMode?: {
       collector?: ICollectorType;
+      currencyFactors: {
+        [code: string]: number,
+      };
       config: IConfigRawJSONDataType,
       ssrContext: ISSRContextType;
       clientDetails: {
@@ -282,15 +285,17 @@ export async function initializeItemizeApp(
     // we expose the root variable because it makes debugging
     // easy and to allow access to the root registry to web workers
     if (!serverMode) {
-      const [initialRoot, lang] = await Promise.all<any>([
+      const [initialRoot, lang, currencyFactors] = await Promise.all<any>([
         fetch(`/rest/resource/build.${initialLang}.json`).then((r) => r.json()),
         fetch("/rest/resource/lang.json").then((r) => r.json()),
-  
+        ssrContext ? ssrContext.currencyFactors : fetch("/rest/currency-factors").then((r) => r.json()),
+
         initialLang !== "en" ?
           importScript(`/rest/resource/${initialLang}.moment.js`) : null,
       ]);
       (window as any).ROOT = new Root(initialRoot);
       (window as any).LANG = lang;
+      (window as any).INITIAL_CURRENCY_FACTORS = currencyFactors;
       if (CacheWorkerInstance.isSupported) {
         CacheWorkerInstance.instance.proxyRoot(initialRoot);
       }
@@ -310,6 +315,7 @@ export async function initializeItemizeApp(
 
       initialCurrency={initialCurrency}
       initialCountry={initialCountry}
+      initialCurrencyFactors={serverMode ? serverMode.currencyFactors : (window as any).INITIAL_CURRENCY_FACTORS}
 
       mainComponent={mainComponent}
       mainWrapper={options && options.mainWrapper}

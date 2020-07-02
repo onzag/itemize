@@ -57,8 +57,8 @@ class Listener {
         if (server === null) {
             return;
         }
-        const io = socket_io_1.default(server);
-        io.on("connection", (socket) => {
+        this.io = socket_io_1.default(server);
+        this.io.on("connection", (socket) => {
             this.addSocket(socket);
             socket.on(remote_protocol_1.REGISTER_REQUEST, (request) => {
                 this.register(socket, request);
@@ -693,6 +693,7 @@ class Listener {
         _1.logger.debug("Listener.pubSubTriggerListeners: received redis event", parsedContent);
         if (channel === constants_1.SERVER_DATA_IDENTIFIER) {
             this.cache.onServerDataChangeInformed(parsedContent);
+            this.io.emit(remote_protocol_1.CURRENCY_FACTORS_UPDATED_EVENT);
             return;
         }
         if (channel === constants_1.SERVER_USER_KICK_IDENTIFIER) {

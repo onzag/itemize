@@ -10,6 +10,9 @@ export interface ISSRCollectedQueryType {
 }
 
 export interface ISSRContextType {
+  currencyFactors: {
+    [code: string]: number,
+  };
   queries: ISSRCollectedQueryType[],
   user: {
     role: string;

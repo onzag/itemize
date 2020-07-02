@@ -230,14 +230,16 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
         // we expose the root variable because it makes debugging
         // easy and to allow access to the root registry to web workers
         if (!serverMode) {
-            const [initialRoot, lang] = await Promise.all([
+            const [initialRoot, lang, currencyFactors] = await Promise.all([
                 fetch(`/rest/resource/build.${initialLang}.json`).then((r) => r.json()),
                 fetch("/rest/resource/lang.json").then((r) => r.json()),
+                ssrContext ? ssrContext.currencyFactors : fetch("/rest/currency-factors").then((r) => r.json()),
                 initialLang !== "en" ?
                     importScript(`/rest/resource/${initialLang}.moment.js`) : null,
             ]);
             window.ROOT = new Root_1.default(initialRoot);
             window.LANG = lang;
+            window.INITIAL_CURRENCY_FACTORS = currencyFactors;
             if (cache_1.default.isSupported) {
                 cache_1.default.instance.proxyRoot(initialRoot);
             }
@@ -247,7 +249,7 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
         moment_1.default.locale(initialLang);
         const root = serverMode ? serverMode.root : window.ROOT;
         // now we get the app that we are expected to use
-        const app = react_1.default.createElement(app_1.default, { root: root, langLocales: serverMode ? serverMode.langLocales : window.LANG, config: config, initialCurrency: initialCurrency, initialCountry: initialCountry, mainComponent: mainComponent, mainWrapper: options && options.mainWrapper });
+        const app = react_1.default.createElement(app_1.default, { root: root, langLocales: serverMode ? serverMode.langLocales : window.LANG, config: config, initialCurrency: initialCurrency, initialCountry: initialCountry, initialCurrencyFactors: serverMode ? serverMode.currencyFactors : window.INITIAL_CURRENCY_FACTORS, mainComponent: mainComponent, mainWrapper: options && options.mainWrapper });
         // if a wrapping function was provided, we use it
         const children = options && options.appWrapper ?
             options.appWrapper(app, config) :

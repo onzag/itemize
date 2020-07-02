@@ -2,7 +2,7 @@ import { IAppDataType, logger } from "..";
 import React from "react";
 import express from "express";
 import { ISSRRule, ISSRRuleDynamic, ISSRRuleSetCb } from ".";
-import { GUEST_METAROLE, PREFIX_GET, UNSPECIFIED_OWNER } from "../../constants";
+import { GUEST_METAROLE, PREFIX_GET, UNSPECIFIED_OWNER, CURRENCY_FACTORS_IDENTIFIER } from "../../constants";
 import { getCookie } from "../mode";
 import { ISSRContextType, ISSRCollectedQueryType } from "../../client/internal/providers/ssr-provider";
 import { initializeItemizeApp } from "../../client";
@@ -345,6 +345,7 @@ export async function ssrGenerator(
       queries,
       user: appliedRule.forUser,
       title: finalTitle,
+      currencyFactors: appData.cache.getServerData()[CURRENCY_FACTORS_IDENTIFIER],
     };
 
     // we replace the HTML with the SSR information that we are using
@@ -370,6 +371,7 @@ export async function ssrGenerator(
             collector: appData.ssrConfig.collector,
             config: appData.config,
             ssrContext: ssr,
+            currencyFactors: ssr.currencyFactors,
             clientDetails: {
               lang: getCookie(splittedCookies, "lang"),
               currency: getCookie(splittedCookies, "currency"),

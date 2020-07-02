@@ -42,6 +42,7 @@ class LocaleContextProvider extends react_1.default.Component {
         return nextProps.children !== this.props.children ||
             nextProps.value.country !== this.props.value.country ||
             nextProps.value.currency !== this.props.value.currency ||
+            nextProps.value.currencyFactors !== this.props.value.currencyFactors ||
             nextProps.value.rtl !== this.props.value.rtl ||
             nextProps.value.updating !== this.props.value.updating ||
             !deep_equal_1.default(nextProps.value.i18n, this.props.value.i18n);
@@ -64,6 +65,7 @@ class App extends react_1.default.Component {
         this.state = {
             specifiedCountry: props.initialCountry,
             specifiedCurrency: props.initialCurrency,
+            specifiedCurrencyFactors: props.initialCurrencyFactors,
             localeIsUpdating: false,
             localeIsUpdatingFrom: null,
             updateIsBlocked: false,
@@ -76,10 +78,26 @@ class App extends react_1.default.Component {
         this.renderAppWithLocaleContext = this.renderAppWithLocaleContext.bind(this);
         this.setTokenState = this.setTokenState.bind(this);
         this.updateUserProperty = this.updateUserProperty.bind(this);
+        this.updateCurrencyFactorsIfNecessary = this.updateCurrencyFactorsIfNecessary.bind(this);
         // a sad hack to know if we are in the client side to initialize this
         // remote listener
         if (typeof document !== "undefined") {
             this.remoteListener = new remote_listener_1.RemoteListener(this.props.root);
+            this.remoteListener.setCurrencyFactorsHandler(this.updateCurrencyFactorsIfNecessary);
+        }
+    }
+    async updateCurrencyFactorsIfNecessary() {
+        try {
+            const newFactors = await fetch(`/rest/currency-factors`).then((r) => r.json());
+            const currentFactors = this.state.specifiedCurrencyFactors;
+            if (!deep_equal_1.default(currentFactors, newFactors)) {
+                this.setState({
+                    specifiedCurrencyFactors: newFactors,
+                });
+            }
+        }
+        catch {
+            return;
         }
     }
     setBlockedCallbackState(state) {
@@ -331,6 +349,7 @@ class App extends react_1.default.Component {
             rtl,
             country: this.state.specifiedCountry,
             currency: this.state.specifiedCurrency,
+            currencyFactors: this.state.specifiedCurrencyFactors,
             updating: this.state.localeIsUpdating,
             langLocales: this.props.langLocales,
             i18n: this.props.root.getI18nData(),

@@ -29,6 +29,9 @@ export interface ILocaleContextType {
   language: string;
   rtl: boolean;
   currency: string;
+  currencyFactors: {
+    [code: string]: number,
+  };
   country: string;
   updating: boolean;
   langLocales: ILangLocalesType;
@@ -53,6 +56,9 @@ export interface IDataContextType {
 interface IAppProps {
   root: Root;
   initialCurrency: string;
+  initialCurrencyFactors: {
+    [code: string]: number,
+  };
   initialCountry: string;
 
   config: IConfigRawJSONDataType;
@@ -72,6 +78,9 @@ interface IAppProps {
 interface IAppState {
   specifiedCountry: string;
   specifiedCurrency: string;
+  specifiedCurrencyFactors: {
+    [code: string]: number,
+  };
   localeIsUpdating: boolean;
   localeIsUpdatingFrom: string;
   updateIsBlocked: boolean;
@@ -113,6 +122,7 @@ export class LocaleContextProvider extends React.Component<ILocaleContextProvide
     return nextProps.children !== this.props.children ||
       nextProps.value.country !== this.props.value.country ||
       nextProps.value.currency !== this.props.value.currency ||
+      nextProps.value.currencyFactors !== this.props.value.currencyFactors ||
       nextProps.value.rtl !==this.props.value.rtl ||
       nextProps.value.updating !== this.props.value.updating ||
       !equals(nextProps.value.i18n, this.props.value.i18n);
@@ -142,6 +152,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     this.state = {
       specifiedCountry: props.initialCountry,
       specifiedCurrency: props.initialCurrency,
+      specifiedCurrencyFactors: props.initialCurrencyFactors,
       localeIsUpdating: false,
       localeIsUpdatingFrom: null,
       updateIsBlocked: false,
@@ -155,11 +166,29 @@ export default class App extends React.Component<IAppProps, IAppState> {
     this.renderAppWithLocaleContext = this.renderAppWithLocaleContext.bind(this);
     this.setTokenState = this.setTokenState.bind(this);
     this.updateUserProperty = this.updateUserProperty.bind(this);
+    this.updateCurrencyFactorsIfNecessary = this.updateCurrencyFactorsIfNecessary.bind(this);
 
     // a sad hack to know if we are in the client side to initialize this
     // remote listener
     if (typeof document !== "undefined") {
       this.remoteListener = new RemoteListener(this.props.root);
+      this.remoteListener.setCurrencyFactorsHandler(
+        this.updateCurrencyFactorsIfNecessary,
+      );
+    }
+  }
+
+  public async updateCurrencyFactorsIfNecessary() {
+    try {
+      const newFactors: {[code: string]: number} = await fetch(`/rest/currency-factors`).then((r) => r.json());
+      const currentFactors = this.state.specifiedCurrencyFactors;
+      if (!equals(currentFactors, newFactors)) {
+        this.setState({
+          specifiedCurrencyFactors: newFactors,
+        });
+      }
+    } catch {
+      return;
     }
   }
 
@@ -449,6 +478,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       rtl,
       country: this.state.specifiedCountry,
       currency: this.state.specifiedCurrency,
+      currencyFactors: this.state.specifiedCurrencyFactors,
 
       updating: this.state.localeIsUpdating,
 

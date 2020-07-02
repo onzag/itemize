@@ -24,7 +24,9 @@ class GlobalManager {
         this.serverData = null;
         this.config = config;
         this.sensitiveConfig = sensitiveConfig;
-        this.currencyLayer = currency_layer_1.setupCurrencyLayer(sensitiveConfig.currencyLayerAccessKey, this.globalCache, sensitiveConfig.currencyLayerHttpsEnabled);
+        this.currencyLayer = sensitiveConfig.currencyLayerAccessKey ?
+            currency_layer_1.setupCurrencyLayer(sensitiveConfig.currencyLayerAccessKey, this.globalCache, sensitiveConfig.currencyLayerHttpsEnabled) :
+            null;
         this.processIdef = this.processIdef.bind(this);
         this.processModule = this.processModule.bind(this);
         this.run = this.run.bind(this);
@@ -251,7 +253,7 @@ class GlobalManager {
     async calculateServerData() {
         try {
             this.serverData = {
-                [constants_1.CURRENCY_FACTORS_IDENTIFIER]: await this.currencyLayer.requestCurrencyFactors(),
+                [constants_1.CURRENCY_FACTORS_IDENTIFIER]: this.currencyLayer ? await this.currencyLayer.requestCurrencyFactors() : null,
             };
             this.serverDataLastUpdated = (new Date()).getTime();
             await this.informNewServerData();
@@ -264,26 +266,32 @@ class GlobalManager {
         }
     }
     async informNewServerData() {
-        let valuesContainer = "";
-        let valuesAsArray = [];
-        Object.keys(this.serverData[constants_1.CURRENCY_FACTORS_IDENTIFIER]).forEach((currencyId) => {
-            if (valuesContainer) {
-                valuesContainer += ",";
-            }
-            valuesContainer += "(?,?)";
-            valuesAsArray = valuesAsArray.concat([currencyId, this.serverData[constants_1.CURRENCY_FACTORS_IDENTIFIER][currencyId]]);
-        });
-        try {
-            await this.knex.raw(`INSERT INTO ?? ("code", "factor") VALUES ${valuesContainer} ` +
-                `ON CONFLICT ("code") DO UPDATE SET "factor" = EXCLUDED."factor"`, [constants_1.CURRENCY_FACTORS_IDENTIFIER].concat(valuesAsArray));
-        }
-        catch (err) {
-            _1.logger.error("GlobalManager.informNewServerData: [SERIOUS] was unable to update database new currency data", {
-                errMessage: err.message,
-                errStack: err.stack,
+        // STORE currency factors in the database if available
+        // for storing
+        if (this.serverData[constants_1.CURRENCY_FACTORS_IDENTIFIER]) {
+            let valuesContainer = "";
+            let valuesAsArray = [];
+            Object.keys(this.serverData[constants_1.CURRENCY_FACTORS_IDENTIFIER]).forEach((currencyId) => {
+                if (valuesContainer) {
+                    valuesContainer += ",";
+                }
+                valuesContainer += "(?,?)";
+                valuesAsArray = valuesAsArray.concat([currencyId, this.serverData[constants_1.CURRENCY_FACTORS_IDENTIFIER][currencyId]]);
             });
+            try {
+                await this.knex.raw(`INSERT INTO ?? ("code", "factor") VALUES ${valuesContainer} ` +
+                    `ON CONFLICT ("code") DO UPDATE SET "factor" = EXCLUDED."factor"`, [constants_1.CURRENCY_FACTORS_IDENTIFIER].concat(valuesAsArray));
+            }
+            catch (err) {
+                _1.logger.error("GlobalManager.informNewServerData: [SERIOUS] was unable to update database new currency data", {
+                    errMessage: err.message,
+                    errStack: err.stack,
+                });
+            }
         }
+        // stringify the server data
         const stringifiedServerData = JSON.stringify(this.serverData);
+        // update the server data so that the instances can receive it
         this.globalCache.set(constants_1.SERVER_DATA_IDENTIFIER, stringifiedServerData, (err) => {
             if (err) {
                 _1.logger.error("GlobalManager.informNewServerData: [SERIOUS] was unable to inform for new server data in set", {
@@ -292,6 +300,7 @@ class GlobalManager {
                 });
             }
         });
+        // publishing new server data
         this.redisPub.publish(constants_1.SERVER_DATA_IDENTIFIER, stringifiedServerData, (err) => {
             if (err) {
                 _1.logger.error("GlobalManager.informNewServerData: [SERIOUS] was unable to inform for new server data in publish", {

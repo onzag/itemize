@@ -6,6 +6,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 
 const urlsToCache = [
   "/",
+  "/rest/currency-factors",
   "/rest/resource/lang.json",
   "/rest/resource/image-fail.svg",
   isDevelopment ? "/rest/resource/build.development.js" : "/rest/resource/build.production.js",
@@ -62,16 +63,23 @@ self.addEventListener("fetch", (event: any) => {
     return false;
   }
 
-  const shouldServeIndex =
+  // use network first, rather than going for the SW first
+  // by not selecting rest we are going for all the paths that should
+  // serve the index, but also we include currency factors here
+  const useNetworkFirstStrategy =
     isOurHost &&
-    urlAnalyzed.pathname.indexOf("/rest") !== 0;
-
-  // const actualEventRequest: Request = shouldServeIndex ?
-  //   new Request("/") : event.request;
+    (
+      urlAnalyzed.pathname.indexOf("/rest") !== 0 ||
+      urlAnalyzed.pathname.indexOf("/rest/currency-factors") === 0
+    );
+  // this basically means that we would be serving the response for / for the index response
+  // rather than whatever the request was pointing too, that means we ignore the request
+  const useNetworkFirstStrategyUseThisPathInstead =
+    useNetworkFirstStrategy && urlAnalyzed.pathname.indexOf("/rest") !== 0 ? "/" : null;
 
   const shouldBeCachedIfFound =
     (!isOurHost && (urlAnalyzed.searchParams.get("sw-cacheable") === "true" || event.request.headers.get("sw-cacheable") === "true")) ||
-    urlAnalyzed.pathname.indexOf("/rest/resource") === 0;
+    urlAnalyzed.pathname.indexOf("/rest/resource") === 0 || urlAnalyzed.pathname.indexOf("/rest/currency-factors") === 0;
 
   const shouldBeRechecked = (!isOurHost && (urlAnalyzed.searchParams.get("sw-recheck") === "true" || event.request.headers.get("sw-recheck") === "true"));
   const acceptHeader = event.request.headers.get("Accept");
@@ -88,7 +96,7 @@ self.addEventListener("fetch", (event: any) => {
       try {
         // we don't even try to get the cache if it's one of our index paths, we will try
         // network first
-        const cachedResponse = shouldServeIndex ? null : await caches.match(event.request);
+        const cachedResponse = useNetworkFirstStrategy ? null : await caches.match(event.request);
         // if we get a match in our cache
         if (cachedResponse) {
           // if it should be rechecked
@@ -133,16 +141,18 @@ self.addEventListener("fetch", (event: any) => {
             await recreatedCache.addAll(urlsToCache);
           }
 
-        // now for the index logic
+        // now for the network first logic
         } else if (
-          shouldServeIndex &&
+          useNetworkFirstStrategy &&
           netWorkResponse.status !== 200
         ) {
-          console.log("invalid network response, using cached for index request");
-          const indexCached = await caches.match(new Request("/"));
-          if (indexCached) {
-            console.log("Service worker cache hit for index request");
-            return indexCached;
+          console.log("network not available, using cached for network first request");
+          let requestToUse: Request = useNetworkFirstStrategyUseThisPathInstead ?
+            new Request(useNetworkFirstStrategyUseThisPathInstead) : event.request;
+          const cached = await caches.match(requestToUse);
+          if (cached) {
+            console.log("Service worker cache hit for network first request ", event.request.url);
+            return cached;
           }
 
         // resources are static, but they are language specific
@@ -182,14 +192,16 @@ self.addEventListener("fetch", (event: any) => {
           }
         }
         if (
-          shouldServeIndex
+          useNetworkFirstStrategy
         ) {
           try {
-            console.log("network not available, using cached for index request");
-            const indexCached = await caches.match(new Request("/"));
-            if (indexCached) {
-              console.log("Service worker cache hit for index request");
-              return indexCached;
+            console.log("network not available, using cached for network first request");
+            let requestToUse: Request = useNetworkFirstStrategyUseThisPathInstead ?
+              new Request(useNetworkFirstStrategyUseThisPathInstead) : event.request;
+            const cached = await caches.match(requestToUse);
+            if (cached) {
+              console.log("Service worker cache hit for network first request ", event.request.url);
+              return cached;
             }
           } catch (err) {
             // Nothing happens

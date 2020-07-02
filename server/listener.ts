@@ -9,6 +9,7 @@ import ItemDefinition, { ItemDefinitionIOActions } from "../base/Root/Module/Ite
 import Knex from "knex";
 import Module from "../base/Root/Module";
 import {
+  CURRENCY_FACTORS_UPDATED_EVENT,
   REGISTER_REQUEST,
   IRegisterRequest,
   OWNED_SEARCH_REGISTER_REQUEST,
@@ -55,7 +56,7 @@ import { IGQLSearchRecord } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from ".";
 import { SERVER_DATA_IDENTIFIER, SERVER_USER_KICK_IDENTIFIER,
-  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE } from "../constants";
+  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER } from "../constants";
 import Ajv from "ajv";
 import { jwtVerify } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
@@ -116,6 +117,8 @@ const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
 const CLUSTER_MANAGER_REGISTER_SS = "CLUSTER_MANAGER_REGISTER_SS";
 
 export class Listener {
+  private io: ioMain.Server;
+
   private listeners: IListenerList = {};
   private listensSS: IServerListensList = {};
 
@@ -167,8 +170,8 @@ export class Listener {
       return;
     }
 
-    const io = ioMain(server);
-    io.on("connection", (socket) => {
+    this.io = ioMain(server);
+    this.io.on("connection", (socket) => {
       this.addSocket(socket);
       socket.on(REGISTER_REQUEST, (request: IRegisterRequest) => {
         this.register(socket, request);
@@ -1100,6 +1103,9 @@ export class Listener {
 
     if (channel === SERVER_DATA_IDENTIFIER) {
       this.cache.onServerDataChangeInformed(parsedContent);
+      this.io.emit(
+        CURRENCY_FACTORS_UPDATED_EVENT,
+      );
       return;
     }
 

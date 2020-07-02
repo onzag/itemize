@@ -8,6 +8,9 @@ export interface ISSRCollectedQueryType {
     fields: IGQLRequestFields;
 }
 export interface ISSRContextType {
+    currencyFactors: {
+        [code: string]: number;
+    };
     queries: ISSRCollectedQueryType[];
     user: {
         role: string;

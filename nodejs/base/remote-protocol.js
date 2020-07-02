@@ -15,6 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 exports.BUILDNUMBER_EVENT = "buildnumber";
 /**
+ * This event occurs when the currency factors have been changed and it streams to
+ * every socket that just happens to be connected, not just identified but just
+ * connected into it, while the data could be attached, we really want to perform
+ * the request to the server in order to ensure that it is cached
+ */
+exports.CURRENCY_FACTORS_UPDATED_EVENT = "currency-factors-updated";
+/**
  * This is streamed to the client once the server hits an error
  * that was somehow caused by the client, there's no much use
  * for an error event other than notice invalid requests

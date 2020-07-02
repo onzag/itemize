@@ -9,6 +9,7 @@ import Knex from "knex";
 import { IRegisterRequest, IOwnedSearchRegisterRequest, IParentedSearchRegisterRequest, IIdentifyRequest, IFeedbackRequest, IParentedSearchFeedbackRequest, IOwnedSearchFeedbackRequest, IUnregisterRequest, IOwnedSearchUnregisterRequest, IParentedSearchUnregisterRequest, IOwnedSearchRecordsAddedEvent, IParentedSearchRecordsAddedEvent, IChangedFeedbackEvent } from "../base/remote-protocol";
 import { ISensitiveConfigRawJSONDataType } from "../config";
 export declare class Listener {
+    private io;
     private listeners;
     private listensSS;
     private redisSub;

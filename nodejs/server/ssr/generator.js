@@ -281,6 +281,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             queries,
             user: appliedRule.forUser,
             title: finalTitle,
+            currencyFactors: appData.cache.getServerData()[constants_1.CURRENCY_FACTORS_IDENTIFIER],
         };
         // we replace the HTML with the SSR information that we are using
         newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(ssr));
@@ -297,6 +298,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
                     collector: appData.ssrConfig.collector,
                     config: appData.config,
                     ssrContext: ssr,
+                    currencyFactors: ssr.currencyFactors,
                     clientDetails: {
                         lang: mode_1.getCookie(splittedCookies, "lang"),
                         currency: mode_1.getCookie(splittedCookies, "currency"),
