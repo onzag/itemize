@@ -13,6 +13,7 @@ import PropertyViewTextRenderer from "./PropertyView/PropertyViewText";
 import PropertyViewFileRenderer from "./PropertyView/PropertyViewFile";
 import PropertyViewDateTimeRenderer from "./PropertyView/PropertyViewDateTime";
 import PropertyViewLocationRenderer from "./PropertyView/PropertyViewLocation";
+import PropertyViewCurrencyRenderer from "./PropertyView/PropertyViewCurrency";
 
 export const rendererContext: IRendererContext = {
   PropertyEntryField: PropertyEntryFieldRenderer,
@@ -29,4 +30,5 @@ export const rendererContext: IRendererContext = {
   PropertyViewDateTime: PropertyViewDateTimeRenderer,
   PropertyViewFile: PropertyViewFileRenderer,
   PropertyViewLocation: PropertyViewLocationRenderer,
+  PropertyViewCurrency: PropertyViewCurrencyRenderer,
 }

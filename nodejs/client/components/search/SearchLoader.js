@@ -274,6 +274,7 @@ class ActualSearchLoader extends react_1.default.Component {
             error: this.state.error,
             dismissError: this.dismissError,
             refreshPage: this.refreshPage,
+            searchId: this.props.searchId,
         })));
     }
 }

@@ -15,6 +15,7 @@ import { ISQLTableRowValue } from "../../base/Root/sql";
 import Root from "../../base/Root";
 
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
+const NO_SSR = process.env.NO_SSR === "true";
 
 interface IMemoizedAnswer {
   html: string,
@@ -52,6 +53,7 @@ export async function ssrGenerator(
   // only if it matches our NODE_ENV, this means that in development mode, with development builds there is SSR
   // but not with production builds, and vice-versa
   const SSRIsDisabledInThisMode = 
+    NO_SSR ||
     (mode === "development" && !developmentISSSRMode) ||
     (mode === "production" && developmentISSSRMode);
 

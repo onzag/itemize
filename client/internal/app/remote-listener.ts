@@ -70,6 +70,7 @@ export class RemoteListener {
   private isReconnect: boolean = false;
   private offline: boolean = false;
   // private initialConsideredDisconnectedIfNoAnswerTimeout: NodeJS.Timeout;
+  private hasSetToken: boolean = false;
   private token: string = null;
   private isReady: boolean = false;
   private logout: () => void;
@@ -77,7 +78,7 @@ export class RemoteListener {
   private currencyFactorsHandler: () => void;
 
   constructor(root: Root) {
-    this.reattachListeners = this.reattachListeners.bind(this);
+    this.onConnect = this.onConnect.bind(this);
     this.onChangeListened = this.onChangeListened.bind(this);
     this.onBuildnumberListened = this.onBuildnumberListened.bind(this);
     this.onDisconnect = this.onDisconnect.bind(this);
@@ -103,7 +104,7 @@ export class RemoteListener {
     // }, 1000);
 
     this.socket = io(`${location.protocol}//${location.host}`);
-    this.socket.on("connect", this.reattachListeners);
+    this.socket.on("connect", this.onConnect);
     this.socket.on("disconnect", this.onDisconnect);
     this.socket.on(KICKED_EVENT, this.onKicked);
     this.socket.on(CHANGED_FEEEDBACK_EVENT, this.onChangeListened);
@@ -138,6 +139,8 @@ export class RemoteListener {
     }
   }
   public async setToken(token: string) {
+    // token might be null so we use this flag
+    this.hasSetToken = true;
     this.token = token;
     if (this.socket.connected) {
       this.socket.emit(
@@ -550,30 +553,23 @@ export class RemoteListener {
       this.socket.on(IDENTIFIED_EVENT, doneListener);
     });
   }
-  private async reattachListeners() {
+  private async onConnect() {
     this.offline = false;
     // clearTimeout(this.initialConsideredDisconnectedIfNoAnswerTimeout);
 
-    // this prevents the request from triggering on the initial connection
-    // as setToken is expected to be called in order to set things to be ready
-    // this is more for reconnection purposes
-    if (!this.isReconnect) {
-      // the next time this hits it will be a reconnect, such are the subsequent times
-      this.isReconnect = true;
-      return;
-    }
-
     // so we attempt to reidentify as soon as we are connected
-    this.socket.emit(
-      IDENTIFY_REQUEST,
-      {
-        uuid: this.uuid,
-        token: this.token,
-      },
-    );
-
-    // now we await for identification to be sucesful
-    await this.onIdentificationDone();
+    if (this.hasSetToken && !this.isReady) {
+      this.socket.emit(
+        IDENTIFY_REQUEST,
+        {
+          uuid: this.uuid,
+          token: this.token,
+        },
+      );
+  
+      // now we await for identification to be sucesful
+      await this.onIdentificationDone();
+    }
 
     // if we happened to die during the event then we return
     if (this.offline) {
@@ -582,7 +578,20 @@ export class RemoteListener {
 
     // if we survived that then we are ready
     this.isReady = true;
+    
+    // this prevents the request from triggering on the initial connection
+    // as setToken is expected to be called in order to set things to be ready
+    // this is more for reconnection purposes
+    if (this.isReconnect) {
+      this.onReconnect();
+    }
 
+    this.connectionListeners.forEach((l) => l());
+
+    // next timethis runs will be considered reconnect
+    this.isReconnect = true;
+  }
+  private onReconnect() {
     // now we reconnect the listeners again
     Object.keys(this.listeners).forEach((listenerKey) => {
       this.attachItemDefinitionListenerFor(this.listeners[listenerKey].request);
@@ -609,10 +618,7 @@ export class RemoteListener {
       });
     });
 
-    this.connectionListeners.forEach((l) => l());
-
     this.triggerCurrencyFactorsHandler();
-    this.isReconnect = true;
   }
   private async onRecordsAddedToOwnedSearch(
     event: IOwnedSearchRecordsAddedEvent,

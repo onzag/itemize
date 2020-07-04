@@ -31,6 +31,9 @@ exports.style = index_1.createStyles({
         color: shouldShowInvalid(props) ? "#f44336" : "#424242",
         marginRight: "-10px",
     }),
+    smallAddornment: (props) => ({
+        color: shouldShowInvalid(props) ? "#f44336" : "#424242",
+    }),
     iconButtonPassword: {
         "backgroundColor": "#2196f3",
         "color": "#fff",
@@ -40,6 +43,11 @@ exports.style = index_1.createStyles({
     },
     iconButton: {
         color: "#424242",
+    },
+    iconButtonSmall: {
+        color: "#424242",
+        width: "32px",
+        height: "32px",
     },
     textButton: {
         border: "solid 1px rgba(0,0,0,0.1)",
@@ -132,20 +140,34 @@ function SelectUnitDialog(props) {
                     react_1.default.createElement(index_1.ListItemText, { primary: props.unitToNode(unit) })))))) : null)));
 }
 const SelectUnitDialogResponsive = index_1.withMobileDialog()(SelectUnitDialog);
+function SelectCurrencyDialog(props) {
+    const closeAndChangeCurrency = (code) => {
+        props.onClose();
+        props.onChangeCurrency(code);
+    };
+    return (react_1.default.createElement(index_1.Dialog, { classes: {
+            paper: "props.dialogClassName",
+        }, open: props.open, onClose: props.onClose, "aria-labelledby": "currency-dialog-title", fullScreen: props.fullScreen },
+        react_1.default.createElement(index_1.DialogTitle, { id: "currency-dialog-title" }, props.currencyI18n.title),
+        react_1.default.createElement("div", null,
+            react_1.default.createElement(index_1.List, null, props.currencyArrData.map((currency) => (react_1.default.createElement(index_1.ListItem, { selected: currency.code === props.currency.code, button: true, onClick: closeAndChangeCurrency.bind(null, currency.code), key: currency.code },
+                react_1.default.createElement(index_1.ListItemText, { primary: currency.symbol + " - " + currency.code }))))))));
+}
+const SelectCurrencyDialogResponsive = index_1.withMobileDialog()(SelectCurrencyDialog);
 class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
     constructor(props) {
         super(props);
         this.state = {
             visible: props.type !== "password",
-            unitDialogOpen: false,
+            dialogOpen: false,
         };
         this.toggleVisible = this.toggleVisible.bind(this);
         this.catchToggleMouseDownEvent = this.catchToggleMouseDownEvent.bind(this);
         this.onChangeByHTMLEvent = this.onChangeByHTMLEvent.bind(this);
         this.onChange = this.onChange.bind(this);
         this.renderBasicTextField = this.renderBasicTextField.bind(this);
-        this.closeUnitDialog = this.closeUnitDialog.bind(this);
-        this.openUnitDialog = this.openUnitDialog.bind(this);
+        this.closeDialog = this.closeDialog.bind(this);
+        this.openDialog = this.openDialog.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
         // this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
         // this.renderAutosuggestField = this.renderAutosuggestField.bind(this);
@@ -220,14 +242,14 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
         }
         this.props.onChange(value, internalValue);
     }
-    openUnitDialog() {
+    openDialog() {
         this.setState({
-            unitDialogOpen: true,
+            dialogOpen: true,
         });
     }
-    closeUnitDialog() {
+    closeDialog() {
         this.setState({
-            unitDialogOpen: false,
+            dialogOpen: false,
         });
     }
     onKeyDown(e) {
@@ -293,17 +315,17 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
         }
         else if (this.props.type === "currency") {
             if (this.props.currencyFormat === "$N") {
-                appliedInputProps.startAdornent = (react_1.default.createElement(index_1.InputAdornment, { position: "start", className: this.props.classes.standardAddornment },
-                    react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onMouseDown: this.catchToggleMouseDownEvent }, this.props.currency.symbol)));
+                appliedInputProps.startAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "start", className: this.props.classes.smallAddornment },
+                    react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButtonSmall }, onMouseDown: this.catchToggleMouseDownEvent, onClick: this.openDialog }, this.props.currency.symbol)));
             }
             else {
                 appliedInputProps.endAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
-                    react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onMouseDown: this.catchToggleMouseDownEvent }, this.props.currency.symbol)));
+                    react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onMouseDown: this.catchToggleMouseDownEvent, onClick: this.openDialog }, this.props.currency.symbol)));
             }
         }
         else if (this.props.type === "unit") {
             appliedInputProps.endAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
-                react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onMouseDown: this.catchToggleMouseDownEvent, onClick: this.openUnitDialog }, this.props.unitToNode(this.props.unit))));
+                react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton }, onMouseDown: this.catchToggleMouseDownEvent, onClick: this.openDialog }, this.props.unitToNode(this.props.unit))));
         }
         else if (this.props.canRestore) {
             let icon;
@@ -321,7 +343,8 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
             appliedInputProps.endAdornment = (react_1.default.createElement(index_1.InputAdornment, { position: "end", className: this.props.classes.standardAddornment },
                 react_1.default.createElement(index_1.IconButton, { tabIndex: -1, classes: { root: this.props.classes.iconButton } }, this.props.icon)));
         }
-        const unitDialog = this.props.type === "unit" ? (react_1.default.createElement(SelectUnitDialogResponsive, Object.assign({}, this.props, { open: this.state.unitDialogOpen, onClose: this.closeUnitDialog }))) : null;
+        const unitDialog = this.props.type === "unit" ? (react_1.default.createElement(SelectUnitDialogResponsive, Object.assign({}, this.props, { open: this.state.dialogOpen, onClose: this.closeDialog }))) : null;
+        const currencyDialog = this.props.type === "currency" ? (react_1.default.createElement(SelectCurrencyDialogResponsive, Object.assign({}, this.props, { open: this.state.dialogOpen, onClose: this.closeDialog }))) : null;
         const descriptionAsAlert = this.props.args["descriptionAsAlert"];
         // return the complex overengineered component in all its glory
         return (react_1.default.createElement("div", { className: this.props.classes.container },
@@ -347,7 +370,8 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
                     },
                 }, inputProps: inputProps, disabled: this.props.disabled, variant: "filled" }, appliedTextFieldProps)),
             react_1.default.createElement("div", { className: this.props.classes.errorMessage }, this.props.currentInvalidReason),
-            unitDialog));
+            unitDialog,
+            currencyDialog));
     }
 }
 const PropertyEntryFieldRenderer = index_1.withStyles(exports.style)(ActualPropertyEntryFieldRenderer);

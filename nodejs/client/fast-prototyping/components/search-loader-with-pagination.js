@@ -15,8 +15,9 @@ function SearchLoaderWithPagination(props) {
         const pagination = (arg.pageCount === 0 ?
             null :
             react_1.default.createElement(mui_core_1.Pagination, { count: arg.pageCount, color: "primary", page: arg.currentPage + 1, onChange: handlePageChange }));
+        // TODO add the search results to say when there's an acutal search and say when there are no results
         return (react_1.default.createElement(react_1.default.Fragment, null,
-            props.children(arg, pagination),
+            props.children(arg, pagination, !!(arg.searchId && arg.pageCount === 0)),
             react_1.default.createElement(snackbar_1.default, { i18nDisplay: arg.error, open: !!arg.error, onClose: arg.dismissError, severity: "error" })));
     }));
 }

@@ -13,6 +13,7 @@ const server_1 = __importDefault(require("react-dom/server"));
 const ItemDefinition_1 = require("../../base/Root/Module/ItemDefinition");
 const basic_1 = require("../resolvers/basic");
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
+const NO_SSR = process.env.NO_SSR === "true";
 ;
 async function ssrGenerator(req, res, html, appData, mode, rule) {
     // first we need a root instance, because this will be used
@@ -34,7 +35,8 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
     // that the client recieved, eg. the client is using development or production builds and we activate
     // only if it matches our NODE_ENV, this means that in development mode, with development builds there is SSR
     // but not with production builds, and vice-versa
-    const SSRIsDisabledInThisMode = (mode === "development" && !developmentISSSRMode) ||
+    const SSRIsDisabledInThisMode = NO_SSR ||
+        (mode === "development" && !developmentISSSRMode) ||
         (mode === "production" && developmentISSSRMode);
     // now we get the config, and the language, from the original path, rememebr this generator runs
     // on an express router

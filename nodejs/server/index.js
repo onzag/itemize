@@ -219,6 +219,7 @@ function initializeApp(appData, custom) {
             });
         });
     });
+    // TODO root with redirect for homepage that doesn't rely on the client for it /
     app.use("/:lang", (req, res, next) => {
         if (req.params.lang.length !== 2) {
             next();

@@ -13,13 +13,18 @@ var NumericType;
 (function (NumericType) {
     NumericType[NumericType["FLOAT"] = 0] = "FLOAT";
     NumericType[NumericType["INTEGER"] = 1] = "INTEGER";
-})(NumericType || (NumericType = {}));
+    NumericType[NumericType["NAN"] = 2] = "NAN";
+})(NumericType = exports.NumericType || (exports.NumericType = {}));
 function getNumericType(type) {
     if (type === "number" || type === "currency" || type === "unit") {
         return NumericType.FLOAT;
     }
-    return NumericType.INTEGER;
+    else if (type === "integer" || type === "year") {
+        return NumericType.INTEGER;
+    }
+    return NumericType.NAN;
 }
+exports.getNumericType = getNumericType;
 function formatValueAsString(numericType, numberSeparator, value) {
     const actualValue = value === null || typeof value === "undefined" ? value : (typeof value.value !== "undefined" ? value.value : value);
     if (actualValue === null) {
@@ -37,6 +42,8 @@ class PropertyEntryField extends react_1.default.Component {
         this.onChangeByNumber = this.onChangeByNumber.bind(this);
         this.unitToNode = this.unitToNode.bind(this);
         this.onChangeUnit = this.onChangeUnit.bind(this);
+        this.onChangeCurrency = this.onChangeCurrency.bind(this);
+        this.getCurrentCurrency = this.getCurrentCurrency.bind(this);
         this.getCurrentUnit = this.getCurrentUnit.bind(this);
     }
     unitToNode(unit) {
@@ -130,6 +137,25 @@ class PropertyEntryField extends react_1.default.Component {
             unit: newUnit,
         });
     }
+    onChangeCurrency(code) {
+        const value = this.props.state.value;
+        if (!value) {
+            this.props.onChange(value, {
+                ...this.props.state.internalValue,
+                currency: code,
+            });
+            return;
+        }
+        const valueStr = typeof value.value === "number" && !isNaN(value.value) ? value.value.toString() : "";
+        const internalValue = this.props.state.internalValue && this.props.state.internalValue.value;
+        this.props.onChange({
+            ...value,
+            currency: code,
+        }, {
+            value: (internalValue || valueStr).toString().replace(".", this.props.i18n[this.props.language].number_decimal_separator),
+            currency: code,
+        });
+    }
     getCurrentUnit() {
         const prefersImperial = this.props.country.code === "US";
         const imperialUnit = this.props.property.getSpecialProperty("imperialUnit");
@@ -140,14 +166,37 @@ class PropertyEntryField extends react_1.default.Component {
             (this.props.state.internalValue && this.props.state.internalValue.unit)) || usedUnit;
         return [currentUnit, standardUnit, imperialUnit, prefersImperial];
     }
+    getCurrentCurrency() {
+        const countrySelectedCurrency = this.props.currency.code;
+        const currentCurrency = (this.props.state.value ?
+            this.props.state.value.currency :
+            (this.props.state.internalValue && this.props.state.internalValue.currency)) || countrySelectedCurrency;
+        return [currentCurrency, countrySelectedCurrency];
+    }
     onChangeByNumber(textualValue) {
-        if (textualValue.trim() === "") {
-            this.props.onChange(null, textualValue);
-            return;
-        }
         // let's get the type and the base type
         const type = this.props.property.getType();
         const numericType = getNumericType(type);
+        if (textualValue.trim() === "") {
+            if (type === "unit") {
+                const [newUnit] = this.getCurrentUnit();
+                this.props.onChange(null, {
+                    unit: newUnit,
+                    value: textualValue,
+                });
+            }
+            else if (type === "currency") {
+                const [newCurrency] = this.getCurrentCurrency();
+                this.props.onChange(null, {
+                    currency: newCurrency,
+                    value: textualValue,
+                });
+            }
+            else {
+                this.props.onChange(null, textualValue);
+            }
+            return;
+        }
         // like if we have a float
         let numericValue;
         let normalizedTextualValueAsString;
@@ -176,6 +225,13 @@ class PropertyEntryField extends react_1.default.Component {
                 const [newUnit] = this.getCurrentUnit();
                 this.props.onChange(NaN, {
                     unit: newUnit,
+                    value: textualValue,
+                });
+            }
+            else if (type === "currency") {
+                const [newCurrency] = this.getCurrentCurrency();
+                this.props.onChange(NaN, {
+                    currency: newCurrency,
                     value: textualValue,
                 });
             }
@@ -210,11 +266,15 @@ class PropertyEntryField extends react_1.default.Component {
         }
         // if the type is a currency
         if (type === "currency") {
+            const [currentCurrency] = this.getCurrentCurrency();
             // do the onchange with the currency code
             this.props.onChange({
                 value: actualNumericValue,
-                currency: this.props.currency.code,
-            }, newTextualValue);
+                currency: currentCurrency,
+            }, {
+                value: textualValue,
+                currency: currentCurrency,
+            });
         }
         else if (type === "unit") {
             const [newUnit, standardUnit] = this.getCurrentUnit();
@@ -255,11 +315,16 @@ class PropertyEntryField extends react_1.default.Component {
         const subtype = this.props.property.getSubtype();
         let currency = null;
         let currencyFormat = null;
+        let currencyArrData = null;
+        let currencyI18n = null;
         if (type === "currency") {
-            currency = this.props.state.value ?
-                imported_resources_1.currencies[this.props.state.value.currency] :
-                this.props.currency;
+            currencyArrData = imported_resources_1.arrCurrencies;
+            const [currencCurrency] = this.getCurrentCurrency();
+            currency = imported_resources_1.currencies[currencCurrency];
             currencyFormat = this.props.i18n[this.props.language].currency_format;
+            currencyI18n = {
+                title: this.props.i18n[this.props.language].currency_dialog_title,
+            };
         }
         let unitPrefersImperial;
         let unitIsLockedToPrimaries;
@@ -286,6 +351,14 @@ class PropertyEntryField extends react_1.default.Component {
                 imperial: this.props.i18n[this.props.language].unit_dialog_imperial,
             };
         }
+        const currentInternalStrOnlyValue = (type === "unit" || type === "currency") && this.props.state.internalValue ?
+            this.props.state.internalValue.value : this.props.state.internalValue;
+        let currentStrOnlyValue = (type === "unit" || type === "currency") && this.props.state.value ?
+            this.props.state.value.value.toString() : (this.props.state.value && this.props.state.value.toString());
+        const numericType = getNumericType(type);
+        if (numericType === NumericType.FLOAT) {
+            currentStrOnlyValue = formatValueAsString(numericType, this.props.i18n[this.props.language].number_decimal_separator, currentStrOnlyValue);
+        }
         const RendererElement = this.props.renderer;
         const rendererArgs = {
             propertyId: this.props.property.getId(),
@@ -303,18 +376,19 @@ class PropertyEntryField extends react_1.default.Component {
             currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
             currentInvalidReason: i18nInvalidReason,
             currentInternalValue: this.props.state.internalValue,
-            currentInternalStrOnlyValue: type === "unit" && this.props.state.internalValue ?
-                this.props.state.internalValue.value : this.props.state.internalValue,
-            currentStrOnlyValue: (type === "unit" || type === "currency") && this.props.state.value ?
-                this.props.state.value.value.toString() : (this.props.state.value && this.props.state.value.toString()),
+            currentInternalStrOnlyValue,
+            currentStrOnlyValue,
             canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
             disabled: this.props.state.enforced,
             autoFocus: this.props.autoFocus || false,
             onChange: this.props.onChange,
             onChangeByNumber: this.onChangeByNumber,
+            onChangeCurrency: this.onChangeCurrency,
             onRestore: this.props.onRestore,
             currency,
             currencyFormat: currencyFormat,
+            currencyArrData: currencyArrData,
+            currencyI18n,
             isNumericType: type === "currency" || type === "unit" || type === "number" || type === "integer" || type === "year",
             unitPrefersImperial,
             unitOptions,

@@ -97,14 +97,18 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
 
     if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
-      const fromArg = arg.args[fromName] as IGQLArgs;
-      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", fromArg.normalized as number);
+      const fromArg = arg.args[fromName] as any as IPropertyDefinitionSupportedCurrencyType;
+      const factor: number = arg.serverData[CURRENCY_FACTORS_IDENTIFIER][fromArg.currency];
+      const normalized = factor ? factor*fromArg.value : null;
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", normalized);
       searchedByIt = true;
     }
 
     if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
-      const toArg = arg.args[toName] as IGQLArgs;
-      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", toArg.normalized as number);
+      const toArg = arg.args[toName] as any as IPropertyDefinitionSupportedCurrencyType;
+      const factor: number = arg.serverData[CURRENCY_FACTORS_IDENTIFIER][toArg.currency];
+      const normalized = factor ? factor*toArg.value : null;
+      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", normalized);
       searchedByIt = true;
     }
 
@@ -138,16 +142,16 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
   sqlMantenience: (arg) => {
     const valueId = arg.prefix + arg.id + "_VALUE";
-    const normalizedValueId = arg.prefix + arg.id + "_CURRENCY";
-    const currencyId = arg.prefix + arg.id + "_NORMALIZED_VALUE";
+    const normalizedValueId = arg.prefix + arg.id + "_NORMALIZED_VALUE";
+    const currencyId = arg.prefix + arg.id + "_CURRENCY";
     const asConversionRule = arg.prefix + arg.id + "_CURRENCY_FACTORS";
     return {
       columnToSet: normalizedValueId,
-      setColumnToRaw: arg.knex.raw("??*??.??", [valueId, asConversionRule, "factor"]),
+      setColumnToRaw: ["??*??.??", [valueId, asConversionRule, "factor"]],
       from: CURRENCY_FACTORS_IDENTIFIER,
       fromAs: asConversionRule,
-      whereRaw: arg.knex.raw("??.?? = ??", [asConversionRule, "name", currencyId]),
-      updateConditionRaw: arg.knex.raw("??*??.?? > 0.5", [valueId, asConversionRule, "factor"])
+      whereRaw: ["?? is not NULL AND ??.?? = ??", [valueId, asConversionRule, "code", currencyId]],
+      updateConditionRaw: ["??*??.?? > 0.5", [valueId, asConversionRule, "factor"]],
     }
   },
   localSearch: (arg) => {

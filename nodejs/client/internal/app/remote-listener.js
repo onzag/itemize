@@ -18,9 +18,10 @@ class RemoteListener {
         this.isReconnect = false;
         this.offline = false;
         // private initialConsideredDisconnectedIfNoAnswerTimeout: NodeJS.Timeout;
+        this.hasSetToken = false;
         this.token = null;
         this.isReady = false;
-        this.reattachListeners = this.reattachListeners.bind(this);
+        this.onConnect = this.onConnect.bind(this);
         this.onChangeListened = this.onChangeListened.bind(this);
         this.onBuildnumberListened = this.onBuildnumberListened.bind(this);
         this.onDisconnect = this.onDisconnect.bind(this);
@@ -43,7 +44,7 @@ class RemoteListener {
         //   this.connectionListeners.forEach((l) => l());
         // }, 1000);
         this.socket = socket_io_client_1.default(`${location.protocol}//${location.host}`);
-        this.socket.on("connect", this.reattachListeners);
+        this.socket.on("connect", this.onConnect);
         this.socket.on("disconnect", this.onDisconnect);
         this.socket.on(remote_protocol_1.KICKED_EVENT, this.onKicked);
         this.socket.on(remote_protocol_1.CHANGED_FEEEDBACK_EVENT, this.onChangeListened);
@@ -77,6 +78,8 @@ class RemoteListener {
         }
     }
     async setToken(token) {
+        // token might be null so we use this flag
+        this.hasSetToken = true;
         this.token = token;
         if (this.socket.connected) {
             this.socket.emit(remote_protocol_1.IDENTIFY_REQUEST, {
@@ -392,30 +395,35 @@ class RemoteListener {
             this.socket.on(remote_protocol_1.IDENTIFIED_EVENT, doneListener);
         });
     }
-    async reattachListeners() {
+    async onConnect() {
         this.offline = false;
         // clearTimeout(this.initialConsideredDisconnectedIfNoAnswerTimeout);
-        // this prevents the request from triggering on the initial connection
-        // as setToken is expected to be called in order to set things to be ready
-        // this is more for reconnection purposes
-        if (!this.isReconnect) {
-            // the next time this hits it will be a reconnect, such are the subsequent times
-            this.isReconnect = true;
-            return;
-        }
         // so we attempt to reidentify as soon as we are connected
-        this.socket.emit(remote_protocol_1.IDENTIFY_REQUEST, {
-            uuid: this.uuid,
-            token: this.token,
-        });
-        // now we await for identification to be sucesful
-        await this.onIdentificationDone();
+        if (this.hasSetToken && !this.isReady) {
+            this.socket.emit(remote_protocol_1.IDENTIFY_REQUEST, {
+                uuid: this.uuid,
+                token: this.token,
+            });
+            // now we await for identification to be sucesful
+            await this.onIdentificationDone();
+        }
         // if we happened to die during the event then we return
         if (this.offline) {
             return;
         }
         // if we survived that then we are ready
         this.isReady = true;
+        // this prevents the request from triggering on the initial connection
+        // as setToken is expected to be called in order to set things to be ready
+        // this is more for reconnection purposes
+        if (this.isReconnect) {
+            this.onReconnect();
+        }
+        this.connectionListeners.forEach((l) => l());
+        // next timethis runs will be considered reconnect
+        this.isReconnect = true;
+    }
+    onReconnect() {
         // now we reconnect the listeners again
         Object.keys(this.listeners).forEach((listenerKey) => {
             this.attachItemDefinitionListenerFor(this.listeners[listenerKey].request);
@@ -437,9 +445,7 @@ class RemoteListener {
                 knownLastRecordDate: lastKnownRecordDate,
             });
         });
-        this.connectionListeners.forEach((l) => l());
         this.triggerCurrencyFactorsHandler();
-        this.isReconnect = true;
     }
     async onRecordsAddedToOwnedSearch(event) {
         const ownedListener = this.ownedSearchListeners[event.qualifiedPathName + "." + event.createdBy];

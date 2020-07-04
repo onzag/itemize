@@ -53,6 +53,9 @@ export const style = createStyles({
     color: shouldShowInvalid(props) ? "#f44336" : "#424242",
     marginRight: "-10px",
   }),
+  smallAddornment: (props: IPropertyEntryFieldRendererProps) => ({
+    color: shouldShowInvalid(props) ? "#f44336" : "#424242",
+  }),
   iconButtonPassword: {
     "backgroundColor": "#2196f3",
     "color": "#fff",
@@ -62,6 +65,11 @@ export const style = createStyles({
   },
   iconButton: {
     color: "#424242",
+  },
+  iconButtonSmall: {
+    color: "#424242",
+    width: "32px",
+    height: "32px",
   },
   textButton: {
     border: "solid 1px rgba(0,0,0,0.1)",
@@ -190,7 +198,7 @@ interface IPropertyEntryFieldRendererWithStylesProps extends IPropertyEntryField
 
 interface IPropertyEntryFieldRendererState {
   visible: boolean;
-  unitDialogOpen: boolean;
+  dialogOpen: boolean;
 }
 
 interface ISelectUnitDialogProps extends IPropertyEntryFieldRendererWithStylesProps {
@@ -277,6 +285,48 @@ function SelectUnitDialog(props: ISelectUnitDialogProps) {
 
 const SelectUnitDialogResponsive = withMobileDialog<ISelectUnitDialogProps>()(SelectUnitDialog);
 
+interface ISelectCurrencyDialogProps extends IPropertyEntryFieldRendererWithStylesProps {
+  open: boolean;
+  onClose: () => void;
+  fullScreen: boolean;
+}
+
+function SelectCurrencyDialog(props: ISelectCurrencyDialogProps) {
+  const closeAndChangeCurrency = (code: string) => {
+    props.onClose();
+    props.onChangeCurrency(code);
+  }
+  return (
+    <Dialog
+      classes={{
+        paper: "props.dialogClassName",
+      }}
+      open={props.open}
+      onClose={props.onClose}
+      aria-labelledby="currency-dialog-title"
+      fullScreen={props.fullScreen}
+    >
+      <DialogTitle id="currency-dialog-title">{props.currencyI18n.title}</DialogTitle>
+      <div>
+        <List>
+          {props.currencyArrData.map((currency) => (
+            <ListItem
+              selected={currency.code === props.currency.code}
+              button={true}
+              onClick={closeAndChangeCurrency.bind(null, currency.code)}
+              key={currency.code}
+            >
+              <ListItemText primary={currency.symbol + " - " + currency.code}/>
+            </ListItem>
+          ))}
+        </List>
+      </div>
+    </Dialog>
+  );
+}
+
+const SelectCurrencyDialogResponsive = withMobileDialog<ISelectCurrencyDialogProps>()(SelectCurrencyDialog);
+
 class ActualPropertyEntryFieldRenderer
   extends React.Component<IPropertyEntryFieldRendererWithStylesProps, IPropertyEntryFieldRendererState> {
 
@@ -288,7 +338,7 @@ class ActualPropertyEntryFieldRenderer
 
     this.state = {
       visible: props.type !== "password",
-      unitDialogOpen: false,
+      dialogOpen: false,
     }
 
     this.toggleVisible = this.toggleVisible.bind(this);
@@ -296,8 +346,8 @@ class ActualPropertyEntryFieldRenderer
     this.onChangeByHTMLEvent = this.onChangeByHTMLEvent.bind(this);
     this.onChange = this.onChange.bind(this);
     this.renderBasicTextField = this.renderBasicTextField.bind(this);
-    this.closeUnitDialog = this.closeUnitDialog.bind(this);
-    this.openUnitDialog = this.openUnitDialog.bind(this);
+    this.closeDialog = this.closeDialog.bind(this);
+    this.openDialog = this.openDialog.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     // this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
     // this.renderAutosuggestField = this.renderAutosuggestField.bind(this);
@@ -395,15 +445,15 @@ class ActualPropertyEntryFieldRenderer
     this.props.onChange(value, internalValue);
   }
 
-  public openUnitDialog() {
+  public openDialog() {
     this.setState({
-      unitDialogOpen: true,
+      dialogOpen: true,
     });
   }
 
-  public closeUnitDialog() {
+  public closeDialog() {
     this.setState({
-      unitDialogOpen: false,
+      dialogOpen: false,
     });
   }
 
@@ -491,15 +541,16 @@ class ActualPropertyEntryFieldRenderer
       );
     } else if (this.props.type === "currency") {
       if (this.props.currencyFormat === "$N") {
-        appliedInputProps.startAdornent = (
+        appliedInputProps.startAdornment = (
           <InputAdornment
             position="start"
-            className={this.props.classes.standardAddornment}
+            className={this.props.classes.smallAddornment}
           >
             <IconButton
               tabIndex={-1}
-              classes={{root: this.props.classes.iconButton}}
+              classes={{root: this.props.classes.iconButtonSmall}}
               onMouseDown={this.catchToggleMouseDownEvent}
+              onClick={this.openDialog}
             >
               {this.props.currency.symbol}
             </IconButton>
@@ -515,6 +566,7 @@ class ActualPropertyEntryFieldRenderer
               tabIndex={-1}
               classes={{root: this.props.classes.iconButton}}
               onMouseDown={this.catchToggleMouseDownEvent}
+              onClick={this.openDialog}
             >
               {this.props.currency.symbol}
             </IconButton>
@@ -531,7 +583,7 @@ class ActualPropertyEntryFieldRenderer
             tabIndex={-1}
             classes={{ root: this.props.classes.iconButton }}
             onMouseDown={this.catchToggleMouseDownEvent}
-            onClick={this.openUnitDialog}
+            onClick={this.openDialog}
           >
             {this.props.unitToNode(this.props.unit)}
           </IconButton>
@@ -576,8 +628,16 @@ class ActualPropertyEntryFieldRenderer
     const unitDialog = this.props.type === "unit" ? (
       <SelectUnitDialogResponsive
         {...this.props}
-        open={this.state.unitDialogOpen}
-        onClose={this.closeUnitDialog}
+        open={this.state.dialogOpen}
+        onClose={this.closeDialog}
+      />
+    ) : null;
+
+    const currencyDialog = this.props.type === "currency" ? (
+      <SelectCurrencyDialogResponsive
+        {...this.props}
+        open={this.state.dialogOpen}
+        onClose={this.closeDialog}
       />
     ) : null;
 
@@ -636,6 +696,7 @@ class ActualPropertyEntryFieldRenderer
         </div>
 
         {unitDialog}
+        {currencyDialog}
       </div>
     );
   }

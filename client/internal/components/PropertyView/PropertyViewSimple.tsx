@@ -1,6 +1,7 @@
 import React from "react";
 import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
 import equals from "deep-equal";
+import { getNumericType, NumericType } from "../PropertyEntry/PropertyEntryField";
 
 export interface IPropertyViewSimpleRendererProps extends IPropertyViewRendererProps<string> {
   capitalize: boolean;
@@ -40,17 +41,27 @@ export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProp
       this.props.state.value
     );
 
+    let currentValue = value === null ?
+      nullValueLabel :
+      (
+        (i18nData && i18nData.values[value.toString()]) ||
+        value.toString()
+      );
+
+    const numericType = getNumericType(
+      this.props.property.getType(),
+    );
+
+    if (numericType === NumericType.FLOAT) {
+      currentValue = currentValue.replace(".", this.props.i18n[this.props.language].number_decimal_separator);
+    }
+
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyViewSimpleRendererProps = {
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
       language: this.props.language,
-      currentValue: value === null ?
-        nullValueLabel :
-        (
-          (i18nData && i18nData.values[value.toString()]) ||
-          value.toString()
-        ),
+      currentValue,
       capitalize: !!this.props.capitalize,
     };
 

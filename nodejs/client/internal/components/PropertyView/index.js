@@ -14,6 +14,7 @@ const config_provider_1 = require("../../providers/config-provider");
 const PropertyViewBoolean_1 = require("./PropertyViewBoolean");
 const PropertyViewDateTime_1 = require("./PropertyViewDateTime");
 const PropertyViewLocation_1 = require("./PropertyViewLocation");
+const PropertyViewCurrency_1 = require("./PropertyViewCurrency");
 ;
 const handlerRegistry = {
     string: {
@@ -37,7 +38,10 @@ const handlerRegistry = {
         handler: PropertyViewText_1.default,
         includeConfig: true,
     },
-    currency: null,
+    currency: {
+        renderer: "PropertyViewCurrency",
+        handler: PropertyViewCurrency_1.PropertyViewCurrency,
+    },
     unit: null,
     password: {
         renderer: "PropertyViewSimple",
@@ -88,7 +92,7 @@ function RawBasePropertyView(props) {
                 invalidReason: null,
                 internalValue: null,
                 propertyId: null,
-            }, language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency], country: imported_resources_1.countries[locale.country], renderer: renderer, rendererArgs: props.rendererArgs || {} }));
+            }, currencyFactors: null, language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency], country: imported_resources_1.countries[locale.country], renderer: renderer, rendererArgs: props.rendererArgs || {} }));
     })));
 }
 exports.RawBasePropertyView = RawBasePropertyView;
@@ -103,9 +107,9 @@ function PropertyView(props) {
     return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(app_1.LocaleContext.Consumer, null, (locale) => {
         const renderer = props.renderer || renderers[registryEntry.renderer];
         if (registryEntry.includeConfig) {
-            return react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(Element, Object.assign({}, props, { language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency], country: imported_resources_1.countries[locale.country], renderer: renderer, rendererArgs: props.rendererArgs || {}, config: config }))));
+            return react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(Element, Object.assign({}, props, { language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency], currencyFactors: locale.currencyFactors, country: imported_resources_1.countries[locale.country], renderer: renderer, rendererArgs: props.rendererArgs || {}, config: config }))));
         }
-        return (react_1.default.createElement(Element, Object.assign({}, props, { language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency], country: imported_resources_1.countries[locale.country], renderer: renderer, rendererArgs: props.rendererArgs || {} })));
+        return (react_1.default.createElement(Element, Object.assign({}, props, { language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency], currencyFactors: locale.currencyFactors, country: imported_resources_1.countries[locale.country], renderer: renderer, rendererArgs: props.rendererArgs || {} })));
     })));
 }
 exports.default = PropertyView;

@@ -225,6 +225,8 @@ exports.LOCALE_I18N = [
     "unit_dialog_others",
     "unit_dialog_metric",
     "unit_dialog_imperial",
+    // for showing the currency selection dialog when selecting a currency
+    "currency_dialog_title",
     // when the app cannot be updated
     "blocked_update",
     "needs_update_navigation",

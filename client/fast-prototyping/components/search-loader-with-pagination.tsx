@@ -5,7 +5,7 @@ import Snackbar from "./snackbar";
 
 interface ISearchLoaderWithPaginationProps {
   pageSize: number;
-  children: (arg: IPagedSearchLoaderArg, pagination: React.ReactNode) => React.ReactNode;
+  children: (arg: IPagedSearchLoaderArg, pagination: React.ReactNode, noResults: boolean) => React.ReactNode;
 }
 
 export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationProps) {
@@ -20,9 +20,10 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
           null :
           <Pagination count={arg.pageCount} color="primary" page={arg.currentPage + 1} onChange={handlePageChange}/>
         );
+        // TODO add the search results to say when there's an acutal search and say when there are no results
         return (
           <>
-            {props.children(arg, pagination)}
+            {props.children(arg, pagination, !!(arg.searchId && arg.pageCount === 0))}
             <Snackbar
               i18nDisplay={arg.error}
               open={!!arg.error}

@@ -73,12 +73,16 @@ const typeValue = {
         }
         if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
             const fromArg = arg.args[fromName];
-            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", fromArg.normalized);
+            const factor = arg.serverData[constants_1.CURRENCY_FACTORS_IDENTIFIER][fromArg.currency];
+            const normalized = factor ? factor * fromArg.value : null;
+            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", normalized);
             searchedByIt = true;
         }
         if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
             const toArg = arg.args[toName];
-            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", toArg.normalized);
+            const factor = arg.serverData[constants_1.CURRENCY_FACTORS_IDENTIFIER][toArg.currency];
+            const normalized = factor ? factor * toArg.value : null;
+            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", normalized);
             searchedByIt = true;
         }
         return searchedByIt;
@@ -112,16 +116,16 @@ const typeValue = {
     },
     sqlMantenience: (arg) => {
         const valueId = arg.prefix + arg.id + "_VALUE";
-        const normalizedValueId = arg.prefix + arg.id + "_CURRENCY";
-        const currencyId = arg.prefix + arg.id + "_NORMALIZED_VALUE";
+        const normalizedValueId = arg.prefix + arg.id + "_NORMALIZED_VALUE";
+        const currencyId = arg.prefix + arg.id + "_CURRENCY";
         const asConversionRule = arg.prefix + arg.id + "_CURRENCY_FACTORS";
         return {
             columnToSet: normalizedValueId,
-            setColumnToRaw: arg.knex.raw("??*??.??", [valueId, asConversionRule, "factor"]),
+            setColumnToRaw: ["??*??.??", [valueId, asConversionRule, "factor"]],
             from: constants_1.CURRENCY_FACTORS_IDENTIFIER,
             fromAs: asConversionRule,
-            whereRaw: arg.knex.raw("??.?? = ??", [asConversionRule, "name", currencyId]),
-            updateConditionRaw: arg.knex.raw("??*??.?? > 0.5", [valueId, asConversionRule, "factor"])
+            whereRaw: ["?? is not NULL AND ??.?? = ??", [valueId, asConversionRule, "code", currencyId]],
+            updateConditionRaw: ["??*??.?? > 0.5", [valueId, asConversionRule, "factor"]],
         };
     },
     localSearch: (arg) => {

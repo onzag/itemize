@@ -11,6 +11,7 @@ interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
     itemDefinition: ItemDefinition;
 }
 export interface ISearchLoaderArg {
+    searchId: string;
     searchRecords: IGQLSearchRecordWithPopulateData[];
     pageCount: number;
     totalCount: number;

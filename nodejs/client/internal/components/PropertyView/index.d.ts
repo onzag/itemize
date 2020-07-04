@@ -36,6 +36,9 @@ export interface IPropertyViewHandlerProps<RendererPropsType> extends IPropertyV
     language: string;
     rtl: boolean;
     currency: ICurrencyType;
+    currencyFactors: {
+        [code: string]: number;
+    };
     i18n: Ii18NType;
     country: ICountryType;
 }

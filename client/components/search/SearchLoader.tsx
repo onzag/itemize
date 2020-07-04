@@ -22,6 +22,7 @@ interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
 }
 
 export interface ISearchLoaderArg {
+  searchId: string;
   searchRecords: IGQLSearchRecordWithPopulateData[];
   pageCount: number;
   totalCount: number;
@@ -419,6 +420,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             error: this.state.error,
             dismissError: this.dismissError,
             refreshPage: this.refreshPage,
+            searchId: this.props.searchId,
           })
         }
       </SearchItemDefinitionValueContext.Provider>

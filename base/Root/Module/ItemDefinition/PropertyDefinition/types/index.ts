@@ -273,11 +273,11 @@ export interface IPropertyDefinitionSupportedType {
    */
   sqlMantenience: (arg: ISQLArgInfo) => {
     columnToSet: string,
-    setColumnToRaw: Knex.Raw,
+    setColumnToRaw: [string, any[]],
     from: string,
     fromAs: string,
-    whereRaw: Knex.Raw,
-    updateConditionRaw: Knex.Raw,
+    whereRaw: [string, any[]],
+    updateConditionRaw: [string, any[]],
   };
 
   /**

@@ -13,6 +13,7 @@ export declare class RemoteListener {
     private uuid;
     private isReconnect;
     private offline;
+    private hasSetToken;
     private token;
     private isReady;
     private logout;
@@ -47,7 +48,8 @@ export declare class RemoteListener {
     private onChangeListened;
     private consumeDelayedFeedbacks;
     private onIdentificationDone;
-    private reattachListeners;
+    private onConnect;
+    private onReconnect;
     private onRecordsAddedToOwnedSearch;
     private onRecordsAddedToParentedSearch;
     private onDisconnect;

@@ -55,6 +55,8 @@ unit_dialog_others = other units
 unit_dialog_metric = metric
 unit_dialog_imperial = imperial
 
+currency_dialog_title = select currency
+
 menu = menu
 reload = reload
 home = home
@@ -146,6 +148,8 @@ unit_dialog_title = select a unit
 unit_dialog_others = other units
 unit_dialog_metric = metric
 unit_dialog_imperial = imperial
+
+currency_dialog_title = select currency
 
 menu = menu
 reload = reload
@@ -239,6 +243,8 @@ unit_dialog_others = other units
 unit_dialog_metric = metric
 unit_dialog_imperial = imperial
 
+currency_dialog_title = select currency
+
 menu = menu
 reload = reload
 home = home
@@ -330,6 +336,8 @@ unit_dialog_title = wählen Sie eine Einheit
 unit_dialog_others = andere Einheiten
 unit_dialog_metric = Metrisch
 unit_dialog_imperial = Zoll
+
+currency_dialog_title = select currency
 
 menu = Menü
 reload = reload
@@ -423,6 +431,8 @@ unit_dialog_others = otras Unidades
 unit_dialog_metric = métricas
 unit_dialog_imperial = imperiales
 
+currency_dialog_title = seleccione divisa
+
 menu = menú
 reload = recargar
 home = página principal
@@ -514,6 +524,8 @@ unit_dialog_title = اختر وحدة
 unit_dialog_others = وحدات اخرى
 unit_dialog_metric = المقياس المتري
 unit_dialog_imperial = المقياس البريطاني
+
+currency_dialog_title = select currency
 
 menu = لائحة
 reload = reload

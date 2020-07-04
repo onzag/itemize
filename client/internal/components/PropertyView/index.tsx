@@ -20,6 +20,7 @@ import { ConfigContext } from "../../providers/config-provider";
 import { PropertyViewBoolean } from "./PropertyViewBoolean";
 import { PropertyViewDateTime } from "./PropertyViewDateTime";
 import { PropertyViewLocation } from "./PropertyViewLocation";
+import { PropertyViewCurrency } from "./PropertyViewCurrency";
 
 /**
  * This is what every view renderer gets
@@ -52,6 +53,9 @@ export interface IPropertyViewHandlerProps<RendererPropsType> extends IPropertyV
   language: string;
   rtl: boolean;
   currency: ICurrencyType;
+  currencyFactors: {
+    [code: string]: number,
+  };
   i18n: Ii18NType;
   country: ICountryType;
 }
@@ -88,7 +92,10 @@ const handlerRegistry:
     handler: PropertyViewText,
     includeConfig: true,
   },
-  currency: null,
+  currency: {
+    renderer: "PropertyViewCurrency",
+    handler: PropertyViewCurrency,
+  },
   unit: null,
   password: {
     renderer: "PropertyViewSimple",
@@ -160,6 +167,7 @@ export function RawBasePropertyView(props: {
                       internalValue: null,
                       propertyId: null,
                     }}
+                    currencyFactors={null}
                     language={locale.language}
                     i18n={locale.i18n}
                     rtl={locale.rtl}
@@ -208,6 +216,7 @@ export default function PropertyView(
                         i18n={locale.i18n}
                         rtl={locale.rtl}
                         currency={currencies[locale.currency]}
+                        currencyFactors={locale.currencyFactors}
                         country={countries[locale.country]}
                         renderer={renderer}
                         rendererArgs={props.rendererArgs || {}}
@@ -223,6 +232,7 @@ export default function PropertyView(
                     i18n={locale.i18n}
                     rtl={locale.rtl}
                     currency={currencies[locale.currency]}
+                    currencyFactors={locale.currencyFactors}
                     country={countries[locale.country]}
                     renderer={renderer}
                     rendererArgs={props.rendererArgs || {}}

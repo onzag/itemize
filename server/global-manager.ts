@@ -272,8 +272,8 @@ export class GlobalManager {
       from: string,
       as: string,
     }> = [];
-    const andWhereRules: any[] = [];
-    const orWhereRules: any[] = [];
+    const andWhereRules: Array<[string, any[]]> = [];
+    const orWhereRules: Array<[string, any[]]> = [];
     properties.forEach((p) => {
       const mantenienceRule = p.pdef.getPropertyDefinitionDescription().sqlMantenience({
         knex: this.knex,
@@ -283,51 +283,80 @@ export class GlobalManager {
         property: p.pdef,
         itemDefinition: p.itemDefinition,
       });
-      updateRules[mantenienceRule.columnToSet] = mantenienceRule.setColumnToRaw;
-      if (mantenienceRule.from) {
-        fromRules.push({
-          from: mantenienceRule.from,
-          as: mantenienceRule.fromAs,
-        });
-      }
-      if (mantenienceRule.whereRaw) {
-        andWhereRules.push(mantenienceRule.whereRaw);
-      }
-      if (mantenienceRule.updateConditionRaw) {
-        orWhereRules.push(mantenienceRule.updateConditionRaw);
+      if (mantenienceRule) {
+        updateRules[mantenienceRule.columnToSet] = mantenienceRule.setColumnToRaw;
+        if (mantenienceRule.from) {
+          fromRules.push({
+            from: mantenienceRule.from,
+            as: mantenienceRule.fromAs,
+          });
+        }
+        if (mantenienceRule.whereRaw) {
+          andWhereRules.push(mantenienceRule.whereRaw);
+        }
+        if (mantenienceRule.updateConditionRaw) {
+          orWhereRules.push(mantenienceRule.updateConditionRaw);
+        }
       }
     });
 
-    const updateQuery = this.knex.update(updateRules).table(tableName);
-    if (fromRules.length) {
-      const bindings: string[] = [];
-      const structure = fromRules.map((rule) => {
-        bindings.push(rule.from);
-        if (rule.as) {
-          bindings.push(rule.as);
-          return "?? ??";
-        }
-        return "??";
-      });
+    let query = "UPDATE ?? SET";
+    let bindings: any[] = [tableName];
+    
+    query += " " + Object.keys(updateRules).map((columnToSet) => {
+      const ruleRawStr = updateRules[columnToSet][0];
+      bindings.push(columnToSet);
+      bindings = bindings.concat(updateRules[columnToSet][1]);
 
-      const rawFrom = this.knex.raw(structure.join(","), bindings);
-      updateQuery.from(rawFrom);
+      return "?? = " + ruleRawStr;
+    }).join(", ");
+
+    if (fromRules.length) {
+      query += " FROM "
+      query += fromRules.map((rule) => {
+        bindings.push(rule.from);
+        bindings.push(rule.as);
+        return "?? ??"
+      }).join(",");
     }
-    if (andWhereRules.length) {
-      andWhereRules.forEach((wr) => {
-        updateQuery.andWhere(wr);
-      });
+
+    if (sinceLimiter || orWhereRules.length || andWhereRules.length) {
+      query += " WHERE";
     }
+
     if (sinceLimiter) {
-      updateQuery.andWhere("created_at", ">=", sinceLimiter);
+      query += " ?? >= ?";
+      bindings.push("created_at", sinceLimiter);
     }
+
+    if (andWhereRules.length) {
+      if (sinceLimiter) {
+        query += " AND ";
+      } else {
+        query += " ";
+      }
+      query += andWhereRules.map((rule) => {
+        bindings = bindings.concat(rule[1]);
+        return rule[0];
+      }).join(" AND ");
+    }
+
     if (orWhereRules.length) {
-      updateQuery.andWhere((orBuilder) => {
-        orWhereRules.forEach((orRule) => {
-          orBuilder.orWhere(orRule);
-        });
-      });
+      if (sinceLimiter || andWhereRules.length) {
+        query += " AND (";
+      } else {
+        query += " (";
+      }
+
+      query += orWhereRules.map((rule) => {
+        bindings = bindings.concat(rule[1]);
+        return rule[0];
+      }).join(" OR ");
+
+      query += ")"
     }
+
+    await this.knex.raw(query, bindings);
 
     // we do not update last_modified in order to avoid useless updates
     // sql mantenience changes now so that it doesn't inform any client or cluster for changes

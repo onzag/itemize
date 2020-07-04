@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const deep_equal_1 = __importDefault(require("deep-equal"));
+const PropertyEntryField_1 = require("../PropertyEntry/PropertyEntryField");
 class PropertyViewSimple extends react_1.default.Component {
     constructor(props) {
         super(props);
@@ -32,15 +33,20 @@ class PropertyViewSimple extends react_1.default.Component {
         const value = (this.props.useAppliedValue ?
             this.props.state.stateAppliedValue :
             this.props.state.value);
+        let currentValue = value === null ?
+            nullValueLabel :
+            ((i18nData && i18nData.values[value.toString()]) ||
+                value.toString());
+        const numericType = PropertyEntryField_1.getNumericType(this.props.property.getType());
+        if (numericType === PropertyEntryField_1.NumericType.FLOAT) {
+            currentValue = currentValue.replace(".", this.props.i18n[this.props.language].number_decimal_separator);
+        }
         const RendererElement = this.props.renderer;
         const rendererArgs = {
             args: this.props.rendererArgs,
             rtl: this.props.rtl,
             language: this.props.language,
-            currentValue: value === null ?
-                nullValueLabel :
-                ((i18nData && i18nData.values[value.toString()]) ||
-                    value.toString()),
+            currentValue,
             capitalize: !!this.props.capitalize,
         };
         return react_1.default.createElement(RendererElement, Object.assign({}, rendererArgs));
