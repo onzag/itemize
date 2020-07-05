@@ -40,6 +40,7 @@ const global_manager_1 = require("./global-manager");
 const generator_1 = require("./ssr/generator");
 const rootpool_1 = require("./rootpool");
 const sql_files_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files");
+const generator_2 = require("./seo/generator");
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -203,6 +204,30 @@ function initializeApp(appData, custom) {
     app.get("/sw.production.js", (req, res) => {
         res.sendFile(path_1.default.resolve(path_1.default.join("dist", "data", "service-worker.production.js")));
     });
+    app.get("/robots.txt", (req, res) => {
+        res.setHeader("content-type", "text/plain; charset=utf-8");
+        let result = "user-agent = *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
+            "disallow: /rest/currency-factors\ndisallow: /graphql\n";
+        if (appData.seoConfig) {
+            Object.keys(appData.seoConfig.seoRules).forEach((urlSet) => {
+                const rule = appData.seoConfig.seoRules[urlSet];
+                if (!rule.crawable) {
+                    const splittedSet = urlSet.replace(/^:[A-Za-z_-]+/g, "*").split(",");
+                    appData.config.supportedLanguages.forEach((supportedLanguage) => {
+                        splittedSet.forEach((denyURL) => {
+                            result += "disallow: /" + supportedLanguage;
+                            if (!denyURL.startsWith("/")) {
+                                result += "/";
+                            }
+                            result += denyURL;
+                        });
+                    });
+                }
+            });
+            result += "Sitemap: " + appData.pkgcloudUploadContainers[appData.seoConfig.seoContainerId].prefix + "sitemaps/index.xml";
+        }
+        res.end(result);
+    });
     const router = express_1.default.Router();
     Object.keys(appData.ssrConfig.ssrRules).forEach((urlCombo) => {
         const rule = appData.ssrConfig.ssrRules[urlCombo];
@@ -257,7 +282,7 @@ function getContainerPromisified(client, containerName) {
 }
 /**
  * Initializes the itemize server with its custom configuration
- * @param ssrRules the server side rendering rules
+ * @param ssrConfig the server side rendering rules
  * @param custom the customization details
  * @param custom.customGQLQueries custom graphql queries
  * @param custom.customTokenGQLQueries custom token graphql queries for generating custom tokens
@@ -268,7 +293,7 @@ function getContainerPromisified(client, containerName) {
  * @param custom.customRouter a custom router to attach to the rest endpoint
  * @param custom.customTriggers a registry for custom triggers
  */
-async function initializeServer(ssrConfig, custom = {}) {
+async function initializeServer(ssrConfig, seoConfig, custom = {}) {
     if (INSTANCE_MODE === "BUILD_DATABASE") {
         dbbuilder_1.default(NODE_ENV);
         return;
@@ -400,6 +425,27 @@ async function initializeServer(ssrConfig, custom = {}) {
         if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
             exports.logger.info("initializeServer: setting up global manager");
             const manager = new global_manager_1.GlobalManager(root, knex, redisGlobalClient, redisPub, config, sensitiveConfig);
+            if (seoConfig) {
+                exports.logger.info("initializeServer: initializing SEO configuration");
+                const seoContainerData = sensitiveConfig.openstackContainers[seoConfig.seoContainerId];
+                const seoContainerClient = pkgcloud_1.default.storage.createClient({
+                    provider: "openstack",
+                    username: seoContainerData.username,
+                    keystoneAuthVersion: 'v3',
+                    region: seoContainerData.region,
+                    domainId: seoContainerData.domainId,
+                    domainName: seoContainerData.domainName,
+                    password: seoContainerData.password,
+                    authUrl: seoContainerData.authUrl,
+                });
+                let prefix = config.containersHostnamePrefixes[seoConfig.seoContainerId];
+                if (prefix.indexOf("/") !== 0) {
+                    prefix = "https://" + prefix;
+                }
+                const seoContainer = await getContainerPromisified(seoContainerClient, seoContainerData.containerName);
+                const seoGenerator = new generator_2.SEOGenerator(seoConfig.seoRules, seoContainer, prefix);
+                manager.setSEOGenerator(seoGenerator);
+            }
             manager.run();
             if (INSTANCE_MODE === "GLOBAL_MANAGER") {
                 return;
@@ -493,6 +539,7 @@ async function initializeServer(ssrConfig, custom = {}) {
             rootPool: rootpool_1.retrieveRootPool(root.rawData),
             langLocales,
             ssrConfig,
+            seoConfig,
             indexDevelopment: index.replace(/\$MODE/g, "development"),
             indexProduction: index.replace(/\$MODE/g, "production"),
             config,

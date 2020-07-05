@@ -20,6 +20,7 @@ import { IRendererContext } from "../client/providers/renderer";
 import { ILocaleContextType } from "../client/internal/app";
 import { ICollectorType } from "../client";
 import { Pool } from "tarn";
+import { ISEORuleSet } from "./seo";
 export declare const logger: winston.Logger;
 /**
  * Contains all the pkgcloud clients connection for every container id
@@ -47,17 +48,16 @@ export interface ISSRConfig {
     mainWrapper?: (mainComponet: React.ReactElement, localeContext: ILocaleContextType) => React.ReactElement;
     collector?: ICollectorType;
 }
-export interface ISEORobotsConfig {
-    [userAgent: string]: string[];
-}
 export interface ISEOConfig {
-    robots: {};
+    seoRules: ISEORuleSet;
+    seoContainerId: string;
 }
 export interface IAppDataType {
     root: Root;
     rootPool: Pool<Root>;
     langLocales: ILangLocalesType;
     ssrConfig: ISSRConfig;
+    seoConfig: ISEOConfig;
     indexDevelopment: string;
     indexProduction: string;
     config: IConfigRawJSONDataType;
@@ -95,7 +95,7 @@ export interface IServerCustomizationDataType {
 }
 /**
  * Initializes the itemize server with its custom configuration
- * @param ssrRules the server side rendering rules
+ * @param ssrConfig the server side rendering rules
  * @param custom the customization details
  * @param custom.customGQLQueries custom graphql queries
  * @param custom.customTokenGQLQueries custom token graphql queries for generating custom tokens
@@ -106,4 +106,4 @@ export interface IServerCustomizationDataType {
  * @param custom.customRouter a custom router to attach to the rest endpoint
  * @param custom.customTriggers a registry for custom triggers
  */
-export declare function initializeServer(ssrConfig: ISSRConfig, custom?: IServerCustomizationDataType): Promise<void>;
+export declare function initializeServer(ssrConfig: ISSRConfig, seoConfig: ISEOConfig, custom?: IServerCustomizationDataType): Promise<void>;

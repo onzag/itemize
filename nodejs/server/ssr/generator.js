@@ -12,8 +12,10 @@ const react_router_dom_1 = require("react-router-dom");
 const server_1 = __importDefault(require("react-dom/server"));
 const ItemDefinition_1 = require("../../base/Root/Module/ItemDefinition");
 const basic_1 = require("../resolvers/basic");
+const moment_1 = __importDefault(require("moment"));
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
 const NO_SSR = process.env.NO_SSR === "true";
+const DATE_RFC2822 = "ddd, DD MMM YYYY HH:mm:ss ZZ";
 ;
 async function ssrGenerator(req, res, html, appData, mode, rule) {
     // first we need a root instance, because this will be used
@@ -30,6 +32,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         res.status(500).end("Internal Server Error");
         return;
     }
+    const ifNoneMatch = req.headers["if-none-match"];
     // now we need to see if we are going to use SSR, due to the fact the NODE_ENV must
     // match between the client and the server in order to produce valid SSR, we check the mode
     // that the client recieved, eg. the client is using development or production builds and we activate
@@ -58,6 +61,8 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         // if it's dynamic we pass the args, otherwse it is what it is
         resultRule = typeof rule === "function" ? rule(req, language, root) : rule;
     }
+    let etag;
+    let invalidCollectDateIndex = null;
     // This is the default, what happens to routes that have nothing setup for them
     // so if no result rule could be calculated, but we also need to ensure that 
     if (!resultRule) {
@@ -80,8 +85,9 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             rtl: false,
             languages: config.supportedLanguages,
             forUser: null,
-            memId: "*." + mode,
+            memId: "*." + appData.buildnumber + "." + mode,
         };
+        etag = appliedRule.memId;
         // this is the root form without any language or any means, there's no SSR data to fill
     }
     else {
@@ -127,8 +133,9 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         // language makes the memory specific for it, in this case language
         // matters so we need to add it to the memory id
         if (appliedRule.memId) {
-            appliedRule.memId += "." + mode + "." + appliedRule.language;
+            appliedRule.memId += "." + appData.buildnumber + "." + mode + "." + appliedRule.language;
         }
+        etag = appliedRule.memId;
         // however like previously specified, we don't want to cache answers for specific
         // users, because they are different, only guests really matter, so we want
         // to drop the memId in such a case completely, no caching of speciifc user id answers
@@ -142,6 +149,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
                     collectionPoint[3] === null);
                 if (!isFindingCurrentUser) {
                     appliedRule.collect = [...appliedRule.collect, ["users", "user", appliedRule.forUser.id, null]];
+                    invalidCollectDateIndex = appliedRule.collect.length - 1;
                 }
             }
         }
@@ -151,6 +159,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
     let collectionFailed = false;
     // and gathering the queries
     const queries = [];
+    let lastModified = new Date(parseInt(appData.buildnumber));
     // now we try to collect if we are asked to collect data
     if (appliedRule.collect) {
         // and we need to build this signature of collection of data
@@ -190,6 +199,10 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             }
             else {
                 // otherwise it's when it was last modified
+                const dateValue = new Date(rowValue.last_modified);
+                if (lastModified.getTime() < dateValue.getTime()) {
+                    lastModified = dateValue;
+                }
                 collectionSignatureArray[index] = rowValue.last_modified;
             }
             // now we build the fileds for the given role access
@@ -219,6 +232,21 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         // now we build the signature as a string
         collectionSignature = collectionSignatureArray.join(".");
     }
+    etag += "-" + collectionSignature.replace(/\s/g, "_");
+    etag = JSON.stringify(etag);
+    if (!collectionFailed &&
+        ifNoneMatch &&
+        // this actually even would check the buildnumber
+        ifNoneMatch === etag) {
+        res.setHeader("Last-Modified", moment_1.default(lastModified).utc().locale("en").format(DATE_RFC2822));
+        res.setHeader("Date", moment_1.default().utc().locale("en").format(DATE_RFC2822));
+        res.setHeader("ETag", etag);
+        res.setHeader("Cache-Control", "public, max-age=0");
+        res.status(304).end();
+        root.cleanState();
+        appData.rootPool.release(root);
+        return;
+    }
     // so if nothing failed during collection, and we have a memory id
     // and we have a memoized answer for that memory id which matches
     // the collection signature
@@ -226,6 +254,9 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         appliedRule.memId) {
         const memoizedAnswer = await appData.cache.getRaw("MEM." + appliedRule.memId);
         if (memoizedAnswer && memoizedAnswer.value && memoizedAnswer.value.collectionSignature === collectionSignature) {
+            res.setHeader("Last-Modified", moment_1.default(lastModified).utc().locale("en").format(DATE_RFC2822));
+            res.setHeader("Date", moment_1.default().utc().locale("en").format(DATE_RFC2822));
+            res.setHeader("ETag", etag);
             // we are done just serve what is in memory and the chicken is done
             res.setHeader("content-type", "text/html; charset=utf-8");
             res.end(memoizedAnswer.value.html);
@@ -333,6 +364,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
             newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
             res.setHeader("content-type", "text/html; charset=utf-8");
+            // cannot set etag or cache headers because the rendering failed
             res.end(newHTML);
             root.cleanState();
             appData.rootPool.release(root);
@@ -365,6 +397,11 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
     }
     // and finally answer the client
     res.setHeader("content-type", "text/html; charset=utf-8");
+    if (!collectionFailed) {
+        res.setHeader("Last-Modified", moment_1.default(lastModified).utc().locale("en").format(DATE_RFC2822));
+        res.setHeader("Date", moment_1.default().utc().locale("en").format(DATE_RFC2822));
+        res.setHeader("ETag", etag);
+    }
     res.end(newHTML);
     // clean and release, it's done!!!
     root.cleanState();

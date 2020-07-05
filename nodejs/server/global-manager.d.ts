@@ -2,6 +2,7 @@ import Knex from "knex";
 import { RedisClient } from "redis";
 import Root from "../base/Root";
 import { ISensitiveConfigRawJSONDataType, IConfigRawJSONDataType } from "../config";
+import { SEOGenerator } from "./seo/generator";
 export declare class GlobalManager {
     private root;
     private knex;
@@ -14,11 +15,13 @@ export declare class GlobalManager {
     private currencyLayer;
     private sensitiveConfig;
     private config;
+    private seoGenerator;
     constructor(root: Root, knex: Knex, globalCache: RedisClient, redisPub: RedisClient, config: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType);
+    setSEOGenerator(seoGenerator: SEOGenerator): void;
     private addAdminUserIfMissing;
     private processModule;
     private processIdef;
-    run(): Promise<void>;
+    run(): void;
     private runOnce;
     private runForModule;
     private runForIdef;

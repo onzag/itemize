@@ -230,7 +230,7 @@ function deleteEverythingInFilesContainerId(uploadsContainer, itemDefinitionOrMo
 exports.deleteEverythingInFilesContainerId = deleteEverythingInFilesContainerId;
 async function removeFolderFor(uploadsContainer, mainPath) {
     return new Promise((resolve, reject) => {
-        server_1.logger.debug("Deleting folder for", { mainPath });
+        server_1.logger.debug("removeFolderFor: Deleting folder for", { mainPath });
         uploadsContainer.getFiles({
             prefix: mainPath,
         }, (err, files) => {
@@ -238,7 +238,7 @@ async function removeFolderFor(uploadsContainer, mainPath) {
                 reject(err);
             }
             else if (files && files.length) {
-                server_1.logger.debug("Bulk deleting", { files });
+                server_1.logger.debug("removeFolderFor: Bulk deleting", { files });
                 uploadsContainer.client.bulkDelete(uploadsContainer, files, (err) => {
                     if (err) {
                         reject(err);
@@ -249,7 +249,7 @@ async function removeFolderFor(uploadsContainer, mainPath) {
                 });
             }
             else {
-                server_1.logger.debug("Could not find any files");
+                server_1.logger.debug("removeFolderFor: Could not find any files");
                 resolve();
             }
         });
@@ -278,7 +278,7 @@ async function addFileFor(mainFilePath, curatedFileName, uploadsContainer, uploa
     }
 }
 async function sqlUploadPipeFile(uploadsContainer, uploadsPrefix, readStream, remote) {
-    server_1.logger.debug("Uploading", { remote });
+    server_1.logger.debug("sqlUploadPipeFile: Uploading", { remote });
     const writeStream = uploadsContainer.client.upload({
         container: uploadsContainer,
         remote,
@@ -286,7 +286,7 @@ async function sqlUploadPipeFile(uploadsContainer, uploadsPrefix, readStream, re
     readStream.pipe(writeStream);
     return new Promise((resolve, reject) => {
         writeStream.on("finish", () => {
-            server_1.logger.debug("Finished uploading", { remote });
+            server_1.logger.debug("sqlUploadPipeFile: Finished uploading", { remote });
             verifyResourceIsReady(new URL(uploadsPrefix + remote), resolve);
         });
         writeStream.on("error", reject);
@@ -295,18 +295,18 @@ async function sqlUploadPipeFile(uploadsContainer, uploadsPrefix, readStream, re
 exports.sqlUploadPipeFile = sqlUploadPipeFile;
 function verifyResourceIsReady(url, done) {
     const strURL = url.toString();
-    server_1.logger.debug("Verifying readiness of " + strURL);
+    server_1.logger.debug("verifyResourceIsReady: Verifying readiness of " + strURL);
     https_1.default.get({
         method: "HEAD",
         host: url.host,
         path: url.pathname,
     }, (resp) => {
         if (resp.statusCode === 200 || resp.statusCode === 0) {
-            server_1.logger.debug("Verification succeed " + strURL);
+            server_1.logger.debug("verifyResourceIsReady: Verification succeed " + strURL);
             done();
         }
         else {
-            server_1.logger.debug("Resource is not yet ready " + strURL);
+            server_1.logger.debug("verifyResourceIsReady: Resource is not yet ready " + strURL);
             setTimeout(verifyResourceIsReady.bind(null, url, done), 100);
         }
     });

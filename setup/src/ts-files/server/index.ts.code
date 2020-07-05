@@ -128,4 +128,21 @@ initializeServer(
     // the style collector which collects style for material UI SSR
     collector: styleCollector,
   },
+  {
+    seoRules: {
+      "/": {
+        crawable: true,
+      },
+      "profile/:id": {
+        crawable: true,
+        collect: [
+          ["users", "user"]
+        ],
+      },
+    },
+    // remember to specify the proper container id or otherwise you will get an error
+    // refer to your sensitive configuration to see your available container ids
+    // that is where sitemaps are stored
+    seoContainerId: "*",
+  },
 );

@@ -35,6 +35,9 @@ class GlobalManager {
         modules.forEach(this.processModule);
         this.addAdminUserIfMissing();
     }
+    setSEOGenerator(seoGenerator) {
+        this.seoGenerator = seoGenerator;
+    }
     async addAdminUserIfMissing() {
         if (!this.config.roles.includes("ADMIN")) {
             _1.logger.info("GlobalManager.addAdminUserIfMissing: admin role is not included within the roles, avoiding this check");
@@ -127,24 +130,45 @@ class GlobalManager {
             }
         }
     }
-    async run() {
-        while (true) {
-            await this.calculateServerData();
-            await this.runOnce();
-            const nowTime = (new Date()).getTime();
-            const timeItPassedSinceServerDataLastUpdated = nowTime - this.serverDataLastUpdated;
-            const timeUntilItNeedsToUpdate = constants_1.SERVER_DATA_MIN_UPDATE_TIME - timeItPassedSinceServerDataLastUpdated;
-            if (timeUntilItNeedsToUpdate <= 0) {
-                _1.logger.error("GlobalManager.processIdef [SERIOUS]: during the processing of events the time needed until next update was negative" +
-                    " this means the server took too long doing mantenience tasks, this means your database is very large, while this is not " +
-                    " a real error as it was handled gracefully, this should be addressed to itemize developers", {
-                    timeUntilItNeedsToUpdate,
-                });
-            }
-            else {
-                await wait(timeUntilItNeedsToUpdate);
-            }
+    run() {
+        if (this.seoGenerator) {
+            (async () => {
+                while (true) {
+                    await this.seoGenerator.run();
+                    const nowTime = (new Date()).getTime();
+                    const timeItPassedSinceSeoGenRan = nowTime - this.serverDataLastUpdated;
+                    const timeUntilSeoGenNeedsToRun = constants_1.SERVER_MAPPING_TIME - timeItPassedSinceSeoGenRan;
+                    if (timeUntilSeoGenNeedsToRun <= 0) {
+                        _1.logger.error("GlobalManager.run [SERIOUS]: during the processing of events the time needed until next mapping was negative" +
+                            " this means the server took forever doing the last mapping, clearly something is off", {
+                            timeUntilSeoGenNeedsToRun,
+                        });
+                    }
+                    else {
+                        await wait(timeUntilSeoGenNeedsToRun);
+                    }
+                }
+            })();
         }
+        (async () => {
+            while (true) {
+                await this.calculateServerData();
+                await this.runOnce();
+                const nowTime = (new Date()).getTime();
+                const timeItPassedSinceServerDataLastUpdated = nowTime - this.serverDataLastUpdated;
+                const timeUntilItNeedsToUpdate = constants_1.SERVER_DATA_MIN_UPDATE_TIME - timeItPassedSinceServerDataLastUpdated;
+                if (timeUntilItNeedsToUpdate <= 0) {
+                    _1.logger.error("GlobalManager.run [SERIOUS]: during the processing of events the time needed until next update was negative" +
+                        " this means the server took too long doing mantenience tasks, this means your database is very large, while this is not " +
+                        " a real error as it was handled gracefully, this should be addressed to itemize developers", {
+                        timeUntilItNeedsToUpdate,
+                    });
+                }
+                else {
+                    await wait(timeUntilItNeedsToUpdate);
+                }
+            }
+        })();
     }
     async runOnce() {
         for (const mod of this.modNeedsMantenience) {

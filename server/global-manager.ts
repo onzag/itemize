@@ -5,12 +5,13 @@ import Module from "../base/Root/Module";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { logger, IServerDataType } from ".";
 import { SERVER_DATA_IDENTIFIER, SERVER_DATA_MIN_UPDATE_TIME, CURRENCY_FACTORS_IDENTIFIER,
-  CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER } from "../constants";
+  CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER, SERVER_MAPPING_TIME } from "../constants";
 import { ISensitiveConfigRawJSONDataType, IConfigRawJSONDataType } from "../config";
 import { CurrencyLayer, setupCurrencyLayer } from "./services/currency-layer";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import uuid from "uuid";
 import Include from "../base/Root/Module/ItemDefinition/Include";
+import { SEOGenerator } from "./seo/generator";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -36,6 +37,7 @@ export class GlobalManager {
   private currencyLayer: CurrencyLayer;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
   private config: IConfigRawJSONDataType;
+  private seoGenerator: SEOGenerator;
   constructor(
     root: Root,
     knex: Knex,
@@ -67,6 +69,9 @@ export class GlobalManager {
     modules.forEach(this.processModule);
 
     this.addAdminUserIfMissing();
+  }
+  public setSEOGenerator(seoGenerator: SEOGenerator) {
+    this.seoGenerator = seoGenerator;
   }
   private async addAdminUserIfMissing() {
     if (!this.config.roles.includes("ADMIN")) {
@@ -197,28 +202,53 @@ export class GlobalManager {
       }
     }
   }
-  public async run() {
-    while (true) {
-      await this.calculateServerData();
-      await this.runOnce();
-
-      const nowTime = (new Date()).getTime();
-      const timeItPassedSinceServerDataLastUpdated = nowTime - this.serverDataLastUpdated;
-      const timeUntilItNeedsToUpdate = SERVER_DATA_MIN_UPDATE_TIME - timeItPassedSinceServerDataLastUpdated;
-
-      if (timeUntilItNeedsToUpdate <= 0) {
-        logger.error(
-          "GlobalManager.processIdef [SERIOUS]: during the processing of events the time needed until next update was negative" +
-          " this means the server took too long doing mantenience tasks, this means your database is very large, while this is not " +
-          " a real error as it was handled gracefully, this should be addressed to itemize developers",
-          {
-            timeUntilItNeedsToUpdate,
+  public run() {
+    if (this.seoGenerator) {
+      (async () => {
+        while (true) {
+          await this.seoGenerator.run();
+    
+          const nowTime = (new Date()).getTime();
+          const timeItPassedSinceSeoGenRan = nowTime - this.serverDataLastUpdated;
+          const timeUntilSeoGenNeedsToRun = SERVER_MAPPING_TIME - timeItPassedSinceSeoGenRan;
+    
+          if (timeUntilSeoGenNeedsToRun <= 0) {
+            logger.error(
+              "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next mapping was negative" +
+              " this means the server took forever doing the last mapping, clearly something is off",
+              {
+                timeUntilSeoGenNeedsToRun,
+              }
+            );
+          } else {
+            await wait(timeUntilSeoGenNeedsToRun);
           }
-        );
-      } else {
-        await wait(timeUntilItNeedsToUpdate);
-      }
+        }
+      })();
     }
+    (async () => {
+      while (true) {
+        await this.calculateServerData();
+        await this.runOnce();
+  
+        const nowTime = (new Date()).getTime();
+        const timeItPassedSinceServerDataLastUpdated = nowTime - this.serverDataLastUpdated;
+        const timeUntilItNeedsToUpdate = SERVER_DATA_MIN_UPDATE_TIME - timeItPassedSinceServerDataLastUpdated;
+  
+        if (timeUntilItNeedsToUpdate <= 0) {
+          logger.error(
+            "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next update was negative" +
+            " this means the server took too long doing mantenience tasks, this means your database is very large, while this is not " +
+            " a real error as it was handled gracefully, this should be addressed to itemize developers",
+            {
+              timeUntilItNeedsToUpdate,
+            }
+          );
+        } else {
+          await wait(timeUntilItNeedsToUpdate);
+        }
+      }
+    })();
   }
   private async runOnce() {
     for (const mod of this.modNeedsMantenience) {

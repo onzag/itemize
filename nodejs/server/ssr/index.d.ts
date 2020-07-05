@@ -24,6 +24,6 @@ export interface ISSRRule extends ISSRRuleDynamic {
 }
 export declare type ISSRRuleSetCb = (req: express.Request, language: string, root: Root) => ISSRRuleDynamic;
 export interface ISSRRuleSet {
-    [urlWithoutLanguage: string]: ISSRRuleDynamic | ISSRRuleSetCb;
+    [commaSeparatedURLsWithoutLanguage: string]: ISSRRuleDynamic | ISSRRuleSetCb;
 }
 export {};

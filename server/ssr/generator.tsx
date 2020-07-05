@@ -13,9 +13,11 @@ import { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import { filterAndPrepareGQLValue } from "../resolvers/basic";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import Root from "../../base/Root";
+import Moment from "moment";
 
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
 const NO_SSR = process.env.NO_SSR === "true";
+const DATE_RFC2822 = "ddd, DD MMM YYYY HH:mm:ss ZZ";
 
 interface IMemoizedAnswer {
   html: string,
@@ -46,6 +48,8 @@ export async function ssrGenerator(
     res.status(500).end("Internal Server Error");
     return;
   }
+
+  const ifNoneMatch = req.headers["if-none-match"];
 
   // now we need to see if we are going to use SSR, due to the fact the NODE_ENV must
   // match between the client and the server in order to produce valid SSR, we check the mode
@@ -81,6 +85,9 @@ export async function ssrGenerator(
     resultRule = typeof rule === "function" ? rule(req, language, root) : rule;
   }
 
+  let etag: string;
+  let invalidCollectDateIndex: number = null;
+
   // This is the default, what happens to routes that have nothing setup for them
   // so if no result rule could be calculated, but we also need to ensure that 
   if (!resultRule) {
@@ -103,8 +110,10 @@ export async function ssrGenerator(
       rtl: false,
       languages: config.supportedLanguages,
       forUser: null,
-      memId: "*." + mode,
+      memId: "*." + appData.buildnumber + "." + mode,
     }
+
+    etag = appliedRule.memId;
     // this is the root form without any language or any means, there's no SSR data to fill
   } else {
 
@@ -157,8 +166,10 @@ export async function ssrGenerator(
     // language makes the memory specific for it, in this case language
     // matters so we need to add it to the memory id
     if (appliedRule.memId) {
-      appliedRule.memId += "." + mode + "." + appliedRule.language;
+      appliedRule.memId += "." + appData.buildnumber + "." + mode + "." + appliedRule.language;
     }
+
+    etag = appliedRule.memId;
 
     // however like previously specified, we don't want to cache answers for specific
     // users, because they are different, only guests really matter, so we want
@@ -177,6 +188,7 @@ export async function ssrGenerator(
           );
         if (!isFindingCurrentUser) {
           appliedRule.collect = [...appliedRule.collect, ["users", "user", appliedRule.forUser.id, null]];
+          invalidCollectDateIndex = appliedRule.collect.length - 1;
         }
       }
     }
@@ -188,6 +200,8 @@ export async function ssrGenerator(
 
   // and gathering the queries
   const queries: ISSRCollectedQueryType[] = [];
+
+  let lastModified = new Date(parseInt(appData.buildnumber));
 
   // now we try to collect if we are asked to collect data
   if (appliedRule.collect) {
@@ -234,6 +248,10 @@ export async function ssrGenerator(
           collectionSignatureArray[index] = "null";
         } else {
           // otherwise it's when it was last modified
+          const dateValue = new Date(rowValue.last_modified);
+          if (lastModified.getTime() < dateValue.getTime()) {
+            lastModified = dateValue;
+          }
           collectionSignatureArray[index] = rowValue.last_modified;
         }
 
@@ -275,6 +293,26 @@ export async function ssrGenerator(
     collectionSignature = collectionSignatureArray.join(".");
   }
 
+  etag += "-" + collectionSignature.replace(/\s/g, "_");
+  etag = JSON.stringify(etag);
+
+  if (
+    !collectionFailed &&
+    ifNoneMatch &&
+    // this actually even would check the buildnumber
+    ifNoneMatch === etag
+  ) {
+    res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
+    res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
+    res.setHeader("ETag", etag);
+    res.setHeader("Cache-Control", "public, max-age=0");
+    res.status(304).end();
+
+    root.cleanState();
+    appData.rootPool.release(root);
+    return;
+  }
+
   // so if nothing failed during collection, and we have a memory id
   // and we have a memoized answer for that memory id which matches
   // the collection signature
@@ -284,6 +322,9 @@ export async function ssrGenerator(
   ) {
     const memoizedAnswer = await appData.cache.getRaw<IMemoizedAnswer>("MEM." + appliedRule.memId);
     if (memoizedAnswer && memoizedAnswer.value && memoizedAnswer.value.collectionSignature === collectionSignature) {
+      res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
+      res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
+      res.setHeader("ETag", etag);
       // we are done just serve what is in memory and the chicken is done
       res.setHeader("content-type", "text/html; charset=utf-8");
       res.end(memoizedAnswer.value.html);
@@ -293,7 +334,7 @@ export async function ssrGenerator(
       appData.rootPool.release(root);
       return;
     }
-  }
+  } 
 
   // now we calculate the og fields that are final, given they can be functions
   // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
@@ -410,6 +451,7 @@ export async function ssrGenerator(
       newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
       newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
       res.setHeader("content-type", "text/html; charset=utf-8");
+      // cannot set etag or cache headers because the rendering failed
       res.end(newHTML);
       root.cleanState();
       appData.rootPool.release(root);
@@ -452,6 +494,11 @@ export async function ssrGenerator(
 
   // and finally answer the client
   res.setHeader("content-type", "text/html; charset=utf-8");
+  if (!collectionFailed) {
+    res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
+    res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
+    res.setHeader("ETag", etag);
+  }
   res.end(newHTML);
 
   // clean and release, it's done!!!

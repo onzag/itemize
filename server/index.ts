@@ -45,6 +45,8 @@ import { ICollectorType } from "../client";
 import { Pool } from "tarn";
 import { retrieveRootPool } from "./rootpool";
 import { removeFolderFor } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
+import { ISEORuleSet } from "./seo";
+import { SEOGenerator } from "./seo/generator";
 
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
@@ -120,14 +122,9 @@ export interface ISSRConfig {
   collector?: ICollectorType;
 }
 
-export interface ISEORobotsConfig {
-  [userAgent: string]: string[]
-}
-
 export interface ISEOConfig {
-  robots: {
-
-  }
+  seoRules: ISEORuleSet;
+  seoContainerId: string;
 }
 
 export interface IAppDataType {
@@ -135,6 +132,7 @@ export interface IAppDataType {
   rootPool: Pool<Root>,
   langLocales: ILangLocalesType;
   ssrConfig: ISSRConfig;
+  seoConfig: ISEOConfig;
   indexDevelopment: string;
   indexProduction: string;
   config: IConfigRawJSONDataType;
@@ -332,6 +330,33 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     res.sendFile(path.resolve(path.join("dist", "data", "service-worker.production.js")));
   });
 
+  app.get("/robots.txt", (req, res) => {
+    res.setHeader("content-type", "text/plain; charset=utf-8");
+    let result: string = "user-agent = *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
+      "disallow: /rest/currency-factors\ndisallow: /graphql\n";
+    if (appData.seoConfig) {
+      Object.keys(appData.seoConfig.seoRules).forEach((urlSet) => {
+        const rule = appData.seoConfig.seoRules[urlSet];
+        if (!rule.crawable) {
+          const splittedSet = urlSet.replace(/^:[A-Za-z_-]+/g, "*").split(",");
+          appData.config.supportedLanguages.forEach((supportedLanguage) => {
+            splittedSet.forEach((denyURL) => {
+              result += "disallow: /" + supportedLanguage
+              if (!denyURL.startsWith("/")) {
+                result += "/"
+              }
+              result += denyURL;
+            });
+          });
+        }
+      });
+  
+      result += "Sitemap: " + appData.pkgcloudUploadContainers[appData.seoConfig.seoContainerId].prefix + "sitemaps/index.xml";
+    }
+
+    res.end(result);
+  });
+
   const router = express.Router();
   Object.keys(appData.ssrConfig.ssrRules).forEach((urlCombo) => {
     const rule = appData.ssrConfig.ssrRules[urlCombo];
@@ -388,7 +413,7 @@ function getContainerPromisified(client: pkgcloud.storage.Client, containerName:
 
 /**
  * Initializes the itemize server with its custom configuration
- * @param ssrRules the server side rendering rules
+ * @param ssrConfig the server side rendering rules
  * @param custom the customization details
  * @param custom.customGQLQueries custom graphql queries
  * @param custom.customTokenGQLQueries custom token graphql queries for generating custom tokens
@@ -399,7 +424,11 @@ function getContainerPromisified(client: pkgcloud.storage.Client, containerName:
  * @param custom.customRouter a custom router to attach to the rest endpoint
  * @param custom.customTriggers a registry for custom triggers
  */
-export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCustomizationDataType = {}) {
+export async function initializeServer(
+  ssrConfig: ISSRConfig,
+  seoConfig: ISEOConfig,
+  custom: IServerCustomizationDataType = {},
+) {
   if (INSTANCE_MODE === "BUILD_DATABASE") {
     build(NODE_ENV);
     return;
@@ -583,7 +612,30 @@ export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCus
       logger.info(
         "initializeServer: setting up global manager",
       );
-      const manager = new GlobalManager(root, knex, redisGlobalClient, redisPub, config, sensitiveConfig);
+      const manager: GlobalManager = new GlobalManager(root, knex, redisGlobalClient, redisPub, config, sensitiveConfig);
+      if (seoConfig) {
+        logger.info(
+          "initializeServer: initializing SEO configuration",
+        );
+        const seoContainerData = sensitiveConfig.openstackContainers[seoConfig.seoContainerId];
+        const seoContainerClient = pkgcloud.storage.createClient({
+          provider: "openstack",
+          username: seoContainerData.username,
+          keystoneAuthVersion: 'v3',
+          region: seoContainerData.region,
+          domainId: seoContainerData.domainId, //default
+          domainName: seoContainerData.domainName,
+          password: seoContainerData.password,
+          authUrl: seoContainerData.authUrl,
+        } as any);
+        let prefix = config.containersHostnamePrefixes[seoConfig.seoContainerId];
+        if (prefix.indexOf("/") !== 0) {
+          prefix = "https://" + prefix;
+        }
+        const seoContainer = await getContainerPromisified(seoContainerClient, seoContainerData.containerName);
+        const seoGenerator = new SEOGenerator(seoConfig.seoRules, seoContainer, prefix);
+        manager.setSEOGenerator(seoGenerator);
+      }
       manager.run();
       if (INSTANCE_MODE === "GLOBAL_MANAGER") {
         return;
@@ -728,6 +780,7 @@ export async function initializeServer(ssrConfig: ISSRConfig, custom: IServerCus
       rootPool: retrieveRootPool(root.rawData),
       langLocales,
       ssrConfig,
+      seoConfig,
       indexDevelopment: index.replace(/\$MODE/g, "development"),
       indexProduction: index.replace(/\$MODE/g, "production"),
       config,

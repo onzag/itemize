@@ -339,7 +339,7 @@ export async function removeFolderFor(
   mainPath: string,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    logger.debug("Deleting folder for", {mainPath});
+    logger.debug("removeFolderFor: Deleting folder for", {mainPath});
 
     (uploadsContainer as any).getFiles({
       prefix: mainPath,
@@ -347,7 +347,7 @@ export async function removeFolderFor(
       if (err) {
         reject(err);
       } else if (files && files.length) {
-        logger.debug("Bulk deleting", {files});
+        logger.debug("removeFolderFor: Bulk deleting", {files});
         (uploadsContainer.client as any).bulkDelete(uploadsContainer, files, (err: pkgcloud.ClientError) => {
           if (err) {
             reject(err);
@@ -356,7 +356,7 @@ export async function removeFolderFor(
           }
         });
       } else {
-        logger.debug("Could not find any files");
+        logger.debug("removeFolderFor: Could not find any files");
         resolve();
       }
     });
@@ -411,7 +411,7 @@ export async function sqlUploadPipeFile(
   readStream: ReadStream | sharp.Sharp,
   remote: string,
 ): Promise<void> {
-  logger.debug("Uploading", {remote});
+  logger.debug("sqlUploadPipeFile: Uploading", {remote});
 
   const writeStream = uploadsContainer.client.upload({
     container: uploadsContainer as any,
@@ -421,7 +421,7 @@ export async function sqlUploadPipeFile(
 
   return new Promise((resolve, reject) => {
     writeStream.on("finish", () => {
-      logger.debug("Finished uploading", {remote});
+      logger.debug("sqlUploadPipeFile: Finished uploading", {remote});
       verifyResourceIsReady(
         new URL(uploadsPrefix + remote),
         resolve,
@@ -433,17 +433,17 @@ export async function sqlUploadPipeFile(
 
 function verifyResourceIsReady(url: URL, done: () => void) {
   const strURL = url.toString();
-  logger.debug("Verifying readiness of " + strURL);
+  logger.debug("verifyResourceIsReady: Verifying readiness of " + strURL);
   https.get({
     method: "HEAD",
     host: url.host,
     path: url.pathname,
   }, (resp) => {
     if (resp.statusCode === 200 || resp.statusCode === 0) {
-      logger.debug("Verification succeed " + strURL);
+      logger.debug("verifyResourceIsReady: Verification succeed " + strURL);
       done();
     } else {
-      logger.debug("Resource is not yet ready " + strURL);
+      logger.debug("verifyResourceIsReady: Resource is not yet ready " + strURL);
       setTimeout(verifyResourceIsReady.bind(null, url, done), 100);
     }
   });
