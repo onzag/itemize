@@ -350,8 +350,12 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
           });
         }
       });
+
+      const hostname = NODE_ENV === "production" ? appData.config.productionHostname : appData.config.developmentHostname;
   
-      result += "Sitemap: " + appData.pkgcloudUploadContainers[appData.seoConfig.seoContainerId].prefix + "sitemaps/index.xml";
+      result += "Sitemap: " +
+        appData.pkgcloudUploadContainers[appData.seoConfig.seoContainerId].prefix + 
+        "sitemaps/" + hostname + "/index.xml";
     }
 
     res.end(result);
@@ -633,7 +637,15 @@ export async function initializeServer(
           prefix = "https://" + prefix;
         }
         const seoContainer = await getContainerPromisified(seoContainerClient, seoContainerData.containerName);
-        const seoGenerator = new SEOGenerator(seoConfig.seoRules, seoContainer, prefix);
+        const seoGenerator = new SEOGenerator(
+          seoConfig.seoRules,
+          seoContainer,
+          knex,
+          root,
+          prefix,
+          config.supportedLanguages,
+          NODE_ENV === "production" ? config.productionHostname : config.developmentHostname,
+        );
         manager.setSEOGenerator(seoGenerator);
       }
       manager.run();
