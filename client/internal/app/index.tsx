@@ -257,8 +257,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // Now we patch moment
     Moment.locale(locale);
 
-    // And we set the language via local storage, so it has priority
-    localStorage.setItem("lang", locale);
+    // And we set the language
     document.cookie = "lang=" + locale + ";path=/"
 
     document.body.parentElement.lang = locale;
@@ -407,7 +406,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
     }
 
     // Now we set the country in local storage
-    localStorage.setItem("country", codeToSet);
     document.cookie = "country=" + codeToSet + ";path=/";
     if (!avoidUpdatingUser) {
       this.updateUserProperty("app_country", codeToSet);
@@ -439,7 +437,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
     }
 
     // We set the currency in local storage
-    localStorage.setItem("currency", codeToSet);
     document.cookie = "currency=" + codeToSet + ";path=/";
     if (!avoidUpdatingUser) {
       this.updateUserProperty("app_currency", codeToSet);

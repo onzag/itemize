@@ -14,6 +14,18 @@ import CacheWorkerInstance from "./internal/workers/cache";
 import { ConfigProvider } from "./internal/providers/config-provider";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 
+export function getCookie(name: string): string {
+  const splittedCookie = document.cookie.split(";").map((c)=>c.trim());
+  const nameEQ = name + "=";
+  const foundCookie = splittedCookie.find((cookieValue) => {
+    return cookieValue.indexOf(nameEQ) === 0;
+  });
+  if (!foundCookie) {
+    return null;
+  }
+  return foundCookie.substr(nameEQ.length) || null;
+}
+
 // Create the browser history to feed the router
 export const history = typeof document !== "undefined" ? createBrowserHistory() : null;
 
@@ -93,9 +105,9 @@ export async function initializeItemizeApp(
   // The stored locale data takes priority over everything
   // The stored locale data has been set manually when fiddling
   // with the language selection, otherwise no language gets stored
-  const storedLang = serverMode ? serverMode.clientDetails.lang : localStorage.getItem("lang");
-  const storedCurrency = serverMode ? serverMode.clientDetails.currency : localStorage.getItem("currency");
-  const storedCountry = serverMode ? serverMode.clientDetails.country : localStorage.getItem("country");
+  const storedLang = serverMode ? serverMode.clientDetails.lang : getCookie("lang");
+  const storedCurrency = serverMode ? serverMode.clientDetails.currency : getCookie("currency");
+  const storedCountry = serverMode ? serverMode.clientDetails.country : getCookie("country");
 
   const config: IConfigRawJSONDataType = serverMode ? serverMode.config : (window as any).CONFIG;
   const ssrContext: ISSRContextType = serverMode ? serverMode.ssrContext : (window as any).SSR;
@@ -134,7 +146,7 @@ export async function initializeItemizeApp(
     // We try to check if we previously tried to guess for this given instance
     // granted, there's no difference from redoing the guess, but, this saves
     // requests from having to go to the server side to make a guess
-    const previouslyGuessedData = serverMode ? serverMode.clientDetails.guessedData : localStorage.getItem("guessedData");
+    const previouslyGuessedData = serverMode ? serverMode.clientDetails.guessedData : getCookie("guessedData");
 
     // So we do a trick here, because previouslyGuessedData
     // is a string, we need to parse it, and the server side
@@ -190,7 +202,6 @@ export async function initializeItemizeApp(
     // and we set it to local storage afterwards, we don't need to waste requests
     if (!serverMode) {
       document.cookie = "guessedData=" + JSON.stringify(guessedUserData) + ";path=/";
-      localStorage.setItem("guessedData", JSON.stringify(guessedUserData));
     }
 
     // Let's set the values

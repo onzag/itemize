@@ -15,6 +15,18 @@ const ssr_provider_1 = require("./internal/providers/ssr-provider");
 const Root_1 = __importDefault(require("../base/Root"));
 const cache_1 = __importDefault(require("./internal/workers/cache"));
 const config_provider_1 = require("./internal/providers/config-provider");
+function getCookie(name) {
+    const splittedCookie = document.cookie.split(";").map((c) => c.trim());
+    const nameEQ = name + "=";
+    const foundCookie = splittedCookie.find((cookieValue) => {
+        return cookieValue.indexOf(nameEQ) === 0;
+    });
+    if (!foundCookie) {
+        return null;
+    }
+    return foundCookie.substr(nameEQ.length) || null;
+}
+exports.getCookie = getCookie;
 // Create the browser history to feed the router
 exports.history = typeof document !== "undefined" ? history_1.createBrowserHistory() : null;
 // keeping track of imported files in this array
@@ -55,9 +67,9 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
     // The stored locale data takes priority over everything
     // The stored locale data has been set manually when fiddling
     // with the language selection, otherwise no language gets stored
-    const storedLang = serverMode ? serverMode.clientDetails.lang : localStorage.getItem("lang");
-    const storedCurrency = serverMode ? serverMode.clientDetails.currency : localStorage.getItem("currency");
-    const storedCountry = serverMode ? serverMode.clientDetails.country : localStorage.getItem("country");
+    const storedLang = serverMode ? serverMode.clientDetails.lang : getCookie("lang");
+    const storedCurrency = serverMode ? serverMode.clientDetails.currency : getCookie("currency");
+    const storedCountry = serverMode ? serverMode.clientDetails.country : getCookie("country");
     const config = serverMode ? serverMode.config : window.CONFIG;
     const ssrContext = serverMode ? serverMode.ssrContext : window.SSR;
     // so if we have a stored language, and that stored language
@@ -93,7 +105,7 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
         // We try to check if we previously tried to guess for this given instance
         // granted, there's no difference from redoing the guess, but, this saves
         // requests from having to go to the server side to make a guess
-        const previouslyGuessedData = serverMode ? serverMode.clientDetails.guessedData : localStorage.getItem("guessedData");
+        const previouslyGuessedData = serverMode ? serverMode.clientDetails.guessedData : getCookie("guessedData");
         // So we do a trick here, because previouslyGuessedData
         // is a string, we need to parse it, and the server side
         // also returns this JSON information, so we process it
@@ -144,7 +156,6 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
         // and we set it to local storage afterwards, we don't need to waste requests
         if (!serverMode) {
             document.cookie = "guessedData=" + JSON.stringify(guessedUserData) + ";path=/";
-            localStorage.setItem("guessedData", JSON.stringify(guessedUserData));
         }
         // Let's set the values
         guessedLang = storedLang || guessedUserData.language;

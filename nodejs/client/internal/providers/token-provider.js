@@ -9,6 +9,7 @@ const constants_1 = require("../../../constants");
 const cache_1 = __importDefault(require("../workers/cache"));
 const deep_equal_1 = __importDefault(require("deep-equal"));
 const ssr_provider_1 = require("./ssr-provider");
+const __1 = require("../..");
 exports.TokenContext = react_1.default.createContext(null);
 function TokenProvider(props) {
     return (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssrContext) => (react_1.default.createElement(ActualTokenProvider, Object.assign({ ssrContext: ssrContext }, props)))));
@@ -27,6 +28,9 @@ class ActualTokenProvider extends react_1.default.Component {
         };
         if (props.ssrContext) {
             initialState.token = props.ssrContext.user.token || null;
+            if (initialState.token === "IN_COOKIE") {
+                initialState.token = __1.getCookie("token");
+            }
             initialState.id = props.ssrContext.user.id || null;
             initialState.role = props.ssrContext.user.role || constants_1.GUEST_METAROLE;
             initialState.isReady = true;
@@ -48,7 +52,7 @@ class ActualTokenProvider extends react_1.default.Component {
             this.props.onProviderStateSet(this.state, this.logout);
             return;
         }
-        const storedToken = localStorage.getItem("token");
+        const storedToken = __1.getCookie("token");
         if (storedToken !== null) {
             this.login(null, null, storedToken, true);
         }
@@ -93,26 +97,20 @@ class ActualTokenProvider extends react_1.default.Component {
             tokenDataRole = tokenData ? tokenData.role : constants_1.GUEST_METAROLE;
             tokenDataToken = tokenData ? tokenData.token : null;
             if (tokenDataToken !== null) {
-                localStorage.setItem("token", tokenDataToken);
-                localStorage.setItem("role", tokenDataRole);
-                localStorage.setItem("id", tokenDataId.toString());
                 document.cookie = "token=" + tokenDataToken + ";path=/";
                 document.cookie = "role=" + tokenDataRole + ";path=/";
                 document.cookie = "id=" + tokenDataId + ";path=/";
             }
             else {
-                localStorage.removeItem("token");
-                localStorage.removeItem("role");
-                localStorage.removeItem("id");
                 document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
                 document.cookie = "role=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
                 document.cookie = "id=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
             }
         }
         else {
-            tokenDataId = parseInt(localStorage.getItem("id")) || null;
-            tokenDataRole = localStorage.getItem("role") || constants_1.GUEST_METAROLE;
-            tokenDataToken = localStorage.getItem("token");
+            tokenDataId = parseInt(__1.getCookie("id")) || null;
+            tokenDataRole = __1.getCookie("role") || constants_1.GUEST_METAROLE;
+            tokenDataToken = __1.getCookie("token");
         }
         const newState = {
             isLoggingIn: false,
@@ -210,9 +208,9 @@ class ActualTokenProvider extends react_1.default.Component {
     }
     cleanAndDestroyLoggedData() {
         // removing the user data
-        localStorage.removeItem("TOKEN");
-        localStorage.removeItem("ID");
-        localStorage.removeItem("ROLE");
+        document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+        document.cookie = "role=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+        document.cookie = "id=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
         // gathering the destruction markers
         const destructionMarkers = 
         // if we have memcached them, pick those

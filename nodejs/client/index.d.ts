@@ -5,6 +5,7 @@ import { IRendererContext } from "./providers/renderer";
 import { ISSRContextType } from "./internal/providers/ssr-provider";
 import { IConfigRawJSONDataType } from "../config";
 import Root, { ILangLocalesType } from "../base/Root";
+export declare function getCookie(name: string): string;
 export declare const history: import("history").History<{}>;
 /**
  * This function imports a file given a url

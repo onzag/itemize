@@ -6,6 +6,7 @@ import { GUEST_METAROLE, ENDPOINT_ERRORS, MEMCACHED_DESTRUCTION_MARKERS_LOCATION
 import CacheWorkerInstance from "../workers/cache";
 import equals from "deep-equal";
 import { ISSRContextType, SSRContext } from "./ssr-provider";
+import { getCookie } from "../..";
 
 export interface IActualTokenProviderState {
   token: string;
@@ -59,6 +60,9 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
 
     if (props.ssrContext) {
       initialState.token = props.ssrContext.user.token || null;
+      if (initialState.token === "IN_COOKIE") {
+        initialState.token = getCookie("token");
+      }
       initialState.id = props.ssrContext.user.id || null;
       initialState.role = props.ssrContext.user.role || GUEST_METAROLE;
       initialState.isReady = true;
@@ -82,7 +86,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       this.props.onProviderStateSet(this.state, this.logout);
       return;
     }
-    const storedToken = localStorage.getItem("token");
+    const storedToken = getCookie("token");
     if (storedToken !== null) {
       this.login(null, null, storedToken, true);
     } else {
@@ -138,24 +142,18 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       tokenDataRole = tokenData ? tokenData.role as string : GUEST_METAROLE;
       tokenDataToken = tokenData ? tokenData.token as string : null;
       if (tokenDataToken !== null) {
-        localStorage.setItem("token", tokenDataToken as string);
-        localStorage.setItem("role", tokenDataRole as string);
-        localStorage.setItem("id", tokenDataId.toString());
         document.cookie = "token=" + tokenDataToken + ";path=/";
         document.cookie = "role=" + tokenDataRole + ";path=/";
         document.cookie = "id=" + tokenDataId + ";path=/";
       } else {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        localStorage.removeItem("id");
         document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
         document.cookie = "role=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
         document.cookie = "id=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
       }
     } else {
-      tokenDataId = parseInt(localStorage.getItem("id")) || null;
-      tokenDataRole = localStorage.getItem("role") || GUEST_METAROLE;
-      tokenDataToken = localStorage.getItem("token");
+      tokenDataId = parseInt(getCookie("id")) || null;
+      tokenDataRole = getCookie("role") || GUEST_METAROLE;
+      tokenDataToken = getCookie("token");
     }
 
     const newState: IActualTokenProviderState = {
@@ -274,9 +272,9 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
   }
   public cleanAndDestroyLoggedData() {
     // removing the user data
-    localStorage.removeItem("TOKEN");
-    localStorage.removeItem("ID");
-    localStorage.removeItem("ROLE");
+    document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+    document.cookie = "role=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+    document.cookie = "id=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
 
     // gathering the destruction markers
     const destructionMarkers =

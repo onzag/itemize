@@ -61,8 +61,19 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         // if it's dynamic we pass the args, otherwse it is what it is
         resultRule = typeof rule === "function" ? rule(req, language, root) : rule;
     }
+    else if (!language) {
+        // fake rule to force a redirect
+        resultRule = {
+            title: null,
+            ogTitle: null,
+            description: null,
+            ogDescription: null,
+            ogImage: null,
+            collect: [],
+            memId: "*.root.redirect",
+        };
+    }
     let etag;
-    let invalidCollectDateIndex = null;
     // This is the default, what happens to routes that have nothing setup for them
     // so if no result rule could be calculated, but we also need to ensure that 
     if (!resultRule) {
@@ -149,7 +160,6 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
                     collectionPoint[3] === null);
                 if (!isFindingCurrentUser) {
                     appliedRule.collect = [...appliedRule.collect, ["users", "user", appliedRule.forUser.id, null]];
-                    invalidCollectDateIndex = appliedRule.collect.length - 1;
                 }
             }
         }
@@ -232,7 +242,9 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         // now we build the signature as a string
         collectionSignature = collectionSignatureArray.join(".");
     }
-    etag += "-" + collectionSignature.replace(/\s/g, "_");
+    if (collectionSignature) {
+        etag += "-" + collectionSignature.replace(/\s/g, "_");
+    }
     etag = JSON.stringify(etag);
     if (!collectionFailed &&
         ifNoneMatch &&
@@ -268,11 +280,14 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
     }
     // now we calculate the og fields that are final, given they can be functions
     // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
-    const finalOgTitle = typeof appliedRule.ogTitle === "string" ? appliedRule.ogTitle : appliedRule.ogTitle(queries, config);
+    const finalOgTitle = (typeof appliedRule.ogTitle === "string" || !appliedRule.ogTitle) ?
+        appliedRule.ogTitle : appliedRule.ogTitle(queries, config);
     // the description as well, same thing
-    const finalOgDescription = typeof appliedRule.ogDescription === "string" ? appliedRule.ogDescription : appliedRule.ogDescription(queries, config);
+    const finalOgDescription = (typeof appliedRule.ogDescription === "string" || !appliedRule.ogDescription) ?
+        appliedRule.ogDescription : appliedRule.ogDescription(queries, config);
     // same for the image but this is special
-    let finalOgImage = typeof appliedRule.ogImage === "string" ? appliedRule.ogImage : appliedRule.ogImage(queries, config);
+    let finalOgImage = (typeof appliedRule.ogImage === "string" || !appliedRule.ogImage) ?
+        appliedRule.ogImage : appliedRule.ogImage(queries, config);
     // because if it's a url and og image tags require absolute paths with entire urls
     // we check if it's an absolute path with no host
     if (finalOgImage && finalOgImage.startsWith("/")) {
@@ -284,8 +299,10 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         finalOgImage = `https://` + finalOgImage;
     }
     // now we calculate the same way title and description
-    const finalTitle = typeof appliedRule.title === "string" ? appliedRule.title : appliedRule.title(queries, config);
-    const finalDescription = typeof appliedRule.description === "string" ? appliedRule.description : appliedRule.description(queries, config);
+    const finalTitle = (typeof appliedRule.title === "string" || !appliedRule.title) ?
+        appliedRule.title : appliedRule.title(queries, config);
+    const finalDescription = (typeof appliedRule.description === "string" || !appliedRule.title) ?
+        appliedRule.description : appliedRule.description(queries, config);
     // and we start replacing from the HTML itself, note how these things might have returned null for some
     let newHTML = html;
     newHTML = newHTML.replace(/\$SSRLANG/g, appliedRule.language || "");
@@ -316,6 +333,20 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             title: finalTitle,
             currencyFactors: appData.cache.getServerData()[constants_1.CURRENCY_FACTORS_IDENTIFIER],
         };
+        let clientSSR = ssr;
+        if (clientSSR.user && clientSSR.user.token) {
+            // make a copy it is slightly different
+            clientSSR = {
+                ...ssr,
+            };
+            // security to avoid sending the token in
+            // the response which might be cached by the client
+            // the client handles this by reading from the cookie
+            clientSSR.user = {
+                ...clientSSR.user,
+                token: "IN_COOKIE",
+            };
+        }
         // we replace the HTML with the SSR information that we are using
         newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(ssr));
         // and now we need the server app data

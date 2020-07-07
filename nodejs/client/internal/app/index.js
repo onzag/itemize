@@ -158,8 +158,7 @@ class App extends react_1.default.Component {
         const pathNameSplitted = window.location.pathname.split("/");
         // Now we patch moment
         moment_1.default.locale(locale);
-        // And we set the language via local storage, so it has priority
-        localStorage.setItem("lang", locale);
+        // And we set the language
         document.cookie = "lang=" + locale + ";path=/";
         document.body.parentElement.lang = locale;
         document.head.querySelector("[rel='manifest']").href =
@@ -288,7 +287,6 @@ class App extends react_1.default.Component {
             this.changeCurrencyTo(currencyUsedThere, avoidUpdatingUser);
         }
         // Now we set the country in local storage
-        localStorage.setItem("country", codeToSet);
         document.cookie = "country=" + codeToSet + ";path=/";
         if (!avoidUpdatingUser) {
             this.updateUserProperty("app_country", codeToSet);
@@ -315,7 +313,6 @@ class App extends react_1.default.Component {
             console.warn("Attempted to set currency to unavailable " + code + ", defaulted to Euros");
         }
         // We set the currency in local storage
-        localStorage.setItem("currency", codeToSet);
         document.cookie = "currency=" + codeToSet + ";path=/";
         if (!avoidUpdatingUser) {
             this.updateUserProperty("app_currency", codeToSet);
