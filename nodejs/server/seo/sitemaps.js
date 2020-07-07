@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 ;
-function toXML(src, targetDomain, sourcePrefix, prefixURL) {
+function toXML(src, targetDomain, sourcePrefix, prefixURL, suffixURL) {
     let result = "<?xml version='1.0' encoding='UTF-8'?>";
     if (src.isIndex) {
         result += "<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
@@ -12,7 +12,17 @@ function toXML(src, targetDomain, sourcePrefix, prefixURL) {
     src.entries.forEach((entry) => {
         if (src.isIndex) {
             result += "<sitemap><loc>";
-            result += sourcePrefix + (prefixURL || "") + entry;
+            result += sourcePrefix;
+            if (prefixURL) {
+                result += prefixURL;
+                if (!result.endsWith("/")) {
+                    result += "/";
+                }
+            }
+            result += entry;
+            if (suffixURL) {
+                result += suffixURL;
+            }
             result += "</loc></sitemap>";
         }
         else {
@@ -25,6 +35,9 @@ function toXML(src, targetDomain, sourcePrefix, prefixURL) {
                 result += "/";
             }
             result += entry;
+            if (suffixURL) {
+                result += suffixURL;
+            }
             result += "</loc></url>";
         }
     });
@@ -34,5 +47,6 @@ function toXML(src, targetDomain, sourcePrefix, prefixURL) {
     else {
         result += "</urlset>";
     }
+    return result;
 }
 exports.toXML = toXML;

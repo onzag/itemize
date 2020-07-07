@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = `const path = require('path');
 const webpack = require("webpack");
+const fs = require("fs");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const WorkerInjectorGeneratorPlugin = require("worker-injector-generator-plugin");
@@ -9,12 +10,17 @@ const WorkerInjectorGeneratorPlugin = require("worker-injector-generator-plugin"
 const isDevelopment = process.env.NODE_ENV === "development";
 const mode = isDevelopment ? "development" : "production";
 
+const config = fs.readFileSync("./config/index.json", "utf-8");
+
 const plugins = [
   new MiniCssExtractPlugin({
     filename: "[name]." + mode + ".css",
     chunkFilename: "[name]." + mode + ".css"
   }),
-  new webpack.IgnorePlugin(/^\\.\\/locale$/, /moment$/),
+  new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+  new webpack.DefinePlugin({
+    CONFIG: JSON.stringify(config),
+  }),
   new WorkerInjectorGeneratorPlugin({
     name: "cache-worker.injector." + mode + ".js",
     importScripts: [

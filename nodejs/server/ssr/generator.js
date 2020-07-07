@@ -18,6 +18,15 @@ const NO_SSR = process.env.NO_SSR === "true";
 const DATE_RFC2822 = "ddd, DD MMM YYYY HH:mm:ss ZZ";
 ;
 async function ssrGenerator(req, res, html, appData, mode, rule) {
+    // do a security check first
+    const hostname = req.headers["host"];
+    if (hostname !== "localhost" &&
+        hostname.indexOf("localhost") !== 0 &&
+        hostname !== appData.config.developmentHostname &&
+        hostname !== appData.config.productionHostname) {
+        res.status(403).end("Invalid Hostname");
+        return;
+    }
     // first we need a root instance, because this will be used
     // like an UI thread we need a clean instance from the pool
     let root;
@@ -61,7 +70,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         // if it's dynamic we pass the args, otherwse it is what it is
         resultRule = typeof rule === "function" ? rule(req, language, root) : rule;
     }
-    else if (!language) {
+    else if (!language && !req.query.noredirect) {
         // fake rule to force a redirect
         resultRule = {
             title: null,

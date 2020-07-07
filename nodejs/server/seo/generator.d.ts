@@ -10,10 +10,11 @@ export declare class SEOGenerator {
     private rules;
     private supportedLanguages;
     private hostname;
+    private pingGoogle;
     private primaryIndex;
     private mainIndex;
     private cache;
-    constructor(rules: ISEORuleSet, container: pkgcloud.storage.Container, knex: Knex, root: Root, prefix: string, supportedLanguages: string[], hostname: string);
+    constructor(rules: ISEORuleSet, container: pkgcloud.storage.Container, knex: Knex, root: Root, prefix: string, supportedLanguages: string[], hostname: string, pingGoogle: boolean);
     run(): Promise<void>;
     private runHeadRequest;
     private runGetRequest;

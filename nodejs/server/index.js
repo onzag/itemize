@@ -48,6 +48,7 @@ const PORT = process.env.PORT || 8000;
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
 const INSTANCE_MODE = process.env.INSTANCE_MODE || "ABSOLUTE";
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
+const PING_GOOGLE = JSON.parse(process.env.PING_GOOGLE || "false");
 // building the logger
 exports.logger = INSTANCE_MODE === "BUILD_DATABASE" ? null : winston_1.default.createLogger({
     level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
@@ -204,6 +205,7 @@ function initializeApp(appData, custom) {
     app.get("/sw.production.js", (req, res) => {
         res.sendFile(path_1.default.resolve(path_1.default.join("dist", "data", "service-worker.production.js")));
     });
+    const hostname = NODE_ENV === "production" ? appData.config.productionHostname : appData.config.developmentHostname;
     app.get("/robots.txt", (req, res) => {
         res.setHeader("content-type", "text/plain; charset=utf-8");
         let result = "user-agent = *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
@@ -224,12 +226,14 @@ function initializeApp(appData, custom) {
                     });
                 }
             });
-            const hostname = NODE_ENV === "production" ? appData.config.productionHostname : appData.config.developmentHostname;
             result += "Sitemap: " +
                 appData.pkgcloudUploadContainers[appData.seoConfig.seoContainerId].prefix +
                 "sitemaps/" + hostname + "/index.xml";
         }
         res.end(result);
+    });
+    app.get("/sitemap.xml", (req, res) => {
+        res.redirect(appData.pkgcloudUploadContainers[appData.seoConfig.seoContainerId].prefix + "sitemaps/" + hostname + "/index.xml");
     });
     const router = express_1.default.Router();
     Object.keys(appData.ssrConfig.ssrRules).forEach((urlCombo) => {
@@ -445,7 +449,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
                     prefix = "https://" + prefix;
                 }
                 const seoContainer = await getContainerPromisified(seoContainerClient, seoContainerData.containerName);
-                const seoGenerator = new generator_2.SEOGenerator(seoConfig.seoRules, seoContainer, knex, root, prefix, config.supportedLanguages, NODE_ENV === "production" ? config.productionHostname : config.developmentHostname);
+                const seoGenerator = new generator_2.SEOGenerator(seoConfig.seoRules, seoContainer, knex, root, prefix, config.supportedLanguages, NODE_ENV === "production" ? config.productionHostname : config.developmentHostname, PING_GOOGLE);
                 manager.setSEOGenerator(seoGenerator);
             }
             manager.run();

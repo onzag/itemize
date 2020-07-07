@@ -179,6 +179,12 @@ exports.rawConfigSchema = {
         fontUrl: {
             type: "string",
         },
+        cacheableExtHostnames: {
+            type: "array",
+            items: {
+                type: "string",
+            },
+        },
         fontName: {
             type: "string",
         },
@@ -255,6 +261,7 @@ exports.rawConfigSchema = {
         "dictionaries",
         "roles",
         "fontUrl",
+        "cacheableExtHostnames",
         "fontName",
         "manifest",
         "fallbackCountryCode",

@@ -28,6 +28,7 @@ services:
             - NODE_ENV=%{NODE_ENV}
             - LOG_LEVEL=error
             - USING_DOCKER=true
+            - PING_GOOGLE=false
     servers:
         image: app:latest
         depends_on:

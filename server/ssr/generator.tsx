@@ -32,6 +32,18 @@ export async function ssrGenerator(
   mode: "development" | "production",
   rule: ISSRRuleDynamic | ISSRRuleSetCb,
 ): Promise<void> {
+  // do a security check first
+  const hostname = req.headers["host"];
+  if (
+    hostname !== "localhost" &&
+    hostname.indexOf("localhost") !== 0 &&
+    hostname !== appData.config.developmentHostname &&
+    hostname !== appData.config.productionHostname
+  ) {
+    res.status(403).end("Invalid Hostname");
+    return;
+  }
+
   // first we need a root instance, because this will be used
   // like an UI thread we need a clean instance from the pool
   let root: Root;
@@ -83,7 +95,7 @@ export async function ssrGenerator(
     // if it all passes, we get the rule, there are two types, dynamic and already done
     // if it's dynamic we pass the args, otherwse it is what it is
     resultRule = typeof rule === "function" ? rule(req, language, root) : rule;
-  } else if (!language) {
+  } else if (!language && !req.query.noredirect) {
     // fake rule to force a redirect
     resultRule = {
       title: null,

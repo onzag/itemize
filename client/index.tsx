@@ -112,6 +112,16 @@ export async function initializeItemizeApp(
   const config: IConfigRawJSONDataType = serverMode ? serverMode.config : (window as any).CONFIG;
   const ssrContext: ISSRContextType = serverMode ? serverMode.ssrContext : (window as any).SSR;
 
+  if (!serverMode && document) {
+    if (
+      location.hostname !== config.productionHostname &&
+      location.hostname !== config.developmentHostname &&
+      location.hostname !== "localhost"
+    ) {
+      return;
+    }
+  }
+
   // so if we have a stored language, and that stored language
   // that do differ, we need to change it to the stored language
   // because that has priority

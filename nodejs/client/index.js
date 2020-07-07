@@ -72,6 +72,13 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
     const storedCountry = serverMode ? serverMode.clientDetails.country : getCookie("country");
     const config = serverMode ? serverMode.config : window.CONFIG;
     const ssrContext = serverMode ? serverMode.ssrContext : window.SSR;
+    if (!serverMode && document) {
+        if (location.hostname !== config.productionHostname &&
+            location.hostname !== config.developmentHostname &&
+            location.hostname !== "localhost") {
+            return;
+        }
+    }
     // so if we have a stored language, and that stored language
     // that do differ, we need to change it to the stored language
     // because that has priority

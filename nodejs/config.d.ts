@@ -18,6 +18,7 @@ export interface IConfigRawJSONDataType {
     manifest: IConfigManifestType;
     fontUrl: string;
     fontName: string;
+    cacheableExtHostnames: string[];
     fallbackCountryCode: string;
     fallbackLanguage: string;
     fallbackCurrency: string;
@@ -198,6 +199,12 @@ export declare const rawConfigSchema: {
         };
         fontUrl: {
             type: string;
+        };
+        cacheableExtHostnames: {
+            type: string;
+            items: {
+                type: string;
+            };
         };
         fontName: {
             type: string;

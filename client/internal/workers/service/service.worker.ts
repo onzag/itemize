@@ -1,11 +1,15 @@
 // We don't import corejs in our service worker as we do not really use
 // any of that overall, we only need the regenerator runtime
 import "regenerator-runtime/runtime";
+import { IConfigRawJSONDataType } from "../../../../config";
+declare var CONFIG: string;
 
 const isDevelopment = process.env.NODE_ENV === "development";
+// parsing and stringifying is more efficient
+const config: IConfigRawJSONDataType = JSON.parse(CONFIG);
 
 const urlsToCache = [
-  "/",
+  "/?noredirect=true",
   "/rest/currency-factors",
   "/rest/resource/lang.json",
   "/rest/resource/image-fail.svg",
@@ -16,6 +20,7 @@ const urlsToCache = [
   isDevelopment ? "/rest/resource/vendors~build.development.css" : "/rest/resource/vendors~build.production.css",
   isDevelopment ? "/rest/resource/cache-worker.development.js" : "/rest/resource/cache-worker.production.js",
   isDevelopment ? "/rest/resource/cache-worker.injector.development.js" : "/rest/resource/cache-worker.injector.production.js",
+  config.fontUrl,
 ];
 const CACHE_NAME = "ITEMIZEV1";
 
@@ -53,6 +58,7 @@ self.addEventListener("fetch", (event: any) => {
     (
       urlAnalyzed.pathname.indexOf("/graphql") === 0 ||
       urlAnalyzed.pathname.indexOf("/sw") === 0 ||
+      urlAnalyzed.pathname.indexOf("/sitemap.xml") === 0 ||
       urlAnalyzed.pathname.indexOf("/robots.txt") === 0 ||
       urlAnalyzed.pathname.indexOf("/favicon") === 0 ||
       urlAnalyzed.pathname.indexOf("/socket.io") === 0
@@ -75,11 +81,19 @@ self.addEventListener("fetch", (event: any) => {
   // this basically means that we would be serving the response for / for the index response
   // rather than whatever the request was pointing too, that means we ignore the request
   const useNetworkFirstStrategyUseThisPathInstead =
-    useNetworkFirstStrategy && urlAnalyzed.pathname.indexOf("/rest") !== 0 ? "/" : null;
+    useNetworkFirstStrategy && urlAnalyzed.pathname.indexOf("/rest") !== 0 ? "/?noredirect=true" : null;
 
   const shouldBeCachedIfFound =
-    (!isOurHost && (urlAnalyzed.searchParams.get("sw-cacheable") === "true" || event.request.headers.get("sw-cacheable") === "true")) ||
-    urlAnalyzed.pathname.indexOf("/rest/resource") === 0 || urlAnalyzed.pathname.indexOf("/rest/currency-factors") === 0;
+    (
+      !isOurHost &&
+      (
+        config.cacheableExtHostnames.includes(urlAnalyzed.hostname) ||
+        urlAnalyzed.searchParams.get("sw-cacheable") === "true" ||
+        event.request.headers.get("sw-cacheable") === "true"
+      )
+    ) ||
+    urlAnalyzed.pathname.indexOf("/rest/resource") === 0 ||
+    urlAnalyzed.pathname.indexOf("/rest/currency-factors") === 0;
 
   const shouldBeRechecked = (!isOurHost && (urlAnalyzed.searchParams.get("sw-recheck") === "true" || event.request.headers.get("sw-recheck") === "true"));
   const acceptHeader = event.request.headers.get("Accept");

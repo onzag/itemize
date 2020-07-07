@@ -19,6 +19,7 @@ export interface IConfigRawJSONDataType {
   manifest: IConfigManifestType;
   fontUrl: string;
   fontName: string;
+  cacheableExtHostnames: string[];
 
   // FALLBACK REGIONALIZATION
   fallbackCountryCode: string;
@@ -269,6 +270,12 @@ export const rawConfigSchema = {
     fontUrl: {
       type: "string",
     },
+    cacheableExtHostnames: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
     fontName: {
       type: "string",
     },
@@ -345,6 +352,7 @@ export const rawConfigSchema = {
     "dictionaries",
     "roles",
     "fontUrl",
+    "cacheableExtHostnames",
     "fontName",
     "manifest",
     "fallbackCountryCode",

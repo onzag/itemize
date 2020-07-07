@@ -6,4 +6,4 @@ export interface ISitemapJSONType {
     isIndex: boolean;
     entries: string[];
 }
-export declare function toXML(src: ISitemapJSONType, targetDomain: string, sourcePrefix: string, prefixURL?: string): void;
+export declare function toXML(src: ISitemapJSONType, targetDomain: string, sourcePrefix: string, prefixURL?: string, suffixURL?: string): string;

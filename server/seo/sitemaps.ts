@@ -13,6 +13,7 @@ export function toXML(
   targetDomain: string,
   sourcePrefix: string,
   prefixURL?: string,
+  suffixURL?: string,
 ) {
   let result: string = "<?xml version='1.0' encoding='UTF-8'?>";
   if (src.isIndex) {
@@ -24,7 +25,17 @@ export function toXML(
   src.entries.forEach((entry) => {
     if (src.isIndex) {
       result += "<sitemap><loc>";
-      result += sourcePrefix + (prefixURL || "") + entry;
+      result += sourcePrefix;
+      if (prefixURL) {
+        result += prefixURL;
+        if (!result.endsWith("/")) {
+          result += "/";
+        }
+      }
+      result += entry;
+      if (suffixURL) {
+        result += suffixURL;
+      }
       result += "</loc></sitemap>";
     } else {
       result += "<url><loc>";
@@ -36,6 +47,9 @@ export function toXML(
         result += "/";
       }
       result += entry
+      if (suffixURL) {
+        result += suffixURL;
+      }
       result += "</loc></url>";
     }
   });
@@ -45,4 +59,6 @@ export function toXML(
   } else {
     result += "</urlset>";
   }
+
+  return result;
 }

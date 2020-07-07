@@ -55,6 +55,7 @@ const PORT = process.env.PORT || 8000;
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
 const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "CLEAN_STORAGE" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
+const PING_GOOGLE = JSON.parse(process.env.PING_GOOGLE || "false");
 
 // building the logger
 export const logger: winston.Logger = INSTANCE_MODE === "BUILD_DATABASE" ? null : winston.createLogger({
@@ -330,6 +331,7 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     res.sendFile(path.resolve(path.join("dist", "data", "service-worker.production.js")));
   });
 
+  const hostname = NODE_ENV === "production" ? appData.config.productionHostname : appData.config.developmentHostname;
   app.get("/robots.txt", (req, res) => {
     res.setHeader("content-type", "text/plain; charset=utf-8");
     let result: string = "user-agent = *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
@@ -350,8 +352,6 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
           });
         }
       });
-
-      const hostname = NODE_ENV === "production" ? appData.config.productionHostname : appData.config.developmentHostname;
   
       result += "Sitemap: " +
         appData.pkgcloudUploadContainers[appData.seoConfig.seoContainerId].prefix + 
@@ -359,6 +359,10 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
     }
 
     res.end(result);
+  });
+
+  app.get("/sitemap.xml", (req, res) => {
+    res.redirect(appData.pkgcloudUploadContainers[appData.seoConfig.seoContainerId].prefix + "sitemaps/" + hostname + "/index.xml")
   });
 
   const router = express.Router();
@@ -644,6 +648,7 @@ export async function initializeServer(
           prefix,
           config.supportedLanguages,
           NODE_ENV === "production" ? config.productionHostname : config.developmentHostname,
+          PING_GOOGLE,
         );
         manager.setSEOGenerator(seoGenerator);
       }

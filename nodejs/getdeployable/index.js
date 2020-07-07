@@ -118,6 +118,9 @@ async function build(version, buildID, services) {
             message += "\n\nYou have included the global manager in your build which is a rare occurrance but expected" +
                 "\nif this is your initial single cluster build or this is your central cluster build, regardless the reason";
             "\nremember to include these by running `docker load -i app.tar.gz`";
+            message += "\n\nThe global manager includes utilities for SEO, by default global manager will not inform google" +
+                "\nof changes in your sitemaps, change the PING_GOOGLE environment variable to true in order to ping google every" +
+                "\ntime your page content changes";
         }
         let npmTokenExists = true;
         try {
