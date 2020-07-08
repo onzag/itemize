@@ -156,6 +156,8 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
                 update: gqlValueToConvert,
                 extraArgs,
                 action: triggers_1.TriggerActions.EDIT,
+                id: resolverArgs.args.id,
+                version: resolverArgs.args.version || null,
             });
             // and if we have a new value
             if (newValueAccordingToModule) {
@@ -174,6 +176,8 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
                 update: gqlValueToConvert,
                 extraArgs,
                 action: triggers_1.TriggerActions.EDIT,
+                id: resolverArgs.args.id,
+                version: resolverArgs.args.version || null,
             });
             // and make it the new value if such trigger was registered
             if (newValueAccordingToIdef) {

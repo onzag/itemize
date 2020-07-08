@@ -13,6 +13,9 @@ const server_1 = __importDefault(require("react-dom/server"));
 const ItemDefinition_1 = require("../../base/Root/Module/ItemDefinition");
 const basic_1 = require("../resolvers/basic");
 const moment_1 = __importDefault(require("moment"));
+const fs_1 = __importDefault(require("fs"));
+const fsAsync = fs_1.default.promises;
+const path_1 = __importDefault(require("path"));
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
 const NO_SSR = process.env.NO_SSR === "true";
 const DATE_RFC2822 = "ddd, DD MMM YYYY HH:mm:ss ZZ";
@@ -79,6 +82,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             ogDescription: null,
             ogImage: null,
             collect: [],
+            collectResources: [],
             memId: "*.root.redirect",
         };
     }
@@ -100,6 +104,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             ogDescription: config.appName,
             ogImage: "/rest/resource/icons/android-chrome-512x512.png",
             collect: null,
+            collectResources: null,
             noData: true,
             language: null,
             rtl: false,
@@ -222,7 +227,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
                 if (lastModified.getTime() < dateValue.getTime()) {
                     lastModified = dateValue;
                 }
-                collectionSignatureArray[index] = rowValue.last_modified;
+                collectionSignatureArray[index] = rowValue.type + "." + rowValue.id + "." + (rowValue.version || "") + "." + rowValue.last_modified;
             }
             // now we build the fileds for the given role access
             const fields = idef.buildFieldsForRoleAccess(ItemDefinition_1.ItemDefinitionIOActions.READ, appliedRule.forUser.role, appliedRule.forUser.id, rowValue ? (idef.isOwnerObjectId() ? rowValue.id : rowValue.created_by) : constants_1.UNSPECIFIED_OWNER);
@@ -249,7 +254,26 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             }
         }));
         // now we build the signature as a string
-        collectionSignature = collectionSignatureArray.join(".");
+        collectionSignature = collectionSignatureArray.join(";");
+    }
+    // now we need to collect the resources
+    const resources = {};
+    if (appliedRule.collectResources) {
+        try {
+            await Promise.all(appliedRule.collectResources.map(async (src) => {
+                resources[src] = await fsAsync.readFile(path_1.default.resolve(path_1.default.join("dist", "data", src)), "utf-8");
+            }));
+        }
+        catch (err) {
+            collectionFailed = true;
+        }
+        // and we need to build this signature of collection of data
+        if (collectionSignature) {
+            collectionSignature += appliedRule.collectResources.join(";");
+        }
+        else {
+            collectionSignature = appliedRule.collectResources.join(";");
+        }
     }
     if (collectionSignature) {
         etag += "-" + collectionSignature.replace(/\s/g, "_");
@@ -338,6 +362,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         // otherwise with the SSR
         const ssr = {
             queries,
+            resources,
             user: appliedRule.forUser,
             title: finalTitle,
             currencyFactors: appData.cache.getServerData()[constants_1.CURRENCY_FACTORS_IDENTIFIER],

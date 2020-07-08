@@ -14,6 +14,9 @@ import { filterAndPrepareGQLValue } from "../resolvers/basic";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import Root from "../../base/Root";
 import Moment from "moment";
+import fs from "fs";
+const fsAsync = fs.promises;
+import path from "path";
 
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
 const NO_SSR = process.env.NO_SSR === "true";
@@ -104,6 +107,7 @@ export async function ssrGenerator(
       ogDescription: null,
       ogImage: null,
       collect: [],
+      collectResources: [],
       memId: "*.root.redirect",
     };
   }
@@ -127,6 +131,7 @@ export async function ssrGenerator(
       ogDescription: config.appName,
       ogImage: "/rest/resource/icons/android-chrome-512x512.png",
       collect: null,
+      collectResources: null,
       noData: true,
       language: null,
       rtl: false,
@@ -227,7 +232,7 @@ export async function ssrGenerator(
   // now we try to collect if we are asked to collect data
   if (appliedRule.collect) {
     // and we need to build this signature of collection of data
-    const collectionSignatureArray: string[] = []
+    const collectionSignatureArray: string[] = [];
 
     // so we start collecting
     await Promise.all(
@@ -273,7 +278,7 @@ export async function ssrGenerator(
           if (lastModified.getTime() < dateValue.getTime()) {
             lastModified = dateValue;
           }
-          collectionSignatureArray[index] = rowValue.last_modified;
+          collectionSignatureArray[index] = rowValue.type + "." + rowValue.id + "." + (rowValue.version || "") + "." + rowValue.last_modified;
         }
 
         // now we build the fileds for the given role access
@@ -311,7 +316,25 @@ export async function ssrGenerator(
     );
 
     // now we build the signature as a string
-    collectionSignature = collectionSignatureArray.join(".");
+    collectionSignature = collectionSignatureArray.join(";");
+  }
+
+  // now we need to collect the resources
+  const resources: {[key: string]: string} = {};
+  if (appliedRule.collectResources) {
+    try {
+      await Promise.all(appliedRule.collectResources.map(async (src) => {
+        resources[src] = await fsAsync.readFile(path.resolve(path.join("dist", "data", src)), "utf-8");
+      }))
+    } catch (err) {
+      collectionFailed = true;
+    }
+    // and we need to build this signature of collection of data
+    if (collectionSignature) {
+      collectionSignature += appliedRule.collectResources.join(";");
+    } else {
+      collectionSignature = appliedRule.collectResources.join(";");
+    }
   }
 
   if (collectionSignature) {
@@ -414,6 +437,7 @@ export async function ssrGenerator(
     // otherwise with the SSR
     const ssr: ISSRContextType = {
       queries,
+      resources,
       user: appliedRule.forUser,
       title: finalTitle,
       currencyFactors: appData.cache.getServerData()[CURRENCY_FACTORS_IDENTIFIER],

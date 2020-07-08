@@ -4,16 +4,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-class HTMLResourceLoader extends react_1.default.PureComponent {
+const ssr_provider_1 = require("../../../client/internal/providers/ssr-provider");
+class ActualHTMLResourceLoader extends react_1.default.PureComponent {
     constructor(props) {
         super(props);
+        let htmlContent = null;
+        if (props.ssrContext) {
+            htmlContent = props.ssrContext[props.src] || null;
+        }
         this.state = {
-            htmlContent: null,
+            htmlContent,
             loading: false,
             failed: false,
         };
     }
     async load() {
+        if (this.props.ssrContext &&
+            this.props.ssrContext[this.props.src]) {
+            if (this.props.ssrContext[this.props.src] !== this.state.htmlContent) {
+                this.setState({
+                    htmlContent: this.props.ssrContext[this.props.src],
+                    failed: false,
+                    loading: false,
+                });
+            }
+            // we run this request in order to cache, even when it's not really used
+            fetch("/rest/resource/" + this.props.src, {
+                headers: {
+                    "sw-cacheable": "true",
+                },
+            });
+            return;
+        }
         this.setState({
             htmlContent: null,
             failed: false,
@@ -72,5 +94,8 @@ class HTMLResourceLoader extends react_1.default.PureComponent {
         const WrapperComponent = this.props.wrapper || "div";
         return (react_1.default.createElement(WrapperComponent, { className: this.props.wrapperClassName, dangerouslySetInnerHTML: { __html: this.state.htmlContent } }));
     }
+}
+function HTMLResourceLoader(props) {
+    return (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (value) => (react_1.default.createElement(ActualHTMLResourceLoader, Object.assign({}, props, { ssrContext: value })))));
 }
 exports.default = HTMLResourceLoader;

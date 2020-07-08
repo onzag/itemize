@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const triggers_1 = require("../resolvers/triggers");
 const constants_1 = require("../../constants");
 const errors_1 = require("../../base/errors");
 const __1 = require("../");
@@ -8,7 +9,8 @@ exports.customUserTriggers = {
         "users/user": async (arg) => {
             // check for sessionId changes in order to trigger a whole kick
             // event
-            if (arg.from &&
+            if ((arg.action === triggers_1.TriggerActions.CREATE || arg.action === triggers_1.TriggerActions.EDIT) &&
+                arg.from &&
                 arg.update) {
                 const newSessionId = arg.update.sessionId;
                 const oldSessionId = arg.from.sessionId;
@@ -20,7 +22,8 @@ exports.customUserTriggers = {
             // either because of creation or from a normal update
             // from will be null during creation, this means creation
             // will trigger this path
-            if (arg.update) {
+            if ((arg.action === triggers_1.TriggerActions.CREATE || arg.action === triggers_1.TriggerActions.EDIT) &&
+                arg.update) {
                 // so this is the new email, remember this can be null and it
                 // can be a partial update in which case it's undefined
                 const newEmail = arg.update.email;

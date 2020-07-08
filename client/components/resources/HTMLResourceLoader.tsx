@@ -1,4 +1,5 @@
 import React from "react";
+import { ISSRContextType, SSRContext } from "../../../client/internal/providers/ssr-provider";
 
 interface IHTMLResourceLoaderProps {
   src: string;
@@ -8,24 +9,53 @@ interface IHTMLResourceLoaderProps {
   failedComponent?: React.ReactNode;
 }
 
-interface IHTMLResourceLoaderState {
+interface IActualHTMLResourceLoaderProps extends IHTMLResourceLoaderProps {
+  ssrContext: ISSRContextType,
+}
+
+interface IActualHTMLResourceLoaderState {
   htmlContent: string;
   loading: boolean;
   failed: boolean;
 }
 
-export default class HTMLResourceLoader
-  extends React.PureComponent<IHTMLResourceLoaderProps, IHTMLResourceLoaderState> {
-  constructor(props: IHTMLResourceLoaderProps) {
+class ActualHTMLResourceLoader
+  extends React.PureComponent<IActualHTMLResourceLoaderProps, IActualHTMLResourceLoaderState> {
+
+  constructor(props: IActualHTMLResourceLoaderProps) {
     super(props);
 
+    let htmlContent: string = null;
+    if (props.ssrContext) {
+      htmlContent = props.ssrContext[props.src] || null;
+    }
     this.state = {
-      htmlContent: null,
+      htmlContent,
       loading: false,
       failed: false,
     };
   }
   public async load() {
+    if (
+      this.props.ssrContext &&
+      this.props.ssrContext[this.props.src]
+    ) {
+      if (this.props.ssrContext[this.props.src] !== this.state.htmlContent) {
+        this.setState({
+          htmlContent: this.props.ssrContext[this.props.src],
+          failed: false,
+          loading: false,
+        });
+      }
+
+      // we run this request in order to cache, even when it's not really used
+      fetch("/rest/resource/" + this.props.src, {
+        headers: {
+          "sw-cacheable": "true",
+        },
+      });
+      return;
+    }
     this.setState({
       htmlContent: null,
       failed: false,
@@ -75,7 +105,7 @@ export default class HTMLResourceLoader
   public componentDidMount() {
     this.load();
   }
-  public componentDidUpdate(prevProps: IHTMLResourceLoaderProps) {
+  public componentDidUpdate(prevProps: IActualHTMLResourceLoaderProps) {
     if (prevProps.src !== this.props.src) {
       this.load();
     }
@@ -95,4 +125,14 @@ export default class HTMLResourceLoader
       />
     );
   }
+}
+
+export default function HTMLResourceLoader(props: IHTMLResourceLoaderProps) {
+  return (
+    <SSRContext.Consumer>
+      {(value) => (
+        <ActualHTMLResourceLoader {...props} ssrContext={value}/>
+      )}
+    </SSRContext.Consumer>
+  )
 }

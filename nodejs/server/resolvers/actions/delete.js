@@ -110,6 +110,8 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
                 update: null,
                 extraArgs: resolverArgs.args,
                 action: triggers_1.TriggerActions.DELETE,
+                id: resolverArgs.args.id,
+                version: resolverArgs.args.version || null,
             });
         }
         // same with the item definition
@@ -123,6 +125,8 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
                 update: null,
                 extraArgs: resolverArgs.args,
                 action: triggers_1.TriggerActions.DELETE,
+                id: resolverArgs.args.id,
+                version: resolverArgs.args.version || null,
             });
         }
     }

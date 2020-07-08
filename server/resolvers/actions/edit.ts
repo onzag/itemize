@@ -258,6 +258,8 @@ export async function editItemDefinition(
         update: gqlValueToConvert,
         extraArgs,
         action: TriggerActions.EDIT,
+        id: resolverArgs.args.id as number,
+        version: resolverArgs.args.version as string || null,
       });
       // and if we have a new value
       if (newValueAccordingToModule) {
@@ -276,6 +278,8 @@ export async function editItemDefinition(
         update: gqlValueToConvert,
         extraArgs,
         action: TriggerActions.EDIT,
+        id: resolverArgs.args.id as number,
+        version: resolverArgs.args.version as string || null,
       });
       // and make it the new value if such trigger was registered
       if (newValueAccordingToIdef) {

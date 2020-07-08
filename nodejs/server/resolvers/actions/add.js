@@ -185,11 +185,13 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
     // and extract the triggers from the registry
     const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef];
     const moduleTrigger = appData.triggers.module[pathOfThisModule];
+    let itemDefinitionSpecificArgs = null;
+    let extraArgs = null;
     // if we got any of them convert
     if (itemDefinitionTrigger || moduleTrigger) {
         // we split the args in the graphql query for that which belongs to the
         // item definition and that which is extra
-        const [itemDefinitionSpecificArgs, extraArgs] = basic_1.splitArgsInGraphqlQuery(itemDefinition, resolverArgs.args);
+        [itemDefinitionSpecificArgs, extraArgs] = basic_1.splitArgsInGraphqlQuery(itemDefinition, resolverArgs.args);
         // so now we just want to convert the values setup here, as done
         // some heavy lifting
         gqlValueToConvert = itemDefinitionSpecificArgs;
@@ -204,6 +206,8 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
                 update: gqlValueToConvert,
                 extraArgs,
                 action: triggers_1.TriggerActions.CREATE,
+                id: null,
+                version: null,
             });
             // and if we have a new value
             if (newValueAccordingToModule) {
@@ -222,6 +226,8 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
                 update: gqlValueToConvert,
                 extraArgs,
                 action: triggers_1.TriggerActions.CREATE,
+                id: null,
+                version: null,
             });
             // and make it the new value if such trigger was registered
             if (newValueAccordingToIdef) {
@@ -248,6 +254,32 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
         DATA: gqlValue,
         ...gqlValue,
     };
+    if (moduleTrigger) {
+        moduleTrigger({
+            appData,
+            itemDefinition: itemDefinition,
+            module: mod,
+            from: null,
+            update: gqlValueToConvert,
+            extraArgs,
+            action: triggers_1.TriggerActions.CREATED,
+            id: value.id,
+            version: value.version,
+        });
+    }
+    if (itemDefinitionTrigger) {
+        itemDefinitionTrigger({
+            appData,
+            itemDefinition: itemDefinition,
+            module: mod,
+            from: null,
+            update: gqlValueToConvert,
+            extraArgs,
+            action: triggers_1.TriggerActions.CREATED,
+            id: value.id,
+            version: value.version,
+        });
+    }
     __1.logger.debug("addItemDefinition: GQL output calculated", finalOutput);
     pooledRoot.cleanState();
     appData.rootPool.release(pooledRoot);

@@ -284,13 +284,16 @@ export async function addItemDefinition(
   // and extract the triggers from the registry
   const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef]
   const moduleTrigger = appData.triggers.module[pathOfThisModule];
+
+  let itemDefinitionSpecificArgs: IGQLArgs = null;
+  let extraArgs: IGQLArgs = null;
   // if we got any of them convert
   if (
     itemDefinitionTrigger || moduleTrigger
   ) {
     // we split the args in the graphql query for that which belongs to the
     // item definition and that which is extra
-    const [itemDefinitionSpecificArgs, extraArgs] = splitArgsInGraphqlQuery(
+    [itemDefinitionSpecificArgs, extraArgs] = splitArgsInGraphqlQuery(
       itemDefinition,
       resolverArgs.args,
     );
@@ -308,6 +311,8 @@ export async function addItemDefinition(
         update: gqlValueToConvert,
         extraArgs,
         action: TriggerActions.CREATE,
+        id: null,
+        version: null,
       });
       // and if we have a new value
       if (newValueAccordingToModule) {
@@ -326,6 +331,8 @@ export async function addItemDefinition(
         update: gqlValueToConvert,
         extraArgs,
         action: TriggerActions.CREATE,
+        id: null,
+        version: null,
       });
       // and make it the new value if such trigger was registered
       if (newValueAccordingToIdef) {
@@ -376,6 +383,35 @@ export async function addItemDefinition(
     DATA: gqlValue,
     ...gqlValue,
   };
+
+  if (
+    moduleTrigger
+  ) {
+    moduleTrigger({
+      appData,
+      itemDefinition: itemDefinition,
+      module: mod,
+      from: null,
+      update: gqlValueToConvert,
+      extraArgs,
+      action: TriggerActions.CREATED,
+      id: value.id,
+      version: value.version,
+    });
+  }
+  if (itemDefinitionTrigger) {
+    itemDefinitionTrigger({
+      appData,
+      itemDefinition: itemDefinition,
+      module: mod,
+      from: null,
+      update: gqlValueToConvert,
+      extraArgs,
+      action: TriggerActions.CREATED,
+      id: value.id,
+      version: value.version,
+    });
+  }
 
   logger.debug(
     "addItemDefinition: GQL output calculated",

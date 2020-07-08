@@ -1,4 +1,4 @@
-import { ITriggerRegistry } from "../resolvers/triggers";
+import { ITriggerRegistry, TriggerActions } from "../resolvers/triggers";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, ENDPOINT_ERRORS } from "../../constants";
 import { EndpointError } from "../../base/errors";
 import { ISQLTableRowValue } from "../../base/Root/sql";
@@ -10,6 +10,7 @@ export const customUserTriggers: ITriggerRegistry = {
       // check for sessionId changes in order to trigger a whole kick
       // event
       if (
+        (arg.action === TriggerActions.CREATE || arg.action === TriggerActions.EDIT) &&
         arg.from &&
         arg.update
       ) {
@@ -26,6 +27,7 @@ export const customUserTriggers: ITriggerRegistry = {
       // from will be null during creation, this means creation
       // will trigger this path
       if (
+        (arg.action === TriggerActions.CREATE || arg.action === TriggerActions.EDIT) &&
         arg.update
       ) {
         // so this is the new email, remember this can be null and it

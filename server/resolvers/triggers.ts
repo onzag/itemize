@@ -5,6 +5,7 @@ import Module from "../../base/Root/Module";
 
 export enum TriggerActions {
   CREATE,
+  CREATED,
   EDIT,
   DELETE,
 }
@@ -16,7 +17,9 @@ export interface TriggerArgType {
   extraArgs: IGQLArgs;
   itemDefinition: ItemDefinition;
   module: Module;
-  action: TriggerActions
+  action: TriggerActions;
+  id: number;
+  version: string;
 }
 
 export type TriggerType = (arg: TriggerArgType) => IGQLValue | Promise<IGQLValue>;

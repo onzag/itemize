@@ -9,6 +9,7 @@ export interface ISSRRuleDynamic {
     ogDescription: string | ISSRRuleDynamicFn;
     ogImage: string | ISSRRuleDynamicFn;
     collect: Array<[string, string, number, string]>;
+    collectResources: string[];
     memId: string;
 }
 export interface ISSRRule extends ISSRRuleDynamic {

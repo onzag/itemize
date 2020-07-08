@@ -4,8 +4,9 @@ import { IAppDataType } from "..";
 import Module from "../../base/Root/Module";
 export declare enum TriggerActions {
     CREATE = 0,
-    EDIT = 1,
-    DELETE = 2
+    CREATED = 1,
+    EDIT = 2,
+    DELETE = 3
 }
 export interface TriggerArgType {
     appData: IAppDataType;
@@ -15,6 +16,8 @@ export interface TriggerArgType {
     itemDefinition: ItemDefinition;
     module: Module;
     action: TriggerActions;
+    id: number;
+    version: string;
 }
 export declare type TriggerType = (arg: TriggerArgType) => IGQLValue | Promise<IGQLValue>;
 export interface IBaseTriggerRegistry {
