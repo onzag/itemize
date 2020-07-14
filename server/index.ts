@@ -625,6 +625,9 @@ export async function initializeServer(
           "initializeServer: initializing SEO configuration",
         );
         const seoContainerData = sensitiveConfig.openstackContainers[seoConfig.seoContainerId];
+        if (!seoContainerData) {
+          throw new Error("Invalid seo container id for the openstack container '" + seoConfig.seoContainerId + "'");
+        }
         const seoContainerClient = pkgcloud.storage.createClient({
           provider: "openstack",
           username: seoContainerData.username,

@@ -138,7 +138,7 @@ initializeServer(
       "profile/:id": {
         crawable: true,
         collect: [
-          ["users", "user"]
+          ["users", "user"],
         ],
       },
     },
