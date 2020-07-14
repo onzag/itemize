@@ -37,7 +37,7 @@ class PropertyViewSimple extends react_1.default.Component {
             nullValueLabel :
             ((i18nData && i18nData.values[value.toString()]) ||
                 value.toString());
-        const numericType = PropertyEntryField_1.getNumericType(this.props.property.getType());
+        const numericType = this.props.property ? PropertyEntryField_1.getNumericType(this.props.property.getType()) : PropertyEntryField_1.NumericType.NAN;
         if (numericType === PropertyEntryField_1.NumericType.FLOAT) {
             currentValue = currentValue.replace(".", this.props.i18n[this.props.language].number_decimal_separator);
         }

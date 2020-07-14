@@ -226,6 +226,10 @@ export interface IItemDefinitionProviderProps {
      */
     automaticSearch?: IActionSearchOptions;
     /**
+     * An id for the automatic search first search
+     */
+    automaticSearchInitialId?: string;
+    /**
      * Setters for setting values for the properties within the item definition
      * itself, useful not to depend on mounting at time
      */
@@ -284,7 +288,7 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
     injectedParentContext: IItemDefinitionContextType;
     config: IConfigRawJSONDataType;
 }
-interface IACtualItemDefinitionProviderSearchState {
+interface IActualItemDefinitionProviderSearchState {
     searchError: EndpointErrorType;
     searching: boolean;
     searchRecords: IGQLSearchRecord[];
@@ -300,7 +304,7 @@ interface IACtualItemDefinitionProviderSearchState {
     searchRequestedIncludes: string[];
     searchFields: any;
 }
-interface IActualItemDefinitionProviderState extends IACtualItemDefinitionProviderSearchState {
+interface IActualItemDefinitionProviderState extends IActualItemDefinitionProviderSearchState {
     itemDefinitionState: IItemDefinitionStateType;
     isBlocked: boolean;
     isBlockedButDataIsAccessible: boolean;
@@ -324,6 +328,7 @@ interface IActualItemDefinitionProviderState extends IACtualItemDefinitionProvid
  */
 export declare class ActualItemDefinitionProvider extends React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
     private isUnmounted;
+    private hasExecutedInitialSearch;
     private lastLoadingForId;
     private lastLoadingForVersion;
     private lastLoadValuePromise;

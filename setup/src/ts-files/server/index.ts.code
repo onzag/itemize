@@ -53,6 +53,7 @@ initializeServer(
             ["cms", "fragment", 1, lang],
           ],
           collectResources: [],
+          collectSearch: [],
           // mem id is special, this is a memory id that is used to cache the result
           // make sure to use a different value for different results, do not worry
           // the timestamp signature of the collected values is used so if any of them
@@ -117,6 +118,7 @@ initializeServer(
             ["users", "user", userId, null],
           ],
           collectResources: [],
+          collectSearch: [],
           // note how the memory id here includes the user id
           memId: "profile." + userId,
         };

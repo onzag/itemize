@@ -388,6 +388,10 @@ export interface IItemDefinitionProviderProps {
    */
   automaticSearch?: IActionSearchOptions;
   /**
+   * An id for the automatic search first search 
+   */
+  automaticSearchInitialId?: string;
+  /**
    * Setters for setting values for the properties within the item definition
    * itself, useful not to depend on mounting at time
    */
@@ -461,7 +465,7 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
   config: IConfigRawJSONDataType;
 }
 
-interface IACtualItemDefinitionProviderSearchState {
+interface IActualItemDefinitionProviderSearchState {
   searchError: EndpointErrorType;
   searching: boolean;
   searchRecords: IGQLSearchRecord[];
@@ -480,7 +484,7 @@ interface IACtualItemDefinitionProviderSearchState {
 
 // This is the state of such, it's basically a copy of the
 // context, so refer to that, the context is avobe
-interface IActualItemDefinitionProviderState extends IACtualItemDefinitionProviderSearchState {
+interface IActualItemDefinitionProviderState extends IActualItemDefinitionProviderSearchState {
   itemDefinitionState: IItemDefinitionStateType;
   isBlocked: boolean;
   isBlockedButDataIsAccessible: boolean;
@@ -508,6 +512,8 @@ export class ActualItemDefinitionProvider extends
   // this variable is useful is async tasks like loadValue are still executing after
   // this component has unmounted, which is a memory leak
   private isUnmounted: boolean = false;
+  // this is for when the search has been executed initially in order to do SSR
+  private hasExecutedInitialSearch: boolean = false;
 
   private lastLoadingForId: number = null;
   private lastLoadingForVersion: string = null;
@@ -647,7 +653,7 @@ export class ActualItemDefinitionProvider extends
       );
     }
 
-    let searchState: IACtualItemDefinitionProviderSearchState = {
+    let searchState: IActualItemDefinitionProviderSearchState = {
       searchError: null,
       searching: false,
       searchResults: null,
@@ -779,7 +785,9 @@ export class ActualItemDefinitionProvider extends
     }
 
     if (this.props.automaticSearch) {
-      this.search(this.props.automaticSearch);
+      if (!this.props.automaticSearchInitialId || this.state.searchId !== this.props.automaticSearchInitialId) {
+        this.search(this.props.automaticSearch);
+      }
     }
 
     if (this.props.markForDestructionOnLogout) {

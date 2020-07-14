@@ -55,6 +55,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         // this variable is useful is async tasks like loadValue are still executing after
         // this component has unmounted, which is a memory leak
         this.isUnmounted = false;
+        // this is for when the search has been executed initially in order to do SSR
+        this.hasExecutedInitialSearch = false;
         this.lastLoadingForId = null;
         this.lastLoadingForVersion = null;
         this.lastLoadValuePromise = null;
@@ -260,7 +262,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             this.setStateToCurrentValueWithExternalChecking(null);
         }
         if (this.props.automaticSearch) {
-            this.search(this.props.automaticSearch);
+            if (!this.props.automaticSearchInitialId || this.state.searchId !== this.props.automaticSearchInitialId) {
+                this.search(this.props.automaticSearch);
+            }
         }
         if (this.props.markForDestructionOnLogout) {
             this.markForDestruction();

@@ -1,7 +1,7 @@
 import React from "react";
 import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
-declare type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search";
+import { SearchVariants } from "../../../constants";
 export interface IPropertyEntryProps<RendererPropsType> {
     id: string;
     onChange?: (value: PropertyDefinitionSupportedType) => void;

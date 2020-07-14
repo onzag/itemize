@@ -48,9 +48,9 @@ export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProp
         value.toString()
       );
 
-    const numericType = getNumericType(
+    const numericType = this.props.property ? getNumericType(
       this.props.property.getType(),
-    );
+    ) : NumericType.NAN;
 
     if (numericType === NumericType.FLOAT) {
       currentValue = currentValue.replace(".", this.props.i18n[this.props.language].number_decimal_separator);

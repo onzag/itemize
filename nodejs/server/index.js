@@ -434,6 +434,9 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             if (seoConfig) {
                 exports.logger.info("initializeServer: initializing SEO configuration");
                 const seoContainerData = sensitiveConfig.openstackContainers[seoConfig.seoContainerId];
+                if (!seoContainerData) {
+                    throw new Error("Invalid seo container id for the openstack container '" + seoConfig.seoContainerId + "'");
+                }
                 const seoContainerClient = pkgcloud_1.default.storage.createClient({
                     provider: "openstack",
                     username: seoContainerData.username,

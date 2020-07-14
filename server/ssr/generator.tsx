@@ -108,6 +108,7 @@ export async function ssrGenerator(
       ogImage: null,
       collect: [],
       collectResources: [],
+      collectSearch: [],
       memId: "*.root.redirect",
     };
   }
@@ -132,6 +133,7 @@ export async function ssrGenerator(
       ogImage: "/rest/resource/icons/android-chrome-512x512.png",
       collect: null,
       collectResources: null,
+      collectSearch: null,
       noData: true,
       language: null,
       rtl: false,
@@ -271,7 +273,7 @@ export async function ssrGenerator(
         // now we check, is it not found, if it's not found, or signature is going to be
         // null for such index
         if (rowValue === null) {
-          collectionSignatureArray[index] = "null";
+          collectionSignatureArray[index] = "NOT_FOUND";
         } else {
           // otherwise it's when it was last modified
           const dateValue = new Date(rowValue.last_modified);

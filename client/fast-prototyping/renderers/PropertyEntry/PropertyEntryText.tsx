@@ -583,8 +583,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   }
   public componentDidUpdate(prevProps: IPropertyEntryTextRendererWithStylesProps, prevState: IPropertyEntryTextRendererState) {
     if (
-      (prevProps.isRichText && !this.props.isRichText) ||
-      (prevState.isReadyToType !== this.state.isReadyToType)
+      (!prevProps.isRichText && this.props.isRichText) ||
+      (prevState.isReadyToType !== this.state.isReadyToType && this.props.isRichText)
     ) {
       this.addPasteEventOnEditor();
     }

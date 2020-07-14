@@ -346,6 +346,7 @@ export declare const ORDERBY_RULE_DIRECTION: GraphQLEnumType;
  */
 export declare const ORDERBY_NULLS_PRIORITY: GraphQLEnumType;
 export declare const ORDERBY_RULE: GraphQLInputObjectType;
+export declare type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search";
 export interface IOrderByRuleType {
     [property: string]: {
         direction: "asc" | "desc";

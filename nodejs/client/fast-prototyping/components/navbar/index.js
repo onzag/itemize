@@ -75,7 +75,7 @@ const defaultMenuEntries = [
         module: "cms",
         idef: "article",
         i18nProps: {
-            id: "home",
+            id: "news",
             capitalize: true,
         },
     },

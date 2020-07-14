@@ -392,8 +392,8 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         });
     }
     componentDidUpdate(prevProps, prevState) {
-        if ((prevProps.isRichText && !this.props.isRichText) ||
-            (prevState.isReadyToType !== this.state.isReadyToType)) {
+        if ((!prevProps.isRichText && this.props.isRichText) ||
+            (prevState.isReadyToType !== this.state.isReadyToType && this.props.isRichText)) {
             this.addPasteEventOnEditor();
         }
     }

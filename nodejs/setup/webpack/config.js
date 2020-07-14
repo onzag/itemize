@@ -17,7 +17,7 @@ const plugins = [
     filename: "[name]." + mode + ".css",
     chunkFilename: "[name]." + mode + ".css"
   }),
-  new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+  new webpack.IgnorePlugin(/^\\.\\/locale$/, /moment$/),
   new webpack.DefinePlugin({
     CONFIG: JSON.stringify(config),
   }),

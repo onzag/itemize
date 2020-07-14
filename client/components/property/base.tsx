@@ -1,18 +1,16 @@
 import React from "react";
-import PropertyDefinition, { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ItemDefinitionContext } from "../../providers/item-definition";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
-import { RESERVED_BASE_PROPERTIES } from "../../../constants";
-import PropertyView, { RawBasePropertyView, IPropertyViewRendererProps } from "../../internal/components/PropertyView";
-import PropertyEntry, { IPropertyEntryRendererProps } from "../../internal/components/PropertyEntry";
+import { RESERVED_BASE_PROPERTIES, SearchVariants } from "../../../constants";
+import PropertyView, { RawBasePropertyView } from "../../internal/components/PropertyView";
+import PropertyEntry from "../../internal/components/PropertyEntry";
 import PropertySetter from "../../internal/components/PropertySetter";
 import { IncludeContext } from "../../providers/include";
 import { fileURLAbsoluter, fileArrayURLAbsoluter } from "../../../util";
 import { IGQLFile } from "../../../gql-querier";
 import { ConfigContext } from "../../internal/providers/config-provider";
-
-type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search";
 
 export interface IPropertyEntryProps<RendererPropsType> {
   id: string;
