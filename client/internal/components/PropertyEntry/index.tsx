@@ -187,6 +187,35 @@ const handlerRegistry:
   files: null,
 };
 
+function defaultCountryBugCatcher(code: string) {
+  console.error("Attempted to load invalid country", code);
+  return {
+    name: "?",
+    native: "?",
+    code,
+    phone: "?",
+    continent: "?",
+    capital: "?",
+    languages: [] as string[],
+    emoji: "?",
+    emojiU: "?",
+    currency: "USD",
+    longitude: 0,
+    latitude: 0,
+  }
+};
+
+function defaultCurrencyBugCacher(code: string) {
+  console.error("Attempted to load invalid currency", code);
+  return {
+    code,
+    name: "?",
+    symbol: "?",
+    rounding: 0,
+    decimals: 2,
+  }
+}
+
 export default function PropertyEntry(
   props: IPropertyEntryMainHandlerProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>,
 ) {
@@ -230,8 +259,8 @@ export default function PropertyEntry(
                           language={locale.language}
                           i18n={locale.i18n}
                           rtl={locale.rtl}
-                          currency={currencies[locale.currency]}
-                          country={countries[locale.country]}
+                          currency={currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency)}
+                          country={countries[locale.country] || defaultCountryBugCatcher(locale.country)}
                           renderer={renderer}
                           rendererArgs={props.rendererArgs || {}}
                           config={config}
@@ -246,8 +275,8 @@ export default function PropertyEntry(
                     language={locale.language}
                     i18n={locale.i18n}
                     rtl={locale.rtl}
-                    currency={currencies[locale.currency]}
-                    country={countries[locale.country]}
+                    currency={currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency)}
+                    country={countries[locale.country] || defaultCountryBugCatcher(locale.country)}
                     renderer={renderer}
                     rendererArgs={props.rendererArgs || {}}
                   />

@@ -19,6 +19,7 @@ class PropertyViewCurrency extends react_1.default.Component {
             nextProps.renderer !== this.props.renderer ||
             !!this.props.rtl !== !!nextProps.rtl ||
             this.props.language !== nextProps.language ||
+            this.props.currency !== nextProps.currency ||
             !deep_equal_1.default(this.props.rendererArgs, nextProps.rendererArgs);
     }
     render() {

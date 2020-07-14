@@ -56,7 +56,7 @@ export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurre
                 selected={ac.code === currencyData.currentCurrency.code}
                 onClick={this.handleCurrencyChange.bind(this, currencyData.changeCurrencyTo, ac.code)}
               >
-                <b>{ac.symbol || ac.code}</b>&nbsp;-&nbsp;{capitalize(ac.name)}
+                <b>{(ac.symbol || ac.code) + " (" + ac.code + ")"}</b>&nbsp;-&nbsp;{capitalize(ac.name)}
               </MenuItem>
             ))}
           </Menu> : null;
@@ -69,6 +69,7 @@ export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurre
                 onClick={this.handleButtonSelectClick}
               >
                 {this.props.useCode ? currencyData.currentCurrency.code : currencyData.currentCurrency.name}
+                {this.props.useCode ? "" : " " + currencyData.currentCurrency.code}
               </Button>
               {menu}
             </React.Fragment>

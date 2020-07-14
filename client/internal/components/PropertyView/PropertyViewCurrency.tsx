@@ -29,6 +29,7 @@ export class PropertyViewCurrency extends React.Component<IPropertyViewHandlerPr
       nextProps.renderer !== this.props.renderer ||
       !!this.props.rtl !== !!nextProps.rtl ||
       this.props.language !== nextProps.language ||
+      this.props.currency !== nextProps.currency ||
       !equals(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {

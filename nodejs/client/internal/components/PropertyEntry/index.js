@@ -90,6 +90,34 @@ const handlerRegistry = {
     },
     files: null,
 };
+function defaultCountryBugCatcher(code) {
+    console.error("Attempted to load invalid country", code);
+    return {
+        name: "?",
+        native: "?",
+        code,
+        phone: "?",
+        continent: "?",
+        capital: "?",
+        languages: [],
+        emoji: "?",
+        emojiU: "?",
+        currency: "USD",
+        longitude: 0,
+        latitude: 0,
+    };
+}
+;
+function defaultCurrencyBugCacher(code) {
+    console.error("Attempted to load invalid currency", code);
+    return {
+        code,
+        name: "?",
+        symbol: "?",
+        rounding: 0,
+        decimals: 2,
+    };
+}
 function PropertyEntry(props) {
     if (props.state.hidden) {
         return null;
@@ -111,9 +139,9 @@ function PropertyEntry(props) {
     return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(app_1.LocaleContext.Consumer, null, (locale) => {
         const renderer = props.renderer || renderers[registryEntry.renderer];
         if (registryEntry.includeConfig) {
-            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(Element, Object.assign({}, props, { language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency], country: imported_resources_1.countries[locale.country], renderer: renderer, rendererArgs: props.rendererArgs || {}, config: config })))));
+            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(Element, Object.assign({}, props, { language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency), country: imported_resources_1.countries[locale.country] || defaultCountryBugCatcher(locale.country), renderer: renderer, rendererArgs: props.rendererArgs || {}, config: config })))));
         }
-        return (react_1.default.createElement(Element, Object.assign({}, props, { language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency], country: imported_resources_1.countries[locale.country], renderer: renderer, rendererArgs: props.rendererArgs || {} })));
+        return (react_1.default.createElement(Element, Object.assign({}, props, { language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency), country: imported_resources_1.countries[locale.country] || defaultCountryBugCatcher(locale.country), renderer: renderer, rendererArgs: props.rendererArgs || {} })));
     })));
 }
 exports.default = PropertyEntry;

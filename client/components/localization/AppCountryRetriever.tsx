@@ -15,7 +15,20 @@ export default function AppCountryRetriever(props: {
       {
         (localeContext) => {
           return props.children({
-            currentCountry: countries[localeContext.country.toUpperCase()],
+            currentCountry: countries[localeContext.country.toUpperCase()] || {
+              name: "?",
+              native: "?",
+              code: "?",
+              phone: "?",
+              continent: "?",
+              capital: "?",
+              languages: [],
+              emoji: "?",
+              emojiU: "?",
+              currency: "USD",
+              longitude: 0,
+              latitude: 0,
+            },
             availableCountries: arrCountries,
             changeCountryTo: localeContext.updating ? () => null : localeContext.changeCountryTo,
           });

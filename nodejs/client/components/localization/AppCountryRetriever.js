@@ -9,7 +9,20 @@ const app_1 = require("../../internal/app");
 function AppCountryRetriever(props) {
     return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeContext) => {
         return props.children({
-            currentCountry: imported_resources_1.countries[localeContext.country.toUpperCase()],
+            currentCountry: imported_resources_1.countries[localeContext.country.toUpperCase()] || {
+                name: "?",
+                native: "?",
+                code: "?",
+                phone: "?",
+                continent: "?",
+                capital: "?",
+                languages: [],
+                emoji: "?",
+                emojiU: "?",
+                currency: "USD",
+                longitude: 0,
+                latitude: 0,
+            },
             availableCountries: imported_resources_1.arrCountries,
             changeCountryTo: localeContext.updating ? () => null : localeContext.changeCountryTo,
         });

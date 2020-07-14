@@ -36,11 +36,13 @@ class CurrencyPicker extends react_1.default.Component {
     render() {
         return (react_1.default.createElement(AppCurrencyRetriever_1.default, null, (currencyData) => {
             const menu = this.state.anchorEl ? react_1.default.createElement(mui_core_1.Menu, { anchorEl: this.state.anchorEl, keepMounted: false, open: !!this.state.anchorEl, onClose: this.handleMenuClose }, currencyData.availableCurrencies.map((ac) => (react_1.default.createElement(mui_core_1.MenuItem, { key: ac.code, selected: ac.code === currencyData.currentCurrency.code, onClick: this.handleCurrencyChange.bind(this, currencyData.changeCurrencyTo, ac.code) },
-                react_1.default.createElement("b", null, ac.symbol || ac.code),
+                react_1.default.createElement("b", null, (ac.symbol || ac.code) + " (" + ac.code + ")"),
                 "\u00A0-\u00A0",
                 localization_1.capitalize(ac.name))))) : null;
             return (react_1.default.createElement(react_1.default.Fragment, null,
-                react_1.default.createElement(mui_core_1.Button, { classes: { root: this.props.className }, color: "inherit", startIcon: react_1.default.createElement("b", null, currencyData.currentCurrency.symbol), onClick: this.handleButtonSelectClick }, this.props.useCode ? currencyData.currentCurrency.code : currencyData.currentCurrency.name),
+                react_1.default.createElement(mui_core_1.Button, { classes: { root: this.props.className }, color: "inherit", startIcon: react_1.default.createElement("b", null, currencyData.currentCurrency.symbol), onClick: this.handleButtonSelectClick },
+                    this.props.useCode ? currencyData.currentCurrency.code : currencyData.currentCurrency.name,
+                    this.props.useCode ? "" : " " + currencyData.currentCurrency.code),
                 menu));
         }));
     }
