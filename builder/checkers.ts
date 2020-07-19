@@ -909,8 +909,12 @@ export function checkPropertyDefinition(
           `type '${rawData.type}' requires special property '${property.name}'`,
           traceback.newTraceToBit("specialProperties"),
         );
-      } else if (rawData.specialProperties && rawData.specialProperties[property.name] &&
-        typeof rawData.specialProperties[property.name] !== property.type) {
+      } else if (
+        rawData.specialProperties &&
+        rawData.specialProperties[property.name] &&
+        property.type !== "any" &&
+        typeof rawData.specialProperties[property.name] !== property.type
+      ) {
         throw new CheckUpError(
           `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`,
           traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),

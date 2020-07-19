@@ -12,7 +12,7 @@ import { standardSQLOutFn, standardSQLEqualFn } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
 } from "../local-sql";
-import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
+import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_RAW_TEXT_LENGTH,
   CLASSIC_BASE_I18N,
@@ -22,9 +22,7 @@ import {
   INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import Knex from "knex";
 import { DOMWindow, DOMPurify } from "../../../../../../util";
-import { IGQLValue, IGQLArgs } from "../../../../../../gql-querier";
 
 /**
  * The text is described by a string

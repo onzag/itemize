@@ -6,8 +6,7 @@ import PropertyEntryBoolean from "./PropertyEntryBoolean";
 import PropertyEntryText from "./PropertyEntryText";
 import PropertyEntryDateTime from "./PropertyEntryDateTime";
 import PropertyEntryLocation from "./PropertyEntryLocation";
-// import PropertyEntryFiles from "./PropertyEntryFiles";
-// import PropertyEntryNumeric from "./PropertyEntryNumeric";
+import PropertyEntryReference from "./PropertyEntryReference";
 import PropertyEntrySelect from "./PropertyEntrySelect";
 import PropertyEntryField from "./PropertyEntryField";
 import PropertyEntryFile from "./PropertyEntryFile";
@@ -23,6 +22,8 @@ import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import Include from "../../../../base/Root/Module/ItemDefinition/Include";
 import { IConfigRawJSONDataType } from "../../../../config";
 import { ConfigContext } from "../../providers/config-provider";
+import { TokenContext } from "../../providers/token-provider";
+import { ISSRContextType, SSRContext } from "../../providers/ssr-provider";
 
 /**
  * This is what every renderer gets regardless of type as long as it's an entry
@@ -60,7 +61,11 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
  * the values are distributed
  */
 export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
+  // conditional includes
   config?: IConfigRawJSONDataType;
+  token?: string;
+  ssr?: ISSRContextType;
+
   itemDefinition: ItemDefinition;
   injectSubmitBlockPromise: (arg: Promise<any>) => void;
   include: Include;
@@ -99,6 +104,8 @@ export interface IPropertyEntryHandlerProps<ValueType, RendererPropsType> extend
 interface IRendererHandlerType {
   renderer: string,
   handler: React.ComponentType<IPropertyEntryHandlerProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>>,
+  includeConfig?: boolean;
+  includeTokenAndSSR?: boolean;
 };
 
 interface IRendererWholeHandlerType extends IRendererHandlerType {
@@ -106,7 +113,6 @@ interface IRendererWholeHandlerType extends IRendererHandlerType {
   subhandler?: {
     [type: string]: IRendererHandlerType;
   },
-  includeConfig?: boolean;
 }
 
 const selectHandler: IRendererHandlerType = {
@@ -129,6 +135,12 @@ const handlerRegistry:
   integer: {
     renderer: "PropertyEntryField",
     handler: PropertyEntryField,
+    subhandler: {
+      reference: {
+        renderer: "PropertyEntryReference",
+        handler: PropertyEntryReference,
+      },
+    },
   },
   number: {
     renderer: "PropertyEntryField",
@@ -250,35 +262,69 @@ export default function PropertyEntry(
                 const renderer: React.ComponentType<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>> =
                   props.renderer || renderers[registryEntry.renderer];
 
-                if (registryEntry.includeConfig) {
+                const nProps = {
+                  ...props,
+                  language: locale.language,
+                  i18n: locale.i18n,
+                  rtl: locale.rtl,
+                  currency: currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency),
+                  country: countries[locale.country] || defaultCountryBugCatcher(locale.country),
+                  renderer,
+                  rendererArgs: props.rendererArgs || {},
+                };
+
+                if (registryEntry.includeConfig && registryEntry.includeTokenAndSSR) {
+                  return (
+                    <ConfigContext.Consumer>
+                      {(config) => (
+                        <SSRContext.Consumer>
+                          {(ssr) => (
+                            <TokenContext.Consumer>
+                              {(tokenData) => (
+                                <Element
+                                  {...nProps}
+                                  token={tokenData.token}
+                                  ssr={ssr}
+                                  config={config}
+                                />
+                              )}
+                            </TokenContext.Consumer>
+                          )}
+                        </SSRContext.Consumer>
+                      )}
+                    </ConfigContext.Consumer>
+                  );
+                } else if (registryEntry.includeConfig) {
                   return (
                     <ConfigContext.Consumer>
                       {(config) => (
                         <Element
-                          {...props}
-                          language={locale.language}
-                          i18n={locale.i18n}
-                          rtl={locale.rtl}
-                          currency={currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency)}
-                          country={countries[locale.country] || defaultCountryBugCatcher(locale.country)}
-                          renderer={renderer}
-                          rendererArgs={props.rendererArgs || {}}
+                          {...nProps}
                           config={config}
                         />
                       )}
                     </ConfigContext.Consumer>
-                  )
+                  );
+                } else if (registryEntry.includeTokenAndSSR) {
+                  return (
+                    <SSRContext.Consumer>
+                      {(ssr) => (
+                        <TokenContext.Consumer>
+                          {(tokenData) => (
+                            <Element
+                              {...nProps}
+                              token={tokenData.token}
+                              ssr={ssr}
+                            />
+                          )}
+                        </TokenContext.Consumer>
+                      )}
+                    </SSRContext.Consumer>
+                  );
                 }
                 return (
                   <Element
-                    {...props}
-                    language={locale.language}
-                    i18n={locale.i18n}
-                    rtl={locale.rtl}
-                    currency={currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency)}
-                    country={countries[locale.country] || defaultCountryBugCatcher(locale.country)}
-                    renderer={renderer}
-                    rendererArgs={props.rendererArgs || {}}
+                    {...nProps}
                   />
                 );
               }

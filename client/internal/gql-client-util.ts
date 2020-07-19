@@ -13,6 +13,7 @@ import {
   PREFIX_GET_LIST,
   PREFIX_TRADITIONAL_SEARCH,
   IOrderByRuleType,
+  ENDPOINT_ERRORS,
 } from "../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum } from "../../gql-querier";
@@ -371,6 +372,7 @@ export async function runGetQueryFor(
     fields: IGQLRequestFields,
     returnMemoryCachedValues: boolean,
     returnWorkerCachedValues: boolean,
+    returnWorkerCachedValuesIfNoInternet?: boolean;
     itemDefinition: ItemDefinition,
     id: number,
     version: string,
@@ -473,6 +475,29 @@ export async function runGetQueryFor(
       memoryCached: false,
       cached: false,
       getQueryFields: mergedResults.fields,
+    }
+  } else if (error.code === ENDPOINT_ERRORS.CANT_CONNECT) {
+    // otherwise now let's check for the worker
+    if (
+      CacheWorkerInstance.isSupported &&
+      arg.returnWorkerCachedValuesIfNoInternet
+    ) {
+      // we ask the worker for the value
+      const workerCachedValue =
+        await CacheWorkerInstance.instance.getCachedValue(
+          queryName, arg.id, arg.version || null, arg.fields,
+        );
+      // if we have a GET request and we are allowed to return from the wroker cache and we actually
+      // found something in our cache, return that
+      if (workerCachedValue) {
+        return {
+          error: null,
+          value: workerCachedValue.value,
+          memoryCached: false,
+          cached: true,
+          getQueryFields: workerCachedValue.fields,
+        };
+      }
     }
   }
 
@@ -735,6 +760,7 @@ export async function runSearchQueryFor(
     offset: number,
     token: string,
     language: string,
+    versionFilter?: string,
   },
   remoteListener: RemoteListener,
   remoteListenerCallback: () => void,
@@ -756,6 +782,10 @@ export async function runSearchQueryFor(
     arg.token,
     arg.language,
   );
+
+  if (arg.versionFilter) {
+    searchArgs.version_filter = arg.versionFilter;
+  }
 
   if (arg.createdBy) {
     searchArgs.created_by = arg.createdBy;

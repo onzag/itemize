@@ -21,26 +21,26 @@ export interface ISSRSearchIncludeSetter {
   };
 };
 
-export interface ISSRSearchRule {
-  slot: [string, string, number, string];
-  searchId: string;
-  options: {
-    setProperties?: ISSRSearchPropertySetter;
-    setIncludes?: ISSRSearchIncludeSetter;
-    requestedProperties: string[];
-    requestedIncludes?: string[];
-    orderBy?: IOrderByRuleType;
-    createdBy?: number;
-    parentedBy?: {
-      module: string,
-      itemDefinition: string,
-      id: number,
-      version?: string,
-    };
-    limit: number;
-    offset: number;
-  };
-}
+// export interface ISSRSearchRule {
+//   slot: [string, string, number, string];
+//   searchId: string;
+//   options: {
+//     setProperties?: ISSRSearchPropertySetter;
+//     setIncludes?: ISSRSearchIncludeSetter;
+//     requestedProperties: string[];
+//     requestedIncludes?: string[];
+//     orderBy?: IOrderByRuleType;
+//     createdBy?: number;
+//     parentedBy?: {
+//       module: string,
+//       itemDefinition: string,
+//       id: number,
+//       version?: string,
+//     };
+//     limit: number;
+//     offset: number;
+//   };
+// }
 
 // this info should be specified
 export interface ISSRRuleDynamic {
@@ -51,7 +51,7 @@ export interface ISSRRuleDynamic {
   ogImage: string | ISSRRuleDynamicFn;
   collect: Array<[string, string, number, string]>;
   collectResources: string[];
-  collectSearch: ISSRSearchRule[];
+  // collectSearch: ISSRSearchRule[];
   memId: string;
 }
 

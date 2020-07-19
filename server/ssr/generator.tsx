@@ -8,15 +8,12 @@ import { ISSRContextType, ISSRCollectedQueryType } from "../../client/internal/p
 import { initializeItemizeApp } from "../../client";
 import { StaticRouter } from "react-router-dom";
 import ReactDOMServer from 'react-dom/server';
-import { IGQLRequestFields } from "../../gql-querier";
-import { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
-import { filterAndPrepareGQLValue } from "../resolvers/basic";
-import { ISQLTableRowValue } from "../../base/Root/sql";
 import Root from "../../base/Root";
 import Moment from "moment";
 import fs from "fs";
 const fsAsync = fs.promises;
 import path from "path";
+import { collect, ICollectionResult } from "./collect";
 
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
 const NO_SSR = process.env.NO_SSR === "true";
@@ -26,6 +23,50 @@ interface IMemoizedAnswer {
   html: string,
   collectionSignature: string,
 };
+
+function collectionFailedCheck(results: ICollectionResult[]): boolean {
+  return results.some(
+    (collectionResult) =>
+      collectionResult.status === false ||
+      (
+        collectionResult.subcollection && collectionFailedCheck(collectionResult.subcollection)
+      )
+  );
+}
+
+function lastModifiedFind(results: ICollectionResult[], current: Date): Date {
+  let final = current;
+  results.forEach((r) => {
+    if (r.lastModified.getTime() > final.getTime()) {
+      final = r.lastModified;
+    }
+    if (r.subcollection) {
+      final = lastModifiedFind(r.subcollection, final);
+    }
+  });
+  return final;
+}
+
+function collectionSignatureBuild(results: ICollectionResult[]): string {
+  return results.map(
+    (collectionResult) =>
+      collectionResult.signature +
+      (
+        collectionResult.subcollection ? "[" + collectionSignatureBuild(collectionResult.subcollection) + "]" : ""
+      )
+  ).join(";");
+}
+
+function collectionQueryBuild(results: ICollectionResult[]): ISSRCollectedQueryType[] {
+  let inOrder: ISSRCollectedQueryType[] = results.map((r) => r.query);
+  results.forEach((r) => {
+    if (r.subcollection) {
+      const subCollectionResult = collectionQueryBuild(r.subcollection);
+      inOrder = inOrder.concat(subCollectionResult);
+    }
+  })
+  return inOrder;
+}
 
 export async function ssrGenerator(
   req: express.Request,
@@ -108,7 +149,7 @@ export async function ssrGenerator(
       ogImage: null,
       collect: [],
       collectResources: [],
-      collectSearch: [],
+      // collectSearch: [],
       memId: "*.root.redirect",
     };
   }
@@ -133,7 +174,7 @@ export async function ssrGenerator(
       ogImage: "/rest/resource/icons/android-chrome-512x512.png",
       collect: null,
       collectResources: null,
-      collectSearch: null,
+      // collectSearch: null,
       noData: true,
       language: null,
       rtl: false,
@@ -227,98 +268,23 @@ export async function ssrGenerator(
   let collectionFailed = false;
 
   // and gathering the queries
-  const queries: ISSRCollectedQueryType[] = [];
+  let queries: ISSRCollectedQueryType[] = [];
 
   let lastModified = new Date(parseInt(appData.buildnumber));
 
   // now we try to collect if we are asked to collect data
   if (appliedRule.collect) {
-    // and we need to build this signature of collection of data
-    const collectionSignatureArray: string[] = [];
-
     // so we start collecting
-    await Promise.all(
-      appliedRule.collect.map(async (collectionPoint, index) => {
-        const splittedModule = collectionPoint[0].split("/");
-        const splittedIdef = collectionPoint[1].split("/");
-        if (splittedModule[0] === "") {
-          splittedModule.shift();
-        }
-        if (splittedIdef[0] === "") {
-          splittedIdef.shift();
-        }
+    const collectionResults: ICollectionResult[] = await Promise.all(
+      appliedRule.collect.map(collect.bind(null, root, appData, appliedRule)),
+    ) as ICollectionResult[];
 
-        // get the module and the item definition
-        const mod = root.getModuleFor(splittedModule);
-        const idef = mod.getItemDefinitionFor(splittedIdef);
-
-        // and we ask the cache for the given value
-        let rowValue: ISQLTableRowValue;
-        try {
-          rowValue = await appData.cache.requestValue(idef, collectionPoint[2], collectionPoint[3]);
-        } catch (err) {
-          logger.error(
-            "ssrGenerator [SERIOUS]: Collection failed due to request not passing",
-            {
-              errStack: err.stack,
-              errMessage: err.message,
-            }
-          )
-          // this is bad our collection failed, it's actually handled gracefully thanks
-          // to the fact I can still serve no data at all and the app should work just fine
-          // to a client, but nonetheless not a good idea
-          collectionFailed = true;
-        }
-
-        // now we check, is it not found, if it's not found, or signature is going to be
-        // null for such index
-        if (rowValue === null) {
-          collectionSignatureArray[index] = "NOT_FOUND";
-        } else {
-          // otherwise it's when it was last modified
-          const dateValue = new Date(rowValue.last_modified);
-          if (lastModified.getTime() < dateValue.getTime()) {
-            lastModified = dateValue;
-          }
-          collectionSignatureArray[index] = rowValue.type + "." + rowValue.id + "." + (rowValue.version || "") + "." + rowValue.last_modified;
-        }
-
-        // now we build the fileds for the given role access
-        const fields: IGQLRequestFields = idef.buildFieldsForRoleAccess(
-          ItemDefinitionIOActions.READ,
-          appliedRule.forUser.role,
-          appliedRule.forUser.id,
-          rowValue ? (idef.isOwnerObjectId() ? rowValue.id : rowValue.created_by) : UNSPECIFIED_OWNER,
-        );
-
-        // and if we have fields at all, such user might not even have access to them at all
-        // which is possible
-        if (fields) {
-          // we build the value for the given role with the given fields
-          const value = rowValue === null ? null : filterAndPrepareGQLValue(
-            appData.knex, appData.cache.getServerData(), rowValue, fields, appliedRule.forUser.role, idef,
-          );
-
-          // and now we build the query in the given index
-          // the queries[index] can be null, no access
-          // queries[index].value = null, not found
-          // queries[index].value.DATA = null, blocked
-          queries[index] = {
-            idef: idef.getQualifiedPathName(),
-            id: collectionPoint[2],
-            version: collectionPoint[3],
-            value: value ? value.toReturnToUser : null,
-            fields: value ? value.requestFields : null,
-          };
-        } else {
-          // means no access to them at all
-          queries[index] = null;
-        }
-      })
-    );
+    collectionFailed = collectionFailedCheck(collectionResults);
 
     // now we build the signature as a string
-    collectionSignature = collectionSignatureArray.join(";");
+    collectionSignature = collectionSignatureBuild(collectionResults);
+    queries = collectionQueryBuild(collectionResults);
+    lastModified = lastModifiedFind(collectionResults, lastModified);
   }
 
   // now we need to collect the resources

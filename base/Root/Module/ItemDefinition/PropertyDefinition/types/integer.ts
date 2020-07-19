@@ -42,6 +42,7 @@ export type PropertyDefinitionSupportedIntegerType = number;
 const typeValue: IPropertyDefinitionSupportedType = {
   // an integer is represented as a number
   json: "number",
+  supportedSubtypes: ["reference"],
   gql: GraphQLInt,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("integer"),
   sqlIn: stardardSQLInFn,
@@ -98,5 +99,31 @@ const typeValue: IPropertyDefinitionSupportedType = {
     tooSmallErrorInclude: true,
     tooLargeErrorInclude: true,
   },
+  specialProperties: [
+    {
+      name: "referencedModule",
+      type: "string",
+    },
+    {
+      name: "referencedItemDefinition",
+      type: "string",
+    },
+    {
+      name: "referencedSearchProperty",
+      type: "string",
+    },
+    {
+      name: "referencedDisplayProperty",
+      type: "string",
+    },
+    {
+      name: "referencedFilteringPropertySet",
+      type: "any",
+    },
+    {
+      name: "referencedFilterByLanguage",
+      type: "boolean",
+    },
+  ],
 };
 export default typeValue;
