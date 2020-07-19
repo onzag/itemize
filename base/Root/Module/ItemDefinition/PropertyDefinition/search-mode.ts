@@ -47,7 +47,7 @@ export function getConversionIds(
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE
   ) {
-    if (rawData.disableRangedSearch) {
+    if (rawData.disableRangedSearch || (rawData.type === "integer" && rawData.subtype === "reference")) {
       ids = [PropertyDefinitionSearchInterfacesPrefixes.EXACT + rawData.id];
     } else {
       ids = [
@@ -191,7 +191,7 @@ export function buildSearchModePropertyDefinitions(
     PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE
   ) {
     // with disable ranged search we basically do the same as exact on top
-    if (rawData.disableRangedSearch) {
+    if (rawData.disableRangedSearch || (rawData.type === "integer" && rawData.subtype === "reference")) {
       newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.EXACT + newPropDef.id;
       if (newPropDef.i18nData) {
         newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search"]);

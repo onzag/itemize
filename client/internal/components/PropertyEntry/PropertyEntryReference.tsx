@@ -3,14 +3,19 @@ import equals from "deep-equal";
 import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import { EndpointErrorType } from "../../../../base/errors";
 import { runGetQueryFor, runSearchQueryFor } from "../../../../client/internal/gql-client-util";
-import { IGQLRequestFields } from "../../../../gql-querier";
+import { IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
-import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import PropertyDefinition, { PropertyDefinitionValueType, IPropertyDefinitionExactPropertyValue, IPropertyDefinitionReferredPropertyValue } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { getConversionIds } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 
 export interface IPropertyEntryReferenceOption {
   id: number;
   text: string;
 };
+
+export interface IReferrencedPropertySet {
+  [propertyId: string]: PropertyDefinitionValueType;
+}
 
 export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRendererProps<number> {
   currentStrValue: string;
@@ -76,13 +81,71 @@ export default class PropertyEntryReference
     const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
 
     const fields: IGQLRequestFields = {
+      id: {},
       DATA: {
         [dProp.getId()]: dProp.getPropertyDefinitionDescription().gqlFields || {} as any,
       }
     } as IGQLRequestFields;
 
+    const propertySet = this.props.property.getSpecialProperty("referencedFilteringPropertySet") as IReferrencedPropertySet || {};
+    const args: IGQLArgs = {};
+
+    // first we need the standard form not of our target item definition
+    // but rather the one we are currently working within, hence the difference
+    let stdSelfIdef = this.props.itemDefinition;
+    // if we are in search mode
+    if (this.props.itemDefinition.isInSearchMode()) {
+      // the standard counterpart needs to be fetched
+      stdSelfIdef = this.props.itemDefinition.getStandardCounterpart();
+    }
+    // now we loop into our property set
+    Object.keys(propertySet).forEach((pId) => {
+      // we try to get the property for the given id from the target
+      // item definition as that is what we are setting in the search
+      const property = idef.getPropertyDefinitionFor(pId, true);
+      // we need then the conversion id for that specific target
+      const conversionIds = getConversionIds(property.rawData);
+      // now the applicatble id that we will use to search, this is in the target
+      // eg. EXACT_username or SEARCH_username
+      const applicableId = conversionIds[0];
+      // now the value we will use will depend on the type of condition we have here
+      const valueToUse = propertySet[pId];
+      // if it's an exact value we just paste it in the arg
+      if (typeof (valueToUse as IPropertyDefinitionExactPropertyValue).exactValue !== "undefined") {
+        args[applicableId] = (valueToUse as IPropertyDefinitionExactPropertyValue).exactValue as any;
+      } else {
+        // otherwise it's a property in our source were we are working in, and our same slot
+        // works similarly to media property in those regards
+        const referredProperty = (valueToUse as IPropertyDefinitionReferredPropertyValue).property;
+
+        // however we don't know if we are in search mode in our source here were this property belongs
+        // so now we need to find what are we setting, while for the target it is always in the standard
+        // mode for us we don't know
+        let actualPropertyId = referredProperty;
+        let actualReferredProperty: PropertyDefinition;
+
+        // so we check if we are in search mode
+        if (this.props.itemDefinition.isInSearchMode()) {
+          // and use a conversion id in such case to exact the current value in the state
+          actualPropertyId = getConversionIds(actualReferredProperty.rawData)[0];
+          actualReferredProperty = this.props.itemDefinition.getPropertyDefinitionFor(actualPropertyId, true);
+        } else {
+          // or not
+          actualReferredProperty = stdSelfIdef.getPropertyDefinitionFor(actualPropertyId, true);
+        }
+
+        // notice how we use the same slot we are currently in
+        args[applicableId] = actualReferredProperty.getCurrentValue(this.props.forId, this.props.forVersion || null) as any;
+      }
+    });
+
+    // now we do this and use the search prop we are searching for and get the conversion
+    // id for the search mode and just paste the string there
+    args[getConversionIds(sProp.rawData)[0]] = strToSearchForValue;
+
+    // now we can run the search using the traditional mode
     const result = await runSearchQueryFor({
-      args: {},
+      args,
       fields,
       orderBy: {},
       createdBy: null,
@@ -96,6 +159,8 @@ export default class PropertyEntryReference
       language: this.props.language,
       versionFilter: filterByLanguage ? this.props.language : null,
     }, null, null);
+    // these nulls which represent the listener are only truly used for the
+    // cached searches, we don't use that here
 
     if (result.error) {
       this.setState({
@@ -104,9 +169,17 @@ export default class PropertyEntryReference
       return;
     }
 
-    const options = result.results.map((r) => (
-      (r && r.DATA && r.DATA[dProp.getId()]).toString()
-    ));
+    // we get the options and sort alphabetically
+    const options: IPropertyEntryReferenceOption[] = result.results.map((r) => (
+      {
+        text: (r && r.DATA && r.DATA[dProp.getId()]).toString(),
+        id: (r && r.id) as number,
+      }
+    )).sort((a: IPropertyEntryReferenceOption, b: IPropertyEntryReferenceOption) => {
+      if(a.text < b.text) { return -1; }
+      if(a.text > b.text) { return 1; }
+      return 0;
+    });
 
     this.setState({
       currentSearchError: null,
@@ -196,6 +269,8 @@ export default class PropertyEntryReference
         [dProp.getId()]: dProp.getPropertyDefinitionDescription().gqlFields || {} as any,
       }
     } as IGQLRequestFields;
+
+
 
     const result = await runGetQueryFor({
       args: {},

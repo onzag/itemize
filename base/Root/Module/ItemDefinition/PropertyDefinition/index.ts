@@ -206,7 +206,7 @@ export interface IPropertyDefinitionRawJSONDataType {
    * description, you set the value here
    */
   specialProperties?: {
-    [key: string]: string | boolean | number;
+    [key: string]: any;
   };
   /**
    * whether nulls are coerced into their default value this is useful
@@ -1718,7 +1718,9 @@ export default class PropertyDefinition {
    * @returns a boolean
    */
   public isRangedSearchDisabled() {
-    return this.rawData.disableRangedSearch || false;
+    return this.rawData.disableRangedSearch ||
+      (this.rawData.type === "integer" && this.rawData.subtype === "reference") ||
+      false;
   }
 
   /**
