@@ -61,6 +61,14 @@ export default class PropertyEntryReference
     this.findCurrentStrValue = this.findCurrentStrValue.bind(this);
     this.dismissSearchError = this.dismissSearchError.bind(this);
     this.dismissFindError = this.dismissFindError.bind(this);
+
+    this.changeListener = this.changeListener.bind(this);
+  }
+
+  public changeListener(id: number, version: string) {
+    if ((id || null) === (this.props.forId || null) && (version || null) === (this.props.forVersion || null)) {
+      this.props.onChange(null, "");
+    }
   }
 
   public componentDidMount() {
@@ -75,6 +83,50 @@ export default class PropertyEntryReference
         filterByLanguage ? this.props.language : null,
       );
     }
+
+    this.addListeners();
+  }
+
+  public componentWillUnmount() {
+    this.removeListeners();
+  }
+
+  public toggleListener(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps> = this.props, fn: string) {
+    const propertySet = props.property.getSpecialProperty("referencedFilteringPropertySet") as IReferrencedPropertySet || {};
+    // first we need the standard form not of our target item definition
+    // but rather the one we are currently working within, hence the difference
+    let stdSelfIdef = this.props.itemDefinition;
+    // if we are in search mode
+    if (this.props.itemDefinition.isInSearchMode()) {
+      // the standard counterpart needs to be fetched
+      stdSelfIdef = this.props.itemDefinition.getStandardCounterpart();
+    }
+
+    // now we loop into our property set
+    Object.keys(propertySet).forEach((pId) => {
+      // now the value we will use will depend on the type of condition we have here
+      const valueToUse = propertySet[pId];
+      // if it's an exact value we just paste it in the arg
+      if (typeof (valueToUse as IPropertyDefinitionExactPropertyValue).exactValue === "undefined") {
+        const referredProperty = (valueToUse as IPropertyDefinitionReferredPropertyValue).property;
+
+        let actualReferredProperty = stdSelfIdef.getPropertyDefinitionFor(referredProperty, true);
+        if (this.props.itemDefinition.isInSearchMode()) {
+          actualReferredProperty = this.props.itemDefinition.getPropertyDefinitionFor(
+            getConversionIds(actualReferredProperty.rawData)[0], true,
+          );
+          actualReferredProperty[fn](this.changeListener)
+        }
+      }
+    });
+  }
+
+  public addListeners(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps> = this.props) {
+    this.toggleListener(props, "removeChangeListener");
+  }
+
+  public removeListeners(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps> = this.props) {
+    this.toggleListener(props, "addChangeListener");
   }
 
   public async search() {
@@ -124,16 +176,13 @@ export default class PropertyEntryReference
         // so now we need to find what are we setting, while for the target it is always in the standard
         // mode for us we don't know
         let actualPropertyId = referredProperty;
-        let actualReferredProperty: PropertyDefinition;
+        let actualReferredProperty = stdSelfIdef.getPropertyDefinitionFor(actualPropertyId, true);
 
         // so we check if we are in search mode
         if (this.props.itemDefinition.isInSearchMode()) {
           // and use a conversion id in such case to exact the current value in the state
           actualPropertyId = getConversionIds(actualReferredProperty.rawData)[0];
           actualReferredProperty = this.props.itemDefinition.getPropertyDefinitionFor(actualPropertyId, true);
-        } else {
-          // or not
-          actualReferredProperty = stdSelfIdef.getPropertyDefinitionFor(actualPropertyId, true);
         }
 
         // notice how we use the same slot we are currently in
@@ -382,6 +431,11 @@ export default class PropertyEntryReference
         this.props.state.value as number,
         this.props.language,
       );
+    }
+
+    if (this.props.property.getId() !== prevProps.property.getId()) {
+      this.removeListeners(prevProps);
+      this.addListeners();
     }
 
     if (prevProps.language !== this.props.language) {

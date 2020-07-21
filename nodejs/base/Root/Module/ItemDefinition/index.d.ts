@@ -636,6 +636,7 @@ export default class ItemDefinition {
      * @returns a promise for the item definition state
      */
     getState(id: number, version: string, onlyIncludeProperties?: string[], onlyIncludeIncludes?: string[], excludePolicies?: boolean): Promise<IItemDefinitionStateType>;
+    applyState(id: number, version: string, state: IItemDefinitionStateType): void;
     /**
      * Applies a value from graphql to the item definition state
      * @param id the id that this state is for (can be null)

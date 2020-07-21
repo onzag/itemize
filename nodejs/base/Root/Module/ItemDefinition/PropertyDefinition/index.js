@@ -451,6 +451,15 @@ class PropertyDefinition {
     getType() {
         return this.rawData.type;
     }
+    addChangeListener(listener) {
+        this.listeners.push(listener);
+    }
+    removeChangeListener(listener) {
+        const index = this.listeners.indexOf(listener);
+        if (index !== -1) {
+            this.listeners.splice(index, 1);
+        }
+    }
     /**
      * Provides the request fields that are necessary
      * and contained within this property in order to be
@@ -829,6 +838,11 @@ class PropertyDefinition {
             }
         }
         const mergedID = id + "." + (version || "");
+        if (this.stateValue[mergedID] !== newValue) {
+            this.listeners.forEach((listener) => {
+                listener(id || null, version || null, newActualValue);
+            });
+        }
         // note that the value is set and never check
         this.stateValue[mergedID] = newActualValue;
         this.stateValueModified[mergedID] = true;

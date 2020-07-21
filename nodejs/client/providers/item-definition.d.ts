@@ -35,6 +35,7 @@ export interface IActionResponseWithId extends IBasicActionResponse {
  * A response given by search
  */
 export interface IActionResponseWithSearchResults extends IBasicActionResponse {
+    searchId: string;
     records: IGQLSearchRecord[];
     results: IGQLValue[];
     count: number;
@@ -100,6 +101,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
     traditional?: boolean;
     limit: number;
     offset: number;
+    storeResults?: boolean;
 }
 export interface IPokeElementsType {
     properties: string[];
@@ -148,6 +150,7 @@ export interface IItemDefinitionContextType {
     delete: () => Promise<IBasicActionResponse>;
     clean: (options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean) => void;
     search: (options: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
+    loadSearch: (id: string) => void;
     onPropertyChange: (property: PropertyDefinition, value: PropertyDefinitionSupportedType, internalValue: any) => void;
     onPropertyRestore: (property: PropertyDefinition) => void;
     onIncludeSetExclusionState: (include: Include, state: IncludeExclusionState) => void;
@@ -374,6 +377,7 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     delete(options?: IActionDeleteOptions): Promise<IBasicActionResponse>;
     clean(options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean): void;
     submit(options: IActionSubmitOptions): Promise<IActionResponseWithId>;
+    loadSearch(id: string): void;
     search(options: IActionSearchOptions): Promise<IActionResponseWithSearchResults>;
     dismissLoadError(): void;
     dismissDeleteError(): void;

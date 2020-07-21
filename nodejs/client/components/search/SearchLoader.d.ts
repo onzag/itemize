@@ -29,7 +29,6 @@ export interface ISearchLoaderProps {
     includePolicies?: boolean;
     cleanOnDismount?: boolean;
     static?: "TOTAL" | "NO_LISTENING";
-    useSearchHistory?: boolean;
     onSearchDataChange?: () => number | void;
 }
 export default function SearchLoader(props: ISearchLoaderProps): JSX.Element;

@@ -25,6 +25,7 @@ export declare enum PropertyInvalidReason {
     NOT_UNIQUE = "NOT_UNIQUE",
     MUST_BE_SPECIFIED = "MUST_BE_SPECIFIED"
 }
+declare type PropertyDefinitionListenerType = (id: number, version: string, newValue: PropertyDefinitionSupportedType) => void;
 /**
  * A conditition for conditional values
  */
@@ -387,6 +388,10 @@ export default class PropertyDefinition {
      */
     private hiddenIf?;
     /**
+     * list of listeners
+     */
+    private listeners;
+    /**
      * enforced values and defaulted values, this is usually set manually
      * and it applies to includes usually with enforced property values
      * hence the enforced value is global
@@ -480,6 +485,8 @@ export default class PropertyDefinition {
      * @returns the type
      */
     getType(): PropertyDefinitionSupportedTypeName;
+    addChangeListener(listener: PropertyDefinitionListenerType): void;
+    removeChangeListener(listener: PropertyDefinitionListenerType): void;
     /**
      * Provides the request fields that are necessary
      * and contained within this property in order to be
@@ -796,3 +803,4 @@ export default class PropertyDefinition {
      */
     mergeWithI18n(pdef: IPropertyDefinitionRawJSONDataType): void;
 }
+export {};

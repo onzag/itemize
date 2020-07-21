@@ -26,16 +26,6 @@ class ActualSearchLoader extends react_1.default.Component {
     }
     componentDidMount() {
         this.refreshPage();
-        if (this.props.useSearchHistory) {
-            this.loadFromQS();
-        }
-    }
-    refreshSearchQS() {
-        // TODO update the search querystring to match if necessary
-    }
-    loadFromQS() {
-        // TODO load and execute a search based on the querystring value, we need to
-        // ensure to execute search from the parent based on the QS data
     }
     componentDidUpdate(prevProps) {
         let currentPage = this.props.currentPage;
@@ -45,9 +35,6 @@ class ActualSearchLoader extends react_1.default.Component {
                 if (typeof newPage === "number") {
                     currentPage = newPage;
                 }
-            }
-            if (this.props.useSearchHistory) {
-                this.refreshSearchQS();
             }
         }
         const currentSearchRecords = (this.props.searchRecords || []).slice(this.props.pageSize * currentPage, this.props.pageSize * (currentPage + 1));

@@ -20,6 +20,7 @@ const config_provider_1 = require("../internal/providers/config-provider");
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
 // TODO this file is too complex, we need to simplify, specially policies they are killing this file
+const STORED_SEARCHES = {};
 function getPropertyListForSearchMode(properties, standardCounterpart) {
     let result = [];
     properties.forEach((propertyId) => {
@@ -88,6 +89,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         this.poke = this.poke.bind(this);
         this.unpoke = this.unpoke.bind(this);
         this.search = this.search.bind(this);
+        this.loadSearch = this.loadSearch.bind(this);
         this.dismissSearchError = this.dismissSearchError.bind(this);
         this.dismissSearchResults = this.dismissSearchResults.bind(this);
         this.onSearchReload = this.onSearchReload.bind(this);
@@ -169,7 +171,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         };
         const internalState = this.props.itemDefinitionInstance.getInternalState(this.props.forId || null, this.props.forVersion || null);
         if (internalState) {
-            searchState = internalState;
+            searchState = internalState.searchState;
+            const state = internalState.state;
+            this.props.itemDefinitionInstance.applyState(this.props.forId || null, this.props.forVersion || null, state);
         }
         // so the initial setup
         return {
@@ -931,6 +935,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
         else if (withSearchResults) {
             return {
+                searchId: null,
                 results: null,
                 records: null,
                 limit: null,
@@ -1313,6 +1318,21 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             error,
         };
     }
+    loadSearch(id) {
+        if (id === this.state.searchId) {
+            return;
+        }
+        else if (id && STORED_SEARCHES[id]) {
+            const state = STORED_SEARCHES[id].state;
+            this.props.itemDefinitionInstance.applyState(this.props.forId || null, this.props.forVersion || null, state);
+            const searchState = STORED_SEARCHES[id].searchState;
+            this.setState({
+                itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null, !this.props.disableExternalChecks, this.props.itemDefinitionInstance.isInSearchMode() ?
+                    getPropertyListForSearchMode(this.props.properties || [], this.props.itemDefinitionInstance.getStandardCounterpart()) : this.props.properties || [], this.props.includes || [], !this.props.includePolicies),
+                ...searchState,
+            });
+        }
+    }
     async search(options) {
         if (this.state.searching) {
             return null;
@@ -1446,6 +1466,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 version: options.parentedBy.version || null,
             };
         }
+        const stateOfSearch = this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null);
         const { results, records, count, limit, offset, error, } = await gql_client_util_1.runSearchQueryFor({
             args: argumentsForQuery,
             fields: requestedSearchFields,
@@ -1466,8 +1487,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             offset: options.offset,
             parentedBy,
         }, this.props.remoteListener, this.onSearchReload);
+        const searchId = uuid_1.default.v4();
         if (error) {
-            const searchStateInfo = {
+            const searchState = {
                 searchError: error,
                 searching: false,
                 searchResults: results,
@@ -1475,7 +1497,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 searchCount: count,
                 searchLimit: limit,
                 searchOffset: offset,
-                searchId: uuid_1.default.v4(),
+                searchId,
                 searchOwner: options.createdBy || null,
                 searchParent,
                 searchShouldCache: !!options.cachePolicy,
@@ -1483,21 +1505,30 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 searchRequestedProperties: options.requestedProperties,
                 searchRequestedIncludes: options.requestedIncludes || [],
             };
+            if (options.storeResults) {
+                STORED_SEARCHES[searchId] = {
+                    searchState,
+                    state: stateOfSearch,
+                };
+            }
             // this would be a wasted instruction otherwise as it'd be reversed
             if (!options.cleanSearchResultsOnAny &&
                 !options.cleanSearchResultsOnFailure) {
-                this.props.itemDefinitionInstance.setInternalState(this.props.forId || null, this.props.forVersion || null, searchStateInfo);
+                this.props.itemDefinitionInstance.setInternalState(this.props.forId || null, this.props.forVersion || null, {
+                    searchState,
+                    state: stateOfSearch,
+                });
             }
             if (!this.isUnmounted) {
                 this.setState({
-                    ...searchStateInfo,
+                    ...searchState,
                     pokedElements,
                 });
             }
             this.clean(options, "fail");
         }
         else {
-            const searchStateInfo = {
+            const searchState = {
                 searchError: null,
                 searching: false,
                 searchResults: results,
@@ -1505,7 +1536,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 searchCount: count,
                 searchLimit: limit,
                 searchOffset: offset,
-                searchId: uuid_1.default.v4(),
+                searchId,
                 searchOwner: options.createdBy || null,
                 searchParent,
                 searchShouldCache: !!options.cachePolicy,
@@ -1513,20 +1544,30 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 searchRequestedProperties: options.requestedProperties,
                 searchRequestedIncludes: options.requestedIncludes || [],
             };
+            if (options.storeResults) {
+                STORED_SEARCHES[searchId] = {
+                    searchState,
+                    state: stateOfSearch,
+                };
+            }
             // this would be a wasted instruction otherwise as it'd be reversed
             if (!options.cleanSearchResultsOnAny &&
                 !options.cleanSearchResultsOnSuccess) {
-                this.props.itemDefinitionInstance.setInternalState(this.props.forId || null, this.props.forVersion || null, searchStateInfo);
+                this.props.itemDefinitionInstance.setInternalState(this.props.forId || null, this.props.forVersion || null, {
+                    searchState,
+                    state: stateOfSearch,
+                });
             }
             if (!this.isUnmounted) {
                 this.setState({
-                    ...searchStateInfo,
+                    ...searchState,
                     pokedElements,
                 });
             }
             this.clean(options, "success");
         }
         return {
+            searchId,
             results,
             records,
             count,
@@ -1696,6 +1737,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 delete: this.delete,
                 clean: this.clean,
                 search: this.search,
+                loadSearch: this.loadSearch,
                 forId: this.props.forId || null,
                 forVersion: this.props.forVersion || null,
                 dismissLoadError: this.dismissLoadError,

@@ -32,7 +32,12 @@ export default class PropertyEntryReference extends React.Component<IPropertyEnt
     private currentlyFindingValueFor;
     private lastCachedSearch;
     constructor(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>);
+    changeListener(id: number, version: string): void;
     componentDidMount(): void;
+    componentWillUnmount(): void;
+    toggleListener(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>, fn: string): void;
+    addListeners(props?: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>): void;
+    removeListeners(props?: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>): void;
     search(): Promise<void>;
     getSpecialData(): [ItemDefinition, PropertyDefinition, PropertyDefinition];
     getSSRFoundValue(forId: number, forVersion: string): string;

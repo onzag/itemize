@@ -721,6 +721,20 @@ class ItemDefinition {
             internalState,
         };
     }
+    applyState(id, version, state) {
+        state.properties.forEach((p) => {
+            const pInIdef = this.getPropertyDefinitionFor(p.propertyId, true);
+            pInIdef.applyValue(id, version, p.stateValue, p.stateValueModified, false);
+        });
+        state.includes.forEach((i) => {
+            const iInIdef = this.getIncludeFor(i.includeId);
+            iInIdef.setExclusionState(id, version, i.exclusionState);
+            i.itemDefinitionState.properties.forEach((p) => {
+                const pInInclude = iInIdef.getSinkingPropertyFor(p.propertyId);
+                pInInclude.applyValue(id, version, p.stateValue, p.stateValueModified, false);
+            });
+        });
+    }
     /**
      * Applies a value from graphql to the item definition state
      * @param id the id that this state is for (can be null)

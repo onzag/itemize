@@ -23,7 +23,7 @@ import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefini
 import { EndpointError } from "../../../../errors";
 import { DOMWindow } from "../../../../../util";
 import equals from "deep-equal";
-import { IGQLFile, IGQLRequestFields } from "../../../../../gql-querier";
+import { IGQLFile } from "../../../../../gql-querier";
 import Include from "../Include";
 
 /**
@@ -47,6 +47,8 @@ export enum PropertyInvalidReason {
   // used for radius whe a location is specified yet the radius is null
   MUST_BE_SPECIFIED = "MUST_BE_SPECIFIED",
 }
+
+type PropertyDefinitionListenerType = (id: number, version: string, newValue: PropertyDefinitionSupportedType) => void;
 
 /**
  * A conditition for conditional values
@@ -742,6 +744,10 @@ export default class PropertyDefinition {
    * Processed hidden conditions from the raw data
    */
   private hiddenIf?: ConditionalRuleSet;
+  /**
+   * list of listeners
+   */
+  private listeners: PropertyDefinitionListenerType[];
 
   /**
    * enforced values and defaulted values, this is usually set manually
@@ -980,6 +986,17 @@ export default class PropertyDefinition {
    */
   public getType() {
     return this.rawData.type;
+  }
+
+  public addChangeListener(listener: PropertyDefinitionListenerType) {
+    this.listeners.push(listener);
+  }
+
+  public removeChangeListener(listener: PropertyDefinitionListenerType) {
+    const index = this.listeners.indexOf(listener);
+    if (index !== -1) {
+      this.listeners.splice(index, 1);
+    }
   }
 
   /**
@@ -1428,6 +1445,12 @@ export default class PropertyDefinition {
     }
 
     const mergedID = id + "." + (version || "");
+    if (this.stateValue[mergedID] !== newValue) {
+      this.listeners.forEach((listener) => {
+        listener(id || null, version || null, newActualValue);
+      });
+    }
+
     // note that the value is set and never check
     this.stateValue[mergedID] = newActualValue;
     this.stateValueModified[mergedID] = true;

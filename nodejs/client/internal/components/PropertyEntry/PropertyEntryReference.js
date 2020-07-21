@@ -23,6 +23,12 @@ class PropertyEntryReference extends react_1.default.Component {
         this.findCurrentStrValue = this.findCurrentStrValue.bind(this);
         this.dismissSearchError = this.dismissSearchError.bind(this);
         this.dismissFindError = this.dismissFindError.bind(this);
+        this.changeListener = this.changeListener.bind(this);
+    }
+    changeListener(id, version) {
+        if ((id || null) === (this.props.forId || null) && (version || null) === (this.props.forVersion || null)) {
+            this.props.onChange(null, "");
+        }
     }
     componentDidMount() {
         if (this.props.state.value &&
@@ -31,6 +37,41 @@ class PropertyEntryReference extends react_1.default.Component {
             const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage");
             this.findCurrentStrValue(this.props.state.value, filterByLanguage ? this.props.language : null);
         }
+        this.addListeners();
+    }
+    componentWillUnmount() {
+        this.removeListeners();
+    }
+    toggleListener(props = this.props, fn) {
+        const propertySet = props.property.getSpecialProperty("referencedFilteringPropertySet") || {};
+        // first we need the standard form not of our target item definition
+        // but rather the one we are currently working within, hence the difference
+        let stdSelfIdef = this.props.itemDefinition;
+        // if we are in search mode
+        if (this.props.itemDefinition.isInSearchMode()) {
+            // the standard counterpart needs to be fetched
+            stdSelfIdef = this.props.itemDefinition.getStandardCounterpart();
+        }
+        // now we loop into our property set
+        Object.keys(propertySet).forEach((pId) => {
+            // now the value we will use will depend on the type of condition we have here
+            const valueToUse = propertySet[pId];
+            // if it's an exact value we just paste it in the arg
+            if (typeof valueToUse.exactValue === "undefined") {
+                const referredProperty = valueToUse.property;
+                let actualReferredProperty = stdSelfIdef.getPropertyDefinitionFor(referredProperty, true);
+                if (this.props.itemDefinition.isInSearchMode()) {
+                    actualReferredProperty = this.props.itemDefinition.getPropertyDefinitionFor(search_mode_1.getConversionIds(actualReferredProperty.rawData)[0], true);
+                    actualReferredProperty[fn](this.changeListener);
+                }
+            }
+        });
+    }
+    addListeners(props = this.props) {
+        this.toggleListener(props, "removeChangeListener");
+    }
+    removeListeners(props = this.props) {
+        this.toggleListener(props, "addChangeListener");
     }
     async search() {
         const strToSearchForValue = this.props.state.internalValue || "";
@@ -76,16 +117,12 @@ class PropertyEntryReference extends react_1.default.Component {
                 // so now we need to find what are we setting, while for the target it is always in the standard
                 // mode for us we don't know
                 let actualPropertyId = referredProperty;
-                let actualReferredProperty;
+                let actualReferredProperty = stdSelfIdef.getPropertyDefinitionFor(actualPropertyId, true);
                 // so we check if we are in search mode
                 if (this.props.itemDefinition.isInSearchMode()) {
                     // and use a conversion id in such case to exact the current value in the state
                     actualPropertyId = search_mode_1.getConversionIds(actualReferredProperty.rawData)[0];
                     actualReferredProperty = this.props.itemDefinition.getPropertyDefinitionFor(actualPropertyId, true);
-                }
-                else {
-                    // or not
-                    actualReferredProperty = stdSelfIdef.getPropertyDefinitionFor(actualPropertyId, true);
                 }
                 // notice how we use the same slot we are currently in
                 args[applicableId] = actualReferredProperty.getCurrentValue(this.props.forId, this.props.forVersion || null);
@@ -273,6 +310,10 @@ class PropertyEntryReference extends react_1.default.Component {
             this.props.state.value &&
             prevProps.language !== this.props.language) {
             this.findCurrentStrValue(this.props.state.value, this.props.language);
+        }
+        if (this.props.property.getId() !== prevProps.property.getId()) {
+            this.removeListeners(prevProps);
+            this.addListeners();
         }
         if (prevProps.language !== this.props.language) {
             this.onCancel();
