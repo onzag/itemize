@@ -231,7 +231,7 @@ class PropertyEntryReference extends react_1.default.Component {
         this.props.onChange(forId, pMatch.toString());
     }
     onChangeSearch(str) {
-        let value = str.trim().length ? null : NaN;
+        let value = str.trim().length ? NaN : null;
         let foundInList = this.state.currentOptions.find((o) => o.text === str);
         if (!foundInList && this.lastCachedSearch) {
             foundInList = this.lastCachedSearch.find((o) => o.text === str);
