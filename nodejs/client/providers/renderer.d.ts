@@ -14,9 +14,11 @@ import { IPropertyViewBooleanRendererProps } from "../internal/components/Proper
 import { IPropertyViewDateTimeRendererProps } from "../internal/components/PropertyView/PropertyViewDateTime";
 import { IPropertyViewLocationRendererProps } from "../internal/components/PropertyView/PropertyViewLocation";
 import { IPropertyViewCurrencyRendererProps } from "../internal/components/PropertyView/PropertyViewCurrency";
+import { IPropertyEntryReferenceRendererProps } from "../internal/components/PropertyEntry/PropertyEntryReference";
 export interface IRendererContext {
     IncludeCalloutWarning?: React.ComponentType<IIncludeCalloutWarningRendererProps>;
     PropertyEntryField?: React.ComponentType<IPropertyEntryFieldRendererProps>;
+    PropertyEntryReference?: React.ComponentType<IPropertyEntryReferenceRendererProps>;
     PropertyEntryFile?: React.ComponentType<IPropertyEntryFileRendererProps>;
     PropertyEntryBoolean?: React.ComponentType<IPropertyEntryBooleanRendererProps>;
     PropertyEntryLocation?: React.ComponentType<IPropertyEntryLocationRendererProps>;

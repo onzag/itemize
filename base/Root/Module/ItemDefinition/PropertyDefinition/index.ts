@@ -388,7 +388,7 @@ async function clientSideIndexChecker(
 ) {
   const mergedID = id + "." + (version || "");
   // null values automatically pass
-  if (value === null) {
+  if (value === null || itemDefinition.isInSearchMode()) {
     return true;
   }
 

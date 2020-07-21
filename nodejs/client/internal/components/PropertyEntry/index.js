@@ -8,8 +8,7 @@ const PropertyEntryBoolean_1 = __importDefault(require("./PropertyEntryBoolean")
 const PropertyEntryText_1 = __importDefault(require("./PropertyEntryText"));
 const PropertyEntryDateTime_1 = __importDefault(require("./PropertyEntryDateTime"));
 const PropertyEntryLocation_1 = __importDefault(require("./PropertyEntryLocation"));
-// import PropertyEntryFiles from "./PropertyEntryFiles";
-// import PropertyEntryNumeric from "./PropertyEntryNumeric";
+const PropertyEntryReference_1 = __importDefault(require("./PropertyEntryReference"));
 const PropertyEntrySelect_1 = __importDefault(require("./PropertyEntrySelect"));
 const PropertyEntryField_1 = __importDefault(require("./PropertyEntryField"));
 const PropertyEntryFile_1 = __importDefault(require("./PropertyEntryFile"));
@@ -17,6 +16,8 @@ const app_1 = require("../../app");
 const imported_resources_1 = require("../../../../imported-resources");
 const renderer_1 = require("../../../providers/renderer");
 const config_provider_1 = require("../../providers/config-provider");
+const token_provider_1 = require("../../providers/token-provider");
+const ssr_provider_1 = require("../../providers/ssr-provider");
 ;
 const selectHandler = {
     renderer: "PropertyEntrySelect",
@@ -33,6 +34,13 @@ const handlerRegistry = {
     integer: {
         renderer: "PropertyEntryField",
         handler: PropertyEntryField_1.default,
+        subhandler: {
+            reference: {
+                renderer: "PropertyEntryReference",
+                handler: PropertyEntryReference_1.default,
+                includeTokenAndSSR: true,
+            },
+        },
     },
     number: {
         renderer: "PropertyEntryField",
@@ -138,10 +146,26 @@ function PropertyEntry(props) {
     // Build the context and render sending the right props
     return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(app_1.LocaleContext.Consumer, null, (locale) => {
         const renderer = props.renderer || renderers[registryEntry.renderer];
-        if (registryEntry.includeConfig) {
-            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(Element, Object.assign({}, props, { language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency), country: imported_resources_1.countries[locale.country] || defaultCountryBugCatcher(locale.country), renderer: renderer, rendererArgs: props.rendererArgs || {}, config: config })))));
+        const nProps = {
+            ...props,
+            language: locale.language,
+            i18n: locale.i18n,
+            rtl: locale.rtl,
+            currency: imported_resources_1.currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency),
+            country: imported_resources_1.countries[locale.country] || defaultCountryBugCatcher(locale.country),
+            renderer,
+            rendererArgs: props.rendererArgs || {},
+        };
+        if (registryEntry.includeConfig && registryEntry.includeTokenAndSSR) {
+            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(Element, Object.assign({}, nProps, { token: tokenData.token, ssr: ssr, config: config })))))))));
         }
-        return (react_1.default.createElement(Element, Object.assign({}, props, { language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency), country: imported_resources_1.countries[locale.country] || defaultCountryBugCatcher(locale.country), renderer: renderer, rendererArgs: props.rendererArgs || {} })));
+        else if (registryEntry.includeConfig) {
+            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(Element, Object.assign({}, nProps, { config: config })))));
+        }
+        else if (registryEntry.includeTokenAndSSR) {
+            return (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(Element, Object.assign({}, nProps, { token: tokenData.token, ssr: ssr })))))));
+        }
+        return (react_1.default.createElement(Element, Object.assign({}, nProps)));
     })));
 }
 exports.default = PropertyEntry;

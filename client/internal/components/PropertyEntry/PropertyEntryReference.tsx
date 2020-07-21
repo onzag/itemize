@@ -43,6 +43,8 @@ export default class PropertyEntryReference
   private searchTimeout: NodeJS.Timeout;
   private currentlyFindingValueFor: [number, string];
 
+  private lastCachedSearch: IPropertyEntryReferenceOption[];
+
   constructor(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>) {
     super(props);
 
@@ -76,7 +78,7 @@ export default class PropertyEntryReference
   }
 
   public async search() {
-    const strToSearchForValue = this.props.state.internalValue;
+    const strToSearchForValue = this.props.state.internalValue || "";
     const [idef, dProp, sProp] = this.getSpecialData();
     const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
 
@@ -152,7 +154,7 @@ export default class PropertyEntryReference
       parentedBy: null,
       cachePolicy: "none",
       token: this.props.token,
-      itemDefinition: idef,
+      itemDefinition: idef.getSearchModeCounterpart(),
       traditional: true,
       offset: 0,
       limit: 6,
@@ -180,6 +182,17 @@ export default class PropertyEntryReference
       if(a.text > b.text) { return 1; }
       return 0;
     });
+
+    this.lastCachedSearch = options;
+
+    // this can happen if the search is cancelled before the user has finished typing
+    // resulting in an unset value that might be in the searchbox at the end
+    if (this.props.state.value === null || isNaN(this.props.state.value as number)) {
+      const foundInList = options.find((o) => o.text === (this.props.state.internalValue || ""));
+      if (foundInList) {
+        this.props.onChange(foundInList.id, (this.props.state.internalValue || "")); 
+      }
+    }
 
     this.setState({
       currentSearchError: null,
@@ -270,8 +283,6 @@ export default class PropertyEntryReference
       }
     } as IGQLRequestFields;
 
-
-
     const result = await runGetQueryFor({
       args: {},
       fields,
@@ -309,7 +320,16 @@ export default class PropertyEntryReference
   }
 
   public onChangeSearch(str: string) {
-    this.props.onChange(null, str);
+    let value: number = str.trim().length ? NaN : null;
+    let foundInList = this.state.currentOptions.find((o) => o.text === str);
+    if (!foundInList && this.lastCachedSearch) {
+      foundInList = this.lastCachedSearch.find((o) => o.text === str);
+    } 
+    if (foundInList) {
+      value = foundInList.id;
+    }
+
+    this.props.onChange(value, str);
     clearTimeout(this.searchTimeout);
     this.searchTimeout = setTimeout(
       this.search,
@@ -319,11 +339,9 @@ export default class PropertyEntryReference
 
   public onSelect(option: IPropertyEntryReferenceOption) {
     this.props.onChange(option.id, option.text);
-    this.onCancel();
   }
 
   public onCancel() {
-    clearTimeout(this.searchTimeout);
     this.setState({
       currentOptions: [],
       currentSearchError: null,

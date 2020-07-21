@@ -45,6 +45,7 @@ export declare function runGetQueryFor(arg: {
     fields: IGQLRequestFields;
     returnMemoryCachedValues: boolean;
     returnWorkerCachedValues: boolean;
+    returnWorkerCachedValuesIfNoInternet?: boolean;
     itemDefinition: ItemDefinition;
     id: number;
     version: string;
@@ -118,6 +119,7 @@ export declare function runSearchQueryFor(arg: {
     offset: number;
     token: string;
     language: string;
+    versionFilter?: string;
 }, remoteListener: RemoteListener, remoteListenerCallback: () => void): Promise<{
     error: EndpointErrorType;
     results?: IGQLValue[];

@@ -110,11 +110,6 @@ exports.style = index_1.createStyles({
         backgroundColor: "white",
         borderBottom: "solid 1px #eee",
     },
-    autosuggestContainer: {
-        position: "relative",
-        display: "block",
-        width: "100%",
-    },
 });
 function SelectUnitDialog(props) {
     const closeAndChangeUnit = (unit) => {
@@ -169,11 +164,6 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
         this.closeDialog = this.closeDialog.bind(this);
         this.openDialog = this.openDialog.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
-        // this.renderAutosuggestContainer = this.renderAutosuggestContainer.bind(this);
-        // this.renderAutosuggestField = this.renderAutosuggestField.bind(this);
-        // this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
-        // this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
-        // this.getSuggestionValue = this.getSuggestionValue.bind(this);
     }
     componentDidMount() {
         if (this.props.autoFocus && this.inputRef) {
@@ -221,21 +211,12 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
     onChangeByHTMLEvent(e) {
         this.onChange(e);
     }
-    onChange(e, autosuggestOverride) {
+    onChange(e) {
         // the change has two values, a textual value, and a
         // numeric value, texual value is always set but
         // numeric value is only set for numbers
-        let value = null;
-        let internalValue = null;
-        // the autosuggest override has priority
-        if (autosuggestOverride) {
-            value = autosuggestOverride.newValue;
-            internalValue = value;
-        }
-        else {
-            value = e.target.value.toString();
-            internalValue = value;
-        }
+        const value = e.target.value.toString();
+        const internalValue = value;
         if (this.props.isNumericType) {
             this.props.onChangeByNumber(value);
             return;

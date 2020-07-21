@@ -73,12 +73,18 @@ const typeValue: IPropertyDefinitionSupportedType = {
   localSearch: standardLocalSearchExactAndRange,
 
   // it gotta be validated to check it's a number
-  validate: (n: PropertyDefinitionSupportedIntegerType) => {
+  validate: (n: PropertyDefinitionSupportedIntegerType, subtype: string) => {
     if (isNaN(n) || !Number.isInteger(n)) {
       return PropertyInvalidReason.INVALID_VALUE;
     } else if (n > MAX_SUPPORTED_INTEGER) {
       return PropertyInvalidReason.TOO_LARGE;
-    } else if (n < MIN_SUPPORTED_INTEGER) {
+    } else if (
+      n < MIN_SUPPORTED_INTEGER ||
+      (
+        subtype === "reference" &&
+        n <= 0
+      )
+    ) {
       return PropertyInvalidReason.TOO_SMALL;
     }
 
@@ -96,25 +102,29 @@ const typeValue: IPropertyDefinitionSupportedType = {
     searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
     searchRange: CLASSIC_SEARCH_RANGED_I18N,
     searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
-    tooSmallErrorInclude: true,
-    tooLargeErrorInclude: true,
+    tooSmallErrorInclude: [null],
+    tooLargeErrorInclude: [null],
   },
   specialProperties: [
     {
       name: "referencedModule",
       type: "string",
+      required: ["reference"],
     },
     {
       name: "referencedItemDefinition",
       type: "string",
+      required: ["reference"],
     },
     {
       name: "referencedSearchProperty",
       type: "string",
+      required: ["reference"],
     },
     {
       name: "referencedDisplayProperty",
       type: "string",
+      required: ["reference"],
     },
     {
       name: "referencedFilteringPropertySet",

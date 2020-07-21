@@ -636,25 +636,26 @@ async function getI18nPropertyData(rawDataConfig, actualLocation, property, sear
     const localeFileTraceback = traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
     const searchIsDisabled = !searchable ||
         (typeof property.searchable !== "undefined" && !property.searchable);
+    const disableRangedSearch = property.disableRangedSearch || (property.type === "integer" && property.subtype === "reference");
     let expectedProperties = definition.i18n.base
         .map((b) => ({ key: b, required: true }))
         // concat to optional properties
         .concat((definition.i18n.optional || [])
         .map((b) => ({ key: b, required: false })))
         // concat to search range properties only if necessary
-        .concat((property.disableRangedSearch || searchIsDisabled ?
+        .concat((disableRangedSearch || searchIsDisabled ?
         [] : definition.i18n.searchRange || [])
         .map((b) => ({ key: b, required: true })))
-        .concat((property.disableRangedSearch || searchIsDisabled ?
+        .concat((disableRangedSearch || searchIsDisabled ?
         [] : definition.i18n.searchRangeOptional || [])
         .map((b) => ({ key: b, required: false })))
         // concat to search properties only if necessary
         .concat((searchIsDisabled || (definition.searchInterface === search_interfaces_1.PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
-        !property.disableRangedSearch) ?
+        !disableRangedSearch) ?
         [] : definition.i18n.searchBase || [])
         .map((b) => ({ key: b, required: true })))
         .concat((searchIsDisabled || (definition.searchInterface === search_interfaces_1.PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
-        !property.disableRangedSearch) ?
+        !disableRangedSearch) ?
         [] : definition.i18n.searchOptional || [])
         .map((b) => ({ key: b, required: false })))
         // request for the values if supported
@@ -753,7 +754,7 @@ async function getI18nPropertyData(rawDataConfig, actualLocation, property, sear
         errorRequiredProperties.push("error.TOO_FEW_DECIMALS");
     }
     if (definition.searchInterface === search_interfaces_1.PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
-        !property.disableRangedSearch &&
+        !disableRangedSearch &&
         (typeof property.searchable === "undefined" ||
             property.searchable)) {
         errorRequiredProperties.push("error.FROM_LARGER_THAN_TO");

@@ -139,6 +139,7 @@ const handlerRegistry:
       reference: {
         renderer: "PropertyEntryReference",
         handler: PropertyEntryReference,
+        includeTokenAndSSR: true,
       },
     },
   },

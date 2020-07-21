@@ -24,7 +24,7 @@ export enum PropertyDefinitionSearchInterfacesType {
   /**
    * full text search, uses a simple raw string as search
    */
-  FTS,
+  TEXT,
   /**
    * uses location and radius for searching
    */

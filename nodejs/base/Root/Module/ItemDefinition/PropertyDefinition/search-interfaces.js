@@ -25,7 +25,7 @@ var PropertyDefinitionSearchInterfacesType;
     /**
      * full text search, uses a simple raw string as search
      */
-    PropertyDefinitionSearchInterfacesType[PropertyDefinitionSearchInterfacesType["FTS"] = 2] = "FTS";
+    PropertyDefinitionSearchInterfacesType[PropertyDefinitionSearchInterfacesType["TEXT"] = 2] = "TEXT";
     /**
      * uses location and radius for searching
      */

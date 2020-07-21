@@ -18,6 +18,7 @@ const local_search_1 = require("../local-search");
 const typeValue = {
     // an integer is represented as a number
     json: "number",
+    supportedSubtypes: ["reference"],
     gql: graphql_1.GraphQLInt,
     sql: sql_1.getStandardSQLFnFor && sql_1.getStandardSQLFnFor("integer"),
     sqlIn: sql_1.stardardSQLInFn,
@@ -48,14 +49,16 @@ const typeValue = {
     },
     localSearch: local_search_1.standardLocalSearchExactAndRange,
     // it gotta be validated to check it's a number
-    validate: (n) => {
+    validate: (n, subtype) => {
         if (isNaN(n) || !Number.isInteger(n)) {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
         }
         else if (n > constants_1.MAX_SUPPORTED_INTEGER) {
             return PropertyDefinition_1.PropertyInvalidReason.TOO_LARGE;
         }
-        else if (n < constants_1.MIN_SUPPORTED_INTEGER) {
+        else if (n < constants_1.MIN_SUPPORTED_INTEGER ||
+            (subtype === "reference" &&
+                n <= 0)) {
             return PropertyDefinition_1.PropertyInvalidReason.TOO_SMALL;
         }
         return null;
@@ -72,8 +75,38 @@ const typeValue = {
         searchOptional: constants_1.CLASSIC_SEARCH_OPTIONAL_I18N,
         searchRange: constants_1.CLASSIC_SEARCH_RANGED_I18N,
         searchRangeOptional: constants_1.CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
-        tooSmallErrorInclude: true,
-        tooLargeErrorInclude: true,
+        tooSmallErrorInclude: [null],
+        tooLargeErrorInclude: [null],
     },
+    specialProperties: [
+        {
+            name: "referencedModule",
+            type: "string",
+            required: ["reference"],
+        },
+        {
+            name: "referencedItemDefinition",
+            type: "string",
+            required: ["reference"],
+        },
+        {
+            name: "referencedSearchProperty",
+            type: "string",
+            required: ["reference"],
+        },
+        {
+            name: "referencedDisplayProperty",
+            type: "string",
+            required: ["reference"],
+        },
+        {
+            name: "referencedFilteringPropertySet",
+            type: "any",
+        },
+        {
+            name: "referencedFilterByLanguage",
+            type: "boolean",
+        },
+    ],
 };
 exports.default = typeValue;

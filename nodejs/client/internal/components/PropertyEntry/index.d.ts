@@ -7,6 +7,7 @@ import { IRendererProps } from "../../renderer";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import Include from "../../../../base/Root/Module/ItemDefinition/Include";
 import { IConfigRawJSONDataType } from "../../../../config";
+import { ISSRContextType } from "../../providers/ssr-provider";
 /**
  * This is what every renderer gets regardless of type as long as it's an entry
  * type, it will get this instance as its props, the ValueType represents the property definition
@@ -39,6 +40,8 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
  */
 export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
     config?: IConfigRawJSONDataType;
+    token?: string;
+    ssr?: ISSRContextType;
     itemDefinition: ItemDefinition;
     injectSubmitBlockPromise: (arg: Promise<any>) => void;
     include: Include;

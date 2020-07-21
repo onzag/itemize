@@ -154,7 +154,7 @@ exports.Articles = mui_core_1.withStyles(exports.articlesStyles)((props) => {
                 react_1.default.createElement(AppLanguageRetriever_1.default, null, (languageData) => (react_1.default.createElement(item_definition_1.ItemDefinitionProvider, { itemDefinition: "article", searchCounterpart: true, setters: [
                         {
                             id: "locale",
-                            searchVariant: "exact",
+                            searchVariant: "search",
                             value: languageData.currentLanguage.code,
                         }
                     ], automaticSearch: {

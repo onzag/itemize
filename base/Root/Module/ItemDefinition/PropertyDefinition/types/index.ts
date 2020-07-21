@@ -306,7 +306,7 @@ export interface IPropertyDefinitionSupportedType {
   specialProperties?: Array<{
     name: string;
     type: "number" | "string" | "boolean" | "any",
-    required?: boolean;
+    required?: boolean | Array<string>;
   }>;
   /**
    * whether a min and max value can be defined, use it if the value is in

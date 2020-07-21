@@ -251,7 +251,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // the max length for the text
   // whether it is searchable or not
   searchable: true,
-  searchInterface: PropertyDefinitionSearchInterfacesType.FTS,
+  searchInterface: PropertyDefinitionSearchInterfacesType.TEXT,
   allowsMinMaxLengthDefined: true,
   // i18n attributes
   i18n: {

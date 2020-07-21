@@ -317,6 +317,25 @@ async function runGetQueryFor(arg) {
             getQueryFields: mergedResults.fields,
         };
     }
+    else if (error.code === constants_1.ENDPOINT_ERRORS.CANT_CONNECT) {
+        // otherwise now let's check for the worker
+        if (cache_1.default.isSupported &&
+            arg.returnWorkerCachedValuesIfNoInternet) {
+            // we ask the worker for the value
+            const workerCachedValue = await cache_1.default.instance.getCachedValue(queryName, arg.id, arg.version || null, arg.fields);
+            // if we have a GET request and we are allowed to return from the wroker cache and we actually
+            // found something in our cache, return that
+            if (workerCachedValue) {
+                return {
+                    error: null,
+                    value: workerCachedValue.value,
+                    memoryCached: false,
+                    cached: true,
+                    getQueryFields: workerCachedValue.fields,
+                };
+            }
+        }
+    }
     return {
         error,
         value: null,
@@ -459,6 +478,9 @@ async function runSearchQueryFor(arg, remoteListener, remoteListenerCallback) {
         arg.itemDefinition.getQualifiedPathName());
     const queryName = (arg.traditional ? constants_1.PREFIX_TRADITIONAL_SEARCH : constants_1.PREFIX_SEARCH) + qualifiedName;
     const searchArgs = getQueryArgsFor(arg.args, arg.token, arg.language);
+    if (arg.versionFilter) {
+        searchArgs.version_filter = arg.versionFilter;
+    }
     if (arg.createdBy) {
         searchArgs.created_by = arg.createdBy;
     }

@@ -14,9 +14,11 @@ import PropertyViewFileRenderer from "./PropertyView/PropertyViewFile";
 import PropertyViewDateTimeRenderer from "./PropertyView/PropertyViewDateTime";
 import PropertyViewLocationRenderer from "./PropertyView/PropertyViewLocation";
 import PropertyViewCurrencyRenderer from "./PropertyView/PropertyViewCurrency";
+import PropertyEntryReferenceRenderer from "./PropertyEntry/PropertyEntryReference";
 
 export const rendererContext: IRendererContext = {
   PropertyEntryField: PropertyEntryFieldRenderer,
+  PropertyEntryReference: PropertyEntryReferenceRenderer,
   PropertyEntryFile: PropertyEntryFileRenderer,
   PropertyEntryBoolean: PropertyEntryBooleanRenderer,
   PropertyEntryLocation: PropertyEntryLocationRenderer, 

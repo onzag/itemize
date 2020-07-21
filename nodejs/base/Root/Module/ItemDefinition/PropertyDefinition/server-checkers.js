@@ -22,6 +22,10 @@ async function serverSideIndexChecker(appData, itemDefinition, include, property
     if (value === null) {
         return true;
     }
+    // if we are in search mode we allow the index to be valid
+    if (property.getParentItemDefinition().isInSearchMode()) {
+        return true;
+    }
     // now we need to get the table this property is in
     const moduleIDColumn = property.isExtension() ? "id" : constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME;
     const moduleVersionColumn = property.isExtension() ? "version" : constants_1.CONNECTOR_SQL_COLUMN_VERSION_FK_NAME;

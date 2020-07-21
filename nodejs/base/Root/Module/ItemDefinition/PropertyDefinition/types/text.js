@@ -206,7 +206,7 @@ const typeValue = {
     // the max length for the text
     // whether it is searchable or not
     searchable: true,
-    searchInterface: search_interfaces_1.PropertyDefinitionSearchInterfacesType.FTS,
+    searchInterface: search_interfaces_1.PropertyDefinitionSearchInterfacesType.TEXT,
     allowsMinMaxLengthDefined: true,
     // i18n attributes
     i18n: {

@@ -61,7 +61,7 @@ function nullIfUndefined(value) {
 async function clientSideIndexChecker(itemDefinition, include, property, value, id, version) {
     const mergedID = id + "." + (version || "");
     // null values automatically pass
-    if (value === null) {
+    if (value === null || itemDefinition.isInSearchMode()) {
         return true;
     }
     // we are using the cache, the client side has a cache because user input might
@@ -1060,7 +1060,9 @@ class PropertyDefinition {
      * @returns a boolean
      */
     isRangedSearchDisabled() {
-        return this.rawData.disableRangedSearch || false;
+        return this.rawData.disableRangedSearch ||
+            (this.rawData.type === "integer" && this.rawData.subtype === "reference") ||
+            false;
     }
     /**
      * Tells if it's searchable, either by default or because

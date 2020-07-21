@@ -584,13 +584,16 @@ function checkPropertyDefinition(rawData, parentItemDefinition, parentModule, tr
     // check special properties are set
     if (propertyDefintionTypeStandard.specialProperties) {
         propertyDefintionTypeStandard.specialProperties.forEach((property) => {
-            if (property.required && !rawData.specialProperties) {
+            const isRequired = property.required === true || (Array.isArray(property.required) && property.required.includes(rawData.subtype || null));
+            if (isRequired && !rawData.specialProperties) {
                 throw new Error_1.default(`type '${rawData.type}' requires specialProperties field for '${property.name}'`, traceback);
             }
-            else if (property.required && !rawData.specialProperties[property.name]) {
+            else if (isRequired && !rawData.specialProperties[property.name]) {
                 throw new Error_1.default(`type '${rawData.type}' requires special property '${property.name}'`, traceback.newTraceToBit("specialProperties"));
             }
-            else if (rawData.specialProperties && rawData.specialProperties[property.name] &&
+            else if (rawData.specialProperties &&
+                rawData.specialProperties[property.name] &&
+                property.type !== "any" &&
                 typeof rawData.specialProperties[property.name] !== property.type) {
                 throw new Error_1.default(`Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`, traceback.newTraceToBit("specialProperties").newTraceToBit(property.name));
             }

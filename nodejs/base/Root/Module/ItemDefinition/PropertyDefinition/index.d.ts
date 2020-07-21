@@ -180,7 +180,7 @@ export interface IPropertyDefinitionRawJSONDataType {
      * description, you set the value here
      */
     specialProperties?: {
-        [key: string]: string | boolean | number;
+        [key: string]: any;
     };
     /**
      * whether nulls are coerced into their default value this is useful
@@ -718,7 +718,7 @@ export default class PropertyDefinition {
      * @param name the name of that specifial property
      * @returns the special property value, either a boolean, number or string, or null
      */
-    getSpecialProperty(name: string): string | number | boolean;
+    getSpecialProperty(name: string): any;
     /**
      * Just gives the parent module
      * @returns a Module

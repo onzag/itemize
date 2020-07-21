@@ -159,7 +159,7 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
                 setters={[
                   {
                     id: "locale",
-                    searchVariant: "exact",
+                    searchVariant: "search",
                     value: languageData.currentLanguage.code,
                   }
                 ]}

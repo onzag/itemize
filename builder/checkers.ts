@@ -899,12 +899,15 @@ export function checkPropertyDefinition(
   // check special properties are set
   if (propertyDefintionTypeStandard.specialProperties) {
     propertyDefintionTypeStandard.specialProperties.forEach((property) => {
-      if (property.required && !rawData.specialProperties) {
+      const isRequired = property.required === true || (
+        Array.isArray(property.required) && property.required.includes(rawData.subtype || null)
+      );
+      if (isRequired && !rawData.specialProperties) {
         throw new CheckUpError(
           `type '${rawData.type}' requires specialProperties field for '${property.name}'`,
           traceback,
         );
-      } else if (property.required && !rawData.specialProperties[property.name]) {
+      } else if (isRequired && !rawData.specialProperties[property.name]) {
         throw new CheckUpError(
           `type '${rawData.type}' requires special property '${property.name}'`,
           traceback.newTraceToBit("specialProperties"),

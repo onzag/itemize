@@ -5,11 +5,10 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { GraphQLString, valueFromAST } from "graphql";
+import { GraphQLString } from "graphql";
 import {
   stardardSQLInFn,
   standardSQLOutFn,
-  standardSQLSearchFnExactAndRange,
   standardSQLEqualFn,
   getStandardSQLFnFor,
   standardSQLBtreeIndexable,
@@ -25,9 +24,9 @@ import {
   CLASSIC_SEARCH_BASE_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N,
   SQL_CONSTRAINT_PREFIX,
+  INCLUDE_PREFIX,
 } from "../../../../../../constants";
-import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import { standardLocalSearchExactAndRange } from "../local-search";
+import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { countries, currencies } from "../../../../../../imported-resources";
 
 /**
@@ -53,6 +52,8 @@ const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%",
  */
 export type PropertyDefinitionSupportedStringType = string;
 
+const exactSearchSubtypes = ["comprehensive-locale", "language", "country", "currency"];
+
 /**
  * The behaviour of strings is described by this type
  */
@@ -72,17 +73,111 @@ const typeValue: IPropertyDefinitionSupportedType = {
   }),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
-  sqlSearch: standardSQLSearchFnExactAndRange,
+  sqlSearch: (arg) => {
+    const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
+
+    if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
+
+      if (exactSearchSubtypes.includes(arg.property.getSubtype())) {
+        arg.knexBuilder.andWhere(
+          arg.prefix + arg.id,
+          (arg.args[searchName] as string),
+        );
+      } else {
+        arg.knexBuilder.andWhereRaw(
+          "?? ilike ? escape ?",
+          [
+            arg.prefix + arg.id,
+            "%" + (arg.args[searchName] as string).replace(/\%/g, "\\%").replace(/\_/g, "\\_") + "%",
+            "\\",
+          ],
+        );
+      }
+
+      return true;
+    }
+
+    return false;
+  },
   sqlEqual: standardSQLEqualFn,
   sqlSSCacheEqual: standardSQLSSCacheEqualFn,
   sqlBtreeIndexable: standardSQLBtreeIndexable,
   sqlMantenience: null,
-  sqlStrSearch: null,
-  localStrSearch: null,
+  sqlStrSearch: (arg) => {
+    if (arg.knexBuilder) {
+      if (exactSearchSubtypes.includes(arg.property.getSubtype())) {
+        arg.knexBuilder.andWhere(
+          arg.prefix + arg.id,
+          arg.search,
+        );
+      } else {
+        arg.knexBuilder.andWhereRaw(
+          "?? ilike ? escape ?",
+          [
+            arg.prefix + arg.id,
+            "%" + arg.search.replace(/\%/g, "\\%").replace(/\_/g, "\\_") + "%",
+            "\\",
+          ],
+        );
+      }
+    }
+
+    return true;
+  },
+  localStrSearch: (arg) => {
+    // item is deleted
+    if (!arg.gqlValue) {
+      return false;
+    }
+    // item is blocked
+    if (arg.gqlValue.DATA === null) {
+      return false;
+    }
+
+    if (arg.search) {
+      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+
+      if (exactSearchSubtypes.includes(arg.property.getSubtype())) {
+        return propertyValue === arg.search;
+      } else {
+        // this is the simple FTS that you get in the client
+        return propertyValue.includes(arg.search);
+      }
+    }
+
+    return true;
+  },
   sqlOrderBy: null,
   localOrderBy: null,
 
-  localSearch: standardLocalSearchExactAndRange,
+  localSearch: (arg) => {
+    // item is deleted
+    if (!arg.gqlValue) {
+      return false;
+    }
+    // item is blocked
+    if (arg.gqlValue.DATA === null) {
+      return false;
+    }
+
+    const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.id;
+    const usefulArgs = arg.include ? arg.args[INCLUDE_PREFIX + arg.include.getId()] || {} : arg.args;
+
+    if (typeof usefulArgs[searchName] !== "undefined" && usefulArgs[searchName] !== null) {
+      const searchMatch = usefulArgs[searchName];
+      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+
+      if (propertyValue === null) {
+        return false;
+      }
+
+      // this is the FTS in the client side, it's not good, it's not meant
+      // to be good, but it gets the job done
+      return propertyValue.includes(searchMatch);
+    }
+
+    return true;
+  },
   localEqual: standardLocalEqual,
 
   nullableDefault: "",
@@ -141,7 +236,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
   // it is searchable by an exact value, use text for organic things
   searchable: true,
-  searchInterface: PropertyDefinitionSearchInterfacesType.EXACT,
+  searchInterface: PropertyDefinitionSearchInterfacesType.TEXT,
   allowsMinMaxLengthDefined: true,
   // i18n attributes required
   i18n: {
