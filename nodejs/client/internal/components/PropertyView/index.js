@@ -15,6 +15,9 @@ const PropertyViewBoolean_1 = require("./PropertyViewBoolean");
 const PropertyViewDateTime_1 = require("./PropertyViewDateTime");
 const PropertyViewLocation_1 = require("./PropertyViewLocation");
 const PropertyViewCurrency_1 = require("./PropertyViewCurrency");
+const PropertyViewReference_1 = __importDefault(require("./PropertyViewReference"));
+const ssr_provider_1 = require("../../../../client/internal/providers/ssr-provider");
+const token_provider_1 = require("../../../../client/internal/providers/token-provider");
 ;
 const handlerRegistry = {
     string: {
@@ -24,6 +27,13 @@ const handlerRegistry = {
     integer: {
         renderer: "PropertyViewSimple",
         handler: PropertyViewSimple_1.PropertyViewSimple,
+        subhandler: {
+            reference: {
+                renderer: "PropertyViewSimple",
+                handler: PropertyViewReference_1.default,
+                includeTokenAndSSR: true,
+            }
+        }
     },
     number: {
         renderer: "PropertyViewSimple",
@@ -100,16 +110,42 @@ function PropertyView(props) {
     if (props.state.hidden) {
         return null;
     }
+    const type = props.property.getType();
+    const subtype = props.property.getSubtype();
     // First get the handler by the type
-    const registryEntry = handlerRegistry[props.property.getType()];
+    let registryEntry = handlerRegistry[type];
+    if (subtype === null && registryEntry.defaultSubhandler) {
+        registryEntry = registryEntry.defaultSubhandler;
+    }
+    else if (subtype && registryEntry.subhandler && registryEntry.subhandler[subtype]) {
+        registryEntry = registryEntry.subhandler[subtype];
+    }
+    // First get the handler by the type
     const Element = registryEntry.handler;
     // Build the context and render sending the right props
     return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(app_1.LocaleContext.Consumer, null, (locale) => {
         const renderer = props.renderer || renderers[registryEntry.renderer];
-        if (registryEntry.includeConfig) {
-            return react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(Element, Object.assign({}, props, { language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency], currencyFactors: locale.currencyFactors, country: imported_resources_1.countries[locale.country], renderer: renderer, rendererArgs: props.rendererArgs || {}, config: config }))));
+        const nProps = {
+            ...props,
+            language: locale.language,
+            i18n: locale.i18n,
+            rtl: locale.rtl,
+            currency: imported_resources_1.currencies[locale.currency],
+            currencyFactors: locale.currencyFactors,
+            country: imported_resources_1.countries[locale.country],
+            renderer,
+            rendererArgs: props.rendererArgs || {},
+        };
+        if (registryEntry.includeConfig && registryEntry.includeTokenAndSSR) {
+            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(Element, Object.assign({}, nProps, { token: tokenData.token, ssr: ssr, config: config })))))))));
         }
-        return (react_1.default.createElement(Element, Object.assign({}, props, { language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency], currencyFactors: locale.currencyFactors, country: imported_resources_1.countries[locale.country], renderer: renderer, rendererArgs: props.rendererArgs || {} })));
+        else if (registryEntry.includeConfig) {
+            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(Element, Object.assign({}, nProps, { config: config })))));
+        }
+        else if (registryEntry.includeTokenAndSSR) {
+            return (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(Element, Object.assign({}, nProps, { token: tokenData.token, ssr: ssr })))))));
+        }
+        return (react_1.default.createElement(Element, Object.assign({}, nProps)));
     })));
 }
 exports.default = PropertyView;

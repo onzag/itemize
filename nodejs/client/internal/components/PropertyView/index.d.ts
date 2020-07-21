@@ -7,6 +7,7 @@ import { IRendererProps } from "../../renderer";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import Include from "../../../../base/Root/Module/ItemDefinition/Include";
 import { IConfigRawJSONDataType } from "../../../../config";
+import { ISSRContextType } from "../../../../client/internal/providers/ssr-provider";
 /**
  * This is what every view renderer gets
  *
@@ -20,6 +21,8 @@ export interface IPropertyViewRendererProps<ValueType> extends IRendererProps {
  */
 export interface IPropertyViewMainHandlerProps<RendererPropsType> {
     config?: IConfigRawJSONDataType;
+    token?: string;
+    ssr?: ISSRContextType;
     containerId: string;
     include: Include;
     itemDefinition: ItemDefinition;

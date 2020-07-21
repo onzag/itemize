@@ -21,6 +21,9 @@ import { PropertyViewBoolean } from "./PropertyViewBoolean";
 import { PropertyViewDateTime } from "./PropertyViewDateTime";
 import { PropertyViewLocation } from "./PropertyViewLocation";
 import { PropertyViewCurrency } from "./PropertyViewCurrency";
+import PropertyViewReference from "./PropertyViewReference";
+import { ISSRContextType, SSRContext } from "../../../../client/internal/providers/ssr-provider";
+import { TokenContext } from "../../../../client/internal/providers/token-provider";
 
 /**
  * This is what every view renderer gets
@@ -36,6 +39,9 @@ export interface IPropertyViewRendererProps<ValueType> extends IRendererProps {
  */
 export interface IPropertyViewMainHandlerProps<RendererPropsType> {
   config?: IConfigRawJSONDataType;
+  token?: string;
+  ssr?: ISSRContextType;
+
   containerId: string;
   include: Include;
   itemDefinition: ItemDefinition;
@@ -64,12 +70,20 @@ interface IRendererHandlerType {
   renderer: string,
   handler: React.ComponentType<IPropertyViewHandlerProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>>,
   includeConfig?: boolean;
+  includeTokenAndSSR?: boolean;
 };
+
+interface IRendererWholeHandlerType extends IRendererHandlerType {
+  defaultSubhandler?: IRendererHandlerType;
+  subhandler?: {
+    [type: string]: IRendererHandlerType;
+  },
+}
 
 const handlerRegistry:
   Record<
     PropertyDefinitionSupportedTypeName,
-    IRendererHandlerType
+    IRendererWholeHandlerType
   > = {
   string: {
     renderer: "PropertyViewSimple",
@@ -78,6 +92,13 @@ const handlerRegistry:
   integer: {
     renderer: "PropertyViewSimple",
     handler: PropertyViewSimple,
+    subhandler: {
+      reference: {
+        renderer: "PropertyViewSimple",
+        handler: PropertyViewReference,
+        includeTokenAndSSR: true,
+      }
+    }
   },
   number: {
     renderer: "PropertyViewSimple",
@@ -193,8 +214,18 @@ export default function PropertyView(
     return null;
   }
 
+  const type = props.property.getType();
+  const subtype = props.property.getSubtype();
+
   // First get the handler by the type
-  const registryEntry = handlerRegistry[props.property.getType()];
+  let registryEntry: IRendererWholeHandlerType = handlerRegistry[type];
+  if (subtype === null && registryEntry.defaultSubhandler) {
+    registryEntry = registryEntry.defaultSubhandler;
+  } else if (subtype && registryEntry.subhandler && registryEntry.subhandler[subtype]) {
+    registryEntry = registryEntry.subhandler[subtype];
+  }
+
+  // First get the handler by the type
   const Element = registryEntry.handler;
 
   // Build the context and render sending the right props
@@ -207,35 +238,71 @@ export default function PropertyView(
               (locale) => {
                 const renderer: React.ComponentType<IPropertyViewRendererProps<PropertyDefinitionSupportedType>> =
                   props.renderer || renderers[registryEntry.renderer];
-                if (registryEntry.includeConfig) {
-                  return <ConfigContext.Consumer>
-                    {(config) => (
-                      <Element
-                        {...props}
-                        language={locale.language}
-                        i18n={locale.i18n}
-                        rtl={locale.rtl}
-                        currency={currencies[locale.currency]}
-                        currencyFactors={locale.currencyFactors}
-                        country={countries[locale.country]}
-                        renderer={renderer}
-                        rendererArgs={props.rendererArgs || {}}
-                        config={config}
-                      />
-                    )}
-                  </ConfigContext.Consumer>
+
+                const nProps = {
+                  ...props,
+                  language: locale.language,
+                  i18n: locale.i18n,
+                  rtl: locale.rtl,
+                  currency: currencies[locale.currency],
+                  currencyFactors: locale.currencyFactors,
+                  country: countries[locale.country],
+                  renderer,
+                  rendererArgs: props.rendererArgs || {},
+                };
+
+                if (registryEntry.includeConfig && registryEntry.includeTokenAndSSR) {
+                  return (
+                    <ConfigContext.Consumer>
+                      {(config) => (
+                        <SSRContext.Consumer>
+                          {(ssr) => (
+                            <TokenContext.Consumer>
+                              {(tokenData) => (
+                                <Element
+                                  {...nProps}
+                                  token={tokenData.token}
+                                  ssr={ssr}
+                                  config={config}
+                                />
+                              )}
+                            </TokenContext.Consumer>
+                          )}
+                        </SSRContext.Consumer>
+                      )}
+                    </ConfigContext.Consumer>
+                  );
+                } else if (registryEntry.includeConfig) {
+                  return (
+                    <ConfigContext.Consumer>
+                      {(config) => (
+                        <Element
+                          {...nProps}
+                          config={config}
+                        />
+                      )}
+                    </ConfigContext.Consumer>
+                  );
+                } else if (registryEntry.includeTokenAndSSR) {
+                  return (
+                    <SSRContext.Consumer>
+                      {(ssr) => (
+                        <TokenContext.Consumer>
+                          {(tokenData) => (
+                            <Element
+                              {...nProps}
+                              token={tokenData.token}
+                              ssr={ssr}
+                            />
+                          )}
+                        </TokenContext.Consumer>
+                      )}
+                    </SSRContext.Consumer>
+                  );
                 }
                 return (
                   <Element
-                    {...props}
-                    language={locale.language}
-                    i18n={locale.i18n}
-                    rtl={locale.rtl}
-                    currency={currencies[locale.currency]}
-                    currencyFactors={locale.currencyFactors}
-                    country={countries[locale.country]}
-                    renderer={renderer}
-                    rendererArgs={props.rendererArgs || {}}
+                    {...nProps}
                   />
                 );
               }

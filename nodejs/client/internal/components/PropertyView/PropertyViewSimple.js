@@ -33,7 +33,7 @@ class PropertyViewSimple extends react_1.default.Component {
         const value = (this.props.useAppliedValue ?
             this.props.state.stateAppliedValue :
             this.props.state.value);
-        let currentValue = value === null ?
+        let currentValue = (value === null || (typeof value === "number" && isNaN(value))) ?
             nullValueLabel :
             ((i18nData && i18nData.values[value.toString()]) ||
                 value.toString());

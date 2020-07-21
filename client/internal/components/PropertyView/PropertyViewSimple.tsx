@@ -41,7 +41,7 @@ export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProp
       this.props.state.value
     );
 
-    let currentValue = value === null ?
+    let currentValue = (value === null || (typeof value === "number" && isNaN(value as number))) ?
       nullValueLabel :
       (
         (i18nData && i18nData.values[value.toString()]) ||

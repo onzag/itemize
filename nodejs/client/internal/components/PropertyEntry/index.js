@@ -136,11 +136,13 @@ function PropertyEntry(props) {
     let registryEntry = props.property.hasSpecificValidValues() ?
         selectHandler :
         handlerRegistry[type];
-    if (subtype === null && registryEntry.defaultSubhandler) {
-        registryEntry = registryEntry.defaultSubhandler;
-    }
-    else if (subtype && registryEntry.subhandler && registryEntry.subhandler[subtype]) {
-        registryEntry = registryEntry.subhandler[subtype];
+    if (!props.property.hasSpecificValidValues()) {
+        if (subtype === null && registryEntry.defaultSubhandler) {
+            registryEntry = registryEntry.defaultSubhandler;
+        }
+        else if (subtype && registryEntry.subhandler && registryEntry.subhandler[subtype]) {
+            registryEntry = registryEntry.subhandler[subtype];
+        }
     }
     const Element = registryEntry.handler;
     // Build the context and render sending the right props
