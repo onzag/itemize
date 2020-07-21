@@ -34,6 +34,8 @@ import { IConfigRawJSONDataType } from "../../config";
 
 // TODO this file is too complex, we need to simplify, specially policies they are killing this file
 
+const STORED_SEARCHES: any = {}
+
 function getPropertyListForSearchMode(properties: string[], standardCounterpart: ItemDefinition) {
   let result: string[] = [];
   properties.forEach((propertyId) => {
@@ -86,6 +88,7 @@ export interface IActionResponseWithId extends IBasicActionResponse {
  * A response given by search
  */
 export interface IActionResponseWithSearchResults extends IBasicActionResponse {
+  searchId: string;
   records: IGQLSearchRecord[];
   results: IGQLValue[];
   count: number;
@@ -156,6 +159,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   traditional?: boolean;
   limit: number;
   offset: number;
+  storeResults?: boolean;
 }
 
 export interface IPokeElementsType {
@@ -264,6 +268,7 @@ export interface IItemDefinitionContextType {
   // in which case you'll just get a searchError you should be in search
   // mode because there are no endpoints otherwise
   search: (options: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
+  loadSearch: (id: string) => void;
   // this is a listener that basically takes a property, and a new value
   // and internal value, whatever is down the line is not expected to do
   // changes directly, but rather call this function, this function will
@@ -602,6 +607,7 @@ export class ActualItemDefinitionProvider extends
     this.poke = this.poke.bind(this);
     this.unpoke = this.unpoke.bind(this);
     this.search = this.search.bind(this);
+    this.loadSearch = this.loadSearch.bind(this);
     this.dismissSearchError = this.dismissSearchError.bind(this);
     this.dismissSearchResults = this.dismissSearchResults.bind(this);
     this.onSearchReload = this.onSearchReload.bind(this);
@@ -673,7 +679,14 @@ export class ActualItemDefinitionProvider extends
       this.props.forId || null, this.props.forVersion || null,
     );
     if (internalState) {
-      searchState = internalState;
+      searchState = internalState.searchState;
+
+      const state = internalState.state;
+      this.props.itemDefinitionInstance.applyState(
+        this.props.forId || null,
+        this.props.forVersion || null,
+        state,
+      );
     }
 
     // so the initial setup
@@ -1702,6 +1715,7 @@ export class ActualItemDefinitionProvider extends
       };
     } else if (withSearchResults) {
       return {
+        searchId: null,
         results: null,
         records: null,
         limit: null,
@@ -2169,6 +2183,35 @@ export class ActualItemDefinitionProvider extends
       error,
     };
   }
+  public loadSearch(id: string) {
+    if (id === this.state.searchId) {
+      return;
+    } else if (id && STORED_SEARCHES[id]) {
+      const state = STORED_SEARCHES[id].state;
+      this.props.itemDefinitionInstance.applyState(
+        this.props.forId || null,
+        this.props.forVersion || null,
+        state,
+      );
+
+      const searchState = STORED_SEARCHES[id].searchState;
+      this.setState({
+        itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
+          this.props.forId || null,
+          this.props.forVersion || null,
+          !this.props.disableExternalChecks,
+          this.props.itemDefinitionInstance.isInSearchMode() ?
+            getPropertyListForSearchMode(
+              this.props.properties || [],
+              this.props.itemDefinitionInstance.getStandardCounterpart()
+            ) : this.props.properties || [],
+          this.props.includes || [],
+          !this.props.includePolicies,
+        ),
+        ...searchState,
+      });
+    }
+  }
   public async search(options: IActionSearchOptions): Promise<IActionResponseWithSearchResults> {
     if (this.state.searching) {
       return null;
@@ -2318,6 +2361,11 @@ export class ActualItemDefinitionProvider extends
       };
     }
 
+    const stateOfSearch = this.props.itemDefinitionInstance.getStateNoExternalChecking(
+      this.props.forId || null,
+      this.props.forVersion || null,
+    );
+
     const {
       results,
       records,
@@ -2346,8 +2394,9 @@ export class ActualItemDefinitionProvider extends
       parentedBy,
     }, this.props.remoteListener, this.onSearchReload);
 
+    const searchId = uuid.v4();
     if (error) {
-      const searchStateInfo = {
+      const searchState = {
         searchError: error,
         searching: false,
         searchResults: results,
@@ -2355,7 +2404,7 @@ export class ActualItemDefinitionProvider extends
         searchCount: count,
         searchLimit: limit,
         searchOffset: offset,
-        searchId: uuid.v4(),
+        searchId,
         searchOwner: options.createdBy || null,
         searchParent,
         searchShouldCache: !!options.cachePolicy,
@@ -2363,6 +2412,13 @@ export class ActualItemDefinitionProvider extends
         searchRequestedProperties: options.requestedProperties,
         searchRequestedIncludes: options.requestedIncludes || [],
       };
+
+      if (options.storeResults) {
+        STORED_SEARCHES[searchId] = {
+          searchState,
+          state: stateOfSearch,
+        };
+      }
 
       // this would be a wasted instruction otherwise as it'd be reversed
       if (
@@ -2372,19 +2428,22 @@ export class ActualItemDefinitionProvider extends
         this.props.itemDefinitionInstance.setInternalState(
           this.props.forId || null,
           this.props.forVersion || null,
-          searchStateInfo,
+          {
+            searchState,
+            state: stateOfSearch,
+          },
         );
       }
 
       if (!this.isUnmounted) {
         this.setState({
-          ...searchStateInfo,
+          ...searchState,
           pokedElements,
         });
       }
       this.clean(options, "fail");
     } else {
-      const searchStateInfo = {
+      const searchState = {
         searchError: null as any,
         searching: false,
         searchResults: results,
@@ -2392,7 +2451,7 @@ export class ActualItemDefinitionProvider extends
         searchCount: count,
         searchLimit: limit,
         searchOffset: offset,
-        searchId: uuid.v4(),
+        searchId,
         searchOwner: options.createdBy || null,
         searchParent,
         searchShouldCache: !!options.cachePolicy,
@@ -2400,6 +2459,13 @@ export class ActualItemDefinitionProvider extends
         searchRequestedProperties: options.requestedProperties,
         searchRequestedIncludes: options.requestedIncludes || [],
       };
+
+      if (options.storeResults) {
+        STORED_SEARCHES[searchId] = {
+          searchState,
+          state: stateOfSearch,
+        };
+      }
 
       // this would be a wasted instruction otherwise as it'd be reversed
       if (
@@ -2409,13 +2475,16 @@ export class ActualItemDefinitionProvider extends
         this.props.itemDefinitionInstance.setInternalState(
           this.props.forId || null,
           this.props.forVersion || null,
-          searchStateInfo,
+          {
+            searchState,
+            state: stateOfSearch,
+          },
         );
       }
 
       if (!this.isUnmounted) {
         this.setState({
-          ...searchStateInfo,
+          ...searchState,
           pokedElements,
         });
       }
@@ -2423,6 +2492,7 @@ export class ActualItemDefinitionProvider extends
     }
 
     return {
+      searchId,
       results,
       records,
       count,
@@ -2630,6 +2700,7 @@ export class ActualItemDefinitionProvider extends
           delete: this.delete,
           clean: this.clean,
           search: this.search,
+          loadSearch: this.loadSearch,
           forId: this.props.forId || null,
           forVersion: this.props.forVersion || null,
           dismissLoadError: this.dismissLoadError,

@@ -41,7 +41,6 @@ export interface ISearchLoaderProps {
   includePolicies?: boolean;
   cleanOnDismount?: boolean;
   static?: "TOTAL" | "NO_LISTENING";
-  useSearchHistory?: boolean;
   onSearchDataChange?: () => number | void;
 }
 
@@ -89,16 +88,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   }
   public componentDidMount() {
     this.refreshPage();
-    if (this.props.useSearchHistory) {
-      this.loadFromQS();
-    }
-  }
-  public refreshSearchQS() {
-    // TODO update the search querystring to match if necessary
-  }
-  public loadFromQS() {
-    // TODO load and execute a search based on the querystring value, we need to
-    // ensure to execute search from the parent based on the QS data
   }
   public componentDidUpdate(prevProps: IActualSearchLoaderProps) {
     let currentPage = this.props.currentPage;
@@ -110,10 +99,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         if (typeof newPage === "number") {
           currentPage = newPage;
         }
-      }
-
-      if (this.props.useSearchHistory) {
-        this.refreshSearchQS();
       }
     }
 
