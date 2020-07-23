@@ -7,6 +7,8 @@ import {
   checkBasicFieldsAreAvailableForRole,
   runPolicyCheck,
   validateTokenIsntBlocked,
+  defaultTriggerForbiddenFunction,
+  defaultTriggerInvalidForbiddenFunction,
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import { EndpointError } from "../../../base/errors";
@@ -16,6 +18,7 @@ import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { TriggerActions } from "../triggers";
+import { IGQLValue } from "../../../gql-querier";
 
 export async function deleteItemDefinition(
   appData: IAppDataType,
@@ -136,12 +139,15 @@ export async function deleteItemDefinition(
   // and extract the triggers from the registry
   const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef]
   const moduleTrigger = appData.triggers.module[pathOfThisModule];
+
+  let currentWholeValueAsGQL: IGQLValue;
+
   // if we got any of them
   if (
     itemDefinitionTrigger || moduleTrigger
   ) {
     // we need to use the gql stored value for the trigger
-    const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+    currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
       appData.knex,
       appData.cache.getServerData(),
       itemDefinition,
@@ -154,12 +160,17 @@ export async function deleteItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        from: currentWholeValueAsGQL,
+        value: currentWholeValueAsGQL,
         update: null,
         extraArgs: resolverArgs.args,
         action: TriggerActions.DELETE,
         id: resolverArgs.args.id as number,
         version: resolverArgs.args.version as string || null,
+        user: {
+          role: tokenData.role,
+          id: tokenData.id,
+        },
+        forbid: defaultTriggerForbiddenFunction,
       });
     }
     // same with the item definition
@@ -169,12 +180,17 @@ export async function deleteItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        from: currentWholeValueAsGQL,
+        value: currentWholeValueAsGQL,
         update: null,
         extraArgs: resolverArgs.args,
         action: TriggerActions.DELETE,
         id: resolverArgs.args.id as number,
         version: resolverArgs.args.version as string || null,
+        user: {
+          role: tokenData.role,
+          id: tokenData.id,
+        },
+        forbid: defaultTriggerForbiddenFunction,
       });
     }
   }
@@ -187,6 +203,47 @@ export async function deleteItemDefinition(
     contentId,
     resolverArgs.args.listener_uuid || null,
   );
+
+  if (moduleTrigger) {
+    // we execute the trigger
+    await moduleTrigger({
+      appData,
+      itemDefinition,
+      module: mod,
+      value: currentWholeValueAsGQL,
+      update: null,
+      extraArgs: resolverArgs.args,
+      action: TriggerActions.DELETED,
+      id: resolverArgs.args.id as number,
+      version: resolverArgs.args.version as string || null,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+      },
+      forbid: defaultTriggerInvalidForbiddenFunction,
+    });
+  }
+
+  // same with the item definition
+  if (itemDefinitionTrigger) {
+    // we call the trigger
+    await itemDefinitionTrigger({
+      appData,
+      itemDefinition,
+      module: mod,
+      value: currentWholeValueAsGQL,
+      update: null,
+      extraArgs: resolverArgs.args,
+      action: TriggerActions.DELETED,
+      id: resolverArgs.args.id as number,
+      version: resolverArgs.args.version as string || null,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+      },
+      forbid: defaultTriggerInvalidForbiddenFunction,
+    });
+  }
 
   logger.debug(
     "deleteItemDefinition: done",

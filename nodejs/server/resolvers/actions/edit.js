@@ -137,11 +137,13 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
     // and extract the triggers from the registry
     const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef];
     const moduleTrigger = appData.triggers.module[pathOfThisModule];
+    let extraArgs;
     // if we got any of them
     if (itemDefinitionTrigger || moduleTrigger) {
         // we split the args in the graphql query for that which belongs to the
         // item definition and that which is extra
-        const [itemDefinitionSpecificArgs, extraArgs] = basic_1.splitArgsInGraphqlQuery(itemDefinition, resolverArgs.args);
+        const [itemDefinitionSpecificArgs, extraArgsFromSplit] = basic_1.splitArgsInGraphqlQuery(itemDefinition, resolverArgs.args);
+        extraArgs = extraArgsFromSplit;
         // so now we just want to convert the values setup here, as done
         // some heavy lifting
         gqlValueToConvert = itemDefinitionSpecificArgs;
@@ -152,12 +154,17 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
                 appData,
                 itemDefinition,
                 module: mod,
-                from: currentWholeValueAsGQL,
+                value: currentWholeValueAsGQL,
                 update: gqlValueToConvert,
                 extraArgs,
                 action: triggers_1.TriggerActions.EDIT,
                 id: resolverArgs.args.id,
                 version: resolverArgs.args.version || null,
+                user: {
+                    role: tokenData.role,
+                    id: tokenData.id,
+                },
+                forbid: basic_1.defaultTriggerForbiddenFunction,
             });
             // and if we have a new value
             if (newValueAccordingToModule) {
@@ -172,12 +179,17 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
                 appData,
                 itemDefinition,
                 module: mod,
-                from: currentWholeValueAsGQL,
+                value: currentWholeValueAsGQL,
                 update: gqlValueToConvert,
                 extraArgs,
                 action: triggers_1.TriggerActions.EDIT,
                 id: resolverArgs.args.id,
                 version: resolverArgs.args.version || null,
+                user: {
+                    role: tokenData.role,
+                    id: tokenData.id,
+                },
+                forbid: basic_1.defaultTriggerForbiddenFunction,
             });
             // and make it the new value if such trigger was registered
             if (newValueAccordingToIdef) {
@@ -187,6 +199,45 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
     }
     const dictionary = basic_1.getDictionary(appData, resolverArgs.args);
     const sqlValue = await appData.cache.requestUpdate(itemDefinition, resolverArgs.args.id, resolverArgs.args.version || null, gqlValueToConvert, currentWholeValueAsGQL, tokenData.id, dictionary, containerId, resolverArgs.args.listener_uuid || null);
+    if (moduleTrigger) {
+        // we execute the trigger
+        await moduleTrigger({
+            appData,
+            itemDefinition,
+            module: mod,
+            value: currentWholeValueAsGQL,
+            update: gqlValueToConvert,
+            extraArgs,
+            action: triggers_1.TriggerActions.EDITED,
+            id: resolverArgs.args.id,
+            version: resolverArgs.args.version || null,
+            user: {
+                role: tokenData.role,
+                id: tokenData.id,
+            },
+            forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
+        });
+    }
+    // same with the item definition
+    if (itemDefinitionTrigger) {
+        // we call the trigger
+        await itemDefinitionTrigger({
+            appData,
+            itemDefinition,
+            module: mod,
+            value: currentWholeValueAsGQL,
+            update: gqlValueToConvert,
+            extraArgs,
+            action: triggers_1.TriggerActions.EDITED,
+            id: resolverArgs.args.id,
+            version: resolverArgs.args.version || null,
+            user: {
+                role: tokenData.role,
+                id: tokenData.id,
+            },
+            forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
+        });
+    }
     __1.logger.debug("editItemDefinition: SQL ouput retrieved");
     __1.logger.silly("editItemDefinition: Value is", sqlValue);
     // convert it using the requested fields for that, and ignoring everything else

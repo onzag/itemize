@@ -96,22 +96,28 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     // and extract the triggers from the registry
     const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef];
     const moduleTrigger = appData.triggers.module[pathOfThisModule];
+    let currentWholeValueAsGQL;
     // if we got any of them
     if (itemDefinitionTrigger || moduleTrigger) {
         // we need to use the gql stored value for the trigger
-        const currentWholeValueAsGQL = sql_1.convertSQLValueToGQLValueForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, wholeSqlStoredValue);
+        currentWholeValueAsGQL = sql_1.convertSQLValueToGQLValueForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, wholeSqlStoredValue);
         if (moduleTrigger) {
             // we execute the trigger
             await moduleTrigger({
                 appData,
                 itemDefinition,
                 module: mod,
-                from: currentWholeValueAsGQL,
+                value: currentWholeValueAsGQL,
                 update: null,
                 extraArgs: resolverArgs.args,
                 action: triggers_1.TriggerActions.DELETE,
                 id: resolverArgs.args.id,
                 version: resolverArgs.args.version || null,
+                user: {
+                    role: tokenData.role,
+                    id: tokenData.id,
+                },
+                forbid: basic_1.defaultTriggerForbiddenFunction,
             });
         }
         // same with the item definition
@@ -121,16 +127,60 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
                 appData,
                 itemDefinition,
                 module: mod,
-                from: currentWholeValueAsGQL,
+                value: currentWholeValueAsGQL,
                 update: null,
                 extraArgs: resolverArgs.args,
                 action: triggers_1.TriggerActions.DELETE,
                 id: resolverArgs.args.id,
                 version: resolverArgs.args.version || null,
+                user: {
+                    role: tokenData.role,
+                    id: tokenData.id,
+                },
+                forbid: basic_1.defaultTriggerForbiddenFunction,
             });
         }
     }
     await appData.cache.requestDelete(itemDefinition, resolverArgs.args.id, resolverArgs.args.version, false, contentId, resolverArgs.args.listener_uuid || null);
+    if (moduleTrigger) {
+        // we execute the trigger
+        await moduleTrigger({
+            appData,
+            itemDefinition,
+            module: mod,
+            value: currentWholeValueAsGQL,
+            update: null,
+            extraArgs: resolverArgs.args,
+            action: triggers_1.TriggerActions.DELETED,
+            id: resolverArgs.args.id,
+            version: resolverArgs.args.version || null,
+            user: {
+                role: tokenData.role,
+                id: tokenData.id,
+            },
+            forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
+        });
+    }
+    // same with the item definition
+    if (itemDefinitionTrigger) {
+        // we call the trigger
+        await itemDefinitionTrigger({
+            appData,
+            itemDefinition,
+            module: mod,
+            value: currentWholeValueAsGQL,
+            update: null,
+            extraArgs: resolverArgs.args,
+            action: triggers_1.TriggerActions.DELETED,
+            id: resolverArgs.args.id,
+            version: resolverArgs.args.version || null,
+            user: {
+                role: tokenData.role,
+                id: tokenData.id,
+            },
+            forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
+        });
+    }
     __1.logger.debug("deleteItemDefinition: done");
     // return null, yep, the output is always null, because it's gone
     // however we are not running the check on the fields that can be read

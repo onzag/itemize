@@ -13,6 +13,8 @@ import {
   runPolicyCheck,
   splitArgsInGraphqlQuery,
   validateContainerIdIsReal,
+  defaultTriggerForbiddenFunction,
+  defaultTriggerInvalidForbiddenFunction,
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import {
@@ -307,12 +309,17 @@ export async function addItemDefinition(
         appData,
         itemDefinition: itemDefinition,
         module: mod,
-        from: null,
+        value: null,
         update: gqlValueToConvert,
         extraArgs,
         action: TriggerActions.CREATE,
         id: null,
         version: null,
+        user: {
+          role: tokenData.role,
+          id: tokenData.id,
+        },
+        forbid: defaultTriggerForbiddenFunction,
       });
       // and if we have a new value
       if (newValueAccordingToModule) {
@@ -327,12 +334,17 @@ export async function addItemDefinition(
         appData,
         itemDefinition: itemDefinition,
         module: mod,
-        from: null,
+        value: null,
         update: gqlValueToConvert,
         extraArgs,
         action: TriggerActions.CREATE,
         id: null,
         version: null,
+        user: {
+          role: tokenData.role,
+          id: tokenData.id,
+        },
+        forbid: defaultTriggerForbiddenFunction,
       });
       // and make it the new value if such trigger was registered
       if (newValueAccordingToIdef) {
@@ -391,12 +403,17 @@ export async function addItemDefinition(
       appData,
       itemDefinition: itemDefinition,
       module: mod,
-      from: null,
+      value: null,
       update: gqlValueToConvert,
       extraArgs,
       action: TriggerActions.CREATED,
       id: value.id,
       version: value.version,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+      },
+      forbid: defaultTriggerInvalidForbiddenFunction,
     });
   }
   if (itemDefinitionTrigger) {
@@ -404,12 +421,17 @@ export async function addItemDefinition(
       appData,
       itemDefinition: itemDefinition,
       module: mod,
-      from: null,
+      value: null,
       update: gqlValueToConvert,
       extraArgs,
       action: TriggerActions.CREATED,
       id: value.id,
       version: value.version,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+      },
+      forbid: defaultTriggerInvalidForbiddenFunction,
     });
   }
 

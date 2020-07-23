@@ -12,6 +12,8 @@ export interface IServerSideTokenDataType {
     role: string;
     sessionId: number;
 }
+export declare function defaultTriggerForbiddenFunction(message: string): void;
+export declare function defaultTriggerInvalidForbiddenFunction(message: string): void;
 /**
  * Given a token, it validates and provides the role information
  * for use in the system
@@ -79,6 +81,7 @@ export interface IFilteredAndPreparedValueType {
     toReturnToUser: any;
     actualValue: any;
     requestFields: any;
+    convertedValue: any;
 }
 /**
  * Filters and prepares a graphql value for output to the rest endpoint

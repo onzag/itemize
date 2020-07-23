@@ -14,6 +14,20 @@ const deep_equal_1 = __importDefault(require("deep-equal"));
 const Include_1 = require("../../base/Root/Module/ItemDefinition/Include");
 const token_1 = require("../token");
 const search_mode_1 = require("../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode");
+function defaultTriggerForbiddenFunction(message) {
+    throw new errors_1.EndpointError({
+        message,
+        code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+    });
+}
+exports.defaultTriggerForbiddenFunction = defaultTriggerForbiddenFunction;
+function defaultTriggerInvalidForbiddenFunction(message) {
+    __1.logger.error("Attempted to forbid on an already allowed action, this means that you attempted to call forbid on CREATED, EDITED or DELETED", {
+        message,
+    });
+    return;
+}
+exports.defaultTriggerInvalidForbiddenFunction = defaultTriggerInvalidForbiddenFunction;
 /**
  * Given a token, it validates and provides the role information
  * for use in the system
@@ -467,6 +481,7 @@ function filterAndPrepareGQLValue(knex, serverData, value, requestedFields, role
         toReturnToUser: actualValue,
         actualValue,
         requestFields: finalRequestFields,
+        convertedValue: valueOfTheItem,
     };
     if (value.blocked_at !== null) {
         const rolesThatHaveAccessToModerationFields = parentModuleOrIdef.getRolesWithModerationAccess();

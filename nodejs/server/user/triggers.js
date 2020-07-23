@@ -10,12 +10,12 @@ exports.customUserTriggers = {
             // check for sessionId changes in order to trigger a whole kick
             // event
             if ((arg.action === triggers_1.TriggerActions.CREATE || arg.action === triggers_1.TriggerActions.EDIT) &&
-                arg.from &&
+                arg.value &&
                 arg.update) {
                 const newSessionId = arg.update.sessionId;
-                const oldSessionId = arg.from.sessionId;
+                const oldSessionId = arg.value.sessionId;
                 if (newSessionId && newSessionId !== oldSessionId) {
-                    arg.appData.listener.sendKickEvent(arg.from.id);
+                    arg.appData.listener.sendKickEvent(arg.value.id);
                 }
             }
             // we add a trigger for when the user updated the email
@@ -30,7 +30,7 @@ exports.customUserTriggers = {
                 // and this is the email that was changed to
                 // !arg from means this is a new user that has assigned itself an email
                 // or the new Email is not undefined and the new email is not equal to the old
-                const changedEmail = !arg.from || (typeof newEmail !== "undefined" && newEmail !== arg.from.email);
+                const changedEmail = !arg.value || (typeof newEmail !== "undefined" && newEmail !== arg.value.email);
                 // newEmail being set is not null, and new email being set is not undefined which means is not
                 // being updated at all
                 if (changedEmail && newEmail !== null && typeof newEmail !== "undefined") {

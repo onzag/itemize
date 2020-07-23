@@ -10,6 +10,7 @@ const graphql_fields_1 = __importDefault(require("graphql-fields"));
 const constants_1 = require("../../../constants");
 const gql_util_1 = require("../../../gql-util");
 const errors_1 = require("../../../base/errors");
+const triggers_1 = require("../triggers");
 async function getItemDefinition(appData, resolverArgs, itemDefinition) {
     __1.logger.debug("getItemDefinition: executed get for " + itemDefinition.getQualifiedPathName());
     // first we check that the language and region provided are
@@ -78,10 +79,54 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
     __1.logger.debug("getItemDefinition: SQL ouput retrieved");
     __1.logger.silly("getItemDefinition: value is", selectQueryValue);
     const valueToProvide = basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), selectQueryValue, requestedFields, tokenData.role, itemDefinition);
+    // now we need to find the triggers
+    const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
+    const mod = itemDefinition.getParentModule();
+    const pathOfThisModule = mod.getPath().join("/");
+    // and extract the triggers from the registry
+    const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef];
+    const moduleTrigger = appData.triggers.module[pathOfThisModule];
+    let toReturnToUser = valueToProvide.toReturnToUser;
+    if (moduleTrigger) {
+        await moduleTrigger({
+            appData,
+            itemDefinition,
+            module: mod,
+            value: valueToProvide.convertedValue,
+            update: null,
+            extraArgs: resolverArgs.args,
+            action: triggers_1.TriggerActions.GET,
+            id: resolverArgs.args.id,
+            version: resolverArgs.args.version || null,
+            user: {
+                role: tokenData.role,
+                id: tokenData.id,
+            },
+            forbid: basic_1.defaultTriggerForbiddenFunction,
+        });
+    }
+    if (itemDefinitionTrigger) {
+        await itemDefinitionTrigger({
+            appData,
+            itemDefinition,
+            module: mod,
+            value: valueToProvide.convertedValue,
+            update: null,
+            extraArgs: resolverArgs.args,
+            action: triggers_1.TriggerActions.GET,
+            id: resolverArgs.args.id,
+            version: resolverArgs.args.version || null,
+            user: {
+                role: tokenData.role,
+                id: tokenData.id,
+            },
+            forbid: basic_1.defaultTriggerForbiddenFunction,
+        });
+    }
     __1.logger.debug("getItemDefinition: GQL ouput retrieved");
-    __1.logger.silly("getItemDefinition: value is", valueToProvide.toReturnToUser);
+    __1.logger.silly("getItemDefinition: value is", toReturnToUser);
     // return if otherwise succeeds
-    return valueToProvide.toReturnToUser;
+    return toReturnToUser;
 }
 exports.getItemDefinition = getItemDefinition;
 async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {

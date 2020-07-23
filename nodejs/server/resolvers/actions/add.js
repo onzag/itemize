@@ -202,12 +202,17 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
                 appData,
                 itemDefinition: itemDefinition,
                 module: mod,
-                from: null,
+                value: null,
                 update: gqlValueToConvert,
                 extraArgs,
                 action: triggers_1.TriggerActions.CREATE,
                 id: null,
                 version: null,
+                user: {
+                    role: tokenData.role,
+                    id: tokenData.id,
+                },
+                forbid: basic_1.defaultTriggerForbiddenFunction,
             });
             // and if we have a new value
             if (newValueAccordingToModule) {
@@ -222,12 +227,17 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
                 appData,
                 itemDefinition: itemDefinition,
                 module: mod,
-                from: null,
+                value: null,
                 update: gqlValueToConvert,
                 extraArgs,
                 action: triggers_1.TriggerActions.CREATE,
                 id: null,
                 version: null,
+                user: {
+                    role: tokenData.role,
+                    id: tokenData.id,
+                },
+                forbid: basic_1.defaultTriggerForbiddenFunction,
             });
             // and make it the new value if such trigger was registered
             if (newValueAccordingToIdef) {
@@ -259,12 +269,17 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
             appData,
             itemDefinition: itemDefinition,
             module: mod,
-            from: null,
+            value: null,
             update: gqlValueToConvert,
             extraArgs,
             action: triggers_1.TriggerActions.CREATED,
             id: value.id,
             version: value.version,
+            user: {
+                role: tokenData.role,
+                id: tokenData.id,
+            },
+            forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
         });
     }
     if (itemDefinitionTrigger) {
@@ -272,12 +287,17 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
             appData,
             itemDefinition: itemDefinition,
             module: mod,
-            from: null,
+            value: null,
             update: gqlValueToConvert,
             extraArgs,
             action: triggers_1.TriggerActions.CREATED,
             id: value.id,
             version: value.version,
+            user: {
+                role: tokenData.role,
+                id: tokenData.id,
+            },
+            forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
         });
     }
     __1.logger.debug("addItemDefinition: GQL output calculated", finalOutput);

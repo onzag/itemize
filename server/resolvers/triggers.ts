@@ -7,12 +7,15 @@ export enum TriggerActions {
   CREATE,
   CREATED,
   EDIT,
+  EDITED,
   DELETE,
+  DELETED,
+  GET,
 }
 
 export interface TriggerArgType {
   appData: IAppDataType;
-  from: IGQLValue;
+  value: IGQLValue;
   update: IGQLArgs;
   extraArgs: IGQLArgs;
   itemDefinition: ItemDefinition;
@@ -20,6 +23,11 @@ export interface TriggerArgType {
   action: TriggerActions;
   id: number;
   version: string;
+  user: {
+    role: string;
+    id: number;
+  },
+  forbid: (message: string) => void;
 }
 
 export type TriggerType = (arg: TriggerArgType) => IGQLValue | Promise<IGQLValue>;

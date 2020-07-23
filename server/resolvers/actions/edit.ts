@@ -10,6 +10,8 @@ import {
   runPolicyCheck,
   validateTokenIsntBlocked,
   splitArgsInGraphqlQuery,
+  defaultTriggerForbiddenFunction,
+  defaultTriggerInvalidForbiddenFunction,
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import {
@@ -234,16 +236,21 @@ export async function editItemDefinition(
   // and extract the triggers from the registry
   const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef]
   const moduleTrigger = appData.triggers.module[pathOfThisModule];
+
+  let extraArgs: IGQLArgs;
+
   // if we got any of them
   if (
     itemDefinitionTrigger || moduleTrigger
   ) {
     // we split the args in the graphql query for that which belongs to the
     // item definition and that which is extra
-    const [itemDefinitionSpecificArgs, extraArgs] = splitArgsInGraphqlQuery(
+    const [itemDefinitionSpecificArgs, extraArgsFromSplit] = splitArgsInGraphqlQuery(
       itemDefinition,
       resolverArgs.args,
     );
+    extraArgs = extraArgsFromSplit;
+
     // so now we just want to convert the values setup here, as done
     // some heavy lifting
     gqlValueToConvert = itemDefinitionSpecificArgs;
@@ -254,12 +261,17 @@ export async function editItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        from: currentWholeValueAsGQL,
+        value: currentWholeValueAsGQL,
         update: gqlValueToConvert,
         extraArgs,
         action: TriggerActions.EDIT,
         id: resolverArgs.args.id as number,
         version: resolverArgs.args.version as string || null,
+        user: {
+          role: tokenData.role,
+          id: tokenData.id,
+        },
+        forbid: defaultTriggerForbiddenFunction,
       });
       // and if we have a new value
       if (newValueAccordingToModule) {
@@ -274,12 +286,17 @@ export async function editItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        from: currentWholeValueAsGQL,
+        value: currentWholeValueAsGQL,
         update: gqlValueToConvert,
         extraArgs,
         action: TriggerActions.EDIT,
         id: resolverArgs.args.id as number,
         version: resolverArgs.args.version as string || null,
+        user: {
+          role: tokenData.role,
+          id: tokenData.id,
+        },
+        forbid: defaultTriggerForbiddenFunction,
       });
       // and make it the new value if such trigger was registered
       if (newValueAccordingToIdef) {
@@ -300,6 +317,46 @@ export async function editItemDefinition(
     containerId,
     resolverArgs.args.listener_uuid || null,
   );
+
+  if (moduleTrigger) {
+    // we execute the trigger
+    await moduleTrigger({
+      appData,
+      itemDefinition,
+      module: mod,
+      value: currentWholeValueAsGQL,
+      update: gqlValueToConvert,
+      extraArgs,
+      action: TriggerActions.EDITED,
+      id: resolverArgs.args.id as number,
+      version: resolverArgs.args.version as string || null,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+      },
+      forbid: defaultTriggerInvalidForbiddenFunction,
+    });
+  }
+  // same with the item definition
+  if (itemDefinitionTrigger) {
+    // we call the trigger
+    await itemDefinitionTrigger({
+      appData,
+      itemDefinition,
+      module: mod,
+      value: currentWholeValueAsGQL,
+      update: gqlValueToConvert,
+      extraArgs,
+      action: TriggerActions.EDITED,
+      id: resolverArgs.args.id as number,
+      version: resolverArgs.args.version as string || null,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+      },
+      forbid: defaultTriggerInvalidForbiddenFunction,
+    });
+  }
 
   logger.debug(
     "editItemDefinition: SQL ouput retrieved",

@@ -11,6 +11,7 @@ import {
   checkListTypes,
   runPolicyCheck,
   checkReadPoliciesAllowThisUserToSearch,
+  defaultTriggerForbiddenFunction,
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import {
@@ -23,6 +24,7 @@ import Module from "../../../base/Root/Module";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { EndpointError } from "../../../base/errors";
 import { IGQLSearchRecord } from "../../../gql-querier";
+import { TriggerActions } from "../triggers";
 
 export async function getItemDefinition(
   appData: IAppDataType,
@@ -142,16 +144,64 @@ export async function getItemDefinition(
     itemDefinition,
   );
 
+  // now we need to find the triggers
+  const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
+  const mod = itemDefinition.getParentModule();
+  const pathOfThisModule = mod.getPath().join("/");
+  // and extract the triggers from the registry
+  const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef]
+  const moduleTrigger = appData.triggers.module[pathOfThisModule];
+
+  let toReturnToUser: any = valueToProvide.toReturnToUser;
+
+  if (moduleTrigger) {
+    await moduleTrigger({
+      appData,
+      itemDefinition,
+      module: mod,
+      value: valueToProvide.convertedValue,
+      update: null,
+      extraArgs: resolverArgs.args,
+      action: TriggerActions.GET,
+      id: resolverArgs.args.id as number,
+      version: resolverArgs.args.version as string || null,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+      },
+      forbid: defaultTriggerForbiddenFunction,
+    });
+  }
+
+  if (itemDefinitionTrigger) {
+    await itemDefinitionTrigger({
+      appData,
+      itemDefinition,
+      module: mod,
+      value: valueToProvide.convertedValue,
+      update: null,
+      extraArgs: resolverArgs.args,
+      action: TriggerActions.GET,
+      id: resolverArgs.args.id as number,
+      version: resolverArgs.args.version as string || null,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+      },
+      forbid: defaultTriggerForbiddenFunction,
+    });
+  }
+
   logger.debug(
     "getItemDefinition: GQL ouput retrieved",
   );
   logger.silly(
     "getItemDefinition: value is",
-    valueToProvide.toReturnToUser,
+    toReturnToUser,
   );
 
   // return if otherwise succeeds
-  return valueToProvide.toReturnToUser;
+  return toReturnToUser;
 }
 
 export async function getItemDefinitionList(

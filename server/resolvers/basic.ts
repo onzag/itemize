@@ -29,6 +29,23 @@ export interface IServerSideTokenDataType {
   sessionId: number;
 }
 
+export function defaultTriggerForbiddenFunction(message: string) {
+  throw new EndpointError({
+    message,
+    code: ENDPOINT_ERRORS.FORBIDDEN,
+  });
+}
+
+export function defaultTriggerInvalidForbiddenFunction(message: string) {
+  logger.error(
+    "Attempted to forbid on an already allowed action, this means that you attempted to call forbid on CREATED, EDITED or DELETED",
+    {
+      message,
+    }
+  );
+  return;
+}
+
 /**
  * Given a token, it validates and provides the role information
  * for use in the system
@@ -517,6 +534,7 @@ export interface IFilteredAndPreparedValueType {
   toReturnToUser: any;
   actualValue: any;
   requestFields: any;
+  convertedValue: any;
 }
 
 /**
@@ -583,6 +601,7 @@ export function filterAndPrepareGQLValue(
     toReturnToUser: actualValue,
     actualValue,
     requestFields: finalRequestFields,
+    convertedValue: valueOfTheItem,
   };
   if (value.blocked_at !== null) {
     const rolesThatHaveAccessToModerationFields = parentModuleOrIdef.getRolesWithModerationAccess();
