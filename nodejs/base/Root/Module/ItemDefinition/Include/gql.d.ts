@@ -13,6 +13,8 @@ import { IGQLFieldsDefinitionType } from "../../../gql";
  * @param include the include
  * @param options.propertiesAsInput if it's in input mode to get
  * graphql input fields instead
+ * @param options.optionalForm makes all the field of the include optional
+ * so they can be decided
  * @returns a list of field definitions that represent the include in graphql form
  * for use within the graphql description
  */

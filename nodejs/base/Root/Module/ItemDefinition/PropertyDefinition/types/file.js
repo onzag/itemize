@@ -1,6 +1,8 @@
 "use strict";
 /**
  * Contains the single file type description
+ *
+ * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const sql_1 = require("../sql");

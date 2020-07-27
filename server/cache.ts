@@ -19,7 +19,7 @@ import { Listener } from "./listener";
 import Root from "../base/Root";
 import { convertGQLValueToSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
-import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
+import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
 import { IOwnedSearchRecordsAddedEvent, IParentedSearchRecordsAddedEvent } from "../base/remote-protocol";
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
 import { EndpointError } from "../base/errors";

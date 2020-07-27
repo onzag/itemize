@@ -270,6 +270,23 @@ declare const _default: {
         versionIsCountry: {
             type: string;
         };
+        requestLimiters: {
+            type: string;
+            properties: {
+                condition: {
+                    type: string;
+                    enum: string[];
+                };
+                custom: {
+                    type: string;
+                    items: {
+                        type: string;
+                    };
+                };
+            };
+            additionalProperties: boolean;
+            required: string[];
+        };
     };
     definitions: {
         PropertyDefinition: {

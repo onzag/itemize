@@ -39,7 +39,7 @@ const dbbuilder_1 = __importDefault(require("../dbbuilder"));
 const global_manager_1 = require("./global-manager");
 const generator_1 = require("./ssr/generator");
 const rootpool_1 = require("./rootpool");
-const sql_files_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files");
+const file_management_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management");
 const generator_2 = require("./seo/generator");
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
@@ -492,7 +492,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             await Promise.all(Object.keys(pkgcloudUploadContainers).map(async (containerId) => {
                 exports.logger.info("initializeServer: cleaning " + containerId);
                 const container = pkgcloudUploadContainers[containerId];
-                await sql_files_1.removeFolderFor(container.container, "");
+                await file_management_1.removeFolderFor(container.container, "");
             }));
             process.exit(0);
         }

@@ -261,6 +261,23 @@ export default {
     versionIsCountry: {
       type: "boolean",
     },
+    requestLimiters: {
+      type: "object",
+      properties: {
+        condition: {
+          type: "string",
+          enum: ["AND", "OR"],
+        },
+        custom: {
+          type: "array",
+          items: {
+            type: "string",
+          }
+        }
+      },
+      additionalProperties: false,
+      required: ["condition", "custom"],
+    }
   },
   definitions: {
     PropertyDefinition: PropertyDefinitionSchema,

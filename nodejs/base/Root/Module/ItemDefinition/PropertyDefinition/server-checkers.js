@@ -11,6 +11,8 @@ const constants_1 = require("../../../../../constants");
 /**
  * The server side index checker checks for unique indexes within properties
  * @param knex the Knex instance
+ * @param itemDefinition item definition
+ * @param include the include where the property resides (or null)
  * @param property the property in question
  * @param value the value of that property as requested to check
  * @param id the slot id

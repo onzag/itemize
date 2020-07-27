@@ -10,9 +10,9 @@ import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
 } from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Include";
-import { IModuleRawJSONDataType, IRawJSONI18NDataType, IRequestLimitersType } from "../base/Root/Module";
+import { IModuleRawJSONDataType, IRawJSONI18NDataType, IModuleRequestLimitersType } from "../base/Root/Module";
 import {
-  IItemDefinitionRawJSONDataType, IPoliciesRawJSONDataType,
+  IItemDefinitionRawJSONDataType, IPoliciesRawJSONDataType, IItemDefinitionRequestLimitersType,
 } from "../base/Root/Module/ItemDefinition";
 import {
   PropertyDefinitionSearchInterfacesType,
@@ -88,7 +88,7 @@ interface IFileModuleDataRawUntreatedJSONDataType {
   searchable?: boolean;
   maxSearchResults?: number;
   maxSearchRecords?: number;
-  requestLimiters?: IRequestLimitersType;
+  requestLimiters?: IModuleRequestLimitersType;
 }
 
 /**
@@ -112,6 +112,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   versionIsLanguageAndCountry?: boolean;
   versionIsLanguage?: boolean;
   versionIsCountry?: boolean;
+  requestLimiters?: IItemDefinitionRequestLimitersType;
 }
 
 export default async function build() {
@@ -671,6 +672,10 @@ async function buildItemDefinition(
     if (actualEvaledFileData.versionIsLanguageAndCountry) {
       finalValue.versionIsLanguageAndCountry = actualEvaledFileData.versionIsLanguageAndCountry;
     }
+  }
+
+  if (actualEvaledFileData.requestLimiters) {
+    finalValue.requestLimiters = actualEvaledFileData.requestLimiters;
   }
 
   if (!finalValue.includes ||

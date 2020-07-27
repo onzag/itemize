@@ -9,13 +9,13 @@
 
 import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces";
 import { INCLUDE_PREFIX } from "../../../../../constants";
-import { IGQLArgs, IGQLValue } from "../../../../../gql-querier";
 import Moment from "moment";
 import { ILocalSearchInfo } from "./types";
 
 /**
  * Performs a local search of an exact and ranged search for
  * a property value
+ * @param arg the local search arg info
  * @returns a boolean on whether it matches
  */
 export function standardLocalSearchExactAndRange(arg: ILocalSearchInfo) {
@@ -67,38 +67,33 @@ export function standardLocalSearchExactAndRange(arg: ILocalSearchInfo) {
  * Runs the same as the standard sql search exact and range but using the date
  * functionality
  * @param format the format either DATE_FORMAT TIME_FORMAT or DATETIME_FORMAT
- * @param args the whole raw arguments from graphql
- * @param rawData the raw data non flattened of the current value being questioned
- * @param id the id of the property
- * @param includeId an optional include id
+ * @param arg the local search arg info
  * @returns a boolean on whether it matches
  */
 export function dateLocalSearchExactAndRange(
   format: string,
-  args: IGQLArgs,
-  rawData: IGQLValue,
-  id: string,
-  includeId?: string,
+  arg: ILocalSearchInfo
 ) {
   // item is deleted
-  if (!rawData) {
+  if (!arg.gqlValue) {
     return false;
   }
   // item is blocked
-  if (rawData.DATA === null) {
+  if (arg.gqlValue.DATA === null) {
     return false;
   }
 
   // we get the names just as we did standard before
-  const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + id;
-  const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + id;
-  const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + id;
+  const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.id;
+  const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.id;
+  const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.id;
 
   // now the useful args again
-  const usefulArgs = includeId ? args[INCLUDE_PREFIX + includeId] || {} : args;
+  const usefulArgs = arg.include ? arg.args[INCLUDE_PREFIX + arg.include.getId()] || {} : arg.args;
 
   // now we use moment to parse our string value
-  const propertyValueMoment = Moment(includeId ? rawData.DATA[includeId][id] : rawData.DATA[id], format);
+  const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+  const propertyValueMoment = Moment(propertyValue);
 
   // and get the conditions
   const conditions: boolean[] = [];

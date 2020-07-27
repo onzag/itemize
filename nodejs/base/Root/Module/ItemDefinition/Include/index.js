@@ -58,9 +58,9 @@ class Include {
      * The constructor for an Include
      * @param rawJSON the raw data as JSON
      * @param parentModule the parent module
-     * @param parentItemDefinition   the item definition that this node is
-     * located, its root; for the example above that
-     * would be the vehicle item definition
+     * @param parentItemDefinition the item definition that this node is
+     * located, for example if this include is for a car wheel, and is included
+     * in vehicle, this parentItemDefinition would be the vehicle definition
      */
     constructor(rawJSON, parentModule, parentItemDefinition) {
         this.rawData = rawJSON;
@@ -86,10 +86,21 @@ class Include {
         // parent item definition
         this.parentItemDefinition = parentItemDefinition;
         this.parentModule = parentModule;
+        // we call the clean state function that does
+        // both the job of cleaning the state and setting up the initial
+        // state, after all it's the same
         this.cleanState(true);
     }
+    /**
+     * Cleans the state of the include so that is empty and clears
+     * the memory
+     * @param init whether it was called in the constructor for initialization
+     */
     cleanState(init) {
+        // if it's not initialization, we need to clean
+        // the parent
         if (!init) {
+            // so we do it
             this.itemDefinition.cleanState();
         }
         // set the enforced and predefined properties overwrites
@@ -157,27 +168,46 @@ class Include {
             return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
         });
     }
+    /**
+     * Builds the fileds as grapqhl fields for a given role that wants to execute a given
+     * action, that will be the maximum fields of the include this user can request
+     * @param action the action that is to be executed
+     * @param role the role that is executing it
+     * @param userId the user id of that user
+     * @param ownerUserId the owner of the item definition where the include is localed
+     * @returns a graphql fields object
+     */
     buildFieldsForRoleAccess(action, role, userId, ownerUserId) {
+        // for delete we cant request anything
         if (action === __1.ItemDefinitionIOActions.DELETE) {
             return null;
         }
+        // if we have no owner it's impossible to build anything
         if (ownerUserId === null) {
             throw new Error("ownerUserId cannot be null");
         }
+        // now we start building the results
         const requestFields = {};
+        // we go through the sinking properties
         this.getSinkingProperties().forEach((sp) => {
+            // if it is disabled from retrieval it can't be added
             if (sp.isRetrievalDisabled()) {
                 return;
             }
+            // otherwise we get the fields that can be accessed for the property itself
             const fieldsForProperty = sp.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
+            // and add it to the list if we get it
             if (fieldsForProperty) {
                 requestFields[sp.getId()] = fieldsForProperty;
             }
         });
+        // return it
         return requestFields;
     }
     /**
      * Tells whether the current item is excluded
+     * @param id the id of the given exclusion state slot id
+     * @param version the version for the given exclusion state slot id
      * @returns a boolean whether it's excluded or not
      */
     getExclusionState(id, version) {
@@ -223,6 +253,8 @@ class Include {
      * This is for when an item might be included
      * like how a car might have a spare wheel or not usually the
      * case is true but it might be false as well
+     * @param id the id of the given exclusion state slot id
+     * @param version the version for the given exclusion state slot id
      * @returns a boolean that tells whether if it can be toggled
      */
     canExclusionBeSet(id, version) {
@@ -256,6 +288,8 @@ class Include {
     }
     /**
      * Sets the exclusion state to a new value
+     * @param id the id of the given exclusion state slot id
+     * @param version the version for the given exclusion state slot id
      * @param value the value for the exclusion state
      */
     setExclusionState(id, version, value) {
@@ -318,6 +352,8 @@ class Include {
      * Provides the current value of this item
      * @param id the id of the stored item definition or module
      * @param version the slot version
+     * @param emulateExternalChecking whether to emulate the external checking results using
+     * previous cached results
      * @returns the state of the include
      */
     getStateNoExternalChecking(id, version, emulateExternalChecking) {

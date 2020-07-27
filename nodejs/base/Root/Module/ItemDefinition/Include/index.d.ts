@@ -185,11 +185,16 @@ export default class Include {
      * The constructor for an Include
      * @param rawJSON the raw data as JSON
      * @param parentModule the parent module
-     * @param parentItemDefinition   the item definition that this node is
-     * located, its root; for the example above that
-     * would be the vehicle item definition
+     * @param parentItemDefinition the item definition that this node is
+     * located, for example if this include is for a car wheel, and is included
+     * in vehicle, this parentItemDefinition would be the vehicle definition
      */
     constructor(rawJSON: IIncludeRawJSONDataType, parentModule: Module, parentItemDefinition: ItemDefinition);
+    /**
+     * Cleans the state of the include so that is empty and clears
+     * the memory
+     * @param init whether it was called in the constructor for initialization
+     */
     cleanState(init?: boolean): void;
     /**
      * Provides the ids of the sinking properties
@@ -220,9 +225,20 @@ export default class Include {
      * @returns a boolean on whether it has role access
      */
     checkRoleAccessFor(action: ItemDefinitionIOActions, role: string, userId: number, ownerUserId: number, requestedFields: IGQLRequestFields, throwError: boolean): boolean;
+    /**
+     * Builds the fileds as grapqhl fields for a given role that wants to execute a given
+     * action, that will be the maximum fields of the include this user can request
+     * @param action the action that is to be executed
+     * @param role the role that is executing it
+     * @param userId the user id of that user
+     * @param ownerUserId the owner of the item definition where the include is localed
+     * @returns a graphql fields object
+     */
     buildFieldsForRoleAccess(action: ItemDefinitionIOActions, role: string, userId: number, ownerUserId: number): IGQLRequestFields;
     /**
      * Tells whether the current item is excluded
+     * @param id the id of the given exclusion state slot id
+     * @param version the version for the given exclusion state slot id
      * @returns a boolean whether it's excluded or not
      */
     getExclusionState(id: number, version: string): IncludeExclusionState;
@@ -231,6 +247,8 @@ export default class Include {
      * This is for when an item might be included
      * like how a car might have a spare wheel or not usually the
      * case is true but it might be false as well
+     * @param id the id of the given exclusion state slot id
+     * @param version the version for the given exclusion state slot id
      * @returns a boolean that tells whether if it can be toggled
      */
     canExclusionBeSet(id: number, version: string): boolean;
@@ -250,6 +268,8 @@ export default class Include {
     isExclusionCallout(): boolean;
     /**
      * Sets the exclusion state to a new value
+     * @param id the id of the given exclusion state slot id
+     * @param version the version for the given exclusion state slot id
      * @param value the value for the exclusion state
      */
     setExclusionState(id: number, version: string, value: IncludeExclusionState): void;
@@ -293,6 +313,8 @@ export default class Include {
      * Provides the current value of this item
      * @param id the id of the stored item definition or module
      * @param version the slot version
+     * @param emulateExternalChecking whether to emulate the external checking results using
+     * previous cached results
      * @returns the state of the include
      */
     getStateNoExternalChecking(id: number, version: string, emulateExternalChecking?: boolean): IIncludeState;

@@ -38,6 +38,7 @@ import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Incl
 import { IPropertiesValueMappingDefinitonRawJSONDataType } from "../base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton";
 import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import Module from "../base/Root/Module";
+import { raw } from "express";
 
 /**
  * Checks a conditional rule set so that it is valid and contains valid
@@ -248,6 +249,19 @@ export function checkItemDefinition(
       "Setting parentingRoleAccess without canBeParentedBy rules",
       actualTraceback.newTraceToBit("parentingRoleAccess"),
     );
+  }
+
+  // check the request limiters
+  if (rawData.requestLimiters) {
+    rawData.requestLimiters.custom.forEach((propertyId, index) => {
+      const propertyRaw = ItemDefinition.getPropertyDefinitionRawFor(rawData, parentModule, propertyId, true);
+      if (!propertyRaw) {
+        throw new CheckUpError(
+          "Could not find property for request limiter",
+          actualTraceback.newTraceToBit("requestLimiters").newTraceToBit("custom").newTraceToBit(index),
+        );
+      }
+    });
   }
 
   // check the custom consistency so that all custom keys are available
@@ -1133,6 +1147,7 @@ export function checkModule(
       rawData.modRoleAccess.includes(GUEST_METAROLE)
     )
   ) {
+    // moderation allows to block content, if literally anyone can block content, that's just not okay
     throw new CheckUpError(
       "Allowing the roles for anyone or guests to moderate is not allowed, as this can create a security flaw",
       actualTraceback.newTraceToBit("modRoleAccess"),
@@ -1146,6 +1161,8 @@ export function checkModule(
       rawData.flagRoleAccess.includes(GUEST_METAROLE)
     )
   ) {
+    // imagine if literally anyone can flag, the possibility of robots flagging and reflagging without moderation
+    // how would you even keep track of the flagging, that's the security flag, technically you can only flag once
     throw new CheckUpError(
       "Allowing the roles for anyone or guests to flag is not allowed, as this can create a security flaw",
       actualTraceback.newTraceToBit("flagRoleAccess"),
@@ -1196,6 +1213,19 @@ export function checkModule(
       } else {
         // otherwise it must be an item definition
         checkItemDefinition(rawRootData, moduleOrItemDef, rawData, actualTraceback);
+      }
+    });
+  }
+
+  // check the request limiters
+  if (rawData.requestLimiters) {
+    rawData.requestLimiters.custom.forEach((propertyId, index) => {
+      const propertyRaw = Module.getPropExtensionRawFor(rawData, propertyId);
+      if (!propertyRaw) {
+        throw new CheckUpError(
+          "Could not find prop extension for request limiter",
+          actualTraceback.newTraceToBit("requestLimiters").newTraceToBit("custom").newTraceToBit(index),
+        );
       }
     });
   }

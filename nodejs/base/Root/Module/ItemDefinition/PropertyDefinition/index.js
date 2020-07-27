@@ -52,6 +52,8 @@ function nullIfUndefined(value) {
 /**
  * Performs the check of an unique index property against
  * the server side
+ * @param itemDefinition the item definition
+ * @param include the include for the property
  * @param property the property in question
  * @param value the value of that property currently
  * @param id the slot id
@@ -116,9 +118,15 @@ class PropertyDefinition {
     /**
      * Builds a property definition
      * @param rawJSON the raw json structure
+     * @param parentModule the parent module of the property
      * @param parentItemDefinition the parent item definition
+     * @param isExtension whether it represents a prop extension (aka null parentItemDefinition)
+     * @param originatingInstance usually null, but when properties are cloned, reinstantiated; this is the original
+     * instance that is attached to the root, the reason we need this is for merging functionality as it will
+     * keep itself attached to the root original property via this weak link
      */
     constructor(rawJSON, parentModule, parentItemDefinition, isExtension, originatingInstance) {
+        // set these
         this.rawData = rawJSON;
         this.parentModule = parentModule;
         this.parentItemDefinition = parentItemDefinition;
@@ -451,9 +459,19 @@ class PropertyDefinition {
     getType() {
         return this.rawData.type;
     }
+    /**
+     * Adds a change listener to the listener for changes
+     * note that these listeners only listens for user changes
+     * not to applied changes of the sorts
+     * @param listener the listener to add
+     */
     addChangeListener(listener) {
         this.listeners.push(listener);
     }
+    /**
+     * Removes an added listener
+     * @param listener the listener to remove
+     */
     removeChangeListener(listener) {
         const index = this.listeners.indexOf(listener);
         if (index !== -1) {
@@ -1219,6 +1237,9 @@ class PropertyDefinition {
      * @returns the locale data
      */
     getI18nDataFor(locale) {
+        // this is where the originating instance matters, when we merge i18nData we use the
+        // actual children and we have no clue of reinstantiated properties
+        // so we actually get this info from the originating instance
         if (this.originatingInstance) {
             return this.originatingInstance.getI18nDataFor(locale);
         }
@@ -1258,11 +1279,23 @@ class PropertyDefinition {
         }
         return [];
     }
+    /**
+     * Builds the fields for a given role and a given action and
+     * a given property
+     * @param action the action that the user wants to execute
+     * @param role the role that is executing this action
+     * @param userId the user id
+     * @param ownerUserId the owner of the item definition for this property
+     */
     buildFieldsForRoleAccess(action, role, userId, ownerUserId) {
+        // for delete, you shouldn't really be getting anything
         if (action === __1.ItemDefinitionIOActions.DELETE) {
             return null;
         }
+        // if the owner is null
         if (ownerUserId === null) {
+            // we can't accept it as the onwer should be something
+            // otherwise it's adding something
             throw new Error("ownerUserId cannot be null");
         }
         // now let's get the roles that have access to the action
@@ -1274,9 +1307,11 @@ class PropertyDefinition {
         // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
         // because null === null in the case of eg. GUEST_METAROLE
         rolesWithAccess.includes(constants_1.OWNER_METAROLE) && userId === ownerUserId) || rolesWithAccess.includes(role);
+        // if no access then null
         if (!hasAccess) {
             return null;
         }
+        // otherwise we get the request fields
         return this.getRequestFields();
     }
     /**

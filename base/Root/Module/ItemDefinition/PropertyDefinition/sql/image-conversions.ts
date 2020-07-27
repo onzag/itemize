@@ -6,12 +6,12 @@
  * @packageDocumentation
  */
 
-import PropertyDefinition from ".";
+import PropertyDefinition from "..";
 import sharp from "sharp";
 import { ReadStream } from "fs";
 import path from "path";
 import pkgcloud from "pkgcloud";
-import { sqlUploadPipeFile } from "./sql-files";
+import { sqlUploadPipeFile } from "./file-management";
 
 /**
  * this is what we get as a result from
@@ -102,6 +102,13 @@ function manyOptionsAnalysis(value: string): IImageConversionArguments[] {
 
 /**
  * Runs the image conversions and stores them in the specified location
+ * @param imageStream the read stream that contains the image
+ * @param filePath entire path, idef id and all where the file is to be stored
+ * @param fileName the name of the file, curated as it is to be stored
+ * @param fileMimeType the mime type that has been retreived of the stream
+ * @param uploadsContainer the container where the image is tobe uploaded
+ * @param uploadsPrefix the prefix of the container
+ * @param propDef the property definition that this refers to
  * @returns a void promise for when this is done
  */
 export async function runImageConversions(
@@ -113,7 +120,11 @@ export async function runImageConversions(
   uploadsPrefix: string,
   propDef: PropertyDefinition,
 ): Promise<void> {
+  // first we get the original file path, by joining the file path
+  // and the name
   const originalImageFilePath = path.join(filePath, fileName);
+
+  // we use that for svg types, no need to convert
   if (fileMimeType === "image/svg+xml") {
     await sqlUploadPipeFile(
       uploadsContainer,
@@ -121,6 +132,7 @@ export async function runImageConversions(
       imageStream,
       originalImageFilePath,
     );
+    return;
   }
 
   // the properties in question are, smallDimension

@@ -10,6 +10,15 @@ import Module, { IModuleRawJSONDataType, ListenerType, IRawJSONI18NDataType, IRa
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { IGQLValue, IGQLRequestFields } from "../../../../gql-querier";
 /**
+ * The request limiters that are set in the item definition
+ * itself, basically only supports the item definition custom
+ * properties
+ */
+export interface IItemDefinitionRequestLimitersType {
+    condition: "AND" | "OR";
+    custom: string[];
+}
+/**
  * Policies eg, readRoleAccess, editRoleAccess, createRoleAccess
  * this is the form they have deep in after the name
  */
@@ -179,6 +188,10 @@ export interface IItemDefinitionRawJSONDataType {
      * A list of roles who have access to parenting
      */
     parentingRoleAccess?: string[];
+    /**
+     * the request limiters
+     */
+    requestLimiters?: IItemDefinitionRequestLimitersType;
 }
 /**
  * Represents the state of policies for a given type
@@ -313,6 +326,7 @@ export default class ItemDefinition {
      * this same item definition raw
      * @param name the name of the expected child item
      * @param avoidImports whether to avoid imported items from the module
+     * @returns a raw item definition if found, or null
      */
     static getItemDefinitionRawFor(itemDefinitionRaw: IItemDefinitionRawJSONDataType, parentModuleRaw: IModuleRawJSONDataType, name: string, avoidImports?: boolean): IItemDefinitionRawJSONDataType;
     /**
@@ -323,6 +337,7 @@ export default class ItemDefinition {
      * @param parentModuleRaw the raw module
      * @param id the id of the property
      * @param includeExtensions whether to include the extensions
+     * @returns a raw property definition if found, or null
      */
     static getPropertyDefinitionRawFor(itemDefinitionRaw: IItemDefinitionRawJSONDataType, parentModuleRaw: IModuleRawJSONDataType, id: string, includeExtensions: boolean): IPropertyDefinitionRawJSONDataType;
     /**
@@ -418,6 +433,11 @@ export default class ItemDefinition {
      */
     init(): void;
     /**
+     * Provides the item definition and only the item definition request limiters
+     * @returns the request limiters object or null
+     */
+    getRequestLimiters(): IItemDefinitionRequestLimitersType;
+    /**
      * Flags this item definition into an extensions instance
      */
     setAsExtensionsInstance(): void;
@@ -436,6 +456,7 @@ export default class ItemDefinition {
      * @param version the version id
      * @param supportedLanguages the array list of supported language this function
      * is unaware of supported languages so it needs to ask in order to check for a version
+     * @returns a boolean on whether it's a valid version
      */
     isValidVersion(version: string, supportedLanguages: string[]): boolean;
     /**
@@ -481,6 +502,7 @@ export default class ItemDefinition {
     /**
      * Provides a raw json item definition that it has a children
      * @param name the name of the item definition
+     * @param avoidImports optional whether to avoid imported item definitions
      * @throws an error if the item definition does not exist
      * @returns a raw item definition
      */

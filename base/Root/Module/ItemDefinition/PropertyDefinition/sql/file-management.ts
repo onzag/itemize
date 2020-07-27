@@ -6,19 +6,19 @@
  * @packageDocumentation
  */
 
-import PropertyDefinition from ".";
-import ItemDefinition from "..";
-import Include from "../Include";
+import PropertyDefinition from "..";
+import ItemDefinition from "../..";
+import Include from "../../Include";
 import { ReadStream } from "fs";
 import path from "path";
-import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../../constants";
+import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../../../constants";
 import { runImageConversions } from "./image-conversions";
-import { IGQLFile } from "../../../../../gql-querier";
+import { IGQLFile } from "../../../../../../gql-querier";
 import pkgcloud from "pkgcloud";
-import { ConsumeStreamsFnType } from "../../../sql";
+import { ConsumeStreamsFnType } from "../../../../sql";
 import sharp from "sharp";
-import { logger } from "../../../../../server";
-import Module from "../..";
+import { logger } from "../../../../../../server";
+import Module from "../../..";
 import https from "https";
 
 /**
@@ -26,11 +26,13 @@ import https from "https";
  * file value
  * @param newValues the new values as a list
  * @param oldValues the old values that this came from
- * @param filesContainerId a transitory id on where to store the files (can be changed later)
+ * @param uploadsContainer the upload container to uploads file for, or delete for
+ * @param uploadsPrefix the uploads prefix of such container
  * @param itemDefinitionOrModule the item definition or module (for prop extension) these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
- * @returns a promise with the new list with the new values
+ * @returns the new values and the consume streams function that will actually consume the
+ * streams to store in the remote storage solution
  */
 export function processFileListFor(
   newValues: IGQLFile[],
@@ -105,10 +107,13 @@ export function processFileListFor(
  * should be of different id
  * @param newValue the new value
  * @param oldValue the old value
+ * @param uploadsContainer the upload container to uploads file for or delete for
+ * @param uploadsPrefix the uploads prefix of such container
  * @param itemDefinitionOrModule the item definition or module these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
- * @returns a promise for the new file value
+ * @returns the new value (or null) consume streams function that will actually consume the
+ * streams to store in the remote storage solution
  */
 export function processSingleFileFor(
   newValue: IGQLFile,
@@ -166,13 +171,16 @@ export function processSingleFileFor(
 }
 
 /**
- * Processes a single file
+ * Processes a single file that is to be changed, that is, their ids is equal
  * @param newVersion the new version of the file with the same id (or null, removes)
  * @param oldVersion the old version of the file with the same id (or null, creates)
+ * @param uploadsContainer the upload container to uploads file for or delete for
+ * @param uploadsPrefix the uploads prefix of such container
  * @param itemDefinitionOrModule the item definition or module (for prop extensions) this field is related to
  * @param include the include (or null)
  * @param propertyDefinition the property
- * @returns a promise for the new the new file value
+ * @returns the new value (or null) and the consume streams function that will actually consume the
+ * streams to store in the remote storage solution
  */
 function processOneFileAndItsSameIDReplacement(
   newVersion: IGQLFile,
@@ -366,11 +374,15 @@ export async function removeFolderFor(
 /**
  * Adds the file and pass the attributes to the processes
  * in order to build the media info
- * @param mainFilePath the file path where all is to be stored
- * @param standardURLPath the url that should be generated
- * @param value the value that we are storing (this value contains a stream)
- * @param propertyDefinition the property definition
- * @returns a promise that contains the url and the file type that was taken from the stream
+ * @param mainFilePath the file path where all is to be stored, that is the entire path
+ * all the way to the property definition id, module, etc...
+ * @param curatedFileName the file name that is being used currently for the file, with all
+ * special invalid characters escaped
+ * @param uploadsContainer the upload container to uploads file for
+ * @param uploadsPrefix the uploads prefix of such container
+ * @param value the value that we are storing (this value must contain a stream)
+ * @param propertyDefinition the property definition for this
+ * @returns a void promise
  */
 async function addFileFor(
   mainFilePath: string,
@@ -380,11 +392,18 @@ async function addFileFor(
   value: IGQLFile,
   propertyDefinition: PropertyDefinition,
 ): Promise<void> {
+  // first we get the createReadStream function from the source gql file
   const { createReadStream } = await value.src;
 
+  // we get it
   const stream: ReadStream = createReadStream();
+  // now we check if it's an image
   const isImage = FILE_SUPPORTED_IMAGE_TYPES.includes(value.type);
+  // and we check if we are going to process such image
   const needsImageProcessing = isImage && !value.type.startsWith("image/svg");
+  // if we do we call the image conversions
+  // algorithm located in the image-conversions.ts file in this same
+  // folder
   if (needsImageProcessing) {
     await runImageConversions(
       stream,
@@ -396,6 +415,7 @@ async function addFileFor(
       propertyDefinition,
     );
   } else {
+    // otherwise we just pipe the file
     await sqlUploadPipeFile(
       uploadsContainer,
       uploadsPrefix,
@@ -405,6 +425,14 @@ async function addFileFor(
   }
 }
 
+/**
+ * Uploads a file in a given upload container
+ * @param uploadsContainer the uploads container
+ * @param uploadsPrefix the uploads prefix of this container
+ * @param readStream the read stream of the file
+ * @param remote the remote name this file is uploaded as, it's whole path
+ * @returns a void promise
+ */
 export async function sqlUploadPipeFile(
   uploadsContainer: pkgcloud.storage.Container,
   uploadsPrefix: string,
@@ -413,15 +441,19 @@ export async function sqlUploadPipeFile(
 ): Promise<void> {
   logger.debug("sqlUploadPipeFile: Uploading", {remote});
 
+  // we make a write stream to the uploads container
   const writeStream = uploadsContainer.client.upload({
     container: uploadsContainer as any,
     remote,
   });
+  // and pipe our read stream
   readStream.pipe(writeStream);
 
+  // return a promise for it
   return new Promise((resolve, reject) => {
     writeStream.on("finish", () => {
       logger.debug("sqlUploadPipeFile: Finished uploading", {remote});
+      // we call the verify resource is ready function
       verifyResourceIsReady(
         new URL(uploadsPrefix + remote),
         resolve,
@@ -431,18 +463,30 @@ export async function sqlUploadPipeFile(
   });
 }
 
+/**
+ * Verifies whether a given uploaded resource is actually ready, as
+ * containers, might have been done uploading but are not ready to serve
+ * the file itself
+ * @param url the url to verify
+ * @param done the callback once it's done
+ */
 function verifyResourceIsReady(url: URL, done: () => void) {
+  // so we get the url string value, for debugging purposes
   const strURL = url.toString();
   logger.debug("verifyResourceIsReady: Verifying readiness of " + strURL);
+
+  // now we use https to call and do a head request to check the status
   https.get({
     method: "HEAD",
     host: url.host,
     path: url.pathname,
   }, (resp) => {
+    // status is succesful
     if (resp.statusCode === 200 || resp.statusCode === 0) {
       logger.debug("verifyResourceIsReady: Verification succeed " + strURL);
       done();
     } else {
+      // otherwise we wait 100 milliseconds, and recursively execute until it's ready
       logger.debug("verifyResourceIsReady: Resource is not yet ready " + strURL);
       setTimeout(verifyResourceIsReady.bind(null, url, done), 100);
     }

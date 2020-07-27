@@ -47,6 +47,7 @@ export declare function processItemDefinition(rawData: IItemDefinitionRawJSONDat
     canBeParentedBy?: import("../base/Root/Module/ItemDefinition").IItemDefinitionParentingRawJSONDataType[];
     mustBeParented?: boolean;
     parentingRoleAccess?: string[];
+    requestLimiters?: import("../base/Root/Module/ItemDefinition").IItemDefinitionRequestLimitersType;
 };
 /**
  * Cleans up build data from
@@ -83,7 +84,7 @@ export declare function processModule(rawData: IModuleRawJSONDataType, locale?: 
     propExtensions?: IPropertyDefinitionRawJSONDataType[];
     maxSearchResults?: number;
     maxSearchRecords?: number;
-    requestLimiters?: import("../base/Root/Module").IRequestLimitersType;
+    requestLimiters?: import("../base/Root/Module").IModuleRequestLimitersType;
 };
 /**
  * Cleans up build data from

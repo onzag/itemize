@@ -6,28 +6,33 @@
  */
 
 import { PropertyDefinitionSupportedType, ISQLArgInfo, ISQLInInfo, ISQLOutInfo,
-  ISQLSearchInfo, ISQLEqualInfo, ISQLBtreeIndexableInfo, ISQLOrderByInfo } from "./types";
-import PropertyDefinition from "../PropertyDefinition";
+  ISQLSearchInfo, ISQLEqualInfo, ISQLBtreeIndexableInfo, ISQLOrderByInfo } from "../types";
+import PropertyDefinition from "../../PropertyDefinition";
 import { ISQLTableRowValue, ISQLTableDefinitionType, ISQLStreamComposedTableRowValue,
-  ConsumeStreamsFnType, ISQLTableIndexType } from "../../../sql";
-import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces";
+  ConsumeStreamsFnType, ISQLTableIndexType } from "../../../../sql";
+import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import Knex from "knex";
-import ItemDefinition from "..";
-import Include from "../Include";
-import { processFileListFor, processSingleFileFor } from "./sql-files";
-import { IGQLArgs, IGQLValue } from "../../../../../gql-querier";
-import { SQL_CONSTRAINT_PREFIX } from "../../../../../constants";
+import ItemDefinition from "../..";
+import Include from "../../Include";
+import { processFileListFor, processSingleFileFor } from "./file-management";
+import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
+import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import pkgcloud from "pkgcloud";
-import Module from "../..";
+import Module from "../../..";
 
 /**
  * Provides the sql function that defines the schema that is used to build
  * the partial table definition
  * @param type the postgresql type
  * @param ext a extension to require for this type
+ * @param indexCalculator an function to decide how to build an index for this type
  * @returns a function that returns the partial table definition object with the given type
  */
-export function getStandardSQLFnFor(type: string, ext: string = null, indexCalculator?: (subtype: string, sqlPrefix: string, id: string) => ISQLTableIndexType):
+export function getStandardSQLFnFor(
+  type: string,
+  ext: string = null,
+  indexCalculator?: (subtype: string, sqlPrefix: string, id: string) => ISQLTableIndexType
+):
   (arg: ISQLArgInfo) => ISQLTableDefinitionType {
 
   // so we return the function
@@ -51,6 +56,11 @@ export function getStandardSQLFnFor(type: string, ext: string = null, indexCalcu
   };
 }
 
+/**
+ * the standard order by functionality
+ * @param arg the orer by info arg
+ * @returns an array of string with the order by
+ */
 export function standardSQLOrderBy(arg: ISQLOrderByInfo) {
   return [arg.prefix + arg.id, arg.direction, arg.nulls] as [string, string, string];
 }
@@ -99,6 +109,8 @@ export function standardSQLOutFn(arg: ISQLOutInfo): PropertyDefinitionSupportedT
 /**
  * The standard sql out function that deserializes values
  * as they are expected to be stored serialized
+ * @param arg the sql out info arg
+ * @returns the supported type json parsed
  */
 export function standardSQLOutWithJSONParseFn(arg: ISQLOutInfo): PropertyDefinitionSupportedType {
   if (arg.row[arg.prefix + arg.id] === null) {
@@ -114,6 +126,8 @@ export function standardSQLOutWithJSONParseFn(arg: ISQLOutInfo): PropertyDefinit
 
 /**
  * The standard function that build queries for the property
+ * @param arg the search info arg
+ * @returns a boolean on whether it was searched by it
  */
 export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
   const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
@@ -141,6 +155,7 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
 
 /**
  * The standard function that perfoms equality checks within the database
+ * @param arg the equal info arg
  * @returns a knex valid search or select query object
  */
 export function standardSQLEqualFn(arg: ISQLEqualInfo) {
@@ -159,8 +174,13 @@ export function standardSQLEqualFn(arg: ISQLEqualInfo) {
   };
 }
 
+/**
+ * The standard btree indexable column builder
+ * @param arg the sql btree indexable arg
+ * @returns an array of the columns to index
+ */
 export function standardSQLBtreeIndexable(arg: ISQLBtreeIndexableInfo) {
-  return [arg.prefix, arg.id];
+  return [arg.prefix + arg.id];
 }
 
 /**
@@ -170,9 +190,6 @@ export function standardSQLBtreeIndexable(arg: ISQLBtreeIndexableInfo) {
  * @param itemDefinition the item definition that contains the property
  * @param include the include within the item definition, or null
  * @param propertyDefinition the property definition in question
- * @param prefix a prefix to prefix the table row names, this is
- * used to prefix item specific properties that are sinked in from
- * the parent in the item
  * @returns the partial sql table definition for the property
  */
 export function getSQLTableDefinitionForProperty(
@@ -205,7 +222,6 @@ export function getSQLTableDefinitionForProperty(
  * @param include the include within the item definition, or null
  * @param propertyDefinition the property definition in question
  * @param row the row that we want to extract information from
- * @param prefix the prefix, if the information happens to be prefixed
  * @returns the graphql value for the property
  */
 export function convertSQLValueToGQLValueForProperty(
@@ -274,16 +290,17 @@ export function convertSQLValueToGQLValueForProperty(
  * data to be immediately added to the database as it is
  * @param knex the knex instance
  * @param serverData the server data
+ * @param mod the module
  * @param itemDefinition the item definition that contains the property
  * @param include the include within the item definition, or null
  * @param propertyDefinition the property definition in question
- * @param propertyDefinition the property definition in question
  * @param data the graphql data
  * @param oldData the old graphql data
- * @param knex the knex instance
+ * @param uploadsContainer the uploads container that is to be used (to manage files)
+ * @param uploadsPrefix the uploads prefix of such container
  * @param dictionary the dictionary to use in full text search mode
- * @returns a promise with the partial sql row value to be inputted, note
- * that this is a promise because data streams need to be processed
+ * @returns a composed value with a partial row value and the consume streams functionality
+ * included in it
  */
 export function convertGQLValueToSQLValueForProperty(
   knex: Knex,
@@ -383,6 +400,7 @@ export function convertGQLValueToSQLValueForProperty(
  * @param propertyDefinition the property definition in question
  * @param args the args coming from the search module in such format
  * @param knexBuilder the knex building instance
+ * @param dictionary the dictionary that is being used
  * @param isOrderedByIt whether there will be a subsequent order by request
  */
 export function buildSQLQueryForProperty(
@@ -411,6 +429,20 @@ export function buildSQLQueryForProperty(
   });
 }
 
+/**
+ * Builds a sql str FTS search query from a given property definition, the data
+ * coming from the search module, a sql prefix to use, and the knex builder
+ * @param knex the knex instance
+ * @param serverData the server data
+ * @param itemDefinition the item definition that contains the property
+ * @param include the include within the item definition, or null
+ * @param propertyDefinition the property definition in question
+ * @param args the args coming from the search module in such format
+ * @param search the search string that is being used
+ * @param knexBuilder the knex building instance
+ * @param dictionary the dictionary that is being used
+ * @param isOrderedByIt whether there will be a subsequent order by request
+ */
 export function buildSQLStrSearchQueryForProperty(
   knex: Knex,
   serverData: any,
@@ -444,6 +476,8 @@ export function buildSQLStrSearchQueryForProperty(
 
 // Just in case to avoid sql injection
 // if for some reason the gql security is taken
+// remember that the direction variable, and nulls, comes directly
+// from the graphql query
 const actualDirection = {
   "asc": "ASC",
   "desc": "DESC",
@@ -452,6 +486,20 @@ const actualNulls = {
   "first": "FIRST",
   "last": "LAST",
 }
+
+/**
+ * Builds an order by query for a given property
+ * @param knex the knex instance
+ * @param serverData the server data that is being used
+ * @param itemDefinition the item definition in question
+ * @param include the include (or null)
+ * @param propertyDefinition the property in question
+ * @param knexBuilder the knex builder that is currently building the query
+ * @param direction the direction to be accounted for
+ * @param nulls the nulls (first or last)
+ * @param wasIncludedInSearch whether this property was included in search
+ * @param wasIncludedInStrSearch whether this property was included in the str FTS search
+ */
 export function buildSQLOrderByForProperty(
   knex: Knex,
   serverData: any,
@@ -464,8 +512,11 @@ export function buildSQLOrderByForProperty(
   wasIncludedInSearch: boolean,
   wasIncludedInStrSearch: boolean,
 ) {
+  // first we need to check whether there's even a sql order by function
   const sqlOrderByFn = propertyDefinition.getPropertyDefinitionDescription().sqlOrderBy;
+  // if we have one
   if (sqlOrderByFn) {
+    // we call it
     const result = sqlOrderByFn({
       knex,
       serverData,
@@ -480,7 +531,9 @@ export function buildSQLOrderByForProperty(
       wasIncludedInStrSearch,
     });
 
+    // if we have a result at all
     if (result) {
+      // then we add it
       knexBuilder.orderByRaw(
         `?? ${actualDirection[result[1].toLowerCase()] || "ASC"} NULLS ${actualNulls[result[2].toLowerCase()] || "LAST"}`,
         [result[0]]
@@ -489,6 +542,16 @@ export function buildSQLOrderByForProperty(
   }
 }
 
+/**
+ * Builds the order by functionality for the internal properties, such as
+ * created_at, edited_at, etc...
+ * @param knex the knex instance
+ * @param itemDefinition the item definition
+ * @param which basically the column name
+ * @param knexBuilder the knex builder
+ * @param direction the direction of the order by rule
+ * @param nulls whether nulls are first or last
+ */
 export function buildSQLOrderByForInternalRequiredProperty(
   knex: Knex,
   itemDefinition: ItemDefinition,
@@ -497,6 +560,7 @@ export function buildSQLOrderByForInternalRequiredProperty(
   direction: "asc" | "desc",
   nulls: "first" | "last",
 ) {
+  // so we call our standard function
   const result = standardSQLOrderBy({
     prefix: "",
     id: which,
@@ -511,6 +575,7 @@ export function buildSQLOrderByForInternalRequiredProperty(
     serverData: null,
   });
 
+  // if we have a result, we add it (we should have one, but who knows)
   if (result) {
     knexBuilder.orderByRaw(
       `?? ${actualDirection[result[1].toLowerCase()] || "ASC"} NULLS ${actualNulls[result[2].toLowerCase()] || "LAST"}`,

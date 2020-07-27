@@ -157,6 +157,15 @@ function checkItemDefinition(rawRootData, rawData, parentModule, traceback) {
     if (rawData.parentingRoleAccess && !rawData.canBeParentedBy) {
         throw new Error_1.default("Setting parentingRoleAccess without canBeParentedBy rules", actualTraceback.newTraceToBit("parentingRoleAccess"));
     }
+    // check the request limiters
+    if (rawData.requestLimiters) {
+        rawData.requestLimiters.custom.forEach((propertyId, index) => {
+            const propertyRaw = ItemDefinition_1.default.getPropertyDefinitionRawFor(rawData, parentModule, propertyId, true);
+            if (!propertyRaw) {
+                throw new Error_1.default("Could not find property for request limiter", actualTraceback.newTraceToBit("requestLimiters").newTraceToBit("custom").newTraceToBit(index));
+            }
+        });
+    }
     // check the custom consistency so that all custom keys are available
     // in all languages, note how we move the traceback location
     checkI18nCustomConsistency(rawData.i18nData, actualTraceback.newTraceToLocation(rawData.i18nDataLocation));
@@ -724,11 +733,14 @@ function checkModule(rawRootData, rawData, traceback) {
     if (rawData.modRoleAccess &&
         (rawData.modRoleAccess.includes(constants_1.ANYONE_METAROLE) ||
             rawData.modRoleAccess.includes(constants_1.GUEST_METAROLE))) {
+        // moderation allows to block content, if literally anyone can block content, that's just not okay
         throw new Error_1.default("Allowing the roles for anyone or guests to moderate is not allowed, as this can create a security flaw", actualTraceback.newTraceToBit("modRoleAccess"));
     }
     if (rawData.flagRoleAccess &&
         (rawData.flagRoleAccess.includes(constants_1.ANYONE_METAROLE) ||
             rawData.flagRoleAccess.includes(constants_1.GUEST_METAROLE))) {
+        // imagine if literally anyone can flag, the possibility of robots flagging and reflagging without moderation
+        // how would you even keep track of the flagging, that's the security flag, technically you can only flag once
         throw new Error_1.default("Allowing the roles for anyone or guests to flag is not allowed, as this can create a security flaw", actualTraceback.newTraceToBit("flagRoleAccess"));
     }
     // and we got to check the prop extensions if we have some
@@ -767,6 +779,15 @@ function checkModule(rawRootData, rawData, traceback) {
             else {
                 // otherwise it must be an item definition
                 checkItemDefinition(rawRootData, moduleOrItemDef, rawData, actualTraceback);
+            }
+        });
+    }
+    // check the request limiters
+    if (rawData.requestLimiters) {
+        rawData.requestLimiters.custom.forEach((propertyId, index) => {
+            const propertyRaw = Module_1.default.getPropExtensionRawFor(rawData, propertyId);
+            if (!propertyRaw) {
+                throw new Error_1.default("Could not find prop extension for request limiter", actualTraceback.newTraceToBit("requestLimiters").newTraceToBit("custom").newTraceToBit(index));
             }
         });
     }

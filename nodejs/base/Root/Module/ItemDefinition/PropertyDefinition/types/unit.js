@@ -9,6 +9,7 @@ const graphql_1 = require("graphql");
 const constants_1 = require("../../../../../../constants");
 const PropertyDefinition_1 = require("../../PropertyDefinition");
 const search_interfaces_1 = require("../search-interfaces");
+const unit_1 = require("../sql/unit");
 /**
  * The description of the unit type as it behaves in the app
  */
@@ -28,84 +29,16 @@ const typeValue = {
             type: graphql_1.GraphQLNonNull && graphql_1.GraphQLNonNull(graphql_1.GraphQLString),
         },
     },
-    sql: (arg) => {
-        return {
-            [arg.prefix + arg.id + "_VALUE"]: {
-                type: "float",
-            },
-            [arg.prefix + arg.id + "_UNIT"]: {
-                type: "text",
-            },
-            [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {
-                type: "float",
-            },
-            [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: {
-                type: "text",
-            },
-        };
-    },
-    sqlIn: (arg) => {
-        if (arg.value === null) {
-            return {
-                [arg.prefix + arg.id + "_VALUE"]: null,
-                [arg.prefix + arg.id + "_UNIT"]: null,
-                [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: null,
-                [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: null,
-            };
-        }
-        const value = arg.value;
-        return {
-            [arg.prefix + arg.id + "_VALUE"]: value.value,
-            [arg.prefix + arg.id + "_UNIT"]: value.unit,
-            [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: value.normalizedValue,
-            [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: value.normalizedUnit,
-        };
-    },
-    sqlOut: (arg) => {
-        const result = {
-            value: arg.row[arg.prefix + arg.id + "_VALUE"],
-            unit: arg.row[arg.prefix + arg.id + "_UNIT"],
-            normalizedValue: arg.row[arg.prefix + arg.id + "_NORMALIZED_VALUE"],
-            normalizedUnit: arg.row[arg.prefix + arg.id + "_NORMALIZED_UNIT"],
-        };
-        if (result.value === null) {
-            return null;
-        }
-        return result;
-    },
-    sqlSearch: (arg) => {
-        const fromName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
-        const toName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
-        const exactName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
-        let searchedByIt = false;
-        if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
-            const exactAsUnit = arg.args[exactName];
-            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_UNIT", exactAsUnit.normalizedUnit);
-            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", exactAsUnit.normalizedValue);
-        }
-        else if (arg.args[exactName] === null) {
-            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", null);
-            searchedByIt = true;
-        }
-        if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
-            const fromAsUnit = arg.args[fromName];
-            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_UNIT", fromAsUnit.normalizedUnit);
-            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", fromAsUnit.normalizedValue);
-            searchedByIt = true;
-        }
-        if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
-            const toAsUnit = arg.args[toName];
-            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_UNIT", toAsUnit.normalizedUnit);
-            arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", toAsUnit.normalizedValue);
-            searchedByIt = true;
-        }
-        return searchedByIt;
-    },
+    sql: unit_1.unitSQL,
+    sqlIn: unit_1.unitSQLIn,
+    sqlOut: unit_1.unitSQLOut,
+    sqlSearch: unit_1.unitSQLSearch,
     sqlStrSearch: null,
     localStrSearch: null,
-    sqlOrderBy: (arg) => {
-        return [arg.prefix + arg.id + "_NORMALIZED_VALUE", arg.direction, arg.nulls];
-    },
+    sqlOrderBy: unit_1.unitSQLOrderBy,
+    sqlEqual: unit_1.unitSQLEqual,
+    sqlSSCacheEqual: unit_1.unitSQLSSCacheEqual,
+    sqlBtreeIndexable: unit_1.unitSQLBtreeIndexable,
     localOrderBy: (arg) => {
         if (arg.a === null && arg.b === null) {
             return 0;
@@ -161,23 +94,6 @@ const typeValue = {
         else {
             return conditions.every((c) => c);
         }
-    },
-    sqlEqual: (arg) => {
-        return {
-            [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: arg.value.normalizedUnit,
-            [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: arg.value.normalizedValue,
-        };
-    },
-    sqlSSCacheEqual: (arg) => {
-        if (arg.value === null) {
-            return arg.row[arg.prefix + arg.id + "_NORMALIZED_VALUE"] === null;
-        }
-        const value = arg.value;
-        return arg.row[arg.prefix + arg.id + "_NORMALIZED_VALUE"] === value.normalizedValue &&
-            arg.row[arg.prefix + arg.id + "_NORMALIZED_UNIT"] === value.normalizedUnit;
-    },
-    sqlBtreeIndexable: (arg) => {
-        return [arg.prefix + arg.id + "_NORMALIZED_UNIT", arg.prefix + arg.id + "_NORMALIZED_VALUE"];
     },
     localEqual: (arg) => {
         const a = arg.a;

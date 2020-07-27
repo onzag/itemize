@@ -8,6 +8,7 @@ import { IPropertyDefinitionSupportedType } from "../types";
  * The string type is described, by, you guessed it, a string
  */
 export declare type PropertyDefinitionSupportedStringType = string;
+export declare const exactStringSearchSubtypes: string[];
 /**
  * The behaviour of strings is described by this type
  */

@@ -11,6 +11,7 @@ import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N, INCLUDE_PREFIX, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedUnitType } from "./unit";
+import { locationSQL, locationSQLIn, locationSQLOut, locationSQLSearch, locationSQLOrderBy, locationSQLEqual, locationSQLSSCacheEqual, locationSQLBtreeIndexable } from "../sql/location";
 
 /**
  * The haversine formula extracted from stackoverflow
@@ -82,121 +83,19 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
   },
-  sql: (arg) => {
-    return {
-      [arg.prefix + arg.id + "_GEO"]: {
-        type: "GEOMETRY(POINT,4326)",
-        ext: "postgis",
-        index: {
-          type: "gist",
-          id: SQL_CONSTRAINT_PREFIX + arg.prefix + arg.id,
-          level: 0,
-        },
-      },
-      [arg.prefix + arg.id + "_ID"]: {
-        type: "text",
-      },
-      [arg.prefix + arg.id + "_LAT"]: {
-        type: "float",
-      },
-      [arg.prefix + arg.id + "_LNG"]: {
-        type: "float",
-      },
-      [arg.prefix + arg.id + "_TXT"]: {
-        type: "text",
-      },
-      [arg.prefix + arg.id + "_ATXT"]: {
-        type: "text",
-      },
-    };
-  },
-  sqlIn: (arg) => {
-    if (arg.value === null) {
-      return {
-        [arg.prefix + arg.id + "_GEO"]: null,
-        [arg.prefix + arg.id + "_ID"]: null,
-        [arg.prefix + arg.id + "_LAT"]: null,
-        [arg.prefix + arg.id + "_LNG"]: null,
-        [arg.prefix + arg.id + "_TXT"]: null,
-        [arg.prefix + arg.id + "_ATXT"]: null,
-      };
-    }
-
-    const value = arg.value as IPropertyDefinitionSupportedLocationType;
-    return {
-      [arg.prefix + arg.id + "_GEO"]: arg.knex.raw("ST_SetSRID(ST_MakePoint(?, ?), 4326)", [value.lng, value.lat]),
-      [arg.prefix + arg.id + "_ID"]: value.id,
-      [arg.prefix + arg.id + "_LAT"]: value.lat,
-      [arg.prefix + arg.id + "_LNG"]: value.lng,
-      [arg.prefix + arg.id + "_TXT"]: value.txt,
-      [arg.prefix + arg.id + "_ATXT"]: value.atxt,
-    };
-  },
-  sqlOut: (arg) => {
-    const result: IPropertyDefinitionSupportedLocationType = {
-      lat: arg.row[arg.prefix + arg.id + "_LAT"],
-      lng: arg.row[arg.prefix + arg.id + "_LNG"],
-      txt: arg.row[arg.prefix + arg.id + "_TXT"],
-      atxt: arg.row[arg.prefix + arg.id + "_ATXT"],
-      id: arg.row[arg.prefix + arg.id + "_ID"],
-    };
-    if (result.lat === null || result.lng === null) {
-      return null;
-    }
-    return result;
-  },
-  sqlSearch: (arg) => {
-    const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + arg.prefix + arg.id;
-    const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + arg.prefix + arg.id;
-
-    if (
-      typeof arg.args[locationName] !== "undefined" && arg.args[locationName] !== null &&
-      typeof arg.args[radiusName] !== "undefined" && arg.args[radiusName] !== null
-    ) {
-      arg.knexBuilder.andWhere(arg.prefix + arg.id + "_GEO", "is not", null);
-
-      const argAsLocation: IPropertyDefinitionSupportedLocationType = arg.args[locationName] as any;
-      const lng = argAsLocation.lng || 0;
-      const lat = argAsLocation.lat || 0;
-      const argAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[radiusName] as any;
-      const distance = (argAsUnit.normalizedValue || 0) * 1000;
-      arg.knexBuilder.andWhereRaw(
-        "ST_DWithin(??, ST_MakePoint(?,?)::geography, ?)",
-        [
-          arg.prefix + arg.id + "_GEO",
-          lng,
-          lat,
-          distance,
-        ],
-      );
-      
-      if (arg.isOrderedByIt) {
-        return [
-          "ST_Distance(??, ST_MakePoint(?,?)::geography) AS ??",
-          [
-            arg.prefix + arg.id + "_GEO",
-            lng,
-            lat,
-            arg.prefix + arg.id + "_CALC_RADIUS",
-          ],
-        ]
-      }
-
-      return true;
-    }
-
-    return false;
-  },
+  sql: locationSQL,
+  sqlIn: locationSQLIn,
+  sqlOut: locationSQLOut,
+  sqlSearch: locationSQLSearch,
   sqlStrSearch: null,
   localStrSearch: null,
   sqlMantenience: null,
-  sqlOrderBy: (arg) => {
-    if (arg.wasIncludedInSearch) {
-      return [arg.prefix + arg.id + "_CALC_RADIUS", arg.direction, arg.nulls];
-    }
-    return null;
-  },
+  sqlOrderBy: locationSQLOrderBy,
   localOrderBy: null,
+  sqlEqual: locationSQLEqual,
+  sqlSSCacheEqual: locationSQLSSCacheEqual,
+  sqlBtreeIndexable: locationSQLBtreeIndexable,
+
   localSearch: (arg) => {
     // item is deleted
     if (!arg.gqlValue) {
@@ -235,25 +134,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
 
     return true;
-  },
-  sqlEqual: (arg) => {
-    if (arg.value === null) {
-      return {
-        [arg.prefix + arg.id + "_ID"]: null,
-      };
-    }
-    return {
-      [arg.prefix + arg.id + "_ID"]: (arg.value as IPropertyDefinitionSupportedLocationType).id,
-    };
-  },
-  sqlSSCacheEqual: (arg) => {
-    if (arg.value === null) {
-      return arg.row[arg.prefix + arg.id + "_ID"] === arg.value;
-    }
-    return arg.row[arg.prefix + arg.id + "ID"] === (arg.value as IPropertyDefinitionSupportedLocationType).id;
-  },
-  sqlBtreeIndexable: () => {
-    return null;
   },
   localEqual: (arg) => {
     if (arg.a === arg.b) {

@@ -433,6 +433,7 @@ class Module {
      * Provides the roles that have access to a given
      * action based on the rules that were set
      * @param action the action from the ItemDefinitionIOActions
+     * @returns an array of string with the roles that have the specific io role access
      */
     getRolesWithAccessTo(action) {
         // in the case of module, only read makes sense as an action
@@ -444,7 +445,8 @@ class Module {
     }
     /**
      * Provides the roles that have moderation access to
-     * the moderation fileds for a given item definition
+     * the moderation fileds for a given module
+     * @returns an array of string with the roles that have moderation access
      */
     getRolesWithModerationAccess() {
         if (this.rawData.modRoleAccess) {
@@ -454,7 +456,8 @@ class Module {
     }
     /**
      * Provides the roles that are alowed to flag the
-     * contents of an item definition
+     * contents of an module
+     * @returns an array of string for the flagging role access
      */
     getRolesWithFlaggingAccess() {
         if (this.rawData.flagRoleAccess) {
@@ -509,12 +512,24 @@ class Module {
             return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
         });
     }
+    /**
+     * Provides the module request limiters
+     * @returns the request limiters object or null
+     */
     getRequestLimiters() {
         return this.rawData.requestLimiters || null;
     }
+    /**
+     * Specifies how many search records might be obtained at once
+     * @returns an integer
+     */
     getMaxSearchRecords() {
         return this.rawData.maxSearchRecords || constants_1.MAX_SEARCH_RECORDS_FALLBACK;
     }
+    /**
+     * Specifies how many search results might be obtained at once
+     * @returns an integer
+     */
     getMaxSearchResults() {
         return this.rawData.maxSearchResults || constants_1.MAX_SEARCH_RESULTS_FALLBACK;
     }

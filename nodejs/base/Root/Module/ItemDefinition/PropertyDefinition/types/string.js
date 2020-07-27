@@ -12,6 +12,7 @@ const PropertyDefinition_1 = require("../../PropertyDefinition");
 const constants_1 = require("../../../../../../constants");
 const search_interfaces_1 = require("../search-interfaces");
 const imported_resources_1 = require("../../../../../../imported-resources");
+const string_1 = require("../sql/string");
 /**
  * The email regex that is used to validate emails
  */
@@ -28,7 +29,7 @@ const EMAIL_REGEX = new RegExp("(?:[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#
  * that can be used to build other stuff, and can make for confusing user identifiers
  */
 const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%", "/", "\\", "*", "\""];
-const exactSearchSubtypes = ["comprehensive-locale", "language", "country", "currency"];
+exports.exactStringSearchSubtypes = ["comprehensive-locale", "language", "country", "currency"];
 /**
  * The behaviour of strings is described by this type
  */
@@ -48,42 +49,12 @@ const typeValue = {
     }),
     sqlIn: sql_1.stardardSQLInFn,
     sqlOut: sql_1.standardSQLOutFn,
-    sqlSearch: (arg) => {
-        const searchName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
-        if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
-            if (exactSearchSubtypes.includes(arg.property.getSubtype())) {
-                arg.knexBuilder.andWhere(arg.prefix + arg.id, arg.args[searchName]);
-            }
-            else {
-                arg.knexBuilder.andWhereRaw("?? ilike ? escape ?", [
-                    arg.prefix + arg.id,
-                    "%" + arg.args[searchName].replace(/\%/g, "\\%").replace(/\_/g, "\\_") + "%",
-                    "\\",
-                ]);
-            }
-            return true;
-        }
-        return false;
-    },
+    sqlSearch: string_1.stringSQLSearch,
     sqlEqual: sql_1.standardSQLEqualFn,
     sqlSSCacheEqual: local_sql_1.standardSQLSSCacheEqualFn,
     sqlBtreeIndexable: sql_1.standardSQLBtreeIndexable,
     sqlMantenience: null,
-    sqlStrSearch: (arg) => {
-        if (arg.knexBuilder) {
-            if (exactSearchSubtypes.includes(arg.property.getSubtype())) {
-                arg.knexBuilder.andWhere(arg.prefix + arg.id, arg.search);
-            }
-            else {
-                arg.knexBuilder.andWhereRaw("?? ilike ? escape ?", [
-                    arg.prefix + arg.id,
-                    "%" + arg.search.replace(/\%/g, "\\%").replace(/\_/g, "\\_") + "%",
-                    "\\",
-                ]);
-            }
-        }
-        return true;
-    },
+    sqlStrSearch: string_1.stringSQLStrSearch,
     localStrSearch: (arg) => {
         // item is deleted
         if (!arg.gqlValue) {
@@ -95,7 +66,7 @@ const typeValue = {
         }
         if (arg.search) {
             const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
-            if (exactSearchSubtypes.includes(arg.property.getSubtype())) {
+            if (exports.exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
                 return propertyValue === arg.search;
             }
             else {

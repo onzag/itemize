@@ -11,7 +11,7 @@ const local_sql_1 = require("../local-sql");
 const PropertyDefinition_1 = require("../../PropertyDefinition");
 const constants_1 = require("../../../../../../constants");
 const search_interfaces_1 = require("../search-interfaces");
-const util_1 = require("../../../../../../util");
+const text_1 = require("../sql/text");
 /**
  * The type describes how the text type behaves in the app, this includes rich text
  */
@@ -37,103 +37,12 @@ const typeValue = {
             type: "boolean",
         },
     ],
-    sql: (arg) => {
-        return {
-            [arg.prefix + arg.id]: {
-                type: "text",
-            },
-            [arg.prefix + arg.id + "_DICTIONARY"]: {
-                type: "regconfig",
-            },
-            [arg.prefix + arg.id + "_VECTOR"]: {
-                type: "tsvector",
-                index: {
-                    type: "gin",
-                    id: "FTS_" + arg.prefix + arg.id,
-                    level: 0,
-                },
-            },
-        };
-    },
-    sqlIn: (arg) => {
-        if (arg.value === null) {
-            return {
-                [arg.prefix + arg.id]: null,
-                [arg.prefix + arg.id + "_VECTOR"]: null,
-                [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
-            };
-        }
-        let escapedText = arg.value;
-        let purifiedText = arg.value;
-        if (arg.property.isRichText()) {
-            const dummyElement = util_1.DOMWindow.document.createElement("div");
-            dummyElement.innerHTML = arg.value.toString();
-            escapedText = dummyElement.textContent;
-            purifiedText = util_1.DOMPurify.sanitize(arg.value.toString(), {
-                ADD_TAGS: ["iframe"],
-                ADD_ATTR: ["frameborder", "allow", "allowfullscreen", "scrolling", "spellcheck", "contenteditable"],
-                FORBID_ATTR: ["sizes", "srcset", "src", "data-src"],
-            });
-        }
-        return {
-            [arg.prefix + arg.id]: purifiedText,
-            [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
-            [arg.prefix + arg.id + "_VECTOR"]: arg.knex.raw("to_tsvector(?, ?)", [
-                arg.dictionary,
-                escapedText,
-            ]),
-        };
-    },
+    sql: text_1.textSQL,
+    sqlIn: text_1.textSQLIn,
     sqlOut: sql_1.standardSQLOutFn,
-    sqlSearch: (arg) => {
-        const searchName = search_interfaces_1.PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
-        if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
-            // TODO improve, this only matches exact words
-            // maybe https://github.com/zombodb/zombodb
-            arg.knexBuilder.andWhereRaw("?? @@ to_tsquery(??, ?)", [
-                arg.prefix + arg.id + "_VECTOR",
-                arg.prefix + arg.id + "_DICTIONARY",
-                arg.args[searchName],
-            ]);
-            if (arg.isOrderedByIt) {
-                return [
-                    "ts_rank(??, to_tsquery(??, ?)) AS ??",
-                    [
-                        arg.prefix + arg.id + "_VECTOR",
-                        arg.prefix + arg.id + "_DICTIONARY",
-                        arg.args[searchName],
-                        arg.prefix + arg.id + "_RANK",
-                    ]
-                ];
-            }
-            return true;
-        }
-        return false;
-    },
-    sqlStrSearch: (arg) => {
-        // TODO improve, this only matches exact words
-        // maybe https://github.com/zombodb/zombodb
-        // due to technical limitations with knex, sometimes the builder
-        // isn't available
-        arg.knexBuilder && arg.knexBuilder.whereRaw("?? @@ to_tsquery(??, ?)", [
-            arg.prefix + arg.id + "_VECTOR",
-            arg.prefix + arg.id + "_DICTIONARY",
-            arg.search,
-        ]);
-        if (arg.isOrderedByIt) {
-            return [
-                "ts_rank(??, to_tsquery(??, ?)) AS ??",
-                [
-                    arg.prefix + arg.id + "_VECTOR",
-                    arg.prefix + arg.id + "_DICTIONARY",
-                    arg.search,
-                    arg.prefix + arg.id + "_STRRANK",
-                ]
-            ];
-        }
-        return true;
-    },
-    sqlBtreeIndexable: () => null,
+    sqlSearch: text_1.textSQLSearch,
+    sqlStrSearch: text_1.textSQLStrSearch,
+    sqlBtreeIndexable: text_1.textSQLBtreeIndexable,
     sqlMantenience: null,
     localSearch: (arg) => {
         // item is deleted
@@ -177,15 +86,7 @@ const typeValue = {
     sqlEqual: sql_1.standardSQLEqualFn,
     sqlSSCacheEqual: local_sql_1.standardSQLSSCacheEqualFn,
     localEqual: local_sql_1.standardLocalEqual,
-    sqlOrderBy: (arg) => {
-        if (arg.wasIncludedInSearch) {
-            return [arg.prefix + arg.id + "_RANK", arg.direction, arg.nulls];
-        }
-        else if (arg.wasIncludedInStrSearch) {
-            return [arg.prefix + arg.id + "_STRRANK", arg.direction, arg.nulls];
-        }
-        return null;
-    },
+    sqlOrderBy: text_1.textSQLOrderBy,
     localOrderBy: () => {
         // can't sort due to ranking limitations
         return 0;

@@ -80,6 +80,7 @@ exports.getGQLTypeForModule = getGQLTypeForModule;
  * Provides the object that represents this module data in
  * its not flattened form with external properties available
  * @param mod the module in question
+ * @returns the output type for the module object
  */
 function getGQLQueryOutputForModule(mod) {
     if (!mod._gqlQueryObj) {

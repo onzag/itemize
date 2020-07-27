@@ -106,7 +106,13 @@ export interface IRawJSONI18NDataType {
  */
 export type ListenerType = () => any;
 
-export interface IRequestLimitersType {
+/**
+ * The request limiters that are set in the module
+ * to limit the requests and the form of these requests
+ * the reason these limiters are in the module is because
+ * they are also used for optimization and matenience operations
+ */
+export interface IModuleRequestLimitersType {
   condition: "AND" | "OR",
   since?: number,
   createdBy?: boolean,
@@ -225,7 +231,7 @@ export interface IModuleRawJSONDataType {
    * required at module level, these are basically args
    * And AND index will ensure to add an ordered btree index to these
    */
-  requestLimiters?: IRequestLimitersType;
+  requestLimiters?: IModuleRequestLimitersType;
 }
 
 /**
@@ -774,6 +780,7 @@ export default class Module {
    * Provides the roles that have access to a given
    * action based on the rules that were set
    * @param action the action from the ItemDefinitionIOActions
+   * @returns an array of string with the roles that have the specific io role access
    */
   public getRolesWithAccessTo(action: ItemDefinitionIOActions) {
     // in the case of module, only read makes sense as an action
@@ -786,7 +793,8 @@ export default class Module {
 
   /**
    * Provides the roles that have moderation access to
-   * the moderation fileds for a given item definition
+   * the moderation fileds for a given module
+   * @returns an array of string with the roles that have moderation access
    */
   public getRolesWithModerationAccess(): string[] {
     if (this.rawData.modRoleAccess) {
@@ -797,7 +805,8 @@ export default class Module {
 
   /**
    * Provides the roles that are alowed to flag the
-   * contents of an item definition
+   * contents of an module
+   * @returns an array of string for the flagging role access
    */
   public getRolesWithFlaggingAccess(): string[] {
     if (this.rawData.flagRoleAccess) {
@@ -866,14 +875,26 @@ export default class Module {
     });
   }
 
+  /**
+   * Provides the module request limiters
+   * @returns the request limiters object or null
+   */
   public getRequestLimiters() {
     return this.rawData.requestLimiters || null;
   }
 
+  /**
+   * Specifies how many search records might be obtained at once
+   * @returns an integer
+   */
   public getMaxSearchRecords() {
     return this.rawData.maxSearchRecords || MAX_SEARCH_RECORDS_FALLBACK;
   }
 
+  /**
+   * Specifies how many search results might be obtained at once
+   * @returns an integer
+   */
   public getMaxSearchResults() {
     return this.rawData.maxSearchResults || MAX_SEARCH_RESULTS_FALLBACK;
   }

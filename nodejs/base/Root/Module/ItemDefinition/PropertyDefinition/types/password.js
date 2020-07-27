@@ -4,15 +4,12 @@
  *
  * @packageDocumentation
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const graphql_1 = require("graphql");
 const sql_1 = require("../sql");
 const PropertyDefinition_1 = require("../../PropertyDefinition");
 const constants_1 = require("../../../../../../constants");
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const password_1 = require("../sql/password");
 /**
  * The behaviour of passwords is specified by this type
  */
@@ -20,27 +17,9 @@ const typeValue = {
     gql: graphql_1.GraphQLString,
     nullableDefault: "",
     sql: sql_1.getStandardSQLFnFor && sql_1.getStandardSQLFnFor("text", "pgcrypto"),
-    sqlIn: (arg) => {
-        if (arg.value === null) {
-            return {
-                [arg.prefix + arg.id]: null,
-            };
-        }
-        return {
-            [arg.prefix + arg.id]: arg.knex.raw("crypt(?, gen_salt('bf',10))", arg.value),
-        };
-    },
+    sqlIn: password_1.passwordSQLIn,
     sqlOut: sql_1.standardSQLOutFn,
-    sqlSearch: () => {
-        // This should never happen,
-        // first off the searchable is false so it should never trigger a sql search
-        // EXACT_password will never exist in the search module
-        // however passwords can be retrieved, its hash, they have to be explicitly set
-        // disable retrieval to true, in the document definition itself, not doing so
-        // is a leak, but should be obvious when checking /graphql
-        // we throw an error still
-        throw new Error("Attempted to search by password");
-    },
+    sqlSearch: password_1.passwordSQLSearch,
     sqlStrSearch: null,
     localStrSearch: null,
     sqlOrderBy: null,
@@ -51,27 +30,8 @@ const typeValue = {
     localEqual: () => {
         throw new Error("Attempted to local equal a password");
     },
-    sqlEqual: (arg) => {
-        return arg.knex.raw("?? = crypt(?, ??)", [
-            arg.prefix + arg.id,
-            arg.value,
-            arg.prefix + arg.id,
-        ]);
-    },
-    sqlSSCacheEqual: (arg) => {
-        if (arg.value === null) {
-            return arg.row[arg.prefix + arg.id] === null;
-        }
-        else if (!arg.row[arg.prefix + arg.id]) {
-            return false;
-        }
-        try {
-            return bcrypt_1.default.compareSync(arg.value, arg.row[arg.prefix + arg.id]);
-        }
-        catch (err) {
-            return false;
-        }
-    },
+    sqlEqual: password_1.passwordSQLEqual,
+    sqlSSCacheEqual: password_1.passwordSQLSSEqual,
     sqlBtreeIndexable: () => {
         throw new Error("Attempted to btree index a password, this might mean a files value is in request limiters, don't do that");
     },

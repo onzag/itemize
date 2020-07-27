@@ -379,6 +379,9 @@ async function buildItemDefinition(rawDataConfig, actualLocation, lastModuleDire
             finalValue.versionIsLanguageAndCountry = actualEvaledFileData.versionIsLanguageAndCountry;
         }
     }
+    if (actualEvaledFileData.requestLimiters) {
+        finalValue.requestLimiters = actualEvaledFileData.requestLimiters;
+    }
     if (!finalValue.includes ||
         (Array.isArray(finalValue.includes) && !finalValue.includes.length)) {
         delete finalValue.includes;

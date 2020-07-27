@@ -17,6 +17,7 @@ import pkgcloud from "pkgcloud";
  * be saved when populated, it basically adds up all the table bits
  * from all the properties and all the items, this does not include
  * prop extensions nor module level properties, nor base
+ * @param knex a knex instance
  * @param itemDefinition the item definition in question
  * @returns a complete table definition type
  */
@@ -25,6 +26,7 @@ export declare function getSQLTableDefinitionForItemDefinition(knex: Knex, itemD
  * Provides all the schema of all the items, self and its children
  * that are included within this item definition and all the table names
  * that should be used using the qualified name
+ * @param knex the knex instance
  * @param itemDefinition the item definition in question
  * @returns a partial sql schema definition for the whole database (adds tables)
  */
@@ -34,6 +36,8 @@ export declare function getSQLTablesSchemaForItemDefinition(knex: Knex, itemDefi
  * to a graphql value for this specific item definition,
  * this includes the prop extensions and the reserved base properties
  * This value is FLATTENED
+ * @param knex the knex instance
+ * @param serverData the server data we are working with
  * @param itemDefinition the item definition in question
  * @param row the row value, with all the columns it has; the row
  * can be overblown with other field data, this will extract only the
@@ -48,10 +52,13 @@ export declare function convertSQLValueToGQLValueForItemDefinition(knex: Knex, s
  * Converts a graphql value, with all its items and everything it
  * has into a SQL row data value for this specific item definition
  * it doesn't include its prop extensions
+ * @param knex the knex instance
+ * @param serverData the server data
  * @param itemDefinition the item definition in question
  * @param data the graphql data
  * @param knex the knex instance
  * @param uploadsContainer the uploads container from openstack
+ * @param uploadsPrefix the uploads prefix of the container
  * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
@@ -66,9 +73,13 @@ export declare function convertGQLValueToSQLValueForItemDefinition(knex: Knex, s
 /**
  * Builds a sql query for an item definition so that it can be
  * queried for searches
+ * @param knex the knex instance
+ * @param serverData the server data
  * @param itemDefinition the item definition that is being requested (normal form)
  * @param args the args from the search mode
  * @param knexBuilder the knex builder instance
  * @param dictionary the dictionary being used
+ * @param search the search arg value
+ * @param orderBy the order by rules
  */
 export declare function buildSQLQueryForItemDefinition(knex: Knex, serverData: any, itemDefinition: ItemDefinition, args: IGQLArgs, knexBuilder: Knex.QueryBuilder, dictionary: string, search: string, orderBy: IOrderByRuleType): [string, any[]][];

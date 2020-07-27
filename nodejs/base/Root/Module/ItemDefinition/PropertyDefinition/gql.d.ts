@@ -13,6 +13,7 @@ import { IGQLFieldsDefinitionType } from "../../../gql";
  * @param propertyDefinition the property definition in question
  * @param options.propertiesAsInput if the property should be as an input object, for use within args
  * @param options.optionalForm makes all the properties optional, nullable
+ * @param options.prefix a prefix to prefix the fields by, usually the include prefix if exists
  * @returns the partial graphql fields definition for the property
  */
 export declare function getGQLFieldsDefinitionForProperty(propertyDefinition: PropertyDefinition, options: {

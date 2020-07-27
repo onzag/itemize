@@ -105,6 +105,10 @@ module.exports = {
         use: "null-loader"
       },
       {
+        test: /itemize\\/[a-zA-Z0-9_\\/]+\\/sql\\/[a-zA-Z0-9_-]+\\.ts/,
+        use: "null-loader"
+      },
+      {
         test: /\\.tsx?$/,
         use: {
           loader: "babel-loader"

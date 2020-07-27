@@ -135,6 +135,15 @@ export interface ILocalOrderByInfo extends IArgInfo {
   b: PropertyDefinitionSupportedType;
 }
 
+export interface ISQLMantenienceType {
+  columnToSet: string,
+  setColumnToRaw: [string, any[]],
+  from: string,
+  fromAs: string,
+  whereRaw: [string, any[]],
+  updateConditionRaw: [string, any[]],
+}
+
 /**
  * How every supported type behaviour should be described
  */
@@ -271,14 +280,7 @@ export interface IPropertyDefinitionSupportedType {
    * and it expects a partial value, this value should be null
    * for fields without mantenience
    */
-  sqlMantenience: (arg: ISQLArgInfo) => {
-    columnToSet: string,
-    setColumnToRaw: [string, any[]],
-    from: string,
-    fromAs: string,
-    whereRaw: [string, any[]],
-    updateConditionRaw: [string, any[]],
-  };
+  sqlMantenience: (arg: ISQLArgInfo) => ISQLMantenienceType;
 
   /**
    * represents an item that would mark for null

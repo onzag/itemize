@@ -28,6 +28,7 @@ import {
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { countries, currencies } from "../../../../../../imported-resources";
+import { stringSQLSearch, stringSQLStrSearch } from "../sql/string";
 
 /**
  * The email regex that is used to validate emails
@@ -52,7 +53,7 @@ const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%",
  */
 export type PropertyDefinitionSupportedStringType = string;
 
-const exactSearchSubtypes = ["comprehensive-locale", "language", "country", "currency"];
+export const exactStringSearchSubtypes = ["comprehensive-locale", "language", "country", "currency"];
 
 /**
  * The behaviour of strings is described by this type
@@ -73,57 +74,12 @@ const typeValue: IPropertyDefinitionSupportedType = {
   }),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
-  sqlSearch: (arg) => {
-    const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
-
-    if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
-
-      if (exactSearchSubtypes.includes(arg.property.getSubtype())) {
-        arg.knexBuilder.andWhere(
-          arg.prefix + arg.id,
-          (arg.args[searchName] as string),
-        );
-      } else {
-        arg.knexBuilder.andWhereRaw(
-          "?? ilike ? escape ?",
-          [
-            arg.prefix + arg.id,
-            "%" + (arg.args[searchName] as string).replace(/\%/g, "\\%").replace(/\_/g, "\\_") + "%",
-            "\\",
-          ],
-        );
-      }
-
-      return true;
-    }
-
-    return false;
-  },
+  sqlSearch: stringSQLSearch,
   sqlEqual: standardSQLEqualFn,
   sqlSSCacheEqual: standardSQLSSCacheEqualFn,
   sqlBtreeIndexable: standardSQLBtreeIndexable,
   sqlMantenience: null,
-  sqlStrSearch: (arg) => {
-    if (arg.knexBuilder) {
-      if (exactSearchSubtypes.includes(arg.property.getSubtype())) {
-        arg.knexBuilder.andWhere(
-          arg.prefix + arg.id,
-          arg.search,
-        );
-      } else {
-        arg.knexBuilder.andWhereRaw(
-          "?? ilike ? escape ?",
-          [
-            arg.prefix + arg.id,
-            "%" + arg.search.replace(/\%/g, "\\%").replace(/\_/g, "\\_") + "%",
-            "\\",
-          ],
-        );
-      }
-    }
-
-    return true;
-  },
+  sqlStrSearch: stringSQLStrSearch,
   localStrSearch: (arg) => {
     // item is deleted
     if (!arg.gqlValue) {
@@ -137,7 +93,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     if (arg.search) {
       const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
 
-      if (exactSearchSubtypes.includes(arg.property.getSubtype())) {
+      if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
         return propertyValue === arg.search;
       } else {
         // this is the simple FTS that you get in the client

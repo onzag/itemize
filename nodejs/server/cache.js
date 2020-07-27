@@ -12,7 +12,7 @@ const constants_1 = require("../constants");
 const version_null_value_1 = require("./version-null-value");
 const sql_1 = require("../base/Root/Module/ItemDefinition/sql");
 const sql_2 = require("../base/Root/Module/sql");
-const sql_files_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files");
+const file_management_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management");
 const errors_1 = require("../base/errors");
 const _1 = require(".");
 const CACHE_EXPIRES_DAYS = 14;
@@ -471,10 +471,10 @@ class Cache {
             const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
                 .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
             if (someFilesInItemDef) {
-                await sql_files_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId].container, itemDefinition, id + "." + (specifiedVersion || null));
+                await file_management_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId].container, itemDefinition, id + "." + (specifiedVersion || null));
             }
             if (someFilesInModule) {
-                await sql_files_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId].container, itemDefinition.getParentModule(), id + "." + (specifiedVersion || null));
+                await file_management_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId].container, itemDefinition.getParentModule(), id + "." + (specifiedVersion || null));
             }
         };
         let runDetachedEvents = async (specifiedVersion) => {

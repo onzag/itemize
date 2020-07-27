@@ -226,31 +226,77 @@ export function retrieveSince(args: IGQLArgs): string {
 
 export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition) {
   const mod = idefOrMod instanceof Module ? idefOrMod : idefOrMod.getParentModule();
-  const limiters = mod.getRequestLimiters();
-  if (!limiters) {
+  const modLimiters = mod.getRequestLimiters();
+  const idefLimiters = idefOrMod instanceof ItemDefinition ? idefOrMod.getRequestLimiters() : null;
+  if (!modLimiters && !idefLimiters) {
     return;
   }
 
+  let customLimitersCombined: Array<{
+    modLimiter: boolean;
+    propertyId: string;
+  }> = [];
+  if (modLimiters && modLimiters.custom) {
+    customLimitersCombined = customLimitersCombined.concat(modLimiters.custom.map((l) => ({
+      modLimiter: true,
+      propertyId: l,
+    })));
+  }
+  if (idefLimiters && idefLimiters.custom) {
+    customLimitersCombined = customLimitersCombined.concat(idefLimiters.custom.map((l) => ({
+      modLimiter: false,
+      propertyId: l,
+    })));
+  }
+
   let customError: string = null;
-  let someCustomLimiterSucceed = false;
-  if (limiters.custom) {
-    someCustomLimiterSucceed = limiters.custom.some((propertyIdLimiter: string) => {
-      const property = mod.getPropExtensionFor(propertyIdLimiter);
+  let customErrorIsModLimiter: boolean = false;
+  let someModCustomLimiterSucceed = false;
+  let someIdefCustomLimiterSucceed = false;
+  if (customLimitersCombined.length) {
+    customLimitersCombined.forEach((v) => {
+      const property = idefOrMod instanceof Module ?
+        mod.getPropExtensionFor(v.propertyId) :
+        idefOrMod.getPropertyDefinitionFor(v.propertyId, true);
+
       const expectedConversionIds = getConversionIds(property.rawData);
       const succeed = expectedConversionIds.every((conversionId: string) => {
         return typeof args[conversionId] === "undefined";
       });
+
       if (!succeed) {
-        customError = "Missing custom request search limiter required by limiter set by " + propertyIdLimiter + " in module " +
-          mod.getQualifiedPathName() + " requiring of both " + expectedConversionIds.join(", ");
+        customErrorIsModLimiter = v.modLimiter;
+        if (v.modLimiter) {
+          customError = "Missing custom request search limiter required by limiter set by " + v.propertyId + " in module " +
+            mod.getQualifiedPathName() + " requiring of " + expectedConversionIds.join(", ");
+        } else {
+          customError = "Missing custom request search limiter required by limiter set by " + v.propertyId + " in idef " +
+            idefOrMod.getQualifiedPathName() + " requiring of " + expectedConversionIds.join(", ");
+        }
       }
-      return succeed;
+      if (succeed && v.modLimiter && !someModCustomLimiterSucceed) {
+        someModCustomLimiterSucceed = succeed;
+      } else if (succeed && !v.modLimiter && !someIdefCustomLimiterSucceed) {
+        someIdefCustomLimiterSucceed = succeed;
+      }
     });
   }
 
   if (
-    limiters.condition === "AND" &&
-    customError
+    modLimiters &&
+    modLimiters.condition === "AND" &&
+    customError &&
+    customErrorIsModLimiter
+  ) {
+    throw new EndpointError({
+      message: customError,
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  } else if (
+    idefLimiters &&
+    idefLimiters.condition === "AND" &&
+    customError &&
+    !customErrorIsModLimiter
   ) {
     throw new EndpointError({
       message: customError,
@@ -260,7 +306,7 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
 
   let sinceError: string = null;
   let sinceSucceed = false;
-  if (limiters.since) {
+  if (modLimiters && modLimiters.since) {
     const sinceArg = args.since ? new Date(args.since as string) : null;
     const hasSince = !!sinceArg;
     if (!hasSince) {
@@ -268,9 +314,9 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
     } else {
       const now = (new Date()).getTime();
       const sinceMs = sinceArg.getTime();
-      if (now - sinceMs > limiters.since) {
+      if (now - sinceMs > modLimiters.since) {
         sinceError = "Since is not respected as it requires a difference of less than " +
-          limiters.since + "ms but " + sinceMs + " provided"
+        modLimiters.since + "ms but " + sinceMs + " provided"
       } else {
         sinceSucceed = true;
       }
@@ -278,7 +324,8 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
   }
 
   if (
-    limiters.condition === "AND" &&
+    modLimiters &&
+    modLimiters.condition === "AND" &&
     sinceError
   ) {
     throw new EndpointError({
@@ -288,12 +335,13 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
   }
 
   let createdBySucceed = false;
-  if (limiters.createdBy) {
+  if (modLimiters && modLimiters.createdBy) {
     createdBySucceed = !!(args.created_by);
   }
 
   if (
-    limiters.condition === "AND" &&
+    modLimiters &&
+    modLimiters.condition === "AND" &&
     !createdBySucceed
   ) {
     throw new EndpointError({
@@ -303,12 +351,13 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
   }
 
   let parentingSucceed = false;
-  if (limiters.parenting) {
+  if (modLimiters && modLimiters.parenting) {
     parentingSucceed = !!(args.parent_id && args.parent_type);
   }
 
   if (
-    limiters.condition === "AND" &&
+    modLimiters &&
+    modLimiters.condition === "AND" &&
     !parentingSucceed
   ) {
     throw new EndpointError({
@@ -317,11 +366,11 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
     });
   }
 
-  if (limiters.condition === "OR") {
-    const passedCustom = limiters.custom && someCustomLimiterSucceed;
-    const passedSince = limiters.since && sinceSucceed;
-    const passedCreatedBy = limiters.createdBy && createdBySucceed;
-    const passedParenting = limiters.parenting && parentingSucceed;
+  if (modLimiters && modLimiters.condition === "OR") {
+    const passedCustom = modLimiters.custom && someModCustomLimiterSucceed;
+    const passedSince = modLimiters.since && sinceSucceed;
+    const passedCreatedBy = modLimiters.createdBy && createdBySucceed;
+    const passedParenting = modLimiters.parenting && parentingSucceed;
 
     if (
       passedCustom ||
@@ -333,7 +382,18 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
     }
 
     throw new EndpointError({
-      message: "None of the OR request limiting conditions passed",
+      message: "None of the OR request limiting conditions from the module passed",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    }); 
+  }
+
+  if (idefLimiters && idefLimiters.condition === "OR") {
+    const passedCustom = modLimiters.custom && someIdefCustomLimiterSucceed;
+    if (passedCustom) {
+      return;
+    }
+    throw new EndpointError({
+      message: "None of the OR request limiting conditions from the item definition passed",
       code: ENDPOINT_ERRORS.UNSPECIFIED,
     }); 
   }

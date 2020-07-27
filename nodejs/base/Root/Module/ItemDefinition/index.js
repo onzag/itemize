@@ -24,6 +24,7 @@ const errors_1 = require("../../../errors");
 const uuid_1 = __importDefault(require("uuid"));
 const gql_util_1 = require("../../../../gql-util");
 const imported_resources_1 = require("../../../../imported-resources");
+;
 /**
  * Represents the possible io actions to be performed
  * within an item definition
@@ -97,6 +98,7 @@ class ItemDefinition {
      * this same item definition raw
      * @param name the name of the expected child item
      * @param avoidImports whether to avoid imported items from the module
+     * @returns a raw item definition if found, or null
      */
     static getItemDefinitionRawFor(itemDefinitionRaw, parentModuleRaw, name, avoidImports) {
         // Find the definition in the raw form
@@ -133,6 +135,7 @@ class ItemDefinition {
      * @param parentModuleRaw the raw module
      * @param id the id of the property
      * @param includeExtensions whether to include the extensions
+     * @returns a raw property definition if found, or null
      */
     static getPropertyDefinitionRawFor(itemDefinitionRaw, parentModuleRaw, id, includeExtensions) {
         // We try to find the item definition locally
@@ -208,6 +211,13 @@ class ItemDefinition {
         });
     }
     /**
+     * Provides the item definition and only the item definition request limiters
+     * @returns the request limiters object or null
+     */
+    getRequestLimiters() {
+        return this.rawData.requestLimiters || null;
+    }
+    /**
      * Flags this item definition into an extensions instance
      */
     setAsExtensionsInstance() {
@@ -232,6 +242,7 @@ class ItemDefinition {
      * @param version the version id
      * @param supportedLanguages the array list of supported language this function
      * is unaware of supported languages so it needs to ask in order to check for a version
+     * @returns a boolean on whether it's a valid version
      */
     isValidVersion(version, supportedLanguages) {
         // if it's not a versioned item definition and the version is not null
@@ -385,6 +396,7 @@ class ItemDefinition {
     /**
      * Provides a raw json item definition that it has a children
      * @param name the name of the item definition
+     * @param avoidImports optional whether to avoid imported item definitions
      * @throws an error if the item definition does not exist
      * @returns a raw item definition
      */

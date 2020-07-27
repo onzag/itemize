@@ -7,7 +7,7 @@
  */
 import { IPropertyDefinitionRawJSONDataType } from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Include";
-import { IPoliciesRawJSONDataType } from "../base/Root/Module/ItemDefinition";
+import { IPoliciesRawJSONDataType, IItemDefinitionRequestLimitersType } from "../base/Root/Module/ItemDefinition";
 import "source-map-support/register";
 /**
  * and this is the raw untreated json for an item
@@ -30,5 +30,6 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
     versionIsLanguageAndCountry?: boolean;
     versionIsLanguage?: boolean;
     versionIsCountry?: boolean;
+    requestLimiters?: IItemDefinitionRequestLimitersType;
 }
 export default function build(): Promise<void>;

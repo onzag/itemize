@@ -3,6 +3,8 @@
  * Contains the very important error type and file
  * which specifies a pattern that is to be used in order
  * to send errors from the server side to the client side
+ *
+ * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 /**

@@ -84,7 +84,13 @@ export interface IRawJSONI18NDataType {
  * and item definitions
  */
 export declare type ListenerType = () => any;
-export interface IRequestLimitersType {
+/**
+ * The request limiters that are set in the module
+ * to limit the requests and the form of these requests
+ * the reason these limiters are in the module is because
+ * they are also used for optimization and matenience operations
+ */
+export interface IModuleRequestLimitersType {
     condition: "AND" | "OR";
     since?: number;
     createdBy?: boolean;
@@ -195,7 +201,7 @@ export interface IModuleRawJSONDataType {
      * required at module level, these are basically args
      * And AND index will ensure to add an ordered btree index to these
      */
-    requestLimiters?: IRequestLimitersType;
+    requestLimiters?: IModuleRequestLimitersType;
 }
 /**
  * The class module that defines how the module behaves
@@ -417,16 +423,19 @@ export default class Module {
      * Provides the roles that have access to a given
      * action based on the rules that were set
      * @param action the action from the ItemDefinitionIOActions
+     * @returns an array of string with the roles that have the specific io role access
      */
     getRolesWithAccessTo(action: ItemDefinitionIOActions): string[];
     /**
      * Provides the roles that have moderation access to
-     * the moderation fileds for a given item definition
+     * the moderation fileds for a given module
+     * @returns an array of string with the roles that have moderation access
      */
     getRolesWithModerationAccess(): string[];
     /**
      * Provides the roles that are alowed to flag the
-     * contents of an item definition
+     * contents of an module
+     * @returns an array of string for the flagging role access
      */
     getRolesWithFlaggingAccess(): string[];
     /**
@@ -445,8 +454,20 @@ export default class Module {
      * @returns a boolean on whether the user is granted role access
      */
     checkRoleAccessFor(action: ItemDefinitionIOActions, role: string, userId: number, ownerUserId: number, requestedFields: IGQLRequestFields, throwError: boolean): boolean;
-    getRequestLimiters(): IRequestLimitersType;
+    /**
+     * Provides the module request limiters
+     * @returns the request limiters object or null
+     */
+    getRequestLimiters(): IModuleRequestLimitersType;
+    /**
+     * Specifies how many search records might be obtained at once
+     * @returns an integer
+     */
     getMaxSearchRecords(): number;
+    /**
+     * Specifies how many search results might be obtained at once
+     * @returns an integer
+     */
     getMaxSearchResults(): number;
     /**
      * Merges two i18n data components, for example the i18n data for

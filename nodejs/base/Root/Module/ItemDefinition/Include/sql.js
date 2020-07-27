@@ -13,9 +13,10 @@ const Include_1 = require("../Include");
 /**
  * Provides the table bit that is necessary to store include data
  * for this include when included from the parent definition
+ * @param kenx the current knex instance
  * @param itemDefinition the item definition that contains the include (not the referred)
  * @param include the include in question
- * @returns the partial table definition schema for the include
+ * @returns the partial table definition schema for the include, prefixed and with the exclusion state
  */
 function getSQLTableDefinitionForInclude(knex, itemDefinition, include) {
     // the exclusion state needs to be stored in the table bit
@@ -47,19 +48,17 @@ function getSQLTableDefinitionForInclude(knex, itemDefinition, include) {
 exports.getSQLTableDefinitionForInclude = getSQLTableDefinitionForInclude;
 /**
  * Given a SQL row it converts the value of the data contained
- * within that row into the valid graphql value for that data
+ * within that row into the valid graphql output
+ * @param knex the knex instance
+ * @param serverData the server data that is currently in use
  * @param include the include in question
  * @param row the row sql data
- * @param graphqlFields contains the only properties that are required
+ * @param graphqlFields (optional) contains the only properties that are required
  * in the request provided by grapql fields,
  * eg {id: {}, name: {}}
  * @returns a partial graphql value
  */
 function convertSQLValueToGQLValueForInclude(knex, serverData, itemDefinition, include, row, graphqlFields) {
-    // first we create a prefix, the prefix is basically ITEM_wheel_
-    // this prefix is added as you remember for every item extra property as
-    // wheel as the item itself
-    const prefix = include.getPrefixedQualifiedIdentifier();
     // now this is the result, of the graphql parent field because this is
     // an object that contains an object, the item sinking properties
     // are contained within that prefix, for example if the sql is
@@ -94,6 +93,11 @@ exports.convertSQLValueToGQLValueForInclude = convertSQLValueToGQLValueForInclud
  * @param itemDefinition the item definition in question
  * @param include the include in question
  * @param data the graphql data value
+ * @param oldData the old graphql data value that used to be stored for that include
+ * @param uploadsContainer the uploads container that is used to store data for this
+ * include
+ * @param uploadsPrefix the prefix of the uploads container that is used to do
+ * https requests given a path
  * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
@@ -145,6 +149,9 @@ function convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, i
 exports.convertGQLValueToSQLValueForInclude = convertGQLValueToSQLValueForInclude;
 /**
  * Builds a sql query for an include
+ * @param knex the knex instance
+ * @param serverData the server data information
+ * @param itemDefinition the item definition that contains the include
  * @param include the include in question
  * @param args the args as they come from the search module, specific for this item (not nested)
  * @param knexBuilder the knex query builder

@@ -44,7 +44,7 @@ import { ILocaleContextType } from "../client/internal/app";
 import { ICollectorType } from "../client";
 import { Pool } from "tarn";
 import { retrieveRootPool } from "./rootpool";
-import { removeFolderFor } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql-files";
+import { removeFolderFor } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
 import { ISEORuleSet } from "./seo";
 import { SEOGenerator } from "./seo/generator";
 

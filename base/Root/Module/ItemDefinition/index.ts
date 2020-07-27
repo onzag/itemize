@@ -33,6 +33,16 @@ import { IGQLValue, IGQLRequestFields } from "../../../../gql-querier";
 import { countries } from "../../../../imported-resources";
 
 /**
+ * The request limiters that are set in the item definition
+ * itself, basically only supports the item definition custom
+ * properties
+ */
+export interface IItemDefinitionRequestLimitersType {
+  condition: "AND" | "OR",
+  custom: string[],
+};
+
+/**
  * Policies eg, readRoleAccess, editRoleAccess, createRoleAccess
  * this is the form they have deep in after the name
  */
@@ -45,7 +55,15 @@ export interface IPolicyValueRawJSONDataType {
   applyingPropertyOnlyAppliesWhenCurrentIsNonNull?: boolean;
   applyingIncludes?: string[];
 
-  // always available for parenting rules, at least module
+  // always available for parenting rules at least module is required
+  // reason is simple when using the policy eg. say you have a parent
+  // thread that only people with a specific key can post to, you want
+  // the properties to come from that module of the parent; so while the policy
+  // exists in the "post" item definition the module and item definition must
+  // be for the "thread" and the properties list is the "thread" code
+
+  // we do not filter these here, the schema.ts file takes care of ensuring
+  // they have the right form
   module?: string;
   itemDefinition?: string;
 }
@@ -226,6 +244,10 @@ export interface IItemDefinitionRawJSONDataType {
    * A list of roles who have access to parenting
    */
   parentingRoleAccess?: string[];
+  /**
+   * the request limiters
+   */
+  requestLimiters?: IItemDefinitionRequestLimitersType;
 }
 
 /**
@@ -368,6 +390,7 @@ export default class ItemDefinition {
    * this same item definition raw
    * @param name the name of the expected child item
    * @param avoidImports whether to avoid imported items from the module
+   * @returns a raw item definition if found, or null
    */
   public static getItemDefinitionRawFor(
     itemDefinitionRaw: IItemDefinitionRawJSONDataType,
@@ -417,6 +440,7 @@ export default class ItemDefinition {
    * @param parentModuleRaw the raw module
    * @param id the id of the property
    * @param includeExtensions whether to include the extensions
+   * @returns a raw property definition if found, or null
    */
   public static getPropertyDefinitionRawFor(
     itemDefinitionRaw: IItemDefinitionRawJSONDataType,
@@ -659,6 +683,14 @@ export default class ItemDefinition {
   }
 
   /**
+   * Provides the item definition and only the item definition request limiters
+   * @returns the request limiters object or null
+   */
+  public getRequestLimiters() {
+    return this.rawData.requestLimiters || null;
+  }
+
+  /**
    * Flags this item definition into an extensions instance
    */
   public setAsExtensionsInstance() {
@@ -686,6 +718,7 @@ export default class ItemDefinition {
    * @param version the version id
    * @param supportedLanguages the array list of supported language this function
    * is unaware of supported languages so it needs to ask in order to check for a version
+   * @returns a boolean on whether it's a valid version
    */
   public isValidVersion(version: string, supportedLanguages: string[]) {
     // if it's not a versioned item definition and the version is not null
@@ -868,6 +901,7 @@ export default class ItemDefinition {
   /**
    * Provides a raw json item definition that it has a children
    * @param name the name of the item definition
+   * @param avoidImports optional whether to avoid imported item definitions
    * @throws an error if the item definition does not exist
    * @returns a raw item definition
    */
