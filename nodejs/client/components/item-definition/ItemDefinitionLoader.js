@@ -1,12 +1,23 @@
 "use strict";
+/**
+ * Provides an item definition loader component that allows for functionality
+ * regarding notFound, blocked, data accessible, loading, loaded, etc... with
+ * conditional rendering
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const item_definition_1 = require("../../providers/item-definition");
+/**
+ * Class that actually does the item definition loader conditional logic and optimizes
+ */
 class ActualItemDefinitionLoader extends react_1.default.Component {
     shouldComponentUpdate(nextProps) {
+        // so we only render if any of our logical rendering attributes differ
         return nextProps.itemDefinitionContext.loadError !== this.props.itemDefinitionContext.loadError ||
             nextProps.children !== this.props.children ||
             nextProps.itemDefinitionContext.blocked !== this.props.itemDefinitionContext.blocked ||
@@ -29,8 +40,10 @@ class ActualItemDefinitionLoader extends react_1.default.Component {
     }
 }
 /**
- * This safe element assumes success and will render success unless proven
- * otherwise, there's no loading, it will use whatever it has stored meanwhile
+ * The item definition loader component allows for conditional rendering depending on the
+ * fact on the state of the item definition value itself, allows for many types of
+ * rendering conditions depending on the loading state, should use mostly if a forId
+ * is specified as that requires loading
  */
 function ItemDefinitionLoader(props) {
     return (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContext) => (react_1.default.createElement(ActualItemDefinitionLoader, Object.assign({}, props, { itemDefinitionContext: itemDefinitionContext })))));

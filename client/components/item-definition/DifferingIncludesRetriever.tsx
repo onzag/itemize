@@ -9,6 +9,7 @@ import {
   ItemDefinitionContext,
 } from "../../providers/item-definition";
 import { IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
+import equals from "deep-equal";
 
 /**
  * The differing include info is the argument that is
@@ -43,6 +44,39 @@ interface IDifferingIncludesRetrieverProps {
   children: (differingIncludes: IDifferingIncludeInfo[]) => React.ReactNode;
 }
 
+/**
+ * The interface for a class for optimization of the differing properties retriever
+ */
+interface IOptimizerDifferingIncludesRetrieverProps {
+  /**
+   * The calculated differing includes
+   */
+  differingIncludes: IDifferingIncludeInfo[];
+  /**
+   * The solution
+   */
+  children: (differingIncludes: IDifferingIncludeInfo[]) => React.ReactNode;
+}
+
+/**
+ * Basically only allows a rerender of the children if the different properties do in fact differ
+ */
+class OptimizerDifferingIncludesRetriever extends React.Component<IOptimizerDifferingIncludesRetrieverProps> {
+  public shouldComponentUpdate(nextProps: IOptimizerDifferingIncludesRetrieverProps) {
+    // basically we only update when the final properties or the children function differ
+    return nextProps.children !== this.props.children ||
+      !equals(nextProps.differingIncludes, this.props.differingIncludes);
+  }
+  public render() {
+    return this.props.children(this.props.differingIncludes);
+  }
+}
+
+/**
+ * The class for differing includes which provides includes that differ from their applied value
+ * @param props the differing includes props
+ * @returns a react component
+ */
 export default function DifferingIncludesRetriever(props: IDifferingIncludesRetrieverProps) {
   // for that we need to use the item definition context
   return (
@@ -125,7 +159,10 @@ export default function DifferingIncludesRetriever(props: IDifferingIncludesRetr
             differingProperties,
           }
         }).filter(v => !!v);
-        return props.children(finalIncludes);
+
+        return (
+          <OptimizerDifferingIncludesRetriever children={props.children} differingIncludes={finalIncludes}/>
+        );
       }
     }</ItemDefinitionContext.Consumer>
   )

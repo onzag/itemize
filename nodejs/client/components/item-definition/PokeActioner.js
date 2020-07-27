@@ -1,4 +1,11 @@
 "use strict";
+/**
+ * Contains the poke actioner class that allows to interact with poked elements,
+ * poked elements by are meant display errors and their actual status, as
+ * "they have been poked by the user" in some way or form
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -6,20 +13,58 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const item_definition_1 = require("../../providers/item-definition");
 const deep_equal_1 = __importDefault(require("deep-equal"));
+/**
+ * Basically uses a should component update to prevent
+ * the function to running with the same argument value
+ */
+class OptimizerPokeActioner extends react_1.default.Component {
+    shouldComponentUpdate(nextProps) {
+        return this.props.children !== nextProps.children ||
+            this.props.poke !== nextProps.poke ||
+            this.props.clean !== nextProps.clean ||
+            this.props.unpoke !== nextProps.unpoke ||
+            this.props.hasInvalidToPokeInclude !== nextProps.hasInvalidToPokeInclude ||
+            this.props.hasInvalidToPokePolicy !== nextProps.hasInvalidToPokePolicy ||
+            this.props.hasInvalidToPokeProperty !== nextProps.hasInvalidToPokeProperty ||
+            !deep_equal_1.default(this.props.pokedElements, nextProps.pokedElements) ||
+            !deep_equal_1.default(this.props.elementsToPoke, nextProps.elementsToPoke);
+    }
+    render() {
+        return this.props.children({
+            hasInvalidToPokeProperty: this.props.hasInvalidToPokeProperty,
+            hasInvalidToPokeInclude: this.props.hasInvalidToPokeInclude,
+            hasInvalidToPokePolicy: this.props.hasInvalidToPokePolicy,
+            pokedElements: this.props.pokedElements,
+            elementsToPoke: this.props.elementsToPoke,
+            unpoke: this.props.unpoke,
+            pokeElementsToPoke: this.props.poke.bind(null, this.props.elementsToPoke),
+            poke: this.props.poke,
+            clean: this.props.clean,
+        });
+    }
+}
+/**
+ * This class contains the actual logic for the poke actioner
+ */
 class ActualPokeActioner extends react_1.default.Component {
     shouldComponentUpdate(nextProps) {
+        // it only updates when these changes, as all the other information is virtually unecessary
         return nextProps.children !== this.props.children ||
             !deep_equal_1.default(nextProps.itemDefinitionContext.pokedElements, this.props.itemDefinitionContext.pokedElements) ||
             !deep_equal_1.default(nextProps.itemDefinitionContext.state, this.props.itemDefinitionContext.state);
     }
     render() {
+        // first we check all the properties from the elements to poke
         const hasInvalidToPokeProperty = this.props.elementsToPoke.properties.some((pId) => {
+            // try to find the state
             const propertyState = this.props.itemDefinitionContext.state.properties.find(pstate => pstate.propertyId === pId);
             if (!propertyState) {
                 return false;
             }
+            // and see if we have an invalid reason
             return propertyState.invalidReason;
         });
+        // we do the same with includes
         const hasInvalidToPokeInclude = this.props.elementsToPoke.includes.some((iId) => {
             if (!this.props.itemDefinitionContext.state.includes) {
                 return false;
@@ -30,6 +75,7 @@ class ActualPokeActioner extends react_1.default.Component {
             }
             return includeState.itemDefinitionState.properties.some((pstate) => pstate.invalidReason);
         });
+        // as well as policies
         const hasInvalidToPokePolicy = this.props.elementsToPoke.policies.some((ppath) => {
             const policyTypeSpace = this.props.itemDefinitionContext.state.policies[ppath[0]];
             if (!policyTypeSpace) {
@@ -41,19 +87,18 @@ class ActualPokeActioner extends react_1.default.Component {
             }
             return policyState.some((pstate) => pstate.invalidReason);
         });
-        return this.props.children({
-            hasInvalidToPokeProperty,
-            hasInvalidToPokeInclude,
-            hasInvalidToPokePolicy,
-            pokedElements: this.props.itemDefinitionContext.pokedElements,
-            elementsToPoke: this.props.elementsToPoke,
-            unpoke: this.props.itemDefinitionContext.unpoke,
-            pokeElementsToPoke: this.props.itemDefinitionContext.poke.bind(null, this.props.elementsToPoke),
-            poke: this.props.itemDefinitionContext.poke,
-            clean: this.props.itemDefinitionContext.clean,
-        });
+        // and we return that to the optimizer
+        return (react_1.default.createElement(OptimizerPokeActioner, { children: this.props.children, hasInvalidToPokeInclude: hasInvalidToPokeInclude, hasInvalidToPokeProperty: hasInvalidToPokeProperty, hasInvalidToPokePolicy: hasInvalidToPokePolicy, pokedElements: this.props.itemDefinitionContext.pokedElements, elementsToPoke: this.props.elementsToPoke, unpoke: this.props.itemDefinitionContext.unpoke, poke: this.props.itemDefinitionContext.poke, clean: this.props.itemDefinitionContext.clean }));
     }
 }
+/**
+ * This actioner allows for conditional poking and realizing the state
+ * of the elements that are expected to be poked in order to build
+ * logic upon them
+ *
+ * @param props the poke actioner props
+ * @returns a react node
+ */
 function PokeActioner(props) {
     return (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContext) => (react_1.default.createElement(ActualPokeActioner, Object.assign({}, props, { itemDefinitionContext: itemDefinitionContext })))));
 }

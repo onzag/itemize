@@ -11,6 +11,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const item_definition_1 = require("../../providers/item-definition");
 const Include_1 = require("../../../base/Root/Module/ItemDefinition/Include");
+const deep_equal_1 = __importDefault(require("deep-equal"));
+/**
+ * Basically only allows a rerender of the children if the different properties do in fact differ
+ */
+class OptimizerDifferingIncludesRetriever extends react_1.default.Component {
+    shouldComponentUpdate(nextProps) {
+        // basically we only update when the final properties or the children function differ
+        return nextProps.children !== this.props.children ||
+            !deep_equal_1.default(nextProps.differingIncludes, this.props.differingIncludes);
+    }
+    render() {
+        return this.props.children(this.props.differingIncludes);
+    }
+}
+/**
+ * The class for differing includes which provides includes that differ from their applied value
+ * @param props the differing includes props
+ * @returns a react component
+ */
 function DifferingIncludesRetriever(props) {
     // for that we need to use the item definition context
     return (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContext) => {
@@ -81,7 +100,7 @@ function DifferingIncludesRetriever(props) {
                 differingProperties,
             };
         }).filter(v => !!v);
-        return props.children(finalIncludes);
+        return (react_1.default.createElement(OptimizerDifferingIncludesRetriever, { children: props.children, differingIncludes: finalIncludes }));
     }));
 }
 exports.default = DifferingIncludesRetriever;

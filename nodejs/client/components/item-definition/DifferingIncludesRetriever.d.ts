@@ -35,5 +35,10 @@ interface IDifferingIncludesRetrieverProps {
      */
     children: (differingIncludes: IDifferingIncludeInfo[]) => React.ReactNode;
 }
+/**
+ * The class for differing includes which provides includes that differ from their applied value
+ * @param props the differing includes props
+ * @returns a react component
+ */
 export default function DifferingIncludesRetriever(props: IDifferingIncludesRetrieverProps): JSX.Element;
 export {};
