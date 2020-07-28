@@ -1,10 +1,22 @@
 "use strict";
+/**
+ * Simply provides the current language
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const app_1 = require("../../internal/app");
+/**
+ * Allows to read the current language as well as to change it from
+ * the list of available languages that it can change, it also provides
+ * the rtl property for right to left languages
+ * @param props the props
+ * @returns a react node
+ */
 function AppLanguageRetriever(props) {
     return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeContext) => {
         const currentLanguage = {

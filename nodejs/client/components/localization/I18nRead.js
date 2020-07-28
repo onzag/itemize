@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * Provides the read functionality to read language content in the
+ * item definition, module, or even the root context
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -10,6 +16,11 @@ const util_1 = require("../../../util");
 const include_1 = require("../../providers/include");
 const module_1 = require("../../providers/module");
 const util_2 = require("../../../util");
+/**
+ * For a given object target, it will loop until it gets a match for the given key
+ * @param target the object targe
+ * @param keySplitted the splitted key to dive in
+ */
 function loopForKeyAtTarget(target, keySplitted) {
     let result = typeof target === "undefined" ? null : target;
     keySplitted.forEach((key) => {
@@ -22,36 +33,46 @@ function loopForKeyAtTarget(target, keySplitted) {
     });
     return result;
 }
-function i18nReadInternal(localeContext, moduleContextualValue, itemDefinitionContextualValue, includeContext, props) {
+/**
+ * This function is a helper that represents what is used internally by
+ * the i18n reader, given what it needs
+ *
+ * @param localeContext it needs the locale context to get the current language and the root locale data
+ * @param mod it needs the module in its context or null
+ * @param idef it needs the item definition in its context or null
+ * @param include the include in its context or null
+ * @param props the current props
+ */
+function i18nReadInternal(localeContext, mod, idef, include, props) {
     const idSplitted = props.id.split(".");
     // so first we go in order of priority of what we want to read
     let i18nValue = null;
     // first by the inlcude context
-    if (includeContext) {
+    if (include) {
         // if we have a name we use the include context using the name i18n function
         // as the name can be inherited from the item definition if not specified
         if (props.propertyId) {
-            const property = includeContext.include.getSinkingPropertyFor(props.propertyId);
+            const property = include.getSinkingPropertyFor(props.propertyId);
             i18nValue = loopForKeyAtTarget(property.getI18nDataFor(localeContext.language), idSplitted);
         }
         else if (props.id === "name") {
-            i18nValue = includeContext.include.getI18nNameFor(localeContext.language) || null;
+            i18nValue = include.getI18nNameFor(localeContext.language) || null;
         }
         else {
             // othewise we just extract the i18n data for the include and call it with the id,
             // normally there are only specific labels here at this level in the include context
-            i18nValue = loopForKeyAtTarget(includeContext.include.getI18nDataFor(localeContext.language), idSplitted);
+            i18nValue = loopForKeyAtTarget(include.getI18nDataFor(localeContext.language), idSplitted);
         }
     }
     // so if the include thing failed and we have an item definition context
-    if (itemDefinitionContextualValue && i18nValue === null) {
+    if (idef && i18nValue === null) {
         if (props.propertyId) {
-            const property = itemDefinitionContextualValue.idef.getPropertyDefinitionFor(props.propertyId, true);
+            const property = idef.getPropertyDefinitionFor(props.propertyId, true);
             i18nValue = loopForKeyAtTarget(property.getI18nDataFor(localeContext.language), idSplitted);
         }
         else {
             // so we get the i18n item definition data
-            const i18nIdefData = itemDefinitionContextualValue.idef.getI18nDataFor(localeContext.language);
+            const i18nIdefData = idef.getI18nDataFor(localeContext.language);
             // if we are specifying a policy like if we are in a policy context
             if (props.policyType && props.policyName) {
                 // we go for the policy value and the policy name value
@@ -72,14 +93,14 @@ function i18nReadInternal(localeContext, moduleContextualValue, itemDefinitionCo
         }
     }
     // now in modules
-    if (moduleContextualValue && i18nValue === null) {
+    if (mod && i18nValue === null) {
         if (props.propertyId) {
-            const property = moduleContextualValue.mod.getPropExtensionFor(props.propertyId);
+            const property = mod.getPropExtensionFor(props.propertyId);
             i18nValue = loopForKeyAtTarget(property.getI18nDataFor(localeContext.language), idSplitted);
         }
         else {
             // modules act similar to item definitions they also support custom properties
-            const i18nModData = moduleContextualValue.mod.getI18nDataFor(localeContext.language);
+            const i18nModData = mod.getI18nDataFor(localeContext.language);
             const customValue = loopForKeyAtTarget(i18nModData, ["custom"].concat(idSplitted));
             if (customValue) {
                 i18nValue = customValue;
@@ -100,18 +121,18 @@ function i18nReadInternal(localeContext, moduleContextualValue, itemDefinitionCo
         // we want to throw an error
         let errMessage = "Unknown key in context: " + props.id;
         // let's make the error more specific
-        if (itemDefinitionContextualValue) {
+        if (idef) {
             // specify the context
             errMessage += "; in item definition context for " +
-                itemDefinitionContextualValue.idef.getName();
+                idef.getName();
             // add the policies if any
             if (props.policyType && props.policyName) {
                 errMessage += "; in policy " + props.policyType + " " + props.policyName;
             }
             // and the include is if so deemed required
-            if (includeContext) {
+            if (include) {
                 errMessage += "; in item context for " +
-                    includeContext.include.getId();
+                    include.getId();
             }
             // and the include is if so deemed required
             if (props.propertyId) {
@@ -158,10 +179,24 @@ function i18nReadInternal(localeContext, moduleContextualValue, itemDefinitionCo
     // otherwise we return the children wrapped function
     return props.children(finalContent);
 }
-exports.i18nReadInternal = i18nReadInternal;
+/**
+ * The optimizer class just pipes to the internal
+ */
+class I18nReadInternalOptimized extends react_1.default.PureComponent {
+    render() {
+        return i18nReadInternal(this.props.localeContext, this.props.mod, this.props.idef, this.props.include, this.props);
+    }
+    ;
+}
+exports.I18nReadInternalOptimized = I18nReadInternalOptimized;
+/**
+ * Allows to read localized properties from the properties
+ * file as they are available in the current context
+ *
+ * @param props the props
+ * @returns a react node
+ */
 function I18nRead(props) {
-    return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (moduleContextualValue) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContext) => {
-        return i18nReadInternal(localeContext, moduleContextualValue, itemDefinitionContextualValue, includeContext, props);
-    }))))))));
+    return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (moduleContextualValue) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContext) => (react_1.default.createElement(I18nReadInternalOptimized, Object.assign({}, props, { localeContext: localeContext, mod: moduleContextualValue && moduleContextualValue.mod, idef: itemDefinitionContextualValue && itemDefinitionContextualValue.idef, include: includeContext && includeContext.include })))))))))));
 }
 exports.default = I18nRead;
