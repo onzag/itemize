@@ -1,15 +1,34 @@
 "use strict";
+/**
+ * Allows the application to know when it's outdated as a new version
+ * with a different buildnumber has been launched, this usually means
+ * the client loses connection and then reconnects realizing
+ * the backend and the frontend don't match anymore and an updated
+ * needs to be installed
+ *
+ * many things happen during an update, cleaning of the service workers cache,
+ * and refreshing the app
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const app_1 = require("../../internal/app");
+/**
+ * The actual class that really performs the logic
+ * for outdated checking
+ */
 class ActualAppIsOutdatedChecker extends react_1.default.Component {
     constructor(props) {
         super(props);
+        // so initially it is considered it via the remote listener
+        // note how we check for it just in case there's SSR of this
+        // and it would be false in such a case as the server is up to date in what it sends
         this.state = {
-            isOutdated: false,
+            isOutdated: this.props.remoteListener ? this.props.remoteListener.isAppUpdated() : false,
         };
         this.onAppUpdated = this.onAppUpdated.bind(this);
     }
@@ -32,6 +51,12 @@ class ActualAppIsOutdatedChecker extends react_1.default.Component {
         return this.props.children(this.state.isOutdated);
     }
 }
+/**
+ * The app is outated checker provides information on an outdated application that requires
+ * a reload (refresh) for it to be updated
+ * @param props the props for outated checking
+ * @returns a react component
+ */
 function AppIsOutdatedChecker(props) {
     return (react_1.default.createElement(app_1.DataContext.Consumer, null, (data) => (react_1.default.createElement(ActualAppIsOutdatedChecker, Object.assign({}, props, { remoteListener: data.remoteListener })))));
 }

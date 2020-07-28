@@ -1,3 +1,9 @@
+/**
+ * Provides the route which is able to create routes that will work
+ * under any language
+ *
+ * @packageDocumentation
+ */
 /// <reference types="react" />
 import { RouteProps } from "react-router-dom";
 /**
