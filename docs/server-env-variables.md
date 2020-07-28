@@ -11,14 +11,6 @@ The default mode, makes the application run into development mode, this has a co
 - A logger transport get added to console
 - Config files for development mode are used
 
-### staging
-
-The staging mode runs the application into production mode basically with one exception
-
-- Config files for staging are used
-- There's no logging transport in console
-- SQL queries are not logged
-
 ### production
 
 The production mode runs the server in the production mode
@@ -91,3 +83,9 @@ Default `false` because the same setup is meant to run inside or outside docker,
 2. PostgreSQL self hosted databases resolve to `pgsql` rather than localhost
 
 This allows to use the same config inside and outside docker, other than local name resolving everything else works the same way.
+
+## NO_SSR
+
+Default `false`
+
+Disables server side rendering

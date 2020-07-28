@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * Contains the classes for the loading of searches via pages in order to create
+ * a pagination in search mode
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -6,6 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const SearchLoader_1 = __importDefault(require("./SearchLoader"));
 const LocationStateReader_1 = __importDefault(require("../navigation/LocationStateReader"));
+/**
+ * The page search loader component allows for creating pagination UI elements rather
+ * simply, it extends the standard search loader for this, it uses the navigation in order
+ * to store its page number so that searches are kept consistent
+ *
+ * TODO somehow combine with searchId so that going back can also go back in search id
+ */
 class PagedSearchLoader extends react_1.default.Component {
     constructor(props) {
         super(props);

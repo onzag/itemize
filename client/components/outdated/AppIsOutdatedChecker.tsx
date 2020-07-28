@@ -47,11 +47,11 @@ class ActualAppIsOutdatedChecker extends
   constructor(props: IActualAppIsOutdatedCheckerProps) {
     super(props);
 
-    // so initially it is considered it via the remote listener
-    // note how we check for it just in case there's SSR of this
-    // and it would be false in such a case as the server is up to date in what it sends
+    // due to SSR we cant use the remote listener here but we wait for it in mount
+    // however clearly if the server is rendering this, it's not going to be
+    // outdated
     this.state = {
-      isOutdated: this.props.remoteListener ? this.props.remoteListener.isAppUpdated() : false,
+      isOutdated: false,
     };
 
     this.onAppUpdated = this.onAppUpdated.bind(this);
@@ -63,6 +63,9 @@ class ActualAppIsOutdatedChecker extends
       nextState.isOutdated !== this.state.isOutdated;
   }
   public componentDidMount() {
+    this.setState({
+      isOutdated: this.props.remoteListener.isAppUpdated(),
+    });
     this.props.remoteListener.addAppUpdatedListener(this.onAppUpdated);
   }
   public componentWillUnmount() {

@@ -16,11 +16,16 @@ import { execSudo } from "../setup/exec";
 const fsAsync = fs.promises;
 
 /**
- * Actually runs the build
+ * Runs the build process
+ * @param version the version, development or production
+ * @param buildID the build id, usually the same as the instance group
+ * @param services the services that we are allowing, comma separated; or full, standard, and slim
  */
 export default async function build(version: string, buildID: string, services: string) {
+  // this is the message we add to our build folder
   let message: string = "";
 
+  // now let's check our deployments folder
   let deploymentsExist = true;
   try {
     await fsAsync.access("deployments", fs.constants.F_OK);
@@ -28,9 +33,11 @@ export default async function build(version: string, buildID: string, services: 
     deploymentsExist = false;
   }
 
+  // if it doesn't exist we make it
   if (!deploymentsExist) {
     await fsAsync.mkdir("deployments");
   }
+  // and we make all these directories
   await fsAsync.mkdir(path.join("deployments", buildID));
   await fsAsync.mkdir(path.join("deployments", buildID, "config"));
   await fsAsync.mkdir(path.join("deployments", buildID, "logs"));
@@ -48,10 +55,13 @@ export default async function build(version: string, buildID: string, services: 
     "utf8",
   ));
 
+  // and now we take our yml docker compose file
   let fullYMLTemplate = await fsAsync.readFile(
     "docker-compose.yml",
     "utf-8",
   );
+
+  // and we need to replace these variables from it
   fullYMLTemplate =
     fullYMLTemplate.replace(/\%\{NODE_ENV\}/g, version)
     .replace(/\%\{INSTANCE_GROUP_ID\}/g, buildID)
@@ -61,6 +71,7 @@ export default async function build(version: string, buildID: string, services: 
     .replace(/\%\{DB_PASSWORD\}/g, dbConfig.password)
     .replace(/\%\{DB_NAME\}/g, dbConfig.database);
 
+  // now the actual services we are adding
   let actualServices: string[] = [];
   if (services === "full") {
     actualServices = ["cluster-manager", "servers", "redis", "nginx", "global-manager", "pgsql"];
@@ -72,8 +83,10 @@ export default async function build(version: string, buildID: string, services: 
     actualServices = services.split(",");
   }
   
+  // we include this information in our final message
   message += "This build contains the following services: " + actualServices.join(", ");
 
+  // if we are adding the proxy, add information about this, and add the nginx logs folder
   if (actualServices.includes("nginx")) {
     await fsAsync.mkdir(path.join("deployments", buildID, "nginx-logs"));
 
@@ -81,52 +94,77 @@ export default async function build(version: string, buildID: string, services: 
     "\nthese are necessary for HTTPS, check out let's encrypt and acme.sh for the purposes of having these certificates";
   }
 
+  // now we log this information
   console.log(colors.yellow("Services allowed are: ") + actualServices.join(", "));
   
+  // now we parse our yaml as it has been replaced
   const parsed = YAML.parse(fullYMLTemplate);
+  // and we need to check every service we have added
   Object.keys(parsed.services).forEach((service) => {
+    // if the service is not in the list of included services
     if (!actualServices.includes(service)) {
+      // we remove it
       console.log(colors.yellow("Dropping unused service: ") + service);
       delete parsed.services[service];
     } else if (parsed.services[service].depends_on) {
+      // also we nee to check our dependencies, we remove dependencies if they are not in there
       parsed.services[service].depends_on = parsed.services[service].depends_on.filter((serviceDependance: string) => {
         return actualServices.includes(serviceDependance);
       });
 
+      // and if we have removed all the dependencies we remove the entire thing altogether
       if (parsed.services[service].depends_on.length === 0) {
         delete parsed.services[service].depends_on;
       }
     }
   });
 
+  // now we can build the compose file
   const yamlPath = path.join("deployments", buildID, "docker-compose.yml");
   console.log("emiting " + colors.green(yamlPath));
   await fsAsync.writeFile(yamlPath, YAML.stringify(parsed));
 
-  console.log("emiting " + colors.green(path.join("deployments", buildID, "config", "index.json")));
-  await fsAsync.copyFile(path.join("config", "index.json"), path.join("deployments", buildID, "config", "index.json"));
+  // these only need to be added if we have a server of sorts
+  if (
+    actualServices.includes("servers") ||
+    actualServices.includes("cluster-manager") ||
+    actualServices.includes("global-manager")
+  ) {
+    // the config file
+    console.log("emiting " + colors.green(path.join("deployments", buildID, "config", "index.json")));
+    await fsAsync.copyFile(path.join("config", "index.json"), path.join("deployments", buildID, "config", "index.json"));
 
-  console.log("emiting " + colors.green(path.join("deployments", buildID, "config", dbConfigToUse)));
-  await fsAsync.copyFile(path.join("config", dbConfigToUse), path.join("deployments", buildID, "config", dbConfigToUse));
+    // the db config file
+    console.log("emiting " + colors.green(path.join("deployments", buildID, "config", dbConfigToUse)));
+    await fsAsync.copyFile(path.join("config", dbConfigToUse), path.join("deployments", buildID, "config", dbConfigToUse));
 
-  console.log("emiting " + colors.green(path.join("deployments", buildID, "config", redisConfigToUse)));
-  await fsAsync.copyFile(path.join("config", redisConfigToUse), path.join("deployments", buildID, "config", redisConfigToUse));
+    // redis
+    console.log("emiting " + colors.green(path.join("deployments", buildID, "config", redisConfigToUse)));
+    await fsAsync.copyFile(path.join("config", redisConfigToUse), path.join("deployments", buildID, "config", redisConfigToUse));
 
-  console.log("emiting " + colors.green(path.join("deployments", buildID, "config", sensitiveConfigToUse)));
-  await fsAsync.copyFile(path.join("config", sensitiveConfigToUse), path.join("deployments", buildID, "config", sensitiveConfigToUse));
+    // sensitive configuration file
+    console.log("emiting " + colors.green(path.join("deployments", buildID, "config", sensitiveConfigToUse)));
+    await fsAsync.copyFile(path.join("config", sensitiveConfigToUse), path.join("deployments", buildID, "config", sensitiveConfigToUse));
+  }
 
+  // and the deployements start.sh file
   console.log("emiting " + colors.green(path.join("deployments", buildID, "start.sh")));
   await fsAsync.copyFile("start.sh", path.join("deployments", buildID, "start.sh"));
 
-  console.log("emiting " + colors.green(path.join("deployments", buildID, "nginx.conf")));
-  await fsAsync.copyFile("nginx.conf", path.join("deployments", buildID, "nginx.conf"));
+  // finally our nginx file
+  if (actualServices.includes("nginx")) {
+    console.log("emiting " + colors.green(path.join("deployments", buildID, "nginx.conf")));
+    await fsAsync.copyFile("nginx.conf", path.join("deployments", buildID, "nginx.conf"));
+  }
 
+  // now we add a bunch of messages about configuration
   if (actualServices.includes("redis")) {
     message += "\n\nYou have included redis in your build, the redis that is included uses your general cache configuration" +
     "\nbut this might differ to the global redis cache, the global redis cache is centralized" +
     "\nthe pub sub is also a centralized database";
   }
 
+  // as well as these
   if (actualServices.includes("servers") || actualServices.includes("cluster-manager") || actualServices.includes("global-manager")) {
     if (actualServices.includes("servers")) {
       message += "\n\nYou have included servers in your build remember these servers are scalable in order to scale them" +
@@ -147,6 +185,7 @@ export default async function build(version: string, buildID: string, services: 
       "\ntime your page content changes";
     }
 
+    // we need to copy the npm token if we have any, as this is necessary in order to build and ship the application
     let npmTokenExists = true;
     try {
       await fsAsync.access(".npm-token", fs.constants.F_OK);
@@ -164,6 +203,7 @@ export default async function build(version: string, buildID: string, services: 
       npmToken = (await fsAsync.readFile(".npm-token", "utf-8")).trim();
     }
 
+    // and now we need to execute the following docker commands
     const absPath = path.resolve(".");
     console.log(colors.yellow("PLEASE WAIT THIS MIGHT TAKE UP TO 5 MINUTES..."));
     await execSudo(
@@ -181,6 +221,7 @@ export default async function build(version: string, buildID: string, services: 
     );
   }
 
+  // now for postgresql
   if (actualServices.includes("pgsql")) {
     message += "\n\nYou have included postgres in your build, this is the central database, and it's not expected you do" +
     "\nthis, very often including postgres in the build is a mistake, nevertheless, it might be the case for standalone clusters" +
@@ -193,6 +234,7 @@ export default async function build(version: string, buildID: string, services: 
     "_default -v $PWD/config:/home/node/app/config -e NODE_ENV=" + version +
     " -e INSTANCE_MODE=BUILD_DATABASE app:latest"
 
+    // the abs path for the pgsql postgis installation we need
     const absPath = path.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis");
     await execSudo(
       `docker build -t pgsqlpostgis ${absPath}`,
@@ -208,6 +250,8 @@ export default async function build(version: string, buildID: string, services: 
       "Itemize Docker Contained PGSQL Postgis Enabled Database Save",
     );
 
+    // and now we want to make a docker compose file for the build
+    // database mode, and as such it will only have the pgsql service
     Object.keys(parsed.services).forEach((service) => {
       if (service !== "pgsql") {
         delete parsed.services[service];
@@ -216,11 +260,13 @@ export default async function build(version: string, buildID: string, services: 
       }
     });
 
+    // we emit such file
     const yamlPath = path.join("deployments", buildID, "docker-compose-only-db.yml");
     console.log("emiting " + colors.green(yamlPath));
     await fsAsync.writeFile(yamlPath, YAML.stringify(parsed));
   }
 
+  // and finally our readme
   const readmePath = path.join("deployments", buildID, "README");
   console.log("emiting " + colors.green(readmePath));
   await fsAsync.writeFile(readmePath, message);
