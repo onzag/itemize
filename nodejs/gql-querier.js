@@ -98,6 +98,7 @@ class GQLQuery {
         // now we need to check whether we are in NodeJS or
         // in the browser, the browser uses the File, and NodeJS
         // uses a read stream
+        // we are checking for a src which means it's a file
         if ((typeof File !== "undefined" && arg.src instanceof File) ||
             (stream_1.Stream && arg.src instanceof stream_1.Stream.Readable)) {
             // let's build the unprocessed file
@@ -108,6 +109,7 @@ class GQLQuery {
                 url: arg.url,
                 size: arg.size,
                 src: arg.src,
+                metadata: arg.metadata,
             };
             // and add it to our list
             this.foundUnprocessedArgFiles.push(detectedUnprocessedFile);

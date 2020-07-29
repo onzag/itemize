@@ -68,6 +68,7 @@ export default class PropertyEntryText extends React.Component<IPropertyEntryHan
         width: number;
         height: number;
     }>;
+    setMetadata(file: IPropertyDefinitionSupportedSingleFilesType, metadata: string): void;
     /**
      * Inserts a file in the media property
      * @param file the file to insert

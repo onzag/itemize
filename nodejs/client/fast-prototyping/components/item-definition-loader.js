@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Utilities for loading item definitions
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,7 +14,10 @@ const ItemDefinitionLoader_1 = __importDefault(require("../../components/item-de
 const util_1 = require("./util");
 const I18nRead_1 = __importDefault(require("../../components/localization/I18nRead"));
 const I18nReadError_1 = __importDefault(require("../../components/localization/I18nReadError"));
-const itemDefinitionLoaderStyles = (theme) => mui_core_1.createStyles({
+/**
+ * The item definition loader styles
+ */
+const itemDefinitionLoaderStyles = mui_core_1.createStyles({
     container: {
         position: "relative",
     },
@@ -32,6 +40,11 @@ const itemDefinitionLoaderStyles = (theme) => mui_core_1.createStyles({
         width: "100%",
     }
 });
+/**
+ * The item definition loader allows to handle cases of not found, blocked or errors in a nice way
+ * @param props the loader props
+ * @returns a react component
+ */
 exports.ItemDefinitionLoader = mui_core_1.withStyles(itemDefinitionLoaderStyles)((props) => {
     return (react_1.default.createElement(ItemDefinitionLoader_1.default, null, (arg) => {
         const notFound = arg.notFound;
@@ -44,13 +57,13 @@ exports.ItemDefinitionLoader = mui_core_1.withStyles(itemDefinitionLoaderStyles)
             let errorComponent = null;
             let imageComponent = null;
             if (notFound) {
-                errorComponent = react_1.default.createElement(I18nRead_1.default, { id: props.notFoundMessageKey || "error.NOT_FOUND", capitalize: true });
+                errorComponent = react_1.default.createElement(I18nRead_1.default, { id: props.notFoundMessageI18nId || "error.NOT_FOUND", capitalize: true });
                 if (props.notFoundImage) {
                     imageComponent = react_1.default.createElement("img", { src: props.notFoundImage });
                 }
             }
             else if (blocked) {
-                errorComponent = react_1.default.createElement(I18nRead_1.default, { id: props.blockedMessageKey || "error.BLOCKED", capitalize: true });
+                errorComponent = react_1.default.createElement(I18nRead_1.default, { id: props.blockedMessageI18nId || "error.BLOCKED", capitalize: true });
                 if (props.blockedImage) {
                     imageComponent = react_1.default.createElement("img", { src: props.blockedImage });
                 }
@@ -69,7 +82,7 @@ exports.ItemDefinitionLoader = mui_core_1.withStyles(itemDefinitionLoaderStyles)
         }
         return react_1.default.createElement("div", { className: `${props.classes.container} ${props.fullWidth ? props.classes.fullWidthContainer : ""}` },
             arg.loading ?
-                react_1.default.createElement(util_1.DelayDisplay, { duration: 700 },
+                react_1.default.createElement(util_1.DelayDisplay, { duration: props.msWaitedToShowLoadingAnimation || 700 },
                     react_1.default.createElement(mui_core_1.CircularProgress, { className: props.classes.circularProgress })) :
                 null,
             props.children);

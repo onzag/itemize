@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * The avatar allows to show an user avatar in a nice way using the mui avatar
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -11,6 +16,9 @@ const util_1 = require("../../components/util");
 const react_dropzone_1 = __importDefault(require("react-dropzone"));
 const constants_1 = require("../../../constants");
 const Reader_1 = __importDefault(require("../../components/property/Reader"));
+/**
+ * We build the styles with the create styles function
+ */
 const avatarStyles = mui_core_1.createStyles({
     flag: {
         position: "absolute",
@@ -149,61 +157,130 @@ const avatarStyles = mui_core_1.createStyles({
         boxShadow: "0px 0px 0px 10px #ffeb3b"
     },
 });
-exports.Avatar = mui_core_1.withStyles(avatarStyles)((props) => {
-    const contentFn = (id, role, userNameValue, profilePictureValue, email, eValidated, address) => {
-        const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : "";
-        const hasWarningForMissingEmail = !(email && email.stateAppliedValue);
-        const hasWarningForNotValidEmail = !(eValidated && eValidated.stateAppliedValue);
-        const hasAnotherWarningForMissingAddress = !(address && address.stateAppliedValue);
-        const hasWarning = email && eValidated && address && props.showWarnings && (hasWarningForMissingEmail || hasWarningForNotValidEmail || hasAnotherWarningForMissingAddress);
-        const isSpecialUser = role !== "USER";
-        const flag = props.hideFlag ? null : (react_1.default.createElement(Reader_1.default, { id: "app_country" }, (appCountryValue) => {
+/**
+ * The simple avatar is just a react component that displays a simple material
+ * ui specific avatar, nothing too special about this
+ */
+class SimpleAvatar extends react_1.default.PureComponent {
+    render() {
+        return (react_1.default.createElement(mui_core_1.Avatar, { alt: this.props.userNameValue, classes: {
+                root: `${this.props.classes.avatar} ${this.props.numberColorClassName} ` +
+                    `${this.props.size === "large" ? this.props.classes.avatarLarge : ""} ` +
+                    `${this.props.size === "medium" ? this.props.classes.avatarMedium : ""} ` +
+                    `${this.props.isSpecialUser ? this.props.classes.specialUser : ""} ` +
+                    `${this.props.isSpecialUser && this.props.size === "large" ? this.props.classes.specialUserLarge : ""} ` +
+                    `${this.props.isSpecialUser && this.props.size === "medium" ? this.props.classes.specialUserMedium : ""}`
+            }, src: this.props.imgSrc }, this.props.userNameValue ? this.props.userNameValue[0].toUpperCase() : ""));
+    }
+}
+/**
+ * The avatar content will do complex logic in order
+ * to display the avatar of a given user in an efficient way
+ */
+class AvatarContent extends react_1.default.PureComponent {
+    render() {
+        // so we assign a random color based on the user id
+        const numberColorClassName = this.props.id ? this.props.classes["randomColor" + (this.props.id % 10)] : "";
+        // now whether it's an special user
+        const isSpecialUser = this.props.specialUserRoles ?
+            this.props.specialUserRoles.includes(this.props.role) : this.props.role !== "USER";
+        // now the flag logic
+        const flag = this.props.hideFlag ? null : (react_1.default.createElement(Reader_1.default, { id: "app_country" }, (appCountryValue) => {
             let countryEmoji = null;
             if (appCountryValue && imported_resources_1.countries[appCountryValue]) {
                 countryEmoji = imported_resources_1.countries[appCountryValue].emoji;
             }
-            return react_1.default.createElement("div", { className: props.classes.flag }, countryEmoji);
+            return react_1.default.createElement("div", { className: this.props.classes.flag }, countryEmoji);
         }));
-        const imageSources = util_1.imageSizeRetriever(profilePictureValue, null);
-        const avatarWithSource = (imageSrc) => (react_1.default.createElement(mui_core_1.Avatar, { alt: userNameValue, classes: { root: `${props.classes.avatar} ${numberColorClassName} ` +
-                    `${props.size === "large" ? props.classes.avatarLarge : ""} ${props.size === "medium" ? props.classes.avatarMedium : ""} ` +
-                    `${isSpecialUser ? props.classes.specialUser : ""} ${isSpecialUser && props.size === "large" ? props.classes.specialUserLarge : ""} ` +
-                    `${isSpecialUser && props.size === "medium" ? props.classes.specialUserMedium : ""}` }, src: imageSrc }, userNameValue ? userNameValue[0].toUpperCase() : ""));
-        const imageSrc = props.size === "large" ? imageSources.imageLargeSizeURL : imageSources.imageSmallSizeURL;
-        const content = (react_1.default.createElement("div", { className: `${props.classes.avatarContainer} ${props.fullWidth ? props.classes.fullWidth : ""}` },
-            props.cacheImage ?
-                avatarWithSource(util_1.cacheableQSLoader(imageSrc)) :
-                avatarWithSource(imageSrc),
+        // and now we get the image sources from the image size retriever, only the standard
+        // sources as we pass no property definition to it
+        const imageSources = util_1.imageSizeRetriever(this.props.profilePictureValue, null);
+        // so which source to use depends, for size large the large image, otherwise the small
+        // yes even for medium
+        const imageSrc = this.props.size === "large" ? imageSources.imageLargeSizeURL : imageSources.imageSmallSizeURL;
+        // now this will be the content
+        const content = (react_1.default.createElement("div", { className: `${this.props.classes.avatarContainer} ${this.props.fullWidth ? this.props.classes.fullWidth : ""}` },
+            react_1.default.createElement(SimpleAvatar, { imgSrc: this.props.cacheImage ? util_1.cacheableQSLoader(imageSrc) : imageSrc, size: this.props.size, numberColorClassName: numberColorClassName, isSpecialUser: isSpecialUser, userNameValue: this.props.userNameValue, classes: this.props.classes }),
             flag));
-        const avatar = props.profileURL ? (react_1.default.createElement(Link_1.default, { className: props.className, to: typeof props.profileURL === "string" ? props.profileURL : props.profileURL(id) }, content)) : content;
-        if (props.showWarnings && hasWarning) {
+        // this will be the actual avatar, depending if we wrap it with a router link or not
+        // according to the logic
+        const avatar = this.props.profileURL ? (react_1.default.createElement(Link_1.default, { className: this.props.linkClassName, to: typeof this.props.profileURL === "string" ? this.props.profileURL : this.props.profileURL(this.props.id) }, content)) : content;
+        // so now for warnings
+        if (this.props.showWarnings && this.props.supportsWarnings) {
             let warningCount = 0;
-            if (hasWarningForMissingEmail || hasWarningForNotValidEmail) {
+            if (this.props.hasWarningForMissingEmail || this.props.hasWarningForNotValidEmail) {
                 warningCount++;
             }
-            if (hasAnotherWarningForMissingAddress) {
+            if (this.props.hasAnotherWarningForMissingAddress) {
                 warningCount++;
             }
-            return react_1.default.createElement(mui_core_1.Badge, { badgeContent: warningCount, color: "secondary", classes: { badge: props.classes.avatarBadge } }, avatar);
+            return react_1.default.createElement(mui_core_1.Badge, { badgeContent: warningCount, color: "secondary", classes: { badge: this.props.classes.avatarBadge } }, avatar);
         }
         else {
+            // no warnings, return as it is
             return avatar;
         }
-    };
+    }
+}
+/**
+ * The avatar will display a nice avatar profile image for the given user in the given context
+ * it should be in an item definition provider for that specific user and contain the following properties
+ *
+ * - profile_picture
+ * - role
+ * - username
+ * - app_country
+ *
+ * if hideFlag is true then app_country is not necessary
+ *
+ * if showWarnings is true then the following properties are also necessary
+ *
+ * - email
+ * - e_validated
+ * - address
+ *
+ * showWarnings is basically only useful for when displaying own currently logged user information in
+ * the navbar or somewhere else where this is relevant
+ *
+ * @param props the avatar props
+ * @returns a react component
+ */
+exports.Avatar = mui_core_1.withStyles(avatarStyles)((props) => {
+    // so this is the standard logic
     return (react_1.default.createElement(Reader_1.default, { id: "id" }, (id) => (react_1.default.createElement(Reader_1.default, { id: "profile_picture" }, (profilePictureValue) => (react_1.default.createElement(Reader_1.default, { id: "role" }, (role) => (react_1.default.createElement(Reader_1.default, { id: "username" }, (userNameValue) => {
         if (!props.showWarnings) {
-            return contentFn(id, role, userNameValue, profilePictureValue);
+            return (react_1.default.createElement(AvatarContent, Object.assign({}, props, { id: id, role: role, userNameValue: userNameValue, profilePictureValue: profilePictureValue, supportsWarnings: false, hasWarningForMissingEmail: false, hasWarningForNotValidEmail: false, hasAnotherWarningForMissingAddress: false, classes: props.classes })));
         }
         return (react_1.default.createElement(Reader_1.default, { id: "email" }, (email, emailState) => (react_1.default.createElement(Reader_1.default, { id: "e_validated" }, (eValidated, eValidatedState) => (react_1.default.createElement(Reader_1.default, { id: "address" }, (address, addressState) => {
-            return contentFn(id, role, userNameValue, profilePictureValue, emailState, eValidatedState, addressState);
+            // now we check for these warnings
+            const hasWarningForMissingEmail = !(emailState && emailState.stateAppliedValue);
+            const hasWarningForNotValidEmail = !(eValidatedState && eValidatedState.stateAppliedValue);
+            const hasAnotherWarningForMissingAddress = !(addressState && addressState.stateAppliedValue);
+            // and if we have to display them at all
+            const supportsWarnings = emailState && eValidatedState && addressState && props.showWarnings && (hasWarningForMissingEmail || hasWarningForNotValidEmail || hasAnotherWarningForMissingAddress);
+            return (react_1.default.createElement(AvatarContent, Object.assign({}, props, { id: id, role: role, userNameValue: userNameValue, profilePictureValue: profilePictureValue, supportsWarnings: supportsWarnings, hasWarningForMissingEmail: hasWarningForMissingEmail, hasWarningForNotValidEmail: hasWarningForNotValidEmail, hasAnotherWarningForMissingAddress: hasAnotherWarningForMissingAddress, classes: props.classes })));
         }))))));
     }))))))));
 });
+/**
+ * When we drop the file, it takes a callback
+ * @param onSetFile the onSetFile function of the renderer, it's bind here
+ * @param files the files that have dropped by the react dropzone utility
+ */
 function onDrop(onSetFile, files) {
+    // we only set one file
     onSetFile(files[0]);
 }
+/**
+ * A fully custom renderer for the avatar component for usage with file types
+ * so it can be passed as a custom renderer via the entry, eg...
+ * <Entry id="profile_picture" renderer={AvatarRenderer}/> rather
+ * than using the default
+ */
 exports.AvatarRenderer = mui_core_1.withStyles(avatarStyles)((props) => {
     const dropzoneRef = react_1.default.useRef();
+    // we are using readers inside the avatar renderer, which is quite the feat, but nonetheless allowed
+    // a bit inefficient but should work out just fine for this
     return (react_1.default.createElement("div", { className: `${props.classes.avatarContainer} ${props.classes.avatarContainerLarge}` },
         react_1.default.createElement(Reader_1.default, { id: "username" }, (username) => (react_1.default.createElement(Reader_1.default, { id: "role" }, (role) => (react_1.default.createElement(Reader_1.default, { id: "id" }, (id) => {
             const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : "";

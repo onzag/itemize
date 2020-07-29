@@ -1,3 +1,10 @@
+/**
+ * Contains the submit, search and delete button for fast prototyping
+ * usage
+ * 
+ * @packageDocumentation
+ */
+
 import React, { useState } from "react";
 import { IActionSubmitOptions, IActionResponseWithId, IActionSearchOptions } from "../../providers/item-definition";
 import { ProgressingElement } from "./util";
@@ -7,24 +14,91 @@ import I18nRead from "../../components/localization/I18nRead";
 import SearchActioner from "../../components/search/SearchActioner";
 import { Button, PropTypes } from "../mui-core";
 
+/**
+ * A redirect function called on the success event
+ */
 type RedirectCallbackFn = (status: IActionResponseWithId) => string;
 
-interface ISubmitButtonProps {
-  options: IActionSubmitOptions;
+/**
+ * The generic options for every button
+ */
+interface IGenericButtonProps {
+  /**
+   * An id for the i18n read element
+   */
   i18nId: string;
+  /**
+   * A wrapper class name, the button is wrapped by the progressing
+   * element, you might want to change its class name
+   */
   wrapperClassName?: string;
+  /**
+   * The button class name itself
+   */
   buttonClassName?: string;
+  /**
+   * The button variant for MUI
+   */
   buttonVariant?: "text" | "outlined" | "contained";
+  /**
+   * The button color
+   */
   buttonColor?: PropTypes.Color;
+  /**
+   * An icon for the button
+   */
   buttonEndIcon?: React.ReactNode;
+  /**
+   * Another icon for the button but at the end
+   */
   buttonStartIcon?: React.ReactNode;
+}
+
+/**
+ * The submit button props
+ */
+interface ISubmitButtonProps extends IGenericButtonProps {
+  /**
+   * The submit options to trigger in the actioner
+   */
+  options: IActionSubmitOptions;
+  /**
+   * If specified, instead of immediately submitting will ask
+   * for confirmation of this action via this component, the component
+   * must take an isActive prop and onClose props, when it closes it would give true or false
+   * to specifies if it will submit or cancel, true = submit, false = cancel
+   */
   CustomConfirmationComponent?: React.ComponentType<{isActive: boolean, onClose: (continueWithProcess: boolean) => void}>;
+  /**
+   * Redirect to an url if succeeded
+   */
   redirectOnSuccess?: string | RedirectCallbackFn;
+  /**
+   * Go back if succeed
+   */
   redirectGoBack?: boolean;
+  /**
+   * Replace during redirection, doesn't work with goback
+   */
   redirectReplace?: boolean;
+  /**
+   * A function that triggers when it has submitted and gives the state of the
+   * submit action
+   */
   onSubmit?: (status: IActionResponseWithId) => void;
 }
 
+/**
+ * Provides a very useful submit button that extends via the submit
+ * actioner and it's fully functional; needs to be in an item
+ * definition context
+ * 
+ * If you need to access the error please use the snackbar.tsx component
+ * in addition of another submit actioner to fetch the error itself
+ * 
+ * @param props the submit button props
+ * @returns a react component
+ */
 export function SubmitButton(props: ISubmitButtonProps) {
   const [confirmationIsActive, setConfirmationIsActive] = useState(false);
   const CustomConfirmationComponent = props.CustomConfirmationComponent;
@@ -91,17 +165,27 @@ export function SubmitButton(props: ISubmitButtonProps) {
   )
 }
 
-interface ISearchButtonProps {
+/**
+ * The search button props
+ */
+interface ISearchButtonProps extends IGenericButtonProps {
+  /**
+   * The search options to trigger in the search actioner
+   */
   options: IActionSearchOptions;
-  i18nId: string;
-  wrapperClassName?: string;
-  buttonClassName?: string;
-  buttonVariant?: "text" | "outlined" | "contained";
-  buttonColor?: PropTypes.Color;
-  buttonEndIcon?: React.ReactNode;
-  buttonStartIcon?: React.ReactNode;
 }
 
+/**
+ * Allows to create a fast prototyping button that will trigger a search
+ * once clicked, uses the search actioner and must be in an item definition context
+ * in search mode
+ * 
+ * If you need to access the error please use the snackbar.tsx component
+ * in addition of another search actioner to fetch the error itself
+ * 
+ * @param props the search button props
+ * @returns a react component
+ */
 export function SearchButton(props: ISearchButtonProps) {
   return (
     <SearchActioner>
@@ -127,6 +211,9 @@ export function SearchButton(props: ISearchButtonProps) {
   )
 }
 
+/**
+ * TODO
+ */
 export function DeleteButton() {
 
 }

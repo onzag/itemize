@@ -1,15 +1,31 @@
+/**
+ * Contains an external dialog that are usually referred errors and messages
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
-import { Button, Typography, WithStyles, Theme, createStyles, withStyles, DoneIcon } from "../../mui-core";
+import { Button, Typography, WithStyles, createStyles, withStyles, DoneIcon } from "../../mui-core";
 import { DialogResponsive } from "../dialog";
 import LocationStateReader from "../../../components/navigation/LocationStateReader";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
 
-const externalDialogsStyle = (theme: Theme) => createStyles({
+/**
+ * The external dialog style creator
+ * @returns a bunch of styles
+ */
+const externalDialogsStyle = () => createStyles({
   needsUpdateContent: {
     padding: "1rem 0.5rem",
   },
 });
 
+/**
+ * The external dialogs component, given a
+ * err, msg, and msgTitle in the query string, all as string will
+ * display a dialog as long as they are there
+ * @returns a react element
+ */
 export const ExternalDialogs = withStyles(externalDialogsStyle)((props: WithStyles<typeof externalDialogsStyle>) => {
   return (
     <LocationStateReader

@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * A dialog that pops up when the app is outdated and asks for a refresh
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -8,14 +13,25 @@ const mui_core_1 = require("../../mui-core");
 const dialog_1 = require("../dialog");
 const AppIsOutdatedChecker_1 = __importDefault(require("../../../components/outdated/AppIsOutdatedChecker"));
 const I18nReadMany_1 = __importDefault(require("../../../components/localization/I18nReadMany"));
-const outdatedDialogStyles = (theme) => mui_core_1.createStyles({
+/**
+ * The dialog styles
+ */
+const outdatedDialogStyles = mui_core_1.createStyles({
     dialogContent: {
         padding: "1rem 0.5rem",
     },
 });
+/**
+ * function that triggers to reload the app
+ */
 function reloadApp() {
     location.reload();
 }
+/**
+ * The outdated dialog will pop up if the application is outdated and needs an update
+ * @param props the outdated props, needs a flag to see if it will open when is outdated
+ * @returns a react component
+ */
 exports.OutdatedDialog = mui_core_1.withStyles(outdatedDialogStyles)((props) => {
     return (react_1.default.createElement(AppIsOutdatedChecker_1.default, null, (isOutdated) => {
         if (isOutdated) {

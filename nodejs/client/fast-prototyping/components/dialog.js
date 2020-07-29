@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains a generic dialog component based on MUI that is meant to be extended
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -6,6 +11,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const mui_core_1 = require("../mui-core");
 const I18nRead_1 = __importDefault(require("../../components/localization/I18nRead"));
+/**
+ * The standard dialog styles
+ */
 const dialogStyles = mui_core_1.createStyles({
     paper: {},
     appbar: {
@@ -27,7 +35,10 @@ const dialogStyles = mui_core_1.createStyles({
         paddingTop: "10px",
     },
 });
-exports.Dialog = mui_core_1.withStyles(dialogStyles)((props) => {
+/**
+ * The dialog itself, non-responsive and rather generic
+ */
+const Dialog = mui_core_1.withStyles(dialogStyles)((props) => {
     return (react_1.default.createElement(mui_core_1.Dialog, { classes: {
             paper: props.classes.paper,
         }, open: props.open, onClose: props.onClose, fullScreen: props.fullScreen, scroll: "paper" },
@@ -39,7 +50,13 @@ exports.Dialog = mui_core_1.withStyles(dialogStyles)((props) => {
         props.children ? react_1.default.createElement(mui_core_1.DialogContent, { className: props.classes.content }, props.children) : null,
         props.buttons ? react_1.default.createElement(mui_core_1.DialogActions, { className: props.classes.actions }, props.buttons) : null));
 });
+exports.Dialog = Dialog;
+/**
+ * This is a responsive version of the dialog
+ * it's able to go in fullscreen mode automatically
+ * takes all the other props
+ */
 const DialogResponsive = mui_core_1.withMobileDialog({
     breakpoint: "xs",
-})(exports.Dialog);
+})(Dialog);
 exports.DialogResponsive = DialogResponsive;

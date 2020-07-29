@@ -531,6 +531,8 @@ export default class PropertyDefinition {
             typeof v.type === "string" &&
             typeof v.url === "string" &&
             typeof v.size === "number" &&
+            // metadata must be string and less than equal 128 characters, or otherwise null
+            ((typeof v.metadata === "string" && v.metadata.length <= 128) || v.metadata === null) &&
             // check that the file size isn't too large
             v.size <= MAX_FILE_SIZE &&
             (
@@ -564,6 +566,8 @@ export default class PropertyDefinition {
         typeof valueAsIGQLFile.type !== "string" ||
         typeof valueAsIGQLFile.url !== "string" ||
         typeof valueAsIGQLFile.size !== "number" ||
+        // metadata is not string, or metadata is longer than 128 characters an metadata is not null as well, invalid
+        ((typeof valueAsIGQLFile.metadata !== "string" || valueAsIGQLFile.metadata.length > 128) && valueAsIGQLFile !== null) ||
         // or file is too large
         valueAsIGQLFile.size > MAX_FILE_SIZE ||
           // or the source is not null and not undefined
@@ -1043,6 +1047,7 @@ export default class PropertyDefinition {
         id: {},
         size: {},
         type: {},
+        metadata: {},
       };
     }
 

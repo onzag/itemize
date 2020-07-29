@@ -245,6 +245,12 @@ export default class PropertyEntryText
 
       const img = new Image();
       img.onload = () => {
+        const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
+        const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
+        this.setMetadata(
+          fileInserted,
+          img.width + "x" + img.height + ";" + dimensionNames.join(","),
+        );
         resolve({
           result: fileInserted,
           width: img.width,
@@ -262,12 +268,35 @@ export default class PropertyEntryText
     });
   }
 
+  public setMetadata(
+    file: IPropertyDefinitionSupportedSingleFilesType,
+    metadata: string,
+  ) {
+    const currentValue =
+      this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+
+    if (currentValue) {
+      const index = currentValue.findIndex((f) => f.id === file.id);
+      if (index !== -1) {
+        const newValue = [...currentValue];
+        newValue[index] = {...currentValue[index]};
+        newValue[index].metadata = metadata;
+
+        this.cachedMediaProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
+        this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
+      }
+    }
+  }
+
   /**
    * Inserts a file in the media property
    * @param file the file to insert
    * @param validateAgainstImages whether the errors and check given will be for image types
    */
-  public onInsertFile(file: File, validateAgainstImages?: boolean) {
+  public onInsertFile(
+    file: File,
+    validateAgainstImages?: boolean,
+  ) {
     // we do this generic check to test whether the file is an image, even when
     // the file check will do its own check
     if (validateAgainstImages && !checkFileInAccepts(file.type, this.cachedMediaPropertyAcceptsImages)) {
@@ -299,6 +328,7 @@ export default class PropertyEntryText
       url: tempURL,
       size: file.size,
       src: file,
+      metadata: null,
     };
 
     const currentValue =

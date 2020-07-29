@@ -66,6 +66,7 @@ class PropertyEntryFile extends react_1.default.Component {
             url: objectURL,
             size: file.size,
             src: file,
+            metadata: null,
         };
         const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
         const accept = util_1.processAccepts(this.props.property.getSpecialProperty("accept"), isExpectingImages);
@@ -94,7 +95,26 @@ class PropertyEntryFile extends react_1.default.Component {
                 rejectedReason: null,
             });
         }
-        this.props.onChange(value, null);
+        if (isExpectingImages) {
+            const img = new Image();
+            img.onload = () => {
+                const dimensions = this.props.property.getSpecialProperty("dimensions") || "";
+                const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
+                value.metadata = img.width + "x" + img.height + ";" + dimensionNames.join(",");
+                this.props.onChange(value, null);
+            };
+            img.onerror = () => {
+                this.setState({
+                    rejected: true,
+                    rejectedValue: value,
+                    rejectedReason: this.props.i18n[this.props.language]["image_uploader_invalid_type"],
+                });
+            };
+            img.src = value.url;
+        }
+        else {
+            this.props.onChange(value, null);
+        }
     }
     onRemoveFile() {
         this.props.onChange(null, null);

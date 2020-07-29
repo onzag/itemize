@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * An standard login dialog component for fast prototyping fully compatible
+ * with the navbar
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -13,6 +19,9 @@ const LogActioner_1 = require("../../components/login/LogActioner");
 const I18nRead_1 = __importDefault(require("../../components/localization/I18nRead"));
 const I18nReadMany_1 = __importDefault(require("../../components/localization/I18nReadMany"));
 const Entry_1 = __importDefault(require("../../components/property/Entry"));
+/**
+ * The login dialog styles
+ */
 const loginDialogStyles = mui_core_1.createStyles({
     welcomeTitle: {
         paddingBottom: "1rem",
@@ -39,9 +48,20 @@ const loginDialogStyles = mui_core_1.createStyles({
         margin: "1rem 0",
     },
 });
+/**
+ * simple utlity to run a couple of functions at once
+ * @param functions the many functions
+ */
 function runManyFunctions(functions) {
     functions.forEach(f => f());
 }
+/**
+ * A fully compatible with the navbar fast prototyping login dialog for the user
+ * to fill in, contains its own item definition provider, but it must be into
+ * a module provider context
+ * @param props the login props
+ * @returns a react component
+ */
 exports.LoginDialog = mui_core_1.withStyles(loginDialogStyles)((props) => {
     return (react_1.default.createElement(item_definition_1.ItemDefinitionProvider, { itemDefinition: "user", disableExternalChecks: true, properties: ["username", "password"] },
         react_1.default.createElement(LogActioner_1.LogActioner, null, (actioner) => (react_1.default.createElement(I18nRead_1.default, { id: "login", capitalize: true }, (i18nLogin) => (react_1.default.createElement(dialog_1.DialogResponsive, { open: props.open, onClose: runManyFunctions.bind(null, [actioner.dismissError, actioner.cleanUnsafeFields, props.onClose]), title: i18nLogin },

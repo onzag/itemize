@@ -102,6 +102,7 @@ export default class PropertyEntryFile
       url: objectURL,
       size: file.size,
       src: file,
+      metadata: null,
     };
 
     const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
@@ -139,10 +140,31 @@ export default class PropertyEntryFile
       })
     }
 
-    this.props.onChange(
-      value,
-      null,
-    );
+    if (isExpectingImages) {
+      const img = new Image();
+      img.onload = () => {
+        const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
+        const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
+        value.metadata = img.width + "x" + img.height + ";" + dimensionNames.join(",");
+        this.props.onChange(
+          value,
+          null,
+        );
+      }
+      img.onerror = () => {
+        this.setState({
+          rejected: true,
+          rejectedValue: value,
+          rejectedReason: this.props.i18n[this.props.language]["image_uploader_invalid_type"],
+        });
+      }
+      img.src = value.url;
+    } else {
+      this.props.onChange(
+        value,
+        null,
+      );
+    }
   }
   public onRemoveFile() {
     this.props.onChange(

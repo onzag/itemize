@@ -1,24 +1,51 @@
+/**
+ * A dialog that pops up when the app is outdated and asks for a refresh
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { Button, Typography, withStyles, Theme, createStyles, WithStyles, UpdateIcon } from "../../mui-core";
 import { DialogResponsive } from "../dialog";
 import AppIsOutdatedChecker from "../../../components/outdated/AppIsOutdatedChecker";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
 
-const outdatedDialogStyles = (theme: Theme) => createStyles({
+/**
+ * The dialog styles
+ */
+const outdatedDialogStyles = createStyles({
   dialogContent: {
     padding: "1rem 0.5rem",
   },
 });
 
+/**
+ * The outdated dialog props
+ */
 interface OutdatedDialogProps extends WithStyles<typeof outdatedDialogStyles> {
+  /**
+   * is open if it's outdated, basically will mean that is open if both this prop
+   * and is outdated match as true
+   */
   isOpenIfOutdated: boolean;
+  /**
+   * what to do on close
+   */
   onClose: () => void;
 }
 
+/**
+ * function that triggers to reload the app
+ */
 function reloadApp() {
   location.reload();
 }
 
+/**
+ * The outdated dialog will pop up if the application is outdated and needs an update
+ * @param props the outdated props, needs a flag to see if it will open when is outdated
+ * @returns a react component
+ */
 export const OutdatedDialog = withStyles(outdatedDialogStyles)((props: OutdatedDialogProps) => {
   return (
     <AppIsOutdatedChecker>

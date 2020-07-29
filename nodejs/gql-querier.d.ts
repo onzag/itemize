@@ -50,6 +50,14 @@ export interface IGQLFile {
      */
     size: number;
     /**
+     * optional metadata, might be null, usually constains width and
+     * height, set by the client, is limited to 128 characters
+     *
+     * encoding is WxH;name,name,name as many names as there are special
+     * dimensions, large, small and medium do not count
+     */
+    metadata: string;
+    /**
      * A source, either a File or a read stream
      */
     src?: File | Promise<any>;

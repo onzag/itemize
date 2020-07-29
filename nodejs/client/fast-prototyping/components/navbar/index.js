@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * The navbar for the fast prototyping usage and what it comes by default
+ *
+ * @packageDocumentation
+ */
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -23,6 +28,11 @@ const menu_1 = require("./menu");
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
 const TitleReader_1 = __importDefault(require("../../../components/util/TitleReader"));
 const UserDataRetriever_1 = __importDefault(require("../../../components/user/UserDataRetriever"));
+/**
+ * the navbar styles generator
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 const navbarStyles = (theme) => mui_core_1.createStyles({
     container: {
         flexBasis: "100%",
@@ -49,17 +59,24 @@ const navbarStyles = (theme) => mui_core_1.createStyles({
         display: "inline-block",
     }
 });
+/**
+ * The default admin entries
+ */
 const defaultMenuAdminEntries = [
     {
         path: "/cms",
         icon: react_1.default.createElement(mui_core_1.ImportantDevicesIcon, null),
         module: "cms",
+        role: "ADMIN",
         i18nProps: {
             id: "name",
             capitalize: true,
         },
     },
 ];
+/**
+ * The default menu entries
+ */
 const defaultMenuEntries = [
     {
         path: "/",
@@ -80,6 +97,14 @@ const defaultMenuEntries = [
         },
     },
 ];
+/**
+ * The navbar fast prototyping component, contains more than just a navbar, it has extra
+ * functionality into it, such as outdated information, a blocking backdrop, etc...
+ * might be disabled by request
+ *
+ * @param props the navbar props
+ * @returns a react component
+ */
 exports.Navbar = mui_core_1.withStyles(navbarStyles)((props) => {
     const [isOutdatedDialogAllowedToBeOpen, setIsOutdatedDialogAllowedToBeOpen] = react_1.useState(true);
     const [isMenuOpen, setMenuOpen] = react_1.useState(false);

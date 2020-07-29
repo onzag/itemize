@@ -80,6 +80,9 @@ export function getGQLFieldsDefinitionForProperty(
         fields.size = {
           type: GraphQLNonNull(GraphQLInt),
         };
+        fields.metadata = {
+          type: GraphQLString,
+        };
 
         // however if we are inputting, we are required
         // either a url or a src on _IN

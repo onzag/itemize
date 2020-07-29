@@ -67,6 +67,9 @@ function getGQLFieldsDefinitionForProperty(propertyDefinition, options) {
                 fields.size = {
                     type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
                 };
+                fields.metadata = {
+                    type: graphql_1.GraphQLString,
+                };
                 // however if we are inputting, we are required
                 // either a url or a src on _IN
                 if (options.propertiesAsInput) {

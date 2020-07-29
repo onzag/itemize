@@ -58,6 +58,14 @@ export interface IGQLFile {
    */
   size: number;
   /**
+   * optional metadata, might be null, usually constains width and
+   * height, set by the client, is limited to 128 characters
+   * 
+   * encoding is WxH;name,name,name as many names as there are special
+   * dimensions, large, small and medium do not count
+   */
+  metadata: string,
+  /**
    * A source, either a File or a read stream
    */
   src?: File | Promise<any>;
@@ -229,6 +237,7 @@ export class GQLQuery {
     // now we need to check whether we are in NodeJS or
     // in the browser, the browser uses the File, and NodeJS
     // uses a read stream
+    // we are checking for a src which means it's a file
     if (
       (typeof File !== "undefined" && arg.src instanceof File) ||
       (Stream && arg.src instanceof Stream.Readable)
@@ -241,6 +250,7 @@ export class GQLQuery {
         url: arg.url as string,
         size: arg.size as number,
         src: arg.src as any,
+        metadata: arg.metadata as any,
       };
       // and add it to our list
       this.foundUnprocessedArgFiles.push(detectedUnprocessedFile);

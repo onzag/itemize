@@ -142,7 +142,7 @@ const ArticleContent = withStyles(articleContentStyles)((props: WithStyles<typeo
                         </ModuleProvider>
                       )}
                     </Reader>
-                    <Avatar className={props.classes.publisherAvatar} hideFlag={true} size="medium" profileURL={(id: number) => `/profile/${id}`} />
+                    <Avatar linkClassName={props.classes.publisherAvatar} hideFlag={true} size="medium" profileURL={(id: number) => `/profile/${id}`} />
                   </ItemDefinitionProvider>
                 </ModuleProvider>
               )}</Reader>

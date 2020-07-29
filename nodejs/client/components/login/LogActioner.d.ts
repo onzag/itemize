@@ -16,7 +16,7 @@ declare type ActionerFn = (actioner: {
      * Performs a login action, username and password field in the user item definition context
      * should be filled for this; username can be an email for this
      */
-    login: (cleanWhenSuccesful?: boolean) => Promise<{
+    login: (cleanWhenSuccessful?: boolean) => Promise<{
         id: number;
         role: string;
         error: EndpointErrorType;
@@ -25,7 +25,7 @@ declare type ActionerFn = (actioner: {
      * Performs a signup action, username and password field in the user item definition context
      * should be filled as well; username cannot be an email for signup, validation should apply
      */
-    signup: (cleanWhenSuccesful?: boolean) => Promise<{
+    signup: (cleanWhenSuccessful?: boolean) => Promise<{
         id: number;
         role: string;
         error: EndpointErrorType;

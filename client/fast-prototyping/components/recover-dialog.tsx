@@ -1,3 +1,10 @@
+/**
+ * An standard recover component for fast prototyping fully compatible
+ * with the navbar
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { Button, createStyles, withStyles, WithStyles, Divider, MailIcon, AlernateEmailIcon, Alert } from "../mui-core";
 import { DialogResponsive } from "./dialog";
@@ -69,7 +76,7 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
                         size="large"
                         aria-label={i18nRecoverAction}
                         startIcon={<MailIcon />}
-                        onClick={actioner.sendResetPassword.bind(null, true)}
+                        onClick={actioner.sendResetPassword}
                         fullWidth={true}
                       >
                         {i18nRecoverAction}

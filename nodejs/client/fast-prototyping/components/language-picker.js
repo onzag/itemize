@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * The language picker component allows the user to choose a language and update the app
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,6 +12,12 @@ const react_1 = __importDefault(require("react"));
 const localization_1 = require("../../components/localization");
 const mui_core_1 = require("../mui-core");
 const AppLanguageRetriever_1 = __importDefault(require("../../components/localization/AppLanguageRetriever"));
+/**
+ * Allows the user to choose a language from the language list
+ *
+ * Because there aren't usually many languages this picker tends to be rather lightweight however
+ * it still remains unmounted by default
+ */
 class LanguagePicker extends react_1.default.Component {
     constructor(props) {
         super(props);

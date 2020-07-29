@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Footer fast prototyping component contains a footer for adding in the itemize application
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -10,6 +15,11 @@ const Link_1 = __importDefault(require("../../../components/navigation/Link"));
 const language_picker_1 = require("../language-picker");
 const currency_picker_1 = require("../currency-picker");
 const country_picker_1 = require("../country-picker");
+/**
+ * Styles of the footer
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 const footerStyles = (theme) => mui_core_1.createStyles({
     container: {
         width: "100%",
@@ -68,6 +78,10 @@ const footerStyles = (theme) => mui_core_1.createStyles({
         height: "2px",
     },
 });
+/**
+ * The footer itself
+ * takes no props
+ */
 exports.Footer = mui_core_1.withStyles(footerStyles)((props) => {
     const year = (new Date()).getUTCFullYear();
     // the first represents the spacer, the second is the actual footer

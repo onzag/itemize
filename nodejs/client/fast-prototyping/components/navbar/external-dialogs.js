@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains an external dialog that are usually referred errors and messages
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -8,11 +13,21 @@ const mui_core_1 = require("../../mui-core");
 const dialog_1 = require("../dialog");
 const LocationStateReader_1 = __importDefault(require("../../../components/navigation/LocationStateReader"));
 const I18nReadMany_1 = __importDefault(require("../../../components/localization/I18nReadMany"));
-const externalDialogsStyle = (theme) => mui_core_1.createStyles({
+/**
+ * The external dialog style creator
+ * @returns a bunch of styles
+ */
+const externalDialogsStyle = () => mui_core_1.createStyles({
     needsUpdateContent: {
         padding: "1rem 0.5rem",
     },
 });
+/**
+ * The external dialogs component, given a
+ * err, msg, and msgTitle in the query string, all as string will
+ * display a dialog as long as they are there
+ * @returns a react element
+ */
 exports.ExternalDialogs = mui_core_1.withStyles(externalDialogsStyle)((props) => {
     return (react_1.default.createElement(LocationStateReader_1.default, { stateIsInQueryString: true, defaultState: { err: null, msg: null, msgtitle: null } }, (state, setLocationState) => {
         const clear = () => {

@@ -115,7 +115,7 @@ const ArticleContent = mui_core_1.withStyles(articleContentStyles)((props) => {
                                 react_1.default.createElement(item_definition_1.NoStateItemDefinitionProvider, { itemDefinition: "article" },
                                     react_1.default.createElement(mui_core_1.Typography, { variant: "h3", className: props.classes.publisher },
                                         react_1.default.createElement(I18nRead_1.default, { id: "by", args: [username] })))))),
-                            react_1.default.createElement(avatar_1.Avatar, { className: props.classes.publisherAvatar, hideFlag: true, size: "medium", profileURL: (id) => `/profile/${id}` })))))),
+                            react_1.default.createElement(avatar_1.Avatar, { linkClassName: props.classes.publisherAvatar, hideFlag: true, size: "medium", profileURL: (id) => `/profile/${id}` })))))),
                 react_1.default.createElement("div", { className: props.classes.innerContainer + " trusted" },
                     react_1.default.createElement("div", { className: props.classes.dateInfo },
                         react_1.default.createElement(mui_core_1.Typography, { variant: "body2" },

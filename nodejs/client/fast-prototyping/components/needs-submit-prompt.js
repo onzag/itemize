@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * Utilizes the needs submit prompt in order to prompt the user
+ * about missing changes
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -33,6 +39,10 @@ class ActualNeedsSubmitDialog extends react_1.default.PureComponent {
     }
 }
 const NeedsSubmitDialog = mui_core_1.withStyles(needsSubmitDialogStyle)(ActualNeedsSubmitDialog);
+/**
+ * The nees submit prompt will show a prompt (aka dialog) for when the user
+ * attempts to leave the page, but hasn't submitted changes
+ */
 class NeedsSubmitPrompt extends react_1.default.PureComponent {
     render() {
         return (react_1.default.createElement(I18nReadMany_1.default, { data: [

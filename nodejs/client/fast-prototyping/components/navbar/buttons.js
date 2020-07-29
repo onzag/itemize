@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains the buttons that are part of the navbar
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -10,6 +15,11 @@ const avatar_1 = require("../avatar");
 const LocationStateReader_1 = __importDefault(require("../../../components/navigation/LocationStateReader"));
 const IfLogStatus_1 = require("../../../components/login/IfLogStatus");
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
+/**
+ * provides the styles for the buttons
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 const buttonsStyles = (theme) => mui_core_1.createStyles({
     languageButton: {
         marginLeft: "1rem",
@@ -32,16 +42,30 @@ const buttonsStyles = (theme) => mui_core_1.createStyles({
         }
     },
 });
+/**
+ * The buttons component which contains all the buttons that are in the navbar as well
+ * as handle the navigation logig for keeping a state for login/signup
+ *
+ * It also contains the avatar
+ *
+ * @param props the props
+ * @returns a react component
+ */
 exports.Buttons = mui_core_1.withStyles(buttonsStyles)((props) => {
+    // we first use the location state reader and keep this in our state
     return (react_1.default.createElement(LocationStateReader_1.default, { defaultState: { signupDialogOpen: false, loginDialogOpen: false, recoverDialogOpen: false } }, (state, setLocationState) => {
+        // so this will open the dialog to login, it will replace the state
+        // if the signup dialog is already open, so going back will quit
         const openLoginDialog = () => setLocationState({
             loginDialogOpen: true,
             signupDialogOpen: false,
             recoverDialogOpen: false,
         }, state.signupDialogOpen);
+        // close the login dialog, it will indeed push
         const closeLoginDialog = () => setLocationState({
             loginDialogOpen: false,
         }, true);
+        // open the signup dialog and others
         const openSignupDialog = () => setLocationState({
             signupDialogOpen: true,
             loginDialogOpen: false,
@@ -58,9 +82,11 @@ exports.Buttons = mui_core_1.withStyles(buttonsStyles)((props) => {
         const closeRecoverDialog = () => setLocationState({
             recoverDialogOpen: false,
         }, true);
+        // now we get our components
         const LoginDialog = props.LoginDialog;
         const SignupDialog = props.SignupDialog;
         const RecoverDialog = props.RecoverDialog;
+        // and return
         return (react_1.default.createElement(IfLogStatus_1.IfLogStatus, null, (status) => {
             if (status === "LOGGED_OUT" || status === "LOGGING_IN") {
                 return react_1.default.createElement(react_1.default.Fragment, null,

@@ -1,17 +1,43 @@
+/**
+ * Contains the currency picker fast prototyping element which allows the user
+ * to select a currency
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { capitalize } from "../../components/localization";
 import { Button, Menu, MenuItem } from "../mui-core";
 import AppCurrencyRetriever from "../../components/localization/AppCurrencyRetriever";
 
+/**
+ * The currency picker props
+ */
 interface ICurrencyPickerProps {
+  /**
+   * The class name for the currency picker
+   */
   className?: string;
+  /**
+   * Whether to use the code and only the code rather the normal
+   * combination of the code and the symbol
+   */
   useCode?: boolean;
 }
 
+/**
+ * The currency picker state
+ */
 interface ICurrencyPickerState {
   anchorEl: HTMLElement;
 }
 
+/**
+ * Contains the currency picker fast prototyping element which allows the user
+ * to select a currency
+ * 
+ * Similarly to the country picker the currency picker can be rather heavy
+ */
 export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurrencyPickerState> {
   constructor(props: ICurrencyPickerProps) {
     super(props);
@@ -46,6 +72,7 @@ export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurre
         {(currencyData) => {
           const menu = this.state.anchorEl ? <Menu
             anchorEl={this.state.anchorEl}
+            // same optimization here
             keepMounted={false}
             open={!!this.state.anchorEl}
             onClose={this.handleMenuClose}

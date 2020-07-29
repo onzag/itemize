@@ -1,3 +1,9 @@
+/**
+ * The navbar for the fast prototyping usage and what it comes by default
+ * 
+ * @packageDocumentation
+ */
+
 import React, { useState } from "react";
 import { AppBar, Toolbar, IconButton, createStyles, WithStyles, withStyles, Theme, Typography, MenuIcon,
   ImportantDevicesIcon, LibraryBooksIcon, HomeIcon } from "../../mui-core";
@@ -13,6 +19,11 @@ import I18nRead from "../../../components/localization/I18nRead";
 import TitleReader from "../../../components/util/TitleReader";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
 
+/**
+ * the navbar styles generator
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 const navbarStyles = (theme: Theme) => createStyles({
   container: {
     flexBasis: "100%",
@@ -40,21 +51,54 @@ const navbarStyles = (theme: Theme) => createStyles({
   }
 });
 
+/**
+ * The navbar props that allow to build a a navbar based on the folowing logic
+ */
 interface INavbarProps extends WithStyles<typeof navbarStyles> {
+  /**
+   * Optional, default is false, exclude the language picker so the language cannot be chosen and instead it goes
+   * with whatever default is loaded, a language picker might be added somewhere else
+   */
   excludeLanguagePicker?: boolean;
+  /**
+   * Exclude the blocking backdrop which shows when the app is blocked from an update, you can add a different sort of
+   * message somewhere else if you exclude it
+   */
   excludeBlockingBackdrop?: boolean;
+  /**
+   * The Login dialog component, required, after all that's what all this navbar is for, check login-dialog.tsx for a default
+   */
   LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void, onRecoverRequest: () => void}>,
+  /**
+   * The Signup dialog component, required, after all that's what all this navbar is for, check signup-dialog.tsx dialog for a default
+   */
   SignupDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
+  /**
+   * The Recover dialog component, required, after all that's what all this navbar is for, check recover-dialog.tsx for a default
+   */
   RecoverDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
+  /**
+   * the menu admin entries that appear on top by a divider,
+   * it uses the MenuEntry form array for it, by default it includes only the CMS for ADMIN role
+   * if you have removed the CMS then you need to remove this or this would cause an error
+   */
   menuAdminEntries?: MenuEntry[];
+  /**
+   * the menu entries themselves, basic and available for all roles specified in the role list or not
+   * fully modifiable, by default will contain the home, and news, more to come
+   */
   menuEntries?: MenuEntry[];
 }
 
+/**
+ * The default admin entries
+ */
 const defaultMenuAdminEntries: MenuEntry[] = [
   {
     path: "/cms",
     icon: <ImportantDevicesIcon/>,
     module: "cms",
+    role: "ADMIN",
     i18nProps: {
       id: "name",
       capitalize: true,
@@ -62,6 +106,9 @@ const defaultMenuAdminEntries: MenuEntry[] = [
   },
 ]
 
+/**
+ * The default menu entries
+ */
 const defaultMenuEntries: MenuEntry[] = [
   {
     path: "/",
@@ -83,6 +130,14 @@ const defaultMenuEntries: MenuEntry[] = [
   },
 ]
 
+/**
+ * The navbar fast prototyping component, contains more than just a navbar, it has extra
+ * functionality into it, such as outdated information, a blocking backdrop, etc...
+ * might be disabled by request
+ * 
+ * @param props the navbar props
+ * @returns a react component
+ */
 export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
   const [isOutdatedDialogAllowedToBeOpen, setIsOutdatedDialogAllowedToBeOpen] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);

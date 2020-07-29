@@ -1,3 +1,9 @@
+/**
+ * An standard recover component for fast prototyping fully compatible
+ * with the navbar
+ *
+ * @packageDocumentation
+ */
 import React from "react";
 import { WithStyles } from "../mui-core";
 declare const recoverDialogStyles: Record<"divider" | "resetPasswordButtonWrapper", import("@material-ui/styles").CSSProperties | import("@material-ui/styles").CreateCSSProperties<{}> | ((props: {}) => import("@material-ui/styles").CreateCSSProperties<{}>)>;

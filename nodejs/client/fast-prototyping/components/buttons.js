@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * Contains the submit, search and delete button for fast prototyping
+ * usage
+ *
+ * @packageDocumentation
+ */
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -17,6 +23,17 @@ const navigation_1 = require("../../components/navigation");
 const I18nRead_1 = __importDefault(require("../../components/localization/I18nRead"));
 const SearchActioner_1 = __importDefault(require("../../components/search/SearchActioner"));
 const mui_core_1 = require("../mui-core");
+/**
+ * Provides a very useful submit button that extends via the submit
+ * actioner and it's fully functional; needs to be in an item
+ * definition context
+ *
+ * If you need to access the error please use the snackbar.tsx component
+ * in addition of another submit actioner to fetch the error itself
+ *
+ * @param props the submit button props
+ * @returns a react component
+ */
 function SubmitButton(props) {
     const [confirmationIsActive, setConfirmationIsActive] = react_1.useState(false);
     const CustomConfirmationComponent = props.CustomConfirmationComponent;
@@ -68,6 +85,17 @@ function SubmitButton(props) {
     }));
 }
 exports.SubmitButton = SubmitButton;
+/**
+ * Allows to create a fast prototyping button that will trigger a search
+ * once clicked, uses the search actioner and must be in an item definition context
+ * in search mode
+ *
+ * If you need to access the error please use the snackbar.tsx component
+ * in addition of another search actioner to fetch the error itself
+ *
+ * @param props the search button props
+ * @returns a react component
+ */
 function SearchButton(props) {
     return (react_1.default.createElement(SearchActioner_1.default, null, (actioner) => {
         return (react_1.default.createElement(react_1.default.Fragment, null,
@@ -77,6 +105,9 @@ function SearchButton(props) {
     }));
 }
 exports.SearchButton = SearchButton;
+/**
+ * TODO
+ */
 function DeleteButton() {
 }
 exports.DeleteButton = DeleteButton;

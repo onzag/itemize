@@ -150,6 +150,9 @@ class PropertyEntryText extends react_1.default.Component {
             const tempURL = fileInserted.url;
             const img = new Image();
             img.onload = () => {
+                const dimensions = this.props.property.getSpecialProperty("dimensions") || "";
+                const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
+                this.setMetadata(fileInserted, img.width + "x" + img.height + ";" + dimensionNames.join(","));
                 resolve({
                     result: fileInserted,
                     width: img.width,
@@ -165,6 +168,19 @@ class PropertyEntryText extends react_1.default.Component {
             };
             img.src = tempURL;
         });
+    }
+    setMetadata(file, metadata) {
+        const currentValue = this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null);
+        if (currentValue) {
+            const index = currentValue.findIndex((f) => f.id === file.id);
+            if (index !== -1) {
+                const newValue = [...currentValue];
+                newValue[index] = { ...currentValue[index] };
+                newValue[index].metadata = metadata;
+                this.cachedMediaProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
+                this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
+            }
+        }
     }
     /**
      * Inserts a file in the media property
@@ -201,6 +217,7 @@ class PropertyEntryText extends react_1.default.Component {
             url: tempURL,
             size: file.size,
             src: file,
+            metadata: null,
         };
         const currentValue = this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null);
         const newValue = currentValue !== null ?

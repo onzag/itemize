@@ -21,12 +21,12 @@ type ActionerFn = (actioner: {
    * Performs a login action, username and password field in the user item definition context
    * should be filled for this; username can be an email for this
    */
-  login: (cleanWhenSuccesful?: boolean) => Promise<{id: number, role: string, error: EndpointErrorType}>,
+  login: (cleanWhenSuccessful?: boolean) => Promise<{id: number, role: string, error: EndpointErrorType}>,
   /**
    * Performs a signup action, username and password field in the user item definition context
    * should be filled as well; username cannot be an email for signup, validation should apply
    */
-  signup: (cleanWhenSuccesful?: boolean) => Promise<{id: number, role: string, error: EndpointErrorType}>,
+  signup: (cleanWhenSuccessful?: boolean) => Promise<{id: number, role: string, error: EndpointErrorType}>,
   /**
    * Performs a logout action
    */
@@ -117,10 +117,10 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
 
   /**
    * Performs the login
-   * @param cleanWhenSuccesful whether to clean the unsafe fields (aka password) when succesful, default is true
+   * @param cleanWhenSuccessful whether to clean the unsafe fields (aka password) when succesful, default is true
    * @returns a promise with the user id, user role, or an error
    */
-  public async login(cleanWhenSuccesful: boolean = true): Promise<{
+  public async login(cleanWhenSuccessful: boolean = true): Promise<{
     id: number;
     role: string;
     error: EndpointErrorType;
@@ -146,7 +146,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     const userData = await this.props.tokenContextValue.login(usernameValue as string, passwordValue as string, null);
 
     // if we get a sucesful login
-    if (cleanWhenSuccesful && userData && !userData.error) {
+    if (cleanWhenSuccessful && userData && !userData.error) {
       // we do it but on a delay in order to avoid flickering for example
       // in dialogs that are going to close
       this.cleanUnsafeFields(true);
@@ -192,10 +192,10 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
 
   /**
    * Performs the signup
-   * @param cleanWhenSuccesful whether to clean the unsafe fields (aka password) when succesful, default is true
+   * @param cleanWhenSuccessful whether to clean the unsafe fields (aka password) when succesful, default is true
    * @returns a promise with the user id, user role, or an error
    */
-  public async signup(cleanWhenSuccesful: boolean = true): Promise<{
+  public async signup(cleanWhenSuccessful: boolean = true): Promise<{
     id: number;
     role: string;
     error: EndpointErrorType;
@@ -214,7 +214,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     // now if there's no error
     if (!result.error) {
       // we call the login and return that
-      return await this.login(cleanWhenSuccesful);
+      return await this.login(cleanWhenSuccessful);
     }
 
     // otherwise we return such error

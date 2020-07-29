@@ -49,10 +49,10 @@ class ActualLogActioner extends react_1.default.Component {
     }
     /**
      * Performs the login
-     * @param cleanWhenSuccesful whether to clean the unsafe fields (aka password) when succesful, default is true
+     * @param cleanWhenSuccessful whether to clean the unsafe fields (aka password) when succesful, default is true
      * @returns a promise with the user id, user role, or an error
      */
-    async login(cleanWhenSuccesful = true) {
+    async login(cleanWhenSuccessful = true) {
         // so we read from the property, the state values
         const username = this.props.itemDefinitionContextualValue.state.properties
             .find((pv) => pv.propertyId === "username");
@@ -71,7 +71,7 @@ class ActualLogActioner extends react_1.default.Component {
         // and we use the context for the token in order to perform the login
         const userData = await this.props.tokenContextValue.login(usernameValue, passwordValue, null);
         // if we get a sucesful login
-        if (cleanWhenSuccesful && userData && !userData.error) {
+        if (cleanWhenSuccessful && userData && !userData.error) {
             // we do it but on a delay in order to avoid flickering for example
             // in dialogs that are going to close
             this.cleanUnsafeFields(true);
@@ -111,10 +111,10 @@ class ActualLogActioner extends react_1.default.Component {
     }
     /**
      * Performs the signup
-     * @param cleanWhenSuccesful whether to clean the unsafe fields (aka password) when succesful, default is true
+     * @param cleanWhenSuccessful whether to clean the unsafe fields (aka password) when succesful, default is true
      * @returns a promise with the user id, user role, or an error
      */
-    async signup(cleanWhenSuccesful = true) {
+    async signup(cleanWhenSuccessful = true) {
         // we nee to check that there's no forId user
         if (this.props.itemDefinitionContextualValue.forId) {
             throw new Error("Attempted to signup an user by overriding user for id " + this.props.itemDefinitionContextualValue.forId);
@@ -127,7 +127,7 @@ class ActualLogActioner extends react_1.default.Component {
         // now if there's no error
         if (!result.error) {
             // we call the login and return that
-            return await this.login(cleanWhenSuccesful);
+            return await this.login(cleanWhenSuccessful);
         }
         // otherwise we return such error
         return {

@@ -1,3 +1,9 @@
+/**
+ * Footer fast prototyping component contains a footer for adding in the itemize application
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { createStyles, WithStyles, withStyles, Theme, CopyrightIcon } from "../../mui-core";
 import I18nRead from "../../../components/localization/I18nRead";
@@ -6,6 +12,11 @@ import { LanguagePicker } from "../language-picker";
 import { CurrencyPicker } from "../currency-picker";
 import { CountryPicker } from "../country-picker";
 
+/**
+ * Styles of the footer
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 const footerStyles = (theme: Theme) => createStyles({
   container: {
     width: "100%",
@@ -65,6 +76,10 @@ const footerStyles = (theme: Theme) => createStyles({
   },
 });
 
+/**
+ * The footer itself
+ * takes no props
+ */
 export const Footer = withStyles(footerStyles)((props: WithStyles<typeof footerStyles>) => {
   const year = (new Date()).getUTCFullYear();
   // the first represents the spacer, the second is the actual footer

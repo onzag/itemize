@@ -1,3 +1,10 @@
+/**
+ * An standard login dialog component for fast prototyping fully compatible
+ * with the navbar
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { Button, createStyles, withStyles, WithStyles, Typography, Divider, DoneIcon, AccountCircleIcon } from "../mui-core";
 import { DialogResponsive } from "./dialog";
@@ -9,6 +16,9 @@ import I18nRead from "../../components/localization/I18nRead";
 import I18nReadMany from "../../components/localization/I18nReadMany";
 import Entry from "../../components/property/Entry";
 
+/**
+ * The login dialog styles
+ */
 const loginDialogStyles = createStyles({
   welcomeTitle: {
     paddingBottom: "1rem",
@@ -36,17 +46,43 @@ const loginDialogStyles = createStyles({
   },
 });
 
+/**
+ * The login dialog props
+ */
 interface ILoginDialogProps extends WithStyles<typeof loginDialogStyles> {
+  /**
+   * whether it is currently opened
+   */
   open: boolean;
+  /**
+   * triggers on close
+   */
   onClose: () => void;
+  /**
+   * When the user requests to signup
+   */
   onSignupRequest: () => void;
+  /**
+   * When the user requests for password recovery
+   */
   onRecoverRequest: () => void;
 }
 
+/**
+ * simple utlity to run a couple of functions at once
+ * @param functions the many functions
+ */
 function runManyFunctions(functions: Array<() => void>) {
   functions.forEach(f => f());
 }
 
+/**
+ * A fully compatible with the navbar fast prototyping login dialog for the user
+ * to fill in, contains its own item definition provider, but it must be into
+ * a module provider context
+ * @param props the login props
+ * @returns a react component
+ */
 export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogProps) => {
   return (
     <ItemDefinitionProvider
