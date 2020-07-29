@@ -1,43 +1,18 @@
+/**
+ * Contains fast prototyping utilities for fast developing
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { createStyles, WithStyles, withStyles, CircularProgress } from "../mui-core";
+import { DelayDisplay } from "../../components/util";
 
 import "./util.scss";
 
-interface DelayDisplayProps {
-  duration: number;
-}
-
-interface DelayDisplayState {
-  shown: boolean;
-}
-
-export class DelayDisplay extends React.PureComponent<DelayDisplayProps, DelayDisplayState> {
-  private timer: NodeJS.Timer;
-  constructor(props: DelayDisplayProps) {
-    super(props);
-
-    this.state = {
-      shown: false,
-    }
-  }
-  componentDidMount() {
-    this.timer = setTimeout(() => {
-      this.setState({
-        shown: true,
-      });
-    }, this.props.duration);
-  }
-  componentWillUnmount() {
-    clearTimeout(this.timer);
-  }
-  render() {
-    if (this.state.shown) {
-      return this.props.children;
-    }
-    return null;
-  }
-}
-
+/**
+ * The progressing element sytle for the progressing element
+ */
 const progressingElementStyle: any = createStyles({
   progressWrapper: (props: IProgressingElementProps) => ({
     position: "relative",
@@ -48,8 +23,8 @@ const progressingElementStyle: any = createStyles({
     position: "absolute",
     top: "50%",
     left: "50%",
-    marginTop: -((props.progressSize || 24)/2),
-    marginLeft: -((props.progressSize || 24)/2),
+    marginTop: -((props.progressCircleSize || 24)/2),
+    marginLeft: -((props.progressCircleSize || 24)/2),
   }),
   cover: {
     position: "absolute",
@@ -61,17 +36,43 @@ const progressingElementStyle: any = createStyles({
   }
 });
 
+/**
+ * Progressing element props
+ */
 interface IProgressingElementProps extends WithStyles<typeof progressingElementStyle> {
+  /**
+   * Whether it is currently progressing
+   */
   isProgressing: boolean;
-  progressSize?: number;
+  /**
+   * The size of the progressing circle (optional) default 24
+   */
+  progressCircleSize?: number;
+  /**
+   * The children to add into it
+   */
   children: React.ReactNode;
+  /**
+   * The delay duration to show this progress happening, the default is 300
+   */
   delayDuration?: number;
+  /**
+   * Whether to use full 100% width
+   */
   fullWidth?: boolean;
+  /**
+   * The class name of the progress wrapper
+   */
   className?: string;
 }
 
+/**
+ * Shows a loading circle on top of a component to show that such is loading
+ * @param props the loading props
+ * @returns a react component
+ */
 export const ProgressingElement = withStyles(progressingElementStyle)((props: IProgressingElementProps) => {
-  const size = props.progressSize || 24;
+  const size = props.progressCircleSize || 24;
   return (<div className={`${props.classes.progressWrapper} ${props.className ? props.className : ""}`}>
     {props.children}
     {
@@ -86,24 +87,59 @@ export const ProgressingElement = withStyles(progressingElementStyle)((props: IP
   </div>);
 });
 
+/**
+ * The slow loading element props
+ */
 interface SlowLoadingElementProps {
+  /**
+   * The children that are slow loading
+   */
   children: React.ReactNode;
+  /**
+   * An id
+   */
   id: string;
+  /**
+   * Wheter the display is inline
+   */
   inline?: boolean;
+  /**
+   * triggers once the item has mounted
+   */
   onMount?: () => void;
 }
 
+/**
+ * The slow loading state
+ */
 interface SlowLoadingElementState {
+  /**
+   * Whether it is ready
+   */
   isReady: boolean;
+  /**
+   * ready for which id
+   */
   readyForId: string;
 }
 
+/**
+ * Some elements can be fairly heavy and slow loading, this component will detach the execution of some of these components
+ * so that they don't have to slow down the execution of other code, doesn't play nice with SSR
+ */
 export class SlowLoadingElement extends React.Component<SlowLoadingElementProps, SlowLoadingElementState> {
+  /**
+   * Becomes true once unmounted, avoid setState on
+   * unmounted components if the element really takes a while
+   * to load
+   */
   private unmounted: boolean = false;
+
   public static getDerivedStateFromProps(
     props: SlowLoadingElementProps,
     state: SlowLoadingElementState,
   ): Partial<SlowLoadingElementState> {
+    // basically if the id changes, we consider ourselves not ready anymore
     if (props.id !== state.readyForId) {
       return {
         isReady: false,

@@ -112,12 +112,14 @@ export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fra
               {(actioner) => (
                 <>
                   <Snackbar
+                    id="submit-fragment-error"
                     severity="error"
                     i18nDisplay={actioner.submitError}
                     open={!!actioner.submitError}
                     onClose={actioner.dismissError}
                   />
                   <Snackbar
+                    id="submit-fragment-success"
                     severity="success"
                     i18nDisplay="success"
                     open={actioner.submitted}

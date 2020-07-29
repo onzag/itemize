@@ -111,6 +111,7 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
               <SubmitActioner>
                 {(actioner) => (
                   <Snackbar
+                    id="change-password-error"
                     severity="error"
                     i18nDisplay={actioner.submitError}
                     open={!!actioner.submitError} onClose={actioner.dismissError}

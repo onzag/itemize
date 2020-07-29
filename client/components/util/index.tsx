@@ -5,6 +5,7 @@
  * @packageDocumentation
  */
 
+import React from "react";
 import { IGQLFile } from "../../../gql-querier";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
@@ -259,4 +260,48 @@ export function cacheableQSLoader(url: string, recheck?: boolean) {
 
   // and return it as a string
   return newURL.toString();
+}
+
+/**
+ * The delay display props
+ */
+interface DelayDisplayProps {
+  duration: number;
+}
+
+/**
+ * The delay display state
+ */
+interface DelayDisplayState {
+  shown: boolean;
+}
+
+/**
+ * Allows to create a component that will only display after a given delay
+ */
+export class DelayDisplay extends React.PureComponent<DelayDisplayProps, DelayDisplayState> {
+  private timer: NodeJS.Timer;
+  constructor(props: DelayDisplayProps) {
+    super(props);
+
+    this.state = {
+      shown: false,
+    }
+  }
+  componentDidMount() {
+    this.timer = setTimeout(() => {
+      this.setState({
+        shown: true,
+      });
+    }, this.props.duration);
+  }
+  componentWillUnmount() {
+    clearTimeout(this.timer);
+  }
+  render() {
+    if (this.state.shown) {
+      return this.props.children;
+    }
+    return null;
+  }
 }

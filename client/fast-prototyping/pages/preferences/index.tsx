@@ -98,12 +98,14 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
                 {(actioner) => (
                   <React.Fragment>
                     <Snackbar
+                      id="submit-preferences-error"
                       severity="error"
                       i18nDisplay={actioner.submitError}
                       open={!!actioner.submitError}
                       onClose={actioner.dismissError}
                     />
                     <Snackbar
+                      id="submit-preferences-success"
                       severity="success"
                       i18nDisplay="preferences_updated_successfully"
                       open={actioner.submitted}

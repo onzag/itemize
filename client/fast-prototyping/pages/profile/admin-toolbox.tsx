@@ -31,12 +31,14 @@ export const AdminToolbox = withStyles(adminToolboxStyles)((props: WithStyles<ty
         {(actioner) => (
           <React.Fragment>
             <Snackbar
+              id="submit-admin-toolbox-error"
               severity="error"
               i18nDisplay={actioner.submitError}
               open={!!actioner.submitError}
               onClose={actioner.dismissError}
             />
             <Snackbar
+              id="submit-admin-toolbox-success"
               severity="success"
               i18nDisplay="profile_updated_successfully"
               open={actioner.submitted}

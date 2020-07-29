@@ -144,12 +144,14 @@ export const Article = withStyles(fragmentStyles)((props: WithStyles<typeof frag
               {(actioner) => (
                 <>
                   <Snackbar
+                    id="submit-article-error"
                     severity="error"
                     i18nDisplay={actioner.submitError}
                     open={!!actioner.submitError}
                     onClose={actioner.dismissError}
                   />
                   <Snackbar
+                    id="submit-article-success"
                     severity="success"
                     i18nDisplay="success"
                     open={actioner.submitted}

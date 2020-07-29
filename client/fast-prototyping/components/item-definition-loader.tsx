@@ -7,7 +7,7 @@
 import React from "react";
 import { withStyles, WithStyles, Theme, createStyles, Typography, IconButton, CircularProgress, RefreshIcon } from "../mui-core";
 import NItemDefinitionLoader from "../../components/item-definition/ItemDefinitionLoader";
-import { DelayDisplay } from "./util";
+import { DelayDisplay } from "../../components/util";
 import I18nRead from "../../components/localization/I18nRead";
 import I18nReadError from "../../components/localization/I18nReadError";
 

@@ -188,12 +188,14 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
                                     </Button>
                                   </ProgressingElement>
                                   <Snackbar
+                                    id="standard-info-edit-error"
                                     severity="error"
                                     i18nDisplay={actioner.statefulError}
                                     open={!!actioner.statefulError}
                                     onClose={actioner.dismissStatefulError}
                                   />
                                   <Snackbar
+                                    id="standard-info-edit-success"
                                     severity="success"
                                     i18nDisplay="missing_email_validation_warning_action_success"
                                     open={actioner.statefulSuccess}

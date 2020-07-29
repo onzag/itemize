@@ -1,10 +1,19 @@
+/**
+ * Contains the snackbar component to display success and error messages
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { Snackbar as MUISnackbar, IconButton, withStyles, WithStyles, createStyles, Theme, CloseIcon } from "../mui-core";
 import { EndpointErrorType } from "../../../base/errors";
-import uuid from "uuid";
 import I18nRead from "../../components/localization/I18nRead";
 import I18nReadError from "../../components/localization/I18nReadError";
 
+/**
+ * the snackbar styles
+ * @param theme the mui theme
+ */
 const snackbarStyles = (theme: Theme) => createStyles({
   success: {
     backgroundColor: theme.palette.success.main,
@@ -28,19 +37,42 @@ const snackbarStyles = (theme: Theme) => createStyles({
   },
 });
 
+/**
+ * The snackbar props that it needs to take
+ */
 interface ISnackbarProps extends WithStyles<typeof snackbarStyles> {
+  /**
+   * An unique id to describe this snackbar
+   */
+  id: string;
+  /**
+   * What to display, it can be an error, which can be taken from actioners
+   * or a string to do a simple read
+   */
   i18nDisplay: EndpointErrorType | string;
+  /**
+   * The severity of the snackbar, which affects the color
+   */
   severity: "primary" | "secondary" | "success" | "error";
+  /**
+   * Whether it is currently visible, very often actioners will have
+   * a property that fits in here nicely, such as "success", "statefulSuccess" or
+   * "error", etc...
+   */
   open: boolean;
+  /**
+   * Triggers when the snackbar closes, very often actioners will have a property that
+   * fits here, such as "dismissSuccess", "dismissError", etc...
+   */
   onClose: () => void;
 }
 
+/**
+ * The actual snackbar class
+ */
 class ActualSnackbar extends React.PureComponent<ISnackbarProps> {
-  private id: string;
   constructor(props: ISnackbarProps) {
     super(props);
-
-    this.id = "id-" + uuid.v1();
   }
   public render() {
     let message: React.ReactNode;
@@ -62,13 +94,13 @@ class ActualSnackbar extends React.PureComponent<ISnackbarProps> {
         autoHideDuration={autoHideDuration}
         onClose={this.props.onClose}
         ContentProps={{
-          "aria-describedby": this.id,
+          "aria-describedby": this.props.id,
           classes: {
             root: this.props.classes[this.props.severity],
           }
         }}
         message={
-          <span id={this.id}>
+          <span id={this.props.id}>
             {message}
           </span>
         }

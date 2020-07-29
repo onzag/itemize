@@ -128,12 +128,14 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
                                 )}
                               </I18nRead>
                               <Snackbar
+                                id="reset-password-error"
                                 severity="error"
                                 i18nDisplay={actioner.statefulError}
                                 open={!!actioner.statefulError}
                                 onClose={actioner.dismissStatefulError}
                               />
                               <Snackbar
+                                id="reset-password-success"
                                 severity="success"
                                 i18nDisplay="reset_password_success"
                                 open={!!actioner.statefulSuccess}

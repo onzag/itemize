@@ -15,6 +15,9 @@ import UserActioner from "../../components/user/UserActioner";
 import I18nRead from "../../components/localization/I18nRead";
 import Entry from "../../components/property/Entry";
 
+/**
+ * The recover dialog styles
+ */
 const recoverDialogStyles = createStyles({
   resetPasswordButtonWrapper: {
     marginTop: "1.5rem",
@@ -24,16 +27,40 @@ const recoverDialogStyles = createStyles({
   },
 });
 
+/**
+ * Props for the recover dialog
+ */
 interface IRecoverDialogProps extends WithStyles<typeof recoverDialogStyles> {
+  /**
+   * Whether the dialog is currently open
+   */
   open: boolean;
+  /**
+   * Triggere when the dialog closes
+   */
   onClose: () => void;
+  /**
+   * Triggered if the user wants to login rather than recover password
+   */
   onLoginRequest: () => void;
 }
 
+/**
+ * runs many functions at once
+ * @param functions the functions to run
+ */
 function runManyFunctions(functions: Array<() => void>) {
   functions.forEach(f => f());
 }
 
+/**
+ * A recover dialog fully compatible with the navbar that allows for quickly adding
+ * a dialog for recovering the password, it contains its own item definition provider but depends to
+ * be in the right module context
+ * 
+ * @param props the props for recovery
+ * @returns a react component
+ */
 export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDialogProps) => {
   return (
     <ItemDefinitionProvider
@@ -99,12 +126,14 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
                   )}
                 </I18nRead>
                 <Snackbar
+                  id="recover-dialog-error"
                   severity="error"
                   i18nDisplay={actioner.statefulError}
                   open={!!actioner.statefulError}
                   onClose={actioner.dismissStatefulError}
                 />
                 <Snackbar
+                  id="recover-dialog-success"
                   severity="success"
                   i18nDisplay="recover_account_action_success"
                   open={!!actioner.statefulSuccess}

@@ -1,3 +1,10 @@
+/**
+ * An standard signup dialog component for fast prototyping fully compatible
+ * with the navbar
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { Button, createStyles, withStyles, WithStyles, Typography, Divider, DoneIcon, AccountCircleIcon } from "../mui-core";
 import { DialogResponsive } from "./dialog";
@@ -15,6 +22,9 @@ import AppCurrencyRetriever from "../../components/localization/AppCurrencyRetri
 import I18nReadError from "../../components/localization/I18nReadError";
 import I18nReadMany from "../../components/localization/I18nReadMany";
 
+/**
+ * The signup dialog styles
+ */
 const signupDialogStyles = createStyles({
   welcomeTitle: {
     paddingBottom: "1rem",
@@ -45,16 +55,39 @@ const signupDialogStyles = createStyles({
   },
 });
 
+/**
+ * The props for the signup dialog that it needs to take
+ */
 interface ISignupDialogProps extends WithStyles<typeof signupDialogStyles> {
+  /**
+   * Whether the dialog is currently open
+   */
   open: boolean;
+  /**
+   * Triggers when the dialog is closed
+   */
   onClose: () => void;
+  /**
+   * when the user requests to login rather than signup
+   */
   onLoginRequest: () => void;
 }
 
+/**
+ * run many functions at once
+ * @param functions the functions to run
+ */
 function runManyFunctions(functions: Array<() => void>) {
   functions.forEach(f => f());
 }
 
+/**
+ * A fully compatible with the navbar fast prototyping signup dialog for the user
+ * to fill in, contains its own item definition provider, but it must be into
+ * a module provider context
+ * @param props the login props
+ * @returns a react component
+ */
 export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialogProps) => {
   return (
     <ItemDefinitionProvider
@@ -154,6 +187,7 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
                   )}
                 </I18nRead>
                 <Snackbar
+                  id="signup-dialog-error"
                   severity="error"
                   i18nDisplay={actioner.error}
                   open={!!actioner.error}
