@@ -125,7 +125,6 @@ export interface ISSRConfig {
 
 export interface ISEOConfig {
   seoRules: ISEORuleSet;
-  seoContainerId: string;
 }
 
 export interface IAppDataType {
@@ -354,7 +353,7 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
       });
   
       result += "Sitemap: " +
-        appData.pkgcloudUploadContainers[appData.seoConfig.seoContainerId].prefix + 
+        appData.pkgcloudUploadContainers[appData.sensitiveConfig.seoContainerID].prefix + 
         "sitemaps/" + hostname + "/index.xml";
     }
 
@@ -362,7 +361,7 @@ function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataTy
   });
 
   app.get("/sitemap.xml", (req, res) => {
-    res.redirect(appData.pkgcloudUploadContainers[appData.seoConfig.seoContainerId].prefix + "sitemaps/" + hostname + "/index.xml")
+    res.redirect(appData.pkgcloudUploadContainers[appData.sensitiveConfig.seoContainerID].prefix + "sitemaps/" + hostname + "/index.xml")
   });
 
   const router = express.Router();
@@ -624,9 +623,9 @@ export async function initializeServer(
         logger.info(
           "initializeServer: initializing SEO configuration",
         );
-        const seoContainerData = sensitiveConfig.openstackContainers[seoConfig.seoContainerId];
+        const seoContainerData = sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
         if (!seoContainerData) {
-          throw new Error("Invalid seo container id for the openstack container '" + seoConfig.seoContainerId + "'");
+          throw new Error("Invalid seo container id for the openstack container '" + sensitiveConfig.seoContainerID + "'");
         }
         const seoContainerClient = pkgcloud.storage.createClient({
           provider: "openstack",
@@ -638,7 +637,7 @@ export async function initializeServer(
           password: seoContainerData.password,
           authUrl: seoContainerData.authUrl,
         } as any);
-        let prefix = config.containersHostnamePrefixes[seoConfig.seoContainerId];
+        let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
         if (prefix.indexOf("/") !== 0) {
           prefix = "https://" + prefix;
         }

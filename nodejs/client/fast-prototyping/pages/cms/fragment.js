@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * A page section for fast prototyping that allows to create and edit fragments
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -14,6 +19,9 @@ const buttons_1 = require("../../components/buttons");
 const I18nReadMany_1 = __importDefault(require("../../../components/localization/I18nReadMany"));
 const snackbar_1 = __importDefault(require("../../components/snackbar"));
 const SubmitActioner_1 = __importDefault(require("../../../components/item-definition/SubmitActioner"));
+/**
+ * The fragment styles
+ */
 const fragmentStyles = mui_core_1.createStyles({
     paper: {
         padding: "1rem",
@@ -29,6 +37,11 @@ const fragmentStyles = mui_core_1.createStyles({
         paddingBottom: "1rem",
     },
 });
+/**
+ * The fragment section itself that allows modifying and creating new fragments
+ * @param props the fragment styles
+ * @returns a react element
+ */
 exports.Fragment = mui_core_1.withStyles(fragmentStyles)((props) => {
     return (react_1.default.createElement(LocationStateReader_1.default, { defaultState: { id: "", version: "" }, stateIsInQueryString: true }, (locationState, setState) => {
         const updateLocationState = (which, e) => {
@@ -67,7 +80,7 @@ exports.Fragment = mui_core_1.withStyles(fragmentStyles)((props) => {
                             react_1.default.createElement(View_1.default, { id: "title" })),
                         react_1.default.createElement(View_1.default, { id: "content" })))),
             react_1.default.createElement(SubmitActioner_1.default, null, (actioner) => (react_1.default.createElement(react_1.default.Fragment, null,
-                react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }),
-                react_1.default.createElement(snackbar_1.default, { severity: "success", i18nDisplay: "success", open: actioner.submitted, onClose: actioner.dismissSubmitted }))))));
+                react_1.default.createElement(snackbar_1.default, { id: "submit-fragment-error", severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }),
+                react_1.default.createElement(snackbar_1.default, { id: "submit-fragment-success", severity: "success", i18nDisplay: "success", open: actioner.submitted, onClose: actioner.dismissSubmitted }))))));
     }));
 });

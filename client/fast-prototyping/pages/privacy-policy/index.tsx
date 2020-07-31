@@ -1,8 +1,20 @@
+/**
+ * A fast prototyping component for the privacy policy information
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
 import TitleSetter from "../../../components/util/TitleSetter";
 import HTMLResourceLoader from "../../../components/resources/HTMLResourceLoader";
 
+/**
+ * The privacy policy information component
+ * the privacy policy is loaded from the resources file based on
+ * privacy_policy_url
+ * @returns a react element
+ */
 export function PrivacyPolicy() {
   return (
     <I18nReadMany data={[

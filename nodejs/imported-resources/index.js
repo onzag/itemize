@@ -1,4 +1,16 @@
 "use strict";
+/**
+ * Countries list origin:
+ * https://raw.githubusercontent.com/annexare/Countries/master/dist/countries.emoji.json
+ * Countries long and lat
+ * https://developers.google.com/public-data/docs/canonical/countries_csv
+ * Currencies list base
+ * https://gist.github.com/Fluidbyte/2973986
+ * Comprehensive currency list names in many languages, downloaded original csv and converted to json
+ * http://www.mapanet.eu/en/resources/Currencies.asp
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };

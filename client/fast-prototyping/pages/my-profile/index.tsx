@@ -1,3 +1,8 @@
+/**
+ * Provides a fast prototyping page for the current user profile, with modification and all
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
@@ -8,11 +13,17 @@ import UserDataRetriever from "../../../components/user/UserDataRetriever";
 import I18nRead from "../../../components/localization/I18nRead";
 import TitleSetter from "../../../components/util/TitleSetter";
 
+/**
+ * This is the main component that provides access to the current user profile
+ * it reads a lot of data and contains a lot of entries
+ * @returns a react component
+ */
 export function MyProfile() {
   return (
     <UserDataRetriever>
       {(userData) => {
         if (!userData.id) {
+          // redirect if not logged in
           return (
             <Redirect to="/" />
           );

@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * The reset password page
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -19,6 +23,9 @@ const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSet
 const Reader_1 = __importDefault(require("../../../components/property/Reader"));
 const I18nReadMany_1 = __importDefault(require("../../../components/localization/I18nReadMany"));
 const Entry_1 = __importDefault(require("../../../components/property/Entry"));
+/**
+ * Contains the reset password styles
+ */
 const resetPasswordStyles = mui_core_1.createStyles({
     container: {
         paddingTop: "1rem",
@@ -42,12 +49,25 @@ const resetPasswordStyles = mui_core_1.createStyles({
         margin: "1rem 0",
     },
 });
+/**
+ * The action as asked once the reset password has been requested
+ * @param token the token for resetting the password
+ * @param actioner and the user actioner
+ */
 async function resetPassword(token, actioner) {
     const result = await actioner.resetPassword(token, true);
     if (!result.error) {
+        // we give the reset_password_success message from the root message
         navigation_1.localizedRedirectTo("/?msg=reset_password_success&msgtitle=reset_password", null, true);
     }
 }
+/**
+ * A compliant fast prototyping reset password component, extract
+ * both the token and the id from the location state by using the location state reader
+ * from the query string and uses such info in the user actioner
+ * @param props the reset password props
+ * @returns a react element
+ */
 exports.ResetPassword = mui_core_1.withStyles(resetPasswordStyles)((props) => {
     return (react_1.default.createElement(LocationStateReader_1.default, { defaultState: { token: null, id: null }, stateIsInQueryString: true }, (state, setState) => {
         const userId = parseInt(state.id, 10) || null;
@@ -80,7 +100,7 @@ exports.ResetPassword = mui_core_1.withStyles(resetPasswordStyles)((props) => {
                             react_1.default.createElement(UserActioner_1.default, null, (actioner) => (react_1.default.createElement(react_1.default.Fragment, null,
                                 react_1.default.createElement(I18nRead_1.default, { id: "reset_password_action" }, (i18nUpdatePassword) => (react_1.default.createElement(util_1.ProgressingElement, { isProgressing: actioner.statefulOnProgress, fullWidth: true },
                                     react_1.default.createElement(mui_core_1.Button, { "aria-label": i18nUpdatePassword, fullWidth: true, size: "large", variant: "contained", color: "primary", endIcon: react_1.default.createElement(mui_core_1.DoneIcon, null), onClick: resetPassword.bind(null, state.token, actioner) }, i18nUpdatePassword)))),
-                                react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.statefulError, open: !!actioner.statefulError, onClose: actioner.dismissStatefulError }),
-                                react_1.default.createElement(snackbar_1.default, { severity: "success", i18nDisplay: "reset_password_success", open: !!actioner.statefulSuccess, onClose: actioner.dismissStatefulSuccess }))))))))))));
+                                react_1.default.createElement(snackbar_1.default, { id: "reset-password-error", severity: "error", i18nDisplay: actioner.statefulError, open: !!actioner.statefulError, onClose: actioner.dismissStatefulError }),
+                                react_1.default.createElement(snackbar_1.default, { id: "reset-password-success", severity: "success", i18nDisplay: "reset_password_success", open: !!actioner.statefulSuccess, onClose: actioner.dismissStatefulSuccess }))))))))))));
     }));
 });

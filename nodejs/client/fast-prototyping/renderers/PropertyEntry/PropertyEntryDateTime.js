@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * The property entry date time for fast prototyping
+ *
+ * @packageDocumentation
+ */
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -11,9 +16,17 @@ const react_1 = __importStar(require("react"));
 const pickers_1 = require("@material-ui/pickers");
 const mui_core_1 = require("../../mui-core");
 const util_1 = require("../../../../util");
+/**
+ * A simple helper function that says when it should show invalid
+ * @param props the renderer props
+ * @returns a boolean on whether is invalid
+ */
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
+/**
+ * The styles for the date time entry
+ */
 exports.style = mui_core_1.createStyles({
     entry: {
         width: "100%",
@@ -74,6 +87,16 @@ exports.style = mui_core_1.createStyles({
         };
     },
 });
+/**
+ * The date time renderer, it uses material ui in order to create very nice pickers for the user
+ * these pickers are smart and will make a difference on whether it's a mobile or a computer,
+ * it supports the following renderer args
+ *
+ * - descriptionAsAlert: shows the description as an alert rather than the default
+ *
+ * @param props the entry props
+ * @returns a react element
+ */
 const PropertyEntryDateTimeRenderer = mui_core_1.withStyles(exports.style)((props) => {
     // we want this to be a double pass because we can't do SSR on this component
     // because we are dependant on the phone or pad property that can only be calculated on the client side

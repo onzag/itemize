@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * An standard signup dialog component for fast prototyping fully compatible
+ * with the navbar
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -19,6 +25,9 @@ const AppCountryRetriever_1 = __importDefault(require("../../components/localiza
 const AppCurrencyRetriever_1 = __importDefault(require("../../components/localization/AppCurrencyRetriever"));
 const I18nReadError_1 = __importDefault(require("../../components/localization/I18nReadError"));
 const I18nReadMany_1 = __importDefault(require("../../components/localization/I18nReadMany"));
+/**
+ * The signup dialog styles
+ */
 const signupDialogStyles = mui_core_1.createStyles({
     welcomeTitle: {
         paddingBottom: "1rem",
@@ -48,9 +57,20 @@ const signupDialogStyles = mui_core_1.createStyles({
         margin: "1rem 0",
     },
 });
+/**
+ * run many functions at once
+ * @param functions the functions to run
+ */
 function runManyFunctions(functions) {
     functions.forEach(f => f());
 }
+/**
+ * A fully compatible with the navbar fast prototyping signup dialog for the user
+ * to fill in, contains its own item definition provider, but it must be into
+ * a module provider context
+ * @param props the login props
+ * @returns a react component
+ */
 exports.SignupDialog = mui_core_1.withStyles(signupDialogStyles)((props) => {
     return (react_1.default.createElement(item_definition_1.ItemDefinitionProvider, { itemDefinition: "user", properties: [
             "username",
@@ -83,5 +103,5 @@ exports.SignupDialog = mui_core_1.withStyles(signupDialogStyles)((props) => {
                     ] })))),
             react_1.default.createElement(mui_core_1.Divider, { className: props.classes.divider }),
             react_1.default.createElement(I18nRead_1.default, { id: "login_instead" }, (i18nLoginInstead) => (react_1.default.createElement(mui_core_1.Button, { color: "secondary", variant: "text", fullWidth: true, "aria-label": i18nLoginInstead, onClick: props.onLoginRequest }, i18nLoginInstead))),
-            react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.error, open: !!actioner.error, onClose: actioner.dismissError }))))))));
+            react_1.default.createElement(snackbar_1.default, { id: "signup-dialog-error", severity: "error", i18nDisplay: actioner.error, open: !!actioner.error, onClose: actioner.dismissError }))))))));
 });

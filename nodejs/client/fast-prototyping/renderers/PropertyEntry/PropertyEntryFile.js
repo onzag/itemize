@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Contains the fast prototyping element for renering a file entry
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -8,9 +12,17 @@ const constants_1 = require("../../../../constants");
 const react_dropzone_1 = __importDefault(require("react-dropzone"));
 const react_1 = __importDefault(require("react"));
 const localization_1 = require("../../../components/localization");
+/**
+ * A simple helper function that says when it should show invalid
+ * @param props the renderer props
+ * @returns a boolean on whether is invalid
+ */
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
+/**
+ * the styles for the file entry
+ */
 exports.style = mui_core_1.createStyles({
     entry: {
         width: "100%",
@@ -106,9 +118,19 @@ exports.style = mui_core_1.createStyles({
         marginLeft: "0.75rem",
     },
 });
+/**
+ * Simple function that binds the onSetFile function from the handler
+ * and triggers when the dropzone receives files
+ * @param onSetFile the on set file function from the handler
+ * @param files the files the dropper got
+ */
 function onDrop(onSetFile, files) {
     onSetFile(files[0]);
 }
+/**
+ * trigger the upload manually
+ * @param dropzoneRef the dropzone reference
+ */
 function manuallyTriggerUpload(dropzoneRef) {
     // utility for the button to manually trigger upload
     // using the ref when it is disabled
@@ -116,6 +138,12 @@ function manuallyTriggerUpload(dropzoneRef) {
         dropzoneRef.current.open();
     }
 }
+/**
+ * The property entry file renderer, allows to set and upload a single file in its
+ * form, support both images and standard files
+ * @param props the entry props
+ * @returns a react element
+ */
 const PropertyEntryFileRenderer = mui_core_1.withStyles(exports.style)((props) => {
     const dropzoneRef = react_1.default.useRef();
     let icon;

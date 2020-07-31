@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Fast prototyping page for changing the password
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -16,6 +21,9 @@ const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSet
 const I18nReadMany_1 = __importDefault(require("../../../components/localization/I18nReadMany"));
 const Entry_1 = __importDefault(require("../../../components/property/Entry"));
 const SubmitActioner_1 = __importDefault(require("../../../components/item-definition/SubmitActioner"));
+/**
+ * Styles for the change password page
+ */
 const changePasswordStyles = mui_core_1.createStyles({
     paper: {
         padding: "1rem",
@@ -29,6 +37,11 @@ const changePasswordStyles = mui_core_1.createStyles({
         paddingTop: "1.2rem",
     },
 });
+/**
+ * A simple page designed to provide functionality to change the password
+ * @param props the page props
+ * @returns a react element
+ */
 exports.ChangePassword = mui_core_1.withStyles(changePasswordStyles)((props) => {
     return (react_1.default.createElement(UserDataRetriever_1.default, null, (userData) => {
         return (react_1.default.createElement(module_1.ModuleProvider, { module: "users" },
@@ -58,6 +71,6 @@ exports.ChangePassword = mui_core_1.withStyles(changePasswordStyles)((props) => 
                                         policiesToCleanOnSuccess: [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]],
                                         unpokeAfterAny: true,
                                     }, buttonColor: "primary", buttonStartIcon: react_1.default.createElement(mui_core_1.DoneOutlineIcon, null), buttonVariant: "contained", redirectOnSuccess: "/my-profile?msg=change_password_success&msgtitle=change_password", redirectGoBack: true, redirectReplace: true }))))),
-                react_1.default.createElement(SubmitActioner_1.default, null, (actioner) => (react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }))))));
+                react_1.default.createElement(SubmitActioner_1.default, null, (actioner) => (react_1.default.createElement(snackbar_1.default, { id: "change-password-error", severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }))))));
     }));
 });

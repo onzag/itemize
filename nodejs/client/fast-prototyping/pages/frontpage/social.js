@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * The social section contains this for the frontpage
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -6,6 +11,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const mui_core_1 = require("../../mui-core");
 const I18nReadMany_1 = __importDefault(require("../../../components/localization/I18nReadMany"));
+/**
+ * provides the styles for the social section
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 exports.socialStyles = (theme) => mui_core_1.createStyles({
     socialTitle: {
         marginTop: "4rem",
@@ -60,6 +70,14 @@ exports.socialStyles = (theme) => mui_core_1.createStyles({
         color: "#BD081C",
     },
 });
+/**
+ * The social section provides the buttons and urls for the different social networks that can be
+ * used as defined by the developer, these networks are language sensitive and are read
+ * from the i18n properties data
+ *
+ * @param props the social props
+ * @returns a react element
+ */
 exports.Social = mui_core_1.withStyles(exports.socialStyles)((props) => {
     return (react_1.default.createElement(I18nReadMany_1.default, { data: [
             {

@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Provides a list of articles for the fast prototyping frontpage
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -14,6 +19,11 @@ const avatar_1 = require("../../components/avatar");
 const AppLanguageRetriever_1 = __importDefault(require("../../../components/localization/AppLanguageRetriever"));
 const Link_1 = __importDefault(require("../../../components/navigation/Link"));
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
+/**
+ * The list of articles styles
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 exports.articlesStyles = (theme) => mui_core_1.createStyles({
     newsTitle: {
         marginTop: "2rem",
@@ -147,6 +157,12 @@ exports.articlesStyles = (theme) => mui_core_1.createStyles({
     },
     moreNewsButton: {},
 });
+/**
+ * Provides a list of articles for fast prototyping that the user can interact with, this is meant
+ * to be placed within the frontpage
+ * @param props the article list props
+ * @returns a react element
+ */
 exports.Articles = mui_core_1.withStyles(exports.articlesStyles)((props) => {
     return (react_1.default.createElement(mui_core_1.Container, { maxWidth: "md", className: props.classes.container },
         react_1.default.createElement(mui_core_1.Paper, { className: props.classes.paper },

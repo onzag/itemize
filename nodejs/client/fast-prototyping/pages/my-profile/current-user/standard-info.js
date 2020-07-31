@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Contains the standard info for the current user information only
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -21,6 +25,13 @@ const Reader_1 = __importDefault(require("../../../../components/property/Reader
 const I18nRead_1 = __importDefault(require("../../../../components/localization/I18nRead"));
 const UserActioner_1 = __importDefault(require("../../../../components/user/UserActioner"));
 const DifferingPropertiesRetriever_1 = __importDefault(require("../../../../components/item-definition/DifferingPropertiesRetriever"));
+/**
+ * The custom confirmation dialog that passes to the submit button as a means
+ * of confirming the password, this dialog follows the guidelines of the submit
+ * button component
+ * @param props the props for the custom confirmation dialog
+ * @returns a react element
+ */
 function CustomConfirmationDialog(props) {
     return (react_1.default.createElement(I18nReadMany_1.default, { data: [
             {
@@ -34,6 +45,11 @@ function CustomConfirmationDialog(props) {
         ] }, (i18nTitle, i18nOk) => (react_1.default.createElement(dialog_1.DialogResponsive, { open: props.isActive, onClose: props.onClose.bind(null, false), title: i18nTitle, buttons: react_1.default.createElement(mui_core_1.Button, { color: "primary", "aria-label": i18nOk, startIcon: react_1.default.createElement(mui_core_1.DoneIcon, null), onClick: props.onClose.bind(null, true) }, i18nOk) },
         react_1.default.createElement(Entry_1.default, { id: "password", policyName: "REQUIRES_PASSWORD_CONFIRMATION", policyType: "edit" })))));
 }
+/**
+ * The standard information styles
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 const currentUserProfileStandardInfoStyles = (theme) => mui_core_1.createStyles({
     paper: {
         padding: "1rem",
@@ -65,6 +81,12 @@ const currentUserProfileStandardInfoStyles = (theme) => mui_core_1.createStyles(
         color: theme.palette.error.main,
     },
 });
+/**
+ * The current user profile standard info shows the standard information of the current
+ * user and allows to modify them in place
+ * @param props the current user information props
+ * @returns a react element
+ */
 exports.CurrentUserProfileStandardInfo = mui_core_1.withStyles(currentUserProfileStandardInfoStyles)((props) => {
     return (react_1.default.createElement(mui_core_1.Paper, { className: props.classes.paper },
         react_1.default.createElement(item_definition_loader_1.ItemDefinitionLoader, null,
@@ -107,8 +129,8 @@ exports.CurrentUserProfileStandardInfo = mui_core_1.withStyles(currentUserProfil
                                         react_1.default.createElement(mui_core_1.Button, { variant: "outlined", color: "secondary", endIcon: react_1.default.createElement(mui_core_1.MailIcon, null), onClick: actioner.sendValidateEmail },
                                             react_1.default.createElement(I18nRead_1.default, { capitalize: true, id: "missing_email_validation_warning_action" }),
                                             react_1.default.createElement("i", { className: props.classes.emailInButton }, " " + emailState.stateAppliedValue))),
-                                    react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.statefulError, open: !!actioner.statefulError, onClose: actioner.dismissStatefulError }),
-                                    react_1.default.createElement(snackbar_1.default, { severity: "success", i18nDisplay: "missing_email_validation_warning_action_success", open: actioner.statefulSuccess, onClose: actioner.dismissStatefulSuccess })))))));
+                                    react_1.default.createElement(snackbar_1.default, { id: "standard-info-edit-error", severity: "error", i18nDisplay: actioner.statefulError, open: !!actioner.statefulError, onClose: actioner.dismissStatefulError }),
+                                    react_1.default.createElement(snackbar_1.default, { id: "standard-info-edit-success", severity: "success", i18nDisplay: "missing_email_validation_warning_action_success", open: actioner.statefulSuccess, onClose: actioner.dismissStatefulSuccess })))))));
                     }
                     return null;
                 }));

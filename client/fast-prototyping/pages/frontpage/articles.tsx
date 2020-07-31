@@ -1,3 +1,9 @@
+/**
+ * Provides a list of articles for the fast prototyping frontpage
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider, ParentItemDefinitionContextProvider } from "../../../providers/item-definition";
@@ -10,6 +16,11 @@ import AppLanguageRetriever from "../../../components/localization/AppLanguageRe
 import Link from "../../../components/navigation/Link";
 import I18nRead from "../../../components/localization/I18nRead";
 
+/**
+ * The list of articles styles
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 export const articlesStyles = (theme: Theme) => createStyles({
   newsTitle: {
     marginTop: "2rem",
@@ -146,6 +157,12 @@ export const articlesStyles = (theme: Theme) => createStyles({
   },
 });
 
+/**
+ * Provides a list of articles for fast prototyping that the user can interact with, this is meant
+ * to be placed within the frontpage
+ * @param props the article list props
+ * @returns a react element
+ */
 export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof articlesStyles>) => {
   return (
     <Container maxWidth="md" className={props.classes.container}>

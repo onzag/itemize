@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 "use strict";
+/**
+ * Main entry file for itemize
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -10,9 +14,13 @@ const colors_1 = __importDefault(require("colors"));
 const builder_1 = __importDefault(require("./builder"));
 const dbbuilder_1 = __importDefault(require("./dbbuilder"));
 const getdeployable_1 = __importDefault(require("./getdeployable"));
+// the action we are asked to execute is the thrird argument 0 is node, 1 is itemize
 const action = process.argv[2];
-const wantsSpecificHelp = process.argv[3] === "--help";
+// if this argument is help for the specific process
+const wantsSpecificHelp = process.argv[3] === "--help" || process.argv[3] === "help";
+// the remaining args
 const remainingArgs = process.argv.slice(3);
+// now this is our action registry for the actions we want to execute
 const actionRegistry = {
     "setup": {
         fn: setup_1.default,
@@ -53,25 +61,34 @@ const actionRegistry = {
         needsArgs: 1,
     },
 };
+// and we trigger these in an async function
 (async () => {
+    // so if our action is registered
     if (actionRegistry[action]) {
+        // if we are tasked with getting specific help, or if the amount of args we need do not match
         if (wantsSpecificHelp || actionRegistry[action].needsArgs !== remainingArgs.length) {
+            // we show the specific usage
             console.log(actionRegistry[action].description);
             console.log("usage: " + colors_1.default.yellow(actionRegistry[action].usage));
         }
         else {
+            // otherwise we try to execute
             try {
                 await actionRegistry[action].fn(...remainingArgs);
             }
             catch (err) {
+                // if something failed during the process we show the error stack and exit with status 1
                 console.log(colors_1.default.red(err.stack));
                 process.exit(1);
             }
         }
     }
     else {
+        // otherwise we just show the help information
         console.log(colors_1.default.green("Welcome to itemize build tool"));
+        // we get into the action registry
         Object.keys(actionRegistry).forEach((action) => {
+            // and explain each action
             console.log(colors_1.default.yellow(action) + "\n\t" + actionRegistry[action].description);
         });
     }

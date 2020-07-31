@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * A fast prototyping component for the contact information
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,6 +12,11 @@ const react_1 = __importDefault(require("react"));
 const I18nReadMany_1 = __importDefault(require("../../../components/localization/I18nReadMany"));
 const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSetter"));
 const HTMLResourceLoader_1 = __importDefault(require("../../../components/resources/HTMLResourceLoader"));
+/**
+ * The contact fast prototyping page
+ * @param props the props for the contact
+ * @returns a react element
+ */
 function Contact(props) {
     return (react_1.default.createElement(I18nReadMany_1.default, { data: [
             { id: props.titleI18nId || "contact", capitalize: true },
@@ -18,6 +28,11 @@ function Contact(props) {
     }));
 }
 exports.Contact = Contact;
+/**
+ * allows to inject props to the contact
+ * @param props the props to inject
+ * @returns an unitialized react component
+ */
 function contactWithProps(props) {
     return () => {
         react_1.default.createElement(Contact, Object.assign({}, props));

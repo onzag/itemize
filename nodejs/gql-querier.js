@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains functions to perform gql queries as well
+ * as the product interfaces for these queries
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };

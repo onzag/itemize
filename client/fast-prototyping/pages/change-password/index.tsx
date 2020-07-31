@@ -1,3 +1,9 @@
+/**
+ * Fast prototyping page for changing the password
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
@@ -12,6 +18,9 @@ import I18nReadMany from "../../../components/localization/I18nReadMany";
 import Entry from "../../../components/property/Entry";
 import SubmitActioner from "../../../components/item-definition/SubmitActioner";
 
+/**
+ * Styles for the change password page
+ */
 const changePasswordStyles = createStyles({
   paper: {
     padding: "1rem",
@@ -26,6 +35,11 @@ const changePasswordStyles = createStyles({
   },
 });
 
+/**
+ * A simple page designed to provide functionality to change the password
+ * @param props the page props
+ * @returns a react element
+ */
 export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyles<typeof changePasswordStyles>) => {
   return (
     <UserDataRetriever>

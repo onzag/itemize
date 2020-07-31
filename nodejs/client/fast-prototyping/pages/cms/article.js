@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Fast prototyping page section for the article in cms mode
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -15,7 +20,10 @@ const I18nReadMany_1 = __importDefault(require("../../../components/localization
 const snackbar_1 = __importDefault(require("../../components/snackbar"));
 const SubmitActioner_1 = __importDefault(require("../../../components/item-definition/SubmitActioner"));
 const articles_1 = require("../frontpage/articles");
-const fragmentStyles = mui_core_1.createStyles({
+/**
+ * The styles for the article section
+ */
+const articleStyles = mui_core_1.createStyles({
     paper: {
         padding: "1rem",
     },
@@ -30,6 +38,11 @@ const fragmentStyles = mui_core_1.createStyles({
         paddingBottom: "1rem",
     },
 });
+/**
+ * Displays a single article, summary and summary image
+ * @param props the single article props
+ * @returns a react element
+ */
 const SingleArticle = mui_core_1.withStyles(articles_1.articlesStyles)((props) => {
     return react_1.default.createElement("div", { className: props.classes.articleContainer },
         react_1.default.createElement("div", { className: props.classes.articleImageContainer },
@@ -45,7 +58,12 @@ const SingleArticle = mui_core_1.withStyles(articles_1.articlesStyles)((props) =
                 react_1.default.createElement("div", { className: props.classes.articleSummary },
                     react_1.default.createElement(View_1.default, { id: "summary" })))));
 });
-exports.Article = mui_core_1.withStyles(fragmentStyles)((props) => {
+/**
+ * Page section that allows for creating and modifying articles
+ * @param props the article props
+ * @returns a react element
+ */
+exports.Article = mui_core_1.withStyles(articleStyles)((props) => {
     return (react_1.default.createElement(LocationStateReader_1.default, { defaultState: { id: "" }, stateIsInQueryString: true }, (locationState, setState) => {
         const updateLocationId = (e) => {
             setState({
@@ -93,7 +111,7 @@ exports.Article = mui_core_1.withStyles(fragmentStyles)((props) => {
                             react_1.default.createElement(View_1.default, { id: "title" })),
                         react_1.default.createElement(View_1.default, { id: "content" })))),
             react_1.default.createElement(SubmitActioner_1.default, null, (actioner) => (react_1.default.createElement(react_1.default.Fragment, null,
-                react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }),
-                react_1.default.createElement(snackbar_1.default, { severity: "success", i18nDisplay: "success", open: actioner.submitted, onClose: actioner.dismissSubmitted }))))));
+                react_1.default.createElement(snackbar_1.default, { id: "submit-article-error", severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }),
+                react_1.default.createElement(snackbar_1.default, { id: "submit-article-success", severity: "success", i18nDisplay: "success", open: actioner.submitted, onClose: actioner.dismissSubmitted }))))));
     }));
 });

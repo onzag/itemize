@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * The user profile that is as seen by the public
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,6 +14,13 @@ const item_definition_1 = require("../../../providers/item-definition");
 const public_user_1 = require("./public-user");
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
 const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSetter"));
+/**
+ * Represents a public user profile component
+ * that displays basic information about a public user
+ *
+ * @param props the profile props
+ * @returns a react element
+ */
 function Profile(props) {
     const currentUserId = parseInt(props.match.params.id) || null;
     const properties = [

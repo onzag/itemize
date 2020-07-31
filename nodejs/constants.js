@@ -1,4 +1,11 @@
 "use strict";
+/**
+ * Contains a bunch of constants that are used through the itemize app
+ * while they can be changed it's not truly recommended, this is mainly for
+ * internal usage and to keep configuration and have an idea
+ *
+ * @packageDocumentation
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 const graphql_1 = require("graphql");
 // DATA ATTRIBUTES
@@ -1030,10 +1037,36 @@ exports.UNSPECIFIED_OWNER = -1;
 exports.PROTECTED_RESOURCES = [
     "/build.development.js",
 ];
+/**
+ * An identifier for the server data
+ */
 exports.SERVER_DATA_IDENTIFIER = "SERVER_DATA";
+/**
+ * An identifier from when the server kicks an user from the
+ * login (aka sudden remote logout)
+ */
 exports.SERVER_USER_KICK_IDENTIFIER = "SERVER_KICK";
+/**
+ * An identifier for the currency factors and the currency
+ * factor information
+ */
 exports.CURRENCY_FACTORS_IDENTIFIER = "CURRENCY_FACTORS";
+/**
+ * An identifier for caching the currency layer api response
+ * for currency conversion in redis
+ */
 exports.CACHED_CURRENCY_LAYER_RESPONSE = "CACHED_CURRENCY_LAYER_RESPONSE";
+/**
+ * The minimum update time for the server data to be changed
+ * basically runs mantenience functions, mainly it's about
+ * updating the currency information
+ */
 exports.SERVER_DATA_MIN_UPDATE_TIME = 259200000; // 3 days
+/**
+ * The time it takes for sitemaps to be refreshed
+ */
 exports.SERVER_MAPPING_TIME = 86400000; // 1 day, to sitemap the site
+/**
+ * The maximum amount of remote listeners a socket supports
+ */
 exports.MAX_REMOTE_LISTENERS_PER_SOCKET = 500;

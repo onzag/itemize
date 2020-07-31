@@ -1,3 +1,9 @@
+/**
+ * The property entry date time for fast prototyping
+ * 
+ * @packageDocumentation
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   DatePicker,
@@ -11,9 +17,18 @@ import { Alert, Typography, createStyles, WithStyles, withStyles, TextField } fr
 import { getLocalizedDateFormat, getLocalizedTimeFormat, getLocalizedDateTimeFormat } from "../../../../util";
 import { IPropertyEntryDateTimeRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryDateTime";
 
+/**
+ * A simple helper function that says when it should show invalid
+ * @param props the renderer props
+ * @returns a boolean on whether is invalid
+ */
 function shouldShowInvalid(props: IPropertyEntryDateTimeRendererProps) {
   return !props.currentValid;
 }
+
+/**
+ * The styles for the date time entry
+ */
 export const style = createStyles({
   entry: {
     width: "100%",
@@ -75,9 +90,22 @@ export const style = createStyles({
   },
 });
 
+/**
+ * The props for the ate time renderer
+ */
 interface IPropertyEntryDateTimeRendererWithStylesProps extends IPropertyEntryDateTimeRendererProps, WithStyles<typeof style> {
 }
 
+/**
+ * The date time renderer, it uses material ui in order to create very nice pickers for the user
+ * these pickers are smart and will make a difference on whether it's a mobile or a computer,
+ * it supports the following renderer args
+ * 
+ * - descriptionAsAlert: shows the description as an alert rather than the default
+ * 
+ * @param props the entry props
+ * @returns a react element
+ */
 const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDateTimeRendererWithStylesProps) => {
   // we want this to be a double pass because we can't do SSR on this component
   // because we are dependant on the phone or pad property that can only be calculated on the client side

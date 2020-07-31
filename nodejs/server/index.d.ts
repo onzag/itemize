@@ -50,7 +50,6 @@ export interface ISSRConfig {
 }
 export interface ISEOConfig {
     seoRules: ISEORuleSet;
-    seoContainerId: string;
 }
 export interface IAppDataType {
     root: Root;

@@ -1,4 +1,11 @@
 "use strict";
+/**
+ * The cms page that contains subroutes into it for sections, for fast
+ * prototyping, allows to create fragments as well as articles, meant only
+ * for admins
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -14,6 +21,11 @@ const info_1 = require("./info");
 const mui_core_1 = require("../../mui-core");
 const navigation_1 = require("../../../components/navigation");
 const item_definition_1 = require("../../../providers/item-definition");
+/**
+ * Used in the tabs for change using the tabs
+ * @param e the change event (unused)
+ * @param value the value it changed to
+ */
 function handleNavbarChangeEvent(e, value) {
     if (value === "info") {
         navigation_1.localizedRedirectTo("/cms");
@@ -21,6 +33,11 @@ function handleNavbarChangeEvent(e, value) {
     }
     navigation_1.localizedRedirectTo("/cms/" + value);
 }
+/**
+ * The cms navigation bar component
+ * @param props the props passed by the cms component
+ * @returns a react element
+ */
 function CMSNavBar(props) {
     const current = props.location.pathname.split("/")[3] || "info";
     let available = [];
@@ -38,6 +55,13 @@ function CMSNavBar(props) {
                         react_1.default.createElement(I18nRead_1.default, { id: "name" })), value: itemDefinition }));
             }))));
 }
+/**
+ * A fast prototyping page which represents the cms for the cms module
+ * that allows to modify and create cms elements
+ *
+ * @param props the props for the cms
+ * @returns a react element
+ */
 function CMS(props) {
     return (react_1.default.createElement(module_1.ModuleProvider, { module: "cms" },
         react_1.default.createElement(I18nRead_1.default, { id: "name", capitalize: true }, (i18nCMS) => {
@@ -52,6 +76,12 @@ function CMS(props) {
 }
 exports.CMS = CMS;
 ;
+/**
+ * Allows to set the props of the cms to use within a route so that props
+ * can be injected
+ * @param props the props to inject
+ * @returns a react component that is not instantiated
+ */
 function cmsWithProps(props) {
     return () => {
         react_1.default.createElement(CMS, Object.assign({}, props));

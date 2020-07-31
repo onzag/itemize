@@ -1,4 +1,11 @@
 "use strict";
+/**
+ * Displays the entire list of articles
+ *
+ * TODO
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -8,6 +15,11 @@ const I18nRead_1 = __importDefault(require("../../../components/localization/I18
 const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSetter"));
 const module_1 = require("../../../providers/module");
 const item_definition_1 = require("../../../providers/item-definition");
+/**
+ * Displays a list of articles and allows these to be searched by the user
+ * this is a fast prototyping component
+ * @returns a react element
+ */
 function Articles() {
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement(module_1.ModuleProvider, { module: "cms" },

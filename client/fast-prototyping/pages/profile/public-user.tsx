@@ -1,3 +1,10 @@
+/**
+ * Contains the public user information section for the fast prototyping
+ * public profile
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { Container, createStyles, WithStyles, withStyles,
   Typography, Paper, Theme, Tooltip, Card, VerifiedUserIcon } from "../../mui-core";
@@ -10,6 +17,11 @@ import I18nRead from "../../../components/localization/I18nRead";
 import View from "../../../components/property/View";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
 
+/**
+ * contains the styles for the public user profile
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 const publicUserProfileStyles = (theme: Theme) => createStyles({
   container: {
     paddingTop: "1rem",
@@ -49,6 +61,11 @@ const publicUserProfileStyles = (theme: Theme) => createStyles({
   },
 });
 
+/**
+ * The public user profile contains basic information that can be accessed about the current public user
+ * @param props the public user profile props
+ * @returns a react element
+ */
 export const PublicUserProfile = withStyles(publicUserProfileStyles)((props: WithStyles<typeof publicUserProfileStyles>) => {
   return (
     <React.Fragment>

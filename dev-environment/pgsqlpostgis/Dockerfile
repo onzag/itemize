@@ -1,3 +1,6 @@
+# PGSQL postgis uses postgres 12
+# This is a simplified version of https://github.com/postgis/docker-postgis/blob/master/12-3.0/Dockerfile
+
 FROM postgres:12
 
 ENV POSTGIS_MAJOR 3

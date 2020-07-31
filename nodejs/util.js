@@ -213,14 +213,17 @@ function getLocalizedDateTimeFormat() {
 exports.getLocalizedDateTimeFormat = getLocalizedDateTimeFormat;
 /**
  * Converts a file to its absolute URL counterpart
- * @param containerHostnamePrefixes
- * @param file
- * @param itemDefinition
- * @param id
- * @param version
- * @param containerId
- * @param include
- * @param property
+ * @param containerHostnamePrefixes the containers hostnames prefixes that allow
+ * to identify the url prefix to access a given container
+ * @param file the file to convert
+ * @param itemDefinition the item definition this file is in and stored as, it is required even
+ * for prop extensions, because every stored value has an item definition attached to it
+ * @param id the id
+ * @param version the version
+ * @param containerId the container id this file was found to be in
+ * @param include the include (or null)
+ * @param property the property it came from
+ * @returns a new IGQLFile but absolute
  */
 function fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property) {
     if (file === null) {
@@ -249,6 +252,20 @@ function fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, v
     };
 }
 exports.fileURLAbsoluter = fileURLAbsoluter;
+/**
+ * Converts an array of files to its absolute url counterpart
+ * @param containerHostnamePrefixes the containers hostnames prefixes that allow
+ * to identify the url prefix to access a given container
+ * @param files the array of files to convert
+ * @param itemDefinition the item definition this file is in and stored as, it is required even
+ * for prop extensions, because every stored value has an item definition attached to it
+ * @param id the id
+ * @param version the version
+ * @param containerId the container id this file was found to be in
+ * @param include the include (or null)
+ * @param property the property it came from
+ * @returns a new array of files
+ */
 function fileArrayURLAbsoluter(containerHostnamePrefixes, files, itemDefinition, id, version, containerId, include, property) {
     if (files === null) {
         return null;

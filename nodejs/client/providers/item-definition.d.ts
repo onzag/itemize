@@ -251,8 +251,7 @@ export interface IItemDefinitionProviderProps {
      */
     includePolicies?: boolean;
     /**
-     * cleans the value from the memory cache once the object dismounts
-     * as the memory cache might only grow and grow
+     * cleans or restores the value from the memory once the object dismounts
      */
     cleanOnDismount?: boolean | IActionCleanOptions;
     /**

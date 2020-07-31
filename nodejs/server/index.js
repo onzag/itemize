@@ -227,13 +227,13 @@ function initializeApp(appData, custom) {
                 }
             });
             result += "Sitemap: " +
-                appData.pkgcloudUploadContainers[appData.seoConfig.seoContainerId].prefix +
+                appData.pkgcloudUploadContainers[appData.sensitiveConfig.seoContainerID].prefix +
                 "sitemaps/" + hostname + "/index.xml";
         }
         res.end(result);
     });
     app.get("/sitemap.xml", (req, res) => {
-        res.redirect(appData.pkgcloudUploadContainers[appData.seoConfig.seoContainerId].prefix + "sitemaps/" + hostname + "/index.xml");
+        res.redirect(appData.pkgcloudUploadContainers[appData.sensitiveConfig.seoContainerID].prefix + "sitemaps/" + hostname + "/index.xml");
     });
     const router = express_1.default.Router();
     Object.keys(appData.ssrConfig.ssrRules).forEach((urlCombo) => {
@@ -433,9 +433,9 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             const manager = new global_manager_1.GlobalManager(root, knex, redisGlobalClient, redisPub, config, sensitiveConfig);
             if (seoConfig) {
                 exports.logger.info("initializeServer: initializing SEO configuration");
-                const seoContainerData = sensitiveConfig.openstackContainers[seoConfig.seoContainerId];
+                const seoContainerData = sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
                 if (!seoContainerData) {
-                    throw new Error("Invalid seo container id for the openstack container '" + seoConfig.seoContainerId + "'");
+                    throw new Error("Invalid seo container id for the openstack container '" + sensitiveConfig.seoContainerID + "'");
                 }
                 const seoContainerClient = pkgcloud_1.default.storage.createClient({
                     provider: "openstack",
@@ -447,7 +447,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
                     password: seoContainerData.password,
                     authUrl: seoContainerData.authUrl,
                 });
-                let prefix = config.containersHostnamePrefixes[seoConfig.seoContainerId];
+                let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
                 if (prefix.indexOf("/") !== 0) {
                     prefix = "https://" + prefix;
                 }

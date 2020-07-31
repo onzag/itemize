@@ -1,7 +1,16 @@
+/**
+ * Contains the component that shows info for the cms and what it does
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { Paper, createStyles, withStyles, WithStyles, Container, Typography, Alert, AlertTitle } from "../../mui-core";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
 
+/**
+ * The information styles
+ */
 const infoStyles = createStyles({
   paper: {
     padding: "1rem",
@@ -14,6 +23,11 @@ const infoStyles = createStyles({
   }
 });
 
+/**
+ * The information component
+ * @param props the information props
+ * @returns a react element
+ */
 export const Info = withStyles(infoStyles)((props: WithStyles<typeof infoStyles>) => {
   return (
     <Container maxWidth="md" className={props.classes.container}>

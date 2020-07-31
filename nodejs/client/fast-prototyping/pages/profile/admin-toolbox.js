@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * The admin toolbox appears on the public profile for allowing to change roles
+ * and other admin activities
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,12 +15,21 @@ const buttons_1 = require("../../components/buttons");
 const snackbar_1 = __importDefault(require("../../components/snackbar"));
 const Entry_1 = __importDefault(require("../../../components/property/Entry"));
 const SubmitActioner_1 = __importDefault(require("../../../components/item-definition/SubmitActioner"));
+/**
+ * The admin toolbox styles
+ */
 const adminToolboxStyles = () => mui_core_1.createStyles({
     divider: {
         marginTop: "1rem",
         marginBottom: "1rem",
     }
 });
+/**
+ * The admin toolbox appears on the public profile for allowing to change roles
+ * and other admin activities
+ * @param props the toolbox props
+ * @returns a react element
+ */
 exports.AdminToolbox = mui_core_1.withStyles(adminToolboxStyles)((props) => {
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement(mui_core_1.Divider, { className: props.classes.divider }),
@@ -24,6 +39,6 @@ exports.AdminToolbox = mui_core_1.withStyles(adminToolboxStyles)((props) => {
                 differingOnly: true,
             }, buttonColor: "primary", buttonStartIcon: react_1.default.createElement(mui_core_1.DoneOutlineIcon, null), buttonVariant: "contained" }),
         react_1.default.createElement(SubmitActioner_1.default, null, (actioner) => (react_1.default.createElement(react_1.default.Fragment, null,
-            react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }),
-            react_1.default.createElement(snackbar_1.default, { severity: "success", i18nDisplay: "profile_updated_successfully", open: actioner.submitted, onClose: actioner.dismissSubmitted }))))));
+            react_1.default.createElement(snackbar_1.default, { id: "submit-admin-toolbox-error", severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }),
+            react_1.default.createElement(snackbar_1.default, { id: "submit-admin-toolbox-success", severity: "success", i18nDisplay: "profile_updated_successfully", open: actioner.submitted, onClose: actioner.dismissSubmitted }))))));
 });

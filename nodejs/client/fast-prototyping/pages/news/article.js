@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Provides a single article page
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -13,6 +18,11 @@ const item_definition_loader_1 = require("../../components/item-definition-loade
 const View_1 = __importDefault(require("../../../components/property/View"));
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
 const avatar_1 = require("../../components/avatar");
+/**
+ * the article content styles
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 const articleContentStyles = (theme) => mui_core_1.createStyles({
     container: {
         padding: 0,
@@ -93,6 +103,12 @@ const articleContentStyles = (theme) => mui_core_1.createStyles({
         margin: "0 0.7rem",
     }
 });
+/**
+ * The article content displays the content for a given article inside
+ * its own containement
+ * @param props the article content props
+ * @returns a react element
+ */
 const ArticleContent = mui_core_1.withStyles(articleContentStyles)((props) => {
     return (react_1.default.createElement(mui_core_1.Container, { maxWidth: "md", className: props.classes.container },
         react_1.default.createElement(mui_core_1.Paper, { className: props.classes.paper },
@@ -131,6 +147,12 @@ const ArticleContent = mui_core_1.withStyles(articleContentStyles)((props) => {
                         })),
                     react_1.default.createElement(View_1.default, { id: "content" }))))));
 });
+/**
+ * the article component itself that will provide for a given
+ * article
+ * @param props the props for the article
+ * @returns a react element
+ */
 function Article(props) {
     const articleId = parseInt(props.match.params.id) || null;
     return (react_1.default.createElement(react_1.default.Fragment, null,

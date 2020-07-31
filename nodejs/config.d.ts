@@ -1,36 +1,129 @@
+/**
+ * Represents the stanard redis and sensitive config information an schemas
+ * @packageDocumentation
+ */
+/**
+ * The manifest configuration for building up the PWA manifest
+ * and also a part of the standard config
+ */
 export interface IConfigManifestType {
+    /**
+     * The safari mask icon color
+     */
     macSafariMaskIconThemeColor: string;
+    /**
+     * The microsoft tile color used in metro ui
+     */
     msTileColor: string;
+    /**
+     * generic theme color (android/chome/FF)
+     */
     themeColor: string;
+    /**
+     * generic background color (android/chrome/FF)
+     */
     backgroundColor: string;
+    /**
+     * The orientation of the app
+     */
     orientation: "portrait" | "landscape";
+    /**
+     * The display for the app
+     */
     display: "fullscreen" | "standalone" | "minimal-ui" | "browser";
 }
+/**
+ * The standard basic configuration structure
+ */
 export interface IConfigRawJSONDataType {
+    /**
+     * The schema entry, usually schema/root
+     */
     entry: string;
+    /**
+     * The application name
+     */
     appName: string;
+    /**
+     * The supported languages as an array of string
+     */
     supportedLanguages: string[];
+    /**
+     * Of the supported languages, which ones are right to left
+     */
     rtlLanguages: string[];
+    /**
+     * The dictionaries assigned to the given supported languages
+     * you might specify only unregionalized versions, eg instead of en-GB en-US only en for english
+     */
     dictionaries: {
         [key: string]: string;
     };
+    /**
+     * The supported user roles
+     * ADMIN is an expected role for this
+     */
     roles: string[];
+    /**
+     * The web manifest configuration
+     */
     manifest: IConfigManifestType;
+    /**
+     * The font url to use
+     */
     fontUrl: string;
+    /**
+     * The font name to use
+     */
     fontName: string;
+    /**
+     * The cacheable external hostnames, add hostnames here eg. fonts.googleapis.com to tell the service worker
+     * that these hostnames should be cached
+     */
     cacheableExtHostnames: string[];
+    /**
+     * The country code the app fallbacks to if some error happens
+     * also the default for development
+     */
     fallbackCountryCode: string;
+    /**
+     * The language the app fallbacks to if some error happens
+     * also the default for development
+     */
     fallbackLanguage: string;
+    /**
+     * The currency the app fallbacks to if some error happens
+     * also the default for development
+     */
     fallbackCurrency: string;
+    /**
+     * The hostname used in development mode, used to avoid SEO hijaking
+     */
     developmentHostname: string;
+    /**
+     * The hostname used in production mode, used to avoid SEO hijacking
+     */
     productionHostname: string;
+    /**
+     * Uploads info, maps countries to containers id
+     * "*" asterisk represents a special match that will match all the non-matching
+     * the value should be container id
+     */
     containersRegionMappers: {
         [countries: string]: string;
     };
+    /**
+     * the hostname prefixes for a given container id, as where the information is stored
+     * must not contain http or https protocol
+     * eg. myopenstackprovider.com/mycontainer/AUTH_123/ or whatever custom domain you have got
+     */
     containersHostnamePrefixes: {
         [containerId: string]: string;
     };
 }
+/**
+ * The sensitive openstack container information
+ */
 export interface ISensitiveConfigOpenstackContainerType {
     username: string;
     password: string;
@@ -40,23 +133,82 @@ export interface ISensitiveConfigOpenstackContainerType {
     authUrl: string;
     containerName: string;
 }
+/**
+ * The sensitive information
+ */
 export interface ISensitiveConfigRawJSONDataType {
+    /**
+     * An ip stack access key
+     * can be null, fallback regionalization will always be used
+     */
     ipStackAccessKey: string;
+    /**
+     * whether ipstack is https enabled
+     * by default it's not, on the free plans
+     */
     ipStackHttpsEnabled: boolean;
+    /**
+     * the currency layer access key,
+     * can be null, currency type won't work
+     */
     currencyLayerAccessKey: string;
+    /**
+     * whether currency layer is https enabled
+     * by default it's not, on the free plans
+     */
     currencyLayerHttpsEnabled: boolean;
+    /**
+     * The here maps api key, can be null, address search won't work
+     */
     hereApiKey: string;
+    /**
+     * The openstack containers, they should match the previously given
+     * containers id
+     */
     openstackContainers: {
         [containerId: string]: ISensitiveConfigOpenstackContainerType;
     };
+    /**
+     * The default container id used when required, eg. creating an admin
+     */
     defaultContainerID: string;
+    /**
+     * The seo container id used when storing sitemaps
+     */
+    seoContainerID: string;
+    /**
+     * mailgun api key, can be null
+     */
     mailgunAPIKey: string;
+    /**
+     * mailgun domain, can be null
+     * it is the domain you are using to send emails
+     */
     mailgunDomain: string;
+    /**
+     * the mailgun api host, usually differs can be
+     * api.mailgun.net or api.eu.mailgun.net
+     */
     mailgunAPIHost: string;
+    /**
+     * The target domain, basically the same as your development/production
+     * hostname, if null, will default to production
+     */
     mailgunTargetDomain: string;
+    /**
+     * a json web token key to use, itemize uses JWT and as such it can be trusted
+     * to call other external APIs
+     */
     jwtKey: string;
+    /**
+     * A development key, allows to use development files in its full form on the production
+     * interface
+     */
     devKey: string;
 }
+/**
+ * The database config
+ */
 export interface IDBConfigRawJSONDataType {
     host: string;
     port: number;
@@ -64,6 +216,9 @@ export interface IDBConfigRawJSONDataType {
     password: string;
     database: string;
 }
+/**
+ * A redis single connection configuration
+ */
 export interface ISingleRedisConfigRawJSONDataType {
     host?: string;
     port?: number;
@@ -71,11 +226,30 @@ export interface ISingleRedisConfigRawJSONDataType {
     db?: number;
     password?: string;
 }
+/**
+ * Redis configuration
+ * All instances can literally be the same instance
+ */
 export interface IRedisConfigRawJSONDataType {
+    /**
+     * The global cache, used to store server data
+     * that is shared within instances
+     */
     global: ISingleRedisConfigRawJSONDataType;
-    cache: ISingleRedisConfigRawJSONDataType;
+    /**
+     * The pubsub cache, also some form of global cache
+     * but used to inform changes of data to instances
+     */
     pubSub: ISingleRedisConfigRawJSONDataType;
+    /**
+     * local cache, should be physically close to the cluster
+     * or run alongside it
+     */
+    cache: ISingleRedisConfigRawJSONDataType;
 }
+/**
+ * A JSON validating schema for the sensitive configuration
+ */
 export declare const rawSensitiveConfigSchema: {
     type: string;
     properties: {
@@ -160,10 +334,16 @@ export declare const rawSensitiveConfigSchema: {
         defaultContainerID: {
             type: string;
         };
+        seoContainerID: {
+            type: string;
+        };
     };
     additionalProperties: boolean;
     required: string[];
 };
+/**
+ * A json validating schema for the standard configuration
+ */
 export declare const rawConfigSchema: {
     type: string;
     properties: {
@@ -269,6 +449,9 @@ export declare const rawConfigSchema: {
     additionalProperties: boolean;
     required: string[];
 };
+/**
+ * A json validating schema for the database configuration
+ */
 export declare const rawDBConfigSchema: {
     type: string;
     properties: {
@@ -291,6 +474,9 @@ export declare const rawDBConfigSchema: {
     additionalProperties: boolean;
     required: string[];
 };
+/***
+ * A json validating schema for the redis config
+ */
 export declare const rawRedisConfigSchemaPart: {
     type: string;
     properties: {

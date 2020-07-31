@@ -1,3 +1,9 @@
+/**
+ * The preferences page allows to modify the current user preferences
+ * regarding specific user information
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
@@ -13,6 +19,9 @@ import TitleSetter from "../../../components/util/TitleSetter";
 import Entry from "../../../components/property/Entry";
 import SubmitActioner from "../../../components/item-definition/SubmitActioner";
 
+/**
+ * The styles for the preferences page
+ */
 const preferencesStyles = createStyles({
   paper: {
     padding: "1rem",
@@ -27,6 +36,12 @@ const preferencesStyles = createStyles({
   },
 });
 
+/**
+ * The preferences page will allow the user to modify things such as notifications, newsletters and address
+ * as well as other information that do not affect the user itself
+ * @param props the preferences props
+ * @returns a react element
+ */
 export const Preferences = withStyles(preferencesStyles)((props: WithStyles<typeof preferencesStyles>) => {
   return (
     <UserDataRetriever>

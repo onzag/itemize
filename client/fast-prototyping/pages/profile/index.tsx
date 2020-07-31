@@ -1,3 +1,9 @@
+/**
+ * The user profile that is as seen by the public
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
@@ -5,6 +11,9 @@ import { PublicUserProfile } from "./public-user";
 import I18nRead from "../../../components/localization/I18nRead";
 import TitleSetter from "../../../components/util/TitleSetter";
 
+/**
+ * The profile props
+ */
 interface ProfileProps {
   match: {
     params: {
@@ -13,6 +22,13 @@ interface ProfileProps {
   };
 }
 
+/**
+ * Represents a public user profile component
+ * that displays basic information about a public user
+ * 
+ * @param props the profile props
+ * @returns a react element
+ */
 export function Profile(props: ProfileProps) {
   const currentUserId = parseInt(props.match.params.id) || null;
   const properties = [

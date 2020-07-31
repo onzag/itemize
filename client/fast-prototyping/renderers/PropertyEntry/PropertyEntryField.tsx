@@ -1,3 +1,8 @@
+/**
+ * The entry for field based (text/number) types
+ * @packageDocumentation
+ */
+
 import React from "react";
 import {
   WithStyles,
@@ -23,9 +28,18 @@ import {
 } from "../../mui-core/index";
 import { IPropertyEntryFieldRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryField";
 
+/**
+ * A simple helper function that says when it should show invalid
+ * @param props the renderer props
+ * @returns a boolean on whether is invalid
+ */
 function shouldShowInvalid(props: IPropertyEntryFieldRendererProps) {
   return !props.currentValid;
 }
+
+/**
+ * The styles for the field
+ */
 export const style = createStyles({
   entry: {
     width: "100%",
@@ -130,22 +144,53 @@ export const style = createStyles({
   },
 });
 
-
+/**
+ * The props for the entry renderer
+ */
 interface IPropertyEntryFieldRendererWithStylesProps extends IPropertyEntryFieldRendererProps, WithStyles<typeof style> {
 }
 
+/**
+ * The state for the entry renderer
+ */
 interface IPropertyEntryFieldRendererState {
+  /**
+   * For passwords, whether it's visible
+   */
   visible: boolean;
+  /**
+   * For units and currencies whether the dialog
+   * to change the current is open
+   */
   dialogOpen: boolean;
 }
 
+/**
+ * The props for the select unit dialog when the field represents a unit
+ * numeric value
+ */
 interface ISelectUnitDialogProps extends IPropertyEntryFieldRendererWithStylesProps {
+  /**
+   * Whether the dialog is open
+   */
   open: boolean;
+  /**
+   * triggers when closes
+   */
   onClose: () => void;
+  /**
+   * Whether it's full screen
+   */
   fullScreen: boolean;
 }
 
+/**
+ * A dialog that allows to select an unit
+ * @param props the props for the select unit dialog
+ * @returns a react element
+ */
 function SelectUnitDialog(props: ISelectUnitDialogProps) {
+  // closes the dialog
   const closeAndChangeUnit = (unit: string) => {
     props.onClose();
     props.onChangeUnit(unit);
@@ -221,14 +266,34 @@ function SelectUnitDialog(props: ISelectUnitDialogProps) {
   );
 }
 
+/**
+ * The select unit dialog, but responsive
+ */
 const SelectUnitDialogResponsive = withMobileDialog<ISelectUnitDialogProps>()(SelectUnitDialog);
 
+/**
+ * The select currency dialog props
+ */
 interface ISelectCurrencyDialogProps extends IPropertyEntryFieldRendererWithStylesProps {
+  /**
+   * Whether such a dialog is open
+   */
   open: boolean;
+  /**
+   * Triggers when it closes
+   */
   onClose: () => void;
+  /**
+   * Whether the dialog is in fullscreen mode
+   */
   fullScreen: boolean;
 }
 
+/**
+ * Allows the user to select the current currency
+ * @param props the dialog props
+ * @returns a react element
+ */
 function SelectCurrencyDialog(props: ISelectCurrencyDialogProps) {
   const closeAndChangeCurrency = (code: string) => {
     props.onClose();
@@ -263,8 +328,16 @@ function SelectCurrencyDialog(props: ISelectCurrencyDialogProps) {
   );
 }
 
+/**
+ * The select currency dialog, but responsive
+ */
 const SelectCurrencyDialogResponsive = withMobileDialog<ISelectCurrencyDialogProps>()(SelectCurrencyDialog);
 
+/**
+ * The actual entry field renderer, as a class, because it's fairly complicated, this renderer handles basic
+ * types that are displayed as a single line text, this includes some numeric types, and even some complex types
+ * such as unit and currency, this is because unlike other types their primary use is just writting something
+ */
 class ActualPropertyEntryFieldRenderer
   extends React.Component<IPropertyEntryFieldRendererWithStylesProps, IPropertyEntryFieldRendererState> {
 
@@ -625,5 +698,10 @@ class ActualPropertyEntryFieldRenderer
   }
 }
 
+/**
+ * The entry field renderer, as a class, because it's fairly complicated, this renderer handles basic
+ * types that are displayed as a single line text, this includes some numeric types, and even some complex types
+ * such as unit and currency, this is because unlike other types their primary use is just writting something
+ */
 const PropertyEntryFieldRenderer = withStyles(style)(ActualPropertyEntryFieldRenderer);
 export default PropertyEntryFieldRenderer;

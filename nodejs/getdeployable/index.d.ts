@@ -5,7 +5,8 @@
  * @packageDocumentation
  */
 /**
- * Runs the build process
+ * Runs the build process, check the main.ts file to see how this is done
+ *
  * @param version the version, development or production
  * @param buildID the build id, usually the same as the instance group
  * @param services the services that we are allowing, comma separated; or full, standard, and slim

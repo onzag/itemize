@@ -80,5 +80,5 @@ exports.LoginDialog = mui_core_1.withStyles(loginDialogStyles)((props) => {
                 react_1.default.createElement(I18nRead_1.default, { id: "forgot_password_question" }, (i18nForgotPassword) => (react_1.default.createElement(mui_core_1.Button, { className: props.classes.forgotPasswordButton, color: "primary", variant: "text", size: "small", fullWidth: true, "aria-label": i18nForgotPassword, onClick: props.onRecoverRequest }, i18nForgotPassword))),
                 react_1.default.createElement(mui_core_1.Divider, { className: props.classes.divider }),
                 react_1.default.createElement(I18nRead_1.default, { id: "signup_instead" }, (i18nSignupInstead) => (react_1.default.createElement(mui_core_1.Button, { color: "secondary", variant: "text", fullWidth: true, "aria-label": i18nSignupInstead, onClick: props.onSignupRequest }, i18nSignupInstead)))),
-            react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.error, open: !!actioner.error, onClose: actioner.dismissError }))))))));
+            react_1.default.createElement(snackbar_1.default, { id: "login-dialog-error", severity: "error", i18nDisplay: actioner.error, open: !!actioner.error, onClose: actioner.dismissError }))))))));
 });

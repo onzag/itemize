@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * A fast prototyping component for the terms and conditions
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,6 +12,12 @@ const react_1 = __importDefault(require("react"));
 const I18nReadMany_1 = __importDefault(require("../../../components/localization/I18nReadMany"));
 const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSetter"));
 const HTMLResourceLoader_1 = __importDefault(require("../../../components/resources/HTMLResourceLoader"));
+/**
+ * The terms and conditions information component
+ * the terms and conditions is loaded from the resources file based on
+ * terms_and_conditions_url
+ * @returns a react element
+ */
 function TermsAndConditions() {
     return (react_1.default.createElement(I18nReadMany_1.default, { data: [
             { id: "terms_and_conditions", capitalize: true },

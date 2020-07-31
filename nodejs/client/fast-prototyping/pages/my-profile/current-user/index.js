@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains the section iformation for the current user in the fast prototyping profile
+ *
+ * @packageDocumentation
+ */
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -19,6 +24,9 @@ const I18nReadMany_1 = __importDefault(require("../../../../components/localizat
 const LogActioner_1 = require("../../../../components/login/LogActioner");
 const I18nRead_1 = __importDefault(require("../../../../components/localization/I18nRead"));
 const SubmitActioner_1 = __importDefault(require("../../../../components/item-definition/SubmitActioner"));
+/**
+ * The logout dialog styles
+ */
 const LogoutDialogStyles = mui_core_1.createStyles({
     dialogContent: {
         padding: "1rem 0.5rem",
@@ -30,6 +38,12 @@ const LogoutDialogStyles = mui_core_1.createStyles({
         alignItems: "center",
     },
 });
+/**
+ * The logout dialog shows when the user attempts to logout from all devices
+ * shows a warning about what this entails
+ * @param props the logout dialog props
+ * @returns a react element
+ */
 const LogoutDialog = mui_core_1.withStyles(LogoutDialogStyles)((props) => {
     return (react_1.default.createElement(I18nReadMany_1.default, { data: [
             {
@@ -47,6 +61,9 @@ const LogoutDialog = mui_core_1.withStyles(LogoutDialogStyles)((props) => {
             react_1.default.createElement(LogActioner_1.LogActioner, null, (actioner) => (react_1.default.createElement(mui_core_1.Button, { color: "secondary", "aria-label": i18nTitle, startIcon: react_1.default.createElement(mui_core_1.ExitToAppIcon, null), onClick: actioner.logoutAll }, i18nTitle)))) },
         react_1.default.createElement(mui_core_1.Typography, { variant: "body1", className: props.classes.dialogContent }, i18nBody)))));
 });
+/**
+ * The current user profile styles
+ */
 const currentUserProfileStyles = mui_core_1.createStyles({
     container: {
         paddingTop: "1rem",
@@ -55,6 +72,12 @@ const currentUserProfileStyles = mui_core_1.createStyles({
         paddingTop: "0.2rem",
     },
 });
+/**
+ * The current user profile contains the standard information for the current user and
+ * allows to modify such, also allows to logout
+ * @param props the current user profile props
+ * @returns a react element
+ */
 exports.CurrentUserProfile = mui_core_1.withStyles(currentUserProfileStyles)((props) => {
     const [isDialogOpen, setIsDialogOpen] = react_1.useState(false);
     return (react_1.default.createElement(react_1.default.Fragment, null,
@@ -68,7 +91,7 @@ exports.CurrentUserProfile = mui_core_1.withStyles(currentUserProfileStyles)((pr
                         react_1.default.createElement(I18nRead_1.default, { capitalize: true, id: "logout_all" }))));
             }),
             react_1.default.createElement(SubmitActioner_1.default, null, (actioner) => (react_1.default.createElement(react_1.default.Fragment, null,
-                react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }),
-                react_1.default.createElement(snackbar_1.default, { severity: "success", i18nDisplay: "profile_updated_successfully", open: actioner.submitted, onClose: actioner.dismissSubmitted }))))),
+                react_1.default.createElement(snackbar_1.default, { id: "profile-update-error", severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }),
+                react_1.default.createElement(snackbar_1.default, { id: "profile-update-success", severity: "success", i18nDisplay: "profile_updated_successfully", open: actioner.submitted, onClose: actioner.dismissSubmitted }))))),
         react_1.default.createElement(LogoutDialog, { isOpen: isDialogOpen, onClose: setIsDialogOpen.bind(this, false) })));
 });

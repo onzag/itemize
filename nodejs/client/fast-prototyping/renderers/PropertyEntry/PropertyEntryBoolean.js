@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * The property entry boolean fast prototyping renderer uses material ui to render
+ * an entry for a boolean value
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -6,6 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const mui_core_1 = require("../../mui-core");
 const localization_1 = require("../../../components/localization");
+/**
+ * The styles of the renderer
+ */
 exports.style = mui_core_1.createStyles({
     entry: {
         width: "100%",
@@ -41,6 +50,11 @@ exports.style = mui_core_1.createStyles({
         justifyContent: "space-between",
     },
 });
+/**
+ * triggers once the boolean has changed
+ * @param props the renderer props
+ * @param e the event itself
+ */
 function handleOnChange(props, e) {
     // we extract the value from the browser event
     const value = e.target.value;
@@ -53,6 +67,15 @@ function handleOnChange(props, e) {
     // note how we don't use internal values for booleans
     return props.onChange(value === "true", null);
 }
+/**
+ * This is the fast prototyping boolean renderer and uses material ui in order to render a slick
+ * boolean entry for it, supports the following args
+ *
+ * - descriptionAsAlert: displays the description as an alert rather than its normal form
+ *
+ * @param props the entry boolean props
+ * @returns a react element
+ */
 const PropertyEntryBooleanRenderer = mui_core_1.withStyles(exports.style)((props) => {
     const descriptionAsAlert = props.args["descriptionAsAlert"];
     let icon = null;

@@ -1,3 +1,9 @@
+/**
+ * Contains functions to perform gql queries as well
+ * as the product interfaces for these queries
+ * @packageDocumentation
+ */
+
 import { Stream } from "stream";
 import FormDataNode from "form-data";
 import fetchNode from "node-fetch";
@@ -11,12 +17,28 @@ import { ENDPOINT_ERRORS } from "./constants";
  * that graphql returns
  */
 export interface IGQLSearchRecord {
+  /**
+   * The type of the search record, basically a qualified name
+   */
   type: string;
+  /**
+   * The id for the pg id
+   */
   id: number;
+  /**
+   * The version for the pg version
+   */
   version: string;
+  /**
+   * Whent he record was created
+   */
   created_at: string;
 }
 
+/**
+ * The records container represents what the server retruns
+ * when it returns a bunch of records
+ */
 export interface IGQLSearchRecordsContainer {
   records: IGQLSearchRecord[],
   last_record_date: string,
@@ -25,6 +47,10 @@ export interface IGQLSearchRecordsContainer {
   offset: number,
 }
 
+/**
+ * The search container represents the results for the case
+ * of traditional searches rather than records based search
+ */
 export interface IGQLSearchResultsContainer {
   results: IGQLValue[],
   count: number,

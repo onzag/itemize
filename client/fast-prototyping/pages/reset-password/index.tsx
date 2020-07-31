@@ -1,3 +1,8 @@
+/**
+ * The reset password page
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
@@ -15,6 +20,9 @@ import Reader from "../../../components/property/Reader";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
 import Entry from "../../../components/property/Entry";
 
+/**
+ * Contains the reset password styles
+ */
 const resetPasswordStyles = createStyles({
   container: {
     paddingTop: "1rem",
@@ -39,13 +47,26 @@ const resetPasswordStyles = createStyles({
   },
 });
 
+/**
+ * The action as asked once the reset password has been requested
+ * @param token the token for resetting the password
+ * @param actioner and the user actioner
+ */
 async function resetPassword(token: string, actioner: IUserActionerArg) {
   const result = await actioner.resetPassword(token, true);
   if (!result.error) {
+    // we give the reset_password_success message from the root message
     localizedRedirectTo("/?msg=reset_password_success&msgtitle=reset_password", null, true);
   }
 }
 
+/**
+ * A compliant fast prototyping reset password component, extract
+ * both the token and the id from the location state by using the location state reader
+ * from the query string and uses such info in the user actioner
+ * @param props the reset password props
+ * @returns a react element
+ */
 export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<typeof resetPasswordStyles>) => {
   return (
     <LocationStateReader
@@ -76,7 +97,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
             >
               <I18nRead id="reset_password" capitalize={true}>
                 {(i18nResetPassword: string) => (
-                  <React.Fragment>
+                  <>
                     <TitleSetter>
                       {i18nResetPassword}
                     </TitleSetter>
@@ -146,7 +167,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
                         </UserActioner>
                       </Paper>
                     </Container>
-                  </React.Fragment>
+                  </>
                 )}
               </I18nRead>
             </ItemDefinitionProvider>

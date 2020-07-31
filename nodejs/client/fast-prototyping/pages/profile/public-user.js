@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * Contains the public user information section for the fast prototyping
+ * public profile
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -13,6 +19,11 @@ const Reader_1 = __importDefault(require("../../../components/property/Reader"))
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
 const View_1 = __importDefault(require("../../../components/property/View"));
 const UserDataRetriever_1 = __importDefault(require("../../../components/user/UserDataRetriever"));
+/**
+ * contains the styles for the public user profile
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 const publicUserProfileStyles = (theme) => mui_core_1.createStyles({
     container: {
         paddingTop: "1rem",
@@ -51,6 +62,11 @@ const publicUserProfileStyles = (theme) => mui_core_1.createStyles({
         display: "inline-block",
     },
 });
+/**
+ * The public user profile contains basic information that can be accessed about the current public user
+ * @param props the public user profile props
+ * @returns a react element
+ */
 exports.PublicUserProfile = mui_core_1.withStyles(publicUserProfileStyles)((props) => {
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement(mui_core_1.Container, { maxWidth: "md", className: props.classes.container },

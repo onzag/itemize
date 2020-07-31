@@ -1,13 +1,25 @@
 "use strict";
+/**
+ * The entry for field based (text/number) types
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const index_1 = require("../../mui-core/index");
+/**
+ * A simple helper function that says when it should show invalid
+ * @param props the renderer props
+ * @returns a boolean on whether is invalid
+ */
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
+/**
+ * The styles for the field
+ */
 exports.style = index_1.createStyles({
     entry: {
         width: "100%",
@@ -111,7 +123,13 @@ exports.style = index_1.createStyles({
         borderBottom: "solid 1px #eee",
     },
 });
+/**
+ * A dialog that allows to select an unit
+ * @param props the props for the select unit dialog
+ * @returns a react element
+ */
 function SelectUnitDialog(props) {
+    // closes the dialog
     const closeAndChangeUnit = (unit) => {
         props.onClose();
         props.onChangeUnit(unit);
@@ -134,7 +152,15 @@ function SelectUnitDialog(props) {
                 react_1.default.createElement(index_1.List, { subheader: react_1.default.createElement(index_1.ListSubheader, { classes: { root: "props.subheaderClassName" } }, props.unitPrefersImperial ? props.unitI18n.metric : props.unitI18n.imperial) }, (props.unitPrefersImperial ? props.unitOptions : props.unitImperialOptions).map((unit) => (react_1.default.createElement(index_1.ListItem, { selected: unit === props.unit, button: true, onClick: closeAndChangeUnit.bind(null, unit), key: unit },
                     react_1.default.createElement(index_1.ListItemText, { primary: props.unitToNode(unit) })))))) : null)));
 }
+/**
+ * The select unit dialog, but responsive
+ */
 const SelectUnitDialogResponsive = index_1.withMobileDialog()(SelectUnitDialog);
+/**
+ * Allows the user to select the current currency
+ * @param props the dialog props
+ * @returns a react element
+ */
 function SelectCurrencyDialog(props) {
     const closeAndChangeCurrency = (code) => {
         props.onClose();
@@ -148,7 +174,15 @@ function SelectCurrencyDialog(props) {
             react_1.default.createElement(index_1.List, null, props.currencyArrData.map((currency) => (react_1.default.createElement(index_1.ListItem, { selected: currency.code === props.currency.code, button: true, onClick: closeAndChangeCurrency.bind(null, currency.code), key: currency.code },
                 react_1.default.createElement(index_1.ListItemText, { primary: currency.symbol + " - " + currency.code }))))))));
 }
+/**
+ * The select currency dialog, but responsive
+ */
 const SelectCurrencyDialogResponsive = index_1.withMobileDialog()(SelectCurrencyDialog);
+/**
+ * The actual entry field renderer, as a class, because it's fairly complicated, this renderer handles basic
+ * types that are displayed as a single line text, this includes some numeric types, and even some complex types
+ * such as unit and currency, this is because unlike other types their primary use is just writting something
+ */
 class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
     constructor(props) {
         super(props);
@@ -355,5 +389,10 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
             currencyDialog));
     }
 }
+/**
+ * The entry field renderer, as a class, because it's fairly complicated, this renderer handles basic
+ * types that are displayed as a single line text, this includes some numeric types, and even some complex types
+ * such as unit and currency, this is because unlike other types their primary use is just writting something
+ */
 const PropertyEntryFieldRenderer = index_1.withStyles(exports.style)(ActualPropertyEntryFieldRenderer);
 exports.default = PropertyEntryFieldRenderer;

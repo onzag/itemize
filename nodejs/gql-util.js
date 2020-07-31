@@ -2,6 +2,8 @@
 /**
  * Contains graphql utlity functions that are used everywhere accross
  * the itemize app
+ *
+ * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 /**

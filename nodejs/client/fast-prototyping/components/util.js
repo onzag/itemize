@@ -1,36 +1,20 @@
 "use strict";
+/**
+ * Contains fast prototyping utilities for fast developing
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const mui_core_1 = require("../mui-core");
+const util_1 = require("../../components/util");
 require("./util.scss");
-class DelayDisplay extends react_1.default.PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            shown: false,
-        };
-    }
-    componentDidMount() {
-        this.timer = setTimeout(() => {
-            this.setState({
-                shown: true,
-            });
-        }, this.props.duration);
-    }
-    componentWillUnmount() {
-        clearTimeout(this.timer);
-    }
-    render() {
-        if (this.state.shown) {
-            return this.props.children;
-        }
-        return null;
-    }
-}
-exports.DelayDisplay = DelayDisplay;
+/**
+ * The progressing element sytle for the progressing element
+ */
 const progressingElementStyle = mui_core_1.createStyles({
     progressWrapper: (props) => ({
         position: "relative",
@@ -41,8 +25,8 @@ const progressingElementStyle = mui_core_1.createStyles({
         position: "absolute",
         top: "50%",
         left: "50%",
-        marginTop: -((props.progressSize || 24) / 2),
-        marginLeft: -((props.progressSize || 24) / 2),
+        marginTop: -((props.progressCircleSize || 24) / 2),
+        marginLeft: -((props.progressCircleSize || 24) / 2),
     }),
     cover: {
         position: "absolute",
@@ -53,19 +37,33 @@ const progressingElementStyle = mui_core_1.createStyles({
         backgroundColor: "rgba(255, 255, 255, 0.65)",
     }
 });
+/**
+ * Shows a loading circle on top of a component to show that such is loading
+ * @param props the loading props
+ * @returns a react component
+ */
 exports.ProgressingElement = mui_core_1.withStyles(progressingElementStyle)((props) => {
-    const size = props.progressSize || 24;
+    const size = props.progressCircleSize || 24;
     return (react_1.default.createElement("div", { className: `${props.classes.progressWrapper} ${props.className ? props.className : ""}` },
         props.children,
         props.isProgressing ?
-            react_1.default.createElement(DelayDisplay, { duration: props.delayDuration || 300 },
+            react_1.default.createElement(util_1.DelayDisplay, { duration: props.delayDuration || 300 },
                 react_1.default.createElement("div", { className: props.classes.cover },
                     react_1.default.createElement(mui_core_1.CircularProgress, { size: size, className: props.classes.progressElement }))) :
             null));
 });
+/**
+ * Some elements can be fairly heavy and slow loading, this component will detach the execution of some of these components
+ * so that they don't have to slow down the execution of other code, doesn't play nice with SSR
+ */
 class SlowLoadingElement extends react_1.default.Component {
     constructor(props) {
         super(props);
+        /**
+         * Becomes true once unmounted, avoid setState on
+         * unmounted components if the element really takes a while
+         * to load
+         */
         this.unmounted = false;
         this.state = {
             isReady: false,
@@ -73,6 +71,7 @@ class SlowLoadingElement extends react_1.default.Component {
         };
     }
     static getDerivedStateFromProps(props, state) {
+        // basically if the id changes, we consider ourselves not ready anymore
         if (props.id !== state.readyForId) {
             return {
                 isReady: false,

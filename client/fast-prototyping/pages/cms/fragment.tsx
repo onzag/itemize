@@ -1,3 +1,9 @@
+/**
+ * A page section for fast prototyping that allows to create and edit fragments
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
@@ -10,6 +16,9 @@ import I18nReadMany from "../../../components/localization/I18nReadMany";
 import Snackbar from "../../components/snackbar";
 import SubmitActioner from "../../../components/item-definition/SubmitActioner";
 
+/**
+ * The fragment styles
+ */
 const fragmentStyles = createStyles({
   paper: {
     padding: "1rem",
@@ -26,6 +35,11 @@ const fragmentStyles = createStyles({
   },
 });
 
+/**
+ * The fragment section itself that allows modifying and creating new fragments
+ * @param props the fragment styles
+ * @returns a react element
+ */
 export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fragmentStyles>) => {
   return (
     <LocationStateReader defaultState={{ id: "", version: "" }} stateIsInQueryString={true}>

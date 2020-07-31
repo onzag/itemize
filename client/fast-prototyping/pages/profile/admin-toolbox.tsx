@@ -1,3 +1,10 @@
+/**
+ * The admin toolbox appears on the public profile for allowing to change roles
+ * and other admin activities
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { Divider, withStyles, WithStyles, createStyles, DoneOutlineIcon } from "../../mui-core";
 import { SubmitButton } from "../../components/buttons";
@@ -5,6 +12,9 @@ import Snackbar from "../../components/snackbar";
 import Entry from "../../../components/property/Entry";
 import SubmitActioner from "../../../components/item-definition/SubmitActioner";
 
+/**
+ * The admin toolbox styles
+ */
 const adminToolboxStyles = () => createStyles({
   divider: {
     marginTop: "1rem",
@@ -12,6 +22,12 @@ const adminToolboxStyles = () => createStyles({
   }
 });
 
+/**
+ * The admin toolbox appears on the public profile for allowing to change roles
+ * and other admin activities
+ * @param props the toolbox props
+ * @returns a react element
+ */
 export const AdminToolbox = withStyles(adminToolboxStyles)((props: WithStyles<typeof adminToolboxStyles>) => {
   return (
     <React.Fragment>

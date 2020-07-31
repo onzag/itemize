@@ -142,9 +142,5 @@ initializeServer(
         ],
       },
     },
-    // remember to specify the proper container id or otherwise you will get an error
-    // refer to your sensitive configuration to see your available container ids
-    // that is where sitemaps are stored
-    seoContainerId: "*",
   },
 );

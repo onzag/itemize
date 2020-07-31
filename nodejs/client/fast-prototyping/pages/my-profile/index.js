@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Provides a fast prototyping page for the current user profile, with modification and all
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -12,9 +16,15 @@ const needs_submit_prompt_1 = require("../../components/needs-submit-prompt");
 const UserDataRetriever_1 = __importDefault(require("../../../components/user/UserDataRetriever"));
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
 const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSetter"));
+/**
+ * This is the main component that provides access to the current user profile
+ * it reads a lot of data and contains a lot of entries
+ * @returns a react component
+ */
 function MyProfile() {
     return (react_1.default.createElement(UserDataRetriever_1.default, null, (userData) => {
         if (!userData.id) {
+            // redirect if not logged in
             return (react_1.default.createElement(Redirect_1.default, { to: "/" }));
         }
         let properties = [

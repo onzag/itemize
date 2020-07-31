@@ -1,3 +1,9 @@
+/**
+ * The social section contains this for the frontpage
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import {
   withStyles,
@@ -19,6 +25,11 @@ import {
   VKIcon } from "../../mui-core";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
 
+/**
+ * provides the styles for the social section
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 export const socialStyles = (theme: Theme) => createStyles({
   socialTitle: {
     marginTop: "4rem",
@@ -74,6 +85,14 @@ export const socialStyles = (theme: Theme) => createStyles({
   },
 });
 
+/**
+ * The social section provides the buttons and urls for the different social networks that can be
+ * used as defined by the developer, these networks are language sensitive and are read
+ * from the i18n properties data
+ * 
+ * @param props the social props
+ * @returns a react element
+ */
 export const Social = withStyles(socialStyles)((props: WithStyles<typeof socialStyles>) => {
   return (
     <I18nReadMany

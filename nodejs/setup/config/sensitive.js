@@ -98,6 +98,13 @@ async function sensitiveConfigSetup(version, currentConfig, referenceConfig, pac
             nullifyFalseValues: true,
         },
         {
+            variableName: "seoContainerID",
+            message: "of all the previous containers id which one is used for storing SEO and sitemap information",
+            defaultValue: "",
+            hidden: false,
+            nullifyFalseValues: true,
+        },
+        {
             variableName: "mailgunAPIKey",
             message: "Used in order to send emails, get your key at https://www.mailgun.com/",
             defaultValue: "",

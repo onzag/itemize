@@ -1,5 +1,12 @@
 "use strict";
+/**
+ * Represents the stanard redis and sensitive config information an schemas
+ * @packageDocumentation
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * A JSON validating schema for the sensitive configuration
+ */
 exports.rawSensitiveConfigSchema = {
     type: "object",
     properties: {
@@ -127,6 +134,9 @@ exports.rawSensitiveConfigSchema = {
         defaultContainerID: {
             type: "string",
         },
+        seoContainerID: {
+            type: "string",
+        },
     },
     additionalProperties: false,
     required: [
@@ -135,6 +145,7 @@ exports.rawSensitiveConfigSchema = {
         "currencyLayerAccessKey",
         "currencyLayerHttpsEnabled",
         "defaultContainerID",
+        "seoContainerID",
         "hereApiKey",
         "mailgunAPIKey",
         "mailgunDomain",
@@ -143,6 +154,9 @@ exports.rawSensitiveConfigSchema = {
         "devKey",
     ],
 };
+/**
+ * A json validating schema for the standard configuration
+ */
 exports.rawConfigSchema = {
     type: "object",
     properties: {
@@ -273,6 +287,9 @@ exports.rawConfigSchema = {
         "containersHostnamePrefixes",
     ],
 };
+/**
+ * A json validating schema for the database configuration
+ */
 exports.rawDBConfigSchema = {
     type: "object",
     properties: {
@@ -301,6 +318,9 @@ exports.rawDBConfigSchema = {
         "password",
     ],
 };
+/***
+ * A json validating schema for the redis config
+ */
 exports.rawRedisConfigSchemaPart = {
     type: "object",
     properties: {

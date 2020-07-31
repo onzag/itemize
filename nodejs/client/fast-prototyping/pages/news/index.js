@@ -1,4 +1,11 @@
 "use strict";
+/**
+ * Provides the news page and all its subpages for fast prototyping
+ *
+ * TODO
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,6 +14,9 @@ const react_1 = __importDefault(require("react"));
 const articles_1 = require("./articles");
 const article_1 = require("./article");
 const Route_1 = __importDefault(require("../../../components/navigation/Route"));
+/**
+ * Provides the news page and all its subpages for fast prototyping
+ */
 function News() {
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement(Route_1.default, { path: "/news", exact: true, component: articles_1.Articles }),

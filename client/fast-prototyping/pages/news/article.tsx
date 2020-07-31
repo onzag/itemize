@@ -1,3 +1,9 @@
+/**
+ * Provides a single article page
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import Reader from "../../../components/property/Reader";
 import TitleSetter from "../../../components/util/TitleSetter";
@@ -9,6 +15,9 @@ import View from "../../../components/property/View";
 import I18nRead from "../../../components/localization/I18nRead";
 import { Avatar } from "../../components/avatar";
 
+/**
+ * The article page props
+ */
 interface ArticleProps {
   match: {
     params: {
@@ -17,6 +26,11 @@ interface ArticleProps {
   };
 }
 
+/**
+ * the article content styles
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 const articleContentStyles = (theme: Theme) => createStyles({
   container: {
     padding: 0,
@@ -98,6 +112,12 @@ const articleContentStyles = (theme: Theme) => createStyles({
   }
 });
 
+/**
+ * The article content displays the content for a given article inside
+ * its own containement
+ * @param props the article content props
+ * @returns a react element
+ */
 const ArticleContent = withStyles(articleContentStyles)((props: WithStyles<typeof articleContentStyles>) => {
   return (
     <Container maxWidth="md" className={props.classes.container}>
@@ -177,6 +197,12 @@ const ArticleContent = withStyles(articleContentStyles)((props: WithStyles<typeo
   )
 });
 
+/**
+ * the article component itself that will provide for a given
+ * article
+ * @param props the props for the article
+ * @returns a react element
+ */
 export function Article(props: ArticleProps) {
   const articleId = parseInt(props.match.params.id) || null;
   return (

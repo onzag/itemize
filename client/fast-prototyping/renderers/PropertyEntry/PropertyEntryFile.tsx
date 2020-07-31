@@ -1,3 +1,8 @@
+/**
+ * Contains the fast prototyping element for renering a file entry
+ * @packageDocumentation
+ */
+
 import { IPropertyEntryFileRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryFile";
 import {
   FormLabel, RootRef, Paper, Button, Typography, IconButton,
@@ -9,9 +14,18 @@ import Dropzone, { DropzoneRef } from "react-dropzone";
 import React from "react";
 import { capitalize } from "../../../components/localization";
 
+/**
+ * A simple helper function that says when it should show invalid
+ * @param props the renderer props
+ * @returns a boolean on whether is invalid
+ */
 function shouldShowInvalid(props: IPropertyEntryFileRendererProps) {
   return !props.currentValid;
 }
+
+/**
+ * the styles for the file entry
+ */
 export const style = createStyles({
   entry: {
     width: "100%",
@@ -108,13 +122,26 @@ export const style = createStyles({
   },
 });
 
+/**
+ * The props for the file renderer, with styles
+ */
 interface IPropertyEntryFileRendererWithStylesProps extends IPropertyEntryFileRendererProps, WithStyles<typeof style> {
 }
 
+/**
+ * Simple function that binds the onSetFile function from the handler
+ * and triggers when the dropzone receives files
+ * @param onSetFile the on set file function from the handler
+ * @param files the files the dropper got
+ */
 function onDrop(onSetFile: (file: File) => void, files: File[]) {
   onSetFile(files[0]);
 }
 
+/**
+ * trigger the upload manually
+ * @param dropzoneRef the dropzone reference
+ */
 function manuallyTriggerUpload(dropzoneRef: React.MutableRefObject<DropzoneRef>) {
   // utility for the button to manually trigger upload
   // using the ref when it is disabled
@@ -123,6 +150,12 @@ function manuallyTriggerUpload(dropzoneRef: React.MutableRefObject<DropzoneRef>)
   }
 }
 
+/**
+ * The property entry file renderer, allows to set and upload a single file in its
+ * form, support both images and standard files
+ * @param props the entry props
+ * @returns a react element
+ */
 const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRendererWithStylesProps) => {
   const dropzoneRef = React.useRef<DropzoneRef>();
   

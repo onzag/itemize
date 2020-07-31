@@ -1,3 +1,8 @@
+/**
+ * Contains the standard info for the current user information only
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { IActionSubmitOptions } from "../../../../providers/item-definition";
 import { Button, Box, Paper, createStyles, withStyles, WithStyles,
@@ -21,11 +26,31 @@ import I18nRead from "../../../../components/localization/I18nRead";
 import UserActioner from "../../../../components/user/UserActioner";
 import DifferingPropertiesRetriever from "../../../../components/item-definition/DifferingPropertiesRetriever";
 
+/**
+ * The custom confirmation dialog props for the dialog
+ * that shows to confirm the password
+ * 
+ * This dialog fits the description provided by the submit button confirmation
+ * options
+ */
 interface CustomConfirmationDialogProps {
+  /**
+   * whether the dialog is active and should be open
+   */
   isActive: boolean;
+  /**
+   * What to do on close
+   */
   onClose: (continueWithProcess: boolean) => void;
 }
 
+/**
+ * The custom confirmation dialog that passes to the submit button as a means
+ * of confirming the password, this dialog follows the guidelines of the submit
+ * button component
+ * @param props the props for the custom confirmation dialog
+ * @returns a react element
+ */
 function CustomConfirmationDialog(props: CustomConfirmationDialogProps) {
   return (
     <I18nReadMany data={
@@ -63,6 +88,11 @@ function CustomConfirmationDialog(props: CustomConfirmationDialogProps) {
   )
 }
 
+/**
+ * The standard information styles
+ * @param theme the mui theme
+ * @returns a bunch of styles
+ */
 const currentUserProfileStandardInfoStyles = (theme: Theme) => createStyles({
   paper: {
     padding: "1rem",
@@ -95,6 +125,12 @@ const currentUserProfileStandardInfoStyles = (theme: Theme) => createStyles({
   },
 });
 
+/**
+ * The current user profile standard info shows the standard information of the current
+ * user and allows to modify them in place
+ * @param props the current user information props
+ * @returns a react element
+ */
 export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStandardInfoStyles)
   ((props: WithStyles<typeof currentUserProfileStandardInfoStyles>) => {
     return (

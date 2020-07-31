@@ -1,3 +1,9 @@
+/**
+ * Fast prototyping page section for the article in cms mode
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { ItemDefinitionProvider } from "../../../providers/item-definition";
 import { ItemDefinitionLoader } from "../../components/item-definition-loader";
@@ -9,10 +15,12 @@ import { SubmitButton } from "../../components/buttons";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
 import Snackbar from "../../components/snackbar";
 import SubmitActioner from "../../../components/item-definition/SubmitActioner";
-import I18nRead from "../../../components/localization/I18nRead";
 import { articlesStyles } from "../frontpage/articles";
 
-const fragmentStyles = createStyles({
+/**
+ * The styles for the article section
+ */
+const articleStyles = createStyles({
   paper: {
     padding: "1rem",
   },
@@ -28,6 +36,11 @@ const fragmentStyles = createStyles({
   },
 });
 
+/**
+ * Displays a single article, summary and summary image
+ * @param props the single article props
+ * @returns a react element
+ */
 const SingleArticle = withStyles(articlesStyles)((props: WithStyles<typeof articlesStyles>) => {
   return <div className={props.classes.articleContainer}>
     <div className={props.classes.articleImageContainer}>
@@ -51,7 +64,12 @@ const SingleArticle = withStyles(articlesStyles)((props: WithStyles<typeof artic
   </div>
 });
 
-export const Article = withStyles(fragmentStyles)((props: WithStyles<typeof fragmentStyles>) => {
+/**
+ * Page section that allows for creating and modifying articles
+ * @param props the article props
+ * @returns a react element
+ */
+export const Article = withStyles(articleStyles)((props: WithStyles<typeof articleStyles>) => {
   return (
     <LocationStateReader defaultState={{ id: "" }} stateIsInQueryString={true}>
       {(locationState, setState) => {

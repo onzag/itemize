@@ -5,7 +5,11 @@
  *
  * @packageDocumentation
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const react_1 = __importDefault(require("react"));
 /**
  * The image source set retriver allows to generate a srcset based on a property, the current file
  * data value, and optionally the image sizes (obtained via the imageSizeRetriever in this same file)
@@ -222,3 +226,31 @@ function cacheableQSLoader(url, recheck) {
     return newURL.toString();
 }
 exports.cacheableQSLoader = cacheableQSLoader;
+/**
+ * Allows to create a component that will only display after a given delay
+ */
+class DelayDisplay extends react_1.default.PureComponent {
+    constructor(props) {
+        super(props);
+        this.state = {
+            shown: false,
+        };
+    }
+    componentDidMount() {
+        this.timer = setTimeout(() => {
+            this.setState({
+                shown: true,
+            });
+        }, this.props.duration);
+    }
+    componentWillUnmount() {
+        clearTimeout(this.timer);
+    }
+    render() {
+        if (this.state.shown) {
+            return this.props.children;
+        }
+        return null;
+    }
+}
+exports.DelayDisplay = DelayDisplay;

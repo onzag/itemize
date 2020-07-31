@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains the component that shows info for the cms and what it does
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -6,6 +11,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const mui_core_1 = require("../../mui-core");
 const I18nReadMany_1 = __importDefault(require("../../../components/localization/I18nReadMany"));
+/**
+ * The information styles
+ */
 const infoStyles = mui_core_1.createStyles({
     paper: {
         padding: "1rem",
@@ -17,6 +25,11 @@ const infoStyles = mui_core_1.createStyles({
         padding: "1rem 1rem 0 1rem",
     }
 });
+/**
+ * The information component
+ * @param props the information props
+ * @returns a react element
+ */
 exports.Info = mui_core_1.withStyles(infoStyles)((props) => {
     return (react_1.default.createElement(mui_core_1.Container, { maxWidth: "md", className: props.classes.container },
         react_1.default.createElement(mui_core_1.Paper, { className: props.classes.paper },

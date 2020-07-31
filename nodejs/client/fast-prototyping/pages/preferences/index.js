@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * The preferences page allows to modify the current user preferences
+ * regarding specific user information
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -16,6 +21,9 @@ const I18nRead_1 = __importDefault(require("../../../components/localization/I18
 const TitleSetter_1 = __importDefault(require("../../../components/util/TitleSetter"));
 const Entry_1 = __importDefault(require("../../../components/property/Entry"));
 const SubmitActioner_1 = __importDefault(require("../../../components/item-definition/SubmitActioner"));
+/**
+ * The styles for the preferences page
+ */
 const preferencesStyles = mui_core_1.createStyles({
     paper: {
         padding: "1rem",
@@ -29,6 +37,12 @@ const preferencesStyles = mui_core_1.createStyles({
         paddingTop: "1.2rem",
     },
 });
+/**
+ * The preferences page will allow the user to modify things such as notifications, newsletters and address
+ * as well as other information that do not affect the user itself
+ * @param props the preferences props
+ * @returns a react element
+ */
 exports.Preferences = mui_core_1.withStyles(preferencesStyles)((props) => {
     return (react_1.default.createElement(UserDataRetriever_1.default, null, (userData) => {
         const properties = [
@@ -61,7 +75,7 @@ exports.Preferences = mui_core_1.withStyles(preferencesStyles)((props) => {
                                         unpokeAfterAny: true,
                                     }, buttonColor: "primary", buttonStartIcon: react_1.default.createElement(mui_core_1.DoneOutlineIcon, null), buttonVariant: "contained" }))))),
                 react_1.default.createElement(SubmitActioner_1.default, null, (actioner) => (react_1.default.createElement(react_1.default.Fragment, null,
-                    react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }),
-                    react_1.default.createElement(snackbar_1.default, { severity: "success", i18nDisplay: "preferences_updated_successfully", open: actioner.submitted, onClose: actioner.dismissSubmitted })))))));
+                    react_1.default.createElement(snackbar_1.default, { id: "submit-preferences-error", severity: "error", i18nDisplay: actioner.submitError, open: !!actioner.submitError, onClose: actioner.dismissError }),
+                    react_1.default.createElement(snackbar_1.default, { id: "submit-preferences-success", severity: "success", i18nDisplay: "preferences_updated_successfully", open: actioner.submitted, onClose: actioner.dismissSubmitted })))))));
     }));
 });

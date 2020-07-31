@@ -1,3 +1,10 @@
+/**
+ * The property entry boolean fast prototyping renderer uses material ui to render
+ * an entry for a boolean value
+ * 
+ * @packageDocumentation
+ */
+
 import { IPropertyEntryBooleanRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryBoolean";
 import React from "react";
 import { Alert, FormControl, FormControlLabel, Switch,
@@ -5,6 +12,9 @@ import { Alert, FormControl, FormControlLabel, Switch,
   createStyles, WithStyles, withStyles, RestoreIcon } from "../../mui-core";
 import { capitalize } from "../../../components/localization";
 
+/**
+ * The styles of the renderer
+ */
 export const style = createStyles({
   entry: {
     width: "100%",
@@ -41,9 +51,17 @@ export const style = createStyles({
   },
 });
 
+/**
+ * The renderer props, based on the properties it will take
+ */
 interface IPropertyEntryBooleanRendererWithStylesProps extends IPropertyEntryBooleanRendererProps, WithStyles<typeof style> {
 }
 
+/**
+ * triggers once the boolean has changed
+ * @param props the renderer props
+ * @param e the event itself
+ */
 function handleOnChange(
   props: IPropertyEntryBooleanRendererWithStylesProps,
   e: React.ChangeEvent<HTMLInputElement>,
@@ -60,6 +78,15 @@ function handleOnChange(
   return props.onChange(value === "true", null);
 }
 
+/**
+ * This is the fast prototyping boolean renderer and uses material ui in order to render a slick
+ * boolean entry for it, supports the following args
+ * 
+ * - descriptionAsAlert: displays the description as an alert rather than its normal form
+ * 
+ * @param props the entry boolean props
+ * @returns a react element
+ */
 const PropertyEntryBooleanRenderer = withStyles(style)((props: IPropertyEntryBooleanRendererWithStylesProps) => {
   const descriptionAsAlert = props.args["descriptionAsAlert"];
 

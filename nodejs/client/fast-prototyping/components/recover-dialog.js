@@ -18,6 +18,9 @@ const util_1 = require("./util");
 const UserActioner_1 = __importDefault(require("../../components/user/UserActioner"));
 const I18nRead_1 = __importDefault(require("../../components/localization/I18nRead"));
 const Entry_1 = __importDefault(require("../../components/property/Entry"));
+/**
+ * The recover dialog styles
+ */
 const recoverDialogStyles = mui_core_1.createStyles({
     resetPasswordButtonWrapper: {
         marginTop: "1.5rem",
@@ -26,9 +29,21 @@ const recoverDialogStyles = mui_core_1.createStyles({
         margin: "1rem 0",
     },
 });
+/**
+ * runs many functions at once
+ * @param functions the functions to run
+ */
 function runManyFunctions(functions) {
     functions.forEach(f => f());
 }
+/**
+ * A recover dialog fully compatible with the navbar that allows for quickly adding
+ * a dialog for recovering the password, it contains its own item definition provider but depends to
+ * be in the right module context
+ *
+ * @param props the props for recovery
+ * @returns a react component
+ */
 exports.RecoverDialog = mui_core_1.withStyles(recoverDialogStyles)((props) => {
     return (react_1.default.createElement(item_definition_1.ItemDefinitionProvider, { itemDefinition: "user", disableExternalChecks: true, properties: ["email"] },
         react_1.default.createElement(UserActioner_1.default, null, (actioner) => (react_1.default.createElement(I18nRead_1.default, { id: "recover_account", capitalize: true }, (i18nRecover) => (react_1.default.createElement(dialog_1.DialogResponsive, { open: props.open, onClose: runManyFunctions.bind(null, [actioner.dismissStatefulError, actioner.cleanUnsafeFields, props.onClose]), title: i18nRecover },
@@ -40,6 +55,6 @@ exports.RecoverDialog = mui_core_1.withStyles(recoverDialogStyles)((props) => {
                 react_1.default.createElement(mui_core_1.Button, { color: "primary", variant: "contained", size: "large", "aria-label": i18nRecoverAction, startIcon: react_1.default.createElement(mui_core_1.MailIcon, null), onClick: actioner.sendResetPassword, fullWidth: true }, i18nRecoverAction)))),
             react_1.default.createElement(mui_core_1.Divider, { className: props.classes.divider }),
             react_1.default.createElement(I18nRead_1.default, { id: "login" }, (i18nLogin) => (react_1.default.createElement(mui_core_1.Button, { color: "secondary", variant: "text", fullWidth: true, "aria-label": i18nLogin, onClick: props.onLoginRequest }, i18nLogin))),
-            react_1.default.createElement(snackbar_1.default, { severity: "error", i18nDisplay: actioner.statefulError, open: !!actioner.statefulError, onClose: actioner.dismissStatefulError }),
-            react_1.default.createElement(snackbar_1.default, { severity: "success", i18nDisplay: "recover_account_action_success", open: !!actioner.statefulSuccess, onClose: actioner.dismissStatefulSuccess }))))))));
+            react_1.default.createElement(snackbar_1.default, { id: "recover-dialog-error", severity: "error", i18nDisplay: actioner.statefulError, open: !!actioner.statefulError, onClose: actioner.dismissStatefulError }),
+            react_1.default.createElement(snackbar_1.default, { id: "recover-dialog-success", severity: "success", i18nDisplay: "recover_account_action_success", open: !!actioner.statefulSuccess, onClose: actioner.dismissStatefulSuccess }))))))));
 });

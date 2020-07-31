@@ -11,7 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const mui_core_1 = require("../mui-core");
 const ItemDefinitionLoader_1 = __importDefault(require("../../components/item-definition/ItemDefinitionLoader"));
-const util_1 = require("./util");
+const util_1 = require("../../components/util");
 const I18nRead_1 = __importDefault(require("../../components/localization/I18nRead"));
 const I18nReadError_1 = __importDefault(require("../../components/localization/I18nReadError"));
 /**

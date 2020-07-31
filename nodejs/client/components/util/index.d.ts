@@ -4,6 +4,7 @@
  *
  * @packageDocumentation
  */
+import React from "react";
 import { IGQLFile } from "../../../gql-querier";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 /**
@@ -49,3 +50,26 @@ export declare function imageSizeRetriever(fileData: IGQLFile, property?: Proper
  * @returns a query string url with the service worker query string parameters
  */
 export declare function cacheableQSLoader(url: string, recheck?: boolean): string;
+/**
+ * The delay display props
+ */
+interface DelayDisplayProps {
+    duration: number;
+}
+/**
+ * The delay display state
+ */
+interface DelayDisplayState {
+    shown: boolean;
+}
+/**
+ * Allows to create a component that will only display after a given delay
+ */
+export declare class DelayDisplay extends React.PureComponent<DelayDisplayProps, DelayDisplayState> {
+    private timer;
+    constructor(props: DelayDisplayProps);
+    componentDidMount(): void;
+    componentWillUnmount(): void;
+    render(): {};
+}
+export {};
