@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 import React from "react";
-import { ILocaleContextType } from "../internal/app";
+import { ILocaleContextType } from "../internal/providers/locale-provider";
 import { IConfigRawJSONDataType } from "../../config";
 /**
  * The appwrapper is the static wrapper that does not really ever change and stays on top
@@ -25,6 +25,7 @@ export declare function appWrapper(app: React.ReactElement, config: IConfigRawJS
  * need to change according to locale
  *
  * @param mainComponent the main component that is under the app
+ * @param config the config of the app
  * @param localeContext the locale that we are using
  */
-export declare function mainWrapper(mainComponent: React.ReactElement, localeContext: ILocaleContextType): JSX.Element;
+export declare function mainWrapper(mainComponent: React.ReactElement, config: IConfigRawJSONDataType, localeContext: ILocaleContextType): JSX.Element;

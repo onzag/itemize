@@ -449,7 +449,6 @@ export async function ssrGenerator(
             collector: appData.ssrConfig.collector,
             config: appData.config,
             ssrContext: ssr,
-            currencyFactors: ssr.currencyFactors,
             clientDetails: {
               lang: getCookie(splittedCookies, "lang"),
               currency: getCookie(splittedCookies, "currency"),

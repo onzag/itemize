@@ -11,7 +11,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const app_1 = require("../../internal/app");
+const locale_provider_1 = require("../../internal/providers/locale-provider");
+const appdata_provider_1 = require("../../internal/providers/appdata-provider");
 const util_1 = require("../../../util");
 // We use this in order to log the messages of the errors we are attempting to display
 // this is good because internal error messages can be different from localized error messages
@@ -161,7 +162,7 @@ function I18nReadError(props) {
     if (props.error === null) {
         return null;
     }
-    return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeData) => {
+    return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeData) => {
         // this is where we display the error
         const freeError = props.error;
         if (isDevelopment && freeError.message) {
@@ -172,7 +173,7 @@ function I18nReadError(props) {
         if (!freeError.modulePath) {
             return (react_1.default.createElement(I18nReadErrorInternalOptimized, Object.assign({}, props, { root: null, localeContext: localeData })));
         }
-        return (react_1.default.createElement(app_1.DataContext.Consumer, null, (data) => (react_1.default.createElement(I18nReadErrorInternalOptimized, Object.assign({}, props, { root: data.value, localeContext: localeData })))));
+        return (react_1.default.createElement(appdata_provider_1.DataContext.Consumer, null, (data) => (react_1.default.createElement(I18nReadErrorInternalOptimized, Object.assign({}, props, { root: data.value, localeContext: localeData })))));
     }));
 }
 exports.default = I18nReadError;

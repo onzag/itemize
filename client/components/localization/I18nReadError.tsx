@@ -8,7 +8,8 @@
 
 import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
-import { LocaleContext, DataContext, IDataContextType, ILocaleContextType } from "../../internal/app";
+import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
+import { DataContext } from "../../internal/providers/appdata-provider";
 import { capitalize } from "../../../util";
 import Module from "../../../base/Root/Module";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";

@@ -10,7 +10,7 @@ import PropertyEntryReference from "./PropertyEntryReference";
 import PropertyEntrySelect from "./PropertyEntrySelect";
 import PropertyEntryField from "./PropertyEntryField";
 import PropertyEntryFile from "./PropertyEntryFile";
-import { LocaleContext } from "../../app";
+import { LocaleContext } from "../../providers/locale-provider";
 import { Ii18NType } from "../../../../base/Root";
 import {
   PropertyDefinitionSupportedTypeName, PropertyDefinitionSupportedType,

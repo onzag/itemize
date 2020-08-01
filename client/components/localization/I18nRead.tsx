@@ -6,7 +6,7 @@
  */
 
 import React from "react";
-import { LocaleContext, ILocaleContextType } from "../../internal/app";
+import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
 import { ItemDefinitionContext } from "../../providers/item-definition";
 import { localeReplacerToArray, localeReplacer } from "../../../util";
 import { IncludeContext } from "../../providers/include";

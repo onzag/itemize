@@ -1,6 +1,6 @@
 import React from "react";
 import Module from "../../base/Root/Module";
-import { DataContext } from "../internal/app";
+import { DataContext } from "../internal/providers/appdata-provider";
 import Root from "../../base/Root";
 import { RemoteListener } from "../internal/app/remote-listener";
 

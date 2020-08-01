@@ -6,7 +6,7 @@
 
 import React from "react";
 import { ICountryType, countries, arrCountries } from "../../../imported-resources";
-import { LocaleContext } from "../../internal/app";
+import { LocaleContext } from "../../internal/providers/locale-provider";
 
 /**
  * The function for the retriever

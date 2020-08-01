@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains the base app structure that holds the main component which
+ * is the custom application file
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -16,52 +21,42 @@ const gql_client_util_1 = require("../gql-client-util");
 const cache_1 = __importDefault(require("../workers/cache"));
 const comlink_1 = require("comlink");
 const deep_equal_1 = __importDefault(require("deep-equal"));
-// Just a message for whether is development
+const locale_provider_1 = require("../providers/locale-provider");
+const appdata_provider_1 = require("../providers/appdata-provider");
+/**
+ * Just a variable for whether is development
+ * @ignore
+ */
 const isDevelopment = process.env.NODE_ENV === "development";
 if (isDevelopment) {
     console.info("Starting Development Mode, Have Fun :)");
 }
-// we create the contexts that are useful for accessing these, default
-// values for both is null
-exports.LocaleContext = react_1.default.createContext(null);
-exports.DataContext = react_1.default.createContext(null);
-class DataContextProvider extends react_1.default.Component {
-    shouldComponentUpdate(nextProps) {
-        return nextProps.children !== this.props.children ||
-            nextProps.value.updateIsBlocked !== this.props.value.updateIsBlocked;
-        // root and remote listener are never really going to change, language
-        // changes should trigger by the locale context and not by this
-    }
-    render() {
-        return (react_1.default.createElement(exports.DataContext.Provider, { value: this.props.value }, this.props.children));
-    }
-}
-exports.DataContextProvider = DataContextProvider;
-class LocaleContextProvider extends react_1.default.Component {
-    shouldComponentUpdate(nextProps) {
-        return nextProps.children !== this.props.children ||
-            nextProps.value.country !== this.props.value.country ||
-            nextProps.value.currency !== this.props.value.currency ||
-            nextProps.value.currencyFactors !== this.props.value.currencyFactors ||
-            nextProps.value.rtl !== this.props.value.rtl ||
-            nextProps.value.updating !== this.props.value.updating ||
-            !deep_equal_1.default(nextProps.value.i18n, this.props.value.i18n);
-    }
-    render() {
-        return (react_1.default.createElement(exports.LocaleContext.Provider, { value: this.props.value }, this.props.children));
-    }
-}
-exports.LocaleContextProvider = LocaleContextProvider;
-// now we export the App
+/**
+ * This is the itemize app, and it contains all the application
+ * logic inside, it sits inside the appWrapper, if specified, as well
+ * as some general providers, that are set by the initialize function
+ * such as the router
+ */
 class App extends react_1.default.Component {
+    /**
+     * The itemize app constructor
+     * @param props props for the app
+     */
     constructor(props) {
         super(props);
+        /**
+         * This is the token state that is actually given by the token provider that sits inside
+         * the application itself, the reason why this app itself needs it, it's because the remote listener
+         * as well as the update functions need token provider
+         */
         this.tokenState = null;
+        /**
+         * the remote listener object that listens for the remote changes
+         * and does the registration of itemize items that are loaded in order for listen to changes
+         * as well as buildnumbers, currency factors changed info, etc...
+         */
         this.remoteListener = null;
-        this.setBlockedCallbackState = this.setBlockedCallbackState.bind(this);
-        if (cache_1.default.isSupported) {
-            cache_1.default.instance.setBlockedCallback(comlink_1.proxy(this.setBlockedCallbackState));
-        }
+        // so our initial state depends on these initial resources
         this.state = {
             specifiedCountry: props.initialCountry,
             specifiedCurrency: props.initialCurrency,
@@ -70,6 +65,14 @@ class App extends react_1.default.Component {
             localeIsUpdatingFrom: null,
             updateIsBlocked: false,
         };
+        // the set blocked callback state function triggered by the cache worker
+        // when it's blocked and can't release indexeddb, we need to pass it
+        this.setBlockedCallbackState = this.setBlockedCallbackState.bind(this);
+        // but it's a worker so we need to check if it's supported
+        if (cache_1.default.isSupported) {
+            // since we are using comlink we use this method
+            cache_1.default.instance.setBlockedCallback(comlink_1.proxy(this.setBlockedCallbackState));
+        }
         // the helper functions that change the state of the whole app
         // to change language, country and currency
         this.changeLanguageTo = this.changeLanguageTo.bind(this);
@@ -86,10 +89,22 @@ class App extends react_1.default.Component {
             this.remoteListener.setCurrencyFactorsHandler(this.updateCurrencyFactorsIfNecessary);
         }
     }
+    /**
+     * function that updates the currency factors if it finds it necessary, now according to the remote
+     * listener specification, the currency factors are rechecked after a disconnect event, so we might not
+     * be sure if such upate is necessary, and since it has rendering consequences we only update if necessary
+     * also when the event triggers for a currency factors change in the remote listener, it might not be a
+     * true change as maybe the prices hasn't changed, unlikely but possible
+     *
+     * Currency factors is also service worked so it should work offline
+     */
     async updateCurrencyFactorsIfNecessary() {
+        // so we try
         try {
+            // get the new factors
             const newFactors = await fetch(`/rest/currency-factors`).then((r) => r.json());
             const currentFactors = this.state.specifiedCurrencyFactors;
+            // and if they don't equal to the current we set the state
             if (!deep_equal_1.default(currentFactors, newFactors)) {
                 this.setState({
                     specifiedCurrencyFactors: newFactors,
@@ -100,6 +115,12 @@ class App extends react_1.default.Component {
             return;
         }
     }
+    /**
+     * Sets the state for the blocked callback, this function is proxied using comlink
+     * to the worker that actually calls this function and specifies if the state
+     * of the app is blocked from update as it can't access indexeddb
+     * @param state the state that it should set to
+     */
     setBlockedCallbackState(state) {
         if (this.state.updateIsBlocked !== state) {
             this.setState({
@@ -107,17 +128,43 @@ class App extends react_1.default.Component {
             });
         }
     }
+    /**
+     * This function is triggered by the TokenProvider as a callback and triggers once
+     * it has a state ready, the state is its own internal state, but since access of the token
+     * provider state is needed here, it's streamed here once it's ready, as well as on any change
+     * @param state the new state
+     * @param logout the logout function
+     */
     setTokenState(state, logout) {
+        // we save this state
         this.tokenState = state;
+        // and set these handlers for the remote listener
         this.remoteListener.setLogoutHandler(logout);
+        // once the remote listener has a token it can start functioning properly
+        // the token might be null, if not logged in; while the token and all is already
+        // the same as the cookie, it might have been expired by the session id or other factors
+        // so only a token validated by the provider makes it here
         this.remoteListener.setToken(state.token);
     }
+    /**
+     * updates an user property from the property list of user properties
+     * and it performs a graphql request to do such
+     *
+     * in practique this is used to update app_language, app_currency and app_country
+     *
+     * @param propertyId the property id we are updating
+     * @param value the value
+     */
     async updateUserProperty(propertyId, value) {
         // we check that there's an user logged in
         if (this.tokenState && this.tokenState.id) {
+            // simple log message
             console.log("updating user property", propertyId, value);
+            // now we need the user definition
             const userItemDefinition = this.props.root
                 .getModuleFor(["users"]).getItemDefinitionFor(["user"]);
+            // so we can run an edit query, this will update
+            // the cache too
             const result = await gql_client_util_1.runEditQueryFor({
                 args: {
                     [propertyId]: value,
@@ -131,17 +178,24 @@ class App extends react_1.default.Component {
                 token: this.tokenState.token,
                 id: this.tokenState.id,
                 version: null,
+                // we use the listener uuid to prevent changes
                 listenerUUID: this.remoteListener.getUUID(),
                 language: "en",
                 cacheStore: true,
             });
             // Ignore errors, we just go for success
             if (result && result.value && result.value.DATA) {
+                // we check the value the server gave us
                 const actualPropertyResult = result.value.DATA[propertyId];
+                // and if we have an applied value to it, as it, it has been somehow loaded
                 if (userItemDefinition.hasAppliedValueTo(this.tokenState.id, null)) {
-                    console.log("found an instance, triggering update");
+                    console.log("found a possible instance, triggering update");
+                    // we get this property, apply the value and trigger the change
                     const property = userItemDefinition.getPropertyDefinitionFor(propertyId, false);
+                    // we apply such value
                     property.applyValue(this.tokenState.id, null, actualPropertyResult, true, false);
+                    // and we inform of changes so that item definitions
+                    // can listen to changes for it
                     userItemDefinition.triggerListeners("change", this.tokenState.id, null);
                 }
             }
@@ -154,19 +208,30 @@ class App extends react_1.default.Component {
     hasLocaleDataFor(locale) {
         return !!this.props.langLocales[locale];
     }
+    /**
+     * Performs the final steps to set the locale data for a given application
+     * after all the respective locale infomation required has been loaded, this
+     * includes changing the url
+     * @param locale the locale we are updating for
+     * @param avoidUpdatingUser whether to avoid updating the user server information
+     */
     finallySetLocaleDataFor(locale, avoidUpdatingUser) {
+        // the pathname splitted for the current location
         const pathNameSplitted = window.location.pathname.split("/");
         // Now we patch moment
         moment_1.default.locale(locale);
         // And we set the language
         document.cookie = "lang=" + locale + ";path=/";
+        // now we set the html lang in locale
         document.body.parentElement.lang = locale;
+        // we also update the manifest
         document.head.querySelector("[rel='manifest']").href =
             "/rest/resource/manifest." + locale + ".json";
         // We set it to the url
         pathNameSplitted[1] = locale;
         const newPathName = pathNameSplitted.join("/");
         __2.history.push(newPathName + window.location.search);
+        // and now if we don't avoid updating the user
         if (!avoidUpdatingUser) {
             this.updateUserProperty("app_language", locale);
         }
@@ -174,6 +239,7 @@ class App extends react_1.default.Component {
     /**
      * Changes the language for the one specified by that locale
      * @param locale the two letter or language-region code for the locale
+     * @param avoidUpdatingUser whether to avoid updating the user
      */
     async changeLanguageTo(locale, avoidUpdatingUser) {
         console.log("changing language to", locale);
@@ -243,20 +309,34 @@ class App extends react_1.default.Component {
      * changing the country will trigger an automatic change
      * of currency and language
      * @param code the two letter uppercase code for the country
+     * @param avoidChangingLanguageAndCurrency avoids changing the language and the currency
+     * @param avoidUpdatingUser avoids updating the user
      */
-    changeCountryTo(code, avoidChangingLanguageAndCurrency, avoidUpdatingUser) {
+    async changeCountryTo(code, avoidChangingLanguageAndCurrency, avoidUpdatingUser) {
         console.log("changing country to", code);
         // Codes should be uppercase, but well, let's get wiggle room for error
         let codeToSet = code.toUpperCase();
         // We check that it's a valid country in our list of countries
         const countryData = imported_resources_1.countries[codeToSet];
-        // This shouldn't really happen, but otherwise we default to Finland
-        // because why not
+        // This shouldn't really happen, but otherwise we default to the fallback
         if (!countryData) {
             codeToSet = this.props.config.fallbackCountryCode;
             console.warn("Attempted to set country to unavailable " + code + ", defaulted to " + codeToSet);
         }
+        // Now we set the country in local storage
+        document.cookie = "country=" + codeToSet + ";path=/";
+        if (!avoidUpdatingUser) {
+            this.updateUserProperty("app_country", codeToSet);
+        }
+        // and update the state
+        this.setState({
+            specifiedCountry: codeToSet,
+        });
         if (!avoidChangingLanguageAndCurrency) {
+            // Now we also change the currency, we default to euros in
+            // case there's no currency defined
+            const currencyUsedThere = countryData.currency || "EUR";
+            this.changeCurrencyTo(currencyUsedThere, avoidUpdatingUser);
             // So now we need to get what is relevant, the languages, we check
             // what languages are spokes in the region, now because we have some places
             // where no official language exist (aka now just Antartica), we check for
@@ -276,30 +356,18 @@ class App extends react_1.default.Component {
             // as you can notice, this language might not be available,
             // in that case the app will default to the default language
             if (this.hasLocaleDataFor(languageSpokenThereRegionalized)) {
-                this.changeLanguageTo(languageSpokenThereRegionalized, avoidUpdatingUser);
+                await this.changeLanguageTo(languageSpokenThereRegionalized, avoidUpdatingUser);
             }
             else {
-                this.changeLanguageTo(languageSpokenThereNonRegionalized, avoidUpdatingUser);
+                await this.changeLanguageTo(languageSpokenThereNonRegionalized, avoidUpdatingUser);
             }
-            // Now we also change the currency, we default to euros in
-            // case there's no currency defined
-            const currencyUsedThere = countryData.currency || "EUR";
-            this.changeCurrencyTo(currencyUsedThere, avoidUpdatingUser);
         }
-        // Now we set the country in local storage
-        document.cookie = "country=" + codeToSet + ";path=/";
-        if (!avoidUpdatingUser) {
-            this.updateUserProperty("app_country", codeToSet);
-        }
-        // and update the state
-        this.setState({
-            specifiedCountry: codeToSet,
-        });
     }
     /**
      * Changes the currency to a given currency code
      * given its 3 letter uppercase code
      * @param code the three letter uppercase code of the currency
+     * @param avoidUpdatingUser whether to avoid updating the user
      */
     changeCurrencyTo(code, avoidUpdatingUser) {
         console.log("changing currency to", code);
@@ -324,7 +392,8 @@ class App extends react_1.default.Component {
     }
     /**
      * Renders the application with the locale context data
-     * @param param0 the url match from the router, contains the url language
+     * @param routerProps the url match from the router, contains the url language
+     * @returns the application in the right locale context
      */
     renderAppWithLocaleContext(routerProps) {
         // typescript being really annoying
@@ -357,12 +426,15 @@ class App extends react_1.default.Component {
         // version nevertheless,
         // note how we include the devtools if we are in development mode
         // such a code is stripped if it's production
-        return (react_1.default.createElement(LocaleContextProvider, { value: localeContextValue },
+        return (react_1.default.createElement(locale_provider_1.LocaleProvider, { value: localeContextValue },
             react_1.default.createElement(token_provider_1.TokenProvider, { localeContext: localeContextValue, onProviderStateSet: this.setTokenState },
                 react_1.default.createElement("div", { id: "main", dir: rtl ? "rtl" : "ltr" }, this.props.mainWrapper ?
-                    this.props.mainWrapper(this.props.mainComponent, localeContextValue) :
+                    this.props.mainWrapper(this.props.mainComponent, this.props.config, localeContextValue) :
                     this.props.mainComponent))));
     }
+    /**
+     * The render function
+     */
     render() {
         // The data contet passes the raw root and the value
         // that contains the instance that can store values
@@ -374,7 +446,7 @@ class App extends react_1.default.Component {
         // Now we return that with the JSS provider, material ui theme provider,
         // our data context, and then pass the react router route, note that the
         // router itself is the parent
-        return (react_1.default.createElement(DataContextProvider, { value: dataContextValue },
+        return (react_1.default.createElement(appdata_provider_1.DataProvider, { value: dataContextValue },
             react_1.default.createElement(react_router_dom_1.Route, { path: "/:lang/", component: this.renderAppWithLocaleContext })));
     }
 }

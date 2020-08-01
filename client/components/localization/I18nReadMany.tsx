@@ -8,7 +8,8 @@
 import React from "react";
 import I18nReadError, { II18nReadErrorProps, I18nReadErrorInternalOptimized } from "./I18nReadError";
 import I18nRead, { II18nReadProps, I18nReadInternalOptimized } from "./I18nRead";
-import { DataContext, ILocaleContextType, IDataContextType, LocaleContext } from "../../internal/app";
+import { ILocaleContextType, LocaleContext } from "../../internal/providers/locale-provider";
+import { DataContext, IDataContextType } from "../../internal/providers/appdata-provider";
 import { IModuleContextType, ModuleContext } from "../../providers/module";
 import { IItemDefinitionContextType, ItemDefinitionContext } from "../../providers/item-definition";
 import { IIncludeContext, IncludeContext } from "../../providers/include";

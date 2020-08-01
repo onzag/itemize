@@ -19,7 +19,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const I18nReadError_1 = __importStar(require("./I18nReadError"));
 const I18nRead_1 = __importStar(require("./I18nRead"));
-const app_1 = require("../../internal/app");
+const locale_provider_1 = require("../../internal/providers/locale-provider");
+const appdata_provider_1 = require("../../internal/providers/appdata-provider");
 const module_1 = require("../../providers/module");
 const item_definition_1 = require("../../providers/item-definition");
 const include_1 = require("../../providers/include");
@@ -79,19 +80,19 @@ function I18nReadMany(props) {
     const isOnlyErrors = props.data.every((e) => e.error);
     // if it's only errors we don't need the item definition, include, module context
     if (isOnlyErrors) {
-        return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(app_1.DataContext.Consumer, null, (dataContext) => {
+        return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(appdata_provider_1.DataContext.Consumer, null, (dataContext) => {
             return i18nReadManyInternal(localeContext, dataContext, null, null, null, props);
         }))));
     }
     else if (!hasError) {
         // if it doesn't have an error we don't need the data context
-        return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (moduleContextualValue) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContext) => {
+        return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (moduleContextualValue) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContext) => {
             return i18nReadManyInternal(localeContext, null, moduleContextualValue, itemDefinitionContextualValue, includeContext, props);
         }))))))));
     }
     else {
         // otherwise we need everything
-        return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(app_1.DataContext.Consumer, null, (dataContext) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (moduleContextualValue) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContext) => {
+        return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(appdata_provider_1.DataContext.Consumer, null, (dataContext) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (moduleContextualValue) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContext) => {
             return i18nReadManyInternal(localeContext, dataContext, moduleContextualValue, itemDefinitionContextualValue, includeContext, props);
         }))))))))));
     }

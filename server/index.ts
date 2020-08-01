@@ -40,7 +40,7 @@ import { GlobalManager } from "./global-manager";
 import { ISSRRuleSet } from "./ssr";
 import { ssrGenerator } from "./ssr/generator";
 import { IRendererContext } from "../client/providers/renderer";
-import { ILocaleContextType } from "../client/internal/app";
+import { ILocaleContextType } from "../client/internal/providers/locale-provider";
 import { ICollectorType } from "../client";
 import { Pool } from "tarn";
 import { retrieveRootPool } from "./rootpool";
@@ -119,7 +119,7 @@ export interface ISSRConfig {
   rendererContext: IRendererContext,
   mainComponent: React.ReactElement,
   appWrapper?: (app: React.ReactElement, config: IConfigRawJSONDataType) => React.ReactElement;
-  mainWrapper?: (mainComponet: React.ReactElement, localeContext: ILocaleContextType) => React.ReactElement;
+  mainWrapper?: (mainComponet: React.ReactElement, config: IConfigRawJSONDataType, localeContext: ILocaleContextType) => React.ReactElement;
   collector?: ICollectorType;
 }
 

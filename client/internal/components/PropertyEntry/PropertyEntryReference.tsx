@@ -209,7 +209,7 @@ export default class PropertyEntryReference
       limit: 6,
       language: this.props.language,
       versionFilter: filterByLanguage ? this.props.language : null,
-    }, null, null);
+    }, null);
     // these nulls which represent the listener are only truly used for the
     // cached searches, we don't use that here
 

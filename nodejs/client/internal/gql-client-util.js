@@ -472,7 +472,7 @@ function convertOrderByRule(orderBy) {
     });
     return result;
 }
-async function runSearchQueryFor(arg, remoteListener, remoteListenerCallback) {
+async function runSearchQueryFor(arg, searchCacheOptions) {
     const qualifiedName = (arg.itemDefinition.isExtensionsInstance() ?
         arg.itemDefinition.getParentModule().getQualifiedPathName() :
         arg.itemDefinition.getQualifiedPathName());
@@ -521,21 +521,21 @@ async function runSearchQueryFor(arg, remoteListener, remoteListenerCallback) {
         gqlValue = cacheWorkerGivenSearchValue.gqlValue;
         if (gqlValue && gqlValue.data) {
             if (arg.cachePolicy === "by-owner") {
-                remoteListener.addOwnedSearchListenerFor(standardCounterpartQualifiedName, arg.createdBy, cacheWorkerGivenSearchValue.lastRecordDate, remoteListenerCallback);
+                searchCacheOptions.remoteListener.addOwnedSearchListenerFor(standardCounterpartQualifiedName, arg.createdBy, cacheWorkerGivenSearchValue.lastRecordDate, searchCacheOptions.onSearchUpdated);
             }
             else {
-                remoteListener.addParentedSearchListenerFor(standardCounterpartQualifiedName, arg.parentedBy.itemDefinition.getQualifiedPathName(), arg.parentedBy.id, arg.parentedBy.version || null, cacheWorkerGivenSearchValue.lastRecordDate, remoteListenerCallback);
+                searchCacheOptions.remoteListener.addParentedSearchListenerFor(standardCounterpartQualifiedName, arg.parentedBy.itemDefinition.getQualifiedPathName(), arg.parentedBy.id, arg.parentedBy.version || null, cacheWorkerGivenSearchValue.lastRecordDate, searchCacheOptions.onSearchUpdated);
             }
-            if (cacheWorkerGivenSearchValue.dataMightBeStale) {
+            if (cacheWorkerGivenSearchValue.dataMightBeStale && !searchCacheOptions.preventStaleFeeback) {
                 if (arg.cachePolicy === "by-owner") {
-                    remoteListener.requestOwnedSearchFeedbackFor({
+                    searchCacheOptions.remoteListener.requestOwnedSearchFeedbackFor({
                         qualifiedPathName: standardCounterpartQualifiedName,
                         createdBy: arg.createdBy,
                         knownLastRecordDate: cacheWorkerGivenSearchValue.lastRecordDate,
                     });
                 }
                 else {
-                    remoteListener.requestParentedSearchFeedbackFor({
+                    searchCacheOptions.remoteListener.requestParentedSearchFeedbackFor({
                         qualifiedPathName: standardCounterpartQualifiedName,
                         parentType: arg.parentedBy.itemDefinition.getQualifiedPathName(),
                         parentId: arg.parentedBy.id,

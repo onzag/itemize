@@ -365,7 +365,6 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
                     collector: appData.ssrConfig.collector,
                     config: appData.config,
                     ssrContext: ssr,
-                    currencyFactors: ssr.currencyFactors,
                     clientDetails: {
                         lang: mode_1.getCookie(splittedCookies, "lang"),
                         currency: mode_1.getCookie(splittedCookies, "currency"),

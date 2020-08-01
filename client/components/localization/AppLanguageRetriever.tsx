@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { LocaleContext } from "../../internal/app";
+import { LocaleContext } from "../../internal/providers/locale-provider";
 
 /**
  * How the language is formed

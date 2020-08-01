@@ -9,7 +9,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const app_1 = require("../../internal/app");
+const locale_provider_1 = require("../../internal/providers/locale-provider");
 /**
  * Allows to read the current language as well as to change it from
  * the list of available languages that it can change, it also provides
@@ -18,7 +18,7 @@ const app_1 = require("../../internal/app");
  * @returns a react node
  */
 function AppLanguageRetriever(props) {
-    return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeContext) => {
+    return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeContext) => {
         const currentLanguage = {
             code: localeContext.language,
             name: localeContext.langLocales[localeContext.language].name,

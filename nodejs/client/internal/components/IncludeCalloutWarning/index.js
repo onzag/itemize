@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const Include_1 = require("../../../../base/Root/Module/ItemDefinition/Include");
-const app_1 = require("../../app");
+const locale_provider_1 = require("../../providers/locale-provider");
 const renderer_1 = require("../../../providers/renderer");
 const deep_equal_1 = __importDefault(require("deep-equal"));
 class ActualIncludeCalloutWarning extends react_1.default.Component {
@@ -34,8 +34,8 @@ class ActualIncludeCalloutWarning extends react_1.default.Component {
 function IncludeCalloutWarning(props) {
     // Build the context and render sending the right props
     if (props.renderer) {
-        return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (locale) => react_1.default.createElement(ActualIncludeCalloutWarning, Object.assign({}, props, { locale: locale, renderer: props.renderer, rendererArgs: props.rendererArgs || {} }))));
+        return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (locale) => react_1.default.createElement(ActualIncludeCalloutWarning, Object.assign({}, props, { locale: locale, renderer: props.renderer, rendererArgs: props.rendererArgs || {} }))));
     }
-    return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(app_1.LocaleContext.Consumer, null, (locale) => react_1.default.createElement(ActualIncludeCalloutWarning, Object.assign({}, props, { locale: locale, renderer: renderers.IncludeCalloutWarning, rendererArgs: props.rendererArgs || {} })))));
+    return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (locale) => react_1.default.createElement(ActualIncludeCalloutWarning, Object.assign({}, props, { locale: locale, renderer: renderers.IncludeCalloutWarning, rendererArgs: props.rendererArgs || {} })))));
 }
 exports.default = IncludeCalloutWarning;

@@ -120,7 +120,11 @@ export declare function runSearchQueryFor(arg: {
     token: string;
     language: string;
     versionFilter?: string;
-}, remoteListener: RemoteListener, remoteListenerCallback: () => void): Promise<{
+}, searchCacheOptions: {
+    remoteListener: RemoteListener;
+    onSearchUpdated: () => void;
+    preventStaleFeeback: boolean;
+}): Promise<{
     error: EndpointErrorType;
     results?: IGQLValue[];
     records: IGQLSearchRecord[];

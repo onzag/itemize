@@ -1,6 +1,6 @@
 import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
-import { ILocaleContextType } from "../app";
+import { ILocaleContextType } from "./locale-provider";
 export interface IActualTokenProviderState {
     token: string;
     id: number;

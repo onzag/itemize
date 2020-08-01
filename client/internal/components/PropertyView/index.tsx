@@ -2,7 +2,7 @@ import PropertyDefinition, {
   IPropertyDefinitionState,
 } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import React from "react";
-import { LocaleContext } from "../../app";
+import { LocaleContext } from "../../providers/locale-provider";
 import { Ii18NType } from "../../../../base/Root";
 import {
   PropertyDefinitionSupportedTypeName, PropertyDefinitionSupportedType,

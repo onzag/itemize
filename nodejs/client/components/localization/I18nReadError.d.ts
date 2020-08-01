@@ -7,7 +7,7 @@
  */
 import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
-import { ILocaleContextType } from "../../internal/app";
+import { ILocaleContextType } from "../../internal/providers/locale-provider";
 import Root from "../../../base/Root";
 /**
  * the error props that the error displayer needs to take

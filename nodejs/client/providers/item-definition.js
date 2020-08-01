@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const app_1 = require("../internal/app");
+const locale_provider_1 = require("../internal/providers/locale-provider");
 const ItemDefinition_1 = require("../../base/Root/Module/ItemDefinition");
 const token_provider_1 = require("../internal/providers/token-provider");
 const constants_1 = require("../../constants");
@@ -56,8 +56,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         // this variable is useful is async tasks like loadValue are still executing after
         // this component has unmounted, which is a memory leak
         this.isUnmounted = false;
-        // this is for when the search has been executed initially in order to do SSR
-        this.hasExecutedInitialSearch = false;
+        this.preventSearchFeedbackOnPossibleStaleData = false;
         this.lastLoadingForId = null;
         this.lastLoadingForVersion = null;
         this.lastLoadValuePromise = null;
@@ -1334,6 +1333,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
     }
     async search(options) {
+        // we extract the hack variable
+        const preventSearchFeedbackOnPossibleStaleData = this.preventSearchFeedbackOnPossibleStaleData;
+        this.preventSearchFeedbackOnPossibleStaleData = false;
         if (this.state.searching) {
             return null;
         }
@@ -1486,7 +1488,11 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             limit: options.limit,
             offset: options.offset,
             parentedBy,
-        }, this.props.remoteListener, this.onSearchReload);
+        }, {
+            remoteListener: this.props.remoteListener,
+            preventStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
+            onSearchUpdated: this.onSearchReload,
+        });
         const searchId = uuid_1.default.v4();
         if (error) {
             const searchState = {
@@ -1625,6 +1631,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         });
     }
     onSearchReload() {
+        this.preventSearchFeedbackOnPossibleStaleData = true;
         this.search(this.lastOptionsUsedForSearch);
     }
     removePossibleSearchListeners(props = this.props, state = this.state) {
@@ -1760,7 +1767,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
 }
 exports.ActualItemDefinitionProvider = ActualItemDefinitionProvider;
 function ItemDefinitionProvider(props) {
-    return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeData) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (data) => (react_1.default.createElement(exports.SearchItemDefinitionValueContext.Consumer, null, (searchContext) => {
+    return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeData) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (data) => (react_1.default.createElement(exports.SearchItemDefinitionValueContext.Consumer, null, (searchContext) => {
         if (!data) {
             throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
         }

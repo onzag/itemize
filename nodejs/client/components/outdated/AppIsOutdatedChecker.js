@@ -16,7 +16,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const app_1 = require("../../internal/app");
+const appdata_provider_1 = require("../../internal/providers/appdata-provider");
 /**
  * The actual class that really performs the logic
  * for outdated checking
@@ -61,6 +61,6 @@ class ActualAppIsOutdatedChecker extends react_1.default.Component {
  * @returns a react component
  */
 function AppIsOutdatedChecker(props) {
-    return (react_1.default.createElement(app_1.DataContext.Consumer, null, (data) => (react_1.default.createElement(ActualAppIsOutdatedChecker, Object.assign({}, props, { remoteListener: data.remoteListener })))));
+    return (react_1.default.createElement(appdata_provider_1.DataContext.Consumer, null, (data) => (react_1.default.createElement(ActualAppIsOutdatedChecker, Object.assign({}, props, { remoteListener: data.remoteListener })))));
 }
 exports.default = AppIsOutdatedChecker;

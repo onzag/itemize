@@ -7,7 +7,7 @@
 
 import React, {useEffect} from "react";
 import { ThemeProvider as MuiThemeProvider, MuiPickersUtilsProvider, createMuiTheme, CssBaseline } from "./mui-core";
-import { ILocaleContextType } from "../internal/app";
+import { ILocaleContextType } from "../internal/providers/locale-provider";
 import Moment from "moment";
 import MomentUtils from "@date-io/moment";
 import { IConfigRawJSONDataType } from "../../config";
@@ -68,9 +68,14 @@ export function appWrapper(app: React.ReactElement, config: IConfigRawJSONDataTy
  * need to change according to locale
  * 
  * @param mainComponent the main component that is under the app
+ * @param config the config of the app
  * @param localeContext the locale that we are using
  */
-export function mainWrapper(mainComponent: React.ReactElement, localeContext: ILocaleContextType) {
+export function mainWrapper(
+  mainComponent: React.ReactElement,
+  config: IConfigRawJSONDataType,
+  localeContext: ILocaleContextType,
+) {
   const languageDeregionalized = localeContext.language.includes("-") ?
     localeContext.language.split("-")[0] : localeContext.language;
   return (

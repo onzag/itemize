@@ -9,7 +9,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const app_1 = require("../../internal/app");
+const appdata_provider_1 = require("../../internal/providers/appdata-provider");
 /**
  * This is the actual class that specify if it's blocked
  */
@@ -33,6 +33,6 @@ class ActualAppIsBlockedFromUpdate extends react_1.default.PureComponent {
  * @returns a react component
  */
 function AppIsBlockedFromUpdate(props) {
-    return (react_1.default.createElement(app_1.DataContext.Consumer, null, (data) => (react_1.default.createElement(ActualAppIsBlockedFromUpdate, Object.assign({}, props, { isBlocked: data.updateIsBlocked })))));
+    return (react_1.default.createElement(appdata_provider_1.DataContext.Consumer, null, (data) => (react_1.default.createElement(ActualAppIsBlockedFromUpdate, Object.assign({}, props, { isBlocked: data.updateIsBlocked })))));
 }
 exports.AppIsBlockedFromUpdate = AppIsBlockedFromUpdate;

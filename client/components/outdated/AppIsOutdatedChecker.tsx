@@ -12,7 +12,7 @@
  */
 
 import React from "react";
-import { DataContext } from "../../internal/app";
+import { DataContext } from "../../internal/providers/appdata-provider";
 import { RemoteListener } from "../../internal/app/remote-listener";
 
 /**

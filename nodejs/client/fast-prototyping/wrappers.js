@@ -68,9 +68,10 @@ exports.appWrapper = appWrapper;
  * need to change according to locale
  *
  * @param mainComponent the main component that is under the app
+ * @param config the config of the app
  * @param localeContext the locale that we are using
  */
-function mainWrapper(mainComponent, localeContext) {
+function mainWrapper(mainComponent, config, localeContext) {
     const languageDeregionalized = localeContext.language.includes("-") ?
         localeContext.language.split("-")[0] : localeContext.language;
     return (react_1.default.createElement(mui_core_1.MuiPickersUtilsProvider, { utils: moment_2.default, locale: languageDeregionalized, libInstance: moment_1.default }, mainComponent));

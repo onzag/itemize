@@ -762,8 +762,11 @@ export async function runSearchQueryFor(
     language: string,
     versionFilter?: string,
   },
-  remoteListener: RemoteListener,
-  remoteListenerCallback: () => void,
+  searchCacheOptions: {
+    remoteListener: RemoteListener,
+    onSearchUpdated: () => void,
+    preventStaleFeeback: boolean,
+  },
 ): Promise<{
   error: EndpointErrorType,
   results?: IGQLValue[],
@@ -841,32 +844,32 @@ export async function runSearchQueryFor(
     gqlValue = cacheWorkerGivenSearchValue.gqlValue;
     if (gqlValue && gqlValue.data) {
       if (arg.cachePolicy === "by-owner") {
-        remoteListener.addOwnedSearchListenerFor(
+        searchCacheOptions.remoteListener.addOwnedSearchListenerFor(
           standardCounterpartQualifiedName,
           arg.createdBy,
           cacheWorkerGivenSearchValue.lastRecordDate,
-          remoteListenerCallback,
+          searchCacheOptions.onSearchUpdated,
         );
       } else {
-        remoteListener.addParentedSearchListenerFor(
+        searchCacheOptions.remoteListener.addParentedSearchListenerFor(
           standardCounterpartQualifiedName,
           arg.parentedBy.itemDefinition.getQualifiedPathName(),
           arg.parentedBy.id,
           arg.parentedBy.version || null,
           cacheWorkerGivenSearchValue.lastRecordDate,
-          remoteListenerCallback,
+          searchCacheOptions.onSearchUpdated,
         );
       }
 
-      if (cacheWorkerGivenSearchValue.dataMightBeStale) {
+      if (cacheWorkerGivenSearchValue.dataMightBeStale && !searchCacheOptions.preventStaleFeeback) {
         if (arg.cachePolicy === "by-owner") {
-          remoteListener.requestOwnedSearchFeedbackFor({
+          searchCacheOptions.remoteListener.requestOwnedSearchFeedbackFor({
             qualifiedPathName: standardCounterpartQualifiedName,
             createdBy: arg.createdBy,
             knownLastRecordDate: cacheWorkerGivenSearchValue.lastRecordDate,
           });
         } else {
-          remoteListener.requestParentedSearchFeedbackFor({
+          searchCacheOptions.remoteListener.requestParentedSearchFeedbackFor({
             qualifiedPathName: standardCounterpartQualifiedName,
             parentType: arg.parentedBy.itemDefinition.getQualifiedPathName(),
             parentId: arg.parentedBy.id,

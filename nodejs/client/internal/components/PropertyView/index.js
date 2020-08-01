@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const app_1 = require("../../app");
+const locale_provider_1 = require("../../providers/locale-provider");
 const imported_resources_1 = require("../../../../imported-resources");
 const renderer_1 = require("../../../providers/renderer");
 const PropertyViewSimple_1 = require("./PropertyViewSimple");
@@ -86,7 +86,7 @@ const handlerRegistry = {
 };
 function RawBasePropertyView(props) {
     // Build the context and render sending the right props
-    return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(app_1.LocaleContext.Consumer, null, (locale) => {
+    return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (locale) => {
         const renderer = props.renderer || renderers.PropertyViewSimple;
         return (react_1.default.createElement(PropertyViewSimple_1.PropertyViewSimple, { itemDefinition: null, property: null, include: null, forId: null, forVersion: null, containerId: null, state: {
                 userSet: false,
@@ -123,7 +123,7 @@ function PropertyView(props) {
     // First get the handler by the type
     const Element = registryEntry.handler;
     // Build the context and render sending the right props
-    return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(app_1.LocaleContext.Consumer, null, (locale) => {
+    return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (locale) => {
         const renderer = props.renderer || renderers[registryEntry.renderer];
         const nProps = {
             ...props,

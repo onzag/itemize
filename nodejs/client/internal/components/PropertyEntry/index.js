@@ -12,7 +12,7 @@ const PropertyEntryReference_1 = __importDefault(require("./PropertyEntryReferen
 const PropertyEntrySelect_1 = __importDefault(require("./PropertyEntrySelect"));
 const PropertyEntryField_1 = __importDefault(require("./PropertyEntryField"));
 const PropertyEntryFile_1 = __importDefault(require("./PropertyEntryFile"));
-const app_1 = require("../../app");
+const locale_provider_1 = require("../../providers/locale-provider");
 const imported_resources_1 = require("../../../../imported-resources");
 const renderer_1 = require("../../../providers/renderer");
 const config_provider_1 = require("../../providers/config-provider");
@@ -146,7 +146,7 @@ function PropertyEntry(props) {
     }
     const Element = registryEntry.handler;
     // Build the context and render sending the right props
-    return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(app_1.LocaleContext.Consumer, null, (locale) => {
+    return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (locale) => {
         const renderer = props.renderer || renderers[registryEntry.renderer];
         const nProps = {
             ...props,

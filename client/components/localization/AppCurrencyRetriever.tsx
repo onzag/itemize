@@ -6,7 +6,7 @@
 
 import React from "react";
 import { ICurrencyType, currencies, arrCurrencies } from "../../../imported-resources";
-import { LocaleContext } from "../../internal/app";
+import { LocaleContext } from "../../internal/providers/locale-provider";
 
 /**
  * This is the function for the arg retriever

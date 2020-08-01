@@ -13,7 +13,7 @@ import { PREFIX_GET_LIST, PREFIX_GET } from "../../../constants";
 import CacheWorkerInstance from "../../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../../gql-util";
 import { buildGqlQuery, gqlQuery, IGQLSearchRecord, IGQLRequestFields, IGQLValue } from "../../../gql-querier";
-import { LocaleContext, ILocaleContextType } from "../../internal/app";
+import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
 import { TokenContext, ITokenContextType } from "../../internal/providers/token-provider";
 import { EndpointErrorType } from "../../../base/errors";
 import { RemoteListener } from "../../internal/app/remote-listener";

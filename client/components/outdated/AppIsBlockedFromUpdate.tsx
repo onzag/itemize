@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { DataContext } from "../../internal/app";
+import { DataContext } from "../../internal/providers/appdata-provider";
 
 /**
  * The props simply contain a children that passes

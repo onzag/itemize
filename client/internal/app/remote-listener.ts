@@ -1,3 +1,11 @@
+/**
+ * Provides the remote listener that uses the remote protocol in order
+ * to communicate with the server for changes as well as to register
+ * listeners
+ * 
+ * @packageDocumentation
+ */
+
 import io from "socket.io-client";
 import Root from "../../../base/Root";
 import uuid from "uuid";
@@ -38,41 +46,130 @@ import {
   CURRENCY_FACTORS_UPDATED_EVENT,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
+import { throws } from "assert";
 
+/**
+ * The remote listener class creates a websocket connection (as well as it falling back to polling)
+ * for usage with the application to listen for changes to item definitions, request feedback as well
+ * as to keep things up to date and reactive
+ */
 export class RemoteListener {
+  /**
+   * The socket io client
+   */
   private socket: SocketIOClient.Socket;
+  /**
+   * The root we are using
+   */
   private root: Root;
+
+  /**
+   * A registry of listeners of which are
+   * listening for changes
+   */
   private listeners: {
+    /**
+     * The qualified path name with id is the item definition qualified pathname plus the id and
+     * the version, we only need one listener at a time
+     */
     [qualifiedPathNameWithId: string]: {
+      /**
+       * The request this represents
+       */
       request: IRegisterRequest;
+      /**
+       * The item definition instances that are attached to this
+       * they are used to keep track of who is listening for changes
+       * so that once the list is empty the listener can be removed
+       * and unregistered
+       */
       parentInstances: any[];
     },
   };
+
+  /**
+   * Registry of listeners that are listening
+   * for changes to an owned search cache
+   */
   private ownedSearchListeners: {
+    /**
+     * Similar with the qualified path name of either a item definition
+     * or a module with the owner id attached to it as an identifier
+     */
     [qualifiedPathNameWithOwnerId: string]: {
+      /**
+       * The request that is used for this
+       */
       request: IOwnedSearchRegisterRequest;
+      /**
+       * The last known record date a record was created (this is the last
+       * created_at of the last record of an owned search)
+       */
       lastKnownRecordDate: string;
+      /**
+       * Similarly the callbacks that are called when the search updates
+       * unlike the instances part, these are direct callbacks that act
+       * as direct listeners
+       */
       callbacks: any[];
     },
   };
+
+  /**
+   * Registry of listeners that are listening for
+   * changes to a parent based search that updates
+   */
   private parentedSearchListeners: {
-    [qualifiedPathNameWithOwnerId: string]: {
+    /**
+     * Similar to the owned one but contains all the
+     * parenting information of what we are listening to
+     */
+    [qualifiedPathNameWithParenting: string]: {
+      /**
+       * The request this id refers to
+       */
       request: IParentedSearchRegisterRequest;
-      callbacks: any[];
+      /**
+       * last known record date for the given answer
+       */
       lastKnownRecordDate: string;
+      /**
+       * The callbacks as well
+       */
+      callbacks: any[];
     },
   };
+
+  /**
+   * Many instances might request feedback for the
+   * same thing at once, so we delay these feedbacks
+   * a little bit
+   */
   private delayedFeedbacks: IFeedbackRequest[] = [];
+  /**
+   * Listeners for connection change status, offline/online
+   */
   private connectionListeners: Array<() => void> = [];
+  /**
+   * Listeners for the app updated changes, when a buildnumber
+   * event is received
+   */
   private appUpdatedListeners: Array<() => void> = [];
+  /**
+   * The last recieved build number, starts by being the current
+   * buildnumber
+   */
   private lastRecievedBuildNumber: string;
+  /**
+   * An uuid to randomly identify this listener
+   */
   private uuid: string = uuid.v4();
-  private isReconnect: boolean = false;
   private offline: boolean = true;
   private hasSetToken: boolean = false;
   private token: string = null;
   private isReady: boolean = false;
   private logout: () => void;
+  private setupTime: number;
 
   private currencyFactorsHandler: () => void;
 
@@ -94,6 +191,8 @@ export class RemoteListener {
     this.connectionListeners = [];
     this.appUpdatedListeners = [];
     this.lastRecievedBuildNumber = (window as any).BUILD_NUMBER;
+
+    this.setupTime = (new Date()).getTime();
 
     this.socket = io(`${location.protocol}//${location.host}`);
     this.socket.on("connect", this.onConnect);
@@ -196,7 +295,9 @@ export class RemoteListener {
   ) {
     const qualifiedIdentifier = itemDefinitionQualifiedPathName + "." + forId + "." + (forVersion || "");
     if (this.listeners[qualifiedIdentifier]) {
-      this.listeners[qualifiedIdentifier].parentInstances.push(parentInstance);
+      if (!this.listeners[qualifiedIdentifier].parentInstances.includes(parentInstance)) {
+        this.listeners[qualifiedIdentifier].parentInstances.push(parentInstance);
+      }
       return;
     }
 
@@ -214,9 +315,7 @@ export class RemoteListener {
   }
   public async attachItemDefinitionListenerFor(request: IRegisterRequest) {
     if (this.socket.connected) {
-      if (!this.isReady) {
-        await this.onIdentificationDone();
-      }
+      await this.onIdentificationDone();
       // check if still connected after a possible await
       if (this.socket.connected) {
         this.socket.emit(
@@ -228,9 +327,7 @@ export class RemoteListener {
   }
   public async attachOwnedSearchListenerFor(request: IOwnedSearchRegisterRequest) {
     if (this.socket.connected) {
-      if (!this.isReady) {
-        await this.onIdentificationDone();
-      }
+      await this.onIdentificationDone();
       // check if still connected after a possible await
       if (this.socket.connected) {
         this.socket.emit(
@@ -242,9 +339,7 @@ export class RemoteListener {
   }
   public async attachParentedSearchListenerFor(request: IParentedSearchRegisterRequest) {
     if (this.socket.connected) {
-      if (!this.isReady) {
-        await this.onIdentificationDone();
-      }
+      await this.onIdentificationDone();
 
       // check if still connected after a possible await
       if (this.socket.connected) {
@@ -257,9 +352,7 @@ export class RemoteListener {
   }
   public async requestOwnedSearchFeedbackFor(request: IOwnedSearchFeedbackRequest) {
     if (this.socket.connected) {
-      if (!this.isReady) {
-        await this.onIdentificationDone();
-      }
+      await this.onIdentificationDone();
     
       // check if still connected after a possible await
       if (this.socket.connected) {
@@ -272,9 +365,7 @@ export class RemoteListener {
   }
   public async requestParentedSearchFeedbackFor(request: IParentedSearchFeedbackRequest) {
     if (this.socket.connected) {
-      if (!this.isReady) {
-        await this.onIdentificationDone();
-      }
+      await this.onIdentificationDone();
 
       // check if still connected after a possible await
       if (this.socket.connected) {
@@ -293,7 +384,9 @@ export class RemoteListener {
   ) {
     const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + createdBy;
     if (this.ownedSearchListeners[qualifiedIdentifier]) {
-      this.ownedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
+      if (!this.ownedSearchListeners[qualifiedIdentifier].callbacks.includes(callback)) {
+        this.ownedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
+      }
       return;
     }
 
@@ -320,7 +413,9 @@ export class RemoteListener {
     const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." +
       parentType + "." + parentId + "." + (parentVersion || "");
     if (this.parentedSearchListeners[qualifiedIdentifier]) {
-      this.parentedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
+      if (!this.parentedSearchListeners[qualifiedIdentifier].callbacks.includes(callback)) {
+        this.parentedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
+      }
       return;
     }
 
@@ -344,9 +439,7 @@ export class RemoteListener {
   ) {
     if (immediate) {
       if (this.socket.connected) {
-        if (!this.isReady) {
-          await this.onIdentificationDone();
-        }
+        await this.onIdentificationDone();
         if (this.socket.connected) {
           this.socket.emit(
             FEEDBACK_REQUEST,
@@ -503,7 +596,7 @@ export class RemoteListener {
   }
   private async consumeDelayedFeedbacks(anSpecificRequest?: IFeedbackRequest) {
     // we wait if not ready
-    if (this.socket.connected && !this.isReady) {
+    if (this.socket.connected) {
       await this.onIdentificationDone();
     }
 
@@ -548,6 +641,17 @@ export class RemoteListener {
   private async onConnect() {
     this.offline = false;
 
+    // we attach any detached requests, all of them are
+    // by doing it here we ensure that any subsequent add won't
+    // trigger twice due to the following wait
+    // the reason you can consider everything to be unattached
+    // is that the attachment can only occur during connection active
+    // so if there was no connection active while the adding was triggered
+    // it was added to the registry but not attached to it
+    // this is why we call the attached detached as soon as possible
+    // in oder to avoid any adding to happen after our identify request
+    this.attachDetacchedRequests();
+
     // so we attempt to reidentify as soon as we are connected
     if (this.hasSetToken && !this.isReady) {
       this.socket.emit(
@@ -569,47 +673,67 @@ export class RemoteListener {
 
     // if we survived that then we are ready
     this.isReady = true;
-    
-    // this prevents the request from triggering on the initial connection
-    // as setToken is expected to be called in order to set things to be ready
-    // this is more for reconnection purposes
-    if (this.isReconnect) {
-      this.onReconnect();
-    }
-
     this.connectionListeners.forEach((l) => l());
-
-    // next timethis runs will be considered reconnect
-    this.isReconnect = true;
   }
-  private onReconnect() {
+  private attachDetacchedRequests() {
+    // so we get the current time and calculate the difference
+    // from when this remote listener was initially setup
+    // to now
+    const curentTime = (new Date()).getTime();
+    const diffTime = curentTime - this.setupTime;
+    // we will only last for feedback if there's a difference larger
+    // than 3 seconds
+    const requiresFeedback = diffTime > 3000;
+    // this will ensure that when the socket connects fast, we don't need
+    // to ask for feedback to what is our fresh data, but when the socket takes a while
+    // maybe it was offline all along and then connects, then our data might be stale
+    // subsequent reconnects will always require feedback despite how short they are
+
+    // in the past this used to be a reconnnect action, it will only ask for feedback for a reconnect
+    // however the initial connect might be some kind of reconnect if it never really managed to
+    // connect, so this method should be better; while it's possible to ask always for feedback
+    // as it wouldn't hurt and remove this logic, this might most likely cause useless network usage
+    // however this also means that if something updates in that 3 second window, the client won't receive
+    // any updates of this, but this is something we can live with
+
     // now we reconnect the listeners again
     Object.keys(this.listeners).forEach((listenerKey) => {
       this.attachItemDefinitionListenerFor(this.listeners[listenerKey].request);
-      this.requestFeedbackFor(this.listeners[listenerKey].request, true);
+      if (requiresFeedback) {
+        this.requestFeedbackFor(this.listeners[listenerKey].request, true);
+      }
     });
 
+    // add the owned search listeners again
     Object.keys(this.ownedSearchListeners).forEach((listenerKey) => {
       this.attachOwnedSearchListenerFor(this.ownedSearchListeners[listenerKey].request);
 
-      const lastKnownRecordDate = this.ownedSearchListeners[listenerKey].lastKnownRecordDate;
-      this.requestOwnedSearchFeedbackFor({
-        ...this.ownedSearchListeners[listenerKey].request,
-        knownLastRecordDate: lastKnownRecordDate,
-      });
+      if (requiresFeedback) {
+        const lastKnownRecordDate = this.ownedSearchListeners[listenerKey].lastKnownRecordDate;
+        this.requestOwnedSearchFeedbackFor({
+          ...this.ownedSearchListeners[listenerKey].request,
+          knownLastRecordDate: lastKnownRecordDate,
+        });
+      }
     });
 
+    // and the parented search listeners as well
     Object.keys(this.parentedSearchListeners).forEach((listenerKey) => {
       this.attachParentedSearchListenerFor(this.parentedSearchListeners[listenerKey].request);
 
-      const lastKnownRecordDate = this.parentedSearchListeners[listenerKey].lastKnownRecordDate;
-      this.requestParentedSearchFeedbackFor({
-        ...this.parentedSearchListeners[listenerKey].request,
-        knownLastRecordDate: lastKnownRecordDate,
-      });
+      if (requiresFeedback) {
+        const lastKnownRecordDate = this.parentedSearchListeners[listenerKey].lastKnownRecordDate;
+        this.requestParentedSearchFeedbackFor({
+          ...this.parentedSearchListeners[listenerKey].request,
+          knownLastRecordDate: lastKnownRecordDate,
+        });
+      }
     });
 
-    this.triggerCurrencyFactorsHandler();
+    if (requiresFeedback) {
+      // and we check for the currency factors now
+      this.triggerCurrencyFactorsHandler();
+    }
   }
   private async onRecordsAddedToOwnedSearch(
     event: IOwnedSearchRecordsAddedEvent,

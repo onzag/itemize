@@ -1,6 +1,6 @@
 import React from "react";
 import Include, { IIncludeState, IncludeExclusionState } from "../../../../base/Root/Module/ItemDefinition/Include";
-import { ILocaleContextType, LocaleContext } from "../../app";
+import { ILocaleContextType, LocaleContext } from "../../providers/locale-provider";
 import { RendererContext } from "../../../providers/renderer";
 import equals from "deep-equal";
 import { IRendererProps } from "../../renderer";

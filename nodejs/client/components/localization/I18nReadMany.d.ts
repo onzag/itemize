@@ -7,7 +7,8 @@
 import React from "react";
 import { II18nReadErrorProps } from "./I18nReadError";
 import { II18nReadProps } from "./I18nRead";
-import { ILocaleContextType, IDataContextType } from "../../internal/app";
+import { ILocaleContextType } from "../../internal/providers/locale-provider";
+import { IDataContextType } from "../../internal/providers/appdata-provider";
 import { IModuleContextType } from "../../providers/module";
 import { IItemDefinitionContextType } from "../../providers/item-definition";
 import { IIncludeContext } from "../../providers/include";

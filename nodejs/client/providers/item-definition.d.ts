@@ -1,5 +1,5 @@
 import React from "react";
-import { ILocaleContextType } from "../internal/app";
+import { ILocaleContextType } from "../internal/providers/locale-provider";
 import ItemDefinition, { IItemDefinitionStateType } from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
@@ -330,7 +330,7 @@ interface IActualItemDefinitionProviderState extends IActualItemDefinitionProvid
  */
 export declare class ActualItemDefinitionProvider extends React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
     private isUnmounted;
-    private hasExecutedInitialSearch;
+    private preventSearchFeedbackOnPossibleStaleData;
     private lastLoadingForId;
     private lastLoadingForVersion;
     private lastLoadValuePromise;

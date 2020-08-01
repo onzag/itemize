@@ -1,5 +1,5 @@
 import React from "react";
-import { LocaleContext, ILocaleContextType } from "../internal/app";
+import { LocaleContext, ILocaleContextType } from "../internal/providers/locale-provider";
 import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition, { IPropertyDefinitionState } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
@@ -516,8 +516,7 @@ export class ActualItemDefinitionProvider extends
   // this variable is useful is async tasks like loadValue are still executing after
   // this component has unmounted, which is a memory leak
   private isUnmounted: boolean = false;
-  // this is for when the search has been executed initially in order to do SSR
-  private hasExecutedInitialSearch: boolean = false;
+  private preventSearchFeedbackOnPossibleStaleData: boolean = false;
 
   private lastLoadingForId: number = null;
   private lastLoadingForVersion: string = null;
@@ -2212,6 +2211,10 @@ export class ActualItemDefinitionProvider extends
     }
   }
   public async search(options: IActionSearchOptions): Promise<IActionResponseWithSearchResults> {
+    // we extract the hack variable
+    const preventSearchFeedbackOnPossibleStaleData = this.preventSearchFeedbackOnPossibleStaleData;
+    this.preventSearchFeedbackOnPossibleStaleData = false;
+    
     if (this.state.searching) {
       return null;
     }
@@ -2391,7 +2394,11 @@ export class ActualItemDefinitionProvider extends
       limit: options.limit,
       offset: options.offset,
       parentedBy,
-    }, this.props.remoteListener, this.onSearchReload);
+    }, {
+      remoteListener: this.props.remoteListener,
+      preventStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
+      onSearchUpdated: this.onSearchReload,
+    });
 
     const searchId = uuid.v4();
     if (error) {
@@ -2549,6 +2556,7 @@ export class ActualItemDefinitionProvider extends
     });
   }
   public onSearchReload() {
+    this.preventSearchFeedbackOnPossibleStaleData = true;
     this.search(this.lastOptionsUsedForSearch);
   }
   public removePossibleSearchListeners(

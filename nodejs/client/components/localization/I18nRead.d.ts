@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 import React from "react";
-import { ILocaleContextType } from "../../internal/app";
+import { ILocaleContextType } from "../../internal/providers/locale-provider";
 import Module from "../../../base/Root/Module";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import Include from "../../../base/Root/Module/ItemDefinition/Include";

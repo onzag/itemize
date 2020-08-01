@@ -10,14 +10,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const imported_resources_1 = require("../../../imported-resources");
-const app_1 = require("../../internal/app");
+const locale_provider_1 = require("../../internal/providers/locale-provider");
 /**
  * provides the current country and allows to change them
  * @param props the country retriever props
  * @returns a react node
  */
 function AppCountryRetriever(props) {
-    return (react_1.default.createElement(app_1.LocaleContext.Consumer, null, (localeContext) => {
+    return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeContext) => {
         return props.children({
             currentCountry: imported_resources_1.countries[localeContext.country.toUpperCase()] || {
                 name: "?",
